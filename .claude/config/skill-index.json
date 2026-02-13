@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-13T18:23:55.899Z",
+  "generatedAt": "2026-02-13T09:22:55.507Z",
   "metadata": {
     "totalSkills": 199,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-13T18:23:55.900Z",
+    "lastValidated": "2026-02-13T09:22:55.508Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md"
   },
   "skills": {
@@ -15,14 +15,7 @@
       "category": "Testing",
       "domain": "development",
       "description": "Testing - tdd",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
       "agentPrimary": [
         "developer",
         "qa",
@@ -43,11 +36,7 @@
         "code-reviewer"
       ],
       "agentSupporting": [],
-      "tags": [
-        "development",
-        "testing",
-        "tdd"
-      ],
+      "tags": ["development", "testing", "tdd"],
       "priority": 1
     },
     "debugging": {
@@ -56,14 +45,7 @@
       "category": "Troubleshooting",
       "domain": "development",
       "description": "Troubleshooting - debugging",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
       "agentPrimary": [
         "developer",
         "python-pro",
@@ -82,11 +64,7 @@
         "incident-responder",
         "reverse-engineer"
       ],
-      "tags": [
-        "development",
-        "troubleshooting",
-        "debugging"
-      ],
+      "tags": ["development", "troubleshooting", "debugging"],
       "priority": 1
     },
     "code-quality-expert": {
@@ -95,27 +73,10 @@
       "category": "Code Quality",
       "domain": "development",
       "description": "Code Quality - code-quality-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "code-reviewer"
-      ],
-      "agentSupporting": [
-        "developer",
-        "rust-pro",
-        "typescript-pro"
-      ],
-      "tags": [
-        "development",
-        "code-quality",
-        "code-quality-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["code-reviewer"],
+      "agentSupporting": ["developer", "rust-pro", "typescript-pro"],
+      "tags": ["development", "code-quality", "code-quality-expert"],
       "priority": 1
     },
     "ripgrep": {
@@ -124,20 +85,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - ripgrep",
-      "requiredTools": [
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer"
-      ],
-      "tags": [
-        "development",
-        "other",
-        "ripgrep"
-      ],
+      "requiredTools": ["Bash"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["developer"],
+      "tags": ["development", "other", "ripgrep"],
       "priority": 3
     },
     "code-analyzer": {
@@ -146,27 +97,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - code-analyzer",
-      "requiredTools": [
-        "Bash",
-        "Read",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "code-reviewer",
-        "c4-code"
-      ],
-      "agentSupporting": [
-        "developer",
-        "qa",
-        "c4-component",
-        "reverse-engineer"
-      ],
-      "tags": [
-        "development",
-        "other",
-        "code-analyzer"
-      ],
+      "requiredTools": ["Bash", "Read", "Glob", "Grep"],
+      "agentPrimary": ["code-reviewer", "c4-code"],
+      "agentSupporting": ["developer", "qa", "c4-component", "reverse-engineer"],
+      "tags": ["development", "other", "code-analyzer"],
       "priority": 1
     },
     "code-style-validator": {
@@ -175,24 +109,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - code-style-validator",
-      "requiredTools": [
-        "Read",
-        "Grep",
-        "Bash",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer",
-        "code-reviewer"
-      ],
-      "tags": [
-        "development",
-        "other",
-        "code-style-validator"
-      ],
+      "requiredTools": ["Read", "Grep", "Bash", "Glob"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["developer", "code-reviewer"],
+      "tags": ["development", "other", "code-style-validator"],
       "priority": 3
     },
     "async-operations": {
@@ -201,20 +121,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - async-operations",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "development",
-        "other",
-        "async-operations"
-      ],
+      "tags": ["development", "other", "async-operations"],
       "priority": 3
     },
     "logging-module-usage": {
@@ -223,20 +133,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - logging-module-usage",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "development",
-        "other",
-        "logging-module-usage"
-      ],
+      "tags": ["development", "other", "logging-module-usage"],
       "priority": 3
     },
     "library-usage": {
@@ -245,20 +145,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - library-usage",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "development",
-        "other",
-        "library-usage"
-      ],
+      "tags": ["development", "other", "library-usage"],
       "priority": 3
     },
     "comprehensive-unit-testing-with-pytest": {
@@ -267,23 +157,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - comprehensive-unit-testing-with-pytest",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer",
-        "qa"
-      ],
-      "tags": [
-        "development",
-        "other",
-        "comprehensive-unit-testing-with-pytest"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["developer", "qa"],
+      "tags": ["development", "other", "comprehensive-unit-testing-with-pytest"],
       "priority": 3
     },
     "unit-testing-requirement": {
@@ -292,20 +169,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - unit-testing-requirement",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "development",
-        "other",
-        "unit-testing-requirement"
-      ],
+      "tags": ["development", "other", "unit-testing-requirement"],
       "priority": 3
     },
     "test-generator": {
@@ -314,20 +181,10 @@
       "category": "Other",
       "domain": "development",
       "description": "Other - test-generator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "qa"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["qa"],
       "agentSupporting": [],
-      "tags": [
-        "development",
-        "other",
-        "test-generator"
-      ],
+      "tags": ["development", "other", "test-generator"],
       "priority": 1
     },
     "security-architect": {
@@ -336,17 +193,8 @@
       "category": "Security",
       "domain": "security",
       "description": "Security - security-architect",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "security-architect"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["security-architect"],
       "agentSupporting": [
         "developer",
         "architect",
@@ -356,11 +204,7 @@
         "incident-responder",
         "reverse-engineer"
       ],
-      "tags": [
-        "security",
-        "security",
-        "security-architect"
-      ],
+      "tags": ["security", "security", "security-architect"],
       "priority": 1
     },
     "auth-security-expert": {
@@ -369,25 +213,10 @@
       "category": "Security",
       "domain": "security",
       "description": "Security - auth-security-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "security-architect"
-      ],
-      "agentSupporting": [
-        "fastapi-pro"
-      ],
-      "tags": [
-        "security",
-        "security",
-        "auth-security-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["security-architect"],
+      "agentSupporting": ["fastapi-pro"],
+      "tags": ["security", "security", "auth-security-expert"],
       "priority": 1
     },
     "memory-forensics": {
@@ -396,24 +225,10 @@
       "category": "Other",
       "domain": "security",
       "description": "Other - memory-forensics",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "reverse-engineer"
-      ],
-      "agentSupporting": [
-        "rust-pro",
-        "security-architect",
-        "incident-responder"
-      ],
-      "tags": [
-        "security",
-        "other",
-        "memory-forensics"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["reverse-engineer"],
+      "agentSupporting": ["rust-pro", "security-architect", "incident-responder"],
+      "tags": ["security", "other", "memory-forensics"],
       "priority": 1
     },
     "binary-analysis-patterns": {
@@ -422,22 +237,10 @@
       "category": "Other",
       "domain": "security",
       "description": "Other - binary-analysis-patterns",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "reverse-engineer"
-      ],
-      "agentSupporting": [
-        "security-architect"
-      ],
-      "tags": [
-        "security",
-        "other",
-        "binary-analysis-patterns"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["reverse-engineer"],
+      "agentSupporting": ["security-architect"],
+      "tags": ["security", "other", "binary-analysis-patterns"],
       "priority": 1
     },
     "protocol-reverse-engineering": {
@@ -446,22 +249,10 @@
       "category": "Other",
       "domain": "security",
       "description": "Other - protocol-reverse-engineering",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "reverse-engineer"
-      ],
-      "agentSupporting": [
-        "reverse-engineer"
-      ],
-      "tags": [
-        "security",
-        "other",
-        "protocol-reverse-engineering"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["reverse-engineer"],
+      "agentSupporting": ["reverse-engineer"],
+      "tags": ["security", "other", "protocol-reverse-engineering"],
       "priority": 1
     },
     "authentication-flow-rules": {
@@ -470,22 +261,10 @@
       "category": "Other",
       "domain": "security",
       "description": "Other - authentication-flow-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "security-architect"
-      ],
-      "agentSupporting": [
-        "fastapi-pro"
-      ],
-      "tags": [
-        "security",
-        "other",
-        "authentication-flow-rules"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["security-architect"],
+      "agentSupporting": ["fastapi-pro"],
+      "tags": ["security", "other", "authentication-flow-rules"],
       "priority": 1
     },
     "plan-generator": {
@@ -494,21 +273,10 @@
       "category": "Planning",
       "domain": "planning",
       "description": "Planning - plan-generator",
-      "requiredTools": [
-        "Read",
-        "Write"
-      ],
-      "agentPrimary": [
-        "planner",
-        "pm",
-        "master-orchestrator"
-      ],
+      "requiredTools": ["Read", "Write"],
+      "agentPrimary": ["planner", "pm", "master-orchestrator"],
       "agentSupporting": [],
-      "tags": [
-        "planning",
-        "planning",
-        "plan-generator"
-      ],
+      "tags": ["planning", "planning", "plan-generator"],
       "priority": 1
     },
     "task-breakdown": {
@@ -527,15 +295,9 @@
         "Grep",
         "Glob"
       ],
-      "agentPrimary": [
-        "planner"
-      ],
+      "agentPrimary": ["planner"],
       "agentSupporting": [],
-      "tags": [
-        "planning",
-        "planning",
-        "task-breakdown"
-      ],
+      "tags": ["planning", "planning", "task-breakdown"],
       "priority": 1
     },
     "brainstorming": {
@@ -544,24 +306,10 @@
       "category": "Other",
       "domain": "planning",
       "description": "Other - brainstorming",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "planner",
-        "architect",
-        "pm"
-      ],
-      "tags": [
-        "planning",
-        "other",
-        "brainstorming"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["planner", "architect", "pm"],
+      "tags": ["planning", "other", "brainstorming"],
       "priority": 3
     },
     "complexity-assessment": {
@@ -570,22 +318,10 @@
       "category": "Other",
       "domain": "planning",
       "description": "Other - complexity-assessment",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "planner",
-        "pm",
-        "router"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["planner", "pm", "router"],
       "agentSupporting": [],
-      "tags": [
-        "planning",
-        "other",
-        "complexity-assessment"
-      ],
+      "tags": ["planning", "other", "complexity-assessment"],
       "priority": 1
     },
     "strategic-planning-with-pseudocode": {
@@ -594,20 +330,10 @@
       "category": "Other",
       "domain": "planning",
       "description": "Other - strategic-planning-with-pseudocode",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "planning",
-        "other",
-        "strategic-planning-with-pseudocode"
-      ],
+      "tags": ["planning", "other", "strategic-planning-with-pseudocode"],
       "priority": 3
     },
     "architecture-review": {
@@ -616,29 +342,10 @@
       "category": "Architecture",
       "domain": "architecture",
       "description": "Architecture - architecture-review",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "architect",
-        "devops",
-        "c4-context",
-        "c4-container",
-        "c4-component"
-      ],
-      "agentSupporting": [
-        "technical-writer",
-        "database-architect"
-      ],
-      "tags": [
-        "architecture",
-        "architecture",
-        "architecture-review"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Glob", "Grep"],
+      "agentPrimary": ["architect", "devops", "c4-context", "c4-container", "c4-component"],
+      "agentSupporting": ["technical-writer", "database-architect"],
+      "tags": ["architecture", "architecture", "architecture-review"],
       "priority": 1
     },
     "diagram-generator": {
@@ -647,29 +354,10 @@
       "category": "Architecture",
       "domain": "architecture",
       "description": "Architecture - diagram-generator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "architect",
-        "c4-context",
-        "c4-container",
-        "c4-component",
-        "c4-code"
-      ],
-      "agentSupporting": [
-        "planner",
-        "technical-writer",
-        "database-architect"
-      ],
-      "tags": [
-        "architecture",
-        "architecture",
-        "diagram-generator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash"],
+      "agentPrimary": ["architect", "c4-context", "c4-container", "c4-component", "c4-code"],
+      "agentSupporting": ["planner", "technical-writer", "database-architect"],
+      "tags": ["architecture", "architecture", "diagram-generator"],
       "priority": 1
     },
     "research-synthesis": {
@@ -678,23 +366,10 @@
       "category": "Research",
       "domain": "research",
       "description": "Research - research-synthesis",
-      "requiredTools": [
-        "WebSearch",
-        "WebFetch",
-        "Read",
-        "Write",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "evolution-orchestrator"
-      ],
+      "requiredTools": ["WebSearch", "WebFetch", "Read", "Write", "Glob", "Grep"],
+      "agentPrimary": ["evolution-orchestrator"],
       "agentSupporting": [],
-      "tags": [
-        "research",
-        "research",
-        "research-synthesis"
-      ],
+      "tags": ["research", "research", "research-synthesis"],
       "priority": 1
     },
     "arxiv-mcp": {
@@ -703,20 +378,10 @@
       "category": "Research",
       "domain": "research",
       "description": "Research - arxiv-mcp",
-      "requiredTools": [
-        "WebSearch",
-        "WebFetch",
-        "Read"
-      ],
-      "agentPrimary": [
-        "researcher"
-      ],
+      "requiredTools": ["WebSearch", "WebFetch", "Read"],
+      "agentPrimary": ["researcher"],
       "agentSupporting": [],
-      "tags": [
-        "research",
-        "research",
-        "arxiv-mcp"
-      ],
+      "tags": ["research", "research", "arxiv-mcp"],
       "priority": 1
     },
     "context-compressor": {
@@ -725,24 +390,10 @@
       "category": "Memory",
       "domain": "memory",
       "description": "Memory - context-compressor",
-      "requiredTools": [
-        "Read",
-        "Write"
-      ],
-      "agentPrimary": [
-        "context-compressor",
-        "devops"
-      ],
-      "agentSupporting": [
-        "developer",
-        "planner",
-        "swarm-coordinator"
-      ],
-      "tags": [
-        "memory",
-        "memory",
-        "context-compressor"
-      ],
+      "requiredTools": ["Read", "Write"],
+      "agentPrimary": ["context-compressor", "devops"],
+      "agentSupporting": ["developer", "planner", "swarm-coordinator"],
+      "tags": ["memory", "memory", "context-compressor"],
       "priority": 1
     },
     "session-handoff": {
@@ -751,21 +402,10 @@
       "category": "Memory",
       "domain": "memory",
       "description": "Memory - session-handoff",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "context-compressor"
-      ],
+      "requiredTools": ["Read", "Write", "Glob", "Grep"],
+      "agentPrimary": ["context-compressor"],
       "agentSupporting": [],
-      "tags": [
-        "memory",
-        "memory",
-        "session-handoff"
-      ],
+      "tags": ["memory", "memory", "session-handoff"],
       "priority": 1
     },
     "operational-modes": {
@@ -774,20 +414,10 @@
       "category": "Other",
       "domain": "memory",
       "description": "Other - operational-modes",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "operational-modes"
-      ],
+      "tags": ["memory", "other", "operational-modes"],
       "priority": 3
     },
     "recovery": {
@@ -796,22 +426,10 @@
       "category": "Other",
       "domain": "memory",
       "description": "Other - recovery",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "master-orchestrator"
-      ],
-      "tags": [
-        "memory",
-        "other",
-        "recovery"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["master-orchestrator"],
+      "tags": ["memory", "other", "recovery"],
       "priority": 3
     },
     "project-onboarding": {
@@ -820,20 +438,10 @@
       "category": "Other",
       "domain": "memory",
       "description": "Other - project-onboarding",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "project-onboarding"
-      ],
+      "tags": ["memory", "other", "project-onboarding"],
       "priority": 3
     },
     "project-analyzer": {
@@ -842,26 +450,10 @@
       "category": "Other",
       "domain": "memory",
       "description": "Other - project-analyzer",
-      "requiredTools": [
-        "Read",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "architect",
-        "c4-context",
-        "c4-container",
-        "conductor-validator"
-      ],
-      "tags": [
-        "memory",
-        "other",
-        "project-analyzer"
-      ],
+      "requiredTools": ["Read", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["architect", "c4-context", "c4-container", "conductor-validator"],
+      "tags": ["memory", "other", "project-analyzer"],
       "priority": 3
     },
     "context-driven-development": {
@@ -870,20 +462,10 @@
       "category": "Other",
       "domain": "memory",
       "description": "Other - context-driven-development",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "conductor-validator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["conductor-validator"],
       "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "context-driven-development"
-      ],
+      "tags": ["memory", "other", "context-driven-development"],
       "priority": 1
     },
     "context-files-rules": {
@@ -892,20 +474,10 @@
       "category": "Other",
       "domain": "memory",
       "description": "Other - context-files-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "context-files-rules"
-      ],
+      "tags": ["memory", "other", "context-files-rules"],
       "priority": 3
     },
     "history-and-next-task-rules": {
@@ -914,20 +486,10 @@
       "category": "Other",
       "domain": "memory",
       "description": "Other - history-and-next-task-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "history-and-next-task-rules"
-      ],
+      "tags": ["memory", "other", "history-and-next-task-rules"],
       "priority": 3
     },
     "qa-workflow": {
@@ -936,25 +498,10 @@
       "category": "Quality",
       "domain": "quality",
       "description": "Quality - qa-workflow",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "qa"
-      ],
-      "tags": [
-        "quality",
-        "quality",
-        "qa-workflow"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["qa"],
+      "tags": ["quality", "quality", "qa-workflow"],
       "priority": 3
     },
     "verification-before-completion": {
@@ -963,10 +510,7 @@
       "category": "Quality",
       "domain": "quality",
       "description": "Quality - verification-before-completion",
-      "requiredTools": [
-        "Read",
-        "Bash"
-      ],
+      "requiredTools": ["Read", "Bash"],
       "agentPrimary": [
         "developer",
         "architect",
@@ -1006,11 +550,7 @@
         "evolution-orchestrator"
       ],
       "agentSupporting": [],
-      "tags": [
-        "quality",
-        "quality",
-        "verification-before-completion"
-      ],
+      "tags": ["quality", "quality", "verification-before-completion"],
       "priority": 1
     },
     "checklist-generator": {
@@ -1019,24 +559,10 @@
       "category": "Quality",
       "domain": "quality",
       "description": "Quality - checklist-generator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "qa"
-      ],
-      "tags": [
-        "quality",
-        "quality",
-        "checklist-generator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Glob", "Grep"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["qa"],
+      "tags": ["quality", "quality", "checklist-generator"],
       "priority": 3
     },
     "response-rater": {
@@ -1045,20 +571,10 @@
       "category": "Other",
       "domain": "quality",
       "description": "Other - response-rater",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "master-orchestrator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["master-orchestrator"],
       "agentSupporting": [],
-      "tags": [
-        "quality",
-        "other",
-        "response-rater"
-      ],
+      "tags": ["quality", "other", "response-rater"],
       "priority": 1
     },
     "verify-information-rule": {
@@ -1067,20 +583,10 @@
       "category": "Other",
       "domain": "quality",
       "description": "Other - verify-information-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "quality",
-        "other",
-        "verify-information-rule"
-      ],
+      "tags": ["quality", "other", "verify-information-rule"],
       "priority": 3
     },
     "thoughtful-and-accurate-responses": {
@@ -1089,20 +595,10 @@
       "category": "Other",
       "domain": "quality",
       "description": "Other - thoughtful-and-accurate-responses",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "quality",
-        "other",
-        "thoughtful-and-accurate-responses"
-      ],
+      "tags": ["quality", "other", "thoughtful-and-accurate-responses"],
       "priority": 3
     },
     "truthfulness-and-clarity-for-ai": {
@@ -1111,20 +607,10 @@
       "category": "Other",
       "domain": "quality",
       "description": "Other - truthfulness-and-clarity-for-ai",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "quality",
-        "other",
-        "truthfulness-and-clarity-for-ai"
-      ],
+      "tags": ["quality", "other", "truthfulness-and-clarity-for-ai"],
       "priority": 3
     },
     "handle-incomplete-tasks": {
@@ -1133,20 +619,10 @@
       "category": "Other",
       "domain": "quality",
       "description": "Other - handle-incomplete-tasks",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "quality",
-        "other",
-        "handle-incomplete-tasks"
-      ],
+      "tags": ["quality", "other", "handle-incomplete-tasks"],
       "priority": 3
     },
     "continuous-improvement-focus": {
@@ -1155,20 +631,10 @@
       "category": "Other",
       "domain": "quality",
       "description": "Other - continuous-improvement-focus",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "quality",
-        "other",
-        "continuous-improvement-focus"
-      ],
+      "tags": ["quality", "other", "continuous-improvement-focus"],
       "priority": 3
     },
     "git-expert": {
@@ -1177,29 +643,10 @@
       "category": "Version Control",
       "domain": "git",
       "description": "Version Control - git-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "developer",
-        "rust-pro",
-        "devops"
-      ],
-      "agentSupporting": [
-        "python-pro",
-        "golang-pro",
-        "typescript-pro"
-      ],
-      "tags": [
-        "git",
-        "version-control",
-        "git-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["developer", "rust-pro", "devops"],
+      "agentSupporting": ["python-pro", "golang-pro", "typescript-pro"],
+      "tags": ["git", "version-control", "git-expert"],
       "priority": 1
     },
     "gitflow": {
@@ -1208,20 +655,10 @@
       "category": "Version Control",
       "domain": "git",
       "description": "Version Control - gitflow",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "git",
-        "version-control",
-        "gitflow"
-      ],
+      "tags": ["git", "version-control", "gitflow"],
       "priority": 3
     },
     "commit-validator": {
@@ -1230,22 +667,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - commit-validator",
-      "requiredTools": [
-        "Read",
-        "Grep",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer"
-      ],
-      "tags": [
-        "git",
-        "other",
-        "commit-validator"
-      ],
+      "requiredTools": ["Read", "Grep", "Bash"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["developer"],
+      "tags": ["git", "other", "commit-validator"],
       "priority": 3
     },
     "smart-revert": {
@@ -1254,25 +679,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - smart-revert",
-      "requiredTools": [
-        "Read",
-        "Bash",
-        "Glob",
-        "Grep",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer"
-      ],
-      "tags": [
-        "git",
-        "other",
-        "smart-revert"
-      ],
+      "requiredTools": ["Read", "Bash", "Glob", "Grep", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["developer"],
+      "tags": ["git", "other", "smart-revert"],
       "priority": 3
     },
     "commit-message-guidelines": {
@@ -1281,20 +691,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - commit-message-guidelines",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "git",
-        "other",
-        "commit-message-guidelines"
-      ],
+      "tags": ["git", "other", "commit-message-guidelines"],
       "priority": 3
     },
     "version-control-rule": {
@@ -1303,20 +703,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - version-control-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "git",
-        "other",
-        "version-control-rule"
-      ],
+      "tags": ["git", "other", "version-control-rule"],
       "priority": 3
     },
     "collaboration-and-version-control-rules": {
@@ -1325,20 +715,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - collaboration-and-version-control-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "git",
-        "other",
-        "collaboration-and-version-control-rules"
-      ],
+      "tags": ["git", "other", "collaboration-and-version-control-rules"],
       "priority": 3
     },
     "using-git-worktrees": {
@@ -1347,20 +727,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - using-git-worktrees",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "git",
-        "other",
-        "using-git-worktrees"
-      ],
+      "tags": ["git", "other", "using-git-worktrees"],
       "priority": 3
     },
     "gitops-workflow": {
@@ -1369,22 +739,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - gitops-workflow",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "devops"
-      ],
-      "tags": [
-        "git",
-        "other",
-        "gitops-workflow"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["devops"],
+      "tags": ["git", "other", "gitops-workflow"],
       "priority": 3
     },
     "finishing-a-development-branch": {
@@ -1393,20 +751,10 @@
       "category": "Other",
       "domain": "git",
       "description": "Other - finishing-a-development-branch",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "git",
-        "other",
-        "finishing-a-development-branch"
-      ],
+      "tags": ["git", "other", "finishing-a-development-branch"],
       "priority": 3
     },
     "github-mcp": {
@@ -1415,20 +763,10 @@
       "category": "Integration",
       "domain": "integration",
       "description": "Integration - github-mcp",
-      "requiredTools": [
-        "Read",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer",
-        "devops"
-      ],
+      "requiredTools": ["Read", "Bash"],
+      "agentPrimary": ["developer", "devops"],
       "agentSupporting": [],
-      "tags": [
-        "integration",
-        "integration",
-        "github-mcp"
-      ],
+      "tags": ["integration", "integration", "github-mcp"],
       "priority": 1
     },
     "chrome-browser": {
@@ -1437,22 +775,10 @@
       "category": "Integration",
       "domain": "integration",
       "description": "Integration - chrome-browser",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "WebFetch"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "qa"
-      ],
-      "tags": [
-        "integration",
-        "integration",
-        "chrome-browser"
-      ],
+      "requiredTools": ["Read", "Write", "WebFetch"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["qa"],
+      "tags": ["integration", "integration", "chrome-browser"],
       "priority": 3
     },
     "slack-notifications": {
@@ -1461,20 +787,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - slack-notifications",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "integration",
-        "other",
-        "slack-notifications"
-      ],
+      "tags": ["integration", "other", "slack-notifications"],
       "priority": 3
     },
     "github-ops": {
@@ -1483,22 +799,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - github-ops",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer"
-      ],
-      "tags": [
-        "integration",
-        "other",
-        "github-ops"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["developer"],
+      "tags": ["integration", "other", "github-ops"],
       "priority": 3
     },
     "jira-pm": {
@@ -1507,22 +811,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - jira-pm",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "pm"
-      ],
-      "tags": [
-        "integration",
-        "other",
-        "jira-pm"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["pm"],
+      "tags": ["integration", "other", "jira-pm"],
       "priority": 3
     },
     "linear-pm": {
@@ -1531,22 +823,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - linear-pm",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "pm"
-      ],
-      "tags": [
-        "integration",
-        "other",
-        "linear-pm"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["pm"],
+      "tags": ["integration", "other", "linear-pm"],
       "priority": 3
     },
     "computer-use": {
@@ -1555,20 +835,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - computer-use",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "integration",
-        "other",
-        "computer-use"
-      ],
+      "tags": ["integration", "other", "computer-use"],
       "priority": 3
     },
     "telegram-bot-api-rules": {
@@ -1577,20 +847,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - telegram-bot-api-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "integration",
-        "other",
-        "telegram-bot-api-rules"
-      ],
+      "tags": ["integration", "other", "telegram-bot-api-rules"],
       "priority": 3
     },
     "agp-router-rules": {
@@ -1599,20 +859,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - agp-router-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "integration",
-        "other",
-        "agp-router-rules"
-      ],
+      "tags": ["integration", "other", "agp-router-rules"],
       "priority": 3
     },
     "web3-expert": {
@@ -1621,22 +871,10 @@
       "category": "Other",
       "domain": "integration",
       "description": "Other - web3-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "security-architect"
-      ],
-      "tags": [
-        "integration",
-        "other",
-        "web3-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["security-architect"],
+      "tags": ["integration", "other", "web3-expert"],
       "priority": 3
     },
     "aws-cloud-ops": {
@@ -1645,22 +883,10 @@
       "category": "DevOps",
       "domain": "devops",
       "description": "DevOps - aws-cloud-ops",
-      "requiredTools": [
-        "Bash",
-        "Read"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "devops",
-        "devops-troubleshooter"
-      ],
-      "tags": [
-        "devops",
-        "devops",
-        "aws-cloud-ops"
-      ],
+      "requiredTools": ["Bash", "Read"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["devops", "devops-troubleshooter"],
+      "tags": ["devops", "devops", "aws-cloud-ops"],
       "priority": 3
     },
     "docker-compose": {
@@ -1669,21 +895,10 @@
       "category": "DevOps",
       "domain": "devops",
       "description": "DevOps - docker-compose",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "devops",
-        "devops-troubleshooter"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["devops", "devops-troubleshooter"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "devops",
-        "docker-compose"
-      ],
+      "tags": ["devops", "devops", "docker-compose"],
       "priority": 1
     },
     "kubernetes-flux": {
@@ -1692,20 +907,10 @@
       "category": "DevOps",
       "domain": "devops",
       "description": "DevOps - kubernetes-flux",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "devops"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["devops"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "devops",
-        "kubernetes-flux"
-      ],
+      "tags": ["devops", "devops", "kubernetes-flux"],
       "priority": 1
     },
     "terraform-infra": {
@@ -1714,20 +919,10 @@
       "category": "DevOps",
       "domain": "devops",
       "description": "DevOps - terraform-infra",
-      "requiredTools": [
-        "Bash",
-        "Read",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "devops"
-      ],
+      "requiredTools": ["Bash", "Read", "Glob"],
+      "agentPrimary": ["devops"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "devops",
-        "terraform-infra"
-      ],
+      "tags": ["devops", "devops", "terraform-infra"],
       "priority": 1
     },
     "container-expert": {
@@ -1736,20 +931,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - container-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "c4-container"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["c4-container"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "other",
-        "container-expert"
-      ],
+      "tags": ["devops", "other", "container-expert"],
       "priority": 1
     },
     "cloud-devops-expert": {
@@ -1758,20 +943,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - cloud-devops-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "other",
-        "cloud-devops-expert"
-      ],
+      "tags": ["devops", "other", "cloud-devops-expert"],
       "priority": 3
     },
     "cloud-native-and-kubernetes-expertise-rules": {
@@ -1780,20 +955,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - cloud-native-and-kubernetes-expertise-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "other",
-        "cloud-native-and-kubernetes-expertise-rules"
-      ],
+      "tags": ["devops", "other", "cloud-native-and-kubernetes-expertise-rules"],
       "priority": 3
     },
     "containerization-rules": {
@@ -1802,20 +967,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - containerization-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "devops"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["devops"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "other",
-        "containerization-rules"
-      ],
+      "tags": ["devops", "other", "containerization-rules"],
       "priority": 1
     },
     "k8s-manifest-generator": {
@@ -1824,21 +979,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - k8s-manifest-generator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "devops",
-        "devops-troubleshooter"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["devops", "devops-troubleshooter"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "other",
-        "k8s-manifest-generator"
-      ],
+      "tags": ["devops", "other", "k8s-manifest-generator"],
       "priority": 1
     },
     "k8s-security-policies": {
@@ -1847,22 +991,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - k8s-security-policies",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "devops"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "k8s-security-policies"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["devops"],
+      "tags": ["devops", "other", "k8s-security-policies"],
       "priority": 3
     },
     "helm-chart-scaffolding": {
@@ -1871,22 +1003,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - helm-chart-scaffolding",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "devops"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "helm-chart-scaffolding"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["devops"],
+      "tags": ["devops", "other", "helm-chart-scaffolding"],
       "priority": 3
     },
     "gcloud-cli": {
@@ -1895,23 +1015,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - gcloud-cli",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "devops",
-        "devops-troubleshooter"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "gcloud-cli"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["devops", "devops-troubleshooter"],
+      "tags": ["devops", "other", "gcloud-cli"],
       "priority": 3
     },
     "sentry-monitoring": {
@@ -1920,23 +1027,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - sentry-monitoring",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "devops",
-        "incident-responder"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "sentry-monitoring"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["devops", "incident-responder"],
+      "tags": ["devops", "other", "sentry-monitoring"],
       "priority": 3
     },
     "ci-cd-implementation-rule": {
@@ -1945,22 +1039,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - ci-cd-implementation-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "devops"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "ci-cd-implementation-rule"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["devops"],
+      "tags": ["devops", "other", "ci-cd-implementation-rule"],
       "priority": 3
     },
     "incident-runbook-templates": {
@@ -1969,22 +1051,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - incident-runbook-templates",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "incident-responder"
-      ],
-      "agentSupporting": [
-        "devops-troubleshooter"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "incident-runbook-templates"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["incident-responder"],
+      "agentSupporting": ["devops-troubleshooter"],
+      "tags": ["devops", "other", "incident-runbook-templates"],
       "priority": 1
     },
     "on-call-handoff-patterns": {
@@ -1993,22 +1063,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - on-call-handoff-patterns",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "incident-responder"
-      ],
-      "agentSupporting": [
-        "devops-troubleshooter"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "on-call-handoff-patterns"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["incident-responder"],
+      "agentSupporting": ["devops-troubleshooter"],
+      "tags": ["devops", "other", "on-call-handoff-patterns"],
       "priority": 1
     },
     "postmortem-writing": {
@@ -2017,22 +1075,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - postmortem-writing",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "incident-responder"
-      ],
-      "agentSupporting": [
-        "devops-troubleshooter"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "postmortem-writing"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["incident-responder"],
+      "agentSupporting": ["devops-troubleshooter"],
+      "tags": ["devops", "other", "postmortem-writing"],
       "priority": 1
     },
     "configuration-management": {
@@ -2041,20 +1087,10 @@
       "category": "Other",
       "domain": "devops",
       "description": "Other - configuration-management",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "devops",
-        "other",
-        "configuration-management"
-      ],
+      "tags": ["devops", "other", "configuration-management"],
       "priority": 3
     },
     "python-backend-expert": {
@@ -2063,27 +1099,10 @@
       "category": "Languages",
       "domain": "languages",
       "description": "Languages - python-backend-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "python-pro",
-        "fastapi-pro",
-        "data-engineer"
-      ],
-      "agentSupporting": [
-        "developer"
-      ],
-      "tags": [
-        "languages",
-        "languages",
-        "python-backend-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["python-pro", "fastapi-pro", "data-engineer"],
+      "agentSupporting": ["developer"],
+      "tags": ["languages", "languages", "python-backend-expert"],
       "priority": 1
     },
     "typescript-expert": {
@@ -2092,14 +1111,7 @@
       "category": "Languages",
       "domain": "languages",
       "description": "Languages - typescript-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
       "agentPrimary": [
         "typescript-pro",
         "nodejs-pro",
@@ -2107,15 +1119,8 @@
         "sveltekit-expert",
         "tauri-desktop-developer"
       ],
-      "agentSupporting": [
-        "developer",
-        "graphql-pro"
-      ],
-      "tags": [
-        "languages",
-        "languages",
-        "typescript-expert"
-      ],
+      "agentSupporting": ["developer", "graphql-pro"],
+      "tags": ["languages", "languages", "typescript-expert"],
       "priority": 1
     },
     "go-expert": {
@@ -2124,23 +1129,10 @@
       "category": "Languages",
       "domain": "languages",
       "description": "Languages - go-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "golang-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["golang-pro"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "languages",
-        "go-expert"
-      ],
+      "tags": ["languages", "languages", "go-expert"],
       "priority": 1
     },
     "java-expert": {
@@ -2149,20 +1141,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - java-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "java-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["java-pro"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "java-expert"
-      ],
+      "tags": ["languages", "other", "java-expert"],
       "priority": 1
     },
     "php-expert": {
@@ -2171,20 +1153,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - php-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "php-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["php-pro"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "php-expert"
-      ],
+      "tags": ["languages", "other", "php-expert"],
       "priority": 1
     },
     "nodejs-expert": {
@@ -2193,22 +1165,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - nodejs-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "nodejs-pro"
-      ],
-      "agentSupporting": [
-        "typescript-pro"
-      ],
-      "tags": [
-        "languages",
-        "other",
-        "nodejs-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["nodejs-pro"],
+      "agentSupporting": ["typescript-pro"],
+      "tags": ["languages", "other", "nodejs-expert"],
       "priority": 1
     },
     "elixir-expert": {
@@ -2217,20 +1177,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - elixir-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "elixir-expert"
-      ],
+      "tags": ["languages", "other", "elixir-expert"],
       "priority": 3
     },
     "cpp": {
@@ -2239,20 +1189,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - cpp",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "cpp"
-      ],
+      "tags": ["languages", "other", "cpp"],
       "priority": 3
     },
     "prioritize-python-3-10-features": {
@@ -2261,20 +1201,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - prioritize-python-3-10-features",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "prioritize-python-3-10-features"
-      ],
+      "tags": ["languages", "other", "prioritize-python-3-10-features"],
       "priority": 3
     },
     "comprehensive-type-annotations": {
@@ -2283,20 +1213,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - comprehensive-type-annotations",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "comprehensive-type-annotations"
-      ],
+      "tags": ["languages", "other", "comprehensive-type-annotations"],
       "priority": 3
     },
     "type-hinting-rule": {
@@ -2305,20 +1225,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - type-hinting-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "type-hinting-rule"
-      ],
+      "tags": ["languages", "other", "type-hinting-rule"],
       "priority": 3
     },
     "asynchronous-programming-preference": {
@@ -2327,23 +1237,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - asynchronous-programming-preference",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "rust-pro",
-        "fastapi-pro"
-      ],
-      "tags": [
-        "languages",
-        "other",
-        "asynchronous-programming-preference"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["rust-pro", "fastapi-pro"],
+      "tags": ["languages", "other", "asynchronous-programming-preference"],
       "priority": 3
     },
     "functional-programming-preference": {
@@ -2352,20 +1249,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - functional-programming-preference",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "functional-programming-preference"
-      ],
+      "tags": ["languages", "other", "functional-programming-preference"],
       "priority": 3
     },
     "rell-general-rules": {
@@ -2374,20 +1261,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - rell-general-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "rell-general-rules"
-      ],
+      "tags": ["languages", "other", "rell-general-rules"],
       "priority": 3
     },
     "latest-language-versions-and-best-practices": {
@@ -2396,20 +1273,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - latest-language-versions-and-best-practices",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "latest-language-versions-and-best-practices"
-      ],
+      "tags": ["languages", "other", "latest-language-versions-and-best-practices"],
       "priority": 3
     },
     "jupyter-notebook-best-practices": {
@@ -2418,20 +1285,10 @@
       "category": "Other",
       "domain": "languages",
       "description": "Other - jupyter-notebook-best-practices",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "languages",
-        "other",
-        "jupyter-notebook-best-practices"
-      ],
+      "tags": ["languages", "other", "jupyter-notebook-best-practices"],
       "priority": 3
     },
     "react-expert": {
@@ -2440,28 +1297,10 @@
       "category": "Frameworks",
       "domain": "frameworks",
       "description": "Frameworks - react-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "frontend-pro",
-        "nextjs-pro",
-        "expo-mobile-developer"
-      ],
-      "agentSupporting": [
-        "typescript-pro",
-        "graphql-pro"
-      ],
-      "tags": [
-        "frameworks",
-        "frameworks",
-        "react-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["frontend-pro", "nextjs-pro", "expo-mobile-developer"],
+      "agentSupporting": ["typescript-pro", "graphql-pro"],
+      "tags": ["frameworks", "frameworks", "react-expert"],
       "priority": 1
     },
     "react-best-practices-vercel": {
@@ -2470,20 +1309,10 @@
       "category": "Frameworks",
       "domain": "frameworks",
       "description": "Frameworks - react-best-practices-vercel",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "frontend-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["frontend-pro"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "frameworks",
-        "react-best-practices-vercel"
-      ],
+      "tags": ["frameworks", "frameworks", "react-best-practices-vercel"],
       "priority": 1
     },
     "composition-patterns-vercel": {
@@ -2492,20 +1321,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - composition-patterns-vercel",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "frontend-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["frontend-pro"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "composition-patterns-vercel"
-      ],
+      "tags": ["frameworks", "other", "composition-patterns-vercel"],
       "priority": 1
     },
     "nextjs-expert": {
@@ -2514,23 +1333,10 @@
       "category": "Frameworks",
       "domain": "frameworks",
       "description": "Frameworks - nextjs-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "nextjs-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["nextjs-pro"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "frameworks",
-        "nextjs-expert"
-      ],
+      "tags": ["frameworks", "frameworks", "nextjs-expert"],
       "priority": 1
     },
     "vue-expert": {
@@ -2539,22 +1345,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - vue-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "frontend-pro"
-      ],
-      "tags": [
-        "frameworks",
-        "other",
-        "vue-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["frontend-pro"],
+      "tags": ["frameworks", "other", "vue-expert"],
       "priority": 3
     },
     "angular-expert": {
@@ -2563,20 +1357,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - angular-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "angular-expert"
-      ],
+      "tags": ["frameworks", "other", "angular-expert"],
       "priority": 3
     },
     "svelte-expert": {
@@ -2585,23 +1369,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - svelte-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "sveltekit-expert",
-        "tauri-desktop-developer"
-      ],
-      "agentSupporting": [
-        "frontend-pro"
-      ],
-      "tags": [
-        "frameworks",
-        "other",
-        "svelte-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["sveltekit-expert", "tauri-desktop-developer"],
+      "agentSupporting": ["frontend-pro"],
+      "tags": ["frameworks", "other", "svelte-expert"],
       "priority": 1
     },
     "astro-expert": {
@@ -2610,20 +1381,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - astro-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "astro-expert"
-      ],
+      "tags": ["frameworks", "other", "astro-expert"],
       "priority": 3
     },
     "qwik-expert": {
@@ -2632,20 +1393,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - qwik-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "qwik-expert"
-      ],
+      "tags": ["frameworks", "other", "qwik-expert"],
       "priority": 3
     },
     "solidjs-expert": {
@@ -2654,20 +1405,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - solidjs-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "solidjs-expert"
-      ],
+      "tags": ["frameworks", "other", "solidjs-expert"],
       "priority": 3
     },
     "flutter-expert": {
@@ -2676,20 +1417,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - flutter-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "flutter-expert"
-      ],
+      "tags": ["frameworks", "other", "flutter-expert"],
       "priority": 3
     },
     "backend-expert": {
@@ -2698,22 +1429,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - backend-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "nodejs-pro"
-      ],
-      "tags": [
-        "frameworks",
-        "other",
-        "backend-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["nodejs-pro"],
+      "tags": ["frameworks", "other", "backend-expert"],
       "priority": 3
     },
     "frontend-expert": {
@@ -2722,20 +1441,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - frontend-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "frontend-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["frontend-pro"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "frontend-expert"
-      ],
+      "tags": ["frameworks", "other", "frontend-expert"],
       "priority": 1
     },
     "graphql-expert": {
@@ -2744,22 +1453,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - graphql-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "graphql-pro"
-      ],
-      "agentSupporting": [
-        "architect"
-      ],
-      "tags": [
-        "frameworks",
-        "other",
-        "graphql-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["graphql-pro"],
+      "agentSupporting": ["architect"],
+      "tags": ["frameworks", "other", "graphql-expert"],
       "priority": 1
     },
     "api-development-expert": {
@@ -2768,15 +1465,8 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - api-development-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "fastapi-pro",
-        "graphql-pro"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["fastapi-pro", "graphql-pro"],
       "agentSupporting": [
         "architect",
         "technical-writer",
@@ -2786,11 +1476,7 @@
         "java-pro",
         "php-pro"
       ],
-      "tags": [
-        "frameworks",
-        "other",
-        "api-development-expert"
-      ],
+      "tags": ["frameworks", "other", "api-development-expert"],
       "priority": 1
     },
     "htmx-expert": {
@@ -2799,20 +1485,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - htmx-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "htmx-expert"
-      ],
+      "tags": ["frameworks", "other", "htmx-expert"],
       "priority": 3
     },
     "chrome-extension-expert": {
@@ -2821,20 +1497,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - chrome-extension-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "frameworks",
-        "other",
-        "chrome-extension-expert"
-      ],
+      "tags": ["frameworks", "other", "chrome-extension-expert"],
       "priority": 3
     },
     "state-management-expert": {
@@ -2843,23 +1509,10 @@
       "category": "Other",
       "domain": "frameworks",
       "description": "Other - state-management-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "typescript-pro",
-        "graphql-pro"
-      ],
-      "tags": [
-        "frameworks",
-        "other",
-        "state-management-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["typescript-pro", "graphql-pro"],
+      "tags": ["frameworks", "other", "state-management-expert"],
       "priority": 3
     },
     "react-native-skills-vercel": {
@@ -2868,20 +1521,10 @@
       "category": "Mobile",
       "domain": "mobile",
       "description": "Mobile - react-native-skills-vercel",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "mobile",
-        "mobile",
-        "react-native-skills-vercel"
-      ],
+      "tags": ["mobile", "mobile", "react-native-skills-vercel"],
       "priority": 3
     },
     "ios-expert": {
@@ -2890,22 +1533,10 @@
       "category": "Mobile",
       "domain": "mobile",
       "description": "Mobile - ios-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "ios-pro"
-      ],
-      "agentSupporting": [
-        "mobile-ux-reviewer"
-      ],
-      "tags": [
-        "mobile",
-        "mobile",
-        "ios-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["ios-pro"],
+      "agentSupporting": ["mobile-ux-reviewer"],
+      "tags": ["mobile", "mobile", "ios-expert"],
       "priority": 1
     },
     "android-expert": {
@@ -2914,22 +1545,10 @@
       "category": "Mobile",
       "domain": "mobile",
       "description": "Mobile - android-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "mobile-ux-reviewer"
-      ],
-      "tags": [
-        "mobile",
-        "mobile",
-        "android-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["mobile-ux-reviewer"],
+      "tags": ["mobile", "mobile", "android-expert"],
       "priority": 3
     },
     "expo-mobile-app-rule": {
@@ -2938,23 +1557,10 @@
       "category": "Other",
       "domain": "mobile",
       "description": "Other - expo-mobile-app-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "expo-mobile-developer",
-        "mobile-ux-reviewer"
-      ],
-      "tags": [
-        "mobile",
-        "other",
-        "expo-mobile-app-rule"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["expo-mobile-developer", "mobile-ux-reviewer"],
+      "tags": ["mobile", "other", "expo-mobile-app-rule"],
       "priority": 3
     },
     "expo-framework-rule": {
@@ -2963,20 +1569,10 @@
       "category": "Other",
       "domain": "mobile",
       "description": "Other - expo-framework-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "expo-mobile-developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["expo-mobile-developer"],
       "agentSupporting": [],
-      "tags": [
-        "mobile",
-        "other",
-        "expo-framework-rule"
-      ],
+      "tags": ["mobile", "other", "expo-framework-rule"],
       "priority": 1
     },
     "nativescript": {
@@ -2985,20 +1581,10 @@
       "category": "Other",
       "domain": "mobile",
       "description": "Other - nativescript",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "mobile",
-        "other",
-        "nativescript"
-      ],
+      "tags": ["mobile", "other", "nativescript"],
       "priority": 3
     },
     "mobile-first-design-rules": {
@@ -3007,22 +1593,10 @@
       "category": "Other",
       "domain": "mobile",
       "description": "Other - mobile-first-design-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "mobile-ux-reviewer"
-      ],
-      "agentSupporting": [
-        "frontend-pro"
-      ],
-      "tags": [
-        "mobile",
-        "other",
-        "mobile-first-design-rules"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["mobile-ux-reviewer"],
+      "agentSupporting": ["frontend-pro"],
+      "tags": ["mobile", "other", "mobile-first-design-rules"],
       "priority": 1
     },
     "mobile-ui-development-rule": {
@@ -3031,23 +1605,10 @@
       "category": "Other",
       "domain": "mobile",
       "description": "Other - mobile-ui-development-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "mobile-ux-reviewer"
-      ],
-      "agentSupporting": [
-        "ios-pro",
-        "expo-mobile-developer"
-      ],
-      "tags": [
-        "mobile",
-        "other",
-        "mobile-ui-development-rule"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["mobile-ux-reviewer"],
+      "agentSupporting": ["ios-pro", "expo-mobile-developer"],
+      "tags": ["mobile", "other", "mobile-ui-development-rule"],
       "priority": 1
     },
     "database-architect": {
@@ -3056,25 +1617,10 @@
       "category": "Database",
       "domain": "database",
       "description": "Database - database-architect",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "architect",
-        "devops",
-        "database-architect"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
+      "agentPrimary": ["architect", "devops", "database-architect"],
       "agentSupporting": [],
-      "tags": [
-        "database",
-        "database",
-        "database-architect"
-      ],
+      "tags": ["database", "database", "database-architect"],
       "priority": 1
     },
     "database-expert": {
@@ -3083,25 +1629,15 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - database-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "database-architect"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["database-architect"],
       "agentSupporting": [
         "fastapi-pro",
         "data-engineer",
         "devops-troubleshooter",
         "incident-responder"
       ],
-      "tags": [
-        "database",
-        "other",
-        "database-expert"
-      ],
+      "tags": ["database", "other", "database-expert"],
       "priority": 1
     },
     "data-expert": {
@@ -3110,22 +1646,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - data-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "data-engineer"
-      ],
-      "agentSupporting": [
-        "python-pro"
-      ],
-      "tags": [
-        "database",
-        "other",
-        "data-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["data-engineer"],
+      "agentSupporting": ["python-pro"],
+      "tags": ["database", "other", "data-expert"],
       "priority": 1
     },
     "text-to-sql": {
@@ -3134,20 +1658,10 @@
       "category": "Database",
       "domain": "database",
       "description": "Database - text-to-sql",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "database-architect"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["database-architect"],
       "agentSupporting": [],
-      "tags": [
-        "database",
-        "database",
-        "text-to-sql"
-      ],
+      "tags": ["database", "database", "text-to-sql"],
       "priority": 1
     },
     "pandas-data-manipulation-rules": {
@@ -3156,23 +1670,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - pandas-data-manipulation-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "python-pro",
-        "data-engineer"
-      ],
-      "tags": [
-        "database",
-        "other",
-        "pandas-data-manipulation-rules"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["python-pro", "data-engineer"],
+      "tags": ["database", "other", "pandas-data-manipulation-rules"],
       "priority": 3
     },
     "large-data-with-dask": {
@@ -3181,22 +1682,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - large-data-with-dask",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "data-engineer"
-      ],
-      "tags": [
-        "database",
-        "other",
-        "large-data-with-dask"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["data-engineer"],
+      "tags": ["database", "other", "large-data-with-dask"],
       "priority": 3
     },
     "drizzle-orm-rules": {
@@ -3205,22 +1694,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - drizzle-orm-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "database-architect"
-      ],
-      "tags": [
-        "database",
-        "other",
-        "drizzle-orm-rules"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["database-architect"],
+      "tags": ["database", "other", "drizzle-orm-rules"],
       "priority": 3
     },
     "entity-class-conventions": {
@@ -3229,22 +1706,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - entity-class-conventions",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "java-pro"
-      ],
-      "tags": [
-        "database",
-        "other",
-        "entity-class-conventions"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["java-pro"],
+      "tags": ["database", "other", "entity-class-conventions"],
       "priority": 3
     },
     "repository-class-conventions": {
@@ -3253,22 +1718,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - repository-class-conventions",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "java-pro"
-      ],
-      "tags": [
-        "database",
-        "other",
-        "repository-class-conventions"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["java-pro"],
+      "tags": ["database", "other", "repository-class-conventions"],
       "priority": 3
     },
     "vercel-kv-database-rules": {
@@ -3277,23 +1730,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - vercel-kv-database-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "nextjs-pro",
-        "database-architect"
-      ],
-      "tags": [
-        "database",
-        "other",
-        "vercel-kv-database-rules"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["nextjs-pro", "database-architect"],
+      "tags": ["database", "other", "vercel-kv-database-rules"],
       "priority": 3
     },
     "experiment-configuration-with-hydra-yaml": {
@@ -3302,20 +1742,10 @@
       "category": "Other",
       "domain": "database",
       "description": "Other - experiment-configuration-with-hydra-yaml",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "database",
-        "other",
-        "experiment-configuration-with-hydra-yaml"
-      ],
+      "tags": ["database", "other", "experiment-configuration-with-hydra-yaml"],
       "priority": 3
     },
     "ai-ml-expert": {
@@ -3324,26 +1754,10 @@
       "category": "AI/ML",
       "domain": "ai-ml",
       "description": "AI/ML - ai-ml-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob",
-        "WebSearch"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "data-engineer"
-      ],
-      "tags": [
-        "ai-ml",
-        "ai/ml",
-        "ai-ml-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["data-engineer"],
+      "tags": ["ai-ml", "ai/ml", "ai-ml-expert"],
       "priority": 3
     },
     "doc-generator": {
@@ -3352,17 +1766,8 @@
       "category": "Documentation",
       "domain": "documentation",
       "description": "Documentation - doc-generator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "technical-writer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["technical-writer"],
       "agentSupporting": [
         "security-architect",
         "c4-context",
@@ -3370,11 +1775,7 @@
         "c4-component",
         "c4-code"
       ],
-      "tags": [
-        "documentation",
-        "documentation",
-        "doc-generator"
-      ],
+      "tags": ["documentation", "documentation", "doc-generator"],
       "priority": 1
     },
     "writing-skills": {
@@ -3383,24 +1784,10 @@
       "category": "Documentation",
       "domain": "documentation",
       "description": "Documentation - writing-skills",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Task"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "technical-writer"
-      ],
-      "tags": [
-        "documentation",
-        "documentation",
-        "writing-skills"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Task"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["technical-writer"],
+      "tags": ["documentation", "documentation", "writing-skills"],
       "priority": 3
     },
     "readme": {
@@ -3409,20 +1796,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - readme",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "technical-writer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["technical-writer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "readme"
-      ],
+      "tags": ["documentation", "other", "readme"],
       "priority": 1
     },
     "detailed-docstrings": {
@@ -3431,20 +1808,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - detailed-docstrings",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "detailed-docstrings"
-      ],
+      "tags": ["documentation", "other", "detailed-docstrings"],
       "priority": 3
     },
     "technical-accuracy-and-usability-rules": {
@@ -3453,20 +1820,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - technical-accuracy-and-usability-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "technical-accuracy-and-usability-rules"
-      ],
+      "tags": ["documentation", "other", "technical-accuracy-and-usability-rules"],
       "priority": 3
     },
     "metadata-and-seo-rules": {
@@ -3475,20 +1832,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - metadata-and-seo-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "metadata-and-seo-rules"
-      ],
+      "tags": ["documentation", "other", "metadata-and-seo-rules"],
       "priority": 3
     },
     "mkdocs-specific-rules": {
@@ -3497,20 +1844,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - mkdocs-specific-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "mkdocs-specific-rules"
-      ],
+      "tags": ["documentation", "other", "mkdocs-specific-rules"],
       "priority": 3
     },
     "content-creation-rules": {
@@ -3519,20 +1856,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - content-creation-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "content-creation-rules"
-      ],
+      "tags": ["documentation", "other", "content-creation-rules"],
       "priority": 3
     },
     "prompt-generation-rules": {
@@ -3541,20 +1868,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - prompt-generation-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "prompt-generation-rules"
-      ],
+      "tags": ["documentation", "other", "prompt-generation-rules"],
       "priority": 3
     },
     "writing-plans": {
@@ -3563,20 +1880,10 @@
       "category": "Other",
       "domain": "documentation",
       "description": "Other - writing-plans",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "documentation",
-        "other",
-        "writing-plans"
-      ],
+      "tags": ["documentation", "other", "writing-plans"],
       "priority": 3
     },
     "agent-creator": {
@@ -3596,15 +1903,9 @@
         "Bash",
         "Task"
       ],
-      "agentPrimary": [
-        "evolution-orchestrator"
-      ],
+      "agentPrimary": ["evolution-orchestrator"],
       "agentSupporting": [],
-      "tags": [
-        "creator",
-        "creator-tools",
-        "agent-creator"
-      ],
+      "tags": ["creator", "creator-tools", "agent-creator"],
       "priority": 1
     },
     "skill-creator": {
@@ -3613,25 +1914,10 @@
       "category": "Creator Tools",
       "domain": "creator",
       "description": "Creator Tools - skill-creator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep",
-        "WebSearch",
-        "WebFetch"
-      ],
-      "agentPrimary": [
-        "evolution-orchestrator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebSearch", "WebFetch"],
+      "agentPrimary": ["evolution-orchestrator"],
       "agentSupporting": [],
-      "tags": [
-        "creator",
-        "creator-tools",
-        "skill-creator"
-      ],
+      "tags": ["creator", "creator-tools", "skill-creator"],
       "priority": 1
     },
     "hook-creator": {
@@ -3640,25 +1926,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - hook-creator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "evolution-orchestrator"
-      ],
-      "tags": [
-        "creator",
-        "other",
-        "hook-creator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["evolution-orchestrator"],
+      "tags": ["creator", "other", "hook-creator"],
       "priority": 3
     },
     "workflow-creator": {
@@ -3667,26 +1938,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - workflow-creator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "master-orchestrator",
-        "evolution-orchestrator"
-      ],
-      "tags": [
-        "creator",
-        "other",
-        "workflow-creator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["master-orchestrator", "evolution-orchestrator"],
+      "tags": ["creator", "other", "workflow-creator"],
       "priority": 3
     },
     "template-creator": {
@@ -3695,22 +1950,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - template-creator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "evolution-orchestrator"
-      ],
-      "tags": [
-        "creator",
-        "other",
-        "template-creator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["evolution-orchestrator"],
+      "tags": ["creator", "other", "template-creator"],
       "priority": 3
     },
     "schema-creator": {
@@ -3719,22 +1962,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - schema-creator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "evolution-orchestrator"
-      ],
-      "tags": [
-        "creator",
-        "other",
-        "schema-creator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["evolution-orchestrator"],
+      "tags": ["creator", "other", "schema-creator"],
       "priority": 3
     },
     "template-renderer": {
@@ -3743,20 +1974,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - template-renderer",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "creator",
-        "other",
-        "template-renderer"
-      ],
+      "tags": ["creator", "other", "template-renderer"],
       "priority": 3
     },
     "artifact-lifecycle": {
@@ -3765,20 +1986,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - artifact-lifecycle",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "evolution-orchestrator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["evolution-orchestrator"],
       "agentSupporting": [],
-      "tags": [
-        "creator",
-        "other",
-        "artifact-lifecycle"
-      ],
+      "tags": ["creator", "other", "artifact-lifecycle"],
       "priority": 1
     },
     "artifact-publisher": {
@@ -3787,22 +1998,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - artifact-publisher",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "master-orchestrator"
-      ],
-      "tags": [
-        "creator",
-        "other",
-        "artifact-publisher"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["master-orchestrator"],
+      "tags": ["creator", "other", "artifact-publisher"],
       "priority": 3
     },
     "mcp-converter": {
@@ -3811,22 +2010,10 @@
       "category": "Other",
       "domain": "creator",
       "description": "Other - mcp-converter",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "evolution-orchestrator"
-      ],
-      "tags": [
-        "creator",
-        "other",
-        "mcp-converter"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["evolution-orchestrator"],
+      "tags": ["creator", "other", "mcp-converter"],
       "priority": 3
     },
     "progressive-disclosure": {
@@ -3844,17 +2031,9 @@
         "Grep",
         "Glob"
       ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "planner"
-      ],
-      "tags": [
-        "requirements",
-        "requirements",
-        "progressive-disclosure"
-      ],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["planner"],
+      "tags": ["requirements", "requirements", "progressive-disclosure"],
       "priority": 3
     },
     "spec-gathering": {
@@ -3863,22 +2042,10 @@
       "category": "Requirements",
       "domain": "requirements",
       "description": "Requirements - spec-gathering",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "pm"
-      ],
-      "agentSupporting": [
-        "planner"
-      ],
-      "tags": [
-        "requirements",
-        "requirements",
-        "spec-gathering"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["pm"],
+      "agentSupporting": ["planner"],
+      "tags": ["requirements", "requirements", "spec-gathering"],
       "priority": 1
     },
     "spec-writing": {
@@ -3887,22 +2054,10 @@
       "category": "Other",
       "domain": "requirements",
       "description": "Other - spec-writing",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "planner"
-      ],
-      "tags": [
-        "requirements",
-        "other",
-        "spec-writing"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["planner"],
+      "tags": ["requirements", "other", "spec-writing"],
       "priority": 3
     },
     "spec-critique": {
@@ -3911,20 +2066,10 @@
       "category": "Other",
       "domain": "requirements",
       "description": "Other - spec-critique",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "requirements",
-        "other",
-        "spec-critique"
-      ],
+      "tags": ["requirements", "other", "spec-critique"],
       "priority": 3
     },
     "interactive-requirements-gathering": {
@@ -3933,22 +2078,10 @@
       "category": "Other",
       "domain": "requirements",
       "description": "Other - interactive-requirements-gathering",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "pm"
-      ],
-      "tags": [
-        "requirements",
-        "other",
-        "interactive-requirements-gathering"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["pm"],
+      "tags": ["requirements", "other", "interactive-requirements-gathering"],
       "priority": 3
     },
     "thinking-tools": {
@@ -3957,22 +2090,10 @@
       "category": "Specialized",
       "domain": "specialized",
       "description": "Specialized - thinking-tools",
-      "requiredTools": [
-        "Read",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "planner"
-      ],
-      "tags": [
-        "specialized",
-        "specialized",
-        "thinking-tools"
-      ],
+      "requiredTools": ["Read", "Glob", "Grep"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["planner"],
+      "tags": ["specialized", "specialized", "thinking-tools"],
       "priority": 3
     },
     "sequential-thinking": {
@@ -3981,20 +2102,10 @@
       "category": "Specialized",
       "domain": "specialized",
       "description": "Specialized - sequential-thinking",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "planner"
-      ],
+      "requiredTools": ["Read", "Write", "Bash"],
+      "agentPrimary": ["planner"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "specialized",
-        "sequential-thinking"
-      ],
+      "tags": ["specialized", "specialized", "sequential-thinking"],
       "priority": 1
     },
     "consensus-voting": {
@@ -4003,26 +2114,10 @@
       "category": "Orchestration",
       "domain": "specialized",
       "description": "Orchestration - consensus-voting",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "devops",
-        "swarm-coordinator"
-      ],
-      "agentSupporting": [
-        "architect"
-      ],
-      "tags": [
-        "specialized",
-        "orchestration",
-        "consensus-voting"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["devops", "swarm-coordinator"],
+      "agentSupporting": ["architect"],
+      "tags": ["specialized", "orchestration", "consensus-voting"],
       "priority": 1
     },
     "swarm-coordination": {
@@ -4031,27 +2126,10 @@
       "category": "Orchestration",
       "domain": "specialized",
       "description": "Orchestration - swarm-coordination",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "swarm-coordinator"
-      ],
-      "agentSupporting": [
-        "planner",
-        "architect",
-        "master-orchestrator"
-      ],
-      "tags": [
-        "specialized",
-        "orchestration",
-        "swarm-coordination"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["swarm-coordinator"],
+      "agentSupporting": ["planner", "architect", "master-orchestrator"],
+      "tags": ["specialized", "orchestration", "swarm-coordination"],
       "priority": 1
     },
     "subagent-driven-development": {
@@ -4060,20 +2138,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - subagent-driven-development",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "master-orchestrator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["master-orchestrator"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "subagent-driven-development"
-      ],
+      "tags": ["specialized", "other", "subagent-driven-development"],
       "priority": 1
     },
     "task-management-protocol": {
@@ -4082,11 +2150,7 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - task-management-protocol",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
       "agentPrimary": [
         "planner",
         "architect",
@@ -4124,14 +2188,8 @@
         "swarm-coordinator",
         "evolution-orchestrator"
       ],
-      "agentSupporting": [
-        "router"
-      ],
-      "tags": [
-        "specialized",
-        "other",
-        "task-management-protocol"
-      ],
+      "agentSupporting": ["router"],
+      "tags": ["specialized", "other", "task-management-protocol"],
       "priority": 1
     },
     "track-management": {
@@ -4140,22 +2198,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - track-management",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "conductor-validator"
-      ],
-      "agentSupporting": [
-        "master-orchestrator"
-      ],
-      "tags": [
-        "specialized",
-        "other",
-        "track-management"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["conductor-validator"],
+      "agentSupporting": ["master-orchestrator"],
+      "tags": ["specialized", "other", "track-management"],
       "priority": 1
     },
     "workflow-patterns": {
@@ -4164,20 +2210,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - workflow-patterns",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "conductor-validator"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["conductor-validator"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "workflow-patterns"
-      ],
+      "tags": ["specialized", "other", "workflow-patterns"],
       "priority": 1
     },
     "smart-debug": {
@@ -4186,20 +2222,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - smart-debug",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "smart-debug"
-      ],
+      "tags": ["specialized", "other", "smart-debug"],
       "priority": 3
     },
     "codebase-integration": {
@@ -4208,20 +2234,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - codebase-integration",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "codebase-integration"
-      ],
+      "tags": ["specialized", "other", "codebase-integration"],
       "priority": 3
     },
     "repo-rag": {
@@ -4230,21 +2246,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - repo-rag",
-      "requiredTools": [
-        "Read",
-        "Bash",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "security-architect"
-      ],
+      "requiredTools": ["Read", "Bash", "Glob", "Grep"],
+      "agentPrimary": ["security-architect"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "repo-rag"
-      ],
+      "tags": ["specialized", "other", "repo-rag"],
       "priority": 1
     },
     "summarize-changes": {
@@ -4253,20 +2258,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - summarize-changes",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "context-compressor"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["context-compressor"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "summarize-changes"
-      ],
+      "tags": ["specialized", "other", "summarize-changes"],
       "priority": 1
     },
     "requesting-code-review": {
@@ -4275,20 +2270,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - requesting-code-review",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "code-reviewer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["code-reviewer"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "requesting-code-review"
-      ],
+      "tags": ["specialized", "other", "requesting-code-review"],
       "priority": 1
     },
     "receiving-code-review": {
@@ -4297,20 +2282,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - receiving-code-review",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "code-reviewer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["code-reviewer"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "receiving-code-review"
-      ],
+      "tags": ["specialized", "other", "receiving-code-review"],
       "priority": 1
     },
     "insight-extraction": {
@@ -4319,22 +2294,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - insight-extraction",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "context-compressor"
-      ],
-      "tags": [
-        "specialized",
-        "other",
-        "insight-extraction"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["context-compressor"],
+      "tags": ["specialized", "other", "insight-extraction"],
       "priority": 3
     },
     "dispatching-parallel-agents": {
@@ -4343,24 +2306,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - dispatching-parallel-agents",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "planner",
-        "master-orchestrator",
-        "swarm-coordinator"
-      ],
-      "tags": [
-        "specialized",
-        "other",
-        "dispatching-parallel-agents"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["planner", "master-orchestrator", "swarm-coordinator"],
+      "tags": ["specialized", "other", "dispatching-parallel-agents"],
       "priority": 3
     },
     "executing-plans": {
@@ -4369,20 +2318,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - executing-plans",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "executing-plans"
-      ],
+      "tags": ["specialized", "other", "executing-plans"],
       "priority": 3
     },
     "skill-discovery": {
@@ -4391,20 +2330,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - skill-discovery",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "router"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["router"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "skill-discovery"
-      ],
+      "tags": ["specialized", "other", "skill-discovery"],
       "priority": 1
     },
     "tool-search": {
@@ -4413,20 +2342,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - tool-search",
-      "requiredTools": [
-        "Read",
-        "Glob",
-        "Grep"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Glob", "Grep"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "tool-search"
-      ],
+      "tags": ["specialized", "other", "tool-search"],
       "priority": 3
     },
     "dependency-analyzer": {
@@ -4435,22 +2354,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - dependency-analyzer",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "security-architect"
-      ],
-      "tags": [
-        "specialized",
-        "other",
-        "dependency-analyzer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["security-architect"],
+      "tags": ["specialized", "other", "dependency-analyzer"],
       "priority": 3
     },
     "filesystem": {
@@ -4459,20 +2366,10 @@
       "category": "Other",
       "domain": "specialized",
       "description": "Other - filesystem",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "devops"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["devops"],
       "agentSupporting": [],
-      "tags": [
-        "specialized",
-        "other",
-        "filesystem"
-      ],
+      "tags": ["specialized", "other", "filesystem"],
       "priority": 1
     },
     "web-design-guidelines-vercel": {
@@ -4481,21 +2378,10 @@
       "category": "Styling",
       "domain": "styling",
       "description": "Styling - web-design-guidelines-vercel",
-      "requiredTools": [
-        "Read",
-        "WebFetch"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "frontend-pro"
-      ],
-      "tags": [
-        "styling",
-        "styling",
-        "web-design-guidelines-vercel"
-      ],
+      "requiredTools": ["Read", "WebFetch"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["frontend-pro"],
+      "tags": ["styling", "styling", "web-design-guidelines-vercel"],
       "priority": 3
     },
     "styling-expert": {
@@ -4504,23 +2390,10 @@
       "category": "Styling",
       "domain": "styling",
       "description": "Styling - styling-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "frontend-pro"
-      ],
-      "agentSupporting": [
-        "nextjs-pro",
-        "sveltekit-expert"
-      ],
-      "tags": [
-        "styling",
-        "styling",
-        "styling-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["frontend-pro"],
+      "agentSupporting": ["nextjs-pro", "sveltekit-expert"],
+      "tags": ["styling", "styling", "styling-expert"],
       "priority": 1
     },
     "ui-components-expert": {
@@ -4529,24 +2402,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - ui-components-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "frontend-pro",
-        "ios-pro",
-        "mobile-ux-reviewer"
-      ],
-      "tags": [
-        "styling",
-        "other",
-        "ui-components-expert"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["frontend-pro", "ios-pro", "mobile-ux-reviewer"],
+      "tags": ["styling", "other", "ui-components-expert"],
       "priority": 3
     },
     "design-and-user-experience-guidelines": {
@@ -4555,22 +2414,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - design-and-user-experience-guidelines",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "mobile-ux-reviewer"
-      ],
-      "tags": [
-        "styling",
-        "other",
-        "design-and-user-experience-guidelines"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["mobile-ux-reviewer"],
+      "tags": ["styling", "other", "design-and-user-experience-guidelines"],
       "priority": 3
     },
     "html-tailwind-css-and-javascript-expert-rule": {
@@ -4579,20 +2426,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - html-tailwind-css-and-javascript-expert-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "html-tailwind-css-and-javascript-expert-rule"
-      ],
+      "tags": ["styling", "other", "html-tailwind-css-and-javascript-expert-rule"],
       "priority": 3
     },
     "image-optimization-rules": {
@@ -4601,20 +2438,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - image-optimization-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "image-optimization-rules"
-      ],
+      "tags": ["styling", "other", "image-optimization-rules"],
       "priority": 3
     },
     "placeholder-images": {
@@ -4623,20 +2450,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - placeholder-images",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "placeholder-images"
-      ],
+      "tags": ["styling", "other", "placeholder-images"],
       "priority": 3
     },
     "modular-design-rule": {
@@ -4645,20 +2462,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - modular-design-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "modular-design-rule"
-      ],
+      "tags": ["styling", "other", "modular-design-rule"],
       "priority": 3
     },
     "private-vs-shared-components": {
@@ -4667,20 +2474,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - private-vs-shared-components",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "private-vs-shared-components"
-      ],
+      "tags": ["styling", "other", "private-vs-shared-components"],
       "priority": 3
     },
     "visual-and-observational-rules": {
@@ -4689,20 +2486,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - visual-and-observational-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "visual-and-observational-rules"
-      ],
+      "tags": ["styling", "other", "visual-and-observational-rules"],
       "priority": 3
     },
     "pyqt6-ui-development-rules": {
@@ -4711,20 +2498,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - pyqt6-ui-development-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "pyqt6-ui-development-rules"
-      ],
+      "tags": ["styling", "other", "pyqt6-ui-development-rules"],
       "priority": 3
     },
     "alpine-js-usage-rules": {
@@ -4733,20 +2510,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - alpine-js-usage-rules",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "alpine-js-usage-rules"
-      ],
+      "tags": ["styling", "other", "alpine-js-usage-rules"],
       "priority": 3
     },
     "accessibility": {
@@ -4755,22 +2522,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - accessibility",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "mobile-ux-reviewer"
-      ],
-      "agentSupporting": [
-        "frontend-pro"
-      ],
-      "tags": [
-        "styling",
-        "other",
-        "accessibility"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["mobile-ux-reviewer"],
+      "agentSupporting": ["frontend-pro"],
+      "tags": ["styling", "other", "accessibility"],
       "priority": 1
     },
     "aceternity-ui-configuration": {
@@ -4779,20 +2534,10 @@
       "category": "Other",
       "domain": "styling",
       "description": "Other - aceternity-ui-configuration",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "styling",
-        "other",
-        "aceternity-ui-configuration"
-      ],
+      "tags": ["styling", "other", "aceternity-ui-configuration"],
       "priority": 3
     },
     "scientific-skills": {
@@ -4801,28 +2546,10 @@
       "category": "Scientific",
       "domain": "scientific",
       "description": "Scientific - scientific-skills",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob",
-        "WebSearch",
-        "WebFetch"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "python-pro",
-        "data-engineer"
-      ],
-      "tags": [
-        "scientific",
-        "scientific",
-        "scientific-skills"
-      ],
+      "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": ["python-pro", "data-engineer"],
+      "tags": ["scientific", "scientific", "scientific-skills"],
       "priority": 3
     },
     "gamedev-expert": {
@@ -4831,20 +2558,10 @@
       "category": "Other",
       "domain": "other",
       "description": "Other - gamedev-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
+      "requiredTools": ["Read", "Write", "Edit"],
+      "agentPrimary": ["developer"],
       "agentSupporting": [],
-      "tags": [
-        "other",
-        "other",
-        "gamedev-expert"
-      ],
+      "tags": ["other", "other", "gamedev-expert"],
       "priority": 3
     }
   },
@@ -4879,14 +2596,8 @@
         "complexity-assessment",
         "strategic-planning-with-pseudocode"
       ],
-      "architecture": [
-        "architecture-review",
-        "diagram-generator"
-      ],
-      "research": [
-        "research-synthesis",
-        "arxiv-mcp"
-      ],
+      "architecture": ["architecture-review", "diagram-generator"],
+      "research": ["research-synthesis", "arxiv-mcp"],
       "memory": [
         "context-compressor",
         "session-handoff",
@@ -5014,9 +2725,7 @@
         "vercel-kv-database-rules",
         "experiment-configuration-with-hydra-yaml"
       ],
-      "ai-ml": [
-        "ai-ml-expert"
-      ],
+      "ai-ml": ["ai-ml-expert"],
       "documentation": [
         "doc-generator",
         "writing-skills",
@@ -5087,23 +2796,13 @@
         "accessibility",
         "aceternity-ui-configuration"
       ],
-      "scientific": [
-        "scientific-skills"
-      ],
-      "other": [
-        "gamedev-expert"
-      ]
+      "scientific": ["scientific-skills"],
+      "other": ["gamedev-expert"]
     },
     "byCategory": {
-      "Testing": [
-        "tdd"
-      ],
-      "Troubleshooting": [
-        "debugging"
-      ],
-      "Code Quality": [
-        "code-quality-expert"
-      ],
+      "Testing": ["tdd"],
+      "Troubleshooting": ["debugging"],
+      "Code Quality": ["code-quality-expert"],
       "Other": [
         "ripgrep",
         "code-analyzer",
@@ -5256,94 +2955,27 @@
         "aceternity-ui-configuration",
         "gamedev-expert"
       ],
-      "Security": [
-        "security-architect",
-        "auth-security-expert"
-      ],
-      "Planning": [
-        "plan-generator",
-        "task-breakdown"
-      ],
-      "Architecture": [
-        "architecture-review",
-        "diagram-generator"
-      ],
-      "Research": [
-        "research-synthesis",
-        "arxiv-mcp"
-      ],
-      "Memory": [
-        "context-compressor",
-        "session-handoff"
-      ],
-      "Quality": [
-        "qa-workflow",
-        "verification-before-completion",
-        "checklist-generator"
-      ],
-      "Version Control": [
-        "git-expert",
-        "gitflow"
-      ],
-      "Integration": [
-        "github-mcp",
-        "chrome-browser"
-      ],
-      "DevOps": [
-        "aws-cloud-ops",
-        "docker-compose",
-        "kubernetes-flux",
-        "terraform-infra"
-      ],
-      "Languages": [
-        "python-backend-expert",
-        "typescript-expert",
-        "go-expert"
-      ],
-      "Frameworks": [
-        "react-expert",
-        "react-best-practices-vercel",
-        "nextjs-expert"
-      ],
-      "Mobile": [
-        "react-native-skills-vercel",
-        "ios-expert",
-        "android-expert"
-      ],
-      "Database": [
-        "database-architect",
-        "text-to-sql"
-      ],
-      "AI/ML": [
-        "ai-ml-expert"
-      ],
-      "Documentation": [
-        "doc-generator",
-        "writing-skills"
-      ],
-      "Creator Tools": [
-        "agent-creator",
-        "skill-creator"
-      ],
-      "Requirements": [
-        "progressive-disclosure",
-        "spec-gathering"
-      ],
-      "Specialized": [
-        "thinking-tools",
-        "sequential-thinking"
-      ],
-      "Orchestration": [
-        "consensus-voting",
-        "swarm-coordination"
-      ],
-      "Styling": [
-        "web-design-guidelines-vercel",
-        "styling-expert"
-      ],
-      "Scientific": [
-        "scientific-skills"
-      ]
+      "Security": ["security-architect", "auth-security-expert"],
+      "Planning": ["plan-generator", "task-breakdown"],
+      "Architecture": ["architecture-review", "diagram-generator"],
+      "Research": ["research-synthesis", "arxiv-mcp"],
+      "Memory": ["context-compressor", "session-handoff"],
+      "Quality": ["qa-workflow", "verification-before-completion", "checklist-generator"],
+      "Version Control": ["git-expert", "gitflow"],
+      "Integration": ["github-mcp", "chrome-browser"],
+      "DevOps": ["aws-cloud-ops", "docker-compose", "kubernetes-flux", "terraform-infra"],
+      "Languages": ["python-backend-expert", "typescript-expert", "go-expert"],
+      "Frameworks": ["react-expert", "react-best-practices-vercel", "nextjs-expert"],
+      "Mobile": ["react-native-skills-vercel", "ios-expert", "android-expert"],
+      "Database": ["database-architect", "text-to-sql"],
+      "AI/ML": ["ai-ml-expert"],
+      "Documentation": ["doc-generator", "writing-skills"],
+      "Creator Tools": ["agent-creator", "skill-creator"],
+      "Requirements": ["progressive-disclosure", "spec-gathering"],
+      "Specialized": ["thinking-tools", "sequential-thinking"],
+      "Orchestration": ["consensus-voting", "swarm-coordination"],
+      "Styling": ["web-design-guidelines-vercel", "styling-expert"],
+      "Scientific": ["scientific-skills"]
     },
     "byTool": {
       "Read": [
@@ -6026,20 +3658,10 @@
         "tool-search",
         "scientific-skills"
       ],
-      "Skill": [
-        "task-breakdown"
-      ],
-      "TaskCreate": [
-        "task-breakdown"
-      ],
-      "TaskUpdate": [
-        "task-breakdown",
-        "progressive-disclosure"
-      ],
-      "TaskList": [
-        "task-breakdown",
-        "progressive-disclosure"
-      ],
+      "Skill": ["task-breakdown"],
+      "TaskCreate": ["task-breakdown"],
+      "TaskUpdate": ["task-breakdown", "progressive-disclosure"],
+      "TaskList": ["task-breakdown", "progressive-disclosure"],
       "WebSearch": [
         "research-synthesis",
         "arxiv-mcp",
@@ -6057,13 +3679,8 @@
         "web-design-guidelines-vercel",
         "scientific-skills"
       ],
-      "Task": [
-        "writing-skills",
-        "agent-creator"
-      ],
-      "AskUserQuestion": [
-        "progressive-disclosure"
-      ]
+      "Task": ["writing-skills", "agent-creator"],
+      "AskUserQuestion": ["progressive-disclosure"]
     },
     "byAgent": {
       "developer": [
@@ -6151,11 +3768,7 @@
         "summarize-changes",
         "insight-extraction"
       ],
-      "router": [
-        "skill-discovery",
-        "complexity-assessment",
-        "task-management-protocol"
-      ],
+      "router": ["skill-discovery", "complexity-assessment", "task-management-protocol"],
       "python-pro": [
         "python-backend-expert",
         "tdd",
@@ -6626,11 +4239,7 @@
         "summarize-changes",
         "insight-extraction"
       ],
-      "router": [
-        "skill-discovery",
-        "complexity-assessment",
-        "task-management-protocol"
-      ],
+      "router": ["skill-discovery", "complexity-assessment", "task-management-protocol"],
       "python-pro": [
         "python-backend-expert",
         "tdd",
