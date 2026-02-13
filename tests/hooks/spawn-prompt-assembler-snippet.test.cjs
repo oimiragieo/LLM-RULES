@@ -97,3 +97,20 @@ test('shouldThrottleExpensiveEnrichment is disabled by default', () => {
     else process.env.SPAWN_ADAPTIVE_ENRICHMENT = prev;
   }
 });
+
+test('shouldThrottleExpensiveEnrichment throttles very large prompts when adaptive mode is enabled', () => {
+  const prev = process.env.SPAWN_ADAPTIVE_ENRICHMENT;
+  process.env.SPAWN_ADAPTIVE_ENRICHMENT = 'on';
+  try {
+    assert.strictEqual(
+      shouldThrottleExpensiveEnrichment(
+        { description: 'high complexity investigation with debugging and performance analysis' },
+        'x'.repeat(22000)
+      ),
+      true
+    );
+  } finally {
+    if (prev === undefined) delete process.env.SPAWN_ADAPTIVE_ENRICHMENT;
+    else process.env.SPAWN_ADAPTIVE_ENRICHMENT = prev;
+  }
+});

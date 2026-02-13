@@ -142,7 +142,10 @@ function isPerfHarnessEnabled() {
 }
 
 function isAdaptiveEnrichmentEnabled() {
-  return process.env.SPAWN_ADAPTIVE_ENRICHMENT === 'true';
+  const value = String(process.env.SPAWN_ADAPTIVE_ENRICHMENT || '')
+    .trim()
+    .toLowerCase();
+  return value === 'true' || value === '1' || value === 'on';
 }
 
 function isSpawnAssemblyCacheEnabled() {
@@ -311,9 +314,9 @@ function readRecentJsonl(filePath, maxRows = 300) {
 
 function shouldThrottleExpensiveEnrichment(toolInput, basePrompt) {
   if (!isAdaptiveEnrichmentEnabled()) return false;
+  if (basePrompt.length > 20000) return true;
   const complexity = classifyPromptComplexity(toolInput, basePrompt);
   if (complexity === 'high') return false;
-  if (basePrompt.length > 20000) return true;
 
   const metricsDir = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
   const assemblyRows = readRecentJsonl(path.join(metricsDir, 'spawn-assembly-metrics.jsonl'));
