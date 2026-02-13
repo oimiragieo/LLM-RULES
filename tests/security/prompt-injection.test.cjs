@@ -30,9 +30,8 @@ describe('Prompt Injection Detection (P1-003)', () => {
 
     assert.strictEqual(result.safe, false, 'Should block prompt with instruction override');
     assert.strictEqual(result.blocked, true, 'Blocked flag should be true');
-    assert.match(
-      result.reason,
-      /instruction_override/i,
+    assert.ok(
+      result.reason && /instruction_override/i.test(result.reason),
       'Reason should indicate instruction override'
     );
   });
@@ -42,7 +41,10 @@ describe('Prompt Injection Detection (P1-003)', () => {
     const result = sanitizePrompt(attack);
 
     assert.strictEqual(result.safe, false, 'Should block disregard rules attack');
-    assert.match(result.reason, /instruction_override/i, 'Should detect instruction override');
+    assert.ok(
+      result.reason && /instruction_override/i.test(result.reason),
+      'Should detect instruction override'
+    );
   });
 
   test('should block system prompt leak attempts', () => {
@@ -50,7 +52,10 @@ describe('Prompt Injection Detection (P1-003)', () => {
     const result = sanitizePrompt(attack);
 
     assert.strictEqual(result.safe, false, 'Should block system prompt leak');
-    assert.match(result.reason, /information_disclosure/i, 'Should detect information disclosure');
+    assert.ok(
+      result.reason && /information_disclosure/i.test(result.reason),
+      'Should detect information disclosure'
+    );
   });
 
   test('should block DAN mode activation', () => {
@@ -58,7 +63,7 @@ describe('Prompt Injection Detection (P1-003)', () => {
     const result = sanitizePrompt(attack);
 
     assert.strictEqual(result.safe, false, 'Should block DAN mode activation');
-    assert.match(result.reason, /jailbreak/i, 'Should detect jailbreak attempt');
+    assert.ok(result.reason && /jailbreak/i.test(result.reason), 'Should detect jailbreak attempt');
   });
 
   // HIGH patterns - sanitize
@@ -112,14 +117,14 @@ describe('Prompt Injection Detection (P1-003)', () => {
   });
 
   test('should detect high-entropy obfuscation', () => {
-    // Create truly high-entropy string (all unique characters, >500 chars)
-    // Using all printable ASCII characters repeated to exceed 500 length
+    // Create high-entropy string using 256 unique characters (codes 33-288)
+    // Shannon entropy = log2(256) = 8.0, exceeding the 7.5 threshold
     const chars = [];
-    for (let i = 33; i <= 126; i++) {
+    for (let i = 33; i <= 288; i++) {
       chars.push(String.fromCharCode(i));
     }
-    // 94 unique chars repeated 6 times = 564 characters with max entropy
-    const obfuscated = chars.join('').repeat(6);
+    // 256 unique chars repeated 3 times = 768 characters, entropy = 8.0
+    const obfuscated = chars.join('').repeat(3);
     const result = sanitizePrompt(obfuscated);
 
     // Should detect high entropy for long strings with many unique characters

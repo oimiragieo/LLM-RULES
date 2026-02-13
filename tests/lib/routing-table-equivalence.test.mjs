@@ -75,6 +75,7 @@ describe('Routing Table Equivalence Tests', () => {
       'code-reviewer',
       'planner',
       'architect',
+      'pm',
       'python-pro',
       'rust-pro',
       'golang-pro',
@@ -120,6 +121,7 @@ describe('Routing Table Equivalence Tests', () => {
       'penetration-tester',
       'accessibility-tester',
       'chaos-engineer',
+      'reflection-agent',
     ]);
 
     it('should map all entries to valid agent names', () => {

@@ -39,10 +39,11 @@ test('SKILL.md documents three search modes', () => {
 test('SKILL.md includes performance comparison table', () => {
   const content = fs.readFileSync(SKILL_FILE, 'utf-8');
 
-  assert.ok(content.includes('| Mode |'), 'Should have performance table');
-  assert.ok(content.includes('| Speed |'), 'Should have Speed column');
-  assert.ok(content.includes('| Accuracy |'), 'Should have Accuracy column');
-  assert.ok(content.includes('| Best For |'), 'Should have Best For column');
+  // Match padded markdown table headers (e.g. '| Mode            |')
+  assert.ok(/| Modes+|/.test(content), 'Should have performance table');
+  assert.ok(/| Speeds+|/.test(content), 'Should have Speed column');
+  assert.ok(/| Accuracys+|/.test(content), 'Should have Accuracy column');
+  assert.ok(/| Best Fors+|/.test(content), 'Should have Best For column');
 });
 
 test('SKILL.md has code examples for all modes', () => {
