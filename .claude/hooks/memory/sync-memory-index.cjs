@@ -54,10 +54,40 @@ function getCoreMemoryFileType(absPath) {
 }
 
 function ensureEntityDbInitialized(dbPath) {
+  const lockFile = dbPath + '.init.lock';
+  let lockAcquired = false;
+
   try {
     const dbDir = path.dirname(dbPath);
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
+    }
+
+    // Atomic lock acquisition (wx = exclusive create, fails if exists)
+    try {
+      fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' });
+      lockAcquired = true;
+    } catch (lockErr) {
+      if (lockErr.code === 'EEXIST') {
+        // Another process is initializing -- check for stale lock (>10s old)
+        try {
+          const stat = fs.statSync(lockFile);
+          if (Date.now() - stat.mtimeMs > 10000) {
+            // Stale lock -- remove and retry
+            fs.unlinkSync(lockFile);
+            fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' });
+            lockAcquired = true;
+          }
+        } catch (_e) {
+          // Another process cleaned it or re-locked -- skip
+        }
+        if (!lockAcquired) {
+          debugLog('sync-memory-index', 'Another process is initializing DB, skipping');
+          return;
+        }
+      } else {
+        throw lockErr;
+      }
     }
 
     // Lazily initialize schema if missing (idempotent).
@@ -77,6 +107,14 @@ function ensureEntityDbInitialized(dbPath) {
     }
   } catch (err) {
     debugLog('sync-memory-index', 'Failed to initialize entity DB schema', err);
+  } finally {
+    if (lockAcquired) {
+      try {
+        fs.unlinkSync(lockFile);
+      } catch (_e) {
+        // Best effort cleanup
+      }
+    }
   }
 }
 
