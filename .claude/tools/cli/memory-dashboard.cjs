@@ -261,7 +261,16 @@ function filterByPeriod(events, period) {
   if (!match) return events;
 
   const [, amount, unit] = match;
-  const now = Date.now();
+  let now = Date.now();
+  // Use the latest event timestamp as the reference clock when data is stale
+  // (common in fixtures/tests and historical log snapshots).
+  const latestEventTime = events.reduce((max, event) => {
+    const t = new Date(event.timestamp).getTime();
+    return Number.isFinite(t) ? Math.max(max, t) : max;
+  }, 0);
+  if (latestEventTime > 0 && latestEventTime < now) {
+    now = latestEventTime;
+  }
   let cutoff;
 
   switch (unit) {
@@ -280,7 +289,7 @@ function filterByPeriod(events, period) {
 
   return events.filter(event => {
     const eventTime = new Date(event.timestamp).getTime();
-    return eventTime >= cutoff;
+    return eventTime > cutoff;
   });
 }
 

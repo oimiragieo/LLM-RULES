@@ -738,13 +738,22 @@ function checkTaskUpdateFirst(
   // Bootstrap fallback: pre-task hook records in_progress in router-state at spawn time.
   // When subagent hook payloads are sparse or delayed, honor that marker to avoid deadlock.
   try {
+    const state = routerState.getState();
     const lastTaskUpdate = routerState.getLastTaskUpdate();
     const candidateTaskId = hookInput?.task_id || hookInput?.taskId || null;
+    const hookSessionId = sessionId ? String(sessionId).trim() : '';
+    const stateSessionId = state?.sessionId ? String(state.sessionId).trim() : '';
+    const hasExplicitSessionMatch =
+      hookSessionId.length > 0 && stateSessionId.length > 0 && hookSessionId === stateSessionId;
+    const hasCandidateTaskId =
+      typeof candidateTaskId === 'string' && candidateTaskId.trim().length > 0;
     const taskIdMatches =
       !candidateTaskId ||
-      !lastTaskUpdate?.taskId ||
-      String(candidateTaskId).trim() === String(lastTaskUpdate.taskId).trim();
+      (lastTaskUpdate?.taskId &&
+        String(candidateTaskId).trim() === String(lastTaskUpdate.taskId).trim());
+    const hasScopedIdentity = hasExplicitSessionMatch || hasCandidateTaskId;
     if (
+      hasScopedIdentity &&
       routerState.wasTaskUpdateCalledRecently() &&
       (lastTaskUpdate?.status === 'in_progress' || lastTaskUpdate?.status === 'in-progress') &&
       taskIdMatches
