@@ -101,4 +101,25 @@ describe('pre-tool-unified taskupdate-first guard', () => {
       assert.match(result.message, /TASKUPDATE-FIRST/);
     });
   });
+
+  test('enforces for non-router agent sessions even when allowed_tools/task_id are missing', () => {
+    withTempStateFile(stateFile => {
+      const priorAgentId = process.env.CLAUDE_AGENT_ID;
+      process.env.CLAUDE_AGENT_ID = 'developer';
+      try {
+        const hookInput = {
+          session_id: 'session-6',
+        };
+        const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo ok' }, stateFile);
+        assert.equal(result.action, 'block');
+        assert.match(result.message, /TASKUPDATE-FIRST/);
+      } finally {
+        if (priorAgentId == null) {
+          delete process.env.CLAUDE_AGENT_ID;
+        } else {
+          process.env.CLAUDE_AGENT_ID = priorAgentId;
+        }
+      }
+    });
+  });
 });

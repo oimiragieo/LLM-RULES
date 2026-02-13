@@ -668,6 +668,13 @@ function isAgentScopedSession(hookInput) {
   const scopedTaskId = hookInput?.task_id || hookInput?.taskId || null;
   if (typeof scopedTaskId === 'string' && scopedTaskId.trim().length > 0) return true;
 
+  // Last-resort fallback: if we are running inside any non-router agent process,
+  // enforce TaskUpdate-first even when hook payload is minimal.
+  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
+    .trim()
+    .toLowerCase();
+  if (agentId && agentId !== 'router') return true;
+
   return false;
 }
 
