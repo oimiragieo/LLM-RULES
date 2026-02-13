@@ -22,6 +22,8 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputAsync } = require('../../lib/utils/hook-input.cjs');
+// SEC-PROTO-001: Use safeParseJSON for prototype pollution protection
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
@@ -46,7 +48,8 @@ function readSpawnRequests(filePath) {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
     if (!content.trim()) return [];
-    const parsed = JSON.parse(content);
+    // SEC-PROTO-001: Use safeParseJSON for prototype pollution protection
+    const parsed = safeParseJSON(content, null);
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     stderrLog('warn', 'Failed to read spawn requests', { error: err.message });

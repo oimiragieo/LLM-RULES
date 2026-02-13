@@ -43,6 +43,8 @@ const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { auditLog, debugLog } = require('../../lib/utils/hook-input.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
+// SEC-PROTO-001: Use safeParseJSON for prototype pollution protection
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
@@ -182,7 +184,8 @@ function readExistingSpawnRequests(spawnRequestFile) {
     }
     const content = fs.readFileSync(spawnRequestFile, 'utf8');
     if (!content.trim()) return [];
-    const parsed = JSON.parse(content);
+    // SEC-PROTO-001: Use safeParseJSON for prototype pollution protection
+    const parsed = safeParseJSON(content, null);
     return Array.isArray(parsed) ? parsed : [];
   } catch (err) {
     debugLog('reflection-queue-processor', 'Error reading existing spawn requests', err);
