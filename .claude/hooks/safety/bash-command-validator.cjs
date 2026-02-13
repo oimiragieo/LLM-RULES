@@ -69,17 +69,22 @@ function detectBadSubstitutionRisk(command) {
 
 let cachedRipgrepAvailable = null;
 
+function buildVersionProbeSpawnOptions() {
+  return {
+    stdio: 'ignore',
+    shell: false,
+    timeout: 1000,
+    windowsHide: true,
+  };
+}
+
 function isRipgrepAvailable() {
   if (cachedRipgrepAvailable !== null) {
     return cachedRipgrepAvailable;
   }
 
   try {
-    const result = spawnSync('rg', ['--version'], {
-      stdio: 'ignore',
-      shell: false,
-      timeout: 1000,
-    });
+    const result = spawnSync('rg', ['--version'], buildVersionProbeSpawnOptions());
     cachedRipgrepAvailable = Boolean(!result.error && result.status === 0);
   } catch (_err) {
     cachedRipgrepAvailable = false;
@@ -365,6 +370,7 @@ module.exports = {
   detectBadSubstitutionRisk,
   detectUnsupportedRipgrepType,
   detectRipgrepUnavailable,
+  buildVersionProbeSpawnOptions,
   detectBashReportWrite,
   detectBrittleCrossShellCount,
   isBypassPermissionsMode,

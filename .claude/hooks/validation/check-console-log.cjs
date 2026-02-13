@@ -16,7 +16,11 @@ function getCandidateFiles() {
   }
 
   try {
-    execSync('git rev-parse --git-dir', { cwd: PROJECT_ROOT, stdio: 'pipe' });
+    execSync('git rev-parse --git-dir', {
+      cwd: PROJECT_ROOT,
+      stdio: 'pipe',
+      windowsHide: true,
+    });
   } catch (_err) {
     return [];
   }
@@ -26,6 +30,7 @@ function getCandidateFiles() {
       cwd: PROJECT_ROOT,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
+      windowsHide: true,
     });
     return output
       .split('\n')

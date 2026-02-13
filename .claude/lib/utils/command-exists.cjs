@@ -10,7 +10,10 @@ function commandExists(cmd) {
 
   try {
     const isWindows = process.platform === 'win32';
-    const result = spawnSync(isWindows ? 'where' : 'which', [cmd], { stdio: 'pipe' });
+    const result = spawnSync(isWindows ? 'where' : 'which', [cmd], {
+      stdio: 'pipe',
+      windowsHide: true,
+    });
     return result.status === 0;
   } catch (_err) {
     return false;

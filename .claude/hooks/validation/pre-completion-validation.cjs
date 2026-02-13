@@ -220,6 +220,7 @@ function validateArtifact(artifactPath) {
       cwd: PROJECT_ROOT,
       stdio: 'pipe',
       encoding: 'utf-8',
+      windowsHide: true,
     });
 
     // Check exit code

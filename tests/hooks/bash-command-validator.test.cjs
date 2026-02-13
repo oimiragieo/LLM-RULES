@@ -73,6 +73,7 @@ const {
   detectBadSubstitutionRisk,
   detectUnsupportedRipgrepType,
   detectRipgrepUnavailable,
+  buildVersionProbeSpawnOptions,
   detectBashReportWrite,
   detectBrittleCrossShellCount,
   isBypassPermissionsMode,
@@ -105,6 +106,10 @@ test('exports detectBadSubstitutionRisk function', () => {
 
 test('exports detectUnsupportedRipgrepType function', () => {
   assertEqual(typeof detectUnsupportedRipgrepType, 'function', 'Should export function');
+});
+
+test('exports buildVersionProbeSpawnOptions function', () => {
+  assertEqual(typeof buildVersionProbeSpawnOptions, 'function', 'Should export function');
 });
 
 test('exports detectBashReportWrite function', () => {
@@ -242,6 +247,12 @@ test('detectRipgrepUnavailable flags rg command when rg is unavailable', () => {
 test('detectRipgrepUnavailable allows rg command when rg is available', () => {
   const reason = detectRipgrepUnavailable('rg -n "todo" .', { ripgrepAvailable: true });
   assertEqual(reason, null, 'Should allow when ripgrep is available');
+});
+
+test('buildVersionProbeSpawnOptions enables windowsHide for sub-process probes', () => {
+  const opts = buildVersionProbeSpawnOptions();
+  assertEqual(opts.windowsHide, true, 'Should hide Windows console windows');
+  assertEqual(opts.shell, false, 'Should execute without shell');
 });
 
 test('detectBashReportWrite blocks redirect writes into reports path', () => {
