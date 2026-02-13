@@ -19,10 +19,12 @@ skills:
   - code-semantic-search
   - code-structural-search
   - code-style-validator
+  - differential-review
   - dry-principle
   - git-expert
   - ripgrep
   - security-architect
+  - static-analysis
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

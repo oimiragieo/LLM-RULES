@@ -30,9 +30,13 @@ skills:
   - complexity-assessment
   - context-compressor
   - plan-generator
+  - planning-with-files
+  - project-onboarding
   - ripgrep
+  - sparc-methodology
   - sequential-thinking
   - spec-gathering
+  - spec-init
   - task-management-protocol
   - verification-before-completion
 

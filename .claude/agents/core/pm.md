@@ -24,7 +24,9 @@ skills:
   - checklist-generator
   - code-semantic-search
   - consensus-voting
+  - interactive-requirements-gathering
   - plan-generator
+  - prd-generator
   - ripgrep
   - sequential-thinking
   - task-management-protocol

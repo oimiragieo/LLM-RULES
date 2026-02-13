@@ -20,10 +20,13 @@ skills:
   - code-semantic-search
   - code-structural-search
   - doc-generator
+  - insecure-defaults
   - memory-forensics
   - protocol-reverse-engineering
   - ripgrep
   - security-architect
+  - semgrep-rule-creator
+  - variant-analysis
   - verification-before-completion
   - web3-expert
 context_files:
