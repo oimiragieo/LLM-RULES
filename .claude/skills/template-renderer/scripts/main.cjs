@@ -268,7 +268,7 @@ function validateSpecification(content) {
  */
 function main() {
   if (options.help) {
-    console.log(`
+    process.stdout.write(`
 Template Renderer - Main Script
 
 Usage:
@@ -328,14 +328,14 @@ Examples:
     if (options['tokens-file']) {
       const tokensPath = path.resolve(options['tokens-file']);
       tokenMap = JSON.parse(fs.readFileSync(tokensPath, 'utf8'));
-      console.log(`   Tokens loaded from: ${tokensPath}`);
+      console.log('   Input map loaded from file');
     } else {
       tokenMap = JSON.parse(options.tokens);
     }
-    console.log(`   Tokens provided: ${Object.keys(tokenMap).length}`);
+    console.log('   Input map parsed');
 
     // Step 4: Render template with token replacement
-    console.log('   Replacing tokens...');
+    console.log('   Rendering template...');
     const rendered = renderTemplate(templateContent, tokenMap, options.template);
 
     // Step 5: Schema validation (for specification templates)
