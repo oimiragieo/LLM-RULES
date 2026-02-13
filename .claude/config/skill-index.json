@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-13T05:31:52.126Z",
+  "generatedAt": "2026-02-13T06:53:58.513Z",
   "metadata": {
     "totalSkills": 199,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-13T05:31:52.127Z",
+    "lastValidated": "2026-02-13T06:53:58.514Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md"
   },
   "skills": {

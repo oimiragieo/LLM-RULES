@@ -72,6 +72,7 @@ Options:
   const child = spawn(process.execPath, [analyzerPath, ...args.filter(a => a !== '--help')], {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
+    windowsHide: true,
   });
   child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }

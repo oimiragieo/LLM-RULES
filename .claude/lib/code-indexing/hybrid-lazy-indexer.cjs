@@ -544,6 +544,7 @@ class HybridLazyIndexer {
         timeout: options.timeout || this.config.ripgrepTimeoutMs,
         maxBuffer: 10 * 1024 * 1024, // 10MB
         shell: false, // CRITICAL: Disable shell to prevent injection
+        windowsHide: true,
       });
 
       if (result.error) {
@@ -561,6 +562,7 @@ class HybridLazyIndexer {
           timeout: options.timeout || this.config.ripgrepTimeoutMs,
           maxBuffer: 10 * 1024 * 1024,
           shell: false,
+          windowsHide: true,
         });
       }
 
@@ -795,6 +797,7 @@ class HybridLazyIndexer {
         encoding: 'utf8',
         timeout: 3000,
         shell: false, // CRITICAL: Disable shell to prevent injection
+        windowsHide: true,
       });
 
       if (result.error || result.status !== 0) {
@@ -817,7 +820,7 @@ class HybridLazyIndexer {
       const result = spawnSync(
         rgPath,
         ['--files', '-g', '!node_modules/**', '-g', '!.git/**', this.projectRoot],
-        { encoding: 'utf8', timeout: 5000, shell: false }
+        { encoding: 'utf8', timeout: 5000, shell: false, windowsHide: true }
       );
 
       if (result.error) {
@@ -878,7 +881,7 @@ class HybridLazyIndexer {
           '-n',
           this.projectRoot,
         ],
-        { encoding: 'utf8', timeout: 3000, shell: false }
+        { encoding: 'utf8', timeout: 3000, shell: false, windowsHide: true }
       );
 
       if (result.error) {

@@ -73,6 +73,7 @@ Options:
   const child = spawn(process.execPath, [generatePath, ...args], {
     stdio: 'inherit',
     cwd: PROJECT_ROOT,
+    windowsHide: true,
   });
   child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
 }

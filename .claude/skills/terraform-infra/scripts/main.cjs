@@ -64,6 +64,7 @@ Options:
       stdio: 'inherit',
       cwd: PROJECT_ROOT,
       shell: false,
+      windowsHide: true,
     }
   );
   child.on('close', (code, signal) => {

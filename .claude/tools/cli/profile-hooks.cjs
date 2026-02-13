@@ -170,6 +170,7 @@ async function executeHook(hookPath, input) {
 
     const child = spawn('node', [fullPath], {
       cwd: PROJECT_ROOT,
+      windowsHide: true,
       env: {
         ...process.env,
         // Disable enforcement for profiling (we just want latency)

@@ -84,6 +84,7 @@ function isBinaryUsable(binPath, versionArgs = ['--version'], timeoutMs = 1500) 
     stdio: 'ignore',
     shell: false,
     timeout: timeoutMs,
+    windowsHide: true,
   });
 
   return !result.error && result.status === 0;

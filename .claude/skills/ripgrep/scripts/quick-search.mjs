@@ -146,6 +146,7 @@ const rg = spawn(rgPath, rgArgs, {
   stdio: 'inherit',
   env,
   shell: false, // SECURITY: Prevent shell interpretation
+  windowsHide: true,
 });
 
 rg.on('error', error => {

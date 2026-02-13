@@ -84,6 +84,7 @@ class AstGrepSearch {
     return new Promise(resolve => {
       const proc = spawn(this.binPath, ['--version'], {
         stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
       });
 
       proc.on('error', () => resolve(false));
@@ -105,6 +106,7 @@ class AstGrepSearch {
     return new Promise((resolve, reject) => {
       const proc = spawn(this.binPath, ['--version'], {
         stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
       });
 
       let stdout = '';
@@ -190,6 +192,7 @@ class AstGrepSearch {
     return new Promise((resolve, reject) => {
       const proc = spawn(this.binPath, args, {
         stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
       });
 
       let stdout = '';

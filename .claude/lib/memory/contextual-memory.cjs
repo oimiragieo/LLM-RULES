@@ -683,6 +683,7 @@ class ContextualMemory {
     return new Promise(resolve => {
       const proc = spawn(binPath, ['--version'], {
         stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
       });
       proc.on('error', () => resolve(false));
       proc.on('close', code => resolve(code === 0));
@@ -735,6 +736,7 @@ class ContextualMemory {
       const proc = spawn(rgPath, args, {
         cwd: memoryDir,
         stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
       });
 
       let stdout = '';

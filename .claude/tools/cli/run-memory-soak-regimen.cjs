@@ -43,6 +43,7 @@ function runNodeTest(testPath) {
     encoding: 'utf8',
     shell: false,
     maxBuffer: 1024 * 1024 * 16,
+    windowsHide: true,
   });
   return {
     testPath,

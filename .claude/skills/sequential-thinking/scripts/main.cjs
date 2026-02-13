@@ -70,6 +70,7 @@ Options:
       stdio: 'inherit',
       cwd: path.dirname(executorPath),
       shell: false,
+      windowsHide: true,
     });
     child.on('close', code => process.exit(code !== null && code !== undefined ? code : 1));
   } else {

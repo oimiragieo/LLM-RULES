@@ -139,7 +139,12 @@ let allDllsFound = true;
 for (const dll of cudaDlls) {
   try {
     // Use spawnSync with array args to prevent command injection
-    const result = spawnSync('where', [dll], { encoding: 'utf-8', stdio: 'pipe', shell: false });
+    const result = spawnSync('where', [dll], {
+      encoding: 'utf-8',
+      stdio: 'pipe',
+      shell: false,
+      windowsHide: true,
+    });
     if (result.status === 0) {
       console.log(`✅ ${dll} found in PATH`);
     } else {
