@@ -133,9 +133,21 @@ function setBlockDedupeState(state) {
   }
 }
 
-function registerBlockAttempt(checkName, toolName) {
+function resolveDedupeSessionId(hookInputOrSession = null) {
+  const envSessionId = process.env.CLAUDE_SESSION_ID || null;
+  if (envSessionId) return envSessionId;
+  if (hookInputOrSession && typeof hookInputOrSession === 'object') {
+    return hookInputOrSession.session_id || hookInputOrSession.sessionId || null;
+  }
+  if (typeof hookInputOrSession === 'string' && hookInputOrSession.trim().length > 0) {
+    return hookInputOrSession.trim();
+  }
+  return null;
+}
+
+function registerBlockAttempt(checkName, toolName, hookInputOrSession = null) {
   const now = Date.now();
-  const sessionId = process.env.CLAUDE_SESSION_ID || null;
+  const sessionId = resolveDedupeSessionId(hookInputOrSession);
   if (!sessionId) {
     return { count: 1, dedupe: false };
   }
@@ -154,6 +166,14 @@ function compactFallbackMessage(title, toolName, count, fallback) {
     `[${title}] Repeated block (${count}x) for ${toolName}. ` +
     `Do not retry the same tool call. Spawn an agent via Task() tool. Fallback: ${fallback}`
   );
+}
+
+function shouldDelegateTaskChecksToPreTaskUnified(toolName) {
+  if (toolName !== 'Task') return false;
+  const mode = String(process.env.ROUTING_GUARD_TASK_CHECKS || 'delegate')
+    .trim()
+    .toLowerCase();
+  return mode !== 'force';
 }
 
 function extractDedupeCount(message) {
@@ -759,7 +779,7 @@ function extractTaskIdFromPrompt(prompt) {
  * @param {Object} toolInput - Tool input containing command
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
-function checkRouterBash(toolName, toolInput = {}) {
+function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
   // Only applies to Bash tool
   if (toolName !== 'Bash') {
     return { pass: true };
@@ -804,7 +824,7 @@ function checkRouterBash(toolName, toolInput = {}) {
 
   // Router is using non-whitelisted Bash command - VIOLATION
   const truncatedCmd = command.length > 50 ? command.slice(0, 47) + '...' : command;
-  const dedupe = registerBlockAttempt('router-bash-check', toolName);
+  const dedupe = registerBlockAttempt('router-bash-check', toolName, hookInput);
   const violationTitle =
     enforcement === 'block'
       ? 'ROUTER BASH VIOLATION BLOCKED (ADR-030)'
@@ -885,7 +905,7 @@ function checkRouterBash(toolName, toolInput = {}) {
  * @param {Object} [toolInput] - Tool input (required for write tools to check file path)
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
-function checkRouterSelfCheck(toolName, toolInput = {}) {
+function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
   // Keep debug logging opt-in to avoid noisy hook output and token bloat.
   const DEBUG = process.env.ROUTER_DEBUG === 'true';
 
@@ -956,7 +976,7 @@ function checkRouterSelfCheck(toolName, toolInput = {}) {
 
   // Router is using blacklisted tool directly - violation
   debugLog('BLOCK: Router using blacklisted tool', { tool: toolName, enforcement });
-  const dedupe = registerBlockAttempt('router-self-check', toolName);
+  const dedupe = registerBlockAttempt('router-self-check', toolName, hookInput);
   const message = dedupe.dedupe
     ? `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode (${dedupe.count}x). Spawn an agent via Task().`
     : `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode. Spawn an agent via Task().`;
@@ -1041,7 +1061,7 @@ function checkPlannerFirst(toolName, toolInput) {
  * @param {string} toolName - Tool being used
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
-function checkTaskCreate(toolName) {
+function checkTaskCreate(toolName, hookInput = null) {
   // Only applies to TaskCreate tool
   if (toolName !== 'TaskCreate') {
     return { pass: true };
@@ -1071,13 +1091,20 @@ function checkTaskCreate(toolName) {
 
   // Violation: trying to create tasks without planner
   const complexity = state.complexity || 'unknown';
-  const message = `[TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER first.`;
+  const dedupe = registerBlockAttempt('task-create-guard', toolName, hookInput);
+  const message = dedupe.dedupe
+    ? compactFallbackMessage(
+        'TASK-CREATE VIOLATION',
+        toolName,
+        dedupe.count,
+        'Spawn PLANNER via Task() before creating additional tasks.'
+      )
+    : `[TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER first.`;
 
-  if (enforcement === 'block') {
+  if (enforcement === 'block' && !dedupe.dedupe) {
     return { pass: false, result: 'block', message };
-  } else {
-    return { pass: true, result: 'warn', message };
   }
+  return { pass: true, result: 'warn', message };
 }
 
 /**
@@ -1379,7 +1406,7 @@ Developer should be LAST RESORT. Specialists have domain-specific prompts and sk
  * @param {string} toolName - Tool being used
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
-function checkTaskListFirstGate(toolName) {
+function checkTaskListFirstGate(toolName, hookInput = null) {
   const enforcement = getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT', 'warn');
   if (enforcement === 'off') {
     return { pass: true };
@@ -1397,7 +1424,7 @@ function checkTaskListFirstGate(toolName) {
   }
 
   // Router is using a tool without calling TaskList first
-  const dedupe = registerBlockAttempt('tasklist-first-gate', toolName);
+  const dedupe = registerBlockAttempt('tasklist-first-gate', toolName, hookInput);
   const message = dedupe.dedupe
     ? compactFallbackMessage(
         'TASKLIST-FIRST VIOLATION',
@@ -1940,7 +1967,7 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
     };
 
     // Check 8: TaskList-First Gate (must come first -- protocol compliance)
-    const taskListCheck = checkTaskListFirstGate(toolName);
+    const taskListCheck = checkTaskListFirstGate(toolName, hookInput);
     if (!taskListCheck.pass) {
       return {
         pass: false,
@@ -1953,7 +1980,7 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
     captureWarn('tasklist-first-gate', taskListCheck);
 
     // Check 0: Router Bash Check (ADR-030 - must come first for Bash commands)
-    const bashCheck = checkRouterBash(toolName, toolInput);
+    const bashCheck = checkRouterBash(toolName, toolInput, hookInput);
     if (!bashCheck.pass) {
       return {
         pass: false,
@@ -1966,7 +1993,7 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
     captureWarn('router-bash-check', bashCheck);
 
     // Check 1: Router Self-Check (now receives toolInput for file path checking)
-    const selfCheck = checkRouterSelfCheck(toolName, toolInput);
+    const selfCheck = checkRouterSelfCheck(toolName, toolInput, hookInput);
     if (!selfCheck.pass) {
       return {
         pass: false,
@@ -1979,24 +2006,27 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
     captureWarn('router-self-check', selfCheck);
 
     // Check 2: Planner-First Guard
-    const plannerCheck = checkPlannerFirst(toolName, toolInput);
-    if (!plannerCheck.pass) {
-      return {
-        pass: false,
-        result: plannerCheck.result,
-        message: plannerCheck.message,
-        checkName: 'planner-first-guard',
-        warnings,
-      };
+    // Delegated by default to pre-task-unified for Task() to avoid duplicate blocks.
+    if (!shouldDelegateTaskChecksToPreTaskUnified(toolName)) {
+      const plannerCheck = checkPlannerFirst(toolName, toolInput);
+      if (!plannerCheck.pass) {
+        return {
+          pass: false,
+          result: plannerCheck.result,
+          message: plannerCheck.message,
+          checkName: 'planner-first-guard',
+          warnings,
+        };
+      }
+      if (plannerCheck.markPlanner) {
+        // Mark planner as spawned in state
+        routerState.markPlannerSpawned();
+      }
+      captureWarn('planner-first-guard', plannerCheck);
     }
-    if (plannerCheck.markPlanner) {
-      // Mark planner as spawned in state
-      routerState.markPlannerSpawned();
-    }
-    captureWarn('planner-first-guard', plannerCheck);
 
     // Check 3: TaskCreate Guard
-    const taskCreateCheck = checkTaskCreate(toolName);
+    const taskCreateCheck = checkTaskCreate(toolName, hookInput);
     if (!taskCreateCheck.pass) {
       return {
         pass: false,
@@ -2009,21 +2039,24 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
     captureWarn('task-create-guard', taskCreateCheck);
 
     // Check 4: Security Review Guard
-    const securityCheck = checkSecurityReview(toolName, toolInput);
-    if (!securityCheck.pass) {
-      return {
-        pass: false,
-        result: securityCheck.result,
-        message: securityCheck.message,
-        checkName: 'security-review-guard',
-        warnings,
-      };
+    // Delegated by default to pre-task-unified for Task() to avoid duplicate blocks.
+    if (!shouldDelegateTaskChecksToPreTaskUnified(toolName)) {
+      const securityCheck = checkSecurityReview(toolName, toolInput);
+      if (!securityCheck.pass) {
+        return {
+          pass: false,
+          result: securityCheck.result,
+          message: securityCheck.message,
+          checkName: 'security-review-guard',
+          warnings,
+        };
+      }
+      if (securityCheck.markSecurity) {
+        // Mark security as spawned in state
+        routerState.markSecuritySpawned();
+      }
+      captureWarn('security-review-guard', securityCheck);
     }
-    if (securityCheck.markSecurity) {
-      // Mark security as spawned in state
-      routerState.markSecuritySpawned();
-    }
-    captureWarn('security-review-guard', securityCheck);
 
     // Check 5: Router Write Guard
     const writeCheck = checkRouterWrite(toolName, toolInput);
@@ -2420,6 +2453,7 @@ module.exports = {
   isRouterInvocation,
   isWhitelistedBashCommand,
   extractTaskIdFromPrompt,
+  shouldDelegateTaskChecksToPreTaskUnified,
   // Staleness detection (Fix 4b)
   applyStaleDetection,
   // PERF-001: Cache management

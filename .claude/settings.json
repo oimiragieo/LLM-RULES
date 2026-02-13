@@ -278,6 +278,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
           }
         ]
       }
@@ -293,6 +297,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/session/pre-compact.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
           }
         ]
       }

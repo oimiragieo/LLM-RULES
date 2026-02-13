@@ -33,6 +33,7 @@ function runTest(testFile) {
 
     const proc = spawn('node', [testFile], {
       stdio: ['inherit', 'pipe', 'pipe'],
+      windowsHide: true,
     });
 
     let output = '';

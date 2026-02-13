@@ -280,6 +280,24 @@
       ],
       "extracted_from": "Pipeline #12 Task #16 reflection, integration-queue.jsonl inspection",
       "date": "2026-02-09"
+    },
+    {
+      "id": "late-test-execution-timing-issue",
+      "gotcha": "Compliance tests written during implementation wave but not executed until final review wave - delays feedback by 2 phases",
+      "context": "Task #13 Code Review Wave - windowsHide compliance test written in Wave 4b but not executed until Wave 6b review",
+      "why_it_happens": "Tests are written and assumed to pass without validation. QA checkpoints typically run at pipeline end (final gate), not after each implementation wave. This creates a timing gap where failures go undiscovered for 2+ phases.",
+      "symptoms": "Test suite written but not run during implementation phase. Failures discovered during code review phase (too late to prevent rework).",
+      "trigger": "Writing tests without immediately executing them. Assuming tests will be run at end-of-pipeline rather than after each wave.",
+      "solution": "Add QA validation after each implementation/fix wave: run compliance tests immediately after spawn/spawnSync changes are made. Don't defer testing to final gate.",
+      "example": "windows-hide-compliance test failed on 3 spawn calls in skill-creator scripts. Failures discovered during review, causing developer rework in follow-up wave.",
+      "impact": "LOW-MEDIUM - Testing is deferred but still happens before deployment. However, rework iteration is created.",
+      "prevention": [
+        "Run compliance tests after EACH implementation wave (not just at end)",
+        "Include test execution in wave completion checklist",
+        "Fail fast: if test fails, fix immediately in same wave"
+      ],
+      "extracted_from": "Task #13 Code Review Reflection - windowsHide Compliance Test",
+      "date": "2026-02-13"
     }
   ]
 }

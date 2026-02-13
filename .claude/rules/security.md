@@ -9,8 +9,80 @@
 
 ## Command Execution Safety
 
-- Use `spawnSync` with array arguments and `shell: false`
-- Never use `eval()` or `new Function()` with user input
+### shell: false Standard (CRITICAL)
+
+**Requirement:** Always use `shell: false` with array arguments for child process spawning.
+
+```javascript
+// SECURE: Proper argument isolation
+const { spawn } = require('child_process');
+spawn('npm', ['run', 'build'], { shell: false });
+spawn('git', ['commit', '-m', message], { shell: false });
+
+// INSECURE: DO NOT USE - shell injection vector
+spawn('npm run build', { shell: true });
+execSync(`git commit -m "${message}"`); // Default shell: true
+```
+
+**Why this matters:**
+
+- `shell: true` exposes process to shell metacharacter injection (wildcards, pipes, command chaining)
+- Array arguments bypass shell parsing entirely—no metacharacter interpretation
+- Single attack vector: Pass a specially crafted string in one array element, and it's passed verbatim (no shell processing)
+
+**Impact:**
+
+- Command injection attacks (e.g., `message = "'; rm -rf /"`) are impossible with `shell: false`
+- Works identically on Windows and Unix (no platform-specific behavior)
+- No performance penalty
+
+**Enforcement:** ESLint rule blocks `shell: true` in production code.
+
+---
+
+### JSON Parsing Safety (HIGH)
+
+**Requirement:** Always use `safeParseJSON()` utility for parsing untrusted JSON. Never use raw `JSON.parse()` on user/agent input.
+
+```javascript
+// INSECURE: Raw JSON.parse crashes on malformed input
+const data = JSON.parse(userInput);
+
+// SECURE: safeParseJSON with error handling
+const { success, data, error } = safeParseJSON(userInput, {});
+if (!success) {
+  logger.error('Parse error:', error);
+  return {};
+}
+```
+
+**safeParseJSON Features:**
+
+- Try-catch wrapping (prevents crash on invalid JSON)
+- Prototype pollution protection (strips `__proto__`, `constructor`, `prototype`)
+- Structured return `{ success, data, error }`
+- Optional fallback value
+- Located in `.claude/lib/utils/safe-json-parse.cjs`
+
+**Why this matters:**
+
+- Invalid JSON in hook input would crash the entire hook process
+- Prototype pollution attacks can modify Object.prototype globally
+- Malicious JSON: `{ "__proto__": { isAdmin: true } }` could escalate privileges
+
+**Impact:**
+
+- Hook reliability: Invalid input handled gracefully instead of crashing
+- Security: Prototype pollution vectors eliminated
+- Audit trail: Errors logged for forensics
+
+**Enforcement:** ESLint rule blocks `JSON.parse()` directly in hook files.
+
+---
+
+### Concurrent File Operations (MEDIUM)
+
+- Use file-based locking (via `proper-lockfile`) for concurrent database initialization
 - Validate file paths before operations (prevent path traversal)
 
 ## OWASP Agentic AI Top 10 (NEW — Critical for AI Systems)

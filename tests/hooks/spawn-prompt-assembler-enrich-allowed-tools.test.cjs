@@ -11,6 +11,21 @@ const { enrichAllowedTools } = require('../../.claude/hooks/routing/spawn-prompt
 // =============================================================================
 
 describe('enrichAllowedTools() - Mandatory Tools', () => {
+  let priorHybridFirst;
+
+  beforeEach(() => {
+    priorHybridFirst = process.env.SPAWN_HYBRID_FIRST;
+    delete process.env.SPAWN_HYBRID_FIRST;
+  });
+
+  afterEach(() => {
+    if (priorHybridFirst === undefined) {
+      delete process.env.SPAWN_HYBRID_FIRST;
+    } else {
+      process.env.SPAWN_HYBRID_FIRST = priorHybridFirst;
+    }
+  });
+
   test('should always include TaskUpdate even when not provided', () => {
     // Empty allowed_tools should still get TaskUpdate
     const result = enrichAllowedTools('developer', [], 'You are DEVELOPER');
@@ -175,6 +190,33 @@ describe('enrichAllowedTools() - Mandatory Tools', () => {
     assert.ok(
       result.includes('Skill'),
       `Skill missing with undefined currentTools, got: ${JSON.stringify(result)}`
+    );
+  });
+
+  test('should de-emphasize Grep when SPAWN_HYBRID_FIRST is on', () => {
+    process.env.SPAWN_HYBRID_FIRST = 'on';
+    const result = enrichAllowedTools('developer', [], 'You are DEVELOPER');
+    assert.ok(
+      !result.includes('Grep'),
+      `Grep should be removed in hybrid-first mode: ${JSON.stringify(result)}`
+    );
+  });
+
+  test('should keep Grep when SPAWN_HYBRID_FIRST is off', () => {
+    process.env.SPAWN_HYBRID_FIRST = 'off';
+    const result = enrichAllowedTools('developer', [], 'You are DEVELOPER');
+    assert.ok(
+      result.includes('Grep'),
+      `Grep should remain when hybrid-first is off: ${JSON.stringify(result)}`
+    );
+  });
+
+  test('should keep Grep when SPAWN_HYBRID_FIRST is unset', () => {
+    delete process.env.SPAWN_HYBRID_FIRST;
+    const result = enrichAllowedTools('developer', [], 'You are DEVELOPER');
+    assert.ok(
+      result.includes('Grep'),
+      `Grep should remain when hybrid-first is unset: ${JSON.stringify(result)}`
     );
   });
 });

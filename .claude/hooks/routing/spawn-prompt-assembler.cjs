@@ -507,6 +507,20 @@ function isEnricherDisabled() {
   return process.env.ALLOWED_TOOLS_ENRICHER === 'off';
 }
 
+function isHybridFirstEnabled() {
+  return (
+    String(process.env.SPAWN_HYBRID_FIRST || 'off')
+      .trim()
+      .toLowerCase() === 'on'
+  );
+}
+
+function applyHybridFirstToolPolicy(tools) {
+  if (!Array.isArray(tools)) return [];
+  if (!isHybridFirstEnabled()) return tools;
+  return tools.filter(tool => tool !== 'Grep');
+}
+
 /**
  * Append config model section to assembled prompt (CONFIG-001). Returns assembled unchanged if disabled or on error.
  * @param {string} assembled - Current prompt text
@@ -760,7 +774,7 @@ function hasAnyTool(tools, candidates) {
 function isUnderProvisionedExplicitTools(currentTools, prompt) {
   if (!Array.isArray(currentTools) || currentTools.length === 0) return false;
 
-  const functionalTools = [
+  const functionalTools = applyHybridFirstToolPolicy([
     'Read',
     'Write',
     'Edit',
@@ -770,7 +784,7 @@ function isUnderProvisionedExplicitTools(currentTools, prompt) {
     'WebSearch',
     'WebFetch',
     'Skill',
-  ];
+  ]);
   const hasFunctionalTools = hasAnyTool(currentTools, functionalTools);
   if (!hasFunctionalTools) return true;
 
@@ -855,7 +869,7 @@ function enrichAllowedTools(agentType, currentTools, prompt) {
   const cappedNonMandatory = nonMandatory.slice(0, Math.max(0, maxNonMandatory));
 
   // Combine: mandatory tools first (guaranteed), then non-mandatory up to limit
-  const result = [...mandatoryInList, ...cappedNonMandatory];
+  const result = applyHybridFirstToolPolicy([...mandatoryInList, ...cappedNonMandatory]);
 
   // Final safety check: if missing mandatory tools, log warning
   const missingMandatory = mandatoryTools.filter(t => !result.includes(t));

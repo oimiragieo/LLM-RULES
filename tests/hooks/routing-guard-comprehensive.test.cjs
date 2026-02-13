@@ -53,6 +53,18 @@ function cleanupState() {
   if (fs.existsSync(creatorStateFile)) {
     fs.unlinkSync(creatorStateFile);
   }
+
+  // Clean block dedupe state
+  const dedupeStateFile = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'routing-block-dedupe.json'
+  );
+  if (fs.existsSync(dedupeStateFile)) {
+    fs.unlinkSync(dedupeStateFile);
+  }
 }
 
 describe('routing-guard.cjs - Check 0: Router Bash Whitelist (ADR-030)', () => {
@@ -261,6 +273,137 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
     const result = routingGuard.checkTaskCreate('TaskCreate');
     assert.equal(result.pass, false);
     assert.match(result.message, /TASK-CREATE VIOLATION/);
+  });
+
+  it('should degrade repeated TaskCreate block into warning loop-breaker', () => {
+    const prevSessionId = process.env.CLAUDE_SESSION_ID;
+    process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
+    process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
+    process.env.CLAUDE_SESSION_ID = `test-session-taskcreate-dedupe-${Date.now()}`;
+
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'HIGH',
+      })
+    );
+
+    const first = routingGuard.checkTaskCreate('TaskCreate');
+    assert.equal(first.pass, false);
+    assert.equal(first.result, 'block');
+
+    const second = routingGuard.checkTaskCreate('TaskCreate');
+    assert.equal(second.pass, true);
+    assert.equal(second.result, 'warn');
+    assert.match(second.message, /Repeated block/);
+
+    if (prevSessionId === undefined) {
+      delete process.env.CLAUDE_SESSION_ID;
+    } else {
+      process.env.CLAUDE_SESSION_ID = prevSessionId;
+    }
+  });
+
+  it('should dedupe TaskCreate using hookInput.session_id when env session is absent', () => {
+    const prevSessionId = process.env.CLAUDE_SESSION_ID;
+    delete process.env.CLAUDE_SESSION_ID;
+    process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
+    process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
+
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'HIGH',
+      })
+    );
+
+    const first = routingGuard.runAllChecks(
+      'TaskCreate',
+      {},
+      { session_id: 'hook-session-taskcreate' }
+    );
+    assert.equal(first.pass, false);
+    assert.equal(first.result, 'block');
+
+    const second = routingGuard.runAllChecks(
+      'TaskCreate',
+      {},
+      { session_id: 'hook-session-taskcreate' }
+    );
+    assert.equal(second.pass, true);
+    assert.equal(second.result, 'allow');
+    assert.ok(Array.isArray(second.warnings));
+    const dedupeWarning = second.warnings.find(
+      w => w.checkName === 'task-create-guard' && /Repeated block/.test(w.message || '')
+    );
+    assert.ok(dedupeWarning);
+
+    if (prevSessionId !== undefined) {
+      process.env.CLAUDE_SESSION_ID = prevSessionId;
+    }
+  });
+});
+
+describe('routing-guard.cjs - Delegation to pre-task-unified for Task checks', () => {
+  afterEach(() => {
+    cleanupState();
+    delete process.env.ROUTING_GUARD_TASK_CHECKS;
+  });
+
+  it('should delegate Task planner/security checks by default', () => {
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: true,
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        requiresSecurityReview: true,
+        securitySpawned: false,
+        complexity: 'high',
+      })
+    );
+
+    const result = routingGuard.runAllChecks('Task', {
+      prompt: 'You are developer. Implement feature.',
+      subagent_type: 'developer',
+    });
+    assert.equal(result.pass, true);
+  });
+
+  it('should enforce Task planner checks when force mode is enabled', () => {
+    process.env.ROUTING_GUARD_TASK_CHECKS = 'force';
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: true,
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      })
+    );
+
+    const result = routingGuard.runAllChecks('Task', {
+      prompt: 'You are developer. Implement feature.',
+      subagent_type: 'developer',
+    });
+    assert.equal(result.pass, false);
+    assert.equal(result.checkName, 'planner-first-guard');
   });
 });
 

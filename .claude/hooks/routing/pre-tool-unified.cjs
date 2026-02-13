@@ -697,6 +697,90 @@ function isAgentScopedSession(hookInput) {
   return false;
 }
 
+function allowFromRouterBootstrap(hookInput, sessionId, now, current, stateFile) {
+  try {
+    const state = routerState.getState();
+    const lastTaskUpdate = routerState.getLastTaskUpdate();
+    const candidateTaskId = hookInput?.task_id || hookInput?.taskId || null;
+    const hookSessionId = sessionId ? String(sessionId).trim() : '';
+    const stateSessionId = state?.sessionId ? String(state.sessionId).trim() : '';
+    const hasExplicitSessionMatch =
+      hookSessionId.length > 0 && stateSessionId.length > 0 && hookSessionId === stateSessionId;
+    const hasCandidateTaskId =
+      typeof candidateTaskId === 'string' && candidateTaskId.trim().length > 0;
+    const taskIdMatches =
+      !candidateTaskId ||
+      (lastTaskUpdate?.taskId &&
+        String(candidateTaskId).trim() === String(lastTaskUpdate.taskId).trim());
+    const hasScopedIdentity = hasExplicitSessionMatch || hasCandidateTaskId;
+
+    if (
+      hasScopedIdentity &&
+      routerState.wasTaskUpdateCalledRecently() &&
+      (lastTaskUpdate?.status === 'in_progress' || lastTaskUpdate?.status === 'in-progress') &&
+      taskIdMatches
+    ) {
+      current.sessions[sessionId] = {
+        inProgress: true,
+        taskId: String(lastTaskUpdate.taskId || candidateTaskId || ''),
+        updatedAt: now,
+      };
+      writeTaskUpdateFirstState(current, stateFile);
+      return { checked: true, action: 'allow' };
+    }
+  } catch (_err) {
+    // Best-effort fallback only.
+  }
+  return null;
+}
+
+function allowWithAutoMark(taskId, toolName) {
+  return {
+    checked: true,
+    action: 'allow',
+    warning:
+      `[TASKUPDATE-FIRST AUTO-MARK] Missing TaskUpdate call detected before ${toolName}; ` +
+      `auto-marked task ${String(taskId)} as in_progress. Agent should call TaskUpdate explicitly next.`,
+  };
+}
+
+function tryAutoMarkTaskUpdateInProgress({
+  hookInput,
+  toolInput,
+  currentEntry,
+  sessionId,
+  now,
+  current,
+  stateFile,
+  toolName,
+}) {
+  const autoMarkEnabled = String(process.env.TASKUPDATE_FIRST_AUTOMARK || 'true').toLowerCase();
+  if (autoMarkEnabled === 'off') return null;
+
+  const inferredTaskId =
+    extractTaskUpdateTaskId(toolInput) ||
+    extractTaskUpdateTaskId(hookInput) ||
+    hookInput?.task_id ||
+    hookInput?.taskId ||
+    currentEntry.taskId ||
+    null;
+  if (!inferredTaskId) return null;
+
+  current.sessions[sessionId] = {
+    inProgress: true,
+    taskId: String(inferredTaskId),
+    updatedAt: now,
+  };
+  writeTaskUpdateFirstState(current, stateFile);
+
+  try {
+    routerState.recordTaskUpdate(String(inferredTaskId), 'in_progress');
+  } catch (_err) {
+    // Best-effort.
+  }
+  return allowWithAutoMark(inferredTaskId, toolName);
+}
+
 function checkTaskUpdateFirst(
   hookInput,
   toolName,
@@ -744,38 +828,20 @@ function checkTaskUpdateFirst(
 
   // Bootstrap fallback: pre-task hook records in_progress in router-state at spawn time.
   // When subagent hook payloads are sparse or delayed, honor that marker to avoid deadlock.
-  try {
-    const state = routerState.getState();
-    const lastTaskUpdate = routerState.getLastTaskUpdate();
-    const candidateTaskId = hookInput?.task_id || hookInput?.taskId || null;
-    const hookSessionId = sessionId ? String(sessionId).trim() : '';
-    const stateSessionId = state?.sessionId ? String(state.sessionId).trim() : '';
-    const hasExplicitSessionMatch =
-      hookSessionId.length > 0 && stateSessionId.length > 0 && hookSessionId === stateSessionId;
-    const hasCandidateTaskId =
-      typeof candidateTaskId === 'string' && candidateTaskId.trim().length > 0;
-    const taskIdMatches =
-      !candidateTaskId ||
-      (lastTaskUpdate?.taskId &&
-        String(candidateTaskId).trim() === String(lastTaskUpdate.taskId).trim());
-    const hasScopedIdentity = hasExplicitSessionMatch || hasCandidateTaskId;
-    if (
-      hasScopedIdentity &&
-      routerState.wasTaskUpdateCalledRecently() &&
-      (lastTaskUpdate?.status === 'in_progress' || lastTaskUpdate?.status === 'in-progress') &&
-      taskIdMatches
-    ) {
-      current.sessions[sessionId] = {
-        inProgress: true,
-        taskId: String(lastTaskUpdate.taskId || candidateTaskId || ''),
-        updatedAt: now,
-      };
-      writeTaskUpdateFirstState(current, stateFile);
-      return { checked: true, action: 'allow' };
-    }
-  } catch (_err) {
-    // Best-effort fallback only.
-  }
+  const bootstrapAllow = allowFromRouterBootstrap(hookInput, sessionId, now, current, stateFile);
+  if (bootstrapAllow) return bootstrapAllow;
+
+  const autoMarkAllow = tryAutoMarkTaskUpdateInProgress({
+    hookInput,
+    toolInput,
+    currentEntry,
+    sessionId,
+    now,
+    current,
+    stateFile,
+    toolName,
+  });
+  if (autoMarkAllow) return autoMarkAllow;
 
   const message =
     '[TASKUPDATE-FIRST] Agent must call TaskUpdate({ taskId, status: "in_progress" }) ' +

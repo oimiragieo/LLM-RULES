@@ -9,6 +9,7 @@ const {
   checkTaskUpdateFirst,
   readTaskUpdateFirstState,
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
+const routerState = require('../../.claude/lib/routing/router-state.cjs');
 
 describe('pre-tool-unified taskupdate-first guard', () => {
   const routerStatePath = path.join(
@@ -27,6 +28,7 @@ describe('pre-tool-unified taskupdate-first guard', () => {
     try {
       fs.mkdirSync(path.dirname(routerStatePath), { recursive: true });
       atomicWriteJSONSync(routerStatePath, state);
+      routerState.invalidateStateCache();
       fn();
     } finally {
       if (existed) {
@@ -34,6 +36,7 @@ describe('pre-tool-unified taskupdate-first guard', () => {
       } else {
         fs.rmSync(routerStatePath, { force: true });
       }
+      routerState.invalidateStateCache();
     }
   }
 
@@ -41,7 +44,9 @@ describe('pre-tool-unified taskupdate-first guard', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'taskupdate-first-'));
     const stateFile = path.join(tempDir, 'state.json');
     const priorMode = process.env.TASKUPDATE_FIRST_ENFORCEMENT;
+    const priorAutoMark = process.env.TASKUPDATE_FIRST_AUTOMARK;
     process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'block';
+    process.env.TASKUPDATE_FIRST_AUTOMARK = 'off';
     try {
       fn(stateFile);
     } finally {
@@ -49,6 +54,11 @@ describe('pre-tool-unified taskupdate-first guard', () => {
         delete process.env.TASKUPDATE_FIRST_ENFORCEMENT;
       } else {
         process.env.TASKUPDATE_FIRST_ENFORCEMENT = priorMode;
+      }
+      if (priorAutoMark == null) {
+        delete process.env.TASKUPDATE_FIRST_AUTOMARK;
+      } else {
+        process.env.TASKUPDATE_FIRST_AUTOMARK = priorAutoMark;
       }
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -193,6 +203,23 @@ describe('pre-tool-unified taskupdate-first guard', () => {
           assert.equal(result.action, 'allow');
         }
       );
+    });
+  });
+
+  test('auto-marks in_progress when task id is present and auto-mark is enabled', () => {
+    withTempStateFile(stateFile => {
+      process.env.TASKUPDATE_FIRST_AUTOMARK = 'true';
+      const hookInput = {
+        session_id: 'session-9',
+        task_id: 'task-9',
+      };
+      const result = checkTaskUpdateFirst(hookInput, 'Read', { file_path: 'README.md' }, stateFile);
+      assert.equal(result.action, 'allow');
+      assert.match(result.warning || '', /AUTO-MARK/);
+
+      const state = readTaskUpdateFirstState(stateFile);
+      assert.equal(state.sessions['session-9'].inProgress, true);
+      assert.equal(state.sessions['session-9'].taskId, 'task-9');
     });
   });
 });

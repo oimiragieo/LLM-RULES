@@ -386,7 +386,8 @@ ENV_VARS.forEach(v => {
 // Start MCP server via uvx or pipx
 const server = spawn('uvx', ['${server}'], {
   stdio: ['inherit', 'inherit', 'inherit'],
-  env: process.env
+  env: process.env,
+  windowsHide: true
 });
 
 server.on('error', (err) => {
@@ -394,7 +395,8 @@ server.on('error', (err) => {
   console.log('uvx not found, trying pipx...');
   const fallback = spawn('pipx', ['run', '${server}'], {
     stdio: ['inherit', 'inherit', 'inherit'],
-    env: process.env
+    env: process.env,
+    windowsHide: true
   });
 
   fallback.on('error', (e) => {

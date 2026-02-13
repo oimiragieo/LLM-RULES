@@ -22,10 +22,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 describe('sync-memory-index DB init race condition prevention', () => {
   it('ensureEntityDbInitialized should use file-based locking pattern', () => {
-    const filePath = path.join(
-      PROJECT_ROOT,
-      '.claude/hooks/memory/sync-memory-index.cjs'
-    );
+    const filePath = path.join(PROJECT_ROOT, '.claude/hooks/memory/sync-memory-index.cjs');
     assert.ok(fs.existsSync(filePath), 'sync-memory-index.cjs not found');
 
     const content = fs.readFileSync(filePath, 'utf8');
@@ -52,10 +49,7 @@ describe('sync-memory-index DB init race condition prevention', () => {
   });
 
   it('should clean up lock file in finally block', () => {
-    const filePath = path.join(
-      PROJECT_ROOT,
-      '.claude/hooks/memory/sync-memory-index.cjs'
-    );
+    const filePath = path.join(PROJECT_ROOT, '.claude/hooks/memory/sync-memory-index.cjs');
     const content = fs.readFileSync(filePath, 'utf8');
 
     // Must have finally block that cleans up lock

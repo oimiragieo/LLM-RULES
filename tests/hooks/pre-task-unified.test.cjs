@@ -43,6 +43,13 @@ const TASKLIST_LOOP_STATE_FILE = path.join(
   'runtime',
   'tasklist-first-loop-state.json'
 );
+const PLANNER_LOOP_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'planner-first-loop-state.json'
+);
 
 function backupState(filePath) {
   if (fs.existsSync(filePath)) {
@@ -101,6 +108,8 @@ describe('pre-task-unified.cjs', () => {
       TASK_RESUME_ENFORCEMENT: process.env.TASK_RESUME_ENFORCEMENT,
       TASK_ALLOW_AGENT_RESUME: process.env.TASK_ALLOW_AGENT_RESUME,
       TASK_SINGLE_PURPOSE_ENFORCEMENT: process.env.TASK_SINGLE_PURPOSE_ENFORCEMENT,
+      PLANNER_FIRST_LOOP_BREAKER_THRESHOLD: process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD,
+      PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS: process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS,
     };
 
     // Clean environment
@@ -112,6 +121,8 @@ describe('pre-task-unified.cjs', () => {
     delete process.env.TASK_RESUME_ENFORCEMENT;
     delete process.env.TASK_ALLOW_AGENT_RESUME;
     delete process.env.TASK_SINGLE_PURPOSE_ENFORCEMENT;
+    delete process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD;
+    delete process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS;
 
     // Invalidate all caches before each test
     preTaskUnified.invalidateCachedState();
@@ -122,6 +133,7 @@ describe('pre-task-unified.cjs', () => {
     restoreState(ROUTER_STATE_FILE, routerStateBackup);
     restoreState(LOOP_STATE_FILE, loopStateBackup);
     restoreState(TASKLIST_LOOP_STATE_FILE, tasklistLoopStateBackup);
+    restoreState(PLANNER_LOOP_STATE_FILE, null);
 
     // Restore environment
     for (const [key, value] of Object.entries(originalEnv)) {
@@ -708,6 +720,131 @@ describe('pre-task-unified.cjs', () => {
       assert.ok(third.message.includes('LOOP-BREAKER'));
 
       preTaskUnified.clearTaskListFirstViolation('tasklist-loop-test');
+    });
+  });
+
+  describe('Planner-first loop-breaker', () => {
+    it('allows Task spawn after threshold violations in window', () => {
+      process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '3';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
+      process.env.CLAUDE_SESSION_ID = 'planner-loop-allow';
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      });
+
+      const first = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const second = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const third = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+
+      assert.strictEqual(first.pass, false);
+      assert.strictEqual(second.pass, false);
+      assert.strictEqual(third.pass, true);
+      assert.strictEqual(third.result, 'warn');
+      assert.ok(third.message.includes('LOOP-BREAKER'));
+    });
+
+    it('blocks until threshold when enforcement is block', () => {
+      process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '4';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
+      process.env.CLAUDE_SESSION_ID = 'planner-loop-block';
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      });
+
+      const first = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const second = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const third = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+
+      assert.strictEqual(first.pass, false);
+      assert.strictEqual(second.pass, false);
+      assert.strictEqual(third.pass, false);
+      assert.strictEqual(third.result, 'block');
+      assert.ok(third.message.includes('PLANNER-FIRST VIOLATION'));
+    });
+
+    it('resets count when planner is spawned', () => {
+      process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '2';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
+      process.env.CLAUDE_SESSION_ID = 'planner-loop-reset';
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      });
+
+      const blockOnce = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      assert.strictEqual(blockOnce.pass, false);
+
+      const plannerSpawn = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are planner. design the complex feature.',
+      });
+      assert.strictEqual(plannerSpawn.pass, true);
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      });
+
+      const afterReset = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      assert.strictEqual(afterReset.pass, false);
+      assert.strictEqual(afterReset.result, 'block');
+    });
+
+    it('respects threshold env override', () => {
+      process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '2';
+      process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
+      process.env.CLAUDE_SESSION_ID = 'planner-loop-threshold';
+
+      writeState(ROUTER_STATE_FILE, {
+        mode: 'router',
+        requiresPlannerFirst: true,
+        plannerSpawned: false,
+        complexity: 'high',
+      });
+
+      const first = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const second = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+
+      assert.strictEqual(first.pass, false);
+      assert.strictEqual(second.pass, true);
+      assert.strictEqual(second.result, 'warn');
+      assert.ok(second.message.includes('LOOP-BREAKER'));
     });
   });
 

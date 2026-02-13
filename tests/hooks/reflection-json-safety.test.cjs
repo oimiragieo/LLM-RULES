@@ -61,10 +61,7 @@ describe('safeParseJSON adoption in reflection hooks', () => {
         const content = fs.readFileSync(filePath, 'utf8');
 
         // Extract the target function body
-        const funcRegex = new RegExp(
-          `function\\s+${hook.functionName}\\s*\\([^)]*\\)\\s*\\{`,
-          'g'
-        );
+        const funcRegex = new RegExp(`function\\s+${hook.functionName}\\s*\\([^)]*\\)\\s*\\{`, 'g');
         const funcMatch = funcRegex.exec(content);
         assert.ok(funcMatch, `Function ${hook.functionName} not found in ${hook.name}`);
 

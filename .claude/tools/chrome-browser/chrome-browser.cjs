@@ -210,6 +210,7 @@ function runSkill() {
       encoding: 'utf-8',
       stdio: options.json ? 'pipe' : 'inherit',
       shell: false, // CRITICAL: Prevents shell interpretation
+      windowsHide: true, // Prevents console flashing + argument leakage on Windows
     });
 
     if (spawnResult.status !== 0) {

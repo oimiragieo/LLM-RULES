@@ -1,4 +1,160 @@
-<!-- Last Cleaned: 2026-02-11 - Added QA test suite gaps -->
+<!-- Last Cleaned: 2026-02-13 - Added Wave 11 Pipeline Retrospective Issues -->
+
+## 2026-02-13: Task #13 Reflection Context Missing (P1)
+
+**Issue**: Reflection queue contained Task #13 completion trigger but no summary metadata — breaks audit trail for batch reflection.
+
+**Impact**: Incomplete learnings extraction, cannot determine what was accomplished or identify patterns from Task #13 work.
+
+**Root Cause**: `post-completion-chain.cjs` may not be populating summary metadata for all task completions, or Task #13 completion did not follow task tracking protocol.
+
+**Workaround**: Mark as "context unavailable" in reflection log; continue with available tasks.
+
+**Solution**:
+
+1. Investigate `post-completion-chain.cjs` to ensure summary always included in reflection queue entries
+2. Add validation check that rejects queue entries without minimum metadata (taskId, summary, timestamp)
+3. Update reflection workflow to gracefully handle missing context (log warning, skip detailed analysis)
+4. Add TaskUpdate validation hook that enforces summary field on completion
+
+**Priority**: P1 (audit trail integrity)
+
+**Related**: reflection-workflow.md, post-completion-chain.cjs, reflection-spawn-request.json format
+
+---
+
+## 2026-02-13: Stale Integration Queue Entries Accumulate (P2)
+
+**Issue**: Integration queue can contain stale entries from previous sessions (e.g., ripgrep skill already catalogued but queue entry persisted).
+
+**Impact**: MEDIUM - Wastes processing time on non-issues, creates false-positive remediation work, queue grows unbounded.
+
+**Root Cause**: Queue entries not automatically validated against current artifact state before processing.
+
+**Solution**:
+
+1. Add queue hygiene step to artifact-integrator skill (Step 0: Validate Queue)
+2. Cross-check each entry against current state:
+   - Skill in catalog? → Mark stale if already integrated
+   - Agent in registry? → Mark stale if already registered
+   - Hook in settings.json? → Mark stale if already wired
+3. Mark stale entries as `processed: true, stale: true, reason: "already integrated"`
+4. Periodic queue cleanup (remove entries >30 days old)
+5. Add integration timestamp to queue entries for staleness detection
+
+**Priority**: P2 (efficiency improvement, prevents queue bloat)
+
+**Related**: artifact-integrator skill, integration-queue.jsonl, ADR-100 Step 0.5
+
+---
+
+## 2026-02-13: Integration Health Scoring Not Calculated (P2)
+
+**Issue**: artifact-integrator skill processes integration queue but does not calculate integration health scores per ADR-100 Step 4.5.
+
+**Impact**: MEDIUM - Missing integration health visibility, cannot track improvement over time, no RBT diagnosis for integration gaps.
+
+**Root Cause**: artifact-integrator skill may not be invoking `quickIntegrationCheck()` from `.claude/lib/workflow/artifact-graph.cjs`.
+
+**Solution**:
+
+1. Update artifact-integrator skill to invoke `quickIntegrationCheck()` for each artifact analyzed
+2. Include integration health score in task completion summary metadata
+3. Add score to RBT diagnosis:
+   - Score >= 90% → Rose: "Well-integrated artifact"
+   - Score 50-79% → Bud: "Integration gaps: [list]"
+   - Score < 50% → Thorn: "Critical integration gaps: [list]"
+4. Include integration health section in artifact-integrator report output
+5. Log integration scores to metrics for trend analysis
+
+**Priority**: P2 (observability improvement)
+
+**Related**: ADR-100 Step 4.5, artifact-graph.cjs, artifact-integrator skill, reflection-agent Step 4.5
+
+---
+
+## 2026-02-13: Missing Automated windowsHide Enforcement
+
+**Issue**: Manual pattern application of `windowsHide: true` across 18 files (Task #10) — future spawn calls may forget to include windowsHide, causing console flashing regression on Windows.
+
+**Impact**: User experience degradation on Windows (annoying console window flashing during subprocess execution).
+
+**Workaround**: Code review checklist includes windowsHide verification for all spawn/spawnSync additions.
+
+**Solution**: Add ESLint rule requiring `windowsHide: true` on all spawn calls, OR create shared `safeSpawn()` wrapper utility that automatically includes the option.
+
+**Priority**: P1 (prevents future regressions)
+
+**Related**: Task #10, security.md (shell execution safety)
+
+---
+
+## 2026-02-13: Task #13 Missing Reflection Context
+
+**Issue**: Reflection queue contained Task #13 completion trigger but no summary metadata — breaks audit trail for batch reflection.
+
+**Impact**: Incomplete learnings extraction, cannot determine what was accomplished or identify patterns.
+
+**Workaround**: Mark as "analyzed but incomplete" in reflection log; continue with available tasks.
+
+**Solution**: Investigate `post-completion-chain.cjs` to ensure summary metadata is always included in reflection queue entries. May need to add validation check before queuing reflection request.
+
+**Priority**: P1 (audit trail integrity)
+
+**Related**: reflection-workflow.md, post-completion-chain.cjs
+
+---
+
+## 2026-02-13: Bash Command Allowlist Lacks Categorization
+
+**Issue**: `SAFE_COMMANDS_ALLOWLIST` in `registry.cjs` has 80+ commands in flat list — hard to understand security model and audit which command categories are permitted.
+
+**Impact**: Difficult to audit security posture; reviewers must read all 80 comments to understand allowlist philosophy.
+
+**Workaround**: Individual commands have inline comments explaining security rationale.
+
+**Solution**: Refactor allowlist into categorized sections:
+
+- Shell builtins (for, while, if, etc.)
+- Read-only filesystem (ls, cat, grep, etc.)
+- Development tools (git, npm, node, etc.)
+- Build tools (make, cargo, gcc, etc.)
+- Archive tools (tar, zip, unzip, etc.)
+
+Add section headers with security rationale for each category.
+
+**Priority**: P2 (improves maintainability but not blocking)
+
+**Related**: Task #11, registry.cjs, security.md
+
+---
+
+## 2026-02-13: Hook Crash Telemetry Missing
+
+**Issue**: File existence guards (Task #12) prevent crashes when files are missing, but don't log which files were expected — diagnostic gap when troubleshooting hook behavior.
+
+**Impact**: When hooks gracefully degrade due to missing files, no telemetry indicates what was expected vs. what was found.
+
+**Workaround**: Manual debugging via adding temporary console.error logs to hooks.
+
+**Solution**: Add structured logging to existence guard pattern:
+
+```javascript
+if (!fs.existsSync(configPath)) {
+  eventBus.emit(EventTypes.HOOK_WARNING, {
+    hook: 'hook-name',
+    message: `Optional file missing: ${configPath}`,
+    gracefulDegradation: true,
+  });
+  return { allow: true };
+}
+```
+
+**Priority**: P1 (improves observability for hook reliability)
+
+**Related**: Task #12, event-bus.cjs, post-tool-metrics-unified.cjs
+
+---
 
 ## 2026-02-10: Integration Health Gaps in Task #22 (Wave 16B)
 
@@ -728,6 +884,19 @@ Additionally, `skill-plan-generator-output.schema.json` (210 lines, Tier 1 gold 
 
 ---
 
+## 2026-02-13: RESOLVED - Security Fixes (Commits 1-4)
+
+**Issues Resolved:**
+
+- ✅ **CRITICAL-002 (shell injection)**: RESOLVED - `shell: true` removed from skill scripts, replaced with `shell: false`
+- ✅ **CRITICAL-001 (JSON.parse safety)**: RESOLVED - safeParseJSON adopted in reflection hooks
+- ✅ **HIGH-002 (DB race condition)**: RESOLVED - File-based locking added to sync-memory-index.cjs
+- ✅ **P0 (nul file)**: RESOLVED - Windows reserved filename deleted
+
+**Impact:** 4 critical/high/P0 issues fixed with zero test regressions. Framework now has hardened shell execution safety and JSON parsing protection.
+
+---
+
 ## 2026-02-11: Test Failures in Comprehensive Test Suites (Non-Blocking)
 
 **Issue**: 3 test failures in new comprehensive test suites added during audit fix pipeline.
@@ -976,3 +1145,68 @@ After remediation (all fixes): System eligible for Type II certification.
 4. **Day 60**: Plan Wave 3 audit (remaining components: agents, skills, workflows)
 
 **Priority**: CRITICAL - All P0 items block deployment without remediation
+
+---
+
+## 2026-02-13: Documentation Wave (Task #16) - Issues Captured
+
+**Summary**: Wave 10 technical writer captured 6 critical/high issues for future remediation and 5 new ADRs for architectural reference.
+
+### P1 Issues Added to Tracking
+
+1. **Missing Automated windowsHide Enforcement**
+   - Manual application across 18 spawn/spawnSync calls in 5 files
+   - Solution: Add ESLint rule requiring windowsHide: true on all spawn/spawnSync calls
+   - Alternative: Create safeSpawn() wrapper utility
+   - Priority: P1 (prevents future regressions)
+   - Related: ADR-114, security.md
+
+2. **Task #13 Reflection Context Missing**
+   - Reflection queue contains completion trigger but no summary metadata
+   - Impact: Breaks audit trail, cannot determine what Task #13 accomplished
+   - Root cause: post-completion-chain.cjs may not populate summary field
+   - Solution: Add validation check that rejects queue entries without minimum metadata
+   - Priority: P1 (audit trail integrity)
+   - Related: reflection-workflow.md, post-completion-chain.cjs
+
+3. **Hook Crash Telemetry Missing**
+   - File existence guards prevent crashes but don't log which files were expected
+   - Diagnostic gap: When hooks gracefully degrade, no telemetry indicates what was expected
+   - Solution: Add structured logging via event bus when optional files are missing
+   - Priority: P1 (improves observability)
+   - Related: sync-memory-index.cjs, post-tool-metrics-unified.cjs
+
+### P2 Issues Added to Tracking
+
+4. **Stale Integration Queue Entries Accumulate**
+   - Integration queue persists entries for already-integrated artifacts
+   - Impact: Wastes processing time on non-issues, queue grows unbounded
+   - Solution: Add hygiene step to artifact-integrator skill validating entries against current state
+   - Priority: P2 (efficiency improvement)
+   - Related: artifact-integrator skill, ADR-100 Step 0.5
+
+5. **Integration Health Scoring Not Calculated**
+   - artifact-integrator processes queue but doesn't invoke quickIntegrationCheck()
+   - Impact: Missing integration health visibility, cannot track improvement over time
+   - Solution: Update artifact-integrator to include integration health score in reports
+   - Priority: P2 (observability improvement)
+   - Related: ADR-100 Step 4.5, artifact-graph.cjs
+
+6. **Bash Command Allowlist Lacks Categorization**
+   - SAFE_COMMANDS_ALLOWLIST in registry.cjs has 80+ commands in flat list
+   - Impact: Hard to audit security model, difficult to understand allowlist philosophy
+   - Solution: Refactor into categorized sections (shell builtins, read-only fs, dev tools, build tools, archive tools)
+   - Priority: P2 (improves maintainability)
+   - Related: Task #11, security.md
+
+### ADRs Added to Memory
+
+All 5 new ADRs documented in decisions.md:
+
+- **ADR-114**: Shell Execution Hardening (shell: false standard) - IMPLEMENTED
+- **ADR-115**: safeParseJSON Utility Standard - IMPLEMENTED
+- **ADR-116**: File-Based Locking for Concurrent Operations - IMPLEMENTED
+- **ADR-113**: Security Input Sanitization Hardening - IMPLEMENTED
+- **ADR-112**: Agent Registry 3-File Split Strategy - IMPLEMENTED (Wave 4a)
+
+**Documentation Report**: `.claude/context/reports/docs-update-2026-02-13.md`

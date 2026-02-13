@@ -1259,6 +1259,35 @@
       ],
       "extracted_from": "Task #21 (Wave 16A), reflection analysis",
       "date": "2026-02-10"
+    },
+    {
+      "id": "code-review-fix-cycle-rapid-remediation",
+      "name": "Code Review to Fix Cycle with Rapid Remediation",
+      "context": "Task #13 Code Review Wave - 3 critical windowsHide violations rapidly fixed",
+      "description": "When code review identifies critical issues with exact file:line citations and clear priority classification, follow-up developer agent can remediate without clarification iteration. Pattern: precise issue location + priority classification + explicit approval checklist → zero-rework fixes. Demonstrated by Task #13 (3 critical issues identified) → Task #14 (all 3 fixed in follow-up)",
+      "why_it_works": "Specificity is the key: exact file:line references eliminate ambiguity. Developer agent can directly apply fixes without asking for clarification.",
+      "key_elements": [
+        "Exact file:line numbers in code review findings",
+        "Priority classification (critical/important/minor)",
+        "Explicit approval checklist",
+        "Clear verdict (REQUEST_CHANGES vs. APPROVE)"
+      ],
+      "example": "Task #13 review: 'Fix Required: Add windowsHide: true to .claude/skills/skill-creator/scripts/create.cjs:1061' → Task #14 developer: fix applied directly without rework",
+      "applicability": "Multi-agent workflows with code-reviewer → developer handoff. Reduces iteration cycles.",
+      "benefits": [
+        "Zero rework iterations when precision is high",
+        "Clear priority helps developers prioritize fixes",
+        "Reduces context needed for follow-up",
+        "Enables parallel fix execution"
+      ],
+      "anti_patterns": [
+        "Vague review findings ('improve error handling' without location)",
+        "Mixed priority levels in single issue",
+        "No explicit approval checklist",
+        "Ambiguous verdicts"
+      ],
+      "extracted_from": "Task #13 Reflection - Code Review to Fix Cycle, code-review-2026-02-13.md",
+      "date": "2026-02-13"
     }
   ]
 }

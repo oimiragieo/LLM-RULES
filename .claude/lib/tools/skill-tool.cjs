@@ -18,6 +18,15 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 const SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');
+const SKILL_ALIASES = {
+  'task-management': 'task-management-protocol',
+};
+
+function normalizeSkillName(skillName) {
+  if (!skillName || typeof skillName !== 'string') return '';
+  const normalized = skillName.toLowerCase().trim();
+  return SKILL_ALIASES[normalized] || normalized;
+}
 
 /**
  * Load skill definition from SKILL.md file
@@ -30,7 +39,7 @@ function loadSkill(skillName) {
   }
 
   // Normalize skill name
-  const normalized = skillName.toLowerCase().trim();
+  const normalized = normalizeSkillName(skillName);
 
   // Direct path
   const directPath = path.join(SKILLS_DIR, normalized, 'SKILL.md');
@@ -183,7 +192,8 @@ function Skill(options = {}) {
   }
 
   // Load skill
-  const skill = loadSkill(skillName);
+  const normalizedRequested = normalizeSkillName(skillName);
+  const skill = loadSkill(normalizedRequested);
   if (!skill) {
     return {
       success: false,
@@ -198,6 +208,7 @@ function Skill(options = {}) {
   return {
     success: true,
     skill: skill.name,
+    requestedSkill: skillName,
     displayName: skill.displayName,
     description: skill.description,
     category: skill.category,
@@ -302,6 +313,8 @@ module.exports = {
   loadSkill,
   listAvailableSkills,
   searchSkills,
+  normalizeSkillName,
+  SKILL_ALIASES,
 };
 
 // CLI execution
