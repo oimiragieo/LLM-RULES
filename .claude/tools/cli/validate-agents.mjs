@@ -200,6 +200,7 @@ function validateAgent(filePath, _relativePath) {
  */
 function scanAgents(dir) {
   const agents = [];
+  const includeArchive = process.env.INCLUDE_ARCHIVE_AGENTS === 'true';
 
   function scan(currentDir, relativeBase) {
     const entries = fs.readdirSync(currentDir, { withFileTypes: true });
@@ -209,6 +210,9 @@ function scanAgents(dir) {
       const relativePath = path.join(relativeBase, entry.name);
 
       if (entry.isDirectory()) {
+        if (!includeArchive && entry.name === '_archive') {
+          continue;
+        }
         scan(fullPath, relativePath);
       } else if (entry.name.endsWith('.md')) {
         agents.push({ fullPath, relativePath, name: entry.name });

@@ -327,6 +327,48 @@ node .claude/skills/skill-creator/scripts/create.cjs \
   --validate ".claude/skills/my-skill"
 ```
 
+### `generate-openai-yaml` - Onboard Skills for UI Discovery
+
+Generate canonical `agents/openai.yaml` metadata so skills are discoverable in agent runtimes.
+
+```bash
+# Generate for a single skill
+node .claude/skills/skill-creator/scripts/generate-openai-yaml.cjs \
+  --skill "my-skill"
+
+# Generate for all skills that do not already have openai.yaml
+node .claude/skills/skill-creator/scripts/generate-openai-yaml.cjs \
+  --all
+```
+
+## TDD Execution Plan (MANDATORY FOR FIXES)
+
+For every skill fix or restore, run this exact plan:
+
+1. **Plan tests first**
+   - Define failing behavior and target files.
+   - Add/update focused tests before code changes.
+2. **Red checkpoint**
+   - Run targeted tests and confirm they fail for the expected reason.
+3. **Green checkpoint**
+   - Implement minimal fix.
+   - Re-run targeted tests until passing.
+4. **Refactor checkpoint**
+   - Clean names/structure without behavior changes.
+   - Re-run targeted tests.
+5. **Repository quality gates**
+   - `npx prettier --check <changed-files>`
+   - `npx eslint <changed-files>`
+   - `node --test <targeted-tests>`
+   - Run domain validators when applicable (`skills:validate`, `agents:registry:validate`, `validate:references`).
+6. **Submission checkpoint**
+   - `git status --short`
+   - `git diff -- <changed-files>`
+   - Split commit by concern:
+     - Commit A: tooling/scripts
+     - Commit B: generated artifacts (for example `agents/openai.yaml`)
+     - Commit C: docs/policy updates
+
 ### `install` - Install Skill from GitHub
 
 Clone and install a skill from a GitHub repository.

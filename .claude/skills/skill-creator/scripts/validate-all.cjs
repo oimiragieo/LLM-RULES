@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const yaml = require('js-yaml');
 
 // SEC-009-VALIDATE FIX: Path validation to prevent command injection
 const DANGEROUS_CHARS = [
@@ -62,6 +63,45 @@ const RECOMMENDED_FIELDS = [
   'error_handling',
   'streaming',
 ];
+const ALLOWED_FRONTMATTER_FIELDS = new Set([
+  'name',
+  'description',
+  'version',
+  'model',
+  'invoked_by',
+  'user_invocable',
+  'tools',
+  'allowed-tools',
+  'args',
+  'best_practices',
+  'error_handling',
+  'streaming',
+  'metadata',
+  'license',
+  'globs',
+  'feature_flag',
+  'source',
+  'source_url',
+  'source_license',
+  'consolidated_from',
+  'templates',
+  'dependencies',
+  'assigned_agents',
+  'related_skills',
+  'aliases',
+  'safety_level',
+  'output_location',
+  'output_paths',
+  'output_schema',
+  'category',
+  'author',
+  'triggers',
+  'skills',
+  'mcp_server_status',
+  'requires_mcp_server',
+  'executable',
+  'test_suite',
+]);
 
 // Colors for output
 const colors = {
@@ -83,41 +123,65 @@ function log(color, message) {
 function parseFrontmatter(content) {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return null;
-
-  const yaml = match[1];
-  const result = {};
-
-  // Simple YAML parser for our use case
-  const lines = yaml.split('\n');
-  let currentKey = null;
-  let inArray = false;
-
-  for (const line of lines) {
-    if (line.match(/^[a-z_]+:/)) {
-      const colonIndex = line.indexOf(':');
-      currentKey = line.slice(0, colonIndex);
-      const value = line.slice(colonIndex + 1).trim();
-
-      if (value === '') {
-        result[currentKey] = [];
-        inArray = true;
-      } else if (value.startsWith('[')) {
-        // Inline array
-        result[currentKey] = value
-          .slice(1, -1)
-          .split(',')
-          .map(s => s.trim());
-        inArray = false;
-      } else {
-        result[currentKey] = value;
-        inArray = false;
-      }
-    } else if (inArray && line.match(/^\s+-\s/)) {
-      result[currentKey].push(line.replace(/^\s+-\s/, '').trim());
+  try {
+    const parsed = yaml.load(match[1]);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null;
     }
+    return parsed;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function validateOpenAiYaml(skillDir, skillName) {
+  const warnings = [];
+  const errors = [];
+  const openAiYamlPath = path.join(skillDir, 'agents', 'openai.yaml');
+  if (!fs.existsSync(openAiYamlPath)) {
+    warnings.push('Missing agents/openai.yaml (recommended for UI discovery)');
+    return { errors, warnings };
   }
 
-  return result;
+  try {
+    const raw = fs.readFileSync(openAiYamlPath, 'utf-8');
+    const doc = yaml.load(raw) || {};
+    const iface = doc.interface || {};
+    if (!iface.display_name) {
+      warnings.push('openai.yaml missing interface.display_name');
+    }
+    const shortDescription = String(iface.short_description || '');
+    if (!shortDescription) {
+      warnings.push('openai.yaml missing interface.short_description');
+    } else if (shortDescription.length < 25 || shortDescription.length > 64) {
+      warnings.push(
+        `openai.yaml interface.short_description should be 25-64 chars (got ${shortDescription.length})`
+      );
+    }
+
+    const defaultPrompt = String(iface.default_prompt || '');
+    if (!defaultPrompt) {
+      warnings.push('openai.yaml missing interface.default_prompt');
+    } else if (!defaultPrompt.includes(`$${skillName}`)) {
+      warnings.push(`openai.yaml default_prompt should explicitly mention $${skillName}`);
+    }
+
+    if (doc.dependencies && Array.isArray(doc.dependencies.tools)) {
+      for (const dep of doc.dependencies.tools) {
+        if (!dep || typeof dep !== 'object') {
+          errors.push('openai.yaml dependencies.tools must contain objects');
+          continue;
+        }
+        if (dep.type === 'mcp' && !dep.value) {
+          errors.push('openai.yaml mcp dependency missing value');
+        }
+      }
+    }
+  } catch (err) {
+    errors.push(`Invalid agents/openai.yaml: ${err.message}`);
+  }
+
+  return { errors, warnings };
 }
 
 /**
@@ -157,6 +221,12 @@ function validateSkillMd(skillPath) {
   for (const field of RECOMMENDED_FIELDS) {
     if (!frontmatter[field]) {
       warnings.push(`Missing recommended field: ${field}`);
+    }
+  }
+
+  for (const key of Object.keys(frontmatter)) {
+    if (!ALLOWED_FRONTMATTER_FIELDS.has(key)) {
+      warnings.push(`Unknown frontmatter field: ${key}`);
     }
   }
 
@@ -210,6 +280,11 @@ function validateSkillMd(skillPath) {
   // Check for Memory Protocol section
   if (!content.includes('Memory Protocol')) {
     warnings.push('Missing Memory Protocol section');
+  }
+
+  const skillLineCount = content.split('\n').length;
+  if (skillLineCount > 500) {
+    warnings.push(`SKILL.md is ${skillLineCount} lines (>500). Consider progressive disclosure.`);
   }
 
   return { errors, warnings, frontmatter };
@@ -304,6 +379,11 @@ function validateSkill(skillName) {
   results.warnings.push(...skillMdResult.warnings.map(w => `[SKILL.md] ${w}`));
   results.checks.skillMd.status = skillMdResult.errors.length === 0 ? 'pass' : 'fail';
 
+  // 1b. Validate optional agents/openai.yaml
+  const openAiYamlResult = validateOpenAiYaml(skillDir, skillName);
+  results.errors.push(...openAiYamlResult.errors.map(e => `[agents/openai.yaml] ${e}`));
+  results.warnings.push(...openAiYamlResult.warnings.map(w => `[agents/openai.yaml] ${w}`));
+
   // 2. Validate main script (required if scripts/ exists)
   const scriptsDir = path.join(skillDir, 'scripts');
   if (fs.existsSync(scriptsDir)) {
@@ -374,12 +454,26 @@ function main() {
   console.log('='.repeat(60) + '\n');
 
   // Get all skills
-  const skills = fs
+  const candidateDirs = fs
     .readdirSync(SKILLS_DIR)
     .filter(f => fs.statSync(path.join(SKILLS_DIR, f)).isDirectory())
+    .filter(f => !f.startsWith('_'))
     .sort();
+  const skippedDirs = [];
+  const skills = candidateDirs.filter(skillName => {
+    const skillMdPath = path.join(SKILLS_DIR, skillName, 'SKILL.md');
+    const isSkill = fs.existsSync(skillMdPath);
+    if (!isSkill) {
+      skippedDirs.push(skillName);
+    }
+    return isSkill;
+  });
 
   console.log(`Found ${skills.length} skills to validate\n`);
+  if (skippedDirs.length > 0) {
+    log('blue', `Skipping ${skippedDirs.length} non-skill directories: ${skippedDirs.join(', ')}`);
+    console.log('');
+  }
 
   const allResults = [];
   let totalErrors = 0;
@@ -449,4 +543,13 @@ function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  parseFrontmatter,
+  validateSkillMd,
+  validateOpenAiYaml,
+  validateSkill,
+};
