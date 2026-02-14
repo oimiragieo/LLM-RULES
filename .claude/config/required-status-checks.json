@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "owner": "ci-governance",
+  "required_checks": [
+    "memory-ci",
+    "memory-mvp-gate",
+    "nightly-strict-gate",
+    "creator-ecosystem-validation",
+    "validate-commands",
+    "validate-skills"
+  ]
+}
