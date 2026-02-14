@@ -101,7 +101,10 @@ describe('validate-skill-ecosystem', () => {
   });
 
   test('buildSkillSlug creates nested-safe identifier', () => {
-    assert.strictEqual(buildSkillSlug('scientific-skills/skills/biopython'), 'scientific-skills--skills--biopython');
+    assert.strictEqual(
+      buildSkillSlug('scientific-skills/skills/biopython'),
+      'scientific-skills--skills--biopython'
+    );
   });
 
   test('isArchivedSkillPath identifies archived skill paths', () => {

@@ -15,6 +15,7 @@ const os = require('os');
 // We'll test the recursive scanning function
 const {
   generateIndex,
+  isArchivedSkillName,
   resolveScanMode,
   scanSkillFilesRecursively,
 } = require('../../../.claude/tools/cli/generate-skill-index.cjs');
@@ -32,6 +33,13 @@ describe('generate-skill-index', () => {
     if (tempDir && fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+
+  describe('isArchivedSkillName', () => {
+    test('detects archived/dead paths', () => {
+      assert.strictEqual(isArchivedSkillName('_archive/dead/example'), true);
+      assert.strictEqual(isArchivedSkillName('scientific-skills/skills/example'), false);
+    });
   });
 
   describe('resolveScanMode', () => {
@@ -59,6 +67,40 @@ describe('generate-skill-index', () => {
 
       assert.ok(index.skills['nested/example-skill']);
       assert.ok((index.index.byAgent.developer || []).includes('nested/example-skill'));
+    });
+
+    test('filters archived skills by default', () => {
+      const index = generateIndex({
+        catalogSkillsOverride: ['_archive/dead/legacy-skill', 'active-skill'],
+        scannedSkillsOverride: {
+          '_archive/dead/nested-legacy': {
+            name: '_archive/dead/nested-legacy',
+            hasSkillFile: true,
+          },
+          'active-nested': { name: 'active-nested', hasSkillFile: true },
+        },
+      });
+
+      assert.ok(!index.skills['_archive/dead/legacy-skill']);
+      assert.ok(!index.skills['_archive/dead/nested-legacy']);
+      assert.ok(index.skills['active-skill']);
+      assert.ok(index.skills['active-nested']);
+    });
+
+    test('can include archived skills when explicitly enabled', () => {
+      const index = generateIndex({
+        includeArchived: true,
+        catalogSkillsOverride: ['_archive/dead/legacy-skill'],
+        scannedSkillsOverride: {
+          '_archive/dead/nested-legacy': {
+            name: '_archive/dead/nested-legacy',
+            hasSkillFile: true,
+          },
+        },
+      });
+
+      assert.ok(index.skills['_archive/dead/legacy-skill']);
+      assert.ok(index.skills['_archive/dead/nested-legacy']);
     });
 
     test('filters stale agent skill mappings that do not exist in generated skills', () => {

@@ -320,4 +320,3 @@ module.exports = {
   runAudit,
   buildSkillSlug,
 };
-

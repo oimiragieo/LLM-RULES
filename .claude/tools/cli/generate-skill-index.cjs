@@ -668,6 +668,13 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
   return skills;
 }
 
+function isArchivedSkillName(name) {
+  if (typeof name !== 'string' || name.length === 0) {
+    return false;
+  }
+  return /(^|\/)(?:_archive|archive|dead)(?:\/|$)/.test(name);
+}
+
 /**
  * Generate the skill index
  */
@@ -679,6 +686,7 @@ function generateIndex(options = {}) {
     scannedSkillsOverride = null,
     skillToAgentsOverride = null,
     agentToSkillsOverride = null,
+    includeArchived = false,
   } = options;
 
   // Get skill list
@@ -694,6 +702,13 @@ function generateIndex(options = {}) {
         : {};
 
   const scannedSkillCount = Object.keys(scannedSkills).length;
+
+  const filteredCatalogSkills = includeArchived
+    ? catalogSkills
+    : catalogSkills.filter(name => !isArchivedSkillName(name));
+  const filteredScannedSkillNames = includeArchived
+    ? Object.keys(scannedSkills)
+    : Object.keys(scannedSkills).filter(name => !isArchivedSkillName(name));
 
   if (verbose) {
     console.log(`Found ${catalogSkills.length} skills in catalog`);
@@ -714,8 +729,8 @@ function generateIndex(options = {}) {
   // Build skills object
   const skills = {};
   const allSkillNames = new Set([
-    ...catalogSkills,
-    ...Object.keys(scannedSkills),
+    ...filteredCatalogSkills,
+    ...filteredScannedSkillNames,
     ...Object.keys(DOMAIN_MAP),
   ]);
 
@@ -820,6 +835,7 @@ function generateIndex(options = {}) {
       totalCategories: Object.keys(byCategory).length,
       lastValidated: new Date().toISOString(),
       source: '.claude/context/artifacts/catalogs/skill-catalog.md',
+      archivedIncluded: includeArchived,
     },
     skills,
     index: {
@@ -996,6 +1012,7 @@ module.exports = {
   generateIndex,
   validateIndex,
   resolveScanMode,
+  isArchivedSkillName,
   parseSkillCatalog,
   scanSkillFiles,
   scanSkillFilesRecursively,
