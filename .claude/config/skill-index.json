@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-14T07:47:28.900Z",
+  "generatedAt": "2026-02-14T08:02:14.704Z",
   "metadata": {
     "totalSkills": 378,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-14T07:47:28.901Z",
+    "lastValidated": "2026-02-14T08:02:14.705Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -900,7 +900,7 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "evolution-orchestrator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -908,7 +908,7 @@
         "other",
         "creators/command-creator"
       ],
-      "priority": 3
+      "priority": 1
     },
     "creators/rule-creator": {
       "name": "creators/rule-creator",
@@ -922,7 +922,7 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "evolution-orchestrator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -930,7 +930,7 @@
         "other",
         "creators/rule-creator"
       ],
-      "priority": 3
+      "priority": 1
     },
     "creators/tool-creator": {
       "name": "creators/tool-creator",
@@ -944,7 +944,7 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "evolution-orchestrator"
       ],
       "agentSupporting": [],
       "tags": [
@@ -952,7 +952,7 @@
         "other",
         "creators/tool-creator"
       ],
-      "priority": 3
+      "priority": 1
     },
     "data-expert": {
       "name": "data-expert",
@@ -5872,7 +5872,9 @@
       "agentPrimary": [
         "developer"
       ],
-      "agentSupporting": [],
+      "agentSupporting": [
+        "evolution-orchestrator"
+      ],
       "tags": [
         "other",
         "other",
@@ -10963,9 +10965,6 @@
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
-        "creators/command-creator",
-        "creators/rule-creator",
-        "creators/tool-creator",
         "dependency-analyzer",
         "design-and-user-experience-guidelines",
         "differential-review",
@@ -11670,7 +11669,11 @@
         "hook-creator",
         "template-creator",
         "schema-creator",
-        "mcp-converter"
+        "mcp-converter",
+        "creators/command-creator",
+        "creators/rule-creator",
+        "creators/tool-creator",
+        "semgrep-rule-creator"
       ],
       "researcher": [
         "arxiv-mcp"
@@ -11716,9 +11719,6 @@
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
-        "creators/command-creator",
-        "creators/rule-creator",
-        "creators/tool-creator",
         "dependency-analyzer",
         "design-and-user-experience-guidelines",
         "differential-review",
@@ -12423,7 +12423,11 @@
         "hook-creator",
         "template-creator",
         "schema-creator",
-        "mcp-converter"
+        "mcp-converter",
+        "creators/command-creator",
+        "creators/rule-creator",
+        "creators/tool-creator",
+        "semgrep-rule-creator"
       ],
       "researcher": [
         "arxiv-mcp"

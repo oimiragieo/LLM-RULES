@@ -384,8 +384,14 @@ const AGENT_SKILLS = {
   'master-orchestrator': ['swarm-coordination', 'consensus-voting'],
   'evolution-orchestrator': [
     'agent-creator',
-    'skill-creator',
+    'command-creator',
+    'rule-creator',
+    'tool-creator',
     'hook-creator',
+    'semgrep-rule-creator',
+    'schema-creator',
+    'skill-creator',
+    'template-creator',
     'workflow-creator',
     'research-synthesis',
   ],
@@ -614,6 +620,12 @@ function scanSkillFiles() {
   return skills;
 }
 
+function isArchivedSkillName(name) {
+  if (typeof name !== 'string' || name.length === 0) {
+    return false;
+  }
+  return /(^|\/)(?:_archive|archive|dead)(?:\/|$)/.test(name);
+}
 /**
  * Recursively scan all SKILL.md files, preserving full relative paths.
  * Fixes SKL-001: handles nested directories like scientific-skills/skills/biopython
@@ -668,13 +680,16 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
   return skills;
 }
 
-function isArchivedSkillName(name) {
+function canonicalSkillLookupKey(name) {
   if (typeof name !== 'string' || name.length === 0) {
-    return false;
+    return name;
   }
-  return /(^|\/)(?:_archive|archive|dead)(?:\/|$)/.test(name);
+  if (name.startsWith('creators/')) {
+    const parts = name.split('/');
+    return parts[parts.length - 1] || name;
+  }
+  return name;
 }
-
 /**
  * Generate the skill index
  */
@@ -735,20 +750,23 @@ function generateIndex(options = {}) {
   ]);
 
   for (const name of allSkillNames) {
-    const domain = DOMAIN_MAP[name] || 'other';
-    const category = CATEGORY_MAP[name] || 'Other';
-    const requiredTools = SKILL_TOOLS[name] || ['Read', 'Write', 'Edit'];
+    const canonicalName = canonicalSkillLookupKey(name);
+    const domain = DOMAIN_MAP[name] || DOMAIN_MAP[canonicalName] || 'other';
+    const category = CATEGORY_MAP[name] || CATEGORY_MAP[canonicalName] || 'Other';
+    const requiredTools =
+      SKILL_TOOLS[name] || SKILL_TOOLS[canonicalName] || ['Read', 'Write', 'Edit'];
 
     // Find agents from matrix first; fallback to hardcoded AGENT_SKILLS
     let agentPrimary = [];
     let agentSupporting = [];
-    if (resolvedSkillToAgents[name]) {
-      agentPrimary = resolvedSkillToAgents[name].agentPrimary || [];
-      agentSupporting = resolvedSkillToAgents[name].agentSupporting || [];
+    const mappedAgents = resolvedSkillToAgents[name] || resolvedSkillToAgents[canonicalName];
+    if (mappedAgents) {
+      agentPrimary = mappedAgents.agentPrimary || [];
+      agentSupporting = mappedAgents.agentSupporting || [];
     }
     if (agentPrimary.length === 0 && agentSupporting.length === 0) {
       for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
-        if (skillList.includes(name)) {
+        if (skillList.includes(name) || skillList.includes(canonicalName)) {
           if (skillList.indexOf(name) < 3) {
             agentPrimary.push(agent);
           } else {

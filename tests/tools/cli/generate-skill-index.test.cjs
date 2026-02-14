@@ -103,6 +103,49 @@ describe('generate-skill-index', () => {
       assert.ok(index.skills['_archive/dead/nested-legacy']);
     });
 
+
+
+    test('fallback AGENT_SKILLS maps nested creator aliases to evolution-orchestrator', () => {
+      const index = generateIndex({
+        catalogSkillsOverride: [],
+        scannedSkillsOverride: {
+          'creators/command-creator': {
+            name: 'creators/command-creator',
+            hasSkillFile: true,
+          },
+        },
+        skillToAgentsOverride: {},
+      });
+
+      const nested = index.skills['creators/command-creator'];
+      assert.ok(nested);
+      assert.ok((nested.agentPrimary || []).includes('evolution-orchestrator'));
+      assert.ok(
+        (index.index.byAgent['evolution-orchestrator'] || []).includes('creators/command-creator')
+      );
+    });
+    test('maps nested creator skill keys through canonical creator aliases', () => {
+      const index = generateIndex({
+        catalogSkillsOverride: [],
+        scannedSkillsOverride: {
+          'creators/command-creator': {
+            name: 'creators/command-creator',
+            hasSkillFile: true,
+          },
+        },
+        skillToAgentsOverride: {
+          'command-creator': {
+            agentPrimary: ['router'],
+            agentSupporting: ['developer'],
+          },
+        },
+      });
+
+      const nested = index.skills['creators/command-creator'];
+      assert.ok(nested);
+      assert.ok((nested.agentPrimary || []).includes('router'));
+      assert.ok((index.index.byAgent.router || []).includes('creators/command-creator'));
+    });
     test('filters stale agent skill mappings that do not exist in generated skills', () => {
       const index = generateIndex({
         catalogSkillsOverride: [],
