@@ -18,9 +18,25 @@ test('branch protection audit requires commands and skills validation checks', (
   assert.match(workflow, /validate-skills/);
 });
 
-test('branch protection failure issue body lists all required checks as separate bullets', () => {
+test('branch protection issue body derives bullets from expectedChecks list', () => {
   const workflow = readWorkflow();
-  assert.match(workflow, /- nightly-strict-gate',\s*\n\s*'- creator-ecosystem-validation'/);
-  assert.match(workflow, /- validate-commands'/);
-  assert.match(workflow, /- validate-skills'/);
+  assert.match(workflow, /const expectedChecks = \[/);
+  assert.match(workflow, /\.\.\.expectedChecks\.map\(\(name\) => `- \$\{name\}`\)/);
+});
+
+test('branch protection expectedChecks include all governance gates', () => {
+  const workflow = readWorkflow();
+  const requiredChecks = [
+    'memory-ci',
+    'memory-mvp-gate',
+    'nightly-strict-gate',
+    'creator-ecosystem-validation',
+    'validate-commands',
+    'validate-skills',
+  ];
+
+  for (const check of requiredChecks) {
+    const escaped = check.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assert.match(workflow, new RegExp(`'${escaped}'`), `missing expected check ${check}`);
+  }
 });
