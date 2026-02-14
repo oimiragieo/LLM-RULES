@@ -51,6 +51,8 @@ function hooksRequire(modulePath) {
 const { parseHookInputAsync, getToolName, getToolInput, debugLog } = libRequire(
   path.join('utils', 'hook-input.cjs')
 );
+const { formatResult } = libRequire(path.join('utils', 'hook-input.cjs'));
+const { canonicalizePathMentionsInText } = libRequire(path.join('utils', 'path-canonicalizer.cjs'));
 
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
@@ -136,6 +138,24 @@ const ORCHESTRATOR_IDS = new Set([
 ]);
 const TASK_ID_REFERENCE_REGEX =
   /Task ID:\s{0,10}[<"']?[a-zA-Z0-9_-]{1,64}|taskId:\s{0,10}[<"']?[a-zA-Z0-9_-]{1,64}/i;
+const INVALID_SUBAGENT_TYPES = new Set([
+  'bash',
+  'read',
+  'write',
+  'edit',
+  'multiedit',
+  'glob',
+  'grep',
+  'websearch',
+  'webfetch',
+  'task',
+  'tasklist',
+  'taskget',
+  'taskupdate',
+  'taskcreate',
+  'taskoutput',
+  'skill',
+]);
 
 function isPerfHarnessEnabled() {
   return process.env.SPAWN_ASSEMBLY_PROFILING === 'true';
@@ -398,7 +418,10 @@ function generateRequiredPrefixFragment(taskId, description) {
 +======================================================================+
 |  Your Task ID: ${taskIdValue}                                                  |
 |                                                                      |
-|  BEFORE doing ANY work, run:                                         |
+|  PRE-FLIGHT (MANDATORY):                                             |
+|  TaskList();                                                         |
+|                                                                      |
+|  FIRST ACTION (MANDATORY):                                           |
 |  TaskUpdate({ taskId: "${taskIdValue}", status: "in_progress" });              |
 |                                                                      |
 |  AFTER completing work, run:                                         |
@@ -424,6 +447,33 @@ All file operations MUST use relative paths from PROJECT_ROOT.
 ## Your Assigned Task
 Task ID: ${taskIdValue}
 Subject: ${subject}`;
+}
+
+function isInvalidSubagentType(agentType) {
+  if (!agentType || typeof agentType !== 'string') return true;
+  const normalized = agentType.trim().toLowerCase();
+  if (!normalized) return true;
+  return INVALID_SUBAGENT_TYPES.has(normalized);
+}
+
+function ensureMandatorySpawnPreflight(prompt, taskId) {
+  if (!prompt || typeof prompt !== 'string') return prompt;
+  const taskIdValue = taskId != null ? String(taskId) : 'MISSING_TASK_ID';
+  const hasPreflightTaskList =
+    /PRE-FLIGHT\s*\(MANDATORY\)[\s\S]{0,300}TaskList\(\)/i.test(prompt) ||
+    /BEFORE doing ANY work[\s\S]{0,300}TaskList\(\)/i.test(prompt);
+  const hasFirstTaskUpdate =
+    /FIRST ACTION\s*\(MANDATORY\)[\s\S]{0,300}TaskUpdate\(\{[^}]{0,200}status:\s*"in_progress"/i.test(
+      prompt
+    ) || /TaskUpdate\(\{\s*taskId:\s*"[^"]+"\s*,\s*status:\s*"in_progress"/i.test(prompt);
+  if (hasPreflightTaskList && hasFirstTaskUpdate) return prompt;
+
+  const preflightBlock = `
+## Spawn Preflight (Mandatory)
+1) PRE-FLIGHT: TaskList()
+2) FIRST ACTION: TaskUpdate({ taskId: "${taskIdValue}", status: "in_progress" })
+`;
+  return `${preflightBlock}\n${prompt}`;
 }
 
 /**
@@ -478,6 +528,8 @@ function normalizeStalePathReferences(prompt) {
   for (const [oldPath, newPath] of Object.entries(STALE_PATH_REWRITES)) {
     normalized = normalized.replaceAll(oldPath, newPath);
   }
+
+  normalized = canonicalizePathMentionsInText(normalized);
   return normalized;
 }
 
@@ -1296,6 +1348,14 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
 
   let basePrompt = toolInput.prompt;
   if (!basePrompt || typeof basePrompt !== 'string') return null;
+  const spawnAgentType = String(toolInput.subagent_type || toolInput.agent_type || '').trim();
+  if (isInvalidSubagentType(spawnAgentType)) {
+    return {
+      blockMessage:
+        `[SPAWN-PROMPT-ASSEMBLER] Invalid subagent_type "${spawnAgentType || '(missing)'}". ` +
+        'subagent_type must be an agent id (e.g., developer, qa, architect), not a tool name.',
+    };
+  }
 
   // FIX HIGH-003: Sanitize task prompt to prevent prompt injection
   basePrompt = sanitizeTaskPrompt(basePrompt);
@@ -1303,6 +1363,7 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
   const explicitTaskId = toolInput.task_id || toolInput.id || null;
   basePrompt = normalizeTaskIdReferences(basePrompt, explicitTaskId);
   basePrompt = normalizeStalePathReferences(basePrompt);
+  basePrompt = ensureMandatorySpawnPreflight(basePrompt, explicitTaskId);
   const inputPromptLength = basePrompt.length;
 
   if (!hasRequiredWarningBox(basePrompt) || !hasTaskIdReference(basePrompt)) {
@@ -1341,6 +1402,10 @@ async function main() {
     const hookInput = await parseHookInputAsync();
     const prepared = prepareTaskSpawnContext(hookInput, sessionId);
     if (!prepared) process.exit(0);
+    if (prepared.blockMessage) {
+      console.log(formatResult('block', prepared.blockMessage));
+      process.exit(2);
+    }
 
     const { toolInput, basePrompt, explicitTaskId, inputPromptLength, hookSessionId } = prepared;
 
@@ -1719,6 +1784,8 @@ module.exports = {
   enrichAllowedTools,
   inferAgentFromPrompt,
   generateRequiredPrefixFragment,
+  ensureMandatorySpawnPreflight,
+  isInvalidSubagentType,
   hasRequiredWarningBox,
   hasTaskIdReference,
   normalizeTaskIdReferences,

@@ -1668,7 +1668,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
         // Write reminder file
         fs.writeFileSync(
           reminderPath,
-          `You have ${requests.length} pending reflection spawn request(s). Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request (or the first batch). Then delete this file and clear/trim the spawn request file.\n`,
+          `STEP 0: You have ${requests.length} pending reflection spawn request(s). Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request (or the first batch). After spawning, clear/trim the spawn request file and delete this reminder. Then announce "Step 0 complete" before TaskList().\n`,
           'utf8'
         );
         if (process.env.DEBUG_HOOKS) {

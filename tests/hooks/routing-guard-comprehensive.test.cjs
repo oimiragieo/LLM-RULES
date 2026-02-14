@@ -125,6 +125,9 @@ describe('routing-guard.cjs - Check 1: Router Self-Check (Blacklisted Tools)', (
   afterEach(() => {
     cleanupState();
     delete process.env.ROUTER_SELF_CHECK;
+    delete process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD;
+    delete process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS;
+    delete process.env.CLAUDE_SESSION_ID;
   });
 
   it('should allow whitelisted tools in router mode', () => {
@@ -175,6 +178,42 @@ describe('routing-guard.cjs - Check 1: Router Self-Check (Blacklisted Tools)', (
 
     const result = routingGuard.checkRouterSelfCheck('Glob', {});
     assert.equal(result.pass, true);
+  });
+  it('should keep first self-check violation message explicit (non-compact)', () => {
+    process.env.ROUTER_SELF_CHECK = 'block';
+    process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
+    process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
+    process.env.CLAUDE_SESSION_ID = 'test-session-selfcheck-first-' + Date.now();
+
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(stateFile, JSON.stringify({ mode: 'router', taskSpawned: false }));
+
+    const first = routingGuard.checkRouterSelfCheck('Glob', {});
+    assert.equal(first.pass, false);
+    assert.equal(first.result, 'block');
+    assert.match(first.message, /ROUTER SELF-CHECK VIOLATION/);
+    assert.equal(/Repeated block/.test(first.message), false);
+  });
+
+  it('should switch to compact self-check fallback message after dedupe threshold', () => {
+    process.env.ROUTER_SELF_CHECK = 'block';
+    process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
+    process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
+    process.env.CLAUDE_SESSION_ID = 'test-session-selfcheck-compact-' + Date.now();
+
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(stateFile, JSON.stringify({ mode: 'router', taskSpawned: false }));
+
+    const first = routingGuard.checkRouterSelfCheck('Glob', {});
+    assert.equal(first.pass, false);
+
+    const second = routingGuard.checkRouterSelfCheck('Glob', {});
+    assert.equal(second.pass, false);
+    assert.equal(second.result, 'block');
+    assert.match(second.message, /Repeated block \(2x\)/);
+    assert.match(second.message, /Do not retry the same tool call/);
   });
 });
 
@@ -313,6 +352,7 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
     delete process.env.CLAUDE_SESSION_ID;
     process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
     process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
+    process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
 
     const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
     fs.mkdirSync(path.dirname(stateFile), { recursive: true });
@@ -322,6 +362,7 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
         requiresPlannerFirst: true,
         plannerSpawned: false,
         complexity: 'HIGH',
+        taskListCalledSincePrompt: true,
       })
     );
 
@@ -465,6 +506,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
   });
 
   it('should warn when developer spawned for documentation task', () => {
+    process.env.SPECIALIST_ROUTING_ENFORCEMENT = 'warn';
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Update documentation for the API.',
       description: 'Update docs',
@@ -476,6 +518,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
   });
 
   it('should warn when developer spawned for refactoring task', () => {
+    process.env.SPECIALIST_ROUTING_ENFORCEMENT = 'warn';
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Refactor the code for clarity.',
       description: 'Refactor',
@@ -486,6 +529,7 @@ describe('routing-guard.cjs - Check 7: Specialist Override Warning', () => {
   });
 
   it('should warn when developer spawned for testing task', () => {
+    process.env.SPECIALIST_ROUTING_ENFORCEMENT = 'warn';
     const result = routingGuard.checkSpecialistOverride('Task', {
       prompt: 'You are developer. Write tests for the API.',
       description: 'Add tests',
@@ -531,6 +575,8 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
   afterEach(() => {
     cleanupState();
     delete process.env.TASKLIST_FIRST_ENFORCEMENT;
+    delete process.env.TASKLIST_FIRST_AUTOREROUTE;
+    delete process.env.TASKLIST_FIRST_AUTOREROUTE_THRESHOLD;
   });
 
   it('should allow tools after TaskList called', () => {
@@ -562,8 +608,8 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
     );
 
     const result = routingGuard.checkTaskListFirstGate('Task');
-    assert.equal(result.pass, true); // Default is warn
-    assert.equal(result.result, 'warn');
+    assert.equal(result.pass, false);
+    assert.equal(result.result, 'block');
     assert.match(result.message, /TASKLIST-FIRST VIOLATION/);
   });
 
@@ -580,6 +626,35 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
 
     const result = routingGuard.checkTaskListFirstGate('Task');
     assert.equal(result.pass, true);
+  });
+
+  it('should auto-reroute repeated block-mode violations to warning loop-breaker', () => {
+    process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
+    process.env.TASKLIST_FIRST_AUTOREROUTE = 'true';
+    process.env.TASKLIST_FIRST_AUTOREROUTE_THRESHOLD = '2';
+    process.env.CLAUDE_SESSION_ID = 'session-tasklist-autoroute';
+
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: false,
+      })
+    );
+
+    const first = routingGuard.checkTaskListFirstGate('Bash');
+    assert.equal(first.pass, false);
+    assert.equal(first.result, 'block');
+
+    const second = routingGuard.checkTaskListFirstGate('Bash');
+    assert.equal(second.pass, true);
+    assert.equal(second.result, 'warn');
+    assert.match(second.message || '', /TASKLIST-FIRST AUTO-REROUTE/);
+
+    delete process.env.CLAUDE_SESSION_ID;
   });
 });
 
@@ -639,6 +714,9 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
   afterEach(() => {
     cleanupState();
     delete process.env.INTENT_AGENT_MATCH;
+    delete process.env.INTENT_AGENT_AUTOREROUTE;
+    delete process.env.INTENT_AGENT_AUTOREROUTE_THRESHOLD;
+    delete process.env.CLAUDE_SESSION_ID;
   });
 
   it('should allow when no intent detected', () => {
@@ -649,13 +727,13 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     assert.equal(result.pass, true);
   });
 
-  it('should warn when security intent detected but not security agent', () => {
+  it('should block when security intent detected but not security agent', () => {
     const result = routingGuard.checkIntentAgentMatch('Task', {
       subagent_type: 'developer',
       prompt: 'Review authentication security and check for vulnerabilities.',
     });
-    assert.equal(result.pass, true);
-    assert.equal(result.result, 'warn');
+    assert.equal(result.pass, false);
+    assert.equal(result.result, 'block');
     assert.match(result.message, /INTENT-AGENT MATCH/);
   });
 
@@ -665,6 +743,18 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
       prompt: 'Review authentication security and check for vulnerabilities.',
     });
     assert.equal(result.pass, true);
+  });
+
+  it('should allow explicit audit routing override for code-reviewer', () => {
+    process.env.INTENT_AGENT_MATCH = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-reviewer',
+      description: 'Code quality audit',
+      prompt: 'Run a bug-focused code audit and include security/test findings.',
+    });
+    assert.equal(result.pass, true);
+    assert.equal(result.result, 'warn');
+    assert.match(result.message || '', /Audit routing override/);
   });
 
   it('should detect multiple intent signals', () => {
@@ -677,6 +767,28 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
         suggestedAgents.includes('qa') ||
         suggestedAgents.includes('technical-writer')
     );
+  });
+
+  it('should auto-reroute repeated intent mismatches to warning loop-breaker', () => {
+    process.env.INTENT_AGENT_MATCH = 'block';
+    process.env.INTENT_AGENT_AUTOREROUTE = 'true';
+    process.env.INTENT_AGENT_AUTOREROUTE_THRESHOLD = '2';
+    process.env.CLAUDE_SESSION_ID = 'session-intent-autoroute';
+
+    const first = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'developer',
+      prompt: 'Review authentication security and check for vulnerabilities.',
+    });
+    assert.equal(first.pass, false);
+    assert.equal(first.result, 'block');
+
+    const second = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'developer',
+      prompt: 'Review authentication security and check for vulnerabilities.',
+    });
+    assert.equal(second.pass, true);
+    assert.equal(second.result, 'warn');
+    assert.match(second.message || '', /INTENT-AGENT AUTO-REROUTE/);
   });
 });
 

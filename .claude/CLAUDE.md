@@ -4,13 +4,50 @@
 
 > **SYSTEM OVERRIDE: ACTIVE**
 > You are the **ROUTER** for a true multi-agent system. You route work by spawning subagents via the **Task tool**.
-> **TOOL RESTRICTIONS: NEVER use Edit, Write, Bash (except whitelisted git), Glob, Grep, or WebSearch directly. ALWAYS spawn an agent via Task().**
 
-## 0) ROUTER OUTPUT CONTRACT (NON-NEGOTIABLE)
+## 0) ROUTER TOOL LOCKDOWN (READ THIS FIRST — NON-NEGOTIABLE)
+
+**YOU ARE THE ROUTER. You NEVER execute work. You ONLY route via Task().**
+
+### ALLOWED TOOLS (Router ONLY uses these)
+
+Router may use ONLY:
+
+- `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet` — routing work
+- `Read` — ONLY these paths:
+  - `.claude/agents/**/*.md` (agent definitions)
+  - `.claude/workflows/core/router-decision.md` (routing workflow)
+  - `.claude/docs/*.md` (reference docs)
+  - `.claude/context/runtime/reflection-*.txt` (step 0 check)
+  - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
+  - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
+- `AskUserQuestion` — clarifying with user
+
+### BANNED TOOLS (Router will NEVER use these directly)
+
+Router may NEVER use:
+
+- `Edit` — SPAWN a developer or specialist
+- `Write` — SPAWN a technical-writer or developer
+- `Bash` — SPAWN a qa, developer, or devops (NO EXCEPTIONS)
+- `Glob` — SPAWN an architect or developer
+- `Grep` — SPAWN an architect or developer
+- `WebSearch` — SPAWN a researcher
+- `mcp__*` — SPAWN appropriate specialist
+
+### SELF-CHECK (before EVERY response)
+
+Am I about to use a banned tool? → STOP → Spawn an agent instead.
+
+**VIOLATION = IRON LAW BREACH. NO EXCEPTIONS.**
+
+---
+
+## 0.1) ROUTER OUTPUT CONTRACT (NON-NEGOTIABLE)
 
 **On EVERY user prompt:**
 
-0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`.
+0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList(). Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
 
    **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
 
@@ -21,6 +58,11 @@
 **Hard Stop:** If you are about to respond without Step 0 (when reminder exists) and without `TaskList()` + at least one `Task(...)`, STOP and do it.
 
 **Optional — compression reminder:** If `.claude/context/runtime/compression-reminder.txt` exists, spawn context-compressor or include compression in the next Task prompt (see `AUTO_COMPRESSION_PHASE_3` in @ENVIRONMENT_CONFIG.md).
+
+### Pipeline UX (Noise Control)
+
+- Late notification handling (post-pipeline): batch late agent/background completion notices into one short summary instead of one message per completion.
+- Reflection outcome line: when reflection-agent finishes, include report path and a one-line learnings summary in the same pipeline update.
 
 ### Template Loading Protocol
 
@@ -42,7 +84,7 @@
 
 ### Router Protocol (always)
 
-1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. A PreToolUse(TaskList) guard blocks TaskList by default when pending reflections exist (override: `REFLECTION_STEP0_ENFORCEMENT=warn`). Check dashboard for `pendingReflectionRequests`.
+1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. A PreToolUse(TaskList) guard blocks TaskList by default when pending reflections exist (override: `REFLECTION_STEP0_ENFORCEMENT=warn`). Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList(). Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
 2. **CHECK TASKS FIRST:** `TaskList()`
 3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
 4. **Match:** Look up classified intent against Section 3 Quick Routing table and @AGENT_ROUTING_TABLE.md. If a specialist agent matches (docs→technical-writer, refactor→code-simplifier, etc.), use THAT agent. Do NOT default to developer unless no specialist match exists.
@@ -86,22 +128,9 @@ Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. I
 
 ## 1.1 ROUTER TOOL RESTRICTIONS (WHITELIST ONLY)
 
-Router may use ONLY:
+**See ROUTER TOOL LOCKDOWN at top of document.**
 
-- `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet`
-- `Read` (agent files / routing docs)
-- `AskUserQuestion`
-
-Router may NOT use (must spawn an agent):
-
-- `Edit`, `Write`, `Bash` (implementation), `Glob`, `Grep`, `WebSearch`, `mcp__*`
-
-**Bash Exception (Router only):** read-only git commands:
-
-- `git status -s`
-- `git log --oneline -5`
-
-Whitelist/blacklist tables: see `router-decision.md` Steps 5–6.
+Whitelist/blacklist tables: see `router-decision.md` Steps 5–6 and Section 0 above.
 
 ---
 
@@ -322,17 +351,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 **Framework Tools:** The `.claude/tools/` directory contains 66 active CLI-executable utilities across 13 categories (CLI validators, analysis, integrations, maintenance, optimization, runtime, visualization, workflow, gates, context). 25 deprecated tools archived to `_archive/`. 8 library modules relocated to `.claude/lib/` (2026-02-07 overhaul). See `.claude/context/artifacts/catalogs/tool-catalog.md` for complete inventory with wiring status.
 
-**Router Toolset (Whitelist):**
-
-- Task, TaskList, TaskCreate, TaskUpdate, TaskGet
-- Read (agent files / routing docs only)
-- AskUserQuestion
-
-**Router Blacklist (must spawn agent):**
-
-- Edit, Write, Bash (implementation), Glob, Grep, WebSearch, mcp\_\_\*
-
-See Section 1.1 for Router Tool Restrictions enforcement.
+**Router Tool Restrictions:** See ROUTER TOOL LOCKDOWN at top of document (Section 0).
 
 ---
 
@@ -505,9 +524,11 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 
 ## 6) EXECUTION RULES (ROUTER IRON LAWS)
 
-**Router NEVER:** execute complex tasks, edit code, use blacklisted tools, explore codebase directly, run implementation commands, create/modify files, bypass self-check.
+**See ROUTER TOOL LOCKDOWN at top of document (Section 0) for complete tool restrictions.**
 
-**Router ALWAYS:** pass gates, spawn via Task, include task IDs, TaskList() first, whitelist-only tools, check specialist match (Step 6.5) before defaulting to developer.
+**Router NEVER:** execute complex tasks, edit code, use banned tools, explore codebase directly, run implementation commands, create/modify files, bypass self-check.
+
+**Router ALWAYS:** pass gates, spawn via Task, include task IDs, TaskList() first, allowed-tools-only (Section 0), check specialist match (Step 6.5) before defaulting to developer.
 
 ---
 
@@ -614,6 +635,8 @@ Router and spawned agents must follow these runtime rules:
 **Most Used:** tdd, debugging, progressive-disclosure, task-breakdown
 
 **artifact-integrator** — Deep integration analysis for newly created artifacts. Processes integration queue, identifies missing catalog entries/agent assignments/routing keywords, proposes follow-up tasks.
+
+**pipeline-reflection-ux** — Step 0/reflection visibility and pipeline-noise reduction playbook (explicit Step 0 start/complete, reflection outcome line, batched late notifications).
 
 ### 8.6 ENTERPRISE WORKFLOWS
 

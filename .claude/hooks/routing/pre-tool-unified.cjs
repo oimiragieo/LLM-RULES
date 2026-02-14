@@ -39,6 +39,7 @@ const { appendJsonl } = libRequire(path.join('utils', 'jsonl-utils.cjs'));
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
+const { canonicalizePathForPlatform } = libRequire(path.join('utils', 'path-canonicalizer.cjs'));
 
 // =============================================================================
 // Check 1: Session Cleanup (from session-cleanup.cjs)
@@ -233,6 +234,13 @@ const AGENT_GUARDRAILS_STATE_FILE = path.join(
   'context',
   'runtime',
   'agent-guardrails-state.json'
+);
+const AGENT_BASH_POLL_GUARD = 'AGENT_BASH_POLL_GUARD';
+const AGENT_BASH_POLL_STALE_MS = Number(process.env.AGENT_BASH_POLL_STALE_MS || 90 * 1000);
+const AGENT_BASH_POLL_REPEAT_THRESHOLD = Number(process.env.AGENT_BASH_POLL_REPEAT_THRESHOLD || 6);
+const AGENT_BASH_POLL_WINDOW_MS = Number(process.env.AGENT_BASH_POLL_WINDOW_MS || 120 * 1000);
+const AGENT_BASH_POLL_MAX_TRACKED_FILES = Number(
+  process.env.AGENT_BASH_POLL_MAX_TRACKED_FILES || 20
 );
 
 const LOCK_SUFFIX = '.lock';
@@ -667,6 +675,61 @@ function extractTaskUpdateTaskId(toolInput) {
   return String(raw).trim();
 }
 
+function isNumericTaskAlias(taskId) {
+  return typeof taskId === 'string' && /^[0-9]+$/.test(taskId.trim());
+}
+
+function resolveCanonicalTaskId(hookInput, toolInput, currentEntry = null) {
+  const hookTaskId =
+    extractTaskUpdateTaskId(hookInput) || hookInput?.task_id || hookInput?.taskId || null;
+  const toolTaskId = extractTaskUpdateTaskId(toolInput);
+  const currentTaskId = currentEntry?.taskId || null;
+
+  if (hookTaskId) {
+    const mismatch =
+      toolTaskId &&
+      String(toolTaskId).trim().length > 0 &&
+      String(toolTaskId).trim() !== String(hookTaskId).trim();
+    return {
+      taskId: String(hookTaskId).trim(),
+      mismatch,
+      toolTaskId: mismatch ? String(toolTaskId).trim() : null,
+      aliasMismatch: mismatch && isNumericTaskAlias(String(toolTaskId).trim()),
+    };
+  }
+
+  if (toolTaskId) {
+    return {
+      taskId: String(toolTaskId).trim(),
+      mismatch: false,
+      toolTaskId: null,
+      aliasMismatch: false,
+    };
+  }
+
+  if (currentTaskId) {
+    return {
+      taskId: String(currentTaskId).trim(),
+      mismatch: false,
+      toolTaskId: null,
+      aliasMismatch: false,
+    };
+  }
+
+  return {
+    taskId: null,
+    mismatch: false,
+    toolTaskId: null,
+    aliasMismatch: false,
+  };
+}
+
+function normalizeTaskIdentifier(value) {
+  if (value == null) return null;
+  const normalized = String(value).replace(/\s+/g, ' ').trim().toLowerCase();
+  return normalized.length > 0 ? normalized : null;
+}
+
 function isAgentScopedSession(hookInput) {
   const allowedTools = Array.isArray(hookInput?.allowed_tools) ? hookInput.allowed_tools : [];
   if (allowedTools.includes('TaskUpdate')) return true;
@@ -698,6 +761,8 @@ function isAgentScopedSession(hookInput) {
 }
 
 function allowFromRouterBootstrap(hookInput, sessionId, now, current, stateFile) {
+  const bootstrapEnabled = String(process.env.TASKUPDATE_FIRST_BOOTSTRAP || 'false').toLowerCase();
+  if (bootstrapEnabled !== 'true') return null;
   try {
     const state = routerState.getState();
     const lastTaskUpdate = routerState.getLastTaskUpdate();
@@ -706,16 +771,17 @@ function allowFromRouterBootstrap(hookInput, sessionId, now, current, stateFile)
     const stateSessionId = state?.sessionId ? String(state.sessionId).trim() : '';
     const hasExplicitSessionMatch =
       hookSessionId.length > 0 && stateSessionId.length > 0 && hookSessionId === stateSessionId;
-    const hasCandidateTaskId =
-      typeof candidateTaskId === 'string' && candidateTaskId.trim().length > 0;
+
+    // Require explicit session match to prevent cross-session bootstrap leakage.
+    if (!hasExplicitSessionMatch) return null;
+
+    const normalizedCandidateTaskId = normalizeTaskIdentifier(candidateTaskId);
+    const normalizedLastTaskId = normalizeTaskIdentifier(lastTaskUpdate?.taskId);
     const taskIdMatches =
-      !candidateTaskId ||
-      (lastTaskUpdate?.taskId &&
-        String(candidateTaskId).trim() === String(lastTaskUpdate.taskId).trim());
-    const hasScopedIdentity = hasExplicitSessionMatch || hasCandidateTaskId;
+      !normalizedCandidateTaskId ||
+      (normalizedLastTaskId && normalizedCandidateTaskId === normalizedLastTaskId);
 
     if (
-      hasScopedIdentity &&
       routerState.wasTaskUpdateCalledRecently() &&
       (lastTaskUpdate?.status === 'in_progress' || lastTaskUpdate?.status === 'in-progress') &&
       taskIdMatches
@@ -754,16 +820,10 @@ function tryAutoMarkTaskUpdateInProgress({
   stateFile,
   toolName,
 }) {
-  const autoMarkEnabled = String(process.env.TASKUPDATE_FIRST_AUTOMARK || 'true').toLowerCase();
+  const autoMarkEnabled = String(process.env.TASKUPDATE_FIRST_AUTOMARK || 'false').toLowerCase();
   if (autoMarkEnabled === 'off') return null;
 
-  const inferredTaskId =
-    extractTaskUpdateTaskId(toolInput) ||
-    extractTaskUpdateTaskId(hookInput) ||
-    hookInput?.task_id ||
-    hookInput?.taskId ||
-    currentEntry.taskId ||
-    null;
+  const inferredTaskId = resolveCanonicalTaskId(hookInput, toolInput, currentEntry).taskId;
   if (!inferredTaskId) return null;
 
   current.sessions[sessionId] = {
@@ -787,9 +847,10 @@ function checkTaskUpdateFirst(
   toolInput,
   stateFile = TASKUPDATE_FIRST_STATE_FILE
 ) {
-  const mode = (process.env.TASKUPDATE_FIRST_ENFORCEMENT || 'warn').toLowerCase();
+  const mode = (process.env.TASKUPDATE_FIRST_ENFORCEMENT || 'block').toLowerCase();
   if (mode === 'off') return { checked: false, reason: 'disabled' };
   if (!isAgentScopedSession(hookInput)) return { checked: false, reason: 'not_agent_session' };
+  if (toolName === 'Task') return { checked: false, reason: 'task_spawn' };
 
   const sessionId =
     hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || null;
@@ -805,14 +866,37 @@ function checkTaskUpdateFirst(
 
   if (toolName === 'TaskUpdate') {
     const status = extractTaskUpdateStatus(toolInput);
-    const taskId = extractTaskUpdateTaskId(toolInput);
+    const taskResolution = resolveCanonicalTaskId(hookInput, toolInput, currentEntry);
+    const taskId = taskResolution.taskId;
+    const isCompleted = status === 'completed';
+
+    if (isCompleted && taskResolution.mismatch) {
+      return {
+        checked: true,
+        action: 'block',
+        message:
+          `[TASKUPDATE-FIRST TASK-ID MISMATCH] Refusing TaskUpdate(completed) with taskId="${taskResolution.toolTaskId}". ` +
+          `Canonical session taskId is "${taskId}". Use canonical taskId when completing task status.`,
+      };
+    }
+
     if (status === 'in_progress' || status === 'in-progress' || status === 'completed') {
       current.sessions[sessionId] = {
-        inProgress: true,
+        inProgress: !isCompleted,
         taskId: taskId || currentEntry.taskId || null,
+        status,
         updatedAt: now,
       };
       writeTaskUpdateFirstState(current, stateFile);
+    }
+    if (taskResolution.aliasMismatch) {
+      return {
+        checked: true,
+        action: 'allow',
+        warning:
+          `[TASKUPDATE-FIRST TASK-ID NORMALIZED] Received TaskUpdate taskId="${taskResolution.toolTaskId}" ` +
+          `but canonical session taskId="${taskId}". Proceeded with canonical taskId to avoid task-state drift.`,
+      };
     }
     return { checked: true, action: 'allow' };
   }
@@ -898,6 +982,170 @@ function getBashCommand(toolInput) {
   return '';
 }
 
+function normalizeTaskOutputPath(rawPath) {
+  if (!rawPath || typeof rawPath !== 'string') return null;
+  let normalized = rawPath.replace(/^['"`]|['"`]$/g, '');
+  if (process.platform === 'win32') {
+    const unixDriveMatch = normalized.match(/^\/([a-zA-Z])\/(.*)$/);
+    if (unixDriveMatch) {
+      const drive = unixDriveMatch[1].toUpperCase();
+      const rest = unixDriveMatch[2].replace(/\//g, '\\');
+      normalized = `${drive}:\\${rest}`;
+    }
+  }
+  return path.resolve(normalized);
+}
+
+function extractTaskOutputPathsFromCommand(command) {
+  if (!command || typeof command !== 'string') return [];
+  const results = new Set();
+  const regexes = [
+    /([A-Za-z]:\\[^\s"'`]*?tasks\\[^\s"'`]+\.output)/g,
+    /(\/[a-zA-Z]\/[^\s"'`]*?\/tasks\/[^\s"'`]+\.output)/g,
+  ];
+  for (const regex of regexes) {
+    let match = regex.exec(command);
+    while (match) {
+      const normalized = normalizeTaskOutputPath(match[1]);
+      if (normalized) results.add(normalized);
+      match = regex.exec(command);
+    }
+  }
+  return Array.from(results);
+}
+
+function isTaskOutputPollingCommand(command) {
+  if (!command || typeof command !== 'string') return false;
+  if (extractTaskOutputPathsFromCommand(command).length === 0) return false;
+  return /\b(cat|tail|head|grep|wc|ls|stat|sed|awk|Get-Content)\b/i.test(command);
+}
+
+function readTailBytes(filePath, maxBytes = 64 * 1024) {
+  try {
+    const stats = fs.statSync(filePath);
+    const size = stats.size;
+    if (size <= 0) return '';
+    const start = Math.max(0, size - maxBytes);
+    const length = size - start;
+    const fd = fs.openSync(filePath, 'r');
+    try {
+      const buffer = Buffer.alloc(length);
+      fs.readSync(fd, buffer, 0, length, start);
+      return buffer.toString('utf8');
+    } finally {
+      fs.closeSync(fd);
+    }
+  } catch (_err) {
+    return '';
+  }
+}
+
+function hasTerminalTestSummary(outputTail) {
+  if (!outputTail || typeof outputTail !== 'string') return false;
+  const hasCounts = /#\s+tests\s+\d+/i.test(outputTail) && /#\s+fail\s+\d+/i.test(outputTail);
+  const hasLifecycleExit = /ELIFECYCLE|Test failed\. See above for more details\./i.test(
+    outputTail
+  );
+  const hasTapSummary = /1\.\.\d+/i.test(outputTail) && /#\s+duration_ms\s+\d+/i.test(outputTail);
+  return hasCounts || hasLifecycleExit || hasTapSummary;
+}
+
+function prunePollHistory(pollHistory, now) {
+  if (!pollHistory || typeof pollHistory !== 'object') return {};
+  const entries = Object.entries(pollHistory)
+    .filter(([, value]) => value && typeof value === 'object')
+    .sort((a, b) => Number(b[1].lastSeenAt || 0) - Number(a[1].lastSeenAt || 0))
+    .slice(0, AGENT_BASH_POLL_MAX_TRACKED_FILES);
+  const pruned = {};
+  for (const [key, value] of entries) {
+    if (now - Number(value.lastSeenAt || 0) <= TASKUPDATE_FIRST_WINDOW_MS) {
+      pruned[key] = value;
+    }
+  }
+  return pruned;
+}
+
+function evaluateTaskOutputPolling(command, entry) {
+  if (!isTaskOutputPollingCommand(command)) {
+    return { action: 'allow', updatedEntry: null };
+  }
+
+  const now = Date.now();
+  const paths = extractTaskOutputPathsFromCommand(command);
+  if (paths.length === 0) {
+    return { action: 'allow', updatedEntry: null };
+  }
+
+  const pollHistory = prunePollHistory(entry?.pollHistory || {}, now);
+  let blockMessage = null;
+
+  for (const outputPath of paths) {
+    const previous = pollHistory[outputPath] || {
+      repeatCount: 0,
+      unchangedCount: 0,
+      lastSeenAt: 0,
+      lastMtimeMs: 0,
+    };
+
+    if (!fs.existsSync(outputPath)) {
+      pollHistory[outputPath] = {
+        ...previous,
+        repeatCount:
+          now - Number(previous.lastSeenAt || 0) <= AGENT_BASH_POLL_WINDOW_MS
+            ? Number(previous.repeatCount || 0) + 1
+            : 1,
+        lastSeenAt: now,
+      };
+      continue;
+    }
+
+    const stats = fs.statSync(outputPath);
+    const staleMs = now - Number(stats.mtimeMs || 0);
+    const unchanged = Number(previous.lastMtimeMs || 0) === Number(stats.mtimeMs || 0);
+    const repeatCount =
+      now - Number(previous.lastSeenAt || 0) <= AGENT_BASH_POLL_WINDOW_MS
+        ? Number(previous.repeatCount || 0) + 1
+        : 1;
+    const unchangedCount = unchanged ? Number(previous.unchangedCount || 0) + 1 : 0;
+    const tail = readTailBytes(outputPath);
+    const terminal = hasTerminalTestSummary(tail);
+
+    pollHistory[outputPath] = {
+      repeatCount,
+      unchangedCount,
+      lastSeenAt: now,
+      lastMtimeMs: Number(stats.mtimeMs || 0),
+      terminalSeen: terminal,
+    };
+
+    if (terminal) {
+      blockMessage =
+        `[AGENT-BASH-POLL-GUARD] Blocking repeated polling for "${outputPath}". ` +
+        'The output already contains terminal test summary markers. ' +
+        'Stop polling and report the final pass/fail counts.';
+      break;
+    }
+
+    if (
+      staleMs >= AGENT_BASH_POLL_STALE_MS &&
+      (repeatCount >= AGENT_BASH_POLL_REPEAT_THRESHOLD ||
+        unchangedCount >= AGENT_BASH_POLL_REPEAT_THRESHOLD)
+    ) {
+      blockMessage =
+        `[AGENT-BASH-POLL-GUARD] Blocking stale task-output polling for "${outputPath}". ` +
+        `No file updates detected for ${Math.round(staleMs / 1000)}s across repeated polls. ` +
+        'Switch to diagnosis or spawn a fresh test run instead of looping.';
+      break;
+    }
+  }
+
+  return {
+    action: blockMessage ? 'block' : 'allow',
+    message: blockMessage,
+    updatedEntry: { ...entry, pollHistory, updatedAt: now },
+  };
+}
+
 function isGitCommitCommand(command) {
   if (!command || typeof command !== 'string') return false;
   return /\bgit\s+(?:commit|push|merge|rebase|cherry-pick)\b/i.test(command);
@@ -913,7 +1161,8 @@ function isCheckpointCommand(command) {
 
 function normalizeToolPath(rawPath) {
   if (!rawPath || typeof rawPath !== 'string') return null;
-  const resolved = path.isAbsolute(rawPath) ? rawPath : path.resolve(PROJECT_ROOT, rawPath);
+  const canonical = canonicalizePathForPlatform(rawPath, PROJECT_ROOT);
+  const resolved = path.isAbsolute(canonical) ? canonical : path.resolve(PROJECT_ROOT, canonical);
   const relative = path.relative(PROJECT_ROOT, resolved);
   if (relative.startsWith('..')) return null;
   return relative.replace(/\\/g, '/');
@@ -955,6 +1204,21 @@ function checkAgentGuardrails(
 
   if (toolName === 'Bash') {
     const command = getBashCommand(toolInput);
+    const pollMode = (process.env[AGENT_BASH_POLL_GUARD] || 'block').toLowerCase();
+    if (pollMode !== 'off') {
+      const pollGuard = evaluateTaskOutputPolling(command, entry);
+      if (pollGuard.updatedEntry) {
+        state.sessions[sessionId] = pollGuard.updatedEntry;
+        writeAgentGuardrailsState(state, stateFile);
+      }
+      if (pollGuard.action === 'block') {
+        if (pollMode === 'warn') {
+          return { checked: true, action: 'allow', warning: pollGuard.message };
+        }
+        return { checked: true, action: 'block', message: pollGuard.message };
+      }
+    }
+
     if (isCheckpointCommand(command)) {
       state.sessions[sessionId] = {
         ...entry,
@@ -1053,6 +1317,7 @@ const REFLECTION_SPAWN_REQUEST_PATH = path.join(
   REFLECTION_RUNTIME_DIR,
   'reflection-spawn-request.json'
 );
+const INTEGRATION_QUEUE_PATH = path.join(REFLECTION_RUNTIME_DIR, 'integration-queue.jsonl');
 const REPORTS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'reports');
 const READ_DIR_LISTING_PATH = path.join(
   PROJECT_ROOT,
@@ -1080,7 +1345,20 @@ function resolveReadPath(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return null;
   const raw = toolInput.file_path || toolInput.filePath || toolInput.path || null;
   if (!raw || typeof raw !== 'string') return null;
-  return path.isAbsolute(raw) ? raw : path.resolve(PROJECT_ROOT, raw);
+  let normalized = raw;
+
+  // Normalize Unix-style drive-prefixed paths emitted on Windows shells.
+  // Example: /c/dev/projects/... -> C:\dev\projects\...
+  if (process.platform === 'win32') {
+    const unixDriveMatch = normalized.match(/^\/([a-zA-Z])\/(.*)$/);
+    if (unixDriveMatch) {
+      const drive = unixDriveMatch[1].toUpperCase();
+      const rest = unixDriveMatch[2].replace(/\//g, '\\');
+      normalized = `${drive}:\\${rest}`;
+    }
+  }
+
+  return path.isAbsolute(normalized) ? normalized : path.resolve(PROJECT_ROOT, normalized);
 }
 
 function isBypassPermissionsMode(hookInput) {
@@ -1181,6 +1459,19 @@ function ensureTaskOutputReadTarget(targetPath) {
   }
 }
 
+function ensureIntegrationQueueReadTarget(targetPath) {
+  try {
+    const normalizedTarget = path.resolve(targetPath);
+    if (normalizedTarget !== path.resolve(INTEGRATION_QUEUE_PATH)) return false;
+    if (fs.existsSync(normalizedTarget)) return false;
+    ensureDir(path.dirname(normalizedTarget));
+    fs.writeFileSync(normalizedTarget, '', 'utf8');
+    return true;
+  } catch (_err) {
+    return false;
+  }
+}
+
 function createDirectoryListingFile(targetDir) {
   try {
     const entries = fs.readdirSync(targetDir, { withFileTypes: true });
@@ -1252,6 +1543,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     ensureReflectionReadTarget(targetPath);
     ensureReportReadTarget(targetPath);
     ensureTaskOutputReadTarget(targetPath);
+    ensureIntegrationQueueReadTarget(targetPath);
     if (!fs.existsSync(targetPath)) {
       const missingPathHints = {
         '.claude/lib/memory/memory-query.cjs': '.claude/lib/memory/core/memory-query.cjs',
@@ -1466,10 +1758,15 @@ module.exports = {
   ensureReflectionReadTarget,
   ensureReportReadTarget,
   ensureTaskOutputReadTarget,
+  ensureIntegrationQueueReadTarget,
   createDirectoryListingFile,
   readAgentGuardrailsState,
   writeAgentGuardrailsState,
   checkAgentGuardrails,
+  extractTaskOutputPathsFromCommand,
+  isTaskOutputPollingCommand,
+  hasTerminalTestSummary,
+  evaluateTaskOutputPolling,
   isGitCommitCommand,
   isCheckpointCommand,
   normalizeToolPath,

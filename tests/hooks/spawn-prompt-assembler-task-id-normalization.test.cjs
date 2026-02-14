@@ -43,3 +43,20 @@ test('normalizeStalePathReferences rewrites known stale report and code paths', 
   );
   assert.equal(output.includes('.claude/lib/memory/memory-query.cjs'), false);
 });
+
+test('normalizes unix-style drive paths in prompt text on Windows', () => {
+  const input = 'Read /c/dev/projects/agent-studio/.claude/context/reports/demo.md for details';
+  const output = normalizeStalePathReferences(input);
+
+  if (process.platform === 'win32') {
+    assert.ok(
+      output.includes('C:\\dev\\projects\\agent-studio\\.claude\\context\\reports\\demo.md')
+    );
+    assert.equal(
+      output.includes('/c/dev/projects/agent-studio/.claude/context/reports/demo.md'),
+      false
+    );
+  } else {
+    assert.equal(output, input);
+  }
+});

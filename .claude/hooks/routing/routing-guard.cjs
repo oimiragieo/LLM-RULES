@@ -23,16 +23,16 @@
  * Trigger: PreToolUse (matches: Task|TaskCreate|TaskOutput|Edit|Write|NotebookEdit|Glob|Grep|WebSearch|Bash)
  *
  * ENFORCEMENT MODES:
- * - ROUTER_BASH_GUARD=block|warn|off (default: warn)
+ * - ROUTER_BASH_GUARD=block|warn|off (default: block)
  * - ROUTER_SELF_CHECK=block|warn|off (default: block)
  * - PLANNER_FIRST_ENFORCEMENT=block|warn|off (default: block)
  * - SECURITY_REVIEW_ENFORCEMENT=block|warn|off (default: block)
  * - ROUTER_WRITE_GUARD=block|warn|off (default: block)
  * - MEMORY_SPAWN_THROTTLING=true|false (default: true)
- * - SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off (default: warn)
- * - TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: warn)
+ * - SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off (default: block)
+ * - TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: block)
  * - CREATOR_ROUTING_ENFORCEMENT=block|warn|off (default: block)
- * - INTENT_AGENT_MATCH=warn|block|off (default: warn)
+ * - INTENT_AGENT_MATCH=warn|block|off (default: block)
  * - CONFIG_MODEL_VALIDATOR=block|warn|off (default: block)
  *
  * Exit codes:
@@ -166,6 +166,42 @@ function compactFallbackMessage(title, toolName, count, fallback) {
     `[${title}] Repeated block (${count}x) for ${toolName}. ` +
     `Do not retry the same tool call. Spawn an agent via Task() tool. Fallback: ${fallback}`
   );
+}
+
+function buildRouterSelfCheckMessage(toolName, dedupe) {
+  if (dedupe?.dedupe) {
+    return compactFallbackMessage(
+      'ROUTER SELF-CHECK VIOLATION',
+      toolName,
+      dedupe.count,
+      'Spawn an appropriate specialist via Task().'
+    );
+  }
+
+  return `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode. Spawn an agent via Task().`;
+}
+
+function shouldAutoReroute(enforcement, dedupeCount, threshold, enabledValue) {
+  if (enforcement !== 'block') return false;
+  if (String(enabledValue || '').toLowerCase() === 'off') return false;
+  const parsedThreshold = Number(threshold);
+  const effectiveThreshold =
+    Number.isFinite(parsedThreshold) && parsedThreshold > 1 ? parsedThreshold : 3;
+  return Number(dedupeCount || 0) >= effectiveThreshold;
+}
+
+function getTaskListAutoRerouteConfig() {
+  return {
+    enabledValue: String(process.env.TASKLIST_FIRST_AUTOREROUTE || 'true').toLowerCase(),
+    threshold: Number(process.env.TASKLIST_FIRST_AUTOREROUTE_THRESHOLD || 3),
+  };
+}
+
+function getIntentAutoRerouteConfig() {
+  return {
+    enabledValue: String(process.env.INTENT_AGENT_AUTOREROUTE || 'true').toLowerCase(),
+    threshold: Number(process.env.INTENT_AGENT_AUTOREROUTE_THRESHOLD || 3),
+  };
 }
 
 function shouldDelegateTaskChecksToPreTaskUnified(toolName) {
@@ -785,7 +821,7 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     return { pass: true };
   }
 
-  const enforcement = getEnforcementMode('ROUTER_BASH_GUARD', 'warn');
+  const enforcement = getEnforcementMode('ROUTER_BASH_GUARD', 'block');
   if (enforcement === 'off') {
     // SEC-AUDIT-016 FIX: Use centralized auditSecurityOverride for consistent logging
     auditSecurityOverride(
@@ -977,9 +1013,7 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
   // Router is using blacklisted tool directly - violation
   debugLog('BLOCK: Router using blacklisted tool', { tool: toolName, enforcement });
   const dedupe = registerBlockAttempt('router-self-check', toolName, hookInput);
-  const message = dedupe.dedupe
-    ? `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode (${dedupe.count}x). Spawn an agent via Task().`
-    : `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode. Spawn an agent via Task().`;
+  const message = buildRouterSelfCheckMessage(toolName, dedupe);
 
   // Record violation in violation-tracker
   const tracker = getViolationTracker();
@@ -1324,7 +1358,7 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
     return { pass: true };
   }
 
-  const enforcement = getEnforcementMode('SPECIALIST_ROUTING_ENFORCEMENT', 'warn');
+  const enforcement = getEnforcementMode('SPECIALIST_ROUTING_ENFORCEMENT', 'block');
   if (enforcement === 'off') {
     return { pass: true };
   }
@@ -1394,20 +1428,17 @@ Developer should be LAST RESORT. Specialists have domain-specific prompts and sk
  * Check 8: TaskList-First Gate
  * Blocks routing-guard-watched tools until TaskList() is called in current prompt cycle.
  *
- * Environment: TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: warn)
+ * Environment: TASKLIST_FIRST_ENFORCEMENT=block|warn|off (default: block)
  *
  * Exempt: Only applies in router mode (not agent mode).
  * Does NOT apply to: Read, TaskList, TaskGet, TaskUpdate, AskUserQuestion
  * (those are whitelisted and never reach routing-guard anyway).
  *
- * NOTE: Default is WARN (not block) for safe rollout. Switch to block after
- * 1 session with no false positives.
- *
  * @param {string} toolName - Tool being used
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
 function checkTaskListFirstGate(toolName, hookInput = null) {
-  const enforcement = getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT', 'warn');
+  const enforcement = getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT', 'block');
   if (enforcement === 'off') {
     return { pass: true };
   }
@@ -1448,6 +1479,19 @@ Call TaskList() first to check existing tasks, then proceed with your operation.
   }
 
   if (enforcement === 'block') {
+    const autoReroute = getTaskListAutoRerouteConfig();
+    if (
+      shouldAutoReroute(enforcement, dedupe.count, autoReroute.threshold, autoReroute.enabledValue)
+    ) {
+      return {
+        pass: true,
+        result: 'warn',
+        message:
+          `[TASKLIST-FIRST AUTO-REROUTE] Repeated violation (${dedupe.count}x) for ${toolName}. ` +
+          'Auto-reroute mode engaged to break denial loops. Next step: call TaskList() immediately, ' +
+          'then continue with TaskGet/TaskUpdate for existing work or Task() for new work.',
+      };
+    }
     return { pass: false, result: 'block', message };
   } else {
     return { pass: true, result: 'warn', message };
@@ -1672,6 +1716,29 @@ function agentMatchesIntent(subagentType, suggestedAgents) {
   return suggestedAgents.includes(subagentType);
 }
 
+function isExplicitAuditRoutingOverride(subagentType, prompt, description = '') {
+  const agent = String(subagentType || '')
+    .trim()
+    .toLowerCase();
+  if (!agent) return false;
+
+  const auditAgents = new Set(['code-reviewer', 'qa', 'architect']);
+  if (!auditAgents.has(agent)) return false;
+
+  const text = `${String(prompt || '')} ${String(description || '')}`.toLowerCase();
+  if (!text.includes('audit')) return false;
+
+  // Common explicit audit intents used by router tasks.
+  const explicitAuditSignals = [
+    'code quality audit',
+    'test quality audit',
+    'architecture audit',
+    'structural audit',
+    'bug-focused code audit',
+  ];
+  return explicitAuditSignals.some(signal => text.includes(signal));
+}
+
 /**
  * Check 10: Intent-Agent Match Check (validates spawned agent matches intent)
  * Merged from intent-agent-match.cjs
@@ -1688,19 +1755,31 @@ function checkIntentAgentMatch(toolName, toolInput = {}) {
     return { pass: true };
   }
 
-  const enforcement = getEnforcementMode('INTENT_AGENT_MATCH', 'warn');
+  const enforcement = getEnforcementMode('INTENT_AGENT_MATCH', 'block');
   if (enforcement === 'off') {
     return { pass: true };
   }
 
   const subagentType = toolInput.subagent_type || 'general-purpose';
   const prompt = toolInput.prompt || '';
+  const description = toolInput.description || '';
 
   // Detect intent signals in the prompt
   const { detectedSignals, suggestedAgents } = detectIntent(prompt);
 
   // Check if spawned agent matches detected intent
   if (!agentMatchesIntent(subagentType, suggestedAgents)) {
+    const dedupe = registerBlockAttempt('intent-agent-match', `Task:${subagentType}`);
+    if (isExplicitAuditRoutingOverride(subagentType, prompt, description)) {
+      return {
+        pass: true,
+        result: 'warn',
+        message:
+          `[INTENT-AGENT MATCH] Audit routing override for '${subagentType}' with intent signals ` +
+          `[${detectedSignals.join(', ')}]. Allowing explicit audit assignment.`,
+      };
+    }
+
     const reason = `Intent signals [${detectedSignals.join(', ')}] detected but spawning '${subagentType}' instead of including '${suggestedAgents.join("' or '")}'`;
     const message = `[INTENT-AGENT MATCH] ${reason}`;
 
@@ -1719,6 +1798,20 @@ function checkIntentAgentMatch(toolName, toolInput = {}) {
           spawnedAgent: subagentType,
         },
       });
+    }
+
+    const autoReroute = getIntentAutoRerouteConfig();
+    if (
+      shouldAutoReroute(enforcement, dedupe.count, autoReroute.threshold, autoReroute.enabledValue)
+    ) {
+      return {
+        pass: true,
+        result: 'warn',
+        message:
+          `[INTENT-AGENT AUTO-REROUTE] Repeated mismatch (${dedupe.count}x). ` +
+          `Requested '${subagentType}' but inferred '${suggestedAgents[0]}' from signals ` +
+          `[${detectedSignals.join(', ')}]. Continue only as temporary loop-breaker and reroute the next Task() to the inferred specialist.`,
+      };
     }
 
     if (enforcement === 'block') {
@@ -1804,7 +1897,7 @@ function extractModelFromToolInput(toolInput) {
  * @param {Object} toolInput - Tool input containing prompt and model
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
-function checkConfigModelValidator(toolName, toolInput = {}, hookInput = null) {
+function checkConfigModelValidator(toolName, toolInput = {}, _hookInput = null) {
   // Only applies to Task tool
   if (toolName !== 'Task') {
     return { pass: true };
@@ -1857,6 +1950,7 @@ function checkConfigModelValidator(toolName, toolInput = {}, hookInput = null) {
   const configResult = resolveAgentModel(agentType, PROJECT_ROOT);
   const configuredModel = configResult.shorthand;
   const configSource = configResult.source;
+  const rawSpawnModel = typeof spawnModel === 'string' ? spawnModel.trim().toLowerCase() : '';
 
   // Normalize spawn model for comparison
   const spawnShorthand = getShorthand(spawnModel);
@@ -1877,9 +1971,19 @@ function checkConfigModelValidator(toolName, toolInput = {}, hookInput = null) {
     return { pass: true };
   }
 
+  // Spawn prompt assembler can autocorrect shorthand model aliases before execution.
+  // Avoid hard blocks here to reduce retry loops and token waste.
+  const isShorthandAlias =
+    rawSpawnModel === 'haiku' || rawSpawnModel === 'sonnet' || rawSpawnModel === 'opus';
+  if (mismatch && isShorthandAlias) {
+    const message =
+      `[CONFIG MODEL VALIDATOR] Shorthand model "${rawSpawnModel}" differs from configured "${configuredModel}". ` +
+      'Allowing spawn so prompt-assembler can autocorrect to config model.';
+    return { pass: true, result: 'warn', message };
+  }
+
   if (mismatch) {
-    const bypassMode = hookInput && hookInput.permission_mode === 'bypassPermissions';
-    const effectiveEnforcement = bypassMode ? 'warn' : enforcement;
+    const effectiveEnforcement = enforcement;
     const message = `
 +======================================================================+
 |  CONFIG MODEL VALIDATOR - MODEL MISMATCH DETECTED                    |

@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 100** (1 deprecated alias) | Last Updated: 2026-02-09
+> **Total Skills: 101** (1 deprecated alias) | Last Updated: 2026-02-14
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 98 (maintained and invoked)
+- **Active Skills:** 99 (maintained and invoked)
 - **Deprecated Aliases:** 1 (`testing-expert` → `tdd`)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -29,7 +29,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Git & Version Control](#git--version-control)     | 1     | git-expert                                                                                                                                                                                             |
 | [Code Style & Linting](#code-style--linting)       | 2     | code-style-validator, dry-principle                                                                                                                                                                    |
 | [Creator Tools](#creator-tools)                    | 12    | research-synthesis, agent-creator, skill-creator, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator |
-| [Memory & Context](#memory--context)               | 6     | context-compressor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management                                                                        |
+| [Memory & Context](#memory--context)               | 7     | context-compressor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux                                                |
 | [Validation & Quality](#validation--quality)       | 5     | verification-before-completion, checklist-generator, response-rater, test-generator, accessibility                                                                                                     |
 | [Specialized Patterns](#specialized-patterns)      | 9     | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology                       |
 | [External Integrations](#external-integrations)    | 1     | project-onboarding                                                                                                                                                                                     |
@@ -255,13 +255,13 @@ Skill({ skill: 'artifact-integrator' });
 Memory and context management.
 
 | Skill                        | Description                     | Primary Agents     |
-| ---------------------------- | ------------------------------- | ------------------ |
+| ---------------------------- | ------------------------------- | ------------------ | --- | ------------------------ | ------------------------------------ | --------------- |
 | `context-compressor`         | Context compression methodology | all agents         |
 | `session-handoff`            | Handoff document creation       | all agents         |
 | `task-management-protocol`   | Task synchronization protocol   | all agents         |
 | `context-driven-development` | Context as managed artifacts    | all agents         |
 | `insight-extraction`         | Extract session learnings       | all agents         |
-| `track-management`           | Logical work unit management    | planner, developer |
+| `track-management`           | Logical work unit management    | planner, developer | `n  | `pipeline-reflection-ux` | Step 0/reflection UX + noise control | router, planner |
 
 ---
 
@@ -393,16 +393,16 @@ Skills restored from archive for backward compatibility and agent reference cont
 | `form-and-actions-in-sveltekit`      | SvelteKit form/action patterns and validation flow               | svelte-pro     |
 | `form-validation-with-zod`           | Zod-based validation patterns for form input safety              | svelte-pro     |
 | `function-length-and-responsibility` | Function sizing and single-responsibility enforcement            | code-reviewer  |
-| `restcontroller-conventions`         | REST controller contract and endpoint structure conventions       | developer      |
+| `restcontroller-conventions`         | REST controller contract and endpoint structure conventions      | developer      |
 | `rule-auditor`                       | Rule quality audit and governance checks                         | architect      |
 | `rust-expert`                        | Rust implementation patterns and idiomatic architecture guidance | rust-pro       |
 | `seo-and-meta-tags-in-sveltekit`     | SEO metadata and head management patterns for SvelteKit          | svelte-pro     |
-| `service-class-conventions`          | Service-layer structure and responsibility boundaries             | developer      |
+| `service-class-conventions`          | Service-layer structure and responsibility boundaries            | developer      |
 | `tall-stack-general`                 | TALL stack conventions for Laravel/Alpine/Livewire workflows     | fullstack-pro  |
 | `tauri-security-rules`               | Tauri desktop security rules and hardening patterns              | tauri-pro      |
 | `tauri-svelte-typescript-general`    | Tauri + Svelte + TypeScript integration conventions              | tauri-pro      |
 | `tauri-svelte-ui-components`         | UI component architecture patterns for Tauri/Svelte projects     | tauri-pro      |
-| `tsconfig-json-rules`                | TypeScript compiler configuration conventions and guardrails      | typescript-pro |
+| `tsconfig-json-rules`                | TypeScript compiler configuration conventions and guardrails     | typescript-pro |
 
 ---
 
@@ -410,24 +410,24 @@ Skills restored from archive for backward compatibility and agent reference cont
 
 Skills present on disk and now explicitly cataloged for index/discovery completeness.
 
-| Skill                               | Description                                                        | Primary Agents      |
-| ----------------------------------- | ------------------------------------------------------------------ | ------------------- |
-| `advanced-elicitation`              | Meta-cognitive elicitation patterns for requirement clarification  | planner             |
-| `artifact-integrator`               | Deep integration analysis and cross-artifact consistency checks    | developer           |
-| `best-practices-guidelines`         | Cross-cutting engineering best-practice baseline                   | developer           |
-| `code-semantic-search`              | Semantic code search over indexed repositories                     | developer           |
-| `code-structural-search`            | AST-structural pattern search for code analysis                    | developer           |
-| `differential-review`               | Security-focused differential review of code changes               | security-architect  |
-| `dry-principle`                     | DRY enforcement and duplication reduction patterns                 | code-reviewer       |
-| `insecure-defaults`                 | Detection of insecure defaults and fail-open configurations        | security-architect  |
-| `planning-with-files`               | File-based planning workflow for long-running implementation tasks | planner             |
-| `prd-generator`                     | Product requirements document generation workflow                  | pm                  |
-| `semgrep-rule-creator`              | Custom Semgrep rule authoring and validation                       | security-architect  |
-| `sparc-methodology`                 | SPARC methodology for structured delivery workflows                | architect           |
-| `spec-init`                         | Unified specification initialization and scaffolding               | planner             |
-| `static-analysis`                   | Static analysis execution and result triage                        | security-architect  |
-| `tauri-native-api-integration`      | Native API integration patterns for Tauri desktop applications     | tauri-pro           |
-| `variant-analysis`                  | Variant detection workflows for vulnerability classes              | security-architect  |
+| Skill                          | Description                                                        | Primary Agents     |
+| ------------------------------ | ------------------------------------------------------------------ | ------------------ |
+| `advanced-elicitation`         | Meta-cognitive elicitation patterns for requirement clarification  | planner            |
+| `artifact-integrator`          | Deep integration analysis and cross-artifact consistency checks    | developer          |
+| `best-practices-guidelines`    | Cross-cutting engineering best-practice baseline                   | developer          |
+| `code-semantic-search`         | Semantic code search over indexed repositories                     | developer          |
+| `code-structural-search`       | AST-structural pattern search for code analysis                    | developer          |
+| `differential-review`          | Security-focused differential review of code changes               | security-architect |
+| `dry-principle`                | DRY enforcement and duplication reduction patterns                 | code-reviewer      |
+| `insecure-defaults`            | Detection of insecure defaults and fail-open configurations        | security-architect |
+| `planning-with-files`          | File-based planning workflow for long-running implementation tasks | planner            |
+| `prd-generator`                | Product requirements document generation workflow                  | pm                 |
+| `semgrep-rule-creator`         | Custom Semgrep rule authoring and validation                       | security-architect |
+| `sparc-methodology`            | SPARC methodology for structured delivery workflows                | architect          |
+| `spec-init`                    | Unified specification initialization and scaffolding               | planner            |
+| `static-analysis`              | Static analysis execution and result triage                        | security-architect |
+| `tauri-native-api-integration` | Native API integration patterns for Tauri desktop applications     | tauri-pro          |
+| `variant-analysis`             | Variant detection workflows for vulnerability classes              | security-architect |
 
 ---
 
