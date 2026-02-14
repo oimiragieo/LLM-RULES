@@ -35,3 +35,8 @@ test('creator ecosystem workflow watches top-level ecosystem artifact directorie
     assert.match(workflow, new RegExp(escaped));
   }
 });
+
+test('creator ecosystem workflow runs status check governance validation in CI', () => {
+  const workflow = readWorkflow('creator-ecosystem-validate.yml');
+  assert.match(workflow, /pnpm validate:status-check-governance/);
+});

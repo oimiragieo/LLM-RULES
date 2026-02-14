@@ -101,3 +101,28 @@ test('validate:full should include agent skill reference validation', () => {
     'validate:full should run validate:agent-skill-refs to catch broken Skill() references'
   );
 });
+
+test('validate:status-check-governance script should exist', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const script = pkg.scripts['validate:status-check-governance'] || '';
+
+  assert.ok(script.length > 0, 'validate:status-check-governance script should be defined');
+  assert.ok(
+    script.includes('tests/workflows/branch-protection-audit.test.cjs'),
+    'validate:status-check-governance should run branch protection governance tests'
+  );
+  assert.ok(
+    script.includes('tests/workflows/required-status-checks-config.test.cjs'),
+    'validate:status-check-governance should validate required status checks config'
+  );
+});
+
+test('validate:full should include status check governance validation', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const fullScript = pkg.scripts['validate:full'] || '';
+
+  assert.ok(
+    fullScript.includes('pnpm validate:status-check-governance'),
+    'validate:full should run status check governance validation'
+  );
+});

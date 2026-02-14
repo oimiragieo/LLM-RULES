@@ -69,5 +69,8 @@ jobs:
           ls -1 .claude/context/reports/skill-ecosystem-audit-*.json
           ls -1 .claude/context/reports/skill-ecosystem-audit-*.md
 
+      - name: Run status check governance validation
+        run: pnpm validate:status-check-governance
+
       - name: Run full package validation gate
         run: pnpm validate:agent-skill-refs
