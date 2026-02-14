@@ -46,6 +46,24 @@ const VALIDATION_SCRIPT = path.join(
   'validate-integration.cjs'
 );
 const TASK_STATUS_FILE = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
+const ACTIVE_CREATORS_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude/context/runtime/active-creators.json'
+);
+const CREATOR_ECOSYSTEM_VALIDATOR =
+  process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-creator-ecosystem.cjs');
+const ENFORCED_CREATOR_SKILLS = [
+  'agent-creator',
+  'command-creator',
+  'rule-creator',
+  'tool-creator',
+  'hook-creator',
+  'semgrep-rule-creator',
+  'skill-creator',
+  'template-creator',
+  'workflow-creator',
+];
 
 // Valid status values
 const VALID_STATUSES = ['pending', 'in_progress', 'completed', 'deleted'];
@@ -249,6 +267,86 @@ function validateArtifact(artifactPath) {
   }
 }
 
+function readActiveCreatorSkills() {
+  try {
+    if (!fs.existsSync(ACTIVE_CREATORS_STATE_FILE)) {
+      return [];
+    }
+    const state = JSON.parse(fs.readFileSync(ACTIVE_CREATORS_STATE_FILE, 'utf8'));
+    return Object.entries(state)
+      .filter(([, value]) => value && value.active)
+      .map(([key]) => key);
+  } catch (_err) {
+    return [];
+  }
+}
+
+function hasCreatorKeyword(text = '') {
+  const normalized = String(text).toLowerCase();
+  return ENFORCED_CREATOR_SKILLS.some(skill => normalized.includes(skill));
+}
+
+function isEcosystemCreatorAction(params = {}) {
+  const metadata = params.metadata || {};
+  const filesTouched = [...(metadata.filesCreated || []), ...(metadata.filesModified || [])].map(
+    file => String(file).replace(/\\/g, '/').toLowerCase()
+  );
+
+  const touchedCreatorDomains = filesTouched.some(file =>
+    [
+      '/.claude/skills/',
+      '/.claude/agents/',
+      '/.claude/hooks/',
+      '/.claude/workflows/',
+      '/.claude/templates/',
+      '/.claude/commands/',
+      '/.claude/rules/',
+      '/.claude/tools/',
+    ].some(prefix => file.includes(prefix))
+  );
+
+  const textSignal = [metadata.summary, metadata.subject, params.taskId, params.task_id]
+    .filter(Boolean)
+    .some(value => hasCreatorKeyword(value));
+
+  const activeCreatorSignal = readActiveCreatorSkills().some(skill =>
+    ENFORCED_CREATOR_SKILLS.includes(skill)
+  );
+
+  return touchedCreatorDomains || textSignal || activeCreatorSignal;
+}
+
+function validateCreatorEcosystem() {
+  try {
+    const result = spawnSync(process.execPath, [CREATOR_ECOSYSTEM_VALIDATOR], {
+      cwd: PROJECT_ROOT,
+      stdio: 'pipe',
+      encoding: 'utf-8',
+      windowsHide: true,
+    });
+
+    if (result.status === 0) {
+      return { passed: true, issues: [] };
+    }
+
+    const output = `${result.stdout || ''}\n${result.stderr || ''}`;
+    const issues = output
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.startsWith('- '))
+      .map(line => line.slice(2));
+
+    return {
+      passed: false,
+      issues: issues.length > 0 ? issues : ['Creator ecosystem validation failed'],
+    };
+  } catch (err) {
+    return {
+      passed: false,
+      issues: [`Creator ecosystem validation error: ${err.message}`],
+    };
+  }
+}
 /**
  * Main hook execution.
  */
@@ -367,6 +465,42 @@ function main(hookInput) {
       process.exit(0);
     }
 
+    // Enforce creator ecosystem alignment when any creator skill is actioned
+    if (isEcosystemCreatorAction(params)) {
+      const ecosystemValidation = validateCreatorEcosystem();
+      if (!ecosystemValidation.passed) {
+        const ecosystemMessage = [
+          '',
+          '+----------------------------------------------------------+',
+          '| CREATOR ECOSYSTEM ALIGNMENT FAILED                       |',
+          '+----------------------------------------------------------+',
+          '| A creator skill action was detected, but ecosystem       |',
+          '| alignment checks failed.                                  |',
+          '|                                                          |',
+          '| Required action:                                          |',
+          '|  1. Align all creator skill folders and contracts        |',
+          '|  2. Run: node .claude/tools/cli/validate-creator-ecosystem.cjs |',
+          '|  3. Re-run TaskUpdate to complete                        |',
+          '|                                                          |',
+        ];
+
+        for (const issue of ecosystemValidation.issues.slice(0, 8)) {
+          ecosystemMessage.push(`|  - ${issue.substring(0, 54).padEnd(54)}|`);
+        }
+
+        ecosystemMessage.push('+----------------------------------------------------------+');
+        ecosystemMessage.push('');
+
+        console.log(
+          JSON.stringify({
+            allow: false,
+            message: ecosystemMessage.join('\n'),
+          })
+        );
+        process.exit(0);
+      }
+    }
+
     // Extract task metadata
     const metadata = extractTaskMetadata(params);
 
@@ -450,12 +584,28 @@ function main(hookInput) {
   }
 }
 
-// Read hook input from stdin
-let hookInput = '';
-process.stdin.setEncoding('utf-8');
-process.stdin.on('data', chunk => {
-  hookInput += chunk;
-});
-process.stdin.on('end', () => {
-  main(hookInput);
-});
+if (require.main === module) {
+  // Read hook input from stdin
+  let hookInput = '';
+  process.stdin.setEncoding('utf-8');
+  process.stdin.on('data', chunk => {
+    hookInput += chunk;
+  });
+  process.stdin.on('end', () => {
+    main(hookInput);
+  });
+}
+
+module.exports = {
+  main,
+  extractTaskMetadata,
+  detectArtifacts,
+  readTaskStatus,
+  writeTaskStatus,
+  isValidTransition,
+  getTransitionError,
+  validateArtifact,
+  isEcosystemCreatorAction,
+  validateCreatorEcosystem,
+  readActiveCreatorSkills,
+};
