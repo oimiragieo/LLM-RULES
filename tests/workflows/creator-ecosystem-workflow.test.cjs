@@ -16,3 +16,22 @@ test('creator ecosystem workflow exists and enforces ecosystem gate with report 
   assert.match(workflow, /validate-agent-skill-references\.cjs/);
   assert.match(workflow, /skill-ecosystem-audit-\*\.json/);
 });
+
+test('creator ecosystem workflow watches top-level ecosystem artifact directories', () => {
+  const workflow = readWorkflow('creator-ecosystem-validate.yml');
+
+  const requiredPaths = [
+    '.claude/commands/**',
+    '.claude/hooks/**',
+    '.claude/tools/**',
+    '.claude/rules/**',
+    '.claude/templates/**',
+    '.claude/workflows/**',
+    '.claude/schemas/**',
+  ];
+
+  for (const requiredPath of requiredPaths) {
+    const escaped = requiredPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assert.match(workflow, new RegExp(escaped));
+  }
+});
