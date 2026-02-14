@@ -733,6 +733,62 @@ function generateOutputSchema(name, _description) {
   );
 }
 
+function generateEnterpriseCommandContent(name) {
+  return `# ${name} Command Surface
+
+## Primary command
+\`/${name}\`
+
+## CLI fallback
+\`node .claude/skills/${name}/scripts/main.cjs --help\`
+
+## Hook commands
+- \`node .claude/skills/${name}/hooks/pre-execute.cjs\`
+- \`node .claude/skills/${name}/hooks/post-execute.cjs\`
+`;
+}
+
+function generateEnterpriseRuleContent(name) {
+  return `# ${name} Skill Rules
+
+1. Validate inputs against \`schemas/input.schema.json\` before execution.
+2. Enforce hook checks before and after execution.
+3. Keep outputs aligned with \`schemas/output.schema.json\`.
+4. Record implementation decisions and failures in memory files.
+`;
+}
+
+function generateEnterpriseTemplateContent(name) {
+  return `# ${name} Implementation Template
+
+## Inputs
+- task_id:
+- session_id:
+- objective:
+
+## Workflow
+1. Run pre-execute hook.
+2. Execute main script.
+3. Run post-execute hook.
+4. Return schema-compliant output.
+`;
+}
+
+function generateResearchRequirementsContent(name) {
+  return `# Research Requirements for ${name}
+
+This skill was created with enterprise defaults. Before implementation, collect best practices using:
+
+1. Exa MCP search (primary)
+2. WebFetch + arXiv fallback (if Exa unavailable or insufficient)
+
+Capture:
+- 2+ implementation references
+- 1+ security/reliability reference
+- constraints and non-goals
+`;
+}
+
 /**
  * Register hooks in settings.json
  */
@@ -1281,6 +1337,13 @@ function createCompanionTool(name, description, _skillDir) {
  */
 function createSkill(config) {
   const { name, description, tools, refs, hooks, schemas } = config;
+  const enterpriseEnabled = config.enterprise !== false && !config.noEnterprise;
+  const shouldCreateRefs = refs || enterpriseEnabled;
+  const shouldCreateHooks = hooks || enterpriseEnabled;
+  const shouldCreateSchemas = schemas || enterpriseEnabled;
+  const shouldCreateTemplates = config.templates || enterpriseEnabled;
+  const shouldCreateRules = config.rules || enterpriseEnabled;
+  const shouldCreateCommands = config.commands || enterpriseEnabled;
 
   if (!name) {
     console.error('❌ Skill name is required (--name)');
@@ -1319,15 +1382,19 @@ function createSkill(config) {
   console.log('   ✅ Created scripts/main.cjs');
 
   // Create optional directories
-  if (refs) {
+  if (shouldCreateRefs) {
     const refsDir = path.join(skillDir, 'references');
     fs.mkdirSync(refsDir, { recursive: true });
     fs.writeFileSync(path.join(refsDir, '.gitkeep'), '# Reference materials for this skill\n');
+    fs.writeFileSync(
+      path.join(refsDir, 'research-requirements.md'),
+      generateResearchRequirementsContent(name)
+    );
     console.log('   ✅ Created references/');
   }
 
   // Create hooks if requested
-  if (hooks) {
+  if (shouldCreateHooks) {
     const hooksDir = path.join(skillDir, 'hooks');
     fs.mkdirSync(hooksDir, { recursive: true });
 
@@ -1349,7 +1416,7 @@ function createSkill(config) {
   }
 
   // Create schemas if requested
-  if (schemas) {
+  if (shouldCreateSchemas) {
     const schemasDir = path.join(skillDir, 'schemas');
     fs.mkdirSync(schemasDir, { recursive: true });
 
@@ -1368,6 +1435,30 @@ function createSkill(config) {
       registerSchema(name, 'input');
       registerSchema(name, 'output');
     }
+  }
+
+  if (shouldCreateTemplates) {
+    const templatesDir = path.join(skillDir, 'templates');
+    fs.mkdirSync(templatesDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(templatesDir, 'implementation-template.md'),
+      generateEnterpriseTemplateContent(name)
+    );
+    console.log('   ✅ Created templates/implementation-template.md');
+  }
+
+  if (shouldCreateRules) {
+    const rulesDir = path.join(skillDir, 'rules');
+    fs.mkdirSync(rulesDir, { recursive: true });
+    fs.writeFileSync(path.join(rulesDir, `${name}.md`), generateEnterpriseRuleContent(name));
+    console.log(`   ✅ Created rules/${name}.md`);
+  }
+
+  if (shouldCreateCommands) {
+    const commandsDir = path.join(skillDir, 'commands');
+    fs.mkdirSync(commandsDir, { recursive: true });
+    fs.writeFileSync(path.join(commandsDir, `${name}.md`), generateEnterpriseCommandContent(name));
+    console.log(`   ✅ Created commands/${name}.md`);
   }
 
   // Format all files
@@ -1392,6 +1483,10 @@ function createSkill(config) {
     console.log('\n🔧 Creating companion tool (--create-tool specified)...');
     toolDir = createCompanionTool(name, description, skillDir);
     toolCreated = true;
+  } else if (enterpriseEnabled && !config.noTool) {
+    console.log('\n🔧 Enterprise default enabled, creating companion tool...');
+    toolDir = createCompanionTool(name, description, skillDir);
+    toolCreated = true;
   } else if (!config.noTool) {
     // Check complexity for auto-creation
     const complexity = detectComplexity(config);
@@ -1409,17 +1504,17 @@ function createSkill(config) {
   console.log(`   ├── SKILL.md`);
   console.log(`   ├── scripts/`);
   console.log(`   │   └── main.cjs`);
-  if (hooks) {
+  if (shouldCreateHooks) {
     console.log(`   ├── hooks/`);
     console.log(`   │   ├── pre-execute.cjs`);
     console.log(`   │   └── post-execute.cjs`);
   }
-  if (schemas) {
+  if (shouldCreateSchemas) {
     console.log(`   ├── schemas/`);
     console.log(`   │   ├── input.schema.json`);
     console.log(`   │   └── output.schema.json`);
   }
-  if (refs) {
+  if (shouldCreateRefs) {
     console.log(`   └── references/`);
   }
 
@@ -1478,17 +1573,17 @@ function createSkill(config) {
     console.log(`   1. Edit ${skillPath} to customize capabilities`);
   }
   console.log(`   2. Implement logic in scripts/main.cjs`);
-  if (hooks) {
+  if (shouldCreateHooks) {
     console.log(`   3. Customize hooks in hooks/`);
     if (!config.registerHooks) {
       console.log(`   4. Register hooks: node create.cjs --register-hooks "${name}"`);
     }
   }
-  if (schemas) {
-    console.log(`   ${hooks ? '5' : '3'}. Define schemas in schemas/`);
+  if (shouldCreateSchemas) {
+    console.log(`   ${shouldCreateHooks ? '5' : '3'}. Define schemas in schemas/`);
     if (!config.registerSchemas) {
       console.log(
-        `   ${hooks ? '6' : '4'}. Register schemas: node create.cjs --register-schemas "${name}"`
+        `   ${shouldCreateHooks ? '6' : '4'}. Register schemas: node create.cjs --register-schemas "${name}"`
       );
     }
   }
@@ -3338,6 +3433,12 @@ Create Options:
   --register-hooks  Also register hooks in settings.json
   --register-schemas Also register schemas in global schemas/
 
+Enterprise defaults (enabled by default):
+  --enterprise      Enable enterprise scaffolding bundle (default)
+  --no-enterprise   Disable enterprise defaults and use minimal scaffold
+  --rules           Create rules/ directory and default rule file
+  --commands        Create commands/ directory and command surface doc
+
 Self-Evolution Options:
   --original-request  The original user request (outputs spawn command for Task tool)
   --no-workflow       Skip creating workflow example
@@ -3660,6 +3761,11 @@ if (options.name) {
     hooks: options.hooks,
     schemas: options.schemas,
     registerHooks: options['register-hooks'],
+    enterprise: options.enterprise,
+    noEnterprise: options['no-enterprise'],
+    rules: options.rules,
+    commands: options.commands,
+    templates: options.templates,
     registerSchemas: options['register-schemas'],
     originalRequest: options['original-request'],
     noWorkflow: options['no-workflow'],

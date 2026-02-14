@@ -85,6 +85,32 @@ Enable self-healing and evolving agent ecosystem by:
 4. Validating skill definitions
 5. Assigning skills to new or existing agents
 
+## Enterprise Bundle Default (MANDATORY)
+
+All new skills MUST scaffold this bundle by default unless the user explicitly requests minimal mode:
+
+- `commands/` (command surface docs)
+- `hooks/` (pre/post execution hooks)
+- `rules/` (skill operating rules)
+- `schemas/` (input/output contracts)
+- `scripts/` (main execution path)
+- `templates/` (implementation template)
+- `references/` (research requirements and source notes)
+- companion tool in `.claude/tools/<skill-name>/`
+- workflow in `.claude/workflows/<skill-name>-skill-workflow.md`
+
+Use `--no-enterprise` only when the request explicitly asks for a minimal scaffold.
+
+## Research Gate (MANDATORY BEFORE FINALIZING SKILL CONTENT)
+
+Before finalizing a new skill, gather current best practices and constraints:
+
+1. Use Exa MCP first (`mcp__exa__get_code_context_exa` and/or `mcp__exa__web_search_exa`).
+2. If Exa is unavailable or insufficient, use `WebFetch` against primary docs and arXiv.
+3. Record findings in `references/research-requirements.md` and keep hooks/rules/schemas aligned with those findings.
+
+Do not finalize a skill without evidence-backed guidance for tooling, workflow, and guardrails.
+
 ## Actions
 
 ### `create` - Create a New Skill
@@ -96,9 +122,14 @@ node .claude/skills/skill-creator/scripts/create.cjs \
   --name "my-skill" \
   --description "What this skill does" \
   --tools "Read,Write,WebSearch" \
+  [--enterprise]        # Enterprise bundle scaffolding (default)
+  [--no-enterprise]     # Opt out of enterprise defaults
   [--refs]              # Create references/ directory
   [--hooks]             # Create hooks/ directory with pre/post execute
   [--schemas]           # Create schemas/ directory with input/output schemas
+  [--rules]             # Create rules/ directory and default rules file
+  [--commands]          # Create commands/ documentation directory
+  [--templates]         # Create templates/ directory
   [--register-hooks]    # Also register hooks in settings.json
   [--register-schemas]  # Also register schemas globally
   [--create-tool]       # Force creation of companion CLI tool
