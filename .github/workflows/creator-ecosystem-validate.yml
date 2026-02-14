@@ -1,0 +1,59 @@
+name: Creator Ecosystem Validation
+
+on:
+  pull_request:
+    paths:
+      - '.claude/skills/**'
+      - '.claude/agents/**'
+      - '.claude/context/config/agent-skill-matrix.json'
+      - '.claude/tools/cli/validate-skill-ecosystem.cjs'
+      - '.claude/tools/cli/validate-agent-skill-references.cjs'
+      - 'package.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '.claude/skills/**'
+      - '.claude/agents/**'
+      - '.claude/context/config/agent-skill-matrix.json'
+      - '.claude/tools/cli/validate-skill-ecosystem.cjs'
+      - '.claude/tools/cli/validate-agent-skill-references.cjs'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  creator-ecosystem-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Enforce skill ecosystem + agent references
+        run: pnpm skills:ecosystem:gate
+
+      - name: Verify ecosystem reports are produced
+        run: |
+          ls -1 .claude/context/reports/skill-ecosystem-audit-*.json
+          ls -1 .claude/context/reports/skill-ecosystem-audit-*.md
+
+      - name: Run full package validation gate
+        run: pnpm validate:agent-skill-refs
