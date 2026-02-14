@@ -1,0 +1,4 @@
+interface:
+  display_name: Code Quality Expert
+  short_description: Code quality expert including clean code, style guides, and
+  default_prompt: Use the $code-quality-expert skill to complete this task safely and efficiently.

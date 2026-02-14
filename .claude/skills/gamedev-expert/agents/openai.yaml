@@ -1,0 +1,4 @@
+interface:
+  display_name: Gamedev Expert
+  short_description: Game development expert including DragonRuby, Unity, and game
+  default_prompt: Use the $gamedev-expert skill to complete this task safely and efficiently.

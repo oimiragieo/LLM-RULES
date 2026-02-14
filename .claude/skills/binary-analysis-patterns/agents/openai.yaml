@@ -1,0 +1,4 @@
+interface:
+  display_name: Binary Analysis Patterns
+  short_description: Master binary analysis patterns including disassembly,
+  default_prompt: Use the $binary-analysis-patterns skill to complete this task safely and efficiently.

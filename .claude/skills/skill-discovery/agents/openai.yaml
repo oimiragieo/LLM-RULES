@@ -1,0 +1,4 @@
+interface:
+  display_name: Skill Discovery
+  short_description: How agents discover and use skills. Use to understand skill
+  default_prompt: Use the $skill-discovery skill to complete this task safely and efficiently.

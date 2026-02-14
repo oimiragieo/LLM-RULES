@@ -1,0 +1,4 @@
+interface:
+  display_name: Memory Forensics
+  short_description: Master memory forensics techniques including memory
+  default_prompt: Use the $memory-forensics skill to complete this task safely and efficiently.

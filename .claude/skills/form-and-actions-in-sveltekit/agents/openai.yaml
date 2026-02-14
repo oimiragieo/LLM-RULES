@@ -1,0 +1,4 @@
+interface:
+  display_name: Form And Actions In Sveltekit
+  short_description: Describes Form and Actions implementations.
+  default_prompt: Use the $form-and-actions-in-sveltekit skill to complete this task safely and efficiently.

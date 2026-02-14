@@ -1,0 +1,4 @@
+interface:
+  display_name: Context Driven Development
+  short_description: Context-Driven Development methodology - treating project
+  default_prompt: Use the $context-driven-development skill to complete this task safely and efficiently.

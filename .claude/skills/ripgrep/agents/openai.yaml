@@ -1,0 +1,4 @@
+interface:
+  display_name: Ripgrep
+  short_description: Enhanced code search with custom ripgrep binary supporting ES
+  default_prompt: Use the $ripgrep skill to complete this task safely and efficiently.

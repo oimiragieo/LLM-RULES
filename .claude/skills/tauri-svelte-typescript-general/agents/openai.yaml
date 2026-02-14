@@ -1,0 +1,4 @@
+interface:
+  display_name: Tauri Svelte Typescript General
+  short_description: General rules for developing desktop applications using Tauri
+  default_prompt: Use the $tauri-svelte-typescript-general skill to complete this task safely and efficiently.

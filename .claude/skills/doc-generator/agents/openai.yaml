@@ -1,0 +1,4 @@
+interface:
+  display_name: Doc Generator
+  short_description: Generates comprehensive documentation from code, APIs, and
+  default_prompt: Use the $doc-generator skill to complete this task safely and efficiently.

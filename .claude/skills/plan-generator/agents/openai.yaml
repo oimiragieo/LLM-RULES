@@ -1,0 +1,4 @@
+interface:
+  display_name: Plan Generator
+  short_description: Creates structured plans from requirements. Generates
+  default_prompt: Use the $plan-generator skill to complete this task safely and efficiently.

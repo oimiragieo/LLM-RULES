@@ -1,0 +1,4 @@
+interface:
+  display_name: Insight Extraction
+  short_description: Extract actionable insights from completed coding sessions. Use
+  default_prompt: Use the $insight-extraction skill to complete this task safely and efficiently.

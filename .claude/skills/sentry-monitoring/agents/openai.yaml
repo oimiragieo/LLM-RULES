@@ -1,0 +1,4 @@
+interface:
+  display_name: Sentry Monitoring
+  short_description: Sentry error tracking and performance monitoring for real-time
+  default_prompt: Use the $sentry-monitoring skill to complete this task safely and efficiently.

@@ -1,0 +1,8 @@
+interface:
+  display_name: Template Renderer
+  short_description: Render templates by replacing {{TOKEN}} placeholders with
+  default_prompt: Use the $template-renderer skill to complete this task safely and efficiently.
+dependencies:
+  tools:
+    - type: mcp
+      value: filesystem

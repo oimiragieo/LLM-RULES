@@ -1,0 +1,4 @@
+interface:
+  display_name: Aws Cloud Ops
+  short_description: AWS cloud operations for CloudWatch, S3, Lambda, EC2, and IAM
+  default_prompt: Use the $aws-cloud-ops skill to complete this task safely and efficiently.

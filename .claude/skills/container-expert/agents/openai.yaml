@@ -1,0 +1,4 @@
+interface:
+  display_name: Container Expert
+  short_description: Container orchestration expert including Docker, Kubernetes,
+  default_prompt: Use the $container-expert skill to complete this task safely and efficiently.

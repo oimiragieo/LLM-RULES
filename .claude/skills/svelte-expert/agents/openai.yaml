@@ -1,0 +1,4 @@
+interface:
+  display_name: Svelte Expert
+  short_description: Svelte and SvelteKit expert including components, stores, and
+  default_prompt: Use the $svelte-expert skill to complete this task safely and efficiently.

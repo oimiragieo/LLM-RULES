@@ -1,0 +1,4 @@
+interface:
+  display_name: Prd Generator
+  short_description: Generate structured Product Requirements Documents using
+  default_prompt: Use the $prd-generator skill to complete this task safely and efficiently.

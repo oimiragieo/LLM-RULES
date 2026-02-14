@@ -1,0 +1,4 @@
+interface:
+  display_name: Schema Creator
+  short_description: Creates JSON Schema validation files for skills, agents, hooks,
+  default_prompt: Use the $schema-creator skill to complete this task safely and efficiently.

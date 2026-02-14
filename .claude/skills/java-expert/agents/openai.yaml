@@ -1,0 +1,4 @@
+interface:
+  display_name: Java Expert
+  short_description: Java and Spring Boot expert including REST APIs, JPA, and
+  default_prompt: Use the $java-expert skill to complete this task safely and efficiently.

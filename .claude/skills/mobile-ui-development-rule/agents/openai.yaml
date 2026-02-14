@@ -1,0 +1,4 @@
+interface:
+  display_name: Mobile Ui Development Rule
+  short_description: General rules pertaining to Mobile UI development. Covers UI/UX
+  default_prompt: Use the $mobile-ui-development-rule skill to complete this task safely and efficiently.

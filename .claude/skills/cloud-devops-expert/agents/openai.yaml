@@ -1,0 +1,4 @@
+interface:
+  display_name: Cloud Devops Expert
+  short_description: Cloud and DevOps expert including AWS, GCP, Azure, and Terraform
+  default_prompt: Use the $cloud-devops-expert skill to complete this task safely and efficiently.

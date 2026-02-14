@@ -1,0 +1,4 @@
+interface:
+  display_name: Helm Chart Scaffolding
+  short_description: Design, organize, and manage Helm charts for templating and
+  default_prompt: Use the $helm-chart-scaffolding skill to complete this task safely and efficiently.

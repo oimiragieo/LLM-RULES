@@ -1,0 +1,4 @@
+interface:
+  display_name: Context Compressor
+  short_description: Context compression and summarization methodology. Techniques
+  default_prompt: Use the $context-compressor skill to complete this task safely and efficiently.

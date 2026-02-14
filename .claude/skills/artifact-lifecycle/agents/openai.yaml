@@ -1,0 +1,4 @@
+interface:
+  display_name: Artifact Lifecycle
+  short_description: Unified lifecycle management for all framework artifacts
+  default_prompt: Use the $artifact-lifecycle skill to complete this task safely and efficiently.

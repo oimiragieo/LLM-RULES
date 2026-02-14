@@ -1,0 +1,4 @@
+interface:
+  display_name: Slack Notifications
+  short_description: Slack messaging, channels, and notifications - send messages,
+  default_prompt: Use the $slack-notifications skill to complete this task safely and efficiently.

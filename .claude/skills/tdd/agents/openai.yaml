@@ -1,0 +1,4 @@
+interface:
+  display_name: Tdd
+  short_description: Test-Driven Development with Iron Laws enforcement. Use when
+  default_prompt: Use the $tdd skill to complete this task safely and efficiently.

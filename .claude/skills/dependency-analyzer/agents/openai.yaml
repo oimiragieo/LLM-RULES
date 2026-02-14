@@ -1,0 +1,4 @@
+interface:
+  display_name: Dependency Analyzer
+  short_description: Analyzes project dependencies, detects outdated packages,
+  default_prompt: Use the $dependency-analyzer skill to complete this task safely and efficiently.

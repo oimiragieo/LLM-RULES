@@ -1,0 +1,6 @@
+interface:
+  display_name: Comprehensive Unit Testing With Pytest
+  short_description: Aims for high test coverage using pytest, testing both common
+  default_prompt: >-
+    Use the $comprehensive-unit-testing-with-pytest skill to complete this task safely and
+    efficiently.

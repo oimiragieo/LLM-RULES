@@ -1,0 +1,8 @@
+interface:
+  display_name: Skill Creator
+  short_description: Create, validate, and convert skills for the agent ecosystem.
+  default_prompt: Use the $skill-creator skill to complete this task safely and efficiently.
+dependencies:
+  tools:
+    - type: mcp
+      value: Exa

@@ -1,0 +1,4 @@
+interface:
+  display_name: Project Analyzer
+  short_description: Automated brownfield codebase analysis. Detects project type,
+  default_prompt: Use the $project-analyzer skill to complete this task safely and efficiently.

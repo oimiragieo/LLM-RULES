@@ -1,0 +1,4 @@
+interface:
+  display_name: Protocol Reverse Engineering
+  short_description: Master network protocol reverse engineering including packet
+  default_prompt: Use the $protocol-reverse-engineering skill to complete this task safely and efficiently.

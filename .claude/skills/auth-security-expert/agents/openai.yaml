@@ -1,0 +1,4 @@
+interface:
+  display_name: Auth Security Expert
+  short_description: OAuth 2.1, JWT (RFC 8725), encryption, and authentication
+  default_prompt: Use the $auth-security-expert skill to complete this task safely and efficiently.

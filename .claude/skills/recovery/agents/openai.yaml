@@ -1,0 +1,4 @@
+interface:
+  display_name: Recovery
+  short_description: Workflow recovery protocol for resuming workflows after context
+  default_prompt: Use the $recovery skill to complete this task safely and efficiently.

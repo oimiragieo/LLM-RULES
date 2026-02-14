@@ -1,0 +1,4 @@
+interface:
+  display_name: Tauri Svelte Ui Components
+  short_description: Rules specific to Svelte UI component development in Tauri
+  default_prompt: Use the $tauri-svelte-ui-components skill to complete this task safely and efficiently.

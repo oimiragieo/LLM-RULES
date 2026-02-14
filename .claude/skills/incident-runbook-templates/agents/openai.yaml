@@ -1,0 +1,4 @@
+interface:
+  display_name: Incident Runbook Templates
+  short_description: Create structured incident response runbooks with step-by-step
+  default_prompt: Use the $incident-runbook-templates skill to complete this task safely and efficiently.

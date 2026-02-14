@@ -1,0 +1,4 @@
+interface:
+  display_name: Ci Cd Implementation Rule
+  short_description: Uses GitHub Actions or GitLab CI for CI/CD implementation.
+  default_prompt: Use the $ci-cd-implementation-rule skill to complete this task safely and efficiently.

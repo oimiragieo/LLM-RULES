@@ -1,0 +1,4 @@
+interface:
+  display_name: Tauri Native Api Integration
+  short_description: Rules for integrating Tauri's native APIs in the frontend
+  default_prompt: Use the $tauri-native-api-integration skill to complete this task safely and efficiently.

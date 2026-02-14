@@ -1,0 +1,4 @@
+interface:
+  display_name: Checklist Generator
+  short_description: Generate context-aware quality checklists for code review and
+  default_prompt: Use the $checklist-generator skill to complete this task safely and efficiently.

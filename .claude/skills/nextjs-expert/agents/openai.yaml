@@ -1,0 +1,4 @@
+interface:
+  display_name: Nextjs Expert
+  short_description: Next.js framework expert including App Router, Server
+  default_prompt: Use the $nextjs-expert skill to complete this task safely and efficiently.

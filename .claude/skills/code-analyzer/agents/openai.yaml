@@ -1,0 +1,4 @@
+interface:
+  display_name: Code Analyzer
+  short_description: Static code analysis and complexity metrics
+  default_prompt: Use the $code-analyzer skill to complete this task safely and efficiently.

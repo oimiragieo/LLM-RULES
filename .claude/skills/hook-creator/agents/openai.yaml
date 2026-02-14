@@ -1,0 +1,4 @@
+interface:
+  display_name: Hook Creator
+  short_description: Creates and registers hooks for the Claude Code framework.
+  default_prompt: Use the $hook-creator skill to complete this task safely and efficiently.

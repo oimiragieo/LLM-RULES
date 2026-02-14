@@ -1,0 +1,4 @@
+interface:
+  display_name: Kubernetes Flux
+  short_description: Kubernetes cluster management and troubleshooting. Query pods,
+  default_prompt: Use the $kubernetes-flux skill to complete this task safely and efficiently.

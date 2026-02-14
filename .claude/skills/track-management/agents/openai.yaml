@@ -1,0 +1,4 @@
+interface:
+  display_name: Track Management
+  short_description: Track management methodology - creating and managing logical
+  default_prompt: Use the $track-management skill to complete this task safely and efficiently.

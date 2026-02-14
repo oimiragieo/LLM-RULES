@@ -1,0 +1,4 @@
+interface:
+  display_name: Go Expert
+  short_description: Go programming expert including APIs, gRPC, concurrency, and
+  default_prompt: Use the $go-expert skill to complete this task safely and efficiently.

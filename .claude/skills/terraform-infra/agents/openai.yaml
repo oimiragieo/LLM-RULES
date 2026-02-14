@@ -1,0 +1,4 @@
+interface:
+  display_name: Terraform Infra
+  short_description: Terraform infrastructure operations with safety controls
+  default_prompt: Use the $terraform-infra skill to complete this task safely and efficiently.

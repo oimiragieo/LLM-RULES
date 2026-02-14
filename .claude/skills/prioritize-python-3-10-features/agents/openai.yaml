@@ -1,0 +1,4 @@
+interface:
+  display_name: Prioritize Python 3 10 Features
+  short_description: Prioritizes the use of new features available in Python 3.12
+  default_prompt: Use the $prioritize-python-3-10-features skill to complete this task safely and efficiently.

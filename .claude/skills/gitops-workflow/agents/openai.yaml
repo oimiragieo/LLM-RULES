@@ -1,0 +1,4 @@
+interface:
+  display_name: Gitops Workflow
+  short_description: Implement GitOps workflows with ArgoCD and Flux for automated,
+  default_prompt: Use the $gitops-workflow skill to complete this task safely and efficiently.

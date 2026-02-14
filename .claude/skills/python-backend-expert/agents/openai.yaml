@@ -1,0 +1,4 @@
+interface:
+  display_name: Python Backend Expert
+  short_description: Python backend expert including Django, FastAPI, Flask,
+  default_prompt: Use the $python-backend-expert skill to complete this task safely and efficiently.

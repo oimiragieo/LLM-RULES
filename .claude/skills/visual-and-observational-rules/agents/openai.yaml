@@ -1,0 +1,4 @@
+interface:
+  display_name: Visual And Observational Rules
+  short_description: Defines the visual aspects of the game and how the player
+  default_prompt: Use the $visual-and-observational-rules skill to complete this task safely and efficiently.

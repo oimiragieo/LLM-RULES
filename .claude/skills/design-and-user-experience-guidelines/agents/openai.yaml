@@ -1,0 +1,6 @@
+interface:
+  display_name: Design And User Experience Guidelines
+  short_description: Specifies design and user experience guidelines, including dark
+  default_prompt: >-
+    Use the $design-and-user-experience-guidelines skill to complete this task safely and
+    efficiently.

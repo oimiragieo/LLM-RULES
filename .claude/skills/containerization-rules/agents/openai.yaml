@@ -1,0 +1,4 @@
+interface:
+  display_name: Containerization Rules
+  short_description: Rules for creating and maintaining Dockerfiles.
+  default_prompt: Use the $containerization-rules skill to complete this task safely and efficiently.

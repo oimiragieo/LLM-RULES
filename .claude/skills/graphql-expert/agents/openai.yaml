@@ -1,0 +1,4 @@
+interface:
+  display_name: Graphql Expert
+  short_description: GraphQL expert including schema design, Apollo Client/Server,
+  default_prompt: Use the $graphql-expert skill to complete this task safely and efficiently.

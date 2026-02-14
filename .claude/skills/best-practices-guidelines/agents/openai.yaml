@@ -1,0 +1,4 @@
+interface:
+  display_name: Best Practices Guidelines
+  short_description: Specifies best practices, including following RESTful API
+  default_prompt: Use the $best-practices-guidelines skill to complete this task safely and efficiently.

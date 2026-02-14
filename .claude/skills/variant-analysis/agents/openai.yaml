@@ -1,0 +1,4 @@
+interface:
+  display_name: Variant Analysis
+  short_description: Discover vulnerability variants by identifying similar code
+  default_prompt: Use the $variant-analysis skill to complete this task safely and efficiently.

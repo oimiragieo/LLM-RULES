@@ -1,0 +1,4 @@
+interface:
+  display_name: Planning With Files
+  short_description: Manus-style file-based planning for complex tasks. Use
+  default_prompt: Use the $planning-with-files skill to complete this task safely and efficiently.

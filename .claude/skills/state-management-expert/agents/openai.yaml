@@ -1,0 +1,4 @@
+interface:
+  display_name: State Management Expert
+  short_description: State management expert including MobX, Redux, Zustand, and
+  default_prompt: Use the $state-management-expert skill to complete this task safely and efficiently.

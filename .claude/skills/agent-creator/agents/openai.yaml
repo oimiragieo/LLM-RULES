@@ -1,0 +1,10 @@
+interface:
+  display_name: Agent Creator
+  short_description: Creates specialized AI agents on-demand when no existing agent
+  default_prompt: Use the $agent-creator skill to complete this task safely and efficiently.
+dependencies:
+  tools:
+    - type: mcp
+      value: Exa
+    - type: mcp
+      value: GitHub

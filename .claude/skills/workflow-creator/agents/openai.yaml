@@ -1,0 +1,10 @@
+interface:
+  display_name: Workflow Creator
+  short_description: Creates multi-agent orchestration workflows for complex tasks.
+  default_prompt: Use the $workflow-creator skill to complete this task safely and efficiently.
+dependencies:
+  tools:
+    - type: mcp
+      value: Exa
+    - type: mcp
+      value: github

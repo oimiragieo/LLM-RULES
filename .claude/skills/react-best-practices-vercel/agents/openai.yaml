@@ -1,0 +1,4 @@
+interface:
+  display_name: Vercel React Best Practices
+  short_description: React and Next.js performance optimization guidelines from
+  default_prompt: Use the $vercel-react-best-practices skill to complete this task safely and efficiently.

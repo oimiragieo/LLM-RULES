@@ -1,0 +1,4 @@
+interface:
+  display_name: Async Operations
+  short_description: Specifies the preferred syntax for asynchronous operations
+  default_prompt: Use the $async-operations skill to complete this task safely and efficiently.
