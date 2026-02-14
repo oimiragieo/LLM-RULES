@@ -17,7 +17,14 @@ maxTurns: 28
 permissionMode: default
 skills:
   - agent-creator
+  - command-creator
+  - rule-creator
+  - tool-creator
+  - hook-creator
+  - semgrep-rule-creator
   - skill-creator
+  - template-creator
+  - workflow-creator
   - skill-discovery
   - swarm-coordination
   - task-management-protocol

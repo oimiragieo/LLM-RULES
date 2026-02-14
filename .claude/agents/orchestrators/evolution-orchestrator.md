@@ -27,7 +27,11 @@ skills:
   - agent-creator
   - artifact-integrator
   - artifact-lifecycle
+  - command-creator
+  - rule-creator
+  - tool-creator
   - hook-creator
+  - semgrep-rule-creator
   - plan-generator
   - research-synthesis
   - ripgrep

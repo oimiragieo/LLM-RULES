@@ -24,6 +24,14 @@ skills:
   - track-management
   - verification-before-completion
   - workflow-creator
+  - agent-creator
+  - skill-creator
+  - command-creator
+  - rule-creator
+  - tool-creator
+  - hook-creator
+  - semgrep-rule-creator
+  - template-creator
 ---
 
 # Master Orchestrator Agent
