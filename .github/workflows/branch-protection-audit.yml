@@ -24,7 +24,9 @@ jobs:
               'memory-ci',
               'memory-mvp-gate',
               'nightly-strict-gate',
-              'creator-ecosystem-validation'
+              'creator-ecosystem-validation',
+              'validate-commands',
+              'validate-skills'
             ];
 
             let protection;
@@ -65,8 +67,10 @@ jobs:
               'Expected status checks:',
               '- memory-ci',
               '- memory-mvp-gate',
-              '- nightly-strict-gate'
-              '- creator-ecosystem-validation'
+              '- nightly-strict-gate',
+              '- creator-ecosystem-validation',
+              '- validate-commands',
+              '- validate-skills'
             ].join('\n');
 
             await github.rest.issues.create({
