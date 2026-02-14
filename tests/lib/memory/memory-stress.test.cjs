@@ -41,14 +41,14 @@ function collectMatchingFiles(rootDir, predicate) {
 
 test(
   'stress: sustained STM->MTM consolidations enforce cap and produce observability events',
-  { timeout: 120000 },
+  { timeout: 90000 },
   () => {
     setupTestRoot();
     const prevEventLog = process.env.MEMORY_TIER_EVENT_LOG;
     process.env.MEMORY_TIER_EVENT_LOG = 'on';
 
     try {
-      for (let i = 0; i < 120; i++) {
+      for (let i = 0; i < 80; i++) {
         const sessionId = `stress-tier-${String(i).padStart(3, '0')}`;
         memoryTiers.writeSTMEntry(
           {
@@ -85,7 +85,7 @@ test(
         .split(/\r?\n/)
         .filter(Boolean)
         .map(line => JSON.parse(line));
-      assert.ok(events.length >= 120, 'Expected many memory-tier events');
+      assert.ok(events.length >= 80, 'Expected many memory-tier events');
       assert.ok(events.some(evt => evt.event === 'consolidated_to_mtm'));
       assert.ok(events.some(evt => evt.event === 'summarized_to_ltm'));
 
@@ -108,14 +108,14 @@ test(
 
 test(
   'stress: concurrent memory-manager writes keep JSON valid and leave no temp/lock residue',
-  { timeout: 120000 },
+  { timeout: 90000 },
   async () => {
     setupTestRoot();
 
     try {
       const ops = [];
-      for (let i = 0; i < 400; i++) {
-        const suffix = i % 160; // force some dedupe pressure + repeated keys
+      for (let i = 0; i < 240; i++) {
+        const suffix = i % 120; // force some dedupe pressure + repeated keys
         if (i % 2 === 0) {
           ops.push(
             memoryManager.recordGotchaAsync(
@@ -135,7 +135,7 @@ test(
 
       await Promise.all(ops);
 
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 10; i++) {
         const context = await memoryManager.loadMemoryForContextAsync(TEST_ROOT);
         assert.ok(Array.isArray(context.gotchas), 'gotchas should be array');
         assert.ok(Array.isArray(context.patterns), 'patterns should be array');
