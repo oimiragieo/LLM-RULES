@@ -30,7 +30,7 @@ const {
   auditLog,
 } = require('../../lib/utils/hook-input.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
-const eventBus = require('../../lib/events/event-bus.cjs');
+let eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 // SEC-PROTO-001: Use safeParseJSON for prototype pollution protection
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
@@ -47,6 +47,10 @@ const STEP0_STATE_PATH = path.join(RUNTIME_DIR, 'reflection-step0-state.json');
 const MAX_PENDING_REFLECTIONS = 5;
 const STEP0_REPEAT_WINDOW_MS = Number(process.env.REFLECTION_STEP0_REPEAT_WINDOW_MS || 120000);
 const STEP0_REPEAT_THRESHOLD = Number(process.env.REFLECTION_STEP0_REPEAT_THRESHOLD || 2);
+const STEP0_LOOP_BREAKER_MODE = String(process.env.REFLECTION_STEP0_LOOP_BREAKER_MODE || 'warn')
+  .trim()
+  .toLowerCase();
+const STEP0_EVENT_TIMEOUT_MS = Number(process.env.REFLECTION_STEP0_EVENT_TIMEOUT_MS || 250);
 
 /** Log to stderr only (stdout reserved for single formatResult line). */
 function stderrLog(message, meta = {}) {
@@ -172,6 +176,37 @@ function registerStep0Block(pendingCount) {
   return count;
 }
 
+function resolveEffectiveEnforcementMode(mode, repeatCount) {
+  if (mode !== 'block') return mode;
+  if (STEP0_LOOP_BREAKER_MODE === 'off') return mode;
+  if (repeatCount < STEP0_REPEAT_THRESHOLD) return mode;
+  return 'warn';
+}
+
+async function emitEventWithTimeout(eventType, payload) {
+  if (!eventBus || typeof eventBus.emit !== 'function') {
+    return { emitted: false, reason: 'event_bus_unavailable' };
+  }
+  try {
+    await Promise.race([
+      eventBus.emit(eventType, payload),
+      new Promise((_, reject) => {
+        setTimeout(
+          () => reject(new Error(`event_emit_timeout:${eventType}`)),
+          STEP0_EVENT_TIMEOUT_MS
+        );
+      }),
+    ]);
+    return { emitted: true };
+  } catch (err) {
+    stderrLog('event_emit_failed', {
+      eventType,
+      error: err?.message || String(err),
+    });
+    return { emitted: false, reason: err?.message || String(err) };
+  }
+}
+
 async function main() {
   const startTime = Date.now();
   try {
@@ -241,51 +276,46 @@ async function main() {
       enforcement: mode,
     });
 
-    if (mode === 'block') {
+    const effectiveMode = resolveEffectiveEnforcementMode(mode, repeatCount);
+
+    if (effectiveMode === 'block') {
       stderrLog('hook_blocked', { reason: 'reflection_step0_pending' });
-      try {
-        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
-          type: EventTypes.TOOL_BLOCKED,
-          timestamp: new Date().toISOString(),
-          toolName: 'TaskList',
-          duration: Date.now() - startTime,
-          reason: 'reflection_step0_pending',
-        });
-      } catch (_e) {
-        // Best-effort
-      }
+      await emitEventWithTimeout(EventTypes.TOOL_BLOCKED, {
+        type: EventTypes.TOOL_BLOCKED,
+        timestamp: new Date().toISOString(),
+        toolName: 'TaskList',
+        duration: Date.now() - startTime,
+        reason: 'reflection_step0_pending',
+      });
       console.log(formatResult('block', message));
       process.exit(2);
     }
 
-    try {
-      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
-        type: EventTypes.TOOL_COMPLETED,
-        timestamp: new Date().toISOString(),
-        toolName: 'TaskList',
-        output: {
-          status: 'warn',
-          reason: 'reflection_step0_pending',
-        },
-        duration: Date.now() - startTime,
-      });
-    } catch (_e) {
-      // Best-effort
-    }
-    stderrLog('hook_end', { status: 'warn', reason: 'reflection_step0_pending' });
+    await emitEventWithTimeout(EventTypes.TOOL_COMPLETED, {
+      type: EventTypes.TOOL_COMPLETED,
+      timestamp: new Date().toISOString(),
+      toolName: 'TaskList',
+      output: {
+        status: 'warn',
+        reason: 'reflection_step0_pending',
+        loopBreakerEngaged: mode === 'block' && effectiveMode === 'warn',
+      },
+      duration: Date.now() - startTime,
+    });
+    stderrLog('hook_end', {
+      status: 'warn',
+      reason: 'reflection_step0_pending',
+      loopBreakerEngaged: mode === 'block' && effectiveMode === 'warn',
+    });
     console.log(formatResult('warn', message));
     process.exit(0);
   } catch (err) {
-    try {
-      await eventBus.emit(EventTypes.TOOL_FAILED, {
-        type: EventTypes.TOOL_FAILED,
-        timestamp: new Date().toISOString(),
-        toolName: 'reflection-step0-guard',
-        error: err.message,
-      });
-    } catch (_e) {
-      // Best-effort
-    }
+    await emitEventWithTimeout(EventTypes.TOOL_FAILED, {
+      type: EventTypes.TOOL_FAILED,
+      timestamp: new Date().toISOString(),
+      toolName: 'reflection-step0-guard',
+      error: err.message,
+    });
     stderrLog('hook_failed', { error: err?.message });
     if (process.env.DEBUG_HOOKS) {
       console.error('[reflection-step0-guard] Error:', err.message);
@@ -303,4 +333,9 @@ module.exports = {
   hasPendingReflections,
   readSpawnRequests,
   clearReminderIfStale,
+  resolveEffectiveEnforcementMode,
+  emitEventWithTimeout,
+  __setEventBus: mock => {
+    eventBus = mock;
+  },
 };
