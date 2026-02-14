@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "windowStartedAt": "2026-02-11T02:45:58.462Z",
-  "updatedAt": "2026-02-14T22:58:45.064Z",
+  "windowStartedAt": "2026-02-14T22:35:31.939Z",
+  "updatedAt": "2026-02-14T22:35:51.910Z",
   "counters": {
-    "writesTotal": 0,
+    "writesTotal": 48,
     "writesFailed": 0,
-    "readsTotal": 134,
-    "parseAttempts": 0,
+    "readsTotal": 0,
+    "parseAttempts": 46,
     "parseFailures": 0,
-    "lockAcquires": 0,
+    "lockAcquires": 13,
     "staleTempCleanups": 0,
     "staleTempFilesRemoved": 0
   },
@@ -31,9 +31,9 @@
         0,
         0,
         0,
-        0,
-        0,
-        0
+        13,
+        18,
+        17
       ]
     },
     "readLatencyMs": {
@@ -50,8 +50,8 @@
       "counts": [
         0,
         0,
-        119,
-        15,
+        0,
+        0,
         0,
         0,
         0,
@@ -71,7 +71,7 @@
         500
       ],
       "counts": [
-        0,
+        13,
         0,
         0,
         0,
@@ -84,9 +84,9 @@
     }
   },
   "latest": {
-    "writeLatencyMs": null,
-    "readLatencyMs": 8,
-    "lockWaitMs": null,
+    "writeLatencyMs": 766,
+    "readLatencyMs": null,
+    "lockWaitMs": 1,
     "lastError": null
   }
 }

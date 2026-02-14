@@ -36,6 +36,11 @@ const {
   auditLog,
   auditSecurityOverride,
 } = require('../../lib/utils/hook-input.cjs');
+const {
+  parseAndValidateTaskUpdate,
+  VALID_TASK_STATUSES,
+} = require('../../lib/routing/task-update-contract.cjs');
+const lifecycleState = require('../../lib/routing/task-lifecycle-state.cjs');
 
 // Paths
 const VALIDATION_SCRIPT = path.join(
@@ -45,7 +50,6 @@ const VALIDATION_SCRIPT = path.join(
   'cli',
   'validate-integration.cjs'
 );
-const TASK_STATUS_FILE = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
 const ACTIVE_CREATORS_STATE_FILE = path.join(
   PROJECT_ROOT,
   '.claude/context/runtime/active-creators.json'
@@ -71,16 +75,7 @@ const ENFORCED_CREATOR_SKILLS = [
   'workflow-creator',
 ];
 
-// Valid status values
-const VALID_STATUSES = ['pending', 'in_progress', 'completed', 'deleted'];
-
-// Valid transitions from current status to new status
-const VALID_TRANSITIONS = {
-  pending: ['in_progress', 'deleted'],
-  in_progress: ['completed', 'deleted'],
-  completed: [], // Cannot transition from completed (terminal state)
-  deleted: [], // Cannot transition from deleted (terminal state)
-};
+const VALID_STATUSES = VALID_TASK_STATUSES;
 
 /**
  * Read current task status from file
@@ -88,15 +83,7 @@ const VALID_TRANSITIONS = {
  * @returns {string} Current status ('pending' if not found)
  */
 function readTaskStatus(taskId) {
-  try {
-    if (fs.existsSync(TASK_STATUS_FILE)) {
-      const data = JSON.parse(fs.readFileSync(TASK_STATUS_FILE, 'utf8'));
-      return data[taskId] || 'pending';
-    }
-  } catch (_err) {
-    // File doesn't exist or invalid JSON - treat as pending
-  }
-  return 'pending';
+  return lifecycleState.readTaskStatus(taskId);
 }
 
 /**
@@ -105,29 +92,14 @@ function readTaskStatus(taskId) {
  * @param {string} status - New status
  */
 function writeTaskStatus(taskId, status) {
-  try {
-    let data = {};
-    if (fs.existsSync(TASK_STATUS_FILE)) {
-      const content = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
-      if (content.trim()) {
-        data = JSON.parse(content);
-      }
-    }
-
-    data[taskId] = status;
-
-    // Ensure directory exists
-    const dir = path.dirname(TASK_STATUS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    fs.writeFileSync(TASK_STATUS_FILE, JSON.stringify(data, null, 2), 'utf8');
-  } catch (err) {
-    // Best effort - don't fail hook if file write fails
+  const before = readTaskStatus(taskId);
+  lifecycleState.writeTaskStatus(taskId, status);
+  const after = readTaskStatus(taskId);
+  if (after !== status && before !== status) {
     auditLog('pre-completion-validation', 'error', {
       error: 'Failed to write task status',
-      message: err.message,
+      taskId,
+      attemptedStatus: status,
     });
   }
 }
@@ -139,18 +111,7 @@ function writeTaskStatus(taskId, status) {
  * @returns {boolean} True if valid, false otherwise
  */
 function isValidTransition(currentStatus, newStatus) {
-  // Normalize to lowercase
-  const current = (currentStatus || 'pending').toLowerCase();
-  const newStat = (newStatus || '').toLowerCase();
-
-  // Invalid if new status is not recognized
-  if (!VALID_STATUSES.includes(newStat)) {
-    return false;
-  }
-
-  // Check transition table
-  const allowedTransitions = VALID_TRANSITIONS[current] || [];
-  return allowedTransitions.includes(newStat);
+  return lifecycleState.isValidTransition(currentStatus, newStatus);
 }
 
 /**
@@ -161,25 +122,7 @@ function isValidTransition(currentStatus, newStatus) {
  * @returns {string} Error message
  */
 function getTransitionError(taskId, currentStatus, newStatus) {
-  const messages = {
-    pending: {
-      completed:
-        'Task cannot go from pending → completed (must go through in_progress first). Use TaskUpdate({ taskId, status: "in_progress" }) before marking complete.',
-    },
-    completed: {
-      _default: `Task ${taskId} is already completed. Cannot change status from completed → ${newStatus}.`,
-    },
-    deleted: {
-      _default: `Task ${taskId} is deleted. Cannot change status from deleted → ${newStatus}.`,
-    },
-  };
-
-  const statusMessages = messages[currentStatus];
-  if (statusMessages) {
-    return statusMessages[newStatus] || statusMessages._default || 'Invalid transition';
-  }
-
-  return `Invalid task status transition: ${taskId} from ${currentStatus} → ${newStatus}`;
+  return lifecycleState.getTransitionError(taskId, currentStatus, newStatus);
 }
 
 /**
@@ -395,7 +338,7 @@ function main(hookInput) {
   try {
     // Parse hook input
     const input = typeof hookInput === 'string' ? JSON.parse(hookInput) : hookInput;
-    const { tool, params } = input;
+    const { tool, params = {} } = input;
 
     // Only intercept TaskUpdate calls
     if (tool !== 'TaskUpdate') {
@@ -404,6 +347,12 @@ function main(hookInput) {
       process.exit(0);
     }
 
+    const parsedParams = parseAndValidateTaskUpdate(params, {
+      allowedStatuses: VALID_STATUSES,
+      requireTaskId: false,
+      requireStatus: false,
+    });
+
     // ============================================================
     // CHECK 1: TASK STATUS TRANSITION VALIDATION
     // ============================================================
@@ -411,14 +360,12 @@ function main(hookInput) {
 
     // If task status enforcement is not disabled, validate status transition
     if (taskStatusMode !== 'off') {
-      // Extract taskId and status (support both taskId and task_id)
-      const taskId = params.taskId || params.task_id;
-      const newStatus = params.status;
+      const taskId = parsedParams.normalized.taskId;
+      const newStatus = parsedParams.normalized.status;
 
       // Only validate if we have taskId and status
       if (taskId && newStatus) {
-        // Normalize status
-        const normalizedStatus = newStatus.toLowerCase();
+        const normalizedStatus = newStatus;
 
         // Check if status is valid
         if (!VALID_STATUSES.includes(normalizedStatus)) {
@@ -500,7 +447,7 @@ function main(hookInput) {
     // CHECK 2: ARTIFACT INTEGRATION VALIDATION (only for "completed")
     // ============================================================
     // Only intercept when status is being set to "completed"
-    if (params.status !== 'completed') {
+    if (parsedParams.normalized.status !== 'completed') {
       // Not completing a task - allow (status validation passed above)
       console.log(JSON.stringify({ allow: true }));
       process.exit(0);

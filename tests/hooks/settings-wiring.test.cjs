@@ -51,3 +51,17 @@ test('UserPromptSubmit includes orchestrator hook in command chain', () => {
     'UserPromptSubmit should include orchestrator hook'
   );
 });
+
+test('PreToolUse TaskUpdate runs contract validator before transition validators', () => {
+  const block = findHookBlock('PreToolUse', 'TaskUpdate');
+  assert.ok(block, 'Expected PreToolUse block for TaskUpdate');
+
+  const commands = listCommands(block);
+  const contractIdx = commands.indexOf(
+    'node .claude/hooks/validation/taskupdate-contract-validator.cjs'
+  );
+  const transitionIdx = commands.indexOf('node .claude/hooks/validation/pre-completion-validation.cjs');
+  assert.ok(contractIdx !== -1, 'TaskUpdate contract validator should be wired');
+  assert.ok(transitionIdx !== -1, 'pre-completion-validation should be wired');
+  assert.ok(contractIdx < transitionIdx, 'Contract validator should run before transition validation');
+});

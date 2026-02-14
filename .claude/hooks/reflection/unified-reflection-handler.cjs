@@ -50,6 +50,7 @@ const { EventTypes } = require('../../lib/events/event-types.cjs');
 
 // PERF-003 #2: Import router-state for TaskUpdate tracking (consolidated from task-update-tracker.cjs)
 const routerState = require('../../lib/routing/router-state.cjs');
+const { parseAndValidateTaskUpdate } = require('../../lib/routing/task-update-contract.cjs');
 
 // Phase 4 Integration: Error summary extractor for reflection workflow
 let errorSummaryExtractor = null;
@@ -78,14 +79,11 @@ const SESSION_END_EVENTS = ['Stop', 'SessionEnd'];
 const MIN_OUTPUT_LENGTH = 50;
 
 function normalizeTaskUpdateFields(toolInput) {
-  const input = toolInput && typeof toolInput === 'object' ? toolInput : {};
-  const rawTaskId = input.taskId ?? input.task_id ?? input.id ?? null;
-  const rawStatus = input.status ?? null;
-  const status = typeof rawStatus === 'string' ? rawStatus.trim().toLowerCase() : null;
-  return {
-    taskId: rawTaskId != null ? String(rawTaskId) : null,
-    status,
-  };
+  const parsed = parseAndValidateTaskUpdate(toolInput, {
+    requireTaskId: false,
+    requireStatus: false,
+  });
+  return parsed.normalized;
 }
 
 // ============================================================

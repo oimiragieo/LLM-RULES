@@ -176,6 +176,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/validation/taskupdate-contract-validator.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/validation/pre-completion-validation.cjs"
           },
           {
