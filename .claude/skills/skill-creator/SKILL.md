@@ -111,6 +111,48 @@ Before finalizing a new skill, gather current best practices and constraints:
 
 Do not finalize a skill without evidence-backed guidance for tooling, workflow, and guardrails.
 
+## Enterprise Acceptance Checklist (BLOCKING)
+
+Before marking skill creation complete, verify all items below:
+
+- [ ] `SKILL.md` exists and includes Memory Protocol
+- [ ] `scripts/main.cjs` exists
+- [ ] `hooks/pre-execute.cjs` and `hooks/post-execute.cjs` exist (unless user explicitly requested minimal)
+- [ ] `schemas/input.schema.json` and `schemas/output.schema.json` exist (unless user explicitly requested minimal)
+- [ ] `rules/<skill-name>.md` exists
+- [ ] `commands/<skill-name>.md` exists
+- [ ] `templates/implementation-template.md` exists
+- [ ] `references/research-requirements.md` exists with Exa-first and fallback notes
+- [ ] Companion tool exists at `.claude/tools/<skill-name>/<skill-name>.cjs` (unless user explicitly disabled)
+- [ ] Workflow exists at `.claude/workflows/<skill-name>-skill-workflow.md` (unless user explicitly disabled)
+
+Use this verification command set:
+
+```bash
+ls .claude/skills/<skill-name>/SKILL.md
+ls .claude/skills/<skill-name>/scripts/main.cjs
+ls .claude/skills/<skill-name>/hooks/pre-execute.cjs .claude/skills/<skill-name>/hooks/post-execute.cjs
+ls .claude/skills/<skill-name>/schemas/input.schema.json .claude/skills/<skill-name>/schemas/output.schema.json
+ls .claude/skills/<skill-name>/rules/<skill-name>.md
+ls .claude/skills/<skill-name>/commands/<skill-name>.md
+ls .claude/skills/<skill-name>/templates/implementation-template.md
+ls .claude/skills/<skill-name>/references/research-requirements.md
+ls .claude/tools/<skill-name>/<skill-name>.cjs
+ls .claude/workflows/<skill-name>-skill-workflow.md
+```
+
+## Research Evidence Quality (MANDATORY)
+
+`references/research-requirements.md` must include:
+
+1. Date of research and query intent.
+2. Exa sources used (or explicit reason Exa was unavailable).
+3. Fallback sources (WebFetch + arXiv) when needed.
+4. 3 actionable design constraints mapped to hooks/rules/schemas.
+5. Clear non-goals to prevent overengineering.
+
+If these are missing, the skill is not complete.
+
 ## Actions
 
 ### `create` - Create a New Skill
