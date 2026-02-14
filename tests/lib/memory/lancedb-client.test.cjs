@@ -552,6 +552,34 @@ test('search - applies limit correctly', async t => {
   await store.close();
 });
 
+test('search - maps distance to bounded similarity for threshold filtering', async () => {
+  const { MemoryVectorStore } = getModule();
+  const store = new MemoryVectorStore({
+    persistDirectory: TEST_DB_PATH,
+    collectionName: 'distance_map_test',
+    embeddingMode: 'test',
+  });
+
+  store.isInitialized = true;
+  store.generateEmbedding = async () => [0.1, 0.2];
+  store.getTableVectorDimension = async () => 2;
+  store.table = {
+    vectorSearch: () => ({
+      limit: () => ({
+        toArray: async () => [
+          { id: 'doc-a', text: 'A', metadata: '{}', _distance: 2.5 },
+          { id: 'doc-b', text: 'B', metadata: '{}', _distance: 0.2 },
+        ],
+      }),
+    }),
+  };
+
+  const filtered = await store.search('query', { minScore: 0.25, limit: 10 });
+  assert.strictEqual(filtered.length, 2, 'Both results should pass bounded similarity threshold');
+  assert.ok(filtered[0].similarity <= 1 && filtered[0].similarity >= 0);
+  assert.ok(filtered[1].similarity <= 1 && filtered[1].similarity >= 0);
+});
+
 // =============================================================================
 // Test Suite 7: Upsert and delete operations
 // =============================================================================

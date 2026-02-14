@@ -62,6 +62,20 @@ const TYPED_METADATA_FIELDS = {
 };
 
 /**
+ * Convert distance metrics into bounded [0,1] similarity scores.
+ * LanceDB distance can exceed 1 depending on metric/model; using 1-distance
+ * causes negative similarity and false threshold filtering.
+ * @param {number} distance
+ * @returns {number}
+ */
+function distanceToSimilarity(distance) {
+  const d = Number(distance);
+  if (!Number.isFinite(d)) return 0;
+  if (d <= 0) return 1;
+  return 1 / (1 + d);
+}
+
+/**
  * @typedef {Object} EmbeddingStatus
  * @property {'unknown'|'ready'|'unavailable'|'disabled'} status
  * @property {string|null} mode
@@ -744,7 +758,7 @@ class MemoryVectorStore {
         id: r.id,
         content: r.text,
         metadata: metadata,
-        similarity: 1 - (r._distance || 0), // Distance->similarity adapter
+        similarity: distanceToSimilarity(r._distance),
       };
     });
 

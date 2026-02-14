@@ -5,7 +5,7 @@
 
 /** Default similarity threshold (0–1) for semantic memory search. Overridable via env MEMORY_SEMANTIC_SEARCH_THRESHOLD. */
 const SEMANTIC_SEARCH_DEFAULT_THRESHOLD = Number(
-  process.env.MEMORY_SEMANTIC_SEARCH_THRESHOLD || '0.72'
+  process.env.MEMORY_SEMANTIC_SEARCH_THRESHOLD || '0.40'
 );
 
 module.exports = {
