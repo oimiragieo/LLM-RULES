@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "scientific-skills--skills--opentargets-databaseInput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "action": {
+      "type": "string"
+    },
+    "target": {
+      "type": "string"
+    }
+  }
+}

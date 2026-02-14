@@ -72,15 +72,30 @@ function hasAnyFile(dirPath, extension) {
   return entries.some(entry => entry.isFile() && entry.name.endsWith(extension));
 }
 
-function hasCompanionTool(toolsRoot, skillBaseName) {
+function buildSkillSlug(skillRelativePath) {
+  return skillRelativePath.replace(/\//g, '--');
+}
+
+function hasCompanionTool(toolsRoot, skillBaseName, skillSlug) {
   const toolDir = path.join(toolsRoot, skillBaseName);
-  if (!fs.existsSync(toolDir)) {
+  const baseMatches = fs.existsSync(toolDir)
+    ? ['.cjs', '.mjs', '.js'].some(ext => fileExists(path.join(toolDir, `${skillBaseName}${ext}`)))
+    : false;
+
+  if (baseMatches) {
+    return true;
+  }
+
+  if (!skillSlug || skillSlug === skillBaseName) {
     return false;
   }
 
-  return ['.cjs', '.mjs', '.js'].some(ext =>
-    fileExists(path.join(toolDir, `${skillBaseName}${ext}`))
-  );
+  const slugDir = path.join(toolsRoot, skillSlug);
+  if (!fs.existsSync(slugDir)) {
+    return false;
+  }
+
+  return ['.cjs', '.mjs', '.js'].some(ext => fileExists(path.join(slugDir, `${skillSlug}${ext}`)));
 }
 
 function evaluateSkill({ projectRoot, skillRelativePath }) {
@@ -90,6 +105,7 @@ function evaluateSkill({ projectRoot, skillRelativePath }) {
 
   const skillDir = path.join(skillsRoot, ...skillRelativePath.split('/'));
   const skillBaseName = path.basename(skillRelativePath);
+  const skillSlug = buildSkillSlug(skillRelativePath);
 
   const checks = {
     'skill.md': fileExists(path.join(skillDir, 'SKILL.md')),
@@ -110,8 +126,10 @@ function evaluateSkill({ projectRoot, skillRelativePath }) {
     'references.research': fileExists(
       path.join(skillDir, 'references', 'research-requirements.md')
     ),
-    'tool.companion': hasCompanionTool(toolsRoot, skillBaseName),
-    'workflow.skill': fileExists(path.join(workflowsRoot, `${skillBaseName}-skill-workflow.md`)),
+    'tool.companion': hasCompanionTool(toolsRoot, skillBaseName, skillSlug),
+    'workflow.skill':
+      fileExists(path.join(workflowsRoot, `${skillBaseName}-skill-workflow.md`)) ||
+      fileExists(path.join(workflowsRoot, `${skillSlug}-skill-workflow.md`)),
   };
 
   let score = 0;
@@ -300,4 +318,6 @@ module.exports = {
   findAllSkills,
   isArchivedSkillPath,
   runAudit,
+  buildSkillSlug,
 };
+

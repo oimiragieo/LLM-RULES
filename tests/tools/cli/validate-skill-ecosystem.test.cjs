@@ -12,6 +12,7 @@ const {
   buildSummary,
   isArchivedSkillPath,
   runAudit,
+  buildSkillSlug,
 } = require('../../../.claude/tools/cli/validate-skill-ecosystem.cjs');
 
 describe('validate-skill-ecosystem', () => {
@@ -31,6 +32,33 @@ describe('validate-skill-ecosystem', () => {
     fs.rmSync(root, { recursive: true, force: true });
   });
 
+  test('evaluateSkill recognizes slugged nested companion tool path', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-audit-'));
+    const skillsRoot = path.join(root, '.claude', 'skills');
+    const toolsRoot = path.join(root, '.claude', 'tools');
+    const workflowsRoot = path.join(root, '.claude', 'workflows');
+
+    const nested = path.join(skillsRoot, 'scientific-skills', 'skills', 'demo-nested');
+    fs.mkdirSync(nested, { recursive: true });
+    fs.writeFileSync(path.join(nested, 'SKILL.md'), '# nested');
+
+    const slug = 'scientific-skills--skills--demo-nested';
+    fs.mkdirSync(path.join(toolsRoot, slug), { recursive: true });
+    fs.writeFileSync(path.join(toolsRoot, slug, slug + '.cjs'), 'module.exports = {};');
+
+    fs.mkdirSync(workflowsRoot, { recursive: true });
+    fs.writeFileSync(path.join(workflowsRoot, slug + '-skill-workflow.md'), '# wf');
+
+    const result = evaluateSkill({
+      projectRoot: root,
+      skillRelativePath: 'scientific-skills/skills/demo-nested',
+    });
+
+    assert.strictEqual(result.checks['tool.companion'], true);
+    assert.strictEqual(result.checks['workflow.skill'], true);
+
+    fs.rmSync(root, { recursive: true, force: true });
+  });
   test('evaluateSkill reports full compliance and perfect score when all contract files exist', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-audit-'));
     const skillsRoot = path.join(root, '.claude', 'skills');
@@ -70,6 +98,10 @@ describe('validate-skill-ecosystem', () => {
     assert.strictEqual(result.missing.length, 0);
 
     fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test('buildSkillSlug creates nested-safe identifier', () => {
+    assert.strictEqual(buildSkillSlug('scientific-skills/skills/biopython'), 'scientific-skills--skills--biopython');
   });
 
   test('isArchivedSkillPath identifies archived skill paths', () => {
