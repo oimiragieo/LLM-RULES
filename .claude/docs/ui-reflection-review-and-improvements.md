@@ -22,7 +22,7 @@ The "UI" here is the **Router’s conversational output** plus **host tool/task 
 
 ### 1.2 What the codebase does (no UI code)
 
-- **user-prompt-unified.cjs:** When `reflection-spawn-request.json` exists and has requests, writes `reflection-reminder.txt` with: *"You have N pending reflection spawn request(s). Read … spawn reflection-agent for each … Then delete this file and clear/trim the spawn request file."*
+- **user-prompt-unified.cjs:** When `reflection-spawn-request.json` exists and has requests, writes `reflection-reminder.txt` with: _"You have N pending reflection spawn request(s). Read … spawn reflection-agent for each … Then delete this file and clear/trim the spawn request file."_
 - **CLAUDE.md:** Router must do Step 0 before TaskList: read reminder, read spawn-request, spawn reflection-agent, delete reminder, clear/trim spawn request.
 - **reflection-step0-guard.cjs:** PreToolUse(TaskList) can block with a message that says "STEP 0 REQUIRED: (1) Read … (2) Spawn … (3) Clear/trim … (4) Clear reminder … THEN TaskList()."
 - **Enterprise workflow:** Phase 6 = REFLECT, Gate 6 = "Learnings recorded"; pipeline implementation uses "Wave 9: Reflection + Developer (commit)".
@@ -34,15 +34,15 @@ So: the codebase defines **when** reflection runs (Step 0 at start, Wave 9 in pi
 
 ## 2. Comparison: Task Handling vs Reflection
 
-| Aspect | Task / pipeline | Reflection |
-|--------|----------------|------------|
-| **Visibility at start** | TaskList() and "Pipeline Status" with wave table. | Only "Read reflection-spawn-request.json" and "Read reflection-reminder.txt" — no "Step 0: N pending reflections; spawning…" or "Step 0 complete." |
-| **Phase label** | Waves 1–9 with names (PM, Architect, Developer, QA, etc.). | Reflection appears as one agent in Wave 9 ("Reflection + Developer (commit)") with no dedicated "Reflection phase" line. |
-| **Outcome** | Wave summary (e.g. "Planner: 93+ tests…") and final table. | "Reflection agent captures learnings" → "Done (8 tool uses · 112.3k tokens)" — no report path or one-line summary in the main flow. |
-| **Report** | Reports list at end (pm-sprint-backlog, architecture-design, etc.). | `pipeline-reflection-2026-02-13.md` is in the list but not called out as "Reflection learnings" or summarized. |
-| **Cleanup** | No separate task for pipeline state. | Separate Task "Clean up reflection reminder file" suggests reminder wasn’t cleared in Step 0 (or was re-created), and adds an extra step the user sees. |
-| **Noise** | Late "Task X completed in background" and "Agent X completed" messages. | Same channel; reflection isn’t noisier, but late notifications apply to all agents. |
-| **Blocking** | Guard blocks TaskList when pending reflections exist. | User only sees the block message from the guard; no prior "You have N pending reflections" banner. |
+| Aspect                  | Task / pipeline                                                         | Reflection                                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Visibility at start** | TaskList() and "Pipeline Status" with wave table.                       | Only "Read reflection-spawn-request.json" and "Read reflection-reminder.txt" — no "Step 0: N pending reflections; spawning…" or "Step 0 complete."      |
+| **Phase label**         | Waves 1–9 with names (PM, Architect, Developer, QA, etc.).              | Reflection appears as one agent in Wave 9 ("Reflection + Developer (commit)") with no dedicated "Reflection phase" line.                                |
+| **Outcome**             | Wave summary (e.g. "Planner: 93+ tests…") and final table.              | "Reflection agent captures learnings" → "Done (8 tool uses · 112.3k tokens)" — no report path or one-line summary in the main flow.                     |
+| **Report**              | Reports list at end (pm-sprint-backlog, architecture-design, etc.).     | `pipeline-reflection-2026-02-13.md` is in the list but not called out as "Reflection learnings" or summarized.                                          |
+| **Cleanup**             | No separate task for pipeline state.                                    | Separate Task "Clean up reflection reminder file" suggests reminder wasn’t cleared in Step 0 (or was re-created), and adds an extra step the user sees. |
+| **Noise**               | Late "Task X completed in background" and "Agent X completed" messages. | Same channel; reflection isn’t noisier, but late notifications apply to all agents.                                                                     |
+| **Blocking**            | Guard blocks TaskList when pending reflections exist.                   | User only sees the block message from the guard; no prior "You have N pending reflections" banner.                                                      |
 
 **Summary:** Task handling is presented as a clear, wave-based pipeline with a final table and reports list. Reflection is under-presented: Step 0 has no explicit start/complete line, Wave 9 reflection has no one-line outcome (report path + summary), and reminder cleanup is a separate task. Late agent/background notifications affect both; batching them would help the whole UI.
 
@@ -53,50 +53,50 @@ So: the codebase defines **when** reflection runs (Step 0 at start, Wave 9 in pi
 ### 3.1 Reflection visibility (codebase + Router instructions)
 
 - **Step 0 banner (Router):** When the Router reads `reflection-reminder.txt` and/or finds pending requests, its **first** visible statement should be explicit, e.g.  
-  *"Step 0: N pending reflection(s) from previous session. Spawning reflection-agent for each (or first batch)."*  
+  _"Step 0: N pending reflection(s) from previous session. Spawning reflection-agent for each (or first batch)."_  
   After spawning and clearing:  
-  *"Step 0 complete. Reminder cleared; spawn request trimmed. Proceeding to TaskList()."*  
+  _"Step 0 complete. Reminder cleared; spawn request trimmed. Proceeding to TaskList()."_  
   **Where:** Document in CLAUDE.md or a Router rule that the first response must include these two lines when Step 0 runs.
 - **Reflection outcome in pipeline:** When reflection-agent finishes (e.g. in Wave 9), the Router should add one line, e.g.  
-  *"Reflection report: `.claude/context/reports/reflections/pipeline-reflection-YYYY-MM-DD.md` — learnings recorded (patterns/gotchas/decisions)."*  
+  _"Reflection report: `.claude/context/reports/reflections/pipeline-reflection-YYYY-MM-DD.md` — learnings recorded (patterns/gotchas/decisions)."_  
   **Where:** Orchestrator / enterprise workflow instructions or a Router rule for "after reflection-agent completes."
 - **Final summary:** In the "Reports Generated" section, always list the reflection report with a short label, e.g.  
-  *"Reflection learnings: `.claude/context/reports/reflections/pipeline-reflection-YYYY-MM-DD.md`"*  
+  _"Reflection learnings: `.claude/context/reports/reflections/pipeline-reflection-YYYY-MM-DD.md`"_  
   and optionally one sentence (e.g. "3 patterns, 2 gotchas, 1 decision") if the Router can read the report or the agent returns a one-line summary.
 
 ### 3.2 Reminder cleanup (codebase)
 
 - **Single place for clearing reminder:** Step 0 in CLAUDE.md already says "delete the reminder file and clear/trim the spawn request file." If the Router does that immediately after spawning reflection-agent, the reminder should not persist. Then a separate "Clean up reflection reminder file" task should not be needed.
-- **If cleanup is intentional:** If the design is to clear the reminder only after the full pipeline (e.g. so the reminder persists until "session end"), document that in MEMORY_SYSTEM.md or reflection docs and have the Router say once: *"Reflection reminder will be cleared after pipeline (by design)."* so the user understands why a cleanup task exists.
-- **Recommendation:** Prefer clearing in Step 0 so the user does not see an extra cleanup task. If the pipeline writes a new reminder for the *next* session (e.g. on SessionEnd), that can be documented separately.
+- **If cleanup is intentional:** If the design is to clear the reminder only after the full pipeline (e.g. so the reminder persists until "session end"), document that in MEMORY_SYSTEM.md or reflection docs and have the Router say once: _"Reflection reminder will be cleared after pipeline (by design)."_ so the user understands why a cleanup task exists.
+- **Recommendation:** Prefer clearing in Step 0 so the user does not see an extra cleanup task. If the pipeline writes a new reminder for the _next_ session (e.g. on SessionEnd), that can be documented separately.
 
 ### 3.3 Guard message (codebase)
 
 - **reflection-step0-guard.cjs** already returns a clear block message. Optionally add a short, user-facing line at the top, e.g.  
-  *"You have N pending reflection(s). Process them (Step 0) before continuing."*  
+  _"You have N pending reflection(s). Process them (Step 0) before continuing."_  
   so the first thing the user sees is context, then the existing "(1) Read … (2) Spawn …" steps.
-- **Reminder text (user-prompt-unified.cjs):** The reminder already says "You have N pending reflection spawn request(s)…" — good. No change required unless we want to add "Step 0" explicitly: *"Step 0: You have N pending…"*.
+- **Reminder text (user-prompt-unified.cjs):** The reminder already says "You have N pending reflection spawn request(s)…" — good. No change required unless we want to add "Step 0" explicitly: _"Step 0: You have N pending…"_.
 
 ### 3.4 Late-arriving and background noise (Router instructions)
 
 - **Late agent completions:** After the pipeline is complete, instead of one paragraph per "Agent X completed," the Router could batch:  
-  *"All pipeline notifications received (PM, Researcher, Architect, Security, Context-Compressor, Planner, etc.). All already incorporated. Pipeline complete."*  
+  _"All pipeline notifications received (PM, Researcher, Architect, Security, Context-Compressor, Planner, etc.). All already incorporated. Pipeline complete."_  
   **Where:** Router rule or orchestrator instructions: "When pipeline is complete and late Task/agent completions arrive, acknowledge in a single batched message, not per-agent."
 - **Background commands:** Similarly, batch at the end:  
-  *"Background commands: format (ok), test suite (exit 1 — 13 known P0-002 failures), test summary (ok), test output (ok). No new failures from this run."*  
+  _"Background commands: format (ok), test suite (exit 1 — 13 known P0-002 failures), test summary (ok), test output (ok). No new failures from this run."_  
   **Where:** Router/QA wave instructions so the final summary doesn’t repeat the same explanation for each background command.
 
 ### 3.5 Reflection as first-class phase (workflow / Router)
 
 - **Wave table:** Keep "Wave 9: Reflection + Developer (commit)" but optionally split for clarity:  
-  *"9a – Reflection (learnings recorded)"* and *"9b – Developer (commit)."*  
+  _"9a – Reflection (learnings recorded)"_ and _"9b – Developer (commit)."_  
   So "Reflect" is explicitly its own row in the narrative.
 - **Phase 6 REFLECT:** The enterprise workflow already has Phase 6 REFLECT and Gate 6. Ensure any Router summary that mentions "phases" or "gates" includes "Phase 6: Reflect — Gate 6: Learnings recorded" so reflection is not omitted in high-level descriptions.
 
 ### 3.6 Reports and missing outputs (agents + Router)
 
 - **"Reports weren't written":** When the Router says "Reports weren't written (agents likely hit context limits)," add a single follow-up line, e.g.  
-  *"Missing reports: Wave X (agent Y), Wave Z (agent W). Consider re-running or smaller context."*  
+  _"Missing reports: Wave X (agent Y), Wave Z (agent W). Consider re-running or smaller context."_  
   So the user knows which wave/agent to re-run or debug.
 - **Reflection agent:** Ensure reflection-agent always writes to the standard path (e.g. `reports/reflections/pipeline-reflection-YYYY-MM-DD.md`) and, if possible, returns a one-line summary (e.g. in task output or a small JSON sidecar) so the Router can surface it without reading the full report.
 
@@ -111,17 +111,17 @@ So: the codebase defines **when** reflection runs (Step 0 at start, Wave 9 in pi
 
 ## 4. Priority and Implementation
 
-| Priority | Improvement | Owner | Effort |
-|----------|-------------|--------|--------|
-| P0 | Step 0 explicit banner + "Step 0 complete" (Router rule / CLAUDE.md) | Router instructions | Low |
-| P0 | Reflection report path + one-line summary after reflection-agent (Wave 9) | Orchestrator / Router rule | Low |
-| P0 | List reflection report in final summary with "Reflection learnings" label | Router / workflow instructions | Low |
-| P1 | Single reminder cleanup in Step 0; remove or document separate cleanup task | Codebase (Step 0 flow + docs) | Low |
-| P1 | Batch late agent completions and background command messages | Router / orchestrator instructions | Low |
-| P2 | Optional split Wave 9a/9b and Phase 6 mention in summaries | Workflow / Router | Low |
-| P2 | "Missing reports" one-liner when reports weren’t written | Router rule | Low |
-| P3 | reflection-agent one-line summary (task output or sidecar) | reflection-agent + schema | Medium |
-| P3 | Dashboard or `reflection-dashboard.json` for pending count + last report | Hooks + host | Medium |
+| Priority | Improvement                                                                 | Owner                              | Effort |
+| -------- | --------------------------------------------------------------------------- | ---------------------------------- | ------ |
+| P0       | Step 0 explicit banner + "Step 0 complete" (Router rule / CLAUDE.md)        | Router instructions                | Low    |
+| P0       | Reflection report path + one-line summary after reflection-agent (Wave 9)   | Orchestrator / Router rule         | Low    |
+| P0       | List reflection report in final summary with "Reflection learnings" label   | Router / workflow instructions     | Low    |
+| P1       | Single reminder cleanup in Step 0; remove or document separate cleanup task | Codebase (Step 0 flow + docs)      | Low    |
+| P1       | Batch late agent completions and background command messages                | Router / orchestrator instructions | Low    |
+| P2       | Optional split Wave 9a/9b and Phase 6 mention in summaries                  | Workflow / Router                  | Low    |
+| P2       | "Missing reports" one-liner when reports weren’t written                    | Router rule                        | Low    |
+| P3       | reflection-agent one-line summary (task output or sidecar)                  | reflection-agent + schema          | Medium |
+| P3       | Dashboard or `reflection-dashboard.json` for pending count + last report    | Hooks + host                       | Medium |
 
 ---
 

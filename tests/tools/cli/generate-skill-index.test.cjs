@@ -14,6 +14,8 @@ const os = require('os');
 
 // We'll test the recursive scanning function
 const {
+  generateIndex,
+  resolveScanMode,
   scanSkillFilesRecursively,
 } = require('../../../.claude/tools/cli/generate-skill-index.cjs');
 
@@ -32,6 +34,48 @@ describe('generate-skill-index', () => {
     }
   });
 
+  describe('resolveScanMode', () => {
+    test('defaults to comprehensive scan when no scan flags are provided', () => {
+      assert.strictEqual(resolveScanMode([]), true);
+    });
+
+    test('disables scan when --quick is provided', () => {
+      assert.strictEqual(resolveScanMode(['--quick']), false);
+    });
+
+    test('keeps scan enabled when --scan is provided', () => {
+      assert.strictEqual(resolveScanMode(['--scan']), true);
+    });
+  });
+
+  describe('generateIndex scan defaults', () => {
+    test('uses scanned skill metadata by default', () => {
+      const index = generateIndex({
+        catalogSkillsOverride: [],
+        scannedSkillsOverride: {
+          'nested/example-skill': { name: 'nested/example-skill', hasSkillFile: true },
+        },
+      });
+
+      assert.ok(index.skills['nested/example-skill']);
+      assert.ok((index.index.byAgent.developer || []).includes('nested/example-skill'));
+    });
+
+    test('filters stale agent skill mappings that do not exist in generated skills', () => {
+      const index = generateIndex({
+        catalogSkillsOverride: [],
+        scannedSkillsOverride: {
+          'nested/example-skill': { name: 'nested/example-skill', hasSkillFile: true },
+        },
+        agentToSkillsOverride: {
+          developer: ['nested/example-skill', 'ghost-skill'],
+        },
+      });
+
+      assert.ok((index.index.byAgent.developer || []).includes('nested/example-skill'));
+      assert.ok(!(index.index.byAgent.developer || []).includes('ghost-skill'));
+    });
+  });
   describe('scanSkillFilesRecursively', () => {
     test('should find SKILL.md in direct subdirectory', () => {
       // Arrange: Create skills/tdd/SKILL.md

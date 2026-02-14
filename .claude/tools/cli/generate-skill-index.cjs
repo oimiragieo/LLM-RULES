@@ -12,8 +12,8 @@
  *   --dry-run   Show what would be generated without writing
  *   --validate  Only validate existing index
  *   --verbose   Show detailed output
- *   --quick     Fast mode - use hardcoded definitions (default)
- *   --scan      Scan mode - read all SKILL.md files (slow but comprehensive)
+ *   --quick     Fast mode - skip SKILL.md scan and use catalog/mappings only
+ *   --scan      Explicitly enable SKILL.md scan (default behavior)
  *
  * Output:
  *   .claude/config/skill-index.json
@@ -672,20 +672,44 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
  * Generate the skill index
  */
 function generateIndex(options = {}) {
-  const { verbose = false, scan = false } = options;
+  const {
+    verbose = false,
+    scan = true,
+    catalogSkillsOverride = null,
+    scannedSkillsOverride = null,
+    skillToAgentsOverride = null,
+    agentToSkillsOverride = null,
+  } = options;
 
   // Get skill list
-  const catalogSkills = parseSkillCatalog();
+  const catalogSkills = Array.isArray(catalogSkillsOverride)
+    ? catalogSkillsOverride
+    : parseSkillCatalog();
   // Use recursive scanner to handle nested skill directories (SKL-001 fix)
-  const scannedSkills = scan ? scanSkillFilesRecursively(SKILLS_DIR) : {};
+  const scannedSkills =
+    scannedSkillsOverride && typeof scannedSkillsOverride === 'object'
+      ? scannedSkillsOverride
+      : scan
+        ? scanSkillFilesRecursively(SKILLS_DIR)
+        : {};
+
+  const scannedSkillCount = Object.keys(scannedSkills).length;
 
   if (verbose) {
     console.log(`Found ${catalogSkills.length} skills in catalog`);
-    console.log(`Found ${Object.keys(scannedSkills).length} skill directories`);
+    console.log(`Found ${scannedSkillCount} skill directories`);
   }
 
   // Load agent-skill-matrix as single source of truth for agent <-> skill mapping
   const { skillToAgents, agentToSkills } = loadAgentSkillMatrix();
+  const resolvedSkillToAgents =
+    skillToAgentsOverride && typeof skillToAgentsOverride === 'object'
+      ? skillToAgentsOverride
+      : skillToAgents;
+  const resolvedAgentToSkills =
+    agentToSkillsOverride && typeof agentToSkillsOverride === 'object'
+      ? agentToSkillsOverride
+      : agentToSkills;
 
   // Build skills object
   const skills = {};
@@ -703,9 +727,9 @@ function generateIndex(options = {}) {
     // Find agents from matrix first; fallback to hardcoded AGENT_SKILLS
     let agentPrimary = [];
     let agentSupporting = [];
-    if (skillToAgents[name]) {
-      agentPrimary = skillToAgents[name].agentPrimary || [];
-      agentSupporting = skillToAgents[name].agentSupporting || [];
+    if (resolvedSkillToAgents[name]) {
+      agentPrimary = resolvedSkillToAgents[name].agentPrimary || [];
+      agentSupporting = resolvedSkillToAgents[name].agentSupporting || [];
     }
     if (agentPrimary.length === 0 && agentSupporting.length === 0) {
       for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
@@ -764,10 +788,27 @@ function generateIndex(options = {}) {
     }
   }
 
-  // By agent: use matrix-derived agentToSkills; fallback to AGENT_SKILLS
-  const agentSource = Object.keys(agentToSkills).length > 0 ? agentToSkills : AGENT_SKILLS;
+  // By agent: start with matrix-derived mappings, then merge computed skill assignments.
+  // This keeps matrix intent while ensuring newly discovered scanned skills are visible.
+  const agentSource =
+    Object.keys(resolvedAgentToSkills).length > 0 ? resolvedAgentToSkills : AGENT_SKILLS;
   for (const [agent, skillList] of Object.entries(agentSource)) {
-    byAgent[agent] = Array.isArray(skillList) ? skillList : [];
+    const filtered = Array.isArray(skillList)
+      ? skillList.filter(skillName => Object.prototype.hasOwnProperty.call(skills, skillName))
+      : [];
+    byAgent[agent] = [...new Set(filtered)];
+  }
+
+  for (const [skillName, skill] of Object.entries(skills)) {
+    const assignedAgents = [...(skill.agentPrimary || []), ...(skill.agentSupporting || [])];
+    for (const agent of assignedAgents) {
+      if (!byAgent[agent]) {
+        byAgent[agent] = [];
+      }
+      if (!byAgent[agent].includes(skillName)) {
+        byAgent[agent].push(skillName);
+      }
+    }
   }
 
   const index = {
@@ -794,13 +835,19 @@ function generateIndex(options = {}) {
     },
   };
 
+  const generatedSkillCount = Object.keys(skills).length;
+  const generatedDomainCount = Object.keys(byDomain).length;
+  const generatedCategoryCount = Object.keys(byCategory).length;
+  const generatedToolMappingCount = Object.keys(byTool).length;
+  const generatedAgentAssignmentCount = Object.keys(byAgent).length;
+
   if (verbose) {
     console.log(`Generated index with:`);
-    console.log(`  - ${Object.keys(skills).length} skills`);
-    console.log(`  - ${Object.keys(byDomain).length} domains`);
-    console.log(`  - ${Object.keys(byCategory).length} categories`);
-    console.log(`  - ${Object.keys(byTool).length} tool mappings`);
-    console.log(`  - ${Object.keys(byAgent).length} agent assignments`);
+    console.log(`  - ${generatedSkillCount} skills`);
+    console.log(`  - ${generatedDomainCount} domains`);
+    console.log(`  - ${generatedCategoryCount} categories`);
+    console.log(`  - ${generatedToolMappingCount} tool mappings`);
+    console.log(`  - ${generatedAgentAssignmentCount} agent assignments`);
   }
 
   return index;
@@ -847,6 +894,23 @@ function validateIndex(indexPath) {
 }
 
 /**
+ * Resolve scan mode from CLI args.
+ * Default is comprehensive scan unless --quick is provided.
+ */
+function resolveScanMode(args = []) {
+  if (!Array.isArray(args)) {
+    return true;
+  }
+  if (args.includes('--quick')) {
+    return false;
+  }
+  if (args.includes('--scan')) {
+    return true;
+  }
+  return true;
+}
+
+/**
  * Main function
  */
 function main() {
@@ -854,7 +918,7 @@ function main() {
   const dryRun = args.includes('--dry-run');
   const validateOnly = args.includes('--validate');
   const verbose = args.includes('--verbose');
-  const scan = args.includes('--scan');
+  const scan = resolveScanMode(args);
 
   console.log('Skill Index Generator');
   console.log('=====================\n');
@@ -931,6 +995,7 @@ if (require.main === module) {
 module.exports = {
   generateIndex,
   validateIndex,
+  resolveScanMode,
   parseSkillCatalog,
   scanSkillFiles,
   scanSkillFilesRecursively,

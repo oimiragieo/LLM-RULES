@@ -26,13 +26,17 @@ describe('ESLint max-lines rule', () => {
         ['eslint', tmpFile.replace(/\\/g, '/')],
         { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
       );
-      assert.ok(output.includes('max-lines'),
-        `ESLint should flag files over 500 lines with max-lines warning, got: ${output}`);
+      assert.ok(
+        output.includes('max-lines'),
+        `ESLint should flag files over 500 lines with max-lines warning, got: ${output}`
+      );
     } catch (err) {
       // If ESLint exits non-zero (e.g. other errors), still check for max-lines
       const output = (err.stdout || '') + (err.stderr || '');
-      assert.ok(output.includes('max-lines'),
-        `ESLint should flag files over 500 lines with max-lines rule, got: ${output}`);
+      assert.ok(
+        output.includes('max-lines'),
+        `ESLint should flag files over 500 lines with max-lines rule, got: ${output}`
+      );
     } finally {
       fs.unlinkSync(tmpFile);
     }
