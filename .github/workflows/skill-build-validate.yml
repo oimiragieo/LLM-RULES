@@ -4,6 +4,17 @@ on:
   pull_request:
     paths:
       - '.claude/skills/**'
+      - '.claude/agents/**'
+      - '.claude/commands/**'
+      - '.claude/hooks/**'
+      - '.claude/tools/**'
+      - '.claude/rules/**'
+      - '.claude/templates/**'
+      - '.claude/workflows/**'
+      - '.claude/schemas/**'
+      - '.claude/context/config/agent-skill-matrix.json'
+      - '.claude/tools/cli/validate-skill-ecosystem.cjs'
+      - '.claude/tools/cli/validate-agent-skill-references.cjs'
       - '.claude/lib/skill-build/**'
       - 'package.json'
   push:
@@ -11,6 +22,17 @@ on:
       - main
     paths:
       - '.claude/skills/**'
+      - '.claude/agents/**'
+      - '.claude/commands/**'
+      - '.claude/hooks/**'
+      - '.claude/tools/**'
+      - '.claude/rules/**'
+      - '.claude/templates/**'
+      - '.claude/workflows/**'
+      - '.claude/schemas/**'
+      - '.claude/context/config/agent-skill-matrix.json'
+      - '.claude/tools/cli/validate-skill-ecosystem.cjs'
+      - '.claude/tools/cli/validate-agent-skill-references.cjs'
       - '.claude/lib/skill-build/**'
       - 'package.json'
 
