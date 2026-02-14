@@ -188,6 +188,7 @@ function parseArgs(argv) {
     outputJson: null,
     outputMd: null,
     includeArchived: false,
+    requirePerfect: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -202,10 +203,24 @@ function parseArgs(argv) {
       i += 1;
     } else if (argv[i] === '--include-archived') {
       args.includeArchived = true;
+    } else if (argv[i] === '--require-perfect') {
+      args.requirePerfect = true;
     }
   }
 
   return args;
+}
+
+function checkGate(summary, requirePerfect = false) {
+  if (!requirePerfect) {
+    return { ok: true, reason: 'gate_disabled' };
+  }
+
+  if ((summary?.scoreBuckets?.needsWork || 0) > 0) {
+    return { ok: false, reason: 'needs_work_present' };
+  }
+
+  return { ok: true, reason: 'all_perfect' };
 }
 
 function renderMarkdown(summary, results, generatedAt) {
@@ -306,6 +321,12 @@ function main() {
   console.log(`Needs work: ${result.summary.scoreBuckets.needsWork}`);
   console.log(`JSON report: ${result.outputJson}`);
   console.log(`Markdown report: ${result.outputMd}`);
+
+  const gate = checkGate(result.summary, args.requirePerfect);
+  if (!gate.ok) {
+    console.error('Ecosystem gate failed: skills still need work (<80 score present).');
+    process.exit(1);
+  }
 }
 
 if (require.main === module) {
@@ -318,5 +339,6 @@ module.exports = {
   findAllSkills,
   isArchivedSkillPath,
   runAudit,
+  checkGate,
   buildSkillSlug,
 };

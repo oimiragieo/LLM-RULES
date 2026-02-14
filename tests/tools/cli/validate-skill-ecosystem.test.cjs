@@ -12,6 +12,7 @@ const {
   buildSummary,
   isArchivedSkillPath,
   runAudit,
+  checkGate,
   buildSkillSlug,
 } = require('../../../.claude/tools/cli/validate-skill-ecosystem.cjs');
 
@@ -129,6 +130,17 @@ describe('validate-skill-ecosystem', () => {
     assert.strictEqual(report.summary.archivedExcluded, 1);
 
     fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test('checkGate enforces require-perfect threshold', () => {
+    const openGate = checkGate({ scoreBuckets: { needsWork: 3 } }, false);
+    assert.strictEqual(openGate.ok, true);
+
+    const strictFail = checkGate({ scoreBuckets: { needsWork: 1 } }, true);
+    assert.strictEqual(strictFail.ok, false);
+
+    const strictPass = checkGate({ scoreBuckets: { needsWork: 0 } }, true);
+    assert.strictEqual(strictPass.ok, true);
   });
 
   test('buildSummary aggregates missing categories and score buckets', () => {
