@@ -105,6 +105,26 @@ describe('generate-skill-index', () => {
 
 
 
+
+    test('creates canonical creator alias entries when only nested creator path exists', () => {
+      const index = generateIndex({
+        catalogSkillsOverride: [],
+        scannedSkillsOverride: {
+          'creators/command-creator': {
+            name: 'creators/command-creator',
+            hasSkillFile: true,
+          },
+        },
+        skillToAgentsOverride: {},
+      });
+
+      assert.ok(index.skills['creators/command-creator']);
+      assert.ok(index.skills['command-creator']);
+      assert.equal(index.skills['command-creator'].aliasOf, 'creators/command-creator');
+      assert.ok(
+        (index.index.byAgent['evolution-orchestrator'] || []).includes('command-creator')
+      );
+    });
     test('fallback AGENT_SKILLS maps nested creator aliases to evolution-orchestrator', () => {
       const index = generateIndex({
         catalogSkillsOverride: [],

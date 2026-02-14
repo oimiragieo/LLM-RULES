@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-14T08:02:14.704Z",
+  "generatedAt": "2026-02-14T08:03:44.521Z",
   "metadata": {
-    "totalSkills": 378,
+    "totalSkills": 381,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-14T08:02:14.705Z",
+    "lastValidated": "2026-02-14T08:03:44.522Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -32,7 +32,8 @@
         "other",
         "accessibility"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "advanced-elicitation": {
       "name": "advanced-elicitation",
@@ -54,7 +55,8 @@
         "other",
         "advanced-elicitation"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "agent-creator": {
       "name": "agent-creator",
@@ -82,7 +84,8 @@
         "creator-tools",
         "agent-creator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "ai-ml-expert": {
       "name": "ai-ml-expert",
@@ -110,7 +113,8 @@
         "ai/ml",
         "ai-ml-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "android-expert": {
       "name": "android-expert",
@@ -134,7 +138,8 @@
         "mobile",
         "android-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "api-development-expert": {
       "name": "api-development-expert",
@@ -165,7 +170,8 @@
         "other",
         "api-development-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "architecture-review": {
       "name": "architecture-review",
@@ -196,7 +202,8 @@
         "architecture",
         "architecture-review"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "artifact-integrator": {
       "name": "artifact-integrator",
@@ -218,7 +225,8 @@
         "other",
         "artifact-integrator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "artifact-lifecycle": {
       "name": "artifact-lifecycle",
@@ -240,7 +248,8 @@
         "other",
         "artifact-lifecycle"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "arxiv-mcp": {
       "name": "arxiv-mcp",
@@ -262,7 +271,8 @@
         "research",
         "arxiv-mcp"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "async-operations": {
       "name": "async-operations",
@@ -284,7 +294,8 @@
         "other",
         "async-operations"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "auth-security-expert": {
       "name": "auth-security-expert",
@@ -311,7 +322,8 @@
         "security",
         "auth-security-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "aws-cloud-ops": {
       "name": "aws-cloud-ops",
@@ -335,7 +347,8 @@
         "devops",
         "aws-cloud-ops"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "best-practices-guidelines": {
       "name": "best-practices-guidelines",
@@ -357,7 +370,8 @@
         "other",
         "best-practices-guidelines"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "binary-analysis-patterns": {
       "name": "binary-analysis-patterns",
@@ -381,7 +395,8 @@
         "other",
         "binary-analysis-patterns"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "build-tools-expert": {
       "name": "build-tools-expert",
@@ -403,7 +418,8 @@
         "other",
         "build-tools-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "checklist-generator": {
       "name": "checklist-generator",
@@ -429,7 +445,8 @@
         "quality",
         "checklist-generator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "chrome-browser": {
       "name": "chrome-browser",
@@ -453,7 +470,8 @@
         "integration",
         "chrome-browser"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "ci-cd-implementation-rule": {
       "name": "ci-cd-implementation-rule",
@@ -477,7 +495,8 @@
         "other",
         "ci-cd-implementation-rule"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "cloud-devops-expert": {
       "name": "cloud-devops-expert",
@@ -499,7 +518,8 @@
         "other",
         "cloud-devops-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "code-analyzer": {
       "name": "code-analyzer",
@@ -528,7 +548,8 @@
         "other",
         "code-analyzer"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "code-quality-expert": {
       "name": "code-quality-expert",
@@ -557,7 +578,8 @@
         "code-quality",
         "code-quality-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "code-semantic-search": {
       "name": "code-semantic-search",
@@ -579,7 +601,8 @@
         "other",
         "code-semantic-search"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "code-structural-search": {
       "name": "code-structural-search",
@@ -601,7 +624,8 @@
         "other",
         "code-structural-search"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "code-style-validator": {
       "name": "code-style-validator",
@@ -627,7 +651,8 @@
         "other",
         "code-style-validator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "complexity-assessment": {
       "name": "complexity-assessment",
@@ -651,7 +676,8 @@
         "other",
         "complexity-assessment"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "composer-dependency-management": {
       "name": "composer-dependency-management",
@@ -675,7 +701,8 @@
         "other",
         "composer-dependency-management"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "comprehensive-type-annotations": {
       "name": "comprehensive-type-annotations",
@@ -697,7 +724,8 @@
         "other",
         "comprehensive-type-annotations"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "comprehensive-unit-testing-with-pytest": {
       "name": "comprehensive-unit-testing-with-pytest",
@@ -722,7 +750,8 @@
         "other",
         "comprehensive-unit-testing-with-pytest"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "configuration-management": {
       "name": "configuration-management",
@@ -744,7 +773,8 @@
         "other",
         "configuration-management"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "consensus-voting": {
       "name": "consensus-voting",
@@ -772,7 +802,8 @@
         "orchestration",
         "consensus-voting"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "container-expert": {
       "name": "container-expert",
@@ -794,7 +825,8 @@
         "other",
         "container-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "containerization-rules": {
       "name": "containerization-rules",
@@ -816,7 +848,8 @@
         "other",
         "containerization-rules"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "context-compressor": {
       "name": "context-compressor",
@@ -842,7 +875,8 @@
         "memory",
         "context-compressor"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "context-driven-development": {
       "name": "context-driven-development",
@@ -864,7 +898,8 @@
         "other",
         "context-driven-development"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "cpp": {
       "name": "cpp",
@@ -886,7 +921,8 @@
         "other",
         "cpp"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "creators/command-creator": {
       "name": "creators/command-creator",
@@ -908,7 +944,8 @@
         "other",
         "creators/command-creator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "creators/rule-creator": {
       "name": "creators/rule-creator",
@@ -930,7 +967,8 @@
         "other",
         "creators/rule-creator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "creators/tool-creator": {
       "name": "creators/tool-creator",
@@ -944,15 +982,18 @@
         "Edit"
       ],
       "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
         "evolution-orchestrator"
       ],
-      "agentSupporting": [],
       "tags": [
         "other",
         "other",
         "creators/tool-creator"
       ],
-      "priority": 1
+      "priority": 3,
+      "aliasOf": null
     },
     "data-expert": {
       "name": "data-expert",
@@ -976,7 +1017,8 @@
         "other",
         "data-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "database-architect": {
       "name": "database-architect",
@@ -1003,7 +1045,8 @@
         "database",
         "database-architect"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "database-expert": {
       "name": "database-expert",
@@ -1030,7 +1073,8 @@
         "other",
         "database-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "debugging": {
       "name": "debugging",
@@ -1069,7 +1113,8 @@
         "troubleshooting",
         "debugging"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "dependency-analyzer": {
       "name": "dependency-analyzer",
@@ -1093,7 +1138,8 @@
         "other",
         "dependency-analyzer"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "design-and-user-experience-guidelines": {
       "name": "design-and-user-experience-guidelines",
@@ -1117,7 +1163,8 @@
         "other",
         "design-and-user-experience-guidelines"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "diagram-generator": {
       "name": "diagram-generator",
@@ -1148,7 +1195,8 @@
         "architecture",
         "diagram-generator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "differential-review": {
       "name": "differential-review",
@@ -1170,7 +1218,8 @@
         "other",
         "differential-review"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "doc-generator": {
       "name": "doc-generator",
@@ -1201,7 +1250,8 @@
         "documentation",
         "doc-generator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "docker-compose": {
       "name": "docker-compose",
@@ -1224,7 +1274,8 @@
         "devops",
         "docker-compose"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "dry-principle": {
       "name": "dry-principle",
@@ -1246,7 +1297,8 @@
         "other",
         "dry-principle"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "dto-conventions": {
       "name": "dto-conventions",
@@ -1270,7 +1322,8 @@
         "other",
         "dto-conventions"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "expo-framework-rule": {
       "name": "expo-framework-rule",
@@ -1292,7 +1345,8 @@
         "other",
         "expo-framework-rule"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "expo-mobile-app-rule": {
       "name": "expo-mobile-app-rule",
@@ -1317,7 +1371,8 @@
         "other",
         "expo-mobile-app-rule"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "filesystem": {
       "name": "filesystem",
@@ -1339,7 +1394,8 @@
         "other",
         "filesystem"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "form-and-actions-in-sveltekit": {
       "name": "form-and-actions-in-sveltekit",
@@ -1363,7 +1419,8 @@
         "other",
         "form-and-actions-in-sveltekit"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "form-validation-with-zod": {
       "name": "form-validation-with-zod",
@@ -1385,7 +1442,8 @@
         "other",
         "form-validation-with-zod"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "frontend-expert": {
       "name": "frontend-expert",
@@ -1407,7 +1465,8 @@
         "other",
         "frontend-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "function-length-and-responsibility": {
       "name": "function-length-and-responsibility",
@@ -1429,7 +1488,8 @@
         "other",
         "function-length-and-responsibility"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "gamedev-expert": {
       "name": "gamedev-expert",
@@ -1451,7 +1511,8 @@
         "other",
         "gamedev-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "gcloud-cli": {
       "name": "gcloud-cli",
@@ -1476,7 +1537,8 @@
         "other",
         "gcloud-cli"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "git-expert": {
       "name": "git-expert",
@@ -1507,7 +1569,8 @@
         "version-control",
         "git-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "github-mcp": {
       "name": "github-mcp",
@@ -1529,7 +1592,8 @@
         "integration",
         "github-mcp"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "gitops-workflow": {
       "name": "gitops-workflow",
@@ -1553,7 +1617,8 @@
         "other",
         "gitops-workflow"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "go-expert": {
       "name": "go-expert",
@@ -1578,7 +1643,8 @@
         "languages",
         "go-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "graphql-expert": {
       "name": "graphql-expert",
@@ -1602,7 +1668,8 @@
         "other",
         "graphql-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "helm-chart-scaffolding": {
       "name": "helm-chart-scaffolding",
@@ -1626,7 +1693,8 @@
         "other",
         "helm-chart-scaffolding"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "hook-creator": {
       "name": "hook-creator",
@@ -1653,7 +1721,8 @@
         "other",
         "hook-creator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "html-tailwind-css-and-javascript-expert-rule": {
       "name": "html-tailwind-css-and-javascript-expert-rule",
@@ -1675,7 +1744,8 @@
         "other",
         "html-tailwind-css-and-javascript-expert-rule"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "incident-runbook-templates": {
       "name": "incident-runbook-templates",
@@ -1699,7 +1769,8 @@
         "other",
         "incident-runbook-templates"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "insecure-defaults": {
       "name": "insecure-defaults",
@@ -1721,7 +1792,8 @@
         "other",
         "insecure-defaults"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "insight-extraction": {
       "name": "insight-extraction",
@@ -1745,7 +1817,8 @@
         "other",
         "insight-extraction"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "integration/artifact-updater": {
       "name": "integration/artifact-updater",
@@ -1767,7 +1840,8 @@
         "other",
         "integration/artifact-updater"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "interactive-requirements-gathering": {
       "name": "interactive-requirements-gathering",
@@ -1791,7 +1865,8 @@
         "other",
         "interactive-requirements-gathering"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "ios-expert": {
       "name": "ios-expert",
@@ -1815,7 +1890,8 @@
         "mobile",
         "ios-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "java-expert": {
       "name": "java-expert",
@@ -1837,7 +1913,8 @@
         "other",
         "java-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "jupyter-notebook-best-practices": {
       "name": "jupyter-notebook-best-practices",
@@ -1859,7 +1936,8 @@
         "other",
         "jupyter-notebook-best-practices"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "k8s-manifest-generator": {
       "name": "k8s-manifest-generator",
@@ -1882,7 +1960,8 @@
         "other",
         "k8s-manifest-generator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "k8s-security-policies": {
       "name": "k8s-security-policies",
@@ -1906,7 +1985,8 @@
         "other",
         "k8s-security-policies"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "kubernetes-flux": {
       "name": "kubernetes-flux",
@@ -1928,7 +2008,8 @@
         "devops",
         "kubernetes-flux"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "logging-module-usage": {
       "name": "logging-module-usage",
@@ -1950,7 +2031,8 @@
         "other",
         "logging-module-usage"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "memory-forensics": {
       "name": "memory-forensics",
@@ -1976,7 +2058,8 @@
         "other",
         "memory-forensics"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "mobile-first-design-rules": {
       "name": "mobile-first-design-rules",
@@ -2000,7 +2083,8 @@
         "other",
         "mobile-first-design-rules"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "mobile-ui-development-rule": {
       "name": "mobile-ui-development-rule",
@@ -2025,7 +2109,8 @@
         "other",
         "mobile-ui-development-rule"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "nextjs-expert": {
       "name": "nextjs-expert",
@@ -2050,7 +2135,8 @@
         "frameworks",
         "nextjs-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "nodejs-expert": {
       "name": "nodejs-expert",
@@ -2074,7 +2160,8 @@
         "other",
         "nodejs-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "on-call-handoff-patterns": {
       "name": "on-call-handoff-patterns",
@@ -2098,7 +2185,8 @@
         "other",
         "on-call-handoff-patterns"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "pandas-data-manipulation-rules": {
       "name": "pandas-data-manipulation-rules",
@@ -2123,7 +2211,8 @@
         "other",
         "pandas-data-manipulation-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "php-expert": {
       "name": "php-expert",
@@ -2145,7 +2234,8 @@
         "other",
         "php-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "pipeline-reflection-ux": {
       "name": "pipeline-reflection-ux",
@@ -2167,7 +2257,8 @@
         "other",
         "pipeline-reflection-ux"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "plan-generator": {
       "name": "plan-generator",
@@ -2190,7 +2281,8 @@
         "planning",
         "plan-generator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "planning-with-files": {
       "name": "planning-with-files",
@@ -2212,7 +2304,8 @@
         "other",
         "planning-with-files"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "postmortem-writing": {
       "name": "postmortem-writing",
@@ -2236,7 +2329,8 @@
         "other",
         "postmortem-writing"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "prd-generator": {
       "name": "prd-generator",
@@ -2258,7 +2352,8 @@
         "other",
         "prd-generator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "prioritize-python-3-10-features": {
       "name": "prioritize-python-3-10-features",
@@ -2280,7 +2375,8 @@
         "other",
         "prioritize-python-3-10-features"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "project-analyzer": {
       "name": "project-analyzer",
@@ -2308,7 +2404,8 @@
         "other",
         "project-analyzer"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "project-onboarding": {
       "name": "project-onboarding",
@@ -2330,7 +2427,8 @@
         "other",
         "project-onboarding"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "protocol-reverse-engineering": {
       "name": "protocol-reverse-engineering",
@@ -2354,7 +2452,8 @@
         "other",
         "protocol-reverse-engineering"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "python-backend-expert": {
       "name": "python-backend-expert",
@@ -2383,7 +2482,8 @@
         "languages",
         "python-backend-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "react-best-practices-vercel": {
       "name": "react-best-practices-vercel",
@@ -2405,7 +2505,8 @@
         "frameworks",
         "react-best-practices-vercel"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "react-expert": {
       "name": "react-expert",
@@ -2435,7 +2536,8 @@
         "frameworks",
         "react-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "react-native-skills-vercel": {
       "name": "react-native-skills-vercel",
@@ -2457,7 +2559,8 @@
         "mobile",
         "react-native-skills-vercel"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "readme": {
       "name": "readme",
@@ -2479,7 +2582,8 @@
         "other",
         "readme"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "recovery": {
       "name": "recovery",
@@ -2503,7 +2607,8 @@
         "other",
         "recovery"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "research-synthesis": {
       "name": "research-synthesis",
@@ -2528,7 +2633,8 @@
         "research",
         "research-synthesis"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "response-rater": {
       "name": "response-rater",
@@ -2550,7 +2656,8 @@
         "other",
         "response-rater"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "restcontroller-conventions": {
       "name": "restcontroller-conventions",
@@ -2574,7 +2681,8 @@
         "other",
         "restcontroller-conventions"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "ripgrep": {
       "name": "ripgrep",
@@ -2596,7 +2704,8 @@
         "other",
         "ripgrep"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "rule-auditor": {
       "name": "rule-auditor",
@@ -2623,7 +2732,8 @@
         "other",
         "rule-auditor"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "rust-expert": {
       "name": "rust-expert",
@@ -2645,7 +2755,8 @@
         "other",
         "rust-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "schema-creator": {
       "name": "schema-creator",
@@ -2669,7 +2780,8 @@
         "other",
         "schema-creator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills": {
       "name": "scientific-skills",
@@ -2699,7 +2811,8 @@
         "scientific",
         "scientific-skills"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/adaptyv": {
       "name": "scientific-skills/skills/adaptyv",
@@ -2721,7 +2834,8 @@
         "other",
         "scientific-skills/skills/adaptyv"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/aeon": {
       "name": "scientific-skills/skills/aeon",
@@ -2743,7 +2857,8 @@
         "other",
         "scientific-skills/skills/aeon"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/alphafold-database": {
       "name": "scientific-skills/skills/alphafold-database",
@@ -2765,7 +2880,8 @@
         "other",
         "scientific-skills/skills/alphafold-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/anndata": {
       "name": "scientific-skills/skills/anndata",
@@ -2787,7 +2903,8 @@
         "other",
         "scientific-skills/skills/anndata"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/arboreto": {
       "name": "scientific-skills/skills/arboreto",
@@ -2809,7 +2926,8 @@
         "other",
         "scientific-skills/skills/arboreto"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/astropy": {
       "name": "scientific-skills/skills/astropy",
@@ -2831,7 +2949,8 @@
         "other",
         "scientific-skills/skills/astropy"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/benchling-integration": {
       "name": "scientific-skills/skills/benchling-integration",
@@ -2853,7 +2972,8 @@
         "other",
         "scientific-skills/skills/benchling-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/biopython": {
       "name": "scientific-skills/skills/biopython",
@@ -2875,7 +2995,8 @@
         "other",
         "scientific-skills/skills/biopython"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/biorxiv-database": {
       "name": "scientific-skills/skills/biorxiv-database",
@@ -2897,7 +3018,8 @@
         "other",
         "scientific-skills/skills/biorxiv-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/bioservices": {
       "name": "scientific-skills/skills/bioservices",
@@ -2919,7 +3041,8 @@
         "other",
         "scientific-skills/skills/bioservices"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/brenda-database": {
       "name": "scientific-skills/skills/brenda-database",
@@ -2941,7 +3064,8 @@
         "other",
         "scientific-skills/skills/brenda-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/cellxgene-census": {
       "name": "scientific-skills/skills/cellxgene-census",
@@ -2963,7 +3087,8 @@
         "other",
         "scientific-skills/skills/cellxgene-census"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/chembl-database": {
       "name": "scientific-skills/skills/chembl-database",
@@ -2985,7 +3110,8 @@
         "other",
         "scientific-skills/skills/chembl-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/cirq": {
       "name": "scientific-skills/skills/cirq",
@@ -3007,7 +3133,8 @@
         "other",
         "scientific-skills/skills/cirq"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/citation-management": {
       "name": "scientific-skills/skills/citation-management",
@@ -3029,7 +3156,8 @@
         "other",
         "scientific-skills/skills/citation-management"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/clinical-decision-support": {
       "name": "scientific-skills/skills/clinical-decision-support",
@@ -3051,7 +3179,8 @@
         "other",
         "scientific-skills/skills/clinical-decision-support"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/clinical-reports": {
       "name": "scientific-skills/skills/clinical-reports",
@@ -3073,7 +3202,8 @@
         "other",
         "scientific-skills/skills/clinical-reports"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/clinicaltrials-database": {
       "name": "scientific-skills/skills/clinicaltrials-database",
@@ -3095,7 +3225,8 @@
         "other",
         "scientific-skills/skills/clinicaltrials-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/clinpgx-database": {
       "name": "scientific-skills/skills/clinpgx-database",
@@ -3117,7 +3248,8 @@
         "other",
         "scientific-skills/skills/clinpgx-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/clinvar-database": {
       "name": "scientific-skills/skills/clinvar-database",
@@ -3139,7 +3271,8 @@
         "other",
         "scientific-skills/skills/clinvar-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/cobrapy": {
       "name": "scientific-skills/skills/cobrapy",
@@ -3161,7 +3294,8 @@
         "other",
         "scientific-skills/skills/cobrapy"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/cosmic-database": {
       "name": "scientific-skills/skills/cosmic-database",
@@ -3183,7 +3317,8 @@
         "other",
         "scientific-skills/skills/cosmic-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/dask": {
       "name": "scientific-skills/skills/dask",
@@ -3205,7 +3340,8 @@
         "other",
         "scientific-skills/skills/dask"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/datacommons-client": {
       "name": "scientific-skills/skills/datacommons-client",
@@ -3227,7 +3363,8 @@
         "other",
         "scientific-skills/skills/datacommons-client"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/datamol": {
       "name": "scientific-skills/skills/datamol",
@@ -3249,7 +3386,8 @@
         "other",
         "scientific-skills/skills/datamol"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/deepchem": {
       "name": "scientific-skills/skills/deepchem",
@@ -3271,7 +3409,8 @@
         "other",
         "scientific-skills/skills/deepchem"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/deeptools": {
       "name": "scientific-skills/skills/deeptools",
@@ -3293,7 +3432,8 @@
         "other",
         "scientific-skills/skills/deeptools"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/denario": {
       "name": "scientific-skills/skills/denario",
@@ -3315,7 +3455,8 @@
         "other",
         "scientific-skills/skills/denario"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/diffdock": {
       "name": "scientific-skills/skills/diffdock",
@@ -3337,7 +3478,8 @@
         "other",
         "scientific-skills/skills/diffdock"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/dnanexus-integration": {
       "name": "scientific-skills/skills/dnanexus-integration",
@@ -3359,7 +3501,8 @@
         "other",
         "scientific-skills/skills/dnanexus-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/document-skills/docx": {
       "name": "scientific-skills/skills/document-skills/docx",
@@ -3381,7 +3524,8 @@
         "other",
         "scientific-skills/skills/document-skills/docx"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/document-skills/pdf": {
       "name": "scientific-skills/skills/document-skills/pdf",
@@ -3403,7 +3547,8 @@
         "other",
         "scientific-skills/skills/document-skills/pdf"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/document-skills/pptx": {
       "name": "scientific-skills/skills/document-skills/pptx",
@@ -3425,7 +3570,8 @@
         "other",
         "scientific-skills/skills/document-skills/pptx"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/document-skills/xlsx": {
       "name": "scientific-skills/skills/document-skills/xlsx",
@@ -3447,7 +3593,8 @@
         "other",
         "scientific-skills/skills/document-skills/xlsx"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/drugbank-database": {
       "name": "scientific-skills/skills/drugbank-database",
@@ -3469,7 +3616,8 @@
         "other",
         "scientific-skills/skills/drugbank-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/ena-database": {
       "name": "scientific-skills/skills/ena-database",
@@ -3491,7 +3639,8 @@
         "other",
         "scientific-skills/skills/ena-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/ensembl-database": {
       "name": "scientific-skills/skills/ensembl-database",
@@ -3513,7 +3662,8 @@
         "other",
         "scientific-skills/skills/ensembl-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/esm": {
       "name": "scientific-skills/skills/esm",
@@ -3535,7 +3685,8 @@
         "other",
         "scientific-skills/skills/esm"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/etetoolkit": {
       "name": "scientific-skills/skills/etetoolkit",
@@ -3557,7 +3708,8 @@
         "other",
         "scientific-skills/skills/etetoolkit"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/exploratory-data-analysis": {
       "name": "scientific-skills/skills/exploratory-data-analysis",
@@ -3579,7 +3731,8 @@
         "other",
         "scientific-skills/skills/exploratory-data-analysis"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/fda-database": {
       "name": "scientific-skills/skills/fda-database",
@@ -3601,7 +3754,8 @@
         "other",
         "scientific-skills/skills/fda-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/flowio": {
       "name": "scientific-skills/skills/flowio",
@@ -3623,7 +3777,8 @@
         "other",
         "scientific-skills/skills/flowio"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/fluidsim": {
       "name": "scientific-skills/skills/fluidsim",
@@ -3645,7 +3800,8 @@
         "other",
         "scientific-skills/skills/fluidsim"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/gene-database": {
       "name": "scientific-skills/skills/gene-database",
@@ -3667,7 +3823,8 @@
         "other",
         "scientific-skills/skills/gene-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/generate-image": {
       "name": "scientific-skills/skills/generate-image",
@@ -3689,7 +3846,8 @@
         "other",
         "scientific-skills/skills/generate-image"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/geniml": {
       "name": "scientific-skills/skills/geniml",
@@ -3711,7 +3869,8 @@
         "other",
         "scientific-skills/skills/geniml"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/geo-database": {
       "name": "scientific-skills/skills/geo-database",
@@ -3733,7 +3892,8 @@
         "other",
         "scientific-skills/skills/geo-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/geopandas": {
       "name": "scientific-skills/skills/geopandas",
@@ -3755,7 +3915,8 @@
         "other",
         "scientific-skills/skills/geopandas"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/get-available-resources": {
       "name": "scientific-skills/skills/get-available-resources",
@@ -3777,7 +3938,8 @@
         "other",
         "scientific-skills/skills/get-available-resources"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/gget": {
       "name": "scientific-skills/skills/gget",
@@ -3799,7 +3961,8 @@
         "other",
         "scientific-skills/skills/gget"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/gtars": {
       "name": "scientific-skills/skills/gtars",
@@ -3821,7 +3984,8 @@
         "other",
         "scientific-skills/skills/gtars"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/gwas-database": {
       "name": "scientific-skills/skills/gwas-database",
@@ -3843,7 +4007,8 @@
         "other",
         "scientific-skills/skills/gwas-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/histolab": {
       "name": "scientific-skills/skills/histolab",
@@ -3865,7 +4030,8 @@
         "other",
         "scientific-skills/skills/histolab"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/hmdb-database": {
       "name": "scientific-skills/skills/hmdb-database",
@@ -3887,7 +4053,8 @@
         "other",
         "scientific-skills/skills/hmdb-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/hypogenic": {
       "name": "scientific-skills/skills/hypogenic",
@@ -3909,7 +4076,8 @@
         "other",
         "scientific-skills/skills/hypogenic"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/hypothesis-generation": {
       "name": "scientific-skills/skills/hypothesis-generation",
@@ -3931,7 +4099,8 @@
         "other",
         "scientific-skills/skills/hypothesis-generation"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/iso-13485-certification": {
       "name": "scientific-skills/skills/iso-13485-certification",
@@ -3953,7 +4122,8 @@
         "other",
         "scientific-skills/skills/iso-13485-certification"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/kegg-database": {
       "name": "scientific-skills/skills/kegg-database",
@@ -3975,7 +4145,8 @@
         "other",
         "scientific-skills/skills/kegg-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/labarchive-integration": {
       "name": "scientific-skills/skills/labarchive-integration",
@@ -3997,7 +4168,8 @@
         "other",
         "scientific-skills/skills/labarchive-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/lamindb": {
       "name": "scientific-skills/skills/lamindb",
@@ -4019,7 +4191,8 @@
         "other",
         "scientific-skills/skills/lamindb"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/latchbio-integration": {
       "name": "scientific-skills/skills/latchbio-integration",
@@ -4041,7 +4214,8 @@
         "other",
         "scientific-skills/skills/latchbio-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/latex-posters": {
       "name": "scientific-skills/skills/latex-posters",
@@ -4063,7 +4237,8 @@
         "other",
         "scientific-skills/skills/latex-posters"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/literature-review": {
       "name": "scientific-skills/skills/literature-review",
@@ -4085,7 +4260,8 @@
         "other",
         "scientific-skills/skills/literature-review"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/market-research-reports": {
       "name": "scientific-skills/skills/market-research-reports",
@@ -4107,7 +4283,8 @@
         "other",
         "scientific-skills/skills/market-research-reports"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/markitdown": {
       "name": "scientific-skills/skills/markitdown",
@@ -4129,7 +4306,8 @@
         "other",
         "scientific-skills/skills/markitdown"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/matchms": {
       "name": "scientific-skills/skills/matchms",
@@ -4151,7 +4329,8 @@
         "other",
         "scientific-skills/skills/matchms"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/matlab": {
       "name": "scientific-skills/skills/matlab",
@@ -4173,7 +4352,8 @@
         "other",
         "scientific-skills/skills/matlab"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/matplotlib": {
       "name": "scientific-skills/skills/matplotlib",
@@ -4195,7 +4375,8 @@
         "other",
         "scientific-skills/skills/matplotlib"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/medchem": {
       "name": "scientific-skills/skills/medchem",
@@ -4217,7 +4398,8 @@
         "other",
         "scientific-skills/skills/medchem"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/metabolomics-workbench-database": {
       "name": "scientific-skills/skills/metabolomics-workbench-database",
@@ -4239,7 +4421,8 @@
         "other",
         "scientific-skills/skills/metabolomics-workbench-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/modal": {
       "name": "scientific-skills/skills/modal",
@@ -4261,7 +4444,8 @@
         "other",
         "scientific-skills/skills/modal"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/molfeat": {
       "name": "scientific-skills/skills/molfeat",
@@ -4283,7 +4467,8 @@
         "other",
         "scientific-skills/skills/molfeat"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/networkx": {
       "name": "scientific-skills/skills/networkx",
@@ -4305,7 +4490,8 @@
         "other",
         "scientific-skills/skills/networkx"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/neurokit2": {
       "name": "scientific-skills/skills/neurokit2",
@@ -4327,7 +4513,8 @@
         "other",
         "scientific-skills/skills/neurokit2"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/neuropixels-analysis": {
       "name": "scientific-skills/skills/neuropixels-analysis",
@@ -4349,7 +4536,8 @@
         "other",
         "scientific-skills/skills/neuropixels-analysis"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/offer-k-dense-web": {
       "name": "scientific-skills/skills/offer-k-dense-web",
@@ -4371,7 +4559,8 @@
         "other",
         "scientific-skills/skills/offer-k-dense-web"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/omero-integration": {
       "name": "scientific-skills/skills/omero-integration",
@@ -4393,7 +4582,8 @@
         "other",
         "scientific-skills/skills/omero-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/openalex-database": {
       "name": "scientific-skills/skills/openalex-database",
@@ -4415,7 +4605,8 @@
         "other",
         "scientific-skills/skills/openalex-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/opentargets-database": {
       "name": "scientific-skills/skills/opentargets-database",
@@ -4437,7 +4628,8 @@
         "other",
         "scientific-skills/skills/opentargets-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/opentrons-integration": {
       "name": "scientific-skills/skills/opentrons-integration",
@@ -4459,7 +4651,8 @@
         "other",
         "scientific-skills/skills/opentrons-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/paper-2-web": {
       "name": "scientific-skills/skills/paper-2-web",
@@ -4481,7 +4674,8 @@
         "other",
         "scientific-skills/skills/paper-2-web"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pathml": {
       "name": "scientific-skills/skills/pathml",
@@ -4503,7 +4697,8 @@
         "other",
         "scientific-skills/skills/pathml"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pdb-database": {
       "name": "scientific-skills/skills/pdb-database",
@@ -4525,7 +4720,8 @@
         "other",
         "scientific-skills/skills/pdb-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/peer-review": {
       "name": "scientific-skills/skills/peer-review",
@@ -4547,7 +4743,8 @@
         "other",
         "scientific-skills/skills/peer-review"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pennylane": {
       "name": "scientific-skills/skills/pennylane",
@@ -4569,7 +4766,8 @@
         "other",
         "scientific-skills/skills/pennylane"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/perplexity-search": {
       "name": "scientific-skills/skills/perplexity-search",
@@ -4591,7 +4789,8 @@
         "other",
         "scientific-skills/skills/perplexity-search"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/plotly": {
       "name": "scientific-skills/skills/plotly",
@@ -4613,7 +4812,8 @@
         "other",
         "scientific-skills/skills/plotly"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/polars": {
       "name": "scientific-skills/skills/polars",
@@ -4635,7 +4835,8 @@
         "other",
         "scientific-skills/skills/polars"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pptx-posters": {
       "name": "scientific-skills/skills/pptx-posters",
@@ -4657,7 +4858,8 @@
         "other",
         "scientific-skills/skills/pptx-posters"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/protocolsio-integration": {
       "name": "scientific-skills/skills/protocolsio-integration",
@@ -4679,7 +4881,8 @@
         "other",
         "scientific-skills/skills/protocolsio-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pubchem-database": {
       "name": "scientific-skills/skills/pubchem-database",
@@ -4701,7 +4904,8 @@
         "other",
         "scientific-skills/skills/pubchem-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pubmed-database": {
       "name": "scientific-skills/skills/pubmed-database",
@@ -4723,7 +4927,8 @@
         "other",
         "scientific-skills/skills/pubmed-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pufferlib": {
       "name": "scientific-skills/skills/pufferlib",
@@ -4745,7 +4950,8 @@
         "other",
         "scientific-skills/skills/pufferlib"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pydeseq2": {
       "name": "scientific-skills/skills/pydeseq2",
@@ -4767,7 +4973,8 @@
         "other",
         "scientific-skills/skills/pydeseq2"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pydicom": {
       "name": "scientific-skills/skills/pydicom",
@@ -4789,7 +4996,8 @@
         "other",
         "scientific-skills/skills/pydicom"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pyhealth": {
       "name": "scientific-skills/skills/pyhealth",
@@ -4811,7 +5019,8 @@
         "other",
         "scientific-skills/skills/pyhealth"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pylabrobot": {
       "name": "scientific-skills/skills/pylabrobot",
@@ -4833,7 +5042,8 @@
         "other",
         "scientific-skills/skills/pylabrobot"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pymatgen": {
       "name": "scientific-skills/skills/pymatgen",
@@ -4855,7 +5065,8 @@
         "other",
         "scientific-skills/skills/pymatgen"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pymc": {
       "name": "scientific-skills/skills/pymc",
@@ -4877,7 +5088,8 @@
         "other",
         "scientific-skills/skills/pymc"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pymoo": {
       "name": "scientific-skills/skills/pymoo",
@@ -4899,7 +5111,8 @@
         "other",
         "scientific-skills/skills/pymoo"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pyopenms": {
       "name": "scientific-skills/skills/pyopenms",
@@ -4921,7 +5134,8 @@
         "other",
         "scientific-skills/skills/pyopenms"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pysam": {
       "name": "scientific-skills/skills/pysam",
@@ -4943,7 +5157,8 @@
         "other",
         "scientific-skills/skills/pysam"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pytdc": {
       "name": "scientific-skills/skills/pytdc",
@@ -4965,7 +5180,8 @@
         "other",
         "scientific-skills/skills/pytdc"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/pytorch-lightning": {
       "name": "scientific-skills/skills/pytorch-lightning",
@@ -4987,7 +5203,8 @@
         "other",
         "scientific-skills/skills/pytorch-lightning"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/qiskit": {
       "name": "scientific-skills/skills/qiskit",
@@ -5009,7 +5226,8 @@
         "other",
         "scientific-skills/skills/qiskit"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/qutip": {
       "name": "scientific-skills/skills/qutip",
@@ -5031,7 +5249,8 @@
         "other",
         "scientific-skills/skills/qutip"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/rdkit": {
       "name": "scientific-skills/skills/rdkit",
@@ -5053,7 +5272,8 @@
         "other",
         "scientific-skills/skills/rdkit"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/reactome-database": {
       "name": "scientific-skills/skills/reactome-database",
@@ -5075,7 +5295,8 @@
         "other",
         "scientific-skills/skills/reactome-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/research-grants": {
       "name": "scientific-skills/skills/research-grants",
@@ -5097,7 +5318,8 @@
         "other",
         "scientific-skills/skills/research-grants"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/research-lookup": {
       "name": "scientific-skills/skills/research-lookup",
@@ -5119,7 +5341,8 @@
         "other",
         "scientific-skills/skills/research-lookup"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/rowan": {
       "name": "scientific-skills/skills/rowan",
@@ -5141,7 +5364,8 @@
         "other",
         "scientific-skills/skills/rowan"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scanpy": {
       "name": "scientific-skills/skills/scanpy",
@@ -5163,7 +5387,8 @@
         "other",
         "scientific-skills/skills/scanpy"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scholar-evaluation": {
       "name": "scientific-skills/skills/scholar-evaluation",
@@ -5185,7 +5410,8 @@
         "other",
         "scientific-skills/skills/scholar-evaluation"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scientific-brainstorming": {
       "name": "scientific-skills/skills/scientific-brainstorming",
@@ -5207,7 +5433,8 @@
         "other",
         "scientific-skills/skills/scientific-brainstorming"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scientific-critical-thinking": {
       "name": "scientific-skills/skills/scientific-critical-thinking",
@@ -5229,7 +5456,8 @@
         "other",
         "scientific-skills/skills/scientific-critical-thinking"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scientific-schematics": {
       "name": "scientific-skills/skills/scientific-schematics",
@@ -5251,7 +5479,8 @@
         "other",
         "scientific-skills/skills/scientific-schematics"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scientific-slides": {
       "name": "scientific-skills/skills/scientific-slides",
@@ -5273,7 +5502,8 @@
         "other",
         "scientific-skills/skills/scientific-slides"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scientific-visualization": {
       "name": "scientific-skills/skills/scientific-visualization",
@@ -5295,7 +5525,8 @@
         "other",
         "scientific-skills/skills/scientific-visualization"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scientific-writing": {
       "name": "scientific-skills/skills/scientific-writing",
@@ -5317,7 +5548,8 @@
         "other",
         "scientific-skills/skills/scientific-writing"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scikit-bio": {
       "name": "scientific-skills/skills/scikit-bio",
@@ -5339,7 +5571,8 @@
         "other",
         "scientific-skills/skills/scikit-bio"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scikit-learn": {
       "name": "scientific-skills/skills/scikit-learn",
@@ -5361,7 +5594,8 @@
         "other",
         "scientific-skills/skills/scikit-learn"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scikit-survival": {
       "name": "scientific-skills/skills/scikit-survival",
@@ -5383,7 +5617,8 @@
         "other",
         "scientific-skills/skills/scikit-survival"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/scvi-tools": {
       "name": "scientific-skills/skills/scvi-tools",
@@ -5405,7 +5640,8 @@
         "other",
         "scientific-skills/skills/scvi-tools"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/seaborn": {
       "name": "scientific-skills/skills/seaborn",
@@ -5427,7 +5663,8 @@
         "other",
         "scientific-skills/skills/seaborn"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/shap": {
       "name": "scientific-skills/skills/shap",
@@ -5449,7 +5686,8 @@
         "other",
         "scientific-skills/skills/shap"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/simpy": {
       "name": "scientific-skills/skills/simpy",
@@ -5471,7 +5709,8 @@
         "other",
         "scientific-skills/skills/simpy"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/stable-baselines3": {
       "name": "scientific-skills/skills/stable-baselines3",
@@ -5493,7 +5732,8 @@
         "other",
         "scientific-skills/skills/stable-baselines3"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/statistical-analysis": {
       "name": "scientific-skills/skills/statistical-analysis",
@@ -5515,7 +5755,8 @@
         "other",
         "scientific-skills/skills/statistical-analysis"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/statsmodels": {
       "name": "scientific-skills/skills/statsmodels",
@@ -5537,7 +5778,8 @@
         "other",
         "scientific-skills/skills/statsmodels"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/string-database": {
       "name": "scientific-skills/skills/string-database",
@@ -5559,7 +5801,8 @@
         "other",
         "scientific-skills/skills/string-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/sympy": {
       "name": "scientific-skills/skills/sympy",
@@ -5581,7 +5824,8 @@
         "other",
         "scientific-skills/skills/sympy"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/torchdrug": {
       "name": "scientific-skills/skills/torchdrug",
@@ -5603,7 +5847,8 @@
         "other",
         "scientific-skills/skills/torchdrug"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/torch_geometric": {
       "name": "scientific-skills/skills/torch_geometric",
@@ -5625,7 +5870,8 @@
         "other",
         "scientific-skills/skills/torch_geometric"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/transformers": {
       "name": "scientific-skills/skills/transformers",
@@ -5647,7 +5893,8 @@
         "other",
         "scientific-skills/skills/transformers"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/treatment-plans": {
       "name": "scientific-skills/skills/treatment-plans",
@@ -5669,7 +5916,8 @@
         "other",
         "scientific-skills/skills/treatment-plans"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/umap-learn": {
       "name": "scientific-skills/skills/umap-learn",
@@ -5691,7 +5939,8 @@
         "other",
         "scientific-skills/skills/umap-learn"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/uniprot-database": {
       "name": "scientific-skills/skills/uniprot-database",
@@ -5713,7 +5962,8 @@
         "other",
         "scientific-skills/skills/uniprot-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/uspto-database": {
       "name": "scientific-skills/skills/uspto-database",
@@ -5735,7 +5985,8 @@
         "other",
         "scientific-skills/skills/uspto-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/vaex": {
       "name": "scientific-skills/skills/vaex",
@@ -5757,7 +6008,8 @@
         "other",
         "scientific-skills/skills/vaex"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/venue-templates": {
       "name": "scientific-skills/skills/venue-templates",
@@ -5779,7 +6031,8 @@
         "other",
         "scientific-skills/skills/venue-templates"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/zarr-python": {
       "name": "scientific-skills/skills/zarr-python",
@@ -5801,7 +6054,8 @@
         "other",
         "scientific-skills/skills/zarr-python"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "scientific-skills/skills/zinc-database": {
       "name": "scientific-skills/skills/zinc-database",
@@ -5823,7 +6077,8 @@
         "other",
         "scientific-skills/skills/zinc-database"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "security-architect": {
       "name": "security-architect",
@@ -5856,7 +6111,8 @@
         "security",
         "security-architect"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "semgrep-rule-creator": {
       "name": "semgrep-rule-creator",
@@ -5880,7 +6136,8 @@
         "other",
         "semgrep-rule-creator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "sentry-monitoring": {
       "name": "sentry-monitoring",
@@ -5905,7 +6162,8 @@
         "other",
         "sentry-monitoring"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "seo-and-meta-tags-in-sveltekit": {
       "name": "seo-and-meta-tags-in-sveltekit",
@@ -5930,7 +6188,8 @@
         "other",
         "seo-and-meta-tags-in-sveltekit"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "sequential-thinking": {
       "name": "sequential-thinking",
@@ -5952,7 +6211,8 @@
         "specialized",
         "sequential-thinking"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "service-class-conventions": {
       "name": "service-class-conventions",
@@ -5976,7 +6236,8 @@
         "other",
         "service-class-conventions"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "session-handoff": {
       "name": "session-handoff",
@@ -5999,7 +6260,8 @@
         "memory",
         "session-handoff"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "skill-creator": {
       "name": "skill-creator",
@@ -6026,7 +6288,8 @@
         "creator-tools",
         "skill-creator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "skill-discovery": {
       "name": "skill-discovery",
@@ -6048,7 +6311,8 @@
         "other",
         "skill-discovery"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "slack-notifications": {
       "name": "slack-notifications",
@@ -6070,7 +6334,8 @@
         "other",
         "slack-notifications"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "smart-debug": {
       "name": "smart-debug",
@@ -6092,7 +6357,8 @@
         "other",
         "smart-debug"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "sparc-methodology": {
       "name": "sparc-methodology",
@@ -6114,7 +6380,8 @@
         "other",
         "sparc-methodology"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "spec-gathering": {
       "name": "spec-gathering",
@@ -6138,7 +6405,8 @@
         "requirements",
         "spec-gathering"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "spec-init": {
       "name": "spec-init",
@@ -6160,7 +6428,8 @@
         "other",
         "spec-init"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "state-management-expert": {
       "name": "state-management-expert",
@@ -6185,7 +6454,8 @@
         "other",
         "state-management-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "static-analysis": {
       "name": "static-analysis",
@@ -6207,7 +6477,8 @@
         "other",
         "static-analysis"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "styling-expert": {
       "name": "styling-expert",
@@ -6232,7 +6503,8 @@
         "styling",
         "styling-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "summarize-changes": {
       "name": "summarize-changes",
@@ -6254,7 +6526,8 @@
         "other",
         "summarize-changes"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "svelte-expert": {
       "name": "svelte-expert",
@@ -6279,7 +6552,8 @@
         "other",
         "svelte-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "swarm-coordination": {
       "name": "swarm-coordination",
@@ -6308,7 +6582,8 @@
         "orchestration",
         "swarm-coordination"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "tall-stack-general": {
       "name": "tall-stack-general",
@@ -6332,7 +6607,8 @@
         "other",
         "tall-stack-general"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "task-management-protocol": {
       "name": "task-management-protocol",
@@ -6390,7 +6666,8 @@
         "other",
         "task-management-protocol"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "tauri-native-api-integration": {
       "name": "tauri-native-api-integration",
@@ -6414,7 +6691,8 @@
         "other",
         "tauri-native-api-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "tauri-security-rules": {
       "name": "tauri-security-rules",
@@ -6438,7 +6716,8 @@
         "other",
         "tauri-security-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "tauri-svelte-typescript-general": {
       "name": "tauri-svelte-typescript-general",
@@ -6462,7 +6741,8 @@
         "other",
         "tauri-svelte-typescript-general"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "tauri-svelte-ui-components": {
       "name": "tauri-svelte-ui-components",
@@ -6486,7 +6766,8 @@
         "other",
         "tauri-svelte-ui-components"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "tdd": {
       "name": "tdd",
@@ -6527,7 +6808,8 @@
         "testing",
         "tdd"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "template-creator": {
       "name": "template-creator",
@@ -6551,7 +6833,8 @@
         "other",
         "template-creator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "template-renderer": {
       "name": "template-renderer",
@@ -6573,7 +6856,8 @@
         "other",
         "template-renderer"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "terraform-infra": {
       "name": "terraform-infra",
@@ -6595,7 +6879,8 @@
         "devops",
         "terraform-infra"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "test-generator": {
       "name": "test-generator",
@@ -6617,7 +6902,8 @@
         "other",
         "test-generator"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "text-to-sql": {
       "name": "text-to-sql",
@@ -6639,7 +6925,8 @@
         "database",
         "text-to-sql"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "thinking-tools": {
       "name": "thinking-tools",
@@ -6663,7 +6950,8 @@
         "specialized",
         "thinking-tools"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "tool-search": {
       "name": "tool-search",
@@ -6685,7 +6973,8 @@
         "other",
         "tool-search"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "track-management": {
       "name": "track-management",
@@ -6709,7 +6998,8 @@
         "other",
         "track-management"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "tsconfig-json-rules": {
       "name": "tsconfig-json-rules",
@@ -6731,7 +7021,8 @@
         "other",
         "tsconfig-json-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "typescript-expert": {
       "name": "typescript-expert",
@@ -6763,7 +7054,8 @@
         "languages",
         "typescript-expert"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "ui-components-expert": {
       "name": "ui-components-expert",
@@ -6789,7 +7081,8 @@
         "other",
         "ui-components-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "variant-analysis": {
       "name": "variant-analysis",
@@ -6811,7 +7104,8 @@
         "other",
         "variant-analysis"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "verification-before-completion": {
       "name": "verification-before-completion",
@@ -6867,7 +7161,8 @@
         "quality",
         "verification-before-completion"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "visual-and-observational-rules": {
       "name": "visual-and-observational-rules",
@@ -6889,7 +7184,8 @@
         "other",
         "visual-and-observational-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "web-design-guidelines-vercel": {
       "name": "web-design-guidelines-vercel",
@@ -6912,7 +7208,8 @@
         "styling",
         "web-design-guidelines-vercel"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "web3-expert": {
       "name": "web3-expert",
@@ -6936,7 +7233,8 @@
         "other",
         "web3-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "workflow-creator": {
       "name": "workflow-creator",
@@ -6964,7 +7262,8 @@
         "other",
         "workflow-creator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "workflow-patterns": {
       "name": "workflow-patterns",
@@ -6986,7 +7285,8 @@
         "other",
         "workflow-patterns"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "writing-skills": {
       "name": "writing-skills",
@@ -7012,7 +7312,8 @@
         "documentation",
         "writing-skills"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "library-usage": {
       "name": "library-usage",
@@ -7034,7 +7335,8 @@
         "other",
         "library-usage"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "unit-testing-requirement": {
       "name": "unit-testing-requirement",
@@ -7056,7 +7358,8 @@
         "other",
         "unit-testing-requirement"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "authentication-flow-rules": {
       "name": "authentication-flow-rules",
@@ -7080,7 +7383,8 @@
         "other",
         "authentication-flow-rules"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "task-breakdown": {
       "name": "task-breakdown",
@@ -7107,7 +7411,8 @@
         "planning",
         "task-breakdown"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "brainstorming": {
       "name": "brainstorming",
@@ -7133,7 +7438,8 @@
         "other",
         "brainstorming"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "strategic-planning-with-pseudocode": {
       "name": "strategic-planning-with-pseudocode",
@@ -7155,7 +7461,8 @@
         "other",
         "strategic-planning-with-pseudocode"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "operational-modes": {
       "name": "operational-modes",
@@ -7177,7 +7484,8 @@
         "other",
         "operational-modes"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "context-files-rules": {
       "name": "context-files-rules",
@@ -7199,7 +7507,8 @@
         "other",
         "context-files-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "history-and-next-task-rules": {
       "name": "history-and-next-task-rules",
@@ -7221,7 +7530,8 @@
         "other",
         "history-and-next-task-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "qa-workflow": {
       "name": "qa-workflow",
@@ -7248,7 +7558,8 @@
         "quality",
         "qa-workflow"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "verify-information-rule": {
       "name": "verify-information-rule",
@@ -7270,7 +7581,8 @@
         "other",
         "verify-information-rule"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "thoughtful-and-accurate-responses": {
       "name": "thoughtful-and-accurate-responses",
@@ -7292,7 +7604,8 @@
         "other",
         "thoughtful-and-accurate-responses"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "truthfulness-and-clarity-for-ai": {
       "name": "truthfulness-and-clarity-for-ai",
@@ -7314,7 +7627,8 @@
         "other",
         "truthfulness-and-clarity-for-ai"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "handle-incomplete-tasks": {
       "name": "handle-incomplete-tasks",
@@ -7336,7 +7650,8 @@
         "other",
         "handle-incomplete-tasks"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "continuous-improvement-focus": {
       "name": "continuous-improvement-focus",
@@ -7358,7 +7673,8 @@
         "other",
         "continuous-improvement-focus"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "gitflow": {
       "name": "gitflow",
@@ -7380,7 +7696,8 @@
         "version-control",
         "gitflow"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "commit-validator": {
       "name": "commit-validator",
@@ -7404,7 +7721,8 @@
         "other",
         "commit-validator"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "smart-revert": {
       "name": "smart-revert",
@@ -7431,7 +7749,8 @@
         "other",
         "smart-revert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "commit-message-guidelines": {
       "name": "commit-message-guidelines",
@@ -7453,7 +7772,8 @@
         "other",
         "commit-message-guidelines"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "version-control-rule": {
       "name": "version-control-rule",
@@ -7475,7 +7795,8 @@
         "other",
         "version-control-rule"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "collaboration-and-version-control-rules": {
       "name": "collaboration-and-version-control-rules",
@@ -7497,7 +7818,8 @@
         "other",
         "collaboration-and-version-control-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "using-git-worktrees": {
       "name": "using-git-worktrees",
@@ -7519,7 +7841,8 @@
         "other",
         "using-git-worktrees"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "finishing-a-development-branch": {
       "name": "finishing-a-development-branch",
@@ -7541,7 +7864,8 @@
         "other",
         "finishing-a-development-branch"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "github-ops": {
       "name": "github-ops",
@@ -7565,7 +7889,8 @@
         "other",
         "github-ops"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "jira-pm": {
       "name": "jira-pm",
@@ -7589,7 +7914,8 @@
         "other",
         "jira-pm"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "linear-pm": {
       "name": "linear-pm",
@@ -7613,7 +7939,8 @@
         "other",
         "linear-pm"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "computer-use": {
       "name": "computer-use",
@@ -7635,7 +7962,8 @@
         "other",
         "computer-use"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "telegram-bot-api-rules": {
       "name": "telegram-bot-api-rules",
@@ -7657,7 +7985,8 @@
         "other",
         "telegram-bot-api-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "agp-router-rules": {
       "name": "agp-router-rules",
@@ -7679,7 +8008,8 @@
         "other",
         "agp-router-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "cloud-native-and-kubernetes-expertise-rules": {
       "name": "cloud-native-and-kubernetes-expertise-rules",
@@ -7701,7 +8031,8 @@
         "other",
         "cloud-native-and-kubernetes-expertise-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "elixir-expert": {
       "name": "elixir-expert",
@@ -7723,7 +8054,8 @@
         "other",
         "elixir-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "type-hinting-rule": {
       "name": "type-hinting-rule",
@@ -7745,7 +8077,8 @@
         "other",
         "type-hinting-rule"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "asynchronous-programming-preference": {
       "name": "asynchronous-programming-preference",
@@ -7770,7 +8103,8 @@
         "other",
         "asynchronous-programming-preference"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "functional-programming-preference": {
       "name": "functional-programming-preference",
@@ -7792,7 +8126,8 @@
         "other",
         "functional-programming-preference"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "rell-general-rules": {
       "name": "rell-general-rules",
@@ -7814,7 +8149,8 @@
         "other",
         "rell-general-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "latest-language-versions-and-best-practices": {
       "name": "latest-language-versions-and-best-practices",
@@ -7836,7 +8172,8 @@
         "other",
         "latest-language-versions-and-best-practices"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "composition-patterns-vercel": {
       "name": "composition-patterns-vercel",
@@ -7858,7 +8195,8 @@
         "other",
         "composition-patterns-vercel"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "vue-expert": {
       "name": "vue-expert",
@@ -7882,7 +8220,8 @@
         "other",
         "vue-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "angular-expert": {
       "name": "angular-expert",
@@ -7904,7 +8243,8 @@
         "other",
         "angular-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "astro-expert": {
       "name": "astro-expert",
@@ -7926,7 +8266,8 @@
         "other",
         "astro-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "qwik-expert": {
       "name": "qwik-expert",
@@ -7948,7 +8289,8 @@
         "other",
         "qwik-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "solidjs-expert": {
       "name": "solidjs-expert",
@@ -7970,7 +8312,8 @@
         "other",
         "solidjs-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "flutter-expert": {
       "name": "flutter-expert",
@@ -7992,7 +8335,8 @@
         "other",
         "flutter-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "backend-expert": {
       "name": "backend-expert",
@@ -8016,7 +8360,8 @@
         "other",
         "backend-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "htmx-expert": {
       "name": "htmx-expert",
@@ -8038,7 +8383,8 @@
         "other",
         "htmx-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "chrome-extension-expert": {
       "name": "chrome-extension-expert",
@@ -8060,7 +8406,8 @@
         "other",
         "chrome-extension-expert"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "nativescript": {
       "name": "nativescript",
@@ -8082,7 +8429,8 @@
         "other",
         "nativescript"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "large-data-with-dask": {
       "name": "large-data-with-dask",
@@ -8106,7 +8454,8 @@
         "other",
         "large-data-with-dask"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "drizzle-orm-rules": {
       "name": "drizzle-orm-rules",
@@ -8130,7 +8479,8 @@
         "other",
         "drizzle-orm-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "entity-class-conventions": {
       "name": "entity-class-conventions",
@@ -8154,7 +8504,8 @@
         "other",
         "entity-class-conventions"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "repository-class-conventions": {
       "name": "repository-class-conventions",
@@ -8178,7 +8529,8 @@
         "other",
         "repository-class-conventions"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "vercel-kv-database-rules": {
       "name": "vercel-kv-database-rules",
@@ -8203,7 +8555,8 @@
         "other",
         "vercel-kv-database-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "experiment-configuration-with-hydra-yaml": {
       "name": "experiment-configuration-with-hydra-yaml",
@@ -8225,7 +8578,8 @@
         "other",
         "experiment-configuration-with-hydra-yaml"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "detailed-docstrings": {
       "name": "detailed-docstrings",
@@ -8247,7 +8601,8 @@
         "other",
         "detailed-docstrings"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "technical-accuracy-and-usability-rules": {
       "name": "technical-accuracy-and-usability-rules",
@@ -8269,7 +8624,8 @@
         "other",
         "technical-accuracy-and-usability-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "metadata-and-seo-rules": {
       "name": "metadata-and-seo-rules",
@@ -8291,7 +8647,8 @@
         "other",
         "metadata-and-seo-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "mkdocs-specific-rules": {
       "name": "mkdocs-specific-rules",
@@ -8313,7 +8670,8 @@
         "other",
         "mkdocs-specific-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "content-creation-rules": {
       "name": "content-creation-rules",
@@ -8335,7 +8693,8 @@
         "other",
         "content-creation-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "prompt-generation-rules": {
       "name": "prompt-generation-rules",
@@ -8357,7 +8716,8 @@
         "other",
         "prompt-generation-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "writing-plans": {
       "name": "writing-plans",
@@ -8379,7 +8739,8 @@
         "other",
         "writing-plans"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "artifact-publisher": {
       "name": "artifact-publisher",
@@ -8403,7 +8764,8 @@
         "other",
         "artifact-publisher"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "mcp-converter": {
       "name": "mcp-converter",
@@ -8427,7 +8789,8 @@
         "other",
         "mcp-converter"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "progressive-disclosure": {
       "name": "progressive-disclosure",
@@ -8455,7 +8818,8 @@
         "requirements",
         "progressive-disclosure"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "spec-writing": {
       "name": "spec-writing",
@@ -8479,7 +8843,8 @@
         "other",
         "spec-writing"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "spec-critique": {
       "name": "spec-critique",
@@ -8501,7 +8866,8 @@
         "other",
         "spec-critique"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "subagent-driven-development": {
       "name": "subagent-driven-development",
@@ -8523,7 +8889,8 @@
         "other",
         "subagent-driven-development"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "codebase-integration": {
       "name": "codebase-integration",
@@ -8545,7 +8912,8 @@
         "other",
         "codebase-integration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "repo-rag": {
       "name": "repo-rag",
@@ -8568,7 +8936,8 @@
         "other",
         "repo-rag"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "requesting-code-review": {
       "name": "requesting-code-review",
@@ -8590,7 +8959,8 @@
         "other",
         "requesting-code-review"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "receiving-code-review": {
       "name": "receiving-code-review",
@@ -8612,7 +8982,8 @@
         "other",
         "receiving-code-review"
       ],
-      "priority": 1
+      "priority": 1,
+      "aliasOf": null
     },
     "dispatching-parallel-agents": {
       "name": "dispatching-parallel-agents",
@@ -8638,7 +9009,8 @@
         "other",
         "dispatching-parallel-agents"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "executing-plans": {
       "name": "executing-plans",
@@ -8660,7 +9032,8 @@
         "other",
         "executing-plans"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "image-optimization-rules": {
       "name": "image-optimization-rules",
@@ -8682,7 +9055,8 @@
         "other",
         "image-optimization-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "placeholder-images": {
       "name": "placeholder-images",
@@ -8704,7 +9078,8 @@
         "other",
         "placeholder-images"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "modular-design-rule": {
       "name": "modular-design-rule",
@@ -8726,7 +9101,8 @@
         "other",
         "modular-design-rule"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "private-vs-shared-components": {
       "name": "private-vs-shared-components",
@@ -8748,7 +9124,8 @@
         "other",
         "private-vs-shared-components"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "pyqt6-ui-development-rules": {
       "name": "pyqt6-ui-development-rules",
@@ -8770,7 +9147,8 @@
         "other",
         "pyqt6-ui-development-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "alpine-js-usage-rules": {
       "name": "alpine-js-usage-rules",
@@ -8792,7 +9170,8 @@
         "other",
         "alpine-js-usage-rules"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
     },
     "aceternity-ui-configuration": {
       "name": "aceternity-ui-configuration",
@@ -8814,7 +9193,79 @@
         "other",
         "aceternity-ui-configuration"
       ],
-      "priority": 3
+      "priority": 3,
+      "aliasOf": null
+    },
+    "command-creator": {
+      "name": "command-creator",
+      "displayName": "Command Creator",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - command-creator",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "evolution-orchestrator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "other",
+        "command-creator"
+      ],
+      "priority": 1,
+      "aliasOf": "creators/command-creator"
+    },
+    "rule-creator": {
+      "name": "rule-creator",
+      "displayName": "Rule Creator",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - rule-creator",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "evolution-orchestrator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "other",
+        "rule-creator"
+      ],
+      "priority": 1,
+      "aliasOf": "creators/rule-creator"
+    },
+    "tool-creator": {
+      "name": "tool-creator",
+      "displayName": "Tool Creator",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - tool-creator",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "evolution-orchestrator"
+      ],
+      "tags": [
+        "other",
+        "other",
+        "tool-creator"
+      ],
+      "priority": 3,
+      "aliasOf": "creators/tool-creator"
     }
   },
   "index": {
@@ -9015,7 +9466,10 @@
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
         "tsconfig-json-rules",
-        "variant-analysis"
+        "variant-analysis",
+        "command-creator",
+        "rule-creator",
+        "tool-creator"
       ],
       "creator": [
         "agent-creator",
@@ -9572,7 +10026,10 @@
         "private-vs-shared-components",
         "pyqt6-ui-development-rules",
         "alpine-js-usage-rules",
-        "aceternity-ui-configuration"
+        "aceternity-ui-configuration",
+        "command-creator",
+        "rule-creator",
+        "tool-creator"
       ],
       "Creator Tools": [
         "agent-creator",
@@ -10050,7 +10507,10 @@
         "private-vs-shared-components",
         "pyqt6-ui-development-rules",
         "alpine-js-usage-rules",
-        "aceternity-ui-configuration"
+        "aceternity-ui-configuration",
+        "command-creator",
+        "rule-creator",
+        "tool-creator"
       ],
       "Write": [
         "accessibility",
@@ -10416,7 +10876,10 @@
         "private-vs-shared-components",
         "pyqt6-ui-development-rules",
         "alpine-js-usage-rules",
-        "aceternity-ui-configuration"
+        "aceternity-ui-configuration",
+        "command-creator",
+        "rule-creator",
+        "tool-creator"
       ],
       "Edit": [
         "accessibility",
@@ -10774,7 +11237,10 @@
         "private-vs-shared-components",
         "pyqt6-ui-development-rules",
         "alpine-js-usage-rules",
-        "aceternity-ui-configuration"
+        "aceternity-ui-configuration",
+        "command-creator",
+        "rule-creator",
+        "tool-creator"
       ],
       "Glob": [
         "agent-creator",
@@ -10965,6 +11431,7 @@
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
+        "creators/tool-creator",
         "dependency-analyzer",
         "design-and-user-experience-guidelines",
         "differential-review",
@@ -11239,7 +11706,8 @@
         "private-vs-shared-components",
         "pyqt6-ui-development-rules",
         "alpine-js-usage-rules",
-        "aceternity-ui-configuration"
+        "aceternity-ui-configuration",
+        "tool-creator"
       ],
       "planner": [
         "plan-generator",
@@ -11673,7 +12141,10 @@
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
-        "semgrep-rule-creator"
+        "semgrep-rule-creator",
+        "command-creator",
+        "rule-creator",
+        "tool-creator"
       ],
       "researcher": [
         "arxiv-mcp"
@@ -11719,6 +12190,7 @@
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
+        "creators/tool-creator",
         "dependency-analyzer",
         "design-and-user-experience-guidelines",
         "differential-review",
@@ -11993,7 +12465,8 @@
         "private-vs-shared-components",
         "pyqt6-ui-development-rules",
         "alpine-js-usage-rules",
-        "aceternity-ui-configuration"
+        "aceternity-ui-configuration",
+        "tool-creator"
       ],
       "planner": [
         "plan-generator",
@@ -12427,7 +12900,10 @@
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
-        "semgrep-rule-creator"
+        "semgrep-rule-creator",
+        "command-creator",
+        "rule-creator",
+        "tool-creator"
       ],
       "researcher": [
         "arxiv-mcp"

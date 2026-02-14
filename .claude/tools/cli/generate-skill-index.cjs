@@ -743,10 +743,19 @@ function generateIndex(options = {}) {
 
   // Build skills object
   const skills = {};
+  const creatorAliasToNested = {};
+  for (const scannedName of filteredScannedSkillNames) {
+    const canonical = canonicalSkillLookupKey(scannedName);
+    if (canonical !== scannedName && !creatorAliasToNested[canonical]) {
+      creatorAliasToNested[canonical] = scannedName;
+    }
+  }
+
   const allSkillNames = new Set([
     ...filteredCatalogSkills,
     ...filteredScannedSkillNames,
     ...Object.keys(DOMAIN_MAP),
+    ...Object.keys(creatorAliasToNested),
   ]);
 
   for (const name of allSkillNames) {
@@ -766,8 +775,13 @@ function generateIndex(options = {}) {
     }
     if (agentPrimary.length === 0 && agentSupporting.length === 0) {
       for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
-        if (skillList.includes(name) || skillList.includes(canonicalName)) {
-          if (skillList.indexOf(name) < 3) {
+        const matchedSkillName = skillList.includes(name)
+          ? name
+          : skillList.includes(canonicalName)
+            ? canonicalName
+            : null;
+        if (matchedSkillName) {
+          if (skillList.indexOf(matchedSkillName) < 3) {
             agentPrimary.push(agent);
           } else {
             agentSupporting.push(agent);
@@ -775,6 +789,8 @@ function generateIndex(options = {}) {
         }
       }
     }
+
+    const aliasOf = creatorAliasToNested[name] || null;
 
     skills[name] = {
       name,
@@ -790,6 +806,7 @@ function generateIndex(options = {}) {
       agentSupporting,
       tags: [domain, category.toLowerCase().replace(/\s+/g, '-'), name],
       priority: agentPrimary.length > 0 ? 1 : 3,
+      aliasOf,
     };
   }
 
