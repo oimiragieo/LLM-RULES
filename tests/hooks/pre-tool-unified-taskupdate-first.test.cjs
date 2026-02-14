@@ -40,6 +40,27 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
     }
   }
 
+  function withMockedRouterSnapshot(snapshot, fn) {
+    const priorGetState = routerState.getState;
+    const priorGetLastTaskUpdate = routerState.getLastTaskUpdate;
+    const priorWasTaskUpdateCalledRecently = routerState.wasTaskUpdateCalledRecently;
+    try {
+      routerState.getState = () => snapshot;
+      routerState.getLastTaskUpdate = () => ({
+        timestamp: snapshot.lastTaskUpdateCall,
+        taskId: snapshot.lastTaskUpdateTaskId,
+        status: snapshot.lastTaskUpdateStatus,
+      });
+      routerState.wasTaskUpdateCalledRecently = () =>
+        Number(snapshot.lastTaskUpdateCall || 0) > Date.now() - 60_000;
+      fn();
+    } finally {
+      routerState.getState = priorGetState;
+      routerState.getLastTaskUpdate = priorGetLastTaskUpdate;
+      routerState.wasTaskUpdateCalledRecently = priorWasTaskUpdateCalledRecently;
+    }
+  }
+
   function withTempStateFile(fn) {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'taskupdate-first-'));
     const stateFile = path.join(tempDir, 'state.json');
@@ -374,7 +395,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   test('uses normalized task id comparison for bootstrap allow', () => {
     withTempStateFile(stateFile => {
       process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'true';
-      withRouterState(
+      withMockedRouterSnapshot(
         {
           mode: 'agent',
           taskSpawned: true,
@@ -404,7 +425,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   test('does not allow bootstrap when router-state session id is missing', () => {
     withTempStateFile(stateFile => {
       process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'true';
-      withRouterState(
+      withMockedRouterSnapshot(
         {
           mode: 'agent',
           taskSpawned: true,

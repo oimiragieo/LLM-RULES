@@ -19,6 +19,9 @@ describe('pre-tool-unified agent guardrails', () => {
       AGENT_GIT_COMMIT_ENFORCEMENT: process.env.AGENT_GIT_COMMIT_ENFORCEMENT,
       AGENT_FILE_ALLOWLIST_ENFORCEMENT: process.env.AGENT_FILE_ALLOWLIST_ENFORCEMENT,
       AGENT_EDIT_CHECKPOINT_ENFORCEMENT: process.env.AGENT_EDIT_CHECKPOINT_ENFORCEMENT,
+      AGENT_BASH_POLL_GUARD: process.env.AGENT_BASH_POLL_GUARD,
+      AGENT_BASH_POLL_REPEAT_THRESHOLD: process.env.AGENT_BASH_POLL_REPEAT_THRESHOLD,
+      AGENT_BASH_POLL_STALE_MS: process.env.AGENT_BASH_POLL_STALE_MS,
       TASKUPDATE_FIRST_ENFORCEMENT: process.env.TASKUPDATE_FIRST_ENFORCEMENT,
     };
 
@@ -26,6 +29,9 @@ describe('pre-tool-unified agent guardrails', () => {
     process.env.AGENT_GIT_COMMIT_ENFORCEMENT = 'block';
     process.env.AGENT_FILE_ALLOWLIST_ENFORCEMENT = 'block';
     process.env.AGENT_EDIT_CHECKPOINT_ENFORCEMENT = 'block';
+    process.env.AGENT_BASH_POLL_GUARD = 'block';
+    process.env.AGENT_BASH_POLL_REPEAT_THRESHOLD = '3';
+    process.env.AGENT_BASH_POLL_STALE_MS = '50';
     process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'off';
 
     try {
@@ -163,6 +169,63 @@ describe('pre-tool-unified agent guardrails', () => {
       seedSession(stateFile, 'session-5');
       const loaded = readAgentGuardrailsState(stateFile);
       assert.ok(loaded.sessions['session-5']);
+    });
+  });
+
+  test('blocks polling when task output already has terminal test summary', () => {
+    withTempGuardrailState(stateFile => {
+      seedSession(stateFile, 'session-6');
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'task-output-'));
+      const tasksDir = path.join(tempDir, 'tasks');
+      fs.mkdirSync(tasksDir, { recursive: true });
+      const outputPath = path.join(tasksDir, 'done.output');
+      fs.writeFileSync(
+        outputPath,
+        '# tests 42\n# pass 40\n# fail 2\nELIFECYCLE Test failed. See above for more details.\n',
+        'utf8'
+      );
+
+      const hookInput = {
+        session_id: 'session-6',
+        allowed_tools: ['TaskUpdate', 'Bash'],
+      };
+      const command = `cat "${outputPath}" | tail -30`;
+      const result = checkAgentGuardrails(hookInput, 'Bash', { command }, stateFile);
+      assert.equal(result.action, 'block');
+      assert.match(result.message, /terminal test summary markers/i);
+
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    });
+  });
+
+  test('blocks stale repeated task-output polling loops', () => {
+    withTempGuardrailState(stateFile => {
+      seedSession(stateFile, 'session-7');
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'task-output-'));
+      const tasksDir = path.join(tempDir, 'tasks');
+      fs.mkdirSync(tasksDir, { recursive: true });
+      const outputPath = path.join(tasksDir, 'stale.output');
+      fs.writeFileSync(outputPath, 'still running...\n', 'utf8');
+      const staleDate = new Date(Date.now() - 2 * 60 * 1000);
+      fs.utimesSync(outputPath, staleDate, staleDate);
+
+      const hookInput = {
+        session_id: 'session-7',
+        allowed_tools: ['TaskUpdate', 'Bash'],
+      };
+      const command = `cat "${outputPath}" | grep -i fail | head -40`;
+
+      const results = [];
+      for (let i = 0; i < 6; i += 1) {
+        results.push(checkAgentGuardrails(hookInput, 'Bash', { command }, stateFile));
+      }
+
+      assert.equal(results[0].action, 'allow');
+      assert.equal(results[4].action, 'allow');
+      assert.equal(results[5].action, 'block');
+      assert.match(results[5].message, /stale task-output polling/i);
+
+      fs.rmSync(tempDir, { recursive: true, force: true });
     });
   });
 });

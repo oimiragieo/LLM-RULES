@@ -174,14 +174,14 @@ class AstGrepSearch {
     // Add include patterns
     if (options.include && options.include.length > 0) {
       for (const glob of options.include) {
-        args.push('--glob', glob);
+        args.push('--globs', glob);
       }
     }
 
     // Add exclude patterns
     if (options.exclude && options.exclude.length > 0) {
       for (const glob of options.exclude) {
-        args.push('--glob', `!${glob}`);
+        args.push('--globs', `!${glob}`);
       }
     }
 
@@ -329,7 +329,7 @@ class AstGrepSearch {
       colEnd: r.range.end.column,
       code: r.text,
       matches: r.metaVariables || {},
-      language: r.language || 'unknown',
+      language: (r.language || 'unknown').toLowerCase(),
     }));
   }
 

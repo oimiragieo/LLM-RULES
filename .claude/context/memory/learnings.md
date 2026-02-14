@@ -1,3 +1,65 @@
+**TDD Implementation Planning Pattern (2026-02-13):**
+
+- Pattern: When synthesizing 8+ input reports into a TDD plan, read all reports in parallel first, then run targeted codebase searches to validate current state before writing the plan
+- Evidence: 8 reports (PM, researcher, architect, security, code-simplifier, impl-patterns, nodejs-pro, pentest) synthesized into 18-step plan across 5 phases
+- Key: Each TDD step must have RED (failing test with exact assertions) -> GREEN (minimal implementation code) -> REFACTOR -> COMMIT (conventional format)
+- Dependency graph matters: nodejs-pro validated execution order; duplicate removal (Step 9) MUST precede module split (Step 12)
+- Re-export pattern (`module.exports = { ...require('./guards/guard-core.cjs'), ... }`) is CJS-safe and preserves backward test compatibility during module splits
+- Commit checkpoints: Insert after Phase 2 and Phase 3 for multi-file projects (40+ files)
+- Start lint rules at `warn` level when existing violations exist, escalate to `error` after migration complete
+
+**Tri-Audit Learnings (2026-02-13):**
+
+- Test pass rate (99.3%) can mask critical coverage gaps (routing logic, loop detection untested). Use audit findings as proxy for coverage validation.
+- Memory file budget crisis: decisions.md (74KB) and issues.md (62KB) 3-4x over budget; rotator tool exists but unused. Immediate rotation required to recover 136KB from spawn prompts.
+- Schema sprawl (111/133 unreferenced) indicates either aspirational validation or documentation-only intent. Triage into enforced vs archived categories for clarity.
+- 10 active hooks unregistered in settings.json; verify bash-command-validator, shell-injection-validator, windows-null-sanitizer are wired through alternative mechanism.
+- Environment variable documentation gap (262/282 undocumented) reduces discoverability. Minimum 80 enforcement-mode variables should be catalogued in .env.example.
+
+---
+
+**Audit Batch Reflection (2026-02-13):**
+
+**Tri-Audit Convergence Pattern:**
+
+- Pattern: When 3+ independent audits identify same issue, it's systemic (P0 priority)
+- Evidence: Oversized modules flagged by security (79KB routing-guard), architecture (107KB skill-creator, 23 circular deps), code review (646 console bypass)
+- Why: Independent discovery = not one agent's opinion but framework-wide problem
+- Action: Elevate to P0, schedule immediate remediation
+- Example: routing-guard.cjs (79KB) and skill-creator (107KB) both violate SRP
+
+**Defensive Programming Trilogy:**
+
+- Layers: Process hiding (`windowsHide: true`) + command validation (`SAFE_COMMANDS_ALLOWLIST`) + existence guards
+- Why: Each layer independently valuable, together = comprehensive defense
+- Application: Apply all 3 when hardening subprocess execution
+- Evidence: 18 files with windowsHide, 80+ allowlisted commands, 3 hooks with existence guards
+- Cross-platform: windowsHide is no-op on Unix (safe everywhere)
+
+**Progressive Quality Gates:**
+
+- Sequence: Tests (blocking) → Lint (blocking) → Format (blocking)
+- Why: Incremental enforcement prevents quality regression
+- Evidence: 99.3% test pass rate + 0 lint errors + 0 format changes = deployment-ready
+- Pattern: Add gates progressively, each as **blocking** (not optional)
+- Enforcement: testing.md now mandates `pnpm lint:fix` + `pnpm format` before completion
+
+**Integration Queue Hygiene:**
+
+- Pattern: Append-only queues require staleness validation to prevent bloat
+- Why: Old entries persist even after artifact integration, wasting processing time
+- Solution: Add Step 0 (Validate Queue) to artifact-integrator — cross-check catalog/registry
+- Evidence: Stale ripgrep entry found (already catalogued but queue entry persisted)
+- Application: All append-only operational queues (integration-queue.jsonl, reflection-spawn-request.json)
+
+**Reflection Queue Metadata Completeness:**
+
+- Pattern: Reflection queue is append-only audit trail — missing metadata = lost history
+- Critical fields: taskId, summary, timestamp (minimum required for audit reconstruction)
+- Evidence: Task #3/4 entries missing summary → cannot extract learnings
+- Fix: Add validation hook rejecting queue entries without minimum metadata
+- Why critical: Reflection depends on metadata to understand what was accomplished
+
 **Windows windowsHide Compliance (2026-02-13):**
 
 - Pattern: Added `windowsHide: true` to 3 spawn calls missing it
@@ -152,3 +214,43 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - All 5 new ADRs (114-116, 113, 112) added to decisions.md
 
 **Report**: `.claude/context/reports/docs-update-2026-02-13.md`
+
+---
+
+## P0/P1 Remediation Research (2026-02-13)
+
+**5-topic security research completed within query budget (5 WebSearch queries):**
+
+1. **OWASP ASI06 Memory Poisoning Prevention**
+   - Pattern: Validate, isolate, expire, audit memory writes
+   - Implementation: MemorySanitizer class with forbidden pattern detection
+   - Priority: P0 (prevents permanent agent corruption)
+
+2. **OWASP ASI01 Prompt Injection Detection**
+   - Tools: Rebuff, LLM Guard, Vigil for ML-based detection
+   - Pattern: Multi-layer defense (input validation, AI detection, output filtering)
+   - Priority: P1 (prevents system prompt leakage)
+
+3. **Dependency Injection in Node.js CommonJS**
+   - Tool: Awilix (battle-tested, no TypeScript required)
+   - Alternative: Manual DI for explicit control
+   - Priority: P1 (breaks circular dependencies, improves testing)
+
+4. **File-Based Locking for Concurrent Writes**
+   - Tool: proper-lockfile (atomic mkdir strategy)
+   - Pattern: Acquire lock, update mtime, release after write
+   - Priority: P0 (prevents race conditions, data corruption)
+
+5. **Console-to-Structured-Logger Migration**
+   - Tool: Pino (5x faster than Winston)
+   - Pattern: console.log → logger.info with context objects
+   - Priority: P1 (improves observability, performance)
+
+**Research efficiency:**
+
+- Query budget: 5 (exactly on target)
+- Report size: 9.5 KB (within <10 KB limit)
+- Sources: 11 high-credibility (OWASP, npm, Better Stack)
+- Timeline: P0 (week 1), P1 (weeks 2-3), P2 (week 4+)
+
+**Memory update rule**: Research reports with <10 KB constraint force prioritization and concise synthesis.

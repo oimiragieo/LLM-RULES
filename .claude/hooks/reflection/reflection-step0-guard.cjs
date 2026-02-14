@@ -179,6 +179,7 @@ function registerStep0Block(pendingCount) {
 function resolveEffectiveEnforcementMode(mode, repeatCount) {
   if (mode !== 'block') return mode;
   if (STEP0_LOOP_BREAKER_MODE === 'off') return mode;
+  if (STEP0_LOOP_BREAKER_MODE === 'block') return mode;
   if (repeatCount < STEP0_REPEAT_THRESHOLD) return mode;
   return 'warn';
 }

@@ -13,6 +13,7 @@ const {
   ensureReflectionReadTarget,
   ensureReportReadTarget,
   ensureTaskOutputReadTarget,
+  ensureIntegrationQueueReadTarget,
   createDirectoryListingFile,
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
 
@@ -22,6 +23,7 @@ describe('pre-tool-unified read safety', () => {
   const defaultDirListingPath = path.join(reflectionRuntimeDir, 'read-safety-dir-listing.txt');
   const reminderPath = path.join(reflectionRuntimeDir, 'reflection-reminder.txt');
   const spawnRequestPath = path.join(reflectionRuntimeDir, 'reflection-spawn-request.json');
+  const integrationQueuePath = path.join(reflectionRuntimeDir, 'integration-queue.jsonl');
 
   function withFileRestored(filePath, fn) {
     const existed = fs.existsSync(filePath);
@@ -75,6 +77,17 @@ describe('pre-tool-unified read safety', () => {
     const resolved = resolveReadPath({ file_path: '.claude/README.md' });
     assert.ok(path.isAbsolute(resolved));
     assert.ok(resolved.endsWith(path.join('.claude', 'README.md')));
+  });
+
+  test('resolveReadPath normalizes /c/ style absolute paths on Windows', () => {
+    const resolved = resolveReadPath({ file_path: '/c/dev/projects/agent-studio/.env.example' });
+    assert.ok(path.isAbsolute(resolved));
+    if (process.platform === 'win32') {
+      assert.match(resolved, /^[A-Z]:\\/);
+      assert.ok(resolved.toLowerCase().includes('agent-studio'));
+    } else {
+      assert.strictEqual(resolved, '/c/dev/projects/agent-studio/.env.example');
+    }
   });
 
   test('checkReadSafety blocks reading a directory', () => {
@@ -264,6 +277,31 @@ describe('pre-tool-unified read safety', () => {
       assert.strictEqual(fs.existsSync(taskPath), true);
       const content = fs.readFileSync(taskPath, 'utf8');
       assert.ok(content.includes('Missing Task Output Placeholder'));
+    });
+  });
+
+  test('ensureIntegrationQueueReadTarget creates optional integration queue file', () => {
+    withFileRestored(integrationQueuePath, () => {
+      fs.mkdirSync(reflectionRuntimeDir, { recursive: true });
+      if (fs.existsSync(integrationQueuePath)) fs.unlinkSync(integrationQueuePath);
+      const created = ensureIntegrationQueueReadTarget(integrationQueuePath);
+      assert.strictEqual(created, true);
+      assert.strictEqual(fs.existsSync(integrationQueuePath), true);
+      assert.strictEqual(fs.readFileSync(integrationQueuePath, 'utf8'), '');
+    });
+  });
+
+  test('checkReadSafety auto-heals missing integration queue path', () => {
+    withFileRestored(integrationQueuePath, () => {
+      fs.mkdirSync(reflectionRuntimeDir, { recursive: true });
+      if (fs.existsSync(integrationQueuePath)) fs.unlinkSync(integrationQueuePath);
+
+      const result = checkReadSafety('Read', {
+        file_path: '.claude/context/runtime/integration-queue.jsonl',
+      });
+
+      assert.strictEqual(result.action, 'allow');
+      assert.strictEqual(fs.existsSync(integrationQueuePath), true);
     });
   });
 

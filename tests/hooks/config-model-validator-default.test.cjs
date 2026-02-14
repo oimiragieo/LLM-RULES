@@ -21,7 +21,7 @@ test('checkConfigModelValidator defaults to block on model mismatch', () => {
 
     const result = routingGuard.checkConfigModelValidator('Task', {
       prompt: 'You are zzzunknown',
-      model: 'opus',
+      model: 'claude-opus-4-5-20251101',
     });
 
     assert.strictEqual(result.pass, false);
@@ -37,7 +37,7 @@ test('checkConfigModelValidator warns when explicitly configured to warn', () =>
 
     const result = routingGuard.checkConfigModelValidator('Task', {
       prompt: 'You are zzzunknown',
-      model: 'opus',
+      model: 'claude-opus-4-5-20251101',
     });
 
     assert.strictEqual(result.pass, true);
@@ -47,18 +47,14 @@ test('checkConfigModelValidator warns when explicitly configured to warn', () =>
   }
 });
 
-test('checkConfigModelValidator downgrades to warn in bypassPermissions mode', () => {
+test('checkConfigModelValidator allows shorthand aliases with warning for autocorrect', () => {
   try {
-    delete process.env.CONFIG_MODEL_VALIDATOR; // default is block
+    delete process.env.CONFIG_MODEL_VALIDATOR;
 
-    const result = routingGuard.checkConfigModelValidator(
-      'Task',
-      {
-        prompt: 'You are zzzunknown',
-        model: 'opus',
-      },
-      { permission_mode: 'bypassPermissions' }
-    );
+    const result = routingGuard.checkConfigModelValidator('Task', {
+      prompt: 'You are zzzunknown',
+      model: 'opus',
+    });
 
     assert.strictEqual(result.pass, true);
     assert.strictEqual(result.result, 'warn');

@@ -2,7 +2,7 @@
 /**
  * Tests for routing-guard.cjs Check 7 (specialist-override)
  *
- * Tests the specialist routing enforcement that warns when 'developer'
+ * Tests the specialist routing enforcement that blocks when 'developer'
  * is spawned for tasks that match specialist agent keywords.
  */
 
@@ -40,7 +40,7 @@ describe('Check 7: Specialist Override', () => {
     routingGuard.invalidateCachedState();
   });
 
-  it('should warn when developer spawn contains documentation keywords', () => {
+  it('should block when developer spawn contains documentation keywords (default)', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are the developer. Update the README documentation.',
@@ -49,13 +49,13 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should return warn result');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should return block result');
     assert.ok(result.message, 'Should have warning message');
     assert.ok(result.message.includes('technical-writer'), 'Should suggest technical-writer');
   });
 
-  it('should warn when developer spawn contains test keywords', () => {
+  it('should block when developer spawn contains test keywords (default)', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are developer. Write tests for the authentication module.',
@@ -64,12 +64,12 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should return warn result');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should return block result');
     assert.ok(result.message.includes('qa'), 'Should suggest qa agent');
   });
 
-  it('should warn when developer spawn contains refactor keywords', () => {
+  it('should block when developer spawn contains refactor keywords (default)', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are the developer. Refactor the auth module to simplify it.',
@@ -78,8 +78,8 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should return warn result');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should return block result');
     assert.ok(result.message.includes('code-simplifier'), 'Should suggest code-simplifier');
   });
 
@@ -141,7 +141,7 @@ describe('Check 7: Specialist Override', () => {
     assert.ok(result.message.includes('technical-writer'), 'Should suggest specialist');
   });
 
-  it('should detect multiple specialist keywords and suggest first match', () => {
+  it('should detect multiple specialist keywords and block by default', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are developer. Refactor code and update docs.',
@@ -150,8 +150,8 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should warn');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should block');
     // Should suggest either code-simplifier or technical-writer (first match)
     assert.ok(
       result.message.includes('code-simplifier') || result.message.includes('technical-writer'),
@@ -159,7 +159,7 @@ describe('Check 7: Specialist Override', () => {
     );
   });
 
-  it('should check both prompt and description for keywords', () => {
+  it('should check both prompt and description for keywords and block by default', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are developer. Implement feature.',
@@ -168,8 +168,8 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should warn');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should block');
     assert.ok(result.message.includes('qa'), 'Should suggest qa from description');
   });
 
@@ -247,7 +247,7 @@ describe('Check 7: Specialist Override', () => {
 
   // TRUE POSITIVE TESTS - These SHOULD trigger warnings
 
-  it('developer spawn with "write documentation" should warn (true positive)', () => {
+  it('developer spawn with "write documentation" should block (true positive)', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are developer. Write documentation for the new endpoints.',
@@ -256,12 +256,12 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should warn for documentation task');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should block for documentation task');
     assert.ok(result.message.includes('technical-writer'), 'Should suggest technical-writer');
   });
 
-  it('developer spawn with "deploy to production" should warn (true positive)', () => {
+  it('developer spawn with "deploy to production" should block (true positive)', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are developer. Deploy to production environment.',
@@ -270,12 +270,12 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should warn for deployment task');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should block for deployment task');
     assert.ok(result.message.includes('devops'), 'Should suggest devops');
   });
 
-  it('developer spawn with "database migration" should warn (true positive)', () => {
+  it('developer spawn with "database migration" should block (true positive)', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are developer. Create database migration for new schema.',
@@ -284,12 +284,12 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should warn for migration task');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should block for migration task');
     assert.ok(result.message.includes('database-architect'), 'Should suggest database-architect');
   });
 
-  it('developer spawn with "run tests" should warn (true positive)', () => {
+  it('developer spawn with "run tests" should block (true positive)', () => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'You are developer. Run tests and analyze coverage.',
@@ -298,8 +298,8 @@ describe('Check 7: Specialist Override', () => {
 
     const result = routingGuard.checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should allow (warn mode)');
-    assert.strictEqual(result.result, 'warn', 'Should warn for test execution task');
+    assert.strictEqual(result.pass, false, 'Should block by default');
+    assert.strictEqual(result.result, 'block', 'Should block for test execution task');
     assert.ok(result.message.includes('qa'), 'Should suggest qa');
   });
 });

@@ -225,40 +225,40 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
     }
   });
 
-  it('should warn when Glob used in router mode without TaskList first (default warn)', () => {
+  it('should block when Glob used in router mode without TaskList first (default block)', () => {
     assert.ok(routingGuard, 'Module should be loadable');
     assert.ok(
       typeof routingGuard.checkTaskListFirstGate === 'function',
       'checkTaskListFirstGate should be exported'
     );
 
-    // Default enforcement is warn
+    // Default enforcement is block
     delete process.env.TASKLIST_FIRST_ENFORCEMENT;
 
     const result = routingGuard.checkTaskListFirstGate('Glob');
-    assert.strictEqual(result.pass, true, 'Warn mode passes but with warning');
-    assert.strictEqual(result.result, 'warn');
+    assert.strictEqual(result.pass, false, 'Default block mode should block');
+    assert.strictEqual(result.result, 'block');
     assert.ok(result.message.includes('TASKLIST-FIRST'), 'Message should mention violation');
   });
 
-  it('should warn when Edit used in router mode without TaskList first', () => {
+  it('should block when Edit used in router mode without TaskList first', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     delete process.env.TASKLIST_FIRST_ENFORCEMENT;
 
     const result = routingGuard.checkTaskListFirstGate('Edit');
-    assert.strictEqual(result.pass, true, 'Warn mode passes');
-    assert.strictEqual(result.result, 'warn');
+    assert.strictEqual(result.pass, false, 'Default block mode should block');
+    assert.strictEqual(result.result, 'block');
   });
 
-  it('should warn when Bash used in router mode without TaskList first', () => {
+  it('should block when Bash used in router mode without TaskList first', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     delete process.env.TASKLIST_FIRST_ENFORCEMENT;
 
     const result = routingGuard.checkTaskListFirstGate('Bash');
-    assert.strictEqual(result.pass, true, 'Warn mode passes');
-    assert.strictEqual(result.result, 'warn');
+    assert.strictEqual(result.pass, false, 'Default block mode should block');
+    assert.strictEqual(result.result, 'block');
   });
 
   it('should pass when taskListCalledSincePrompt is true', () => {
@@ -288,14 +288,14 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
     assert.strictEqual(result.pass, true, 'Should pass in agent mode');
   });
 
-  it('should warn for Task tool when taskListCalledSincePrompt is false', () => {
+  it('should block for Task tool when taskListCalledSincePrompt is false', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     delete process.env.TASKLIST_FIRST_ENFORCEMENT;
 
     const result = routingGuard.checkTaskListFirstGate('Task');
-    assert.strictEqual(result.pass, true, 'Warn mode passes');
-    assert.strictEqual(result.result, 'warn');
+    assert.strictEqual(result.pass, false, 'Default block mode should block');
+    assert.strictEqual(result.result, 'block');
   });
 
   it('should always pass when TASKLIST_FIRST_ENFORCEMENT=off', () => {

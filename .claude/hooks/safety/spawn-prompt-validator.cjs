@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines */
 /**
  * Spawn Prompt Validator Hook
  * ===========================
@@ -262,6 +263,24 @@ const LOOP_BREAKER_STATE_PATH = path.join(
 const LOOP_BREAKER_THRESHOLD = Number(process.env.SPAWN_PROMPT_LOOP_BREAKER_THRESHOLD || 3);
 const LOOP_BREAKER_WINDOW_MS = Number(process.env.SPAWN_PROMPT_LOOP_BREAKER_WINDOW_MS || 120000);
 const LOOP_BREAKER_MAX_ENTRIES = Number(process.env.SPAWN_PROMPT_LOOP_BREAKER_MAX_ENTRIES || 500);
+const INVALID_SUBAGENT_TYPES = new Set([
+  'bash',
+  'read',
+  'write',
+  'edit',
+  'multiedit',
+  'glob',
+  'grep',
+  'websearch',
+  'webfetch',
+  'task',
+  'tasklist',
+  'taskget',
+  'taskupdate',
+  'taskcreate',
+  'taskoutput',
+  'skill',
+]);
 
 function readLoopBreakerState(statePath = LOOP_BREAKER_STATE_PATH) {
   try {
@@ -362,7 +381,10 @@ function buildRequiredPrefixFragment(taskId, description) {
 +======================================================================+
 |  Your Task ID: ${taskIdValue}                                                   |
 |                                                                      |
-|  BEFORE doing ANY work, run:                                         |
+|  PRE-FLIGHT (MANDATORY):                                             |
+|  TaskList();                                                         |
+|                                                                      |
+|  FIRST ACTION (MANDATORY):                                           |
 |  TaskUpdate({ taskId: "${taskIdValue}", status: "in_progress" });               |
 |                                                                      |
 |  AFTER completing work, run:                                         |
@@ -388,6 +410,12 @@ All file operations MUST use relative paths from PROJECT_ROOT.
 ## Your Assigned Task
 Task ID: ${taskIdValue}
 Subject: ${subject}`;
+}
+
+function isInvalidSubagentType(toolInput) {
+  const subagentType = (toolInput?.subagent_type || '').trim().toLowerCase();
+  if (!subagentType) return true;
+  return INVALID_SUBAGENT_TYPES.has(subagentType);
 }
 
 /**
@@ -841,6 +869,22 @@ function maybeExitForOrchestratorSpawn(toolInput, ensuredTask, startTime) {
   process.exit(0);
 }
 
+function maybeExitForInvalidSubagentType(toolInput, startTime) {
+  if (!isInvalidSubagentType(toolInput)) {
+    return false;
+  }
+
+  const value = toolInput?.subagent_type || '(missing)';
+  const message =
+    `[SPAWN-PROMPT-VALIDATOR] Invalid subagent_type "${value}". ` +
+    'Use a valid agent id (e.g., developer, qa, architect), not a tool name.';
+  console.log(formatResult('block', message));
+  emitRuntimeHealth('blocked_invalid_subagent_type', Date.now() - startTime, {
+    subagentType: value,
+  });
+  process.exit(2);
+}
+
 function maybeLogTaskIdInjection(hookInput, toolInput, ensuredTask) {
   if (!ensuredTask.modified) {
     return;
@@ -1014,6 +1058,7 @@ async function main() {
     maybeLogTaskIdInjection(hookInput, toolInput, ensuredTask);
 
     maybeExitForOrchestratorSpawn(toolInput, ensuredTask, startTime);
+    maybeExitForInvalidSubagentType(toolInput, startTime);
 
     const initialValidation = validatePrompt(prompt);
     const { effectiveToolInput, validation } = runPromptNormalizationPipeline(
@@ -1119,6 +1164,7 @@ module.exports = {
   safeRegexTest,
   isOrchestratorSpawn,
   isTemplateBasedSpawn,
+  isInvalidSubagentType,
   calculatePromptCompactness,
   readLoopBreakerState,
   writeLoopBreakerState,

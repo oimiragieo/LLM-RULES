@@ -85,6 +85,12 @@ export default [
       'max-depth': ['warn', 4],
       'max-nested-callbacks': ['warn', 4],
 
+      // Module Size Budget (ADR-121)
+      // Set to 'warn' initially because routing-guard.cjs (2,473 lines) and
+      // create.cjs (3,677 lines) exceed the budget. Will escalate to 'error'
+      // after Phase 3 module splits complete.
+      'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }],
+
       // Node.js Specific
       'no-console': 'off', // CLI tools need console
     },

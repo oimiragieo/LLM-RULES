@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 const { describe, test } = require('node:test');
 const assert = require('node:assert');
 const {
@@ -12,6 +13,7 @@ const {
   safeRegexTest,
   isOrchestratorSpawn,
   isTemplateBasedSpawn,
+  isInvalidSubagentType,
   calculatePromptCompactness,
   registerSpawnValidationFailure,
   clearSpawnValidationFailure,
@@ -22,6 +24,8 @@ const {
 } = require('../../.claude/hooks/safety/spawn-prompt-validator.cjs');
 const {
   generateRequiredPrefixFragment,
+  ensureMandatorySpawnPreflight,
+  isInvalidSubagentType: isAssemblerInvalidSubagentType,
   hasTaskIdReference,
   hasExplicitTaskId: assemblerHasExplicitTaskId,
 } = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
@@ -356,6 +360,31 @@ describe('buildRequiredPrefixFragment()', () => {
     assert.ok(prefix.includes('Task ID: 123'));
     assert.ok(prefix.includes('PROJECT_ROOT:'));
     assert.ok(prefix.includes('TASK TRACKING REQUIRED'));
+    assert.ok(prefix.includes('PRE-FLIGHT (MANDATORY)'));
+    assert.ok(prefix.includes('TaskList();'));
+    assert.ok(prefix.includes('FIRST ACTION (MANDATORY)'));
+  });
+});
+
+describe('spawn preflight enforcement helpers', () => {
+  test('assembler should inject mandatory preflight block when missing', () => {
+    const prompt = '## Task\nImplement the fix.';
+    const enriched = ensureMandatorySpawnPreflight(prompt, 'task-123');
+    assert.ok(enriched.includes('## Spawn Preflight (Mandatory)'));
+    assert.ok(enriched.includes('PRE-FLIGHT: TaskList()'));
+    assert.ok(
+      enriched.includes('FIRST ACTION: TaskUpdate({ taskId: "task-123", status: "in_progress" })')
+    );
+  });
+
+  test('validator should flag invalid subagent_type tool names', () => {
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'Bash' }), true);
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'developer' }), false);
+  });
+
+  test('assembler should flag invalid subagent_type tool names', () => {
+    assert.strictEqual(isAssemblerInvalidSubagentType('Bash'), true);
+    assert.strictEqual(isAssemblerInvalidSubagentType('qa'), false);
   });
 });
 

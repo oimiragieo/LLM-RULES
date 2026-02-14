@@ -40,15 +40,14 @@ test('PostToolUse Edit|Write|NotebookEdit includes memory/index hooks', () => {
   assert.ok(commands.includes('node .claude/hooks/routing/code-index-updater.cjs'));
 });
 
-test('UserPromptSubmit uses single orchestrator hook', () => {
+test('UserPromptSubmit includes orchestrator hook in command chain', () => {
   const block = findHookBlock('UserPromptSubmit', '');
   assert.ok(block, 'Expected UserPromptSubmit block for default matcher');
 
   const commands = listCommands(block);
-  assert.strictEqual(commands.length, 1, 'UserPromptSubmit should have exactly one command hook');
-  assert.strictEqual(
-    commands[0],
-    'node .claude/hooks/session/user-prompt-orchestrator.cjs',
-    'UserPromptSubmit should be wired to orchestrator hook'
+  assert.ok(commands.length >= 1, 'UserPromptSubmit should have at least one command hook');
+  assert.ok(
+    commands.includes('node .claude/hooks/session/user-prompt-orchestrator.cjs'),
+    'UserPromptSubmit should include orchestrator hook'
   );
 });

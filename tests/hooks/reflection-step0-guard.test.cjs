@@ -54,6 +54,18 @@ test('resolveEffectiveEnforcementMode keeps block before repeat threshold', () =
   }
 });
 
+test('resolveEffectiveEnforcementMode defaults loop-breaker to warn', () => {
+  const { guard, restore } = loadGuardWithEnv({
+    REFLECTION_STEP0_REPEAT_THRESHOLD: '2',
+    REFLECTION_STEP0_LOOP_BREAKER_MODE: null,
+  });
+  try {
+    assert.equal(guard.resolveEffectiveEnforcementMode('block', 2), 'warn');
+  } finally {
+    restore();
+  }
+});
+
 test('resolveEffectiveEnforcementMode degrades repeated block to warn', () => {
   const { guard, restore } = loadGuardWithEnv({
     REFLECTION_STEP0_REPEAT_THRESHOLD: '2',

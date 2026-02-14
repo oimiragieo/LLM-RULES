@@ -262,7 +262,9 @@ describe('loop-state-manager', () => {
       const state = getState(tempStateFile);
       // After resetState, there may be default history entries from the schema
       // Check that no invalid actions were added
-      const hasNullAction = state.actionHistory.some(h => h.action === null || h.action === '' || h.action === undefined);
+      const hasNullAction = state.actionHistory.some(
+        h => h.action === null || h.action === '' || h.action === undefined
+      );
       assert.strictEqual(hasNullAction, false);
     });
 

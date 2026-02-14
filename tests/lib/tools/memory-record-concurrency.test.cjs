@@ -13,6 +13,7 @@ function readJson(filePath) {
 function runCliRecord({ type, text, projectRoot }) {
   const cliPath = path.join(process.cwd(), '.claude', 'tools', 'cli', 'memory-record.cjs');
   return new Promise((resolve, reject) => {
+    const timeoutMs = Number(process.env.MEMORY_RECORD_CLI_TIMEOUT_MS || 20000);
     const child = spawn(
       process.execPath,
       [cliPath, '--type', type, '--text', text, '--project-root', projectRoot],
@@ -22,6 +23,8 @@ function runCliRecord({ type, text, projectRoot }) {
           ...process.env,
           MEMORY_AUTO_SYNC: 'off',
           MEMORY_EMBED_ON_WRITE: 'off',
+          MEMORY_FILE_LOCK_WAIT_MS: '10',
+          MEMORY_FILE_LOCK_TIMEOUT_MS: '5000',
         },
         stdio: ['ignore', 'pipe', 'pipe'],
       }
@@ -29,6 +32,17 @@ function runCliRecord({ type, text, projectRoot }) {
 
     let stdout = '';
     let stderr = '';
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      try {
+        child.kill('SIGKILL');
+      } catch (_err) {
+        // Best-effort cleanup.
+      }
+      settled = true;
+      reject(new Error(`memory-record timed out after ${timeoutMs}ms (${type}): ${text}`));
+    }, timeoutMs);
     child.stdout.on('data', data => {
       stdout += String(data);
     });
@@ -36,8 +50,16 @@ function runCliRecord({ type, text, projectRoot }) {
       stderr += String(data);
     });
 
-    child.on('error', reject);
+    child.on('error', err => {
+      clearTimeout(timer);
+      if (settled) return;
+      settled = true;
+      reject(err);
+    });
     child.on('close', code => {
+      clearTimeout(timer);
+      if (settled) return;
+      settled = true;
       if (code !== 0) {
         reject(new Error(`memory-record exited ${code}: ${stderr || stdout}`));
         return;
@@ -47,7 +69,7 @@ function runCliRecord({ type, text, projectRoot }) {
   });
 }
 
-test('memory-record concurrent gotcha writes do not lose entries', async t => {
+test('memory-record concurrent gotcha writes do not lose entries', { timeout: 60000 }, async t => {
   const baseTmp = path.join(process.cwd(), '.tmp');
   fs.mkdirSync(baseTmp, { recursive: true });
   const tmpRoot = fs.mkdtempSync(path.join(baseTmp, 'memory-record-concurrency-'));
@@ -81,7 +103,7 @@ test('memory-record concurrent gotcha writes do not lose entries', async t => {
   }
 });
 
-test('memory-record concurrent pattern writes do not lose entries', async t => {
+test('memory-record concurrent pattern writes do not lose entries', { timeout: 60000 }, async t => {
   const baseTmp = path.join(process.cwd(), '.tmp');
   fs.mkdirSync(baseTmp, { recursive: true });
   const tmpRoot = fs.mkdtempSync(path.join(baseTmp, 'memory-record-concurrency-'));

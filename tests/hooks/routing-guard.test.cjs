@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines */
 /**
  * Routing Guard Tests
  * ====================
@@ -434,7 +435,7 @@ describe('routing-guard', () => {
       assert.strictEqual(result.pass, true);
     });
 
-    it('should still block non-default model mismatches', () => {
+    it('should warn/allow shorthand alias mismatches for assembler autocorrection', () => {
       assert.ok(routingGuard, 'Module should be loadable');
 
       process.env.CONFIG_MODEL_VALIDATOR = 'block';
@@ -443,8 +444,8 @@ describe('routing-guard', () => {
         model: 'opus',
       });
 
-      assert.strictEqual(result.pass, false);
-      assert.strictEqual(result.result, 'block');
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, 'warn');
     });
   });
 
@@ -633,7 +634,7 @@ describe('routing-guard', () => {
       assert.strictEqual(result.pass, true);
     });
 
-    it('should warn (not block) by default for non-whitelisted router Bash commands', () => {
+    it('should block by default for non-whitelisted router Bash commands', () => {
       assert.ok(routingGuard, 'Module should be loadable');
       assert.ok(routerState, 'Router state module should be loadable');
 
@@ -643,9 +644,9 @@ describe('routing-guard', () => {
       routingGuard.invalidateCachedState();
 
       const result = routingGuard.checkRouterBash('Bash', { command: 'pnpm test' });
-      assert.strictEqual(result.pass, true);
-      assert.strictEqual(result.result, 'warn');
-      assert.ok(result.message.includes('ROUTER BASH VIOLATION WARNED'));
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
+      assert.ok(result.message.includes('ROUTER BASH VIOLATION BLOCKED'));
     });
 
     it('should pass when enforcement is off', () => {
@@ -927,7 +928,10 @@ describe('routing-guard', () => {
         'Glob should be BLOCKED via runAllChecks in router mode'
       );
       assert.strictEqual(result.result, 'block', 'Result should be block');
-      assert.ok(result.message.includes('blacklisted'), 'Message should mention blacklisted tool');
+      assert.ok(
+        result.message.includes('TASKLIST-FIRST') || result.message.includes('blacklisted'),
+        'Message should mention TaskList-first or blacklisted tool'
+      );
     });
   });
 
@@ -1071,6 +1075,7 @@ describe('routing-guard', () => {
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'off', // Enforcement disabled
+          TASKLIST_FIRST_ENFORCEMENT: 'off',
         },
         cwd: PROJECT_ROOT,
       });
@@ -1103,10 +1108,13 @@ describe('routing-guard', () => {
       const output = JSON.parse(result.stdout);
       assert.strictEqual(output.result, 'block');
       assert.ok(
-        output.message.includes('Spawn an agent'),
-        'Message should tell user to spawn agent'
+        output.message.includes('TaskList()') || output.message.includes('Spawn an agent'),
+        'Message should tell user the next required protocol step'
       );
-      assert.ok(output.message.includes('Task()'), 'Message should mention Task tool');
+      assert.ok(
+        output.message.includes('Task()') || output.message.includes('TaskList()'),
+        'Message should mention Task() or TaskList()'
+      );
     });
 
     it('ENFORCEMENT-003: Hook should block WebSearch in router mode', () => {

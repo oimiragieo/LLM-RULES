@@ -351,10 +351,7 @@ describe('metrics-reader', () => {
         { event: 'spawn_end', success: false },
       ];
 
-      const tokenRows = [
-        { output_tokens_est: 100 },
-        { output_tokens_est: 200 },
-      ];
+      const tokenRows = [{ output_tokens_est: 100 }, { output_tokens_est: 200 }];
 
       const churnRows = [
         { event: 'router_guard_decision', result: 'allow' },
