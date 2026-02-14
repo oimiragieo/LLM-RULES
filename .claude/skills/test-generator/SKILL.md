@@ -240,7 +240,7 @@ describe('User Authentication Flow', () => {
 
 ```bash
 # Generate tests for a file
-node .claude/tools/test-generator/generate.mjs src/components/UserProfile.tsx
+node .claude/skills/test-generator/scripts/main.cjs src/components/UserProfile.tsx
 
 # The tool will analyze the file and generate appropriate tests
 ```

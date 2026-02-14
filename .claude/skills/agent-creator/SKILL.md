@@ -939,7 +939,7 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 
 4. NO SKILLS THAT DON'T EXIST
    - Every skill in skills: array must exist at .claude/skills/<skill>/SKILL.md
-   - Run: node .claude/tools/validate-agents.mjs to catch broken pointers
+   - Run: node .claude/tools/cli/validate-agents.mjs to catch broken pointers
 
 5. NO AGENT WITHOUT MEMORY PROTOCOL
    - Every agent MUST have Memory Protocol section in body
@@ -1058,7 +1058,7 @@ grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: Not in routing table!"
 grep "<agent-name>" .claude/agents/core/router.md || echo "ERROR: Not in router!"
 
 # Full validation
-node .claude/tools/validate-agents.mjs
+node .claude/tools/cli/validate-agents.mjs
 ```
 
 ### Validation Checklist (Run After Every Creation) - BLOCKING
@@ -1070,7 +1070,7 @@ node .claude/tools/validate-agents.mjs
 [ -f ".claude/context/artifacts/research-reports/agent-keywords-<agent-name>.md" ] || echo "ERROR: Keyword research report missing - AGENT CREATION INCOMPLETE"
 
 # Validate the new agent
-node .claude/tools/validate-agents.mjs 2>&1 | grep "<agent-name>"
+node .claude/tools/cli/validate-agents.mjs 2>&1 | grep "<agent-name>"
 
 # Verify skills exist
 for skill in $(grep -A10 "^skills:" .claude/agents/<category>/<agent>.md | grep "  - " | sed 's/  - //'); do

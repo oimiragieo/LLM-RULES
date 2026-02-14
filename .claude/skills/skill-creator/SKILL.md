@@ -1403,7 +1403,7 @@ grep -i "<capability-keyword>" .claude/agents/core/router.md || echo "NEEDS ROUT
 ls .claude/workflows/*<keyword>* 2>/dev/null || echo "MAY NEED WORKFLOW"
 
 # Verify all system changes
-node .claude/tools/validate-agents.mjs
+node .claude/tools/cli/validate-agents.mjs
 node .claude/skills/skill-creator/scripts/validate-all.cjs
 ```
 

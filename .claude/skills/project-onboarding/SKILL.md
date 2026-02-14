@@ -307,7 +307,7 @@ Output a concise summary:
 **Framework**: Claude Code + Custom agents
 
 **Quick Commands**:
-- Validate: `node .claude/tools/validate-agents.mjs`
+- Validate: `node .claude/tools/cli/validate-agents.mjs`
 - Test hooks: `node .claude/hooks/routing/router-enforcer.cjs` (uses `.claude/lib/routing/routing-table.cjs`)
 
 **Key Locations**:
