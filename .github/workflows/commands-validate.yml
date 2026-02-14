@@ -41,5 +41,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Enforce ecosystem gate
+        run: pnpm skills:ecosystem:gate
+
       - name: Validate commands
         run: npm run validate:commands

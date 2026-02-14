@@ -48,6 +48,9 @@ jobs:
             echo "No skill-build TypeScript project found, skipping tsc check"
           fi
 
+      - name: Enforce ecosystem gate
+        run: pnpm skills:ecosystem:gate
+
       - name: Validate rule structure
         run: npm run skills:validate
         continue-on-error: false
