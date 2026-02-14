@@ -225,7 +225,7 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
     }
   });
 
-  it('should block when Glob used in router mode without TaskList first (default block)', () => {
+  it('should auto-reroute when Glob used in router mode without TaskList first (default block)', () => {
     assert.ok(routingGuard, 'Module should be loadable');
     assert.ok(
       typeof routingGuard.checkTaskListFirstGate === 'function',
@@ -236,9 +236,9 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
     delete process.env.TASKLIST_FIRST_ENFORCEMENT;
 
     const result = routingGuard.checkTaskListFirstGate('Glob');
-    assert.strictEqual(result.pass, false, 'Default block mode should block');
-    assert.strictEqual(result.result, 'block');
-    assert.ok(result.message.includes('TASKLIST-FIRST'), 'Message should mention violation');
+    assert.strictEqual(result.pass, true, 'Glob should fail-open with auto-reroute');
+    assert.strictEqual(result.result, 'warn');
+    assert.ok(result.message.includes('TASKLIST-FIRST AUTO-REROUTE'));
   });
 
   it('should block when Edit used in router mode without TaskList first', () => {
@@ -318,14 +318,14 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
     assert.strictEqual(result.result, 'warn');
   });
 
-  it('should return block result when TASKLIST_FIRST_ENFORCEMENT=block', () => {
+  it('should return warn auto-reroute for Glob when TASKLIST_FIRST_ENFORCEMENT=block', () => {
     assert.ok(routingGuard, 'Module should be loadable');
 
     process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
 
     const result = routingGuard.checkTaskListFirstGate('Glob');
-    assert.strictEqual(result.pass, false, 'Block mode blocks');
-    assert.strictEqual(result.result, 'block');
-    assert.ok(result.message.includes('TASKLIST-FIRST'), 'Message should mention violation');
+    assert.strictEqual(result.pass, true, 'Glob should auto-reroute in block mode');
+    assert.strictEqual(result.result, 'warn');
+    assert.ok(result.message.includes('TASKLIST-FIRST AUTO-REROUTE'));
   });
 });

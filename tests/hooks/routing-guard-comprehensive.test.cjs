@@ -215,6 +215,29 @@ describe('routing-guard.cjs - Check 1: Router Self-Check (Blacklisted Tools)', (
     assert.match(second.message, /Repeated block \(2x\)/);
     assert.match(second.message, /Do not retry the same tool call/);
   });
+
+  it('should dedupe self-check using hookInput.session_id when env session is absent', () => {
+    process.env.ROUTER_SELF_CHECK = 'block';
+    process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
+    process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
+    delete process.env.CLAUDE_SESSION_ID;
+
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(stateFile, JSON.stringify({ mode: 'router', taskSpawned: false }));
+
+    const first = routingGuard.checkRouterSelfCheck('Glob', {}, { session_id: 'hook-session-selfcheck' });
+    assert.equal(first.pass, false);
+    assert.equal(first.result, 'block');
+    assert.match(first.message, /ROUTER SELF-CHECK VIOLATION/);
+    assert.equal(/Repeated block/.test(first.message), false);
+
+    const second = routingGuard.checkRouterSelfCheck('Glob', {}, { session_id: 'hook-session-selfcheck' });
+    assert.equal(second.pass, false);
+    assert.equal(second.result, 'block');
+    assert.match(second.message, /Repeated block \(2x\)/);
+    assert.match(second.message, /Do not retry the same tool call/);
+  });
 });
 
 describe('routing-guard.cjs - Check 2: Planner-First Enforcement', () => {
@@ -789,6 +812,39 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     assert.equal(second.pass, true);
     assert.equal(second.result, 'warn');
     assert.match(second.message || '', /INTENT-AGENT AUTO-REROUTE/);
+  });
+
+  it('should ignore injected memory/constitution sections when detecting intent', () => {
+    process.env.INTENT_AGENT_MATCH = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-reviewer',
+      description: 'Code quality audit',
+      prompt: `Run a broad code quality audit.\n\n## Agent Constitution\nGeneral principles.\n\n## Memory Context (Auto-Loaded)\nsecurity test assertion vulnerability auth token exploit\n`,
+    });
+    assert.equal(result.pass, true);
+  });
+
+  it('should allow bug-hunt audit routing override for code-reviewer', () => {
+    process.env.INTENT_AGENT_ENFORCEMENT = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-reviewer',
+      description: 'Code quality bug hunt',
+      prompt: 'Search the codebase for security issues and bugs, and write an audit report.',
+    });
+
+    assert.equal(result.pass, true);
+  });
+
+  it('should allow code-review override even when test/coverage keywords are present', () => {
+    process.env.INTENT_AGENT_ENFORCEMENT = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-reviewer',
+      description: 'Code review for bugs and issues',
+      prompt:
+        'Search for bugs and issues, include test coverage and assertion quality findings in the report.',
+    });
+
+    assert.equal(result.pass, true);
   });
 });
 

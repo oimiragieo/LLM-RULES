@@ -1456,6 +1456,7 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
 
   // Router is using a tool without calling TaskList first
   const dedupe = registerBlockAttempt('tasklist-first-gate', toolName, hookInput);
+  const isReadOnlyDiscoveryTool = toolName === 'Glob' || toolName === 'Grep';
   const message = dedupe.dedupe
     ? compactFallbackMessage(
         'TASKLIST-FIRST VIOLATION',
@@ -1479,6 +1480,17 @@ Call TaskList() first to check existing tasks, then proceed with your operation.
   }
 
   if (enforcement === 'block') {
+    // Enterprise loop-prevention: for read-only discovery tools, immediately
+    // switch first miss to warn/auto-reroute instead of hard-blocking.
+    if (isReadOnlyDiscoveryTool) {
+      return {
+        pass: true,
+        result: 'warn',
+        message:
+          `[TASKLIST-FIRST AUTO-REROUTE] ${toolName} attempted before TaskList(). ` +
+          'Auto-reroute mode engaged. Call TaskList() now, then continue with exploration tools.',
+      };
+    }
     const autoReroute = getTaskListAutoRerouteConfig();
     if (
       shouldAutoReroute(enforcement, dedupe.count, autoReroute.threshold, autoReroute.enabledValue)
@@ -1702,6 +1714,27 @@ function detectIntent(text) {
   };
 }
 
+function getIntentSignalText(prompt, description = '') {
+  const promptText = String(prompt || '');
+  const cutoffMarkers = [
+    '\n## Agent Constitution',
+    '\n## Memory Context (Auto-Loaded)',
+    '\n## Dynamic behaviour rules',
+    '\n### Model (from config)',
+  ];
+
+  let trimmedPrompt = promptText;
+  for (const marker of cutoffMarkers) {
+    const idx = trimmedPrompt.indexOf(marker);
+    if (idx !== -1) {
+      trimmedPrompt = trimmedPrompt.slice(0, idx);
+      break;
+    }
+  }
+
+  return `${String(description || '')}\n${trimmedPrompt}`.trim();
+}
+
 /**
  * Check if the spawned agent type matches the detected intent
  * @param {string} subagentType - The agent being spawned
@@ -1726,17 +1759,22 @@ function isExplicitAuditRoutingOverride(subagentType, prompt, description = '') 
   if (!auditAgents.has(agent)) return false;
 
   const text = `${String(prompt || '')} ${String(description || '')}`.toLowerCase();
-  if (!text.includes('audit')) return false;
-
   // Common explicit audit intents used by router tasks.
   const explicitAuditSignals = [
     'code quality audit',
+    'code review',
     'test quality audit',
     'architecture audit',
     'structural audit',
     'bug-focused code audit',
+    'bug hunt',
+    'bugs and issues',
+    'review for bugs',
+    'codebase audit',
+    'issue sweep',
   ];
-  return explicitAuditSignals.some(signal => text.includes(signal));
+  const hasExplicitSignal = explicitAuditSignals.some(signal => text.includes(signal));
+  return text.includes('audit') || hasExplicitSignal;
 }
 
 /**
@@ -1764,8 +1802,9 @@ function checkIntentAgentMatch(toolName, toolInput = {}) {
   const prompt = toolInput.prompt || '';
   const description = toolInput.description || '';
 
-  // Detect intent signals in the prompt
-  const { detectedSignals, suggestedAgents } = detectIntent(prompt);
+  // Detect intent signals on task-specific text only (exclude injected memory/constitution sections).
+  const intentSignalText = getIntentSignalText(prompt, description);
+  const { detectedSignals, suggestedAgents } = detectIntent(intentSignalText);
 
   // Check if spawned agent matches detected intent
   if (!agentMatchesIntent(subagentType, suggestedAgents)) {
