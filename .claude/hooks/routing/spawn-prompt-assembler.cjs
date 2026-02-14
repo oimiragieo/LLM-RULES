@@ -818,11 +818,13 @@ function enforcePromptBudget(prompt) {
 }
 
 function emitSpawnRagTelemetry(assembledPrompt, memoryQuery) {
-  const enabled = String(process.env.RAG_AT_SPAWN || 'on')
-    .trim()
-    .toLowerCase() !== 'off';
+  const enabled =
+    String(process.env.RAG_AT_SPAWN || 'on')
+      .trim()
+      .toLowerCase() !== 'off';
   const sectionAdded =
-    typeof assembledPrompt === 'string' && assembledPrompt.includes('### Task-Relevant Memory (RAG)');
+    typeof assembledPrompt === 'string' &&
+    assembledPrompt.includes('### Task-Relevant Memory (RAG)');
   const queryLength = String(memoryQuery || '').trim().length;
   const payload = {
     enabled,
@@ -1839,6 +1841,7 @@ if (require.main === module) {
 
 module.exports = {
   looksAssembled,
+  emitSpawnRagTelemetry,
   appendSemanticMatches,
   appendQueryMemories,
   appendEntityGraph,

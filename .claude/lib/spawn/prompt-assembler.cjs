@@ -41,6 +41,7 @@ const MAX_MEMORY_SECTION_CHARS = 3500;
 const DEFAULT_RAG_AT_SPAWN_LIMIT = 5;
 const DEFAULT_RAG_AT_SPAWN_MAX_ITEMS = 5;
 const DEFAULT_RAG_AT_SPAWN_MAX_CHARS = 1800;
+const DEFAULT_RAG_AT_SPAWN_FALLBACK_THRESHOLD = 0.25;
 const DEFAULT_SKILL_SECTION_MODE = 'full';
 const DEFAULT_MEMORY_MODE = 'hybrid';
 const DEFAULT_SUMMARY_BLOCK_MAX_TOKENS = 400;
@@ -201,6 +202,8 @@ function getPositiveInt(value, fallback) {
 }
 
 function getNumericValue(value) {
+  if (value === undefined || value === null) return null;
+  if (typeof value === 'string' && value.trim().length === 0) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 }
@@ -588,6 +591,10 @@ async function queryMemoryForSpawn(memoryQuery, { ragLimit, ragThreshold, search
   );
   const thresholdFromOption = getNumericValue(ragThreshold);
   const thresholdFromEnv = getNumericValue(process.env.RAG_AT_SPAWN_THRESHOLD);
+  const adaptiveFallbackEnabled =
+    String(process.env.RAG_AT_SPAWN_ADAPTIVE_FALLBACK || 'on')
+      .trim()
+      .toLowerCase() !== 'off';
   const searchOptions = { limit };
   if (thresholdFromOption !== null) {
     searchOptions.threshold = thresholdFromOption;
@@ -602,8 +609,30 @@ async function queryMemoryForSpawn(memoryQuery, { ragLimit, ragThreshold, search
       searchFn = memoryManager?.searchMemory;
     }
     if (typeof searchFn !== 'function') return [];
-    const results = await searchFn(query, searchOptions);
-    return Array.isArray(results) ? results : [];
+    const initialResults = await searchFn(query, searchOptions);
+    const normalizedInitial = Array.isArray(initialResults) ? initialResults : [];
+    if (normalizedInitial.length > 0) return normalizedInitial;
+
+    const hasExplicitThreshold = thresholdFromOption !== null || thresholdFromEnv !== null;
+    if (!adaptiveFallbackEnabled || hasExplicitThreshold) {
+      return normalizedInitial;
+    }
+
+    const fallbackThreshold = getNumericValue(process.env.RAG_AT_SPAWN_FALLBACK_THRESHOLD);
+    const fallbackOptions = {
+      ...searchOptions,
+      threshold:
+        fallbackThreshold !== null ? fallbackThreshold : DEFAULT_RAG_AT_SPAWN_FALLBACK_THRESHOLD,
+    };
+    const fallbackResults = await searchFn(query, fallbackOptions);
+    const normalizedFallback = Array.isArray(fallbackResults) ? fallbackResults : [];
+    if (normalizedFallback.length > 0) {
+      logger.info('spawn_rag_adaptive_fallback_hit', {
+        fallback_threshold: fallbackOptions.threshold,
+        result_count: normalizedFallback.length,
+      });
+    }
+    return normalizedFallback;
   } catch (err) {
     logger.warn('spawn_rag_memory_search_failed', { error: err?.message });
     return [];
