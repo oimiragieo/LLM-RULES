@@ -232,7 +232,9 @@ async function main() {
 
     stderrLog('hook_start');
 
-    if (!hasPendingReflections()) {
+    // Use a stable snapshot and refresh once before blocking to avoid TOCTOU false blocks.
+    let requests = readSpawnRequests(SPAWN_REQUEST_PATH);
+    if (!Array.isArray(requests) || requests.length === 0) {
       // Clean stale reminder so we do not deadlock on "0 pending" conditions.
       clearReminderIfStale();
       stderrLog('hook_end', { status: 'no_pending' });
@@ -240,7 +242,6 @@ async function main() {
     }
 
     // Task 1.2: Auto-trim old reflections if count > MAX_PENDING_REFLECTIONS
-    let requests = readSpawnRequests(SPAWN_REQUEST_PATH);
     if (requests.length > MAX_PENDING_REFLECTIONS) {
       const trimmed = trimOldReflections(requests);
       try {
@@ -253,6 +254,14 @@ async function main() {
       } catch (err) {
         stderrLog('trim_failed', { error: err.message });
       }
+    }
+
+    // Refresh once right before enforcement; another process may have cleared queue.
+    requests = readSpawnRequests(SPAWN_REQUEST_PATH);
+    if (!Array.isArray(requests) || requests.length === 0) {
+      clearReminderIfStale();
+      stderrLog('hook_end', { status: 'no_pending_after_refresh' });
+      process.exit(0);
     }
 
     // Count pending requests for detailed message
