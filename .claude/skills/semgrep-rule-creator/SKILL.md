@@ -435,3 +435,42 @@ Read `.claude/context/memory/learnings.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## Ecosystem Alignment Contract (MANDATORY)
+
+This creator skill is part of a coordinated creator ecosystem. Any artifact created here must align with and validate against related creators:
+
+- `agent-creator` for ownership and execution paths
+- `skill-creator` for capability packaging and assignment
+- `tool-creator` for executable automation surfaces
+- `hook-creator` for enforcement and guardrails
+- `rule-creator` and `semgrep-rule-creator` for policy and static checks
+- `template-creator` for standardized scaffolds
+- `workflow-creator` for orchestration and phase gating
+- `command-creator` for user/operator command UX
+
+### Cross-Creator Handshake (Required)
+
+Before completion, verify all relevant handshakes:
+
+1. Artifact route exists in `.claude/CLAUDE.md` and related routing docs.
+2. Discovery/registry entries are updated (catalog/index/registry as applicable).
+3. Companion artifacts are created or explicitly waived with reason.
+4. `validate-integration.cjs` passes for the created artifact.
+5. Skill index is regenerated when skill metadata changes.
+
+### Research Gate (Exa First, arXiv Fallback)
+
+For new patterns, templates, or workflows, research is mandatory:
+
+1. Use Exa first for implementation and ecosystem patterns.
+2. If Exa is insufficient, use `WebFetch` plus arXiv references.
+3. Record decisions, constraints, and non-goals in artifact references/docs.
+4. Keep updates minimal and avoid overengineering.
+
+### Regression-Safe Delivery
+
+- Follow strict RED -> GREEN -> REFACTOR for behavior changes.
+- Run targeted tests for changed modules.
+- Run lint/format on changed files.
+- Keep commits scoped by concern (logic/docs/generated artifacts).
