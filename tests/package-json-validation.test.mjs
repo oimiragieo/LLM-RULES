@@ -91,3 +91,13 @@ test('validate:sync script should work on Windows without bash', () => {
     'validate:sync should use node for cross-platform compatibility'
   );
 });
+
+test('validate:full should include agent skill reference validation', () => {
+  const pkg = JSON.parse(readFileSync(join(PROJECT_ROOT, 'package.json'), 'utf-8'));
+  const fullScript = pkg.scripts['validate:full'] || '';
+
+  assert.ok(
+    fullScript.includes('pnpm validate:agent-skill-refs'),
+    'validate:full should run validate:agent-skill-refs to catch broken Skill() references'
+  );
+});
