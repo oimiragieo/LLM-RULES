@@ -56,6 +56,16 @@ const METRIC_EVENT_SCHEMAS = {
       phases: 'object',
     },
   },
+  spawn_rag: {
+    required: {
+      event: 'string',
+      timestamp: 'string',
+      task_id: 'nullable-string',
+      rag_enabled: 'boolean',
+      rag_section_added: 'boolean',
+      rag_memory_query_len: 'number',
+    },
+  },
   token_burn: {
     required: {
       event: 'string',

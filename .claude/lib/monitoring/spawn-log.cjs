@@ -109,6 +109,23 @@ function logMemoryFailure({ taskId, error, sessionId }) {
   });
 }
 
+function logSpawnRagMetric({
+  taskId,
+  sessionId,
+  ragEnabled,
+  ragSectionAdded,
+  ragMemoryQueryLen,
+}) {
+  append({
+    event: 'spawn_rag',
+    task_id: taskId || null,
+    session_id: sessionId || null,
+    rag_enabled: Boolean(ragEnabled),
+    rag_section_added: Boolean(ragSectionAdded),
+    rag_memory_query_len: Number.isFinite(ragMemoryQueryLen) ? ragMemoryQueryLen : 0,
+  });
+}
+
 function logSpawnAssemblyMetric({
   taskId,
   agentType,
@@ -118,6 +135,9 @@ function logSpawnAssemblyMetric({
   inputChars,
   outputChars,
   compactnessScore,
+  ragEnabled = null,
+  ragSectionAdded = null,
+  ragMemoryQueryLen = null,
 }) {
   appendToFile(SPAWN_ASSEMBLY_METRICS_PATH, {
     event: 'spawn_assembly',
@@ -129,6 +149,9 @@ function logSpawnAssemblyMetric({
     input_chars: Number.isFinite(inputChars) ? inputChars : null,
     output_chars: Number.isFinite(outputChars) ? outputChars : null,
     compactness_score: Number.isFinite(compactnessScore) ? compactnessScore : null,
+    rag_enabled: typeof ragEnabled === 'boolean' ? ragEnabled : null,
+    rag_section_added: typeof ragSectionAdded === 'boolean' ? ragSectionAdded : null,
+    rag_memory_query_len: Number.isFinite(ragMemoryQueryLen) ? ragMemoryQueryLen : null,
   });
 }
 
@@ -170,6 +193,7 @@ module.exports = {
   logSpawnStart,
   logSpawnEnd,
   logMemoryFailure,
+  logSpawnRagMetric,
   logSpawnAssemblyMetric,
   logTokenBurnMetric,
   estimateTokensFromChars,

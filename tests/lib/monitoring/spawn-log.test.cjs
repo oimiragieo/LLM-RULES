@@ -81,6 +81,9 @@ test('spawn-log appends entries and trims to max lines', () => {
       phases: { assemble_ms: 5.5 },
       inputChars: 100,
       outputChars: 140,
+      ragEnabled: true,
+      ragSectionAdded: false,
+      ragMemoryQueryLen: 87,
     });
     logTokenBurnMetric({
       taskId: 'task-1',
@@ -98,6 +101,9 @@ test('spawn-log appends entries and trims to max lines', () => {
     const assemblyRow = JSON.parse(assemblyLines[0]);
     assert.equal(assemblyRow.event, 'spawn_assembly');
     assert.equal(assemblyRow.total_ms, 12.345);
+    assert.equal(assemblyRow.rag_enabled, true);
+    assert.equal(assemblyRow.rag_section_added, false);
+    assert.equal(assemblyRow.rag_memory_query_len, 87);
 
     const tokenLines = fs.readFileSync(tokenPath, 'utf8').split('\n').filter(Boolean);
     assert.equal(tokenLines.length, 1);
@@ -113,6 +119,57 @@ test('spawn-log appends entries and trims to max lines', () => {
     }
     if (fs.existsSync(tokenPath)) {
       fs.unlinkSync(tokenPath);
+    }
+    if (prevMax === undefined) {
+      delete process.env.SPAWN_LOG_MAX_LINES;
+    } else {
+      process.env.SPAWN_LOG_MAX_LINES = prevMax;
+    }
+  }
+});
+
+test('spawn-log writes spawn_rag telemetry row', () => {
+  const projectRoot = getProjectRoot();
+  const logPath = getSpawnLogPath(projectRoot);
+  const prevMax = process.env.SPAWN_LOG_MAX_LINES;
+  process.env.SPAWN_LOG_MAX_LINES = '20';
+
+  const spawnLogPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '.claude',
+    'lib',
+    'monitoring',
+    'spawn-log.cjs'
+  );
+  delete require.cache[spawnLogPath];
+  const { logSpawnRagMetric } = require(spawnLogPath);
+
+  try {
+    if (fs.existsSync(logPath)) {
+      fs.unlinkSync(logPath);
+    }
+    logSpawnRagMetric({
+      taskId: 'task-rag-1',
+      sessionId: 'session-rag-1',
+      ragEnabled: true,
+      ragSectionAdded: false,
+      ragMemoryQueryLen: 128,
+    });
+
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+    assert.equal(lines.length, 1);
+    const row = JSON.parse(lines[0]);
+    assert.equal(row.event, 'spawn_rag');
+    assert.equal(row.task_id, 'task-rag-1');
+    assert.equal(row.rag_enabled, true);
+    assert.equal(row.rag_section_added, false);
+    assert.equal(row.rag_memory_query_len, 128);
+  } finally {
+    if (fs.existsSync(logPath)) {
+      fs.unlinkSync(logPath);
     }
     if (prevMax === undefined) {
       delete process.env.SPAWN_LOG_MAX_LINES;

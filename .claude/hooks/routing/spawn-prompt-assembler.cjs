@@ -502,10 +502,29 @@ function normalizeTaskIdReferences(prompt, taskId) {
   if (!normalizedTaskId) return prompt;
 
   return prompt
+    .replace(/(\*\*Task ID:\s*)([a-zA-Z0-9_-]{1,64})(\*\*)/gi, `$1${normalizedTaskId}$3`)
     .replace(/(\*\*Task ID\*\*:\s*)([a-zA-Z0-9_-]{1,64})/gi, `$1${normalizedTaskId}`)
     .replace(/(Task ID:\s*)([a-zA-Z0-9_-]{1,64})/gi, `$1${normalizedTaskId}`)
-    .replace(/(taskId\s*:\s*['"])([^'"]+)(['"])/gi, `$1${normalizedTaskId}$3`)
-    .replace(/(task_id\s*:\s*['"])([^'"]+)(['"])/gi, `$1${normalizedTaskId}$3`);
+    .replace(/(taskId\s*:\s*)(['"]?)([^'",}\s]+)(\2)/gi, (_match, prefix, quote) => {
+      const q = quote || '';
+      return `${prefix}${q}${normalizedTaskId}${q}`;
+    })
+    .replace(/(task_id\s*:\s*)(['"]?)([^'",}\s]+)(\2)/gi, (_match, prefix, quote) => {
+      const q = quote || '';
+      return `${prefix}${q}${normalizedTaskId}${q}`;
+    })
+    .replace(
+      /(Use\s+TaskUpdate\s+to\s+mark\s+task\s+)(?:id\s*)?(?:#\s*)?1(\s+as\s+in_progress\b)/gi,
+      `$1${normalizedTaskId}$2`
+    )
+    .replace(
+      /(Use\s+TaskUpdate\s+to\s+mark\s+task\s+)(?:id\s*)?(?:#\s*)?1(\s+as\s+completed\b)/gi,
+      `$1${normalizedTaskId}$2`
+    )
+    .replace(
+      /(Use\s+TaskUpdate\s+to\s+mark\s+task\s+)(?:id\s*)?(?:#\s*)?1(\s+as\s+completed\s+when\s+done\b)/gi,
+      `$1${normalizedTaskId}$2`
+    );
 }
 
 const STALE_PATH_REWRITES = Object.freeze({
@@ -796,6 +815,22 @@ function enforcePromptBudget(prompt) {
   }
 
   return reduced;
+}
+
+function emitSpawnRagTelemetry(assembledPrompt, memoryQuery) {
+  const enabled = String(process.env.RAG_AT_SPAWN || 'on')
+    .trim()
+    .toLowerCase() !== 'off';
+  const sectionAdded =
+    typeof assembledPrompt === 'string' && assembledPrompt.includes('### Task-Relevant Memory (RAG)');
+  const queryLength = String(memoryQuery || '').trim().length;
+  const payload = {
+    enabled,
+    section_added: sectionAdded,
+    memory_query_len: queryLength,
+  };
+  stderrLog('spawn_rag_status', payload);
+  return payload;
 }
 
 function loadAgentRegistry() {
@@ -1447,20 +1482,27 @@ async function main() {
     });
 
     let assembled = basePrompt;
+    let memoryQuery = '';
     let cacheHit = false;
+    let ragTelemetry = null;
     if (!alreadyAssembled) {
       assembled = getCachedAssembly(cacheKey);
       cacheHit = Boolean(assembled);
       if (assembled) {
         perf.mark('cache_hit_ms');
       } else {
-        assembled = promptAssembler.assembleSpawnPrompt({
+        memoryQuery = String(toolInput.description || basePrompt || '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 240);
+        assembled = await promptAssembler.assembleSpawnPromptAsync({
           agentType,
           allowedTools,
           basePrompt,
           skillSectionMode,
           includeMemory: true,
           presetId,
+          memoryQuery,
         });
 
         if (contextMode.hasContextOrMode && contextMode.promptFragment) {
@@ -1480,6 +1522,7 @@ async function main() {
     perf.mark('base_assembly_ms');
     perf.mark('semantic_memory_ms');
     perf.mark('entity_graph_ms');
+    ragTelemetry = emitSpawnRagTelemetry(assembled, memoryQuery);
 
     // Append constitution and behaviour principles to every spawned agent
     const constitutionContext = loadConstitutionContext(PROJECT_ROOT);
@@ -1579,6 +1622,9 @@ async function main() {
           inputChars: inputPromptLength,
           outputChars: assembled.length,
           compactnessScore: validation.compactness?.score,
+          ragEnabled: ragTelemetry?.enabled ?? null,
+          ragSectionAdded: ragTelemetry?.section_added ?? null,
+          ragMemoryQueryLen: ragTelemetry?.memory_query_len ?? null,
         });
         logTokenBurnMetric({
           taskId: explicitTaskId,
@@ -1591,6 +1637,19 @@ async function main() {
       } catch (perfErr) {
         debugLog('spawn-prompt-assembler', 'Perf harness logging failed (ignored)', perfErr);
       }
+    }
+
+    try {
+      const { logSpawnRagMetric } = libRequire(path.join('monitoring', 'spawn-log.cjs'));
+      logSpawnRagMetric({
+        taskId: explicitTaskId,
+        sessionId: hookSessionId,
+        ragEnabled: ragTelemetry?.enabled ?? false,
+        ragSectionAdded: ragTelemetry?.section_added ?? false,
+        ragMemoryQueryLen: ragTelemetry?.memory_query_len ?? 0,
+      });
+    } catch (_err) {
+      // best-effort
     }
 
     // Claude Code hook protocol: output { tool_input: { ... } } to modify tool parameters.
@@ -1621,6 +1680,9 @@ async function main() {
           task_id: explicitTaskId || null,
           cache_hit: cacheHit,
           adaptive_throttled: throttleExpensive,
+          rag_enabled: ragTelemetry?.enabled ?? null,
+          rag_section_added: ragTelemetry?.section_added ?? null,
+          rag_memory_query_len: ragTelemetry?.memory_query_len ?? null,
         },
       });
     } catch (_err) {
