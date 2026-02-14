@@ -10,7 +10,7 @@
 
 const path = require('path');
 const { PROJECT_ROOT: _PROJECT_ROOT } = require('../utils/project-root.cjs');
-const { assembleSpawnPrompt } = require('../spawn/prompt-assembler.cjs');
+const { assembleSpawnPrompt, assembleSpawnPromptAsync } = require('../spawn/prompt-assembler.cjs');
 
 /**
  * Task Tool Function
@@ -41,12 +41,31 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
 
   try {
     // Assemble the complete spawn prompt with tools and skills
-    const assembledPrompt = assembleSpawnPrompt({
-      agentType: subagent_type,
-      allowedTools: allowed_tools,
-      basePrompt: prompt,
-      includeMemory: true,
-    });
+    const ragEnabled =
+      String(process.env.RAG_AT_SPAWN || 'on')
+        .trim()
+        .toLowerCase() !== 'off';
+    const memoryQuery = ragEnabled
+      ? String(description || '').trim() ||
+        String(prompt || '')
+          .trim()
+          .slice(0, 240)
+      : '';
+    const assembledPrompt =
+      typeof assembleSpawnPromptAsync === 'function'
+        ? await assembleSpawnPromptAsync({
+            agentType: subagent_type,
+            allowedTools: allowed_tools,
+            basePrompt: prompt,
+            includeMemory: true,
+            memoryQuery,
+          })
+        : assembleSpawnPrompt({
+            agentType: subagent_type,
+            allowedTools: allowed_tools,
+            basePrompt: prompt,
+            includeMemory: true,
+          });
 
     // In a real implementation, this would spawn an actual subagent
     // For now, we'll simulate the spawn and return a success result

@@ -677,7 +677,142 @@ Complete the task.`;
   });
 
   // ======================================================================
-  // 8. Integration
+  // 8. RAG Memory at Spawn
+  // ======================================================================
+
+  describe('RAG Memory at Spawn', () => {
+    it('formatRagMemorySection should return empty string for empty input', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const section = assembler.formatRagMemorySection([]);
+      assert.equal(section, '');
+    });
+
+    it('formatRagMemorySection should render task-relevant memory bullets', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const section = assembler.formatRagMemorySection([
+        { content: 'Use lock files for concurrent writes', similarity: 0.91 },
+        { content: 'Call TaskUpdate before and after work', similarity: 0.88 },
+      ]);
+
+      assert.ok(section.includes('### Task-Relevant Memory (RAG)'));
+      assert.ok(section.includes('Use lock files for concurrent writes'));
+      assert.ok(section.includes('Call TaskUpdate before and after work'));
+    });
+
+    it('formatRagMemorySection should enforce max item cap', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const section = assembler.formatRagMemorySection(
+        [{ content: 'One' }, { content: 'Two' }, { content: 'Three' }, { content: 'Four' }],
+        { maxItems: 2 }
+      );
+
+      const bulletCount = (section.match(/^- /gm) || []).length;
+      assert.equal(bulletCount, 2);
+      assert.ok(section.includes('One'));
+      assert.ok(section.includes('Two'));
+      assert.ok(!section.includes('Three'));
+    });
+
+    it('assembleSpawnPromptAsync should match sync behavior when memoryQuery is omitted', async () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const syncPrompt = assembler.assembleSpawnPrompt({
+        agentType: 'developer',
+        allowedTools: VALID_DEVELOPER_TOOLS,
+        basePrompt: SAMPLE_BASE_PROMPT,
+      });
+
+      const asyncPrompt = await assembler.assembleSpawnPromptAsync({
+        agentType: 'developer',
+        allowedTools: VALID_DEVELOPER_TOOLS,
+        basePrompt: SAMPLE_BASE_PROMPT,
+      });
+
+      assert.equal(asyncPrompt, syncPrompt);
+    });
+
+    it('assembleSpawnPromptAsync should include RAG subsection when memory query has matches', async () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const enhanced = await assembler.assembleSpawnPromptAsync({
+        agentType: 'developer',
+        allowedTools: VALID_DEVELOPER_TOOLS,
+        basePrompt: SAMPLE_BASE_PROMPT,
+        memoryQuery: 'routing guardrails',
+        searchMemoryFn: async () => [
+          { content: 'Route security-heavy tasks to security-architect first', similarity: 0.95 },
+          { content: 'Use TaskList preflight before Task spawns', similarity: 0.9 },
+        ],
+      });
+
+      assert.ok(enhanced.includes('## Memory Context (Auto-Loaded)'));
+      assert.ok(enhanced.includes('### Task-Relevant Memory (RAG)'));
+      assert.ok(enhanced.includes('Route security-heavy tasks to security-architect first'));
+    });
+
+    it('assembleSpawnPromptAsync should fail open when memory search throws', async () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const enhanced = await assembler.assembleSpawnPromptAsync({
+        agentType: 'developer',
+        allowedTools: VALID_DEVELOPER_TOOLS,
+        basePrompt: SAMPLE_BASE_PROMPT,
+        memoryQuery: 'task updates',
+        searchMemoryFn: async () => {
+          throw new Error('search unavailable');
+        },
+      });
+
+      assert.ok(enhanced.includes('## Memory Context (Auto-Loaded)'));
+      assert.ok(!enhanced.includes('### Task-Relevant Memory (RAG)'));
+    });
+
+    it('assembleSpawnPromptAsync should honor RAG_AT_SPAWN=off kill switch', async () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const original = process.env.RAG_AT_SPAWN;
+      process.env.RAG_AT_SPAWN = 'off';
+      try {
+        const enhanced = await assembler.assembleSpawnPromptAsync({
+          agentType: 'developer',
+          allowedTools: VALID_DEVELOPER_TOOLS,
+          basePrompt: SAMPLE_BASE_PROMPT,
+          memoryQuery: 'should be ignored',
+          searchMemoryFn: async () => [{ content: 'should not appear' }],
+        });
+
+        assert.ok(enhanced.includes('## Memory Context (Auto-Loaded)'));
+        assert.ok(!enhanced.includes('### Task-Relevant Memory (RAG)'));
+        assert.ok(!enhanced.includes('should not appear'));
+      } finally {
+        if (typeof original === 'undefined') {
+          delete process.env.RAG_AT_SPAWN;
+        } else {
+          process.env.RAG_AT_SPAWN = original;
+        }
+      }
+    });
+  });
+
+  // ======================================================================
+  // 9. Integration
   // ======================================================================
 
   describe('Integration', () => {

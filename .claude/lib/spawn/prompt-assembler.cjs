@@ -38,6 +38,9 @@ const logger = createLogger('prompt-assembler');
 const MAX_MEMORY_ITEMS_PER_SECTION = 3;
 const MAX_MEMORY_ITEM_CHARS = 220;
 const MAX_MEMORY_SECTION_CHARS = 3500;
+const DEFAULT_RAG_AT_SPAWN_LIMIT = 5;
+const DEFAULT_RAG_AT_SPAWN_MAX_ITEMS = 5;
+const DEFAULT_RAG_AT_SPAWN_MAX_CHARS = 1800;
 const DEFAULT_SKILL_SECTION_MODE = 'full';
 const DEFAULT_MEMORY_MODE = 'hybrid';
 const DEFAULT_SUMMARY_BLOCK_MAX_TOKENS = 400;
@@ -45,6 +48,10 @@ const DEFAULT_RECENT_OBSERVATIONS_MAX_TOKENS = 400;
 const DEFAULT_TIER_B_MAX_TOKENS = 400;
 const DEFAULT_OPEN_FINDINGS_MAX_ITEMS = 3;
 const DEFAULT_OPEN_FINDINGS_MIN_SEVERITY = 'high';
+const CORE_AGENT_SKILLS = Object.freeze({
+  developer: ['tdd', 'debugging', 'code-quality-expert'],
+  qa: ['verification-before-completion', 'tdd'],
+});
 
 /**
  * Load tool manifest (cached)
@@ -185,6 +192,38 @@ function getTokenLimit(value, fallback) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
   return Math.floor(parsed);
+}
+
+function getPositiveInt(value, fallback) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return Math.floor(parsed);
+}
+
+function getNumericValue(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function isRagAtSpawnEnabled() {
+  return (
+    String(process.env.RAG_AT_SPAWN || 'on')
+      .trim()
+      .toLowerCase() !== 'off'
+  );
+}
+
+function normalizeMemoryText(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function clipMemoryText(value) {
+  const normalized = normalizeMemoryText(value);
+  if (!normalized) return '';
+  if (normalized.length <= MAX_MEMORY_ITEM_CHARS) return normalized;
+  return normalized.slice(0, MAX_MEMORY_ITEM_CHARS - 3) + '...';
 }
 
 function estimateTokens(text) {
@@ -433,18 +472,6 @@ function formatMemorySection(memory) {
   lines.push('_Recent learnings from past sessions_');
   lines.push('');
 
-  const normalizeMemoryText = value =>
-    String(value || '')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-  const clipMemoryText = value => {
-    const normalized = normalizeMemoryText(value);
-    if (!normalized) return '';
-    if (normalized.length <= MAX_MEMORY_ITEM_CHARS) return normalized;
-    return normalized.slice(0, MAX_MEMORY_ITEM_CHARS - 3) + '...';
-  };
-
   if (gotchas.length > 0) {
     lines.push('### Gotchas (Pitfalls to Avoid)');
     for (const g of gotchas.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
@@ -507,6 +534,80 @@ function formatMemorySection(memory) {
 
   // Final safety cap in case memory records carry unusually long content.
   return section.slice(0, MAX_MEMORY_SECTION_CHARS - 3) + '...';
+}
+
+/**
+ * Format query-retrieved memory matches for spawn prompt injection.
+ *
+ * @param {Array<{content?: string, text?: string, similarity?: number}>} ragResults
+ * @param {{maxItems?: number, maxChars?: number}} [options]
+ * @returns {string}
+ */
+function formatRagMemorySection(ragResults, options = {}) {
+  const items = Array.isArray(ragResults) ? ragResults : [];
+  if (items.length === 0) return '';
+
+  const maxItems = getPositiveInt(
+    options.maxItems ?? process.env.RAG_AT_SPAWN_MAX_ITEMS,
+    DEFAULT_RAG_AT_SPAWN_MAX_ITEMS
+  );
+  const maxChars = getPositiveInt(
+    options.maxChars ?? process.env.RAG_AT_SPAWN_MAX_CHARS,
+    DEFAULT_RAG_AT_SPAWN_MAX_CHARS
+  );
+
+  const lines = [];
+  lines.push('### Task-Relevant Memory (RAG)');
+  lines.push('_Semantically matched memory for this task_');
+  lines.push('');
+
+  for (const item of items.slice(0, maxItems)) {
+    const content = clipMemoryText(item?.content || item?.text || item?.summary);
+    if (!content) continue;
+    const similarity = Number(item?.similarity);
+    const similarityTag = Number.isFinite(similarity) ? ` (sim: ${similarity.toFixed(2)})` : '';
+    lines.push(`- ${content}${similarityTag}`);
+  }
+
+  if (lines.length <= 3) return '';
+
+  const section = lines.join('\n');
+  if (section.length <= maxChars) return section;
+  return section.slice(0, Math.max(0, maxChars - 3)) + '...';
+}
+
+async function queryMemoryForSpawn(memoryQuery, { ragLimit, ragThreshold, searchMemoryFn } = {}) {
+  if (!isRagAtSpawnEnabled()) return [];
+
+  const query = String(memoryQuery || '').trim();
+  if (!query) return [];
+
+  const limit = getPositiveInt(
+    ragLimit ?? process.env.RAG_AT_SPAWN_LIMIT,
+    DEFAULT_RAG_AT_SPAWN_LIMIT
+  );
+  const thresholdFromOption = getNumericValue(ragThreshold);
+  const thresholdFromEnv = getNumericValue(process.env.RAG_AT_SPAWN_THRESHOLD);
+  const searchOptions = { limit };
+  if (thresholdFromOption !== null) {
+    searchOptions.threshold = thresholdFromOption;
+  } else if (thresholdFromEnv !== null) {
+    searchOptions.threshold = thresholdFromEnv;
+  }
+
+  try {
+    let searchFn = searchMemoryFn;
+    if (typeof searchFn !== 'function') {
+      const memoryManager = require('../memory/memory-manager.cjs');
+      searchFn = memoryManager?.searchMemory;
+    }
+    if (typeof searchFn !== 'function') return [];
+    const results = await searchFn(query, searchOptions);
+    return Array.isArray(results) ? results : [];
+  } catch (err) {
+    logger.warn('spawn_rag_memory_search_failed', { error: err?.message });
+    return [];
+  }
 }
 
 function loadAgentRegistry(projectRoot = PROJECT_ROOT) {
@@ -710,6 +811,31 @@ function getSkillsByAgent(agentType, maxSkills = 20) {
         });
       }
     }
+  }
+
+  // Ensure core skills are represented for key agents when available in the index.
+  const coreSkills = CORE_AGENT_SKILLS[normalizedType] || [];
+  if (coreSkills.length > 0) {
+    const prioritized = [];
+    for (const coreName of coreSkills) {
+      const existing = result.find(s => s.name === coreName);
+      if (existing) {
+        prioritized.push(existing);
+        continue;
+      }
+      const skillData = skills[coreName];
+      if (!skillData) continue;
+      prioritized.push({
+        name: coreName,
+        description: skillData.description || `${skillData.displayName || coreName} skill`,
+        category: skillData.category || 'General',
+        requiredTools: skillData.requiredTools || [],
+      });
+    }
+    const deduped = [...prioritized, ...result].filter(
+      (skill, idx, arr) => arr.findIndex(s => s.name === skill.name) === idx
+    );
+    return deduped.slice(0, maxSkills);
   }
 
   return result;
@@ -1064,6 +1190,126 @@ function assembleSpawnPrompt({
 }
 
 /**
+ * Async spawn prompt assembly with optional task-query memory retrieval (RAG).
+ * Keeps sync behavior when memoryQuery is omitted.
+ *
+ * @param {Object} options
+ * @returns {Promise<string>}
+ */
+async function assembleSpawnPromptAsync(options = {}) {
+  const {
+    agentType = 'developer',
+    allowedTools = [],
+    basePrompt = '',
+    maxToolsInPrompt = 15,
+    maxSkillsInPrompt = 20,
+    skillSectionMode = DEFAULT_SKILL_SECTION_MODE,
+    includeMemory = true,
+    presetId = null,
+    projectRoot = PROJECT_ROOT,
+    memoryQuery = '',
+    ragLimit = null,
+    ragThreshold = null,
+    searchMemoryFn = null,
+  } = options;
+
+  const normalizedQuery = String(memoryQuery || '').trim();
+  if (!normalizedQuery) {
+    return assembleSpawnPrompt({
+      agentType,
+      allowedTools,
+      basePrompt,
+      maxToolsInPrompt,
+      maxSkillsInPrompt,
+      skillSectionMode,
+      includeMemory,
+      presetId,
+      projectRoot,
+    });
+  }
+
+  const toolsToShow = allowedTools.slice(0, maxToolsInPrompt);
+  const describedTools = filterAndDescribeTools(toolsToShow);
+
+  let skills = getSkillsByAgent(agentType, maxSkillsInPrompt);
+  if (presetId) {
+    const presetSkills = getPresetSkillNames(presetId, projectRoot);
+    if (presetSkills.length > 0) {
+      skills = getSkillsByName(presetSkills, maxSkillsInPrompt);
+    }
+  }
+
+  let memorySection = '';
+  if (includeMemory) {
+    if (getMemoryMode() === 'observational') {
+      const observational = loadObservationalMemory(projectRoot);
+      const hasObservationalData =
+        String(observational.summary || '').trim().length > 0 ||
+        (Array.isArray(observational.recentObservations) &&
+          observational.recentObservations.length > 0);
+      if (hasObservationalData) {
+        memorySection = formatObservationalSection(
+          observational.summary,
+          observational.recentObservations
+        );
+      } else {
+        memorySection = formatMemorySection(loadMemoryContext(projectRoot));
+      }
+    } else {
+      memorySection = formatMemorySection(loadMemoryContext(projectRoot));
+    }
+
+    const ragResults = await queryMemoryForSpawn(normalizedQuery, {
+      ragLimit,
+      ragThreshold,
+      searchMemoryFn,
+    });
+    const ragSection = formatRagMemorySection(ragResults);
+    if (ragSection) {
+      memorySection = memorySection ? `${memorySection}\n\n${ragSection}` : ragSection;
+    }
+
+    const openFindingsSection = formatOpenFindingsSection(loadOpenFindings(projectRoot));
+    if (openFindingsSection) {
+      memorySection = memorySection
+        ? `${memorySection}\n\n${openFindingsSection.trim()}`
+        : openFindingsSection.trim();
+    }
+  }
+
+  const behaviourSection = formatBehaviourSection(loadBehaviourRules(projectRoot));
+  const overrides = loadAgentPromptOverrides(agentType, projectRoot);
+  const ruleSnippet = getPresetRuleSnippet(presetId, projectRoot);
+  let mergedBasePrompt = overrides ? `${basePrompt}\n\n${overrides}` : basePrompt;
+  if (ruleSnippet) {
+    mergedBasePrompt = `## Preset Rules\n\n${ruleSnippet}\n\n${mergedBasePrompt}`;
+  }
+
+  const toolsSection = buildToolsSection(describedTools);
+  const skillsSection = buildSkillsSection(skills, { skillSectionMode });
+  const discoverySection = buildDiscoverySection();
+
+  const enhancedPrompt = injectSections(mergedBasePrompt, {
+    toolsSection,
+    skillsSection,
+    discoverySection,
+    memorySection,
+    behaviourSection,
+  });
+
+  if (includeMemory && memorySection) {
+    try {
+      const { recordMemoryBlockChurn } = require('../memory/observations.cjs');
+      recordMemoryBlockChurn(projectRoot, memorySection);
+    } catch (_err) {
+      // Best-effort metric recording.
+    }
+  }
+
+  return enhancedPrompt;
+}
+
+/**
  * Validate the loaded presets.json against presets.schema.json.
  * Advisory only -- returns validation result but does not throw.
  * Graceful degradation if schema or validator is unavailable.
@@ -1115,7 +1361,9 @@ module.exports = {
   getPresetRuleSnippet,
   loadAgentPromptOverrides,
   formatMemorySection,
+  formatRagMemorySection,
   formatBehaviourSection,
+  assembleSpawnPromptAsync,
   validatePresets,
   // For testing cache invalidation
   _clearCache: () => {
