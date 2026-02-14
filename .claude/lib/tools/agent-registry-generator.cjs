@@ -525,6 +525,46 @@ function getRequiredToolsUnionForAgent(agentId, matrix, skillIndex) {
   return [...tools];
 }
 
+function getAssignedSkillsForAgent(agentId, matrix, skillIndex, frontmatterSkills = []) {
+  const assigned = [];
+  const seen = new Set();
+  const push = value => {
+    if (typeof value !== 'string' || value.length === 0) return;
+    if (seen.has(value)) return;
+    seen.add(value);
+    assigned.push(value);
+  };
+
+  for (const skill of Array.isArray(frontmatterSkills) ? frontmatterSkills : []) {
+    push(skill);
+  }
+
+  const matrixSkills = new Set();
+  const agents = matrix.agents || {};
+  for (const categoryAgents of Object.values(agents)) {
+    if (typeof categoryAgents !== 'object') continue;
+    const config = categoryAgents[agentId];
+    if (!config) continue;
+    const primary = Array.isArray(config.primary) ? config.primary : [];
+    const secondary = Array.isArray(config.secondary) ? config.secondary : [];
+    const always = Array.isArray(config.always) ? config.always : [];
+    const contextual =
+      config.contextual && typeof config.contextual === 'object'
+        ? Object.values(config.contextual).flat()
+        : [];
+    [...primary, ...secondary, ...always, ...contextual].forEach(s => matrixSkills.add(s));
+  }
+
+  const indexSkills = skillIndex.skills || {};
+  for (const skillName of matrixSkills) {
+    const variants = getSkillEntryVariants(skillName);
+    const resolved = variants.find(name => Object.prototype.hasOwnProperty.call(indexSkills, name));
+    push(resolved || skillName);
+  }
+
+  return assigned;
+}
+
 /**
  * Generate capability card for a single agent
  * @param {Object} agentDef - Agent definition from frontmatter
@@ -532,9 +572,17 @@ function getRequiredToolsUnionForAgent(agentId, matrix, skillIndex) {
  * @param {string} category - Agent category
  * @param {string} filePath - Full path to agent file
  * @param {string[]} [toolsUnionFromSkills] - Union of tools required by agent's skills (from matrix + skill-index)
+ * @param {string[]} [assignedSkills] - Consolidated skills from frontmatter + matrix
  * @returns {Object} Capability card
  */
-function generateCapabilityCard(agentDef, agentId, category, filePath, toolsUnionFromSkills = []) {
+function generateCapabilityCard(
+  agentDef,
+  agentId,
+  category,
+  filePath,
+  toolsUnionFromSkills = [],
+  assignedSkills = null
+) {
   const domain = inferDomain(agentDef, agentId, category);
   const triggerPhrases = extractTriggerPhrases(agentDef, agentId);
 
@@ -560,7 +608,12 @@ function generateCapabilityCard(agentDef, agentId, category, filePath, toolsUnio
   }
 
   // Get skills list
-  const skills = agentDef.skills && Array.isArray(agentDef.skills) ? agentDef.skills : [];
+  const skills =
+    Array.isArray(assignedSkills) && assignedSkills.length > 0
+      ? assignedSkills
+      : agentDef.skills && Array.isArray(agentDef.skills)
+        ? agentDef.skills
+        : [];
   const { examples, tags } = extractExamplesAndTags(agentDef, triggerPhrases, skills);
 
   // Build display name
@@ -776,12 +829,19 @@ class AgentRegistryGenerator {
       if (!Array.isArray(toolsUnionFromSkills) || toolsUnionFromSkills.length === 0) {
         toolsUnionFromSkills = getDefaultTools(agentId);
       }
+      const assignedSkills = getAssignedSkillsForAgent(
+        agentId,
+        matrix,
+        skillIndex,
+        agentInfo.definition.skills
+      );
       const card = generateCapabilityCard(
         agentInfo.definition,
         agentId,
         agentInfo.category,
         agentInfo.filePath,
-        toolsUnionFromSkills
+        toolsUnionFromSkills,
+        assignedSkills
       );
       this.registry.agents[agentId] = card;
     }
@@ -893,6 +953,7 @@ module.exports = {
   extractTriggerPhrases,
   extractExamplesAndTags,
   getRequiredToolsUnionForAgent,
+  getAssignedSkillsForAgent,
   getSkillEntryVariants,
   DOMAIN_MAPPING,
 };
