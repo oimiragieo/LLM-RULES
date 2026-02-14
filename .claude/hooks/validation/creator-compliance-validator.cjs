@@ -29,6 +29,13 @@ const path = require('path');
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
+const CREATOR_ECOSYSTEM_VALIDATOR =
+  process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-creator-ecosystem.cjs');
+const SKILL_ECOSYSTEM_VALIDATOR =
+  process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-skill-ecosystem.cjs');
+
 // Creator output path patterns
 const CREATOR_PATHS = {
   agent: /\.claude[/\\]agents[/\\]/,
@@ -184,6 +191,66 @@ function formatResult(allow, message = '') {
   return JSON.stringify({ allow, message });
 }
 
+function runValidatorScript(scriptPath, args = [], fallbackIssue = 'Validation failed') {
+  try {
+    const { spawnSync } = require('child_process');
+    const result = spawnSync(process.execPath, [scriptPath, ...args], {
+      cwd: PROJECT_ROOT,
+      stdio: 'pipe',
+      encoding: 'utf-8',
+      windowsHide: true,
+    });
+
+    if (result.status === 0) {
+      return { passed: true, issues: [] };
+    }
+
+    const output = `${result.stdout || ''}\n${result.stderr || ''}`;
+    const issues = output
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.startsWith('- ') || line.length > 0)
+      .slice(0, 10)
+      .map(line => (line.startsWith('- ') ? line.slice(2) : line));
+
+    return {
+      passed: false,
+      issues: issues.length > 0 ? issues : [fallbackIssue],
+    };
+  } catch (err) {
+    return {
+      passed: false,
+      issues: [`${fallbackIssue}: ${err.message}`],
+    };
+  }
+}
+
+function validateCreatorEcosystemStrict() {
+  const creatorValidation = runValidatorScript(
+    CREATOR_ECOSYSTEM_VALIDATOR,
+    [],
+    'Creator ecosystem validation failed'
+  );
+  const skillValidation = runValidatorScript(
+    SKILL_ECOSYSTEM_VALIDATOR,
+    ['--require-perfect'],
+    'Skill ecosystem gate failed'
+  );
+
+  const issues = [];
+  if (!creatorValidation.passed) {
+    issues.push(...creatorValidation.issues);
+  }
+  if (!skillValidation.passed) {
+    issues.push(...skillValidation.issues);
+  }
+
+  return {
+    passed: issues.length === 0,
+    issues,
+  };
+}
+
 /**
  * Main hook execution.
  */
@@ -240,6 +307,36 @@ async function main() {
       // No creator files - pass
       console.log(formatResult(true));
       process.exit(0);
+    }
+
+    const strictValidation = validateCreatorEcosystemStrict();
+    if (!strictValidation.passed) {
+      const strictMessage = [
+        '',
+        '+======================================================================+',
+        '|  CREATOR ECOSYSTEM GATE FAILED                                        |',
+        '+======================================================================+',
+        '|  Strict ecosystem checks failed for creator completion.               |',
+        '|                                                                      |',
+        '|  Required action:                                                    |',
+        '|  1. Run: pnpm skills:ecosystem:gate                                 |',
+        '|  2. Fix missing creator-skill contracts                              |',
+        '|  3. Re-run TaskUpdate to complete                                    |',
+      ];
+
+      for (const issue of strictValidation.issues.slice(0, 6)) {
+        strictMessage.push(`|  - ${issue.substring(0, 66).padEnd(66)}|`);
+      }
+
+      strictMessage.push('+======================================================================+');
+      strictMessage.push('');
+
+      if (mode === 'block') {
+        console.log(formatResult(false, strictMessage.join('\n')));
+        process.exit(2);
+      }
+
+      console.warn(strictMessage.join('\n'));
     }
 
     // Check compliance for each creator file
@@ -315,4 +412,8 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { main };
+module.exports = {
+  main,
+  runValidatorScript,
+  validateCreatorEcosystemStrict,
+};
