@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Evolution Request",
+  "description": "Standard payload for proposed ecosystem evolution requests.",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "source",
+    "trigger",
+    "evidence",
+    "suggestedArtifactType",
+    "summary",
+    "status"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["reflection-agent", "planner", "architect", "router", "other"]
+    },
+    "trigger": {
+      "type": "string",
+      "enum": [
+        "repeated_error",
+        "no_agent",
+        "integration_gap",
+        "user_request",
+        "rubric_regression",
+        "other"
+      ]
+    },
+    "evidence": {
+      "type": "string",
+      "minLength": 8
+    },
+    "suggestedArtifactType": {
+      "type": ["string", "null"],
+      "enum": ["skill", "agent", "workflow", "hook", null]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 8
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proposed"]
+    }
+  },
+  "additionalProperties": false
+}

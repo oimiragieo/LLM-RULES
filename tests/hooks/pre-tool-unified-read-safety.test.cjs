@@ -128,9 +128,12 @@ describe('pre-tool-unified read safety', () => {
     const result = checkReadSafety('Read', {
       file_path: '.claude/lib/memory/memory-query.cjs',
     });
-    assert.strictEqual(result.action, 'block');
-    assert.ok(String(result.message || '').includes('Did you mean'));
-    assert.match(String(result.message || ''), /memory[\\/]+core[\\/]+memory-query\.cjs/);
+    assert.strictEqual(result.action, 'rewrite');
+    assert.ok(String(result.bypassWarning || '').includes('Rewrote stale path'));
+    assert.match(
+      String(result.rewrittenToolInput?.file_path || ''),
+      /memory[\\/]+core[\\/]+memory-query\.cjs/
+    );
   });
 
   test('main enforces read safety when hook input is provided on stdin', () => {
@@ -173,8 +176,9 @@ describe('pre-tool-unified read safety', () => {
     try {
       fs.writeFileSync(filePath, 'a'.repeat(130000), 'utf8');
       const result = checkReadSafety('Read', { file_path: filePath });
-      assert.strictEqual(result.action, 'block');
-      assert.ok(result.message.includes('requires chunked Read'));
+      assert.strictEqual(result.action, 'rewrite');
+      assert.strictEqual(result.rewrittenToolInput.offset, 0);
+      assert.strictEqual(result.rewrittenToolInput.limit, 4000);
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -190,10 +194,28 @@ describe('pre-tool-unified read safety', () => {
         { file_path: filePath },
         { permission_mode: 'bypassPermissions' }
       );
+      assert.strictEqual(result.action, 'rewrite');
+      assert.strictEqual(result.rewrittenToolInput.offset, 0);
+      assert.strictEqual(result.rewrittenToolInput.limit, 4000);
+      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('checkReadSafety blocks large file without read window when auto-window is disabled', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-file-no-autowindow-'));
+    const filePath = path.join(tempDir, 'large.txt');
+    const prior = process.env.READ_SAFETY_AUTOWINDOW;
+    process.env.READ_SAFETY_AUTOWINDOW = 'off';
+    try {
+      fs.writeFileSync(filePath, 'a'.repeat(130000), 'utf8');
+      const result = checkReadSafety('Read', { file_path: filePath });
       assert.strictEqual(result.action, 'block');
-      assert.ok(String(result.message || '').includes('[READ SAFETY][bypass]'));
       assert.ok(String(result.message || '').includes('requires chunked Read'));
     } finally {
+      if (prior == null) delete process.env.READ_SAFETY_AUTOWINDOW;
+      else process.env.READ_SAFETY_AUTOWINDOW = prior;
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });

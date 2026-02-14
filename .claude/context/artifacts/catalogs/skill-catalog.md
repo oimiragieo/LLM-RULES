@@ -29,7 +29,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Git & Version Control](#git--version-control)     | 1     | git-expert                                                                                                                                                                                             |
 | [Code Style & Linting](#code-style--linting)       | 2     | code-style-validator, dry-principle                                                                                                                                                                    |
 | [Creator Tools](#creator-tools)                    | 12    | research-synthesis, agent-creator, skill-creator, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator |
-| [Memory & Context](#memory--context)               | 7     | context-compressor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux                                                |
+| [Memory & Context](#memory--context)               | 9     | context-compressor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution          |
 | [Validation & Quality](#validation--quality)       | 5     | verification-before-completion, checklist-generator, response-rater, test-generator, accessibility                                                                                                     |
 | [Specialized Patterns](#specialized-patterns)      | 9     | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology                       |
 | [External Integrations](#external-integrations)    | 1     | project-onboarding                                                                                                                                                                                     |
@@ -254,14 +254,17 @@ Skill({ skill: 'artifact-integrator' });
 
 Memory and context management.
 
-| Skill                        | Description                     | Primary Agents     |
-| ---------------------------- | ------------------------------- | ------------------ | --- | ------------------------ | ------------------------------------ | --------------- |
-| `context-compressor`         | Context compression methodology | all agents         |
-| `session-handoff`            | Handoff document creation       | all agents         |
-| `task-management-protocol`   | Task synchronization protocol   | all agents         |
-| `context-driven-development` | Context as managed artifacts    | all agents         |
-| `insight-extraction`         | Extract session learnings       | all agents         |
-| `track-management`           | Logical work unit management    | planner, developer | `n  | `pipeline-reflection-ux` | Step 0/reflection UX + noise control | router, planner |
+| Skill                    | Description                                                  | Primary Agents             |
+| ------------------------ | ------------------------------------------------------------ | -------------------------- |
+| `context-compressor`     | Context compression methodology                              | all agents                 |
+| `session-handoff`        | Handoff document creation                                    | all agents                 |
+| `task-management-protocol` | Task synchronization protocol                              | all agents                 |
+| `context-driven-development` | Context as managed artifacts                             | all agents                 |
+| `insight-extraction`     | Extract session learnings                                    | all agents                 |
+| `track-management`       | Logical work unit management                                 | planner, developer         |
+| `pipeline-reflection-ux` | Step 0/reflection UX and pipeline-noise control             | router, planner            |
+| `framework-context`      | Structured framework context for reflection/planning         | reflection-agent, planner  |
+| `recommend-evolution`    | Trigger-based evolution recommendation and request recording | reflection-agent, planner  |
 
 ---
 

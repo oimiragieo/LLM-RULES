@@ -1,7 +1,8 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
-const { execFileSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const path = require('path');
+const eslintBin = path.join(path.dirname(require.resolve('eslint/package.json')), 'bin', 'eslint.js');
 
 describe('ESLint max-lines rule', () => {
   it('should report error for files exceeding 500 lines (skipBlankLines, skipComments)', () => {
@@ -19,13 +20,12 @@ describe('ESLint max-lines rule', () => {
     fs.writeFileSync(tmpFile, lines.join('\n'));
 
     try {
-      // max-lines is set to 'warn' severity, so ESLint exits 0
-      // Check stdout for the warning text instead of expecting non-zero exit
-      const output = execFileSync(
-        process.platform === 'win32' ? 'npx.cmd' : 'npx',
-        ['eslint', tmpFile.replace(/\\/g, '/')],
+      const run = spawnSync(
+        process.execPath,
+        [eslintBin, tmpFile.replace(/\\/g, '/')],
         { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
       );
+      const output = (run.stdout || '') + (run.stderr || '');
       assert.ok(
         output.includes('max-lines'),
         `ESLint should flag files over 500 lines with max-lines warning, got: ${output}`
@@ -56,13 +56,12 @@ describe('ESLint max-lines rule', () => {
     fs.writeFileSync(tmpFile, lines.join('\n'));
 
     try {
-      // Run with project's eslint config
-      execFileSync(
-        process.platform === 'win32' ? 'npx.cmd' : 'npx',
-        ['eslint', tmpFile.replace(/\\/g, '/')],
+      const run = spawnSync(
+        process.execPath,
+        [eslintBin, tmpFile.replace(/\\/g, '/')],
         { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
       );
-      // No error = pass
+      assert.strictEqual(run.status, 0, `ESLint should succeed, got status=${run.status}`);
     } finally {
       fs.unlinkSync(tmpFile);
     }

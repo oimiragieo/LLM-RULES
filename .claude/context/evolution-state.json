@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "lastEvolution": null,
-  "evolutions": [],
+  "lastEvolution": "2026-02-14-framework-skills",
+  "evolutions": [
+    {
+      "id": "2026-02-14-framework-context-skill",
+      "artifactType": "skill",
+      "name": "framework-context",
+      "path": ".claude/skills/framework-context/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-14T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-14-recommend-evolution-skill",
+      "artifactType": "skill",
+      "name": "recommend-evolution",
+      "path": ".claude/skills/recommend-evolution/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-14T00:00:00.000Z"
+    }
+  ],
   "pendingProposals": [],
   "status": "idle"
 }

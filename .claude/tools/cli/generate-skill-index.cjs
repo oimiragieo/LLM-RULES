@@ -28,7 +28,21 @@ const path = require('path');
 const PROJECT_ROOT = process.cwd();
 const CONFIG_DIR = path.join(PROJECT_ROOT, '.claude', 'config');
 const INDEX_PATH = path.join(CONFIG_DIR, 'skill-index.json');
-const CATALOG_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'skill-catalog.md');
+const CATALOG_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'artifacts',
+  'catalogs',
+  'skill-catalog.md'
+);
+const CATALOG_PATH_LEGACY = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'artifacts',
+  'skill-catalog.md'
+);
 const SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');
 const AGENT_SKILL_MATRIX_PATH = path.join(
   PROJECT_ROOT,
@@ -87,6 +101,8 @@ const DOMAIN_MAP = {
   'context-driven-development': 'memory',
   'context-files-rules': 'memory',
   'history-and-next-task-rules': 'memory',
+  'framework-context': 'memory',
+  'recommend-evolution': 'memory',
 
   // Quality
   'qa-workflow': 'quality',
@@ -300,6 +316,8 @@ const CATEGORY_MAP = {
   'arxiv-mcp': 'Research',
   'context-compressor': 'Memory',
   'session-handoff': 'Memory',
+  'framework-context': 'Memory',
+  'recommend-evolution': 'Memory',
   'qa-workflow': 'Quality',
   'verification-before-completion': 'Quality',
   'checklist-generator': 'Quality',
@@ -350,6 +368,8 @@ const AGENT_SKILLS = {
   ],
   qa: ['tdd', 'qa-workflow', 'verification-before-completion', 'checklist-generator'],
   planner: [
+    'framework-context',
+    'recommend-evolution',
     'plan-generator',
     'task-breakdown',
     'brainstorming',
@@ -357,6 +377,7 @@ const AGENT_SKILLS = {
     'thinking-tools',
     'progressive-disclosure',
   ],
+  'reflection-agent': ['framework-context', 'recommend-evolution'],
   architect: [
     'architecture-review',
     'diagram-generator',
@@ -422,6 +443,8 @@ const SKILL_TOOLS = {
   'research-synthesis': ['WebSearch', 'WebFetch', 'Read', 'Write', 'Glob', 'Grep'],
   'context-compressor': ['Read', 'Write'],
   'session-handoff': ['Read', 'Write', 'Glob', 'Grep'],
+  'framework-context': ['Read', 'Skill'],
+  'recommend-evolution': ['Read', 'Write', 'Edit', 'Skill'],
   'qa-workflow': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
   'verification-before-completion': ['Read', 'Bash'],
   'checklist-generator': ['Read', 'Write', 'Edit', 'Glob', 'Grep'],
@@ -483,6 +506,12 @@ const SKILL_TOOLS = {
   'repo-rag': ['Read', 'Bash', 'Glob', 'Grep'],
   'project-analyzer': ['Read', 'Bash', 'Glob', 'Grep'],
   'tool-search': ['Read', 'Glob', 'Grep'],
+};
+
+const SKILL_DESCRIPTION_MAP = {
+  'framework-context': 'Load and synthesize framework architecture context for reflection/planning.',
+  'recommend-evolution':
+    'Detect capability gaps and record standardized evolution recommendations.',
 };
 
 /**
@@ -560,8 +589,14 @@ function parseSkillCatalog() {
   const skills = [];
 
   try {
-    if (fs.existsSync(CATALOG_PATH)) {
-      const content = fs.readFileSync(CATALOG_PATH, 'utf8');
+    const existingCatalogPath = fs.existsSync(CATALOG_PATH)
+      ? CATALOG_PATH
+      : fs.existsSync(CATALOG_PATH_LEGACY)
+        ? CATALOG_PATH_LEGACY
+        : null;
+
+    if (existingCatalogPath) {
+      const content = fs.readFileSync(existingCatalogPath, 'utf8');
 
       // Extract skill names from table rows
       const skillPattern = /\| `([^`]+)` \|/g;
@@ -762,8 +797,8 @@ function generateIndex(options = {}) {
     const canonicalName = canonicalSkillLookupKey(name);
     const domain = DOMAIN_MAP[name] || DOMAIN_MAP[canonicalName] || 'other';
     const category = CATEGORY_MAP[name] || CATEGORY_MAP[canonicalName] || 'Other';
-    const requiredTools =
-      SKILL_TOOLS[name] || SKILL_TOOLS[canonicalName] || ['Read', 'Write', 'Edit'];
+    const requiredTools = SKILL_TOOLS[name] ||
+      SKILL_TOOLS[canonicalName] || ['Read', 'Write', 'Edit'];
 
     // Find agents from matrix first; fallback to hardcoded AGENT_SKILLS
     let agentPrimary = [];
@@ -792,6 +827,13 @@ function generateIndex(options = {}) {
 
     const aliasOf = creatorAliasToNested[name] || null;
 
+    const description =
+      SKILL_DESCRIPTION_MAP[name] ||
+      SKILL_DESCRIPTION_MAP[canonicalName] ||
+      `${category} - ${name}`;
+
+    const tags = [...new Set([domain, category.toLowerCase().replace(/\s+/g, '-'), name])];
+
     skills[name] = {
       name,
       displayName: name
@@ -800,11 +842,11 @@ function generateIndex(options = {}) {
         .join(' '),
       category,
       domain,
-      description: `${category} - ${name}`,
+      description,
       requiredTools,
       agentPrimary: agentPrimary.length > 0 ? agentPrimary : ['developer'],
       agentSupporting,
-      tags: [domain, category.toLowerCase().replace(/\s+/g, '-'), name],
+      tags,
       priority: agentPrimary.length > 0 ? 1 : 3,
       aliasOf,
     };

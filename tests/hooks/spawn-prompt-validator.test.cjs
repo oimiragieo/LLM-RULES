@@ -28,6 +28,7 @@ const {
   isInvalidSubagentType: isAssemblerInvalidSubagentType,
   hasTaskIdReference,
   hasExplicitTaskId: assemblerHasExplicitTaskId,
+  normalizeTaskIdReferences,
 } = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
 
 // =============================================================================
@@ -385,6 +386,42 @@ describe('spawn preflight enforcement helpers', () => {
   test('assembler should flag invalid subagent_type tool names', () => {
     assert.strictEqual(isAssemblerInvalidSubagentType('Bash'), true);
     assert.strictEqual(isAssemblerInvalidSubagentType('qa'), false);
+  });
+
+  test('assembler should normalize hardcoded taskId "1" to canonical task id', () => {
+    const prompt = `
+## Steps
+1. TaskUpdate({ taskId: "1", status: "in_progress" })
+2. TaskUpdate({ taskId: "1", status: "completed" })
+`;
+    const normalized = normalizeTaskIdReferences(prompt, 'task-canonical-42');
+    assert.ok(normalized.includes('taskId: "task-canonical-42"'));
+    assert.ok(!normalized.includes('taskId: "1"'));
+  });
+
+  test('assembler should normalize unquoted numeric task_id values to canonical task id', () => {
+    const prompt = `
+TaskUpdate({ task_id: 1, status: "in_progress" })
+TaskUpdate({ taskId: 1, status: "completed" })
+`;
+    const normalized = normalizeTaskIdReferences(prompt, 'task-canonical-99');
+    assert.ok(normalized.includes('task_id: "task-canonical-99"'));
+    assert.ok(normalized.includes('taskId: "task-canonical-99"'));
+    assert.ok(!/\btask_id:\s*1\b/.test(normalized));
+    assert.ok(!/\btaskId:\s*1\b/.test(normalized));
+  });
+
+  test('assembler should normalize stale "mark task 1" TaskUpdate instructions to canonical task id', () => {
+    const prompt = `
+IMPORTANT INSTRUCTIONS:
+- Use TaskUpdate to mark task 1 as in_progress immediately
+- Use TaskUpdate to mark task 1 as completed when done
+`;
+    const normalized = normalizeTaskIdReferences(prompt, 'task-canonical-77');
+    assert.ok(normalized.includes('mark task task-canonical-77 as in_progress'));
+    assert.ok(normalized.includes('mark task task-canonical-77 as completed when done'));
+    assert.ok(!normalized.includes('mark task 1 as in_progress'));
+    assert.ok(!normalized.includes('mark task 1 as completed when done'));
   });
 });
 

@@ -99,12 +99,9 @@ test('getAssignedSkillsForAgent resolves aliases and keeps frontmatter skills fi
     },
   };
 
-  const assigned = getAssignedSkillsForAgent(
-    'evolution-orchestrator',
-    matrix,
-    skillIndex,
-    ['artifact-integrator']
-  );
+  const assigned = getAssignedSkillsForAgent('evolution-orchestrator', matrix, skillIndex, [
+    'artifact-integrator',
+  ]);
 
   assert.deepEqual(assigned.slice(0, 3), [
     'artifact-integrator',

@@ -165,6 +165,46 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 
 ---
 
+## Batch Reflection: Framework Health Assessment (2026-02-14)
+
+**Pattern: Module Decomposition via Chain-of-Responsibility + JSON Config (2026-02-14)**
+
+- **Context**: routing-guard.cjs (2599 lines) identified as over-complex but salvageable
+- **Pattern**: Separate constants (600 lines) → JSON config, helpers (170 lines) → functions, checks (1570 lines) → modular validators
+- **Evidence**: 93% extraction potential confirmed; secondary targets (user-prompt-unified 2155L, pre-tool-unified 1912L) follow same pattern
+- **Key insight**: SPECIALIST_KEYWORD_MAP (250 lines) converts to JSON, reducing file size 10%
+- **Application**: Apply chain-of-responsibility pattern to all modules >2000 LOC
+- **Success metric**: routing-guard.cjs → <1000 LOC per file after decomposition
+
+**Pattern: JSON.parse Vulnerability Cascade (2026-02-14)**
+
+- **Context**: Security audit found 76% unprotected JSON.parse calls (68 occurrences, 36 files)
+- **Pattern**: Tiered migration strategy - (1) Add safeParseJSON fallback, (2) Strict enforcement mode, (3) ESLint rule to prevent future
+- **Evidence**: 3 CRITICAL security findings; nested prototype pollution in safe-json.cjs; shell injection validator gaps in 3 cloud skills
+- **Critical blocker**: Must address before other security work (P0 remediation, Week 1, 9 story points)
+- **Application**: Remediation backlog: 68 occurrences → 36 files → 3-phase migration (1 week)
+
+**Pattern: Remediation Sequencing & Compression (2026-02-14)**
+
+- **Context**: Framework health assessment scored 5.3/10; 13 remediation tasks prioritized
+- **Pattern**: RICE prioritization (Reach × Impact × Confidence / Effort) compresses timeline 40%
+- **Evidence**: Sprint allocation (6.7 + 6.25 + 1.125 = 13.5 days) → 8 days with critical-path optimization
+- **Critical path**: P0.1 Hook Extraction (5 days) gates all other work; 5 quick wins (1.2 days) unlock dependencies
+- **Target**: Framework health 7.5/10 → 9.0/10 after Phase 1 (Sprint 1)
+- **Application**: Use RICE model for all >5-task backlogs; identify critical path before scheduling
+
+**Pattern: Research Efficiency Within Token Budget (2026-02-14)**
+
+- **Context**: 6 complex security/engineering topics researched in 5-query budget
+- **Pattern**: Batch 3 concepts per query, synthesize in parallel, reference external tools (Fastify docs, proper-lockfile README)
+- **Evidence**: Covered secure-json-parse, file locking, module patterns, TTL cleanup, logging (Pino 5-10x faster than Winston)
+- **Key finding**: setGracefulCleanup() is TTL mechanism for temp file cleanup; Pino structured logging reduces console noise
+- **Application**: Use 5-query cap for all research tasks; batch concepts to achieve coverage
+
+**Cross-Reference**: `.claude/context/reports/reflections/batch-reflection-2026-02-14.md`
+
+---
+
 ## Wave 10 Documentation Capture (2026-02-13)
 
 **5 key patterns documented from 10-wave enterprise pipeline:**
@@ -254,3 +294,32 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Timeline: P0 (week 1), P1 (weeks 2-3), P2 (week 4+)
 
 **Memory update rule**: Research reports with <10 KB constraint force prioritization and concise synthesis.
+
+## [2026-02-14] New Skill Created: recommend-evolution
+
+- **Description**: Detect capability gaps and record evolution recommendations for later orchestration.
+- **Tools**: Read,Write,Edit,Skill
+- **Location**: `.claude/skills/recommend-evolution/SKILL.md`
+- **Invocation**: `/recommend-evolution` or via agent assignment
+
+**Usage hint**: Use this skill for "detect capability gaps and record evolution recommendations for later orchestration".
+
+
+## [2026-02-14] New Skill Created: framework-context
+
+- **Description**: Provide structured framework context for system-level reflection and planning decisions.
+- **Tools**: Read,Skill
+- **Location**: `.claude/skills/framework-context/SKILL.md`
+- **Invocation**: `/framework-context` or via agent assignment
+
+**Usage hint**: Use this skill for "provide structured framework context for system-level reflection and planning decisions".
+
+## [2026-02-14] Reflection Evolution Skills Integrated
+
+- Finalized `framework-context` and `recommend-evolution` SKILL contracts with explicit trigger/output behavior.
+- Limited assignments to `reflection-agent` and `planner` (removed unintended scaffold auto-assignment from `architect` and `devops`).
+- Added evolution request payload schema: `.claude/schemas/evolution-request.schema.json`.
+- Added runtime queue file: `.claude/context/runtime/evolution-requests.jsonl`.
+- Added research synthesis reports:
+  - `.claude/context/artifacts/research-reports/framework-context-research-2026-02-14.md`
+  - `.claude/context/artifacts/research-reports/recommend-evolution-research-2026-02-14.md`

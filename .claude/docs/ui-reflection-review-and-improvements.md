@@ -67,7 +67,7 @@ So: the codebase defines **when** reflection runs (Step 0 at start, Wave 9 in pi
 ### 3.2 Reminder cleanup (codebase)
 
 - **Single place for clearing reminder:** Step 0 in CLAUDE.md already says "delete the reminder file and clear/trim the spawn request file." If the Router does that immediately after spawning reflection-agent, the reminder should not persist. Then a separate "Clean up reflection reminder file" task should not be needed.
-- **If cleanup is intentional:** If the design is to clear the reminder only after the full pipeline (e.g. so the reminder persists until "session end"), document that in MEMORY_SYSTEM.md or reflection docs and have the Router say once: _"Reflection reminder will be cleared after pipeline (by design)."_ so the user understands why a cleanup task exists.
+- **If cleanup is intentional:** If the design is to clear the reminder only after the full pipeline (e.g. so the reminder persists until "session end"), document that in MEMORY*SYSTEM.md or reflection docs and have the Router say once: *"Reflection reminder will be cleared after pipeline (by design)."\_ so the user understands why a cleanup task exists.
 - **Recommendation:** Prefer clearing in Step 0 so the user does not see an extra cleanup task. If the pipeline writes a new reminder for the _next_ session (e.g. on SessionEnd), that can be documented separately.
 
 ### 3.3 Guard message (codebase)

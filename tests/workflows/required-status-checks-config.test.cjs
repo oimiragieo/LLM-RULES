@@ -41,7 +41,7 @@ test('required-status-checks config includes governance baseline gates', () => {
     'nightly-strict-gate',
     'creator-ecosystem-validation',
     'validate-commands',
-    'validate-skills'
+    'validate-skills',
   ];
   for (const check of required) {
     assert.equal(checks.includes(check), true, `missing required check: ${check}`);

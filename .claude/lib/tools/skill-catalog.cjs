@@ -20,6 +20,11 @@ const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
+const CORE_AGENT_RECOMMENDATIONS = Object.freeze({
+  developer: ['tdd', 'debugging', 'code-quality-expert'],
+  qa: ['tdd', 'verification-before-completion'],
+});
+
 /**
  * SkillCatalogQuery - Query interface for skill discovery
  *
@@ -91,7 +96,10 @@ class SkillCatalogQuery {
     }
 
     // 4. Get all skills as array
-    let results = Object.values(skillIndex.skills || {});
+    let results = Object.entries(skillIndex.skills || {}).map(([name, skill]) => ({
+      ...skill,
+      name: skill?.name || name,
+    }));
 
     // 5. Apply filters
     if (options.domain) {
@@ -110,21 +118,35 @@ class SkillCatalogQuery {
 
     if (options.agentType) {
       // Get recommended skills for this agent type
-      const recommendedList = skillIndex.discovery?.recommendedForAgent?.[options.agentType] || [];
+      const configuredRecommended =
+        skillIndex.discovery?.recommendedForAgent?.[options.agentType] || [];
+      const fallbackRecommended = CORE_AGENT_RECOMMENDATIONS[options.agentType] || [];
+      const orderedRecommended = [...fallbackRecommended, ...configuredRecommended];
+      const recommendedSet = new Set(orderedRecommended);
+      const recommendationRank = new Map(
+        orderedRecommended.map((skillName, index) => [skillName, index])
+      );
 
       // Mark recommended skills
       results = results.map(skill => ({
         ...skill,
         recommended:
-          recommendedList.includes(skill.name) ||
+          recommendedSet.has(skill.name) ||
           (skill.agentPrimary && skill.agentPrimary.includes(options.agentType)) ||
           false,
       }));
 
       // Sort with recommended first
       results.sort((a, b) => {
+        const aRank = recommendationRank.has(a.name)
+          ? recommendationRank.get(a.name)
+          : Number.MAX_SAFE_INTEGER;
+        const bRank = recommendationRank.has(b.name)
+          ? recommendationRank.get(b.name)
+          : Number.MAX_SAFE_INTEGER;
         if (a.recommended && !b.recommended) return -1;
         if (!a.recommended && b.recommended) return 1;
+        if (aRank !== bRank) return aRank - bRank;
         return 0;
       });
     }

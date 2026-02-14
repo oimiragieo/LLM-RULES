@@ -31,6 +31,14 @@ const SKILL_CATALOG = path.join(
   '.claude',
   'context',
   'artifacts',
+  'catalogs',
+  'skill-catalog.md'
+);
+const SKILL_CATALOG_LEGACY = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'artifacts',
   'skill-catalog.md'
 );
 const ROUTING_TABLE = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table.cjs');
@@ -62,6 +70,11 @@ function getArtifactName(artifactPath) {
   const normalizedPath = artifactPath.replace(/\\/g, '/');
   const parts = normalizedPath.split('/');
   const filename = parts[parts.length - 1];
+  const parent = parts[parts.length - 2] || '';
+
+  if (filename.toLowerCase() === 'skill.md' && parent) {
+    return parent;
+  }
 
   // Remove extension
   return filename.replace(/\.(md|cjs|mjs|json)$/, '');
@@ -113,7 +126,7 @@ function checkSkillCatalog(artifactPath, artifactType, artifactName) {
     return { applicable: false, passed: true, message: 'Not applicable for this artifact type' };
   }
 
-  const catalog = readFileSafe(SKILL_CATALOG);
+  const catalog = readFileSafe(SKILL_CATALOG) || readFileSafe(SKILL_CATALOG_LEGACY);
   if (!catalog) {
     return { applicable: true, passed: false, message: 'Could not read skill-catalog.md' };
   }

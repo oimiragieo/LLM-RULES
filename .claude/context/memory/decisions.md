@@ -163,3 +163,22 @@
 
 **Status:** ACTIVE (CRITICAL)
 **Decision:** Router tool restrictions are ABSOLUTE. No thresholds, no exceptions, no "just this once." Capability ≠ Authorization. New hook: router-tool-whitelist-gate.cjs enforces whitelist at PreToolUse.
+
+---
+
+## ADR-123: Complexity Audit Effort Estimation (2026-02-14)
+
+**Status:** PROPOSED
+**Decision:** Complexity audits MUST include post-analysis effort estimation phase. Use parametric model: base_effort × (LOC / 1000) × coupling_factor × test_complexity_factor. Sample 3 files per tier, extrapolate to full tier, document samples in appendix.
+**Rationale:** Line count ≠ effort. routing-guard.cjs (2578L) could be 8-80 hours depending on coupling/tests. Without estimates, audit roadmap is unschedulable.
+**Evidence:** Task #1 audit identified 6 critical files but could not answer "how long to refactor routing-guard?" This ambiguity prevents prioritization.
+
+---
+
+## ADR-124: Complexity Metrics Baseline Protocol (2026-02-14)
+
+**Status:** PROPOSED
+**Decision:** All quality improvement claims MUST define baseline metrics pre-refactor. For cognitive load reduction, track: avg cyclomatic complexity, max nesting depth, avg file LOC. Measure pre/post, report actual improvement.
+**Rationale:** "40-60% cognitive load reduction" is unverifiable without metric definition. Post-refactoring, team reports subjective feelings, but no objective data supports the claim.
+**Implementation:** Run baseline metrics (plato, ESLint with complexity plugin) before starting refactoring phase. Run again post-refactoring. Compare deltas.
+**Example:** Baseline: avg_complexity=8.2, max_nesting=16, avg_LOC=650 → Target: 6.0, 5, 350 → Post-refactor: actually achieved 6.1, 4, 340 = "76% of projected improvement achieved."

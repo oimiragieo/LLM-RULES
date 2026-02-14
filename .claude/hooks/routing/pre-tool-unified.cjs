@@ -621,6 +621,17 @@ function checkToolScope(hookInput, toolName) {
 const TASKUPDATE_FIRST_WINDOW_MS = Number(
   process.env.TASKUPDATE_FIRST_WINDOW_MS || 24 * 60 * 60 * 1000
 );
+const TASKUPDATE_FIRST_PREFLIGHT_TASKLIST_MAX = Number(
+  process.env.TASKUPDATE_FIRST_PREFLIGHT_TASKLIST_MAX || 1
+);
+const TASKUPDATE_FIRST_MAX_VIOLATIONS = Number(process.env.TASKUPDATE_FIRST_MAX_VIOLATIONS || 1);
+
+function isTaskUpdateFirstSelfHealEnabled() {
+  const value = String(process.env.TASKUPDATE_FIRST_SELF_HEAL || 'on')
+    .trim()
+    .toLowerCase();
+  return value !== 'off';
+}
 
 function readTaskUpdateFirstState(stateFile = TASKUPDATE_FIRST_STATE_FILE) {
   try {
@@ -728,6 +739,52 @@ function normalizeTaskIdentifier(value) {
   if (value == null) return null;
   const normalized = String(value).replace(/\s+/g, ' ').trim().toLowerCase();
   return normalized.length > 0 ? normalized : null;
+}
+
+function resolveGuidanceTaskId(hookInput, toolInput, currentEntry) {
+  const directResolution = resolveCanonicalTaskId(hookInput, toolInput, currentEntry).taskId;
+  if (directResolution) return directResolution;
+
+  const hookTaskId = hookInput?.task_id || hookInput?.taskId || null;
+  if (typeof hookTaskId === 'string' && hookTaskId.trim().length > 0) {
+    return hookTaskId.trim();
+  }
+
+  const currentTaskId = currentEntry?.taskId || null;
+  if (typeof currentTaskId === 'string' && currentTaskId.trim().length > 0) {
+    return currentTaskId.trim();
+  }
+
+  try {
+    const stateTaskId = routerState.getCurrentSpawnTaskId();
+    if (typeof stateTaskId === 'string' && stateTaskId.trim().length > 0) {
+      return stateTaskId.trim();
+    }
+  } catch (_err) {
+    // Best-effort fallback only.
+  }
+
+  try {
+    const state = routerState.getState();
+    const fallbackTaskId = state?.currentSpawnTaskId || state?.lastTaskUpdateTaskId || null;
+    if (typeof fallbackTaskId === 'string' && fallbackTaskId.trim().length > 0) {
+      return fallbackTaskId.trim();
+    }
+  } catch (_err) {
+    // Best-effort fallback only.
+  }
+
+  return null;
+}
+
+function allowWithSelfHeal(taskId, toolName) {
+  return {
+    checked: true,
+    action: 'allow',
+    warning:
+      `[TASKUPDATE-FIRST SELF-HEAL] First preflight violation before ${toolName}; ` +
+      `auto-marked task ${String(taskId)} as in_progress and allowed execution to prevent deny-loop.`,
+  };
 }
 
 function isAgentScopedSession(hookInput) {
@@ -861,6 +918,8 @@ function checkTaskUpdateFirst(
   const currentEntry = current.sessions[sessionId] || {
     inProgress: false,
     taskId: null,
+    preflightTaskListCalls: 0,
+    preflightViolations: 0,
     updatedAt: 0,
   };
 
@@ -885,6 +944,8 @@ function checkTaskUpdateFirst(
         inProgress: !isCompleted,
         taskId: taskId || currentEntry.taskId || null,
         status,
+        preflightTaskListCalls: 0,
+        preflightViolations: 0,
         updatedAt: now,
       };
       writeTaskUpdateFirstState(current, stateFile);
@@ -910,6 +971,30 @@ function checkTaskUpdateFirst(
     return { checked: true, action: 'allow' };
   }
 
+  if (toolName === 'TaskList') {
+    const nextTaskListCalls = Number(currentEntry.preflightTaskListCalls || 0) + 1;
+    current.sessions[sessionId] = {
+      ...currentEntry,
+      preflightTaskListCalls: nextTaskListCalls,
+      updatedAt: now,
+    };
+    writeTaskUpdateFirstState(current, stateFile);
+
+    if (nextTaskListCalls <= TASKUPDATE_FIRST_PREFLIGHT_TASKLIST_MAX) {
+      return { checked: true, action: 'allow' };
+    }
+
+    const canonicalTaskId = resolveGuidanceTaskId(hookInput, toolInput, currentEntry);
+    const recommendedTaskId = canonicalTaskId || '<canonical-task-id>';
+    return {
+      checked: true,
+      action: 'block',
+      message:
+        `[TASKUPDATE-FIRST HARD-FAIL] Repeated TaskList() preflight without TaskUpdate(in_progress). ` +
+        `Before any further tools, run TaskUpdate({ taskId: "${recommendedTaskId}", status: "in_progress" }).`,
+    };
+  }
+
   // Bootstrap fallback: pre-task hook records in_progress in router-state at spawn time.
   // When subagent hook payloads are sparse or delayed, honor that marker to avoid deadlock.
   const bootstrapAllow = allowFromRouterBootstrap(hookInput, sessionId, now, current, stateFile);
@@ -927,9 +1012,43 @@ function checkTaskUpdateFirst(
   });
   if (autoMarkAllow) return autoMarkAllow;
 
+  const nextViolations = Number(currentEntry.preflightViolations || 0) + 1;
+  const canonicalTaskId = resolveGuidanceTaskId(hookInput, toolInput, currentEntry);
+  const recommendedTaskId = canonicalTaskId || '<canonical-task-id>';
+
+  const selfHealEnabled = isTaskUpdateFirstSelfHealEnabled();
+  if (selfHealEnabled && nextViolations === 1 && canonicalTaskId) {
+    current.sessions[sessionId] = {
+      inProgress: true,
+      taskId: canonicalTaskId,
+      status: 'in_progress',
+      preflightTaskListCalls: Number(currentEntry.preflightTaskListCalls || 0),
+      preflightViolations: 0,
+      updatedAt: now,
+    };
+    writeTaskUpdateFirstState(current, stateFile);
+    try {
+      routerState.recordTaskUpdate(String(canonicalTaskId), 'in_progress');
+    } catch (_err) {
+      // Best-effort.
+    }
+    return allowWithSelfHeal(canonicalTaskId, toolName);
+  }
+
+  current.sessions[sessionId] = {
+    ...currentEntry,
+    preflightViolations: nextViolations,
+    updatedAt: now,
+  };
+  writeTaskUpdateFirstState(current, stateFile);
+
+  const baseGuidance =
+    `Only TaskList() and TaskUpdate() are allowed before first in_progress. ` +
+    `Run TaskUpdate({ taskId: "${recommendedTaskId}", status: "in_progress" }) before using ${toolName}.`;
   const message =
-    '[TASKUPDATE-FIRST] Agent must call TaskUpdate({ taskId, status: "in_progress" }) ' +
-    `before using ${toolName}.`;
+    nextViolations > TASKUPDATE_FIRST_MAX_VIOLATIONS
+      ? `[TASKUPDATE-FIRST HARD-FAIL] Repeated preflight violation. ${baseGuidance}`
+      : `[TASKUPDATE-FIRST AUTO-REROUTE] ${baseGuidance}`;
   if (mode === 'warn') {
     return { checked: true, action: 'allow', warning: message };
   }
@@ -1328,6 +1447,20 @@ const READ_DIR_LISTING_PATH = path.join(
 );
 const READ_DIR_LISTING_MAX_ATTEMPTS = 5;
 
+function isReadSafetyAutoWindowEnabled() {
+  return (
+    String(process.env.READ_SAFETY_AUTOWINDOW || 'on')
+      .trim()
+      .toLowerCase() !== 'off'
+  );
+}
+
+function getReadSafetyAutoWindowLimit() {
+  const parsed = Number(process.env.READ_SAFETY_AUTOWINDOW_LIMIT || 4000);
+  if (!Number.isFinite(parsed) || parsed <= 0) return 4000;
+  return Math.floor(parsed);
+}
+
 function hasReadWindow(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return false;
   const numeric = value => Number.isFinite(Number(value)) && Number(value) >= 0;
@@ -1345,19 +1478,7 @@ function resolveReadPath(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return null;
   const raw = toolInput.file_path || toolInput.filePath || toolInput.path || null;
   if (!raw || typeof raw !== 'string') return null;
-  let normalized = raw;
-
-  // Normalize Unix-style drive-prefixed paths emitted on Windows shells.
-  // Example: /c/dev/projects/... -> C:\dev\projects\...
-  if (process.platform === 'win32') {
-    const unixDriveMatch = normalized.match(/^\/([a-zA-Z])\/(.*)$/);
-    if (unixDriveMatch) {
-      const drive = unixDriveMatch[1].toUpperCase();
-      const rest = unixDriveMatch[2].replace(/\//g, '\\');
-      normalized = `${drive}:\\${rest}`;
-    }
-  }
-
+  const normalized = canonicalizePathForPlatform(raw, PROJECT_ROOT);
   return path.isAbsolute(normalized) ? normalized : path.resolve(PROJECT_ROOT, normalized);
 }
 
@@ -1559,6 +1680,21 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       };
       const relativePath = path.relative(PROJECT_ROOT, targetPath).replace(/\\/g, '/');
       const suggestedPath = missingPathHints[relativePath];
+      if (suggestedPath) {
+        const canonicalTarget = path.join(PROJECT_ROOT, suggestedPath);
+        if (fs.existsSync(canonicalTarget)) {
+          return {
+            checked: true,
+            action: 'rewrite',
+            rewrittenToolInput: {
+              ...toolInput,
+              file_path: canonicalTarget,
+            },
+            bypassWarning:
+              `[READ SAFETY] Rewrote stale path "${targetPath}" to canonical path "${canonicalTarget}".`,
+          };
+        }
+      }
       const suggestionText = suggestedPath
         ? ` Did you mean "${path.join(PROJECT_ROOT, suggestedPath)}"?`
         : '';
@@ -1595,6 +1731,22 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
 
     // If file is large and caller did not request a window, force chunked read.
     if (stats.size > READ_CHUNK_GUARD_BYTES && !hasReadWindow(toolInput)) {
+      if (isReadSafetyAutoWindowEnabled()) {
+        const limit = getReadSafetyAutoWindowLimit();
+        return {
+          checked: true,
+          action: 'rewrite',
+          rewrittenToolInput: {
+            ...toolInput,
+            offset: 0,
+            limit,
+          },
+          bypassWarning:
+            `${
+              isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '
+            }Large file (${stats.size} bytes) auto-windowed to offset=0, limit=${limit}.`,
+        };
+      }
       return {
         checked: true,
         action: 'block',

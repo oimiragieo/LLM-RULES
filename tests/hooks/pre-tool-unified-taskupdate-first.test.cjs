@@ -66,10 +66,12 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
     const stateFile = path.join(tempDir, 'state.json');
     const priorMode = process.env.TASKUPDATE_FIRST_ENFORCEMENT;
     const priorAutoMark = process.env.TASKUPDATE_FIRST_AUTOMARK;
+    const priorSelfHeal = process.env.TASKUPDATE_FIRST_SELF_HEAL;
     const priorSessionId = process.env.CLAUDE_SESSION_ID;
     const priorBootstrap = process.env.TASKUPDATE_FIRST_BOOTSTRAP;
     process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'block';
     process.env.TASKUPDATE_FIRST_AUTOMARK = 'off';
+    process.env.TASKUPDATE_FIRST_SELF_HEAL = 'off';
     process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'off';
     delete process.env.CLAUDE_SESSION_ID;
     try {
@@ -84,6 +86,11 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
         delete process.env.TASKUPDATE_FIRST_AUTOMARK;
       } else {
         process.env.TASKUPDATE_FIRST_AUTOMARK = priorAutoMark;
+      }
+      if (priorSelfHeal == null) {
+        delete process.env.TASKUPDATE_FIRST_SELF_HEAL;
+      } else {
+        process.env.TASKUPDATE_FIRST_SELF_HEAL = priorSelfHeal;
       }
       if (priorSessionId == null) {
         delete process.env.CLAUDE_SESSION_ID;
@@ -108,7 +115,146 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
 
       const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo hello' }, stateFile);
       assert.equal(result.action, 'block');
-      assert.match(result.message, /TaskUpdate\(\{ taskId, status: "in_progress" \}\)/);
+      assert.match(result.message || '', /TaskUpdate\(\{ taskId: /);
+      assert.match(result.message || '', /in_progress/);
+    });
+  });
+
+  test('returns auto-reroute guidance on first preflight violation', () => {
+    withTempStateFile(stateFile => {
+      const hookInput = {
+        session_id: 'session-reroute-1',
+        allowed_tools: ['TaskUpdate', 'TaskList', 'Read', 'Bash'],
+        task_id: 'task-canonical-reroute-1',
+      };
+
+      const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo hello' }, stateFile);
+      assert.equal(result.action, 'block');
+      assert.match(result.message || '', /AUTO-REROUTE/);
+      assert.match(result.message || '', /task-canonical-reroute-1/);
+    });
+  });
+
+  test('hard-fails on repeated preflight violations before in_progress', () => {
+    withTempStateFile(stateFile => {
+      const hookInput = {
+        session_id: 'session-reroute-2',
+        allowed_tools: ['TaskUpdate', 'TaskList', 'Read', 'Bash'],
+        task_id: 'task-canonical-reroute-2',
+      };
+
+      const first = checkTaskUpdateFirst(hookInput, 'Read', { file_path: 'README.md' }, stateFile);
+      assert.equal(first.action, 'block');
+      assert.match(first.message || '', /AUTO-REROUTE/);
+
+      const second = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo hello' }, stateFile);
+      assert.equal(second.action, 'block');
+      assert.match(second.message || '', /HARD-FAIL/);
+    });
+  });
+
+  test('blocks repeated TaskList preflight loops before in_progress', () => {
+    withTempStateFile(stateFile => {
+      const hookInput = {
+        session_id: 'session-tasklist-loop',
+        allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
+        task_id: 'task-canonical-loop',
+      };
+
+      const first = checkTaskUpdateFirst(hookInput, 'TaskList', {}, stateFile);
+      assert.equal(first.action, 'allow');
+
+      const second = checkTaskUpdateFirst(hookInput, 'TaskList', {}, stateFile);
+      assert.equal(second.action, 'block');
+      assert.match(second.message || '', /HARD-FAIL/);
+      assert.match(second.message || '', /task-canonical-loop/);
+    });
+  });
+
+  test('uses router-state currentSpawnTaskId in reroute guidance when hook task_id is missing', () => {
+    withTempStateFile(stateFile => {
+      withRouterState(
+        {
+          mode: 'agent',
+          taskSpawned: true,
+          sessionId: 'session-guidance-fallback',
+          currentSpawnTaskId: 'task-canonical-fallback-42',
+        },
+        () => {
+          const hookInput = {
+            session_id: 'session-guidance-fallback',
+            allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
+          };
+          const result = checkTaskUpdateFirst(
+            hookInput,
+            'Read',
+            { file_path: 'README.md' },
+            stateFile
+          );
+          assert.equal(result.action, 'block');
+          assert.match(result.message || '', /task-canonical-fallback-42/);
+        }
+      );
+    });
+  });
+
+  test('self-heal allows first non-preflight tool when canonical task id is resolvable', () => {
+    withTempStateFile(stateFile => {
+      process.env.TASKUPDATE_FIRST_SELF_HEAL = 'on';
+      withRouterState(
+        {
+          mode: 'agent',
+          taskSpawned: true,
+          sessionId: 'session-self-heal',
+          currentSpawnTaskId: 'task-self-heal-1',
+        },
+        () => {
+          const hookInput = {
+            session_id: 'session-self-heal',
+            allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
+          };
+          const result = checkTaskUpdateFirst(
+            hookInput,
+            'Read',
+            { file_path: 'README.md' },
+            stateFile
+          );
+          assert.equal(result.action, 'allow');
+          assert.match(result.warning || '', /SELF-HEAL/);
+
+          const state = readTaskUpdateFirstState(stateFile);
+          assert.equal(state.sessions['session-self-heal'].inProgress, true);
+          assert.equal(state.sessions['session-self-heal'].taskId, 'task-self-heal-1');
+        }
+      );
+    });
+  });
+
+  test('self-heal can be disabled and preserves block behavior', () => {
+    withTempStateFile(stateFile => {
+      process.env.TASKUPDATE_FIRST_SELF_HEAL = 'off';
+      withRouterState(
+        {
+          mode: 'agent',
+          taskSpawned: true,
+          sessionId: 'session-self-heal-off',
+          currentSpawnTaskId: 'task-self-heal-off-1',
+        },
+        () => {
+          const hookInput = {
+            session_id: 'session-self-heal-off',
+            allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
+          };
+          const result = checkTaskUpdateFirst(
+            hookInput,
+            'Read',
+            { file_path: 'README.md' },
+            stateFile
+          );
+          assert.equal(result.action, 'block');
+          assert.match(result.message || '', /AUTO-REROUTE|HARD-FAIL|TASKUPDATE-FIRST/);
+        }
+      );
     });
   });
 
@@ -439,6 +585,38 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
           const hookInput = {
             session_id: 'session-14',
             task_id: 'task-14',
+            allowed_tools: ['TaskUpdate', 'Read'],
+          };
+          const result = checkTaskUpdateFirst(
+            hookInput,
+            'Read',
+            { file_path: 'README.md' },
+            stateFile
+          );
+          assert.equal(result.action, 'block');
+          assert.match(result.message || '', /TASKUPDATE-FIRST/);
+        }
+      );
+    });
+  });
+
+  test('does not allow bootstrap when router-state session id mismatches hook session_id', () => {
+    withTempStateFile(stateFile => {
+      process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'true';
+      withMockedRouterSnapshot(
+        {
+          mode: 'agent',
+          taskSpawned: true,
+          sessionId: 'session-A',
+          lastTaskUpdateCall: Date.now(),
+          lastTaskUpdateTaskId: 'task-15',
+          lastTaskUpdateStatus: 'in_progress',
+          taskUpdatesThisSession: 1,
+        },
+        () => {
+          const hookInput = {
+            session_id: 'session-B',
+            task_id: 'task-15',
             allowed_tools: ['TaskUpdate', 'Read'],
           };
           const result = checkTaskUpdateFirst(

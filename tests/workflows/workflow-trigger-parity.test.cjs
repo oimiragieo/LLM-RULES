@@ -6,7 +6,7 @@ const path = require('node:path');
 const workflowFiles = [
   'creator-ecosystem-validate.yml',
   'skill-build-validate.yml',
-  'commands-validate.yml'
+  'commands-validate.yml',
 ];
 
 const requiredTriggerPaths = [
@@ -22,7 +22,7 @@ const requiredTriggerPaths = [
   '.claude/context/config/agent-skill-matrix.json',
   '.claude/tools/cli/validate-skill-ecosystem.cjs',
   '.claude/tools/cli/validate-agent-skill-references.cjs',
-  'package.json'
+  'package.json',
 ];
 
 function readWorkflow(name) {

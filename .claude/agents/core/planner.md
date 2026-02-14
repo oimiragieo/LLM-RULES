@@ -32,6 +32,7 @@ skills:
   - plan-generator
   - planning-with-files
   - project-onboarding
+  - recommend-evolution
   - ripgrep
   - sparc-methodology
   - sequential-thinking
@@ -39,6 +40,7 @@ skills:
   - spec-init
   - task-management-protocol
   - verification-before-completion
+  - framework-context
 
 # Agent Identity
 identity:

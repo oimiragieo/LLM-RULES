@@ -685,15 +685,12 @@ test('[Memory] Should cache patterns for performance', async () => {
     path.join(PROJECT_ROOT, '.claude/lib/utils/memory-integrated-suggester.cjs')
   );
 
-  const start1 = Date.now();
-  await loadDomainPatterns('authentication');
-  const time1 = Date.now() - start1;
+  const first = await loadDomainPatterns('authentication');
+  const second = await loadDomainPatterns('authentication');
 
-  const start2 = Date.now();
-  await loadDomainPatterns('authentication');
-  const time2 = Date.now() - start2;
-
-  assert.ok(time2 <= time1, 'Cached call should be faster or equal');
+  // Deterministic cache check: cached call should return the same array reference.
+  assert.strictEqual(second, first, 'Cached call should reuse cached pattern array');
+  assert.deepStrictEqual(second, first, 'Cached call should preserve pattern content');
 });
 
 // ============================================================================

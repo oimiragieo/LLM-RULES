@@ -638,6 +638,10 @@ Router and spawned agents must follow these runtime rules:
 
 **pipeline-reflection-ux** — Step 0/reflection visibility and pipeline-noise reduction playbook (explicit Step 0 start/complete, reflection outcome line, batched late notifications).
 
+**framework-context** — Structured framework model for system-level reflection/planning (memory tiers, routing, workflows, hooks, directory layout). Invoke before proposing system evolution.
+
+**recommend-evolution** — Trigger-based evolution recommendation workflow. Records proposals in `.claude/context/runtime/evolution-requests.jsonl` and reflection report sections; does not auto-spawn orchestrators.
+
 ### 8.6 ENTERPRISE WORKFLOWS
 
 > **REFERENCE:** See **@ENTERPRISE_WORKFLOWS.md** for complete workflow catalog.

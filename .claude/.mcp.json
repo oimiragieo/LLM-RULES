@@ -3,11 +3,11 @@
   "mcpServers": {
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem@0", "."]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem@0", "C:\\dev\\projects\\agent-studio"]
     },
     "git": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git@0", "."]
+      "args": ["-y", "@modelcontextprotocol/server-git@0", "C:\\dev\\projects\\agent-studio"]
     },
     "memory": {
       "command": "npx",

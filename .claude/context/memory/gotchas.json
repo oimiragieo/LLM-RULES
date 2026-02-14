@@ -298,6 +298,45 @@
       ],
       "extracted_from": "Task #13 Code Review Reflection - windowsHide Compliance Test",
       "date": "2026-02-13"
+    },
+    {
+      "id": "complexity-audit-effort-estimation-gap",
+      "gotcha": "Complexity audit identifies refactoring opportunities but omits effort estimation per task, making prioritization difficult",
+      "context": "Task #1 Complexity Audit (2026-02-14) - 6-phase roadmap spans Weeks 1-7 but provides no hour/day breakdown per phase",
+      "why_it_happens": "Analysis tools (LOC counters, nesting depth checkers) measure scope but don't measure effort. Developer time estimates require understanding of: (1) file coupling/dependencies, (2) test rewrite effort, (3) validation complexity, (4) regression risk.",
+      "symptoms": "Project manager cannot schedule resources ('Phase 2: Week 2-3' but no hour estimate). Developer cannot assess if 'split routing-guard.cjs' is 4 hours or 40 hours. Prioritization based on size alone may not reflect true effort.",
+      "trigger": "Running automated complexity analysis without manual effort estimation pass afterward",
+      "solution": "Add post-analysis effort estimation phase: (1) Sample 3 files from each priority tier, (2) Measure actual refactoring time, (3) Extrapolate to full tier, (4) Add effort estimates to roadmap phases",
+      "example": "routing-guard.cjs (2578L) appears high-priority. Effort unknown: could be 8 hours (straightforward extraction) or 80 hours (heavy test rewriting). Manual sampling: refactoring similar 1500L file took 12 hours with tests. Extrapolate: routing-guard likely 20-24 hours.",
+      "prevention": [
+        "Include 'effort estimation' as step after analysis in audit workflow",
+        "Use parametric estimation: base_effort × (LOC / 1000) × coupling_factor × test_complexity_factor",
+        "Document samples in appendix: '3 files sampled: X hours, Y hours, Z hours → average N hours per 500L file'"
+      ],
+      "impact": "MEDIUM - Reduces audit actionability without actual time estimates for planning",
+      "applicability": "All complexity audits, refactoring roadmaps, technical debt prioritization",
+      "extracted_from": "Task #1 Reflection - Complexity Audit 2026-02-14, 'Buds' analysis",
+      "date": "2026-02-14"
+    },
+    {
+      "id": "complexity-metrics-baseline-undefined",
+      "gotcha": "Audit claims '40-60% reduction in cognitive load' but provides no baseline measurement method or metric definition",
+      "context": "Task #1 Complexity Audit (2026-02-14) - Section 7 'Metrics & Estimates' projects impact without establishing pre-refactor baseline",
+      "why_it_happens": "Cognitive load is qualitative. Files >1000L, deep nesting, and duplication all contribute, but there's no single metric (cyclomatic complexity, maintainability index) to track improvement. Without baseline, post-refactoring claim of '40-60% improvement' is unverifiable.",
+      "symptoms": "Can measure 'oversized modules: 92 → 45' (quantitative), but cannot measure 'cognitive load: X → Y' (qualitative). Post-refactoring, developer reports 'code feels cleaner' but no objective evidence of productivity improvement.",
+      "trigger": "Citing reduction percentages for non-quantifiable dimensions (cognitive load, maintainability) without defining how to measure them",
+      "solution": "Define baseline metrics before refactoring: (1) Average cyclomatic complexity per module, (2) Max nesting depth per module, (3) Average file LOC, (4) Halstead complexity score. Track these metrics pre/post and use deltas as proxy for cognitive load.",
+      "example": "Baseline: avg complexity = 8.2, max nesting = 16, avg LOC = 650. Target: avg complexity = 6.0, max nesting = 5, avg LOC = 350. Post-refactor measurement validates claims.",
+      "prevention": [
+        "Define 'cognitive load reduction' operationally: 'X% reduction in average cyclomatic complexity + Y% reduction in max nesting'",
+        "Measure baseline metrics before starting refactoring",
+        "Track metrics monthly via automated tool (plato, SonarQube, ESLint with metrics output)",
+        "Report actual vs claimed improvement post-refactor"
+      ],
+      "impact": "MEDIUM - Makes audit claims non-falsifiable without post-refactor verification",
+      "applicability": "All quality/maintainability improvement claims",
+      "extracted_from": "Task #1 Reflection - Complexity Audit 2026-02-14, Section 7 impact analysis",
+      "date": "2026-02-14"
     }
   ]
 }

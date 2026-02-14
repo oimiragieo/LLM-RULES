@@ -1,15 +1,596 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-14T08:03:44.521Z",
+  "generatedAt": "2026-02-14T18:12:57.972Z",
   "metadata": {
-    "totalSkills": 381,
+    "totalSkills": 383,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-14T08:03:44.522Z",
+    "lastValidated": "2026-02-14T18:12:57.973Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
   "skills": {
+    "verification-before-completion": {
+      "name": "verification-before-completion",
+      "displayName": "Verification Before Completion",
+      "category": "Quality",
+      "domain": "quality",
+      "description": "Quality - verification-before-completion",
+      "requiredTools": [
+        "Read",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer",
+        "architect",
+        "qa",
+        "technical-writer",
+        "python-pro",
+        "rust-pro",
+        "golang-pro",
+        "typescript-pro",
+        "fastapi-pro",
+        "frontend-pro",
+        "nodejs-pro",
+        "ios-pro",
+        "java-pro",
+        "nextjs-pro",
+        "php-pro",
+        "sveltekit-expert",
+        "tauri-desktop-developer",
+        "expo-mobile-developer",
+        "data-engineer",
+        "graphql-pro",
+        "mobile-ux-reviewer",
+        "code-reviewer",
+        "security-architect",
+        "devops",
+        "devops-troubleshooter",
+        "incident-responder",
+        "c4-context",
+        "c4-container",
+        "c4-component",
+        "c4-code",
+        "conductor-validator",
+        "reverse-engineer",
+        "database-architect",
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "quality",
+        "verification-before-completion"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "complexity-assessment": {
+      "name": "complexity-assessment",
+      "displayName": "Complexity Assessment",
+      "category": "Other",
+      "domain": "planning",
+      "description": "Other - complexity-assessment",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "planner",
+        "pm",
+        "router"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "planning",
+        "other",
+        "complexity-assessment"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "protocol-reverse-engineering": {
+      "name": "protocol-reverse-engineering",
+      "displayName": "Protocol Reverse Engineering",
+      "category": "Other",
+      "domain": "security",
+      "description": "Other - protocol-reverse-engineering",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "reverse-engineer"
+      ],
+      "agentSupporting": [
+        "reverse-engineer"
+      ],
+      "tags": [
+        "security",
+        "other",
+        "protocol-reverse-engineering"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "incident-runbook-templates": {
+      "name": "incident-runbook-templates",
+      "displayName": "Incident Runbook Templates",
+      "category": "Other",
+      "domain": "devops",
+      "description": "Other - incident-runbook-templates",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "incident-responder"
+      ],
+      "agentSupporting": [
+        "devops-troubleshooter"
+      ],
+      "tags": [
+        "devops",
+        "other",
+        "incident-runbook-templates"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "python-backend-expert": {
+      "name": "python-backend-expert",
+      "displayName": "Python Backend Expert",
+      "category": "Languages",
+      "domain": "languages",
+      "description": "Languages - python-backend-expert",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob"
+      ],
+      "agentPrimary": [
+        "python-pro",
+        "fastapi-pro",
+        "data-engineer"
+      ],
+      "agentSupporting": [
+        "developer"
+      ],
+      "tags": [
+        "languages",
+        "python-backend-expert"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "expo-framework-rule": {
+      "name": "expo-framework-rule",
+      "displayName": "Expo Framework Rule",
+      "category": "Other",
+      "domain": "mobile",
+      "description": "Other - expo-framework-rule",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "expo-mobile-developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "mobile",
+        "other",
+        "expo-framework-rule"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "tauri-native-api-integration": {
+      "name": "tauri-native-api-integration",
+      "displayName": "Tauri Native Api Integration",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - tauri-native-api-integration",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "tauri-desktop-developer"
+      ],
+      "tags": [
+        "other",
+        "tauri-native-api-integration"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "database-architect": {
+      "name": "database-architect",
+      "displayName": "Database Architect",
+      "category": "Database",
+      "domain": "database",
+      "description": "Database - database-architect",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob"
+      ],
+      "agentPrimary": [
+        "architect",
+        "devops",
+        "database-architect"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "database",
+        "database-architect"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "writing-skills": {
+      "name": "writing-skills",
+      "displayName": "Writing Skills",
+      "category": "Documentation",
+      "domain": "documentation",
+      "description": "Documentation - writing-skills",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Task"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "technical-writer"
+      ],
+      "tags": [
+        "documentation",
+        "writing-skills"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "gamedev-expert": {
+      "name": "gamedev-expert",
+      "displayName": "Gamedev Expert",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - gamedev-expert",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "gamedev-expert"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "git-expert": {
+      "name": "git-expert",
+      "displayName": "Git Expert",
+      "category": "Version Control",
+      "domain": "git",
+      "description": "Version Control - git-expert",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob"
+      ],
+      "agentPrimary": [
+        "developer",
+        "rust-pro",
+        "devops"
+      ],
+      "agentSupporting": [
+        "python-pro",
+        "golang-pro",
+        "typescript-pro"
+      ],
+      "tags": [
+        "git",
+        "version-control",
+        "git-expert"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "code-style-validator": {
+      "name": "code-style-validator",
+      "displayName": "Code Style Validator",
+      "category": "Other",
+      "domain": "development",
+      "description": "Other - code-style-validator",
+      "requiredTools": [
+        "Read",
+        "Grep",
+        "Bash",
+        "Glob"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "developer",
+        "code-reviewer"
+      ],
+      "tags": [
+        "development",
+        "other",
+        "code-style-validator"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "artifact-integrator": {
+      "name": "artifact-integrator",
+      "displayName": "Artifact Integrator",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - artifact-integrator",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "artifact-integrator"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "task-management-protocol": {
+      "name": "task-management-protocol",
+      "displayName": "Task Management Protocol",
+      "category": "Other",
+      "domain": "specialized",
+      "description": "Other - task-management-protocol",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "planner",
+        "architect",
+        "qa",
+        "pm",
+        "python-pro",
+        "rust-pro",
+        "golang-pro",
+        "typescript-pro",
+        "fastapi-pro",
+        "frontend-pro",
+        "nodejs-pro",
+        "ios-pro",
+        "java-pro",
+        "nextjs-pro",
+        "php-pro",
+        "sveltekit-expert",
+        "tauri-desktop-developer",
+        "expo-mobile-developer",
+        "data-engineer",
+        "graphql-pro",
+        "mobile-ux-reviewer",
+        "security-architect",
+        "devops",
+        "devops-troubleshooter",
+        "incident-responder",
+        "c4-context",
+        "c4-container",
+        "c4-component",
+        "c4-code",
+        "conductor-validator",
+        "reverse-engineer",
+        "database-architect",
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator"
+      ],
+      "agentSupporting": [
+        "router"
+      ],
+      "tags": [
+        "specialized",
+        "other",
+        "task-management-protocol"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "context-driven-development": {
+      "name": "context-driven-development",
+      "displayName": "Context Driven Development",
+      "category": "Other",
+      "domain": "memory",
+      "description": "Other - context-driven-development",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "conductor-validator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "memory",
+        "other",
+        "context-driven-development"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "pipeline-reflection-ux": {
+      "name": "pipeline-reflection-ux",
+      "displayName": "Pipeline Reflection Ux",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - pipeline-reflection-ux",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "pipeline-reflection-ux"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "interactive-requirements-gathering": {
+      "name": "interactive-requirements-gathering",
+      "displayName": "Interactive Requirements Gathering",
+      "category": "Other",
+      "domain": "requirements",
+      "description": "Other - interactive-requirements-gathering",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "pm"
+      ],
+      "tags": [
+        "requirements",
+        "other",
+        "interactive-requirements-gathering"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "project-onboarding": {
+      "name": "project-onboarding",
+      "displayName": "Project Onboarding",
+      "category": "Other",
+      "domain": "memory",
+      "description": "Other - project-onboarding",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "memory",
+        "other",
+        "project-onboarding"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "code-structural-search": {
+      "name": "code-structural-search",
+      "displayName": "Code Structural Search",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - code-structural-search",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "code-structural-search"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "advanced-elicitation": {
+      "name": "advanced-elicitation",
+      "displayName": "Advanced Elicitation",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - advanced-elicitation",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "advanced-elicitation"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "function-length-and-responsibility": {
+      "name": "function-length-and-responsibility",
+      "displayName": "Function Length And Responsibility",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - function-length-and-responsibility",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "function-length-and-responsibility"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "accessibility": {
       "name": "accessibility",
       "displayName": "Accessibility",
@@ -33,29 +614,6 @@
         "accessibility"
       ],
       "priority": 1,
-      "aliasOf": null
-    },
-    "advanced-elicitation": {
-      "name": "advanced-elicitation",
-      "displayName": "Advanced Elicitation",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - advanced-elicitation",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "other",
-        "advanced-elicitation"
-      ],
-      "priority": 3,
       "aliasOf": null
     },
     "agent-creator": {
@@ -135,7 +693,6 @@
       ],
       "tags": [
         "mobile",
-        "mobile",
         "android-expert"
       ],
       "priority": 3,
@@ -199,33 +756,9 @@
       ],
       "tags": [
         "architecture",
-        "architecture",
         "architecture-review"
       ],
       "priority": 1,
-      "aliasOf": null
-    },
-    "artifact-integrator": {
-      "name": "artifact-integrator",
-      "displayName": "Artifact Integrator",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - artifact-integrator",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "other",
-        "artifact-integrator"
-      ],
-      "priority": 3,
       "aliasOf": null
     },
     "artifact-lifecycle": {
@@ -267,7 +800,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "research",
         "research",
         "arxiv-mcp"
       ],
@@ -319,7 +851,6 @@
       ],
       "tags": [
         "security",
-        "security",
         "auth-security-expert"
       ],
       "priority": 1,
@@ -344,7 +875,6 @@
       ],
       "tags": [
         "devops",
-        "devops",
         "aws-cloud-ops"
       ],
       "priority": 3,
@@ -366,7 +896,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "best-practices-guidelines"
       ],
@@ -415,7 +944,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "build-tools-expert"
       ],
       "priority": 3,
@@ -442,7 +970,6 @@
       ],
       "tags": [
         "quality",
-        "quality",
         "checklist-generator"
       ],
       "priority": 3,
@@ -466,7 +993,6 @@
         "qa"
       ],
       "tags": [
-        "integration",
         "integration",
         "chrome-browser"
       ],
@@ -598,85 +1124,9 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "code-semantic-search"
       ],
       "priority": 3,
-      "aliasOf": null
-    },
-    "code-structural-search": {
-      "name": "code-structural-search",
-      "displayName": "Code Structural Search",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - code-structural-search",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "other",
-        "code-structural-search"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "code-style-validator": {
-      "name": "code-style-validator",
-      "displayName": "Code Style Validator",
-      "category": "Other",
-      "domain": "development",
-      "description": "Other - code-style-validator",
-      "requiredTools": [
-        "Read",
-        "Grep",
-        "Bash",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer",
-        "code-reviewer"
-      ],
-      "tags": [
-        "development",
-        "other",
-        "code-style-validator"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "complexity-assessment": {
-      "name": "complexity-assessment",
-      "displayName": "Complexity Assessment",
-      "category": "Other",
-      "domain": "planning",
-      "description": "Other - complexity-assessment",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "planner",
-        "pm",
-        "router"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "planning",
-        "other",
-        "complexity-assessment"
-      ],
-      "priority": 1,
       "aliasOf": null
     },
     "composer-dependency-management": {
@@ -697,7 +1147,6 @@
         "php-pro"
       ],
       "tags": [
-        "other",
         "other",
         "composer-dependency-management"
       ],
@@ -872,31 +1321,7 @@
       ],
       "tags": [
         "memory",
-        "memory",
         "context-compressor"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "context-driven-development": {
-      "name": "context-driven-development",
-      "displayName": "Context Driven Development",
-      "category": "Other",
-      "domain": "memory",
-      "description": "Other - context-driven-development",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "conductor-validator"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "context-driven-development"
       ],
       "priority": 1,
       "aliasOf": null
@@ -941,7 +1366,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "creators/command-creator"
       ],
       "priority": 1,
@@ -963,7 +1387,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "creators/rule-creator"
       ],
@@ -988,7 +1411,6 @@
         "evolution-orchestrator"
       ],
       "tags": [
-        "other",
         "other",
         "creators/tool-creator"
       ],
@@ -1016,34 +1438,6 @@
         "database",
         "other",
         "data-expert"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "database-architect": {
-      "name": "database-architect",
-      "displayName": "Database Architect",
-      "category": "Database",
-      "domain": "database",
-      "description": "Database - database-architect",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "architect",
-        "devops",
-        "database-architect"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "database",
-        "database",
-        "database-architect"
       ],
       "priority": 1,
       "aliasOf": null
@@ -1192,7 +1586,6 @@
       ],
       "tags": [
         "architecture",
-        "architecture",
         "diagram-generator"
       ],
       "priority": 1,
@@ -1214,7 +1607,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "differential-review"
       ],
@@ -1247,7 +1639,6 @@
       ],
       "tags": [
         "documentation",
-        "documentation",
         "doc-generator"
       ],
       "priority": 1,
@@ -1271,7 +1662,6 @@
       "agentSupporting": [],
       "tags": [
         "devops",
-        "devops",
         "docker-compose"
       ],
       "priority": 1,
@@ -1293,7 +1683,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "dry-principle"
       ],
@@ -1319,33 +1708,9 @@
       ],
       "tags": [
         "other",
-        "other",
         "dto-conventions"
       ],
       "priority": 3,
-      "aliasOf": null
-    },
-    "expo-framework-rule": {
-      "name": "expo-framework-rule",
-      "displayName": "Expo Framework Rule",
-      "category": "Other",
-      "domain": "mobile",
-      "description": "Other - expo-framework-rule",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "expo-mobile-developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "mobile",
-        "other",
-        "expo-framework-rule"
-      ],
-      "priority": 1,
       "aliasOf": null
     },
     "expo-mobile-app-rule": {
@@ -1416,7 +1781,6 @@
       ],
       "tags": [
         "other",
-        "other",
         "form-and-actions-in-sveltekit"
       ],
       "priority": 3,
@@ -1439,10 +1803,31 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "form-validation-with-zod"
       ],
       "priority": 3,
+      "aliasOf": null
+    },
+    "framework-context": {
+      "name": "framework-context",
+      "displayName": "Framework Context",
+      "category": "Memory",
+      "domain": "memory",
+      "description": "Load and synthesize framework architecture context for reflection/planning.",
+      "requiredTools": [
+        "Read",
+        "Skill"
+      ],
+      "agentPrimary": [
+        "planner",
+        "reflection-agent"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "memory",
+        "framework-context"
+      ],
+      "priority": 1,
       "aliasOf": null
     },
     "frontend-expert": {
@@ -1466,52 +1851,6 @@
         "frontend-expert"
       ],
       "priority": 1,
-      "aliasOf": null
-    },
-    "function-length-and-responsibility": {
-      "name": "function-length-and-responsibility",
-      "displayName": "Function Length And Responsibility",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - function-length-and-responsibility",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "other",
-        "function-length-and-responsibility"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "gamedev-expert": {
-      "name": "gamedev-expert",
-      "displayName": "Gamedev Expert",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - gamedev-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "other",
-        "gamedev-expert"
-      ],
-      "priority": 3,
       "aliasOf": null
     },
     "gcloud-cli": {
@@ -1540,38 +1879,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "git-expert": {
-      "name": "git-expert",
-      "displayName": "Git Expert",
-      "category": "Version Control",
-      "domain": "git",
-      "description": "Version Control - git-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "developer",
-        "rust-pro",
-        "devops"
-      ],
-      "agentSupporting": [
-        "python-pro",
-        "golang-pro",
-        "typescript-pro"
-      ],
-      "tags": [
-        "git",
-        "version-control",
-        "git-expert"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
     "github-mcp": {
       "name": "github-mcp",
       "displayName": "Github Mcp",
@@ -1588,7 +1895,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "integration",
         "integration",
         "github-mcp"
       ],
@@ -1639,7 +1945,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "languages",
         "languages",
         "go-expert"
       ],
@@ -1747,31 +2052,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "incident-runbook-templates": {
-      "name": "incident-runbook-templates",
-      "displayName": "Incident Runbook Templates",
-      "category": "Other",
-      "domain": "devops",
-      "description": "Other - incident-runbook-templates",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "incident-responder"
-      ],
-      "agentSupporting": [
-        "devops-troubleshooter"
-      ],
-      "tags": [
-        "devops",
-        "other",
-        "incident-runbook-templates"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
     "insecure-defaults": {
       "name": "insecure-defaults",
       "displayName": "Insecure Defaults",
@@ -1788,7 +2068,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "insecure-defaults"
       ],
@@ -1837,33 +2116,7 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "integration/artifact-updater"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "interactive-requirements-gathering": {
-      "name": "interactive-requirements-gathering",
-      "displayName": "Interactive Requirements Gathering",
-      "category": "Other",
-      "domain": "requirements",
-      "description": "Other - interactive-requirements-gathering",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "pm"
-      ],
-      "tags": [
-        "requirements",
-        "other",
-        "interactive-requirements-gathering"
       ],
       "priority": 3,
       "aliasOf": null
@@ -1886,7 +2139,6 @@
         "mobile-ux-reviewer"
       ],
       "tags": [
-        "mobile",
         "mobile",
         "ios-expert"
       ],
@@ -2004,7 +2256,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "devops",
         "devops",
         "kubernetes-flux"
       ],
@@ -2132,7 +2383,6 @@
       "agentSupporting": [],
       "tags": [
         "frameworks",
-        "frameworks",
         "nextjs-expert"
       ],
       "priority": 1,
@@ -2237,29 +2487,6 @@
       "priority": 1,
       "aliasOf": null
     },
-    "pipeline-reflection-ux": {
-      "name": "pipeline-reflection-ux",
-      "displayName": "Pipeline Reflection Ux",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - pipeline-reflection-ux",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "other",
-        "pipeline-reflection-ux"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "plan-generator": {
       "name": "plan-generator",
       "displayName": "Plan Generator",
@@ -2277,7 +2504,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "planning",
         "planning",
         "plan-generator"
       ],
@@ -2300,7 +2526,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "planning-with-files"
       ],
@@ -2348,7 +2573,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "prd-generator"
       ],
@@ -2407,84 +2631,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "project-onboarding": {
-      "name": "project-onboarding",
-      "displayName": "Project Onboarding",
-      "category": "Other",
-      "domain": "memory",
-      "description": "Other - project-onboarding",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "project-onboarding"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "protocol-reverse-engineering": {
-      "name": "protocol-reverse-engineering",
-      "displayName": "Protocol Reverse Engineering",
-      "category": "Other",
-      "domain": "security",
-      "description": "Other - protocol-reverse-engineering",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "reverse-engineer"
-      ],
-      "agentSupporting": [
-        "reverse-engineer"
-      ],
-      "tags": [
-        "security",
-        "other",
-        "protocol-reverse-engineering"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "python-backend-expert": {
-      "name": "python-backend-expert",
-      "displayName": "Python Backend Expert",
-      "category": "Languages",
-      "domain": "languages",
-      "description": "Languages - python-backend-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Grep",
-        "Glob"
-      ],
-      "agentPrimary": [
-        "python-pro",
-        "fastapi-pro",
-        "data-engineer"
-      ],
-      "agentSupporting": [
-        "developer"
-      ],
-      "tags": [
-        "languages",
-        "languages",
-        "python-backend-expert"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
     "react-best-practices-vercel": {
       "name": "react-best-practices-vercel",
       "displayName": "React Best Practices Vercel",
@@ -2501,7 +2647,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "frameworks",
         "frameworks",
         "react-best-practices-vercel"
       ],
@@ -2533,7 +2678,6 @@
       ],
       "tags": [
         "frameworks",
-        "frameworks",
         "react-expert"
       ],
       "priority": 1,
@@ -2555,7 +2699,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "mobile",
         "mobile",
         "react-native-skills-vercel"
       ],
@@ -2581,6 +2724,30 @@
         "documentation",
         "other",
         "readme"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "recommend-evolution": {
+      "name": "recommend-evolution",
+      "displayName": "Recommend Evolution",
+      "category": "Memory",
+      "domain": "memory",
+      "description": "Detect capability gaps and record standardized evolution recommendations.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Skill"
+      ],
+      "agentPrimary": [
+        "planner",
+        "reflection-agent"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "memory",
+        "recommend-evolution"
       ],
       "priority": 1,
       "aliasOf": null
@@ -2630,7 +2797,6 @@
       "agentSupporting": [],
       "tags": [
         "research",
-        "research",
         "research-synthesis"
       ],
       "priority": 1,
@@ -2677,7 +2843,6 @@
         "java-pro"
       ],
       "tags": [
-        "other",
         "other",
         "restcontroller-conventions"
       ],
@@ -2729,7 +2894,6 @@
       ],
       "tags": [
         "other",
-        "other",
         "rule-auditor"
       ],
       "priority": 3,
@@ -2751,7 +2915,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "rust-expert"
       ],
@@ -2808,7 +2971,6 @@
       ],
       "tags": [
         "scientific",
-        "scientific",
         "scientific-skills"
       ],
       "priority": 3,
@@ -2830,7 +2992,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/adaptyv"
       ],
@@ -2854,7 +3015,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/aeon"
       ],
       "priority": 3,
@@ -2876,7 +3036,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/alphafold-database"
       ],
@@ -2900,7 +3059,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/anndata"
       ],
       "priority": 3,
@@ -2922,7 +3080,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/arboreto"
       ],
@@ -2946,7 +3103,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/astropy"
       ],
       "priority": 3,
@@ -2968,7 +3124,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/benchling-integration"
       ],
@@ -2992,7 +3147,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/biopython"
       ],
       "priority": 3,
@@ -3014,7 +3168,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/biorxiv-database"
       ],
@@ -3038,7 +3191,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/bioservices"
       ],
       "priority": 3,
@@ -3060,7 +3212,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/brenda-database"
       ],
@@ -3084,7 +3235,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/cellxgene-census"
       ],
       "priority": 3,
@@ -3106,7 +3256,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/chembl-database"
       ],
@@ -3130,7 +3279,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/cirq"
       ],
       "priority": 3,
@@ -3152,7 +3300,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/citation-management"
       ],
@@ -3176,7 +3323,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/clinical-decision-support"
       ],
       "priority": 3,
@@ -3198,7 +3344,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/clinical-reports"
       ],
@@ -3222,7 +3367,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/clinicaltrials-database"
       ],
       "priority": 3,
@@ -3244,7 +3388,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/clinpgx-database"
       ],
@@ -3268,7 +3411,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/clinvar-database"
       ],
       "priority": 3,
@@ -3290,7 +3432,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/cobrapy"
       ],
@@ -3314,7 +3455,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/cosmic-database"
       ],
       "priority": 3,
@@ -3336,7 +3476,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/dask"
       ],
@@ -3360,7 +3499,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/datacommons-client"
       ],
       "priority": 3,
@@ -3382,7 +3520,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/datamol"
       ],
@@ -3406,7 +3543,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/deepchem"
       ],
       "priority": 3,
@@ -3428,7 +3564,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/deeptools"
       ],
@@ -3452,7 +3587,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/denario"
       ],
       "priority": 3,
@@ -3474,7 +3608,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/diffdock"
       ],
@@ -3498,7 +3631,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/dnanexus-integration"
       ],
       "priority": 3,
@@ -3520,7 +3652,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/document-skills/docx"
       ],
@@ -3544,7 +3675,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/document-skills/pdf"
       ],
       "priority": 3,
@@ -3566,7 +3696,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/document-skills/pptx"
       ],
@@ -3590,7 +3719,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/document-skills/xlsx"
       ],
       "priority": 3,
@@ -3612,7 +3740,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/drugbank-database"
       ],
@@ -3636,7 +3763,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/ena-database"
       ],
       "priority": 3,
@@ -3658,7 +3784,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/ensembl-database"
       ],
@@ -3682,7 +3807,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/esm"
       ],
       "priority": 3,
@@ -3704,7 +3828,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/etetoolkit"
       ],
@@ -3728,7 +3851,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/exploratory-data-analysis"
       ],
       "priority": 3,
@@ -3750,7 +3872,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/fda-database"
       ],
@@ -3774,7 +3895,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/flowio"
       ],
       "priority": 3,
@@ -3796,7 +3916,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/fluidsim"
       ],
@@ -3820,7 +3939,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/gene-database"
       ],
       "priority": 3,
@@ -3842,7 +3960,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/generate-image"
       ],
@@ -3866,7 +3983,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/geniml"
       ],
       "priority": 3,
@@ -3888,7 +4004,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/geo-database"
       ],
@@ -3912,7 +4027,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/geopandas"
       ],
       "priority": 3,
@@ -3934,7 +4048,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/get-available-resources"
       ],
@@ -3958,7 +4071,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/gget"
       ],
       "priority": 3,
@@ -3980,7 +4092,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/gtars"
       ],
@@ -4004,7 +4115,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/gwas-database"
       ],
       "priority": 3,
@@ -4026,7 +4136,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/histolab"
       ],
@@ -4050,7 +4159,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/hmdb-database"
       ],
       "priority": 3,
@@ -4072,7 +4180,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/hypogenic"
       ],
@@ -4096,7 +4203,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/hypothesis-generation"
       ],
       "priority": 3,
@@ -4118,7 +4224,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/iso-13485-certification"
       ],
@@ -4142,7 +4247,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/kegg-database"
       ],
       "priority": 3,
@@ -4164,7 +4268,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/labarchive-integration"
       ],
@@ -4188,7 +4291,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/lamindb"
       ],
       "priority": 3,
@@ -4210,7 +4312,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/latchbio-integration"
       ],
@@ -4234,7 +4335,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/latex-posters"
       ],
       "priority": 3,
@@ -4256,7 +4356,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/literature-review"
       ],
@@ -4280,7 +4379,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/market-research-reports"
       ],
       "priority": 3,
@@ -4302,7 +4400,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/markitdown"
       ],
@@ -4326,7 +4423,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/matchms"
       ],
       "priority": 3,
@@ -4348,7 +4444,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/matlab"
       ],
@@ -4372,7 +4467,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/matplotlib"
       ],
       "priority": 3,
@@ -4394,7 +4488,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/medchem"
       ],
@@ -4418,7 +4511,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/metabolomics-workbench-database"
       ],
       "priority": 3,
@@ -4440,7 +4532,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/modal"
       ],
@@ -4464,7 +4555,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/molfeat"
       ],
       "priority": 3,
@@ -4486,7 +4576,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/networkx"
       ],
@@ -4510,7 +4599,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/neurokit2"
       ],
       "priority": 3,
@@ -4532,7 +4620,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/neuropixels-analysis"
       ],
@@ -4556,7 +4643,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/offer-k-dense-web"
       ],
       "priority": 3,
@@ -4578,7 +4664,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/omero-integration"
       ],
@@ -4602,7 +4687,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/openalex-database"
       ],
       "priority": 3,
@@ -4624,7 +4708,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/opentargets-database"
       ],
@@ -4648,7 +4731,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/opentrons-integration"
       ],
       "priority": 3,
@@ -4670,7 +4752,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/paper-2-web"
       ],
@@ -4694,7 +4775,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pathml"
       ],
       "priority": 3,
@@ -4716,7 +4796,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pdb-database"
       ],
@@ -4740,7 +4819,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/peer-review"
       ],
       "priority": 3,
@@ -4762,7 +4840,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pennylane"
       ],
@@ -4786,7 +4863,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/perplexity-search"
       ],
       "priority": 3,
@@ -4808,7 +4884,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/plotly"
       ],
@@ -4832,7 +4907,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/polars"
       ],
       "priority": 3,
@@ -4854,7 +4928,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pptx-posters"
       ],
@@ -4878,7 +4951,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/protocolsio-integration"
       ],
       "priority": 3,
@@ -4900,7 +4972,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pubchem-database"
       ],
@@ -4924,7 +4995,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pubmed-database"
       ],
       "priority": 3,
@@ -4946,7 +5016,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pufferlib"
       ],
@@ -4970,7 +5039,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pydeseq2"
       ],
       "priority": 3,
@@ -4992,7 +5060,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pydicom"
       ],
@@ -5016,7 +5083,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pyhealth"
       ],
       "priority": 3,
@@ -5038,7 +5104,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pylabrobot"
       ],
@@ -5062,7 +5127,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pymatgen"
       ],
       "priority": 3,
@@ -5084,7 +5148,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pymc"
       ],
@@ -5108,7 +5171,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pymoo"
       ],
       "priority": 3,
@@ -5130,7 +5192,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pyopenms"
       ],
@@ -5154,7 +5215,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pysam"
       ],
       "priority": 3,
@@ -5176,7 +5236,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/pytdc"
       ],
@@ -5200,7 +5259,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/pytorch-lightning"
       ],
       "priority": 3,
@@ -5222,7 +5280,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/qiskit"
       ],
@@ -5246,7 +5303,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/qutip"
       ],
       "priority": 3,
@@ -5268,7 +5324,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/rdkit"
       ],
@@ -5292,7 +5347,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/reactome-database"
       ],
       "priority": 3,
@@ -5314,7 +5368,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/research-grants"
       ],
@@ -5338,7 +5391,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/research-lookup"
       ],
       "priority": 3,
@@ -5360,7 +5412,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/rowan"
       ],
@@ -5384,7 +5435,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/scanpy"
       ],
       "priority": 3,
@@ -5406,7 +5456,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/scholar-evaluation"
       ],
@@ -5430,7 +5479,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/scientific-brainstorming"
       ],
       "priority": 3,
@@ -5452,7 +5500,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/scientific-critical-thinking"
       ],
@@ -5476,7 +5523,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/scientific-schematics"
       ],
       "priority": 3,
@@ -5498,7 +5544,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/scientific-slides"
       ],
@@ -5522,7 +5567,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/scientific-visualization"
       ],
       "priority": 3,
@@ -5544,7 +5588,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/scientific-writing"
       ],
@@ -5568,7 +5611,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/scikit-bio"
       ],
       "priority": 3,
@@ -5590,7 +5632,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/scikit-learn"
       ],
@@ -5614,7 +5655,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/scikit-survival"
       ],
       "priority": 3,
@@ -5636,7 +5676,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/scvi-tools"
       ],
@@ -5660,7 +5699,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/seaborn"
       ],
       "priority": 3,
@@ -5682,7 +5720,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/shap"
       ],
@@ -5706,7 +5743,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/simpy"
       ],
       "priority": 3,
@@ -5728,7 +5764,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/stable-baselines3"
       ],
@@ -5752,7 +5787,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/statistical-analysis"
       ],
       "priority": 3,
@@ -5774,7 +5808,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/statsmodels"
       ],
@@ -5798,7 +5831,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/string-database"
       ],
       "priority": 3,
@@ -5820,7 +5852,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/sympy"
       ],
@@ -5844,7 +5875,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/torchdrug"
       ],
       "priority": 3,
@@ -5866,7 +5896,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/torch_geometric"
       ],
@@ -5890,7 +5919,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/transformers"
       ],
       "priority": 3,
@@ -5912,7 +5940,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/treatment-plans"
       ],
@@ -5936,7 +5963,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/umap-learn"
       ],
       "priority": 3,
@@ -5958,7 +5984,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/uniprot-database"
       ],
@@ -5982,7 +6007,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/uspto-database"
       ],
       "priority": 3,
@@ -6004,7 +6028,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/vaex"
       ],
@@ -6028,7 +6051,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/venue-templates"
       ],
       "priority": 3,
@@ -6051,7 +6073,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "scientific-skills/skills/zarr-python"
       ],
       "priority": 3,
@@ -6073,7 +6094,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "scientific-skills/skills/zinc-database"
       ],
@@ -6108,7 +6128,6 @@
       ],
       "tags": [
         "security",
-        "security",
         "security-architect"
       ],
       "priority": 1,
@@ -6132,7 +6151,6 @@
         "evolution-orchestrator"
       ],
       "tags": [
-        "other",
         "other",
         "semgrep-rule-creator"
       ],
@@ -6185,7 +6203,6 @@
       ],
       "tags": [
         "other",
-        "other",
         "seo-and-meta-tags-in-sveltekit"
       ],
       "priority": 3,
@@ -6207,7 +6224,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "specialized",
         "specialized",
         "sequential-thinking"
       ],
@@ -6233,7 +6249,6 @@
       ],
       "tags": [
         "other",
-        "other",
         "service-class-conventions"
       ],
       "priority": 3,
@@ -6256,7 +6271,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "memory",
         "memory",
         "session-handoff"
       ],
@@ -6377,7 +6391,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "sparc-methodology"
       ],
       "priority": 3,
@@ -6402,7 +6415,6 @@
       ],
       "tags": [
         "requirements",
-        "requirements",
         "spec-gathering"
       ],
       "priority": 1,
@@ -6424,7 +6436,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "spec-init"
       ],
@@ -6474,7 +6485,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "static-analysis"
       ],
       "priority": 3,
@@ -6499,7 +6509,6 @@
         "sveltekit-expert"
       ],
       "tags": [
-        "styling",
         "styling",
         "styling-expert"
       ],
@@ -6604,92 +6613,7 @@
       ],
       "tags": [
         "other",
-        "other",
         "tall-stack-general"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "task-management-protocol": {
-      "name": "task-management-protocol",
-      "displayName": "Task Management Protocol",
-      "category": "Other",
-      "domain": "specialized",
-      "description": "Other - task-management-protocol",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "planner",
-        "architect",
-        "qa",
-        "pm",
-        "python-pro",
-        "rust-pro",
-        "golang-pro",
-        "typescript-pro",
-        "fastapi-pro",
-        "frontend-pro",
-        "nodejs-pro",
-        "ios-pro",
-        "java-pro",
-        "nextjs-pro",
-        "php-pro",
-        "sveltekit-expert",
-        "tauri-desktop-developer",
-        "expo-mobile-developer",
-        "data-engineer",
-        "graphql-pro",
-        "mobile-ux-reviewer",
-        "security-architect",
-        "devops",
-        "devops-troubleshooter",
-        "incident-responder",
-        "c4-context",
-        "c4-container",
-        "c4-component",
-        "c4-code",
-        "conductor-validator",
-        "reverse-engineer",
-        "database-architect",
-        "master-orchestrator",
-        "swarm-coordinator",
-        "evolution-orchestrator"
-      ],
-      "agentSupporting": [
-        "router"
-      ],
-      "tags": [
-        "specialized",
-        "other",
-        "task-management-protocol"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "tauri-native-api-integration": {
-      "name": "tauri-native-api-integration",
-      "displayName": "Tauri Native Api Integration",
-      "category": "Other",
-      "domain": "other",
-      "description": "Other - tauri-native-api-integration",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "tauri-desktop-developer"
-      ],
-      "tags": [
-        "other",
-        "other",
-        "tauri-native-api-integration"
       ],
       "priority": 3,
       "aliasOf": null
@@ -6712,7 +6636,6 @@
         "tauri-desktop-developer"
       ],
       "tags": [
-        "other",
         "other",
         "tauri-security-rules"
       ],
@@ -6738,7 +6661,6 @@
       ],
       "tags": [
         "other",
-        "other",
         "tauri-svelte-typescript-general"
       ],
       "priority": 3,
@@ -6762,7 +6684,6 @@
         "tauri-desktop-developer"
       ],
       "tags": [
-        "other",
         "other",
         "tauri-svelte-ui-components"
       ],
@@ -6876,7 +6797,6 @@
       "agentSupporting": [],
       "tags": [
         "devops",
-        "devops",
         "terraform-infra"
       ],
       "priority": 1,
@@ -6922,7 +6842,6 @@
       "agentSupporting": [],
       "tags": [
         "database",
-        "database",
         "text-to-sql"
       ],
       "priority": 1,
@@ -6946,7 +6865,6 @@
         "planner"
       ],
       "tags": [
-        "specialized",
         "specialized",
         "thinking-tools"
       ],
@@ -7018,7 +6936,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "tsconfig-json-rules"
       ],
       "priority": 3,
@@ -7050,7 +6967,6 @@
         "graphql-pro"
       ],
       "tags": [
-        "languages",
         "languages",
         "typescript-expert"
       ],
@@ -7101,67 +7017,9 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "variant-analysis"
       ],
       "priority": 3,
-      "aliasOf": null
-    },
-    "verification-before-completion": {
-      "name": "verification-before-completion",
-      "displayName": "Verification Before Completion",
-      "category": "Quality",
-      "domain": "quality",
-      "description": "Quality - verification-before-completion",
-      "requiredTools": [
-        "Read",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer",
-        "architect",
-        "qa",
-        "technical-writer",
-        "python-pro",
-        "rust-pro",
-        "golang-pro",
-        "typescript-pro",
-        "fastapi-pro",
-        "frontend-pro",
-        "nodejs-pro",
-        "ios-pro",
-        "java-pro",
-        "nextjs-pro",
-        "php-pro",
-        "sveltekit-expert",
-        "tauri-desktop-developer",
-        "expo-mobile-developer",
-        "data-engineer",
-        "graphql-pro",
-        "mobile-ux-reviewer",
-        "code-reviewer",
-        "security-architect",
-        "devops",
-        "devops-troubleshooter",
-        "incident-responder",
-        "c4-context",
-        "c4-container",
-        "c4-component",
-        "c4-code",
-        "conductor-validator",
-        "reverse-engineer",
-        "database-architect",
-        "master-orchestrator",
-        "swarm-coordinator",
-        "evolution-orchestrator"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "quality",
-        "quality",
-        "verification-before-completion"
-      ],
-      "priority": 1,
       "aliasOf": null
     },
     "visual-and-observational-rules": {
@@ -7204,7 +7062,6 @@
         "frontend-pro"
       ],
       "tags": [
-        "styling",
         "styling",
         "web-design-guidelines-vercel"
       ],
@@ -7286,33 +7143,6 @@
         "workflow-patterns"
       ],
       "priority": 1,
-      "aliasOf": null
-    },
-    "writing-skills": {
-      "name": "writing-skills",
-      "displayName": "Writing Skills",
-      "category": "Documentation",
-      "domain": "documentation",
-      "description": "Documentation - writing-skills",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Task"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "technical-writer"
-      ],
-      "tags": [
-        "documentation",
-        "documentation",
-        "writing-skills"
-      ],
-      "priority": 3,
       "aliasOf": null
     },
     "library-usage": {
@@ -7403,15 +7233,16 @@
         "Glob"
       ],
       "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
         "planner"
       ],
-      "agentSupporting": [],
       "tags": [
-        "planning",
         "planning",
         "task-breakdown"
       ],
-      "priority": 1,
+      "priority": 3,
       "aliasOf": null
     },
     "brainstorming": {
@@ -7554,7 +7385,6 @@
         "qa"
       ],
       "tags": [
-        "quality",
         "quality",
         "qa-workflow"
       ],
@@ -8815,7 +8645,6 @@
       ],
       "tags": [
         "requirements",
-        "requirements",
         "progressive-disclosure"
       ],
       "priority": 3,
@@ -9213,7 +9042,6 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "other",
         "command-creator"
       ],
       "priority": 1,
@@ -9235,7 +9063,6 @@
       ],
       "agentSupporting": [],
       "tags": [
-        "other",
         "other",
         "rule-creator"
       ],
@@ -9261,7 +9088,6 @@
       ],
       "tags": [
         "other",
-        "other",
         "tool-creator"
       ],
       "priority": 3,
@@ -9270,29 +9096,91 @@
   },
   "index": {
     "byDomain": {
-      "styling": [
-        "accessibility",
-        "design-and-user-experience-guidelines",
-        "html-tailwind-css-and-javascript-expert-rule",
-        "styling-expert",
-        "ui-components-expert",
-        "visual-and-observational-rules",
-        "web-design-guidelines-vercel",
-        "image-optimization-rules",
-        "placeholder-images",
-        "modular-design-rule",
-        "private-vs-shared-components",
-        "pyqt6-ui-development-rules",
-        "alpine-js-usage-rules",
-        "aceternity-ui-configuration"
+      "quality": [
+        "verification-before-completion",
+        "checklist-generator",
+        "response-rater",
+        "qa-workflow",
+        "verify-information-rule",
+        "thoughtful-and-accurate-responses",
+        "truthfulness-and-clarity-for-ai",
+        "handle-incomplete-tasks",
+        "continuous-improvement-focus"
+      ],
+      "planning": [
+        "complexity-assessment",
+        "plan-generator",
+        "task-breakdown",
+        "brainstorming",
+        "strategic-planning-with-pseudocode"
+      ],
+      "security": [
+        "protocol-reverse-engineering",
+        "auth-security-expert",
+        "binary-analysis-patterns",
+        "memory-forensics",
+        "security-architect",
+        "authentication-flow-rules"
+      ],
+      "devops": [
+        "incident-runbook-templates",
+        "aws-cloud-ops",
+        "ci-cd-implementation-rule",
+        "cloud-devops-expert",
+        "configuration-management",
+        "container-expert",
+        "containerization-rules",
+        "docker-compose",
+        "gcloud-cli",
+        "helm-chart-scaffolding",
+        "k8s-manifest-generator",
+        "k8s-security-policies",
+        "kubernetes-flux",
+        "on-call-handoff-patterns",
+        "postmortem-writing",
+        "sentry-monitoring",
+        "terraform-infra",
+        "cloud-native-and-kubernetes-expertise-rules"
+      ],
+      "languages": [
+        "python-backend-expert",
+        "comprehensive-type-annotations",
+        "cpp",
+        "go-expert",
+        "java-expert",
+        "jupyter-notebook-best-practices",
+        "nodejs-expert",
+        "php-expert",
+        "prioritize-python-3-10-features",
+        "typescript-expert",
+        "elixir-expert",
+        "type-hinting-rule",
+        "asynchronous-programming-preference",
+        "functional-programming-preference",
+        "rell-general-rules",
+        "latest-language-versions-and-best-practices"
+      ],
+      "mobile": [
+        "expo-framework-rule",
+        "android-expert",
+        "expo-mobile-app-rule",
+        "ios-expert",
+        "mobile-first-design-rules",
+        "mobile-ui-development-rule",
+        "react-native-skills-vercel",
+        "nativescript"
       ],
       "other": [
-        "advanced-elicitation",
+        "tauri-native-api-integration",
+        "gamedev-expert",
         "artifact-integrator",
+        "pipeline-reflection-ux",
+        "code-structural-search",
+        "advanced-elicitation",
+        "function-length-and-responsibility",
         "best-practices-guidelines",
         "build-tools-expert",
         "code-semantic-search",
-        "code-structural-search",
         "composer-dependency-management",
         "creators/command-creator",
         "creators/rule-creator",
@@ -9302,11 +9190,8 @@
         "dto-conventions",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
-        "function-length-and-responsibility",
-        "gamedev-expert",
         "insecure-defaults",
         "integration/artifact-updater",
-        "pipeline-reflection-ux",
         "planning-with-files",
         "prd-generator",
         "restcontroller-conventions",
@@ -9461,7 +9346,6 @@
         "spec-init",
         "static-analysis",
         "tall-stack-general",
-        "tauri-native-api-integration",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -9470,6 +9354,116 @@
         "command-creator",
         "rule-creator",
         "tool-creator"
+      ],
+      "database": [
+        "database-architect",
+        "data-expert",
+        "database-expert",
+        "pandas-data-manipulation-rules",
+        "text-to-sql",
+        "large-data-with-dask",
+        "drizzle-orm-rules",
+        "entity-class-conventions",
+        "repository-class-conventions",
+        "vercel-kv-database-rules",
+        "experiment-configuration-with-hydra-yaml"
+      ],
+      "documentation": [
+        "writing-skills",
+        "doc-generator",
+        "readme",
+        "detailed-docstrings",
+        "technical-accuracy-and-usability-rules",
+        "metadata-and-seo-rules",
+        "mkdocs-specific-rules",
+        "content-creation-rules",
+        "prompt-generation-rules",
+        "writing-plans"
+      ],
+      "git": [
+        "git-expert",
+        "gitops-workflow",
+        "gitflow",
+        "commit-validator",
+        "smart-revert",
+        "commit-message-guidelines",
+        "version-control-rule",
+        "collaboration-and-version-control-rules",
+        "using-git-worktrees",
+        "finishing-a-development-branch"
+      ],
+      "development": [
+        "code-style-validator",
+        "async-operations",
+        "code-analyzer",
+        "code-quality-expert",
+        "comprehensive-unit-testing-with-pytest",
+        "debugging",
+        "logging-module-usage",
+        "ripgrep",
+        "tdd",
+        "test-generator",
+        "library-usage",
+        "unit-testing-requirement"
+      ],
+      "specialized": [
+        "task-management-protocol",
+        "consensus-voting",
+        "dependency-analyzer",
+        "filesystem",
+        "insight-extraction",
+        "sequential-thinking",
+        "skill-discovery",
+        "smart-debug",
+        "summarize-changes",
+        "swarm-coordination",
+        "thinking-tools",
+        "tool-search",
+        "track-management",
+        "workflow-patterns",
+        "subagent-driven-development",
+        "codebase-integration",
+        "repo-rag",
+        "requesting-code-review",
+        "receiving-code-review",
+        "dispatching-parallel-agents",
+        "executing-plans"
+      ],
+      "memory": [
+        "context-driven-development",
+        "project-onboarding",
+        "context-compressor",
+        "framework-context",
+        "project-analyzer",
+        "recommend-evolution",
+        "recovery",
+        "session-handoff",
+        "operational-modes",
+        "context-files-rules",
+        "history-and-next-task-rules"
+      ],
+      "requirements": [
+        "interactive-requirements-gathering",
+        "spec-gathering",
+        "progressive-disclosure",
+        "spec-writing",
+        "spec-critique"
+      ],
+      "styling": [
+        "accessibility",
+        "design-and-user-experience-guidelines",
+        "html-tailwind-css-and-javascript-expert-rule",
+        "styling-expert",
+        "ui-components-expert",
+        "visual-and-observational-rules",
+        "web-design-guidelines-vercel",
+        "image-optimization-rules",
+        "placeholder-images",
+        "modular-design-rule",
+        "private-vs-shared-components",
+        "pyqt6-ui-development-rules",
+        "alpine-js-usage-rules",
+        "aceternity-ui-configuration"
       ],
       "creator": [
         "agent-creator",
@@ -9485,16 +9479,6 @@
       ],
       "ai-ml": [
         "ai-ml-expert"
-      ],
-      "mobile": [
-        "android-expert",
-        "expo-framework-rule",
-        "expo-mobile-app-rule",
-        "ios-expert",
-        "mobile-first-design-rules",
-        "mobile-ui-development-rule",
-        "react-native-skills-vercel",
-        "nativescript"
       ],
       "frameworks": [
         "api-development-expert",
@@ -9524,59 +9508,6 @@
         "arxiv-mcp",
         "research-synthesis"
       ],
-      "development": [
-        "async-operations",
-        "code-analyzer",
-        "code-quality-expert",
-        "code-style-validator",
-        "comprehensive-unit-testing-with-pytest",
-        "debugging",
-        "logging-module-usage",
-        "ripgrep",
-        "tdd",
-        "test-generator",
-        "library-usage",
-        "unit-testing-requirement"
-      ],
-      "security": [
-        "auth-security-expert",
-        "binary-analysis-patterns",
-        "memory-forensics",
-        "protocol-reverse-engineering",
-        "security-architect",
-        "authentication-flow-rules"
-      ],
-      "devops": [
-        "aws-cloud-ops",
-        "ci-cd-implementation-rule",
-        "cloud-devops-expert",
-        "configuration-management",
-        "container-expert",
-        "containerization-rules",
-        "docker-compose",
-        "gcloud-cli",
-        "helm-chart-scaffolding",
-        "incident-runbook-templates",
-        "k8s-manifest-generator",
-        "k8s-security-policies",
-        "kubernetes-flux",
-        "on-call-handoff-patterns",
-        "postmortem-writing",
-        "sentry-monitoring",
-        "terraform-infra",
-        "cloud-native-and-kubernetes-expertise-rules"
-      ],
-      "quality": [
-        "checklist-generator",
-        "response-rater",
-        "verification-before-completion",
-        "qa-workflow",
-        "verify-information-rule",
-        "thoughtful-and-accurate-responses",
-        "truthfulness-and-clarity-for-ai",
-        "handle-incomplete-tasks",
-        "continuous-improvement-focus"
-      ],
       "integration": [
         "chrome-browser",
         "github-mcp",
@@ -9589,119 +9520,35 @@
         "telegram-bot-api-rules",
         "agp-router-rules"
       ],
-      "planning": [
-        "complexity-assessment",
-        "plan-generator",
-        "task-breakdown",
-        "brainstorming",
-        "strategic-planning-with-pseudocode"
-      ],
-      "languages": [
-        "comprehensive-type-annotations",
-        "cpp",
-        "go-expert",
-        "java-expert",
-        "jupyter-notebook-best-practices",
-        "nodejs-expert",
-        "php-expert",
-        "prioritize-python-3-10-features",
-        "python-backend-expert",
-        "typescript-expert",
-        "elixir-expert",
-        "type-hinting-rule",
-        "asynchronous-programming-preference",
-        "functional-programming-preference",
-        "rell-general-rules",
-        "latest-language-versions-and-best-practices"
-      ],
-      "specialized": [
-        "consensus-voting",
-        "dependency-analyzer",
-        "filesystem",
-        "insight-extraction",
-        "sequential-thinking",
-        "skill-discovery",
-        "smart-debug",
-        "summarize-changes",
-        "swarm-coordination",
-        "task-management-protocol",
-        "thinking-tools",
-        "tool-search",
-        "track-management",
-        "workflow-patterns",
-        "subagent-driven-development",
-        "codebase-integration",
-        "repo-rag",
-        "requesting-code-review",
-        "receiving-code-review",
-        "dispatching-parallel-agents",
-        "executing-plans"
-      ],
-      "memory": [
-        "context-compressor",
-        "context-driven-development",
-        "project-analyzer",
-        "project-onboarding",
-        "recovery",
-        "session-handoff",
-        "operational-modes",
-        "context-files-rules",
-        "history-and-next-task-rules"
-      ],
-      "database": [
-        "data-expert",
-        "database-architect",
-        "database-expert",
-        "pandas-data-manipulation-rules",
-        "text-to-sql",
-        "large-data-with-dask",
-        "drizzle-orm-rules",
-        "entity-class-conventions",
-        "repository-class-conventions",
-        "vercel-kv-database-rules",
-        "experiment-configuration-with-hydra-yaml"
-      ],
-      "documentation": [
-        "doc-generator",
-        "readme",
-        "writing-skills",
-        "detailed-docstrings",
-        "technical-accuracy-and-usability-rules",
-        "metadata-and-seo-rules",
-        "mkdocs-specific-rules",
-        "content-creation-rules",
-        "prompt-generation-rules",
-        "writing-plans"
-      ],
-      "git": [
-        "git-expert",
-        "gitops-workflow",
-        "gitflow",
-        "commit-validator",
-        "smart-revert",
-        "commit-message-guidelines",
-        "version-control-rule",
-        "collaboration-and-version-control-rules",
-        "using-git-worktrees",
-        "finishing-a-development-branch"
-      ],
-      "requirements": [
-        "interactive-requirements-gathering",
-        "spec-gathering",
-        "progressive-disclosure",
-        "spec-writing",
-        "spec-critique"
-      ],
       "scientific": [
         "scientific-skills"
       ]
     },
     "byCategory": {
+      "Quality": [
+        "verification-before-completion",
+        "checklist-generator",
+        "qa-workflow"
+      ],
       "Other": [
-        "accessibility",
-        "advanced-elicitation",
-        "api-development-expert",
+        "complexity-assessment",
+        "protocol-reverse-engineering",
+        "incident-runbook-templates",
+        "expo-framework-rule",
+        "tauri-native-api-integration",
+        "gamedev-expert",
+        "code-style-validator",
         "artifact-integrator",
+        "task-management-protocol",
+        "context-driven-development",
+        "pipeline-reflection-ux",
+        "interactive-requirements-gathering",
+        "project-onboarding",
+        "code-structural-search",
+        "advanced-elicitation",
+        "function-length-and-responsibility",
+        "accessibility",
+        "api-development-expert",
         "artifact-lifecycle",
         "async-operations",
         "best-practices-guidelines",
@@ -9711,16 +9558,12 @@
         "cloud-devops-expert",
         "code-analyzer",
         "code-semantic-search",
-        "code-structural-search",
-        "code-style-validator",
-        "complexity-assessment",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
         "configuration-management",
         "container-expert",
         "containerization-rules",
-        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
@@ -9732,25 +9575,20 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
-        "expo-framework-rule",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "frontend-expert",
-        "function-length-and-responsibility",
-        "gamedev-expert",
         "gcloud-cli",
         "gitops-workflow",
         "graphql-expert",
         "helm-chart-scaffolding",
         "hook-creator",
         "html-tailwind-css-and-javascript-expert-rule",
-        "incident-runbook-templates",
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "java-expert",
         "jupyter-notebook-best-practices",
         "k8s-manifest-generator",
@@ -9763,14 +9601,11 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
-        "pipeline-reflection-ux",
         "planning-with-files",
         "postmortem-writing",
         "prd-generator",
         "prioritize-python-3-10-features",
         "project-analyzer",
-        "project-onboarding",
-        "protocol-reverse-engineering",
         "readme",
         "recovery",
         "response-rater",
@@ -9935,8 +9770,6 @@
         "summarize-changes",
         "svelte-expert",
         "tall-stack-general",
-        "task-management-protocol",
-        "tauri-native-api-integration",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -10030,6 +9863,23 @@
         "command-creator",
         "rule-creator",
         "tool-creator"
+      ],
+      "Languages": [
+        "python-backend-expert",
+        "go-expert",
+        "typescript-expert"
+      ],
+      "Database": [
+        "database-architect",
+        "text-to-sql"
+      ],
+      "Documentation": [
+        "writing-skills",
+        "doc-generator"
+      ],
+      "Version Control": [
+        "git-expert",
+        "gitflow"
       ],
       "Creator Tools": [
         "agent-creator",
@@ -10061,11 +9911,6 @@
         "kubernetes-flux",
         "terraform-infra"
       ],
-      "Quality": [
-        "checklist-generator",
-        "verification-before-completion",
-        "qa-workflow"
-      ],
       "Integration": [
         "chrome-browser",
         "github-mcp"
@@ -10079,27 +9924,12 @@
       ],
       "Memory": [
         "context-compressor",
+        "framework-context",
+        "recommend-evolution",
         "session-handoff"
-      ],
-      "Database": [
-        "database-architect",
-        "text-to-sql"
       ],
       "Troubleshooting": [
         "debugging"
-      ],
-      "Documentation": [
-        "doc-generator",
-        "writing-skills"
-      ],
-      "Version Control": [
-        "git-expert",
-        "gitflow"
-      ],
-      "Languages": [
-        "go-expert",
-        "python-backend-expert",
-        "typescript-expert"
       ],
       "Frameworks": [
         "nextjs-expert",
@@ -10131,14 +9961,33 @@
     },
     "byTool": {
       "Read": [
-        "accessibility",
+        "verification-before-completion",
+        "complexity-assessment",
+        "protocol-reverse-engineering",
+        "incident-runbook-templates",
+        "python-backend-expert",
+        "expo-framework-rule",
+        "tauri-native-api-integration",
+        "database-architect",
+        "writing-skills",
+        "gamedev-expert",
+        "git-expert",
+        "code-style-validator",
+        "artifact-integrator",
+        "task-management-protocol",
+        "context-driven-development",
+        "pipeline-reflection-ux",
+        "interactive-requirements-gathering",
+        "project-onboarding",
+        "code-structural-search",
         "advanced-elicitation",
+        "function-length-and-responsibility",
+        "accessibility",
         "agent-creator",
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
         "architecture-review",
-        "artifact-integrator",
         "artifact-lifecycle",
         "arxiv-mcp",
         "async-operations",
@@ -10154,9 +10003,6 @@
         "code-analyzer",
         "code-quality-expert",
         "code-semantic-search",
-        "code-structural-search",
-        "code-style-validator",
-        "complexity-assessment",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
@@ -10165,13 +10011,11 @@
         "container-expert",
         "containerization-rules",
         "context-compressor",
-        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
         "data-expert",
-        "database-architect",
         "database-expert",
         "debugging",
         "dependency-analyzer",
@@ -10182,16 +10026,13 @@
         "docker-compose",
         "dry-principle",
         "dto-conventions",
-        "expo-framework-rule",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
+        "framework-context",
         "frontend-expert",
-        "function-length-and-responsibility",
-        "gamedev-expert",
         "gcloud-cli",
-        "git-expert",
         "github-mcp",
         "gitops-workflow",
         "go-expert",
@@ -10199,11 +10040,9 @@
         "helm-chart-scaffolding",
         "hook-creator",
         "html-tailwind-css-and-javascript-expert-rule",
-        "incident-runbook-templates",
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -10219,20 +10058,17 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
-        "pipeline-reflection-ux",
         "plan-generator",
         "planning-with-files",
         "postmortem-writing",
         "prd-generator",
         "prioritize-python-3-10-features",
         "project-analyzer",
-        "project-onboarding",
-        "protocol-reverse-engineering",
-        "python-backend-expert",
         "react-best-practices-vercel",
         "react-expert",
         "react-native-skills-vercel",
         "readme",
+        "recommend-evolution",
         "recovery",
         "research-synthesis",
         "response-rater",
@@ -10404,8 +10240,6 @@
         "svelte-expert",
         "swarm-coordination",
         "tall-stack-general",
-        "task-management-protocol",
-        "tauri-native-api-integration",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -10422,13 +10256,11 @@
         "typescript-expert",
         "ui-components-expert",
         "variant-analysis",
-        "verification-before-completion",
         "visual-and-observational-rules",
         "web-design-guidelines-vercel",
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
-        "writing-skills",
         "library-usage",
         "unit-testing-requirement",
         "authentication-flow-rules",
@@ -10512,15 +10344,70 @@
         "rule-creator",
         "tool-creator"
       ],
+      "Bash": [
+        "verification-before-completion",
+        "python-backend-expert",
+        "database-architect",
+        "writing-skills",
+        "git-expert",
+        "code-style-validator",
+        "agent-creator",
+        "ai-ml-expert",
+        "auth-security-expert",
+        "aws-cloud-ops",
+        "code-analyzer",
+        "code-quality-expert",
+        "consensus-voting",
+        "debugging",
+        "diagram-generator",
+        "doc-generator",
+        "github-mcp",
+        "go-expert",
+        "hook-creator",
+        "nextjs-expert",
+        "project-analyzer",
+        "react-expert",
+        "ripgrep",
+        "scientific-skills",
+        "security-architect",
+        "sequential-thinking",
+        "skill-creator",
+        "swarm-coordination",
+        "tdd",
+        "terraform-infra",
+        "typescript-expert",
+        "workflow-creator",
+        "qa-workflow",
+        "commit-validator",
+        "smart-revert",
+        "repo-rag"
+      ],
       "Write": [
-        "accessibility",
+        "complexity-assessment",
+        "protocol-reverse-engineering",
+        "incident-runbook-templates",
+        "python-backend-expert",
+        "expo-framework-rule",
+        "tauri-native-api-integration",
+        "database-architect",
+        "writing-skills",
+        "gamedev-expert",
+        "git-expert",
+        "artifact-integrator",
+        "task-management-protocol",
+        "context-driven-development",
+        "pipeline-reflection-ux",
+        "interactive-requirements-gathering",
+        "project-onboarding",
+        "code-structural-search",
         "advanced-elicitation",
+        "function-length-and-responsibility",
+        "accessibility",
         "agent-creator",
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
         "architecture-review",
-        "artifact-integrator",
         "artifact-lifecycle",
         "async-operations",
         "auth-security-expert",
@@ -10533,8 +10420,6 @@
         "cloud-devops-expert",
         "code-quality-expert",
         "code-semantic-search",
-        "code-structural-search",
-        "complexity-assessment",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
@@ -10543,13 +10428,11 @@
         "container-expert",
         "containerization-rules",
         "context-compressor",
-        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
         "data-expert",
-        "database-architect",
         "database-expert",
         "debugging",
         "dependency-analyzer",
@@ -10560,27 +10443,21 @@
         "docker-compose",
         "dry-principle",
         "dto-conventions",
-        "expo-framework-rule",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "frontend-expert",
-        "function-length-and-responsibility",
-        "gamedev-expert",
         "gcloud-cli",
-        "git-expert",
         "gitops-workflow",
         "go-expert",
         "graphql-expert",
         "helm-chart-scaffolding",
         "hook-creator",
         "html-tailwind-css-and-javascript-expert-rule",
-        "incident-runbook-templates",
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -10596,19 +10473,16 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
-        "pipeline-reflection-ux",
         "plan-generator",
         "planning-with-files",
         "postmortem-writing",
         "prd-generator",
         "prioritize-python-3-10-features",
-        "project-onboarding",
-        "protocol-reverse-engineering",
-        "python-backend-expert",
         "react-best-practices-vercel",
         "react-expert",
         "react-native-skills-vercel",
         "readme",
+        "recommend-evolution",
         "recovery",
         "research-synthesis",
         "response-rater",
@@ -10780,8 +10654,6 @@
         "svelte-expert",
         "swarm-coordination",
         "tall-stack-general",
-        "task-management-protocol",
-        "tauri-native-api-integration",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -10799,7 +10671,6 @@
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
-        "writing-skills",
         "library-usage",
         "unit-testing-requirement",
         "authentication-flow-rules",
@@ -10882,14 +10753,31 @@
         "tool-creator"
       ],
       "Edit": [
-        "accessibility",
+        "complexity-assessment",
+        "protocol-reverse-engineering",
+        "incident-runbook-templates",
+        "python-backend-expert",
+        "expo-framework-rule",
+        "tauri-native-api-integration",
+        "database-architect",
+        "writing-skills",
+        "gamedev-expert",
+        "git-expert",
+        "artifact-integrator",
+        "task-management-protocol",
+        "context-driven-development",
+        "pipeline-reflection-ux",
+        "interactive-requirements-gathering",
+        "project-onboarding",
+        "code-structural-search",
         "advanced-elicitation",
+        "function-length-and-responsibility",
+        "accessibility",
         "agent-creator",
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
         "architecture-review",
-        "artifact-integrator",
         "artifact-lifecycle",
         "async-operations",
         "auth-security-expert",
@@ -10901,8 +10789,6 @@
         "cloud-devops-expert",
         "code-quality-expert",
         "code-semantic-search",
-        "code-structural-search",
-        "complexity-assessment",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
@@ -10910,13 +10796,11 @@
         "consensus-voting",
         "container-expert",
         "containerization-rules",
-        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
         "data-expert",
-        "database-architect",
         "database-expert",
         "debugging",
         "dependency-analyzer",
@@ -10927,27 +10811,21 @@
         "docker-compose",
         "dry-principle",
         "dto-conventions",
-        "expo-framework-rule",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "frontend-expert",
-        "function-length-and-responsibility",
-        "gamedev-expert",
         "gcloud-cli",
-        "git-expert",
         "gitops-workflow",
         "go-expert",
         "graphql-expert",
         "helm-chart-scaffolding",
         "hook-creator",
         "html-tailwind-css-and-javascript-expert-rule",
-        "incident-runbook-templates",
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -10963,18 +10841,15 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
-        "pipeline-reflection-ux",
         "planning-with-files",
         "postmortem-writing",
         "prd-generator",
         "prioritize-python-3-10-features",
-        "project-onboarding",
-        "protocol-reverse-engineering",
-        "python-backend-expert",
         "react-best-practices-vercel",
         "react-expert",
         "react-native-skills-vercel",
         "readme",
+        "recommend-evolution",
         "recovery",
         "response-rater",
         "restcontroller-conventions",
@@ -11143,8 +11018,6 @@
         "svelte-expert",
         "swarm-coordination",
         "tall-stack-general",
-        "task-management-protocol",
-        "tauri-native-api-integration",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -11162,7 +11035,6 @@
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
-        "writing-skills",
         "library-usage",
         "unit-testing-requirement",
         "authentication-flow-rules",
@@ -11242,7 +11114,11 @@
         "rule-creator",
         "tool-creator"
       ],
-      "Glob": [
+      "Grep": [
+        "python-backend-expert",
+        "database-architect",
+        "git-expert",
+        "code-style-validator",
         "agent-creator",
         "ai-ml-expert",
         "architecture-review",
@@ -11250,17 +11126,51 @@
         "checklist-generator",
         "code-analyzer",
         "code-quality-expert",
-        "code-style-validator",
         "consensus-voting",
-        "database-architect",
         "debugging",
         "doc-generator",
-        "git-expert",
         "go-expert",
         "hook-creator",
         "nextjs-expert",
         "project-analyzer",
+        "react-expert",
+        "research-synthesis",
+        "scientific-skills",
+        "security-architect",
+        "session-handoff",
+        "skill-creator",
+        "swarm-coordination",
+        "tdd",
+        "thinking-tools",
+        "tool-search",
+        "typescript-expert",
+        "workflow-creator",
+        "task-breakdown",
+        "qa-workflow",
+        "commit-validator",
+        "smart-revert",
+        "progressive-disclosure",
+        "repo-rag"
+      ],
+      "Glob": [
         "python-backend-expert",
+        "database-architect",
+        "git-expert",
+        "code-style-validator",
+        "agent-creator",
+        "ai-ml-expert",
+        "architecture-review",
+        "auth-security-expert",
+        "checklist-generator",
+        "code-analyzer",
+        "code-quality-expert",
+        "consensus-voting",
+        "debugging",
+        "doc-generator",
+        "go-expert",
+        "hook-creator",
+        "nextjs-expert",
+        "project-analyzer",
         "react-expert",
         "research-synthesis",
         "scientific-skills",
@@ -11280,43 +11190,9 @@
         "progressive-disclosure",
         "repo-rag"
       ],
-      "Grep": [
-        "agent-creator",
-        "ai-ml-expert",
-        "architecture-review",
-        "auth-security-expert",
-        "checklist-generator",
-        "code-analyzer",
-        "code-quality-expert",
-        "code-style-validator",
-        "consensus-voting",
-        "database-architect",
-        "debugging",
-        "doc-generator",
-        "git-expert",
-        "go-expert",
-        "hook-creator",
-        "nextjs-expert",
-        "project-analyzer",
-        "python-backend-expert",
-        "react-expert",
-        "research-synthesis",
-        "scientific-skills",
-        "security-architect",
-        "session-handoff",
-        "skill-creator",
-        "swarm-coordination",
-        "tdd",
-        "thinking-tools",
-        "tool-search",
-        "typescript-expert",
-        "workflow-creator",
-        "task-breakdown",
-        "qa-workflow",
-        "commit-validator",
-        "smart-revert",
-        "progressive-disclosure",
-        "repo-rag"
+      "Task": [
+        "writing-skills",
+        "agent-creator"
       ],
       "WebSearch": [
         "agent-creator",
@@ -11335,49 +11211,9 @@
         "skill-creator",
         "web-design-guidelines-vercel"
       ],
-      "Bash": [
-        "agent-creator",
-        "ai-ml-expert",
-        "auth-security-expert",
-        "aws-cloud-ops",
-        "code-analyzer",
-        "code-quality-expert",
-        "code-style-validator",
-        "consensus-voting",
-        "database-architect",
-        "debugging",
-        "diagram-generator",
-        "doc-generator",
-        "git-expert",
-        "github-mcp",
-        "go-expert",
-        "hook-creator",
-        "nextjs-expert",
-        "project-analyzer",
-        "python-backend-expert",
-        "react-expert",
-        "ripgrep",
-        "scientific-skills",
-        "security-architect",
-        "sequential-thinking",
-        "skill-creator",
-        "swarm-coordination",
-        "tdd",
-        "terraform-infra",
-        "typescript-expert",
-        "verification-before-completion",
-        "workflow-creator",
-        "writing-skills",
-        "qa-workflow",
-        "commit-validator",
-        "smart-revert",
-        "repo-rag"
-      ],
-      "Task": [
-        "agent-creator",
-        "writing-skills"
-      ],
       "Skill": [
+        "framework-context",
+        "recommend-evolution",
         "task-breakdown"
       ],
       "TaskCreate": [
@@ -11413,10 +11249,18 @@
         "typescript-expert",
         "security-architect",
         "context-compressor",
+        "tauri-native-api-integration",
+        "writing-skills",
+        "gamedev-expert",
+        "artifact-integrator",
+        "pipeline-reflection-ux",
+        "interactive-requirements-gathering",
+        "project-onboarding",
+        "code-structural-search",
         "advanced-elicitation",
+        "function-length-and-responsibility",
         "ai-ml-expert",
         "android-expert",
-        "artifact-integrator",
         "async-operations",
         "aws-cloud-ops",
         "best-practices-guidelines",
@@ -11426,7 +11270,6 @@
         "ci-cd-implementation-rule",
         "cloud-devops-expert",
         "code-semantic-search",
-        "code-structural-search",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "configuration-management",
@@ -11440,8 +11283,6 @@
         "expo-mobile-app-rule",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
-        "function-length-and-responsibility",
-        "gamedev-expert",
         "gcloud-cli",
         "gitops-workflow",
         "helm-chart-scaffolding",
@@ -11450,17 +11291,14 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
         "pandas-data-manipulation-rules",
-        "pipeline-reflection-ux",
         "planning-with-files",
         "prd-generator",
         "prioritize-python-3-10-features",
         "project-analyzer",
-        "project-onboarding",
         "react-native-skills-vercel",
         "recovery",
         "restcontroller-conventions",
@@ -11622,7 +11460,6 @@
         "state-management-expert",
         "static-analysis",
         "tall-stack-general",
-        "tauri-native-api-integration",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -11637,9 +11474,9 @@
         "web-design-guidelines-vercel",
         "web3-expert",
         "workflow-creator",
-        "writing-skills",
         "library-usage",
         "unit-testing-requirement",
+        "task-breakdown",
         "brainstorming",
         "strategic-planning-with-pseudocode",
         "operational-modes",
@@ -11721,6 +11558,8 @@
         "diagram-generator",
         "dispatching-parallel-agents",
         "swarm-coordination",
+        "framework-context",
+        "recommend-evolution",
         "thinking-tools",
         "task-breakdown",
         "progressive-disclosure"
@@ -12148,6 +11987,10 @@
       ],
       "researcher": [
         "arxiv-mcp"
+      ],
+      "reflection-agent": [
+        "framework-context",
+        "recommend-evolution"
       ]
     }
   },
@@ -12172,10 +12015,18 @@
         "typescript-expert",
         "security-architect",
         "context-compressor",
+        "tauri-native-api-integration",
+        "writing-skills",
+        "gamedev-expert",
+        "artifact-integrator",
+        "pipeline-reflection-ux",
+        "interactive-requirements-gathering",
+        "project-onboarding",
+        "code-structural-search",
         "advanced-elicitation",
+        "function-length-and-responsibility",
         "ai-ml-expert",
         "android-expert",
-        "artifact-integrator",
         "async-operations",
         "aws-cloud-ops",
         "best-practices-guidelines",
@@ -12185,7 +12036,6 @@
         "ci-cd-implementation-rule",
         "cloud-devops-expert",
         "code-semantic-search",
-        "code-structural-search",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "configuration-management",
@@ -12199,8 +12049,6 @@
         "expo-mobile-app-rule",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
-        "function-length-and-responsibility",
-        "gamedev-expert",
         "gcloud-cli",
         "gitops-workflow",
         "helm-chart-scaffolding",
@@ -12209,17 +12057,14 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
         "pandas-data-manipulation-rules",
-        "pipeline-reflection-ux",
         "planning-with-files",
         "prd-generator",
         "prioritize-python-3-10-features",
         "project-analyzer",
-        "project-onboarding",
         "react-native-skills-vercel",
         "recovery",
         "restcontroller-conventions",
@@ -12381,7 +12226,6 @@
         "state-management-expert",
         "static-analysis",
         "tall-stack-general",
-        "tauri-native-api-integration",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -12396,9 +12240,9 @@
         "web-design-guidelines-vercel",
         "web3-expert",
         "workflow-creator",
-        "writing-skills",
         "library-usage",
         "unit-testing-requirement",
+        "task-breakdown",
         "brainstorming",
         "strategic-planning-with-pseudocode",
         "operational-modes",
@@ -12480,6 +12324,8 @@
         "diagram-generator",
         "dispatching-parallel-agents",
         "swarm-coordination",
+        "framework-context",
+        "recommend-evolution",
         "thinking-tools",
         "task-breakdown",
         "progressive-disclosure"
@@ -12907,6 +12753,10 @@
       ],
       "researcher": [
         "arxiv-mcp"
+      ],
+      "reflection-agent": [
+        "framework-context",
+        "recommend-evolution"
       ]
     }
   }

@@ -14,7 +14,9 @@ skills:
   - artifact-integrator
   - code-analyzer
   - context-compressor
+  - framework-context
   - insight-extraction
+  - recommend-evolution
   - summarize-changes
   - task-management-protocol
   - verification-before-completion
@@ -183,6 +185,7 @@ Invoke your assigned skills using the Skill tool:
 Skill({ skill: 'verification-before-completion' });
 Skill({ skill: 'code-analyzer' });
 Skill({ skill: 'insight-extraction' });
+Skill({ skill: 'framework-context' });
 ```
 
 > **CRITICAL**: Use `Skill()` tool to invoke skill workflows, not just read skill files.
@@ -608,6 +611,7 @@ Based on research findings and production requirements:
 Skill({ skill: 'verification-before-completion' }); // Quality gates
 Skill({ skill: 'code-analyzer' }); // Static analysis
 Skill({ skill: 'insight-extraction' }); // Pattern extraction
+Skill({ skill: 'framework-context' }); // Framework grounding
 ```
 
 ### Automatic Skills (Always Invoke)
@@ -619,11 +623,13 @@ Skill({ skill: 'insight-extraction' }); // Pattern extraction
 
 ### Contextual Skills (When Applicable)
 
-| Condition           | Skill                | Purpose                         |
-| ------------------- | -------------------- | ------------------------------- |
-| Code reflection     | `code-analyzer`      | Static code analysis patterns   |
-| Security outputs    | `security-architect` | Security-specific rubrics       |
-| Architecture review | `architect`          | Architecture quality assessment |
+| Condition              | Skill                 | Purpose                               |
+| ---------------------- | --------------------- | ------------------------------------- |
+| Code reflection        | `code-analyzer`       | Static code analysis patterns         |
+| Security outputs       | `security-architect`  | Security-specific rubrics             |
+| Architecture review    | `architect`           | Architecture quality assessment       |
+| System-level analysis  | `framework-context`   | Framework architecture context        |
+| Capability-gap pattern | `recommend-evolution` | Standardized evolution recommendation |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 
