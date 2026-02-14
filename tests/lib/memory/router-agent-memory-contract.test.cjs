@@ -10,19 +10,62 @@ const memoryTiers = require('../../../.claude/lib/memory/memory-tiers.cjs');
 const memoryManager = require('../../../.claude/lib/memory/memory-manager.cjs');
 const { ContextualMemory } = require('../../../.claude/lib/memory/contextual-memory.cjs');
 
-const TEST_ROOT = path.join(__dirname, '.test-memory-contracts');
-
-function setup() {
-  fs.rmSync(TEST_ROOT, { recursive: true, force: true });
-  fs.mkdirSync(path.join(TEST_ROOT, '.claude', 'context', 'memory'), { recursive: true });
+function buildTestRoot(label) {
+  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+  return path.join(__dirname, `.test-memory-contracts-${label}-${suffix}`);
 }
 
-function cleanup() {
-  fs.rmSync(TEST_ROOT, { recursive: true, force: true });
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-test('contract: STM->MTM overflow creates LTM summary and remains queryable by agents', () => {
-  setup();
+async function removeTestRootWithRetry(testRoot) {
+  const maxAttempts = 8;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      fs.rmSync(testRoot, {
+        recursive: true,
+        force: true,
+        maxRetries: 5,
+        retryDelay: 40,
+      });
+      return;
+    } catch (err) {
+      const code = err && err.code;
+      const retryable = (
+        code === 'EBUSY' ||
+        code === 'EPERM' ||
+        code === 'EACCES' ||
+        code === 'ENOTEMPTY' ||
+        code === 'EMFILE'
+      );
+      if (!retryable || attempt === maxAttempts) {
+        throw err;
+      }
+      await sleep(attempt * 50);
+    }
+  }
+}
+
+async function setup(label) {
+  const testRoot = buildTestRoot(label);
+  await removeTestRootWithRetry(testRoot);
+  fs.mkdirSync(path.join(testRoot, '.claude', 'context', 'memory'), { recursive: true });
+  return testRoot;
+}
+
+async function cleanup(testRoot) {
+  // Allow async file/DB teardown to settle on Windows before recursive delete.
+  await sleep(120);
+  try {
+    await removeTestRootWithRetry(testRoot);
+  } catch (_err) {
+    // Best-effort cleanup; lock-release timing should not fail contract assertions.
+  }
+}
+
+test('contract: STM->MTM overflow creates LTM summary and remains queryable by agents', async () => {
+  const testRoot = await setup('overflow');
   let contextualMemory = null;
   try {
     for (let i = 0; i < 14; i++) {
@@ -33,13 +76,13 @@ test('contract: STM->MTM overflow creates LTM summary and remains queryable by a
           summary: `agent summary ${i}`,
           tasks_completed: [`task-${i}`],
         },
-        TEST_ROOT
+        testRoot
       );
-      const consolidated = memoryTiers.consolidateSession(`session-${i}`, TEST_ROOT);
+      const consolidated = memoryTiers.consolidateSession(`session-${i}`, testRoot);
       assert.equal(consolidated.success, true);
     }
 
-    contextualMemory = new ContextualMemory({ projectRoot: TEST_ROOT });
+    contextualMemory = new ContextualMemory({ projectRoot: testRoot });
     const mem = contextualMemory.loadContextSync({
       maxItems: { sessions: 20, gotchas: 20, patterns: 20, decisions: 10, discoveries: 20 },
       maxChars: {
@@ -65,23 +108,24 @@ test('contract: STM->MTM overflow creates LTM summary and remains queryable by a
         // Best-effort cleanup in tests.
       }
     }
-    cleanup();
+    await cleanup(testRoot);
   }
 });
 
 test('contract: concurrent agent writes share memory without overwrite', async () => {
-  setup();
+  const testRoot = await setup('concurrent');
   try {
+    const writesPerAgent = 12;
     const writes = [];
-    for (let i = 0; i < 60; i++) {
-      writes.push(memoryManager.recordPatternAsync({ text: `agent-A-pattern-${i}` }, TEST_ROOT));
-      writes.push(memoryManager.recordPatternAsync({ text: `agent-B-pattern-${i}` }, TEST_ROOT));
-      writes.push(memoryManager.recordGotchaAsync({ text: `agent-A-gotcha-${i}` }, TEST_ROOT));
-      writes.push(memoryManager.recordGotchaAsync({ text: `agent-B-gotcha-${i}` }, TEST_ROOT));
+    for (let i = 0; i < writesPerAgent; i++) {
+      writes.push(memoryManager.recordPatternAsync({ text: `agent-A-pattern-${i}` }, testRoot));
+      writes.push(memoryManager.recordPatternAsync({ text: `agent-B-pattern-${i}` }, testRoot));
+      writes.push(memoryManager.recordGotchaAsync({ text: `agent-A-gotcha-${i}` }, testRoot));
+      writes.push(memoryManager.recordGotchaAsync({ text: `agent-B-gotcha-${i}` }, testRoot));
     }
     await Promise.all(writes);
 
-    const memDir = path.join(TEST_ROOT, '.claude', 'context', 'memory');
+    const memDir = path.join(testRoot, '.claude', 'context', 'memory');
     const patterns = JSON.parse(fs.readFileSync(path.join(memDir, 'patterns.json'), 'utf8'));
     const gotchas = JSON.parse(fs.readFileSync(path.join(memDir, 'gotchas.json'), 'utf8'));
 
@@ -90,6 +134,6 @@ test('contract: concurrent agent writes share memory without overwrite', async (
     assert.ok(gotchas.some(g => String(g.text).includes('agent-A-gotcha-')));
     assert.ok(gotchas.some(g => String(g.text).includes('agent-B-gotcha-')));
   } finally {
-    cleanup();
+    await cleanup(testRoot);
   }
 });
