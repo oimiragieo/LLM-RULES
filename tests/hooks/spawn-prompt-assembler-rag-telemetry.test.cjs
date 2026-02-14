@@ -7,7 +7,14 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
-const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'routing',
+  'spawn-prompt-assembler.cjs'
+);
+const { emitSpawnRagTelemetry } = require(HOOK_PATH);
 
 function runHook(input, env = {}) {
   return new Promise(resolve => {
@@ -77,3 +84,12 @@ test('spawn-prompt-assembler emits RAG telemetry when RAG is disabled', async ()
   );
 });
 
+test('emitSpawnRagTelemetry reports section_added=true when RAG section is present', () => {
+  const payload = emitSpawnRagTelemetry(
+    '## Memory Context (Auto-Loaded)\n\n### Task-Relevant Memory (RAG)\n- item',
+    'routing guardrails taskupdate'
+  );
+
+  assert.equal(payload.section_added, true);
+  assert.equal(payload.memory_query_len, 'routing guardrails taskupdate'.length);
+});

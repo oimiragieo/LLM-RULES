@@ -763,6 +763,72 @@ Complete the task.`;
       assert.ok(enhanced.includes('Route security-heavy tasks to security-architect first'));
     });
 
+    it('assembleSpawnPromptAsync should retry with adaptive fallback threshold when first pass is empty', async () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const originalThreshold = process.env.RAG_AT_SPAWN_THRESHOLD;
+      const originalFallback = process.env.RAG_AT_SPAWN_ADAPTIVE_FALLBACK;
+      process.env.RAG_AT_SPAWN_THRESHOLD = 'not-a-number';
+      process.env.RAG_AT_SPAWN_ADAPTIVE_FALLBACK = 'on';
+
+      const calls = [];
+      try {
+        const enhanced = await assembler.assembleSpawnPromptAsync({
+          agentType: 'developer',
+          allowedTools: VALID_DEVELOPER_TOOLS,
+          basePrompt: SAMPLE_BASE_PROMPT,
+          memoryQuery: 'taskupdate routing memory',
+          searchMemoryFn: async (_query, options) => {
+            calls.push(options);
+            if (calls.length === 1) return [];
+            return [{ content: 'Fallback recovered relevant memory snippet', similarity: 0.34 }];
+          },
+        });
+
+        assert.equal(calls.length, 2, 'should perform initial + fallback search');
+        assert.ok(!Object.prototype.hasOwnProperty.call(calls[0], 'threshold'));
+        assert.equal(calls[1].threshold, 0.25);
+        assert.ok(enhanced.includes('### Task-Relevant Memory (RAG)'));
+        assert.ok(enhanced.includes('Fallback recovered relevant memory snippet'));
+      } finally {
+        if (typeof originalThreshold === 'undefined') {
+          delete process.env.RAG_AT_SPAWN_THRESHOLD;
+        } else {
+          process.env.RAG_AT_SPAWN_THRESHOLD = originalThreshold;
+        }
+        if (typeof originalFallback === 'undefined') {
+          delete process.env.RAG_AT_SPAWN_ADAPTIVE_FALLBACK;
+        } else {
+          process.env.RAG_AT_SPAWN_ADAPTIVE_FALLBACK = originalFallback;
+        }
+      }
+    });
+
+    it('assembleSpawnPromptAsync should not run adaptive fallback when explicit threshold is provided', async () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const calls = [];
+      const enhanced = await assembler.assembleSpawnPromptAsync({
+        agentType: 'developer',
+        allowedTools: VALID_DEVELOPER_TOOLS,
+        basePrompt: SAMPLE_BASE_PROMPT,
+        memoryQuery: 'taskupdate routing memory',
+        ragThreshold: 0.5,
+        searchMemoryFn: async (_query, options) => {
+          calls.push(options);
+          return [];
+        },
+      });
+
+      assert.equal(calls.length, 1, 'should only perform one search with explicit threshold');
+      assert.equal(calls[0].threshold, 0.5);
+      assert.ok(!enhanced.includes('### Task-Relevant Memory (RAG)'));
+    });
+
     it('assembleSpawnPromptAsync should fail open when memory search throws', async () => {
       if (!assembler) {
         assert.fail('Module not implemented yet');
