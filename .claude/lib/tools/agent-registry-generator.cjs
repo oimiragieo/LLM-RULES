@@ -481,6 +481,21 @@ function loadAgentSkillMatrixAndSkillIndex() {
  * @param {Object} skillIndex - skill-index.json content
  * @returns {string[]} Tool names
  */
+function getSkillEntryVariants(skillName) {
+  const variants = new Set();
+  if (typeof skillName !== 'string' || skillName.length === 0) {
+    return [];
+  }
+  variants.add(skillName);
+  if (skillName.startsWith('creators/')) {
+    const parts = skillName.split('/');
+    variants.add(parts[parts.length - 1]);
+  } else {
+    variants.add('creators/' + skillName);
+  }
+  return [...variants];
+}
+
 function getRequiredToolsUnionForAgent(agentId, matrix, skillIndex) {
   const skills = new Set();
   const agents = matrix.agents || {};
@@ -500,9 +515,11 @@ function getRequiredToolsUnionForAgent(agentId, matrix, skillIndex) {
   const tools = new Set();
   const indexSkills = skillIndex.skills || {};
   for (const skillName of skills) {
-    const skill = indexSkills[skillName];
-    if (skill && Array.isArray(skill.requiredTools)) {
-      skill.requiredTools.forEach(t => tools.add(t));
+    for (const variant of getSkillEntryVariants(skillName)) {
+      const skill = indexSkills[variant];
+      if (skill && Array.isArray(skill.requiredTools)) {
+        skill.requiredTools.forEach(t => tools.add(t));
+      }
     }
   }
   return [...tools];
@@ -875,5 +892,7 @@ module.exports = {
   inferDomain,
   extractTriggerPhrases,
   extractExamplesAndTags,
+  getRequiredToolsUnionForAgent,
+  getSkillEntryVariants,
   DOMAIN_MAPPING,
 };
