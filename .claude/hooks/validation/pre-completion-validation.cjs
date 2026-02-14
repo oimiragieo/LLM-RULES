@@ -56,6 +56,9 @@ const CREATOR_ECOSYSTEM_VALIDATOR =
 const SKILL_ECOSYSTEM_VALIDATOR =
   process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH ||
   path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-skill-ecosystem.cjs');
+const AGENT_SKILL_REFERENCE_VALIDATOR =
+  process.env.AGENT_SKILL_REFERENCE_VALIDATOR_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-agent-skill-references.cjs');
 const ENFORCED_CREATOR_SKILLS = [
   'agent-creator',
   'command-creator',
@@ -363,6 +366,11 @@ function validateCreatorEcosystem() {
     ['--require-perfect'],
     'Skill ecosystem gate failed'
   );
+  const agentSkillReferenceValidation = runValidatorScript(
+    AGENT_SKILL_REFERENCE_VALIDATOR,
+    [],
+    'Agent skill reference validation failed'
+  );
 
   const issues = [];
   if (!creatorValidation.passed) {
@@ -370,6 +378,9 @@ function validateCreatorEcosystem() {
   }
   if (!skillValidation.passed) {
     issues.push(...skillValidation.issues);
+  }
+  if (!agentSkillReferenceValidation.passed) {
+    issues.push(...agentSkillReferenceValidation.issues);
   }
 
   return {

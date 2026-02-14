@@ -35,6 +35,9 @@ const CREATOR_ECOSYSTEM_VALIDATOR =
 const SKILL_ECOSYSTEM_VALIDATOR =
   process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH ||
   path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-skill-ecosystem.cjs');
+const AGENT_SKILL_REFERENCE_VALIDATOR =
+  process.env.AGENT_SKILL_REFERENCE_VALIDATOR_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-agent-skill-references.cjs');
 
 // Creator output path patterns
 const CREATOR_PATHS = {
@@ -236,6 +239,11 @@ function validateCreatorEcosystemStrict() {
     ['--require-perfect'],
     'Skill ecosystem gate failed'
   );
+  const agentSkillReferenceValidation = runValidatorScript(
+    AGENT_SKILL_REFERENCE_VALIDATOR,
+    [],
+    'Agent skill reference validation failed'
+  );
 
   const issues = [];
   if (!creatorValidation.passed) {
@@ -243,6 +251,9 @@ function validateCreatorEcosystemStrict() {
   }
   if (!skillValidation.passed) {
     issues.push(...skillValidation.issues);
+  }
+  if (!agentSkillReferenceValidation.passed) {
+    issues.push(...agentSkillReferenceValidation.issues);
   }
 
   return {
@@ -328,7 +339,9 @@ async function main() {
         strictMessage.push(`|  - ${issue.substring(0, 66).padEnd(66)}|`);
       }
 
-      strictMessage.push('+======================================================================+');
+      strictMessage.push(
+        '+======================================================================+'
+      );
       strictMessage.push('');
 
       if (mode === 'block') {

@@ -136,7 +136,8 @@
     "detect:orphans": "node .claude/tools/_archive/detect-orphans.mjs",
     "verify:git-notes": "node .claude/tools/cli/git-notes-verify.cjs",
     "assess:ecosystem": "node .claude/tools/analysis/ecosystem-assessor/assess-ecosystem.mjs",
-    "skills:ecosystem:gate": "node .claude/tools/cli/validate-skill-ecosystem.cjs --require-perfect"
+    "skills:ecosystem:gate": "node .claude/tools/cli/validate-skill-ecosystem.cjs --require-perfect",
+    "validate:agent-skill-refs": "node .claude/tools/cli/validate-agent-skill-references.cjs"
   },
   "keywords": [
     "claude",
