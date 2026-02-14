@@ -53,6 +53,9 @@ const ACTIVE_CREATORS_STATE_FILE = path.join(
 const CREATOR_ECOSYSTEM_VALIDATOR =
   process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH ||
   path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-creator-ecosystem.cjs');
+const SKILL_ECOSYSTEM_VALIDATOR =
+  process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-skill-ecosystem.cjs');
 const ENFORCED_CREATOR_SKILLS = [
   'agent-creator',
   'command-creator',
@@ -316,9 +319,9 @@ function isEcosystemCreatorAction(params = {}) {
   return touchedCreatorDomains || textSignal || activeCreatorSignal;
 }
 
-function validateCreatorEcosystem() {
+function runValidatorScript(scriptPath, args = [], fallbackIssue = 'Validation failed') {
   try {
-    const result = spawnSync(process.execPath, [CREATOR_ECOSYSTEM_VALIDATOR], {
+    const result = spawnSync(process.execPath, [scriptPath, ...args], {
       cwd: PROJECT_ROOT,
       stdio: 'pipe',
       encoding: 'utf-8',
@@ -333,19 +336,46 @@ function validateCreatorEcosystem() {
     const issues = output
       .split('\n')
       .map(line => line.trim())
-      .filter(line => line.startsWith('- '))
-      .map(line => line.slice(2));
+      .filter(line => line.startsWith('- ') || line.length > 0)
+      .slice(0, 10)
+      .map(line => (line.startsWith('- ') ? line.slice(2) : line));
 
     return {
       passed: false,
-      issues: issues.length > 0 ? issues : ['Creator ecosystem validation failed'],
+      issues: issues.length > 0 ? issues : [fallbackIssue],
     };
   } catch (err) {
     return {
       passed: false,
-      issues: [`Creator ecosystem validation error: ${err.message}`],
+      issues: [`${fallbackIssue}: ${err.message}`],
     };
   }
+}
+
+function validateCreatorEcosystem() {
+  const creatorValidation = runValidatorScript(
+    CREATOR_ECOSYSTEM_VALIDATOR,
+    [],
+    'Creator ecosystem validation failed'
+  );
+  const skillValidation = runValidatorScript(
+    SKILL_ECOSYSTEM_VALIDATOR,
+    ['--require-perfect'],
+    'Skill ecosystem gate failed'
+  );
+
+  const issues = [];
+  if (!creatorValidation.passed) {
+    issues.push(...creatorValidation.issues);
+  }
+  if (!skillValidation.passed) {
+    issues.push(...skillValidation.issues);
+  }
+
+  return {
+    passed: issues.length === 0,
+    issues,
+  };
 }
 /**
  * Main hook execution.
@@ -479,7 +509,7 @@ function main(hookInput) {
           '|                                                          |',
           '| Required action:                                          |',
           '|  1. Align all creator skill folders and contracts        |',
-          '|  2. Run: node .claude/tools/cli/validate-creator-ecosystem.cjs |',
+          '|  2. Run: pnpm skills:ecosystem:gate                        |',
           '|  3. Re-run TaskUpdate to complete                        |',
           '|                                                          |',
         ];

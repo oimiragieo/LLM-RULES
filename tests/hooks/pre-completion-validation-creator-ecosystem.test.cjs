@@ -39,7 +39,6 @@ test('validateCreatorEcosystem honors validator path override', () => {
   fs.writeFileSync(validatorPath, 'process.exit(1);\n', 'utf8');
   process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH = validatorPath;
 
-  // Re-require hook module to pick up env-based constant
   delete require.cache[
     require.resolve('../../.claude/hooks/validation/pre-completion-validation.cjs')
   ];
@@ -50,6 +49,67 @@ test('validateCreatorEcosystem honors validator path override', () => {
   assert.ok(result.issues.length >= 1);
 
   delete process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH;
+  delete require.cache[
+    require.resolve('../../.claude/hooks/validation/pre-completion-validation.cjs')
+  ];
+});
+
+test('validateCreatorEcosystem enforces strict skill ecosystem gate with --require-perfect', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-ecosystem-gate-'));
+  const creatorValidatorPath = path.join(tmpDir, 'creator-validator.cjs');
+  const skillValidatorPath = path.join(tmpDir, 'skill-validator.cjs');
+
+  fs.writeFileSync(creatorValidatorPath, 'process.exit(0);\n', 'utf8');
+  fs.writeFileSync(
+    skillValidatorPath,
+    `
+if (process.argv.includes('--require-perfect')) {
+  process.exit(0);
+}
+process.exit(1);
+`,
+    'utf8'
+  );
+
+  process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH = creatorValidatorPath;
+  process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH = skillValidatorPath;
+
+  delete require.cache[
+    require.resolve('../../.claude/hooks/validation/pre-completion-validation.cjs')
+  ];
+  const freshHook = require('../../.claude/hooks/validation/pre-completion-validation.cjs');
+
+  const result = freshHook.validateCreatorEcosystem();
+  assert.equal(result.passed, true);
+
+  delete process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH;
+  delete process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH;
+  delete require.cache[
+    require.resolve('../../.claude/hooks/validation/pre-completion-validation.cjs')
+  ];
+});
+
+test('validateCreatorEcosystem fails when strict skill ecosystem gate fails', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-ecosystem-gate-fail-'));
+  const creatorValidatorPath = path.join(tmpDir, 'creator-validator.cjs');
+  const skillValidatorPath = path.join(tmpDir, 'skill-validator.cjs');
+
+  fs.writeFileSync(creatorValidatorPath, 'process.exit(0);\n', 'utf8');
+  fs.writeFileSync(skillValidatorPath, 'process.exit(1);\n', 'utf8');
+
+  process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH = creatorValidatorPath;
+  process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH = skillValidatorPath;
+
+  delete require.cache[
+    require.resolve('../../.claude/hooks/validation/pre-completion-validation.cjs')
+  ];
+  const freshHook = require('../../.claude/hooks/validation/pre-completion-validation.cjs');
+
+  const result = freshHook.validateCreatorEcosystem();
+  assert.equal(result.passed, false);
+
+  delete process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH;
+  delete process.env.SKILL_ECOSYSTEM_VALIDATOR_PATH;
   delete require.cache[
     require.resolve('../../.claude/hooks/validation/pre-completion-validation.cjs')
   ];
