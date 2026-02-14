@@ -33,25 +33,36 @@ function parseArgs(argv) {
   return {
     json: map.get('--json') === 'true',
     writeReport: map.get('--write-report') !== 'false',
+    testTimeoutMs: Number(map.get('--test-timeout-ms') || 300000),
   };
 }
 
-function runNodeTest(testPath) {
+function runNodeTest(testPath, timeoutMs) {
   const startedAt = Date.now();
+  console.log(`[memory-soak] start ${testPath}`);
   const result = spawnSync(process.execPath, ['--test', testPath], {
     cwd: PROJECT_ROOT,
     encoding: 'utf8',
     shell: false,
     maxBuffer: 1024 * 1024 * 16,
     windowsHide: true,
+    timeout: timeoutMs,
+    killSignal: 'SIGKILL',
   });
+  const status = typeof result.status === 'number' ? result.status : 1;
+  const timedOut = Boolean(result.error && result.error.code === 'ETIMEDOUT');
+  console.log(
+    `[memory-soak] done ${testPath} status=${status} timeout=${timedOut} duration_ms=${Date.now() - startedAt}`
+  );
   return {
     testPath,
-    status: result.status ?? 1,
+    status,
     signal: result.signal || null,
     durationMs: Date.now() - startedAt,
+    timedOut,
     stdout: result.stdout || '',
     stderr: result.stderr || '',
+    error: result.error ? String(result.error.message || result.error) : null,
   };
 }
 
@@ -77,7 +88,7 @@ function main() {
     'tests/lib/memory/memory-stress.test.cjs',
   ];
 
-  const runs = tests.map(runNodeTest);
+  const runs = tests.map(testPath => runNodeTest(testPath, opts.testTimeoutMs));
   const failed = runs.filter(run => run.status !== 0);
   const report = {
     timestamp: new Date().toISOString(),
@@ -87,6 +98,8 @@ function main() {
       status: run.status,
       signal: run.signal,
       durationMs: run.durationMs,
+      timedOut: run.timedOut,
+      error: run.error,
     })),
     failedCount: failed.length,
     ok: failed.length === 0,
@@ -117,6 +130,15 @@ function main() {
   if (!report.ok) {
     for (const run of failed) {
       process.stderr.write(`\n[${run.testPath}] failed with status ${run.status}\n`);
+      if (run.timedOut) {
+        process.stderr.write(`[${run.testPath}] timed out after ${opts.testTimeoutMs}ms\n`);
+      }
+      if (run.error) {
+        process.stderr.write(`[${run.testPath}] error: ${run.error}\n`);
+      }
+      if (run.stdout) {
+        process.stderr.write(run.stdout.slice(0, 4000));
+      }
       if (run.stderr) {
         process.stderr.write(run.stderr.slice(0, 4000));
       }
