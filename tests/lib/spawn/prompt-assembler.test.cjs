@@ -703,6 +703,20 @@ Complete the task.`;
       assert.ok(section.includes('### Task-Relevant Memory (RAG)'));
       assert.ok(section.includes('Use lock files for concurrent writes'));
       assert.ok(section.includes('Call TaskUpdate before and after work'));
+      assert.match(section, /\[rag:[a-f0-9]{8}\]/, 'Should include stable rag evidence IDs');
+    });
+
+    it('formatMemorySection should include mem evidence ids for injected facts', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const section = assembler.formatMemorySection({
+        gotchas: ['Avoid stale lock files'],
+      });
+
+      assert.ok(section.includes('## Memory Context (Auto-Loaded)'));
+      assert.match(section, /\[mem:[a-f0-9]{8}\]/, 'Should include stable memory evidence IDs');
     });
 
     it('formatRagMemorySection should enforce max item cap', () => {

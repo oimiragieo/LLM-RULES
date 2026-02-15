@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 
@@ -227,6 +228,13 @@ function clipMemoryText(value) {
   if (!normalized) return '';
   if (normalized.length <= MAX_MEMORY_ITEM_CHARS) return normalized;
   return normalized.slice(0, MAX_MEMORY_ITEM_CHARS - 3) + '...';
+}
+
+function buildEvidenceId(prefix, content) {
+  const normalized = normalizeMemoryText(content);
+  if (!normalized) return `${prefix}:unknown`;
+  const digest = crypto.createHash('sha1').update(normalized).digest('hex').slice(0, 8);
+  return `${prefix}:${digest}`;
 }
 
 function estimateTokens(text) {
@@ -473,6 +481,7 @@ function formatMemorySection(memory) {
   const lines = [];
   lines.push('## Memory Context (Auto-Loaded)');
   lines.push('_Recent learnings from past sessions_');
+  lines.push('_When using these facts, cite the evidence id like [mem:xxxxxxxx]._');
   lines.push('');
 
   if (gotchas.length > 0) {
@@ -480,7 +489,7 @@ function formatMemorySection(memory) {
     for (const g of gotchas.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const text = typeof g === 'string' ? g : g?.text;
       const clipped = clipMemoryText(text);
-      if (clipped) lines.push(`- ${clipped}`);
+      if (clipped) lines.push(`- [${buildEvidenceId('mem', clipped)}] ${clipped}`);
     }
     lines.push('');
   }
@@ -490,7 +499,7 @@ function formatMemorySection(memory) {
     for (const p of patterns.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const text = typeof p === 'string' ? p : p?.text;
       const clipped = clipMemoryText(text);
-      if (clipped) lines.push(`- ${clipped}`);
+      if (clipped) lines.push(`- [${buildEvidenceId('mem', clipped)}] ${clipped}`);
     }
     lines.push('');
   }
@@ -500,7 +509,7 @@ function formatMemorySection(memory) {
     for (const d of decisions.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const text = typeof d === 'string' ? d : d?.text;
       const clipped = clipMemoryText(text);
-      if (clipped) lines.push(`- ${clipped}`);
+      if (clipped) lines.push(`- [${buildEvidenceId('mem', clipped)}] ${clipped}`);
     }
     lines.push('');
   }
@@ -511,7 +520,7 @@ function formatMemorySection(memory) {
       const p = d?.path;
       const desc = d?.description;
       const clipped = clipMemoryText(desc);
-      if (p && clipped) lines.push(`- \`${p}\`: ${clipped}`);
+      if (p && clipped) lines.push(`- [${buildEvidenceId('mem', `${p}:${clipped}`)}] \`${p}\`: ${clipped}`);
     }
     lines.push('');
   }
@@ -521,10 +530,11 @@ function formatMemorySection(memory) {
     for (const s of recentSessions.slice(0, MAX_MEMORY_ITEMS_PER_SECTION)) {
       const n = s?.session_number ?? s?.sessionNum;
       const summary = clipMemoryText(s?.summary || 'No summary');
+      const evidenceId = buildEvidenceId('mem', `session:${n ?? 'unknown'}:${summary}`);
       if (n !== undefined && n !== null) {
-        lines.push(`- Session ${n}: ${summary}`);
+        lines.push(`- [${evidenceId}] Session ${n}: ${summary}`);
       } else {
-        lines.push(`- ${summary}`);
+        lines.push(`- [${evidenceId}] ${summary}`);
       }
     }
     lines.push('');
@@ -562,6 +572,7 @@ function formatRagMemorySection(ragResults, options = {}) {
   const lines = [];
   lines.push('### Task-Relevant Memory (RAG)');
   lines.push('_Semantically matched memory for this task_');
+  lines.push('_When using these facts, cite the evidence id like [rag:xxxxxxxx]._');
   lines.push('');
 
   for (const item of items.slice(0, maxItems)) {
@@ -569,7 +580,7 @@ function formatRagMemorySection(ragResults, options = {}) {
     if (!content) continue;
     const similarity = Number(item?.similarity);
     const similarityTag = Number.isFinite(similarity) ? ` (sim: ${similarity.toFixed(2)})` : '';
-    lines.push(`- ${content}${similarityTag}`);
+    lines.push(`- [${buildEvidenceId('rag', content)}] ${content}${similarityTag}`);
   }
 
   if (lines.length <= 3) return '';
