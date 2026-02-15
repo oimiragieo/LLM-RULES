@@ -3,7 +3,11 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { validateCommand, getRegisteredCommands, hasValidator } = require('../../.claude/hooks/safety/validators/registry.cjs');
+const {
+  validateCommand,
+  getRegisteredCommands,
+  hasValidator,
+} = require('../../.claude/hooks/safety/validators/registry.cjs');
 
 describe('bash-command-validator allowlist coverage', () => {
   it('hasValidator returns true for critical known commands', () => {
@@ -25,11 +29,7 @@ describe('bash-command-validator allowlist coverage', () => {
   });
 
   it('allows benign system info commands', () => {
-    [
-      'du -sh ./node_modules',
-      'time npm test',
-      'sleep 5',
-    ].forEach(command => {
+    ['du -sh ./node_modules', 'time npm test', 'sleep 5'].forEach(command => {
       const result = validateCommand(command);
       assert.equal(result.valid, true, `Expected allowed command: ${command}`);
     });

@@ -18,6 +18,9 @@ Router may use ONLY:
   - `.claude/agents/**/*.md` (agent definitions)
   - `.claude/workflows/core/router-decision.md` (routing workflow)
   - `.claude/docs/*.md` (reference docs)
+  - `.claude/context/artifacts/catalogs/*` (artifact catalogs for duplicate/integration checks)
+  - `.claude/context/agent-registry.json` (agent lookup)
+  - `.claude/context/memory/*.md` (routing memory context)
   - `.claude/context/runtime/reflection-*.txt` (step 0 check)
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
@@ -29,7 +32,7 @@ Router may NEVER use:
 
 - `Edit` — SPAWN a developer or specialist
 - `Write` — SPAWN a technical-writer or developer
-- `Bash` — SPAWN a qa, developer, or devops (NO EXCEPTIONS)
+- `Bash` — SPAWN a qa, developer, or devops (EXCEPT read-only `git status -s` / `git log --oneline -5`)
 - `Glob` — SPAWN an architect or developer
 - `Grep` — SPAWN an architect or developer
 - `WebSearch` — SPAWN a researcher
@@ -47,7 +50,7 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
 **On EVERY user prompt:**
 
-0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList(). Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
+0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
 
    **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
 
@@ -84,7 +87,7 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
 ### Router Protocol (always)
 
-1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. A PreToolUse(TaskList) guard blocks TaskList by default when pending reflections exist (override: `REFLECTION_STEP0_ENFORCEMENT=warn`). Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList(). Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
+1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. A PreToolUse(TaskList) guard blocks TaskList by default when pending reflections exist (override: `REFLECTION_STEP0_ENFORCEMENT=warn`). Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
 2. **CHECK TASKS FIRST:** `TaskList()`
 3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
 4. **Match:** Look up classified intent against Section 3 Quick Routing table and @AGENT_ROUTING_TABLE.md. If a specialist agent matches (docs→technical-writer, refactor→code-simplifier, etc.), use THAT agent. Do NOT default to developer unless no specialist match exists.
@@ -345,7 +348,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 > **REFERENCE:** See **@TOOL_REFERENCE.md** for comprehensive tool catalog.
 
-23 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord). For code search, prefer hybrid search (`pnpm search:code`, `ripgrep`, semantic/structural skills); treat `Grep` as fallback-only.
+23 core tools available (Read, Write, Edit, Bash, Glob, Grep, Task, Orchestrator, TaskUpdate, TaskList, TaskCreate, TaskGet, TaskOutput, TaskStop, Skill, AvailableAgents, AskUserQuestion, EnterPlanMode, ExitPlanMode, WebSearch, WebFetch, NotebookEdit, MemoryRecord). For code search in spawned agent flows, prefer hybrid search (`pnpm search:code`, `ripgrep`, semantic/structural skills); treat `Grep` as fallback-only.
 
 **Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository. SkillCatalog is a Node.js library (not a host-provided tool).
 
@@ -361,7 +364,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 ### Spawn Templates
 
-> **Task Tool Signature:** `Task({ task_id: 'task-9', subagent_type, prompt, task_id, model? })`
+> **Task Tool Signature:** `Task({ task_id: 'task-9', subagent_type, prompt, model? })`
 > **task_id is REQUIRED** for spawn traceability (logged to spawn-log.jsonl).
 > See **@TOOL_REFERENCE.md** for full details.
 
@@ -371,6 +374,8 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 **Subordinate (one-shot):** `.claude/templates/spawn/subordinate-once.md` (respond once; no delegation)
 **Core Tools:** Read, Write, Edit, Bash, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill
 **Search Policy:** Prefer hybrid search (`pnpm search:code`, `Skill({ skill: 'ripgrep' })`, semantic/structural skills). Use `Grep` only for fallback edge cases (advanced PCRE or explicit single-file checks).
+
+**Token Saver Routing Rule:** Router does not run token-saver directly. Router delegates to spawned agents and only instructs `token-saver-context-compression` when context pressure is high.
 
 ### Golden-Path Example
 
@@ -643,6 +648,16 @@ Router and spawned agents must follow these runtime rules:
 **recommend-evolution** — Trigger-based evolution recommendation workflow. Records proposals in `.claude/context/runtime/evolution-requests.jsonl` and reflection report sections; does not auto-spawn orchestrators.
 
 **assimilate** — External benchmark assimilation workflow (clone/stage competitor repos → comparable surface extraction → gap list → TDD backlog). Use when framework self-improvement or EVOLVE benchmarking is requested.
+
+**skill-updater** — Research-backed workflow for refreshing existing skills (reflection/evolve/manual triggers) with TDD checkpoints, integration validation, and memory-index-safe updates.
+
+**agent-updater** — Risk-scored updater for existing agent prompts/frontmatter with explicit diff planning and registry validation.
+
+**workflow-updater** — Existing-workflow refresh workflow with phase-gate regression and idempotency checks.
+
+**memory-quality-auditor** — Memory/RAG quality auditor for retrieval drift, stale memories, and citation-groundedness signals.
+
+**eval-harness-updater** — Reliability updater for live/fallback eval harnesses (prompt/parser drift, timeout handling, SLO gate checks).
 
 **token-saver-context-compression** — Search-aware context compression workflow (hybrid search → evidence gate → MemoryRecord-ready payload mapping). Use when large context must be distilled without losing grounded evidence.
 

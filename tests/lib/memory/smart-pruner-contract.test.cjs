@@ -115,12 +115,16 @@ test('C-002: validateResultContract catches missing "removed" field', () => {
 test('C-002: memory-scheduler uses correct field from deduplicateFile', () => {
   // This verifies the INTEGRATION between scheduler and pruner
   const schedulerPath = require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs');
+  const schedulerTasksPath =
+    require.resolve('../../../.claude/lib/memory/memory-scheduler-tasks.cjs');
   const schedulerSource = fs.readFileSync(schedulerPath, 'utf8');
+  const schedulerTasksSource = fs.readFileSync(schedulerTasksPath, 'utf8');
+  const combinedSource = `${schedulerSource}\n${schedulerTasksSource}`;
 
   // After fix: scheduler should use dedupResult.removed (not dedupResult.entriesRemoved)
   // Line ~421 should use .duplicatesRemoved or .removed
-  const hasDuplicatesRemoved = schedulerSource.includes('dedupResult.duplicatesRemoved');
-  const hasRemoved = schedulerSource.includes('dedupResult.removed');
+  const hasDuplicatesRemoved = combinedSource.includes('dedupResult.duplicatesRemoved');
+  const hasRemoved = combinedSource.includes('dedupResult.removed');
 
   assert.ok(
     hasDuplicatesRemoved || hasRemoved,
@@ -128,7 +132,7 @@ test('C-002: memory-scheduler uses correct field from deduplicateFile', () => {
   );
 
   // Should NOT use entriesRemoved (the bug)
-  const hasEntriesRemoved = schedulerSource.includes('dedupResult.entriesRemoved');
+  const hasEntriesRemoved = combinedSource.includes('dedupResult.entriesRemoved');
   assert.strictEqual(
     hasEntriesRemoved,
     false,

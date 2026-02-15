@@ -101,4 +101,3 @@ applyPrototypeMethods(HybridLazyIndexerMethodsB);
 applyPrototypeMethods(HybridLazyIndexerMethodsC);
 
 module.exports = { HybridLazyIndexer };
-

@@ -4,9 +4,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const {
-  CONTRACT_MARKER,
-} = require('../../.claude/lib/agents/agent-template-contract.cjs');
+const { CONTRACT_MARKER } = require('../../.claude/lib/agents/agent-template-contract.cjs');
 const {
   rewriteFileContent,
 } = require('../../.claude/tools/cli/backfill-agent-template-contract.cjs');

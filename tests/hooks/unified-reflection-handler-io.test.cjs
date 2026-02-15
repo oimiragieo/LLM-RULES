@@ -494,7 +494,6 @@ describe('unified-reflection-handler.cjs', () => {
       assertEqual(eventType, null, 'Read should not be handled');
     });
   });
-
 });
 // ============================================================
 

@@ -8,7 +8,11 @@ const yaml = require('js-yaml');
 const CONTRACT_MARKER = '<!-- agent-template-contract:v1 -->';
 const REQUIRED_HEADINGS = ['## Token Saver Invocation Rule'];
 const REQUIRED_SKILLS_BASE = ['task-management-protocol'];
-const REQUIRED_SKILLS_SEARCH_HEAVY = ['ripgrep', 'code-semantic-search', 'token-saver-context-compression'];
+const REQUIRED_SKILLS_SEARCH_HEAVY = [
+  'ripgrep',
+  'code-semantic-search',
+  'token-saver-context-compression',
+];
 const SEARCH_HEAVY_PATTERNS = [/code-semantic-search/, /ripgrep/, /pnpm search:code/];
 
 function isAgentFile(filePath) {
@@ -16,8 +20,7 @@ function isAgentFile(filePath) {
   const normalized = filePath.replace(/\\/g, '/');
   const withoutDrive = normalized.replace(/^[A-Za-z]:/, '');
   return (
-    /(?:^|\/)\.claude\/agents\/.+\.md$/i.test(withoutDrive) &&
-    !/README\.md$/i.test(withoutDrive)
+    /(?:^|\/)\.claude\/agents\/.+\.md$/i.test(withoutDrive) && !/README\.md$/i.test(withoutDrive)
   );
 }
 
@@ -86,7 +89,9 @@ function validateAgentContent(content, { requireMarker = true } = {}) {
   }
 
   if (!/Use `Skill\(\{ skill: 'token-saver-context-compression' \}\)`/.test(content)) {
-    warnings.push('Token Saver Invocation Rule does not include explicit Skill() invocation example');
+    warnings.push(
+      'Token Saver Invocation Rule does not include explicit Skill() invocation example'
+    );
   }
 
   return {
@@ -111,7 +116,8 @@ function validateAgentFile(filePath, options = {}) {
 
 function shouldEnforceForWrite({ filePath, incomingContent, existingContent }) {
   if (!isAgentFile(filePath)) return false;
-  const existingHasMarker = typeof existingContent === 'string' && existingContent.includes(CONTRACT_MARKER);
+  const existingHasMarker =
+    typeof existingContent === 'string' && existingContent.includes(CONTRACT_MARKER);
   const incomingHasMarker =
     typeof incomingContent === 'string' && incomingContent.includes(CONTRACT_MARKER);
 
@@ -130,8 +136,25 @@ function renderAgentTemplate({
   description,
   model = 'sonnet',
   temperature = 0.3,
-  tools = ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'],
-  skills = ['task-management-protocol', 'ripgrep', 'code-semantic-search', 'token-saver-context-compression', 'verification-before-completion'],
+  tools = [
+    'Read',
+    'Write',
+    'Edit',
+    'Glob',
+    'Grep',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+  ],
+  skills = [
+    'task-management-protocol',
+    'ripgrep',
+    'code-semantic-search',
+    'token-saver-context-compression',
+    'verification-before-completion',
+  ],
 }) {
   return `---
 name: ${name}
@@ -195,7 +218,11 @@ function scanAgentFiles(rootDir) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) walk(full);
-      else if (entry.isFile() && entry.name.endsWith('.md') && entry.name.toLowerCase() !== 'readme.md') {
+      else if (
+        entry.isFile() &&
+        entry.name.endsWith('.md') &&
+        entry.name.toLowerCase() !== 'readme.md'
+      ) {
         out.push(full);
       }
     }

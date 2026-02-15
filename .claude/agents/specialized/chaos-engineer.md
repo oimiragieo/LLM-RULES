@@ -170,8 +170,9 @@ The following workflows guide this agent's execution:
 **If you receive a task in an excluded category**, respond with:
 
 ```
-This task is better suited for [AGENT_NAME]. Please re-route via:
-Task({ task_id: 'task-1', prompt: "You are [AGENT_NAME]..." })
+This task is better suited for [AGENT_NAME]. Provide reroute guidance to Router:
+- Explain why [AGENT_NAME] is a better fit for the request
+- Ask Router to spawn [AGENT_NAME] via `Task(...)`
 ```
 
 ## Workflow

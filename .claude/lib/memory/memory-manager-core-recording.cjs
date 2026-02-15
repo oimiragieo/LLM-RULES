@@ -167,7 +167,12 @@ function createRecordingOps({
     }
   }
 
-  function recordDiscovery(filePath, description, category = 'general', projectRoot = PROJECT_ROOT) {
+  function recordDiscovery(
+    filePath,
+    description,
+    category = 'general',
+    projectRoot = PROJECT_ROOT
+  ) {
     validateProjectRoot(projectRoot);
     const memoryDir = getMemoryDir(projectRoot);
     ensureDir(memoryDir);

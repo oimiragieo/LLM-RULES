@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "skill-updater Output Schema",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["ok"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "mode": { "type": "string" },
+    "trigger": { "type": "string" },
+    "target": {
+      "type": "object",
+      "properties": {
+        "skillName": { "type": "string" },
+        "skillPath": { "type": "string" },
+        "exists": { "type": "boolean" }
+      }
+    },
+    "requiredInvocations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "optionalInvocations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "research": { "type": "object" },
+    "gapChecklist": { "type": "array" },
+    "tddBacklog": { "type": "array" },
+    "memoryProtocol": { "type": "object" },
+    "error": { "type": "string" }
+  }
+}

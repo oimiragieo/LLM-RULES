@@ -1,6 +1,6 @@
+---
 description: Canon TDD workflow (scenario backlog, RED proof, minimal GREEN, optional refactor)
 disable-model-invocation: true
-
 ---
 
 Invoke the `tdd` skill and execute Canon TDD:

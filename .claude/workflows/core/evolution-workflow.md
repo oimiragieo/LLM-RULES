@@ -11,8 +11,11 @@ skills:
     research-synthesis,
     assimilate,
     agent-creator,
+    agent-updater,
     skill-creator,
+    skill-updater,
     workflow-creator,
+    workflow-updater,
     hook-creator,
     schema-creator,
     template-creator,
@@ -20,6 +23,12 @@ skills:
 triggers:
   - 'create new agent'
   - 'create new skill'
+  - 'refresh agent'
+  - 'refresh skill'
+  - 'refresh workflow'
+  - 'update existing agent'
+  - 'update existing skill'
+  - 'update existing workflow'
   - 'need a .*agent'
   - 'need a .*skill'
   - 'no matching agent'
@@ -34,7 +43,7 @@ triggers:
 
 ## Overview
 
-The EVOLVE workflow is the mandatory process for creating new ecosystem artifacts (agents, skills, workflows, hooks, schemas, templates). It ensures research-backed, validated, quality-gated artifact creation.
+The EVOLVE workflow is the mandatory process for creating new ecosystem artifacts (agents, skills, workflows, hooks, schemas, templates) and refreshing existing artifacts (`agent-update`, `skill-update`, `workflow-update`). It ensures research-backed, validated, quality-gated artifact evolution.
 
 ```
 E → V → O → L → V → E
@@ -144,7 +153,7 @@ stateDiagram-v2
 Edit('.claude/context/evolution-state.json', {
   state: 'evaluating',
   currentEvolution: {
-    type: 'agent|skill|workflow|hook|schema|template',
+    type: 'agent|agent-update|skill|skill-update|workflow|workflow-update|hook|schema|template',
     name: 'proposed-name',
     phase: 'evaluate',
     startedAt: new Date().toISOString(),
@@ -253,13 +262,16 @@ const isValidName = namePattern.test('proposed-name');
 
 **Naming Conventions**:
 
-| Artifact | Convention                      | Example                                  | Regex                       |
-| -------- | ------------------------------- | ---------------------------------------- | --------------------------- |
-| Agent    | `<domain>-<role>`               | `mobile-ux-reviewer`, `data-engineer`    | `^[a-z]+-[a-z]+(-[a-z]+)*$` |
-| Skill    | `<verb>-<object>` or `<domain>` | `code-analyzer`, `tdd`, `github-mcp`     | `^[a-z]+(-[a-z]+)*$`        |
-| Workflow | `<process>-workflow`            | `feature-development-workflow`           | `^[a-z]+-workflow$`         |
-| Hook     | `<trigger>-<action>`            | `pre-commit-validator`, `security-guard` | `^[a-z]+-[a-z]+(-[a-z]+)*$` |
-| Schema   | `<artifact>-schema`             | `agent-schema`, `skill-schema`           | `^[a-z]+-schema$`           |
+| Artifact        | Convention                      | Example                                      | Regex                        |
+| --------------- | ------------------------------- | -------------------------------------------- | ---------------------------- |
+| Agent           | `<domain>-<role>`               | `mobile-ux-reviewer`, `data-engineer`        | `^[a-z]+-[a-z]+(-[a-z]+)*$`  |
+| Agent Update    | existing agent name only        | `reflection-agent`, `evolution-orchestrator` | must match existing agent    |
+| Skill           | `<verb>-<object>` or `<domain>` | `code-analyzer`, `tdd`, `github-mcp`         | `^[a-z]+(-[a-z]+)*$`         |
+| Skill Update    | existing skill name only        | `tdd`, `skill-creator`                       | must match existing skill    |
+| Workflow        | `<process>-workflow`            | `feature-development-workflow`               | `^[a-z]+-workflow$`          |
+| Workflow Update | existing workflow name only     | `evolution-workflow`, `enterprise-workflow`  | must match existing workflow |
+| Hook            | `<trigger>-<action>`            | `pre-commit-validator`, `security-guard`     | `^[a-z]+-[a-z]+(-[a-z]+)*$`  |
+| Schema          | `<artifact>-schema`             | `agent-schema`, `skill-schema`               | `^[a-z]+-schema$`            |
 
 **Failure Mode**:
 
@@ -437,11 +449,20 @@ switch (artifactType) {
   case 'agent':
     Skill({ skill: 'agent-creator' });
     break;
+  case 'agent-update':
+    Skill({ skill: 'agent-updater' }); // refresh existing agent
+    break;
   case 'skill':
-    Skill({ skill: 'skill-creator' });
+    Skill({ skill: 'skill-creator' }); // net-new skill
+    break;
+  case 'skill-update':
+    Skill({ skill: 'skill-updater' }); // refresh existing skill
     break;
   case 'workflow':
     Skill({ skill: 'workflow-creator' });
+    break;
+  case 'workflow-update':
+    Skill({ skill: 'workflow-updater' }); // refresh existing workflow
     break;
   case 'hook':
     Skill({ skill: 'hook-creator' });
@@ -594,12 +615,14 @@ Bash("node .claude/tools/validate-agents.mjs 2>&1 | grep '<agent-name>'");
 - [ ] All referenced tools are valid
 - [ ] Examples are complete and correct
 - [ ] Documentation is comprehensive
+- [ ] Artifact regression gate passes (`node .claude/tools/cli/validate-artifact-regression-gate.cjs`)
 
 **Failure Mode**:
 
 - If quality issues found: RETURN to LOCK for fixes
 - Document specific issues for fix iteration
 - Maximum 5 fix iterations before ABORT
+- If regression gate fails: append remediation queue entry and RETURN to LOCK
 
 **Gate Validation Script**:
 
@@ -740,14 +763,15 @@ const gate6Passed = Object.values(gate6).every(v => v === true);
 
 ## Enforcement Hooks
 
-| Hook                             | Phase         | Type        | Trigger                         | Action                                     |
-| -------------------------------- | ------------- | ----------- | ------------------------------- | ------------------------------------------ |
-| `evolution-trigger-detector.cjs` | IDLE→EVALUATE | PostToolUse | Detects evolution keywords      | Initiates EVOLVE workflow                  |
-| `conflict-detector.cjs`          | VALIDATE      | PreToolUse  | Before creator skill invocation | Blocks if naming/capability conflict       |
-| `research-enforcement.cjs`       | OBTAIN→LOCK   | PreToolUse  | Before Write/Edit for artifacts | Blocks creation without research report    |
-| `evolution-state-guard.cjs`      | ALL           | PreToolUse  | Any phase transition            | Enforces state machine, prevents skipping  |
-| `quality-gate-validator.cjs`     | VERIFY        | PreToolUse  | Before ENABLE transition        | Blocks incomplete/placeholder artifacts    |
-| `evolution-audit.cjs`            | ENABLE        | PostToolUse | After deployment                | Logs all evolutions, verifies registration |
+| Hook                               | Phase         | Type        | Trigger                         | Action                                           |
+| ---------------------------------- | ------------- | ----------- | ------------------------------- | ------------------------------------------------ |
+| `evolution-trigger-detector.cjs`   | IDLE→EVALUATE | PostToolUse | Detects evolution keywords      | Initiates EVOLVE workflow                        |
+| `conflict-detector.cjs`            | VALIDATE      | PreToolUse  | Before creator skill invocation | Blocks if naming/capability conflict             |
+| `research-enforcement.cjs`         | OBTAIN→LOCK   | PreToolUse  | Before Write/Edit for artifacts | Blocks creation without research report          |
+| `evolution-state-guard.cjs`        | ALL           | PreToolUse  | Any phase transition            | Enforces state machine, prevents skipping        |
+| `quality-gate-validator.cjs`       | VERIFY        | PreToolUse  | Before ENABLE transition        | Blocks incomplete/placeholder artifacts          |
+| `artifact-scoring-ledger-hook.cjs` | VERIFY/ENABLE | PostToolUse | Completed TaskUpdate            | Writes score ledger + opens/resolves remediation |
+| `evolution-audit.cjs`              | ENABLE        | PostToolUse | After deployment                | Logs all evolutions, verifies registration       |
 
 ### Hook Implementation Pattern
 
@@ -843,7 +867,7 @@ These rules are INVIOLABLE. Violations break the workflow.
   "state": "idle|evaluating|validating|obtaining|locking|verifying|enabling|blocked|failed",
   "lastUpdated": "ISO-timestamp",
   "currentEvolution": {
-    "type": "agent|skill|workflow|hook|schema|template",
+    "type": "agent|agent-update|skill|skill-update|workflow|workflow-update|hook|schema|template",
     "name": "artifact-name",
     "phase": "evaluate|validate|obtain|lock|verify|enable",
     "startedAt": "ISO-timestamp",
@@ -945,15 +969,15 @@ Create agent for: "GraphQL schema review"
   → Found: graphql-inspector, eslint-plugin-graphql, custom validators
 - Query 3: "AI agent GraphQL review automation"
   → Found: GitHub Copilot patterns, automated review tools
-- Codebase analysis: Reading api-integrator.md, architect.md patterns
-- Research report saved: .claude/context/artifacts/research-reports/graphql-schema-reviewer-research.md
+- Codebase analysis: Reading api-designer.md, architect.md patterns
+- Research report saved: <research-report-path>.md
 - State updated: obtaining
 - Gate 3 PASSED (3 queries, 5 sources, 2 patterns)
 
 === Phase L: LOCK ===
 - Invoking agent-creator skill
 - Applying research findings to template
-- Creating: .claude/agents/domain/graphql-schema-reviewer.md
+- Creating: <new-agent-path>.md
 - Schema validation: PASSED
 - Required fields: COMPLETE (tools, skills, protocols)
 - State updated: locking
@@ -970,16 +994,16 @@ Create agent for: "GraphQL schema review"
 
 === Phase E: ENABLE ===
 - Updating CLAUDE.md routing table
-- grep "graphql-schema-reviewer" .claude/CLAUDE.md → FOUND
+- Verify routing references updated in `.claude/CLAUDE.md` → FOUND
 - Updating evolution state history
 - Recording to learnings.md and decisions.md
 - State updated: idle
 - Gate 6 PASSED
 
 [EVOLUTION-ORCHESTRATOR] Evolution complete!
-Created: graphql-schema-reviewer agent
-Location: .claude/agents/domain/graphql-schema-reviewer.md
-Research: .claude/context/artifacts/research-reports/graphql-schema-reviewer-research.md
+Created: new domain agent
+Location: <new-agent-path>.md
+Research: <research-report-path>.md
 ```
 
 ---
@@ -1060,8 +1084,11 @@ This workflow integrates with:
 | `research-synthesis` | OBTAIN (MANDATORY)                 |
 | `assimilate`         | OBTAIN (optional benchmark parity) |
 | `agent-creator`      | LOCK                               |
+| `agent-updater`      | LOCK (existing agent refresh)      |
 | `skill-creator`      | LOCK                               |
+| `skill-updater`      | LOCK (existing skill refresh)      |
 | `workflow-creator`   | LOCK                               |
+| `workflow-updater`   | LOCK (existing workflow refresh)   |
 | `hook-creator`       | LOCK                               |
 | `schema-creator`     | LOCK                               |
 | `template-creator`   | LOCK                               |

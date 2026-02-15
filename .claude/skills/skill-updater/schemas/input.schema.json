@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "skill-updater Input Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["skill"],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Target skill name or path to SKILL.md"
+    },
+    "trigger": {
+      "type": "string",
+      "enum": ["manual", "reflection", "evolve"],
+      "default": "manual"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["plan", "execute"],
+      "default": "plan"
+    },
+    "topic": {
+      "type": "string",
+      "description": "Optional research topic override"
+    }
+  }
+}

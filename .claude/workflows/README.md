@@ -46,6 +46,11 @@ Skill-specific workflows tied to individual creator skills or domain agents:
 - **consensus-voting-skill-workflow.md** - Multi-agent consensus patterns for making architectural decisions
 - **architecture-review-skill-workflow.md** - Architecture review process
 - **context-compressor-skill-workflow.md** - Context compression and summarization workflows
+- **skill-updater-skill-workflow.md** - Existing skill refresh workflow (reflection/EVOLVE/manual triggers)
+- **agent-updater-skill-workflow.md** - Existing agent refresh workflow with risk-scored prompt/frontmatter diffs
+- **workflow-updater-skill-workflow.md** - Existing workflow refresh workflow with gate/idempotency checks
+- **memory-quality-auditor-skill-workflow.md** - Memory quality audit workflow for drift/staleness/groundedness
+- **eval-harness-updater-skill-workflow.md** - Eval harness reliability refresh workflow (live/fallback/SLO)
 - **conductor-setup-workflow.md** - Context-Driven Development (CDD) setup and validation
 - **domain-development-workflow.md** - TDD workflow (Red-Green-Refactor Cycle) for all 22 domain specialist agents
 - **code-review-workflow.md** - Two-pass code review process (Pass 1: blocking, Pass 2: non-blocking)

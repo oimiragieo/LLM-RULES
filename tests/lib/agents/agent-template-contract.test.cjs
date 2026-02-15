@@ -14,7 +14,10 @@ const {
 
 test('isAgentFile recognizes relative and absolute .claude/agents paths', () => {
   assert.equal(isAgentFile('.claude/agents/domain/example.md'), true);
-  assert.equal(isAgentFile('C:\\dev\\projects\\agent-studio\\.claude\\agents\\domain\\example.md'), true);
+  assert.equal(
+    isAgentFile('C:\\dev\\projects\\agent-studio\\.claude\\agents\\domain\\example.md'),
+    true
+  );
   assert.equal(isAgentFile('/workspace/agent-studio/.claude/agents/domain/example.md'), true);
   assert.equal(isAgentFile('.claude/skills/example/SKILL.md'), false);
 });

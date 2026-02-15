@@ -2,9 +2,9 @@
 
 # Command Catalog
 
-**Last Updated:** 2026-02-09
-**Total Commands:** 82
-**Pattern:** Thin delegators to skills (80 delegators, 1 enriched, 1 standalone)
+**Last Updated:** 2026-02-15
+**Total Commands:** 88
+**Pattern:** Thin delegators to skills (86 delegators, 1 enriched, 1 standalone)
 
 This catalog documents all slash commands in the agent-studio framework with their skill delegations and usage contexts.
 
@@ -15,6 +15,7 @@ This catalog documents all slash commands in the agent-studio framework with the
 | Command                               | Description                                  | Delegates To                         | Category     |
 | ------------------------------------- | -------------------------------------------- | ------------------------------------ | ------------ |
 | `/agent-creator`                      | Create specialized AI agents                 | `agent-creator`                      | Creator      |
+| `/agent-updater`                      | Refresh existing agents with risk scoring    | `agent-updater`                      | Creator      |
 | `/analyze`                            | Project structure and health analysis        | `code-analyzer`                      | Analysis     |
 | `/android-expert`                     | Android/Kotlin/Jetpack Compose               | `android-expert`                     | Mobile       |
 | `/api-development-expert`             | API design and development                   | `api-development-expert`             | Development  |
@@ -30,6 +31,8 @@ This catalog documents all slash commands in the agent-studio framework with the
 | `/complexity-assessment`              | Task complexity classification               | `complexity-assessment`              | Planning     |
 | `/compress`                           | Compress context to reduce tokens            | `context-compressor`                 | Context      |
 | `/token-saver-context-compression`    | Search-aware context compression             | `token-saver-context-compression`    | Context      |
+| `/skill-updater`                      | Refresh existing skills with TDD gates       | `skill-updater`                      | Creator      |
+| `/skill-refresh`                      | Alias for skill updater refresh workflow     | `skill-updater`                      | Creator      |
 | `/container-expert`                   | Docker/container expertise                   | `container-expert`                   | DevOps       |
 | `/context-driven-development`         | Context as managed artifacts                 | `context-driven-development`         | Context      |
 | `/data-expert`                        | Data processing and transformation           | `data-expert`                        | Data         |
@@ -39,6 +42,7 @@ This catalog documents all slash commands in the agent-studio framework with the
 | `/differential-review`                | Differential code review                     | `differential-review`                | Security     |
 | `/docker-compose`                     | Docker Compose orchestration                 | `docker-compose`                     | DevOps       |
 | `/expo-framework-rule`                | Expo framework patterns                      | `expo-framework-rule`                | Mobile       |
+| `/eval-harness-updater`               | Refresh eval harness reliability and SLOs    | `eval-harness-updater`               | Validation   |
 | `/frontend-expert`                    | Frontend development patterns                | `frontend-expert`                    | Frontend     |
 | `/gamedev-expert`                     | Game development expertise                   | `gamedev-expert`                     | Gaming       |
 | `/go-expert`                          | Go language expertise                        | `go-expert`                          | Languages    |
@@ -53,6 +57,7 @@ This catalog documents all slash commands in the agent-studio framework with the
 | `/k8s-manifest-generator`             | Kubernetes manifest generation               | `k8s-manifest-generator`             | DevOps       |
 | `/learn`                              | Extract session patterns to memory           | `context-compressor` + memory        | Context      |
 | `/mobile-first-design-rules`          | Mobile-first design patterns                 | `mobile-first-design-rules`          | Mobile       |
+| `/memory-quality-auditor`             | Audit memory retrieval and groundedness      | `memory-quality-auditor`             | Context      |
 | `/nextjs-expert`                      | Next.js expertise                            | `nextjs-expert`                      | Frameworks   |
 | `/nodejs-expert`                      | Node.js expertise                            | `nodejs-expert`                      | Languages    |
 | `/php-expert`                         | PHP expertise                                | `php-expert`                         | Languages    |
@@ -90,6 +95,7 @@ This catalog documents all slash commands in the agent-studio framework with the
 | `/verification-before-completion`     | Pre-completion gate                          | `verification-before-completion`     | Quality      |
 | `/web3-expert`                        | Solidity/Ethereum expertise                  | `web3-expert`                        | Languages    |
 | `/workflow-creator`                   | Create orchestration workflows               | `workflow-creator`                   | Creator      |
+| `/workflow-updater`                   | Refresh existing workflows safely            | `workflow-updater`                   | Creator      |
 | `/write-plan`                         | Create implementation plan with tasks        | `plan-generator`                     | Planning     |
 
 ---

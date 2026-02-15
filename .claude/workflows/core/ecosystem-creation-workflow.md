@@ -140,7 +140,7 @@ Missing companions queued to `.claude/context/runtime/integration-queue.jsonl`:
 
 ```json
 {
-  "artifactPath": ".claude/skills/new-skill/SKILL.md",
+  "artifactPath": ".claude/skills/<new-skill-name>/SKILL.md",
   "artifactType": "skill",
   "missingCompanions": ["agent-assignment", "example-usage"],
   "severity": "mustHave",

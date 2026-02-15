@@ -27,7 +27,9 @@ function parseRepos(raw) {
 
 function buildResult(options) {
   const runId = options.runId || new Date().toISOString().replace(/[:.]/g, '-');
-  const workspace = path.join('.claude', 'context', 'runtime', 'assimilate', runId).replace(/\\/g, '/');
+  const workspace = path
+    .join('.claude', 'context', 'runtime', 'assimilate', runId)
+    .replace(/\\/g, '/');
   const repos = parseRepos(options.repos);
   const mode = repos.length > 0 ? 'execution' : 'planning';
 

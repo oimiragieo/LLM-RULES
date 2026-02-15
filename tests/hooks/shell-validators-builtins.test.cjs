@@ -3,7 +3,9 @@
 const { describe, test } = require('node:test');
 const assert = require('node:assert');
 
-const { DANGEROUS_BUILTINS } = require('../../.claude/hooks/safety/validators/shell-validators.cjs');
+const {
+  DANGEROUS_BUILTINS,
+} = require('../../.claude/hooks/safety/validators/shell-validators.cjs');
 const { DANGEROUS_BUILTIN_CASES } = require('../helpers/shell-validator-cases.cjs');
 
 describe('shell-validators dangerous builtins', () => {

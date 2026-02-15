@@ -1,3 +1,10 @@
+## Artifact Hardening Layer (2026-02-15)
+
+- Added unified artifact scoring ledger + automated remediation queue at runtime.
+- Added mandatory regression gate (`validate-artifact-regression-gate.cjs`) and wired it into `pnpm validate:full`.
+- Hook `artifact-scoring-ledger-hook.cjs` now processes completed `TaskUpdate` metadata for scoring/remediation automation.
+- EVOLVE VERIFY documentation updated to require regression gate pass before ENABLE.
+
 ## Assimilate Skill Creation (2026-02-15)
 
 - Added new `assimilate` skill to support framework self-improvement benchmarking.
@@ -375,3 +382,21 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Standardized mapping from compression output to memory targets in .claude/skills/token-saver-context-compression/scripts/main.cjs.
 - Added targeted tests for wrapper behavior, memory pipeline, and spawn citation E2E compatibility.
 - Updated core agents (developer, planner, context-compressor, reflection-agent) to include token-saver-context-compression in skill assignments.
+
+## Skill-Updater Workflow Added (2026-02-15)
+
+- Added new `skill-updater` bundle at `.claude/skills/skill-updater/` for refresh-only skill upgrades with research + TDD gates.
+- Wired EVOLVE + reflection trigger paths to use `skill-updater` for existing-skill refreshes (while preserving `skill-creator` for net-new skills).
+- Added command surfaces: `.claude/commands/skill-updater.md` and `.claude/commands/skill-refresh.md`.
+- Added workflow + research artifacts:
+  - `.claude/workflows/skill-updater-skill-workflow.md`
+  - `.claude/context/artifacts/research-reports/skill-updater-research-2026-02-15.md`
+- Updated catalog/docs references and evolution state for discoverability and governance.
+
+## Updater/Auditor Skill Pack Added (2026-02-15)
+
+- Added `agent-updater` for risk-scored agent prompt/frontmatter refresh.
+- Added `workflow-updater` for phase-gate and idempotency-safe workflow refresh.
+- Added `memory-quality-auditor` for retrieval drift/staleness/groundedness audits.
+- Added `eval-harness-updater` for live/fallback eval parser and SLO hardening.
+- Wired EVOLVE/reflection docs and catalogs for these skills and command surfaces.

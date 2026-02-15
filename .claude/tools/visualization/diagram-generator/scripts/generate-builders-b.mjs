@@ -37,7 +37,4 @@ function calculateComplexity(nodeCount, edgeCount) {
   return 10;
 }
 
-export {
-  generateDiagramFromDescription,
-  calculateComplexity,
-};
+export { generateDiagramFromDescription, calculateComplexity };

@@ -3,7 +3,10 @@
 const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
-const { atomicWriteSync, atomicWriteAsync: atomicWriteAsyncWithLock } = require('../utils/atomic-write.cjs');
+const {
+  atomicWriteSync,
+  atomicWriteAsync: atomicWriteAsyncWithLock,
+} = require('../utils/atomic-write.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
 const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
@@ -384,7 +387,9 @@ function createCoreOps({
     if (memory.recent_sessions.length > 0) {
       sections.push('## Recent Sessions\n');
       for (const s of memory.recent_sessions) {
-        sections.push(`### Session ${s.session_number} (${s.timestamp?.split('T')[0] || 'unknown'})`);
+        sections.push(
+          `### Session ${s.session_number} (${s.timestamp?.split('T')[0] || 'unknown'})`
+        );
         if (s.summary) sections.push(s.summary);
         if (s.tasks_completed?.length > 0) {
           sections.push('Tasks: ' + s.tasks_completed.join(', '));
@@ -429,7 +434,9 @@ function createCoreOps({
       results = [];
     }
 
-    const candidateTexts = new Set(results.map(r => String(r?.content || '').trim()).filter(Boolean));
+    const candidateTexts = new Set(
+      results.map(r => String(r?.content || '').trim()).filter(Boolean)
+    );
 
     const ids = new Set();
     const removeByText = entry => {

@@ -193,7 +193,11 @@ function applyMemoryRecordsToFiles(records, memoryDir) {
   mergeUniqueJsonEntries(path.join(memoryDir, 'patterns.json'), records.patterns);
   mergeUniqueJsonEntries(path.join(memoryDir, 'gotchas.json'), records.gotchas);
   appendMarkdownEntries(path.join(memoryDir, 'issues.md'), 'Token Saver Issues', records.issues);
-  appendMarkdownEntries(path.join(memoryDir, 'decisions.md'), 'Token Saver Decisions', records.decisions);
+  appendMarkdownEntries(
+    path.join(memoryDir, 'decisions.md'),
+    'Token Saver Decisions',
+    records.decisions
+  );
 }
 
 function runTokenSaverWorkflow({ corpusFile, query, mode, failOnInsufficientEvidence }) {
@@ -272,7 +276,10 @@ function main(input = {}, deps = {}) {
 
   const hits = normalizeSearchResults(searchCmd.stdout, limit);
   fs.mkdirSync(RUNTIME_DIR, { recursive: true });
-  const corpusFile = path.join(RUNTIME_DIR, `corpus-${Date.now()}-${Math.random().toString(16).slice(2)}.txt`);
+  const corpusFile = path.join(
+    RUNTIME_DIR,
+    `corpus-${Date.now()}-${Math.random().toString(16).slice(2)}.txt`
+  );
   const corpus = hits
     .map(hit => `FILE: ${hit.file}\n${hit.snippets.join('\n')}`.trim())
     .join('\n\n---\n\n');

@@ -2,7 +2,7 @@
 
 **Source:** CLAUDE.md Section 3 (subsection)
 **Version:** v2.2.1
-**Last Updated:** 2026-01-31
+**Last Updated:** 2026-02-15
 
 ---
 
@@ -16,19 +16,22 @@ Complete mapping of creator skills invoked via `Skill()` tool for creating new a
 
 ### Creator Skills (invoked via `Skill()`, not standalone agents)
 
-| Request Type            | Creator Skill\*        | Skill File                                                                           |
-| ----------------------- | ---------------------- | ------------------------------------------------------------------------------------ |
-| **Before ANY creation** | `research-synthesis`\* | `.claude/skills/research-synthesis/SKILL.md`                                         |
-| **No matching agent**   | `agent-creator`\*      | `.claude/skills/agent-creator/SKILL.md`                                              |
-| **New tool/capability** | `skill-creator`\*      | `.claude/skills/skill-creator/SKILL.md`                                              |
-| **New workflow**        | `workflow-creator`\*   | `.claude/skills/workflow-creator/SKILL.md`                                           |
-| **New hook**            | `hook-creator`\*       | `.claude/skills/hook-creator/SKILL.md`                                               |
-| **New template**        | `template-creator`\*   | `.claude/skills/template-creator/SKILL.md`                                           |
-| **New schema**          | `schema-creator`\*     | `.claude/skills/schema-creator/SKILL.md`                                             |
-| **New command**         | `command-creator`\*    | `.claude/skills/creators/command-creator/SKILL.md`                                   |
-| **New rule**            | `rule-creator`\*       | `.claude/skills/creators/rule-creator/SKILL.md`                                      |
-| **New tool**            | `tool-creator`\*       | `.claude/skills/creators/tool-creator/SKILL.md`                                      |
-| **After ANY creation**  | `artifact-integrator`  | Post-creation hook → integration-queue.jsonl → artifact-integrator → follow-up tasks |
+| Request Type                  | Creator Skill\*        | Skill File                                                                           |
+| ----------------------------- | ---------------------- | ------------------------------------------------------------------------------------ |
+| **Before ANY creation**       | `research-synthesis`\* | `.claude/skills/research-synthesis/SKILL.md`                                         |
+| **No matching agent**         | `agent-creator`\*      | `.claude/skills/agent-creator/SKILL.md`                                              |
+| **Refresh existing agent**    | `agent-updater`\*      | `.claude/skills/agent-updater/SKILL.md`                                              |
+| **New tool/capability**       | `skill-creator`\*      | `.claude/skills/skill-creator/SKILL.md`                                              |
+| **Refresh existing skill**    | `skill-updater`\*      | `.claude/skills/skill-updater/SKILL.md`                                              |
+| **New workflow**              | `workflow-creator`\*   | `.claude/skills/workflow-creator/SKILL.md`                                           |
+| **Refresh existing workflow** | `workflow-updater`\*   | `.claude/skills/workflow-updater/SKILL.md`                                           |
+| **New hook**                  | `hook-creator`\*       | `.claude/skills/hook-creator/SKILL.md`                                               |
+| **New template**              | `template-creator`\*   | `.claude/skills/template-creator/SKILL.md`                                           |
+| **New schema**                | `schema-creator`\*     | `.claude/skills/schema-creator/SKILL.md`                                             |
+| **New command**               | `command-creator`\*    | `.claude/skills/creators/command-creator/SKILL.md`                                   |
+| **New rule**                  | `rule-creator`\*       | `.claude/skills/creators/rule-creator/SKILL.md`                                      |
+| **New tool**                  | `tool-creator`\*       | `.claude/skills/creators/tool-creator/SKILL.md`                                      |
+| **After ANY creation**        | `artifact-integrator`  | Post-creation hook → integration-queue.jsonl → artifact-integrator → follow-up tasks |
 
 \*Spawn a general-purpose agent that invokes the skill via `Skill({ skill: "..." })`.
 

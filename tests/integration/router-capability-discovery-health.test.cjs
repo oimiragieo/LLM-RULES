@@ -6,7 +6,9 @@ const assert = require('assert');
 const { describe, it, before, after, beforeEach } = require('node:test');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
-const { AvailableAgentsQuery } = require(path.join(PROJECT_ROOT, '.claude/lib/tools/available-agents.cjs'));
+const { AvailableAgentsQuery } = require(
+  path.join(PROJECT_ROOT, '.claude/lib/tools/available-agents.cjs')
+);
 const FIXTURES_DIR = path.join(PROJECT_ROOT, 'tests/fixtures');
 const CAPABILITY_ROUTING_PATH = path.join(PROJECT_ROOT, '.claude/config/capability-routing.json');
 

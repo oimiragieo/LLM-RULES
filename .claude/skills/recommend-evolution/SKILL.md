@@ -57,6 +57,8 @@ Use these thresholds:
 
 - If gap is integration of existing artifact, prefer:
   `Skill({ skill: 'artifact-integrator' })`
+- If gap is stale/underperforming existing skill, prefer:
+  `Skill({ skill: 'skill-updater' })`
 - If gap requires net-new capability/artifact, continue with evolution recommendation
 - If no artifact change needed, update memory only and exit
 

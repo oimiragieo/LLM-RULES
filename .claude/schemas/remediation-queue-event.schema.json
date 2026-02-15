@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Remediation Queue Event",
+  "type": "object",
+  "required": ["timestamp", "action", "status", "artifactKey", "artifactType", "artifactName", "severity"],
+  "properties": {
+    "timestamp": { "type": "string" },
+    "action": { "type": "string", "enum": ["open", "resolve"] },
+    "status": { "type": "string", "enum": ["open", "resolved"] },
+    "artifactKey": { "type": "string" },
+    "artifactType": { "type": "string" },
+    "artifactName": { "type": "string" },
+    "artifactPath": { "type": ["string", "null"] },
+    "severity": { "type": "string", "enum": ["critical", "high", "medium"] },
+    "overallScore": { "type": ["number", "null"] },
+    "source": { "type": "string" },
+    "notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

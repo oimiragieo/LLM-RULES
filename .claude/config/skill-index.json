@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-15T09:14:39.829Z",
+  "generatedAt": "2026-02-15T10:35:31.484Z",
   "metadata": {
-    "totalSkills": 385,
+    "totalSkills": 390,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-15T09:14:39.829Z",
+    "lastValidated": "2026-02-15T10:35:31.485Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -561,6 +561,28 @@
         "agent-creator"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "agent-updater": {
+      "name": "agent-updater",
+      "displayName": "Agent Updater",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - agent-updater",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "agent-updater"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "ai-ml-expert": {
@@ -1676,6 +1698,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "eval-harness-updater": {
+      "name": "eval-harness-updater",
+      "displayName": "Eval Harness Updater",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - eval-harness-updater",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "eval-harness-updater"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "expo-mobile-app-rule": {
       "name": "expo-mobile-app-rule",
       "displayName": "Expo Mobile App Rule",
@@ -2273,6 +2317,28 @@
         "memory-forensics"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "memory-quality-auditor": {
+      "name": "memory-quality-auditor",
+      "displayName": "Memory Quality Auditor",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - memory-quality-auditor",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "memory-quality-auditor"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "mobile-first-design-rules": {
@@ -6313,6 +6379,28 @@
       "priority": 1,
       "aliasOf": null
     },
+    "skill-updater": {
+      "name": "skill-updater",
+      "displayName": "Skill Updater",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - skill-updater",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "skill-updater"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "slack-notifications": {
       "name": "slack-notifications",
       "displayName": "Slack Notifications",
@@ -7187,6 +7275,28 @@
         "workflow-patterns"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "workflow-updater": {
+      "name": "workflow-updater",
+      "displayName": "Workflow Updater",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - workflow-updater",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "workflow-updater"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "library-usage": {
@@ -9222,6 +9332,7 @@
         "code-structural-search",
         "advanced-elicitation",
         "function-length-and-responsibility",
+        "agent-updater",
         "assimilate",
         "best-practices-guidelines",
         "build-tools-expert",
@@ -9233,10 +9344,12 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "eval-harness-updater",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "insecure-defaults",
         "integration/artifact-updater",
+        "memory-quality-auditor",
         "pipeline-reflection-ux",
         "planning-with-files",
         "prd-generator",
@@ -9388,6 +9501,7 @@
         "semgrep-rule-creator",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "skill-updater",
         "sparc-methodology",
         "spec-init",
         "static-analysis",
@@ -9397,6 +9511,7 @@
         "tauri-svelte-ui-components",
         "tsconfig-json-rules",
         "variant-analysis",
+        "workflow-updater",
         "command-creator",
         "rule-creator",
         "tool-creator"
@@ -9592,6 +9707,7 @@
         "advanced-elicitation",
         "function-length-and-responsibility",
         "accessibility",
+        "agent-updater",
         "api-development-expert",
         "artifact-lifecycle",
         "assimilate",
@@ -9621,6 +9737,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "eval-harness-updater",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
@@ -9641,6 +9758,7 @@
         "k8s-security-policies",
         "logging-module-usage",
         "memory-forensics",
+        "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
         "nodejs-expert",
@@ -9808,6 +9926,7 @@
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
         "skill-discovery",
+        "skill-updater",
         "slack-notifications",
         "smart-debug",
         "sparc-methodology",
@@ -9833,6 +9952,7 @@
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
+        "workflow-updater",
         "library-usage",
         "unit-testing-requirement",
         "authentication-flow-rules",
@@ -10030,6 +10150,7 @@
         "function-length-and-responsibility",
         "accessibility",
         "agent-creator",
+        "agent-updater",
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
@@ -10074,6 +10195,7 @@
         "docker-compose",
         "dry-principle",
         "dto-conventions",
+        "eval-harness-updater",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
@@ -10099,6 +10221,7 @@
         "kubernetes-flux",
         "logging-module-usage",
         "memory-forensics",
+        "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
         "nextjs-expert",
@@ -10277,6 +10400,7 @@
         "session-handoff",
         "skill-creator",
         "skill-discovery",
+        "skill-updater",
         "slack-notifications",
         "smart-debug",
         "sparc-methodology",
@@ -10311,6 +10435,7 @@
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
+        "workflow-updater",
         "library-usage",
         "unit-testing-requirement",
         "authentication-flow-rules",
@@ -10452,6 +10577,7 @@
         "function-length-and-responsibility",
         "accessibility",
         "agent-creator",
+        "agent-updater",
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
@@ -10493,6 +10619,7 @@
         "docker-compose",
         "dry-principle",
         "dto-conventions",
+        "eval-harness-updater",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
@@ -10516,6 +10643,7 @@
         "kubernetes-flux",
         "logging-module-usage",
         "memory-forensics",
+        "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
         "nextjs-expert",
@@ -10693,6 +10821,7 @@
         "session-handoff",
         "skill-creator",
         "skill-discovery",
+        "skill-updater",
         "slack-notifications",
         "smart-debug",
         "sparc-methodology",
@@ -10723,6 +10852,7 @@
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
+        "workflow-updater",
         "library-usage",
         "unit-testing-requirement",
         "authentication-flow-rules",
@@ -10824,6 +10954,7 @@
         "function-length-and-responsibility",
         "accessibility",
         "agent-creator",
+        "agent-updater",
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
@@ -10863,6 +10994,7 @@
         "docker-compose",
         "dry-principle",
         "dto-conventions",
+        "eval-harness-updater",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",
@@ -10886,6 +11018,7 @@
         "kubernetes-flux",
         "logging-module-usage",
         "memory-forensics",
+        "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
         "nextjs-expert",
@@ -11059,6 +11192,7 @@
         "service-class-conventions",
         "skill-creator",
         "skill-discovery",
+        "skill-updater",
         "slack-notifications",
         "smart-debug",
         "sparc-methodology",
@@ -11089,6 +11223,7 @@
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
+        "workflow-updater",
         "library-usage",
         "unit-testing-requirement",
         "authentication-flow-rules",
@@ -11313,6 +11448,7 @@
         "code-structural-search",
         "advanced-elicitation",
         "function-length-and-responsibility",
+        "agent-updater",
         "ai-ml-expert",
         "android-expert",
         "assimilate",
@@ -11335,6 +11471,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "eval-harness-updater",
         "expo-mobile-app-rule",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
@@ -11349,6 +11486,7 @@
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
+        "memory-quality-auditor",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -11509,6 +11647,7 @@
         "sentry-monitoring",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "skill-updater",
         "slack-notifications",
         "smart-debug",
         "sparc-methodology",
@@ -11530,6 +11669,7 @@
         "web-design-guidelines-vercel",
         "web3-expert",
         "workflow-creator",
+        "workflow-updater",
         "library-usage",
         "unit-testing-requirement",
         "task-breakdown",
@@ -12081,6 +12221,7 @@
         "code-structural-search",
         "advanced-elicitation",
         "function-length-and-responsibility",
+        "agent-updater",
         "ai-ml-expert",
         "android-expert",
         "assimilate",
@@ -12103,6 +12244,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "eval-harness-updater",
         "expo-mobile-app-rule",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
@@ -12117,6 +12259,7 @@
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
+        "memory-quality-auditor",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -12277,6 +12420,7 @@
         "sentry-monitoring",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "skill-updater",
         "slack-notifications",
         "smart-debug",
         "sparc-methodology",
@@ -12298,6 +12442,7 @@
         "web-design-guidelines-vercel",
         "web3-expert",
         "workflow-creator",
+        "workflow-updater",
         "library-usage",
         "unit-testing-requirement",
         "task-breakdown",

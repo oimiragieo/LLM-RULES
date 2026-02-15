@@ -77,16 +77,14 @@ function countStaleTempArtifacts(memoryDir, thresholds = { hours: 24, max: 10 })
     const staleThreshold = thresholds.hours * 60 * 60 * 1000;
     const files = fs.readdirSync(tempDir);
 
-    return files
-      .slice(0, thresholds.max)
-      .filter(file => {
-        try {
-          const stats = fs.statSync(path.join(tempDir, file));
-          return now - stats.mtimeMs > staleThreshold;
-        } catch {
-          return false;
-        }
-      }).length;
+    return files.slice(0, thresholds.max).filter(file => {
+      try {
+        const stats = fs.statSync(path.join(tempDir, file));
+        return now - stats.mtimeMs > staleThreshold;
+      } catch {
+        return false;
+      }
+    }).length;
   } catch {
     return 0;
   }

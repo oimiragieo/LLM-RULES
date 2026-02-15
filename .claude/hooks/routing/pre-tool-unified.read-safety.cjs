@@ -4,10 +4,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const {
-  PROJECT_ROOT,
-  canonicalizePathForPlatform,
-} = require('./pre-tool-unified.shared.cjs');
+const { PROJECT_ROOT, canonicalizePathForPlatform } = require('./pre-tool-unified.shared.cjs');
 const { ensureDir } = require('./pre-tool-unified.execution.cjs');
 
 const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 120000);

@@ -7,7 +7,13 @@ const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude', 'schemas', 'track-metadata.schema.json');
-const ANALYTICS_LIB_PATH = path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'track-analytics.cjs');
+const ANALYTICS_LIB_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'lib',
+  'utils',
+  'track-analytics.cjs'
+);
 
 let trackAnalytics;
 let validate;
@@ -74,7 +80,9 @@ describe('Track Metadata Analytics Reporting and Edge Cases', () => {
 
     it('should include agent metrics when assignee data exists', () => {
       if (!trackAnalytics) assert.fail('Analytics library not loaded');
-      const report = trackAnalytics.generateReport(sampleTracks.map(t => ({ ...t, assignee: 'developer' })));
+      const report = trackAnalytics.generateReport(
+        sampleTracks.map(t => ({ ...t, assignee: 'developer' }))
+      );
       assert.ok(report.includes('## Agent Metrics'));
     });
 
@@ -96,34 +104,120 @@ describe('Track Metadata Analytics Reporting and Edge Cases', () => {
 
   describe('Edge Cases', () => {
     it('should validate/reject edge schema combinations', () => {
-      assert.ok(!validate({ trackId: 'test_20260129', type: 'feature', status: 'new', metrics: null }));
-      assert.ok(validate({ trackId: 'test_20260129', type: 'feature', status: 'completed', estimatedEffort: { days: 0 } }));
-      assert.ok(validate({ trackId: 'test_20260129', type: 'feature', status: 'in_progress', estimatedEffort: { days: 365 } }));
-      assert.ok(validate({ trackId: 'test_20260129', type: 'feature', status: 'completed', estimatedEffort: { days: 2.5 }, actualEffort: { days: 1.75 } }));
-      assert.ok(validate({ trackId: 'test_20260129', type: 'feature', status: 'completed', reporting: { generatedAt: '2026-01-29T10:00:00Z', insights: [] } }));
-      assert.ok(!validate({ trackId: 'test_20260129', type: 'feature', status: 'completed', reporting: { generatedAt: '2026-01-29' } }));
-      assert.ok(!validate({ trackId: 'test_20260129', type: 'feature', status: 'new', description: '' }));
+      assert.ok(
+        !validate({ trackId: 'test_20260129', type: 'feature', status: 'new', metrics: null })
+      );
+      assert.ok(
+        validate({
+          trackId: 'test_20260129',
+          type: 'feature',
+          status: 'completed',
+          estimatedEffort: { days: 0 },
+        })
+      );
+      assert.ok(
+        validate({
+          trackId: 'test_20260129',
+          type: 'feature',
+          status: 'in_progress',
+          estimatedEffort: { days: 365 },
+        })
+      );
+      assert.ok(
+        validate({
+          trackId: 'test_20260129',
+          type: 'feature',
+          status: 'completed',
+          estimatedEffort: { days: 2.5 },
+          actualEffort: { days: 1.75 },
+        })
+      );
+      assert.ok(
+        validate({
+          trackId: 'test_20260129',
+          type: 'feature',
+          status: 'completed',
+          reporting: { generatedAt: '2026-01-29T10:00:00Z', insights: [] },
+        })
+      );
+      assert.ok(
+        !validate({
+          trackId: 'test_20260129',
+          type: 'feature',
+          status: 'completed',
+          reporting: { generatedAt: '2026-01-29' },
+        })
+      );
+      assert.ok(
+        !validate({ trackId: 'test_20260129', type: 'feature', status: 'new', description: '' })
+      );
       assert.ok(!validate({ trackId: 'test_20260129', type: 'FEATURE', status: 'new' }));
-      assert.ok(!validate({ trackId: 'test_20260129', type: 'feature', status: 'new', priority: null }));
-      assert.ok(validate({ trackId: 'test1_20260129', type: 'feature', status: 'new', dependencies: ['test2_20260129'] }));
+      assert.ok(
+        !validate({ trackId: 'test_20260129', type: 'feature', status: 'new', priority: null })
+      );
+      assert.ok(
+        validate({
+          trackId: 'test1_20260129',
+          type: 'feature',
+          status: 'new',
+          dependencies: ['test2_20260129'],
+        })
+      );
     });
 
     it('should handle missing and malformed analytics fields gracefully', () => {
       if (!trackAnalytics) assert.fail('Analytics library not loaded');
-      assert.strictEqual(trackAnalytics.queryByPhase('implementation', [{ trackId: 'x', type: 'feature', status: 'new' }]).tasks.length, 0);
-      assert.strictEqual(trackAnalytics.queryByAgent('developer', [{ trackId: 'x', type: 'feature', status: 'new' }]).tasks.length, 0);
-      assert.strictEqual(trackAnalytics.computeProjectMetrics([{ trackId: 'x', type: 'feature', status: 'completed' }]).totalEstimatedDays, 0);
-      assert.strictEqual(trackAnalytics.computeProjectMetrics([{ trackId: 'x', type: 'feature', status: 'completed', estimatedEffort: { days: 5 } }]).totalActualDays, 0);
-      const duration = trackAnalytics.queryByStatus('completed', [{ trackId: 'x', type: 'feature', status: 'completed' }]).metrics.avgDurationDays;
+      assert.strictEqual(
+        trackAnalytics.queryByPhase('implementation', [
+          { trackId: 'x', type: 'feature', status: 'new' },
+        ]).tasks.length,
+        0
+      );
+      assert.strictEqual(
+        trackAnalytics.queryByAgent('developer', [{ trackId: 'x', type: 'feature', status: 'new' }])
+          .tasks.length,
+        0
+      );
+      assert.strictEqual(
+        trackAnalytics.computeProjectMetrics([
+          { trackId: 'x', type: 'feature', status: 'completed' },
+        ]).totalEstimatedDays,
+        0
+      );
+      assert.strictEqual(
+        trackAnalytics.computeProjectMetrics([
+          { trackId: 'x', type: 'feature', status: 'completed', estimatedEffort: { days: 5 } },
+        ]).totalActualDays,
+        0
+      );
+      const duration = trackAnalytics.queryByStatus('completed', [
+        { trackId: 'x', type: 'feature', status: 'completed' },
+      ]).metrics.avgDurationDays;
       assert.ok(duration === 0 || duration === null);
-      assert.ok(trackAnalytics.queryByStatus('completed', [{ trackId: 'x', type: 'feature', status: 'completed', created_at: 'invalid-date', updated_at: 'invalid-date' }]));
+      assert.ok(
+        trackAnalytics.queryByStatus('completed', [
+          {
+            trackId: 'x',
+            type: 'feature',
+            status: 'completed',
+            created_at: 'invalid-date',
+            updated_at: 'invalid-date',
+          },
+        ])
+      );
       assert.ok(trackAnalytics.computeProjectMetrics([{ trackId: 'x' }]));
     });
 
     it('should handle division by zero in effort multiplier', () => {
       if (!trackAnalytics) assert.fail('Analytics library not loaded');
       const result = trackAnalytics.computeProjectMetrics([
-        { trackId: 'x', type: 'feature', status: 'completed', estimatedEffort: { days: 0 }, actualEffort: { days: 5 } },
+        {
+          trackId: 'x',
+          type: 'feature',
+          status: 'completed',
+          estimatedEffort: { days: 0 },
+          actualEffort: { days: 5 },
+        },
       ]);
       assert.ok(result.avgEffortMultiplier === Infinity || result.avgEffortMultiplier === null);
     });
@@ -137,7 +231,12 @@ describe('Track Metadata Analytics Reporting and Edge Cases', () => {
           trackId: `test${i}_20260129`,
           type: 'feature',
           status: 'new',
-          metrics: { elapsedTimeMs: 1000 * i, effortMultiplier: 1.0, riskScore: 50, completionRate: 0 },
+          metrics: {
+            elapsedTimeMs: 1000 * i,
+            effortMultiplier: 1.0,
+            riskScore: 50,
+            completionRate: 0,
+          },
         });
       }
       assert.ok(Date.now() - startTime < 1000);
@@ -173,8 +272,14 @@ describe('Track Metadata Analytics Reporting and Edge Cases', () => {
         trackId: 'test_20260129',
         type: 'feature',
         status: 'completed',
-        estimatedEffort: { days: 10, breakdown: { design: 2, implementation: 5, testing: 2, documentation: 1 } },
-        actualEffort: { days: 8, breakdown: { design: 1.5, implementation: 4, testing: 1.5, documentation: 1 } },
+        estimatedEffort: {
+          days: 10,
+          breakdown: { design: 2, implementation: 5, testing: 2, documentation: 1 },
+        },
+        actualEffort: {
+          days: 8,
+          breakdown: { design: 1.5, implementation: 4, testing: 1.5, documentation: 1 },
+        },
       };
       assert.ok(validate(metadata));
     });

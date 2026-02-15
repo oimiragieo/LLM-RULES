@@ -225,6 +225,10 @@
           },
           {
             "type": "command",
+            "command": "node .claude/hooks/quality/artifact-scoring-ledger-hook.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/workflow/post-creation-integration.cjs",
             "timeout": 5000
           }

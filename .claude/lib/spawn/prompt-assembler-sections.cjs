@@ -160,7 +160,9 @@ function injectMemorySection(enhanced, memorySection) {
     const nextHeadingIdx = enhanced.indexOf('\n## ', afterHeaderIdx === -1 ? idx : afterHeaderIdx);
     if (nextHeadingIdx !== -1) {
       return (
-        enhanced.slice(0, nextHeadingIdx) + `\n\n${memorySection}\n` + enhanced.slice(nextHeadingIdx)
+        enhanced.slice(0, nextHeadingIdx) +
+        `\n\n${memorySection}\n` +
+        enhanced.slice(nextHeadingIdx)
       );
     }
   }

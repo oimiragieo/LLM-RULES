@@ -14,8 +14,15 @@ export function validateMcpAndSettings(context) {
       if (typeof mcpConfig !== 'object' || mcpConfig === null) {
         errors.push('.mcp.json: Root must be an object');
       } else {
-        const allowedTopLevelKeys = ['betaFeatures', 'toolSearch', 'mcpServers', 'disabledMcpServers'];
-        const unknownKeys = Object.keys(mcpConfig).filter(key => !allowedTopLevelKeys.includes(key));
+        const allowedTopLevelKeys = [
+          'betaFeatures',
+          'toolSearch',
+          'mcpServers',
+          'disabledMcpServers',
+        ];
+        const unknownKeys = Object.keys(mcpConfig).filter(
+          key => !allowedTopLevelKeys.includes(key)
+        );
         if (unknownKeys.length > 0) {
           warnings.push(`.mcp.json: Unknown top-level keys: ${unknownKeys.join(', ')}`);
         }
@@ -106,7 +113,10 @@ function validateToolSearchBlock(mcpConfig, errors) {
     return;
   }
 
-  if (mcpConfig.toolSearch.enabled !== undefined && typeof mcpConfig.toolSearch.enabled !== 'boolean') {
+  if (
+    mcpConfig.toolSearch.enabled !== undefined &&
+    typeof mcpConfig.toolSearch.enabled !== 'boolean'
+  ) {
     errors.push('.mcp.json: toolSearch.enabled must be a boolean');
   }
 
@@ -148,7 +158,9 @@ function validateMcpServersBlock(mcpConfig, warnings, errors) {
       }
     } else if (serverConfig.type === 'sse' || serverConfig.type === 'http') {
       if (!serverConfig.url) {
-        errors.push(`.mcp.json: Server ${serverName} (${serverConfig.type}) missing required field: url`);
+        errors.push(
+          `.mcp.json: Server ${serverName} (${serverConfig.type}) missing required field: url`
+        );
       }
     } else if (serverConfig.type === 'sdk') {
       if (!serverConfig.name) {
@@ -168,7 +180,9 @@ function validateProjectSettings(context, mcpToolSearchEnabled) {
       const settings = JSON.parse(settingsContent);
 
       if (mcpToolSearchEnabled) {
-        const routerModel = String(settings?.models?.router ?? settings?.session?.default_model ?? '').trim();
+        const routerModel = String(
+          settings?.models?.router ?? settings?.session?.default_model ?? ''
+        ).trim();
         if (routerModel && routerModel.toLowerCase().includes('haiku')) {
           warnings.push(
             [
@@ -179,7 +193,10 @@ function validateProjectSettings(context, mcpToolSearchEnabled) {
           );
         }
 
-        if (Array.isArray(settings.disallowedTools) && settings.disallowedTools.includes('MCPSearchTool')) {
+        if (
+          Array.isArray(settings.disallowedTools) &&
+          settings.disallowedTools.includes('MCPSearchTool')
+        ) {
           warnings.push(
             'settings.json: disallowedTools includes MCPSearchTool, which disables Tool Search even if enabled in .mcp.json.'
           );
@@ -206,7 +223,9 @@ function validateProjectSettings(context, mcpToolSearchEnabled) {
       }
 
       if (settings.allowedTools && settings.disallowedTools) {
-        const overlap = settings.allowedTools.filter(tool => settings.disallowedTools.includes(tool));
+        const overlap = settings.allowedTools.filter(tool =>
+          settings.disallowedTools.includes(tool)
+        );
         if (overlap.length > 0) {
           warnings.push(
             `settings.json: Tools in both allowedTools and disallowedTools: ${overlap.join(', ')}`
@@ -229,7 +248,10 @@ function validateLocalSettings(context) {
 
   if (context.exists(context.resolve(rootDir, localSettingsPath))) {
     try {
-      const localSettingsContent = context.read(context.resolve(rootDir, localSettingsPath), 'utf-8');
+      const localSettingsContent = context.read(
+        context.resolve(rootDir, localSettingsPath),
+        'utf-8'
+      );
       const localSettings = JSON.parse(localSettingsContent);
 
       if (localSettings.allowedTools && !Array.isArray(localSettings.allowedTools)) {

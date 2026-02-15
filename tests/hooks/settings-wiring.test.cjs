@@ -87,3 +87,20 @@ test('PreToolUse TaskUpdate runs contract validator before transition validators
     'Contract validator should run before transition validation'
   );
 });
+
+test('PostToolUse TaskUpdate includes artifact scoring ledger hook after completion chain', () => {
+  const block = findHookBlock('PostToolUse', 'TaskUpdate');
+  assert.ok(block, 'Expected PostToolUse block for TaskUpdate');
+
+  const commands = listCommands(block);
+  const completionIdx = commands.indexOf('node .claude/hooks/workflow/post-completion-chain.cjs');
+  const scoringIdx = commands.indexOf(
+    'node .claude/hooks/quality/artifact-scoring-ledger-hook.cjs'
+  );
+  assert.ok(completionIdx !== -1, 'post-completion-chain should be wired');
+  assert.ok(scoringIdx !== -1, 'artifact-scoring-ledger-hook should be wired');
+  assert.ok(
+    completionIdx < scoringIdx,
+    'artifact-scoring-ledger-hook should run after post-completion-chain'
+  );
+});

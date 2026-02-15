@@ -275,4 +275,3 @@ module.exports = {
   ensureFixtureRegistry,
   cleanupFixtureRegistry,
 };
-

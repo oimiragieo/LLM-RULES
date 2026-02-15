@@ -243,7 +243,7 @@ Grep: "<related-term>" in .claude/skills/
 | ------------- | ------------------------------- | ----------------------------- |
 | Core          | `.claude/agents/core/`          | developer, planner, architect |
 | Specialized   | `.claude/agents/specialized/`   | security-architect, devops    |
-| Domain Expert | `.claude/agents/domain/`        | ux-reviewer, data-scientist   |
+| Domain Expert | `.claude/agents/domain/`        | frontend-pro, data-engineer   |
 | Orchestrator  | `.claude/agents/orchestrators/` | master-orchestrator           |
 
 ### Step 5: Generate Agent Definition (WITH SKILL LOADING AND LAZY-LOAD RULE)
@@ -850,19 +850,19 @@ Skill({ skill: 'doc-generator' });
 
 5. **Execute**: Spawn via Task tool
 
-### Example 2: Data Scientist Agent
+### Example 2: Data Engineer Agent
 
 **User**: "Analyze this dataset and build a prediction model"
 
-1. **Check**: No `data-scientist*.md` agent exists
+1. **Check**: No `data-engineer*.md` agent exists
 2. **Research**:
    - `WebSearch: "data science workflow best practices 2026"`
    - `WebSearch: "machine learning model evaluation techniques"`
 3. **Find skills**: `text-to-sql`, `diagram-generator`, `doc-generator`, `task-management-protocol`
-4. **Create**: `.claude/agents/domain/data-scientist.md`
+4. **Create**: `.claude/agents/domain/data-engineer.md`
 5. **Execute**: Task tool with new agent
 
-### Example 3: API Integration Specialist
+### Example 3: API Design Specialist
 
 **User**: "Help me integrate with the Stripe API"
 
@@ -871,7 +871,7 @@ Skill({ skill: 'doc-generator' });
    - `WebSearch: "Stripe API integration best practices 2026"`
    - `WebFetch: "https://stripe.com/docs"` (extract key patterns)
 3. **Find skills**: `github-ops`, `test-generator`, `doc-generator`, `task-management-protocol`
-4. **Create**: `.claude/agents/domain/api-integrator.md`
+4. **Create**: `.claude/agents/domain/api-designer.md`
 5. **Execute**: Spawn agent to complete integration
 
 ## Integration with Router

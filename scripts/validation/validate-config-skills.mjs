@@ -88,7 +88,9 @@ function validateAgentSkillFile(context, path, name) {
         }
 
         if (parsed.name && parsed.name !== name) {
-          warnings.push(`Skill ${name}: Frontmatter name "${parsed.name}" doesn't match directory name`);
+          warnings.push(
+            `Skill ${name}: Frontmatter name "${parsed.name}" doesn't match directory name`
+          );
         }
 
         if (parsed['context:fork'] !== undefined && typeof parsed['context:fork'] !== 'boolean') {

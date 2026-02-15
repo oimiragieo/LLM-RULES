@@ -1,11 +1,11 @@
 {
   "version": 1,
   "windowStartedAt": "2026-02-11T02:45:58.462Z",
-  "updatedAt": "2026-02-15T09:08:05.525Z",
+  "updatedAt": "2026-02-15T10:10:15.906Z",
   "counters": {
     "writesTotal": 0,
     "writesFailed": 0,
-    "readsTotal": 141,
+    "readsTotal": 144,
     "parseAttempts": 0,
     "parseFailures": 0,
     "lockAcquires": 0,
@@ -19,7 +19,7 @@
     },
     "readLatencyMs": {
       "bucketsMs": [1, 5, 10, 25, 50, 100, 250, 500],
-      "counts": [0, 0, 121, 20, 0, 0, 0, 0, 0]
+      "counts": [0, 0, 124, 20, 0, 0, 0, 0, 0]
     },
     "lockWaitMs": {
       "bucketsMs": [1, 5, 10, 25, 50, 100, 250, 500],
@@ -28,7 +28,7 @@
   },
   "latest": {
     "writeLatencyMs": null,
-    "readLatencyMs": 12,
+    "readLatencyMs": 7,
     "lockWaitMs": null,
     "lastError": null
   }

@@ -32,7 +32,9 @@ function createActions(ctx) {
       errors.push('ERROR: Invalid skill name format. Must be lowercase-with-hyphens.');
     }
     if (config.description && config.description.length < CONTENT_MINIMUMS.descriptionMinLength) {
-      errors.push(`ERROR: Description must be at least ${CONTENT_MINIMUMS.descriptionMinLength} characters`);
+      errors.push(
+        `ERROR: Description must be at least ${CONTENT_MINIMUMS.descriptionMinLength} characters`
+      );
     }
     if (config.name) {
       const skillPath = path.join(SKILLS_DIR, config.name);
@@ -54,7 +56,9 @@ function createActions(ctx) {
     const content = fs.readFileSync(skillPath, 'utf8');
     const lines = content.split('\n').length;
     if (lines < CONTENT_MINIMUMS.totalLines) {
-      warnings.push(`Skill has only ${lines} lines (recommended minimum: ${CONTENT_MINIMUMS.totalLines})`);
+      warnings.push(
+        `Skill has only ${lines} lines (recommended minimum: ${CONTENT_MINIMUMS.totalLines})`
+      );
     }
     for (const section of CONTENT_MINIMUMS.requiredSections) {
       const sectionPattern = new RegExp(`(##\\s*${section}|<${section}>)`, 'i');
@@ -67,10 +71,15 @@ function createActions(ctx) {
     const reasons = [];
     if (config.hooks) reasons.push('hooks');
     if (config.schemas) reasons.push('schemas');
-    const toolList = String(config.tools || '').split(',').map(t => t.trim()).filter(Boolean);
+    const toolList = String(config.tools || '')
+      .split(',')
+      .map(t => t.trim())
+      .filter(Boolean);
     if (toolList.length >= 6) reasons.push('many-tools');
     if (config.args) reasons.push('args');
-    if (/(orchestrat|pipeline|workflow|integrat|automati)/i.test(String(config.description || ''))) {
+    if (
+      /(orchestrat|pipeline|workflow|integrat|automati)/i.test(String(config.description || ''))
+    ) {
       reasons.push('complex-domain');
     }
     return { isComplex: reasons.length >= 2, reasons };
@@ -90,15 +99,27 @@ function createActions(ctx) {
     if (flags.hooks) {
       const hooksDir = path.join(skillDir, 'hooks');
       fs.mkdirSync(hooksDir, { recursive: true });
-      fs.writeFileSync(path.join(hooksDir, 'pre-execute.cjs'), templates.generatePreHookContent(name, description));
-      fs.writeFileSync(path.join(hooksDir, 'post-execute.cjs'), templates.generatePostHookContent(name, description));
+      fs.writeFileSync(
+        path.join(hooksDir, 'pre-execute.cjs'),
+        templates.generatePreHookContent(name, description)
+      );
+      fs.writeFileSync(
+        path.join(hooksDir, 'post-execute.cjs'),
+        templates.generatePostHookContent(name, description)
+      );
     }
 
     if (flags.schemas) {
       const schemasDir = path.join(skillDir, 'schemas');
       fs.mkdirSync(schemasDir, { recursive: true });
-      fs.writeFileSync(path.join(schemasDir, 'input.schema.json'), templates.generateInputSchema(name, description));
-      fs.writeFileSync(path.join(schemasDir, 'output.schema.json'), templates.generateOutputSchema(name, description));
+      fs.writeFileSync(
+        path.join(schemasDir, 'input.schema.json'),
+        templates.generateInputSchema(name, description)
+      );
+      fs.writeFileSync(
+        path.join(schemasDir, 'output.schema.json'),
+        templates.generateOutputSchema(name, description)
+      );
     }
 
     if (flags.templates) {
@@ -113,21 +134,33 @@ function createActions(ctx) {
     if (flags.rules) {
       const rulesDir = path.join(skillDir, 'rules');
       fs.mkdirSync(rulesDir, { recursive: true });
-      fs.writeFileSync(path.join(rulesDir, `${name}.md`), templates.generateEnterpriseRuleContent(name));
+      fs.writeFileSync(
+        path.join(rulesDir, `${name}.md`),
+        templates.generateEnterpriseRuleContent(name)
+      );
     }
 
     if (flags.commands) {
       const commandsDir = path.join(skillDir, 'commands');
       fs.mkdirSync(commandsDir, { recursive: true });
-      fs.writeFileSync(path.join(commandsDir, `${name}.md`), templates.generateEnterpriseCommandContent(name));
+      fs.writeFileSync(
+        path.join(commandsDir, `${name}.md`),
+        templates.generateEnterpriseCommandContent(name)
+      );
     }
   }
 
   function createCompanionTool(name, description) {
     const toolDir = path.join(TOOLS_DIR, name);
     fs.mkdirSync(toolDir, { recursive: true });
-    fs.writeFileSync(path.join(toolDir, `${name}.cjs`), templates.generateToolScript(name, description));
-    fs.writeFileSync(path.join(toolDir, 'README.md'), templates.generateToolReadme(name, description));
+    fs.writeFileSync(
+      path.join(toolDir, `${name}.cjs`),
+      templates.generateToolScript(name, description)
+    );
+    fs.writeFileSync(
+      path.join(toolDir, 'README.md'),
+      templates.generateToolReadme(name, description)
+    );
     return toolDir;
   }
 
@@ -137,7 +170,9 @@ function createActions(ctx) {
       return createCompanionTool(config.name, config.description, skillDir);
     }
     const complexity = detectComplexity(config);
-    return complexity.isComplex ? createCompanionTool(config.name, config.description, skillDir) : null;
+    return complexity.isComplex
+      ? createCompanionTool(config.name, config.description, skillDir)
+      : null;
   }
 
   function createWorkflow(name) {
@@ -177,7 +212,10 @@ function createActions(ctx) {
 
     const scriptsDir = path.join(skillDir, 'scripts');
     fs.mkdirSync(scriptsDir, { recursive: true });
-    fs.writeFileSync(path.join(scriptsDir, 'main.cjs'), templates.generateScriptContent(name, description));
+    fs.writeFileSync(
+      path.join(scriptsDir, 'main.cjs'),
+      templates.generateScriptContent(name, description)
+    );
 
     writeEnterpriseDirs(skillDir, name, description, flags);
     formatDirectory(skillDir, PROJECT_ROOT);
@@ -227,11 +265,17 @@ function createActions(ctx) {
           const idx = line.indexOf(':');
           if (idx > 0) {
             const key = line.slice(0, idx).trim();
-            const value = line.slice(idx + 1).trim().replace(/^"|"$/g, '');
+            const value = line
+              .slice(idx + 1)
+              .trim()
+              .replace(/^"|"$/g, '');
             output[key] = value;
           }
         }
-        const result = validateData({ status: 'success', output }, path.join(CLAUDE_DIR, 'schemas', 'skill-definition.schema.json'));
+        const result = validateData(
+          { status: 'success', output },
+          path.join(CLAUDE_DIR, 'schemas', 'skill-definition.schema.json')
+        );
         if (!result.valid) {
           console.error('Schema validation failed');
           return false;
@@ -247,7 +291,10 @@ function createActions(ctx) {
       console.log('No skills directory found');
       return;
     }
-    const skills = fs.readdirSync(SKILLS_DIR, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name);
+    const skills = fs
+      .readdirSync(SKILLS_DIR, { withFileTypes: true })
+      .filter(e => e.isDirectory())
+      .map(e => e.name);
     skills.forEach(skill => console.log(skill));
   }
 

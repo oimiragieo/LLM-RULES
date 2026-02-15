@@ -104,7 +104,10 @@ function collectMerkleFilePaths(node, basePath = '') {
 async function loadCheckpoint(options) {
   if (!options.enableCheckpoints) return { filesProcessed: 0, chunksProcessed: 0 };
 
-  const checkpointPath = path.join(options.projectRoot, '.claude/context/code-index/checkpoint.json');
+  const checkpointPath = path.join(
+    options.projectRoot,
+    '.claude/context/code-index/checkpoint.json'
+  );
 
   try {
     const checkpoint = JSON.parse(await fs.readFile(checkpointPath, 'utf8'));
@@ -120,7 +123,10 @@ async function loadCheckpoint(options) {
 async function saveCheckpoint(options, filesProcessed, totalFiles, totalChunks) {
   if (!options.enableCheckpoints) return;
 
-  const checkpointPath = path.join(options.projectRoot, '.claude/context/code-index/checkpoint.json');
+  const checkpointPath = path.join(
+    options.projectRoot,
+    '.claude/context/code-index/checkpoint.json'
+  );
 
   await fs.writeFile(
     checkpointPath,
@@ -134,7 +140,10 @@ async function saveCheckpoint(options, filesProcessed, totalFiles, totalChunks) 
 }
 
 async function clearCheckpoint(options) {
-  const checkpointPath = path.join(options.projectRoot, '.claude/context/code-index/checkpoint.json');
+  const checkpointPath = path.join(
+    options.projectRoot,
+    '.claude/context/code-index/checkpoint.json'
+  );
   try {
     await fs.unlink(checkpointPath);
   } catch {

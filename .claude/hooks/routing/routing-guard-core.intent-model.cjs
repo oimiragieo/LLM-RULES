@@ -1,6 +1,10 @@
 'use strict';
 
-const { getEnforcementMode, auditLog, auditSecurityOverride } = require('../../lib/utils/hook-input.cjs');
+const {
+  getEnforcementMode,
+  auditLog,
+  auditSecurityOverride,
+} = require('../../lib/utils/hook-input.cjs');
 const {
   getViolationTracker,
   registerBlockAttempt,

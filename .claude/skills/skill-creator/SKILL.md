@@ -624,10 +624,10 @@ User: "I need to analyze sentiment in customer feedback"
 1. Research: WebSearch "sentiment analysis API MCP server 2026"
 2. Found: @modelcontextprotocol/server-sentiment (hypothetical)
 3. Converting MCP server to skill...
-4. Created: .claude/skills/sentiment-analyzer/SKILL.md
+4. Created: .claude/skills/<new-skill-name>/SKILL.md
 5. Assigning to agent: developer (or creating new agent)
 
-[DEVELOPER] Now using sentiment-analyzer skill...
+[DEVELOPER] Now using <new-skill-name> skill...
 ```
 
 ## Workflow: Convert MCP Tool Request
@@ -643,7 +643,7 @@ User: "Add the Slack MCP server so I can send messages"
 3. Generating skill definition...
 4. Creating executor script...
 5. Testing connection...
-6. Created: .claude/skills/slack-mcp/SKILL.md
+6. Created: .claude/skills/<new-skill-name>/SKILL.md
 
 [ROUTER] Skill available. Which agent should use it?
 ```
@@ -1236,10 +1236,10 @@ This skill is part of the Creator Ecosystem. After creating a skill, consider if
 **Chain Example:**
 
 ```text
-[SKILL-CREATOR] Created: sentiment-analyzer skill
+[SKILL-CREATOR] Created: <new-skill-name> skill
 [SKILL-CREATOR] This skill needs a dedicated agent...
-[SKILL-CREATOR] -> Invoking agent-creator to create sentiment-analyst agent
-[AGENT-CREATOR] Created: sentiment-analyst agent with sentiment-analyzer skill
+[SKILL-CREATOR] -> Invoking agent-creator to create <new-agent-name> agent
+[AGENT-CREATOR] Created: <new-agent-name> agent with <new-skill-name> skill
 ```
 
 **Integration Verification:**
@@ -1363,10 +1363,10 @@ Run this analysis after every skill creation:
    - Are there commands that should be added?
 ```
 
-### Example: Creating a "writing" Skill
+### Example: Creating a New Documentation Skill
 
 ```
-[SKILL-CREATOR] ✅ Created: .claude/skills/writing/SKILL.md
+[SKILL-CREATOR] ✅ Created: .claude/skills/<new-skill-name>/SKILL.md
 
 [SKILL-CREATOR] 🔍 System Impact Analysis...
 

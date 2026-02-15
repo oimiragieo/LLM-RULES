@@ -502,13 +502,12 @@ This makes plans falsifiable and success criteria explicit.
 2. Extract learnings and update memory files
 3. Check for evolution opportunities (new agents/skills needed)
 
-**Spawn Command**:
-Task({
-task_id: 'task-1',
-subagent_type: "reflection-agent",
-description: "Session reflection and learning extraction",
-prompt: "You are REFLECTION-AGENT. Read @.claude/agents/core/reflection-agent.md. Analyze the completed work from this plan, extract learnings to memory files, and check for evolution opportunities (patterns that suggest new agents or skills should be created)."
-})
+**Routing Command (Router-owned)**:
+Ask Router to spawn:
+
+- `subagent_type: "reflection-agent"`
+- `description: "Session reflection and learning extraction"`
+- Prompt requiring learnings extraction and evolution recommendations
 
 **Success Criteria**:
 
@@ -573,7 +572,7 @@ The constitution checkpoint enforces quality before implementation:
   - **Verify**: ADR includes alternatives considered and rationale
 
 - [ ] **0.3** Security review of auth approach (~1 hour)
-  - **Spawn**: Task({ task_id: 'task-2', subagent_type: "security-architect", ... })
+  - **Route**: Ask Router to spawn `security-architect` with auth design context
   - **Output**: Security assessment with threat model
   - **Verify**: All CRITICAL/HIGH risks have mitigations
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastEvolution": "2026-02-15-assimilate-skill",
+  "lastEvolution": "2026-02-15-updater-auditor-skill-pack",
   "evolutions": [
     {
       "id": "2026-02-14-framework-context-skill",
@@ -39,6 +39,62 @@
       "artifactType": "skill",
       "name": "assimilate",
       "path": ".claude/skills/assimilate/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-artifact-hardening-layer",
+      "artifactType": "workflow",
+      "name": "artifact-quality-runtime-layer",
+      "path": ".claude/hooks/quality/artifact-scoring-ledger-hook.cjs",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-skill-updater-skill",
+      "artifactType": "skill",
+      "name": "skill-updater",
+      "path": ".claude/skills/skill-updater/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-agent-updater-skill",
+      "artifactType": "skill",
+      "name": "agent-updater",
+      "path": ".claude/skills/agent-updater/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-workflow-updater-skill",
+      "artifactType": "skill",
+      "name": "workflow-updater",
+      "path": ".claude/skills/workflow-updater/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-memory-quality-auditor-skill",
+      "artifactType": "skill",
+      "name": "memory-quality-auditor",
+      "path": ".claude/skills/memory-quality-auditor/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-eval-harness-updater-skill",
+      "artifactType": "skill",
+      "name": "eval-harness-updater",
+      "path": ".claude/skills/eval-harness-updater/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-updater-auditor-skill-pack",
+      "artifactType": "workflow",
+      "name": "updater-auditor-skill-pack",
+      "path": ".claude/workflows/agent-updater-skill-workflow.md",
       "status": "completed",
       "completedAt": "2026-02-15T00:00:00.000Z"
     }

@@ -7,7 +7,9 @@ const path = require('path');
 const fs = require('fs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const routingGuard = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs'));
+const routingGuard = require(
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs')
+);
 
 function cleanupState() {
   routingGuard.invalidateCachedState();
@@ -201,7 +203,10 @@ describe('routing-guard.cjs - Check 11: Config Model Validator', () => {
   });
 
   it('should extract agent type and model helpers', () => {
-    assert.equal(routingGuard.extractAgentTypeFromPrompt('You are PLANNER. Create plan.'), 'planner');
+    assert.equal(
+      routingGuard.extractAgentTypeFromPrompt('You are PLANNER. Create plan.'),
+      'planner'
+    );
     assert.equal(
       routingGuard.extractAgentTypeFromPrompt('Read .claude/agents/core/developer.md'),
       'developer'

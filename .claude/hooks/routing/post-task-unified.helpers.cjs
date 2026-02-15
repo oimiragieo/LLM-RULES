@@ -1,8 +1,6 @@
 'use strict';
 
-const {
-  createPostTaskCompletionHelpers,
-} = require('./post-task-unified-completion.helpers.cjs');
+const { createPostTaskCompletionHelpers } = require('./post-task-unified-completion.helpers.cjs');
 
 function createPostTaskUnifiedHelpers(deps) {
   const {

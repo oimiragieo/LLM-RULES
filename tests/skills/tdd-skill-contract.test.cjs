@@ -14,7 +14,9 @@ function runNode(args, options = {}) {
 
 test('tdd input/output schemas are valid JSON', () => {
   const input = JSON.parse(fs.readFileSync('.claude/skills/tdd/schemas/input.schema.json', 'utf8'));
-  const output = JSON.parse(fs.readFileSync('.claude/skills/tdd/schemas/output.schema.json', 'utf8'));
+  const output = JSON.parse(
+    fs.readFileSync('.claude/skills/tdd/schemas/output.schema.json', 'utf8')
+  );
 
   assert.equal(input.title, 'tdd Input Schema');
   assert.equal(output.title, 'tdd Output Schema');
@@ -74,7 +76,10 @@ test('tdd post-execute hook updates bounded memory profile', () => {
   assert.match(result.stdout, /Memory profile updated/);
 
   const profile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
-  assert.equal(profile.commandHints.testCommand, 'pnpm test tests/skills/tdd-skill-contract.test.cjs');
+  assert.equal(
+    profile.commandHints.testCommand,
+    'pnpm test tests/skills/tdd-skill-contract.test.cjs'
+  );
   assert.equal(profile.commandHints.lintCommand, 'pnpm lint');
   assert.equal(profile.commandHints.formatCommand, 'pnpm format:check');
   assert.equal(profile.entries.failureSignatures.length, 1);

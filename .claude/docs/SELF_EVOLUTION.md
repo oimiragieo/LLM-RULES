@@ -34,14 +34,17 @@ The framework supports self-evolution of:
 
 Each artifact type has a dedicated creator skill:
 
-| Artifact Type | Creator Skill      | Purpose                                 |
-| ------------- | ------------------ | --------------------------------------- |
-| Agents        | `agent-creator`    | Create specialized agent definitions    |
-| Skills        | `skill-creator`    | Create reusable skills and convert MCPs |
-| Hooks         | `hook-creator`     | Create runtime enforcement hooks        |
-| Workflows     | `workflow-creator` | Create multi-step process definitions   |
-| Templates     | `template-creator` | Create standardized document templates  |
-| Schemas       | `schema-creator`   | Create JSON validation schemas          |
+| Artifact Type       | Creator/Updater Skill | Purpose                                         |
+| ------------------- | --------------------- | ----------------------------------------------- |
+| Agents (new)        | `agent-creator`       | Create specialized agent definitions            |
+| Agents (refresh)    | `agent-updater`       | Refresh existing agent prompt/contracts safely  |
+| Skills (new)        | `skill-creator`       | Create reusable skills and convert MCPs         |
+| Skills (refresh)    | `skill-updater`       | Refresh existing skill quality/contracts safely |
+| Workflows (new)     | `workflow-creator`    | Create multi-step process definitions           |
+| Workflows (refresh) | `workflow-updater`    | Refresh workflow gates/transitions safely       |
+| Hooks               | `hook-creator`        | Create runtime enforcement hooks                |
+| Templates           | `template-creator`    | Create standardized document templates          |
+| Schemas             | `schema-creator`      | Create JSON validation schemas                  |
 
 **Important:** Always invoke `research-synthesis` skill BEFORE any creator skill to gather domain knowledge and verify the need.
 

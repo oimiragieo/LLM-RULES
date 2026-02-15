@@ -30,7 +30,12 @@ skills:
   - context-compressor
   - framework-context
   - insight-extraction
+  - memory-quality-auditor
+  - eval-harness-updater
+  - agent-updater
+  - workflow-updater
   - recommend-evolution
+  - skill-updater
   - summarize-changes
   - task-management-protocol
   - token-saver-context-compression
@@ -516,6 +521,7 @@ When executing reflection tasks, follow this 8-step approach:
 | Missing tool pattern in 3+ tasks      | Recommend adding tool to agent skills |
 | Recurring security issue              | Escalate to security-architect review |
 | Artifact integration gaps in 3+ tasks | Queue artifact-integrator analysis    |
+| Stale skill guidance in 3+ tasks      | Invoke skill-updater for refresh plan |
 
 **Security Constraint**: Reflection agent follows the Immutable Security Core pattern - cannot modify protected paths (hooks, CLAUDE.md Sections 1.1-1.3, 6, state management files) without human approval.
 
@@ -557,6 +563,17 @@ TaskUpdate({
   taskId: '<your-task-id>',
   status: 'completed',
   metadata: {
+    artifactType: 'agent|skill|hook|workflow',
+    artifactName: '<artifact-name>',
+    artifactPath: '<path-if-applicable>',
+    scores: {
+      completeness: 0.85,
+      accuracy: 0.9,
+      clarity: 0.8,
+      consistency: 0.85,
+      actionability: 0.8,
+    },
+    overallScore: 0.84,
     summary: 'Reflected on task #X: score 0.85, 2 learnings extracted, memory updated',
     filesModified: [
       '@.claude/context/memory/patterns.json',
@@ -656,13 +673,18 @@ Skill({ skill: 'token-saver-context-compression' }); // Compress large evidence 
 
 ### Contextual Skills (When Applicable)
 
-| Condition              | Skill                 | Purpose                               |
-| ---------------------- | --------------------- | ------------------------------------- |
-| Code reflection        | `code-analyzer`       | Static code analysis patterns         |
-| Security outputs       | `security-architect`  | Security-specific rubrics             |
-| Architecture review    | `architect`           | Architecture quality assessment       |
-| System-level analysis  | `framework-context`   | Framework architecture context        |
-| Capability-gap pattern | `recommend-evolution` | Standardized evolution recommendation |
+| Condition              | Skill                    | Purpose                                |
+| ---------------------- | ------------------------ | -------------------------------------- |
+| Code reflection        | `code-analyzer`          | Static code analysis patterns          |
+| Security outputs       | `security-architect`     | Security-specific rubrics              |
+| Architecture review    | `architect`              | Architecture quality assessment        |
+| System-level analysis  | `framework-context`      | Framework architecture context         |
+| Capability-gap pattern | `recommend-evolution`    | Standardized evolution recommendation  |
+| Stale skill pattern    | `skill-updater`          | Refresh existing skill workflow safely |
+| Stale agent pattern    | `agent-updater`          | Refresh existing agent prompt safely   |
+| Workflow drift pattern | `workflow-updater`       | Restore phase/gate reliability         |
+| Memory quality drift   | `memory-quality-auditor` | Audit retrieval and groundedness       |
+| Eval signal drift      | `eval-harness-updater`   | Repair live/fallback eval reliability  |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 

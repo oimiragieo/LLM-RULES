@@ -22,7 +22,11 @@ function generateSkillContent(config) {
     steps = [],
   } = config;
 
-  const toolsArray = Array.isArray(tools) ? tools : String(tools).split(',').map(t => t.trim());
+  const toolsArray = Array.isArray(tools)
+    ? tools
+    : String(tools)
+        .split(',')
+        .map(t => t.trim());
   const titleCase = toTitleCase(name);
 
   const defaultCapabilities =
@@ -38,8 +42,14 @@ function generateSkillContent(config) {
     steps.length > 0
       ? steps
       : [
-          { title: 'Gather Context', description: 'Read relevant files and understand requirements' },
-          { title: 'Execute', description: "Perform the skill's main function using available tools" },
+          {
+            title: 'Gather Context',
+            description: 'Read relevant files and understand requirements',
+          },
+          {
+            title: 'Execute',
+            description: "Perform the skill's main function using available tools",
+          },
           { title: 'Output', description: 'Return results and save artifacts if applicable' },
         ];
 
@@ -189,7 +199,11 @@ function generateOutputSchema(name) {
       required: ['success'],
       properties: {
         success: { type: 'boolean', description: 'Whether the skill executed successfully' },
-        result: { type: 'object', description: 'The skill execution result', additionalProperties: true },
+        result: {
+          type: 'object',
+          description: 'The skill execution result',
+          additionalProperties: true,
+        },
         error: { type: 'string', description: 'Error message if execution failed' },
       },
       additionalProperties: true,

@@ -22,11 +22,14 @@ tools:
   - TaskUpdate
   - TaskList
   - TaskGet
+  - AvailableAgents
+  - Bash
   - Skill
   - WebSearch
   - WebFetch
 skills:
   - agent-creator
+  - agent-updater
   - assimilate
   - artifact-integrator
   - artifact-lifecycle
@@ -40,10 +43,14 @@ skills:
   - ripgrep
   - schema-creator
   - skill-creator
+  - skill-updater
+  - workflow-updater
   - task-management-protocol
   - template-creator
   - verification-before-completion
   - workflow-creator
+  - eval-harness-updater
+  - memory-quality-auditor
   - code-semantic-search
   - token-saver-context-compression
 ---
@@ -115,6 +122,7 @@ E - Enable     -> Deploy and register in ecosystem
 - **User explicitly requests**: "Create a new agent for X"
 - **System evolution needed**: New workflow, hook, or schema required
 - **Skill expansion**: Adding new capabilities to the ecosystem
+- **Skill refresh needed**: Existing skill is stale/low-quality and requires `skill-updater`
 
 ## EVOLVE Workflow Protocol
 
@@ -329,8 +337,14 @@ switch (artifactType) {
   case 'agent':
     Skill({ skill: 'agent-creator' });
     break;
+  case 'agent-update':
+    Skill({ skill: 'agent-updater' }); // refresh existing agent
+    break;
   case 'skill':
-    Skill({ skill: 'skill-creator' });
+    Skill({ skill: 'skill-creator' }); // net-new skill
+    break;
+  case 'skill-update':
+    Skill({ skill: 'skill-updater' }); // refresh existing skill
     break;
   case 'workflow':
     Skill({ skill: 'workflow-creator' });
@@ -343,6 +357,9 @@ switch (artifactType) {
     break;
   case 'template':
     Skill({ skill: 'template-creator' });
+    break;
+  case 'workflow-update':
+    Skill({ skill: 'workflow-updater' }); // refresh existing workflow
     break;
 }
 
@@ -406,7 +423,7 @@ Read('created-artifact-path');
 Glob('@.claude/skills/*/SKILL.md'); // Check all assigned skills
 
 // Run validation tools if available
-Bash("node .claude/tools/validate-agents.mjs 2>&1 | grep '<agent-name>'");
+Bash('node .claude/tools/validate-agents.mjs');
 ```
 
 **Verification Checklist**:
@@ -461,7 +478,7 @@ if (artifactType === 'agent') {
   });
 
   // Verify routing table update
-  Bash("grep '<agent-name>' .claude/CLAUDE.md || echo 'ERROR: Not in routing table!'");
+  Read('.claude/CLAUDE.md'); // Verify `<agent-name>` appears in routing references
 }
 
 // 2. Update skill catalog (for skills)
@@ -540,7 +557,7 @@ grep "<skill-name>" @.claude/context/artifacts/catalogs/skill-catalog.md || echo
     {
       "type": "agent",
       "name": "completed-agent-name",
-      "path": "@.claude/agents/category/name.md",
+      "path": "<new-agent-path>.md",
       "completedAt": "ISO-timestamp",
       "researchReport": "path-to-research",
       "registrations": ["CLAUDE.md", "router.md"]
@@ -671,6 +688,9 @@ TaskList();
 Skill({ skill: 'research-synthesis' }); // MANDATORY before any creation
 Skill({ skill: 'agent-creator' }); // Create agent artifacts
 Skill({ skill: 'skill-creator' }); // Create skill artifacts
+Skill({ skill: 'skill-updater' }); // Refresh existing skill artifacts
+Skill({ skill: 'agent-updater' }); // Refresh existing agent artifacts
+Skill({ skill: 'workflow-updater' }); // Refresh existing workflow artifacts
 ```
 
 ### Automatic Skills (Always Invoke)
@@ -684,14 +704,17 @@ Skill({ skill: 'skill-creator' }); // Create skill artifacts
 
 ### Creator Skills (Invoke Based on Artifact Type)
 
-| Artifact Type | Skill              | Purpose                                      |
-| ------------- | ------------------ | -------------------------------------------- |
-| Agent         | `agent-creator`    | Create agent markdown with schema validation |
-| Skill         | `skill-creator`    | Create skill directory with SKILL.md         |
-| Workflow      | `workflow-creator` | Create workflow markdown files               |
-| Hook          | `hook-creator`     | Create CJS/MJS hooks with tests              |
-| Schema        | `schema-creator`   | Create JSON Schema definitions               |
-| Template      | `template-creator` | Create artifact templates                    |
+| Artifact Type   | Skill              | Purpose                                      |
+| --------------- | ------------------ | -------------------------------------------- |
+| Agent           | `agent-creator`    | Create agent markdown with schema validation |
+| Agent Update    | `agent-updater`    | Refresh existing agent prompt/frontmatter    |
+| Skill           | `skill-creator`    | Create skill directory with SKILL.md         |
+| Skill Update    | `skill-updater`    | Refresh existing skill using TDD + research  |
+| Workflow        | `workflow-creator` | Create workflow markdown files               |
+| Workflow Update | `workflow-updater` | Refresh existing workflow with gate checks   |
+| Hook            | `hook-creator`     | Create CJS/MJS hooks with tests              |
+| Schema          | `schema-creator`   | Create JSON Schema definitions               |
+| Template        | `template-creator` | Create artifact templates                    |
 
 ### Usage in EVOLVE Phases
 
@@ -704,8 +727,17 @@ switch (artifactType) {
   case 'agent':
     Skill({ skill: 'agent-creator' });
     break;
+  case 'agent-update':
+    Skill({ skill: 'agent-updater' });
+    break;
   case 'skill':
     Skill({ skill: 'skill-creator' });
+    break;
+  case 'skill-update':
+    Skill({ skill: 'skill-updater' });
+    break;
+  case 'workflow-update':
+    Skill({ skill: 'workflow-updater' });
     break;
   case 'workflow':
     Skill({ skill: 'workflow-creator' });
@@ -833,7 +865,7 @@ Review:
 === Phase L: LOCK ===
 - Invoking agent-creator skill
 - Using research findings for capabilities
-- Creating: @.claude/agents/domain/graphql-schema-reviewer.md
+- Creating: `<new-agent-path>.md` (example)
 - Schema validation: PASSED
 - Required fields: COMPLETE
 - Gate 4 PASSED
@@ -854,7 +886,7 @@ Review:
 
 [EVOLUTION-ORCHESTRATOR] Evolution complete!
 Created: graphql-schema-reviewer agent
-Location: @.claude/agents/domain/graphql-schema-reviewer.md
+Location: `<new-agent-path>.md`
 Research: @.claude/context/artifacts/research-reports/graphql-schema-reviewer-research.md
 ```
 
@@ -876,15 +908,18 @@ The Router should invoke this agent when:
 
 This agent is the meta-orchestrator for the Creator Ecosystem:
 
-| Creator Skill        | Invoked In | Purpose                   |
-| -------------------- | ---------- | ------------------------- |
-| `research-synthesis` | Phase O    | Gather best practices     |
-| `agent-creator`      | Phase L    | Create agent artifacts    |
-| `skill-creator`      | Phase L    | Create skill artifacts    |
-| `workflow-creator`   | Phase L    | Create workflow artifacts |
-| `hook-creator`       | Phase L    | Create hook artifacts     |
-| `schema-creator`     | Phase L    | Create schema artifacts   |
-| `template-creator`   | Phase L    | Create template artifacts |
+| Creator Skill        | Invoked In | Purpose                    |
+| -------------------- | ---------- | -------------------------- |
+| `research-synthesis` | Phase O    | Gather best practices      |
+| `agent-creator`      | Phase L    | Create agent artifacts     |
+| `agent-updater`      | Phase L    | Refresh existing agents    |
+| `skill-creator`      | Phase L    | Create skill artifacts     |
+| `skill-updater`      | Phase L    | Refresh existing skills    |
+| `workflow-creator`   | Phase L    | Create workflow artifacts  |
+| `workflow-updater`   | Phase L    | Refresh existing workflows |
+| `hook-creator`       | Phase L    | Create hook artifacts      |
+| `schema-creator`     | Phase L    | Create schema artifacts    |
+| `template-creator`   | Phase L    | Create template artifacts  |
 
 ## Self-Healing Agent Selection (Phase 3)
 

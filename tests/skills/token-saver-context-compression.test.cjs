@@ -9,7 +9,10 @@ const tokenSaver = require('../../.claude/skills/token-saver-context-compression
 test('classifyMemoryTarget applies deterministic mapping rules', () => {
   assert.equal(tokenSaver.classifyMemoryTarget('Gotcha: avoid this pitfall'), 'gotchas');
   assert.equal(tokenSaver.classifyMemoryTarget('Issue: bug in state machine'), 'issues');
-  assert.equal(tokenSaver.classifyMemoryTarget('Decision: choose explicit transitions'), 'decisions');
+  assert.equal(
+    tokenSaver.classifyMemoryTarget('Decision: choose explicit transitions'),
+    'decisions'
+  );
   assert.equal(tokenSaver.classifyMemoryTarget('Use canonical taskupdate sequence'), 'patterns');
 });
 

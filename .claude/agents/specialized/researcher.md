@@ -21,6 +21,7 @@ tools:
   - Bash
   - TaskUpdate
   - TaskList
+  - TaskCreate
   - TaskGet
   - Skill
 skills:

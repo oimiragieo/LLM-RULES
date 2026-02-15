@@ -21,10 +21,7 @@ test('assimilate main parses repos and returns execution mode', () => {
   });
   assert.equal(result.ok, true);
   assert.equal(result.mode, 'execution');
-  assert.deepEqual(result.repos, [
-    'https://github.com/example/a',
-    'https://github.com/example/b',
-  ]);
+  assert.deepEqual(result.repos, ['https://github.com/example/a', 'https://github.com/example/b']);
   assert.match(result.workspace, /unit-test-run/);
   assert.match(result.kickoff, /four phases/i);
 });

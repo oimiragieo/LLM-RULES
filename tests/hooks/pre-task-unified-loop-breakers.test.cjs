@@ -97,7 +97,9 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       writeState(ROUTER_STATE_FILE, { mode: 'router', taskListCalledSincePrompt: false });
 
       const first = preTaskUnified.checkTaskListFirst('Task', { session_id: 'tasklist-loop-test' });
-      const second = preTaskUnified.checkTaskListFirst('Task', { session_id: 'tasklist-loop-test' });
+      const second = preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-loop-test',
+      });
       const third = preTaskUnified.checkTaskListFirst('Task', { session_id: 'tasklist-loop-test' });
 
       assert.strictEqual(first.pass, false);
@@ -123,9 +125,15 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const first = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
-      const second = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
-      const third = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
+      const first = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const second = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const third = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
 
       assert.strictEqual(first.pass, false);
       assert.strictEqual(second.pass, false);
@@ -146,9 +154,15 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const first = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
-      const second = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
-      const third = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
+      const first = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const second = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const third = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
 
       assert.strictEqual(first.pass, false);
       assert.strictEqual(second.pass, false);
@@ -170,10 +184,14 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const blockOnce = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
+      const blockOnce = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
       assert.strictEqual(blockOnce.pass, false);
 
-      const plannerSpawn = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are planner. design the complex feature.' });
+      const plannerSpawn = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are planner. design the complex feature.',
+      });
       assert.strictEqual(plannerSpawn.pass, true);
 
       writeState(ROUTER_STATE_FILE, {
@@ -183,7 +201,9 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const afterReset = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
+      const afterReset = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
       assert.strictEqual(afterReset.pass, false);
       assert.strictEqual(afterReset.result, 'block');
     });
@@ -201,8 +221,12 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const first = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
-      const second = preTaskUnified.checkRoutingGuard('Task', { prompt: 'You are developer. implement complex feature.' });
+      const first = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
+      const second = preTaskUnified.checkRoutingGuard('Task', {
+        prompt: 'You are developer. implement complex feature.',
+      });
 
       assert.strictEqual(first.pass, false);
       assert.strictEqual(second.pass, true);

@@ -1,8 +1,14 @@
 'use strict';
 
 function createPostTaskCompletionHelpers(deps) {
-  const { fs, path, routerState, getFindingsRegistry, PROJECT_ROOT, TASKUPDATE_RECOVERY_QUEUE_PATH } =
-    deps;
+  const {
+    fs,
+    path,
+    routerState,
+    getFindingsRegistry,
+    PROJECT_ROOT,
+    TASKUPDATE_RECOVERY_QUEUE_PATH,
+  } = deps;
 
   const COMPLETION_INDICATORS = [
     /task.*(?:complete|completed|done|finished)/i,

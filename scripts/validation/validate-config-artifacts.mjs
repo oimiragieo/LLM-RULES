@@ -15,7 +15,9 @@ function validateHookFiles(context) {
   const referencedHookScripts = new Set();
   if (context.exists(context.resolve(rootDir, settingsPathForHooks))) {
     try {
-      const settings = JSON.parse(context.read(context.resolve(rootDir, settingsPathForHooks), 'utf-8'));
+      const settings = JSON.parse(
+        context.read(context.resolve(rootDir, settingsPathForHooks), 'utf-8')
+      );
       const hookEvents = settings?.hooks || {};
       for (const blocks of Object.values(hookEvents)) {
         if (!Array.isArray(blocks)) {

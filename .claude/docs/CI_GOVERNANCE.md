@@ -9,8 +9,13 @@
 
 - Local governance gate: `pnpm validate:status-check-governance`
 - Agent template contract gate: `pnpm validate:agent-template-contract`
+- Artifact regression gate: `pnpm validate:artifact-regression`
 - Full package gate: `pnpm validate:full`
 - One-time fleet backfill (manual): `pnpm agents:contract:backfill`
+- Autonomous quality loop (optional runtime daemon):
+  - `pnpm quality:daemon:run-once`
+  - `pnpm quality:daemon:start`
+  - `pnpm quality:daemon:status`
 
 ## Update Procedure
 

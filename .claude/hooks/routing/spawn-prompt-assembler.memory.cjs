@@ -173,7 +173,9 @@ async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot 
     .join('\n');
 
   try {
-    const { getContextForSearch } = libRequire(path.join('memory', 'session-context-for-search.cjs'));
+    const { getContextForSearch } = libRequire(
+      path.join('memory', 'session-context-for-search.cjs')
+    );
     const searchContext = getContextForSearch(query, {
       projectRoot,
       maxArchives: 3,
@@ -283,7 +285,11 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
           threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
         });
       } catch (fallbackErr) {
-        debugLog('spawn-prompt-assembler', 'Semantic memory retrieval failed (ignored)', fallbackErr);
+        debugLog(
+          'spawn-prompt-assembler',
+          'Semantic memory retrieval failed (ignored)',
+          fallbackErr
+        );
         stderrLog('hook_failed', {
           error: fallbackErr?.message,
           reason: 'memory_or_semantic_load',

@@ -137,8 +137,9 @@ The following workflows guide this agent's execution:
 **If you receive a task in an excluded category**, respond with:
 
 ```
-This task is better suited for [AGENT_NAME]. Please re-route via:
-Task({ task_id: 'task-1', prompt: "You are [AGENT_NAME]..." })
+This task is better suited for [AGENT_NAME]. Provide reroute guidance to Router:
+- Explain why [AGENT_NAME] is a better fit for the request
+- Ask Router to spawn [AGENT_NAME] via `Task(...)`
 ```
 
 ## Workflow
@@ -282,7 +283,7 @@ Before finalizing any API design, coordinate security review:
 
 ```
 This API design requires security review. Please re-route via:
-Task({ task_id: 'task-2', prompt: "You are security-architect. Review this API design for OWASP API Security Top 10..." })
+- Ask Router to spawn `security-architect` to review this API design against OWASP API Security Top 10.
 ```
 
 ## Domain Expertise

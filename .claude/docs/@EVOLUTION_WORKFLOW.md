@@ -2,7 +2,7 @@
 
 **Source:** CLAUDE.md Section 4
 **Version:** v2.2.1
-**Last Updated:** 2026-01-31
+**Last Updated:** 2026-02-15
 
 ---
 
@@ -20,6 +20,7 @@ Complete EVOLVE workflow specification (E→V→O→L→V→E) for self-evolutio
 - Router detects "no matching agent"
 - Pattern analyzer suggests evolution
 - Explicit create agent/skill/workflow/hook/template/schema
+- Reflection marks an existing artifact (agent/skill/workflow) as stale/underperforming and requires refresh
 
 ### EVOLVE Acronym (mandatory)
 
@@ -95,7 +96,12 @@ Requested capability: <DESCRIBE WHAT USER NEEDS>
 1. Read: .claude/agents/orchestrators/evolution-orchestrator.md
 2. Follow: .claude/workflows/core/evolution-workflow.md
 3. CRITICAL: Phase O (Obtain/Research) is MANDATORY - minimum 3 Exa queries before creating artifact.
-4. Use Skill({ skill: "research-synthesis" }) then appropriate creator skill.
+4. Use Skill({ skill: "research-synthesis" }) then:
+   - net-new agent/skill/workflow -> corresponding creator skill
+   - existing agent refresh -> Skill({ skill: "agent-updater" })
+   - existing skill refresh -> Skill({ skill: "skill-updater" })
+   - existing workflow refresh -> Skill({ skill: "workflow-updater" })
+   - other artifacts -> appropriate creator skill.
 
 Task ID: <ID>
 FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" });
@@ -128,6 +134,7 @@ LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: {...} });`,
 **L - Lock:**
 
 - Create artifact files
+- For existing refreshes, use dedicated updaters (`agent-updater`, `skill-updater`, `workflow-updater`) instead of net-new creators
 - Update CLAUDE.md routing references
 - Update catalogs/registries
 - Assign artifact to relevant agents

@@ -156,4 +156,3 @@ module.exports = {
   gatherSessionInsights,
   parseSessionInsightsFromMarkdown,
 };
-

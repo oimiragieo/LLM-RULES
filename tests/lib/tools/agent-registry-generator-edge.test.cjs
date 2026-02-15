@@ -105,6 +105,10 @@ describe('Agent registry generator edge cases', () => {
     const generator = new AgentRegistryGenerator();
     const registry = await generator.generate(AGENTS_DIR);
     const validation = generator.validate(registry);
-    assert.strictEqual(validation.valid, true, `Validation failed: ${JSON.stringify(validation.errors)}`);
+    assert.strictEqual(
+      validation.valid,
+      true,
+      `Validation failed: ${JSON.stringify(validation.errors)}`
+    );
   });
 });

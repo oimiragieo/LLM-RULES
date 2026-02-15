@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "eval-harness-updater output",
+  "type": "object",
+  "required": ["ok"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "target": { "type": "object" },
+    "checks": { "type": "array", "items": { "type": "string" } }
+  }
+}

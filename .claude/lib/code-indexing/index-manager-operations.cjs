@@ -59,7 +59,9 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
 
     await manager.vectorStore.addChunksOnly(toFlush, {
       embedBatchSize,
-      onEmbedProgress: onProgress ? (batchDone, tot) => onProgress('embed', batchDone, tot) : undefined,
+      onEmbedProgress: onProgress
+        ? (batchDone, tot) => onProgress('embed', batchDone, tot)
+        : undefined,
     });
 
     chunksFlushed += toFlush.length;
@@ -73,7 +75,9 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
       const memAfter = process.memoryUsage();
       const rssAfter = (memAfter.rss / 1024 / 1024).toFixed(0);
       const heapAfter = (memAfter.heapUsed / 1024 / 1024).toFixed(0);
-      console.log(`[FLUSH] Done ${chunksFlushed}/${totalChunks} (rss:${rssAfter}MB heap:${heapAfter}MB)`);
+      console.log(
+        `[FLUSH] Done ${chunksFlushed}/${totalChunks} (rss:${rssAfter}MB heap:${heapAfter}MB)`
+      );
     }
 
     if (typeof global.gc === 'function') {
@@ -123,7 +127,10 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
         const relPath = path.relative(manager.options.projectRoot, filePath).replace(/\\/g, '/');
         const chunks = [];
         for (let lineIdx = 0; lineIdx < lines.length; lineIdx += 50) {
-          const text = lines.slice(lineIdx, lineIdx + 50).join('\n').trim();
+          const text = lines
+            .slice(lineIdx, lineIdx + 50)
+            .join('\n')
+            .trim();
           if (text.length === 0) continue;
           chunks.push({ id: `${relPath}:${lineIdx}`, text });
         }
@@ -151,7 +158,10 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
           onProgress('chunk', globalIndex, allFiles.length);
         }
 
-        if (manager.options.enableCheckpoints && filesProcessed % manager.options.checkpointInterval === 0) {
+        if (
+          manager.options.enableCheckpoints &&
+          filesProcessed % manager.options.checkpointInterval === 0
+        ) {
           await manager._saveCheckpoint(filesProcessed, allFiles.length, totalChunks);
         }
 
@@ -199,7 +209,9 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
       const rssGB = mem.rss / 1024 / 1024 / 1024;
 
       if (rssGB > manager.memoryConfig.emergencyThresholdGB) {
-        console.warn(`🚨 EMERGENCY: Memory critical (rss:${rssGB.toFixed(2)}GB), draining queue...`);
+        console.warn(
+          `🚨 EMERGENCY: Memory critical (rss:${rssGB.toFixed(2)}GB), draining queue...`
+        );
         await Promise.all(Array.from(inFlight));
         await flushPromise;
         await flushBuffer();
@@ -300,12 +312,18 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
     files: fileHashes,
   };
 
-  const metadataPath = path.join(manager.options.projectRoot, '.claude/context/code-index/metadata.json');
+  const metadataPath = path.join(
+    manager.options.projectRoot,
+    '.claude/context/code-index/metadata.json'
+  );
   const metadataDir = path.dirname(metadataPath);
   await fs.mkdir(metadataDir, { recursive: true });
   await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
 
-  const merklePath = path.join(manager.options.projectRoot, '.claude/context/code-index/merkle-tree.json');
+  const merklePath = path.join(
+    manager.options.projectRoot,
+    '.claude/context/code-index/merkle-tree.json'
+  );
   const merkleTree = new MerkleTree(manager.options.projectRoot, manager.options.excludePatterns);
   await merkleTree.build();
   if (merkleTree.root) {
@@ -328,7 +346,10 @@ async function incrementalUpdateImpl(manager, options = {}) {
   const startTime = Date.now();
   await manager._initializeComponents();
 
-  const merklePath = path.join(manager.options.projectRoot, '.claude/context/code-index/merkle-tree.json');
+  const merklePath = path.join(
+    manager.options.projectRoot,
+    '.claude/context/code-index/merkle-tree.json'
+  );
   const oldTree = await MerkleTree.load(merklePath);
 
   if (!oldTree) {

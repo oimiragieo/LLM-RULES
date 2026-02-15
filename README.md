@@ -309,6 +309,33 @@ pnpm test:memory:ci
 pnpm metrics:memory:slo:ci
 ```
 
+## Autonomous Quality Daemon (New)
+
+This repo is still session/CI-driven, but now includes a background quality daemon you can run independently.
+
+What it does:
+
+- Runs the artifact regression gate on a timer
+- Writes heartbeat/state to `.claude/context/runtime/artifact-quality-daemon-state.json`
+- Opens/resolves system remediation events in `.claude/context/runtime/remediation-queue.jsonl`
+
+Commands:
+
+```bash
+# One cycle now
+pnpm quality:daemon:run-once
+
+# Continuous loop (foreground)
+pnpm quality:daemon:start
+
+# Inspect daemon heartbeat/state
+pnpm quality:daemon:status
+```
+
+Key env var:
+
+- `ARTIFACT_QUALITY_DAEMON_INTERVAL_MS` (default `300000`)
+
 ## Drop-In Setup (Use In Another Repo)
 
 1. Copy `.claude/` into the target repository.

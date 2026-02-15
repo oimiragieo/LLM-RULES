@@ -44,7 +44,9 @@ function createReflectionActions({
     try {
       let memoryTiers = null;
       try {
-        memoryTiers = require(path.join(projectRoot, '.claude', 'lib', 'memory', 'memory-tiers.cjs'));
+        memoryTiers = require(
+          path.join(projectRoot, '.claude', 'lib', 'memory', 'memory-tiers.cjs')
+        );
       } catch (_e) {
         debugLog(
           'unified-reflection',
@@ -223,10 +225,8 @@ function createReflectionActions({
         policyPath:
           process.env.ML_POLICY_PATH || path.join(mlContextDir, 'optimization-policies.json'),
         statePath:
-          process.env.ML_FEEDBACK_STATE_PATH ||
-          path.join(mlContextDir, 'feedback-loop-state.json'),
-        sessionsPath:
-          process.env.ML_SESSIONS_LOG_PATH || path.join(mlContextDir, 'sessions.jsonl'),
+          process.env.ML_FEEDBACK_STATE_PATH || path.join(mlContextDir, 'feedback-loop-state.json'),
+        sessionsPath: process.env.ML_SESSIONS_LOG_PATH || path.join(mlContextDir, 'sessions.jsonl'),
       };
 
       const feedback = mlIndex.getFeedbackLoop(persistence);
@@ -342,7 +342,12 @@ function createReflectionActions({
 
       for (const discovery of extracted.discoveries || []) {
         if (
-          memoryManager.recordDiscovery(discovery.path, discovery.description, 'general', projectRoot)
+          memoryManager.recordDiscovery(
+            discovery.path,
+            discovery.description,
+            'general',
+            projectRoot
+          )
         ) {
           recorded++;
         }
@@ -370,4 +375,3 @@ function createReflectionActions({
 module.exports = {
   createReflectionActions,
 };
-

@@ -15,7 +15,15 @@ const ALL_WATCHED_TOOLS = [
   'TaskCreate',
 ];
 
-const BLACKLISTED_TOOLS = ['Glob', 'Grep', 'Edit', 'Write', 'NotebookEdit', 'WebSearch', 'TaskOutput'];
+const BLACKLISTED_TOOLS = [
+  'Glob',
+  'Grep',
+  'Edit',
+  'Write',
+  'NotebookEdit',
+  'WebSearch',
+  'TaskOutput',
+];
 
 const ROUTER_BASH_WHITELIST = [
   /^git\s+status(\s+-s|\s+--short)?$/,

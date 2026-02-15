@@ -59,14 +59,7 @@ function searchWithRipgrep(memory, query, files, limit) {
     const memoryDir = memory.config.memoryDir;
     const candidates = [];
 
-    const args = [
-      '-i',
-      '-n',
-      '-C',
-      '2',
-      '--',
-      query,
-    ];
+    const args = ['-i', '-n', '-C', '2', '--', query];
 
     for (const rel of files) {
       const abs = path.join(memoryDir, rel);

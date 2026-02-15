@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Artifact Score Entry",
+  "type": "object",
+  "required": ["timestamp", "artifactType", "artifactName", "source"],
+  "properties": {
+    "timestamp": { "type": "string" },
+    "sessionId": { "type": ["string", "null"] },
+    "taskId": { "type": ["string", "null"] },
+    "artifactType": {
+      "type": "string",
+      "enum": ["agent", "skill", "hook", "workflow", "schema", "template", "tool", "command", "unknown"]
+    },
+    "artifactName": { "type": "string", "minLength": 1 },
+    "artifactPath": { "type": ["string", "null"] },
+    "source": { "type": "string" },
+    "dimensions": {
+      "type": "object",
+      "properties": {
+        "completeness": { "type": ["number", "null"] },
+        "accuracy": { "type": ["number", "null"] },
+        "clarity": { "type": ["number", "null"] },
+        "consistency": { "type": ["number", "null"] },
+        "actionability": { "type": ["number", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "overallScore": { "type": ["number", "null"] },
+    "thresholdPass": { "type": "number" },
+    "thresholdCritical": { "type": "number" },
+    "notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

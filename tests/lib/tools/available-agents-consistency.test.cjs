@@ -9,7 +9,12 @@ const { AvailableAgentsQuery } = require('../../../.claude/lib/tools/available-a
 const FIXTURE_DIR = path.join(__dirname, '..', '..', 'fixtures');
 const CONSISTENCY_DIR = path.join(FIXTURE_DIR, 'registry-consistency');
 const CONSISTENCY_AGENTS_DIR = path.join(CONSISTENCY_DIR, '.claude', 'agents', 'core');
-const CONSISTENCY_REGISTRY = path.join(CONSISTENCY_DIR, '.claude', 'context', 'agent-registry.json');
+const CONSISTENCY_REGISTRY = path.join(
+  CONSISTENCY_DIR,
+  '.claude',
+  'context',
+  'agent-registry.json'
+);
 
 describe('AvailableAgents registry consistency', () => {
   let originalEnv;

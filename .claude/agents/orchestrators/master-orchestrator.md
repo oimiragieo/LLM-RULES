@@ -20,6 +20,7 @@ tools:
   - TaskList
   - TaskCreate
   - TaskGet
+  - AvailableAgents
   - Skill
   - Orchestrator
 skills:

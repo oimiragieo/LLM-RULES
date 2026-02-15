@@ -69,10 +69,10 @@ flowchart TD
 // Read creator registry to check for duplicates
 Read('.claude/context/artifacts/catalogs/creator-registry.json');
 
-// Search for similar agents/skills/workflows
-Glob('.claude/agents/**/*.md');
-Glob('.claude/skills/*/SKILL.md');
-Glob('.claude/workflows/**/*.md');
+// Read artifact catalogs/indexes (router-safe, no Glob/Grep)
+Read('.claude/context/agent-registry.json');
+Read('.claude/context/artifacts/catalogs/skill-catalog.md');
+Read('.claude/context/artifacts/catalogs/workflow-catalog.md');
 ```
 
 **Decision**:
@@ -322,17 +322,18 @@ Without these, the skill was NEVER invoked because Router couldn't find it.
 
 ### 5.1 Whitelisted Tools
 
-| Tool                | Allowed Purpose                     | Example                                                              |
-| ------------------- | ----------------------------------- | -------------------------------------------------------------------- |
-| `TaskList()`        | Check existing work                 | Check for pending tasks                                              |
-| `TaskCreate()`      | Create new tasks                    | Break down complex work                                              |
-| `TaskUpdate()`      | Update task status/metadata         | Mark task as spawned                                                 |
-| `TaskGet()`         | Get task details                    | Fetch task for spawning                                              |
-| `Task()`            | **SPAWN AGENTS** (primary function) | Delegate work to specialist                                          |
-| `Read()`            | Read routing files ONLY             | `.claude/agents/*.md`, `.claude/CLAUDE.md`, `.claude/workflows/*.md` |
-| `AskUserQuestion()` | Clarify requirements                | Ambiguous requests                                                   |
+| Tool                | Allowed Purpose                      | Example                                                                                                                                                                                                                                                                                |
+| ------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TaskList()`        | Check existing work                  | Check for pending tasks                                                                                                                                                                                                                                                                |
+| `TaskCreate()`      | Create new tasks                     | Break down complex work                                                                                                                                                                                                                                                                |
+| `TaskUpdate()`      | Update task status/metadata          | Mark task as spawned                                                                                                                                                                                                                                                                   |
+| `TaskGet()`         | Get task details                     | Fetch task for spawning                                                                                                                                                                                                                                                                |
+| `Task()`            | **SPAWN AGENTS** (primary function)  | Delegate work to specialist                                                                                                                                                                                                                                                            |
+| `Read()`            | Read router-approved docs/state only | `.claude/agents/*.md`, `.claude/CLAUDE.md`, `.claude/workflows/*.md`, `.claude/context/artifacts/catalogs/*`, `.claude/context/agent-registry.json`, `.claude/context/memory/*.md`, `.claude/context/runtime/{reflection-*.txt,reflection-spawn-request.json,integration-queue.jsonl}` |
+| `AskUserQuestion()` | Clarify requirements                 | Ambiguous requests                                                                                                                                                                                                                                                                     |
+| `Bash`              | Read-only repo status                | `git status -s` or `git log --oneline -5`                                                                                                                                                                                                                                              |
 
-**The ONLY exception for Bash**: `git status -s` or `git log --oneline -5` for read-only context.
+`Bash` is blacklisted for Router except read-only `git status -s` and `git log --oneline -5`. If other shell access is required, spawn a specialist agent.
 
 ### 5.2 Router Actions After Self-Check
 
@@ -1129,16 +1130,16 @@ Task({
 
 ### WHITELIST (Router MAY use)
 
-| Tool                | Allowed Purpose                                                                   |
-| ------------------- | --------------------------------------------------------------------------------- |
-| `TaskList()`        | Check existing work                                                               |
-| `TaskCreate()`      | Create new tasks                                                                  |
-| `TaskUpdate()`      | Update task status/metadata                                                       |
-| `Task()`            | **SPAWN AGENTS** (primary function)                                               |
-| `TaskGet()`         | Get task details                                                                  |
-| `Read()`            | **ONLY** for `.claude/agents/*.md`, `.claude/CLAUDE.md`, `.claude/workflows/*.md` |
-| `AskUserQuestion()` | Clarify requirements before routing                                               |
-| `Bash`              | **ONLY** for `git status -s` or `git log --oneline -5` (read-only)                |
+| Tool                | Allowed Purpose                                                                                                                                                                                                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TaskList()`        | Check existing work                                                                                                                                                                                                                                                                                                             |
+| `TaskCreate()`      | Create new tasks                                                                                                                                                                                                                                                                                                                |
+| `TaskUpdate()`      | Update task status/metadata                                                                                                                                                                                                                                                                                                     |
+| `Task()`            | **SPAWN AGENTS** (primary function)                                                                                                                                                                                                                                                                                             |
+| `TaskGet()`         | Get task details                                                                                                                                                                                                                                                                                                                |
+| `Read()`            | **ONLY** for router-approved docs/state: `.claude/agents/*.md`, `.claude/CLAUDE.md`, `.claude/workflows/*.md`, `.claude/context/artifacts/catalogs/*`, `.claude/context/agent-registry.json`, `.claude/context/memory/*.md`, `.claude/context/runtime/{reflection-*.txt,reflection-spawn-request.json,integration-queue.jsonl}` |
+| `AskUserQuestion()` | Clarify requirements before routing                                                                                                                                                                                                                                                                                             |
+| `Bash`              | **ONLY** `git status -s` or `git log --oneline -5` (read-only)                                                                                                                                                                                                                                                                  |
 
 ### BLACKLIST (Router NEVER uses)
 

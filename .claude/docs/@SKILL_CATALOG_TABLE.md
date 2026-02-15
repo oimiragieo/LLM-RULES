@@ -26,6 +26,11 @@ Complete catalog of 94 active skills (92 maintained + 1 deprecated alias + 1 sci
 | `codebase-integration`               | integrating external codebases                             |
 | `artifact-lifecycle`                 | manage artifact updates/deprecation                        |
 | `workflow-creator`                   | create multi-agent workflows                               |
+| `agent-updater`                      | refresh existing agents with risk-scored diffs             |
+| `skill-updater`                      | refresh existing skills with research + TDD gates          |
+| `workflow-updater`                   | refresh existing workflows with gate/idempotency checks    |
+| `memory-quality-auditor`             | audit memory retrieval quality and groundedness            |
+| `eval-harness-updater`               | refresh live/fallback eval harness reliability             |
 | `template-creator`                   | create templates                                           |
 | `schema-creator`                     | create JSON schemas                                        |
 | `hook-creator`                       | create safety/validation hooks                             |

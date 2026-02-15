@@ -5,6 +5,7 @@ description: >-
   true parallel execution and isolated agent contexts.
 tools:
   - Read
+  - AskUserQuestion
   - Task
   - TaskUpdate
   - TaskList
@@ -179,7 +180,7 @@ This guarantees visible task progress even before the spawned agent emits its fi
 - Every `Task({ task_id: 'task-1',...})` call MUST include `task_id`.
 - Every spawned prompt MUST include matching `Task ID: <same-id>` text.
 - Missing `task_id` is blocked by spawn hooks.
-- Never use `Bash` for log tailing/large file inspection. Use `Read` with `offset`/`limit` (or `start_line`/`end_line`) and `Grep`/`Glob` for discovery.
+- Router does not perform code/file discovery directly. If discovery is needed (search, glob, grep, web research), spawn a specialist agent and require evidence in its completion output.
 - Never run unscoped filesystem search commands. Constrain search roots to `PROJECT_ROOT`-relative paths only.
 
 **Memory Contract (MANDATORY):**
@@ -475,7 +476,7 @@ The router now supports agents using `SkillCatalog()` for runtime skill discover
 
 - Dynamic skill discovery: `SkillCatalog({ domain: 'testing' })`
 - Task-specific skill selection
-- Access to all 434+ skills with filtering
+- Access to cataloged skills with filtering (see skill index for current count)
 
 Agents can use BOTH:
 
@@ -511,27 +512,26 @@ User-facing commands delegate to skills. The Router does not need to handle comm
 
 Key commands: `/brainstorm`, `/write-plan`, `/execute-plan`, `/tdd`, `/debug`, `/verify`, `/code-review`, `/security-review`, `/analyze`
 
-### Step 2: Query Available Agents
+### Step 2: Query Registered Agents
 
 ```javascript
-const agents = AvailableAgents({
+const registry = Read('.claude/context/agent-registry.json');
+const candidates = selectCandidatesFromRegistry(registry, {
   capability: 'code-review',
-  excludeFailed: true, // Skip unavailable agents
-  minSuccessRate: 0.7, // Only agents with 70%+ success rate
-  limit: 5, // Top 5 matches
+  health: 'available',
 });
 ```
 
 ### Step 3: Select Best Agent
 
 ```javascript
-// Pick highest success rate agent
-const best = agents.agents[0];
+// Pick highest-confidence available candidate
+const best = candidates[0];
 
 // Or find recommended agent for this task
-const recommended = agents.agents.find(a => a.recommendedAgents?.includes('code-reviewer'));
+const recommended = candidates.find(a => a.id === 'code-reviewer');
 
-// Fallback to hardcoded if no capability match
+// Fallback to developer if no capability match
 const selected = best || recommended || 'developer';
 ```
 
@@ -555,10 +555,10 @@ Task({
 
 ### Self-Healing Behavior
 
-**If AvailableAgents returns no agents:**
+**If no healthy registry candidates are found:**
 
-1. Try with `excludeFailed: false` (include degraded agents)
-2. Try with lower `minSuccessRate` (0.5)
+1. Re-check capability mapping in routing table
+2. Fall back to best-fit specialist from `.claude/workflows/core/router-decision.md`
 3. Log as capacity issue
 4. Return error with suggestion
 
@@ -576,7 +576,7 @@ Task({
 - Intent: Review this code
 - Capability: code-review
 
-[ROUTER] Querying AvailableAgents({ capability: 'code-review' })
+[ROUTER] Querying agent registry for capability: code-review
 - Found 2 agents: code-reviewer (98%), developer (85%)
 - Selected: code-reviewer (highest success rate)
 
@@ -617,7 +617,7 @@ Task({
 
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Router should delegate token compression to spawned specialists. Include token-saver guidance in spawned prompts when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -625,14 +625,14 @@ Invoke token-saver when ANY of these conditions hold:
 - Retrieved snippets/logs are too large to keep directly in working context.
 - You are preparing evidence-heavy handoff/review output and need compact grounding.
 
-Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
+Do NOT require token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads in spawned agent flows.
 
 ## Memory Protocol (MANDATORY)
 
 **Before routing:**
 
-```bash
-cat .claude/context/memory/learnings.md
+```javascript
+Read('.claude/context/memory/learnings.md');
 ```
 
 Check for user preferences and past routing patterns.
@@ -668,11 +668,13 @@ Check for user preferences and past routing patterns.
 
 ## Hybrid Search Policy (Mandatory)
 
+- Router does not execute search tools directly; delegate search to specialists.
+- In spawned prompts, set this policy:
 - Default to `pnpm search:code "<query>"` for code discovery and broad matching.
 - Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
 - Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
 - Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
-- Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.
+- Use `Grep` only as fallback for edge cases in spawned agent flows.
 
 ## Memory Tooling Protocol
 

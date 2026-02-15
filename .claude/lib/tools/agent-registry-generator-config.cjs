@@ -1,7 +1,19 @@
 'use strict';
 
 function getDefaultTools(_agentType) {
-  return ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'];
+  return [
+    'Read',
+    'Write',
+    'Edit',
+    'Bash',
+    'Glob',
+    'Grep',
+    'TaskUpdate',
+    'TaskList',
+    'TaskCreate',
+    'TaskGet',
+    'Skill',
+  ];
 }
 
 const DOMAIN_MAPPING = {
