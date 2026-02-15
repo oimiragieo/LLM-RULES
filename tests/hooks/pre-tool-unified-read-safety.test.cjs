@@ -103,7 +103,7 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
-  test('checkReadSafety rewrites directory reads in bypassPermissions mode', () => {
+  test('checkReadSafety blocks directory reads in bypassPermissions mode', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-dir-bypass-'));
     try {
       const result = checkReadSafety(
@@ -111,10 +111,9 @@ describe('pre-tool-unified read safety', () => {
         { file_path: tempDir },
         { permission_mode: 'bypassPermissions' }
       );
-      assert.strictEqual(result.action, 'rewrite');
-      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
-      assert.ok(String(result.bypassWarning || '').includes('generated listing'));
-      assert.ok(fs.existsSync(String(result.rewrittenToolInput?.file_path || '')));
+      assert.strictEqual(result.action, 'block');
+      assert.ok(String(result.message || '').includes('[READ SAFETY][bypass]'));
+      assert.ok(String(result.message || '').includes('is a directory'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -506,7 +505,7 @@ describe('pre-tool-unified read safety', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test('checkReadSafety rewrites directory reads in bypass mode even when default listing path is unavailable', () => {
+  test('checkReadSafety blocks directory reads in bypass mode even when default listing path is unavailable', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-rewrite-file-'));
     withPathRestored(defaultDirListingPath, () => {
       if (fs.existsSync(defaultDirListingPath)) {
@@ -519,12 +518,8 @@ describe('pre-tool-unified read safety', () => {
         { permission_mode: 'bypassPermissions' }
       );
 
-      assert.strictEqual(result.action, 'rewrite');
-      assert.ok(result.rewrittenToolInput?.file_path);
-      assert.notStrictEqual(
-        path.resolve(String(result.rewrittenToolInput.file_path)),
-        path.resolve(defaultDirListingPath)
-      );
+      assert.strictEqual(result.action, 'block');
+      assert.ok(String(result.message || '').includes('[READ SAFETY][bypass]'));
     });
     fs.rmSync(tempDir, { recursive: true, force: true });
   });

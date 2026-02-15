@@ -508,34 +508,11 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       isProjectFile && !hasReadWindow(toolInput) && stats.size > READ_REQUIRE_SEARCH_FIRST_BYTES;
 
     if (stats.isDirectory()) {
-      if (isBypassPermissionsMode(hookInput)) {
-        const listingPath = createDirectoryListingFile(targetPath);
-        if (listingPath) {
-          return {
-            checked: true,
-            action: 'rewrite',
-            rewrittenToolInput: {
-              ...toolInput,
-              file_path: listingPath,
-            },
-            bypassWarning:
-              `[READ SAFETY][bypass] "${targetPath}" is a directory. ` +
-              `Rewrote Read target to generated listing "${listingPath}".`,
-          };
-        }
-        return {
-          checked: true,
-          action: 'block',
-          message:
-            `[READ SAFETY][bypass] "${targetPath}" is a directory. ` +
-            'Read requires a concrete file path. Use Glob/rg --files to list files, then Read a specific file.',
-        };
-      }
       return {
         checked: true,
         action: 'block',
         message:
-          `[READ SAFETY] "${targetPath}" is a directory. ` +
+          `${isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '}"${targetPath}" is a directory. ` +
           'Use Glob/rg --files for directory listing, then Read a specific file.',
       };
     }
