@@ -169,6 +169,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
   'tail',
   'wc',
   'grep',
+  'rg',
   'find',
   'which',
   'whoami',

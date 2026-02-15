@@ -181,6 +181,17 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     });
     assert.equal(result.pass, true);
   });
+
+  it('should allow code-reviewer for codebase bug-and-issue scan prompts', () => {
+    process.env.INTENT_AGENT_ENFORCEMENT = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-reviewer',
+      description: 'Codebase bug and issue scan',
+      prompt:
+        'Search the codebase for any issues or bugs, include security, test coverage, and docs findings.',
+    });
+    assert.equal(result.pass, true);
+  });
 });
 
 describe('routing-guard.cjs - Check 11: Config Model Validator', () => {

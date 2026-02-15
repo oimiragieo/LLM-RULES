@@ -15,7 +15,9 @@ const ROUTER_STATE_FILE = path.join(
   'router-state.json'
 );
 
-const routingGuard = require(path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs'));
+const routingGuard = require(
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs')
+);
 
 function cleanupState() {
   routingGuard.invalidateCachedState();

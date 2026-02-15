@@ -241,6 +241,12 @@ describe('registry', () => {
       assert.strictEqual(result.hasValidator, false);
     });
 
+    test('ALLOWS allowlisted command: rg search', () => {
+      const result = validateCommand('rg -n "pattern" .claude/hooks');
+      assert.strictEqual(result.valid, true);
+      assert.strictEqual(result.hasValidator, false);
+    });
+
     test('ALLOWS allowlisted command: git status', () => {
       // This also has a validator, but should still pass
       const result = validateCommand('git status');

@@ -120,7 +120,10 @@ function parsePromptList(prompt, key) {
   const re = new RegExp(`^\\s*${key}\\s*:\\s*(.+)$`, 'im');
   const match = prompt.match(re);
   if (!match || !match[1]) return [];
-  return match[1].split(/[,;]/).map(v => v.trim()).filter(Boolean);
+  return match[1]
+    .split(/[,;]/)
+    .map(v => v.trim())
+    .filter(Boolean);
 }
 
 function extractClaimMetadataFromTaskInput(toolInput = {}) {
@@ -137,10 +140,9 @@ function extractClaimMetadataFromTaskInput(toolInput = {}) {
       : [];
   const allowedFromPrompt = parsePromptList(prompt, 'ALLOWED_FILES');
   const ownedFromPrompt = parsePromptList(prompt, 'OWNED_PATHS');
-  const dependencies =
-    (Array.isArray(toolInput.depends_on) ? toolInput.depends_on : []).concat(
-      parsePromptList(prompt, 'DEPENDS_ON')
-    );
+  const dependencies = (Array.isArray(toolInput.depends_on) ? toolInput.depends_on : []).concat(
+    parsePromptList(prompt, 'DEPENDS_ON')
+  );
   const dependencyType =
     toolInput.dependency_type ||
     toolInput.dependencyType ||
@@ -154,10 +156,10 @@ function extractClaimMetadataFromTaskInput(toolInput = {}) {
       ...allowedFromPrompt,
       ...ownedFromPrompt,
     ]),
-    dependsOn: Array.from(
-      new Set(dependencies.map(v => String(v || '').trim()).filter(Boolean))
-    ),
-    dependencyType: String(dependencyType || 'blocks').trim().toLowerCase(),
+    dependsOn: Array.from(new Set(dependencies.map(v => String(v || '').trim()).filter(Boolean))),
+    dependencyType: String(dependencyType || 'blocks')
+      .trim()
+      .toLowerCase(),
   };
 }
 

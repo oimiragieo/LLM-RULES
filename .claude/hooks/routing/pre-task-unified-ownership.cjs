@@ -13,7 +13,10 @@ const { getEnforcementMode, auditLog } = libRequire(path.join('utils', 'hook-inp
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const taskClaimLedger = libRequire(path.join('routing', 'task-claim-ledger.cjs'));
 
-const { extractTaskIdFromTaskInput, extractSpawnAgentType } = require('./pre-task-unified-helpers.cjs');
+const {
+  extractTaskIdFromTaskInput,
+  extractSpawnAgentType,
+} = require('./pre-task-unified-helpers.cjs');
 
 function parseParallelGroup(toolInput = {}) {
   const direct = toolInput.parallel_group ?? toolInput.parallelGroup;
@@ -49,7 +52,8 @@ function checkParallelOwnershipRequired(toolInput) {
   const stateSnapshot = routerState.getState();
   const explicitComplexity = toolInput?.complexity || toolInput?.task_complexity;
   const complexity = normalizeComplexity(explicitComplexity || stateSnapshot.complexity);
-  const isMediumOrHigher = complexity === 'medium' || complexity === 'high' || complexity === 'epic';
+  const isMediumOrHigher =
+    complexity === 'medium' || complexity === 'high' || complexity === 'epic';
   if (!isMediumOrHigher) {
     return { pass: true };
   }

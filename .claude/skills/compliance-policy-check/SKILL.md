@@ -73,4 +73,3 @@ For `CONDITIONAL` and `FAIL`, include precise remediation tasks and ownership (a
 ## Memory Protocol
 
 Record recurring policy drift patterns in `.claude/context/memory/issues.md` and stabilized controls in `.claude/context/memory/decisions.md`.
-
