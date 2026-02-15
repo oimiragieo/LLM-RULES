@@ -19,7 +19,7 @@ streaming: supported
 output_location: .claude/agents/
 ---
 
-**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
+**Mode: Hybrid (Prompt + Scripted Guardrails)** — Use prompt workflow plus `scripts/main.cjs` for contract-safe generation/validation.
 
 # Agent Creator Skill
 
@@ -61,6 +61,24 @@ grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NO
 | Run in terminal       | `claude -p "prompt" --allowedTools "..."`      |
 
 ## Agent Creation Process
+
+### Contract-First Generator (MANDATORY)
+
+All newly created agents must be generated from the managed template contract before any manual refinements.
+
+Use:
+
+```bash
+node .claude/skills/agent-creator/scripts/main.cjs --action generate --name <agent-name> --description "<summary>" --category <core|domain|specialized|orchestrators>
+```
+
+Validate:
+
+```bash
+node .claude/skills/agent-creator/scripts/main.cjs --action validate --file .claude/agents/<category>/<agent-name>.md
+```
+
+Do not create agent markdown freehand for new agents. The template enforces required sections/skills (including Token Saver invocation rules) and inserts the contract marker used by CI/hook validation.
 
 ### Step 0: Existence Check and Updater Delegation (MANDATORY - FIRST STEP)
 

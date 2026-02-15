@@ -4,14 +4,23 @@
 const fsPromises = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
-const { DatabaseSync } = require('node:sqlite');
 const { MemoryVectorStore } = require('./lancedb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
-const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
-const { resolveRipgrepBinary, resolveAstGrepBinary } = require('../utils/binary-resolver.cjs');
+const {
+  computeQualityScore,
+  isPathInside,
+  loadContextSync,
+  toSafeInt,
+} = require('./contextual-memory-context-loader.cjs');
+const {
+  checkBinaryAvailable,
+  getAstGrepPath,
+  getRipgrepPath,
+  keywordSearch,
+  searchWithRipgrep,
+} = require('./contextual-memory-search-fallback.cjs');
 
 const logger = createLogger('contextual-memory');
 
@@ -24,133 +33,6 @@ const logger = createLogger('contextual-memory');
  * @property {string} lancedbConfig.persistDirectory
  * @property {string} lancedbConfig.collectionName
  */
-
-const ACCESS_TRACKING_MIN_INTERVAL_MS = Number(
-  process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS || 5 * 60 * 1000
-);
-const ACCESS_TRACKING_ENABLED =
-  String(process.env.MEMORY_ACCESS_TRACKING || 'on').toLowerCase() !== 'off';
-const DEFAULT_MAX_ITEMS = {
-  gotchas: Number.parseInt(process.env.MEMORY_MAX_ITEMS_GOTCHAS || '20', 10),
-  patterns: Number.parseInt(process.env.MEMORY_MAX_ITEMS_PATTERNS || '20', 10),
-  decisions: Number.parseInt(process.env.MEMORY_MAX_ITEMS_DECISIONS || '10', 10),
-  discoveries: Number.parseInt(process.env.MEMORY_MAX_ITEMS_DISCOVERIES || '30', 10),
-  sessions: Number.parseInt(process.env.MEMORY_MAX_ITEMS_SESSIONS || '5', 10),
-};
-const DEFAULT_MAX_CHARS = {
-  gotchas: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_GOTCHAS || '2000', 10),
-  patterns: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_PATTERNS || '2000', 10),
-  decisions: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_DECISIONS || '2000', 10),
-  discoveries: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_DISCOVERIES || '3000', 10),
-  sessions: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_SESSIONS || '5000', 10),
-  legacy: Number.parseInt(process.env.MEMORY_MAX_CONTEXT_CHARS_LEGACY || '3000', 10),
-};
-
-function toSafeInt(val, fallback = 0) {
-  const n = Number.parseInt(String(val), 10);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function toSafePositiveInt(val, fallback) {
-  const n = Number.parseInt(String(val), 10);
-  return Number.isFinite(n) && n > 0 ? n : fallback;
-}
-
-function isPathInside(baseDir, targetPath) {
-  const base = path.resolve(baseDir);
-  const target = path.resolve(targetPath);
-
-  if (process.platform === 'win32') {
-    const baseLower = base.toLowerCase();
-    const targetLower = target.toLowerCase();
-    return targetLower === baseLower || targetLower.startsWith(`${baseLower}${path.sep}`);
-  }
-
-  return target === base || target.startsWith(`${base}${path.sep}`);
-}
-
-function computeQualityScore(accessCount) {
-  const count = Number.isFinite(accessCount) ? accessCount : 0;
-  const max = 20;
-  const ratio = Math.min(Math.log1p(count) / Math.log1p(max), 1);
-  return Math.round((0.5 + ratio * 0.5) * 1000) / 1000;
-}
-
-function getAccessStatsPath(memoryDir) {
-  return path.join(memoryDir, 'access-stats.json');
-}
-
-function loadAccessStats(memoryDir) {
-  const statsPath = getAccessStatsPath(memoryDir);
-  try {
-    if (fs.existsSync(statsPath)) {
-      const parsed = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
-      if (parsed && typeof parsed === 'object') {
-        return {
-          version: parsed.version || '1.0',
-          entries: parsed.entries && typeof parsed.entries === 'object' ? parsed.entries : {},
-        };
-      }
-    }
-  } catch (_e) {
-    // Best-effort; fall through to default
-  }
-  return { version: '1.0', entries: {} };
-}
-
-function buildAccessKey(entry) {
-  if (!entry || typeof entry !== 'object') return null;
-  if (entry.id) return `id:${entry.id}`;
-  if (typeof entry.text === 'string') {
-    return `text:${entry.text}\n${entry.timestamp || ''}`;
-  }
-  return null;
-}
-
-function applyAccessStats(entries, stats) {
-  if (!Array.isArray(entries) || entries.length === 0) return;
-  if (!stats || typeof stats !== 'object' || !stats.entries) return;
-  for (const entry of entries) {
-    const key = buildAccessKey(entry);
-    if (!key) continue;
-    const stat = stats.entries[key];
-    if (!stat) continue;
-    entry.accessCount = toSafeInt(stat.accessCount, 0);
-    entry.lastAccessed = stat.lastAccessed || null;
-  }
-}
-
-function updateAccessStatsInPlace(stats, returnedEntries, nowIso) {
-  if (!ACCESS_TRACKING_ENABLED) return false;
-  if (!stats || typeof stats !== 'object') return false;
-  if (!Array.isArray(returnedEntries) || returnedEntries.length === 0) return false;
-
-  const entries = stats.entries || {};
-  const nowMs = Date.parse(nowIso);
-  const minInterval = Number.isFinite(ACCESS_TRACKING_MIN_INTERVAL_MS)
-    ? ACCESS_TRACKING_MIN_INTERVAL_MS
-    : 0;
-
-  let changed = false;
-  for (const entry of returnedEntries) {
-    const key = buildAccessKey(entry);
-    if (!key) continue;
-
-    const current = entries[key] || { accessCount: 0, lastAccessed: null };
-    const lastAccessedMs = current.lastAccessed ? Date.parse(current.lastAccessed) : 0;
-
-    if (!current.lastAccessed || nowMs - lastAccessedMs >= minInterval) {
-      entries[key] = {
-        accessCount: toSafeInt(current.accessCount, 0) + 1,
-        lastAccessed: nowIso,
-      };
-      changed = true;
-    }
-  }
-
-  stats.entries = entries;
-  return changed;
-}
 
 /**
  * ContextualMemory - Unified API for hybrid memory system
@@ -351,200 +233,7 @@ class ContextualMemory {
    * @returns {Object} Memory context object
    */
   loadContextSync(options = {}) {
-    const rawMaxItems =
-      options.maxItems && typeof options.maxItems === 'object' ? options.maxItems : {};
-    const rawMaxChars =
-      options.maxChars && typeof options.maxChars === 'object' ? options.maxChars : {};
-    const maxItems = {
-      gotchas: toSafePositiveInt(rawMaxItems.gotchas, DEFAULT_MAX_ITEMS.gotchas),
-      patterns: toSafePositiveInt(rawMaxItems.patterns, DEFAULT_MAX_ITEMS.patterns),
-      decisions: toSafePositiveInt(rawMaxItems.decisions, DEFAULT_MAX_ITEMS.decisions),
-      discoveries: toSafePositiveInt(rawMaxItems.discoveries, DEFAULT_MAX_ITEMS.discoveries),
-      sessions: toSafePositiveInt(rawMaxItems.sessions, DEFAULT_MAX_ITEMS.sessions),
-    };
-    const maxChars = {
-      gotchas: toSafePositiveInt(rawMaxChars.gotchas, DEFAULT_MAX_CHARS.gotchas),
-      patterns: toSafePositiveInt(rawMaxChars.patterns, DEFAULT_MAX_CHARS.patterns),
-      decisions: toSafePositiveInt(rawMaxChars.decisions, DEFAULT_MAX_CHARS.decisions),
-      discoveries: toSafePositiveInt(rawMaxChars.discoveries, DEFAULT_MAX_CHARS.discoveries),
-      sessions: toSafePositiveInt(rawMaxChars.sessions, DEFAULT_MAX_CHARS.sessions),
-      legacy: toSafePositiveInt(rawMaxChars.legacy, DEFAULT_MAX_CHARS.legacy),
-    };
-    const result = {
-      gotchas: [],
-      patterns: [],
-      decisions: [],
-      discoveries: [],
-      recent_sessions: [],
-      legacy_summary: '',
-    };
-
-    const memoryDir = this.config.memoryDir;
-    const dbPath = this.config.dbPath;
-    let dbPatternsLoaded = false;
-    let dbGotchasLoaded = false;
-
-    if (dbPath && fs.existsSync(dbPath)) {
-      try {
-        const db = new DatabaseSync(dbPath);
-        const patterns = this._loadEntitiesFromDb(db, 'pattern', maxItems.patterns);
-        if (patterns.length > 0) {
-          result.patterns = patterns;
-          dbPatternsLoaded = true;
-        }
-
-        const issues = this._loadEntitiesFromDb(db, 'issue', maxItems.gotchas);
-        if (issues.length > 0) {
-          result.gotchas = issues;
-          dbGotchasLoaded = true;
-        }
-
-        const decisions = this._loadEntitiesFromDb(db, 'decision', maxItems.decisions);
-        if (decisions.length > 0) {
-          result.decisions = decisions;
-        }
-
-        db.close();
-      } catch (e) {
-        logger.debug('DB load failed', { error: e.message });
-      }
-    }
-
-    const accessStats = loadAccessStats(memoryDir);
-    const nowIso = new Date().toISOString();
-
-    const gotchasFile = path.join(memoryDir, 'gotchas.json');
-    if (!dbGotchasLoaded && fs.existsSync(gotchasFile)) {
-      try {
-        const allGotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
-        const selectedGotchas = allGotchas.slice(-maxItems.gotchas);
-        result.gotchas = this._truncateItems(selectedGotchas, maxChars.gotchas);
-        applyAccessStats(result.gotchas, accessStats);
-      } catch (e) {
-        logger.debug('Gotchas load failed', { error: e.message });
-      }
-    }
-
-    const patternsFile = path.join(memoryDir, 'patterns.json');
-    if (!dbPatternsLoaded && fs.existsSync(patternsFile)) {
-      try {
-        const allPatterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
-        const selectedPatterns = allPatterns.slice(-maxItems.patterns);
-        result.patterns = this._truncateItems(selectedPatterns, maxChars.patterns);
-        applyAccessStats(result.patterns, accessStats);
-      } catch (e) {
-        logger.debug('Patterns load failed', { error: e.message });
-      }
-    }
-
-    const gotchasAccessChanged = updateAccessStatsInPlace(accessStats, result.gotchas, nowIso);
-    const patternsAccessChanged = updateAccessStatsInPlace(accessStats, result.patterns, nowIso);
-    const accessChanged = gotchasAccessChanged || patternsAccessChanged;
-
-    // FIXED (Issue #2 - HIGH): Make access stats write non-blocking (fire-and-forget)
-    // Using setImmediate to avoid blocking the read operation
-    if (accessChanged) {
-      setImmediate(() => {
-        try {
-          atomicWriteJSONSync(getAccessStatsPath(memoryDir), {
-            version: '1.0',
-            entries: accessStats.entries || {},
-          });
-          applyAccessStats(result.gotchas, accessStats);
-          applyAccessStats(result.patterns, accessStats);
-        } catch (_e) {
-          // Best-effort; do not block context load
-        }
-      });
-    }
-
-    const mapFile = path.join(memoryDir, 'codebase_map.json');
-    if (fs.existsSync(mapFile)) {
-      try {
-        const map = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
-        const discoveries = Object.entries(map.discovered_files || {})
-          .slice(-maxItems.discoveries)
-          .map(([filePath, info]) => ({ path: filePath, ...info }));
-        result.discoveries = this._truncateItems(discoveries, maxChars.discoveries);
-      } catch (e) {
-        logger.debug('Discoveries load failed', { error: e.message });
-      }
-    }
-
-    try {
-      const memoryTiers = require('./memory-tiers.cjs');
-      const projectRoot = this.config.projectRoot || PROJECT_ROOT;
-      const mtmSessions = memoryTiers.getMTMSessions(projectRoot);
-      if (mtmSessions && mtmSessions.length > 0) {
-        const sorted = mtmSessions
-          .sort(
-            (a, b) =>
-              new Date(a.timestamp || a.consolidated_at || 0) -
-              new Date(b.timestamp || b.consolidated_at || 0)
-          )
-          .slice(-maxItems.sessions);
-
-        const sessionNumberBase = mtmSessions.length - sorted.length;
-        for (let i = 0; i < sorted.length; i++) {
-          const session = sorted[i];
-          result.recent_sessions.push({
-            session_number: sessionNumberBase + i + 1,
-            timestamp: session.timestamp || session.consolidated_at,
-            summary: session.summary || '',
-            tasks_completed: (session.tasks_completed || []).slice(0, 5),
-            source: 'mtm',
-          });
-        }
-
-        const ltmDir = memoryTiers.getTierPath('LTM', projectRoot);
-        if (fs.existsSync(ltmDir)) {
-          try {
-            const ltmFiles = fs
-              .readdirSync(ltmDir)
-              .filter(f => f.endsWith('.json') && f.startsWith('summary_'))
-              .sort()
-              .slice(-2);
-            for (const file of ltmFiles) {
-              try {
-                const summary = JSON.parse(fs.readFileSync(path.join(ltmDir, file), 'utf8'));
-                if (summary.type === 'session_summary') {
-                  result.recent_sessions.unshift({
-                    session_number: 0,
-                    timestamp: summary.created_at,
-                    summary: `[LTM Summary] ${summary.session_count} sessions from ${summary.date_range?.start || 'unknown'} to ${summary.date_range?.end || 'unknown'}`,
-                    tasks_completed: [],
-                    source: 'ltm',
-                    key_learnings: (summary.key_learnings || []).slice(0, 3),
-                  });
-                }
-              } catch (_e) {
-                // ignore malformed LTM
-              }
-            }
-          } catch (_e) {
-            // ignore LTM read errors
-          }
-        }
-      }
-    } catch (e) {
-      logger.debug('loadContextSync (mtm) error', { error: e.message });
-    }
-
-    const legacyPath = path.join(memoryDir, 'learnings.md');
-    if (fs.existsSync(legacyPath)) {
-      try {
-        const legacyContent = fs.readFileSync(legacyPath, 'utf8');
-        const limit = maxChars.legacy;
-        result.legacy_summary =
-          typeof limit === 'number' && legacyContent.length > limit
-            ? '...' + legacyContent.slice(-limit)
-            : legacyContent;
-      } catch (_e) {
-        // ignore legacy read errors
-      }
-    }
-
-    return result;
+    return loadContextSync(this, options);
   }
 
   async loadContext(options = {}) {
@@ -640,23 +329,7 @@ class ContextualMemory {
    * @returns {string|null} Path to ripgrep binary or null if unavailable
    */
   _getRipgrepPath() {
-    if (this._resolvedRipgrepPath !== undefined) return this._resolvedRipgrepPath;
-
-    let vscodeRgPath = null;
-    try {
-      const { rgPath } = require('@vscode/ripgrep');
-      vscodeRgPath = rgPath;
-    } catch {
-      // Ignore and use resolver fallbacks.
-    }
-
-    this._resolvedRipgrepPath = resolveRipgrepBinary({
-      projectRoot: this.config.projectRoot || process.cwd(),
-      preferredPath: process.env.RG_BIN,
-      vscodeRgPath,
-    });
-
-    return this._resolvedRipgrepPath;
+    return getRipgrepPath(this);
   }
 
   /**
@@ -665,12 +338,7 @@ class ContextualMemory {
    * @returns {string|null} Path to ast-grep binary or null if unavailable
    */
   _getAstGrepPath() {
-    if (this._resolvedAstGrepPath !== undefined) return this._resolvedAstGrepPath;
-    this._resolvedAstGrepPath = resolveAstGrepBinary({
-      projectRoot: this.config.projectRoot || process.cwd(),
-      preferredPath: process.env.AST_GREP_BIN,
-    });
-    return this._resolvedAstGrepPath || 'ast-grep';
+    return getAstGrepPath(this);
   }
 
   /**
@@ -680,18 +348,7 @@ class ContextualMemory {
    * @returns {Promise<boolean>}
    */
   async _checkBinaryAvailable(binPath) {
-    return new Promise(resolve => {
-      const proc = spawn(binPath, ['--version'], {
-        stdio: ['ignore', 'pipe', 'pipe'],
-        windowsHide: true,
-      });
-      proc.on('error', () => resolve(false));
-      proc.on('close', code => resolve(code === 0));
-      setTimeout(() => {
-        proc.kill();
-        resolve(false);
-      }, 5000);
-    });
+    return await checkBinaryAvailable(binPath);
   }
 
   /**
@@ -703,76 +360,7 @@ class ContextualMemory {
    * @returns {Promise<Array>}
    */
   async _searchWithRipgrep(query, files, limit) {
-    const rgPath = this._getRipgrepPath();
-    if (!rgPath) return [];
-
-    const available = await this._checkBinaryAvailable(rgPath);
-    if (!available) return [];
-
-    const memoryDir = this.config.memoryDir;
-    const candidates = [];
-
-    // Build ripgrep command: search query in specific files
-    const args = [
-      '-i', // case-insensitive
-      '-n', // line numbers
-      '-C',
-      '2', // context lines
-      '--', // end of options
-      query,
-    ];
-
-    // Add file paths (absolute)
-    for (const rel of files) {
-      const abs = path.join(memoryDir, rel);
-      if (fs.existsSync(abs)) {
-        args.push(abs);
-      }
-    }
-
-    if (args.length === 5) return []; // No files to search
-
-    return new Promise(resolve => {
-      const proc = spawn(rgPath, args, {
-        cwd: memoryDir,
-        stdio: ['ignore', 'pipe', 'pipe'],
-        windowsHide: true,
-      });
-
-      let stdout = '';
-      proc.stdout.on('data', data => {
-        stdout += data.toString();
-      });
-
-      proc.on('close', code => {
-        // ripgrep returns 1 when no matches found (not an error)
-        if (code !== 0 && code !== 1) {
-          resolve([]);
-          return;
-        }
-
-        // Parse ripgrep output: "file:line:context"
-        const lines = stdout.split('\n').filter(l => l.trim());
-        for (const line of lines.slice(0, limit * 3)) {
-          // Format: "path/to/file:123:  context line"
-          const match = line.match(/^(.+?):(\d+):(.*)$/);
-          if (match) {
-            const [, filePath, , content] = match;
-            const rel = path.relative(memoryDir, filePath).replace(/\\/g, '/');
-            candidates.push({
-              content: content.trim(),
-              metadata: { path: rel },
-              similarity: null,
-              source: 'ripgrep',
-            });
-          }
-        }
-
-        resolve(candidates.slice(0, limit));
-      });
-
-      proc.on('error', () => resolve([]));
-    });
+    return await searchWithRipgrep(this, query, files, limit);
   }
 
   /**
@@ -788,83 +376,7 @@ class ContextualMemory {
    * @returns {Promise<Array>}
    */
   async _keywordSearch(query, options = {}) {
-    const limit = typeof options.limit === 'number' ? options.limit : 5;
-    const q = String(query || '')
-      .trim()
-      .toLowerCase();
-    if (!q) return [];
-
-    // Keep file set explicit to avoid scanning large directories.
-    const files = [
-      'learnings.md',
-      'decisions.md',
-      'issues.md',
-      'active_context.md',
-      'gotchas.json',
-      'patterns.json',
-      'codebase_map.json',
-    ];
-
-    // Include some recent sessions and MTM entries (bounded).
-    for (const dir of ['mtm']) {
-      const absDir = path.join(this.config.memoryDir, dir);
-      try {
-        if (!fs.existsSync(absDir)) continue;
-        const names = fs
-          .readdirSync(absDir)
-          .filter(n => n.endsWith('.json'))
-          .sort()
-          .slice(-10);
-        for (const n of names) files.push(path.join(dir, n));
-      } catch {
-        // ignore
-      }
-    }
-
-    // Try ripgrep first (fastest for text search)
-    const ripgrepResults = await this._searchWithRipgrep(q, files, limit);
-    if (ripgrepResults.length > 0) {
-      return ripgrepResults;
-    }
-
-    // Fallback to file-read approach (original implementation)
-    const candidates = [];
-    const MAX_BYTES = 80_000;
-
-    for (const rel of files) {
-      const abs = path.join(this.config.memoryDir, rel);
-      try {
-        if (!fs.existsSync(abs)) continue;
-        const stat = fs.statSync(abs);
-        const start = stat.size > MAX_BYTES ? stat.size - MAX_BYTES : 0;
-        const fd = fs.openSync(abs, 'r');
-        try {
-          const buf = Buffer.alloc(stat.size - start);
-          fs.readSync(fd, buf, 0, buf.length, start);
-          const text = buf.toString('utf8');
-          const lower = text.toLowerCase();
-          const idx = lower.indexOf(q);
-          if (idx === -1) continue;
-
-          const snippetStart = Math.max(0, idx - 100);
-          const snippetEnd = Math.min(text.length, idx + q.length + 300);
-          const snippet = text.slice(snippetStart, snippetEnd).trim();
-
-          candidates.push({
-            content: snippet,
-            metadata: { path: rel },
-            similarity: null,
-            source: 'keyword',
-          });
-        } finally {
-          fs.closeSync(fd);
-        }
-      } catch {
-        // ignore unreadable file
-      }
-    }
-
-    return candidates.slice(0, limit);
+    return await keywordSearch(this, query, options);
   }
 
   /**

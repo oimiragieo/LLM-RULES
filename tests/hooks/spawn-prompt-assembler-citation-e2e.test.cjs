@@ -7,6 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
+const tokenSaverWrapper = require('../../.claude/skills/token-saver-context-compression/scripts/main.cjs');
 
 const HOOK_PATH = path.join(
   PROJECT_ROOT,
@@ -15,14 +16,13 @@ const HOOK_PATH = path.join(
   'routing',
   'spawn-prompt-assembler.cjs'
 );
-const RAG_PRELOAD_PATH = path.join(PROJECT_ROOT, 'tests', 'fixtures', 'spawn-rag-memory-stub.preload.cjs');
-const MEMORY_GOTCHAS_PATH = path.join(
+const RAG_PRELOAD_PATH = path.join(
   PROJECT_ROOT,
-  '.claude',
-  'context',
-  'memory',
-  'gotchas.json'
+  'tests',
+  'fixtures',
+  'spawn-rag-memory-stub.preload.cjs'
 );
+const MEMORY_GOTCHAS_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'gotchas.json');
 
 async function withTemporaryFile(filePath, temporaryContents, fn) {
   const dir = path.dirname(filePath);
@@ -107,7 +107,12 @@ function buildTaskInput(overrides = {}) {
 
 test('hook e2e injects memory evidence IDs [mem:xxxxxxxx] for tier memory', async () => {
   const seededGotchas = JSON.stringify(
-    [{ text: 'MEM_E2E_SENTINEL_ALWAYS_USE_TASKUPDATE_FIRST', timestamp: '2026-02-15T00:00:00.000Z' }],
+    [
+      {
+        text: 'MEM_E2E_SENTINEL_ALWAYS_USE_TASKUPDATE_FIRST',
+        timestamp: '2026-02-15T00:00:00.000Z',
+      },
+    ],
     null,
     2
   );
@@ -118,7 +123,11 @@ test('hook e2e injects memory evidence IDs [mem:xxxxxxxx] for tier memory', asyn
     const prompt = output.tool_input.prompt;
 
     assert.match(prompt, /\[mem:[a-f0-9]{8}\]/, 'Expected memory evidence ID in injected prompt');
-    assert.doesNotMatch(prompt, /\[rag:[a-f0-9]{8}\]/, 'RAG evidence should be absent when disabled');
+    assert.doesNotMatch(
+      prompt,
+      /\[rag:[a-f0-9]{8}\]/,
+      'RAG evidence should be absent when disabled'
+    );
   });
 });
 
@@ -126,7 +135,7 @@ test('hook e2e injects RAG evidence IDs [rag:xxxxxxxx] when RAG search returns m
   const result = await runHook(
     buildTaskInput({ task_id: 'e2e-citation-002' }),
     {
-    RAG_AT_SPAWN: 'on',
+      RAG_AT_SPAWN: 'on',
     },
     [RAG_PRELOAD_PATH]
   );
@@ -139,4 +148,36 @@ test('hook e2e injects RAG evidence IDs [rag:xxxxxxxx] when RAG search returns m
     /RAG_E2E_SENTINEL_USE_CANONICAL_TASKUPDATE_FLOW/,
     'Expected stubbed RAG sentinel content in prompt'
   );
+});
+
+test('hook e2e injects [mem:*] from wrapper-distilled memory payloads', async () => {
+  const memoryRecords = tokenSaverWrapper.mapCompressionToMemoryRecords(
+    {
+      findings: [
+        { text: 'Gotcha: WRAPPER_DISTILLED_SENTINEL_ALWAYS_EMIT_TASKUPDATE_FIRST' },
+        { text: 'Use canonical lifecycle transitions for reliability' },
+      ],
+    },
+    { query: 'task lifecycle reliability' }
+  );
+
+  const seededGotchas = JSON.stringify(memoryRecords.gotchas, null, 2);
+  const seededPatterns = JSON.stringify(memoryRecords.patterns, null, 2);
+  const patternsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'patterns.json');
+
+  await withTemporaryFile(MEMORY_GOTCHAS_PATH, seededGotchas, async () => {
+    await withTemporaryFile(patternsPath, seededPatterns, async () => {
+      const result = await runHook(buildTaskInput({ task_id: 'e2e-citation-003' }), {
+        RAG_AT_SPAWN: 'off',
+      });
+      const output = parseHookOutput(result);
+      const prompt = output.tool_input.prompt;
+
+      assert.match(
+        prompt,
+        /\[mem:[a-f0-9]{8}\]/,
+        'Expected memory evidence IDs from wrapper-distilled payload'
+      );
+    });
+  });
 });

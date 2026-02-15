@@ -1,0 +1,106 @@
+'use strict';
+
+function getDefaultTools(_agentType) {
+  return ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill'];
+}
+
+const DOMAIN_MAPPING = {
+  tdd: 'code',
+  debugging: 'code',
+  implementation: 'code',
+  refactoring: 'code',
+  'code-review': 'code',
+  'code-reviewer': 'code',
+  'code-simplifier': 'code',
+  'code-quality': 'code',
+  'code-analyzer': 'code',
+  'qa-workflow': 'testing',
+  testing: 'testing',
+  test: 'testing',
+  qa: 'testing',
+  'security-architect': 'security',
+  security: 'security',
+  owasp: 'security',
+  'threat-modeling': 'security',
+  auth: 'security',
+  'auth-security': 'security',
+  devops: 'devops',
+  infrastructure: 'devops',
+  'ci-cd': 'devops',
+  deployment: 'devops',
+  docker: 'devops',
+  kubernetes: 'devops',
+  incident: 'devops',
+  research: 'research',
+  'fact-finding': 'research',
+  researcher: 'research',
+  scientific: 'research',
+  documentation: 'documentation',
+  'technical-writing': 'documentation',
+  'technical-writer': 'documentation',
+  docs: 'documentation',
+  architecture: 'architecture',
+  'system-design': 'architecture',
+  c4: 'architecture',
+  architect: 'architecture',
+  database: 'database',
+  schema: 'database',
+  sql: 'database',
+  'data-engineer': 'database',
+  react: 'frontend',
+  vue: 'frontend',
+  angular: 'frontend',
+  frontend: 'frontend',
+  nextjs: 'frontend',
+  svelte: 'frontend',
+  sveltekit: 'frontend',
+  nodejs: 'backend',
+  express: 'backend',
+  fastapi: 'backend',
+  django: 'backend',
+  spring: 'backend',
+  laravel: 'backend',
+  php: 'backend',
+  java: 'backend',
+  python: 'backend',
+  golang: 'backend',
+  rust: 'backend',
+  go: 'backend',
+  ios: 'mobile',
+  android: 'mobile',
+  'react-native': 'mobile',
+  expo: 'mobile',
+  mobile: 'mobile',
+  tauri: 'mobile',
+  ai: 'ai-ml',
+  ml: 'ai-ml',
+  'machine-learning': 'ai-ml',
+  'deep-learning': 'ai-ml',
+  'ai-ml': 'ai-ml',
+  web3: 'blockchain',
+  blockchain: 'blockchain',
+  defi: 'blockchain',
+  'smart-contracts': 'blockchain',
+  orchestration: 'orchestration',
+  swarm: 'orchestration',
+  'multi-agent': 'orchestration',
+  orchestrator: 'orchestration',
+  coordinator: 'orchestration',
+  planning: 'planning',
+  planner: 'planning',
+  roadmap: 'planning',
+  'project-management': 'planning',
+  pm: 'planning',
+};
+
+function normalizeModelName(model) {
+  if (!model) return 'sonnet';
+  const modelLower = model.toLowerCase();
+  if (modelLower.includes('haiku')) return 'haiku';
+  if (modelLower.includes('sonnet')) return 'sonnet';
+  if (modelLower.includes('opus')) return 'opus';
+  if (['haiku', 'sonnet', 'opus'].includes(modelLower)) return modelLower;
+  return 'sonnet';
+}
+
+module.exports = { getDefaultTools, DOMAIN_MAPPING, normalizeModelName };

@@ -13,8 +13,9 @@
  */
 
 import { readFile, readdir, stat } from 'fs/promises';
-import { join, dirname, relative, extname, _sep } from 'path';
+import { join, dirname, relative, extname } from 'path';
 import { fileURLToPath } from 'url';
+import { formatMarkdown, showHelp, validateOutputSchema } from './search-formatters.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(__dirname, '../../../..');
@@ -60,33 +61,6 @@ function parseArgs(args) {
   }
 
   return parsed;
-}
-
-/**
- * Show help message
- */
-function showHelp() {
-  console.log(`
-Repo RAG - High-recall codebase retrieval
-
-Usage:
-  node search.mjs --query "search query" [options]
-
-Options:
-  --query <query>       Search query (required)
-  --path <path>         Target directory to search (default: current dir)
-  --limit <n>           Maximum results to return (default: 10)
-  --type <type>         Search type: hybrid, keyword, symbol, semantic, path (default: hybrid)
-  --extensions <exts>   Comma-separated file extensions (default: ts,tsx,js,jsx,py,mjs,cjs,vue,svelte)
-  --format <format>     Output format: json, markdown (default: json)
-  --threshold <n>       Minimum relevance score 0-1 (default: 0.3)
-
-Examples:
-  node search.mjs --query "authentication patterns"
-  node search.mjs --query "class UserService" --type symbol
-  node search.mjs --query "error handling" --path src/ --limit 20
-  node search.mjs --query "authentication middleware" --extensions ts,js
-  `);
 }
 
 /**
@@ -560,95 +534,18 @@ function rankResults(results, limit, threshold) {
 }
 
 /**
- * Calculate summary statistics
- */
-function calculateSummary(results, _files) {
-  const topFiles = [...new Set(results.map(r => r.file))].slice(0, 5);
-
-  const symbolTypes = new Set();
-  results.forEach(r => {
-    if (r.symbol) {
-      symbolTypes.add(r.symbol.type);
-    }
-  });
-
-  const matchTypes = new Map();
-  results.forEach(r => {
-    matchTypes.set(r.match_type, (matchTypes.get(r.match_type) || 0) + 1);
-  });
-
-  return {
-    top_files: topFiles,
-    symbol_types_found: Array.from(symbolTypes),
-    match_type_distribution: Object.fromEntries(matchTypes),
-    recommendations: generateRecommendations(results),
-  };
-}
-
-/**
- * Generate recommendations based on results
- */
-function generateRecommendations(results) {
-  const recommendations = [];
-
-  if (results.length === 0) {
-    recommendations.push('No results found. Try broadening your search query.');
-  } else if (results.length < 3) {
-    recommendations.push('Few results found. Consider using semantic search or hybrid mode.');
-  }
-
-  const symbolMatches = results.filter(r => r.match_type === 'symbol').length;
-  if (symbolMatches > results.length * 0.7) {
-    recommendations.push('Most matches are symbols. Consider reviewing symbol definitions.');
-  }
-
-  const avgScore = results.reduce((sum, r) => sum + r.relevance_score, 0) / results.length;
-  if (avgScore < 0.5) {
-    recommendations.push(
-      'Low average relevance. Try refining your query with more specific terms.'
-    );
-  }
-
-  return recommendations;
-}
-
-/**
- * Validate output against schema
- */
-async function validateOutput(output, schemaPath) {
-  try {
-    const schemaContent = await readFile(join(PROJECT_ROOT, schemaPath), 'utf-8');
-    const schema = JSON.parse(schemaContent);
-
-    // Basic validation - check required fields
-    const requiredFields = schema.required || [];
-    for (const field of requiredFields) {
-      if (!(field in output)) {
-        console.error(`Missing required field: ${field}`);
-        return false;
-      }
-    }
-    return true;
-  } catch (err) {
-    console.error('Schema validation failed:', err.message);
-    return false;
-  }
-}
-
-/**
  * Format output according to schema
  */
 function formatOutput(query, files, searchResults, args) {
-  const { results, _strategiesUsed, duration } = searchResults;
+  const { results, duration } = searchResults;
   const rankedResults = rankResults(results, args.limit, args.threshold);
-  const _summary = calculateSummary(rankedResults, files);
 
   return {
     skill_name: 'repo-rag',
     query,
     query_type: args.type,
     results_count: rankedResults.length,
-    files_searched: files.map(f => f.relativePath).slice(0, 100), // Limit to first 100 files
+    files_searched: files.map(f => f.relativePath).slice(0, 100),
     semantic_matches: rankedResults.map(r => ({
       file: r.file,
       line_start: r.line,
@@ -669,50 +566,6 @@ function formatOutput(query, files, searchResults, args) {
     },
     timestamp: new Date().toISOString(),
   };
-}
-
-/**
- * Format as markdown
- */
-function formatMarkdown(output) {
-  const lines = [];
-
-  lines.push('# Repo RAG Search Results\n');
-  lines.push(`**Query**: ${output.input.query}`);
-  lines.push(`**Strategy**: ${output.search.strategies_used.join(', ')}`);
-  lines.push(`**Files Scanned**: ${output.search.files_scanned}`);
-  lines.push(`**Matches Found**: ${output.search.matches_found}`);
-  lines.push(`**Duration**: ${output.execution.duration_ms}ms\n`);
-
-  if (output.results.length === 0) {
-    lines.push('*No results found.*\n');
-  } else {
-    lines.push('## Results\n');
-
-    output.results.forEach((result, idx) => {
-      lines.push(`### ${idx + 1}. ${result.file}:${result.line}`);
-      lines.push(`- **Type**: ${result.match_type}`);
-      lines.push(`- **Relevance**: ${(result.relevance_score * 100).toFixed(0)}%`);
-
-      if (result.symbol) {
-        lines.push(`- **Symbol**: ${result.symbol.type} \`${result.symbol.name}\``);
-      }
-
-      lines.push('\n```');
-      lines.push(result.snippet);
-      lines.push('```\n');
-    });
-  }
-
-  if (output.summary.recommendations.length > 0) {
-    lines.push('## Recommendations\n');
-    output.summary.recommendations.forEach(rec => {
-      lines.push(`- ${rec}`);
-    });
-    lines.push('');
-  }
-
-  return lines.join('\n');
 }
 
 /**
@@ -745,8 +598,8 @@ async function main() {
     const output = formatOutput(args.query, files, searchResults, args);
 
     // Validate output
-    const schemaPath = '.claude/schemas/skill-repo-rag-output.schema.json';
-    const isValid = await validateOutput(output, schemaPath);
+    const schemaPath = join(PROJECT_ROOT, 'schemas/skill-repo-rag-output.schema.json');
+    const isValid = await validateOutputSchema(output, schemaPath, readFile);
 
     if (!isValid) {
       console.error('Warning: Output does not conform to schema');

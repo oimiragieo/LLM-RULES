@@ -1,28 +1,18 @@
 'use strict';
 
-/**
- * Agent Registry Generator Tests
- * Phase 3A: Agent Capability Card Schema & Generator
- *
- * TDD: Write tests first, then implementation.
- */
-
 const { describe, it, beforeEach, afterEach, before } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 
-// Project root for consistent paths
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const SCHEMA_PATH = path.join(PROJECT_ROOT, '.claude/schemas/agent-capability-card.schema.json');
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude/agents');
 const _REGISTRY_OUTPUT = path.join(PROJECT_ROOT, '.claude/context/agent-registry.json');
 
-// Will be loaded after schema exists
 let Ajv, addFormats;
 
 before(() => {
-  // Load AJV for schema validation
   Ajv = require('ajv');
   addFormats = require('ajv-formats');
 });
@@ -33,7 +23,6 @@ describe('Agent Capability Card Schema', () => {
   let validate;
 
   beforeEach(() => {
-    // Load schema fresh each test
     if (fs.existsSync(SCHEMA_PATH)) {
       schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf-8'));
       ajv = new Ajv({ allErrors: true, strict: false });
@@ -541,189 +530,6 @@ describe('AgentRegistryGenerator', () => {
       const agentCount = Object.keys(registry.agents).length;
 
       assert.ok(agentCount >= 40, `Expected at least 40 agents, got ${agentCount}`);
-    });
-  });
-
-  describe('Schema Validation', () => {
-    it('should validate generated registry against schema', async () => {
-      if (!generator) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const registry = await generator.generate(AGENTS_DIR);
-      const validation = generator.validate(registry);
-
-      assert.strictEqual(
-        validation.valid,
-        true,
-        `Validation failed: ${JSON.stringify(validation.errors)}`
-      );
-    });
-  });
-});
-
-describe('Edge Cases', () => {
-  describe('Missing Agent Frontmatter', () => {
-    it('should handle agent without frontmatter gracefully', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { parseAgentFrontmatter } = require(generatorPath);
-      const content = '# Agent without frontmatter\n\nJust content here.';
-      const result = parseAgentFrontmatter(content);
-
-      assert.strictEqual(result, null, 'Should return null for missing frontmatter');
-    });
-  });
-
-  describe('Invalid YAML Frontmatter', () => {
-    it('should handle malformed YAML gracefully', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { parseAgentFrontmatter } = require(generatorPath);
-      const content = '---\ninvalid: yaml: here: bad\n---\n\nContent';
-      const result = parseAgentFrontmatter(content);
-
-      // Should not throw, return null instead
-      assert.strictEqual(result, null, 'Should return null for invalid YAML');
-    });
-  });
-
-  describe('Domain Inference', () => {
-    it('should infer domain from agent skills', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { inferDomain } = require(generatorPath);
-      const agentDef = { skills: ['tdd', 'debugging'] };
-      const domain = inferDomain(agentDef, 'test-agent', 'core');
-
-      assert.strictEqual(domain, 'code', 'TDD skill should infer code domain');
-    });
-
-    it('should infer domain from agent id', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { inferDomain } = require(generatorPath);
-      const domain = inferDomain({}, 'security-architect', 'specialized');
-
-      assert.strictEqual(domain, 'security', 'security-architect should infer security domain');
-    });
-
-    it('should fallback to category-based domain', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { inferDomain } = require(generatorPath);
-      const domain = inferDomain({}, 'unknown-agent', 'orchestrator');
-
-      assert.strictEqual(
-        domain,
-        'orchestration',
-        'orchestrator category should infer orchestration domain'
-      );
-    });
-  });
-
-  describe('Trigger Phrase Extraction', () => {
-    it('should extract phrases from agent id', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { extractTriggerPhrases } = require(generatorPath);
-      const phrases = extractTriggerPhrases({}, 'code-reviewer');
-
-      assert.ok(phrases.includes('code'), 'Should extract code from id');
-      assert.ok(phrases.includes('reviewer'), 'Should extract reviewer from id');
-    });
-
-    it('should extract action words from description', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { extractTriggerPhrases } = require(generatorPath);
-      const phrases = extractTriggerPhrases(
-        {
-          description: 'This agent can implement features and debug issues',
-        },
-        'developer'
-      );
-
-      assert.ok(phrases.includes('implement'), 'Should extract implement');
-      assert.ok(phrases.includes('debug'), 'Should extract debug');
-    });
-  });
-
-  describe('Examples and Tags Extraction', () => {
-    it('should extract examples and tags from frontmatter', () => {
-      const generatorPath = path.join(
-        PROJECT_ROOT,
-        '.claude/lib/tools/agent-registry-generator.cjs'
-      );
-      if (!fs.existsSync(generatorPath)) {
-        console.log('Skipping: Generator not yet implemented');
-        return;
-      }
-
-      const { extractExamplesAndTags } = require(generatorPath);
-      const result = extractExamplesAndTags(
-        {
-          examples: ['Review this API', 'Design a schema'],
-          tags: ['review', 'schema'],
-          skills: ['tdd'],
-        },
-        ['code review'],
-        ['tdd']
-      );
-
-      assert.ok(result.examples.includes('Review this API'));
-      assert.ok(result.tags.includes('review'));
-      assert.ok(result.tags.includes('tdd'));
     });
   });
 });

@@ -1,7 +1,9 @@
 ---
 name: tauri-desktop-developer
 version: 1.0.0
-description: Tauri 2.0 desktop application development expert with Rust backend and web frontend integration. Use for building cross-platform desktop apps, native system integrations, and secure desktop applications.
+description: >-
+  Tauri 2.0 desktop application development expert with Rust backend and web frontend integration. Use for building
+  cross-platform desktop apps, native system integrations, and secure desktop applications.
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
@@ -26,6 +28,7 @@ tools:
 skills:
   - task-management-protocol
   - code-semantic-search
+  - token-saver-context-compression
   - code-structural-search
   - debugging
   - git-expert
@@ -41,6 +44,8 @@ skills:
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Tauri Desktop Developer Agent
 
@@ -377,6 +382,18 @@ This agent can search code efficiently using the hybrid search system:
 | ripgrep                | <10ms  | ~70%     | Keyword filtering      |
 | code-semantic-search   | <150ms | ~95%     | General code discovery |
 | code-structural-search | <50ms  | 100%     | Exact pattern matching |
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

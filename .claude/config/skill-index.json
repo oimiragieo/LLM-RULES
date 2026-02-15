@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-14T18:12:57.972Z",
+  "generatedAt": "2026-02-15T09:14:39.829Z",
   "metadata": {
-    "totalSkills": 383,
+    "totalSkills": 385,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-14T18:12:57.973Z",
+    "lastValidated": "2026-02-15T09:14:39.829Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -373,94 +373,12 @@
       "priority": 3,
       "aliasOf": null
     },
-    "task-management-protocol": {
-      "name": "task-management-protocol",
-      "displayName": "Task Management Protocol",
-      "category": "Other",
-      "domain": "specialized",
-      "description": "Other - task-management-protocol",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "planner",
-        "architect",
-        "qa",
-        "pm",
-        "python-pro",
-        "rust-pro",
-        "golang-pro",
-        "typescript-pro",
-        "fastapi-pro",
-        "frontend-pro",
-        "nodejs-pro",
-        "ios-pro",
-        "java-pro",
-        "nextjs-pro",
-        "php-pro",
-        "sveltekit-expert",
-        "tauri-desktop-developer",
-        "expo-mobile-developer",
-        "data-engineer",
-        "graphql-pro",
-        "mobile-ux-reviewer",
-        "security-architect",
-        "devops",
-        "devops-troubleshooter",
-        "incident-responder",
-        "c4-context",
-        "c4-container",
-        "c4-component",
-        "c4-code",
-        "conductor-validator",
-        "reverse-engineer",
-        "database-architect",
-        "master-orchestrator",
-        "swarm-coordinator",
-        "evolution-orchestrator"
-      ],
-      "agentSupporting": [
-        "router"
-      ],
-      "tags": [
-        "specialized",
-        "other",
-        "task-management-protocol"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "context-driven-development": {
-      "name": "context-driven-development",
-      "displayName": "Context Driven Development",
-      "category": "Other",
-      "domain": "memory",
-      "description": "Other - context-driven-development",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "conductor-validator"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "memory",
-        "other",
-        "context-driven-development"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "pipeline-reflection-ux": {
-      "name": "pipeline-reflection-ux",
-      "displayName": "Pipeline Reflection Ux",
+    "token-saver-context-compression": {
+      "name": "token-saver-context-compression",
+      "displayName": "Token Saver Context Compression",
       "category": "Other",
       "domain": "other",
-      "description": "Other - pipeline-reflection-ux",
+      "description": "Other - token-saver-context-compression",
       "requiredTools": [
         "Read",
         "Write",
@@ -472,7 +390,7 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "pipeline-reflection-ux"
+        "token-saver-context-compression"
       ],
       "priority": 3,
       "aliasOf": null
@@ -804,6 +722,28 @@
         "arxiv-mcp"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "assimilate": {
+      "name": "assimilate",
+      "displayName": "Assimilate",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - assimilate",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "assimilate"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "async-operations": {
@@ -1322,6 +1262,29 @@
       "tags": [
         "memory",
         "context-compressor"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
+    "context-driven-development": {
+      "name": "context-driven-development",
+      "displayName": "Context Driven Development",
+      "category": "Other",
+      "domain": "memory",
+      "description": "Other - context-driven-development",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "conductor-validator"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "memory",
+        "other",
+        "context-driven-development"
       ],
       "priority": 1,
       "aliasOf": null
@@ -2485,6 +2448,28 @@
         "php-expert"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "pipeline-reflection-ux": {
+      "name": "pipeline-reflection-ux",
+      "displayName": "Pipeline Reflection Ux",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - pipeline-reflection-ux",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "pipeline-reflection-ux"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "plan-generator": {
@@ -6618,6 +6603,65 @@
       "priority": 3,
       "aliasOf": null
     },
+    "task-management-protocol": {
+      "name": "task-management-protocol",
+      "displayName": "Task Management Protocol",
+      "category": "Other",
+      "domain": "specialized",
+      "description": "Other - task-management-protocol",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "planner",
+        "architect",
+        "qa",
+        "pm",
+        "python-pro",
+        "rust-pro",
+        "golang-pro",
+        "typescript-pro",
+        "fastapi-pro",
+        "frontend-pro",
+        "nodejs-pro",
+        "ios-pro",
+        "java-pro",
+        "nextjs-pro",
+        "php-pro",
+        "sveltekit-expert",
+        "tauri-desktop-developer",
+        "expo-mobile-developer",
+        "data-engineer",
+        "graphql-pro",
+        "mobile-ux-reviewer",
+        "security-architect",
+        "devops",
+        "devops-troubleshooter",
+        "incident-responder",
+        "c4-context",
+        "c4-container",
+        "c4-component",
+        "c4-code",
+        "conductor-validator",
+        "reverse-engineer",
+        "database-architect",
+        "master-orchestrator",
+        "swarm-coordinator",
+        "evolution-orchestrator"
+      ],
+      "agentSupporting": [
+        "router"
+      ],
+      "tags": [
+        "specialized",
+        "other",
+        "task-management-protocol"
+      ],
+      "priority": 1,
+      "aliasOf": null
+    },
     "tauri-security-rules": {
       "name": "tauri-security-rules",
       "displayName": "Tauri Security Rules",
@@ -9174,10 +9218,11 @@
         "tauri-native-api-integration",
         "gamedev-expert",
         "artifact-integrator",
-        "pipeline-reflection-ux",
+        "token-saver-context-compression",
         "code-structural-search",
         "advanced-elicitation",
         "function-length-and-responsibility",
+        "assimilate",
         "best-practices-guidelines",
         "build-tools-expert",
         "code-semantic-search",
@@ -9192,6 +9237,7 @@
         "form-validation-with-zod",
         "insecure-defaults",
         "integration/artifact-updater",
+        "pipeline-reflection-ux",
         "planning-with-files",
         "prd-generator",
         "restcontroller-conventions",
@@ -9406,33 +9452,17 @@
         "library-usage",
         "unit-testing-requirement"
       ],
-      "specialized": [
-        "task-management-protocol",
-        "consensus-voting",
-        "dependency-analyzer",
-        "filesystem",
-        "insight-extraction",
-        "sequential-thinking",
-        "skill-discovery",
-        "smart-debug",
-        "summarize-changes",
-        "swarm-coordination",
-        "thinking-tools",
-        "tool-search",
-        "track-management",
-        "workflow-patterns",
-        "subagent-driven-development",
-        "codebase-integration",
-        "repo-rag",
-        "requesting-code-review",
-        "receiving-code-review",
-        "dispatching-parallel-agents",
-        "executing-plans"
+      "requirements": [
+        "interactive-requirements-gathering",
+        "spec-gathering",
+        "progressive-disclosure",
+        "spec-writing",
+        "spec-critique"
       ],
       "memory": [
-        "context-driven-development",
         "project-onboarding",
         "context-compressor",
+        "context-driven-development",
         "framework-context",
         "project-analyzer",
         "recommend-evolution",
@@ -9441,13 +9471,6 @@
         "operational-modes",
         "context-files-rules",
         "history-and-next-task-rules"
-      ],
-      "requirements": [
-        "interactive-requirements-gathering",
-        "spec-gathering",
-        "progressive-disclosure",
-        "spec-writing",
-        "spec-critique"
       ],
       "styling": [
         "accessibility",
@@ -9520,6 +9543,29 @@
         "telegram-bot-api-rules",
         "agp-router-rules"
       ],
+      "specialized": [
+        "consensus-voting",
+        "dependency-analyzer",
+        "filesystem",
+        "insight-extraction",
+        "sequential-thinking",
+        "skill-discovery",
+        "smart-debug",
+        "summarize-changes",
+        "swarm-coordination",
+        "task-management-protocol",
+        "thinking-tools",
+        "tool-search",
+        "track-management",
+        "workflow-patterns",
+        "subagent-driven-development",
+        "codebase-integration",
+        "repo-rag",
+        "requesting-code-review",
+        "receiving-code-review",
+        "dispatching-parallel-agents",
+        "executing-plans"
+      ],
       "scientific": [
         "scientific-skills"
       ]
@@ -9539,9 +9585,7 @@
         "gamedev-expert",
         "code-style-validator",
         "artifact-integrator",
-        "task-management-protocol",
-        "context-driven-development",
-        "pipeline-reflection-ux",
+        "token-saver-context-compression",
         "interactive-requirements-gathering",
         "project-onboarding",
         "code-structural-search",
@@ -9550,6 +9594,7 @@
         "accessibility",
         "api-development-expert",
         "artifact-lifecycle",
+        "assimilate",
         "async-operations",
         "best-practices-guidelines",
         "binary-analysis-patterns",
@@ -9564,6 +9609,7 @@
         "configuration-management",
         "container-expert",
         "containerization-rules",
+        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
@@ -9601,6 +9647,7 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
+        "pipeline-reflection-ux",
         "planning-with-files",
         "postmortem-writing",
         "prd-generator",
@@ -9770,6 +9817,7 @@
         "summarize-changes",
         "svelte-expert",
         "tall-stack-general",
+        "task-management-protocol",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -9974,9 +10022,7 @@
         "git-expert",
         "code-style-validator",
         "artifact-integrator",
-        "task-management-protocol",
-        "context-driven-development",
-        "pipeline-reflection-ux",
+        "token-saver-context-compression",
         "interactive-requirements-gathering",
         "project-onboarding",
         "code-structural-search",
@@ -9990,6 +10036,7 @@
         "architecture-review",
         "artifact-lifecycle",
         "arxiv-mcp",
+        "assimilate",
         "async-operations",
         "auth-security-expert",
         "aws-cloud-ops",
@@ -10011,6 +10058,7 @@
         "container-expert",
         "containerization-rules",
         "context-compressor",
+        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
@@ -10058,6 +10106,7 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
+        "pipeline-reflection-ux",
         "plan-generator",
         "planning-with-files",
         "postmortem-writing",
@@ -10240,6 +10289,7 @@
         "svelte-expert",
         "swarm-coordination",
         "tall-stack-general",
+        "task-management-protocol",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -10394,9 +10444,7 @@
         "gamedev-expert",
         "git-expert",
         "artifact-integrator",
-        "task-management-protocol",
-        "context-driven-development",
-        "pipeline-reflection-ux",
+        "token-saver-context-compression",
         "interactive-requirements-gathering",
         "project-onboarding",
         "code-structural-search",
@@ -10409,6 +10457,7 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
+        "assimilate",
         "async-operations",
         "auth-security-expert",
         "best-practices-guidelines",
@@ -10428,6 +10477,7 @@
         "container-expert",
         "containerization-rules",
         "context-compressor",
+        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
@@ -10473,6 +10523,7 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
+        "pipeline-reflection-ux",
         "plan-generator",
         "planning-with-files",
         "postmortem-writing",
@@ -10654,6 +10705,7 @@
         "svelte-expert",
         "swarm-coordination",
         "tall-stack-general",
+        "task-management-protocol",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -10764,9 +10816,7 @@
         "gamedev-expert",
         "git-expert",
         "artifact-integrator",
-        "task-management-protocol",
-        "context-driven-development",
-        "pipeline-reflection-ux",
+        "token-saver-context-compression",
         "interactive-requirements-gathering",
         "project-onboarding",
         "code-structural-search",
@@ -10779,6 +10829,7 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
+        "assimilate",
         "async-operations",
         "auth-security-expert",
         "best-practices-guidelines",
@@ -10796,6 +10847,7 @@
         "consensus-voting",
         "container-expert",
         "containerization-rules",
+        "context-driven-development",
         "cpp",
         "creators/command-creator",
         "creators/rule-creator",
@@ -10841,6 +10893,7 @@
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
+        "pipeline-reflection-ux",
         "planning-with-files",
         "postmortem-writing",
         "prd-generator",
@@ -11018,6 +11071,7 @@
         "svelte-expert",
         "swarm-coordination",
         "tall-stack-general",
+        "task-management-protocol",
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
@@ -11253,7 +11307,7 @@
         "writing-skills",
         "gamedev-expert",
         "artifact-integrator",
-        "pipeline-reflection-ux",
+        "token-saver-context-compression",
         "interactive-requirements-gathering",
         "project-onboarding",
         "code-structural-search",
@@ -11261,6 +11315,7 @@
         "function-length-and-responsibility",
         "ai-ml-expert",
         "android-expert",
+        "assimilate",
         "async-operations",
         "aws-cloud-ops",
         "best-practices-guidelines",
@@ -11295,6 +11350,7 @@
         "k8s-security-policies",
         "logging-module-usage",
         "pandas-data-manipulation-rules",
+        "pipeline-reflection-ux",
         "planning-with-files",
         "prd-generator",
         "prioritize-python-3-10-features",
@@ -12019,7 +12075,7 @@
         "writing-skills",
         "gamedev-expert",
         "artifact-integrator",
-        "pipeline-reflection-ux",
+        "token-saver-context-compression",
         "interactive-requirements-gathering",
         "project-onboarding",
         "code-structural-search",
@@ -12027,6 +12083,7 @@
         "function-length-and-responsibility",
         "ai-ml-expert",
         "android-expert",
+        "assimilate",
         "async-operations",
         "aws-cloud-ops",
         "best-practices-guidelines",
@@ -12061,6 +12118,7 @@
         "k8s-security-policies",
         "logging-module-usage",
         "pandas-data-manipulation-rules",
+        "pipeline-reflection-ux",
         "planning-with-files",
         "prd-generator",
         "prioritize-python-3-10-features",

@@ -1,4 +1,4 @@
 interface:
   display_name: Tdd
-  short_description: Test-Driven Development with Iron Laws enforcement. Use when
-  default_prompt: Use the $tdd skill to complete this task safely and efficiently.
+  short_description: Canon TDD for humans and AI agents (scenario backlog, RED proof, minimal GREEN, optional refactor).
+  default_prompt: Use the $tdd skill and provide RED/GREEN evidence for each scenario.

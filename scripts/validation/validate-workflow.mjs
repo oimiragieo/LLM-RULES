@@ -1,33 +1,18 @@
 #!/usr/bin/env node
-/**
- * Workflow Validation Script
- *
- * Comprehensive validation of workflow YAML files:
- * - YAML structure and syntax
- * - Referenced agents exist (skipped for template workflows)
- * - Referenced schemas exist
- * - Step dependencies (artifacts from previous steps)
- * - Circular dependencies
- * - Step numbering (sequential or proper decimals)
- * - Optional artifact syntax consistency
- * - Template variable usage
- * - Template workflow mode detection
- *
- * Template Workflows:
- *   Workflows with `template: true` metadata or agent fields containing {{...}}
- *   placeholders skip agent file existence validation during dry-run.
- *
- * Usage:
- *   node scripts/validate-workflow.mjs [--workflow <path>] [--verbose]
- *
- * Exit codes:
- *   0: All validations passed
- *   1: One or more validations failed
- */
+/** Workflow YAML validator for structure, references, steps, and dependencies. */
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import {
+  findStepInWorkflow,
+  getAllStepNumbers,
+  hasTemplatePlaceholder,
+  isSpecialOutput,
+  isTemplateWorkflow,
+  parseArtifactReference,
+  validateTemplateVariableSyntax,
+} from './workflow-validation-helpers.mjs';
 
 // Import js-yaml
 let yaml;
@@ -54,39 +39,6 @@ const errors = [];
 const warnings = [];
 
 /**
- * Check if a value contains template placeholders
- * @param {string} value - Value to check
- * @returns {boolean} - True if value contains {{...}} placeholders
- */
-function hasTemplatePlaceholder(value) {
-  if (typeof value !== 'string') return false;
-  return /\{\{[^}]+\}\}/.test(value);
-}
-
-/**
- * Check if workflow is a template workflow
- * @param {object} workflow - Parsed workflow object
- * @returns {boolean} - True if workflow is a template
- */
-function isTemplateWorkflow(workflow) {
-  // Check for explicit template metadata
-  if (workflow.template === true || workflow.metadata?.template === true) {
-    return true;
-  }
-
-  // Check if any step has template placeholders in agent field
-  const stepNumbers = getAllStepNumbers(workflow);
-  for (const stepNumber of stepNumbers) {
-    const step = findStepInWorkflow(workflow, stepNumber);
-    if (step && step.agent && hasTemplatePlaceholder(step.agent)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
  * Find all workflow YAML files (recursively under .claude/workflows)
  */
 function findWorkflowFiles() {
@@ -100,230 +52,6 @@ function findWorkflowFiles() {
   return entries
     .filter(f => typeof f === 'string' && (f.endsWith('.yaml') || f.endsWith('.yml')))
     .map(f => resolve(workflowsDir, f));
-}
-
-/**
- * Find step in workflow (handles both flat steps array and nested phases)
- */
-function findStepInWorkflow(workflow, stepNumber) {
-  // Handle flat steps array
-  if (workflow.steps && Array.isArray(workflow.steps)) {
-    for (const step of workflow.steps) {
-      if (String(step.step) === String(stepNumber)) {
-        return step;
-      }
-    }
-  }
-
-  // Handle phase-based workflows (BMad format)
-  if (workflow.phases && Array.isArray(workflow.phases)) {
-    for (const phase of workflow.phases) {
-      if (phase.steps && Array.isArray(phase.steps)) {
-        for (const step of phase.steps) {
-          if (String(step.step) === String(stepNumber)) {
-            return step;
-          }
-        }
-      }
-      // Check if_yes and if_no steps
-      if (phase.decision) {
-        if (phase.decision.if_yes && Array.isArray(phase.decision.if_yes)) {
-          for (const step of phase.decision.if_yes) {
-            if (String(step.step) === String(stepNumber)) {
-              return step;
-            }
-          }
-        }
-        if (phase.decision.if_no && Array.isArray(phase.decision.if_no)) {
-          for (const step of phase.decision.if_no) {
-            if (String(step.step) === String(stepNumber)) {
-              return step;
-            }
-          }
-        }
-      }
-      // Check epic_loop and story_loop
-      if (
-        phase.epic_loop &&
-        phase.epic_loop.story_loop &&
-        Array.isArray(phase.epic_loop.story_loop)
-      ) {
-        for (const step of phase.epic_loop.story_loop) {
-          if (String(step.step) === String(stepNumber)) {
-            return step;
-          }
-        }
-      }
-    }
-  }
-
-  return null;
-}
-
-/**
- * Get all step numbers from workflow
- */
-function getAllStepNumbers(workflow) {
-  const steps = [];
-
-  if (workflow.steps && Array.isArray(workflow.steps)) {
-    workflow.steps.forEach(step => {
-      if (step.step !== undefined) {
-        steps.push(String(step.step));
-      }
-    });
-  }
-
-  if (workflow.phases && Array.isArray(workflow.phases)) {
-    workflow.phases.forEach(phase => {
-      if (phase.steps && Array.isArray(phase.steps)) {
-        phase.steps.forEach(step => {
-          if (step.step !== undefined) {
-            steps.push(String(step.step));
-          }
-        });
-      }
-      if (phase.decision) {
-        if (phase.decision.if_yes && Array.isArray(phase.decision.if_yes)) {
-          phase.decision.if_yes.forEach(step => {
-            if (step.step !== undefined) {
-              steps.push(String(step.step));
-            }
-          });
-        }
-        if (phase.decision.if_no && Array.isArray(phase.decision.if_no)) {
-          phase.decision.if_no.forEach(step => {
-            if (step.step !== undefined) {
-              steps.push(String(step.step));
-            }
-          });
-        }
-      }
-      if (
-        phase.epic_loop &&
-        phase.epic_loop.story_loop &&
-        Array.isArray(phase.epic_loop.story_loop)
-      ) {
-        phase.epic_loop.story_loop.forEach(step => {
-          if (step.step !== undefined) {
-            steps.push(String(step.step));
-          }
-        });
-      }
-    });
-  }
-
-  return steps;
-}
-
-/**
- * Validate template variable syntax (properly closed)
- */
-function validateTemplateVariableSyntax(str) {
-  if (typeof str !== 'string') return { valid: true, errors: [] };
-
-  const errors = [];
-
-  // Check for unclosed variables: {{variable without closing }}
-  // Pattern: {{ followed by non-} chars until end of string
-  const unclosedMatches = str.match(/\{\{[^}]*$/g);
-  if (unclosedMatches) {
-    errors.push(`Unclosed template variable: ${unclosedMatches[0]}`);
-  }
-
-  // Check for closing braces without opening: }} that aren't preceded by {{
-  // Strategy: Remove all valid {{...}} patterns, then check for orphaned }}
-  const withoutValidTemplates = str.replace(/\{\{[^}]+\}\}/g, '');
-  if (withoutValidTemplates.includes('}}')) {
-    errors.push(`Orphaned closing braces found`);
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-}
-
-/**
- * Check if an output is a special type (non-JSON)
- * Special types: code-artifacts, reasoning files
- */
-function isSpecialOutput(output) {
-  if (typeof output === 'string') {
-    // Check for reasoning file pattern
-    if (output.startsWith('reasoning:')) {
-      return { type: 'reasoning', isSpecial: true };
-    }
-    // Check for code-artifacts (not a JSON file)
-    if (output === 'code-artifacts' || output === 'code-artifacts (from step') {
-      return { type: 'code-artifacts', isSpecial: true };
-    }
-    // Check if it's a directory reference (no .json extension)
-    if (!output.endsWith('.json') && !output.includes('{{') && !output.startsWith('reasoning:')) {
-      return { type: 'directory', isSpecial: true };
-    }
-  }
-  if (typeof output === 'object' && output.reasoning) {
-    return { type: 'reasoning', isSpecial: true };
-  }
-  return { type: 'json', isSpecial: false };
-}
-
-/**
- * Parse artifact reference from input string
- * Handles patterns like: "artifact.json (from step X)" or "artifact.json (from step X, optional)" or "(optional, from step X)"
- * Also handles special outputs like "code-artifacts (from step X)"
- */
-function parseArtifactReference(input) {
-  if (typeof input !== 'string') {
-    return null;
-  }
-
-  // Pattern 1: artifact.json (from step X) or artifact.json (from step X, optional)
-  let match = input.match(/^(.+\.json)\s*\(from step (\d+(?:\.\d+)?)(?:,\s*optional)?\)$/);
-  if (match) {
-    return {
-      artifact: match[1].trim(),
-      fromStep: match[2],
-      optional: input.includes('optional'),
-      isSpecial: false,
-    };
-  }
-
-  // Pattern 2: artifact.json (optional, from step X)
-  match = input.match(/^(.+\.json)\s*\(optional,\s*from step (\d+(?:\.\d+)?)\)$/);
-  if (match) {
-    return {
-      artifact: match[1].trim(),
-      fromStep: match[2],
-      optional: true,
-      isSpecial: false,
-    };
-  }
-
-  // Pattern 3: code-artifacts (from step X) or code-artifacts (from step X, optional)
-  match = input.match(/^code-artifacts\s*\(from step (\d+(?:\.\d+)?)(?:,\s*optional)?\)$/);
-  if (match) {
-    return {
-      artifact: 'code-artifacts',
-      fromStep: match[1],
-      optional: input.includes('optional'),
-      isSpecial: true,
-    };
-  }
-
-  // Pattern 4: code-artifacts (optional, from step X)
-  match = input.match(/^code-artifacts\s*\(optional,\s*from step (\d+(?:\.\d+)?)\)$/);
-  if (match) {
-    return {
-      artifact: 'code-artifacts',
-      fromStep: match[1],
-      optional: true,
-      isSpecial: true,
-    };
-  }
-
-  return null;
 }
 
 /**

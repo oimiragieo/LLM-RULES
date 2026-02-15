@@ -1,14 +1,23 @@
 ---
 name: party-orchestrator
 version: 2.0.0
-description: Compatibility orchestrator for Party Mode style multi-agent collaboration. Routes through standard Task-based coordination.
+description: >-
+  Compatibility orchestrator for Party Mode style multi-agent collaboration. Routes through standard Task-based
+  coordination.
 model: opus
 temperature: 0.2
 context_strategy: lazy_load
 maxTurns: 28
 permissionMode: default
 priority: high
-tools: [Read, Task, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  - Read
+  - Task
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - swarm-coordination
   - task-management-protocol
@@ -16,7 +25,11 @@ skills:
   - verification-before-completion
   - security-architect
   - ripgrep
+  - code-semantic-search
+  - token-saver-context-compression
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Party Orchestrator
 
@@ -64,3 +77,15 @@ Return concise orchestration updates:
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.

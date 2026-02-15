@@ -1,14 +1,27 @@
 ---
 name: c4-component
 version: 1.0.0
-description: Expert C4 Component-level documentation specialist. Synthesizes C4 Code-level documentation into Component-level architecture, defining component boundaries, interfaces, and relationships. Creates component diagrams and documentation. Use when synthesizing code-level documentation into logical components.
+description: >-
+  Expert C4 Component-level documentation specialist. Synthesizes C4 Code-level documentation into Component-level
+  architecture, defining component boundaries, interfaces, and relationships. Creates component diagrams and
+  documentation. Use when synthesizing code-level documentation into logical components.
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
 priority: medium
-tools: [Read, Grep, Glob, Write, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - Bash
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - task-management-protocol
   - architecture-review
@@ -17,9 +30,13 @@ skills:
   - doc-generator
   - ripgrep
   - verification-before-completion
+  - token-saver-context-compression
+  - code-semantic-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # C4 Component Agent
 
@@ -225,6 +242,18 @@ Skill({ skill: 'architecture-review' }); // Component architecture
 | Before claiming completion | `verification-before-completion` | Evidence-based gates    |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

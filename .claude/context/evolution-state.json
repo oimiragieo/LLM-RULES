@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastEvolution": "2026-02-14-framework-skills",
+  "lastEvolution": "2026-02-15-assimilate-skill",
   "evolutions": [
     {
       "id": "2026-02-14-framework-context-skill",
@@ -17,6 +17,30 @@
       "path": ".claude/skills/recommend-evolution/SKILL.md",
       "status": "completed",
       "completedAt": "2026-02-14T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-tdd-skill-refresh",
+      "artifactType": "skill",
+      "name": "tdd",
+      "path": ".claude/skills/tdd/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-token-saver-context-compression-skill",
+      "artifactType": "skill",
+      "name": "token-saver-context-compression",
+      "path": ".claude/skills/token-saver-context-compression/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-assimilate-skill",
+      "artifactType": "skill",
+      "name": "assimilate",
+      "path": ".claude/skills/assimilate/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
     }
   ],
   "pendingProposals": [],

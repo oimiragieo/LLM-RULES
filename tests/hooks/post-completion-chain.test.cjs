@@ -316,7 +316,10 @@ async function testDuplicateCompletionIsIdempotent() {
   const secondAdvance = JSON.parse(fs.readFileSync(PHASE_ADVANCE_FILE, 'utf8'));
   const secondTimestamp = secondAdvance.timestamp;
 
-  assert(firstTimestamp === secondTimestamp, 'Duplicate completion should not rewrite phase-advance');
+  assert(
+    firstTimestamp === secondTimestamp,
+    'Duplicate completion should not rewrite phase-advance'
+  );
 
   fs.unlinkSync(planPath);
   fs.rmSync(path.dirname(planPath), { recursive: true, force: true });

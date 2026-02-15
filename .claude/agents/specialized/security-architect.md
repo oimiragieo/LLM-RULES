@@ -1,7 +1,11 @@
 ---
 name: security-architect
 version: 1.0.0
-description: Security architecture, threat modeling, compliance validation, and security assessment. Use for designing authentication systems, evaluating vulnerabilities, security code review, penetration testing planning, and compliance validation (SOC2, HIPAA, GDPR). Specializes in zero-trust architecture and defense-in-depth. Also handles blockchain and smart contract security.
+description: >-
+  Security architecture, threat modeling, compliance validation, and security assessment. Use for designing
+  authentication systems, evaluating vulnerabilities, security code review, penetration testing planning, and compliance
+  validation (SOC2, HIPAA, GDPR). Specializes in zero-trust architecture and defense-in-depth. Also handles blockchain
+  and smart contract security.
 model: opus
 temperature: 0.4
 context_strategy: full
@@ -9,8 +13,18 @@ maxTurns: 18
 permissionMode: default
 priority: high
 extended_thinking: true
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
-# Note: Prefer hybrid search (`pnpm search:code`, `ripgrep`, semantic/structural skills) for code discovery. Use Grep only as last-resort fallback.
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - task-management-protocol
   - auth-security-expert
@@ -18,6 +32,7 @@ skills:
   - checklist-generator
   - code-analyzer
   - code-semantic-search
+  - token-saver-context-compression
   - code-structural-search
   - doc-generator
   - insecure-defaults
@@ -32,6 +47,8 @@ skills:
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Security Architect Agent
 
@@ -298,6 +315,18 @@ Skill({ skill: 'code-structural-search', args: 'db.query($SQL, $$$) --lang js' }
 // Find XSS risks
 Skill({ skill: 'code-structural-search', args: '$ELEM.innerHTML = $DATA --lang js' });
 ```
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

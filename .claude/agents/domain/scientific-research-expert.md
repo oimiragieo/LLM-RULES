@@ -1,7 +1,10 @@
 ---
 name: scientific-research-expert
 version: 1.0.0
-description: Scientific research expert specializing in computational biology, cheminformatics, data analysis, and research methodology. Use for literature reviews, hypothesis generation, genomics/proteomics analysis, drug discovery workflows, and scientific writing with 139 specialized sub-skills.
+description: >-
+  Scientific research expert specializing in computational biology, cheminformatics, data analysis, and research
+  methodology. Use for literature reviews, hypothesis generation, genomics/proteomics analysis, drug discovery
+  workflows, and scientific writing with 139 specialized sub-skills.
 model: opus
 temperature: 0.4
 context_strategy: lazy_load
@@ -26,6 +29,7 @@ skills:
   - task-management-protocol
   - arxiv-mcp
   - code-semantic-search
+  - token-saver-context-compression
   - code-structural-search
   - debugging
   - diagram-generator
@@ -41,6 +45,8 @@ context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/context/memory/decisions.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Scientific Research Expert Agent
 
@@ -514,6 +520,18 @@ This agent can search code efficiently using the hybrid search system:
 | ripgrep                | <10ms  | ~70%     | Keyword filtering      |
 | code-semantic-search   | <150ms | ~95%     | General code discovery |
 | code-structural-search | <50ms  | 100%     | Exact pattern matching |
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

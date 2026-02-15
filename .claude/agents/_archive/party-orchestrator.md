@@ -1,14 +1,25 @@
 ---
 name: party-orchestrator
 version: 1.0.0
-description: Multi-agent collaboration coordinator for Party Mode. Orchestrates team-based agent interactions with security controls.
+description: >-
+  Multi-agent collaboration coordinator for Party Mode. Orchestrates team-based agent interactions with security
+  controls.
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
 priority: high
-tools: [Read, Write, Edit, Task, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  - Read
+  - Write
+  - Edit
+  - Task
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - context-compressor
   - dispatching-parallel-agents
@@ -18,7 +29,11 @@ skills:
   - swarm-coordination
   - task-management-protocol
   - verification-before-completion
+  - code-semantic-search
+  - token-saver-context-compression
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Party Orchestrator Agent
 
@@ -443,6 +458,18 @@ If you receive a task in an excluded category, respond with routing recommendati
 
 - `.claude/workflows/core/router-decision.md` - Routing logic
 - `.claude/workflows/security-architect-skill-workflow.md` - Security audits
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

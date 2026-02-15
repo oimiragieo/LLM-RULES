@@ -1,6 +1,9 @@
 ---
 name: code-simplifier
-description: Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses on recently modified code unless instructed otherwise. Use for code cleanup, refactoring for readability, eliminating complexity, and applying project standards.
+description: >-
+  Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses
+  on recently modified code unless instructed otherwise. Use for code cleanup, refactoring for readability, eliminating
+  complexity, and applying project standards.
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
@@ -8,13 +11,25 @@ maxTurns: 18
 permissionMode: default
 priority: medium
 extended_thinking: true
-tools: [Read, Write, Edit, Bash, Grep, Glob, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - task-management-protocol
   - best-practices-guidelines
   - code-analyzer
   - code-quality-expert
   - code-semantic-search
+  - token-saver-context-compression
   - code-structural-search
   - code-style-validator
   - debugging
@@ -25,6 +40,8 @@ skills:
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Code Simplifier Agent
 
@@ -358,6 +375,18 @@ TaskList();
 - Work survives context resets
 - No duplicate work (tasks have owners)
 - Dependencies are respected (blocked tasks can't start)
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

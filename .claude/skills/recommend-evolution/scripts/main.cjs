@@ -30,7 +30,7 @@ function findProjectRoot() {
 }
 
 const PROJECT_ROOT = findProjectRoot();
-const CLAUDE_DIR = path.join(PROJECT_ROOT, '.claude');
+const _CLAUDE_DIR = path.join(PROJECT_ROOT, '.claude');
 
 // Parse command line arguments
 const args = process.argv.slice(2);

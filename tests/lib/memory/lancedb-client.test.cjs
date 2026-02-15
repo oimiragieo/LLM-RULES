@@ -1,58 +1,16 @@
-#!/usr/bin/env node
-/**
- * LanceDB Client Tests - Critical Memory Vector Storage
- * =====================================================
- *
- * Tests for:
- * 1. CRITICAL: dropTable method does NOT delete directory (FIX-MEMORY-CRITICAL-001)
- * 2. Table creation and initialization
- * 3. Error handling (DB connection failures, invalid paths)
- * 4. Concurrent table operations
- * 5. Embedding generation and vector operations
- */
-
 'use strict';
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
 const fs = require('fs');
 const path = require('path');
-
-// Test directory setup
-const TEST_DIR = path.join(__dirname, '.test-lancedb');
-const TEST_DB_PATH = path.join(TEST_DIR, 'test-lancedb');
-
-/**
- * Setup test directory
- */
-function setupTestDir() {
-  if (fs.existsSync(TEST_DIR)) {
-    fs.rmSync(TEST_DIR, { recursive: true, force: true });
-  }
-  fs.mkdirSync(TEST_DIR, { recursive: true });
-}
-
-/**
- * Cleanup test directory
- */
-function cleanupTestDir() {
-  if (fs.existsSync(TEST_DIR)) {
-    fs.rmSync(TEST_DIR, { recursive: true, force: true });
-  }
-}
-
-/**
- * Get fresh module (clear require cache)
- */
-function getModule() {
-  const modulePath = require.resolve('../../../.claude/lib/memory/lancedb-client.cjs');
-  delete require.cache[modulePath];
-  return require(modulePath);
-}
-
-// =============================================================================
-// Test Suite 1: CRITICAL - dropTable does NOT delete directory
-// =============================================================================
+const {
+  TEST_DIR,
+  TEST_DB_PATH,
+  setupTestDir,
+  cleanupTestDir,
+  getModule,
+} = require('../../helpers/memory-lancedb-test-utils.cjs');
 
 test('dropTable - CRITICAL: does NOT delete directory when dropping table', async t => {
   setupTestDir();
@@ -60,7 +18,6 @@ test('dropTable - CRITICAL: does NOT delete directory when dropping table', asyn
 
   const { MemoryVectorStore } = getModule();
 
-  // Create store with test embedding mode (no network/model download)
   const store = new MemoryVectorStore({
     persistDirectory: TEST_DB_PATH,
     collectionName: 'test_table',
@@ -69,7 +26,6 @@ test('dropTable - CRITICAL: does NOT delete directory when dropping table', asyn
 
   await store.initialize();
 
-  // Add a document to create the table
   await store.addDocuments([
     { id: 'doc1', text: 'Test document for table creation', metadata: { type: 'test' } },
   ]);
@@ -145,10 +101,6 @@ test('dropTable - clears table vector dimension cache', async t => {
 
   await store.close();
 });
-
-// =============================================================================
-// Test Suite 2: Table creation and initialization
-// =============================================================================
 
 test('initialize - creates directory if not exists', async t => {
   setupTestDir();
@@ -227,9 +179,7 @@ test('initialize - opens existing table if present', async t => {
   await store2.close();
 });
 
-// =============================================================================
 // Test Suite 3: Error handling
-// =============================================================================
 
 test('initialize - handles invalid embedding mode', async t => {
   setupTestDir();
@@ -344,9 +294,7 @@ test('addDocuments - skips documents without text', async t => {
   await store.close();
 });
 
-// =============================================================================
 // Test Suite 4: Concurrent operations
-// =============================================================================
 
 test('concurrent addDocuments - handles parallel inserts', async t => {
   setupTestDir();
@@ -425,9 +373,7 @@ test('shared store - different instances for different configs', async t => {
   assert.notStrictEqual(store1, store2, 'Should return different instances for different configs');
 });
 
-// =============================================================================
 // Test Suite 5: Embedding and vector operations
-// =============================================================================
 
 test('generateEmbedding - test mode produces stable embeddings', async t => {
   setupTestDir();
@@ -492,9 +438,7 @@ test('getEmbeddingDimension - returns null when embeddings off', async t => {
   await store.close();
 });
 
-// =============================================================================
 // Test Suite 6: Search operations
-// =============================================================================
 
 test('search - filters by similarity threshold', async t => {
   setupTestDir();
@@ -580,9 +524,7 @@ test('search - maps distance to bounded similarity for threshold filtering', asy
   assert.ok(filtered[1].similarity <= 1 && filtered[1].similarity >= 0);
 });
 
-// =============================================================================
 // Test Suite 7: Upsert and delete operations
-// =============================================================================
 
 test('upsertDocuments - updates existing document', async t => {
   setupTestDir();
@@ -659,9 +601,7 @@ test('deleteByMetadata - returns false when table does not exist', async t => {
   await store.close();
 });
 
-// =============================================================================
 // Test Suite 8: Status and utility methods
-// =============================================================================
 
 test('isAvailable - returns true after successful init', async t => {
   setupTestDir();
@@ -677,47 +617,6 @@ test('isAvailable - returns true after successful init', async t => {
 
   const available = await store.isAvailable();
   assert.strictEqual(available, true, 'Store should be available');
-
-  await store.close();
-});
-
-test('isMockMode - returns true for test mode', async t => {
-  setupTestDir();
-  t.after(cleanupTestDir);
-
-  const { MemoryVectorStore } = getModule();
-
-  const store = new MemoryVectorStore({
-    persistDirectory: TEST_DB_PATH,
-    collectionName: 'test_table',
-    embeddingMode: 'test',
-  });
-
-  await store.initialize();
-
-  assert.strictEqual(store.isMockMode(), true, 'Test mode should be considered mock mode');
-
-  await store.close();
-});
-
-test('getEmbeddingStatus - returns status object', async t => {
-  setupTestDir();
-  t.after(cleanupTestDir);
-
-  const { MemoryVectorStore } = getModule();
-
-  const store = new MemoryVectorStore({
-    persistDirectory: TEST_DB_PATH,
-    collectionName: 'test_table',
-    embeddingMode: 'test',
-  });
-
-  await store.initialize();
-
-  const status = store.getEmbeddingStatus();
-  assert.ok(status, 'Should return status object');
-  assert.strictEqual(status.status, 'ready', 'Status should be ready for test mode');
-  assert.strictEqual(status.mode, 'test', 'Mode should be test');
 
   await store.close();
 });

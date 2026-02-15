@@ -1,3 +1,10 @@
+## Assimilate Skill Creation (2026-02-15)
+
+- Added new `assimilate` skill to support framework self-improvement benchmarking.
+- Standard execution is four phases: clone/stage externals, extract comparable surfaces, produce prioritized gap list, convert to TDD backlog.
+- Integrated into EVOLVE and assigned to `evolution-orchestrator` and `reflection-agent` so capability-gap workflows can invoke it directly.
+- Added contract artifacts (command surface, schemas, hooks, script, template) so assimilation runs are structured and repeatable.
+
 **TDD Implementation Planning Pattern (2026-02-13):**
 
 - Pattern: When synthesizing 8+ input reports into a TDD plan, read all reports in parallel first, then run targeted codebase searches to validate current state before writing the plan
@@ -304,7 +311,6 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 
 **Usage hint**: Use this skill for "detect capability gaps and record evolution recommendations for later orchestration".
 
-
 ## [2026-02-14] New Skill Created: framework-context
 
 - **Description**: Provide structured framework context for system-level reflection and planning decisions.
@@ -323,3 +329,49 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Added research synthesis reports:
   - `.claude/context/artifacts/research-reports/framework-context-research-2026-02-14.md`
   - `.claude/context/artifacts/research-reports/recommend-evolution-research-2026-02-14.md`
+
+## [2026-02-15] TDD Skill Refresh (Canon + AI Guardrails)
+
+- Updated `.claude/skills/tdd/SKILL.md` to align with Canon TDD:
+  - explicit scenario backlog step
+  - one-scenario loop discipline
+  - RED/GREEN evidence requirement
+  - optional refactor positioning
+- Added AI-focused guardrails informed by current TDD-for-LLM research:
+  - bounded repair loops
+  - anti-test-hacking checks
+  - test-as-spec prompt guidance
+  - class-level dependency-ordered loop guidance
+- Replaced scaffold placeholders in skill-local bundle:
+  - `references/research-requirements.md`
+  - `hooks/pre-execute.cjs`, `hooks/post-execute.cjs`
+  - `schemas/input.schema.json`, `schemas/output.schema.json`
+  - `templates/implementation-template.md`
+  - `rules/tdd.md`, `commands/tdd.md`
+  - `scripts/main.cjs`, `agents/openai.yaml`
+- Synced ecosystem surfaces:
+  - `.claude/workflows/tdd-skill-workflow.md`
+  - `.claude/commands/tdd.md`
+  - `.claude/rules/tdd.md`
+  - `.claude/schemas/skill-tdd-output.schema.json`
+  - `.claude/context/evolution-state.json`
+
+## [2026-02-15] TDD Memory Acceleration Layer Added
+
+- Added bounded runtime profile: `.claude/context/runtime/tdd-memory-profile.json`
+- Added profile guidance doc: `.claude/skills/tdd/references/tdd-memory-profile.md`
+- Hook integration:
+  - `.claude/skills/tdd/hooks/pre-execute.cjs` reads profile hints (test/lint/format commands)
+  - `.claude/skills/tdd/hooks/post-execute.cjs` updates profile with deduped signatures/templates
+- Safety limits:
+  - max profile size 16 KB
+  - max 20 entries per bucket
+  - max value length 180 chars
+  - no raw logs, no sensitive data, no bypass of RED proof
+
+## Token Saver Skill Integration (2026-02-15)
+
+- Upgraded token-saver-context-compression to creator-compliant enterprise bundle (commands/hooks/rules/schemas/templates/references + companion tool + workflow).
+- Standardized mapping from compression output to memory targets in .claude/skills/token-saver-context-compression/scripts/main.cjs.
+- Added targeted tests for wrapper behavior, memory pipeline, and spawn citation E2E compatibility.
+- Updated core agents (developer, planner, context-compressor, reflection-agent) to include token-saver-context-compression in skill assignments.

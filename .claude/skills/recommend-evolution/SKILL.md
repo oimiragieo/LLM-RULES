@@ -87,6 +87,7 @@ Schema reference:
 
 ```markdown
 ## Evolution Recommendation
+
 - Trigger: <trigger>
 - Evidence: <evidence>
 - Suggested Artifact Type: <type|null>
@@ -107,7 +108,10 @@ Return recommendation summary and what was recorded.
 
 ```javascript
 // Repeated failure pattern -> recommend skill creation
-Skill({ skill: 'recommend-evolution', args: '--trigger repeated_error --suggestedArtifactType skill' });
+Skill({
+  skill: 'recommend-evolution',
+  args: '--trigger repeated_error --suggestedArtifactType skill',
+});
 
 // Routing miss -> recommend new agent/workflow discussion
 Skill({ skill: 'recommend-evolution', args: '--trigger no_agent --suggestedArtifactType agent' });
@@ -119,11 +123,13 @@ Skill({ skill: 'recommend-evolution', args: '--trigger no_agent --suggestedArtif
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+
 ```powershell
 Get-Content .claude/context/memory/learnings.md -TotalCount 120
 ```
 
 **After completing:**
+
 - Recommendation pattern -> `.claude/context/memory/learnings.md`
 - Ambiguous trigger logic -> `.claude/context/memory/issues.md`
 - Evolution policy decision -> `.claude/context/memory/decisions.md`

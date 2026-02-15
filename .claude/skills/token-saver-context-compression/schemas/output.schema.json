@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "token-saver-context-compression Output Schema",
+  "type": "object",
+  "required": ["ok"],
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "search": {
+      "type": "object",
+      "properties": {
+        "query": { "type": "string" },
+        "hits": { "type": "integer" },
+        "limit": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "sufficient": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "memoryRecords": {
+      "type": "object",
+      "properties": {
+        "patterns": { "type": "array" },
+        "gotchas": { "type": "array" },
+        "issues": { "type": "array" },
+        "decisions": { "type": "array" }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "string"
+    },
+    "stage": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

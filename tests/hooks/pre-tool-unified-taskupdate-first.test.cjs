@@ -4,6 +4,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const { atomicWriteJSONSync } = require('../../.claude/lib/utils/atomic-write.cjs');
+const {
+  withMockedRouterSnapshot,
+  withRouterState,
+  withTempStateFile,
+} = require('../helpers/taskupdate-first-test-utils.cjs');
 
 const {
   checkTaskUpdateFirst,
@@ -22,92 +27,10 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
     'router-state.json'
   );
 
-  function withRouterState(state, fn) {
-    const existed = fs.existsSync(routerStatePath);
-    const prior = existed ? fs.readFileSync(routerStatePath, 'utf8') : null;
-    try {
-      fs.mkdirSync(path.dirname(routerStatePath), { recursive: true });
-      atomicWriteJSONSync(routerStatePath, state);
-      routerState.invalidateStateCache();
-      fn();
-    } finally {
-      if (existed) {
-        fs.writeFileSync(routerStatePath, prior, 'utf8');
-      } else {
-        fs.rmSync(routerStatePath, { force: true });
-      }
-      routerState.invalidateStateCache();
-    }
-  }
-
-  function withMockedRouterSnapshot(snapshot, fn) {
-    const priorGetState = routerState.getState;
-    const priorGetLastTaskUpdate = routerState.getLastTaskUpdate;
-    const priorWasTaskUpdateCalledRecently = routerState.wasTaskUpdateCalledRecently;
-    try {
-      routerState.getState = () => snapshot;
-      routerState.getLastTaskUpdate = () => ({
-        timestamp: snapshot.lastTaskUpdateCall,
-        taskId: snapshot.lastTaskUpdateTaskId,
-        status: snapshot.lastTaskUpdateStatus,
-      });
-      routerState.wasTaskUpdateCalledRecently = () =>
-        Number(snapshot.lastTaskUpdateCall || 0) > Date.now() - 60_000;
-      fn();
-    } finally {
-      routerState.getState = priorGetState;
-      routerState.getLastTaskUpdate = priorGetLastTaskUpdate;
-      routerState.wasTaskUpdateCalledRecently = priorWasTaskUpdateCalledRecently;
-    }
-  }
-
-  function withTempStateFile(fn) {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'taskupdate-first-'));
-    const stateFile = path.join(tempDir, 'state.json');
-    const priorMode = process.env.TASKUPDATE_FIRST_ENFORCEMENT;
-    const priorAutoMark = process.env.TASKUPDATE_FIRST_AUTOMARK;
-    const priorSelfHeal = process.env.TASKUPDATE_FIRST_SELF_HEAL;
-    const priorSessionId = process.env.CLAUDE_SESSION_ID;
-    const priorBootstrap = process.env.TASKUPDATE_FIRST_BOOTSTRAP;
-    process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'block';
-    process.env.TASKUPDATE_FIRST_AUTOMARK = 'off';
-    process.env.TASKUPDATE_FIRST_SELF_HEAL = 'off';
-    process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'off';
-    delete process.env.CLAUDE_SESSION_ID;
-    try {
-      fn(stateFile);
-    } finally {
-      if (priorMode == null) {
-        delete process.env.TASKUPDATE_FIRST_ENFORCEMENT;
-      } else {
-        process.env.TASKUPDATE_FIRST_ENFORCEMENT = priorMode;
-      }
-      if (priorAutoMark == null) {
-        delete process.env.TASKUPDATE_FIRST_AUTOMARK;
-      } else {
-        process.env.TASKUPDATE_FIRST_AUTOMARK = priorAutoMark;
-      }
-      if (priorSelfHeal == null) {
-        delete process.env.TASKUPDATE_FIRST_SELF_HEAL;
-      } else {
-        process.env.TASKUPDATE_FIRST_SELF_HEAL = priorSelfHeal;
-      }
-      if (priorSessionId == null) {
-        delete process.env.CLAUDE_SESSION_ID;
-      } else {
-        process.env.CLAUDE_SESSION_ID = priorSessionId;
-      }
-      if (priorBootstrap == null) {
-        delete process.env.TASKUPDATE_FIRST_BOOTSTRAP;
-      } else {
-        process.env.TASKUPDATE_FIRST_BOOTSTRAP = priorBootstrap;
-      }
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-  }
+  const deps = { fs, path, os, routerState, atomicWriteJSONSync };
 
   test('blocks agent tool calls before TaskUpdate(in_progress)', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-1',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read', 'Bash'],
@@ -121,7 +44,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('returns auto-reroute guidance on first preflight violation', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-reroute-1',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read', 'Bash'],
@@ -136,7 +59,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('hard-fails on repeated preflight violations before in_progress', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-reroute-2',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read', 'Bash'],
@@ -154,7 +77,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('blocks repeated TaskList preflight loops before in_progress', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-tasklist-loop',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
@@ -172,8 +95,10 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('uses router-state currentSpawnTaskId in reroute guidance when hook task_id is missing', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       withRouterState(
+        deps,
+        routerStatePath,
         {
           mode: 'agent',
           taskSpawned: true,
@@ -199,9 +124,11 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('self-heal allows first non-preflight tool when canonical task id is resolvable', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       process.env.TASKUPDATE_FIRST_SELF_HEAL = 'on';
       withRouterState(
+        deps,
+        routerStatePath,
         {
           mode: 'agent',
           taskSpawned: true,
@@ -231,9 +158,11 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('self-heal can be disabled and preserves block behavior', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       process.env.TASKUPDATE_FIRST_SELF_HEAL = 'off';
       withRouterState(
+        deps,
+        routerStatePath,
         {
           mode: 'agent',
           taskSpawned: true,
@@ -259,7 +188,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('does not enforce on Task spawns', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-task-spawn',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Task'],
@@ -277,7 +206,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('allows subsequent tool calls after TaskUpdate(in_progress)', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-2',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read', 'Bash'],
@@ -301,7 +230,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('warn mode allows but returns warning payload', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'warn';
       const hookInput = {
         session_id: 'session-3',
@@ -315,7 +244,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('default mode is block when TASKUPDATE_FIRST_ENFORCEMENT is unset', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       delete process.env.TASKUPDATE_FIRST_ENFORCEMENT;
       const hookInput = {
         session_id: 'session-default-mode',
@@ -327,21 +256,26 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('skips enforcement for non-agent scoped sessions', () => {
-    withTempStateFile(stateFile => {
-      withRouterState({ mode: 'router', taskSpawned: false, sessionId: 'session-4' }, () => {
-        const hookInput = {
-          session_id: 'session-4',
-          allowed_tools: ['Read', 'Bash'],
-        };
-        const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo ok' }, stateFile);
-        assert.equal(result.checked, false);
-        assert.equal(result.reason, 'not_agent_session');
-      });
+    withTempStateFile(deps, stateFile => {
+      withRouterState(
+        deps,
+        routerStatePath,
+        { mode: 'router', taskSpawned: false, sessionId: 'session-4' },
+        () => {
+          const hookInput = {
+            session_id: 'session-4',
+            allowed_tools: ['Read', 'Bash'],
+          };
+          const result = checkTaskUpdateFirst(hookInput, 'Bash', { command: 'echo ok' }, stateFile);
+          assert.equal(result.checked, false);
+          assert.equal(result.reason, 'not_agent_session');
+        }
+      );
     });
   });
 
   test('enforces when task_id is present even without allowed_tools', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-5',
         task_id: 'task-5',
@@ -353,7 +287,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('enforces for non-router agent sessions even when allowed_tools/task_id are missing', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const priorAgentId = process.env.CLAUDE_AGENT_ID;
       process.env.CLAUDE_AGENT_ID = 'developer';
       try {
@@ -374,10 +308,12 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('enforces when router state indicates spawned agent context', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const priorAgentId = process.env.CLAUDE_AGENT_ID;
       delete process.env.CLAUDE_AGENT_ID;
       withRouterState(
+        deps,
+        routerStatePath,
         {
           mode: 'agent',
           taskSpawned: true,
@@ -402,9 +338,11 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('allows when recent router-state TaskUpdate bootstrap marker is present', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'true';
       withRouterState(
+        deps,
+        routerStatePath,
         {
           mode: 'agent',
           taskSpawned: true,
@@ -427,7 +365,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('auto-marks in_progress when task id is present and auto-mark is enabled', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       process.env.TASKUPDATE_FIRST_AUTOMARK = 'true';
       const hookInput = {
         session_id: 'session-9',
@@ -446,7 +384,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('normalizes TaskUpdate taskId to canonical hook task_id when mismatch occurs', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-10',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
@@ -469,7 +407,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('completed TaskUpdate clears inProgress and re-enforces before next tool call', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-11',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
@@ -508,7 +446,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
   });
 
   test('blocks TaskUpdate(completed) when taskId mismatches canonical hook task_id', () => {
-    withTempStateFile(stateFile => {
+    withTempStateFile(deps, stateFile => {
       const hookInput = {
         session_id: 'session-12',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
@@ -538,97 +476,70 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
       assert.equal(state.sessions['session-12'].status, 'in_progress');
     });
   });
-  test('uses normalized task id comparison for bootstrap allow', () => {
-    withTempStateFile(stateFile => {
+  test('bootstrap gating respects normalized IDs and router-session constraints', () => {
+    withTempStateFile(deps, stateFile => {
       process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'true';
-      withMockedRouterSnapshot(
+      const cases = [
         {
-          mode: 'agent',
-          taskSpawned: true,
-          sessionId: 'session-13',
-          lastTaskUpdateCall: Date.now(),
-          lastTaskUpdateTaskId: 'Task-13',
-          lastTaskUpdateStatus: 'in_progress',
-          taskUpdatesThisSession: 1,
+          snapshot: {
+            mode: 'agent',
+            taskSpawned: true,
+            sessionId: 'session-13',
+            lastTaskUpdateCall: Date.now(),
+            lastTaskUpdateTaskId: 'Task-13',
+            lastTaskUpdateStatus: 'in_progress',
+            taskUpdatesThisSession: 1,
+          },
+          hookInput: { session_id: 'session-13', task_id: 'task-13' },
+          expectedAction: 'allow',
         },
-        () => {
-          const hookInput = {
-            session_id: 'session-13',
-            task_id: 'task-13',
-          };
-          const result = checkTaskUpdateFirst(
-            hookInput,
-            'Read',
-            { file_path: 'README.md' },
-            stateFile
-          );
-          assert.equal(result.action, 'allow');
-        }
-      );
-    });
-  });
-
-  test('does not allow bootstrap when router-state session id is missing', () => {
-    withTempStateFile(stateFile => {
-      process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'true';
-      withMockedRouterSnapshot(
         {
-          mode: 'agent',
-          taskSpawned: true,
-          sessionId: null,
-          lastTaskUpdateCall: Date.now(),
-          lastTaskUpdateTaskId: 'task-14',
-          lastTaskUpdateStatus: 'in_progress',
-          taskUpdatesThisSession: 1,
-        },
-        () => {
-          const hookInput = {
+          snapshot: {
+            mode: 'agent',
+            taskSpawned: true,
+            sessionId: null,
+            lastTaskUpdateCall: Date.now(),
+            lastTaskUpdateTaskId: 'task-14',
+            lastTaskUpdateStatus: 'in_progress',
+            taskUpdatesThisSession: 1,
+          },
+          hookInput: {
             session_id: 'session-14',
             task_id: 'task-14',
             allowed_tools: ['TaskUpdate', 'Read'],
-          };
-          const result = checkTaskUpdateFirst(
-            hookInput,
-            'Read',
-            { file_path: 'README.md' },
-            stateFile
-          );
-          assert.equal(result.action, 'block');
-          assert.match(result.message || '', /TASKUPDATE-FIRST/);
-        }
-      );
-    });
-  });
-
-  test('does not allow bootstrap when router-state session id mismatches hook session_id', () => {
-    withTempStateFile(stateFile => {
-      process.env.TASKUPDATE_FIRST_BOOTSTRAP = 'true';
-      withMockedRouterSnapshot(
-        {
-          mode: 'agent',
-          taskSpawned: true,
-          sessionId: 'session-A',
-          lastTaskUpdateCall: Date.now(),
-          lastTaskUpdateTaskId: 'task-15',
-          lastTaskUpdateStatus: 'in_progress',
-          taskUpdatesThisSession: 1,
+          },
+          expectedAction: 'block',
         },
-        () => {
-          const hookInput = {
+        {
+          snapshot: {
+            mode: 'agent',
+            taskSpawned: true,
+            sessionId: 'session-A',
+            lastTaskUpdateCall: Date.now(),
+            lastTaskUpdateTaskId: 'task-15',
+            lastTaskUpdateStatus: 'in_progress',
+            taskUpdatesThisSession: 1,
+          },
+          hookInput: {
             session_id: 'session-B',
             task_id: 'task-15',
             allowed_tools: ['TaskUpdate', 'Read'],
-          };
+          },
+          expectedAction: 'block',
+        },
+      ];
+
+      for (const c of cases) {
+        withMockedRouterSnapshot(routerState, c.snapshot, () => {
           const result = checkTaskUpdateFirst(
-            hookInput,
+            c.hookInput,
             'Read',
             { file_path: 'README.md' },
             stateFile
           );
-          assert.equal(result.action, 'block');
-          assert.match(result.message || '', /TASKUPDATE-FIRST/);
-        }
-      );
+          assert.equal(result.action, c.expectedAction);
+        });
+      }
     });
   });
 });

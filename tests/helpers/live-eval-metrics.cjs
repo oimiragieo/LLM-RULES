@@ -35,11 +35,7 @@ function processAssistantBlocks(content, state) {
 }
 
 function processParsedStreamObject(obj, state) {
-  if (
-    obj?.type === 'assistant' &&
-    obj?.message?.content &&
-    Array.isArray(obj.message.content)
-  ) {
+  if (obj?.type === 'assistant' && obj?.message?.content && Array.isArray(obj.message.content)) {
     processAssistantBlocks(obj.message.content, state);
   }
   if (obj?.type === 'result' && typeof obj?.result === 'string') {
@@ -82,7 +78,8 @@ function parseStreamOutput(stdout) {
 function hasNoStreamSignal(result) {
   if (!result || typeof result !== 'object') return true;
   const hasOutput = String(result.finalResultText || '').trim().length > 0;
-  const hasEvidence = Array.isArray(result.spawnedEvidenceIds) && result.spawnedEvidenceIds.length > 0;
+  const hasEvidence =
+    Array.isArray(result.spawnedEvidenceIds) && result.spawnedEvidenceIds.length > 0;
   return !hasOutput && !hasEvidence;
 }
 
@@ -92,7 +89,9 @@ function computeSummary(results) {
   const withInjectedEvidence = results.filter(r => r.spawnedEvidenceIds.length > 0).length;
   const withOutputCitations = results.filter(r => r.outputCitations.length > 0).length;
   const groundedCount = results.filter(r => r.grounded).length;
-  const withAnyOutput = results.filter(r => String(r.finalResultText || '').trim().length > 0).length;
+  const withAnyOutput = results.filter(
+    r => String(r.finalResultText || '').trim().length > 0
+  ).length;
   const citationEligible = Math.max(withInjectedEvidence, 1);
   const citationObserved = Math.max(withOutputCitations, 1);
 
@@ -113,4 +112,3 @@ module.exports = {
   hasNoStreamSignal,
   computeSummary,
 };
-

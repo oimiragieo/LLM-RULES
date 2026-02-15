@@ -31,6 +31,23 @@ test('PreToolUse Edit|Write|NotebookEdit includes unified-pre-write-hook', () =>
   );
 });
 
+test('PreToolUse Edit|Write|NotebookEdit runs agent template contract validator before unified pre-write', () => {
+  const block = findHookBlock('PreToolUse', 'Edit|Write|NotebookEdit');
+  assert.ok(block, 'Expected PreToolUse block for Edit|Write|NotebookEdit');
+
+  const commands = listCommands(block);
+  const contractIdx = commands.indexOf(
+    'node .claude/hooks/validation/agent-template-contract-validator.cjs'
+  );
+  const preWriteIdx = commands.indexOf('node .claude/hooks/safety/unified-pre-write-hook.cjs');
+  assert.ok(contractIdx !== -1, 'agent-template-contract-validator should be wired');
+  assert.ok(preWriteIdx !== -1, 'unified-pre-write-hook should be wired');
+  assert.ok(
+    contractIdx < preWriteIdx,
+    'agent-template-contract-validator should run before unified-pre-write-hook'
+  );
+});
+
 test('PostToolUse Edit|Write|NotebookEdit includes memory/index hooks', () => {
   const block = findHookBlock('PostToolUse', 'Edit|Write|NotebookEdit');
   assert.ok(block, 'Expected PostToolUse block for Edit|Write|NotebookEdit');
@@ -60,8 +77,13 @@ test('PreToolUse TaskUpdate runs contract validator before transition validators
   const contractIdx = commands.indexOf(
     'node .claude/hooks/validation/taskupdate-contract-validator.cjs'
   );
-  const transitionIdx = commands.indexOf('node .claude/hooks/validation/pre-completion-validation.cjs');
+  const transitionIdx = commands.indexOf(
+    'node .claude/hooks/validation/pre-completion-validation.cjs'
+  );
   assert.ok(contractIdx !== -1, 'TaskUpdate contract validator should be wired');
   assert.ok(transitionIdx !== -1, 'pre-completion-validation should be wired');
-  assert.ok(contractIdx < transitionIdx, 'Contract validator should run before transition validation');
+  assert.ok(
+    contractIdx < transitionIdx,
+    'Contract validator should run before transition validation'
+  );
 });

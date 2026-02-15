@@ -6,6 +6,7 @@ This skill was created with enterprise defaults. Before implementation, collect 
 2. WebFetch + arXiv fallback (if Exa unavailable or insufficient)
 
 Capture:
+
 - 2+ implementation references
 - 1+ security/reliability reference
 - constraints and non-goals

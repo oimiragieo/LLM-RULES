@@ -1,7 +1,9 @@
 ---
 name: pm
 version: 1.0.0
-description: Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use for roadmap planning, user story creation, stakeholder updates, and agile workflow management.
+description: >-
+  Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use
+  for roadmap planning, user story creation, stakeholder updates, and agile workflow management.
 model: sonnet
 temperature: 0.5
 context_strategy: lazy_load
@@ -31,7 +33,10 @@ skills:
   - sequential-thinking
   - task-management-protocol
   - verification-before-completion
+  - token-saver-context-compression
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Product Manager Agent
 
@@ -279,6 +284,18 @@ Invoke based on task context:
 - Effort: [score]
 - **Total**: [calculated score]
 ```
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

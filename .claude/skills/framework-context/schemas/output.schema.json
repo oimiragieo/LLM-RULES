@@ -3,9 +3,7 @@
   "title": "framework-context Output Schema",
   "description": "Output validation schema for framework-context skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

@@ -23,8 +23,19 @@ const REPORT_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'eva
 const REPORT_PATH = path.join(REPORT_DIR, 'subagent-memory-rag-live-latest.json');
 const TIMEOUT_MS = Number(process.env.SUBAGENT_LIVE_EVAL_TIMEOUT_MS || 180000);
 const MAX_TURNS = Number(process.env.SUBAGENT_LIVE_EVAL_MAX_TURNS || 2);
-const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs');
-const RAG_PRELOAD_PATH = path.join(PROJECT_ROOT, 'tests', 'fixtures', 'spawn-rag-memory-stub.preload.cjs');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'routing',
+  'spawn-prompt-assembler.cjs'
+);
+const RAG_PRELOAD_PATH = path.join(
+  PROJECT_ROOT,
+  'tests',
+  'fixtures',
+  'spawn-rag-memory-stub.preload.cjs'
+);
 const MEMORY_GOTCHAS_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'gotchas.json');
 const LIVE_SMOKE_CASE = {
   id: 'live-smoke',
@@ -35,7 +46,8 @@ const LIVE_SMOKE_CASE = {
 const EVAL_CASES = [
   {
     id: 'live-001',
-    prompt: 'Use Task once. After completion, cite one exact [mem:xxxxxxxx] or [rag:xxxxxxxx] id if visible.',
+    prompt:
+      'Use Task once. After completion, cite one exact [mem:xxxxxxxx] or [rag:xxxxxxxx] id if visible.',
   },
   {
     id: 'live-002',
@@ -71,7 +83,6 @@ const FALLBACK_CASES = [
 function ensureReportDir() {
   fs.mkdirSync(REPORT_DIR, { recursive: true });
 }
-
 
 function runLiveCase(tc) {
   return new Promise(resolve => {
@@ -194,9 +205,12 @@ function buildHookInput(taskId) {
       task_id: taskId,
       subagent_type: 'developer',
       description: 'Live eval hook fallback diagnostic task',
-      prompt: ['You are DEVELOPER.', '', '## PROJECT CONTEXT', `PROJECT_ROOT: ${PROJECT_ROOT}`].join(
-        '\n'
-      ),
+      prompt: [
+        'You are DEVELOPER.',
+        '',
+        '## PROJECT CONTEXT',
+        `PROJECT_ROOT: ${PROJECT_ROOT}`,
+      ].join('\n'),
       allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
     },
   };
@@ -304,7 +318,9 @@ function runDeterministicProbeSuite(hookResults) {
         ok: false,
         exitCode: result.exitCode,
         error: result.error || 'no injected prompt from hook fallback',
-        spawnedEvidenceIds: Array.isArray(result.spawnedEvidenceIds) ? result.spawnedEvidenceIds : [],
+        spawnedEvidenceIds: Array.isArray(result.spawnedEvidenceIds)
+          ? result.spawnedEvidenceIds
+          : [],
         outputCitations: [],
         grounded: false,
         finalResultText: '',
@@ -318,10 +334,10 @@ function runDeterministicProbeSuite(hookResults) {
       question: tc.question || 'Use available memory evidence and cite one ID.',
     });
     const answer = String(probe?.answer || '');
-    const outputCitations = [
-      ...new Set([...(probe?.citations || []), ...parseCitations(answer)]),
-    ];
-    const spawnedEvidenceIds = Array.isArray(result.spawnedEvidenceIds) ? result.spawnedEvidenceIds : [];
+    const outputCitations = [...new Set([...(probe?.citations || []), ...parseCitations(answer)])];
+    const spawnedEvidenceIds = Array.isArray(result.spawnedEvidenceIds)
+      ? result.spawnedEvidenceIds
+      : [];
     const grounded =
       outputCitations.length > 0 && outputCitations.every(id => spawnedEvidenceIds.includes(id));
 
@@ -420,72 +436,76 @@ function assertStrictThresholdsIfEnabled({
 }
 
 describe('live eval: subagent memory/rag usage', () => {
-  it('runs live subagent eval and writes groundedness metrics report', { skip: !RUN_LIVE_EVALS }, async t => {
-    const smoke = await runLiveCase(LIVE_SMOKE_CASE);
-    if (!smoke.ok && /not recognized|not found|ENOENT/i.test(smoke.error || smoke.stderr || '')) {
-      t.skip('claude CLI is not available in this environment');
-      return;
-    }
+  it(
+    'runs live subagent eval and writes groundedness metrics report',
+    { skip: !RUN_LIVE_EVALS },
+    async t => {
+      const smoke = await runLiveCase(LIVE_SMOKE_CASE);
+      if (!smoke.ok && /not recognized|not found|ENOENT/i.test(smoke.error || smoke.stderr || '')) {
+        t.skip('claude CLI is not available in this environment');
+        return;
+      }
 
-    const smokeShortCircuited = hasNoStreamSignal(smoke);
-    const results = await collectLiveResults(smokeShortCircuited);
+      const smokeShortCircuited = hasNoStreamSignal(smoke);
+      const results = await collectLiveResults(smokeShortCircuited);
 
-    const liveSummaryInput = smokeShortCircuited ? [smoke] : results;
-    const summary = computeSummary(liveSummaryInput);
-    const fallbackTriggered = smokeShortCircuited || shouldUseFallback(summary);
-    const {
-      fallbackResults,
-      fallbackSummary,
-      deterministicProbeResults,
-      deterministicProbeSummary,
-    } = await collectFallbackData(fallbackTriggered);
-    const { effectiveSummary, probeUsable } = buildEffectiveSummary({
-      fallbackTriggered,
-      summary,
-      fallbackSummary,
-      deterministicProbeSummary,
-    });
-
-    const report = {
-      generated_at: new Date().toISOString(),
-      mode: fallbackTriggered ? 'dual_run' : 'live_subagent_runtime',
-      model_runner: 'claude -p --output-format stream-json',
-      strict_thresholds: STRICT_THRESHOLDS,
-      summary: effectiveSummary,
-      live_cli: {
-        smoke,
-        short_circuited: smokeShortCircuited,
+      const liveSummaryInput = smokeShortCircuited ? [smoke] : results;
+      const summary = computeSummary(liveSummaryInput);
+      const fallbackTriggered = smokeShortCircuited || shouldUseFallback(summary);
+      const {
+        fallbackResults,
+        fallbackSummary,
+        deterministicProbeResults,
+        deterministicProbeSummary,
+      } = await collectFallbackData(fallbackTriggered);
+      const { effectiveSummary, probeUsable } = buildEffectiveSummary({
+        fallbackTriggered,
         summary,
-        cases: results,
-      },
-      hook_e2e_fallback: fallbackTriggered
-        ? {
-            summary: fallbackSummary,
-            cases: fallbackResults,
-          }
-        : null,
-      deterministic_subagent_probe: fallbackTriggered
-        ? {
-            summary: deterministicProbeSummary,
-            cases: deterministicProbeResults,
-          }
-        : null,
-    };
+        fallbackSummary,
+        deterministicProbeSummary,
+      });
 
-    ensureReportDir();
-    fs.writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2), 'utf8');
+      const report = {
+        generated_at: new Date().toISOString(),
+        mode: fallbackTriggered ? 'dual_run' : 'live_subagent_runtime',
+        model_runner: 'claude -p --output-format stream-json',
+        strict_thresholds: STRICT_THRESHOLDS,
+        summary: effectiveSummary,
+        live_cli: {
+          smoke,
+          short_circuited: smokeShortCircuited,
+          summary,
+          cases: results,
+        },
+        hook_e2e_fallback: fallbackTriggered
+          ? {
+              summary: fallbackSummary,
+              cases: fallbackResults,
+            }
+          : null,
+        deterministic_subagent_probe: fallbackTriggered
+          ? {
+              summary: deterministicProbeSummary,
+              cases: deterministicProbeResults,
+            }
+          : null,
+      };
 
-    assert.ok(fs.existsSync(REPORT_PATH), 'report should be written');
-    if (!smokeShortCircuited) {
-      assert.ok(results.length === EVAL_CASES.length, 'all eval cases should run');
+      ensureReportDir();
+      fs.writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2), 'utf8');
+
+      assert.ok(fs.existsSync(REPORT_PATH), 'report should be written');
+      if (!smokeShortCircuited) {
+        assert.ok(results.length === EVAL_CASES.length, 'all eval cases should run');
+      }
+
+      assertStrictThresholdsIfEnabled({
+        fallbackTriggered,
+        probeUsable,
+        summary,
+        fallbackSummary,
+        deterministicProbeSummary,
+      });
     }
-
-    assertStrictThresholdsIfEnabled({
-      fallbackTriggered,
-      probeUsable,
-      summary,
-      fallbackSummary,
-      deterministicProbeSummary,
-    });
-  });
+  );
 });

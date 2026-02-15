@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "assimilate Input Schema",
+  "type": "object",
+  "properties": {
+    "repos": {
+      "description": "List of repo URLs or local clone paths to benchmark",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "focus": {
+      "description": "Comparison surfaces to prioritize",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["memory", "search", "agents", "creators", "workflows", "all"]
+      }
+    },
+    "maxGaps": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 20
+    }
+  },
+  "additionalProperties": true
+}

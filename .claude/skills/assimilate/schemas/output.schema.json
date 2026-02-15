@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "assimilate Output Schema",
+  "type": "object",
+  "required": ["mode", "workspace", "phases", "checkpoints"],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["planning", "execution"]
+    },
+    "workspace": {
+      "type": "string"
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "goal"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "goal": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

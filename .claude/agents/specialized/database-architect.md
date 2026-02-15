@@ -1,7 +1,9 @@
 ---
 name: database-architect
 version: 1.0.0
-description: Database schema design, query optimization, migration planning, and data modeling. Use for designing database schemas, optimizing queries, planning migrations, data consistency validation, and database performance tuning.
+description: >-
+  Database schema design, query optimization, migration planning, and data modeling. Use for designing database schemas,
+  optimizing queries, planning migrations, data consistency validation, and database performance tuning.
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
@@ -25,6 +27,7 @@ skills:
   - task-management-protocol
   - architecture-review
   - code-semantic-search
+  - token-saver-context-compression
   - data-expert
   - database-architect
   - database-expert
@@ -35,6 +38,8 @@ skills:
   - text-to-sql
   - verification-before-completion
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Database Architect Agent
 
@@ -379,6 +384,18 @@ Skill({ skill: 'text-to-sql' }); // Query generation
 | Before claiming completion | `verification-before-completion` | Evidence-based gates         |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

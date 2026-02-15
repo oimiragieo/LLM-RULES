@@ -106,11 +106,13 @@ Skill({ skill: 'framework-context', args: '--scope workflows' });
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+
 ```powershell
 Get-Content .claude/context/memory/learnings.md -TotalCount 120
 ```
 
 **After completing:**
+
 - New framework-context pattern -> `.claude/context/memory/learnings.md`
 - Broken/ambiguous framework mapping -> `.claude/context/memory/issues.md`
 - Architectural interpretation decision -> `.claude/context/memory/decisions.md`

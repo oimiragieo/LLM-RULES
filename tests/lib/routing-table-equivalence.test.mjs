@@ -1,11 +1,18 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
+import {
+  INTENT_TO_AGENT_NAMES,
+  ROUTING_TABLE_AGENT_NAMES,
+} from '../helpers/routing-table-agents.mjs';
 
 const require = createRequire(import.meta.url);
 const routingTable = require('../../.claude/lib/routing/routing-table.cjs');
 
 describe('Routing Table Equivalence Tests', () => {
+  const routingTableAgentNames = new Set(ROUTING_TABLE_AGENT_NAMES);
+  const intentToAgentNames = new Set(INTENT_TO_AGENT_NAMES);
+
   describe('Export Shape Tests', () => {
     it('should export all required keys', () => {
       const requiredKeys = [
@@ -64,66 +71,6 @@ describe('Routing Table Equivalence Tests', () => {
   });
 
   describe('ROUTING_TABLE Coverage Tests', () => {
-    const agentNames = new Set([
-      'developer',
-      'technical-writer',
-      'qa',
-      'code-simplifier',
-      'security-architect',
-      'devops',
-      'database-architect',
-      'code-reviewer',
-      'planner',
-      'architect',
-      'pm',
-      'python-pro',
-      'rust-pro',
-      'golang-pro',
-      'typescript-pro',
-      'fastapi-pro',
-      'c4-context',
-      'c4-container',
-      'c4-component',
-      'c4-code',
-      'web3-blockchain-expert',
-      'frontend-pro',
-      'nodejs-pro',
-      'expo-mobile-developer',
-      'tauri-desktop-developer',
-      'ios-pro',
-      'android-pro',
-      'data-engineer',
-      'master-orchestrator',
-      'swarm-coordinator',
-      'evolution-orchestrator',
-      'context-compressor',
-      'conductor-validator',
-      'reverse-engineer',
-      'incident-responder',
-      'devops-troubleshooter',
-      'graphql-pro',
-      'java-pro',
-      'php-pro',
-      'mobile-ux-reviewer',
-      'nextjs-pro',
-      'sveltekit-expert',
-      'llm-architect',
-      'prompt-engineer',
-      'mcp-developer',
-      'gamedev-pro',
-      'scientific-research-expert',
-      'researcher',
-      'ai-ml-specialist',
-      'api-designer',
-      'microservices-architect',
-      'sre-engineer',
-      'performance-engineer',
-      'penetration-tester',
-      'accessibility-tester',
-      'chaos-engineer',
-      'reflection-agent',
-    ]);
-
     it('should map all entries to valid agent names', () => {
       const entries = Object.entries(routingTable.ROUTING_TABLE);
       assert.ok(entries.length > 0, 'ROUTING_TABLE should have entries');
@@ -134,7 +81,10 @@ describe('Routing Table Equivalence Tests', () => {
           'string',
           `Keyword "${keyword}" should map to a string agent name`
         );
-        assert.ok(agentNames.has(agent), `Keyword "${keyword}" maps to unknown agent "${agent}"`);
+        assert.ok(
+          routingTableAgentNames.has(agent),
+          `Keyword "${keyword}" maps to unknown agent "${agent}"`
+        );
       }
     });
 
@@ -180,72 +130,11 @@ describe('Routing Table Equivalence Tests', () => {
 
     it('should record total ROUTING_TABLE entry count (baseline snapshot)', () => {
       const count = Object.keys(routingTable.ROUTING_TABLE).length;
-      // Baseline: 208 entries as of 2026-02-09
       assert.ok(count >= 200, `Expected at least 200 entries, got ${count}`);
     });
   });
 
   describe('INTENT_TO_AGENT Coverage Tests', () => {
-    const agentNames = new Set([
-      'architect',
-      'context-compressor',
-      'developer',
-      'planner',
-      'pm',
-      'qa',
-      'router',
-      'technical-writer',
-      'python-pro',
-      'rust-pro',
-      'golang-pro',
-      'typescript-pro',
-      'java-pro',
-      'php-pro',
-      'fastapi-pro',
-      'nextjs-pro',
-      'sveltekit-expert',
-      'nodejs-pro',
-      'expo-mobile-developer',
-      'tauri-desktop-developer',
-      'ios-pro',
-      'android-pro',
-      'graphql-pro',
-      'frontend-pro',
-      'data-engineer',
-      'mobile-ux-reviewer',
-      'c4-code',
-      'c4-component',
-      'c4-container',
-      'c4-context',
-      'code-reviewer',
-      'code-simplifier',
-      'conductor-validator',
-      'database-architect',
-      'devops',
-      'devops-troubleshooter',
-      'incident-responder',
-      'reverse-engineer',
-      'researcher',
-      'security-architect',
-      'master-orchestrator',
-      'swarm-coordinator',
-      'evolution-orchestrator',
-      'scientific-research-expert',
-      'llm-architect',
-      'prompt-engineer',
-      'mcp-developer',
-      'ai-ml-specialist',
-      'api-designer',
-      'microservices-architect',
-      'sre-engineer',
-      'performance-engineer',
-      'penetration-tester',
-      'accessibility-tester',
-      'chaos-engineer',
-      'gamedev-pro',
-      'web3-blockchain-expert',
-    ]);
-
     it('should map all intent keys to valid agent names', () => {
       const entries = Object.entries(routingTable.INTENT_TO_AGENT);
       assert.ok(entries.length > 0, 'INTENT_TO_AGENT should have entries');
@@ -256,7 +145,10 @@ describe('Routing Table Equivalence Tests', () => {
           'string',
           `Intent "${intent}" should map to a string agent name`
         );
-        assert.ok(agentNames.has(agent), `Intent "${intent}" maps to unknown agent "${agent}"`);
+        assert.ok(
+          intentToAgentNames.has(agent),
+          `Intent "${intent}" maps to unknown agent "${agent}"`
+        );
       }
     });
 
@@ -466,7 +358,6 @@ describe('Routing Table Equivalence Tests', () => {
   describe('INTENT_KEYWORDS Snapshot Test', () => {
     it('should have expected number of intent categories', () => {
       const categories = Object.keys(routingTable.INTENT_KEYWORDS);
-      // Simplified: ~56 categories after removing legacy duplicate sections (Phase 3.3)
       assert.ok(
         categories.length >= 50,
         `Expected at least 50 intent categories, got ${categories.length}`
@@ -479,7 +370,6 @@ describe('Routing Table Equivalence Tests', () => {
         assert.ok(Array.isArray(keywords), 'Each intent category should have an array of keywords');
         totalKeywords += keywords.length;
       }
-      // Simplified: ~350 total keywords after Phase 3.3 reduction (from ~1570)
       assert.ok(totalKeywords >= 200, `Expected at least 200 total keywords, got ${totalKeywords}`);
     });
 
@@ -542,67 +432,24 @@ describe('Routing Table Equivalence Tests', () => {
       }
     });
 
-    it('should have "developer" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'developer'),
-        'Should have patterns for "developer"'
-      );
-    });
-
-    it('should have "qa" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'qa'),
-        'Should have patterns for "qa"'
-      );
-    });
-
-    it('should have "architect" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'architect'),
-        'Should have patterns for "architect"'
-      );
-    });
-
-    it('should have "planner" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'planner'),
-        'Should have patterns for "planner"'
-      );
-    });
-
-    it('should have "security-architect" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'security-architect'),
-        'Should have patterns for "security-architect"'
-      );
-    });
-
-    it('should have "technical-writer" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'technical-writer'),
-        'Should have patterns for "technical-writer"'
-      );
-    });
-
-    it('should have "devops" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'devops'),
-        'Should have patterns for "devops"'
-      );
-    });
-
-    it('should have "incident-responder" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'incident-responder'),
-        'Should have patterns for "incident-responder"'
-      );
-    });
-
-    it('should have "code-reviewer" patterns', () => {
-      assert.ok(
-        Object.hasOwn(routingTable.ROUTING_PATTERNS, 'code-reviewer'),
-        'Should have patterns for "code-reviewer"'
-      );
+    it('should include required agent pattern groups', () => {
+      const requiredAgents = [
+        'developer',
+        'qa',
+        'architect',
+        'planner',
+        'security-architect',
+        'technical-writer',
+        'devops',
+        'incident-responder',
+        'code-reviewer',
+      ];
+      for (const agent of requiredAgents) {
+        assert.ok(
+          Object.hasOwn(routingTable.ROUTING_PATTERNS, agent),
+          `Should have patterns for "${agent}"`
+        );
+      }
     });
 
     it('should match pattern examples correctly', () => {
@@ -648,21 +495,12 @@ describe('Routing Table Equivalence Tests', () => {
       }
     });
 
-    it('should include "reactjs" pattern', () => {
-      const reactjsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find(
-        p => p.pattern === 'reactjs'
-      );
-      assert.ok(reactjsPattern, 'Should have "reactjs" prefix pattern');
-    });
-
-    it('should include "nextjs" pattern', () => {
-      const nextjsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find(p => p.pattern === 'nextjs');
-      assert.ok(nextjsPattern, 'Should have "nextjs" prefix pattern');
-    });
-
-    it('should include "nodejs" pattern', () => {
-      const nodejsPattern = routingTable.ROUTING_PREFIX_PATTERNS.find(p => p.pattern === 'nodejs');
-      assert.ok(nodejsPattern, 'Should have "nodejs" prefix pattern');
+    it('should include required prefix patterns', () => {
+      const requiredPrefixes = ['reactjs', 'nextjs', 'nodejs'];
+      for (const prefix of requiredPrefixes) {
+        const found = routingTable.ROUTING_PREFIX_PATTERNS.find(p => p.pattern === prefix);
+        assert.ok(found, `Should have "${prefix}" prefix pattern`);
+      }
     });
   });
 });

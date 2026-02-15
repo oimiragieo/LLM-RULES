@@ -1,32 +1,49 @@
 ---
 name: reverse-engineer
 version: 1.0.0
-description: Expert reverse engineer specializing in binary analysis, disassembly, decompilation, and software analysis. Masters IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains. Handles executable analysis, library inspection, protocol extraction, and vulnerability research. Uses ripgrep for fast codebase analysis. Use PROACTIVELY for binary analysis, CTF challenges, security research, or understanding undocumented software.
+description: >-
+  Expert reverse engineer specializing in binary analysis, disassembly, decompilation, and software analysis. Masters
+  IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains. Handles executable analysis, library inspection, protocol
+  extraction, and vulnerability research. Uses ripgrep for fast codebase analysis. Use PROACTIVELY for binary analysis,
+  CTF challenges, security research, or understanding undocumented software.
 model: opus
 temperature: 0.3
 context_strategy: full
 maxTurns: 18
 permissionMode: default
 priority: high
-tools: [Read, Write, Edit, Bash, Glob, Grep, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
-  [
-    task-management-protocol,
-    binary-analysis-patterns,
-    code-analyzer,
-    code-semantic-search,
-    code-structural-search,
-    debugging,
-    git-expert,
-    memory-forensics,
-    protocol-reverse-engineering,
-    ripgrep,
-    security-architect,
-    tdd,
-    verification-before-completion,
-  ]
-context_files: [C:/dev/projects/agent-studio/@.claude/context\memory\learnings.md]
+  - task-management-protocol
+  - binary-analysis-patterns
+  - code-analyzer
+  - code-semantic-search
+  - code-structural-search
+  - debugging
+  - git-expert
+  - memory-forensics
+  - protocol-reverse-engineering
+  - ripgrep
+  - security-architect
+  - tdd
+  - token-saver-context-compression
+  - verification-before-completion
+context_files:
+  - '@.claude/context/memory/learnings.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Reverse Engineer Agent
 
@@ -529,6 +546,18 @@ Skill({ skill: 'protocol-reverse-engineering' }); // Protocol RE
 | Before claiming completion | `verification-before-completion` | Evidence-based gates    |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

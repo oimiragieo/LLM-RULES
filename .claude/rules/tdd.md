@@ -13,6 +13,16 @@ NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
 
 Write code before the test? Delete it. Start over. No exceptions.
 
+## Canon Sequence
+
+0. Maintain scenario backlog.
+1. Convert exactly one scenario into one runnable test.
+2. Prove RED (failing for expected reason).
+3. Implement minimum GREEN patch.
+4. Prove GREEN (targeted + impacted tests).
+5. Optionally refactor with tests green.
+6. Repeat until backlog complete.
+
 ## Red-Green-Refactor Cycle
 
 ### RED - Write Failing Test
@@ -79,6 +89,13 @@ Write code before the test? Delete it. Start over. No exceptions.
 - "Keep as reference" or "adapt existing code"
 - "I already manually tested it"
 
+## AI-Assisted Guardrails
+
+- Keep prompts test-centric; treat tests as executable specs.
+- Use bounded repair loops (max 3 attempts per scenario).
+- Run anti-test-hacking checks before completion.
+- For class-level changes, sequence by method dependencies.
+
 ## Common Rationalizations
 
 | Excuse                         | Reality                                     |
@@ -100,6 +117,7 @@ Before marking any task complete:
 3. All tests pass
 4. Every new function/method has a test
 5. Watched each test fail before implementing
+6. RED and GREEN evidence are captured
 
 **Tasks are NOT complete until all pass.**
 

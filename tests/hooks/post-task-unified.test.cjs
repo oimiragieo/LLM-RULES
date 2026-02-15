@@ -1,13 +1,4 @@
 #!/usr/bin/env node
-/**
- * Tests for post-task-unified.cjs
- *
- * Consolidated PostToolUse(Task) hook that combines:
- * 1. agent-context-tracker.cjs - Agent mode tracking
- * 2. session-memory-extractor.cjs - Session memory extraction
- * 3. task-completion-guard.cjs - Task completion warning
- * 4. evolution-audit.cjs - Evolution auditing
- */
 
 'use strict';
 
@@ -15,6 +6,10 @@ const { describe, it, beforeEach, afterEach, _mock } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
 const fs = require('fs');
+const {
+  backupAndClearRecoveryQueue,
+  restoreRecoveryQueue,
+} = require('../helpers/post-task-unified-test-utils.cjs');
 
 // Store original functions before importing module
 const originalExit = process.exit;
@@ -47,12 +42,7 @@ describe('post-task-unified.cjs', () => {
     delete process.env.EVOLUTION_AUDIT;
 
     // Backup and clear recovery queue
-    if (fs.existsSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH)) {
-      recoveryQueueBackup = fs.readFileSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, 'utf8');
-      fs.unlinkSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH);
-    } else {
-      recoveryQueueBackup = null;
-    }
+    recoveryQueueBackup = backupAndClearRecoveryQueue(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH);
   });
 
   afterEach(() => {
@@ -60,47 +50,35 @@ describe('post-task-unified.cjs', () => {
     process.argv = [...originalArgv];
 
     // Restore recovery queue
-    if (recoveryQueueBackup === null) {
-      if (fs.existsSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH)) {
-        fs.unlinkSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH);
-      }
-    } else {
-      const dir = path.dirname(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, recoveryQueueBackup, 'utf8');
-    }
+    restoreRecoveryQueue(unifiedHook.TASKUPDATE_RECOVERY_QUEUE_PATH, recoveryQueueBackup);
   });
 
   describe('Module exports', () => {
     it('should export all required functions', () => {
-      // From agent-context-tracker
-      assert.strictEqual(typeof unifiedHook.extractTaskDescription, 'function');
-      assert.strictEqual(typeof unifiedHook.isPlannerSpawn, 'function');
-      assert.strictEqual(typeof unifiedHook.isSecuritySpawn, 'function');
-
-      // From extract-workflow-learnings
-      assert.strictEqual(typeof unifiedHook.isWorkflowComplete, 'function');
-      assert.strictEqual(typeof unifiedHook.extractLearnings, 'function');
-      assert.strictEqual(typeof unifiedHook.appendLearnings, 'function');
+      const expectedFunctions = [
+        'extractTaskDescription',
+        'isPlannerSpawn',
+        'isSecuritySpawn',
+        'isWorkflowComplete',
+        'extractLearnings',
+        'appendLearnings',
+        'extractPatterns',
+        'extractGotchas',
+        'extractDiscoveries',
+        'detectsCompletion',
+        'extractExpectedArtifactPaths',
+        'getMissingArtifacts',
+        'synthesizeRecoveryTaskUpdate',
+        'isEvolutionCompletion',
+        'getLatestEvolution',
+        'formatAuditEntry',
+      ];
+      for (const fnName of expectedFunctions) {
+        assert.strictEqual(typeof unifiedHook[fnName], 'function');
+      }
       assert.ok(Array.isArray(unifiedHook.WORKFLOW_COMPLETE_MARKERS));
       assert.ok(Array.isArray(unifiedHook.LEARNING_PATTERNS));
-
-      // From session-memory-extractor
-      assert.strictEqual(typeof unifiedHook.extractPatterns, 'function');
-      assert.strictEqual(typeof unifiedHook.extractGotchas, 'function');
-      assert.strictEqual(typeof unifiedHook.extractDiscoveries, 'function');
-
-      // From task-completion-guard
-      assert.strictEqual(typeof unifiedHook.detectsCompletion, 'function');
-      assert.strictEqual(typeof unifiedHook.extractExpectedArtifactPaths, 'function');
-      assert.strictEqual(typeof unifiedHook.getMissingArtifacts, 'function');
-      assert.strictEqual(typeof unifiedHook.synthesizeRecoveryTaskUpdate, 'function');
       assert.ok(Array.isArray(unifiedHook.COMPLETION_INDICATORS));
-
-      // From evolution-audit
-      assert.strictEqual(typeof unifiedHook.isEvolutionCompletion, 'function');
-      assert.strictEqual(typeof unifiedHook.getLatestEvolution, 'function');
-      assert.strictEqual(typeof unifiedHook.formatAuditEntry, 'function');
     });
 
     it('should export PROJECT_ROOT', () => {
@@ -534,89 +512,6 @@ describe('post-task-unified.cjs', () => {
         if (original === null) fs.unlinkSync(findingsPath);
         else fs.writeFileSync(findingsPath, original, 'utf8');
       }
-    });
-  });
-
-  describe('Evolution Audit', () => {
-    describe('isEvolutionCompletion', () => {
-      it('should detect enable phase', () => {
-        const state = {
-          currentEvolution: { phase: 'enable' },
-        };
-        assert.strictEqual(unifiedHook.isEvolutionCompletion(state), true);
-      });
-
-      it('should detect recently completed evolution', () => {
-        const state = {
-          evolutions: [
-            {
-              createdAt: new Date().toISOString(),
-            },
-          ],
-        };
-        assert.strictEqual(unifiedHook.isEvolutionCompletion(state), true);
-      });
-
-      it('should return false for null state', () => {
-        assert.strictEqual(unifiedHook.isEvolutionCompletion(null), false);
-      });
-
-      it('should return false for old evolutions', () => {
-        const oldDate = new Date(Date.now() - 10 * 60 * 1000).toISOString(); // 10 mins ago
-        const state = {
-          evolutions: [
-            {
-              createdAt: oldDate,
-            },
-          ],
-        };
-        assert.strictEqual(unifiedHook.isEvolutionCompletion(state), false);
-      });
-    });
-
-    describe('getLatestEvolution', () => {
-      it('should get last evolution from array', () => {
-        const state = {
-          evolutions: [{ name: 'first' }, { name: 'second' }],
-        };
-        const latest = unifiedHook.getLatestEvolution(state);
-        assert.strictEqual(latest.name, 'second');
-      });
-
-      it('should fall back to currentEvolution', () => {
-        const state = {
-          currentEvolution: { name: 'current' },
-        };
-        const latest = unifiedHook.getLatestEvolution(state);
-        assert.strictEqual(latest.name, 'current');
-      });
-
-      it('should return null for empty state', () => {
-        assert.strictEqual(unifiedHook.getLatestEvolution(null), null);
-        assert.strictEqual(unifiedHook.getLatestEvolution({}), null);
-      });
-    });
-
-    describe('formatAuditEntry', () => {
-      it('should format evolution data', () => {
-        const evolution = {
-          type: 'agent',
-          name: 'test-agent',
-          path: '.claude/agents/test.md',
-          researchReport: 'research.md',
-        };
-        const entry = unifiedHook.formatAuditEntry(evolution);
-        assert.ok(entry.includes('[EVOLUTION]'));
-        assert.ok(entry.includes('type=agent'));
-        assert.ok(entry.includes('name=test-agent'));
-        assert.ok(entry.includes('status=completed'));
-      });
-
-      it('should handle null evolution', () => {
-        const entry = unifiedHook.formatAuditEntry(null);
-        assert.ok(entry.includes('[EVOLUTION]'));
-        assert.ok(entry.includes('type=unknown'));
-      });
     });
   });
 

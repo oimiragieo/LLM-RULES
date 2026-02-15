@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 101** (1 deprecated alias) | Last Updated: 2026-02-14
+> **Total Skills: 102** (1 deprecated alias) | Last Updated: 2026-02-15
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 99 (maintained and invoked)
+- **Active Skills:** 100 (maintained and invoked)
 - **Deprecated Aliases:** 1 (`testing-expert` → `tdd`)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -15,28 +15,28 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 ## Quick Reference by Category
 
-| Category                                           | Count | Key Skills                                                                                                                                                                                             |
-| -------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                            |
-| [Planning & Architecture](#planning--architecture) | 9     | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator                                                                                                           |
-| [Security](#security)                              | 11    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults                  |
-| [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                             |
-| [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                        |
-| [Frameworks](#frameworks)                          | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                             |
-| [Mobile](#mobile)                                  | 5     | ios-expert, android-expert, expo-framework-rule, tauri-native-api-integration, mobile-first-design-rules                                                                                               |
-| [Data & Database](#data--database)                 | 4     | database-architect, database-expert, data-expert, text-to-sql                                                                                                                                          |
-| [Documentation](#documentation)                    | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                                                  |
-| [Git & Version Control](#git--version-control)     | 1     | git-expert                                                                                                                                                                                             |
-| [Code Style & Linting](#code-style--linting)       | 2     | code-style-validator, dry-principle                                                                                                                                                                    |
-| [Creator Tools](#creator-tools)                    | 12    | research-synthesis, agent-creator, skill-creator, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator |
-| [Memory & Context](#memory--context)               | 9     | context-compressor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution          |
-| [Validation & Quality](#validation--quality)       | 5     | verification-before-completion, checklist-generator, response-rater, test-generator, accessibility                                                                                                     |
-| [Specialized Patterns](#specialized-patterns)      | 9     | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology                       |
-| [External Integrations](#external-integrations)    | 1     | project-onboarding                                                                                                                                                                                     |
-| [Scientific Research](#scientific-research)        | 1     | scientific-skills (parent with 139 sub-skills)                                                                                                                                                         |
-| [Incident Response](#incident-response)            | 3     | incident-runbook-templates, on-call-handoff-patterns, postmortem-writing                                                                                                                               |
-| [Search](#search)                                  | 4     | ripgrep, code-semantic-search, code-structural-search, frontend-expert                                                                                                                                 |
-| [Other](#other)                                    | 4     | advanced-elicitation, summarize-changes, container-expert, php-expert                                                                                                                                  |
+| Category                                           | Count | Key Skills                                                                                                                                                                                                                                   |
+| -------------------------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                                                                  |
+| [Planning & Architecture](#planning--architecture) | 9     | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator                                                                                                                                                 |
+| [Security](#security)                              | 11    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults                                                        |
+| [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                                                                   |
+| [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                                                              |
+| [Frameworks](#frameworks)                          | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                                                                   |
+| [Mobile](#mobile)                                  | 5     | ios-expert, android-expert, expo-framework-rule, tauri-native-api-integration, mobile-first-design-rules                                                                                                                                     |
+| [Data & Database](#data--database)                 | 4     | database-architect, database-expert, data-expert, text-to-sql                                                                                                                                                                                |
+| [Documentation](#documentation)                    | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                                                                                        |
+| [Git & Version Control](#git--version-control)     | 1     | git-expert                                                                                                                                                                                                                                   |
+| [Code Style & Linting](#code-style--linting)       | 2     | code-style-validator, dry-principle                                                                                                                                                                                                          |
+| [Creator Tools](#creator-tools)                    | 12    | research-synthesis, agent-creator, skill-creator, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator                                       |
+| [Memory & Context](#memory--context)               | 11    | context-compressor, token-saver-context-compression, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution, assimilate |
+| [Validation & Quality](#validation--quality)       | 5     | verification-before-completion, checklist-generator, response-rater, test-generator, accessibility                                                                                                                                           |
+| [Specialized Patterns](#specialized-patterns)      | 9     | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology                                                             |
+| [External Integrations](#external-integrations)    | 1     | project-onboarding                                                                                                                                                                                                                           |
+| [Scientific Research](#scientific-research)        | 1     | scientific-skills (parent with 139 sub-skills)                                                                                                                                                                                               |
+| [Incident Response](#incident-response)            | 3     | incident-runbook-templates, on-call-handoff-patterns, postmortem-writing                                                                                                                                                                     |
+| [Search](#search)                                  | 4     | ripgrep, code-semantic-search, code-structural-search, frontend-expert                                                                                                                                                                       |
+| [Other](#other)                                    | 4     | advanced-elicitation, summarize-changes, container-expert, php-expert                                                                                                                                                                        |
 
 ---
 
@@ -44,19 +44,19 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 Essential development workflow skills.
 
-| Skill                            | Description                                                                           | Primary Agents                 |
-| -------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------ |
-| `tdd`                            | Test-Driven Development with Iron Laws. **Includes deprecated alias: testing-expert** | developer, qa                  |
-| `debugging`                      | Systematic 4-phase debugging with root cause investigation                            | developer                      |
-| `ripgrep`                        | Enhanced code search with ES module support (.mjs, .cjs, .mts, .cts)                  | 36+ agents (all domain agents) |
-| `code-quality-expert`            | Clean code principles, style guides, refactoring patterns                             | code-reviewer, developer       |
-| `code-analyzer`                  | Static code analysis and complexity metrics                                           | code-reviewer, architect       |
-| `code-semantic-search`           | Semantic code search using Phase 1 vectors + Phase 2 hybrid                           | 36+ agents (all domain agents) |
-| `code-structural-search`         | AST-based pattern matching with ast-grep                                              | 36+ agents (all domain agents) |
-| `code-style-validator`           | Programmatic AST-based style validation                                               | code-reviewer                  |
-| `dry-principle`                  | Don't Repeat Yourself enforcement                                                     | code-reviewer                  |
-| `verification-before-completion` | Gate function preventing unverified claims                                            | all agents                     |
-| `best-practices-guidelines`      | Cross-cutting best practices                                                          | all agents                     |
+| Skill                            | Description                                                                    | Primary Agents                 |
+| -------------------------------- | ------------------------------------------------------------------------------ | ------------------------------ |
+| `tdd`                            | Canon TDD with scenario backlog and RED/GREEN proof (alias: `testing-expert`). | developer, qa                  |
+| `debugging`                      | Systematic 4-phase debugging with root cause investigation                     | developer                      |
+| `ripgrep`                        | Enhanced code search with ES module support (.mjs, .cjs, .mts, .cts)           | 36+ agents (all domain agents) |
+| `code-quality-expert`            | Clean code principles, style guides, refactoring patterns                      | code-reviewer, developer       |
+| `code-analyzer`                  | Static code analysis and complexity metrics                                    | code-reviewer, architect       |
+| `code-semantic-search`           | Semantic code search using Phase 1 vectors + Phase 2 hybrid                    | 36+ agents (all domain agents) |
+| `code-structural-search`         | AST-based pattern matching with ast-grep                                       | 36+ agents (all domain agents) |
+| `code-style-validator`           | Programmatic AST-based style validation                                        | code-reviewer                  |
+| `dry-principle`                  | Don't Repeat Yourself enforcement                                              | code-reviewer                  |
+| `verification-before-completion` | Gate function preventing unverified claims                                     | all agents                     |
+| `best-practices-guidelines`      | Cross-cutting best practices                                                   | all agents                     |
 
 **Invocation:**
 
@@ -254,17 +254,19 @@ Skill({ skill: 'artifact-integrator' });
 
 Memory and context management.
 
-| Skill                    | Description                                                  | Primary Agents             |
-| ------------------------ | ------------------------------------------------------------ | -------------------------- |
-| `context-compressor`     | Context compression methodology                              | all agents                 |
-| `session-handoff`        | Handoff document creation                                    | all agents                 |
-| `task-management-protocol` | Task synchronization protocol                              | all agents                 |
-| `context-driven-development` | Context as managed artifacts                             | all agents                 |
-| `insight-extraction`     | Extract session learnings                                    | all agents                 |
-| `track-management`       | Logical work unit management                                 | planner, developer         |
-| `pipeline-reflection-ux` | Step 0/reflection UX and pipeline-noise control             | router, planner            |
-| `framework-context`      | Structured framework context for reflection/planning         | reflection-agent, planner  |
-| `recommend-evolution`    | Trigger-based evolution recommendation and request recording | reflection-agent, planner  |
+| Skill                             | Description                                                  | Primary Agents                           |
+| --------------------------------- | ------------------------------------------------------------ | ---------------------------------------- |
+| `context-compressor`              | Context compression methodology                              | all agents                               |
+| `token-saver-context-compression` | Search-aware context compression with MemoryRecord mapping   | developer, planner, context-compressor   |
+| `session-handoff`                 | Handoff document creation                                    | all agents                               |
+| `task-management-protocol`        | Task synchronization protocol                                | all agents                               |
+| `context-driven-development`      | Context as managed artifacts                                 | all agents                               |
+| `insight-extraction`              | Extract session learnings                                    | all agents                               |
+| `track-management`                | Logical work unit management                                 | planner, developer                       |
+| `pipeline-reflection-ux`          | Step 0/reflection UX and pipeline-noise control              | router, planner                          |
+| `framework-context`               | Structured framework context for reflection/planning         | reflection-agent, planner                |
+| `recommend-evolution`             | Trigger-based evolution recommendation and request recording | reflection-agent, planner                |
+| `assimilate`                      | External benchmark assimilation into TDD upgrade backlog     | evolution-orchestrator, reflection-agent |
 
 ---
 

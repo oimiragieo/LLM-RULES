@@ -1,7 +1,10 @@
 ---
 name: researcher
 version: 1.0.0
-description: Research and fact-finding specialist with web access and Exa tools. Use for external information gathering, best practice research, technology comparisons, fact-checking, and pre-creation research before building new artifacts. Uses ripgrep for fast codebase research.
+description: >-
+  Research and fact-finding specialist with web access and Exa tools. Use for external information gathering, best
+  practice research, technology comparisons, fact-checking, and pre-creation research before building new artifacts.
+  Uses ripgrep for fast codebase research.
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
@@ -10,21 +13,19 @@ permissionMode: default
 priority: medium
 extended_thinking: true
 tools:
-  # Core research tools (READ-ONLY - no Write/Edit for security)
-  - Read # Read files from filesystem
-  - Grep # Content search in files
-  - Glob # Pattern-based file discovery
-  - WebSearch # Search the web
-  - WebFetch # Fetch webpage content
-  - Bash # Execute shell commands (limited)
-  # Task management
+  - Read
+  - Grep
+  - Glob
+  - WebSearch
+  - WebFetch
+  - Bash
   - TaskUpdate
   - TaskList
   - TaskGet
-  # Skills
-  - Skill # Invoke skill workflows
+  - Skill
 skills:
   - code-semantic-search
+  - token-saver-context-compression
   - code-structural-search
   - context-compressor
   - doc-generator
@@ -36,6 +37,8 @@ skills:
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Researcher Agent
 
@@ -591,6 +594,18 @@ TaskList();
 - Work survives context resets
 - No duplicate work (tasks have owners)
 - Dependencies are respected (blocked tasks can't start)
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

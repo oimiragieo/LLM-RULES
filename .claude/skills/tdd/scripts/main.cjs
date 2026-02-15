@@ -1,65 +1,70 @@
 #!/usr/bin/env node
 
 /**
- * Tdd - Main Script
- * Test-Driven Development workflow enforcement with Red-Green-Refactor cycle.
- *
- * Usage:
- *   node main.cjs [options]
- *
- * Options:
- *   --help     Show this help message
+ * tdd - Main Script
+ * Minimal CLI helper for Canon TDD evidence scaffolding.
  */
 
-const fs = require('fs');
-const path = require('path');
-
-// Find project root
-function findProjectRoot() {
-  let dir = __dirname;
-  while (dir !== path.parse(dir).root) {
-    if (fs.existsSync(path.join(dir, '.claude'))) {
-      return dir;
+function parseArgs(argv) {
+  const options = {};
+  for (let i = 0; i < argv.length; i++) {
+    if (!argv[i].startsWith('--')) {
+      continue;
     }
-    dir = path.dirname(dir);
-  }
-  return process.cwd();
-}
-
-const PROJECT_ROOT = findProjectRoot();
-
-// Parse command line arguments
-const args = process.argv.slice(2);
-const options = {};
-for (let i = 0; i < args.length; i++) {
-  if (args[i].startsWith('--')) {
-    const key = args[i].slice(2);
-    const value = args[i + 1] && !args[i + 1].startsWith('--') ? args[++i] : true;
+    const key = argv[i].slice(2);
+    const value = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true;
     options[key] = value;
   }
+  return options;
 }
 
-/**
- * Main execution
- */
 function main() {
+  const options = parseArgs(process.argv.slice(2));
+
   if (options.help) {
     console.log(`
-Tdd - Main Script
+tdd - Main Script
 
 Usage:
-  node main.cjs [options]
+  node main.cjs --task "<summary>" [--mode full_task|single_cycle]
+  node main.cjs --help
 
 Options:
-  --help     Show this help message
+  --task      Required task summary
+  --mode      full_task (default) or single_cycle
+  --help      Show this help message
 `);
     process.exit(0);
   }
 
-  console.log(
-    'TDD skill provides test-driven development guidance. Invoke via the agent; no standalone script.'
-  );
-  process.exit(0);
+  if (!options.task || typeof options.task !== 'string') {
+    console.error('Missing required --task argument');
+    process.exit(1);
+  }
+
+  const mode = options.mode === 'single_cycle' ? 'single_cycle' : 'full_task';
+  const output = {
+    success: true,
+    redVerified: false,
+    greenVerified: false,
+    scenarioProgress: { total: 1, completed: 0 },
+    evidence: {
+      redCommand: '',
+      redFailureSummary: '',
+      greenCommand: '',
+      greenPassSummary: '',
+    },
+    repairAttempts: 0,
+    testHackingChecks: {
+      passed: false,
+      findings: [
+        'Execution scaffold only. Run through agent-guided TDD loop to produce real evidence.',
+      ],
+    },
+    note: `Prepared ${mode} scaffold for task: ${options.task}`,
+  };
+
+  console.log(JSON.stringify(output, null, 2));
 }
 
 main();

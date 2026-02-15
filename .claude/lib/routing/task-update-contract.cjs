@@ -1,11 +1,6 @@
 'use strict';
 
-const VALID_TASK_STATUSES = Object.freeze([
-  'pending',
-  'in_progress',
-  'completed',
-  'deleted',
-]);
+const VALID_TASK_STATUSES = Object.freeze(['pending', 'in_progress', 'completed', 'deleted']);
 
 function normalizeStatus(rawStatus) {
   if (rawStatus == null) return null;

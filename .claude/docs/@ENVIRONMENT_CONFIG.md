@@ -291,12 +291,12 @@ AGENT_STUDIO_ENV=staging claude
 
 These variables are used by `tests/evals/subagent-memory-rag-live.eval.cjs` (they are eval harness toggles, not runtime hook controls):
 
-| Variable                             | Values     | Default | Purpose                                                                                 |
-| ------------------------------------ | ---------- | ------- | --------------------------------------------------------------------------------------- |
-| `RUN_LIVE_SUBAGENT_EVALS`            | on/off     | off     | Enables live eval execution; when off, the eval test is skipped.                       |
-| `RUN_LIVE_SUBAGENT_EVALS_STRICT`     | on/off     | off     | Enables strict threshold assertions for summary rates.                                  |
-| `SUBAGENT_LIVE_EVAL_TIMEOUT_MS`      | number     | 120000  | Per-case timeout for live CLI eval runs before forced kill/timeout classification.     |
-| `SUBAGENT_LIVE_EVAL_MAX_TURNS`       | number     | 3       | Max turns passed to `claude -p` during live eval.                                       |
+| Variable                         | Values | Default | Purpose                                                                            |
+| -------------------------------- | ------ | ------- | ---------------------------------------------------------------------------------- |
+| `RUN_LIVE_SUBAGENT_EVALS`        | on/off | off     | Enables live eval execution; when off, the eval test is skipped.                   |
+| `RUN_LIVE_SUBAGENT_EVALS_STRICT` | on/off | off     | Enables strict threshold assertions for summary rates.                             |
+| `SUBAGENT_LIVE_EVAL_TIMEOUT_MS`  | number | 120000  | Per-case timeout for live CLI eval runs before forced kill/timeout classification. |
+| `SUBAGENT_LIVE_EVAL_MAX_TURNS`   | number | 3       | Max turns passed to `claude -p` during live eval.                                  |
 
 The eval report is written to:
 

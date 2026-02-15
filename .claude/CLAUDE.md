@@ -642,6 +642,10 @@ Router and spawned agents must follow these runtime rules:
 
 **recommend-evolution** — Trigger-based evolution recommendation workflow. Records proposals in `.claude/context/runtime/evolution-requests.jsonl` and reflection report sections; does not auto-spawn orchestrators.
 
+**assimilate** — External benchmark assimilation workflow (clone/stage competitor repos → comparable surface extraction → gap list → TDD backlog). Use when framework self-improvement or EVOLVE benchmarking is requested.
+
+**token-saver-context-compression** — Search-aware context compression workflow (hybrid search → evidence gate → MemoryRecord-ready payload mapping). Use when large context must be distilled without losing grounded evidence.
+
 ### 8.6 ENTERPRISE WORKFLOWS
 
 > **REFERENCE:** See **@ENTERPRISE_WORKFLOWS.md** for complete workflow catalog.

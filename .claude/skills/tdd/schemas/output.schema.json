@@ -1,23 +1,87 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "tdd Output Schema",
-  "description": "Output validation schema for tdd skill",
+  "description": "Output contract for Canon TDD execution with RED/GREEN evidence",
   "type": "object",
-  "required": ["success"],
+  "required": ["success", "redVerified", "greenVerified"],
   "properties": {
     "success": {
       "type": "boolean",
       "description": "Whether the skill executed successfully"
     },
-    "result": {
+    "redVerified": {
+      "type": "boolean",
+      "description": "True when RED was explicitly observed and captured."
+    },
+    "greenVerified": {
+      "type": "boolean",
+      "description": "True when GREEN was explicitly observed and captured."
+    },
+    "scenarioProgress": {
       "type": "object",
-      "description": "The skill execution result",
-      "additionalProperties": true
+      "required": ["total", "completed"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "redCommand": {
+          "type": "string"
+        },
+        "redFailureSummary": {
+          "type": "string"
+        },
+        "greenCommand": {
+          "type": "string"
+        },
+        "greenPassSummary": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "repairAttempts": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "testHackingChecks": {
+      "type": "object",
+      "required": ["passed"],
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "memoryProfileUpdated": {
+      "type": "boolean",
+      "description": "True when bounded tdd-memory-profile was updated."
+    },
+    "memoryProfilePath": {
+      "type": "string",
+      "description": "Path to tdd-memory-profile JSON."
     },
     "error": {
       "type": "string",
       "description": "Error message if execution failed"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

@@ -1,17 +1,48 @@
-# tdd Implementation Template
+# TDD Implementation Template
 
-## Goal
+## Change Goal
 
-- Define target outcome and acceptance criteria.
+- Problem:
+- Acceptance criteria:
+- Out of scope:
 
-## TDD
+## Scenario Backlog (Required)
 
-1. Red
-2. Green
-3. Refactor
+| ID  | Scenario | Priority | Status |
+| --- | -------- | -------- | ------ |
+| S1  |          |          | TODO   |
 
-## Verification
+## Cycle Evidence (One scenario per loop)
 
-- lint
-- format
-- targeted tests
+### Scenario ID
+
+### RED
+
+- Test added/updated:
+- Command:
+- Failure summary:
+
+### GREEN
+
+- Production files changed:
+- Command:
+- Pass summary:
+
+### REFACTOR (Optional)
+
+- Refactor performed:
+- Verification command:
+- Result:
+
+## Anti-Test-Hacking Check
+
+- [ ] Assertions still express the original requirement
+- [ ] No test-only branch or feature flag added
+- [ ] Negative test included for bug-fix scenarios
+
+## Completion Checks
+
+- [ ] All scenario backlog items resolved or deferred with reason
+- [ ] All touched tests pass
+- [ ] Lint command run
+- [ ] Format check command run

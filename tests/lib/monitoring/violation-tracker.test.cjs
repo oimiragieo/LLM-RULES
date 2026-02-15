@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { makeViolation } = require('../../helpers/violation-tracker-test-utils.cjs');
 
 // Module under test
 const {
@@ -14,21 +15,19 @@ const {
   _resetForTesting,
 } = require('../../../.claude/lib/monitoring/violation-tracker.cjs');
 
-describe('recordViolation', () => {
+function createMetricsFixture(prefix) {
   let tempDir;
   let metricsFile;
 
   before(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'violation-tracker-test-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
     metricsFile = path.join(tempDir, 'router-violations.jsonl');
   });
 
   beforeEach(() => {
-    // Clean up file before each test
     if (fs.existsSync(metricsFile)) {
       fs.unlinkSync(metricsFile);
     }
-    // Reset rate limiter
     _resetForTesting();
   });
 
@@ -38,16 +37,18 @@ describe('recordViolation', () => {
     }
   });
 
+  return {
+    getTempDir: () => tempDir,
+    getMetricsFile: () => metricsFile,
+  };
+}
+
+describe('recordViolation', () => {
+  const fixture = createMetricsFixture('violation-tracker-test-');
+
   it('writes a JSONL entry to router-violations.jsonl', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
-      tool: 'Grep',
-      action: 'warn',
-      checkName: 'routerSelfCheck',
-      routerMode: 'router',
-      taskSpawned: false,
-      sessionId: 'test-session',
-    };
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({ sessionId: 'test-session' });
 
     recordViolation(violation, metricsFile);
 
@@ -62,18 +63,9 @@ describe('recordViolation', () => {
   });
 
   it('creates metrics directory if it does not exist', () => {
-    const nestedDir = path.join(tempDir, 'nested', 'metrics');
+    const nestedDir = path.join(fixture.getTempDir(), 'nested', 'metrics');
     const nestedFile = path.join(nestedDir, 'router-violations.jsonl');
-
-    const violation = {
-      timestamp: new Date().toISOString(),
-      tool: 'Glob',
-      action: 'block',
-      checkName: 'routerSelfCheck',
-      routerMode: 'router',
-      taskSpawned: false,
-      sessionId: 'test',
-    };
+    const violation = makeViolation({ tool: 'Glob', action: 'block' });
 
     recordViolation(violation, nestedFile);
 
@@ -82,34 +74,11 @@ describe('recordViolation', () => {
   });
 
   it('appends multiple violations as separate lines', () => {
+    const metricsFile = fixture.getMetricsFile();
     const violations = [
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Glob',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Write',
-        action: 'block',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
+      makeViolation(),
+      makeViolation({ tool: 'Glob' }),
+      makeViolation({ tool: 'Write', action: 'block' }),
     ];
 
     violations.forEach(v => recordViolation(v, metricsFile));
@@ -121,6 +90,7 @@ describe('recordViolation', () => {
   });
 
   it('never throws (best-effort pattern)', () => {
+    const tempDir = fixture.getTempDir();
     // Create read-only directory (platform-specific)
     const readonlyDir = path.join(tempDir, 'readonly');
     fs.mkdirSync(readonlyDir, { recursive: true });
@@ -131,15 +101,7 @@ describe('recordViolation', () => {
 
     const readonlyFile = path.join(readonlyDir, 'violations.jsonl');
 
-    const violation = {
-      timestamp: new Date().toISOString(),
-      tool: 'Grep',
-      action: 'warn',
-      checkName: 'routerSelfCheck',
-      routerMode: 'router',
-      taskSpawned: false,
-      sessionId: 'test',
-    };
+    const violation = makeViolation();
 
     // Should not throw even with permission error
     assert.doesNotThrow(() => {
@@ -153,15 +115,8 @@ describe('recordViolation', () => {
   });
 
   it('[SEC-MON-001] validates tool name against known whitelist', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
-      tool: 'UnknownMaliciousTool',
-      action: 'warn',
-      checkName: 'routerSelfCheck',
-      routerMode: 'router',
-      taskSpawned: false,
-      sessionId: 'test',
-    };
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({ tool: 'UnknownMaliciousTool' });
 
     recordViolation(violation, metricsFile);
 
@@ -173,15 +128,8 @@ describe('recordViolation', () => {
   });
 
   it('[SEC-MON-001] truncates all string fields to 500 characters', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
-      tool: 'A'.repeat(1000),
-      action: 'warn',
-      checkName: 'routerSelfCheck',
-      routerMode: 'router',
-      taskSpawned: false,
-      sessionId: 'test',
-    };
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({ tool: 'A'.repeat(1000) });
 
     recordViolation(violation, metricsFile);
 
@@ -193,16 +141,13 @@ describe('recordViolation', () => {
   });
 
   it('[SEC-MON-002] scrubs secret patterns from command field', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({
       tool: 'Bash',
       action: 'block',
       checkName: 'routerBash',
-      routerMode: 'router',
-      taskSpawned: false,
       command: 'curl -H "Bearer sk-abc123" https://api.example.com',
-      sessionId: 'test',
-    };
+    });
 
     recordViolation(violation, metricsFile);
 
@@ -215,16 +160,13 @@ describe('recordViolation', () => {
   });
 
   it('[SEC-MON-002] scrubs ghp_ tokens from command field', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({
       tool: 'Bash',
       action: 'block',
       checkName: 'routerBash',
-      routerMode: 'router',
-      taskSpawned: false,
       command: 'git push https://ghp_abcdef123@github.com/repo',
-      sessionId: 'test',
-    };
+    });
 
     recordViolation(violation, metricsFile);
 
@@ -236,16 +178,13 @@ describe('recordViolation', () => {
   });
 
   it('[SEC-MON-002] scrubs password= patterns from command field', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({
       tool: 'Bash',
       action: 'block',
       checkName: 'routerBash',
-      routerMode: 'router',
-      taskSpawned: false,
       command: 'login password=mysecret123',
-      sessionId: 'test',
-    };
+    });
 
     recordViolation(violation, metricsFile);
 
@@ -257,16 +196,8 @@ describe('recordViolation', () => {
   });
 
   it('[SEC-MON-002] never includes raw prompt content', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
-      tool: 'Grep',
-      action: 'warn',
-      checkName: 'routerSelfCheck',
-      routerMode: 'router',
-      taskSpawned: false,
-      sessionId: 'test',
-      prompt: 'This should not be logged',
-    };
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({ prompt: 'This should not be logged' });
 
     recordViolation(violation, metricsFile);
 
@@ -278,15 +209,8 @@ describe('recordViolation', () => {
   });
 
   it('includes required fields: timestamp, tool, action, checkName, routerMode, sessionId', () => {
-    const violation = {
-      timestamp: new Date().toISOString(),
-      tool: 'Grep',
-      action: 'warn',
-      checkName: 'routerSelfCheck',
-      routerMode: 'router',
-      taskSpawned: false,
-      sessionId: 'test-session-123',
-    };
+    const metricsFile = fixture.getMetricsFile();
+    const violation = makeViolation({ sessionId: 'test-session-123' });
 
     recordViolation(violation, metricsFile);
 
@@ -303,44 +227,13 @@ describe('recordViolation', () => {
 });
 
 describe('rotation', () => {
-  let tempDir;
-  let metricsFile;
-
-  before(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'violation-rotation-test-'));
-    metricsFile = path.join(tempDir, 'router-violations.jsonl');
-  });
-
-  beforeEach(() => {
-    // Clean up file before each test
-    if (fs.existsSync(metricsFile)) {
-      fs.unlinkSync(metricsFile);
-    }
-    // Reset rate limiter
-    _resetForTesting();
-  });
-
-  after(() => {
-    if (tempDir && fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-  });
+  const fixture = createMetricsFixture('violation-rotation-test-');
 
   it('trims JSONL file when it exceeds maxLines (default 2000)', () => {
+    const metricsFile = fixture.getMetricsFile();
     // Write 2100 violations
     for (let i = 0; i < 2100; i++) {
-      recordViolation(
-        {
-          timestamp: new Date().toISOString(),
-          tool: 'Grep',
-          action: 'warn',
-          checkName: 'routerSelfCheck',
-          routerMode: 'router',
-          taskSpawned: false,
-          sessionId: 'test',
-        },
-        metricsFile
-      );
+      recordViolation(makeViolation(), metricsFile);
     }
 
     const content = fs.readFileSync(metricsFile, 'utf8');
@@ -351,23 +244,13 @@ describe('rotation', () => {
   });
 
   it('respects VIOLATION_METRICS_MAX_LINES env override', () => {
+    const metricsFile = fixture.getMetricsFile();
     const originalEnv = process.env.VIOLATION_METRICS_MAX_LINES;
     process.env.VIOLATION_METRICS_MAX_LINES = '50';
 
     // Write 60 violations
     for (let i = 0; i < 60; i++) {
-      recordViolation(
-        {
-          timestamp: new Date().toISOString(),
-          tool: 'Grep',
-          action: 'warn',
-          checkName: 'routerSelfCheck',
-          routerMode: 'router',
-          taskSpawned: false,
-          sessionId: 'test',
-        },
-        metricsFile
-      );
+      recordViolation(makeViolation(), metricsFile);
     }
 
     const content = fs.readFileSync(metricsFile, 'utf8');
@@ -439,91 +322,16 @@ describe('rate limiting', () => {
 });
 
 describe('getViolationStats', () => {
-  let tempDir;
-  let metricsFile;
-
-  before(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'violation-stats-test-'));
-    metricsFile = path.join(tempDir, 'router-violations.jsonl');
-  });
-
-  beforeEach(() => {
-    // Clean up file before each test
-    if (fs.existsSync(metricsFile)) {
-      fs.unlinkSync(metricsFile);
-    }
-    // Reset rate limiter
-    _resetForTesting();
-  });
-
-  after(() => {
-    if (tempDir && fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-  });
+  const fixture = createMetricsFixture('violation-stats-test-');
 
   it('returns count and breakdown by tool', () => {
+    const metricsFile = fixture.getMetricsFile();
     // Write 5 violations (3 Grep, 2 Glob)
-    recordViolation(
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
-    recordViolation(
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
-    recordViolation(
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
-    recordViolation(
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Glob',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
-    recordViolation(
-      {
-        timestamp: new Date().toISOString(),
-        tool: 'Glob',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
+    recordViolation(makeViolation(), metricsFile);
+    recordViolation(makeViolation(), metricsFile);
+    recordViolation(makeViolation(), metricsFile);
+    recordViolation(makeViolation({ tool: 'Glob' }), metricsFile);
+    recordViolation(makeViolation({ tool: 'Glob' }), metricsFile);
 
     const stats = getViolationStats({ metricsFile });
 
@@ -533,36 +341,15 @@ describe('getViolationStats', () => {
   });
 
   it('filters by time window', () => {
+    const metricsFile = fixture.getMetricsFile();
     const now = new Date();
     const old = new Date(now.getTime() - 2 * 60 * 60 * 1000); // 2 hours ago
 
     // Write old violation
-    recordViolation(
-      {
-        timestamp: old.toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
+    recordViolation(makeViolation({ timestamp: old.toISOString() }), metricsFile);
 
     // Write recent violation
-    recordViolation(
-      {
-        timestamp: now.toISOString(),
-        tool: 'Glob',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
+    recordViolation(makeViolation({ timestamp: now.toISOString(), tool: 'Glob' }), metricsFile);
 
     const stats = getViolationStats({ metricsFile, windowMinutes: 60 });
 
@@ -571,6 +358,7 @@ describe('getViolationStats', () => {
   });
 
   it('handles malformed JSONL lines gracefully', () => {
+    const metricsFile = fixture.getMetricsFile();
     // Write mix of valid and invalid lines
     fs.writeFileSync(metricsFile, '{"valid": true}\n');
     fs.appendFileSync(metricsFile, 'invalid json line\n');
@@ -583,7 +371,7 @@ describe('getViolationStats', () => {
   });
 
   it('returns empty stats for missing file', () => {
-    const nonexistentFile = path.join(tempDir, 'nonexistent.jsonl');
+    const nonexistentFile = path.join(fixture.getTempDir(), 'nonexistent.jsonl');
 
     const stats = getViolationStats({ metricsFile: nonexistentFile });
 
@@ -595,44 +383,13 @@ describe('getViolationStats', () => {
 });
 
 describe('checkThreshold', () => {
-  let tempDir;
-  let metricsFile;
-
-  before(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'violation-threshold-test-'));
-    metricsFile = path.join(tempDir, 'router-violations.jsonl');
-  });
-
-  beforeEach(() => {
-    // Clean up file before each test
-    if (fs.existsSync(metricsFile)) {
-      fs.unlinkSync(metricsFile);
-    }
-    // Reset rate limiter
-    _resetForTesting();
-  });
-
-  after(() => {
-    if (tempDir && fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-  });
+  const fixture = createMetricsFixture('violation-threshold-test-');
 
   it('returns exceeded: false when under threshold', () => {
+    const metricsFile = fixture.getMetricsFile();
     // Write 3 violations
     for (let i = 0; i < 3; i++) {
-      recordViolation(
-        {
-          timestamp: new Date().toISOString(),
-          tool: 'Grep',
-          action: 'warn',
-          checkName: 'routerSelfCheck',
-          routerMode: 'router',
-          taskSpawned: false,
-          sessionId: 'test',
-        },
-        metricsFile
-      );
+      recordViolation(makeViolation(), metricsFile);
     }
 
     const result = checkThreshold({ metricsFile, threshold: 5 });
@@ -643,20 +400,10 @@ describe('checkThreshold', () => {
   });
 
   it('returns exceeded: true when over threshold', () => {
+    const metricsFile = fixture.getMetricsFile();
     // Write 7 violations
     for (let i = 0; i < 7; i++) {
-      recordViolation(
-        {
-          timestamp: new Date().toISOString(),
-          tool: 'Grep',
-          action: 'warn',
-          checkName: 'routerSelfCheck',
-          routerMode: 'router',
-          taskSpawned: false,
-          sessionId: 'test',
-        },
-        metricsFile
-      );
+      recordViolation(makeViolation(), metricsFile);
     }
 
     const result = checkThreshold({ metricsFile, threshold: 5 });
@@ -667,48 +414,16 @@ describe('checkThreshold', () => {
   });
 
   it('uses configurable threshold and window', () => {
+    const metricsFile = fixture.getMetricsFile();
     const now = new Date();
     const old = new Date(now.getTime() - 40 * 60 * 1000); // 40 minutes ago
 
     // Write old violation (outside 30-min window)
-    recordViolation(
-      {
-        timestamp: old.toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
+    recordViolation(makeViolation({ timestamp: old.toISOString() }), metricsFile);
 
     // Write 2 recent violations
-    recordViolation(
-      {
-        timestamp: now.toISOString(),
-        tool: 'Grep',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
-    recordViolation(
-      {
-        timestamp: now.toISOString(),
-        tool: 'Glob',
-        action: 'warn',
-        checkName: 'routerSelfCheck',
-        routerMode: 'router',
-        taskSpawned: false,
-        sessionId: 'test',
-      },
-      metricsFile
-    );
+    recordViolation(makeViolation({ timestamp: now.toISOString() }), metricsFile);
+    recordViolation(makeViolation({ timestamp: now.toISOString(), tool: 'Glob' }), metricsFile);
 
     const result = checkThreshold({ metricsFile, threshold: 2, windowMs: 30 * 60 * 1000 });
 

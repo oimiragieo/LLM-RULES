@@ -257,6 +257,58 @@ Expected latency profile on this repo (Windows, measured):
 - Warm repeated daemon queries: ~0.18-0.19s steady state
 - Direct mode (`HYBRID_SEARCH_DAEMON=off`) repeated CLI calls: ~0.73s average
 
+## Memory + Search + Token Saver (Simple Flow)
+
+If you only remember one thing, remember this:
+
+1. **Search finds candidates**
+2. **Memory keeps what matters**
+3. **Token saver compresses only when context gets too large**
+
+### Step-by-step
+
+1. Start with search:
+   - Run `pnpm search:code "your query"` to find likely files/snippets quickly.
+2. Read only the best matches:
+   - Open a small set of top results instead of dumping whole folders.
+3. If the result set is still too big:
+   - Use `Skill({ skill: 'token-saver-context-compression' })` to compress/summarize evidence.
+4. Save useful outcomes to memory:
+   - Store durable findings (patterns, gotchas, decisions, issues).
+5. On future spawns:
+   - The spawn prompt injects memory/RAG evidence and expects citation IDs like `[mem:...]` and `[rag:...]`.
+
+### When to use token saver vs normal flow
+
+- Use normal flow (default):
+  - Small task, few files, short snippets.
+- Use token saver:
+  - Many search hits, long logs, or large cross-file synthesis.
+  - You need a compact evidence pack for handoff/review.
+
+### Why this is the default design
+
+- Search is fast and good for discovery.
+- Memory prevents relearning the same lessons.
+- Token saver is a pressure valve, not the first step.
+- This keeps prompts smaller while staying grounded in evidence.
+
+### Minimal operator recipe
+
+```bash
+# 1) Discover
+pnpm search:code "auth token refresh bug"
+
+# 2) If context is too large, compress (inside agent flow via Skill)
+# Skill({ skill: 'token-saver-context-compression' })
+
+# 3) Persist useful outcomes (via MemoryRecord or write paths that trigger memory sync hooks)
+
+# 4) Validate memory/search pipeline health
+pnpm test:memory:ci
+pnpm metrics:memory:slo:ci
+```
+
 ## Drop-In Setup (Use In Another Repo)
 
 1. Copy `.claude/` into the target repository.

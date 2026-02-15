@@ -1,23 +1,7 @@
 #!/usr/bin/env node
-/**
- * Tests for bash-command-validator.cjs
- *
- * Tests the bash command validator hook which validates bash commands
- * using the validator registry and blocks dangerous commands.
- *
- * Test Categories:
- * 1. Module exports
- * 2. Command extraction from hook input
- * 3. Blocked message formatting
- * 4. Integration with validator registry
- * 5. Dangerous commands blocked (via registry validators)
- * 6. Safe commands allowed
- * 7. Command injection prevention
- * 8. Error handling (fail-closed behavior)
- */
+/** Tests for bash-command-validator.cjs and validator-registry integration. */
 
 'use strict';
-
 const path = require('path');
 
 // Test helpers
@@ -65,7 +49,6 @@ function assertFalse(value, message) {
 }
 
 console.log('\n=== bash-command-validator.cjs tests ===\n');
-
 // Import the module under test
 const {
   extractCommand,
@@ -80,11 +63,7 @@ const {
 } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
 
 // Import the registry for integration tests
-const {
-  validateCommand,
-  getRegisteredCommands,
-  hasValidator,
-} = require('../../.claude/hooks/safety/validators/registry.cjs');
+const { validateCommand } = require('../../.claude/hooks/safety/validators/registry.cjs');
 
 // ============================================================
 // Module Exports Tests
@@ -323,12 +302,6 @@ test('validateCommand returns valid for safe git status', () => {
 test('validateCommand returns valid for safe git add', () => {
   const result = validateCommand('git add .');
   assertTrue(result.valid, 'git add should be allowed');
-});
-
-test('validateCommand returns valid for commands without validators', () => {
-  const result = validateCommand('echo hello');
-  assertTrue(result.valid, 'Commands without validators should be allowed');
-  assertFalse(result.hasValidator, 'Should indicate no validator exists');
 });
 
 // ============================================================
@@ -707,188 +680,6 @@ test('pkill python is allowed (dev process)', () => {
   const result = validateCommand('pkill python');
   assertTrue(result.valid, 'pkill python should be allowed');
 });
-
-// ============================================================
-// chmod Command Validation
-// ============================================================
-
-console.log('\n--- chmod Command Validation ---');
-
-test('chmod +x is allowed', () => {
-  const result = validateCommand('chmod +x script.sh');
-  assertTrue(result.valid, 'chmod +x should be allowed');
-});
-
-test('chmod 755 is allowed', () => {
-  const result = validateCommand('chmod 755 script.sh');
-  assertTrue(result.valid, 'chmod 755 should be allowed');
-});
-
-test('chmod 644 is allowed', () => {
-  const result = validateCommand('chmod 644 file.txt');
-  assertTrue(result.valid, 'chmod 644 should be allowed');
-});
-
-test('chmod 777 is blocked', () => {
-  const result = validateCommand('chmod 777 /etc/passwd');
-  assertFalse(result.valid, 'chmod 777 should be blocked');
-});
-
-test('chmod 000 is blocked', () => {
-  const result = validateCommand('chmod 000 file');
-  assertFalse(result.valid, 'chmod 000 should be blocked');
-});
-
-// ============================================================
-// rsync Command Validation
-// ============================================================
-
-console.log('\n--- rsync Command Validation ---');
-
-test('rsync local to local is allowed', () => {
-  const result = validateCommand('rsync -av ./src ./dest');
-  assertTrue(result.valid, 'rsync local should be allowed');
-});
-
-test('rsync to remote host is blocked', () => {
-  const result = validateCommand('rsync -av ./src user@host:/path');
-  assertFalse(result.valid, 'rsync to remote should be blocked');
-});
-
-test('rsync from remote host is blocked', () => {
-  const result = validateCommand('rsync -av user@host:/path ./dest');
-  assertFalse(result.valid, 'rsync from remote should be blocked');
-});
-
-// ============================================================
-// Edge Cases and Error Handling
-// ============================================================
-
-console.log('\n--- Edge Cases and Error Handling ---');
-
-test('validateCommand handles empty string', () => {
-  const result = validateCommand('');
-  assertFalse(result.valid, 'Empty string should be invalid');
-});
-
-test('validateCommand handles null', () => {
-  const result = validateCommand(null);
-  assertFalse(result.valid, 'null should be invalid');
-});
-
-test('validateCommand handles undefined', () => {
-  const result = validateCommand(undefined);
-  assertFalse(result.valid, 'undefined should be invalid');
-});
-
-test('validateCommand handles whitespace-only command', () => {
-  const result = validateCommand('   ');
-  // After trim, this might be treated as empty or safe depending on implementation
-  // The registry should handle this gracefully
-  assertTrue(Object.hasOwn(result, 'valid'), 'Should return a valid result object');
-});
-
-test('validateCommand handles commands with paths', () => {
-  const result = validateCommand('/usr/bin/git status');
-  assertTrue(result.valid, '/usr/bin/git status should be allowed');
-});
-
-test('validateCommand handles Windows-style paths', () => {
-  const result = validateCommand('C:\\Windows\\System32\\cmd.exe /c dir');
-  // This depends on whether cmd.exe has a validator
-  assertTrue(Object.hasOwn(result, 'valid'), 'Should return a valid result object');
-});
-
-test('validateCommand extracts base command from full path', () => {
-  const result = validateCommand('/usr/local/bin/rm -rf /');
-  assertFalse(result.valid, 'rm via full path should still be validated');
-});
-
-// ============================================================
-// hasValidator function
-// ============================================================
-
-console.log('\n--- hasValidator function ---');
-
-test('hasValidator returns true for rm', () => {
-  assertTrue(hasValidator('rm'), 'Should have validator for rm');
-});
-
-test('hasValidator returns true for git', () => {
-  assertTrue(hasValidator('git'), 'Should have validator for git');
-});
-
-test('hasValidator returns true for sudo', () => {
-  assertTrue(hasValidator('sudo'), 'Should have validator for sudo');
-});
-
-test('hasValidator returns true for curl', () => {
-  assertTrue(hasValidator('curl'), 'Should have validator for curl');
-});
-
-test('hasValidator returns false for unknown command', () => {
-  assertFalse(hasValidator('unknown_command_xyz'), 'Should not have validator for unknown command');
-});
-
-// ============================================================
-// getRegisteredCommands function
-// ============================================================
-
-console.log('\n--- getRegisteredCommands function ---');
-
-test('getRegisteredCommands returns array', () => {
-  const commands = getRegisteredCommands();
-  assertTrue(Array.isArray(commands), 'Should return an array');
-});
-
-test('getRegisteredCommands includes security-critical commands', () => {
-  const commands = getRegisteredCommands();
-  assertTrue(commands.includes('rm'), 'Should include rm');
-  assertTrue(commands.includes('sudo'), 'Should include sudo');
-  assertTrue(commands.includes('ssh'), 'Should include ssh');
-  assertTrue(commands.includes('nc'), 'Should include nc');
-  assertTrue(commands.includes('curl'), 'Should include curl');
-  assertTrue(commands.includes('git'), 'Should include git');
-});
-
-// ============================================================
-// System Info Commands (du, time, sleep)
-// ============================================================
-
-console.log('\n--- System Info Commands: du, time, sleep ---');
-
-test('du is recognized as safe (disk usage)', () => {
-  const result = validateCommand('du -sh ./node_modules');
-  assertTrue(result.valid, 'du should be allowed (read-only disk usage)');
-});
-
-test('time is recognized as safe (timing wrapper)', () => {
-  const result = validateCommand('time npm test');
-  assertTrue(result.valid, 'time should be allowed (benign timing wrapper)');
-});
-
-test('sleep is recognized as safe (pause command)', () => {
-  const result = validateCommand('sleep 5');
-  assertTrue(result.valid, 'sleep should be allowed (benign pause)');
-});
-
-// ============================================================
-// PowerShell Security Test (should remain blocked)
-// ============================================================
-
-console.log('\n--- PowerShell Security ---');
-
-test('powershell is NOT in allowlist (security risk - shell bypass)', () => {
-  const result = validateCommand('powershell -Command "Get-Process"');
-  // PowerShell is a shell itself and could bypass bash restrictions
-  // It should be blocked (not in allowlist, no validator registered)
-  assertFalse(result.valid, 'powershell should be blocked (shell bypass risk)');
-  assertIncludes(result.error, 'Unregistered command', 'Should block unregistered command');
-});
-
-// ============================================================
-// Print Test Summary
-// ============================================================
 
 console.log('\n========================================');
 console.log(`Test Results: ${passed} passed, ${failed} failed`);

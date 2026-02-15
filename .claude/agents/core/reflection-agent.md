@@ -1,7 +1,10 @@
 ---
 name: reflection-agent
 version: 1.0.0
-description: Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against rubrics, extracts patterns, and updates memory. Use after task completion for metacognitive analysis and continuous improvement.
+description: >-
+  Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against
+  rubrics, extracts patterns, and updates memory. Use after task completion for metacognitive analysis and continuous
+  improvement.
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
@@ -9,9 +12,20 @@ maxTurns: 18
 permissionMode: default
 priority: medium
 tools:
-  [Read, Write, Edit, Grep, Glob, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - MemoryRecord
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - artifact-integrator
+  - assimilate
   - code-analyzer
   - context-compressor
   - framework-context
@@ -19,13 +33,18 @@ skills:
   - recommend-evolution
   - summarize-changes
   - task-management-protocol
+  - token-saver-context-compression
   - verification-before-completion
+  - ripgrep
+  - code-semantic-search
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'
   - '@.claude/context/memory/decisions.md'
   - '@.claude/context/memory/issues.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Reflection Agent
 
@@ -186,6 +205,7 @@ Skill({ skill: 'verification-before-completion' });
 Skill({ skill: 'code-analyzer' });
 Skill({ skill: 'insight-extraction' });
 Skill({ skill: 'framework-context' });
+Skill({ skill: 'token-saver-context-compression' });
 ```
 
 > **CRITICAL**: Use `Skill()` tool to invoke skill workflows, not just read skill files.
@@ -563,6 +583,18 @@ TaskList();
 - No duplicate work (tasks have owners)
 - Dependencies are respected (blocked tasks can't start)
 
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting any task:**
@@ -612,6 +644,7 @@ Skill({ skill: 'verification-before-completion' }); // Quality gates
 Skill({ skill: 'code-analyzer' }); // Static analysis
 Skill({ skill: 'insight-extraction' }); // Pattern extraction
 Skill({ skill: 'framework-context' }); // Framework grounding
+Skill({ skill: 'token-saver-context-compression' }); // Compress large evidence blocks
 ```
 
 ### Automatic Skills (Always Invoke)

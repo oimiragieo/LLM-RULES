@@ -53,472 +53,15 @@ const AGENT_SKILL_MATRIX_PATH = path.join(
 );
 
 // Domain mappings
-const DOMAIN_MAP = {
-  // Core Development
-  tdd: 'development',
-  debugging: 'development',
-  'code-quality-expert': 'development',
-  ripgrep: 'development',
-  'code-analyzer': 'development',
-  'code-style-validator': 'development',
-  'async-operations': 'development',
-  'logging-module-usage': 'development',
-  'library-usage': 'development',
-  'comprehensive-unit-testing-with-pytest': 'development',
-  'unit-testing-requirement': 'development',
-  'test-generator': 'development',
+const {
+  DOMAIN_MAP,
+  CATEGORY_MAP,
+  AGENT_SKILLS,
+  SKILL_TOOLS,
+  SKILL_DESCRIPTION_MAP,
+} = require('./generate-skill-index-definitions.cjs');
+const { validateIndex } = require('./generate-skill-index-validators.cjs');
 
-  // Security
-  'security-architect': 'security',
-  'auth-security-expert': 'security',
-  'memory-forensics': 'security',
-  'binary-analysis-patterns': 'security',
-  'protocol-reverse-engineering': 'security',
-  'authentication-flow-rules': 'security',
-
-  // Planning
-  'plan-generator': 'planning',
-  'task-breakdown': 'planning',
-  brainstorming: 'planning',
-  'complexity-assessment': 'planning',
-  'strategic-planning-with-pseudocode': 'planning',
-
-  // Architecture
-  'architecture-review': 'architecture',
-  'diagram-generator': 'architecture',
-
-  // Research
-  'research-synthesis': 'research',
-  'arxiv-mcp': 'research',
-
-  // Memory
-  'context-compressor': 'memory',
-  'session-handoff': 'memory',
-  'operational-modes': 'memory',
-  recovery: 'memory',
-  'project-onboarding': 'memory',
-  'project-analyzer': 'memory',
-  'context-driven-development': 'memory',
-  'context-files-rules': 'memory',
-  'history-and-next-task-rules': 'memory',
-  'framework-context': 'memory',
-  'recommend-evolution': 'memory',
-
-  // Quality
-  'qa-workflow': 'quality',
-  'verification-before-completion': 'quality',
-  'checklist-generator': 'quality',
-  'response-rater': 'quality',
-  'verify-information-rule': 'quality',
-  'thoughtful-and-accurate-responses': 'quality',
-  'truthfulness-and-clarity-for-ai': 'quality',
-  'handle-incomplete-tasks': 'quality',
-  'continuous-improvement-focus': 'quality',
-
-  // Git
-  'git-expert': 'git',
-  gitflow: 'git',
-  'commit-validator': 'git',
-  'smart-revert': 'git',
-  'commit-message-guidelines': 'git',
-  'version-control-rule': 'git',
-  'collaboration-and-version-control-rules': 'git',
-  'using-git-worktrees': 'git',
-  'gitops-workflow': 'git',
-  'finishing-a-development-branch': 'git',
-
-  // Integration
-  'github-mcp': 'integration',
-  'chrome-browser': 'integration',
-  'slack-notifications': 'integration',
-  'github-ops': 'integration',
-  'jira-pm': 'integration',
-  'linear-pm': 'integration',
-  'computer-use': 'integration',
-  'telegram-bot-api-rules': 'integration',
-  'agp-router-rules': 'integration',
-  'web3-expert': 'integration',
-
-  // DevOps
-  'aws-cloud-ops': 'devops',
-  'docker-compose': 'devops',
-  'kubernetes-flux': 'devops',
-  'terraform-infra': 'devops',
-  'container-expert': 'devops',
-  'cloud-devops-expert': 'devops',
-  'cloud-native-and-kubernetes-expertise-rules': 'devops',
-  'containerization-rules': 'devops',
-  'k8s-manifest-generator': 'devops',
-  'k8s-security-policies': 'devops',
-  'helm-chart-scaffolding': 'devops',
-  'gcloud-cli': 'devops',
-  'sentry-monitoring': 'devops',
-  'ci-cd-implementation-rule': 'devops',
-  'incident-runbook-templates': 'devops',
-  'on-call-handoff-patterns': 'devops',
-  'postmortem-writing': 'devops',
-  'configuration-management': 'devops',
-
-  // Languages
-  'python-backend-expert': 'languages',
-  'typescript-expert': 'languages',
-  'go-expert': 'languages',
-  'java-expert': 'languages',
-  'php-expert': 'languages',
-  'nodejs-expert': 'languages',
-  'elixir-expert': 'languages',
-  cpp: 'languages',
-  'prioritize-python-3-10-features': 'languages',
-  'comprehensive-type-annotations': 'languages',
-  'type-hinting-rule': 'languages',
-  'asynchronous-programming-preference': 'languages',
-  'functional-programming-preference': 'languages',
-  'rell-general-rules': 'languages',
-  'latest-language-versions-and-best-practices': 'languages',
-  'jupyter-notebook-best-practices': 'languages',
-
-  // Frameworks
-  'react-expert': 'frameworks',
-  'react-best-practices-vercel': 'frameworks',
-  'composition-patterns-vercel': 'frameworks',
-  'nextjs-expert': 'frameworks',
-  'vue-expert': 'frameworks',
-  'angular-expert': 'frameworks',
-  'svelte-expert': 'frameworks',
-  'astro-expert': 'frameworks',
-  'qwik-expert': 'frameworks',
-  'solidjs-expert': 'frameworks',
-  'flutter-expert': 'frameworks',
-  'backend-expert': 'frameworks',
-  'frontend-expert': 'frameworks',
-  'graphql-expert': 'frameworks',
-  'api-development-expert': 'frameworks',
-  'htmx-expert': 'frameworks',
-  'chrome-extension-expert': 'frameworks',
-  'state-management-expert': 'frameworks',
-
-  // Mobile
-  'react-native-skills-vercel': 'mobile',
-  'ios-expert': 'mobile',
-  'android-expert': 'mobile',
-  'expo-mobile-app-rule': 'mobile',
-  'expo-framework-rule': 'mobile',
-  nativescript: 'mobile',
-  'mobile-first-design-rules': 'mobile',
-  'mobile-ui-development-rule': 'mobile',
-
-  // Database
-  'database-architect': 'database',
-  'database-expert': 'database',
-  'data-expert': 'database',
-  'text-to-sql': 'database',
-  'pandas-data-manipulation-rules': 'database',
-  'large-data-with-dask': 'database',
-  'drizzle-orm-rules': 'database',
-  'entity-class-conventions': 'database',
-  'repository-class-conventions': 'database',
-  'vercel-kv-database-rules': 'database',
-  'experiment-configuration-with-hydra-yaml': 'database',
-
-  // AI/ML
-  'ai-ml-expert': 'ai-ml',
-
-  // Documentation
-  'doc-generator': 'documentation',
-  'writing-skills': 'documentation',
-  readme: 'documentation',
-  'detailed-docstrings': 'documentation',
-  'technical-accuracy-and-usability-rules': 'documentation',
-  'metadata-and-seo-rules': 'documentation',
-  'mkdocs-specific-rules': 'documentation',
-  'content-creation-rules': 'documentation',
-  'prompt-generation-rules': 'documentation',
-  'writing-plans': 'documentation',
-
-  // Creator
-  'agent-creator': 'creator',
-  'skill-creator': 'creator',
-  'hook-creator': 'creator',
-  'workflow-creator': 'creator',
-  'template-creator': 'creator',
-  'schema-creator': 'creator',
-  'template-renderer': 'creator',
-  'artifact-lifecycle': 'creator',
-  'artifact-publisher': 'creator',
-  'mcp-converter': 'creator',
-
-  // Requirements
-  'progressive-disclosure': 'requirements',
-  'spec-gathering': 'requirements',
-  'spec-writing': 'requirements',
-  'spec-critique': 'requirements',
-  'interactive-requirements-gathering': 'requirements',
-
-  // Specialized
-  'thinking-tools': 'specialized',
-  'sequential-thinking': 'specialized',
-  'consensus-voting': 'specialized',
-  'swarm-coordination': 'specialized',
-  'subagent-driven-development': 'specialized',
-  'task-management-protocol': 'specialized',
-  'track-management': 'specialized',
-  'workflow-patterns': 'specialized',
-  'smart-debug': 'specialized',
-  'codebase-integration': 'specialized',
-  'repo-rag': 'specialized',
-  'summarize-changes': 'specialized',
-  'requesting-code-review': 'specialized',
-  'receiving-code-review': 'specialized',
-  'insight-extraction': 'specialized',
-  'dispatching-parallel-agents': 'specialized',
-  'executing-plans': 'specialized',
-  'skill-discovery': 'specialized',
-  'tool-search': 'specialized',
-  'dependency-analyzer': 'specialized',
-  filesystem: 'specialized',
-
-  // Styling
-  'web-design-guidelines-vercel': 'styling',
-  'styling-expert': 'styling',
-  'ui-components-expert': 'styling',
-  'design-and-user-experience-guidelines': 'styling',
-  'html-tailwind-css-and-javascript-expert-rule': 'styling',
-  'image-optimization-rules': 'styling',
-  'placeholder-images': 'styling',
-  'modular-design-rule': 'styling',
-  'private-vs-shared-components': 'styling',
-  'visual-and-observational-rules': 'styling',
-  'pyqt6-ui-development-rules': 'styling',
-  'alpine-js-usage-rules': 'styling',
-  accessibility: 'styling',
-  // NOTE: mobile-ux-reviewer is an AGENT, not a skill (no SKILL.md exists) - removed SKL-002
-  'aceternity-ui-configuration': 'styling',
-
-  // Scientific
-  'scientific-skills': 'scientific',
-
-  // Other
-  'gamedev-expert': 'other',
-};
-
-// Category mappings
-const CATEGORY_MAP = {
-  tdd: 'Testing',
-  debugging: 'Troubleshooting',
-  'code-quality-expert': 'Code Quality',
-  'security-architect': 'Security',
-  'auth-security-expert': 'Security',
-  'plan-generator': 'Planning',
-  'task-breakdown': 'Planning',
-  'architecture-review': 'Architecture',
-  'diagram-generator': 'Architecture',
-  'research-synthesis': 'Research',
-  'arxiv-mcp': 'Research',
-  'context-compressor': 'Memory',
-  'session-handoff': 'Memory',
-  'framework-context': 'Memory',
-  'recommend-evolution': 'Memory',
-  'qa-workflow': 'Quality',
-  'verification-before-completion': 'Quality',
-  'checklist-generator': 'Quality',
-  'git-expert': 'Version Control',
-  gitflow: 'Version Control',
-  'github-mcp': 'Integration',
-  'chrome-browser': 'Integration',
-  'aws-cloud-ops': 'DevOps',
-  'docker-compose': 'DevOps',
-  'kubernetes-flux': 'DevOps',
-  'terraform-infra': 'DevOps',
-  'python-backend-expert': 'Languages',
-  'typescript-expert': 'Languages',
-  'go-expert': 'Languages',
-  'react-expert': 'Frameworks',
-  'react-best-practices-vercel': 'Frameworks',
-  'nextjs-expert': 'Frameworks',
-  'react-native-skills-vercel': 'Mobile',
-  'ios-expert': 'Mobile',
-  'android-expert': 'Mobile',
-  'database-architect': 'Database',
-  'text-to-sql': 'Database',
-  'ai-ml-expert': 'AI/ML',
-  'doc-generator': 'Documentation',
-  'writing-skills': 'Documentation',
-  'agent-creator': 'Creator Tools',
-  'skill-creator': 'Creator Tools',
-  'progressive-disclosure': 'Requirements',
-  'spec-gathering': 'Requirements',
-  'thinking-tools': 'Specialized',
-  'sequential-thinking': 'Specialized',
-  'swarm-coordination': 'Orchestration',
-  'consensus-voting': 'Orchestration',
-  'web-design-guidelines-vercel': 'Styling',
-  'styling-expert': 'Styling',
-  'scientific-skills': 'Scientific',
-};
-
-// Agent assignments
-const AGENT_SKILLS = {
-  developer: [
-    'tdd',
-    'debugging',
-    'code-quality-expert',
-    'git-expert',
-    'ripgrep',
-    'verification-before-completion',
-  ],
-  qa: ['tdd', 'qa-workflow', 'verification-before-completion', 'checklist-generator'],
-  planner: [
-    'framework-context',
-    'recommend-evolution',
-    'plan-generator',
-    'task-breakdown',
-    'brainstorming',
-    'complexity-assessment',
-    'thinking-tools',
-    'progressive-disclosure',
-  ],
-  'reflection-agent': ['framework-context', 'recommend-evolution'],
-  architect: [
-    'architecture-review',
-    'diagram-generator',
-    'security-architect',
-    'database-architect',
-  ],
-  'security-architect': ['security-architect', 'auth-security-expert', 'memory-forensics'],
-  'technical-writer': ['doc-generator', 'writing-skills', 'readme'],
-  devops: [
-    'aws-cloud-ops',
-    'docker-compose',
-    'kubernetes-flux',
-    'terraform-infra',
-    'container-expert',
-  ],
-  researcher: ['research-synthesis', 'arxiv-mcp'],
-  'code-reviewer': ['code-quality-expert', 'code-analyzer', 'code-style-validator'],
-  'frontend-pro': [
-    'react-expert',
-    'react-best-practices-vercel',
-    'composition-patterns-vercel',
-    'web-design-guidelines-vercel',
-    'nextjs-expert',
-  ],
-  'master-orchestrator': ['swarm-coordination', 'consensus-voting'],
-  'evolution-orchestrator': [
-    'agent-creator',
-    'command-creator',
-    'rule-creator',
-    'tool-creator',
-    'hook-creator',
-    'semgrep-rule-creator',
-    'schema-creator',
-    'skill-creator',
-    'template-creator',
-    'workflow-creator',
-    'research-synthesis',
-  ],
-  'data-engineer': ['database-architect', 'ai-ml-expert', 'scientific-skills'],
-  'ai-ml-specialist': ['ai-ml-expert', 'scientific-skills'],
-};
-
-// Tool requirements for key skills
-const SKILL_TOOLS = {
-  tdd: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  debugging: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'code-quality-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'security-architect': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'auth-security-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'plan-generator': ['Read', 'Write'],
-  'task-breakdown': [
-    'Read',
-    'Write',
-    'Skill',
-    'TaskCreate',
-    'TaskUpdate',
-    'TaskList',
-    'Grep',
-    'Glob',
-  ],
-  'architecture-review': ['Read', 'Write', 'Edit', 'Glob', 'Grep'],
-  'diagram-generator': ['Read', 'Write', 'Edit', 'Bash'],
-  'research-synthesis': ['WebSearch', 'WebFetch', 'Read', 'Write', 'Glob', 'Grep'],
-  'context-compressor': ['Read', 'Write'],
-  'session-handoff': ['Read', 'Write', 'Glob', 'Grep'],
-  'framework-context': ['Read', 'Skill'],
-  'recommend-evolution': ['Read', 'Write', 'Edit', 'Skill'],
-  'qa-workflow': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'verification-before-completion': ['Read', 'Bash'],
-  'checklist-generator': ['Read', 'Write', 'Edit', 'Glob', 'Grep'],
-  'git-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  gitflow: ['Read', 'Write', 'Edit'],
-  'github-mcp': ['Read', 'Bash'],
-  'chrome-browser': ['Read', 'Write', 'WebFetch'],
-  'arxiv-mcp': ['WebSearch', 'WebFetch', 'Read'],
-  'aws-cloud-ops': ['Bash', 'Read'],
-  'docker-compose': ['Read', 'Write', 'Edit'],
-  'kubernetes-flux': ['Read', 'Write', 'Edit'],
-  'terraform-infra': ['Bash', 'Read', 'Glob'],
-  'python-backend-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'typescript-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'go-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'react-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'react-best-practices-vercel': ['Read', 'Write', 'Edit'],
-  'react-native-skills-vercel': ['Read', 'Write', 'Edit'],
-  'composition-patterns-vercel': ['Read', 'Write', 'Edit'],
-  'web-design-guidelines-vercel': ['Read', 'WebFetch'],
-  'nextjs-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'agent-creator': [
-    'Read',
-    'Write',
-    'Edit',
-    'Glob',
-    'Grep',
-    'WebSearch',
-    'WebFetch',
-    'Bash',
-    'Task',
-  ],
-  'skill-creator': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep', 'WebSearch', 'WebFetch'],
-  'hook-creator': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'workflow-creator': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'doc-generator': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'writing-skills': ['Read', 'Write', 'Edit', 'Bash', 'Task'],
-  'thinking-tools': ['Read', 'Glob', 'Grep'],
-  'sequential-thinking': ['Read', 'Write', 'Bash'],
-  'progressive-disclosure': [
-    'Read',
-    'Write',
-    'AskUserQuestion',
-    'TaskUpdate',
-    'TaskList',
-    'Grep',
-    'Glob',
-  ],
-  'database-architect': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'],
-  'ai-ml-expert': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'WebSearch'],
-  'scientific-skills': ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'WebSearch', 'WebFetch'],
-  'swarm-coordination': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  'consensus-voting': ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
-  ripgrep: ['Bash'],
-  'code-analyzer': ['Bash', 'Read', 'Glob', 'Grep'],
-  'code-style-validator': ['Read', 'Grep', 'Bash', 'Glob'],
-  'commit-validator': ['Read', 'Grep', 'Bash'],
-  'smart-revert': ['Read', 'Bash', 'Glob', 'Grep', 'Write', 'Edit'],
-  'repo-rag': ['Read', 'Bash', 'Glob', 'Grep'],
-  'project-analyzer': ['Read', 'Bash', 'Glob', 'Grep'],
-  'tool-search': ['Read', 'Glob', 'Grep'],
-};
-
-const SKILL_DESCRIPTION_MAP = {
-  'framework-context': 'Load and synthesize framework architecture context for reflection/planning.',
-  'recommend-evolution':
-    'Detect capability gaps and record standardized evolution recommendations.',
-};
-
-/**
- * Load agent-skill-matrix.json and build skill -> agents and agent -> skills maps.
- * Primary/always -> agentPrimary; secondary/contextual -> agentSupporting.
- * @returns {{ skillToAgents: Object.<string, { agentPrimary: string[], agentSupporting: string[] }>, agentToSkills: Object.<string, string[]> }}
- */
 function loadAgentSkillMatrix() {
   const skillToAgents = {};
   const agentToSkills = {};
@@ -725,12 +268,9 @@ function canonicalSkillLookupKey(name) {
   }
   return name;
 }
-/**
- * Generate the skill index
- */
-function generateIndex(options = {}) {
+
+function resolveIndexInputs(options = {}) {
   const {
-    verbose = false,
     scan = true,
     catalogSkillsOverride = null,
     scannedSkillsOverride = null,
@@ -739,18 +279,15 @@ function generateIndex(options = {}) {
     includeArchived = false,
   } = options;
 
-  // Get skill list
   const catalogSkills = Array.isArray(catalogSkillsOverride)
     ? catalogSkillsOverride
     : parseSkillCatalog();
-  // Use recursive scanner to handle nested skill directories (SKL-001 fix)
   const scannedSkills =
     scannedSkillsOverride && typeof scannedSkillsOverride === 'object'
       ? scannedSkillsOverride
       : scan
         ? scanSkillFilesRecursively(SKILLS_DIR)
         : {};
-
   const scannedSkillCount = Object.keys(scannedSkills).length;
 
   const filteredCatalogSkills = includeArchived
@@ -760,12 +297,6 @@ function generateIndex(options = {}) {
     ? Object.keys(scannedSkills)
     : Object.keys(scannedSkills).filter(name => !isArchivedSkillName(name));
 
-  if (verbose) {
-    console.log(`Found ${catalogSkills.length} skills in catalog`);
-    console.log(`Found ${scannedSkillCount} skill directories`);
-  }
-
-  // Load agent-skill-matrix as single source of truth for agent <-> skill mapping
   const { skillToAgents, agentToSkills } = loadAgentSkillMatrix();
   const resolvedSkillToAgents =
     skillToAgentsOverride && typeof skillToAgentsOverride === 'object'
@@ -776,8 +307,18 @@ function generateIndex(options = {}) {
       ? agentToSkillsOverride
       : agentToSkills;
 
-  // Build skills object
-  const skills = {};
+  return {
+    catalogSkills,
+    scannedSkillCount,
+    filteredCatalogSkills,
+    filteredScannedSkillNames,
+    resolvedSkillToAgents,
+    resolvedAgentToSkills,
+    includeArchived,
+  };
+}
+
+function buildCreatorAliasMap(filteredScannedSkillNames) {
   const creatorAliasToNested = {};
   for (const scannedName of filteredScannedSkillNames) {
     const canonical = canonicalSkillLookupKey(scannedName);
@@ -785,93 +326,89 @@ function generateIndex(options = {}) {
       creatorAliasToNested[canonical] = scannedName;
     }
   }
+  return creatorAliasToNested;
+}
 
-  const allSkillNames = new Set([
-    ...filteredCatalogSkills,
-    ...filteredScannedSkillNames,
-    ...Object.keys(DOMAIN_MAP),
-    ...Object.keys(creatorAliasToNested),
-  ]);
-
-  for (const name of allSkillNames) {
-    const canonicalName = canonicalSkillLookupKey(name);
-    const domain = DOMAIN_MAP[name] || DOMAIN_MAP[canonicalName] || 'other';
-    const category = CATEGORY_MAP[name] || CATEGORY_MAP[canonicalName] || 'Other';
-    const requiredTools = SKILL_TOOLS[name] ||
-      SKILL_TOOLS[canonicalName] || ['Read', 'Write', 'Edit'];
-
-    // Find agents from matrix first; fallback to hardcoded AGENT_SKILLS
-    let agentPrimary = [];
-    let agentSupporting = [];
-    const mappedAgents = resolvedSkillToAgents[name] || resolvedSkillToAgents[canonicalName];
-    if (mappedAgents) {
-      agentPrimary = mappedAgents.agentPrimary || [];
-      agentSupporting = mappedAgents.agentSupporting || [];
-    }
-    if (agentPrimary.length === 0 && agentSupporting.length === 0) {
-      for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
-        const matchedSkillName = skillList.includes(name)
-          ? name
-          : skillList.includes(canonicalName)
-            ? canonicalName
-            : null;
-        if (matchedSkillName) {
-          if (skillList.indexOf(matchedSkillName) < 3) {
-            agentPrimary.push(agent);
-          } else {
-            agentSupporting.push(agent);
-          }
-        }
-      }
-    }
-
-    const aliasOf = creatorAliasToNested[name] || null;
-
-    const description =
-      SKILL_DESCRIPTION_MAP[name] ||
-      SKILL_DESCRIPTION_MAP[canonicalName] ||
-      `${category} - ${name}`;
-
-    const tags = [...new Set([domain, category.toLowerCase().replace(/\s+/g, '-'), name])];
-
-    skills[name] = {
-      name,
-      displayName: name
-        .split('-')
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' '),
-      category,
-      domain,
-      description,
-      requiredTools,
-      agentPrimary: agentPrimary.length > 0 ? agentPrimary : ['developer'],
-      agentSupporting,
-      tags,
-      priority: agentPrimary.length > 0 ? 1 : 3,
-      aliasOf,
+function resolveAgentsForSkill(name, canonicalName, resolvedSkillToAgents) {
+  const mappedAgents = resolvedSkillToAgents[name] || resolvedSkillToAgents[canonicalName];
+  if (mappedAgents) {
+    return {
+      agentPrimary: mappedAgents.agentPrimary || [],
+      agentSupporting: mappedAgents.agentSupporting || [],
     };
   }
 
-  // Build indexes
+  const agentPrimary = [];
+  const agentSupporting = [];
+  for (const [agent, skillList] of Object.entries(AGENT_SKILLS)) {
+    const matchedSkillName = skillList.includes(name)
+      ? name
+      : skillList.includes(canonicalName)
+        ? canonicalName
+        : null;
+    if (!matchedSkillName) {
+      continue;
+    }
+    if (skillList.indexOf(matchedSkillName) < 3) {
+      agentPrimary.push(agent);
+    } else {
+      agentSupporting.push(agent);
+    }
+  }
+  return { agentPrimary, agentSupporting };
+}
+
+function buildSkillEntry(name, creatorAliasToNested, resolvedSkillToAgents) {
+  const canonicalName = canonicalSkillLookupKey(name);
+  const domain = DOMAIN_MAP[name] || DOMAIN_MAP[canonicalName] || 'other';
+  const category = CATEGORY_MAP[name] || CATEGORY_MAP[canonicalName] || 'Other';
+  const requiredTools = SKILL_TOOLS[name] ||
+    SKILL_TOOLS[canonicalName] || ['Read', 'Write', 'Edit'];
+  const { agentPrimary, agentSupporting } = resolveAgentsForSkill(
+    name,
+    canonicalName,
+    resolvedSkillToAgents
+  );
+  const aliasOf = creatorAliasToNested[name] || null;
+  const description =
+    SKILL_DESCRIPTION_MAP[name] || SKILL_DESCRIPTION_MAP[canonicalName] || `${category} - ${name}`;
+  const tags = [...new Set([domain, category.toLowerCase().replace(/\s+/g, '-'), name])];
+
+  return {
+    name,
+    displayName: name
+      .split('-')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' '),
+    category,
+    domain,
+    description,
+    requiredTools,
+    agentPrimary: agentPrimary.length > 0 ? agentPrimary : ['developer'],
+    agentSupporting,
+    tags,
+    priority: agentPrimary.length > 0 ? 1 : 3,
+    aliasOf,
+  };
+}
+
+function buildIndexes(skills, resolvedAgentToSkills) {
   const byDomain = {};
   const byCategory = {};
   const byTool = {};
   const byAgent = {};
 
   for (const [name, skill] of Object.entries(skills)) {
-    // By domain
     if (!byDomain[skill.domain]) {
       byDomain[skill.domain] = [];
     }
     byDomain[skill.domain].push(name);
 
-    // By category
     if (!byCategory[skill.category]) {
       byCategory[skill.category] = [];
     }
     byCategory[skill.category].push(name);
 
-    // By tool
     for (const tool of skill.requiredTools) {
       if (!byTool[tool]) {
         byTool[tool] = [];
@@ -880,8 +417,6 @@ function generateIndex(options = {}) {
     }
   }
 
-  // By agent: start with matrix-derived mappings, then merge computed skill assignments.
-  // This keeps matrix intent while ensuring newly discovered scanned skills are visible.
   const agentSource =
     Object.keys(resolvedAgentToSkills).length > 0 ? resolvedAgentToSkills : AGENT_SKILLS;
   for (const [agent, skillList] of Object.entries(agentSource)) {
@@ -902,6 +437,63 @@ function generateIndex(options = {}) {
       }
     }
   }
+
+  return { byDomain, byCategory, byTool, byAgent };
+}
+
+function logGeneratedIndexSummary(verbose, index) {
+  if (!verbose) {
+    return;
+  }
+
+  const generatedSkillCount = Object.keys(index.skills).length;
+  const generatedDomainCount = Object.keys(index.index.byDomain).length;
+  const generatedCategoryCount = Object.keys(index.index.byCategory).length;
+  const generatedToolMappingCount = Object.keys(index.index.byTool).length;
+  const generatedAgentAssignmentCount = Object.keys(index.index.byAgent).length;
+
+  console.log('Generated index with:');
+  console.log(`  - ${generatedSkillCount} skills`);
+  console.log(`  - ${generatedDomainCount} domains`);
+  console.log(`  - ${generatedCategoryCount} categories`);
+  console.log(`  - ${generatedToolMappingCount} tool mappings`);
+  console.log(`  - ${generatedAgentAssignmentCount} agent assignments`);
+}
+/**
+ * Generate the skill index
+ */
+function generateIndex(options = {}) {
+  const { verbose = false } = options;
+  const {
+    catalogSkills,
+    scannedSkillCount,
+    filteredCatalogSkills,
+    filteredScannedSkillNames,
+    resolvedSkillToAgents,
+    resolvedAgentToSkills,
+    includeArchived,
+  } = resolveIndexInputs(options);
+
+  if (verbose) {
+    console.log(`Found ${catalogSkills.length} skills in catalog`);
+    console.log(`Found ${scannedSkillCount} skill directories`);
+  }
+
+  const skills = {};
+  const creatorAliasToNested = buildCreatorAliasMap(filteredScannedSkillNames);
+
+  const allSkillNames = new Set([
+    ...filteredCatalogSkills,
+    ...filteredScannedSkillNames,
+    ...Object.keys(DOMAIN_MAP),
+    ...Object.keys(creatorAliasToNested),
+  ]);
+
+  for (const name of allSkillNames) {
+    skills[name] = buildSkillEntry(name, creatorAliasToNested, resolvedSkillToAgents);
+  }
+
+  const { byDomain, byCategory, byTool, byAgent } = buildIndexes(skills, resolvedAgentToSkills);
 
   const index = {
     version: '1.0.0',
@@ -928,62 +520,9 @@ function generateIndex(options = {}) {
     },
   };
 
-  const generatedSkillCount = Object.keys(skills).length;
-  const generatedDomainCount = Object.keys(byDomain).length;
-  const generatedCategoryCount = Object.keys(byCategory).length;
-  const generatedToolMappingCount = Object.keys(byTool).length;
-  const generatedAgentAssignmentCount = Object.keys(byAgent).length;
-
-  if (verbose) {
-    console.log(`Generated index with:`);
-    console.log(`  - ${generatedSkillCount} skills`);
-    console.log(`  - ${generatedDomainCount} domains`);
-    console.log(`  - ${generatedCategoryCount} categories`);
-    console.log(`  - ${generatedToolMappingCount} tool mappings`);
-    console.log(`  - ${generatedAgentAssignmentCount} agent assignments`);
-  }
+  logGeneratedIndexSummary(verbose, index);
 
   return index;
-}
-
-/**
- * Validate existing index
- */
-function validateIndex(indexPath) {
-  const errors = [];
-  const warnings = [];
-
-  try {
-    const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
-
-    // Check version
-    if (!index.version) {
-      errors.push('Missing version field');
-    }
-
-    // Check skills count
-    const skillCount = Object.keys(index.skills || {}).length;
-    if (skillCount < 100) {
-      warnings.push(`Expected 400+ skills, found ${skillCount}`);
-    }
-
-    // Check domains
-    const domainCount = Object.keys(index.index?.byDomain || {}).length;
-    if (domainCount < 10) {
-      warnings.push(`Expected 20+ domains, found ${domainCount}`);
-    }
-
-    // Check each skill has required fields
-    for (const [name, skill] of Object.entries(index.skills || {})) {
-      if (!skill.requiredTools || skill.requiredTools.length === 0) {
-        warnings.push(`Skill ${name} has no required tools`);
-      }
-    }
-
-    return { valid: errors.length === 0, errors, warnings };
-  } catch (err) {
-    return { valid: false, errors: [`Failed to parse index: ${err.message}`], warnings };
-  }
 }
 
 /**

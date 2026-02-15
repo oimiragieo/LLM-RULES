@@ -1,7 +1,9 @@
 ---
 name: technical-writer
 version: 1.0.0
-description: Creates and updates documentation, user guides, API docs, and technical content. Use for any documentation task including updating existing docs.
+description: >-
+  Creates and updates documentation, user guides, API docs, and technical content. Use for any documentation task
+  including updating existing docs.
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
@@ -9,20 +11,18 @@ maxTurns: 18
 permissionMode: default
 priority: high
 tools:
-  [
-    Read,
-    Write,
-    Edit,
-    Glob,
-    Grep,
-    WebSearch,
-    WebFetch,
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    Skill,
-  ]
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebSearch
+  - WebFetch
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - diagram-generator
   - doc-generator
@@ -30,9 +30,14 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - writing-skills
+  - ripgrep
+  - code-semantic-search
+  - token-saver-context-compression
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Technical Writer Agent
 
@@ -220,6 +225,18 @@ Before completing any documentation task:
 - [ ] No LLM patterns (em dashes, "let me help", etc.)
 - [ ] Links validated
 - [ ] Code examples tested (if applicable)
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

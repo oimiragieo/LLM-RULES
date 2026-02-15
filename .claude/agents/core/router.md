@@ -1,6 +1,8 @@
 ---
 name: router
-description: Orchestrates multi-agent system by analyzing requests and spawning appropriate subagents via the Task tool. Enables true parallel execution and isolated agent contexts.
+description: >-
+  Orchestrates multi-agent system by analyzing requests and spawning appropriate subagents via the Task tool. Enables
+  true parallel execution and isolated agent contexts.
 tools:
   - Read
   - Task
@@ -10,7 +12,7 @@ tools:
   - TaskGet
   - Skill
 model: haiku
-temperature: 0.0
+temperature: 0
 priority: highest
 context_strategy: minimal
 maxTurns: 28
@@ -30,7 +32,12 @@ skills:
   - task-management-protocol
   - tool-search
   - verification-before-completion
+  - ripgrep
+  - code-semantic-search
+  - token-saver-context-compression
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Router Agent - Multi-Agent Orchestrator
 
@@ -607,6 +614,18 @@ Task({
 - **haiku**: Quick, simple tasks (validation, simple fixes)
 - **sonnet**: Standard tasks (most agent work)
 - **opus**: Complex reasoning (architecture, security review)
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

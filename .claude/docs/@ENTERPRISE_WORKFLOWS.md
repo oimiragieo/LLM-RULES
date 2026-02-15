@@ -14,31 +14,32 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 
 ## CONTENT
 
-| Workflow                | Path                                                                | Purpose                         |
-| ----------------------- | ------------------------------------------------------------------- | ------------------------------- |
-| Router Decision         | `.claude/workflows/core/router-decision.md`                         | master routing                  |
-| **Enterprise Workflow** | `.claude/workflows/core/enterprise-workflow.md`                     | **multi-phase execution**       |
-| **Ecosystem Creation**  | `.claude/workflows/core/ecosystem-creation-workflow.md`             | **artifact creation lifecycle** |
-| External Integration    | `.claude/workflows/core/external-integration.md`                    | safe integration                |
-| Artifact Lifecycle      | `.claude/workflows/core/skill-lifecycle.md`                         | create/update/deprecate         |
-| Feature Development     | `.claude/workflows/enterprise/feature-development-workflow.md`      | end-to-end                      |
-| C4 Architecture         | `.claude/workflows/enterprise/c4-architecture-workflow.md`          | C4 docs                         |
-| Conductor Setup         | `.claude/workflows/conductor-setup-workflow.md`                     | CDD setup                       |
-| Incident Response       | `.claude/workflows/operations/incident-response.md`                 | prod incidents                  |
-| Evolution Workflow      | `.claude/workflows/core/evolution-workflow.md`                      | EVOLVE process                  |
-| Reflection Workflow     | `.claude/workflows/core/reflection-workflow.md`                     | quality + learnings             |
-| Security Audit          | `.claude/workflows/security-architect-skill-workflow.md`            | security audit                  |
-| Architecture Review     | `.claude/workflows/architecture-review-skill-workflow.md`           | arch review                     |
-| Consensus Voting        | `.claude/workflows/consensus-voting-skill-workflow.md`              | consensus                       |
-| Swarm Coordination      | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md` | swarm patterns                  |
-| Database Design         | `.claude/workflows/database-architect-skill-workflow.md`            | schema workflows                |
-| Context Compression     | `.claude/workflows/context-compressor-skill-workflow.md`            | summarization                   |
-| Post-Creation Valid.    | `.claude/workflows/core/post-creation-validation.md`                | artifact integration            |
-| Progressive Disclos.    | `.claude/workflows/progressive-disclosure-skill-workflow.md`        | requirements gathering          |
-| **Domain Development**  | `.claude/workflows/domain-development-workflow.md`                  | **TDD for domain agents**       |
-| **Code Review**         | `.claude/workflows/code-review-workflow.md`                         | **two-pass review**             |
-| **Product Management**  | `.claude/workflows/product-management-workflow.md`                  | **INVEST sprint mgmt**          |
-| **Documentation**       | `.claude/workflows/documentation-workflow.md`                       | **Diataxis framework**          |
+| Workflow                | Path                                                                  | Purpose                           |
+| ----------------------- | --------------------------------------------------------------------- | --------------------------------- |
+| Router Decision         | `.claude/workflows/core/router-decision.md`                           | master routing                    |
+| **Enterprise Workflow** | `.claude/workflows/core/enterprise-workflow.md`                       | **multi-phase execution**         |
+| **Ecosystem Creation**  | `.claude/workflows/core/ecosystem-creation-workflow.md`               | **artifact creation lifecycle**   |
+| External Integration    | `.claude/workflows/core/external-integration.md`                      | safe integration                  |
+| Artifact Lifecycle      | `.claude/workflows/core/skill-lifecycle.md`                           | create/update/deprecate           |
+| Feature Development     | `.claude/workflows/enterprise/feature-development-workflow.md`        | end-to-end                        |
+| C4 Architecture         | `.claude/workflows/enterprise/c4-architecture-workflow.md`            | C4 docs                           |
+| Conductor Setup         | `.claude/workflows/conductor-setup-workflow.md`                       | CDD setup                         |
+| Incident Response       | `.claude/workflows/operations/incident-response.md`                   | prod incidents                    |
+| Evolution Workflow      | `.claude/workflows/core/evolution-workflow.md`                        | EVOLVE process                    |
+| Reflection Workflow     | `.claude/workflows/core/reflection-workflow.md`                       | quality + learnings               |
+| Security Audit          | `.claude/workflows/security-architect-skill-workflow.md`              | security audit                    |
+| Architecture Review     | `.claude/workflows/architecture-review-skill-workflow.md`             | arch review                       |
+| Consensus Voting        | `.claude/workflows/consensus-voting-skill-workflow.md`                | consensus                         |
+| Swarm Coordination      | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md`   | swarm patterns                    |
+| Database Design         | `.claude/workflows/database-architect-skill-workflow.md`              | schema workflows                  |
+| Context Compression     | `.claude/workflows/context-compressor-skill-workflow.md`              | summarization                     |
+| Token Saver Compression | `.claude/workflows/token-saver-context-compression-skill-workflow.md` | search-aware evidence compression |
+| Post-Creation Valid.    | `.claude/workflows/core/post-creation-validation.md`                  | artifact integration              |
+| Progressive Disclos.    | `.claude/workflows/progressive-disclosure-skill-workflow.md`          | requirements gathering            |
+| **Domain Development**  | `.claude/workflows/domain-development-workflow.md`                    | **TDD for domain agents**         |
+| **Code Review**         | `.claude/workflows/code-review-workflow.md`                           | **two-pass review**               |
+| **Product Management**  | `.claude/workflows/product-management-workflow.md`                    | **INVEST sprint mgmt**            |
+| **Documentation**       | `.claude/workflows/documentation-workflow.md`                         | **Diataxis framework**            |
 
 ### Workflow Categories
 

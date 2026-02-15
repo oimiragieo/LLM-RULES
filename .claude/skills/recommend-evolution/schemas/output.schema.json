@@ -3,9 +3,7 @@
   "title": "recommend-evolution Output Schema",
   "description": "Output validation schema for recommend-evolution skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

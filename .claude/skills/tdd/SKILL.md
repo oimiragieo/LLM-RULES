@@ -1,49 +1,49 @@
 ---
 name: tdd
-description: Test-Driven Development with Iron Laws enforcement. Use when writing any production code to ensure tests are written first. Includes testing-expert capabilities.
-version: 1.1
+description: Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely.
+version: 1.2
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 aliases: [testing-expert]
 best_practices:
-  - Write failing test before any production code
-  - Watch the test fail before implementing
-  - Write minimal code to pass the test
-  - Refactor only after green
+  - Keep a visible test scenario backlog and execute one scenario at a time
+  - Prove RED before code changes and keep evidence in command output
+  - Implement smallest GREEN patch that satisfies current failing test only
+  - Use bounded repair loops and anti-test-hacking checks before completion
 error_handling: strict
 streaming: supported
 ---
-
-**Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
 
 # Test-Driven Development (TDD)
 
 ## Overview
 
-Write the test first. Watch it fail. Write minimal code to pass.
+This skill implements Canon TDD with AI-specific guardrails:
 
-**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
-
-**Violating the letter of the rules is violating the spirit of the rules.**
+1. Build or update a scenario list.
+2. Execute exactly one scenario as a runnable test.
+3. Prove RED.
+4. Implement minimum change for GREEN.
+5. Optionally refactor.
+6. Repeat until scenario list is empty.
 
 ## When to Use
 
-**Always:**
+Use for:
 
 - New features
 - Bug fixes
-- Refactoring
 - Behavior changes
+- Repository-scale patching driven by tests
+- AI-assisted code generation where tests are executable specifications
 
-**Exceptions (ask your human partner):**
+Ask human approval before bypassing only for:
 
 - Throwaway prototypes
-- Generated code
-- Configuration files
-
-Thinking "skip TDD just this once"? Stop. That's rationalization.
+- Purely declarative config edits with no execution path
+- One-off migration scripts that will not be maintained
 
 ## The Iron Law
 
@@ -51,390 +51,137 @@ Thinking "skip TDD just this once"? Stop. That's rationalization.
 NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
 ```
 
-Write code before the test? Delete it. Start over.
-
-**No exceptions:**
-
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-
-Implement fresh from tests. Period.
-
-## Red-Green-Refactor
-
-### RED - Write Failing Test
-
-Write one minimal test showing what should happen.
-
-<Good>
-```typescript
-test('retries failed operations 3 times', async () => {
-  let attempts = 0;
-  const operation = () => {
-    attempts++;
-    if (attempts < 3) throw new Error('fail');
-    return 'success';
-  };
-
-const result = await retryOperation(operation);
+If code was written first, discard and restart from RED.
 
-expect(result).toBe('success');
-expect(attempts).toBe(3);
-});
+## Canon Loop
 
-````
-Clear name, tests real behavior, one thing
-</Good>
+### Step 0: Create/refresh scenario backlog
 
-<Bad>
-```typescript
-test('retry works', async () => {
-  const mock = jest.fn()
-    .mockRejectedValueOnce(new Error())
-    .mockRejectedValueOnce(new Error())
-    .mockResolvedValueOnce('success');
-  await retryOperation(mock);
-  expect(mock).toHaveBeenCalledTimes(3);
-});
-````
+- Keep a short ordered list of test scenarios for this task.
+- Prioritize by design signal and risk, not by implementation convenience.
+- Add discovered scenarios during execution.
 
-Vague name, tests mock not code
-</Bad>
+### Step 1: Pick exactly one scenario and write one runnable test
 
-**Requirements:**
+- One behavior per cycle.
+- Use clear behavior names.
+- Favor real collaborators; mock only external boundaries.
 
-- One behavior
-- Clear name
-- Real code (no mocks unless unavoidable)
+### Step 2: Prove RED
 
-### Verify RED - Watch It Fail
+- Run the narrowest test command.
+- Failure must be due to missing behavior, not syntax or setup errors.
+- Record red evidence (test file and failing assertion message).
 
-**MANDATORY. Never skip.**
+### Step 3: Implement minimum GREEN patch
 
-```bash
-npm test path/to/test.test.ts
-```
+- Implement only what current red test requires.
+- No speculative APIs or unrelated cleanup.
+- Keep patch bounded to current scenario.
 
-Confirm:
+### Step 4: Prove GREEN
 
-- Test fails (not errors)
-- Failure message is expected
-- Fails because feature missing (not typos)
+- Re-run narrow test command.
+- Run impacted suite (or package-level test set).
+- Confirm no regressions.
 
-**Test passes?** You're testing existing behavior. Fix test.
+### Step 5: Optional refactor
 
-**Test errors?** Fix error, re-run until it fails correctly.
+- Refactor only with green tests.
+- Re-run the same test set after refactor.
 
-### GREEN - Minimal Code
+### Step 6: Repeat until backlog empty
 
-Write simplest code to pass the test.
+## AI-Assisted Guardrails
 
-<Good>
-```typescript
-async function retryOperation<T>(fn: () => Promise<T>): Promise<T> {
-  for (let i = 0; i < 3; i++) {
-    try {
-      return await fn();
-    } catch (e) {
-      if (i === 2) throw e;
-    }
-  }
-  throw new Error('unreachable');
-}
-```
-Just enough to pass
-</Good>
+- Use tests as executable prompt context; keep prompts short and test-focused.
+- Prefer deterministic tests (stable fixtures, no nondeterministic ordering).
+- Use bounded repair loops: max 3 repair attempts per scenario before redesign.
+- Run anti-test-hacking checks:
+  - Verify changed assertions still express original requirement.
+  - Add at least one negative test for bug-fix tasks.
+- Ensure code does not branch on test-only artifacts.
 
-<Bad>
-```typescript
-async function retryOperation<T>(
-  fn: () => Promise<T>,
-  options?: {
-    maxRetries?: number;
-    backoff?: 'linear' | 'exponential';
-    onRetry?: (attempt: number) => void;
-  }
-): Promise<T> {
-  // YAGNI
-}
-```
-Over-engineered
-</Bad>
+## Memory Acceleration Layer
 
-Don't add features, refactor other code, or "improve" beyond the test.
+Use lightweight memory only to reduce repeated setup and triage:
 
-### Verify GREEN - Watch It Pass
+- preferred repo-local test/lint/format commands
+- recurring failure signatures and short fix summaries
+- recurring anti-pattern reminders
+- reusable scenario templates
 
-**MANDATORY.**
+Reference: `references/tdd-memory-profile.md`
 
-```bash
-npm test path/to/test.test.ts
-```
+Hard rules:
 
-Confirm:
+- memory never bypasses RED proof
+- memory never changes Canon sequence
+- keep profile bounded and low-noise
 
-- Test passes
-- Other tests still pass
-- Output pristine (no errors, warnings)
+## Repository-Scale and Class-Level Guidance
 
-**Test fails?** Fix code, not test.
-
-**Other tests fail?** Fix now.
-
-### REFACTOR - Clean Up
-
-After green only:
-
-- Remove duplication
-- Improve names
-- Extract helpers
-
-Keep tests green. Don't add behavior.
-
-### Repeat
-
-Next failing test for next feature.
-
-## Good Tests
-
-| Quality          | Good                                | Bad                                                 |
-| ---------------- | ----------------------------------- | --------------------------------------------------- |
-| **Minimal**      | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
-| **Clear**        | Name describes behavior             | `test('test1')`                                     |
-| **Shows intent** | Demonstrates desired API            | Obscures what code should do                        |
-
-## Why Order Matters
-
-**"I'll write tests after to verify it works"**
-
-Tests written after code pass immediately. Passing immediately proves nothing:
-
-- Might test wrong thing
-- Might test implementation, not behavior
-- Might miss edge cases you forgot
-- You never saw it catch the bug
-
-Test-first forces you to see the test fail, proving it actually tests something.
-
-**"I already manually tested all the edge cases"**
-
-Manual testing is ad-hoc. You think you tested everything but:
-
-- No record of what you tested
-- Can't re-run when code changes
-- Easy to forget cases under pressure
-- "It worked when I tried it" does not equal comprehensive
-
-Automated tests are systematic. They run the same way every time.
-
-**"Deleting X hours of work is wasteful"**
-
-Sunk cost fallacy. The time is already gone. Your choice now:
-
-- Delete and rewrite with TDD (X more hours, high confidence)
-- Keep it and add tests after (30 min, low confidence, likely bugs)
-
-The "waste" is keeping code you can't trust. Working code without real tests is technical debt.
-
-**"TDD is dogmatic, being pragmatic means adapting"**
-
-TDD IS pragmatic:
-
-- Finds bugs before commit (faster than debugging after)
-- Prevents regressions (tests catch breaks immediately)
-- Documents behavior (tests show how to use code)
-- Enables refactoring (change freely, tests catch breaks)
-
-"Pragmatic" shortcuts = debugging in production = slower.
-
-**"Tests after achieve the same goals - it's spirit not ritual"**
-
-No. Tests-after answer "What does this do?" Tests-first answer "What should this do?"
-
-Tests-after are biased by your implementation. You test what you built, not what's required. You verify remembered edge cases, not discovered ones.
-
-Tests-first force edge case discovery before implementing. Tests-after verify you remembered everything (you didn't).
-
-30 minutes of tests after does not equal TDD. You get coverage, lose proof tests work.
-
-## Common Rationalizations
-
-| Excuse                                 | Reality                                                                 |
-| -------------------------------------- | ----------------------------------------------------------------------- |
-| "Too simple to test"                   | Simple code breaks. Test takes 30 seconds.                              |
-| "I'll test after"                      | Tests passing immediately prove nothing.                                |
-| "Tests after achieve same goals"       | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-| "Already manually tested"              | Ad-hoc does not equal systematic. No record, can't re-run.              |
-| "Deleting X hours is wasteful"         | Sunk cost fallacy. Keeping unverified code is technical debt.           |
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete.             |
-| "Need to explore first"                | Fine. Throw away exploration, start with TDD.                           |
-| "Test hard = design unclear"           | Listen to test. Hard to test = hard to use.                             |
-| "TDD will slow me down"                | TDD faster than debugging. Pragmatic = test-first.                      |
-| "Manual test faster"                   | Manual doesn't prove edge cases. You'll re-test every change.           |
-| "Existing code has no tests"           | You're improving it. Add tests for existing code.                       |
-
-## Red Flags - STOP and Start Over
-
-- Code before test
-- Test after implementation
-- Test passes immediately
-- Can't explain why test failed
-- Tests added "later"
-- Rationalizing "just this once"
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "Keep as reference" or "adapt existing code"
-- "Already spent X hours, deleting is wasteful"
-- "TDD is dogmatic, I'm being pragmatic"
-- "This is different because..."
-
-**All of these mean: Delete code. Start over with TDD.**
-
-## Example: Bug Fix
-
-**Bug:** Empty email accepted
-
-**RED**
-
-```typescript
-test('rejects empty email', async () => {
-  const result = await submitForm({ email: '' });
-  expect(result.error).toBe('Email required');
-});
-```
-
-**Verify RED**
-
-```bash
-$ npm test
-FAIL: expected 'Email required', got undefined
-```
-
-**GREEN**
-
-```typescript
-function submitForm(data: FormData) {
-  if (!data.email?.trim()) {
-    return { error: 'Email required' };
-  }
-  // ...
-}
-```
-
-**Verify GREEN**
-
-```bash
-$ npm test
-PASS
-```
-
-**REFACTOR**
-Extract validation for multiple fields if needed.
+- For repository-scale work, decompose by failing test cluster and assign one cluster per loop.
+- For class-level synthesis, derive a method dependency order and implement one method at a time with method-level public tests.
+- Keep long-context pressure low by limiting each loop to one scenario and one patch objective.
 
 ## Verification Checklist
 
-Before marking work complete:
+- [ ] Scenario backlog exists and was updated during work
+- [ ] Every production change maps to at least one failing-then-passing test
+- [ ] RED evidence captured (command + failure summary)
+- [ ] GREEN evidence captured (command + pass summary)
+- [ ] No unresolved failing tests in touched scope
+- [ ] Lint/format/test commands completed or explicitly reported as blocked
+- [ ] No detected test-hacking pattern
 
-- [ ] Every new function/method has a test
-- [ ] Watched each test fail before implementing
-- [ ] Each test failed for expected reason (feature missing, not typo)
-- [ ] Wrote minimal code to pass each test
-- [ ] All tests pass
-- [ ] **`pnpm lint:fix` passes with 0 errors**
-- [ ] **`pnpm format` produces no changes**
-- [ ] Output pristine (no errors, warnings)
-- [ ] Tests use real code (mocks only if unavoidable)
-- [ ] Edge cases and errors covered
+## Pre-Completion Commands (Project-Scoped)
 
-Can't check all boxes? You skipped TDD. Start over.
+Use the project's actual commands. Typical sequence:
 
-## Pre-Completion: Lint and Format (MANDATORY)
-
-Before marking any task complete, run:
-
-1. `pnpm lint:fix` — fix all linting issues
-2. `pnpm format` — format all files
-3. If either command fails, fix the issues before proceeding
-
-**This is a BLOCKING requirement.** Tasks are NOT complete until both pass.
-
-## When Stuck
-
-| Problem                | Solution                                                             |
-| ---------------------- | -------------------------------------------------------------------- |
-| Don't know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
-| Test too complicated   | Design too complicated. Simplify interface.                          |
-| Must mock everything   | Code too coupled. Use dependency injection.                          |
-| Test setup huge        | Extract helpers. Still complex? Simplify design.                     |
-
-## Debugging Integration
-
-Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
-
-Never fix bugs without a test.
-
-## Testing Anti-Patterns
-
-When adding mocks or test utilities, read @testing-anti-patterns.md to avoid common pitfalls:
-
-- Testing mock behavior instead of real behavior
-- Adding test-only methods to production classes
-- Mocking without understanding dependencies
-
-## Final Rule
-
-```
-Production code -> test exists and failed first
-Otherwise -> not TDD
+```bash
+# 1) targeted test
+pnpm test <target>
+# 2) impacted suite
+pnpm test
+# 3) lint
+pnpm lint
+# 4) format check
+pnpm format:check
 ```
 
-No exceptions without your human partner's permission.
+If the repo uses different scripts, replace these with local equivalents and report exactly what ran.
 
-## Framework-Specific Testing Guidelines
+## Rationalization Countermeasures
 
-This section consolidates testing patterns from the `testing-expert` skill.
+- "I will add tests later" -> stop and write current red test.
+- "This is too small to test" -> write one minimal behavior test.
+- "I already manually tested" -> manual runs do not replace executable regression tests.
+- "I spent too long to delete pre-test code" -> sunk cost; restart from RED.
 
-### Angular Testing
+## Related Files
 
-| Framework                     | Purpose                                       | Usage                       |
-| ----------------------------- | --------------------------------------------- | --------------------------- |
-| **Jasmine + Karma**           | Unit testing components and services          | Default Angular test runner |
-| **Angular Testing Utilities** | Component testing with focus on user behavior | DOM interaction testing     |
-| **Protractor / Cypress**      | End-to-end testing of user flows              | Full integration tests      |
+- `references/research-requirements.md`
+- `references/tdd-memory-profile.md`
+- `testing-anti-patterns.md`
+- `rules/tdd.md`
+- `templates/implementation-template.md`
 
-**Best Practices:**
+## Research Basis
 
-- Implement proper test coverage targets (aim for 80%+ coverage)
-- Use mocking for external dependencies and HTTP calls in unit tests
-- Test both success and error states for components and services
-- Use snapshot testing sparingly and only for simple, stable components
+This skill is aligned with:
 
-### Test Type Selection
+- Martin Fowler TDD (Dec 11, 2023)
+- Kent Beck Canon TDD (Dec 11, 2023)
+- Rafique & Misic meta-analysis, IEEE TSE DOI:10.1109/TSE.2012.28
+- LLM4TDD (arXiv:2312.04687)
+- Test-Driven Development for Code Generation (arXiv:2402.13521)
+- Tests as Prompt (arXiv:2505.09027)
+- SWE-Flow (arXiv:2506.09003)
+- TDFlow (arXiv:2510.23761)
+- Scaling TDD from Functions to Classes (arXiv:2602.03557)
 
-| Test Type             | When to Use                             | Tools                   |
-| --------------------- | --------------------------------------- | ----------------------- |
-| **Unit Tests**        | Isolated component/function logic       | Jest, Vitest, pytest    |
-| **Integration Tests** | Multiple components working together    | Testing Library, pytest |
-| **E2E Tests**         | Full user flows through the application | Cypress, Playwright     |
-| **API Tests**         | Endpoint validation                     | Supertest, httpx        |
-
-### Testing and Monitoring
-
-- Guide the creation of test cases for each component
-- Assist with setting up monitoring and logging
-- Help interpret performance metrics and suggest optimizations
-- Prioritize security, scalability, and maintainability
-
-### Related Skills
-
-- `test-generator` - Generates test code from specifications
-- `comprehensive-unit-testing-with-pytest` - Python-specific pytest patterns
-- `qa-workflow` - Systematic QA validation with fix loops
-
-## Memory Protocol (MANDATORY)
+## Memory Protocol
 
 **Before starting:**
 Read `.claude/context/memory/learnings.md`
@@ -445,4 +192,4 @@ Read `.claude/context/memory/learnings.md`
 - Issue found -> `.claude/context/memory/issues.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
-> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+Assume interruption: if it is not in memory, it did not happen.

@@ -9,6 +9,7 @@ agents: [evolution-orchestrator, planner, developer, qa]
 skills:
   [
     research-synthesis,
+    assimilate,
     agent-creator,
     skill-creator,
     workflow-creator,
@@ -310,6 +311,10 @@ Skill({ skill: 'research-synthesis' });
 // - Minimum 3 Exa/WebSearch queries
 // - Analysis of existing codebase patterns
 // - Structured research report output
+
+// 3. OPTIONAL: Invoke assimilate for external benchmark parity
+// Use when improvement requires comparing external frameworks/repositories.
+Skill({ skill: 'assimilate' });
 ```
 
 **Research Prioritization Matrix** (NEW - Enhancement #7):
@@ -1050,15 +1055,16 @@ This workflow integrates with:
 
 **Related Skills**:
 
-| Skill                | Used In Phase      |
-| -------------------- | ------------------ |
-| `research-synthesis` | OBTAIN (MANDATORY) |
-| `agent-creator`      | LOCK               |
-| `skill-creator`      | LOCK               |
-| `workflow-creator`   | LOCK               |
-| `hook-creator`       | LOCK               |
-| `schema-creator`     | LOCK               |
-| `template-creator`   | LOCK               |
+| Skill                | Used In Phase                      |
+| -------------------- | ---------------------------------- |
+| `research-synthesis` | OBTAIN (MANDATORY)                 |
+| `assimilate`         | OBTAIN (optional benchmark parity) |
+| `agent-creator`      | LOCK                               |
+| `skill-creator`      | LOCK                               |
+| `workflow-creator`   | LOCK                               |
+| `hook-creator`       | LOCK                               |
+| `schema-creator`     | LOCK                               |
+| `template-creator`   | LOCK                               |
 
 ---
 

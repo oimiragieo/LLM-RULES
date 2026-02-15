@@ -32,13 +32,12 @@ async function removeTestRootWithRetry(testRoot) {
       return;
     } catch (err) {
       const code = err && err.code;
-      const retryable = (
+      const retryable =
         code === 'EBUSY' ||
         code === 'EPERM' ||
         code === 'EACCES' ||
         code === 'ENOTEMPTY' ||
-        code === 'EMFILE'
-      );
+        code === 'EMFILE';
       if (!retryable || attempt === maxAttempts) {
         throw err;
       }

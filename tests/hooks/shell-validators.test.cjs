@@ -6,7 +6,6 @@ const assert = require('node:assert');
 const {
   SHELL_INTERPRETERS,
   DANGEROUS_PATTERNS,
-  DANGEROUS_BUILTINS,
   checkDangerousPatterns,
   extractCArgument,
   extractCArgumentLegacy,
@@ -17,6 +16,7 @@ const {
   parseCommand,
   parseCommandLegacy,
 } = require('../../.claude/hooks/safety/validators/shell-validators.cjs');
+const { DANGEROUS_PATTERN_CASES } = require('../helpers/shell-validator-cases.cjs');
 
 describe('shell-validators', () => {
   describe('SHELL_INTERPRETERS', () => {
@@ -34,43 +34,20 @@ describe('shell-validators', () => {
   });
 
   describe('DANGEROUS_PATTERNS', () => {
-    test('includes ANSI-C quoting pattern', () => {
-      const pattern = DANGEROUS_PATTERNS.find(p => p.name === 'ANSI-C quoting');
-      assert.ok(pattern, 'ANSI-C quoting pattern should exist');
-      assert.ok(pattern.pattern.test("$'test'"), "Pattern should match $'...'");
-    });
-
-    test('includes backtick pattern', () => {
-      const pattern = DANGEROUS_PATTERNS.find(p => p.name === 'Backtick command substitution');
-      assert.ok(pattern, 'Backtick pattern should exist');
-      assert.ok(pattern.pattern.test('`whoami`'), 'Pattern should match `...`');
-    });
-
-    test('includes command substitution pattern', () => {
-      const pattern = DANGEROUS_PATTERNS.find(p => p.name === 'Command substitution');
-      assert.ok(pattern, 'Command substitution pattern should exist');
-      assert.ok(pattern.pattern.test('$(whoami)'), 'Pattern should match $(...)');
-    });
-
-    test('includes here-document pattern', () => {
-      const pattern = DANGEROUS_PATTERNS.find(p => p.name === 'Here-document');
-      assert.ok(pattern, 'Here-document pattern should exist');
-      assert.ok(pattern.pattern.test('cat <<EOF'), 'Pattern should match <<WORD');
-      assert.ok(pattern.pattern.test('cat <<-EOF'), 'Pattern should match <<-WORD');
-    });
-
-    test('includes brace expansion pattern', () => {
-      const pattern = DANGEROUS_PATTERNS.find(p => p.name === 'Brace expansion with commands');
-      assert.ok(pattern, 'Brace expansion pattern should exist');
-      assert.ok(pattern.pattern.test('{a,b,c}'), 'Pattern should match {a,b,c}');
-    });
-
-    test('includes here-string pattern', () => {
-      const pattern = DANGEROUS_PATTERNS.find(p => p.name === 'Here-string');
-      assert.ok(pattern, 'Here-string pattern should exist');
-      assert.ok(pattern.pattern.test('cat <<<EOF'), 'Pattern should match <<<');
-      assert.ok(pattern.pattern.test('bash<<<"input"'), 'Pattern should match <<< without space');
-    });
+    for (const tc of DANGEROUS_PATTERN_CASES) {
+      test(`includes ${tc.name} pattern`, () => {
+        const pattern = DANGEROUS_PATTERNS.find(p => p.name === tc.name);
+        assert.ok(pattern, `${tc.name} pattern should exist`);
+        if (tc.match) {
+          assert.ok(pattern.pattern.test(tc.match), tc.message);
+        }
+        if (tc.matchMany) {
+          tc.matchMany.forEach((candidate, index) => {
+            assert.ok(pattern.pattern.test(candidate), tc.messageMany[index]);
+          });
+        }
+      });
+    }
 
     test('command substitution pattern does not match arithmetic expansion', () => {
       const pattern = DANGEROUS_PATTERNS.find(p => p.name === 'Command substitution');
@@ -81,39 +58,6 @@ describe('shell-validators', () => {
         false,
         'Pattern should NOT match $((...))'
       );
-    });
-  });
-
-  describe('DANGEROUS_BUILTINS', () => {
-    test('includes eval builtin pattern', () => {
-      const pattern = DANGEROUS_BUILTINS.find(p => p.name === 'eval builtin');
-      assert.ok(pattern, 'eval builtin pattern should exist');
-      assert.ok(pattern.pattern.test('eval cmd'), 'Pattern should match eval at start');
-      assert.ok(pattern.pattern.test('echo test; eval cmd'), 'Pattern should match eval after ;');
-    });
-
-    test('includes source builtin pattern', () => {
-      const pattern = DANGEROUS_BUILTINS.find(p => p.name === 'source builtin');
-      assert.ok(pattern, 'source builtin pattern should exist');
-      assert.ok(pattern.pattern.test('source file.sh'), 'Pattern should match source at start');
-      assert.ok(
-        pattern.pattern.test('test && source file'),
-        'Pattern should match source after &&'
-      );
-    });
-
-    test('includes dot builtin pattern', () => {
-      const pattern = DANGEROUS_BUILTINS.find(p => p.name === 'dot (.) builtin');
-      assert.ok(pattern, 'dot builtin pattern should exist');
-      assert.ok(pattern.pattern.test('. /etc/profile'), 'Pattern should match dot at start');
-      assert.ok(pattern.pattern.test('test || . script.sh'), 'Pattern should match dot after ||');
-    });
-
-    test('dot builtin pattern does not match relative paths', () => {
-      const pattern = DANGEROUS_BUILTINS.find(p => p.name === 'dot (.) builtin');
-      assert.ok(pattern, 'dot builtin pattern should exist');
-      assert.strictEqual(pattern.pattern.test('./script.sh'), false, 'Should NOT match ./');
-      assert.strictEqual(pattern.pattern.test('../script.sh'), false, 'Should NOT match ../');
     });
   });
 

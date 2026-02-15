@@ -109,13 +109,7 @@ function logMemoryFailure({ taskId, error, sessionId }) {
   });
 }
 
-function logSpawnRagMetric({
-  taskId,
-  sessionId,
-  ragEnabled,
-  ragSectionAdded,
-  ragMemoryQueryLen,
-}) {
+function logSpawnRagMetric({ taskId, sessionId, ragEnabled, ragSectionAdded, ragMemoryQueryLen }) {
   append({
     event: 'spawn_rag',
     task_id: taskId || null,

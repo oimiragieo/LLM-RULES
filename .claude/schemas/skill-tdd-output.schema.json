@@ -2,14 +2,14 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://agent-studio.dev/schemas/skill-tdd-output.schema.json",
   "title": "TDD Skill Output",
-  "description": "Validates output from tdd skill invocation - Test-Driven Development cycle verification",
+  "description": "Validates output from tdd skill invocation with Canon TDD evidence requirements",
   "type": "object",
   "required": ["output", "status"],
   "properties": {
     "output": {
       "type": "object",
       "description": "TDD cycle execution results",
-      "required": ["testResults", "redGreenRefactorCycle", "coverage"],
+      "required": ["redGreenRefactorCycle", "testResults"],
       "properties": {
         "testResults": {
           "type": "object",
@@ -63,37 +63,67 @@
             }
           }
         },
-        "coverage": {
+        "scenarioBacklog": {
           "type": "object",
-          "required": ["percentage"],
+          "required": ["total", "completed"],
           "properties": {
-            "percentage": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 100,
-              "description": "Code coverage percentage"
-            },
-            "linesCovered": {
+            "total": {
               "type": "number",
               "minimum": 0
             },
-            "linesTotal": {
-              "type": "number",
-              "minimum": 0
-            },
-            "branchesCovered": {
-              "type": "number",
-              "minimum": 0
-            },
-            "branchesTotal": {
+            "completed": {
               "type": "number",
               "minimum": 0
             }
           }
         },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "redCommand": {
+              "type": "string"
+            },
+            "redFailureSummary": {
+              "type": "string"
+            },
+            "greenCommand": {
+              "type": "string"
+            },
+            "greenPassSummary": {
+              "type": "string"
+            }
+          }
+        },
+        "repairAttempts": {
+          "type": "number",
+          "minimum": 0
+        },
+        "testHackingChecks": {
+          "type": "object",
+          "required": ["passed"],
+          "properties": {
+            "passed": {
+              "type": "boolean"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "memoryProfileUpdated": {
+          "type": "boolean",
+          "description": "True when tdd-memory-profile was updated."
+        },
+        "memoryProfilePath": {
+          "type": "string",
+          "description": "Path to the tdd-memory-profile JSON."
+        },
         "lintAndFormatPassed": {
           "type": "boolean",
-          "description": "pnpm lint:fix and pnpm format completed successfully"
+          "description": "Configured lint and format commands completed successfully"
         },
         "filesModified": {
           "type": "array",

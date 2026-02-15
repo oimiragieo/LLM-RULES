@@ -85,6 +85,10 @@
           },
           {
             "type": "command",
+            "command": "node .claude/hooks/validation/agent-template-contract-validator.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/safety/unified-pre-write-hook.cjs"
           },
           {

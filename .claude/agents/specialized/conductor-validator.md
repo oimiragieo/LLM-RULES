@@ -1,7 +1,9 @@
 ---
 name: conductor-validator
 version: 1.0.0
-description: Validates Conductor project artifacts for completeness, consistency, and correctness. Use after setup, when diagnosing issues, or before implementation to verify project context.
+description: >-
+  Validates Conductor project artifacts for completeness, consistency, and correctness. Use after setup, when diagnosing
+  issues, or before implementation to verify project context.
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
@@ -25,7 +27,11 @@ skills:
   - workflow-patterns
   - verification-before-completion
   - rule-auditor
+  - token-saver-context-compression
+  - code-semantic-search
 ---
+
+<!-- agent-template-contract:v1 -->
 
 # Conductor Validator Agent
 
@@ -311,6 +317,18 @@ Skill({ skill: 'workflow-patterns' }); // Workflow validation
 | Before claiming completion | `verification-before-completion` | Evidence-based gates          |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

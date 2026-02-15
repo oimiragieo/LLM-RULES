@@ -1,9 +1,68 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "tdd Input Schema",
-  "description": "Input validation schema for tdd skill",
+  "description": "Input contract for Canon TDD execution",
   "type": "object",
-  "required": [],
-  "properties": {},
-  "additionalProperties": true
+  "required": ["task"],
+  "properties": {
+    "task": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Concise statement of behavior or bug to implement/fix."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["single_cycle", "full_task"],
+      "default": "full_task",
+      "description": "single_cycle runs one RED->GREEN loop; full_task runs backlog to completion."
+    },
+    "scenarioBacklog": {
+      "type": "array",
+      "description": "Ordered list of scenarios to drive test-first development.",
+      "items": {
+        "type": "object",
+        "required": ["id", "scenario"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scenario": {
+            "type": "string",
+            "minLength": 3
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "repairBudget": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "default": 3,
+      "description": "Maximum repair attempts for a single scenario before redesign/escalation."
+    },
+    "testCommand": {
+      "type": "string",
+      "description": "Project-specific test command for the current scope."
+    },
+    "lintCommand": {
+      "type": "string",
+      "description": "Project-specific lint command."
+    },
+    "formatCommand": {
+      "type": "string",
+      "description": "Project-specific format or format-check command."
+    },
+    "enableMemoryProfile": {
+      "type": "boolean",
+      "default": true,
+      "description": "Use bounded tdd-memory-profile hints for commands and recurring failures."
+    }
+  },
+  "additionalProperties": false
 }

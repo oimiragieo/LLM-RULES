@@ -18,7 +18,7 @@ console.log('📝 [RECOMMEND-EVOLUTION] Post-execute processing...');
 /**
  * Process execution result
  */
-function processResult(result) {
+function processResult(_result) {
   // TODO: Add your post-processing logic here
   // Examples:
   // - Log execution to audit file

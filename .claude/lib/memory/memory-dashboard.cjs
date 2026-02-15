@@ -25,12 +25,22 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { summarizeOperationalSLO } = require('./memory-slo-metrics.cjs');
+const { calculateHealthScore, generateRecommendations } = require('./memory-dashboard-scoring.cjs');
+const {
+  getMemoryDir,
+  getMetricsDir,
+  getFileSizeKB,
+  getJsonEntryCount,
+  countDirFiles,
+  getDirSizeKB,
+  countStaleTempArtifacts,
+  getFileLineCount,
+  getFileStatus,
+} = require('./memory-dashboard-helpers.cjs');
 
 const logger = createLogger('memory-dashboard');
 
-// ============================================================================
 // Configuration
-// ============================================================================
 
 const CONFIG = {
   // Thresholds for health scoring
@@ -53,299 +63,10 @@ const CONFIG = {
   },
 };
 
-// ============================================================================
 // Helper Functions
-// ============================================================================
 
 /**
  * Get the memory directory path
- */
-function getMemoryDir(projectRoot = PROJECT_ROOT) {
-  return path.join(projectRoot, '.claude', 'context', 'memory');
-}
-
-/**
- * Get the metrics directory path
- */
-function getMetricsDir(projectRoot = PROJECT_ROOT) {
-  const metricsDir = path.join(getMemoryDir(projectRoot), 'metrics');
-  if (!fs.existsSync(metricsDir)) {
-    fs.mkdirSync(metricsDir, { recursive: true });
-  }
-  return metricsDir;
-}
-
-/**
- * Safely get file size in KB
- */
-function getFileSizeKB(filePath) {
-  try {
-    if (fs.existsSync(filePath)) {
-      return Math.round(fs.statSync(filePath).size / 1024);
-    }
-  } catch (e) {
-    logger.debug('getFileSizeKB error', {
-      function: 'getFileSizeKB',
-      error: e.message,
-    });
-  }
-  return 0;
-}
-
-/**
- * Safely parse JSON file and return entry count
- */
-function getJsonEntryCount(filePath) {
-  try {
-    if (fs.existsSync(filePath)) {
-      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      if (Array.isArray(data)) {
-        return data.length;
-      }
-      if (data.discovered_files) {
-        return Object.keys(data.discovered_files).length;
-      }
-    }
-  } catch (e) {
-    logger.debug('getJsonEntryCount error', {
-      function: 'getJsonEntryCount',
-      error: e.message,
-    });
-  }
-  return 0;
-}
-
-/**
- * Count files in a directory matching a pattern
- */
-function countDirFiles(dirPath, pattern = /\.json$/) {
-  try {
-    if (fs.existsSync(dirPath)) {
-      return fs.readdirSync(dirPath).filter(f => pattern.test(f)).length;
-    }
-  } catch (e) {
-    logger.debug('countDirFiles error', {
-      function: 'countDirFiles',
-      error: e.message,
-    });
-  }
-  return 0;
-}
-
-function getDirSizeKB(dirPath, pattern = null) {
-  try {
-    if (!fs.existsSync(dirPath)) return 0;
-    const files = fs.readdirSync(dirPath);
-    let total = 0;
-    for (const f of files) {
-      if (pattern && !pattern.test(f)) continue;
-      const fp = path.join(dirPath, f);
-      try {
-        total += fs.statSync(fp).size;
-      } catch (_e) {
-        // ignore
-      }
-    }
-    return Math.round(total / 1024);
-  } catch (_e) {
-    return 0;
-  }
-}
-
-function countStaleTempArtifacts(
-  memoryDir,
-  staleAgeMs = Number(process.env.MEMORY_STALE_TEMP_AGE_MS || 24 * 60 * 60 * 1000)
-) {
-  if (!fs.existsSync(memoryDir)) return 0;
-  const now = Date.now();
-  let count = 0;
-  const stack = [memoryDir];
-
-  while (stack.length > 0) {
-    const currentDir = stack.pop();
-    let entries = [];
-    try {
-      entries = fs.readdirSync(currentDir, { withFileTypes: true });
-    } catch (_e) {
-      continue;
-    }
-
-    for (const entry of entries) {
-      const filePath = path.join(currentDir, entry.name);
-      if (entry.isDirectory()) {
-        stack.push(filePath);
-        continue;
-      }
-
-      const isTmpArtifact =
-        entry.name.endsWith('.tmp') ||
-        entry.name.includes('.tmp.') ||
-        entry.name.startsWith('.tmp-') ||
-        entry.name.endsWith('.lock');
-      if (!isTmpArtifact) continue;
-
-      try {
-        const stats = fs.statSync(filePath);
-        if (now - stats.mtimeMs > staleAgeMs) {
-          count += 1;
-        }
-      } catch (_e) {
-        // ignore
-      }
-    }
-  }
-
-  return count;
-}
-
-// ============================================================================
-// Health Score Calculation
-// ============================================================================
-
-/**
- * Calculate health score for a single metric
- * Returns 1.0 for healthy, 0.5-1.0 for warning zone, 0-0.5 for critical
- */
-function calculateMetricScore(value, threshold) {
-  if (value <= threshold.warn * 0.7) {
-    return 1.0; // Well under warn threshold
-  }
-  if (value <= threshold.warn) {
-    // Approaching warn threshold: 0.8 - 1.0
-    const ratio = value / threshold.warn;
-    return 1.0 - (ratio - 0.7) * (0.2 / 0.3);
-  }
-  if (value <= threshold.critical) {
-    // In warning zone: 0.5 - 0.8
-    const ratio = (value - threshold.warn) / (threshold.critical - threshold.warn);
-    return 0.8 - ratio * 0.3;
-  }
-  // Over critical: 0 - 0.5
-  const overRatio = Math.min((value - threshold.critical) / threshold.critical, 1);
-  return 0.5 - overRatio * 0.5;
-}
-
-/**
- * Calculate overall health score (0-1)
- * Based on weighted average of all metrics
- */
-function calculateHealthScore(metrics) {
-  const {
-    learningsSizeKB = 0,
-    patternsCount = 0,
-    gotchasCount = 0,
-    codebaseMapEntries = 0,
-    mtmSessionCount = 0,
-  } = metrics;
-
-  const scores = {
-    learnings: calculateMetricScore(learningsSizeKB, CONFIG.THRESHOLDS.learningsKB),
-    patterns: calculateMetricScore(patternsCount, CONFIG.THRESHOLDS.patterns),
-    gotchas: calculateMetricScore(gotchasCount, CONFIG.THRESHOLDS.gotchas),
-    codebaseMap: calculateMetricScore(codebaseMapEntries, CONFIG.THRESHOLDS.codebaseMapEntries),
-    mtm: calculateMetricScore(mtmSessionCount, CONFIG.THRESHOLDS.mtmSessions),
-  };
-
-  // Weighted average
-  let totalScore = 0;
-  let totalWeight = 0;
-  for (const [key, weight] of Object.entries(CONFIG.HEALTH_WEIGHTS)) {
-    totalScore += scores[key] * weight;
-    totalWeight += weight;
-  }
-
-  return Math.round((totalScore / totalWeight) * 100) / 100;
-}
-
-// ============================================================================
-// Recommendation Generation
-// ============================================================================
-
-/**
- * Generate recommendations based on current metrics
- */
-function generateRecommendations(metrics) {
-  const {
-    learningsSizeKB = 0,
-    patternsCount = 0,
-    gotchasCount = 0,
-    codebaseMapEntries = 0,
-    mtmSessionCount = 0,
-    legacySessionsCount = 0,
-  } = metrics;
-
-  const recommendations = [];
-
-  // Learnings.md recommendations
-  if (learningsSizeKB >= CONFIG.THRESHOLDS.learningsKB.critical) {
-    recommendations.push(
-      `CRITICAL: learnings.md is ${learningsSizeKB}KB - run archival immediately`
-    );
-  } else if (learningsSizeKB >= CONFIG.THRESHOLDS.learningsKB.warn) {
-    recommendations.push(
-      `Consider archiving learnings.md (${learningsSizeKB}KB approaching ${CONFIG.THRESHOLDS.learningsKB.critical}KB threshold)`
-    );
-  }
-
-  // Patterns recommendations
-  if (patternsCount >= CONFIG.THRESHOLDS.patterns.critical) {
-    recommendations.push(
-      `CRITICAL: patterns.json has ${patternsCount} entries - run deduplication and pruning`
-    );
-  } else if (patternsCount >= CONFIG.THRESHOLDS.patterns.warn) {
-    recommendations.push(
-      `Consider pruning patterns.json (${patternsCount} entries approaching ${CONFIG.THRESHOLDS.patterns.critical} threshold)`
-    );
-  }
-
-  // Gotchas recommendations
-  if (gotchasCount >= CONFIG.THRESHOLDS.gotchas.critical) {
-    recommendations.push(
-      `CRITICAL: gotchas.json has ${gotchasCount} entries - run deduplication and pruning`
-    );
-  } else if (gotchasCount >= CONFIG.THRESHOLDS.gotchas.warn) {
-    recommendations.push(
-      `Consider pruning gotchas.json (${gotchasCount} entries approaching ${CONFIG.THRESHOLDS.gotchas.critical} threshold)`
-    );
-  }
-
-  // Codebase map recommendations
-  if (codebaseMapEntries >= CONFIG.THRESHOLDS.codebaseMapEntries.critical) {
-    recommendations.push(
-      `CRITICAL: codebase_map.json has ${codebaseMapEntries} entries - run TTL pruning`
-    );
-  } else if (codebaseMapEntries >= CONFIG.THRESHOLDS.codebaseMapEntries.warn) {
-    recommendations.push(
-      `Consider pruning codebase_map.json (${codebaseMapEntries} entries approaching ${CONFIG.THRESHOLDS.codebaseMapEntries.critical} threshold)`
-    );
-  }
-
-  // MTM recommendations
-  if (mtmSessionCount >= CONFIG.THRESHOLDS.mtmSessions.critical) {
-    recommendations.push(
-      `CRITICAL: MTM has ${mtmSessionCount} sessions - run summarization to LTM immediately`
-    );
-  } else if (mtmSessionCount >= CONFIG.THRESHOLDS.mtmSessions.warn) {
-    recommendations.push(
-      `Consider summarizing MTM sessions to LTM (${mtmSessionCount} sessions approaching ${CONFIG.THRESHOLDS.mtmSessions.critical} limit)`
-    );
-  }
-
-  if (legacySessionsCount > 0) {
-    recommendations.push(
-      `Legacy sessions/ has ${legacySessionsCount} files - run migration and delete legacy data`
-    );
-  }
-
-  return recommendations;
-}
-
-// ============================================================================
-// Metrics Collection
-// ============================================================================
-
-/**
- * Collect all metrics from the memory system
  */
 function collectMetrics(projectRoot = PROJECT_ROOT) {
   const memoryDir = getMemoryDir(projectRoot);
@@ -414,23 +135,29 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
   totalSizeKB += getFileSizeKB(path.join(memoryDir, 'issues.md'));
 
   // Calculate health score
-  const healthScore = calculateHealthScore({
-    learningsSizeKB,
-    patternsCount,
-    gotchasCount,
-    codebaseMapEntries,
-    mtmSessionCount: mtmSessions,
-  });
+  const healthScore = calculateHealthScore(
+    {
+      learningsSizeKB,
+      patternsCount,
+      gotchasCount,
+      codebaseMapEntries,
+      mtmSessionCount: mtmSessions,
+    },
+    CONFIG
+  );
 
   // Generate recommendations
-  const recommendations = generateRecommendations({
-    learningsSizeKB,
-    patternsCount,
-    gotchasCount,
-    codebaseMapEntries,
-    mtmSessionCount: mtmSessions,
-    legacySessionsCount: sessionsCount,
-  });
+  const recommendations = generateRecommendations(
+    {
+      learningsSizeKB,
+      patternsCount,
+      gotchasCount,
+      codebaseMapEntries,
+      mtmSessionCount: mtmSessions,
+      legacySessionsCount: sessionsCount,
+    },
+    CONFIG
+  );
 
   if (!slo.pass.writeLatency) {
     recommendations.push(
@@ -506,38 +233,6 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
 
 /**
  * Get file line count
- */
-function getFileLineCount(filePath) {
-  try {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      return content.split('\n').length;
-    }
-  } catch (e) {
-    logger.debug('getFileLineCount error', {
-      function: 'getFileLineCount',
-      error: e.message,
-    });
-  }
-  return 0;
-}
-
-/**
- * Get status string based on value and threshold
- */
-function getFileStatus(value, threshold) {
-  if (value >= threshold.critical) return 'critical';
-  if (value >= threshold.warn) return 'warning';
-  return 'healthy';
-}
-
-// ============================================================================
-// Metrics History
-// ============================================================================
-
-/**
- * Save metrics to daily file.
- * getMetricsDir() ensures the metrics directory exists before write.
  */
 function saveMetrics(metrics, projectRoot = PROJECT_ROOT) {
   const metricsDir = getMetricsDir(projectRoot);
@@ -622,9 +317,7 @@ function cleanupOldMetrics(projectRoot = PROJECT_ROOT) {
   return removedCount;
 }
 
-// ============================================================================
 // Unified Dashboard
-// ============================================================================
 
 /**
  * Get complete dashboard with all sections
@@ -783,9 +476,7 @@ function formatDashboard(dashboard) {
   return lines.join('\n');
 }
 
-// ============================================================================
 // CLI Interface
-// ============================================================================
 
 if (require.main === module) {
   const args = process.argv.slice(2);
@@ -848,9 +539,7 @@ Examples:
   }
 }
 
-// ============================================================================
 // Exports
-// ============================================================================
 
 module.exports = {
   CONFIG,
