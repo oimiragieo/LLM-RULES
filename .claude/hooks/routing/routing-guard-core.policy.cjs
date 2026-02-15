@@ -35,6 +35,11 @@ const ROUTER_BASH_WHITELIST = [
 const WHITELISTED_TOOLS = ['TaskUpdate', 'TaskList', 'TaskGet', 'Read', 'AskUserQuestion'];
 const WRITE_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
 const IMPLEMENTATION_AGENTS = ['developer', 'qa', 'devops'];
+const HIGH_RISK_SPECIALISTS_REQUIRING_ARCHITECT = [
+  'devops',
+  'devops-troubleshooter',
+  'chaos-engineer',
+];
 
 const SPECIALIST_KEYWORD_MAP = {
   'technical-writer': [
@@ -304,6 +309,10 @@ const SECURITY_PATTERNS = {
   description: ['security'],
 };
 
+const ARCHITECT_PATTERNS = {
+  prompt: ['you are architect', 'you are the architect'],
+};
+
 const ALWAYS_ALLOWED_WRITE_PATTERNS = [
   /\.claude[/\\]context[/\\]runtime[/\\]/,
   /\.claude[/\\]context[/\\]memory[/\\]/,
@@ -342,6 +351,62 @@ function isSecuritySpawn(toolInput) {
   return false;
 }
 
+function isArchitectSpawn(toolInput = {}) {
+  const subagentType = (toolInput.subagent_type || '').toLowerCase();
+  if (subagentType === 'architect') {
+    return true;
+  }
+
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const description = (toolInput.description || '').toLowerCase();
+  const combined = `${prompt} ${description}`;
+  if (combined.includes('security-architect') || combined.includes('database-architect')) {
+    return false;
+  }
+
+  for (const pattern of ARCHITECT_PATTERNS.prompt) {
+    if (prompt.includes(pattern)) return true;
+  }
+  return false;
+}
+
+function isCodeSimplifierSpawn(toolInput = {}) {
+  const subagentType = (toolInput.subagent_type || '').toLowerCase();
+  if (subagentType === 'code-simplifier') {
+    return true;
+  }
+
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const description = (toolInput.description || '').toLowerCase();
+  const combined = `${prompt} ${description}`;
+  return (
+    combined.includes('you are code-simplifier') ||
+    combined.includes('you are the code-simplifier') ||
+    combined.includes('you are code simplifier') ||
+    combined.includes('you are the code simplifier') ||
+    combined.includes('code-simplifier')
+  );
+}
+
+function extractSpawnAgentType(toolInput = {}) {
+  const subagentType = (toolInput.subagent_type || '').toLowerCase();
+  if (subagentType) {
+    return subagentType;
+  }
+
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const match = prompt.match(/\byou are (?:the )?([a-z0-9-]+)/i);
+  if (match && match[1]) {
+    return match[1].toLowerCase();
+  }
+  return '';
+}
+
+function isHighRiskSpecialistSpawn(toolInput = {}) {
+  const agentType = extractSpawnAgentType(toolInput);
+  return HIGH_RISK_SPECIALISTS_REQUIRING_ARCHITECT.includes(agentType);
+}
+
 function isImplementationAgentSpawn(toolInput) {
   const prompt = (toolInput.prompt || '').toLowerCase();
   return IMPLEMENTATION_AGENTS.some(
@@ -372,10 +437,15 @@ module.exports = {
   WHITELISTED_TOOLS,
   WRITE_TOOLS,
   IMPLEMENTATION_AGENTS,
+  HIGH_RISK_SPECIALISTS_REQUIRING_ARCHITECT,
   SPECIALIST_KEYWORD_MAP,
   isAlwaysAllowedWrite,
   isPlannerSpawn,
   isSecuritySpawn,
+  isArchitectSpawn,
+  isCodeSimplifierSpawn,
+  extractSpawnAgentType,
+  isHighRiskSpecialistSpawn,
   isImplementationAgentSpawn,
   isWhitelistedBashCommand,
   extractTaskIdFromPrompt,

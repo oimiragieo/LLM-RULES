@@ -200,6 +200,7 @@ describe('Fix 4a: state-reset includes required fields', () => {
       'plannerSpawned',
       'requiresSecurityReview',
       'securitySpawned',
+      'architectSpawned',
       'lastTaskUpdateCall',
       'lastTaskUpdateTaskId',
       'lastTaskUpdateStatus',

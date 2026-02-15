@@ -49,7 +49,8 @@ function fileExists(ref) {
 
 function checkConcreteReferences(filePath, text) {
   const rel = toRel(filePath);
-  const refRe = /\.claude\/(agents\/[A-Za-z0-9_./-]+\.md|workflows\/[A-Za-z0-9_./-]+\.md|skills\/[A-Za-z0-9_./-]+\/SKILL\.md)/g;
+  const refRe =
+    /\.claude\/(agents\/[A-Za-z0-9_./-]+\.md|workflows\/[A-Za-z0-9_./-]+\.md|skills\/[A-Za-z0-9_./-]+\/SKILL\.md)/g;
   for (const match of text.matchAll(refRe)) {
     const ref = `.claude/${match[1]}`;
     if (isPlaceholderReference(ref)) continue;
@@ -69,7 +70,8 @@ function checkDeprecatedAliases(filePath, text) {
     },
     {
       pattern: /skills\/progressive-disclosure\/SKILL\.md/g,
-      message: 'deprecated skill path ".claude/skills/progressive-disclosure/SKILL.md" (use context-compressor)',
+      message:
+        'deprecated skill path ".claude/skills/progressive-disclosure/SKILL.md" (use context-compressor)',
     },
   ];
   for (const check of aliasChecks) {
@@ -80,11 +82,11 @@ function checkDeprecatedAliases(filePath, text) {
 }
 
 const files = [
-  ...walk(WORKFLOWS_DIR, (p) => p.endsWith('.md')),
-  ...walk(SKILLS_DIR, (p) => p.endsWith('SKILL.md')),
+  ...walk(WORKFLOWS_DIR, p => p.endsWith('.md')),
+  ...walk(SKILLS_DIR, p => p.endsWith('SKILL.md')),
 ]
-  .map((p) => p.replaceAll('\\', '/'))
-  .filter((p) => !isIgnoredFile(p));
+  .map(p => p.replaceAll('\\', '/'))
+  .filter(p => !isIgnoredFile(p));
 
 for (const file of files) {
   const text = fs.readFileSync(file, 'utf8');

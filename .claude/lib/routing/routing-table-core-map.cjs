@@ -177,6 +177,14 @@ const ROUTING_TABLE = {
   roadmap: 'pm',
   prioritization: 'pm',
   product: 'pm',
+  // Technical Program Management
+  program: 'technical-program-manager',
+  tpm: 'technical-program-manager',
+  dependency: 'technical-program-manager',
+  dependencies: 'technical-program-manager',
+  milestone: 'technical-program-manager',
+  raid: 'technical-program-manager',
+  crossfunctional: 'technical-program-manager',
   // Reflection Agent
   reflection: 'reflection-agent',
   retrospective: 'reflection-agent',

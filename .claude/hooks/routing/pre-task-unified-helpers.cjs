@@ -27,7 +27,16 @@ const SECURITY_PATTERNS = {
   description: ['security'],
 };
 
+const ARCHITECT_PATTERNS = {
+  prompt: ['you are architect', 'you are the architect'],
+};
+
 const IMPLEMENTATION_AGENTS = ['developer', 'qa', 'devops'];
+const HIGH_RISK_SPECIALISTS_REQUIRING_ARCHITECT = [
+  'devops',
+  'devops-troubleshooter',
+  'chaos-engineer',
+];
 
 const EVOLUTION_TRIGGERS = [
   'agent-creator',
@@ -75,6 +84,62 @@ function isSecuritySpawn(toolInput) {
     if (description.includes(pattern)) return true;
   }
   return false;
+}
+
+function isArchitectSpawn(toolInput = {}) {
+  const subagentType = (toolInput.subagent_type || '').toLowerCase();
+  if (subagentType === 'architect') {
+    return true;
+  }
+
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const description = (toolInput.description || '').toLowerCase();
+  const combined = `${prompt} ${description}`;
+  if (combined.includes('security-architect') || combined.includes('database-architect')) {
+    return false;
+  }
+
+  for (const pattern of ARCHITECT_PATTERNS.prompt) {
+    if (prompt.includes(pattern)) return true;
+  }
+  return false;
+}
+
+function isCodeSimplifierSpawn(toolInput = {}) {
+  const subagentType = (toolInput.subagent_type || '').toLowerCase();
+  if (subagentType === 'code-simplifier') {
+    return true;
+  }
+
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const description = (toolInput.description || '').toLowerCase();
+  const combined = `${prompt} ${description}`;
+  return (
+    combined.includes('you are code-simplifier') ||
+    combined.includes('you are the code-simplifier') ||
+    combined.includes('you are code simplifier') ||
+    combined.includes('you are the code simplifier') ||
+    combined.includes('code-simplifier')
+  );
+}
+
+function extractSpawnAgentType(toolInput = {}) {
+  const subagentType = (toolInput.subagent_type || '').toLowerCase();
+  if (subagentType) {
+    return subagentType;
+  }
+
+  const prompt = (toolInput.prompt || '').toLowerCase();
+  const match = prompt.match(/\byou are (?:the )?([a-z0-9-]+)/i);
+  if (match && match[1]) {
+    return match[1].toLowerCase();
+  }
+  return '';
+}
+
+function isHighRiskSpecialistSpawn(toolInput = {}) {
+  const agentType = extractSpawnAgentType(toolInput);
+  return HIGH_RISK_SPECIALISTS_REQUIRING_ARCHITECT.includes(agentType);
 }
 
 function isImplementationAgentSpawn(toolInput) {
@@ -345,11 +410,17 @@ function checkSpawnRoleGuardrails(toolInput) {
 module.exports = {
   PLANNER_PATTERNS,
   SECURITY_PATTERNS,
+  ARCHITECT_PATTERNS,
   IMPLEMENTATION_AGENTS,
+  HIGH_RISK_SPECIALISTS_REQUIRING_ARCHITECT,
   EVOLUTION_TRIGGERS,
   EVOLUTION_TYPES,
   isPlannerSpawn,
   isSecuritySpawn,
+  isArchitectSpawn,
+  isCodeSimplifierSpawn,
+  extractSpawnAgentType,
+  isHighRiskSpecialistSpawn,
   isImplementationAgentSpawn,
   extractTaskDescription,
   extractAgentType,

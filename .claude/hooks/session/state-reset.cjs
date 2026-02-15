@@ -64,6 +64,7 @@ function resetState() {
     plannerSpawned: false,
     requiresSecurityReview: false,
     securitySpawned: false,
+    architectSpawned: false,
     lastTaskUpdateCall: null,
     lastTaskUpdateTaskId: null,
     lastTaskUpdateStatus: null,

@@ -4,6 +4,10 @@ const { getEnforcementMode, auditSecurityOverride } = require('../../lib/utils/h
 const {
   isPlannerSpawn,
   isSecuritySpawn,
+  isArchitectSpawn,
+  isCodeSimplifierSpawn,
+  isHighRiskSpecialistSpawn,
+  extractSpawnAgentType,
   isImplementationAgentSpawn,
   SPECIALIST_KEYWORD_MAP,
 } = require('./routing-guard-core.policy.cjs');
@@ -120,6 +124,63 @@ function checkSecurityReview(toolName, toolInput) {
 
   const message = `[SEC-004] Security review required before implementation.
 Spawn SECURITY-ARCHITECT first to review security implications.`;
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+  return { pass: true, result: 'warn', message };
+}
+
+function checkCodeSimplifierArchitectReview(toolName, toolInput = {}) {
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT', 'block');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  if (isArchitectSpawn(toolInput)) {
+    return { pass: true, markArchitect: true };
+  }
+
+  const state = getCachedRouterState();
+  if (state.architectSpawned || !isCodeSimplifierSpawn(toolInput)) {
+    return { pass: true };
+  }
+
+  const message = `[ARCH-001] Code simplification requires architect review first.
+Spawn ARCHITECT first to validate structural safety, then run CODE-SIMPLIFIER.`;
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+  return { pass: true, result: 'warn', message };
+}
+
+function checkHighRiskSpecialistArchitectReview(toolName, toolInput = {}) {
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT', 'block');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  if (isArchitectSpawn(toolInput)) {
+    return { pass: true, markArchitect: true };
+  }
+
+  const state = getCachedRouterState();
+  if (state.architectSpawned || !isHighRiskSpecialistSpawn(toolInput)) {
+    return { pass: true };
+  }
+
+  const agentType = extractSpawnAgentType(toolInput) || 'specialist';
+  const message = `[ARCH-002] ${agentType} requires architect review first for high-risk changes.
+Spawn ARCHITECT first to validate system-level safety, then run ${agentType}.`;
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -340,6 +401,8 @@ module.exports = {
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,
+  checkCodeSimplifierArchitectReview,
+  checkHighRiskSpecialistArchitectReview,
   checkSpecialistOverride,
   checkTaskListFirstGate,
   checkCreatorIntentGuard,

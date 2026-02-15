@@ -23,6 +23,7 @@ const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 const routerState = require('../../lib/routing/router-state.cjs');
 const { parseAndValidateTaskUpdate } = require('../../lib/routing/task-update-contract.cjs');
+const taskClaimLedger = require('../../lib/routing/task-claim-ledger.cjs');
 
 const {
   gatherSessionInsights: gatherSessionInsightsBase,
@@ -73,6 +74,7 @@ const eventHandlers = createReflectionEventHandlers({
   getToolOutput,
   debugLog,
   routerState,
+  taskClaimLedger,
   parseAndValidateTaskUpdate,
   gatherSessionInsights,
   errorSummaryExtractor,

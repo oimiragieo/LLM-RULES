@@ -99,6 +99,17 @@ Read('.claude/context/artifacts/catalogs/workflow-catalog.md');
 
 **Why**: Ensures newly created artifacts are integrated into the ecosystem (catalogs, agent assignments, routing tables) without blocking the user's primary workflow.
 
+## Step 0.6: CREATION PREFLIGHT (Artifact Creation Requests)
+
+If request intent is artifact creation/evolution, run a preflight task before creator execution:
+
+1. Spawn planner (or technical-program-manager for cross-team impact)
+2. Invoke:
+   - `Skill({ skill: "creation-feasibility-gate" })`
+   - `Skill({ skill: "compliance-policy-check" })`
+3. If feasibility returns `BLOCK` or compliance returns `FAIL`, do not proceed to creator skills until blockers are resolved.
+4. If preflight returns `PASS/WARN/CONDITIONAL`, continue with creator routing.
+
 ## Step 1: Check Existing Tasks
 
 **ALWAYS run this FIRST before analyzing the request.**
@@ -157,7 +168,7 @@ TaskList();
 | **Data**           | "ETL", "pipeline", "analytics", "data processing"                                                             | data-engineer, database-architect              |
 | **Infrastructure** | "Docker", "K8s", "AWS", "infrastructure", "CI/CD"                                                             | devops, container-expert, terraform-infra      |
 | **Security**       | "auth", "security", "encryption", "vulnerability"                                                             | security-architect, auth-security-expert       |
-| **Product**        | "feature", "requirements", "roadmap", "strategy"                                                              | pm, planner                                    |
+| **Product**        | "feature", "requirements", "roadmap", "strategy", "program", "dependency", "milestone"                        | pm, technical-program-manager, planner         |
 | **Documentation**  | "docs", "README", "guide", "documentation", "update docs", "review docs", "doc accuracy", "fix documentation" | technical-writer, doc-generator                |
 | **Architecture**   | "design", "architecture", "C4", "system design"                                                               | architect, c4-\* agents                        |
 
@@ -362,15 +373,16 @@ Without these, the skill was NEVER invoked because Router couldn't find it.
 
 ### Core Development Agents
 
-| Request Type           | Agent                | File                                        |
-| ---------------------- | -------------------- | ------------------------------------------- |
-| Bug fixes, coding      | `developer`          | `.claude/agents/core/developer.md`          |
-| New features, planning | `planner`            | `.claude/agents/core/planner.md`            |
-| System design          | `architect`          | `.claude/agents/core/architect.md`          |
-| Testing, QA            | `qa`                 | `.claude/agents/core/qa.md`                 |
-| Documentation          | `technical-writer`   | `.claude/agents/core/technical-writer.md`   |
-| Product management     | `pm`                 | `.claude/agents/core/pm.md`                 |
-| Context compression    | `context-compressor` | `.claude/agents/core/context-compressor.md` |
+| Request Type                             | Agent                       | File                                               |
+| ---------------------------------------- | --------------------------- | -------------------------------------------------- |
+| Bug fixes, coding                        | `developer`                 | `.claude/agents/core/developer.md`                 |
+| New features, planning                   | `planner`                   | `.claude/agents/core/planner.md`                   |
+| Cross-team delivery, dependency tracking | `technical-program-manager` | `.claude/agents/core/technical-program-manager.md` |
+| System design                            | `architect`                 | `.claude/agents/core/architect.md`                 |
+| Testing, QA                              | `qa`                        | `.claude/agents/core/qa.md`                        |
+| Documentation                            | `technical-writer`          | `.claude/agents/core/technical-writer.md`          |
+| Product management                       | `pm`                        | `.claude/agents/core/pm.md`                        |
+| Context compression                      | `context-compressor`        | `.claude/agents/core/context-compressor.md`        |
 
 ### Specialized Agents
 
@@ -555,9 +567,47 @@ When spawning an agent for an existing task (from TaskGet), check the task descr
 
 **Rule:** Do NOT override the planner's specialist recommendation with `developer` unless the recommendation is clearly wrong.
 
+When task metadata includes microtask fields (`owned_paths`, `forbidden_paths`, `depends_on`, `dependency_type`, `parallel_group`):
+
+- Respect planner ownership boundaries as hard routing constraints
+- Do not spawn microtasks in parallel if `owned_paths` overlap
+- Do not spawn dependents before all `depends_on` tasks are complete
+- Treat `dependency_type=blocks` as execution-gating; `related|parent-child|discovered-from` are non-blocking context links
+- PreToolUse(Task) enforces ownership overlap blocks against active task claims (`task-claim-ledger.json`)
+- PreToolUse(Task) also blocks MEDIUM+ parallel microtasks missing ownership metadata (`TASK_PARALLEL_OWNERSHIP_REQUIRED=block`)
+
 ## Step 7: Spawn Decision (Single vs Parallel vs Phased)
 
 **Based on complexity and risk from Step 2, determine spawn strategy:**
+
+### 7.0 Full Enterprise Pipeline Trigger (Operational Default for Improvement Sweeps)
+
+If user intent includes phrases like:
+
+- "run the full enterprise pipeline"
+- "integrate/fix all findings"
+- "improve the framework itself"
+- "end-to-end hardening/evolution pass"
+
+Router MUST route via enterprise orchestration, not ad-hoc single spawns. Use this ordered phase set:
+
+1. `reflection-agent` (intake and pending learnings)
+2. `pm` + `technical-program-manager` + `researcher`
+3. `architect` + `security-architect` + `code-simplifier` + `researcher`
+4. domain + specialized implementation agents
+5. `planner` + `context-compressor`
+6. `developer` + `chaos-engineer`
+7. `code-reviewer`
+8. `qa`
+9. `devops`
+10. `technical-writer`
+11. `reflection-agent` (closeout + memory updates)
+
+Non-negotiable routing requirements in this mode:
+
+- Search policy: hybrid search first (`pnpm search:code`, semantic/structural search skills, `ripgrep` skill). `Grep` is fallback-only.
+- Planner contract: invoke `Skill({ skill: "tdd" })`, produce a detailed TDD plan, and explicitly call `researcher` and/or `architect` when uncertainty remains.
+- Context pressure: include `context-compressor` phase before heavy implementation when prompts/artifacts are large.
 
 ### 7.1 Single Agent Spawn
 
@@ -613,6 +663,15 @@ Subject: Fix login bug
 **When**: Medium to High complexity, Multiple independent perspectives needed, High to Critical risk.
 
 **Include multiple Task() calls in a SINGLE response for parallel execution.**
+
+Parallel spawn is allowed ONLY when all are true:
+
+1. Task shards are independent by planner microtask contract
+2. No overlap in `owned_paths`
+3. No dependency edge between spawned shards
+4. Fan-out cap not exceeded (`max 4` active parallel shards)
+
+If any condition fails, fall back to phased/sequential spawn.
 
 ```javascript
 // Example: Security-sensitive feature
@@ -680,6 +739,21 @@ Review payment feature design for security best practices.
 | **External API**         | Explore            | Planner   | Architect + Security | Consolidate |
 | **Auth/Security change** | Explore            | Planner   | Security (mandatory) | Consolidate |
 | **Database migration**   | Explore            | Planner   | Architect            | Implement   |
+
+### 7.4 Conflict-Free Microtask Scheduling (Planner-Driven)
+
+For plans that include microtask DAG metadata:
+
+1. Topologically sort by `depends_on`
+2. Spawn only same-level nodes with disjoint `owned_paths`
+3. Enforce fan-out cap of 4
+4. Wait for completion + validation per shard group
+5. Run merge/review gate before advancing to next shard group
+
+Failure handling:
+
+- On ownership conflict detection: pause parallelization, re-route sequentially, request planner correction
+- On repeated shard failures: spawn planner in consolidation mode to rewrite shard boundaries
 
 ### 7.5 Enterprise Workflow Integration (Automatic Phase Advancement)
 

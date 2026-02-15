@@ -1,6 +1,6 @@
 ---
 name: evolution-orchestrator
-version: 1.0.0
+version: 1.1.0
 description: >-
   Meta-agent that orchestrates the EVOLVE workflow for creating new agents, skills, workflows, hooks, and schemas.
   Ensures research-first, validation-gated artifact creation.
@@ -33,7 +33,9 @@ skills:
   - assimilate
   - artifact-integrator
   - artifact-lifecycle
+  - compliance-policy-check
   - command-creator
+  - creation-feasibility-gate
   - rule-creator
   - tool-creator
   - hook-creator

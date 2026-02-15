@@ -1,6 +1,6 @@
 ---
 name: reflection-agent
-version: 1.0.0
+version: 1.1.0
 description: >-
   Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against
   rubrics, extracts patterns, and updates memory. Use after task completion for metacognitive analysis and continuous
@@ -25,6 +25,8 @@ tools:
   - Skill
 skills:
   - artifact-integrator
+  - compliance-policy-check
+  - creation-feasibility-gate
   - assimilate
   - code-analyzer
   - context-compressor
@@ -362,6 +364,22 @@ Consolidate learnings into persistent memory:
 
 **Preferred write path:** use the `MemoryRecord` tool for patterns/gotchas when available. Avoid manual JSON edits.
 
+### Step 5.5: Memory Curation Contract (MANDATORY)
+
+For each reflection run, include an explicit curation decision:
+
+1. **Retain**: high-signal learning to keep in active memory
+2. **Compress**: verbose evidence to distill with token-saver/context-compressor
+3. **Archive**: stale/noisy content to move out of active hot path
+
+Score each candidate `0-1` on:
+
+- Reuse value
+- Evidence quality
+- Retrieval relevance
+
+Only `retain` items with strong evidence and expected reuse. Record rationale in report and memory log.
+
 4. **Reflection Log** → `.claude/context/memory/reflection-log.jsonl`
    - Append structured reflection entry (JSON)
    - Maintain append-only log for audit trail
@@ -429,6 +447,13 @@ Agent: developer
 - Missing edge case handling for null inputs
 
 ## Learnings Extracted
+
+## Memory Curation Decisions
+
+- Retain: [...]
+- Compress: [...]
+- Archive: [...]
+- Rationale: short evidence-based summary
 
 - Pattern X (async context managers) is effective for resource cleanup
 - Strategy Y (test parameterization) reduces test duplication
@@ -673,18 +698,20 @@ Skill({ skill: 'token-saver-context-compression' }); // Compress large evidence 
 
 ### Contextual Skills (When Applicable)
 
-| Condition              | Skill                    | Purpose                                |
-| ---------------------- | ------------------------ | -------------------------------------- |
-| Code reflection        | `code-analyzer`          | Static code analysis patterns          |
-| Security outputs       | `security-architect`     | Security-specific rubrics              |
-| Architecture review    | `architect`              | Architecture quality assessment        |
-| System-level analysis  | `framework-context`      | Framework architecture context         |
-| Capability-gap pattern | `recommend-evolution`    | Standardized evolution recommendation  |
-| Stale skill pattern    | `skill-updater`          | Refresh existing skill workflow safely |
-| Stale agent pattern    | `agent-updater`          | Refresh existing agent prompt safely   |
-| Workflow drift pattern | `workflow-updater`       | Restore phase/gate reliability         |
-| Memory quality drift   | `memory-quality-auditor` | Audit retrieval and groundedness       |
-| Eval signal drift      | `eval-harness-updater`   | Repair live/fallback eval reliability  |
+| Condition               | Skill                       | Purpose                                |
+| ----------------------- | --------------------------- | -------------------------------------- |
+| Code reflection         | `code-analyzer`             | Static code analysis patterns          |
+| Security outputs        | `security-architect`        | Security-specific rubrics              |
+| Architecture review     | `architect`                 | Architecture quality assessment        |
+| System-level analysis   | `framework-context`         | Framework architecture context         |
+| Capability-gap pattern  | `recommend-evolution`       | Standardized evolution recommendation  |
+| Creation viability risk | `creation-feasibility-gate` | Preflight artifact feasibility check   |
+| Policy/compliance risk  | `compliance-policy-check`   | Policy alignment before evolution      |
+| Stale skill pattern     | `skill-updater`             | Refresh existing skill workflow safely |
+| Stale agent pattern     | `agent-updater`             | Refresh existing agent prompt safely   |
+| Workflow drift pattern  | `workflow-updater`          | Restore phase/gate reliability         |
+| Memory quality drift    | `memory-quality-auditor`    | Audit retrieval and groundedness       |
+| Eval signal drift       | `eval-harness-updater`      | Repair live/fallback eval reliability  |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 

@@ -173,11 +173,11 @@ function normalizeTaskIdReferences(prompt, taskId) {
     .replace(/(\*\*Task ID\*\*:\s*)([a-zA-Z0-9_-]{1,64})/gi, `$1${normalizedTaskId}`)
     .replace(/(Task ID:\s*)([a-zA-Z0-9_-]{1,64})/gi, `$1${normalizedTaskId}`)
     .replace(/(taskId\s*:\s*)(['"]?)([^'",}\s]+)(\2)/gi, (_match, prefix, quote) => {
-      const q = quote || '';
+      const q = quote || '"';
       return `${prefix}${q}${normalizedTaskId}${q}`;
     })
     .replace(/(task_id\s*:\s*)(['"]?)([^'",}\s]+)(\2)/gi, (_match, prefix, quote) => {
-      const q = quote || '';
+      const q = quote || '"';
       return `${prefix}${q}${normalizedTaskId}${q}`;
     })
     .replace(

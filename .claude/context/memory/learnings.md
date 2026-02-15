@@ -1,3 +1,16 @@
+## Creation Preflight + Compliance Gates (2026-02-15)
+
+- Added `creation-feasibility-gate` skill to block low-value or infeasible artifact creation before creator workflows.
+- Added `compliance-policy-check` skill to enforce rule/policy alignment before high-risk evolution and design changes.
+- Wired both into router/enterprise/evolution/reflection workflows for operational preflight use.
+
+## Planner/PM/TPM Collaboration Hardening (2026-02-15)
+
+- Planner and PM prompts now enforce a strict PRD -> EPIC -> story -> implementation handoff contract for HIGH/EPIC work.
+- Added `technical-program-manager` core agent to own cross-team sequencing, dependency management, and RAID tracking.
+- Router/routing docs and routing table mappings now include `technical-program-manager` so cross-team program requests can route directly.
+- Enterprise workflow now includes PM/TPM participation for product-heavy HIGH/EPIC phases and full-sweep routing.
+
 ## Artifact Hardening Layer (2026-02-15)
 
 - Added unified artifact scoring ledger + automated remediation queue at runtime.

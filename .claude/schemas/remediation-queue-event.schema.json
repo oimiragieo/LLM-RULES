@@ -2,7 +2,15 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Remediation Queue Event",
   "type": "object",
-  "required": ["timestamp", "action", "status", "artifactKey", "artifactType", "artifactName", "severity"],
+  "required": [
+    "timestamp",
+    "action",
+    "status",
+    "artifactKey",
+    "artifactType",
+    "artifactName",
+    "severity"
+  ],
   "properties": {
     "timestamp": { "type": "string" },
     "action": { "type": "string", "enum": ["open", "resolve"] },

@@ -25,7 +25,10 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { summarizeOperationalSLO } = require('./memory-slo-metrics.cjs');
-const { calculateHealthScore, generateRecommendations } = require('./memory-dashboard-scoring.cjs');
+const {
+  calculateHealthScore: calculateHealthScoreWithConfig,
+  generateRecommendations: generateRecommendationsWithConfig,
+} = require('./memory-dashboard-scoring.cjs');
 const {
   getMemoryDir,
   getMetricsDir,
@@ -62,6 +65,14 @@ const CONFIG = {
     mtm: 0.25,
   },
 };
+
+function calculateHealthScore(metrics, config = CONFIG) {
+  return calculateHealthScoreWithConfig(metrics, config);
+}
+
+function generateRecommendations(metrics, config = CONFIG) {
+  return generateRecommendationsWithConfig(metrics, config);
+}
 
 // Helper Functions
 

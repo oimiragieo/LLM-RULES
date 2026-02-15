@@ -16,7 +16,15 @@ function mkRoot() {
 }
 
 test('parseArgs supports mode/project-root/interval/json', () => {
-  const parsed = daemon.parseArgs(['--mode', 'once', '--project-root', 'C:\\tmp', '--interval-ms', '5000', '--json']);
+  const parsed = daemon.parseArgs([
+    '--mode',
+    'once',
+    '--project-root',
+    'C:\\tmp',
+    '--interval-ms',
+    '5000',
+    '--json',
+  ]);
   assert.equal(parsed.mode, 'once');
   assert.equal(parsed.intervalMs, 5000);
   assert.equal(parsed.json, true);

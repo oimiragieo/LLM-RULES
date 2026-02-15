@@ -37,7 +37,8 @@ function normalizeSkillRef(raw) {
     const normalizedPath = input.replace(/\\/g, '/');
     const parts = normalizedPath.split('/');
     const idx = parts.lastIndexOf('skills');
-    const skillName = idx >= 0 && idx + 1 < parts.length ? parts[idx + 1] : path.basename(path.dirname(input));
+    const skillName =
+      idx >= 0 && idx + 1 < parts.length ? parts[idx + 1] : path.basename(path.dirname(input));
     return { skillName, skillPath: normalizedPath };
   }
 
@@ -69,14 +70,35 @@ function buildResearchChecklist(input) {
 
 function buildGapChecklist(skillName) {
   return [
-    { id: 'skill-md', check: `Validate .claude/skills/${skillName}/SKILL.md trigger clarity + workflow completeness` },
-    { id: 'script', check: `Validate .claude/skills/${skillName}/scripts/main.cjs deterministic output contract` },
-    { id: 'schemas', check: `Validate .claude/skills/${skillName}/schemas/input.schema.json and output.schema.json` },
-    { id: 'hooks', check: `Validate .claude/skills/${skillName}/hooks/pre-execute.cjs and post-execute.cjs` },
-    { id: 'command-surface', check: `Validate .claude/skills/${skillName}/commands/${skillName}.md plus .claude/commands delegator` },
+    {
+      id: 'skill-md',
+      check: `Validate .claude/skills/${skillName}/SKILL.md trigger clarity + workflow completeness`,
+    },
+    {
+      id: 'script',
+      check: `Validate .claude/skills/${skillName}/scripts/main.cjs deterministic output contract`,
+    },
+    {
+      id: 'schemas',
+      check: `Validate .claude/skills/${skillName}/schemas/input.schema.json and output.schema.json`,
+    },
+    {
+      id: 'hooks',
+      check: `Validate .claude/skills/${skillName}/hooks/pre-execute.cjs and post-execute.cjs`,
+    },
+    {
+      id: 'command-surface',
+      check: `Validate .claude/skills/${skillName}/commands/${skillName}.md plus .claude/commands delegator`,
+    },
     { id: 'template-rule', check: `Validate template/rules references and no stale defaults` },
-    { id: 'workflow-doc', check: `Validate .claude/workflows/${skillName}-skill-workflow.md exists and matches behavior` },
-    { id: 'catalog-wiring', check: 'Validate CLAUDE.md + skill-catalog + agent assignments + skill index' },
+    {
+      id: 'workflow-doc',
+      check: `Validate .claude/workflows/${skillName}-skill-workflow.md exists and matches behavior`,
+    },
+    {
+      id: 'catalog-wiring',
+      check: 'Validate CLAUDE.md + skill-catalog + agent assignments + skill index',
+    },
   ];
 }
 

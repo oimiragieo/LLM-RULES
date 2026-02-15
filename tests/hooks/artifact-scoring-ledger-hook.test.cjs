@@ -6,8 +6,13 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
-const { processHookInput } = require('../../.claude/hooks/quality/artifact-scoring-ledger-hook.cjs');
-const { getRuntimePaths, readJsonlSafe } = require('../../.claude/lib/quality/artifact-quality-runtime.cjs');
+const {
+  processHookInput,
+} = require('../../.claude/hooks/quality/artifact-scoring-ledger-hook.cjs');
+const {
+  getRuntimePaths,
+  readJsonlSafe,
+} = require('../../.claude/lib/quality/artifact-quality-runtime.cjs');
 
 function mkProjectRoot() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'artifact-score-hook-'));

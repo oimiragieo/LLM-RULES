@@ -15,6 +15,8 @@ const routingGuard = require('./routing-guard-core.cjs');
  *
  * getEnforcementMode('PLANNER_FIRST_ENFORCEMENT', 'block')
  * getEnforcementMode('SECURITY_REVIEW_ENFORCEMENT', 'block')
+ * getEnforcementMode('CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT', 'block')
+ * getEnforcementMode('HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT', 'block')
  * getEnforcementMode('ROUTER_BASH_GUARD', 'block')
  * getEnforcementMode('SPECIALIST_ROUTING_ENFORCEMENT', 'block')
  * getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT', 'block')

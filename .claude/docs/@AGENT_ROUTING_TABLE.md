@@ -2,7 +2,7 @@
 
 **Source:** CLAUDE.md Section 3
 **Version:** v2.2.1
-**Last Updated:** 2026-01-31
+**Last Updated:** 2026-02-15
 
 ---
 
@@ -40,6 +40,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | TypeScript expert                    | `typescript-pro`             | `.claude/agents/domain/typescript-pro.md`                |
 | FastAPI expert                       | `fastapi-pro`                | `.claude/agents/domain/fastapi-pro.md`                   |
 | Product management                   | `pm`                         | `.claude/agents/core/pm.md`                              |
+| Technical program management         | `technical-program-manager`  | `.claude/agents/core/technical-program-manager.md`       |
 | Quality reflection                   | `reflection-agent`           | `.claude/agents/core/reflection-agent.md`                |
 | Frontend/React/Vue                   | `frontend-pro`               | `.claude/agents/domain/frontend-pro.md`                  |
 | Node.js/Express/NestJS               | `nodejs-pro`                 | `.claude/agents/domain/nodejs-pro.md`                    |

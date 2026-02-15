@@ -12,7 +12,7 @@ const { test, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 // Use shared project root
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
@@ -83,7 +83,7 @@ function deleteLoopState() {
  */
 function runHook() {
   try {
-    execSync(`node "${HOOK_PATH}"`, { encoding: 'utf-8', stdio: 'pipe' });
+    execFileSync(process.execPath, [HOOK_PATH], { encoding: 'utf-8', stdio: 'pipe' });
     return { success: true };
   } catch (err) {
     return {
@@ -142,6 +142,7 @@ test('resets taskSpawned to false on every call', () => {
   assert.strictEqual(state.plannerSpawned, false);
   assert.strictEqual(state.requiresSecurityReview, false);
   assert.strictEqual(state.securitySpawned, false);
+  assert.strictEqual(state.architectSpawned, false);
 });
 
 // Test 2: Preserve sessionId across resets

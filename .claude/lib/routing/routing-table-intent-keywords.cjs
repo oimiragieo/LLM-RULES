@@ -36,6 +36,16 @@ const INTENT_KEYWORDS = {
     'scrum',
     'kanban',
   ],
+  technical_program_manager: [
+    'technical program manager',
+    'tpm',
+    'program plan',
+    'cross-team dependency',
+    'dependency management',
+    'milestone tracking',
+    'raid log',
+    'delivery governance',
+  ],
   qa: ['test', 'testing', 'qa', 'regression', 'e2e', 'edge case', 'test coverage', 'validation'],
   router: ['route', 'routing', 'orchestrate', 'dispatch', 'multi-agent', 'spawn agent'],
   documentation: [

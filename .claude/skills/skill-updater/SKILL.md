@@ -65,6 +65,7 @@ Skill({ skill: 'research-synthesis' });
 ```
 
 2. Gather at least:
+
 - 3 Exa/web queries
 - 1 arXiv/canonical paper source when topic is methodology-heavy (TDD, agent evaluation, memory/RAG, orchestration)
 - 1 internal codebase parity check (`pnpm search:code`, `ripgrep`, semantic/structural search)
@@ -105,11 +106,13 @@ Create RED/GREEN/REFACTOR/VERIFY plan for the target skill:
 ### Step 5: Integration + Evolution Recording
 
 1. Update references:
+
 - `.claude/CLAUDE.md`
 - `.claude/context/artifacts/catalogs/skill-catalog.md`
 - relevant agent prompts/frontmatter
 
 2. Record refresh outcome in:
+
 - `.claude/context/memory/learnings.md`
 - `.claude/context/evolution-state.json` (if EVOLVE-triggered)
 

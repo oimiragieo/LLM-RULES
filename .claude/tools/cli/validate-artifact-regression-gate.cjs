@@ -33,7 +33,8 @@ function runGate(options = {}) {
         ? options.projectRoot
         : undefined
     );
-  const passThreshold = toNumber(options.passThreshold ?? process.env.ARTIFACT_SCORE_PASS_THRESHOLD) ?? 0.7;
+  const passThreshold =
+    toNumber(options.passThreshold ?? process.env.ARTIFACT_SCORE_PASS_THRESHOLD) ?? 0.7;
   const maxRegression =
     toNumber(options.maxRegression ?? process.env.ARTIFACT_SCORE_MAX_REGRESSION) ?? 0.08;
   const enforceRemediation = String(
@@ -55,7 +56,9 @@ function runGate(options = {}) {
       continue;
     }
     if (latestScore < passThreshold) {
-      failures.push(`${key}: latest score ${latestScore.toFixed(3)} < pass threshold ${passThreshold}`);
+      failures.push(
+        `${key}: latest score ${latestScore.toFixed(3)} < pass threshold ${passThreshold}`
+      );
     }
     if (previousScore != null && previousScore - latestScore > maxRegression) {
       failures.push(
@@ -64,7 +67,11 @@ function runGate(options = {}) {
     }
   }
 
-  if (enforceRemediation !== 'false' && enforceRemediation !== 'off' && enforceRemediation !== '0') {
+  if (
+    enforceRemediation !== 'false' &&
+    enforceRemediation !== 'off' &&
+    enforceRemediation !== '0'
+  ) {
     const remediationState = readRemediationState(runtime.remediationPath);
     for (const [key, item] of remediationState.entries()) {
       if (item.status === 'open' && (item.severity === 'critical' || item.severity === 'high')) {
@@ -83,7 +90,9 @@ function runGate(options = {}) {
       passThreshold,
       maxRegression,
       remediationEnforced:
-        enforceRemediation !== 'false' && enforceRemediation !== 'off' && enforceRemediation !== '0',
+        enforceRemediation !== 'false' &&
+        enforceRemediation !== 'off' &&
+        enforceRemediation !== '0',
     },
     runtimePaths: runtime,
   };

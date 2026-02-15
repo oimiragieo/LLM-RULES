@@ -7,6 +7,7 @@ const INTENT_TO_AGENT = {
   developer: 'developer',
   planner: 'planner',
   pm: 'pm',
+  technical_program_manager: 'technical-program-manager',
   qa: 'qa',
   router: 'router',
   documentation: 'technical-writer',

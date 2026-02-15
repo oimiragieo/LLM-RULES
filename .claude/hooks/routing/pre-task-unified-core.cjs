@@ -17,6 +17,7 @@ const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manage
 
 const state = require('./pre-task-unified-state.cjs');
 const helpers = require('./pre-task-unified-helpers.cjs');
+const ownership = require('./pre-task-unified-ownership.cjs');
 
 const {
   LOOP_STATE_FILE,
@@ -46,6 +47,10 @@ const {
   EVOLUTION_TYPES,
   isPlannerSpawn,
   isSecuritySpawn,
+  isArchitectSpawn,
+  isCodeSimplifierSpawn,
+  isHighRiskSpecialistSpawn,
+  extractSpawnAgentType,
   isImplementationAgentSpawn,
   extractTaskDescription,
   extractAgentType,
@@ -161,6 +166,44 @@ Spawn SECURITY-ARCHITECT first to review security implications.`;
         }
         console.warn(message);
       }
+    }
+  }
+
+  const architectEnforcement = getEnforcementMode('CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT', 'block');
+  if (architectEnforcement !== 'off') {
+    if (isArchitectSpawn(toolInput)) {
+      return { pass: true, markArchitect: true };
+    }
+
+    if (isCodeSimplifierSpawn(toolInput) && !stateSnapshot.architectSpawned) {
+      const message = `[ARCH-001] Code simplification requires architect review first.
+Spawn ARCHITECT first to validate structural safety, then run CODE-SIMPLIFIER.`;
+
+      if (architectEnforcement === 'block') {
+        return { pass: false, result: 'block', message };
+      }
+      console.warn(message);
+    }
+  }
+
+  const highRiskArchitectEnforcement = getEnforcementMode(
+    'HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT',
+    'block'
+  );
+  if (highRiskArchitectEnforcement !== 'off') {
+    if (isArchitectSpawn(toolInput)) {
+      return { pass: true, markArchitect: true };
+    }
+
+    if (isHighRiskSpecialistSpawn(toolInput) && !stateSnapshot.architectSpawned) {
+      const agentType = extractSpawnAgentType(toolInput) || 'specialist';
+      const message = `[ARCH-002] ${agentType} requires architect review first for high-risk changes.
+Spawn ARCHITECT first to validate system-level safety, then run ${agentType}.`;
+
+      if (highRiskArchitectEnforcement === 'block') {
+        return { pass: false, result: 'block', message };
+      }
+      console.warn(message);
     }
   }
 
@@ -350,6 +393,9 @@ function runAllChecks(hookInput) {
   if (routingResult.markSecurity) {
     routerState.markSecuritySpawned();
   }
+  if (routingResult.markArchitect) {
+    routerState.markArchitectSpawned();
+  }
 
   const spawnGuardrailResult = checkSpawnRoleGuardrails(toolInput);
   if (!spawnGuardrailResult.pass) {
@@ -365,6 +411,34 @@ function runAllChecks(hookInput) {
     }
   }
 
+  const ownershipRequiredResult = ownership.checkParallelOwnershipRequired(toolInput);
+  if (!ownershipRequiredResult.pass) {
+    return {
+      pass: false,
+      exitCode: ownershipRequiredResult.result === 'block' ? 2 : 0,
+      message: ownershipRequiredResult.message,
+    };
+  }
+  if (Array.isArray(ownershipRequiredResult.warnings)) {
+    for (const warning of ownershipRequiredResult.warnings) {
+      console.warn(warning);
+    }
+  }
+
+  const ownershipResult = ownership.checkTaskOwnershipConflicts(toolInput, hookInput);
+  if (!ownershipResult.pass) {
+    return {
+      pass: false,
+      exitCode: ownershipResult.result === 'block' ? 2 : 0,
+      message: ownershipResult.message,
+    };
+  }
+  if (Array.isArray(ownershipResult.warnings)) {
+    for (const warning of ownershipResult.warnings) {
+      console.warn(warning);
+    }
+  }
+
   const loopResult = checkLoopPrevention(hookInput);
   if (!loopResult.pass) {
     return {
@@ -376,6 +450,7 @@ function runAllChecks(hookInput) {
 
   updateLoopStateAfterAllow(hookInput);
   updateTaskLifecycleStateAfterAllow(hookInput);
+  ownership.registerTaskOwnershipClaimAfterAllow(hookInput, toolInput);
   persistGuardrailPolicy(hookInput, toolInput);
   return { pass: true, exitCode: 0 };
 }
@@ -388,6 +463,10 @@ module.exports = {
   checkLoopPrevention,
   isPlannerSpawn,
   isSecuritySpawn,
+  isArchitectSpawn,
+  isCodeSimplifierSpawn,
+  isHighRiskSpecialistSpawn,
+  extractSpawnAgentType,
   isImplementationAgentSpawn,
   extractTaskDescription,
   extractAgentType,
@@ -404,6 +483,9 @@ module.exports = {
   clearPlannerFirstViolation,
   invalidateCachedState,
   updateLoopStateAfterAllow,
+  checkParallelOwnershipRequired: ownership.checkParallelOwnershipRequired,
+  checkTaskOwnershipConflicts: ownership.checkTaskOwnershipConflicts,
+  registerTaskOwnershipClaimAfterAllow: ownership.registerTaskOwnershipClaimAfterAllow,
   checkSpawnRoleGuardrails,
   hasResumeDirective,
   hasMultiWaveDirective,

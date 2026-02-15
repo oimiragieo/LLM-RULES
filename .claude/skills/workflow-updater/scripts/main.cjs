@@ -49,7 +49,11 @@ function resolveWorkflowPath(raw) {
 
   const core = path.join(WORKFLOWS_DIR, 'core', `${input}.md`);
   if (fs.existsSync(core)) {
-    return { workflowName: input, workflowPath: `.claude/workflows/core/${input}.md`, exists: true };
+    return {
+      workflowName: input,
+      workflowPath: `.claude/workflows/core/${input}.md`,
+      exists: true,
+    };
   }
 
   return { workflowName: input, workflowPath: `.claude/workflows/**/${input}.md`, exists: false };
@@ -76,7 +80,8 @@ function main(input = null) {
       ok: false,
       stage: 'resolve_target',
       target,
-      recommendation: 'Workflow not found. Use Skill({ skill: "workflow-creator" }) for net-new workflow.',
+      recommendation:
+        'Workflow not found. Use Skill({ skill: "workflow-creator" }) for net-new workflow.',
     };
   }
 
@@ -96,7 +101,10 @@ function main(input = null) {
       { phase: 'REFACTOR', items: ['tighten transitions and docs wording'] },
       {
         phase: 'VERIFY',
-        items: ['node scripts/validate-workflow.mjs', `node .claude/tools/cli/validate-integration.cjs ${target.workflowPath}`],
+        items: [
+          'node scripts/validate-workflow.mjs',
+          `node .claude/tools/cli/validate-integration.cjs ${target.workflowPath}`,
+        ],
       },
     ],
   };

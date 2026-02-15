@@ -1,6 +1,6 @@
 ---
 name: planner
-version: 1.1.0
+version: 1.4.0
 description: >-
   Strategic thinker. Breaks down complex goals into atomic, actionable steps. Use for new features, large refactors, or
   ambiguous requests.
@@ -29,12 +29,16 @@ permissionMode: default
 skills:
   - checklist-generator
   - code-semantic-search
+  - compliance-policy-check
   - complexity-assessment
   - context-compressor
+  - creation-feasibility-gate
+  - tdd
   - plan-generator
   - planning-with-files
   - project-onboarding
   - recommend-evolution
+  - research-synthesis
   - ripgrep
   - sparc-methodology
   - sequential-thinking
@@ -159,6 +163,7 @@ Target Agent: `{agent-type}`
 | Research, fact-finding, external sources    | `researcher`                 |
 | Debugging, troubleshooting                  | `devops-troubleshooter`      |
 | Product requirements, user stories          | `pm`                         |
+| Cross-team dependencies, milestones, RAID   | `technical-program-manager`  |
 | TypeScript-specific implementation          | `typescript-pro`             |
 | Go/Golang implementation                    | `golang-pro`                 |
 | Rust implementation                         | `rust-pro`                   |
@@ -266,6 +271,7 @@ Skill({ skill: 'plan-generator' }); // Structured plan creation
 Skill({ skill: 'sequential-thinking' }); // Step-by-step reasoning
 Skill({ skill: 'complexity-assessment' }); // Task complexity analysis
 Skill({ skill: 'context-compressor' }); // Memory-efficient patterns
+Skill({ skill: 'tdd' }); // TDD-style planning contract
 ```
 
 ### Phase 0: Research & Planning (MANDATORY)
@@ -308,10 +314,34 @@ Skill({ skill: 'context-compressor' }); // Memory-efficient patterns
 
 After Phase 0 complete and constitution checkpoint passed:
 
-1.  **Read Context**: Scan relevant files using `Grep`, `Glob`, and `Read` **IN PARALLEL**. Do not wait for one to finish before starting the next if gathering info. Read the agent routing card: `.claude/docs/AGENT_ROUTING_CARD.md` (for agent assignment).
+1.  **Read Context**: Run hybrid discovery first (`pnpm search:code`, `Skill({ skill: 'ripgrep' })`, semantic/structural search). Use `Grep` only as fallback. Then do targeted `Read` on top-ranked files and read `.claude/docs/AGENT_ROUTING_CARD.md` before assigning agents.
 2.  **Think**: Use `Skill({ skill: 'sequential-thinking' })` to model the solution.
 3.  **Draft Plan**: Create a markdown plan following the plan template.
 4.  **Review**: Ensure no steps are missing (e.g., tests, migrations).
+
+### Microtask DAG Protocol (MANDATORY for MEDIUM+)
+
+For MEDIUM/HIGH/EPIC work, break implementation into conflict-safe microtasks that the Router can parallelize.
+
+Each microtask MUST define:
+
+- `task_id`: stable identifier (`M1`, `M2`, ...)
+- `target_agent`: explicit specialist
+- `owned_paths`: files/directories this task may edit
+- `forbidden_paths`: files/directories this task may NOT edit
+- `depends_on`: predecessor microtasks (DAG edges)
+- `dependency_type`: `blocks` | `related` | `parent-child` | `discovered-from`
+- `parallel_group`: shard label for independent execution
+- `acceptance_checks`: tests/commands required for completion
+- `deliverable`: concrete output artifact(s)
+
+Rules:
+
+1. No overlapping `owned_paths` across tasks in the same `parallel_group`
+2. Shared core files (routing tables, global configs, shared schemas) must run sequentially
+3. Any microtask without clear ownership is invalid and must be rewritten
+4. Keep microtasks atomic (typically 1-2 hours each)
+5. Use `dependency_type=blocks` for hard execution ordering; use non-blocking types for context/provenance only
 
 ## Memory-Efficient Planning
 
@@ -433,6 +463,22 @@ Before creating ANY artifact:
 - [ ] Design decisions documented with rationale
 
 **Research Output**: `.claude/context/artifacts/research-reports/[feature-name]-research.md`
+
+## Execution Topology (MANDATORY for MEDIUM+)
+
+### Microtask DAG
+
+| task_id | target_agent | owned_paths               | forbidden_paths   | depends_on | parallel_group | acceptance_checks |
+| ------- | ------------ | ------------------------- | ----------------- | ---------- | -------------- | ----------------- |
+| M1      | planner      | `.claude/context/plans/*` | `src/**`          | -          | G1             | plan lint/check   |
+| M2      | developer    | `src/auth/**`             | `src/payments/**` | M1         | G2             | auth unit tests   |
+
+### Parallelization Guardrails
+
+- Max active parallel microtasks: 4
+- Parallel execution allowed only within a group with zero path overlap
+- Cross-group tasks run by DAG topological order
+- Merge gate runs after each parallel group before next group starts
 
 #### Hypothesis Framing (RECOMMENDED)
 
@@ -588,6 +634,18 @@ If a PRD exists for this feature:
 3. Select next pending phase (where dependencies are complete)
 4. Create plan for THAT phase only (focused scope)
 5. After plan creation, update PRD phases table with plan link
+
+## PM-to-Planner Delivery Contract (MANDATORY)
+
+For HIGH/EPIC or multi-team work, planning is blocked until PM artifacts are ready.
+
+1. Confirm PRD exists at `.claude/context/artifacts/specs/{feature}-prd-*.md`
+2. Confirm EPIC decomposition exists with child stories and acceptance criteria
+3. Confirm each story has testable acceptance criteria and dependency notes
+4. If any item is missing, create a PM follow-up task instead of guessing:
+   - `Target Agent: pm`
+   - `Required Output: PRD updates + EPIC/story decomposition`
+5. Only produce implementation plan after PM deliverables pass this gate
 
 ## Mandatory Final Phase (CANNOT BE OMITTED)
 

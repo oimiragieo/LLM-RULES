@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-15T10:35:31.484Z",
+  "generatedAt": "2026-02-15T11:50:59.519Z",
   "metadata": {
-    "totalSkills": 390,
+    "totalSkills": 392,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-15T10:35:31.485Z",
+    "lastValidated": "2026-02-15T11:50:59.520Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -1091,6 +1091,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "compliance-policy-check": {
+      "name": "compliance-policy-check",
+      "displayName": "Compliance Policy Check",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - compliance-policy-check",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "compliance-policy-check"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "composer-dependency-management": {
       "name": "composer-dependency-management",
       "displayName": "Composer Dependency Management",
@@ -1330,6 +1352,28 @@
         "languages",
         "other",
         "cpp"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "creation-feasibility-gate": {
+      "name": "creation-feasibility-gate",
+      "displayName": "Creation Feasibility Gate",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - creation-feasibility-gate",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "creation-feasibility-gate"
       ],
       "priority": 3,
       "aliasOf": null
@@ -9337,7 +9381,9 @@
         "best-practices-guidelines",
         "build-tools-expert",
         "code-semantic-search",
+        "compliance-policy-check",
         "composer-dependency-management",
+        "creation-feasibility-gate",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
@@ -9719,6 +9765,7 @@
         "cloud-devops-expert",
         "code-analyzer",
         "code-semantic-search",
+        "compliance-policy-check",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
@@ -9727,6 +9774,7 @@
         "containerization-rules",
         "context-driven-development",
         "cpp",
+        "creation-feasibility-gate",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
@@ -10171,6 +10219,7 @@
         "code-analyzer",
         "code-quality-expert",
         "code-semantic-search",
+        "compliance-policy-check",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
@@ -10181,6 +10230,7 @@
         "context-compressor",
         "context-driven-development",
         "cpp",
+        "creation-feasibility-gate",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
@@ -10595,6 +10645,7 @@
         "cloud-devops-expert",
         "code-quality-expert",
         "code-semantic-search",
+        "compliance-policy-check",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
@@ -10605,6 +10656,7 @@
         "context-compressor",
         "context-driven-development",
         "cpp",
+        "creation-feasibility-gate",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
@@ -10971,6 +11023,7 @@
         "cloud-devops-expert",
         "code-quality-expert",
         "code-semantic-search",
+        "compliance-policy-check",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "comprehensive-unit-testing-with-pytest",
@@ -10980,6 +11033,7 @@
         "containerization-rules",
         "context-driven-development",
         "cpp",
+        "creation-feasibility-gate",
         "creators/command-creator",
         "creators/rule-creator",
         "creators/tool-creator",
@@ -11461,10 +11515,12 @@
         "ci-cd-implementation-rule",
         "cloud-devops-expert",
         "code-semantic-search",
+        "compliance-policy-check",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
+        "creation-feasibility-gate",
         "creators/tool-creator",
         "dependency-analyzer",
         "design-and-user-experience-guidelines",
@@ -12234,10 +12290,12 @@
         "ci-cd-implementation-rule",
         "cloud-devops-expert",
         "code-semantic-search",
+        "compliance-policy-check",
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "configuration-management",
         "cpp",
+        "creation-feasibility-gate",
         "creators/tool-creator",
         "dependency-analyzer",
         "design-and-user-experience-guidelines",

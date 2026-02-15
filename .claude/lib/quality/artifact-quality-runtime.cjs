@@ -28,8 +28,12 @@ function average(values) {
 }
 
 function normalizeArtifactType(raw) {
-  const value = String(raw || 'unknown').trim().toLowerCase();
-  if (['agent', 'skill', 'hook', 'workflow', 'schema', 'template', 'tool', 'command'].includes(value)) {
+  const value = String(raw || 'unknown')
+    .trim()
+    .toLowerCase();
+  if (
+    ['agent', 'skill', 'hook', 'workflow', 'schema', 'template', 'tool', 'command'].includes(value)
+  ) {
     return value;
   }
   return 'unknown';
@@ -47,7 +51,8 @@ function buildScoreEntry(hookInput) {
   const normalized = parsed.normalized || {};
   if (normalized.status !== 'completed') return null;
 
-  const metadata = toolInput.metadata && typeof toolInput.metadata === 'object' ? toolInput.metadata : {};
+  const metadata =
+    toolInput.metadata && typeof toolInput.metadata === 'object' ? toolInput.metadata : {};
   const scores = metadata.scores && typeof metadata.scores === 'object' ? metadata.scores : {};
 
   const dimensions = {
@@ -68,7 +73,11 @@ function buildScoreEntry(hookInput) {
 
   const artifactType = normalizeArtifactType(metadata.artifactType || metadata.type);
   const artifactName = String(
-    metadata.artifactName || metadata.name || metadata.artifact || normalized.taskId || 'unknown-artifact'
+    metadata.artifactName ||
+      metadata.name ||
+      metadata.artifact ||
+      normalized.taskId ||
+      'unknown-artifact'
   ).trim();
   const artifactPath =
     typeof metadata.artifactPath === 'string' && metadata.artifactPath.trim()
@@ -93,7 +102,9 @@ function buildScoreEntry(hookInput) {
 
 function artifactKey(entry) {
   const type = normalizeArtifactType(entry?.artifactType);
-  const name = String(entry?.artifactName || 'unknown-artifact').trim().toLowerCase();
+  const name = String(entry?.artifactName || 'unknown-artifact')
+    .trim()
+    .toLowerCase();
   return `${type}:${name}`;
 }
 

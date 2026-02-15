@@ -51,7 +51,13 @@ function computeAudit() {
 
   const patternsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'patterns.json');
   const gotchasPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'gotchas.json');
-  const accessStatsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'access-stats.json');
+  const accessStatsPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'memory',
+    'access-stats.json'
+  );
 
   const patterns = safeReadJson(patternsPath, []) || [];
   const gotchas = safeReadJson(gotchasPath, []) || [];
@@ -77,8 +83,10 @@ function computeAudit() {
   const failed = [];
   if (metrics.evidence_injection_rate < thresholds.min_evidence_injection_rate)
     failed.push('evidence_injection_rate');
-  if (metrics.citation_use_rate < thresholds.min_citation_use_rate) failed.push('citation_use_rate');
-  if (metrics.groundedness_rate < thresholds.min_groundedness_rate) failed.push('groundedness_rate');
+  if (metrics.citation_use_rate < thresholds.min_citation_use_rate)
+    failed.push('citation_use_rate');
+  if (metrics.groundedness_rate < thresholds.min_groundedness_rate)
+    failed.push('groundedness_rate');
   if (metrics.stale_ratio_estimate > thresholds.max_stale_ratio_estimate)
     failed.push('stale_ratio_estimate');
 

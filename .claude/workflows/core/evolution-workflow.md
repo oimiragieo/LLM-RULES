@@ -9,6 +9,8 @@ agents: [evolution-orchestrator, planner, developer, qa]
 skills:
   [
     research-synthesis,
+    creation-feasibility-gate,
+    compliance-policy-check,
     assimilate,
     agent-creator,
     agent-updater,
@@ -251,6 +253,10 @@ Grep('proposed-name', '.claude/workflows/');
 // Pattern: [a-z][a-z0-9-]* (kebab-case, lowercase)
 const namePattern = /^[a-z][a-z0-9-]*$/;
 const isValidName = namePattern.test('proposed-name');
+
+// 5. Run mandatory policy/feasibility preflight skills
+Skill({ skill: 'creation-feasibility-gate' });
+Skill({ skill: 'compliance-policy-check' });
 ```
 
 **Exit Conditions** (ALL required):
@@ -259,6 +265,8 @@ const isValidName = namePattern.test('proposed-name');
 - [ ] No capability conflicts that would cause routing ambiguity
 - [ ] Name follows ecosystem conventions (`[a-z][a-z0-9-]*`)
 - [ ] Name is unique in ecosystem
+- [ ] Feasibility preflight returned PASS or WARN
+- [ ] Compliance preflight returned PASS or CONDITIONAL
 
 **Naming Conventions**:
 

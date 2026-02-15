@@ -1,21 +1,22 @@
-# Agent Routing Card (49 Agents)
+# Agent Routing Card (60 Agents)
 
 > Compact reference for planners and orchestrators. Read this BEFORE assigning agents to tasks.
 > Source of truth: `.claude/context/agent-registry.json`
 
-## Core Agents (9)
+## Core Agents (10)
 
-| Agent              | Use When                                                       | NOT For                               |
-| ------------------ | -------------------------------------------------------------- | ------------------------------------- |
-| architect          | System design, architecture decisions, tech stack selection    | Writing code                          |
-| developer          | General coding, bug fixes, new features — **LAST RESORT**      | Docs, review, tests, deploy, refactor |
-| planner            | Task breakdown, implementation planning, complexity analysis   | Executing plans                       |
-| qa                 | Testing strategy, test execution, coverage, quality validation | Writing production code               |
-| pm                 | Product requirements, user stories, roadmap                    | Implementation                        |
-| technical-writer   | Documentation, README, guides, API docs, doc reviews           | Writing code                          |
-| context-compressor | Context reduction, summarization, token optimization           | Implementation                        |
-| reflection-agent   | Quality assessment, learning extraction, post-task analysis    | Implementation                        |
-| router             | Request routing — you don't spawn this, it spawns you          | Everything                            |
+| Agent                     | Use When                                                       | NOT For                               |
+| ------------------------- | -------------------------------------------------------------- | ------------------------------------- |
+| architect                 | System design, architecture decisions, tech stack selection    | Writing code                          |
+| developer                 | General coding, bug fixes, new features — **LAST RESORT**      | Docs, review, tests, deploy, refactor |
+| planner                   | Task breakdown, implementation planning, complexity analysis   | Executing plans                       |
+| qa                        | Testing strategy, test execution, coverage, quality validation | Writing production code               |
+| pm                        | Product requirements, user stories, roadmap                    | Implementation                        |
+| technical-program-manager | Cross-team delivery, dependencies, phase gates, RAID tracking  | Writing production code               |
+| technical-writer          | Documentation, README, guides, API docs, doc reviews           | Writing code                          |
+| context-compressor        | Context reduction, summarization, token optimization           | Implementation                        |
+| reflection-agent          | Quality assessment, learning extraction, post-task analysis    | Implementation                        |
+| router                    | Request routing — you don't spawn this, it spawns you          | Everything                            |
 
 ## Review & Quality (3)
 

@@ -53,6 +53,7 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
 
    **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
+   **STEP 0.6 — CREATION PREFLIGHT:** For artifact creation/evolution requests, spawn planner/TPM to run `creation-feasibility-gate` and `compliance-policy-check` before creator execution.
 
 1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed).
@@ -66,6 +67,9 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
 - Late notification handling (post-pipeline): batch late agent/background completion notices into one short summary instead of one message per completion.
 - Reflection outcome line: when reflection-agent finishes, include report path and a one-line learnings summary in the same pipeline update.
+- Full enterprise sweep trigger: when user requests "run full enterprise pipeline" / "integrate all findings", route through the ordered enterprise phases in `router-decision.md` Step 7.0 instead of ad-hoc single-agent routing.
+- Enterprise search policy: for enterprise sweeps, require hybrid search first (`pnpm search:code`, semantic/structural search skills, `ripgrep` skill), with `Grep` as fallback-only.
+- Enterprise planner contract: planner must invoke `Skill({ skill: 'tdd' })`, produce a detailed TDD plan, emit microtask DAG metadata (`owned_paths`, `forbidden_paths`, `depends_on`, `dependency_type`, `parallel_group`) for MEDIUM+ work, and call `researcher`/`architect` when uncertain.
 
 ### Template Loading Protocol
 
@@ -141,12 +145,13 @@ Whitelist/blacklist tables: see `router-decision.md` Steps 5–6 and Section 0 a
 
 Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **spawn required agent(s)**.
 
-| Gate                    | Trigger (ANY YES)                                                                   | Required Routing                       |
-| ----------------------- | ----------------------------------------------------------------------------------- | -------------------------------------- |
-| **1: Complexity**       | multi-step (>1 operation), multi-file changes, architecture decisions               | **Spawn PLANNER first**                |
-| **2: Security**         | auth/authz/credentials, security-critical code, external data handling/integrations | include **SECURITY-ARCHITECT**         |
-| **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                               | spawn appropriate agent                |
-| **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts    | invoke correct **creator skill** first |
+| Gate                    | Trigger (ANY YES)                                                                                   | Required Routing                       |
+| ----------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **1: Complexity**       | multi-step (>1 operation), multi-file changes, architecture decisions                               | **Spawn PLANNER first**                |
+| **2: Security**         | auth/authz/credentials, security-critical code, external data handling/integrations                 | include **SECURITY-ARCHITECT**         |
+| **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                                               | spawn appropriate agent                |
+| **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts                    | invoke correct **creator skill** first |
+| **5: Architect Review** | spawning code-simplifier/devops/devops-troubleshooter/chaos-engineer without prior architect review | spawn **ARCHITECT** first              |
 
 **Gate 1 (Complexity):**
 
@@ -167,6 +172,13 @@ Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **
 - Are you about to use a blacklisted tool (Edit/Write/Bash for implementation/Glob/Grep/WebSearch/mcp\_\_\*)?
 - Are you about to use TaskCreate for a complex request?
   **If any YES → STOP. Spawn an agent instead.**
+
+**Gate 5 (Architect Review for High-Risk Specialists):**
+
+- Are you spawning `code-simplifier`?
+- Are you spawning `devops`, `devops-troubleshooter`, or `chaos-engineer`?
+- Has `architect` already been spawned in the current routing cycle?
+  **If specialist YES and architect NO → STOP. Spawn ARCHITECT first.**
 
 ### Gate 4: Creator Output Paths (IRON LAW)
 
@@ -332,11 +344,12 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 **Primary Hooks:**
 
 - `routing-guard.cjs` - Enforces planner-first, security review, router self-check (PreToolUse Task, default: block)
+  - Also enforces architect-first for `code-simplifier`, `devops`, `devops-troubleshooter`, `chaos-engineer` (default: block)
 - `unified-creator-guard.cjs` - Enforces Gate 4 creator workflow (PreToolUse Write/Edit, default: block)
 - `post-creation-integration.cjs` - Detects creator completions, queues integration analysis (PostToolUse TaskUpdate, default: warn)
 
 **Enforcement Modes:** block (default) | warn | off
-**Override:** `PLANNER_FIRST_ENFORCEMENT=warn`, `CREATOR_GUARD=off`, `SECURITY_REVIEW_ENFORCEMENT=off`, `SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`
+**Override:** `PLANNER_FIRST_ENFORCEMENT=warn`, `CREATOR_GUARD=off`, `SECURITY_REVIEW_ENFORCEMENT=off`, `SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, `CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT=warn|block|off`, `HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT=warn|block|off`, `TASK_OWNERSHIP_GUARD=warn|block|off`, `TASK_PARALLEL_OWNERSHIP_REQUIRED=warn|block|off`
 
 **Specialist Override Check:**
 
@@ -394,34 +407,35 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 **Quick Routing (MANDATORY — consult before EVERY spawn):**
 
-| Task Type                                    | Agent                     | NOT developer |
-| -------------------------------------------- | ------------------------- | ------------- |
-| Bug fixes, coding, new features              | `developer`               | —             |
-| Documentation, README, guides, doc updates   | `technical-writer`        | YES           |
-| Code cleanup, refactoring, simplification    | `code-simplifier`         | YES           |
-| Code review, PR review, audit                | `code-reviewer`           | YES           |
-| Testing, QA, test strategy, coverage         | `qa`                      | YES           |
-| System design, architecture decisions        | `architect`               | YES           |
-| Security review, auth, threat modeling       | `security-architect`      | YES           |
-| Infrastructure, Docker, CI/CD, deploy        | `devops`                  | YES           |
-| Database schema, queries, migrations         | `database-architect`      | YES           |
-| Planning, task breakdown                     | `planner`                 | YES           |
-| Product requirements, user stories           | `pm`                      | YES           |
-| Python-specific work                         | `python-pro`              | YES           |
-| Frontend/React/Vue/CSS                       | `frontend-pro`            | YES           |
-| Node.js/Express/NestJS backend               | `nodejs-pro`              | YES           |
-| Research, external fact-finding              | `researcher`              | YES           |
-| Debugging, troubleshooting                   | `devops-troubleshooter`   | YES           |
-| Performance testing, profiling, load testing | `performance-engineer`    | YES           |
-| Security testing, pentesting, vulnerability  | `penetration-tester`      | YES           |
-| API design, OpenAPI, contracts               | `api-designer`            | YES           |
-| Accessibility, WCAG, a11y                    | `accessibility-tester`    | YES           |
-| LLM architecture, RAG, model serving         | `llm-architect`           | YES           |
-| MCP servers, protocol development            | `mcp-developer`           | YES           |
-| Microservices, distributed systems           | `microservices-architect` | YES           |
-| SRE, SLOs, reliability                       | `sre-engineer`            | YES           |
-| Chaos engineering, resilience testing        | `chaos-engineer`          | YES           |
-| Prompt optimization, prompt engineering      | `prompt-engineer`         | YES           |
+| Task Type                                     | Agent                       | NOT developer |
+| --------------------------------------------- | --------------------------- | ------------- |
+| Bug fixes, coding, new features               | `developer`                 | —             |
+| Documentation, README, guides, doc updates    | `technical-writer`          | YES           |
+| Code cleanup, refactoring, simplification     | `code-simplifier`           | YES           |
+| Code review, PR review, audit                 | `code-reviewer`             | YES           |
+| Testing, QA, test strategy, coverage          | `qa`                        | YES           |
+| System design, architecture decisions         | `architect`                 | YES           |
+| Security review, auth, threat modeling        | `security-architect`        | YES           |
+| Infrastructure, Docker, CI/CD, deploy         | `devops`                    | YES           |
+| Database schema, queries, migrations          | `database-architect`        | YES           |
+| Planning, task breakdown                      | `planner`                   | YES           |
+| Product requirements, user stories            | `pm`                        | YES           |
+| Cross-team delivery, dependencies, milestones | `technical-program-manager` | YES           |
+| Python-specific work                          | `python-pro`                | YES           |
+| Frontend/React/Vue/CSS                        | `frontend-pro`              | YES           |
+| Node.js/Express/NestJS backend                | `nodejs-pro`                | YES           |
+| Research, external fact-finding               | `researcher`                | YES           |
+| Debugging, troubleshooting                    | `devops-troubleshooter`     | YES           |
+| Performance testing, profiling, load testing  | `performance-engineer`      | YES           |
+| Security testing, pentesting, vulnerability   | `penetration-tester`        | YES           |
+| API design, OpenAPI, contracts                | `api-designer`              | YES           |
+| Accessibility, WCAG, a11y                     | `accessibility-tester`      | YES           |
+| LLM architecture, RAG, model serving          | `llm-architect`             | YES           |
+| MCP servers, protocol development             | `mcp-developer`             | YES           |
+| Microservices, distributed systems            | `microservices-architect`   | YES           |
+| SRE, SLOs, reliability                        | `sre-engineer`              | YES           |
+| Chaos engineering, resilience testing         | `chaos-engineer`            | YES           |
+| Prompt optimization, prompt engineering       | `prompt-engineer`           | YES           |
 
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`
 
@@ -646,6 +660,10 @@ Router and spawned agents must follow these runtime rules:
 **framework-context** — Structured framework model for system-level reflection/planning (memory tiers, routing, workflows, hooks, directory layout). Invoke before proposing system evolution.
 
 **recommend-evolution** — Trigger-based evolution recommendation workflow. Records proposals in `.claude/context/runtime/evolution-requests.jsonl` and reflection report sections; does not auto-spawn orchestrators.
+
+**creation-feasibility-gate** — Preflight viability checker for proposed new artifacts (PASS/WARN/BLOCK with evidence) before creator skills run.
+
+**compliance-policy-check** — Policy/rule compliance gate for proposed design or artifact evolution (PASS/CONDITIONAL/FAIL with mitigations).
 
 **assimilate** — External benchmark assimilation workflow (clone/stage competitor repos → comparable surface extraction → gap list → TDD backlog). Use when framework self-improvement or EVOLVE benchmarking is requested.
 

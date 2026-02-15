@@ -120,6 +120,7 @@ function getDefaultState() {
     plannerSpawned: false,
     requiresSecurityReview: false,
     securitySpawned: false,
+    architectSpawned: false,
     // TaskUpdate tracking fields
     lastTaskUpdateCall: null,
     lastTaskUpdateTaskId: null,
@@ -331,6 +332,7 @@ function resetToRouterMode() {
     plannerSpawned: false,
     requiresSecurityReview: false,
     securitySpawned: false,
+    architectSpawned: false,
     // Reset TaskUpdate tracking fields
     lastTaskUpdateCall: null,
     lastTaskUpdateTaskId: null,
@@ -480,6 +482,14 @@ function markSecuritySpawned() {
 }
 
 /**
+ * Mark that the ARCHITECT agent has been spawned
+ * SEC-AUDIT-011 FIX: Uses saveStateWithRetry for atomic updates
+ */
+function markArchitectSpawned() {
+  return saveStateWithRetry({ architectSpawned: true });
+}
+
+/**
  * Set whether security review is required
  * SEC-AUDIT-011 FIX: Uses saveStateWithRetry for atomic updates
  * @param {boolean} required - Whether security review is required
@@ -527,6 +537,14 @@ function isSecurityRequired() {
  */
 function isSecuritySpawned() {
   return getState().securitySpawned;
+}
+
+/**
+ * Check if architect has been spawned
+ * @returns {boolean} True if ARCHITECT agent was spawned
+ */
+function isArchitectSpawned() {
+  return getState().architectSpawned === true;
 }
 
 // ==========================================
@@ -689,6 +707,7 @@ module.exports = {
   setComplexity,
   markPlannerSpawned,
   markSecuritySpawned,
+  markArchitectSpawned,
   setSecurityRequired,
   // Complexity tracking - getters
   getComplexity,
@@ -696,6 +715,7 @@ module.exports = {
   isPlannerSpawned,
   isSecurityRequired,
   isSecuritySpawned,
+  isArchitectSpawned,
   // TaskUpdate tracking
   recordTaskUpdate,
   wasTaskUpdateCalledRecently,

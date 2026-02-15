@@ -499,6 +499,16 @@ Include integration assessment in reflection report:
 
 **Purpose**: Persist learnings into appropriate memory files.
 
+### 6.0 Memory Curation Decision (Mandatory)
+
+For each reflection run, classify memory candidates as:
+
+- `retain`: high reuse and strong evidence quality
+- `compress`: valuable but too verbose for hot context
+- `archive`: stale/noisy/low-reuse content
+
+Record a short rationale for each decision in the reflection report.
+
 ### 6.1 Memory File Mapping
 
 | Learning Type    | Target File                                   | Format             |
@@ -799,6 +809,7 @@ module.exports = async ({ tool, params }) => {
 - [x] learnings.md updated with {n} patterns
 - [x] decisions.md updated with {m} ADRs
 - [x] reflection-log.jsonl entry appended
+- [x] memory curation decisions recorded (retain/compress/archive + rationale)
 
 ---
 
@@ -916,6 +927,9 @@ When OPEN:
 - **insight-extraction**: Pattern extraction techniques
 - **verification-before-completion**: Quality gate function
 - **code-analyzer**: Static analysis for code outputs
+- **creation-feasibility-gate**: Preflight viability checks for proposed new artifacts
+- **compliance-policy-check**: Policy/rule alignment checks before evolution changes
+- **recommend-evolution**: Standardized evolution recommendation recording
 
 ## Related Agents
 

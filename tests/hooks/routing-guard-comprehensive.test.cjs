@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Comprehensive tests for routing-guard.cjs
- * Tests all 12 enforcement checks with enforcement mode variations
+ * Tests all enforcement checks with enforcement mode variations
  *
  * Test coverage:
  * - Check 0: Router Bash whitelist (ADR-030)

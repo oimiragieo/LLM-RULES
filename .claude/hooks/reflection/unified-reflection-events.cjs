@@ -6,6 +6,7 @@ function createReflectionEventHandlers({
   getToolOutput,
   debugLog,
   routerState,
+  taskClaimLedger,
   parseAndValidateTaskUpdate,
   gatherSessionInsights,
   errorSummaryExtractor,
@@ -81,6 +82,9 @@ function createReflectionEventHandlers({
 
     if (update.taskId && update.status) {
       routerState.recordTaskUpdate(update.taskId, update.status);
+      if (taskClaimLedger && typeof taskClaimLedger.releaseClaim === 'function') {
+        taskClaimLedger.releaseClaim(update.taskId, update.status);
+      }
       if (process.env.DEBUG_HOOKS) {
         debugLog(
           'unified-reflection',
@@ -109,6 +113,9 @@ function createReflectionEventHandlers({
 
     if (update.taskId && update.status) {
       routerState.recordTaskUpdate(update.taskId, update.status);
+      if (taskClaimLedger && typeof taskClaimLedger.releaseClaim === 'function') {
+        taskClaimLedger.releaseClaim(update.taskId, update.status);
+      }
       if (process.env.DEBUG_HOOKS) {
         debugLog(
           'unified-reflection',

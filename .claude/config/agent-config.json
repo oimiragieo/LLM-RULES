@@ -178,6 +178,23 @@
       ],
       "model": "claude-sonnet-4-5"
     },
+    "technical-program-manager": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
     "technical-writer": {
       "tools": [
         "Bash",

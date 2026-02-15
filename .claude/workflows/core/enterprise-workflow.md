@@ -187,8 +187,8 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 | TRIVIAL    | Single file, < 10 lines, no dependencies, obvious fix        | Phase 2 -> Phase 4                                         |
 | LOW        | Single module, clear scope, < 3 files                        | Phase 1 (planner only) -> 2 -> 3 (code-reviewer only) -> 4 |
 | MEDIUM     | Multiple modules, some unknowns, 3-10 files                  | Phase 1 (planner + architect) -> 2 -> 3 -> 4 -> 5          |
-| HIGH       | Cross-cutting, many unknowns, 10+ files, architecture impact | All phases (1 through 6)                                   |
-| EPIC       | System-wide impact, new subsystem, breaking changes          | All phases with orchestrator coordination                  |
+| HIGH       | Cross-cutting, many unknowns, 10+ files, architecture impact | All phases (1 through 6); add PM/TPM for product programs  |
+| EPIC       | System-wide impact, new subsystem, breaking changes          | All phases with orchestrator coordination; include PM/TPM  |
 
 ### Risk Rubric
 
@@ -234,7 +234,16 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
    Output: .claude/context/artifacts/research-reports/{capability}-research-{date}.md
    ```
 
-2. **Spawn planner** to define the creation tasks:
+2. **Run feasibility preflight** before any creator:
+
+   ```
+   Agent: planner (or technical-program-manager for cross-team impact)
+   Task: Validate capability creation feasibility
+   Skills: creation-feasibility-gate + compliance-policy-check
+   Output: PASS|WARN|BLOCK with blockers and mitigations
+   ```
+
+3. **Spawn planner** to define the creation tasks (only if preflight != BLOCK):
 
    ```
    Agent: planner
@@ -242,7 +251,7 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
    Output: .claude/context/plans/{capability}-creation-plan-{date}.md
    ```
 
-3. **Spawn creator** (via appropriate creator skill):
+4. **Spawn creator** (via appropriate creator skill):
 
    ```
    Agent: general-purpose
@@ -250,7 +259,7 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
    Output: .claude/agents/{category}/{new-agent}.md (or equivalent)
    ```
 
-4. **Resume Phase 0** with new capability available
+5. **Resume Phase 0** with new capability available
 
 ### Exit Criteria
 
@@ -261,6 +270,8 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 
 ### Quality Gate: Creator Validation
 
+- [ ] Feasibility preflight status is PASS or WARN
+- [ ] Compliance policy check is PASS or CONDITIONAL with mitigations tracked
 - [ ] Artifact passes schema validation
 - [ ] CLAUDE.md routing references updated
 - [ ] Catalog/registry entries added
@@ -280,12 +291,12 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 
 ### Agents Spawned (Varies by Complexity)
 
-| Complexity | Agents Spawned                                        | Execution |
-| ---------- | ----------------------------------------------------- | --------- |
-| LOW        | planner                                               | Single    |
-| MEDIUM     | planner + architect                                   | Parallel  |
-| HIGH       | planner + architect + security-architect              | Parallel  |
-| EPIC       | planner + architect + security-architect + researcher | Parallel  |
+| Complexity | Agents Spawned                                                                                          | Execution |
+| ---------- | ------------------------------------------------------------------------------------------------------- | --------- |
+| LOW        | planner                                                                                                 | Single    |
+| MEDIUM     | planner + architect                                                                                     | Parallel  |
+| HIGH       | planner + architect + security-architect (+ pm + technical-program-manager for product/cross-team work) | Parallel  |
+| EPIC       | planner + architect + security-architect + researcher + pm + technical-program-manager                  | Parallel  |
 
 ### Agent Responsibilities
 
@@ -293,8 +304,21 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 
 - Break request into implementation tasks with acceptance criteria
 - Define task dependencies and ordering
+- Produce microtask DAG metadata for MEDIUM+ work (`owned_paths`, `forbidden_paths`, `depends_on`, `dependency_type`, `parallel_group`, `acceptance_checks`)
 - Estimate effort per task
 - Output: `.claude/context/plans/{feature}-impl-plan-{date}.md`
+
+**PM** (product scope, HIGH/EPIC, or explicit roadmap/PRD requests):
+
+- Own PRD quality and EPIC/story decomposition
+- Define business outcomes and measurable acceptance outcomes
+- Output: `.claude/context/artifacts/specs/{feature}-prd-{date}.md`
+
+**Technical Program Manager** (cross-team dependencies, HIGH/EPIC):
+
+- Maintain dependency map and milestone sequence
+- Track RAID (risks, assumptions, issues, dependencies)
+- Output: `.claude/context/artifacts/programs/{feature}-program-plan-{date}.md`
 
 **Architect** (MEDIUM+):
 
@@ -347,15 +371,16 @@ All Phase 1 agents MUST write to:
 
 ### Quality Gate 1: DESIGN APPROVED
 
-| Check                                 | Required For | Blocking? |
-| ------------------------------------- | ------------ | --------- |
-| Implementation plan exists with tasks | ALL          | YES       |
-| Each task has acceptance criteria     | LOW+         | YES       |
-| Architecture document exists          | MEDIUM+      | YES       |
-| No conflicting agent recommendations  | MEDIUM+      | YES       |
-| Threat model exists                   | HIGH+        | YES       |
-| Research report with 3+ sources       | EPIC         | YES       |
-| All Phase 1 agents completed          | ALL          | YES       |
+| Check                                                               | Required For | Blocking? |
+| ------------------------------------------------------------------- | ------------ | --------- |
+| Implementation plan exists with tasks                               | ALL          | YES       |
+| Each task has acceptance criteria                                   | LOW+         | YES       |
+| MEDIUM+ plan includes microtask DAG ownership + dependency metadata | MEDIUM+      | YES       |
+| Architecture document exists                                        | MEDIUM+      | YES       |
+| No conflicting agent recommendations                                | MEDIUM+      | YES       |
+| Threat model exists                                                 | HIGH+        | YES       |
+| Research report with 3+ sources                                     | EPIC         | YES       |
+| All Phase 1 agents completed                                        | ALL          | YES       |
 
 **If gate fails:** Router identifies which check failed and re-spawns the appropriate agent with corrective instructions.
 
@@ -380,6 +405,17 @@ All Phase 1 agents MUST write to:
 3. **Fallback**: `developer` (ONLY when neither task-level nor domain detection yields a match)
 
 **Rule:** `developer` is the LAST RESORT. Task-level agent assignment ALWAYS takes priority.
+
+### Parallel Implementation Guardrails (Planner DAG)
+
+For planner microtask DAG execution in Phase 2:
+
+- Parallel shards are allowed only when `owned_paths` are disjoint
+- `depends_on` must be satisfied before spawn
+- `dependency_type=blocks` is required for hard prerequisite edges; other dependency types are informational
+- Max parallel shard fan-out: 4
+- Shared/high-risk files (routing, global config, shared schema) run sequentially
+- After each shard group, run merge/review gate before next group
 
 ### Agents Spawned
 
@@ -776,6 +812,20 @@ Phase 0 -> Phase 1 (planner + architect + security-architect + researcher) -> Ph
 
 No phases skipped. Master-orchestrator coordinates if multiple subsystems affected.
 
+### FULL SWEEP (framework hardening / "run full enterprise pipeline")
+
+Use this when user explicitly requests full-system improvement or "integrate/fix all findings":
+
+```
+reflection-agent -> (pm + technical-program-manager + researcher) -> (architect + security-architect + code-simplifier + researcher) -> (domain + specialized agents) -> (planner + context-compressor) -> (developer + chaos-engineer) -> code-reviewer -> qa -> devops -> technical-writer -> reflection-agent
+```
+
+Operational requirements for this profile:
+
+- Search-first: use hybrid search (`pnpm search:code`, semantic/structural search skills, ripgrep skill). Use `Grep` only as fallback.
+- Planner quality gate: planner must invoke `Skill({ skill: "tdd" })` and produce a detailed TDD plan before implementation phases.
+- Uncertainty handling: if planner confidence is low, explicitly spawn `researcher` and/or `architect` before implementation continues.
+
 ---
 
 ## Agent Handoff Protocol
@@ -1022,20 +1072,20 @@ CLAUDE.md Section 3.5 references this workflow. The Router reads CLAUDE.md, whic
 
 ## Summary: Agents Activated Per Phase
 
-| Phase               | Agents                                             | Always        | Conditional                                           |
-| ------------------- | -------------------------------------------------- | ------------- | ----------------------------------------------------- |
-| Phase 0 (Triage)    | Router                                             | Yes           | --                                                    |
-| Phase 0.5 (Create)  | researcher, planner, creator                       | No            | Capability gap detected                               |
-| Phase 1 (Design)    | planner, architect, security-architect, researcher | planner       | architect (MED+), security (HIGH+), researcher (EPIC) |
-| Phase 2 (Implement) | developer, domain specialist, database-architect   | developer     | domain (when detected), database (schema changes)     |
-| Phase 3 (Review)    | code-reviewer, qa, security-architect, architect   | code-reviewer | qa (MED+), security (HIGH+), architect (EPIC)         |
-| Phase 4 (Deploy)    | devops                                             | Yes           | --                                                    |
-| Phase 5 (Document)  | technical-writer                                   | Yes           | --                                                    |
-| Phase 6 (Reflect)   | reflection-agent                                   | Yes           | --                                                    |
+| Phase               | Agents                                                                            | Always        | Conditional                                                                        |
+| ------------------- | --------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------- |
+| Phase 0 (Triage)    | Router                                                                            | Yes           | --                                                                                 |
+| Phase 0.5 (Create)  | researcher, planner, creator                                                      | No            | Capability gap detected                                                            |
+| Phase 1 (Design)    | planner, architect, security-architect, researcher, pm, technical-program-manager | planner       | architect (MED+), security (HIGH+), researcher (EPIC), pm/tpm (product/cross-team) |
+| Phase 2 (Implement) | developer, domain specialist, database-architect                                  | developer     | domain (when detected), database (schema changes)                                  |
+| Phase 3 (Review)    | code-reviewer, qa, security-architect, architect                                  | code-reviewer | qa (MED+), security (HIGH+), architect (EPIC)                                      |
+| Phase 4 (Deploy)    | devops                                                                            | Yes           | --                                                                                 |
+| Phase 5 (Document)  | technical-writer                                                                  | Yes           | --                                                                                 |
+| Phase 6 (Reflect)   | reflection-agent                                                                  | Yes           | --                                                                                 |
 
-**Total unique agents activated:** 12 (vs 1 today)
+**Total unique agents activated:** 14 (vs 1 today)
 
-- Core: planner, developer, qa, architect, technical-writer, reflection-agent (6)
+- Core: planner, pm, technical-program-manager, developer, qa, architect, technical-writer, reflection-agent (8)
 - Specialized: code-reviewer, security-architect, devops, database-architect, researcher (5)
 - Domain: context-dependent (23 available)
 

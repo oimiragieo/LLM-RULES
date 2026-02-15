@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastEvolution": "2026-02-15-updater-auditor-skill-pack",
+  "lastEvolution": "2026-02-15-creation-preflight-policy-skill-pack",
   "evolutions": [
     {
       "id": "2026-02-14-framework-context-skill",
@@ -95,6 +95,30 @@
       "artifactType": "workflow",
       "name": "updater-auditor-skill-pack",
       "path": ".claude/workflows/agent-updater-skill-workflow.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-creation-feasibility-gate-skill",
+      "artifactType": "skill",
+      "name": "creation-feasibility-gate",
+      "path": ".claude/skills/creation-feasibility-gate/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-compliance-policy-check-skill",
+      "artifactType": "skill",
+      "name": "compliance-policy-check",
+      "path": ".claude/skills/compliance-policy-check/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-creation-preflight-policy-skill-pack",
+      "artifactType": "workflow",
+      "name": "creation-preflight-policy-skill-pack",
+      "path": ".claude/workflows/core/evolution-workflow.md",
       "status": "completed",
       "completedAt": "2026-02-15T00:00:00.000Z"
     }

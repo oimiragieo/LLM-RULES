@@ -25,10 +25,18 @@ function parseArgs(argv) {
     options[key] = hasValue ? argv[++i] : true;
   }
   return {
-    mode: String(options.mode || 'once').trim().toLowerCase(),
+    mode: String(options.mode || 'once')
+      .trim()
+      .toLowerCase(),
     projectRoot:
-      typeof options['project-root'] === 'string' ? path.resolve(options['project-root']) : process.cwd(),
-    intervalMs: Number(options['interval-ms'] || process.env.ARTIFACT_QUALITY_DAEMON_INTERVAL_MS || DEFAULT_INTERVAL_MS),
+      typeof options['project-root'] === 'string'
+        ? path.resolve(options['project-root'])
+        : process.cwd(),
+    intervalMs: Number(
+      options['interval-ms'] ||
+        process.env.ARTIFACT_QUALITY_DAEMON_INTERVAL_MS ||
+        DEFAULT_INTERVAL_MS
+    ),
     json: options.json === true || options.json === 'true',
   };
 }

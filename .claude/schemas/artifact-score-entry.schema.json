@@ -9,7 +9,17 @@
     "taskId": { "type": ["string", "null"] },
     "artifactType": {
       "type": "string",
-      "enum": ["agent", "skill", "hook", "workflow", "schema", "template", "tool", "command", "unknown"]
+      "enum": [
+        "agent",
+        "skill",
+        "hook",
+        "workflow",
+        "schema",
+        "template",
+        "tool",
+        "command",
+        "unknown"
+      ]
     },
     "artifactName": { "type": "string", "minLength": 1 },
     "artifactPath": { "type": ["string", "null"] },

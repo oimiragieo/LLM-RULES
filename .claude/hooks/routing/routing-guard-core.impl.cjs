@@ -22,6 +22,10 @@ const {
   isAlwaysAllowedWrite,
   isPlannerSpawn,
   isSecuritySpawn,
+  isArchitectSpawn,
+  isCodeSimplifierSpawn,
+  isHighRiskSpecialistSpawn,
+  extractSpawnAgentType,
   isImplementationAgentSpawn,
   isWhitelistedBashCommand,
   extractTaskIdFromPrompt,
@@ -47,6 +51,8 @@ const {
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,
+  checkCodeSimplifierArchitectReview,
+  checkHighRiskSpecialistArchitectReview,
   checkSpecialistOverride,
   checkTaskListFirstGate,
   checkCreatorIntentGuard,
@@ -164,6 +170,36 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
         routerState.markSecuritySpawned();
       }
       captureWarn('security-review-guard', securityCheck);
+
+      const architectCheck = checkCodeSimplifierArchitectReview(toolName, toolInput);
+      if (!architectCheck.pass) {
+        return {
+          pass: false,
+          result: architectCheck.result,
+          message: architectCheck.message,
+          checkName: 'code-simplifier-architect-guard',
+          warnings,
+        };
+      }
+      if (architectCheck.markArchitect) {
+        routerState.markArchitectSpawned();
+      }
+      captureWarn('code-simplifier-architect-guard', architectCheck);
+
+      const highRiskArchitectCheck = checkHighRiskSpecialistArchitectReview(toolName, toolInput);
+      if (!highRiskArchitectCheck.pass) {
+        return {
+          pass: false,
+          result: highRiskArchitectCheck.result,
+          message: highRiskArchitectCheck.message,
+          checkName: 'high-risk-specialist-architect-guard',
+          warnings,
+        };
+      }
+      if (highRiskArchitectCheck.markArchitect) {
+        routerState.markArchitectSpawned();
+      }
+      captureWarn('high-risk-specialist-architect-guard', highRiskArchitectCheck);
     }
 
     const writeCheck = checkRouterWrite(toolName, toolInput);
@@ -455,6 +491,8 @@ module.exports = {
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,
+  checkCodeSimplifierArchitectReview,
+  checkHighRiskSpecialistArchitectReview,
   checkRouterWrite,
   checkMemoryPressure,
   checkSpecialistOverride,
@@ -468,6 +506,10 @@ module.exports = {
   extractModelFromToolInput,
   isPlannerSpawn,
   isSecuritySpawn,
+  isArchitectSpawn,
+  isCodeSimplifierSpawn,
+  isHighRiskSpecialistSpawn,
+  extractSpawnAgentType,
   isImplementationAgentSpawn,
   isAlwaysAllowedWrite,
   isRouterInvocation,
