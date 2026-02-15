@@ -262,6 +262,20 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
     return { pass: true };
   }
 
+  const permissionMode = String(
+    hookInput?.permission_mode || hookInput?.permissionMode || ''
+  ).toLowerCase();
+  const isBypassPermissions = permissionMode === 'bypasspermissions';
+  if (isBypassPermissions && (toolName === 'Bash' || toolName === 'Read')) {
+    return {
+      pass: true,
+      result: 'warn',
+      message:
+        `[TASKLIST-FIRST BYPASS] Allowing ${toolName} before TaskList() in bypassPermissions mode. ` +
+        'Call TaskList() as soon as possible to sync task state.',
+    };
+  }
+
   const dedupe = registerBlockAttempt('tasklist-first-gate', toolName, hookInput);
   const isReadOnlyDiscoveryTool = toolName === 'Glob' || toolName === 'Grep';
   const message = dedupe.dedupe

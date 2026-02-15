@@ -37,19 +37,48 @@ function resolveSelectedModel(toolInput, configModel, explicitTaskId, agentType)
   return selectedModel;
 }
 
-function buildModifiedInput(toolInput, assembled, allowedTools, selectedModel) {
+function parseBackgroundAllowlist(raw) {
+  return new Set(
+    String(raw || '')
+      .split(',')
+      .map(entry => entry.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+function buildModifiedInput(toolInput, assembled, allowedTools, selectedModel, agentType) {
   const modifiedInput = {
     ...toolInput,
     prompt: assembled,
     allowed_tools: allowedTools,
     model: selectedModel,
   };
-  if (
-    modifiedInput.run_in_background === undefined &&
-    modifiedInput.runInBackground === undefined
-  ) {
-    modifiedInput.run_in_background = true;
+
+  const normalizedAgentType = String(agentType || '')
+    .trim()
+    .toLowerCase();
+  const allowlist = parseBackgroundAllowlist(
+    process.env.SPAWN_BACKGROUND_AGENT_ALLOWLIST || 'artifact-integrator'
+  );
+  const explicitBackgroundRequested =
+    modifiedInput.run_in_background === true || modifiedInput.runInBackground === true;
+  const allowBackgroundAny =
+    String(process.env.SPAWN_ALLOW_BACKGROUND_ANY || 'false')
+      .trim()
+      .toLowerCase() === 'true';
+  const allowBackground =
+    explicitBackgroundRequested &&
+    (allowBackgroundAny || (normalizedAgentType && allowlist.has(normalizedAgentType)));
+
+  if (explicitBackgroundRequested && !allowBackground) {
+    stderrLog('spawn_background_overridden', {
+      reason: 'agent_not_allowlisted',
+      agentType: normalizedAgentType || null,
+    });
   }
+  modifiedInput.run_in_background = Boolean(allowBackground);
+  delete modifiedInput.runInBackground;
+
   return modifiedInput;
 }
 

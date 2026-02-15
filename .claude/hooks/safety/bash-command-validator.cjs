@@ -299,6 +299,12 @@ async function main() {
 
     const brittleCountReason = detectBrittleCrossShellCount(command);
     if (brittleCountReason) {
+      if (isBypassPermissionsMode(hookInput)) {
+        console.error(
+          `[BASH-COMMAND-VALIDATOR][warn] ${brittleCountReason} (allowed in bypassPermissions mode)`
+        );
+        process.exit(0);
+      }
       console.error(formatBlockedMessage(command, brittleCountReason));
       process.exit(2);
     }

@@ -311,11 +311,19 @@ async function main() {
 
     const configModel = resolveConfigModel(agentType);
     assembled = appendConfigModelSection(assembled, configModel);
+    assembled = normalizeTaskIdReferences(assembled, explicitTaskId);
+    assembled = ensureMandatorySpawnPreflight(assembled, explicitTaskId);
     assembled = enforcePromptBudget(assembled);
     putCachedAssembly(cacheKey, assembled);
     perf.mark('model_and_budget_ms');
     const selectedModel = resolveSelectedModel(toolInput, configModel, explicitTaskId, agentType);
-    const modifiedInput = buildModifiedInput(toolInput, assembled, allowedTools, selectedModel);
+    const modifiedInput = buildModifiedInput(
+      toolInput,
+      assembled,
+      allowedTools,
+      selectedModel,
+      agentType
+    );
     logSpawnStartSafe({ explicitTaskId, agentType, assembled, hookSessionId });
 
     const validation = validateAssembledPromptOrExit(assembled);

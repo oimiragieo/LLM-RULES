@@ -56,6 +56,43 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
   }
 
   const command = toolInput.command || '';
+  const permissionMode = String(
+    hookInput?.permission_mode || hookInput?.permissionMode || ''
+  ).toLowerCase();
+  const isBypassPermissions = permissionMode === 'bypasspermissions';
+  if (isBypassPermissions) {
+    return {
+      pass: true,
+      result: 'warn',
+      message:
+        '[ROUTER BASH GUARD][bypass] Allowing Bash command in bypassPermissions mode. ' +
+        'Use Task() delegation for stronger separation when possible.',
+    };
+  }
+
+  const isReadOnlyDiscoveryCommand = (() => {
+    if (!command || typeof command !== 'string') return false;
+    const trimmed = command.trim();
+    if (!trimmed) return false;
+    if (/[>]{1,2}\s*[^|]/.test(trimmed)) return false;
+    if (/\b(rm|mv|cp|chmod|chown|sudo|ssh|scp|curl|wget|python|node|perl)\b/i.test(trimmed)) {
+      return false;
+    }
+    return /^(find|ls|du|wc|grep|rg|cat|head|tail|stat|sort|uniq|comm|basename|dirname)\b/i.test(
+      trimmed
+    );
+  })();
+
+  if (isBypassPermissions && isReadOnlyDiscoveryCommand) {
+    return {
+      pass: true,
+      result: 'warn',
+      message:
+        '[ROUTER BASH GUARD][bypass] Allowing read-only discovery command in bypassPermissions mode. ' +
+        'Prefer Task() delegation for non-trivial analysis.',
+    };
+  }
+
   if (isWhitelistedBashCommand(command)) {
     return { pass: true };
   }
@@ -184,6 +221,23 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
       taskSpawned: state.taskSpawned,
     });
     return { pass: true };
+  }
+
+  const permissionMode = String(
+    hookInput?.permission_mode || hookInput?.permissionMode || ''
+  ).toLowerCase();
+  const isBypassPermissions = permissionMode === 'bypasspermissions';
+  if (
+    isBypassPermissions &&
+    (toolName === 'Glob' || toolName === 'Grep' || toolName === 'WebSearch')
+  ) {
+    return {
+      pass: true,
+      result: 'warn',
+      message:
+        `[ROUTER SELF-CHECK BYPASS] Allowing ${toolName} in bypassPermissions mode to avoid router deadlocks. ` +
+        'Prefer Task() delegation for deeper analysis.',
+    };
   }
 
   debugLog('BLOCK: Router using blacklisted tool', { tool: toolName, enforcement });

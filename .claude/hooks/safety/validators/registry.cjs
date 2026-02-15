@@ -184,6 +184,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
   'strings', // Extract strings from binary
   'sort', // Sort lines
   'uniq', // Unique lines
+  'comm', // Compare sorted line sets (read-only)
   'du', // Disk usage (read-only)
   'sleep', // Pause execution (benign timing)
 

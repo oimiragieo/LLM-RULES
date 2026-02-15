@@ -764,6 +764,25 @@ describe('routing-guard', () => {
       routerState.clearCurrentSpawnTaskId();
     });
 
+    it('should warn-allow read-only discovery bash in bypassPermissions mode', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      assert.ok(routerState, 'Router state module should be loadable');
+
+      routerState.resetToRouterMode();
+      routerState.invalidateStateCache();
+      routingGuard.invalidateCachedState();
+      process.env.ROUTER_BASH_GUARD = 'block';
+
+      const result = routingGuard.checkRouterBash(
+        'Bash',
+        { command: 'find /c/dev/projects/agent-studio/.claude/hooks -type f -name "*.cjs" | sort' },
+        { permission_mode: 'bypassPermissions' }
+      );
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, 'warn');
+      assert.ok(String(result.message || '').includes('bypass'));
+    });
+
     it('should include visceral message with correct format', () => {
       assert.ok(routingGuard, 'Module should be loadable');
       assert.ok(routerState, 'Router state module should be loadable');
@@ -877,6 +896,25 @@ describe('routing-guard', () => {
         'WebSearch should be BLOCKED in router mode - Router must spawn agent instead'
       );
       assert.strictEqual(result.result, 'block', 'Result should be block');
+    });
+
+    it('should warn-allow Grep in bypassPermissions mode', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      assert.ok(routerState, 'Router state module should be loadable');
+
+      routerState.resetToRouterMode();
+      routerState.invalidateStateCache();
+      routingGuard.invalidateCachedState();
+      process.env.ROUTER_SELF_CHECK = 'block';
+
+      const result = routingGuard.checkRouterSelfCheck(
+        'Grep',
+        { pattern: 'recordTaskUpdate', path: '.claude/hooks' },
+        { permission_mode: 'bypassPermissions' }
+      );
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, 'warn');
+      assert.match(String(result.message || ''), /ROUTER SELF-CHECK BYPASS/);
     });
 
     it('should ALLOW Glob tool in agent mode (after Task spawned)', () => {

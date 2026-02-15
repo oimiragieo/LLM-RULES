@@ -423,6 +423,18 @@ IMPORTANT INSTRUCTIONS:
     assert.ok(!normalized.includes('mark task 1 as in_progress'));
     assert.ok(!normalized.includes('mark task 1 as completed when done'));
   });
+
+  test('assembler should normalize "FIRST: Call TaskUpdate" taskId placeholders to canonical task id', () => {
+    const prompt = `
+Task ID: task-real-321
+FIRST: Call TaskUpdate({ taskId: "1", status: "in_progress" })
+AFTER: Call TaskUpdate({ taskId: "1", status: "completed" })
+`;
+    const normalized = normalizeTaskIdReferences(prompt, 'task-real-321');
+    assert.ok(normalized.includes('FIRST: Call TaskUpdate({ taskId: "task-real-321"'));
+    assert.ok(normalized.includes('AFTER: Call TaskUpdate({ taskId: "task-real-321"'));
+    assert.ok(!normalized.includes('taskId: "1"'));
+  });
 });
 
 describe('spawn validator loop-breaker', () => {

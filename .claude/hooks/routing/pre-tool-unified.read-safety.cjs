@@ -428,6 +428,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     ensureIntegrationQueueReadTarget(targetPath);
     if (!fs.existsSync(targetPath)) {
       const missingPathHints = {
+        '.claude/agents/router.md': '.claude/agents/core/router.md',
         '.claude/lib/memory/memory-query.cjs': '.claude/lib/memory/core/memory-query.cjs',
         '.claude/lib/utils/safe-json-parse.cjs': '.claude/lib/utils/safe-json.cjs',
         'tests/metrics/metrics-schema-contract.test.cjs':
@@ -478,6 +479,20 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
 
     if (stats.isDirectory()) {
       if (isBypassPermissionsMode(hookInput)) {
+        const listingPath = createDirectoryListingFile(targetPath);
+        if (listingPath) {
+          return {
+            checked: true,
+            action: 'rewrite',
+            rewrittenToolInput: {
+              ...toolInput,
+              file_path: listingPath,
+            },
+            bypassWarning:
+              `[READ SAFETY][bypass] "${targetPath}" is a directory. ` +
+              `Rewrote Read target to generated listing "${listingPath}".`,
+          };
+        }
         return {
           checked: true,
           action: 'block',

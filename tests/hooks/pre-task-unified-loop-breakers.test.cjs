@@ -78,6 +78,19 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
   });
 
   describe('TaskList-first loop-breaker', () => {
+    it('should bypass TaskList-first enforcement in bypassPermissions mode', () => {
+      process.env.CLAUDE_SESSION_ID = 'tasklist-bypass-test';
+      process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
+      writeState(ROUTER_STATE_FILE, { mode: 'router', taskListCalledSincePrompt: false });
+
+      const result = preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-bypass-test',
+        permission_mode: 'bypassPermissions',
+      });
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, undefined);
+    });
+
     it('should warn-allow by default when TASKLIST_FIRST_ENFORCEMENT is unset', () => {
       process.env.CLAUDE_SESSION_ID = 'tasklist-default-warn-test';
       delete process.env.TASKLIST_FIRST_ENFORCEMENT;

@@ -106,12 +106,11 @@ async function main() {
     // Extract skill name
     const skillName = extractSkillName(filePath) || 'unknown';
 
-    // Return warning (exit 0 but with message) about using Skill() tool instead
+    // Emit plain-text warning only; never return JSON payload from this advisory hook.
+    // JSON outputs can interfere with tool_input mutation hooks when multiple hooks match.
     console.log(
-      JSON.stringify({
-        result: 'warn',
-        message: `Consider using Skill({ skill: "${skillName}" }) instead of reading SKILL.md directly. Reading is allowed for reference, but Skill() tool applies the workflow.`,
-      })
+      `[SKILL-INVOCATION] Consider using Skill({ skill: "${skillName}" }) instead of reading SKILL.md directly. ` +
+        'Reading is allowed for reference, but Skill() tool applies the workflow.'
     );
     process.exit(0);
   } catch (err) {

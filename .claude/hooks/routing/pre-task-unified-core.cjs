@@ -74,6 +74,12 @@ function checkTaskListFirst(toolName, hookInput = null) {
   if (toolName !== 'Task') {
     return { pass: true };
   }
+  const permissionMode = String(
+    hookInput?.permission_mode || hookInput?.permissionMode || ''
+  ).toLowerCase();
+  if (permissionMode === 'bypasspermissions') {
+    return { pass: true };
+  }
   const mode = (process.env.TASKLIST_FIRST_ENFORCEMENT || 'warn').toLowerCase();
   if (mode === 'off') {
     return { pass: true };

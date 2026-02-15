@@ -237,3 +237,52 @@
 **Solution**: Refactor into categorized sections (shell builtins, read-only fs, dev tools, build tools, archive tools).
 
 **Priority**: P2
+
+## Code Quality Review Findings (2026-02-15)
+
+### CRITICAL Issues (P0 - Fix Sprint 1)
+
+1. **CRITICAL-001: Silent data loss in safe-json.cjs**
+   - Lines 236-249: JSON.parse(JSON.stringify()) in try-catch with silent fallback
+   - Impact: Data corruption goes undetected
+   - Fix: Add logging, use structured clone API or deep-clone library, add tests
+
+2. **CRITICAL-002: Race conditions in file access**
+   - Files: memory-manager.cjs, code-index-updater.cjs
+   - Issue: No file locking for concurrent access
+   - Fix: Implement proper-lockfile per ADR-116, atomic writes
+
+3. **CRITICAL-003: Memory leaks in error tracking**
+   - Files: error-pattern-detector.cjs (Maps), safe-json.cjs (warnedSchemas Set)
+   - Issue: Unbounded data structures grow indefinitely
+   - Fix: Implement LRU cache (max 100 entries), TTL-based expiration
+
+### HIGH Issues (P1 - Fix Sprint 2)
+
+4. **HIGH-001: Empty catch blocks lose telemetry**
+   - File: pre-task-unified.cjs lines 94-150
+   - Issue: Event bus errors silently swallowed
+   - Fix: Log all errors, circuit breaker pattern, fallback metrics
+
+5. **HIGH-002: Shell injection regex complexity**
+   - File: bash-command-validator.cjs lines 40-68
+   - Issue: Complex regex difficult to verify
+   - Fix: Comprehensive tests (50+ cases), document edge cases
+
+6. **HIGH-003: Synchronous file I/O blocks event loop**
+   - Files: 15+ across memory/ and hooks/
+   - Impact: Latency spikes, poor scalability
+   - Fix: Migrate to fs.promises, read-through cache
+
+7. **HIGH-004: Missing hook input validation**
+   - File: hook-input.cjs
+   - Impact: Crashes on malformed input, fail-open risk
+   - Fix: JSON schema validation, safe defaults
+
+### Test Coverage Gaps
+
+- Concurrent file access scenarios (race conditions)
+- Error pattern detector edge cases (circular refs, OOM)
+- Regex validator completeness (known-bad/good inputs)
+- Hook input malformed data handling
+- Memory leak scenarios (long-running processes)

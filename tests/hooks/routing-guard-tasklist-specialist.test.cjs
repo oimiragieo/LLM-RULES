@@ -206,4 +206,24 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
 
     delete process.env.CLAUDE_SESSION_ID;
   });
+
+  it('should warn-allow Bash before TaskList in bypassPermissions mode', () => {
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: false,
+      })
+    );
+
+    const result = routingGuard.checkTaskListFirstGate('Bash', {
+      permission_mode: 'bypassPermissions',
+    });
+    assert.equal(result.pass, true);
+    assert.equal(result.result, 'warn');
+    assert.match(result.message, /TASKLIST-FIRST BYPASS/);
+  });
 });
