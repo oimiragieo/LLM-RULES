@@ -83,11 +83,19 @@ context/
 │   ├── behaviour.md
 │   ├── active_context.md
 │   ├── access-stats.json    # Access tracking sidecar (active path)
+│   ├── gotchas.json         # Structured gotcha records
+│   ├── patterns.json        # Structured pattern records
+│   ├── open-findings.json   # Open audit findings
+│   ├── reflection-log.jsonl # Reflection session log
+│   ├── codebase_map.json    # File discovery tracking
+│   ├── maintenance-status.json # Weekly maintenance tracking
 │   ├── archive/
 │   ├── named/               # Named memory API: readMemory/writeMemory (CLAUDE.md Section 8)
 │   ├── stm/                 # STM tier: session data written by user-prompt-unified.cjs
 │   ├── mtm/                 # MTM tier: canonical recent-session storage (active)
-│   └── ltm/                 # LTM tier: summarized session data written by memory-tiers.cjs
+│   ├── ltm/                 # LTM tier: summarized session data written by memory-tiers.cjs
+│   ├── metrics/             # Memory SLO metrics (daily JSON)
+│   └── cold/                # Cold storage archives (gzip'd JSONL)
 ├── metrics/
 │   ├── hook-metrics.jsonl
 │   ├── spawn-log.jsonl

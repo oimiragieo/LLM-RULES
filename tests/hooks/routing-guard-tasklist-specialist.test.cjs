@@ -226,4 +226,26 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
     assert.equal(result.result, 'warn');
     assert.match(result.message, /TASKLIST-FIRST BYPASS/);
   });
+
+  it('should warn-allow Write before TaskList in bypassPermissions mode', () => {
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    const backup = fs.existsSync(stateFile) ? fs.readFileSync(stateFile, 'utf8') : null;
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({ mode: 'router', taskSpawned: false, taskListCalledSincePrompt: false }),
+      'utf8'
+    );
+
+    const result = routingGuard.checkTaskListFirstGate('Write', {
+      permission_mode: 'bypassPermissions',
+    });
+
+    assert.equal(result.pass, true);
+    assert.equal(result.result, 'warn');
+    assert.match(result.message, /TASKLIST-FIRST BYPASS/);
+
+    if (backup === null) fs.unlinkSync(stateFile);
+    else fs.writeFileSync(stateFile, backup, 'utf8');
+  });
 });

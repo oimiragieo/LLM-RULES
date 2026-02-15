@@ -1,6 +1,6 @@
 # Memory Protocol
 
-- Read `.claude/context/memory/learnings.md` before starting any task.
+- Read memory context via `loadMemoryForContext()` (auto-injected into spawn prompts) or `node .claude/lib/memory/memory-manager.cjs load` before starting any task. (Note: `learnings.md` is a legacy read-only archive.)
 - Write learnings, issues, and decisions to the appropriate memory files after completing work.
 - Assume interruption: if it's not in memory, it didn't happen.
 - Use named memory API (`.claude/context/memory/named/`) for topic-specific persistent notes.
@@ -8,70 +8,99 @@
 - Check `decisions.md` for relevant ADRs before making architectural choices.
 - Check `issues.md` for known blockers and workarounds before debugging.
 
-## Hierarchical Memory Tiers (ADR-102)
+## Memory Architecture
 
-**Memory is organized in tiers by access frequency and age:**
+The memory system has two distinct subsystems:
 
-### HOT Tier (Active Files)
+### 1. Session-Based Tiers (STM/MTM/LTM)
 
-- Location: `.claude/context/memory/` (root)
-- Files: `learnings.md`, `decisions.md`, `issues.md`, `codebase_map.json`
-- Budget: Each file must stay under 20KB
-- Access: Read on every task start
-- Rotation: Monthly to WARM tier
+Session memory is organized in three tiers based on recency:
 
-### WARM Tier (Recent Archives)
+**STM (Short-Term Memory)** — Current session
+- Location: `.claude/context/memory/stm/`
+- Format: `session_current.json`
+- Retention: Current session only
 
-- Location: `.claude/context/memory/archive/`
-- Pattern: `learnings-YYYY-MM.md`, `decisions-YYYY-MM.md`
-- Retention: Last 30 days
-- Access: On-demand for context
-- Rotation: After 30 days to COLD tier
+**MTM (Mid-Term Memory)** — Recent sessions
+- Location: `.claude/context/memory/mtm/`
+- Format: `session_*.json`
+- Retention: Last 10 sessions
+- Promotion: On session end, STM → MTM
 
-### COLD Tier (Long-Term Storage)
+**LTM (Long-Term Memory)** — Permanent knowledge
+- Location: `.claude/context/memory/ltm/`
+- Format: `summary_*.json` (compressed summaries)
+- Retention: Indefinite
 
-- Location: `.claude/context/memory/archive/YYYY/`
-- Retention: Indefinite (compressed)
-- Access: Rare, manual only
-- Format: Compressed markdown
+### 2. File-Based Rotation
+
+Markdown memory files are rotated based on file size:
+- Active files: `.claude/context/memory/` (root)
+- Archive: `.claude/context/memory/archive/`
+- Files: `learnings.md`, `decisions.md`, `issues.md`
+- Trigger: File exceeds size threshold (see `LEARNINGS_ARCHIVE_THRESHOLD_KB`, `DECISIONS_WARN_THRESHOLD_KB` env vars)
 
 ## Memory Budget Management
 
-**Active file limits (HOT tier)**:
+**Active file limits** (STM/MTM/LTM tiers):
 
-- `learnings.md`: 20KB max (rotate monthly)
-- `decisions.md`: 20KB max (rotate monthly)
-- `issues.md`: 10KB max (archive resolved issues)
-- `codebase_map.json`: 50KB max (prune stale entries)
+- `learnings.md`: Archive threshold 40KB (configurable via `LEARNINGS_ARCHIVE_THRESHOLD_KB` env var)
+- `decisions.md`: Warn threshold 80KB (configurable via `DECISIONS_WARN_THRESHOLD_KB` env var)
+- `issues.md`: Archive resolved issues periodically
+- `codebase_map.json`: Max entries 500 (configurable via `CODEBASE_MAP_MAX_ENTRIES` env var)
 
-**When to rotate**:
-
-- File exceeds budget
-- End of month (automatic via cron)
-- Major phase completion
+**Rotation trigger**: File size exceeds threshold (NOT time-based)
 
 ## Memory Subsystem Integration
 
 **Implementation**: `.claude/lib/memory/` provides:
 
-- `memory-rotator.cjs` - Automated tier rotation
-- `memory-consolidation.cjs` - Duplicate detection and merging
-- `contextual-memory.cjs` - Query interface for tiered access
+- `memory-rotator.cjs` - File-size-based rotation (active → archive)
+- `memory-deduplicator.cjs` - Duplicate detection
+- `smart-pruner.cjs` - Memory pruning
+- `memory-tiers.cjs` - STM/MTM/LTM session tier management
+- `contextual-memory.cjs` - Semantic search and entity query interface
 
-**Usage**: Agents should use memory API, not direct file access:
+**Named memory API** (for topic-specific notes in `.claude/context/memory/named/`):
 
 ```javascript
-const { readMemory, writeMemory } = require('.claude/lib/memory/contextual-memory.cjs');
+const manager = require('.claude/lib/memory/memory-manager.cjs');
 
-// Read (searches HOT → WARM → COLD)
-const learnings = await readMemory('learnings');
+// Read a named memory
+const content = await manager.readMemory('topic-name');
 
-// Write (appends to HOT tier)
-await writeMemory('learnings', 'New pattern: ...');
+// Write a named memory
+await manager.writeMemory('topic-name', 'Content here');
+
+// List all named memories
+const names = await manager.listMemories();
+
+// Delete a named memory
+await manager.deleteMemory('topic-name');
 ```
+
+**Structured memory API** (for gotchas, patterns, discoveries):
+
+```javascript
+const manager = require('.claude/lib/memory/memory-manager.cjs');
+
+manager.recordGotcha({ text: 'Windows paths need normalization', area: 'platform' });
+manager.recordPattern({ text: 'Use shell: false for child_process', area: 'security' });
+manager.recordDiscovery({ text: 'BM25 indexer supports lazy IDF', area: 'search' });
+```
+
+**Additional data stores** (in `.claude/context/memory/`):
+- `gotchas.json` — Gotcha records
+- `patterns.json` — Pattern records
+- `access-stats.json` — Access statistics
+- `open-findings.json` — Open audit findings
+- `codebase_map.json` — File discovery tracking
+- `maintenance-status.json` — Weekly maintenance tracking
+- `active_context.md` — Current context state
+- `reflection-log.jsonl` — Reflection session log
 
 ## Related References
 
-- `ADR-102` - Memory management rebuild architecture
+- Memory management rebuild architecture (documented in `.claude/docs/MEMORY_SYSTEM.md`)
 - `.claude/lib/memory/` - Memory subsystem implementation
 - `context-compressor` skill - Compression strategies

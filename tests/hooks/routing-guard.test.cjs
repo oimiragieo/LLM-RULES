@@ -783,6 +783,28 @@ describe('routing-guard', () => {
       assert.ok(String(result.message || '').includes('bypass'));
     });
 
+    it('should block brittle sleep+cat polling command even in bypassPermissions mode', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      assert.ok(routerState, 'Router state module should be loadable');
+
+      routerState.resetToRouterMode();
+      routerState.invalidateStateCache();
+      routingGuard.invalidateCachedState();
+      process.env.ROUTER_BASH_GUARD = 'block';
+
+      const result = routingGuard.checkRouterBash(
+        'Bash',
+        {
+          command:
+            'sleep 10 && cat /c/Users/oimir/AppData/Local/Temp/claude-debug-tail.txt',
+        },
+        { permission_mode: 'bypassPermissions' }
+      );
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
+      assert.ok(String(result.message || '').includes('brittle sleep+cat polling'));
+    });
+
     it('should include visceral message with correct format', () => {
       assert.ok(routingGuard, 'Module should be loadable');
       assert.ok(routerState, 'Router state module should be loadable');
@@ -910,6 +932,25 @@ describe('routing-guard', () => {
       const result = routingGuard.checkRouterSelfCheck(
         'Grep',
         { pattern: 'recordTaskUpdate', path: '.claude/hooks' },
+        { permission_mode: 'bypassPermissions' }
+      );
+      assert.strictEqual(result.pass, true);
+      assert.strictEqual(result.result, 'warn');
+      assert.match(String(result.message || ''), /ROUTER SELF-CHECK BYPASS/);
+    });
+
+    it('should warn-allow Write in bypassPermissions mode', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      assert.ok(routerState, 'Router state module should be loadable');
+
+      routerState.resetToRouterMode();
+      routerState.invalidateStateCache();
+      routingGuard.invalidateCachedState();
+      process.env.ROUTER_SELF_CHECK = 'block';
+
+      const result = routingGuard.checkRouterSelfCheck(
+        'Write',
+        { file_path: '.claude/context/reports/tmp.md', content: '# temp' },
         { permission_mode: 'bypassPermissions' }
       );
       assert.strictEqual(result.pass, true);

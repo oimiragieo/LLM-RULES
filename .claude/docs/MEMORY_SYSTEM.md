@@ -1183,17 +1183,19 @@ pnpm run agents:registry
 **Solution**: Initialize memory files
 
 ```bash
-mkdir -p .claude/context/memory/sessions
+mkdir -p .claude/context/memory/stm
+mkdir -p .claude/context/memory/mtm
+mkdir -p .claude/context/memory/ltm
 echo '[]' > .claude/context/memory/gotchas.json
 echo '[]' > .claude/context/memory/patterns.json
 echo '{"discovered_files":{},"last_updated":null}' > .claude/context/memory/codebase_map.json
 ```
 
-### Session Numbers Not Incrementing
+### Session Files Use Timestamp Format
 
-**Symptom**: New sessions overwrite old ones
+**Note**: The modern memory system uses timestamp-based session files in the MTM tier (`.claude/context/memory/mtm/`). Files follow the pattern `session_YYYY-MM-DDTHH-MM-SS.json`. The legacy `session_NNN.json` format with zero-padded numbers is no longer used.
 
-**Solution**: Check session file naming format. Files must match `session_NNN.json` pattern with zero-padded numbers.
+If you see numbered session files in `.claude/context/memory/sessions/`, they are from the legacy system and can be archived.
 
 ### Memory Load Too Slow
 

@@ -190,9 +190,8 @@ describe('pre-tool-unified read safety', () => {
     try {
       fs.writeFileSync(filePath, 'a'.repeat(130000), 'utf8');
       const result = checkReadSafety('Read', { file_path: filePath });
-      assert.strictEqual(result.action, 'rewrite');
-      assert.strictEqual(result.rewrittenToolInput.offset, 0);
-      assert.strictEqual(result.rewrittenToolInput.limit, 4000);
+      assert.strictEqual(result.action, 'block');
+      assert.ok(String(result.message || '').includes('Direct Read on large file'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -241,10 +240,8 @@ describe('pre-tool-unified read safety', () => {
         { file_path: filePath },
         { permission_mode: 'bypassPermissions' }
       );
-      assert.strictEqual(result.action, 'rewrite');
-      assert.strictEqual(result.rewrittenToolInput.offset, 0);
-      assert.strictEqual(result.rewrittenToolInput.limit, 4000);
-      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+      assert.strictEqual(result.action, 'block');
+      assert.ok(String(result.message || '').includes('Direct Read on large file'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -259,7 +256,7 @@ describe('pre-tool-unified read safety', () => {
       fs.writeFileSync(filePath, 'a'.repeat(130000), 'utf8');
       const result = checkReadSafety('Read', { file_path: filePath });
       assert.strictEqual(result.action, 'block');
-      assert.ok(String(result.message || '').includes('requires chunked Read'));
+      assert.ok(String(result.message || '').includes('Direct Read on large file'));
     } finally {
       if (prior == null) delete process.env.READ_SAFETY_AUTOWINDOW;
       else process.env.READ_SAFETY_AUTOWINDOW = prior;

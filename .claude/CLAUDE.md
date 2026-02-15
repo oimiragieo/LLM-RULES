@@ -615,13 +615,14 @@ Invoke the {skill-name} skill and follow it exactly as presented to you
 
 All spawned agents:
 
-1. **Read:** `.claude/context/memory/learnings.md` (before starting)
+1. **Memory context auto-injected:** The spawn-prompt-assembler automatically injects constitution, behaviour, semantic matches, and entity graph context into agent prompts.
 2. **Write:** learnings/issues/decisions to:
    - `learnings.md` (patterns/solutions)
    - `decisions.md` (ADRs)
    - `issues.md` (blockers/workarounds)
-3. **Compression reminder (optional):** if `.claude/context/runtime/compression-reminder.txt` exists, spawn the `context-compressor` skill (or invoke `Skill({ skill: 'context-compressor' })`) and clear the reminder.
-4. **Named memory API (optional):** project-specific notes in `.claude/context/memory/named/` via:
+3. **Structured memory:** Use `recordGotcha()`, `recordPattern()`, `recordDiscovery()` via `memory-manager.cjs` for structured data.
+4. **Compression reminder (optional):** if `.claude/context/runtime/compression-reminder.txt` exists, spawn the `context-compressor` skill (or invoke `Skill({ skill: 'context-compressor' })`) and clear the reminder.
+5. **Named memory API (optional):** project-specific notes in `.claude/context/memory/named/` via `memory-manager.cjs`:
    - `readMemory(name)`
    - `writeMemory(name, content)`
    - `listMemories()`
@@ -629,23 +630,22 @@ All spawned agents:
 
 > **Assume interruption:** if it's not in memory, it didn't happen.
 
-### 8.1 Observational Memory Routing Rules
+### 8.1 Memory Tier Architecture
 
-Router and spawned agents must follow these runtime rules:
+The memory system uses two subsystems:
 
-1. **Mode + kill switch:**
+1. **Session tiers (STM/MTM/LTM):**
+   - STM: Current session context (`.claude/context/memory/stm/`)
+   - MTM: Last 10 sessions (`.claude/context/memory/mtm/`)
+   - LTM: Permanent compressed summaries (`.claude/context/memory/ltm/`)
+2. **File rotation:** `learnings.md`/`decisions.md`/`issues.md` rotate to `archive/` when exceeding size threshold (default: 20KB via `memory-rotator.cjs`).
+3. **Memory mode + kill switch:**
    - `MEMORY_MODE=hybrid|observational` (default: `hybrid`)
    - `OBSERVATIONAL_MEMORY_ENABLED=on|off` (default: `on`)
    - If kill switch is `off`, treat mode as `hybrid` regardless of `MEMORY_MODE`.
-2. **Tier behavior:**
-   - **Tier A (default):** observational summary + recent observations.
+4. **Tier behavior in spawn prompts:**
+   - **Tier A (default):** session context + structured memory (gotchas, patterns).
    - **Tier B (optional depth):** semantic/entity memory only when `memory_depth=true` or prompt intent is exploratory/debug/high-uncertainty.
-3. **Section token caps (defaults):**
-   - `MEMORY_SUMMARY_BLOCK_MAX_TOKENS=400`
-   - `MEMORY_RECENT_OBSERVATIONS_MAX_TOKENS=400`
-   - `MEMORY_TIER_B_MAX_TOKENS=400`
-4. **Fallback safety:**
-   - If `observations_summary.md` and/or `observations.jsonl` are missing or empty, fall back to legacy memory section formatting (no prompt assembly failure).
 5. **Task protocol remains strict:**
    - Memory mode does **not** relax task tracking. Spawned agents must still do FIRST `TaskUpdate(in_progress)` before work, LAST `TaskUpdate(completed)` before `TaskList()`.
 

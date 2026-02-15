@@ -60,6 +60,20 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     hookInput?.permission_mode || hookInput?.permissionMode || ''
   ).toLowerCase();
   const isBypassPermissions = permissionMode === 'bypasspermissions';
+  const isBrittleSleepCatPolling =
+    typeof command === 'string' &&
+    /\b(sleep|timeout)\b/i.test(command) &&
+    /\bcat\b/i.test(command) &&
+    /\/c\/users\//i.test(command);
+  if (isBypassPermissions && isBrittleSleepCatPolling) {
+    return {
+      pass: false,
+      result: 'block',
+      message:
+        '[ROUTER BASH GUARD][bypass] Blocked brittle sleep+cat polling command. ' +
+        'Use Read with offset/limit against a concrete file path instead.',
+    };
+  }
   if (isBypassPermissions) {
     return {
       pass: true,
@@ -229,7 +243,12 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
   const isBypassPermissions = permissionMode === 'bypasspermissions';
   if (
     isBypassPermissions &&
-    (toolName === 'Glob' || toolName === 'Grep' || toolName === 'WebSearch')
+    (toolName === 'Glob' ||
+      toolName === 'Grep' ||
+      toolName === 'WebSearch' ||
+      toolName === 'Write' ||
+      toolName === 'Edit' ||
+      toolName === 'NotebookEdit')
   ) {
     return {
       pass: true,

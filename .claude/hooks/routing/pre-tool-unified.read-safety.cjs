@@ -11,6 +11,9 @@ const { ensureDir } = require('./pre-tool-unified.execution.cjs');
 const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 120000);
 const READ_CHUNK_GUARD_TOKENS = Number(process.env.READ_CHUNK_GUARD_TOKENS || 20000);
 const READ_ESTIMATED_CHARS_PER_TOKEN = Number(process.env.READ_ESTIMATED_CHARS_PER_TOKEN || 4);
+const READ_HARD_BLOCK_LARGE_DIRECT = String(process.env.READ_HARD_BLOCK_LARGE_DIRECT || 'on')
+  .trim()
+  .toLowerCase();
 const READ_REQUIRE_SEARCH_FIRST = String(process.env.READ_REQUIRE_SEARCH_FIRST || 'on')
   .trim()
   .toLowerCase();
@@ -507,6 +510,22 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
         message:
           `[READ SAFETY] "${targetPath}" is a directory. ` +
           'Use Glob/rg --files for directory listing, then Read a specific file.',
+      };
+    }
+
+    if (
+      READ_HARD_BLOCK_LARGE_DIRECT !== 'off' &&
+      stats.size > READ_CHUNK_GUARD_BYTES &&
+      !hasReadWindow(toolInput)
+    ) {
+      return {
+        checked: true,
+        action: 'block',
+        message:
+          `${
+            isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '
+          }Direct Read on large file (${stats.size} bytes) blocked. ` +
+          'Retry with offset/limit (or start_line/end_line), e.g. offset: 0, limit: 4000.',
       };
     }
 

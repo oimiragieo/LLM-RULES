@@ -266,7 +266,14 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
     hookInput?.permission_mode || hookInput?.permissionMode || ''
   ).toLowerCase();
   const isBypassPermissions = permissionMode === 'bypasspermissions';
-  if (isBypassPermissions && (toolName === 'Bash' || toolName === 'Read')) {
+  if (
+    isBypassPermissions &&
+    (toolName === 'Bash' ||
+      toolName === 'Read' ||
+      toolName === 'Write' ||
+      toolName === 'Edit' ||
+      toolName === 'NotebookEdit')
+  ) {
     return {
       pass: true,
       result: 'warn',

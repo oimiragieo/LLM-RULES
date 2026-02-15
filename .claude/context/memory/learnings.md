@@ -1,3 +1,11 @@
+## Memory Documentation Alignment (2026-02-15)
+
+- Fixed 8 documentation misalignments across 3 files where documented behavior didn't match actual memory system implementation
+- Key fixes: learnings.md is legacy archive (not active), thresholds are 40KB/80KB (not 20KB), session files use timestamps (not numbers)
+- Pattern: When documentation references implementation details (thresholds, file formats), verify against source code and MEMORY_SYSTEM.md
+- Updated `.claude/rules/memory-protocol.md`, `@DIRECTORY_STRUCTURE.md`, and `MEMORY_SYSTEM.md`
+- Report: `.claude/context/reports/memory-docs-alignment-2026-02-15.md`
+
 ## Creation Preflight + Compliance Gates (2026-02-15)
 
 - Added `creation-feasibility-gate` skill to block low-value or infeasible artifact creation before creator workflows.
