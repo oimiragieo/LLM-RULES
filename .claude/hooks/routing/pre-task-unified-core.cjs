@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable max-lines */
 
 const path = require('path');
 const fs = require('fs');
