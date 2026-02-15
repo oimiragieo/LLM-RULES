@@ -577,6 +577,8 @@ When task metadata includes microtask fields (`owned_paths`, `forbidden_paths`, 
 - Do not spawn microtasks in parallel if `owned_paths` overlap
 - Do not spawn dependents before all `depends_on` tasks are complete
 - Treat `dependency_type=blocks` as execution-gating; `related|parent-child|discovered-from` are non-blocking context links
+- Keep `developer`, `qa`, and `code-reviewer` aligned to the same ownership contract for implementation + review phases
+- Treat 500-line file guidance as a soft maintainability signal; do not auto-convert work into microservices without design evidence
 - PreToolUse(Task) enforces ownership overlap blocks against active task claims (`task-claim-ledger.json`)
 - PreToolUse(Task) also blocks MEDIUM+ parallel microtasks missing ownership metadata (`TASK_PARALLEL_OWNERSHIP_REQUIRED=block`)
 

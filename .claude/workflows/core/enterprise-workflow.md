@@ -417,6 +417,25 @@ For planner microtask DAG execution in Phase 2:
 - Shared/high-risk files (routing, global config, shared schema) run sequentially
 - After each shard group, run merge/review gate before next group
 
+### Role-Level Execution Contract (Developer/QA/Code-Reviewer)
+
+- `developer`: implement per shard with explicit ownership boundaries; do not cross-edit overlapping shards in the same wave.
+- `qa`: verify each shard locally, then run cross-shard integration regression before phase completion.
+- `code-reviewer`: issue findings per shard and at merge boundaries; block approval when ownership contracts are violated.
+- File-size guidance: treat ~500 LOC as a soft maintainability threshold, not a hard microservice trigger.
+
+### Hook Enforcement Points (Operational)
+
+Parallel + task lifecycle safety is enforced by runtime hooks:
+
+| Concern                      | Hook/Module                                             | Behavior                                                         |
+| ---------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------- |
+| Parallel ownership required  | `.claude/hooks/routing/pre-task-unified-ownership.cjs`  | Blocks or warns on parallel work with missing ownership metadata |
+| Ownership conflict detection | `.claude/hooks/routing/pre-task-unified-ownership.cjs`  | Blocks overlapping `owned_paths` claims                          |
+| Task spawn orchestration     | `.claude/hooks/routing/pre-task-unified-core.cjs`       | Enforces spawn guardrails and registers lifecycle bootstrap      |
+| TaskUpdate-first protocol    | `.claude/hooks/routing/pre-tool-unified.taskupdate.cjs` | Enforces first `TaskUpdate(in_progress)` before heavy tools      |
+| Completion phase chaining    | `.claude/hooks/workflow/post-completion-chain.cjs`      | Advances workflow phase only after completion gate checks        |
+
 ### Agents Spawned
 
 | Condition                             | Agent(s)                                         | Execution               |

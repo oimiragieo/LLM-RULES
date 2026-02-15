@@ -62,6 +62,17 @@ grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NO
 
 ## Agent Creation Process
 
+### Creator/Updater Alignment (MANDATORY)
+
+`agent-creator` and `agent-updater` must evolve together, using the same lifecycle pattern as `skill-creator`/`skill-updater`:
+
+- Step 0 existence check routes existing artifacts to updater flow.
+- Research gate (Exa-first, fallback web/arXiv) before content finalization.
+- RED/GREEN/REFACTOR/VERIFY checkpoints.
+- Integration validation + registry/catalog regeneration.
+
+If lifecycle drift is discovered, update creator/updater skill docs + workflow docs before creating additional agents.
+
 ### Contract-First Generator (MANDATORY)
 
 All newly created agents must be generated from the managed template contract before any manual refinements.

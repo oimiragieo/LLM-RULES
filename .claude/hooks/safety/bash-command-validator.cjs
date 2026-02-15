@@ -198,6 +198,33 @@ function detectBrittleCrossShellCount(command) {
   return null;
 }
 
+function detectSearchBypassPattern(command) {
+  if (!command || typeof command !== 'string') return null;
+
+  const normalized = command.toLowerCase();
+  if (
+    normalized.includes('pnpm search:code') ||
+    normalized.includes('pnpm search:structure') ||
+    /(^|\s)rg(\s|$)/.test(normalized)
+  ) {
+    return null;
+  }
+
+  const broadFindPattern =
+    /\bfind\b[\s\S]{0,220}(?:\.claude|tests|src)[\s\S]{0,220}\|\s*(?:while|xargs|sort|grep)\b/i;
+  const recursiveGrepPattern =
+    /\bgrep\b[\s\S]{0,80}\s-(?:r|rn|nr)\b[\s\S]{0,240}(?:\.claude|tests|src)\b/i;
+
+  if (!broadFindPattern.test(command) && !recursiveGrepPattern.test(command)) {
+    return null;
+  }
+
+  return (
+    'Broad shell scanning detected. Use hybrid search first (`pnpm search:code "<query>" --limit 10`) ' +
+    'or `rg` for targeted regex, then run bounded reads.'
+  );
+}
+
 /**
  * Extract the bash command from hook input.
  *
@@ -311,6 +338,18 @@ async function main() {
       process.exit(2);
     }
 
+    const searchBypassReason = detectSearchBypassPattern(command);
+    if (searchBypassReason) {
+      if (isBypassPermissionsMode(hookInput)) {
+        console.error(
+          `[BASH-COMMAND-VALIDATOR][warn] ${searchBypassReason} (allowed in bypassPermissions mode)`
+        );
+        process.exit(0);
+      }
+      console.error(formatBlockedMessage(command, searchBypassReason));
+      process.exit(2);
+    }
+
     // Validate the command using the registry
     const result = validateCommand(command);
 
@@ -382,6 +421,7 @@ module.exports = {
   detectBashArtifactWrite,
   detectBashReportWrite,
   detectBrittleCrossShellCount,
+  detectSearchBypassPattern,
   isBypassPermissionsMode,
   parseHookInput: parseHookInputAsync,
 };

@@ -5,7 +5,18 @@
   "required": ["ok"],
   "properties": {
     "ok": { "type": "boolean" },
+    "mode": { "type": "string", "enum": ["plan", "execute"] },
     "risk": { "type": "string", "enum": ["low", "medium", "high"] },
-    "target": { "type": "object" }
+    "target": { "type": "object" },
+    "patchPlan": {
+      "type": "object",
+      "properties": {
+        "objective": { "type": "string" },
+        "promptFiles": { "type": "array", "items": { "type": "string" } },
+        "workflowFiles": { "type": "array", "items": { "type": "string" } },
+        "hookEnforcementPoints": { "type": "array", "items": { "type": "string" } },
+        "validationCommands": { "type": "array", "items": { "type": "string" } }
+      }
+    }
   }
 }

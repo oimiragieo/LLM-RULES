@@ -364,3 +364,15 @@ TaskList();
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+## Parallel QA Contract (Mandatory)
+
+- For MEDIUM+ implementations, validate by ownership shard before global regression:
+  - Per-shard tests for each `owned_paths` segment
+  - Cross-shard integration tests at merge boundaries
+- Require explicit traceability from planner/developer microtask metadata:
+  - `owned_paths`
+  - `depends_on`
+  - acceptance checks
+- Do not approve parallel readiness when shard ownership overlaps.
+- Treat 500 lines as a soft review threshold for readability risk, not a hard fail condition.

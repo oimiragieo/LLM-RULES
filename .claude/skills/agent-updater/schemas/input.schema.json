@@ -6,6 +6,7 @@
   "properties": {
     "agent": { "type": "string" },
     "trigger": { "type": "string", "enum": ["manual", "reflection", "evolve"] },
+    "mode": { "type": "string", "enum": ["plan", "execute"] },
     "changes": { "type": "string" }
   }
 }

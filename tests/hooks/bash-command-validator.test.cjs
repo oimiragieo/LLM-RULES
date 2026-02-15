@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /** Tests for bash-command-validator.cjs and validator-registry integration. */
+/* eslint-disable max-lines */
 
 'use strict';
 const path = require('path');
@@ -59,6 +60,7 @@ const {
   buildVersionProbeSpawnOptions,
   detectBashReportWrite,
   detectBrittleCrossShellCount,
+  detectSearchBypassPattern,
   isBypassPermissionsMode,
 } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
 
@@ -97,6 +99,10 @@ test('exports detectBashReportWrite function', () => {
 
 test('exports isBypassPermissionsMode function', () => {
   assertEqual(typeof isBypassPermissionsMode, 'function', 'Should export function');
+});
+
+test('exports detectSearchBypassPattern function', () => {
+  assertEqual(typeof detectSearchBypassPattern, 'function', 'Should export function');
 });
 
 // ============================================================
@@ -270,6 +276,34 @@ test('detectBrittleCrossShellCount blocks ls/wc counting pattern', () => {
 test('detectBrittleCrossShellCount allows safe commands', () => {
   const reason = detectBrittleCrossShellCount('git status');
   assertEqual(reason, null, 'Should allow safe commands');
+});
+
+test('detectSearchBypassPattern blocks broad find|grep scans over project code', () => {
+  const reason = detectSearchBypassPattern(
+    'find "C:/dev/projects/agent-studio/.claude/lib/memory" -name "*.cjs" | while read f; do basename "$f"; done | sort'
+  );
+  assertTrue(Boolean(reason), 'Should block broad shell scanning');
+  assertIncludes(reason.toLowerCase(), 'hybrid search', 'Should direct to hybrid search');
+});
+
+test('detectSearchBypassPattern blocks recursive grep scans over .claude', () => {
+  const reason = detectSearchBypassPattern(
+    'grep -rn "normalize.*path" .claude/hooks .claude/lib --include="*.cjs"'
+  );
+  assertTrue(Boolean(reason), 'Should block recursive grep scan pattern');
+});
+
+test('detectSearchBypassPattern allows pnpm search:code and rg usage', () => {
+  assertEqual(
+    detectSearchBypassPattern('pnpm search:code -- "taskupdate-first" --limit 10'),
+    null,
+    'Should allow hybrid search command'
+  );
+  assertEqual(
+    detectSearchBypassPattern('rg -n "taskupdate-first" .claude/hooks'),
+    null,
+    'Should allow rg command'
+  );
 });
 
 test('isBypassPermissionsMode detects bypass permissions payloads', () => {

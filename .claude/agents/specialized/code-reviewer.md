@@ -577,3 +577,14 @@ cat .claude/context/memory/learnings.md
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+## Parallel Review Contract (Mandatory)
+
+- Review parallel implementation by shard first, then by system integration.
+- Validate planner/developer ownership metadata before approving parallel safety:
+  - `owned_paths`
+  - `forbidden_paths`
+  - `depends_on`
+  - `parallel_group`
+- Escalate as HIGH risk when overlapping ownership or missing dependency ordering is detected.
+- Treat 500 lines as a maintainability risk signal only; do not force architectural splits without design evidence.

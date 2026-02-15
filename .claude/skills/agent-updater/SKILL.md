@@ -27,14 +27,41 @@ Refresh existing agent definitions safely using research, explicit prompt/frontm
 
 Never modify agent prompts blind. Produce a diff plan with risk score and regression gates first.
 
+## Alignment Contract (Creator + Skill Lifecycle)
+
+`agent-updater` must align with:
+
+- `.claude/skills/agent-creator/SKILL.md`
+- `.claude/skills/skill-creator/SKILL.md`
+- `.claude/skills/skill-updater/SKILL.md`
+
+If lifecycle expectations drift (research gate, enterprise bundle, validation chain), update agent updater artifacts first before refreshing target agents.
+
 ## Workflow
 
 1. Resolve target agent path and verify existence.
 2. Invoke `framework-context` and `research-synthesis`.
-3. Build prompt/frontmatter diff plan with risk score (`low|medium|high`).
-4. Generate RED/GREEN/REFACTOR/VERIFY backlog.
-5. Validate integration and regenerate agent registry if assignments changed.
-6. Record learnings and unresolved risks in memory.
+3. Generate an exact patch plan that includes:
+   - prompt files to update
+   - workflow files to update
+   - hook enforcement points to respect
+   - validation commands to run
+4. Build prompt/frontmatter diff plan with risk score (`low|medium|high`).
+5. Generate RED/GREEN/REFACTOR/VERIFY backlog.
+6. Validate integration and regenerate agent registry if assignments changed.
+7. Record learnings and unresolved risks in memory.
+
+## Exact Patch Plan Output (Required)
+
+Every run must output a structured patch plan with:
+
+- `objective`
+- `promptFiles`
+- `workflowFiles`
+- `hookEnforcementPoints`
+- `validationCommands`
+
+Use `node .claude/skills/agent-updater/scripts/main.cjs --agent <target> --mode plan` to generate it.
 
 ## Risk Scoring Model
 
@@ -47,6 +74,26 @@ Never modify agent prompts blind. Produce a diff plan with risk score and regres
 - Search evidence with `pnpm search:code` and search skills.
 - Use `token-saver-context-compression` only for large prompt diffs.
 - Use `recommend-evolution` if update is insufficient and net-new artifact needed.
+
+## Enforcement Points for Parallel Safety
+
+When updating developer/qa/code-reviewer contracts, explicitly align with:
+
+- `.claude/hooks/routing/pre-task-unified-core.cjs`
+- `.claude/hooks/routing/pre-task-unified-ownership.cjs`
+- `.claude/hooks/routing/pre-tool-unified.taskupdate.cjs`
+- `.claude/hooks/workflow/post-completion-chain.cjs`
+
+Do not introduce prompt rules that contradict active hook behavior.
+
+## Enterprise Acceptance Checklist (Blocking)
+
+- [ ] Exact patch plan generated
+- [ ] Risk-scored diff completed
+- [ ] RED/GREEN/REFACTOR/VERIFY backlog documented
+- [ ] Integration validation run
+- [ ] Agent registry regenerated when skill assignments/frontmatter changed
+- [ ] Memory learnings/decisions/issues updated
 
 ## Memory Protocol
 

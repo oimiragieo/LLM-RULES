@@ -455,3 +455,16 @@ cat .claude/context/memory/learnings.md
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+## Microtask Ownership Contract (Mandatory)
+
+- Break implementation into microtasks with explicit path ownership before parallel work.
+- For MEDIUM+ tasks, include planner-style metadata in task context or updates:
+  - `owned_paths`
+  - `forbidden_paths`
+  - `depends_on`
+  - `dependency_type`
+  - `parallel_group`
+- Never run parallel coding shards with overlapping `owned_paths`.
+- Treat 500 lines as a soft maintainability signal, not a hard architectural rule.
+- If a file trends too large/complex, open a follow-up refactor task instead of forcing microservice splits mid-change.

@@ -78,6 +78,34 @@ function classifyRisk(changes) {
   return 'low';
 }
 
+function buildPatchPlan(target) {
+  return {
+    objective:
+      'Refresh agent prompt/frontmatter with explicit microtask ownership, search/token-saver policy, and regression-safe workflow alignment.',
+    promptFiles: [
+      '.claude/agents/core/developer.md',
+      '.claude/agents/core/qa.md',
+      '.claude/agents/specialized/code-reviewer.md',
+    ],
+    workflowFiles: [
+      '.claude/workflows/core/enterprise-workflow.md',
+      '.claude/workflows/core/router-decision.md',
+    ],
+    hookEnforcementPoints: [
+      '.claude/hooks/routing/pre-task-unified-core.cjs',
+      '.claude/hooks/routing/pre-task-unified-ownership.cjs',
+      '.claude/hooks/routing/pre-tool-unified.taskupdate.cjs',
+      '.claude/hooks/workflow/post-completion-chain.cjs',
+    ],
+    validationCommands: [
+      `node .claude/tools/cli/validate-integration.cjs ${target}`,
+      'node .claude/tools/cli/generate-agent-registry.cjs',
+      'pnpm validate:workflow-skill-contracts',
+      'pnpm lint',
+    ],
+  };
+}
+
 function main(input = null) {
   const options = input || parseArgs(process.argv.slice(2));
   if (options.help) {
@@ -104,16 +132,23 @@ function main(input = null) {
   }
 
   const risk = classifyRisk(options.changes || '');
+  const patchPlan = buildPatchPlan(resolved.agentPath);
   return {
     ok: true,
     trigger,
     target: resolved,
     risk,
+    mode:
+      String(options.mode || 'plan')
+        .trim()
+        .toLowerCase() || 'plan',
     requiredInvocations: [
       "Skill({ skill: 'framework-context' })",
       "Skill({ skill: 'research-synthesis' })",
+      "Skill({ skill: 'skill-updater' }) // if skill parity changes are needed",
       "Skill({ skill: 'verification-before-completion' })",
     ],
+    patchPlan,
     tddBacklog: [
       { phase: 'RED', items: ['Add failing tests for target agent behavior drift.'] },
       { phase: 'GREEN', items: ['Apply minimal frontmatter/prompt updates.'] },
