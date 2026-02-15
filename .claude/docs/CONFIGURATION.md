@@ -278,24 +278,62 @@ export CLAUDE_CODE_TASK_LIST_ID="agent-studio-tasks"
 
 **Documentation**: `.claude/docs/MEMORY_SYSTEM.md`, `.claude/skills/task-management-protocol/SKILL.md`
 
-### MEMORY_PRUNE_THRESHOLD
+### MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB
 
-**Purpose**: Size threshold for triggering memory pruning.
+**Purpose**: Threshold for auto-archiving `learnings.md`.
 
 **Values**:
 
-- `100000` (default) - 100KB per memory file
-- `N` (integer) - Custom threshold in bytes
+- `40` (default) - Archive when `learnings.md` exceeds 40KB
+- `N` (integer) - Custom threshold in KB
 
 **Used By**:
 
-- `.claude/lib/memory/memory-pruner.js`
-- `.claude/lib/memory/memory-manager.js`
+- `.claude/lib/memory/memory-manager.cjs`
 
 **Example**:
 
 ```bash
-export MEMORY_PRUNE_THRESHOLD=150000  # 150KB threshold
+export MEMORY_LEARNINGS_ARCHIVE_THRESHOLD_KB=50
+```
+
+### MEMORY_LEARNINGS_WARN_THRESHOLD_KB
+
+**Purpose**: Warning threshold for memory health output.
+
+**Values**:
+
+- `40` (default) - Warn when `learnings.md` exceeds 40KB
+- `N` (integer) - Custom threshold in KB
+
+**Used By**:
+
+- `.claude/lib/memory/memory-manager.cjs`
+
+**Example**:
+
+```bash
+export MEMORY_LEARNINGS_WARN_THRESHOLD_KB=40
+```
+
+### MEMORY_ACCESS_TRACKING / MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS
+
+**Purpose**: Controls access-count sidecar updates for `patterns.json` / `gotchas.json`.
+
+**Values**:
+
+- `MEMORY_ACCESS_TRACKING`: `on|off` (default: `on`)
+- `MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS`: number (default: `300000`)
+
+**Used By**:
+
+- `.claude/lib/memory/memory-manager.cjs`
+
+**Example**:
+
+```bash
+export MEMORY_ACCESS_TRACKING=on
+export MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS=300000
 ```
 
 ---

@@ -8,6 +8,10 @@
 
 This document provides a comprehensive mapping between enforcement hooks and agent archetypes, showing which hooks govern which agents at runtime.
 
+> Memory-system accuracy note (2026-02-15):
+> For memory behavior, treat `.claude/settings.json` + `.claude/docs/MEMORY_SYSTEM.md` as canonical.
+> This mapping is high-level and may omit recent non-memory hook consolidations.
+
 ---
 
 ## Section 1: Hook-Agent Matrix

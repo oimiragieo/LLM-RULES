@@ -33,7 +33,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 | ------------------ | -------------------- | ------------------------------------------------------------------- |
 | `UserPromptSubmit` | User sends message   | Router analysis, memory reminder, session context reset             |
 | `PreToolUse`       | Before tool executes | Command validation, routing enforcement, blocking unsafe operations |
-| `PostToolUse`      | After tool executes  | Memory extraction, recording changes, format enforcement            |
+| `PostToolUse`      | After tool executes  | Memory/index sync, telemetry, task/reflection recording             |
 | `SessionEnd`       | Session ends         | Persist session insights, create session files                      |
 
 ## Hook Locations
@@ -172,15 +172,11 @@ kill -9 0                                # Kill all processes
 
 **Exit Codes**: `0` allow, `2` block (fail-closed on error per SEC-008).
 
-### task-list-tracker.cjs
+### pre-task-unified.cjs
 
-**Event**: `PostToolUse(TaskList)`
-**Purpose**: Records that TaskList() was called since the last UserPromptSubmit. Used with PreToolUse(Task) to enforce **TaskList-first**: TaskList() must be called before Task() in the same session.
-**Environment**: TaskList-first enforcement is in `pre-task-unified.cjs` (PreToolUse Task): `TASKLIST_FIRST_ENFORCEMENT=block|warn|off` (default: `block`).
-
-**Note**: Router TaskList-first is enforced by pre-task-unified (PreToolUse Task) and state set by PostToolUse TaskList (task-list-tracker.cjs).
-
-**Documentation routing**: Documentation routing (routes docs to technical-writer) is enforced by `documentation-routing-guard.cjs` (PreToolUse Task, registered in settings.json at line 188). The check logic is also duplicated in `pre-task-unified.cjs` (CHECK 3: Documentation Routing Guard) for defense-in-depth.
+**Event**: `PreToolUse(Task)`
+**Purpose**: Enforces router task lifecycle guardrails before Task spawns (including TaskList-first and routing-policy checks).
+**Environment**: `TASKLIST_FIRST_ENFORCEMENT=block|warn|off` (default: `block`), plus other routing guardrail modes documented in `@ENVIRONMENT_CONFIG.md`.
 
 ### router-write-guard.cjs
 
@@ -215,11 +211,11 @@ Router: Task({ task_id: 'task-1', prompt: "You are DEVELOPER. Fix bug in app.ts.
 
 > **Archived**: Moved to `.claude/archive/hooks/memory/`. Canonical behavior is in `post-task-unified.cjs` (workflow learning extraction and task-output memory extraction). Not registered in `.claude/settings.json`.
 
-### format-memory.cjs
+### sync-memory-index.cjs
 
-**Event**: `PostToolUse(Edit|Write)`
-**Purpose**: Format memory files for consistency
-**Ensures**: Memory files follow markdown standards
+**Event**: `PostToolUse(Edit|Write|NotebookEdit)`
+**Purpose**: Canonical memory/index synchronization hook after memory-affecting edits.
+**Ensures**: Structured memory files are synced for downstream query/injection flows.
 
 ## Security Validators
 
@@ -331,8 +327,7 @@ Hooks are registered in `.claude/settings.json`:
       {
         "matcher": "",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/routing/user-prompt-unified.cjs" },
-          { "type": "command", "command": "node .claude/hooks/memory/memory-health-check.cjs" }
+          { "type": "command", "command": "node .claude/hooks/routing/user-prompt-unified.cjs" }
         ]
       }
     ],
@@ -395,12 +390,7 @@ Hooks are registered in `.claude/settings.json`:
       {
         "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
-          { "type": "command", "command": "node .claude/hooks/memory/format-memory.cjs" },
           { "type": "command", "command": "node .claude/hooks/memory/sync-memory-index.cjs" },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/enforce-claude-md-update.cjs"
-          },
           { "type": "command", "command": "node .claude/hooks/routing/code-index-updater.cjs" }
         ]
       },
@@ -652,7 +642,7 @@ This hook system addresses critical security vulnerabilities identified in the 7
 ## References
 
 - **Hook Creator Skill**: `.claude/skills/hook-creator/SKILL.md`
-- **Router State Management**: `.claude/hooks/routing/router-state.cjs`
+- **Router State Management**: `.claude/lib/routing/router-state.cjs`
 - **Memory Manager**: `.claude/lib/memory/memory-manager.cjs`
 - **Validator Registry**: `.claude/hooks/safety/validators/registry.cjs`
 - **Security Audit**: 7-agent audit findings (SEC-001, SEC-002, SEC-003, SEC-004)

@@ -1,6 +1,6 @@
 # Memory System Documentation
 
-**Last verified:** 2026-02-01 (paths: STM write on UserPromptSubmit, loadMemoryForContext MTM→LTM→legacy, sync-memory-index, reflection reminder, memory-health-check, weekly maintenance fallback)
+**Last verified:** 2026-02-15 (paths: STM write on UserPromptSubmit, loadMemoryForContext MTM→LTM→legacy, sync-memory-index, reflection reminder, weekly maintenance fallback)
 
 ## Why Memory Matters
 
@@ -82,12 +82,10 @@ Entity extraction is format-based. Supported heading styles include `###` or `##
 The memory system is enforced/maintained via Claude Code hooks registered in `.claude/settings.json`:
 
 - `UserPromptSubmit`
-  - `.claude/hooks/routing/user-prompt-unified.cjs` (includes the Memory Protocol reminder and a lightweight memory health check)
-  - `.claude/hooks/memory/memory-health-check.cjs` (full memory health check with tier monitoring + smart pruning + metrics)
+  - `.claude/hooks/routing/user-prompt-unified.cjs` (includes Memory Protocol reminder, reflection reminder management, prompt-based reflection queue processing, and maintenance fallback checks)
 - `PostToolUse` (matcher `Edit|Write|NotebookEdit`)
-  - `.claude/hooks/memory/format-memory.cjs` (formats/normalizes memory writes after edits/writes)
   - `.claude/hooks/memory/sync-memory-index.cjs` (canonical sync path: syncs decisions/issues plus patterns.json/gotchas.json into the SQLite entity index).
-  - `.claude/hooks/memory/planning-progress-tracker.cjs` (tracks planning progress on memory edits)
+  - `.claude/hooks/routing/code-index-updater.cjs` (keeps code index metadata aligned after edits/writes)
   - Note: `SyncLayer` and `BackgroundSyncWorker` have been moved to `.claude/archive/lib/memory/` and are no longer in the active codebase. Sync is done only by `sync-memory-index.cjs`.
 - `SessionEnd`
   - `.claude/hooks/reflection/unified-reflection-handler.cjs` (records session into STM/MTM, best-effort embeddings + maintenance, queues reflection)
@@ -107,7 +105,7 @@ An optional Step 0 guard runs on `PreToolUse(TaskList)` via `.claude/hooks/refle
 
 **Reflection is best-effort:** If the Router skips Step 0, pending reflections will not run. Check the dashboard (or health output) for `pendingReflectionRequests` to see if reflections are queued.
 
-**Reflection queue is processed on SessionEnd by default.** The reflection-queue-processor reads `.claude/context/reflection-queue.jsonl` and writes `.claude/context/runtime/reflection-spawn-request.json`. In environments that do not emit SessionEnd, you can enable prompt-based processing by setting `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on`, which runs the processor on `UserPromptSubmit` with an interval guard (`REFLECTION_QUEUE_PROCESS_INTERVAL_MS`). The queue file is trimmed to the last N lines (default 2000) via `REFLECTION_QUEUE_MAX_LINES` to prevent unbounded growth. To run reflection manually, execute `node .claude/hooks/reflection/reflection-queue-processor.cjs`. **Headless / rare sessions:** If SessionEnd rarely or never fires (e.g. headless or long-lived sessions), set `REFLECTION_QUEUE_PROCESS_ON_PROMPT=on` and run weekly maintenance via cron or `pnpm run memory:weekly` (or use the worker).
+**Reflection queue is processed on SessionEnd by default.** The reflection-queue-processor reads `.claude/context/reflection-queue.jsonl` and writes `.claude/context/runtime/reflection-spawn-request.json`. Prompt-based queue processing is also enabled by default in `user-prompt-unified.cjs` (`REFLECTION_QUEUE_PROCESS_ON_PROMPT` empty/on/true/1), with interval guard `REFLECTION_QUEUE_PROCESS_INTERVAL_MS` and timeout `REFLECTION_QUEUE_PROCESS_TIMEOUT_MS`. The queue file is trimmed to the last N lines (default 2000) via `REFLECTION_QUEUE_MAX_LINES`. To run reflection manually, execute `node .claude/hooks/reflection/reflection-queue-processor.cjs`. **Headless / rare sessions:** If SessionEnd rarely or never fires (e.g. headless or long-lived sessions), keep prompt processing enabled and run weekly maintenance via cron or `pnpm run memory:weekly` (or use the worker).
 
 ## Reflection and Evolution Memory Flow
 
@@ -124,13 +122,12 @@ This pipeline is intentionally best-effort and bounded: failures in one stage sh
 
 Hooks run in sequence; a hook that exits non-zero may prevent subsequent hooks from running (host-dependent). Each hook should be defensive and avoid throwing; use try/catch and exit 0 for advisory checks so the chain can continue.
 
-### Inlined vs Standalone Memory Health Check
+### Memory Health Check
 
-Both run by design: the inlined check is lightweight (e.g. auto-archive/prune); the standalone hook provides full metrics and tier health; no consolidation into a single hook is required.
+Current runtime wiring uses the inlined path only:
 
-- **Inlined (lightweight)**: `user-prompt-unified.cjs` runs a quick health check + auto-archive/prune.
-- **Standalone (full)**: `memory-health-check.cjs` runs on `UserPromptSubmit` and writes richer health metrics.
-  - Rate-limited via `MEMORY_HEALTH_CHECK_INTERVAL_MS` (default: 5 minutes) to avoid redundant checks.
+- **Inlined**: `user-prompt-unified.cjs` performs lightweight maintenance and fallback checks (including overdue weekly maintenance trigger).
+- There is no standalone `memory-health-check.cjs` hook registered in current `.claude/settings.json`.
 
 ## Metrics Locations
 
@@ -141,7 +138,10 @@ There are two primary metrics roots:
 
 ### Metrics and dashboard
 
-Metrics are collected on `UserPromptSubmit` via `memory-health-check.cjs` (Phase 4). The hook loads `.claude/lib/memory/memory-dashboard.cjs`; if that module fails to load or Phase 4 throws, the hook still completes and sets `output.metricsLogged = false` and `output.metricsError` so callers know metrics did not run. A structured error is logged (`metrics_logging_error`). When dashboard load or Phase 4 fails, an optional fallback one-line JSONL entry is written to `.claude/context/memory/metrics/fallback.jsonl` with `timestamp`, `event: 'health_check'`, `status`, `warningsCount`, and optionally `metricsError`, so at least one data point exists for the run. Inspect metrics without running the full health check via `pnpm run memory:dashboard` (or `node .claude/lib/memory/memory-dashboard.cjs`; default command shows health). A separate token/budget dashboard CLI is available via `pnpm run memory:dashboard:budget` (from `.claude/tools/cli/memory-dashboard.cjs`).
+Memory/system metrics are emitted by active runtime hooks (not a standalone memory-health-check hook). For current health snapshots and summaries, use:
+
+- `pnpm run memory:dashboard` (or `node .claude/lib/memory/memory-dashboard.cjs`)
+- `pnpm run memory:health` (or `node .claude/lib/memory/memory-manager.cjs health`)
 
 ### Strict rollout monitoring
 
@@ -782,6 +782,53 @@ Each entry tracks `memory_block_hash`, `previous_hash`, and `churned` (`true` wh
 
 Use `pnpm run test:memory:ci` to run the memory safety/integration gate locally or in CI.  
 The workflow `.github/workflows/memory-ci.yml` runs this gate on memory-related changes, plus format/lint and memory SLO checks.
+
+### Live memory/RAG eval modes
+
+Live evaluation for spawn-time memory usage and citation groundedness is implemented in:
+
+- `tests/evals/subagent-memory-rag-live.eval.cjs`
+- Report output: `.claude/context/runtime/evals/subagent-memory-rag-live-latest.json`
+
+The eval now supports three execution legs with automatic fallback:
+
+1. `live_cli`
+   - Real runtime path via `claude -p --output-format stream-json`
+   - Measures whether spawned Task prompts include memory/RAG evidence ids and whether assistant output cites grounded ids.
+2. `hook_e2e_fallback`
+   - Runs the real hook subprocess (`.claude/hooks/routing/spawn-prompt-assembler.cjs`)
+   - Verifies injection fidelity (`[mem:...]`, `[rag:...]`) even when live CLI stalls.
+3. `deterministic_subagent_probe`
+   - Consumes injected hook prompt with deterministic probe logic
+   - Produces citation and groundedness continuity metrics when live CLI is unavailable.
+
+Summary selection:
+
+- `summary.mode = live_cli` when live output is usable
+- `summary.mode = hook_e2e_fallback` when live output is unusable and deterministic probe is not selected
+- `summary.mode = deterministic_subagent_probe` when probe output is available
+
+Primary metrics in the report summary:
+
+- `spawn_success_rate`
+- `evidence_injection_rate`
+- `citation_use_rate`
+- `groundedness_rate`
+- `timed_out_cases`
+- `output_observed_rate`
+
+Recommended commands:
+
+```bash
+# Default (skip unless explicitly enabled)
+node --test tests/evals/subagent-memory-rag-live.eval.cjs
+
+# Live run with practical limits
+RUN_LIVE_SUBAGENT_EVALS=on SUBAGENT_LIVE_EVAL_TIMEOUT_MS=120000 SUBAGENT_LIVE_EVAL_MAX_TURNS=3 node --test tests/evals/subagent-memory-rag-live.eval.cjs
+
+# Strict threshold enforcement (CI/nightly)
+RUN_LIVE_SUBAGENT_EVALS=on RUN_LIVE_SUBAGENT_EVALS_STRICT=on SUBAGENT_LIVE_EVAL_TIMEOUT_MS=120000 SUBAGENT_LIVE_EVAL_MAX_TURNS=3 node --test tests/evals/subagent-memory-rag-live.eval.cjs
+```
 
 ### Cache-stability summary CLI
 

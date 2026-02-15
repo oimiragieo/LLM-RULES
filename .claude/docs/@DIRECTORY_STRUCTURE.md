@@ -82,10 +82,11 @@ context/
 │   ├── constitution.md
 │   ├── behaviour.md
 │   ├── active_context.md
+│   ├── access-stats.json    # Access tracking sidecar (active path)
 │   ├── archive/
 │   ├── named/               # Named memory API: readMemory/writeMemory (CLAUDE.md Section 8)
 │   ├── stm/                 # STM tier: session data written by user-prompt-unified.cjs
-│   ├── mtm/                 # MTM tier: (medium-term memory - future use)
+│   ├── mtm/                 # MTM tier: canonical recent-session storage (active)
 │   └── ltm/                 # LTM tier: summarized session data written by memory-tiers.cjs
 ├── metrics/
 │   ├── hook-metrics.jsonl
@@ -108,7 +109,6 @@ context/
 │   └── [team-name].csv
 ├── tmp/                     # Temporary files (auto-cleaned 24h)
 ├── workflows/               # Workflow state data
-├── access-stats.json        # (legacy root - stats tracking)
 ├── agent-catalog.json       # Generated simplified view of agent-registry.json (NOT a duplicate)
 ├── agent-registry.json      # Agent registry (canonical root location - 35+ cross-cutting references)
 ├── dashboard.json           # Dashboard state

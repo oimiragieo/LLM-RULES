@@ -164,7 +164,6 @@ For troubleshooting workflows and log locations, see `.claude/docs/OBSERVABILITY
 | `REFLECTION_QUEUE_PROCESS_INTERVAL_MS` | number | 600000  | Minimum interval between queue processing runs (ms).    |
 | `REFLECTION_QUEUE_MAX_LINES`           | number | 2000    | Cap reflection-queue.jsonl to last N lines.             |
 | `REFLECTION_QUEUE_PROCESS_TIMEOUT_MS`  | number | 60000   | Timeout for queue processing (ms).                      |
-| `REFLECTION_QUEUE_MAX_LINES`           | number | 5000    | Max lines to keep in reflection-queue.jsonl (rotation). |
 
 ### Model Client Variables
 
@@ -287,6 +286,23 @@ WORKER_ENABLED=true claude
 # Use staging environment
 AGENT_STUDIO_ENV=staging claude
 ```
+
+### Live Eval Harness Variables (Test/Eval)
+
+These variables are used by `tests/evals/subagent-memory-rag-live.eval.cjs` (they are eval harness toggles, not runtime hook controls):
+
+| Variable                             | Values     | Default | Purpose                                                                                 |
+| ------------------------------------ | ---------- | ------- | --------------------------------------------------------------------------------------- |
+| `RUN_LIVE_SUBAGENT_EVALS`            | on/off     | off     | Enables live eval execution; when off, the eval test is skipped.                       |
+| `RUN_LIVE_SUBAGENT_EVALS_STRICT`     | on/off     | off     | Enables strict threshold assertions for summary rates.                                  |
+| `SUBAGENT_LIVE_EVAL_TIMEOUT_MS`      | number     | 120000  | Per-case timeout for live CLI eval runs before forced kill/timeout classification.     |
+| `SUBAGENT_LIVE_EVAL_MAX_TURNS`       | number     | 3       | Max turns passed to `claude -p` during live eval.                                       |
+
+The eval report is written to:
+
+- `.claude/context/runtime/evals/subagent-memory-rag-live-latest.json`
+
+When live CLI stream is unavailable, the report may switch effective summary mode to fallback paths (`hook_e2e_fallback` or `deterministic_subagent_probe`) while preserving `live_cli` diagnostics.
 
 ---
 
