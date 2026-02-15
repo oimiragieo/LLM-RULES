@@ -41,6 +41,7 @@ skills:
   - summarize-changes
   - task-management-protocol
   - token-saver-context-compression
+  - troubleshooting-regression
   - verification-before-completion
   - ripgrep
   - code-semantic-search

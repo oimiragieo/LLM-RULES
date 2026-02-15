@@ -17,17 +17,20 @@ The memory system has two distinct subsystems:
 Session memory is organized in three tiers based on recency:
 
 **STM (Short-Term Memory)** — Current session
+
 - Location: `.claude/context/memory/stm/`
 - Format: `session_current.json`
 - Retention: Current session only
 
 **MTM (Mid-Term Memory)** — Recent sessions
+
 - Location: `.claude/context/memory/mtm/`
 - Format: `session_*.json`
 - Retention: Last 10 sessions
 - Promotion: On session end, STM → MTM
 
 **LTM (Long-Term Memory)** — Permanent knowledge
+
 - Location: `.claude/context/memory/ltm/`
 - Format: `summary_*.json` (compressed summaries)
 - Retention: Indefinite
@@ -35,6 +38,7 @@ Session memory is organized in three tiers based on recency:
 ### 2. File-Based Rotation
 
 Markdown memory files are rotated based on file size:
+
 - Active files: `.claude/context/memory/` (root)
 - Archive: `.claude/context/memory/archive/`
 - Files: `learnings.md`, `decisions.md`, `issues.md`
@@ -90,6 +94,7 @@ manager.recordDiscovery({ text: 'BM25 indexer supports lazy IDF', area: 'search'
 ```
 
 **Additional data stores** (in `.claude/context/memory/`):
+
 - `gotchas.json` — Gotcha records
 - `patterns.json` — Pattern records
 - `access-stats.json` — Access statistics

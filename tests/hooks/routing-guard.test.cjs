@@ -795,8 +795,7 @@ describe('routing-guard', () => {
       const result = routingGuard.checkRouterBash(
         'Bash',
         {
-          command:
-            'sleep 10 && cat /c/Users/oimir/AppData/Local/Temp/claude-debug-tail.txt',
+          command: 'sleep 10 && cat /c/Users/oimir/AppData/Local/Temp/claude-debug-tail.txt',
         },
         { permission_mode: 'bypassPermissions' }
       );

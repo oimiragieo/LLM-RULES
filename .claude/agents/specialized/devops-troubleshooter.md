@@ -30,6 +30,7 @@ skills:
   - cloud-devops-expert
   - code-semantic-search
   - token-saver-context-compression
+  - troubleshooting-regression
   - container-expert
   - context-compressor
   - debugging

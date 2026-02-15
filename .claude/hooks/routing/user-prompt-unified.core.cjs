@@ -1041,6 +1041,8 @@ function recordUserPromptResult(result) {
     return result;
   }
   const expectedFiles = [
+    { name: 'patterns.json', description: 'Reusable implementation patterns' },
+    { name: 'gotchas.json', description: 'Recurring pitfalls and fixes' },
     { name: 'learnings.md', description: 'Patterns, solutions, preferences' },
     { name: 'decisions.md', description: 'Architecture Decision Records' },
     { name: 'issues.md', description: 'Known issues, blockers' },

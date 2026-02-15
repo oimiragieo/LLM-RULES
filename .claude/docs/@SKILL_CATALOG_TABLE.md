@@ -2,7 +2,7 @@
 
 **Source:** CLAUDE.md Section 8.5
 **Version:** v2.2.1
-**Last Updated:** 2026-02-09
+**Last Updated:** 2026-02-15
 
 ---
 
@@ -31,6 +31,7 @@ Complete catalog of 94 active skills (92 maintained + 1 deprecated alias + 1 sci
 | `workflow-updater`                   | refresh existing workflows with gate/idempotency checks    |
 | `memory-quality-auditor`             | audit memory retrieval quality and groundedness            |
 | `eval-harness-updater`               | refresh live/fallback eval harness reliability             |
+| `troubleshooting-regression`         | debug-log-first regression diagnosis and validation        |
 | `template-creator`                   | create templates                                           |
 | `schema-creator`                     | create JSON schemas                                        |
 | `hook-creator`                       | create safety/validation hooks                             |

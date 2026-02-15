@@ -3,8 +3,8 @@
 # Command Catalog
 
 **Last Updated:** 2026-02-15
-**Total Commands:** 88
-**Pattern:** Thin delegators to skills (86 delegators, 1 enriched, 1 standalone)
+**Total Commands:** 89
+**Pattern:** Thin delegators to skills (87 delegators, 1 enriched, 1 standalone)
 
 This catalog documents all slash commands in the agent-studio framework with their skill delegations and usage contexts.
 
@@ -31,6 +31,7 @@ This catalog documents all slash commands in the agent-studio framework with the
 | `/complexity-assessment`              | Task complexity classification               | `complexity-assessment`              | Planning     |
 | `/compress`                           | Compress context to reduce tokens            | `context-compressor`                 | Context      |
 | `/token-saver-context-compression`    | Search-aware context compression             | `token-saver-context-compression`    | Context      |
+| `/troubleshooting-regression`         | Debug-log-first regression troubleshooting   | `troubleshooting-regression`         | Context      |
 | `/skill-updater`                      | Refresh existing skills with TDD gates       | `skill-updater`                      | Creator      |
 | `/skill-refresh`                      | Alias for skill updater refresh workflow     | `skill-updater`                      | Creator      |
 | `/container-expert`                   | Docker/container expertise                   | `container-expert`                   | DevOps       |

@@ -26,6 +26,13 @@ const PLANNER_LOOP_STATE_FILE = path.join(
   'runtime',
   'planner-first-loop-state.json'
 );
+const TOOL_GOVERNANCE_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'tool-governance-state.json'
+);
 
 function backupState(filePath) {
   return fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf-8') : null;
@@ -50,6 +57,7 @@ describe('pre-task-unified exports and context tracker', () => {
   let loopStateBackup = null;
   let tasklistLoopStateBackup = null;
   let plannerLoopStateBackup = null;
+  let governanceStateBackup = null;
   let originalEnv = {};
 
   beforeEach(() => {
@@ -58,6 +66,7 @@ describe('pre-task-unified exports and context tracker', () => {
     loopStateBackup = backupState(LOOP_STATE_FILE);
     tasklistLoopStateBackup = backupState(TASKLIST_LOOP_STATE_FILE);
     plannerLoopStateBackup = backupState(PLANNER_LOOP_STATE_FILE);
+    governanceStateBackup = backupState(TOOL_GOVERNANCE_STATE_FILE);
     originalEnv = { ...process.env };
     preTaskUnified.invalidateCachedState();
   });
@@ -67,6 +76,7 @@ describe('pre-task-unified exports and context tracker', () => {
     restoreState(LOOP_STATE_FILE, loopStateBackup);
     restoreState(TASKLIST_LOOP_STATE_FILE, tasklistLoopStateBackup);
     restoreState(PLANNER_LOOP_STATE_FILE, plannerLoopStateBackup);
+    restoreState(TOOL_GOVERNANCE_STATE_FILE, governanceStateBackup);
     for (const key of Object.keys(process.env)) {
       if (!(key in originalEnv)) delete process.env[key];
     }
@@ -101,5 +111,63 @@ describe('pre-task-unified exports and context tracker', () => {
       tool_input: { prompt: 'You are DEVELOPER. Fix the login bug in authentication module.' },
     });
     assert.strictEqual(result.pass, true);
+  });
+
+  it('should block Task when no recent core memory read evidence exists', () => {
+    writeState(ROUTER_STATE_FILE, {
+      mode: 'router',
+      requiresPlannerFirst: false,
+      plannerSpawned: false,
+      requiresSecurityReview: false,
+      taskListCalledSincePrompt: true,
+    });
+    process.env.CLAUDE_SESSION_ID = `memory-block-${Date.now()}`;
+    process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+
+    restoreState(TOOL_GOVERNANCE_STATE_FILE, null);
+    const result = preTaskUnified.runAllChecks({
+      tool_name: 'Task',
+      tool_input: {
+        prompt: 'You are DEVELOPER. Implement a small fix.',
+      },
+    });
+
+    assert.strictEqual(result.pass, false);
+    assert.strictEqual(result.exitCode, 2);
+    assert.ok(String(result.message || '').includes('[MEMORY-FIRST]'));
+  });
+
+  it('should allow Task when recent core memory read evidence exists', () => {
+    const sessionId = `memory-allow-${Date.now()}`;
+    writeState(ROUTER_STATE_FILE, {
+      mode: 'router',
+      requiresPlannerFirst: false,
+      plannerSpawned: false,
+      requiresSecurityReview: false,
+      taskListCalledSincePrompt: true,
+    });
+    process.env.CLAUDE_SESSION_ID = sessionId;
+    process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+
+    writeState(TOOL_GOVERNANCE_STATE_FILE, {
+      sessions: {
+        [sessionId]: {
+          lastCoreMemoryReadAt: Date.now(),
+          lastCoreMemoryReadPath: '.claude/context/memory/decisions.md',
+          lastSeenAt: Date.now(),
+        },
+      },
+    });
+
+    const result = preTaskUnified.runAllChecks({
+      tool_name: 'Task',
+      tool_input: {
+        task_id: 'task-123',
+        prompt: 'You are DEVELOPER. Implement a small fix.',
+      },
+    });
+
+    assert.strictEqual(result.pass, true);
+    assert.strictEqual(result.exitCode, 0);
   });
 });

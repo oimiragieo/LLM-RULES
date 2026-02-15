@@ -71,6 +71,15 @@ async function main() {
       console.warn(`[pre-tool-unified:taskupdate-first] ${taskUpdateFirst.warning}`);
     }
 
+    const bashArtifactWriteResult = guardrails.checkBashArtifactWriteSafety(toolName, toolInput);
+    if (bashArtifactWriteResult.action === 'block') {
+      console.log(formatResult('block', bashArtifactWriteResult.message));
+      process.exit(2);
+    }
+    if (bashArtifactWriteResult.warning) {
+      console.warn(`[pre-tool-unified:guardrail] ${bashArtifactWriteResult.warning}`);
+    }
+
     const guardrailResult = guardrails.checkAgentGuardrails(hookInput, toolName, toolInput);
     if (guardrailResult.action === 'block') {
       console.log(formatResult('block', guardrailResult.message));
@@ -133,6 +142,7 @@ module.exports = {
   createDirectoryListingFile: readSafety.createDirectoryListingFile,
   readAgentGuardrailsState: guardrails.readAgentGuardrailsState,
   writeAgentGuardrailsState: guardrails.writeAgentGuardrailsState,
+  checkBashArtifactWriteSafety: guardrails.checkBashArtifactWriteSafety,
   checkAgentGuardrails: guardrails.checkAgentGuardrails,
   extractTaskOutputPathsFromCommand: guardrails.extractTaskOutputPathsFromCommand,
   isTaskOutputPollingCommand: guardrails.isTaskOutputPollingCommand,

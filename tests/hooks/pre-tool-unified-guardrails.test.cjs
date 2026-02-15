@@ -5,6 +5,7 @@ const path = require('node:path');
 const os = require('node:os');
 
 const {
+  checkBashArtifactWriteSafety,
   checkAgentGuardrails,
   readAgentGuardrailsState,
   writeAgentGuardrailsState,
@@ -20,6 +21,7 @@ describe('pre-tool-unified agent guardrails', () => {
       AGENT_FILE_ALLOWLIST_ENFORCEMENT: process.env.AGENT_FILE_ALLOWLIST_ENFORCEMENT,
       AGENT_EDIT_CHECKPOINT_ENFORCEMENT: process.env.AGENT_EDIT_CHECKPOINT_ENFORCEMENT,
       AGENT_BASH_POLL_GUARD: process.env.AGENT_BASH_POLL_GUARD,
+      AGENT_BASH_ARTIFACT_WRITE_GUARD: process.env.AGENT_BASH_ARTIFACT_WRITE_GUARD,
       AGENT_BASH_POLL_REPEAT_THRESHOLD: process.env.AGENT_BASH_POLL_REPEAT_THRESHOLD,
       AGENT_BASH_POLL_STALE_MS: process.env.AGENT_BASH_POLL_STALE_MS,
       TASKUPDATE_FIRST_ENFORCEMENT: process.env.TASKUPDATE_FIRST_ENFORCEMENT,
@@ -30,6 +32,7 @@ describe('pre-tool-unified agent guardrails', () => {
     process.env.AGENT_FILE_ALLOWLIST_ENFORCEMENT = 'block';
     process.env.AGENT_EDIT_CHECKPOINT_ENFORCEMENT = 'block';
     process.env.AGENT_BASH_POLL_GUARD = 'block';
+    process.env.AGENT_BASH_ARTIFACT_WRITE_GUARD = 'block';
     process.env.AGENT_BASH_POLL_REPEAT_THRESHOLD = '3';
     process.env.AGENT_BASH_POLL_STALE_MS = '50';
     process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'off';
@@ -226,6 +229,48 @@ describe('pre-tool-unified agent guardrails', () => {
       assert.match(results[5].message, /stale task-output polling/i);
 
       fs.rmSync(tempDir, { recursive: true, force: true });
+    });
+  });
+
+  test('blocks bash redirection writes to reports/memory artifacts', () => {
+    withTempGuardrailState(stateFile => {
+      seedSession(stateFile, 'session-8');
+      const hookInput = {
+        session_id: 'session-8',
+        allowed_tools: ['TaskUpdate', 'Bash', 'Write'],
+      };
+      const result = checkAgentGuardrails(
+        hookInput,
+        'Bash',
+        {
+          command:
+            'cat > "/c/dev/projects/agent-studio/.claude/context/reports/example.md" << \'EOF\'\nhello\nEOF',
+        },
+        stateFile
+      );
+      assert.equal(result.action, 'block');
+      assert.match(result.message, /Bash redirection\/heredoc/i);
+    });
+  });
+
+  test('generic bash artifact write guard blocks even outside agent-scoped sessions', () => {
+    withTempGuardrailState(() => {
+      const result = checkBashArtifactWriteSafety('Bash', {
+        command:
+          "cat > /c/dev/projects/agent-studio/.claude/context/reports/code-review-2026-02-15.md << 'EOF'\ntext\nEOF",
+      });
+      assert.equal(result.action, 'block');
+      assert.match(result.message, /Use Write\/Edit tools/i);
+    });
+  });
+
+  test('generic bash artifact write guard blocks relative .claude context writes', () => {
+    withTempGuardrailState(() => {
+      const result = checkBashArtifactWriteSafety('Bash', {
+        command: "cat > .claude/context/reports/test-bash-write-guard.md << 'EOF'\ntext\nEOF",
+      });
+      assert.equal(result.action, 'block');
+      assert.match(result.message, /Bash redirection\/heredoc/i);
     });
   });
 });

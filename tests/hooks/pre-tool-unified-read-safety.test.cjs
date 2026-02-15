@@ -360,6 +360,24 @@ describe('pre-tool-unified read safety', () => {
     });
   });
 
+  test('checkReadSafety records core memory read evidence for session governance', () => {
+    const sessionId = `memory-core-${Date.now()}`;
+    withFileRestored(governanceStatePath, () => {
+      const result = checkReadSafety(
+        'Read',
+        { file_path: '.claude/context/memory/decisions.md', offset: 0, limit: 200 },
+        { session_id: sessionId }
+      );
+      assert.strictEqual(result.action, 'allow');
+
+      const governance = JSON.parse(fs.readFileSync(governanceStatePath, 'utf8'));
+      const entry = governance?.sessions?.[sessionId];
+      assert.ok(entry);
+      assert.ok(Number(entry.lastCoreMemoryReadAt || 0) > 0);
+      assert.strictEqual(entry.lastCoreMemoryReadPath, '.claude/context/memory/decisions.md');
+    });
+  });
+
   test('ensureReflectionReadTarget creates missing reflection reminder file', () => {
     withFileRestored(reminderPath, () => {
       fs.mkdirSync(reflectionRuntimeDir, { recursive: true });

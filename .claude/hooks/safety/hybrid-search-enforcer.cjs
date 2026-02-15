@@ -56,6 +56,17 @@ function hasUnsupportedTypeAlias(toolInput) {
   );
 }
 
+function sanitizeUnsupportedTypeAlias(toolInput) {
+  const input = toolInput && typeof toolInput === 'object' ? { ...toolInput } : {};
+  const keys = ['type', 'file_type', 'fileType'];
+  for (const key of keys) {
+    if (typeof input[key] === 'string' && input[key].trim().toLowerCase() === 'cjs') {
+      delete input[key];
+    }
+  }
+  return input;
+}
+
 function decide(toolInput) {
   if (hasUnsupportedTypeAlias(toolInput)) {
     return { allow: false, reason: 'unsupported_type_alias' };
@@ -99,6 +110,20 @@ async function main() {
     }
 
     const message = blockMessage();
+    if (decision.reason === 'unsupported_type_alias' && mode === 'warn') {
+      const normalizedInput = sanitizeUnsupportedTypeAlias(toolInput);
+      auditLog('hybrid-search-enforcer', 'warn_normalized', { reason: decision.reason });
+      console.log(
+        formatResult({
+          permissionDecision: 'allow',
+          result: 'warn',
+          message,
+          permissionDecisionReason: message,
+          tool_input: normalizedInput,
+        })
+      );
+      return process.exit(0);
+    }
     if (mode === 'warn') {
       auditLog('hybrid-search-enforcer', 'warn', { reason: decision.reason });
       console.log(formatResult('warn', message));
@@ -126,6 +151,7 @@ module.exports = {
   hasAdvancedRegex,
   isTargetedSingleFile,
   hasUnsupportedTypeAlias,
+  sanitizeUnsupportedTypeAlias,
   decide,
   getMode,
   blockMessage,

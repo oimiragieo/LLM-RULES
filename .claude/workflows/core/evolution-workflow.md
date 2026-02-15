@@ -1087,19 +1087,20 @@ This workflow integrates with:
 
 **Related Skills**:
 
-| Skill                | Used In Phase                      |
-| -------------------- | ---------------------------------- |
-| `research-synthesis` | OBTAIN (MANDATORY)                 |
-| `assimilate`         | OBTAIN (optional benchmark parity) |
-| `agent-creator`      | LOCK                               |
-| `agent-updater`      | LOCK (existing agent refresh)      |
-| `skill-creator`      | LOCK                               |
-| `skill-updater`      | LOCK (existing skill refresh)      |
-| `workflow-creator`   | LOCK                               |
-| `workflow-updater`   | LOCK (existing workflow refresh)   |
-| `hook-creator`       | LOCK                               |
-| `schema-creator`     | LOCK                               |
-| `template-creator`   | LOCK                               |
+| Skill                        | Used In Phase                               |
+| ---------------------------- | ------------------------------------------- |
+| `research-synthesis`         | OBTAIN (MANDATORY)                          |
+| `assimilate`                 | OBTAIN (optional benchmark parity)          |
+| `agent-creator`              | LOCK                                        |
+| `agent-updater`              | LOCK (existing agent refresh)               |
+| `skill-creator`              | LOCK                                        |
+| `skill-updater`              | LOCK (existing skill refresh)               |
+| `workflow-creator`           | LOCK                                        |
+| `workflow-updater`           | LOCK (existing workflow refresh)            |
+| `hook-creator`               | LOCK                                        |
+| `schema-creator`             | LOCK                                        |
+| `template-creator`           | LOCK                                        |
+| `troubleshooting-regression` | VERIFY (regression triage + fix validation) |
 
 ---
 

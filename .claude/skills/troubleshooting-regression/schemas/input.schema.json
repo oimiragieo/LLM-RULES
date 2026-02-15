@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "troubleshooting-regression Input Schema",
+  "type": "object",
+  "properties": {
+    "prompt": {
+      "type": "string",
+      "description": "Optional prompt to run via claude -p ... -d before log analysis"
+    },
+    "logPath": {
+      "type": "string",
+      "description": "Optional absolute path to debug log; latest log is used when omitted"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["quick", "full"],
+      "default": "quick"
+    },
+    "strict": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "additionalProperties": false
+}

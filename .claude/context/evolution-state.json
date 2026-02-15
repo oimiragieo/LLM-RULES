@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastEvolution": "2026-02-15-creation-preflight-policy-skill-pack",
+  "lastEvolution": "2026-02-15-troubleshooting-regression-skill",
   "evolutions": [
     {
       "id": "2026-02-14-framework-context-skill",
@@ -119,6 +119,14 @@
       "artifactType": "workflow",
       "name": "creation-preflight-policy-skill-pack",
       "path": ".claude/workflows/core/evolution-workflow.md",
+      "status": "completed",
+      "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-15-troubleshooting-regression-skill",
+      "artifactType": "skill",
+      "name": "troubleshooting-regression",
+      "path": ".claude/skills/troubleshooting-regression/SKILL.md",
       "status": "completed",
       "completedAt": "2026-02-15T00:00:00.000Z"
     }

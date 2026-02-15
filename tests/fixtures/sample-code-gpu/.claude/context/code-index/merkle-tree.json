@@ -1,0 +1,20 @@
+{
+  "type": "directory",
+  "name": "sample-code-gpu",
+  "hash": "87c84d6ef222bed4f74023efc6db2a7c141c75392e2b622856b77d398438c1c8",
+  "metadata": {
+    "path": ""
+  },
+  "children": {
+    "auth.js": {
+      "type": "file",
+      "name": "auth.js",
+      "hash": "8d31c4f4c0ec322553b0e5e53de04a925f3f581e0dda5eef12adf31407b533cb",
+      "metadata": {
+        "path": "auth.js",
+        "size": 270,
+        "mtime": 1771185594346.309
+      }
+    }
+  }
+}

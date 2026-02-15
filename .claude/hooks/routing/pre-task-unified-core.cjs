@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
@@ -18,6 +19,17 @@ const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manage
 const state = require('./pre-task-unified-state.cjs');
 const helpers = require('./pre-task-unified-helpers.cjs');
 const ownership = require('./pre-task-unified-ownership.cjs');
+const TOOL_GOVERNANCE_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'tool-governance-state.json'
+);
+const TASK_REQUIRE_CORE_MEMORY_READ = String(process.env.TASK_REQUIRE_CORE_MEMORY_READ || 'on')
+  .trim()
+  .toLowerCase();
+const CORE_MEMORY_READ_WINDOW_MS = Number(process.env.CORE_MEMORY_READ_WINDOW_MS || 60 * 60 * 1000);
 
 const {
   LOOP_STATE_FILE,
@@ -115,6 +127,55 @@ function checkAgentContextPreTracker(hookInput) {
   }
 
   return { pass: true };
+}
+
+function checkCoreMemoryReadBeforeTask(hookInput) {
+  if (TASK_REQUIRE_CORE_MEMORY_READ === 'off') {
+    return { pass: true };
+  }
+
+  const permissionMode = String(
+    hookInput?.permission_mode || hookInput?.permissionMode || ''
+  ).toLowerCase();
+  if (permissionMode === 'bypasspermissions') {
+    return { pass: true };
+  }
+
+  const sessionId = resolveStableSessionId(hookInput);
+  const now = Date.now();
+  let sessions = {};
+  try {
+    if (!fs.existsSync(TOOL_GOVERNANCE_STATE_FILE)) {
+      return {
+        pass: false,
+        result: 'block',
+        message:
+          '[MEMORY-FIRST] Core memory evidence missing for this session. ' +
+          'Read `.claude/context/memory/patterns.json`, `.claude/context/memory/gotchas.json`, ' +
+          '`.claude/context/memory/decisions.md`, and `.claude/context/memory/issues.md` before Task spawn.',
+      };
+    }
+    const parsed = JSON.parse(fs.readFileSync(TOOL_GOVERNANCE_STATE_FILE, 'utf8'));
+    sessions = parsed?.sessions || {};
+  } catch (_err) {
+    sessions = {};
+  }
+
+  const entry = sessions[sessionId];
+  const lastReadAt = Number(entry?.lastCoreMemoryReadAt || 0);
+  const hasRecentMemoryRead = lastReadAt > 0 && now - lastReadAt <= CORE_MEMORY_READ_WINDOW_MS;
+  if (hasRecentMemoryRead) {
+    return { pass: true };
+  }
+
+  return {
+    pass: false,
+    result: 'block',
+    message:
+      '[MEMORY-FIRST] Task spawn blocked: no recent core memory read found for this session. ' +
+      'Read `.claude/context/memory/patterns.json`, `.claude/context/memory/gotchas.json`, ' +
+      '`.claude/context/memory/decisions.md`, and `.claude/context/memory/issues.md`, then retry Task().',
+  };
 }
 
 function checkRoutingGuard(toolName, toolInput, hookInput = null) {
@@ -385,6 +446,15 @@ function runAllChecks(hookInput) {
 
   checkAgentContextPreTracker(hookInput);
 
+  const memoryFirstResult = checkCoreMemoryReadBeforeTask(hookInput);
+  if (!memoryFirstResult.pass) {
+    return {
+      pass: false,
+      exitCode: memoryFirstResult.result === 'block' ? 2 : 0,
+      message: memoryFirstResult.message,
+    };
+  }
+
   const routingResult = checkRoutingGuard(toolName, toolInput, hookInput);
   if (!routingResult.pass) {
     return {
@@ -465,6 +535,7 @@ module.exports = {
   runAllChecks,
   checkTaskListFirst,
   checkAgentContextPreTracker,
+  checkCoreMemoryReadBeforeTask,
   checkRoutingGuard,
   checkLoopPrevention,
   isPlannerSpawn,

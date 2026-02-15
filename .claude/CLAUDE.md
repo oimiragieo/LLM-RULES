@@ -681,6 +681,8 @@ The memory system uses two subsystems:
 
 **token-saver-context-compression** — Search-aware context compression workflow (hybrid search → evidence gate → MemoryRecord-ready payload mapping). Use when large context must be distilled without losing grounded evidence.
 
+**troubleshooting-regression** — Debug-log-first regression troubleshooting workflow (reproduce → extract findings → map owner hook/module → patch + targeted validation). Use when sessions stall, hooks misfire, or memory/search routing regresses.
+
 ### 8.6 ENTERPRISE WORKFLOWS
 
 > **REFERENCE:** See **@ENTERPRISE_WORKFLOWS.md** for complete workflow catalog.

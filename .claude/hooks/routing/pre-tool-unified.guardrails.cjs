@@ -26,6 +26,7 @@ const AGENT_BASH_POLL_WINDOW_MS = Number(process.env.AGENT_BASH_POLL_WINDOW_MS |
 const AGENT_BASH_POLL_MAX_TRACKED_FILES = Number(
   process.env.AGENT_BASH_POLL_MAX_TRACKED_FILES || 20
 );
+const AGENT_BASH_ARTIFACT_WRITE_GUARD = 'AGENT_BASH_ARTIFACT_WRITE_GUARD';
 const TASKUPDATE_FIRST_WINDOW_MS = Number(
   process.env.TASKUPDATE_FIRST_WINDOW_MS || 24 * 60 * 60 * 1000
 );
@@ -253,6 +254,28 @@ function isCheckpointCommand(command) {
   );
 }
 
+function isBashArtifactWriteCommand(command) {
+  if (!command || typeof command !== 'string') return false;
+  const writesWithRedirection = /(cat\s*<<|cat\s+>|>>|\btee\b)/i.test(command);
+  if (!writesWithRedirection) return false;
+  return /(?:^|[\s"'`\\/])\.claude[\\/]+context[\\/]+(?:reports|memory)[\\/]/i.test(command);
+}
+
+function checkBashArtifactWriteSafety(toolName, toolInput) {
+  if (toolName !== 'Bash') return { checked: false, reason: 'not_bash' };
+  const mode = (process.env[AGENT_BASH_ARTIFACT_WRITE_GUARD] || 'block').toLowerCase();
+  if (mode === 'off') return { checked: false, reason: 'disabled' };
+  const command = getBashCommand(toolInput);
+  if (!isBashArtifactWriteCommand(command)) return { checked: true, action: 'allow' };
+  const message =
+    '[AGENT-GUARDRAIL] Bash redirection/heredoc to project artifact paths is blocked. ' +
+    'Use Write/Edit tools for reports or memory artifacts instead of `cat >`, `>>`, or `tee`.';
+  if (mode === 'warn') {
+    return { checked: true, action: 'allow', warning: message };
+  }
+  return { checked: true, action: 'block', message };
+}
+
 function normalizeToolPath(rawPath) {
   if (!rawPath || typeof rawPath !== 'string') return null;
   const canonical = canonicalizePathForPlatform(rawPath, PROJECT_ROOT);
@@ -298,6 +321,19 @@ function checkAgentGuardrails(
 
   if (toolName === 'Bash') {
     const command = getBashCommand(toolInput);
+    const artifactWriteMode = (
+      process.env[AGENT_BASH_ARTIFACT_WRITE_GUARD] || 'block'
+    ).toLowerCase();
+    if (artifactWriteMode !== 'off' && isBashArtifactWriteCommand(command)) {
+      const message =
+        '[AGENT-GUARDRAIL] Bash redirection/heredoc to project artifact paths is blocked. ' +
+        'Use Write/Edit tools for reports or memory artifacts instead of `cat >`, `>>`, or `tee`.';
+      if (artifactWriteMode === 'warn') {
+        return { checked: true, action: 'allow', warning: message };
+      }
+      return { checked: true, action: 'block', message };
+    }
+
     const pollMode = (process.env[AGENT_BASH_POLL_GUARD] || 'block').toLowerCase();
     if (pollMode !== 'off') {
       const pollGuard = evaluateTaskOutputPolling(command, entry);
@@ -403,6 +439,7 @@ function checkAgentGuardrails(
 module.exports = {
   readAgentGuardrailsState,
   writeAgentGuardrailsState,
+  checkBashArtifactWriteSafety,
   checkAgentGuardrails,
   extractTaskOutputPathsFromCommand,
   isTaskOutputPollingCommand,

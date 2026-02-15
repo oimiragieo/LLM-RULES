@@ -139,27 +139,33 @@ function detectUnsupportedRipgrepType(command) {
  * @param {string} command - Raw shell command
  * @returns {string|null} Blocking reason or null when safe
  */
-function detectBashReportWrite(command) {
+function detectBashArtifactWrite(command) {
   if (!command || typeof command !== 'string') return null;
 
-  const reportPathPattern = /\.claude[\\/]+context[\\/]+reports[\\/]+/i;
-  if (!reportPathPattern.test(command)) return null;
+  const artifactPathPattern = /\.claude[\\/]+context[\\/]+(?:reports|memory)[\\/]+/i;
+  if (!artifactPathPattern.test(command)) return null;
 
   const writesViaRedirection =
-    /(?:^|[\s;|&])(?:cat|echo|printf)\b[\s\S]*?(?:>>?|1>>?)\s*['"]?[^'"\s]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(
+    /(?:^|[\s;|&])(?:cat|echo|printf)\b[\s\S]*?(?:>>?|1>>?)\s*['"]?[^'"\s]*\.claude[\\/]+context[\\/]+(?:reports|memory)[\\/]+/i.test(
       command
-    ) || /(?:>>?|1>>?)\s*['"]?[^'"\s]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(command);
-  const writesViaTee = /\btee\b[\s\S]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(command);
+    ) ||
+    /(?:>>?|1>>?)\s*['"]?[^'"\s]*\.claude[\\/]+context[\\/]+(?:reports|memory)[\\/]+/i.test(
+      command
+    );
+  const writesViaTee = /\btee\b[\s\S]*\.claude[\\/]+context[\\/]+(?:reports|memory)[\\/]+/i.test(
+    command
+  );
   const writesViaFileOps =
-    /\b(?:cp|mv|touch)\b[\s\S]*\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(command);
+    /\b(?:cp|mv|touch)\b[\s\S]*\.claude[\\/]+context[\\/]+(?:reports|memory)[\\/]+/i.test(command);
 
   if (!writesViaRedirection && !writesViaTee && !writesViaFileOps) return null;
 
   return (
-    'Bash writes to .claude/context/reports are not allowed for task artifacts. ' +
+    'Bash writes to .claude/context/reports or .claude/context/memory are not allowed for task artifacts. ' +
     'Use Write/Edit tools to create report files so hooks can validate wiring and completion.'
   );
 }
+const detectBashReportWrite = detectBashArtifactWrite;
 
 /**
  * Detect brittle cross-shell counting one-liners that frequently fail on Windows
@@ -287,12 +293,8 @@ async function main() {
       process.exit(2);
     }
 
-    const reportWriteReason = detectBashReportWrite(command);
+    const reportWriteReason = detectBashArtifactWrite(command);
     if (reportWriteReason) {
-      if (isBypassPermissionsMode(hookInput)) {
-        console.error(`[bash-command-validator][bypass] ${reportWriteReason}`);
-        process.exit(0);
-      }
       console.error(formatBlockedMessage(command, reportWriteReason));
       process.exit(2);
     }
@@ -377,6 +379,7 @@ module.exports = {
   detectUnsupportedRipgrepType,
   detectRipgrepUnavailable,
   buildVersionProbeSpawnOptions,
+  detectBashArtifactWrite,
   detectBashReportWrite,
   detectBrittleCrossShellCount,
   isBypassPermissionsMode,

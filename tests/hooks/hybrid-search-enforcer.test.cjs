@@ -7,6 +7,7 @@ const {
   hasAdvancedRegex,
   isTargetedSingleFile,
   hasUnsupportedTypeAlias,
+  sanitizeUnsupportedTypeAlias,
   decide,
   getMode,
 } = require('../../.claude/hooks/safety/hybrid-search-enforcer.cjs');
@@ -39,6 +40,19 @@ test('decide blocks unsupported cjs type alias before search execution', () => {
   const decision = decide({ pattern: 'TaskUpdate', type: 'cjs' });
   assert.equal(decision.allow, false);
   assert.equal(decision.reason, 'unsupported_type_alias');
+});
+
+test('sanitizeUnsupportedTypeAlias removes cjs type keys and keeps other fields', () => {
+  const sanitized = sanitizeUnsupportedTypeAlias({
+    pattern: 'TaskUpdate',
+    type: 'cjs',
+    file_type: 'CJS',
+    path: 'src/app.cjs',
+  });
+  assert.equal('type' in sanitized, false);
+  assert.equal('file_type' in sanitized, false);
+  assert.equal(sanitized.path, 'src/app.cjs');
+  assert.equal(sanitized.pattern, 'TaskUpdate');
 });
 
 test('getMode defaults to warn and validates values', () => {

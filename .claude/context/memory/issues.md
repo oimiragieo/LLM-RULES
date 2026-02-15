@@ -286,3 +286,48 @@
 - Regex validator completeness (known-bad/good inputs)
 - Hook input malformed data handling
 - Memory leak scenarios (long-running processes)
+
+---
+
+## QA Audit 2026-02-15 — Critical Test Coverage Gaps
+
+**Date**: 2026-02-15
+**Severity**: CRITICAL
+**Impact**: Core subsystems have 0% test coverage
+
+**Critical Findings**:
+
+1. **39 memory modules untested** (0% coverage) — Risk: data loss/corruption
+   - memory-sanitizer.cjs (prototype pollution protection)
+   - memory-lifecycle.cjs (STM→MTM→LTM transitions)
+   - memory-extraction.cjs (entity extraction)
+   - lancedb-client-impl.cjs (vector store operations)
+   - memory-rotator.cjs (40KB/80KB threshold enforcement)
+
+2. **17 routing modules untested** (0% coverage) — Risk: misrouting
+   - intent-classifier.cjs (semantic intent matching)
+   - fuzzy-intent-matcher.cjs (specialist-first routing)
+   - routing-table.cjs (agent selection)
+   - task-lifecycle-state.cjs (state transitions)
+   - task-claim-ledger.cjs (concurrent ownership)
+
+3. **No regression tests** for known bugs:
+   - Context overflow (5+ parallel agents incident 2026-02-09)
+   - Memory rotation threshold violations (74KB decisions.md, 62KB issues.md)
+   - Windows path normalization (glob pattern backslashes)
+   - Hook registration staleness (requires session restart)
+
+4. **No security tests** (OWASP ASI):
+   - Memory poisoning (prototype pollution via **proto**)
+   - Prompt injection (instruction marker detection)
+   - Tool misuse (blacklist bypass attempts)
+
+5. **Test quality issues**:
+   - Tests check internal state instead of behavior (ADR-103 violation)
+   - Mocking overuse (false confidence)
+   - Missing negative tests (error paths untested)
+   - No integration boundary tests
+
+**Test Debt**: ~150 missing test files, 4-6 weeks effort (2 devs, TDD)
+
+**Full Report**: `.claude/context/reports/qa/qa-audit-2026-02-15.md`

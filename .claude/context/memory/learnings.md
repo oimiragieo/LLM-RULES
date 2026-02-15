@@ -421,3 +421,12 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Added `memory-quality-auditor` for retrieval drift/staleness/groundedness audits.
 - Added `eval-harness-updater` for live/fallback eval parser and SLO hardening.
 - Wired EVOLVE/reflection docs and catalogs for these skills and command surfaces.
+
+## Troubleshooting Regression Skill Added (2026-02-15)
+
+- Added new creator-compliant skill bundle: `.claude/skills/troubleshooting-regression/`.
+- Added command surface: `.claude/commands/troubleshooting-regression.md`.
+- Added workflow: `.claude/workflows/troubleshooting-regression-skill-workflow.md`.
+- Added companion tool: `.claude/tools/troubleshooting-regression/troubleshooting-regression.cjs`.
+- Wired into core/specialized troubleshooters: `reflection-agent`, `qa`, `code-reviewer`, `devops-troubleshooter`.
+- Skill enforces debug-log-first diagnosis, search/memory/token-saver guardrail alignment, and targeted regression validation before closure.

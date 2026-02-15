@@ -930,6 +930,7 @@ When OPEN:
 - **creation-feasibility-gate**: Preflight viability checks for proposed new artifacts
 - **compliance-policy-check**: Policy/rule alignment checks before evolution changes
 - **recommend-evolution**: Standardized evolution recommendation recording
+- **troubleshooting-regression**: Debug-log-first triage when reflection detects routing/hook/memory/search regressions
 
 ## Related Agents
 

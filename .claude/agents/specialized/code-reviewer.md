@@ -31,6 +31,7 @@ skills:
   - code-quality-expert
   - code-semantic-search
   - token-saver-context-compression
+  - troubleshooting-regression
   - code-structural-search
   - code-style-validator
   - differential-review

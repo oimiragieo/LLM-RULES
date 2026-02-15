@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "troubleshooting-regression Output Schema",
+  "type": "object",
+  "required": ["ok", "logPath", "totalFindings", "criticalFindings", "findings", "nextActions"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "logPath": { "type": ["string", "null"] },
+    "totalFindings": { "type": "integer", "minimum": 0 },
+    "criticalFindings": { "type": "integer", "minimum": 0 },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "message", "owner", "action"],
+        "properties": {
+          "id": { "type": "string" },
+          "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+          "message": { "type": "string" },
+          "owner": { "type": "string" },
+          "action": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "nextActions": { "type": "array", "items": { "type": "string" } },
+    "runResult": { "type": ["object", "null"], "additionalProperties": true },
+    "error": { "type": "string" }
+  },
+  "additionalProperties": true
+}

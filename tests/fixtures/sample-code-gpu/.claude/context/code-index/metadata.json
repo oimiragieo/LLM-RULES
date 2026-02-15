@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-02-15T19:59:54.711Z",
+  "stats": {
+    "files": 1,
+    "chunks": 2,
+    "embeddings": 2,
+    "byLanguage": {
+      "javascript": 1
+    }
+  },
+  "files": {
+    "C:\\dev\\projects\\agent-studio\\tests\\fixtures\\sample-code-gpu\\auth.js": {
+      "hash": "fc4a62e9cc92efb48818e3fd30c2702c19a391183812541122f5ea98cf6c4e52",
+      "chunks": 2
+    }
+  }
+}

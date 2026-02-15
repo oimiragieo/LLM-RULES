@@ -5,7 +5,11 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { PROJECT_ROOT, canonicalizePathForPlatform } = require('./pre-tool-unified.shared.cjs');
+const {
+  PROJECT_ROOT,
+  canonicalizePathForPlatform,
+  safeParseJSON,
+} = require('./pre-tool-unified.shared.cjs');
 const { ensureDir } = require('./pre-tool-unified.execution.cjs');
 
 const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 120000);
@@ -36,6 +40,7 @@ const TOOL_GOVERNANCE_STATE_PATH = path.join(REFLECTION_RUNTIME_DIR, 'tool-gover
 const TOOL_GOVERNANCE_STALE_MS = Number(
   process.env.TOOL_GOVERNANCE_STALE_MS || 24 * 60 * 60 * 1000
 );
+const CORE_MEMORY_READ_WINDOW_MS = Number(process.env.CORE_MEMORY_READ_WINDOW_MS || 60 * 60 * 1000);
 const REFLECTION_REMINDER_PATH = path.join(REFLECTION_RUNTIME_DIR, 'reflection-reminder.txt');
 const REFLECTION_SPAWN_REQUEST_PATH = path.join(
   REFLECTION_RUNTIME_DIR,
@@ -56,6 +61,12 @@ const SEARCH_EVIDENCE_PATTERNS = [
   /\bhybrid-search\b/i,
   /\bsemantic-search\b/i,
 ];
+const CORE_MEMORY_FILES = new Set([
+  path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'patterns.json'),
+  path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'gotchas.json'),
+  path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'decisions.md'),
+  path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'issues.md'),
+]);
 
 function isReadSafetyAutoWindowEnabled() {
   return (
@@ -101,7 +112,7 @@ function pruneGovernanceSessions(sessions, now = Date.now()) {
 function readGovernanceState() {
   try {
     if (!fs.existsSync(TOOL_GOVERNANCE_STATE_PATH)) return { sessions: {} };
-    const parsed = JSON.parse(fs.readFileSync(TOOL_GOVERNANCE_STATE_PATH, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(TOOL_GOVERNANCE_STATE_PATH, 'utf8'), null);
     if (!parsed || typeof parsed !== 'object' || typeof parsed.sessions !== 'object') {
       return { sessions: {} };
     }
@@ -157,6 +168,16 @@ function recordToolGovernanceEvidence(toolName, toolInput, hookInput) {
     entry.lastTokenSaverAt = now;
   }
 
+  if (toolName === 'Read') {
+    const readPath = resolveReadPath(toolInput);
+    if (readPath && CORE_MEMORY_FILES.has(path.resolve(readPath))) {
+      entry.lastCoreMemoryReadAt = now;
+      entry.lastCoreMemoryReadPath = path
+        .relative(PROJECT_ROOT, path.resolve(readPath))
+        .replace(/\\/g, '/');
+    }
+  }
+
   if (Object.keys(entry).length === 0) return;
   entry.lastSeenAt = now;
   state.sessions[sessionId] = entry;
@@ -176,15 +197,21 @@ function getSessionGovernanceSnapshot(hookInput) {
     hasRecentTokenSaver:
       Number(entry.lastTokenSaverAt || 0) > 0 &&
       now - Number(entry.lastTokenSaverAt || 0) <= READ_TOKEN_SAVER_WINDOW_MS,
+    hasRecentCoreMemoryRead:
+      Number(entry.lastCoreMemoryReadAt || 0) > 0 &&
+      now - Number(entry.lastCoreMemoryReadAt || 0) <= CORE_MEMORY_READ_WINDOW_MS,
     lastSearchAt: Number(entry.lastSearchAt || 0),
     lastTokenSaverAt: Number(entry.lastTokenSaverAt || 0),
+    lastCoreMemoryReadAt: Number(entry.lastCoreMemoryReadAt || 0),
+    lastCoreMemoryReadPath: String(entry.lastCoreMemoryReadPath || ''),
   };
 }
 
 function isContextPressureHigh(hookInput) {
   try {
     if (!fs.existsSync(TOKEN_SLO_STATE_PATH)) return false;
-    const parsed = JSON.parse(fs.readFileSync(TOKEN_SLO_STATE_PATH, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(TOKEN_SLO_STATE_PATH, 'utf8'), null);
+    if (!parsed || typeof parsed !== 'object') return false;
     const sessions = parsed?.sessions || {};
     const sessionId = resolveSessionId(hookInput);
     const entry = sessions?.[sessionId];
