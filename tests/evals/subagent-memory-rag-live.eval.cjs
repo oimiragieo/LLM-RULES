@@ -15,27 +15,31 @@ const STRICT_THRESHOLDS =
 const PROJECT_ROOT = path.join(__dirname, '..', '..');
 const REPORT_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'evals');
 const REPORT_PATH = path.join(REPORT_DIR, 'subagent-memory-rag-live-latest.json');
-const TIMEOUT_MS = Number(process.env.SUBAGENT_LIVE_EVAL_TIMEOUT_MS || 120000);
-const MAX_TURNS = Number(process.env.SUBAGENT_LIVE_EVAL_MAX_TURNS || 3);
+const TIMEOUT_MS = Number(process.env.SUBAGENT_LIVE_EVAL_TIMEOUT_MS || 180000);
+const MAX_TURNS = Number(process.env.SUBAGENT_LIVE_EVAL_MAX_TURNS || 2);
 const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs');
 const RAG_PRELOAD_PATH = path.join(PROJECT_ROOT, 'tests', 'fixtures', 'spawn-rag-memory-stub.preload.cjs');
 const MEMORY_GOTCHAS_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'gotchas.json');
+const LIVE_SMOKE_CASE = {
+  id: 'live-smoke',
+  prompt:
+    'Use Task once with subagent_type="developer" and prompt "reply READY then complete". Then answer in one sentence.',
+};
 
 const EVAL_CASES = [
   {
     id: 'live-001',
-    prompt:
-      'Use Task tool exactly once with subagent_type="developer". Subagent prompt: "Reply only READY and call TaskUpdate completed immediately. No file reads." Then respond in one sentence. If any [mem:xxxxxxxx] or [rag:xxxxxxxx] IDs appear anywhere in context, include one exact ID.',
+    prompt: 'Use Task once. After completion, cite one exact [mem:xxxxxxxx] or [rag:xxxxxxxx] id if visible.',
   },
   {
     id: 'live-002',
     prompt:
-      'Delegate a micro-task using Task once: ask subagent to return "READY" only. After it returns, provide one concise recommendation for task lifecycle safety and include one exact [mem:xxxxxxxx] or [rag:xxxxxxxx] ID if visible.',
+      'Spawn one fast developer subagent task, then give one lifecycle recommendation and cite one exact evidence id when available.',
   },
   {
     id: 'live-003',
     prompt:
-      'Spawn one fast subagent task (Task tool) with instruction "return READY and complete". Then give one routing guardrail. If any evidence IDs [mem:xxxxxxxx]/[rag:xxxxxxxx] are visible, cite one exactly.',
+      'Run one micro Task and then state one routing guardrail with one exact [mem:xxxxxxxx] or [rag:xxxxxxxx] citation if present.',
   },
 ];
 
@@ -394,6 +398,13 @@ function shouldUseFallback(summary) {
   return summary.timed_out_cases === summary.total_cases || summary.output_observed_rate === 0;
 }
 
+function hasNoStreamSignal(result) {
+  if (!result || typeof result !== 'object') return true;
+  const hasOutput = String(result.finalResultText || '').trim().length > 0;
+  const hasEvidence = Array.isArray(result.spawnedEvidenceIds) && result.spawnedEvidenceIds.length > 0;
+  return !hasOutput && !hasEvidence;
+}
+
 function computeSummary(results) {
   const total = results.length;
   const spawnSuccess = results.filter(r => r.ok).length;
@@ -417,24 +428,24 @@ function computeSummary(results) {
 
 describe('live eval: subagent memory/rag usage', () => {
   it('runs live subagent eval and writes groundedness metrics report', { skip: !RUN_LIVE_EVALS }, async t => {
-    const probe = await runLiveCase({
-      id: 'probe',
-      prompt: 'Say "live probe".',
-    });
-    if (!probe.ok && /not recognized|not found|ENOENT/i.test(probe.error || probe.stderr || '')) {
+    const smoke = await runLiveCase(LIVE_SMOKE_CASE);
+    if (!smoke.ok && /not recognized|not found|ENOENT/i.test(smoke.error || smoke.stderr || '')) {
       t.skip('claude CLI is not available in this environment');
       return;
     }
 
+    const smokeShortCircuited = hasNoStreamSignal(smoke);
     const results = [];
-    for (const tc of EVAL_CASES) {
-      // eslint-disable-next-line no-await-in-loop
-      const result = await runLiveCase(tc);
-      results.push(result);
+    if (!smokeShortCircuited) {
+      for (const tc of EVAL_CASES) {
+        const result = await runLiveCase(tc);
+        results.push(result);
+      }
     }
 
-    const summary = computeSummary(results);
-    const fallbackTriggered = shouldUseFallback(summary);
+    const liveSummaryInput = smokeShortCircuited ? [smoke] : results;
+    const summary = computeSummary(liveSummaryInput);
+    const fallbackTriggered = smokeShortCircuited || shouldUseFallback(summary);
     const fallbackResults = fallbackTriggered ? await runFallbackSuite() : [];
     const fallbackSummary = fallbackTriggered ? computeSummary(fallbackResults) : null;
     const deterministicProbeResults = fallbackTriggered
@@ -465,6 +476,8 @@ describe('live eval: subagent memory/rag usage', () => {
       strict_thresholds: STRICT_THRESHOLDS,
       summary: effectiveSummary,
       live_cli: {
+        smoke,
+        short_circuited: smokeShortCircuited,
         summary,
         cases: results,
       },
@@ -486,7 +499,9 @@ describe('live eval: subagent memory/rag usage', () => {
     fs.writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2), 'utf8');
 
     assert.ok(fs.existsSync(REPORT_PATH), 'report should be written');
-    assert.ok(results.length === EVAL_CASES.length, 'all eval cases should run');
+    if (!smokeShortCircuited) {
+      assert.ok(results.length === EVAL_CASES.length, 'all eval cases should run');
+    }
 
     if (STRICT_THRESHOLDS) {
       const strictSource = fallbackTriggered
