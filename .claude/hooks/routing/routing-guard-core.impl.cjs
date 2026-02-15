@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+/* eslint-disable max-lines */
 
 const {
   parseHookInputAsync,
@@ -44,6 +45,7 @@ const {
 const {
   checkRouterBash,
   checkRouterSelfCheck,
+  checkRouterReadGovernance,
   checkRouterWrite,
   checkMemoryPressure,
 } = require('./routing-guard-core.checks-router.cjs');
@@ -125,6 +127,18 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       };
     }
     captureWarn('router-self-check', selfCheck);
+
+    const readGovernance = checkRouterReadGovernance(toolName, toolInput, hookInput);
+    if (!readGovernance.pass) {
+      return {
+        pass: false,
+        result: readGovernance.result,
+        message: readGovernance.message,
+        checkName: 'router-read-governance',
+        warnings,
+      };
+    }
+    captureWarn('router-read-governance', readGovernance);
 
     if (!shouldDelegateTaskChecksToPreTaskUnified(toolName)) {
       const plannerCheck = checkPlannerFirst(toolName, toolInput);
@@ -488,6 +502,7 @@ module.exports = {
   runAllChecks,
   checkRouterBash,
   checkRouterSelfCheck,
+  checkRouterReadGovernance,
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,

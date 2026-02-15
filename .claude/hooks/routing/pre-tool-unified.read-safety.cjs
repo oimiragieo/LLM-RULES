@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable max-lines */
 
 const fs = require('fs');
 const os = require('os');
@@ -8,7 +9,30 @@ const { PROJECT_ROOT, canonicalizePathForPlatform } = require('./pre-tool-unifie
 const { ensureDir } = require('./pre-tool-unified.execution.cjs');
 
 const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 120000);
+const READ_CHUNK_GUARD_TOKENS = Number(process.env.READ_CHUNK_GUARD_TOKENS || 20000);
+const READ_ESTIMATED_CHARS_PER_TOKEN = Number(process.env.READ_ESTIMATED_CHARS_PER_TOKEN || 4);
+const READ_REQUIRE_SEARCH_FIRST = String(process.env.READ_REQUIRE_SEARCH_FIRST || 'on')
+  .trim()
+  .toLowerCase();
+const READ_REQUIRE_SEARCH_FIRST_BYTES = Number(
+  process.env.READ_REQUIRE_SEARCH_FIRST_BYTES || 50000
+);
+const READ_REQUIRE_SEARCH_WINDOW_MS = Number(
+  process.env.READ_REQUIRE_SEARCH_WINDOW_MS || 15 * 60 * 1000
+);
+const READ_TOKEN_SAVER_ENFORCEMENT = String(process.env.READ_TOKEN_SAVER_ENFORCEMENT || 'on')
+  .trim()
+  .toLowerCase();
+const READ_TOKEN_SAVER_WINDOW_MS = Number(process.env.READ_TOKEN_SAVER_WINDOW_MS || 20 * 60 * 1000);
+const READ_CONTEXT_PRESSURE_BREACH_THRESHOLD = Number(
+  process.env.READ_CONTEXT_PRESSURE_BREACH_THRESHOLD || 3
+);
 const REFLECTION_RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+const TOKEN_SLO_STATE_PATH = path.join(REFLECTION_RUNTIME_DIR, 'token-slo-state.json');
+const TOOL_GOVERNANCE_STATE_PATH = path.join(REFLECTION_RUNTIME_DIR, 'tool-governance-state.json');
+const TOOL_GOVERNANCE_STALE_MS = Number(
+  process.env.TOOL_GOVERNANCE_STALE_MS || 24 * 60 * 60 * 1000
+);
 const REFLECTION_REMINDER_PATH = path.join(REFLECTION_RUNTIME_DIR, 'reflection-reminder.txt');
 const REFLECTION_SPAWN_REQUEST_PATH = path.join(
   REFLECTION_RUNTIME_DIR,
@@ -24,6 +48,11 @@ const READ_DIR_LISTING_PATH = path.join(
   'read-safety-dir-listing.txt'
 );
 const READ_DIR_LISTING_MAX_ATTEMPTS = 5;
+const SEARCH_EVIDENCE_PATTERNS = [
+  /\bpnpm\s+search:code\b/i,
+  /\bhybrid-search\b/i,
+  /\bsemantic-search\b/i,
+];
 
 function isReadSafetyAutoWindowEnabled() {
   return (
@@ -39,6 +68,141 @@ function getReadSafetyAutoWindowLimit() {
   return Math.floor(parsed);
 }
 
+function getReadSafetyMaxWindowLimit() {
+  const fallback = getReadSafetyAutoWindowLimit();
+  const parsed = Number(process.env.READ_SAFETY_MAX_WINDOW_LIMIT || fallback);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return Math.floor(parsed);
+}
+
+function resolveSessionId(hookInput = null) {
+  const fromHook = hookInput?.session_id || hookInput?.sessionId || null;
+  if (fromHook && String(fromHook).trim()) return String(fromHook).trim();
+  const fromEnv = process.env.CLAUDE_SESSION_ID || null;
+  if (fromEnv && String(fromEnv).trim()) return String(fromEnv).trim();
+  return 'unknown';
+}
+
+function pruneGovernanceSessions(sessions, now = Date.now()) {
+  const next = {};
+  for (const [sessionId, entry] of Object.entries(sessions || {})) {
+    if (!entry || typeof entry !== 'object') continue;
+    const lastSeenAt = Number(entry.lastSeenAt || 0);
+    if (lastSeenAt > 0 && now - lastSeenAt <= TOOL_GOVERNANCE_STALE_MS) {
+      next[sessionId] = entry;
+    }
+  }
+  return next;
+}
+
+function readGovernanceState() {
+  try {
+    if (!fs.existsSync(TOOL_GOVERNANCE_STATE_PATH)) return { sessions: {} };
+    const parsed = JSON.parse(fs.readFileSync(TOOL_GOVERNANCE_STATE_PATH, 'utf8'));
+    if (!parsed || typeof parsed !== 'object' || typeof parsed.sessions !== 'object') {
+      return { sessions: {} };
+    }
+    return { sessions: parsed.sessions || {} };
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeGovernanceState(state) {
+  try {
+    ensureDir(path.dirname(TOOL_GOVERNANCE_STATE_PATH));
+    const sessions = pruneGovernanceSessions(state?.sessions || {});
+    fs.writeFileSync(
+      TOOL_GOVERNANCE_STATE_PATH,
+      JSON.stringify({ sessions }, null, 2) + '\n',
+      'utf8'
+    );
+  } catch (_err) {
+    // Best-effort state tracking.
+  }
+}
+
+function isSearchEvidenceCommand(command) {
+  if (!command || typeof command !== 'string') return false;
+  return SEARCH_EVIDENCE_PATTERNS.some(pattern => pattern.test(command));
+}
+
+function isTokenSaverSkillInvocation(toolInput) {
+  const skillNameRaw =
+    toolInput?.skill ||
+    toolInput?.skill_name ||
+    toolInput?.name ||
+    toolInput?.skillName ||
+    toolInput?.id ||
+    null;
+  if (!skillNameRaw) return false;
+  return String(skillNameRaw).trim().toLowerCase() === 'token-saver-context-compression';
+}
+
+function recordToolGovernanceEvidence(toolName, toolInput, hookInput) {
+  const sessionId = resolveSessionId(hookInput);
+  const now = Date.now();
+  const state = readGovernanceState();
+  const entry = state.sessions[sessionId] || {};
+
+  if (toolName === 'Bash' && isSearchEvidenceCommand(toolInput?.command || '')) {
+    entry.lastSearchAt = now;
+    entry.lastSearchCommand = String(toolInput.command || '').slice(0, 200);
+  }
+
+  if (toolName === 'Skill' && isTokenSaverSkillInvocation(toolInput || {})) {
+    entry.lastTokenSaverAt = now;
+  }
+
+  if (Object.keys(entry).length === 0) return;
+  entry.lastSeenAt = now;
+  state.sessions[sessionId] = entry;
+  writeGovernanceState(state);
+}
+
+function getSessionGovernanceSnapshot(hookInput) {
+  const sessionId = resolveSessionId(hookInput);
+  const now = Date.now();
+  const sessions = readGovernanceState().sessions || {};
+  const entry = sessions[sessionId] || {};
+  return {
+    sessionId,
+    hasRecentSearch:
+      Number(entry.lastSearchAt || 0) > 0 &&
+      now - Number(entry.lastSearchAt || 0) <= READ_REQUIRE_SEARCH_WINDOW_MS,
+    hasRecentTokenSaver:
+      Number(entry.lastTokenSaverAt || 0) > 0 &&
+      now - Number(entry.lastTokenSaverAt || 0) <= READ_TOKEN_SAVER_WINDOW_MS,
+    lastSearchAt: Number(entry.lastSearchAt || 0),
+    lastTokenSaverAt: Number(entry.lastTokenSaverAt || 0),
+  };
+}
+
+function isContextPressureHigh(hookInput) {
+  try {
+    if (!fs.existsSync(TOKEN_SLO_STATE_PATH)) return false;
+    const parsed = JSON.parse(fs.readFileSync(TOKEN_SLO_STATE_PATH, 'utf8'));
+    const sessions = parsed?.sessions || {};
+    const sessionId = resolveSessionId(hookInput);
+    const entry = sessions?.[sessionId];
+    if (!entry || typeof entry !== 'object') return false;
+
+    const now = Date.now();
+    const downgradedUntil = Number(entry.downgradedUntil || 0);
+    if (downgradedUntil > now) return true;
+
+    const breachCount = Number(entry.breachCount || 0);
+    const lastBreachAt = Number(entry.lastBreachAt || 0);
+    return (
+      breachCount >= READ_CONTEXT_PRESSURE_BREACH_THRESHOLD &&
+      lastBreachAt > 0 &&
+      now - lastBreachAt <= READ_TOKEN_SAVER_WINDOW_MS
+    );
+  } catch (_err) {
+    return false;
+  }
+}
+
 function hasReadWindow(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return false;
   const numeric = value => Number.isFinite(Number(value)) && Number(value) >= 0;
@@ -50,6 +214,23 @@ function hasReadWindow(toolInput) {
     numeric(toolInput.startLine) ||
     numeric(toolInput.endLine)
   );
+}
+
+function getReadWindowLimit(toolInput) {
+  if (!toolInput || typeof toolInput !== 'object') return null;
+
+  const parsedLimit = Number(toolInput.limit);
+  if (Number.isFinite(parsedLimit) && parsedLimit >= 0) {
+    return Math.floor(parsedLimit);
+  }
+
+  const start = Number(toolInput.start_line ?? toolInput.startLine);
+  const end = Number(toolInput.end_line ?? toolInput.endLine);
+  if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+    return Math.floor(end - start + 1);
+  }
+
+  return null;
 }
 
 function resolveReadPath(toolInput) {
@@ -223,6 +404,8 @@ function createDirectoryListingFile(targetDir) {
 }
 
 function checkReadSafety(toolName, toolInput, hookInput = null) {
+  recordToolGovernanceEvidence(toolName, toolInput, hookInput);
+
   if (toolName !== 'Read') {
     return { checked: false, reason: 'not_read_tool' };
   }
@@ -285,6 +468,13 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     }
 
     const stats = fs.statSync(targetPath);
+    const strictSearchEnabled = READ_REQUIRE_SEARCH_FIRST !== 'off';
+    const strictTokenSaverEnabled = READ_TOKEN_SAVER_ENFORCEMENT !== 'off';
+    const isProjectFile = path
+      .resolve(targetPath)
+      .startsWith(path.resolve(PROJECT_ROOT) + path.sep);
+    const shouldGateLargeDirectRead =
+      isProjectFile && !hasReadWindow(toolInput) && stats.size > READ_REQUIRE_SEARCH_FIRST_BYTES;
 
     if (stats.isDirectory()) {
       if (isBypassPermissionsMode(hookInput)) {
@@ -303,6 +493,33 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
           `[READ SAFETY] "${targetPath}" is a directory. ` +
           'Use Glob/rg --files for directory listing, then Read a specific file.',
       };
+    }
+
+    if (strictSearchEnabled && shouldGateLargeDirectRead) {
+      const governance = getSessionGovernanceSnapshot(hookInput);
+      if (!governance.hasRecentSearch) {
+        return {
+          checked: true,
+          action: 'block',
+          message:
+            `[READ SAFETY] Large direct Read (${stats.size} bytes) requires search evidence first. ` +
+            'Run `pnpm search:code "<query>"` or hybrid-search, then retry Read with offset/limit.',
+        };
+      }
+
+      if (
+        strictTokenSaverEnabled &&
+        isContextPressureHigh(hookInput) &&
+        !governance.hasRecentTokenSaver
+      ) {
+        return {
+          checked: true,
+          action: 'block',
+          message:
+            '[READ SAFETY] Context pressure is high for this session. ' +
+            'Invoke `Skill({ skill: "token-saver-context-compression" })` before large Read calls.',
+        };
+      }
     }
 
     if (stats.size > READ_CHUNK_GUARD_BYTES && !hasReadWindow(toolInput)) {
@@ -332,6 +549,52 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       };
     }
 
+    if (!hasReadWindow(toolInput)) {
+      const estimatedTokens = Math.ceil(stats.size / Math.max(1, READ_ESTIMATED_CHARS_PER_TOKEN));
+      if (estimatedTokens > READ_CHUNK_GUARD_TOKENS) {
+        if (isReadSafetyAutoWindowEnabled()) {
+          const limit = getReadSafetyAutoWindowLimit();
+          return {
+            checked: true,
+            action: 'rewrite',
+            rewrittenToolInput: {
+              ...toolInput,
+              offset: 0,
+              limit,
+            },
+            bypassWarning: `${
+              isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '
+            }Estimated read size (${estimatedTokens} tokens) auto-windowed to offset=0, limit=${limit}.`,
+          };
+        }
+        return {
+          checked: true,
+          action: 'block',
+          message:
+            `${
+              isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '
+            }Estimated read size (${estimatedTokens} tokens) requires chunked Read. ` +
+            'Retry with offset/limit (or start_line/end_line), e.g. offset: 0, limit: 4000.',
+        };
+      }
+    }
+
+    const maxWindowLimit = getReadSafetyMaxWindowLimit();
+    const requestedWindow = getReadWindowLimit(toolInput);
+    if (requestedWindow != null && requestedWindow > maxWindowLimit) {
+      return {
+        checked: true,
+        action: 'rewrite',
+        rewrittenToolInput: {
+          ...toolInput,
+          limit: maxWindowLimit,
+        },
+        bypassWarning: `${
+          isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '
+        }Requested Read window (${requestedWindow}) exceeded safe max (${maxWindowLimit}); limit clamped.`,
+      };
+    }
+
     return { checked: true, action: 'allow' };
   } catch (err) {
     if (process.env.DEBUG_HOOKS) {
@@ -343,6 +606,12 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
 
 module.exports = {
   checkReadSafety,
+  isSearchEvidenceCommand,
+  isTokenSaverSkillInvocation,
+  recordToolGovernanceEvidence,
+  getSessionGovernanceSnapshot,
+  isContextPressureHigh,
+  getReadWindowLimit,
   hasReadWindow,
   resolveReadPath,
   isBypassPermissionsMode,

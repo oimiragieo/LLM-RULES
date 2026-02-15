@@ -24,6 +24,8 @@ describe('pre-tool-unified read safety', () => {
   const reminderPath = path.join(reflectionRuntimeDir, 'reflection-reminder.txt');
   const spawnRequestPath = path.join(reflectionRuntimeDir, 'reflection-spawn-request.json');
   const integrationQueuePath = path.join(reflectionRuntimeDir, 'integration-queue.jsonl');
+  const governanceStatePath = path.join(reflectionRuntimeDir, 'tool-governance-state.json');
+  const tokenSloStatePath = path.join(reflectionRuntimeDir, 'token-slo-state.json');
 
   function withFileRestored(filePath, fn) {
     const existed = fs.existsSync(filePath);
@@ -184,6 +186,39 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
+  test('checkReadSafety auto-windows based on token estimate even below byte guard', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-token-estimate-'));
+    const filePath = path.join(tempDir, 'token-heavy.txt');
+    try {
+      fs.writeFileSync(filePath, 'x'.repeat(90000), 'utf8');
+      const result = checkReadSafety('Read', { file_path: filePath });
+      assert.strictEqual(result.action, 'rewrite');
+      assert.strictEqual(result.rewrittenToolInput.offset, 0);
+      assert.strictEqual(result.rewrittenToolInput.limit, 4000);
+      assert.ok(String(result.bypassWarning || '').includes('Estimated read size'));
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('checkReadSafety clamps oversized explicit read limit', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-clamp-window-'));
+    const filePath = path.join(tempDir, 'small.txt');
+    const priorMax = process.env.READ_SAFETY_MAX_WINDOW_LIMIT;
+    process.env.READ_SAFETY_MAX_WINDOW_LIMIT = '2500';
+    try {
+      fs.writeFileSync(filePath, 'small', 'utf8');
+      const result = checkReadSafety('Read', { file_path: filePath, offset: 0, limit: 5000 });
+      assert.strictEqual(result.action, 'rewrite');
+      assert.strictEqual(result.rewrittenToolInput.limit, 2500);
+      assert.ok(String(result.bypassWarning || '').includes('exceeded safe max'));
+    } finally {
+      if (priorMax == null) delete process.env.READ_SAFETY_MAX_WINDOW_LIMIT;
+      else process.env.READ_SAFETY_MAX_WINDOW_LIMIT = priorMax;
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   test('checkReadSafety blocks large unwindowed read in bypassPermissions mode', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-file-bypass-'));
     const filePath = path.join(tempDir, 'large.txt');
@@ -230,6 +265,90 @@ describe('pre-tool-unified read safety', () => {
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+
+  test('checkReadSafety blocks large direct project reads until search evidence exists', () => {
+    const sessionId = `read-gov-${Date.now()}`;
+    const targetPath = path.join(reflectionRuntimeDir, `read-governance-${Date.now()}.txt`);
+    withFileRestored(governanceStatePath, () => {
+      fs.mkdirSync(reflectionRuntimeDir, { recursive: true });
+      fs.writeFileSync(targetPath, 'x'.repeat(60000), 'utf8');
+
+      try {
+        const blocked = checkReadSafety(
+          'Read',
+          { file_path: '.claude/context/runtime/' + path.basename(targetPath) },
+          { session_id: sessionId }
+        );
+        assert.strictEqual(blocked.action, 'block');
+        assert.ok(String(blocked.message || '').includes('requires search evidence first'));
+
+        checkReadSafety(
+          'Bash',
+          { command: 'pnpm search:code "read governance"' },
+          { session_id: sessionId }
+        );
+        const allowed = checkReadSafety(
+          'Read',
+          { file_path: '.claude/context/runtime/' + path.basename(targetPath) },
+          { session_id: sessionId }
+        );
+        assert.strictEqual(allowed.action, 'allow');
+      } finally {
+        if (fs.existsSync(targetPath)) fs.unlinkSync(targetPath);
+      }
+    });
+  });
+
+  test('checkReadSafety requires token-saver when context pressure is high', () => {
+    const sessionId = `read-pressure-${Date.now()}`;
+    const targetPath = path.join(reflectionRuntimeDir, `read-pressure-${Date.now()}.txt`);
+    withFileRestored(governanceStatePath, () => {
+      withFileRestored(tokenSloStatePath, () => {
+        fs.mkdirSync(reflectionRuntimeDir, { recursive: true });
+        fs.writeFileSync(targetPath, 'y'.repeat(60000), 'utf8');
+
+        const tokenState = {
+          sessions: {
+            [sessionId]: {
+              breachCount: 4,
+              lastBreachAt: Date.now(),
+              downgradedUntil: Date.now() + 5 * 60 * 1000,
+            },
+          },
+        };
+        fs.writeFileSync(tokenSloStatePath, JSON.stringify(tokenState, null, 2) + '\n', 'utf8');
+
+        try {
+          checkReadSafety(
+            'Bash',
+            { command: 'pnpm search:code "context pressure"' },
+            { session_id: sessionId }
+          );
+          const blocked = checkReadSafety(
+            'Read',
+            { file_path: '.claude/context/runtime/' + path.basename(targetPath) },
+            { session_id: sessionId }
+          );
+          assert.strictEqual(blocked.action, 'block');
+          assert.ok(String(blocked.message || '').includes('token-saver-context-compression'));
+
+          checkReadSafety(
+            'Skill',
+            { skill: 'token-saver-context-compression' },
+            { session_id: sessionId }
+          );
+          const allowed = checkReadSafety(
+            'Read',
+            { file_path: '.claude/context/runtime/' + path.basename(targetPath) },
+            { session_id: sessionId }
+          );
+          assert.strictEqual(allowed.action, 'allow');
+        } finally {
+          if (fs.existsSync(targetPath)) fs.unlinkSync(targetPath);
+        }
+      });
+    });
   });
 
   test('ensureReflectionReadTarget creates missing reflection reminder file', () => {

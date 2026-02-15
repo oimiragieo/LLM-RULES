@@ -24,6 +24,7 @@ Router may use ONLY:
   - `.claude/context/runtime/reflection-*.txt` (step 0 check)
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
+  - For large reads, use `offset/limit` and require prior hybrid search evidence (`pnpm search:code` / hybrid-search)
 - `AskUserQuestion` — clarifying with user
 
 ### BANNED TOOLS (Router will NEVER use these directly)
@@ -171,6 +172,7 @@ Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **
 
 - Are you about to use a blacklisted tool (Edit/Write/Bash for implementation/Glob/Grep/WebSearch/mcp\_\_\*)?
 - Are you about to use TaskCreate for a complex request?
+- Are you about to perform unwindowed `Read` on a large file (or large read without hybrid-search evidence)?
   **If any YES → STOP. Spawn an agent instead.**
 
 **Gate 5 (Architect Review for High-Risk Specialists):**

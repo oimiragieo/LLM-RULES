@@ -210,6 +210,48 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
   }
 }
 
+function hasReadWindow(toolInput = {}) {
+  const numeric = value => Number.isFinite(Number(value)) && Number(value) >= 0;
+  return (
+    numeric(toolInput.offset) ||
+    numeric(toolInput.limit) ||
+    numeric(toolInput.start_line) ||
+    numeric(toolInput.end_line) ||
+    numeric(toolInput.startLine) ||
+    numeric(toolInput.endLine)
+  );
+}
+
+function checkRouterReadGovernance(toolName, toolInput = {}) {
+  if (toolName !== 'Read') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('ROUTER_READ_GOVERNANCE', 'block');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  const state = getCachedRouterState();
+  if (state.mode === 'agent' || state.taskSpawned) {
+    return { pass: true };
+  }
+
+  if (hasReadWindow(toolInput)) {
+    return { pass: true };
+  }
+
+  const message =
+    '[ROUTER READ GOVERNANCE] Unwindowed Read blocked in router mode. ' +
+    'Run hybrid search first (`pnpm search:code`), then use Read with offset/limit. ' +
+    'If context pressure is high, invoke token-saver-context-compression before large reads.';
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+  return { pass: true, result: 'warn', message };
+}
+
 function checkRouterWrite(toolName, toolInput) {
   if (!WRITE_TOOLS.includes(toolName)) {
     return { pass: true };
@@ -319,6 +361,7 @@ function checkMemoryPressure(toolName) {
 module.exports = {
   checkRouterBash,
   checkRouterSelfCheck,
+  checkRouterReadGovernance,
   checkRouterWrite,
   checkMemoryPressure,
 };

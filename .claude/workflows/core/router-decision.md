@@ -277,7 +277,7 @@ Integrate external codebase: {user request}
 - **YES**: STOP. Spawn developer or appropriate agent. DO NOT PROCEED.
 - **NO**: Continue to Question 4.
 
-### Question 4: Am I exploring the codebase (searching, analyzing files)?
+### Question 4: Am I exploring the codebase or attempting unscoped reads?
 
 **Exploration indicators**:
 
@@ -285,6 +285,8 @@ Integrate external codebase: {user request}
 - Need to search code (Grep)
 - Need to read multiple files to understand structure
 - Need to analyze dependencies
+- Need to read a large file without `offset/limit`
+- Have not run hybrid search evidence first (`pnpm search:code` / hybrid-search)
 
 **Decision**:
 
@@ -340,11 +342,13 @@ Without these, the skill was NEVER invoked because Router couldn't find it.
 | `TaskUpdate()`      | Update task status/metadata          | Mark task as spawned                                                                                                                                                                                                                                                                   |
 | `TaskGet()`         | Get task details                     | Fetch task for spawning                                                                                                                                                                                                                                                                |
 | `Task()`            | **SPAWN AGENTS** (primary function)  | Delegate work to specialist                                                                                                                                                                                                                                                            |
-| `Read()`            | Read router-approved docs/state only | `.claude/agents/*.md`, `.claude/CLAUDE.md`, `.claude/workflows/*.md`, `.claude/context/artifacts/catalogs/*`, `.claude/context/agent-registry.json`, `.claude/context/memory/*.md`, `.claude/context/runtime/{reflection-*.txt,reflection-spawn-request.json,integration-queue.jsonl}` |
+| `Read()`            | Read router-approved docs/state only (windowed for large files) | `.claude/agents/*.md`, `.claude/CLAUDE.md`, `.claude/workflows/*.md`, `.claude/context/artifacts/catalogs/*`, `.claude/context/agent-registry.json`, `.claude/context/memory/*.md`, `.claude/context/runtime/{reflection-*.txt,reflection-spawn-request.json,integration-queue.jsonl}` |
 | `AskUserQuestion()` | Clarify requirements                 | Ambiguous requests                                                                                                                                                                                                                                                                     |
 | `Bash`              | Read-only repo status                | `git status -s` or `git log --oneline -5`                                                                                                                                                                                                                                              |
 
 `Bash` is blacklisted for Router except read-only `git status -s` and `git log --oneline -5`. If other shell access is required, spawn a specialist agent.
+
+`Read` governance: Router must use `offset/limit` for large files. For large reads in agent flows, run hybrid search evidence first; when context pressure is high, require token-saver before attempting large reads.
 
 ### 5.2 Router Actions After Self-Check
 

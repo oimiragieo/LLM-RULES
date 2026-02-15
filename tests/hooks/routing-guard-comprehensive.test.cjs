@@ -314,6 +314,41 @@ describe('routing-guard.cjs - Check 2: Planner-First Enforcement', () => {
   });
 });
 
+describe('routing-guard.cjs - Router Read Governance', () => {
+  afterEach(() => {
+    cleanupState();
+    delete process.env.ROUTER_READ_GOVERNANCE;
+  });
+
+  it('blocks unwindowed Read in router mode', () => {
+    process.env.ROUTER_READ_GOVERNANCE = 'block';
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(stateFile, JSON.stringify({ mode: 'router', taskSpawned: false }));
+
+    const result = routingGuard.checkRouterReadGovernance('Read', {
+      file_path: '.claude/CLAUDE.md',
+    });
+    assert.equal(result.pass, false);
+    assert.equal(result.result, 'block');
+    assert.match(result.message, /ROUTER READ GOVERNANCE/);
+  });
+
+  it('allows windowed Read in router mode', () => {
+    process.env.ROUTER_READ_GOVERNANCE = 'block';
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(stateFile, JSON.stringify({ mode: 'router', taskSpawned: false }));
+
+    const result = routingGuard.checkRouterReadGovernance('Read', {
+      file_path: '.claude/CLAUDE.md',
+      offset: 0,
+      limit: 800,
+    });
+    assert.equal(result.pass, true);
+  });
+});
+
 describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
   afterEach(() => {
     cleanupState();
