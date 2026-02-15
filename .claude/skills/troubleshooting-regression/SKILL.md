@@ -18,6 +18,7 @@ Use this skill when the framework appears stale, stuck, or regressed and you nee
 ## Iron Law
 
 Do not declare a regression fixed without:
+
 1. reproducible trigger prompt,
 2. hook/tool evidence from debug logs,
 3. targeted test pass for touched scope.

@@ -24,7 +24,10 @@ test('analyzeLog detects memory/search/task regressions and ignores MCP noise', 
   assert.ok(ids.includes('task_stall'));
   assert.ok(ids.includes('memory_first'));
   assert.ok(ids.includes('hook_error'));
-  assert.equal(findings.some(item => /mcp auth/i.test(item.message)), false);
+  assert.equal(
+    findings.some(item => /mcp auth/i.test(item.message)),
+    false
+  );
 });
 
 test('buildNextActions returns stability guidance when no findings exist', () => {

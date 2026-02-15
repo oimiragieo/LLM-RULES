@@ -56,22 +56,23 @@ function classifyLine(line) {
       severity: 'medium',
       pattern: /\[SEARCH-FIRST\]|read blocked until search evidence/i,
       owner: '.claude/hooks/routing/pre-tool-unified.read-safety.cjs',
-      action: 'Run hybrid search first (`pnpm search:code`) and ensure search evidence is recorded.',
+      action:
+        'Run hybrid search first (`pnpm search:code`) and ensure search evidence is recorded.',
     },
     {
       id: 'memory_first',
       severity: 'medium',
       pattern: /\[MEMORY-FIRST\]|memory review required before task spawn/i,
       owner: '.claude/hooks/routing/pre-task-unified-core.cjs',
-      action: 'Require memory baseline read (`patterns.json` + `gotchas.json`) before spawning parallel agents.',
+      action:
+        'Require memory baseline read (`patterns.json` + `gotchas.json`) before spawning parallel agents.',
     },
     {
       id: 'token_saver_gate',
       severity: 'medium',
       pattern: /\[TOKEN-SAVER\]|token saver required|context pressure/i,
       owner: '.claude/hooks/routing/user-prompt-unified.core.cjs',
-      action:
-        'Invoke token-saver-context-compression when context pressure threshold triggers.',
+      action: 'Invoke token-saver-context-compression when context pressure threshold triggers.',
     },
     {
       id: 'hook_error',
@@ -133,7 +134,9 @@ function buildNextActions(findings) {
   for (const finding of findings) {
     actions.push(`${finding.id}: ${finding.action}`);
   }
-  actions.push('After patching, run targeted tests and a fresh debug session to verify non-reproduction.');
+  actions.push(
+    'After patching, run targeted tests and a fresh debug session to verify non-reproduction.'
+  );
   return Array.from(new Set(actions));
 }
 
@@ -162,7 +165,11 @@ function main(input = {}) {
   const runResult = maybeRunPrompt(prompt);
   const logPath = explicitPath || findLatestLog(debugDir);
   if (!logPath || !fs.existsSync(logPath)) {
-    return { ok: false, error: `No debug log found. Expected under ${debugDir}`, logPath: logPath || null };
+    return {
+      ok: false,
+      error: `No debug log found. Expected under ${debugDir}`,
+      logPath: logPath || null,
+    };
   }
 
   const text = fs.readFileSync(logPath, 'utf8');

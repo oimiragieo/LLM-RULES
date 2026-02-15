@@ -1,4 +1,3 @@
-
 function authenticate(username, password) {
   // Authentication logic
   return username === 'admin' && password === 'secret';
@@ -13,4 +12,3 @@ class AuthService {
     return authenticate(user, pass);
   }
 }
-      
