@@ -200,7 +200,7 @@ async function testPhaseAdvanceOnCompletion() {
 
   // Cleanup
   fs.unlinkSync(planPath);
-  fs.rmdirSync(path.dirname(planPath), { recursive: true });
+  fs.rmSync(path.dirname(planPath), { recursive: true, force: true });
 }
 
 // Test 5: Do not advance when gate fails
@@ -258,6 +258,70 @@ async function testNoAdvanceOnGateFailure() {
   );
 }
 
+// Test 6: Duplicate completion should not advance phase again
+async function testDuplicateCompletionIsIdempotent() {
+  cleanup();
+  console.log('\n=== Test: Duplicate completion idempotency ===');
+
+  const workflowState = {
+    workflowId: 'wf-test-004',
+    currentPhase: 'PHASE_2_IMPLEMENT',
+    phases: {
+      PHASE_1_DESIGN: {
+        status: 'completed',
+        gate: { passed: true },
+      },
+      PHASE_2_IMPLEMENT: {
+        status: 'in_progress',
+        agents: {
+          developer: { taskId: '45', status: 'in_progress' },
+        },
+      },
+      PHASE_3_REVIEW: {
+        status: 'pending',
+      },
+    },
+    artifacts: {
+      implementationPlan: '.claude/context/plans/test-plan-idempotent.md',
+    },
+  };
+
+  fs.mkdirSync(path.dirname(WORKFLOW_STATE_FILE), { recursive: true });
+  fs.writeFileSync(WORKFLOW_STATE_FILE, JSON.stringify(workflowState, null, 2));
+
+  const planPath = path.join(PROJECT_ROOT, workflowState.artifacts.implementationPlan);
+  fs.mkdirSync(path.dirname(planPath), { recursive: true });
+  fs.writeFileSync(planPath, '# Test Plan\n\n## Tasks\n\n- [x] Task 1\n');
+
+  const hookData = {
+    toolUse: {
+      tool: 'TaskUpdate',
+      input: {
+        taskId: '45',
+        status: 'completed',
+        metadata: {
+          summary: 'Implementation complete',
+          testsAdded: true,
+          testsPassing: true,
+        },
+      },
+    },
+  };
+
+  await processTaskCompletion(hookData);
+  const firstAdvance = JSON.parse(fs.readFileSync(PHASE_ADVANCE_FILE, 'utf8'));
+  const firstTimestamp = firstAdvance.timestamp;
+
+  await processTaskCompletion(hookData);
+  const secondAdvance = JSON.parse(fs.readFileSync(PHASE_ADVANCE_FILE, 'utf8'));
+  const secondTimestamp = secondAdvance.timestamp;
+
+  assert(firstTimestamp === secondTimestamp, 'Duplicate completion should not rewrite phase-advance');
+
+  fs.unlinkSync(planPath);
+  fs.rmSync(path.dirname(planPath), { recursive: true, force: true });
+}
+
 // Run all tests
 async function runTests() {
   console.log('\n========================================');
@@ -270,6 +334,7 @@ async function runTests() {
     await testMarkAgentComplete();
     await testPhaseAdvanceOnCompletion();
     await testNoAdvanceOnGateFailure();
+    await testDuplicateCompletionIsIdempotent();
 
     console.log('\n========================================');
     console.log(`Tests Passed: ${testsPass}`);

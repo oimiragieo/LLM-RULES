@@ -132,6 +132,18 @@ async function processTaskCompletion(hookData) {
     return { result: {} };
   }
 
+  // Idempotency guard: if phase already completed, ignore duplicate completion events.
+  if (phaseData.status === 'completed' || phaseData.gate?.passed === true) {
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
+  // Idempotency guard: ignore duplicate completion for already-completed agent.
+  if (phaseData.agents[matchedAgentName]?.status === 'completed') {
+    console.log(formatResult({}));
+    return { result: {} };
+  }
+
   // Mark agent as complete and store metadata
   phaseData.agents[matchedAgentName].status = 'completed';
   if (toolInput.metadata) {
