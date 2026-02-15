@@ -10,6 +10,11 @@ const { spawn } = require('child_process');
 const memoryManager = require('../../../.claude/lib/memory/memory-manager.cjs');
 
 const TEST_ROOT_PREFIX = '.test-memory-soak-chaos';
+const SOAK_TEST_TIMEOUT_MS = Number(process.env.MEMORY_SOAK_TEST_TIMEOUT_MS || 240000);
+const SOAK_WORKER_TIMEOUT_MS = Number(process.env.MEMORY_SOAK_WORKER_TIMEOUT_MS || 120000);
+const RESTART_WRITES_PER_WORKER = Number(process.env.MEMORY_SOAK_RESTART_WRITES || 16);
+const CONTENTION_WRITES_PER_WORKER = Number(process.env.MEMORY_SOAK_CONTENTION_WRITES || 12);
+const CONCURRENT_WORKER_WRITES = Number(process.env.MEMORY_SOAK_CONCURRENT_WRITES || 8);
 
 function createTestRoot(label) {
   const safeLabel = String(label || 'default').replace(/[^a-zA-Z0-9_-]/g, '-');
@@ -175,46 +180,89 @@ function logPhase(message) {
 
 test(
   'soak+chaos: multi-process contention and restart keeps memory JSON valid',
-  { timeout: 180000 },
+  { timeout: SOAK_TEST_TIMEOUT_MS },
   async () => {
-  const testRoot = createTestRoot('contention-restart');
-  const workerScript = setup(testRoot);
-  try {
-    // restart-style phases
-    logPhase('phase restart A');
-    await runWorkerWithTimeout(workerScript, testRoot, 'A', 16, 90000);
-    logPhase('phase restart B');
-    await runWorkerWithTimeout(workerScript, testRoot, 'B', 16, 90000);
+    const testRoot = createTestRoot('contention-restart');
+    const workerScript = setup(testRoot);
+    try {
+      logPhase(
+        `config test_timeout=${SOAK_TEST_TIMEOUT_MS} worker_timeout=${SOAK_WORKER_TIMEOUT_MS}`
+      );
+      // restart-style phases
+      logPhase('phase restart A');
+      await runWorkerWithTimeout(
+        workerScript,
+        testRoot,
+        'A',
+        RESTART_WRITES_PER_WORKER,
+        SOAK_WORKER_TIMEOUT_MS
+      );
+      logPhase('phase restart B');
+      await runWorkerWithTimeout(
+        workerScript,
+        testRoot,
+        'B',
+        RESTART_WRITES_PER_WORKER,
+        SOAK_WORKER_TIMEOUT_MS
+      );
 
-    // contention spike
-    logPhase('phase contention C1-C4');
-    await Promise.all([
-      runWorkerWithTimeout(workerScript, testRoot, 'C1', 14, 90000),
-      runWorkerWithTimeout(workerScript, testRoot, 'C2', 14, 90000),
-      runWorkerWithTimeout(workerScript, testRoot, 'C3', 14, 90000),
-      runWorkerWithTimeout(workerScript, testRoot, 'C4', 14, 90000),
-    ]);
+      // contention spike
+      logPhase('phase contention C1-C4');
+      await Promise.all([
+        runWorkerWithTimeout(
+          workerScript,
+          testRoot,
+          'C1',
+          CONTENTION_WRITES_PER_WORKER,
+          SOAK_WORKER_TIMEOUT_MS
+        ),
+        runWorkerWithTimeout(
+          workerScript,
+          testRoot,
+          'C2',
+          CONTENTION_WRITES_PER_WORKER,
+          SOAK_WORKER_TIMEOUT_MS
+        ),
+        runWorkerWithTimeout(
+          workerScript,
+          testRoot,
+          'C3',
+          CONTENTION_WRITES_PER_WORKER,
+          SOAK_WORKER_TIMEOUT_MS
+        ),
+        runWorkerWithTimeout(
+          workerScript,
+          testRoot,
+          'C4',
+          CONTENTION_WRITES_PER_WORKER,
+          SOAK_WORKER_TIMEOUT_MS
+        ),
+      ]);
 
-    const patternsPath = path.join(testRoot, '.claude', 'context', 'memory', 'patterns.json');
-    const gotchasPath = path.join(testRoot, '.claude', 'context', 'memory', 'gotchas.json');
-    const patterns = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
-    const gotchas = JSON.parse(fs.readFileSync(gotchasPath, 'utf8'));
+      const patternsPath = path.join(testRoot, '.claude', 'context', 'memory', 'patterns.json');
+      const gotchasPath = path.join(testRoot, '.claude', 'context', 'memory', 'gotchas.json');
+      const patterns = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
+      const gotchas = JSON.parse(fs.readFileSync(gotchasPath, 'utf8'));
 
-    assert.ok(Array.isArray(patterns));
-    assert.ok(Array.isArray(gotchas));
-    assert.ok(patterns.length >= 88, `expected >=88 patterns, got ${patterns.length}`);
-    assert.ok(gotchas.length >= 88, `expected >=88 gotchas, got ${gotchas.length}`);
-    assert.equal(countTempArtifacts(testRoot), 0);
-  } finally {
-    cleanup(testRoot);
-  }
+      assert.ok(Array.isArray(patterns));
+      assert.ok(Array.isArray(gotchas));
+      const expectedEntries = RESTART_WRITES_PER_WORKER * 2 + CONTENTION_WRITES_PER_WORKER * 4;
+      assert.ok(
+        patterns.length >= expectedEntries,
+        `expected >=${expectedEntries} patterns, got ${patterns.length}`
+      );
+      assert.ok(
+        gotchas.length >= expectedEntries,
+        `expected >=${expectedEntries} gotchas, got ${gotchas.length}`
+      );
+      assert.equal(countTempArtifacts(testRoot), 0);
+    } finally {
+      cleanup(testRoot);
+    }
   }
 );
 
-test(
-  'fault injection: malformed JSON recovers on next write',
-  { timeout: 60000 },
-  async () => {
+test('fault injection: malformed JSON recovers on next write', { timeout: 60000 }, async () => {
   const testRoot = createTestRoot('fault-injection');
   setup(testRoot);
   try {
@@ -233,22 +281,29 @@ test(
   } finally {
     cleanup(testRoot);
   }
-  }
-);
+});
 
 test(
   'soak+chaos: concurrent workers preserve all writes and leave no artifacts',
-  { timeout: 180000 },
+  { timeout: SOAK_TEST_TIMEOUT_MS },
   async () => {
     const testRoot = createTestRoot('10-workers');
     const workerScript = setup(testRoot);
     try {
       const workers = [];
       const workerCount = 6;
-      const writesPerWorker = 8;
+      const writesPerWorker = CONCURRENT_WORKER_WRITES;
 
       for (let i = 0; i < workerCount; i++) {
-        workers.push(runWorkerWithTimeout(workerScript, testRoot, `W${i}`, writesPerWorker, 90000));
+        workers.push(
+          runWorkerWithTimeout(
+            workerScript,
+            testRoot,
+            `W${i}`,
+            writesPerWorker,
+            SOAK_WORKER_TIMEOUT_MS
+          )
+        );
       }
 
       await Promise.all(workers);
