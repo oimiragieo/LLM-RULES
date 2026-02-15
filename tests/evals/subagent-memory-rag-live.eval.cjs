@@ -8,6 +8,12 @@ const fs = require('fs');
 const path = require('path');
 const { parseCitations } = require('../helpers/parse-memory-citations.cjs');
 const { runSubagentMemoryProbe } = require('../fixtures/subagent-memory-probe.cjs');
+const {
+  extractEvidenceIdsFromPrompt,
+  parseStreamOutput,
+  hasNoStreamSignal,
+  computeSummary,
+} = require('../helpers/live-eval-metrics.cjs');
 
 const RUN_LIVE_EVALS = String(process.env.RUN_LIVE_SUBAGENT_EVALS || 'off').toLowerCase() === 'on';
 const STRICT_THRESHOLDS =
@@ -66,65 +72,6 @@ function ensureReportDir() {
   fs.mkdirSync(REPORT_DIR, { recursive: true });
 }
 
-function extractEvidenceIdsFromPrompt(text) {
-  const input = String(text || '');
-  const matches = input.match(/\[(?:mem|rag):[a-f0-9]{8}\]/g) || [];
-  return [...new Set(matches)];
-}
-
-function parseStreamOutput(stdout) {
-  const lines = String(stdout || '')
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(Boolean);
-
-  const spawnedEvidenceIds = new Set();
-  let finalResultText = '';
-  const assistantTextBlocks = [];
-
-  for (const line of lines) {
-    for (const id of extractEvidenceIdsFromPrompt(line)) {
-      spawnedEvidenceIds.add(id);
-    }
-
-    let obj;
-    try {
-      obj = JSON.parse(line);
-    } catch (_err) {
-      continue;
-    }
-
-    if (obj?.type === 'assistant' && obj?.message?.content && Array.isArray(obj.message.content)) {
-      for (const block of obj.message.content) {
-        if (block?.type === 'text' && typeof block?.text === 'string') {
-          assistantTextBlocks.push(block.text);
-        }
-        if (block?.type === 'tool_use' && block?.name === 'Task') {
-          const promptText = String(block?.input?.prompt || '');
-          for (const id of extractEvidenceIdsFromPrompt(promptText)) {
-            spawnedEvidenceIds.add(id);
-          }
-        }
-      }
-    }
-
-    if (obj?.type === 'result' && typeof obj?.result === 'string') {
-      finalResultText = obj.result;
-    }
-  }
-
-  const composedOutput = [finalResultText, ...assistantTextBlocks].join('\n');
-  const outputCitations = parseCitations(composedOutput);
-  const grounded =
-    outputCitations.length > 0 && outputCitations.every(id => spawnedEvidenceIds.has(id));
-
-  return {
-    spawnedEvidenceIds: [...spawnedEvidenceIds],
-    outputCitations,
-    grounded,
-    finalResultText: composedOutput,
-  };
-}
 
 function runLiveCase(tc) {
   return new Promise(resolve => {
@@ -338,11 +285,9 @@ async function runFallbackSuite() {
   for (const tc of FALLBACK_CASES) {
     if (Array.isArray(tc.seedGotchas)) {
       const seeded = JSON.stringify(tc.seedGotchas, null, 2);
-      // eslint-disable-next-line no-await-in-loop
       const result = await withTemporaryFile(MEMORY_GOTCHAS_PATH, seeded, () => runHookCase(tc));
       results.push(result);
     } else {
-      // eslint-disable-next-line no-await-in-loop
       const result = await runHookCase(tc);
       results.push(result);
     }
@@ -398,32 +343,80 @@ function shouldUseFallback(summary) {
   return summary.timed_out_cases === summary.total_cases || summary.output_observed_rate === 0;
 }
 
-function hasNoStreamSignal(result) {
-  if (!result || typeof result !== 'object') return true;
-  const hasOutput = String(result.finalResultText || '').trim().length > 0;
-  const hasEvidence = Array.isArray(result.spawnedEvidenceIds) && result.spawnedEvidenceIds.length > 0;
-  return !hasOutput && !hasEvidence;
+async function collectLiveResults(smokeShortCircuited) {
+  if (smokeShortCircuited) return [];
+  const results = [];
+  for (const tc of EVAL_CASES) {
+    const result = await runLiveCase(tc);
+    results.push(result);
+  }
+  return results;
 }
 
-function computeSummary(results) {
-  const total = results.length;
-  const spawnSuccess = results.filter(r => r.ok).length;
-  const withInjectedEvidence = results.filter(r => r.spawnedEvidenceIds.length > 0).length;
-  const withOutputCitations = results.filter(r => r.outputCitations.length > 0).length;
-  const groundedCount = results.filter(r => r.grounded).length;
-  const withAnyOutput = results.filter(r => String(r.finalResultText || '').trim().length > 0).length;
-  const citationEligible = Math.max(withInjectedEvidence, 1);
-  const citationObserved = Math.max(withOutputCitations, 1);
-
+async function collectFallbackData(fallbackTriggered) {
+  if (!fallbackTriggered) {
+    return {
+      fallbackResults: [],
+      fallbackSummary: null,
+      deterministicProbeResults: [],
+      deterministicProbeSummary: null,
+    };
+  }
+  const fallbackResults = await runFallbackSuite();
+  const fallbackSummary = computeSummary(fallbackResults);
+  const deterministicProbeResults = runDeterministicProbeSuite(fallbackResults);
+  const deterministicProbeSummary = computeSummary(deterministicProbeResults);
   return {
-    total_cases: total,
-    spawn_success_rate: spawnSuccess / Math.max(total, 1),
-    evidence_injection_rate: withInjectedEvidence / Math.max(total, 1),
-    citation_use_rate: withOutputCitations / citationEligible,
-    groundedness_rate: groundedCount / citationObserved,
-    timed_out_cases: results.filter(r => /timeout/i.test(String(r.error || ''))).length,
-    output_observed_rate: withAnyOutput / Math.max(total, 1),
+    fallbackResults,
+    fallbackSummary,
+    deterministicProbeResults,
+    deterministicProbeSummary,
   };
+}
+
+function buildEffectiveSummary({
+  fallbackTriggered,
+  summary,
+  fallbackSummary,
+  deterministicProbeSummary,
+}) {
+  const probeUsable = fallbackTriggered && deterministicProbeSummary?.output_observed_rate > 0;
+  if (!fallbackTriggered) {
+    return { effectiveSummary: { mode: 'live_cli', ...summary }, probeUsable };
+  }
+  const selected = probeUsable ? deterministicProbeSummary : fallbackSummary;
+  return {
+    effectiveSummary: {
+      mode: probeUsable ? 'deterministic_subagent_probe' : 'hook_e2e_fallback',
+      ...selected,
+      live_timed_out_cases: summary.timed_out_cases,
+      live_output_observed_rate: summary.output_observed_rate,
+      hook_spawn_success_rate: fallbackSummary?.spawn_success_rate ?? 0,
+      hook_evidence_injection_rate: fallbackSummary?.evidence_injection_rate ?? 0,
+    },
+    probeUsable,
+  };
+}
+
+function assertStrictThresholdsIfEnabled({
+  fallbackTriggered,
+  probeUsable,
+  summary,
+  fallbackSummary,
+  deterministicProbeSummary,
+}) {
+  if (!STRICT_THRESHOLDS) return;
+  const strictSource = fallbackTriggered
+    ? probeUsable
+      ? deterministicProbeSummary
+      : fallbackSummary
+    : summary;
+  assert.ok(strictSource.spawn_success_rate >= 0.66, 'spawn success rate below strict threshold');
+  assert.ok(
+    strictSource.evidence_injection_rate >= 0.33,
+    'evidence injection rate below strict threshold'
+  );
+  assert.ok(strictSource.groundedness_rate >= 0.5, 'groundedness rate below strict threshold');
 }
 
 describe('live eval: subagent memory/rag usage', () => {
@@ -435,39 +428,23 @@ describe('live eval: subagent memory/rag usage', () => {
     }
 
     const smokeShortCircuited = hasNoStreamSignal(smoke);
-    const results = [];
-    if (!smokeShortCircuited) {
-      for (const tc of EVAL_CASES) {
-        const result = await runLiveCase(tc);
-        results.push(result);
-      }
-    }
+    const results = await collectLiveResults(smokeShortCircuited);
 
     const liveSummaryInput = smokeShortCircuited ? [smoke] : results;
     const summary = computeSummary(liveSummaryInput);
     const fallbackTriggered = smokeShortCircuited || shouldUseFallback(summary);
-    const fallbackResults = fallbackTriggered ? await runFallbackSuite() : [];
-    const fallbackSummary = fallbackTriggered ? computeSummary(fallbackResults) : null;
-    const deterministicProbeResults = fallbackTriggered
-      ? runDeterministicProbeSuite(fallbackResults)
-      : [];
-    const deterministicProbeSummary = fallbackTriggered
-      ? computeSummary(deterministicProbeResults)
-      : null;
-    const probeUsable =
-      fallbackTriggered &&
-      deterministicProbeSummary &&
-      deterministicProbeSummary.output_observed_rate > 0;
-    const effectiveSummary = fallbackTriggered
-      ? {
-          mode: probeUsable ? 'deterministic_subagent_probe' : 'hook_e2e_fallback',
-          ...(probeUsable ? deterministicProbeSummary : fallbackSummary),
-          live_timed_out_cases: summary.timed_out_cases,
-          live_output_observed_rate: summary.output_observed_rate,
-          hook_spawn_success_rate: fallbackSummary?.spawn_success_rate ?? 0,
-          hook_evidence_injection_rate: fallbackSummary?.evidence_injection_rate ?? 0,
-        }
-      : { mode: 'live_cli', ...summary };
+    const {
+      fallbackResults,
+      fallbackSummary,
+      deterministicProbeResults,
+      deterministicProbeSummary,
+    } = await collectFallbackData(fallbackTriggered);
+    const { effectiveSummary, probeUsable } = buildEffectiveSummary({
+      fallbackTriggered,
+      summary,
+      fallbackSummary,
+      deterministicProbeSummary,
+    });
 
     const report = {
       generated_at: new Date().toISOString(),
@@ -503,21 +480,12 @@ describe('live eval: subagent memory/rag usage', () => {
       assert.ok(results.length === EVAL_CASES.length, 'all eval cases should run');
     }
 
-    if (STRICT_THRESHOLDS) {
-      const strictSource = fallbackTriggered
-        ? probeUsable
-          ? deterministicProbeSummary
-          : fallbackSummary
-        : summary;
-      assert.ok(
-        strictSource.spawn_success_rate >= 0.66,
-        'spawn success rate below strict threshold'
-      );
-      assert.ok(
-        strictSource.evidence_injection_rate >= 0.33,
-        'evidence injection rate below strict threshold'
-      );
-      assert.ok(strictSource.groundedness_rate >= 0.5, 'groundedness rate below strict threshold');
-    }
+    assertStrictThresholdsIfEnabled({
+      fallbackTriggered,
+      probeUsable,
+      summary,
+      fallbackSummary,
+      deterministicProbeSummary,
+    });
   });
 });
