@@ -63,11 +63,20 @@ module.exports = {
         includeSystemOverhead: true,
       });
 
-      // Assume sonnet model for estimation
+      // Resolve default model from config
+      let modelId = 'claude-sonnet-4-5';
+      try {
+        const { resolveAgentModel } = require('../utils/agent-config-reader.cjs');
+        const resolved = resolveAgentModel('developer');
+        modelId = resolved.model;
+      } catch (_err) {
+        // Fallback to default
+      }
+
       const cost = this.ml.costPredictor.estimateCost(
         tokens,
         tokens * 0.5, // Assume 50% response ratio
-        'claude-sonnet-4-20250514'
+        modelId
       );
 
       return cost;

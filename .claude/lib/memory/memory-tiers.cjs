@@ -20,7 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
-const { withLock } = require('../utils/file-locker.cjs');
+const { withFileLock } = require('./memory-tiers-lock.cjs');
 const {
   isStructuredSummaryEnabled,
   isSessionArchiveEnabled,
@@ -29,7 +29,7 @@ const {
   appendTierEvent: appendTierEventBase,
 } = require('./memory-tier-helpers.cjs');
 
-// BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
+// BUG-001 Fix: Use canonical PROJECT_ROOT to prevent nested .claude folder creation
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 // Configuration
@@ -38,48 +38,6 @@ const CONFIG = {
   MTM_WARN_THRESHOLD: 8, // Warn when approaching limit
   SUMMARY_MIN_SESSIONS: 5, // Minimum sessions to summarize
 };
-
-/**
- * Get the path used as a lock sentinel for tier operations.
- * The lock file is placed in the runtime directory to avoid
- * cluttering the memory tier directories themselves.
- *
- * @param {string} [projectRoot=PROJECT_ROOT] - Project root
- * @returns {string} Absolute path to the lock sentinel file
- */
-function getLockFilePath(projectRoot = PROJECT_ROOT) {
-  const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
-  if (!fs.existsSync(runtimeDir)) fs.mkdirSync(runtimeDir, { recursive: true });
-  const lockSentinel = path.join(runtimeDir, 'memory-tiers.lock');
-  // Ensure sentinel file exists (proper-lockfile requires it)
-  if (!fs.existsSync(lockSentinel)) fs.writeFileSync(lockSentinel, '');
-  return lockSentinel;
-}
-
-/**
- * Execute a function while holding the memory-tiers file lock.
- * This serializes concurrent tier operations to prevent data corruption
- * during read-modify-write cycles on MTM/LTM directories.
- *
- * Graceful degradation: if locking fails (e.g., stale lock, permissions),
- * the function executes without the lock and logs a warning to stderr.
- *
- * @param {Function} fn - Async function to execute under lock
- * @param {string} [projectRoot=PROJECT_ROOT] - Project root
- * @returns {Promise<any>} Result of fn()
- */
-async function withFileLock(fn, projectRoot = PROJECT_ROOT) {
-  const lockPath = getLockFilePath(projectRoot);
-  try {
-    return await withLock(lockPath, fn);
-  } catch (lockErr) {
-    // Graceful degradation: proceed without lock
-    process.stderr.write(
-      `[memory-tiers] Lock acquisition failed, proceeding without lock: ${lockErr.message}\n`
-    );
-    return await fn();
-  }
-}
 
 // Memory tier definitions
 const MEMORY_TIERS = {

@@ -140,6 +140,47 @@ function runEcosystemImpactAnalysis(creatorType, artifactPath) {
 }
 
 /**
+ * Run ecosystem impact analysis with timeout observability.
+ * Returns a timedOut flag so callers can record degraded behavior.
+ *
+ * @param {string} creatorType
+ * @param {string} artifactPath
+ * @param {Object} [options]
+ * @param {Function} [options.analyzer] - Override analyzer implementation for tests
+ * @param {number} [options.timeoutMs] - Timeout budget in milliseconds
+ * @param {Function} [options.log] - Logger function (defaults to stderr)
+ * @returns {Promise<{report: Object|null, timedOut: boolean}>}
+ */
+async function runEcosystemImpactAnalysisWithTimeout(creatorType, artifactPath, options = {}) {
+  const timeoutMs = Number(
+    options.timeoutMs || process.env.POST_CREATION_INTEGRATION_TIMEOUT_MS || 5000
+  );
+  const analyzer = options.analyzer || runEcosystemImpactAnalysis;
+  const log =
+    typeof options.log === 'function'
+      ? options.log
+      : message => process.stderr.write(`[post-creation-integration] ${message}\n`);
+
+  const timeout = Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 5000;
+  let timer = null;
+  try {
+    const report = await Promise.race([
+      Promise.resolve(analyzer(creatorType, artifactPath)),
+      new Promise(resolve => {
+        timer = setTimeout(() => resolve('__TIMEOUT__'), timeout);
+      }),
+    ]);
+    if (report === '__TIMEOUT__') {
+      log(`Skipped due to timeout (${timeout}ms): ecosystem impact analysis`);
+      return { report: null, timedOut: true };
+    }
+    return { report: report || null, timedOut: false };
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+/**
  * Extract artifact ID from task metadata
  * @param {Object} hookData - Hook input data
  * @param {string} creatorType - Type of creator
@@ -312,7 +353,11 @@ async function processCreatorCompletion(hookData) {
   const check = quickIntegrationCheck(artifactId, GRAPH_PATH);
 
   // Run ecosystem impact analysis
-  const impactReport = runEcosystemImpactAnalysis(detection.creatorType, artifactPath);
+  const impactResult = await runEcosystemImpactAnalysisWithTimeout(
+    detection.creatorType,
+    artifactPath
+  );
+  const impactReport = impactResult.report;
 
   // Log to stderr
   process.stderr.write(
@@ -434,6 +479,7 @@ module.exports = {
   appendToQueue,
   appendToQueueWithImpact,
   runEcosystemImpactAnalysis,
+  runEcosystemImpactAnalysisWithTimeout,
   rotateQueue,
   processCreatorCompletion,
   GRAPH_PATH,

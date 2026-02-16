@@ -102,7 +102,9 @@ function main(argv = process.argv) {
   } else if (missing.length === 0) {
     process.stdout.write('hooks-doc-sync: PASS\n');
   } else {
-    process.stdout.write(`hooks-doc-sync: ${opts.strict ? 'FAIL' : 'WARN'} (${missing.length} missing)\n`);
+    process.stdout.write(
+      `hooks-doc-sync: ${opts.strict ? 'FAIL' : 'WARN'} (${missing.length} missing)\n`
+    );
     for (const name of missing) {
       process.stdout.write(` - ${name}\n`);
     }

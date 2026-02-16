@@ -21,7 +21,7 @@ function spawnSubagentProcess({
   timeoutMs = 10000,
 }) {
   return new Promise((resolve, reject) => {
-    const runnerPath = path.join(__dirname, 'task-subagent-runner.cjs');
+    const runnerPath = path.join(__dirname, 'task-subagent-telemetry.cjs');
     const childInput = JSON.stringify({
       subagentType,
       taskId,

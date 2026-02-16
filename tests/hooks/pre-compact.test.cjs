@@ -17,12 +17,7 @@ const SESSION_METRICS_FILE = path.join(RUNTIME_DIR, 'session-metrics.json');
 const DRIFT_STATE_FILE = path.join(RUNTIME_DIR, 'drift-state.json');
 const SNAPSHOT_FILE = path.join(RUNTIME_DIR, 'pre-compact-snapshot.json');
 
-const TRACKED_FILES = [
-  EDIT_COUNTER_FILE,
-  SESSION_METRICS_FILE,
-  DRIFT_STATE_FILE,
-  SNAPSHOT_FILE,
-];
+const TRACKED_FILES = [EDIT_COUNTER_FILE, SESSION_METRICS_FILE, DRIFT_STATE_FILE, SNAPSHOT_FILE];
 
 let backups = new Map();
 

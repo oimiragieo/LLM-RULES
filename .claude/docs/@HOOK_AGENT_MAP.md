@@ -11,12 +11,29 @@ This document provides a comprehensive mapping between enforcement hooks and age
 > Memory-system accuracy note (2026-02-15):
 > For memory behavior, treat `.claude/settings.json` + `.claude/docs/MEMORY_SYSTEM.md` as canonical.
 > This mapping is high-level and may omit recent non-memory hook consolidations.
+> Status semantics used in this document:
+>
+> - **Active**: registered in `.claude/settings.json`
+> - **Optional/Inactive**: documented for context only, not currently registered
 
 ---
 
 ## Section 1: Hook-Agent Matrix
 
 This table shows which hooks apply to which agent archetypes. Hooks are triggered by tool usage, so the mapping follows tool permissions.
+
+### Optional/Inactive Legacy Names (not registered in current settings)
+
+The following names may appear in historical notes/matrices but are currently consolidated or replaced in `.claude/settings.json`:
+
+- `session-cleanup.cjs`
+- `tool-scope-validator.cjs`
+- `metrics-collector-hook.cjs`
+- `error-tracker-hook.cjs`
+- `anomaly-detector.cjs`
+- `config-model-validator.cjs`
+- `intent-agent-match.cjs`
+- `task-status-enforcement.cjs`
 
 | Hook                                                                                           | Router | Implementer | Reviewer | Documenter | Orchestrator | Researcher |
 | ---------------------------------------------------------------------------------------------- | ------ | ----------- | -------- | ---------- | ------------ | ---------- |

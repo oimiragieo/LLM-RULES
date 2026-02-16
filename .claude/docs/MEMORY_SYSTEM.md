@@ -83,6 +83,7 @@ The memory system is enforced/maintained via Claude Code hooks registered in `.c
 
 - `UserPromptSubmit`
   - `.claude/hooks/routing/user-prompt-unified.cjs` (includes Memory Protocol reminder, reflection reminder management, prompt-based reflection queue processing, and maintenance fallback checks)
+  - STM write behavior: UserPromptSubmit updates STM session state for in-session continuity.
 - `PostToolUse` (matcher `Edit|Write|NotebookEdit`)
   - `.claude/hooks/memory/sync-memory-index.cjs` (canonical sync path: syncs decisions/issues plus patterns.json/gotchas.json into the SQLite entity index).
   - `.claude/hooks/routing/code-index-updater.cjs` (keeps code index metadata aligned after edits/writes)
@@ -90,6 +91,7 @@ The memory system is enforced/maintained via Claude Code hooks registered in `.c
 - `SessionEnd`
   - `.claude/hooks/reflection/unified-reflection-handler.cjs` (records session into STM/MTM, best-effort embeddings + maintenance, queues reflection)
   - `.claude/hooks/reflection/reflection-queue-processor.cjs` (writes `.claude/context/runtime/reflection-spawn-request.json` so reflection is actionable)
+  - SessionEnd is responsible for consolidation/finalization (STM -> MTM/LTM pathways), not per-prompt STM mutation.
 
 ### Memory Reminder
 
@@ -100,6 +102,8 @@ Note: Claude Code does not provide a `SessionStart` hook event; “session-start
 ### Reflection spawn
 
 Reflection is **reminder-driven**. The Router **must** perform Step 0 before `TaskList()`; no daemon or hook spawns the reflection-agent—compliance is required for pending reflections to run. The reflection-queue-processor writes `.claude/context/runtime/reflection-spawn-request.json`; on `UserPromptSubmit`, when that file has pending requests, `.claude/hooks/routing/user-prompt-unified.cjs` writes `.claude/context/runtime/reflection-reminder.txt`. Before `TaskList()` or any other tool, if `reflection-reminder.txt` exists, the Router must read it, read `reflection-spawn-request.json`, spawn reflection-agent for each request (or the first batch), then delete the reminder file and clear/trim the spawn request file. Health/dashboard may show `pendingReflectionRequests: N` when the spawn-request file contains queued items. A PreToolUse(TaskList) guard blocks by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning.
+
+Subagent citation and evidence behavior is defined in `@.claude/docs/SUBAGENT_MEMORY_CONTRACT.md`.
 
 An optional Step 0 guard runs on `PreToolUse(TaskList)` via `.claude/hooks/reflection/reflection-step0-guard.cjs`. It **blocks by default** when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow TaskList with warnings instead.
 

@@ -32,7 +32,10 @@ test('collectActiveHookBasenames extracts command basenames from settings hooks'
             {
               matcher: 'Task',
               hooks: [
-                { type: 'command', command: 'node .claude/hooks/routing/spawn-prompt-assembler.cjs' },
+                {
+                  type: 'command',
+                  command: 'node .claude/hooks/routing/spawn-prompt-assembler.cjs',
+                },
                 { type: 'command', command: 'node .claude/hooks/routing/pre-task-unified.cjs' },
               ],
             },
@@ -51,7 +54,11 @@ test('collectActiveHookBasenames extracts command basenames from settings hooks'
 test('findMissingHooks returns undocumented hooks not in exclusions', () => {
   assert.ok(validator, 'validator should be available');
 
-  const active = ['pre-task-unified.cjs', 'spawn-prompt-assembler.cjs', 'post-tool-metrics-unified.cjs'];
+  const active = [
+    'pre-task-unified.cjs',
+    'spawn-prompt-assembler.cjs',
+    'post-tool-metrics-unified.cjs',
+  ];
   const docsText = '... pre-task-unified.cjs ... spawn-prompt-assembler.cjs ...';
   const missing = validator.findMissingHooks(active, docsText, ['post-tool-metrics-unified.cjs']);
 

@@ -112,6 +112,35 @@ function getActiveLogFile() {
 }
 
 /**
+ * Synchronous sleep for exponential backoff
+ *
+ * SEC-AUDIT-020 FIX: Uses Atomics.wait() when available to properly block
+ * the thread without CPU spin. Falls back to busy-wait on older Node.js.
+ *
+ * @param {number} ms - Milliseconds to sleep
+ */
+function syncSleep(ms) {
+  // Use Atomics.wait for proper blocking (Node.js v16+)
+  if (typeof SharedArrayBuffer !== 'undefined' && typeof Atomics !== 'undefined') {
+    try {
+      // Create a shared buffer that will never be signaled (timeout-only)
+      const sharedBuffer = new SharedArrayBuffer(4);
+      const int32 = new Int32Array(sharedBuffer);
+      // Atomics.wait blocks the thread without CPU spin
+      Atomics.wait(int32, 0, 0, ms);
+      return;
+    } catch (_e) {
+      // Fall through to busy-wait if Atomics.wait fails
+    }
+  }
+  // Fallback to busy-wait for older Node.js versions
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    // Busy wait - only used when Atomics.wait unavailable
+  }
+}
+
+/**
  * Write error entry to log file with retry logic
  *
  * @param {Object} errorEntry - Error entry object
@@ -153,11 +182,7 @@ function writeError(errorEntry) {
       if (e.code === 'EBUSY' || e.code === 'EAGAIN' || e.code === 'EMFILE') {
         // Wait before retry
         const delay = RETRY_CONFIG.baseDelay * Math.pow(2, attempt);
-        // Use sync sleep for simplicity (this is error handling, not performance-critical)
-        const start = Date.now();
-        while (Date.now() - start < delay) {
-          // Busy wait
-        }
+        syncSleep(delay);
         continue;
       }
 

@@ -21,12 +21,9 @@ test('resume fails with explicit error when checkpoint JSON is malformed', async
     emit() {},
   };
 
-  await assert.rejects(
-    async () => {
-      await persistenceMethods.resume.call(fakeEngine, checkpointId);
-    },
-    /Invalid checkpoint/i
-  );
+  await assert.rejects(async () => {
+    await persistenceMethods.resume.call(fakeEngine, checkpointId);
+  }, /Invalid checkpoint/i);
 
   fs.rmSync(checkpointDir, { recursive: true, force: true });
 });

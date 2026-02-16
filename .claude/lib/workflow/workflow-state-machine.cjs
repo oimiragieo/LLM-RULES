@@ -14,6 +14,7 @@
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 
 /**
  * Valid state transitions
@@ -132,7 +133,7 @@ class WorkflowStateMachine {
       outputData: this.outputData,
     };
 
-    fs.writeFileSync(this.stateFile, JSON.stringify(content, null, 2), 'utf8');
+    atomicWriteJSONSync(this.stateFile, content);
   }
 
   /**

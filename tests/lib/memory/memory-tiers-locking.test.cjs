@@ -131,26 +131,25 @@ describe('M11: Memory Tiers File Locking', () => {
     );
   });
 
-  test('graceful degradation when lock acquisition fails', async () => {
+  test('fails closed when lock acquisition fails', async () => {
     const tiers = require('../../../.claude/lib/memory/memory-tiers.cjs');
+    const lockfile = require('proper-lockfile');
 
-    // Create a session in MTM
-    const mtmDir = tiers.getTierPath('MTM', tmpDir);
-    const sessionData = {
-      session_id: 'degraded-session',
-      tier: 'MTM',
-      timestamp: new Date().toISOString(),
-      summary: 'Degraded session test',
-    };
-    fs.writeFileSync(
-      path.join(mtmDir, 'session_degraded.json'),
-      JSON.stringify(sessionData, null, 2)
-    );
+    const lockPath = path.join(tmpDir, '.claude', 'context', 'runtime', 'memory-tiers.lock');
+    fs.writeFileSync(lockPath, '', 'utf8');
+    const release = lockfile.lockSync(lockPath, {
+      stale: 60_000,
+      retries: { retries: 0 },
+    });
 
-    // promoteToLTM should still work even without locking infrastructure
-    // (graceful degradation: if locking fails, proceed without lock)
-    const result = tiers.promoteToLTM('degraded-session', tmpDir);
-    assert.strictEqual(result.success, true, 'Promotion should succeed even in degraded mode');
+    try {
+      await assert.rejects(
+        tiers.withFileLock(async () => 'unexpected', tmpDir),
+        /fail-closed|lock acquisition failed/i
+      );
+    } finally {
+      release();
+    }
   });
 
   test('concurrent summarizeOldSessions with consolidation does not corrupt', async () => {

@@ -65,7 +65,10 @@ function loadBaseline(filePath) {
 
 function main(argv = process.argv) {
   const opts = parseArgs(argv);
-  const roots = [path.join(PROJECT_ROOT, '.claude', 'hooks'), path.join(PROJECT_ROOT, '.claude', 'lib')];
+  const roots = [
+    path.join(PROJECT_ROOT, '.claude', 'hooks'),
+    path.join(PROJECT_ROOT, '.claude', 'lib'),
+  ];
   const files = roots.flatMap(root => walk(root));
   const baseline = loadBaseline(opts.baselinePath);
 

@@ -126,7 +126,10 @@ function hooksRequire(modulePath) {
 
 /**
  * Require a module using relative path from hooks directory
- * Resolves ../../lib/ style paths correctly
+ * Resolves ../../lib/ style paths correctly.
+ *
+ * Note: ../ paths are evaluated relative to this module location
+ * (.claude/lib/utils), not the caller file path.
  */
 function resolveHookRequire(relativePath) {
   // Handle ../../lib/... paths
@@ -135,7 +138,7 @@ function resolveHookRequire(relativePath) {
     return libRequire(subPath);
   }
 
-  // Handle ../... paths (relative to hooks subdirectory)
+  // Handle ../... paths (relative to this resolver module path)
   if (relativePath.startsWith('../')) {
     // Already relative to hooks, use normal require
     return require(relativePath);

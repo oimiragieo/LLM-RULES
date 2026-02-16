@@ -96,7 +96,9 @@ function main(argv = process.argv) {
   } else if (issues.length === 0) {
     process.stdout.write('windows-hide-spawn: PASS\n');
   } else {
-    process.stdout.write(`windows-hide-spawn: ${opts.strict ? 'FAIL' : 'WARN'} (${issues.length})\n`);
+    process.stdout.write(
+      `windows-hide-spawn: ${opts.strict ? 'FAIL' : 'WARN'} (${issues.length})\n`
+    );
     for (const issue of issues) {
       process.stdout.write(` - ${issue.file}:${issue.line} ${issue.snippet}\n`);
     }

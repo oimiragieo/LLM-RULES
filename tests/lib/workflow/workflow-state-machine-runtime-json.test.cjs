@@ -7,7 +7,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { WorkflowStateMachine } = require('../../../.claude/lib/workflow/workflow-state-machine.cjs');
+const {
+  WorkflowStateMachine,
+} = require('../../../.claude/lib/workflow/workflow-state-machine.cjs');
 
 function withTempDir(fn) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'workflow-state-machine-json-'));

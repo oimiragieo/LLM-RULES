@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `run-hook.cmd` on Windows by replacing the fragile batch/bash wrapper with a robust Node.js script (`run-hook.cjs`). This ensures hooks can be executed reliably across platforms without path separator issues.
+- Documented missing `memory-reminder` hook in `.claude/hooks/README.md` as a known issue (file is missing).
+
 ### Changed - Observational Memory Rollout, CI Gates, and Stability Hardening (2026-02-12)
 
 #### Memory Architecture / Behavior

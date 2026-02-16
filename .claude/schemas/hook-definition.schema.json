@@ -15,7 +15,14 @@
     },
     "type": {
       "type": "string",
-      "enum": ["PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop"],
+      "enum": [
+        "PreToolUse",
+        "PostToolUse",
+        "PostToolUseFailure",
+        "UserPromptSubmit",
+        "SessionEnd",
+        "Stop"
+      ],
       "description": "Hook trigger type"
     },
     "purpose": {

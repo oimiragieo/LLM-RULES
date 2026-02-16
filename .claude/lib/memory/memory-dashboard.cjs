@@ -21,7 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
+// BUG-001 Fix: Use canonical PROJECT_ROOT to prevent nested .claude folder creation
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { summarizeOperationalSLO } = require('./memory-slo-metrics.cjs');

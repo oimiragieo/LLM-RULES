@@ -409,6 +409,15 @@ function looksAssembled(prompt) {
   );
 }
 
+function buildEvidenceId(prefix, content) {
+  const normalized = String(content || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!normalized) return `${prefix}:unknown`;
+  const digest = crypto.createHash('sha1').update(normalized).digest('hex').slice(0, 8);
+  return `${prefix}:${digest}`;
+}
+
 module.exports = {
   PROJECT_ROOT,
   LIB_DIR,
@@ -440,4 +449,5 @@ module.exports = {
   enforcePromptBudget,
   emitSpawnRagTelemetry,
   looksAssembled,
+  buildEvidenceId,
 };

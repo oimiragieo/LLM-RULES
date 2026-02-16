@@ -40,17 +40,17 @@ test('Task uses real process spawn by default', async () => {
     assert.equal(result.spawn.exitCode, 0);
     assert.ok(
       result.spawn.script.endsWith(
-        path.join('.claude', 'lib', 'tools', 'task-subagent-runner.cjs')
+        path.join('.claude', 'lib', 'tools', 'task-subagent-telemetry.cjs')
       ),
-      'Task should run framework subagent runner script'
+      'Task should run framework subagent telemetry script'
     );
     assert.equal(result.spawn.output?.frameworkLoaded, true);
 
     const updatedEvents = fs.existsSync(eventsPath) ? fs.readFileSync(eventsPath, 'utf8') : '';
     const appended = updatedEvents.slice(initialEvents.length);
     assert.ok(
-      appended.includes('"toolName":"task-subagent-runner"'),
-      'Runner should emit TOOL_COMPLETED event to event-bus sink'
+      appended.includes('"toolName":"task-subagent-telemetry"'),
+      'Telemetry helper should emit TOOL_COMPLETED event to event-bus sink'
     );
   } finally {
     restoreEnv('TASK_TOOL_REAL_SPAWN', previous);

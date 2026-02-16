@@ -144,7 +144,9 @@ function main(argv = process.argv) {
   } else if (missing.length === 0) {
     process.stdout.write('enforcement-env-sync: PASS\n');
   } else {
-    process.stdout.write(`enforcement-env-sync: ${opts.strict ? 'FAIL' : 'WARN'} (${missing.length} missing)\n`);
+    process.stdout.write(
+      `enforcement-env-sync: ${opts.strict ? 'FAIL' : 'WARN'} (${missing.length} missing)\n`
+    );
     for (const item of missing) {
       process.stdout.write(` - ${item}\n`);
     }

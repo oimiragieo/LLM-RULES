@@ -7,6 +7,7 @@ const {
   libRequire,
   debugLog,
   capTierBSection,
+  buildEvidenceId,
 } = require('./spawn-prompt-assembler.core.cjs');
 
 function appendSemanticMatches(prompt, results) {
@@ -15,6 +16,7 @@ function appendSemanticMatches(prompt, results) {
   const lines = [];
   lines.push('### Semantic Matches (ContextualMemory)');
   lines.push('_Best-effort semantic retrieval based on this task_');
+  lines.push('_When using these facts, cite the evidence id like [mem:xxxxxxxx]._');
   lines.push('');
 
   for (const r of results.slice(0, 3)) {
@@ -29,7 +31,10 @@ function appendSemanticMatches(prompt, results) {
       .trim()
       .slice(0, 180);
     if (!snippet) continue;
-    lines.push(`- [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`);
+    const evidenceId = buildEvidenceId('mem', snippet);
+    lines.push(
+      `- [${evidenceId}] [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`
+    );
   }
 
   const section = capTierBSection(lines.join('\n').trimEnd() + '\n');
@@ -51,6 +56,7 @@ function appendQueryMemories(prompt, results) {
   const lines = [];
   lines.push('### Relevant Memories (Query)');
   lines.push('_Best-effort retrieval based on the current task_');
+  lines.push('_When using these facts, cite the evidence id like [mem:xxxxxxxx]._');
   lines.push('');
 
   for (const r of results.slice(0, 5)) {
@@ -65,7 +71,10 @@ function appendQueryMemories(prompt, results) {
       .trim()
       .slice(0, 180);
     if (!snippet) continue;
-    lines.push(`- [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`);
+    const evidenceId = buildEvidenceId('mem', snippet);
+    lines.push(
+      `- [${evidenceId}] [${src}${sim}]${where}: ${snippet}${snippet.length >= 180 ? '...' : ''}`
+    );
   }
 
   const section = capTierBSection(lines.join('\n').trimEnd() + '\n');

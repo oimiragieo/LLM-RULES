@@ -23,7 +23,7 @@ const { spawnSync } = require('child_process');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
-// BUG-001 Fix: Import findProjectRoot to prevent nested .claude folder creation
+// BUG-001 Fix: Use canonical PROJECT_ROOT to prevent nested .claude folder creation
 // CRITICAL-001 FIX: Path traversal prevention
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
 const eventBus = require('../events/event-bus.cjs');
