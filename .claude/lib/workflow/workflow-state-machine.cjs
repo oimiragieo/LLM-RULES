@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 /**
  * Valid state transitions
@@ -75,29 +76,36 @@ class WorkflowStateMachine {
   _initialize() {
     if (this.stateFile && fs.existsSync(this.stateFile)) {
       // Restore from file
-      const content = JSON.parse(fs.readFileSync(this.stateFile, 'utf8'));
-      this.state = {
-        currentState: content.currentState,
-        workflowId: content.workflowId,
-        enteredAt: content.enteredAt,
-        metadata: content.metadata || {},
-      };
-      this.transitionHistory = content.transitionHistory || [];
-      this.children = content.children || [];
-      this.parentId = content.parentId || null;
-      this.progress = content.progress || 0;
-      this.inputData = content.inputData || null;
-      this.outputData = content.outputData || null;
-    } else {
-      // Create new state
-      this.state = {
-        currentState: this.initialState,
-        workflowId: this.workflowId,
-        enteredAt: new Date().toISOString(),
-        metadata: {},
-      };
-      this._persist();
+      const content = readObjectFile(this.stateFile);
+      if (
+        content &&
+        typeof content.currentState === 'string' &&
+        typeof content.workflowId === 'string'
+      ) {
+        this.state = {
+          currentState: content.currentState,
+          workflowId: content.workflowId,
+          enteredAt: content.enteredAt || new Date().toISOString(),
+          metadata: content.metadata || {},
+        };
+        this.transitionHistory = content.transitionHistory || [];
+        this.children = content.children || [];
+        this.parentId = content.parentId || null;
+        this.progress = content.progress || 0;
+        this.inputData = content.inputData || null;
+        this.outputData = content.outputData || null;
+        return;
+      }
     }
+
+    // Create new state
+    this.state = {
+      currentState: this.initialState,
+      workflowId: this.workflowId,
+      enteredAt: new Date().toISOString(),
+      metadata: {},
+    };
+    this._persist();
   }
 
   /**
@@ -340,8 +348,10 @@ class WorkflowStateMachine {
     let totalProgress = 0;
     for (const childInfo of this.children) {
       if (childInfo.stateFile && fs.existsSync(childInfo.stateFile)) {
-        const childData = JSON.parse(fs.readFileSync(childInfo.stateFile, 'utf8'));
-        totalProgress += childData.progress || 0;
+        const childData = readObjectFile(childInfo.stateFile);
+        if (childData) {
+          totalProgress += childData.progress || 0;
+        }
       }
     }
 
@@ -458,6 +468,19 @@ class WorkflowStateMachine {
     this.transactionLog = [];
 
     this._persist();
+  }
+}
+
+function readObjectFile(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const parsed = safeParseJSON(raw, null);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null;
+    }
+    return parsed;
+  } catch (_err) {
+    return null;
   }
 }
 

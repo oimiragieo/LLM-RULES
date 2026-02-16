@@ -31,6 +31,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const { promisify } = require('util');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const _gzip = promisify(zlib.gzip);
 const _gunzip = promisify(zlib.gunzip);
@@ -92,7 +93,11 @@ function compressState(state) {
 function decompressState(compressed) {
   const buffer = zlib.gunzipSync(compressed);
   const json = buffer.toString('utf-8');
-  return JSON.parse(json);
+  const parsed = safeParseJSON(json, null);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Invalid checkpoint payload');
+  }
+  return parsed;
 }
 
 // =============================================================================
@@ -452,6 +457,19 @@ function generateChecksum(data) {
   return crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex');
 }
 
+function isValidSimpleCheckpoint(parsed) {
+  return Boolean(
+    parsed &&
+    typeof parsed === 'object' &&
+    !Array.isArray(parsed) &&
+    typeof parsed.workflowId === 'string' &&
+    typeof parsed.stepId === 'string' &&
+    typeof parsed.timestamp === 'string' &&
+    typeof parsed.checksum === 'string' &&
+    Object.prototype.hasOwnProperty.call(parsed, 'state')
+  );
+}
+
 /**
  * Save checkpoint (simple API)
  * Accepts both signatures:
@@ -510,12 +528,16 @@ async function load(arg1, arg2) {
 
   try {
     const content = await fs.promises.readFile(checkpointPath, 'utf8');
-    return JSON.parse(content);
+    const parsed = safeParseJSON(content, null);
+    if (!isValidSimpleCheckpoint(parsed)) {
+      return null;
+    }
+    return parsed;
   } catch (err) {
     if (err.code === 'ENOENT') {
       return null;
     }
-    throw err;
+    return null;
   }
 }
 

@@ -142,6 +142,7 @@ function runTestSuite(suiteKey, verbose = false) {
       encoding: 'utf-8',
       stdio: verbose ? 'inherit' : 'pipe',
       cwd: PROJECT_ROOT,
+      windowsHide: true,
     });
 
     if (result.status !== 0) {

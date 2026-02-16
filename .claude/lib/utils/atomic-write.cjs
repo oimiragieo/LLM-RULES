@@ -52,6 +52,7 @@ function atomicWriteSync(filePath, content, options = {}) {
   const dir = path.dirname(filePath);
   const tempFile = path.join(dir, `.tmp-${crypto.randomBytes(4).toString('hex')}`);
   const syncLockEnabled =
+    !options.skipLock &&
     String(process.env.ATOMIC_WRITE_SYNC_LOCK || 'on')
       .trim()
       .toLowerCase() !== 'off';
@@ -212,11 +213,14 @@ async function atomicWriteAsync(filePath, content, options = {}) {
  *
  * @param {string} filePath - Absolute path to target file
  * @param {*} data - Data to serialize to JSON
+ * @param {Object} [options] - Options for write (e.g. skipLock: true)
  * @throws {Error} If serialization, write, or rename fails
  */
-function atomicWriteJSONSync(filePath, data) {
+function atomicWriteJSONSync(filePath, data, options = {}) {
   const content = JSON.stringify(data, null, 2) + '\n';
-  atomicWriteSync(filePath, content, 'utf8');
+  const writeOptions =
+    typeof options === 'string' ? { encoding: options } : { encoding: 'utf8', ...options };
+  atomicWriteSync(filePath, content, writeOptions);
 }
 
 /**
@@ -304,13 +308,13 @@ function restoreFromBackup(filePath, backupPath = null) {
  * @throws {Error} If serialization, write, or rename fails
  */
 function atomicWriteJSONSyncWithBackup(filePath, data, options = {}) {
-  const { backup = true } = options;
+  const { backup = true, ...writeOptions } = options;
 
   if (backup) {
     createBackup(filePath);
   }
 
-  atomicWriteJSONSync(filePath, data);
+  atomicWriteJSONSync(filePath, data, writeOptions);
 }
 
 module.exports = {

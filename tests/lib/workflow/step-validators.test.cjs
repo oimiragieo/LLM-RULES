@@ -296,6 +296,22 @@ describe('validateSettingsJsonRegistration', () => {
     const result = validateSettingsJsonRegistration('nonexistent-hook-xyz123');
     assertEqual(result.passed, false);
   });
+
+  it('should fail gracefully when settings.json is malformed', () => {
+    const settingsPath = path.join(PROJECT_ROOT, '.claude', 'settings.json');
+    const original = fs.readFileSync(settingsPath, 'utf8');
+    fs.writeFileSync(settingsPath, '{bad json', 'utf8');
+    try {
+      const result = validateSettingsJsonRegistration('any-hook');
+      assertEqual(result.passed, false);
+      assert(
+        typeof result.error === 'string' && result.error.length > 0,
+        'Should return parse-safe error'
+      );
+    } finally {
+      fs.writeFileSync(settingsPath, original, 'utf8');
+    }
+  });
 });
 
 describe('validateSkillCatalogRegistration', () => {

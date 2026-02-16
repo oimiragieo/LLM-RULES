@@ -51,7 +51,7 @@ evolution:
 monitoring:
   enabled: true
   thresholds:
-    hookExecutionTimeMs: 10 # Alert if hook takes longer than 10ms
+    hookExecutionTimeMs: 100 # Alert if hook takes longer than 100ms
     hookFailureRate: 5 # Alert if failure rate exceeds 5%
     agentFailureRate: 3 # Alert if agent failure rate exceeds 3%
     errorRatePerHour: 10 # Alert if more than 10 errors per hour

@@ -18,6 +18,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // =============================================================================
 // Constants
@@ -419,7 +420,10 @@ function validateSettingsJsonRegistration(hookName) {
     }
 
     const content = fs.readFileSync(settingsPath, 'utf-8');
-    const settings = JSON.parse(content);
+    const settings = safeParseJSON(content, null);
+    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+      return { passed: false, error: 'Failed to check settings.json: invalid JSON' };
+    }
 
     // Check if hook is in hooks array
     if (settings.hooks && Array.isArray(settings.hooks)) {

@@ -60,17 +60,20 @@ const SCHEMAS = {
       taskSpawnedAt: null,
       taskDescription: null,
       sessionId: null,
+      taskListCalledSincePrompt: false,
       // Complexity tracking fields
       complexity: 'trivial',
       requiresPlannerFirst: false,
       plannerSpawned: false,
       requiresSecurityReview: false,
       securitySpawned: false,
+      architectSpawned: false,
       // TaskUpdate tracking fields
       lastTaskUpdateCall: null,
       lastTaskUpdateTaskId: null,
       lastTaskUpdateStatus: null,
       taskUpdatesThisSession: 0,
+      currentSpawnTaskId: null,
       // Optimistic concurrency version field
       version: 0,
     },

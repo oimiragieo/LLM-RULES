@@ -36,6 +36,7 @@ skills:
   - diagram-generator
   - git-expert
   - pandas-data-manipulation-rules
+  - pipeline-reflection-ux
   - python-backend-expert
   - ripgrep
   - tdd

@@ -28,6 +28,7 @@ const path = require('path');
 const { parseHookInputAsync, formatResult } = require('../../lib/utils/hook-input.cjs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const { evaluateGate } = require('../../lib/workflow/quality-gates.cjs');
+const { readWorkflowStateFile } = require('../../lib/runtime/state-contracts.cjs');
 
 // Resolve project root
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -101,7 +102,12 @@ async function processTaskCompletion(hookData) {
 
   console.error('[post-completion-chain] Processing completion for task:', update.taskId);
 
-  const workflowState = JSON.parse(fs.readFileSync(WORKFLOW_STATE_FILE, 'utf8'));
+  const workflowState = readWorkflowStateFile(WORKFLOW_STATE_FILE, null);
+  if (!workflowState) {
+    console.error('[post-completion-chain] Invalid workflow state file, passing through');
+    console.log(formatResult({}));
+    return { result: {} };
+  }
   const currentPhase = workflowState.currentPhase;
 
   if (!currentPhase || currentPhase === 'COMPLETE') {

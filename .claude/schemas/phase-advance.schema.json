@@ -1,0 +1,14 @@
+{
+  "title": "Phase Advance Signal",
+  "type": "object",
+  "required": ["workflowId", "advanceTo", "previousPhase", "gatePassed", "timestamp"],
+  "properties": {
+    "workflowId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "advanceTo": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "previousPhase": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "gatePassed": { "type": "boolean" },
+    "gateResults": { "type": ["object", "null"], "additionalProperties": true },
+    "timestamp": { "type": "string", "minLength": 1, "maxLength": 80 }
+  },
+  "additionalProperties": true
+}

@@ -300,6 +300,15 @@ test('missing state file creates new one without crashing', () => {
   assertTrue(fs.existsSync(STATE_FILE), 'State file should exist on disk');
 });
 
+test('malformed state file is ignored and reinitialized', () => {
+  cleanupState();
+  fs.writeFileSync(STATE_FILE, '{bad json', 'utf-8');
+  const { result, state } = runAndGetState('Add authentication to the app');
+  assertEqual(result.exitCode, 0, 'Should exit 0 with malformed prior state');
+  assertTrue(state !== null, 'State should be reinitialized');
+  assertEqual(state.editCount, 1, 'Reinitialized state should start at first edit');
+});
+
 // ============================================================
 // Test 7: Session ID sanitization
 // ============================================================

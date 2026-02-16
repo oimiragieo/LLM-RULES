@@ -136,6 +136,19 @@ test('should return null if checkpoint does not exist', async () => {
   await teardownTest();
 });
 
+test('should return null (not throw) for malformed checkpoint JSON', async () => {
+  await setupTest();
+
+  const workflowId = 'malformed-workflow';
+  const checkpointPath = path.join(TEST_ROOT, `${workflowId}.json`);
+  await fs.writeFile(checkpointPath, '{bad json', 'utf8');
+
+  const loaded = await checkpointManager.load({ workflowId }, TEST_ROOT);
+  assert.strictEqual(loaded, null, 'Malformed checkpoint should be treated as missing');
+
+  await teardownTest();
+});
+
 test('should load checkpoint in <50ms', async () => {
   await setupTest();
 

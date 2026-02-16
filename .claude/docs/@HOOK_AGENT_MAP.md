@@ -87,13 +87,13 @@ These environment variables control hook enforcement modes. Set them in `.env` t
 | `PLANNER_FIRST_ENFORCEMENT`    | routing-guard.cjs          | block   | block/warn/off | Require planner for complex tasks                           |
 | `SECURITY_REVIEW_ENFORCEMENT`  | routing-guard.cjs          | block   | block/warn/off | Require security-architect for security work                |
 | `CREATOR_GUARD`                | unified-creator-guard.cjs  | block   | block/warn/off | Block direct artifact writes (SKILL.md, agents/\*.md, etc.) |
-| `REFLECTION_STEP0_ENFORCEMENT` | reflection-step0-guard.cjs | warn    | block/warn/off | Block TaskList when pending reflections                     |
+| `REFLECTION_STEP0_ENFORCEMENT` | reflection-step0-guard.cjs | block   | block/warn/off | Block TaskList when pending reflections                     |
 | `SPAWN_PROMPT_VALIDATOR`       | spawn-prompt-validator.cjs | warn    | block/warn/off | Validate spawn prompt structure                             |
 | `CONFIG_MODEL_VALIDATOR`       | config-model-validator.cjs | warn    | block/warn/off | Validate model matches config.yaml                          |
 | `TOOL_SCOPE_VALIDATOR`         | tool-scope-validator.cjs   | warn    | block/warn/off | Validate tool in agent's allowed set                        |
 | `ROUTER_WRITE_GUARD`           | routing-guard.cjs          | block   | block/warn/off | Block Router from using Write/Edit/NotebookEdit             |
 | `ROUTER_SELF_CHECK`            | routing-guard.cjs          | block   | block/warn/off | Enforce Router self-check gates                             |
-| `TASKLIST_FIRST_ENFORCEMENT`   | routing-guard.cjs          | warn    | block/warn/off | Enforce TaskList() before Task()                            |
+| `TASKLIST_FIRST_ENFORCEMENT`   | routing-guard.cjs          | block   | block/warn/off | Enforce TaskList() before Task()                            |
 | `STATE_STALE_THRESHOLD_MS`     | routing-guard.cjs          | 600000  | number         | State staleness threshold (ms)                              |
 | `RESEARCH_ENFORCEMENT`         | research-enforcement.cjs   | block   | block/warn/off | Enforce research-synthesis before creators                  |
 
@@ -110,9 +110,9 @@ These environment variables control hook enforcement modes. Set them in `.env` t
 PLANNER_FIRST_ENFORCEMENT=block
 SECURITY_REVIEW_ENFORCEMENT=block
 CREATOR_GUARD=block
-REFLECTION_STEP0_ENFORCEMENT=warn
-SPAWN_PROMPT_VALIDATOR=warn
-CONFIG_MODEL_VALIDATOR=warn
+REFLECTION_STEP0_ENFORCEMENT=block
+SPAWN_PROMPT_VALIDATOR=block
+CONFIG_MODEL_VALIDATOR=block
 INTENT_AGENT_ENFORCEMENT=block
 TOOL_SCOPE_VALIDATOR=warn
 ```

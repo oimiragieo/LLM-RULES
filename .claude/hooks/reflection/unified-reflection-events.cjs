@@ -102,6 +102,9 @@ function createReflectionEventHandlers({
 
     if (toolInput.metadata && toolInput.metadata.summary) {
       entry.summary = toolInput.metadata.summary;
+    } else {
+      const fallbackTaskId = update.taskId || 'unknown';
+      entry.summary = `Task ${fallbackTaskId} completed without summary metadata`;
     }
 
     return entry;

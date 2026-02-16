@@ -257,6 +257,29 @@ describe('reflection-queue-processor', () => {
       assert.strictEqual(first.total, 1);
       assert.strictEqual(second.total, 1);
     });
+
+    it('should sanitize existing spawn requests when loading from file', () => {
+      const spawnFile = processor.getSpawnRequestFile(processor.QUEUE_FILE);
+      fs.mkdirSync(path.dirname(spawnFile), { recursive: true });
+      fs.writeFileSync(
+        spawnFile,
+        JSON.stringify([
+          { id: 'bad-1' },
+          {
+            id: 'good-1',
+            subagent_type: 'reflection-agent',
+            prompt: 'Process reflection',
+            source: { priority: 'high' },
+          },
+        ]),
+        'utf8'
+      );
+
+      const loaded = processor.readExistingSpawnRequests(spawnFile);
+      assert.strictEqual(loaded.length, 1);
+      assert.strictEqual(loaded[0].id, 'good-1');
+      assert.strictEqual(loaded[0].subagent_type, 'reflection-agent');
+    });
   });
 
   describe('markEntriesProcessed', () => {

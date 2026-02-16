@@ -26,6 +26,18 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - Agent type extraction for model validation now correctly parses prompts such as `You are a developer`.
 - `spawn-prompt-assembler.cjs` includes model mismatch fail-safe auto-correction to configured model before final spawn validation.
 - Spawn prompt assembly now supports token/perf controls (`SPAWN_PROMPT_MAX_CHARS`, adaptive enrichment, cache, optional profiling metrics).
+- Active settings-registered hooks now explicitly include:
+  - `bash-pretool-bundle.cjs`
+  - `hybrid-search-enforcer.cjs`
+  - `agent-template-contract-validator.cjs`
+  - `taskupdate-contract-validator.cjs`
+  - `creator-compliance-validator.cjs`
+  - `post-tool-metrics-unified.cjs`
+  - `post-creation-integration.cjs`
+  - `artifact-scoring-ledger-hook.cjs`
+  - `agent-registry-auto-refresh.cjs`
+  - `sanitize-debug-log.cjs`
+  - `user-prompt-orchestrator.cjs`
 
 ## Hook Events
 

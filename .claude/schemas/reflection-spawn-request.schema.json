@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-code.anthropic.com/schemas/reflection-spawn-request",
+  "title": "Reflection Spawn Request",
+  "type": "array",
+  "maxItems": 200,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "subagent_type", "prompt", "source"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "subagent_type": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120
+      },
+      "description": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "prompt": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 12000
+      },
+      "source": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["trigger", "timestamp", "taskId", "context", "priority"],
+        "properties": {
+          "trigger": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "taskId": {
+            "type": ["string", "null"],
+            "maxLength": 128
+          },
+          "context": {
+            "type": ["string", "null"],
+            "maxLength": 128
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        }
+      }
+    }
+  }
+}

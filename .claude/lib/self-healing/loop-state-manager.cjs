@@ -240,7 +240,7 @@ function saveState(state, stateFile = LOOP_STATE_FILE) {
       actionHistory: pruneActionHistory(state?.actionHistory),
       updatedAt: new Date().toISOString(),
     };
-    atomicWriteJSONSync(stateFile, updated);
+    atomicWriteJSONSync(stateFile, updated, { skipLock: true });
   } finally {
     if (lockAcquired) {
       releaseLock(stateFile);

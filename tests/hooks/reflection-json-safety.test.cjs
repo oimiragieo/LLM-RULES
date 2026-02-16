@@ -47,12 +47,13 @@ describe('safeParseJSON adoption in reflection hooks', () => {
 
         const content = fs.readFileSync(filePath, 'utf8');
 
-        // Check for safeParseJSON import
-        const importPattern = /require\([^)]*safe-json\.cjs[^)]*\)/;
+        // Accept either direct safeParseJSON import or shared contract helper import
+        const importPattern =
+          /require\([^)]*safe-json\.cjs[^)]*\)|require\([^)]*spawn-request-contract\.cjs[^)]*\)/;
         assert.ok(
           importPattern.test(content),
-          `${hook.name} does not import from safe-json.cjs. ` +
-            'Must use safeParseJSON for prototype pollution protection.'
+          `${hook.name} does not import safe JSON parsing path. ` +
+            'Must use safeParseJSON directly or shared spawn-request contract helper.'
         );
       });
 
@@ -77,9 +78,9 @@ describe('safeParseJSON adoption in reflection hooks', () => {
         const funcBody = content.substring(startIdx, endIdx);
 
         // Check that the function body does NOT contain raw JSON.parse(content)
-        // but DOES contain safeParseJSON
+        // but DOES contain safeParseJSON or readSpawnRequestsFile
         const rawJsonParse = /JSON\.parse\s*\(\s*content\s*\)/;
-        const safeJsonParse = /safeParseJSON\s*\(/;
+        const safeJsonParse = /safeParseJSON\s*\(|readSpawnRequestsFile\s*\(/;
 
         assert.ok(
           !rawJsonParse.test(funcBody),
@@ -89,8 +90,8 @@ describe('safeParseJSON adoption in reflection hooks', () => {
 
         assert.ok(
           safeJsonParse.test(funcBody),
-          `${hook.name}.${hook.functionName}() does not call safeParseJSON. ` +
-            'Must use safeParseJSON instead of JSON.parse.'
+          `${hook.name}.${hook.functionName}() does not call safe JSON parser path. ` +
+            'Must use safeParseJSON or readSpawnRequestsFile instead of JSON.parse.'
         );
       });
     });

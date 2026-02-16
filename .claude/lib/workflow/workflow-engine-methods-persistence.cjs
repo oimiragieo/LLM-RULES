@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 module.exports = {
   /**
@@ -54,7 +55,16 @@ module.exports = {
       throw new Error(`Checkpoint not found: ${checkpointId}`);
     }
 
-    const checkpointData = JSON.parse(await fs.promises.readFile(checkpointPath, 'utf-8'));
+    const raw = await fs.promises.readFile(checkpointPath, 'utf-8');
+    const checkpointData = safeParseJSON(raw, null);
+    if (
+      !checkpointData ||
+      typeof checkpointData !== 'object' ||
+      Array.isArray(checkpointData) ||
+      !Object.prototype.hasOwnProperty.call(checkpointData, 'state')
+    ) {
+      throw new Error(`Invalid checkpoint payload: ${checkpointId}`);
+    }
 
     // Restore state
     this.state = checkpointData.state;

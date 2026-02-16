@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
@@ -26,7 +27,10 @@ function safeReadJSON(filePath, defaults) {
   try {
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(content);
+      const parsed = safeParseJSON(content, null);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed;
+      }
     }
   } catch (_err) {
     // File missing or malformed JSON - return defaults

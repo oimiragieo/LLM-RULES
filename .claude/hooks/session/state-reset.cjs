@@ -25,6 +25,7 @@ const path = require('path');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs');
 
 // Paths
@@ -36,8 +37,10 @@ const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'rou
 function getCurrentSessionId() {
   try {
     if (fs.existsSync(STATE_FILE)) {
-      const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));
-      return state.sessionId || null;
+      const state = safeParseJSON(fs.readFileSync(STATE_FILE, 'utf-8'), null);
+      if (state && typeof state === 'object' && !Array.isArray(state)) {
+        return state.sessionId || null;
+      }
     }
   } catch (_err) {
     // Ignore errors

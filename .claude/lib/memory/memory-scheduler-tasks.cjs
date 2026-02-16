@@ -135,6 +135,7 @@ function createMemorySchedulerTaskRunners(deps) {
 
       const proc = spawnSync(process.execPath, [cliPath, '--json'], {
         encoding: 'utf8',
+        windowsHide: true,
       });
       if (proc.status !== 0) {
         result.details = proc.stderr || 'memory-extract failed';

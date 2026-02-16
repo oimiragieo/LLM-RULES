@@ -13,6 +13,7 @@ const {
 
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
+const { readRouterStateFile } = libRequire(path.join('runtime', 'state-contracts.cjs'));
 
 function resolveSelectedModel(toolInput, configModel, explicitTaskId, agentType) {
   let selectedModel = toolInput.model || configModel?.model || toolInput.model;
@@ -280,7 +281,7 @@ function getActivePreset() {
   );
   try {
     if (fs.existsSync(routerStatePath)) {
-      const state = JSON.parse(fs.readFileSync(routerStatePath, 'utf8'));
+      const state = readRouterStateFile(routerStatePath, { preset: null });
       if (state.preset) {
         return state.preset;
       }

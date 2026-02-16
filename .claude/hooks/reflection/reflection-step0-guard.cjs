@@ -30,10 +30,10 @@ const {
   auditLog,
 } = require('../../lib/utils/hook-input.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 let eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
-// SEC-PROTO-001: Use safeParseJSON for prototype pollution protection
-const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { readSpawnRequestsFile } = require('../../lib/reflection/spawn-request-contract.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
@@ -67,29 +67,7 @@ function stderrLog(message, meta = {}) {
 }
 
 function readSpawnRequests(filePath) {
-  try {
-    if (!fs.existsSync(filePath)) return [];
-    const content = fs.readFileSync(filePath, 'utf8');
-    if (!content.trim()) return [];
-    // SEC-PROTO-001: Use safeParseJSON for prototype pollution protection.
-    const parsed = safeParseJSON(content, null);
-    if (Array.isArray(parsed)) {
-      return parsed;
-    }
-
-    // safeParseJSON fallback may normalize arrays into objects with numeric keys.
-    if (parsed && typeof parsed === 'object') {
-      const numericKeys = Object.keys(parsed)
-        .filter(key => /^\d+$/.test(key))
-        .sort((a, b) => Number(a) - Number(b));
-      if (numericKeys.length > 0) {
-        return numericKeys.map(key => parsed[key]);
-      }
-    }
-    return [];
-  } catch (_err) {
-    return [];
-  }
+  return readSpawnRequestsFile(filePath);
 }
 
 function clearReminderIfStale() {

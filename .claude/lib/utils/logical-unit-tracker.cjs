@@ -12,6 +12,7 @@ const { execFileSync } = require('node:child_process');
 function runGit(repoPath, args, options = {}) {
   return execFileSync('git', args, {
     cwd: repoPath,
+    windowsHide: true,
     ...options,
   });
 }

@@ -14,10 +14,7 @@ test('eventBus.on enforces max total subscription cap', () => {
   const sub = eventBus.on('AGENT_STARTED', () => {});
   assert.ok(sub);
 
-  assert.throws(
-    () => eventBus.on('AGENT_COMPLETED', () => {}),
-    /subscription limit exceeded/i
-  );
+  assert.throws(() => eventBus.on('AGENT_COMPLETED', () => {}), /subscription limit exceeded/i);
 
   eventBus.off(sub);
   eventBus.maxTotalSubscriptions = originalCap;

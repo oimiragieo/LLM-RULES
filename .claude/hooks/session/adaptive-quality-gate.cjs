@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Allow tests to override runtime directory via env var
 const RUNTIME_DIR =
@@ -32,11 +33,19 @@ function readCounter() {
       return { count: 0, firstThresholdHit: false, secondThresholdHit: false };
     }
     const data = fs.readFileSync(COUNTER_FILE, 'utf8');
-    return JSON.parse(data);
+    const parsed = safeParseJSON(data, null);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      typeof parsed.count === 'number'
+    ) {
+      return parsed;
+    }
   } catch (_err) {
     // Malformed file - reset to default
-    return { count: 0, firstThresholdHit: false, secondThresholdHit: false };
   }
+  return { count: 0, firstThresholdHit: false, secondThresholdHit: false };
 }
 
 /**
@@ -63,7 +72,17 @@ function determineThresholds() {
       return { first: 5, second: 10, repeat: 10 };
     }
 
-    const metrics = JSON.parse(fs.readFileSync(METRICS_FILE, 'utf8'));
+    const metricsRaw = fs.readFileSync(METRICS_FILE, 'utf8');
+    const metrics = safeParseJSON(metricsRaw, null);
+    if (
+      !metrics ||
+      typeof metrics !== 'object' ||
+      Array.isArray(metrics) ||
+      (metrics.corrections_count !== undefined && typeof metrics.corrections_count !== 'number') ||
+      (metrics.prompt_count !== undefined && typeof metrics.prompt_count !== 'number')
+    ) {
+      return { first: 5, second: 10, repeat: 10 };
+    }
     const corrections = metrics.corrections_count || 0;
     const prompts = metrics.prompt_count || 1; // avoid division by zero
 
@@ -126,7 +145,11 @@ function main() {
     const stdinBuffer = fs.readFileSync(0, 'utf8');
 
     // Parse input JSON
-    JSON.parse(stdinBuffer);
+    const parsedInput = safeParseJSON(stdinBuffer, null);
+    if (!parsedInput || typeof parsedInput !== 'object' || Array.isArray(parsedInput)) {
+      process.exit(0);
+      return;
+    }
 
     // Read counter
     let counter = readCounter();

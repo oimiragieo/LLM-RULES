@@ -15,6 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { readPhaseAdvanceFile } = require('../runtime/state-contracts.cjs');
 
 /**
  * Default phase-advance signal file
@@ -149,13 +150,7 @@ const PHASE_AGENT_ROUTING = {
  */
 function checkForAdvance(filePath = DEFAULT_PHASE_ADVANCE_FILE) {
   try {
-    if (!fs.existsSync(filePath)) {
-      return null;
-    }
-
-    const content = fs.readFileSync(filePath, 'utf8');
-    const signal = JSON.parse(content);
-    return signal;
+    return readPhaseAdvanceFile(filePath, null);
   } catch (_err) {
     // Corrupted file or invalid JSON
     return null;

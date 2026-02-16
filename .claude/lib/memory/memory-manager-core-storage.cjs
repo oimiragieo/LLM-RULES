@@ -168,6 +168,7 @@ function createStorageHelpers({
             cwd: projectRoot,
             stdio: 'ignore',
             timeout: timeoutMs,
+            windowsHide: true,
           });
           if (spawnResult.signal === 'SIGTERM' || spawnResult.status !== 0) {
             logger.warn('Embedding generation may be partial', {
@@ -296,7 +297,7 @@ function createStorageHelpers({
     }
   }
 
-  function writeMemoryArray(filePath, data) {
+  function writeMemoryArray(filePath, data, options = {}) {
     const arrayData = Array.isArray(data) ? data : [];
 
     for (const entry of arrayData) {
@@ -314,7 +315,7 @@ function createStorageHelpers({
       }
     }
 
-    atomicWriteJSONSync(filePath, arrayData);
+    atomicWriteJSONSync(filePath, arrayData, options);
   }
 
   function normalizeEntryIds(entries) {
@@ -341,34 +342,46 @@ function createStorageHelpers({
     let deleted = 0;
     const remainingIds = new Set(list);
 
-    const gotchas = loadMemoryArray(gotchasFile);
-    const gotchasChanged = normalizeEntryIds(gotchas);
-    const keptGotchas = gotchas.filter(entry => {
-      const entryId = buildEntryId(entry);
-      if (remainingIds.has(entryId)) {
-        remainingIds.delete(entryId);
-        deleted += 1;
-        return false;
-      }
-      return true;
-    });
-    if (gotchasChanged || keptGotchas.length !== gotchas.length) {
-      writeMemoryArray(gotchasFile, keptGotchas);
+    try {
+      withFileLockSync(gotchasFile, () => {
+        const gotchas = loadMemoryArray(gotchasFile);
+        const gotchasChanged = normalizeEntryIds(gotchas);
+        const keptGotchas = gotchas.filter(entry => {
+          const entryId = buildEntryId(entry);
+          if (remainingIds.has(entryId)) {
+            remainingIds.delete(entryId);
+            deleted += 1;
+            return false;
+          }
+          return true;
+        });
+        if (gotchasChanged || keptGotchas.length !== gotchas.length) {
+          writeMemoryArray(gotchasFile, keptGotchas, { skipLock: true });
+        }
+      });
+    } catch (e) {
+      logger.warn('Failed to lock/update gotchas.json', { error: e.message });
     }
 
-    const patterns = loadMemoryArray(patternsFile);
-    const patternsChanged = normalizeEntryIds(patterns);
-    const keptPatterns = patterns.filter(entry => {
-      const entryId = buildEntryId(entry);
-      if (remainingIds.has(entryId)) {
-        remainingIds.delete(entryId);
-        deleted += 1;
-        return false;
-      }
-      return true;
-    });
-    if (patternsChanged || keptPatterns.length !== patterns.length) {
-      writeMemoryArray(patternsFile, keptPatterns);
+    try {
+      withFileLockSync(patternsFile, () => {
+        const patterns = loadMemoryArray(patternsFile);
+        const patternsChanged = normalizeEntryIds(patterns);
+        const keptPatterns = patterns.filter(entry => {
+          const entryId = buildEntryId(entry);
+          if (remainingIds.has(entryId)) {
+            remainingIds.delete(entryId);
+            deleted += 1;
+            return false;
+          }
+          return true;
+        });
+        if (patternsChanged || keptPatterns.length !== patterns.length) {
+          writeMemoryArray(patternsFile, keptPatterns, { skipLock: true });
+        }
+      });
+    } catch (e) {
+      logger.warn('Failed to lock/update patterns.json', { error: e.message });
     }
 
     return { deleted, notFound: [...remainingIds] };

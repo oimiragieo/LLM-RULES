@@ -63,6 +63,19 @@ describe('ArtifactGraph persistence and stats', () => {
         assert.notStrictEqual(graph.graph.lastUpdated, before);
       }, 10);
     });
+
+    it('falls back to empty graph when persisted file has invalid shape', () => {
+      fs.writeFileSync(
+        graphPath,
+        JSON.stringify({ version: '1.0.0', lastUpdated: 'bad-shape', nodes: [] }),
+        'utf8'
+      );
+
+      const graph = new ArtifactGraph(graphPath);
+      assert.deepStrictEqual(graph.graph.nodes, {});
+      assert.deepStrictEqual(graph.graph.edges, []);
+      assert.strictEqual(typeof graph.graph.lastUpdated, 'string');
+    });
   });
 
   describe('getStats', () => {

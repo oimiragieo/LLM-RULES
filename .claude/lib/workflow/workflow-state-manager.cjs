@@ -20,6 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { readWorkflowStateFile } = require('../runtime/state-contracts.cjs');
 
 /**
  * Default state file path
@@ -69,11 +70,7 @@ function initializePhase() {
  */
 function readState(stateFilePath) {
   try {
-    if (!fs.existsSync(stateFilePath)) {
-      return null;
-    }
-    const content = fs.readFileSync(stateFilePath, 'utf8');
-    return JSON.parse(content);
+    return readWorkflowStateFile(stateFilePath, null);
   } catch (_err) {
     // Corrupted file or invalid JSON
     return null;

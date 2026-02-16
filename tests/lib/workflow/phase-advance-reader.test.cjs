@@ -54,11 +54,29 @@ test('phase-advance-reader tests', async t => {
     fs.writeFileSync(PHASE_ADVANCE_FILE, JSON.stringify(signal, null, 2), 'utf8');
 
     const result = phaseAdvanceReader.checkForAdvance(PHASE_ADVANCE_FILE);
-    assert.deepStrictEqual(result, signal);
+    assert.ok(result);
+    assert.strictEqual(result.workflowId, signal.workflowId);
+    assert.strictEqual(result.advanceTo, signal.advanceTo);
+    assert.strictEqual(result.previousPhase, signal.previousPhase);
+    assert.strictEqual(result.gatePassed, signal.gatePassed);
+    assert.strictEqual(result.timestamp, signal.timestamp);
   });
 
   await t.test('checkForAdvance() returns null for corrupted file', () => {
     fs.writeFileSync(PHASE_ADVANCE_FILE, 'invalid json{', 'utf8');
+    const result = phaseAdvanceReader.checkForAdvance(PHASE_ADVANCE_FILE);
+    assert.strictEqual(result, null);
+  });
+
+  await t.test('checkForAdvance() returns null for invalid signal shape', () => {
+    fs.writeFileSync(
+      PHASE_ADVANCE_FILE,
+      JSON.stringify({
+        workflowId: 'wf-only',
+        // missing required fields: advanceTo, previousPhase, gatePassed, timestamp
+      }),
+      'utf8'
+    );
     const result = phaseAdvanceReader.checkForAdvance(PHASE_ADVANCE_FILE);
     assert.strictEqual(result, null);
   });

@@ -1,0 +1,58 @@
+{
+  "title": "Workflow State",
+  "type": "object",
+  "required": ["workflowId", "currentPhase", "phases"],
+  "properties": {
+    "workflowId": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "requestSummary": { "type": ["string", "null"] },
+    "complexity": { "type": ["string", "null"] },
+    "currentPhase": { "type": "string", "minLength": 1 },
+    "phases": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "status": { "type": ["string", "null"] },
+          "startedAt": { "type": ["string", "null"] },
+          "completedAt": { "type": ["string", "null"] },
+          "agents": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "taskId": { "type": ["string", "null"] },
+                "status": { "type": ["string", "null"] },
+                "startedAt": { "type": ["string", "null"] },
+                "completedAt": { "type": ["string", "null"] },
+                "artifacts": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "metadata": {}
+              },
+              "additionalProperties": true
+            }
+          },
+          "gate": {
+            "type": ["object", "null"],
+            "properties": {
+              "passed": { "type": ["boolean", "null"] }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "artifacts": { "type": "object", "additionalProperties": true },
+    "skippedPhases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "createdAt": { "type": ["string", "null"] },
+    "updatedAt": { "type": ["string", "null"] },
+    "completedAt": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

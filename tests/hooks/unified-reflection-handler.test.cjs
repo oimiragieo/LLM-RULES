@@ -313,6 +313,21 @@ describe('unified-reflection-handler.cjs', () => {
 
       assertEqual(entry.summary, 'Completed auth feature');
     });
+
+    it('should include fallback summary when metadata summary is missing', () => {
+      const input = {
+        tool_name: 'TaskUpdate',
+        tool_input: {
+          taskId: '77',
+          status: 'completed',
+        },
+      };
+
+      const entry = hook.handleTaskCompletion(input);
+
+      assert(entry.summary, 'Should include a non-empty summary');
+      assertEqual(entry.summary, 'Task 77 completed without summary metadata');
+    });
   });
 
   // PERF-003 #2: Tests for TaskUpdate tracking (consolidated from task-update-tracker.cjs)

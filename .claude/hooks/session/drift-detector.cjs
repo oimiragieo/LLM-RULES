@@ -26,6 +26,7 @@ const path = require('path');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Paths
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
@@ -165,7 +166,11 @@ function getState() {
   }
 
   try {
-    return JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));
+    const parsed = safeParseJSON(fs.readFileSync(STATE_FILE, 'utf-8'), null);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null;
+    }
+    return parsed;
   } catch (_err) {
     return null;
   }
@@ -253,7 +258,11 @@ function main() {
     // Parse input
     let input;
     try {
-      input = JSON.parse(data);
+      input = safeParseJSON(data, null);
+      if (!input || typeof input !== 'object' || Array.isArray(input)) {
+        process.exit(0);
+        return;
+      }
     } catch (_err) {
       // Malformed JSON - fail-open without passthrough output
       process.exit(0);

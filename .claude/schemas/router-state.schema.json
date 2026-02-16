@@ -1,0 +1,27 @@
+{
+  "title": "Router State",
+  "type": "object",
+  "properties": {
+    "mode": { "type": "string", "enum": ["router", "agent"] },
+    "lastReset": { "type": ["string", "null"] },
+    "taskSpawned": { "type": "boolean" },
+    "taskSpawnedAt": { "type": ["string", "null"] },
+    "taskDescription": { "type": ["string", "null"] },
+    "sessionId": { "type": ["string", "null"] },
+    "taskListCalledSincePrompt": { "type": "boolean" },
+    "complexity": { "type": "string" },
+    "requiresPlannerFirst": { "type": "boolean" },
+    "plannerSpawned": { "type": "boolean" },
+    "requiresSecurityReview": { "type": "boolean" },
+    "securitySpawned": { "type": "boolean" },
+    "architectSpawned": { "type": "boolean" },
+    "lastTaskUpdateCall": { "type": ["number", "null"] },
+    "lastTaskUpdateTaskId": { "type": ["string", "null"] },
+    "lastTaskUpdateStatus": { "type": ["string", "null"] },
+    "taskUpdatesThisSession": { "type": "number" },
+    "currentSpawnTaskId": { "type": ["string", "null"] },
+    "version": { "type": "number" },
+    "preset": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

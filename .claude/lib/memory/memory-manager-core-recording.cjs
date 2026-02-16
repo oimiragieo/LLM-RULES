@@ -58,7 +58,7 @@ function createRecordingOps({
           entry.id = buildEntryId(entry);
 
           gotchas.push(entry);
-          atomicWriteJSONSync(gotchasFile, gotchas);
+          atomicWriteJSONSync(gotchasFile, gotchas, { skipLock: true });
           maybeSyncMemoryJson(gotchasFile, projectRoot);
           emitMemorySavedEvent({
             key: `gotchas:${entry.id}`,
@@ -133,7 +133,7 @@ function createRecordingOps({
           entry.id = buildEntryId(entry);
 
           patterns.push(entry);
-          atomicWriteJSONSync(patternsFile, patterns);
+          atomicWriteJSONSync(patternsFile, patterns, { skipLock: true });
           maybeSyncMemoryJson(patternsFile, projectRoot);
           emitMemorySavedEvent({
             key: `patterns:${entry.id}`,
@@ -200,7 +200,10 @@ function createRecordingOps({
       };
       codebaseMap.last_updated = now;
 
-      atomicWriteSync(mapFile, JSON.stringify(codebaseMap, null, 2) + '\n');
+      atomicWriteSync(mapFile, JSON.stringify(codebaseMap, null, 2) + '\n', {
+        encoding: 'utf8',
+        skipLock: true,
+      });
       emitMemorySavedEvent({
         key: `discoveries:${filePath}`,
         value: { path: filePath, category, last_accessed: now },

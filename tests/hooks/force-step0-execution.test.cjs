@@ -10,6 +10,7 @@ const {
   getPendingReflectionState,
   isTaskNotificationPrompt,
   isBypassPermissionsMode,
+  readSpawnRequests,
 } = require('../../.claude/hooks/reflection/force-step0-execution.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -63,4 +64,26 @@ test('isBypassPermissionsMode detects bypass permissions mode', () => {
   assert.equal(isBypassPermissionsMode({ permission_mode: 'bypassPermissions' }), true);
   assert.equal(isBypassPermissionsMode({ permission_mode: 'default' }), false);
   assert.equal(isBypassPermissionsMode(null), false);
+});
+
+test('readSpawnRequests returns only valid spawn-request contract rows', () => {
+  fs.mkdirSync(runtimeDir, { recursive: true });
+  const spawnSnap = snapshot(spawnRequestPath);
+  try {
+    fs.writeFileSync(
+      spawnRequestPath,
+      JSON.stringify([
+        { id: 'bad-1' },
+        { id: 'good-1', subagent_type: 'reflection-agent', prompt: 'do reflection' },
+      ]),
+      'utf8'
+    );
+
+    const rows = readSpawnRequests(spawnRequestPath);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].id, 'good-1');
+    assert.equal(rows[0].subagent_type, 'reflection-agent');
+  } finally {
+    restore(spawnRequestPath, spawnSnap);
+  }
 });

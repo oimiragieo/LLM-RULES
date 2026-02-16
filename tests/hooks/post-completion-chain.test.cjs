@@ -86,6 +86,31 @@ async function testPassThroughNoWorkflow() {
   );
 }
 
+// Test 2b: Pass through when workflow-state.json is malformed/invalid
+async function testPassThroughInvalidWorkflowState() {
+  cleanup();
+  console.log('\n=== Test: Pass through with invalid workflow state ===');
+
+  fs.mkdirSync(path.dirname(WORKFLOW_STATE_FILE), { recursive: true });
+  fs.writeFileSync(WORKFLOW_STATE_FILE, '{"invalid":true}', 'utf8');
+
+  const hookData = {
+    toolUse: {
+      tool: 'TaskUpdate',
+      input: {
+        taskId: '42',
+        status: 'completed',
+      },
+    },
+  };
+
+  const result = await processTaskCompletion(hookData);
+  assert(
+    Object.keys(result.result || {}).length === 0,
+    'Should pass through when workflow state is invalid'
+  );
+}
+
 // Test 3: Mark agent complete when TaskUpdate(completed) matches workflow agent
 async function testMarkAgentComplete() {
   cleanup();
@@ -334,6 +359,7 @@ async function runTests() {
   try {
     await testPassThroughNonCompletion();
     await testPassThroughNoWorkflow();
+    await testPassThroughInvalidWorkflowState();
     await testMarkAgentComplete();
     await testPhaseAdvanceOnCompletion();
     await testNoAdvanceOnGateFailure();

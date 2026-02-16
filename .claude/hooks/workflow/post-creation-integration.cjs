@@ -25,6 +25,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Resolve project root
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -242,15 +243,7 @@ function rotateQueue() {
     }
 
     // Parse all entries
-    const entries = lines
-      .map(line => {
-        try {
-          return JSON.parse(line);
-        } catch {
-          return null;
-        }
-      })
-      .filter(Boolean);
+    const entries = lines.map(line => safeParseJSON(line, null)).filter(Boolean);
 
     // Keep: all unprocessed + most recent processed (up to limit)
     const unprocessed = entries.filter(e => !e.processed);
@@ -405,7 +398,10 @@ async function parseHookInputAsync() {
 
     process.stdin.on('end', () => {
       try {
-        const parsed = JSON.parse(data);
+        const parsed = safeParseJSON(data, null);
+        if (!parsed || typeof parsed !== 'object') {
+          throw new Error('Hook input payload is not valid JSON object');
+        }
         resolve(parsed);
       } catch (err) {
         reject(new Error(`Failed to parse hook input: ${err.message}`));

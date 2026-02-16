@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 /**
  * ArtifactGraph - CRUD operations and query API for artifact relationship graph
@@ -28,7 +29,18 @@ class ArtifactGraph {
     try {
       if (fs.existsSync(this.graphPath)) {
         const content = fs.readFileSync(this.graphPath, 'utf8');
-        return JSON.parse(content);
+        const parsed = safeParseJSON(content, null);
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          !Array.isArray(parsed) &&
+          parsed.nodes &&
+          typeof parsed.nodes === 'object' &&
+          !Array.isArray(parsed.nodes) &&
+          Array.isArray(parsed.edges)
+        ) {
+          return parsed;
+        }
       }
     } catch (_err) {
       // Fall through to create new graph

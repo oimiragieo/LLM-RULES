@@ -25,49 +25,12 @@ const fs = require('fs');
 const path = require('path');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const { invalidateCache } = require('../../lib/utils/state-cache.cjs');
+const { readRouterStateFile } = require('../../lib/runtime/state-contracts.cjs');
 
 // Resolve project root deterministically from this file location:
 // <project>/.claude/hooks/routing/router-state.cjs -> <project>
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
-// =============================================================================
-// SEC-007: Safe JSON Parsing
-// =============================================================================
-
-/**
- * Safely parse JSON to prevent prototype pollution
- *
- * Uses Object.create(null) intermediate to strip __proto__ and constructor
- *
- * @param {string} content - JSON string to parse
- * @returns {Object|null} Parsed object or null on error
- */
-function safeJSONParse(content) {
-  try {
-    const parsed = JSON.parse(content);
-
-    // Only process objects (not arrays, primitives)
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      // Create clean object without prototype
-      const clean = Object.create(null);
-
-      // Copy only own enumerable properties, excluding dangerous keys
-      const dangerousKeys = ['__proto__', 'constructor', 'prototype'];
-      for (const key of Object.keys(parsed)) {
-        if (!dangerousKeys.includes(key)) {
-          clean[key] = parsed[key];
-        }
-      }
-
-      // Return as regular object
-      return Object.assign({}, clean);
-    }
-
-    return parsed;
-  } catch (_e) {
-    return null;
-  }
-}
 const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
 
 /**
@@ -195,14 +158,7 @@ function validateVersion(version) {
 function loadStateFromFile() {
   try {
     ensureRuntimeDir();
-    if (!fs.existsSync(STATE_FILE)) {
-      return getDefaultState();
-    }
-    const content = fs.readFileSync(STATE_FILE, 'utf-8');
-    const parsed = safeJSONParse(content);
-    if (parsed) {
-      return { ...getDefaultState(), ...parsed };
-    }
+    return readRouterStateFile(STATE_FILE, getDefaultState());
   } catch (_e) {
     // On any error, return default
   }

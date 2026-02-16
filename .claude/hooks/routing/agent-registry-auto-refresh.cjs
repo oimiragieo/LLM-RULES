@@ -13,13 +13,18 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
-const STAMP_PATH = path.join(PROJECT_ROOT, '.claude/context/runtime/agent-registry-auto-refresh.json');
+const STAMP_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude/context/runtime/agent-registry-auto-refresh.json'
+);
 const DEFAULT_DEBOUNCE_MS = Number(process.env.AGENT_REGISTRY_AUTO_REFRESH_DEBOUNCE_MS || 1500);
 
 function isEnabled() {
-  return String(process.env.AGENT_REGISTRY_AUTO_REFRESH || 'on')
-    .trim()
-    .toLowerCase() !== 'off';
+  return (
+    String(process.env.AGENT_REGISTRY_AUTO_REFRESH || 'on')
+      .trim()
+      .toLowerCase() !== 'off'
+  );
 }
 
 function normalizeFilePath(filePath) {

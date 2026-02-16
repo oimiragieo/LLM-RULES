@@ -27,7 +27,7 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 | `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
 | `pre-task-unified.cjs`          | `.claude/hooks/routing/`    | PreToolUse(Task)                            | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`                                                                 |
 | `tool-scope-validator.cjs`      | `.claude/hooks/routing/`    | PreToolUse(All)                             | warn    | `TOOL_SCOPE_VALIDATOR`                                                                                               |
-| `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | warn    | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
+| `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | block   | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
 | `error-tracker-hook.cjs`        | `.claude/hooks/monitoring/` | PostToolUse(All)                            | N/A     | None (monitoring only)                                                                                               |
 | `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
 | `drift-detector.cjs`            | `.claude/hooks/session/`    | UserPromptSubmit                            | N/A     | None (always enabled, informational)                                                                                 |
@@ -89,7 +89,7 @@ This hook consolidates multiple router enforcement policies:
 
 8. **TaskList-first gate** (`TASKLIST_FIRST_ENFORCEMENT`)
    - Requires TaskList() called before Task() spawns
-   - Default: `warn`
+   - Default: `block`
    - Override: `TASKLIST_FIRST_ENFORCEMENT=block|off`
    - Enforces CLAUDE.md Section 0 routing protocol
 
@@ -106,7 +106,7 @@ SECURITY_REVIEW_ENFORCEMENT=block|warn|off  # Default: block
 ROUTER_SELF_CHECK=block|warn  # Default: block (off not allowed)
 
 # TaskList-first gate
-TASKLIST_FIRST_ENFORCEMENT=block|warn|off  # Default: warn
+TASKLIST_FIRST_ENFORCEMENT=block|warn|off  # Default: block
 
 # State staleness threshold
 STATE_STALE_THRESHOLD_MS=number  # Default: 600000 (10 minutes)
@@ -465,7 +465,7 @@ Bash({ command: 'npm test' });
 
 **Location:** `.claude/hooks/reflection/reflection-step0-guard.cjs`
 **Event Type:** PreToolUse(TaskList)
-**Default Enforcement:** warn
+**Default Enforcement:** block
 **Purpose:** Enforces Step 0 (reflection processing) before Router continues
 
 ### Reflection Step 0 Protocol
@@ -490,7 +490,7 @@ CLAUDE.md Section 0 requires:
 
 ```bash
 # Reflection step 0 enforcement
-REFLECTION_STEP0_ENFORCEMENT=block|warn|off  # Default: warn
+REFLECTION_STEP0_ENFORCEMENT=block|warn|off  # Default: block
 
 # Disable all reflection
 REFLECTION_ENABLED=false  # Disables entire reflection system
@@ -1091,7 +1091,7 @@ Hooks are registered in `.claude/settings.json`:
 PLANNER_FIRST_ENFORCEMENT=block|warn|off        # Default: block
 SECURITY_REVIEW_ENFORCEMENT=block|warn|off      # Default: block
 ROUTER_SELF_CHECK=block|warn                    # Default: block (off not allowed)
-TASKLIST_FIRST_ENFORCEMENT=block|warn|off       # Default: warn
+TASKLIST_FIRST_ENFORCEMENT=block|warn|off       # Default: block
 
 # State management
 STATE_STALE_THRESHOLD_MS=number                 # Default: 600000 (10 minutes)
@@ -1115,7 +1115,7 @@ SHELL_INJECTION_VALIDATOR=block|warn|off        # Default: block
 TOOL_SCOPE_VALIDATOR=block|warn|off             # Default: warn
 
 # Reflection
-REFLECTION_STEP0_ENFORCEMENT=block|warn|off     # Default: warn
+REFLECTION_STEP0_ENFORCEMENT=block|warn|off     # Default: block
 REFLECTION_ENABLED=true|false                   # Default: true
 
 # Model validation

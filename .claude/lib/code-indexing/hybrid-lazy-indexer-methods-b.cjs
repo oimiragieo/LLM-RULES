@@ -340,7 +340,7 @@ class HybridLazyIndexerMethodsB {
           '*.mjs',
           this.projectRoot,
         ],
-        { encoding: 'utf8', timeout: 3000, shell: false }
+        { encoding: 'utf8', timeout: 3000, shell: false, windowsHide: true }
       );
 
       if (result.error) {
