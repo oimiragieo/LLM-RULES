@@ -23,7 +23,7 @@ function spawnSubagentProcess({
   return new Promise((resolve, reject) => {
     const childCode =
       "const input = JSON.parse(process.argv[1] || '{}');" +
-      "const out = { ok: true, agent: input.subagentType, task_id: input.taskId, promptLength: input.promptLength, description: input.description };" +
+      'const out = { ok: true, agent: input.subagentType, task_id: input.taskId, promptLength: input.promptLength, description: input.description };' +
       'process.stdout.write(JSON.stringify(out));';
 
     const child = spawn(
@@ -147,9 +147,10 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
           });
 
     const resolvedTaskId = task_id || `task-${Date.now()}`;
-    const useRealSpawn = String(process.env.TASK_TOOL_REAL_SPAWN || 'on')
-      .trim()
-      .toLowerCase() !== 'off';
+    const useRealSpawn =
+      String(process.env.TASK_TOOL_REAL_SPAWN || 'on')
+        .trim()
+        .toLowerCase() !== 'off';
 
     if (useRealSpawn) {
       const timeoutMs = Number(process.env.TASK_TOOL_SPAWN_TIMEOUT_MS || 10000);
@@ -176,7 +177,9 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
       };
     }
 
-    console.log(`[Task Tool] Simulating spawn for ${subagent_type} (prompt length: ${assembledPrompt.length})`);
+    console.log(
+      `[Task Tool] Simulating spawn for ${subagent_type} (prompt length: ${assembledPrompt.length})`
+    );
     return {
       status: 'completed',
       agent: subagent_type,

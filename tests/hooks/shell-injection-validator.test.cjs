@@ -240,13 +240,10 @@ rm -rf /`,
 
       const result = await validator.handler(input);
 
-      // Comments should NOT trigger validation (handled by Bash, not executed)
-      // But our current implementation doesn't parse comments, so it WILL block
-      // This is a safe false positive (overly strict is better than missed injection)
       assert.strictEqual(
         result.allowed,
-        false,
-        'Should block even in comments (safe false positive)'
+        true,
+        'Should allow when dangerous text appears in comment'
       );
     });
 
@@ -257,14 +254,105 @@ rm -rf /`,
 
       const result = await validator.handler(input);
 
-      // String literals should be safe, but detection is complex
-      // Current implementation MAY trigger (depends on pattern matching)
-      // This test documents behavior (may be false positive)
       assert.strictEqual(
         result.allowed,
-        false,
-        'Current implementation blocks (safe false positive)'
+        true,
+        'Should allow when dangerous text appears only in a quoted string literal'
       );
+    });
+
+    it('should BLOCK encoded payload decoded and executed in command substitution', async () => {
+      const input = {
+        command: 'echo $(echo "cm0gLXJmIC8=" | base64 -d | sh)',
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block base64 decode + shell execution');
+      assert.ok(result.reason, 'Should provide blocking reason');
+    });
+
+    it('should BLOCK encoded payload decoded and executed in backticks', async () => {
+      const input = {
+        command: 'echo `echo cm0gLXJmIC8= | base64 -d | bash`',
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block backtick decode + execution');
+    });
+
+    it('should BLOCK printf hex decode piped to sh in command substitution', async () => {
+      const input = {
+        command: "echo $(printf '\\\\x72\\\\x6d\\\\x20\\\\x2d\\\\x72\\\\x66\\\\x20\\\\x2f' | sh)",
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block printf hex decode piped to sh');
+    });
+
+    it('should BLOCK xxd hex decode piped to bash in command substitution', async () => {
+      const input = {
+        command: 'echo $(echo 726d202d7266202f | xxd -r -p | bash)',
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block xxd hex decode piped to bash');
+    });
+
+    it('should BLOCK perl pack hex decode piped to env sh in command substitution', async () => {
+      const input = {
+        command: 'echo $(perl -e \'print pack("H*","726d202d7266202f")\' | env sh)',
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block perl hex decode piped to env sh');
+    });
+
+    it('should BLOCK decode chain piped to $SHELL in command substitution', async () => {
+      const input = {
+        command: 'echo $(echo "cm0gLXJmIC8=" | base64 -d | $SHELL)',
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block decode chain piped to $SHELL');
+    });
+
+    it('should BLOCK indirect shell execution via bash -c in command substitution', async () => {
+      const input = {
+        command: 'echo $(echo "cm0gLXJmIC8=" | base64 -d; bash -c "$(cat)")',
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block bash -c indirect execution chain');
+    });
+
+    it('should BLOCK python fromhex decode piped to sh', async () => {
+      const input = {
+        command:
+          'python -c "import binascii; print(binascii.unhexlify(\'726d202d7266202f\').decode())" | sh',
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block python fromhex decode piped to sh');
+    });
+
+    it('should BLOCK multi-line heredoc decode chain piped to bash', async () => {
+      const input = {
+        command: `cat <<'EOF' | bash
+echo cm0gLXJmIC8= | base64 -d
+EOF`,
+      };
+
+      const result = await validator.handler(input);
+
+      assert.strictEqual(result.allowed, false, 'Should block heredoc decode chain piped to bash');
     });
   });
 

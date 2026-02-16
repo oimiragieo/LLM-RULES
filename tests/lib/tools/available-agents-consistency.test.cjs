@@ -93,4 +93,50 @@ describe('AvailableAgents registry consistency', () => {
     assert.strictEqual(result.success, false);
     assert.ok(result.error.includes('Agent registry drift detected'));
   });
+
+  it('reloads registry when registry file changes on disk', () => {
+    const query = new AvailableAgentsQuery({
+      registryPath: CONSISTENCY_REGISTRY,
+      agentsDir: path.join(CONSISTENCY_DIR, '.claude', 'agents'),
+      enableConsistencyCheck: false,
+    });
+
+    const before = query.query({ capability: 'new-cap', minSuccessRate: 0 });
+    assert.strictEqual(before.success, true);
+    assert.strictEqual(before.count, 0);
+
+    const updatedRegistry = {
+      version: '1.0.0',
+      generatedAt: new Date().toISOString(),
+      agents: {
+        'missing-agent': {
+          id: 'missing-agent',
+          displayName: 'Missing Agent',
+          category: 'core',
+          filePath: '.claude/agents/core/missing-agent.md',
+          capabilities: [],
+          health: { status: 'healthy', successRate: 1.0 },
+        },
+        'new-agent': {
+          id: 'new-agent',
+          displayName: 'New Agent',
+          category: 'core',
+          filePath: '.claude/agents/core/new-agent.md',
+          capabilities: [{ name: 'new-cap', domain: 'code', description: 'new capability' }],
+          health: { status: 'healthy', successRate: 1.0 },
+        },
+      },
+      index: { byCapability: { 'new-cap': ['new-agent'] }, byDomain: {}, byCategory: {} },
+      health: { healthy: ['new-agent'], degraded: [], unavailable: [] },
+      metadata: { totalAgents: 2 },
+    };
+    fs.writeFileSync(CONSISTENCY_REGISTRY, JSON.stringify(updatedRegistry, null, 2));
+    const bump = new Date(Date.now() + 2000);
+    fs.utimesSync(CONSISTENCY_REGISTRY, bump, bump);
+
+    const after = query.query({ capability: 'new-cap', minSuccessRate: 0 });
+    assert.strictEqual(after.success, true);
+    assert.strictEqual(after.count, 1);
+    assert.strictEqual(after.agents[0].id, 'new-agent');
+  });
 });

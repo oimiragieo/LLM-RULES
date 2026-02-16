@@ -82,6 +82,7 @@ class AvailableAgentsQuery {
     this.registryPath = options.registryPath || DEFAULT_REGISTRY_PATH;
     this.agentsDir = options.agentsDir || DEFAULT_AGENTS_DIR;
     this.registry = null;
+    this.registryMtimeMs = null;
     this.cache = new Map();
     this.cacheTimeouts = new Map();
     this.CACHE_TTL = options.cacheTTL || 2 * 60 * 1000; // 2 minutes
@@ -98,15 +99,33 @@ class AvailableAgentsQuery {
    * @throws {Error} If registry cannot be loaded
    */
   getRegistry() {
-    if (this.registry) return this.registry;
+    const currentMtimeMs = this.getRegistryMtimeMs();
+    if (
+      this.registry &&
+      ((this.registryMtimeMs === null && currentMtimeMs === null) ||
+        this.registryMtimeMs === currentMtimeMs)
+    ) {
+      return this.registry;
+    }
 
     try {
       const content = fs.readFileSync(this.registryPath, 'utf-8');
       this.registry = JSON.parse(content);
+      this.registryMtimeMs = currentMtimeMs;
+      this.cache.clear();
+      this.cacheTimeouts.clear();
       this.checkRegistryConsistency();
       return this.registry;
     } catch (error) {
       throw new Error(`Failed to load agent registry: ${error.message}`);
+    }
+  }
+
+  getRegistryMtimeMs() {
+    try {
+      return fs.statSync(this.registryPath).mtimeMs;
+    } catch {
+      return null;
     }
   }
 
@@ -207,6 +226,8 @@ class AvailableAgentsQuery {
       return this.buildErrorResponse(validationError);
     }
 
+    this.invalidateCachesOnRegistryChange();
+
     // 2. Check cache
     const cacheKey = this.getCacheKey(options);
     const cached = this.getFromCache(cacheKey);
@@ -281,6 +302,21 @@ class AvailableAgentsQuery {
 
     this.setCache(cacheKey, response);
     return response;
+  }
+
+  invalidateCachesOnRegistryChange() {
+    if (!this.registry) return;
+    const currentMtimeMs = this.getRegistryMtimeMs();
+    if (
+      (this.registryMtimeMs === null && currentMtimeMs === null) ||
+      this.registryMtimeMs === currentMtimeMs
+    ) {
+      return;
+    }
+    this.cache.clear();
+    this.cacheTimeouts.clear();
+    this.registry = null;
+    this.registryMtimeMs = null;
   }
 
   /**
@@ -489,6 +525,7 @@ class AvailableAgentsQuery {
     this.cache.clear();
     this.cacheTimeouts.clear();
     this.registry = null;
+    this.registryMtimeMs = null;
   }
 
   /**

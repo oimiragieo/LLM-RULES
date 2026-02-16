@@ -33,4 +33,3 @@ test('eventBus.on deduplicates identical handler for same event', async () => {
   // Cleanup once (dedupe should return same subscription object)
   eventBus.off(sub1);
 });
-

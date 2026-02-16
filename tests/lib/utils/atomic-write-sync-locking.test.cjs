@@ -43,4 +43,3 @@ test('atomicWriteSync waits when cross-process lock is held', async () => {
 
   fs.rmSync(dir, { recursive: true, force: true });
 });
-

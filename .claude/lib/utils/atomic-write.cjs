@@ -67,7 +67,8 @@ function atomicWriteSync(filePath, content, options = {}) {
       const lockTarget = fs.existsSync(filePath) ? filePath : dir;
       const maxWaitMs = Number(process.env.ATOMIC_WRITE_SYNC_LOCK_TIMEOUT_MS || 3000);
       const retryMs = Number(process.env.ATOMIC_WRITE_SYNC_LOCK_RETRY_MS || 25);
-      const deadline = Date.now() + (Number.isFinite(maxWaitMs) && maxWaitMs > 0 ? maxWaitMs : 3000);
+      const deadline =
+        Date.now() + (Number.isFinite(maxWaitMs) && maxWaitMs > 0 ? maxWaitMs : 3000);
       const effectiveRetryMs = Number.isFinite(retryMs) && retryMs > 0 ? retryMs : 25;
 
       for (;;) {

@@ -27,17 +27,12 @@
  * - SHELL_INJECTION_VALIDATOR=off - Disable validation (DANGEROUS)
  */
 
-/**
- * Dangerous patterns that indicate shell injection attempts
- */
 const INJECTION_PATTERNS = [
   { pattern: /;\s*rm\s+-rf/, message: 'Chained rm -rf command detected' },
   { pattern: /\|\s*rm\s+-rf/, message: 'Piped rm -rf command detected' },
   { pattern: /&&\s*rm\s+-rf/, message: 'Conditional rm -rf command detected' },
-  { pattern: /eval\s+/, message: 'eval command injection risk' },
+  { pattern: /\beval\s+/, message: 'eval command injection risk' },
   { pattern: />>\s*\/dev\//, message: 'System device redirect detected' },
-  { pattern: /\$\([^)]*rm/, message: 'Command substitution with rm' },
-  { pattern: /`[^`]*rm/, message: 'Backtick execution with rm' },
 ];
 
 /**
@@ -48,6 +43,258 @@ const DANGEROUS_TARGETS = [
   { pattern: /rm\s+-rf\s+~/, message: 'rm -rf ~ (home deletion)' },
   { pattern: /rm\s+-rf\s+\*/, message: 'rm -rf * (wildcard deletion)' },
 ];
+
+function buildViolation(message, detected, mode) {
+  const payload = {
+    message: `[SHELL-INJECTION] ${message}`,
+    detected,
+  };
+  if (mode === 'warn') {
+    return {
+      allowed: true,
+      warning: payload.message,
+      detected: payload.detected,
+    };
+  }
+  return {
+    allowed: false,
+    reason: payload.message,
+    detected: payload.detected,
+  };
+}
+
+function isWordBoundaryChar(ch) {
+  return !ch || /\s|[;|&()<>]/.test(ch);
+}
+
+function extractAndSanitizeShell(command) {
+  const substitutions = [];
+  let output = '';
+  let i = 0;
+  let inSingle = false;
+  let inDouble = false;
+  let escaped = false;
+
+  function collectBacktick(startIndex) {
+    let j = startIndex + 1;
+    let localEscaped = false;
+    let content = '';
+    while (j < command.length) {
+      const ch = command[j];
+      if (localEscaped) {
+        content += ch;
+        localEscaped = false;
+        j++;
+        continue;
+      }
+      if (ch === '\\') {
+        localEscaped = true;
+        j++;
+        continue;
+      }
+      if (ch === '`') {
+        return { endIndex: j, content };
+      }
+      content += ch;
+      j++;
+    }
+    return null;
+  }
+
+  function collectCommandSub(startIndex) {
+    let j = startIndex + 2;
+    let depth = 1;
+    let localEscaped = false;
+    let localSingle = false;
+    let localDouble = false;
+    let content = '';
+
+    while (j < command.length) {
+      const ch = command[j];
+      if (localEscaped) {
+        content += ch;
+        localEscaped = false;
+        j++;
+        continue;
+      }
+      if (ch === '\\') {
+        localEscaped = true;
+        content += ch;
+        j++;
+        continue;
+      }
+      if (!localDouble && ch === "'") {
+        localSingle = !localSingle;
+        content += ch;
+        j++;
+        continue;
+      }
+      if (!localSingle && ch === '"') {
+        localDouble = !localDouble;
+        content += ch;
+        j++;
+        continue;
+      }
+      if (!localSingle && !localDouble) {
+        if (ch === '(') {
+          depth++;
+        } else if (ch === ')') {
+          depth--;
+          if (depth === 0) {
+            return { endIndex: j, content };
+          }
+        }
+      }
+      content += ch;
+      j++;
+    }
+    return null;
+  }
+
+  while (i < command.length) {
+    const ch = command[i];
+
+    if (escaped) {
+      output += inSingle || inDouble ? ' ' : ch;
+      escaped = false;
+      i++;
+      continue;
+    }
+
+    if (ch === '\\') {
+      escaped = true;
+      output += inSingle || inDouble ? ' ' : ch;
+      i++;
+      continue;
+    }
+
+    if (!inDouble && ch === "'") {
+      inSingle = !inSingle;
+      output += ' ';
+      i++;
+      continue;
+    }
+    if (!inSingle && ch === '"') {
+      inDouble = !inDouble;
+      output += ' ';
+      i++;
+      continue;
+    }
+
+    if (inSingle || inDouble) {
+      output += ' ';
+      i++;
+      continue;
+    }
+
+    if (!inSingle && !inDouble && ch === '`') {
+      const backtick = collectBacktick(i);
+      if (backtick) {
+        substitutions.push({ type: 'backtick', content: backtick.content });
+        output += ' '.repeat(backtick.endIndex - i + 1);
+        i = backtick.endIndex + 1;
+        continue;
+      }
+    }
+
+    if (!inSingle && !inDouble && ch === '$' && command[i + 1] === '(') {
+      const sub = collectCommandSub(i);
+      if (sub) {
+        substitutions.push({ type: 'substitution', content: sub.content });
+        output += ' '.repeat(sub.endIndex - i + 1);
+        i = sub.endIndex + 1;
+        continue;
+      }
+    }
+
+    if (!inSingle && !inDouble && ch === '#') {
+      const prev = i > 0 ? command[i - 1] : '';
+      if (isWordBoundaryChar(prev)) {
+        while (i < command.length && command[i] !== '\n') {
+          output += ' ';
+          i++;
+        }
+        continue;
+      }
+    }
+
+    output += ch;
+    i++;
+  }
+
+  return { sanitized: output, substitutions };
+}
+
+function analyzeSubstitution(content) {
+  const normalized = content.toLowerCase();
+  if (/\brm\s+-rf\b/.test(normalized)) {
+    return { message: 'Command substitution with rm', detected: '/\\brm\\s+-rf\\b/' };
+  }
+  if (/\beval\b/.test(normalized)) {
+    return { message: 'Command substitution with eval', detected: '/\\beval\\b/' };
+  }
+  const decodedExec = analyzeDecodedExecution(content);
+  if (decodedExec) {
+    return decodedExec;
+  }
+  return null;
+}
+
+function analyzeDecodedExecution(content) {
+  const normalized = content.toLowerCase();
+  const hasBase64Decode =
+    /\bbase64\b/.test(normalized) && /(?:\s|^)-(?:d)\b|--decode\b/.test(normalized);
+  const hasHexDecode =
+    /printf\s+['"][^'"]*\\x[0-9a-f]{2}/.test(normalized) ||
+    /\bxxd\s+-r\s+-p\b/.test(normalized) ||
+    /\bpack\(\s*["']h\*["']/.test(normalized) ||
+    /\bfromhex\s*\(/.test(normalized) ||
+    /\bbinascii\.unhexlify\s*\(/.test(normalized);
+  const hasDecode = hasBase64Decode || hasHexDecode;
+  const pipesToShell =
+    /\|\s*(?:env\s+)?(?:\/bin\/)?(?:sh|bash|zsh|ksh)\b/.test(normalized) ||
+    /\|\s*(?:["'])?\$shell(?:["'])?\b/.test(normalized) ||
+    /\|\s*\$\{shell\}/.test(normalized);
+  const hasShellDashC = /(?:^|[;|&]\s*)(?:\/bin\/)?(?:sh|bash|zsh|ksh)\s+-c\b/.test(normalized);
+  if (hasDecode && (pipesToShell || hasShellDashC)) {
+    return {
+      message: 'Encoded payload decode and shell execution in substitution',
+      detected:
+        '/(?:base64 -d|--decode|printf \\\\x..|xxd -r -p|pack("H*")|fromhex).*(?:\\|\\s*(?:env )?(?:sh|bash|zsh|ksh|\\$SHELL)|(?:sh|bash|zsh|ksh) -c)/',
+    };
+  }
+  return null;
+}
+
+function analyzeInlineInterpreterExecution(command) {
+  const normalized = command.toLowerCase();
+  const pipesToShell =
+    /\|\s*(?:env\s+)?(?:\/bin\/)?(?:sh|bash|zsh|ksh)\b/.test(normalized) ||
+    /\|\s*(?:["'])?\$shell(?:["'])?\b/.test(normalized) ||
+    /\|\s*\$\{shell\}/.test(normalized);
+  if (!pipesToShell) {
+    return null;
+  }
+
+  const hasPythonInlineCode = /\bpython(?:\d+(?:\.\d+)?)?\b[\s\S]*\s-c\s+['"]/.test(normalized);
+  if (!hasPythonInlineCode) {
+    return null;
+  }
+
+  const hasDecodeInInlineCode =
+    /\bfromhex\s*\(/.test(normalized) ||
+    /\bbinascii\.unhexlify\s*\(/.test(normalized) ||
+    /\bbase64\.b64decode\s*\(/.test(normalized);
+  if (!hasDecodeInInlineCode) {
+    return null;
+  }
+
+  return {
+    message: 'Inline interpreter decode payload piped to shell',
+    detected:
+      '/python -c .* (fromhex|binascii.unhexlify|base64.b64decode) .*\\|\\s*(?:sh|bash|zsh|ksh|\\$SHELL)/',
+  };
+}
 
 /**
  * Validates Bash command for shell injection patterns
@@ -65,53 +312,38 @@ function handler(input) {
     return { allowed: true };
   }
 
-  // Check injection patterns
-  for (const { pattern, message } of INJECTION_PATTERNS) {
-    if (pattern.test(command)) {
-      const violation = {
-        message: `[SHELL-INJECTION] ${message}`,
-        detected: pattern.toString(),
-      };
+  const inlineInterpreterFinding = analyzeInlineInterpreterExecution(command);
+  if (inlineInterpreterFinding) {
+    return buildViolation(
+      inlineInterpreterFinding.message,
+      inlineInterpreterFinding.detected,
+      mode
+    );
+  }
 
-      if (mode === 'warn') {
-        return {
-          allowed: true,
-          warning: violation.message,
-          detected: violation.detected,
-        };
-      }
+  const { sanitized, substitutions } = extractAndSanitizeShell(command);
 
-      // block mode (default)
-      return {
-        allowed: false,
-        reason: violation.message,
-        detected: violation.detected,
-      };
+  const topLevelDecodedExec = analyzeDecodedExecution(sanitized);
+  if (topLevelDecodedExec) {
+    return buildViolation(topLevelDecodedExec.message, topLevelDecodedExec.detected, mode);
+  }
+
+  for (const sub of substitutions) {
+    const finding = analyzeSubstitution(sub.content);
+    if (finding) {
+      return buildViolation(finding.message, finding.detected, mode);
     }
   }
 
-  // Check dangerous targets
+  for (const { pattern, message } of INJECTION_PATTERNS) {
+    if (pattern.test(sanitized)) {
+      return buildViolation(message, pattern.toString(), mode);
+    }
+  }
+
   for (const { pattern, message } of DANGEROUS_TARGETS) {
-    if (pattern.test(command)) {
-      const violation = {
-        message: `[SHELL-INJECTION] ${message}`,
-        detected: pattern.toString(),
-      };
-
-      if (mode === 'warn') {
-        return {
-          allowed: true,
-          warning: violation.message,
-          detected: violation.detected,
-        };
-      }
-
-      // block mode (default)
-      return {
-        allowed: false,
-        reason: violation.message,
-        detected: violation.detected,
-      };
+    if (pattern.test(sanitized)) {
+      return buildViolation(message, pattern.toString(), mode);
     }
   }
 
@@ -122,4 +354,8 @@ module.exports = {
   handler,
   INJECTION_PATTERNS, // Export for testing
   DANGEROUS_TARGETS, // Export for testing
+  extractAndSanitizeShell,
+  analyzeSubstitution,
+  analyzeDecodedExecution,
+  analyzeInlineInterpreterExecution,
 };

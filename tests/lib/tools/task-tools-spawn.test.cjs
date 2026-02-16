@@ -57,4 +57,3 @@ test('Task supports simulate mode when TASK_TOOL_REAL_SPAWN=off', async () => {
     restoreEnv('TASK_TOOL_REAL_SPAWN', previous);
   }
 });
-
