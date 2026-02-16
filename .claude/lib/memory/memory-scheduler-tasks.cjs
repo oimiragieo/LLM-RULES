@@ -349,7 +349,7 @@ function createMemorySchedulerTaskRunners(deps) {
     return result;
   }
 
-  function runWeeklyReport(projectRoot = PROJECT_ROOT) {
+  async function runWeeklyReport(projectRoot = PROJECT_ROOT) {
     validateProjectRoot(projectRoot);
     const libDir = getLibDir(projectRoot);
     const dashboard = safeRequire(path.join(libDir, 'memory-dashboard.cjs'));
@@ -401,6 +401,68 @@ function createMemorySchedulerTaskRunners(deps) {
     return result;
   }
 
+  async function runTaskRecovery(projectRoot = PROJECT_ROOT) {
+    validateProjectRoot(projectRoot);
+    const result = {
+      type: 'taskRecovery',
+      timestamp: new Date().toISOString(),
+      success: false,
+      recoveredCount: 0,
+      details: null,
+    };
+
+    try {
+      const TaskRouter = safeRequire(
+        path.join(PROJECT_ROOT, '.claude', 'lib', 'workflow', 'task-router.cjs')
+      );
+      if (!TaskRouter) {
+        result.details = 'task-router.cjs not available';
+        return result;
+      }
+
+      const router = new TaskRouter();
+      await router.initialize();
+      const recovered = await router.recoverOrphanedDelegations();
+
+      result.success = true;
+      result.recoveredCount = recovered.length;
+      result.details = { recoveredIds: recovered.map(r => r.taskId) };
+    } catch (e) {
+      result.details = e.message;
+    }
+
+    return result;
+  }
+
+  async function runVectorMaintenance(projectRoot = PROJECT_ROOT) {
+    validateProjectRoot(projectRoot);
+    const result = {
+      type: 'vectorMaintenance',
+      timestamp: new Date().toISOString(),
+      success: false,
+      details: null,
+    };
+
+    try {
+      const { MemoryVectorStore } =
+        safeRequire(path.join(PROJECT_ROOT, '.claude', 'lib', 'memory', 'lancedb-client.cjs')) ||
+        {};
+      if (!MemoryVectorStore) {
+        result.details = 'lancedb-client.cjs not available';
+        return result;
+      }
+
+      const store = new MemoryVectorStore();
+      const maintenanceResult = await store.optimize();
+      result.success = maintenanceResult.status !== 'failed';
+      result.details = maintenanceResult;
+    } catch (e) {
+      result.details = e.message;
+    }
+
+    return result;
+  }
+
   async function runTask(taskName, projectRoot = PROJECT_ROOT) {
     switch (taskName) {
       case 'consolidation':
@@ -423,6 +485,10 @@ function createMemorySchedulerTaskRunners(deps) {
         return runExtraction(projectRoot);
       case 'weeklyReport':
         return runWeeklyReport(projectRoot);
+      case 'taskRecovery':
+        return runTaskRecovery(projectRoot);
+      case 'vectorMaintenance':
+        return runVectorMaintenance(projectRoot);
       default:
         return { type: taskName, success: false, details: `Unknown task: ${taskName}` };
     }
@@ -440,6 +506,8 @@ function createMemorySchedulerTaskRunners(deps) {
     runPruning,
     runArchiveOldLTM,
     runWeeklyReport,
+    runTaskRecovery,
+    runVectorMaintenance,
   };
 }
 

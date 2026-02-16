@@ -624,6 +624,34 @@ class MemoryVectorStore {
     };
   }
 
+  /**
+   * Optimize the vector store by compacting files and cleaning up old versions.
+   */
+  async optimize() {
+    if (!this.isInitialized) await this.initialize();
+    if (!this.table) return { status: 'skipped', reason: 'no_table' };
+
+    const results = {
+      compacted: false,
+      cleanedUp: false,
+    };
+
+    try {
+      if (typeof this.table.compactFiles === 'function') {
+        await this.table.compactFiles();
+        results.compacted = true;
+      }
+      if (typeof this.table.cleanupOldVersions === 'function') {
+        await this.table.cleanupOldVersions();
+        results.cleanedUp = true;
+      }
+      return { status: 'optimized', ...results };
+    } catch (err) {
+      logger.warn(`Optimization failed: ${err.message}`);
+      return { status: 'failed', error: err.message };
+    }
+  }
+
   async searchResilient(query, options = {}) {
     try {
       const results = await this.search(query, options);

@@ -18,11 +18,14 @@ test('appendTierEvent includes traceId from environment when not provided', () =
       fs.mkdirSync(dir, { recursive: true });
     });
 
-    const eventsPath = path.join(tmpDir, '.claude', 'context', 'runtime', 'memory-tier-events.jsonl');
-    const lines = fs
-      .readFileSync(eventsPath, 'utf8')
-      .split('\n')
-      .filter(Boolean);
+    const eventsPath = path.join(
+      tmpDir,
+      '.claude',
+      'context',
+      'runtime',
+      'memory-tier-events.jsonl'
+    );
+    const lines = fs.readFileSync(eventsPath, 'utf8').split('\n').filter(Boolean);
     assert.equal(lines.length >= 1, true);
 
     const payload = JSON.parse(lines[0]);

@@ -15,6 +15,18 @@ class TaskRouter {
     this.fallbackCount = 0;
     this.totalRoutes = 0;
     this.delegations = new Map(); // taskId -> delegation state
+    const DelegationStore = require('./delegation-store.cjs');
+    this.store = new DelegationStore(config.delegationsPath);
+  }
+
+  /**
+   * Initialize router state from persistent storage
+   */
+  async initialize() {
+    const persisted = await this.store.load();
+    for (const [taskId, record] of Object.entries(persisted)) {
+      this.delegations.set(taskId, record);
+    }
   }
 
   /**
@@ -256,7 +268,7 @@ class TaskRouter {
     }
   }
 
-  registerDelegation({
+  async registerDelegation({
     taskId,
     parentAgent,
     targetAgent,
@@ -282,10 +294,11 @@ class TaskRouter {
       updatedAt: now,
     };
     this.delegations.set(id, record);
+    await this.store.updateRecord(id, record);
     return record;
   }
 
-  applyDelegationUpdate(taskId, update = {}) {
+  async applyDelegationUpdate(taskId, update = {}) {
     const id = String(taskId || '').trim();
     if (!id || !this.delegations.has(id)) return false;
     const status = String(update.status || '').trim();
@@ -300,13 +313,14 @@ class TaskRouter {
       updatedAt: Date.now(),
     };
     this.delegations.set(id, updated);
+    await this.store.updateRecord(id, updated);
     return true;
   }
 
-  recoverOrphanedDelegations(now = Date.now()) {
+  async recoverOrphanedDelegations(now = Date.now()) {
     const recovered = [];
     for (const [taskId, record] of this.delegations.entries()) {
-      if (record.status === 'completed') continue;
+      if (record.status === 'completed' || record.status === 'failed') continue;
       const deadline = record.updatedAt + (record.timeoutMs || 30000);
       if (now >= deadline) {
         const updated = {
@@ -316,6 +330,7 @@ class TaskRouter {
           updatedAt: now,
         };
         this.delegations.set(taskId, updated);
+        await this.store.updateRecord(taskId, updated);
         recovered.push(updated);
       }
     }

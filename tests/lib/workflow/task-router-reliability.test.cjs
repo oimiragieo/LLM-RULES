@@ -12,9 +12,9 @@ test('route propagates traceId for unified observability', async () => {
   assert.equal(decision.metadata.traceId, 'trace-123');
 });
 
-test('registerDelegation rejects circular delegation chains', () => {
+test('registerDelegation rejects circular delegation chains', async () => {
   const router = new TaskRouter();
-  assert.throws(
+  await assert.rejects(
     () =>
       router.registerDelegation({
         taskId: 't-1',
@@ -26,11 +26,12 @@ test('registerDelegation rejects circular delegation chains', () => {
   );
 });
 
-test('recoverOrphanedDelegations reassigns stranded tasks after timeout', () => {
+test('recoverOrphanedDelegations reassigns stranded tasks after timeout', async () => {
   const router = new TaskRouter();
+  await router.initialize();
   const now = Date.now();
 
-  router.registerDelegation({
+  await router.registerDelegation({
     taskId: 't-2',
     parentAgent: 'master-orchestrator',
     targetAgent: 'developer',
@@ -39,24 +40,25 @@ test('recoverOrphanedDelegations reassigns stranded tasks after timeout', () => 
     traceId: 'trace-orphan',
   });
 
-  const recovered = router.recoverOrphanedDelegations(now + 150);
+  const recovered = await router.recoverOrphanedDelegations(now + 150);
   assert.equal(recovered.length, 1);
   assert.equal(recovered[0].taskId, 't-2');
   assert.equal(recovered[0].status, 'reassigned');
 });
 
-test('invalid delegation updates are rejected', () => {
+test('invalid delegation updates are rejected', async () => {
   const router = new TaskRouter();
-  router.registerDelegation({
+  await router.initialize();
+  await router.registerDelegation({
     taskId: 't-3',
     parentAgent: 'agent-a',
     targetAgent: 'agent-b',
     chain: ['agent-a'],
   });
 
-  const bad = router.applyDelegationUpdate('t-3', { status: 'bogus' });
+  const bad = await router.applyDelegationUpdate('t-3', { status: 'bogus' });
   assert.equal(bad, false);
 
-  const good = router.applyDelegationUpdate('t-3', { status: 'in_progress' });
+  const good = await router.applyDelegationUpdate('t-3', { status: 'in_progress' });
   assert.equal(good, true);
 });

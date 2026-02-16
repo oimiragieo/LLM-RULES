@@ -46,12 +46,14 @@ const CONFIG = {
     consolidation: { type: 'daily', description: 'Consolidate STM to MTM' },
     healthCheck: { type: 'daily', description: 'Check tier health and metrics' },
     metricsLog: { type: 'daily', description: 'Log daily metrics' },
+    taskRecovery: { type: 'daily', description: 'Recover orphaned agent delegations' },
     summarization: { type: 'weekly', description: 'Summarize old MTM sessions to LTM' },
     deduplication: { type: 'weekly', description: 'Deduplicate patterns and gotchas' },
     pruning: { type: 'weekly', description: 'Prune low-utility entries' },
     archiveOldLTM: { type: 'weekly', description: 'Archive old LTM summaries to cold storage' },
     extraction: { type: 'weekly', description: 'Extract structured memories from recent MTM' },
     weeklyReport: { type: 'weekly', description: 'Generate weekly health report' },
+    vectorMaintenance: { type: 'weekly', description: 'Optimize vector database' },
   },
 };
 
@@ -159,6 +161,8 @@ const {
   runPruning,
   runArchiveOldLTM,
   runWeeklyReport,
+  runTaskRecovery,
+  runVectorMaintenance,
 } = createMemorySchedulerTaskRunners({
   PROJECT_ROOT,
   validateProjectRoot,
@@ -189,6 +193,7 @@ async function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
   tasks.push(await runConsolidation(projectRoot));
   tasks.push(runHealthCheck(projectRoot));
   tasks.push(runMetricsLog(projectRoot));
+  tasks.push(await runTaskRecovery(projectRoot));
 
   // Update status
   const status = readStatus(projectRoot);
@@ -261,6 +266,7 @@ async function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
   tasks.push(await runConsolidation(projectRoot));
   tasks.push(runHealthCheck(projectRoot));
   tasks.push(runMetricsLog(projectRoot));
+  tasks.push(await runTaskRecovery(projectRoot));
 
   // Run weekly tasks
   tasks.push(runRotation(projectRoot));
@@ -269,7 +275,8 @@ async function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
   tasks.push(runPruning(projectRoot));
   tasks.push(runArchiveOldLTM(projectRoot));
   tasks.push(runExtraction(projectRoot));
-  const weeklyReportResult = runWeeklyReport(projectRoot);
+  tasks.push(await runVectorMaintenance(projectRoot));
+  const weeklyReportResult = await runWeeklyReport(projectRoot);
   tasks.push(weeklyReportResult);
 
   // Update status
