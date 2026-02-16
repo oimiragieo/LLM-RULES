@@ -237,7 +237,7 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
         pass: false,
         result: 'block',
         message:
-          `[ROUTER SELF-CHECK BYPASS] Repeated WebSearch in bypassPermissions mode (${dedupe.count}x) is blocked to prevent loops. ` +
+          `[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER SELF-CHECK BYPASS] Repeated WebSearch in bypassPermissions mode (${dedupe.count}x) is blocked to prevent loops. ` +
           'Spawn a researcher/planner via Task() for external research.',
       };
     }

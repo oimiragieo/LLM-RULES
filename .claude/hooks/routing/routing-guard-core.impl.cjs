@@ -41,6 +41,7 @@ const {
   setStateCacheEnabled,
   clearInvocationCache,
   isRouterInvocation,
+  resetBlockDedupeState,
 } = require('./routing-guard-core.shared.cjs');
 const {
   checkRouterBash,
@@ -534,6 +535,7 @@ module.exports = {
   applyStaleDetection,
   getCachedRouterState,
   invalidateCachedState,
+  resetBlockDedupeState,
   getMemoryMonitor,
   ALL_WATCHED_TOOLS,
   BLACKLISTED_TOOLS,

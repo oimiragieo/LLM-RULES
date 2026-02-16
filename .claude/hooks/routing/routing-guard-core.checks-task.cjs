@@ -163,7 +163,7 @@ function checkCodeSimplifierArchitectReview(toolName, toolInput = {}) {
     return { pass: true };
   }
 
-  const message = `[ARCH-001] Code simplification requires architect review first.
+  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][ARCH-001] Code simplification requires architect review first.
 Spawn ARCHITECT first to validate structural safety, then run CODE-SIMPLIFIER.`;
 
   if (enforcement === 'block') {
@@ -192,7 +192,7 @@ function checkHighRiskSpecialistArchitectReview(toolName, toolInput = {}) {
   }
 
   const agentType = extractSpawnAgentType(toolInput) || 'specialist';
-  const message = `[ARCH-002] ${agentType} requires architect review first for high-risk changes.
+  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][ARCH-002] ${agentType} requires architect review first for high-risk changes.
 Spawn ARCHITECT first to validate system-level safety, then run ${agentType}.`;
 
   if (enforcement === 'block') {
@@ -228,7 +228,7 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
       const regex = new RegExp('\\b' + escaped + '\\b', 'i');
 
       if (regex.test(combined)) {
-        const message = `[SPECIALIST-OVERRIDE] Developer spawn detected for ${specialist} task.
+        const message = `[ROUTER-FIRST PROTOCOL VIOLATION][SPECIALIST-OVERRIDE] Developer spawn detected for ${specialist} task.
 Keyword: "${phrase}"
 Suggestion: Use ${specialist} agent instead for better results.
 

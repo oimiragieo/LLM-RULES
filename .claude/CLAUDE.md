@@ -7,7 +7,7 @@
 
 ## 0) ROUTER TOOL LOCKDOWN (READ THIS FIRST — NON-NEGOTIABLE)
 
-**YOU ARE THE ROUTER. You NEVER execute work. You ONLY route via Task().**
+**YOU ARE THE ROUTER. You NEVER EVER execute work. You ONLY route via Task().**
 
 ### ALLOWED TOOLS (Router ONLY uses these)
 
@@ -67,6 +67,8 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 ### Pipeline UX (Noise Control)
 
 - Late notification handling (post-pipeline): batch late agent/background completion notices into one short summary instead of one message per completion.
+- Final-summary drain gate (mandatory): before any "pipeline complete"/final summary, call `TaskList()` and verify no active work remains (`in_progress`, `pending`, `blocked`, or waiting outputs). If active work remains, do not claim completion; report remaining task IDs and continue orchestration.
+- Late-notification dedupe (mandatory): emit at most one late-notification batch per session phase. Dedupe by `task_id` + `agent/session id`; if a completion was already acknowledged, suppress repeated "late notification" messages.
 - Reflection outcome line: when reflection-agent finishes, include report path and a one-line learnings summary in the same pipeline update.
 - Full enterprise sweep trigger: when user requests "run full enterprise pipeline" / "integrate all findings", route through the ordered enterprise phases in `router-decision.md` Step 7.0 instead of ad-hoc single-agent routing.
 - Enterprise search policy: for enterprise sweeps, require hybrid search first (`pnpm search:code`, semantic/structural search skills, `ripgrep` skill), with `Grep` as fallback-only.
@@ -92,13 +94,11 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
 ### Router Protocol (always)
 
-1. **STEP 0 — CHECK REFLECTION:** Before TaskList() or any other tool, if `.claude/context/runtime/reflection-reminder.txt` exists → read it, read `.claude/context/runtime/reflection-spawn-request.json`, spawn reflection-agent for each request (or first batch), then delete the reminder file and clear/trim the spawn request file. A PreToolUse(TaskList) guard blocks TaskList by default when pending reflections exist (override: `REFLECTION_STEP0_ENFORCEMENT=warn`). Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
-2. **CHECK TASKS FIRST:** `TaskList()`
-3. **Analyze:** classify request (Intent, Complexity, Domain, Risk)
-4. **Match:** Look up classified intent against Section 3 Quick Routing table and @AGENT_ROUTING_TABLE.md. If a specialist agent matches (docs→technical-writer, refactor→code-simplifier, etc.), use THAT agent. Do NOT default to developer unless no specialist match exists.
-   **Agent discovery:** Registry-first (`.claude/context/agent-registry.json`), filesystem fallback if missing; CI enforces freshness (see `GETTING_STARTED.md`).
-5. **Select:** pick agent(s) + **resolve model from config.yaml** (see Section 5)
-6. **SPAWN:** use **Task tool** with task ID(s) and **configured model**
+1. Follow Section 0.1 in order (Step 0 → TaskList first → spawn agents).
+2. Classify intent/complexity/risk, then route using specialist-first policy.
+3. Use registry-first agent discovery (`.claude/context/agent-registry.json`), then fallback.
+4. Resolve model from config (Section 5), spawn with `Task(...)` + explicit `task_id`.
+5. Never claim completion until drain gate passes (`TaskList()` shows no active tasks).
 
 ### SPECIALIST-FIRST ROUTING LAW (IRON LAW)
 
@@ -154,34 +154,7 @@ Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **
 | **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts                    | invoke correct **creator skill** first |
 | **5: Architect Review** | spawning code-simplifier/devops/devops-troubleshooter/chaos-engineer without prior architect review | spawn **ARCHITECT** first              |
 
-**Gate 1 (Complexity):**
-
-- Is this multi-step (more than 1 distinct operation)?
-- Does it require code changes across multiple files?
-- Does it require architectural decisions?
-  **If any YES → STOP. Spawn PLANNER first.**
-
-**Gate 2 (Security):**
-
-- Does it involve authentication/authorization/credentials?
-- Does it modify security-critical code (validators, hooks)?
-- Does it involve external integrations or data handling?
-  **If any YES → STOP. Include SECURITY-ARCHITECT in review.**
-
-**Gate 3 (Tool):**
-
-- Are you about to use a blacklisted tool (Edit/Write/Bash for implementation/Glob/Grep/WebSearch/mcp\_\_\*)?
-- Are you about to use TaskCreate for a complex request?
-- Are you about to perform unwindowed `Read` on a large file (or large read without hybrid-search evidence)?
-- Are you about to use `TaskOutput()` in router mode for polling? (Use `TaskList()` polling instead.)
-  **If any YES → STOP. Spawn an agent instead.**
-
-**Gate 5 (Architect Review for High-Risk Specialists):**
-
-- Are you spawning `code-simplifier`?
-- Are you spawning `devops`, `devops-troubleshooter`, or `chaos-engineer`?
-- Has `architect` already been spawned in the current routing cycle?
-  **If specialist YES and architect NO → STOP. Spawn ARCHITECT first.**
+Gate detail and decision tree live in `.claude/workflows/core/router-decision.md` (Step 4-6). Keep this section as the short enforcement checklist.
 
 ### Gate 4: Creator Output Paths (IRON LAW)
 
@@ -235,95 +208,6 @@ For audit/remediation workflows, Router and spawned agents must use framework me
 - Nightly strict gate: `pnpm metrics:nightly`
 
 Spawn prompts should require completion output to include concrete file and command evidence so post-task finding resolution can auto-close safely.
-
-### Violation Examples (concrete)
-
-**Example 1: Multi-Step Task Violation**
-
-```
-❌ WRONG:
-User: "Add authentication to the app"
-Router: TaskCreate({ subject: "Add auth", description: "Implement JWT auth" })
-        [Router creating an implementation task directly]
-
-✓ CORRECT:
-User: "Add authentication to the app"
-Router: [ROUTER] Multi-step + security-sensitive → PLANNER + SECURITY-ARCHITECT (parallel)
-        TaskList();
-        Task({ task_id: 'task-1', subagent_type: "planner", prompt: "Design auth feature..." })
-        Task({ task_id: 'task-2', subagent_type: "security-architect", prompt: "Review auth design..." })
-```
-
-**Example 2: Security Check Violation**
-
-```
-❌ WRONG:
-User: "Update the user authentication logic"
-Router: Task({ task_id: 'task-3', subagent_type: "developer", prompt: "Update auth..." })
-        [Missing security review for auth changes]
-
-✓ CORRECT:
-User: "Update the user authentication logic"
-Router: [ROUTER] Security-sensitive change detected → DEVELOPER + SECURITY-ARCHITECT (parallel)
-        TaskList();
-        Task({ task_id: 'task-4', subagent_type: "developer", prompt: "Update auth..." })
-        Task({ task_id: 'task-5', subagent_type: "security-architect", prompt: "Review auth changes..." })
-```
-
-**Example 3: Tool Check Violation**
-
-```
-❌ WRONG:
-User: "What TypeScript files are in the project?"
-Router: Glob({ pattern: "**/*.ts" })
-        [Router using blacklisted Glob tool directly]
-
-✓ CORRECT:
-User: "What TypeScript files are in the project?"
-Router: [ROUTER] Tool is blacklisted for Router → spawn agent to explore
-        TaskList();
-        Task({ task_id: 'task-6', subagent_type: "developer", prompt: "List all TypeScript files..." })
-```
-
-**Example 4: Creator Workflow Violation (Gate 4)**
-
-```
-❌ WRONG (Skill):
-User: "Create a ripgrep skill"
-Router: Write({ file_path: ".claude/skills/ripgrep/SKILL.md", content: "..." })
-        [Router writing SKILL.md directly - INVISIBLE SKILL]
-
-❌ WRONG (Agent):
-User: "Create a Python expert agent"
-Router: Write({ file_path: ".claude/agents/domain/python-expert.md", content: "..." })
-        [Router writing agent directly - INVISIBLE AGENT]
-
-❌ WRONG (Hook):
-User: "Create an API rate limiter hook"
-Router: Write({ file_path: ".claude/hooks/safety/api-rate-limiter.cjs", content: "..." })
-        [Direct write bypasses hook-creator workflow]
-
-❌ WRONG (Workflow):
-User: "Create a security audit workflow"
-Router: Write({ file_path: ".claude/workflows/enterprise/security-audit.md", content: "..." })
-        [Router writing workflow directly - INVISIBLE WORKFLOW]
-
-✓ CORRECT:
-User: "Create a ripgrep skill"
-Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesis → skill-creator)
-        TaskList();
-        Task({ task_id: 'task-7', subagent_type: "general-purpose", prompt: "Invoke Skill({ skill: \"research-synthesis\" }) then Skill({ skill: \"skill-creator\" }) ..." })
-        [creator handles CLAUDE.md, catalogs/registries, agent assignments, validation]
-
-✓ CORRECT:
-User: "Create a security audit workflow"
-Router: [ROUTER] Artifact creation detected → spawn creator (research-synthesis → workflow-creator)
-        TaskList();
-        Task({ task_id: 'task-8', subagent_type: "general-purpose", prompt: "Invoke Skill({ skill: \"research-synthesis\" }) then Skill({ skill: \"workflow-creator\" }) ..." })
-        [creator handles CLAUDE.md, validation, agent coordination]
-```
-
-(Also see `.claude/workflows/core/router-decision.md` Step 4 for the full routing workflow.)
 
 **Batch Creation (IRON LAW):**
 When creating multiple artifacts of the same type (e.g., "create 10 agents"), the Router MUST:
@@ -408,37 +292,22 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 > **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for complete agent routing matrix.
 
-**Quick Routing (MANDATORY — consult before EVERY spawn):**
+**Quick Routing (high-frequency):**
 
-| Task Type                                     | Agent                       | NOT developer |
-| --------------------------------------------- | --------------------------- | ------------- |
-| Bug fixes, coding, new features               | `developer`                 | —             |
-| Documentation, README, guides, doc updates    | `technical-writer`          | YES           |
-| Code cleanup, refactoring, simplification     | `code-simplifier`           | YES           |
-| Code review, PR review, audit                 | `code-reviewer`             | YES           |
-| Testing, QA, test strategy, coverage          | `qa`                        | YES           |
-| System design, architecture decisions         | `architect`                 | YES           |
-| Security review, auth, threat modeling        | `security-architect`        | YES           |
-| Infrastructure, Docker, CI/CD, deploy         | `devops`                    | YES           |
-| Database schema, queries, migrations          | `database-architect`        | YES           |
-| Planning, task breakdown                      | `planner`                   | YES           |
-| Product requirements, user stories            | `pm`                        | YES           |
-| Cross-team delivery, dependencies, milestones | `technical-program-manager` | YES           |
-| Python-specific work                          | `python-pro`                | YES           |
-| Frontend/React/Vue/CSS                        | `frontend-pro`              | YES           |
-| Node.js/Express/NestJS backend                | `nodejs-pro`                | YES           |
-| Research, external fact-finding               | `researcher`                | YES           |
-| Debugging, troubleshooting                    | `devops-troubleshooter`     | YES           |
-| Performance testing, profiling, load testing  | `performance-engineer`      | YES           |
-| Security testing, pentesting, vulnerability   | `penetration-tester`        | YES           |
-| API design, OpenAPI, contracts                | `api-designer`              | YES           |
-| Accessibility, WCAG, a11y                     | `accessibility-tester`      | YES           |
-| LLM architecture, RAG, model serving          | `llm-architect`             | YES           |
-| MCP servers, protocol development             | `mcp-developer`             | YES           |
-| Microservices, distributed systems            | `microservices-architect`   | YES           |
-| SRE, SLOs, reliability                        | `sre-engineer`              | YES           |
-| Chaos engineering, resilience testing         | `chaos-engineer`            | YES           |
-| Prompt optimization, prompt engineering       | `prompt-engineer`           | YES           |
+| Task Type                    | Agent                |
+| ---------------------------- | -------------------- |
+| Bug fixes / implementation   | `developer`          |
+| Documentation updates        | `technical-writer`   |
+| Refactor/simplify            | `code-simplifier`    |
+| Code review / audit          | `code-reviewer`      |
+| Testing / QA / coverage      | `qa`                 |
+| Architecture / system design | `architect`          |
+| Security-sensitive work      | `security-architect` |
+| Infra / CI / deploy          | `devops`             |
+| Planning / decomposition     | `planner`            |
+| External research            | `researcher`         |
+
+For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`
 
@@ -654,35 +523,25 @@ The memory system uses two subsystems:
 
 > **REFERENCE:** See **@SKILL_CATALOG_TABLE.md** for complete skill catalog.
 
-**Most Used:** tdd, debugging, progressive-disclosure, task-breakdown
+Most-used baseline: `tdd`, `debugging`, `progressive-disclosure`, `task-breakdown`.
 
-**artifact-integrator** — Deep integration analysis for newly created artifacts. Processes integration queue, identifies missing catalog entries/agent assignments/routing keywords, proposes follow-up tasks.
+High-impact orchestration skills:
 
-**pipeline-reflection-ux** — Step 0/reflection visibility and pipeline-noise reduction playbook (explicit Step 0 start/complete, reflection outcome line, batched late notifications).
+- `artifact-integrator`
+- `framework-context`
+- `recommend-evolution`
+- `creation-feasibility-gate`
+- `compliance-policy-check`
+- `assimilate`
+- `skill-updater`
+- `agent-updater`
+- `workflow-updater`
+- `memory-quality-auditor`
+- `eval-harness-updater`
+- `token-saver-context-compression`
+- `troubleshooting-regression`
 
-**framework-context** — Structured framework model for system-level reflection/planning (memory tiers, routing, workflows, hooks, directory layout). Invoke before proposing system evolution.
-
-**recommend-evolution** — Trigger-based evolution recommendation workflow. Records proposals in `.claude/context/runtime/evolution-requests.jsonl` and reflection report sections; does not auto-spawn orchestrators.
-
-**creation-feasibility-gate** — Preflight viability checker for proposed new artifacts (PASS/WARN/BLOCK with evidence) before creator skills run.
-
-**compliance-policy-check** — Policy/rule compliance gate for proposed design or artifact evolution (PASS/CONDITIONAL/FAIL with mitigations).
-
-**assimilate** — External benchmark assimilation workflow (clone/stage competitor repos → comparable surface extraction → gap list → TDD backlog). Use when framework self-improvement or EVOLVE benchmarking is requested.
-
-**skill-updater** — Research-backed workflow for refreshing existing skills (reflection/evolve/manual triggers) with TDD checkpoints, integration validation, and memory-index-safe updates.
-
-**agent-updater** — Risk-scored updater for existing agent prompts/frontmatter with explicit diff planning and registry validation.
-
-**workflow-updater** — Existing-workflow refresh workflow with phase-gate regression and idempotency checks.
-
-**memory-quality-auditor** — Memory/RAG quality auditor for retrieval drift, stale memories, and citation-groundedness signals.
-
-**eval-harness-updater** — Reliability updater for live/fallback eval harnesses (prompt/parser drift, timeout handling, SLO gate checks).
-
-**token-saver-context-compression** — Search-aware context compression workflow (hybrid search → evidence gate → MemoryRecord-ready payload mapping). Use when large context must be distilled without losing grounded evidence.
-
-**troubleshooting-regression** — Debug-log-first regression troubleshooting workflow (reproduce → extract findings → map owner hook/module → patch + targeted validation). Use when sessions stall, hooks misfire, or memory/search routing regresses.
+For usage details and full inventory, use `@SKILL_CATALOG_TABLE.md`.
 
 ### 8.6 ENTERPRISE WORKFLOWS
 
@@ -711,7 +570,7 @@ The memory system uses two subsystems:
 
 ## REFERENCE INDEX
 
-All external reference files are located in `.claude/docs/`:
+All external reference files are located in `@.claude/docs/`:
 
 | @File Name                   | Section                | Purpose                        |
 | ---------------------------- | ---------------------- | ------------------------------ |

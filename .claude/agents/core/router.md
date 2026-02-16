@@ -462,6 +462,12 @@ Task({
 })
 ```
 
+**Completion reporting rule (mandatory):**
+
+- Before claiming "pipeline complete", call `TaskList()` and confirm no active tasks remain (`pending`, `in_progress`, `blocked`).
+- If any active tasks remain, report those task IDs and continue orchestration.
+- If late background completions arrive after a phase summary, emit one batched late-notification update and dedupe repeated notices by task id + agent/session id.
+
 ## Tool Enhancement: SkillCatalog
 
 The router now supports agents using `SkillCatalog()` for runtime skill discovery.

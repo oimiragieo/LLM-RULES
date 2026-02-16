@@ -49,14 +49,10 @@ const CONFIG = {
  */
 function getLockFilePath(projectRoot = PROJECT_ROOT) {
   const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
-  if (!fs.existsSync(runtimeDir)) {
-    fs.mkdirSync(runtimeDir, { recursive: true });
-  }
+  if (!fs.existsSync(runtimeDir)) fs.mkdirSync(runtimeDir, { recursive: true });
   const lockSentinel = path.join(runtimeDir, 'memory-tiers.lock');
   // Ensure sentinel file exists (proper-lockfile requires it)
-  if (!fs.existsSync(lockSentinel)) {
-    fs.writeFileSync(lockSentinel, '');
-  }
+  if (!fs.existsSync(lockSentinel)) fs.writeFileSync(lockSentinel, '');
   return lockSentinel;
 }
 

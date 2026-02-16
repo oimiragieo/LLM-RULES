@@ -395,7 +395,7 @@ See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog
 **Track Metadata Schema** (SPEC-007):
 
 - **Path**: `.claude/schemas/track-metadata.schema.json`
-- **Documentation**: `.claude/docs/TRACK_METADATA.md`
+- **Documentation**: `@.claude/docs/TRACK_METADATA.md`
 - **Purpose**: Consistent structure for task/track metadata
 - **Features**: Effort estimation, phase tracking, dependency management
 - **Integration**: TaskCreate, workflow state, reporting

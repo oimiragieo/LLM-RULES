@@ -37,8 +37,9 @@ const ROUTING_RUNTIME_DIR = path.join(__dirname, '..', '..', 'context', 'runtime
 const BLOCK_DEDUPE_STATE_PATH = path.join(ROUTING_RUNTIME_DIR, 'routing-block-dedupe.json');
 const BLOCK_DEDUPE_THRESHOLD = Number(process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD || 2);
 const BLOCK_DEDUPE_WINDOW_MS = Number(process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS || 90000);
+let _blockDedupeStateCache = null;
 
-function getBlockDedupeState() {
+function loadBlockDedupeStateFromDisk() {
   try {
     if (!fs.existsSync(BLOCK_DEDUPE_STATE_PATH)) return {};
     const raw = fs.readFileSync(BLOCK_DEDUPE_STATE_PATH, 'utf8');
@@ -49,12 +50,35 @@ function getBlockDedupeState() {
   }
 }
 
+function getBlockDedupeState() {
+  if (_blockDedupeStateCache === null) {
+    _blockDedupeStateCache = loadBlockDedupeStateFromDisk();
+  }
+  return { ..._blockDedupeStateCache };
+}
+
 function setBlockDedupeState(state) {
+  _blockDedupeStateCache = state && typeof state === 'object' ? { ...state } : {};
   try {
     fs.mkdirSync(ROUTING_RUNTIME_DIR, { recursive: true });
-    fs.writeFileSync(BLOCK_DEDUPE_STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+    fs.writeFileSync(
+      BLOCK_DEDUPE_STATE_PATH,
+      JSON.stringify(_blockDedupeStateCache, null, 2),
+      'utf8'
+    );
   } catch (_err) {
     // Best-effort: dedupe is optimization only.
+  }
+}
+
+function resetBlockDedupeState() {
+  _blockDedupeStateCache = {};
+  try {
+    if (fs.existsSync(BLOCK_DEDUPE_STATE_PATH)) {
+      fs.unlinkSync(BLOCK_DEDUPE_STATE_PATH);
+    }
+  } catch (_err) {
+    // Best-effort reset for tests.
   }
 }
 
@@ -257,4 +281,5 @@ module.exports = {
   setStateCacheEnabled,
   clearInvocationCache,
   isRouterInvocation,
+  resetBlockDedupeState,
 };

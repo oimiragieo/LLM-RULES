@@ -1144,11 +1144,40 @@ TaskList(); // Check for metadata updates from agents
 TaskList();
 ```
 
-## Step 9.5: Template Loading and Validation
+### 9.4 Final-Summary Drain Gate (MANDATORY)
+
+Before any "pipeline complete" or final summary statement:
+
+```javascript
+const tasks = TaskList();
+const active = tasks.filter(t =>
+  ['pending', 'in_progress', 'blocked'].includes(String(t.status || '').toLowerCase())
+);
+if (active.length > 0) {
+  // Do NOT claim completion yet
+  // Report active task IDs and continue orchestration
+}
+```
+
+Rules:
+
+- Never emit final completion while active tasks remain.
+- If task output is still pending fan-in, continue polling with `TaskList()` until settled.
+- If blocked tasks remain, report blockers explicitly in the status update.
+
+### 9.5 Late-Notification Dedupe (MANDATORY)
+
+When background tasks finish after a phase summary:
+
+- Batch completions into one short "late notifications" message.
+- Dedupe notifications by `task_id` + `agent/session id`.
+- Do not emit repeated notifications for already-acknowledged completions.
+
+## Step 9.6: Template Loading and Validation
 
 **After selecting model, before spawning:**
 
-### 9.5.1 Select Appropriate Template
+### 9.6.1 Select Appropriate Template
 
 | Agent Type                               | Template File                                                           |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
@@ -1156,7 +1185,7 @@ TaskList();
 | Orchestrators (master, swarm, evolution) | `.claude/templates/spawn/orchestrator-spawn.md`                         |
 | Agents with identity fields              | `.claude/templates/spawn/agent-identity-integration.md` + base template |
 
-### 9.5.2 Load Template
+### 9.6.2 Load Template
 
 ```javascript
 // Load template file
@@ -1169,7 +1198,7 @@ if (!template) {
 }
 ```
 
-### 9.5.3 Populate Template Placeholders
+### 9.6.3 Populate Template Placeholders
 
 Replace these placeholders in template:
 
@@ -1182,7 +1211,7 @@ Replace these placeholders in template:
 | `<agent-file-path>`          | Path to agent definition file               |
 | `<SUBJECT>`                  | Task subject from TaskGet                   |
 
-### 9.5.4 Validation Check
+### 9.6.4 Validation Check
 
 Spawn prompt will be validated by `spawn-prompt-validator.cjs` hook.
 Ensure prompt contains:
@@ -1195,7 +1224,7 @@ Ensure prompt contains:
 
 **If validation fails in 'block' mode, spawn will be rejected.**
 
-### 9.5.5 Execute Spawn
+### 9.6.5 Execute Spawn
 
 ```javascript
 Task({
