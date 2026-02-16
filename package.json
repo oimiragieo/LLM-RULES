@@ -123,6 +123,7 @@
     "test:ml": "node --test --test-concurrency=1 tests/ml/*.test.cjs",
     "code:index:reindex": "node --max-old-space-size=32768 .claude/tools/cli/index-codebase.cjs index",
     "search:code": "node .claude/tools/cli/hybrid-search.cjs",
+    "trace:query": "node .claude/tools/cli/trace-query.cjs",
     "search:structure": "node .claude/tools/cli/hybrid-search.cjs --structure",
     "search:file": "node .claude/tools/cli/hybrid-search.cjs --file",
     "search:daemon:start": "node -e \"const {spawn}=require('node:child_process'); const p=spawn(process.execPath,['.claude/tools/cli/hybrid-search-daemon.cjs'],{detached:true,stdio:'ignore',windowsHide:true}); p.unref(); console.log('hybrid-search-daemon started');\"",

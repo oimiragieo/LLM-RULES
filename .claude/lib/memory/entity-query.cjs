@@ -3,6 +3,7 @@
 
 const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 /**
  * EntityQuery - Query entities and traverse relationship graphs
@@ -23,7 +24,7 @@ class EntityQuery {
   constructor(dbOrPath) {
     if (typeof dbOrPath === 'string') {
       // Open database from path
-      const projectRoot = path.resolve(__dirname, '../../../');
+      const projectRoot = PROJECT_ROOT;
       let dbPath;
       if (dbOrPath === ':memory:') {
         dbPath = dbOrPath;

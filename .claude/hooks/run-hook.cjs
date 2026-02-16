@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
 const { findProjectRoot } = require('../lib/utils/project-root.cjs');
+const eventBus = require('../lib/events/event-bus.cjs');
 
 function detectProjectRoot(cwd = process.cwd()) {
   const fromCwd = findProjectRoot(cwd);
@@ -36,6 +36,17 @@ function resolveHookScriptPath(hookName, projectRoot = detectProjectRoot()) {
   return { scriptPath, hooksDir, projectRoot };
 }
 
+function buildHookEnv(baseEnv = process.env) {
+  const context = eventBus.getContext ? eventBus.getContext() : { traceId: null };
+  const traceId = String(baseEnv.CLAUDE_TRACE_ID || context.traceId || '').trim();
+  if (!traceId) return { ...baseEnv };
+  return {
+    ...baseEnv,
+    CLAUDE_TRACE_ID: traceId,
+    HOOK_TRACE_ID: traceId,
+  };
+}
+
 function main() {
   // 1. Parse arguments
   // node run-hook.cjs <hook-name> [args...]
@@ -47,7 +58,7 @@ function main() {
 
   const hookName = args[0];
   const hookArgs = args.slice(1);
-  const { scriptPath, hooksDir } = resolveHookScriptPath(hookName);
+  const { scriptPath, hooksDir, projectRoot } = resolveHookScriptPath(hookName);
 
   if (!fs.existsSync(scriptPath)) {
     console.error(`Error: Hook not found: ${scriptPath}`);
@@ -56,27 +67,18 @@ function main() {
   }
 
   // 3. Execute
-  // If it's a JS/Node file, run with node. If .sh, run with bash.
-  const ext = path.extname(scriptPath);
-  let cmd, cmdArgs;
+  const HookRunner = require('../lib/utils/hook-runner.cjs');
+  const runner = new HookRunner({ projectRoot, env: buildHookEnv(process.env) });
 
-  if (ext === '.sh') {
-    cmd = 'bash';
-    cmdArgs = [scriptPath, ...hookArgs];
-  } else {
-    cmd = process.execPath; // node
-    cmdArgs = [scriptPath, ...hookArgs];
-  }
-
-  const child = spawn(cmd, cmdArgs, {
-    stdio: 'inherit',
-    env: process.env,
-    windowsHide: true,
-  });
-
-  child.on('close', code => {
-    process.exit(code);
-  });
+  runner
+    .run(scriptPath, hookArgs)
+    .then(code => {
+      process.exit(code);
+    })
+    .catch(err => {
+      console.error(`Error executing hook: ${err.message}`);
+      process.exit(1);
+    });
 }
 
 if (require.main === module) {
@@ -86,4 +88,5 @@ if (require.main === module) {
 module.exports = {
   detectProjectRoot,
   resolveHookScriptPath,
+  buildHookEnv,
 };

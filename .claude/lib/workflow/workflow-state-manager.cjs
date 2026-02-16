@@ -21,11 +21,20 @@
 const fs = require('fs');
 const path = require('path');
 const { readWorkflowStateFile } = require('../runtime/state-contracts.cjs');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const eventBus = require('../events/event-bus.cjs');
 
 /**
  * Default state file path
  */
-const DEFAULT_STATE_FILE = path.join(__dirname, '../../context/runtime/workflow-state.json');
+const DEFAULT_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'workflow-state.json'
+);
 
 /**
  * All possible phases
@@ -92,8 +101,8 @@ function writeState(stateFilePath, state) {
   // Update updatedAt timestamp
   state.updatedAt = new Date().toISOString();
 
-  // Write file
-  fs.writeFileSync(stateFilePath, JSON.stringify(state, null, 2), 'utf8');
+  // Write file atomically (temp + rename) to avoid partial/truncated state.
+  atomicWriteJSONSync(stateFilePath, state);
 }
 
 /**
@@ -119,6 +128,7 @@ function createWorkflow(requestSummary, complexity, stateFilePath = DEFAULT_STAT
 
   const state = {
     workflowId,
+    traceId: eventBus.getContext().traceId,
     requestSummary,
     complexity,
     currentPhase: 'PHASE_0_TRIAGE',
@@ -167,6 +177,10 @@ function advancePhase(workflowId, nextPhase, stateFilePath = DEFAULT_STATE_FILE)
   }
 
   const now = new Date().toISOString();
+  const contextTraceId = eventBus.getContext().traceId;
+  if (!state.traceId && contextTraceId) {
+    state.traceId = contextTraceId;
+  }
 
   // Mark current phase as completed
   if (state.currentPhase !== 'PHASE_0_TRIAGE') {
@@ -361,6 +375,7 @@ function getPhaseArtifacts(workflowId, phase, stateFilePath = DEFAULT_STATE_FILE
 }
 
 module.exports = {
+  DEFAULT_STATE_FILE,
   createWorkflow,
   getActiveWorkflow,
   advancePhase,

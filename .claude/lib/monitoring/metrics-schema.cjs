@@ -139,6 +139,15 @@ const METRIC_EVENT_SCHEMAS = {
   },
 };
 
+const FLIGHT_RECORDER_SCHEMA = {
+  required: {
+    traceId: 'string',
+    timestamp: 'string',
+    component: 'string',
+    event: 'string',
+  },
+};
+
 function validateMetricRow(row) {
   if (!isPlainObject(row)) {
     return { valid: false, errors: ['row must be object'] };
@@ -219,6 +228,22 @@ function validateJsonlFile(filePath, options = {}) {
 
 module.exports = {
   METRIC_EVENT_SCHEMAS,
+  FLIGHT_RECORDER_SCHEMA,
   validateMetricRow,
+  validateFlightRecorderRow: row => {
+    if (!isPlainObject(row)) {
+      return { valid: false, errors: ['row must be object'] };
+    }
+    const errors = [];
+    for (const [field, typeName] of Object.entries(FLIGHT_RECORDER_SCHEMA.required)) {
+      if (!matchesType(row[field], typeName)) {
+        errors.push(`${field} must be ${typeName}`);
+      }
+    }
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
+  },
   validateJsonlFile,
 };

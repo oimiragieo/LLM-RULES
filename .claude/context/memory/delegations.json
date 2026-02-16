@@ -3,10 +3,7 @@
     "taskId": "t-2",
     "parentAgent": "master-orchestrator",
     "targetAgent": "developer",
-    "chain": [
-      "master-orchestrator",
-      "developer"
-    ],
+    "chain": ["master-orchestrator", "developer"],
     "timeoutMs": 100,
     "status": "reassigned",
     "traceId": "trace-orphan",
@@ -18,10 +15,7 @@
     "taskId": "t-3",
     "parentAgent": "agent-a",
     "targetAgent": "agent-b",
-    "chain": [
-      "agent-a",
-      "agent-b"
-    ],
+    "chain": ["agent-a", "agent-b"],
     "timeoutMs": 30000,
     "status": "reassigned",
     "traceId": null,

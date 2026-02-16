@@ -39,7 +39,6 @@ test('TaskRouter persists delegations across initializations', async () => {
     const router3 = new TaskRouter({ delegationsPath });
     await router3.initialize();
     assert.equal(router3.delegations.get('persist-1').status, 'completed');
-
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
@@ -71,7 +70,6 @@ test('recoverOrphanedDelegations marks old pending tasks as reassigned', async (
     const router2 = new TaskRouter({ delegationsPath });
     await router2.initialize();
     assert.equal(router2.delegations.get('orphan-1').status, 'reassigned');
-
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

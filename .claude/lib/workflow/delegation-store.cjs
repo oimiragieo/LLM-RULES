@@ -6,7 +6,13 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { withFileLock } = require('../memory/memory-tiers-lock.cjs');
 
-const DELEGATIONS_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'delegations.json');
+const DELEGATIONS_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'memory',
+  'delegations.json'
+);
 
 class DelegationStore {
   constructor(filePath = DELEGATIONS_FILE) {

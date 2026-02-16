@@ -232,20 +232,21 @@ Recommended Skills: `tdd`, `verification-before-completion`
 
 **Common Task-to-Skill Mappings:**
 
-| Task Type                  | Recommended Skills                                                  |
-| -------------------------- | ------------------------------------------------------------------- |
-| New feature implementation | `tdd`, `verification-before-completion`                             |
-| Bug fix                    | `debugging`, `tdd`, `verification-before-completion`                |
-| Code cleanup/refactoring   | `verification-before-completion`                                    |
-| Documentation update       | `doc-generator`, `writing-skills`, `verification-before-completion` |
-| Security review            | `security-architect`, `auth-security-expert`                        |
-| Architecture design        | `architecture-review`, `diagram-generator`                          |
-| Code review                | `code-analyzer`, `checklist-generator`                              |
-| Research task              | `research-synthesis`                                                |
-| Test writing               | `tdd`, `checklist-generator`                                        |
-| Planning                   | `complexity-assessment`, `task-management-protocol`                 |
-| Session ending             | `insight-extraction`, `session-handoff`                             |
-| Creating new artifacts     | `research-synthesis` + appropriate creator skill                    |
+| Task Type                  | Recommended Skills                                                          |
+| -------------------------- | --------------------------------------------------------------------------- |
+| New feature implementation | `tdd`, `verification-before-completion`                                     |
+| Bug fix                    | `debugging`, `tdd`, `verification-before-completion`                        |
+| Incident/debug triage      | `debugging`, `troubleshooting-regression`, `verification-before-completion` |
+| Code cleanup/refactoring   | `verification-before-completion`                                            |
+| Documentation update       | `doc-generator`, `writing-skills`, `verification-before-completion`         |
+| Security review            | `security-architect`, `auth-security-expert`                                |
+| Architecture design        | `architecture-review`, `diagram-generator`                                  |
+| Code review                | `code-analyzer`, `checklist-generator`                                      |
+| Research task              | `research-synthesis`                                                        |
+| Test writing               | `tdd`, `checklist-generator`                                                |
+| Planning                   | `complexity-assessment`, `task-management-protocol`                         |
+| Session ending             | `insight-extraction`, `session-handoff`                                     |
+| Creating new artifacts     | `research-synthesis` + appropriate creator skill                            |
 
 **Skill Catalog Reference:** `.claude/context/artifacts/catalogs/skill-catalog.md`
 
@@ -315,6 +316,9 @@ Skill({ skill: 'tdd' }); // TDD-style planning contract
 After Phase 0 complete and constitution checkpoint passed:
 
 1.  **Read Context**: Run hybrid discovery first (`pnpm search:code`, `Skill({ skill: 'ripgrep' })`, semantic/structural search). Use `Grep` only as fallback. Then do targeted `Read` on top-ranked files and read `.claude/docs/AGENT_ROUTING_CARD.md` before assigning agents.
+
+- For incident/debug plans, include a first-class trace step: `pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200` (or component/event fallback when trace id is unknown).
+
 2.  **Think**: Use `Skill({ skill: 'sequential-thinking' })` to model the solution.
 3.  **Draft Plan**: Create a markdown plan following the plan template.
 4.  **Review**: Ensure no steps are missing (e.g., tests, migrations).

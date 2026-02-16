@@ -1,0 +1,89 @@
+name: Observability CI
+
+on:
+  pull_request:
+    paths:
+      - '.claude/lib/monitoring/**'
+      - '.claude/lib/events/**'
+      - '.claude/lib/utils/hook-runner.cjs'
+      - '.claude/lib/utils/hook-worker-bridge.cjs'
+      - '.claude/hooks/benchmarks/**'
+      - '.claude/hooks/validation/flight-recorder-schema-gate.cjs'
+      - '.claude/hooks/monitoring/slo-alert-gate.cjs'
+      - '.claude/tools/cli/trace-query.cjs'
+      - 'tests/lib/monitoring/**'
+      - 'tests/integration/event-telemetry-sink.test.cjs'
+      - 'tests/integration/trace-linkage.test.cjs'
+      - 'tests/tools/trace-query-cli.test.cjs'
+      - 'tests/hooks/benchmarks/perf-regression-gate.test.cjs'
+      - 'tests/hooks/benchmarks/perf-gate-ci-integration.test.cjs'
+      - 'tests/validation/flight-recorder-schema-gate.test.cjs'
+      - 'tests/hooks/monitoring/slo-alert-gate.test.cjs'
+      - '.github/workflows/observability-ci.yml'
+      - 'package.json'
+  push:
+    branches:
+      - main
+    paths:
+      - '.claude/lib/monitoring/**'
+      - '.claude/lib/events/**'
+      - '.claude/lib/utils/hook-runner.cjs'
+      - '.claude/lib/utils/hook-worker-bridge.cjs'
+      - '.claude/hooks/benchmarks/**'
+      - '.claude/hooks/validation/flight-recorder-schema-gate.cjs'
+      - '.claude/hooks/monitoring/slo-alert-gate.cjs'
+      - '.claude/tools/cli/trace-query.cjs'
+      - 'tests/lib/monitoring/**'
+      - 'tests/integration/event-telemetry-sink.test.cjs'
+      - 'tests/integration/trace-linkage.test.cjs'
+      - 'tests/tools/trace-query-cli.test.cjs'
+      - 'tests/hooks/benchmarks/perf-regression-gate.test.cjs'
+      - 'tests/hooks/benchmarks/perf-gate-ci-integration.test.cjs'
+      - 'tests/validation/flight-recorder-schema-gate.test.cjs'
+      - 'tests/hooks/monitoring/slo-alert-gate.test.cjs'
+      - '.github/workflows/observability-ci.yml'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  observability-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm -s lint
+
+      - name: Run observability test slice
+        run: node --test tests/lib/monitoring/flight-recorder-rotation.test.cjs tests/lib/monitoring/flight-recorder-replay.test.cjs tests/lib/monitoring/slo-rollups.test.cjs tests/tools/trace-query-cli.test.cjs tests/integration/event-telemetry-sink.test.cjs tests/integration/trace-linkage.test.cjs tests/validation/flight-recorder-schema-gate.test.cjs tests/hooks/monitoring/slo-alert-gate.test.cjs tests/hooks/benchmarks/perf-regression-gate.test.cjs
+
+      - name: Perf gate
+        run: node .claude/hooks/benchmarks/perf-gate.cjs
+        env:
+          HOOK_RUNNER_MODE: worker
+          PERF_GATE_MAX_LATENCY_MS: 5
+
+      - name: Flight recorder schema gate
+        run: node .claude/hooks/validation/flight-recorder-schema-gate.cjs
+        env:
+          FLIGHT_RECORDER_SCHEMA_GATE_STRICT: 'true'

@@ -36,6 +36,22 @@ Select-String -Path $p -Pattern "No pending reflections|status\":\"no_pending\"|
 Select-String -Path $p -Pattern "Large direct Read|requires search evidence first|token-saver-context-compression|Bash redirection\/heredoc"
 ```
 
+## 2.1 Trace-First Commands
+
+Use trace data before broad code changes for incident/debug/root-cause work:
+
+```bash
+pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200
+```
+
+If trace id is unknown:
+
+```bash
+pnpm trace:query --component <component-name> --event <event-name> --since <ISO-8601> --limit 200
+```
+
+Capture the exact command and trace id(s) in your report so follow-up agents can reproduce the same timeline.
+
 ## 3. Known Failure Modes and Fixes
 
 ### A. "No tasks/task updates" feeling, but session is running

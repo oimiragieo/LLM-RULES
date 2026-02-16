@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { atomicWriteJSONSyncWithBackup } = require('../utils/atomic-write.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 module.exports = {
@@ -16,11 +17,6 @@ module.exports = {
       throw new Error('Checkpoint directory not configured');
     }
 
-    // Ensure directory exists
-    if (!fs.existsSync(checkpointDir)) {
-      fs.mkdirSync(checkpointDir, { recursive: true });
-    }
-
     const checkpointId = `checkpoint-${this.state.runId}-${Date.now()}`;
     const checkpointPath = path.join(checkpointDir, `${checkpointId}.json`);
 
@@ -31,7 +27,8 @@ module.exports = {
       state: this.getState(),
     };
 
-    await fs.promises.writeFile(checkpointPath, JSON.stringify(checkpointData, null, 2));
+    // SEC-IMPL-004: Atomic write with backup to prevent corruption
+    atomicWriteJSONSyncWithBackup(checkpointPath, checkpointData);
 
     this.emit('checkpoint:save', { checkpointId, runId: this.state.runId, path: checkpointPath });
 

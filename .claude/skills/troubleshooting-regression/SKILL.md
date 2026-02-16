@@ -20,22 +20,25 @@ Use this skill when the framework appears stale, stuck, or regressed and you nee
 Do not declare a regression fixed without:
 
 1. reproducible trigger prompt,
-2. hook/tool evidence from debug logs,
-3. targeted test pass for touched scope.
+2. trace evidence from `pnpm trace:query`,
+3. hook/tool evidence from debug logs,
+4. targeted test pass for touched scope.
 
 ## Workflow
 
 1. Identify session and log source.
-2. Extract high-signal errors (excluding known MCP auth/startup noise).
-3. Map each error to owning hook/module.
-4. Patch minimal code path and add/update regression test.
-5. Run targeted checks (tests + lint/format on changed files).
-6. Re-run debug prompt and verify error class no longer reproduces.
-7. Record learnings/issues in memory.
+2. Run trace query first (`pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200`).
+3. Extract high-signal errors (excluding known MCP auth/startup noise).
+4. Map each error to owning hook/module.
+5. Patch minimal code path and add/update regression test.
+6. Run targeted checks (tests + lint/format on changed files).
+7. Re-run debug prompt and verify error class no longer reproduces.
+8. Record learnings/issues in memory.
 
 ## Evidence Model
 
 - Source of truth: `C:\\Users\\<user>\\.claude\\debug\\*.txt`
+- Trace source of truth: `pnpm trace:query` output for the same incident window
 - Filter: ignore external MCP transport/auth noise; keep framework/runtime errors
 - Error classes:
   - routing/task lifecycle
@@ -49,6 +52,7 @@ Primary wrapper:
 
 ```bash
 node .claude/skills/troubleshooting-regression/scripts/main.cjs --prompt "search the codebase for any issues or bugs"
+pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200
 ```
 
 Optional direct log analysis:

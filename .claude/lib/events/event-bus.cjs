@@ -20,10 +20,14 @@
 'use strict';
 
 const EventEmitter = require('events');
+const { AsyncLocalStorage } = require('async_hooks');
 const { validateEvent } = require('./event-types.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 
+const crypto = require('crypto');
 const logger = createLogger('event-bus');
+const storage = new AsyncLocalStorage();
+const MAX_DEPTH = 10;
 
 class EventBus {
   constructor() {
@@ -39,40 +43,102 @@ class EventBus {
    * Emit event and await handler completion in priority order.
    * @param {string} eventType - Event type (e.g., 'AGENT_STARTED')
    * @param {object} payload - Event payload
+   * @param {object} [options] - Emission options
+   * @param {string} [options.mode='sequential'] - 'sequential' or 'parallel'
    * @returns {Promise<void>}
    */
-  async emit(eventType, payload) {
-    // Add timestamp to payload if not present
-    const enrichedPayload = {
-      ...payload,
-      timestamp: payload.timestamp || new Date().toISOString(),
-    };
+  async emit(eventType, payload, options = {}) {
+    const parentContext = storage.getStore() || { depth: 0, traceId: null };
+    const { depth } = parentContext;
 
-    // Validate event before emitting
-    const validation = validateEvent(eventType, enrichedPayload);
-    if (!validation.valid) {
-      const errorMessage = `Invalid event ${eventType}: ${validation.errors.map(e => e.message).join(', ')}`;
-      logger.error(errorMessage, { errors: validation.errors });
-      // Don't emit invalid events
-      return;
+    if (depth >= MAX_DEPTH) {
+      throw new Error(
+        `Max emission depth exceeded (${depth}). Circular event emission detected for ${eventType}.`
+      );
     }
 
-    // Get subscriptions for this event type, sorted by priority (descending)
-    const subs = this.subscriptions
-      .filter(sub => sub.eventType === eventType)
-      .sort((a, b) => b.priority - a.priority);
+    const traceId = payload.traceId || parentContext.traceId || crypto.randomUUID();
 
-    // Execute handlers in priority order.
-    // emit() resolves only after handlers complete, preserving async contract.
-    for (const sub of subs) {
-      try {
-        // Handler can be sync or async
-        await sub.handler(enrichedPayload);
-      } catch (error) {
-        // Log error but don't crash the event bus
-        logger.error(`Handler error for ${eventType}`, { error: error.message });
+    return storage.run({ depth: depth + 1, traceId }, async () => {
+      // Add timestamp and traceId to payload if not present
+      const enrichedPayload = {
+        ...payload,
+        traceId,
+        timestamp: payload.timestamp || new Date().toISOString(),
+      };
+
+      // Validate event before emitting
+      const validation = validateEvent(eventType, enrichedPayload);
+      if (!validation.valid) {
+        const errorMessage = `Invalid event ${eventType}: ${validation.errors.map(e => e.message).join(', ')}`;
+        logger.error(errorMessage, { errors: validation.errors });
+        // Don't emit invalid events
+        return;
       }
-    }
+
+      // Get subscriptions for this event type, sorted by priority (descending)
+      const subs = this.subscriptions
+        .filter(sub => sub.eventType === eventType)
+        .sort((a, b) => b.priority - a.priority);
+
+      const mode = options.mode || 'sequential';
+      const TIMEOUT_MS = Number(process.env.EVENT_BUS_HANDLER_TIMEOUT || 5000);
+
+      if (mode === 'parallel') {
+        const promises = subs.map(async sub => {
+          try {
+            const handlerPromise = sub.handler(enrichedPayload);
+            if (handlerPromise && typeof handlerPromise.then === 'function') {
+              await Promise.race([
+                handlerPromise,
+                new Promise((_, reject) =>
+                  setTimeout(
+                    () => reject(new Error(`Handler timeout after ${TIMEOUT_MS}ms`)),
+                    TIMEOUT_MS
+                  )
+                ),
+              ]);
+            }
+          } catch (error) {
+            logger.error(`Handler error for ${eventType} (parallel)`, { error: error.message });
+          }
+        });
+        await Promise.allSettled(promises);
+      } else {
+        // Execute handlers in priority order.
+        // emit() resolves only after handlers complete, preserving async contract.
+        for (const sub of subs) {
+          try {
+            // Handler can be sync or async
+            const handlerPromise = sub.handler(enrichedPayload);
+
+            // If it's a promise, race it against timeout
+            if (handlerPromise && typeof handlerPromise.then === 'function') {
+              await Promise.race([
+                handlerPromise,
+                new Promise((_, reject) =>
+                  setTimeout(
+                    () => reject(new Error(`Handler timeout after ${TIMEOUT_MS}ms`)),
+                    TIMEOUT_MS
+                  )
+                ),
+              ]);
+            }
+          } catch (error) {
+            // Log error but don't crash the event bus
+            logger.error(`Handler error for ${eventType}`, { error: error.message });
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Get current execution context (traceId, depth)
+   * @returns {{ traceId: string|null, depth: number }}
+   */
+  getContext() {
+    return storage.getStore() || { traceId: null, depth: 0 };
   }
 
   /**

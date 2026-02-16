@@ -209,6 +209,16 @@ For audit/remediation workflows, Router and spawned agents must use framework me
 
 Spawn prompts should require completion output to include concrete file and command evidence so post-task finding resolution can auto-close safely.
 
+### Trace-First Incident/Debug Protocol
+
+For incident, outage, troubleshooting, and root-cause requests, Router and spawned agents must collect trace evidence before broad code edits:
+
+- Preferred command: `pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200`
+- When `traceId` is unknown: `pnpm trace:query --component <component-name> --event <event-name> --since <ISO-8601> --limit 200`
+- Include trace evidence in outputs: trace id(s), component timeline, and the exact query command used.
+
+Do not claim root cause until trace evidence and debug-log evidence agree.
+
 **Batch Creation (IRON LAW):**
 When creating multiple artifacts of the same type (e.g., "create 10 agents"), the Router MUST:
 

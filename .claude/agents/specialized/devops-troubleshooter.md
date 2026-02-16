@@ -217,15 +217,24 @@ Use search tools to understand the codebase before acting:
 
 ## Response Approach
 
-1. **Assess the situation** with urgency appropriate to impact and scope
-2. **Gather comprehensive data** from logs, metrics, traces, and system state
-3. **Form and test hypotheses** systematically with minimal system disruption
-4. **Implement immediate fixes** to restore service while planning permanent solutions
-5. **Document thoroughly** for postmortem analysis and future reference
-6. **Add monitoring and alerting** to detect similar issues proactively
-7. **Plan long-term improvements** to prevent recurrence and improve system resilience
-8. **Share knowledge** through runbooks, documentation, and team training
-9. **Conduct blameless postmortems** to identify systemic improvements
+### Trace-First Triage (MANDATORY)
+
+Before broad debugging, run `pnpm trace:query` and anchor the investigation on trace evidence:
+
+1. If trace id exists: `pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200`
+2. If trace id is unknown: `pnpm trace:query --component <component-name> --event <event-name> --since <ISO-8601> --limit 200`
+3. Correlate trace timeline with debug logs and metrics before proposing fixes.
+4. Include exact trace-query command(s) and trace id(s) in the final report.
+
+5. **Assess the situation** with urgency appropriate to impact and scope
+6. **Gather comprehensive data** from logs, metrics, traces, and system state
+7. **Form and test hypotheses** systematically with minimal system disruption
+8. **Implement immediate fixes** to restore service while planning permanent solutions
+9. **Document thoroughly** for postmortem analysis and future reference
+10. **Add monitoring and alerting** to detect similar issues proactively
+11. **Plan long-term improvements** to prevent recurrence and improve system resilience
+12. **Share knowledge** through runbooks, documentation, and team training
+13. **Conduct blameless postmortems** to identify systemic improvements
 
 ## Example Interactions
 

@@ -54,9 +54,10 @@ Orchestrate multi-agent incident response with modern SRE practices for rapid re
 ## Instructions
 
 1. Invoke skills: Skill({ skill: 'debugging' }), Skill({ skill: 'sentry-monitoring' })
-2. Perform rapid observability sweep for incident: $ARGUMENTS. Query: 1) Distributed tracing (OpenTelemetry/Jaeger), 2) Metrics correlation (Prometheus/Grafana/DataDog), 3) Log aggregation (ELK/Splunk), 4) APM data, 5) Real User Monitoring. Identify anomalies, error patterns, and service degradation points."
+2. First run trace query for baseline timeline: `pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200` (or `--component` + `--event` fallback when trace id is unknown).
+3. Perform rapid observability sweep for incident: $ARGUMENTS. Query: 1) Distributed tracing (OpenTelemetry/Jaeger), 2) Metrics correlation (Prometheus/Grafana/DataDog), 3) Log aggregation (ELK/Splunk), 4) APM data, 5) Real User Monitoring. Identify anomalies, error patterns, and service degradation points."
 
-- Output: Observability findings, anomaly detection, service health matrix, trace analysis
+- Output: Observability findings, anomaly detection, service health matrix, trace analysis, exact `pnpm trace:query` command and trace id(s)
 - Context: Severity level from step 1, affected services
 
 ### 3. Initial Mitigation

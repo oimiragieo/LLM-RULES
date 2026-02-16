@@ -72,6 +72,17 @@ jobs:
       - name: Run framework test gate
         run: pnpm run test:framework
 
+      - name: Run hook performance regression gate
+        run: node .claude/hooks/benchmarks/perf-gate.cjs
+        env:
+          HOOK_RUNNER_MODE: worker
+          PERF_GATE_MAX_LATENCY_MS: 5
+
+      - name: Run flight recorder schema gate
+        run: node .claude/hooks/validation/flight-recorder-schema-gate.cjs
+        env:
+          FLIGHT_RECORDER_SCHEMA_GATE_STRICT: 'true'
+
       - name: Run memory SLO CI checks
         run: pnpm run metrics:memory:slo:ci
 

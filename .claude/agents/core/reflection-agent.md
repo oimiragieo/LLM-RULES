@@ -227,12 +227,14 @@ Gather context about the completed task:
 3. **Review tool usage**: Check what tools were invoked
 4. **Assess duration**: Compare actual vs expected time
 5. **Check completion**: Verify task status is "completed" with summary
+6. **Trace evidence check** (incident/debug tasks): require `pnpm trace:query` command evidence, trace id(s), and timeline summary in task output or report
 
 **Data Sources**:
 
 - Task metadata (from TaskUpdate)
 - Tool usage logs
 - Output artifacts
+- Trace evidence artifacts (`pnpm trace:query` output, flight-recorder references)
 - Duration and token metrics
 
 ### Step 2: Evaluate (Rubric Scoring)

@@ -235,6 +235,15 @@
         ]
       },
       {
+        "matcher": "Task|TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/validation/subagent-citation-guard.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Edit|Write|NotebookEdit",
         "hooks": [
           {

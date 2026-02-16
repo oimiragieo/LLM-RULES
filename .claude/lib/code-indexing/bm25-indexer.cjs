@@ -194,6 +194,46 @@ class BM25Indexer {
   }
 
   /**
+   * Remove a document from the index
+   * @param {string} id - ID of the document to remove
+   * @returns {boolean} True if document was removed
+   */
+  removeDocument(id) {
+    const initialLen = this.documents.length;
+    this.documents = this.documents.filter(doc => doc.id !== id);
+
+    if (this.documents.length !== initialLen) {
+      this._idfDirty = true;
+      this.N = this.documents.length;
+      // Recalculate avg length
+      const totalLength = this.documents.reduce((sum, doc) => sum + doc.length, 0);
+      this.avgDocLength = this.N > 0 ? totalLength / this.N : 0;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Update a document in the index
+   * @param {string} id - Document ID
+   * @param {string} text - New document text
+   */
+  updateDocument(id, text) {
+    this.removeDocument(id);
+    this.addDocuments([{ id, text }]);
+  }
+
+  /**
+   * Optimize the index by compacting memory and forcing IDF recalculation
+   */
+  optimize() {
+    this._calculateIDF();
+    this._idfDirty = false;
+    // Suggest garbage collection for the documents array if it's large
+    // (In Node.js this is automatic, but we ensure we're not holding references)
+  }
+
+  /**
    * Calculate BM25 score for a document given a query
    * @param {Object} doc - Document object
    * @param {string[]} queryTokens - Query tokens
