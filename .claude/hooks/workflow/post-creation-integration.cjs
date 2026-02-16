@@ -26,10 +26,11 @@
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { DEFAULT_ARTIFACT_GRAPH_PATH } = require('../../lib/workflow/artifact-graph.cjs');
 
 // Resolve project root
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
-const GRAPH_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'artifact-graph.json');
+const GRAPH_PATH = DEFAULT_ARTIFACT_GRAPH_PATH;
 const QUEUE_PATH = path.join(
   PROJECT_ROOT,
   '.claude',

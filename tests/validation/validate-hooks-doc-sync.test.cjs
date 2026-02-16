@@ -64,3 +64,19 @@ test('findMissingHooks returns undocumented hooks not in exclusions', () => {
 
   assert.deepEqual(missing, []);
 });
+
+test('findStaleHooksInActiveSection detects stale hooks in active list section', () => {
+  assert.ok(validator, 'validator should be available');
+
+  const active = ['pre-task-unified.cjs', 'spawn-prompt-assembler.cjs'];
+  const docsText = `
+## Recent Updates
+- Active settings-registered hooks now explicitly include:
+  - \`pre-task-unified.cjs\`
+  - \`spawn-prompt-assembler.cjs\`
+  - \`metrics-collector-hook.cjs\`
+`;
+
+  const stale = validator.findStaleHooksInActiveSection(active, docsText, []);
+  assert.deepEqual(stale, ['metrics-collector-hook.cjs']);
+});

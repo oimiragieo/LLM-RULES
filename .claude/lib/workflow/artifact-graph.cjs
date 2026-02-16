@@ -3,6 +3,15 @@
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+
+const DEFAULT_ARTIFACT_GRAPH_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'data',
+  'artifact-graph.json'
+);
 
 /**
  * ArtifactGraph - CRUD operations and query API for artifact relationship graph
@@ -538,4 +547,4 @@ class ArtifactGraph {
   }
 }
 
-module.exports = { ArtifactGraph };
+module.exports = { ArtifactGraph, DEFAULT_ARTIFACT_GRAPH_PATH };

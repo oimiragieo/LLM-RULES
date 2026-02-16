@@ -9,7 +9,7 @@
  *
  * Usage:
  *   node .claude/tools/cli/bootstrap-artifact-graph.cjs [options]
- *   --output PATH    Path to write graph (default: .claude/context/runtime/artifact-graph.json)
+ *   --output PATH    Path to write graph (default: .claude/context/data/artifact-graph.json)
  *   --dry-run        Print stats without writing
  *   --verbose        Show each artifact and edge found
  */
@@ -30,14 +30,14 @@ const findProjectRoot = () => {
 };
 
 const PROJECT_ROOT = findProjectRoot();
-const { ArtifactGraph } = require(
+const { ArtifactGraph, DEFAULT_ARTIFACT_GRAPH_PATH } = require(
   path.join(PROJECT_ROOT, '.claude/lib/workflow/artifact-graph.cjs')
 );
 
 // Parse CLI args
 const args = process.argv.slice(2);
 const options = {
-  output: path.join(PROJECT_ROOT, '.claude/context/runtime/artifact-graph.json'),
+  output: DEFAULT_ARTIFACT_GRAPH_PATH,
   dryRun: false,
   verbose: false,
 };

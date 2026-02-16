@@ -18,6 +18,8 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `0`: Allow operation
 - `2`: Block operation
 
+Step-0 reflection enforcement hooks (`force-step0-execution.cjs`, `reflection-step0-guard.cjs`) use exit `2` for block behavior. Hook-chain continuation on non-zero exits is host-defined, so treat non-zero as a potential chain stop.
+
 ## Recent Updates (2026-02)
 
 - `post-task-unified.cjs` now enforces task completion tracking with hard-block default:

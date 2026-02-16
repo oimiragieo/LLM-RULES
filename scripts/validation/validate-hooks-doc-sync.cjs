@@ -38,6 +38,24 @@ function findMissingHooks(activeHookBasenames, docsText, exclusions = []) {
     .sort();
 }
 
+function extractActiveSectionHookNames(docsText) {
+  const marker = 'Active settings-registered hooks now explicitly include:';
+  const start = docsText.indexOf(marker);
+  if (start === -1) return [];
+  const after = docsText.slice(start + marker.length);
+  const nextHeading = after.search(/\n##\s+/);
+  const section = nextHeading >= 0 ? after.slice(0, nextHeading) : after;
+  const matches = section.match(/\b([A-Za-z0-9._-]+\.cjs)\b/g) || [];
+  return Array.from(new Set(matches)).sort();
+}
+
+function findStaleHooksInActiveSection(activeHookBasenames, docsText, exclusions = []) {
+  const excluded = new Set((exclusions || []).map(String));
+  const active = new Set((activeHookBasenames || []).map(String));
+  const listed = extractActiveSectionHookNames(docsText);
+  return listed.filter(name => !excluded.has(name) && !active.has(name)).sort();
+}
+
 function parseArgs(argv) {
   const args = argv.slice(2);
   const opts = {
@@ -88,29 +106,35 @@ function main(argv = process.argv) {
   const active = collectActiveHookBasenames(opts.settingsPath);
   const docsText = readDocsText(opts.docsPaths);
   const missing = findMissingHooks(active, docsText, opts.exclusions);
+  const stale = findStaleHooksInActiveSection(active, docsText, opts.exclusions);
   const result = {
     settingsPath: path.relative(PROJECT_ROOT, opts.settingsPath),
     docsPaths: opts.docsPaths.map(p => path.relative(PROJECT_ROOT, p)),
     activeCount: active.length,
     missingCount: missing.length,
     missing,
+    staleCount: stale.length,
+    stale,
     strict: opts.strict,
   };
 
   if (opts.json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  } else if (missing.length === 0) {
+  } else if (missing.length === 0 && stale.length === 0) {
     process.stdout.write('hooks-doc-sync: PASS\n');
   } else {
     process.stdout.write(
-      `hooks-doc-sync: ${opts.strict ? 'FAIL' : 'WARN'} (${missing.length} missing)\n`
+      `hooks-doc-sync: ${opts.strict ? 'FAIL' : 'WARN'} (${missing.length} missing, ${stale.length} stale)\n`
     );
     for (const name of missing) {
       process.stdout.write(` - ${name}\n`);
     }
+    for (const name of stale) {
+      process.stdout.write(` - stale: ${name}\n`);
+    }
   }
 
-  if (opts.strict && missing.length > 0) {
+  if (opts.strict && (missing.length > 0 || stale.length > 0)) {
     process.exitCode = 1;
   }
 
@@ -124,6 +148,8 @@ if (require.main === module) {
 module.exports = {
   collectActiveHookBasenames,
   findMissingHooks,
+  extractActiveSectionHookNames,
+  findStaleHooksInActiveSection,
   parseArgs,
   readDocsText,
   main,

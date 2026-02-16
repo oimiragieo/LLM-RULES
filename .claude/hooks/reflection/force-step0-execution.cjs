@@ -23,11 +23,16 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { parseHookInputAsync } = require('../../lib/utils/hook-input.cjs');
 const { readSpawnRequestsFile } = require('../../lib/reflection/spawn-request-contract.cjs');
+const {
+  buildStep0ReminderMessage,
+} = require('../../lib/reflection/reflection-reminder-message.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
 const REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
 const SPAWN_LOG_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics', 'spawn-log.jsonl');
+const EXIT_ALLOW = 0;
+const EXIT_BLOCK = 2;
 
 /** Log to stderr only (stdout reserved for hook output). */
 function stderrLog(level, message, meta = {}) {
@@ -107,11 +112,21 @@ function logToSpawnLog(event) {
   }
 }
 
+function writeReminderFile(pendingCount) {
+  try {
+    fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+    const content = buildStep0ReminderMessage(pendingCount);
+    fs.writeFileSync(REMINDER_PATH, content, 'utf8');
+  } catch (err) {
+    stderrLog('warn', 'Failed to write reflection reminder file', { error: err.message });
+  }
+}
+
 async function main() {
   // Skip if reflection system is disabled
   if (process.env.REFLECTION_ENABLED === 'false') {
     stderrLog('info', 'Reflection system disabled, skipping Step 0 check');
-    process.exit(0);
+    process.exit(EXIT_ALLOW);
   }
 
   let hookInput = null;
@@ -123,7 +138,7 @@ async function main() {
 
   if (isTaskNotificationPrompt(hookInput)) {
     stderrLog('info', 'Skipping Step 0 check for internal task notification payload');
-    process.exit(0);
+    process.exit(EXIT_ALLOW);
   }
 
   stderrLog('info', 'Checking for pending reflections (Step 0)');
@@ -155,7 +170,7 @@ async function main() {
       spawn_request_count: requestCount,
       action: 'allow_with_advisory',
     });
-    process.exit(0);
+    process.exit(EXIT_ALLOW);
   }
 
   stderrLog('error', 'BLOCKING: Pending reflections must be processed before proceeding', {
@@ -171,6 +186,7 @@ async function main() {
     spawn_request_count: requestCount,
     action: 'blocking_all_router_operations_until_reflections_processed',
   });
+  writeReminderFile(requestCount);
 
   // Exit with error to block the tool call
   console.log(
@@ -185,7 +201,7 @@ async function main() {
     })
   );
 
-  process.exit(1);
+  process.exit(EXIT_BLOCK);
 }
 
 if (require.main === module) {
@@ -200,4 +216,7 @@ module.exports = {
   getPendingReflectionState,
   isTaskNotificationPrompt,
   isBypassPermissionsMode,
+  writeReminderFile,
+  EXIT_ALLOW,
+  EXIT_BLOCK,
 };

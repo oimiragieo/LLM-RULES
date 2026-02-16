@@ -71,6 +71,12 @@ const { getCachedState: getCachedState, invalidateCache: invalidateCache } = lib
 const { atomicWriteJSONSync: atomicWriteJSONSync } = libRequire(
   path.join('utils', 'atomic-write.cjs')
 );
+const { readSpawnRequestsFile: readSpawnRequestsFile } = libRequire(
+  path.join('reflection', 'spawn-request-contract.cjs')
+);
+const { buildStep0ReminderMessage: buildStep0ReminderMessage } = libRequire(
+  path.join('reflection', 'reflection-reminder-message.cjs')
+);
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes: EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 const { logRouterCostRiskEvent: logRouterCostRiskEvent, logRouterSloAlert: logRouterSloAlert } =
@@ -1449,15 +1455,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     const spawnRequestPath = path.join(runtimeDir, 'reflection-spawn-request.json');
     const reminderPath = path.join(runtimeDir, 'reflection-reminder.txt');
     if (fs.existsSync(spawnRequestPath)) {
-      const raw = fs.readFileSync(spawnRequestPath, 'utf8');
-      const requests = (() => {
-        try {
-          const a = JSON.parse(raw);
-          return Array.isArray(a) ? a : [];
-        } catch {
-          return [];
-        }
-      })();
+      const requests = readSpawnRequestsFile(spawnRequestPath);
       if (requests.length > 0) {
         if (!fs.existsSync(runtimeDir)) {
           fs.mkdirSync(runtimeDir, { recursive: true });
@@ -1465,7 +1463,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
         // Write reminder file
         fs.writeFileSync(
           reminderPath,
-          `STEP 0: You have ${requests.length} pending reflection spawn request(s). Read .claude/context/runtime/reflection-spawn-request.json and spawn reflection-agent for each request (or the first batch). After spawning, clear/trim the spawn request file and delete this reminder. Then announce "Step 0 complete" before TaskList().\n`,
+          buildStep0ReminderMessage(requests.length),
           'utf8'
         );
         if (process.env.DEBUG_HOOKS) {

@@ -5,6 +5,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const {
   getPendingReflectionState,
@@ -85,5 +86,77 @@ test('readSpawnRequests returns only valid spawn-request contract rows', () => {
     assert.equal(rows[0].subagent_type, 'reflection-agent');
   } finally {
     restore(spawnRequestPath, spawnSnap);
+  }
+});
+
+test('main exits 2 when blocking on pending reflections', () => {
+  fs.mkdirSync(runtimeDir, { recursive: true });
+  const spawnSnap = snapshot(spawnRequestPath);
+  const reminderSnap = snapshot(reminderPath);
+  try {
+    fs.writeFileSync(
+      spawnRequestPath,
+      JSON.stringify([
+        { id: 'good-1', subagent_type: 'reflection-agent', prompt: 'do reflection now' },
+      ]),
+      'utf8'
+    );
+
+    const hookPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'reflection',
+      'force-step0-execution.cjs'
+    );
+    const result = spawnSync(process.execPath, [hookPath], {
+      input: JSON.stringify({ event: 'UserPromptSubmit', prompt: 'normal prompt' }),
+      encoding: 'utf8',
+      env: { ...process.env, REFLECTION_ENABLED: 'true' },
+    });
+
+    assert.equal(result.status, 2, `Expected exit 2, got ${result.status}: ${result.stderr}`);
+  } finally {
+    restore(spawnRequestPath, spawnSnap);
+    restore(reminderPath, reminderSnap);
+  }
+});
+
+test('main writes reminder file when blocking on pending reflections', () => {
+  fs.mkdirSync(runtimeDir, { recursive: true });
+  const spawnSnap = snapshot(spawnRequestPath);
+  const reminderSnap = snapshot(reminderPath);
+  try {
+    fs.writeFileSync(
+      spawnRequestPath,
+      JSON.stringify([
+        { id: 'good-2', subagent_type: 'reflection-agent', prompt: 'do reflection next' },
+      ]),
+      'utf8'
+    );
+    if (fs.existsSync(reminderPath)) fs.unlinkSync(reminderPath);
+
+    const hookPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'hooks',
+      'reflection',
+      'force-step0-execution.cjs'
+    );
+    const result = spawnSync(process.execPath, [hookPath], {
+      input: JSON.stringify({ event: 'UserPromptSubmit', prompt: 'another normal prompt' }),
+      encoding: 'utf8',
+      env: { ...process.env, REFLECTION_ENABLED: 'true' },
+    });
+    assert.equal(result.status, 2);
+    assert.equal(fs.existsSync(reminderPath), true, 'Expected reflection reminder file');
+
+    const content = fs.readFileSync(reminderPath, 'utf8');
+    assert.match(content, /STEP 0/i);
+    assert.match(content, /reflection-spawn-request\.json/i);
+    assert.match(content, /spawn reflection-agent/i);
+  } finally {
+    restore(spawnRequestPath, spawnSnap);
+    restore(reminderPath, reminderSnap);
   }
 });
