@@ -316,6 +316,8 @@ Session entries include a `source` field (`'mtm'`, `'ltm'`, or `'legacy'`) for d
 
 This ensures agents can recall session data written via `memory-tiers.cjs` (STM → MTM → LTM flow).
 
+Implementation note: `loadMemoryForContextAsync()` uses synchronous file I/O under the hood via the shared context loader (sync I/O behind an async API) for deterministic hook/runtime behavior.
+
 **Legacy Structure Example**:
 
 ```json

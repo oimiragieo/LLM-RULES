@@ -36,7 +36,7 @@ function createReflectionActions({
     }
   }
 
-  function recordSession(sessionData) {
+  async function recordSession(sessionData) {
     if (!isEnabled()) {
       return;
     }
@@ -55,8 +55,8 @@ function createReflectionActions({
         return;
       }
 
-      memoryTiers.writeSTMEntry(sessionData, projectRoot);
-      memoryTiers.consolidateSession(sessionData.session_id, projectRoot);
+      await memoryTiers.writeSTMEntry(sessionData, projectRoot);
+      await memoryTiers.consolidateSession(sessionData.session_id, projectRoot);
 
       if (process.env.DEBUG_HOOKS) {
         debugLog(

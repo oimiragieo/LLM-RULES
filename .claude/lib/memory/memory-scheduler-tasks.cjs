@@ -20,7 +20,7 @@ function createMemorySchedulerTaskRunners(deps) {
     safeParseJSON,
   } = deps;
 
-  function runConsolidation(projectRoot = PROJECT_ROOT) {
+  async function runConsolidation(projectRoot = PROJECT_ROOT) {
     validateProjectRoot(projectRoot);
     const libDir = getLibDir(projectRoot);
     const memoryTiers = safeRequire(path.join(libDir, 'memory-tiers.cjs'));
@@ -45,7 +45,7 @@ function createMemorySchedulerTaskRunners(deps) {
         result.details = { skipped: true, reason: 'No active STM session' };
         return result;
       }
-      const consolidateResult = memoryTiers.consolidateSession('current', projectRoot);
+      const consolidateResult = await memoryTiers.consolidateSession('current', projectRoot);
       result.success =
         consolidateResult.success === true || consolidateResult.error === 'No STM session found';
       result.details = consolidateResult;
@@ -204,7 +204,7 @@ function createMemorySchedulerTaskRunners(deps) {
     return result;
   }
 
-  function runSummarization(projectRoot = PROJECT_ROOT) {
+  async function runSummarization(projectRoot = PROJECT_ROOT) {
     validateProjectRoot(projectRoot);
     const libDir = getLibDir(projectRoot);
     const memoryTiers = safeRequire(path.join(libDir, 'memory-tiers.cjs'));
@@ -222,7 +222,7 @@ function createMemorySchedulerTaskRunners(deps) {
     }
 
     try {
-      const summaryResult = memoryTiers.summarizeOldSessions(projectRoot);
+      const summaryResult = await memoryTiers.summarizeOldSessions(projectRoot);
       result.success = true;
       result.details = summaryResult;
     } catch (e) {
@@ -401,7 +401,7 @@ function createMemorySchedulerTaskRunners(deps) {
     return result;
   }
 
-  function runTask(taskName, projectRoot = PROJECT_ROOT) {
+  async function runTask(taskName, projectRoot = PROJECT_ROOT) {
     switch (taskName) {
       case 'consolidation':
         return runConsolidation(projectRoot);

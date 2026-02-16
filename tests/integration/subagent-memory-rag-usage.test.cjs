@@ -121,4 +121,22 @@ describe('subagent memory/rag usage', () => {
       }
     }
   });
+
+  it('rejects fabricated citation ids that are not present in injected evidence', () => {
+    const prompt = buildPromptWithMemory({
+      memory: {
+        patterns: ['Use guarded retries MEM_SENTINEL_GUARD_007'],
+      },
+      rag: [],
+    });
+
+    const evidence = parseEvidenceFromPrompt(prompt);
+    const fabricated = '[mem:deadbeef]';
+
+    assert.equal(
+      evidence.has(fabricated),
+      false,
+      'Fabricated IDs must not resolve as valid evidence'
+    );
+  });
 });

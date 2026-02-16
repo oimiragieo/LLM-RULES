@@ -180,13 +180,13 @@ const {
 /**
  * Run daily maintenance tasks
  */
-function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
+async function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
   const startTime = Date.now();
   const timestamp = new Date().toISOString();
   const tasks = [];
 
   // Run daily tasks
-  tasks.push(runConsolidation(projectRoot));
+  tasks.push(await runConsolidation(projectRoot));
   tasks.push(runHealthCheck(projectRoot));
   tasks.push(runMetricsLog(projectRoot));
 
@@ -252,19 +252,19 @@ function runDailyMaintenance(projectRoot = PROJECT_ROOT) {
 /**
  * Run weekly maintenance tasks (includes daily tasks)
  */
-function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
+async function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
   const startTime = Date.now();
   const timestamp = new Date().toISOString();
   const tasks = [];
 
   // Run daily tasks first
-  tasks.push(runConsolidation(projectRoot));
+  tasks.push(await runConsolidation(projectRoot));
   tasks.push(runHealthCheck(projectRoot));
   tasks.push(runMetricsLog(projectRoot));
 
   // Run weekly tasks
   tasks.push(runRotation(projectRoot));
-  tasks.push(runSummarization(projectRoot));
+  tasks.push(await runSummarization(projectRoot));
   tasks.push(runDeduplication(projectRoot));
   tasks.push(runPruning(projectRoot));
   tasks.push(runArchiveOldLTM(projectRoot));
@@ -336,7 +336,7 @@ function runWeeklyMaintenance(projectRoot = PROJECT_ROOT) {
 /**
  * Run maintenance by type or specific task
  */
-function runMaintenance(type, projectRoot = PROJECT_ROOT) {
+async function runMaintenance(type, projectRoot = PROJECT_ROOT) {
   switch (type) {
     case 'daily':
       return runDailyMaintenance(projectRoot);
@@ -345,7 +345,7 @@ function runMaintenance(type, projectRoot = PROJECT_ROOT) {
     default:
       // Run specific task
       const startTime = Date.now();
-      const taskResult = runTask(type, projectRoot);
+      const taskResult = await runTask(type, projectRoot);
 
       // Update status
       const status = readStatus(projectRoot);
@@ -407,27 +407,27 @@ function getMaintenanceStatus(projectRoot = PROJECT_ROOT) {
 // CLI Interface
 // ============================================================================
 
-if (require.main === module) {
+async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
 
   switch (command) {
     case 'daily':
       console.log('Running daily maintenance...\n');
-      const dailyResult = runDailyMaintenance();
+      const dailyResult = await runDailyMaintenance();
       console.log(JSON.stringify(dailyResult, null, 2));
       break;
 
     case 'weekly':
       console.log('Running weekly maintenance...\n');
-      const weeklyResult = runWeeklyMaintenance();
+      const weeklyResult = await runWeeklyMaintenance();
       console.log(JSON.stringify(weeklyResult, null, 2));
       break;
 
     case 'run':
       if (args[1]) {
         console.log(`Running ${args[1]} maintenance...\n`);
-        const result = runMaintenance(args[1]);
+        const result = await runMaintenance(args[1]);
         console.log(JSON.stringify(result, null, 2));
       } else {
         console.error('Usage: memory-scheduler.cjs run <type>');
@@ -444,7 +444,7 @@ if (require.main === module) {
     case 'task':
       if (args[1]) {
         console.log(`Running task: ${args[1]}...\n`);
-        const taskResult = runTask(args[1]);
+        const taskResult = await runTask(args[1]);
         console.log(JSON.stringify(taskResult, null, 2));
       } else {
         console.error('Usage: memory-scheduler.cjs task <task-name>');
@@ -488,9 +488,12 @@ Examples:
   }
 }
 
-// ============================================================================
-// Exports
-// ============================================================================
+if (require.main === module) {
+  main().catch(err => {
+    console.error('Unhandled error:', err);
+    process.exit(1);
+  });
+}
 
 module.exports = {
   CONFIG,

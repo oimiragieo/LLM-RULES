@@ -2,7 +2,7 @@
 'use strict';
 
 const {
-  parseHookInputSync,
+  parseHookInputAsync,
   getToolName,
   getToolInput,
   formatResult,
@@ -49,8 +49,17 @@ function runValidation(input) {
   return { allow: false, message };
 }
 
-function main(hookInput = null) {
-  const input = hookInput || parseHookInputSync() || {};
+async function main(hookInput = null) {
+  const input = hookInput || (await parseHookInputAsync({ timeout: 300, allowEmpty: true }));
+  if (!input || typeof input !== 'object') {
+    const message = '[TASKUPDATE-CONTRACT] Missing or invalid hook input payload';
+    auditLog('taskupdate-contract-validator', 'block', {
+      check: 'taskupdate-contract-input-parse',
+      error: 'missing_or_invalid_input',
+    });
+    console.log(formatResult({ allow: false, message }));
+    return;
+  }
   const result = runValidation(input);
   if (!result.allow) {
     console.log(formatResult({ allow: false, message: result.message }));
@@ -60,7 +69,11 @@ function main(hookInput = null) {
 }
 
 if (require.main === module) {
-  main();
+  main().catch(() => {
+    const message = '[TASKUPDATE-CONTRACT] Failed to parse hook input';
+    console.log(formatResult({ allow: false, message }));
+    process.exit(0);
+  });
 }
 
 module.exports = {

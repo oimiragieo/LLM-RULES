@@ -9,6 +9,14 @@ const fs = require('fs');
 const originalExit = process.exit;
 const originalSemanticRouting = process.env.SEMANTIC_ROUTING;
 let lastExitCode = null; // eslint-disable-line no-unused-vars
+async function waitForPath(filePath, timeoutMs = 500, pollMs = 25) {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    if (fs.existsSync(filePath)) return true;
+    await new Promise(resolve => setTimeout(resolve, pollMs));
+  }
+  return fs.existsSync(filePath);
+}
 
 beforeEach(() => {
   lastExitCode = null;
@@ -159,11 +167,14 @@ describe('STM writes (UserPromptSubmit)', () => {
         'session_current.json'
       );
       if (result.stmWrite) {
-        assert.strictEqual(fs.existsSync(stmPath), true, 'STM session_current.json should exist');
+        const exists = await waitForPath(stmPath);
+        assert.strictEqual(exists, true, 'STM session_current.json should exist');
         const entry = JSON.parse(fs.readFileSync(stmPath, 'utf8'));
         assert.strictEqual(entry.session_id, 'test-session-stm');
         assert.strictEqual(entry.tier, 'STM');
       }
+      // Avoid teardown racing an in-flight best-effort write path.
+      await new Promise(resolve => setTimeout(resolve, 60));
     } finally {
       fs.rmSync(tmpRoot, { recursive: true, force: true });
     }

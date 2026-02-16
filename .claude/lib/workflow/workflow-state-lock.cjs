@@ -5,6 +5,8 @@ const path = require('path');
 const { withLock } = require('../utils/file-locker.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
+// LOCK_ORDER: workflow-state -> memory-tiers
+
 function getWorkflowStateLockPath(projectRoot = PROJECT_ROOT) {
   const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
   if (!fs.existsSync(runtimeDir)) fs.mkdirSync(runtimeDir, { recursive: true });

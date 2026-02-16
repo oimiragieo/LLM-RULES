@@ -148,7 +148,7 @@ async function main() {
         queueReflection(result.reflection);
         outcome.queued = true;
 
-        actions.recordSession(result.sessionData);
+        await actions.recordSession(result.sessionData);
         outcome.sessionRecorded = true;
 
         outcome.embeddingTriggered = true;

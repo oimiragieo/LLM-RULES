@@ -23,7 +23,7 @@ const fs = require('fs');
 const { PROJECT_ROOT, validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const {
-  parseHookInputSync,
+  parseHookInputAsync,
   getToolName,
   getToolInput,
   extractFilePath,
@@ -281,7 +281,7 @@ async function main() {
   let output = null;
   let toolName = null;
   let absPath = null;
-  const hookInput = parseHookInputSync();
+  const hookInput = await parseHookInputAsync({ timeout: 300, allowEmpty: true });
   if (!hookInput) process.exit(0);
 
   toolName = getToolName(hookInput);
