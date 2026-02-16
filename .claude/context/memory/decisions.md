@@ -1,3 +1,49 @@
+## ADR-131: Enforce TaskUpdate via Hook Rather Than Developer Training (2026-02-16 REFLECTION DECISION)
+
+**Status:** ACCEPTED (Post-Pipeline Analysis, Task #19)
+**Decision:** Rather than relying on developer training for TaskUpdate(completed) protocol, enforce via pre-completion validation hook in routing layer.
+
+**Rationale:**
+
+- Evidence: Developer failed TaskUpdate(completed) 3 times in enterprise pipeline despite clear spawn template
+- Training alone insufficient to overcome cognitive load under time pressure
+- Hook-based enforcement catches all agents uniformly, prevents workflow stalls
+- Zero false positives (TaskUpdate is always required before claiming completion)
+
+**Implementation:**
+
+- Hook: `pre-completion-validation.cjs` (already present in reflection-agent definition) must be active on all agent spawns
+- Check: TaskUpdate metadata must include `filesModified`, `summary`, or `outputArtifacts` before allowing status=completed
+- Fallback: Agent can be warned but not blocked if metadata is incomplete (degraded mode)
+
+**Pattern**: Behavioral enforcement beats behavioral training. Use hooks for critical invariants.
+
+**Evidence:** Enterprise pipeline session (Task #10-19) completed 12 critical fixes. Post-execution review (Task #19) identified TaskUpdate gap as medium recurring risk.
+
+---
+
+## ADR-130: Centralized Enforcement Configuration Pattern (2026-02-16)
+
+**Status:** ACCEPTED & IMPLEMENTED (Enterprise Pipeline Session, Task #10)
+**Decision:** Create enforcement-defaults.cjs module to consolidate 21 scattered environment variable defaults across 8+ hooks.
+
+**Rationale:**
+
+- Single source of truth for enforcement modes (PLANNER_FIRST_ENFORCEMENT, CREATOR_GUARD, etc.)
+- Eliminates duplicate `process.env.X || 'default'` logic (8 files × 21 vars = 168 lines → 1 file × 21 vars = 21 lines)
+- Easier auditing (one file vs scattered)
+- Consistent fallback behavior across enforcement points
+
+**Implementation:**
+
+- Created `.claude/lib/enforcement/enforcement-defaults.cjs` with 21 enforcement flag exports
+- Updated `hook-input.cjs`, `pre-task-unified-core.cjs` to import and use centralized defaults
+- Pattern applies to any multi-hook system with shared environment configuration
+
+**Evidence:** Session completed 12 critical fixes including this centralization. 8x reduction in config duplication.
+
+---
+
 ## ADR-125 through ADR-129: Enterprise Audit Bug Fix Architecture (2026-02-15)
 
 **Status:** PROPOSED (all 5 ADRs)

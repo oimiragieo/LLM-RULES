@@ -29,6 +29,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('./utils/safe-json.cjs');
 
 // =============================================================================
 // Constants
@@ -121,7 +122,7 @@ class EvolutionStateSync {
       }
 
       const content = await fs.promises.readFile(this.options.statePath, 'utf-8');
-      const state = JSON.parse(content);
+      const state = safeParseJSON(content);
 
       // Update cache
       this._stateCache = state;

@@ -91,7 +91,7 @@ function checkTaskListFirst(toolName, hookInput = null) {
   if (permissionMode === 'bypasspermissions') {
     return { pass: true };
   }
-  const mode = (process.env.TASKLIST_FIRST_ENFORCEMENT || 'warn').toLowerCase();
+  const mode = getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT').toLowerCase();
   if (mode === 'off') {
     return { pass: true };
   }

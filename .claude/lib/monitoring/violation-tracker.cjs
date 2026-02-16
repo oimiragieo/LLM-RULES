@@ -17,6 +17,7 @@ const fs = require('fs');
 const { appendJsonl } = require('../utils/jsonl-utils.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { validateMetricRow } = require('./metrics-schema.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const VIOLATIONS_FILE = path.join(
   PROJECT_ROOT,
@@ -208,7 +209,10 @@ function getViolationStats(options = {}) {
     const allEntries = [];
     for (const line of lines) {
       try {
-        allEntries.push(JSON.parse(line));
+        const parsed = safeParseJSON(line);
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          allEntries.push(parsed);
+        }
       } catch (_err) {
         // Skip malformed lines
       }
@@ -289,10 +293,12 @@ function checkThreshold(options = {}) {
     let count = 0;
     for (const line of lines) {
       try {
-        const entry = JSON.parse(line);
-        const timestamp = new Date(entry.timestamp).getTime();
-        if (now - timestamp <= windowMs) {
-          count++;
+        const entry = safeParseJSON(line);
+        if (entry && typeof entry === 'object') {
+          const timestamp = new Date(entry.timestamp).getTime();
+          if (now - timestamp <= windowMs) {
+            count++;
+          }
         }
       } catch (_err) {
         // Skip malformed lines

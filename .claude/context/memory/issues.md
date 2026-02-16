@@ -32,6 +32,37 @@
 
 ---
 
+## 2026-02-16: Verification Evidence Missing in Task Completion (P1) — NEW
+
+**Issue**: Enterprise pipeline session (Task #10) completed 12 critical fixes but provided no verification evidence (no `pnpm test`, `pnpm lint:fix`, `pnpm format` output).
+
+**Impact**: Cannot verify fixes actually work. Violates verification-before-completion skill protocol: "If you haven't run the verification command in this message, you cannot claim it passes."
+
+**Solution**: Enforce verification evidence requirement in completion metadata. Add pre-completion validation hook that checks for test/lint/format evidence before allowing TaskUpdate(completed).
+
+**Priority**: P1
+
+---
+
+## 2026-02-16: Critical Test Coverage Gaps in Routing & State Machine (P0) — DISCOVERED PHASE 10
+
+**Issue**: QA audit revealed 213/213 tests pass but critical routing/state-machine paths untested.
+
+**Evidence**:
+
+- routing-guard.cjs Check 7 (specialist override) has no integration tests
+- Task state machine (not_started → in_progress → completed) untested
+- Workflow cycle detection untested
+- Result: 100% pass rate masks critical regression risk
+
+**Risk**: Specialist misrouting (developer instead of specialist), task corruption, workflow hangs
+
+**Solution**: Create 45 P0 tests (routing × 20, state machine × 15, cycle detection × 10) in 3.5 days
+
+**Priority**: P0 — Blocks next production deployment
+
+---
+
 ## 2026-02-14: Reflection Queue Context Missing (P1) — RECURRING
 
 **Issue**: Reflection queue entries lack summary metadata. Task #13, Tasks 1-2 confirmed missing context.

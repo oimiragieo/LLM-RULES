@@ -9,6 +9,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -56,7 +58,7 @@ function main() {
     const abs = path.join(legacyDir, file);
     let session;
     try {
-      session = JSON.parse(fs.readFileSync(abs, 'utf8'));
+      session = safeParseJSON(fs.readFileSync(abs, 'utf8'));
     } catch (_e) {
       console.warn(`[migrate-legacy-sessions] Skipped (parse error): ${file}`);
       skipped++;

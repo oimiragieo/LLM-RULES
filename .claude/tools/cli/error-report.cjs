@@ -28,6 +28,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -154,7 +156,7 @@ function readErrors(options = {}) {
 
       for (const line of lines) {
         try {
-          const entry = JSON.parse(line);
+          const entry = safeParseJSON(line);
           errors.push(entry);
         } catch (_e) {
           // Skip invalid lines

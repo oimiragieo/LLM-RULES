@@ -21,6 +21,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const { safeParseJSON } = require('./utils/safe-json.cjs');
 
 // =============================================================================
 // Configuration
@@ -259,7 +260,8 @@ function queryErrors(filter = {}) {
         if (results.length >= limit) break;
 
         try {
-          const entry = JSON.parse(line);
+          const entry = safeParseJSON(line);
+          if (!entry || typeof entry !== 'object' || Object.keys(entry).length === 0) continue;
 
           // Apply filters
           if (filter.category && entry.category !== filter.category) continue;

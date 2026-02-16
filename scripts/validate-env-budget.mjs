@@ -12,6 +12,8 @@ const ENV_EXAMPLE = path.join(PROJECT_ROOT, '.env.example');
 const MAX_VARS = 250;
 
 function main() {
+  let hasError = false;
+
   if (!fs.existsSync(ENV_EXAMPLE)) {
     console.error('.env.example not found');
     process.exit(1);
@@ -28,6 +30,7 @@ function main() {
 
   if (vars.length > MAX_VARS) {
     console.error(`❌ Too many environment variables: ${vars.length} > ${MAX_VARS}`);
+    hasError = true;
   }
 
   // Check for .env.minimal
@@ -38,7 +41,8 @@ function main() {
   }
 
   const minimalContent = fs.readFileSync(MINIMAL_PATH, 'utf8');
-  const minimalVars = minimalContent.split('\n')
+  const minimalVars = minimalContent
+    .split('\n')
     .map(l => l.trim())
     .filter(l => l && !l.startsWith('#'))
     .map(l => l.split('=')[0]);
@@ -46,6 +50,10 @@ function main() {
   console.log(`Found ${minimalVars.length} variables in .env.minimal`);
   if (minimalVars.length > 30) {
     console.error(`❌ .env.minimal should be minimal! Found ${minimalVars.length} vars.`);
+    hasError = true;
+  }
+
+  if (hasError) {
     process.exit(1);
   }
 

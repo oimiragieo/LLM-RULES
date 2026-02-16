@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 /**
  * Memory Stats Dashboard CLI
@@ -42,7 +43,7 @@ function parseJSONL(filePath) {
   return lines
     .map(line => {
       try {
-        return JSON.parse(line);
+        return safeParseJSON(line);
       } catch {
         return null; // Skip malformed lines
       }

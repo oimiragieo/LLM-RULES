@@ -18,6 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { performance } = require('perf_hooks');
 
 // Resolve paths for reliable module loading
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -575,6 +576,7 @@ function recordPeriodicFindingsSnapshot() {
 
 async function main() {
   const startedAt = Date.now();
+  const perfStart = performance.now();
 
   try {
     const hookInput = await parseHookInputAsync();
@@ -587,6 +589,18 @@ async function main() {
     trackErrors(hookInput);
     detectAnomalies(hookInput);
     recordPeriodicFindingsSnapshot();
+
+    const perfDuration = performance.now() - perfStart;
+    if (process.env.DEBUG_HOOKS === 'true' || perfDuration > 100) {
+      process.stderr.write(
+        JSON.stringify({
+          hook: 'post-tool-metrics-unified',
+          event: 'perf_metrics',
+          durationMs: Number(perfDuration.toFixed(2)),
+          timestamp: new Date().toISOString(),
+        }) + '\n'
+      );
+    }
 
     process.exit(0);
   } catch (err) {

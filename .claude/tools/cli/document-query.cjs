@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 const fetch = global.fetch;
 
 function parseArgs(args) {
@@ -77,30 +78,37 @@ async function run() {
   const documentPath = args.document || args._[0];
   if (!documentPath || args.help) {
     printUsage();
-    process.exit(documentPath ? 0 : 1);
+    return { ok: Boolean(documentPath) };
   }
   const query = args.query || args._[1] || '';
 
-  try {
-    const text = await loadDocument(documentPath);
-    if (!query) {
-      process.stdout.write(text + '\n');
-      process.exit(0);
-    }
-    const scored = scoreParagraphs(text, query);
-    if (scored.length === 0) {
-      process.stdout.write('No matching sections found.\n');
-      process.exit(0);
-    }
-    const top = scored.slice(0, 3);
-    process.stdout.write(
-      top.map(item => `---\nScore: ${item.score}\n${item.paragraph}\n`).join('\n') + '\n'
-    );
-    process.exit(0);
-  } catch (err) {
-    process.stderr.write(`${err.message}\n`);
-    process.exit(1);
+  const text = await loadDocument(documentPath);
+  if (!query) {
+    process.stdout.write(text + '\n');
+    return { ok: true };
   }
+
+  const scored = scoreParagraphs(text, query);
+  if (scored.length === 0) {
+    process.stdout.write('No matching sections found.\n');
+    return { ok: true };
+  }
+
+  const top = scored.slice(0, 3);
+  process.stdout.write(
+    top.map(item => `---\nScore: ${item.score}\n${item.paragraph}\n`).join('\n') + '\n'
+  );
+  return { ok: true };
 }
 
-run();
+const wrappedRun = wrapCLITool(run, 'document-query');
+
+if (require.main === module) {
+  wrappedRun();
+}
+
+module.exports = {
+  run,
+  parseArgs,
+  scoreParagraphs,
+};

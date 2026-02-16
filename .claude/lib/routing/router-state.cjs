@@ -107,17 +107,31 @@ function getDefaultState() {
 
 /**
  * Get current state from file
- * Uses SEC-007 safe JSON parsing to prevent prototype pollution
+ * SEC-AUDIT-016 FIX #5: TTL-based cache (5-second) to reduce file I/O
  * @returns {Object} Current state object
  */
 function getState() {
-  // Read directly from disk for correctness.
-  // Hooks run in separate Node processes, so cross-hook in-memory caching is ineffective.
-  return loadStateFromFile();
+  const now = Date.now();
+
+  // SEC-AUDIT-016 FIX #5: Simple TTL cache (5 seconds)
+  // Check if we have a cached value that's still valid
+  if (getState._cache && getState._cacheTimestamp && now - getState._cacheTimestamp < 5000) {
+    return getState._cache;
+  }
+
+  // Cache miss or expired - read from file
+  const state = loadStateFromFile();
+
+  // Update cache
+  getState._cache = state;
+  getState._cacheTimestamp = now;
+
+  return state;
 }
 
 /**
  * Save state to file atomically
+ * SEC-AUDIT-016 FIX #5: Invalidates TTL cache in addition to file cache
  * Uses atomic write (temp file + rename) to prevent corruption on crash
  * Invalidates cache to ensure subsequent reads get fresh data
  * @param {Object} state - State to save
@@ -131,6 +145,9 @@ function saveState(state) {
     atomicWriteJSONSync(stateFile, state);
     // Invalidate cache so subsequent getState() calls see the new data
     invalidateCache(stateFile);
+    // SEC-AUDIT-016 FIX #5: Clear TTL cache
+    delete getState._cache;
+    delete getState._cacheTimestamp;
   } catch (e) {
     // Best effort - don't fail the hook if state can't be saved
     console.error('[router-state] Warning: Could not save state:', e.message);
@@ -162,13 +179,15 @@ function validateVersion(version) {
 
 /**
  * Read state directly from file (bypasses cache)
- * Used for conflict detection in optimistic concurrency
+ * Uses safeParseJSON to prevent prototype pollution (SEC-AUDIT-016 FIX #3)
  * @returns {Object} Current state from file
  */
 function loadStateFromFile() {
   const stateFile = getStateFilePath();
   try {
     ensureRuntimeDir();
+    // SEC-AUDIT-016 FIX #3: Use safeParseJSON for prototype pollution protection
+    // readRouterStateFile internally uses safeParseJSON
     return readRouterStateFile(stateFile, getDefaultState());
   } catch (_e) {
     // On any error, return default
@@ -179,13 +198,14 @@ function loadStateFromFile() {
 /**
  * Synchronous sleep for exponential backoff
  *
- * SEC-AUDIT-020 FIX: Uses Atomics.wait() when available to properly block
- * the thread without CPU spin. Falls back to busy-wait on older Node.js.
+ * SEC-AUDIT-016 FIX #2: Uses Atomics.wait() for proper blocking without CPU spin.
+ * No fallback to busy-wait (fails early if Atomics unavailable).
  *
  * @param {number} ms - Milliseconds to sleep
+ * @throws {Error} If Atomics.wait is unavailable (Node.js <16.9)
  */
 function syncSleep(ms) {
-  // Use Atomics.wait for proper blocking (Node.js v16+)
+  // SEC-AUDIT-016 FIX #2: Only use Atomics.wait (no busy-wait fallback)
   if (typeof SharedArrayBuffer !== 'undefined' && typeof Atomics !== 'undefined') {
     try {
       // Create a shared buffer that will never be signaled (timeout-only)
@@ -194,19 +214,28 @@ function syncSleep(ms) {
       // Atomics.wait blocks the thread without CPU spin
       Atomics.wait(int32, 0, 0, ms);
       return;
-    } catch (_e) {
-      // Fall through to busy-wait if Atomics.wait fails
+    } catch (e) {
+      // Log error and throw to caller
+      process.stderr.write(
+        `[router-state] ERROR: Atomics.wait failed: ${e.message}\n` +
+          `Node.js 16.9+ required for synchronous sleep. Use async operations or upgrade Node.js.\n`
+      );
+      throw new Error('Atomics.wait unavailable - Node.js 16.9+ required');
     }
   }
-  // Fallback to busy-wait for older Node.js versions
-  const start = Date.now();
-  while (Date.now() - start < ms) {
-    // Busy wait - only used when Atomics.wait unavailable
-  }
+  // No Atomics available - fail early
+  process.stderr.write(
+    `[router-state] ERROR: SharedArrayBuffer/Atomics not available\n` +
+      `Node.js 16.9+ required for synchronous sleep. Use async operations or upgrade Node.js.\n`
+  );
+  throw new Error('Atomics.wait unavailable - Node.js 16.9+ required');
 }
 
 /**
  * Save state with optimistic concurrency control and retry
+ *
+ * SEC-AUDIT-016 FIX #4: Atomic file operations using write-then-rename pattern.
+ * SEC-AUDIT-016 FIX #6: Bounded retry with stderr logging on exhaustion.
  *
  * Uses read-modify-write pattern with version checking:
  * 1. Read current state
@@ -214,27 +243,37 @@ function syncSleep(ms) {
  * 3. Merge updates
  * 4. Increment version
  * 5. Re-read and verify version hasn't changed
- * 6. Write atomically
+ * 6. Write atomically (temp file + rename)
  *
  * On conflict (version changed), retry with exponential backoff
  *
  * Security safeguards:
- * - Max 5 retries (DoS protection)
+ * - Max 5 retries (DoS protection) - SEC-AUDIT-016 FIX #6
  * - Version validated as positive integer (manipulation prevention)
  * - Exponential backoff (thundering herd prevention)
+ * - Stderr logging on retry exhaustion - SEC-AUDIT-016 FIX #6
  *
  * @param {Object} updates - Fields to update in state
- * @param {number} [retries=MAX_RETRIES] - Maximum retries (default: 5)
+ * @param {number} [maxRetries=MAX_RETRIES] - Maximum retries (default: 5)
  * @returns {Object} Merged state that was saved
  * @throws {Error} If save fails after all retries
  */
-function saveStateWithRetry(updates, retries = MAX_RETRIES) {
+function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
   const stateFile = getStateFilePath();
-  for (let i = 0; i < retries; i++) {
+
+  for (let i = 0; i < maxRetries; i++) {
     // Apply exponential backoff on retries (skip first attempt)
     if (i > 0) {
       const backoffMs = BASE_BACKOFF * Math.pow(2, i - 1);
-      syncSleep(backoffMs);
+      try {
+        syncSleep(backoffMs);
+      } catch (e) {
+        // SEC-AUDIT-016 FIX #6: Log sleep failure
+        process.stderr.write(
+          `[router-state] Warning: syncSleep failed on retry ${i + 1}/${maxRetries}: ${e.message}\n`
+        );
+        // Continue to next iteration (skip sleep)
+      }
     }
 
     // Step 1: Read current state directly from file
@@ -251,29 +290,50 @@ function saveStateWithRetry(updates, retries = MAX_RETRIES) {
       version: currentVersion + 1,
     };
 
-    // Step 5: Re-read to check for conflicts
+    // Step 5: Re-read to check for conflicts (TOCTOU check)
     const recheck = loadStateFromFile();
     const recheckVersion = validateVersion(recheck.version);
 
     // If version changed since we read, someone else wrote - retry
     if (recheckVersion !== currentVersion) {
+      // SEC-AUDIT-016 FIX #6: Log conflict detection
+      if (process.env.METRICS_DEBUG === 'true' || process.env.MEMORY_DEBUG === 'true') {
+        process.stderr.write(
+          `[router-state] Conflict detected on attempt ${i + 1}/${maxRetries}: ` +
+            `expected version ${currentVersion}, found ${recheckVersion}\n`
+        );
+      }
       continue; // Conflict detected, retry
     }
 
-    // Step 6: Write atomically
+    // Step 6: Write atomically (SEC-AUDIT-016 FIX #4)
+    // atomicWriteJSONSync already uses write-then-rename pattern
     try {
       ensureRuntimeDir();
       atomicWriteJSONSync(stateFile, merged);
       invalidateCache(stateFile);
       return merged;
-    } catch (_e) {
+    } catch (e) {
+      // SEC-AUDIT-016 FIX #6: Log write failure
+      if (process.env.METRICS_DEBUG === 'true' || process.env.MEMORY_DEBUG === 'true') {
+        process.stderr.write(
+          `[router-state] Write failed on attempt ${i + 1}/${maxRetries}: ${e.message}\n`
+        );
+      }
       // Write failed, retry
       continue;
     }
   }
 
-  // All retries exhausted
-  throw new Error(`Save failed after ${retries} retries - concurrent modification conflict`);
+  // SEC-AUDIT-016 FIX #6: All retries exhausted - stderr logging
+  const errorMsg = `Save failed after ${maxRetries} retries - concurrent modification conflict`;
+  process.stderr.write(
+    `[router-state] CRITICAL: ${errorMsg}\n` +
+      `File: ${stateFile}\n` +
+      `Updates: ${JSON.stringify(updates)}\n` +
+      `Consider increasing MAX_RETRIES or investigating concurrent access patterns.\n`
+  );
+  throw new Error(errorMsg);
 }
 
 /**
@@ -521,7 +581,7 @@ function isArchitectSpawned() {
 
 /**
  * Record a TaskUpdate call
- * SEC-AUDIT-011 FIX: Uses saveStateWithRetry for atomic updates
+ * SEC-AUDIT-016 FIX #1: Documented non-atomic counter race condition (informational only)
  * @param {string} taskId - The task ID being updated
  * @param {string} status - The status being set (in_progress, completed, etc.)
  * @returns {Object} Updated state
@@ -531,11 +591,11 @@ function recordTaskUpdate(taskId, status) {
   const current = getState();
   const currentCount = current.taskUpdatesThisSession || 0;
 
-  // SEC-AUDIT-011 Known Limitation: Non-atomic read-modify-write race condition
-  // Lines 574-583 execute a non-atomic sequence:
-  //   1. Read: getState() retrieves currentCount (line 574)
-  //   2. Calculate: increment value (line 575)
-  //   3. Write: saveStateWithRetry() persists incremented count (lines 578-583)
+  // SEC-AUDIT-016 FIX #1: Known Limitation - Non-atomic read-modify-write race condition
+  // This function executes a non-atomic sequence:
+  //   1. Read: getState() retrieves currentCount
+  //   2. Calculate: increment value (currentCount + 1)
+  //   3. Write: saveStateWithRetry() persists incremented count
   //
   // In rare concurrent scenarios (e.g., rapid TaskUpdate calls across parallel agents),
   // the taskUpdatesThisSession counter may lose updates if two reads happen before
@@ -549,7 +609,7 @@ function recordTaskUpdate(taskId, status) {
   //   complexity and latency to a non-critical tracking function
   //
   // Mitigation: saveStateWithRetry() ensures POSIX-atomic file operations where possible,
-  // and provides retry logic for transient failures. On Windows NTFS, atomicity is best-effort.
+  // and provides retry logic for transient failures (SEC-AUDIT-016 FIX #4, #6).
   //
   // To enable debug logging of state updates: MEMORY_DEBUG=true or METRICS_DEBUG=true
   //
@@ -603,10 +663,14 @@ function resetTaskUpdateTracking() {
 
 /**
  * Invalidate the state cache
+ * SEC-AUDIT-016 FIX #5: Also clear TTL cache in getState()
  * Useful for testing or when external processes modify the state file
  */
 function invalidateStateCache() {
   invalidateCache(getStateFilePath());
+  // SEC-AUDIT-016 FIX #5: Clear TTL cache
+  delete getState._cache;
+  delete getState._cacheTimestamp;
 }
 
 /**

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -53,7 +55,7 @@ function readRows(filePath, cutoffMs) {
   const rows = [];
   for (const line of lines) {
     try {
-      const parsed = JSON.parse(line);
+      const parsed = safeParseJSON(line);
       const ts = parseTimestamp(parsed);
       if (ts == null || ts < cutoffMs) continue;
       rows.push(parsed);

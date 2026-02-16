@@ -20,6 +20,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -72,7 +74,7 @@ function loadAgentSkillMatrix() {
       return { skillToAgents, agentToSkills };
     }
     const raw = fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8');
-    const matrix = JSON.parse(raw);
+    const matrix = safeParseJSON(raw);
     const agents = matrix.agents || {};
 
     for (const [_category, categoryAgents] of Object.entries(agents)) {

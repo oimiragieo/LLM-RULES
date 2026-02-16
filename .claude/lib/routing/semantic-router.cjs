@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { EmbeddingGenerator } = require('../code-indexing/embedding-generator.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 let cachedPrototypes = null;
 
@@ -25,8 +26,8 @@ function loadPrototypes(prototypesPath) {
     prototypesPath || path.join(PROJECT_ROOT, '.claude', 'config', 'routing-prototypes.json');
   try {
     const raw = fs.readFileSync(resolvedPath, 'utf8');
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return null;
+    const parsed = safeParseJSON(raw);
+    if (!parsed || typeof parsed !== 'object' || Object.keys(parsed).length === 0) return null;
     if (!parsed.prototypes || typeof parsed.dimensions !== 'number') return null;
     cachedPrototypes = {
       path: resolvedPath,

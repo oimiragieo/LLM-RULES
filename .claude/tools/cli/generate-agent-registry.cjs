@@ -17,6 +17,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const path = require('path');
@@ -105,12 +107,13 @@ async function main() {
 
     console.log(`Validating registry: ${registryPath}\n`);
 
-    const registry = JSON.parse(fs.readFileSync(registryPath, 'utf-8'));
+    const registry = safeParseJSON(fs.readFileSync(registryPath, 'utf-8'));
     const validation = generator.validate(registry);
 
     if (validation.valid) {
+      const agentCount = registry.agents ? Object.keys(registry.agents).length : 0;
       console.log('Validation PASSED');
-      console.log(`  Agents: ${Object.keys(registry.agents).length}`);
+      console.log(`  Agents: ${agentCount}`);
       console.log(`  Healthy: ${registry.health.healthy.length}`);
       console.log(`  Degraded: ${registry.health.degraded.length}`);
       console.log(`  Unavailable: ${registry.health.unavailable.length}`);
@@ -141,8 +144,12 @@ async function main() {
   for (const [category, agents] of Object.entries(registry.index.byCategory)) {
     console.log(`    - ${category}: ${agents.length} agents`);
   }
-  console.log(`  Domains: ${Object.keys(registry.index.byDomain).length}`);
-  console.log(`  Capabilities: ${Object.keys(registry.index.byCapability).length}`);
+  const domainCount = registry.index?.byDomain ? Object.keys(registry.index.byDomain).length : 0;
+  const capabilityCount = registry.index?.byCapability
+    ? Object.keys(registry.index.byCapability).length
+    : 0;
+  console.log(`  Domains: ${domainCount}`);
+  console.log(`  Capabilities: ${capabilityCount}`);
   console.log();
 
   // Validate

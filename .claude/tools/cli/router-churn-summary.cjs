@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -36,7 +38,7 @@ function readRows(file, cutoff) {
   const rows = [];
   for (const line of lines) {
     try {
-      const row = JSON.parse(line);
+      const row = safeParseJSON(line);
       const ts = Date.parse(row.timestamp || '');
       if (!Number.isFinite(ts) || ts < cutoff) continue;
       rows.push(row);

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -52,7 +54,7 @@ function readCacheStability(projectRoot) {
   let churned = 0;
   for (const line of lines) {
     try {
-      const row = JSON.parse(line);
+      const row = safeParseJSON(line);
       total += 1;
       if (row?.churned === true) churned += 1;
     } catch (_err) {

@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 const { validatePathWithinProject, PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const HISTORY_FILENAME = 'qa_iteration_history.json';
 
@@ -18,7 +19,7 @@ function getIterationHistory(planDir) {
   const filePath = resolveHistoryPath(planDir);
   if (!filePath || !fs.existsSync(filePath)) return [];
   try {
-    const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(filePath, 'utf8'));
     return Array.isArray(parsed) ? parsed : [];
   } catch (_e) {
     return [];

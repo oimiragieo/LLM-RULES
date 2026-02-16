@@ -1,101 +1,171 @@
 #!/usr/bin/env node
 /**
- * Unified Write PreToolUse Hook Bundle
- * Consolidates 8 hooks for Edit|Write|NotebookEdit into a single process.
+ * Unified Write PreToolUse Hook Bundle (PERF-001)
+ * Consolidates 8 hooks for Edit|Write|NotebookEdit into a single in-process execution.
+ * Target Latency: <100ms
  */
 'use strict';
 
-const { spawnSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
-const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { performance } = require('perf_hooks');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
-const HOOKS = [
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'),
-  path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'hooks',
-    'validation',
-    'agent-template-contract-validator.cjs'
-  ),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'unified-pre-write-hook.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'evolution-state-guard.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'research-enforcement.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'quality-gate-validator.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'session', 'adaptive-quality-gate.cjs'),
-];
+const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
 
-function runHook(scriptPath, input) {
-  return spawnSync(process.execPath, [scriptPath], {
-    cwd: PROJECT_ROOT,
-    input,
-    encoding: 'utf8',
-    windowsHide: true,
-    maxBuffer: 10 * 1024 * 1024,
-  });
+function libRequire(modulePath) {
+  return require(path.join(LIB_DIR, modulePath));
 }
 
-function tryParseJson(text) {
-  const trimmed = String(text || '').trim();
-  if (!trimmed || !trimmed.startsWith('{')) return null;
-  const { success, data } = safeParseJSON(trimmed, null);
-  return success ? data : null;
-}
+const { parseHookInputAsync, getToolName, getToolInput, formatResult, auditLog } =
+  libRequire('utils/hook-input.cjs');
 
-function applyHookOutput(currentInput, hookStdout) {
-  const parsed = tryParseJson(hookStdout);
-  if (!parsed || !parsed.tool_input || typeof parsed.tool_input !== 'object') {
-    return currentInput;
-  }
-
-  const parent = tryParseJson(currentInput);
-  if (!parent || typeof parent !== 'object') {
-    return currentInput;
-  }
-
-  parent.tool_input = parsed.tool_input;
-  return JSON.stringify(parent);
-}
+// In-process hook modules
+const { runAllChecks: runRoutingGuard } = require('../routing/routing-guard-core.impl.cjs');
+const { validateCreatorWorkflow } = require('../routing/unified-creator-guard.cjs');
+const { validateAgentContent, isAgentFile, shouldEnforceForWrite } = libRequire(
+  'agents/agent-template-contract.cjs'
+);
+const { getIncomingContent } = require('../validation/agent-template-contract-validator.cjs');
+const { CHECKS: preWriteChecks } = require('./unified-pre-write-hook.cjs');
+const evolutionGuard = require('../evolution/evolution-state-guard.cjs');
+const researchEnforcement = require('../evolution/research-enforcement.cjs');
+const qualityGate = require('../evolution/quality-gate-validator.cjs');
+const adaptiveGate = require('../session/adaptive-quality-gate.cjs');
 
 async function main() {
-  let currentInput = '';
+  const perfStart = performance.now();
+  let hookInput = null;
+
   try {
-    currentInput = require('fs').readFileSync(0, 'utf8');
-  } catch (_err) {
+    hookInput = await parseHookInputAsync();
+    if (!hookInput) process.exit(0);
+
+    const toolName = getToolName(hookInput);
+    const toolInput = getToolInput(hookInput);
+
+    const t0 = performance.now();
+    // 1. Routing Guard
+    const rgResult = runRoutingGuard(toolName, toolInput, hookInput);
+    const t1 = performance.now();
+    if (!rgResult.pass) {
+      console.log(formatResult(rgResult.result, rgResult.message));
+      process.exit(2);
+    }
+
+    // 2. Unified Creator Guard
+    const creatorResult = validateCreatorWorkflow(toolName, toolInput);
+    const t2 = performance.now();
+    if (!creatorResult.pass) {
+      console.log(formatResult(creatorResult.result, creatorResult.message));
+      process.exit(2);
+    }
+
+    // 3. Agent Template Contract
+    const absPath = path.resolve(PROJECT_ROOT, toolInput.file_path || toolInput.path || '');
+    if (isAgentFile(absPath)) {
+      const existingContent = fs.existsSync(absPath) ? fs.readFileSync(absPath, 'utf8') : null;
+      const incomingContent = getIncomingContent(toolName, toolInput, existingContent);
+      if (shouldEnforceForWrite({ filePath: absPath, incomingContent, existingContent })) {
+        const validation = validateAgentContent(incomingContent, { requireMarker: true });
+        if (!validation.valid) {
+          const msg = `[AGENT-TEMPLATE-CONTRACT] ${validation.errors.join(' | ')}`;
+          console.log(formatResult('block', msg));
+          process.exit(2);
+        }
+      }
+    }
+    const t3 = performance.now();
+
+    // 4. Unified Pre-Write Hook (11 checks)
+    for (const check of preWriteChecks) {
+      const result = await check.run(toolName, toolInput, hookInput);
+      if (!result.pass) {
+        console.log(formatResult(result.result, result.message));
+        process.exit(2);
+      }
+    }
+    const t4 = performance.now();
+
+    // 5. Evolution State Guard
+    const targetState = evolutionGuard.extractTargetState(toolInput);
+    if (targetState) {
+      const state = evolutionGuard.getEvolutionState();
+      if (!evolutionGuard.isValidTransition(state?.state || 'idle', targetState)) {
+        console.log(formatResult('block', `Invalid evolution state transition: ${targetState}`));
+        process.exit(2);
+      }
+    }
+    const t5 = performance.now();
+
+    // 6. Research Enforcement
+    const filePath = toolInput.file_path || toolInput.path || '';
+    if (researchEnforcement.isArtifactPath(filePath)) {
+      const state = researchEnforcement.getEvolutionState();
+      const research = researchEnforcement.checkResearchComplete(state);
+      if (!research.complete) {
+        console.log(formatResult('block', 'Research phase incomplete.'));
+        process.exit(2);
+      }
+    }
+    const t6 = performance.now();
+
+    // 7. Quality Gate (Verify Phase)
+    const artifactType = qualityGate.detectArtifactType(filePath);
+    if (artifactType) {
+      const state = qualityGate.getEvolutionState();
+      if (qualityGate.isInVerifyPhase(state)) {
+        const content = toolInput.content || toolInput.new_string || '';
+        const validation = qualityGate.validateQuality(content, artifactType);
+        if (!validation.valid) {
+          console.log(formatResult('block', 'Quality gate failed.'));
+          process.exit(2);
+        }
+      }
+    }
+    const t7 = performance.now();
+
+    // 8. Adaptive Quality Gate (informational side-effects)
+    try {
+      let counter = adaptiveGate.readCounter();
+      counter.count += 1;
+      const thresholds = adaptiveGate.determineThresholds();
+      counter = adaptiveGate.checkThresholds(counter.count, thresholds, counter);
+      adaptiveGate.writeCounter(counter);
+    } catch (_e) {
+      /* ignore informational failures */
+    }
+    const t8 = performance.now();
+
+    // Final Performance Check
+    const duration = performance.now() - perfStart;
+    if (process.env.DEBUG_HOOKS === 'true' || duration > 100) {
+      auditLog('write-pretool-bundle', 'perf_metrics', {
+        durationMs: Number(duration.toFixed(2)),
+        checks: {
+          routingGuard: Number((t1 - t0).toFixed(2)),
+          creatorGuard: Number((t2 - t1).toFixed(2)),
+          agentContract: Number((t3 - t2).toFixed(2)),
+          preWrite: Number((t4 - t3).toFixed(2)),
+          evolutionGuard: Number((t5 - t4).toFixed(2)),
+          researchEnf: Number((t6 - t5).toFixed(2)),
+          qualityGate: Number((t7 - t6).toFixed(2)),
+          adaptiveGate: Number((t8 - t7).toFixed(2)),
+          startup: Number((t0 - perfStart).toFixed(2)),
+        },
+      });
+    }
+
+    // Success - pass through the original input (or modified if any hook supported transformation)
+    process.stdout.write(JSON.stringify(hookInput));
     process.exit(0);
+  } catch (err) {
+    if (process.env.HOOK_FAIL_OPEN === 'true') process.exit(0);
+    console.error(`[write-pretool-bundle] Critical error: ${err.message}`);
+    process.exit(2);
   }
-
-  for (const hookPath of HOOKS) {
-    const res = runHook(hookPath, currentInput);
-
-    if (res.error) {
-      console.error(`[write-pretool-bundle] Failed to run hook: ${hookPath}`);
-      console.error(String(res.error.message || res.error));
-      process.exit(1);
-    }
-
-    if (res.status !== 0) {
-      if (res.stdout) process.stdout.write(res.stdout);
-      if (res.stderr) process.stderr.write(res.stderr);
-      process.exit(res.status || 1);
-    }
-
-    currentInput = applyHookOutput(currentInput, res.stdout);
-  }
-
-  // Preserve hook chain behavior by returning potentially transformed input.
-  process.stdout.write(currentInput);
 }
 
 if (require.main === module) {
   main();
 }
-
-module.exports = {
-  HOOKS,
-  tryParseJson,
-  applyHookOutput,
-  main,
-};

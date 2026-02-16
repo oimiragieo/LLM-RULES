@@ -5,6 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const OBSERVATIONS_FILE = path.join('.claude', 'context', 'memory', 'observations.jsonl');
 const OBSERVATIONS_SUMMARY_FILE = path.join(
@@ -138,8 +139,8 @@ function readObservations(projectRoot, options = {}) {
   const parsed = [];
   for (const line of lines) {
     try {
-      const row = JSON.parse(line);
-      if (!row || typeof row !== 'object') continue;
+      const row = safeParseJSON(line);
+      if (!row || typeof row !== 'object' || Object.keys(row).length === 0) continue;
       if (sinceTs && Number.isFinite(sinceTs)) {
         const rowTs = Date.parse(String(row.timestamp || ''));
         if (!Number.isFinite(rowTs) || rowTs < sinceTs) continue;
@@ -294,7 +295,7 @@ function recordMemoryBlockChurn(projectRoot, memorySectionString) {
     const lines = fs.readFileSync(metricsPath, 'utf8').split('\n').filter(Boolean);
     for (let i = lines.length - 1; i >= 0; i--) {
       try {
-        const row = JSON.parse(lines[i]);
+        const row = safeParseJSON(lines[i]);
         if (row && typeof row.previous_hash !== 'undefined' && row.memory_block_hash) {
           previous_hash = String(row.memory_block_hash);
           break;

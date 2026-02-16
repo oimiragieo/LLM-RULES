@@ -21,6 +21,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -492,7 +494,7 @@ function main() {
       process.exit(1);
     }
 
-    const registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
+    const registry = safeParseJSON(fs.readFileSync(REGISTRY_PATH, 'utf8'));
     const errors = validateRegistry(registry);
 
     if (errors.length > 0) {
@@ -501,8 +503,9 @@ function main() {
       process.exit(1);
     }
 
+    const totalWorkflows = registry.workflows ? Object.keys(registry.workflows).length : 0;
     console.log('Registry is valid.');
-    console.log('Total workflows:', Object.keys(registry.workflows).length);
+    console.log('Total workflows:', totalWorkflows);
     process.exit(0);
   }
 
@@ -533,7 +536,8 @@ function main() {
     process.exit(1);
   }
 
-  console.log('Generated registry with', Object.keys(registry.workflows).length, 'workflows');
+  const generatedWorkflowCount = registry.workflows ? Object.keys(registry.workflows).length : 0;
+  console.log('Generated registry with', generatedWorkflowCount, 'workflows');
   console.log('');
   console.log('Summary:');
   console.log('  By category:', JSON.stringify(registry.summary.byCategory));

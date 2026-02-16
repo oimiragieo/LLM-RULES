@@ -20,7 +20,7 @@ test('Router State Race Conditions', async t => {
   await t.test('concurrent saveStateWithRetry should maintain consistency', async () => {
     const iterations = 20;
     const promises = [];
-    
+
     // Reset state first
     routerState.resetToRouterMode();
 
@@ -41,9 +41,9 @@ test('Router State Race Conditions', async t => {
 
     const results = await Promise.allSettled(promises);
     const rejected = results.filter(r => r.status === 'rejected');
-    
+
     console.log(`Success: ${iterations - rejected.length}, Failed: ${rejected.length}`);
-    
+
     // We expect some to fail if they exceed MAX_RETRIES (5),
     // but the file should NOT be corrupted.
     const finalState = routerState.getState();

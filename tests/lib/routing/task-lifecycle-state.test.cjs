@@ -1,67 +1,57 @@
 'use strict';
 
-const { test, describe, before, after } = require('node:test');
-const assert = require('node:assert');
-const path = require('path');
-const fs = require('fs');
-// No need to set env var here as the module uses PROJECT_ROOT by default,
-// but we want to avoid overwriting production data.
-// We'll mock the file path if possible or just use a safe temp project root.
-
 const {
   isValidTransition,
   getTransitionError,
 } = require('../../../.claude/lib/routing/task-lifecycle-state.cjs');
+const assert = require('node:assert');
+const test = require('node:test');
 
-describe('Task Lifecycle State Machine', () => {
-  test('isValidTransition should validate standard lifecycle', () => {
-    assert.strictEqual(isValidTransition('pending', 'in_progress'), true, 'pending -> in_progress');
-    assert.strictEqual(
-      isValidTransition('in_progress', 'completed'),
-      true,
-      'in_progress -> completed'
-    );
-    assert.strictEqual(isValidTransition('in_progress', 'deleted'), true, 'in_progress -> deleted');
+test('Task Lifecycle State Machine', async t => {
+  await t.test('Valid transitions', async () => {
+    // pending -> in_progress
+    assert.strictEqual(isValidTransition('pending', 'in_progress'), true);
+    // pending -> deleted
+    assert.strictEqual(isValidTransition('pending', 'deleted'), true);
+    // in_progress -> completed
+    assert.strictEqual(isValidTransition('in_progress', 'completed'), true);
+    // in_progress -> deleted
+    assert.strictEqual(isValidTransition('in_progress', 'deleted'), true);
   });
 
-  test('isValidTransition should block invalid transitions', () => {
-    assert.strictEqual(
-      isValidTransition('pending', 'completed'),
-      false,
-      'pending -> completed (must be in_progress first)'
-    );
-    assert.strictEqual(
-      isValidTransition('completed', 'in_progress'),
-      false,
-      'completed -> in_progress'
-    );
-    assert.strictEqual(isValidTransition('deleted', 'pending'), false, 'deleted -> pending');
+  await t.test('Invalid transitions', async () => {
+    // pending -> completed (Must go through in_progress)
+    assert.strictEqual(isValidTransition('pending', 'completed'), false);
+    // completed -> in_progress (Terminal state)
+    assert.strictEqual(isValidTransition('completed', 'in_progress'), false);
+    // deleted -> in_progress (Terminal state)
+    assert.strictEqual(isValidTransition('deleted', 'in_progress'), false);
+    // completed -> pending
+    assert.strictEqual(isValidTransition('completed', 'pending'), false);
   });
 
-  test('isValidTransition should allow idempotent transitions', () => {
+  await t.test('Self-transitions (Idempotency)', async () => {
+    assert.strictEqual(isValidTransition('pending', 'pending'), true);
     assert.strictEqual(isValidTransition('in_progress', 'in_progress'), true);
     assert.strictEqual(isValidTransition('completed', 'completed'), true);
+    assert.strictEqual(isValidTransition('deleted', 'deleted'), true);
   });
 
-  test('getTransitionError should provide helpful messages', () => {
+  await t.test('Case-insensitivity', async () => {
+    assert.strictEqual(isValidTransition('PENDING', 'IN_PROGRESS'), true);
+    assert.strictEqual(isValidTransition('in_progress', 'COMPLETED'), true);
+  });
+
+  await t.test('Transition Error Messages', async () => {
     const error = getTransitionError('task-1', 'pending', 'completed');
-    assert.match(
-      error,
-      /must go through in_progress first/,
-      'Error message for pending->completed'
-    );
+    assert.match(error, /must go through in_progress/);
 
-    const error2 = getTransitionError('task-1', 'completed', 'in_progress');
-    assert.match(error2, /already completed/, 'Error message for completed->in_progress');
+    const terminalError = getTransitionError('task-1', 'completed', 'in_progress');
+    assert.match(terminalError, /already completed/);
   });
 
-  test('writeTaskStatus and readTaskStatus should persist state', async () => {
-    // We need to be careful not to overwrite production .claude/context/runtime/task-status.json
-    // Since task-lifecycle-state.cjs uses PROJECT_ROOT which is pre-computed,
-    // we should ideally have a way to override TASK_STATUS_FILE.
-    // Looking at the code, it's a const.
-    // For now, we've verified the logic part.
-    // To test persistence safely, we'd need to refactor the module to allow path injection
-    // or use a mock filesystem.
+  await t.test('Invalid status validation', async () => {
+    assert.strictEqual(isValidTransition('pending', 'nonsense'), false);
+    assert.strictEqual(isValidTransition('nonsense', 'in_progress'), false);
   });
 });

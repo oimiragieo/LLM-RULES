@@ -143,15 +143,21 @@ async function main() {
           routerState.recordTaskUpdate(String(taskId), String(status));
           await lifecycleState.writeTaskStatus(String(taskId), String(status));
 
-          await eventBus.emit(EventTypes.TASK_UPDATED, {
-            type: EventTypes.TASK_UPDATED,
-            timestamp: new Date().toISOString(),
-            taskId: String(taskId),
-            status: String(status),
-            metadata: toolInput.metadata || {},
-          });
-        } catch (_err) {
-          // Best-effort
+          await Promise.race([
+            eventBus.emit(EventTypes.TASK_UPDATED, {
+              type: EventTypes.TASK_UPDATED,
+              timestamp: new Date().toISOString(),
+              taskId: String(taskId),
+              status: String(status),
+              metadata: toolInput.metadata || {},
+            }),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Event emission timeout')), 5000)
+            ),
+          ]);
+        } catch (err) {
+          // Non-critical error - log to stderr but don't block
+          console.error(`[post-task-unified:TaskUpdate] Event emission error: ${err.message}`);
         }
       }
       process.exit(0);
@@ -161,15 +167,21 @@ async function main() {
     if (toolName === 'TaskList') {
       runTaskListTracking();
       try {
-        await eventBus.emit(EventTypes.TOOL_COMPLETED, {
-          type: EventTypes.TOOL_COMPLETED,
-          timestamp: new Date().toISOString(),
-          toolName: 'TaskList',
-          duration: Date.now() - startTime,
-          output: { status: 'ok' },
-        });
-      } catch (_err) {
-        // Best-effort
+        await Promise.race([
+          eventBus.emit(EventTypes.TOOL_COMPLETED, {
+            type: EventTypes.TOOL_COMPLETED,
+            timestamp: new Date().toISOString(),
+            toolName: 'TaskList',
+            duration: Date.now() - startTime,
+            output: { status: 'ok' },
+          }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Event emission timeout')), 5000)
+          ),
+        ]);
+      } catch (err) {
+        // Non-critical error - log to stderr but don't block
+        console.error(`[post-task-unified:TaskList] Event emission error: ${err.message}`);
       }
       process.exit(0);
       return;
@@ -276,31 +288,48 @@ async function main() {
     }
 
     try {
-      await eventBus.emit(EventTypes.TOOL_COMPLETED, {
-        type: EventTypes.TOOL_COMPLETED,
-        timestamp: new Date().toISOString(),
-        toolName: 'Task',
-        duration: Date.now() - startTime,
-        output: { status: 'ok' },
-      });
-    } catch (_err) {
-      // Best-effort
+      await Promise.race([
+        eventBus.emit(EventTypes.TOOL_COMPLETED, {
+          type: EventTypes.TOOL_COMPLETED,
+          timestamp: new Date().toISOString(),
+          toolName: 'Task',
+          duration: Date.now() - startTime,
+          output: { status: 'ok' },
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Event emission timeout')), 5000)
+        ),
+      ]);
+    } catch (err) {
+      // Non-critical error - log to stderr but don't block
+      console.error(`[post-task-unified:Task] Event emission error: ${err.message}`);
     }
     process.exit(0);
   } catch (err) {
+    // Log ALL errors to stderr with context
+    console.error(`[post-task-unified] Hook error: ${err.message}`);
+    if (err.stack) {
+      console.error(`[post-task-unified] Stack: ${err.stack}`);
+    }
+
     try {
-      await eventBus.emit(EventTypes.TOOL_FAILED, {
-        type: EventTypes.TOOL_FAILED,
-        timestamp: new Date().toISOString(),
-        toolName: 'post-task-unified',
-        error: err.message,
-      });
-    } catch (_err) {
-      // Best-effort
+      await Promise.race([
+        eventBus.emit(EventTypes.TOOL_FAILED, {
+          type: EventTypes.TOOL_FAILED,
+          timestamp: new Date().toISOString(),
+          toolName: 'post-task-unified',
+          error: err.message,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Event emission timeout')), 5000)
+        ),
+      ]);
+    } catch (emitErr) {
+      // Non-critical error - log to stderr but don't block
+      console.error(`[post-task-unified] Event emission error: ${emitErr.message}`);
     }
-    if (process.env.DEBUG_HOOKS) {
-      console.error('[post-task-unified] Error:', err.message);
-    }
+
+    // Exit 0 for non-critical errors (don't block tool pipeline)
     process.exit(0);
   }
 }

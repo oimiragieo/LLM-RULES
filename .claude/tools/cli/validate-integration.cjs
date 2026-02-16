@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 /**
  * validate-integration.cjs
  *
@@ -504,7 +505,7 @@ function getRecentArtifacts(hoursAgo = 24) {
   if (!stateContent) return [];
 
   try {
-    const state = JSON.parse(stateContent);
+    const state = safeParseJSON(stateContent);
     const cutoff = Date.now() - hoursAgo * 60 * 60 * 1000;
     const recent = [];
 

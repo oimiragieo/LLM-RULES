@@ -13,6 +13,8 @@
 
 'use strict';
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 // Default to BM25-only mode to avoid async pipeline OOM
 // Override with LANCEDB_EMBEDDING_MODE=hybrid for dense vectors
 if (!process.env.LANCEDB_EMBEDDING_MODE) {
@@ -24,6 +26,7 @@ const cliProgress = require('cli-progress');
 const fs = require('fs').promises;
 const path = require('path');
 const { IndexManager } = require('../../lib/code-indexing/index-manager.cjs');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 // Chalk 5.x is ESM-only, so we use a simple fallback for CommonJS
 const chalk = {
@@ -78,7 +81,7 @@ program
       let config = {};
       try {
         const configContent = await fs.readFile(configPath, 'utf-8');
-        config = JSON.parse(configContent);
+        config = safeParseJSON(configContent);
       } catch (_err) {
         // Use defaults if config not found
       }
@@ -356,7 +359,7 @@ program
       }
 
       // Load metadata
-      const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf8'));
+      const metadata = safeParseJSON(await fs.readFile(metadataPath, 'utf8'));
 
       console.log(chalk.blue.bold('Index Status:'));
       console.log(`  Created: ${new Date(metadata.timestamp).toLocaleString()}`);
@@ -436,10 +439,18 @@ program
     }
   });
 
-// Parse arguments
-program.parse(process.argv);
+async function main() {
+  program.parse(process.argv);
 
-// Show help if no command provided
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
+  if (!process.argv.slice(2).length) {
+    program.outputHelp();
+  }
+
+  return { ok: true };
+}
+
+const wrappedMain = wrapCLITool(main, 'index-codebase');
+
+if (require.main === module) {
+  wrappedMain();
 }

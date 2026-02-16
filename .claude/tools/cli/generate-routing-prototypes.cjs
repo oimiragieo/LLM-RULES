@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -35,7 +37,7 @@ function collectPhrasesPerAgent() {
 
   try {
     if (fs.existsSync(AGENT_REGISTRY_PATH)) {
-      const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+      const registry = safeParseJSON(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
       if (registry && registry.agents) {
         for (const [agentId, list] of byAgent.entries()) {
           const card = registry.agents[agentId];

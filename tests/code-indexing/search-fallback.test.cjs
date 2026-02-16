@@ -31,7 +31,11 @@ describe('Search fallback resilience', () => {
       },
     ]);
 
-    const results = await store.hybridSearch('login token', { mode: 'hybrid', k_sparse: 5, k_dense: 5 });
+    const results = await store.hybridSearch('login token', {
+      mode: 'hybrid',
+      k_sparse: 5,
+      k_dense: 5,
+    });
     assert.ok(results.length > 0);
     assert.ok(results.some(r => r.id === 'chunk-1' || r.metadata?.filePath === 'src/auth.js'));
 
@@ -59,7 +63,11 @@ describe('Search fallback resilience', () => {
       },
     ]);
 
-    const results = await store.hybridSearch('cache invalidation', { mode: 'hybrid', k_sparse: 5, k_dense: 5 });
+    const results = await store.hybridSearch('cache invalidation', {
+      mode: 'hybrid',
+      k_sparse: 5,
+      k_dense: 5,
+    });
     assert.ok(results.length > 0);
 
     await store.close();

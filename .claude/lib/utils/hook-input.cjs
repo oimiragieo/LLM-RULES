@@ -271,13 +271,24 @@ function isEnabled(envVar, defaultMode = 'block') {
 /**
  * Get enforcement mode from environment variable
  *
+ * Uses centralized defaults from enforcement-defaults.cjs.
+ * Falls back to legacy defaultMode parameter for backwards compatibility.
+ *
  * @param {string} envVar - Environment variable name
- * @param {string} [defaultMode='block'] - Default mode if env var not set
+ * @param {string} [defaultMode] - Legacy parameter (ignored, kept for backwards compat)
  * @returns {string} Enforcement mode ('block', 'warn', or 'off')
  */
-function getEnforcementMode(envVar, defaultMode = 'block') {
-  const mode = process.env[envVar] || defaultMode;
-  return VALID_ENFORCEMENT_MODES.includes(mode) ? mode : defaultMode;
+function getEnforcementMode(envVar, defaultMode) {
+  // Try centralized defaults first
+  try {
+    const { getEnforcementMode: getCentralized } = require('./enforcement-defaults.cjs');
+    return getCentralized(envVar);
+  } catch {
+    // Fallback to legacy behavior if centralized module not available
+    const fallback = defaultMode || 'warn';
+    const mode = process.env[envVar] || fallback;
+    return VALID_ENFORCEMENT_MODES.includes(mode) ? mode : fallback;
+  }
 }
 
 /**

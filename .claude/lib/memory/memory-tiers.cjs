@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { withFileLock } = require('./memory-tiers-lock.cjs');
 const {
   isStructuredSummaryEnabled,
@@ -118,7 +119,8 @@ function readSTMEntry(projectRoot = PROJECT_ROOT) {
   }
 
   try {
-    return JSON.parse(fs.readFileSync(stmPath, 'utf8'));
+    const raw = fs.readFileSync(stmPath, 'utf8');
+    return safeParseJSON(raw);
   } catch (e) {
     if (process.env.MEMORY_DEBUG) {
       console.error('[MEMORY_DEBUG]', 'readSTMEntry:', e.message);
@@ -154,7 +156,9 @@ function getMTMSessions(projectRoot = PROJECT_ROOT) {
   return files
     .map(f => {
       try {
-        const data = JSON.parse(fs.readFileSync(path.join(mtmDir, f), 'utf8'));
+        const raw = fs.readFileSync(path.join(mtmDir, f), 'utf8');
+        const data = safeParseJSON(raw);
+        if (!data || typeof data !== 'object') return null;
         return { ...data, _filename: f };
       } catch (e) {
         if (process.env.MEMORY_DEBUG) {
@@ -183,7 +187,11 @@ function _consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
 
   let sessionData;
   try {
-    sessionData = JSON.parse(fs.readFileSync(stmPath, 'utf8'));
+    const raw = fs.readFileSync(stmPath, 'utf8');
+    sessionData = safeParseJSON(raw);
+    if (!sessionData || typeof sessionData !== 'object') {
+      throw new Error('Invalid STM JSON structure');
+    }
   } catch (e) {
     if (process.env.MEMORY_DEBUG) {
       console.error('[MEMORY_DEBUG]', 'consolidateSession:', e.message);

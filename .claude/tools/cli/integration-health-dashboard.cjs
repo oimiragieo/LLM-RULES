@@ -19,6 +19,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -88,7 +90,7 @@ function loadGraph(graphPath) {
 
   try {
     const content = fs.readFileSync(graphPath, 'utf8');
-    return JSON.parse(content);
+    return safeParseJSON(content);
   } catch (_err) {
     return null;
   }
@@ -111,7 +113,7 @@ function loadQueue(queuePath) {
     return lines
       .map(line => {
         try {
-          return JSON.parse(line);
+          return safeParseJSON(line);
         } catch {
           return null;
         }

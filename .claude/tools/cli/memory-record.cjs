@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -66,9 +68,9 @@ function parseArgs(argv) {
 function readJsonPayload(input) {
   if (!input) return null;
   if (fs.existsSync(input)) {
-    return JSON.parse(fs.readFileSync(input, 'utf8'));
+    return safeParseJSON(fs.readFileSync(input, 'utf8'));
   }
-  return JSON.parse(input);
+  return safeParseJSON(input);
 }
 
 function recordMemory({ type, text, category, area, payload, projectRoot = PROJECT_ROOT }) {

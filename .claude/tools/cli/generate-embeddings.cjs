@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 /**
  * Embedding Generator CLI Tool
@@ -82,7 +83,7 @@ function loadJsonEntries(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8');
   let parsed = [];
   try {
-    parsed = JSON.parse(raw);
+    parsed = safeParseJSON(raw);
   } catch (_e) {
     return [];
   }

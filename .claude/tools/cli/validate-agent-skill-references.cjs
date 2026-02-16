@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -64,7 +66,7 @@ function loadSkillIndexSkills(skillIndexPath = SKILL_INDEX_PATH) {
   if (!fs.existsSync(skillIndexPath)) {
     throw new Error(`Missing skill index: ${skillIndexPath}`);
   }
-  const raw = JSON.parse(fs.readFileSync(skillIndexPath, 'utf8'));
+  const raw = safeParseJSON(fs.readFileSync(skillIndexPath, 'utf8'));
   const skills = raw.skills || {};
   const valid = new Set();
   for (const key of Object.keys(skills)) {

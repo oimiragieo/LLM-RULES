@@ -23,6 +23,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -113,7 +115,7 @@ function readErrorLogs() {
 
     for (const line of lines) {
       try {
-        errors.push(JSON.parse(line));
+        errors.push(safeParseJSON(line));
       } catch (_e) {
         // Skip malformed
       }

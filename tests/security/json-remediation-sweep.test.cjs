@@ -15,6 +15,13 @@ const TARGET_FILES = [
   '.claude/lib/utils/state-cache.cjs',
   '.claude/lib/utils/hook-resolver.cjs',
   '.claude/lib/utils/schema-validator.cjs',
+  '.claude/lib/routing/semantic-router.cjs',
+  '.claude/lib/routing/agent-registry-resolver.cjs',
+  '.claude/lib/quality/artifact-quality-runtime.cjs',
+  '.claude/lib/qa/report.cjs',
+  '.claude/lib/memory/observations.cjs',
+  '.claude/lib/memory/intent-analyzer.cjs',
+  '.claude/lib/evolution-state-sync.cjs',
 ];
 
 describe('JSON remediation sweep', () => {
@@ -34,16 +41,22 @@ describe('JSON remediation sweep', () => {
       const source = fs.readFileSync(filePath, 'utf8');
       const normalizedPath = normalizePath(relativePath);
 
-      assert.match(
-        source,
-        /safeParseJSON/,
-        `Expected safeParseJSON usage in ${normalizedPath}`
-      );
+      assert.match(source, /safeParseJSON/, `Expected safeParseJSON usage in ${normalizedPath}`);
       assert.doesNotMatch(
         source,
         /\bJSON\.parse\s*\(/,
         `Expected no raw JSON.parse in ${normalizedPath}`
       );
+    }
+  });
+
+  test('CLI tool files avoid raw JSON.parse after remediation sweep', () => {
+    const cliDir = path.join(process.cwd(), '.claude', 'tools', 'cli');
+    const cliFiles = fs.readdirSync(cliDir).filter(name => name.endsWith('.cjs'));
+
+    for (const file of cliFiles) {
+      const source = fs.readFileSync(path.join(cliDir, file), 'utf8');
+      assert.doesNotMatch(source, /\bJSON\.parse\s*\(/, `Expected no raw JSON.parse in ${file}`);
     }
   });
 });

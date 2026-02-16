@@ -12,9 +12,17 @@
 
 'use strict';
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 const { execSync, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
+
+const wrappedPreflight = wrapCLITool(async () => ({ ok: true }), 'check-gpu');
+if (process.env.TRIGGER_WRAPPER_ERROR === 'true') {
+  wrappedPreflight();
+}
 
 console.log('=== GPU Configuration Check ===\n');
 
@@ -43,7 +51,7 @@ const projectRoot = path.resolve(__dirname, '../../../');
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
 if (fs.existsSync(packageJsonPath)) {
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  const packageJson = safeParseJSON(fs.readFileSync(packageJsonPath, 'utf-8'));
   const deps = {
     ...packageJson.dependencies,
     ...packageJson.optionalDependencies,

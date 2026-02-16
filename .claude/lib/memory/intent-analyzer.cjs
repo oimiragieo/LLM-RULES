@@ -3,6 +3,7 @@
 const { ModelClient } = require('../clients/model-client.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { getIntentAnalysisPrompt } = require('./prompts/intent-analysis.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('intent-analyzer');
 
@@ -65,7 +66,7 @@ async function analyzeIntent(context, options = {}) {
   try {
     const response = await modelClient.generateText({ system, messages: user });
     const payload = stripCodeFences(response);
-    const parsed = JSON.parse(payload);
+    const parsed = safeParseJSON(payload);
     const rawQueries = Array.isArray(parsed?.queries) ? parsed.queries : [];
 
     const queries = rawQueries

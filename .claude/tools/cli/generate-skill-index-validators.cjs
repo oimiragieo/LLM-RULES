@@ -1,5 +1,7 @@
 'use strict';
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 const fs = require('fs');
 
 function validateIndex(indexPath) {
@@ -7,7 +9,7 @@ function validateIndex(indexPath) {
   const warnings = [];
 
   try {
-    const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+    const index = safeParseJSON(fs.readFileSync(indexPath, 'utf8'));
 
     if (!index.version) {
       errors.push('Missing version field');

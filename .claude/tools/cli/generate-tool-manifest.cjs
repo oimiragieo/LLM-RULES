@@ -18,6 +18,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -57,7 +59,7 @@ function checkMCPServers() {
 
   try {
     if (fs.existsSync(SETTINGS_PATH)) {
-      const settings = JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf8'));
+      const settings = safeParseJSON(fs.readFileSync(SETTINGS_PATH, 'utf8'));
       const mcpServers = settings.mcpServers || {};
 
       for (const server of Object.keys(mcpServers)) {
@@ -138,7 +140,7 @@ function generateManifest(options = {}) {
   // Count total agents from agent-registry.json
   let totalAgents = Object.keys(agentDefaults).length; // fallback
   if (fs.existsSync(AGENT_REGISTRY_PATH)) {
-    const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+    const registry = safeParseJSON(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
     totalAgents = Object.keys(registry.agents || {}).length;
   }
 
@@ -212,7 +214,7 @@ function collectReferencedTools() {
   const tools = new Set();
   try {
     if (fs.existsSync(SKILL_INDEX_PATH)) {
-      const skillIndex = JSON.parse(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
+      const skillIndex = safeParseJSON(fs.readFileSync(SKILL_INDEX_PATH, 'utf8'));
       const skills = skillIndex.skills || {};
       for (const skill of Object.values(skills)) {
         if (skill && Array.isArray(skill.requiredTools)) {
@@ -225,7 +227,7 @@ function collectReferencedTools() {
   }
   try {
     if (fs.existsSync(AGENT_REGISTRY_PATH)) {
-      const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+      const registry = safeParseJSON(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
       const agents = registry.agents || {};
       for (const agent of Object.values(agents)) {
         const caps = agent.capabilities || [];
@@ -263,7 +265,7 @@ function validateManifest(manifestPath) {
   const warnings = [];
 
   try {
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const manifest = safeParseJSON(fs.readFileSync(manifestPath, 'utf8'));
 
     // Check version
     if (!manifest.version) {
@@ -314,7 +316,7 @@ function validateManifest(manifestPath) {
       try {
         const Ajv = require('ajv');
         const addFormats = require('ajv-formats');
-        const schema = JSON.parse(fs.readFileSync(TOOL_MANIFEST_SCHEMA_PATH, 'utf8'));
+        const schema = safeParseJSON(fs.readFileSync(TOOL_MANIFEST_SCHEMA_PATH, 'utf8'));
         const ajv = new Ajv({ strict: false });
         addFormats(ajv);
         const validate = ajv.compile(schema);

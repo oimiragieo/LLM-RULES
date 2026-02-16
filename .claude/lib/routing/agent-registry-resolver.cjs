@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { getPreferredAgent } = require('./routing-table.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const CAPABILITY_ROUTING_PATH = path.join(
   PROJECT_ROOT,
@@ -18,7 +19,7 @@ function loadCapabilityRoutingForResolver() {
   if (capabilityRoutingCache) return capabilityRoutingCache;
   try {
     const raw = fs.readFileSync(CAPABILITY_ROUTING_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     capabilityRoutingCache = {
       capabilityMap:
         parsed && parsed.capabilityMap && typeof parsed.capabilityMap === 'object'

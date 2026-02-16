@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -69,7 +71,7 @@ function main() {
     process.exit(1);
   }
 
-  const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+  const registry = safeParseJSON(fs.readFileSync(registryPath, 'utf8'));
   const catalog = buildCatalog(registry);
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });

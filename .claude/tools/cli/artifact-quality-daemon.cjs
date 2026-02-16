@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('node:fs');
@@ -62,7 +64,7 @@ function ensureRuntimeDir(paths) {
 
 function writeState(paths, patch) {
   const prev = fs.existsSync(paths.statePath)
-    ? JSON.parse(fs.readFileSync(paths.statePath, 'utf8'))
+    ? safeParseJSON(fs.readFileSync(paths.statePath, 'utf8'))
     : {};
   const next = {
     ...prev,
@@ -75,7 +77,7 @@ function writeState(paths, patch) {
 
 function getState(paths) {
   if (!fs.existsSync(paths.statePath)) return null;
-  return JSON.parse(fs.readFileSync(paths.statePath, 'utf8'));
+  return safeParseJSON(fs.readFileSync(paths.statePath, 'utf8'));
 }
 
 function maybeWriteSystemRemediation(paths, gate) {

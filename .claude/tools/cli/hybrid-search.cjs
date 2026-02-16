@@ -9,6 +9,8 @@
  */
 
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const net = require('net');
@@ -61,7 +63,7 @@ function daemonRequest(payload, timeoutMs = DAEMON_TIMEOUT_MS) {
       clearTimeout(timer);
       socket.end();
       try {
-        resolve(JSON.parse(line));
+        resolve(safeParseJSON(line));
       } catch (err) {
         reject(err);
       }

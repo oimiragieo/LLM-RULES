@@ -22,16 +22,22 @@ const { parseHookInputAsync, getToolName, getToolInput, formatResult } = libRequ
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 
-function emitToolBlocked(toolName, reason) {
+async function emitToolBlocked(toolName, reason) {
   try {
-    eventBus.emit(EventTypes.TOOL_BLOCKED, {
-      type: EventTypes.TOOL_BLOCKED,
-      timestamp: new Date().toISOString(),
-      toolName,
-      reason,
-    });
-  } catch (_err) {
-    // Best-effort.
+    await Promise.race([
+      eventBus.emit(EventTypes.TOOL_BLOCKED, {
+        type: EventTypes.TOOL_BLOCKED,
+        timestamp: new Date().toISOString(),
+        toolName,
+        reason,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Event emission timeout')), 5000)
+      ),
+    ]);
+  } catch (err) {
+    // Non-critical error - log to stderr but don't block
+    console.error(`[pre-tool-unified] Event emission error: ${err.message}`);
   }
 }
 
@@ -50,21 +56,21 @@ async function main() {
     const limitResult = execution.checkExecutionLimit(hookInput, toolName, toolInput);
     if (limitResult.action === 'block') {
       console.log(formatResult('block', limitResult.message));
-      emitToolBlocked(toolName, 'execution_limit_exceeded');
+      await emitToolBlocked(toolName, 'execution_limit_exceeded');
       process.exit(2);
     }
 
     const scopeResult = execution.checkToolScope(hookInput, toolName);
     if (scopeResult.action === 'block') {
       console.log(formatResult('block', scopeResult.message));
-      emitToolBlocked(toolName, 'tool_scope_violation');
+      await emitToolBlocked(toolName, 'tool_scope_violation');
       process.exit(2);
     }
 
     const taskUpdateFirst = taskUpdate.checkTaskUpdateFirst(hookInput, toolName, toolInput);
     if (taskUpdateFirst.action === 'block') {
       console.log(formatResult('block', taskUpdateFirst.message));
-      emitToolBlocked(toolName, 'taskupdate_first_violation');
+      await emitToolBlocked(toolName, 'taskupdate_first_violation');
       process.exit(2);
     }
     if (taskUpdateFirst.warning) {
@@ -92,7 +98,7 @@ async function main() {
     const readSafetyResult = readSafety.checkReadSafety(toolName, toolInput, hookInput);
     if (readSafetyResult.action === 'block') {
       console.log(formatResult('block', readSafetyResult.message));
-      emitToolBlocked(toolName, 'read_safety_violation');
+      await emitToolBlocked(toolName, 'read_safety_violation');
       process.exit(2);
     }
     if (readSafetyResult.action === 'rewrite' && readSafetyResult.rewrittenToolInput) {
@@ -108,9 +114,21 @@ async function main() {
 
     process.exit(0);
   } catch (err) {
-    if (process.env.DEBUG_HOOKS) {
-      console.error('[pre-tool-unified] Error:', err.message);
+    // Log ALL errors to stderr with context
+    const hookInput = process.argv[2];
+    let toolInfo = '';
+    try {
+      const input = JSON.parse(hookInput || '{}');
+      const tool = input.tool || 'unknown';
+      toolInfo = ` [tool=${tool}]`;
+    } catch (_) {
+      // Ignore parse errors
     }
+    console.error(`[pre-tool-unified] Hook error${toolInfo}: ${err.message}`);
+    if (err.stack) {
+      console.error(`[pre-tool-unified] Stack: ${err.stack}`);
+    }
+    // Exit 0 for non-critical errors (don't block tool pipeline)
     process.exit(0);
   }
 }

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
@@ -104,7 +106,7 @@ async function main() {
         if (!line.trim()) continue;
         let req;
         try {
-          req = JSON.parse(line);
+          req = safeParseJSON(line);
         } catch {
           socket.write(`${JSON.stringify({ ok: false, error: 'Invalid JSON request' })}\n`);
           continue;

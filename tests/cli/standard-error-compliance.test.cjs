@@ -6,7 +6,10 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const TOOL_SAMPLES = [
-  { name: 'cleanup-transient-artifacts', file: '.claude/tools/cli/cleanup-transient-artifacts.cjs' },
+  {
+    name: 'cleanup-transient-artifacts',
+    file: '.claude/tools/cli/cleanup-transient-artifacts.cjs',
+  },
   { name: 'open-findings-summary', file: '.claude/tools/cli/open-findings-summary.cjs' },
   { name: 'runtime-health-snapshot', file: '.claude/tools/cli/runtime-health-snapshot.cjs' },
   { name: 'trace-query', file: '.claude/tools/cli/trace-query.cjs' },

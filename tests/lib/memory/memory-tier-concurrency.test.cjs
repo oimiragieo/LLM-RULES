@@ -29,7 +29,14 @@ describe('Memory tier concurrency', () => {
     const rotate = summarizeOldSessions(projectRoot, 1);
     await Promise.all([...writes, rotate]);
 
-    const stmPath = path.join(projectRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json');
+    const stmPath = path.join(
+      projectRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
+    );
     if (fs.existsSync(stmPath)) {
       assert.doesNotThrow(() => JSON.parse(fs.readFileSync(stmPath, 'utf8')));
     }

@@ -79,17 +79,27 @@ function extractAndSanitizeShell(command) {
     let j = startIndex + 1;
     let localEscaped = false;
     let content = '';
+    let iterCount = 0;
+    const maxIter = 10000;
     while (j < command.length) {
       const ch = command[j];
       if (localEscaped) {
         content += ch;
         localEscaped = false;
         j++;
+        iterCount++;
+        if (iterCount >= maxIter) {
+          break;
+        }
         continue;
       }
       if (ch === '\\') {
         localEscaped = true;
         j++;
+        iterCount++;
+        if (iterCount >= maxIter) {
+          break;
+        }
         continue;
       }
       if (ch === '`') {
@@ -97,6 +107,10 @@ function extractAndSanitizeShell(command) {
       }
       content += ch;
       j++;
+      iterCount++;
+      if (iterCount >= maxIter) {
+        break;
+      }
     }
     return null;
   }
@@ -108,6 +122,8 @@ function extractAndSanitizeShell(command) {
     let localSingle = false;
     let localDouble = false;
     let content = '';
+    let iterCount = 0;
+    const maxIter = 10000;
 
     while (j < command.length) {
       const ch = command[j];
@@ -115,24 +131,40 @@ function extractAndSanitizeShell(command) {
         content += ch;
         localEscaped = false;
         j++;
+        iterCount++;
+        if (iterCount >= maxIter) {
+          break;
+        }
         continue;
       }
       if (ch === '\\') {
         localEscaped = true;
         content += ch;
         j++;
+        iterCount++;
+        if (iterCount >= maxIter) {
+          break;
+        }
         continue;
       }
       if (!localDouble && ch === "'") {
         localSingle = !localSingle;
         content += ch;
         j++;
+        iterCount++;
+        if (iterCount >= maxIter) {
+          break;
+        }
         continue;
       }
       if (!localSingle && ch === '"') {
         localDouble = !localDouble;
         content += ch;
         j++;
+        iterCount++;
+        if (iterCount >= maxIter) {
+          break;
+        }
         continue;
       }
       if (!localSingle && !localDouble) {
@@ -147,6 +179,10 @@ function extractAndSanitizeShell(command) {
       }
       content += ch;
       j++;
+      iterCount++;
+      if (iterCount >= maxIter) {
+        break;
+      }
     }
     return null;
   }
@@ -210,9 +246,17 @@ function extractAndSanitizeShell(command) {
     if (!inSingle && !inDouble && ch === '#') {
       const prev = i > 0 ? command[i - 1] : '';
       if (isWordBoundaryChar(prev)) {
+        // Add iteration limit to prevent DoS on malformed input
+        let iterCount = 0;
+        const maxIter = 10000;
         while (i < command.length && command[i] !== '\n') {
           output += ' ';
           i++;
+          iterCount++;
+          if (iterCount >= maxIter) {
+            // Malformed input: comment too long, stop processing
+            break;
+          }
         }
         continue;
       }
@@ -303,6 +347,15 @@ function analyzeInlineInterpreterExecution(command) {
  * @returns {{allowed: boolean, reason?: string, warning?: string, detected?: string}}
  */
 function handler(input) {
+  // Input validation: check for null/undefined and command property
+  if (!input || typeof input !== 'object') {
+    return { allowed: false, reason: '[SHELL-INJECTION] Invalid hook input: expected object' };
+  }
+
+  if (typeof input.command !== 'string') {
+    return { allowed: false, reason: '[SHELL-INJECTION] Invalid command: expected string' };
+  }
+
   const { command } = input;
 
   // Check enforcement mode

@@ -6,6 +6,7 @@ const path = require('node:path');
 const { appendJsonl } = require('../utils/jsonl-utils.cjs');
 const { parseAndValidateTaskUpdate } = require('../routing/task-update-contract.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function getRuntimePaths(projectRoot = PROJECT_ROOT) {
   const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
@@ -119,7 +120,10 @@ function readJsonlSafe(filePath) {
     const out = [];
     for (const line of lines) {
       try {
-        out.push(JSON.parse(line));
+        const parsed = safeParseJSON(line);
+        if (parsed && Object.keys(parsed).length > 0) {
+          out.push(parsed);
+        }
       } catch (_e) {
         // best effort
       }

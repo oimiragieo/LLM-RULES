@@ -5,6 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { PROJECT_ROOT, validatePathWithinProject } = require('../utils/project-root.cjs');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const OPEN_FINDINGS_FILE = path.join('.claude', 'context', 'memory', 'open-findings.json');
 const OPEN_FINDINGS_TREND_FILE = path.join(
@@ -193,7 +194,8 @@ function loadRegistry(projectRoot = PROJECT_ROOT) {
   }
 
   try {
-    const parsed = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    const raw = fs.readFileSync(registryPath, 'utf8');
+    const parsed = safeParseJSON(raw);
     if (!parsed || typeof parsed !== 'object') {
       return { generatedAt: new Date().toISOString(), findings: [] };
     }
@@ -464,7 +466,7 @@ function readFindingsTrend(projectRoot = PROJECT_ROOT, options = {}) {
   const results = [];
   for (const line of lines) {
     try {
-      const parsed = JSON.parse(line);
+      const parsed = safeParseJSON(line);
       const ts = Date.parse(String(parsed?.timestamp || ''));
       if (!Number.isFinite(ts) || ts < cutoff) continue;
       results.push(parsed);
