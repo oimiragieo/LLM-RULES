@@ -5,9 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const {
-  DEFAULT_ARTIFACT_GRAPH_PATH,
-} = require('../../../.claude/lib/workflow/artifact-graph.cjs');
+const { DEFAULT_ARTIFACT_GRAPH_PATH } = require('../../../.claude/lib/workflow/artifact-graph.cjs');
 
 test('artifact graph default path uses context/data', () => {
   assert.equal(

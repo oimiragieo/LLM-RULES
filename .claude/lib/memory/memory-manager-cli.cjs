@@ -138,6 +138,36 @@ function runMemoryManagerCli({ args, manager, logger, projectRoot }) {
       }
       break;
 
+    case 'find-entities':
+      if (args[1]) {
+        const limit = Number(getFlagValue('limit') || 10);
+        manager
+          .findEntities(args[1], { limit })
+          .then(result => console.log(JSON.stringify(result, null, 2)))
+          .catch(err => {
+            logger.error('Find entities failed', { error: err.message });
+            process.exit(1);
+          });
+      } else {
+        logger.error('Usage: memory-manager.cjs find-entities "type" [--limit=10]');
+      }
+      break;
+
+    case 'get-related':
+      if (args[1]) {
+        const depth = Number(getFlagValue('depth') || 1);
+        manager
+          .getRelated(args[1], { depth })
+          .then(result => console.log(JSON.stringify(result, null, 2)))
+          .catch(err => {
+            logger.error('Get related failed', { error: err.message });
+            process.exit(1);
+          });
+      } else {
+        logger.error('Usage: memory-manager.cjs get-related "id" [--depth=1]');
+      }
+      break;
+
     default:
       console.log(`
 Memory Manager - Session-Based Memory System
@@ -155,6 +185,8 @@ Commands:
   record-discovery   Record a codebase discovery
   forget             Remove memory entries similar to a query
   delete-by-ids      Remove memory entries by id (gotchas/patterns)
+  find-entities      Find entities by type (SQLite)
+  get-related        Get related entities (SQLite)
   save-session       (deprecated, exits 1; use memory-tiers / SessionEnd)
 
 Examples:
@@ -168,6 +200,8 @@ Examples:
   node memory-manager.cjs record-discovery "src/auth.ts" "JWT authentication handler"
   node memory-manager.cjs forget "avoid sync fs in hooks" --threshold=0.7 --area=main
   node memory-manager.cjs delete-by-ids id1,id2
+  node memory-manager.cjs find-entities concept --limit=5
+  node memory-manager.cjs get-related task-123 --depth=2
   echo '{"summary":"Fixed auth bug"}' | node memory-manager.cjs save-session   # deprecated, exits 1
 `);
   }

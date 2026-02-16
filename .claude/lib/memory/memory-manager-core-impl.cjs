@@ -172,4 +172,6 @@ module.exports = {
   recordGotchaAsync: ops.recordGotchaAsync,
   recordPatternAsync: ops.recordPatternAsync,
   loadMemoryForContextAsync: ops.loadMemoryForContextAsync,
+  findEntities: ops.findEntities,
+  getRelated: ops.getRelated,
 };

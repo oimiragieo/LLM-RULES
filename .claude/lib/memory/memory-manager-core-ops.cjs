@@ -484,6 +484,36 @@ function createCoreOps({
     return { deleted: ids.size, ids: [...ids] };
   }
 
+  async function findEntities(type, filters = {}) {
+    try {
+      const { ContextualMemory } = require('./contextual-memory.cjs');
+      const memory = new ContextualMemory();
+      const results = await memory.findEntities(type, filters);
+      memory.close();
+      return results;
+    } catch (err) {
+      if (process.env.MEMORY_DEBUG) {
+        logger.error('ContextualMemory findEntities failed', { error: err.message });
+      }
+      return [];
+    }
+  }
+
+  async function getRelated(id, options = {}) {
+    try {
+      const { ContextualMemory } = require('./contextual-memory.cjs');
+      const memory = new ContextualMemory();
+      const results = await memory.getRelated(id, options);
+      memory.close();
+      return results;
+    } catch (err) {
+      if (process.env.MEMORY_DEBUG) {
+        logger.error('ContextualMemory getRelated failed', { error: err.message });
+      }
+      return [];
+    }
+  }
+
   return {
     getCurrentSessionNumber,
     checkAndArchiveLearnings,
@@ -504,6 +534,8 @@ function createCoreOps({
     getMemoryStats,
     searchMemory,
     forgetMemoryByQuery,
+    findEntities,
+    getRelated,
   };
 }
 
