@@ -30,6 +30,22 @@ test('normalizeTaskIdReferences rewrites hardcoded task placeholders to active t
   assert.equal(output.includes('task_id: "1"'), false);
 });
 
+test('normalizeTaskIdReferences rewrites role-line and numeric single-quote task ids', () => {
+  const input = [
+    'You are task-1. Complete the assigned work.',
+    "TaskUpdate({ taskId: '1', status: 'in_progress' })",
+    "TaskUpdate({ task_id: '1', status: 'completed' })",
+  ].join('\n');
+
+  const output = normalizeTaskIdReferences(input, 'task-abc-999');
+  assert.ok(output.includes('You are task-abc-999. Complete the assigned work.'));
+  assert.ok(output.includes("taskId: 'task-abc-999'"));
+  assert.ok(output.includes("task_id: 'task-abc-999'"));
+  assert.equal(output.includes('task-1'), false);
+  assert.equal(output.includes("taskId: '1'"), false);
+  assert.equal(output.includes("task_id: '1'"), false);
+});
+
 test('normalizeStalePathReferences rewrites known stale report and code paths', () => {
   const input = [
     '.claude/lib/memory/memory-query.cjs',

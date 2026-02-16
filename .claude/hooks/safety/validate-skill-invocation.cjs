@@ -108,7 +108,7 @@ async function main() {
 
     // Emit plain-text warning only; never return JSON payload from this advisory hook.
     // JSON outputs can interfere with tool_input mutation hooks when multiple hooks match.
-    console.log(
+    console.error(
       `[SKILL-INVOCATION] Consider using Skill({ skill: "${skillName}" }) instead of reading SKILL.md directly. ` +
         'Reading is allowed for reference, but Skill() tool applies the workflow.'
     );
