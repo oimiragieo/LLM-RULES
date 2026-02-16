@@ -57,7 +57,11 @@ describe('M11: Memory Tiers File Locking', () => {
 
     // All promotions should succeed without corrupting each other
     const successes = results.filter(r => r.success);
-    assert.strictEqual(successes.length, 3, `Expected 3 successful promotions, got ${successes.length}: ${JSON.stringify(results)}`);
+    assert.strictEqual(
+      successes.length,
+      3,
+      `Expected 3 successful promotions, got ${successes.length}: ${JSON.stringify(results)}`
+    );
 
     // Verify LTM directory has exactly 3 promoted files
     const ltmDir = tiers.getTierPath('LTM', tmpDir);
@@ -106,7 +110,11 @@ describe('M11: Memory Tiers File Locking', () => {
 
     // All consolidations should succeed
     const successes = results.filter(r => r.success);
-    assert.strictEqual(successes.length, 3, `Expected 3 successful consolidations, got ${successes.length}`);
+    assert.strictEqual(
+      successes.length,
+      3,
+      `Expected 3 successful consolidations, got ${successes.length}`
+    );
 
     // MTM should have exactly 3 sessions
     const mtmSessions = tiers.getMTMSessions(tmpDir);
@@ -187,11 +195,7 @@ describe('M11: Memory Tiers File Locking', () => {
       summarizeResult.summarized >= 0,
       `Summarization should report non-negative count: ${summarizeResult.summarized}`
     );
-    assert.strictEqual(
-      consolidateResult.success,
-      true,
-      'Consolidation should succeed'
-    );
+    assert.strictEqual(consolidateResult.success, true, 'Consolidation should succeed');
 
     // Verify no corrupted files
     const ltmDir = tiers.getTierPath('LTM', tmpDir);
@@ -200,10 +204,7 @@ describe('M11: Memory Tiers File Locking', () => {
       for (const file of ltmFiles) {
         const content = fs.readFileSync(path.join(ltmDir, file), 'utf8');
         // Should be valid JSON (no corruption)
-        assert.doesNotThrow(
-          () => JSON.parse(content),
-          `LTM file ${file} should be valid JSON`
-        );
+        assert.doesNotThrow(() => JSON.parse(content), `LTM file ${file} should be valid JSON`);
       }
     }
   });

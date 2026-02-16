@@ -106,6 +106,7 @@ describe('pre-task-unified.cjs', () => {
       PLANNER_FIRST_ENFORCEMENT: process.env.PLANNER_FIRST_ENFORCEMENT,
       SECURITY_REVIEW_ENFORCEMENT: process.env.SECURITY_REVIEW_ENFORCEMENT,
       LOOP_PREVENTION_MODE: process.env.LOOP_PREVENTION_MODE,
+      TASK_REQUIRE_CORE_MEMORY_READ: process.env.TASK_REQUIRE_CORE_MEMORY_READ,
       CLAUDE_SESSION_ID: process.env.CLAUDE_SESSION_ID,
       TASK_RESUME_ENFORCEMENT: process.env.TASK_RESUME_ENFORCEMENT,
       TASK_ALLOW_AGENT_RESUME: process.env.TASK_ALLOW_AGENT_RESUME,
@@ -119,6 +120,7 @@ describe('pre-task-unified.cjs', () => {
     delete process.env.PLANNER_FIRST_ENFORCEMENT;
     delete process.env.SECURITY_REVIEW_ENFORCEMENT;
     delete process.env.LOOP_PREVENTION_MODE;
+    delete process.env.TASK_REQUIRE_CORE_MEMORY_READ;
     delete process.env.CLAUDE_SESSION_ID;
     delete process.env.TASK_RESUME_ENFORCEMENT;
     delete process.env.TASK_ALLOW_AGENT_RESUME;
@@ -401,6 +403,8 @@ describe('pre-task-unified.cjs', () => {
 
   describe('runAllChecks', () => {
     it('should run all 3 checks in order', () => {
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+
       // Set up clean state
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
@@ -440,6 +444,8 @@ describe('pre-task-unified.cjs', () => {
     });
 
     it('should record in_progress lifecycle when task_id is provided', () => {
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,
@@ -473,6 +479,8 @@ describe('pre-task-unified.cjs', () => {
     });
 
     it('should stop on first failure', () => {
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+
       // Set up state that will fail routing-guard check
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
@@ -500,6 +508,8 @@ describe('pre-task-unified.cjs', () => {
     });
 
     it('should check loop prevention last', () => {
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+
       // Set up state that passes all but loop-prevention
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
@@ -537,6 +547,8 @@ describe('pre-task-unified.cjs', () => {
     });
 
     it('should block resume-style Task spawns by default', () => {
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,
@@ -563,6 +575,7 @@ describe('pre-task-unified.cjs', () => {
 
     it('should allow resume-style spawn when override is explicitly enabled', () => {
       process.env.TASK_ALLOW_AGENT_RESUME = 'true';
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off'; // Disable memory read requirement
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,
@@ -588,6 +601,7 @@ describe('pre-task-unified.cjs', () => {
 
     it('should block multi-wave spawn prompts in single-purpose block mode', () => {
       process.env.TASK_SINGLE_PURPOSE_ENFORCEMENT = 'block';
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off'; // Disable memory read requirement
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,

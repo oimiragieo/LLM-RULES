@@ -45,7 +45,12 @@ describe('pre-tool-unified taskupdate-first router session fallback', { concurre
           const hookInput = {
             session_id: 'session-7b',
           };
-          const result = checkTaskUpdateFirst(hookInput, 'Read', { file_path: 'README.md' }, stateFile);
+          const result = checkTaskUpdateFirst(
+            hookInput,
+            'Read',
+            { file_path: 'README.md' },
+            stateFile
+          );
           assert.equal(result.checked, false);
           assert.equal(result.reason, 'not_agent_session');
         }
@@ -76,7 +81,12 @@ describe('pre-tool-unified taskupdate-first router session fallback', { concurre
             allowed_tools: ['TaskUpdate', 'Read'],
           };
 
-          const result = checkTaskUpdateFirst(hookInput, 'Read', { file_path: 'README.md' }, stateFile);
+          const result = checkTaskUpdateFirst(
+            hookInput,
+            'Read',
+            { file_path: 'README.md' },
+            stateFile
+          );
           assert.equal(result.action, 'allow');
           assert.match(result.warning || '', /AUTO-MARK/);
           assert.match(result.warning || '', /task-router-autofill/);

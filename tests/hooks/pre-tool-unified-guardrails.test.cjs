@@ -22,6 +22,7 @@ describe('pre-tool-unified agent guardrails', () => {
       AGENT_EDIT_CHECKPOINT_ENFORCEMENT: process.env.AGENT_EDIT_CHECKPOINT_ENFORCEMENT,
       AGENT_BASH_POLL_GUARD: process.env.AGENT_BASH_POLL_GUARD,
       AGENT_BASH_ARTIFACT_WRITE_GUARD: process.env.AGENT_BASH_ARTIFACT_WRITE_GUARD,
+      AGENT_WINDOWS_BASH_GUARD: process.env.AGENT_WINDOWS_BASH_GUARD,
       AGENT_BASH_POLL_REPEAT_THRESHOLD: process.env.AGENT_BASH_POLL_REPEAT_THRESHOLD,
       AGENT_BASH_POLL_STALE_MS: process.env.AGENT_BASH_POLL_STALE_MS,
       TASKUPDATE_FIRST_ENFORCEMENT: process.env.TASKUPDATE_FIRST_ENFORCEMENT,
@@ -33,6 +34,7 @@ describe('pre-tool-unified agent guardrails', () => {
     process.env.AGENT_EDIT_CHECKPOINT_ENFORCEMENT = 'block';
     process.env.AGENT_BASH_POLL_GUARD = 'block';
     process.env.AGENT_BASH_ARTIFACT_WRITE_GUARD = 'block';
+    process.env.AGENT_WINDOWS_BASH_GUARD = 'block';
     process.env.AGENT_BASH_POLL_REPEAT_THRESHOLD = '3';
     process.env.AGENT_BASH_POLL_STALE_MS = '50';
     process.env.TASKUPDATE_FIRST_ENFORCEMENT = 'off';
@@ -249,7 +251,10 @@ describe('pre-tool-unified agent guardrails', () => {
         stateFile
       );
       assert.equal(result.action, 'block');
-      assert.match(result.message, /Bash redirection\/heredoc/i);
+      assert.match(
+        result.message,
+        /Bash redirection\/heredoc|Windows-incompatible Bash heredoc\/tmp command blocked/i
+      );
     });
   });
 
@@ -270,7 +275,56 @@ describe('pre-tool-unified agent guardrails', () => {
         command: "cat > .claude/context/reports/test-bash-write-guard.md << 'EOF'\ntext\nEOF",
       });
       assert.equal(result.action, 'block');
-      assert.match(result.message, /Bash redirection\/heredoc/i);
+      assert.match(
+        result.message,
+        /Bash redirection\/heredoc|Windows-incompatible Bash heredoc\/tmp command blocked/i
+      );
+    });
+  });
+
+  test('generic bash artifact write guard blocks Windows-incompatible heredoc/tmp usage', () => {
+    withTempGuardrailState(() => {
+      const result = checkBashArtifactWriteSafety('Bash', {
+        command:
+          "cat > /tmp/research-synthesis.md << 'EOF'\nhello\nEOF\ncat /tmp/research-synthesis.md",
+      });
+      if (process.platform === 'win32') {
+        assert.equal(result.action, 'block');
+        assert.match(result.message, /Windows-incompatible Bash heredoc\/tmp command blocked/i);
+      } else {
+        assert.equal(result.action, 'allow');
+      }
+    });
+  });
+
+  test('generic bash artifact write guard blocks windows /c drive cd prefix pattern', () => {
+    withTempGuardrailState(() => {
+      const result = checkBashArtifactWriteSafety('Bash', {
+        command:
+          'cd /c/dev/projects/agent-studio && node --test tests/lib/utils/safe-json-bounded-set.test.cjs',
+      });
+      if (process.platform === 'win32') {
+        assert.equal(result.action, 'block');
+        assert.match(result.message, /avoid `cd \/c\/\.\.\.` style prefixes/i);
+      } else {
+        assert.equal(result.action, 'allow');
+      }
+    });
+  });
+
+  test('windows bash guard still blocks /c drive prefix when artifact guard is off', () => {
+    withTempGuardrailState(() => {
+      process.env.AGENT_BASH_ARTIFACT_WRITE_GUARD = 'off';
+      process.env.AGENT_WINDOWS_BASH_GUARD = 'block';
+      const result = checkBashArtifactWriteSafety('Bash', {
+        command: 'cd /c/dev/projects/agent-studio && pnpm lint:fix',
+      });
+      if (process.platform === 'win32') {
+        assert.equal(result.action, 'block');
+        assert.match(result.message, /Windows-incompatible Bash heredoc\/tmp command blocked/i);
+      } else {
+        assert.ok(result.action === 'allow' || result.reason === 'disabled');
+      }
     });
   });
 });

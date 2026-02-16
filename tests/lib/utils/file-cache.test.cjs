@@ -61,7 +61,11 @@ describe('M13: File Cache Utility', () => {
 
     // Now should read fresh content from disk
     const content2 = cache.readFileSync(testFile);
-    assert.strictEqual(content2, 'modified content', 'Should return fresh content after TTL expires');
+    assert.strictEqual(
+      content2,
+      'modified content',
+      'Should return fresh content after TTL expires'
+    );
   });
 
   test('cache invalidation removes entry', () => {

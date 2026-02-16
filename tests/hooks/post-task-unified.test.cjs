@@ -297,6 +297,25 @@ describe('post-task-unified.cjs', () => {
         assert.strictEqual(unifiedHook.detectsCompletion({}), false);
       });
     });
+
+    describe('inferTaskOutputStatus', () => {
+      it('extracts completed status from object-shaped TaskOutput', () => {
+        const status = unifiedHook.inferTaskOutputStatus({
+          task: { status: 'completed' },
+        });
+        assert.strictEqual(status, 'completed');
+      });
+
+      it('extracts completed status from json string TaskOutput', () => {
+        const status = unifiedHook.inferTaskOutputStatus('{"status":"completed"}');
+        assert.strictEqual(status, 'completed');
+      });
+
+      it('returns null when TaskOutput has no status field', () => {
+        const status = unifiedHook.inferTaskOutputStatus({ message: 'waiting' });
+        assert.strictEqual(status, null);
+      });
+    });
   });
 
   describe('Task Completion Guard Enforcement', () => {

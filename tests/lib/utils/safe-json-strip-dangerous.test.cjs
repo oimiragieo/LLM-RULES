@@ -11,12 +11,14 @@ test('test top-level __proto__ stripped in fallback path', () => {
 
   // Check that Object.prototype wasn't polluted
   const testObj = {};
-  assert.strictEqual(testObj.isAdmin, undefined,
-    'Object.prototype should not be polluted by __proto__ injection');
+  assert.strictEqual(
+    testObj.isAdmin,
+    undefined,
+    'Object.prototype should not be polluted by __proto__ injection'
+  );
 
   // Result should not contain __proto__ key
-  assert.strictEqual(result.__proto__, undefined,
-    '__proto__ key should be stripped from result');
+  assert.strictEqual(result.__proto__, undefined, '__proto__ key should be stripped from result');
 });
 
 test('test nested __proto__ stripped recursively', () => {
@@ -26,13 +28,19 @@ test('test nested __proto__ stripped recursively', () => {
 
   // Check that Object.prototype wasn't polluted
   const testObj = {};
-  assert.strictEqual(testObj.isAdmin, undefined,
-    'Nested __proto__ should not pollute Object.prototype');
+  assert.strictEqual(
+    testObj.isAdmin,
+    undefined,
+    'Nested __proto__ should not pollute Object.prototype'
+  );
 
   // Check that data exists but __proto__ is stripped
   assert.ok(result.data !== undefined, 'data key should exist');
-  assert.strictEqual(result.data.__proto__, Object.prototype,
-    '__proto__ should reference Object.prototype, not be a data key');
+  assert.strictEqual(
+    result.data.__proto__,
+    Object.prototype,
+    '__proto__ should reference Object.prototype, not be a data key'
+  );
 });
 
 test('test deeply nested __proto__ stripped (3 levels)', () => {
@@ -42,8 +50,11 @@ test('test deeply nested __proto__ stripped (3 levels)', () => {
 
   // Check for pollution
   const testObj = {};
-  assert.strictEqual(testObj.x, undefined,
-    'Deeply nested __proto__ should not pollute Object.prototype');
+  assert.strictEqual(
+    testObj.x,
+    undefined,
+    'Deeply nested __proto__ should not pollute Object.prototype'
+  );
 
   // Verify structure exists but __proto__ is cleaned
   assert.ok(result.a !== undefined, 'Level 1 should exist');
@@ -57,14 +68,16 @@ test('test constructor key stripped recursively', () => {
 
   // Check for pollution via constructor
   const testObj = {};
-  assert.strictEqual(testObj.y, undefined,
-    'constructor.prototype pollution should be prevented');
+  assert.strictEqual(testObj.y, undefined, 'constructor.prototype pollution should be prevented');
 
   // data key should exist but constructor should be stripped
   assert.ok(result.data !== undefined, 'data key should exist');
   // constructor should be the normal Function.constructor, not a data key
-  assert.strictEqual(typeof result.data.constructor, 'function',
-    'constructor should be normal prototype chain, not polluted data');
+  assert.strictEqual(
+    typeof result.data.constructor,
+    'function',
+    'constructor should be normal prototype chain, not polluted data'
+  );
 });
 
 test('test array items sanitized recursively', () => {
@@ -87,19 +100,27 @@ test('test schema path deep copy also sanitized', () => {
   // Test with schema-allowed key containing nested __proto__
   const input = '{"allowedData":{"nested":{"__proto__":{"hack":true}}}}';
 
-  const result = safeParseJSON(input, 'router-state', {
-    allowedData: {
-      type: 'object',
-      required: true,
+  const result = safeParseJSON(
+    input,
+    'router-state',
+    {
+      allowedData: {
+        type: 'object',
+        required: true,
+      },
     },
-  }, {
-    allowedData: {},
-  });
+    {
+      allowedData: {},
+    }
+  );
 
   // Check for pollution after deep copy
   const testObj = {};
-  assert.strictEqual(testObj.hack, undefined,
-    'Schema-validated deep copy should also strip dangerous keys');
+  assert.strictEqual(
+    testObj.hack,
+    undefined,
+    'Schema-validated deep copy should also strip dangerous keys'
+  );
 
   // Verify structure
   assert.ok(result.allowedData !== undefined, 'allowedData should exist');

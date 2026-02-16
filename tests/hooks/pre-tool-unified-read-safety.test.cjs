@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 const { test, describe } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
@@ -21,6 +23,10 @@ describe('pre-tool-unified read safety', () => {
   const reflectionRuntimeDir = path.join(__dirname, '..', '..', '.claude', 'context', 'runtime');
   const reportsDir = path.join(__dirname, '..', '..', '.claude', 'context', 'reports');
   const defaultDirListingPath = path.join(reflectionRuntimeDir, 'read-safety-dir-listing.txt');
+  const blockedReadPlaceholderPath = path.join(
+    reflectionRuntimeDir,
+    'read-safety-blocked-read.txt'
+  );
   const reminderPath = path.join(reflectionRuntimeDir, 'reflection-reminder.txt');
   const spawnRequestPath = path.join(reflectionRuntimeDir, 'reflection-spawn-request.json');
   const integrationQueuePath = path.join(reflectionRuntimeDir, 'integration-queue.jsonl');
@@ -111,9 +117,10 @@ describe('pre-tool-unified read safety', () => {
         { file_path: tempDir },
         { permission_mode: 'bypassPermissions' }
       );
-      assert.strictEqual(result.action, 'block');
-      assert.ok(String(result.message || '').includes('[READ SAFETY][bypass]'));
-      assert.ok(String(result.message || '').includes('is a directory'));
+      assert.strictEqual(result.action, 'rewrite');
+      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+      assert.ok(String(result.bypassWarning || '').includes('is a directory'));
+      assert.ok(fs.existsSync(result.rewrittenToolInput.file_path));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -124,6 +131,40 @@ describe('pre-tool-unified read safety', () => {
     const result = checkReadSafety('Read', { file_path: missingPath });
     assert.strictEqual(result.action, 'block');
     assert.ok(String(result.message || '').includes('does not exist'));
+  });
+
+  test('checkReadSafety bypass rewrite uses alternate diagnostics file when default placeholder path is a directory', () => {
+    const missingPath = path.join(
+      os.tmpdir(),
+      `read-guard-missing-bypass-${Date.now()}`,
+      'missing.md'
+    );
+    withPathRestored(blockedReadPlaceholderPath, () => {
+      fs.mkdirSync(path.dirname(blockedReadPlaceholderPath), { recursive: true });
+      if (fs.existsSync(blockedReadPlaceholderPath)) {
+        fs.rmSync(blockedReadPlaceholderPath, { recursive: true, force: true });
+      }
+      fs.mkdirSync(blockedReadPlaceholderPath, { recursive: true });
+
+      const result = checkReadSafety(
+        'Read',
+        { file_path: missingPath },
+        { permission_mode: 'bypassPermissions' }
+      );
+      assert.strictEqual(result.action, 'rewrite');
+      const rewrittenPath = String(result.rewrittenToolInput?.file_path || '');
+      assert.ok(rewrittenPath.length > 0);
+      assert.ok(fs.existsSync(rewrittenPath));
+      assert.ok(!fs.statSync(rewrittenPath).isDirectory());
+
+      if (
+        rewrittenPath &&
+        rewrittenPath !== blockedReadPlaceholderPath &&
+        fs.existsSync(rewrittenPath)
+      ) {
+        fs.unlinkSync(rewrittenPath);
+      }
+    });
   });
 
   test('checkReadSafety suggests canonical path for known stale references', () => {
@@ -239,8 +280,10 @@ describe('pre-tool-unified read safety', () => {
         { file_path: filePath },
         { permission_mode: 'bypassPermissions' }
       );
-      assert.strictEqual(result.action, 'block');
-      assert.ok(String(result.message || '').includes('Direct Read on large file'));
+      assert.strictEqual(result.action, 'rewrite');
+      assert.strictEqual(result.rewrittenToolInput.offset, 0);
+      assert.strictEqual(result.rewrittenToolInput.limit, 4000);
+      assert.ok(String(result.bypassWarning || '').includes('Direct Read on large file'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -518,10 +561,27 @@ describe('pre-tool-unified read safety', () => {
         { permission_mode: 'bypassPermissions' }
       );
 
-      assert.strictEqual(result.action, 'block');
-      assert.ok(String(result.message || '').includes('[READ SAFETY][bypass]'));
+      assert.strictEqual(result.action, 'rewrite');
+      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+      assert.ok(fs.existsSync(result.rewrittenToolInput.file_path));
     });
     fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  test('checkReadSafety rewrites missing path to diagnostics file in bypass mode', () => {
+    const missingPath = path.join(
+      os.tmpdir(),
+      `read-guard-missing-bypass-${Date.now()}`,
+      'missing.md'
+    );
+    const result = checkReadSafety(
+      'Read',
+      { file_path: missingPath },
+      { permission_mode: 'bypassPermissions' }
+    );
+    assert.strictEqual(result.action, 'rewrite');
+    assert.ok(String(result.bypassWarning || '').includes('does not exist'));
+    assert.ok(fs.existsSync(result.rewrittenToolInput.file_path));
   });
 
   test('cleanupMemoryTempFiles removes stale .tmp artifacts but keeps normal files', () => {

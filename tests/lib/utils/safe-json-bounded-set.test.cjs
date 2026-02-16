@@ -8,7 +8,7 @@ test('test warnedSchemas Set does not exceed MAX_WARNED_SCHEMAS', () => {
   // Mock stderr to suppress warnings during test
   const originalStderr = process.stderr.write;
   let warnCount = 0;
-  process.stderr.write = function(chunk) {
+  process.stderr.write = function (chunk) {
     if (chunk.toString().includes('WARN')) warnCount++;
     return true;
   };
@@ -16,28 +16,38 @@ test('test warnedSchemas Set does not exceed MAX_WARNED_SCHEMAS', () => {
   try {
     // Call safeParseJSON 250 times with unique schema violations to fill the Set
     for (let i = 0; i < 250; i++) {
-      safeParseJSON('{"unexpected":"value"}', `test-schema-${i}`, {
-        expected: {
-          type: 'string',
-          required: true,
+      safeParseJSON(
+        '{"unexpected":"value"}',
+        `test-schema-${i}`,
+        {
+          expected: {
+            type: 'string',
+            required: true,
+          },
         },
-      }, {
-        expected: 'default',
-      });
+        {
+          expected: 'default',
+        }
+      );
     }
 
     // Reset warn count
     warnCount = 0;
 
     // Call with the first schema again - should warn because it was evicted (after 200 capacity)
-    safeParseJSON('{"unexpected":"value"}', 'test-schema-0', {
-      expected: {
-        type: 'string',
-        required: true,
+    safeParseJSON(
+      '{"unexpected":"value"}',
+      'test-schema-0',
+      {
+        expected: {
+          type: 'string',
+          required: true,
+        },
       },
-    }, {
-      expected: 'default',
-    });
+      {
+        expected: 'default',
+      }
+    );
 
     // Should have triggered a warning (key was evicted from bounded Set)
     assert.ok(warnCount > 0, 'After 250 calls, first key should be evicted and warn again');
@@ -49,7 +59,7 @@ test('test warnedSchemas Set does not exceed MAX_WARNED_SCHEMAS', () => {
 test('test FIFO eviction removes oldest entry', () => {
   const originalStderr = process.stderr.write;
   const warnings = [];
-  process.stderr.write = function(chunk) {
+  process.stderr.write = function (chunk) {
     warnings.push(chunk.toString());
     return true;
   };
@@ -57,27 +67,37 @@ test('test FIFO eviction removes oldest entry', () => {
   try {
     // Fill to capacity + 1
     for (let i = 0; i < 201; i++) {
-      safeParseJSON('{"bad":"data"}', `evict-test-${i}`, {
-        good: {
-          type: 'string',
-          required: true,
+      safeParseJSON(
+        '{"bad":"data"}',
+        `evict-test-${i}`,
+        {
+          good: {
+            type: 'string',
+            required: true,
+          },
         },
-      }, {
-        good: 'default',
-      });
+        {
+          good: 'default',
+        }
+      );
     }
 
     warnings.length = 0; // Clear
 
     // Call with first key again - should warn (was evicted)
-    safeParseJSON('{"bad":"data"}', 'evict-test-0', {
-      good: {
-        type: 'string',
-        required: true,
+    safeParseJSON(
+      '{"bad":"data"}',
+      'evict-test-0',
+      {
+        good: {
+          type: 'string',
+          required: true,
+        },
       },
-    }, {
-      good: 'default',
-    });
+      {
+        good: 'default',
+      }
+    );
 
     // Should have new warning for evict-test-0
     assert.ok(warnings.length > 0, 'Oldest key should be evicted after exceeding capacity');
@@ -91,7 +111,7 @@ test('test Set size remains bounded at exactly MAX_WARNED_SCHEMAS', () => {
   // After adding MAX_WARNED_SCHEMAS + 50 unique keys, the first 50 should be evicted
   const originalStderr = process.stderr.write;
   const warnKeys = new Set();
-  process.stderr.write = function(chunk) {
+  process.stderr.write = function (chunk) {
     const match = chunk.toString().match(/test-schema: (size-test-\d+)/);
     if (match) warnKeys.add(match[1]);
     return true;
@@ -100,28 +120,38 @@ test('test Set size remains bounded at exactly MAX_WARNED_SCHEMAS', () => {
   try {
     // Add 250 unique schema warnings (MAX is 200)
     for (let i = 0; i < 250; i++) {
-      safeParseJSON('{"x":"y"}', `size-test-${i}`, {
-        required: {
-          type: 'string',
-          required: true,
+      safeParseJSON(
+        '{"x":"y"}',
+        `size-test-${i}`,
+        {
+          required: {
+            type: 'string',
+            required: true,
+          },
         },
-      }, {
-        required: 'default',
-      });
+        {
+          required: 'default',
+        }
+      );
     }
 
     warnKeys.clear();
 
     // Test first 50 keys - all should warn again (evicted)
     for (let i = 0; i < 50; i++) {
-      safeParseJSON('{"x":"y"}', `size-test-${i}`, {
-        required: {
-          type: 'string',
-          required: true,
+      safeParseJSON(
+        '{"x":"y"}',
+        `size-test-${i}`,
+        {
+          required: {
+            type: 'string',
+            required: true,
+          },
         },
-      }, {
-        required: 'default',
-      });
+        {
+          required: 'default',
+        }
+      );
     }
 
     // Should have warnings for evicted keys
@@ -134,36 +164,49 @@ test('test Set size remains bounded at exactly MAX_WARNED_SCHEMAS', () => {
 test('test normal warning deduplication still works within capacity', () => {
   const originalStderr = process.stderr.write;
   let warnCount = 0;
-  process.stderr.write = function(chunk) {
+  process.stderr.write = function (chunk) {
     if (chunk.toString().includes('dedup-test')) warnCount++;
     return true;
   };
 
   try {
     // Call twice with same schema key
-    safeParseJSON('{"a":"b"}', 'dedup-test', {
-      c: {
-        type: 'string',
-        required: true,
+    safeParseJSON(
+      '{"a":"b"}',
+      'dedup-test',
+      {
+        c: {
+          type: 'string',
+          required: true,
+        },
       },
-    }, {
-      c: 'default',
-    });
+      {
+        c: 'default',
+      }
+    );
 
     const firstCount = warnCount;
 
-    safeParseJSON('{"a":"b"}', 'dedup-test', {
-      c: {
-        type: 'string',
-        required: true,
+    safeParseJSON(
+      '{"a":"b"}',
+      'dedup-test',
+      {
+        c: {
+          type: 'string',
+          required: true,
+        },
       },
-    }, {
-      c: 'default',
-    });
+      {
+        c: 'default',
+      }
+    );
 
     // Second call should NOT add warning (dedup works)
-    assert.strictEqual(warnCount, firstCount,
-      'Second call with same schema should not produce another warning (dedup works)');
+    assert.strictEqual(
+      warnCount,
+      firstCount,
+      'Second call with same schema should not produce another warning (dedup works)'
+    );
   } finally {
     process.stderr.write = originalStderr;
   }

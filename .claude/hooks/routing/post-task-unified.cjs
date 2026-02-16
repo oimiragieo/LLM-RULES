@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Unified PostToolUse(Task|TaskList) Hook
+ * Unified PostToolUse(Task|TaskList|TaskOutput) Hook
  */
 
 'use strict';
@@ -120,7 +120,7 @@ async function main() {
     }
 
     const toolName = getToolName(hookInput);
-    if (toolName !== 'Task' && toolName !== 'TaskList') {
+    if (toolName !== 'Task' && toolName !== 'TaskList' && toolName !== 'TaskOutput') {
       process.exit(0);
       return;
     }
@@ -138,6 +138,37 @@ async function main() {
       } catch (_err) {
         // Best-effort
       }
+      process.exit(0);
+      return;
+    }
+
+    if (toolName === 'TaskOutput') {
+      const toolInput = getToolInput(hookInput) || {};
+      const taskOutput = getToolOutput(hookInput);
+      const status = inferTaskOutputStatus(taskOutput);
+      const taskId = toolInput?.task_id || toolInput?.taskId || toolInput?.id || null;
+
+      if (taskId && status === 'completed') {
+        const hadMatchingCompleted = hasMatchingCompletedTaskUpdate(taskId);
+        try {
+          routerState.recordTaskUpdate(String(taskId), 'completed');
+        } catch (_trackErr) {
+          // Best-effort status reconciliation only.
+        }
+
+        if (!hadMatchingCompleted) {
+          synthesizeRecoveryTaskUpdate(
+            String(taskId),
+            'taskoutput_completed_without_taskupdate',
+            'Agent must call TaskUpdate({ taskId, status: "completed" }) before relying on TaskOutput.',
+            {
+              source: 'TaskOutput',
+              inferredStatus: 'completed',
+            }
+          );
+        }
+      }
+
       process.exit(0);
       return;
     }
@@ -235,6 +266,40 @@ if (require.main === module) {
   main();
 }
 
+function inferTaskOutputStatus(taskOutput) {
+  const normalize = value => {
+    if (!value || typeof value !== 'string') return null;
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return null;
+    return normalized;
+  };
+
+  if (taskOutput && typeof taskOutput === 'object') {
+    const candidates = [
+      taskOutput.status,
+      taskOutput.task_status,
+      taskOutput.state,
+      taskOutput.task?.status,
+      taskOutput.result?.status,
+      taskOutput.metadata?.status,
+    ];
+    for (const candidate of candidates) {
+      const normalized = normalize(candidate);
+      if (normalized) return normalized;
+    }
+    return null;
+  }
+
+  if (typeof taskOutput === 'string') {
+    const match = taskOutput.match(/"status"\s*:\s*"([^"]+)"/i);
+    if (match && match[1]) {
+      return normalize(match[1]);
+    }
+  }
+
+  return null;
+}
+
 module.exports = {
   main,
   PROJECT_ROOT,
@@ -267,4 +332,5 @@ module.exports = {
   getEvolutionState,
   EVOLUTION_STATE_PATH,
   AUDIT_LOG_PATH,
+  inferTaskOutputStatus,
 };

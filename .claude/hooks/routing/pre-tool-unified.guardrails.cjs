@@ -27,6 +27,7 @@ const AGENT_BASH_POLL_MAX_TRACKED_FILES = Number(
   process.env.AGENT_BASH_POLL_MAX_TRACKED_FILES || 20
 );
 const AGENT_BASH_ARTIFACT_WRITE_GUARD = 'AGENT_BASH_ARTIFACT_WRITE_GUARD';
+const AGENT_WINDOWS_BASH_GUARD = 'AGENT_WINDOWS_BASH_GUARD';
 const TASKUPDATE_FIRST_WINDOW_MS = Number(
   process.env.TASKUPDATE_FIRST_WINDOW_MS || 24 * 60 * 60 * 1000
 );
@@ -261,11 +262,45 @@ function isBashArtifactWriteCommand(command) {
   return /(?:^|[\s"'`\\/])\.claude[\\/]+context[\\/]+(?:reports|memory)[\\/]/i.test(command);
 }
 
+function isWindowsIncompatibleBashCommand(command) {
+  if (!command || typeof command !== 'string') return false;
+  if (process.platform !== 'win32') return false;
+  const usesHeredoc = /<<\s*['"]?[A-Z0-9_-]+['"]?/i.test(command);
+  const writesUnixTmp = /(?:^|\s)(?:cat|tee)\s*(?:>|>>).*\/tmp\//i.test(command);
+  const readsUnixTmp = /(?:^|\s)cat\s+\/tmp\//i.test(command);
+  const unixDriveCdPrefix = /(?:^|&&|\|\|)\s*cd\s+\/[a-zA-Z]\//i.test(command);
+  return usesHeredoc || writesUnixTmp || readsUnixTmp || unixDriveCdPrefix;
+}
+
+function evaluateWindowsBashGuard(command) {
+  const mode = (process.env[AGENT_WINDOWS_BASH_GUARD] || 'block').toLowerCase();
+  if (mode === 'off') {
+    return { checked: false, reason: 'disabled' };
+  }
+  if (!isWindowsIncompatibleBashCommand(command)) {
+    return { checked: true, action: 'allow' };
+  }
+  const message =
+    '[AGENT-GUARDRAIL] Windows-incompatible Bash heredoc/tmp command blocked. ' +
+    'Use Write/Edit tools for artifact content, avoid `cd /c/...` style prefixes, and use a Windows-safe Bash/PowerShell command.';
+  if (mode === 'warn') {
+    return { checked: true, action: 'allow', warning: message };
+  }
+  return { checked: true, action: 'block', message };
+}
+
 function checkBashArtifactWriteSafety(toolName, toolInput) {
   if (toolName !== 'Bash') return { checked: false, reason: 'not_bash' };
+  const command = getBashCommand(toolInput);
+  const windowsGuardResult = evaluateWindowsBashGuard(command);
+  if (windowsGuardResult.action === 'block') {
+    return windowsGuardResult;
+  }
+  if (windowsGuardResult.warning) {
+    return windowsGuardResult;
+  }
   const mode = (process.env[AGENT_BASH_ARTIFACT_WRITE_GUARD] || 'block').toLowerCase();
   if (mode === 'off') return { checked: false, reason: 'disabled' };
-  const command = getBashCommand(toolInput);
   if (!isBashArtifactWriteCommand(command)) return { checked: true, action: 'allow' };
   const message =
     '[AGENT-GUARDRAIL] Bash redirection/heredoc to project artifact paths is blocked. ' +
@@ -322,6 +357,13 @@ function checkAgentGuardrails(
 
   if (toolName === 'Bash') {
     const command = getBashCommand(toolInput);
+    const windowsGuardResult = evaluateWindowsBashGuard(command);
+    if (windowsGuardResult.action === 'block') {
+      return windowsGuardResult;
+    }
+    if (windowsGuardResult.warning) {
+      return windowsGuardResult;
+    }
     const artifactWriteMode = (
       process.env[AGENT_BASH_ARTIFACT_WRITE_GUARD] || 'block'
     ).toLowerCase();

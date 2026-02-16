@@ -284,7 +284,7 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
     routerState.invalidateStateCache();
     routingGuard.invalidateCachedState();
 
-    const result = routingGuard.checkTaskListFirstGate('Edit');
+    const result = routingGuard.checkTaskListFirstGate('Edit', { task_id: 'test-agent-task' });
     assert.strictEqual(result.pass, true, 'Should pass in agent mode');
   });
 

@@ -208,7 +208,7 @@
         ]
       },
       {
-        "matcher": "Task|TaskList",
+        "matcher": "Task|TaskList|TaskOutput",
         "hooks": [
           {
             "type": "command",

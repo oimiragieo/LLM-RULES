@@ -60,6 +60,7 @@ describe('pre-task-unified ownership guard', () => {
     process.env.PLANNER_FIRST_ENFORCEMENT = 'off';
     process.env.SECURITY_REVIEW_ENFORCEMENT = 'off';
     process.env.LOOP_PREVENTION_MODE = 'off';
+    process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
     process.env.TASK_OWNERSHIP_GUARD = 'block';
     process.env.TASK_PARALLEL_OWNERSHIP_REQUIRED = 'block';
   });

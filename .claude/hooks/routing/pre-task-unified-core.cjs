@@ -28,9 +28,6 @@ const TOOL_GOVERNANCE_STATE_FILE = path.join(
   'runtime',
   'tool-governance-state.json'
 );
-const TASK_REQUIRE_CORE_MEMORY_READ = String(process.env.TASK_REQUIRE_CORE_MEMORY_READ || 'on')
-  .trim()
-  .toLowerCase();
 const CORE_MEMORY_READ_WINDOW_MS = Number(process.env.CORE_MEMORY_READ_WINDOW_MS || 60 * 60 * 1000);
 
 const {
@@ -132,7 +129,10 @@ function checkAgentContextPreTracker(hookInput) {
 }
 
 function checkCoreMemoryReadBeforeTask(hookInput) {
-  if (TASK_REQUIRE_CORE_MEMORY_READ === 'off') {
+  const memReadMode = String(process.env.TASK_REQUIRE_CORE_MEMORY_READ || 'on')
+    .trim()
+    .toLowerCase();
+  if (memReadMode === 'off') {
     return { pass: true };
   }
 

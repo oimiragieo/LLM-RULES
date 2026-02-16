@@ -1288,6 +1288,119 @@
       ],
       "extracted_from": "Task #13 Reflection - Code Review to Fix Cycle, code-review-2026-02-13.md",
       "date": "2026-02-13"
+    },
+    {
+      "id": "non-blocking-guardrail-enforcement-pattern",
+      "name": "Non-Blocking Guardrail Enforcement Pattern",
+      "context": "Router Guardrail Hardening (Task #2 Reflection, 2026-02-15) - Framework guardrails with flexible enforcement modes",
+      "description": "Router guardrails (Gates 1-5) block invalid operations without blocking valid operations. Implementation uses enforcement modes (block/warn/off) providing flexibility for gradual rollout. Pattern: (1) Gate triggers on specific condition, (2) Enforcement mode provides flexibility, (3) Error message directs remediation. Enables framework evolution without breaking existing systems.",
+      "why_it_works": "Enforcement modes allow opt-out during transition periods while still protecting against critical violations. Gates validate upstream of costly operations (task spawning, code modification).",
+      "key_elements": [
+        "Specific gate triggers (e.g., multi-step task without planner)",
+        "Flexible enforcement modes (block/warn/off)",
+        "Contextual error messages directing remediation",
+        "Existing hook infrastructure (no new complexity)"
+      ],
+      "examples": [
+        "Gate 1 (Complexity): Multi-step task without planner → Enforce: block (blocks incomplete planning)",
+        "Gate 5 (Architect Review): code-simplifier without architect → Enforce: warn (allows risky operations with visibility)"
+      ],
+      "applicability": "Any safety constraint needing gradual rollout or optional enforcement. Useful for backward compatibility during refactoring.",
+      "benefits": [
+        "Safety constraints enforced without blocking valid operations",
+        "Flexible enforcement modes support transition periods",
+        "Existing hook infrastructure prevents framework complexity",
+        "Clear error messages drive correct behavior"
+      ],
+      "anti_patterns": [
+        "All-or-nothing enforcement (no warn mode → breaks existing systems)",
+        "Unclear error messages (users don't know how to remediate)",
+        "New hook infrastructure (adds framework complexity)",
+        "Silent enforcement (violations not logged)"
+      ],
+      "test_evidence": "ADR-105 Router Enforcement Hardening: 124 tests, 100% pass rate, zero downstream regressions",
+      "extracted_from": "Task #2 Reflection - Framework Guardrails Hardening, reflection-2026-02-15.md",
+      "date": "2026-02-15"
+    },
+    {
+      "id": "ownership-transfer-via-metadata-pattern",
+      "name": "Ownership Transfer via Metadata for Multi-Phase Workflows",
+      "context": "Microtask Ownership Contracts (Task #2 Reflection, 2026-02-15) - Creator/updater alignment in multi-phase artifact creation",
+      "description": "Microtask metadata enables explicit ownership transfer (creator → implementer) via TaskUpdate metadata fields. Pattern: (1) Creator task includes created_by/artifact_path, (2) Implementer task references creator task ID, (3) Updater changes owned_by to reflect responsibility, (4) Post-completion validation verifies ownership chain. Scales to any multi-phase artifact creation workflow (creation → implementation → review → deployment).",
+      "why_it_works": "Explicit ownership prevents confusion about who is responsible for each phase. Metadata-based tracking survives context resets (persisted in TaskUpdate payloads).",
+      "key_elements": [
+        "Creator task metadata: created_by, artifact_path, artifact_type",
+        "Implementer task metadata: references creator task ID",
+        "Ownership updates: owned_by field changes with responsibility",
+        "Post-completion validation: verify ownership chain integrity"
+      ],
+      "examples": [
+        "Skill Creation: skill-creator → Task A (created_by: skill-creator) → developer → Task B (owned_by: developer, references: Task A) → qa → Task C (owned_by: qa)"
+      ],
+      "applicability": "Multi-phase artifact creation workflows. Especially useful for: artifact creation, feature development, security hardening, refactoring initiatives.",
+      "benefits": [
+        "Clear responsibility boundaries across phases",
+        "Ownership chain traceable via task metadata",
+        "Scales from 2-phase to N-phase workflows",
+        "Prevents duplicate work (only owner can update)"
+      ],
+      "anti_patterns": [
+        "Shared ownership (multiple agents updating same artifact)",
+        "Implicit ownership (metadata not updated with responsibility transfer)",
+        "No validation (broken ownership chains not detected)",
+        "Lost context (ownership unclear after context reset)"
+      ],
+      "test_evidence": "ADR-120 implementation: 23 circular dependencies resolved via ownership transfer, creator/updater alignment validated",
+      "extracted_from": "Task #2 Reflection - Guardrails Hardening, microtask contract analysis",
+      "date": "2026-02-15"
+    },
+    {
+      "id": "anti-pattern-removal-deprecation-cycle",
+      "name": "Anti-Pattern Removal via Deprecation Cycle",
+      "context": "TaskOutput Polling Removal (Task #2 Reflection, 2026-02-15) - Systematic elimination of unbounded blocking loops",
+      "description": "Anti-patterns (like TaskOutput polling: unbounded blocking loops) removed via structured deprecation cycle: (1) Document anti-pattern with impact analysis, (2) Implement alternative pattern, (3) Enforce via hook (block anti-pattern in new code), (4) Migrate downstream (update existing code). Enables framework evolution without breaking existing systems.",
+      "why_it_works": "Structured deprecation prevents incomplete transitions. Enforcement hook prevents new violations while migration handles existing code.",
+      "phases": [
+        {
+          "phase": 1,
+          "name": "Document",
+          "action": "Identify anti-pattern, quantify impact (e.g., TaskOutput polling unbounded latency)"
+        },
+        {
+          "phase": 2,
+          "name": "Implement Alternative",
+          "action": "TaskList polling pattern (non-blocking agent coordination)"
+        },
+        {
+          "phase": 3,
+          "name": "Enforce",
+          "action": "Hook blocks TaskOutput registration in new code"
+        },
+        {
+          "phase": 4,
+          "name": "Migrate",
+          "action": "Update agents/workflows using TaskOutput → TaskList"
+        }
+      ],
+      "examples": [
+        "TaskOutput polling: unbounded blocking loops on status checks → Replace with TaskList polling (bounded iteration)"
+      ],
+      "applicability": "Any framework anti-pattern needing removal without breaking existing systems. Useful for: performance improvements, security hardening, API modernization.",
+      "benefits": [
+        "Clear deprecation path prevents confusion",
+        "Enforcement hook prevents regressions",
+        "Allows parallel migration (not blocking)",
+        "Measurable progress (migrate count → 0)"
+      ],
+      "anti_patterns": [
+        "Abrupt removal (breaks existing code)",
+        "No alternative pattern (forces workarounds)",
+        "No enforcement (regressions reintroduce anti-pattern)",
+        "No migration guidance (downstream users blocked)"
+      ],
+      "test_evidence": "Commit 9d8360d4: TaskOutput polling removed from critical path, Router guardrails hardened, all tests passing",
+      "extracted_from": "Task #2 Reflection - Guardrails Hardening, anti-pattern analysis",
+      "date": "2026-02-15"
     }
   ]
 }

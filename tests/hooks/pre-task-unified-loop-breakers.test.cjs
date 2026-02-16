@@ -284,6 +284,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       process.env.PLANNER_FIRST_ENFORCEMENT = 'off';
       process.env.SECURITY_REVIEW_ENFORCEMENT = 'off';
       process.env.LOOP_PREVENTION_MODE = 'off';
+      process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
 
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',

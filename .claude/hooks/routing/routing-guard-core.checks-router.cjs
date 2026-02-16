@@ -82,41 +82,18 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
       pass: false,
       result: 'block',
       message:
-        '[ROUTER BASH GUARD][bypass] Blocked brittle sleep+cat polling command. ' +
+        '[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER BASH GUARD][bypass] Blocked brittle sleep+cat polling command. ' +
         'Use Read with offset/limit against a concrete file path instead.',
     };
   }
   if (isBypassPermissions) {
-    return {
-      pass: true,
-      result: 'warn',
-      message:
-        '[ROUTER BASH GUARD][bypass] Allowing Bash command in bypassPermissions mode. ' +
-        'Use Task() delegation for stronger separation when possible.',
-    };
-  }
-
-  const isReadOnlyDiscoveryCommand = (() => {
-    if (!command || typeof command !== 'string') return false;
-    const trimmed = command.trim();
-    if (!trimmed) return false;
-    if (/[>]{1,2}\s*[^|]/.test(trimmed)) return false;
-    if (/\b(rm|mv|cp|chmod|chown|sudo|ssh|scp|curl|wget|python|node|perl)\b/i.test(trimmed)) {
-      return false;
+    const message =
+      '[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER BASH GUARD][bypass] Direct Bash is not allowed in router mode, even with bypassPermissions. ' +
+      'Use whitelisted git discovery commands only, or delegate via Task() to a specialist agent.';
+    if (isWhitelistedBashCommand(command)) {
+      return { pass: true, result: 'warn', message };
     }
-    return /^(find|ls|du|wc|grep|rg|cat|head|tail|stat|sort|uniq|comm|basename|dirname)\b/i.test(
-      trimmed
-    );
-  })();
-
-  if (isBypassPermissions && isReadOnlyDiscoveryCommand) {
-    return {
-      pass: true,
-      result: 'warn',
-      message:
-        '[ROUTER BASH GUARD][bypass] Allowing read-only discovery command in bypassPermissions mode. ' +
-        'Prefer Task() delegation for non-trivial analysis.',
-    };
+    return { pass: false, result: 'block', message };
   }
 
   if (isWhitelistedBashCommand(command)) {
@@ -127,8 +104,8 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
   const dedupe = registerBlockAttempt('router-bash-check', toolName, hookInput);
   const violationTitle =
     enforcement === 'block'
-      ? 'ROUTER BASH VIOLATION BLOCKED (ADR-030)'
-      : 'ROUTER BASH VIOLATION WARNED (ADR-030)';
+      ? 'ROUTER-FIRST PROTOCOL VIOLATION | ROUTER BASH VIOLATION BLOCKED (ADR-030)'
+      : 'ROUTER-FIRST PROTOCOL VIOLATION | ROUTER BASH VIOLATION WARNED (ADR-030)';
   if (dedupe.dedupe) {
     const fallback =
       "Task({ task_id: 'task-1', subagent_type: 'general-purpose', description: 'Run bash command safely', prompt: 'Use Bash for the required command and report results.' })";
@@ -253,11 +230,29 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
     hookInput?.permission_mode || hookInput?.permissionMode || ''
   ).toLowerCase();
   const isBypassPermissions = permissionMode === 'bypasspermissions';
+  if (isBypassPermissions && toolName === 'WebSearch') {
+    const dedupe = registerBlockAttempt('router-bypass-websearch', toolName, hookInput);
+    if (dedupe.dedupe) {
+      return {
+        pass: false,
+        result: 'block',
+        message:
+          `[ROUTER SELF-CHECK BYPASS] Repeated WebSearch in bypassPermissions mode (${dedupe.count}x) is blocked to prevent loops. ` +
+          'Spawn a researcher/planner via Task() for external research.',
+      };
+    }
+    return {
+      pass: true,
+      result: 'warn',
+      message:
+        '[ROUTER SELF-CHECK BYPASS] Allowing one WebSearch in bypassPermissions mode. ' +
+        'Do not loop WebSearch; spawn a researcher/planner via Task() if more research is needed.',
+    };
+  }
   if (
     isBypassPermissions &&
     (toolName === 'Glob' ||
       toolName === 'Grep' ||
-      toolName === 'WebSearch' ||
       toolName === 'Write' ||
       toolName === 'Edit' ||
       toolName === 'NotebookEdit')
@@ -327,7 +322,7 @@ function checkRouterReadGovernance(toolName, toolInput = {}) {
   }
 
   const message =
-    '[ROUTER READ GOVERNANCE] Unwindowed Read blocked in router mode. ' +
+    '[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER READ GOVERNANCE] Unwindowed Read blocked in router mode. ' +
     'Run hybrid search first (`pnpm search:code`), then use Read with offset/limit. ' +
     'If context pressure is high, invoke token-saver-context-compression before large reads.';
 
@@ -365,7 +360,7 @@ function checkRouterWrite(toolName, toolInput) {
   }
 
   const fileName = filePath ? path.basename(filePath) : 'unknown';
-  const message = `[ROUTER WRITE BLOCKED] Tool: ${toolName}, File: ${fileName}
+  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER WRITE BLOCKED] Tool: ${toolName}, File: ${fileName}
 The Router cannot directly edit files. Spawn an agent using the Task tool.`;
 
   if (enforcement === 'block') {

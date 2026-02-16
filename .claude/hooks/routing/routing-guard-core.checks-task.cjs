@@ -62,7 +62,7 @@ function checkPlannerFirst(toolName, toolInput) {
   }
 
   const complexity = state.complexity || 'unknown';
-  const message = `[PLANNER-FIRST VIOLATION] Complexity=${complexity}. Spawn PLANNER first via Task().`;
+  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][PLANNER-FIRST VIOLATION] Complexity=${complexity}. Spawn PLANNER first via Task().`;
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -98,12 +98,12 @@ function checkTaskCreate(toolName, hookInput = null) {
   const dedupe = registerBlockAttempt('task-create-guard', toolName, hookInput);
   const message = dedupe.dedupe
     ? compactFallbackMessage(
-        'TASK-CREATE VIOLATION',
+        'ROUTER-FIRST PROTOCOL VIOLATION | TASK-CREATE VIOLATION',
         toolName,
         dedupe.count,
         'Spawn PLANNER via Task() before creating additional tasks.'
       )
-    : `[TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER first.`;
+    : `[ROUTER-FIRST PROTOCOL VIOLATION][TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER first.`;
 
   if (enforcement === 'block' && !dedupe.dedupe) {
     return { pass: false, result: 'block', message };
@@ -135,7 +135,7 @@ function checkSecurityReview(toolName, toolInput) {
     return { pass: true };
   }
 
-  const message = `[SEC-004] Security review required before implementation.
+  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][SEC-004] Security review required before implementation.
 Spawn SECURITY-ARCHITECT first to review security implications.`;
 
   if (enforcement === 'block') {
@@ -300,12 +300,12 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
   const isReadOnlyDiscoveryTool = toolName === 'Glob' || toolName === 'Grep';
   const message = dedupe.dedupe
     ? compactFallbackMessage(
-        'TASKLIST-FIRST VIOLATION',
+        'ROUTER-FIRST PROTOCOL VIOLATION | TASKLIST-FIRST VIOLATION',
         toolName,
         dedupe.count,
         'TaskList() once, then continue with Task()/tool call'
       )
-    : `[TASKLIST-FIRST VIOLATION] Router must call TaskList() before using ${toolName}.
+    : `[ROUTER-FIRST PROTOCOL VIOLATION][TASKLIST-FIRST VIOLATION] Router must call TaskList() before using ${toolName}.
 Call TaskList() first to check existing tasks, then proceed with your operation.`;
 
   const tracker = getViolationTracker();
@@ -386,6 +386,7 @@ function checkCreatorIntentGuard(toolName, toolInput = {}) {
 
   const message = `
 +======================================================================+
+|  ROUTER-FIRST PROTOCOL VIOLATION                                     |
 |  CREATOR ROUTING VIOLATION                                           |
 +======================================================================+
 |  Creator intent detected: ${creatorType.padEnd(40)}|

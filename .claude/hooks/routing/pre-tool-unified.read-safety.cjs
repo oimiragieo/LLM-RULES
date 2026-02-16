@@ -55,7 +55,15 @@ const READ_DIR_LISTING_PATH = path.join(
   'runtime',
   'read-safety-dir-listing.txt'
 );
+const READ_BLOCKED_TARGET_PLACEHOLDER_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'read-safety-blocked-read.txt'
+);
 const READ_DIR_LISTING_MAX_ATTEMPTS = 5;
+const READ_BLOCKED_PLACEHOLDER_MAX_ATTEMPTS = 5;
 const SEARCH_EVIDENCE_PATTERNS = [
   /\bpnpm\s+search:code\b/i,
   /\bhybrid-search\b/i,
@@ -433,6 +441,68 @@ function createDirectoryListingFile(targetDir) {
   }
 }
 
+function createBlockedReadPlaceholder(targetPath, reason) {
+  try {
+    ensureDir(path.dirname(READ_BLOCKED_TARGET_PLACEHOLDER_PATH));
+    const relativeTarget = path.relative(PROJECT_ROOT, targetPath || '').replace(/\\/g, '/');
+    const lines = [
+      '# Read Safety Blocked Target',
+      '',
+      `Requested path: ${relativeTarget || String(targetPath || '(unknown)')}`,
+      `Reason: ${reason}`,
+      '',
+      'Use Glob or pnpm search:code to discover a valid file path, then retry Read with offset/limit.',
+      '',
+    ];
+
+    for (let attempt = 0; attempt < READ_BLOCKED_PLACEHOLDER_MAX_ATTEMPTS; attempt += 1) {
+      const candidatePath =
+        attempt === 0
+          ? READ_BLOCKED_TARGET_PLACEHOLDER_PATH
+          : path.join(
+              path.dirname(READ_BLOCKED_TARGET_PLACEHOLDER_PATH),
+              `read-safety-blocked-read-${process.pid}-${Date.now()}-${attempt}.txt`
+            );
+
+      try {
+        if (fs.existsSync(candidatePath)) {
+          const existingStats = fs.statSync(candidatePath);
+          if (existingStats.isDirectory()) {
+            continue;
+          }
+        }
+
+        fs.writeFileSync(candidatePath, lines.join('\n'), 'utf8');
+        if (!fs.existsSync(candidatePath)) {
+          continue;
+        }
+        const writtenStats = fs.statSync(candidatePath);
+        if (!writtenStats.isDirectory() && writtenStats.size > 0) {
+          return candidatePath;
+        }
+      } catch (_candidateErr) {
+        // Try next candidate file.
+      }
+    }
+    // Last-resort diagnostics fallback.
+    try {
+      const emergencyPath = path.join(
+        os.tmpdir(),
+        `claude-read-safety-blocked-${process.pid}-${Date.now()}.txt`
+      );
+      fs.writeFileSync(emergencyPath, lines.join('\n'), 'utf8');
+      if (fs.existsSync(emergencyPath) && fs.statSync(emergencyPath).isFile()) {
+        return emergencyPath;
+      }
+    } catch (_emergencyErr) {
+      // Fall through to null.
+    }
+    return null;
+  } catch (_err) {
+    return null;
+  }
+}
+
 function checkReadSafety(toolName, toolInput, hookInput = null) {
   recordToolGovernanceEvidence(toolName, toolInput, hookInput);
 
@@ -489,6 +559,27 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       const suggestionText = suggestedPath
         ? ` Did you mean "${path.join(PROJECT_ROOT, suggestedPath)}"?`
         : '';
+      if (isBypassPermissionsMode(hookInput)) {
+        const placeholderPath = createBlockedReadPlaceholder(
+          targetPath,
+          'target path does not exist'
+        );
+        if (placeholderPath) {
+          return {
+            checked: true,
+            action: 'rewrite',
+            rewrittenToolInput: {
+              ...toolInput,
+              file_path: placeholderPath,
+              offset: 0,
+              limit: getReadSafetyAutoWindowLimit(),
+            },
+            bypassWarning:
+              `[READ SAFETY][bypass] "${targetPath}" does not exist. Rewriting Read to diagnostics file ` +
+              `"${placeholderPath}" to prevent host Read failure.${suggestionText}`,
+          };
+        }
+      }
       return {
         checked: true,
         action: 'block',
@@ -508,6 +599,24 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       isProjectFile && !hasReadWindow(toolInput) && stats.size > READ_REQUIRE_SEARCH_FIRST_BYTES;
 
     if (stats.isDirectory()) {
+      if (isBypassPermissionsMode(hookInput)) {
+        const listingPath = createDirectoryListingFile(targetPath);
+        if (listingPath) {
+          return {
+            checked: true,
+            action: 'rewrite',
+            rewrittenToolInput: {
+              ...toolInput,
+              file_path: listingPath,
+              offset: 0,
+              limit: getReadSafetyAutoWindowLimit(),
+            },
+            bypassWarning:
+              `[READ SAFETY][bypass] "${targetPath}" is a directory. Rewrote Read to ` +
+              `generated directory listing "${listingPath}".`,
+          };
+        }
+      }
       return {
         checked: true,
         action: 'block',
@@ -522,6 +631,21 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       stats.size > READ_CHUNK_GUARD_BYTES &&
       !hasReadWindow(toolInput)
     ) {
+      if (isBypassPermissionsMode(hookInput) && isReadSafetyAutoWindowEnabled()) {
+        const limit = getReadSafetyAutoWindowLimit();
+        return {
+          checked: true,
+          action: 'rewrite',
+          rewrittenToolInput: {
+            ...toolInput,
+            offset: 0,
+            limit,
+          },
+          bypassWarning:
+            `[READ SAFETY][bypass] Direct Read on large file (${stats.size} bytes) was blocked by policy. ` +
+            `Auto-windowed to offset=0, limit=${limit} to avoid oversized host read.`,
+        };
+      }
       return {
         checked: true,
         action: 'block',
@@ -536,6 +660,21 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     if (strictSearchEnabled && shouldGateLargeDirectRead) {
       const governance = getSessionGovernanceSnapshot(hookInput);
       if (!governance.hasRecentSearch) {
+        if (isBypassPermissionsMode(hookInput) && isReadSafetyAutoWindowEnabled()) {
+          const limit = getReadSafetyAutoWindowLimit();
+          return {
+            checked: true,
+            action: 'rewrite',
+            rewrittenToolInput: {
+              ...toolInput,
+              offset: 0,
+              limit,
+            },
+            bypassWarning:
+              `[READ SAFETY][bypass] Missing search evidence for large direct Read (${stats.size} bytes). ` +
+              `Auto-windowed to offset=0, limit=${limit}. Run \`pnpm search:code "<query>"\` before next large Read.`,
+          };
+        }
         return {
           checked: true,
           action: 'block',
@@ -550,6 +689,21 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
         isContextPressureHigh(hookInput) &&
         !governance.hasRecentTokenSaver
       ) {
+        if (isBypassPermissionsMode(hookInput) && isReadSafetyAutoWindowEnabled()) {
+          const limit = getReadSafetyAutoWindowLimit();
+          return {
+            checked: true,
+            action: 'rewrite',
+            rewrittenToolInput: {
+              ...toolInput,
+              offset: 0,
+              limit,
+            },
+            bypassWarning:
+              '[READ SAFETY][bypass] Context pressure is high and token-saver evidence is missing. ' +
+              `Auto-windowed to offset=0, limit=${limit}; run token-saver-context-compression before more large Reads.`,
+          };
+        }
         return {
           checked: true,
           action: 'block',

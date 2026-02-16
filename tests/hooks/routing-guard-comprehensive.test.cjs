@@ -443,7 +443,7 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
     const first = routingGuard.runAllChecks(
       'TaskCreate',
       {},
-      { session_id: 'hook-session-taskcreate' }
+      { session_id: sessionId }
     );
     assert.equal(first.pass, false);
     assert.equal(first.result, 'block');
@@ -451,7 +451,7 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
     const second = routingGuard.runAllChecks(
       'TaskCreate',
       {},
-      { session_id: 'hook-session-taskcreate' }
+      { session_id: sessionId }
     );
     assert.equal(second.pass, true);
     assert.equal(second.result, 'allow');
@@ -464,6 +464,31 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
     if (prevSessionId !== undefined) {
       process.env.CLAUDE_SESSION_ID = prevSessionId;
     }
+  });
+
+  it('should allow one bypass WebSearch then block repeated bypass WebSearch calls', () => {
+    process.env.ROUTER_SELF_CHECK = 'block';
+    process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
+    process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
+    process.env.CLAUDE_SESSION_ID = `test-session-bypass-websearch-${Date.now()}`;
+
+    const first = routingGuard.checkRouterSelfCheck(
+      'WebSearch',
+      { query: 'agent framework issues' },
+      { permission_mode: 'bypassPermissions' }
+    );
+    assert.equal(first.pass, true);
+    assert.equal(first.result, 'warn');
+    assert.match(first.message, /Allowing one WebSearch/i);
+
+    const second = routingGuard.checkRouterSelfCheck(
+      'WebSearch',
+      { query: 'agent framework issues' },
+      { permission_mode: 'bypassPermissions' }
+    );
+    assert.equal(second.pass, false);
+    assert.equal(second.result, 'block');
+    assert.match(second.message, /Repeated WebSearch/i);
   });
 });
 
@@ -572,3 +597,4 @@ describe('routing-guard.cjs - Check 4: Security Review Enforcement', () => {
     assert.equal(result.markSecurity, true);
   });
 });
+    const sessionId = `hook-session-taskcreate-${Date.now()}-${Math.floor(Math.random() * 10000)}`;

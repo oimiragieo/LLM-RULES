@@ -10,31 +10,44 @@ test('test structuredClone used for nested object deep copy', () => {
   const input = JSON.stringify({ nested: { data: { value: 42 } } });
 
   // Parse with schema that expects the nested structure
-  const result = safeParseJSON(input, 'test-schema', {
-    nested: {
-      type: 'object',
-      required: true,
+  const result = safeParseJSON(
+    input,
+    'test-schema',
+    {
+      nested: {
+        type: 'object',
+        required: true,
+      },
     },
-  }, {
-    nested: { data: { value: 0 } },
-  });
+    {
+      nested: { data: { value: 0 } },
+    }
+  );
 
   // Modify the original nested object
   result.nested.data.modifiedField = 'added';
 
   // Re-parse the same input
-  const result2 = safeParseJSON(input, 'test-schema', {
-    nested: {
-      type: 'object',
-      required: true,
+  const result2 = safeParseJSON(
+    input,
+    'test-schema',
+    {
+      nested: {
+        type: 'object',
+        required: true,
+      },
     },
-  }, {
-    nested: { data: { value: 0 } },
-  });
+    {
+      nested: { data: { value: 0 } },
+    }
+  );
 
   // The second result should NOT have the modification from result
-  assert.strictEqual(result2.nested.data.modifiedField, undefined,
-    'Deep copy should prevent mutations from affecting subsequent parses');
+  assert.strictEqual(
+    result2.nested.data.modifiedField,
+    undefined,
+    'Deep copy should prevent mutations from affecting subsequent parses'
+  );
 });
 
 test('test circular reference does not silently replace with defaults', () => {
@@ -46,18 +59,26 @@ test('test circular reference does not silently replace with defaults', () => {
   // Current code would catch JSON.stringify error and silently use defaults
   const input = JSON.stringify({ data: { a: 1 } }); // Can't stringify circular, so use similar structure
 
-  const result = safeParseJSON(input, 'test-schema', {
-    data: {
-      type: 'object',
-      required: true,
+  const result = safeParseJSON(
+    input,
+    'test-schema',
+    {
+      data: {
+        type: 'object',
+        required: true,
+      },
     },
-  }, {
-    data: { a: 999 }, // Default value
-  });
+    {
+      data: { a: 999 }, // Default value
+    }
+  );
 
   // Result should preserve original value, NOT default (999)
-  assert.strictEqual(result.data.a, 1,
-    'Circular reference fallback should preserve original data, not silently default');
+  assert.strictEqual(
+    result.data.a,
+    1,
+    'Circular reference fallback should preserve original data, not silently default'
+  );
 });
 
 test('test Date objects preserved in deep copy', () => {
@@ -76,8 +97,11 @@ test('test Date objects preserved in deep copy', () => {
   // This test demonstrates the limitation. safeParseJSON only receives JSON strings from callers,
   // so Date preservation is not applicable. The structuredClone in safeParseJSON is for nested
   // objects already parsed from JSON (which never contain Date objects, only primitives/objects/arrays).
-  assert.strictEqual(typeof deepCopied.timestamp, 'string',
-    'JSON roundtrip converts Date to ISO string - this is expected JSON.parse/stringify behavior');
+  assert.strictEqual(
+    typeof deepCopied.timestamp,
+    'string',
+    'JSON roundtrip converts Date to ISO string - this is expected JSON.parse/stringify behavior'
+  );
 });
 
 test('test undefined values in arrays not stripped', () => {
@@ -93,15 +117,18 @@ test('test undefined values in arrays not stripped', () => {
 
   // This test expects structuredClone to preserve undefined (will fail currently)
   const structuredCopied = structuredClone(arr);
-  assert.strictEqual(structuredCopied[1], undefined,
-    'structuredClone should preserve undefined in arrays');
+  assert.strictEqual(
+    structuredCopied[1],
+    undefined,
+    'structuredClone should preserve undefined in arrays'
+  );
 });
 
 test('test error logged to stderr when deep copy fails', () => {
   // Mock stderr to capture output
   const originalStderr = process.stderr.write;
   let stderrOutput = '';
-  process.stderr.write = function(chunk) {
+  process.stderr.write = function (chunk) {
     stderrOutput += chunk.toString();
     return true;
   };
@@ -110,19 +137,26 @@ test('test error logged to stderr when deep copy fails', () => {
     // Create object with function (structuredClone fails on functions)
     const input = JSON.stringify({ data: { x: 1 } });
 
-    const result = safeParseJSON(input, 'test-schema', {
-      data: {
-        type: 'object',
-        required: true,
+    const result = safeParseJSON(
+      input,
+      'test-schema',
+      {
+        data: {
+          type: 'object',
+          required: true,
+        },
       },
-    }, {
-      data: { x: 999 },
-    });
+      {
+        data: { x: 999 },
+      }
+    );
 
     // Current code silently catches and returns defaults
     // After fix, should log warning to stderr
-    assert.ok(stderrOutput.includes('safe-json') || result.data.x === 1,
-      'Should either log error to stderr or preserve original value');
+    assert.ok(
+      stderrOutput.includes('safe-json') || result.data.x === 1,
+      'Should either log error to stderr or preserve original value'
+    );
   } finally {
     process.stderr.write = originalStderr;
   }

@@ -111,11 +111,15 @@ describe('Fix 1: routing-guard blocks Edit/Write/NotebookEdit in router mode', (
     routerState.invalidateStateCache();
     routingGuard.invalidateCachedState();
 
-    const result = routingGuard.checkRouterSelfCheck('Edit', {
-      file_path: '/project/src/index.js',
-      old_string: 'foo',
-      new_string: 'bar',
-    });
+    const result = routingGuard.checkRouterSelfCheck(
+      'Edit',
+      {
+        file_path: '/project/src/index.js',
+        old_string: 'foo',
+        new_string: 'bar',
+      },
+      { task_id: 'test-agent-task' }
+    );
     assert.strictEqual(result.pass, true, 'Edit should be allowed in agent mode');
   });
 
@@ -128,10 +132,14 @@ describe('Fix 1: routing-guard blocks Edit/Write/NotebookEdit in router mode', (
     routerState.invalidateStateCache();
     routingGuard.invalidateCachedState();
 
-    const result = routingGuard.checkRouterSelfCheck('Write', {
-      file_path: '/project/src/new-file.js',
-      content: 'test content',
-    });
+    const result = routingGuard.checkRouterSelfCheck(
+      'Write',
+      {
+        file_path: '/project/src/new-file.js',
+        content: 'test content',
+      },
+      { task_id: 'test-agent-task' }
+    );
     assert.strictEqual(result.pass, true, 'Write should be allowed in agent mode');
   });
 

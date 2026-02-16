@@ -134,7 +134,7 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     process.env.INTENT_AGENT_MATCH = 'block';
     process.env.INTENT_AGENT_AUTOREROUTE = 'true';
     process.env.INTENT_AGENT_AUTOREROUTE_THRESHOLD = '2';
-    process.env.CLAUDE_SESSION_ID = 'session-intent-autoroute';
+    process.env.CLAUDE_SESSION_ID = `session-intent-autoroute-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
     const first = routingGuard.checkIntentAgentMatch('Task', {
       subagent_type: 'developer',

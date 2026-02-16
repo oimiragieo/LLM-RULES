@@ -96,14 +96,14 @@ function compactFallbackMessage(title, toolName, count, fallback) {
 function buildRouterSelfCheckMessage(toolName, dedupe) {
   if (dedupe?.dedupe) {
     return compactFallbackMessage(
-      'ROUTER SELF-CHECK VIOLATION',
+      'ROUTER-FIRST PROTOCOL VIOLATION | ROUTER SELF-CHECK VIOLATION',
       toolName,
       dedupe.count,
       'Spawn an appropriate specialist via Task().'
     );
   }
 
-  return `[ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode. Spawn an agent via Task().`;
+  return `[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER SELF-CHECK VIOLATION] ${toolName} is blacklisted in router mode. Spawn an agent via Task().`;
 }
 
 function shouldAutoReroute(enforcement, dedupeCount, threshold, enabledValue) {

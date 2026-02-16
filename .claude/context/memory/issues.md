@@ -331,3 +331,21 @@
 **Test Debt**: ~150 missing test files, 4-6 weeks effort (2 devs, TDD)
 
 **Full Report**: `.claude/context/reports/qa/qa-audit-2026-02-15.md`
+
+---
+
+## Phase 5-6 Minor Issues (2026-02-15)
+
+**M18: Race Condition M18-M19 Deferred** (P2)
+
+- Issue: memory-tiers.cjs concurrent initialization with STM/MTM/LTM could theoretically race on initial lock acquisition
+- Status: DEFERRED to future sprint (low probability, file locking added as safety net per ADR-126)
+- Workaround: Sequential session startup + file-based lock prevents race condition in practice
+- Impact: Non-blocking, mitigation in place
+
+**M19: memory-tiers.cjs Line Count Warning** (P3 - non-blocking)
+
+- Issue: memory-tiers.cjs exceeds 500-line budget (502/500 lines)
+- Status: Minor lint warning, not enforced at deployment
+- Plan: Split to memory-tiers-core.cjs (300L) + memory-tiers-eviction.cjs (200L) in next sprint
+- Impact: Code organization, no functional change required

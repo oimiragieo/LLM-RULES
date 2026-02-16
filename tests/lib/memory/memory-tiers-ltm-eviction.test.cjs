@@ -77,9 +77,18 @@ test('test preserves promoted_ files during eviction', () => {
 
       // Verify promoted files still exist
       const files = fs.readdirSync(ltmDir);
-      assert.ok(files.includes('promoted_important_20260101.json'), 'Promoted file 1 should be preserved');
-      assert.ok(files.includes('promoted_critical_20260102.json'), 'Promoted file 2 should be preserved');
-      assert.ok(files.includes('promoted_milestone_20260103.json'), 'Promoted file 3 should be preserved');
+      assert.ok(
+        files.includes('promoted_important_20260101.json'),
+        'Promoted file 1 should be preserved'
+      );
+      assert.ok(
+        files.includes('promoted_critical_20260102.json'),
+        'Promoted file 2 should be preserved'
+      );
+      assert.ok(
+        files.includes('promoted_milestone_20260103.json'),
+        'Promoted file 3 should be preserved'
+      );
 
       // Verify summary files were evicted correctly (only 20 remain)
       const summaryFiles = files.filter(f => f.startsWith('summary_'));
