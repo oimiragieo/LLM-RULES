@@ -1461,11 +1461,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
           fs.mkdirSync(runtimeDir, { recursive: true });
         }
         // Write reminder file
-        fs.writeFileSync(
-          reminderPath,
-          buildStep0ReminderMessage(requests.length),
-          'utf8'
-        );
+        fs.writeFileSync(reminderPath, buildStep0ReminderMessage(requests.length), 'utf8');
         if (process.env.DEBUG_HOOKS) {
           console.warn(
             '[user-prompt-unified] Reflection reminder written; Router must perform Step 0.'
