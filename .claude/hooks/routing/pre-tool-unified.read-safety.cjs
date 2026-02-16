@@ -12,9 +12,9 @@ const {
 } = require('./pre-tool-unified.shared.cjs');
 const { ensureDir } = require('./pre-tool-unified.execution.cjs');
 
-const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 120000);
-const READ_CHUNK_GUARD_TOKENS = Number(process.env.READ_CHUNK_GUARD_TOKENS || 20000);
-const READ_ESTIMATED_CHARS_PER_TOKEN = Number(process.env.READ_ESTIMATED_CHARS_PER_TOKEN || 4);
+const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 60000);
+const READ_CHUNK_GUARD_TOKENS = Number(process.env.READ_CHUNK_GUARD_TOKENS || 12000);
+const READ_ESTIMATED_CHARS_PER_TOKEN = Number(process.env.READ_ESTIMATED_CHARS_PER_TOKEN || 5);
 const READ_HARD_BLOCK_LARGE_DIRECT = String(process.env.READ_HARD_BLOCK_LARGE_DIRECT || 'on')
   .trim()
   .toLowerCase();
@@ -252,6 +252,12 @@ function hasReadWindow(toolInput) {
     numeric(toolInput.startLine) ||
     numeric(toolInput.endLine)
   );
+}
+
+function isReadWindowOversized(toolInput) {
+  const limit = getReadWindowLimit(toolInput);
+  // 40,000 tokens is approx 200KB, well within the 256KB host limit
+  return Number.isFinite(limit) && limit > 40000;
 }
 
 function getReadWindowLimit(toolInput) {
@@ -595,8 +601,19 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     const isProjectFile = path
       .resolve(targetPath)
       .startsWith(path.resolve(PROJECT_ROOT) + path.sep);
+    const hasWindow = hasReadWindow(toolInput);
     const shouldGateLargeDirectRead =
-      isProjectFile && !hasReadWindow(toolInput) && stats.size > READ_REQUIRE_SEARCH_FIRST_BYTES;
+      isProjectFile && !hasWindow && stats.size > READ_REQUIRE_SEARCH_FIRST_BYTES;
+
+    if (hasWindow && isReadWindowOversized(toolInput)) {
+      return {
+        checked: true,
+        action: 'block',
+        message:
+          `[READ SAFETY] Requested read window is too large. ` +
+          `Limit your request to 40,000 tokens or 10,000 lines max to avoid host failure.`,
+      };
+    }
 
     if (stats.isDirectory()) {
       if (isBypassPermissionsMode(hookInput)) {
@@ -629,7 +646,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     if (
       READ_HARD_BLOCK_LARGE_DIRECT !== 'off' &&
       stats.size > READ_CHUNK_GUARD_BYTES &&
-      !hasReadWindow(toolInput)
+      !hasWindow
     ) {
       if (isBypassPermissionsMode(hookInput) && isReadSafetyAutoWindowEnabled()) {
         const limit = getReadSafetyAutoWindowLimit();
@@ -714,7 +731,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       }
     }
 
-    if (stats.size > READ_CHUNK_GUARD_BYTES && !hasReadWindow(toolInput)) {
+    if (stats.size > READ_CHUNK_GUARD_BYTES && !hasWindow) {
       if (isReadSafetyAutoWindowEnabled()) {
         const limit = getReadSafetyAutoWindowLimit();
         return {
@@ -741,7 +758,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       };
     }
 
-    if (!hasReadWindow(toolInput)) {
+    if (!hasWindow) {
       const estimatedTokens = Math.ceil(stats.size / Math.max(1, READ_ESTIMATED_CHARS_PER_TOKEN));
       if (estimatedTokens > READ_CHUNK_GUARD_TOKENS) {
         if (isReadSafetyAutoWindowEnabled()) {

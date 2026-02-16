@@ -126,7 +126,16 @@ const INTENT_KEYWORDS = {
   c4_component: ['c4 component', 'component level', 'component diagram', 'component architecture'],
   c4_container: ['c4 container', 'container level', 'container diagram', 'deployment architecture'],
   c4_context: ['c4 context', 'system context', 'context diagram', 'high-level architecture'],
-  code_reviewer: ['code review', 'pr review', 'pull request', 'review code'],
+  code_reviewer: [
+    'code review',
+    'pr review',
+    'pull request',
+    'review code',
+    'bug hunt',
+    'find bugs',
+    'scan for issues',
+    'code audit',
+  ],
   code_simplifier: [
     'simplify',
     'clean up',
@@ -192,6 +201,8 @@ const INTENT_KEYWORDS = {
     'encryption',
     'owasp',
     'zero trust',
+    'vulnerability search',
+    'security audit',
   ],
 
   // === ORCHESTRATOR AGENTS (3) ===

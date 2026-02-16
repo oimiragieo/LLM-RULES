@@ -127,7 +127,7 @@ function detectUnsupportedRipgrepType(command) {
   if (!hasUnsupportedType) return null;
 
   return (
-    'Unsupported ripgrep type alias "cjs". Use globs instead: ' +
+    'Unsupported ripgrep type alias "cjs". Use "js" instead (which includes .cjs in many environments) or use globs: ' +
     '`rg -n "<pattern>" -g "*.cjs" -S <path>`.'
   );
 }

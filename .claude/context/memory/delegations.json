@@ -8,8 +8,8 @@
     "status": "reassigned",
     "traceId": "trace-orphan",
     "createdAt": 1771225967156,
-    "updatedAt": 1771226095406,
-    "recoveredAt": 1771226095406
+    "updatedAt": 1771258708168,
+    "recoveredAt": 1771258708168
   },
   "t-3": {
     "taskId": "t-3",
@@ -20,10 +20,10 @@
     "status": "reassigned",
     "traceId": null,
     "createdAt": 1771225967177,
-    "updatedAt": 1771226095406,
+    "updatedAt": 1771258704456,
     "updatePayload": {
       "status": "in_progress"
     },
-    "recoveredAt": 1771226095406
+    "recoveredAt": 1771258704456
   }
 }

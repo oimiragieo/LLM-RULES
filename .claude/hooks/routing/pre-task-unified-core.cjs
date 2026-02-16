@@ -139,7 +139,9 @@ function checkCoreMemoryReadBeforeTask(hookInput) {
   const permissionMode = String(
     hookInput?.permission_mode || hookInput?.permissionMode || ''
   ).toLowerCase();
-  if (permissionMode === 'bypasspermissions') {
+  const agentId = String(hookInput?.agent_id || hookInput?.agentId || '').toLowerCase();
+
+  if (permissionMode === 'bypasspermissions' || agentId === 'router') {
     return { pass: true };
   }
 

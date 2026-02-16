@@ -31,7 +31,10 @@ This workflow is executed for EVERY user request. The Router MUST follow all ste
 
 ```mermaid
 flowchart TD
-    A[User Request] --> B{Step 0: Artifact Creation?}
+    A[User Request] --> B0{Step 0: Pending Reflection?}
+    B0 -->|Yes| C0[Spawn Reflection Agent]
+    C0 --> E
+    B0 -->|No| B{Step 0.1: Artifact Creation?}
     B -->|Yes| C[Check if Exists]
     C -->|Exists| D[Report: Already Exists]
     C -->|New| E[Step 1: TaskList]
@@ -59,28 +62,20 @@ flowchart TD
 
 **Router Restrictions**: You may ONLY use whitelisted tools (see Step 5).
 
-## Step 0: Duplication Check (For Artifact Creation Requests)
+## Step 0: PENDING REFLECTION CHECK (Atomic Handshake)
 
-**Trigger**: User request contains keywords like "create agent", "create skill", "create workflow", "create hook", "create template", "create schema".
+**Trigger**: Every user prompt.
 
-**Action**: Before proceeding with routing, check if similar artifact already exists.
+**Action**: Check for pending reflections BEFORE `TaskList()`.
 
-```javascript
-// Read creator registry to check for duplicates
-Read('.claude/context/artifacts/catalogs/creator-registry.json');
+1. Check if `.claude/context/runtime/reflection-reminder.txt` exists.
+2. If exists, read `.claude/context/runtime/reflection-spawn-request.json`.
+3. **SPAWN** `reflection-agent` for the requests.
+4. **CRITICAL**: DO NOT manually delete the reminder file or clear the JSON file.
+5. The system uses an **Atomic Handshake**: the `reflection-agent` MUST call `TaskUpdate` with `metadata: { processedReflectionIds: [...] }`.
+6. The `reflection-cleanup.cjs` hook will then automatically remove the processed requests.
 
-// Read artifact catalogs/indexes (router-safe, no Glob/Grep)
-Read('.claude/context/agent-registry.json');
-Read('.claude/context/artifacts/catalogs/skill-catalog.md');
-Read('.claude/context/artifacts/catalogs/workflow-catalog.md');
-```
-
-**Decision**:
-
-- **Duplicate found**: Inform user, ask if they want to enhance existing artifact or create new one
-- **No duplicate**: Proceed to Step 0.5
-
-**Why**: Prevents ecosystem bloat and duplicate functionality.
+**Why**: Ensures no reflection data is lost if the agent fails or crashes.
 
 ## Step 0.5: CHECK INTEGRATION QUEUE (Non-Blocking)
 

@@ -248,6 +248,7 @@ function buildTaskPrompt(entry) {
   const trigger = entry.trigger || 'unknown';
   const timestamp = entry.timestamp || new Date().toISOString();
   const priority = entry.priority || 'medium';
+  const id = `${trigger}:${timestamp}:${entry.taskId || entry.context || ''}`;
 
   let context = '';
   switch (trigger) {
@@ -279,7 +280,9 @@ Instructions:
 1. Read your agent definition: .claude/agents/core/reflection-agent.md
 2. Analyze the context and extract learnings
 3. Update memory files as appropriate
-4. Document any patterns or issues discovered`;
+4. Document any patterns or issues discovered
+5. ATOMIC COMPLETION: In your final TaskUpdate({ status: "completed" }), you MUST include the following in metadata:
+   metadata: { processedReflectionIds: ["${id}"] }`;
 }
 
 /**

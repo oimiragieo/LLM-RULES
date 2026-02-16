@@ -1058,10 +1058,22 @@ function recordUserPromptResult(result) {
     const filePath = path.join(memoryDir, file.name);
     try {
       const stats = fs.statSync(filePath);
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const lineCount = content.split('\n').length;
+      let lineCount = 0;
+      if (stats.size > 100000) {
+        // Estimate line count for large files to avoid FileTooLargeError (approx 80 chars per line)
+        lineCount = Math.ceil(stats.size / 80);
+      } else {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        lineCount = content.split('\n').length;
+      }
       const lastModified = stats.mtime.toISOString().split('T')[0];
-      result.files.push({ ...file, exists: true, lines: lineCount, modified: lastModified });
+      result.files.push({
+        ...file,
+        exists: true,
+        lines: lineCount,
+        modified: lastModified,
+        size: stats.size,
+      });
     } catch (_error) {
       result.files.push({ ...file, exists: false });
     }

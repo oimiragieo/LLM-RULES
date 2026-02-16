@@ -14,6 +14,11 @@
         "minLength": 1,
         "maxLength": 200
       },
+      "status": {
+        "type": "string",
+        "enum": ["pending", "acknowledged", "completed"],
+        "default": "pending"
+      },
       "subagent_type": {
         "type": "string",
         "minLength": 1,

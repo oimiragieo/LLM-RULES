@@ -9,6 +9,61 @@ const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 
 const logger = createLogger('contextual-memory');
 
+// Process-level cache for parsed memory files to speed up agent spawns
+const PARSED_MEMORY_CACHE = new Map();
+
+/**
+ * Efficiently parse JSON with mtime-validated caching.
+ */
+function safeParseWithCache(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    const stats = fs.statSync(filePath);
+    const cached = PARSED_MEMORY_CACHE.get(filePath);
+    if (cached && cached.mtime === stats.mtimeMs) {
+      return cached.data;
+    }
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    PARSED_MEMORY_CACHE.set(filePath, { mtime: stats.mtimeMs, data });
+    return data;
+  } catch (e) {
+    logger.debug('Memory cache parse failed', { file: filePath, error: e.message });
+    return null;
+  }
+}
+
+/**
+ * Read the end of a file without loading the entire content into memory.
+ * Prevents FileTooLargeError for archives.
+ */
+function readTailSync(filePath, maxBytes) {
+  try {
+    if (!fs.existsSync(filePath)) return '';
+    const stats = fs.statSync(filePath);
+    const size = stats.size;
+    if (size === 0) return '';
+
+    const readSize = Math.min(size, maxBytes);
+    const buffer = Buffer.alloc(readSize);
+    const fd = fs.openSync(filePath, 'r');
+    try {
+      fs.readSync(fd, buffer, 0, readSize, size - readSize);
+      let content = buffer.toString('utf8');
+      // If we truncated, trim the first partial line/character
+      if (size > maxBytes) {
+        const firstNewline = content.indexOf('\n');
+        content = '...' + (firstNewline !== -1 ? content.substring(firstNewline + 1) : content);
+      }
+      return content;
+    } finally {
+      fs.closeSync(fd);
+    }
+  } catch (e) {
+    logger.debug('readTailSync failed', { file: filePath, error: e.message });
+    return '';
+  }
+}
+
 function getAccessTrackingMinIntervalMs() {
   return Number(process.env.MEMORY_ACCESS_TRACKING_MIN_INTERVAL_MS || 5 * 60 * 1000);
 }
@@ -211,26 +266,22 @@ function loadContextSync(memory, options = {}) {
   const nowIso = new Date().toISOString();
 
   const gotchasFile = path.join(memoryDir, 'gotchas.json');
-  if (!dbGotchasLoaded && fs.existsSync(gotchasFile)) {
-    try {
-      const allGotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+  if (!dbGotchasLoaded) {
+    const allGotchas = safeParseWithCache(gotchasFile);
+    if (allGotchas) {
       const selectedGotchas = allGotchas.slice(-maxItems.gotchas);
       result.gotchas = memory._truncateItems(selectedGotchas, maxChars.gotchas);
       applyAccessStats(result.gotchas, accessStats);
-    } catch (e) {
-      logger.debug('Gotchas load failed', { error: e.message });
     }
   }
 
   const patternsFile = path.join(memoryDir, 'patterns.json');
-  if (!dbPatternsLoaded && fs.existsSync(patternsFile)) {
-    try {
-      const allPatterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+  if (!dbPatternsLoaded) {
+    const allPatterns = safeParseWithCache(patternsFile);
+    if (allPatterns) {
       const selectedPatterns = allPatterns.slice(-maxItems.patterns);
       result.patterns = memory._truncateItems(selectedPatterns, maxChars.patterns);
       applyAccessStats(result.patterns, accessStats);
-    } catch (e) {
-      logger.debug('Patterns load failed', { error: e.message });
     }
   }
 
@@ -254,16 +305,12 @@ function loadContextSync(memory, options = {}) {
   }
 
   const mapFile = path.join(memoryDir, 'codebase_map.json');
-  if (fs.existsSync(mapFile)) {
-    try {
-      const map = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
-      const discoveries = Object.entries(map.discovered_files || {})
-        .slice(-maxItems.discoveries)
-        .map(([filePath, info]) => ({ path: filePath, ...info }));
-      result.discoveries = memory._truncateItems(discoveries, maxChars.discoveries);
-    } catch (e) {
-      logger.debug('Discoveries load failed', { error: e.message });
-    }
+  const map = safeParseWithCache(mapFile);
+  if (map) {
+    const discoveries = Object.entries(map.discovered_files || {})
+      .slice(-maxItems.discoveries)
+      .map(([filePath, info]) => ({ path: filePath, ...info }));
+    result.discoveries = memory._truncateItems(discoveries, maxChars.discoveries);
   }
 
   try {
@@ -326,17 +373,9 @@ function loadContextSync(memory, options = {}) {
   }
 
   const legacyPath = path.join(memoryDir, 'learnings.md');
-  if (fs.existsSync(legacyPath)) {
-    try {
-      const legacyContent = fs.readFileSync(legacyPath, 'utf8');
-      const limit = maxChars.legacy;
-      result.legacy_summary =
-        typeof limit === 'number' && legacyContent.length > limit
-          ? '...' + legacyContent.slice(-limit)
-          : legacyContent;
-    } catch (_e) {
-      // ignore legacy read errors
-    }
+  const limit = maxChars.legacy;
+  if (typeof limit === 'number') {
+    result.legacy_summary = readTailSync(legacyPath, limit);
   }
 
   return result;

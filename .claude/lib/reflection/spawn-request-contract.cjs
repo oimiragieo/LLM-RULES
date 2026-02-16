@@ -82,9 +82,13 @@ function sanitizeSpawnRequest(entry, index) {
 
   const source = entry.source && typeof entry.source === 'object' ? entry.source : {};
   const timestamp = isIsoTimestamp(source.timestamp) ? source.timestamp : new Date().toISOString();
+  const status = ['pending', 'acknowledged', 'completed'].includes(entry.status)
+    ? entry.status
+    : 'pending';
 
   return {
     id,
+    status,
     subagent_type: subagentType,
     description,
     prompt,
@@ -96,6 +100,31 @@ function sanitizeSpawnRequest(entry, index) {
       priority,
     },
   };
+}
+
+function acknowledgeRequests(filePath, ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return;
+  const requests = readSpawnRequestsFile(filePath);
+  const idSet = new Set(ids);
+
+  const updated = requests.map(req => {
+    if (idSet.has(req.id)) {
+      return { ...req, status: 'acknowledged' };
+    }
+    return req;
+  });
+
+  fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf8');
+}
+
+function removeRequests(filePath, ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return;
+  const requests = readSpawnRequestsFile(filePath);
+  const idSet = new Set(ids);
+
+  const filtered = requests.filter(req => !idSet.has(req.id));
+
+  fs.writeFileSync(filePath, JSON.stringify(filtered, null, 2), 'utf8');
 }
 
 function parseSpawnRequests(content, options = {}) {
@@ -130,6 +159,8 @@ function readSpawnRequestsFile(filePath, options = {}) {
 module.exports = {
   parseSpawnRequests,
   readSpawnRequestsFile,
+  acknowledgeRequests,
+  removeRequests,
   sanitizeSpawnRequest,
   normalizeRawToArray,
   DEFAULT_MAX_ENTRIES,

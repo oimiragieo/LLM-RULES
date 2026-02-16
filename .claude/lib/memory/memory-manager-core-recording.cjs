@@ -25,6 +25,7 @@ function createRecordingOps({
 
     const gotchasFile = path.join(memoryDir, 'gotchas.json');
 
+    let shouldSync = false;
     try {
       const wrote = withFileLockSync(gotchasFile, () => {
         let gotchas = [];
@@ -59,7 +60,7 @@ function createRecordingOps({
 
           gotchas.push(entry);
           atomicWriteJSONSync(gotchasFile, gotchas, { skipLock: true });
-          maybeSyncMemoryJson(gotchasFile, projectRoot);
+          shouldSync = true;
           emitMemorySavedEvent({
             key: `gotchas:${entry.id}`,
             value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
@@ -77,6 +78,9 @@ function createRecordingOps({
         },
         projectRoot
       );
+      if (wrote && shouldSync) {
+        maybeSyncMemoryJson(gotchasFile, projectRoot);
+      }
       return wrote;
     } catch (err) {
       recordMemoryOperation(
@@ -100,6 +104,7 @@ function createRecordingOps({
 
     const patternsFile = path.join(memoryDir, 'patterns.json');
 
+    let shouldSync = false;
     try {
       const wrote = withFileLockSync(patternsFile, () => {
         let patterns = [];
@@ -134,7 +139,7 @@ function createRecordingOps({
 
           patterns.push(entry);
           atomicWriteJSONSync(patternsFile, patterns, { skipLock: true });
-          maybeSyncMemoryJson(patternsFile, projectRoot);
+          shouldSync = true;
           emitMemorySavedEvent({
             key: `patterns:${entry.id}`,
             value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
@@ -152,6 +157,9 @@ function createRecordingOps({
         },
         projectRoot
       );
+      if (wrote && shouldSync) {
+        maybeSyncMemoryJson(patternsFile, projectRoot);
+      }
       return wrote;
     } catch (err) {
       recordMemoryOperation(

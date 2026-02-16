@@ -16,6 +16,9 @@ const { createReportingOps } = require('./memory-manager-core-reporting.cjs');
 const { createCoreOps } = require('./memory-manager-core-ops.cjs');
 
 function emitMemorySavedEvent({ key, value, source }) {
+  if (String(process.env.MEMORY_EMIT_EVENTS || 'on').toLowerCase() === 'off') {
+    return;
+  }
   try {
     const maybePromise = eventBus.emit(EventTypes.MEMORY_SAVED, {
       type: EventTypes.MEMORY_SAVED,
@@ -32,6 +35,9 @@ function emitMemorySavedEvent({ key, value, source }) {
 }
 
 function emitMemoryQueriedEvent({ query, results, latency }) {
+  if (String(process.env.MEMORY_EMIT_EVENTS || 'on').toLowerCase() === 'off') {
+    return;
+  }
   try {
     const maybePromise = eventBus.emit(EventTypes.MEMORY_QUERIED, {
       type: EventTypes.MEMORY_QUERIED,

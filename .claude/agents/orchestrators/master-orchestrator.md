@@ -126,12 +126,15 @@ Read('.claude/docs/AGENT_ROUTING_CARD.md')
 
 ## Responsibilities
 
-1.  **Scope**: Spawn `Planner` to breakdown requests.
-2.  **Review**: Rate plans (7/10 minimum) using `response-rater`.
-3.  **Select Agents**: Before spawning agents for any phase, consult `AGENT_ROUTING_CARD.md` to select the most specific specialist available. Never default to `developer` when a language, framework, mobile, or domain specialist matches the task.
-4.  **Coordinate**: Spawn specialized agents via `Task`, using the correct specialist from the routing card.
-5.  **Monitor**: Track progress and update `.claude/context/runtime/dashboard.md`.
-6.  **Synthesize**: Combine outputs into a final response for the user.
+1.  **Step 0 (Pre-flight)**: Before starting any new work, check `.claude/context/runtime/reflection-spawn-request.json`. If requests exist, spawn `reflection-agent` to batch process them.
+    - **Requirement**: The spawned agent MUST include `metadata: { processedReflectionIds: [...] }` in its final `TaskUpdate` to trigger automated cleanup.
+2.  **Atomic Handshake**: Do NOT manually delete reflection files. The system will automatically remove processed requests upon successful `TaskUpdate(completed)`.
+3.  **Scope**: Spawn `Planner` to breakdown requests.
+4.  **Review**: Rate plans (7/10 minimum) using `response-rater`.
+5.  **Select Agents**: Before spawning agents for any phase, consult `AGENT_ROUTING_CARD.md` to select the most specific specialist available. Never default to `developer` when a language, framework, mobile, or domain specialist matches the task.
+6.  **Coordinate**: Spawn specialized agents via `Task`, using the correct specialist from the routing card.
+7.  **Monitor**: Track progress and update `.claude/context/runtime/dashboard.md`.
+8.  **Synthesize**: Combine outputs into a final response for the user.
 
 ## Execution Rules
 

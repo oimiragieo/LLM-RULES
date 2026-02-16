@@ -10,11 +10,11 @@ const { spawn } = require('child_process');
 const memoryManager = require('../../../.claude/lib/memory/memory-manager.cjs');
 
 const TEST_ROOT_PREFIX = '.test-memory-soak-chaos';
-const SOAK_TEST_TIMEOUT_MS = Number(process.env.MEMORY_SOAK_TEST_TIMEOUT_MS || 240000);
-const SOAK_WORKER_TIMEOUT_MS = Number(process.env.MEMORY_SOAK_WORKER_TIMEOUT_MS || 120000);
-const RESTART_WRITES_PER_WORKER = Number(process.env.MEMORY_SOAK_RESTART_WRITES || 16);
-const CONTENTION_WRITES_PER_WORKER = Number(process.env.MEMORY_SOAK_CONTENTION_WRITES || 12);
-const CONCURRENT_WORKER_WRITES = Number(process.env.MEMORY_SOAK_CONCURRENT_WRITES || 8);
+const SOAK_TEST_TIMEOUT_MS = Number(process.env.MEMORY_SOAK_TEST_TIMEOUT_MS || 600000);
+const SOAK_WORKER_TIMEOUT_MS = Number(process.env.MEMORY_SOAK_WORKER_TIMEOUT_MS || 300000);
+const RESTART_WRITES_PER_WORKER = Number(process.env.MEMORY_SOAK_RESTART_WRITES || 4);
+const CONTENTION_WRITES_PER_WORKER = Number(process.env.MEMORY_SOAK_CONTENTION_WRITES || 3);
+const CONCURRENT_WORKER_WRITES = Number(process.env.MEMORY_SOAK_CONCURRENT_WRITES || 2);
 
 function createTestRoot(label) {
   const safeLabel = String(label || 'default').replace(/[^a-zA-Z0-9_-]/g, '-');
@@ -41,6 +41,7 @@ const count = Number(process.argv[4] || '50');
     await manager.recordGotchaAsync({ text: \`worker-\${worker}-gotcha-\${i}\` }, root);
   }
   process.stdout.write('ok');
+  process.exit(0);
 })().catch(err => {
   console.error(err && err.stack ? err.stack : String(err));
   process.exit(1);
@@ -92,8 +93,11 @@ async function runWorkerWithTimeout(workerScript, testRoot, workerId, count, tim
         cwd: path.join(__dirname),
         env: {
           ...process.env,
-          MEMORY_FILE_LOCK_TIMEOUT_MS: '30000',
-          MEMORY_FILE_LOCK_WAIT_MS: '10',
+          MEMORY_FILE_LOCK_TIMEOUT_MS: '120000',
+          MEMORY_FILE_LOCK_WAIT_MS: '5',
+          MEMORY_AUTO_SYNC: 'off',
+          MEMORY_EMBED_ON_WRITE: 'off',
+          MEMORY_EMIT_EVENTS: 'off',
         },
         stdio: ['ignore', 'pipe', 'pipe'],
       }

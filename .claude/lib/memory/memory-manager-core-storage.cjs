@@ -54,7 +54,7 @@ function createStorageHelpers({
     const lockPath = `${filePath}.lock`;
     const waitMs = Number(process.env.MEMORY_FILE_LOCK_WAIT_MS || 20);
     const timeoutMs = Number(process.env.MEMORY_FILE_LOCK_TIMEOUT_MS || 5000);
-    const staleMs = Number(process.env.MEMORY_FILE_LOCK_STALE_MS || timeoutMs * 2);
+    const staleMs = Number(process.env.MEMORY_FILE_LOCK_STALE_MS || 60000);
     const deadline = Date.now() + timeoutMs;
     const waitStart = Date.now();
     let acquired = false;
@@ -70,11 +70,15 @@ function createStorageHelpers({
           throw err;
         }
 
-        if (code === 'EEXIST') {
+        if (code === 'EEXIST' || code === 'EPERM' || code === 'EBUSY') {
           try {
-            const stats = fs.statSync(lockPath);
-            if (Date.now() - stats.mtimeMs > staleMs) {
-              fs.rmSync(lockPath, { recursive: true, force: true });
+            if (fs.existsSync(lockPath)) {
+              const stats = fs.statSync(lockPath);
+              if (Date.now() - stats.mtimeMs > staleMs) {
+                fs.rmSync(lockPath, { recursive: true, force: true });
+                continue;
+              }
+            } else {
               continue;
             }
           } catch (_e) {
@@ -117,10 +121,18 @@ function createStorageHelpers({
       return callback();
     } finally {
       if (acquired) {
-        try {
-          fs.rmSync(lockPath, { recursive: true, force: true });
-        } catch (_e) {
-          // Best-effort; stale lock cleanup handles leftovers.
+        let released = false;
+        for (let attempt = 0; attempt < 200 && !released; attempt += 1) {
+          try {
+            fs.rmSync(lockPath, { recursive: true, force: true });
+            released = true;
+          } catch (_e) {
+            // Transient Windows handle lag; retry a few times.
+            sleepSync(10);
+          }
+        }
+        if (!released) {
+          // Best-effort only; stale lock cleanup handles leftovers.
         }
       }
     }

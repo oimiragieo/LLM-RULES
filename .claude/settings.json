@@ -14,6 +14,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
           },
           {
@@ -226,6 +230,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/workflow/post-completion-chain.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/reflection/reflection-cleanup.cjs"
           },
           {
             "type": "command",

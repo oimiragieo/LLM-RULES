@@ -145,6 +145,12 @@ const CREATOR_CONFIGS = [
     primaryFile: '*.cjs|*.mjs',
     excludePatterns: [/\.test\.cjs$/i, /_archive[/\\]/i],
   },
+  {
+    creator: 'reflection-agent',
+    patterns: [/\.claude[/\\]context[/\\]runtime[/\\]reflection-.*\.json$/i],
+    artifactType: 'state:reflection',
+    primaryFile: 'reflection-spawn-request.json',
+  },
 ];
 
 /**
@@ -224,6 +230,15 @@ function findRequiredCreator(filePath) {
  * @returns {{ active: boolean, invokedAt?: string, elapsedMs?: number, artifactName?: string }}
  */
 function isCreatorActive(creatorName) {
+  // SEC-FIX: If the current agent ID matches the required creator, allow it.
+  // This allows specialized agents like reflection-agent to manage their own state.
+  const currentAgentId = String(process.env.CLAUDE_AGENT_ID || '')
+    .trim()
+    .toLowerCase();
+  if (currentAgentId === creatorName.toLowerCase()) {
+    return { active: true, artifactName: 'self' };
+  }
+
   try {
     const statePath = path.join(PROJECT_ROOT, STATE_FILE);
     if (!fs.existsSync(statePath)) {

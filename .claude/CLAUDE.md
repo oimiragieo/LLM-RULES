@@ -34,6 +34,8 @@ Router may NEVER use:
 - `Edit` — SPAWN a developer or specialist
 - `Write` — SPAWN a technical-writer or developer
 - `Bash` — SPAWN a qa, developer, or devops (EXCEPT read-only `git status -s` / `git log --oneline -5`)
+  - **Router is FORBIDDEN from running `pnpm search:code` or `ripgrep` directly.**
+  - If search evidence is needed for a large `Read`, spawn a specialist first.
 - `Glob` — SPAWN an architect or developer
 - `Grep` — SPAWN an architect or developer
 - `WebSearch` — SPAWN a researcher
@@ -51,7 +53,7 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
 **On EVERY user prompt:**
 
-0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). Then delete the reminder file and clear/trim the spawn request file. Only after that proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after reminder/spawn-request cleanup and before TaskList().
+0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). **DO NOT manually delete or clear these files.** The system uses an **Atomic Handshake**: the reflection-agent MUST call `TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })`, and the `reflection-cleanup.cjs` hook will then automatically remove the processed requests. Only after spawning proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after spawning and before TaskList().
 
    **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
    **STEP 0.6 — CREATION PREFLIGHT:** For artifact creation/evolution requests, spawn planner/TPM to run `creation-feasibility-gate` and `compliance-policy-check` before creator execution.
@@ -71,7 +73,7 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 - Late-notification dedupe (mandatory): emit at most one late-notification batch per session phase. Dedupe by `task_id` + `agent/session id`; if a completion was already acknowledged, suppress repeated "late notification" messages.
 - Reflection outcome line: when reflection-agent finishes, include report path and a one-line learnings summary in the same pipeline update.
 - Full enterprise sweep trigger: when user requests "run full enterprise pipeline" / "integrate all findings", route through the ordered enterprise phases in `router-decision.md` Step 7.0 instead of ad-hoc single-agent routing.
-- Enterprise search policy: for enterprise sweeps, require hybrid search first (`pnpm search:code`, semantic/structural search skills, `ripgrep` skill), with `Grep` as fallback-only.
+- Enterprise search policy: for enterprise sweeps, require hybrid search first (`pnpm search:code`, semantic/structural search skills, `ripgrep` skill), with `Grep` as fallback-only. **Router NEVER runs these; always spawn an agent.**
 - Enterprise planner contract: planner must invoke `Skill({ skill: 'tdd' })`, produce a detailed TDD plan, emit microtask DAG metadata (`owned_paths`, `forbidden_paths`, `depends_on`, `dependency_type`, `parallel_group`) for MEDIUM+ work, and call `researcher`/`architect` when uncertain.
 
 ### Template Loading Protocol

@@ -27,10 +27,10 @@ const TASKUPDATE_FIRST_PREFLIGHT_TASKLIST_MAX = Number(
 const TASKUPDATE_FIRST_MAX_VIOLATIONS = Number(process.env.TASKUPDATE_FIRST_MAX_VIOLATIONS || 1);
 
 function isTaskUpdateFirstSelfHealEnabled() {
-  const value = String(process.env.TASKUPDATE_FIRST_SELF_HEAL || 'on')
+  const value = String(process.env.TASKUPDATE_FIRST_SELF_HEAL || 'off')
     .trim()
     .toLowerCase();
-  return value !== 'off';
+  return value === 'on';
 }
 
 function readTaskUpdateFirstState(stateFile = TASKUPDATE_FIRST_STATE_FILE) {
@@ -292,7 +292,7 @@ function tryAutoMarkTaskUpdateInProgress({
   toolName,
 }) {
   const autoMarkEnabled = String(process.env.TASKUPDATE_FIRST_AUTOMARK || 'false').toLowerCase();
-  if (autoMarkEnabled === 'off') return null;
+  if (autoMarkEnabled !== 'true') return null;
 
   const inferredTaskId =
     resolveCanonicalTaskId(hookInput, toolInput, currentEntry).taskId ||
