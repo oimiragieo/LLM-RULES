@@ -2,6 +2,8 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const path = require('path');
+const fs = require('fs');
 
 const { Task } = require('../../../.claude/lib/tools/task-tools.cjs');
 
@@ -15,7 +17,11 @@ function restoreEnv(name, value) {
 
 test('Task uses real process spawn by default', async () => {
   const previous = process.env.TASK_TOOL_REAL_SPAWN;
+  const previousSink = process.env.EVENT_BUS_SINK;
+  const eventsPath = path.join(process.cwd(), '.claude/context/runtime/event-bus.jsonl');
+  const initialEvents = fs.existsSync(eventsPath) ? fs.readFileSync(eventsPath, 'utf8') : '';
   delete process.env.TASK_TOOL_REAL_SPAWN;
+  delete process.env.EVENT_BUS_SINK;
 
   try {
     const result = await Task({
@@ -32,8 +38,23 @@ test('Task uses real process spawn by default', async () => {
     assert.equal(result.spawn.mode, 'process');
     assert.equal(typeof result.spawn.pid, 'number');
     assert.equal(result.spawn.exitCode, 0);
+    assert.ok(
+      result.spawn.script.endsWith(
+        path.join('.claude', 'lib', 'tools', 'task-subagent-runner.cjs')
+      ),
+      'Task should run framework subagent runner script'
+    );
+    assert.equal(result.spawn.output?.frameworkLoaded, true);
+
+    const updatedEvents = fs.existsSync(eventsPath) ? fs.readFileSync(eventsPath, 'utf8') : '';
+    const appended = updatedEvents.slice(initialEvents.length);
+    assert.ok(
+      appended.includes('"toolName":"task-subagent-runner"'),
+      'Runner should emit TOOL_COMPLETED event to event-bus sink'
+    );
   } finally {
     restoreEnv('TASK_TOOL_REAL_SPAWN', previous);
+    restoreEnv('EVENT_BUS_SINK', previousSink);
   }
 });
 

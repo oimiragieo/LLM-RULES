@@ -21,28 +21,18 @@ function spawnSubagentProcess({
   timeoutMs = 10000,
 }) {
   return new Promise((resolve, reject) => {
-    const childCode =
-      "const input = JSON.parse(process.argv[1] || '{}');" +
-      'const out = { ok: true, agent: input.subagentType, task_id: input.taskId, promptLength: input.promptLength, description: input.description };' +
-      'process.stdout.write(JSON.stringify(out));';
+    const runnerPath = path.join(__dirname, 'task-subagent-runner.cjs');
+    const childInput = JSON.stringify({
+      subagentType,
+      taskId,
+      description,
+      promptLength,
+    });
 
-    const child = spawn(
-      process.execPath,
-      [
-        '-e',
-        childCode,
-        JSON.stringify({
-          subagentType,
-          taskId,
-          description,
-          promptLength,
-        }),
-      ],
-      {
-        stdio: ['ignore', 'pipe', 'pipe'],
-        windowsHide: true,
-      }
-    );
+    const child = spawn(process.execPath, [runnerPath, childInput], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
 
     let stdout = '';
     let stderr = '';
@@ -86,6 +76,7 @@ function spawnSubagentProcess({
         pid: child.pid || null,
         exitCode: code,
         output: parsed,
+        script: runnerPath,
       });
     });
   });
@@ -173,6 +164,8 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
           mode: 'process',
           pid: spawned.pid,
           exitCode: spawned.exitCode,
+          script: spawned.script,
+          output: spawned.output,
         },
       };
     }

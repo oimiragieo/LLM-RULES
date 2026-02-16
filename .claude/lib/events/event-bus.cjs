@@ -29,6 +29,7 @@ class EventBus {
   constructor() {
     this.emitter = new EventEmitter();
     this.subscriptions = [];
+    this.maxTotalSubscriptions = Number(process.env.EVENT_BUS_MAX_SUBSCRIPTIONS || 10000);
 
     // Increase max listeners to avoid warnings (default is 10)
     this.emitter.setMaxListeners(100);
@@ -87,6 +88,15 @@ class EventBus {
     );
     if (existing) {
       return existing;
+    }
+    if (
+      Number.isFinite(this.maxTotalSubscriptions) &&
+      this.maxTotalSubscriptions > 0 &&
+      this.subscriptions.length >= this.maxTotalSubscriptions
+    ) {
+      throw new Error(
+        `EventBus subscription limit exceeded (${this.maxTotalSubscriptions}). Refusing new subscription for ${eventType}.`
+      );
     }
 
     const subscription = {

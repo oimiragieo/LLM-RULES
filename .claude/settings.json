@@ -243,6 +243,10 @@
           },
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/agent-registry-auto-refresh.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/code-index-updater.cjs"
           }
         ]
