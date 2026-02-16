@@ -9,8 +9,87 @@
 'use strict';
 
 const path = require('path');
+const { spawn } = require('child_process');
 const { PROJECT_ROOT: _PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { assembleSpawnPrompt, assembleSpawnPromptAsync } = require('../spawn/prompt-assembler.cjs');
+
+function spawnSubagentProcess({
+  subagentType,
+  taskId,
+  description,
+  promptLength,
+  timeoutMs = 10000,
+}) {
+  return new Promise((resolve, reject) => {
+    const childCode =
+      "const input = JSON.parse(process.argv[1] || '{}');" +
+      "const out = { ok: true, agent: input.subagentType, task_id: input.taskId, promptLength: input.promptLength, description: input.description };" +
+      'process.stdout.write(JSON.stringify(out));';
+
+    const child = spawn(
+      process.execPath,
+      [
+        '-e',
+        childCode,
+        JSON.stringify({
+          subagentType,
+          taskId,
+          description,
+          promptLength,
+        }),
+      ],
+      {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
+      }
+    );
+
+    let stdout = '';
+    let stderr = '';
+    const timer = setTimeout(() => {
+      try {
+        child.kill();
+      } catch (_e) {
+        // Best effort.
+      }
+      reject(new Error(`Task tool spawn timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+
+    child.stdout.on('data', chunk => {
+      stdout += String(chunk || '');
+    });
+    child.stderr.on('data', chunk => {
+      stderr += String(chunk || '');
+    });
+
+    child.on('error', err => {
+      clearTimeout(timer);
+      reject(err);
+    });
+
+    child.on('close', code => {
+      clearTimeout(timer);
+      if (code !== 0) {
+        reject(new Error(`Task tool subagent exited with code ${code}: ${stderr.trim()}`));
+        return;
+      }
+
+      let parsed = null;
+      try {
+        parsed = stdout ? JSON.parse(stdout) : null;
+      } catch (parseErr) {
+        reject(new Error(`Task tool failed to parse subagent output: ${parseErr.message}`));
+        return;
+      }
+
+      resolve({
+        pid: child.pid || null,
+        exitCode: code,
+        output: parsed,
+      });
+    });
+  });
+}
 
 /**
  * Task Tool Function
@@ -67,23 +146,48 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
             includeMemory: true,
           });
 
-    // In a real implementation, this would spawn an actual subagent
-    // For now, we'll simulate the spawn and return a success result
-    console.log(
-      `[Task Tool] Would spawn ${subagent_type} with prompt length: ${assembledPrompt.length}`
-    );
+    const resolvedTaskId = task_id || `task-${Date.now()}`;
+    const useRealSpawn = String(process.env.TASK_TOOL_REAL_SPAWN || 'on')
+      .trim()
+      .toLowerCase() !== 'off';
 
-    // Simulate task execution
-    const result = {
+    if (useRealSpawn) {
+      const timeoutMs = Number(process.env.TASK_TOOL_SPAWN_TIMEOUT_MS || 10000);
+      const spawned = await spawnSubagentProcess({
+        subagentType: subagent_type,
+        taskId: resolvedTaskId,
+        description,
+        promptLength: assembledPrompt.length,
+        timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 10000,
+      });
+
+      return {
+        status: 'completed',
+        agent: subagent_type,
+        task_id: resolvedTaskId,
+        description,
+        result: `Task completed by ${subagent_type} agent`,
+        tools_used: allowed_tools,
+        spawn: {
+          mode: 'process',
+          pid: spawned.pid,
+          exitCode: spawned.exitCode,
+        },
+      };
+    }
+
+    console.log(`[Task Tool] Simulating spawn for ${subagent_type} (prompt length: ${assembledPrompt.length})`);
+    return {
       status: 'completed',
       agent: subagent_type,
-      task_id: task_id || `task-${Date.now()}`,
+      task_id: resolvedTaskId,
       description,
       result: `Task completed by ${subagent_type} agent`,
       tools_used: allowed_tools,
+      spawn: {
+        mode: 'simulated',
+      },
     };
-
-    return result;
   } catch (error) {
     console.error('[Task Tool] Error:', error);
     return {

@@ -51,11 +51,41 @@ function sleep(ms) {
 function atomicWriteSync(filePath, content, options = {}) {
   const dir = path.dirname(filePath);
   const tempFile = path.join(dir, `.tmp-${crypto.randomBytes(4).toString('hex')}`);
+  const syncLockEnabled =
+    String(process.env.ATOMIC_WRITE_SYNC_LOCK || 'on')
+      .trim()
+      .toLowerCase() !== 'off';
+  let releaseLock = null;
 
   try {
     // Ensure directory exists
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
+    }
+
+    if (syncLockEnabled) {
+      const lockTarget = fs.existsSync(filePath) ? filePath : dir;
+      const maxWaitMs = Number(process.env.ATOMIC_WRITE_SYNC_LOCK_TIMEOUT_MS || 3000);
+      const retryMs = Number(process.env.ATOMIC_WRITE_SYNC_LOCK_RETRY_MS || 25);
+      const deadline = Date.now() + (Number.isFinite(maxWaitMs) && maxWaitMs > 0 ? maxWaitMs : 3000);
+      const effectiveRetryMs = Number.isFinite(retryMs) && retryMs > 0 ? retryMs : 25;
+
+      for (;;) {
+        try {
+          releaseLock = lockfile.lockSync(lockTarget, { stale: 5000 });
+          break;
+        } catch (lockErr) {
+          const lockBusy =
+            lockErr &&
+            (lockErr.code === 'ELOCKED' ||
+              lockErr.code === 'EEXIST' ||
+              /already locked/i.test(lockErr.message || ''));
+          if (!lockBusy || Date.now() >= deadline) {
+            throw lockErr;
+          }
+          sleep(effectiveRetryMs);
+        }
+      }
     }
 
     // Write to temp file
@@ -98,6 +128,14 @@ function atomicWriteSync(filePath, content, options = {}) {
       }
     }
     throw e;
+  } finally {
+    if (typeof releaseLock === 'function') {
+      try {
+        releaseLock();
+      } catch (_unlockErr) {
+        // Best effort unlock.
+      }
+    }
   }
 }
 

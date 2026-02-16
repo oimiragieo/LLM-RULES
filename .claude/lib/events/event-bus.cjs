@@ -82,6 +82,13 @@ class EventBus {
    * @returns {Subscription} Subscription object
    */
   on(eventType, handler, priority = 50) {
+    const existing = this.subscriptions.find(
+      sub => sub.eventType === eventType && sub.handler === handler
+    );
+    if (existing) {
+      return existing;
+    }
+
     const subscription = {
       eventType,
       handler,
