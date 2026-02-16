@@ -31,6 +31,9 @@ const AGENT_WINDOWS_BASH_GUARD = 'AGENT_WINDOWS_BASH_GUARD';
 const TASKUPDATE_FIRST_WINDOW_MS = Number(
   process.env.TASKUPDATE_FIRST_WINDOW_MS || 24 * 60 * 60 * 1000
 );
+const WINDOWS_BASH_GUARDRAIL_MESSAGE =
+  '[ROUTER-FIRST PROTOCOL VIOLATION][AGENT-GUARDRAIL] Windows-incompatible Bash heredoc/tmp command blocked. ' +
+  'Use Write/Edit tools for artifact content, avoid `cd /c/...` style prefixes, and use a Windows-safe Bash/PowerShell command.';
 
 function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
   try {
@@ -264,12 +267,21 @@ function isBashArtifactWriteCommand(command) {
 
 function isWindowsIncompatibleBashCommand(command) {
   if (!command || typeof command !== 'string') return false;
+
+  // Deterministic hard-block for /c-style path usage in Bash commands.
+  // We enforce this independent of platform because these paths are brittle
+  // in our Windows-oriented tool chain and have repeatedly caused guardrail drift.
+  const unixDriveCdPrefix = /(?:^|&&|\|\|)\s*cd\s+\/[a-zA-Z]\//i.test(command);
+  const unixDrivePathToken = /(?:^|[\s"'`])\/[a-zA-Z]\/[^\s"'`]*/i.test(command);
+  if (unixDriveCdPrefix || unixDrivePathToken) {
+    return true;
+  }
+
   if (process.platform !== 'win32') return false;
   const usesHeredoc = /<<\s*['"]?[A-Z0-9_-]+['"]?/i.test(command);
   const writesUnixTmp = /(?:^|\s)(?:cat|tee)\s*(?:>|>>).*\/tmp\//i.test(command);
   const readsUnixTmp = /(?:^|\s)cat\s+\/tmp\//i.test(command);
-  const unixDriveCdPrefix = /(?:^|&&|\|\|)\s*cd\s+\/[a-zA-Z]\//i.test(command);
-  return usesHeredoc || writesUnixTmp || readsUnixTmp || unixDriveCdPrefix;
+  return usesHeredoc || writesUnixTmp || readsUnixTmp;
 }
 
 function evaluateWindowsBashGuard(command) {
@@ -280,13 +292,10 @@ function evaluateWindowsBashGuard(command) {
   if (!isWindowsIncompatibleBashCommand(command)) {
     return { checked: true, action: 'allow' };
   }
-  const message =
-    '[AGENT-GUARDRAIL] Windows-incompatible Bash heredoc/tmp command blocked. ' +
-    'Use Write/Edit tools for artifact content, avoid `cd /c/...` style prefixes, and use a Windows-safe Bash/PowerShell command.';
   if (mode === 'warn') {
-    return { checked: true, action: 'allow', warning: message };
+    return { checked: true, action: 'allow', warning: WINDOWS_BASH_GUARDRAIL_MESSAGE };
   }
-  return { checked: true, action: 'block', message };
+  return { checked: true, action: 'block', message: WINDOWS_BASH_GUARDRAIL_MESSAGE };
 }
 
 function checkBashArtifactWriteSafety(toolName, toolInput) {

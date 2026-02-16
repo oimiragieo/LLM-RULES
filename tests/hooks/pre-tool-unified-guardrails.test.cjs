@@ -303,12 +303,9 @@ describe('pre-tool-unified agent guardrails', () => {
         command:
           'cd /c/dev/projects/agent-studio && node --test tests/lib/utils/safe-json-bounded-set.test.cjs',
       });
-      if (process.platform === 'win32') {
-        assert.equal(result.action, 'block');
-        assert.match(result.message, /avoid `cd \/c\/\.\.\.` style prefixes/i);
-      } else {
-        assert.equal(result.action, 'allow');
-      }
+      assert.equal(result.action, 'block');
+      assert.match(result.message, /ROUTER-FIRST PROTOCOL VIOLATION/i);
+      assert.match(result.message, /avoid `cd \/c\/\.\.\.` style prefixes/i);
     });
   });
 
@@ -319,12 +316,21 @@ describe('pre-tool-unified agent guardrails', () => {
       const result = checkBashArtifactWriteSafety('Bash', {
         command: 'cd /c/dev/projects/agent-studio && pnpm lint:fix',
       });
-      if (process.platform === 'win32') {
-        assert.equal(result.action, 'block');
-        assert.match(result.message, /Windows-incompatible Bash heredoc\/tmp command blocked/i);
-      } else {
-        assert.ok(result.action === 'allow' || result.reason === 'disabled');
-      }
+      assert.equal(result.action, 'block');
+      assert.match(result.message, /ROUTER-FIRST PROTOCOL VIOLATION/i);
+      assert.match(result.message, /Windows-incompatible Bash heredoc\/tmp command blocked/i);
+    });
+  });
+
+  test('blocks /c style path usage even when not used via cd prefix', () => {
+    withTempGuardrailState(() => {
+      process.env.AGENT_BASH_ARTIFACT_WRITE_GUARD = 'off';
+      process.env.AGENT_WINDOWS_BASH_GUARD = 'block';
+      const result = checkBashArtifactWriteSafety('Bash', {
+        command: 'node .claude/tools/analyze.cjs --root /c/dev/projects/agent-studio --format json',
+      });
+      assert.equal(result.action, 'block');
+      assert.match(result.message, /ROUTER-FIRST PROTOCOL VIOLATION/i);
     });
   });
 });

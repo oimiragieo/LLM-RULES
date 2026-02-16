@@ -93,7 +93,7 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     if (isWhitelistedBashCommand(command)) {
       return { pass: true, result: 'warn', message };
     }
-    return { pass: true, result: 'warn', message };
+    return { pass: false, result: 'block', message };
   }
 
   if (isWhitelistedBashCommand(command)) {
