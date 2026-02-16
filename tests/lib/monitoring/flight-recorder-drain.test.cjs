@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Test: Flight Recorder Final Drain (TDD 2.1)
- * 
+ *
  * Verifies that all telemetry events are flushed to disk even when the process exits.
  */
 
@@ -19,10 +19,11 @@ async function runTest() {
   console.log('--- Telemetry Final Drain Test ---');
 
   if (fs.existsSync(TEST_LOG)) fs.unlinkSync(TEST_LOG);
-  if (!fs.existsSync(path.dirname(TEST_LOG))) fs.mkdirSync(path.dirname(TEST_LOG), { recursive: true });
+  if (!fs.existsSync(path.dirname(TEST_LOG)))
+    fs.mkdirSync(path.dirname(TEST_LOG), { recursive: true });
 
   const safeLogPath = TEST_LOG.split(path.sep).join('/');
-  
+
   // 1. Create a script that records events and exits
   const scriptContent = `
     const { record } = require('../lib/monitoring/flight-recorder.cjs');

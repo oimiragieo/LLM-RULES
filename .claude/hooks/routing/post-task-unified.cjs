@@ -141,7 +141,7 @@ async function main() {
       if (taskId && status) {
         try {
           routerState.recordTaskUpdate(String(taskId), String(status));
-          lifecycleState.writeTaskStatus(String(taskId), String(status));
+          await lifecycleState.writeTaskStatus(String(taskId), String(status));
 
           await eventBus.emit(EventTypes.TASK_UPDATED, {
             type: EventTypes.TASK_UPDATED,
@@ -185,7 +185,7 @@ async function main() {
         const hadMatchingCompleted = hasMatchingCompletedTaskUpdate(taskId);
         try {
           routerState.recordTaskUpdate(String(taskId), 'completed');
-          lifecycleState.writeTaskStatus(String(taskId), 'completed');
+          await lifecycleState.writeTaskStatus(String(taskId), 'completed');
         } catch (_trackErr) {
           // Best-effort status reconciliation only.
         }
@@ -232,7 +232,7 @@ async function main() {
       if (effectiveTaskId) {
         try {
           routerState.recordTaskUpdate(String(effectiveTaskId), 'in_progress');
-          lifecycleState.writeTaskStatus(String(effectiveTaskId), 'in_progress');
+          await lifecycleState.writeTaskStatus(String(effectiveTaskId), 'in_progress');
         } catch (_trackErr) {
           // Best-effort tracking only.
         }

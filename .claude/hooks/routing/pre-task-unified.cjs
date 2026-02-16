@@ -89,7 +89,7 @@ async function main() {
       process.exit(0);
     }
 
-    const result = runAllChecks(hookInput);
+    const result = await runAllChecks(hookInput);
 
     if (!result.pass) {
       try {

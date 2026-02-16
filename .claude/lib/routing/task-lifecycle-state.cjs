@@ -4,7 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const { withLock } = require('../utils/file-locker.cjs');
+
 const TASK_STATUS_FILE = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
+const TASK_STATUS_LOCK = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.lock');
 const VALID_LIFECYCLE_STATUSES = Object.freeze(['pending', 'in_progress', 'completed', 'deleted']);
 const VALID_TRANSITIONS = Object.freeze({
   pending: ['in_progress', 'deleted'],
@@ -16,7 +20,9 @@ const VALID_TRANSITIONS = Object.freeze({
 function readTaskStatus(taskId) {
   try {
     if (fs.existsSync(TASK_STATUS_FILE)) {
-      const data = JSON.parse(fs.readFileSync(TASK_STATUS_FILE, 'utf8'));
+      const content = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
+      if (!content.trim()) return 'pending';
+      const data = JSON.parse(content);
       return data[taskId] || 'pending';
     }
   } catch (_err) {
@@ -25,24 +31,27 @@ function readTaskStatus(taskId) {
   return 'pending';
 }
 
-function writeTaskStatus(taskId, status) {
+async function writeTaskStatus(taskId, status) {
+  const dir = path.dirname(TASK_STATUS_FILE);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  if (!fs.existsSync(TASK_STATUS_LOCK)) fs.writeFileSync(TASK_STATUS_LOCK, '', 'utf8');
+
   try {
-    let data = {};
-    if (fs.existsSync(TASK_STATUS_FILE)) {
-      const content = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
-      if (content.trim()) {
-        data = JSON.parse(content);
+    await withLock(TASK_STATUS_LOCK, async () => {
+      let data = {};
+      if (fs.existsSync(TASK_STATUS_FILE)) {
+        const content = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
+        if (content.trim()) {
+          data = JSON.parse(content);
+        }
       }
-    }
 
-    data[taskId] = status;
+      // Idempotency: if status already matches, skip write to save I/O
+      if (data[taskId] === status) return;
 
-    const dir = path.dirname(TASK_STATUS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-
-    fs.writeFileSync(TASK_STATUS_FILE, JSON.stringify(data, null, 2), 'utf8');
+      data[taskId] = status;
+      atomicWriteJSONSync(TASK_STATUS_FILE, data);
+    });
   } catch (_err) {
     // Best effort only.
   }
@@ -51,9 +60,16 @@ function writeTaskStatus(taskId, status) {
 function isValidTransition(currentStatus, newStatus) {
   const current = (currentStatus || 'pending').toLowerCase();
   const next = (newStatus || '').toLowerCase();
+
   if (!VALID_LIFECYCLE_STATUSES.includes(next)) {
     return false;
   }
+
+  // Idempotent self-transitions are always valid
+  if (current === next) {
+    return true;
+  }
+
   const allowedTransitions = VALID_TRANSITIONS[current] || [];
   return allowedTransitions.includes(next);
 }

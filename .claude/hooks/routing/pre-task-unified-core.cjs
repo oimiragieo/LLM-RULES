@@ -409,7 +409,7 @@ function persistGuardrailPolicy(hookInput, toolInput) {
   }
 }
 
-function updateTaskLifecycleStateAfterAllow(hookInput) {
+async function updateTaskLifecycleStateAfterAllow(hookInput) {
   try {
     const toolInput = getToolInput(hookInput);
     const taskId = extractTaskIdFromTaskInput(toolInput);
@@ -420,13 +420,13 @@ function updateTaskLifecycleStateAfterAllow(hookInput) {
 
     // Unify with lifecycle validation layer
     const lifecycleState = require('../../lib/routing/task-lifecycle-state.cjs');
-    lifecycleState.writeTaskStatus(String(taskId), 'in_progress');
+    await lifecycleState.writeTaskStatus(String(taskId), 'in_progress');
   } catch (err) {
     auditLog('pre-task-unified', 'task_lifecycle_update_failed', { error: err.message });
   }
 }
 
-function runAllChecks(hookInput) {
+async function runAllChecks(hookInput) {
   const toolName = getToolName(hookInput);
   if (toolName !== 'Task') {
     return { pass: true, exitCode: 0 };
@@ -527,8 +527,8 @@ function runAllChecks(hookInput) {
     };
   }
 
-  updateLoopStateAfterAllow(hookInput);
-  updateTaskLifecycleStateAfterAllow(hookInput);
+  await updateLoopStateAfterAllow(hookInput);
+  await updateTaskLifecycleStateAfterAllow(hookInput);
   ownership.registerTaskOwnershipClaimAfterAllow(hookInput, toolInput);
   persistGuardrailPolicy(hookInput, toolInput);
   return { pass: true, exitCode: 0 };

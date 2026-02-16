@@ -43,10 +43,7 @@ const VALIDATION_SCRIPT = path.join(
 );
 const ACTIVE_CREATORS_STATE_FILE = path.join(
   PROJECT_ROOT,
-  '.claude',
-  'context',
-  'runtime',
-  'active-creators.json'
+  '.claude/context/runtime/active-creators.json'
 );
 const CREATOR_ECOSYSTEM_VALIDATOR =
   process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH ||
@@ -78,15 +75,6 @@ const VALID_STATUSES = VALID_TASK_STATUSES;
  */
 function readTaskStatus(taskId) {
   return lifecycleState.readTaskStatus(taskId);
-}
-
-/**
- * Write task status to file
- * @param {string} taskId - Task ID to update
- * @param {string} status - New status
- */
-function writeTaskStatus(taskId, status) {
-  lifecycleState.writeTaskStatus(taskId, status);
 }
 
 /**
@@ -320,8 +308,8 @@ async function main() {
           const currentStatus = readTaskStatus(taskId);
           const isValid = isValidTransition(currentStatus, newStatus);
 
-          if (currentStatus === 'in_progress' && newStatus === 'in_progress') {
-            // Idempotent
+          if (currentStatus === newStatus) {
+            // Idempotent self-transition
           } else if (!isValid) {
             const msg = getTransitionError(taskId, currentStatus, newStatus);
             if (taskStatusMode === 'block') {
@@ -331,7 +319,8 @@ async function main() {
               console.warn(`[WARN] ${msg}`);
             }
           } else {
-            writeTaskStatus(taskId, newStatus);
+            // Valid transition - allow but don't write yet.
+            // PostToolUse (post-task-unified.cjs) will persist the new status.
             auditLog('pre-completion-validation', 'allow', { taskId, currentStatus, newStatus });
           }
         }
@@ -383,7 +372,6 @@ module.exports = {
   extractTaskMetadata,
   detectArtifacts,
   readTaskStatus,
-  writeTaskStatus,
   isValidTransition,
   getTransitionError,
   validateArtifact,

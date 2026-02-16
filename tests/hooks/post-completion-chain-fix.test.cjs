@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Test: Post-completion chain integration
- * 
+ *
  * Verifies that TaskUpdate(completed) triggers workflow phase advancement.
  */
 
@@ -12,7 +12,13 @@ const path = require('path');
 const fs = require('fs');
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
-const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'workflow', 'post-completion-chain.cjs');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'workflow',
+  'post-completion-chain.cjs'
+);
 const TEST_STATE = path.join(PROJECT_ROOT, '.claude', 'tmp', 'test-wf-state.json');
 const TEST_SIGNAL = path.join(PROJECT_ROOT, '.claude', 'tmp', 'test-phase-advance.json');
 
@@ -38,16 +44,18 @@ async function testPostCompletion() {
 
   await test('should advance workflow phase on completion', async () => {
     const taskId = 'task-42';
-    
+
     // 1. Setup initial workflow state
     const dummyPlan = path.join(PROJECT_ROOT, '.claude', 'tmp', 'dummy-plan.md');
+    if (!fs.existsSync(path.dirname(dummyPlan)))
+      fs.mkdirSync(path.dirname(dummyPlan), { recursive: true });
     fs.writeFileSync(dummyPlan, '# Dummy Plan');
-    
+
     const initialState = {
       workflowId: 'wf-test',
       currentPhase: 'PHASE_1_DESIGN',
       artifacts: {
-        implementationPlan: '.claude/tmp/dummy-plan.md'
+        implementationPlan: '.claude/tmp/dummy-plan.md',
       },
       phases: {
         PHASE_1_DESIGN: {
@@ -55,13 +63,14 @@ async function testPostCompletion() {
           agents: {
             planner: {
               taskId: taskId,
-              status: 'in_progress'
-            }
-          }
-        }
-      }
+              status: 'in_progress',
+            },
+          },
+        },
+      },
     };
-    if (!fs.existsSync(path.dirname(TEST_STATE))) fs.mkdirSync(path.dirname(TEST_STATE), { recursive: true });
+    if (!fs.existsSync(path.dirname(TEST_STATE)))
+      fs.mkdirSync(path.dirname(TEST_STATE), { recursive: true });
     fs.writeFileSync(TEST_STATE, JSON.stringify(initialState));
 
     // 2. Simulate completion hook input
@@ -69,20 +78,20 @@ async function testPostCompletion() {
       tool_name: 'TaskUpdate',
       tool_input: {
         taskId,
-        status: 'completed'
-      }
+        status: 'completed',
+      },
     };
 
     // 3. Run hook
     const child = spawn(process.execPath, [HOOK_PATH, JSON.stringify(hookInput)], {
       stdio: ['pipe', 'inherit', 'inherit'],
-      env: { 
-        ...process.env, 
+      env: {
+        ...process.env,
         WORKFLOW_STATE_FILE: TEST_STATE,
-        PHASE_ADVANCE_FILE: TEST_SIGNAL
-      }
+        PHASE_ADVANCE_FILE: TEST_SIGNAL,
+      },
     });
-    
+
     await new Promise(r => child.on('close', r));
 
     // 4. Verify state update
@@ -91,7 +100,9 @@ async function testPostCompletion() {
       throw new Error(`Expected phase status completed, got ${state.phases.PHASE_1_DESIGN.status}`);
     }
     if (state.phases.PHASE_1_DESIGN.agents.planner.status !== 'completed') {
-      throw new Error(`Expected agent status completed, got ${state.phases.PHASE_1_DESIGN.agents.planner.status}`);
+      throw new Error(
+        `Expected agent status completed, got ${state.phases.PHASE_1_DESIGN.agents.planner.status}`
+      );
     }
 
     // 5. Verify signal creation

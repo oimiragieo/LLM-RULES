@@ -10,18 +10,18 @@ const eventBus = require('../events/event-bus.cjs');
 
 function startHeartbeat(taskId, options = {}) {
   const interval = options.interval || 5000;
-  
+
   const timer = setInterval(() => {
     eventBus.emit('TASK_HEARTBEAT', {
       type: 'TASK_HEARTBEAT',
       taskId,
       timestamp: new Date().toISOString(),
-      ...options.metadata
+      ...options.metadata,
     });
   }, interval);
 
   if (timer.unref) timer.unref();
-  
+
   return timer;
 }
 
@@ -33,5 +33,5 @@ function stopHeartbeat(timer) {
 
 module.exports = {
   startHeartbeat,
-  stopHeartbeat
+  stopHeartbeat,
 };

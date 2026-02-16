@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Test: Task Heartbeat visibility (TDD 3.1)
- * 
+ *
  * Verifies that long-running tasks emit periodic heartbeats.
  */
 
@@ -35,10 +35,10 @@ async function testHeartbeat() {
     // We simulate a "TaskUpdate" that triggers heartbeats
     // or we manually trigger the hook.
     // For now, let's verify if the bus is wired to receive them.
-    
+
     // We'll implement the heartbeat logic in a dedicated module.
     const { startHeartbeat, stopHeartbeat } = require('../../../.claude/lib/utils/heartbeat.cjs');
-    
+
     const h = startHeartbeat('task-1', { interval: 50 });
     await new Promise(resolve => setTimeout(resolve, 210));
     stopHeartbeat(h);

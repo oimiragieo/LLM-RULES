@@ -191,6 +191,14 @@ async function processTaskCompletion(hookData) {
         timestamp: new Date().toISOString(),
       };
 
+      // Advance global currentPhase pointer
+      workflowState.currentPhase = nextPhase;
+      if (workflowState.phases[nextPhase]) {
+        workflowState.phases[nextPhase].status = 'in_progress';
+        workflowState.phases[nextPhase].startedAt = new Date().toISOString();
+      }
+
+      atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
       atomicWriteJSONSync(PHASE_ADVANCE_FILE, phaseAdvanceSignal);
       auditLog('post-completion-chain', 'phase_advanced', { from: currentPhase, to: nextPhase });
     });

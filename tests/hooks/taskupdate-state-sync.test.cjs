@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Test: TaskUpdate state synchronization
- * 
+ *
  * Verifies that calling TaskUpdate updates the router-state.json
  * and emits a TASK_UPDATED event via the post-task-unified hook.
  */
@@ -39,28 +39,28 @@ async function testTaskUpdateSync() {
   await test('should update router-state when TaskUpdate is called', async () => {
     const taskId = 'test-sync-task-123';
     const status = 'in_progress';
-    
+
     // Simulate hook input for TaskUpdate (Nested Schema)
     const hookInput = {
       toolUse: {
         tool: 'TaskUpdate',
         input: {
           taskId,
-          status
-        }
+          status,
+        },
       },
-      session_id: 'test-session'
+      session_id: 'test-session',
     };
 
     // Run hook with isolated state file
     const child = spawn(process.execPath, [HOOK_PATH, JSON.stringify(hookInput)], {
       stdio: ['pipe', 'inherit', 'inherit'],
-      env: { 
-        ...process.env, 
-        ROUTER_STATE_FILE: TEST_STATE
-      }
+      env: {
+        ...process.env,
+        ROUTER_STATE_FILE: TEST_STATE,
+      },
     });
-    
+
     await new Promise(r => child.on('close', r));
 
     // Verify state

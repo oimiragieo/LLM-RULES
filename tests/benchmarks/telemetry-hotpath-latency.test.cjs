@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Benchmark: Flight Recorder Latency Regression (TDD 1.1)
- * 
+ *
  * Measures the impact of file pruning on the recording hot-path.
  */
 
@@ -19,7 +19,7 @@ async function runBenchmark() {
   console.log('--- Telemetry Hot-Path Benchmark ---');
 
   if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
-  
+
   // Cleanup
   const files = fs.readdirSync(LOG_DIR);
   for (const file of files) {
@@ -42,7 +42,7 @@ async function runBenchmark() {
   // 2. Measure record() latency
   const ITERATIONS = 500;
   console.log(`Recording ${ITERATIONS} events...`);
-  
+
   const start = Date.now();
   for (let i = 0; i < ITERATIONS; i++) {
     record({ event: 'bench', i }, TEST_LOG);
@@ -55,7 +55,9 @@ async function runBenchmark() {
   // Target: With AsyncLogBuffer + Optimized Pruning, this should be < 0.1ms avg
   // Currently, if it's calling pruneOldFiles every time, it will be > 1ms.
   if (elapsed > 100) {
-    console.error(`\n[FAIL] Performance regression detected: ${elapsed}ms is too slow for ${ITERATIONS} records.`);
+    console.error(
+      `\n[FAIL] Performance regression detected: ${elapsed}ms is too slow for ${ITERATIONS} records.`
+    );
     process.exit(1);
   } else {
     console.log('\n[PASS] Telemetry hot-path is efficient.');
