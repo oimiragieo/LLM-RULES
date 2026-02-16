@@ -114,7 +114,15 @@ async function main() {
           });
         }
       } catch (_err) {
-        // Best-effort
+        process.stderr.write(
+          JSON.stringify({
+            timestamp: new Date().toISOString(),
+            level: 'error',
+            component: 'pre-task-unified',
+            event: 'telemetry_emit_failed',
+            error: _err.message,
+          }) + '\n'
+        );
       }
       console.log(formatResult(result.exitCode === 2 ? 'block' : 'warn', result.message));
       process.exit(result.exitCode);

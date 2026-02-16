@@ -21,6 +21,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 
 const { PROJECT_ROOT, validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const {
   parseHookInputSync,
   getToolName,
@@ -167,10 +168,10 @@ function syncJsonMemory(absPath, dbPath) {
   }
 
   let items = [];
-  try {
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) items = parsed;
-  } catch (_e) {
+  const parsed = safeParseJSON(raw, null);
+  if (Array.isArray(parsed)) {
+    items = parsed;
+  } else {
     return;
   }
 

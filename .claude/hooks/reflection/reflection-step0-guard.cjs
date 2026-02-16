@@ -146,13 +146,10 @@ function hasPendingReflections() {
 }
 
 function readStep0State() {
-  try {
-    if (!fs.existsSync(STEP0_STATE_PATH)) return {};
-    const parsed = JSON.parse(fs.readFileSync(STEP0_STATE_PATH, 'utf8'));
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch (_err) {
-    return {};
-  }
+  if (!fs.existsSync(STEP0_STATE_PATH)) return {};
+  const content = fs.readFileSync(STEP0_STATE_PATH, 'utf8');
+  const parsed = safeParseJSON(content, null);
+  return parsed && typeof parsed === 'object' ? parsed : {};
 }
 
 function writeStep0State(state) {

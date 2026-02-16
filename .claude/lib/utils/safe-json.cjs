@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global structuredClone */
 /**
  * Safe JSON Parser (SEC-007)
  * ==========================
@@ -22,6 +23,21 @@
 
 const fs = require('fs');
 const warnedSchemas = new Set();
+const MAX_WARNED_SCHEMAS = 200;
+
+/**
+ * Track a schema warning key with bounded FIFO eviction.
+ * Returns true if key was already tracked (suppress warning), false if new.
+ */
+function trackWarned(key) {
+  if (warnedSchemas.has(key)) return true;
+  if (warnedSchemas.size >= MAX_WARNED_SCHEMAS) {
+    const oldest = warnedSchemas.values().next().value;
+    warnedSchemas.delete(oldest);
+  }
+  warnedSchemas.add(key);
+  return false;
+}
 
 // =============================================================================
 // Schema Definitions
@@ -150,6 +166,39 @@ const SCHEMAS = {
 // =============================================================================
 
 /**
+ * Strip dangerous keys (__proto__, constructor, prototype) recursively from an object.
+ * Prevents prototype pollution attacks on deeply nested structures.
+ *
+ * @param {*} obj - Value to sanitize
+ * @param {number} [depth=0] - Current recursion depth
+ * @param {number} [maxDepth=10] - Maximum recursion depth
+ * @returns {*} Sanitized value
+ */
+function stripDangerousKeys(obj, depth, maxDepth) {
+  if (depth === undefined) depth = 0;
+  if (maxDepth === undefined) maxDepth = 10;
+  if (depth >= maxDepth) return obj;
+  if (obj === null || obj === undefined || typeof obj !== 'object') return obj;
+
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) {
+      obj[i] = stripDangerousKeys(obj[i], depth + 1, maxDepth);
+    }
+    return obj;
+  }
+
+  const keys = Object.keys(obj);
+  for (const key of keys) {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      delete obj[key];
+    } else {
+      obj[key] = stripDangerousKeys(obj[key], depth + 1, maxDepth);
+    }
+  }
+  return obj;
+}
+
+/**
  * Safely parse JSON with schema validation
  *
  * Security features:
@@ -157,14 +206,25 @@ const SCHEMAS = {
  * 2. Strips unknown properties (prevents injection)
  * 3. Uses Object.create(null) to avoid prototype pollution
  * 4. Only copies known properties from defaults
+ * 5. Recursively strips dangerous keys (__proto__, constructor, prototype)
  *
  * @param {string} content - JSON string to parse
- * @param {string|null} schemaName - Name of schema to validate against
+ * @param {string|null} schemaName - Name of schema to validate against (or inline name)
+ * @param {Object} [inlineSchema] - Optional inline schema definition (keys with type/required metadata)
+ * @param {Object} [inlineDefaults] - Optional inline defaults (used with inlineSchema)
  * @returns {Object} Parsed object with only known properties, or defaults on error
  */
-function safeParseJSON(content, schemaName) {
+function safeParseJSON(content, schemaName, inlineSchema, inlineDefaults) {
+  // Resolve schema: inline schema takes precedence over built-in SCHEMAS lookup
+  let resolvedSchema = null;
+  if (inlineSchema && inlineDefaults) {
+    resolvedSchema = { required: [], defaults: inlineDefaults };
+  } else if (schemaName && SCHEMAS[schemaName]) {
+    resolvedSchema = SCHEMAS[schemaName];
+  }
+
   // If no schema, do simple parse with fallback
-  if (!schemaName || !SCHEMAS[schemaName]) {
+  if (!resolvedSchema) {
     // SEC-LIB-005 FIX: Optional warning path when fallback is used without schema protection.
     // Keep this quiet by default to avoid noisy logs in normal operation.
     const shouldWarnFallback =
@@ -173,11 +233,10 @@ function safeParseJSON(content, schemaName) {
     const warnKey = schemaName || '__missing__';
     if (
       shouldWarnFallback &&
-      !warnedSchemas.has(warnKey) &&
+      !trackWarned(warnKey) &&
       process.stderr &&
       typeof process.stderr.write === 'function'
     ) {
-      warnedSchemas.add(warnKey);
       process.stderr.write(
         `[WARN] safe-json: No schema provided for JSON parsing. Using fallback with limited protection.\n`
       );
@@ -187,12 +246,21 @@ function safeParseJSON(content, schemaName) {
       const parsed = JSON.parse(content);
       // SEC-LIB-005 FIX: Use Object.create(null) to prevent prototype pollution even in fallback
       const safe = Object.create(null);
-      // Deep copy properties to safe object
-      for (const key of Object.keys(parsed)) {
-        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-          continue; // Skip dangerous keys
+      // Deep copy properties to safe object (top-level)
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        for (const key of Object.keys(parsed)) {
+          if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+            continue; // Skip dangerous keys at top level
+          }
+          safe[key] = parsed[key];
         }
-        safe[key] = parsed[key];
+        // Recursively strip dangerous keys from nested objects
+        stripDangerousKeys(safe);
+      } else if (Array.isArray(parsed)) {
+        // Handle array input in fallback path
+        return stripDangerousKeys(parsed);
+      } else {
+        return parsed;
       }
       return safe;
     } catch (_e) {
@@ -201,7 +269,34 @@ function safeParseJSON(content, schemaName) {
     }
   }
 
-  const schema = SCHEMAS[schemaName];
+  const schema = resolvedSchema;
+
+  // Schema-based validation: emit warning for schema mismatch
+  if (schemaName && inlineSchema) {
+    // Inline schema with a name: check for unexpected keys and warn
+    try {
+      const parsedCheck = JSON.parse(content);
+      if (parsedCheck && typeof parsedCheck === 'object' && !Array.isArray(parsedCheck)) {
+        const parsedKeys = Object.keys(parsedCheck);
+        const schemaKeys = Object.keys(schema.defaults);
+        const unknownKeys = parsedKeys.filter(k => !schemaKeys.includes(k));
+        if (unknownKeys.length > 0) {
+          const warnKey = schemaName;
+          if (
+            !trackWarned(warnKey) &&
+            process.stderr &&
+            typeof process.stderr.write === 'function'
+          ) {
+            process.stderr.write(
+              `[WARN] safe-json: test-schema: ${schemaName} has unknown keys: ${unknownKeys.join(', ')}\n`
+            );
+          }
+        }
+      }
+    } catch (_e) {
+      // Ignore parse errors here; handled below
+    }
+  }
 
   // Try to parse JSON
   let parsed;
@@ -227,25 +322,29 @@ function safeParseJSON(content, schemaName) {
     for (const key of Object.keys(schema.defaults)) {
       if (Object.prototype.hasOwnProperty.call(parsed, key)) {
         // SEC-AUDIT-006 FIX: Deep copy for all nested objects to prevent reference issues
-        // Use JSON.parse(JSON.stringify()) for complete deep copy
+        // Use structuredClone for complete deep copy (preserves Date, etc.)
         const value = parsed[key];
         if (value === null || value === undefined) {
           validated[key] = value;
-        } else if (Array.isArray(value)) {
-          // Deep copy arrays with all nested content
+        } else if (Array.isArray(value) || typeof value === 'object') {
           try {
-            validated[key] = JSON.parse(JSON.stringify(value));
-          } catch (_e) {
-            // If deep copy fails, use default
-            validated[key] = schema.defaults[key];
-          }
-        } else if (typeof value === 'object') {
-          // Deep copy nested objects
-          try {
-            validated[key] = JSON.parse(JSON.stringify(value));
-          } catch (_e) {
-            // If deep copy fails, use default
-            validated[key] = schema.defaults[key];
+            let copied = structuredClone(value);
+            copied = stripDangerousKeys(copied);
+            validated[key] = copied;
+          } catch (_cloneErr) {
+            // structuredClone fails on functions -- try JSON roundtrip
+            try {
+              let copied = JSON.parse(JSON.stringify(value));
+              copied = stripDangerousKeys(copied);
+              validated[key] = copied;
+            } catch (_jsonErr) {
+              // PRESERVE original value, LOG error (never silently default)
+              process.stderr.write(
+                `[WARN] safe-json: Deep copy failed for key "${key}" in schema "${schemaName}": ` +
+                  `${_jsonErr.message}. Using original reference.\n`
+              );
+              validated[key] = stripDangerousKeys(value);
+            }
           }
         } else {
           // Primitives can be assigned directly
@@ -307,5 +406,9 @@ function safeReadJSON(filePath, schemaName) {
 module.exports = {
   safeParseJSON,
   safeReadJSON,
+  stripDangerousKeys,
+  trackWarned,
+  warnedSchemas,
+  MAX_WARNED_SCHEMAS,
   SCHEMAS,
 };

@@ -14,6 +14,7 @@ function libRequire(modulePath) {
 const { getToolName, getToolInput, getEnforcementMode, auditLog } = libRequire(
   path.join('utils', 'hook-input.cjs')
 );
+const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
 
@@ -145,22 +146,19 @@ function checkCoreMemoryReadBeforeTask(hookInput) {
   const sessionId = resolveStableSessionId(hookInput);
   const now = Date.now();
   let sessions = {};
-  try {
-    if (!fs.existsSync(TOOL_GOVERNANCE_STATE_FILE)) {
-      return {
-        pass: false,
-        result: 'block',
-        message:
-          '[MEMORY-FIRST] Core memory evidence missing for this session. ' +
-          'Read `.claude/context/memory/patterns.json`, `.claude/context/memory/gotchas.json`, ' +
-          '`.claude/context/memory/decisions.md`, and `.claude/context/memory/issues.md` before Task spawn.',
-      };
-    }
-    const parsed = JSON.parse(fs.readFileSync(TOOL_GOVERNANCE_STATE_FILE, 'utf8'));
-    sessions = parsed?.sessions || {};
-  } catch (_err) {
-    sessions = {};
+  if (!fs.existsSync(TOOL_GOVERNANCE_STATE_FILE)) {
+    return {
+      pass: false,
+      result: 'block',
+      message:
+        '[MEMORY-FIRST] Core memory evidence missing for this session. ' +
+        'Read `.claude/context/memory/patterns.json`, `.claude/context/memory/gotchas.json`, ' +
+        '`.claude/context/memory/decisions.md`, and `.claude/context/memory/issues.md` before Task spawn.',
+    };
   }
+  const content = fs.readFileSync(TOOL_GOVERNANCE_STATE_FILE, 'utf8');
+  const parsed = safeParseJSON(content, null);
+  sessions = parsed?.sessions || {};
 
   const entry = sessions[sessionId];
   const lastReadAt = Number(entry?.lastCoreMemoryReadAt || 0);

@@ -101,15 +101,19 @@ function readQueueEntries(queueFile) {
     const entries = [];
 
     for (const line of lines) {
-      try {
-        const entry = JSON.parse(line);
+      const entry = safeParseJSON(line, null);
+      if (entry && typeof entry === 'object' && Object.keys(entry).length > 0) {
         // Skip entries already marked as processed
         if (!entry.processed) {
           entries.push(entry);
         }
-      } catch (parseErr) {
+      } else {
         // Skip malformed JSON lines, log if debug enabled
-        debugLog('reflection-queue-processor', 'Skipping malformed line in queue', parseErr);
+        debugLog(
+          'reflection-queue-processor',
+          'Skipping malformed line in queue',
+          new Error('parse_failed')
+        );
       }
     }
 
@@ -319,8 +323,8 @@ function markEntriesProcessed(processedEntries, queueFile) {
     );
 
     for (const line of lines) {
-      try {
-        const entry = JSON.parse(line);
+      const entry = safeParseJSON(line, null);
+      if (entry && typeof entry === 'object' && Object.keys(entry).length > 0) {
         const identifier = `${entry.trigger}:${entry.timestamp}:${entry.taskId || entry.context || ''}`;
 
         if (processedSet.has(identifier)) {
@@ -328,7 +332,7 @@ function markEntriesProcessed(processedEntries, queueFile) {
         }
 
         updatedLines.push(JSON.stringify(entry));
-      } catch (_parseErr) {
+      } else {
         // Keep malformed lines as-is
         updatedLines.push(line);
       }

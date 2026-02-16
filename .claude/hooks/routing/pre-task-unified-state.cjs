@@ -12,6 +12,7 @@ function libRequire(modulePath) {
 
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
+const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 
 const LOOP_STATE_FILE = loopStateManager.LOOP_STATE_FILE;
 const TASKLIST_LOOP_STATE_FILE = path.join(
@@ -62,21 +63,18 @@ function getLoopState() {
 }
 
 function readTaskListLoopState(stateFile = TASKLIST_LOOP_STATE_FILE) {
-  try {
-    if (!fs.existsSync(stateFile)) return { sessions: {} };
-    const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-    if (
-      !parsed ||
-      typeof parsed !== 'object' ||
-      !parsed.sessions ||
-      typeof parsed.sessions !== 'object'
-    ) {
-      return { sessions: {} };
-    }
-    return parsed;
-  } catch (_err) {
+  if (!fs.existsSync(stateFile)) return { sessions: {} };
+  const content = fs.readFileSync(stateFile, 'utf8');
+  const parsed = safeParseJSON(content, null);
+  if (
+    !parsed ||
+    typeof parsed !== 'object' ||
+    !parsed.sessions ||
+    typeof parsed.sessions !== 'object'
+  ) {
     return { sessions: {} };
   }
+  return parsed;
 }
 
 function writeTaskListLoopState(state, stateFile = TASKLIST_LOOP_STATE_FILE) {
@@ -114,21 +112,18 @@ function clearTaskListFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID |
 }
 
 function readPlannerFirstLoopState(stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
-  try {
-    if (!fs.existsSync(stateFile)) return { sessions: {} };
-    const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-    if (
-      !parsed ||
-      typeof parsed !== 'object' ||
-      !parsed.sessions ||
-      typeof parsed.sessions !== 'object'
-    ) {
-      return { sessions: {} };
-    }
-    return parsed;
-  } catch (_err) {
+  if (!fs.existsSync(stateFile)) return { sessions: {} };
+  const content = fs.readFileSync(stateFile, 'utf8');
+  const parsed = safeParseJSON(content, null);
+  if (
+    !parsed ||
+    typeof parsed !== 'object' ||
+    !parsed.sessions ||
+    typeof parsed.sessions !== 'object'
+  ) {
     return { sessions: {} };
   }
+  return parsed;
 }
 
 function writePlannerFirstLoopState(state, stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
@@ -172,21 +167,18 @@ function resolveStableSessionId(hookInput = null) {
 }
 
 function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
-  try {
-    if (!fs.existsSync(stateFile)) return { sessions: {} };
-    const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-    if (
-      !parsed ||
-      typeof parsed !== 'object' ||
-      !parsed.sessions ||
-      typeof parsed.sessions !== 'object'
-    ) {
-      return { sessions: {} };
-    }
-    return parsed;
-  } catch (_err) {
+  if (!fs.existsSync(stateFile)) return { sessions: {} };
+  const content = fs.readFileSync(stateFile, 'utf8');
+  const parsed = safeParseJSON(content, null);
+  if (
+    !parsed ||
+    typeof parsed !== 'object' ||
+    !parsed.sessions ||
+    typeof parsed.sessions !== 'object'
+  ) {
     return { sessions: {} };
   }
+  return parsed;
 }
 
 function writeAgentGuardrailsState(state, stateFile = AGENT_GUARDRAILS_STATE_FILE) {

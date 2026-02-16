@@ -20,6 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { withLock } = require('../utils/file-locker.cjs');
 const {
   isStructuredSummaryEnabled,
   isSessionArchiveEnabled,
@@ -37,6 +38,52 @@ const CONFIG = {
   MTM_WARN_THRESHOLD: 8, // Warn when approaching limit
   SUMMARY_MIN_SESSIONS: 5, // Minimum sessions to summarize
 };
+
+/**
+ * Get the path used as a lock sentinel for tier operations.
+ * The lock file is placed in the runtime directory to avoid
+ * cluttering the memory tier directories themselves.
+ *
+ * @param {string} [projectRoot=PROJECT_ROOT] - Project root
+ * @returns {string} Absolute path to the lock sentinel file
+ */
+function getLockFilePath(projectRoot = PROJECT_ROOT) {
+  const runtimeDir = path.join(projectRoot, '.claude', 'context', 'runtime');
+  if (!fs.existsSync(runtimeDir)) {
+    fs.mkdirSync(runtimeDir, { recursive: true });
+  }
+  const lockSentinel = path.join(runtimeDir, 'memory-tiers.lock');
+  // Ensure sentinel file exists (proper-lockfile requires it)
+  if (!fs.existsSync(lockSentinel)) {
+    fs.writeFileSync(lockSentinel, '');
+  }
+  return lockSentinel;
+}
+
+/**
+ * Execute a function while holding the memory-tiers file lock.
+ * This serializes concurrent tier operations to prevent data corruption
+ * during read-modify-write cycles on MTM/LTM directories.
+ *
+ * Graceful degradation: if locking fails (e.g., stale lock, permissions),
+ * the function executes without the lock and logs a warning to stderr.
+ *
+ * @param {Function} fn - Async function to execute under lock
+ * @param {string} [projectRoot=PROJECT_ROOT] - Project root
+ * @returns {Promise<any>} Result of fn()
+ */
+async function withFileLock(fn, projectRoot = PROJECT_ROOT) {
+  const lockPath = getLockFilePath(projectRoot);
+  try {
+    return await withLock(lockPath, fn);
+  } catch (lockErr) {
+    // Graceful degradation: proceed without lock
+    process.stderr.write(
+      `[memory-tiers] Lock acquisition failed, proceeding without lock: ${lockErr.message}\n`
+    );
+    return await fn();
+  }
+}
 
 // Memory tier definitions
 const MEMORY_TIERS = {
@@ -573,6 +620,47 @@ function summarizeOldSessions(projectRoot = PROJECT_ROOT, incomingSessions = 0) 
 }
 
 // ============================================================================
+// LTM Eviction
+// ============================================================================
+
+const LTM_MAX_SUMMARIES = parseInt(process.env.LTM_MAX_SUMMARIES || '20', 10);
+
+/**
+ * Evict oldest LTM summary files when exceeding LTM_MAX_SUMMARIES.
+ * Promoted files (prefixed with 'promoted_') are preserved and not counted.
+ *
+ * @param {string} [projectRoot=PROJECT_ROOT] - Project root directory path
+ * @returns {{evicted: number}} Number of files evicted
+ */
+function evictOldLTMSummaries(projectRoot) {
+  if (projectRoot === undefined) projectRoot = PROJECT_ROOT;
+  const ltmDir = getTierPath('LTM', projectRoot);
+
+  if (!fs.existsSync(ltmDir)) {
+    return { evicted: 0 };
+  }
+
+  const files = fs.readdirSync(ltmDir).filter(f => f.endsWith('.json'));
+  const _promoted = files.filter(f => f.startsWith('promoted_'));
+  const regular = files.filter(f => !f.startsWith('promoted_'));
+
+  // Sort regular files alphabetically (oldest first by naming convention)
+  regular.sort();
+
+  // Keep only the newest LTM_MAX_SUMMARIES regular files
+  const excess = regular.length - LTM_MAX_SUMMARIES;
+  if (excess > 0) {
+    const toDelete = regular.slice(0, excess);
+    for (const file of toDelete) {
+      fs.unlinkSync(path.join(ltmDir, file));
+    }
+    return { evicted: toDelete.length };
+  }
+
+  return { evicted: 0 };
+}
+
+// ============================================================================
 // Health Check
 // ============================================================================
 
@@ -699,6 +787,7 @@ Examples:
 module.exports = {
   MEMORY_TIERS,
   CONFIG,
+  LTM_MAX_SUMMARIES,
   getMemoryDir,
   getTierPath,
   // STM
@@ -713,6 +802,9 @@ module.exports = {
   promoteToLTM,
   generateSessionSummary,
   summarizeOldSessions,
+  evictOldLTMSummaries,
   // Health
   getTierHealth,
+  // Locking
+  withFileLock,
 };
