@@ -24,7 +24,7 @@ Use this template for orchestrators that spawn and coordinate other agents.
 
 ```javascript
 Task({
-  task_id: 'task-1',
+  task_id: '<ID>',
   subagent_type: 'master-orchestrator',
   model: 'sonnet',
   max_turns: 28,
@@ -39,15 +39,15 @@ Task({
     'TaskOutput',
     'Skill',
   ],
-  prompt: `Task ID: task-1
+  prompt: `Task ID: <ID>
 You are master-orchestrator. Read .claude/agents/orchestrators/master-orchestrator.md.
-FIRST: TaskUpdate({ taskId: "task-1", status: "in_progress" }).
+FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" }).
 Objective: <coordination goal>.
 Spawn plan:
 1) <agent + task>
 2) <agent + task>
 Consolidation criteria: <acceptance checks>.
-LAST: TaskUpdate({ taskId: "task-1", status: "completed", metadata: { summary: "...", filesModified: [...] } }).
+LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: { summary: "...", filesModified: [...] } }).
 Then call TaskList().`,
 });
 ```

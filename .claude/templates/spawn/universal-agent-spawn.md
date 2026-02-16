@@ -38,19 +38,19 @@ Use this template for all non-orchestrator agents.
 
 ```javascript
 Task({
-  task_id: 'task-1',
+  task_id: '<ID>',
   subagent_type: 'developer',
   model: 'sonnet',
   max_turns: 18,
   description: 'Implement X in Y and return verification evidence',
   allowed_tools: ['Read', 'TaskUpdate', 'TaskList', 'TaskGet', 'TaskOutput', 'Skill'],
-  prompt: `Task ID: task-1
+  prompt: `Task ID: <ID>
 You are developer. Read .claude/agents/core/developer.md.
-FIRST: TaskUpdate({ taskId: "task-1", status: "in_progress" }).
+FIRST: TaskUpdate({ taskId: "<ID>", status: "in_progress" }).
 Do only: <exact task scope>.
 Constraints: <limits>.
 Deliverables: <files + checks>.
-LAST: TaskUpdate({ taskId: "task-1", status: "completed", metadata: { summary: "...", filesModified: [...] } }).
+LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: { summary: "...", filesModified: [...] } }).
 Then call TaskList().`,
 });
 ```

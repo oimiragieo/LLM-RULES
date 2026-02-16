@@ -61,7 +61,7 @@ Apply these traits when evaluating options and communicating results.
 
 // 3. Inject identity section into prompt (after task warning, before PROJECT CONTEXT)
 Task({
-  task_id: 'task-1',
+  task_id: '<ID>',
   subagent_type: agentData.name,
   model: agentData.model,
   description: `${agentData.identity?.role || agentData.name} doing <TASK>`,

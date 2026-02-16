@@ -11,7 +11,7 @@
  * PRESERVES legitimate code in markdown blocks (triple backticks).
  *
  * Based on security patterns from:
- * - .claude/lib/utils/safe-json-parse.cjs (prototype pollution)
+ * - .claude/lib/utils/safe-json.cjs (prototype pollution)
  * - OWASP Agentic AI Top 10 (ASI01, ASI06)
  *
  * Created: 2026-02-13 (P0-005 Fix)

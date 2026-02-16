@@ -10,6 +10,9 @@ test('normalizeTaskIdReferences rewrites hardcoded task placeholders to active t
   const input = [
     '**Task ID**: task-1',
     'Task ID: task-1',
+    'TASK ID: task-1',
+    'TaskUpdate({ taskId: "1", status: "in_progress" })',
+    'TaskUpdate({ task_id: "1", status: "completed" })',
     "TaskUpdate({ taskId: 'task-1', status: 'in_progress' })",
     "TaskUpdate({ task_id: 'task-1', status: 'completed' })",
   ].join('\n');
@@ -17,9 +20,14 @@ test('normalizeTaskIdReferences rewrites hardcoded task placeholders to active t
   const output = normalizeTaskIdReferences(input, 'task-real-123');
   assert.ok(output.includes('**Task ID**: task-real-123'));
   assert.ok(output.includes('Task ID: task-real-123'));
+  assert.ok(output.includes('TASK ID: task-real-123'));
+  assert.ok(output.includes('taskId: "task-real-123"'));
+  assert.ok(output.includes('task_id: "task-real-123"'));
   assert.ok(output.includes("taskId: 'task-real-123'"));
   assert.ok(output.includes("task_id: 'task-real-123'"));
   assert.equal(output.includes('task-1'), false);
+  assert.equal(output.includes('taskId: "1"'), false);
+  assert.equal(output.includes('task_id: "1"'), false);
 });
 
 test('normalizeStalePathReferences rewrites known stale report and code paths', () => {

@@ -62,7 +62,7 @@ if (!success) {
 - Prototype pollution protection (strips `__proto__`, `constructor`, `prototype`)
 - Structured return `{ success, data, error }`
 - Optional fallback value
-- Located in `.claude/lib/utils/safe-json-parse.cjs`
+- Located in `.claude/lib/utils/safe-json.cjs`
 
 **Why this matters:**
 
