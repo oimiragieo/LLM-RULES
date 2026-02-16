@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * BM25 Health Check & Maintenance
- * 
+ *
  * Validates the sparse index for:
  * 1. Orphaned documents (IDs that no longer exist in the source/vector store).
  * 2. Stale content (Documents where the hash doesn't match current state).
@@ -24,12 +24,12 @@ class BM25HealthChecker {
   check(validIds) {
     const indexedIds = this.indexer.documents.map(d => d.id);
     const validSet = new Set(validIds);
-    
+
     const orphaned = indexedIds.filter(id => !validSet.has(id));
     const missing = validIds.filter(id => !indexedIds.includes(id));
-    
-    const healthScore = indexedIds.length === 0 ? 1 : 
-      Math.max(0, 1 - (orphaned.length / indexedIds.length));
+
+    const healthScore =
+      indexedIds.length === 0 ? 1 : Math.max(0, 1 - orphaned.length / indexedIds.length);
 
     return {
       totalIndexed: indexedIds.length,
@@ -37,7 +37,7 @@ class BM25HealthChecker {
       missingCount: missing.length,
       orphanedIds: orphaned,
       healthScore,
-      status: healthScore > 0.9 ? 'healthy' : 'degraded'
+      status: healthScore > 0.9 ? 'healthy' : 'degraded',
     };
   }
 
@@ -47,17 +47,17 @@ class BM25HealthChecker {
   repair(validIds) {
     const report = this.check(validIds);
     let repairedCount = 0;
-    
+
     for (const id of report.orphanedIds) {
       if (this.indexer.removeDocument(id)) {
         repairedCount++;
       }
     }
-    
+
     if (repairedCount > 0) {
       this.indexer.optimize();
     }
-    
+
     return { repairedCount, finalHealth: this.check(validIds) };
   }
 }

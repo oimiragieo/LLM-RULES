@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Tests for Flight Recorder (Phase 2)
- * 
+ *
  * Verifies that the flight recorder:
  * 1. Appends events in JSONL format.
  * 2. Is resilient to write failures (fail-open).
@@ -46,13 +46,16 @@ async function testRecorder() {
 
   await test('should append valid events to JSONL', async () => {
     if (!recorder) throw new Error('Recorder not loaded');
-    
-    recorder.record({
-      event: 'test_event',
-      traceId: 'trace-1',
-      component: 'test',
-      data: { foo: 'bar' }
-    }, TEST_LOG);
+
+    recorder.record(
+      {
+        event: 'test_event',
+        traceId: 'trace-1',
+        component: 'test',
+        data: { foo: 'bar' },
+      },
+      TEST_LOG
+    );
 
     const content = fs.readFileSync(TEST_LOG, 'utf8').trim();
     const parsed = JSON.parse(content);
@@ -62,10 +65,10 @@ async function testRecorder() {
 
   await test('should be resilient to write failures (fail-open)', async () => {
     if (!recorder) throw new Error('Recorder not loaded');
-    
+
     // Simulate read-only directory or invalid path
     const invalidPath = path.join('/invalid/path/to/logs.jsonl');
-    
+
     // This should NOT throw
     recorder.record({ event: 'fail_open_test' }, invalidPath);
   });

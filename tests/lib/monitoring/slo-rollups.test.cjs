@@ -7,7 +7,10 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const { buildRollups, generateRollups } = require('../../../.claude/lib/monitoring/slo-rollups.cjs');
+const {
+  buildRollups,
+  generateRollups,
+} = require('../../../.claude/lib/monitoring/slo-rollups.cjs');
 
 test('buildRollups computes p50/p95 and recorder failure rate', () => {
   const rollups = buildRollups([

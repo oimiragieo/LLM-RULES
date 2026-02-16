@@ -5,12 +5,21 @@ const path = require('path');
 const { replay } = require('./flight-recorder-replay.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
-const DEFAULT_SLO_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'reports', 'slo-metrics.json');
+const DEFAULT_SLO_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'reports',
+  'slo-metrics.json'
+);
 
 function percentile(values, pct) {
   if (!Array.isArray(values) || values.length === 0) return 0;
   const sorted = values.slice().sort((a, b) => a - b);
-  const index = Math.min(sorted.length - 1, Math.max(0, Math.ceil((pct / 100) * sorted.length) - 1));
+  const index = Math.min(
+    sorted.length - 1,
+    Math.max(0, Math.ceil((pct / 100) * sorted.length) - 1)
+  );
   return sorted[index];
 }
 

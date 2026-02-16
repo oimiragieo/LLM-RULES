@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Performance Regression Gate
- * 
+ *
  * Runs the hook latency benchmark and enforces strict enterprise SLOs.
  * Exit Codes:
  * - 0: PASS (within bounds)
@@ -22,9 +22,9 @@ async function main() {
   const mode = process.env.HOOK_RUNNER_MODE || 'worker';
   const runner = new HookRunner({ mode });
   const { scriptPath } = resolveHookScriptPath(TEST_HOOK);
-  
+
   const iterations = 10;
-  
+
   // Warm up
   if (mode === 'worker') {
     await runner.run(scriptPath, ['--dry-run']);
@@ -38,7 +38,9 @@ async function main() {
   const avg = total / iterations;
 
   if (avg > MAX_AVG_LATENCY_MS) {
-    console.error(`[PERF-GATE] REGRESSION DETECTED: Avg latency ${avg.toFixed(2)}ms exceeds limit of ${MAX_AVG_LATENCY_MS}ms`);
+    console.error(
+      `[PERF-GATE] REGRESSION DETECTED: Avg latency ${avg.toFixed(2)}ms exceeds limit of ${MAX_AVG_LATENCY_MS}ms`
+    );
     process.exit(2);
   }
 

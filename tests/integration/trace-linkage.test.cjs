@@ -16,12 +16,42 @@ test('trace-query reconstructs task lifecycle linkage for a trace id', () => {
   const traceId = 'trace-linkage-1';
   try {
     const entries = [
-      { traceId, timestamp: '2026-01-01T00:00:00.000Z', component: 'router', event: 'task_created', taskId: '1' },
-      { traceId, timestamp: '2026-01-01T00:00:01.000Z', component: 'worker', event: 'task_updated', taskId: '1', status: 'in_progress' },
-      { traceId, timestamp: '2026-01-01T00:00:02.000Z', component: 'worker', event: 'task_updated', taskId: '1', status: 'completed' },
-      { traceId, timestamp: '2026-01-01T00:00:03.000Z', component: 'workflow', event: 'phase_transition', phase: 'PHASE_2_IMPLEMENT' },
+      {
+        traceId,
+        timestamp: '2026-01-01T00:00:00.000Z',
+        component: 'router',
+        event: 'task_created',
+        taskId: '1',
+      },
+      {
+        traceId,
+        timestamp: '2026-01-01T00:00:01.000Z',
+        component: 'worker',
+        event: 'task_updated',
+        taskId: '1',
+        status: 'in_progress',
+      },
+      {
+        traceId,
+        timestamp: '2026-01-01T00:00:02.000Z',
+        component: 'worker',
+        event: 'task_updated',
+        taskId: '1',
+        status: 'completed',
+      },
+      {
+        traceId,
+        timestamp: '2026-01-01T00:00:03.000Z',
+        component: 'workflow',
+        event: 'phase_transition',
+        phase: 'PHASE_2_IMPLEMENT',
+      },
     ];
-    fs.writeFileSync(recorderPath, entries.map(row => JSON.stringify(row)).join('\n') + '\n', 'utf8');
+    fs.writeFileSync(
+      recorderPath,
+      entries.map(row => JSON.stringify(row)).join('\n') + '\n',
+      'utf8'
+    );
 
     const result = spawnSync(
       process.execPath,

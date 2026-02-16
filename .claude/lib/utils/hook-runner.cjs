@@ -8,7 +8,7 @@ const { spawn } = require('child_process');
 const globalPool = {
   workers: [],
   busy: new Set(),
-  queue: []
+  queue: [],
 };
 
 class HookRunner {
@@ -27,7 +27,7 @@ class HookRunner {
    */
   async run(scriptPath, hookArgs = []) {
     const ext = path.extname(scriptPath);
-    
+
     // Non-JS hooks always use process mode
     if (ext === '.sh' || this.mode === 'process') {
       return this.runProcess(scriptPath, hookArgs);
@@ -51,7 +51,7 @@ class HookRunner {
       cmdArgs = [scriptPath, ...hookArgs];
     }
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const child = spawn(cmd, cmdArgs, {
         stdio: 'inherit',
         env: this.baseEnv,
@@ -71,8 +71,8 @@ class HookRunner {
     const worker = await this._getAvailableWorker();
     globalPool.busy.add(worker);
 
-    return new Promise((resolve) => {
-      const onMessage = (msg) => {
+    return new Promise(resolve => {
+      const onMessage = msg => {
         if (msg.type === 'success' || msg.type === 'error') {
           if (msg.type === 'error') {
             console.error(`[Hook Worker Error] ${msg.message}\n${msg.stack}`);
@@ -81,21 +81,21 @@ class HookRunner {
         }
       };
 
-      const onError = (err) => {
+      const onError = err => {
         console.error(`[Worker Thread Crash] ${err.message}`);
         cleanup(1);
       };
 
-      const onExit = (code) => {
+      const onExit = code => {
         cleanup(code || 1);
       };
 
-      const cleanup = (exitCode) => {
+      const cleanup = exitCode => {
         worker.removeListener('message', onMessage);
         worker.removeListener('error', onError);
         worker.removeListener('exit', onExit);
         globalPool.busy.delete(worker);
-        
+
         // If the worker exited, remove from pool
         const index = globalPool.workers.indexOf(worker);
         if (index > -1 && worker.threadId === -1) {
@@ -115,8 +115,8 @@ class HookRunner {
         data: {
           scriptPath,
           hookArgs,
-          env: this.baseEnv
-        }
+          env: this.baseEnv,
+        },
       });
     });
   }
@@ -138,7 +138,7 @@ class HookRunner {
     }
 
     // Wait for worker to become available
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       globalPool.queue.push(resolve);
     });
   }

@@ -129,6 +129,11 @@ class VectorStore {
   }
 
   async deleteFile(filePath) {
+    // Phase 2 Fix: Sync delete with BM25
+    if (this.bm25Index) {
+      this.bm25Index.removeDocumentsByMetadata('filePath', filePath);
+    }
+
     if (!this.store) return; // BM25-only mode
     return await this.store.deleteByMetadata('filePath', filePath);
   }
@@ -246,9 +251,11 @@ class VectorStore {
     const docs = chunks.map(chunk => ({
       id: chunk.id,
       text: chunk.content || chunk.text,
-      filePath: chunk.filePath,
-      startLine: chunk.lineStart || chunk.startLine,
-      endLine: chunk.lineEnd || chunk.endLine,
+      metadata: {
+        filePath: chunk.filePath,
+        startLine: chunk.lineStart || chunk.startLine,
+        endLine: chunk.lineEnd || chunk.endLine,
+      },
     }));
 
     this.bm25Index.addDocuments(docs);

@@ -8,6 +8,8 @@ const path = require('path');
 const {
   isCreatorCompletion,
   processCreatorCompletion,
+  appendToQueueWithImpact,
+  MAX_QUEUE_ENTRY_BYTES,
 } = require('./post-creation-integration.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -125,5 +127,59 @@ test('processCreatorCompletion writes to queue when gaps found', async () => {
   assert.strictEqual(entry.processed, false);
 
   // Cleanup
+  fs.unlinkSync(QUEUE_PATH);
+});
+
+test('appendToQueueWithImpact caps oversized queue entries to 10KB', () => {
+  if (fs.existsSync(QUEUE_PATH)) fs.unlinkSync(QUEUE_PATH);
+
+  const hugeImpactReport = {
+    mustHave: Array.from({ length: 300 }, (_v, i) => ({
+      id: `must-${i}`,
+      status: 'pending',
+      description: 'x'.repeat(120),
+    })),
+    shouldHave: Array.from({ length: 300 }, (_v, i) => ({
+      id: `should-${i}`,
+      status: 'pending',
+      description: 'y'.repeat(120),
+    })),
+    notes: 'z'.repeat(40000),
+  };
+
+  appendToQueueWithImpact('skill:oversize-test', 'skill', ['missing-link'], hugeImpactReport);
+
+  const lines = fs.readFileSync(QUEUE_PATH, 'utf8').split('\n').filter(Boolean);
+  const lastLine = lines[lines.length - 1];
+  const lineBytes = Buffer.byteLength(lastLine, 'utf8');
+
+  assert.ok(
+    lineBytes <= MAX_QUEUE_ENTRY_BYTES,
+    `Queue line exceeded ${MAX_QUEUE_ENTRY_BYTES} bytes: ${lineBytes}`
+  );
+
+  const parsed = JSON.parse(lastLine);
+  assert.ok(
+    parsed.impactReportTruncated === true ||
+      parsed.impactReportOmitted === true ||
+      parsed.impactReportSanitized === true,
+    'Expected oversized impact report to be sanitized/truncated/omitted'
+  );
+
+  fs.unlinkSync(QUEUE_PATH);
+});
+
+test('appendToQueueWithImpact sanitizes invalid impactReport shape', () => {
+  if (fs.existsSync(QUEUE_PATH)) fs.unlinkSync(QUEUE_PATH);
+
+  // Invalid shape: scalar instead of object
+  appendToQueueWithImpact('skill:invalid-shape', 'skill', ['missing-link'], 'not-an-object');
+
+  const lines = fs.readFileSync(QUEUE_PATH, 'utf8').split('\n').filter(Boolean);
+  const parsed = JSON.parse(lines[lines.length - 1]);
+
+  assert.equal(parsed.impactReport, null);
+  assert.equal(parsed.impactReportInvalid, true);
+
   fs.unlinkSync(QUEUE_PATH);
 });

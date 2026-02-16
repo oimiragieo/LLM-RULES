@@ -16,9 +16,13 @@ test('createWorkflow persists active eventBus trace id', async () => {
   try {
     const traceId = 'trace-workflow-1';
     let workflowId = '';
-    const sub = eventBus.on('TASK_CREATED', () => {
-      workflowId = stateManager.createWorkflow('trace workflow', 'LOW', statePath);
-    }, 100);
+    const sub = eventBus.on(
+      'TASK_CREATED',
+      () => {
+        workflowId = stateManager.createWorkflow('trace workflow', 'LOW', statePath);
+      },
+      100
+    );
     await eventBus.emit(
       'TASK_CREATED',
       {

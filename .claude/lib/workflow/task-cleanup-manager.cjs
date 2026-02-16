@@ -30,6 +30,10 @@
 
 'use strict';
 
+const { appendJsonl } = require('../utils/jsonl-utils.cjs');
+const path = require('path');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+
 /**
  * Default configuration values
  */
@@ -37,6 +41,8 @@ const DEFAULTS = {
   retentionMs: 30 * 60 * 1000, // 30 minutes
   interval: 60 * 1000, // 1 minute
   batchSize: 100,
+  dlqPath: path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'tasks-dlq.jsonl'),
+  enableDLQ: true,
 };
 
 /**
@@ -48,6 +54,7 @@ function getConfigFromEnv() {
     retentionMs: parseInt(process.env.TASK_CLEANUP_RETENTION_MS || DEFAULTS.retentionMs, 10),
     interval: parseInt(process.env.TASK_CLEANUP_INTERVAL_MS || DEFAULTS.interval, 10),
     batchSize: parseInt(process.env.TASK_CLEANUP_BATCH_SIZE || DEFAULTS.batchSize, 10),
+    enableDLQ: process.env.TASK_CLEANUP_DLQ !== 'false',
   };
 }
 
@@ -82,6 +89,8 @@ class TaskCleanupManager {
     this.retentionMs = config.retentionMs ?? envConfig.retentionMs;
     this.interval = config.interval ?? envConfig.interval;
     this.batchSize = config.batchSize ?? envConfig.batchSize;
+    this.enableDLQ = config.enableDLQ ?? envConfig.enableDLQ;
+    this.dlqPath = config.dlqPath || DEFAULTS.dlqPath;
 
     // Task access functions (can be overridden for testing or integration)
     this.getTaskList = config.getTaskList || this._defaultGetTaskList.bind(this);
@@ -100,6 +109,23 @@ class TaskCleanupManager {
 
     // Internal task storage (for standalone mode)
     this._taskStore = new Map();
+  }
+
+  /**
+   * Archive a task to the Dead Letter Queue
+   * @param {Object} task
+   * @param {string} reason
+   */
+  _archiveToDLQ(task, reason) {
+    if (!this.enableDLQ || !this.dlqPath) return;
+
+    const entry = {
+      ...task,
+      archivedAt: new Date().toISOString(),
+      reason,
+    };
+
+    appendJsonl(this.dlqPath, entry);
   }
 
   /**
@@ -218,6 +244,11 @@ class TaskCleanupManager {
 
       for (const task of tasksToClean) {
         try {
+          // Archive failed/cancelled tasks to DLQ before removal
+          if (task.status === 'failed' || task.status === 'cancelled') {
+            this._archiveToDLQ(task, 'cleanup_failed_task');
+          }
+
           const removed = await this.removeTask(task.id);
           if (removed) {
             cleanedCount++;

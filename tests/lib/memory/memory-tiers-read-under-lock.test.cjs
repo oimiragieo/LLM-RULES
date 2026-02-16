@@ -67,13 +67,18 @@ test('getMTMSessions remains stable under repeated concurrent consolidation writ
     assert.ok(writerFailures.length <= 2, `Too many lock failures: ${writerFailures.length}`);
 
     const finalSessions = memoryTiers.getMTMSessions(projectRoot);
-    assert.ok(finalSessions.length >= 6, `Expected at least 6 sessions, got ${finalSessions.length}`);
+    assert.ok(
+      finalSessions.length >= 6,
+      `Expected at least 6 sessions, got ${finalSessions.length}`
+    );
   } finally {
     if (typeof originalRetries === 'undefined') delete process.env.MEMORY_TIERS_LOCK_RETRIES;
     else process.env.MEMORY_TIERS_LOCK_RETRIES = originalRetries;
-    if (typeof originalMinTimeout === 'undefined') delete process.env.MEMORY_TIERS_LOCK_MIN_TIMEOUT_MS;
+    if (typeof originalMinTimeout === 'undefined')
+      delete process.env.MEMORY_TIERS_LOCK_MIN_TIMEOUT_MS;
     else process.env.MEMORY_TIERS_LOCK_MIN_TIMEOUT_MS = originalMinTimeout;
-    if (typeof originalMaxTimeout === 'undefined') delete process.env.MEMORY_TIERS_LOCK_MAX_TIMEOUT_MS;
+    if (typeof originalMaxTimeout === 'undefined')
+      delete process.env.MEMORY_TIERS_LOCK_MAX_TIMEOUT_MS;
     else process.env.MEMORY_TIERS_LOCK_MAX_TIMEOUT_MS = originalMaxTimeout;
     fs.rmSync(projectRoot, { recursive: true, force: true });
   }

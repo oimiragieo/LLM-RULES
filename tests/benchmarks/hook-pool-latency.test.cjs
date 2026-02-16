@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Benchmark: Hook Pool Latency
- * 
+ *
  * Measures the speed of executing multiple hooks within the same process
  * using the HookRunner worker pool.
  */
@@ -17,7 +17,7 @@ const TEST_HOOK = 'validation/check-console-log';
 async function runBenchmark(mode, iterations = 10) {
   const runner = new HookRunner({ mode });
   const { scriptPath } = resolveHookScriptPath(TEST_HOOK);
-  
+
   // Warm up the pool if in worker mode
   if (mode === 'worker') {
     await runner.run(scriptPath, ['--dry-run']);
@@ -43,10 +43,10 @@ async function main() {
     const workerTime = await runBenchmark('worker', 20);
     console.log(`[MODE: worker ] Total: ${workerTime}ms | Avg: ${workerTime / 20}ms`);
 
-    const improvement = ((processTime - workerTime) / processTime * 100).toFixed(1);
+    const improvement = (((processTime - workerTime) / processTime) * 100).toFixed(1);
     console.log(`
 Improvement: ${improvement}%`);
-    
+
     // In same process, worker mode should be VERY fast (sub-10ms avg ideally)
     if (workerTime < processTime * 0.2) {
       console.log('\nResult: [PASS] Worker pool is exceptionally fast.');

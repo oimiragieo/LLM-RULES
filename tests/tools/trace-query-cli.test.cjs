@@ -33,9 +33,13 @@ test('trace-query returns timeline for matching trace id', () => {
       'utf8'
     );
 
-    const result = spawnSync(process.execPath, [CLI, '--trace-id', 'trace-abc', '--file', filePath], {
-      encoding: 'utf8',
-    });
+    const result = spawnSync(
+      process.execPath,
+      [CLI, '--trace-id', 'trace-abc', '--file', filePath],
+      {
+        encoding: 'utf8',
+      }
+    );
     assert.equal(result.status, 0, result.stderr);
     const parsed = JSON.parse(result.stdout);
     assert.equal(parsed.traceId, 'trace-abc');

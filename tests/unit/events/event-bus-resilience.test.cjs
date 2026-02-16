@@ -61,12 +61,12 @@ async function testResilience() {
     const start = Date.now();
     // We expect this to take max ~100ms (timeout) + overhead, NOT 200ms
     // Note: The current implementation waits, so this test is EXPECTED TO FAIL or take 200ms
-    await eventBus.emit(EVENT, { 
-        type: EVENT, 
-        timestamp: new Date().toISOString(),
-        agentId: 'test', 
-        agentType: 'test', 
-        taskId: 'test' 
+    await eventBus.emit(EVENT, {
+      type: EVENT,
+      timestamp: new Date().toISOString(),
+      agentId: 'test',
+      agentType: 'test',
+      taskId: 'test',
     });
     const elapsed = Date.now() - start;
 

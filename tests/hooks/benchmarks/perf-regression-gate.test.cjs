@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Tests for Performance Gate (Phase 4.1)
- * 
+ *
  * Verifies that the performance gate:
  * 1. Correctly identifies regressions (exit code 2).
  * 2. Allows healthy performance (exit code 0).
@@ -13,7 +13,16 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const GATE_PATH = path.resolve(__dirname, '..', '..', '..', '.claude', 'hooks', 'benchmarks', 'perf-gate.cjs');
+const GATE_PATH = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '.claude',
+  'hooks',
+  'benchmarks',
+  'perf-gate.cjs'
+);
 
 async function testPerfGate() {
   console.log('Performance Gate Hook Tests');
@@ -41,9 +50,9 @@ async function testPerfGate() {
     // This will run the actual gate we're about to implement
     const child = spawn(process.execPath, [GATE_PATH], {
       stdio: 'inherit',
-      env: { ...process.env, HOOK_RUNNER_MODE: 'worker' }
+      env: { ...process.env, HOOK_RUNNER_MODE: 'worker' },
     });
-    
+
     const code = await new Promise(r => child.on('close', r));
     if (code !== 0) throw new Error(`Expected 0, got ${code}`);
   });
@@ -52,9 +61,9 @@ async function testPerfGate() {
     // In process mode, latency is ~40ms, which is > 10ms limit
     const child = spawn(process.execPath, [GATE_PATH], {
       stdio: 'ignore',
-      env: { ...process.env, HOOK_RUNNER_MODE: 'process' }
+      env: { ...process.env, HOOK_RUNNER_MODE: 'process' },
     });
-    
+
     const code = await new Promise(r => child.on('close', r));
     if (code !== 2) throw new Error(`Expected 2 (regression), got ${code}`);
   });

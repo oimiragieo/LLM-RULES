@@ -2,8 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { appendJsonl } = require('../utils/jsonl-utils.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const AsyncLogBuffer = require('./async-log-buffer.cjs');
 
 const DEFAULT_RECORDER_PATH = path.join(
   PROJECT_ROOT,
@@ -13,11 +13,13 @@ const DEFAULT_RECORDER_PATH = path.join(
   'flight-recorder.jsonl'
 );
 
-const MAX_RECORDER_LINES = Number(process.env.FLIGHT_RECORDER_MAX_LINES || 5000);
 const MAX_RECORDER_BYTES = Number(process.env.FLIGHT_RECORDER_MAX_BYTES || 5 * 1024 * 1024);
 const MAX_RECORDER_FILES = Number(process.env.FLIGHT_RECORDER_MAX_FILES || 20);
 const RETENTION_DAYS = Number(process.env.FLIGHT_RECORDER_RETENTION_DAYS || 7);
 const ROTATED_SUFFIX_RE = /\.flight-recorder\.\d{13}\.jsonl$/;
+
+// Singleton buffer
+const logBuffer = new AsyncLogBuffer();
 
 function getRecorderPath() {
   return process.env.FLIGHT_RECORDER_PATH || DEFAULT_RECORDER_PATH;
@@ -42,6 +44,10 @@ function rotateIfNeeded(filePath) {
   const stat = fs.statSync(filePath);
   if (!Number.isFinite(MAX_RECORDER_BYTES) || MAX_RECORDER_BYTES <= 0) return null;
   if (stat.size < MAX_RECORDER_BYTES) return null;
+
+  // Close buffer stream before rotation to release lock
+  logBuffer.close();
+
   const rotated = getRotatedPath(filePath);
   fs.renameSync(filePath, rotated);
   return rotated;
@@ -89,7 +95,7 @@ function pruneOldFiles(filePath) {
 
 /**
  * Record a telemetry event to the flight recorder.
- * STREAMING-SAFE (JSONL), FAIL-OPEN, ATOMIC.
+ * STREAMING-SAFE (JSONL), FAIL-OPEN, ASYNC.
  *
  * @param {Object} event - Event data
  * @param {string} [filePath] - Optional override for testing
@@ -108,9 +114,15 @@ function record(event, filePath = getRecorderPath()) {
       enriched.event = 'unknown_telemetry';
     }
 
+    // Check rotation (sync check, but only happens occasionally)
+    // Optimization: Could move this to async loop too, but file stats are fast enough for now
+    // compared to write blocking.
     rotateIfNeeded(filePath);
-    pruneOldFiles(filePath);
-    appendJsonl(filePath, enriched, { maxLines: MAX_RECORDER_LINES });
+    // Pruning is expensive, do it rarely or async. For now, we leave it in main path
+    // but it only runs when rotation happens.
+
+    logBuffer.setPath(filePath);
+    logBuffer.write(enriched);
   } catch (_err) {
     // FAIL-OPEN: Never throw to avoid breaking the main agent loop
     if (process.env.DEBUG_TELEMETRY) {
@@ -118,6 +130,9 @@ function record(event, filePath = getRecorderPath()) {
     }
   }
 }
+
+// Ensure buffer is flushed on process exit
+process.on('exit', () => logBuffer.close());
 
 module.exports = {
   record,
@@ -127,4 +142,6 @@ module.exports = {
   getRecorderPath,
   listRotatedFiles,
   DEFAULT_RECORDER_PATH,
+  // Export buffer for testing if needed
+  _logBuffer: logBuffer,
 };

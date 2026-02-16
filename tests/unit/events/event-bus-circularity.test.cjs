@@ -31,42 +31,42 @@ async function testCircularity() {
   await test('should prevent infinite event loops', async () => {
     const EVENT_A = 'AGENT_STARTED';
     const EVENT_B = 'TASK_CREATED';
-    
+
     let emissionCount = 0;
-    
+
     // Handler A triggers B
-    eventBus.on(EVENT_A, async (payload) => {
+    eventBus.on(EVENT_A, async payload => {
       emissionCount++;
       if (emissionCount > 50) return; // Safety break
-      await eventBus.emit(EVENT_B, { 
-        type: EVENT_B, 
+      await eventBus.emit(EVENT_B, {
+        type: EVENT_B,
         taskId: payload.taskId,
         subject: 'Circular Test',
         description: 'Testing circularity protection',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
     // Handler B triggers A
-    eventBus.on(EVENT_B, async (payload) => {
+    eventBus.on(EVENT_B, async payload => {
       emissionCount++;
       if (emissionCount > 50) return; // Safety break
-      await eventBus.emit(EVENT_A, { 
-        type: EVENT_A, 
-        agentId: 'test', 
-        agentType: 'test', 
+      await eventBus.emit(EVENT_A, {
+        type: EVENT_A,
+        agentId: 'test',
+        agentType: 'test',
         taskId: payload.taskId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
     try {
-      await eventBus.emit(EVENT_A, { 
-        type: EVENT_A, 
-        agentId: 'test', 
-        agentType: 'test', 
+      await eventBus.emit(EVENT_A, {
+        type: EVENT_A,
+        agentId: 'test',
+        agentType: 'test',
         taskId: 'loop-test',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (_err) {
       // This might not be reached if the bus catches the error
@@ -80,7 +80,7 @@ async function testCircularity() {
     if (emissionCount >= 50) {
       throw new Error(`Infinite loop detected! Emission count reached ${emissionCount}`);
     }
-    
+
     throw new Error(`Circularity protection failed to trigger. Emission count: ${emissionCount}`);
   });
 

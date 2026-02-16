@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Tests for BM25 Maintenance & Health (Phase 4.2)
- * 
+ *
  * Verifies that the indexer can:
  * 1. Remove documents precisely.
  * 2. Detect orphaned documents via HealthChecker.
@@ -35,11 +35,11 @@ async function testMaintenance() {
     const indexer = new BM25Indexer();
     indexer.addDocuments([
       { id: 'doc1', text: 'hello world' },
-      { id: 'doc2', text: 'foo bar' }
+      { id: 'doc2', text: 'foo bar' },
     ]);
-    
+
     if (indexer.N !== 2) throw new Error('Initial N should be 2');
-    
+
     indexer.removeDocument('doc1');
     if (indexer.N !== 1) throw new Error(`N should be 1 after removal, got ${indexer.N}`);
     if (indexer.documents[0].id !== 'doc2') throw new Error('Wrong document remains');
@@ -50,19 +50,20 @@ async function testMaintenance() {
     indexer.addDocuments([
       { id: 'doc1', text: 'hello' },
       { id: 'doc2', text: 'world' },
-      { id: 'doc3', text: 'orphaned' }
+      { id: 'doc3', text: 'orphaned' },
     ]);
-    
+
     const checker = new BM25HealthChecker(indexer);
     const validIds = ['doc1', 'doc2'];
-    
+
     const report = checker.check(validIds);
     if (report.orphanedCount !== 1) throw new Error('Should detect 1 orphaned doc');
     if (report.status !== 'degraded') throw new Error('Should be degraded');
-    
+
     const repairResult = checker.repair(validIds);
     if (repairResult.repairedCount !== 1) throw new Error('Should have repaired 1 doc');
-    if (repairResult.finalHealth.status !== 'healthy') throw new Error('Should be healthy after repair');
+    if (repairResult.finalHealth.status !== 'healthy')
+      throw new Error('Should be healthy after repair');
   });
 
   console.log(`

@@ -16,9 +16,19 @@ test('replay returns valid rows and skips malformed lines', () => {
     fs.writeFileSync(
       filePath,
       [
-        JSON.stringify({ traceId: 'trace-1', component: 'a', event: 'e1', timestamp: '2026-01-01T00:00:00.000Z' }),
+        JSON.stringify({
+          traceId: 'trace-1',
+          component: 'a',
+          event: 'e1',
+          timestamp: '2026-01-01T00:00:00.000Z',
+        }),
         '{bad json',
-        JSON.stringify({ traceId: 'trace-1', component: 'b', event: 'e2', timestamp: '2026-01-01T00:00:01.000Z' }),
+        JSON.stringify({
+          traceId: 'trace-1',
+          component: 'b',
+          event: 'e2',
+          timestamp: '2026-01-01T00:00:01.000Z',
+        }),
       ].join('\n') + '\n',
       'utf8'
     );

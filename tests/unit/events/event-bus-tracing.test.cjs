@@ -33,30 +33,30 @@ async function testTracing() {
   await test('should generate and propagate traceId', async () => {
     const EVENT_1 = 'AGENT_STARTED';
     const EVENT_2 = 'TASK_CREATED';
-    
+
     let traceId1, traceId2;
-    
-    eventBus.on(EVENT_1, async (payload) => {
+
+    eventBus.on(EVENT_1, async payload => {
       traceId1 = payload.traceId;
-      await eventBus.emit(EVENT_2, { 
-        type: EVENT_2, 
+      await eventBus.emit(EVENT_2, {
+        type: EVENT_2,
         taskId: 'nested-task',
         subject: 'Nested',
         description: 'Nested task',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
-    eventBus.on(EVENT_2, (payload) => {
+    eventBus.on(EVENT_2, payload => {
       traceId2 = payload.traceId;
     });
 
-    await eventBus.emit(EVENT_1, { 
-      type: EVENT_1, 
-      agentId: 'test', 
-      agentType: 'test', 
+    await eventBus.emit(EVENT_1, {
+      type: EVENT_1,
+      agentId: 'test',
+      agentType: 'test',
       taskId: 'root-task',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     if (!traceId1) throw new Error('Root event missing traceId');
@@ -69,17 +69,17 @@ async function testTracing() {
     const customTraceId = 'custom-trace-123';
     let receivedTraceId;
 
-    eventBus.on(EVENT, (payload) => {
+    eventBus.on(EVENT, payload => {
       receivedTraceId = payload.traceId;
     });
 
-    await eventBus.emit(EVENT, { 
-      type: EVENT, 
-      agentId: 'test', 
-      agentType: 'test', 
+    await eventBus.emit(EVENT, {
+      type: EVENT,
+      agentId: 'test',
+      agentType: 'test',
       taskId: 'override-test',
       traceId: customTraceId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     if (receivedTraceId !== customTraceId) {

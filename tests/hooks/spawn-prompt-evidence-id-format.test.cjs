@@ -4,9 +4,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const {
-  buildEvidenceId,
-} = require('../../.claude/hooks/routing/spawn-prompt-assembler.core.cjs');
+const { buildEvidenceId } = require('../../.claude/hooks/routing/spawn-prompt-assembler.core.cjs');
 
 test('buildEvidenceId generates deterministic mem id with 8-hex digest', () => {
   const a = buildEvidenceId('mem', 'Use guarded retries for race conditions.');

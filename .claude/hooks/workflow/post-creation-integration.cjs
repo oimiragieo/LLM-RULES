@@ -39,7 +39,10 @@ const QUEUE_PATH = path.join(
   'integration-queue.jsonl'
 );
 const MAX_QUEUE_LINES = 500;
+const MAX_QUEUE_ENTRY_BYTES = 10 * 1024; // 10KB per JSONL line
 const ENFORCEMENT_MODE = process.env.INTEGRATION_ENFORCEMENT || 'warn';
+const MAX_IMPACT_ITEMS = 25;
+const MAX_IMPACT_TEXT_CHARS = 240;
 
 /**
  * Check if TaskUpdate represents a creator completion
@@ -225,7 +228,8 @@ function appendToQueue(artifactId, creatorType, gaps) {
   }
 
   // Append to queue
-  fs.appendFileSync(QUEUE_PATH, JSON.stringify(entry) + '\n', 'utf8');
+  const serialized = serializeQueueEntryWithCap(entry);
+  fs.appendFileSync(QUEUE_PATH, serialized + '\n', 'utf8');
 
   // Rotate if needed
   rotateQueue();
@@ -239,6 +243,7 @@ function appendToQueue(artifactId, creatorType, gaps) {
  * @param {Object|null} impactReport - Ecosystem impact analysis report
  */
 function appendToQueueWithImpact(artifactId, creatorType, gaps, impactReport) {
+  const sanitizedImpact = sanitizeImpactReport(impactReport);
   const entry = {
     timestamp: new Date().toISOString(),
     artifactId,
@@ -248,8 +253,14 @@ function appendToQueueWithImpact(artifactId, creatorType, gaps, impactReport) {
     gaps,
     priority: 'P1',
     processed: false,
-    impactReport: impactReport || null,
+    impactReport: sanitizedImpact.impactReport,
   };
+  if (sanitizedImpact.impactReportInvalid) {
+    entry.impactReportInvalid = true;
+  }
+  if (sanitizedImpact.impactReportSanitized) {
+    entry.impactReportSanitized = true;
+  }
 
   // Ensure queue directory exists
   const queueDir = path.dirname(QUEUE_PATH);
@@ -258,7 +269,8 @@ function appendToQueueWithImpact(artifactId, creatorType, gaps, impactReport) {
   }
 
   // Append to queue
-  fs.appendFileSync(QUEUE_PATH, JSON.stringify(entry) + '\n', 'utf8');
+  const serialized = serializeQueueEntryWithCap(entry);
+  fs.appendFileSync(QUEUE_PATH, serialized + '\n', 'utf8');
 
   // Rotate if needed
   rotateQueue();
@@ -309,6 +321,141 @@ function rotateQueue() {
     // Fail silently - rotation is optimization, not critical
     process.stderr.write(`[post-creation-integration] Queue rotation failed: ${err.message}\n`);
   }
+}
+
+function clipText(value, maxChars = MAX_IMPACT_TEXT_CHARS) {
+  const normalized = String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!normalized) return '';
+  if (normalized.length <= maxChars) return normalized;
+  return normalized.slice(0, maxChars - 3) + '...';
+}
+
+function sanitizeImpactItem(item) {
+  if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+  const safe = {
+    id: clipText(item.id, 120),
+    status: clipText(item.status, 40),
+    description: clipText(item.description, MAX_IMPACT_TEXT_CHARS),
+  };
+
+  if (!safe.id && !safe.status && !safe.description) {
+    return null;
+  }
+
+  return safe;
+}
+
+function sanitizeImpactReport(impactReport) {
+  if (impactReport == null) {
+    return {
+      impactReport: null,
+      impactReportInvalid: false,
+      impactReportSanitized: false,
+    };
+  }
+
+  if (typeof impactReport !== 'object' || Array.isArray(impactReport)) {
+    return {
+      impactReport: null,
+      impactReportInvalid: true,
+      impactReportSanitized: true,
+    };
+  }
+
+  const mustHaveRaw = Array.isArray(impactReport.mustHave) ? impactReport.mustHave : [];
+  const shouldHaveRaw = Array.isArray(impactReport.shouldHave) ? impactReport.shouldHave : [];
+
+  const mustHave = mustHaveRaw.map(sanitizeImpactItem).filter(Boolean).slice(0, MAX_IMPACT_ITEMS);
+  const shouldHave = shouldHaveRaw
+    .map(sanitizeImpactItem)
+    .filter(Boolean)
+    .slice(0, MAX_IMPACT_ITEMS);
+
+  const safeReport = {
+    mustHave,
+    shouldHave,
+    mustHaveCount: mustHaveRaw.length,
+    shouldHaveCount: shouldHaveRaw.length,
+  };
+
+  const score = Number(impactReport.score);
+  if (Number.isFinite(score)) {
+    safeReport.score = score;
+  }
+
+  const status = clipText(impactReport.status, 80);
+  if (status) {
+    safeReport.status = status;
+  }
+
+  const wasSanitized =
+    mustHave.length !== mustHaveRaw.length ||
+    shouldHave.length !== shouldHaveRaw.length ||
+    Object.keys(impactReport).length > Object.keys(safeReport).length;
+
+  return {
+    impactReport: safeReport,
+    impactReportInvalid: false,
+    impactReportSanitized: wasSanitized,
+  };
+}
+
+function serializeQueueEntryWithCap(entry) {
+  const initialSerialized = JSON.stringify(entry);
+  if (Buffer.byteLength(initialSerialized, 'utf8') <= MAX_QUEUE_ENTRY_BYTES) {
+    return initialSerialized;
+  }
+
+  // First fallback: compact impact report to summary counters.
+  const compact = { ...entry };
+  if (compact.impactReport) {
+    const mustHaveCount = Number(compact.impactReport.mustHaveCount) || 0;
+    const shouldHaveCount = Number(compact.impactReport.shouldHaveCount) || 0;
+    compact.impactReport = {
+      mustHaveCount,
+      shouldHaveCount,
+      truncated: true,
+    };
+    compact.impactReportTruncated = true;
+  }
+
+  let serialized = JSON.stringify(compact);
+  if (Buffer.byteLength(serialized, 'utf8') <= MAX_QUEUE_ENTRY_BYTES) {
+    return serialized;
+  }
+
+  // Second fallback: omit impact report entirely.
+  compact.impactReport = null;
+  compact.impactReportOmitted = true;
+  serialized = JSON.stringify(compact);
+  if (Buffer.byteLength(serialized, 'utf8') <= MAX_QUEUE_ENTRY_BYTES) {
+    return serialized;
+  }
+
+  // Final fallback: minimal shape with clipped values.
+  const minimal = {
+    timestamp: entry.timestamp || new Date().toISOString(),
+    artifactId: clipText(entry.artifactId, 128) || 'unknown',
+    creatorType: clipText(entry.creatorType, 64) || 'unknown',
+    changeType: clipText(entry.changeType, 32) || 'created',
+    source: 'post-creation-integration.cjs',
+    gaps: Array.isArray(entry.gaps) ? entry.gaps.map(g => clipText(g, 80)).slice(0, 10) : [],
+    priority: clipText(entry.priority, 8) || 'P1',
+    processed: Boolean(entry.processed),
+    impactReport: null,
+    impactReportOmitted: true,
+    entryTruncated: true,
+  };
+
+  serialized = JSON.stringify(minimal);
+  while (Buffer.byteLength(serialized, 'utf8') > MAX_QUEUE_ENTRY_BYTES && minimal.gaps.length > 0) {
+    minimal.gaps.pop();
+    serialized = JSON.stringify(minimal);
+  }
+
+  return serialized;
 }
 
 /**
@@ -481,10 +628,13 @@ module.exports = {
   appendToQueueWithImpact,
   runEcosystemImpactAnalysis,
   runEcosystemImpactAnalysisWithTimeout,
+  sanitizeImpactReport,
+  serializeQueueEntryWithCap,
   rotateQueue,
   processCreatorCompletion,
   GRAPH_PATH,
   QUEUE_PATH,
+  MAX_QUEUE_ENTRY_BYTES,
 };
 
 // Run as script

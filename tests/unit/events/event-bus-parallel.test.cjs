@@ -30,7 +30,7 @@ async function testParallel() {
 
   await test('should execute handlers in parallel when requested', async () => {
     const EVENT = 'AGENT_STARTED';
-    
+
     // Each handler takes 50ms
     eventBus.on(EVENT, async () => {
       await new Promise(resolve => setTimeout(resolve, 50));
@@ -45,20 +45,24 @@ async function testParallel() {
     const start = Date.now();
     // Default is sequential, so this would take ~150ms
     // We pass a flag for parallel
-    await eventBus.emit(EVENT, { 
-      type: EVENT, 
-      agentId: 'test', 
-      agentType: 'test', 
-      taskId: 'parallel-test',
-      timestamp: new Date().toISOString()
-    }, { mode: 'parallel' });
-    
+    await eventBus.emit(
+      EVENT,
+      {
+        type: EVENT,
+        agentId: 'test',
+        agentType: 'test',
+        taskId: 'parallel-test',
+        timestamp: new Date().toISOString(),
+      },
+      { mode: 'parallel' }
+    );
+
     const elapsed = Date.now() - start;
 
     if (elapsed > 120) {
       throw new Error(`Emission took ${elapsed}ms, expected parallel execution (< 100ms)`);
     }
-    
+
     if (elapsed < 40) {
       throw new Error(`Emission took ${elapsed}ms, too fast?`);
     }

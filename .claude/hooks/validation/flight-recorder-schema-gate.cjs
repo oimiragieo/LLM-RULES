@@ -8,7 +8,9 @@ const { getRecorderPath } = require('../../lib/monitoring/flight-recorder.cjs');
 function main() {
   const filePath = process.env.FLIGHT_RECORDER_PATH || getRecorderPath();
   const strict = String(process.env.FLIGHT_RECORDER_SCHEMA_GATE_STRICT || 'true').toLowerCase();
-  const requireData = String(process.env.FLIGHT_RECORDER_SCHEMA_REQUIRE_DATA || 'false').toLowerCase();
+  const requireData = String(
+    process.env.FLIGHT_RECORDER_SCHEMA_REQUIRE_DATA || 'false'
+  ).toLowerCase();
   const { entries, skipped } = replay(filePath);
 
   if (requireData === 'true' && entries.length === 0 && skipped === 0) {

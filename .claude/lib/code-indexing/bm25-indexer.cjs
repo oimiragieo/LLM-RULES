@@ -93,6 +93,7 @@ class BM25Indexer {
     this.avgDocLength = 0; // Average document length
     this.N = 0; // Total document count
     this._idfDirty = true; // Flag to track if IDF needs recalculation
+    this.docMetadata = {}; // Map of id -> metadata
   }
 
   /**
@@ -182,6 +183,10 @@ class BM25Indexer {
         length: tokens.length,
         termFreqs,
       });
+
+      if (doc.metadata) {
+        this.docMetadata[doc.id] = doc.metadata;
+      }
     }
 
     // Update corpus statistics
@@ -203,6 +208,7 @@ class BM25Indexer {
     this.documents = this.documents.filter(doc => doc.id !== id);
 
     if (this.documents.length !== initialLen) {
+      delete this.docMetadata[id];
       this._idfDirty = true;
       this.N = this.documents.length;
       // Recalculate avg length
@@ -211,6 +217,29 @@ class BM25Indexer {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Remove documents matching a metadata filter
+   * @param {string} key - Metadata key (e.g., 'filePath')
+   * @param {string} value - Metadata value to match
+   * @returns {number} Count of removed documents
+   */
+  removeDocumentsByMetadata(key, value) {
+    const idsToRemove = [];
+    for (const [id, meta] of Object.entries(this.docMetadata)) {
+      if (meta && meta[key] === value) {
+        idsToRemove.push(id);
+      }
+    }
+
+    let count = 0;
+    for (const id of idsToRemove) {
+      if (this.removeDocument(id)) {
+        count++;
+      }
+    }
+    return count;
   }
 
   /**
@@ -309,6 +338,7 @@ class BM25Indexer {
       idf: this.idf,
       avgDocLength: this.avgDocLength,
       N: this.N,
+      docMetadata: this.docMetadata,
     };
   }
 
@@ -323,6 +353,7 @@ class BM25Indexer {
     indexer.idf = json.idf;
     indexer.avgDocLength = json.avgDocLength;
     indexer.N = json.N;
+    indexer.docMetadata = json.docMetadata || {};
     indexer._idfDirty = false; // IDF already calculated in serialized data
     return indexer;
   }
