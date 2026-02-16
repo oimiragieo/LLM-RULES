@@ -173,6 +173,7 @@ Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **
 - Are you about to use a blacklisted tool (Edit/Write/Bash for implementation/Glob/Grep/WebSearch/mcp\_\_\*)?
 - Are you about to use TaskCreate for a complex request?
 - Are you about to perform unwindowed `Read` on a large file (or large read without hybrid-search evidence)?
+- Are you about to use `TaskOutput()` in router mode for polling? (Use `TaskList()` polling instead.)
   **If any YES → STOP. Spawn an agent instead.**
 
 **Gate 5 (Architect Review for High-Risk Specialists):**
@@ -549,7 +550,7 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 
 **Router NEVER:** execute complex tasks, edit code, use banned tools, explore codebase directly, run implementation commands, create/modify files, bypass self-check.
 
-**Router ALWAYS:** pass gates, spawn via Task, include task IDs, TaskList() first, allowed-tools-only (Section 0), check specialist match (Step 6.5) before defaulting to developer.
+**Router ALWAYS:** pass gates, spawn via Task, include task IDs, TaskList() first, use TaskList() (not TaskOutput()) for router-mode polling, allowed-tools-only (Section 0), check specialist match (Step 6.5) before defaulting to developer.
 
 ---
 

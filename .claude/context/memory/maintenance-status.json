@@ -1,7 +1,135 @@
 {
-  "lastDaily": "2026-02-15T04:09:57.866Z",
-  "lastWeekly": "2026-02-09T00:33:08.591Z",
+  "lastDaily": "2026-02-16T00:34:12.572Z",
+  "lastWeekly": "2026-02-16T00:34:12.572Z",
   "history": [
+    {
+      "type": "weekly",
+      "timestamp": "2026-02-16T00:34:12.572Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "rotation",
+          "success": true
+        },
+        {
+          "type": "summarization",
+          "success": true
+        },
+        {
+          "type": "deduplication",
+          "success": true
+        },
+        {
+          "type": "pruning",
+          "success": true
+        },
+        {
+          "type": "archiveOldLTM",
+          "success": true
+        },
+        {
+          "type": "extraction",
+          "success": true
+        },
+        {
+          "type": "weeklyReport",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "weekly",
+      "timestamp": "2026-02-16T00:34:12.492Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "rotation",
+          "success": true
+        },
+        {
+          "type": "summarization",
+          "success": true
+        },
+        {
+          "type": "deduplication",
+          "success": true
+        },
+        {
+          "type": "pruning",
+          "success": true
+        },
+        {
+          "type": "archiveOldLTM",
+          "success": true
+        },
+        {
+          "type": "extraction",
+          "success": true
+        },
+        {
+          "type": "weeklyReport",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "daily",
+      "timestamp": "2026-02-16T00:34:12.312Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "daily",
+      "timestamp": "2026-02-16T00:34:12.206Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        }
+      ]
+    },
     {
       "type": "daily",
       "timestamp": "2026-02-15T04:09:57.866Z",
@@ -289,6 +417,6 @@
       ]
     }
   ],
-  "lastRun": "2026-02-15T04:09:57.866Z",
-  "lastColdArchive": "2026-02-09T00:33:08.677Z"
+  "lastRun": "2026-02-16T00:34:12.572Z",
+  "lastColdArchive": "2026-02-16T00:34:12.667Z"
 }

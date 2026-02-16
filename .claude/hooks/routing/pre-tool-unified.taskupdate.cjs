@@ -201,14 +201,31 @@ function isAgentScopedSession(hookInput) {
 
   try {
     const state = routerState.getState();
-    if (state && (state.taskSpawned === true || state.mode === 'agent')) {
-      return true;
-    }
+    const hookSessionId = String(hookInput?.session_id || hookInput?.sessionId || '').trim();
+    const stateSessionId = String(state?.sessionId || '').trim();
+    if (!hookSessionId || !stateSessionId || hookSessionId !== stateSessionId) return false;
+    const stateTaskId = String(
+      state?.currentSpawnTaskId || state?.lastTaskUpdateTaskId || ''
+    ).trim();
+    if (stateTaskId && (state.taskSpawned === true || state.mode === 'agent')) return true;
   } catch (_err) {
     // Best-effort only.
   }
 
   return false;
+}
+
+function resolveRouterSessionTaskId(hookInput) {
+  try {
+    const state = routerState.getState();
+    const hookSessionId = String(hookInput?.session_id || hookInput?.sessionId || '').trim();
+    const stateSessionId = String(state?.sessionId || '').trim();
+    if (!hookSessionId || !stateSessionId || hookSessionId !== stateSessionId) return null;
+    const taskId = String(state?.currentSpawnTaskId || state?.lastTaskUpdateTaskId || '').trim();
+    return taskId || null;
+  } catch (_err) {
+    return null;
+  }
 }
 
 function allowFromRouterBootstrap(hookInput, sessionId, now, current, stateFile) {
@@ -273,7 +290,9 @@ function tryAutoMarkTaskUpdateInProgress({
   const autoMarkEnabled = String(process.env.TASKUPDATE_FIRST_AUTOMARK || 'false').toLowerCase();
   if (autoMarkEnabled === 'off') return null;
 
-  const inferredTaskId = resolveCanonicalTaskId(hookInput, toolInput, currentEntry).taskId;
+  const inferredTaskId =
+    resolveCanonicalTaskId(hookInput, toolInput, currentEntry).taskId ||
+    resolveRouterSessionTaskId(hookInput);
   if (!inferredTaskId) return null;
 
   current.sessions[sessionId] = {

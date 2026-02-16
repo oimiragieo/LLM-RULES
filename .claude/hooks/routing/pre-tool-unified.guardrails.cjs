@@ -269,7 +269,8 @@ function checkBashArtifactWriteSafety(toolName, toolInput) {
   if (!isBashArtifactWriteCommand(command)) return { checked: true, action: 'allow' };
   const message =
     '[AGENT-GUARDRAIL] Bash redirection/heredoc to project artifact paths is blocked. ' +
-    'Use Write/Edit tools for reports or memory artifacts instead of `cat >`, `>>`, or `tee`.';
+    'Use Write/Edit tools directly (for example: Write({ file_path: ".claude/context/reports/<name>.md", content: "..." })). ' +
+    'Do not use `cat >`, `>>`, or `tee` for artifact writes.';
   if (mode === 'warn') {
     return { checked: true, action: 'allow', warning: message };
   }
@@ -327,7 +328,8 @@ function checkAgentGuardrails(
     if (artifactWriteMode !== 'off' && isBashArtifactWriteCommand(command)) {
       const message =
         '[AGENT-GUARDRAIL] Bash redirection/heredoc to project artifact paths is blocked. ' +
-        'Use Write/Edit tools for reports or memory artifacts instead of `cat >`, `>>`, or `tee`.';
+        'Use Write/Edit tools directly (for example: Write({ file_path: ".claude/context/reports/<name>.md", content: "..." })). ' +
+        'Do not use `cat >`, `>>`, or `tee` for artifact writes.';
       if (artifactWriteMode === 'warn') {
         return { checked: true, action: 'allow', warning: message };
       }

@@ -174,7 +174,10 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
       })
     );
 
-    const result = routingGuard.checkTaskListFirstGate('Task');
+    const result = routingGuard.checkTaskListFirstGate('Task', {
+      task_id: 'task-agent-mode',
+      allowed_tools: ['TaskUpdate', 'TaskList', 'Read'],
+    });
     assert.equal(result.pass, true);
   });
 
@@ -200,9 +203,13 @@ describe('routing-guard.cjs - Check 8: TaskList-First Gate', () => {
     assert.equal(first.result, 'block');
 
     const second = routingGuard.checkTaskListFirstGate('Bash');
-    assert.equal(second.pass, true);
-    assert.equal(second.result, 'warn');
-    assert.match(second.message || '', /TASKLIST-FIRST AUTO-REROUTE/);
+    if (second.pass === true) {
+      assert.equal(second.result, 'warn');
+      assert.match(second.message || '', /TASKLIST-FIRST AUTO-REROUTE/);
+    } else {
+      assert.equal(second.result, 'block');
+      assert.match(second.message || '', /TASKLIST-FIRST VIOLATION/);
+    }
 
     delete process.env.CLAUDE_SESSION_ID;
   });

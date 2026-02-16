@@ -24,6 +24,19 @@ const {
   buildRouterSelfCheckMessage,
 } = require('./routing-guard-core.shared.cjs');
 
+function hasExplicitAgentContext(hookInput = null) {
+  if (!hookInput || typeof hookInput !== 'object') return false;
+  const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
+  if (taskId) return true;
+  const allowedTools = Array.isArray(hookInput.allowed_tools) ? hookInput.allowed_tools : [];
+  if (allowedTools.includes('TaskUpdate')) return true;
+  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
+    .trim()
+    .toLowerCase();
+  if (agentId && agentId !== 'router') return true;
+  return false;
+}
+
 function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
   if (toolName !== 'Bash') {
     return { pass: true };
@@ -40,8 +53,7 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     return { pass: true };
   }
 
-  const state = getCachedRouterState();
-  if (state.mode === 'agent' || state.taskSpawned) {
+  if (hasExplicitAgentContext(hookInput)) {
     return { pass: true };
   }
   try {
@@ -229,7 +241,7 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
     lastReset: state.lastReset,
   });
 
-  if (state.mode === 'agent' || state.taskSpawned) {
+  if (hasExplicitAgentContext(hookInput)) {
     debugLog('ALLOW: Agent mode or task spawned', {
       mode: state.mode,
       taskSpawned: state.taskSpawned,

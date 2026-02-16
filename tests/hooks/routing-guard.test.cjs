@@ -731,7 +731,7 @@ describe('routing-guard', () => {
       assert.ok(result.message.includes('ROUTER BASH VIOLATION'));
     });
 
-    it('should pass for any command when in agent mode', () => {
+    it('should pass for any command when in explicit agent context', () => {
       assert.ok(routingGuard, 'Module should be loadable');
       assert.ok(routerState, 'Router state module should be loadable');
 
@@ -743,7 +743,11 @@ describe('routing-guard', () => {
 
       process.env.ROUTER_BASH_GUARD = 'block';
 
-      const result = routingGuard.checkRouterBash('Bash', { command: 'pnpm test' });
+      const result = routingGuard.checkRouterBash(
+        'Bash',
+        { command: 'pnpm test' },
+        { task_id: 'task-agent-bash', allowed_tools: ['TaskUpdate', 'TaskList', 'Bash'] }
+      );
       assert.strictEqual(result.pass, true);
     });
 
@@ -957,7 +961,7 @@ describe('routing-guard', () => {
       assert.match(String(result.message || ''), /ROUTER SELF-CHECK BYPASS/);
     });
 
-    it('should ALLOW Glob tool in agent mode (after Task spawned)', () => {
+    it('should ALLOW Glob tool in explicit agent context (after Task spawned)', () => {
       assert.ok(routingGuard, 'Module should be loadable');
       assert.ok(routerState, 'Router state module should be loadable');
 
@@ -976,8 +980,12 @@ describe('routing-guard', () => {
       process.env.ROUTER_SELF_CHECK = 'block';
 
       // Test: Glob should be ALLOWED in agent mode
-      const result = routingGuard.checkRouterSelfCheck('Glob', {});
-      assert.strictEqual(result.pass, true, 'Glob should be ALLOWED in agent mode (Task spawned)');
+      const result = routingGuard.checkRouterSelfCheck(
+        'Glob',
+        {},
+        { task_id: 'task-agent-glob', allowed_tools: ['TaskUpdate', 'TaskList', 'Read'] }
+      );
+      assert.strictEqual(result.pass, true, 'Glob should be ALLOWED in explicit agent context');
     });
 
     it('should block Glob even when user explicitly requests it (ROUTING-002 root cause)', () => {

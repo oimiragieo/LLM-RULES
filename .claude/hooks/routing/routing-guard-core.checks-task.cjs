@@ -20,6 +20,19 @@ const {
   getTaskListAutoRerouteConfig,
 } = require('./routing-guard-core.shared.cjs');
 
+function hasExplicitAgentContext(hookInput = null) {
+  if (!hookInput || typeof hookInput !== 'object') return false;
+  const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
+  if (taskId) return true;
+  const allowedTools = Array.isArray(hookInput.allowed_tools) ? hookInput.allowed_tools : [];
+  if (allowedTools.includes('TaskUpdate')) return true;
+  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
+    .trim()
+    .toLowerCase();
+  if (agentId && agentId !== 'router') return true;
+  return false;
+}
+
 function checkPlannerFirst(toolName, toolInput) {
   if (toolName !== 'Task') {
     return { pass: true };
@@ -253,11 +266,11 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
     return { pass: true };
   }
 
-  const state = getCachedRouterState();
-  if (state.mode === 'agent' || state.taskSpawned) {
+  if (hasExplicitAgentContext(hookInput)) {
     return { pass: true };
   }
 
+  const state = getCachedRouterState();
   if (state.taskListCalledSincePrompt) {
     return { pass: true };
   }

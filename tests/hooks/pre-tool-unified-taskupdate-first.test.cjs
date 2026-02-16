@@ -317,6 +317,7 @@ describe('pre-tool-unified taskupdate-first guard', { concurrency: 1 }, () => {
         {
           mode: 'agent',
           taskSpawned: true,
+          currentSpawnTaskId: 'task-7',
           sessionId: 'session-7',
           lastReset: new Date().toISOString(),
         },

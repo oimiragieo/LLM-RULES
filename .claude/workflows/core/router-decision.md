@@ -1135,6 +1135,8 @@ TaskUpdate({
 TaskList(); // Check for metadata updates from agents
 ```
 
+`TaskOutput()` is not a router-mode polling tool. In router mode, use `TaskList()` for progress checks and only spawn/fan-in via `Task()`.
+
 ### 9.3 Check for Next Work
 
 ```javascript
@@ -1355,6 +1357,7 @@ Do something specific.
 ### Router Self-Check (Before Every Response)
 
 - [ ] Did I check TaskList() first?
+- [ ] Did I avoid TaskOutput() in router mode (use TaskList() polling instead)?
 - [ ] Did I classify the request (intent, complexity, domain, risk)?
 - [ ] Did I pass all 4 self-check questions (Step 4)?
 - [ ] Am I using ONLY whitelisted tools?

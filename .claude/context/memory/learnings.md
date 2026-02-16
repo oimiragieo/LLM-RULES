@@ -1,3 +1,53 @@
+## QA Audit: Test Coverage Gaps and Regression Risks (2026-02-15)
+
+**Context:** Comprehensive QA audit revealed 100% test pass rate (213/213) and 0 lint errors, but critical coverage gaps in routing logic and task lifecycle state machine.
+
+**Critical Findings (P0 - HIGH REGRESSION RISK):**
+
+1. **Routing-guard.cjs integration tests missing** (2599 LOC → split into modular routing-guard-core.cjs)
+   - Gap: No tests for Check 7 (specialist override), Check 5 (architect-first), Check 1 (planner-first)
+   - Risk: Developer spawned instead of specialist (technical-writer, code-simplifier, qa)
+   - Impact: 59 agents exist; misrouting wastes specialist expertise
+   - Mitigation: 20 integration tests (2 days)
+
+2. **Task lifecycle state machine untested** (task-lifecycle-state.cjs, pre-task-unified-core.cjs)
+   - Gap: No state transition tests (not_started → in_progress → completed/blocked)
+   - Risk: Tasks stuck in progress, duplicate task claims, invalid state transitions
+   - Impact: Workflow stalls, duplicate work, task corruption
+   - Mitigation: 15 state transition tests (1 day)
+
+3. **Workflow cycle detection untested** (workflow/cycle-detector.cjs)
+   - Gap: No tests for infinite loop detection
+   - Risk: Workflow phase advances infinitely, never exits
+   - Impact: System hang, resource exhaustion, session crash
+   - Mitigation: 10 cycle detection tests (0.5 day)
+
+**High Priority Gaps (P1):**
+
+4. **Batch creation detection untested** (user-prompt-unified.cjs line ~500-800)
+   - Gap: No tests for "create 10 agents" → orchestrator routing
+   - Risk: 10 developers write directly (no creator skills, invisible artifacts)
+   - Impact: Missing catalog entries, CLAUDE.md out of sync, routing failures
+
+5. **Spawn-prompt-assembler memory injection partially tested**
+   - Gap: Constitution/behaviour loading tests exist, but no memory mode validation
+   - Risk: Agents spawned without STM/MTM/LTM context
+   - Impact: Agents make decisions without project learnings
+
+6. **Routing-table disambiguation untested**
+   - Gap: No tests for ambiguous intents ("review code" → code-reviewer, NOT developer)
+   - Risk: Intent misclassification
+   - Impact: Specialist misrouting
+
+**Pattern: Test Coverage Can Mask Critical Gaps**
+
+- 100% pass rate (213/213 tests) + 0 lint errors = looks healthy
+- But: Critical paths untested (routing logic, state machine, loop detection)
+- Memory learnings: "99.3% test pass rate can mask critical coverage gaps (routing logic, loop detection untested)"
+- Fix: Add P0 tests first (45 tests, 3.5 days), then P1 tests (40 tests, 6 days)
+
+**Report:** `.claude/context/reports/qa-audit-2026-02-15.md`
+
 ## Memory Documentation Alignment (2026-02-15)
 
 - Fixed 8 documentation misalignments across 3 files where documented behavior didn't match actual memory system implementation
