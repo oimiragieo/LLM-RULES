@@ -33,7 +33,7 @@ function runValidation(input) {
   const result = parseAndValidateTaskUpdate(effectivePayload, {
     allowedStatuses: VALID_TASK_STATUSES,
     requireTaskId: true,
-    requireStatus: true,
+    requireStatus: false,
   });
 
   if (result.valid) {

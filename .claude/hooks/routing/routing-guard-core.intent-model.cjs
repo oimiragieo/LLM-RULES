@@ -144,11 +144,15 @@ function isExplicitAuditRoutingOverride(subagentType, prompt, description = '') 
   const text = `${String(prompt || '')} ${String(description || '')}`.toLowerCase();
   const explicitAuditSignals = [
     'code quality audit',
+    'code quality bug sweep',
     'code review',
     'test quality audit',
     'architecture audit',
+    'architecture improvement sweep',
+    'improvement sweep',
     'structural audit',
     'bug-focused code audit',
+    'bug sweep',
     'bug hunt',
     'bugs and issues',
     'review for bugs',
@@ -161,7 +165,14 @@ function isExplicitAuditRoutingOverride(subagentType, prompt, description = '') 
   ];
   const hasExplicitSignal = explicitAuditSignals.some(signal => text.includes(signal));
   const isCodebaseScan = text.includes('codebase') && text.includes('scan');
-  return text.includes('audit') || hasExplicitSignal || isCodebaseScan;
+  const hasCodebaseIssueSweep =
+    text.includes('codebase') &&
+    ((text.includes('issues') && text.includes('bugs')) ||
+      text.includes('bug sweep') ||
+      text.includes('issue sweep') ||
+      text.includes('improve') ||
+      text.includes('do better'));
+  return text.includes('audit') || hasExplicitSignal || isCodebaseScan || hasCodebaseIssueSweep;
 }
 
 function checkIntentAgentMatch(toolName, toolInput = {}) {

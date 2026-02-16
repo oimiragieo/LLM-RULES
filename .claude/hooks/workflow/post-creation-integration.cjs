@@ -25,6 +25,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const {
+  getToolName,
+  getToolInput,
+  formatResult: formatHookResult,
+} = require('../../lib/utils/hook-input.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { DEFAULT_ARTIFACT_GRAPH_PATH } = require('../../lib/workflow/artifact-graph.cjs');
 
@@ -50,7 +55,7 @@ const MAX_IMPACT_TEXT_CHARS = 240;
  * @returns {Object} { match: boolean, creatorType?: string }
  */
 function isCreatorCompletion(hookData) {
-  const toolInput = hookData?.toolUse?.input || {};
+  const toolInput = getToolInput(hookData);
 
   // Must be completed status
   if (toolInput.status !== 'completed') {
@@ -191,7 +196,7 @@ async function runEcosystemImpactAnalysisWithTimeout(creatorType, artifactPath, 
  * @returns {string} Artifact ID
  */
 function extractArtifactId(hookData, creatorType) {
-  const toolInput = hookData?.toolUse?.input || {};
+  const toolInput = getToolInput(hookData);
 
   // Method 1: Explicit artifactId in metadata
   if (toolInput.metadata?.artifactId) {
@@ -201,38 +206,6 @@ function extractArtifactId(hookData, creatorType) {
   // Method 2: Construct from metadata
   const artifactName = toolInput.metadata?.artifactName || 'unknown';
   return `${creatorType}:${artifactName}`;
-}
-
-/**
- * Append entry to integration queue
- * @param {string} artifactId - Artifact ID
- * @param {string} creatorType - Creator type
- * @param {string[]} gaps - Missing integrations
- */
-function appendToQueue(artifactId, creatorType, gaps) {
-  const entry = {
-    timestamp: new Date().toISOString(),
-    artifactId,
-    creatorType,
-    changeType: 'created',
-    source: 'post-creation-integration.cjs',
-    gaps,
-    priority: 'P1',
-    processed: false,
-  };
-
-  // Ensure queue directory exists
-  const queueDir = path.dirname(QUEUE_PATH);
-  if (!fs.existsSync(queueDir)) {
-    fs.mkdirSync(queueDir, { recursive: true });
-  }
-
-  // Append to queue
-  const serialized = serializeQueueEntryWithCap(entry);
-  fs.appendFileSync(QUEUE_PATH, serialized + '\n', 'utf8');
-
-  // Rotate if needed
-  rotateQueue();
 }
 
 /**
@@ -459,27 +432,18 @@ function serializeQueueEntryWithCap(entry) {
 }
 
 /**
- * Format hook result
- * @param {Object} result - Result object
- * @returns {string} JSON string
- */
-function formatResult(result) {
-  return JSON.stringify(result);
-}
-
-/**
  * Process creator completion and queue integration check
  * @param {Object} hookData - Parsed hook input data
  * @returns {Promise<Object>} Result object
  */
 async function processCreatorCompletion(hookData) {
-  const toolName = hookData?.toolUse?.tool;
-  const _toolInput = hookData?.toolUse?.input || {};
+  const toolName = getToolName(hookData);
+  const toolInput = getToolInput(hookData);
 
   // Only process TaskUpdate
   if (toolName !== 'TaskUpdate') {
     process.stderr.write('[post-creation-integration] Not a TaskUpdate, passing through\n');
-    process.stdout.write(formatResult({ allow: true }));
+    process.stdout.write(formatHookResult({ allow: true }));
     return { result: { allow: true } };
   }
 
@@ -487,7 +451,7 @@ async function processCreatorCompletion(hookData) {
   const detection = isCreatorCompletion(hookData);
   if (!detection.match) {
     // Not a creator completion, allow and exit
-    process.stdout.write(formatResult({ allow: true }));
+    process.stdout.write(formatHookResult({ allow: true }));
     return { result: { allow: true } };
   }
 
@@ -495,7 +459,7 @@ async function processCreatorCompletion(hookData) {
   const artifactId = extractArtifactId(hookData, detection.creatorType);
 
   // Extract artifact path from metadata
-  const artifactPath = _toolInput.metadata?.artifactPath || artifactId;
+  const artifactPath = toolInput.metadata?.artifactPath || artifactId;
 
   // Quick integration check (artifact-graph)
   const check = quickIntegrationCheck(artifactId, GRAPH_PATH);
@@ -568,12 +532,12 @@ async function processCreatorCompletion(hookData) {
       : `✅ Artifact ${artifactId} appears fully integrated.`;
 
   if (shouldBlock) {
-    process.stdout.write(formatResult({ allow: false, message: `BLOCKED: ${message}` }));
+    process.stdout.write(formatHookResult({ allow: false, message: `BLOCKED: ${message}` }));
     return { result: { allow: false, message: `BLOCKED: ${message}` } };
   }
 
   // Allow by default (warn mode)
-  process.stdout.write(formatResult({ allow: true, message }));
+  process.stdout.write(formatHookResult({ allow: true, message }));
   return { result: { allow: true, message } };
 }
 
@@ -582,27 +546,8 @@ async function processCreatorCompletion(hookData) {
  * @returns {Promise<Object>} Parsed hook data
  */
 async function parseHookInputAsync() {
-  return new Promise((resolve, reject) => {
-    let data = '';
-
-    process.stdin.on('data', chunk => {
-      data += chunk;
-    });
-
-    process.stdin.on('end', () => {
-      try {
-        const parsed = safeParseJSON(data, null);
-        if (!parsed || typeof parsed !== 'object') {
-          throw new Error('Hook input payload is not valid JSON object');
-        }
-        resolve(parsed);
-      } catch (err) {
-        reject(new Error(`Failed to parse hook input: ${err.message}`));
-      }
-    });
-
-    process.stdin.on('error', reject);
-  });
+  const { parseHookInputAsync: unifiedParser } = require('../../lib/utils/hook-input.cjs');
+  return unifiedParser({ timeout: 300 });
 }
 
 /**
@@ -611,33 +556,35 @@ async function parseHookInputAsync() {
 async function main() {
   try {
     const hookData = await parseHookInputAsync();
+    if (!hookData) {
+      process.exit(0);
+    }
     await processCreatorCompletion(hookData);
   } catch (error) {
     process.stderr.write(`Post-creation integration error: ${error.message}\n`);
-    process.stdout.write(formatResult({ allow: true }));
+    process.stdout.write(formatHookResult({ allow: true }));
     process.exit(0); // Fail open - don't block on errors
   }
 }
 
-// Export for testing
 module.exports = {
   isCreatorCompletion,
   quickIntegrationCheck,
-  extractArtifactId,
-  appendToQueue,
-  appendToQueueWithImpact,
   runEcosystemImpactAnalysis,
   runEcosystemImpactAnalysisWithTimeout,
+  extractArtifactId,
   sanitizeImpactReport,
   serializeQueueEntryWithCap,
+  appendToQueueWithImpact,
   rotateQueue,
   processCreatorCompletion,
-  GRAPH_PATH,
+  parseHookInputAsync,
+  main,
   QUEUE_PATH,
+  GRAPH_PATH,
   MAX_QUEUE_ENTRY_BYTES,
 };
 
-// Run as script
 if (require.main === module) {
   main();
 }

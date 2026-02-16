@@ -5,25 +5,13 @@
  * PreToolUse hook that validates artifact integration and task status transitions
  * before allowing TaskUpdate.
  *
- * WHEN IT RUNS:
- * - Before TaskUpdate tool execution
- *
- * WHAT IT DOES:
- * - Validates task status transitions (pending → in_progress → completed)
- * - Detects if task involves artifact creation (when status: "completed")
- * - Runs integration validation (when status: "completed")
- * - Blocks invalid transitions or incomplete integration
- * - Provides clear remediation steps
- *
- * Part of the Post-Creation Validation Workflow.
- * @see .claude/workflows/core/post-creation-validation.md
- *
- * MERGED FROM:
- * - task-status-enforcement.cjs (2026-02-09)
+ * Trigger: PreToolUse on TaskUpdate
  *
  * ENVIRONMENT VARIABLES:
  * - TASK_STATUS_ENFORCEMENT: 'block' (default) | 'warn' | 'off'
  */
+
+'use strict';
 
 const fs = require('fs');
 const path = require('path');
@@ -34,7 +22,10 @@ const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const {
   getEnforcementMode,
   auditLog,
-  auditSecurityOverride,
+  parseHookInputAsync,
+  getToolName,
+  getToolInput,
+  formatResult: formatHookResult,
 } = require('../../lib/utils/hook-input.cjs');
 const {
   parseAndValidateTaskUpdate,
@@ -52,7 +43,10 @@ const VALIDATION_SCRIPT = path.join(
 );
 const ACTIVE_CREATORS_STATE_FILE = path.join(
   PROJECT_ROOT,
-  '.claude/context/runtime/active-creators.json'
+  '.claude',
+  'context',
+  'runtime',
+  'active-creators.json'
 );
 const CREATOR_ECOSYSTEM_VALIDATOR =
   process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH ||
@@ -92,23 +86,11 @@ function readTaskStatus(taskId) {
  * @param {string} status - New status
  */
 function writeTaskStatus(taskId, status) {
-  const before = readTaskStatus(taskId);
   lifecycleState.writeTaskStatus(taskId, status);
-  const after = readTaskStatus(taskId);
-  if (after !== status && before !== status) {
-    auditLog('pre-completion-validation', 'error', {
-      error: 'Failed to write task status',
-      taskId,
-      attemptedStatus: status,
-    });
-  }
 }
 
 /**
  * Check if transition is valid
- * @param {string} currentStatus - Current task status
- * @param {string} newStatus - New status being set
- * @returns {boolean} True if valid, false otherwise
  */
 function isValidTransition(currentStatus, newStatus) {
   return lifecycleState.isValidTransition(currentStatus, newStatus);
@@ -116,10 +98,6 @@ function isValidTransition(currentStatus, newStatus) {
 
 /**
  * Get transition error message
- * @param {string} taskId - Task ID
- * @param {string} currentStatus - Current task status
- * @param {string} newStatus - New status being set
- * @returns {string} Error message
  */
 function getTransitionError(taskId, currentStatus, newStatus) {
   return lifecycleState.getTransitionError(taskId, currentStatus, newStatus);
@@ -134,7 +112,7 @@ function extractTaskMetadata(params) {
     return {
       filesModified: metadata.filesModified || [],
       summary: metadata.summary || '',
-      taskId: params.taskId,
+      taskId: params.taskId || params.task_id || params.id,
     };
   } catch (_err) {
     return { filesModified: [], summary: '', taskId: null };
@@ -146,18 +124,17 @@ function extractTaskMetadata(params) {
  */
 function detectArtifacts(filesModified) {
   const artifacts = [];
+  if (!Array.isArray(filesModified)) return artifacts;
 
   for (const filePath of filesModified) {
     const normalizedPath = filePath.replace(/\\/g, '/');
 
-    // Check if it's an artifact path
     if (
       normalizedPath.includes('/.claude/agents/') ||
       normalizedPath.includes('/.claude/skills/') ||
       normalizedPath.includes('/.claude/workflows/') ||
       normalizedPath.includes('/.claude/hooks/')
     ) {
-      // Extract artifact info
       const type = normalizedPath.includes('/agents/')
         ? 'agent'
         : normalizedPath.includes('/skills/')
@@ -166,13 +143,9 @@ function detectArtifacts(filesModified) {
             ? 'workflow'
             : 'hook';
 
-      artifacts.push({
-        path: filePath,
-        type,
-      });
+      artifacts.push({ path: filePath, type });
     }
   }
-
   return artifacts;
 }
 
@@ -181,8 +154,6 @@ function detectArtifacts(filesModified) {
  */
 function validateArtifact(artifactPath) {
   try {
-    // Run validation script
-    // SEC-FIX: Use spawnSync with array args instead of string interpolation (prevents command injection)
     const result = spawnSync(process.execPath, [VALIDATION_SCRIPT, artifactPath], {
       cwd: PROJECT_ROOT,
       stdio: 'pipe',
@@ -190,25 +161,20 @@ function validateArtifact(artifactPath) {
       windowsHide: true,
     });
 
-    // Check exit code
     if (result.status !== 0) {
       throw new Error(result.stderr || result.stdout || 'Validation failed');
     }
 
     return { passed: true, issues: [] };
   } catch (err) {
-    // Validation failed - parse output for issues
     const output = err.stdout || err.stderr || '';
     const issues = [];
-
-    // Extract failed checks from output
     const lines = output.split('\n');
     for (const line of lines) {
       if (line.includes('✗') || line.includes('FAIL')) {
         issues.push(line.trim());
       }
     }
-
     return {
       passed: false,
       issues: issues.length > 0 ? issues : ['Integration validation failed'],
@@ -218,9 +184,7 @@ function validateArtifact(artifactPath) {
 
 function readActiveCreatorSkills() {
   try {
-    if (!fs.existsSync(ACTIVE_CREATORS_STATE_FILE)) {
-      return [];
-    }
+    if (!fs.existsSync(ACTIVE_CREATORS_STATE_FILE)) return [];
     const state = JSON.parse(fs.readFileSync(ACTIVE_CREATORS_STATE_FILE, 'utf8'));
     return Object.entries(state)
       .filter(([, value]) => value && value.active)
@@ -274,9 +238,7 @@ function runValidatorScript(scriptPath, args = [], fallbackIssue = 'Validation f
       windowsHide: true,
     });
 
-    if (result.status === 0) {
-      return { passed: true, issues: [] };
-    }
+    if (result.status === 0) return { passed: true, issues: [] };
 
     const output = `${result.stdout || ''}\n${result.stderr || ''}`;
     const issues = output
@@ -291,10 +253,7 @@ function runValidatorScript(scriptPath, args = [], fallbackIssue = 'Validation f
       issues: issues.length > 0 ? issues : [fallbackIssue],
     };
   } catch (err) {
-    return {
-      passed: false,
-      issues: [`${fallbackIssue}: ${err.message}`],
-    };
+    return { passed: false, issues: [`${fallbackIssue}: ${err.message}`] };
   }
 }
 
@@ -315,273 +274,108 @@ function validateCreatorEcosystem() {
     'Agent skill reference validation failed'
   );
 
-  const issues = [];
-  if (!creatorValidation.passed) {
-    issues.push(...creatorValidation.issues);
-  }
-  if (!skillValidation.passed) {
-    issues.push(...skillValidation.issues);
-  }
-  if (!agentSkillReferenceValidation.passed) {
-    issues.push(...agentSkillReferenceValidation.issues);
-  }
-
-  return {
-    passed: issues.length === 0,
-    issues,
-  };
+  const issues = [
+    ...creatorValidation.issues,
+    ...skillValidation.issues,
+    ...agentSkillReferenceValidation.issues,
+  ];
+  return { passed: issues.length === 0, issues };
 }
+
 /**
  * Main hook execution.
  */
-function main(hookInput) {
+async function main() {
   try {
-    // Parse hook input
-    const input = typeof hookInput === 'string' ? JSON.parse(hookInput) : hookInput;
-    const { tool, params = {} } = input;
+    const input = await parseHookInputAsync({ timeout: 300 });
+    if (!input) process.exit(0);
 
-    // Only intercept TaskUpdate calls
-    if (tool !== 'TaskUpdate') {
-      // Not a TaskUpdate call - allow
-      console.log(JSON.stringify({ allow: true }));
-      process.exit(0);
-    }
+    const toolName = getToolName(input);
+    const toolParams = getToolInput(input);
 
-    const parsedParams = parseAndValidateTaskUpdate(params, {
+    if (toolName !== 'TaskUpdate') process.exit(0);
+
+    const parsedParams = parseAndValidateTaskUpdate(toolParams, {
       allowedStatuses: VALID_STATUSES,
       requireTaskId: false,
       requireStatus: false,
     });
 
-    // ============================================================
-    // CHECK 1: TASK STATUS TRANSITION VALIDATION
-    // ============================================================
     const taskStatusMode = getEnforcementMode('TASK_STATUS_ENFORCEMENT', 'block');
 
-    // If task status enforcement is not disabled, validate status transition
     if (taskStatusMode !== 'off') {
       const taskId = parsedParams.normalized.taskId;
       const newStatus = parsedParams.normalized.status;
 
-      // Only validate if we have taskId and status
       if (taskId && newStatus) {
-        const normalizedStatus = newStatus;
-
-        // Check if status is valid
-        if (!VALID_STATUSES.includes(normalizedStatus)) {
-          const message = `Invalid status value: "${newStatus}". Valid statuses: ${VALID_STATUSES.join(', ')}`;
-
-          auditLog('pre-completion-validation', taskStatusMode === 'block' ? 'block' : 'warn', {
-            check: 'task-status-enforcement',
-            taskId,
-            newStatus,
-            reason: 'Invalid status value',
-          });
-
+        if (!VALID_STATUSES.includes(newStatus)) {
+          const msg = `Invalid status: "${newStatus}". Valid: ${VALID_STATUSES.join(', ')}`;
           if (taskStatusMode === 'block') {
-            console.log(JSON.stringify({ allow: false, message }));
+            console.log(formatHookResult('block', msg));
             process.exit(0);
           } else {
-            console.warn(`[WARN] ${message}`);
+            console.warn(`[WARN] ${msg}`);
           }
         } else {
-          // Get current status
           const currentStatus = readTaskStatus(taskId);
+          const isValid = isValidTransition(currentStatus, newStatus);
 
-          // Check if transition is valid
-          const isValid = isValidTransition(currentStatus, normalizedStatus);
-
-          // Special case: in_progress → in_progress (idempotent but warn)
-          if (currentStatus === 'in_progress' && normalizedStatus === 'in_progress') {
-            auditLog('pre-completion-validation', 'warn', {
-              check: 'task-status-enforcement',
-              taskId,
-              currentStatus,
-              newStatus: normalizedStatus,
-              reason: 'Idempotent transition (already in_progress)',
-            });
-            console.warn(
-              `[WARN] Task ${taskId} is already in_progress. Redundant TaskUpdate call detected.`
-            );
-            // Allow through - idempotent
+          if (currentStatus === 'in_progress' && newStatus === 'in_progress') {
+            // Idempotent
           } else if (!isValid) {
-            const message = getTransitionError(taskId, currentStatus, normalizedStatus);
-
-            auditLog('pre-completion-validation', taskStatusMode === 'block' ? 'block' : 'warn', {
-              check: 'task-status-enforcement',
-              taskId,
-              currentStatus,
-              newStatus: normalizedStatus,
-              reason: 'Invalid transition',
-            });
-
+            const msg = getTransitionError(taskId, currentStatus, newStatus);
             if (taskStatusMode === 'block') {
-              console.log(JSON.stringify({ allow: false, message }));
+              console.log(formatHookResult('block', msg));
               process.exit(0);
             } else {
-              console.warn(`[WARN] ${message}`);
+              console.warn(`[WARN] ${msg}`);
             }
           } else {
-            // Valid transition - update status file
-            writeTaskStatus(taskId, normalizedStatus);
-
-            auditLog('pre-completion-validation', 'allow', {
-              check: 'task-status-enforcement',
-              taskId,
-              currentStatus,
-              newStatus: normalizedStatus,
-            });
+            writeTaskStatus(taskId, newStatus);
+            auditLog('pre-completion-validation', 'allow', { taskId, currentStatus, newStatus });
           }
         }
       }
-    } else {
-      auditSecurityOverride(
-        'pre-completion-validation',
-        'TASK_STATUS_ENFORCEMENT',
-        'off',
-        'Task status transitions not validated'
-      );
     }
 
-    // ============================================================
-    // CHECK 2: ARTIFACT INTEGRATION VALIDATION (only for "completed")
-    // ============================================================
-    // Only intercept when status is being set to "completed"
-    if (parsedParams.normalized.status !== 'completed') {
-      // Not completing a task - allow (status validation passed above)
-      console.log(JSON.stringify({ allow: true }));
-      process.exit(0);
-    }
+    if (parsedParams.normalized.status !== 'completed') process.exit(0);
 
-    // Enforce creator ecosystem alignment when any creator skill is actioned
-    if (isEcosystemCreatorAction(params)) {
-      const ecosystemValidation = validateCreatorEcosystem();
-      if (!ecosystemValidation.passed) {
-        const ecosystemMessage = [
-          '',
-          '+----------------------------------------------------------+',
-          '| CREATOR ECOSYSTEM ALIGNMENT FAILED                       |',
-          '+----------------------------------------------------------+',
-          '| A creator skill action was detected, but ecosystem       |',
-          '| alignment checks failed.                                  |',
-          '|                                                          |',
-          '| Required action:                                          |',
-          '|  1. Align all creator skill folders and contracts        |',
-          '|  2. Run: pnpm skills:ecosystem:gate                        |',
-          '|  3. Re-run TaskUpdate to complete                        |',
-          '|                                                          |',
-        ];
-
-        for (const issue of ecosystemValidation.issues.slice(0, 8)) {
-          ecosystemMessage.push(`|  - ${issue.substring(0, 54).padEnd(54)}|`);
-        }
-
-        ecosystemMessage.push('+----------------------------------------------------------+');
-        ecosystemMessage.push('');
-
-        console.log(
-          JSON.stringify({
-            allow: false,
-            message: ecosystemMessage.join('\n'),
-          })
-        );
+    if (isEcosystemCreatorAction(toolParams)) {
+      const ecosystem = validateCreatorEcosystem();
+      if (!ecosystem.passed) {
+        const msg = ['CREATOR ECOSYSTEM ALIGNMENT FAILED', ...ecosystem.issues].join('\n');
+        console.log(formatHookResult('block', msg));
         process.exit(0);
       }
     }
 
-    // Extract task metadata
-    const metadata = extractTaskMetadata(params);
-
-    // Detect artifacts in modified files
+    const metadata = extractTaskMetadata(toolParams);
     const artifacts = detectArtifacts(metadata.filesModified);
 
-    // If no artifacts, allow completion
-    if (artifacts.length === 0) {
-      console.log(JSON.stringify({ allow: true }));
-      process.exit(0);
+    if (artifacts.length === 0) process.exit(0);
+
+    const failed = [];
+    for (const art of artifacts) {
+      const v = validateArtifact(art.path);
+      if (!v.passed) failed.push({ ...art, issues: v.issues });
     }
 
-    // Validate each artifact
-    const failedArtifacts = [];
+    if (failed.length === 0) process.exit(0);
 
-    for (const artifact of artifacts) {
-      const validation = validateArtifact(artifact.path);
-      if (!validation.passed) {
-        failedArtifacts.push({
-          ...artifact,
-          issues: validation.issues,
-        });
-      }
-    }
-
-    // If all artifacts passed, allow completion
-    if (failedArtifacts.length === 0) {
-      console.log(JSON.stringify({ allow: true }));
-      process.exit(0);
-    }
-
-    // Block completion - validation failed
-    const blockMessage = [
-      '',
-      '+----------------------------------------------------------+',
-      '| PRE-COMPLETION VALIDATION FAILED                         |',
-      '+----------------------------------------------------------+',
-      '| Cannot complete task - artifact integration incomplete.  |',
-      '|                                                          |',
-      `| Task ID: ${metadata.taskId || 'unknown'}`,
-      `| Artifacts with issues: ${failedArtifacts.length}`,
-      '|                                                          |',
-    ];
-
-    for (const artifact of failedArtifacts) {
-      blockMessage.push(`|  [${artifact.type}] ${path.basename(artifact.path)}`);
-      for (const issue of artifact.issues.slice(0, 3)) {
-        // Max 3 issues shown
-        blockMessage.push(`|    - ${issue.substring(0, 50)}`);
-      }
-    }
-
-    blockMessage.push('|                                                          |');
-    blockMessage.push('| Required action:                                         |');
-    blockMessage.push('|  1. Run: node .claude/tools/cli/validate-integration.cjs \\|');
-    blockMessage.push('|           <artifact-path>                                |');
-    blockMessage.push('|  2. Fix reported issues                                 |');
-    blockMessage.push('|  3. Re-run TaskUpdate to complete                       |');
-    blockMessage.push('|                                                          |');
-    blockMessage.push('| See: .claude/workflows/core/post-creation-validation.md  |');
-    blockMessage.push('+----------------------------------------------------------+');
-    blockMessage.push('');
-
-    // Block with message
-    console.log(
-      JSON.stringify({
-        allow: false,
-        message: blockMessage.join('\n'),
-      })
-    );
+    const blockMsg = [
+      'PRE-COMPLETION VALIDATION FAILED',
+      ...failed.map(f => `[${f.type}] ${f.path}`),
+    ].join('\n');
+    console.log(formatHookResult('block', blockMsg));
     process.exit(0);
   } catch (err) {
-    // Error in hook - allow completion (fail open)
-    console.log(
-      JSON.stringify({
-        allow: true,
-        message: `Pre-completion validation error: ${err.message}`,
-      })
-    );
+    console.error(`[pre-completion-validation] Hook failed: ${err.message}`);
     process.exit(0);
   }
 }
 
 if (require.main === module) {
-  // Read hook input from stdin
-  let hookInput = '';
-  process.stdin.setEncoding('utf-8');
-  process.stdin.on('data', chunk => {
-    hookInput += chunk;
-  });
-  process.stdin.on('end', () => {
-    main(hookInput);
-  });
+  main();
 }
 
 module.exports = {

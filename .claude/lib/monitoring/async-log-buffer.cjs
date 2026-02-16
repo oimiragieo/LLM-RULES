@@ -85,15 +85,34 @@ class AsyncLogBuffer {
     }
   }
 
-  close() {
-    this.flush(); // Attempt final flush
-    if (this.writeStream) {
-      this.writeStream.end();
-      this.writeStream = null;
-    }
+  /**
+   * Final synchronous flush for process exit.
+   */
+  flushSync() {
+    if (this.buffer.length === 0 || !this.filePath) return;
+
     if (this.flushTimer) {
       clearTimeout(this.flushTimer);
       this.flushTimer = null;
+    }
+
+    const chunk = this.buffer.join('');
+    this.buffer = [];
+    this.bufferSize = 0;
+
+    try {
+      // Use synchronous append to ensure it finishes before process dies
+      fs.appendFileSync(this.filePath, chunk, 'utf8');
+    } catch (_err) {
+      // Best effort
+    }
+  }
+
+  close() {
+    this.flushSync();
+    if (this.writeStream) {
+      this.writeStream.end();
+      this.writeStream = null;
     }
   }
 }

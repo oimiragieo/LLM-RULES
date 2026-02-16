@@ -19,7 +19,7 @@ async function withWorkflowStateLock(fn, projectRoot = PROJECT_ROOT) {
   const lockPath = getWorkflowStateLockPath(projectRoot);
   return withLock(lockPath, fn, {
     retries: {
-      retries: Number(process.env.WORKFLOW_STATE_LOCK_RETRIES || 5),
+      retries: Number(process.env.WORKFLOW_STATE_LOCK_RETRIES || 20),
       minTimeout: Number(process.env.WORKFLOW_STATE_LOCK_MIN_TIMEOUT_MS || 50),
       maxTimeout: Number(process.env.WORKFLOW_STATE_LOCK_MAX_TIMEOUT_MS || 500),
     },

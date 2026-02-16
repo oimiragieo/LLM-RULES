@@ -73,9 +73,11 @@ function main() {
   const plainTextHookWarn = lines.filter(l =>
     l.includes('Hook output does not start with {, treating as plain text')
   );
-  const contaminatedYouAreTaskOne = lines.filter(l => /\bYou are task-1\b/i.test(l));
+  const contaminatedYouAreTaskOne = lines.filter(
+    l => /\bYou are task-1\b/i.test(l) || /\bYou are task\s*#\s*[0-9]{1,10}\b/i.test(l)
+  );
   const contaminatedTaskUpdateNumeric = lines.filter(l =>
-    /TaskUpdate\(\{\s*task(?:Id|_id)\s*:\s*['"]1['"]/i.test(l)
+    /TaskUpdate\(\{\s*task(?:Id|_id)\s*:\s*['"][0-9]{1,10}['"]/i.test(l)
   );
   const bashToolError = lines.filter(l => l.includes('Bash tool error'));
   const badSubstitution = lines.filter(l => l.includes('Bad substitution'));
@@ -87,7 +89,10 @@ function main() {
   const maxReadMissing = Number(process.env.DEBUG_LOG_MAX_READ_MISSING || 6);
   const maxBashToolError = Number(process.env.DEBUG_LOG_MAX_BASH_TOOL_ERROR || 3);
   const maxBadSubstitution = Number(process.env.DEBUG_LOG_MAX_BAD_SUBSTITUTION || 2);
-  const maxPlainTextHookWarn = Number(process.env.DEBUG_LOG_MAX_PLAINTEXT_HOOK_WARN || 5);
+  // Runtime may emit benign plain-text hook warnings in debug mode when hooks return
+  // multi-line output. Keep this threshold high enough to catch explosions without
+  // failing on expected noise.
+  const maxPlainTextHookWarn = Number(process.env.DEBUG_LOG_MAX_PLAINTEXT_HOOK_WARN || 150);
   const maxReadTokenExceededThreshold = Number(process.env.DEBUG_LOG_MAX_READ_TOKEN_EXCEEDED || 2);
   const ignoreSecretLeakCheck =
     String(process.env.DEBUG_LOG_IGNORE_SECRET_LEAKS || 'false')

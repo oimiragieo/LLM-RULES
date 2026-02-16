@@ -31,13 +31,22 @@ const { readRouterStateFile } = require('../../lib/runtime/state-contracts.cjs')
 // <project>/.claude/hooks/routing/router-state.cjs -> <project>
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
-const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+/**
+ * Get the path to the router state file.
+ * Respects ROUTER_STATE_FILE env var for testing.
+ */
+function getStateFilePath() {
+  return (
+    process.env.ROUTER_STATE_FILE ||
+    path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json')
+  );
+}
 
 /**
  * Ensure the runtime directory exists
  */
 function ensureRuntimeDir() {
-  const dir = path.dirname(STATE_FILE);
+  const dir = path.dirname(getStateFilePath());
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -114,13 +123,14 @@ function getState() {
  * @param {Object} state - State to save
  */
 function saveState(state) {
+  const stateFile = getStateFilePath();
   try {
     ensureRuntimeDir();
     // Atomic write: write to temp file, then rename
     // Prevents data corruption if process crashes mid-write
-    atomicWriteJSONSync(STATE_FILE, state);
+    atomicWriteJSONSync(stateFile, state);
     // Invalidate cache so subsequent getState() calls see the new data
-    invalidateCache(STATE_FILE);
+    invalidateCache(stateFile);
   } catch (e) {
     // Best effort - don't fail the hook if state can't be saved
     console.error('[router-state] Warning: Could not save state:', e.message);
@@ -156,9 +166,10 @@ function validateVersion(version) {
  * @returns {Object} Current state from file
  */
 function loadStateFromFile() {
+  const stateFile = getStateFilePath();
   try {
     ensureRuntimeDir();
-    return readRouterStateFile(STATE_FILE, getDefaultState());
+    return readRouterStateFile(stateFile, getDefaultState());
   } catch (_e) {
     // On any error, return default
   }
@@ -218,6 +229,7 @@ function syncSleep(ms) {
  * @throws {Error} If save fails after all retries
  */
 function saveStateWithRetry(updates, retries = MAX_RETRIES) {
+  const stateFile = getStateFilePath();
   for (let i = 0; i < retries; i++) {
     // Apply exponential backoff on retries (skip first attempt)
     if (i > 0) {
@@ -251,8 +263,8 @@ function saveStateWithRetry(updates, retries = MAX_RETRIES) {
     // Step 6: Write atomically
     try {
       ensureRuntimeDir();
-      atomicWriteJSONSync(STATE_FILE, merged);
-      invalidateCache(STATE_FILE);
+      atomicWriteJSONSync(stateFile, merged);
+      invalidateCache(stateFile);
       return merged;
     } catch (_e) {
       // Write failed, retry
@@ -594,7 +606,7 @@ function resetTaskUpdateTracking() {
  * Useful for testing or when external processes modify the state file
  */
 function invalidateStateCache() {
-  invalidateCache(STATE_FILE);
+  invalidateCache(getStateFilePath());
 }
 
 /**
@@ -657,7 +669,7 @@ module.exports = {
   isInAgentContext,
   checkWriteAllowed,
   getEnforcementMode,
-  STATE_FILE,
+  getStateFilePath,
   PROJECT_ROOT,
   // Complexity tracking - setters
   setComplexity,

@@ -30,4 +30,3 @@ test('validate-skill-invocation emits advisory on stderr and keeps stdout clean'
   assert.strictEqual((result.stdout || '').trim(), '');
   assert.ok((result.stderr || '').includes('[SKILL-INVOCATION]'));
 });
-

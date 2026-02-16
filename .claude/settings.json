@@ -18,6 +18,10 @@
           },
           {
             "type": "command",
+            "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/session/state-reset.cjs"
           },
           {
@@ -208,7 +212,7 @@
         ]
       },
       {
-        "matcher": "Task|TaskList|TaskOutput",
+        "matcher": "Task|TaskList|TaskOutput|TaskUpdate",
         "hooks": [
           {
             "type": "command",

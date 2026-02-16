@@ -188,16 +188,20 @@ function allowWithSelfHeal(taskId, toolName) {
 }
 
 function isAgentScopedSession(hookInput) {
+  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
+    .trim()
+    .toLowerCase();
+
+  // The Router is the root coordinator and should NEVER be restricted by task-first protocols.
+  if (agentId === 'router') return false;
+
   const allowedTools = Array.isArray(hookInput?.allowed_tools) ? hookInput.allowed_tools : [];
   if (allowedTools.includes('TaskUpdate')) return true;
 
   const scopedTaskId = hookInput?.task_id || hookInput?.taskId || null;
   if (typeof scopedTaskId === 'string' && scopedTaskId.trim().length > 0) return true;
 
-  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
-    .trim()
-    .toLowerCase();
-  if (agentId && agentId !== 'router') return true;
+  if (agentId && agentId !== '') return true;
 
   try {
     const state = routerState.getState();
@@ -351,11 +355,16 @@ function checkTaskUpdateFirst(
       };
     }
 
-    if (status === 'in_progress' || status === 'in-progress' || status === 'completed') {
+    if (
+      status === 'in_progress' ||
+      status === 'in-progress' ||
+      status === 'completed' ||
+      (!status && taskId)
+    ) {
       current.sessions[sessionId] = {
-        inProgress: !isCompleted,
+        inProgress: status !== 'completed',
         taskId: taskId || currentEntry.taskId || null,
-        status,
+        status: status || currentEntry.status || 'in_progress',
         preflightTaskListCalls: 0,
         preflightViolations: 0,
         updatedAt: now,

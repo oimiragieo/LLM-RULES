@@ -297,7 +297,7 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
   }
 
   const dedupe = registerBlockAttempt('tasklist-first-gate', toolName, hookInput);
-  const isReadOnlyDiscoveryTool = toolName === 'Glob' || toolName === 'Grep';
+  const isReadOnlyDiscoveryTool = toolName === 'Glob' || toolName === 'Grep' || toolName === 'Read';
   const message = dedupe.dedupe
     ? compactFallbackMessage(
         'ROUTER-FIRST PROTOCOL VIOLATION | TASKLIST-FIRST VIOLATION',

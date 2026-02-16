@@ -46,6 +46,7 @@ const EventTypes = {
   TASK_BLOCKED: 'TASK_BLOCKED',
   TASK_UNBLOCKED: 'TASK_UNBLOCKED',
   TASK_DELETED: 'TASK_DELETED',
+  TASK_HEARTBEAT: 'TASK_HEARTBEAT',
 
   // Tool Events (5)
   TOOL_INVOKED: 'TOOL_INVOKED',
@@ -95,6 +96,7 @@ const TASK_EVENTS = [
   'TASK_BLOCKED',
   'TASK_UNBLOCKED',
   'TASK_DELETED',
+  'TASK_HEARTBEAT',
 ];
 
 const TOOL_EVENTS = [
@@ -202,6 +204,10 @@ function validateEvent(eventType, payload) {
     if (TASK_EVENTS.includes(eventType)) {
       if (!payload.taskId)
         errors.push({ path: '/taskId', message: 'taskId is required for task events' });
+
+      if (eventType === 'TASK_HEARTBEAT') {
+        // Heartbeat specifically requires taskId
+      }
 
       if (eventType === 'TASK_CREATED') {
         if (!payload.subject) errors.push({ path: '/subject', message: 'subject is required' });

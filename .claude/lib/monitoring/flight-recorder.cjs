@@ -39,6 +39,9 @@ function listRotatedFiles(filePath) {
     .map(name => path.join(dir, name));
 }
 
+let lastPruneTime = 0;
+const PRUNE_DEBOUNCE_MS = 60 * 1000; // 1 minute
+
 function rotateIfNeeded(filePath) {
   if (!fs.existsSync(filePath)) return null;
   const stat = fs.statSync(filePath);
@@ -50,6 +53,14 @@ function rotateIfNeeded(filePath) {
 
   const rotated = getRotatedPath(filePath);
   fs.renameSync(filePath, rotated);
+
+  // SEC-IMPL: Prune only during rotation to keep hot-path fast
+  const now = Date.now();
+  if (now - lastPruneTime > PRUNE_DEBOUNCE_MS) {
+    pruneOldFiles(filePath);
+    lastPruneTime = now;
+  }
+
   return rotated;
 }
 
@@ -115,11 +126,12 @@ function record(event, filePath = getRecorderPath()) {
     }
 
     // Check rotation (sync check, but only happens occasionally)
+
     // Optimization: Could move this to async loop too, but file stats are fast enough for now
+
     // compared to write blocking.
+
     rotateIfNeeded(filePath);
-    // Pruning is expensive, do it rarely or async. For now, we leave it in main path
-    // but it only runs when rotation happens.
 
     logBuffer.setPath(filePath);
     logBuffer.write(enriched);

@@ -169,6 +169,9 @@ function normalizeTaskIdReferences(prompt, taskId) {
   if (!normalizedTaskId) return prompt;
 
   return prompt
+    .replace(/\b(You are\s+)task\s*#\s*[0-9]{1,10}(\b)/gi, (_match, prefix, suffix) => {
+      return `${prefix}${normalizedTaskId}${suffix}`;
+    })
     .replace(
       /\b(You are\s+)(?:task-[a-zA-Z0-9_-]{1,64}|[0-9]{1,10})(\b)/gi,
       (_match, prefix, suffix) => {

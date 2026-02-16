@@ -150,6 +150,24 @@ describe('prompt-assembler', () => {
         'Should emphasize importance'
       );
     });
+
+    it('should include read-before-write guidance for report artifacts', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const tools = VALID_DEVELOPER_TOOLS;
+      const section = assembler.buildToolsSection(tools);
+
+      assert.ok(
+        section.includes('Read it first') || section.includes('Read it first;'),
+        'Should instruct reading existing files before write/edit'
+      );
+      assert.ok(
+        section.includes('.claude/context/reports'),
+        'Should explicitly mention report artifact paths'
+      );
+    });
   });
 
   // ======================================================================

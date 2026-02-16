@@ -51,6 +51,8 @@ function getFindingsRegistry() {
   return findingsRegistry || null;
 }
 
+const lifecycleState = require('../../lib/routing/task-lifecycle-state.cjs');
+
 const LEARNINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
 const EVOLUTION_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
 const AUDIT_LOG_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-audit.log');
@@ -110,6 +112,7 @@ const {
   runEvolutionAudit,
 } = helpers;
 
+// eslint-disable-next-line complexity
 async function main() {
   const startTime = Date.now();
   try {
@@ -120,7 +123,37 @@ async function main() {
     }
 
     const toolName = getToolName(hookInput);
-    if (toolName !== 'Task' && toolName !== 'TaskList' && toolName !== 'TaskOutput') {
+    if (
+      toolName !== 'Task' &&
+      toolName !== 'TaskList' &&
+      toolName !== 'TaskOutput' &&
+      toolName !== 'TaskUpdate'
+    ) {
+      process.exit(0);
+      return;
+    }
+
+    if (toolName === 'TaskUpdate') {
+      const toolInput = getToolInput(hookInput) || {};
+      const status = toolInput.status || toolInput.state || null;
+      const taskId = toolInput.taskId || toolInput.task_id || toolInput.id || null;
+
+      if (taskId && status) {
+        try {
+          routerState.recordTaskUpdate(String(taskId), String(status));
+          lifecycleState.writeTaskStatus(String(taskId), String(status));
+
+          await eventBus.emit(EventTypes.TASK_UPDATED, {
+            type: EventTypes.TASK_UPDATED,
+            timestamp: new Date().toISOString(),
+            taskId: String(taskId),
+            status: String(status),
+            metadata: toolInput.metadata || {},
+          });
+        } catch (_err) {
+          // Best-effort
+        }
+      }
       process.exit(0);
       return;
     }
@@ -152,6 +185,7 @@ async function main() {
         const hadMatchingCompleted = hasMatchingCompletedTaskUpdate(taskId);
         try {
           routerState.recordTaskUpdate(String(taskId), 'completed');
+          lifecycleState.writeTaskStatus(String(taskId), 'completed');
         } catch (_trackErr) {
           // Best-effort status reconciliation only.
         }
@@ -198,6 +232,7 @@ async function main() {
       if (effectiveTaskId) {
         try {
           routerState.recordTaskUpdate(String(effectiveTaskId), 'in_progress');
+          lifecycleState.writeTaskStatus(String(effectiveTaskId), 'in_progress');
         } catch (_trackErr) {
           // Best-effort tracking only.
         }

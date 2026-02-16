@@ -202,6 +202,39 @@ describe('routing-guard.cjs - Check 10: Intent-Agent Match', () => {
     });
     assert.equal(result.pass, true);
   });
+
+  it('should allow code-reviewer for code quality bug sweep prompts', () => {
+    process.env.INTENT_AGENT_MATCH = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-reviewer',
+      description: 'Code quality bug sweep',
+      prompt:
+        'Search the codebase for bugs, including security concerns, test coverage issues, and documentation gaps.',
+    });
+    assert.equal(result.pass, true);
+  });
+
+  it('should allow architect for architecture improvement sweep prompts', () => {
+    process.env.INTENT_AGENT_MATCH = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'architect',
+      description: 'Architecture improvement sweep',
+      prompt:
+        'Analyze architecture issues and include security, testing, and documentation concerns in the sweep report.',
+    });
+    assert.equal(result.pass, true);
+  });
+
+  it('should allow code-reviewer for user phrase "issues or bugs ... improve or do better"', () => {
+    process.env.INTENT_AGENT_MATCH = 'block';
+    const result = routingGuard.checkIntentAgentMatch('Task', {
+      subagent_type: 'code-reviewer',
+      description: 'Sweep request',
+      prompt:
+        'search the codebase for any issues or bugs, look for areas we can improve or do better.',
+    });
+    assert.equal(result.pass, true);
+  });
 });
 
 describe('routing-guard.cjs - Check 11: Config Model Validator', () => {

@@ -297,7 +297,7 @@ function getEnforcementMode(envVar, defaultMode = 'block') {
  */
 function getToolName(input) {
   if (!input) return null;
-  return input.tool_name || input.tool || null;
+  return input.tool_name || input.tool || input.toolUse?.tool || input.toolUse?.tool_name || null;
 }
 
 /**
@@ -308,7 +308,15 @@ function getToolName(input) {
  */
 function getToolInput(input) {
   if (!input) return {};
-  return input.tool_input || input.input || input.parameters || {};
+  return (
+    input.tool_input ||
+    input.input ||
+    input.parameters ||
+    input.toolUse?.input ||
+    input.toolUse?.tool_input ||
+    input.toolUse?.parameters ||
+    {}
+  );
 }
 
 /**
@@ -319,7 +327,14 @@ function getToolInput(input) {
  */
 function getToolOutput(input) {
   if (!input) return null;
-  return input.tool_output || input.output || input.result || null;
+  return (
+    input.tool_output ||
+    input.output ||
+    input.result ||
+    input.toolResult?.output ||
+    input.toolResult?.result ||
+    null
+  );
 }
 
 /**

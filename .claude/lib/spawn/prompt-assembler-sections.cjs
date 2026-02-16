@@ -41,6 +41,8 @@ function buildToolsSection(tools) {
     '\n**CRITICAL/MANDATORY:** Call TaskUpdate({ taskId, status: "in_progress" }) when starting work.\n';
   section += 'Call TaskUpdate({ taskId, status: "completed" }) when done.\n';
   section +=
+    'Before editing an existing file (especially `.claude/context/reports/*`), Read it first; if it does not exist, create it with Write.\n';
+  section +=
     'Use Write/Edit for file creation or updates; do not use Bash redirection (`>`, `>>`, `tee`) for artifacts.\n';
 
   return section;

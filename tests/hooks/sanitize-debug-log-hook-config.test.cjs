@@ -54,3 +54,9 @@ test('settings.json Stop hooks include sanitize-debug-log command', () => {
   const hasSanitizer = commands.some(command => /sanitize-debug-log/i.test(command));
   assert.equal(hasSanitizer, true);
 });
+
+test('settings.json UserPromptSubmit hooks include sanitize-debug-log command', () => {
+  const commands = getHookCommands('UserPromptSubmit');
+  const hasSanitizer = commands.some(command => /sanitize-debug-log/i.test(command));
+  assert.equal(hasSanitizer, true);
+});

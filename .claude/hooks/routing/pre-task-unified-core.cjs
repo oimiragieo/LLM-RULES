@@ -417,6 +417,10 @@ function updateTaskLifecycleStateAfterAllow(hookInput) {
 
     routerState.setCurrentSpawnTaskId(taskId);
     routerState.recordTaskUpdate(taskId, 'in_progress');
+
+    // Unify with lifecycle validation layer
+    const lifecycleState = require('../../lib/routing/task-lifecycle-state.cjs');
+    lifecycleState.writeTaskStatus(String(taskId), 'in_progress');
   } catch (err) {
     auditLog('pre-task-unified', 'task_lifecycle_update_failed', { error: err.message });
   }

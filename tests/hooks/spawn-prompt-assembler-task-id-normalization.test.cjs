@@ -46,6 +46,29 @@ test('normalizeTaskIdReferences rewrites role-line and numeric single-quote task
   assert.equal(output.includes("task_id: '1'"), false);
 });
 
+test('normalizeTaskIdReferences rewrites "task #N" role markers and numeric task ids', () => {
+  const input = [
+    'You are task #1: Code quality audit.',
+    'You are task #2: Architecture review.',
+    'FIRST: Call TaskUpdate({ taskId: "2", status: "in_progress" })',
+    'LAST: Call TaskUpdate({ task_id: "1", status: "completed" })',
+  ].join('\n');
+
+  const output = normalizeTaskIdReferences(input, 'task-7600b003c263-code-quality-audit-mloyulmd');
+  assert.ok(
+    output.includes('You are task-7600b003c263-code-quality-audit-mloyulmd: Code quality audit.')
+  );
+  assert.ok(
+    output.includes('You are task-7600b003c263-code-quality-audit-mloyulmd: Architecture review.')
+  );
+  assert.ok(output.includes('taskId: "task-7600b003c263-code-quality-audit-mloyulmd"'));
+  assert.ok(output.includes('task_id: "task-7600b003c263-code-quality-audit-mloyulmd"'));
+  assert.equal(output.includes('task #1'), false);
+  assert.equal(output.includes('task #2'), false);
+  assert.equal(output.includes('taskId: "2"'), false);
+  assert.equal(output.includes('task_id: "1"'), false);
+});
+
 test('normalizeStalePathReferences rewrites known stale report and code paths', () => {
   const input = [
     '.claude/lib/memory/memory-query.cjs',
