@@ -1,6 +1,10 @@
 'use strict';
 
-const { normalizePath, normalizeGlobPattern, escapePathForRegex } = require('../../../.claude/lib/utils/path-utils.cjs');
+const {
+  normalizePath,
+  normalizeGlobPattern,
+  escapePathForRegex,
+} = require('../../../.claude/lib/utils/path-utils.cjs');
 const assert = require('assert');
 const test = require('node:test');
 

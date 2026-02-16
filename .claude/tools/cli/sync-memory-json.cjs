@@ -8,6 +8,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const path = require('path');
 const fs = require('fs');
@@ -50,8 +51,10 @@ function main() {
   }
 }
 
+const wrappedMain = wrapCLITool(main, 'sync-memory-json');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = { main };

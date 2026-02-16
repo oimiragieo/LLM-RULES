@@ -23,6 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { MemoryVectorStore } = require('../../lib/memory/lancedb-client.cjs');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 /**
  * Chunk markdown content by section headers (##)
@@ -362,10 +363,8 @@ module.exports = {
   reindexIfNeeded,
 };
 
-// Run if executed directly
+const wrappedMain = wrapCLITool(main, 'generate-embeddings');
+
 if (require.main === module) {
-  main().catch(error => {
-    console.error('ERROR:', error.message);
-    process.exit(1);
-  });
+  wrappedMain();
 }

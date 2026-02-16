@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const { logRuntimeHealth } = require('../../lib/monitoring/runtime-health-log.cjs');
 
@@ -51,8 +52,10 @@ function main() {
   }
 }
 
+const wrappedMain = wrapCLITool(main, 'runtime-health-snapshot');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

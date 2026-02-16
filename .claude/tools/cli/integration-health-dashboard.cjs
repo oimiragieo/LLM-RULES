@@ -19,6 +19,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -415,6 +416,8 @@ module.exports = {
 };
 
 // Run as script
+const wrappedMain = wrapCLITool(main, 'integration-health-dashboard');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }

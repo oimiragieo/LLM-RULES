@@ -163,9 +163,14 @@ class VectorStore {
   async loadBM25Index() {
     const bm25Path = path.join(this.persistDirectory, 'bm25-index.json');
     if (fs.existsSync(bm25Path)) {
-      const data = JSON.parse(fs.readFileSync(bm25Path, 'utf-8'));
-      const { BM25Indexer } = require('./bm25-indexer.cjs');
-      this.bm25Index = BM25Indexer.fromJSON(data);
+      try {
+        const data = JSON.parse(fs.readFileSync(bm25Path, 'utf-8'));
+        const { BM25Indexer } = require('./bm25-indexer.cjs');
+        this.bm25Index = BM25Indexer.fromJSON(data);
+      } catch (_err) {
+        // Corrupt or incompatible BM25 index should fail open.
+        this.bm25Index = null;
+      }
     }
   }
 

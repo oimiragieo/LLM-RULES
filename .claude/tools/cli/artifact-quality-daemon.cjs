@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -274,11 +275,10 @@ async function main() {
   throw new Error(`Unknown mode: ${options.mode}`);
 }
 
+const wrappedMain = wrapCLITool(main, 'artifact-quality-daemon');
+
 if (require.main === module) {
-  main().catch(err => {
-    console.error(err && err.message ? err.message : String(err));
-    process.exit(1);
-  });
+  wrappedMain();
 }
 
 module.exports = {

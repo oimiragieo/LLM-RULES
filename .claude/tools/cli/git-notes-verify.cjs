@@ -21,6 +21,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const _path = require('path');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 // Import hook for verification logic
 const gitNotesAudit = require('../../hooks/audit/git-notes-audit.cjs');
@@ -304,8 +305,10 @@ Examples:
 }
 
 // Run CLI
+const wrappedMain = wrapCLITool(main, 'git-notes-verify');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 // Export for testing

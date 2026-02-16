@@ -23,6 +23,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -533,12 +534,10 @@ async function main() {
   }
 }
 
-// Run if executed directly
+const wrappedMain = wrapCLITool(main, 'weekly-error-analysis');
+
 if (require.main === module) {
-  main().catch(err => {
-    console.error('Error:', err.message);
-    process.exit(1);
-  });
+  wrappedMain();
 }
 
 module.exports = {

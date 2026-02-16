@@ -17,6 +17,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -666,6 +667,8 @@ module.exports = {
 };
 
 // Run main only if executed directly (not when required as module)
+const wrappedMain = wrapCLITool(main, 'security-lint');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }

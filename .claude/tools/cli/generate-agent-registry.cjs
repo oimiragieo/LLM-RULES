@@ -17,6 +17,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const path = require('path');
 
@@ -167,12 +168,10 @@ async function main() {
   console.log('\nDone!');
 }
 
-// Run if called directly
+const wrappedMain = wrapCLITool(main, 'generate-agent-registry');
+
 if (require.main === module) {
-  main().catch(error => {
-    console.error('Error:', error.message);
-    process.exit(1);
-  });
+  wrappedMain();
 }
 
 module.exports = { main, parseArgs };

@@ -9,6 +9,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const net = require('net');
 const { spawn } = require('child_process');
@@ -291,7 +292,8 @@ Examples:
   }
 }
 
-main().catch(err => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+const wrappedMain = wrapCLITool(main, 'hybrid-search');
+
+if (require.main === module) {
+  wrappedMain();
+}

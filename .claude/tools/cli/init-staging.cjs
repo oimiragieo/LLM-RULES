@@ -13,6 +13,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 const { getEnvironment } = require('../../lib/utils/environment.cjs');
 const { getProjectRoot } = require('../../lib/utils/config-loader.cjs');
 
@@ -222,14 +223,16 @@ async function initStaging(options = {}) {
 }
 
 // Run if executed directly
-if (require.main === module) {
+async function cliMain() {
   const args = process.argv.slice(2);
   const force = args.includes('--force') || args.includes('-f');
+  await initStaging({ force });
+}
 
-  initStaging({ force }).catch(error => {
-    console.error(`\n❌ Error: ${error.message}`);
-    process.exit(1);
-  });
+const wrappedMain = wrapCLITool(cliMain, 'init-staging');
+
+if (require.main === module) {
+  wrappedMain();
 }
 
 module.exports = { initStaging, copyDir };

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const { replay } = require('../../lib/monitoring/flight-recorder-replay.cjs');
 const { getRecorderPath } = require('../../lib/monitoring/flight-recorder.cjs');
@@ -107,8 +108,10 @@ function main() {
   process.exit(0);
 }
 
+const wrappedMain = wrapCLITool(main, 'trace-query');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

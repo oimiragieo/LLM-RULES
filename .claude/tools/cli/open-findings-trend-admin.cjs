@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -61,8 +62,10 @@ function main() {
   }
 }
 
+const wrappedMain = wrapCLITool(main, 'open-findings-trend-admin');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

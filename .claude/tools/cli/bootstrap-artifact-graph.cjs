@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 /**
  * bootstrap-artifact-graph.cjs
@@ -580,7 +581,11 @@ function main() {
 
 // Run
 try {
-  main();
+  const wrappedMain = wrapCLITool(main, 'bootstrap-artifact-graph');
+
+  if (require.main === module) {
+    wrappedMain();
+  }
 } catch (err) {
   console.error('Fatal error:', err.message);
   if (options.verbose) {

@@ -201,6 +201,12 @@ async function main() {
             }
           );
         }
+      } else if (taskId && status === null) {
+        if (process.env.DEBUG_HOOKS === 'true') {
+          console.warn(
+            `[post-task-unified] Warning: Could not infer status from TaskOutput for task ${taskId}`
+          );
+        }
       }
 
       process.exit(0);

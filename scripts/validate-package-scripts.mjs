@@ -3,9 +3,12 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '..');
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../.claude/lib/utils/safe-json.cjs');
 
 async function main() {
   const pkgPath = path.join(PROJECT_ROOT, 'package.json');
@@ -14,11 +17,9 @@ async function main() {
     process.exit(1);
   }
 
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  const pkg = safeParseJSON(fs.readFileSync(pkgPath, 'utf8'), null);
   const scripts = pkg.scripts || {};
   const errors = [];
-
-  console.log(`Validating ${Object.keys(scripts).length} scripts...`);
 
   for (const [name, script] of Object.entries(scripts)) {
     // Skip echo-only (archived) scripts
@@ -31,7 +32,7 @@ async function main() {
       const scriptFile = nodeMatch[1];
       // Skip node flags or -e
       if (scriptFile.startsWith('-')) continue;
-      
+
       const absPath = path.resolve(PROJECT_ROOT, scriptFile);
       if (!fs.existsSync(absPath)) {
         errors.push(`Script "${name}" references missing file: ${scriptFile}`);

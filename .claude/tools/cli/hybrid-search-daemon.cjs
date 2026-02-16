@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const fsp = require('fs').promises;
@@ -203,9 +204,8 @@ async function main() {
   });
 }
 
-main().catch(err => {
-  process.stderr.write(
-    `[hybrid-daemon] Fatal: ${err instanceof Error ? err.message : String(err)}\n`
-  );
-  process.exit(1);
-});
+const wrappedMain = wrapCLITool(main, 'hybrid-search-daemon');
+
+if (require.main === module) {
+  wrappedMain();
+}

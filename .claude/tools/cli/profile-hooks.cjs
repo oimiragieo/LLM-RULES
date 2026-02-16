@@ -25,6 +25,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const { spawn } = require('child_process');
 const path = require('path');
@@ -532,7 +533,8 @@ Options:
   }
 }
 
-main().catch(err => {
-  console.error('Error:', err.message);
-  process.exit(1);
-});
+const wrappedMain = wrapCLITool(main, 'profile-hooks');
+
+if (require.main === module) {
+  wrappedMain();
+}

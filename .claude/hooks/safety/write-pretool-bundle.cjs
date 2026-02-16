@@ -13,7 +13,13 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const HOOKS = [
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs'),
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'validation', 'agent-template-contract-validator.cjs'),
+  path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'hooks',
+    'validation',
+    'agent-template-contract-validator.cjs'
+  ),
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'unified-pre-write-hook.cjs'),
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'evolution-state-guard.cjs'),
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'research-enforcement.cjs'),

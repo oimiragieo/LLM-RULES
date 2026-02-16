@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -132,13 +133,10 @@ function main() {
   console.log(`${status} in ${result.file}`);
 }
 
+const wrappedMain = wrapCLITool(main, 'memory-record');
+
 if (require.main === module) {
-  try {
-    main();
-  } catch (err) {
-    console.error(err.message || String(err));
-    process.exit(1);
-  }
+  wrappedMain();
 }
 
 module.exports = { recordMemory };

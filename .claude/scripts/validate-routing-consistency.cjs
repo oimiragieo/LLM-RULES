@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../lib/utils/project-root.cjs');
+const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
 const { ROUTING_TABLE } = require('../lib/routing/routing-table.cjs');
 
 const CAPABILITY_ROUTING_PATH = path.join(
@@ -18,7 +19,7 @@ const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
 function readJsonIfExists(filePath) {
   try {
     if (fs.existsSync(filePath)) {
-      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      return safeParseJSON(fs.readFileSync(filePath, 'utf8'), null);
     }
   } catch (_err) {
     return null;

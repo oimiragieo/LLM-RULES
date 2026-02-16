@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -329,8 +330,10 @@ function main() {
   }
 }
 
+const wrappedMain = wrapCLITool(main, 'validate-skill-ecosystem');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

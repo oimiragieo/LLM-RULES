@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const {
   getRuntimePaths,
@@ -125,8 +126,10 @@ function main() {
   }
 }
 
+const wrappedMain = wrapCLITool(main, 'validate-artifact-regression-gate');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

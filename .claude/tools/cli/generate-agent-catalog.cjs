@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -76,13 +77,10 @@ function main() {
   console.log(`Generated agent catalog at ${outputPath}`);
 }
 
+const wrappedMain = wrapCLITool(main, 'generate-agent-catalog');
+
 if (require.main === module) {
-  try {
-    main();
-  } catch (err) {
-    console.error('[generate-agent-catalog] Failed:', err.message);
-    process.exit(1);
-  }
+  wrappedMain();
 }
 
 module.exports = { buildCatalog };

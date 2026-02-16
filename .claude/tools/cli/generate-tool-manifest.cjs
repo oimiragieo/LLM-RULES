@@ -18,6 +18,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -448,12 +449,10 @@ async function main() {
   }
 }
 
-// Run if called directly
+const wrappedMain = wrapCLITool(main, 'generate-tool-manifest');
+
 if (require.main === module) {
-  main().catch(err => {
-    console.error(`Error: ${err.message}`);
-    process.exit(1);
-  });
+  wrappedMain();
 }
 
 module.exports = {

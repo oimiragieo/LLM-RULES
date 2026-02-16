@@ -6,6 +6,7 @@ const path = require('path');
 const os = require('os');
 const { PROJECT_ROOT } = require('./project-root.cjs');
 const { commandExists } = require('./command-exists.cjs');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 const PACKAGE_MANAGERS = {
   npm: {
@@ -61,7 +62,7 @@ function loadConfig(projectDir = PROJECT_ROOT) {
   try {
     if (fs.existsSync(configPath)) {
       const content = fs.readFileSync(configPath, 'utf8');
-      return JSON.parse(content);
+      return safeParseJSON(content, null);
     }
   } catch (_err) {
     return null;
@@ -94,7 +95,7 @@ function detectFromPackageJson(projectDir = PROJECT_ROOT) {
   try {
     if (fs.existsSync(packageJsonPath)) {
       const content = fs.readFileSync(packageJsonPath, 'utf8');
-      const pkg = JSON.parse(content);
+      const pkg = safeParseJSON(content, null);
       if (pkg.packageManager) {
         const pmName = pkg.packageManager.split('@')[0];
         if (PACKAGE_MANAGERS[pmName]) {
@@ -130,7 +131,7 @@ function getPackageManager(options = {}) {
   try {
     if (fs.existsSync(projectConfigPath)) {
       const content = fs.readFileSync(projectConfigPath, 'utf8');
-      const config = JSON.parse(content);
+      const config = safeParseJSON(content, null);
       if (config.packageManager && PACKAGE_MANAGERS[config.packageManager]) {
         return {
           name: config.packageManager,
@@ -162,7 +163,7 @@ function getPackageManager(options = {}) {
   try {
     if (fs.existsSync(globalConfigPath)) {
       const content = fs.readFileSync(globalConfigPath, 'utf8');
-      const config = JSON.parse(content);
+      const config = safeParseJSON(content, null);
       if (config.packageManager && PACKAGE_MANAGERS[config.packageManager]) {
         return {
           name: config.packageManager,

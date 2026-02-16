@@ -9,6 +9,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -103,8 +104,10 @@ function main() {
   }
 }
 
+const wrappedMain = wrapCLITool(main, 'migrate-legacy-sessions');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = { main };

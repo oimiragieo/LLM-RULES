@@ -28,6 +28,7 @@
  */
 
 const fs = require('fs');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 // Lazy-load Ajv (graceful if missing)
 let Ajv = null;
@@ -67,7 +68,7 @@ function createValidator(schemaPath) {
       return null;
     }
 
-    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'), null);
     // validateSchema:false allows schemas with $schema meta-references
     // (draft-2020-12, draft-07) that Ajv doesn't auto-resolve
     const ajv = new Ajv({ allErrors: true, strict: false, validateSchema: false });

@@ -4,10 +4,11 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../lib/utils/project-root.cjs');
+const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
 
 function loadJson(filePath) {
   const raw = fs.readFileSync(filePath, 'utf8');
-  return JSON.parse(raw);
+  return safeParseJSON(raw, null);
 }
 
 function runQuickStatus(options = {}) {

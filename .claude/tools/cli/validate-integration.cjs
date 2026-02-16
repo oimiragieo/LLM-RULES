@@ -20,6 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -587,8 +588,10 @@ Exit codes:
 }
 
 // Run if called directly
+const wrappedMain = wrapCLITool(main, 'validate-integration');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = { validateArtifact, getRecentArtifacts };

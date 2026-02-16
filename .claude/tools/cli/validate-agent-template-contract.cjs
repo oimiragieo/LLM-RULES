@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const path = require('node:path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -58,8 +59,10 @@ function main() {
   console.log(`Agent template contract validation passed (${scanned} ${scope}).`);
 }
 
+const wrappedMain = wrapCLITool(main, 'validate-agent-template-contract');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = { parseArgs, main };

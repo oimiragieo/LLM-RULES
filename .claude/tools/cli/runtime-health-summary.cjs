@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -109,5 +110,8 @@ function main() {
 
   if (failures.length > 0) process.exit(1);
 }
+const wrappedMain = wrapCLITool(main, 'runtime-health-summary');
 
-main();
+if (require.main === module) {
+  wrappedMain();
+}

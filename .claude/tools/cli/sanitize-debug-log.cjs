@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -105,6 +106,8 @@ function main() {
   console.log(`processed=${targets.length} changed=${changedCount} inPlace=${opts.inPlace}`);
 }
 
+const wrappedMain = wrapCLITool(main, 'sanitize-debug-log');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }

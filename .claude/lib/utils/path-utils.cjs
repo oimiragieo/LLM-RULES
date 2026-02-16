@@ -38,5 +38,5 @@ function escapePathForRegex(p) {
 module.exports = {
   normalizePath,
   normalizeGlobPattern,
-  escapePathForRegex
+  escapePathForRegex,
 };

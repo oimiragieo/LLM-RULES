@@ -5,6 +5,7 @@
 const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs = require('fs');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 /**
  * Initialize SQLite database with entity schema
@@ -316,6 +317,8 @@ module.exports = {
 };
 
 // Run CLI if executed directly
+const wrappedMain = wrapCLITool(main, 'init-memory-db');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }

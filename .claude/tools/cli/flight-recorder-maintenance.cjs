@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -142,5 +143,8 @@ function main() {
     process.stdout.write(`- Deleted: ${result.deletedCount}\n`);
   }
 }
+const wrappedMain = wrapCLITool(main, 'flight-recorder-maintenance');
 
-main();
+if (require.main === module) {
+  wrappedMain();
+}

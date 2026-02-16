@@ -12,6 +12,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 /**
  * Get the project root directory
@@ -36,7 +37,7 @@ function getProjectRoot() {
     if (fs.existsSync(path.join(currentDir, 'package.json'))) {
       // Verify it has our scripts or name
       try {
-        const pkg = JSON.parse(fs.readFileSync(path.join(currentDir, 'package.json'), 'utf-8'));
+        const pkg = safeParseJSON(fs.readFileSync(path.join(currentDir, 'package.json'), 'utf-8'));
         if (pkg.name === 'agent-studio' || (pkg.scripts && pkg.scripts['agent:worker'])) {
           return currentDir;
         }

@@ -28,6 +28,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -575,6 +576,8 @@ module.exports = {
 };
 
 // Run CLI if executed directly
+const wrappedMain = wrapCLITool(run, 'error-report');
+
 if (require.main === module) {
-  run();
+  wrappedMain();
 }

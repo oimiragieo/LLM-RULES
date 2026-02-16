@@ -5,6 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
 const { extractRequires, resolveRequirePath } = require('../lib/utils/require-analyzer.cjs');
 
 // Constants
@@ -61,7 +62,7 @@ function crossReferenceSettings(projectRoot, settingsPath, results) {
 
   try {
     const settingsContent = fs.readFileSync(settingsPath, 'utf8');
-    const settings = JSON.parse(settingsContent);
+    const settings = safeParseJSON(settingsContent, null);
 
     results.settingsCheck.checked = true;
 

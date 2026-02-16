@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -180,8 +181,10 @@ function main(rawOptions = null) {
   return summary;
 }
 
+const wrappedMain = wrapCLITool(main, 'backfill-agent-template-contract');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

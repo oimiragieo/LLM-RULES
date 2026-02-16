@@ -20,6 +20,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -620,8 +621,10 @@ function main() {
 }
 
 // Run if called directly
+const wrappedMain = wrapCLITool(main, 'generate-skill-index');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

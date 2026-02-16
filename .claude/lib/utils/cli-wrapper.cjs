@@ -14,8 +14,11 @@ const { auditLog } = require('./hook-input.cjs');
  * @returns {Function} Wrapped function
  */
 function wrapCLITool(fn, toolName = 'cli-tool') {
-  return async function(...args) {
+  return async function (...args) {
     try {
+      if (process.env.TRIGGER_WRAPPER_ERROR === 'true') {
+        throw new Error('Triggered wrapper error for compliance test');
+      }
       const result = await fn(...args);
       if (result && typeof result === 'object' && result.ok === false) {
         throw new Error(result.error || result.message || 'Unknown tool error');
@@ -24,14 +27,14 @@ function wrapCLITool(fn, toolName = 'cli-tool') {
     } catch (err) {
       console.error(`
 ❌ Error [${toolName}]: ${err.message}`);
-      
+
       if (process.env.DEBUG_HOOKS === 'true' && err.stack) {
         console.error(err.stack);
       }
 
       auditLog(toolName, 'error', {
         message: err.message,
-        stack: process.env.DEBUG_HOOKS === 'true' ? err.stack : undefined
+        stack: process.env.DEBUG_HOOKS === 'true' ? err.stack : undefined,
       });
 
       process.exit(err.exitCode || 1);
@@ -40,5 +43,5 @@ function wrapCLITool(fn, toolName = 'cli-tool') {
 }
 
 module.exports = {
-  wrapCLITool
+  wrapCLITool,
 };

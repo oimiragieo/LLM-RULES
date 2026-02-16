@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const { runExtractionPipeline } = require('../../lib/memory/run-extraction-pipeline.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -39,7 +40,8 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error(err.message);
-  process.exit(1);
-});
+const wrappedMain = wrapCLITool(main, 'memory-extract');
+
+if (require.main === module) {
+  wrappedMain();
+}

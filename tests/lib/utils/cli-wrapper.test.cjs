@@ -11,12 +11,12 @@ test('CLI Wrapper', async t => {
       called = true;
       return { ok: true };
     });
-    
+
     await tool();
     assert.strictEqual(called, true);
   });
 
-  // Since wrapCLITool calls process.exit, testing the failure path 
+  // Since wrapCLITool calls process.exit, testing the failure path
   // requires mocking process.exit or running in a separate process.
   // For this unit test, we'll just verify it returns the success case.
 });

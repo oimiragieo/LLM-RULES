@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -121,7 +122,8 @@ async function main() {
   console.log('Generated routing prototypes.');
 }
 
-main().catch(err => {
-  console.error('[generate-routing-prototypes] Failed:', err.message);
-  process.exit(1);
-});
+const wrappedMain = wrapCLITool(main, 'generate-routing-prototypes');
+
+if (require.main === module) {
+  wrappedMain();
+}

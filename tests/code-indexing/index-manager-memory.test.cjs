@@ -15,8 +15,11 @@ test('IndexManager Memory Safety', async t => {
   const files = [];
   for (let i = 0; i < 100; i++) {
     const filePath = path.join(tmpDir, `file${i}.js`);
-    fs.writeFileSync(filePath, `// Test file ${i}
-function test() { return ${i}; }`);
+    fs.writeFileSync(
+      filePath,
+      `// Test file ${i}
+function test() { return ${i}; }`
+    );
     files.push(filePath);
   }
 
@@ -24,13 +27,13 @@ function test() { return ${i}; }`);
     projectRoot: tmpDir,
     concurrency: 2,
     batchSize: 10,
-    verbose: true
+    verbose: true,
   });
 
   await t.test('should index files in batches and honor concurrency', async () => {
     // Mock discoverFiles to return our 100 files
     manager._discoverFiles = async () => files;
-    
+
     // Mock components
     manager._initializeComponents = async () => {
       manager.parser = { detectLanguage: () => 'javascript' };
@@ -40,7 +43,7 @@ function test() { return ${i}; }`);
         addChunksToBM25: async () => {},
         saveBM25Index: async () => {},
         dropCodeTable: async () => {},
-        deleteFile: async () => {}
+        deleteFile: async () => {},
       };
     };
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const { recordFindingsTrendSnapshot } = require('../../lib/memory/findings-registry.cjs');
 
@@ -31,8 +32,10 @@ function main() {
   }
 }
 
+const wrappedMain = wrapCLITool(main, 'open-findings-trend-snapshot');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
 
 module.exports = {

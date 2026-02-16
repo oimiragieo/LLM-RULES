@@ -16,6 +16,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const PROJECT_ROOT = process.cwd();
 const DEFAULT_CONTEXT_DIR = path.join(PROJECT_ROOT, '.claude/context');
@@ -425,8 +426,7 @@ function main(options = {}) {
   return formatAndExport(dashboardData, json, exportPath);
 }
 
-// CLI execution
-if (require.main === module) {
+function cliMain() {
   const args = process.argv.slice(2);
   const options = {};
 
@@ -446,6 +446,12 @@ if (require.main === module) {
 
   const output = main(options);
   console.log(output);
+}
+
+const wrappedMain = wrapCLITool(cliMain, 'memory-dashboard');
+
+if (require.main === module) {
+  wrappedMain();
 }
 
 module.exports = {

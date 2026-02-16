@@ -293,4 +293,27 @@ export default [
       ],
     },
   },
+
+  // JSON safety remediation guardrail (Phase 3): ban raw JSON.parse in remediated utility files.
+  {
+    files: [
+      '.claude/scripts/quick-status.cjs',
+      '.claude/scripts/validate-routing-consistency.cjs',
+      '.claude/scripts/verify-hook-modules.cjs',
+      '.claude/lib/utils/package-manager.cjs',
+      '.claude/lib/utils/state-cache.cjs',
+      '.claude/lib/utils/hook-resolver.cjs',
+      '.claude/lib/utils/schema-validator.cjs',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.object.name='JSON'][callee.property.name='parse']",
+          message:
+            'Use safeParseJSON from .claude/lib/utils/safe-json.cjs instead of raw JSON.parse.',
+        },
+      ],
+    },
+  },
 ];

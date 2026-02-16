@@ -30,6 +30,7 @@
 'use strict';
 
 const fs = require('fs');
+const { safeParseJSON } = require('./safe-json.cjs');
 
 /**
  * Default TTL in milliseconds (1 second)
@@ -74,7 +75,7 @@ function getCachedState(filePath, defaultValue = {}, ttlMs = DEFAULT_TTL_MS) {
     }
 
     const fileContent = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(fileContent);
+    const data = safeParseJSON(fileContent, null);
 
     // Cache the result
     cache.set(filePath, { data, timestamp: now });

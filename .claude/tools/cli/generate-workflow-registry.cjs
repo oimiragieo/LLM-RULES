@@ -21,6 +21,7 @@
  */
 
 'use strict';
+const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
@@ -571,6 +572,8 @@ module.exports = {
 };
 
 // Run CLI if called directly
+const wrappedMain = wrapCLITool(main, 'generate-workflow-registry');
+
 if (require.main === module) {
-  main();
+  wrappedMain();
 }
