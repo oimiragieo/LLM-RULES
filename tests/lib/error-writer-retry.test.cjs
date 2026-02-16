@@ -10,16 +10,16 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { writeError, getErrorReportsDir } = require('../../.claude/lib/error-writer.cjs');
+const { writeError } = require('../../.claude/lib/error-writer.cjs');
 
-test('Error Writer - should retry on transient failures (simulated EBUSY)', async (t) => {
+test('Error Writer - should retry on transient failures (simulated EBUSY)', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'error-writer-test-'));
   process.env.ERROR_REPORTS_DIR = tmpDir;
 
   // Mock fs.appendFileSync to throw EBUSY twice, then succeed
   const originalAppend = fs.appendFileSync;
   let attempts = 0;
-  
+
   // We need to override it on the fs module because error-writer requires it
   fs.appendFileSync = (path, data, options) => {
     attempts++;
@@ -35,7 +35,7 @@ test('Error Writer - should retry on transient failures (simulated EBUSY)', asyn
     const success = writeError({ message: 'Test error', errorId: 'test-1' });
     assert.strictEqual(success, true, 'Should eventually succeed');
     assert.strictEqual(attempts, 3, 'Should have attempted 3 times');
-    
+
     // Verify file content
     const files = fs.readdirSync(tmpDir);
     assert.strictEqual(files.length, 1);

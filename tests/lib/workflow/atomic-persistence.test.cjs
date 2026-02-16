@@ -6,7 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const { WorkflowStateMachine } = require('../../../.claude/lib/workflow/workflow-state-machine.cjs');
+const {
+  WorkflowStateMachine,
+} = require('../../../.claude/lib/workflow/workflow-state-machine.cjs');
 
 test('workflow state persistence avoids direct target writes during persist', async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'wf-atomic-persist-'));

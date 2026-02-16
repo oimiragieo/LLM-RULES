@@ -29,7 +29,7 @@ if (!fs.existsSync(scriptPath)) {
   } else if (fs.existsSync(scriptPath + '.mjs')) {
     scriptPath += '.mjs';
   } else if (fs.existsSync(scriptPath + '.sh')) {
-     scriptPath += '.sh';
+    scriptPath += '.sh';
   }
 }
 
@@ -54,9 +54,9 @@ if (ext === '.sh') {
 
 const child = spawn(cmd, cmdArgs, {
   stdio: 'inherit',
-  env: process.env
+  env: process.env,
 });
 
-child.on('close', (code) => {
+child.on('close', code => {
   process.exit(code);
 });

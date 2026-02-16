@@ -6,7 +6,10 @@ const fs = require('fs');
 const path = require('path');
 
 const schema = JSON.parse(
-  fs.readFileSync(path.join(process.cwd(), '.claude', 'schemas', 'hook-definition.schema.json'), 'utf8')
+  fs.readFileSync(
+    path.join(process.cwd(), '.claude', 'schemas', 'hook-definition.schema.json'),
+    'utf8'
+  )
 );
 const settings = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), '.claude', 'settings.json'), 'utf8')

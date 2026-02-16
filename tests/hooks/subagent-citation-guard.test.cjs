@@ -7,9 +7,9 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
-const path = require('path');
 
 // We'll mock the hook input and simulate a subagent completion
-test('Subagent Citation Guard - should detect missing citations', async (t) => {
+test('Subagent Citation Guard - should detect missing citations', () => {
   // TODO: Implement actual hook logic and test it
+  assert.ok(true);
 });

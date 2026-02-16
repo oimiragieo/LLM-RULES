@@ -32,13 +32,10 @@ test('withFileLock fails closed when lock cannot be acquired', async () => {
   let invoked = false;
   try {
     await assert.rejects(
-      tiers.withFileLock(
-        async () => {
-          invoked = true;
-          return 'unexpected';
-        },
-        tmpDir
-      ),
+      tiers.withFileLock(async () => {
+        invoked = true;
+        return 'unexpected';
+      }, tmpDir),
       /lock/i
     );
     assert.equal(invoked, false, 'callback must not run when lock acquisition fails');
