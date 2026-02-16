@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Tests for Task Dead Letter Queue (Phase 3)
- * 
+ *
  * Verifies that failed tasks are moved to a DLQ for inspection
  * instead of being silently deleted by the cleanup manager.
  */
@@ -35,7 +35,8 @@ async function testDLQ() {
 
   // Ensure clean state
   if (fs.existsSync(TEST_DLQ)) fs.unlinkSync(TEST_DLQ);
-  if (!fs.existsSync(path.dirname(TEST_DLQ))) fs.mkdirSync(path.dirname(TEST_DLQ), { recursive: true });
+  if (!fs.existsSync(path.dirname(TEST_DLQ)))
+    fs.mkdirSync(path.dirname(TEST_DLQ), { recursive: true });
 
   await test('should archive failed tasks to DLQ before deletion', async () => {
     const manager = new TaskCleanupManager({
@@ -53,7 +54,7 @@ async function testDLQ() {
       status: 'failed',
       error: 'Simulated crash',
       createdAt: Date.now() - 1000,
-      completedAt: Date.now() - 1000
+      completedAt: Date.now() - 1000,
     };
 
     manager.addTask(failedTask);
@@ -73,7 +74,7 @@ async function testDLQ() {
     }
     const lines = fs.readFileSync(TEST_DLQ, 'utf8').trim().split('\n');
     const entry = JSON.parse(lines[0]);
-    
+
     if (entry.id !== failedTask.id) throw new Error('DLQ entry ID mismatch');
     if (entry.reason !== 'cleanup_failed_task') throw new Error('DLQ reason mismatch');
   });

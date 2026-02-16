@@ -61,9 +61,9 @@ class AsyncLogBuffer {
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir, { recursive: true });
         }
-        
+
         this.writeStream = fs.createWriteStream(this.filePath, { flags: 'a' });
-        this.writeStream.on('error', (err) => {
+        this.writeStream.on('error', err => {
           console.error(`[AsyncLogBuffer] Stream error: ${err.message}`);
           this.writeStream = null; // Reset on error to retry next time
         });

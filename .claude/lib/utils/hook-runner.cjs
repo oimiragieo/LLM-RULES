@@ -11,11 +11,21 @@ const globalPool = {
   queue: [],
 };
 
+function removeWorkerFromPool(worker) {
+  globalPool.busy.delete(worker);
+  const index = globalPool.workers.indexOf(worker);
+  if (index > -1) {
+    globalPool.workers.splice(index, 1);
+  }
+}
+
 class HookRunner {
   constructor(options = {}) {
     this.projectRoot = options.projectRoot;
     this.mode = options.mode || process.env.HOOK_RUNNER_MODE || 'process';
     this.maxWorkers = options.maxWorkers || Number(process.env.HOOK_WORKER_POOL_SIZE || 4);
+    this.workerRunTimeoutMs =
+      options.workerRunTimeoutMs || Number(process.env.HOOK_WORKER_RUN_TIMEOUT_MS || 30000);
     this.baseEnv = options.env || process.env;
   }
 
@@ -72,43 +82,69 @@ class HookRunner {
     globalPool.busy.add(worker);
 
     return new Promise(resolve => {
-      const onMessage = msg => {
-        if (msg.type === 'success' || msg.type === 'error') {
-          if (msg.type === 'error') {
-            console.error(`[Hook Worker Error] ${msg.message}\n${msg.stack}`);
-          }
-          cleanup(msg.code || (msg.type === 'success' ? 0 : 1));
+      let settled = false;
+      let timeoutHandle = null;
+
+      const finalize = (exitCode, options = {}) => {
+        if (settled) return;
+        settled = true;
+
+        const { removeWorker = false, terminateWorker = false } = options;
+
+        if (timeoutHandle) {
+          clearTimeout(timeoutHandle);
+          timeoutHandle = null;
         }
-      };
 
-      const onError = err => {
-        console.error(`[Worker Thread Crash] ${err.message}`);
-        cleanup(1);
-      };
-
-      const onExit = code => {
-        cleanup(code || 1);
-      };
-
-      const cleanup = exitCode => {
         worker.removeListener('message', onMessage);
         worker.removeListener('error', onError);
         worker.removeListener('exit', onExit);
         globalPool.busy.delete(worker);
 
-        // If the worker exited, remove from pool
-        const index = globalPool.workers.indexOf(worker);
-        if (index > -1 && worker.threadId === -1) {
-          globalPool.workers.splice(index, 1);
+        if (removeWorker || worker.threadId === -1) {
+          removeWorkerFromPool(worker);
+        }
+
+        if (terminateWorker && typeof worker.terminate === 'function') {
+          Promise.resolve(worker.terminate()).catch(() => {
+            // best effort
+          });
         }
 
         resolve(exitCode);
         this._processQueue();
       };
 
+      const onMessage = msg => {
+        if (msg.type === 'success' || msg.type === 'error') {
+          if (msg.type === 'error') {
+            console.error(`[Hook Worker Error] ${msg.message}\n${msg.stack}`);
+          }
+          finalize(msg.code || (msg.type === 'success' ? 0 : 1));
+        }
+      };
+
+      const onError = err => {
+        console.error(`[Worker Thread Crash] ${err.message}`);
+        finalize(1, { removeWorker: true });
+      };
+
+      const onExit = code => {
+        finalize(code || 1, { removeWorker: true });
+      };
+
       worker.on('message', onMessage);
       worker.on('error', onError);
       worker.on('exit', onExit);
+
+      if (Number.isFinite(this.workerRunTimeoutMs) && this.workerRunTimeoutMs > 0) {
+        timeoutHandle = setTimeout(() => {
+          console.error(
+            `[Hook Worker Timeout] ${this.workerRunTimeoutMs}ms exceeded for ${scriptPath}`
+          );
+          finalize(1, { removeWorker: true, terminateWorker: true });
+        }, this.workerRunTimeoutMs);
+      }
 
       worker.postMessage({
         type: 'run',
@@ -152,3 +188,24 @@ class HookRunner {
 }
 
 module.exports = HookRunner;
+module.exports.__getPoolState = function __getPoolState() {
+  return {
+    workers: globalPool.workers,
+    busy: globalPool.busy,
+    queue: globalPool.queue,
+  };
+};
+module.exports.__resetPoolForTests = function __resetPoolForTests() {
+  for (const worker of globalPool.workers) {
+    try {
+      if (worker && typeof worker.terminate === 'function') {
+        worker.terminate();
+      }
+    } catch (_err) {
+      // best effort
+    }
+  }
+  globalPool.workers.length = 0;
+  globalPool.busy.clear();
+  globalPool.queue.length = 0;
+};

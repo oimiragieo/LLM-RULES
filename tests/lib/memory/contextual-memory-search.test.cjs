@@ -134,6 +134,42 @@ test('search - falls back to keyword search when LanceDB unavailable', async t =
   memory.close();
 });
 
+test('search - with MEMORY_SEMANTIC_SEARCH=off uses keyword fallback and does not throw', async t => {
+  setupTestDir();
+  t.after(cleanupTestDir);
+
+  const previous = process.env.MEMORY_SEMANTIC_SEARCH;
+  process.env.MEMORY_SEMANTIC_SEARCH = 'off';
+  t.after(() => {
+    if (previous === undefined) {
+      delete process.env.MEMORY_SEMANTIC_SEARCH;
+    } else {
+      process.env.MEMORY_SEMANTIC_SEARCH = previous;
+    }
+  });
+
+  const { ContextualMemory } = getModule();
+  const memory = new ContextualMemory({
+    projectRoot: TEST_DIR,
+    memoryDir: TEST_MEMORY_DIR,
+    dbPath: TEST_DB_PATH,
+  });
+
+  let keywordCalled = 0;
+  memory._keywordSearch = async () => {
+    keywordCalled += 1;
+    return [{ content: 'keyword-result', metadata: { source: 'fallback' }, similarity: 0.5 }];
+  };
+
+  const results = await memory.search('semantic off query');
+  assert.equal(keywordCalled, 1, 'Expected keyword fallback to run when semantic search is off');
+  assert.ok(Array.isArray(results));
+  assert.equal(results.length, 1);
+  assert.equal(results[0].content, 'keyword-result');
+
+  memory.close();
+});
+
 test('search - applies filters correctly', async t => {
   setupTestDir();
   t.after(cleanupTestDir);

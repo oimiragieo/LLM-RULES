@@ -6,9 +6,11 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 function parseBool(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase() === 'true';
+  return (
+    String(value || '')
+      .trim()
+      .toLowerCase() === 'true'
+  );
 }
 
 function parseArgs(argv) {
@@ -23,8 +25,7 @@ function parseArgs(argv) {
 
   return {
     file:
-      map.get('--file') ||
-      path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'tasks-dlq.jsonl'),
+      map.get('--file') || path.join(PROJECT_ROOT, '.claude', 'context', 'data', 'tasks-dlq.jsonl'),
     hours: Number(map.get('--hours') || 24),
     json: parseBool(map.get('--json')),
     requireData: parseBool(map.get('--require-data')),
@@ -64,7 +65,9 @@ function readRows(filePath, cutoffMs) {
 
 function summarize(rows, hours) {
   const failed = rows.filter(row => String(row.status || '').toLowerCase() === 'failed').length;
-  const cancelled = rows.filter(row => String(row.status || '').toLowerCase() === 'cancelled').length;
+  const cancelled = rows.filter(
+    row => String(row.status || '').toLowerCase() === 'cancelled'
+  ).length;
   const total = rows.length;
   const ratePerHour = hours > 0 ? Number((total / hours).toFixed(3)) : total;
   return {

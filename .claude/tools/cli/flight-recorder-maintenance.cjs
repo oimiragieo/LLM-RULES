@@ -5,16 +5,24 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
-const DEFAULT_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reports', 'flight-recorder.jsonl');
+const DEFAULT_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'reports',
+  'flight-recorder.jsonl'
+);
 const DEFAULT_MAX_BYTES = Number(process.env.FLIGHT_RECORDER_MAX_BYTES || 5 * 1024 * 1024);
 const DEFAULT_MAX_FILES = Number(process.env.FLIGHT_RECORDER_MAX_FILES || 20);
 const DEFAULT_RETENTION_DAYS = Number(process.env.FLIGHT_RECORDER_RETENTION_DAYS || 7);
 const ROTATED_SUFFIX_RE = /\.flight-recorder\.\d{13}\.jsonl$/;
 
 function parseBool(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase() === 'true';
+  return (
+    String(value || '')
+      .trim()
+      .toLowerCase() === 'true'
+  );
 }
 
 function parseArgs(argv) {
