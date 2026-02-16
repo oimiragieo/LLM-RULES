@@ -3,13 +3,8 @@
 
 async function runMemoryTiersCli(api, args = process.argv.slice(2)) {
   const command = args[0];
-  const {
-    getTierHealth,
-    consolidateSession,
-    summarizeOldSessions,
-    promoteToLTM,
-    getMTMSessions,
-  } = api;
+  const { getTierHealth, consolidateSession, summarizeOldSessions, promoteToLTM, getMTMSessions } =
+    api;
 
   switch (command) {
     case 'health':

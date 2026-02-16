@@ -5,7 +5,13 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const HOOK = path.join(process.cwd(), '.claude', 'hooks', 'validation', 'taskupdate-contract-validator.cjs');
+const HOOK = path.join(
+  process.cwd(),
+  '.claude',
+  'hooks',
+  'validation',
+  'taskupdate-contract-validator.cjs'
+);
 
 test('taskupdate-contract-validator blocks invalid TaskUpdate when input is provided via stdin only', () => {
   const payload = {

@@ -14,6 +14,7 @@ class TaskRouter {
     this.defaultSystem = config.defaultSystem || 'agent-studio';
     this.fallbackCount = 0;
     this.totalRoutes = 0;
+    this.delegations = new Map(); // taskId -> delegation state
   }
 
   /**
@@ -28,15 +29,19 @@ class TaskRouter {
    */
   async route(task) {
     this.totalRoutes++;
+    const traceId = task?.traceId || null;
 
     // 1. Sticky session check (highest priority for non-feature flag rules)
     const stickyRule = this.rules.find(r => r.stickySession && r.featureFlag);
     if (!stickyRule && task.userId && this.stickySessionStore.has(task.userId)) {
-      return {
-        system: this.stickySessionStore.get(task.userId),
-        reason: 'sticky_session',
-        metadata: { userId: task.userId },
-      };
+      return this._attachTrace(
+        {
+          system: this.stickySessionStore.get(task.userId),
+          reason: 'sticky_session',
+          metadata: { userId: task.userId },
+        },
+        traceId
+      );
     }
 
     // Sort rules by priority (higher priority first)
@@ -48,11 +53,14 @@ class TaskRouter {
       if (rule.featureFlag) {
         // Check sticky session for this specific rule
         if (rule.stickySession && task.userId && this.stickySessionStore.has(task.userId)) {
-          return {
-            system: this.stickySessionStore.get(task.userId),
-            reason: 'sticky_session',
-            metadata: { userId: task.userId },
-          };
+          return this._attachTrace(
+            {
+              system: this.stickySessionStore.get(task.userId),
+              reason: 'sticky_session',
+              metadata: { userId: task.userId },
+            },
+            traceId
+          );
         }
 
         const rand = Math.random();
@@ -64,12 +72,15 @@ class TaskRouter {
             percentage: rule.percentage,
           });
         }
-        return {
-          system,
-          reason: 'feature_flag',
-          featureFlag: rule.featureFlag,
-          percentage: rule.percentage,
-        };
+        return this._attachTrace(
+          {
+            system,
+            reason: 'feature_flag',
+            featureFlag: rule.featureFlag,
+            percentage: rule.percentage,
+          },
+          traceId
+        );
       }
 
       // Pattern-based routing
@@ -78,14 +89,17 @@ class TaskRouter {
         if (task.systemHealth && task.systemHealth[rule.system] === 'unhealthy') {
           if (rule.fallback) {
             this.fallbackCount++;
-            return {
-              system: rule.fallback,
-              reason: 'fallback_on_error',
-              metadata: {
-                originalSystem: rule.system,
-                fallbackReason: 'health_check_failed',
+            return this._attachTrace(
+              {
+                system: rule.fallback,
+                reason: 'fallback_on_error',
+                metadata: {
+                  originalSystem: rule.system,
+                  fallbackReason: 'health_check_failed',
+                },
               },
-            };
+              traceId
+            );
           }
         }
 
@@ -101,11 +115,14 @@ class TaskRouter {
           }
           // Outside time window, use fallback
           if (rule.fallback) {
-            return {
-              system: rule.fallback,
-              reason: 'time_fallback',
-              pattern: rule.pattern,
-            };
+            return this._attachTrace(
+              {
+                system: rule.fallback,
+                reason: 'time_fallback',
+                pattern: rule.pattern,
+              },
+              traceId
+            );
           }
           continue; // Time window not active, try next rule
         }
@@ -144,17 +161,27 @@ class TaskRouter {
       const flag = this.featureFlags[task.featureFlag];
       const rand = Math.random();
       const system = rand < flag.percentage / 100 ? 'agent-studio' : 'conductor-main';
-      return this._recordStickySession(task.userId, system, {
-        reason: 'feature_flag',
-        flag: task.featureFlag,
-        percentage: flag.percentage,
-      });
+      return this._recordStickySession(
+        task.userId,
+        system,
+        {
+          reason: 'feature_flag',
+          flag: task.featureFlag,
+          percentage: flag.percentage,
+        },
+        traceId
+      );
     }
 
     // 4. Default fallback
-    return this._recordStickySession(task.userId, this.defaultSystem, {
-      reason: 'default',
-    });
+    return this._recordStickySession(
+      task.userId,
+      this.defaultSystem,
+      {
+        reason: 'default',
+      },
+      traceId
+    );
   }
 
   /**
@@ -206,11 +233,93 @@ class TaskRouter {
   /**
    * Record sticky session for user
    */
-  _recordStickySession(userId, system, metadata) {
+  _recordStickySession(userId, system, metadata, traceId = null) {
     if (userId) {
       this.stickySessionStore.set(userId, system);
     }
-    return { system, ...metadata };
+    return this._attachTrace({ system, ...metadata }, traceId);
+  }
+
+  _attachTrace(decision, traceId) {
+    if (!traceId) return decision;
+    const mergedMetadata = { ...(decision.metadata || {}), traceId };
+    return { ...decision, traceId, metadata: mergedMetadata };
+  }
+
+  validateDelegationChain(chain = [], nextAgent) {
+    const normalizedChain = Array.isArray(chain) ? chain.filter(Boolean) : [];
+    const normalizedNext = String(nextAgent || '').trim();
+    if (!normalizedNext) return;
+    if (normalizedChain.includes(normalizedNext)) {
+      const cycle = [...normalizedChain, normalizedNext].join(' -> ');
+      throw new Error(`Circular Dependency Detected: ${cycle}`);
+    }
+  }
+
+  registerDelegation({
+    taskId,
+    parentAgent,
+    targetAgent,
+    chain = [],
+    timeoutMs = 30000,
+    traceId = null,
+  }) {
+    const id = String(taskId || '').trim();
+    if (!id) {
+      throw new Error('taskId is required for delegation registration');
+    }
+    this.validateDelegationChain(chain, targetAgent);
+    const now = Date.now();
+    const record = {
+      taskId: id,
+      parentAgent: parentAgent || null,
+      targetAgent: targetAgent || null,
+      chain: Array.isArray(chain) ? [...chain, targetAgent].filter(Boolean) : [targetAgent],
+      timeoutMs,
+      status: 'pending',
+      traceId,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.delegations.set(id, record);
+    return record;
+  }
+
+  applyDelegationUpdate(taskId, update = {}) {
+    const id = String(taskId || '').trim();
+    if (!id || !this.delegations.has(id)) return false;
+    const status = String(update.status || '').trim();
+    if (!['pending', 'in_progress', 'completed', 'failed'].includes(status)) {
+      return false;
+    }
+    const record = this.delegations.get(id);
+    const updated = {
+      ...record,
+      status,
+      updatePayload: { ...update },
+      updatedAt: Date.now(),
+    };
+    this.delegations.set(id, updated);
+    return true;
+  }
+
+  recoverOrphanedDelegations(now = Date.now()) {
+    const recovered = [];
+    for (const [taskId, record] of this.delegations.entries()) {
+      if (record.status === 'completed') continue;
+      const deadline = record.updatedAt + (record.timeoutMs || 30000);
+      if (now >= deadline) {
+        const updated = {
+          ...record,
+          status: 'reassigned',
+          recoveredAt: now,
+          updatedAt: now,
+        };
+        this.delegations.set(taskId, updated);
+        recovered.push(updated);
+      }
+    }
+    return recovered;
   }
 
   /**

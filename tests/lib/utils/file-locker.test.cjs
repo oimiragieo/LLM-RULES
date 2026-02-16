@@ -125,3 +125,51 @@ test('P0-006: concurrent withLock calls are serialized', async () => {
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+test('P0-006: stale lock is recovered automatically', async () => {
+  const { withLock } = require('../../../.claude/lib/utils/file-locker.cjs');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'p006-stale-'));
+  const testFile = path.join(tmpDir, 'stale.txt');
+  fs.writeFileSync(testFile, 'initial');
+
+  // Simulate an orphaned stale lock directory.
+  const staleLockDir = `${testFile}.lock`;
+  fs.mkdirSync(staleLockDir, { recursive: true });
+  const staleTime = new Date(Date.now() - 5000);
+  fs.utimesSync(staleLockDir, staleTime, staleTime);
+
+  const result = await withLock(testFile, async () => 'recovered', {
+    stale: 100,
+    retries: { retries: 2, minTimeout: 10, maxTimeout: 20 },
+  });
+
+  assert.equal(result, 'recovered');
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('P0-006: high contention (20 callers) serializes without corruption', async () => {
+  const { withLock } = require('../../../.claude/lib/utils/file-locker.cjs');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'p006-20-'));
+  const testFile = path.join(tmpDir, 'contention.json');
+  fs.writeFileSync(testFile, JSON.stringify({ hits: 0 }), 'utf8');
+
+  await Promise.all(
+    Array.from({ length: 20 }, () =>
+      withLock(
+        testFile,
+        async () => {
+          const current = JSON.parse(fs.readFileSync(testFile, 'utf8'));
+          current.hits += 1;
+          fs.writeFileSync(testFile, JSON.stringify(current), 'utf8');
+        },
+        {
+          retries: { retries: 40, minTimeout: 10, maxTimeout: 100 },
+        }
+      )
+    )
+  );
+
+  const finalValue = JSON.parse(fs.readFileSync(testFile, 'utf8'));
+  assert.equal(finalValue.hits, 20);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});

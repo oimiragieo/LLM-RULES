@@ -7,7 +7,10 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { ContextualMemory } = require('../../../.claude/lib/memory/contextual-memory.cjs');
-const { ensureEntityDbInitialized, syncJsonMemory } = require('../../../.claude/hooks/memory/sync-memory-index.cjs');
+const {
+  ensureEntityDbInitialized,
+  syncJsonMemory,
+} = require('../../../.claude/hooks/memory/sync-memory-index.cjs');
 
 test('ContextualMemory entity lifecycle initializes schema and queries without table errors', async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ctx-entity-life-'));
@@ -38,7 +41,10 @@ test('syncJsonMemory followed by ContextualMemory query works on fresh DB', asyn
     fs.mkdirSync(memoryDir, { recursive: true });
 
     const patternsPath = path.join(memoryDir, 'patterns.json');
-    fs.writeFileSync(patternsPath, JSON.stringify([{ text: 'prefer small cohesive modules' }], null, 2));
+    fs.writeFileSync(
+      patternsPath,
+      JSON.stringify([{ text: 'prefer small cohesive modules' }], null, 2)
+    );
 
     ensureEntityDbInitialized(dbPath);
     syncJsonMemory(patternsPath, dbPath);

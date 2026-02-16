@@ -114,9 +114,14 @@ function appendTierEvent(eventType, details = {}, projectRoot, ensureDir) {
       }
     }
 
+    const traceId =
+      details && typeof details.traceId === 'string' && details.traceId.trim()
+        ? details.traceId.trim()
+        : process.env.TRACE_ID || null;
     const payload = {
       ts: new Date().toISOString(),
       event: eventType,
+      ...(traceId ? { traceId } : {}),
       ...details,
     };
     fs.appendFileSync(eventsPath, `${JSON.stringify(payload)}\n`, 'utf8');

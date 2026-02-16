@@ -15,11 +15,13 @@ const lockfile = require('proper-lockfile');
 
 // Default lock options
 const DEFAULT_LOCK_OPTIONS = {
-  stale: 10000, // Lock considered stale after 10 seconds
+  stale: 15000, // Lock considered stale after 15 seconds
   retries: {
-    retries: 5, // Retry 5 times
-    minTimeout: 100, // Start with 100ms delay
-    maxTimeout: 1000, // Max 1s delay between retries
+    retries: 20, // Retry for high-contention multi-agent bursts
+    minTimeout: 50,
+    maxTimeout: 500,
+    factor: 1.2,
+    randomize: true,
   },
 };
 

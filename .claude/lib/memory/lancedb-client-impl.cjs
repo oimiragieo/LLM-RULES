@@ -492,6 +492,150 @@ class MemoryVectorStore {
     return Array.isArray(vec) ? vec.length : null;
   }
 
+  _buildDimensionMismatchStatus(expectedDimension, actualDimension, context = 'vector') {
+    const reason =
+      `embedding dimension mismatch (table ${expectedDimension} vs ${context} ${actualDimension}). ` +
+      'Re-indexing Required (pnpm run memory:reindex).';
+    return {
+      status: 'reindex_required',
+      reason,
+      expectedDimension,
+      actualDimension,
+    };
+  }
+
+  async validateDimensions(vector, context = 'vector') {
+    if (!this.isInitialized) await this.initialize();
+    const expectedDimension = await this.getTableVectorDimension();
+    const actualDimension = Array.isArray(vector) ? vector.length : null;
+
+    if (!Number.isFinite(expectedDimension) || !Number.isFinite(actualDimension)) {
+      return {
+        status: 'unknown',
+        reason: 'dimension_unavailable',
+        expectedDimension: Number.isFinite(expectedDimension) ? expectedDimension : null,
+        actualDimension: Number.isFinite(actualDimension) ? actualDimension : null,
+      };
+    }
+
+    if (expectedDimension === actualDimension) {
+      return {
+        status: 'ok',
+        reason: null,
+        expectedDimension,
+        actualDimension,
+      };
+    }
+
+    const mismatch = this._buildDimensionMismatchStatus(
+      expectedDimension,
+      actualDimension,
+      context
+    );
+    this._embeddingStatus = {
+      status: 'unavailable',
+      mode: this._embeddingStatus?.mode || this.config.embeddingMode,
+      reason: mismatch.reason,
+    };
+    return mismatch;
+  }
+
+  async safeRebuild(_options = {}) {
+    if (!this.isInitialized) await this.initialize();
+
+    const archiveDir = path.join(
+      path.resolve(this.config.persistDirectory),
+      'archives',
+      this.config.collectionName
+    );
+    fs.mkdirSync(archiveDir, { recursive: true });
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const archivePath = path.join(archiveDir, `rebuild-${stamp}.json`);
+
+    let archivedRows = 0;
+    let tableExisted = false;
+    if (this.table) {
+      tableExisted = true;
+      try {
+        if (typeof this.table.query === 'function') {
+          const rows = await this.table.query().limit(1000000).toArray();
+          archivedRows = Array.isArray(rows) ? rows.length : 0;
+          fs.writeFileSync(
+            archivePath,
+            JSON.stringify(
+              {
+                archivedAt: new Date().toISOString(),
+                collectionName: this.config.collectionName,
+                tableVectorDimension: this._tableVectorDim,
+                rowCount: archivedRows,
+                rows,
+              },
+              null,
+              2
+            ),
+            'utf8'
+          );
+        } else {
+          fs.writeFileSync(
+            archivePath,
+            JSON.stringify(
+              {
+                archivedAt: new Date().toISOString(),
+                collectionName: this.config.collectionName,
+                tableVectorDimension: this._tableVectorDim,
+                rowCount: 0,
+                note: 'table.query() unavailable; metadata-only archive',
+              },
+              null,
+              2
+            ),
+            'utf8'
+          );
+        }
+      } catch (err) {
+        fs.writeFileSync(
+          archivePath,
+          JSON.stringify(
+            {
+              archivedAt: new Date().toISOString(),
+              collectionName: this.config.collectionName,
+              tableVectorDimension: this._tableVectorDim,
+              rowCount: archivedRows,
+              archiveError: err?.message || String(err),
+            },
+            null,
+            2
+          ),
+          'utf8'
+        );
+      }
+    }
+
+    await this.dropTable();
+    this.table = null;
+    this._tableVectorDim = null;
+
+    return {
+      status: 'rebuilt',
+      tableExisted,
+      archivedRows,
+      archivePath,
+    };
+  }
+
+  async searchResilient(query, options = {}) {
+    try {
+      const results = await this.search(query, options);
+      return { status: 'ok', results };
+    } catch (error) {
+      if (error?.code === 'LANCEDB_REINDEX_REQUIRED') {
+        return { status: 'reindex_required', results: [], reason: error.message };
+      }
+      throw error;
+    }
+  }
+
   async listTables() {
     if (!this.isInitialized) await this.initialize();
     if (!this.db) return [];
@@ -546,13 +690,17 @@ class MemoryVectorStore {
     const data = toEmbed.map((doc, i) => {
       const vector = vectors[i];
       if (Number.isFinite(tableDim) && vector.length !== tableDim) {
-        const reason = `embedding dimension mismatch (table ${tableDim} vs vector ${vector.length}). Re-index or rebuild the LanceDB table (pnpm run memory:reindex).`;
+        const mismatch = this._buildDimensionMismatchStatus(tableDim, vector.length, 'vector');
         this._embeddingStatus = {
           status: 'unavailable',
           mode: this._embeddingStatus?.mode || this.config.embeddingMode,
-          reason,
+          reason: mismatch.reason,
         };
-        throw new Error(reason);
+        const err = new Error(mismatch.reason);
+        err.code = 'LANCEDB_REINDEX_REQUIRED';
+        err.reindexRequired = true;
+        err.status = mismatch;
+        throw err;
       }
       const text = doc.text || doc.content || '';
       const metadataObj = typeof doc.metadata === 'object' && doc.metadata ? doc.metadata : {};
@@ -643,13 +791,17 @@ class MemoryVectorStore {
     const queryVector = await this.generateEmbedding(query);
     const tableDim = await this.getTableVectorDimension();
     if (Number.isFinite(tableDim) && queryVector.length !== tableDim) {
-      const reason = `embedding dimension mismatch (table ${tableDim} vs query ${queryVector.length}). Re-index or rebuild the LanceDB table (pnpm run memory:reindex).`;
+      const mismatch = this._buildDimensionMismatchStatus(tableDim, queryVector.length, 'query');
       this._embeddingStatus = {
         status: 'unavailable',
         mode: this._embeddingStatus?.mode || this.config.embeddingMode,
-        reason,
+        reason: mismatch.reason,
       };
-      throw new Error(reason);
+      const err = new Error(mismatch.reason);
+      err.code = 'LANCEDB_REINDEX_REQUIRED';
+      err.reindexRequired = true;
+      err.status = mismatch;
+      throw err;
     }
 
     let searchBuilder = this.table.vectorSearch(queryVector).limit(limit);

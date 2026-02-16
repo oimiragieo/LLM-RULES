@@ -12,7 +12,10 @@ function collectFiles(dir) {
     if (e.isDirectory()) {
       if (e.name === '_archive' || e.name === 'node_modules') continue;
       out.push(...collectFiles(full));
-    } else if (e.isFile() && (full.endsWith('.cjs') || full.endsWith('.js') || full.endsWith('.mjs'))) {
+    } else if (
+      e.isFile() &&
+      (full.endsWith('.cjs') || full.endsWith('.js') || full.endsWith('.mjs'))
+    ) {
       out.push(full);
     }
   }
