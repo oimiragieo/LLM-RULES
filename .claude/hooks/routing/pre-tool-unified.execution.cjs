@@ -59,8 +59,8 @@ function tryClaimStaleLock(lockFile) {
   try {
     fs.renameSync(lockFile, claimingFile);
     try {
-      const lockData = JSON.parse(fs.readFileSync(claimingFile, 'utf8'));
-      if (lockData.pid && !isProcessAlive(lockData.pid)) {
+      const lockData = safeParseJSON(fs.readFileSync(claimingFile, 'utf8'));
+      if (lockData && lockData.pid && !isProcessAlive(lockData.pid)) {
         fs.unlinkSync(claimingFile);
         return true;
       }

@@ -212,8 +212,7 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
   }
 
   const prompt = (toolInput.prompt || '').toLowerCase();
-  const isDeveloperSpawn =
-    prompt.includes('you are developer') || prompt.includes('you are the developer');
+  const isDeveloperSpawn = /\byou are (?:a |the )?developer\b/i.test(prompt);
 
   if (!isDeveloperSpawn) {
     return { pass: true };

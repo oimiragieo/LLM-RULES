@@ -14,6 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Scan rules configuration
 const SCAN_RULES = [
@@ -87,7 +88,12 @@ function main() {
     stdin.on('end', () => {
       try {
         const input = chunks.join('');
-        const data = JSON.parse(input);
+        const { success, data } = safeParseJSON(input, 'edit-result');
+        if (!success || !data) {
+          process.stdout.write(input);
+          process.exit(0);
+          return;
+        }
 
         // Extract file path
         const filePath = data.tool_result?.file_path || data.tool_input?.file_path;

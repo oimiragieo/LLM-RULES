@@ -33,6 +33,8 @@ function getViolationTracker() {
   return violationTracker;
 }
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 const ROUTING_RUNTIME_DIR = path.join(__dirname, '..', '..', 'context', 'runtime');
 const BLOCK_DEDUPE_STATE_PATH = path.join(ROUTING_RUNTIME_DIR, 'routing-block-dedupe.json');
 const BLOCK_DEDUPE_THRESHOLD = Number(process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD || 2);
@@ -43,8 +45,8 @@ function loadBlockDedupeStateFromDisk() {
   try {
     if (!fs.existsSync(BLOCK_DEDUPE_STATE_PATH)) return {};
     const raw = fs.readFileSync(BLOCK_DEDUPE_STATE_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
+    const { success, data } = safeParseJSON(raw, 'routing-block-dedupe');
+    return success && data && typeof data === 'object' ? data : {};
   } catch (_err) {
     return {};
   }

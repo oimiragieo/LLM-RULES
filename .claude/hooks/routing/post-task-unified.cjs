@@ -238,12 +238,14 @@ async function main() {
         }
       }
 
+      /*
       try {
         const { clearCurrentSpawnTaskId } = require('../../lib/routing/router-state.cjs');
         clearCurrentSpawnTaskId();
       } catch (_clearErr) {
         // Best-effort cleanup.
       }
+      */
     } catch (_err) {
       // Best-effort
     }

@@ -31,6 +31,7 @@ const { PROJECT_ROOT: _PROJECT_ROOT } = libRequire(path.join('utils', 'project-r
 const { parseHookInputAsync: parseHookInputAsync } = libRequire(
   path.join('utils', 'hook-input.cjs')
 );
+const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 const { loadConfig: loadConfig } = libRequire(path.join('utils', 'config-loader.cjs'));
 const { appendJsonl: appendJsonl } = libRequire(path.join('utils', 'jsonl-utils.cjs'));
 const { createLogger: createLogger } = libRequire(path.join('utils', 'logger.cjs'));
@@ -150,7 +151,7 @@ function shouldRecordPromptFindingsSnapshot(
   const intervalMs = getFindingsSnapshotIntervalMs();
   try {
     if (!fs.existsSync(stateFilePath)) return true;
-    const payload = JSON.parse(fs.readFileSync(stateFilePath, 'utf8'));
+    const payload = safeParseJSON(fs.readFileSync(stateFilePath, 'utf8'));
     const lastRecordedMs = Number(payload?.lastRecordedMs || 0);
     if (!Number.isFinite(lastRecordedMs)) return true;
     return nowMs - lastRecordedMs >= intervalMs;
@@ -397,7 +398,7 @@ function readCompressionState() {
     if (!fs.existsSync(AUTO_COMPRESSION_STATE_PATH)) {
       return { sessions: {} };
     }
-    return JSON.parse(fs.readFileSync(AUTO_COMPRESSION_STATE_PATH, 'utf8'));
+    return safeParseJSON(fs.readFileSync(AUTO_COMPRESSION_STATE_PATH, 'utf8'));
   } catch (_err) {
     return { sessions: {} };
   }
@@ -418,7 +419,7 @@ function readTokenSloState() {
     if (!fs.existsSync(TOKEN_SLO_STATE_PATH)) {
       return { sessions: {} };
     }
-    return JSON.parse(fs.readFileSync(TOKEN_SLO_STATE_PATH, 'utf8'));
+    return safeParseJSON(fs.readFileSync(TOKEN_SLO_STATE_PATH, 'utf8'));
   } catch (_err) {
     return { sessions: {} };
   }
@@ -707,7 +708,7 @@ function maybeAutoCompress(tokenStatus) {
  */ function loadAgentsFromRegistry() {
   try {
     if (!fs.existsSync(AGENT_REGISTRY_PATH)) return [];
-    const registry = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
+    const registry = safeParseJSON(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
     return agentsFromRegistry(registry);
   } catch (_e) {
     return [];
@@ -1285,7 +1286,7 @@ function recordUserPromptResult(result) {
     let metrics = { corrections_count: 0, prompt_count: 0 };
     try {
       if (fs.existsSync(metricsFile)) {
-        metrics = JSON.parse(fs.readFileSync(metricsFile, 'utf8'));
+        metrics = safeParseJSON(fs.readFileSync(metricsFile, 'utf8'));
       }
     } catch (_) {
       /* use defaults */
@@ -1546,7 +1547,7 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
     let lastDaily = null;
     if (fs.existsSync(statusPath)) {
       try {
-        const status = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+        const status = safeParseJSON(fs.readFileSync(statusPath, 'utf8'));
         lastWeekly = status.lastWeekly || null;
         lastDaily = status.lastDaily || null;
       } catch (_e) {

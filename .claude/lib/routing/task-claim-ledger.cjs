@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const LEDGER_FILE = path.join(
@@ -65,7 +66,7 @@ function defaultLedger() {
 function readLedger() {
   try {
     if (!fs.existsSync(LEDGER_FILE)) return defaultLedger();
-    const parsed = JSON.parse(fs.readFileSync(LEDGER_FILE, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(LEDGER_FILE, 'utf8'));
     if (!parsed || typeof parsed !== 'object' || typeof parsed.claims !== 'object') {
       return defaultLedger();
     }

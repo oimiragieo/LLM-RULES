@@ -10,9 +10,17 @@
 
 const fs = require('fs');
 const path = require('path');
-const { PROJECT_ROOT } = require('../../lib/utils/hook-input.cjs');
-const { parseHookInputAsync, getToolName, getToolInput, auditLog } = require('../../lib/utils/hook-input.cjs');
-const { removeRequests, readSpawnRequestsFile } = require('../../lib/reflection/spawn-request-contract.cjs');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const {
+  parseHookInputAsync,
+  getToolName,
+  getToolInput,
+  auditLog,
+} = require('../../lib/utils/hook-input.cjs');
+const {
+  removeRequests,
+  readSpawnRequestsFile,
+} = require('../../lib/reflection/spawn-request-contract.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
@@ -27,7 +35,7 @@ async function main() {
     const toolInput = getToolInput(input);
 
     if (toolName !== 'TaskUpdate') process.exit(0);
-    
+
     const status = toolInput.status || toolInput.state;
     if (status !== 'completed') process.exit(0);
 
@@ -36,7 +44,7 @@ async function main() {
 
     // If the taskId matches a reflection request ID (or is part of a batch)
     const processedIds = toolInput.metadata?.processedReflectionIds;
-    
+
     if (Array.isArray(processedIds) && processedIds.length > 0) {
       removeRequests(SPAWN_REQUEST_PATH, processedIds);
       auditLog('reflection-cleanup', 'removed_processed_requests', { count: processedIds.length });

@@ -34,6 +34,16 @@ function hasExplicitAgentContext(hookInput = null) {
     .trim()
     .toLowerCase();
   if (agentId && agentId !== 'router') return true;
+
+  // Fallback: check persistent router state
+  try {
+    const state = getCachedRouterState();
+    if (state.mode === 'agent' || state.taskSpawned === true) return true;
+    if (state.currentSpawnTaskId || state.lastTaskUpdateTaskId) return true;
+  } catch (_err) {
+    // Best-effort only
+  }
+
   return false;
 }
 
@@ -87,10 +97,16 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     };
   }
   if (isBypassPermissions) {
+    const isDiscovery =
+      typeof command === 'string' &&
+      /\b(find|ls|grep|stat|head|tail|cat|wc|sort|uniq|du|df)\b/i.test(command) &&
+      !/>>|>/.test(command); // No redirection
+
     const message =
       '[ROUTER-FIRST PROTOCOL VIOLATION][ROUTER BASH GUARD][bypass] Direct Bash is not allowed in router mode, even with bypassPermissions. ' +
       'Use whitelisted git discovery commands only, or delegate via Task() to a specialist agent.';
-    if (isWhitelistedBashCommand(command)) {
+
+    if (isWhitelistedBashCommand(command) || isDiscovery) {
       return { pass: true, result: 'warn', message };
     }
     return { pass: false, result: 'block', message };

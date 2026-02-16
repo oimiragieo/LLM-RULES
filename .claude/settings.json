@@ -85,35 +85,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/routing-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/unified-creator-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/validation/agent-template-contract-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/unified-pre-write-hook.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/evolution/evolution-state-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/evolution/research-enforcement.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session/adaptive-quality-gate.cjs"
+            "command": "node .claude/hooks/safety/write-pretool-bundle.cjs"
           }
         ]
       },

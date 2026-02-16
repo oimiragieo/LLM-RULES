@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const {
   ROUTING_TABLE,
   ROUTING_PREFIX_PATTERNS,
@@ -28,7 +29,7 @@ function loadCapabilityRoutingForClassifier() {
   if (capabilityRoutingCache) return capabilityRoutingCache;
   try {
     const raw = fs.readFileSync(CAPABILITY_ROUTING_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     capabilityRoutingCache = {
       capabilityMap:
         parsed && parsed.capabilityMap && typeof parsed.capabilityMap === 'object'
@@ -126,7 +127,7 @@ function recordIntentFeedback(intentId, success, options = {}) {
   try {
     if (fs.existsSync(feedbackPath)) {
       const raw = fs.readFileSync(feedbackPath, 'utf8');
-      const parsed = JSON.parse(raw);
+      const parsed = safeParseJSON(raw);
       if (parsed && Array.isArray(parsed.entries)) {
         payload = parsed;
       }

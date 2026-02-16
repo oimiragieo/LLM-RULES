@@ -19,6 +19,8 @@
 
 'use strict';
 
+const { safeParseJSON } = require('./safe-json.cjs');
+
 /**
  * Default timeout for stdin reading in milliseconds
  * @constant {number}
@@ -111,12 +113,9 @@ function parseHookInputSync() {
     return null;
   }
 
-  try {
-    const parsed = JSON.parse(process.argv[2]);
-    return sanitizeObject(parsed);
-  } catch (_e) {
-    return null;
-  }
+  const parsed = safeParseJSON(process.argv[2]);
+  if (!parsed || Object.keys(parsed).length === 0) return null;
+  return sanitizeObject(parsed);
 }
 
 /**
@@ -132,11 +131,9 @@ async function parseHookInputAsync(options = {}) {
 
   // Try command line argument first (older hook format, some hooks still use this)
   if (process.argv[2]) {
-    try {
-      const parsed = JSON.parse(process.argv[2]);
+    const parsed = safeParseJSON(process.argv[2]);
+    if (parsed && Object.keys(parsed).length > 0) {
       return sanitizeObject(parsed);
-    } catch (_e) {
-      // Not valid JSON, try stdin
     }
   }
 
@@ -170,14 +167,12 @@ async function parseHookInputAsync(options = {}) {
         return;
       }
 
-      try {
-        const parsed = JSON.parse(input);
-        cleanup();
-        resolveOnce(sanitizeObject(parsed));
-      } catch (_e) {
-        // Invalid JSON
-        cleanup();
+      const parsed = safeParseJSON(input);
+      cleanup();
+      if (!parsed || (typeof parsed === 'object' && Object.keys(parsed).length === 0)) {
         resolveOnce(allowEmpty ? null : undefined);
+      } else {
+        resolveOnce(sanitizeObject(parsed));
       }
     };
 
@@ -233,19 +228,15 @@ function validateHookInput(jsonString) {
     return null;
   }
 
-  try {
-    const parsed = JSON.parse(trimmed);
+  const parsed = safeParseJSON(trimmed);
 
-    // Arrays are not valid hook input
-    if (Array.isArray(parsed)) {
-      return null;
-    }
-
-    // Filter by allowed keys at top level for security
-    return sanitizeObject(parsed, true);
-  } catch (_e) {
+  // Arrays are not valid hook input
+  if (!parsed || Array.isArray(parsed) || Object.keys(parsed).length === 0) {
     return null;
   }
+
+  // Filter by allowed keys at top level for security
+  return sanitizeObject(parsed, true);
 }
 
 /**

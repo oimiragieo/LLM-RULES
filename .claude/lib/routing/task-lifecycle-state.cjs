@@ -6,6 +6,7 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 const { withLock } = require('../utils/file-locker.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const TASK_STATUS_FILE = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
 const TASK_STATUS_LOCK = path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.lock');
@@ -22,7 +23,7 @@ function readTaskStatus(taskId) {
     if (fs.existsSync(TASK_STATUS_FILE)) {
       const content = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
       if (!content.trim()) return 'pending';
-      const data = JSON.parse(content);
+      const data = safeParseJSON(content);
       return data[taskId] || 'pending';
     }
   } catch (_err) {
@@ -42,7 +43,7 @@ async function writeTaskStatus(taskId, status) {
       if (fs.existsSync(TASK_STATUS_FILE)) {
         const content = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
         if (content.trim()) {
-          data = JSON.parse(content);
+          data = safeParseJSON(content);
         }
       }
 

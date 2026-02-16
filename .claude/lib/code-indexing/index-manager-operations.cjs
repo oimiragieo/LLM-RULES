@@ -29,15 +29,39 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
 
   await manager.vectorStore.dropCodeTable();
 
+  const batchSize = manager.options.batchSize || 100;
+  const totalFilesCount = allFiles.length;
   let totalChunks = checkpoint.chunksProcessed || 0;
   let totalEmbeddings = 0;
   let chunksFlushed = checkpoint.chunksProcessed || 0;
+  let filesProcessed = startIndex;
   const fileHashes = {};
   const concurrency = manager.options.concurrency;
   const flushSize = manager.options.chunkFlushSize;
 
   const chunkBuffer = [];
   let flushPromise = Promise.resolve();
+
+  // Worker setup moved outside loop
+  const workerPath = path.resolve(__dirname, 'parse-chunk-worker.cjs');
+  let pool = null;
+  let parseInProcess = null;
+
+  if (concurrency <= 1) {
+    console.log('[INDEX] Using in-process parsing (no worker threads)');
+    parseInProcess = require(workerPath);
+  } else {
+    console.log(`[INDEX] Using Piscina worker pool (${concurrency} threads)`);
+    pool = new Piscina({
+      filename: workerPath,
+      maxThreads: concurrency,
+      minThreads: 1,
+      resourceLimits: {
+        maxOldGenerationSizeMb: manager.memoryConfig.maxOldGenerationSizeMb,
+        maxYoungGenerationSizeMb: manager.memoryConfig.maxYoungGenerationSizeMb,
+      },
+    });
+  }
 
   const flushBuffer = async () => {
     if (chunkBuffer.length === 0) return;
@@ -71,227 +95,135 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
       await manager.vectorStore.saveBM25Index();
     }
 
-    if (manager.options.verbose) {
-      const memAfter = process.memoryUsage();
-      const rssAfter = (memAfter.rss / 1024 / 1024).toFixed(0);
-      const heapAfter = (memAfter.heapUsed / 1024 / 1024).toFixed(0);
-      console.log(
-        `[FLUSH] Done ${chunksFlushed}/${totalChunks} (rss:${rssAfter}MB heap:${heapAfter}MB)`
-      );
-    }
-
     if (typeof global.gc === 'function') {
       global.gc();
     }
   };
 
-  const workerPath = path.resolve(__dirname, 'parse-chunk-worker.cjs');
-  let pool = null;
-  let parseInProcess = null;
+  // Process in discrete batches to allow heap reclamation
+  for (let b = 0; b < files.length; b += batchSize) {
+    const currentBatch = files.slice(b, b + batchSize);
 
-  if (concurrency <= 1) {
-    console.log('[INDEX] Using in-process parsing (no worker threads)');
-    parseInProcess = require(workerPath);
-  } else {
-    console.log(`[INDEX] Using Piscina worker pool (${concurrency} threads)`);
-    pool = new Piscina({
-      filename: workerPath,
-      maxThreads: concurrency,
-      minThreads: 1,
-      resourceLimits: {
-        maxOldGenerationSizeMb: manager.memoryConfig.maxOldGenerationSizeMb,
-        maxYoungGenerationSizeMb: manager.memoryConfig.maxYoungGenerationSizeMb,
-      },
-    });
-  }
+    if (manager.vectorStore.embeddingMode === 'off') {
+      const fsSync = require('fs');
+      for (let i = 0; i < currentBatch.length; i++) {
+        const filePath = currentBatch[i];
+        const globalIndex = startIndex + b + i + 1;
+        try {
+          const stats = fsSync.statSync(filePath);
+          if (stats.size > manager.options.maxFileSize || stats.size === 0) continue;
 
-  let filesProcessed = startIndex;
+          const content = fsSync.readFileSync(filePath, 'utf-8');
+          const language = manager.parser.detectLanguage(filePath);
+          if (!language) continue;
 
-  if (manager.vectorStore.embeddingMode === 'off') {
-    console.log('[INDEX] BM25-only sync fast-path enabled (simple 50-line chunking)');
-    const fsSync = require('fs');
+          const lines = content.split('\n');
+          const relPath = path.relative(manager.options.projectRoot, filePath).replace(/\\/g, '/');
+          const chunks = [];
+          for (let lineIdx = 0; lineIdx < lines.length; lineIdx += 50) {
+            const text = lines
+              .slice(lineIdx, lineIdx + 50)
+              .join('\n')
+              .trim();
+            if (text.length === 0) continue;
+            chunks.push({ id: `${relPath}:${lineIdx}`, text });
+          }
 
-    for (let i = 0; i < files.length; i++) {
-      const filePath = files[i];
-      const globalIndex = startIndex + i + 1;
-
-      try {
-        const stats = fsSync.statSync(filePath);
-        if (stats.size > manager.options.maxFileSize || stats.size === 0) continue;
-
-        const content = fsSync.readFileSync(filePath, 'utf-8');
-        const language = manager.parser.detectLanguage(filePath);
-        if (!language) continue;
-
-        const lines = content.split('\n');
-        const relPath = path.relative(manager.options.projectRoot, filePath).replace(/\\/g, '/');
-        const chunks = [];
-        for (let lineIdx = 0; lineIdx < lines.length; lineIdx += 50) {
-          const text = lines
-            .slice(lineIdx, lineIdx + 50)
-            .join('\n')
-            .trim();
-          if (text.length === 0) continue;
-          chunks.push({ id: `${relPath}:${lineIdx}`, text });
-        }
-
-        filesProcessed++;
-        fileHashes[filePath] = { hash: null, chunks: chunks.length };
-        totalChunks += chunks.length;
-
-        if (chunks.length > 0) {
-          await manager.vectorStore.addChunksToBM25(chunks);
-        }
-
-        if (manager.options.verbose && filesProcessed % 100 === 0) {
-          const elapsed = (Date.now() - startTime) / 1000;
-          const rate = (filesProcessed - startIndex) / elapsed;
-          const remaining = allFiles.length - filesProcessed;
-          const mem = process.memoryUsage();
-          console.log(
-            `[PROGRESS] ${filesProcessed}/${allFiles.length} (${rate.toFixed(1)}/sec, ~${(remaining / rate / 60).toFixed(1)}min left) rss:${(mem.rss / 1048576).toFixed(0)}MB heap:${(mem.heapUsed / 1048576).toFixed(0)}MB`
-          );
-        }
-
-        if (onProgress) {
-          onProgress('parse', globalIndex, allFiles.length);
-          onProgress('chunk', globalIndex, allFiles.length);
-        }
-
-        if (
-          manager.options.enableCheckpoints &&
-          filesProcessed % manager.options.checkpointInterval === 0
-        ) {
-          await manager._saveCheckpoint(filesProcessed, allFiles.length, totalChunks);
-        }
-
-        if (filesProcessed % 500 === 0) {
-          await manager.vectorStore.saveBM25Index();
-        }
-      } catch (err) {
-        if (manager.options.verbose) {
-          console.error(
-            `[INDEX] Error: ${path.relative(manager.options.projectRoot, filePath)}: ${err.message}`
-          );
-        }
-      }
-    }
-
-    await manager.vectorStore.saveBM25Index();
-  } else {
-    const inFlight = new Set();
-    filesProcessed = startIndex;
-    const parseStartTime = Date.now();
-
-    const runOne = async (filePath, index) => {
-      const stats = await fs.stat(filePath);
-      if (stats.size > manager.options.maxFileSize) {
-        return { filePath, chunks: [], hash: null, skipped: true, index };
-      }
-
-      const content = await fs.readFile(filePath, 'utf-8');
-      const language = manager.parser.detectLanguage(filePath);
-      if (!language) {
-        return { filePath, chunks: [], hash: '', index };
-      }
-
-      const result = parseInProcess
-        ? parseInProcess({ filePath, content, language })
-        : await pool.run({ filePath, content, language });
-      return { ...result, index };
-    };
-
-    for (let i = 0; i < files.length; i++) {
-      const filePath = files[i];
-      const globalIndex = startIndex + i + 1;
-
-      const mem = process.memoryUsage();
-      const rssGB = mem.rss / 1024 / 1024 / 1024;
-
-      if (rssGB > manager.memoryConfig.emergencyThresholdGB) {
-        console.warn(
-          `🚨 EMERGENCY: Memory critical (rss:${rssGB.toFixed(2)}GB), draining queue...`
-        );
-        await Promise.all(Array.from(inFlight));
-        await flushPromise;
-        await flushBuffer();
-
-        if (typeof global.gc === 'function') {
-          for (let gc = 0; gc < 3; gc++) global.gc();
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log('🔄 Resuming after memory recovery...');
-      }
-
-      if (rssGB > manager.memoryConfig.memoryThresholdGB && inFlight.size >= concurrency) {
-        console.warn(`⚠️ Backpressure: Memory at ${rssGB.toFixed(2)}GB, throttling...`);
-        await Promise.race(Array.from(inFlight));
-        await flushBuffer();
-      }
-
-      while (inFlight.size >= concurrency) {
-        await Promise.race(Array.from(inFlight));
-      }
-
-      const task = runOne(filePath, globalIndex);
-      inFlight.add(task);
-
-      task
-        .then(async result => {
           filesProcessed++;
-          fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
-          totalChunks += result.chunks.length;
-          totalEmbeddings += result.chunks.length;
+          fileHashes[filePath] = { hash: null, chunks: chunks.length };
+          totalChunks += chunks.length;
 
-          if (manager.options.verbose && filesProcessed % 50 === 0) {
-            const elapsedSec = (Date.now() - parseStartTime) / 1000;
-            const filesPerSec = (filesProcessed - startIndex) / elapsedSec;
-            const remainingFiles = allFiles.length - filesProcessed;
-            const estimatedMin = remainingFiles / filesPerSec / 60;
-            const mem = process.memoryUsage();
-            const rss = (mem.rss / 1024 / 1024).toFixed(0);
-            const heapUsed = (mem.heapUsed / 1024 / 1024).toFixed(0);
-            const ext = (mem.external / 1024 / 1024).toFixed(0);
-            console.log(
-              `[PROGRESS] ${filesProcessed}/${allFiles.length} (${filesPerSec.toFixed(1)}/sec, ~${estimatedMin.toFixed(1)}min left) rss:${rss}MB heap:${heapUsed}MB ext:${ext}MB`
-            );
+          if (chunks.length > 0) {
+            await manager.vectorStore.addChunksToBM25(chunks);
           }
 
           if (onProgress) {
-            onProgress('parse', result.index, allFiles.length);
-            onProgress('chunk', result.index, allFiles.length);
+            onProgress('parse', globalIndex, totalFilesCount);
+            onProgress('chunk', globalIndex, totalFilesCount);
           }
+        } catch (err) {
+          if (manager.options.verbose) console.error(`[INDEX] Error: ${filePath}: ${err.message}`);
+        }
+      }
+    } else {
+      const inFlight = new Set();
+      const runOne = async (filePath, index) => {
+        const stats = await fs.stat(filePath);
+        if (stats.size > manager.options.maxFileSize) {
+          return { filePath, chunks: [], hash: null, skipped: true, index };
+        }
+        const content = await fs.readFile(filePath, 'utf-8');
+        const language = manager.parser.detectLanguage(filePath);
+        if (!language) return { filePath, chunks: [], hash: '', index };
 
-          if (result.chunks.length > 0) {
-            chunkBuffer.push(...result.chunks);
+        const result = parseInProcess
+          ? parseInProcess({ filePath, content, language })
+          : await pool.run({ filePath, content, language });
+        return { ...result, index };
+      };
 
-            if (chunkBuffer.length >= flushSize) {
-              flushPromise = flushPromise.then(() => flushBuffer());
+      for (let i = 0; i < currentBatch.length; i++) {
+        const filePath = currentBatch[i];
+        const globalIndex = startIndex + b + i + 1;
+
+        // Memory backpressure logic
+        const mem = process.memoryUsage();
+        const rssGB = mem.rss / 1024 / 1024 / 1024;
+
+        if (rssGB > manager.memoryConfig.emergencyThresholdGB) {
+          console.warn(`🚨 EMERGENCY: Memory critical (rss:${rssGB.toFixed(2)}GB), draining...`);
+          await Promise.all(Array.from(inFlight));
+          await flushPromise;
+          await flushBuffer();
+          if (typeof global.gc === 'function') global.gc();
+          await new Promise(r => setTimeout(r, 1000));
+        }
+
+        while (inFlight.size >= concurrency) {
+          await Promise.race(Array.from(inFlight));
+        }
+
+        const task = runOne(filePath, globalIndex);
+        inFlight.add(task);
+
+        task
+          .then(async result => {
+            filesProcessed++;
+            fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
+            totalChunks += result.chunks.length;
+            totalEmbeddings += result.chunks.length;
+
+            if (onProgress) {
+              onProgress('parse', result.index, totalFilesCount);
+              onProgress('chunk', result.index, totalFilesCount);
             }
-          }
 
-          if (
-            manager.options.enableCheckpoints &&
-            filesProcessed % manager.options.checkpointInterval === 0
-          ) {
-            manager
-              ._saveCheckpoint(filesProcessed, allFiles.length, totalChunks)
-              .catch(err => console.error('[CHECKPOINT] Save failed:', err.message));
-          }
-        })
-        .catch(err => console.error(`Error indexing ${filePath}:`, err.message))
-        .finally(() => inFlight.delete(task));
+            if (result.chunks.length > 0) {
+              chunkBuffer.push(...result.chunks);
+              if (chunkBuffer.length >= flushSize) {
+                flushPromise = flushPromise.then(() => flushBuffer());
+              }
+            }
+          })
+          .finally(() => inFlight.delete(task));
+      }
+      await Promise.all(Array.from(inFlight));
     }
 
-    await Promise.all(Array.from(inFlight));
-    if (pool) await pool.destroy();
-
-    await flushPromise;
-    await flushBuffer();
-
-    await manager.vectorStore.saveBM25Index();
+    // End of batch maintenance
+    if (manager.options.enableCheckpoints) {
+      await manager._saveCheckpoint(filesProcessed, totalFilesCount, totalChunks);
+    }
+    if (filesProcessed % 500 === 0) {
+      await manager.vectorStore.saveBM25Index();
+    }
+    if (typeof global.gc === 'function') global.gc();
   }
+
+  if (pool) await pool.destroy();
+  await flushPromise;
+  await flushBuffer();
+  await manager.vectorStore.saveBM25Index();
 
   const byLanguage = {};
   for (const filePath of allFiles) {

@@ -284,7 +284,7 @@ function isWindowsIncompatibleBashCommand(command) {
   return usesHeredoc || writesUnixTmp || readsUnixTmp;
 }
 
-function evaluateWindowsBashGuard(command) {
+function evaluateWindowsBashGuard(command, hookInput) {
   const mode = (process.env[AGENT_WINDOWS_BASH_GUARD] || 'block').toLowerCase();
   if (mode === 'off') {
     return { checked: false, reason: 'disabled' };
@@ -292,16 +292,22 @@ function evaluateWindowsBashGuard(command) {
   if (!isWindowsIncompatibleBashCommand(command)) {
     return { checked: true, action: 'allow' };
   }
-  if (mode === 'warn') {
+
+  const isBypass =
+    hookInput?.permission_mode === 'bypassPermissions' ||
+    hookInput?.permissionMode === 'bypassPermissions';
+  const isAgent = isAgentScopedSession(hookInput);
+
+  if (mode === 'warn' || (isAgent && isBypass)) {
     return { checked: true, action: 'allow', warning: WINDOWS_BASH_GUARDRAIL_MESSAGE };
   }
   return { checked: true, action: 'block', message: WINDOWS_BASH_GUARDRAIL_MESSAGE };
 }
 
-function checkBashArtifactWriteSafety(toolName, toolInput) {
+function checkBashArtifactWriteSafety(toolName, toolInput, hookInput) {
   if (toolName !== 'Bash') return { checked: false, reason: 'not_bash' };
   const command = getBashCommand(toolInput);
-  const windowsGuardResult = evaluateWindowsBashGuard(command);
+  const windowsGuardResult = evaluateWindowsBashGuard(command, hookInput);
   if (windowsGuardResult.action === 'block') {
     return windowsGuardResult;
   }
@@ -366,7 +372,7 @@ function checkAgentGuardrails(
 
   if (toolName === 'Bash') {
     const command = getBashCommand(toolInput);
-    const windowsGuardResult = evaluateWindowsBashGuard(command);
+    const windowsGuardResult = evaluateWindowsBashGuard(command, hookInput);
     if (windowsGuardResult.action === 'block') {
       return windowsGuardResult;
     }

@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * Unified Write PreToolUse Hook Bundle
+ * Consolidates 8 hooks for Edit|Write|NotebookEdit into a single process.
+ */
 'use strict';
 
 const { spawnSync } = require('child_process');
@@ -7,10 +11,14 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const HOOKS = [
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'bash-command-validator.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'shell-injection-validator.cjs'),
-  path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'windows-null-sanitizer.cjs'),
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'routing-guard.cjs'),
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'unified-creator-guard.cjs'),
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'validation', 'agent-template-contract-validator.cjs'),
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'unified-pre-write-hook.cjs'),
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'evolution-state-guard.cjs'),
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'research-enforcement.cjs'),
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'evolution', 'quality-gate-validator.cjs'),
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'session', 'adaptive-quality-gate.cjs'),
 ];
 
 function runHook(scriptPath, input) {
@@ -45,7 +53,7 @@ function applyHookOutput(currentInput, hookStdout) {
   return JSON.stringify(parent);
 }
 
-function main() {
+async function main() {
   let currentInput = '';
   try {
     currentInput = require('fs').readFileSync(0, 'utf8');
@@ -57,7 +65,7 @@ function main() {
     const res = runHook(hookPath, currentInput);
 
     if (res.error) {
-      console.error(`[bash-pretool-bundle] Failed to run hook: ${hookPath}`);
+      console.error(`[write-pretool-bundle] Failed to run hook: ${hookPath}`);
       console.error(String(res.error.message || res.error));
       process.exit(1);
     }

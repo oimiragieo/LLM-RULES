@@ -40,6 +40,7 @@ const {
   auditLog,
   auditSecurityOverride,
 } = require('../../lib/utils/hook-input.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 // MED-001 FIX: Use shared PROJECT_ROOT utility instead of duplicating
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
@@ -245,7 +246,13 @@ function isCreatorActive(creatorName) {
       return { active: false };
     }
 
-    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    const { success, data: state } = safeParseJSON(
+      fs.readFileSync(statePath, 'utf8'),
+      'creator-state'
+    );
+    if (!success || !state) {
+      return { active: false };
+    }
     const creatorState = state[creatorName];
 
     if (!creatorState || !creatorState.active || !creatorState.invokedAt) {
@@ -290,11 +297,9 @@ function markCreatorActive(creatorName, artifactName = null) {
     // Load existing state or create new
     let state = {};
     if (fs.existsSync(statePath)) {
-      try {
-        state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-      } catch (_e) {
-        // Invalid state file, start fresh
-        state = {};
+      const { success, data } = safeParseJSON(fs.readFileSync(statePath, 'utf8'), 'creator-state');
+      if (success && data) {
+        state = data;
       }
     }
 
@@ -326,12 +331,15 @@ function clearCreatorActive(creatorName) {
     const statePath = path.join(PROJECT_ROOT, STATE_FILE);
     if (!fs.existsSync(statePath)) return true;
 
-    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-    if (state[creatorName]) {
+    const { success, data: state } = safeParseJSON(
+      fs.readFileSync(statePath, 'utf8'),
+      'creator-state'
+    );
+    if (success && state && state[creatorName]) {
       state[creatorName].active = false;
+      fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
     }
 
-    fs.writeFileSync(statePath, JSON.stringify(state, null, 2));
     return true;
   } catch (_err) {
     return false;
@@ -415,15 +423,9 @@ function validateArtifactContent(artifactType, content) {
   }
 
   // Try to parse content as JSON
-  let parsed;
-  try {
-    parsed = JSON.parse(content);
-  } catch (_e) {
-    // Content is not JSON (e.g., markdown) - skip validation gracefully
-    return result;
-  }
-
-  if (!parsed || typeof parsed !== 'object') {
+  const { success, data: parsed } = safeParseJSON(content, null);
+  if (!success || !parsed || typeof parsed !== 'object') {
+    // Content is not JSON or invalid - skip validation gracefully
     return result;
   }
 
@@ -447,14 +449,12 @@ function validateArtifactContent(artifactType, content) {
     return result;
   }
 
-  let schema;
-  try {
-    schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
-  } catch (_e) {
-    return result;
-  }
+  const { success: schemaSuccess, data: schema } = safeParseJSON(
+    fs.readFileSync(schemaPath, 'utf8'),
+    'artifact-schema'
+  );
 
-  if (!schema) {
+  if (!schemaSuccess || !schema) {
     return result;
   }
 

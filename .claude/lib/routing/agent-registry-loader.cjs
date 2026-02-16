@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const REGISTRY_DIR = path.join(PROJECT_ROOT, '.claude', 'context');
 const INDEX_FILE = path.join(REGISTRY_DIR, 'agent-registry-index.json');
@@ -21,7 +22,7 @@ let cache = null;
 
 function loadIndex() {
   const raw = fs.readFileSync(INDEX_FILE, 'utf8');
-  return JSON.parse(raw);
+  return safeParseJSON(raw);
 }
 
 function loadCategory(category) {
@@ -31,7 +32,7 @@ function loadCategory(category) {
   const filePath = path.join(REGISTRY_DIR, entry.path);
   try {
     const raw = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(raw);
+    return safeParseJSON(raw);
   } catch (err) {
     console.error(`[agent-registry-loader] Failed to load category ${category}:`, err.message);
     return { agents: {} };
@@ -51,7 +52,7 @@ function loadAll() {
     const filePath = path.join(REGISTRY_DIR, entry.path);
     try {
       const raw = fs.readFileSync(filePath, 'utf8');
-      const parsed = JSON.parse(raw);
+      const parsed = safeParseJSON(raw);
       if (parsed.agents) {
         Object.assign(merged.agents, parsed.agents);
       }

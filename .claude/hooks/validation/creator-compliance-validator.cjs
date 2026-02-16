@@ -25,6 +25,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Use shared utility for project root
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
@@ -269,7 +270,12 @@ async function main() {
   try {
     // Read hook input from stdin
     const hookInput = await readStdin();
-    const input = JSON.parse(hookInput);
+    const { success, data: input } = safeParseJSON(hookInput, 'hook-input');
+    if (!success || !input) {
+      console.log(formatResult(true));
+      process.exit(0);
+      return;
+    }
 
     // Extract tool and params
     const toolName = input.tool_name || input.tool;
