@@ -253,7 +253,7 @@ class AstGrepSearch {
     const structuralResults = await this.search(pattern, language, {
       include: filePaths.map(f => {
         // Convert absolute path to relative for glob matching
-        return path.relative(this.projectRoot, f);
+        return path.relative(this.projectRoot, f).replace(/\\/g, '/');
       }),
     });
 

@@ -47,7 +47,7 @@ StandardTools.Write = async function ({ path: filePath, content }) {
     await fs.promises.mkdir(dir, { recursive: true });
   }
   await fs.promises.writeFile(safePath, content, 'utf8');
-  return `Successfully wrote to ${path.relative(PROJECT_ROOT, safePath)}`;
+  return `Successfully wrote to ${path.relative(PROJECT_ROOT, safePath).replace(/\\/g, '/')}`;
 };
 
 /**
@@ -74,7 +74,7 @@ StandardTools.Edit = async function ({ path: filePath, edits, dryRun }) {
   }
 
   await fs.promises.writeFile(safePath, modified, 'utf8');
-  return `Successfully edited ${path.relative(PROJECT_ROOT, safePath)}`;
+  return `Successfully edited ${path.relative(PROJECT_ROOT, safePath).replace(/\\/g, '/')}`;
 };
 
 /**
@@ -204,5 +204,5 @@ StandardTools.listFiles = async function (args) {
 StandardTools.deleteFile = async function ({ path: filePath }) {
   const safePath = sanitizePath(filePath, PROJECT_ROOT);
   await fs.promises.unlink(safePath);
-  return `Successfully deleted ${path.relative(PROJECT_ROOT, safePath)}`;
+  return `Successfully deleted ${path.relative(PROJECT_ROOT, safePath).replace(/\\/g, '/')}`;
 };

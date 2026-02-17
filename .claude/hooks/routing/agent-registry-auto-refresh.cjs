@@ -46,7 +46,8 @@ function shouldRefreshRegistry(toolName, filePath) {
 function readLastRunMs() {
   try {
     if (!fs.existsSync(STAMP_PATH)) return 0;
-    const parsed = JSON.parse(fs.readFileSync(STAMP_PATH, 'utf8'));
+    const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+    const parsed = safeParseJSON(fs.readFileSync(STAMP_PATH, 'utf8'), null, null, {});
     return Number(parsed?.lastRunMs || 0);
   } catch (_err) {
     return 0;

@@ -2,10 +2,11 @@
 
 const eventBus = require('../events/event-bus.cjs');
 const { EventTypes } = require('../events/event-types.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 async function main() {
   const inputRaw = process.argv[2] || '{}';
-  const input = JSON.parse(inputRaw);
+  const input = safeParseJSON(inputRaw, null, null, {});
   const startedAt = Date.now();
 
   await eventBus.emit(EventTypes.TOOL_COMPLETED, {

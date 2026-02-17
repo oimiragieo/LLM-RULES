@@ -267,8 +267,12 @@ function loadAgentRegistry() {
   if (_registryCache) return _registryCache;
   try {
     if (fs.existsSync(AGENT_REGISTRY_PATH)) {
-      _registryCache = JSON.parse(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'));
-      return _registryCache;
+      const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+      const parsed = safeParseJSON(fs.readFileSync(AGENT_REGISTRY_PATH, 'utf8'), null);
+      if (parsed) {
+        _registryCache = parsed;
+        return _registryCache;
+      }
     }
   } catch (e) {
     debugLog('spawn-prompt-assembler', 'Failed to load agent-registry', e);
@@ -281,8 +285,12 @@ function loadToolManifest() {
   if (_manifestCache) return _manifestCache;
   try {
     if (fs.existsSync(TOOL_MANIFEST_PATH)) {
-      _manifestCache = JSON.parse(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf8'));
-      return _manifestCache;
+      const { safeParseJSON: safeParseJSON2 } = require('../../lib/utils/safe-json.cjs');
+      const parsed2 = safeParseJSON2(fs.readFileSync(TOOL_MANIFEST_PATH, 'utf8'), null);
+      if (parsed2) {
+        _manifestCache = parsed2;
+        return _manifestCache;
+      }
     }
   } catch (e) {
     debugLog('spawn-prompt-assembler', 'Failed to load tool-manifest', e);

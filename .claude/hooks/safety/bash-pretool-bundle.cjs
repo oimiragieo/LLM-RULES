@@ -61,13 +61,13 @@ function main() {
     if (res.error) {
       console.error(`[bash-pretool-bundle] Failed to run hook: ${hookPath}`);
       console.error(String(res.error.message || res.error));
-      process.exit(1);
+      process.exit(2);
     }
 
     if (res.status !== 0) {
       if (res.stdout) process.stdout.write(res.stdout);
       if (res.stderr) process.stderr.write(res.stderr);
-      process.exit(res.status || 1);
+      process.exit(res.status || 2);
     }
 
     currentInput = applyHookOutput(currentInput, res.stdout);

@@ -76,7 +76,8 @@ const EXCLUDE_PATTERNS = [
 ];
 
 // Simple lock file for cross-process coordination
-const LOCK_FILE = path.join(process.cwd(), '.claude/context/code-index/.indexing.lock');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const LOCK_FILE = path.join(PROJECT_ROOT, '.claude/context/code-index/.indexing.lock');
 const DEFAULT_DEBOUNCE_MS = parseInt(process.env.CODE_INDEX_DEBOUNCE_MS || '5000', 10);
 const LOCK_TIMEOUT_MS = 10000; // 10 seconds max lock time (indexing should be fast)
 
@@ -361,8 +362,9 @@ async function main() {
       process.exit(0);
     }
 
-    // Schedule debounced update
-    scheduleDebouncedUpdate(filePath);
+    // Run index update directly before exiting (C-1 fix: debounce timer
+    // fires after process.exit kills the event loop, making it dead code)
+    await triggerIndexUpdate(filePath);
 
     // Exit successfully (don't block the tool)
     process.exit(0);

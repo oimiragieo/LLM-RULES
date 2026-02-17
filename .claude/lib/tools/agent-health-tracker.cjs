@@ -100,8 +100,9 @@ class AgentHealthTracker {
     if (!fs.existsSync(this.registryPath)) {
       throw new Error(`Registry not found: ${this.registryPath}`);
     }
+    const { safeParseJSON } = require('../utils/safe-json.cjs');
     const content = fs.readFileSync(this.registryPath, 'utf-8');
-    return JSON.parse(content);
+    return safeParseJSON(content, null, null, { agents: {} });
   }
 
   /**

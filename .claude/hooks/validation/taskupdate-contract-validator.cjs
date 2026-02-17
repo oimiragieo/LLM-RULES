@@ -58,12 +58,12 @@ async function main(hookInput = null) {
       error: 'missing_or_invalid_input',
     });
     console.log(formatResult({ allow: false, message }));
-    return;
+    process.exit(2);
   }
   const result = runValidation(input);
   if (!result.allow) {
     console.log(formatResult({ allow: false, message: result.message }));
-    return;
+    process.exit(2);
   }
   console.log(formatResult({ allow: true }));
 }
@@ -72,7 +72,7 @@ if (require.main === module) {
   main().catch(() => {
     const message = '[TASKUPDATE-CONTRACT] Failed to parse hook input';
     console.log(formatResult({ allow: false, message }));
-    process.exit(0);
+    process.exit(2);
   });
 }
 

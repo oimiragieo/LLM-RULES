@@ -173,7 +173,13 @@ function validateArtifact(artifactPath) {
 function readActiveCreatorSkills() {
   try {
     if (!fs.existsSync(ACTIVE_CREATORS_STATE_FILE)) return [];
-    const state = JSON.parse(fs.readFileSync(ACTIVE_CREATORS_STATE_FILE, 'utf8'));
+    const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+    const state = safeParseJSON(
+      fs.readFileSync(ACTIVE_CREATORS_STATE_FILE, 'utf8'),
+      null,
+      null,
+      {}
+    );
     return Object.entries(state)
       .filter(([, value]) => value && value.active)
       .map(([key]) => key);
@@ -300,7 +306,7 @@ async function main() {
           const msg = `Invalid status: "${newStatus}". Valid: ${VALID_STATUSES.join(', ')}`;
           if (taskStatusMode === 'block') {
             console.log(formatHookResult('block', msg));
-            process.exit(0);
+            process.exit(2);
           } else {
             console.warn(`[WARN] ${msg}`);
           }
@@ -314,7 +320,7 @@ async function main() {
             const msg = getTransitionError(taskId, currentStatus, newStatus);
             if (taskStatusMode === 'block') {
               console.log(formatHookResult('block', msg));
-              process.exit(0);
+              process.exit(2);
             } else {
               console.warn(`[WARN] ${msg}`);
             }

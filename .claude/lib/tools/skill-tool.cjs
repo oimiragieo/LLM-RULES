@@ -94,7 +94,7 @@ function parseSkillFile(filePath, skillName) {
       category: frontmatter.category || 'General',
       domain: frontmatter.domain || 'general',
       content: body,
-      filePath: path.relative(PROJECT_ROOT, filePath),
+      filePath: path.relative(PROJECT_ROOT, filePath).replace(/\\/g, '/'),
       requiredTools: frontmatter.requiredTools || ['Read', 'Write', 'Edit'],
       tags: frontmatter.tags || [],
     };
@@ -106,7 +106,7 @@ function parseSkillFile(filePath, skillName) {
       category: 'General',
       domain: 'general',
       content: '',
-      filePath: path.relative(PROJECT_ROOT, filePath),
+      filePath: path.relative(PROJECT_ROOT, filePath).replace(/\\/g, '/'),
       error: err.message,
     };
   }
@@ -324,7 +324,7 @@ if (require.main === module) {
   if (args.length === 0) {
     console.log('Usage: node skill-tool.cjs <skill-name> [args]');
     console.log('       node skill-tool.cjs --list');
-    console.log('       node skill-tool.cjs --search <keyword>');
+    console.log('       node skill-tool.cjs --search <term>');
     process.exit(1);
   }
 

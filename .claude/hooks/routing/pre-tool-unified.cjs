@@ -127,7 +127,8 @@ async function main() {
     const hookInput = process.argv[2];
     let toolInfo = '';
     try {
-      const input = JSON.parse(hookInput || '{}');
+      const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+      const input = safeParseJSON(hookInput || '{}', null, null, {});
       const tool = input.tool || 'unknown';
       toolInfo = ` [tool=${tool}]`;
     } catch (_) {

@@ -294,7 +294,17 @@ class PatternLibrary {
    * @param {Object} options - Options (merge: boolean)
    */
   import(json, options = {}) {
-    const data = JSON.parse(json);
+    const { safeParseJSON } = require('./safe-json.cjs');
+    const data = safeParseJSON(json, null);
+    if (
+      !data ||
+      (typeof data === 'object' &&
+        !Array.isArray(data) &&
+        Object.keys(data).length === 0 &&
+        !data.patterns)
+    ) {
+      throw new Error('Failed to parse pattern library JSON: invalid or malformed input');
+    }
 
     if (!options.merge) {
       this.patterns.clear();

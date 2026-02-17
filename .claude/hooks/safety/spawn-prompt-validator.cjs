@@ -287,7 +287,8 @@ function readLoopBreakerState(statePath = LOOP_BREAKER_STATE_PATH) {
     if (!fs.existsSync(statePath)) {
       return { entries: {} };
     }
-    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+    const parsed = safeParseJSON(fs.readFileSync(statePath, 'utf8'), null);
     if (
       !parsed ||
       typeof parsed !== 'object' ||

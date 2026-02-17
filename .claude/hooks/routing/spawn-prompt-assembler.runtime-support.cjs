@@ -298,8 +298,12 @@ function loadPresets() {
 
   try {
     if (fs.existsSync(presetsPath)) {
-      _presetsCache = JSON.parse(fs.readFileSync(presetsPath, 'utf8'));
-      return _presetsCache;
+      const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+      const parsed = safeParseJSON(fs.readFileSync(presetsPath, 'utf8'), null);
+      if (parsed) {
+        _presetsCache = parsed;
+        return _presetsCache;
+      }
     }
   } catch (e) {
     debugLog('spawn-prompt-assembler', 'Failed to load presets.json (ignored)', e);

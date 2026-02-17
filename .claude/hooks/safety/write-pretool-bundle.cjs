@@ -160,9 +160,13 @@ async function main() {
     process.stdout.write(JSON.stringify(hookInput));
     process.exit(0);
   } catch (err) {
-    if (process.env.HOOK_FAIL_OPEN === 'true') process.exit(0);
-    console.error(`[write-pretool-bundle] Critical error: ${err.message}`);
-    process.exit(2);
+    // Fail-open by default: unexpected exceptions should not block ALL writes.
+    // Set HOOK_FAIL_CLOSED=true to revert to blocking behavior.
+    console.error(`[write-pretool-bundle] Unexpected error (fail-open): ${err.message}`);
+    if (process.env.HOOK_FAIL_CLOSED === 'true') {
+      process.exit(2);
+    }
+    process.exit(0);
   }
 }
 

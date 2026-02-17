@@ -116,7 +116,8 @@ function resolveSkillSectionMode() {
 function readAssemblyCache() {
   try {
     if (!fs.existsSync(SPAWN_CACHE_PATH)) return { entries: {} };
-    const parsed = JSON.parse(fs.readFileSync(SPAWN_CACHE_PATH, 'utf8'));
+    const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+    const parsed = safeParseJSON(fs.readFileSync(SPAWN_CACHE_PATH, 'utf8'), null);
     return parsed && typeof parsed === 'object' && parsed.entries ? parsed : { entries: {} };
   } catch (_err) {
     return { entries: {} };
@@ -207,7 +208,9 @@ function readRecentJsonl(filePath, maxRows = 300) {
     const rows = [];
     for (const line of lines.slice(-maxRows)) {
       try {
-        rows.push(JSON.parse(line));
+        const { safeParseJSON: parseJsonl } = require('../../lib/utils/safe-json.cjs');
+        const row = parseJsonl(line, null);
+        if (row) rows.push(row);
       } catch (_err) {
         // ignore malformed rows
       }

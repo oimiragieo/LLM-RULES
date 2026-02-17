@@ -24,7 +24,9 @@ function trimJsonlFile(filePath, maxLines) {
   if (lines.length <= maxLines) return;
 
   const trimmed = lines.slice(-maxLines).join('\n') + '\n';
-  fs.writeFileSync(filePath, trimmed, 'utf8');
+  const tmpPath = filePath + '.tmp';
+  fs.writeFileSync(tmpPath, trimmed, 'utf8');
+  fs.renameSync(tmpPath, filePath);
 }
 
 function appendJsonl(filePath, entry, options = {}) {

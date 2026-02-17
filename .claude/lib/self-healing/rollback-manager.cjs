@@ -290,7 +290,8 @@ class RollbackManager {
     if (!fs.existsSync(manifestPath)) {
       return null;
     }
-    return JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    const { safeParseJSON } = require('../utils/safe-json.cjs');
+    return safeParseJSON(fs.readFileSync(manifestPath, 'utf-8'), null);
   }
 
   /**

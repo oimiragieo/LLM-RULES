@@ -18,23 +18,7 @@
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
-          },
-          {
-            "type": "command",
             "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session/state-reset.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session/drift-detector.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/user-prompt-unified.cjs"
           },
           {
             "type": "command",
