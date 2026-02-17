@@ -1,0 +1,54 @@
+{
+  "scan_info": {
+    "tool": "medusa-security",
+    "version": "2026.3.0",
+    "target": ".",
+    "timestamp": "2026-02-17T10:00:00Z",
+    "scanners_run": 76,
+    "files_scanned": 150,
+    "scan_duration_seconds": 12.5
+  },
+  "summary": {
+    "total_findings": 3,
+    "critical": 1,
+    "high": 1,
+    "medium": 1,
+    "low": 0,
+    "security_score": 45
+  },
+  "results": [
+    {
+      "severity": "CRITICAL",
+      "scanner": "PromptInjectionScanner",
+      "rule_id": "MEDUSA-PI-001",
+      "message": "Direct prompt injection: unsanitized user input concatenated into LLM prompt",
+      "file": "src/llm/chat.js",
+      "line": 42,
+      "column": 5,
+      "cwe_id": 94,
+      "category": "ai_security"
+    },
+    {
+      "severity": "HIGH",
+      "scanner": "MCPServerScanner",
+      "rule_id": "MEDUSA-MCP-101",
+      "message": "MCP tool description contains hidden XML instructions",
+      "file": "mcp-server/tools.json",
+      "line": 15,
+      "column": 1,
+      "cwe_id": null,
+      "category": "ai_security"
+    },
+    {
+      "severity": "MEDIUM",
+      "scanner": "SecretScanner",
+      "rule_id": "MEDUSA-SEC-001",
+      "message": "Hardcoded API key: sk-proj-ABC123...",
+      "file": "config/settings.js",
+      "line": 8,
+      "column": 15,
+      "cwe_id": 798,
+      "category": "secrets"
+    }
+  ]
+}

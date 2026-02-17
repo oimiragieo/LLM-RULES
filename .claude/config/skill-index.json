@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-17T02:31:56.239Z",
+  "generatedAt": "2026-02-17T06:34:23.991Z",
   "metadata": {
-    "totalSkills": 391,
+    "totalSkills": 392,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-17T02:31:56.241Z",
+    "lastValidated": "2026-02-17T06:34:23.991Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -2286,6 +2286,28 @@
         "development",
         "other",
         "logging-module-usage"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "medusa-security": {
+      "name": "medusa-security",
+      "displayName": "Medusa Security",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - medusa-security",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "medusa-security"
       ],
       "priority": 3,
       "aliasOf": null
@@ -9369,6 +9391,7 @@
         "form-validation-with-zod",
         "insecure-defaults",
         "integration/artifact-updater",
+        "medusa-security",
         "memory-quality-auditor",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -9778,6 +9801,7 @@
         "k8s-manifest-generator",
         "k8s-security-policies",
         "logging-module-usage",
+        "medusa-security",
         "memory-forensics",
         "memory-quality-auditor",
         "mobile-first-design-rules",
@@ -10242,6 +10266,7 @@
         "k8s-security-policies",
         "kubernetes-flux",
         "logging-module-usage",
+        "medusa-security",
         "memory-forensics",
         "memory-quality-auditor",
         "mobile-first-design-rules",
@@ -10665,6 +10690,7 @@
         "k8s-security-policies",
         "kubernetes-flux",
         "logging-module-usage",
+        "medusa-security",
         "memory-forensics",
         "memory-quality-auditor",
         "mobile-first-design-rules",
@@ -11041,6 +11067,7 @@
         "k8s-security-policies",
         "kubernetes-flux",
         "logging-module-usage",
+        "medusa-security",
         "memory-forensics",
         "memory-quality-auditor",
         "mobile-first-design-rules",
@@ -11512,6 +11539,7 @@
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
+        "medusa-security",
         "memory-quality-auditor",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
@@ -12285,6 +12313,7 @@
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
+        "medusa-security",
         "memory-quality-auditor",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",

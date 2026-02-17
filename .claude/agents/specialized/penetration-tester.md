@@ -39,6 +39,7 @@ skills:
   - tdd
   - debugging
   - context-compressor
+  - medusa-security
 context_files:
   - '@.claude/context/memory/learnings.md'
 capabilities:

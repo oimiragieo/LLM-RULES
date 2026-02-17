@@ -45,6 +45,7 @@ skills:
   - variant-analysis
   - verification-before-completion
   - web3-expert
+  - medusa-security
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

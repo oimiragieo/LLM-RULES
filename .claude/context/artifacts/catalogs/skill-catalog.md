@@ -19,7 +19,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | -------------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                                                                                                                                                                          |
 | [Planning & Architecture](#planning--architecture) | 9     | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator                                                                                                                                                                                                                                                         |
-| [Security](#security)                              | 11    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults                                                                                                                                                                |
+| [Security](#security)                              | 12    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults, medusa-security                                                                                                                                               |
 | [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                                                                                                                                                                           |
 | [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                                                                                                                                                                      |
 | [Frameworks](#frameworks)                          | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                                                                                                                                                                           |
@@ -90,19 +90,20 @@ Design and planning skills.
 
 Security analysis and validation.
 
-| Skill                          | Description                                     | Primary Agents     |
-| ------------------------------ | ----------------------------------------------- | ------------------ |
-| `security-architect`           | OWASP Top 10, threat modeling, STRIDE analysis  | security-architect |
-| `auth-security-expert`         | OAuth 2.1, JWT (RFC 8725), encryption           | security-architect |
-| `binary-analysis-patterns`     | Disassembly, decompilation, reverse engineering | security-architect |
-| `memory-forensics`             | Memory acquisition and artifact extraction      | security-architect |
-| `protocol-reverse-engineering` | Network protocol analysis                       | security-architect |
-| `accessibility`                | WCAG 2.1 AA compliance, semantic HTML, ARIA     | frontend-expert    |
-| `static-analysis`              | CodeQL and Semgrep SARIF analysis               | security-architect |
-| `variant-analysis`             | Discover vulnerability variants                 | security-architect |
-| `differential-review`          | Security-focused diff/PR review                 | security-architect |
-| `semgrep-rule-creator`         | Create custom Semgrep rules                     | security-architect |
-| `insecure-defaults`            | Detect hardcoded credentials, fail-open configs | security-architect |
+| Skill                          | Description                                                                   | Primary Agents                                        |
+| ------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `security-architect`           | OWASP Top 10, threat modeling, STRIDE analysis                                | security-architect                                    |
+| `auth-security-expert`         | OAuth 2.1, JWT (RFC 8725), encryption                                         | security-architect                                    |
+| `binary-analysis-patterns`     | Disassembly, decompilation, reverse engineering                               | security-architect                                    |
+| `memory-forensics`             | Memory acquisition and artifact extraction                                    | security-architect                                    |
+| `protocol-reverse-engineering` | Network protocol analysis                                                     | security-architect                                    |
+| `accessibility`                | WCAG 2.1 AA compliance, semantic HTML, ARIA                                   | frontend-expert                                       |
+| `static-analysis`              | CodeQL and Semgrep SARIF analysis                                             | security-architect                                    |
+| `variant-analysis`             | Discover vulnerability variants                                               | security-architect                                    |
+| `differential-review`          | Security-focused diff/PR review                                               | security-architect                                    |
+| `semgrep-rule-creator`         | Create custom Semgrep rules                                                   | security-architect                                    |
+| `insecure-defaults`            | Detect hardcoded credentials, fail-open configs                               | security-architect                                    |
+| `medusa-security`              | AI-first SAST with 3,000+ patterns: prompt injection, MCP, agents, RAG, OWASP | security-architect, penetration-tester, code-reviewer |
 
 ---
 

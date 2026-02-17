@@ -1,0 +1,74 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "medusa-security",
+          "version": "2026.3.0",
+          "rules": [
+            {
+              "id": "MEDUSA-PI-001",
+              "shortDescription": { "text": "Direct prompt injection detected" },
+              "defaultConfiguration": { "level": "error" }
+            },
+            {
+              "id": "MEDUSA-MCP-101",
+              "shortDescription": { "text": "MCP tool poisoning in description" },
+              "defaultConfiguration": { "level": "warning" }
+            },
+            {
+              "id": "MEDUSA-SEC-001",
+              "shortDescription": { "text": "Hardcoded API key detected" },
+              "defaultConfiguration": { "level": "error" }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "MEDUSA-PI-001",
+          "level": "error",
+          "message": {
+            "text": "Direct prompt injection: unsanitized user input concatenated into LLM prompt"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "src/llm/chat.js" },
+                "region": { "startLine": 42, "startColumn": 5 }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "MEDUSA-MCP-101",
+          "level": "warning",
+          "message": { "text": "MCP tool description contains hidden XML instructions" },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "mcp-server/tools.json" },
+                "region": { "startLine": 15, "startColumn": 1 }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "MEDUSA-SEC-001",
+          "level": "error",
+          "message": { "text": "Hardcoded API key: sk-proj-ABC123..." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "config/settings.js" },
+                "region": { "startLine": 8, "startColumn": 15 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
