@@ -34,7 +34,15 @@ function shouldFallbackForToolCapabilities(toolInput) {
         .toLowerCase()
     )
   );
-  return normalizedTools.has('websearch') || normalizedTools.has('webfetch');
+  // Haiku can struggle with advanced tool-reference/tool-discovery workflows.
+  // Auto-upgrade to Sonnet when advanced tool profiles are requested.
+  return (
+    normalizedTools.has('websearch') ||
+    normalizedTools.has('webfetch') ||
+    normalizedTools.has('skill') ||
+    normalizedTools.has('taskcreate') ||
+    normalizedTools.has('taskoutput')
+  );
 }
 
 function resolveSelectedModel(toolInput, configModel, explicitTaskId, agentType) {
