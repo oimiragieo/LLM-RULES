@@ -35,7 +35,6 @@ const {
   getToolName,
   getToolInput,
   extractFilePath,
-  getEnforcementMode,
   formatResult,
   auditLog,
   auditSecurityOverride,
@@ -511,7 +510,10 @@ function validateCreatorWorkflow(toolName, toolInput) {
   }
 
   // Check enforcement mode
-  const enforcement = getEnforcementMode('CREATOR_GUARD', 'block');
+  // NOTE: CREATOR_GUARD defaults to 'block' (not 'warn') - use env var directly
+  // to avoid the centralized enforcement-defaults.cjs returning 'warn' as fallback.
+  const rawGuard = (process.env.CREATOR_GUARD || '').trim().toLowerCase();
+  const enforcement = ['block', 'warn', 'off'].includes(rawGuard) ? rawGuard : 'block';
   if (enforcement === 'off') {
     // SEC-AUDIT-016 FIX: Use centralized auditSecurityOverride for consistent logging
     auditSecurityOverride(

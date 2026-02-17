@@ -11,17 +11,7 @@ maxTurns: 18
 permissionMode: default
 priority: high
 extended_thinking: true
-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - Bash
-  - TaskUpdate
-  - TaskList
-  - TaskCreate
-  - TaskGet
-  - Skill
+tools: [Read, Write, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
   - checklist-generator
