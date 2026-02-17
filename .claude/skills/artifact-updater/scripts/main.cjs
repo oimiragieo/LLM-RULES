@@ -44,22 +44,22 @@ function runIntegration(type) {
 function updateArtifactMetadata(filePath) {
   const absolutePath = path.resolve(PROJECT_ROOT, filePath);
   if (!fs.existsSync(absolutePath)) return;
-  
+
   let content = fs.readFileSync(absolutePath, 'utf8');
   const now = new Date().toISOString();
-  
+
   if (content.includes('lastVerifiedAt:')) {
     content = content.replace(/lastVerifiedAt: .*/, `lastVerifiedAt: ${now}`);
   } else {
     content = content.replace(/---\n/, `---\nlastVerifiedAt: ${now}\n`);
   }
-  
+
   if (content.includes('verified:')) {
     content = content.replace(/verified: .*/, `verified: true`);
   } else {
     content = content.replace(/---\n/, `---\nverified: true\n`);
   }
-  
+
   fs.writeFileSync(absolutePath, content, 'utf8');
 }
 
@@ -78,18 +78,23 @@ function main() {
     process.exit(1);
   }
 
-  const inferredType = type || (file.includes('/agents/') ? 'agent' : file.includes('/skills/') ? 'skill' : 'unknown');
-  
+  const inferredType =
+    type || (file.includes('/agents/') ? 'agent' : file.includes('/skills/') ? 'skill' : 'unknown');
+
   // Apply metadata updates
   updateArtifactMetadata(file);
 
   runIntegration(inferredType);
-  
+
   const learningsPath = path.join(CLAUDE_DIR, 'context', 'memory', 'learnings.md');
   if (fs.existsSync(learningsPath)) {
-    fs.appendFileSync(learningsPath, `
+    fs.appendFileSync(
+      learningsPath,
+      `
 - Updated ${inferredType}: ${file} (${new Date().toISOString().split('T')[0]})
-`, 'utf8');
+`,
+      'utf8'
+    );
   }
 
   console.log(JSON.stringify({ ok: true, action: 'update', file, type: inferredType }, null, 2));

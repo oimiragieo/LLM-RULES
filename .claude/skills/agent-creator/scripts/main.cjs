@@ -102,17 +102,21 @@ function getOutputPath(name, category = 'domain') {
 }
 
 function updateRoutingTableKeywords(name, description) {
-  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-keywords.cjs');
+  const filePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'lib',
+    'routing',
+    'routing-table-intent-keywords.cjs'
+  );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
   if (content.includes(`'${name}':`)) return;
 
   // Simple heuristic: extract keywords from name and description
-  const keywords = Array.from(new Set([
-    name,
-    ...name.split('-'),
-    ...description.toLowerCase().match(/\b\w{4,}\b/g) || []
-  ])).slice(0, 10);
+  const keywords = Array.from(
+    new Set([name, ...name.split('-'), ...(description.toLowerCase().match(/\b\w{4,}\b/g) || [])])
+  ).slice(0, 10);
 
   const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\[/g, '[').replace(/\]/g, '],')},`;
   const insertionPoint = content.lastIndexOf('};');
@@ -123,7 +127,13 @@ function updateRoutingTableKeywords(name, description) {
 }
 
 function updateRoutingTableAgents(name) {
-  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-agents.cjs');
+  const filePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'lib',
+    'routing',
+    'routing-table-intent-agents.cjs'
+  );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
   if (content.includes(`'${name}':`)) return;
@@ -136,19 +146,22 @@ function updateRoutingTableAgents(name) {
   }
 }
 
-function updateClaudeMdRouting(name, category, description) {
+function updateClaudeMdRouting(name, category, _description) {
   const claudeMdPath = path.join(PROJECT_ROOT, '.claude', 'CLAUDE.md');
   if (!fs.existsSync(claudeMdPath)) return;
   let content = fs.readFileSync(claudeMdPath, 'utf8');
   if (content.includes(`\`${name}\``)) return;
 
-  const entry = `| ${name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ')} | \`${name}\` | \`.claude/agents/${category}/${name}.md\` |`;
+  const entry = `| ${name
+    .split('-')
+    .map(p => p[0].toUpperCase() + p.slice(1))
+    .join(' ')} | \`${name}\` | \`.claude/agents/${category}/${name}.md\` |`;
   const tableHeader = '## 3) AGENT ROUTING TABLE';
   const tableEnd = '### Creator Skills';
-  
+
   const startIdx = content.indexOf(tableHeader);
   const endIdx = content.indexOf(tableEnd, startIdx);
-  
+
   if (startIdx !== -1 && endIdx !== -1) {
     const tablePart = content.slice(startIdx, endIdx);
     const lines = tablePart.split('\n');
@@ -163,7 +176,13 @@ function updateClaudeMdRouting(name, category, description) {
 }
 
 function regenerateAgentRegistry() {
-  const scriptPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'generate-agent-registry.cjs');
+  const scriptPath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'tools',
+    'cli',
+    'generate-agent-registry.cjs'
+  );
   const { spawnSync } = require('node:child_process');
   spawnSync('node', [scriptPath], { windowsHide: true });
 }

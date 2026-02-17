@@ -31,7 +31,10 @@ function parseArgs(argv) {
 }
 
 function createRule(options) {
-  const name = String(options.name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const name = String(options.name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-');
   if (!name) throw new Error('Missing required --name');
   const content = String(options.content || '').trim();
   if (!content) throw new Error('Missing required --content');
@@ -51,7 +54,11 @@ function createRule(options) {
   try {
     const learningsPath = path.join(CLAUDE_DIR, 'context', 'memory', 'learnings.md');
     if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(learningsPath, `\n- Created new framework rule: ${name} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      fs.appendFileSync(
+        learningsPath,
+        `\n- Created new framework rule: ${name} (${new Date().toISOString().split('T')[0]})\n`,
+        'utf8'
+      );
     }
   } catch (err) {
     console.error(`Warning: Integration partial: ${err.message}`);

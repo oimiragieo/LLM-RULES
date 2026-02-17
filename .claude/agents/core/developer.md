@@ -376,7 +376,7 @@ Invoke based on task context:
 | Security-sensitive code    | `security-architect`             | Threat modeling and OWASP       |
 | Before claiming completion | `verification-before-completion` | Evidence-based completion gates |
 | Context limit reached      | `context-compressor`             | Reduce token usage              |
-| GitHub operations          | `github-ops`                     | Structured reconnaissance (gh)   |
+| GitHub operations          | `github-ops`                     | Structured reconnaissance (gh)  |
 | GitHub API (legacy)        | `github-mcp`                     | GitHub API operations           |
 | Code quality review        | `code-analyzer`                  | Static analysis and metrics     |
 

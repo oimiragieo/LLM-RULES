@@ -19,6 +19,7 @@ streaming: supported
 Provides structured guidance for repository reconnaissance using `gh api` and `gh search`.
 
 ## Overview
+
 Repository reconnaissance often fails when agents guess file paths or attempt to fetch large files blindly. This skill enforces a structured `Map -> Identify -> Fetch` sequence using the GitHub CLI to minimize token waste and improve reliability.
 
 ## ⚡ Essential Reconnaissance Commands
@@ -26,26 +27,31 @@ Repository reconnaissance often fails when agents guess file paths or attempt to
 Use these commands to understand a repository structure before fetching content.
 
 ### 1. List Repository Root
+
 ```bash
 gh api repos/{owner}/{repo}/contents --jq '.[].name'
 ```
 
 ### 2. List Specific Directory
+
 ```bash
 gh api repos/{owner}/{repo}/contents/{path} --jq '.[].name'
 ```
 
 ### 3. Fetch File Content (Base64 Decoded)
+
 ```bash
 gh api repos/{owner}/{repo}/contents/{path} --jq '.content' | base64 -d
 ```
 
 ### 4. Search for Pattern in Repository
+
 ```bash
 gh search code "{pattern}" --repo {owner}/{repo}
 ```
 
 ### 5. Get Repository Metadata
+
 ```bash
 gh repo view {owner}/{repo} --json description,stargazerCount,updatedAt
 ```
@@ -64,6 +70,7 @@ gh repo view {owner}/{repo} --json description,stargazerCount,updatedAt
 - Use native paths for any local storage.
 
 ## Assigned Agents
+
 - **artifact-integrator**: Lead agent for repository onboarding.
 - **developer**: PR management and exploration.
 
@@ -73,6 +80,7 @@ gh repo view {owner}/{repo} --json description,stargazerCount,updatedAt
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New pattern -> `.claude/context/memory/learnings.md`
 - Issue found -> `.claude/context/memory/issues.md`
 - Decision made -> `.claude/context/memory/decisions.md`

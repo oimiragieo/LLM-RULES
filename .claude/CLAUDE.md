@@ -306,19 +306,19 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 **Quick Routing (high-frequency):**
 
-| Task Type                    | Agent                |
-| ---------------------------- | -------------------- |
-| Bug fixes / implementation   | `developer`          |
-| Documentation updates        | `technical-writer`   |
-| Refactor/simplify            | `code-simplifier`    |
-| Code review / audit          | `code-reviewer`      |
-| Testing / QA / coverage      | `qa`                 |
-| Architecture / system design | `architect`          |
-| External Integration         | `artifact-integrator`| `.claude/agents/orchestrators/artifact-integrator.md` |
-| Security-sensitive work      | `security-architect` |
-| Infra / CI / deploy          | `devops`             |
-| Planning / decomposition     | `planner`            |
-| External research            | `researcher`         |
+| Task Type                    | Agent                 |
+| ---------------------------- | --------------------- | ----------------------------------------------------- |
+| Bug fixes / implementation   | `developer`           |
+| Documentation updates        | `technical-writer`    |
+| Refactor/simplify            | `code-simplifier`     |
+| Code review / audit          | `code-reviewer`       |
+| Testing / QA / coverage      | `qa`                  |
+| Architecture / system design | `architect`           |
+| External Integration         | `artifact-integrator` | `.claude/agents/orchestrators/artifact-integrator.md` |
+| Security-sensitive work      | `security-architect`  |
+| Infra / CI / deploy          | `devops`              |
+| Planning / decomposition     | `planner`             |
+| External research            | `researcher`          |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 

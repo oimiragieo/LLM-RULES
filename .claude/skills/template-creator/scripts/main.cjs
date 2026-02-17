@@ -31,9 +31,15 @@ function parseArgs(argv) {
 }
 
 function updateTemplateCatalog(name, category, purpose) {
-  const catalogPath = path.join(CLAUDE_DIR, 'context', 'artifacts', 'catalogs', 'template-catalog.md');
+  const catalogPath = path.join(
+    CLAUDE_DIR,
+    'context',
+    'artifacts',
+    'catalogs',
+    'template-catalog.md'
+  );
   if (!fs.existsSync(catalogPath)) return;
-  let content = fs.readFileSync(catalogPath, 'utf8');
+  const content = fs.readFileSync(catalogPath, 'utf8');
   if (content.includes(name)) return;
 
   const entry = `\n### ${name}.md\n\n| Field | Value |\n| --- | --- |\n| **Path** | \`.claude/templates/${category}/${name}.md\` |\n| **Category** | ${category.charAt(0).toUpperCase() + category.slice(1)} Templates |\n| **Status** | active |\n\n**Purpose:** ${purpose}\n`;
@@ -43,7 +49,7 @@ function updateTemplateCatalog(name, category, purpose) {
 function updateTemplatesReadme(name, category, useCase) {
   const readmePath = path.join(TEMPLATES_DIR, 'README.md');
   if (!fs.existsSync(readmePath)) return;
-  let content = fs.readFileSync(readmePath, 'utf8');
+  const content = fs.readFileSync(readmePath, 'utf8');
   if (content.includes(name)) return;
 
   const entry = `\n- \`${category}/${name}.md\`: ${useCase}\n`;
@@ -51,7 +57,10 @@ function updateTemplatesReadme(name, category, useCase) {
 }
 
 function createTemplate(options) {
-  const name = String(options.name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const name = String(options.name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-');
   if (!name) throw new Error('Missing required --name');
   const category = String(options.category || 'general').trim();
   const content = String(options.content || '# Template').trim();
@@ -59,7 +68,7 @@ function createTemplate(options) {
 
   const categoryDir = path.join(TEMPLATES_DIR, category);
   const templatePath = path.join(categoryDir, `${name}.md`);
-  
+
   if (fs.existsSync(templatePath)) {
     return { ok: true, status: 'exists', path: templatePath };
   }
@@ -73,7 +82,11 @@ function createTemplate(options) {
     updateTemplatesReadme(name, category, purpose);
     const learningsPath = path.join(CLAUDE_DIR, 'context', 'memory', 'learnings.md');
     if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(learningsPath, `\n- Created new template: ${category}/${name} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      fs.appendFileSync(
+        learningsPath,
+        `\n- Created new template: ${category}/${name} (${new Date().toISOString().split('T')[0]})\n`,
+        'utf8'
+      );
     }
   } catch (err) {
     console.error(`Warning: Integration partial: ${err.message}`);
@@ -85,7 +98,9 @@ function createTemplate(options) {
 function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help || Object.keys(options).length === 0) {
-    console.log('Template Creator CLI\nUsage: --name <name> --category <cat> --content <content> [--purpose <purpose>]');
+    console.log(
+      'Template Creator CLI\nUsage: --name <name> --category <cat> --content <content> [--purpose <purpose>]'
+    );
     return;
   }
 

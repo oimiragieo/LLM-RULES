@@ -31,18 +31,26 @@ function parseArgs(argv) {
 }
 
 function updateRoutingTableKeywords(name, description) {
-  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-keywords.cjs');
+  const filePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'lib',
+    'routing',
+    'routing-table-intent-keywords.cjs'
+  );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
   if (content.includes(`'${name}':`)) return;
 
-  const keywords = Array.from(new Set([
-    name,
-    ...name.split('-'),
-    'workflow',
-    'phased',
-    ...description.toLowerCase().match(/\b\w{4,}\b/g) || []
-  ])).slice(0, 10);
+  const keywords = Array.from(
+    new Set([
+      name,
+      ...name.split('-'),
+      'workflow',
+      'phased',
+      ...(description.toLowerCase().match(/\b\w{4,}\b/g) || []),
+    ])
+  ).slice(0, 10);
 
   const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
   const insertionPoint = content.lastIndexOf('};');
@@ -53,7 +61,13 @@ function updateRoutingTableKeywords(name, description) {
 }
 
 function updateRoutingTableAgents(name) {
-  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-agents.cjs');
+  const filePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'lib',
+    'routing',
+    'routing-table-intent-agents.cjs'
+  );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
   if (content.includes(`'${name}':`)) return;
@@ -72,7 +86,12 @@ function updateClaudeMdWorkflows(name, category, description) {
   let content = fs.readFileSync(claudeMdPath, 'utf8');
   if (content.includes(name)) return;
 
-  const entry = `\n### ${name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ')}\n\n**Path:** \`.claude/workflows/${category}/${name}.md\`\n\n**When to use:** ${description}\n`;
+  const entry = `\n### ${name
+    .split('-')
+    .map(p => p[0].toUpperCase() + p.slice(1))
+    .join(
+      ' '
+    )}\n\n**Path:** \`.claude/workflows/${category}/${name}.md\`\n\n**When to use:** ${description}\n`;
   const sectionHeader = '## 8.6 ENTERPRISE WORKFLOWS';
   const idx = content.indexOf(sectionHeader);
   if (idx !== -1) {
@@ -87,15 +106,21 @@ function updateClaudeMdWorkflows(name, category, description) {
 }
 
 function createWorkflow(options) {
-  const name = String(options.name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const name = String(options.name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-');
   if (!name) throw new Error('Missing required --name');
   const category = String(options.category || 'enterprise').trim();
   const description = String(options.description || 'Multi-agent workflow').trim();
-  const agents = String(options.agents || '').split(',').map(a => a.trim()).filter(Boolean);
+  const agents = String(options.agents || '')
+    .split(',')
+    .map(a => a.trim())
+    .filter(Boolean);
 
   const categoryDir = path.join(WORKFLOWS_DIR, category);
   const workflowPath = path.join(categoryDir, `${name}.md`);
-  
+
   if (fs.existsSync(workflowPath)) {
     return { ok: true, status: 'exists', path: workflowPath };
   }
@@ -111,7 +136,10 @@ ${agents.map(a => `  - ${a}`).join('\n')}
 tags: [workflow]
 ---
 
-# ${name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ')}
+# ${name
+    .split('-')
+    .map(p => p[0].toUpperCase() + p.slice(1))
+    .join(' ')}
 
 ${description}
 
@@ -130,7 +158,11 @@ ${description}
     updateRoutingTableAgents(name); // Workflows map to orchestrators
     const learningsPath = path.join(CLAUDE_DIR, 'context', 'memory', 'learnings.md');
     if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(learningsPath, `\n- Created new workflow: ${category}/${name} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      fs.appendFileSync(
+        learningsPath,
+        `\n- Created new workflow: ${category}/${name} (${new Date().toISOString().split('T')[0]})\n`,
+        'utf8'
+      );
     }
   } catch (err) {
     console.error(`Warning: Integration partial: ${err.message}`);
@@ -142,7 +174,9 @@ ${description}
 function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help || Object.keys(options).length === 0) {
-    console.log('Workflow Creator CLI\nUsage: --name <name> --category <cat> --description <desc> [--agents <agent1,agent2>]');
+    console.log(
+      'Workflow Creator CLI\nUsage: --name <name> --category <cat> --description <desc> [--agents <agent1,agent2>]'
+    );
     return;
   }
 

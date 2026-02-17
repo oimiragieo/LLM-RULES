@@ -259,11 +259,9 @@ function createActions(ctx) {
     let content = fs.readFileSync(filePath, 'utf8');
     if (content.includes(`'${name}':`)) return;
 
-    const keywords = Array.from(new Set([
-      name,
-      ...name.split('-'),
-      ...description.toLowerCase().match(/\b\w{4,}\b/g) || []
-    ])).slice(0, 10);
+    const keywords = Array.from(
+      new Set([name, ...name.split('-'), ...(description.toLowerCase().match(/\b\w{4,}\b/g) || [])])
+    ).slice(0, 10);
 
     const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
     const insertionPoint = content.lastIndexOf('};');
@@ -287,22 +285,28 @@ function createActions(ctx) {
     }
   }
 
-  function updateClaudeMdSkills(name, description) {
+  function updateClaudeMdSkills(name, _description) {
     const claudeMdPath = path.join(CLAUDE_DIR, 'CLAUDE.md');
     if (!fs.existsSync(claudeMdPath)) return;
     let content = fs.readFileSync(claudeMdPath, 'utf8');
     if (content.includes(`\`${name}\``)) return;
 
-    const sectionHeader = '## 8.5 WORKFLOW ENHANCEMENT SKILLS';
     const insertionPoint = content.indexOf('- `framework-context`');
     if (insertionPoint !== -1) {
-      content = content.slice(0, insertionPoint) + `- \`${name}\`\n` + content.slice(insertionPoint);
+      content =
+        content.slice(0, insertionPoint) + `- \`${name}\`\n` + content.slice(insertionPoint);
       fs.writeFileSync(claudeMdPath, content, 'utf8');
     }
   }
 
   function updateSkillCatalog(name, description, tools) {
-    const catalogPath = path.join(CLAUDE_DIR, 'context', 'artifacts', 'catalogs', 'skill-catalog.md');
+    const catalogPath = path.join(
+      CLAUDE_DIR,
+      'context',
+      'artifacts',
+      'catalogs',
+      'skill-catalog.md'
+    );
     if (!fs.existsSync(catalogPath)) return;
     let content = fs.readFileSync(catalogPath, 'utf8');
     if (content.includes(`\`${name}\``)) return;

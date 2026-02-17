@@ -84,7 +84,7 @@ function matchIntentFromKeywords(promptLower) {
     for (const phrase of phrases) {
       const kw = String(phrase || '').toLowerCase();
       if (!kw) continue;
-      
+
       // Use broad matching for URLs and technical patterns, word-boundary for others
       const isTechnical = kw.includes('.') || kw.includes('/') || kw.includes('://');
       if (isTechnical) {

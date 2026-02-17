@@ -85,7 +85,15 @@ const INTENT_PATTERNS = {
     weight: 10,
   },
   'artifact-integrator': {
-    keywords: ['github.com', 'repository', 'repo', 'external data', 'integrate repo', 'from url', 'onboard repo'],
+    keywords: [
+      'github.com',
+      'repository',
+      'repo',
+      'external data',
+      'integrate repo',
+      'from url',
+      'onboard repo',
+    ],
     agents: ['artifact-integrator', 'security-architect', 'planner'],
     weight: 10,
   },

@@ -43,7 +43,7 @@ function walk(dir, extension, out = []) {
 function auditArtifacts() {
   const skillFiles = walk(SKILLS_DIR, 'SKILL.md');
   const agentFiles = walk(AGENTS_DIR, '.md');
-  
+
   const unverified = [];
   const stale = [];
   const now = Date.now();
@@ -55,16 +55,19 @@ function auditArtifacts() {
       const content = fs.readFileSync(file, 'utf8');
       const isAgent = file.includes(path.sep + 'agents' + path.sep);
       const name = isAgent ? path.basename(file, '.md') : path.basename(path.dirname(file));
-      
+
       const verified = content.includes('verified: true');
       const lastVerifiedMatch = content.match(/lastVerifiedAt: (.*)/);
-      
+
       const label = `${isAgent ? '[AGENT]' : '[SKILL]'} ${name}`;
-      
+
       if (!verified) {
         unverified.push(label);
       } else if (lastVerifiedMatch) {
-        const lastVerifiedStr = lastVerifiedMatch[1].trim().split('\n')[0].replace(/[^-0-9T:Z.]/g, '');
+        const lastVerifiedStr = lastVerifiedMatch[1]
+          .trim()
+          .split('\n')[0]
+          .replace(/[^-0-9T:Z.]/g, '');
         const lastVerified = new Date(lastVerifiedStr).getTime();
         if (isNaN(lastVerified) || now - lastVerified > SIX_MONTHS_MS) {
           stale.push(label);

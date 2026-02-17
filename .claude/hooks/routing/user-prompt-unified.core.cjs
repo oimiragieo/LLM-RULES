@@ -818,13 +818,14 @@ function maybeAutoCompress(tokenStatus) {
 
   // PLATFORM AWARENESS INJECTION (Phase 4.3 Remediation)
   // Ensure all spawned agents are aware they are on Windows to prevent pathing loops.
-  const platformRule = '\n+======================================================================+\n' +
-                       '|  PLATFORM AWARENESS: YOU ARE ON WINDOWS                              |\n' +
-                       '+======================================================================+\n' +
-                       '|  1. USE NATIVE PATHS: Use C:/... instead of /c/...                   |\n' +
-                       '|  2. NO BASH REDIRECTION: Avoid cat > file. Use Write/Edit tools.     |\n' +
-                       '|  3. NO /tmp: Use the project temp dir provided in the prompt.         |\n' +
-                       '+======================================================================+\n';
+  const platformRule =
+    '\n+======================================================================+\n' +
+    '|  PLATFORM AWARENESS: YOU ARE ON WINDOWS                              |\n' +
+    '+======================================================================+\n' +
+    '|  1. USE NATIVE PATHS: Use C:/... instead of /c/...                   |\n' +
+    '|  2. NO BASH REDIRECTION: Avoid cat > file. Use Write/Edit tools.     |\n' +
+    '|  3. NO /tmp: Use the project temp dir provided in the prompt.         |\n' +
+    '+======================================================================+\n';
   routerState.saveStateWithRetry({ platformAwarenessRule: platformRule });
 
   return {
@@ -888,7 +889,10 @@ function maybeAutoCompress(tokenStatus) {
       }
     }
 
-    if (detectedIntent === 'artifact-integrator' && (agent.name === 'researcher' || agent.name === 'developer')) {
+    if (
+      detectedIntent === 'artifact-integrator' &&
+      (agent.name === 'researcher' || agent.name === 'developer')
+    ) {
       score -= 10; // Forced specialist-first for repo onboarding
     }
 
@@ -901,7 +905,7 @@ function maybeAutoCompress(tokenStatus) {
 
   // Filter out weak candidates if we have a clear winner (gap > 8)
   // This prevents spawning a second agent when one is clearly superior.
-  if (scores.length > 1 && (scores[0].score - scores[1].score) > 8) {
+  if (scores.length > 1 && scores[0].score - scores[1].score > 8) {
     return { candidates: [scores[0]], intent: detectedIntent };
   }
 

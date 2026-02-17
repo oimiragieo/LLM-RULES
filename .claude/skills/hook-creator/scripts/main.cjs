@@ -33,17 +33,17 @@ function parseArgs(argv) {
 function registerHookInSettings(name, category, type) {
   const settingsPath = path.join(CLAUDE_DIR, 'settings.json');
   if (!fs.existsSync(settingsPath)) return;
-  
+
   let settings;
   try {
     settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-  } catch (err) {
+  } catch (_err) {
     return;
   }
 
   const hookPath = `.claude/hooks/${category}/${name}.cjs`;
   if (!settings.hooks) settings.hooks = {};
-  
+
   let targetArray;
   if (type.toLowerCase().includes('pre')) {
     if (!settings.hooks['pre-tool']) settings.hooks['pre-tool'] = [];
@@ -62,15 +62,21 @@ function registerHookInSettings(name, category, type) {
 function updateHooksReadme(name, category, description) {
   const readmePath = path.join(HOOKS_DIR, 'README.md');
   if (!fs.existsSync(readmePath)) return;
-  let content = fs.readFileSync(readmePath, 'utf8');
+  const content = fs.readFileSync(readmePath, 'utf8');
   if (content.includes(name)) return;
 
-  const entry = `\n#### ${name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ')} (\`${name}.cjs\`)\n\n${description}\n`;
+  const entry = `\n#### ${name
+    .split('-')
+    .map(p => p[0].toUpperCase() + p.slice(1))
+    .join(' ')} (\`${name}.cjs\`)\n\n${description}\n`;
   fs.appendFileSync(readmePath, entry, 'utf8');
 }
 
 function createHook(options) {
-  const name = String(options.name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const name = String(options.name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-');
   if (!name) throw new Error('Missing required --name');
   const category = String(options.category || 'safety').trim();
   const type = String(options.type || 'PreToolUse').trim();
@@ -78,7 +84,7 @@ function createHook(options) {
 
   const hookDir = path.join(HOOKS_DIR, category);
   const hookPath = path.join(hookDir, `${name}.cjs`);
-  
+
   if (fs.existsSync(hookPath)) {
     return { ok: true, status: 'exists', path: hookPath };
   }
@@ -136,7 +142,11 @@ module.exports = { validate };
     updateHooksReadme(name, category, description);
     const learningsPath = path.join(CLAUDE_DIR, 'context', 'memory', 'learnings.md');
     if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(learningsPath, `\n- Created new hook: ${name} in ${category} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      fs.appendFileSync(
+        learningsPath,
+        `\n- Created new hook: ${name} in ${category} (${new Date().toISOString().split('T')[0]})\n`,
+        'utf8'
+      );
     }
   } catch (err) {
     console.error(`Warning: Integration partial: ${err.message}`);
@@ -148,7 +158,9 @@ module.exports = { validate };
 function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help || Object.keys(options).length === 0) {
-    console.log('Hook Creator CLI\nUsage: --name <name> --category <cat> --type <type> [--description <desc>]');
+    console.log(
+      'Hook Creator CLI\nUsage: --name <name> --category <cat> --type <type> [--description <desc>]'
+    );
     return;
   }
 

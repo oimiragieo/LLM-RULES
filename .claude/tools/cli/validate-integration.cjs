@@ -43,7 +43,6 @@ const SKILL_CATALOG_LEGACY = path.join(
   'artifacts',
   'skill-catalog.md'
 );
-const ROUTING_TABLE = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table.cjs');
 const ROUTING_DIR = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing');
 const EVOLUTION_STATE = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
 const LEARNINGS_MD = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');

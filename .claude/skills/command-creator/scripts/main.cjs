@@ -31,16 +31,20 @@ function parseArgs(argv) {
 }
 
 function updateRoutingTableKeywords(name, description) {
-  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-keywords.cjs');
+  const filePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'lib',
+    'routing',
+    'routing-table-intent-keywords.cjs'
+  );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
   if (content.includes(`'${name}':`)) return;
 
-  const keywords = Array.from(new Set([
-    name,
-    ...name.split('-'),
-    ...description.toLowerCase().match(/\b\w{4,}\b/g) || []
-  ])).slice(0, 10);
+  const keywords = Array.from(
+    new Set([name, ...name.split('-'), ...(description.toLowerCase().match(/\b\w{4,}\b/g) || [])])
+  ).slice(0, 10);
 
   const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
   const insertionPoint = content.lastIndexOf('};');
@@ -51,7 +55,13 @@ function updateRoutingTableKeywords(name, description) {
 }
 
 function updateRoutingTableAgents(name, skill) {
-  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-agents.cjs');
+  const filePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'lib',
+    'routing',
+    'routing-table-intent-agents.cjs'
+  );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
   if (content.includes(`'${name}':`)) return;
@@ -66,7 +76,13 @@ function updateRoutingTableAgents(name, skill) {
 }
 
 function updateCommandCatalog(name, description, skill) {
-  const catalogPath = path.join(CLAUDE_DIR, 'context', 'artifacts', 'catalogs', 'command-catalog.md');
+  const catalogPath = path.join(
+    CLAUDE_DIR,
+    'context',
+    'artifacts',
+    'catalogs',
+    'command-catalog.md'
+  );
   if (!fs.existsSync(catalogPath)) return;
   let content = fs.readFileSync(catalogPath, 'utf8');
   if (content.includes(`/${name}`)) return;
@@ -83,7 +99,10 @@ function updateCommandCatalog(name, description, skill) {
 }
 
 function createCommand(options) {
-  const name = String(options.name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const name = String(options.name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-');
   if (!name) throw new Error('Missing required --name');
   const skill = String(options.skill || '').trim();
   if (!skill) throw new Error('Missing required --skill');
@@ -115,7 +134,11 @@ Invoke the ${skill} skill and follow it exactly as presented to you
     updateRoutingTableAgents(name, skill);
     const learningsPath = path.join(CLAUDE_DIR, 'context', 'memory', 'learnings.md');
     if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(learningsPath, `\n- Created new command: /${name} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      fs.appendFileSync(
+        learningsPath,
+        `\n- Created new command: /${name} (${new Date().toISOString().split('T')[0]})\n`,
+        'utf8'
+      );
     }
   } catch (err) {
     console.error(`Warning: Integration partial: ${err.message}`);

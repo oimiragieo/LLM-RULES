@@ -290,11 +290,12 @@ describe('prompt-assembler', () => {
         'Should require pipefail for Bash fetch pipelines so upstream command failures are not masked'
       );
       assert.ok(
-        section.includes('gh api') && section.includes('--jq \'.content\''),
+        section.includes('gh api') && section.includes("--jq '.content'"),
         'Should include a canonical gh api content fetch pattern'
       );
       assert.ok(
-        section.includes('only fetch discovered paths') || section.includes('list directories first'),
+        section.includes('only fetch discovered paths') ||
+          section.includes('list directories first'),
         'Should require discovery-first path traversal to avoid speculative 404 fetch loops'
       );
     });

@@ -17,26 +17,33 @@ best_practices:
 Unified maintenance for all framework artifacts.
 
 ## Overview
+
 As the ecosystem evolves, artifacts drift from current standards. This skill provides a single point of entry for refreshing any artifact while ensuring all downstream registries and documentation remain in sync.
 
 ## Workflow
 
 ### Step 0: Existence Check
+
 ```bash
 test -f {{ARTIFACT_PATH}} && echo "EXISTS" || echo "NOT_FOUND"
 ```
 
 ### Step 1: Research
+
 Research best practices for the target domain if the update is complex.
 
 ### Step 2: Update
-Apply changes using `Edit` or `Write` tools. 
+
+Apply changes using `Edit` or `Write` tools.
 
 ### Step 3: Integrate
+
 Regenerate relevant registries:
+
 - Agent registry for agents
 - Skill index for skills
 - Command catalog for commands
 
 ## Memory Protocol (MANDATORY)
+
 Standard memory protocol applies.

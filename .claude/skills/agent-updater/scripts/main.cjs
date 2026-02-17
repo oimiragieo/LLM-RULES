@@ -81,18 +81,28 @@ function classifyRisk(changes) {
 function buildPatchPlan(target, agentName) {
   // POST-UPDATE INTEGRATION (Phase 4.3 Hardening)
   try {
-    const scriptPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'generate-agent-registry.cjs');
+    const scriptPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'tools',
+      'cli',
+      'generate-agent-registry.cjs'
+    );
     const { spawnSync } = require('node:child_process');
     spawnSync('node', [scriptPath], { windowsHide: true });
-    
+
     // Also sync routing keywords/agents if they exist
     if (agentName) {
       updateRoutingTableKeywords(agentName, ''); // Minimal refresh
     }
-    
+
     const learningsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
     if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(learningsPath, `\n- Refreshed agent: ${target} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      fs.appendFileSync(
+        learningsPath,
+        `\n- Refreshed agent: ${target} (${new Date().toISOString().split('T')[0]})\n`,
+        'utf8'
+      );
     }
   } catch (err) {
     console.error(`Warning: Post-update integration partial: ${err.message}`);
@@ -125,16 +135,19 @@ function buildPatchPlan(target, agentName) {
   };
 }
 
-function updateRoutingTableKeywords(name, description) {
-  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-keywords.cjs');
+function updateRoutingTableKeywords(name, _description) {
+  const filePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'lib',
+    'routing',
+    'routing-table-intent-keywords.cjs'
+  );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
   if (content.includes(`'${name}':`)) return;
 
-  const keywords = Array.from(new Set([
-    name,
-    ...name.split('-'),
-  ])).slice(0, 10);
+  const keywords = Array.from(new Set([name, ...name.split('-')])).slice(0, 10);
 
   const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
   const insertionPoint = content.lastIndexOf('};');
@@ -147,22 +160,22 @@ function updateRoutingTableKeywords(name, description) {
 function updateAgentMetadata(agentPath) {
   const absolutePath = path.join(PROJECT_ROOT, agentPath);
   if (!fs.existsSync(absolutePath)) return;
-  
+
   let content = fs.readFileSync(absolutePath, 'utf8');
   const now = new Date().toISOString();
-  
+
   if (content.includes('lastVerifiedAt:')) {
     content = content.replace(/lastVerifiedAt: .*/, `lastVerifiedAt: ${now}`);
   } else {
     content = content.replace(/---\n/, `---\nlastVerifiedAt: ${now}\n`);
   }
-  
+
   if (content.includes('verified:')) {
     content = content.replace(/verified: .*/, `verified: true`);
   } else {
     content = content.replace(/---\n/, `---\nverified: true\n`);
   }
-  
+
   fs.writeFileSync(absolutePath, content, 'utf8');
 }
 

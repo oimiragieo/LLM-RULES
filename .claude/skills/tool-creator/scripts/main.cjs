@@ -33,7 +33,7 @@ function parseArgs(argv) {
 function updateToolCatalog(name, description, category) {
   const catalogPath = path.join(CLAUDE_DIR, 'context', 'artifacts', 'catalogs', 'tool-catalog.md');
   if (!fs.existsSync(catalogPath)) return;
-  let content = fs.readFileSync(catalogPath, 'utf8');
+  const content = fs.readFileSync(catalogPath, 'utf8');
   if (content.includes(name)) return;
 
   const entry = `| ${name} | ${description} | .claude/tools/${category}/${name}.cjs | active |`;
@@ -42,7 +42,10 @@ function updateToolCatalog(name, description, category) {
 }
 
 function createTool(options) {
-  const name = String(options.name || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+  const name = String(options.name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-');
   if (!name) throw new Error('Missing required --name');
   const category = String(options.category || 'cli').trim();
   const description = String(options.description || 'CLI utility').trim();
@@ -50,7 +53,7 @@ function createTool(options) {
 
   const categoryDir = path.join(TOOLS_DIR, category);
   const toolPath = path.join(categoryDir, `${name}.cjs`);
-  
+
   if (fs.existsSync(toolPath)) {
     return { ok: true, status: 'exists', path: toolPath };
   }
@@ -61,7 +64,7 @@ function createTool(options) {
  */
 
 const main = async () => {
-  ${implementation || "// Implementation here"}
+  ${implementation || '// Implementation here'}
 };
 
 if (require.main === module) {
@@ -79,7 +82,11 @@ module.exports = { main };
     updateToolCatalog(name, description, category);
     const learningsPath = path.join(CLAUDE_DIR, 'context', 'memory', 'learnings.md');
     if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(learningsPath, `\n- Created new tool: ${category}/${name} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      fs.appendFileSync(
+        learningsPath,
+        `\n- Created new tool: ${category}/${name} (${new Date().toISOString().split('T')[0]})\n`,
+        'utf8'
+      );
     }
   } catch (err) {
     console.error(`Warning: Integration partial: ${err.message}`);
@@ -91,7 +98,9 @@ module.exports = { main };
 function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help || Object.keys(options).length === 0) {
-    console.log('Tool Creator CLI\nUsage: --name <name> --category <cat> --implementation <code> [--description <desc>]');
+    console.log(
+      'Tool Creator CLI\nUsage: --name <name> --category <cat> --implementation <code> [--description <desc>]'
+    );
     return;
   }
 

@@ -327,7 +327,7 @@ if (!success) {
 **Decision:**
 
 1. **Mandatory Reconnaissance Phase:** Agents MUST list directory contents using `gh api` before reading specific files.
-2. **Tiered Ingestion:** 
+2. **Tiered Ingestion:**
    - Tier 1: List root and core directories (metadata only).
    - Tier 2: Identify and read entrypoints (`README.md`, `package.json`, `gemini-extension.json`).
    - Tier 3: Targeted deep dive into logic files based on Tier 2 findings.
@@ -337,16 +337,19 @@ if (!success) {
 **Consequences:**
 
 **Positive:**
+
 - Eliminates "failure loops" from incorrect file path guesses.
 - Significantly reduces token usage during discovery phase.
 - Improves stability on Windows by enforcing native path patterns.
 - Higher success rate for `artifact-integrator` agent.
 
 **Negative:**
+
 - Requires one extra tool call (`gh api`) before reading files.
 - Agents must be trained/prompted to use the new `github-ops` skill.
 
 **Related:**
+
 - `github-ops` skill bundle
 - `artifact-integrator` specialized agent
 - `user-prompt-unified` Platform Awareness Rule

@@ -208,7 +208,16 @@ const DISAMBIGUATION_RULES = {
   // "researcher" could be researcher (general) or artifact-integrator (onboarding)
   researcher: [
     {
-      condition: ['github', 'repo', 'repository', 'integrate', 'onboard', 'ingest', 'github.com', 'https://'],
+      condition: [
+        'github',
+        'repo',
+        'repository',
+        'integrate',
+        'onboard',
+        'ingest',
+        'github.com',
+        'https://',
+      ],
       prefer: 'artifact-integrator',
       deprioritize: 'researcher',
     },
