@@ -41,7 +41,7 @@ flowchart TD
     B -->|No| E
     E --> F[Step 2: Classify Request]
     F --> G{Step 3: External Repo?}
-    G -->|Yes| H[External Integration Workflow]
+    G -->|Yes| H[Artifact Integrator Orchestrator]
     G -->|No| I[Step 4: Self-Check Gate]
     I -->|Violation| J[STOP - Spawn Agent]
     I -->|Pass| K[Step 5: Validate Tools]
@@ -97,6 +97,8 @@ flowchart TD
 ## Step 0.6: CREATION PREFLIGHT (Artifact Creation Requests)
 
 If request intent is artifact creation/evolution, run a preflight task before creator execution:
+
+**EXCEPTION**: Skip this step if **Step 3 (External Repository)** is detected. The `artifact-integrator` orchestrator handles its own security-first multi-agent pipeline (recon -> security audit -> planning).
 
 1. Spawn planner (or technical-program-manager for cross-team impact)
 2. Invoke:
@@ -190,15 +192,17 @@ TaskList();
 
 **Trigger Words**: "github", "repo", "repository", "clone", "integrate", "import codebase", "external code", "download", "git clone"
 
-**If detected**, classify as **Codebase Integration** request:
+**If detected**, classify as **Codebase Integration** request and spawn the **artifact-integrator** orchestrator:
 
 ```javascript
-// Route to codebase-integration skill
+// Route to artifact-integrator orchestrator
 Task({
   task_id: '{created-task-id}',
-  subagent_type: 'general-purpose',
-  description: 'Integrating external codebase',
-  prompt: `You are performing codebase integration.
+  subagent_type: 'artifact-integrator', // LEAD ORCHESTRATOR
+  model: 'opus',
+  run_in_background: true,
+  description: 'Orchestrating external codebase integration',
+  prompt: `You are the ARTIFACT-INTEGRATOR lead orchestrator.
 
 ## PROJECT CONTEXT
 PROJECT_ROOT: C:\\dev\\projects\\agent-studio
@@ -208,19 +212,23 @@ All file operations MUST be relative to PROJECT_ROOT.
 Integrate external codebase: {user request}
 
 ## Instructions
-1. Invoke codebase-integration skill: Skill({ skill: "codebase-integration" })
-2. Follow 8-phase workflow from skill
+1. Read your agent definition: .claude/agents/orchestrators/artifact-integrator.md
+2. Follow your security-first multi-agent pipeline:
+   - Phase 1: Recon (via github-ops)
+   - Phase 2: Audit (Spawn security-architect)
+   - Phase 3: Plan (Spawn planner)
+   - Phase 4: Implement (Spawn developer/specialists)
 3. MANDATORY: Update CLAUDE.md after integration
 4. Record learnings to .claude/context/memory/learnings.md
 
 ## Critical
-- Skill() tool invokes the skill (don't just read it)
-- CLAUDE.md MUST be updated (BLOCKING requirement)
+- You are the LEAD. Use Task() tool to spawn the team.
+- Security Audit is BLOCKING. Do not implement before audit passes.
 `,
 });
 ```
 
-**Why**: External code integration has special requirements (router updates, validation, structure preservation).
+**Why**: External code integration has high risk. The `artifact-integrator` enforces defense-in-depth via mandatory security reviews and task decomposition.
 
 ## Step 4: Self-Check Protocol (MANDATORY)
 

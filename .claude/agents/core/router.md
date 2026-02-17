@@ -127,20 +127,20 @@ Classify the request:
 
 **CRITICAL**: Complex tasks require multiple perspectives. Use this matrix:
 
-| Task Type                   | Primary Agent    | Required Review Agents        | Spawn Strategy  |
-| --------------------------- | ---------------- | ----------------------------- | --------------- |
-| Bug fix (simple)            | developer        | -                             | Single          |
-| Bug fix (security-related)  | developer        | security-architect            | Sequential      |
-| New feature                 | planner          | architect, security-architect | Parallel review |
-| Codebase integration        | planner          | architect, security-architect | Parallel review |
-| Architecture change         | architect        | security-architect            | Parallel        |
-| External API integration    | planner          | architect, security-architect | Parallel review |
-| Database changes            | planner          | architect                     | Parallel        |
-| Authentication/Auth changes | planner          | security-architect, architect | Parallel review |
-| Performance optimization    | architect        | developer                     | Sequential      |
-| Code review/audit           | architect        | security-architect            | Parallel        |
-| Refactoring (large)         | planner          | architect                     | Parallel review |
-| Documentation (new/update)  | technical-writer | -                             | Single          |
+| Task Type                   | Primary Agent       | Required Review Agents        | Spawn Strategy           |
+| --------------------------- | ------------------- | ----------------------------- | ------------------------ |
+| Bug fix (simple)            | developer           | -                             | Single                   |
+| Bug fix (security-related)  | developer           | security-architect            | Sequential               |
+| New feature                 | planner             | architect, security-architect | Parallel review          |
+| Codebase integration        | artifact-integrator | security-architect            | Background Orchestration |
+| Architecture change         | architect           | security-architect            | Parallel                 |
+| External API integration    | planner             | architect, security-architect | Parallel review          |
+| Database changes            | planner             | architect                     | Parallel                 |
+| Authentication/Auth changes | planner             | security-architect, architect | Parallel review          |
+| Performance optimization    | architect           | developer                     | Sequential               |
+| Code review/audit           | architect           | security-architect            | Parallel                 |
+| Refactoring (large)         | planner             | architect                     | Parallel review          |
+| Documentation (new/update)  | technical-writer    | -                             | Single                   |
 
 **Review Protocol for Planning Tasks**:
 
@@ -169,6 +169,22 @@ Classify the request:
 | `incident-responder` | `.claude/agents/specialized/incident-responder.md` | Production incidents |
 
 **Domain Agents:** Check `.claude/agents/domain/` for specialized agents.
+
+### Specialist-First Routing Law (IRON LAW)
+
+**Developer is the LAST RESORT.** If a specialist agent matches the task, the specialist MUST be used.
+
+| User Request             | WRONG      | CORRECT                   |
+| ------------------------ | ---------- | ------------------------- |
+| "update docs"            | developer  | **technical-writer**      |
+| "refactor/clean up"      | developer  | **code-simplifier**       |
+| "review code"            | developer  | **code-reviewer**         |
+| "run tests"              | developer  | **qa**                    |
+| "deploy/Docker/CI"       | developer  | **devops**                |
+| "design database"        | developer  | **database-architect**    |
+| "research/investigate"   | developer  | **researcher**            |
+| "integrate/onboard repo" | researcher | **artifact-integrator**   |
+| "debug production"       | developer  | **devops-troubleshooter** |
 
 ### Step 3: Spawn Agent(s) with Task Tool
 
@@ -425,10 +441,18 @@ Task({
 - Risk Level: HIGH (external code, potential security/architectural impact)
 - Target Agents: explore (parallel) → planner → architect + security-architect (review)
 
-[ROUTER] 🚀 Phase 1: Spawning EXPLORE agents for BOTH codebases (parallel)...
-[ROUTER] 🚀 Phase 2: Spawning PLANNER for integration plan...
-[ROUTER] 🚀 Phase 3: Spawning ARCHITECT and SECURITY-ARCHITECT for review (parallel)...
-[ROUTER] 🚀 Phase 4: Consolidating feedback into final plan...
+[ROUTER] 🚀 Phase 1: Spawning ARTIFACT-INTEGRATOR in background...
+```
+
+```javascript
+Task({
+  task_id: 'integrate-repo-1',
+  subagent_type: 'artifact-integrator',
+  model: 'opus',
+  run_in_background: true,
+  description: 'Orchestrating PowerShell integration',
+  prompt: '...',
+});
 ```
 
 This ensures external code is reviewed for:

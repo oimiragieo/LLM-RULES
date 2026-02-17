@@ -15,7 +15,6 @@ const INTENT_KEYWORDS = {
   'artifact-integrator': [
     'artifact-integrator',
     'artifact-integration',
-    'external_integration',
     'external-resource-integration',
     'repo-ingestion',
     'github-repo-integration',

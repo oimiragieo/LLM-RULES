@@ -18,6 +18,12 @@ const TEMPLATE_PATH = path.join(
   'templates',
   'agent-template.md'
 );
+const ORCHESTRATOR_REQUIRED_FILES = Object.freeze([
+  '.claude/CLAUDE.md',
+  '.claude/workflows/core/router-decision.md',
+  '.claude/workflows/core/ecosystem-creation-workflow.md',
+  '.claude/agents/core/router.md',
+]);
 
 function parseArgs(argv) {
   const options = {};
@@ -229,6 +235,13 @@ function generateAgent(options) {
     action: 'generate',
     outputPath,
     params,
+    orchestratorIntegration:
+      category === 'orchestrators'
+        ? {
+            requiredFiles: ORCHESTRATOR_REQUIRED_FILES,
+            note: 'Orchestrator creation requires synchronized routing/workflow documentation updates.',
+          }
+        : null,
   };
 }
 

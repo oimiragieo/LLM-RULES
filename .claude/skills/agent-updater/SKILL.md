@@ -51,6 +51,17 @@ If lifecycle expectations drift (research gate, enterprise bundle, validation ch
 6. Validate integration and regenerate agent registry if assignments changed.
 7. Record learnings and unresolved risks in memory.
 
+## Orchestrator Update Contract (MANDATORY)
+
+If the target agent is under `.claude/agents/orchestrators/`, the patch plan and execution MUST include synchronized updates to:
+
+- `.claude/CLAUDE.md`
+- `.claude/workflows/core/router-decision.md`
+- `.claude/workflows/core/ecosystem-creation-workflow.md`
+- `.claude/agents/core/router.md`
+
+Do not treat orchestrator updates as complete until all four files are checked and aligned with the new behavior.
+
 ## Exact Patch Plan Output (Required)
 
 Every run must output a structured patch plan with:

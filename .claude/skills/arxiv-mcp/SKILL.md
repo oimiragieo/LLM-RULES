@@ -168,7 +168,7 @@ search_query=cat:cs.LG+ANDNOT+ti:survey
 ### When NOT to Use arxiv-mcp
 
 - General web research → Use WebSearch/WebFetch instead
-- Implementation examples → Use Grep/Glob on codebase
+- Implementation examples → Use `pnpm search:code` or ripgrep skill on codebase (Grep/Glob as fallback)
 - Product research → Use WebSearch with news filter
 - Community discussions → Use WebSearch for forums/Stack Overflow
 

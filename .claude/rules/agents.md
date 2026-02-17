@@ -37,16 +37,17 @@ See `.claude/context/agent-registry.json` for full list of 59 agents.
 
 **Common Misrouting** (verify EVERY spawn):
 
-| User Request           | WRONG     | CORRECT                   |
-| ---------------------- | --------- | ------------------------- |
-| "update docs"          | developer | **technical-writer**      |
-| "refactor/clean up"    | developer | **code-simplifier**       |
-| "review code"          | developer | **code-reviewer**         |
-| "run tests"            | developer | **qa**                    |
-| "deploy/Docker/CI"     | developer | **devops**                |
-| "design database"      | developer | **database-architect**    |
-| "research/investigate" | developer | **researcher**            |
-| "debug production"     | developer | **devops-troubleshooter** |
+| User Request             | WRONG      | CORRECT                   |
+| ------------------------ | ---------- | ------------------------- |
+| "update docs"            | developer  | **technical-writer**      |
+| "refactor/clean up"      | developer  | **code-simplifier**       |
+| "review code"            | developer  | **code-reviewer**         |
+| "run tests"              | developer  | **qa**                    |
+| "deploy/Docker/CI"       | developer  | **devops**                |
+| "design database"        | developer  | **database-architect**    |
+| "research/investigate"   | developer  | **researcher**            |
+| "integrate repo/onboard" | researcher | **artifact-integrator**   |
+| "debug production"       | developer  | **devops-troubleshooter** |
 
 **Why**: 59 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
 

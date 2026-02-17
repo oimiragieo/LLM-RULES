@@ -96,6 +96,7 @@ const INTENT_PATTERNS = {
     ],
     agents: ['artifact-integrator', 'security-architect', 'planner'],
     weight: 10,
+    critical: true,
   },
 };
 
@@ -103,11 +104,13 @@ function detectIntent(text) {
   const normalized = text.toLowerCase();
   const detectedSignals = [];
   const suggestedAgents = new Set();
+  let isCritical = false;
 
   for (const [_intent, config] of Object.entries(INTENT_PATTERNS)) {
     for (const keyword of config.keywords) {
       if (normalized.includes(keyword.toLowerCase())) {
         detectedSignals.push(keyword);
+        if (config.critical) isCritical = true;
         for (const agent of config.agents) {
           suggestedAgents.add(agent);
         }
@@ -118,6 +121,7 @@ function detectIntent(text) {
   return {
     detectedSignals: [...new Set(detectedSignals)],
     suggestedAgents: Array.from(suggestedAgents),
+    isCritical,
   };
 }
 
@@ -208,7 +212,7 @@ function checkIntentAgentMatch(toolName, toolInput = {}) {
   const description = toolInput.description || '';
 
   const intentSignalText = getIntentSignalText(prompt, description);
-  const { detectedSignals, suggestedAgents } = detectIntent(intentSignalText);
+  const { detectedSignals, suggestedAgents, isCritical } = detectIntent(intentSignalText);
 
   if (!agentMatchesIntent(subagentType, suggestedAgents)) {
     const dedupe = registerBlockAttempt('intent-agent-match', `Task:${subagentType}`);
@@ -237,12 +241,14 @@ function checkIntentAgentMatch(toolName, toolInput = {}) {
           detectedSignals,
           suggestedAgents,
           spawnedAgent: subagentType,
+          isCritical,
         },
       });
     }
 
     const autoReroute = getIntentAutoRerouteConfig();
     if (
+      !isCritical &&
       shouldAutoReroute(enforcement, dedupe.count, autoReroute.threshold, autoReroute.enabledValue)
     ) {
       return {

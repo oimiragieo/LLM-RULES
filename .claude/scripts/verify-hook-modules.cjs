@@ -62,7 +62,7 @@ function crossReferenceSettings(projectRoot, settingsPath, results) {
 
   try {
     const settingsContent = fs.readFileSync(settingsPath, 'utf8');
-    const settings = safeParseJSON(settingsContent, null);
+    const settings = safeParseJSON(settingsContent, 'settings-json');
 
     results.settingsCheck.checked = true;
 
@@ -271,7 +271,13 @@ function main() {
   const args = process.argv.slice(2);
   const jsonMode = args.includes('--json');
 
-  const results = verifyHooks();
+  let projectRoot = process.cwd();
+  const rootIdx = args.indexOf('--projectRoot');
+  if (rootIdx !== -1 && args[rootIdx + 1]) {
+    projectRoot = path.resolve(args[rootIdx + 1]);
+  }
+
+  const results = verifyHooks({ projectRoot });
 
   if (jsonMode) {
     console.log(formatJsonReport(results));

@@ -16,6 +16,12 @@ function findProjectRoot() {
 
 const PROJECT_ROOT = findProjectRoot();
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
+const ORCHESTRATOR_REQUIRED_FILES = Object.freeze([
+  '.claude/CLAUDE.md',
+  '.claude/workflows/core/router-decision.md',
+  '.claude/workflows/core/ecosystem-creation-workflow.md',
+  '.claude/agents/core/router.md',
+]);
 
 function parseArgs(argv) {
   const options = {};
@@ -108,6 +114,9 @@ function buildPatchPlan(target, agentName) {
     console.error(`Warning: Post-update integration partial: ${err.message}`);
   }
 
+  const normalizedTarget = String(target || '').replace(/\\/g, '/');
+  const isOrchestrator = normalizedTarget.includes('/orchestrators/');
+
   return {
     objective:
       'Refresh agent prompt/frontmatter with explicit microtask ownership, search/token-saver policy, and regression-safe workflow alignment.',
@@ -132,6 +141,7 @@ function buildPatchPlan(target, agentName) {
       'pnpm validate:workflow-skill-contracts',
       'pnpm lint',
     ],
+    orchestratorRequiredFiles: isOrchestrator ? ORCHESTRATOR_REQUIRED_FILES : [],
   };
 }
 

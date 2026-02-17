@@ -75,10 +75,19 @@
     "orchestrate": "orchestration",
     "coordinate": "orchestration",
     "multi-agent": "orchestration",
-    "workflow": "orchestration"
+    "workflow": "orchestration",
+
+    "integrate": "artifact-integration",
+    "onboard": "artifact-integration",
+    "ingest": "artifact-integration",
+    "repository": "artifact-integration",
+    "repo": "artifact-integration",
+    "github.com": "artifact-integration",
+    "https://": "artifact-integration"
   },
 
   "defaultAgents": {
+    "artifact-integration": "artifact-integrator",
     "code-review": "code-reviewer",
     "implementation": "developer",
     "bug-fixing": "developer",
@@ -113,6 +122,7 @@
   "capabilityPriority": {
     "description": "When multiple capabilities match, use this priority order",
     "order": [
+      "artifact-integration",
       "security-review",
       "architecture-design",
       "code-review",

@@ -953,7 +953,7 @@ Follow the phased workflow in: .claude/workflows/core/skill-lifecycle.md
 
 Phase 1: Discovery - Check if k8s-deploy or similar skill exists
 Phase 2: Decision - CREATE or integrate existing
-Phase 3: Action - Invoke skill-creator
+Phase 3: Action - Invoke skill-creator via `Skill({ skill: 'skill-creator' })`
 Phase 4: Integration - Update registry, CLAUDE.md, assign to devops agent
 Phase 5: Validation - Test skill invocation and references
 
@@ -1040,3 +1040,8 @@ These rules are INVIOLABLE:
    - learnings.md for patterns
    - decisions.md for rationale
    - If not in memory, it didn't happen
+
+8. **TOOLS ARE NOT AGENTS**
+   - Creator/updater tools are **SKILLS**, not agents.
+   - Always use `Skill({ skill: 'name' })`.
+   - **NEVER** use `Task()` to spawn an agent type ending in `-creator` or `-updater`.

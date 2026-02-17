@@ -23,7 +23,7 @@ paths:
 
 **Don't Use:**
 
-- Exact text matching (use Grep instead)
+- Exact text matching (use ripgrep skill or `pnpm search:code` instead; Grep tool as last resort)
 - File name searches (use Glob instead)
 - Simple keyword searches (use ripgrep instead)
 

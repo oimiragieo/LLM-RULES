@@ -59,6 +59,7 @@ const {
   checkSpecialistOverride,
   checkTaskListFirstGate,
   checkCreatorIntentGuard,
+  checkSkillAgentConfused,
 } = require('./routing-guard-core.checks-task.cjs');
 const {
   INTENT_PATTERNS,
@@ -263,6 +264,17 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       };
     }
     captureWarn('creator-intent-guard', creatorCheck);
+
+    const skillAgentConfusedCheck = checkSkillAgentConfused(toolName, toolInput);
+    if (!skillAgentConfusedCheck.pass) {
+      return {
+        pass: false,
+        result: skillAgentConfusedCheck.result,
+        message: skillAgentConfusedCheck.message,
+        checkName: 'skill-agent-confusion',
+        warnings,
+      };
+    }
 
     const intentCheck = checkIntentAgentMatch(toolName, toolInput);
     if (!intentCheck.pass) {

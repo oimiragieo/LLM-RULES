@@ -203,7 +203,7 @@ Skill({
 
 - Do not use `Bash` tail/cat/find for large log inspection.
 - Use `Read` with explicit windows: `offset`/`limit` or `start_line`/`end_line`.
-- Use `Glob`/`Grep` to discover targets first, then bounded `Read`.
+- Use `pnpm search:code` or `Skill({ skill: 'ripgrep' })` to discover targets first, then bounded `Read`; use `Glob`/`Grep` only as fallback.
 - Scope all searches to workspace-relative paths; never traverse entire drives.
 
 **Tool Selection Guide:**

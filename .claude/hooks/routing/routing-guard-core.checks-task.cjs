@@ -435,6 +435,75 @@ function checkCreatorIntentGuard(toolName, toolInput = {}) {
   return { pass: true, result: 'warn', message };
 }
 
+function checkSkillAgentConfused(toolName, toolInput = {}) {
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const subagentType = String(toolInput.subagent_type || '').trim();
+  if (!subagentType) {
+    return { pass: true };
+  }
+
+  const skillNames = [
+    'agent-creator',
+    'skill-creator',
+    'hook-creator',
+    'workflow-creator',
+    'template-creator',
+    'schema-creator',
+    'tool-creator',
+    'command-creator',
+    'agent-updater',
+    'skill-updater',
+    'workflow-updater',
+    'artifact-updater',
+    'research-synthesis',
+    'github-ops',
+    'ripgrep',
+    'tdd',
+  ];
+
+  if (skillNames.includes(subagentType)) {
+    const message = `
++======================================================================+
+|  ROUTER-FIRST PROTOCOL VIOLATION                                     |
+|  SKILL-AGENT CONFUSION DETECTED                                      |
++======================================================================+
+|  Requested subagent_type: '${subagentType.padEnd(25)}'               |
+|                                                                      |
+|  '${subagentType}' is a SKILL, not an agent type.                    |
+|  You cannot spawn a skill via Task().                                |
+|                                                                      |
+|  CORRECT APPROACH:                                                   |
+|  1. Spawn a valid agent (e.g., 'developer' or 'general-purpose')     |
+|  2. That agent must invoke the skill via Skill():                    |
+|                                                                      |
+|  Skill({ skill: "${subagentType}" })                                 |
+|                                                                      |
++======================================================================+
+`;
+
+    const tracker = getViolationTracker();
+    if (tracker) {
+      tracker.recordViolation({
+        tool: 'Task',
+        action: 'blocked',
+        checkName: 'skill-agent-confusion',
+        routerMode: 'router',
+        sessionId: process.env.CLAUDE_SESSION_ID || 'unknown',
+        metadata: {
+          requestedType: subagentType,
+        },
+      });
+    }
+
+    return { pass: false, result: 'block', message };
+  }
+
+  return { pass: true };
+}
+
 module.exports = {
   checkPlannerFirst,
   checkTaskCreate,
@@ -444,4 +513,5 @@ module.exports = {
   checkSpecialistOverride,
   checkTaskListFirstGate,
   checkCreatorIntentGuard,
+  checkSkillAgentConfused,
 };

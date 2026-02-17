@@ -127,19 +127,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/routing/spawn-prompt-assembler.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/pre-task-unified.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/routing-guard.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/safety/spawn-prompt-validator.cjs"
+            "command": "node .claude/hooks/routing/task-pretool-orchestrator.cjs"
           }
         ]
       },

@@ -858,7 +858,7 @@ function maybeAutoCompress(tokenStatus) {
       let capabilityHits = 0;
       for (const word of promptWords) {
         if (word.length <= 3) continue;
-        if (agent.capabilityPhrases.some(phrase => phrase.includes(word) || phrase === word)) {
+        if (agent.capabilityPhrases.some(phrase => word.includes(phrase) || phrase === word)) {
           score += 1;
           capabilityHits += 1;
         }
@@ -873,7 +873,7 @@ function maybeAutoCompress(tokenStatus) {
 
     // MULTI-AGENT TEAM BOOST (Phase 4.4 Hardening)
     // If it's an external integration, we NEED the security architect and planner too.
-    if (detectedIntent === 'external_integration') {
+    if (detectedIntent === 'artifact-integrator') {
       if (['security-architect', 'planner'].includes(agent.name)) {
         score += 7; // Boost the support team
       }

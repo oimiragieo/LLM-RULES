@@ -92,3 +92,24 @@ test('agent-creator supports --generate/--validate style boolean actions', () =>
   });
   assert.equal(validated.ok, true);
 });
+
+test('agent-creator generate returns orchestrator integration checklist for orchestrator category', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-creator-orchestrator-'));
+  const outputPath = path.join(tmpDir, '.claude', 'agents', 'orchestrators', 'repo-onboarder.md');
+
+  const result = agentCreator.main({
+    action: 'generate',
+    name: 'repo-onboarder',
+    category: 'orchestrators',
+    description: 'Repository integration orchestrator',
+    output: outputPath,
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.orchestratorIntegration.requiredFiles, [
+    '.claude/CLAUDE.md',
+    '.claude/workflows/core/router-decision.md',
+    '.claude/workflows/core/ecosystem-creation-workflow.md',
+    '.claude/agents/core/router.md',
+  ]);
+});

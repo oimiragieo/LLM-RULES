@@ -4,6 +4,7 @@ version: 1.0.0
 description: >-
   Research and fact-finding specialist with web access and Exa tools. Use for external information gathering, best
   practice research, technology comparisons, fact-checking, and pre-creation research before building new artifacts.
+  DO NOT use for GitHub repository reconnaissance or onboarding; use the artifact-integrator orchestrator instead.
   Uses ripgrep for fast codebase research.
 model: sonnet
 temperature: 0.4

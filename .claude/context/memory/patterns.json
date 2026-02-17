@@ -2,6 +2,46 @@
   "version": 1,
   "patterns": [
     {
+      "id": "fail-fast-hook-orchestration",
+      "name": "Fail-Fast Hook Orchestration Pattern",
+      "context": "Task PreTool Orchestrator (Task #4, 2026-02-17) — task-pretool-orchestrator.cjs",
+      "description": "When chaining multiple PreToolUse hooks for a single tool event, a dedicated orchestrator hook enforces fail-fast policy: the first hook to return non-zero exit code halts the chain immediately. Later hooks cannot neutralize an earlier block decision. The orchestrator passes stdout of hook N as stdin to hook N+1, preserving context across the chain.",
+      "implementation": {
+        "orchestrator_responsibility": "Run child hooks in deterministic order via spawnSync. On non-zero exit, emit child's stdout and exit with same code. Do not run remaining hooks.",
+        "stdin_passing": "Capture stdout of hook N, pass as input to hook N+1 via spawnSync input option",
+        "missing_file_handling": "Fail-closed: if hook file does not exist, exit with code 2 (block). Never skip silently.",
+        "security_convention": "shell: false + windowsHide: true on all child spawnSync calls"
+      },
+      "security_test_contract": [
+        "First blocking hook decision must be final (subsequent hooks must not execute)",
+        "Must fail-closed on missing hook file (exit 2, not 0)"
+      ],
+      "applicability": "Any scenario requiring ordered execution of multiple PreToolUse/PostToolUse hooks where earlier blocks must not be overridden",
+      "benefits": [
+        "Prevents security bypasses via hook neutralization",
+        "Deterministic execution order (predictable for debugging)",
+        "Context propagation via stdin chain preserves hook output for consumers",
+        "Fail-closed on missing files (safer than fail-open)"
+      ],
+      "extracted_from": "Task #4 (2026-02-17) creation of .claude/hooks/routing/task-pretool-orchestrator.cjs",
+      "date": "2026-02-17"
+    },
+    {
+      "id": "agent-disambiguation-negative-routing",
+      "name": "Negative Routing Guidance in Agent Descriptions",
+      "context": "researcher.md and artifact-integrator.md update (Task #3, 2026-02-17) — routing confusion between researcher and artifact-integrator agents",
+      "description": "When two agents serve adjacent domains and cause routing confusion, adding explicit negative routing guidance ('DO NOT use for X; use Y instead') to agent description is more effective than positive-only description updates. This prevents the router from defaulting to a wrong agent for similar-sounding requests.",
+      "example": "researcher.md: 'DO NOT use for GitHub repository reconnaissance or onboarding; use the artifact-integrator orchestrator instead.'",
+      "applicability": "Any pair of agents where domain overlap causes routing ambiguity",
+      "benefits": [
+        "Explicit anti-pattern routing prevents systematic misrouting",
+        "Single agent definition change propagates to registry and routing table",
+        "Survives future routing table updates (embedded in authoritative source)"
+      ],
+      "extracted_from": "Task #3 (2026-02-17) agent description updates",
+      "date": "2026-02-17"
+    },
+    {
       "id": "commands-thin-delegator-pattern",
       "name": "Thin Delegator Pattern for Commands",
       "context": "Commands System Overhaul (Enterprise Pipeline #5, Tasks #83-86)",

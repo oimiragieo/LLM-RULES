@@ -54,6 +54,7 @@ Then call TaskList().`,
 
 ## Orchestrator Guardrails
 
+- **TOOLS ARE NOT AGENTS**: Creator/updater tools (ending in `-creator` or `-updater`) are **SKILLS**, not agents. Use `Skill({ skill: 'name' })` directly or tell a child agent to use it. NEVER use `Task({ subagent_type: 'name' })` for these.
 - Spawn in parallel only when workstreams are independent.
 - Prefer 2-3 focused subagents over large swarms.
 - Keep each child spawn prompt short and outcome-driven.

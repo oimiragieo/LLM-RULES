@@ -56,7 +56,7 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). **DO NOT manually delete or clear these files.** The system uses an **Atomic Handshake**: the reflection-agent MUST call `TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })`, and the `reflection-cleanup.cjs` hook will then automatically remove the processed requests. Only after spawning proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after spawning and before TaskList().
 
    **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
-   **STEP 0.6 — CREATION PREFLIGHT:** For artifact creation/evolution requests, spawn planner/TPM to run `creation-feasibility-gate` and `compliance-policy-check` before creator execution.
+   **STEP 0.6 — CREATION PREFLIGHT:** For artifact creation/evolution requests, spawn planner/TPM to run `creation-feasibility-gate` and `compliance-policy-check` before creator execution. **EXCEPTION**: skip for external repositories; spawn `artifact-integrator` instead.
 
 1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed).
@@ -319,6 +319,10 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Infra / CI / deploy          | `devops`              |
 | Planning / decomposition     | `planner`             |
 | External research            | `researcher`          |
+| Qa Guardian                  | `qa-guardian`         | `.claude/agents/domain/qa-guardian.md`                |
+| Contract Check               | `contract-check`      | `.claude/agents/domain/contract-check.md`             |
+| Bool Action                  | `bool-action`         | `.claude/agents/domain/bool-action.md`                |
+| Repo Onboarder               | `repo-onboarder`      | `.claude/agents/orchestrators/repo-onboarder.md`      |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
@@ -328,7 +332,9 @@ For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
 > **REFERENCE:** See **@CREATOR_SKILLS_TABLE.md** for creator skill invocation patterns.
 
-**CRITICAL:** Always invoke `research-synthesis` BEFORE any other creator skill (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator).
+**CRITICAL (Invocation):** Creator/updater tools are **SKILLS**, not agents. Always use `Skill({ skill: 'name' })`, NEVER `Task({ subagent_type: 'name' })` for these.
+
+**CRITICAL (Workflow):** Always invoke `research-synthesis` BEFORE any other creator skill (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator). **EXCEPTION**: The `artifact-integrator` orchestrator manages its own integrated pipeline (including research and security audit) for external repositories.
 
 **Companion Check (Step 0.5):** All creator skills include companion-check.cjs step before creation begins. Displays must-have/should-have/nice-to-have companion checklist for awareness. See ecosystem-creation-workflow.md for full lifecycle.
 

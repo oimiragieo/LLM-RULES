@@ -22,7 +22,8 @@ This workflow defines the end-to-end process for creating artifacts within the C
 
 - Router spawns appropriate creator agent
 - Creator type determined by artifact type and path pattern
-- Research-synthesis skill MUST be invoked first (research-first protocol)
+- **EXCEPTION**: For external repository integration, the `artifact-integrator` lead orchestrator is spawned. It handles its own research and security audit phases.
+- For all other internal creation, the Research-synthesis skill MUST be invoked first (research-first protocol).
 
 ### Phase 2: Research (research-synthesis skill)
 
@@ -86,9 +87,11 @@ This workflow defines the end-to-end process for creating artifacts within the C
 
 ### Phase 4: Creation (creator skill)
 
-**Creator Skill Invocation:**
+**Creator Tool Invocation (MANDATORY):**
 
-Agent invokes appropriate creator skill based on artifact type:
+Agent invokes appropriate creator skill using the `Skill()` tool.
+
+**CRITICAL**: Creator/updater tools are **SKILLS**, not agents. Always use `Skill({ skill: 'name' })`, NEVER `Task({ subagent_type: 'name' })` for these.
 
 - `skill-creator` → `.claude/skills/**/SKILL.md`
 - `agent-creator` → `.claude/agents/**/*.md`

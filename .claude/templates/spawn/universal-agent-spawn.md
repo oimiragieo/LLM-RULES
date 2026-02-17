@@ -23,7 +23,8 @@ Use this template for all non-orchestrator agents.
 1. `TaskList()` first.
 2. `TaskCreate(...)` to allocate IDs.
 3. `Task(...)` with matching `task_id`.
-4. Subagent does `TaskUpdate(in_progress)` first and `TaskUpdate(completed)` last.
+4. **TOOLS ARE NOT AGENTS**: Creator/updater tools (ending in `-creator` or `-updater`) are **SKILLS**, not agents. Use `Skill({ skill: 'name' })`, NEVER `Task({ subagent_type: 'name' })` for these.
+5. Subagent does `TaskUpdate(in_progress)` first and `TaskUpdate(completed)` last.
 
 ## Memory Tooling Protocol (Required)
 

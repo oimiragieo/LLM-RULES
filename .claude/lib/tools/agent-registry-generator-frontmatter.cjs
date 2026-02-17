@@ -157,6 +157,10 @@ function extractTriggerPhrases(agentDef, agentId) {
   const namePhrases = agentId.split('-').filter(p => p.length > 2);
   phrases.push(...namePhrases);
 
+  if (agentDef.triggerPhrases && Array.isArray(agentDef.triggerPhrases)) {
+    phrases.push(...agentDef.triggerPhrases.filter(Boolean).map(p => String(p).toLowerCase()));
+  }
+
   if (agentDef.description) {
     const actionWords =
       agentDef.description.match(

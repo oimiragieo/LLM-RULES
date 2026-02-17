@@ -1043,6 +1043,17 @@ Run this analysis after every agent creation:
    - Update Planning Orchestration Matrix for multi-agent patterns
 ```
 
+### Orchestrator Sync Contract (MANDATORY)
+
+If category is `orchestrators`, you MUST also update and verify all of the following files:
+
+- `.claude/CLAUDE.md`
+- `.claude/workflows/core/router-decision.md`
+- `.claude/workflows/core/ecosystem-creation-workflow.md`
+- `.claude/agents/core/router.md`
+
+Do not mark orchestrator creation complete until all four files reflect the new/updated orchestrator behavior.
+
 ### Example: Creating a "technical-writer" Agent
 
 ```

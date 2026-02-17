@@ -24,3 +24,18 @@ test('agent-updater recommends creator for missing target', () => {
   assert.equal(result.stage, 'resolve_target');
   assert.match(result.recommendation, /agent-creator/i);
 });
+
+test('agent-updater patch plan includes orchestrator routing docs when target is orchestrator', () => {
+  const result = agentUpdater.main({
+    agent: 'artifact-integrator',
+    changes: 'tighten routing and orchestration protocol',
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.patchPlan.orchestratorRequiredFiles, [
+    '.claude/CLAUDE.md',
+    '.claude/workflows/core/router-decision.md',
+    '.claude/workflows/core/ecosystem-creation-workflow.md',
+    '.claude/agents/core/router.md',
+  ]);
+});

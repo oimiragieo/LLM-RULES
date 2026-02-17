@@ -2,6 +2,61 @@
   "version": 1,
   "gotchas": [
     {
+      "id": "hook-created-not-wired-in-settings",
+      "gotcha": "Creating a hook file without immediately registering it in settings.json produces an invisible artifact — the hook has zero effect until wired",
+      "context": "task-pretool-orchestrator.cjs (Task #4, 2026-02-17) was created but not registered in settings.json",
+      "why_it_happens": "Developers create the implementation file and consider the task done. The settings.json registration step is separate and easy to forget, especially when completing a task quickly.",
+      "symptoms": "Hook file exists on disk and tests may pass, but the hook never executes because Claude Code reads the hook chain from settings.json at session startup.",
+      "trigger": "Creating any new .cjs hook file in .claude/hooks/ without checking settings.json for the corresponding PreToolUse/PostToolUse/UserPromptSubmit registration",
+      "solution": "Always add a settings.json registration entry immediately after creating a hook file. Pattern: create file → add entry to settings.json → restart session to activate.",
+      "detection_pattern": "Search settings.json for the hook filename. If zero results, the hook is unregistered.",
+      "prevention": [
+        "Include 'Add to settings.json' as explicit step in hook-creator workflow",
+        "Add settings-wiring.test.cjs assertion for new hooks (tests will catch unregistered hooks)",
+        "Create post-file-write check: verify hook path appears in settings.json"
+      ],
+      "extracted_from": "Batch reflection tasks #3-4 (2026-02-17) — task-pretool-orchestrator integration health 40%",
+      "date": "2026-02-17"
+    },
+    {
+      "id": "missing-taskupdate-metadata-recurring",
+      "gotcha": "Tasks completing without TaskUpdate summary metadata block reflection quality scoring and pattern extraction — CRITICAL systemic failure (12+ occurrences on 2026-02-17 alone; training-based approach permanently exhausted)",
+      "context": "Reflection of batch tasks #2, #1, #4 (2026-02-17 22:23-22:28); prior: tasks #3-4, #5-9, #13-16, #32-33; ghost task batches at 22:14 and 22:23",
+      "why_it_happens": "Agents completing short/fast tasks feel the task is 'too small to document'. The 70-line TaskUpdate warning box in spawn templates is insufficient enforcement. Training-based approaches have failed across 12+ confirmed sessions on 2026-02-17 alone.",
+      "symptoms": "Reflection spawn request contains: 'Task N completed without summary metadata'. Reflection agent cannot score output quality, extract patterns, or identify files modified. Router must manually update task status.",
+      "trigger": "Short tasks (completed in <5 minutes), TDD fix tasks, pipeline guard tasks, audit remediation tasks — any work that feels routine or quick",
+      "solution": "Implement hook-based enforcement: pre-completion-validation.cjs should check for non-empty metadata.summary before allowing status: completed. Override: COMPLETION_METADATA_ENFORCEMENT=warn|block|off. Training alone has failed 12+ times — hook enforcement is MANDATORY and non-negotiable.",
+      "minimum_viable_metadata": "{ summary: 'Fixed X in Y.cjs', filesModified: ['path/file.cjs'] } — even one line enables reflection scoring",
+      "prevention": [
+        "Add pre-completion hook (COMPLETION_METADATA_ENFORCEMENT=warn|block) — P0 priority, blocking all other work",
+        "Update spawn template: 'SHORT TASKS STILL NEED SUMMARY: summary: Fixed X in Y.cjs is sufficient'",
+        "Post-completion hook: auto-capture git diff --stat and attach to task context",
+        "Make TaskUpdate(completed) without summary a blocking error, not a warning"
+      ],
+      "impact": "CRITICAL - Reflection agent defaults to WARNING score (0.45) for all tasks without metadata, even if underlying work is high quality. Router stalls when tasks stay in_progress. 4+ tasks simultaneously stuck requiring manual intervention. 12+ occurrences on 2026-02-17 alone.",
+      "occurrence_count": 12,
+      "extracted_from": "Batch reflection tasks #1-2-4 (2026-02-17 22:23-22:28); escalated from 9+ prior occurrences",
+      "date": "2026-02-17"
+    },
+    {
+      "id": "ghost-task-reflection-echo",
+      "gotcha": "Reflection queue can re-trigger on task IDs previously identified as ghost tasks, creating a reflection echo loop",
+      "context": "2026-02-17 22:23 batch: Reflection 1 (task #2) was triggered AFTER the 22:14 batch had already identified task #2 as a ghost task. The re-trigger occurred because cleanup hook may not have cleared the ID before the next reflection spawn.",
+      "why_it_happens": "reflection-cleanup.cjs processes completed reflection-agent TaskUpdate calls and removes processedReflectionIds. However, if the ghost task IDs persist in reflection-spawn-request.json between reflection batches (e.g., due to partial cleanup or race condition), a new reflection-agent spawn picks them up again.",
+      "symptoms": "A reflection batch shows a task ID that was already documented as a ghost task in the immediately preceding reflection batch. The new batch cannot provide additional diagnostic value — it is a pure duplicate spawn.",
+      "trigger": "Ghost task completion events that are captured in reflection-spawn-request.json AND not fully cleared by reflection-cleanup.cjs before the next reflection-agent spawn",
+      "solution": "Add ghost-task deduplication to reflection-queue-processor.cjs: before spawning, check if any reflectionId in the pending batch was already processed (appears in reflection-log.jsonl processedReflectionIds) and has status 'ghost_task_detected'. If so, suppress spawn and log deduplication event.",
+      "detection_pattern": "Check reflection-log.jsonl for prior entries with same reflectionId before spawning new reflection-agent",
+      "prevention": [
+        "Add TaskGet validation at queue processing time — reject ghost tasks before they enter spawn queue",
+        "Add deduplication key to spawn-request.json entries (check against last N processedReflectionIds)",
+        "Implement REFLECTION_TASK_VALIDATION=warn|block enforcement mode in queue processor"
+      ],
+      "impact": "MEDIUM — wastes reflection-agent spawn budget on zero-value re-reflections; compounds context usage; inflates ghost-task occurrence counts artificially",
+      "extracted_from": "Batch reflection tasks #1-2-4 (2026-02-17 22:23-22:28) — identified ghost task echo on task #2",
+      "date": "2026-02-17"
+    },
+    {
       "id": "commands-not-creator-guarded",
       "gotcha": "Commands are NOT protected by unified-creator-guard.cjs (unlike skills, agents, hooks, templates)",
       "context": "Commands System security review (ADR-087 rationale)",
@@ -376,6 +431,35 @@
       ],
       "impact": "CRITICAL - Reflection agent defaults to WARNING score (0.45) for all tasks without metadata, even if underlying work is high quality. Router stalls when tasks stay in_progress. 4 tasks simultaneously stuck requiring manual intervention.",
       "extracted_from": "Reflection of tasks #5-9 (2026-02-17); escalated from tasks #32-33 (2026-02-17); pattern first documented in Task #19 reflection (2026-02-16)",
+      "date": "2026-02-17"
+    },
+    {
+      "id": "parallel-completion-timestamp-diagnostic",
+      "gotcha": "Two tasks completing within 260ms of each other with no metadata is a diagnostic signal for parallel spawning without TaskUpdate — not a timing coincidence",
+      "context": "Tasks #3 and #4 completed at 22:15:39Z and 22:15:40Z on 2026-02-17, 260ms apart, both without TaskUpdate metadata",
+      "why_it_happens": "Router spawns agents in parallel. Both agents complete their work but exit without calling TaskUpdate. Post-completion hook fires for both within milliseconds, creating twin reflection triggers.",
+      "symptoms": "Two reflection triggers appear in spawn-request.json with timestamps 200-500ms apart, both with 'context: null'",
+      "trigger": "Any parallel agent spawn where agents complete quickly without calling TaskUpdate",
+      "solution": "Use the timestamp gap as diagnostic: query git log for commits in the N-minute window around the completion timestamps. Commits will identify the agents and their work even without TaskUpdate metadata.",
+      "recovery_procedure": "1. Note the two completion timestamps (e.g., 22:15:39 and 22:15:40), 2. Run: git log --since='22:10' --until='22:20' --oneline --stat, 3. Match commit content to task IDs, 4. Use commit diff as proxy for TaskUpdate metadata",
+      "prevention": [
+        "pre-completion-validation.cjs hook (COMPLETION_METADATA_ENFORCEMENT=warn|block) — P0",
+        "Add post-completion evidence capture: write git diff --stat to task-completion-evidence/ at exit"
+      ],
+      "extracted_from": "Reflection of tasks #3 and #4 (2026-02-17T22:15:39-40Z batch)",
+      "date": "2026-02-17"
+    },
+    {
+      "id": "memory-as-reflection-fallback",
+      "gotcha": "When TaskUpdate metadata is absent, gotchas.json and patterns.json entries that reference the task ID can provide enough context for partial quality assessment — reflection-agent should query these before defaulting to evidence-unavailable",
+      "context": "Task #4 (2026-02-17) had no TaskUpdate metadata, but gotchas.json entry 'hook-created-not-wired-in-settings' and patterns.json entry 'fail-fast-hook-orchestration' both referenced 'Task #4, 2026-02-17' — enabling score recovery from 0.45 to 0.574",
+      "why_it_happens": "Agents write to gotchas.json/patterns.json during task execution (not just at completion). These writes survive even if the final TaskUpdate(completed) is never called.",
+      "trigger": "Any task where the agent wrote to memory files during execution but failed to call TaskUpdate(completed)",
+      "solution": "In reflection-agent Step 1 (Reflect/Data Ingestion): after TaskGet fails, grep gotchas.json and patterns.json for the task ID string. If entries exist, use them as partial metadata for scoring.",
+      "implementation_hint": "Grep pattern: taskId appears in 'context' fields and 'extracted_from' fields as 'Task #N, YYYY-MM-DD' or 'task-pretool-orchestrator.cjs (Task #N, YYYY-MM-DD)'",
+      "value_added": "Task 4: score recovery from 0.45 (default warning) to 0.574 (warning with partial evidence). Enables actionable integration health check that would otherwise be skipped.",
+      "prevention": "This is a feature, not a bug — but proper solution is still pre-completion-validation.cjs to capture TaskUpdate metadata before exit",
+      "extracted_from": "Reflection of tasks #3 and #4 (2026-02-17) — novel technique discovered during reflection",
       "date": "2026-02-17"
     }
   ]

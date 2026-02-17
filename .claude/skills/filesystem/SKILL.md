@@ -9,7 +9,7 @@ tools: [Read, Write, Edit, Bash, Glob, Grep]
 best_practices:
   - Use Read for file contents
   - Use Glob for file pattern matching
-  - Use Grep for content searching
+  - Use pnpm search:code or ripgrep skill for content searching; Grep tool is fallback-only
   - Use Edit for modifications
 error_handling: graceful
 streaming: supported
@@ -63,7 +63,9 @@ Common patterns:
 
 ### Searching Content
 
-**Grep Tool**: Search file contents
+**Primary Search**: Use `pnpm search:code "query"` or `Skill({ skill: 'ripgrep' })` for content searching. The built-in Grep tool is fallback-only.
+
+**Grep Tool**: Search file contents (fallback only — prefer `pnpm search:code` or ripgrep skill first)
 
 ```
 Grep pattern="function myFunc" path="/src"
@@ -142,7 +144,7 @@ Edit file_path="/src/file.ts" old_string="oldFunction" new_string="newFunction"
 
 1. **Read Before Edit**: Always read a file before editing it
 2. **Use Glob Over Bash**: Prefer Glob to `find` for file discovery
-3. **Use Grep Over Bash**: Prefer Grep to `grep` for searching
+3. **Search Tool Hierarchy**: Use `pnpm search:code` or `Skill({ skill: 'ripgrep' })` first; use the Grep tool as fallback over raw bash grep only
 4. **Parallel Reads**: Read multiple files in one message for speed
 5. **Verify Changes**: Read file after editing to verify
 

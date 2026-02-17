@@ -1055,6 +1055,39 @@ Rollback failed integration to restore framework to pre-integration state.
 });
 ```
 
+## Iron Laws of External Integration
+
+These rules are INVIOLABLE:
+
+1. **NO INTEGRATION WITHOUT ISOLATION**
+   - Always clone to temp directory first
+   - Never copy directly to framework without validation
+
+2. **NO INTEGRATION WITHOUT SECURITY REVIEW**
+   - All external code must be audited for malicious patterns
+   - Security-architect review is MANDATORY for medium/high risk
+
+3. **NO INTEGRATION WITHOUT ARCHITECT REVIEW**
+   - Structural alignment must be verified
+   - Naming conventions must be checked
+
+4. **TOOLS ARE NOT AGENTS**
+   - Creator/updater tools (ending in `-creator` or `-updater`) are **SKILLS**, not agents.
+   - Always use `Skill({ skill: 'name' })`.
+   - **NEVER** use `Task({ subagent_type: 'name' })` for these.
+
+5. **NO COMPLETION WITHOUT CLAUDE.MD UPDATE**
+   - Integrated artifacts must be documented in CLAUDE.md
+   - This is BLOCKING for Router visibility
+
+6. **NO SUCCESS WITHOUT VERIFICATION**
+   - Integration tests must pass
+   - Verify with grep and registry checks
+
+7. **ALWAYS PROVIDE ROLLBACK PLAN**
+   - Integration plan must include rollback procedure
+   - Execute rollback immediately on failure
+
 ## Related Workflows
 
 - **Codebase Integration Skill**: For integrating entire codebases, use `Skill({ skill: "codebase-integration" })`

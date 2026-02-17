@@ -49,6 +49,7 @@ const INTENT_TO_AGENT = {
   c4_container: 'c4-container',
   c4_context: 'c4-context',
   code_reviewer: 'code-reviewer',
+  'artifact-integrator': 'artifact-integrator',
   external_integration: 'artifact-integrator',
   artifact_integrator: 'artifact-integrator',
   code_simplifier: 'code-simplifier',

@@ -20,31 +20,14 @@ function listCommands(block) {
   return (block?.hooks || []).map(h => h.command).filter(Boolean);
 }
 
-test('PreToolUse Edit|Write|NotebookEdit includes unified-pre-write-hook', () => {
+test('PreToolUse Edit|Write|NotebookEdit includes write-pretool-bundle', () => {
   const block = findHookBlock('PreToolUse', 'Edit|Write|NotebookEdit');
   assert.ok(block, 'Expected PreToolUse block for Edit|Write|NotebookEdit');
 
   const commands = listCommands(block);
   assert.ok(
-    commands.includes('node .claude/hooks/safety/unified-pre-write-hook.cjs'),
-    'unified-pre-write-hook.cjs should be wired for Edit/Write/NotebookEdit'
-  );
-});
-
-test('PreToolUse Edit|Write|NotebookEdit runs agent template contract validator before unified pre-write', () => {
-  const block = findHookBlock('PreToolUse', 'Edit|Write|NotebookEdit');
-  assert.ok(block, 'Expected PreToolUse block for Edit|Write|NotebookEdit');
-
-  const commands = listCommands(block);
-  const contractIdx = commands.indexOf(
-    'node .claude/hooks/validation/agent-template-contract-validator.cjs'
-  );
-  const preWriteIdx = commands.indexOf('node .claude/hooks/safety/unified-pre-write-hook.cjs');
-  assert.ok(contractIdx !== -1, 'agent-template-contract-validator should be wired');
-  assert.ok(preWriteIdx !== -1, 'unified-pre-write-hook should be wired');
-  assert.ok(
-    contractIdx < preWriteIdx,
-    'agent-template-contract-validator should run before unified-pre-write-hook'
+    commands.includes('node .claude/hooks/safety/write-pretool-bundle.cjs'),
+    'write-pretool-bundle.cjs should be wired for Edit/Write/NotebookEdit'
   );
 });
 
