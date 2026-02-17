@@ -92,9 +92,9 @@ describe('recordAgentForCurrentPhaseIfActive', () => {
     writeWorkflowState(stateFile);
 
     // Act: call the helper
-    const {
-      recordAgentForCurrentPhaseIfActive,
-    } = require(`${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`);
+    const { recordAgentForCurrentPhaseIfActive } = require(
+      `${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`
+    );
 
     recordAgentForCurrentPhaseIfActive(
       PROJECT_ROOT,
@@ -125,9 +125,9 @@ describe('recordAgentForCurrentPhaseIfActive', () => {
     const nonExistent = path.join(tmp.dir, 'no-file.json');
 
     // Act + Assert: should not throw
-    const {
-      recordAgentForCurrentPhaseIfActive,
-    } = require(`${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`);
+    const { recordAgentForCurrentPhaseIfActive } = require(
+      `${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`
+    );
 
     assert.doesNotThrow(() => {
       recordAgentForCurrentPhaseIfActive(
@@ -152,9 +152,9 @@ describe('recordAgentForCurrentPhaseIfActive', () => {
     const _originalContent = fs.readFileSync(stateFile, 'utf8');
 
     // Act
-    const {
-      recordAgentForCurrentPhaseIfActive,
-    } = require(`${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`);
+    const { recordAgentForCurrentPhaseIfActive } = require(
+      `${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`
+    );
 
     recordAgentForCurrentPhaseIfActive(
       PROJECT_ROOT,
@@ -176,9 +176,9 @@ describe('recordAgentForCurrentPhaseIfActive', () => {
     writeWorkflowState(stateFile, { currentPhase: 'PHASE_0_TRIAGE' });
 
     // Act
-    const {
-      recordAgentForCurrentPhaseIfActive,
-    } = require(`${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`);
+    const { recordAgentForCurrentPhaseIfActive } = require(
+      `${PROJECT_ROOT}/.claude/lib/workflow/workflow-record-agent.cjs`
+    );
 
     recordAgentForCurrentPhaseIfActive(
       PROJECT_ROOT,

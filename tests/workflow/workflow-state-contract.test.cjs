@@ -57,8 +57,12 @@ describe('workflow-state-contract: schema round-trip', () => {
     const stateFile = path.join(tmp.dir, 'workflow-state.json');
 
     // Use createWorkflow to produce a valid state
-    const { createWorkflow } = require(`${PROJECT_ROOT}/.claude/lib/workflow/workflow-state-manager.cjs`);
-    const { readWorkflowStateFile } = require(`${PROJECT_ROOT}/.claude/lib/runtime/state-contracts.cjs`);
+    const { createWorkflow } = require(
+      `${PROJECT_ROOT}/.claude/lib/workflow/workflow-state-manager.cjs`
+    );
+    const { readWorkflowStateFile } = require(
+      `${PROJECT_ROOT}/.claude/lib/runtime/state-contracts.cjs`
+    );
 
     const workflowId = createWorkflow('round-trip test', 'LOW', stateFile);
 
@@ -69,7 +73,10 @@ describe('workflow-state-contract: schema round-trip', () => {
     const state = readWorkflowStateFile(stateFile, null);
 
     // Should not be null (schema validation must pass)
-    assert.ok(state !== null, 'readWorkflowStateFile should return non-null (schema validation passed)');
+    assert.ok(
+      state !== null,
+      'readWorkflowStateFile should return non-null (schema validation passed)'
+    );
 
     // Core required fields per schema: workflowId, currentPhase, phases
     assert.strictEqual(state.workflowId, workflowId, 'workflowId should match');
@@ -88,8 +95,12 @@ describe('workflow-state-contract: schema round-trip', () => {
   it('Test 1b: state written by createWorkflow passes schema: required fields present', () => {
     const stateFile = path.join(tmp.dir, 'workflow-state-b.json');
 
-    const { createWorkflow } = require(`${PROJECT_ROOT}/.claude/lib/workflow/workflow-state-manager.cjs`);
-    const { readWorkflowStateFile } = require(`${PROJECT_ROOT}/.claude/lib/runtime/state-contracts.cjs`);
+    const { createWorkflow } = require(
+      `${PROJECT_ROOT}/.claude/lib/workflow/workflow-state-manager.cjs`
+    );
+    const { readWorkflowStateFile } = require(
+      `${PROJECT_ROOT}/.claude/lib/runtime/state-contracts.cjs`
+    );
 
     createWorkflow('complexity test', 'MEDIUM', stateFile);
 
@@ -150,7 +161,9 @@ describe('workflow-state-contract: phase advance on agent completion', () => {
     // We use PHASE_2_IMPLEMENT -> PHASE_3_REVIEW because Gate 2 only checks that all agents
     // are marked completed (with no failing tests flag), whereas Gate 1 requires an
     // implementationPlan artifact file to exist on disk.
-    const { createWorkflow } = require(`${PROJECT_ROOT}/.claude/lib/workflow/workflow-state-manager.cjs`);
+    const { createWorkflow } = require(
+      `${PROJECT_ROOT}/.claude/lib/workflow/workflow-state-manager.cjs`
+    );
     const { atomicWriteJSONSync } = require(`${PROJECT_ROOT}/.claude/lib/utils/atomic-write.cjs`);
 
     const workflowId = createWorkflow('phase advance test', 'LOW', stateFile);
@@ -209,7 +222,11 @@ describe('workflow-state-contract: phase advance on agent completion', () => {
     const advance = JSON.parse(fs.readFileSync(phaseAdvanceFile, 'utf8'));
     assert.strictEqual(advance.workflowId, workflowId, 'phase-advance workflowId should match');
     assert.strictEqual(advance.advanceTo, 'PHASE_3_REVIEW', 'advanceTo should be PHASE_3_REVIEW');
-    assert.strictEqual(advance.previousPhase, 'PHASE_2_IMPLEMENT', 'previousPhase should be PHASE_2_IMPLEMENT');
+    assert.strictEqual(
+      advance.previousPhase,
+      'PHASE_2_IMPLEMENT',
+      'previousPhase should be PHASE_2_IMPLEMENT'
+    );
     assert.strictEqual(advance.gatePassed, true, 'gatePassed should be true');
     assert.ok(typeof advance.timestamp === 'string', 'timestamp should be a string');
   });

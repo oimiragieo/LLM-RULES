@@ -199,8 +199,12 @@ function buildReport(scanMeta, medusaFindings, manualFindings, filesScanned) {
 
   lines.push('## Notes');
   lines.push('');
-  lines.push('- This review intentionally avoids recursive `Glob` calls to prevent ripgrep timeout failures.');
-  lines.push('- Manual checks cover shell execution risk and unsafe parsing patterns in high-value framework paths.');
+  lines.push(
+    '- This review intentionally avoids recursive `Glob` calls to prevent ripgrep timeout failures.'
+  );
+  lines.push(
+    '- Manual checks cover shell execution risk and unsafe parsing patterns in high-value framework paths.'
+  );
   lines.push('');
 
   return lines.join('\n');

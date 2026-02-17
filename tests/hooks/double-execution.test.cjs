@@ -33,14 +33,10 @@ describe('UserPromptSubmit hook double-execution prevention', () => {
     const orchestratorSrc = fs.readFileSync(orchestratorPath, 'utf8');
 
     // Extract HOOK_ORDER paths from orchestrator source
-    const hookOrderMatch = orchestratorSrc.match(
-      /const HOOK_ORDER = \[([\s\S]*?)\];/
-    );
+    const hookOrderMatch = orchestratorSrc.match(/const HOOK_ORDER = \[([\s\S]*?)\];/);
     assert.ok(hookOrderMatch, 'Should find HOOK_ORDER array in orchestrator');
 
-    const hookPaths = hookOrderMatch[1]
-      .match(/'([^']+\.cjs)'/g)
-      .map(s => s.replace(/'/g, ''));
+    const hookPaths = hookOrderMatch[1].match(/'([^']+\.cjs)'/g).map(s => s.replace(/'/g, ''));
 
     // Get all UserPromptSubmit hook commands from settings.json
     const userPromptHooks = settings.hooks?.UserPromptSubmit || [];

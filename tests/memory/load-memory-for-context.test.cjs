@@ -64,9 +64,13 @@ describe('loadMemoryForContext – semantic search off', () => {
 
   it('returns gotchas and patterns arrays without throwing', () => {
     // Clear require cache so env var takes effect
-    const corePath = require.resolve(path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core.cjs'));
+    const corePath = require.resolve(
+      path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core.cjs')
+    );
     delete require.cache[corePath];
-    const implPath = require.resolve(path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core-impl.cjs'));
+    const implPath = require.resolve(
+      path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core-impl.cjs')
+    );
     delete require.cache[implPath];
     delete require.cache[managerPath];
 
@@ -107,7 +111,9 @@ describe('loadMemoryForContext – no DB, file-based fallback', () => {
 
   it('returns the gotcha entry from file when DB is absent, without throwing', () => {
     // Clear module cache so a fresh ContextualMemory is created with temp root
-    const ctxMemPath = require.resolve(path.resolve(PROJECT_ROOT, '.claude/lib/memory/contextual-memory.cjs'));
+    const ctxMemPath = require.resolve(
+      path.resolve(PROJECT_ROOT, '.claude/lib/memory/contextual-memory.cjs')
+    );
     delete require.cache[ctxMemPath];
 
     let result;
@@ -147,9 +153,13 @@ describe('formatMemoryAsMarkdown – semantic off returns string', () => {
   });
 
   it('returns a non-empty string and does not throw', () => {
-    const corePath = require.resolve(path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core.cjs'));
+    const corePath = require.resolve(
+      path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core.cjs')
+    );
     delete require.cache[corePath];
-    const implPath = require.resolve(path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core-impl.cjs'));
+    const implPath = require.resolve(
+      path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-manager-core-impl.cjs')
+    );
     delete require.cache[implPath];
     delete require.cache[managerPath];
 

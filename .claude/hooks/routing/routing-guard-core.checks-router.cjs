@@ -125,9 +125,20 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     const primaryCommand = extractPrimaryShellCommand(command);
     const isDiscovery =
       typeof command === 'string' &&
-      ['find', 'ls', 'grep', 'stat', 'head', 'tail', 'cat', 'wc', 'sort', 'uniq', 'du', 'df'].includes(
-        primaryCommand
-      ) &&
+      [
+        'find',
+        'ls',
+        'grep',
+        'stat',
+        'head',
+        'tail',
+        'cat',
+        'wc',
+        'sort',
+        'uniq',
+        'du',
+        'df',
+      ].includes(primaryCommand) &&
       !/>>|>/.test(command); // No redirection
 
     const message =

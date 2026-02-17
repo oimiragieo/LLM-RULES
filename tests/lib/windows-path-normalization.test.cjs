@@ -58,9 +58,9 @@ describe('Windows path normalization', () => {
         'utf8'
       );
       // Both filePath assignments (success and error paths) should normalize
-      const filePathLines = src.split('\n').filter(
-        line => line.includes('filePath:') && line.includes('path.relative')
-      );
+      const filePathLines = src
+        .split('\n')
+        .filter(line => line.includes('filePath:') && line.includes('path.relative'));
       for (const line of filePathLines) {
         assert.ok(
           line.includes('replace'),

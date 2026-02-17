@@ -103,13 +103,13 @@ medusa scan . --format sarif --scanners ai-context
 
 The skill uses helper scripts located at `.claude/skills/medusa-security/scripts/`:
 
-| Script                  | Purpose                              |
-| ----------------------- | ------------------------------------ |
-| `sarif-parser.cjs`      | Parses SARIF v2.1.0 output           |
-| `json-parser.cjs`       | Parses Medusa JSON output            |
-| `finding-formatter.cjs` | Formats findings with OWASP mapping  |
-| `main.cjs`              | Orchestrates the full pipeline       |
-| `cli-wrapper.cjs`       | Wraps Medusa CLI invocation          |
+| Script                  | Purpose                                         |
+| ----------------------- | ----------------------------------------------- |
+| `sarif-parser.cjs`      | Parses SARIF v2.1.0 output                      |
+| `json-parser.cjs`       | Parses Medusa JSON output                       |
+| `finding-formatter.cjs` | Formats findings with OWASP mapping             |
+| `main.cjs`              | Orchestrates the full pipeline                  |
+| `cli-wrapper.cjs`       | Wraps Medusa CLI invocation                     |
 | `security-review.cjs`   | Deterministic report writer (no Glob recursion) |
 
 ### Using the Pipeline
@@ -158,20 +158,20 @@ Findings are automatically mapped to:
 
 ## Severity Triage
 
-| Severity | Action               | Timeline         |
-| -------- | -------------------- | ---------------- |
-| CRITICAL | Immediate fix        | Before any merge |
-| HIGH     | Fix before release   | Same sprint      |
-| MEDIUM   | Fix in next sprint   | Next cycle       |
-| LOW      | Track and address    | Backlog          |
+| Severity | Action             | Timeline         |
+| -------- | ------------------ | ---------------- |
+| CRITICAL | Immediate fix      | Before any merge |
+| HIGH     | Fix before release | Same sprint      |
+| MEDIUM   | Fix in next sprint | Next cycle       |
+| LOW      | Track and address  | Backlog          |
 
 ## Agent Integration
 
-| Agent                | Usage                                                     |
-| -------------------- | --------------------------------------------------------- |
-| `security-architect` | Primary consumer. Use for comprehensive security reviews. |
-| `penetration-tester` | Use for targeted vulnerability scanning with authorization.|
-| `code-reviewer`      | Use AI-only scan as part of code review workflow.         |
+| Agent                | Usage                                                       |
+| -------------------- | ----------------------------------------------------------- |
+| `security-architect` | Primary consumer. Use for comprehensive security reviews.   |
+| `penetration-tester` | Use for targeted vulnerability scanning with authorization. |
+| `code-reviewer`      | Use AI-only scan as part of code review workflow.           |
 
 ## CI/CD Integration
 

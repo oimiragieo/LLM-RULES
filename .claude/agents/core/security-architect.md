@@ -13,7 +13,8 @@ maxTurns: 18
 permissionMode: default
 priority: high
 extended_thinking: true
-tools: [Read, Write, Edit, Glob, Grep, Bash, WebSearch, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  [Read, Write, Edit, Glob, Grep, Bash, WebSearch, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
   - auth-security-expert

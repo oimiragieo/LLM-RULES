@@ -103,17 +103,13 @@ function recordAgentForCurrentPhaseIfActive(projectRoot, agentInfo, stateFilePat
     }).catch(err => {
       // Swallow: workflow state errors must never block agent spawning
       if (process.env.WORKFLOW_RECORD_AGENT_DEBUG === 'true') {
-        process.stderr.write(
-          `[workflow-record-agent] lock error: ${err && err.message}\n`
-        );
+        process.stderr.write(`[workflow-record-agent] lock error: ${err && err.message}\n`);
       }
     });
   } catch (err) {
     // Swallow all errors — bad workflow state must never block spawning
     if (process.env.WORKFLOW_RECORD_AGENT_DEBUG === 'true') {
-      process.stderr.write(
-        `[workflow-record-agent] error: ${err && err.message}\n`
-      );
+      process.stderr.write(`[workflow-record-agent] error: ${err && err.message}\n`);
     }
   }
 }

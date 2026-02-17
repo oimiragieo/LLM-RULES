@@ -37,13 +37,8 @@ const PROTECTED_BRANCHES = new Set([
   'staging',
 ]);
 
-const BLOCKED_CHECKOUT_RESET_PATH_PREFIXES = [
-  'tests/fixtures/',
-  '.claude/context/memory/',
-];
-const BLOCKED_CHECKOUT_RESET_PATH_EXACT = new Set([
-  '.claude/context/agent-registry.json',
-]);
+const BLOCKED_CHECKOUT_RESET_PATH_PREFIXES = ['tests/fixtures/', '.claude/context/memory/'];
+const BLOCKED_CHECKOUT_RESET_PATH_EXACT = new Set(['.claude/context/agent-registry.json']);
 
 /**
  * Parse a command string into tokens, handling quotes.

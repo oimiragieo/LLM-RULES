@@ -254,7 +254,8 @@ function pruneCodebaseMap(projectRoot = PROJECT_ROOT) {
   const newDiscoveredFiles = {};
   for (const entry of entries) {
     const { path: entryPath, _accessDate, ...info } = entry;
-    if (info.description) info.description = _sanitizeMapField(info.description, 'description', entryPath);
+    if (info.description)
+      info.description = _sanitizeMapField(info.description, 'description', entryPath);
     if (info.category) info.category = _sanitizeMapField(info.category, 'category', entryPath);
     newDiscoveredFiles[entryPath] = info;
   }
@@ -280,7 +281,10 @@ function _countLoadedItems(result) {
 }
 
 function _recordReadOp(started, projectRoot) {
-  recordMemoryOperation({ kind: 'read', ok: true, readLatencyMs: Date.now() - started }, projectRoot);
+  recordMemoryOperation(
+    { kind: 'read', ok: true, readLatencyMs: Date.now() - started },
+    projectRoot
+  );
 }
 
 function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
@@ -288,8 +292,15 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
   validateProjectRoot(projectRoot);
   const { ContextualMemory } = require('./contextual-memory.cjs');
   const memory = new ContextualMemory({ projectRoot });
-  const result = memory.loadContextSync({ maxItems: CONFIG.MAX_ITEMS, maxChars: CONFIG.MAX_CONTEXT_CHARS });
-  emitMemoryQueriedEvent({ query: 'context:loadMemoryForContext', results: _countLoadedItems(result), latency: Date.now() - started });
+  const result = memory.loadContextSync({
+    maxItems: CONFIG.MAX_ITEMS,
+    maxChars: CONFIG.MAX_CONTEXT_CHARS,
+  });
+  emitMemoryQueriedEvent({
+    query: 'context:loadMemoryForContext',
+    results: _countLoadedItems(result),
+    latency: Date.now() - started,
+  });
   _recordReadOp(started, projectRoot);
   return result;
 }
@@ -299,8 +310,15 @@ async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
   validateProjectRoot(projectRoot);
   const { ContextualMemory } = require('./contextual-memory.cjs');
   const memory = new ContextualMemory({ projectRoot });
-  const result = await memory.loadContext({ maxItems: CONFIG.MAX_ITEMS, maxChars: CONFIG.MAX_CONTEXT_CHARS });
-  emitMemoryQueriedEvent({ query: 'context:loadMemoryForContextAsync', results: _countLoadedItems(result), latency: Date.now() - started });
+  const result = await memory.loadContext({
+    maxItems: CONFIG.MAX_ITEMS,
+    maxChars: CONFIG.MAX_CONTEXT_CHARS,
+  });
+  emitMemoryQueriedEvent({
+    query: 'context:loadMemoryForContextAsync',
+    results: _countLoadedItems(result),
+    latency: Date.now() - started,
+  });
   _recordReadOp(started, projectRoot);
   return result;
 }
@@ -316,7 +334,9 @@ async function readMemoryAsync(file) {
 
 async function atomicWriteAsync(filePath, data) {
   const previous = asyncWriteQueue.get(filePath) || Promise.resolve();
-  const queued = previous.catch(() => {}).then(() => atomicWriteAsyncWithLock(filePath, data, 'utf8'));
+  const queued = previous
+    .catch(() => {})
+    .then(() => atomicWriteAsyncWithLock(filePath, data, 'utf8'));
   asyncWriteQueue.set(filePath, queued);
   try {
     await queued;
@@ -343,7 +363,10 @@ async function recordPatternAsync(pattern, projectRoot = PROJECT_ROOT) {
 
 function formatMemoryAsMarkdown(projectRoot = PROJECT_ROOT) {
   const memory = loadMemoryForContext(projectRoot);
-  const sections = ['# Project Memory Context\n', '_Loaded with read-time truncation for context efficiency_\n'];
+  const sections = [
+    '# Project Memory Context\n',
+    '_Loaded with read-time truncation for context efficiency_\n',
+  ];
 
   if (memory.gotchas.length > 0) {
     sections.push('## Gotchas (Pitfalls to Avoid)\n');
@@ -380,7 +403,8 @@ async function _callContextualMemory(method, args) {
     memory.close();
     return results;
   } catch (err) {
-    if (process.env.MEMORY_DEBUG) logger.error(`ContextualMemory ${method} failed`, { error: err.message });
+    if (process.env.MEMORY_DEBUG)
+      logger.error(`ContextualMemory ${method} failed`, { error: err.message });
     return [];
   }
 }
@@ -419,11 +443,17 @@ async function forgetMemoryByQuery(query, options = {}, projectRoot = PROJECT_RO
     return !area || entry.area === storage.normalizeArea(area);
   };
 
-  for (const [file, label] of [[gotchasFile, 'gotchas'], [patternsFile, 'patterns']]) {
+  for (const [file, label] of [
+    [gotchasFile, 'gotchas'],
+    [patternsFile, 'patterns'],
+  ]) {
     const entries = storage.loadMemoryArray(file);
     const changed = storage.normalizeEntryIds(entries);
     const kept = entries.filter(entry => {
-      if (removeByText(entry)) { ids.add(storage.buildEntryId(entry)); return false; }
+      if (removeByText(entry)) {
+        ids.add(storage.buildEntryId(entry));
+        return false;
+      }
       return true;
     });
     if (changed || kept.length !== entries.length) storage.writeMemoryArray(file, kept);

@@ -78,10 +78,11 @@ describe('quality-gates: Gate 1 (Design -> Implement) artifacts contract', () =>
     );
 
     // Must mention implementation plan in some blocking message
-    const hasMsg = result.blocking.some(
-      (msg) => msg.toLowerCase().includes('implementation plan')
+    const hasMsg = result.blocking.some(msg => msg.toLowerCase().includes('implementation plan'));
+    assert.ok(
+      hasMsg,
+      `blocking messages should mention "implementation plan"; got: ${JSON.stringify(result.blocking)}`
     );
-    assert.ok(hasMsg, `blocking messages should mention "implementation plan"; got: ${JSON.stringify(result.blocking)}`);
   });
 
   it('Test 2: passes when implementationPlan path is set and file exists', () => {
@@ -113,9 +114,10 @@ describe('quality-gates: Gate 1 (Design -> Implement) artifacts contract', () =>
       'blocking array should be non-empty'
     );
 
-    const hasMsg = result.blocking.some(
-      (msg) => msg.toLowerCase().includes('implementation plan')
+    const hasMsg = result.blocking.some(msg => msg.toLowerCase().includes('implementation plan'));
+    assert.ok(
+      hasMsg,
+      `blocking messages should mention "implementation plan"; got: ${JSON.stringify(result.blocking)}`
     );
-    assert.ok(hasMsg, `blocking messages should mention "implementation plan"; got: ${JSON.stringify(result.blocking)}`);
   });
 });

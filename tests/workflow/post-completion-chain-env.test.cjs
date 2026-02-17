@@ -48,9 +48,7 @@ function buildWorkflowStateWithAgent(stateFile, taskId) {
   const { createWorkflow } = require(
     `${PROJECT_ROOT}/.claude/lib/workflow/workflow-state-manager.cjs`
   );
-  const { atomicWriteJSONSync } = require(
-    `${PROJECT_ROOT}/.claude/lib/utils/atomic-write.cjs`
-  );
+  const { atomicWriteJSONSync } = require(`${PROJECT_ROOT}/.claude/lib/utils/atomic-write.cjs`);
 
   const workflowId = createWorkflow('env-path-test', 'LOW', stateFile);
 
@@ -83,9 +81,7 @@ function requireFreshChain() {
 
   // Also clear the shared path-helper module if it exists
   try {
-    const helperPath = require.resolve(
-      `${PROJECT_ROOT}/.claude/lib/utils/workflow-paths.cjs`
-    );
+    const helperPath = require.resolve(`${PROJECT_ROOT}/.claude/lib/utils/workflow-paths.cjs`);
     delete require.cache[helperPath];
   } catch (_e) {
     // not yet created – that's fine
@@ -154,7 +150,10 @@ describe('post-completion-chain: WORKFLOW_STATE_FILE env resolution', () => {
     await processTaskCompletion(makeHookData(taskId));
 
     // Assert: the state file at the env-var path is updated
-    assert.ok(fs.existsSync(stateFile), 'workflow-state.json must exist at WORKFLOW_STATE_FILE path');
+    assert.ok(
+      fs.existsSync(stateFile),
+      'workflow-state.json must exist at WORKFLOW_STATE_FILE path'
+    );
 
     const saved = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
     assert.strictEqual(
@@ -171,10 +170,7 @@ describe('post-completion-chain: WORKFLOW_STATE_FILE env resolution', () => {
       'runtime',
       'workflow-state.json'
     );
-    assert.ok(
-      stateFile !== cwdStatePath,
-      'stateFile path must differ from cwd-based default path'
-    );
+    assert.ok(stateFile !== cwdStatePath, 'stateFile path must differ from cwd-based default path');
     // The cwd-based default path must NOT have been written to
     if (fs.existsSync(cwdStatePath)) {
       const cwdSaved = JSON.parse(fs.readFileSync(cwdStatePath, 'utf8'));
@@ -197,7 +193,11 @@ describe('post-completion-chain: WORKFLOW_STATE_FILE env resolution', () => {
     );
 
     const advance = JSON.parse(fs.readFileSync(phaseAdvanceFile, 'utf8'));
-    assert.strictEqual(advance.advanceTo, 'PHASE_3_REVIEW', 'phase-advance should target PHASE_3_REVIEW');
+    assert.strictEqual(
+      advance.advanceTo,
+      'PHASE_3_REVIEW',
+      'phase-advance should target PHASE_3_REVIEW'
+    );
   });
 });
 
@@ -245,9 +245,7 @@ describe('post-completion-chain: dynamic path resolution (env set after module l
     );
     delete require.cache[chainPath];
     try {
-      const helperPath = require.resolve(
-        `${PROJECT_ROOT}/.claude/lib/utils/workflow-paths.cjs`
-      );
+      const helperPath = require.resolve(`${PROJECT_ROOT}/.claude/lib/utils/workflow-paths.cjs`);
       delete require.cache[helperPath];
     } catch (_e) {
       // not yet created – fine
@@ -331,7 +329,11 @@ describe('post-completion-chain: different cwd does not affect path resolution',
     buildWorkflowStateWithAgent(stateFile, taskId);
 
     // cwd is now tmp.dir (not project root)
-    assert.notStrictEqual(process.cwd(), PROJECT_ROOT, 'cwd must differ from project root for this test');
+    assert.notStrictEqual(
+      process.cwd(),
+      PROJECT_ROOT,
+      'cwd must differ from project root for this test'
+    );
 
     const { processTaskCompletion } = requireFreshChain();
 
@@ -339,7 +341,10 @@ describe('post-completion-chain: different cwd does not affect path resolution',
     await processTaskCompletion(makeHookData(taskId));
 
     // Assert: state file was updated correctly despite wrong cwd
-    assert.ok(fs.existsSync(stateFile), 'workflow-state.json must exist at WORKFLOW_STATE_FILE path');
+    assert.ok(
+      fs.existsSync(stateFile),
+      'workflow-state.json must exist at WORKFLOW_STATE_FILE path'
+    );
 
     const saved = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
     assert.strictEqual(
@@ -355,6 +360,10 @@ describe('post-completion-chain: different cwd does not affect path resolution',
     );
 
     const advance = JSON.parse(fs.readFileSync(phaseAdvanceFile, 'utf8'));
-    assert.strictEqual(advance.advanceTo, 'PHASE_3_REVIEW', 'phase-advance should target PHASE_3_REVIEW');
+    assert.strictEqual(
+      advance.advanceTo,
+      'PHASE_3_REVIEW',
+      'phase-advance should target PHASE_3_REVIEW'
+    );
   });
 });

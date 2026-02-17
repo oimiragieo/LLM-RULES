@@ -42,10 +42,7 @@ function runHook(hookPath, input) {
 // Bug C-3: pre-completion-validation.cjs
 // ---------------------------------------------------------------------------
 describe('pre-completion-validation exit codes (C-3)', () => {
-  const HOOK = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/validation/pre-completion-validation.cjs'
-  );
+  const HOOK = path.join(PROJECT_ROOT, '.claude/hooks/validation/pre-completion-validation.cjs');
 
   it('exits 2 when TaskUpdate has invalid status (block decision)', () => {
     // TASK_STATUS_ENFORCEMENT=block is the default.
@@ -95,10 +92,7 @@ describe('pre-completion-validation exit codes (C-3)', () => {
 // Bug C-4: bash-pretool-bundle.cjs
 // ---------------------------------------------------------------------------
 describe('bash-pretool-bundle exit codes (C-4)', () => {
-  const HOOK = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/safety/bash-pretool-bundle.cjs'
-  );
+  const HOOK = path.join(PROJECT_ROOT, '.claude/hooks/safety/bash-pretool-bundle.cjs');
 
   it('exits 2 (not 1) when a sub-hook fails to run (res.error path)', () => {
     // We can test the internal error path by checking the exported main function

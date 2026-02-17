@@ -135,6 +135,7 @@
 ## Codebase Audit Remediation — Session Insights (2026-02-16)
 
 ### Task
+
 Comprehensive security and quality audit across 5 commits: shell-injection validator fix, cloud-skill command injection, JSON parsing safety, memory sanitization, missing mkdir, dead npm scripts, memory chain refactor, and atomic state-file writes.
 
 ### Outcome: SUCCESS — All 5 commits landed cleanly
@@ -144,30 +145,35 @@ Comprehensive security and quality audit across 5 commits: shell-injection valid
 ### Patterns Discovered
 
 **Pattern: Shell-injection validator must have a stdin entrypoint to actually validate**
+
 - Applies to: Any hook registered as subprocess validator that receives tool input via stdin
 - Example: `.claude/hooks/safety/shell-injection-validator.cjs` — had the validation logic but no `process.stdin` read loop; the validator never ran
 - Fix: Add `process.stdin.on('data', ...)` entrypoint that parses hook JSON and calls internal validate() function
 - Severity signal: CVSS 9.1 — a validator with no entry point is identical to no validator at all
 
 **Pattern: `shell:true` in skill scripts is a CRITICAL injection vector**
+
 - Applies to: Any Node.js `spawn`/`exec` that passes untrusted arguments to a shell
 - Files: `aws-cloud-ops/scripts/main.cjs`, `gcloud-cli/scripts/main.cjs`, `kubernetes-flux/scripts/main.cjs`
 - Fix: Change `spawn(cmd, { shell: true })` to `spawn(cmd, args, { shell: false })` where args is an array
 - Reuse: Search for `shell: true` in `.claude/skills/**/*.cjs` periodically as new skills are added
 
 **Pattern: `JSON.parse()` on hook input is a prototype pollution and crash vector**
+
 - Applies to: Any hook or monitoring script that parses stdin or file-based JSON
 - File: `.claude/hooks/monitoring/slo-alert-gate.cjs`
 - Fix: Replace `JSON.parse(raw)` with `safeParseJSON(raw, fallback)` from `.claude/lib/utils/safe-json.cjs`
 - The utility strips `__proto__`, `constructor`, `prototype` keys and returns `{ success, data, error }` instead of throwing
 
 **Pattern: Delegation chain flattening reduces maintenance surface**
+
 - Applies to: Modules with 3+ levels of delegation (core → core-impl → core-ops)
 - File: `.claude/lib/memory/memory-manager-core.cjs` — merged `core-impl.cjs` (183 LOC) and `core-ops.cjs` (544 LOC) directly into core
 - Benefit: 4-hop call chain reduced to 2-hop; single file to read/edit; no cross-file dependency drift
 - When NOT to flatten: When files exceed 500 LOC and cyclomatic complexity is high — extract helpers instead
 
 **Pattern: Atomic writes required for any hook that writes runtime state files**
+
 - Applies to: Hooks writing to `.claude/context/runtime/*.json` when multiple hooks may run concurrently
 - Files fixed: `force-step0-execution.cjs`, `reflection-step0-guard.cjs`, `agent-registry-auto-refresh.cjs`, `pre-task-unified-state.cjs`
 - Fix: Replace `fs.writeFileSync(path, JSON.stringify(data))` with `atomicWriteJSONSync(path, data)` from existing utility
@@ -178,24 +184,29 @@ Comprehensive security and quality audit across 5 commits: shell-injection valid
 ### Gotchas Discovered
 
 **Gotcha: Wave 1 report files overwritten by read-safety hook placeholders**
+
 - Trigger: Read-safety hook intercepts file read on paths it considers protected and writes a placeholder; subsequent writes to the same path get placeholder content instead of the actual report
 - Solution: Write reports to a temp path first, then move; or check that the path is not in the safety hook's protected-paths list before reporting
 - Impact: Lost initial Wave 1 results; needed multiple revert rounds
 
 **Gotcha: Haiku agents go off-scope more than sonnet agents**
+
 - Trigger: Using `haiku` model for tasks that require tight scope discipline (security fixes, targeted file edits)
 - Observation: Haiku agents deleted test fixtures and modified unrelated files during remediation
 - Solution: Use `sonnet` for security/audit tasks; reserve `haiku` for read-only analysis and low-risk reporting
 
 **Gotcha: Agents re-modify reverted files in subsequent spawns**
+
 - Trigger: Router reverts a file change; same agent type spawned again picks up the pre-revert state from memory or re-derives the same change from context
 - Solution: After reverting, update task description to explicitly list forbidden paths for follow-up agents; use `owned_paths`/`forbidden_paths` microtask metadata
 
 **Gotcha: `git add -A` after agent work can stage unintended deletions**
+
 - Trigger: Router runs `git add -A` to stage everything after agent completes; agent may have deleted files it shouldn't have
 - Solution: Always use `git add <specific-file>` for targeted staging; run `git diff --cached --stat` before committing to verify scope
 
 **Gotcha: ESLint 500-line limit blocks merges if refactors create large files**
+
 - Trigger: Merging two satellite files into a core file pushes line count past ESLint `max-lines` threshold; lint fails; commit blocked
 - Solution: Plan helper extraction BEFORE merge; split pure-function helpers into separate files first; then merge the delegation layer
 - Observed on: `memory-manager-core.cjs` after Phase 2 merge
@@ -205,11 +216,13 @@ Comprehensive security and quality audit across 5 commits: shell-injection valid
 ### Approach Analysis
 
 **What Worked**
+
 - Targeted per-file commits with explicit scope in commit message — reviewers and future agents can bisect cleanly
 - Using existing `atomicWriteJSONSync` utility rather than implementing locking from scratch — zero new dependencies
 - Verifying the shell-injection validator fix with a test invocation before committing — confirmed stdin loop was exercised
 
 **What Failed**
+
 - Trying to consolidate memory satellite files in one pass — files were too large, ESLint blocked; required splitting into two commits (Phase 1 + Phase 2)
 - Trusting agent "success" reports without checking `git diff --stat` — agents reported completion but had made out-of-scope changes
 

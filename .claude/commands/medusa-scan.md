@@ -1,6 +1,7 @@
 ---
 disable-model-invocation: true
 ---
+
 Invoke the `medusa-security` skill and run the deterministic review entry point:
 
 ```bash

@@ -49,7 +49,10 @@ function cleanupRoot(dir) {
 // ---------------------------------------------------------------------------
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const hookCorePath = path.resolve(PROJECT_ROOT, '.claude/hooks/routing/user-prompt-unified.core.cjs');
+const hookCorePath = path.resolve(
+  PROJECT_ROOT,
+  '.claude/hooks/routing/user-prompt-unified.core.cjs'
+);
 const memoryTiersPath = path.resolve(PROJECT_ROOT, '.claude/lib/memory/memory-tiers.cjs');
 
 // ---------------------------------------------------------------------------
@@ -78,7 +81,14 @@ describe('STM update on UserPromptSubmit', () => {
   });
 
   it('writes session_current.json after runAllChecks', async () => {
-    const stmFile = path.join(tempRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json');
+    const stmFile = path.join(
+      tempRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
+    );
 
     // File should not exist yet
     assert.equal(fs.existsSync(stmFile), false, 'STM file must not exist before hook runs');
@@ -176,7 +186,14 @@ describe('STM updated_at advances on subsequent prompts', () => {
   });
 
   it('updated_at is later on second prompt', async () => {
-    const stmFile = path.join(tempRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json');
+    const stmFile = path.join(
+      tempRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
+    );
 
     await hookCore.runAllChecks(
       { session_id: 'test-session-003', prompt: 'First prompt in the session' },
