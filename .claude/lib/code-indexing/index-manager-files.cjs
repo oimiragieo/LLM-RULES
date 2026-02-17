@@ -128,6 +128,7 @@ async function saveCheckpoint(options, filesProcessed, totalFiles, totalChunks) 
     '.claude/context/code-index/checkpoint.json'
   );
 
+  await fs.mkdir(path.dirname(checkpointPath), { recursive: true });
   await fs.writeFile(
     checkpointPath,
     JSON.stringify({
