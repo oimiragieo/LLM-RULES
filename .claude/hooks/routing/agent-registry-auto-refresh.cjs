@@ -12,6 +12,7 @@ const {
   formatResult,
 } = require('../../lib/utils/hook-input.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
 const STAMP_PATH = path.join(
   PROJECT_ROOT,
@@ -54,8 +55,7 @@ function readLastRunMs() {
 
 function writeLastRunMs(nowMs) {
   try {
-    fs.mkdirSync(path.dirname(STAMP_PATH), { recursive: true });
-    fs.writeFileSync(STAMP_PATH, JSON.stringify({ lastRunMs: nowMs }, null, 2));
+    atomicWriteJSONSync(STAMP_PATH, { lastRunMs: nowMs });
   } catch (_err) {
     // Non-blocking best effort.
   }

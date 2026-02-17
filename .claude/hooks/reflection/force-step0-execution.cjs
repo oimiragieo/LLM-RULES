@@ -26,6 +26,7 @@ const { readSpawnRequestsFile } = require('../../lib/reflection/spawn-request-co
 const {
   buildStep0ReminderMessage,
 } = require('../../lib/reflection/reflection-reminder-message.cjs');
+const { atomicWriteSync } = require('../../lib/utils/atomic-write.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
@@ -114,9 +115,8 @@ function logToSpawnLog(event) {
 
 function writeReminderFile(pendingCount) {
   try {
-    fs.mkdirSync(RUNTIME_DIR, { recursive: true });
     const content = buildStep0ReminderMessage(pendingCount);
-    fs.writeFileSync(REMINDER_PATH, content, 'utf8');
+    atomicWriteSync(REMINDER_PATH, content, 'utf8');
   } catch (err) {
     stderrLog('warn', 'Failed to write reflection reminder file', { error: err.message });
   }

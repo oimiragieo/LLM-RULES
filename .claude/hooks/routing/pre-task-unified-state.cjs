@@ -13,6 +13,7 @@ function libRequire(modulePath) {
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
 const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
+const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
 
 const LOOP_STATE_FILE = loopStateManager.LOOP_STATE_FILE;
 const TASKLIST_LOOP_STATE_FILE = path.join(
@@ -79,11 +80,7 @@ function readTaskListLoopState(stateFile = TASKLIST_LOOP_STATE_FILE) {
 
 function writeTaskListLoopState(state, stateFile = TASKLIST_LOOP_STATE_FILE) {
   try {
-    const dir = path.dirname(stateFile);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8');
+    atomicWriteJSONSync(stateFile, state);
   } catch (_err) {
     // Best-effort
   }
@@ -128,11 +125,7 @@ function readPlannerFirstLoopState(stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
 
 function writePlannerFirstLoopState(state, stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
   try {
-    const dir = path.dirname(stateFile);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8');
+    atomicWriteJSONSync(stateFile, state);
   } catch (_err) {
     // Best-effort
   }
@@ -183,11 +176,7 @@ function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
 
 function writeAgentGuardrailsState(state, stateFile = AGENT_GUARDRAILS_STATE_FILE) {
   try {
-    const dir = path.dirname(stateFile);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2), 'utf8');
+    atomicWriteJSONSync(stateFile, state);
   } catch (_err) {
     // Best-effort.
   }

@@ -31,6 +31,7 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 let eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { readSpawnRequestsFile } = require('../../lib/reflection/spawn-request-contract.cjs');
@@ -132,8 +133,7 @@ function readStep0State() {
 
 function writeStep0State(state) {
   try {
-    fs.mkdirSync(RUNTIME_DIR, { recursive: true });
-    fs.writeFileSync(STEP0_STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+    atomicWriteJSONSync(STEP0_STATE_PATH, state);
   } catch (_err) {
     // Best-effort
   }
