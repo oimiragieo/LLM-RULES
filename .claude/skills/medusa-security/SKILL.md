@@ -110,6 +110,7 @@ The skill uses helper scripts located at `.claude/skills/medusa-security/scripts
 | `finding-formatter.cjs` | Formats findings with OWASP mapping  |
 | `main.cjs`              | Orchestrates the full pipeline       |
 | `cli-wrapper.cjs`       | Wraps Medusa CLI invocation          |
+| `security-review.cjs`   | Deterministic report writer (no Glob recursion) |
 
 ### Using the Pipeline
 
@@ -123,6 +124,30 @@ node .claude/skills/medusa-security/scripts/main.cjs --mode ai-only --target .
 # Quick scan (git-changed files)
 node .claude/skills/medusa-security/scripts/main.cjs --mode quick --target .
 ```
+
+### Deterministic Security Review (Recommended in Claude sessions)
+
+Use this when you need the final security review report and want to avoid recursive `Glob` timeouts:
+
+```bash
+node .claude/skills/medusa-security/scripts/security-review.cjs
+```
+
+This writes:
+
+`/.claude/context/reports/security-review-medusa-scan-2026-02-17.md`
+
+and performs fixed-path checks on:
+
+- `.claude/hooks/`
+- `.claude/lib/`
+- `.claude/skills/medusa-security/scripts/`
+- `.claude/CLAUDE.md`
+
+### Important Runtime Guardrail
+
+- Avoid recursive glob patterns like `.claude/skills/medusa-security/**/*` in long sessions.
+- Prefer direct file reads and deterministic script entry points.
 
 ## OWASP Mapping
 
