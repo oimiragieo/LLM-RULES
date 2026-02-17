@@ -1437,7 +1437,10 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
         process.env.CLAUDE_SESSION_ID ||
         `session-${Date.now()}`;
       const summary = input.prompt || input.message || 'User prompt submitted';
-      stmWrite = memoryTiers.writeSTMEntry(
+      // Await the async writeSTMEntry so that session_current.json is flushed before
+      // runAllChecks returns. Without await the promise resolves after the caller
+      // proceeds, making the STM file unreliable for downstream consumers.
+      stmWrite = await memoryTiers.writeSTMEntry(
         { session_id: sessionId, timestamp: new Date().toISOString(), summary: summary },
         projectRoot
       );

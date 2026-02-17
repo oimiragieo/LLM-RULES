@@ -24,7 +24,6 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const {
   parseHookInputAsync,
   getToolName,
@@ -36,15 +35,7 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const { evaluateGate } = require('../../lib/workflow/quality-gates.cjs');
 const { withWorkflowStateLock } = require('../../lib/workflow/workflow-state-lock.cjs');
 const { readWorkflowStateFile } = require('../../lib/runtime/state-contracts.cjs');
-
-// Resolve project root
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
-const WORKFLOW_STATE_FILE =
-  process.env.WORKFLOW_STATE_FILE ||
-  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'workflow-state.json');
-const PHASE_ADVANCE_FILE =
-  process.env.PHASE_ADVANCE_FILE ||
-  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'phase-advance.json');
+const { getWorkflowStatePath, getPhaseAdvancePath } = require('../../lib/utils/workflow-paths.cjs');
 
 function normalizeTaskUpdateFields(toolInput) {
   const input = toolInput && typeof toolInput === 'object' ? toolInput : {};
@@ -87,8 +78,12 @@ async function processTaskCompletion(hookData) {
     return { result: {} };
   }
 
+  // Resolve paths at call time so env-var overrides work even when set after module load
+  const workflowStateFile = getWorkflowStatePath();
+  const phaseAdvanceFile = getPhaseAdvancePath();
+
   // Read workflow state
-  if (!fs.existsSync(WORKFLOW_STATE_FILE)) {
+  if (!fs.existsSync(workflowStateFile)) {
     return { result: {} };
   }
 
@@ -96,7 +91,7 @@ async function processTaskCompletion(hookData) {
 
   try {
     await withWorkflowStateLock(async () => {
-      const workflowState = readWorkflowStateFile(WORKFLOW_STATE_FILE, null);
+      const workflowState = readWorkflowStateFile(workflowStateFile, null);
       if (!workflowState) {
         throw new Error('Invalid workflow state file');
       }
@@ -149,7 +144,7 @@ async function processTaskCompletion(hookData) {
       );
 
       if (!allAgentsComplete) {
-        atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
+        atomicWriteJSONSync(workflowStateFile, workflowState);
         auditLog('post-completion-chain', 'agent_completed', {
           agentName: matchedAgentName,
           allComplete: false,
@@ -166,7 +161,7 @@ async function processTaskCompletion(hookData) {
       };
       phaseData.status = 'completed';
 
-      atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
+      atomicWriteJSONSync(workflowStateFile, workflowState);
 
       if (!gateResult.passed) {
         auditLog('post-completion-chain', 'gate_failed', { currentPhase, gateResult });
@@ -177,7 +172,7 @@ async function processTaskCompletion(hookData) {
       if (!nextPhase || nextPhase === 'COMPLETE') {
         workflowState.currentPhase = 'COMPLETE';
         workflowState.completedAt = new Date().toISOString();
-        atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
+        atomicWriteJSONSync(workflowStateFile, workflowState);
         auditLog('post-completion-chain', 'workflow_complete');
         return;
       }
@@ -198,8 +193,8 @@ async function processTaskCompletion(hookData) {
         workflowState.phases[nextPhase].startedAt = new Date().toISOString();
       }
 
-      atomicWriteJSONSync(WORKFLOW_STATE_FILE, workflowState);
-      atomicWriteJSONSync(PHASE_ADVANCE_FILE, phaseAdvanceSignal);
+      atomicWriteJSONSync(workflowStateFile, workflowState);
+      atomicWriteJSONSync(phaseAdvanceFile, phaseAdvanceSignal);
       auditLog('post-completion-chain', 'phase_advanced', { from: currentPhase, to: nextPhase });
     });
   } catch (err) {
@@ -227,8 +222,13 @@ async function main() {
 // Export for testing
 module.exports = {
   processTaskCompletion,
-  WORKFLOW_STATE_FILE,
-  PHASE_ADVANCE_FILE,
+  // Re-export resolved paths for backwards-compatibility (resolved at access time via getters)
+  get WORKFLOW_STATE_FILE() {
+    return getWorkflowStatePath();
+  },
+  get PHASE_ADVANCE_FILE() {
+    return getPhaseAdvancePath();
+  },
 };
 
 // Run as script

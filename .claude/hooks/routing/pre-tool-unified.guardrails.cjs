@@ -12,6 +12,17 @@ const {
 } = require('./pre-tool-unified.shared.cjs');
 const { ensureDir } = require('./pre-tool-unified.execution.cjs');
 const { isAgentScopedSession } = require('./pre-tool-unified.taskupdate.cjs');
+const {
+  isFinalizationRequired,
+  getFinalizationPrompt,
+} = require('../../lib/routing/finalization-checklist.cjs');
+
+/**
+ * Agent types that are considered valid finalization subagents.
+ * When all pipeline phases are complete, the router should spawn one of these.
+ * Extend this list as new finalization-capable agents are added.
+ */
+const FINALIZATION_AGENT_TYPES = ['qa', 'devops', 'reflection-agent'];
 
 const AGENT_GUARDRAILS_STATE_FILE = path.join(
   PROJECT_ROOT,
@@ -390,12 +401,14 @@ function checkRouterGuardrails(hookInput, toolName, toolInput) {
   }
   if (toolName === 'Task') {
     const pipelineContext = hookInput.context || {};
-    if (pipelineContext.allPhasesComplete === true) {
+    if (isFinalizationRequired(pipelineContext)) {
       const subagentType = toolInput.subagent_type || toolInput.subagentType || '';
-      if (!['qa', 'devops'].includes(subagentType.toLowerCase())) {
+      if (!FINALIZATION_AGENT_TYPES.includes(subagentType.toLowerCase())) {
+        const finalizationTypes = FINALIZATION_AGENT_TYPES.join(', ');
         const warning =
-          '[ROUTER-GUARDRAIL] All pipeline phases complete. Consider spawning a finalization subagent ' +
-          '(qa or devops) to run lint, format, tests, and git operations before claiming completion.';
+          `[ROUTER-GUARDRAIL] All pipeline phases complete. Consider spawning a finalization subagent ` +
+          `(${finalizationTypes}) to run lint, format, tests, and git operations before claiming completion. ` +
+          `Finalization checklist:\n${getFinalizationPrompt()}`;
         return { checked: true, action: 'allow', warning };
       }
     }
@@ -564,4 +577,5 @@ module.exports = {
   isWindowsIncompatibleBashCommand,
   evaluateWindowsBashGuard,
   isRouterSession,
+  FINALIZATION_AGENT_TYPES,
 };

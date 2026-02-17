@@ -18,10 +18,13 @@ const path = require('path');
  *
  * @param {string} phase - Current phase (e.g., 'PHASE_2_IMPLEMENT')
  * @param {Object} workflowState - Complete workflow state object
+ * @param {string} [projectRoot] - Optional project root override (e.g. for tests); falls back to
+ *   process.env.PROJECT_ROOT then the repo root relative to this file.
  * @returns {Object} { passed: boolean, blocking: string[], warnings: string[] }
  */
-function evaluateGate(phase, workflowState) {
-  const PROJECT_ROOT = process.env.PROJECT_ROOT || path.resolve(__dirname, '..', '..', '..');
+function evaluateGate(phase, workflowState, projectRoot) {
+  const PROJECT_ROOT =
+    projectRoot || process.env.PROJECT_ROOT || path.resolve(__dirname, '..', '..', '..');
 
   const result = {
     passed: true,
@@ -276,6 +279,26 @@ function evaluateGate6(workflowState, projectRoot, result) {
   return result;
 }
 
+/**
+ * Returns the expected artifact keys required for each phase gate.
+ * This keeps the Router, phase-advance reader, and quality gates in sync.
+ *
+ * @param {string} phase - Phase identifier (e.g., 'PHASE_1_DESIGN')
+ * @returns {string[]} Array of artifact key names expected in workflowState.artifacts
+ */
+function getRequiredArtifactsForPhase(phase) {
+  const PHASE_ARTIFACT_REQUIREMENTS = {
+    PHASE_1_DESIGN: ['implementationPlan'],
+    PHASE_2_IMPLEMENT: [], // gate checks agent metadata, not artifact files
+    PHASE_3_REVIEW: [], // gate checks agent metadata (criticalFindings, approved)
+    PHASE_4_DEPLOY: [], // gate checks devops agent metadata (ciPassed)
+    PHASE_5_DOCUMENT: [], // non-blocking gate
+    PHASE_6_REFLECT: [], // non-blocking gate
+  };
+  return PHASE_ARTIFACT_REQUIREMENTS[phase] || [];
+}
+
 module.exports = {
   evaluateGate,
+  getRequiredArtifactsForPhase,
 };
