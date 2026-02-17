@@ -1,6 +1,6 @@
 # Skill Catalog
 
-> **Total Skills: 108** (1 deprecated alias) | Last Updated: 2026-02-15
+> **Total Skills: 109** (1 deprecated alias) | Last Updated: 2026-02-17
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
@@ -32,7 +32,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Memory & Context](#memory--context)               | 15    | context-compressor, token-saver-context-compression, memory-quality-auditor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution, assimilate, creation-feasibility-gate, compliance-policy-check, troubleshooting-regression |
 | [Validation & Quality](#validation--quality)       | 6     | verification-before-completion, checklist-generator, response-rater, test-generator, accessibility, eval-harness-updater                                                                                                                                                                                                                             |
 | [Specialized Patterns](#specialized-patterns)      | 9     | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology                                                                                                                                                                     |
-| [External Integrations](#external-integrations)    | 1     | project-onboarding                                                                                                                                                                                                                                                                                                                                   |
+| [External Integrations](#external-integrations)    | 2     | project-onboarding, dynamic-api-integration                                                                                                                                                                                                                                                                                                          |
 | [Scientific Research](#scientific-research)        | 1     | scientific-skills (parent with 139 sub-skills)                                                                                                                                                                                                                                                                                                       |
 | [Incident Response](#incident-response)            | 3     | incident-runbook-templates, on-call-handoff-patterns, postmortem-writing                                                                                                                                                                                                                                                                             |
 | [Search](#search)                                  | 4     | ripgrep, code-semantic-search, code-structural-search, frontend-expert                                                                                                                                                                                                                                                                               |
@@ -315,9 +315,10 @@ Advanced patterns and methodologies.
 
 External tools and systems.
 
-| Skill                | Description             | Primary Agents |
-| -------------------- | ----------------------- | -------------- |
-| `project-onboarding` | New codebase onboarding | all agents     |
+| Skill                     | Description                                                                                                    | Primary Agents                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `project-onboarding`      | New codebase onboarding                                                                                        | all agents                        |
+| `dynamic-api-integration` | Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs and tool templates (UTCP-inspired) | developer, researcher, nodejs-pro |
 
 ---
 

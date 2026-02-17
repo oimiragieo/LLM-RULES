@@ -64,6 +64,9 @@ const INTENT_TO_AGENT = {
   swarm_coordinator: 'swarm-coordinator',
   evolution_orchestrator: 'evolution-orchestrator',
 
+  // Assimilate intent (codebase extraction, benchmarking - uses assimilate skill)
+  assimilate: 'evolution-orchestrator',
+
   // Artifact Integration (routes to architect for integration analysis)
   'artifact-integration': 'architect',
 

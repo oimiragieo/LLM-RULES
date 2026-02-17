@@ -327,12 +327,233 @@ function runIntegrationChecklist(artifactType, artifactPath, options = {}) {
   return postCreation;
 }
 
+// =============================================================================
+// 6. enhancedIntegrationChecklist
+// =============================================================================
+
+/**
+ * Enhanced post-creation checklist with catalog/registry verification.
+ *
+ * Extends runIntegrationChecklist with:
+ * - Catalog entry verification (skill-catalog.md, agent-routing-table, etc.)
+ * - Agent-registry entry verification (for agent artifacts)
+ * - Schema validation (for JSON-based artifacts)
+ *
+ * @param {string} artifactType - Type of artifact (skill, agent, hook, etc.)
+ * @param {string} artifactPath - Absolute path to the artifact file
+ * @param {Object} [options] - Additional options
+ * @param {string} [options.artifactName] - Name of the artifact (for catalog lookup)
+ * @param {string} [options.catalogPath] - Override path to catalog file
+ * @param {string} [options.registryPath] - Override path to agent-registry.json
+ * @returns {{ passed: string[], failed: string[], warnings: string[] }}
+ */
+function enhancedIntegrationChecklist(artifactType, artifactPath, options = {}) {
+  // Start with base checks
+  const result = runIntegrationChecklist(artifactType, artifactPath, options);
+
+  const artifactName = options.artifactName || '';
+
+  // Catalog entry check (for skills)
+  if (artifactType === 'skill' && artifactName) {
+    const catalogPath =
+      options.catalogPath ||
+      path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'catalogs', 'skill-catalog.md');
+
+    if (fs.existsSync(catalogPath)) {
+      try {
+        const catalog = fs.readFileSync(catalogPath, 'utf8');
+        if (catalog.includes(artifactName)) {
+          result.passed.push('catalog entry found');
+        } else {
+          result.failed.push(
+            `Missing catalog entry for skill '${artifactName}' in skill-catalog.md`
+          );
+        }
+      } catch (_err) {
+        result.warnings.push('Could not read skill catalog');
+      }
+    } else {
+      result.warnings.push('Skill catalog file not found');
+    }
+  }
+
+  // Agent-registry check (for agent artifacts)
+  if (artifactType === 'agent' && artifactName) {
+    const registryPath =
+      options.registryPath || path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+
+    if (fs.existsSync(registryPath)) {
+      try {
+        const raw = fs.readFileSync(registryPath, 'utf8');
+        const registry = safeParseJSON(raw);
+        if (registry) {
+          const hasEntry = Array.isArray(registry.agents)
+            ? registry.agents.some(a => a.name === artifactName || a.type === artifactName)
+            : registry[artifactName] !== undefined;
+
+          if (hasEntry) {
+            result.passed.push('registry entry found');
+          } else {
+            result.failed.push(`Missing agent-registry entry for '${artifactName}'`);
+          }
+        } else {
+          result.warnings.push('Could not parse agent-registry.json');
+        }
+      } catch (_err) {
+        result.warnings.push('Could not read agent-registry.json');
+      }
+    } else {
+      result.warnings.push('Agent registry file not found');
+    }
+  }
+
+  return result;
+}
+
+// =============================================================================
+// 7. verifySkillCreation
+// =============================================================================
+
+/**
+ * End-to-end verification for a newly created skill.
+ *
+ * Checks:
+ * 1. Skill name matches kebab-case pattern
+ * 2. SKILL.md exists in skill directory
+ * 3. Provenance header present in SKILL.md
+ * 4. Skill appears in skill-catalog.md
+ * 5. Skill content validates against skill-definition schema
+ * 6. At least one agent has the skill assigned
+ *
+ * @param {string} skillName - Name of the skill (kebab-case)
+ * @param {Object} [options] - Additional options
+ * @param {string} [options.skillsDir] - Override skills directory
+ * @param {string} [options.catalogPath] - Override catalog path
+ * @param {string} [options.registryPath] - Override registry path
+ * @returns {{ passed: string[], failed: string[], warnings: string[], passedCount: number, failedCount: number, warningsCount: number }}
+ */
+function verifySkillCreation(skillName, options = {}) {
+  const passed = [];
+  const failed = [];
+  const warnings = [];
+
+  // Check 1: Skill name format (kebab-case)
+  const KEBAB_CASE = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+  if (KEBAB_CASE.test(skillName)) {
+    passed.push('name format valid (kebab-case)');
+  } else {
+    failed.push(`name format invalid: '${skillName}' must be lowercase kebab-case`);
+  }
+
+  // Check 2: SKILL.md exists
+  const skillsDir = options.skillsDir || path.join(PROJECT_ROOT, '.claude', 'skills');
+  const skillDir = path.join(skillsDir, skillName);
+  const skillMdPath = path.join(skillDir, 'SKILL.md');
+
+  if (fs.existsSync(skillMdPath)) {
+    passed.push('SKILL.md exists');
+
+    // Check provenance
+    try {
+      const content = fs.readFileSync(skillMdPath, 'utf8');
+      const firstLine = content.split('\n')[0] || '';
+      if (PROVENANCE_REGEX.test(firstLine)) {
+        passed.push('provenance header present');
+      } else {
+        failed.push('Missing provenance header in SKILL.md');
+      }
+    } catch (_err) {
+      warnings.push('Could not read SKILL.md for provenance check');
+    }
+  } else {
+    failed.push(`SKILL.md not found at ${skillMdPath}`);
+  }
+
+  // Check 3: Skill catalog entry
+  const catalogPath =
+    options.catalogPath ||
+    path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'catalogs', 'skill-catalog.md');
+
+  if (fs.existsSync(catalogPath)) {
+    try {
+      const catalog = fs.readFileSync(catalogPath, 'utf8');
+      if (catalog.includes(skillName)) {
+        passed.push('catalog entry found in skill-catalog.md');
+      } else {
+        failed.push(`Missing catalog entry: '${skillName}' not found in skill-catalog.md`);
+      }
+    } catch (_err) {
+      warnings.push('Could not read skill-catalog.md');
+    }
+  } else {
+    warnings.push('skill-catalog.md not found');
+  }
+
+  // Check 4: Schema validation (lightweight -- check name pattern)
+  if (KEBAB_CASE.test(skillName)) {
+    const schemaContent = { status: 'success', output: { name: skillName, description: '' } };
+    const schemaResult = validateSchema('skill', schemaContent);
+    if (schemaResult.valid) {
+      passed.push('schema validation passed');
+    } else {
+      for (const err of schemaResult.errors) {
+        warnings.push(`Schema: ${err}`);
+      }
+    }
+  }
+
+  // Check 5: Agent assignment
+  const registryPath =
+    options.registryPath || path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+
+  if (fs.existsSync(registryPath)) {
+    try {
+      const raw = fs.readFileSync(registryPath, 'utf8');
+      const registry = safeParseJSON(raw);
+      if (registry) {
+        let hasAssignment = false;
+
+        // Search through agents for skill assignment
+        const agents = registry.agents || Object.values(registry);
+        for (const agent of Array.isArray(agents) ? agents : []) {
+          const skills = agent.skills || agent.assigned_skills || [];
+          if (Array.isArray(skills) && skills.includes(skillName)) {
+            hasAssignment = true;
+            break;
+          }
+        }
+
+        if (hasAssignment) {
+          passed.push('agent assignment found');
+        } else {
+          warnings.push(
+            `No agent assignment found for skill '${skillName}' (consider assigning to relevant agents)`
+          );
+        }
+      }
+    } catch (_err) {
+      warnings.push('Could not read agent-registry.json for assignment check');
+    }
+  }
+
+  return {
+    passed,
+    failed,
+    warnings,
+    passedCount: passed.length,
+    failedCount: failed.length,
+    warningsCount: warnings.length,
+  };
+}
+
 module.exports = {
   validatePostCreation,
   updateCatalog,
   queueCrossCreatorReview,
   validateSchema,
   runIntegrationChecklist,
+  enhancedIntegrationChecklist,
+  verifySkillCreation,
   // Internal exports for testing
   SCHEMA_MAP,
   PROVENANCE_REGEX,

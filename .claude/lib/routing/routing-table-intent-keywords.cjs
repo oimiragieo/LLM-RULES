@@ -231,6 +231,20 @@ const INTENT_KEYWORDS = {
     'extend capabilities',
   ],
 
+  // === ASSIMILATE INTENT (routes to evolution-orchestrator for codebase extraction) ===
+  assimilate: [
+    'assimilate',
+    'extract from codebase',
+    'deep dive codebase',
+    'benchmark against',
+    'compare frameworks',
+    'adopt best ideas',
+    'pull features',
+    'learn from codebase',
+    'codebase analysis',
+    'extract patterns',
+  ],
+
   // === GAME DEVELOPMENT ===
   gamedev: [
     'game',
