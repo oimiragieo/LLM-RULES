@@ -47,6 +47,31 @@ function hasExplicitAgentContext(hookInput = null) {
   return false;
 }
 
+function extractPrimaryShellCommand(command) {
+  if (!command || typeof command !== 'string') return '';
+
+  const segments = command
+    .split(/&&|\|\||;/)
+    .map(segment => segment.trim())
+    .filter(Boolean);
+  if (!segments.length) return '';
+
+  let first = segments[0];
+  // Skip leading env var assignments like FOO=bar BAR=baz cmd ...
+  while (/^[A-Za-z_][\w]*=/.test(first)) {
+    const spaceIndex = first.indexOf(' ');
+    if (spaceIndex === -1) return '';
+    first = first.slice(spaceIndex + 1).trim();
+  }
+  if (!first) return '';
+
+  const firstToken = first.split(/\s+/)[0];
+  const basename = firstToken.includes('/') ? firstToken.split('/').pop() : firstToken;
+  return String(basename || '')
+    .trim()
+    .toLowerCase();
+}
+
 function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
   if (toolName !== 'Bash') {
     return { pass: true };
@@ -97,9 +122,12 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     };
   }
   if (isBypassPermissions) {
+    const primaryCommand = extractPrimaryShellCommand(command);
     const isDiscovery =
       typeof command === 'string' &&
-      /\b(find|ls|grep|stat|head|tail|cat|wc|sort|uniq|du|df)\b/i.test(command) &&
+      ['find', 'ls', 'grep', 'stat', 'head', 'tail', 'cat', 'wc', 'sort', 'uniq', 'du', 'df'].includes(
+        primaryCommand
+      ) &&
       !/>>|>/.test(command); // No redirection
 
     const message =

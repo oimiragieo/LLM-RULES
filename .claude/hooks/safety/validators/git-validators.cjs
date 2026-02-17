@@ -37,6 +37,14 @@ const PROTECTED_BRANCHES = new Set([
   'staging',
 ]);
 
+const BLOCKED_CHECKOUT_RESET_PATH_PREFIXES = [
+  'tests/fixtures/',
+  '.claude/context/memory/',
+];
+const BLOCKED_CHECKOUT_RESET_PATH_EXACT = new Set([
+  '.claude/context/agent-registry.json',
+]);
+
 /**
  * Parse a command string into tokens, handling quotes.
  *
@@ -298,6 +306,52 @@ function validateGitPush(commandString) {
   return { valid: true, error: '' };
 }
 
+function normalizePathToken(token) {
+  return String(token || '')
+    .trim()
+    .replaceAll('\\', '/')
+    .replace(/^["']|["']$/g, '')
+    .toLowerCase();
+}
+
+function isDangerousCheckoutResetPath(pathToken) {
+  const normalized = normalizePathToken(pathToken);
+  if (!normalized) return false;
+  if (BLOCKED_CHECKOUT_RESET_PATH_EXACT.has(normalized)) return true;
+  return BLOCKED_CHECKOUT_RESET_PATH_PREFIXES.some(prefix => normalized.startsWith(prefix));
+}
+
+function validateGitCheckout(commandString, tokens) {
+  if (!tokens || tokens.length < 2 || tokens[0] !== 'git') {
+    return { valid: true, error: '' };
+  }
+
+  const checkoutCommand = tokens.includes('checkout') || tokens.includes('restore');
+  if (!checkoutCommand) {
+    return { valid: true, error: '' };
+  }
+
+  const separatorIndex = tokens.indexOf('--');
+  if (separatorIndex === -1 || separatorIndex >= tokens.length - 1) {
+    return { valid: true, error: '' };
+  }
+
+  const resetTargets = tokens.slice(separatorIndex + 1);
+  const blocked = resetTargets.find(isDangerousCheckoutResetPath);
+  if (!blocked) {
+    return { valid: true, error: '' };
+  }
+
+  return {
+    valid: false,
+    error:
+      `BLOCKED: Destructive git checkout/restore reset is not allowed for protected path "${blocked}".\n\n` +
+      `Protected prefixes: ${BLOCKED_CHECKOUT_RESET_PATH_PREFIXES.join(', ')}\n` +
+      `Protected files: ${Array.from(BLOCKED_CHECKOUT_RESET_PATH_EXACT).join(', ')}\n\n` +
+      `Use targeted edits via Write/Edit tools instead of mass reset commands.`,
+  };
+}
+
 /**
  * Main git validator that checks all git security rules.
  *
@@ -359,6 +413,11 @@ function validateGitCommand(commandString) {
     return validateGitPush(commandString);
   }
 
+  // Check git checkout/restore resets on protected runtime/test paths
+  if (subcommand === 'checkout' || subcommand === 'restore') {
+    return validateGitCheckout(commandString, tokens);
+  }
+
   return { valid: true, error: '' };
 }
 
@@ -368,5 +427,6 @@ module.exports = {
   validateGitConfig,
   validateGitInlineConfig,
   validateGitPush,
+  validateGitCheckout,
   validateGitCommand,
 };

@@ -53,4 +53,16 @@ describe('routing-guard.cjs - Router Bash bypassPermissions enforcement', () => 
     assert.equal(result.pass, true);
     assert.equal(result.result, 'warn');
   });
+
+  it('blocks destructive git checkout reset commands in bypassPermissions router mode', () => {
+    process.env.ROUTER_BASH_GUARD = 'block';
+    const result = routingGuard.checkRouterBash(
+      'Bash',
+      { command: 'git checkout HEAD -- tests/fixtures/' },
+      { permission_mode: 'bypassPermissions' }
+    );
+    assert.equal(result.pass, false);
+    assert.equal(result.result, 'block');
+    assert.match(result.message, /Direct Bash is not allowed/i);
+  });
 });

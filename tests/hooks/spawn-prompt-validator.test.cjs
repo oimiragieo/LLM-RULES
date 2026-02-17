@@ -659,6 +659,20 @@ describe('isTemplateBasedSpawn()', () => {
   });
 });
 
+describe('isInvalidSubagentType()', () => {
+  test('should block tool names used as subagent_type', () => {
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'Bash' }), true);
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'TaskList' }), true);
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'Read' }), true);
+  });
+
+  test('should allow valid agent ids', () => {
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'developer' }), false);
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'qa' }), false);
+    assert.strictEqual(isInvalidSubagentType({ subagent_type: 'architect' }), false);
+  });
+});
+
 // =============================================================================
 // Integration Tests: End-to-End Scenarios
 // =============================================================================

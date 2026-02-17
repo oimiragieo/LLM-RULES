@@ -299,5 +299,28 @@ describe('git-validators', () => {
       const result = gitValidators.validateGitCommand('git');
       assert.strictEqual(result.valid, true);
     });
+
+    it('should block destructive checkout reset of fixtures directory', () => {
+      const result = gitValidators.validateGitCommand('git checkout HEAD -- tests/fixtures/');
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.error.includes('BLOCKED'));
+      assert.ok(result.error.includes('tests/fixtures'));
+    });
+
+    it('should block destructive checkout reset of runtime context memory files', () => {
+      const result = gitValidators.validateGitCommand(
+        'git checkout HEAD -- .claude/context/memory/delegations.json .claude/context/memory/codebase_map.json'
+      );
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.error.includes('BLOCKED'));
+      assert.ok(result.error.includes('.claude/context/memory'));
+    });
+
+    it('should allow checkout of regular source file', () => {
+      const result = gitValidators.validateGitCommand(
+        'git checkout HEAD -- .claude/hooks/safety/bash-pretool-bundle.cjs'
+      );
+      assert.strictEqual(result.valid, true);
+    });
   });
 });

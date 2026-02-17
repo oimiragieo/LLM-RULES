@@ -15,6 +15,28 @@ const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 const { readRouterStateFile } = libRequire(path.join('runtime', 'state-contracts.cjs'));
 
+function modelLooksLikeHaiku(model) {
+  const normalized = String(model || '')
+    .trim()
+    .toLowerCase();
+  return normalized === 'haiku' || normalized.includes('haiku');
+}
+
+function shouldFallbackForToolCapabilities(toolInput) {
+  if (String(process.env.SPAWN_MODEL_TOOL_CAPABILITY_FALLBACK || 'true').toLowerCase() === 'off') {
+    return false;
+  }
+  const allowedTools = Array.isArray(toolInput?.allowed_tools) ? toolInput.allowed_tools : [];
+  const normalizedTools = new Set(
+    allowedTools.map(tool =>
+      String(tool || '')
+        .trim()
+        .toLowerCase()
+    )
+  );
+  return normalizedTools.has('websearch') || normalizedTools.has('webfetch');
+}
+
 function resolveSelectedModel(toolInput, configModel, explicitTaskId, agentType) {
   let selectedModel = toolInput.model || configModel?.model || toolInput.model;
   try {
@@ -35,6 +57,18 @@ function resolveSelectedModel(toolInput, configModel, explicitTaskId, agentType)
   } catch (_e) {
     // Best-effort fallback: keep selectedModel as-is
   }
+
+  if (modelLooksLikeHaiku(selectedModel) && shouldFallbackForToolCapabilities(toolInput)) {
+    selectedModel = 'sonnet';
+    stderrLog('spawn_model_capability_fallback', {
+      task_id: explicitTaskId || null,
+      agentType,
+      fromModel: toolInput?.model || configModel?.model || 'haiku',
+      toModel: selectedModel,
+      reason: 'web_tools_require_tool_reference_support',
+    });
+  }
+
   return selectedModel;
 }
 
