@@ -1,6 +1,32 @@
 'use strict';
 
 const INTENT_KEYWORDS = {
+  // === HIGH PRIORITY INTENTS ===
+  researcher: [
+    'investigate',
+    'research',
+    'fact-check',
+    'web search',
+    'best practices',
+    'arxiv',
+    'academic paper',
+    'preprint',
+  ],
+  'artifact-integrator': [
+    'artifact-integrator',
+    'artifact-integration',
+    'external_integration',
+    'external-resource-integration',
+    'repo-ingestion',
+    'github-repo-integration',
+    'skill-mapping',
+    'integrate repo',
+    'github.com/',
+    'https://',
+    'repository',
+    'repo',
+  ],
+
   // === CORE AGENTS (8) ===
   architect: [
     'architect',
@@ -385,26 +411,6 @@ const INTENT_KEYWORDS = {
     'rdkit',
     'biopython',
     'pubmed',
-  ],
-
-  // === RESEARCHER ===
-  researcher: [
-    'investigate',
-    'research',
-    'fact-check',
-    'web search',
-    'best practices',
-    'arxiv',
-    'academic paper',
-    'preprint',
-  ],
-
-  // === ARTIFACT INTEGRATION ===
-  'artifact-integration': [
-    'integrate artifact',
-    'orphan artifact',
-    'artifact graph',
-    'integration health',
   ],
 
   // === WEB3/BLOCKCHAIN ===

@@ -335,6 +335,16 @@ Examples:
 
     writeSchema(schemaPath, schema);
 
+    // POST-CREATION INTEGRATION
+    try {
+      const learningsPath = path.join(PROJECT_ROOT, '.claude/context/memory/learnings.md');
+      if (fs.existsSync(learningsPath)) {
+        fs.appendFileSync(learningsPath, `\n- Created new schema: ${path.basename(schemaPath)} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+      }
+    } catch (err) {
+      console.error(`Warning: Integration partial: ${err.message}`);
+    }
+
     // Validate the created schema
     const validation = validateSchema(schemaPath);
 

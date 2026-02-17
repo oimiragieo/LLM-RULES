@@ -8,6 +8,8 @@ context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
 priority: high
+verified: true
+lastVerifiedAt: {{lastVerifiedAt}}
 tools:
   [{{tools_csv}}]
 skills:

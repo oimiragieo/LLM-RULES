@@ -79,6 +79,16 @@ const INTENT_PATTERNS = {
     agents: ['planner'],
     weight: 9,
   },
+  code_review: {
+    keywords: ['review code', 'code review', 'pr review', 'audit code', 'review pull request'],
+    agents: ['code-reviewer'],
+    weight: 10,
+  },
+  'artifact-integrator': {
+    keywords: ['github.com', 'repository', 'repo', 'external data', 'integrate repo', 'from url', 'onboard repo'],
+    agents: ['artifact-integrator', 'security-architect', 'planner'],
+    weight: 10,
+  },
 };
 
 function detectIntent(text) {

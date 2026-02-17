@@ -104,6 +104,13 @@ Skill({ skill: 'debugging' });  // Invoke debugging skill
   (uses semantic index + structural refinement via ast-grep when available)
 - For change awareness: \`git status --porcelain\` and \`git diff\`
 - Avoid brittle shell one-liners like \`dir ... | find /c\`, \`ls ... | wc -l\`, or commands that start with \`/c\`.
+- For GitHub content fetches via Bash, fail fast and never mask upstream errors:
+  \`set -euo pipefail; gh api repos/OWNER/REPO/contents/PATH --jq '.content' | base64 -d\`
+  If \`gh api\` fails (404/401/etc.), stop and handle the error before continuing.
+- GitHub repo traversal rule: list directories first and only fetch discovered paths (do not guess deep file paths).
+- If \`gh api\` is unavailable (auth not configured, permission denied, or repeated HTTP errors), fallback to git:
+  \`git clone --depth 1 https://github.com/OWNER/REPO.git <temp-dir>\`
+  Enumerate files locally and read from the clone; do not continue speculative API path probing.
 
 ### Finding Capabilities
 For a full skill list: Read .claude/context/artifacts/catalogs/skill-catalog.md

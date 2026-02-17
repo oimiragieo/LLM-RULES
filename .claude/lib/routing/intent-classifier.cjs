@@ -10,6 +10,7 @@ const {
   ROUTING_PREFIX_PATTERNS,
   ROUTING_PATTERNS,
   INTENT_KEYWORDS,
+  DISAMBIGUATION_RULES,
   getPreferredAgent,
 } = require('./routing-table.cjs');
 const { resolveByPattern } = require('./pattern-router.cjs');
@@ -83,11 +84,20 @@ function matchIntentFromKeywords(promptLower) {
     for (const phrase of phrases) {
       const kw = String(phrase || '').toLowerCase();
       if (!kw) continue;
-      // Use word-boundary matching to prevent false positives (e.g. 'going' matching 'go')
-      const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = new RegExp(`\\b${escaped}\\b`);
-      if (re.test(promptLower)) {
-        return { intent: intentKey, source: 'intent_keywords' };
+      
+      // Use broad matching for URLs and technical patterns, word-boundary for others
+      const isTechnical = kw.includes('.') || kw.includes('/') || kw.includes('://');
+      if (isTechnical) {
+        if (promptLower.includes(kw)) {
+          return { intent: intentKey, source: 'intent_keywords_broad' };
+        }
+      } else {
+        // Use word-boundary matching to prevent false positives (e.g. 'going' matching 'go')
+        const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`\\b${escaped}\\b`);
+        if (re.test(promptLower)) {
+          return { intent: intentKey, source: 'intent_keywords' };
+        }
       }
     }
   }
@@ -174,6 +184,18 @@ function classifyIntent(prompt, options = {}) {
   if (keywordMatch) {
     intent = keywordMatch.intent;
     source = keywordMatch.source;
+
+    // Apply disambiguation rules for keyword matches
+    const rules = DISAMBIGUATION_RULES[intent];
+    if (Array.isArray(rules)) {
+      for (const rule of rules) {
+        if (rule.condition.some(cond => promptLower.includes(cond.toLowerCase()))) {
+          intent = rule.prefer;
+          source = 'disambiguation';
+          // No break here, allow later rules to further disambiguate if needed
+        }
+      }
+    }
   } else {
     const routingMatch = matchIntentFromRoutingTable(promptLower);
     if (routingMatch) {

@@ -238,8 +238,92 @@ function createActions(ctx) {
       console.log(`Companion tool created at ${toolDir}`);
     }
 
+    // POST-CREATION INTEGRATION (Phase 4.3 Hardening)
+    try {
+      updateClaudeMdSkills(name, description);
+      updateSkillCatalog(name, description, tools);
+      updateRoutingTableKeywords(name, description);
+      updateRoutingTableAgents(name);
+      regenerateSkillIndex();
+    } catch (err) {
+      console.error(`Warning: Post-creation integration partial: ${err.message}`);
+    }
+
     void tools;
     return skillDir;
+  }
+
+  function updateRoutingTableKeywords(name, description) {
+    const filePath = path.join(CLAUDE_DIR, 'lib', 'routing', 'routing-table-intent-keywords.cjs');
+    if (!fs.existsSync(filePath)) return;
+    let content = fs.readFileSync(filePath, 'utf8');
+    if (content.includes(`'${name}':`)) return;
+
+    const keywords = Array.from(new Set([
+      name,
+      ...name.split('-'),
+      ...description.toLowerCase().match(/\b\w{4,}\b/g) || []
+    ])).slice(0, 10);
+
+    const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
+    const insertionPoint = content.lastIndexOf('};');
+    if (insertionPoint !== -1) {
+      content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+      fs.writeFileSync(filePath, content, 'utf8');
+    }
+  }
+
+  function updateRoutingTableAgents(name) {
+    const filePath = path.join(CLAUDE_DIR, 'lib', 'routing', 'routing-table-intent-agents.cjs');
+    if (!fs.existsSync(filePath)) return;
+    let content = fs.readFileSync(filePath, 'utf8');
+    if (content.includes(`'${name}':`)) return;
+
+    const entry = `  '${name}': '${name}',`;
+    const insertionPoint = content.lastIndexOf('};');
+    if (insertionPoint !== -1) {
+      content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+      fs.writeFileSync(filePath, content, 'utf8');
+    }
+  }
+
+  function updateClaudeMdSkills(name, description) {
+    const claudeMdPath = path.join(CLAUDE_DIR, 'CLAUDE.md');
+    if (!fs.existsSync(claudeMdPath)) return;
+    let content = fs.readFileSync(claudeMdPath, 'utf8');
+    if (content.includes(`\`${name}\``)) return;
+
+    const sectionHeader = '## 8.5 WORKFLOW ENHANCEMENT SKILLS';
+    const insertionPoint = content.indexOf('- `framework-context`');
+    if (insertionPoint !== -1) {
+      content = content.slice(0, insertionPoint) + `- \`${name}\`\n` + content.slice(insertionPoint);
+      fs.writeFileSync(claudeMdPath, content, 'utf8');
+    }
+  }
+
+  function updateSkillCatalog(name, description, tools) {
+    const catalogPath = path.join(CLAUDE_DIR, 'context', 'artifacts', 'catalogs', 'skill-catalog.md');
+    if (!fs.existsSync(catalogPath)) return;
+    let content = fs.readFileSync(catalogPath, 'utf8');
+    if (content.includes(`\`${name}\``)) return;
+
+    const entry = `| \`${name}\` | ${description} | ${tools || 'Read'} |`;
+    const section = '## Specialized Patterns';
+    const idx = content.indexOf(section);
+    if (idx !== -1) {
+      const nextSection = content.indexOf('\n---', idx);
+      const tableEnd = content.lastIndexOf('|', nextSection !== -1 ? nextSection : undefined);
+      if (tableEnd !== -1) {
+        content = content.slice(0, tableEnd + 1) + `\n${entry}` + content.slice(tableEnd + 1);
+        fs.writeFileSync(catalogPath, content, 'utf8');
+      }
+    }
+  }
+
+  function regenerateSkillIndex() {
+    const scriptPath = path.join(CLAUDE_DIR, 'tools', 'cli', 'generate-skill-index.cjs');
+    const { spawnSync } = require('child_process');
+    spawnSync('node', [scriptPath], { windowsHide: true });
   }
 
   function validateSkill(skillPath) {

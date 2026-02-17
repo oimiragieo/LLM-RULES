@@ -409,6 +409,14 @@ async function main() {
 
     const configModel = resolveConfigModel(agentType);
     assembled = appendConfigModelSection(assembled, configModel);
+
+    // PLATFORM AWARENESS INJECTION
+    const routerState = libRequire(path.join('routing', 'router-state.cjs'));
+    const state = routerState.getState();
+    if (state.platformAwarenessRule) {
+      assembled += state.platformAwarenessRule;
+    }
+
     assembled = normalizeTaskIdReferences(assembled, explicitTaskId);
     assembled = ensureMandatorySpawnPreflight(assembled, explicitTaskId);
     assembled = enforcePromptBudget(assembled);

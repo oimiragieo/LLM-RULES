@@ -312,4 +312,45 @@ if (!success) {
 
 ---
 
+## ADR-137: Structured Repository Reconnaissance Pattern (2026-02-17)
+
+**Status:** ACCEPTED
+**Decision:** Mandate a tiered reconnaissance pattern (`Map -> Identify -> Fetch`) for all repository ingestion and onboarding tasks, implemented via the `github-ops` skill.
+
+**Context:**
+
+- Repository onboarding tasks often enter "failure loops" where agents guess file paths or attempt to fetch large files blindly.
+- Log analysis (session `d8c6d343`) showed 60+ tool uses wasted on "File does not exist" errors and streaming stalls due to blind fetching.
+- Agents frequently use Linux-style paths (`/c/dev/...`) on Windows, triggering security blocks or tool crashes.
+- High token waste: fetching a 26KB `CHANGELOG.md` when only the version string was needed.
+
+**Decision:**
+
+1. **Mandatory Reconnaissance Phase:** Agents MUST list directory contents using `gh api` before reading specific files.
+2. **Tiered Ingestion:** 
+   - Tier 1: List root and core directories (metadata only).
+   - Tier 2: Identify and read entrypoints (`README.md`, `package.json`, `gemini-extension.json`).
+   - Tier 3: Targeted deep dive into logic files based on Tier 2 findings.
+3. **Filtering**: Use `--jq` to filter API responses to minimize context bloat.
+4. **Platform Safety**: Enforce native Windows paths and block Linux-specific constructs in `gh` commands via `github-ops` hooks.
+
+**Consequences:**
+
+**Positive:**
+- Eliminates "failure loops" from incorrect file path guesses.
+- Significantly reduces token usage during discovery phase.
+- Improves stability on Windows by enforcing native path patterns.
+- Higher success rate for `artifact-integrator` agent.
+
+**Negative:**
+- Requires one extra tool call (`gh api`) before reading files.
+- Agents must be trained/prompted to use the new `github-ops` skill.
+
+**Related:**
+- `github-ops` skill bundle
+- `artifact-integrator` specialized agent
+- `user-prompt-unified` Platform Awareness Rule
+
+---
+
 ## ADR-131: Enforce TaskUpdate via Hook Rather Than Developer Training (2026-02-16 REFLECTION DECISION)

@@ -55,7 +55,8 @@ function renderFromFileTemplate(template, params) {
     .replace(/\{\{model\}\}/g, params.model)
     .replace(/\{\{temperature\}\}/g, String(params.temperature))
     .replace(/\{\{tools_csv\}\}/g, params.tools.join(', '))
-    .replace(/\{\{skills_yaml\}\}/g, params.skills.map(skill => `  - ${skill}`).join('\n'));
+    .replace(/\{\{skills_yaml\}\}/g, params.skills.map(skill => `  - ${skill}`).join('\n'))
+    .replace(/\{\{lastVerifiedAt\}\}/g, params.lastVerifiedAt);
 }
 
 function buildParams(options) {
@@ -92,11 +93,86 @@ function buildParams(options) {
     temperature,
     tools,
     skills,
+    lastVerifiedAt: new Date().toISOString(),
   };
 }
 
 function getOutputPath(name, category = 'domain') {
   return path.join(PROJECT_ROOT, '.claude', 'agents', category, `${name}.md`);
+}
+
+function updateRoutingTableKeywords(name, description) {
+  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-keywords.cjs');
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf8');
+  if (content.includes(`'${name}':`)) return;
+
+  // Simple heuristic: extract keywords from name and description
+  const keywords = Array.from(new Set([
+    name,
+    ...name.split('-'),
+    ...description.toLowerCase().match(/\b\w{4,}\b/g) || []
+  ])).slice(0, 10);
+
+  const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\[/g, '[').replace(/\]/g, '],')},`;
+  const insertionPoint = content.lastIndexOf('};');
+  if (insertionPoint !== -1) {
+    content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+    fs.writeFileSync(filePath, content, 'utf8');
+  }
+}
+
+function updateRoutingTableAgents(name) {
+  const filePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table-intent-agents.cjs');
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf8');
+  if (content.includes(`'${name}':`)) return;
+
+  const entry = `  '${name}': '${name}',`;
+  const insertionPoint = content.lastIndexOf('};');
+  if (insertionPoint !== -1) {
+    content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+    fs.writeFileSync(filePath, content, 'utf8');
+  }
+}
+
+function updateClaudeMdRouting(name, category, description) {
+  const claudeMdPath = path.join(PROJECT_ROOT, '.claude', 'CLAUDE.md');
+  if (!fs.existsSync(claudeMdPath)) return;
+  let content = fs.readFileSync(claudeMdPath, 'utf8');
+  if (content.includes(`\`${name}\``)) return;
+
+  const entry = `| ${name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ')} | \`${name}\` | \`.claude/agents/${category}/${name}.md\` |`;
+  const tableHeader = '## 3) AGENT ROUTING TABLE';
+  const tableEnd = '### Creator Skills';
+  
+  const startIdx = content.indexOf(tableHeader);
+  const endIdx = content.indexOf(tableEnd, startIdx);
+  
+  if (startIdx !== -1 && endIdx !== -1) {
+    const tablePart = content.slice(startIdx, endIdx);
+    const lines = tablePart.split('\n');
+    const lastRowIdx = lines.findLastIndex(l => l.trim().startsWith('|'));
+    if (lastRowIdx !== -1) {
+      lines.splice(lastRowIdx + 1, 0, entry);
+      const updatedTable = lines.join('\n');
+      content = content.slice(0, startIdx) + updatedTable + content.slice(endIdx);
+      fs.writeFileSync(claudeMdPath, content, 'utf8');
+    }
+  }
+}
+
+function regenerateAgentRegistry() {
+  const scriptPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'generate-agent-registry.cjs');
+  const { spawnSync } = require('node:child_process');
+  spawnSync('node', [scriptPath], { windowsHide: true });
+}
+
+function updateLearnings(name, type) {
+  const learningsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
+  if (!fs.existsSync(learningsPath)) return;
+  const entry = `\n- Created new ${type}: ${name} (${new Date().toISOString().split('T')[0]})\n`;
+  fs.appendFileSync(learningsPath, entry, 'utf8');
 }
 
 function generateAgent(options) {
@@ -112,6 +188,17 @@ function generateAgent(options) {
 
   ensureDirectory(path.dirname(outputPath));
   fs.writeFileSync(outputPath, content, 'utf8');
+
+  // POST-CREATION INTEGRATION (Phase 4.3 Hardening)
+  try {
+    updateClaudeMdRouting(params.name, category, params.description);
+    updateRoutingTableKeywords(params.name, params.description);
+    updateRoutingTableAgents(params.name);
+    regenerateAgentRegistry();
+    updateLearnings(params.name, 'agent');
+  } catch (err) {
+    console.error(`Warning: Post-creation integration partial: ${err.message}`);
+  }
 
   const validation = validateAgentFile(outputPath, { requireMarker: true });
   if (!validation.valid) {

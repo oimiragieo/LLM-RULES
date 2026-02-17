@@ -277,6 +277,48 @@ describe('prompt-assembler', () => {
         'Should include guidance against brittle cross-shell command patterns'
       );
     });
+
+    it('should include fail-fast GitHub API fetch guidance for bash pipelines', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const section = assembler.buildDiscoverySection();
+
+      assert.ok(
+        section.includes('set -euo pipefail'),
+        'Should require pipefail for Bash fetch pipelines so upstream command failures are not masked'
+      );
+      assert.ok(
+        section.includes('gh api') && section.includes('--jq \'.content\''),
+        'Should include a canonical gh api content fetch pattern'
+      );
+      assert.ok(
+        section.includes('only fetch discovered paths') || section.includes('list directories first'),
+        'Should require discovery-first path traversal to avoid speculative 404 fetch loops'
+      );
+    });
+
+    it('should include git-clone fallback guidance when gh api is unavailable', () => {
+      if (!assembler) {
+        assert.fail('Module not implemented yet');
+      }
+
+      const section = assembler.buildDiscoverySection();
+
+      assert.ok(
+        section.includes('If `gh api` is unavailable') || section.includes('gh api is unavailable'),
+        'Should explicitly describe gh api unavailability as a first-class scenario'
+      );
+      assert.ok(
+        section.includes('git clone --depth 1'),
+        'Should include a canonical git clone fallback command'
+      );
+      assert.ok(
+        section.includes('Enumerate files locally') || section.includes('enumerate files locally'),
+        'Should require local file enumeration after clone to avoid guessed API paths'
+      );
+    });
   });
 
   // ======================================================================

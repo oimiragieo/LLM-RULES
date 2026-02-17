@@ -205,6 +205,19 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'accessibility-tester',
     },
   ],
+  // "researcher" could be researcher (general) or artifact-integrator (onboarding)
+  researcher: [
+    {
+      condition: ['github', 'repo', 'repository', 'integrate', 'onboard', 'ingest', 'github.com', 'https://'],
+      prefer: 'artifact-integrator',
+      deprioritize: 'researcher',
+    },
+    {
+      condition: ['fact-check', 'best practice', 'technology comparison', 'arxiv'],
+      prefer: 'researcher',
+      deprioritize: 'artifact-integrator',
+    },
+  ],
 };
 
 module.exports = { DISAMBIGUATION_RULES };

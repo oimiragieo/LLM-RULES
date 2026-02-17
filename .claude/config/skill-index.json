@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-17T19:09:20.330Z",
+  "generatedAt": "2026-02-17T20:59:58.867Z",
   "metadata": {
-    "totalSkills": 393,
+    "totalSkills": 394,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-17T19:09:20.330Z",
+    "lastValidated": "2026-02-17T20:59:58.867Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -322,6 +322,31 @@
         "git-expert"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "github-ops": {
+      "name": "github-ops",
+      "displayName": "Github Ops",
+      "category": "Other",
+      "domain": "integration",
+      "description": "Other - github-ops",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "developer"
+      ],
+      "tags": [
+        "integration",
+        "other",
+        "github-ops"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "code-style-validator": {
@@ -721,6 +746,28 @@
         "artifact-lifecycle"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "artifact-updater": {
+      "name": "artifact-updater",
+      "displayName": "Artifact Updater",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - artifact-updater",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "artifact-updater"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "arxiv-mcp": {
@@ -7983,31 +8030,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "github-ops": {
-      "name": "github-ops",
-      "displayName": "Github Ops",
-      "category": "Other",
-      "domain": "integration",
-      "description": "Other - github-ops",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "developer"
-      ],
-      "tags": [
-        "integration",
-        "other",
-        "github-ops"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "jira-pm": {
       "name": "jira-pm",
       "displayName": "Jira Pm",
@@ -9398,6 +9420,7 @@
         "advanced-elicitation",
         "function-length-and-responsibility",
         "agent-updater",
+        "artifact-updater",
         "assimilate",
         "best-practices-guidelines",
         "build-tools-expert",
@@ -9620,6 +9643,18 @@
         "using-git-worktrees",
         "finishing-a-development-branch"
       ],
+      "integration": [
+        "github-ops",
+        "chrome-browser",
+        "github-mcp",
+        "slack-notifications",
+        "web3-expert",
+        "jira-pm",
+        "linear-pm",
+        "computer-use",
+        "telegram-bot-api-rules",
+        "agp-router-rules"
+      ],
       "development": [
         "code-style-validator",
         "async-operations",
@@ -9700,18 +9735,6 @@
         "arxiv-mcp",
         "research-synthesis"
       ],
-      "integration": [
-        "chrome-browser",
-        "github-mcp",
-        "slack-notifications",
-        "web3-expert",
-        "github-ops",
-        "jira-pm",
-        "linear-pm",
-        "computer-use",
-        "telegram-bot-api-rules",
-        "agp-router-rules"
-      ],
       "specialized": [
         "consensus-voting",
         "dependency-analyzer",
@@ -9765,6 +9788,7 @@
         "expo-framework-rule",
         "tauri-native-api-integration",
         "gamedev-expert",
+        "github-ops",
         "code-style-validator",
         "artifact-integrator",
         "token-saver-context-compression",
@@ -9777,6 +9801,7 @@
         "agent-updater",
         "api-development-expert",
         "artifact-lifecycle",
+        "artifact-updater",
         "assimilate",
         "async-operations",
         "best-practices-guidelines",
@@ -10046,7 +10071,6 @@
         "collaboration-and-version-control-rules",
         "using-git-worktrees",
         "finishing-a-development-branch",
-        "github-ops",
         "jira-pm",
         "linear-pm",
         "computer-use",
@@ -10210,6 +10234,7 @@
         "writing-skills",
         "gamedev-expert",
         "git-expert",
+        "github-ops",
         "code-style-validator",
         "artifact-integrator",
         "token-saver-context-compression",
@@ -10226,6 +10251,7 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
+        "artifact-updater",
         "arxiv-mcp",
         "assimilate",
         "async-operations",
@@ -10535,7 +10561,6 @@
         "collaboration-and-version-control-rules",
         "using-git-worktrees",
         "finishing-a-development-branch",
-        "github-ops",
         "jira-pm",
         "linear-pm",
         "computer-use",
@@ -10641,6 +10666,7 @@
         "writing-skills",
         "gamedev-expert",
         "git-expert",
+        "github-ops",
         "artifact-integrator",
         "token-saver-context-compression",
         "interactive-requirements-gathering",
@@ -10656,6 +10682,7 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
+        "artifact-updater",
         "assimilate",
         "async-operations",
         "auth-security-expert",
@@ -10954,7 +10981,6 @@
         "collaboration-and-version-control-rules",
         "using-git-worktrees",
         "finishing-a-development-branch",
-        "github-ops",
         "jira-pm",
         "linear-pm",
         "computer-use",
@@ -11021,6 +11047,7 @@
         "writing-skills",
         "gamedev-expert",
         "git-expert",
+        "github-ops",
         "artifact-integrator",
         "token-saver-context-compression",
         "interactive-requirements-gathering",
@@ -11036,6 +11063,7 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
+        "artifact-updater",
         "assimilate",
         "async-operations",
         "auth-security-expert",
@@ -11327,7 +11355,6 @@
         "collaboration-and-version-control-rules",
         "using-git-worktrees",
         "finishing-a-development-branch",
-        "github-ops",
         "jira-pm",
         "linear-pm",
         "computer-use",
@@ -11530,6 +11557,7 @@
         "agent-updater",
         "ai-ml-expert",
         "android-expert",
+        "artifact-updater",
         "assimilate",
         "async-operations",
         "aws-cloud-ops",
@@ -12305,6 +12333,7 @@
         "agent-updater",
         "ai-ml-expert",
         "android-expert",
+        "artifact-updater",
         "assimilate",
         "async-operations",
         "aws-cloud-ops",

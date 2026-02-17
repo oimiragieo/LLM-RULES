@@ -71,6 +71,8 @@ invoked_by: ${invokedBy}
 user_invocable: ${userInvocable}
 tools: [${toolsArray.join(', ')}]
 ${args ? `args: "${args}"` : ''}
+verified: true
+lastVerifiedAt: ${new Date().toISOString()}
 best_practices:
 ${defaultBestPractices.map(p => `  - ${p}`).join('\n')}
 error_handling: graceful

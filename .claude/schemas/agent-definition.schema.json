@@ -97,6 +97,16 @@
           "type": "boolean",
           "description": "Enable extended thinking mode"
         },
+        "verified": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the agent has been verified by the creator/updater workflow"
+        },
+        "lastVerifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of when the agent was last verified or updated"
+        },
         "hooks": {
           "type": "object",
           "properties": {

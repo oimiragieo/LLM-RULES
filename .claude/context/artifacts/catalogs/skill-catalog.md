@@ -26,7 +26,8 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Mobile](#mobile)                                  | 5     | ios-expert, android-expert, expo-framework-rule, tauri-native-api-integration, mobile-first-design-rules                                                                                                                                                                                                                                             |
 | [Data & Database](#data--database)                 | 4     | database-architect, database-expert, data-expert, text-to-sql                                                                                                                                                                                                                                                                                        |
 | [Documentation](#documentation)                    | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                                                                                                                                                                                                |
-| [Git & Version Control](#git--version-control)     | 1     | git-expert                                                                                                                                                                                                                                                                                                                                           |
+| [Git & Version Control](#git--version-control)     | 2     | git-expert, github-ops |
+
 | [Code Style & Linting](#code-style--linting)       | 2     | code-style-validator, dry-principle                                                                                                                                                                                                                                                                                                                  |
 | [Creator Tools](#creator-tools)                    | 15    | research-synthesis, agent-creator, agent-updater, skill-creator, skill-updater, workflow-updater, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator                                                                                               |
 | [Memory & Context](#memory--context)               | 15    | context-compressor, token-saver-context-compression, memory-quality-auditor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution, assimilate, creation-feasibility-gate, compliance-policy-check, troubleshooting-regression |
@@ -201,6 +202,7 @@ Git operations wrapper.
 | Skill        | Description                                       | Primary Agents    |
 | ------------ | ------------------------------------------------- | ----------------- |
 | `git-expert` | Advanced Git operations, token-efficient commands | developer, devops |
+| `github-ops` | Structured reconnaissance via GitHub CLI (gh)     | artifact-integrator, developer |
 
 ---
 

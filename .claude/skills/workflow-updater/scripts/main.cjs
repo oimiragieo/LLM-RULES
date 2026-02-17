@@ -74,6 +74,16 @@ function main(input = null) {
     ? options.trigger
     : 'manual';
 
+  // POST-UPDATE INTEGRATION (Phase 4.3 Hardening)
+  try {
+    const learningsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
+    if (fs.existsSync(learningsPath)) {
+      fs.appendFileSync(learningsPath, `\n- Updated workflow: ${target.workflowName} (${new Date().toISOString().split('T')[0]})\n`, 'utf8');
+    }
+  } catch (err) {
+    console.error(`Warning: Post-update integration partial: ${err.message}`);
+  }
+
   if (!target.workflowName) return { ok: false, stage: 'input', error: 'Missing --workflow' };
   if (!target.exists) {
     return {

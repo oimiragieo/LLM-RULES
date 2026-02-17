@@ -1,7 +1,23 @@
 {
   "version": 1,
-  "lastEvolution": "2026-02-15-troubleshooting-regression-skill",
+  "lastEvolution": "2026-02-17-github-ops-skill",
   "evolutions": [
+    {
+      "id": "2026-02-17-artifact-integrator-agent",
+      "artifactType": "agent",
+      "name": "artifact-integrator",
+      "path": ".claude/agents/specialized/artifact-integrator.md",
+      "status": "completed",
+      "completedAt": "2026-02-17T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-17-github-ops-skill",
+      "artifactType": "skill",
+      "name": "github-ops",
+      "path": ".claude/skills/github-ops/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-17T00:00:00.000Z"
+    },
     {
       "id": "2026-02-14-framework-context-skill",
       "artifactType": "skill",

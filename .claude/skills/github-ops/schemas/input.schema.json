@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "command": {
+      "type": "string",
+      "description": "The gh api or search command to execute"
+    },
+    "args": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional arguments for the command"
+    },
+    "jqFilter": {
+      "type": "string",
+      "description": "Optional JQ filter to apply to the response"
+    }
+  },
+  "required": ["command"]
+}

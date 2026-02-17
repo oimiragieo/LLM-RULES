@@ -108,6 +108,16 @@
           "type": "string",
           "description": "Original MCP server name if converted",
           "maxLength": 200
+        },
+        "verified": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the skill has been verified by the creator/updater workflow"
+        },
+        "lastVerifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of when the skill was last verified or updated"
         }
       },
       "additionalProperties": false,

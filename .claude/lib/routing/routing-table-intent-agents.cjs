@@ -49,6 +49,8 @@ const INTENT_TO_AGENT = {
   c4_container: 'c4-container',
   c4_context: 'c4-context',
   code_reviewer: 'code-reviewer',
+  external_integration: 'artifact-integrator',
+  artifact_integrator: 'artifact-integrator',
   code_simplifier: 'code-simplifier',
   conductor_validator: 'conductor-validator',
   database_architect: 'database-architect',
@@ -67,8 +69,8 @@ const INTENT_TO_AGENT = {
   // Assimilate intent (codebase extraction, benchmarking - uses assimilate skill)
   assimilate: 'evolution-orchestrator',
 
-  // Artifact Integration (routes to architect for integration analysis)
-  'artifact-integration': 'architect',
+  // Artifact Integration (routes to artifact-integrator for analysis)
+  'artifact-integration': 'artifact-integrator',
 
   // Scientific intent (dedicated agent with 139 scientific sub-skills)
   scientific: 'scientific-research-expert',

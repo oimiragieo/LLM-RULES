@@ -564,7 +564,15 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 
 **Memory update rule**: Research reports with <10 KB constraint force prioritization and concise synthesis.
 
-## [2026-02-14] New Skill Created: recommend-evolution
+## [2026-02-17] New Skill Created: github-ops
+
+- **Description**: Workflow for repository reconnaissance and operations using GitHub CLI (gh). Optimizes token usage by using structured API queries instead of blind file fetching.
+- **Tools**: Bash, Read
+- **Location**: `.claude/skills/github-ops/SKILL.md`
+- **Invocation**: `Skill({ skill: 'github-ops' })`
+- **Assigned Agents**: `artifact-integrator`, `developer`
+
+**Usage hint**: Use this skill for "repository reconnaissance using gh api and gh search". Encapsulates best practices for structured Mapping -> Identifying -> Fetching to avoid tool failures and token waste.
 
 - **Description**: Detect capability gaps and record evolution recommendations for later orchestration.
 - **Tools**: Read,Write,Edit,Skill

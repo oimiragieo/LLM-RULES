@@ -815,6 +815,18 @@ function maybeAutoCompress(tokenStatus) {
   if (requiresSecurityReview) {
     routerState.setSecurityRequired(true);
   }
+
+  // PLATFORM AWARENESS INJECTION (Phase 4.3 Remediation)
+  // Ensure all spawned agents are aware they are on Windows to prevent pathing loops.
+  const platformRule = '\n+======================================================================+\n' +
+                       '|  PLATFORM AWARENESS: YOU ARE ON WINDOWS                              |\n' +
+                       '+======================================================================+\n' +
+                       '|  1. USE NATIVE PATHS: Use C:/... instead of /c/...                   |\n' +
+                       '|  2. NO BASH REDIRECTION: Avoid cat > file. Use Write/Edit tools.     |\n' +
+                       '|  3. NO /tmp: Use the project temp dir provided in the prompt.         |\n' +
+                       '+======================================================================+\n';
+  routerState.saveStateWithRetry({ platformAwarenessRule: platformRule });
+
   return {
     complexity: complexity,
     requiresArchitectReview: requiresArchitectReview,
@@ -855,13 +867,44 @@ function maybeAutoCompress(tokenStatus) {
     // Direct routing table match
     const preferredAgent = classification?.defaultAgent || getPreferredAgent(detectedIntent);
     if (preferredAgent && agent.name === preferredAgent) {
-      score += 5;
+      score += 8;
     }
+
+    // MULTI-AGENT TEAM BOOST (Phase 4.4 Hardening)
+    // If it's an external integration, we NEED the security architect and planner too.
+    if (detectedIntent === 'external_integration') {
+      if (['security-architect', 'planner'].includes(agent.name)) {
+        score += 7; // Boost the support team
+      }
+    }
+
+    // WINNER-TAKES-ALL REDUCTION (Phase 4.2 Optimization)
+    // If we have a very strong intent match, deprioritize overlapping generic agents.
+    if (detectedIntent === 'code_review' && agent.name === 'architect') {
+      const archKeywords = ['system', 'topology', 'database schema', 'schema', 'restructure'];
+      const hasArchSignal = archKeywords.some(k => promptLower.includes(k));
+      if (!hasArchSignal) {
+        score -= 5; // Deprioritize architect if it's just a code review
+      }
+    }
+
+    if (detectedIntent === 'artifact-integrator' && (agent.name === 'researcher' || agent.name === 'developer')) {
+      score -= 10; // Forced specialist-first for repo onboarding
+    }
+
     // Priority boost
     if (agent.priority === 'high') score += 1;
     scores.push({ agent: agent, score: score, intent: detectedIntent });
   }
+
   scores.sort((a, b) => b.score - a.score);
+
+  // Filter out weak candidates if we have a clear winner (gap > 8)
+  // This prevents spawning a second agent when one is clearly superior.
+  if (scores.length > 1 && (scores[0].score - scores[1].score) > 8) {
+    return { candidates: [scores[0]], intent: detectedIntent };
+  }
+
   return { candidates: scores.slice(0, 3), intent: detectedIntent };
 }
 function recordUserPromptResult(result) {

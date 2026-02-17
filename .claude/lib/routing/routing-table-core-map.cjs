@@ -268,6 +268,12 @@ const ROUTING_TABLE = {
   'blast-radius': 'chaos-engineer',
   'steady-state': 'chaos-engineer',
   'fault-tolerance': 'chaos-engineer',
+  // Artifact Integration
+  'artifact-integrator': 'artifact-integrator',
+  'artifact-integration': 'artifact-integrator',
+  integrate: 'artifact-integrator',
+  ingest: 'artifact-integrator',
+  onboard: 'artifact-integrator',
 };
 
 module.exports = { ROUTING_TABLE };

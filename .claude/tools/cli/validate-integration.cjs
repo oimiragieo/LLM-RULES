@@ -44,6 +44,7 @@ const SKILL_CATALOG_LEGACY = path.join(
   'skill-catalog.md'
 );
 const ROUTING_TABLE = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing', 'routing-table.cjs');
+const ROUTING_DIR = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing');
 const EVOLUTION_STATE = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
 const LEARNINGS_MD = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
 const DECISIONS_MD = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'decisions.md');
@@ -154,25 +155,29 @@ function checkRoutingTable(artifactPath, artifactType, artifactName) {
     return { applicable: false, passed: true, message: 'Not applicable for this artifact type' };
   }
 
-  const table = readFileSafe(ROUTING_TABLE);
-  if (!table) {
-    return { applicable: true, passed: false, message: 'Could not read routing-table.cjs' };
-  }
-
-  const hasEntry = table.toLowerCase().includes(artifactName.toLowerCase());
-
-  if (hasEntry) {
-    return {
-      applicable: true,
-      passed: true,
-      message: `Found "${artifactName}" in routing-table.cjs`,
-    };
+  // Scan all files in routing directory
+  try {
+    const files = fs.readdirSync(ROUTING_DIR);
+    for (const file of files) {
+      if (file.endsWith('.cjs') || file.endsWith('.js')) {
+        const content = readFileSafe(path.join(ROUTING_DIR, file));
+        if (content && content.toLowerCase().includes(artifactName.toLowerCase())) {
+          return {
+            applicable: true,
+            passed: true,
+            message: `Found "${artifactName}" in ${file}`,
+          };
+        }
+      }
+    }
+  } catch (_err) {
+    return { applicable: true, passed: false, message: 'Could not read routing directory' };
   }
 
   return {
     applicable: true,
     passed: false,
-    message: `No keywords/mapping found for "${artifactName}" in routing-table.cjs`,
+    message: `No keywords/mapping found for "${artifactName}" in routing directory`,
   };
 }
 

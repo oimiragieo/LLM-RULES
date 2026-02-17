@@ -314,6 +314,7 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Code review / audit          | `code-reviewer`      |
 | Testing / QA / coverage      | `qa`                 |
 | Architecture / system design | `architect`          |
+| External Integration         | `artifact-integrator`| `.claude/agents/orchestrators/artifact-integrator.md` |
 | Security-sensitive work      | `security-architect` |
 | Infra / CI / deploy          | `devops`             |
 | Planning / decomposition     | `planner`            |
@@ -540,6 +541,7 @@ Most-used baseline: `tdd`, `debugging`, `progressive-disclosure`, `task-breakdow
 High-impact orchestration skills:
 
 - `artifact-integrator`
+- `github-ops`
 - `framework-context`
 - `recommend-evolution`
 - `creation-feasibility-gate`
