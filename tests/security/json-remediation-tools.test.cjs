@@ -22,13 +22,17 @@ test('Tool files must use safeParseJSON or have justification for raw JSON.parse
   for (const relativePath of TARGET_TOOLS) {
     const filePath = path.join(process.cwd(), relativePath);
     const source = fs.readFileSync(filePath, 'utf8');
-    
+
     // For doctor.mjs, we expect it to import safeParseJSON or use a safe wrapper
     // Since it's a doctor/validation tool, some raw parsing might be okay for internal config,
     // but safeParseJSON is preferred for user-provided or external data.
-    
+
     // Initial check: just flag if they use raw JSON.parse
     const usesRawParse = /\bJSON\.parse\s*\(/.test(source);
-    assert.strictEqual(usesRawParse, false, `${relativePath} should use safeParseJSON from .claude/lib/utils/safe-json.cjs`);
+    assert.strictEqual(
+      usesRawParse,
+      false,
+      `${relativePath} should use safeParseJSON from .claude/lib/utils/safe-json.cjs`
+    );
   }
 });

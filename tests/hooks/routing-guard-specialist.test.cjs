@@ -9,7 +9,9 @@ const assert = require('node:assert');
  */
 
 // Import the check function from routing-guard-core.checks-task.cjs
-const { checkSpecialistOverride } = require('../../.claude/hooks/routing/routing-guard-core.checks-task.cjs');
+const {
+  checkSpecialistOverride,
+} = require('../../.claude/hooks/routing/routing-guard-core.checks-task.cjs');
 
 // Set enforcement to 'block' for all tests (default is 'warn')
 const _ORIGINAL_ENFORCEMENT = process.env.SPECIALIST_ROUTING_ENFORCEMENT;
@@ -93,7 +95,10 @@ test('Check7: "database schema" → requires database-architect', () => {
   const result = checkSpecialistOverride('Task', toolInput);
 
   assert.strictEqual(result.pass, false, 'Should fail (block developer for database task)');
-  assert.ok(result.message.includes('database-architect'), 'Message should suggest database-architect');
+  assert.ok(
+    result.message.includes('database-architect'),
+    'Message should suggest database-architect'
+  );
 });
 
 test('Check7: "research options" → requires researcher', () => {
@@ -217,10 +222,7 @@ test('Check7: partial keyword match should NOT trigger (word boundary)', () => {
 
   // NOTE: If this fails, it means word boundary check is working correctly
   // The test passes if the check allows it OR blocks it (we're testing current behavior)
-  assert.ok(
-    typeof result.pass === 'boolean',
-    'Should return a valid result'
-  );
+  assert.ok(typeof result.pass === 'boolean', 'Should return a valid result');
 });
 
 test('Check7: Tool is not Task → bypass check', () => {
@@ -302,9 +304,6 @@ test('Check7: all specialist keywords covered', () => {
       false,
       `Should block developer for ${name} keyword: "${keyword}"`
     );
-    assert.ok(
-      result.message.toLowerCase().includes(name),
-      `Should suggest ${name} specialist`
-    );
+    assert.ok(result.message.toLowerCase().includes(name), `Should suggest ${name} specialist`);
   });
 });

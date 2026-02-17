@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 'use strict';
 
 const fs = require('fs');
@@ -369,6 +370,39 @@ function isAllowedByFilePolicy(targetPath, allowlist) {
   });
 }
 
+function isRouterSession(hookInput) {
+  if (!hookInput || typeof hookInput !== 'object') return false;
+  const agentType = hookInput.agent_type || hookInput.agentType || '';
+  return agentType.toLowerCase() === 'router';
+}
+
+function checkRouterGuardrails(hookInput, toolName, toolInput) {
+  if (toolName === 'Bash') {
+    const command = getBashCommand(toolInput);
+    const routerGitMode = (process.env.ROUTER_GIT_COMMIT_ENFORCEMENT || 'block').toLowerCase();
+    if (routerGitMode !== 'off' && isGitCommitCommand(command)) {
+      const message =
+        '[ROUTER-GUARDRAIL] Router mode cannot run git commit/push/merge directly. ' +
+        'Delegate to a finalization subagent (qa, devops, or developer with allowGitCommit=true).';
+      if (routerGitMode === 'warn') return { checked: true, action: 'allow', warning: message };
+      return { checked: true, action: 'block', message };
+    }
+  }
+  if (toolName === 'Task') {
+    const pipelineContext = hookInput.context || {};
+    if (pipelineContext.allPhasesComplete === true) {
+      const subagentType = toolInput.subagent_type || toolInput.subagentType || '';
+      if (!['qa', 'devops'].includes(subagentType.toLowerCase())) {
+        const warning =
+          '[ROUTER-GUARDRAIL] All pipeline phases complete. Consider spawning a finalization subagent ' +
+          '(qa or devops) to run lint, format, tests, and git operations before claiming completion.';
+        return { checked: true, action: 'allow', warning };
+      }
+    }
+  }
+  return null;
+}
+
 function checkAgentGuardrails(
   hookInput,
   toolName,
@@ -377,6 +411,12 @@ function checkAgentGuardrails(
 ) {
   const mode = (process.env.AGENT_GUARDRAIL_ENFORCEMENT || 'block').toLowerCase();
   if (mode === 'off') return { checked: false, reason: 'disabled' };
+
+  if (isRouterSession(hookInput)) {
+    const routerResult = checkRouterGuardrails(hookInput, toolName, toolInput);
+    if (routerResult) return routerResult;
+  }
+
   if (!isAgentScopedSession(hookInput)) return { checked: false, reason: 'not_agent_session' };
 
   const state = readAgentGuardrailsState(stateFile);
@@ -523,4 +563,5 @@ module.exports = {
   isAllowedByFilePolicy,
   isWindowsIncompatibleBashCommand,
   evaluateWindowsBashGuard,
+  isRouterSession,
 };

@@ -1,0 +1,66 @@
+[
+  {
+    "text": "agent-A-gotcha-0",
+    "timestamp": "2026-02-17T00:39:30.994Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "e3e47c13c778e8a4dae8957abd578c7e2ebb5f44"
+  },
+  {
+    "text": "agent-B-gotcha-0",
+    "timestamp": "2026-02-17T00:39:40.143Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0861f9b31426738fcf151649ddea02c8837b5c8e"
+  },
+  {
+    "text": "agent-A-gotcha-1",
+    "timestamp": "2026-02-17T00:40:07.940Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "55ad9413a2cb1ece97842cdf0b433e5fc5b0cc7f"
+  },
+  {
+    "text": "agent-B-gotcha-1",
+    "timestamp": "2026-02-17T00:40:17.162Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "0a3df57110d884a654cae557fde63b4274f22b74"
+  },
+  {
+    "text": "agent-A-gotcha-2",
+    "timestamp": "2026-02-17T00:40:45.168Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "aeb8ecd5499c401862084eed8ad0113295c0cb34"
+  },
+  {
+    "text": "agent-B-gotcha-2",
+    "timestamp": "2026-02-17T00:40:54.493Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "a5b235049ffc0b9557e86c7bd57ff8524ac5e96b"
+  },
+  {
+    "text": "agent-A-gotcha-3",
+    "timestamp": "2026-02-17T00:41:22.571Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "c35110577dc8c537aa189752c3803c9ac98e810c"
+  },
+  {
+    "text": "agent-B-gotcha-3",
+    "timestamp": "2026-02-17T00:41:31.977Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "area": "main",
+    "id": "d796792171852c192b5ce0a23dc77f2655763a4d"
+  }
+]

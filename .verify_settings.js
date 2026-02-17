@@ -36,11 +36,20 @@ if (duplicates.length > 0) {
 }
 
 // Check event types validity
-const validEvents = ['UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'PostToolUseFailure', 'SessionEnd', 'Stop'];
+const validEvents = [
+  'UserPromptSubmit',
+  'PreToolUse',
+  'PostToolUse',
+  'PostToolUseFailure',
+  'SessionEnd',
+  'Stop',
+];
 const foundEvents = Object.keys(hooks);
 const invalidEvents = foundEvents.filter(e => !validEvents.includes(e));
 
-console.log(`\n✓ Valid hook events: ${foundEvents.filter(e => validEvents.includes(e)).join(', ')}`);
+console.log(
+  `\n✓ Valid hook events: ${foundEvents.filter(e => validEvents.includes(e)).join(', ')}`
+);
 if (invalidEvents.length > 0) {
   console.log(`✗ Invalid events found: ${invalidEvents.join(', ')}`);
 }

@@ -2,7 +2,7 @@
 
 /**
  * Environment Variable Guard Bypass Audit (WS4-002)
- * 
+ *
  * Logs and blocks dangerous guard overrides to prevent security bypass.
  * Implements OWASP ASI06 defense against persistent agent corruption.
  */
@@ -81,11 +81,11 @@ function checkGuardOverrides() {
  */
 function warnOnEnforcementOverride(varName) {
   const value = process.env[varName];
-  
+
   if (value === 'off') {
     const message = `WARNING: ${varName}=${value} - Security enforcement disabled`;
     process.stderr.write(`[env-guard-audit] ${message}\n`);
-    
+
     return {
       warned: true,
       message,

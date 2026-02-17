@@ -46,7 +46,10 @@ test('EnvGuard: in CI mode (CI=true), dangerous overrides blocked', () => {
 
     assert.strictEqual(result.blocked, true, 'Should block dangerous overrides in CI');
     assert.ok(result.violations.length > 0, 'Should have violations');
-    assert.ok(result.violations[0].includes('ROUTER_BASH_GUARD'), 'Should detect ROUTER_BASH_GUARD=off');
+    assert.ok(
+      result.violations[0].includes('ROUTER_BASH_GUARD'),
+      'Should detect ROUTER_BASH_GUARD=off'
+    );
   } finally {
     if (originalCI === undefined) {
       delete process.env.CI;
@@ -70,7 +73,10 @@ test('EnvGuard: warning emitted when ENFORCEMENT var set to off', () => {
     const result = warnOnEnforcementOverride('PLANNER_FIRST_ENFORCEMENT');
 
     assert.strictEqual(result.warned, true, 'Should emit warning');
-    assert.ok(result.message.includes('PLANNER_FIRST_ENFORCEMENT'), 'Warning should mention variable');
+    assert.ok(
+      result.message.includes('PLANNER_FIRST_ENFORCEMENT'),
+      'Warning should mention variable'
+    );
     assert.ok(result.message.includes('off'), 'Warning should show value');
   } finally {
     if (originalValue === undefined) {
