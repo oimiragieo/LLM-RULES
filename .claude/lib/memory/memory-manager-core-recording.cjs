@@ -5,6 +5,8 @@ const path = require('path');
 const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { DEFAULT_AREA } = require('./memory-areas.cjs');
 const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
+const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function createRecordingOps({
   PROJECT_ROOT,
@@ -30,16 +32,27 @@ function createRecordingOps({
       const wrote = withFileLockSync(gotchasFile, () => {
         let gotchas = [];
         if (fs.existsSync(gotchasFile)) {
-          try {
-            gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
+          const raw = fs.readFileSync(gotchasFile, 'utf8');
+          const parsed = safeParseJSON(raw, null);
+          if (Array.isArray(parsed)) {
+            gotchas = parsed;
             recordMemoryOperation({ parseAttempt: true }, projectRoot);
-          } catch (_e) {
+          } else {
             recordMemoryOperation(
               { parseAttempt: true, parseFailure: true, ok: false, error: 'gotchas_parse_failed' },
               projectRoot
             );
             gotchas = [];
           }
+        }
+
+        const gotchaText = typeof gotcha === 'string' ? gotcha : gotcha?.text;
+        const sanitizeResult = sanitizeMemoryContent(gotchaText);
+        if (!sanitizeResult.safe) {
+          process.stderr.write(
+            `[memory-manager] WARNING: recordGotcha skipped — unsafe content detected: ${sanitizeResult.detections.join('; ')}\n`
+          );
+          return false;
         }
 
         const isDuplicate = gotchas.some(
@@ -109,16 +122,27 @@ function createRecordingOps({
       const wrote = withFileLockSync(patternsFile, () => {
         let patterns = [];
         if (fs.existsSync(patternsFile)) {
-          try {
-            patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
+          const raw = fs.readFileSync(patternsFile, 'utf8');
+          const parsed = safeParseJSON(raw, null);
+          if (Array.isArray(parsed)) {
+            patterns = parsed;
             recordMemoryOperation({ parseAttempt: true }, projectRoot);
-          } catch (_e) {
+          } else {
             recordMemoryOperation(
               { parseAttempt: true, parseFailure: true, ok: false, error: 'patterns_parse_failed' },
               projectRoot
             );
             patterns = [];
           }
+        }
+
+        const patternText = typeof pattern === 'string' ? pattern : pattern?.text;
+        const sanitizeResult = sanitizeMemoryContent(patternText);
+        if (!sanitizeResult.safe) {
+          process.stderr.write(
+            `[memory-manager] WARNING: recordPattern skipped — unsafe content detected: ${sanitizeResult.detections.join('; ')}\n`
+          );
+          return false;
         }
 
         const isDuplicate = patterns.some(
@@ -187,13 +211,27 @@ function createRecordingOps({
 
     const mapFile = path.join(memoryDir, 'codebase_map.json');
 
+    const sanitizeResult = sanitizeMemoryContent(description);
+    if (!sanitizeResult.safe) {
+      process.stderr.write(
+        `[memory-manager] WARNING: recordDiscovery skipped — unsafe content detected: ${sanitizeResult.detections.join('; ')}\n`
+      );
+      return false;
+    }
+
     return withFileLockSync(mapFile, () => {
       let codebaseMap = { discovered_files: {}, last_updated: null };
       if (fs.existsSync(mapFile)) {
-        try {
-          codebaseMap = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
-        } catch (_e) {
-          codebaseMap = { discovered_files: {}, last_updated: null };
+        const raw = fs.readFileSync(mapFile, 'utf8');
+        const parsed = safeParseJSON(raw, null);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          codebaseMap = {
+            discovered_files:
+              parsed.discovered_files && typeof parsed.discovered_files === 'object'
+                ? parsed.discovered_files
+                : {},
+            last_updated: parsed.last_updated || null,
+          };
         }
       }
 

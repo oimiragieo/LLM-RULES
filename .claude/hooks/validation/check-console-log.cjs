@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 function getCandidateFiles() {
@@ -15,30 +15,27 @@ function getCandidateFiles() {
       .filter(Boolean);
   }
 
-  try {
-    execSync('git rev-parse --git-dir', {
-      cwd: PROJECT_ROOT,
-      stdio: 'pipe',
-      windowsHide: true,
-    });
-  } catch (_err) {
+  const gitDirResult = spawnSync('git', ['rev-parse', '--git-dir'], {
+    cwd: PROJECT_ROOT,
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+  if (gitDirResult.status !== 0 || gitDirResult.error) {
     return [];
   }
 
-  try {
-    const output = execSync('git diff --name-only HEAD', {
-      cwd: PROJECT_ROOT,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-      windowsHide: true,
-    });
-    return output
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
-  } catch (_err) {
+  const diffResult = spawnSync('git', ['diff', '--name-only', 'HEAD'], {
+    cwd: PROJECT_ROOT,
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+  if (diffResult.status !== 0 || diffResult.error) {
     return [];
   }
+  return diffResult.stdout
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
 }
 
 function filterScriptFiles(files) {

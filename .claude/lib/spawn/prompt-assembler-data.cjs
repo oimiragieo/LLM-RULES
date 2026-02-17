@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 let TOOL_MANIFEST = null;
 let SKILL_INDEX = null;
@@ -19,7 +20,11 @@ function getToolManifest() {
   if (!TOOL_MANIFEST) {
     const manifestPath = path.join(PROJECT_ROOT, '.claude/config/tool-manifest.json');
     try {
-      TOOL_MANIFEST = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+      const content = fs.readFileSync(manifestPath, 'utf-8');
+      TOOL_MANIFEST = safeParseJSON(content, null) || {
+        tools: { core: [], mcp: [] },
+        validation: { agentDefaults: {} },
+      };
     } catch (_e) {
       TOOL_MANIFEST = {
         tools: { core: [], mcp: [] },
@@ -55,7 +60,8 @@ function getSkillIndex() {
   if (!SKILL_INDEX) {
     const indexPath = path.join(PROJECT_ROOT, '.claude/config/skill-index.json');
     try {
-      SKILL_INDEX = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+      const content = fs.readFileSync(indexPath, 'utf-8');
+      SKILL_INDEX = safeParseJSON(content, null) || { skills: {} };
     } catch (_e) {
       SKILL_INDEX = { skills: {} };
     }
@@ -68,7 +74,7 @@ function loadPresets(projectRoot = PROJECT_ROOT) {
     const presetsPath = path.join(projectRoot, '.claude', 'config', 'presets.json');
     try {
       if (fs.existsSync(presetsPath)) {
-        const parsed = JSON.parse(fs.readFileSync(presetsPath, 'utf-8'));
+        const parsed = safeParseJSON(fs.readFileSync(presetsPath, 'utf-8'), null) || {};
         PRESETS = parsed?.presets || {};
       } else {
         PRESETS = {};

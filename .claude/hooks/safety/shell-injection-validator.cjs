@@ -414,15 +414,17 @@ module.exports = {
 };
 
 if (require.main === module) {
+  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
   let raw = '';
   process.stdin.setEncoding('utf-8');
   process.stdin.on('data', chunk => {
     raw += chunk;
   });
   process.stdin.on('end', () => {
-    let input;
+    // Validate JSON is parseable first (fail-closed on invalid input)
     try {
-      input = JSON.parse(raw);
+      JSON.parse(raw);
     } catch (_e) {
       process.stdout.write(
         JSON.stringify({ allowed: false, reason: '[SHELL-INJECTION] Invalid JSON input' })
@@ -430,6 +432,8 @@ if (require.main === module) {
       process.exit(2);
       return;
     }
+    // Use safeParseJSON for prototype-pollution-safe parsing
+    const input = safeParseJSON(raw);
 
     // Extract command from Claude Code hook payload structure
     // The hook receives: { tool_name, tool_input: { command } }

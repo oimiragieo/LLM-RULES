@@ -17,6 +17,7 @@ const {
 const { createLogger } = require('../utils/logger.cjs');
 const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
 const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('memory-manager');
 const asyncWriteQueue = new Map();
@@ -214,7 +215,12 @@ function pruneCodebaseMap(projectRoot = PROJECT_ROOT) {
 
   let codebaseMap;
   try {
-    codebaseMap = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+    const content = fs.readFileSync(mapPath, 'utf8');
+    codebaseMap = safeParseJSON(content, null, null, null);
+    if (!codebaseMap || typeof codebaseMap !== 'object' || Array.isArray(codebaseMap)) {
+      logger.warn('pruneCodebaseMap: invalid codebase_map structure, skipping prune');
+      return result;
+    }
   } catch (_e) {
     return result;
   }

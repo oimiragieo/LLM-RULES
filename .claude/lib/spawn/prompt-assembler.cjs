@@ -17,6 +17,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const {
   getSkillsByAgent,
   getSkillsByName,
@@ -259,7 +260,7 @@ function validatePresets(projectRoot = PROJECT_ROOT) {
     if (!fs.existsSync(presetsPath)) {
       return { valid: true, errors: null, skipped: true };
     }
-    const presetsData = JSON.parse(fs.readFileSync(presetsPath, 'utf-8'));
+    const presetsData = safeParseJSON(fs.readFileSync(presetsPath, 'utf-8'), null) || {};
     const schemaPath = path.join(projectRoot, '.claude', 'schemas', 'presets.schema.json');
     return _validateData(presetsData, schemaPath);
   } catch (_e) {

@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 const { atomicWriteJSONSync, atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { createLogger } = require('../utils/logger.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { DEFAULT_AREA, isValidArea } = require('./memory-areas.cjs');
 const {
   syncJsonMemory,
@@ -282,7 +283,8 @@ function createStorageHelpers({
   function loadMemoryArray(filePath) {
     if (!fs.existsSync(filePath)) return [];
     try {
-      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const content = fs.readFileSync(filePath, 'utf8');
+      const data = safeParseJSON(content, null, null, []);
       recordMemoryOperation(
         {
           parseAttempt: true,
