@@ -13,6 +13,10 @@
 import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -138,7 +142,7 @@ const MCP_SKILL_MAPPING = {
 function loadMcpConfig() {
   try {
     if (!existsSync(MCP_CONFIG_PATH)) return { mcpServers: {} };
-    return JSON.parse(readFileSync(MCP_CONFIG_PATH, 'utf-8'));
+    return safeParseJSON(readFileSync(MCP_CONFIG_PATH, 'utf-8'));
   } catch {
     return { mcpServers: {} };
   }

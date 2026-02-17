@@ -20,6 +20,7 @@ tools:
   - Glob
   - Grep
   - Bash
+  - WebSearch
   - TaskUpdate
   - TaskList
   - TaskCreate

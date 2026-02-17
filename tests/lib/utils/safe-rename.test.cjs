@@ -68,7 +68,8 @@ describe('safeRenameSync', () => {
   it('preserves file content after cross-drive rename', () => {
     const srcPath = path.join(testDir, 'source.txt');
     const destPath = path.join(testDir, 'destination.txt');
-    const testContent = 'important data that must be preserved\nwith multiple lines\nand special chars: !@#$%';
+    const testContent =
+      'important data that must be preserved\nwith multiple lines\nand special chars: !@#$%';
 
     fs.writeFileSync(srcPath, testContent, 'utf8');
 
@@ -96,7 +97,7 @@ describe('safeRenameSync', () => {
 
     assert.throws(
       () => safeRenameSync(srcPath, destPath),
-      (err) => {
+      err => {
         return err.code === 'ENOENT' || err.message.includes('no such file');
       },
       'Should throw ENOENT error for missing source'

@@ -20,6 +20,10 @@ import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -277,7 +281,7 @@ function validateHooks() {
   }
 
   try {
-    const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+    const settings = safeParseJSON(fs.readFileSync(settingsPath, 'utf-8'));
     const hooks = settings.hooks || {};
 
     for (const [event, handlers] of Object.entries(hooks)) {
@@ -319,7 +323,7 @@ function validateMcp() {
   }
 
   try {
-    const mcp = JSON.parse(fs.readFileSync(mcpPath, 'utf-8'));
+    const mcp = safeParseJSON(fs.readFileSync(mcpPath, 'utf-8'));
     const servers = mcp.mcpServers || {};
 
     // Check for version pins

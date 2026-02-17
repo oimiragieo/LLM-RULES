@@ -31,7 +31,9 @@ const path = require('node:path');
 function safeRenameSync(srcPath, destPath) {
   // Validate source exists
   if (!fs.existsSync(srcPath)) {
-    const err = new Error(`ENOENT: no such file or directory, rename '${srcPath}' -> '${destPath}'`);
+    const err = new Error(
+      `ENOENT: no such file or directory, rename '${srcPath}' -> '${destPath}'`
+    );
     err.code = 'ENOENT';
     throw err;
   }

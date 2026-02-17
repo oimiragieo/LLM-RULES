@@ -84,6 +84,8 @@ const CONFIG = {
     { pathSubstring: 'step-validators.cjs', ruleId: 'SEC-013' }, // new Function() for dynamic workflow validation (controlled input)
     { pathSubstring: 'generate-tool-manifest.cjs', ruleId: 'SEC-030' }, // CLI diagnostic logging
     { pathSubstring: 'run-workflow-tests.cjs', ruleId: 'SEC-030' }, // CLI test suite help output (not sensitive)
+    { pathSubstring: 'ecosystem-assessor/', ruleId: 'SEC-030' }, // CLI analysis tool diagnostic output
+    { pathSubstring: 'project-analyzer/', ruleId: 'SEC-030' }, // CLI analysis tool diagnostic output
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
     { pathSubstring: 'count-all-tests.mjs', ruleId: 'SEC-011' }, // internal test counter with controlled input
   ],

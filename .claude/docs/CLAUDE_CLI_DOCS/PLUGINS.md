@@ -4,45 +4,27 @@
 
 > Use this file to discover all available pages before exploring further.
 
-
-
 \# Create plugins
-
-
 
 > Create custom plugins to extend Claude Code with skills, agents, hooks, and MCP servers.
 
-
-
 Plugins let you extend Claude Code with custom functionality that can be shared across projects and teams. This guide covers creating your own plugins with skills, agents, hooks, and MCP servers.
-
-
 
 Looking to install existing plugins? See \[Discover and install plugins](/en/discover-plugins). For complete technical specifications, see \[Plugins reference](/en/plugins-reference).
 
-
-
 \## When to use plugins vs standalone configuration
-
-
 
 Claude Code supports two ways to add custom skills, agents, and hooks:
 
-
-
-| Approach                                                    | Skill names          | Best for                                                                                        |
+| Approach | Skill names | Best for |
 
 | :---------------------------------------------------------- | :------------------- | :---------------------------------------------------------------------------------------------- |
 
-| \*\*Standalone\*\* (`.claude/` directory)                       | `/hello`             | Personal workflows, project-specific customizations, quick experiments                          |
+| \*\*Standalone\*\* (`.claude/` directory) | `/hello` | Personal workflows, project-specific customizations, quick experiments |
 
 | \*\*Plugins\*\* (directories with `.claude-plugin/plugin.json`) | `/plugin-name:hello` | Sharing with teammates, distributing to community, versioned releases, reusable across projects |
 
-
-
 \*\*Use standalone configuration when\*\*:
-
-
 
 \* You're customizing Claude Code for a single project
 
@@ -52,11 +34,7 @@ Claude Code supports two ways to add custom skills, agents, and hooks:
 
 \* You want short skill names like `/hello` or `/review`
 
-
-
 \*\*Use plugins when\*\*:
-
-
 
 \* You want to share functionality with your team or community
 
@@ -68,33 +46,21 @@ Claude Code supports two ways to add custom skills, agents, and hooks:
 
 \* You're okay with namespaced skills like `/my-plugin:hello` (namespacing prevents conflicts between plugins)
 
-
-
 <Tip>
 
 &nbsp; Start with standalone configuration in `.claude/` for quick iteration, then \[convert to a plugin](#convert-existing-configurations-to-plugins) when you're ready to share.
 
 </Tip>
 
-
-
 \## Quickstart
-
-
 
 This quickstart walks you through creating a plugin with a custom skill. You'll create a manifest (the configuration file that defines your plugin), add a skill, and test it locally using the `--plugin-dir` flag.
 
-
-
 \### Prerequisites
-
-
 
 \* Claude Code \[installed and authenticated](/en/quickstart#step-1-install-claude-code)
 
 \* Claude Code version 1.0.33 or later (run `claude --version` to check)
-
-
 
 <Note>
 
@@ -102,233 +68,167 @@ This quickstart walks you through creating a plugin with a custom skill. You'll 
 
 </Note>
 
-
-
 \### Create your first plugin
-
-
 
 <Steps>
 
 &nbsp; <Step title="Create the plugin directory">
 
-&nbsp;   Every plugin lives in its own directory containing a manifest and your skills, agents, or hooks. Create one now:
+&nbsp; Every plugin lives in its own directory containing a manifest and your skills, agents, or hooks. Create one now:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; mkdir my-first-plugin
 
-&nbsp;   ```bash  theme={null}
-
-&nbsp;   mkdir my-first-plugin
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Create the plugin manifest">
 
-&nbsp;   The manifest file at `.claude-plugin/plugin.json` defines your plugin's identity: its name, description, and version. Claude Code uses this metadata to display your plugin in the plugin manager.
+&nbsp; The manifest file at `.claude-plugin/plugin.json` defines your plugin's identity: its name, description, and version. Claude Code uses this metadata to display your plugin in the plugin manager.
 
+&nbsp; Create the `.claude-plugin` directory inside your plugin folder:
 
+&nbsp; ```bash theme={null}
 
-&nbsp;   Create the `.claude-plugin` directory inside your plugin folder:
+&nbsp; mkdir my-first-plugin/.claude-plugin
 
+&nbsp; ```
 
+&nbsp; Then create `my-first-plugin/.claude-plugin/plugin.json` with this content:
 
-&nbsp;   ```bash  theme={null}
+&nbsp; ```json my-first-plugin/.claude-plugin/plugin.json theme={null}
 
-&nbsp;   mkdir my-first-plugin/.claude-plugin
+&nbsp; {
 
-&nbsp;   ```
+&nbsp; "name": "my-first-plugin",
 
+&nbsp; "description": "A greeting plugin to learn the basics",
 
+&nbsp; "version": "1.0.0",
 
-&nbsp;   Then create `my-first-plugin/.claude-plugin/plugin.json` with this content:
+&nbsp; "author": {
 
+&nbsp; "name": "Your Name"
 
+&nbsp; }
 
-&nbsp;   ```json my-first-plugin/.claude-plugin/plugin.json theme={null}
+&nbsp; }
 
-&nbsp;   {
+&nbsp; ```
 
-&nbsp;   "name": "my-first-plugin",
+&nbsp; | Field | Purpose |
 
-&nbsp;   "description": "A greeting plugin to learn the basics",
+&nbsp; | :------------ | :----------------------------------------------------------------------------------------------------- |
 
-&nbsp;   "version": "1.0.0",
+&nbsp; | `name` | Unique identifier and skill namespace. Skills are prefixed with this (e.g., `/my-first-plugin:hello`). |
 
-&nbsp;   "author": {
+&nbsp; | `description` | Shown in the plugin manager when browsing or installing plugins. |
 
-&nbsp;   "name": "Your Name"
+&nbsp; | `version` | Track releases using \[semantic versioning](/en/plugins-reference#version-management). |
 
-&nbsp;   }
+&nbsp; | `author` | Optional. Helpful for attribution. |
 
-&nbsp;   }
-
-&nbsp;   ```
-
-
-
-&nbsp;   | Field         | Purpose                                                                                                |
-
-&nbsp;   | :------------ | :----------------------------------------------------------------------------------------------------- |
-
-&nbsp;   | `name`        | Unique identifier and skill namespace. Skills are prefixed with this (e.g., `/my-first-plugin:hello`). |
-
-&nbsp;   | `description` | Shown in the plugin manager when browsing or installing plugins.                                       |
-
-&nbsp;   | `version`     | Track releases using \[semantic versioning](/en/plugins-reference#version-management).                  |
-
-&nbsp;   | `author`      | Optional. Helpful for attribution.                                                                     |
-
-
-
-&nbsp;   For additional fields like `homepage`, `repository`, and `license`, see the \[full manifest schema](/en/plugins-reference#plugin-manifest-schema).
+&nbsp; For additional fields like `homepage`, `repository`, and `license`, see the \[full manifest schema](/en/plugins-reference#plugin-manifest-schema).
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Add a skill">
 
-&nbsp;   Skills live in the `skills/` directory. Each skill is a folder containing a `SKILL.md` file. The folder name becomes the skill name, prefixed with the plugin's namespace (`hello/` in a plugin named `my-first-plugin` creates `/my-first-plugin:hello`).
+&nbsp; Skills live in the `skills/` directory. Each skill is a folder containing a `SKILL.md` file. The folder name becomes the skill name, prefixed with the plugin's namespace (`hello/` in a plugin named `my-first-plugin` creates `/my-first-plugin:hello`).
 
+&nbsp; Create a skill directory in your plugin folder:
 
+&nbsp; ```bash theme={null}
 
-&nbsp;   Create a skill directory in your plugin folder:
+&nbsp; mkdir -p my-first-plugin/skills/hello
 
+&nbsp; ```
 
+&nbsp; Then create `my-first-plugin/skills/hello/SKILL.md` with this content:
 
-&nbsp;   ```bash  theme={null}
+&nbsp; ```markdown my-first-plugin/skills/hello/SKILL.md theme={null}
 
-&nbsp;   mkdir -p my-first-plugin/skills/hello
+&nbsp; ---
 
-&nbsp;   ```
+&nbsp; description: Greet the user with a friendly message
 
+&nbsp; disable-model-invocation: true
 
+&nbsp; ---
 
-&nbsp;   Then create `my-first-plugin/skills/hello/SKILL.md` with this content:
+&nbsp; Greet the user warmly and ask how you can help them today.
 
-
-
-&nbsp;   ```markdown my-first-plugin/skills/hello/SKILL.md theme={null}
-
-&nbsp;   ---
-
-&nbsp;   description: Greet the user with a friendly message
-
-&nbsp;   disable-model-invocation: true
-
-&nbsp;   ---
-
-
-
-&nbsp;   Greet the user warmly and ask how you can help them today.
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Test your plugin">
 
-&nbsp;   Run Claude Code with the `--plugin-dir` flag to load your plugin:
+&nbsp; Run Claude Code with the `--plugin-dir` flag to load your plugin:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; claude --plugin-dir ./my-first-plugin
 
-&nbsp;   ```bash  theme={null}
+&nbsp; ```
 
-&nbsp;   claude --plugin-dir ./my-first-plugin
+&nbsp; Once Claude Code starts, try your new command:
 
-&nbsp;   ```
+&nbsp; ```shell theme={null}
 
+&nbsp; /my-first-plugin:hello
 
+&nbsp; ```
 
-&nbsp;   Once Claude Code starts, try your new command:
+&nbsp; You'll see Claude respond with a greeting. Run `/help` to see your command listed under the plugin namespace.
 
+&nbsp; <Note>
 
+&nbsp; \*\*Why namespacing?\*\* Plugin skills are always namespaced (like `/greet:hello`) to prevent conflicts when multiple plugins have skills with the same name.
 
-&nbsp;   ```shell  theme={null}
+&nbsp; To change the namespace prefix, update the `name` field in `plugin.json`.
 
-&nbsp;   /my-first-plugin:hello
-
-&nbsp;   ```
-
-
-
-&nbsp;   You'll see Claude respond with a greeting. Run `/help` to see your command listed under the plugin namespace.
-
-
-
-&nbsp;   <Note>
-
-&nbsp;     \*\*Why namespacing?\*\* Plugin skills are always namespaced (like `/greet:hello`) to prevent conflicts when multiple plugins have skills with the same name.
-
-
-
-&nbsp;     To change the namespace prefix, update the `name` field in `plugin.json`.
-
-&nbsp;   </Note>
+&nbsp; </Note>
 
 &nbsp; </Step>
 
-
-
 &nbsp; <Step title="Add skill arguments">
 
-&nbsp;   Make your skill dynamic by accepting user input. The `$ARGUMENTS` placeholder captures any text the user provides after the skill name.
+&nbsp; Make your skill dynamic by accepting user input. The `$ARGUMENTS` placeholder captures any text the user provides after the skill name.
 
+&nbsp; Update your `hello.md` file:
 
+&nbsp; ```markdown my-first-plugin/commands/hello.md theme={null}
 
-&nbsp;   Update your `hello.md` file:
+&nbsp; ---
 
+&nbsp; description: Greet the user with a personalized message
 
+&nbsp; ---
 
-&nbsp;   ```markdown my-first-plugin/commands/hello.md theme={null}
+&nbsp; # Hello Command
 
-&nbsp;   ---
+&nbsp; Greet the user named "$ARGUMENTS" warmly and ask how you can help them today. Make the greeting personal and encouraging.
 
-&nbsp;   description: Greet the user with a personalized message
+&nbsp; ```
 
-&nbsp;   ---
+&nbsp; Restart Claude Code to pick up the changes, then try the command with your name:
 
+&nbsp; ```shell theme={null}
 
+&nbsp; /my-first-plugin:hello Alex
 
-&nbsp;   # Hello Command
+&nbsp; ```
 
-
-
-&nbsp;   Greet the user named "$ARGUMENTS" warmly and ask how you can help them today. Make the greeting personal and encouraging.
-
-&nbsp;   ```
-
-
-
-&nbsp;   Restart Claude Code to pick up the changes, then try the command with your name:
-
-
-
-&nbsp;   ```shell  theme={null}
-
-&nbsp;   /my-first-plugin:hello Alex
-
-&nbsp;   ```
-
-
-
-&nbsp;   Claude will greet you by name. For more on passing arguments to skills, see \[Skills](/en/skills#pass-arguments-to-skills).
+&nbsp; Claude will greet you by name. For more on passing arguments to skills, see \[Skills](/en/skills#pass-arguments-to-skills).
 
 &nbsp; </Step>
 
 </Steps>
 
-
-
 You've successfully created and tested a plugin with these key components:
-
-
 
 \* \*\*Plugin manifest\*\* (`.claude-plugin/plugin.json`): describes your plugin's metadata
 
@@ -336,23 +236,15 @@ You've successfully created and tested a plugin with these key components:
 
 \* \*\*Skill arguments\*\* (`$ARGUMENTS`): captures user input for dynamic behavior
 
-
-
 <Tip>
 
 &nbsp; The `--plugin-dir` flag is useful for development and testing. When you're ready to share your plugin with others, see \[Create and distribute a plugin marketplace](/en/plugin-marketplaces).
 
 </Tip>
 
-
-
 \## Plugin structure overview
 
-
-
 You've created a plugin with a skill, but plugins can include much more: custom agents, hooks, MCP servers, and LSP servers.
-
-
 
 <Warning>
 
@@ -360,27 +252,23 @@ You've created a plugin with a skill, but plugins can include much more: custom 
 
 </Warning>
 
-
-
-| Directory         | Location    | Purpose                                                                        |
+| Directory | Location | Purpose |
 
 | :---------------- | :---------- | :----------------------------------------------------------------------------- |
 
 | `.claude-plugin/` | Plugin root | Contains `plugin.json` manifest (optional if components use default locations) |
 
-| `commands/`       | Plugin root | Skills as Markdown files                                                       |
+| `commands/` | Plugin root | Skills as Markdown files |
 
-| `agents/`         | Plugin root | Custom agent definitions                                                       |
+| `agents/` | Plugin root | Custom agent definitions |
 
-| `skills/`         | Plugin root | Agent Skills with `SKILL.md` files                                             |
+| `skills/` | Plugin root | Agent Skills with `SKILL.md` files |
 
-| `hooks/`          | Plugin root | Event handlers in `hooks.json`                                                 |
+| `hooks/` | Plugin root | Event handlers in `hooks.json` |
 
-| `.mcp.json`       | Plugin root | MCP server configurations                                                      |
+| `.mcp.json` | Plugin root | MCP server configurations |
 
-| `.lsp.json`       | Plugin root | LSP server configurations for code intelligence                                |
-
-
+| `.lsp.json` | Plugin root | LSP server configurations for code intelligence |
 
 <Note>
 
@@ -388,27 +276,15 @@ You've created a plugin with a skill, but plugins can include much more: custom 
 
 </Note>
 
-
-
 \## Develop more complex plugins
-
-
 
 Once you're comfortable with basic plugins, you can create more sophisticated extensions.
 
-
-
 \### Add Skills to your plugin
-
-
 
 Plugins can include \[Agent Skills](/en/skills) to extend Claude's capabilities. Skills are model-invoked: Claude automatically uses them based on the task context.
 
-
-
 Add a `skills/` directory at your plugin root with Skill folders containing `SKILL.md` files:
-
-
 
 ```
 
@@ -426,13 +302,9 @@ my-plugin/
 
 ```
 
-
-
 Each `SKILL.md` needs frontmatter with `name` and `description` fields, followed by instructions:
 
-
-
-```yaml  theme={null}
+```yaml theme={null}
 
 ---
 
@@ -456,15 +328,9 @@ When reviewing code, check for:
 
 ```
 
-
-
 After installing the plugin, restart Claude Code to load the Skills. For complete Skill authoring guidance including progressive disclosure and tool restrictions, see \[Agent Skills](/en/skills).
 
-
-
 \### Add LSP servers to your plugin
-
-
 
 <Tip>
 
@@ -472,11 +338,7 @@ After installing the plugin, restart Claude Code to load the Skills. For complet
 
 </Tip>
 
-
-
 LSP (Language Server Protocol) plugins give Claude real-time code intelligence. If you need to support a language that doesn't have an official LSP plugin, you can create your own by adding an `.lsp.json` file to your plugin:
-
-
 
 ```json .lsp.json theme={null}
 
@@ -500,43 +362,25 @@ LSP (Language Server Protocol) plugins give Claude real-time code intelligence. 
 
 ```
 
-
-
 Users installing your plugin must have the language server binary installed on their machine.
-
-
 
 For complete LSP configuration options, see \[LSP servers](/en/plugins-reference#lsp-servers).
 
-
-
 \### Organize complex plugins
-
-
 
 For plugins with many components, organize your directory structure by functionality. For complete directory layouts and organization patterns, see \[Plugin directory structure](/en/plugins-reference#plugin-directory-structure).
 
-
-
 \### Test your plugins locally
-
-
 
 Use the `--plugin-dir` flag to test plugins during development. This loads your plugin directly without requiring installation.
 
-
-
-```bash  theme={null}
+```bash theme={null}
 
 claude --plugin-dir ./my-plugin
 
 ```
 
-
-
 As you make changes to your plugin, restart Claude Code to pick up the updates. Test your plugin components:
-
-
 
 \* Try your commands with `/command-name`
 
@@ -544,15 +388,11 @@ As you make changes to your plugin, restart Claude Code to pick up the updates. 
 
 \* Verify hooks work as expected
 
-
-
 <Tip>
 
 &nbsp; You can load multiple plugins at once by specifying the flag multiple times:
 
-
-
-&nbsp; ```bash  theme={null}
+&nbsp; ```bash theme={null}
 
 &nbsp; claude --plugin-dir ./plugin-one --plugin-dir ./plugin-two
 
@@ -560,15 +400,9 @@ As you make changes to your plugin, restart Claude Code to pick up the updates. 
 
 </Tip>
 
-
-
 \### Debug plugin issues
 
-
-
 If your plugin isn't working as expected:
-
-
 
 1\. \*\*Check the structure\*\*: Ensure your directories are at the plugin root, not inside `.claude-plugin/`
 
@@ -576,15 +410,9 @@ If your plugin isn't working as expected:
 
 3\. \*\*Use validation and debugging tools\*\*: See \[Debugging and development tools](/en/plugins-reference#debugging-and-development-tools) for CLI commands and troubleshooting techniques
 
-
-
 \### Share your plugins
 
-
-
 When your plugin is ready to share:
-
-
 
 1\. \*\*Add documentation\*\*: Include a `README.md` with installation and usage instructions
 
@@ -594,11 +422,7 @@ When your plugin is ready to share:
 
 4\. \*\*Test with others\*\*: Have team members test the plugin before wider distribution
 
-
-
 Once your plugin is in a marketplace, others can install it using the instructions in \[Discover and install plugins](/en/discover-plugins).
-
-
 
 <Note>
 
@@ -606,173 +430,131 @@ Once your plugin is in a marketplace, others can install it using the instructio
 
 </Note>
 
-
-
 \## Convert existing configurations to plugins
-
-
 
 If you already have skills or hooks in your `.claude/` directory, you can convert them into a plugin for easier sharing and distribution.
 
-
-
 \### Migration steps
-
-
 
 <Steps>
 
 &nbsp; <Step title="Create the plugin structure">
 
-&nbsp;   Create a new plugin directory:
+&nbsp; Create a new plugin directory:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; mkdir -p my-plugin/.claude-plugin
 
-&nbsp;   ```bash  theme={null}
+&nbsp; ```
 
-&nbsp;   mkdir -p my-plugin/.claude-plugin
+&nbsp; Create the manifest file at `my-plugin/.claude-plugin/plugin.json`:
 
-&nbsp;   ```
+&nbsp; ```json my-plugin/.claude-plugin/plugin.json theme={null}
 
+&nbsp; {
 
+&nbsp; "name": "my-plugin",
 
-&nbsp;   Create the manifest file at `my-plugin/.claude-plugin/plugin.json`:
+&nbsp; "description": "Migrated from standalone configuration",
 
+&nbsp; "version": "1.0.0"
 
+&nbsp; }
 
-&nbsp;   ```json my-plugin/.claude-plugin/plugin.json theme={null}
-
-&nbsp;   {
-
-&nbsp;     "name": "my-plugin",
-
-&nbsp;     "description": "Migrated from standalone configuration",
-
-&nbsp;     "version": "1.0.0"
-
-&nbsp;   }
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Copy your existing files">
 
-&nbsp;   Copy your existing configurations to the plugin directory:
+&nbsp; Copy your existing configurations to the plugin directory:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; # Copy commands
 
-&nbsp;   ```bash  theme={null}
+&nbsp; cp -r .claude/commands my-plugin/
 
-&nbsp;   # Copy commands
+&nbsp; # Copy agents (if any)
 
-&nbsp;   cp -r .claude/commands my-plugin/
+&nbsp; cp -r .claude/agents my-plugin/
 
+&nbsp; # Copy skills (if any)
 
+&nbsp; cp -r .claude/skills my-plugin/
 
-&nbsp;   # Copy agents (if any)
-
-&nbsp;   cp -r .claude/agents my-plugin/
-
-
-
-&nbsp;   # Copy skills (if any)
-
-&nbsp;   cp -r .claude/skills my-plugin/
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Migrate hooks">
 
-&nbsp;   If you have hooks in your settings, create a hooks directory:
+&nbsp; If you have hooks in your settings, create a hooks directory:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; mkdir my-plugin/hooks
 
-&nbsp;   ```bash  theme={null}
+&nbsp; ```
 
-&nbsp;   mkdir my-plugin/hooks
+&nbsp; Create `my-plugin/hooks/hooks.json` with your hooks configuration. Copy the `hooks` object from your `.claude/settings.json` or `settings.local.json`, since the format is the same. The command receives hook input as JSON on stdin, so use `jq` to extract the file path:
 
-&nbsp;   ```
+&nbsp; ```json my-plugin/hooks/hooks.json theme={null}
 
+&nbsp; {
 
+&nbsp; "hooks": {
 
-&nbsp;   Create `my-plugin/hooks/hooks.json` with your hooks configuration. Copy the `hooks` object from your `.claude/settings.json` or `settings.local.json`, since the format is the same. The command receives hook input as JSON on stdin, so use `jq` to extract the file path:
+&nbsp; "PostToolUse": \[
 
+&nbsp; {
 
+&nbsp; "matcher": "Write|Edit",
 
-&nbsp;   ```json my-plugin/hooks/hooks.json theme={null}
+&nbsp; "hooks": \[{ "type": "command", "command": "jq -r '.tool_input.file_path' | xargs npm run lint:fix" }]
 
-&nbsp;   {
+&nbsp; }
 
-&nbsp;     "hooks": {
+&nbsp; ]
 
-&nbsp;       "PostToolUse": \[
+&nbsp; }
 
-&nbsp;         {
+&nbsp; }
 
-&nbsp;           "matcher": "Write|Edit",
-
-&nbsp;           "hooks": \[{ "type": "command", "command": "jq -r '.tool\_input.file\_path' | xargs npm run lint:fix" }]
-
-&nbsp;         }
-
-&nbsp;       ]
-
-&nbsp;     }
-
-&nbsp;   }
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
 
-
-
 &nbsp; <Step title="Test your migrated plugin">
 
-&nbsp;   Load your plugin to verify everything works:
+&nbsp; Load your plugin to verify everything works:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; claude --plugin-dir ./my-plugin
 
-&nbsp;   ```bash  theme={null}
+&nbsp; ```
 
-&nbsp;   claude --plugin-dir ./my-plugin
-
-&nbsp;   ```
-
-
-
-&nbsp;   Test each component: run your commands, check agents appear in `/agents`, and verify hooks trigger correctly.
+&nbsp; Test each component: run your commands, check agents appear in `/agents`, and verify hooks trigger correctly.
 
 &nbsp; </Step>
 
 </Steps>
 
-
-
 \### What changes when migrating
 
-
-
-| Standalone (`.claude/`)       | Plugin                           |
+| Standalone (`.claude/`) | Plugin |
 
 | :---------------------------- | :------------------------------- |
 
-| Only available in one project | Can be shared via marketplaces   |
+| Only available in one project | Can be shared via marketplaces |
 
-| Files in `.claude/commands/`  | Files in `plugin-name/commands/` |
+| Files in `.claude/commands/` | Files in `plugin-name/commands/` |
 
-| Hooks in `settings.json`      | Hooks in `hooks/hooks.json`      |
+| Hooks in `settings.json` | Hooks in `hooks/hooks.json` |
 
-| Must manually copy to share   | Install with `/plugin install`   |
-
-
+| Must manually copy to share | Install with `/plugin install` |
 
 <Note>
 
@@ -780,29 +562,17 @@ If you already have skills or hooks in your `.claude/` directory, you can conver
 
 </Note>
 
-
-
 \## Next steps
-
-
 
 Now that you understand Claude Code's plugin system, here are suggested paths for different goals:
 
-
-
 \### For plugin users
-
-
 
 \* \[Discover and install plugins](/en/discover-plugins): browse marketplaces and install plugins
 
 \* \[Configure team marketplaces](/en/discover-plugins#configure-team-marketplaces): set up repository-level plugins for your team
 
-
-
 \### For plugin developers
-
-
 
 \* \[Create and distribute a marketplace](/en/plugin-marketplaces): package and share your plugins
 
@@ -817,4 +587,3 @@ Now that you understand Claude Code's plugin system, here are suggested paths fo
 &nbsp; \* \[Hooks](/en/hooks): event handling and automation
 
 &nbsp; \* \[MCP](/en/mcp): external tool integration
-

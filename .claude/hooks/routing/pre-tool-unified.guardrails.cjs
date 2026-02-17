@@ -298,6 +298,19 @@ function evaluateWindowsBashGuard(command, hookInput) {
     hookInput?.permissionMode === 'bypassPermissions';
   const isAgent = isAgentScopedSession(hookInput);
 
+  if (isBypass) {
+    const { canonicalizePathMentionsInText } = require('../../lib/utils/path-canonicalizer.cjs');
+    const rewritten = canonicalizePathMentionsInText(command);
+    if (rewritten !== command) {
+      return {
+        checked: true,
+        action: 'rewrite',
+        rewrittenCommand: rewritten,
+        bypassWarning: `[AGENT-GUARDRAIL][bypass] Auto-rewrote Windows-incompatible bash command to: ${rewritten}`,
+      };
+    }
+  }
+
   if (mode === 'warn' || (isAgent && isBypass)) {
     return { checked: true, action: 'allow', warning: WINDOWS_BASH_GUARDRAIL_MESSAGE };
   }
@@ -508,4 +521,6 @@ module.exports = {
   isCheckpointCommand,
   normalizeToolPath,
   isAllowedByFilePolicy,
+  isWindowsIncompatibleBashCommand,
+  evaluateWindowsBashGuard,
 };

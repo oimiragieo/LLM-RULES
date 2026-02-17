@@ -255,10 +255,9 @@ function safeParseJSON(content, schemaName, inlineSchema, inlineDefaults) {
           if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
             continue; // Skip dangerous keys at top level
           }
-          safe[key] = parsed[key];
+          // Strip dangerous keys BEFORE assigning to safe
+          safe[key] = stripDangerousKeys(parsed[key]);
         }
-        // Recursively strip dangerous keys from nested objects
-        stripDangerousKeys(safe);
       } else if (Array.isArray(parsed)) {
         // Handle array input in fallback path
         return stripDangerousKeys(parsed);
@@ -267,7 +266,10 @@ function safeParseJSON(content, schemaName, inlineSchema, inlineDefaults) {
       }
       return safe;
     } catch (_e) {
-      // SEC-LIB-005 FIX: Return Object.create(null) instead of {}
+      // SEC-LIB-005 FIX: Return inlineDefaults if provided, otherwise Object.create(null)
+      if (inlineDefaults && typeof inlineDefaults === 'object') {
+        return inlineDefaults;
+      }
       return Object.create(null);
     }
   }

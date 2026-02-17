@@ -50,12 +50,7 @@ const path = require('node:path');
  * // => "Archive Cleanup: 75 total, 60 deleted, 15 kept"
  */
 function auditArchives(options) {
-  const {
-    retentionDays = 90,
-    minKeep = 5,
-    dryRun = true,
-    archiveDirs = [],
-  } = options || {};
+  const { retentionDays = 90, minKeep = 5, dryRun = true, archiveDirs = [] } = options || {};
 
   // Collect all files from all archive directories
   const allFiles = [];

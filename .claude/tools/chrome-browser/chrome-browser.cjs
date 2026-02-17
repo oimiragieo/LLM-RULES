@@ -28,6 +28,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 /**
  * SEC-009 FIX: Security validation for paths to prevent command injection
@@ -148,7 +149,7 @@ function loadConfig(configPath) {
   }
 
   try {
-    return JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
+    return safeParseJSON(fs.readFileSync(fullPath, 'utf-8'));
   } catch (e) {
     console.error(`❌ Failed to parse config file: ${e.message}`);
     process.exit(1);
@@ -221,7 +222,7 @@ function runSkill() {
     if (options.json && spawnResult.stdout) {
       // Try to parse and re-output as formatted JSON
       try {
-        const parsed = JSON.parse(spawnResult.stdout);
+        const parsed = safeParseJSON(spawnResult.stdout);
         console.log(JSON.stringify(parsed, null, 2));
       } catch {
         console.log(spawnResult.stdout);

@@ -4,29 +4,17 @@
 
 > Use this file to discover all available pages before exploring further.
 
-
-
 \# Interactive mode
-
-
 
 > Complete reference for keyboard shortcuts, input modes, and interactive features in Claude Code sessions.
 
-
-
 \## Keyboard shortcuts
-
-
 
 <Note>
 
 &nbsp; Keyboard shortcuts may vary by platform and terminal. Press `?` to see available shortcuts for your environment.
 
-
-
 &nbsp; \*\*macOS users\*\*: Option/Alt key shortcuts (`Alt+B`, `Alt+F`, `Alt+Y`, `Alt+M`, `Alt+P`) require configuring Option as Meta in your terminal:
-
-
 
 &nbsp; \* \*\*iTerm2\*\*: Settings → Profiles → Keys → Set Left/Right Option key to "Esc+"
 
@@ -34,87 +22,71 @@
 
 &nbsp; \* \*\*VS Code\*\*: Settings → Profiles → Keys → Set Left/Right Option key to "Esc+"
 
-
-
 &nbsp; See \[Terminal configuration](/en/terminal-config) for details.
 
 </Note>
 
-
-
 \### General controls
 
-
-
-| Shortcut                                          | Description                        | Context                                                                                                                                              |
+| Shortcut | Description | Context |
 
 | :------------------------------------------------ | :--------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
 
-| `Ctrl+C`                                          | Cancel current input or generation | Standard interrupt                                                                                                                                   |
+| `Ctrl+C` | Cancel current input or generation | Standard interrupt |
 
-| `Ctrl+D`                                          | Exit Claude Code session           | EOF signal                                                                                                                                           |
+| `Ctrl+D` | Exit Claude Code session | EOF signal |
 
-| `Ctrl+G`                                          | Open in default text editor        | Edit your prompt or custom response in your default text editor                                                                                      |
+| `Ctrl+G` | Open in default text editor | Edit your prompt or custom response in your default text editor |
 
-| `Ctrl+L`                                          | Clear terminal screen              | Keeps conversation history                                                                                                                           |
+| `Ctrl+L` | Clear terminal screen | Keeps conversation history |
 
-| `Ctrl+O`                                          | Toggle verbose output              | Shows detailed tool usage and execution                                                                                                              |
+| `Ctrl+O` | Toggle verbose output | Shows detailed tool usage and execution |
 
-| `Ctrl+R`                                          | Reverse search command history     | Search through previous commands interactively                                                                                                       |
+| `Ctrl+R` | Reverse search command history | Search through previous commands interactively |
 
-| `Ctrl+V` or `Cmd+V` (iTerm2) or `Alt+V` (Windows) | Paste image from clipboard         | Pastes an image or path to an image file                                                                                                             |
+| `Ctrl+V` or `Cmd+V` (iTerm2) or `Alt+V` (Windows) | Paste image from clipboard | Pastes an image or path to an image file |
 
-| `Ctrl+B`                                          | Background running tasks           | Backgrounds bash commands and agents. Tmux users press twice                                                                                         |
+| `Ctrl+B` | Background running tasks | Backgrounds bash commands and agents. Tmux users press twice |
 
-| `Ctrl+T`                                          | Toggle task list                   | Show or hide the \[task list](#task-list) in the terminal status area                                                                                 |
+| `Ctrl+T` | Toggle task list | Show or hide the \[task list](#task-list) in the terminal status area |
 
-| `Left/Right arrows`                               | Cycle through dialog tabs          | Navigate between tabs in permission dialogs and menus                                                                                                |
+| `Left/Right arrows` | Cycle through dialog tabs | Navigate between tabs in permission dialogs and menus |
 
-| `Up/Down arrows`                                  | Navigate command history           | Recall previous inputs                                                                                                                               |
+| `Up/Down arrows` | Navigate command history | Recall previous inputs |
 
-| `Esc` + `Esc`                                     | Rewind or summarize                | Restore code and/or conversation to a previous point, or summarize from a selected message                                                           |
+| `Esc` + `Esc` | Rewind or summarize | Restore code and/or conversation to a previous point, or summarize from a selected message |
 
-| `Shift+Tab` or `Alt+M` (some configurations)      | Toggle permission modes            | Switch between Auto-Accept Mode, Plan Mode, and normal mode. When an \[agent team](/en/agent-teams) is active, the cycle also includes Delegate Mode. |
+| `Shift+Tab` or `Alt+M` (some configurations) | Toggle permission modes | Switch between Auto-Accept Mode, Plan Mode, and normal mode. When an \[agent team](/en/agent-teams) is active, the cycle also includes Delegate Mode. |
 
-| `Option+P` (macOS) or `Alt+P` (Windows/Linux)     | Switch model                       | Switch models without clearing your prompt                                                                                                           |
+| `Option+P` (macOS) or `Alt+P` (Windows/Linux) | Switch model | Switch models without clearing your prompt |
 
-| `Option+T` (macOS) or `Alt+T` (Windows/Linux)     | Toggle extended thinking           | Enable or disable extended thinking mode. Run `/terminal-setup` first to enable this shortcut                                                        |
-
-
+| `Option+T` (macOS) or `Alt+T` (Windows/Linux) | Toggle extended thinking | Enable or disable extended thinking mode. Run `/terminal-setup` first to enable this shortcut |
 
 \### Text editing
 
-
-
-| Shortcut                 | Description                  | Context                                                                                                       |
+| Shortcut | Description | Context |
 
 | :----------------------- | :--------------------------- | :------------------------------------------------------------------------------------------------------------ |
 
-| `Ctrl+K`                 | Delete to end of line        | Stores deleted text for pasting                                                                               |
+| `Ctrl+K` | Delete to end of line | Stores deleted text for pasting |
 
-| `Ctrl+U`                 | Delete entire line           | Stores deleted text for pasting                                                                               |
+| `Ctrl+U` | Delete entire line | Stores deleted text for pasting |
 
-| `Ctrl+Y`                 | Paste deleted text           | Paste text deleted with `Ctrl+K` or `Ctrl+U`                                                                  |
+| `Ctrl+Y` | Paste deleted text | Paste text deleted with `Ctrl+K` or `Ctrl+U` |
 
-| `Alt+Y` (after `Ctrl+Y`) | Cycle paste history          | After pasting, cycle through previously deleted text. Requires \[Option as Meta](#keyboard-shortcuts) on macOS |
+| `Alt+Y` (after `Ctrl+Y`) | Cycle paste history | After pasting, cycle through previously deleted text. Requires \[Option as Meta](#keyboard-shortcuts) on macOS |
 
-| `Alt+B`                  | Move cursor back one word    | Word navigation. Requires \[Option as Meta](#keyboard-shortcuts) on macOS                                      |
+| `Alt+B` | Move cursor back one word | Word navigation. Requires \[Option as Meta](#keyboard-shortcuts) on macOS |
 
-| `Alt+F`                  | Move cursor forward one word | Word navigation. Requires \[Option as Meta](#keyboard-shortcuts) on macOS                                      |
-
-
+| `Alt+F` | Move cursor forward one word | Word navigation. Requires \[Option as Meta](#keyboard-shortcuts) on macOS |
 
 \### Theme and display
 
-
-
-| Shortcut | Description                                | Context                                                                                                      |
+| Shortcut | Description | Context |
 
 | :------- | :----------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
 
 | `Ctrl+T` | Toggle syntax highlighting for code blocks | Only works inside the `/theme` picker menu. Controls whether code in Claude's responses uses syntax coloring |
-
-
 
 <Note>
 
@@ -122,27 +94,21 @@
 
 </Note>
 
-
-
 \### Multiline input
 
-
-
-| Method           | Shortcut       | Context                                                 |
+| Method | Shortcut | Context |
 
 | :--------------- | :------------- | :------------------------------------------------------ |
 
-| Quick escape     | `\\` + `Enter`  | Works in all terminals                                  |
+| Quick escape | `\\` + `Enter` | Works in all terminals |
 
-| macOS default    | `Option+Enter` | Default on macOS                                        |
+| macOS default | `Option+Enter` | Default on macOS |
 
-| Shift+Enter      | `Shift+Enter`  | Works out of the box in iTerm2, WezTerm, Ghostty, Kitty |
+| Shift+Enter | `Shift+Enter` | Works out of the box in iTerm2, WezTerm, Ghostty, Kitty |
 
-| Control sequence | `Ctrl+J`       | Line feed character for multiline                       |
+| Control sequence | `Ctrl+J` | Line feed character for multiline |
 
-| Paste mode       | Paste directly | For code blocks, logs                                   |
-
-
+| Paste mode | Paste directly | For code blocks, logs |
 
 <Tip>
 
@@ -150,179 +116,149 @@
 
 </Tip>
 
-
-
 \### Quick commands
 
-
-
-| Shortcut     | Description       | Notes                                                                |
+| Shortcut | Description | Notes |
 
 | :----------- | :---------------- | :------------------------------------------------------------------- |
 
-| `/` at start | Command or skill  | See \[built-in commands](#built-in-commands) and \[skills](/en/skills) |
+| `/` at start | Command or skill | See \[built-in commands](#built-in-commands) and \[skills](/en/skills) |
 
-| `!` at start | Bash mode         | Run commands directly and add execution output to the session        |
+| `!` at start | Bash mode | Run commands directly and add execution output to the session |
 
-| `@`          | File path mention | Trigger file path autocomplete                                       |
-
-
+| `@` | File path mention | Trigger file path autocomplete |
 
 \## Built-in commands
 
-
-
 Built-in commands are shortcuts for common actions. The table below covers commonly used commands but not all available options. Type `/` in Claude Code to see the full list, or type `/` followed by any letters to filter.
-
-
 
 To create your own commands you can invoke with `/`, see \[skills](/en/skills).
 
-
-
-| Command                   | Purpose                                                                                                                                                                                                                    |
+| Command | Purpose |
 
 | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 
-| `/clear`                  | Clear conversation history                                                                                                                                                                                                 |
+| `/clear` | Clear conversation history |
 
-| `/compact \[instructions]` | Compact conversation with optional focus instructions                                                                                                                                                                      |
+| `/compact \[instructions]` | Compact conversation with optional focus instructions |
 
-| `/config`                 | Open the Settings interface (Config tab)                                                                                                                                                                                   |
+| `/config` | Open the Settings interface (Config tab) |
 
-| `/context`                | Visualize current context usage as a colored grid                                                                                                                                                                          |
+| `/context` | Visualize current context usage as a colored grid |
 
-| `/cost`                   | Show token usage statistics. See \[cost tracking guide](/en/costs#using-the-cost-command) for subscription-specific details.                                                                                                |
+| `/cost` | Show token usage statistics. See \[cost tracking guide](/en/costs#using-the-cost-command) for subscription-specific details. |
 
-| `/debug \[description]`    | Troubleshoot the current session by reading the session debug log. Optionally describe the issue                                                                                                                           |
+| `/debug \[description]` | Troubleshoot the current session by reading the session debug log. Optionally describe the issue |
 
-| `/doctor`                 | Checks the health of your Claude Code installation                                                                                                                                                                         |
+| `/doctor` | Checks the health of your Claude Code installation |
 
-| `/exit`                   | Exit the REPL                                                                                                                                                                                                              |
+| `/exit` | Exit the REPL |
 
-| `/export \[filename]`      | Export the current conversation to a file or clipboard                                                                                                                                                                     |
+| `/export \[filename]` | Export the current conversation to a file or clipboard |
 
-| `/help`                   | Get usage help                                                                                                                                                                                                             |
+| `/help` | Get usage help |
 
-| `/init`                   | Initialize project with `CLAUDE.md` guide                                                                                                                                                                                  |
+| `/init` | Initialize project with `CLAUDE.md` guide |
 
-| `/mcp`                    | Manage MCP server connections and OAuth authentication                                                                                                                                                                     |
+| `/mcp` | Manage MCP server connections and OAuth authentication |
 
-| `/memory`                 | Edit `CLAUDE.md` memory files                                                                                                                                                                                              |
+| `/memory` | Edit `CLAUDE.md` memory files |
 
-| `/model`                  | Select or change the AI model. With Opus 4.6, use left/right arrows to \[adjust effort level](/en/model-config#adjust-effort-level). The change takes effect immediately without waiting for the current response to finish |
+| `/model` | Select or change the AI model. With Opus 4.6, use left/right arrows to \[adjust effort level](/en/model-config#adjust-effort-level). The change takes effect immediately without waiting for the current response to finish |
 
-| `/permissions`            | View or update \[permissions](/en/permissions#manage-permissions)                                                                                                                                                           |
+| `/permissions` | View or update \[permissions](/en/permissions#manage-permissions) |
 
-| `/plan`                   | Enter plan mode directly from the prompt                                                                                                                                                                                   |
+| `/plan` | Enter plan mode directly from the prompt |
 
-| `/rename <name>`          | Rename the current session for easier identification                                                                                                                                                                       |
+| `/rename <name>` | Rename the current session for easier identification |
 
-| `/resume \[session]`       | Resume a conversation by ID or name, or open the session picker                                                                                                                                                            |
+| `/resume \[session]` | Resume a conversation by ID or name, or open the session picker |
 
-| `/rewind`                 | Rewind the conversation and/or code, or summarize from a selected message                                                                                                                                                  |
+| `/rewind` | Rewind the conversation and/or code, or summarize from a selected message |
 
-| `/stats`                  | Visualize daily usage, session history, streaks, and model preferences                                                                                                                                                     |
+| `/stats` | Visualize daily usage, session history, streaks, and model preferences |
 
-| `/status`                 | Open the Settings interface (Status tab) showing version, model, account, and connectivity                                                                                                                                 |
+| `/status` | Open the Settings interface (Status tab) showing version, model, account, and connectivity |
 
-| `/statusline`             | Set up Claude Code's status line UI                                                                                                                                                                                        |
+| `/statusline` | Set up Claude Code's status line UI |
 
-| `/copy`                   | Copy the last assistant response to clipboard                                                                                                                                                                              |
+| `/copy` | Copy the last assistant response to clipboard |
 
-| `/tasks`                  | List and manage background tasks                                                                                                                                                                                           |
+| `/tasks` | List and manage background tasks |
 
-| `/teleport`               | Resume a remote session from claude.ai (subscribers only)                                                                                                                                                                  |
+| `/teleport` | Resume a remote session from claude.ai (subscribers only) |
 
-| `/desktop`                | Hand off the current CLI session to the Claude Code Desktop app (macOS and Windows only)                                                                                                                                   |
+| `/desktop` | Hand off the current CLI session to the Claude Code Desktop app (macOS and Windows only) |
 
-| `/theme`                  | Change the color theme                                                                                                                                                                                                     |
+| `/theme` | Change the color theme |
 
-| `/todos`                  | List current TODO items                                                                                                                                                                                                    |
+| `/todos` | List current TODO items |
 
-| `/usage`                  | For subscription plans only: show plan usage limits and rate limit status                                                                                                                                                  |
-
-
+| `/usage` | For subscription plans only: show plan usage limits and rate limit status |
 
 \### MCP prompts
 
-
-
 MCP servers can expose prompts that appear as commands. These use the format `/mcp\_\_<server>\_\_<prompt>` and are dynamically discovered from connected servers. See \[MCP prompts](/en/mcp#use-mcp-prompts-as-commands) for details.
-
-
 
 \## Vim editor mode
 
-
-
 Enable vim-style editing with `/vim` command or configure permanently via `/config`.
-
-
 
 \### Mode switching
 
-
-
-| Command | Action                      | From mode |
+| Command | Action | From mode |
 
 | :------ | :-------------------------- | :-------- |
 
-| `Esc`   | Enter NORMAL mode           | INSERT    |
+| `Esc` | Enter NORMAL mode | INSERT |
 
-| `i`     | Insert before cursor        | NORMAL    |
+| `i` | Insert before cursor | NORMAL |
 
-| `I`     | Insert at beginning of line | NORMAL    |
+| `I` | Insert at beginning of line | NORMAL |
 
-| `a`     | Insert after cursor         | NORMAL    |
+| `a` | Insert after cursor | NORMAL |
 
-| `A`     | Insert at end of line       | NORMAL    |
+| `A` | Insert at end of line | NORMAL |
 
-| `o`     | Open line below             | NORMAL    |
+| `o` | Open line below | NORMAL |
 
-| `O`     | Open line above             | NORMAL    |
-
-
+| `O` | Open line above | NORMAL |
 
 \### Navigation (NORMAL mode)
 
-
-
-| Command         | Action                                              |
+| Command | Action |
 
 | :-------------- | :-------------------------------------------------- |
 
-| `h`/`j`/`k`/`l` | Move left/down/up/right                             |
+| `h`/`j`/`k`/`l` | Move left/down/up/right |
 
-| `w`             | Next word                                           |
+| `w` | Next word |
 
-| `e`             | End of word                                         |
+| `e` | End of word |
 
-| `b`             | Previous word                                       |
+| `b` | Previous word |
 
-| `0`             | Beginning of line                                   |
+| `0` | Beginning of line |
 
-| `$`             | End of line                                         |
+| `$` | End of line |
 
-| `^`             | First non-blank character                           |
+| `^` | First non-blank character |
 
-| `gg`            | Beginning of input                                  |
+| `gg` | Beginning of input |
 
-| `G`             | End of input                                        |
+| `G` | End of input |
 
-| `f{char}`       | Jump to next occurrence of character                |
+| `f{char}` | Jump to next occurrence of character |
 
-| `F{char}`       | Jump to previous occurrence of character            |
+| `F{char}` | Jump to previous occurrence of character |
 
-| `t{char}`       | Jump to just before next occurrence of character    |
+| `t{char}` | Jump to just before next occurrence of character |
 
-| `T{char}`       | Jump to just after previous occurrence of character |
+| `T{char}` | Jump to just after previous occurrence of character |
 
-| `;`             | Repeat last f/F/t/T motion                          |
+| `;` | Repeat last f/F/t/T motion |
 
-| `,`             | Repeat last f/F/t/T motion in reverse               |
-
-
+| `,` | Repeat last f/F/t/T motion in reverse |
 
 <Note>
 
@@ -330,83 +266,67 @@ Enable vim-style editing with `/vim` command or configure permanently via `/conf
 
 </Note>
 
-
-
 \### Editing (NORMAL mode)
 
-
-
-| Command        | Action                  |
+| Command | Action |
 
 | :------------- | :---------------------- |
 
-| `x`            | Delete character        |
+| `x` | Delete character |
 
-| `dd`           | Delete line             |
+| `dd` | Delete line |
 
-| `D`            | Delete to end of line   |
+| `D` | Delete to end of line |
 
 | `dw`/`de`/`db` | Delete word/to end/back |
 
-| `cc`           | Change line             |
+| `cc` | Change line |
 
-| `C`            | Change to end of line   |
+| `C` | Change to end of line |
 
 | `cw`/`ce`/`cb` | Change word/to end/back |
 
-| `yy`/`Y`       | Yank (copy) line        |
+| `yy`/`Y` | Yank (copy) line |
 
-| `yw`/`ye`/`yb` | Yank word/to end/back   |
+| `yw`/`ye`/`yb` | Yank word/to end/back |
 
-| `p`            | Paste after cursor      |
+| `p` | Paste after cursor |
 
-| `P`            | Paste before cursor     |
+| `P` | Paste before cursor |
 
-| `>>`           | Indent line             |
+| `>>` | Indent line |
 
-| `<<`           | Dedent line             |
+| `<<` | Dedent line |
 
-| `J`            | Join lines              |
+| `J` | Join lines |
 
-| `.`            | Repeat last change      |
-
-
+| `.` | Repeat last change |
 
 \### Text objects (NORMAL mode)
 
-
-
 Text objects work with operators like `d`, `c`, and `y`:
 
-
-
-| Command   | Action                                   |
+| Command | Action |
 
 | :-------- | :--------------------------------------- |
 
-| `iw`/`aw` | Inner/around word                        |
+| `iw`/`aw` | Inner/around word |
 
 | `iW`/`aW` | Inner/around WORD (whitespace-delimited) |
 
-| `i"`/`a"` | Inner/around double quotes               |
+| `i"`/`a"` | Inner/around double quotes |
 
-| `i'`/`a'` | Inner/around single quotes               |
+| `i'`/`a'` | Inner/around single quotes |
 
-| `i(`/`a(` | Inner/around parentheses                 |
+| `i(`/`a(` | Inner/around parentheses |
 
-| `i\[`/`a\[` | Inner/around brackets                    |
+| `i\[`/`a\[` | Inner/around brackets |
 
-| `i{`/`a{` | Inner/around braces                      |
-
-
+| `i{`/`a{` | Inner/around braces |
 
 \## Command history
 
-
-
 Claude Code maintains command history for the current session:
-
-
 
 \* History is stored per working directory
 
@@ -416,15 +336,9 @@ Claude Code maintains command history for the current session:
 
 \* \*\*Note\*\*: History expansion (`!`) is disabled by default
 
-
-
 \### Reverse search with Ctrl+R
 
-
-
 Press `Ctrl+R` to interactively search through your command history:
-
-
 
 1\. \*\*Start search\*\*: Press `Ctrl+R` to activate reverse history search
 
@@ -434,51 +348,33 @@ Press `Ctrl+R` to interactively search through your command history:
 
 4\. \*\*Accept match\*\*:
 
-&nbsp;  \* Press `Tab` or `Esc` to accept the current match and continue editing
+&nbsp; \* Press `Tab` or `Esc` to accept the current match and continue editing
 
-&nbsp;  \* Press `Enter` to accept and execute the command immediately
+&nbsp; \* Press `Enter` to accept and execute the command immediately
 
 5\. \*\*Cancel search\*\*:
 
-&nbsp;  \* Press `Ctrl+C` to cancel and restore your original input
+&nbsp; \* Press `Ctrl+C` to cancel and restore your original input
 
-&nbsp;  \* Press `Backspace` on empty search to cancel
-
-
+&nbsp; \* Press `Backspace` on empty search to cancel
 
 The search displays matching commands with the search term highlighted, making it easy to find and reuse previous inputs.
 
-
-
 \## Background bash commands
-
-
 
 Claude Code supports running bash commands in the background, allowing you to continue working while long-running processes execute.
 
-
-
 \### How backgrounding works
-
-
 
 When Claude Code runs a command in the background, it runs the command asynchronously and immediately returns a background task ID. Claude Code can respond to new prompts while the command continues executing in the background.
 
-
-
 To run commands in the background, you can either:
-
-
 
 \* Prompt Claude Code to run a command in the background
 
 \* Press Ctrl+B to move a regular Bash tool invocation to the background. (Tmux users must press Ctrl+B twice due to tmux's prefix key.)
 
-
-
 \*\*Key features:\*\*
-
-
 
 \* Output is buffered and Claude can retrieve it using the TaskOutput tool
 
@@ -486,15 +382,9 @@ To run commands in the background, you can either:
 
 \* Background tasks are automatically cleaned up when Claude Code exits
 
-
-
 To disable all background task functionality, set the `CLAUDE\_CODE\_DISABLE\_BACKGROUND\_TASKS` environment variable to `1`. See \[Environment variables](/en/settings#environment-variables) for details.
 
-
-
 \*\*Common backgrounded commands:\*\*
-
-
 
 \* Build tools (webpack, vite, make)
 
@@ -506,17 +396,11 @@ To disable all background task functionality, set the `CLAUDE\_CODE\_DISABLE\_BA
 
 \* Long-running processes (docker, terraform)
 
-
-
 \### Bash mode with `!` prefix
-
-
 
 Run bash commands directly without going through Claude by prefixing your input with `!`:
 
-
-
-```bash  theme={null}
+```bash theme={null}
 
 ! npm test
 
@@ -526,11 +410,7 @@ Run bash commands directly without going through Claude by prefixing your input 
 
 ```
 
-
-
 Bash mode:
-
-
 
 \* Adds the command and its output to the conversation context
 
@@ -542,57 +422,33 @@ Bash mode:
 
 \* Supports history-based autocomplete: type a partial command and press \*\*Tab\*\* to complete from previous `!` commands in the current project
 
-
-
 This is useful for quick shell operations while maintaining conversation context.
-
-
 
 \## Prompt suggestions
 
-
-
 When you first open a session, a grayed-out example command appears in the prompt input to help you get started. Claude Code picks this from your project's git history, so it reflects files you've been working on recently.
 
-
-
 After Claude responds, suggestions continue to appear based on your conversation history, such as a follow-up step from a multi-part request or a natural continuation of your workflow.
-
-
 
 \* Press \*\*Tab\*\* to accept the suggestion, or press \*\*Enter\*\* to accept and submit
 
 \* Start typing to dismiss it
 
-
-
 The suggestion runs as a background request that reuses the parent conversation's prompt cache, so the additional cost is minimal. Claude Code skips suggestion generation when the cache is cold to avoid unnecessary cost.
-
-
 
 Suggestions are automatically skipped after the first turn of a conversation, in non-interactive mode, and in plan mode.
 
-
-
 To disable prompt suggestions entirely, set the environment variable or toggle the setting in `/config`:
 
-
-
-```bash  theme={null}
+```bash theme={null}
 
 export CLAUDE\_CODE\_ENABLE\_PROMPT\_SUGGESTION=false
 
 ```
 
-
-
 \## Task list
 
-
-
 When working on complex, multi-step work, Claude creates a task list to track progress. Tasks appear in the status area of your terminal with indicators showing what's pending, in progress, or complete.
-
-
 
 \* Press `Ctrl+T` to toggle the task list view. The display shows up to 10 tasks at a time
 
@@ -604,15 +460,9 @@ When working on complex, multi-step work, Claude creates a task list to track pr
 
 \* To revert to the previous TODO list, set `CLAUDE\_CODE\_ENABLE\_TASKS=false`.
 
-
-
 \## PR review status
 
-
-
 When working on a branch with an open pull request, Claude Code displays a clickable PR link in the footer (for example, "PR #446"). The link has a colored underline indicating the review state:
-
-
 
 \* Green: approved
 
@@ -624,11 +474,7 @@ When working on a branch with an open pull request, Claude Code displays a click
 
 \* Purple: merged
 
-
-
 `Cmd+click` (Mac) or `Ctrl+click` (Windows/Linux) the link to open the pull request in your browser. The status updates automatically every 60 seconds.
-
-
 
 <Note>
 
@@ -636,11 +482,7 @@ When working on a branch with an open pull request, Claude Code displays a click
 
 </Note>
 
-
-
 \## See also
-
-
 
 \* \[Skills](/en/skills) - Custom prompts and workflows
 
@@ -651,4 +493,3 @@ When working on a branch with an open pull request, Claude Code displays a click
 \* \[Settings](/en/settings) - Configuration options
 
 \* \[Memory management](/en/memory) - Managing CLAUDE.md files
-

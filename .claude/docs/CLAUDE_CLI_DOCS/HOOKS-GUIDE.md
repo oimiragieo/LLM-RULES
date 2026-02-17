@@ -4,27 +4,15 @@
 
 > Use this file to discover all available pages before exploring further.
 
-
-
 \# Automate workflows with hooks
-
-
 
 > Run shell commands automatically when Claude Code edits files, finishes tasks, or needs input. Format code, send notifications, validate commands, and enforce project rules.
 
-
-
 Hooks are user-defined shell commands that execute at specific points in Claude Code's lifecycle. They provide deterministic control over Claude Code's behavior, ensuring certain actions always happen rather than relying on the LLM to choose to run them. Use hooks to enforce project rules, automate repetitive tasks, and integrate Claude Code with your existing tools.
-
-
 
 For decisions that require judgment rather than deterministic rules, you can also use \[prompt-based hooks](#prompt-based-hooks) or \[agent-based hooks](#agent-based-hooks) that use a Claude model to evaluate conditions.
 
-
-
 For other ways to extend Claude Code, see \[skills](/en/skills) for giving Claude additional instructions and executable commands, \[subagents](/en/sub-agents) for running tasks in isolated contexts, and \[plugins](/en/plugins) for packaging extensions to share across projects.
-
-
 
 <Tip>
 
@@ -32,123 +20,89 @@ For other ways to extend Claude Code, see \[skills](/en/skills) for giving Claud
 
 </Tip>
 
-
-
 \## Set up your first hook
 
-
-
 The fastest way to create a hook is through the `/hooks` interactive menu in Claude Code. This walkthrough creates a desktop notification hook, so you get alerted whenever Claude is waiting for your input instead of watching the terminal.
-
-
 
 <Steps>
 
 &nbsp; <Step title="Open the hooks menu">
 
-&nbsp;   Type `/hooks` in the Claude Code CLI. You'll see a list of all available hook events, plus an option to disable all hooks. Each event corresponds to a point in Claude's lifecycle where you can run custom code. Select `Notification` to create a hook that fires when Claude needs your attention.
+&nbsp; Type `/hooks` in the Claude Code CLI. You'll see a list of all available hook events, plus an option to disable all hooks. Each event corresponds to a point in Claude's lifecycle where you can run custom code. Select `Notification` to create a hook that fires when Claude needs your attention.
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Configure the matcher">
 
-&nbsp;   The menu shows a list of matchers, which filter when the hook fires. Set the matcher to `\*` to fire on all notification types. You can narrow it later by changing the matcher to a specific value like `permission\_prompt` or `idle\_prompt`.
+&nbsp; The menu shows a list of matchers, which filter when the hook fires. Set the matcher to `\*` to fire on all notification types. You can narrow it later by changing the matcher to a specific value like `permission\_prompt` or `idle\_prompt`.
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Add your command">
 
-&nbsp;   Select `+ Add new hook…`. The menu prompts you for a shell command to run when the event fires. Hooks run any shell command you provide, so you can use your platform's built-in notification tool. Copy the command for your OS:
+&nbsp; Select `+ Add new hook…`. The menu prompts you for a shell command to run when the event fires. Hooks run any shell command you provide, so you can use your platform's built-in notification tool. Copy the command for your OS:
 
+&nbsp; <Tabs>
 
+&nbsp; <Tab title="macOS">
 
-&nbsp;   <Tabs>
+&nbsp; Uses \[`osascript`](https://ss64.com/mac/osascript.html) to trigger a native macOS notification through AppleScript:
 
-&nbsp;     <Tab title="macOS">
+&nbsp; ```
 
-&nbsp;       Uses \[`osascript`](https://ss64.com/mac/osascript.html) to trigger a native macOS notification through AppleScript:
+&nbsp; osascript -e 'display notification "Claude Code needs your attention" with title "Claude Code"'
 
+&nbsp; ```
 
+&nbsp; </Tab>
 
-&nbsp;       ```
+&nbsp; <Tab title="Linux">
 
-&nbsp;       osascript -e 'display notification "Claude Code needs your attention" with title "Claude Code"'
+&nbsp; Uses `notify-send`, which is pre-installed on most Linux desktops with a notification daemon:
 
-&nbsp;       ```
+&nbsp; ```
 
-&nbsp;     </Tab>
+&nbsp; notify-send 'Claude Code' 'Claude Code needs your attention'
 
+&nbsp; ```
 
+&nbsp; </Tab>
 
-&nbsp;     <Tab title="Linux">
+&nbsp; <Tab title="Windows (PowerShell)">
 
-&nbsp;       Uses `notify-send`, which is pre-installed on most Linux desktops with a notification daemon:
+&nbsp; Uses PowerShell to show a native message box through .NET's Windows Forms:
 
+&nbsp; ```
 
+&nbsp; powershell.exe -Command "\[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); \[System.Windows.Forms.MessageBox]::Show('Claude Code needs your attention', 'Claude Code')"
 
-&nbsp;       ```
+&nbsp; ```
 
-&nbsp;       notify-send 'Claude Code' 'Claude Code needs your attention'
+&nbsp; </Tab>
 
-&nbsp;       ```
-
-&nbsp;     </Tab>
-
-
-
-&nbsp;     <Tab title="Windows (PowerShell)">
-
-&nbsp;       Uses PowerShell to show a native message box through .NET's Windows Forms:
-
-
-
-&nbsp;       ```
-
-&nbsp;       powershell.exe -Command "\[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); \[System.Windows.Forms.MessageBox]::Show('Claude Code needs your attention', 'Claude Code')"
-
-&nbsp;       ```
-
-&nbsp;     </Tab>
-
-&nbsp;   </Tabs>
+&nbsp; </Tabs>
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Choose a storage location">
 
-&nbsp;   The menu asks where to save the hook configuration. Select `User settings` to store it in `~/.claude/settings.json`, which applies the hook to all your projects. You could also choose `Project settings` to scope it to the current project. See \[Configure hook location](#configure-hook-location) for all available scopes.
+&nbsp; The menu asks where to save the hook configuration. Select `User settings` to store it in `~/.claude/settings.json`, which applies the hook to all your projects. You could also choose `Project settings` to scope it to the current project. See \[Configure hook location](#configure-hook-location) for all available scopes.
 
 &nbsp; </Step>
 
-
-
 &nbsp; <Step title="Test the hook">
 
-&nbsp;   Press `Esc` to return to the CLI. Ask Claude to do something that requires permission, then switch away from the terminal. You should receive a desktop notification.
+&nbsp; Press `Esc` to return to the CLI. Ask Claude to do something that requires permission, then switch away from the terminal. You should receive a desktop notification.
 
 &nbsp; </Step>
 
 </Steps>
 
-
-
 \## What you can automate
-
-
 
 Hooks let you run code at key points in Claude Code's lifecycle: format files after edits, block commands before they execute, send notifications when Claude needs input, inject context at session start, and more. For the full list of hook events, see the \[Hooks reference](/en/hooks#hook-lifecycle).
 
-
-
 Each example includes a ready-to-use configuration block that you add to a \[settings file](#configure-hook-location). The most common patterns:
-
-
 
 \* \[Get notified when Claude needs input](#get-notified-when-claude-needs-input)
 
@@ -158,157 +112,137 @@ Each example includes a ready-to-use configuration block that you add to a \[set
 
 \* \[Re-inject context after compaction](#re-inject-context-after-compaction)
 
-
-
 \### Get notified when Claude needs input
-
-
 
 Get a desktop notification whenever Claude finishes working and needs your input, so you can switch to other tasks without checking the terminal.
 
-
-
 This hook uses the `Notification` event, which fires when Claude is waiting for input or permission. Each tab below uses the platform's native notification command. Add this to `~/.claude/settings.json`, or use the \[interactive walkthrough](#set-up-your-first-hook) above to configure it with `/hooks`:
-
-
 
 <Tabs>
 
 &nbsp; <Tab title="macOS">
 
-&nbsp;   ```json  theme={null}
+&nbsp; ```json theme={null}
 
-&nbsp;   {
+&nbsp; {
 
-&nbsp;     "hooks": {
+&nbsp; "hooks": {
 
-&nbsp;       "Notification": \[
+&nbsp; "Notification": \[
 
-&nbsp;         {
+&nbsp; {
 
-&nbsp;           "matcher": "",
+&nbsp; "matcher": "",
 
-&nbsp;           "hooks": \[
+&nbsp; "hooks": \[
 
-&nbsp;             {
+&nbsp; {
 
-&nbsp;               "type": "command",
+&nbsp; "type": "command",
 
-&nbsp;               "command": "osascript -e 'display notification \\"Claude Code needs your attention\\" with title \\"Claude Code\\"'"
+&nbsp; "command": "osascript -e 'display notification \\"Claude Code needs your attention\\" with title \\"Claude Code\\"'"
 
-&nbsp;             }
+&nbsp; }
 
-&nbsp;           ]
+&nbsp; ]
 
-&nbsp;         }
+&nbsp; }
 
-&nbsp;       ]
+&nbsp; ]
 
-&nbsp;     }
+&nbsp; }
 
-&nbsp;   }
+&nbsp; }
 
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Tab>
-
-
 
 &nbsp; <Tab title="Linux">
 
-&nbsp;   ```json  theme={null}
+&nbsp; ```json theme={null}
 
-&nbsp;   {
+&nbsp; {
 
-&nbsp;     "hooks": {
+&nbsp; "hooks": {
 
-&nbsp;       "Notification": \[
+&nbsp; "Notification": \[
 
-&nbsp;         {
+&nbsp; {
 
-&nbsp;           "matcher": "",
+&nbsp; "matcher": "",
 
-&nbsp;           "hooks": \[
+&nbsp; "hooks": \[
 
-&nbsp;             {
+&nbsp; {
 
-&nbsp;               "type": "command",
+&nbsp; "type": "command",
 
-&nbsp;               "command": "notify-send 'Claude Code' 'Claude Code needs your attention'"
+&nbsp; "command": "notify-send 'Claude Code' 'Claude Code needs your attention'"
 
-&nbsp;             }
+&nbsp; }
 
-&nbsp;           ]
+&nbsp; ]
 
-&nbsp;         }
+&nbsp; }
 
-&nbsp;       ]
+&nbsp; ]
 
-&nbsp;     }
+&nbsp; }
 
-&nbsp;   }
+&nbsp; }
 
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Tab>
 
-
-
 &nbsp; <Tab title="Windows (PowerShell)">
 
-&nbsp;   ```json  theme={null}
+&nbsp; ```json theme={null}
 
-&nbsp;   {
+&nbsp; {
 
-&nbsp;     "hooks": {
+&nbsp; "hooks": {
 
-&nbsp;       "Notification": \[
+&nbsp; "Notification": \[
 
-&nbsp;         {
+&nbsp; {
 
-&nbsp;           "matcher": "",
+&nbsp; "matcher": "",
 
-&nbsp;           "hooks": \[
+&nbsp; "hooks": \[
 
-&nbsp;             {
+&nbsp; {
 
-&nbsp;               "type": "command",
+&nbsp; "type": "command",
 
-&nbsp;               "command": "powershell.exe -Command \\"\[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); \[System.Windows.Forms.MessageBox]::Show('Claude Code needs your attention', 'Claude Code')\\""
+&nbsp; "command": "powershell.exe -Command \\"\[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); \[System.Windows.Forms.MessageBox]::Show('Claude Code needs your attention', 'Claude Code')\\""
 
-&nbsp;             }
+&nbsp; }
 
-&nbsp;           ]
+&nbsp; ]
 
-&nbsp;         }
+&nbsp; }
 
-&nbsp;       ]
+&nbsp; ]
 
-&nbsp;     }
+&nbsp; }
 
-&nbsp;   }
+&nbsp; }
 
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Tab>
 
 </Tabs>
 
-
-
 \### Auto-format code after edits
-
-
 
 Automatically run \[Prettier](https://prettier.io/) on every file Claude edits, so formatting stays consistent without manual intervention.
 
-
-
 This hook uses the `PostToolUse` event with an `Edit|Write` matcher, so it runs only after file-editing tools. The command extracts the edited file path with \[`jq`](https://jqlang.github.io/jq/) and passes it to Prettier. Add this to `.claude/settings.json` in your project root:
 
-
-
-```json  theme={null}
+```json theme={null}
 
 {
 
@@ -342,151 +276,115 @@ This hook uses the `PostToolUse` event with an `Edit|Write` matcher, so it runs 
 
 ```
 
-
-
 <Note>
 
 &nbsp; The Bash examples on this page use `jq` for JSON parsing. Install it with `brew install jq` (macOS), `apt-get install jq` (Debian/Ubuntu), or see \[`jq` downloads](https://jqlang.github.io/jq/download/).
 
 </Note>
 
-
-
 \### Block edits to protected files
-
-
 
 Prevent Claude from modifying sensitive files like `.env`, `package-lock.json`, or anything in `.git/`. Claude receives feedback explaining why the edit was blocked, so it can adjust its approach.
 
-
-
 This example uses a separate script file that the hook calls. The script checks the target file path against a list of protected patterns and exits with code 2 to block the edit.
-
-
 
 <Steps>
 
 &nbsp; <Step title="Create the hook script">
 
-&nbsp;   Save this to `.claude/hooks/protect-files.sh`:
+&nbsp; Save this to `.claude/hooks/protect-files.sh`:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; #!/bin/bash
 
-&nbsp;   ```bash  theme={null}
+&nbsp; # protect-files.sh
 
-&nbsp;   #!/bin/bash
+&nbsp; INPUT=$(cat)
 
-&nbsp;   # protect-files.sh
+&nbsp; FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 
+&nbsp; PROTECTED_PATTERNS=(".env" "package-lock.json" ".git/")
 
+&nbsp; for pattern in "${PROTECTED_PATTERNS\[@]}"; do
 
-&nbsp;   INPUT=$(cat)
+&nbsp; if \[\[ "$FILE\_PATH" == \*"$pattern"\* ]]; then
 
-&nbsp;   FILE\_PATH=$(echo "$INPUT" | jq -r '.tool\_input.file\_path // empty')
+&nbsp; echo "Blocked: $FILE\_PATH matches protected pattern '$pattern'" >\&2
 
+&nbsp; exit 2
 
+&nbsp; fi
 
-&nbsp;   PROTECTED\_PATTERNS=(".env" "package-lock.json" ".git/")
+&nbsp; done
 
+&nbsp; exit 0
 
-
-&nbsp;   for pattern in "${PROTECTED\_PATTERNS\[@]}"; do
-
-&nbsp;     if \[\[ "$FILE\_PATH" == \*"$pattern"\* ]]; then
-
-&nbsp;       echo "Blocked: $FILE\_PATH matches protected pattern '$pattern'" >\&2
-
-&nbsp;       exit 2
-
-&nbsp;     fi
-
-&nbsp;   done
-
-
-
-&nbsp;   exit 0
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
-
-
 
 &nbsp; <Step title="Make the script executable (macOS/Linux)">
 
-&nbsp;   Hook scripts must be executable for Claude Code to run them:
+&nbsp; Hook scripts must be executable for Claude Code to run them:
 
+&nbsp; ```bash theme={null}
 
+&nbsp; chmod +x .claude/hooks/protect-files.sh
 
-&nbsp;   ```bash  theme={null}
-
-&nbsp;   chmod +x .claude/hooks/protect-files.sh
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
 
-
-
 &nbsp; <Step title="Register the hook">
 
-&nbsp;   Add a `PreToolUse` hook to `.claude/settings.json` that runs the script before any `Edit` or `Write` tool call:
+&nbsp; Add a `PreToolUse` hook to `.claude/settings.json` that runs the script before any `Edit` or `Write` tool call:
 
+&nbsp; ```json theme={null}
 
+&nbsp; {
 
-&nbsp;   ```json  theme={null}
+&nbsp; "hooks": {
 
-&nbsp;   {
+&nbsp; "PreToolUse": \[
 
-&nbsp;     "hooks": {
+&nbsp; {
 
-&nbsp;       "PreToolUse": \[
+&nbsp; "matcher": "Edit|Write",
 
-&nbsp;         {
+&nbsp; "hooks": \[
 
-&nbsp;           "matcher": "Edit|Write",
+&nbsp; {
 
-&nbsp;           "hooks": \[
+&nbsp; "type": "command",
 
-&nbsp;             {
+&nbsp; "command": "\\"$CLAUDE_PROJECT_DIR\\"/.claude/hooks/protect-files.sh"
 
-&nbsp;               "type": "command",
+&nbsp; }
 
-&nbsp;               "command": "\\"$CLAUDE\_PROJECT\_DIR\\"/.claude/hooks/protect-files.sh"
+&nbsp; ]
 
-&nbsp;             }
+&nbsp; }
 
-&nbsp;           ]
+&nbsp; ]
 
-&nbsp;         }
+&nbsp; }
 
-&nbsp;       ]
+&nbsp; }
 
-&nbsp;     }
-
-&nbsp;   }
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Step>
 
 </Steps>
 
-
-
 \### Re-inject context after compaction
-
-
 
 When Claude's context window fills up, compaction summarizes the conversation to free space. This can lose important details. Use a `SessionStart` hook with a `compact` matcher to re-inject critical context after every compaction.
 
-
-
 Any text your command writes to stdout is added to Claude's context. This example reminds Claude of project conventions and recent work. Add this to `.claude/settings.json` in your project root:
 
-
-
-```json  theme={null}
+```json theme={null}
 
 {
 
@@ -520,75 +418,55 @@ Any text your command writes to stdout is added to Claude's context. This exampl
 
 ```
 
-
-
 You can replace the `echo` with any command that produces dynamic output, like `git log --oneline -5` to show recent commits. For injecting context on every session start, consider using \[CLAUDE.md](/en/memory) instead. For environment variables, see \[`CLAUDE\_ENV\_FILE`](/en/hooks#persist-environment-variables) in the reference.
-
-
 
 \## How hooks work
 
-
-
 Hook events fire at specific lifecycle points in Claude Code. When an event fires, all matching hooks run in parallel, and identical hook commands are automatically deduplicated. The table below shows each event and when it triggers:
 
-
-
-| Event                | When it fires                                                      |
+| Event | When it fires |
 
 | :------------------- | :----------------------------------------------------------------- |
 
-| `SessionStart`       | When a session begins or resumes                                   |
+| `SessionStart` | When a session begins or resumes |
 
-| `UserPromptSubmit`   | When you submit a prompt, before Claude processes it               |
+| `UserPromptSubmit` | When you submit a prompt, before Claude processes it |
 
-| `PreToolUse`         | Before a tool call executes. Can block it                          |
+| `PreToolUse` | Before a tool call executes. Can block it |
 
-| `PermissionRequest`  | When a permission dialog appears                                   |
+| `PermissionRequest` | When a permission dialog appears |
 
-| `PostToolUse`        | After a tool call succeeds                                         |
+| `PostToolUse` | After a tool call succeeds |
 
-| `PostToolUseFailure` | After a tool call fails                                            |
+| `PostToolUseFailure` | After a tool call fails |
 
-| `Notification`       | When Claude Code sends a notification                              |
+| `Notification` | When Claude Code sends a notification |
 
-| `SubagentStart`      | When a subagent is spawned                                         |
+| `SubagentStart` | When a subagent is spawned |
 
-| `SubagentStop`       | When a subagent finishes                                           |
+| `SubagentStop` | When a subagent finishes |
 
-| `Stop`               | When Claude finishes responding                                    |
+| `Stop` | When Claude finishes responding |
 
-| `TeammateIdle`       | When an \[agent team](/en/agent-teams) teammate is about to go idle |
+| `TeammateIdle` | When an \[agent team](/en/agent-teams) teammate is about to go idle |
 
-| `TaskCompleted`      | When a task is being marked as completed                           |
+| `TaskCompleted` | When a task is being marked as completed |
 
-| `PreCompact`         | Before context compaction                                          |
+| `PreCompact` | Before context compaction |
 
-| `SessionEnd`         | When a session terminates                                          |
-
-
+| `SessionEnd` | When a session terminates |
 
 Each hook has a `type` that determines how it runs. Most hooks use `"type": "command"`, which runs a shell command. Two other options use a Claude model to make decisions: `"type": "prompt"` for single-turn evaluation and `"type": "agent"` for multi-turn verification with tool access. See \[Prompt-based hooks](#prompt-based-hooks) and \[Agent-based hooks](#agent-based-hooks) for details.
 
-
-
 \### Read input and return output
-
-
 
 Hooks communicate with Claude Code through stdin, stdout, stderr, and exit codes. When an event fires, Claude Code passes event-specific data as JSON to your script's stdin. Your script reads that data, does its work, and tells Claude Code what to do next via the exit code.
 
-
-
 \#### Hook input
-
-
 
 Every event includes common fields like `session\_id` and `cwd`, but each event type adds different data. For example, when Claude runs a Bash command, a `PreToolUse` hook receives something like this on stdin:
 
-
-
-```json  theme={null}
+```json theme={null}
 
 {
 
@@ -610,21 +488,13 @@ Every event includes common fields like `session\_id` and `cwd`, but each event 
 
 ```
 
-
-
 Your script can parse that JSON and act on any of those fields. `UserPromptSubmit` hooks get the `prompt` text instead, `SessionStart` hooks get the `source` (startup, resume, compact), and so on. See \[Common input fields](/en/hooks#common-input-fields) in the reference for shared fields, and each event's section for event-specific schemas.
-
-
 
 \#### Hook output
 
-
-
 Your script tells Claude Code what to do next by writing to stdout or stderr and exiting with a specific code. For example, a `PreToolUse` hook that wants to block a command:
 
-
-
-```bash  theme={null}
+```bash theme={null}
 
 \#!/bin/bash
 
@@ -648,11 +518,7 @@ exit 0  # exit 0 = let it proceed
 
 ```
 
-
-
 The exit code determines what happens next:
-
-
 
 \* \*\*Exit 0\*\*: the action proceeds. For `UserPromptSubmit` and `SessionStart` hooks, anything you write to stdout is added to Claude's context.
 
@@ -660,15 +526,9 @@ The exit code determines what happens next:
 
 \* \*\*Any other exit code\*\*: the action proceeds. Stderr is logged but not shown to Claude. Toggle verbose mode with `Ctrl+O` to see these messages in the transcript.
 
-
-
 \#### Structured JSON output
 
-
-
 Exit codes give you two options: allow or block. For more control, exit 0 and print a JSON object to stdout instead.
-
-
 
 <Note>
 
@@ -676,13 +536,9 @@ Exit codes give you two options: allow or block. For more control, exit 0 and pr
 
 </Note>
 
-
-
 For example, a `PreToolUse` hook can deny a tool call and tell Claude why, or escalate it to the user for approval:
 
-
-
-```json  theme={null}
+```json theme={null}
 
 {
 
@@ -700,11 +556,7 @@ For example, a `PreToolUse` hook can deny a tool call and tell Claude why, or es
 
 ```
 
-
-
 Claude Code reads `permissionDecision` and cancels the tool call, then feeds `permissionDecisionReason` back to Claude as feedback. These three options are specific to `PreToolUse`:
-
-
 
 \* `"allow"`: proceed without showing a permission prompt
 
@@ -712,25 +564,15 @@ Claude Code reads `permissionDecision` and cancels the tool call, then feeds `pe
 
 \* `"ask"`: show the permission prompt to the user as normal
 
-
-
 Other events use different decision patterns. For example, `PostToolUse` and `Stop` hooks use a top-level `decision: "block"` field, while `PermissionRequest` uses `hookSpecificOutput.decision.behavior`. See the \[summary table](/en/hooks#decision-control) in the reference for a full breakdown by event.
-
-
 
 For `UserPromptSubmit` hooks, use `additionalContext` instead to inject text into Claude's context. Prompt-based hooks (`type: "prompt"`) handle output differently: see \[Prompt-based hooks](#prompt-based-hooks).
 
-
-
 \### Filter hooks with matchers
-
-
 
 Without a matcher, a hook fires on every occurrence of its event. Matchers let you narrow that down. For example, if you want to run a formatter only after file edits (not after every tool call), add a matcher to your `PostToolUse` hook:
 
-
-
-```json  theme={null}
+```json theme={null}
 
 {
 
@@ -758,243 +600,197 @@ Without a matcher, a hook fires on every occurrence of its event. Matchers let y
 
 ```
 
-
-
 The `"Edit|Write"` matcher is a regex pattern that matches the tool name. The hook only fires when Claude uses the `Edit` or `Write` tool, not when it uses `Bash`, `Read`, or any other tool.
-
-
 
 Each event type matches on a specific field. Matchers support exact strings and regex patterns:
 
-
-
-| Event                                                                  | What the matcher filters  | Example matcher values                                                         |
+| Event | What the matcher filters | Example matcher values |
 
 | :--------------------------------------------------------------------- | :------------------------ | :----------------------------------------------------------------------------- |
 
-| `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | tool name                 | `Bash`, `Edit\\|Write`, `mcp\_\_.\*`                                               |
+| `PreToolUse`, `PostToolUse`, `PostToolUseFailure`, `PermissionRequest` | tool name | `Bash`, `Edit\\|Write`, `mcp\_\_.\*` |
 
-| `SessionStart`                                                         | how the session started   | `startup`, `resume`, `clear`, `compact`                                        |
+| `SessionStart` | how the session started | `startup`, `resume`, `clear`, `compact` |
 
-| `SessionEnd`                                                           | why the session ended     | `clear`, `logout`, `prompt\_input\_exit`, `bypass\_permissions\_disabled`, `other` |
+| `SessionEnd` | why the session ended | `clear`, `logout`, `prompt\_input\_exit`, `bypass\_permissions\_disabled`, `other` |
 
-| `Notification`                                                         | notification type         | `permission\_prompt`, `idle\_prompt`, `auth\_success`, `elicitation\_dialog`       |
+| `Notification` | notification type | `permission\_prompt`, `idle\_prompt`, `auth\_success`, `elicitation\_dialog` |
 
-| `SubagentStart`                                                        | agent type                | `Bash`, `Explore`, `Plan`, or custom agent names                               |
+| `SubagentStart` | agent type | `Bash`, `Explore`, `Plan`, or custom agent names |
 
-| `PreCompact`                                                           | what triggered compaction | `manual`, `auto`                                                               |
+| `PreCompact` | what triggered compaction | `manual`, `auto` |
 
-| `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCompleted`            | no matcher support        | always fires on every occurrence                                               |
+| `UserPromptSubmit`, `Stop`, `TeammateIdle`, `TaskCompleted` | no matcher support | always fires on every occurrence |
 
-| `SubagentStop`                                                         | agent type                | same values as `SubagentStart`                                                 |
-
-
+| `SubagentStop` | agent type | same values as `SubagentStart` |
 
 A few more examples showing matchers on different event types:
-
-
 
 <Tabs>
 
 &nbsp; <Tab title="Log every Bash command">
 
-&nbsp;   Match only `Bash` tool calls and log each command to a file. The `PostToolUse` event fires after the command completes, so `tool\_input.command` contains what ran. The hook receives the event data as JSON on stdin, and `jq -r '.tool\_input.command'` extracts just the command string, which `>>` appends to the log file:
+&nbsp; Match only `Bash` tool calls and log each command to a file. The `PostToolUse` event fires after the command completes, so `tool\_input.command` contains what ran. The hook receives the event data as JSON on stdin, and `jq -r '.tool\_input.command'` extracts just the command string, which `>>` appends to the log file:
 
+&nbsp; ```json theme={null}
 
+&nbsp; {
 
-&nbsp;   ```json  theme={null}
+&nbsp; "hooks": {
 
-&nbsp;   {
+&nbsp; "PostToolUse": \[
 
-&nbsp;     "hooks": {
+&nbsp; {
 
-&nbsp;       "PostToolUse": \[
+&nbsp; "matcher": "Bash",
 
-&nbsp;         {
+&nbsp; "hooks": \[
 
-&nbsp;           "matcher": "Bash",
+&nbsp; {
 
-&nbsp;           "hooks": \[
+&nbsp; "type": "command",
 
-&nbsp;             {
+&nbsp; "command": "jq -r '.tool_input.command' >> ~/.claude/command-log.txt"
 
-&nbsp;               "type": "command",
+&nbsp; }
 
-&nbsp;               "command": "jq -r '.tool\_input.command' >> ~/.claude/command-log.txt"
+&nbsp; ]
 
-&nbsp;             }
+&nbsp; }
 
-&nbsp;           ]
+&nbsp; ]
 
-&nbsp;         }
+&nbsp; }
 
-&nbsp;       ]
+&nbsp; }
 
-&nbsp;     }
-
-&nbsp;   }
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Tab>
-
-
 
 &nbsp; <Tab title="Match MCP tools">
 
-&nbsp;   MCP tools use a different naming convention than built-in tools: `mcp\_\_<server>\_\_<tool>`, where `<server>` is the MCP server name and `<tool>` is the tool it provides. For example, `mcp\_\_github\_\_search\_repositories` or `mcp\_\_filesystem\_\_read\_file`. Use a regex matcher to target all tools from a specific server, or match across servers with a pattern like `mcp\_\_.\*\_\_write.\*`. See \[Match MCP tools](/en/hooks#match-mcp-tools) in the reference for the full list of examples.
+&nbsp; MCP tools use a different naming convention than built-in tools: `mcp\_\_<server>\_\_<tool>`, where `<server>` is the MCP server name and `<tool>` is the tool it provides. For example, `mcp\_\_github\_\_search\_repositories` or `mcp\_\_filesystem\_\_read\_file`. Use a regex matcher to target all tools from a specific server, or match across servers with a pattern like `mcp\_\_.\*\_\_write.\*`. See \[Match MCP tools](/en/hooks#match-mcp-tools) in the reference for the full list of examples.
 
+&nbsp; The command below extracts the tool name from the hook's JSON input with `jq` and writes it to stderr, where it shows up in verbose mode (`Ctrl+O`):
 
+&nbsp; ```json theme={null}
 
-&nbsp;   The command below extracts the tool name from the hook's JSON input with `jq` and writes it to stderr, where it shows up in verbose mode (`Ctrl+O`):
+&nbsp; {
 
+&nbsp; "hooks": {
 
+&nbsp; "PreToolUse": \[
 
-&nbsp;   ```json  theme={null}
+&nbsp; {
 
-&nbsp;   {
+&nbsp; "matcher": "mcp\_\_github\_\_.\*",
 
-&nbsp;     "hooks": {
+&nbsp; "hooks": \[
 
-&nbsp;       "PreToolUse": \[
+&nbsp; {
 
-&nbsp;         {
+&nbsp; "type": "command",
 
-&nbsp;           "matcher": "mcp\_\_github\_\_.\*",
+&nbsp; "command": "echo \\"GitHub tool called: $(jq -r '.tool_name')\\" >\&2"
 
-&nbsp;           "hooks": \[
+&nbsp; }
 
-&nbsp;             {
+&nbsp; ]
 
-&nbsp;               "type": "command",
+&nbsp; }
 
-&nbsp;               "command": "echo \\"GitHub tool called: $(jq -r '.tool\_name')\\" >\&2"
+&nbsp; ]
 
-&nbsp;             }
+&nbsp; }
 
-&nbsp;           ]
+&nbsp; }
 
-&nbsp;         }
-
-&nbsp;       ]
-
-&nbsp;     }
-
-&nbsp;   }
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Tab>
 
-
-
 &nbsp; <Tab title="Clean up on session end">
 
-&nbsp;   The `SessionEnd` event supports matchers on the reason the session ended. This hook only fires on `clear` (when you run `/clear`), not on normal exits:
+&nbsp; The `SessionEnd` event supports matchers on the reason the session ended. This hook only fires on `clear` (when you run `/clear`), not on normal exits:
 
+&nbsp; ```json theme={null}
 
+&nbsp; {
 
-&nbsp;   ```json  theme={null}
+&nbsp; "hooks": {
 
-&nbsp;   {
+&nbsp; "SessionEnd": \[
 
-&nbsp;     "hooks": {
+&nbsp; {
 
-&nbsp;       "SessionEnd": \[
+&nbsp; "matcher": "clear",
 
-&nbsp;         {
+&nbsp; "hooks": \[
 
-&nbsp;           "matcher": "clear",
+&nbsp; {
 
-&nbsp;           "hooks": \[
+&nbsp; "type": "command",
 
-&nbsp;             {
+&nbsp; "command": "rm -f /tmp/claude-scratch-\*.txt"
 
-&nbsp;               "type": "command",
+&nbsp; }
 
-&nbsp;               "command": "rm -f /tmp/claude-scratch-\*.txt"
+&nbsp; ]
 
-&nbsp;             }
+&nbsp; }
 
-&nbsp;           ]
+&nbsp; ]
 
-&nbsp;         }
+&nbsp; }
 
-&nbsp;       ]
+&nbsp; }
 
-&nbsp;     }
-
-&nbsp;   }
-
-&nbsp;   ```
+&nbsp; ```
 
 &nbsp; </Tab>
 
 </Tabs>
 
-
-
 For full matcher syntax, see the \[Hooks reference](/en/hooks#configuration).
-
-
 
 \### Configure hook location
 
-
-
 Where you add a hook determines its scope:
 
-
-
-| Location                                                   | Scope                              | Shareable                          |
+| Location | Scope | Shareable |
 
 | :--------------------------------------------------------- | :--------------------------------- | :--------------------------------- |
 
-| `~/.claude/settings.json`                                  | All your projects                  | No, local to your machine          |
+| `~/.claude/settings.json` | All your projects | No, local to your machine |
 
-| `.claude/settings.json`                                    | Single project                     | Yes, can be committed to the repo  |
+| `.claude/settings.json` | Single project | Yes, can be committed to the repo |
 
-| `.claude/settings.local.json`                              | Single project                     | No, gitignored                     |
+| `.claude/settings.local.json` | Single project | No, gitignored |
 
-| Managed policy settings                                    | Organization-wide                  | Yes, admin-controlled              |
+| Managed policy settings | Organization-wide | Yes, admin-controlled |
 
-| \[Plugin](/en/plugins) `hooks/hooks.json`                   | When plugin is enabled             | Yes, bundled with the plugin       |
+| \[Plugin](/en/plugins) `hooks/hooks.json` | When plugin is enabled | Yes, bundled with the plugin |
 
 | \[Skill](/en/skills) or \[agent](/en/sub-agents) frontmatter | While the skill or agent is active | Yes, defined in the component file |
 
-
-
 You can also use the \[`/hooks` menu](/en/hooks#the-hooks-menu) in Claude Code to add, delete, and view hooks interactively. To disable all hooks at once, use the toggle at the bottom of the `/hooks` menu or set `"disableAllHooks": true` in your settings file.
-
-
 
 Hooks added through the `/hooks` menu take effect immediately. If you edit settings files directly while Claude Code is running, the changes won't take effect until you review them in the `/hooks` menu or restart your session.
 
-
-
 \## Prompt-based hooks
-
-
 
 For decisions that require judgment rather than deterministic rules, use `type: "prompt"` hooks. Instead of running a shell command, Claude Code sends your prompt and the hook's input data to a Claude model (Haiku by default) to make the decision. You can specify a different model with the `model` field if you need more capability.
 
-
-
 The model's only job is to return a yes/no decision as JSON:
-
-
 
 \* `"ok": true`: the action proceeds
 
 \* `"ok": false`: the action is blocked. The model's `"reason"` is fed back to Claude so it can adjust.
 
-
-
 This example uses a `Stop` hook to ask the model whether all requested tasks are complete. If the model returns `"ok": false`, Claude keeps working and uses the `reason` as its next instruction:
 
-
-
-```json  theme={null}
+```json theme={null}
 
 {
 
@@ -1026,29 +822,17 @@ This example uses a `Stop` hook to ask the model whether all requested tasks are
 
 ```
 
-
-
 For full configuration options, see \[Prompt-based hooks](/en/hooks#prompt-based-hooks) in the reference.
-
-
 
 \## Agent-based hooks
 
-
-
 When verification requires inspecting files or running commands, use `type: "agent"` hooks. Unlike prompt hooks which make a single LLM call, agent hooks spawn a subagent that can read files, search code, and use other tools to verify conditions before returning a decision.
-
-
 
 Agent hooks use the same `"ok"` / `"reason"` response format as prompt hooks, but with a longer default timeout of 60 seconds and up to 50 tool-use turns.
 
-
-
 This example verifies that tests pass before allowing Claude to stop:
 
-
-
-```json  theme={null}
+```json theme={null}
 
 {
 
@@ -1082,23 +866,13 @@ This example verifies that tests pass before allowing Claude to stop:
 
 ```
 
-
-
 Use prompt hooks when the hook input data alone is enough to make a decision. Use agent hooks when you need to verify something against the actual state of the codebase.
-
-
 
 For full configuration options, see \[Agent-based hooks](/en/hooks#agent-based-hooks) in the reference.
 
-
-
 \## Limitations and troubleshooting
 
-
-
 \### Limitations
-
-
 
 \* Hooks communicate through stdout, stderr, and exit codes only. They cannot trigger slash commands or tool calls directly.
 
@@ -1110,15 +884,9 @@ For full configuration options, see \[Agent-based hooks](/en/hooks#agent-based-h
 
 \* `Stop` hooks fire whenever Claude finishes responding, not only at task completion. They do not fire on user interrupts.
 
-
-
 \### Hook not firing
 
-
-
 The hook is configured but never executes.
-
-
 
 \* Run `/hooks` and confirm the hook appears under the correct event
 
@@ -1128,23 +896,17 @@ The hook is configured but never executes.
 
 \* If using `PermissionRequest` hooks in non-interactive mode (`-p`), switch to `PreToolUse` instead
 
-
-
 \### Hook error in output
-
-
 
 You see a message like "PreToolUse hook error: ..." in the transcript.
 
-
-
 \* Your script exited with a non-zero code unexpectedly. Test it manually by piping sample JSON:
 
-&nbsp; ```bash  theme={null}
+&nbsp; ```bash theme={null}
 
-&nbsp; echo '{"tool\_name":"Bash","tool\_input":{"command":"ls"}}' | ./my-hook.sh
+&nbsp; echo '{"tool_name":"Bash","tool_input":{"command":"ls"}}' | ./my-hook.sh
 
-&nbsp; echo $?  # Check the exit code
+&nbsp; echo $? # Check the exit code
 
 &nbsp; ```
 
@@ -1154,15 +916,9 @@ You see a message like "PreToolUse hook error: ..." in the transcript.
 
 \* If the script isn't running at all, make it executable: `chmod +x ./my-hook.sh`
 
-
-
 \### `/hooks` shows no hooks configured
 
-
-
 You edited a settings file but the hooks don't appear in the menu.
-
-
 
 \* Restart your session or open `/hooks` to reload. Hooks added through the `/hooks` menu take effect immediately, but manual file edits require a reload.
 
@@ -1170,21 +926,13 @@ You edited a settings file but the hooks don't appear in the menu.
 
 \* Confirm the settings file is in the correct location: `.claude/settings.json` for project hooks, `~/.claude/settings.json` for global hooks
 
-
-
 \### Stop hook runs forever
-
-
 
 Claude keeps working in an infinite loop instead of stopping.
 
-
-
 Your Stop hook script needs to check whether it already triggered a continuation. Parse the `stop\_hook\_active` field from the JSON input and exit early if it's `true`:
 
-
-
-```bash  theme={null}
+```bash theme={null}
 
 \#!/bin/bash
 
@@ -1200,19 +948,11 @@ fi
 
 ```
 
-
-
 \### JSON validation failed
-
-
 
 Claude Code shows a JSON parsing error even though your hook script outputs valid JSON.
 
-
-
 When Claude Code runs a hook, it spawns a shell that sources your profile (`~/.zshrc` or `~/.bashrc`). If your profile contains unconditional `echo` statements, that output gets prepended to your hook's JSON:
-
-
 
 ```
 
@@ -1222,13 +962,9 @@ Shell ready on arm64
 
 ```
 
-
-
 Claude Code tries to parse this as JSON and fails. To fix this, wrap echo statements in your shell profile so they only run in interactive shells:
 
-
-
-```bash  theme={null}
+```bash theme={null}
 
 \# In ~/.zshrc or ~/.bashrc
 
@@ -1240,27 +976,16 @@ fi
 
 ```
 
-
-
 The `$-` variable contains shell flags, and `i` means interactive. Hooks run in non-interactive shells, so the echo is skipped.
-
-
 
 \### Debug techniques
 
-
-
 Toggle verbose mode with `Ctrl+O` to see hook output in the transcript, or run `claude --debug` for full execution details including which hooks matched and their exit codes.
 
-
-
 \## Learn more
-
-
 
 \* \[Hooks reference](/en/hooks): full event schemas, JSON output format, async hooks, and MCP tool hooks
 
 \* \[Security considerations](/en/hooks#security-considerations): review before deploying hooks in shared or production environments
 
 \* \[Bash command validator example](https://github.com/anthropics/claude-code/blob/main/examples/hooks/bash\_command\_validator\_example.py): complete reference implementation
-

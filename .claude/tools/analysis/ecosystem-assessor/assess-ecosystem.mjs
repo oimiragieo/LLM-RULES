@@ -14,8 +14,12 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { assessHooks, generateHookContent } from './hook-assessor.mjs';
 import { discoverMcpMatches, getMcpToolsRef, getConversionCommand } from './mcp-discoverer.mjs';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -182,7 +186,7 @@ export function createHookFile(templateName, hookName, category = 'custom') {
 export function registerHook(hookPath, trigger, matcher = '') {
   let settings = {};
   if (existsSync(SETTINGS_PATH)) {
-    settings = JSON.parse(readFileSync(SETTINGS_PATH, 'utf-8'));
+    settings = safeParseJSON(readFileSync(SETTINGS_PATH, 'utf-8'));
   }
 
   if (!settings.hooks) settings.hooks = {};
@@ -498,7 +502,7 @@ export function ecosystemHealthCheck() {
   // Count hooks from settings.json
   if (existsSync(SETTINGS_PATH)) {
     try {
-      const settings = JSON.parse(readFileSync(SETTINGS_PATH, 'utf-8'));
+      const settings = safeParseJSON(readFileSync(SETTINGS_PATH, 'utf-8'));
       for (const trigger of Object.keys(settings.hooks || {})) {
         for (const entry of settings.hooks[trigger]) {
           stats.hooks += entry.hooks?.length || 0;

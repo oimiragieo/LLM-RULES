@@ -184,9 +184,26 @@ function matchesNewIntentPattern(prompt) {
 }
 
 /**
+ * Check if prompt is an internal task notification
+ */
+function isInternalPayload(prompt) {
+  if (!prompt) return false;
+  return (
+    prompt.includes('<task-notification>') ||
+    prompt.includes('<task-output>') ||
+    prompt.includes('Your Task ID: task-')
+  );
+}
+
+/**
  * Process user prompt for drift detection
  */
 function processPrompt(userPrompt, sessionId) {
+  // Ignore internal payloads
+  if (isInternalPayload(userPrompt)) {
+    return;
+  }
+
   // Sanitize session ID
   const safeSid = sanitizeSessionId(sessionId);
 

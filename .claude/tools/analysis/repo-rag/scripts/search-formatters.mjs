@@ -1,3 +1,7 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../../../lib/utils/safe-json.cjs');
+
 function showHelp() {
   console.log(`
 Repo RAG - High-recall codebase retrieval
@@ -66,7 +70,7 @@ function formatMarkdown(output) {
 async function validateOutputSchema(output, schemaFullPath, readFileFn) {
   try {
     const schemaContent = await readFileFn(schemaFullPath, 'utf-8');
-    const schema = JSON.parse(schemaContent);
+    const schema = safeParseJSON(schemaContent);
 
     const requiredFields = schema.required || [];
     for (const field of requiredFields) {

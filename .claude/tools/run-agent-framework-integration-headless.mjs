@@ -11,6 +11,10 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
 
 // Import js-yaml for YAML parsing
 let yaml;
@@ -180,7 +184,7 @@ function testSchemas() {
       if (existsSync(schemaPath)) {
         try {
           const content = readFileSync(schemaPath, 'utf-8');
-          JSON.parse(content);
+          safeParseJSON(content);
           logTest(`Schema ${schema} is valid JSON`, true);
         } catch (error) {
           logTest(`Schema ${schema} is valid JSON`, false, error.message);
@@ -240,7 +244,7 @@ function testMCPConfig() {
     logTest('MCP config exists', true);
 
     const content = readFileSync(mcpPath, 'utf-8');
-    const mcpConfig = JSON.parse(content);
+    const mcpConfig = safeParseJSON(content);
     logTest('MCP config is valid JSON', true);
 
     // Check for expected MCP servers

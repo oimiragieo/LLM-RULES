@@ -13,6 +13,7 @@ priority: high
 extended_thinking: true
 tools:
   - Read
+  - Write
   - Glob
   - Grep
   - Bash
@@ -21,9 +22,6 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
-disallowedTools:
-  - Write
-  - Edit
 skills:
   - task-management-protocol
   - checklist-generator

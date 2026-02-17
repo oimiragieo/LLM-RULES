@@ -24,6 +24,7 @@ import { join, dirname, resolve, extname } from 'path';
 import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { createRequire } from 'module';
 import {
   parseClassStructure,
   parseERSchema,
@@ -35,6 +36,9 @@ import {
   generateStateDiagram,
 } from './generate-builders-a.mjs';
 import { generateDiagramFromDescription, calculateComplexity } from './generate-builders-b.mjs';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../../../lib/utils/safe-json.cjs');
 
 const execAsync = promisify(exec);
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -293,7 +297,7 @@ async function generateDiagram(args) {
 async function validateOutput(output, schemaPath) {
   try {
     const schemaContent = await readFile(join(PROJECT_ROOT, schemaPath), 'utf-8');
-    const schema = JSON.parse(schemaContent);
+    const schema = safeParseJSON(schemaContent);
 
     // Basic validation - check required fields
     const requiredFields = schema.required || [];

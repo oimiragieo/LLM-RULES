@@ -91,6 +91,15 @@ async function main() {
       console.log(formatResult('block', guardrailResult.message));
       process.exit(2);
     }
+    if (guardrailResult.action === 'rewrite' && guardrailResult.rewrittenCommand) {
+      if (guardrailResult.bypassWarning) {
+        console.error(`[pre-tool-unified:guardrail] ${guardrailResult.bypassWarning}`);
+      }
+      console.log(
+        JSON.stringify({ tool_input: { ...toolInput, command: guardrailResult.rewrittenCommand } })
+      );
+      process.exit(0);
+    }
     if (guardrailResult.warning) {
       console.warn(`[pre-tool-unified:guardrail] ${guardrailResult.warning}`);
     }

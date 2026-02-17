@@ -355,9 +355,13 @@ skills:
       const cliPath = path.join(PROJECT_ROOT, 'scripts/validation/ci-validation-gate.cjs');
 
       try {
-        execFileSync(process.execPath, [cliPath, '--project-root', tempDir, '--registry', registryPath], {
-          stdio: 'ignore',
-        });
+        execFileSync(
+          process.execPath,
+          [cliPath, '--project-root', tempDir, '--registry', registryPath],
+          {
+            stdio: 'ignore',
+          }
+        );
         // If no error thrown, test should fail
         assert.fail('Expected CLI to exit with code 1');
       } catch (error) {

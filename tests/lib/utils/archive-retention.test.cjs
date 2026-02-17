@@ -97,8 +97,16 @@ describe('auditArchives', () => {
 
     // Files should still exist
     assert.strictEqual(result.stale, 2, 'Should identify 2 stale');
-    assert.strictEqual(fs.existsSync(path.join(archiveDir, 'old1.cjs')), true, 'old1.cjs should still exist');
-    assert.strictEqual(fs.existsSync(path.join(archiveDir, 'old2.cjs')), true, 'old2.cjs should still exist');
+    assert.strictEqual(
+      fs.existsSync(path.join(archiveDir, 'old1.cjs')),
+      true,
+      'old1.cjs should still exist'
+    );
+    assert.strictEqual(
+      fs.existsSync(path.join(archiveDir, 'old2.cjs')),
+      true,
+      'old2.cjs should still exist'
+    );
     assert.ok(result.summary.includes('DRY RUN'), 'Summary should indicate dry run');
   });
 
@@ -169,11 +177,23 @@ describe('auditArchives', () => {
     assert.strictEqual(result.kept, 1, 'Should keep 1 new');
 
     // Old files should be deleted
-    assert.strictEqual(fs.existsSync(path.join(archiveDir, 'old1.cjs')), false, 'old1.cjs should be deleted');
-    assert.strictEqual(fs.existsSync(path.join(archiveDir, 'old2.cjs')), false, 'old2.cjs should be deleted');
+    assert.strictEqual(
+      fs.existsSync(path.join(archiveDir, 'old1.cjs')),
+      false,
+      'old1.cjs should be deleted'
+    );
+    assert.strictEqual(
+      fs.existsSync(path.join(archiveDir, 'old2.cjs')),
+      false,
+      'old2.cjs should be deleted'
+    );
 
     // New file should still exist
-    assert.strictEqual(fs.existsSync(path.join(archiveDir, 'new1.cjs')), true, 'new1.cjs should still exist');
+    assert.strictEqual(
+      fs.existsSync(path.join(archiveDir, 'new1.cjs')),
+      true,
+      'new1.cjs should still exist'
+    );
   });
 
   it('minKeep protects newest files even when old', () => {

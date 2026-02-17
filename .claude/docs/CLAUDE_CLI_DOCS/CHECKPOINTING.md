@@ -4,35 +4,19 @@
 
 > Use this file to discover all available pages before exploring further.
 
-
-
 \# Checkpointing
-
-
 
 > Track, rewind, and summarize Claude's edits and conversation to manage session state.
 
-
-
 Claude Code automatically tracks Claude's file edits as you work, allowing you to quickly undo changes and rewind to previous states if anything gets off track.
-
-
 
 \## How checkpoints work
 
-
-
 As you work with Claude, checkpointing automatically captures the state of your code before each edit. This safety net lets you pursue ambitious, wide-scale tasks knowing you can always return to a prior code state.
-
-
 
 \### Automatic tracking
 
-
-
 Claude Code tracks all changes made by its file editing tools:
-
-
 
 \* Every user prompt creates a new checkpoint
 
@@ -40,15 +24,9 @@ Claude Code tracks all changes made by its file editing tools:
 
 \* Automatically cleaned up along with sessions after 30 days (configurable)
 
-
-
 \### Rewind and summarize
 
-
-
 Press `Esc` twice (`Esc` + `Esc`) or use the `/rewind` command to open the rewind menu. A scrollable list shows each of your prompts from the session. Select the point you want to act on, then choose an action:
-
-
 
 \* \*\*Restore code and conversation\*\*: revert both code and conversation to that point
 
@@ -60,19 +38,11 @@ Press `Esc` twice (`Esc` + `Esc`) or use the `/rewind` command to open the rewin
 
 \* \*\*Never mind\*\*: return to the message list without making changes
 
-
-
 After restoring the conversation or summarizing, the original prompt from the selected message is restored into the input field so you can re-send or edit it.
-
-
 
 \#### Restore vs. summarize
 
-
-
 The three restore options revert state: they undo code changes, conversation history, or both. "Summarize from here" works differently:
-
-
 
 \* Messages before the selected message stay intact
 
@@ -82,11 +52,7 @@ The three restore options revert state: they undo code changes, conversation his
 
 \* The original messages are preserved in the session transcript, so Claude can reference the details if needed
 
-
-
 This is similar to `/compact`, but targeted: instead of summarizing the entire conversation, you keep early context in full detail and only compress the parts that are using up space. You can type optional instructions to guide what the summary focuses on.
-
-
 
 <Note>
 
@@ -94,15 +60,9 @@ This is similar to `/compact`, but targeted: instead of summarizing the entire c
 
 </Note>
 
-
-
 \## Common use cases
 
-
-
 Checkpoints are particularly useful when:
-
-
 
 \* \*\*Exploring alternatives\*\*: try different implementation approaches without losing your starting point
 
@@ -112,21 +72,13 @@ Checkpoints are particularly useful when:
 
 \* \*\*Freeing context space\*\*: summarize a verbose debugging session from the midpoint forward, keeping your initial instructions intact
 
-
-
 \## Limitations
-
-
 
 \### Bash command changes not tracked
 
-
-
 Checkpointing does not track files modified by bash commands. For example, if Claude Code runs:
 
-
-
-```bash  theme={null}
+```bash theme={null}
 
 rm file.txt
 
@@ -136,27 +88,15 @@ cp source.txt dest.txt
 
 ```
 
-
-
 These file modifications cannot be undone through rewind. Only direct file edits made through Claude's file editing tools are tracked.
-
-
 
 \### External changes not tracked
 
-
-
 Checkpointing only tracks files that have been edited within the current session. Manual changes you make to files outside of Claude Code and edits from other concurrent sessions are normally not captured, unless they happen to modify the same files as the current session.
-
-
 
 \### Not a replacement for version control
 
-
-
 Checkpoints are designed for quick, session-level recovery. For permanent version history and collaboration:
-
-
 
 \* Continue using version control (ex. Git) for commits, branches, and long-term history
 
@@ -164,15 +104,10 @@ Checkpoints are designed for quick, session-level recovery. For permanent versio
 
 \* Think of checkpoints as "local undo" and Git as "permanent history"
 
-
-
 \## See also
-
-
 
 \* \[Interactive mode](/en/interactive-mode) - Keyboard shortcuts and session controls
 
 \* \[Built-in commands](/en/interactive-mode#built-in-commands) - Accessing checkpoints using `/rewind`
 
 \* \[CLI reference](/en/cli-reference) - Command-line options
-

@@ -723,10 +723,22 @@ function clearCurrentSpawnTaskId() {
   return saveStateWithRetry({ currentSpawnTaskId: null });
 }
 
+/**
+ * Update state directly (useful for testing or bulk updates)
+ * @param {Object} updates - Fields to update
+ */
+function updateState(updates) {
+  const current = getState();
+  const next = { ...current, ...updates };
+  saveState(next);
+  return next;
+}
+
 // Export functions
 module.exports = {
   // Existing exports
   getState,
+  updateState,
   resetToRouterMode,
   enterAgentMode,
   exitAgentMode,

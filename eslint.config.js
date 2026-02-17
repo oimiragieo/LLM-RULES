@@ -325,6 +325,26 @@ export default [
       '.claude/lib/memory/intent-analyzer.cjs',
 
       '.claude/lib/evolution-state-sync.cjs',
+
+      '.claude/tools/cli/doctor.mjs',
+
+      '.claude/tools/chrome-browser/chrome-browser.cjs',
+
+      '.claude/tools/analysis/project-analyzer/analyzer.mjs',
+
+      '.claude/tools/analysis/ecosystem-assessor/assess-ecosystem.mjs',
+
+      '.claude/tools/analysis/ecosystem-assessor/hook-assessor.mjs',
+
+      '.claude/tools/analysis/ecosystem-assessor/mcp-discoverer.mjs',
+
+      '.claude/tools/visualization/diagram-generator/scripts/generate.mjs',
+
+      '.claude/tools/run-agent-framework-integration-headless.mjs',
+
+      '.claude/tools/analysis/repo-rag/scripts/search-formatters.mjs',
+
+      '.claude/tools/validate-latest-integration-artifacts.mjs',
     ],
 
     rules: {

@@ -14,12 +14,16 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { glob } from 'glob';
+import { createRequire } from 'module';
 import {
   detectProjectType,
   detectFrameworks,
   calculateTechDebt,
   generateRecommendations,
 } from './analyzer-heuristics.mjs';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -185,7 +189,7 @@ async function detectManifests(projectRoot) {
         const content = await fs.readFile(filePath, 'utf-8');
         if (file.endsWith('.json') || file.endsWith('.toml')) {
           try {
-            manifests[file] = file.endsWith('.json') ? JSON.parse(content) : content;
+            manifests[file] = file.endsWith('.json') ? safeParseJSON(content) : content;
           } catch {
             manifests[file] = content; // Keep as string if parse fails
           }
@@ -389,7 +393,7 @@ async function analyzeStructure(projectRoot) {
   // Detect module system (check package.json)
   try {
     const pkgPath = path.join(projectRoot, 'package.json');
-    const pkg = JSON.parse(await fs.readFile(pkgPath, 'utf-8'));
+    const pkg = safeParseJSON(await fs.readFile(pkgPath, 'utf-8'));
     structure.module_system = pkg.type === 'module' ? 'esm' : 'commonjs';
   } catch {
     structure.module_system = 'unknown';
@@ -481,7 +485,7 @@ async function analyzeCodeQuality(projectRoot, manifests) {
     quality.type_safety.typescript = true;
     try {
       const tsconfigPath = path.join(projectRoot, 'tsconfig.json');
-      const tsconfig = JSON.parse(await fs.readFile(tsconfigPath, 'utf-8'));
+      const tsconfig = safeParseJSON(await fs.readFile(tsconfigPath, 'utf-8'));
       quality.type_safety.strict_mode = tsconfig.compilerOptions?.strict === true;
     } catch {
       // Ignore parse errors

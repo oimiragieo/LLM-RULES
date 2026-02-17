@@ -1,7 +1,6 @@
-
 function hello(name) {
   // This is a greeting function that logs a personalized hello message
-  const message = "Hello, " + name + "! Welcome to the code indexing system.";
+  const message = 'Hello, ' + name + '! Welcome to the code indexing system.';
   console.log(message);
   return message;
 }
@@ -17,4 +16,3 @@ class Greeter {
     return 'Hi, ' + actualName + '! Nice to meet you.';
   }
 }
-      

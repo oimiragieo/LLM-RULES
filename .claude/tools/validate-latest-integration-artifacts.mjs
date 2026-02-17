@@ -7,6 +7,10 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,7 +38,7 @@ function validateSchemaFiles() {
     const filePath = resolve(schemasDir, file);
     try {
       const content = readFileSync(filePath, 'utf-8');
-      JSON.parse(content);
+      safeParseJSON(content);
       validCount++;
       log(`✅ ${file} - valid`);
     } catch (error) {

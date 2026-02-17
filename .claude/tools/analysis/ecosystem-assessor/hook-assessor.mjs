@@ -12,6 +12,10 @@
 import { existsSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -262,7 +266,8 @@ const HOOK_TEMPLATES = {
 const fs = require('fs');
 
 function parseHookInput() {
-  try { return process.argv[2] ? JSON.parse(process.argv[2]) : null; }
+  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+  try { return process.argv[2] ? safeParseJSON(process.argv[2]) : null; }
   catch { return null; }
 }
 
@@ -303,7 +308,8 @@ main();
 const fs = require('fs');
 
 function parseHookInput() {
-  try { return process.argv[2] ? JSON.parse(process.argv[2]) : null; }
+  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+  try { return process.argv[2] ? safeParseJSON(process.argv[2]) : null; }
   catch { return null; }
 }
 
@@ -347,7 +353,8 @@ const fs = require('fs');
 const path = require('path');
 
 function parseHookInput() {
-  try { return process.argv[2] ? JSON.parse(process.argv[2]) : null; }
+  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+  try { return process.argv[2] ? safeParseJSON(process.argv[2]) : null; }
   catch { return null; }
 }
 
@@ -392,7 +399,7 @@ function extractKeywords(text) {
 function getExistingHooks() {
   try {
     if (!existsSync(SETTINGS_PATH)) return [];
-    const settings = JSON.parse(readFileSync(SETTINGS_PATH, 'utf-8'));
+    const settings = safeParseJSON(readFileSync(SETTINGS_PATH, 'utf-8'));
     const hooks = settings.hooks || {};
     const existing = [];
 
