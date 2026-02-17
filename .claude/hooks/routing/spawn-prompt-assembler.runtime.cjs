@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 
 const core = require('./spawn-prompt-assembler.core.cjs');
 const taskTools = require('./spawn-prompt-assembler.task-tools.cjs');
@@ -51,6 +52,10 @@ const {
   appendConstitutionSection,
   appendConfigModelSection,
   resolveConfigModel,
+  extractRequiredOutputs,
+  requiresArtifactWrite,
+  hasArtifactWriterTools,
+  buildMissingWriterToolsMessage,
 } = taskTools;
 
 const {
@@ -77,6 +82,76 @@ const {
 } = runtimeSupport;
 
 const { buildContextModePrompt } = libRequire(path.join('spawn', 'prompt-factory.cjs'));
+const TASK_OUTPUT_CONTRACTS_PATH =
+  process.env.TASK_OUTPUT_CONTRACTS_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'task-output-contracts.json');
+const TASK_OUTPUT_METRICS_PATH =
+  process.env.TASK_OUTPUT_METRICS_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'task-output-enforcement-metrics.json');
+
+function readTaskOutputContracts() {
+  try {
+    if (!fs.existsSync(TASK_OUTPUT_CONTRACTS_PATH)) return { tasks: {} };
+    const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
+    const parsed = safeParseJSON(fs.readFileSync(TASK_OUTPUT_CONTRACTS_PATH, 'utf8'), null);
+    if (!parsed || typeof parsed !== 'object' || typeof parsed.tasks !== 'object') {
+      return { tasks: {} };
+    }
+    return { tasks: parsed.tasks };
+  } catch (_err) {
+    return { tasks: {} };
+  }
+}
+
+function writeTaskOutputContracts(state) {
+  try {
+    fs.mkdirSync(path.dirname(TASK_OUTPUT_CONTRACTS_PATH), { recursive: true });
+    fs.writeFileSync(TASK_OUTPUT_CONTRACTS_PATH, JSON.stringify(state, null, 2) + '\n', 'utf8');
+  } catch (_err) {
+    // Best-effort persistence.
+  }
+}
+
+function persistTaskOutputContract(taskId, requiredOutputs, agentType) {
+  if (!taskId || !requiresArtifactWrite(requiredOutputs)) return;
+  const now = new Date().toISOString();
+  const state = readTaskOutputContracts();
+  state.tasks[String(taskId)] = {
+    requiredOutputs: requiredOutputs.map(output => String(output)),
+    updatedAt: now,
+    createdAt: state.tasks?.[String(taskId)]?.createdAt || now,
+    agentType: String(agentType || ''),
+  };
+  writeTaskOutputContracts(state);
+}
+
+function incrementTaskOutputMetric(counterName) {
+  try {
+    const now = new Date().toISOString();
+    let state = { counters: {}, updatedAt: now };
+    if (fs.existsSync(TASK_OUTPUT_METRICS_PATH)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(TASK_OUTPUT_METRICS_PATH, 'utf8'));
+        if (parsed && typeof parsed === 'object') {
+          state = {
+            counters: parsed.counters && typeof parsed.counters === 'object' ? parsed.counters : {},
+            updatedAt: parsed.updatedAt || now,
+          };
+        }
+      } catch (_err) {
+        // Reset invalid metrics state.
+      }
+    }
+    const key = String(counterName || '').trim();
+    if (!key) return;
+    state.counters[key] = Number(state.counters[key] || 0) + 1;
+    state.updatedAt = now;
+    fs.mkdirSync(path.dirname(TASK_OUTPUT_METRICS_PATH), { recursive: true });
+    fs.writeFileSync(TASK_OUTPUT_METRICS_PATH, JSON.stringify(state, null, 2) + '\n', 'utf8');
+  } catch (_err) {
+    // Metrics are best-effort only.
+  }
+}
 
 function prepareTaskSpawnContext(hookInput, sessionId) {
   if (!hookInput) return null;
@@ -262,6 +337,20 @@ async function main() {
 
     const { toolInput, basePrompt, explicitTaskId, inputPromptLength, hookSessionId } = prepared;
 
+    const requiredOutputs = extractRequiredOutputs(basePrompt, toolInput);
+    const explicitAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
+    const hasExplicitAllowedTools = explicitAllowedTools.length > 0;
+    if (
+      hasExplicitAllowedTools &&
+      requiresArtifactWrite(requiredOutputs) &&
+      !hasArtifactWriterTools(explicitAllowedTools)
+    ) {
+      incrementTaskOutputMetric('artifact_contract_missing_tools');
+      console.log(formatResult('block', buildMissingWriterToolsMessage(requiredOutputs)));
+      process.exit(2);
+      return;
+    }
+
     const alreadyAssembled = looksAssembled(basePrompt);
     perf.mark('prechecks_ms');
 
@@ -269,6 +358,13 @@ async function main() {
       toolInput,
       basePrompt
     );
+    if (requiresArtifactWrite(requiredOutputs) && !hasArtifactWriterTools(allowedTools)) {
+      incrementTaskOutputMetric('artifact_contract_missing_tools');
+      console.log(formatResult('block', buildMissingWriterToolsMessage(requiredOutputs)));
+      process.exit(2);
+      return;
+    }
+    persistTaskOutputContract(explicitTaskId, requiredOutputs, agentType);
     const { throttleExpensive, cacheKey } = computeSpawnCacheContext({
       toolInput,
       basePrompt,

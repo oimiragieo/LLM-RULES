@@ -453,6 +453,7 @@ function createBlockedReadPlaceholder(targetPath, reason) {
     const relativeTarget = path.relative(PROJECT_ROOT, targetPath || '').replace(/\\/g, '/');
     const lines = [
       '# Read Safety Blocked Target',
+      'NON-DELIVERABLE: Diagnostic placeholder, cannot satisfy required output contracts.',
       '',
       `Requested path: ${relativeTarget || String(targetPath || '(unknown)')}`,
       `Reason: ${reason}`,

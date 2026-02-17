@@ -45,6 +45,12 @@ const ACTIVE_CREATORS_STATE_FILE = path.join(
   PROJECT_ROOT,
   '.claude/context/runtime/active-creators.json'
 );
+const TASK_OUTPUT_CONTRACTS_PATH =
+  process.env.TASK_OUTPUT_CONTRACTS_PATH ||
+  path.join(PROJECT_ROOT, '.claude/context/runtime/task-output-contracts.json');
+const TASK_OUTPUT_METRICS_PATH =
+  process.env.TASK_OUTPUT_METRICS_PATH ||
+  path.join(PROJECT_ROOT, '.claude/context/runtime/task-output-enforcement-metrics.json');
 const CREATOR_ECOSYSTEM_VALIDATOR =
   process.env.CREATOR_ECOSYSTEM_VALIDATOR_PATH ||
   path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'validate-creator-ecosystem.cjs');
@@ -276,6 +282,123 @@ function validateCreatorEcosystem() {
   return { passed: issues.length === 0, issues };
 }
 
+function readTaskOutputContracts() {
+  try {
+    if (!fs.existsSync(TASK_OUTPUT_CONTRACTS_PATH)) return { tasks: {} };
+    const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+    const parsed = safeParseJSON(fs.readFileSync(TASK_OUTPUT_CONTRACTS_PATH, 'utf8'), null, null, {});
+    if (!parsed || typeof parsed !== 'object' || typeof parsed.tasks !== 'object') {
+      return { tasks: {} };
+    }
+    return { tasks: parsed.tasks || {} };
+  } catch (_err) {
+    return { tasks: {} };
+  }
+}
+
+function resolveRequiredOutputsForTask(taskId, params = {}) {
+  const contracts = readTaskOutputContracts();
+  const contractOutputs = contracts.tasks?.[String(taskId)]?.requiredOutputs;
+  const metadata = params.metadata && typeof params.metadata === 'object' ? params.metadata : {};
+  const declared = metadata.requiredOutputs || metadata.required_outputs || [];
+  const fromParams = [];
+  if (Array.isArray(declared)) {
+    for (const output of declared) {
+      if (typeof output === 'string') fromParams.push(output);
+      else if (output && typeof output === 'object') {
+        fromParams.push(output.path || output.file_path || output.filePath || '');
+      }
+    }
+  }
+  const raw = [...(Array.isArray(contractOutputs) ? contractOutputs : []), ...fromParams]
+    .map(item => String(item || '').trim())
+    .filter(Boolean);
+  const seen = new Set();
+  const normalized = [];
+  for (const entry of raw) {
+    const key = entry.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    normalized.push(entry);
+  }
+  return normalized;
+}
+
+function resolveOutputPath(outputPath) {
+  const normalized = String(outputPath || '').trim();
+  if (!normalized) return null;
+  if (path.isAbsolute(normalized)) return normalized;
+  return path.resolve(PROJECT_ROOT, normalized);
+}
+
+function isReadSafetyPlaceholderPath(targetPath) {
+  const basename = path.basename(String(targetPath || '')).toLowerCase();
+  return basename.startsWith('read-safety-blocked-read');
+}
+
+function hasPlaceholderMarker(content) {
+  const text = String(content || '');
+  return (
+    text.includes('# Missing Report Placeholder') ||
+    text.includes('# Read Safety Blocked Target') ||
+    text.includes('NON-DELIVERABLE')
+  );
+}
+
+function validateRequiredOutputs(requiredOutputs) {
+  const missing = [];
+  const invalid = [];
+  for (const output of requiredOutputs) {
+    const resolved = resolveOutputPath(output);
+    if (!resolved || !fs.existsSync(resolved)) {
+      missing.push(output);
+      continue;
+    }
+    if (isReadSafetyPlaceholderPath(resolved)) {
+      invalid.push(output);
+      continue;
+    }
+    try {
+      const content = fs.readFileSync(resolved, 'utf8');
+      if (hasPlaceholderMarker(content)) {
+        invalid.push(output);
+      }
+    } catch (_err) {
+      invalid.push(output);
+    }
+  }
+  return { passed: missing.length === 0 && invalid.length === 0, missing, invalid };
+}
+
+function incrementTaskOutputMetric(counterName) {
+  try {
+    const now = new Date().toISOString();
+    let state = { counters: {}, updatedAt: now };
+    if (fs.existsSync(TASK_OUTPUT_METRICS_PATH)) {
+      try {
+        const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+        const parsed = safeParseJSON(fs.readFileSync(TASK_OUTPUT_METRICS_PATH, 'utf8'), null, null, {});
+        if (parsed && typeof parsed === 'object') {
+          state = {
+            counters: parsed.counters && typeof parsed.counters === 'object' ? parsed.counters : {},
+            updatedAt: parsed.updatedAt || now,
+          };
+        }
+      } catch (_err) {
+        // Reset invalid metrics state.
+      }
+    }
+    const key = String(counterName || '').trim();
+    if (!key) return;
+    state.counters[key] = Number(state.counters[key] || 0) + 1;
+    state.updatedAt = now;
+    fs.mkdirSync(path.dirname(TASK_OUTPUT_METRICS_PATH), { recursive: true });
+    fs.writeFileSync(TASK_OUTPUT_METRICS_PATH, JSON.stringify(state, null, 2) + '\n', 'utf8');
+  } catch (_err) {
+    // Best effort only.
+  }
+}
+
 /**
  * Main hook execution.
  */
@@ -335,6 +458,35 @@ async function main() {
 
     if (parsedParams.normalized.status !== 'completed') process.exit(0);
 
+    const completionTaskId = parsedParams.normalized.taskId;
+    const requiredOutputs = resolveRequiredOutputsForTask(completionTaskId, toolParams);
+    const taskOutputMode = getEnforcementMode('TASK_OUTPUT_ENFORCEMENT', 'block');
+    if (taskOutputMode !== 'off' && completionTaskId && requiredOutputs.length > 0) {
+      const outputValidation = validateRequiredOutputs(requiredOutputs);
+      if (!outputValidation.passed) {
+        incrementTaskOutputMetric('artifact_completion_blocked');
+        if (outputValidation.invalid.length > 0) {
+          incrementTaskOutputMetric('placeholder_attempt_detected');
+        }
+        const lines = ['REQUIRED OUTPUT VALIDATION FAILED'];
+        if (outputValidation.missing.length > 0) {
+          lines.push('Missing required outputs:');
+          for (const item of outputValidation.missing) lines.push(`- ${item}`);
+        }
+        if (outputValidation.invalid.length > 0) {
+          lines.push('Invalid placeholder outputs:');
+          for (const item of outputValidation.invalid) lines.push(`- ${item}`);
+        }
+        const validationMessage = lines.join('\n');
+        if (taskOutputMode === 'warn') {
+          console.warn(`[WARN] ${validationMessage}`);
+        } else {
+          console.log(formatHookResult('block', validationMessage));
+          process.exit(2);
+        }
+      }
+    }
+
     if (isEcosystemCreatorAction(toolParams)) {
       const ecosystem = validateCreatorEcosystem();
       if (!ecosystem.passed) {
@@ -384,4 +536,6 @@ module.exports = {
   isEcosystemCreatorAction,
   validateCreatorEcosystem,
   readActiveCreatorSkills,
+  resolveRequiredOutputsForTask,
+  validateRequiredOutputs,
 };

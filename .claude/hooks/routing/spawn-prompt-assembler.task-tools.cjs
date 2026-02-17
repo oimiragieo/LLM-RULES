@@ -59,6 +59,10 @@ const STALE_PATH_REWRITES = Object.freeze({
   '.claude/context/artifacts/research-reports/implementation-patterns-research-2026-02-13.md':
     '.claude/context/reports/implementation-patterns-research-2026-02-13.md',
 });
+const REPORT_PATH_IN_TEXT_REGEX = /(?:^|[\s"'`])(\.claude[\\/]+context[\\/]+reports[\\/][^\s"'`]+\.md)\b/gi;
+const WINDOWS_REPORT_PATH_REGEX =
+  /(?:^|[\s"'`])([a-zA-Z]:\\[^"'`\r\n]*?\.claude\\context\\reports\\[^"'`\r\n]+\.md)\b/g;
+const BACKTICKED_PATH_REGEX = /`([^`\r\n]+)`/g;
 
 function sanitizeTaskPrompt(prompt) {
   if (!prompt || typeof prompt !== 'string') {
@@ -319,6 +323,82 @@ function hasAnyTool(tools, candidates) {
   return candidates.some(candidate => set.has(candidate));
 }
 
+function normalizeOutputPathCandidate(candidate) {
+  if (!candidate || typeof candidate !== 'string') return null;
+  const trimmed = candidate.trim();
+  if (!trimmed) return null;
+  if (!/\.md$/i.test(trimmed)) return null;
+  if (!/(^|[\\/])\.claude[\\/]+context[\\/]+reports[\\/]+/i.test(trimmed)) return null;
+  return trimmed.replace(/\\/g, '/');
+}
+
+function collectOutputPath(paths, candidate) {
+  const normalized = normalizeOutputPathCandidate(candidate);
+  if (!normalized) return;
+  paths.push(normalized);
+}
+
+function uniquePaths(paths) {
+  const seen = new Set();
+  const result = [];
+  for (const item of paths) {
+    const key = item.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(item);
+  }
+  return result;
+}
+
+function extractRequiredOutputs(prompt, toolInput = {}) {
+  const paths = [];
+  const payload = toolInput && typeof toolInput === 'object' ? toolInput : {};
+  const declaredOutputs = payload.required_outputs || payload.requiredOutputs || [];
+  if (Array.isArray(declaredOutputs)) {
+    for (const output of declaredOutputs) {
+      if (typeof output === 'string') {
+        collectOutputPath(paths, output);
+        continue;
+      }
+      if (output && typeof output === 'object') {
+        collectOutputPath(paths, output.path || output.file_path || output.filePath || '');
+      }
+    }
+  }
+
+  const promptText = typeof prompt === 'string' ? prompt : '';
+  if (!promptText) return uniquePaths(paths);
+
+  for (const match of promptText.matchAll(REPORT_PATH_IN_TEXT_REGEX)) {
+    collectOutputPath(paths, match[1]);
+  }
+  for (const match of promptText.matchAll(WINDOWS_REPORT_PATH_REGEX)) {
+    collectOutputPath(paths, match[1]);
+  }
+  for (const match of promptText.matchAll(BACKTICKED_PATH_REGEX)) {
+    collectOutputPath(paths, match[1]);
+  }
+
+  return uniquePaths(paths);
+}
+
+function requiresArtifactWrite(requiredOutputs) {
+  return Array.isArray(requiredOutputs) && requiredOutputs.length > 0;
+}
+
+function hasArtifactWriterTools(tools) {
+  return hasAnyTool(tools, ['Write', 'Edit']);
+}
+
+function buildMissingWriterToolsMessage(requiredOutputs) {
+  const sample = requiredOutputs.slice(0, 3).join(', ');
+  return (
+    '[SPAWN-PROMPT-ASSEMBLER] Required output artifact(s) detected but allowed_tools is missing ' +
+    'Write/Edit. Add Write or Edit before spawning this task. ' +
+    `Required outputs: ${sample}${requiredOutputs.length > 3 ? ', ...' : ''}`
+  );
+}
+
 function isUnderProvisionedExplicitTools(currentTools, prompt) {
   if (!Array.isArray(currentTools) || currentTools.length === 0) return false;
 
@@ -545,4 +625,8 @@ module.exports = {
   appendConstitutionSection,
   appendConfigModelSection,
   resolveConfigModel,
+  extractRequiredOutputs,
+  requiresArtifactWrite,
+  hasArtifactWriterTools,
+  buildMissingWriterToolsMessage,
 };

@@ -56,13 +56,15 @@ const lifecycleState = require('../../lib/routing/task-lifecycle-state.cjs');
 const LEARNINGS_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
 const EVOLUTION_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
 const AUDIT_LOG_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-audit.log');
-const TASKUPDATE_RECOVERY_QUEUE_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'runtime',
-  'taskupdate-recovery-queue.jsonl'
-);
+const TASKUPDATE_RECOVERY_QUEUE_PATH =
+  process.env.TASKUPDATE_RECOVERY_QUEUE_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'taskupdate-recovery-queue.jsonl');
+const TASK_OUTPUT_CONTRACTS_PATH =
+  process.env.TASK_OUTPUT_CONTRACTS_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'task-output-contracts.json');
+const TASK_ARTIFACT_AUDIT_PATH =
+  process.env.TASK_ARTIFACT_AUDIT_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'task-artifact-audit.jsonl');
 
 const helpers = createPostTaskUnifiedHelpers({
   fs,
@@ -77,6 +79,72 @@ const helpers = createPostTaskUnifiedHelpers({
   AUDIT_LOG_PATH,
   TASKUPDATE_RECOVERY_QUEUE_PATH,
 });
+
+function readTaskOutputContract(taskId) {
+  try {
+    if (!taskId || !fs.existsSync(TASK_OUTPUT_CONTRACTS_PATH)) return null;
+    const raw = fs.readFileSync(TASK_OUTPUT_CONTRACTS_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    const tasks = parsed && typeof parsed === 'object' ? parsed.tasks : null;
+    if (!tasks || typeof tasks !== 'object') return null;
+    return tasks[String(taskId)] || null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function appendTaskArtifactAudit(entry) {
+  try {
+    fs.mkdirSync(path.dirname(TASK_ARTIFACT_AUDIT_PATH), { recursive: true });
+    fs.appendFileSync(TASK_ARTIFACT_AUDIT_PATH, JSON.stringify(entry) + '\n', 'utf8');
+  } catch (_err) {
+    // Best-effort audit logging only.
+  }
+}
+
+function resolveOutputPath(outputPath) {
+  const normalized = String(outputPath || '').trim();
+  if (!normalized) return null;
+  if (path.isAbsolute(normalized)) return normalized;
+  return path.resolve(PROJECT_ROOT, normalized);
+}
+
+function isReadSafetyPlaceholderPath(targetPath) {
+  const basename = path.basename(String(targetPath || '')).toLowerCase();
+  return basename.startsWith('read-safety-blocked-read');
+}
+
+function hasPlaceholderMarker(content) {
+  const text = String(content || '');
+  return (
+    text.includes('# Missing Report Placeholder') ||
+    text.includes('# Read Safety Blocked Target') ||
+    text.includes('NON-DELIVERABLE')
+  );
+}
+
+function validateRequiredOutputs(requiredOutputs) {
+  const missing = [];
+  const invalid = [];
+  for (const output of requiredOutputs || []) {
+    const resolved = resolveOutputPath(output);
+    if (!resolved || !fs.existsSync(resolved)) {
+      missing.push(output);
+      continue;
+    }
+    if (isReadSafetyPlaceholderPath(resolved)) {
+      invalid.push(output);
+      continue;
+    }
+    try {
+      const content = fs.readFileSync(resolved, 'utf8');
+      if (hasPlaceholderMarker(content)) invalid.push(output);
+    } catch (_err) {
+      invalid.push(output);
+    }
+  }
+  return { passed: missing.length === 0 && invalid.length === 0, missing, invalid };
+}
 
 const {
   WORKFLOW_COMPLETE_MARKERS,
@@ -142,6 +210,17 @@ async function main() {
         try {
           routerState.recordTaskUpdate(String(taskId), String(status));
           await lifecycleState.writeTaskStatus(String(taskId), String(status));
+          const outputContract = readTaskOutputContract(taskId);
+          appendTaskArtifactAudit({
+            timestamp: new Date().toISOString(),
+            taskId: String(taskId),
+            status: String(status),
+            hasOutputContract: Boolean(outputContract),
+            requiredOutputCount: Array.isArray(outputContract?.requiredOutputs)
+              ? outputContract.requiredOutputs.length
+              : 0,
+            source: 'TaskUpdate',
+          });
 
           await Promise.race([
             eventBus.emit(EventTypes.TASK_UPDATED, {
@@ -194,22 +273,47 @@ async function main() {
       const taskId = toolInput?.task_id || toolInput?.taskId || toolInput?.id || null;
 
       if (taskId && status === 'completed') {
+        const outputContract = readTaskOutputContract(taskId);
+        const requiredOutputs = Array.isArray(outputContract?.requiredOutputs)
+          ? outputContract.requiredOutputs
+          : [];
+        const outputValidation = validateRequiredOutputs(requiredOutputs);
+        const canAdvanceCompletion = !requiredOutputs.length || outputValidation.passed;
         const hadMatchingCompleted = hasMatchingCompletedTaskUpdate(taskId);
-        try {
-          routerState.recordTaskUpdate(String(taskId), 'completed');
-          await lifecycleState.writeTaskStatus(String(taskId), 'completed');
-        } catch (_trackErr) {
-          // Best-effort status reconciliation only.
+        if (canAdvanceCompletion) {
+          try {
+            routerState.recordTaskUpdate(String(taskId), 'completed');
+            await lifecycleState.writeTaskStatus(String(taskId), 'completed');
+          } catch (_trackErr) {
+            // Best-effort status reconciliation only.
+          }
+        } else {
+          appendTaskArtifactAudit({
+            timestamp: new Date().toISOString(),
+            taskId: String(taskId),
+            status: 'taskoutput_completed_blocked_missing_artifacts',
+            hasOutputContract: true,
+            requiredOutputCount: requiredOutputs.length,
+            missingOutputs: outputValidation.missing,
+            invalidOutputs: outputValidation.invalid,
+            source: 'TaskOutput',
+          });
         }
 
         if (!hadMatchingCompleted) {
           synthesizeRecoveryTaskUpdate(
             String(taskId),
-            'taskoutput_completed_without_taskupdate',
-            'Agent must call TaskUpdate({ taskId, status: "completed" }) before relying on TaskOutput.',
+            canAdvanceCompletion
+              ? 'taskoutput_completed_without_taskupdate'
+              : 'taskoutput_completed_missing_required_outputs',
+            canAdvanceCompletion
+              ? 'Agent must call TaskUpdate({ taskId, status: "completed" }) before relying on TaskOutput.'
+              : 'TaskOutput reported completed, but required outputs are missing/invalid. Agent must produce required artifacts and call TaskUpdate(completed).',
             {
               source: 'TaskOutput',
               inferredStatus: 'completed',
+              missingOutputs: outputValidation.missing,
+              invalidOutputs: outputValidation.invalid,
             }
           );
         }
