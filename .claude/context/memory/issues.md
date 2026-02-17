@@ -1,5 +1,42 @@
 <!-- Last Cleaned: 2026-02-13 - Ruthless trimming to 84% reduction -->
 
+## 2026-02-17: Haiku Agent Scope Creep — Out-of-Scope Changes Pattern (P0) — NEW
+
+**Issue**: During audit remediation pipeline (Tasks #5-9), haiku-model agents deleted 200+ test fixtures and modified unrelated files outside their assigned scope. Required a full revert cycle (task 9) to clean up.
+
+**Evidence**: Task 9 was explicitly created to "revert out-of-scope changes" from agents in tasks 5-8. Multiple revert rounds needed. This is a haiku-specific pattern: lower-model agents interpret scope boundaries more loosely.
+
+**Root Cause**: Haiku agents lack the precise instruction-following discipline of sonnet/opus agents for scope-bounded tasks. When given "fix security issues in files X, Y, Z", haiku may rewrite or delete adjacent files it considers relevant.
+
+**Solution**:
+
+1. Use `forbidden_paths` in spawn prompt metadata for haiku agents (microtask DAG pattern)
+2. Prefix spawn instructions with explicit scope boundary: "ONLY modify files: [list]. DO NOT touch any other files."
+3. For remediation tasks with haiku: add post-task git diff check before proceeding to next phase
+4. Consider using sonnet (not haiku) for scope-bounded remediation tasks
+
+**Prevention**: Add `SCOPE_CREEP_GUARD=warn|block` enforcement mode to routing-guard.cjs that validates agent's diff against declared `owned_paths` at completion.
+
+**Priority**: P0 — Prevents pipeline correctness, wasted time on reverts
+
+---
+
+## 2026-02-17: TaskUpdate Compliance Systemic Failure (7th+ Occurrence) (P0) — ESCALATED
+
+**Issue**: Tasks 5, 6, 7, 8 (audit remediation session 2026-02-17) all stayed `in_progress` indefinitely — no TaskUpdate called. Router had to manually update all 4. Previously documented in tasks 32, 33, and earlier sessions.
+
+**Evidence**: 7+ confirmed occurrences across multiple pipelines. Training-based approaches (warning box in spawn prompt) have failed every time.
+
+**Impact**: Router cannot track progress; phases stall; tasks appear stuck; pipeline audit trail broken; reflection quality degraded to WARNING score (0.45) due to missing metadata.
+
+**Escalation Level**: CRITICAL — Training + warning box approach has failed 7+ times. Hook enforcement is now mandatory.
+
+**Solution**: Implement `pre-completion-validation.cjs` hook with `COMPLETION_METADATA_ENFORCEMENT=warn|block`. Minimum viable metadata: `{ summary: 'Fixed X in Y.cjs', filesModified: ['path/file.cjs'] }`. Block or warn on completion without summary field.
+
+**Priority**: P0 — Blocking quality assurance and reflection pipeline reliability
+
+---
+
 ## 2026-02-13: Oversized Modules Require Refactoring (P0)
 
 **Issue**: 6 modules exceed 50KB with 2 exceeding 100KB.

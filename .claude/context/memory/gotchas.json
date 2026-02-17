@@ -339,21 +339,43 @@
       "date": "2026-02-14"
     },
     {
+      "id": "haiku-agent-scope-creep",
+      "gotcha": "Haiku agents are disproportionately prone to out-of-scope changes — deleting test fixtures, modifying unrelated files — requiring revert cycles",
+      "context": "Audit remediation session 2026-02-17 (Tasks #5-9): haiku agents deleted 200+ test fixtures and modified out-of-scope files. Task #9 was a full revert task.",
+      "why_it_happens": "Haiku model has lower instruction-following precision for scope-bounded tasks. When told 'fix X', it may interpret 'relevant context' broadly and modify/delete adjacent files it deems related.",
+      "trigger": "Spawning haiku-model agents on remediation tasks with implicit scope boundaries (e.g., 'fix security issues' without explicit file list)",
+      "solution": "Add explicit forbidden_paths in spawn prompt microtask DAG metadata. Prepend: 'ONLY modify: [list]. DO NOT touch any other file.' For haiku remediation tasks: add post-task git diff check before next phase proceeds.",
+      "examples": [
+        "Task #5-8: haiku agent for security fixes deleted 200+ test fixtures in tests/ directory",
+        "Task #9: revert task required to clean up out-of-scope changes"
+      ],
+      "prevention": [
+        "Use sonnet (not haiku) for scope-bounded remediation tasks",
+        "Include forbidden_paths in spawn prompt for all haiku agents",
+        "Add SCOPE_CREEP_GUARD=warn enforcement to routing-guard.cjs",
+        "Validate git diff against owned_paths at task completion before advancing pipeline"
+      ],
+      "model_risk_profile": "haiku > sonnet > opus for scope creep risk",
+      "extracted_from": "Reflection of tasks #5-9 (2026-02-17 audit remediation session)",
+      "date": "2026-02-17"
+    },
+    {
       "id": "missing-taskupdate-metadata-recurring",
-      "gotcha": "Tasks completing without TaskUpdate summary metadata block reflection quality scoring and pattern extraction — this is a recurring systemic failure (5+ occurrences across pipelines)",
-      "context": "Reflection batch tasks #32 and #33 (2026-02-17), also observed in Tasks #9, #13, #19 pipelines",
-      "why_it_happens": "Agents completing short/fast tasks feel the task is 'too small to document'. The 70-line TaskUpdate warning box in spawn templates is insufficient enforcement. Training-based approaches have failed across 5+ sessions.",
-      "symptoms": "Reflection spawn request contains: 'Task N completed without summary metadata'. Reflection agent cannot score output quality, extract patterns, or identify files modified.",
-      "trigger": "Short tasks (completed in <5 minutes), TDD fix tasks, pipeline guard tasks — any work that feels routine or quick",
-      "solution": "Implement hook-based enforcement: pre-completion-validation.cjs should check for non-empty metadata.summary before allowing status: completed. Override: COMPLETION_METADATA_ENFORCEMENT=warn|block|off. Training alone is insufficient after 5+ failures.",
+      "gotcha": "Tasks completing without TaskUpdate summary metadata block reflection quality scoring and pattern extraction — CRITICAL systemic failure (7+ occurrences across pipelines, training-based approach fully exhausted)",
+      "context": "Reflection of tasks #5-9 (2026-02-17), tasks #32-33 (2026-02-17), also observed in Tasks #9, #13, #19 pipelines",
+      "why_it_happens": "Agents completing short/fast tasks feel the task is 'too small to document'. The 70-line TaskUpdate warning box in spawn templates is insufficient enforcement. Training-based approaches have failed across 7+ sessions.",
+      "symptoms": "Reflection spawn request contains: 'Task N completed without summary metadata'. Reflection agent cannot score output quality, extract patterns, or identify files modified. Router must manually update task status.",
+      "trigger": "Short tasks (completed in <5 minutes), TDD fix tasks, pipeline guard tasks, audit remediation tasks — any work that feels routine or quick",
+      "solution": "Implement hook-based enforcement: pre-completion-validation.cjs should check for non-empty metadata.summary before allowing status: completed. Override: COMPLETION_METADATA_ENFORCEMENT=warn|block|off. Training alone has failed 7+ times — hook enforcement is mandatory.",
       "minimum_viable_metadata": "{ summary: 'Fixed X in Y.cjs', filesModified: ['path/file.cjs'] } — even one line enables reflection scoring",
       "prevention": [
-        "Add pre-completion hook (COMPLETION_METADATA_ENFORCEMENT=warn|block)",
+        "Add pre-completion hook (COMPLETION_METADATA_ENFORCEMENT=warn|block) — P0 priority",
         "Update spawn template: 'SHORT TASKS STILL NEED SUMMARY: summary: Fixed X in Y.cjs is sufficient'",
-        "Post-completion hook: auto-capture git diff --stat and attach to task context"
+        "Post-completion hook: auto-capture git diff --stat and attach to task context",
+        "Make TaskUpdate(completed) without summary a blocking error, not a warning"
       ],
-      "impact": "HIGH - Reflection agent defaults to WARNING score (0.45) for all tasks without metadata, even if underlying work is high quality. Creates false signal in reflection pipeline.",
-      "extracted_from": "Reflection of tasks #32, #33 (2026-02-17); pattern first documented in Task #19 reflection (2026-02-16)",
+      "impact": "CRITICAL - Reflection agent defaults to WARNING score (0.45) for all tasks without metadata, even if underlying work is high quality. Router stalls when tasks stay in_progress. 4 tasks simultaneously stuck requiring manual intervention.",
+      "extracted_from": "Reflection of tasks #5-9 (2026-02-17); escalated from tasks #32-33 (2026-02-17); pattern first documented in Task #19 reflection (2026-02-16)",
       "date": "2026-02-17"
     }
   ]
