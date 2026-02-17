@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const { DEFAULT_SLO_PATH } = require('../../lib/monitoring/slo-rollups.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 function main() {
   const path = process.env.SLO_METRICS_PATH || DEFAULT_SLO_PATH;
@@ -11,7 +12,8 @@ function main() {
     process.exit(0);
   }
 
-  const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+  const raw = fs.readFileSync(path, 'utf8');
+  const data = safeParseJSON(raw, null);
   const hookP95Max = Number(process.env.HOOK_P95_MAX_MS || 5);
   const recorderFailureMax = Number(process.env.RECORDER_FAILURE_RATE_MAX || 0.01);
   const p95 = Number(data?.hookLatency?.p95_ms || 0);

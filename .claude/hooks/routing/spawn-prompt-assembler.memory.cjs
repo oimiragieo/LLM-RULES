@@ -10,6 +10,57 @@ const {
   buildEvidenceId,
 } = require('./spawn-prompt-assembler.core.cjs');
 
+/**
+ * Prompt injection blocklist patterns (case-insensitive line-level filter).
+ * Any line matching one of these patterns is stripped from memory content
+ * before injection into agent spawn prompts.
+ */
+const INJECTION_PATTERNS = [
+  /ignore\s+previous/i,
+  /ignore\s+all/i,
+  /disregard\s+instructions/i,
+  /system\s+prompt/i,
+  /override/i,
+  /you\s+are\s+now/i,
+  /forget\s+everything/i,
+  /new\s+instructions/i,
+];
+
+/**
+ * Sanitize memory content by removing lines that match known prompt injection
+ * patterns. Logs a warning to stderr when content is filtered.
+ *
+ * @param {string} content - Raw memory content to sanitize.
+ * @param {string} [source] - Optional label for the source (used in warning).
+ * @returns {string} Sanitized content with suspicious lines removed.
+ */
+function sanitizeMemoryContent(content, source) {
+  if (typeof content !== 'string' || content.length === 0) return content;
+
+  const lines = content.split('\n');
+  const filtered = [];
+  const stripped = [];
+
+  for (const line of lines) {
+    const matched = INJECTION_PATTERNS.some(pattern => pattern.test(line));
+    if (matched) {
+      stripped.push(line.trim().slice(0, 120));
+    } else {
+      filtered.push(line);
+    }
+  }
+
+  if (stripped.length > 0) {
+    const label = source ? ` [source: ${source}]` : '';
+    process.stderr.write(
+      `[spawn-prompt-assembler] WARN: memory sanitization stripped ${stripped.length} suspicious line(s)${label}: ${JSON.stringify(stripped)}\n`
+    );
+    return filtered.join('\n');
+  }
+
+  return content;
+}
+
 function appendSemanticMatches(prompt, results) {
   if (!Array.isArray(results) || results.length === 0) return prompt;
 
@@ -25,11 +76,9 @@ function appendSemanticMatches(prompt, results) {
     const metaPath = r?.metadata?.path || r?.metadata?.file || r?.metadata?.source || null;
     const where = metaPath ? ` (${metaPath})` : '';
 
-    const displayText = r?.metadata?.abstract || r?.metadata?.overview || String(r?.content || '');
-    const snippet = String(displayText || '')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 180);
+    const rawText = r?.metadata?.abstract || r?.metadata?.overview || String(r?.content || '');
+    const sanitizedText = sanitizeMemoryContent(String(rawText || ''), src);
+    const snippet = sanitizedText.replace(/\s+/g, ' ').trim().slice(0, 180);
     if (!snippet) continue;
     const evidenceId = buildEvidenceId('mem', snippet);
     lines.push(
@@ -65,11 +114,9 @@ function appendQueryMemories(prompt, results) {
     const metaPath = r?.metadata?.path || r?.metadata?.file || r?.metadata?.source || null;
     const where = metaPath ? ` (${metaPath})` : '';
 
-    const displayText = r?.metadata?.abstract || r?.metadata?.overview || String(r?.content || '');
-    const snippet = String(displayText || '')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 180);
+    const rawText = r?.metadata?.abstract || r?.metadata?.overview || String(r?.content || '');
+    const sanitizedText = sanitizeMemoryContent(String(rawText || ''), src);
+    const snippet = sanitizedText.replace(/\s+/g, ' ').trim().slice(0, 180);
     if (!snippet) continue;
     const evidenceId = buildEvidenceId('mem', snippet);
     lines.push(
@@ -107,8 +154,12 @@ function appendEntityGraph(prompt, data) {
   if (decisions.length > 0) {
     lines.push('**Decisions**');
     for (const d of decisions.slice(0, 3)) {
-      const name = d?.name || d?.id || 'decision';
-      const content = d?.content ? `: ${String(d.content).slice(0, 140)}` : '';
+      const name = sanitizeMemoryContent(String(d?.name || d?.id || 'decision'), 'entity:decision');
+      const rawContent = d?.content ? String(d.content) : '';
+      const sanitizedContent = rawContent
+        ? sanitizeMemoryContent(rawContent, 'entity:decision')
+        : '';
+      const content = sanitizedContent ? `: ${sanitizedContent.slice(0, 140)}` : '';
       lines.push(`- ${name}${content}${content.length >= 140 ? '...' : ''}`);
     }
     lines.push('');
@@ -117,8 +168,10 @@ function appendEntityGraph(prompt, data) {
   if (issues.length > 0) {
     lines.push('**Issues**');
     for (const i of issues.slice(0, 3)) {
-      const name = i?.name || i?.id || 'issue';
-      const content = i?.content ? `: ${String(i.content).slice(0, 140)}` : '';
+      const name = sanitizeMemoryContent(String(i?.name || i?.id || 'issue'), 'entity:issue');
+      const rawContent = i?.content ? String(i.content) : '';
+      const sanitizedContent = rawContent ? sanitizeMemoryContent(rawContent, 'entity:issue') : '';
+      const content = sanitizedContent ? `: ${sanitizedContent.slice(0, 140)}` : '';
       lines.push(`- ${name}${content}${content.length >= 140 ? '...' : ''}`);
     }
     lines.push('');
@@ -356,4 +409,5 @@ module.exports = {
   insertContextModeSection,
   applySemanticMemoryToPrompt,
   applyEntityGraphToPrompt,
+  sanitizeMemoryContent,
 };

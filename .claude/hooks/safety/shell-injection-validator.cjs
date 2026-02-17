@@ -412,3 +412,34 @@ module.exports = {
   analyzeDecodedExecution,
   analyzeInlineInterpreterExecution,
 };
+
+if (require.main === module) {
+  let raw = '';
+  process.stdin.setEncoding('utf-8');
+  process.stdin.on('data', chunk => {
+    raw += chunk;
+  });
+  process.stdin.on('end', () => {
+    let input;
+    try {
+      input = JSON.parse(raw);
+    } catch (_e) {
+      process.stdout.write(
+        JSON.stringify({ allowed: false, reason: '[SHELL-INJECTION] Invalid JSON input' })
+      );
+      process.exit(2);
+      return;
+    }
+
+    // Extract command from Claude Code hook payload structure
+    // The hook receives: { tool_name, tool_input: { command } }
+    const command =
+      (input && input.tool_input && input.tool_input.command) || (input && input.command) || null;
+
+    const hookInput = command !== null ? { command } : input;
+    const result = handler(hookInput);
+
+    process.stdout.write(JSON.stringify(result));
+    process.exit(result.allowed ? 0 : 2);
+  });
+}

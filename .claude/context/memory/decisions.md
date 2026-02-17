@@ -150,6 +150,39 @@ async function recordLearning(text, source = 'user') {
 
 ---
 
+## ADR-136: Runtime State Unification (2026-02-16)
+
+**Status:** PROPOSED
+**Decision:** Unify 14 runtime state JSON files into a single `runtime-state.json` with namespaced sections, managed by a `RuntimeStateManager` class that uses `proper-lockfile` for all writes.
+
+**Context:**
+
+- Architecture audit (2026-02-16) identified C3: 14 concurrent-writable runtime state files without unified locking.
+- `proper-lockfile` is already a production dependency but used only in LanceDB initialization.
+- Hook processes can execute concurrently (multiple hooks registered for same event), creating race conditions.
+- Files affected: router-state.json, task-status.json, spawn-assembly-cache.json, routing-block-dedupe.json, agent-guardrails-state.json, drift-state.json, edit-counter.json, tool-governance-state.json, reflection-step0-state.json, token-slo-state.json, and 4 more.
+
+**Decision:**
+
+1. Create `.claude/lib/runtime/runtime-state-manager.cjs` — single class for all runtime state reads/writes
+2. Uses `proper-lockfile` for write operations (lock timeout: 5s, stale: 10s)
+3. Single `runtime-state.json` with namespaced sections: `{ routing: {}, tasks: {}, reflection: {}, workflow: {}, telemetry: {} }`
+4. Migrate hooks incrementally (start with highest-frequency hooks: routing-guard, post-task-unified)
+5. Backward-compatible: old file paths remain as shims that delegate to RuntimeStateManager during migration
+
+**Consequences:**
+
+**Positive:** Eliminates concurrency bugs; reduces file I/O from 14 reads to 1; enables atomic multi-property updates; single debugging point for session state.
+
+**Negative:** Migration effort (~1 week); transient period where some hooks use old files and some use new manager.
+
+**Related:**
+
+- Architecture Audit 2026-02-16: Finding C3
+- Architecture Audit 2026-02-16: BACKWARD_PROPAGATION (schema:runtime-state-unified)
+
+---
+
 ## ADR-136: safeParseJSON Migration and ESLint Enforcement (2026-02-16)
 
 **Status:** ACCEPTED

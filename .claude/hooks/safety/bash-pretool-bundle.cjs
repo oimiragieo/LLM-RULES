@@ -26,8 +26,10 @@ function runHook(scriptPath, input) {
 function tryParseJson(text) {
   const trimmed = String(text || '').trim();
   if (!trimmed || !trimmed.startsWith('{')) return null;
-  const { success, data } = safeParseJSON(trimmed, null);
-  return success ? data : null;
+  const parsed = safeParseJSON(trimmed, null);
+  // safeParseJSON returns the parsed object directly (not {success, data})
+  if (!parsed || typeof parsed !== 'object') return null;
+  return parsed;
 }
 
 function applyHookOutput(currentInput, hookStdout) {
