@@ -59,7 +59,8 @@ const STALE_PATH_REWRITES = Object.freeze({
   '.claude/context/artifacts/research-reports/implementation-patterns-research-2026-02-13.md':
     '.claude/context/reports/implementation-patterns-research-2026-02-13.md',
 });
-const REPORT_PATH_IN_TEXT_REGEX = /(?:^|[\s"'`])(\.claude[\\/]+context[\\/]+reports[\\/][^\s"'`]+\.md)\b/gi;
+const REPORT_PATH_IN_TEXT_REGEX =
+  /(?:^|[\s"'`])(\.claude[\\/]+context[\\/]+reports[\\/][^\s"'`]+\.md)\b/gi;
 const WINDOWS_REPORT_PATH_REGEX =
   /(?:^|[\s"'`])([a-zA-Z]:\\[^"'`\r\n]*?\.claude\\context\\reports\\[^"'`\r\n]+\.md)\b/g;
 const BACKTICKED_PATH_REGEX = /`([^`\r\n]+)`/g;

@@ -109,6 +109,7 @@ const SPECIALIST_KEYWORD_MAP = {
     'optimize queries',
   ],
   researcher: [
+    'research',
     'research options',
     'investigate options',
     'compare alternatives',

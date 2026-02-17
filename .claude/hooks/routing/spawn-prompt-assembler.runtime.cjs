@@ -338,7 +338,9 @@ async function main() {
     const { toolInput, basePrompt, explicitTaskId, inputPromptLength, hookSessionId } = prepared;
 
     const requiredOutputs = extractRequiredOutputs(basePrompt, toolInput);
-    const explicitAllowedTools = Array.isArray(toolInput.allowed_tools) ? toolInput.allowed_tools : [];
+    const explicitAllowedTools = Array.isArray(toolInput.allowed_tools)
+      ? toolInput.allowed_tools
+      : [];
     const hasExplicitAllowedTools = explicitAllowedTools.length > 0;
     if (
       hasExplicitAllowedTools &&

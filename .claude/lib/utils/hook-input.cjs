@@ -282,10 +282,10 @@ function getEnforcementMode(envVar, defaultMode) {
   // Try centralized defaults first
   try {
     const { getEnforcementMode: getCentralized } = require('./enforcement-defaults.cjs');
-    return getCentralized(envVar);
+    return getCentralized(envVar, defaultMode || 'block');
   } catch {
     // Fallback to legacy behavior if centralized module not available
-    const fallback = defaultMode || 'warn';
+    const fallback = defaultMode || 'block';
     const mode = process.env[envVar] || fallback;
     return VALID_ENFORCEMENT_MODES.includes(mode) ? mode : fallback;
   }

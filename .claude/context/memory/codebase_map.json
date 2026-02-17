@@ -1,11 +1,10 @@
 {
-  "version": 1,
   "discovered_files": {
     "tests/fixtures/code-indexing/hook-test/src/main.js": {
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-02-17T01:11:35.612Z"
+      "last_accessed": "2026-02-17T18:27:01.930Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "description": "Memory facade storage layer (read/write memory files)",
@@ -112,5 +111,5 @@
       "accessDate": "2026-02-11T00:00:00.000Z"
     }
   },
-  "last_updated": "2026-02-17T01:11:35.612Z"
+  "last_updated": "2026-02-17T18:27:01.930Z"
 }

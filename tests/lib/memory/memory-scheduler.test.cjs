@@ -107,6 +107,7 @@ function createTestMemoryData() {
 // Simple test framework
 let passCount = 0;
 let failCount = 0;
+const pendingTests = [];
 
 function describe(name, fn) {
   console.log(`\n${name}`);
@@ -114,277 +115,291 @@ function describe(name, fn) {
 }
 
 function it(name, fn) {
-  try {
-    fn();
-    console.log(`  [PASS] ${name}`);
-    passCount++;
-  } catch (err) {
-    console.error(`  [FAIL] ${name}`);
-    console.error(`         ${err.message}`);
-    failCount++;
-    process.exitCode = 1;
-  }
+  pendingTests.push({ name, fn });
 }
 
 // Run tests
 if (require.main === module) {
-  console.log('Memory Scheduler Tests - Phase 4 Automated Maintenance');
-  console.log('======================================================');
+  (async () => {
+    console.log('Memory Scheduler Tests - Phase 4 Automated Maintenance');
+    console.log('======================================================');
 
-  // Test Suite 1: runDailyMaintenance
-  describe('runDailyMaintenance', function () {
-    it('should run STM to MTM consolidation', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
+    // Test Suite 1: runDailyMaintenance
+    describe('runDailyMaintenance', function () {
+      it('should run STM to MTM consolidation', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
 
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runDailyMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runDailyMaintenance(TEST_PROJECT_ROOT);
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const {
+            runDailyMaintenance,
+          } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runDailyMaintenance(TEST_PROJECT_ROOT);
 
-        assert(result, 'Should return a result');
-        assert(result.timestamp, 'Should have timestamp');
-        assert(result.tasks, 'Should have tasks');
-        assert(Array.isArray(result.tasks), 'tasks should be an array');
-      } finally {
-        cleanupTestDir();
-      }
+          assert(result, 'Should return a result');
+          assert(result.timestamp, 'Should have timestamp');
+          assert(result.tasks, 'Should have tasks');
+          assert(Array.isArray(result.tasks), 'tasks should be an array');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      it('should check tier health', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const {
+            runDailyMaintenance,
+          } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runDailyMaintenance(TEST_PROJECT_ROOT);
+
+          assert(result.healthCheck, 'Should have healthCheck');
+          assert(typeof result.healthCheck.healthScore === 'number', 'Should have health score');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      it('should log metrics', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const {
+            runDailyMaintenance,
+          } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          await runDailyMaintenance(TEST_PROJECT_ROOT);
+
+          const metricsDir = path.join(MEMORY_DIR, 'metrics');
+          const files = fs.readdirSync(metricsDir).filter(f => f.endsWith('.json'));
+
+          assert(files.length >= 1, 'Should have at least one metrics file');
+        } finally {
+          cleanupTestDir();
+        }
+      });
     });
 
-    it('should check tier health', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
+    // Test Suite 2: runWeeklyMaintenance
+    describe('runWeeklyMaintenance', function () {
+      it('should include all weekly tasks', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
 
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runDailyMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runDailyMaintenance(TEST_PROJECT_ROOT);
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const {
+            runWeeklyMaintenance,
+          } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runWeeklyMaintenance(TEST_PROJECT_ROOT);
 
-        assert(result.healthCheck, 'Should have healthCheck');
-        assert(typeof result.healthCheck.healthScore === 'number', 'Should have health score');
-      } finally {
-        cleanupTestDir();
-      }
+          assert(result, 'Should return a result');
+          assert(result.timestamp, 'Should have timestamp');
+          assert(result.tasks, 'Should have tasks');
+
+          // Should include both daily and weekly tasks
+          const taskTypes = result.tasks.map(t => t.type);
+          assert(taskTypes.includes('consolidation'), 'Should include consolidation');
+          assert(taskTypes.includes('healthCheck'), 'Should include healthCheck');
+          assert(taskTypes.includes('metricsLog'), 'Should include metricsLog');
+          assert(taskTypes.includes('summarization'), 'Should include summarization');
+          assert(taskTypes.includes('deduplication'), 'Should include deduplication');
+          assert(taskTypes.includes('pruning'), 'Should include pruning');
+          assert(taskTypes.includes('archiveOldLTM'), 'Should include archiveOldLTM');
+          assert(taskTypes.includes('weeklyReport'), 'Should include weeklyReport');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      it('should generate weekly health report', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const {
+            runWeeklyMaintenance,
+          } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runWeeklyMaintenance(TEST_PROJECT_ROOT);
+
+          assert(result.weeklyReport, 'Should have weeklyReport');
+        } finally {
+          cleanupTestDir();
+        }
+      });
     });
 
-    it('should log metrics', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
+    // Test Suite 3: runMaintenance (manual)
+    describe('runMaintenance', function () {
+      it('should run daily tasks when type is "daily"', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
 
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runDailyMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        runDailyMaintenance(TEST_PROJECT_ROOT);
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const { runMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runMaintenance('daily', TEST_PROJECT_ROOT);
 
-        const metricsDir = path.join(MEMORY_DIR, 'metrics');
-        const files = fs.readdirSync(metricsDir).filter(f => f.endsWith('.json'));
+          assert(result, 'Should return a result');
+          assert(result.maintenanceType === 'daily', 'Should be daily maintenance');
+        } finally {
+          cleanupTestDir();
+        }
+      });
 
-        assert(files.length >= 1, 'Should have at least one metrics file');
-      } finally {
-        cleanupTestDir();
-      }
+      it('should run weekly tasks when type is "weekly"', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const { runMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runMaintenance('weekly', TEST_PROJECT_ROOT);
+
+          assert(result, 'Should return a result');
+          assert(result.maintenanceType === 'weekly', 'Should be weekly maintenance');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      it('should run specific task when given a task name', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const { runMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runMaintenance('healthCheck', TEST_PROJECT_ROOT);
+
+          assert(result, 'Should return a result');
+          // When running a specific task, result has type and success directly
+          assert(
+            result.type === 'healthCheck' || result.maintenanceType === 'task',
+            'Should have result from specific task'
+          );
+        } finally {
+          cleanupTestDir();
+        }
+      });
     });
+
+    // Test Suite 4: getMaintenanceStatus
+    describe('getMaintenanceStatus', function () {
+      it('should return current maintenance status', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const {
+            getMaintenanceStatus,
+            runDailyMaintenance,
+          } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+
+          // Run maintenance first
+          await runDailyMaintenance(TEST_PROJECT_ROOT);
+
+          const status = getMaintenanceStatus(TEST_PROJECT_ROOT);
+
+          assert(status, 'Should return status');
+          assert(status.lastDaily || status.lastRun, 'Should have last run info');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+    });
+
+    // Test Suite 5: Task execution
+    describe('Individual task execution', function () {
+      it('should run consolidation task', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runTask('consolidation', TEST_PROJECT_ROOT);
+
+          assert(result, 'Should return result');
+          assert(result.type === 'consolidation', 'Should be consolidation type');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      it('should run healthCheck task', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runTask('healthCheck', TEST_PROJECT_ROOT);
+
+          assert(result, 'Should return result');
+          assert(result.type === 'healthCheck', 'Should be healthCheck type');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      it('should run deduplication task', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runTask('deduplication', TEST_PROJECT_ROOT);
+
+          assert(result, 'Should return result');
+          assert(result.type === 'deduplication', 'Should be deduplication type');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      it('should run archiveOldLTM task', async function () {
+        setupTestDir();
+        try {
+          createTestMemoryData();
+
+          delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
+          const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
+          const result = await runTask('archiveOldLTM', TEST_PROJECT_ROOT);
+
+          assert(result, 'Should return result');
+          assert(result.type === 'archiveOldLTM', 'Should be archiveOldLTM type');
+          assert(typeof result.success === 'boolean', 'Should have success flag');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+    });
+
+    for (const testCase of pendingTests) {
+      try {
+        await testCase.fn();
+        console.log(`  [PASS] ${testCase.name}`);
+        passCount++;
+      } catch (err) {
+        console.error(`  [FAIL] ${testCase.name}`);
+        console.error(`         ${err.message}`);
+        failCount++;
+        process.exitCode = 1;
+      }
+    }
+    console.log('\n======================================================');
+    console.log(`Test run complete. ${passCount} passed, ${failCount} failed.`);
+  })().catch(err => {
+    console.error(err);
+    process.exitCode = 1;
   });
-
-  // Test Suite 2: runWeeklyMaintenance
-  describe('runWeeklyMaintenance', function () {
-    it('should include all weekly tasks', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const {
-          runWeeklyMaintenance,
-        } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runWeeklyMaintenance(TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return a result');
-        assert(result.timestamp, 'Should have timestamp');
-        assert(result.tasks, 'Should have tasks');
-
-        // Should include both daily and weekly tasks
-        const taskTypes = result.tasks.map(t => t.type);
-        assert(taskTypes.includes('consolidation'), 'Should include consolidation');
-        assert(taskTypes.includes('healthCheck'), 'Should include healthCheck');
-        assert(taskTypes.includes('metricsLog'), 'Should include metricsLog');
-        assert(taskTypes.includes('summarization'), 'Should include summarization');
-        assert(taskTypes.includes('deduplication'), 'Should include deduplication');
-        assert(taskTypes.includes('pruning'), 'Should include pruning');
-        assert(taskTypes.includes('archiveOldLTM'), 'Should include archiveOldLTM');
-        assert(taskTypes.includes('weeklyReport'), 'Should include weeklyReport');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-
-    it('should generate weekly health report', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const {
-          runWeeklyMaintenance,
-        } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runWeeklyMaintenance(TEST_PROJECT_ROOT);
-
-        assert(result.weeklyReport, 'Should have weeklyReport');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-  });
-
-  // Test Suite 3: runMaintenance (manual)
-  describe('runMaintenance', function () {
-    it('should run daily tasks when type is "daily"', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runMaintenance('daily', TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return a result');
-        assert(result.maintenanceType === 'daily', 'Should be daily maintenance');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-
-    it('should run weekly tasks when type is "weekly"', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runMaintenance('weekly', TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return a result');
-        assert(result.maintenanceType === 'weekly', 'Should be weekly maintenance');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-
-    it('should run specific task when given a task name', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runMaintenance } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runMaintenance('healthCheck', TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return a result');
-        // When running a specific task, result has type and success directly
-        assert(
-          result.type === 'healthCheck' || result.maintenanceType === 'task',
-          'Should have result from specific task'
-        );
-      } finally {
-        cleanupTestDir();
-      }
-    });
-  });
-
-  // Test Suite 4: getMaintenanceStatus
-  describe('getMaintenanceStatus', function () {
-    it('should return current maintenance status', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const {
-          getMaintenanceStatus,
-          runDailyMaintenance,
-        } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-
-        // Run maintenance first
-        runDailyMaintenance(TEST_PROJECT_ROOT);
-
-        const status = getMaintenanceStatus(TEST_PROJECT_ROOT);
-
-        assert(status, 'Should return status');
-        assert(status.lastDaily || status.lastRun, 'Should have last run info');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-  });
-
-  // Test Suite 5: Task execution
-  describe('Individual task execution', function () {
-    it('should run consolidation task', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runTask('consolidation', TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return result');
-        assert(result.type === 'consolidation', 'Should be consolidation type');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-
-    it('should run healthCheck task', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runTask('healthCheck', TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return result');
-        assert(result.type === 'healthCheck', 'Should be healthCheck type');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-
-    it('should run deduplication task', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runTask('deduplication', TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return result');
-        assert(result.type === 'deduplication', 'Should be deduplication type');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-
-    it('should run archiveOldLTM task', function () {
-      setupTestDir();
-      try {
-        createTestMemoryData();
-
-        delete require.cache[require.resolve('../../../.claude/lib/memory/memory-scheduler.cjs')];
-        const { runTask } = require('../../../.claude/lib/memory/memory-scheduler.cjs');
-        const result = runTask('archiveOldLTM', TEST_PROJECT_ROOT);
-
-        assert(result, 'Should return result');
-        assert(result.type === 'archiveOldLTM', 'Should be archiveOldLTM type');
-        assert(typeof result.success === 'boolean', 'Should have success flag');
-      } finally {
-        cleanupTestDir();
-      }
-    });
-  });
-
-  console.log('\n======================================================');
-  console.log(`Test run complete. ${passCount} passed, ${failCount} failed.`);
 }

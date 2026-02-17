@@ -245,11 +245,8 @@ function isCreatorActive(creatorName) {
       return { active: false };
     }
 
-    const { success, data: state } = safeParseJSON(
-      fs.readFileSync(statePath, 'utf8'),
-      'creator-state'
-    );
-    if (!success || !state) {
+    const state = safeParseJSON(fs.readFileSync(statePath, 'utf8'), 'creator-state');
+    if (!state || typeof state !== 'object') {
       return { active: false };
     }
     const creatorState = state[creatorName];
@@ -296,9 +293,9 @@ function markCreatorActive(creatorName, artifactName = null) {
     // Load existing state or create new
     let state = {};
     if (fs.existsSync(statePath)) {
-      const { success, data } = safeParseJSON(fs.readFileSync(statePath, 'utf8'), 'creator-state');
-      if (success && data) {
-        state = data;
+      const parsed = safeParseJSON(fs.readFileSync(statePath, 'utf8'), 'creator-state');
+      if (parsed && typeof parsed === 'object') {
+        state = parsed;
       }
     }
 
@@ -330,11 +327,8 @@ function clearCreatorActive(creatorName) {
     const statePath = path.join(PROJECT_ROOT, STATE_FILE);
     if (!fs.existsSync(statePath)) return true;
 
-    const { success, data: state } = safeParseJSON(
-      fs.readFileSync(statePath, 'utf8'),
-      'creator-state'
-    );
-    if (success && state && state[creatorName]) {
+    const state = safeParseJSON(fs.readFileSync(statePath, 'utf8'), 'creator-state');
+    if (state && typeof state === 'object' && state[creatorName]) {
       state[creatorName].active = false;
       fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
     }
@@ -421,9 +415,14 @@ function validateArtifactContent(artifactType, content) {
     return result;
   }
 
+  const trimmed = typeof content === 'string' ? content.trim() : '';
+  if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+    return result;
+  }
+
   // Try to parse content as JSON
-  const { success, data: parsed } = safeParseJSON(content, null);
-  if (!success || !parsed || typeof parsed !== 'object') {
+  const parsed = safeParseJSON(content, null);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     // Content is not JSON or invalid - skip validation gracefully
     return result;
   }
@@ -448,12 +447,8 @@ function validateArtifactContent(artifactType, content) {
     return result;
   }
 
-  const { success: schemaSuccess, data: schema } = safeParseJSON(
-    fs.readFileSync(schemaPath, 'utf8'),
-    'artifact-schema'
-  );
-
-  if (!schemaSuccess || !schema) {
+  const schema = safeParseJSON(fs.readFileSync(schemaPath, 'utf8'), 'artifact-schema');
+  if (!schema || typeof schema !== 'object') {
     return result;
   }
 

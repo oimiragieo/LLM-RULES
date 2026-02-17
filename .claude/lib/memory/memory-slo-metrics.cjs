@@ -139,7 +139,8 @@ function saveOperationalMetrics(metrics, projectRoot = PROJECT_ROOT) {
     let lastErr = null;
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
-        atomicWriteJSONSync(target, payload);
+        // We already hold a per-file lock in withFileLockSync; skip nested lock acquisition.
+        atomicWriteJSONSync(target, payload, { skipLock: true });
         return target;
       } catch (err) {
         lastErr = err;

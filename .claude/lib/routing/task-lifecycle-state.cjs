@@ -9,9 +9,11 @@ const { withLock } = require('../utils/file-locker.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const TASK_STATUS_FILE =
-  process.env.TASK_STATUS_FILE_PATH || path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
+  process.env.TASK_STATUS_FILE_PATH ||
+  path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.json');
 const TASK_STATUS_LOCK =
-  process.env.TASK_STATUS_LOCK_PATH || path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.lock');
+  process.env.TASK_STATUS_LOCK_PATH ||
+  path.join(PROJECT_ROOT, '.claude/context/runtime/task-status.lock');
 const VALID_LIFECYCLE_STATUSES = Object.freeze(['pending', 'in_progress', 'completed', 'deleted']);
 const VALID_TRANSITIONS = Object.freeze({
   pending: ['in_progress', 'deleted'],

@@ -26,7 +26,9 @@ const path = require('path');
 const { PROJECT_ROOT } = require('../../../.claude/lib/utils/project-root.cjs');
 
 // Module under test — enhancedIntegrationChecklist does not exist yet (RED phase)
-const { enhancedIntegrationChecklist } = require('../../../.claude/lib/creators/creator-commons.cjs');
+const {
+  enhancedIntegrationChecklist,
+} = require('../../../.claude/lib/creators/creator-commons.cjs');
 
 // Test fixtures
 const TMP_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'tmp', 'test-enhanced-checklist');
@@ -100,9 +102,7 @@ function createMockCatalogWithoutEntry() {
  */
 function createMockRegistryWithAgent(agentName) {
   const registry = {
-    agents: [
-      { name: agentName, type: agentName, description: 'A test agent' },
-    ],
+    agents: [{ name: agentName, type: agentName, description: 'A test agent' }],
   };
   fs.writeFileSync(MOCK_REGISTRY_PATH, JSON.stringify(registry, null, 2));
 }
@@ -112,9 +112,7 @@ function createMockRegistryWithAgent(agentName) {
  */
 function createMockRegistryWithoutAgent() {
   const registry = {
-    agents: [
-      { name: 'other-agent', type: 'other-agent', description: 'Another agent' },
-    ],
+    agents: [{ name: 'other-agent', type: 'other-agent', description: 'Another agent' }],
   };
   fs.writeFileSync(MOCK_REGISTRY_PATH, JSON.stringify(registry, null, 2));
 }
@@ -195,7 +193,9 @@ describe('enhancedIntegrationChecklist', () => {
 
     assert.ok(Array.isArray(result.failed), 'result.failed should be an array');
     assert.ok(
-      result.failed.some(f => f.toLowerCase().includes('registry') || f.toLowerCase().includes('agent')),
+      result.failed.some(
+        f => f.toLowerCase().includes('registry') || f.toLowerCase().includes('agent')
+      ),
       `Expected result.failed to include a string about missing registry entry, got: ${JSON.stringify(result.failed)}`
     );
   });
@@ -215,8 +215,8 @@ describe('enhancedIntegrationChecklist', () => {
     // - Provenance header check
     const allResults = [...result.passed, ...result.failed, ...result.warnings];
     const hasProvenanceCheck = allResults.some(r => r.toLowerCase().includes('provenance'));
-    const hasFileCheck = allResults.some(r =>
-      r.toLowerCase().includes('exist') || r.toLowerCase().includes('file')
+    const hasFileCheck = allResults.some(
+      r => r.toLowerCase().includes('exist') || r.toLowerCase().includes('file')
     );
 
     assert.ok(
@@ -241,8 +241,8 @@ describe('enhancedIntegrationChecklist', () => {
 
     assert.ok(Array.isArray(result.warnings), 'result.warnings should be an array');
     assert.ok(
-      result.warnings.some(w =>
-        w.toLowerCase().includes('catalog') || w.toLowerCase().includes('not found')
+      result.warnings.some(
+        w => w.toLowerCase().includes('catalog') || w.toLowerCase().includes('not found')
       ),
       `Expected result.warnings to mention missing catalog, got: ${JSON.stringify(result.warnings)}`
     );
@@ -253,7 +253,11 @@ describe('enhancedIntegrationChecklist', () => {
     const jsonArtifactPath = path.join(TMP_DIR, 'test-config.json');
     fs.writeFileSync(
       jsonArtifactPath,
-      JSON.stringify({ status: 'success', output: { name: 'test', description: 'Test config' } }, null, 2)
+      JSON.stringify(
+        { status: 'success', output: { name: 'test', description: 'Test config' } },
+        null,
+        2
+      )
     );
 
     // For JSON artifacts, the function should run schema validation
@@ -289,7 +293,11 @@ describe('enhancedIntegrationChecklist', () => {
       assert.strictEqual(typeof item, 'string', `failed item must be string, got: ${typeof item}`);
     }
     for (const item of result.warnings) {
-      assert.strictEqual(typeof item, 'string', `warnings item must be string, got: ${typeof item}`);
+      assert.strictEqual(
+        typeof item,
+        'string',
+        `warnings item must be string, got: ${typeof item}`
+      );
     }
   });
 });

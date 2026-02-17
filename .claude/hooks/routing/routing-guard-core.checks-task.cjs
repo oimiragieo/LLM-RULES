@@ -24,8 +24,6 @@ function hasExplicitAgentContext(hookInput = null) {
   if (!hookInput || typeof hookInput !== 'object') return false;
   const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
   if (taskId) return true;
-  const allowedTools = Array.isArray(hookInput.allowed_tools) ? hookInput.allowed_tools : [];
-  if (allowedTools.includes('TaskUpdate')) return true;
   const agentId = String(process.env.CLAUDE_AGENT_ID || '')
     .trim()
     .toLowerCase();
@@ -212,7 +210,11 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
   }
 
   const prompt = (toolInput.prompt || '').toLowerCase();
-  const isDeveloperSpawn = /\byou are (?:a |the )?developer\b/i.test(prompt);
+  const declaredSubagent = String(toolInput.subagent_type || '')
+    .trim()
+    .toLowerCase();
+  const isDeveloperSpawn =
+    declaredSubagent === 'developer' || /\byou are (?:a |the )?developer\b/i.test(prompt);
 
   if (!isDeveloperSpawn) {
     return { pass: true };
@@ -227,9 +229,11 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
       const regex = new RegExp('\\b' + escaped + '\\b', 'i');
 
       if (regex.test(combined)) {
+        const canonicalHint = specialist === 'qa' ? '\nCanonical trigger: "run tests"' : '';
         const message = `[ROUTER-FIRST PROTOCOL VIOLATION][SPECIALIST-OVERRIDE] Developer spawn detected for ${specialist} task.
 Keyword: "${phrase}"
 Suggestion: Use ${specialist} agent instead for better results.
+${canonicalHint}
 
 Developer should be LAST RESORT. Specialists have domain-specific prompts and skills.`;
 

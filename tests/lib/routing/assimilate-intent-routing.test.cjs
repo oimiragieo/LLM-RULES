@@ -6,26 +6,20 @@ const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
-const { INTENT_KEYWORDS } = require(path.join(
-  PROJECT_ROOT,
-  '.claude/lib/routing/routing-table-intent-keywords.cjs'
-));
-const { INTENT_TO_AGENT } = require(path.join(
-  PROJECT_ROOT,
-  '.claude/lib/routing/routing-table-intent-agents.cjs'
-));
-const { fuzzyMatchIntent } = require(path.join(
-  PROJECT_ROOT,
-  '.claude/lib/routing/fuzzy-intent-matcher.cjs'
-));
+const { INTENT_KEYWORDS } = require(
+  path.join(PROJECT_ROOT, '.claude/lib/routing/routing-table-intent-keywords.cjs')
+);
+const { INTENT_TO_AGENT } = require(
+  path.join(PROJECT_ROOT, '.claude/lib/routing/routing-table-intent-agents.cjs')
+);
+const { fuzzyMatchIntent } = require(
+  path.join(PROJECT_ROOT, '.claude/lib/routing/fuzzy-intent-matcher.cjs')
+);
 
 describe('assimilate intent routing', () => {
   // Test 1: New keywords exist in INTENT_KEYWORDS
   it('has assimilate intent with extraction keywords', () => {
-    assert.ok(
-      INTENT_KEYWORDS.assimilate,
-      'INTENT_KEYWORDS.assimilate must be defined'
-    );
+    assert.ok(INTENT_KEYWORDS.assimilate, 'INTENT_KEYWORDS.assimilate must be defined');
     assert.ok(
       Array.isArray(INTENT_KEYWORDS.assimilate),
       'INTENT_KEYWORDS.assimilate must be an array'
@@ -116,18 +110,13 @@ describe('assimilate intent routing', () => {
       INTENT_KEYWORDS.assimilate,
       'assimilate intent must exist for collision check (RED: not yet added)'
     );
-    assert.ok(
-      Array.isArray(INTENT_KEYWORDS.assimilate),
-      'assimilate keywords must be an array'
-    );
+    assert.ok(Array.isArray(INTENT_KEYWORDS.assimilate), 'assimilate keywords must be an array');
     assert.ok(
       Array.isArray(INTENT_KEYWORDS.evolution_orchestrator),
       'evolution_orchestrator keywords must be an array'
     );
     const assimilateSet = new Set(INTENT_KEYWORDS.assimilate);
-    const collisions = INTENT_KEYWORDS.evolution_orchestrator.filter(kw =>
-      assimilateSet.has(kw)
-    );
+    const collisions = INTENT_KEYWORDS.evolution_orchestrator.filter(kw => assimilateSet.has(kw));
     assert.strictEqual(
       collisions.length,
       0,

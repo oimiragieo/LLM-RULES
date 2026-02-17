@@ -59,11 +59,17 @@ function readRouterStateFile(filePath, defaults) {
   }
 
   const validate = getValidator('router-state', 'router-state.schema.json');
-  if (!validate(parsed)) {
-    return fallback;
+  if (validate(parsed)) {
+    return { ...fallback, ...parsed };
   }
 
-  return { ...fallback, ...parsed };
+  // Accept legacy/minimal snapshots by validating merged defaults + parsed payload.
+  const merged = { ...fallback, ...parsed };
+  if (validate(merged)) {
+    return merged;
+  }
+
+  return fallback;
 }
 
 function readWorkflowStateFile(filePath, fallback = null) {

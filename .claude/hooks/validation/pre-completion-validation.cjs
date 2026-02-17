@@ -286,7 +286,12 @@ function readTaskOutputContracts() {
   try {
     if (!fs.existsSync(TASK_OUTPUT_CONTRACTS_PATH)) return { tasks: {} };
     const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
-    const parsed = safeParseJSON(fs.readFileSync(TASK_OUTPUT_CONTRACTS_PATH, 'utf8'), null, null, {});
+    const parsed = safeParseJSON(
+      fs.readFileSync(TASK_OUTPUT_CONTRACTS_PATH, 'utf8'),
+      null,
+      null,
+      {}
+    );
     if (!parsed || typeof parsed !== 'object' || typeof parsed.tasks !== 'object') {
       return { tasks: {} };
     }
@@ -377,7 +382,12 @@ function incrementTaskOutputMetric(counterName) {
     if (fs.existsSync(TASK_OUTPUT_METRICS_PATH)) {
       try {
         const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
-        const parsed = safeParseJSON(fs.readFileSync(TASK_OUTPUT_METRICS_PATH, 'utf8'), null, null, {});
+        const parsed = safeParseJSON(
+          fs.readFileSync(TASK_OUTPUT_METRICS_PATH, 'utf8'),
+          null,
+          null,
+          {}
+        );
         if (parsed && typeof parsed === 'object') {
           state = {
             counters: parsed.counters && typeof parsed.counters === 'object' ? parsed.counters : {},

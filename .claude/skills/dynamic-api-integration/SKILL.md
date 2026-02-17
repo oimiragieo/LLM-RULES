@@ -1,5 +1,5 @@
-<!-- Agent: skill-creator | Task: #1 | Session: 2026-02-17 -->
----
+## <!-- Agent: skill-creator | Task: #1 | Session: 2026-02-17 -->
+
 name: dynamic-api-integration
 description: Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Adapted from UTCP (Universal Tool Calling Protocol) patterns for Node.js / Claude Code agents.
 version: 1.0.0
@@ -8,14 +8,16 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, WebFetch, WebSearch]
 best_practices:
-  - Always fetch and validate the OpenAPI spec before constructing requests
-  - Use environment variables for all API keys and secrets — never hardcode
-  - Apply max_iterations guard to prevent infinite API call loops
-  - Truncate or summarize large API responses to stay within context budget
-  - Match user intent to API endpoints semantically before calling
-  - Handle errors explicitly with retry logic for transient failures
-error_handling: strict
-streaming: supported
+
+- Always fetch and validate the OpenAPI spec before constructing requests
+- Use environment variables for all API keys and secrets — never hardcode
+- Apply max_iterations guard to prevent infinite API call loops
+- Truncate or summarize large API responses to stay within context budget
+- Match user intent to API endpoints semantically before calling
+- Handle errors explicitly with retry logic for transient failures
+  error_handling: strict
+  streaming: supported
+
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -77,15 +79,15 @@ WebFetch({
 
 **What to extract from the spec:**
 
-| Field | Location in Spec | Purpose |
-|-------|-----------------|---------|
-| Base URL | `servers[0].url` | API root for all requests |
-| Endpoints | `paths.*` | Available operations |
-| Methods | `paths.*.get/post/put/delete` | HTTP verbs per endpoint |
-| Parameters | `paths.*.*.parameters[]` | Query, path, header params |
-| Request body | `paths.*.*.requestBody` | POST/PUT payload schema |
-| Auth | `components.securitySchemes` | API key, Bearer, OAuth |
-| Response schema | `paths.*.*.responses.200` | Expected response format |
+| Field           | Location in Spec              | Purpose                    |
+| --------------- | ----------------------------- | -------------------------- |
+| Base URL        | `servers[0].url`              | API root for all requests  |
+| Endpoints       | `paths.*`                     | Available operations       |
+| Methods         | `paths.*.get/post/put/delete` | HTTP verbs per endpoint    |
+| Parameters      | `paths.*.*.parameters[]`      | Query, path, header params |
+| Request body    | `paths.*.*.requestBody`       | POST/PUT payload schema    |
+| Auth            | `components.securitySchemes`  | API key, Bearer, OAuth     |
+| Response schema | `paths.*.*.responses.200`     | Expected response format   |
 
 **Common OpenAPI spec locations:**
 
@@ -172,13 +174,13 @@ Ask yourself: What data does the user want? What action do they want performed?
 
 ### Step 2: Map intent to endpoint
 
-| User Intent | Likely HTTP Method | Endpoint Pattern |
-|------------|-------------------|------------------|
-| "Find / search / list / get" | GET | `/search`, `/list`, `/{resource}` |
-| "Create / add / register" | POST | `/{resource}` |
-| "Update / modify / change" | PUT or PATCH | `/{resource}/{id}` |
-| "Delete / remove" | DELETE | `/{resource}/{id}` |
-| "Get details about X" | GET | `/{resource}/{id}` |
+| User Intent                  | Likely HTTP Method | Endpoint Pattern                  |
+| ---------------------------- | ------------------ | --------------------------------- |
+| "Find / search / list / get" | GET                | `/search`, `/list`, `/{resource}` |
+| "Create / add / register"    | POST               | `/{resource}`                     |
+| "Update / modify / change"   | PUT or PATCH       | `/{resource}/{id}`                |
+| "Delete / remove"            | DELETE             | `/{resource}/{id}`                |
+| "Get details about X"        | GET                | `/{resource}/{id}`                |
 
 ### Step 3: Select parameters
 
@@ -286,34 +288,35 @@ echo "Body: $BODY" | head -c 2000  # Truncate to 2KB for context safety
 
 ```javascript
 WebFetch({
-  url: "https://api.example.com/search?q=test",
-  prompt: "Extract the top 5 results with their titles and descriptions. Format as a numbered list."
-})
+  url: 'https://api.example.com/search?q=test',
+  prompt:
+    'Extract the top 5 results with their titles and descriptions. Format as a numbered list.',
+});
 ```
 
 **When to use which:**
 
-| Scenario | Tool | Reason |
-|----------|------|--------|
-| Need raw JSON for further processing | Bash (curl) | Full control, parseable output |
-| Need summarized/extracted data | WebFetch | AI processes response inline |
-| Need to check HTTP status codes | Bash (curl) | WebFetch abstracts status away |
-| Large response (>50KB) | Bash (curl) + truncate | WebFetch may timeout on large pages |
-| HTML page (not JSON) | WebFetch | Converts HTML to markdown |
+| Scenario                             | Tool                   | Reason                              |
+| ------------------------------------ | ---------------------- | ----------------------------------- |
+| Need raw JSON for further processing | Bash (curl)            | Full control, parseable output      |
+| Need summarized/extracted data       | WebFetch               | AI processes response inline        |
+| Need to check HTTP status codes      | Bash (curl)            | WebFetch abstracts status away      |
+| Large response (>50KB)               | Bash (curl) + truncate | WebFetch may timeout on large pages |
+| HTML page (not JSON)                 | WebFetch               | Converts HTML to markdown           |
 
 ### Error Handling
 
 **HTTP Status Code Handling:**
 
-| Status | Meaning | Action |
-|--------|---------|--------|
-| 200-299 | Success | Parse response, continue |
-| 400 | Bad Request | Check parameters, fix and retry |
-| 401 | Unauthorized | Check API key/token, re-authenticate |
-| 403 | Forbidden | Check permissions, report to user |
-| 404 | Not Found | Check URL/resource ID, try alternative endpoint |
-| 429 | Rate Limited | Wait (check Retry-After header), then retry |
-| 500-599 | Server Error | Wait and retry up to 3 times |
+| Status  | Meaning      | Action                                          |
+| ------- | ------------ | ----------------------------------------------- |
+| 200-299 | Success      | Parse response, continue                        |
+| 400     | Bad Request  | Check parameters, fix and retry                 |
+| 401     | Unauthorized | Check API key/token, re-authenticate            |
+| 403     | Forbidden    | Check permissions, report to user               |
+| 404     | Not Found    | Check URL/resource ID, try alternative endpoint |
+| 429     | Rate Limited | Wait (check Retry-After header), then retry     |
+| 500-599 | Server Error | Wait and retry up to 3 times                    |
 
 **Retry with Exponential Backoff:**
 
@@ -453,11 +456,33 @@ curl -s -X GET "https://api.github.com/users/octocat/repos?sort=updated&per_page
   "description": "List repositories for a GitHub user, sorted by most recently updated",
   "base_url": "https://api.github.com/users/{username}/repos",
   "method": "GET",
-  "auth": { "type": "bearer", "header": "Authorization", "env_var": "GITHUB_TOKEN", "prefix": "Bearer " },
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "env_var": "GITHUB_TOKEN",
+    "prefix": "Bearer "
+  },
   "parameters": {
-    "username": { "type": "string", "required": true, "in": "path", "description": "GitHub username" },
-    "sort": { "type": "string", "required": false, "in": "query", "description": "Sort field: created, updated, pushed, full_name", "default": "updated" },
-    "per_page": { "type": "integer", "required": false, "in": "query", "description": "Results per page (max 100)", "default": 10 }
+    "username": {
+      "type": "string",
+      "required": true,
+      "in": "path",
+      "description": "GitHub username"
+    },
+    "sort": {
+      "type": "string",
+      "required": false,
+      "in": "query",
+      "description": "Sort field: created, updated, pushed, full_name",
+      "default": "updated"
+    },
+    "per_page": {
+      "type": "integer",
+      "required": false,
+      "in": "query",
+      "description": "Results per page (max 100)",
+      "default": 10
+    }
   }
 }
 ```
@@ -497,12 +522,12 @@ API responses can be very large. Apply these rules to prevent context overflow:
 
 ### Response Size Limits
 
-| Response Size | Action |
-|--------------|--------|
-| < 5 KB | Use full response |
-| 5-20 KB | Extract relevant fields only |
-| 20-50 KB | Summarize via WebFetch or node script |
-| > 50 KB | Truncate to first 5KB + count remaining |
+| Response Size | Action                                  |
+| ------------- | --------------------------------------- |
+| < 5 KB        | Use full response                       |
+| 5-20 KB       | Extract relevant fields only            |
+| 20-50 KB      | Summarize via WebFetch or node script   |
+| > 50 KB       | Truncate to first 5KB + count remaining |
 
 ### Extraction Pattern (Recommended for Large Responses)
 
@@ -551,15 +576,15 @@ Before completing a dynamic API integration task:
 
 ## Anti-Patterns (AVOID)
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|-------------|-------------|-----------------|
-| Hardcoding API keys | Security risk, breaks when rotated | Use `$ENV_VAR` in all commands |
-| Calling API without reading spec first | Wrong endpoint, wrong parameters | Discover first (Phase 1) |
-| Passing full 100KB response to context | Context overflow, degraded performance | Truncate/extract (Phase 4) |
-| No iteration guard on chained calls | Infinite loops burning tokens | Always enforce max_iterations |
-| Guessing parameter names | 400 errors, wasted calls | Read spec/docs before constructing |
-| Ignoring HTTP error codes | Silent failures, wrong results | Check status, handle 4xx/5xx |
-| Using POST when GET is correct | API rejects or creates unintended resources | Match method to intent (Phase 2) |
+| Anti-Pattern                           | Why It Fails                                | Correct Approach                   |
+| -------------------------------------- | ------------------------------------------- | ---------------------------------- |
+| Hardcoding API keys                    | Security risk, breaks when rotated          | Use `$ENV_VAR` in all commands     |
+| Calling API without reading spec first | Wrong endpoint, wrong parameters            | Discover first (Phase 1)           |
+| Passing full 100KB response to context | Context overflow, degraded performance      | Truncate/extract (Phase 4)         |
+| No iteration guard on chained calls    | Infinite loops burning tokens               | Always enforce max_iterations      |
+| Guessing parameter names               | 400 errors, wasted calls                    | Read spec/docs before constructing |
+| Ignoring HTTP error codes              | Silent failures, wrong results              | Check status, handle 4xx/5xx       |
+| Using POST when GET is correct         | API rejects or creates unintended resources | Match method to intent (Phase 2)   |
 
 ---
 
@@ -585,9 +610,14 @@ None:     (no auth header needed)
 **Tool Template Quick Create:**
 
 ```json
-{ "name": "...", "description": "...", "base_url": "...", "method": "GET",
+{
+  "name": "...",
+  "description": "...",
+  "base_url": "...",
+  "method": "GET",
   "auth": { "type": "api_key", "header": "...", "env_var": "..." },
-  "parameters": { "q": { "type": "string", "required": true, "in": "query" } } }
+  "parameters": { "q": { "type": "string", "required": true, "in": "query" } }
+}
 ```
 
 ---

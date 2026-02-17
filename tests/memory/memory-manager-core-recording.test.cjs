@@ -41,7 +41,9 @@ function cleanupRoot(dir) {
 // ---------------------------------------------------------------------------
 
 function buildRecordingOps(projectRoot) {
-  const { createRecordingOps } = require('../../.claude/lib/memory/memory-manager-core-recording.cjs');
+  const {
+    createRecordingOps,
+  } = require('../../.claude/lib/memory/memory-manager-core-recording.cjs');
   const { DEFAULT_AREA } = require('../../.claude/lib/memory/memory-areas.cjs');
   const crypto = require('crypto');
 
@@ -49,15 +51,19 @@ function buildRecordingOps(projectRoot) {
 
   return createRecordingOps({
     PROJECT_ROOT: projectRoot,
-    validateProjectRoot: (r) => {
+    validateProjectRoot: r => {
       if (!r) throw new Error('invalid root');
     },
     getMemoryDir: () => memoryDir,
-    ensureDir: (d) => fs.mkdirSync(d, { recursive: true }),
+    ensureDir: d => fs.mkdirSync(d, { recursive: true }),
     withFileLockSync: (_file, fn) => fn(),
-    buildEntryId: (entry) =>
-      crypto.createHash('md5').update(entry.text || '').digest('hex').slice(0, 8),
-    normalizeArea: (area) => area || DEFAULT_AREA,
+    buildEntryId: entry =>
+      crypto
+        .createHash('md5')
+        .update(entry.text || '')
+        .digest('hex')
+        .slice(0, 8),
+    normalizeArea: area => area || DEFAULT_AREA,
     maybeSyncMemoryJson: () => {},
     emitMemorySavedEvent: () => {},
   });
@@ -78,7 +84,10 @@ describe('recordGotcha', () => {
   after(() => cleanupRoot(dir));
 
   it('writes a safe gotcha to gotchas.json', () => {
-    const result = ops.recordGotcha({ text: 'Always validate input at boundaries', area: 'security' }, dir);
+    const result = ops.recordGotcha(
+      { text: 'Always validate input at boundaries', area: 'security' },
+      dir
+    );
     assert.equal(result, true, 'should return true for new entry');
 
     const gotchasFile = path.join(memDir, 'gotchas.json');
@@ -144,7 +153,10 @@ describe('recordPattern', () => {
   after(() => cleanupRoot(dir));
 
   it('writes a safe pattern to patterns.json', () => {
-    const result = ops.recordPattern({ text: 'Use composition over inheritance', area: 'design' }, dir);
+    const result = ops.recordPattern(
+      { text: 'Use composition over inheritance', area: 'design' },
+      dir
+    );
     assert.equal(result, true);
 
     const patternsFile = path.join(memDir, 'patterns.json');
@@ -197,14 +209,22 @@ describe('recordDiscovery', () => {
   after(() => cleanupRoot(dir));
 
   it('writes a safe discovery to codebase_map.json', () => {
-    const result = ops.recordDiscovery('src/auth/jwt.ts', 'JWT token validation module', 'auth', dir);
+    const result = ops.recordDiscovery(
+      'src/auth/jwt.ts',
+      'JWT token validation module',
+      'auth',
+      dir
+    );
     assert.equal(result, true);
 
     const mapFile = path.join(memDir, 'codebase_map.json');
     assert.ok(fs.existsSync(mapFile));
     const map = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
     assert.ok(map.discovered_files['src/auth/jwt.ts']);
-    assert.equal(map.discovered_files['src/auth/jwt.ts'].description, 'JWT token validation module');
+    assert.equal(
+      map.discovered_files['src/auth/jwt.ts'].description,
+      'JWT token validation module'
+    );
   });
 
   it('skips and returns false for unsafe description (shell injection)', () => {
@@ -242,7 +262,9 @@ describe('recordDiscovery', () => {
 
     // Small delay to ensure timestamp differs
     const start = Date.now();
-    while (Date.now() - start < 5) { /* wait */ }
+    while (Date.now() - start < 5) {
+      /* wait */
+    }
 
     ops.recordDiscovery('src/stable.ts', 'Updated description', 'general', dir);
     const map2 = JSON.parse(fs.readFileSync(mapFile, 'utf8'));

@@ -7,8 +7,20 @@ const path = require('node:path');
 const cp = require('node:child_process');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
-const POST_TASK_HOOK = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'post-task-unified.cjs');
-const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'tmp', 'task-output-contract-runtime');
+const POST_TASK_HOOK = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'routing',
+  'post-task-unified.cjs'
+);
+const RUNTIME_DIR = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'tmp',
+  'task-output-contract-runtime'
+);
 const CONTRACTS_PATH = path.join(RUNTIME_DIR, 'task-output-contracts.json');
 const TASK_STATUS_PATH = path.join(RUNTIME_DIR, 'task-status.json');
 const RECOVERY_QUEUE_PATH = path.join(RUNTIME_DIR, 'taskupdate-recovery-queue.jsonl');
@@ -111,7 +123,9 @@ test('TaskOutput completed does not advance lifecycle when required artifacts ar
       'in_progress',
       'task status must remain in_progress when required artifacts are missing'
     );
-    const queue = fs.existsSync(RECOVERY_QUEUE_PATH) ? fs.readFileSync(RECOVERY_QUEUE_PATH, 'utf8') : '';
+    const queue = fs.existsSync(RECOVERY_QUEUE_PATH)
+      ? fs.readFileSync(RECOVERY_QUEUE_PATH, 'utf8')
+      : '';
     assert.match(queue, /taskoutput_completed_missing_required_outputs/);
   } finally {
     restore(CONTRACTS_PATH, contractsSnapshot);
@@ -140,8 +154,14 @@ test('TaskOutput completed advances lifecycle when required artifacts are presen
       tool_output: { status: 'completed' },
     });
     assert.equal(result.status, 0, `hook should not crash: ${result.stderr || result.stdout}`);
-    assert.equal(readTaskStatus(taskId), 'completed', 'task status should advance when artifacts exist');
-    const queue = fs.existsSync(RECOVERY_QUEUE_PATH) ? fs.readFileSync(RECOVERY_QUEUE_PATH, 'utf8') : '';
+    assert.equal(
+      readTaskStatus(taskId),
+      'completed',
+      'task status should advance when artifacts exist'
+    );
+    const queue = fs.existsSync(RECOVERY_QUEUE_PATH)
+      ? fs.readFileSync(RECOVERY_QUEUE_PATH, 'utf8')
+      : '';
     assert.match(queue, /taskoutput_completed_without_taskupdate/);
   } finally {
     restore(CONTRACTS_PATH, contractsSnapshot);

@@ -745,6 +745,7 @@ module.exports = {
   isInAgentContext,
   checkWriteAllowed,
   getEnforcementMode,
+  STATE_FILE: getStateFilePath(),
   getStateFilePath,
   PROJECT_ROOT,
   // Complexity tracking - setters

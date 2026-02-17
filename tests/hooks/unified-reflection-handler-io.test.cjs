@@ -239,7 +239,7 @@ describe('unified-reflection-handler.cjs', () => {
       }
     });
 
-    it('should create a session file when recordSession called', () => {
+    it('should create a session file when recordSession called', async () => {
       // Note: recordSession now uses memory-tiers (STM → MTM) exclusively.
       // Legacy sessions/ directory is no longer written to (duplicate storage removed).
       fs.mkdirSync(mtmDir, { recursive: true });
@@ -267,7 +267,7 @@ describe('unified-reflection-handler.cjs', () => {
         timestamp: new Date().toISOString(),
       };
 
-      hook.recordSession(sessionData);
+      await hook.recordSession(sessionData);
 
       const afterMtm = new Set(listMtmFilesSafe());
 

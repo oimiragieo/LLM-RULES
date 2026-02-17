@@ -28,15 +28,22 @@ const ENFORCEMENT_DEFAULTS = {
   // Routing enforcement
   PLANNER_FIRST_ENFORCEMENT: 'block',
   SECURITY_REVIEW_ENFORCEMENT: 'block',
-  SPECIALIST_ROUTING_ENFORCEMENT: 'warn',
-  CREATOR_ROUTING_ENFORCEMENT: 'warn',
+  SPECIALIST_ROUTING_ENFORCEMENT: 'block',
+  CREATOR_ROUTING_ENFORCEMENT: 'block',
+  CODE_SIMPLIFIER_ARCHITECT_ENFORCEMENT: 'block',
+  HIGH_RISK_SPECIALIST_ARCHITECT_ENFORCEMENT: 'block',
+  ROUTER_BASH_GUARD: 'block',
+  INTENT_AGENT_MATCH: 'block',
+  CONFIG_MODEL_VALIDATOR: 'block',
+  ROUTER_SELF_CHECK: 'block',
+  ROUTER_WRITE_GUARD: 'block',
   RESEARCH_ENFORCEMENT: 'block',
 
   // Reflection enforcement
   REFLECTION_STEP0_ENFORCEMENT: 'block',
 
   // Task management enforcement
-  TASKLIST_FIRST_ENFORCEMENT: 'warn',
+  TASKLIST_FIRST_ENFORCEMENT: 'block',
   TASKUPDATE_FIRST_ENFORCEMENT: 'block',
 
   // Agent guardrails
@@ -49,6 +56,7 @@ const ENFORCEMENT_DEFAULTS = {
   CREATOR_COMPLIANCE_ENFORCEMENT: 'warn',
 
   // Safety and validation
+  CONFLICT_DETECTOR: 'block',
   HYBRID_GREP_ENFORCEMENT: 'warn',
   READ_TOKEN_SAVER_ENFORCEMENT: 'on',
 
@@ -58,6 +66,8 @@ const ENFORCEMENT_DEFAULTS = {
   INTEGRATION_ENFORCEMENT: 'warn',
   NO_TRACK_ENFORCEMENT: 'off',
 };
+
+const VALID_ENFORCEMENT_MODES = new Set(['block', 'warn', 'off', 'on']);
 
 /**
  * Get the enforcement mode for a given environment variable.
@@ -74,8 +84,17 @@ const ENFORCEMENT_DEFAULTS = {
  *   const mode = getEnforcementMode('PLANNER_FIRST_ENFORCEMENT');
  *   // Returns 'block' (from defaults) unless PLANNER_FIRST_ENFORCEMENT is set
  */
-function getEnforcementMode(key) {
-  return process.env[key] || ENFORCEMENT_DEFAULTS[key] || 'warn';
+function getEnforcementMode(key, defaultMode = 'block') {
+  const normalizedDefault = VALID_ENFORCEMENT_MODES.has(defaultMode) ? defaultMode : 'block';
+  const envValue = process.env[key];
+  if (VALID_ENFORCEMENT_MODES.has(envValue)) {
+    return envValue;
+  }
+  const mappedDefault = ENFORCEMENT_DEFAULTS[key];
+  if (VALID_ENFORCEMENT_MODES.has(mappedDefault)) {
+    return mappedDefault;
+  }
+  return normalizedDefault;
 }
 
 /**

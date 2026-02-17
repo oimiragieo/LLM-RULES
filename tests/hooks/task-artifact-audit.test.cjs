@@ -15,17 +15,11 @@ const RUNTIME_TEST_DIR = path.join(
   'tmp',
   'task-artifact-audit-runtime'
 );
-const CONTRACTS_PATH = path.join(
-  RUNTIME_TEST_DIR,
-  'task-output-contracts.json'
-);
+const CONTRACTS_PATH = path.join(RUNTIME_TEST_DIR, 'task-output-contracts.json');
 const TASK_STATUS_PATH = path.join(RUNTIME_TEST_DIR, 'task-status.json');
 const TASK_STATUS_LOCK_PATH = path.join(RUNTIME_TEST_DIR, 'task-status.lock');
 const RECOVERY_QUEUE_PATH = path.join(RUNTIME_TEST_DIR, 'taskupdate-recovery-queue.jsonl');
-const AUDIT_PATH = path.join(
-  RUNTIME_TEST_DIR,
-  'task-artifact-audit.jsonl'
-);
+const AUDIT_PATH = path.join(RUNTIME_TEST_DIR, 'task-artifact-audit.jsonl');
 
 function runHook(input) {
   return cp.spawnSync(process.execPath, [HOOK_PATH], {

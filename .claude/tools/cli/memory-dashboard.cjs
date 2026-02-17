@@ -42,11 +42,14 @@ function parseJSONL(filePath) {
 
   return lines
     .map(line => {
-      try {
-        return safeParseJSON(line);
-      } catch {
+      const parsed = safeParseJSON(line, null, null, null);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
         return null; // Skip malformed lines
       }
+      if (Object.keys(parsed).length === 0) {
+        return null; // safeParseJSON fallback for malformed JSON
+      }
+      return parsed;
     })
     .filter(obj => obj !== null);
 }

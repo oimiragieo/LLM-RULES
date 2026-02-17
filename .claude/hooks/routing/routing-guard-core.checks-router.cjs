@@ -28,8 +28,6 @@ function hasExplicitAgentContext(hookInput = null) {
   if (!hookInput || typeof hookInput !== 'object') return false;
   const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
   if (taskId) return true;
-  const allowedTools = Array.isArray(hookInput.allowed_tools) ? hookInput.allowed_tools : [];
-  if (allowedTools.includes('TaskUpdate')) return true;
   const agentId = String(process.env.CLAUDE_AGENT_ID || '')
     .trim()
     .toLowerCase();

@@ -24,12 +24,13 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../');
  * @param {object} input - Input object serialized to JSON for stdin
  * @returns {{ status: number, stdout: string, stderr: string }}
  */
-function runHook(hookPath, input) {
+function runHook(hookPath, input, envOverrides = {}) {
   const result = spawnSync(process.execPath, [hookPath], {
     input: JSON.stringify(input),
     encoding: 'utf8',
     cwd: PROJECT_ROOT,
     shell: false,
+    env: { ...process.env, ...envOverrides },
   });
   return {
     status: result.status,
@@ -135,7 +136,10 @@ describe('bash-pretool-bundle exit codes (C-4)', () => {
         command: 'echo hello',
       },
     };
-    const result = runHook(HOOK, input);
+    const result = runHook(HOOK, input, {
+      TASKLIST_FIRST_ENFORCEMENT: 'off',
+      ROUTER_BASH_GUARD: 'off',
+    });
     assert.strictEqual(
       result.status,
       0,

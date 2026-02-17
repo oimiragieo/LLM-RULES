@@ -428,7 +428,7 @@ async function updateTaskLifecycleStateAfterAllow(hookInput) {
   }
 }
 
-async function runAllChecks(hookInput) {
+function runAllChecks(hookInput) {
   const toolName = getToolName(hookInput);
   if (toolName !== 'Task') {
     return { pass: true, exitCode: 0 };
@@ -529,8 +529,10 @@ async function runAllChecks(hookInput) {
     };
   }
 
-  await updateLoopStateAfterAllow(hookInput);
-  await updateTaskLifecycleStateAfterAllow(hookInput);
+  updateLoopStateAfterAllow(hookInput);
+  // Preserve synchronous return contract for test and hook callers.
+  // Task lifecycle persistence is best-effort and can continue asynchronously.
+  void updateTaskLifecycleStateAfterAllow(hookInput);
   ownership.registerTaskOwnershipClaimAfterAllow(hookInput, toolInput);
   persistGuardrailPolicy(hookInput, toolInput);
   return { pass: true, exitCode: 0 };

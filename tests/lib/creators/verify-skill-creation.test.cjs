@@ -195,7 +195,9 @@ describe('verifySkillCreation', () => {
     });
 
     assert.ok(
-      passResult.passed.some(p => p.toLowerCase().includes('name') && p.toLowerCase().includes('format')),
+      passResult.passed.some(
+        p => p.toLowerCase().includes('name') && p.toLowerCase().includes('format')
+      ),
       `Expected valid name to produce passed entry with 'name format', got: ${JSON.stringify(passResult.passed)}`
     );
 
@@ -207,7 +209,9 @@ describe('verifySkillCreation', () => {
     });
 
     assert.ok(
-      failResult.failed.some(f => f.toLowerCase().includes('name') && f.toLowerCase().includes('format')),
+      failResult.failed.some(
+        f => f.toLowerCase().includes('name') && f.toLowerCase().includes('format')
+      ),
       `Expected invalid name to produce failed entry with 'name format', got: ${JSON.stringify(failResult.failed)}`
     );
   });

@@ -7,7 +7,13 @@ const path = require('node:path');
 const cp = require('node:child_process');
 
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
-const SPAWN_HOOK = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'spawn-prompt-assembler.cjs');
+const SPAWN_HOOK = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'routing',
+  'spawn-prompt-assembler.cjs'
+);
 const PRE_COMPLETION_HOOK = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -24,7 +30,13 @@ const RUNTIME_TEST_DIR = path.join(
 );
 const CONTRACTS_PATH = path.join(RUNTIME_TEST_DIR, 'task-output-contracts.json');
 const METRICS_PATH = path.join(RUNTIME_TEST_DIR, 'task-output-enforcement-metrics.json');
-const TMP_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'tmp', 'task-artifact-contract-tests');
+const TMP_DIR = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'tmp',
+  'task-artifact-contract-tests'
+);
 const REPORT_PATH = path.join(TMP_DIR, 'required-output-report.md');
 const PLACEHOLDER_PATH = path.join(TMP_DIR, 'read-safety-blocked-read.txt');
 
@@ -127,14 +139,22 @@ test('spawn blocks when required report output is declared but Write/Edit tools 
       SPAWN_ADAPTIVE_ENRICHMENT: 'off',
     });
 
-    assert.equal(result.status, 2, `expected block exit code 2, got ${result.status}: ${result.stdout}`);
+    assert.equal(
+      result.status,
+      2,
+      `expected block exit code 2, got ${result.status}: ${result.stdout}`
+    );
     assert.match(
       result.stdout,
       /missing Write\/Edit|Required output artifact/i,
       `expected writer-tools block message, got: ${result.stdout}`
     );
     const afterCounter = readMetricCounter('artifact_contract_missing_tools');
-    assert.equal(afterCounter, beforeCounter + 1, 'expected artifact_contract_missing_tools metric increment');
+    assert.equal(
+      afterCounter,
+      beforeCounter + 1,
+      'expected artifact_contract_missing_tools metric increment'
+    );
   } finally {
     restoreContracts(snapshot);
     restoreMetrics(metricsSnapshot);
@@ -153,7 +173,8 @@ test('spawn allows when required output is present and Write tool is available; 
         subagent_type: 'developer',
         description: 'Write integration report',
         allowed_tools: ['TaskUpdate', 'TaskList', 'Write'],
-        prompt: 'Write a detailed report to `.claude/context/reports/integration-audit-2026-02-17.md`.',
+        prompt:
+          'Write a detailed report to `.claude/context/reports/integration-audit-2026-02-17.md`.',
       },
     };
 
@@ -164,7 +185,11 @@ test('spawn allows when required output is present and Write tool is available; 
       SPAWN_ADAPTIVE_ENRICHMENT: 'off',
     });
 
-    assert.equal(result.status, 0, `expected allow exit code 0, got ${result.status}: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `expected allow exit code 0, got ${result.status}: ${result.stderr}`
+    );
     const contracts = JSON.parse(fs.readFileSync(CONTRACTS_PATH, 'utf8'));
     assert.ok(contracts.tasks[taskId], 'expected task output contract to be persisted');
     assert.ok(
@@ -196,7 +221,11 @@ test('pre-completion blocks completed status when required output file is missin
       TASK_STATUS_ENFORCEMENT: 'off',
       TASK_OUTPUT_ENFORCEMENT: 'block',
     });
-    assert.equal(result.status, 2, `expected block exit code 2, got ${result.status}: ${result.stdout}`);
+    assert.equal(
+      result.status,
+      2,
+      `expected block exit code 2, got ${result.status}: ${result.stdout}`
+    );
     assert.match(result.stdout, /REQUIRED OUTPUT VALIDATION FAILED|Missing required outputs/i);
   } finally {
     restoreContracts(snapshot);
@@ -224,7 +253,11 @@ test('pre-completion allows completed status when required output exists and is 
       TASK_STATUS_ENFORCEMENT: 'off',
       TASK_OUTPUT_ENFORCEMENT: 'block',
     });
-    assert.equal(result.status, 0, `expected allow exit code 0, got ${result.status}: ${result.stdout}`);
+    assert.equal(
+      result.status,
+      0,
+      `expected allow exit code 0, got ${result.status}: ${result.stdout}`
+    );
   } finally {
     restoreContracts(snapshot);
     fs.rmSync(TMP_DIR, { recursive: true, force: true });
@@ -257,7 +290,11 @@ test('pre-completion blocks when required output points to read-safety placehold
       TASK_STATUS_ENFORCEMENT: 'off',
       TASK_OUTPUT_ENFORCEMENT: 'block',
     });
-    assert.equal(result.status, 2, `expected block exit code 2, got ${result.status}: ${result.stdout}`);
+    assert.equal(
+      result.status,
+      2,
+      `expected block exit code 2, got ${result.status}: ${result.stdout}`
+    );
     assert.match(result.stdout, /Invalid placeholder outputs|REQUIRED OUTPUT VALIDATION FAILED/i);
     assert.equal(
       readMetricCounter('artifact_completion_blocked'),
@@ -292,7 +329,11 @@ test('pre-completion remains backward compatible when no required output contrac
       TASK_STATUS_ENFORCEMENT: 'off',
       TASK_OUTPUT_ENFORCEMENT: 'block',
     });
-    assert.equal(result.status, 0, `expected allow exit code 0, got ${result.status}: ${result.stdout}`);
+    assert.equal(
+      result.status,
+      0,
+      `expected allow exit code 0, got ${result.status}: ${result.stdout}`
+    );
   } finally {
     restoreContracts(snapshot);
   }
@@ -315,7 +356,11 @@ test('pre-completion warn mode does not block missing required outputs', () => {
       TASK_STATUS_ENFORCEMENT: 'off',
       TASK_OUTPUT_ENFORCEMENT: 'warn',
     });
-    assert.equal(result.status, 0, `expected warn mode to allow, got ${result.status}: ${result.stdout}`);
+    assert.equal(
+      result.status,
+      0,
+      `expected warn mode to allow, got ${result.status}: ${result.stdout}`
+    );
   } finally {
     restoreContracts(snapshot);
     fs.rmSync(TMP_DIR, { recursive: true, force: true });

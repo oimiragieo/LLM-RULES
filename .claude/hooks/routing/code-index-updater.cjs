@@ -31,6 +31,7 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const path = require('path');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const { validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
@@ -85,6 +86,15 @@ function isDisabled() {
   return process.env.CODE_INDEX_AUTO_UPDATE === 'off';
 }
 
+function resolveLockFilePath() {
+  const cwd = process.cwd();
+  const cwdLockDir = path.join(cwd, '.claude/context/code-index');
+  if (cwd !== PROJECT_ROOT && fsSync.existsSync(cwdLockDir)) {
+    return path.join(cwdLockDir, '.indexing.lock');
+  }
+  return LOCK_FILE;
+}
+
 function shouldIndexFile(filePath) {
   if (!filePath || typeof filePath !== 'string') return false;
 
@@ -106,14 +116,15 @@ function shouldIndexFile(filePath) {
  * For fast indexing (<1s), this lightweight check is sufficient
  */
 async function canProceed() {
+  const lockFile = resolveLockFilePath();
   try {
     // Check if lock exists and is stale
-    const lockStats = await fs.stat(LOCK_FILE);
+    const lockStats = await fs.stat(lockFile);
     const lockAge = Date.now() - lockStats.mtimeMs;
 
     if (lockAge > LOCK_TIMEOUT_MS) {
       // Stale lock - remove it
-      await fs.unlink(LOCK_FILE).catch(() => {});
+      await fs.unlink(lockFile).catch(() => {});
       return true;
     }
 
@@ -129,9 +140,11 @@ async function canProceed() {
  * Create lock file (lightweight protection for metadata.json writes)
  */
 async function createLock() {
+  const lockFile = resolveLockFilePath();
   try {
+    await fs.mkdir(path.dirname(lockFile), { recursive: true });
     await fs.writeFile(
-      LOCK_FILE,
+      lockFile,
       JSON.stringify({
         pid: process.pid,
         timestamp: Date.now(),
@@ -148,7 +161,8 @@ async function createLock() {
  * Remove lock file
  */
 async function removeLock() {
-  await fs.unlink(LOCK_FILE).catch(() => {});
+  const lockFile = resolveLockFilePath();
+  await fs.unlink(lockFile).catch(() => {});
 }
 
 /**
