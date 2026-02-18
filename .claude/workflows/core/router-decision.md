@@ -161,12 +161,12 @@ TaskList();
 | ------------------ | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
 | **Frontend**       | "UI", "React", "Vue", "frontend", "component"                                                                 | frontend-pro, react-expert, vue-expert         |
 | **Backend**        | "API", "server", "backend", "database", "service"                                                             | developer, python-pro, golang-pro, nodejs-pro  |
-| **Mobile**         | "iOS", "Android", "mobile", "app", "native"                                                                   | ios-pro, expo-mobile-developer, flutter-expert |
+| **Mobile**         | "iOS", "Android", "mobile", "app", "native"                                                                   | ios-pro, expo-mobile-developer, android-pro    |
 | **Data**           | "ETL", "pipeline", "analytics", "data processing"                                                             | data-engineer, database-architect              |
 | **Infrastructure** | "Docker", "K8s", "AWS", "infrastructure", "CI/CD"                                                             | devops, container-expert, terraform-infra      |
 | **Security**       | "auth", "security", "encryption", "vulnerability"                                                             | security-architect, auth-security-expert       |
 | **Product**        | "feature", "requirements", "roadmap", "strategy", "program", "dependency", "milestone"                        | pm, technical-program-manager, planner         |
-| **Documentation**  | "docs", "README", "guide", "documentation", "update docs", "review docs", "doc accuracy", "fix documentation" | technical-writer, doc-generator                |
+| **Documentation**  | "docs", "README", "guide", "documentation", "update docs", "review docs", "doc accuracy", "fix documentation" | technical-writer                                |
 | **Architecture**   | "design", "architecture", "C4", "system design"                                                               | architect, c4-\* agents                        |
 
 ### 2.4 Risk Classification

@@ -49,6 +49,11 @@ describe('intent-classifier', () => {
     assert.strictEqual(result.defaultAgent, 'code-simplifier');
   });
 
+  it('routes party mode prompts to party-orchestrator', () => {
+    const result = classifyIntent('Use party mode for a structured multi-agent collaboration session.');
+    assert.strictEqual(result.defaultAgent, 'party-orchestrator');
+  });
+
   it('should record intent feedback to a custom path', () => {
     const tmpPath = require('path').join(__dirname, 'intent-feedback.test.json');
     process.env.INTENT_FEEDBACK_PATH = tmpPath;

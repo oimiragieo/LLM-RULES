@@ -189,6 +189,10 @@ const ROUTING_TABLE = {
   reflection: 'reflection-agent',
   retrospective: 'reflection-agent',
   insight: 'reflection-agent',
+  // Party mode orchestration
+  party: 'party-orchestrator',
+  consensus: 'party-orchestrator',
+  debate: 'party-orchestrator',
   // Context-Driven
   conductor: 'conductor-validator',
   cdd: 'conductor-validator',

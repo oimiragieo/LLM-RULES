@@ -67,6 +67,7 @@ const INTENT_TO_AGENT = {
   master_orchestrator: 'master-orchestrator',
   swarm_coordinator: 'swarm-coordinator',
   evolution_orchestrator: 'evolution-orchestrator',
+  party_mode: 'party-orchestrator',
 
   // Assimilate intent (codebase extraction, benchmarking - uses assimilate skill)
   assimilate: 'evolution-orchestrator',

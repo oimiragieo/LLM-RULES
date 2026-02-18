@@ -227,6 +227,14 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'artifact-integrator',
     },
   ],
+  // "swarm" can map to party mode orchestration when explicitly requested.
+  swarm_coordinator: [
+    {
+      condition: ['party mode', 'consensus voting', 'agent debate'],
+      prefer: 'party_mode',
+      deprioritize: 'swarm_coordinator',
+    },
+  ],
 };
 
 module.exports = { DISAMBIGUATION_RULES };

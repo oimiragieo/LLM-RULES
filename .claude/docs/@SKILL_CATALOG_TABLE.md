@@ -8,7 +8,7 @@
 
 ## PURPOSE
 
-Complete catalog of 94 active skills (92 maintained + 1 deprecated alias + 1 scientific parent) available via `Skill()` tool for improving agent workflows, testing, research, and development processes. Includes hybrid search integration (code-semantic-search, code-structural-search, ripgrep) deployed across 36+ agents. 214 dead skills archived to `.claude/skills/_archive/dead/` (Pipeline #16B, 2026-02-07).
+Catalog of active workflow-enhancement skills available via `Skill()` tool for improving agent workflows, testing, research, and development processes. Includes hybrid search integration (`code-semantic-search`, `code-structural-search`, `ripgrep`) across core/specialized/domain agents. Archived skills live under `.claude/skills/_archive/dead/`.
 
 ---
 
@@ -18,12 +18,9 @@ Complete catalog of 94 active skills (92 maintained + 1 deprecated alias + 1 sci
 | ------------------------------------ | ---------------------------------------------------------- |
 | `project-onboarding`                 | unfamiliar codebase                                        |
 | `thinking-tools`                     | self-reflection at critical phases                         |
-| `operational-modes`                  | regulate tool usage                                        |
 | `summarize-changes`                  | after non-trivial coding                                   |
 | `session-handoff`                    | before ending long sessions                                |
 | `interactive-requirements-gathering` | structured user input                                      |
-| `smart-revert`                       | revert logical work units (git notes-based, feature-level) |
-| `codebase-integration`               | integrating external codebases                             |
 | `artifact-lifecycle`                 | manage artifact updates/deprecation                        |
 | `workflow-creator`                   | create multi-agent workflows                               |
 | `agent-updater`                      | refresh existing agents with risk-scored diffs             |
@@ -37,20 +34,15 @@ Complete catalog of 94 active skills (92 maintained + 1 deprecated alias + 1 sci
 | `hook-creator`                       | create safety/validation hooks                             |
 | `spec-init`                          | unified spec creation (progressive disclosure)             |
 | `spec-gathering`                     | start new features                                         |
-| `spec-writing`                       | formal specs                                               |
-| `spec-critique`                      | validate specs                                             |
 | `complexity-assessment`              | analyze complexity                                         |
 | `insight-extraction`                 | capture learnings                                          |
-| `qa-workflow`                        | systematic test/fix loops                                  |
 | `ripgrep`                            | enhanced search for .mjs/.cjs/.mts/.cts                    |
 | `code-semantic-search`               | semantic code search (hybrid: vectors + BM25)              |
 | `code-structural-search`             | AST-based pattern matching (ast-grep)                      |
 | `chrome-browser`                     | browser automation/testing                                 |
 | `arxiv-mcp`                          | arXiv search/retrieve                                      |
 | `checklist-generator`                | quality checklists (IEEE + contextual)                     |
-| `progressive-disclosure`             | gather requirements (3-5 clarifications)                   |
 | `template-renderer`                  | render templates with token replacement                    |
-| `task-breakdown`                     | break plans into Epic→Story→Task lists                     |
 | `tdd`                                | test-driven development workflow                           |
 | `debugging`                          | systematic debugging approach                              |
 | `git-expert`                         | token-efficient git operations                             |
@@ -60,7 +52,6 @@ Complete catalog of 94 active skills (92 maintained + 1 deprecated alias + 1 sci
 | `code-analyzer`                      | static code analysis and metrics                           |
 | `code-quality-expert`                | clean code, style guides, refactoring                      |
 | `code-style-validator`               | programmatic style validation (AST-based)                  |
-| `commit-validator`                   | Conventional Commits validation                            |
 
 ### Skill Discovery
 

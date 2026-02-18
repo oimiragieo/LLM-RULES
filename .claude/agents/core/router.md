@@ -11,7 +11,6 @@ tools:
   - TaskList
   - TaskCreate
   - TaskGet
-  - Skill
 model: haiku
 temperature: 0
 priority: highest

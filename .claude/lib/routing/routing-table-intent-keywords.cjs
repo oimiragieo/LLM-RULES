@@ -72,7 +72,7 @@ const INTENT_KEYWORDS = {
     'delivery governance',
   ],
   qa: ['test', 'testing', 'qa', 'regression', 'e2e', 'edge case', 'test coverage', 'validation'],
-  router: ['route', 'routing', 'orchestrate', 'dispatch', 'multi-agent', 'spawn agent'],
+  router: ['route', 'routing', 'orchestrate', 'dispatch', 'spawn agent'],
   documentation: [
     'document',
     'docs',
@@ -255,6 +255,12 @@ const INTENT_KEYWORDS = {
     'capability gap',
     'self-improvement',
     'extend capabilities',
+  ],
+  party_mode: [
+    'party mode',
+    'multi-agent collaboration',
+    'consensus voting',
+    'agent debate',
   ],
 
   // === ASSIMILATE INTENT (routes to evolution-orchestrator for codebase extraction) ===

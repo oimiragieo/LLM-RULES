@@ -71,13 +71,6 @@ const COMPLEXITY_DEFAULTS = {
   architect: 'opus',
   qa: 'opus',
   'security-architect': 'opus',
-  'evolution-orchestrator': 'opus',
-  'master-orchestrator': 'opus',
-  'party-orchestrator': 'opus',
-  'swarm-coordinator': 'opus',
-  'reverse-engineer': 'opus',
-  'ai-ml-specialist': 'opus',
-  'web3-blockchain-expert': 'opus',
 
   // Haiku agents (low complexity, simple tasks)
   'context-compressor': 'haiku',
