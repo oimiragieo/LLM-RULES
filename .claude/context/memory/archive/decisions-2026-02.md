@@ -661,3 +661,64 @@ Check 7 (checkSpecialistOverride) was added to routing-guard.cjs via TDD to enfo
 - Users can discover commands through the catalog
 
 **Architecture Plan:** `.claude/context/plans/commands-overhaul-architecture-2026-02-07.md`
+
+---
+
+## ADR-135: Reflection Data Sufficiency Gate and Ghost-Task Echo Deduplication (2026-02-18)
+
+**Status:** PROPOSED (P0 CRITICAL)
+**Decision:** Implement three-layer deduplication for reflection queue processor and add TaskGet validation before spawning reflection-agent.
+
+**Context:**
+
+Reflection-agent reflection-log.jsonl stores batch entries with numeric taskIds (e.g., "1", "17") that collide with actual task IDs in the task system. When tasks complete and are reflected upon normally (e.g., Task 1 on 2026-02-14 with score 0.856 PASS), the reflection-log.jsonl entry with taskId "1" is stored permanently. Later, when the queue processor re-runs, it interprets the numeric taskId as a pending completion event and spawns ghost-task reflections.
+
+Evidence:
+
+- Reflection-log.jsonl entry #4 (2026-02-14): Task 1 successfully reflected, score 0.856 PASS
+- Reflection-log.jsonl entries #6-#15 (2026-02-18): 10+ subsequent reflections for same task, all INSUFFICIENT_DATA
+- Issues.md REFLECTION-BLIND-001 (P1): Already documented as recurring pattern, 16th+ occurrence
+
+**Decision:**
+
+1. **IMMEDIATE (P0):** Change reflection-log.jsonl batch entry format from numeric taskId to `batch-{timestamp}` to eliminate collision with actual task IDs
+   - Impact: Prevent ghost-echo loop
+   - Effort: 30 min (simple format change)
+
+2. **SHORT-TERM (P1):** Add TaskGet validation in reflection-queue-processor.cjs before spawning reflection-agent
+   - Check: Does task exist in active task system?
+   - Behavior: Skip spawn if task not found, log warning
+   - Impact: Prevent spawning reflection for phantom/archived tasks
+   - Effort: 1 hour
+
+3. **SHORT-TERM (P1):** Implement deduplication check against prior processedReflectionIds
+   - Check: Is this taskId already in processedReflectionIds from prior reflection entry?
+   - Behavior: Skip spawn if duplicate detected
+   - Impact: Prevent immediate re-reflection of same task
+   - Effort: 1 hour
+
+**Consequences:**
+
+**Positive:**
+
+- Eliminates wasted reflection-agent spawns (16+ false positives already observed)
+- Reduces echo loop risk in sustained sessions
+- Improves reflection queue processor reliability (gates before spawn)
+- Maintains audit trail (processedReflectionIds tracks all reflections)
+
+**Negative:**
+
+- Small code change to queue processor (minimal risk)
+- May hide some edge-case task recompletion scenarios (mitigated by explicit processedReflectionIds check)
+
+**Related Issues:**
+
+- REFLECTION-BLIND-001 (issues.md, P1): 4-layer validation gap, affects 14+ completions
+- GHOST-ECHO-001 (issues.md, P1): Numeric taskId collision in reflection-log.jsonl
+- Reflection-log entry #16 (2026-02-18T09:26:10): Full analysis of ghost-echo with score withheld per PHASE 0 Iron Law
+
+**Implementation Notes:**
+
+- Change must be coordinated with reflection-cleanup.cjs hook (atomic handshake protocol)
+- Add unit tests for deduplication logic in reflection-queue-processor.test.cjs
+- Update `.claude/context/memory/reflection-log.jsonl` to use batch-{timestamp} format going forward

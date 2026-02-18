@@ -40,6 +40,9 @@ const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
 const REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
 const STEP0_STATE_PATH = path.join(RUNTIME_DIR, 'reflection-step0-state.json');
+const REFLECTION_LOG_PATH =
+  process.env.REFLECTION_LOG_FILE_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'reflection-log.jsonl');
 
 /**
  * Maximum pending reflections before auto-clearing oldest entries
@@ -52,6 +55,7 @@ const STEP0_LOOP_BREAKER_MODE = String(process.env.REFLECTION_STEP0_LOOP_BREAKER
   .trim()
   .toLowerCase();
 const STEP0_EVENT_TIMEOUT_MS = Number(process.env.REFLECTION_STEP0_EVENT_TIMEOUT_MS || 250);
+const REFLECTION_GHOST_SUPPRESS_HOURS = Number(process.env.REFLECTION_GHOST_SUPPRESS_HOURS || 24);
 
 /** Log to stderr only (stdout reserved for single formatResult line). */
 function stderrLog(message, meta = {}) {
@@ -69,6 +73,49 @@ function stderrLog(message, meta = {}) {
 
 function readSpawnRequests(filePath) {
   return readSpawnRequestsFile(filePath);
+}
+
+function readGhostTaskIdsFromReflectionLog() {
+  const ghosts = new Set();
+  try {
+    if (!fs.existsSync(REFLECTION_LOG_PATH)) return ghosts;
+    const raw = fs.readFileSync(REFLECTION_LOG_PATH, 'utf8');
+    if (!raw.trim()) return ghosts;
+    const cutoffMs = Date.now() - REFLECTION_GHOST_SUPPRESS_HOURS * 60 * 60 * 1000;
+    for (const line of raw.split('\n')) {
+      const entry = safeParseJSON(line, null);
+      if (!entry || typeof entry !== 'object') continue;
+      const taskId = entry.taskId != null ? String(entry.taskId).trim() : '';
+      if (!taskId) continue;
+      const reason = String(entry.reason || '').toLowerCase();
+      const ts = Date.parse(entry.timestamp || '');
+      const isRecent = Number.isFinite(ts) ? ts >= cutoffMs : true;
+      if (isRecent && reason.includes('task') && reason.includes('not found')) {
+        ghosts.add(taskId);
+      }
+    }
+  } catch (_err) {
+    // Best effort only.
+  }
+  return ghosts;
+}
+
+function pruneGhostSpawnRequests(requests) {
+  if (!Array.isArray(requests) || requests.length === 0) {
+    return { requests: [], prunedCount: 0 };
+  }
+  const ghostTaskIds = readGhostTaskIdsFromReflectionLog();
+  if (ghostTaskIds.size === 0) {
+    return { requests, prunedCount: 0 };
+  }
+  const filtered = requests.filter(req => {
+    const taskId = req?.source?.taskId != null ? String(req.source.taskId).trim() : '';
+    return !taskId || !ghostTaskIds.has(taskId);
+  });
+  return {
+    requests: filtered,
+    prunedCount: requests.length - filtered.length,
+  };
 }
 
 function clearReminderIfStale() {
@@ -209,6 +256,12 @@ async function main() {
 
     // Use a stable snapshot and refresh once before blocking to avoid TOCTOU false blocks.
     let requests = readSpawnRequests(SPAWN_REQUEST_PATH);
+    const pruned = pruneGhostSpawnRequests(requests);
+    requests = pruned.requests;
+    if (pruned.prunedCount > 0) {
+      atomicWriteJSONSync(SPAWN_REQUEST_PATH, requests);
+      stderrLog('pruned_ghost_spawn_requests', { pruned: pruned.prunedCount });
+    }
     if (!Array.isArray(requests) || requests.length === 0) {
       // Clean stale reminder so we do not deadlock on "0 pending" conditions.
       clearReminderIfStale();
@@ -317,6 +370,8 @@ if (require.main === module) {
 module.exports = {
   hasPendingReflections,
   readSpawnRequests,
+  readGhostTaskIdsFromReflectionLog,
+  pruneGhostSpawnRequests,
   clearReminderIfStale,
   resolveEffectiveEnforcementMode,
   emitEventWithTimeout,

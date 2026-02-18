@@ -44,9 +44,27 @@ describe('reflection-queue-processor', () => {
   let testDir;
   let processor;
   let originalQueueFile;
+  let originalReflectionLogPath;
+  let originalTaskStatusPath;
 
   beforeEach(() => {
     testDir = createTestDir();
+    originalReflectionLogPath = process.env.REFLECTION_LOG_FILE_PATH;
+    originalTaskStatusPath = process.env.TASK_STATUS_FILE_PATH;
+    process.env.REFLECTION_LOG_FILE_PATH = path.join(
+      testDir,
+      '.claude',
+      'context',
+      'memory',
+      'reflection-log.jsonl'
+    );
+    process.env.TASK_STATUS_FILE_PATH = path.join(
+      testDir,
+      '.claude',
+      'context',
+      'runtime',
+      'task-status.json'
+    );
     // Clear require cache to get fresh module
     delete require.cache[require.resolve(PROCESSOR_PATH)];
     processor = require(PROCESSOR_PATH);
@@ -56,6 +74,16 @@ describe('reflection-queue-processor', () => {
 
   afterEach(() => {
     processor.QUEUE_FILE = originalQueueFile;
+    if (originalReflectionLogPath === undefined) {
+      delete process.env.REFLECTION_LOG_FILE_PATH;
+    } else {
+      process.env.REFLECTION_LOG_FILE_PATH = originalReflectionLogPath;
+    }
+    if (originalTaskStatusPath === undefined) {
+      delete process.env.TASK_STATUS_FILE_PATH;
+    } else {
+      process.env.TASK_STATUS_FILE_PATH = originalTaskStatusPath;
+    }
     cleanupTestDir(testDir);
   });
 
@@ -279,6 +307,86 @@ describe('reflection-queue-processor', () => {
       assert.strictEqual(loaded.length, 1);
       assert.strictEqual(loaded[0].id, 'good-1');
       assert.strictEqual(loaded[0].subagent_type, 'reflection-agent');
+    });
+  });
+
+  describe('ghost-task suppression', () => {
+    function writeTaskStatus(statusMap) {
+      const file = process.env.TASK_STATUS_FILE_PATH;
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, JSON.stringify(statusMap, null, 2), 'utf8');
+    }
+
+    function appendReflectionLog(entry) {
+      const file = process.env.REFLECTION_LOG_FILE_PATH;
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, JSON.stringify(entry) + '\n', 'utf8');
+    }
+
+    it('suppresses task_completion entries for known ghost tasks', () => {
+      writeTaskStatus({ 'task-real': 'completed', 'task-ghost': 'completed' });
+      appendReflectionLog({
+        taskId: 'task-ghost',
+        timestamp: new Date().toISOString(),
+        reason: 'Task task-ghost not found in task store',
+        scoreWithheld: true,
+        dataQuality: 'insufficient',
+      });
+
+      const queueEntries = [
+        {
+          taskId: 'task-ghost',
+          trigger: 'task_completion',
+          timestamp: '2026-02-18T10:00:00Z',
+          priority: 'high',
+        },
+        {
+          taskId: 'task-real',
+          trigger: 'task_completion',
+          timestamp: '2026-02-18T10:01:00Z',
+          priority: 'high',
+        },
+      ];
+      fs.writeFileSync(
+        processor.QUEUE_FILE,
+        queueEntries.map(e => JSON.stringify(e)).join('\n') + '\n',
+        'utf8'
+      );
+
+      const result = processor.processQueue(processor.QUEUE_FILE);
+      assert.strictEqual(result.processed, 1);
+      assert.strictEqual(result.spawnRequests.length, 1);
+      assert.strictEqual(result.spawnRequests[0].source.taskId, 'task-real');
+      assert.strictEqual(result.dropped.knownGhostTask, 1);
+    });
+
+    it('suppresses task_completion entries with missing task status records', () => {
+      writeTaskStatus({ 'task-known': 'completed' });
+      const queueEntries = [
+        {
+          taskId: 'task-missing',
+          trigger: 'task_completion',
+          timestamp: '2026-02-18T10:00:00Z',
+          priority: 'high',
+        },
+        {
+          taskId: 'task-known',
+          trigger: 'task_completion',
+          timestamp: '2026-02-18T10:01:00Z',
+          priority: 'high',
+        },
+      ];
+      fs.writeFileSync(
+        processor.QUEUE_FILE,
+        queueEntries.map(e => JSON.stringify(e)).join('\n') + '\n',
+        'utf8'
+      );
+
+      const result = processor.processQueue(processor.QUEUE_FILE);
+      assert.strictEqual(result.processed, 1);
+      assert.strictEqual(result.spawnRequests.length, 1);
+      assert.strictEqual(result.spawnRequests[0].source.taskId, 'task-known');
+      assert.strictEqual(result.dropped.missingTaskStatus, 1);
     });
   });
 

@@ -49,6 +49,13 @@ const { readSpawnRequestsFile } = require('../../lib/reflection/spawn-request-co
 // Configuration
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
 const REFLECTION_QUEUE_MAX_LINES = Number(process.env.REFLECTION_QUEUE_MAX_LINES || 2000);
+const REFLECTION_LOG_FILE =
+  process.env.REFLECTION_LOG_FILE_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'reflection-log.jsonl');
+const TASK_STATUS_FILE =
+  process.env.TASK_STATUS_FILE_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'task-status.json');
+const REFLECTION_GHOST_SUPPRESS_HOURS = Number(process.env.REFLECTION_GHOST_SUPPRESS_HOURS || 24);
 
 function getContextDir(queueFile = QUEUE_FILE) {
   return path.dirname(queueFile);
@@ -131,6 +138,121 @@ function readQueueEntries(queueFile) {
  */
 function getPendingEntries(entries) {
   return entries.filter(entry => !entry.processed);
+}
+
+function readTaskStatusMap() {
+  try {
+    if (!fs.existsSync(TASK_STATUS_FILE)) return {};
+    const raw = fs.readFileSync(TASK_STATUS_FILE, 'utf8');
+    const parsed = safeParseJSON(raw, {});
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch (_err) {
+    return {};
+  }
+}
+
+function readReflectionLogEntries() {
+  try {
+    if (!fs.existsSync(REFLECTION_LOG_FILE)) return [];
+    const raw = fs.readFileSync(REFLECTION_LOG_FILE, 'utf8');
+    if (!raw.trim()) return [];
+    return raw
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean)
+      .map(line => safeParseJSON(line, null))
+      .filter(entry => entry && typeof entry === 'object');
+  } catch (_err) {
+    return [];
+  }
+}
+
+function buildGhostTaskSet(logEntries) {
+  const ghosts = new Set();
+  if (!Array.isArray(logEntries) || logEntries.length === 0) return ghosts;
+
+  const cutoffMs = Date.now() - REFLECTION_GHOST_SUPPRESS_HOURS * 60 * 60 * 1000;
+  for (const entry of logEntries) {
+    const taskId = entry.taskId != null ? String(entry.taskId).trim() : '';
+    if (!taskId) continue;
+    const reason = String(entry.reason || '').toLowerCase();
+    const ts = Date.parse(entry.timestamp || '');
+    const isRecent = Number.isFinite(ts) ? ts >= cutoffMs : true;
+    if (!isRecent) continue;
+    if (reason.includes('task') && reason.includes('not found')) {
+      ghosts.add(taskId);
+    }
+  }
+  return ghosts;
+}
+
+function dedupePendingEntries(pending, options = {}) {
+  const taskStatus = options.taskStatus || readTaskStatusMap();
+  const hasTaskStatusData = Object.keys(taskStatus).length > 0;
+  const logs = options.reflectionLogEntries || readReflectionLogEntries();
+  const knownGhostTasks = buildGhostTaskSet(logs);
+  const accepted = [];
+  const seenIds = new Set();
+  const taskCompletionsByTaskId = new Map();
+  const dropped = {
+    duplicateRequestId: 0,
+    duplicateTaskCompletion: 0,
+    knownGhostTask: 0,
+    missingTaskStatus: 0,
+  };
+
+  for (const entry of pending) {
+    const requestId = `${entry.trigger || 'unknown'}:${entry.timestamp || ''}:${entry.taskId || entry.context || ''}`;
+    if (seenIds.has(requestId)) {
+      dropped.duplicateRequestId++;
+      continue;
+    }
+    seenIds.add(requestId);
+
+    if (entry.trigger !== 'task_completion') {
+      accepted.push(entry);
+      continue;
+    }
+
+    const taskId = entry.taskId != null ? String(entry.taskId).trim() : '';
+    if (!taskId) {
+      accepted.push(entry);
+      continue;
+    }
+
+    if (knownGhostTasks.has(taskId)) {
+      dropped.knownGhostTask++;
+      continue;
+    }
+
+    if (hasTaskStatusData && !Object.prototype.hasOwnProperty.call(taskStatus, taskId)) {
+      dropped.missingTaskStatus++;
+      continue;
+    }
+
+    const existing = taskCompletionsByTaskId.get(taskId);
+    if (!existing) {
+      taskCompletionsByTaskId.set(taskId, entry);
+      accepted.push(entry);
+      continue;
+    }
+
+    const existingTs = Date.parse(existing.timestamp || '');
+    const nextTs = Date.parse(entry.timestamp || '');
+    const replace =
+      Number.isFinite(nextTs) && (!Number.isFinite(existingTs) || nextTs > existingTs);
+    dropped.duplicateTaskCompletion++;
+    if (replace) {
+      const idx = accepted.indexOf(existing);
+      if (idx >= 0) accepted[idx] = entry;
+      taskCompletionsByTaskId.set(taskId, entry);
+    }
+  }
+
+  return {
+    entries: accepted,
+    dropped,
+  };
 }
 
 /**
@@ -347,6 +469,12 @@ function processQueue(queueFile = QUEUE_FILE) {
     processed: 0,
     instructions: [],
     spawnRequests: [],
+    dropped: {
+      duplicateRequestId: 0,
+      duplicateTaskCompletion: 0,
+      knownGhostTask: 0,
+      missingTaskStatus: 0,
+    },
   };
 
   if (!isEnabled()) {
@@ -360,7 +488,10 @@ function processQueue(queueFile = QUEUE_FILE) {
     return result;
   }
 
-  for (const entry of pending) {
+  const deduped = dedupePendingEntries(pending);
+  result.dropped = deduped.dropped;
+
+  for (const entry of deduped.entries) {
     const instruction = generateSpawnInstruction(entry);
     result.instructions.push(instruction);
     result.spawnRequests.push(generateSpawnRequest(entry));
@@ -457,6 +588,10 @@ module.exports = {
   writeSpawnRequests,
   readExistingSpawnRequests,
   markEntriesProcessed,
+  readTaskStatusMap,
+  readReflectionLogEntries,
+  buildGhostTaskSet,
+  dedupePendingEntries,
   processQueue,
   main,
   getSpawnRequestFile,

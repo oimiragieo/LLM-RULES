@@ -5,6 +5,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
+const os = require('node:os');
 
 const GUARD_PATH = path.join(
   __dirname,
@@ -205,5 +206,50 @@ test('readSpawnRequests enforces spawn-request max entries and prompt bounds', (
       fs.writeFileSync(SPAWN_REQUEST_PATH, original, 'utf8');
     }
     restore();
+  }
+});
+
+test('pruneGhostSpawnRequests removes requests for known ghost taskIds', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'reflection-step0-ghost-'));
+  const reflectionLogPath = path.join(tempRoot, 'reflection-log.jsonl');
+  const { guard, restore } = loadGuardWithEnv({
+    REFLECTION_LOG_FILE_PATH: reflectionLogPath,
+    REFLECTION_GHOST_SUPPRESS_HOURS: '24',
+  });
+
+  try {
+    fs.writeFileSync(
+      reflectionLogPath,
+      JSON.stringify({
+        taskId: 'ghost-1',
+        timestamp: new Date().toISOString(),
+        reason: 'Task ghost-1 not found in task store',
+        scoreWithheld: true,
+      }) + '\n',
+      'utf8'
+    );
+
+    const requests = [
+      {
+        id: 'task_completion:ts:ghost-1',
+        subagent_type: 'reflection-agent',
+        prompt: 'ghost',
+        source: { taskId: 'ghost-1' },
+      },
+      {
+        id: 'task_completion:ts:real-1',
+        subagent_type: 'reflection-agent',
+        prompt: 'real',
+        source: { taskId: 'real-1' },
+      },
+    ];
+
+    const result = guard.pruneGhostSpawnRequests(requests);
+    assert.equal(result.prunedCount, 1);
+    assert.equal(result.requests.length, 1);
+    assert.equal(result.requests[0].source.taskId, 'real-1');
+  } finally {
+    restore();
+    fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });
