@@ -3,6 +3,8 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { isExcluded } = require('./index-manager-config.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { atomicWriteAsync } = require('../utils/atomic-write.cjs');
 
 async function discoverFiles(manager, dir) {
   const files = [];
@@ -110,7 +112,16 @@ async function loadCheckpoint(options) {
   );
 
   try {
-    const checkpoint = JSON.parse(await fs.readFile(checkpointPath, 'utf8'));
+    const checkpoint = safeParseJSON(await fs.readFile(checkpointPath, 'utf8'), null);
+    if (!checkpoint || typeof checkpoint !== 'object' || Array.isArray(checkpoint)) {
+      return { filesProcessed: 0, chunksProcessed: 0 };
+    }
+    if (!Number.isFinite(Number(checkpoint.filesProcessed))) {
+      return { filesProcessed: 0, chunksProcessed: 0 };
+    }
+    if (!Number.isFinite(Number(checkpoint.chunksProcessed))) {
+      return { filesProcessed: 0, chunksProcessed: 0 };
+    }
     console.log(
       `[CHECKPOINT] Resuming: ${checkpoint.filesProcessed}/${checkpoint.totalFiles} files already processed`
     );
@@ -129,7 +140,7 @@ async function saveCheckpoint(options, filesProcessed, totalFiles, totalChunks) 
   );
 
   await fs.mkdir(path.dirname(checkpointPath), { recursive: true });
-  await fs.writeFile(
+  await atomicWriteAsync(
     checkpointPath,
     JSON.stringify({
       filesProcessed,

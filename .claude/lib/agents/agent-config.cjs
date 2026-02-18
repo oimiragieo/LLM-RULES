@@ -12,20 +12,39 @@ try {
   // Schema validator not available -- skip schema validation
 }
 
-const CONFIG_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'agent-config.json');
+const CONFIG_PATH =
+  process.env.AGENT_CONFIG_PATH || path.join(PROJECT_ROOT, '.claude', 'config', 'agent-config.json');
 let _cache = null;
+let _cacheMeta = null;
+
+function _getFileMeta(filePath) {
+  const stats = fs.statSync(filePath);
+  return {
+    mtimeMs: Number(stats.mtimeMs),
+    size: Number(stats.size),
+  };
+}
+
+function _isSameMeta(a, b) {
+  return !!a && !!b && a.mtimeMs === b.mtimeMs && a.size === b.size;
+}
 
 function load() {
-  if (_cache) return _cache;
   try {
     if (fs.existsSync(CONFIG_PATH)) {
+      const nextMeta = _getFileMeta(CONFIG_PATH);
+      if (_cache && _isSameMeta(_cacheMeta, nextMeta)) {
+        return _cache;
+      }
       _cache = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      _cacheMeta = nextMeta;
       return _cache;
     }
   } catch (_e) {
     // ignore and fall through to defaults
   }
   _cache = { version: '1.0.0', agents: {}, thinkingBudgetMap: {} };
+  _cacheMeta = null;
   return _cache;
 }
 
@@ -104,6 +123,7 @@ function validateConfig() {
 
 function clearCache() {
   _cache = null;
+  _cacheMeta = null;
 }
 
 module.exports = {

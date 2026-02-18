@@ -2,6 +2,10 @@
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const CONFIG_PATH = path.join(process.cwd(), '.claude', 'config', 'agent-config.json');
 
 const {
   getDefaultTools,
@@ -9,6 +13,7 @@ const {
   getThinkingBudget,
   getPhaseForAgent,
   listAgentTypes,
+  clearCache,
 } = require('../../../.claude/lib/agents/agent-config.cjs');
 
 test('agent-config exposes defaults for known agents', () => {
@@ -34,4 +39,26 @@ test('agent-config exposes thinking budgets', () => {
 test('agent-config lists configured agent types', () => {
   const agents = listAgentTypes();
   assert.ok(agents.includes('planner'));
+});
+
+test('agent-config cache auto-refreshes when config file changes', () => {
+  const originalRaw = fs.readFileSync(CONFIG_PATH, 'utf8');
+  const parsed = JSON.parse(originalRaw);
+  const originalMedium = parsed?.thinkingBudgetMap?.medium;
+  const nextMedium = Number(originalMedium || 4096) + 123;
+
+  try {
+    clearCache();
+    const before = getThinkingBudget('medium');
+    assert.equal(before, originalMedium);
+
+    parsed.thinkingBudgetMap = { ...(parsed.thinkingBudgetMap || {}), medium: nextMedium };
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(parsed, null, 2) + '\n', 'utf8');
+
+    const after = getThinkingBudget('medium');
+    assert.equal(after, nextMedium);
+  } finally {
+    fs.writeFileSync(CONFIG_PATH, originalRaw, 'utf8');
+    clearCache();
+  }
 });

@@ -617,7 +617,11 @@ function maybeAutoCompress(tokenStatus) {
           writeCompressionState(state);
         }
       })
-      .catch(() => {});
+      .catch(err => {
+        if (process.env.DEBUG_HOOKS) {
+          console.warn('[user-prompt-unified] Auto-compression trigger failed:', err?.message);
+        }
+      });
   } catch (_err) {
     // Best-effort
   }

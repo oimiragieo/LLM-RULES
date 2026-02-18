@@ -611,7 +611,9 @@ class ContextualMemory {
       try {
         const result = this.vectorStore.close();
         if (result && typeof result.then === 'function') {
-          result.catch(() => {});
+          result.catch(err => {
+            logger.debug('Vector store close failed', { error: err?.message || String(err) });
+          });
         }
       } catch (_e) {
         // best-effort

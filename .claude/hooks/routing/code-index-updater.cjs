@@ -124,7 +124,11 @@ async function canProceed() {
 
     if (lockAge > LOCK_TIMEOUT_MS) {
       // Stale lock - remove it
-      await fs.unlink(lockFile).catch(() => {});
+      await fs.unlink(lockFile).catch(err => {
+        if (err && err.code !== 'ENOENT' && process.env.DEBUG_HOOKS) {
+          debugLog('code-index-updater', `Failed removing stale lock ${lockFile}`, err);
+        }
+      });
       return true;
     }
 
@@ -162,7 +166,11 @@ async function createLock() {
  */
 async function removeLock() {
   const lockFile = resolveLockFilePath();
-  await fs.unlink(lockFile).catch(() => {});
+  await fs.unlink(lockFile).catch(err => {
+    if (err && err.code !== 'ENOENT' && process.env.DEBUG_HOOKS) {
+      debugLog('code-index-updater', `Failed removing lock ${lockFile}`, err);
+    }
+  });
 }
 
 /**

@@ -329,7 +329,6 @@ function findMTMSession(sessionId, projectRoot = PROJECT_ROOT) {
  * Internal synchronous version of promoteToLTM.
  */
 function _promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
-  const _mtmDir = getTierPath('MTM', projectRoot);
   const ltmDir = getTierPath('LTM', projectRoot);
   ensureDir(ltmDir);
 

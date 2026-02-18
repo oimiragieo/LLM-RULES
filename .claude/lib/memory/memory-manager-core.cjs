@@ -26,7 +26,16 @@ function _emitEvent(eventType, payload) {
   if (String(process.env.MEMORY_EMIT_EVENTS || 'on').toLowerCase() === 'off') return;
   try {
     const p = eventBus.emit(eventType, { type: eventType, ...payload });
-    if (p && typeof p.catch === 'function') p.catch(() => {});
+    if (p && typeof p.catch === 'function') {
+      p.catch(err => {
+        if (process.env.MEMORY_DEBUG) {
+          logger.warn('Event emission failed', {
+            eventType,
+            error: err?.message || String(err),
+          });
+        }
+      });
+    }
   } catch (_e) {
     // Best-effort observability; do not block memory operations.
   }
@@ -293,10 +302,21 @@ function _recordReadOp(started, projectRoot) {
   );
 }
 
+let _ContextualMemoryClass = null;
+function getContextualMemoryClass() {
+  if (_ContextualMemoryClass) return _ContextualMemoryClass;
+  const loaded = require('./contextual-memory.cjs');
+  if (!loaded || typeof loaded.ContextualMemory !== 'function') {
+    throw new Error('ContextualMemory module unavailable');
+  }
+  _ContextualMemoryClass = loaded.ContextualMemory;
+  return _ContextualMemoryClass;
+}
+
 function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
   const started = Date.now();
   validateProjectRoot(projectRoot);
-  const { ContextualMemory } = require('./contextual-memory.cjs');
+  const ContextualMemory = getContextualMemoryClass();
   const memory = new ContextualMemory({ projectRoot });
   const result = memory.loadContextSync({
     maxItems: CONFIG.MAX_ITEMS,
@@ -314,7 +334,7 @@ function loadMemoryForContext(projectRoot = PROJECT_ROOT) {
 async function loadMemoryForContextAsync(projectRoot = PROJECT_ROOT) {
   const started = Date.now();
   validateProjectRoot(projectRoot);
-  const { ContextualMemory } = require('./contextual-memory.cjs');
+  const ContextualMemory = getContextualMemoryClass();
   const memory = new ContextualMemory({ projectRoot });
   const result = await memory.loadContext({
     maxItems: CONFIG.MAX_ITEMS,
@@ -341,7 +361,14 @@ async function readMemoryAsync(file) {
 async function atomicWriteAsync(filePath, data) {
   const previous = asyncWriteQueue.get(filePath) || Promise.resolve();
   const queued = previous
-    .catch(() => {})
+    .catch(err => {
+      if (process.env.MEMORY_DEBUG) {
+        logger.warn('Previous queued write failed', {
+          filePath,
+          error: err?.message || String(err),
+        });
+      }
+    })
     .then(() => atomicWriteAsyncWithLock(filePath, data, 'utf8'));
   asyncWriteQueue.set(filePath, queued);
   try {
@@ -403,7 +430,7 @@ function formatMemoryAsMarkdown(projectRoot = PROJECT_ROOT) {
 
 async function _callContextualMemory(method, args) {
   try {
-    const { ContextualMemory } = require('./contextual-memory.cjs');
+    const ContextualMemory = getContextualMemoryClass();
     const memory = new ContextualMemory();
     const results = await memory[method](...args);
     memory.close();
