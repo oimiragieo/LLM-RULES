@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
-const { withFileLock } = require('./memory-tiers-lock.cjs');
+const { withFileLock, withFileLockSync } = require('./memory-tiers-lock.cjs');
 const {
   isStructuredSummaryEnabled,
   isSessionArchiveEnabled,
@@ -296,7 +296,7 @@ function _consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
  * Thread-safe with file locking.
  */
 function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
-  return _consolidateSession(sessionId, projectRoot);
+  return withFileLockSync(() => _consolidateSession(sessionId, projectRoot), projectRoot);
 }
 
 async function consolidateSessionWithLock(sessionId, projectRoot = PROJECT_ROOT) {

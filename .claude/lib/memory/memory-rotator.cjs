@@ -226,9 +226,10 @@ function rotateIfNeeded(filePath, options = {}) {
   // Create backup of active file before truncation
   createBackup(filePath);
 
-  // Build truncated active file content (recent + permanent)
-  const keepSectionsSet = [...recentSections, ...permanentSections];
-  const truncatedContent = keepSectionsSet.map(s => s.content).join('\n\n---\n\n');
+  // Build truncated active file content preserving original section order.
+  const keepSectionsSet = new Set([...recentSections, ...permanentSections]);
+  const keptSectionsInOriginalOrder = sections.filter(section => keepSectionsSet.has(section));
+  const truncatedContent = keptSectionsInOriginalOrder.map(s => s.content).join('\n\n---\n\n');
 
   // Write truncated active file atomically
   atomicWriteSync(filePath, truncatedContent);

@@ -236,5 +236,22 @@ describe('ComplexityClassifier', () => {
       assert.strictEqual(result1.complexity, result2.complexity);
       assert.strictEqual(result1.risk, result2.risk);
     });
+
+    it('should not classify "author" as HIGH via auth substring', () => {
+      const result = classifyRequest('update author bio in docs');
+      assert.notStrictEqual(result.complexity, 'HIGH');
+      assert.strictEqual(result.risk, 'LOW');
+    });
+
+    it('should not classify "fix all typos" as EPIC', () => {
+      const result = classifyRequest('fix all typos in README');
+      assert.notStrictEqual(result.complexity, 'EPIC');
+    });
+
+    it('should not classify security doc updates as HIGH complexity by keyword alone', () => {
+      const result = classifyRequest('security doc update in handbook');
+      assert.notStrictEqual(result.complexity, 'HIGH');
+      assert.strictEqual(result.risk, 'HIGH');
+    });
   });
 });

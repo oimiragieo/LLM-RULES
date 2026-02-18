@@ -42,7 +42,7 @@ function collectMatchingFiles(rootDir, predicate) {
 test(
   'stress: sustained STM->MTM consolidations enforce cap and produce observability events',
   { timeout: 90000 },
-  () => {
+  async () => {
     setupTestRoot();
     const prevEventLog = process.env.MEMORY_TIER_EVENT_LOG;
     process.env.MEMORY_TIER_EVENT_LOG = 'on';
@@ -59,7 +59,7 @@ test(
           },
           TEST_ROOT
         );
-        const result = memoryTiers.consolidateSession(sessionId, TEST_ROOT);
+        const result = await memoryTiers.consolidateSession(sessionId, TEST_ROOT);
         assert.equal(result.success, true, `Consolidation failed at iteration ${i}`);
       }
 

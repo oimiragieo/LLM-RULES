@@ -77,7 +77,7 @@ test('contract: STM->MTM overflow creates LTM summary and remains queryable by a
         },
         testRoot
       );
-      const consolidated = memoryTiers.consolidateSession(`session-${i}`, testRoot);
+      const consolidated = await memoryTiers.consolidateSession(`session-${i}`, testRoot);
       assert.equal(consolidated.success, true);
     }
 

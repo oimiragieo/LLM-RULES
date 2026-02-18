@@ -9,28 +9,6 @@
 'use strict';
 
 /**
- * Complexity signals (from enterprise-orchestration-plan.md)
- * Note: auth/security are primarily RISK signals, only HIGH complexity if they're the main focus
- */
-const COMPLEXITY_SIGNALS = {
-  TRIVIAL: ['fix typo', 'typo', 'rename'],
-  LOW: ['add', 'helper', 'validation'],
-  MEDIUM: ['refactor', 'improve', 'multiple', 'files', 'update'], // "update" can be MEDIUM if multi-file
-  HIGH: ['architecture', 'system', 'design'],
-  EPIC: ['migrate', 'rewrite', 'overhaul', 'entire', 'all'],
-};
-
-/**
- * Risk signals (from enterprise-orchestration-plan.md)
- */
-const RISK_SIGNALS = {
-  LOW: [], // Default
-  MEDIUM: ['api', 'external', 'data', 'integration'],
-  HIGH: ['auth', 'password', 'credentials', 'payment', 'security'],
-  CRITICAL: ['production', 'deploy', 'database migration'],
-};
-
-/**
  * Phase paths by complexity (from enterprise-workflow.md)
  */
 const PHASE_PATHS = {
@@ -70,6 +48,18 @@ const PHASE_PATHS = {
   ],
 };
 
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function hasWord(text, word) {
+  return new RegExp(`\\b${escapeRegex(word)}\\b`, 'i').test(text);
+}
+
+function hasAnyWord(text, words) {
+  return words.some(word => hasWord(text, word));
+}
+
 /**
  * Classify a request by complexity and risk
  * @param {string} requestText - The user's request text
@@ -77,40 +67,46 @@ const PHASE_PATHS = {
  */
 function classifyRequest(requestText) {
   const normalized = requestText.toLowerCase();
+  const isDocumentationRequest = hasAnyWord(normalized, [
+    'doc',
+    'docs',
+    'documentation',
+    'readme',
+    'handbook',
+    'guide',
+  ]);
+  const hasArchitectureSignal = hasAnyWord(normalized, ['architecture', 'system', 'design']);
+  const hasDomainSecuritySignal = hasAnyWord(normalized, [
+    'auth',
+    'authentication',
+    'authorization',
+    'oauth',
+    'security',
+  ]);
 
   // Classify complexity (check from highest to lowest priority)
   // Priority: EPIC > MEDIUM (scope) > HIGH (architecture or domain without scope) > LOW > TRIVIAL
   let complexity = 'TRIVIAL';
 
   // EPIC: migrate, rewrite, overhaul, entire, all (highest priority - always wins)
-  if (COMPLEXITY_SIGNALS.EPIC.some(signal => normalized.includes(signal))) {
+  if (
+    hasAnyWord(normalized, ['migrate', 'rewrite', 'overhaul', 'entire']) ||
+    (hasWord(normalized, 'all') && !hasAnyWord(normalized, ['typo', 'typos', 'doc', 'docs']))
+  ) {
     complexity = 'EPIC';
   }
   // MEDIUM: refactor, improve, multiple, files (SCOPE signals - take precedence over domain)
   else if (
-    normalized.includes('refactor') ||
-    normalized.includes('improve') ||
-    normalized.includes('multiple') ||
-    normalized.includes('files')
+    hasAnyWord(normalized, ['refactor', 'improve', 'multiple', 'files'])
   ) {
     complexity = 'MEDIUM';
   }
   // HIGH: architecture, system, design, OR auth/security (ARCHITECTURE or DOMAIN signals, but only if no SCOPE)
-  else if (
-    normalized.includes('architecture') ||
-    normalized.includes('system') ||
-    normalized.includes('design') ||
-    normalized.includes('auth') ||
-    normalized.includes('security')
-  ) {
+  else if (hasArchitectureSignal || (hasDomainSecuritySignal && !isDocumentationRequest)) {
     complexity = 'HIGH';
   }
   // LOW: add, helper, validation (basic operations)
-  else if (
-    normalized.includes('add') ||
-    normalized.includes('helper') ||
-    normalized.includes('validation')
-  ) {
+  else if (hasAnyWord(normalized, ['add', 'helper', 'validation'])) {
     complexity = 'LOW';
   }
   // TRIVIAL: default for short or simple requests
@@ -122,15 +118,29 @@ function classifyRequest(requestText) {
   let risk = 'LOW';
 
   // CRITICAL: production, deploy, database migration
-  if (RISK_SIGNALS.CRITICAL.some(signal => normalized.includes(signal))) {
+  if (
+    hasAnyWord(normalized, ['production', 'deploy']) ||
+    normalized.includes('database migration')
+  ) {
     risk = 'CRITICAL';
   }
   // HIGH: auth, password, credentials, payment, security
-  else if (RISK_SIGNALS.HIGH.some(signal => normalized.includes(signal))) {
+  else if (
+    hasAnyWord(normalized, [
+      'auth',
+      'authentication',
+      'authorization',
+      'oauth',
+      'password',
+      'credentials',
+      'payment',
+      'security',
+    ])
+  ) {
     risk = 'HIGH';
   }
   // MEDIUM: api, external, data, integration
-  else if (RISK_SIGNALS.MEDIUM.some(signal => normalized.includes(signal))) {
+  else if (hasAnyWord(normalized, ['api', 'external', 'data', 'integration'])) {
     risk = 'MEDIUM';
   }
 

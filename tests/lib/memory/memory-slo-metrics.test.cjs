@@ -62,3 +62,22 @@ test('memory-slo-metrics persists metrics file and reloads state', () => {
     cleanup();
   }
 });
+
+test('memory-slo-metrics records operation even if SharedArrayBuffer throws', () => {
+  setup();
+  const originalSharedArrayBuffer = global.SharedArrayBuffer;
+  try {
+    global.SharedArrayBuffer = class BrokenSharedArrayBuffer {
+      constructor() {
+        throw new Error('SAB unavailable');
+      }
+    };
+
+    const metrics = recordMemoryOperation({ kind: 'write', writeLatencyMs: 10 }, TEST_ROOT);
+    assert.ok(metrics);
+    assert.equal(metrics.counters.writesTotal, 1);
+  } finally {
+    global.SharedArrayBuffer = originalSharedArrayBuffer;
+    cleanup();
+  }
+});

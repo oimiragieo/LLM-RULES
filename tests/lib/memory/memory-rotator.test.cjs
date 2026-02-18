@@ -340,6 +340,58 @@ test('rotateIfNeeded() - auto-creates archive directory if missing', () => {
   }
 });
 
+test('rotateIfNeeded() - preserves original section order for kept sections', () => {
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
+
+  try {
+    const testFile = path.join(tmpDir, 'ordering.md');
+    const content = `# Ordering
+
+## Old 1 [PERMANENT]
+**Date:** 2026-01-01
+Permanent old.
+
+---
+
+## Mid 1
+**Date:** 2026-01-10
+Mid content.
+
+---
+
+## New 1
+**Date:** 2026-02-20
+Newest content.
+
+---
+
+## Old 2 [PERMANENT]
+**Date:** 2026-01-02
+Permanent second old.
+
+---
+
+## New 2
+**Date:** 2026-02-21
+Newest second content.
+`;
+    fs.writeFileSync(testFile, content);
+
+    const result = rotator.rotateIfNeeded(testFile, { thresholdKB: 0.1, keepSections: 1 });
+    assert.strictEqual(result.rotated, true);
+
+    const finalContent = fs.readFileSync(testFile, 'utf8');
+    const old2Idx = finalContent.indexOf('## Old 2 [PERMANENT]');
+    const new2Idx = finalContent.indexOf('## New 2');
+
+    assert.ok(old2Idx >= 0 && new2Idx >= 0, 'Expected kept permanent + recent sections');
+    assert.ok(old2Idx < new2Idx, 'Expected original order: Old 2 before New 2');
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
+});
+
 // ========================================================================
 // Bug 1 Fix: File locking during rotation (TDD RED then GREEN)
 // ========================================================================

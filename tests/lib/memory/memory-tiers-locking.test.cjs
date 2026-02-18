@@ -104,7 +104,7 @@ describe('M11: Memory Tiers File Locking', () => {
       );
 
       // Consolidate immediately
-      const result = tiers.consolidateSession(`rapid-session-${i}`, tmpDir);
+      const result = await tiers.consolidateSession(`rapid-session-${i}`, tmpDir);
       results.push(result);
     }
 
@@ -119,6 +119,36 @@ describe('M11: Memory Tiers File Locking', () => {
     // MTM should have exactly 3 sessions
     const mtmSessions = tiers.getMTMSessions(tmpDir);
     assert.strictEqual(mtmSessions.length, 3, `Expected 3 MTM sessions, got ${mtmSessions.length}`);
+  });
+
+  test('consolidateSession fails closed when memory tiers lock is held', async () => {
+    const tiers = require('../../../.claude/lib/memory/memory-tiers.cjs');
+    const lockfile = require('proper-lockfile');
+
+    tiers.writeSTMEntry(
+      {
+        session_id: 'locked-session',
+        timestamp: new Date().toISOString(),
+        summary: 'Lock test',
+      },
+      tmpDir
+    );
+
+    const lockPath = path.join(tmpDir, '.claude', 'context', 'runtime', 'memory-tiers.lock');
+    fs.writeFileSync(lockPath, '', 'utf8');
+    const release = lockfile.lockSync(lockPath, {
+      stale: 60_000,
+      retries: { retries: 0 },
+    });
+
+    try {
+      assert.throws(
+        () => tiers.consolidateSession('locked-session', tmpDir),
+        /fail-closed|lock acquisition failed/i
+      );
+    } finally {
+      release();
+    }
   });
 
   test('lock timeout behavior - withFileLock available in tiers module', () => {
@@ -186,7 +216,7 @@ describe('M11: Memory Tiers File Locking', () => {
     // Run summarization and consolidation concurrently
     const [summarizeResult, consolidateResult] = await Promise.all([
       Promise.resolve(tiers.summarizeOldSessions(tmpDir, 1)),
-      Promise.resolve(tiers.consolidateSession('concurrent-consolidation', tmpDir)),
+      tiers.consolidateSession('concurrent-consolidation', tmpDir),
     ]);
 
     // Both should complete without error
