@@ -213,6 +213,11 @@ function classifyIntent(prompt, options = {}) {
     }
   }
 
+  // Preserve explicit intent->agent mapping precedence over capability defaults.
+  if (!defaultAgent && intent !== 'general') {
+    defaultAgent = getPreferredAgent(intent);
+  }
+
   if (intent === 'general' && !defaultAgent) {
     const patternMatch = resolveByPattern(promptLower, ROUTING_PATTERNS);
     if (patternMatch) {

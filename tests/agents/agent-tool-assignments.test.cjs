@@ -3,20 +3,32 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 
+function parseTools(content, agentName) {
+  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  assert.ok(frontmatterMatch, `${agentName} should have frontmatter`);
+  const frontmatter = frontmatterMatch[1];
+
+  const yamlListMatch = frontmatter.match(/tools:\s*\n((?:\s*-\s*[^\n]+\n?)+)/);
+  if (yamlListMatch) {
+    return yamlListMatch[1]
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.startsWith('- '))
+      .map(line => line.replace(/^- /, '').trim().replace(/['"]/g, ''));
+  }
+
+  const bracketMatch = frontmatter.match(/tools:\s*\[([\s\S]*?)\]/m);
+  assert.ok(bracketMatch, `${agentName} should have tools array in frontmatter`);
+  return bracketMatch[1]
+    .split(',')
+    .map(t => t.trim().replace(/['"]/g, ''))
+    .filter(Boolean);
+}
+
 test('Agent Tools: code-reviewer has Write tool', () => {
   const agentPath = path.join(process.cwd(), '.claude/agents/specialized/code-reviewer.md');
   const content = fs.readFileSync(agentPath, 'utf8');
-
-  // Extract frontmatter tools
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-  assert.ok(frontmatterMatch, 'code-reviewer should have frontmatter');
-
-  const frontmatter = frontmatterMatch[1];
-  const toolsMatch = frontmatter.match(/tools:\s*\[(.*?)\]/);
-
-  assert.ok(toolsMatch, 'code-reviewer should have tools array in frontmatter');
-
-  const tools = toolsMatch[1].split(',').map(t => t.trim().replace(/['"]/g, ''));
+  const tools = parseTools(content, 'code-reviewer');
 
   assert.ok(
     tools.includes('Write'),
@@ -27,16 +39,7 @@ test('Agent Tools: code-reviewer has Write tool', () => {
 test('Agent Tools: qa has Write tool', () => {
   const agentPath = path.join(process.cwd(), '.claude/agents/core/qa.md');
   const content = fs.readFileSync(agentPath, 'utf8');
-
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-  assert.ok(frontmatterMatch, 'qa should have frontmatter');
-
-  const frontmatter = frontmatterMatch[1];
-  const toolsMatch = frontmatter.match(/tools:\s*\[(.*?)\]/);
-
-  assert.ok(toolsMatch, 'qa should have tools array in frontmatter');
-
-  const tools = toolsMatch[1].split(',').map(t => t.trim().replace(/['"]/g, ''));
+  const tools = parseTools(content, 'qa');
 
   assert.ok(
     tools.includes('Write'),
@@ -45,18 +48,9 @@ test('Agent Tools: qa has Write tool', () => {
 });
 
 test('Agent Tools: security-architect has WebSearch tool', () => {
-  const agentPath = path.join(process.cwd(), '.claude/agents/core/security-architect.md');
+  const agentPath = path.join(process.cwd(), '.claude/agents/specialized/security-architect.md');
   const content = fs.readFileSync(agentPath, 'utf8');
-
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-  assert.ok(frontmatterMatch, 'security-architect should have frontmatter');
-
-  const frontmatter = frontmatterMatch[1];
-  const toolsMatch = frontmatter.match(/tools:\s*\[(.*?)\]/);
-
-  assert.ok(toolsMatch, 'security-architect should have tools array in frontmatter');
-
-  const tools = toolsMatch[1].split(',').map(t => t.trim().replace(/['"]/g, ''));
+  const tools = parseTools(content, 'security-architect');
 
   assert.ok(
     tools.includes('WebSearch'),

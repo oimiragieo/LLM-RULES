@@ -16,3 +16,9 @@ test('commands workflow enforces ecosystem gate', () => {
   const workflow = readWorkflow('commands-validate.yml');
   assert.match(workflow, /pnpm skills:ecosystem:gate/);
 });
+
+test('skill-build workflow does not reference removed skill build scripts', () => {
+  const workflow = readWorkflow('skill-build-validate.yml');
+  assert.doesNotMatch(workflow, /skill:extract-tests/);
+  assert.doesNotMatch(workflow, /skill:build/);
+});

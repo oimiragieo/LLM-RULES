@@ -39,6 +39,16 @@ describe('intent-classifier', () => {
     assert.ok(result.alternatives.length <= 2);
   });
 
+  it('routes feature prompts to planner', () => {
+    const result = classifyIntent('We need to plan a new feature rollout.');
+    assert.strictEqual(result.defaultAgent, 'planner');
+  });
+
+  it('keeps refactor routing on code-simplifier (not architect pattern override)', () => {
+    const result = classifyIntent('Please refactor this legacy module for clarity.');
+    assert.strictEqual(result.defaultAgent, 'code-simplifier');
+  });
+
   it('should record intent feedback to a custom path', () => {
     const tmpPath = require('path').join(__dirname, 'intent-feedback.test.json');
     process.env.INTENT_FEEDBACK_PATH = tmpPath;

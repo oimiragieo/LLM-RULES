@@ -121,7 +121,7 @@ const INTENT_TO_AGENT = {
 
   // Legacy intents (map to most appropriate agent)
   bug: 'developer',
-  feature: 'developer',
+  feature: 'planner',
   test: 'qa',
   tdd: 'qa',
   security: 'security-architect',

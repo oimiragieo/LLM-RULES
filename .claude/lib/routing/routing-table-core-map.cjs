@@ -4,7 +4,7 @@ const ROUTING_TABLE = {
   // Core request types to agent mapping
   bug: 'developer',
   coding: 'developer',
-  feature: 'developer',
+  feature: 'planner',
   test: 'qa',
   testing: 'qa',
   qa: 'qa',

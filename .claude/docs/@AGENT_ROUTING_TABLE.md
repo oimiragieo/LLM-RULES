@@ -64,8 +64,8 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | LLM architecture/RAG/model serving   | `llm-architect`              | `.claude/agents/domain/llm-architect.md`                 |
 | Prompt engineering/optimization      | `prompt-engineer`            | `.claude/agents/domain/prompt-engineer.md`               |
 | MCP server/client development        | `mcp-developer`              | `.claude/agents/domain/mcp-developer.md`                 |
-| API design/OpenAPI/contracts         | `api-designer`               | `.claude/agents/specialized/api-designer.md`             |
-| Microservices/distributed systems    | `microservices-architect`    | `.claude/agents/specialized/microservices-architect.md`  |
+| API design/OpenAPI/contracts         | `api-designer`               | `.claude/agents/domain/api-designer.md`                  |
+| Microservices/distributed systems    | `microservices-architect`    | `.claude/agents/domain/microservices-architect.md`       |
 | SRE/reliability/SLOs                 | `sre-engineer`               | `.claude/agents/specialized/sre-engineer.md`             |
 | Performance/profiling/optimization   | `performance-engineer`       | `.claude/agents/specialized/performance-engineer.md`     |
 | Penetration testing/security testing | `penetration-tester`         | `.claude/agents/specialized/penetration-tester.md`       |
@@ -87,6 +87,12 @@ Complete agent routing matrix mapping request types to agent definitions across 
 **Routing Logic Source of Truth:**
 
 - `.claude/lib/routing/routing-table.cjs` (INTENT_KEYWORDS, INTENT_TO_AGENT, DISAMBIGUATION_RULES)
+- Resolution order in classifier (`.claude/lib/routing/intent-classifier.cjs`):
+  1. `INTENT_KEYWORDS` + disambiguation
+  2. `ROUTING_TABLE` keyword hits
+  3. Prefix patterns
+  4. Regex `ROUTING_PATTERNS`
+  5. Fuzzy `INTENT_KEYWORDS` fallback
 
 **Hybrid Search Integration (Phase 1):**
 

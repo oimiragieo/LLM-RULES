@@ -38,7 +38,7 @@ const INTENT_KEYWORDS = {
     'resilience',
   ],
   context_compressor: ['compress', 'context compression', 'summarize', 'token reduction', 'prune'],
-  developer: ['code', 'implement', 'fix bug', 'debug', 'refactor', 'tdd', 'test-driven', 'commit'],
+  developer: ['code', 'implement', 'fix bug', 'debug', 'tdd', 'test-driven', 'commit'],
   planner: [
     'plan',
     'planning',
@@ -165,6 +165,7 @@ const INTENT_KEYWORDS = {
     'simplify',
     'clean up',
     'reduce complexity',
+    'refactor',
     'refactor for clarity',
     'code smell',
   ],

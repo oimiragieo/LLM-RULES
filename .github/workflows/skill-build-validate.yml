@@ -77,18 +77,11 @@ jobs:
         run: npm run skills:validate
         continue-on-error: false
 
-      - name: Extract test cases
-        run: npm run skill:extract-tests
-        continue-on-error: true
-
-      - name: Build skills
-        run: npm run skill:build
-        continue-on-error: true
-
       - name: Report results
         if: always()
         run: |
           echo "::group::Validation Summary"
           echo "✓ TypeScript compilation passed"
           echo "✓ Rule structure validation passed"
+          echo "✓ Ecosystem gate passed"
           echo "::endgroup::"
