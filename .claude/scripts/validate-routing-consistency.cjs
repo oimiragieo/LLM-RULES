@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../lib/utils/project-root.cjs');
 const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
-const { ROUTING_TABLE } = require('../lib/routing/routing-table.cjs');
+const { ROUTING_TABLE, INTENT_TO_AGENT } = require('../lib/routing/routing-table-data.cjs');
 
 const CAPABILITY_ROUTING_PATH = path.join(
   PROJECT_ROOT,
@@ -59,44 +59,51 @@ function loadCapabilityRouting() {
   };
 }
 
-function validateRoutingConsistency() {
-  const issues = [];
-  const { capabilityMap, defaultAgents, domainFallbacks } = loadCapabilityRouting();
-  const registry = readJsonIfExists(AGENT_REGISTRY_PATH);
-  const agentIds = collectAgentIdsFromRegistry(registry) || collectAgentIdsFromFilesystem();
-
+function checkCapabilityRoutingConsistency(issues, capabilityMap, defaultAgents, routingTable) {
   for (const [keyword, capability] of Object.entries(capabilityMap)) {
-    if (Object.prototype.hasOwnProperty.call(ROUTING_TABLE, keyword)) {
-      const routingAgent = ROUTING_TABLE[keyword];
-      const capabilityAgent = defaultAgents[capability];
-      if (capabilityAgent && routingAgent && capabilityAgent !== routingAgent) {
-        issues.push(
-          `Keyword "${keyword}" maps to agent "${routingAgent}" in routing-table and to capability "${capability}" (agent "${capabilityAgent}") in capability-routing.`
-        );
-      }
+    if (!Object.prototype.hasOwnProperty.call(routingTable, keyword)) continue;
+    const routingAgent = routingTable[keyword];
+    const capabilityAgent = defaultAgents[capability];
+    if (capabilityAgent && routingAgent && capabilityAgent !== routingAgent) {
+      issues.push(
+        `Keyword "${keyword}" maps to agent "${routingAgent}" in routing-table and to capability "${capability}" (agent "${capabilityAgent}") in capability-routing.`
+      );
     }
   }
+}
 
-  for (const agentId of Object.values(defaultAgents)) {
+function checkAgentReferences(issues, mappingLabel, values, agentIds) {
+  for (const agentId of values) {
     if (agentId && !agentIds.has(agentId)) {
-      issues.push(`defaultAgents references unknown agent: ${agentId}`);
+      issues.push(`${mappingLabel} references unknown agent: ${agentId}`);
     }
   }
+}
 
+function checkDomainFallbacks(issues, domainFallbacks, agentIds) {
   for (const fallbackList of Object.values(domainFallbacks)) {
     if (!Array.isArray(fallbackList)) continue;
-    for (const agentId of fallbackList) {
-      if (agentId && !agentIds.has(agentId)) {
-        issues.push(`domainFallbacks references unknown agent: ${agentId}`);
-      }
-    }
+    checkAgentReferences(issues, 'domainFallbacks', fallbackList, agentIds);
   }
+}
 
-  for (const agentId of Object.values(ROUTING_TABLE)) {
-    if (agentId && !agentIds.has(agentId)) {
-      issues.push(`ROUTING_TABLE references unknown agent: ${agentId}`);
-    }
-  }
+function validateRoutingConsistency(options = {}) {
+  const issues = [];
+  const {
+    routingTable = ROUTING_TABLE,
+    intentToAgent = INTENT_TO_AGENT,
+    capabilityRouting = loadCapabilityRouting(),
+    registry = readJsonIfExists(AGENT_REGISTRY_PATH),
+    agentIds = collectAgentIdsFromRegistry(registry) || collectAgentIdsFromFilesystem(),
+  } = options;
+
+  const { capabilityMap = {}, defaultAgents = {}, domainFallbacks = {} } = capabilityRouting;
+
+  checkCapabilityRoutingConsistency(issues, capabilityMap, defaultAgents, routingTable);
+  checkAgentReferences(issues, 'defaultAgents', Object.values(defaultAgents), agentIds);
+  checkDomainFallbacks(issues, domainFallbacks, agentIds);
+  checkAgentReferences(issues, 'ROUTING_TABLE', Object.values(routingTable), agentIds);
+  checkAgentReferences(issues, 'INTENT_TO_AGENT', Object.values(intentToAgent), agentIds);
 
   return issues;
 }
