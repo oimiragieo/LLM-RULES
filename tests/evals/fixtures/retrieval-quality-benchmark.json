@@ -1,0 +1,265 @@
+{
+  "generatedAt": "2026-02-18T08:58:19.086Z",
+  "source": "real-memory-artifacts",
+  "total": 30,
+  "cases": [
+    {
+      "id": "gotcha:hook-created-not-wired-in-settings",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "creating hook file without immediately",
+      "needles": ["creating a hook file without immediately", "hook created not wired in settings"]
+    },
+    {
+      "id": "gotcha:missing-taskupdate-metadata-recurring",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "tasks completing without taskupdate summary",
+      "needles": [
+        "tasks completing without taskupdate summary metadata",
+        "missing taskupdate metadata recurring"
+      ]
+    },
+    {
+      "id": "gotcha:ghost-task-reflection-echo",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "reflection queue trigger task previously",
+      "needles": ["reflection queue can re trigger on", "ghost task reflection echo"]
+    },
+    {
+      "id": "gotcha:commands-not-creator-guarded",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "commands protected unified creator guard",
+      "needles": ["commands are not protected by unified", "commands not creator guarded"]
+    },
+    {
+      "id": "gotcha:thin-delegator-template-scalability",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "while thin delegators line shims",
+      "needles": ["while thin delegators 3 line shims", "thin delegator template scalability"]
+    },
+    {
+      "id": "gotcha:enriched-commands-rarity",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "enriched commands learn integrates multiple",
+      "needles": ["enriched commands learn that integrates multiple", "enriched commands rarity"]
+    },
+    {
+      "id": "gotcha:depth-calculation-after-relocation",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "when moving files deeper directory",
+      "needles": ["when moving files deeper in directory", "depth calculation after relocation"]
+    },
+    {
+      "id": "gotcha:security-lint-test-file-false-positives",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "security scanner triggers false positives",
+      "needles": [
+        "security scanner triggers false positives on",
+        "security lint test file false positives"
+      ]
+    },
+    {
+      "id": "gotcha:consumer-discovery-misses-dynamic-requires",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "consumer discovery grep patterns miss",
+      "needles": [
+        "consumer discovery grep patterns may miss",
+        "consumer discovery misses dynamic requires"
+      ]
+    },
+    {
+      "id": "gotcha:architecture-plan-document-missing",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "architecture plan documents referenced adrs",
+      "needles": [
+        "architecture plan documents may be referenced",
+        "architecture plan document missing"
+      ]
+    },
+    {
+      "id": "gotcha:windows-compatibility-partial-resolution",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "adding compatibility documentation without creating",
+      "needles": [
+        "adding compatibility documentation without creating full",
+        "windows compatibility partial resolution"
+      ]
+    },
+    {
+      "id": "gotcha:thin-rules-worse-than-no-rules",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "thin rules lines worse than",
+      "needles": ["thin rules 3 7 lines are", "thin rules worse than no rules"]
+    },
+    {
+      "id": "gotcha:merged-files-leave-broken-references",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "after merging files coding style",
+      "needles": ["after merging files e g coding", "merged files leave broken references"]
+    },
+    {
+      "id": "gotcha:config-headers-claim-false-consumers",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "configuration files have header comments",
+      "needles": [
+        "configuration files may have header comments",
+        "config headers claim false consumers"
+      ]
+    },
+    {
+      "id": "gotcha:systemic-json-parse-vulnerability-memory",
+      "sourceType": "gotcha",
+      "expectedPath": "gotchas.json",
+      "query": "json parse calls across memory",
+      "needles": ["38 raw json parse calls across", "systemic json parse vulnerability memory"]
+    },
+    {
+      "id": "pattern:fail-fast-hook-orchestration",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "fail fast hook orchestration pattern",
+      "needles": ["fail fast hook orchestration pattern when", "fail fast hook orchestration"]
+    },
+    {
+      "id": "pattern:agent-disambiguation-negative-routing",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "negative routing guidance agent descriptions",
+      "needles": [
+        "negative routing guidance in agent descriptions",
+        "agent disambiguation negative routing"
+      ]
+    },
+    {
+      "id": "pattern:commands-thin-delegator-pattern",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "thin delegator pattern commands line",
+      "needles": ["thin delegator pattern for commands commands", "commands thin delegator pattern"]
+    },
+    {
+      "id": "pattern:commands-inventory-audit-pattern",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "systematic commands inventory audit before",
+      "needles": [
+        "systematic commands inventory audit before refactoring",
+        "commands inventory audit pattern"
+      ]
+    },
+    {
+      "id": "pattern:dead-infrastructure-cleanup-pattern",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "dead infrastructure cleanup grep validation",
+      "needles": [
+        "dead infrastructure cleanup via grep validation",
+        "dead infrastructure cleanup pattern"
+      ]
+    },
+    {
+      "id": "pattern:recursive-descent-parser-safe-eval",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "recursive descent parser safe expression",
+      "needles": [
+        "recursive descent parser for safe expression",
+        "recursive descent parser safe eval"
+      ]
+    },
+    {
+      "id": "pattern:consumer-discovery-pattern-relocations",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "consumer discovery pattern file relocations",
+      "needles": [
+        "consumer discovery pattern for file relocations",
+        "consumer discovery pattern relocations"
+      ]
+    },
+    {
+      "id": "pattern:tool-catalog-discoverability",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "tool catalog programmatic discoverability create",
+      "needles": [
+        "tool catalog as programmatic discoverability aid",
+        "tool catalog discoverability"
+      ]
+    },
+    {
+      "id": "pattern:script-phantom-import-regression-pattern",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "script phantom import regression testing",
+      "needles": [
+        "script phantom import regression testing pattern",
+        "script phantom import regression pattern"
+      ]
+    },
+    {
+      "id": "pattern:tdd-security-fix-pattern",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "pattern security vulnerability fixes when",
+      "needles": ["tdd pattern for security vulnerability fixes", "tdd security fix pattern"]
+    },
+    {
+      "id": "pattern:rules-are-auto-loaded-system-prompt",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "rules auto loading system prompt",
+      "needles": ["rules auto loading system prompt pattern", "rules are auto loaded system prompt"]
+    },
+    {
+      "id": "pattern:rule-index-must-match-filesystem",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "rule index filesystem sync pattern",
+      "needles": ["rule index filesystem sync pattern rule", "rule index must match filesystem"]
+    },
+    {
+      "id": "pattern:agent-registry-consistency-pattern",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "agent registry consistency model after",
+      "needles": [
+        "agent registry consistency model after any",
+        "agent registry consistency pattern"
+      ]
+    },
+    {
+      "id": "pattern:post-overhaul-registry-sync-pattern",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "registry synchronization following system overhauls",
+      "needles": [
+        "registry synchronization following system overhauls after",
+        "post overhaul registry sync pattern"
+      ]
+    },
+    {
+      "id": "pattern:aggregate-metadata-staleness-detection",
+      "sourceType": "pattern",
+      "expectedPath": "patterns.json",
+      "query": "aggregate metadata staleness detection pattern",
+      "needles": [
+        "aggregate metadata staleness detection pattern configuration",
+        "aggregate metadata staleness detection"
+      ]
+    }
+  ]
+}

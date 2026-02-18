@@ -886,6 +886,34 @@ Behavior details:
 | `MEMORY_SEMANTIC_SEARCH`                 | `on`     | Set to `off` to force keyword-only retrieval.                                                                 |
 | `MEMORY_SEMANTIC_SEARCH_THRESHOLD`       | `0.72`   | Default vector similarity threshold (vector only).                                                            |
 
+### Retrieval Quality Eval Gate
+
+Run retrieval quality baseline before promoting retrieval changes:
+
+```bash
+pnpm metrics:retrieval:baseline
+```
+
+Artifacts:
+
+- Benchmark fixture: `tests/evals/fixtures/retrieval-quality-benchmark.json`
+- Baseline report: `.claude/context/reports/retrieval-quality-baseline-latest.json`
+
+Metrics tracked:
+
+- `Recall@5`
+- `MRR@10`
+- `latency p50/p95`
+- `fallbackRate`
+- `keywordOnlyRate`
+
+Promotion thresholds (expanded vs legacy):
+
+- `Recall@5` uplift >= `0.03`
+- `MRR@10` delta >= `0`
+- `p95` latency regression <= `0.15`
+- `fallbackRate` delta <= `0`
+
 ## Keyword Search Fallback
 
 When semantic search (LanceDB) is unavailable or disabled, `ContextualMemory` falls back to keyword search with performance optimizations:

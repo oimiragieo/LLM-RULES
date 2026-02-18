@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-02-18T08:58:23.557Z",
+  "queryCount": 30,
+  "runs": [
+    {
+      "mode": "legacy",
+      "recallAt5": 0.0667,
+      "mrrAt10": 0.022,
+      "p50": 66.14,
+      "p95": 78.71,
+      "fallbackRate": 0,
+      "keywordOnlyRate": 0.1
+    },
+    {
+      "mode": "expanded",
+      "recallAt5": 0.0667,
+      "mrrAt10": 0.022,
+      "p50": 63.5,
+      "p95": 67.72,
+      "fallbackRate": 0,
+      "keywordOnlyRate": 0.1
+    }
+  ],
+  "comparison": {
+    "deltas": {
+      "recallAt5": 0,
+      "mrrAt10": 0,
+      "p95LatencyRatio": -0.1396,
+      "fallbackRate": 0
+    },
+    "thresholds": {
+      "minRecallAt5Uplift": 0.03,
+      "minMrrAt10Delta": 0,
+      "maxP95RegressionRatio": 0.15,
+      "maxFallbackRateDelta": 0
+    },
+    "pass": false
+  }
+}
