@@ -4,6 +4,7 @@ const { ModelClient } = require('../clients/model-client.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { getDedupDecisionPrompt } = require('./prompts/dedup-decision.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('memory-deduplicator');
 
@@ -158,7 +159,10 @@ async function deduplicateCandidate(candidate, context = {}) {
   try {
     const response = await modelClient.generateText({ system, messages: user });
     const payload = stripCodeFences(response);
-    const parsed = JSON.parse(payload);
+    const parsed = safeParseJSON(payload, null);
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('LLM response did not parse to a valid object');
+    }
     const decision = normalizeDecision(parsed && parsed.decision);
 
     return {

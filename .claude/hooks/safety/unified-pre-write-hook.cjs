@@ -324,7 +324,7 @@ CHECKS.push({
 
     // Check if trying to create certain protected file types without proper context
     const isSkillCreation = /\.claude\/skills\/[^/]+\/SKILL\.md$/.test(filePath);
-    const isAgentCreation = /\.claude\/agents\/[^/]+\.md$/.test(filePath);
+    const isAgentCreation = /\.claude\/agents\/.+\.md$/.test(filePath);
     const isWorkflowCreation = /\.claude\/workflows\/[^/]+\.(md|yaml)$/.test(filePath);
 
     if (isSkillCreation || isAgentCreation || isWorkflowCreation) {
@@ -468,6 +468,7 @@ CHECKS.push({
 async function main() {
   const startTime = Date.now();
 
+  let targetFilePath = '';
   try {
     const hookInput = await parseHookInputAsync();
     if (!hookInput) {
@@ -476,6 +477,7 @@ async function main() {
 
     const toolName = getToolName(hookInput);
     const toolInput = getToolInput(hookInput);
+    targetFilePath = toolInput.file_path || toolInput.target_file || '';
 
     // Only handle write tools
     const WRITE_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
@@ -534,6 +536,19 @@ async function main() {
   } catch (err) {
     // Fail closed
     if (process.env.HOOK_FAIL_OPEN === 'true') {
+      // SECURITY: Never fail-open for security-critical paths
+      const SECURITY_CRITICAL_PATTERNS = [
+        /\\.claude\/hooks\//,
+        /\\.claude\/agents\//,
+        /\\.env$/,
+        /\\.env\./,
+      ];
+      const targetPath = targetFilePath;
+      const isSecurityCritical = SECURITY_CRITICAL_PATTERNS.some(p => p.test(targetPath));
+      if (isSecurityCritical) {
+        process.stdout.write(JSON.stringify({ allowed: false, reason: 'Security-critical path: fail-open disabled' }));
+        process.exit(2);
+      }
       auditLog('unified-pre-write-hook', 'fail_open_override', { error: err.message });
       process.exit(0);
     }

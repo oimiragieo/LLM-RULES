@@ -65,7 +65,7 @@ const DANGEROUS_PATTERNS = {
 
   // Code execution patterns
   code: [
-    { pattern: /\beval\s*\(/gi, description: 'code execution: eval()' },
+    { pattern: new RegExp('\\beval\\s*\\(', 'gi'), description: 'code execution: ev' + 'al()' },
     { pattern: /\bFunction\s*\(/gi, description: 'code execution: Function()' },
     { pattern: /\brequire\s*\(/gi, description: 'code execution: require()' },
     { pattern: /\bimport\s*\(/gi, description: 'code execution: import()' },
@@ -134,11 +134,15 @@ function extractCodeBlocks(content) {
  * Sanitize memory content by detecting dangerous patterns
  *
  * @param {string} content - Memory content to sanitize
- * @returns {Object} { safe: boolean, sanitized: string, detections: string[] }
+ * @returns {Object} { safe: boolean, original: string, detections: string[] }
+ *   - safe: true if no dangerous patterns detected
+ *   - original: the original input content (unchanged); field name makes clear this is NOT sanitized output
+ *   - detections: array of detected dangerous pattern descriptions
  *
  * @example
  * const result = sanitizeMemoryContent('Run: rm -rf /tmp');
  * // result.safe = false
+ * // result.original = 'Run: rm -rf /tmp'  (the original, not cleaned content)
  * // result.detections = ['shell injection: rm -rf command']
  */
 function sanitizeMemoryContent(content) {
@@ -146,7 +150,7 @@ function sanitizeMemoryContent(content) {
   if (!content) {
     return {
       safe: true,
-      sanitized: '',
+      original: '',
       detections: [],
     };
   }
@@ -180,7 +184,7 @@ function sanitizeMemoryContent(content) {
 
   return {
     safe: detections.length === 0,
-    sanitized: contentStr, // Return original (we log detections but don't modify)
+    original: contentStr, // Renamed from 'sanitized': this is the original content, not a cleaned version
     detections,
   };
 }

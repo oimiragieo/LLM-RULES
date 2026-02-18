@@ -169,8 +169,8 @@ function checkAndArchiveLearnings(projectRoot = PROJECT_ROOT) {
 
   const archiveFilename = `learnings-${new Date().toISOString().slice(0, 7)}.md`;
   result.archivePath = path.join(archiveDir, archiveFilename);
-  fs.appendFileSync(result.archivePath, archiveResult.sanitized + '\n\n');
-  atomicWriteSync(learningsPath, keepResult.sanitized);
+  fs.appendFileSync(result.archivePath, archiveResult.original + '\n\n');
+  atomicWriteSync(learningsPath, keepResult.original);
   result.archived = true;
   result.archivedBytes = archiveContent.length;
 

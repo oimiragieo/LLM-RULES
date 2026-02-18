@@ -251,7 +251,7 @@ function createStorageHelpers({
     if (!validation.safe) {
       throw new Error(`Invalid memory path: ${validation.reason}`);
     }
-    atomicWriteSync(filePath, result.sanitized, 'utf8');
+    atomicWriteSync(filePath, result.original, 'utf8');
     return `Memory '${name}' written.`;
   }
 
