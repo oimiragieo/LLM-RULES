@@ -416,6 +416,8 @@ class ContextualMemory {
     const threshold =
       typeof options.threshold === 'number' ? options.threshold : SEMANTIC_SEARCH_DEFAULT_THRESHOLD;
     const branchLimit = Math.max(limit * 2, 10);
+    const vectorBranchLimitMode = process.env.MEMORY_HYBRID_VECTOR_BRANCH_LIMIT_MODE;
+    const vectorLimit = vectorBranchLimitMode === 'expanded' ? branchLimit : limit;
 
     if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
       return await this._keywordSearch(query, { limit });
@@ -427,7 +429,7 @@ class ContextualMemory {
         const vectorStore = await this._getVectorStore();
         if (!vectorStore) return [];
         const results = await vectorStore.search(query, {
-          limit,
+          limit: vectorLimit,
           filters: options.filters,
         });
         return Array.isArray(results) ? results : [];

@@ -15,6 +15,7 @@ const MANAGED_ENV_KEYS = [
   'MEMORY_HYBRID_RRF_K',
   'MEMORY_HYBRID_KEYWORD_WEIGHT',
   'MEMORY_HYBRID_VECTOR_WEIGHT',
+  'MEMORY_HYBRID_VECTOR_BRANCH_LIMIT_MODE',
 ];
 let envSnapshot = null;
 
@@ -265,4 +266,87 @@ test('contract: malformed branch items are normalized to result-shape', async ()
   const fused = await memory.hybridMemoryQuery('query', { limit: 3, threshold: 0.1 });
   assert.ok(fused.length >= 1);
   fused.forEach(assertMemorySearchResultShape);
+});
+
+test('P0: legacy default keeps vector branch limit equal to options.limit', async () => {
+  setup();
+  const memory = createMemory();
+  let vectorLimit = null;
+
+  memory._keywordSearch = async () => [{ content: 'k', metadata: { id: 'k1' }, similarity: null }];
+  memory._getVectorStore = async () => ({
+    search: async (_query, opts) => {
+      vectorLimit = opts?.limit;
+      return [{ content: 'v', metadata: { id: 'v1' }, similarity: 0.92 }];
+    },
+  });
+
+  const results = await memory.hybridMemoryQuery('query', { limit: 5, threshold: 0.1 });
+  assert.ok(results.length >= 1);
+  assert.equal(vectorLimit, 5);
+});
+
+test('P1: expanded mode sets vector branch limit to branchLimit', async () => {
+  setup();
+  const memory = createMemory();
+  let vectorLimit = null;
+
+  memory._keywordSearch = async () => [{ content: 'k', metadata: { id: 'k1' }, similarity: null }];
+  memory._getVectorStore = async () => ({
+    search: async (_query, opts) => {
+      vectorLimit = opts?.limit;
+      return [{ content: 'v', metadata: { id: 'v1' }, similarity: 0.92 }];
+    },
+  });
+
+  await withEnv({ MEMORY_HYBRID_VECTOR_BRANCH_LIMIT_MODE: 'expanded' }, async () => {
+    const results = await memory.hybridMemoryQuery('query', { limit: 5, threshold: 0.1 });
+    assert.ok(results.length >= 1);
+  });
+
+  assert.equal(vectorLimit, 10);
+});
+
+test('P2: expanded mode still returns at most options.limit items', async () => {
+  setup();
+  const memory = createMemory();
+
+  memory._keywordSearch = async () =>
+    Array.from({ length: 12 }, (_, i) => ({
+      content: `keyword-${i}`,
+      metadata: { id: `k${i}` },
+      similarity: null,
+    }));
+  memory._getVectorStore = async () => ({
+    search: async () =>
+      Array.from({ length: 12 }, (_, i) => ({
+        content: `vector-${i}`,
+        metadata: { id: `v${i}` },
+        similarity: 0.9 - i * 0.01,
+      })),
+  });
+
+  await withEnv({ MEMORY_HYBRID_VECTOR_BRANCH_LIMIT_MODE: 'expanded' }, async () => {
+    const results = await memory.hybridMemoryQuery('query', { limit: 3, threshold: 0.1 });
+    assert.ok(results.length <= 3);
+  });
+});
+
+test('P3: env restore keeps default behavior between tests (effective legacy default)', async () => {
+  setup();
+  const memory = createMemory();
+  let vectorLimit = null;
+
+  assert.equal(process.env.MEMORY_HYBRID_VECTOR_BRANCH_LIMIT_MODE, undefined);
+
+  memory._keywordSearch = async () => [{ content: 'k', metadata: { id: 'k1' }, similarity: null }];
+  memory._getVectorStore = async () => ({
+    search: async (_query, opts) => {
+      vectorLimit = opts?.limit;
+      return [{ content: 'v', metadata: { id: 'v1' }, similarity: 0.8 }];
+    },
+  });
+
+  await memory.hybridMemoryQuery('query', { limit: 4, threshold: 0.1 });
+  assert.equal(vectorLimit, 4);
 });

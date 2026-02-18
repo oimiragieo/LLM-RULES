@@ -877,13 +877,14 @@ Behavior details:
 
 ### Hybrid retrieval tuning
 
-| Variable                         | Default | Description                                        |
-| -------------------------------- | ------- | -------------------------------------------------- |
-| `MEMORY_HYBRID_RRF_K`            | `60`    | RRF damping constant.                              |
-| `MEMORY_HYBRID_KEYWORD_WEIGHT`   | `0.4`   | Weight for keyword branch in fusion.               |
-| `MEMORY_HYBRID_VECTOR_WEIGHT`    | `0.6`   | Weight for vector branch in fusion.                |
-| `MEMORY_SEMANTIC_SEARCH`         | `on`    | Set to `off` to force keyword-only retrieval.      |
-| `MEMORY_SEMANTIC_SEARCH_THRESHOLD` | `0.72` | Default vector similarity threshold (vector only). |
+| Variable                                 | Default  | Description                                                                                                   |
+| ---------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
+| `MEMORY_HYBRID_RRF_K`                    | `60`     | RRF damping constant.                                                                                         |
+| `MEMORY_HYBRID_KEYWORD_WEIGHT`           | `0.4`    | Weight for keyword branch in fusion.                                                                          |
+| `MEMORY_HYBRID_VECTOR_WEIGHT`            | `0.6`    | Weight for vector branch in fusion.                                                                           |
+| `MEMORY_HYBRID_VECTOR_BRANCH_LIMIT_MODE` | `legacy` | `legacy` keeps vector limit at `options.limit`; `expanded` uses `branchLimit` for larger RRF candidate pools. |
+| `MEMORY_SEMANTIC_SEARCH`                 | `on`     | Set to `off` to force keyword-only retrieval.                                                                 |
+| `MEMORY_SEMANTIC_SEARCH_THRESHOLD`       | `0.72`   | Default vector similarity threshold (vector only).                                                            |
 
 ## Keyword Search Fallback
 
