@@ -73,6 +73,7 @@ describe('routing-guard', () => {
       assert.ok(routingGuard, 'Module should be loadable');
       assert.strictEqual(typeof routingGuard.checkRouterSelfCheck, 'function');
       assert.strictEqual(typeof routingGuard.checkPlannerFirst, 'function');
+      assert.strictEqual(typeof routingGuard.checkTaskPayloadContract, 'function');
       assert.strictEqual(typeof routingGuard.checkTaskCreate, 'function');
       assert.strictEqual(typeof routingGuard.checkSecurityReview, 'function');
       assert.strictEqual(typeof routingGuard.checkRouterWrite, 'function');
@@ -361,6 +362,57 @@ describe('routing-guard', () => {
       process.env.PLANNER_FIRST_ENFORCEMENT = 'off';
       const result = routingGuard.checkTaskCreate('TaskCreate');
       assert.strictEqual(result.pass, true);
+    });
+  });
+
+  describe('checkTaskPayloadContract', () => {
+    it('should block Task when description is missing', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      process.env.TASK_PAYLOAD_CONTRACT_ENFORCEMENT = 'block';
+      process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+
+      const result = routingGuard.checkTaskPayloadContract('Task', {
+        subagent_type: 'developer',
+        prompt: 'You are developer. Fix bug.',
+      });
+
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
+      assert.match(result.message, /missing required field\(s\): description/i);
+    });
+
+    it('should block TaskCreate when description is missing', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      process.env.TASK_PAYLOAD_CONTRACT_ENFORCEMENT = 'block';
+      process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+
+      const result = routingGuard.checkTaskPayloadContract('TaskCreate', {});
+
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
+      assert.match(result.message, /missing required field\(s\): description/i);
+    });
+  });
+
+  describe('runAllChecks payload contract integration', () => {
+    it('should block Task before execution when description is missing', () => {
+      assert.ok(routingGuard, 'Module should be loadable');
+      process.env.TASK_PAYLOAD_CONTRACT_ENFORCEMENT = 'block';
+      process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+
+      const result = routingGuard.runAllChecks(
+        'Task',
+        {
+          subagent_type: 'developer',
+          prompt: 'You are developer. Fix bug.',
+        },
+        { permission_mode: 'normal' }
+      );
+
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
+      assert.strictEqual(result.checkName, 'task-payload-contract');
+      assert.match(result.message, /description/i);
     });
   });
 
