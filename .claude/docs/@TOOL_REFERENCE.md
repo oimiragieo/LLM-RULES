@@ -10,6 +10,8 @@
 
 Comprehensive catalog of all available tools in the agent-studio framework, including core tools (23 total), MCP tools, tool categories, agent tool mappings, and validation enforcement.
 
+No-op stub wrappers are governed by `.claude/docs/TOOL_STUB_POLICY.md` and enforced by `pnpm validate:tool-stubs`.
+
 ---
 
 ## CONTENT
