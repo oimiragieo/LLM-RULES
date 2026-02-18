@@ -18,6 +18,7 @@ const {
   scanFile,
   shouldScanFile,
   shouldSkipScanning,
+  extractSecurityLintIgnoreDirective,
   CONFIG,
 } = require('../../../.claude/tools/cli/security-lint.cjs');
 
@@ -258,14 +259,25 @@ function testScanFileDetectsPrototypePollution() {
   assert(protoFindings.length >= 1, 'Should detect prototype pollution (SEC-050)');
 }
 
-function testSkipsFileWithIgnoreDirective() {
+function testDoesNotSkipIgnoreDirectiveOutsideAllowlist() {
   const content = `// security-lint-ignore
 const apiKey = "sk-abc123def456ghi789jkl012mno345";
 `;
   const filePath = createTestFile(content, '.js');
 
   const findings = scanFile(filePath);
-  assert(findings.length === 0, 'Should skip file with ignore directive');
+  assert(findings.length > 0, 'Should not skip non-allowlisted file with ignore directive');
+}
+
+function testSkipsAllowlistedIgnoreDirectiveWithReason() {
+  const content = `// security-lint-ignore: intentional security fixture
+const apiKey = "sk-abc123def456ghi789jkl012mno345";
+`;
+  const allowlistedPath = 'tests/scripts/install-security.test.cjs';
+  assert(
+    shouldSkipScanning(allowlistedPath, content),
+    'Should skip allowlisted file with explicit ignore reason'
+  );
 }
 
 function testSkipsSecurityLintTestFiles() {
@@ -296,16 +308,30 @@ describe('auth tests', () => {
 function testShouldSkipScanningFunction() {
   // Test the shouldSkipScanning function directly
   assert(
-    shouldSkipScanning('file.js', '// security-lint-ignore\ncode'),
-    'Should skip with JS comment directive'
+    !shouldSkipScanning('file.js', '// security-lint-ignore\ncode'),
+    'Should not skip non-allowlisted JS comment directive'
   );
   assert(
-    shouldSkipScanning('file.js', '/* security-lint-ignore */\ncode'),
-    'Should skip with block comment directive'
+    !shouldSkipScanning('file.js', '/* security-lint-ignore */\ncode'),
+    'Should not skip non-allowlisted block comment directive'
   );
   assert(
-    shouldSkipScanning('file.sh', '# security-lint-ignore\ncode'),
-    'Should skip with shell comment directive'
+    !shouldSkipScanning('file.sh', '# security-lint-ignore\ncode'),
+    'Should not skip non-allowlisted shell comment directive'
+  );
+  assert(
+    shouldSkipScanning(
+      'tests/lib/workflow/decision-handler-security.test.cjs',
+      '// security-lint-ignore: intentional security fixture\ncode'
+    ),
+    'Should skip allowlisted directive with reason'
+  );
+  assert(
+    !shouldSkipScanning(
+      'tests/lib/workflow/decision-handler-security.test.cjs',
+      '// security-lint-ignore\ncode'
+    ),
+    'Should require a reason for allowlisted ignore directive'
   );
   assert(
     shouldSkipScanning('file.test.js', 'const {SECURITY_RULES} = require("security-lint");'),
@@ -316,6 +342,18 @@ function testShouldSkipScanningFunction() {
     !shouldSkipScanning('file.test.js', 'describe("tests", () => {});'),
     'Should not skip regular test file'
   );
+}
+
+function testExtractSecurityLintIgnoreDirective() {
+  const withReason = extractSecurityLintIgnoreDirective(
+    '// security-lint-ignore: because this file contains test payloads\nconst x = 1;'
+  );
+  assert(withReason, 'Directive with reason should parse');
+  assert(withReason.reason.length > 0, 'Reason should be captured');
+
+  const withoutReason = extractSecurityLintIgnoreDirective('// security-lint-ignore\nconst x = 1;');
+  assert(withoutReason, 'Directive without reason should parse');
+  assert.strictEqual(withoutReason.reason, '', 'Missing reason should be an empty string');
 }
 
 function testSkipsEvalInDocumentationMarkdown() {
@@ -421,10 +459,12 @@ function main() {
     ['Allows localhost HTTP', testScanFileAllowsLocalhost],
     ['Detects disabled SSL (SEC-021)', testScanFileDetectsDisabledSsl],
     ['Detects prototype pollution (SEC-050)', testScanFileDetectsPrototypePollution],
-    ['Skips file with ignore directive', testSkipsFileWithIgnoreDirective],
+    ['Does not skip ignore directive outside allowlist', testDoesNotSkipIgnoreDirectiveOutsideAllowlist],
+    ['Skips allowlisted ignore directive with reason', testSkipsAllowlistedIgnoreDirectiveWithReason],
     ['Skips security-lint test files', testSkipsSecurityLintTestFiles],
     ['Does not skip regular test files', testDoesNotSkipRegularTestFiles],
     ['shouldSkipScanning function works correctly', testShouldSkipScanningFunction],
+    ['extractSecurityLintIgnoreDirective parses directive reasons', testExtractSecurityLintIgnoreDirective],
     ['Skips eval() in documentation .md files', testSkipsEvalInDocumentationMarkdown],
     ['Skips eval() in memory .json files', testSkipsEvalInMemoryJson],
     ['Skips http:// in .schema.json files', testSkipsHttpInSchemaJson],

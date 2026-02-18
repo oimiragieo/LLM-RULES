@@ -230,15 +230,6 @@ function findRequiredCreator(filePath) {
  * @returns {{ active: boolean, invokedAt?: string, elapsedMs?: number, artifactName?: string }}
  */
 function isCreatorActive(creatorName) {
-  // SEC-FIX: If the current agent ID matches the required creator, allow it.
-  // This allows specialized agents like reflection-agent to manage their own state.
-  const currentAgentId = String(process.env.CLAUDE_AGENT_ID || '')
-    .trim()
-    .toLowerCase();
-  if (currentAgentId === creatorName.toLowerCase()) {
-    return { active: true, artifactName: 'self' };
-  }
-
   try {
     const statePath = path.join(PROJECT_ROOT, STATE_FILE);
     if (!fs.existsSync(statePath)) {
@@ -541,11 +532,6 @@ function validateCreatorWorkflow(toolName, toolInput) {
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
   const fileExists = fs.existsSync(fullPath);
 
-  // Edit tool always targets existing files - allow without creator token
-  if (toolName === 'Edit') {
-    return { pass: true };
-  }
-
   // Write to existing file = editing, not creating - allow without creator token
   if (toolName === 'Write' && fileExists && !requiresAlwaysOnCreator) {
     return { pass: true };
@@ -602,6 +588,10 @@ function validateCreatorWorkflow(toolName, toolInput) {
  */
 async function main() {
   try {
+    if (process.env.CREATOR_GUARD_TEST_FORCE_THROW === '1') {
+      throw new Error('Forced unified-creator-guard test failure');
+    }
+
     // Parse the hook input
     const hookInput = await parseHookInputAsync();
 
@@ -671,10 +661,17 @@ async function main() {
     // All checks passed
     process.exit(0);
   } catch (err) {
-    // SEC-008: Allow debug override for troubleshooting
-    if (process.env.HOOK_FAIL_OPEN === 'true') {
+    // SEC-008: Allow emergency fail-open only with explicit dual-control acknowledgement.
+    if (isFailOpenOverrideAuthorized()) {
       auditLog('unified-creator-guard', 'fail_open_override', { error: err.message });
       process.exit(0);
+    }
+
+    if (String(process.env.HOOK_FAIL_OPEN || '').toLowerCase() === 'true') {
+      auditLog('unified-creator-guard', 'fail_open_override_denied', {
+        error: err.message,
+        reason: 'HOOK_FAIL_OPEN set without required acknowledgment/scope',
+      });
     }
 
     // Audit log the error
@@ -683,6 +680,26 @@ async function main() {
     // SEC-008: Fail closed - deny when security state unknown
     process.exit(2);
   }
+}
+
+function isFailOpenOverrideAuthorized() {
+  if (String(process.env.HOOK_FAIL_OPEN || '').toLowerCase() !== 'true') {
+    return false;
+  }
+  const ack = String(process.env.HOOK_FAIL_OPEN_ACK || '').trim();
+  const scope = String(process.env.HOOK_FAIL_OPEN_SCOPE || '')
+    .toLowerCase()
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+  if (ack !== 'ALLOW_HOOK_FAIL_OPEN') {
+    return false;
+  }
+  return (
+    scope.includes('all') ||
+    scope.includes('creator-guard') ||
+    scope.includes('unified-creator-guard')
+  );
 }
 
 // Run if this is the main module
@@ -728,4 +745,5 @@ module.exports = {
   DEFAULT_TTL_MS,
   WATCHED_TOOLS,
   PROJECT_ROOT,
+  isFailOpenOverrideAuthorized,
 };

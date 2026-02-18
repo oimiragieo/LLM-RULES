@@ -320,9 +320,29 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
   }
 }
 
+function isFailOpenOverrideAuthorized() {
+  if (String(process.env.HOOK_FAIL_OPEN || '').toLowerCase() !== 'true') {
+    return false;
+  }
+  const ack = String(process.env.HOOK_FAIL_OPEN_ACK || '').trim();
+  const scope = String(process.env.HOOK_FAIL_OPEN_SCOPE || '')
+    .toLowerCase()
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+  if (ack !== 'ALLOW_HOOK_FAIL_OPEN') {
+    return false;
+  }
+  return scope.includes('all') || scope.includes('routing-guard');
+}
+
 async function main() {
   const startTime = Date.now();
   try {
+    if (process.env.ROUTING_GUARD_TEST_FORCE_THROW === '1') {
+      throw new Error('Forced routing-guard test failure');
+    }
+
     invalidateCachedState();
 
     const hookInput = await parseHookInputAsync();
@@ -494,7 +514,7 @@ async function main() {
         // Best-effort
       }
     }
-    if (process.env.HOOK_FAIL_OPEN === 'true') {
+    if (isFailOpenOverrideAuthorized()) {
       auditLog('routing-guard', 'fail_open_override', { error: err.message });
       logRuntimeHealth({
         component: 'routing-guard',
@@ -504,6 +524,13 @@ async function main() {
         extra: { error: err.message },
       });
       process.exit(0);
+    }
+
+    if (String(process.env.HOOK_FAIL_OPEN || '').toLowerCase() === 'true') {
+      auditLog('routing-guard', 'fail_open_override_denied', {
+        error: err.message,
+        reason: 'HOOK_FAIL_OPEN set without required acknowledgment/scope',
+      });
     }
 
     auditLog('routing-guard', 'error_fail_closed', { error: err.message });
@@ -562,6 +589,7 @@ module.exports = {
   getCachedRouterState,
   invalidateCachedState,
   resetBlockDedupeState,
+  isFailOpenOverrideAuthorized,
   getMemoryMonitor,
   ALL_WATCHED_TOOLS,
   BLACKLISTED_TOOLS,

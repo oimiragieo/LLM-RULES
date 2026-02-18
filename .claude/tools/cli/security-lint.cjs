@@ -90,6 +90,12 @@ const CONFIG = {
     { pathSubstring: 'count-all-tests.mjs', ruleId: 'SEC-011' }, // internal test counter with controlled input
   ],
 
+  // Files explicitly allowed to bypass scanning with security-lint-ignore.
+  securityLintIgnoreAllowlist: [
+    'tests/lib/workflow/decision-handler-security.test.cjs',
+    'tests/scripts/install-security.test.cjs',
+  ],
+
   // Severity levels
   severityLevels: {
     critical: 3,
@@ -386,13 +392,16 @@ function shouldScanFile(filePath) {
  * @returns {boolean} Whether to skip scanning
  */
 function shouldSkipScanning(filePath, content) {
-  // Skip if file has security-lint-ignore directive
-  if (
-    content.startsWith('// security-lint-ignore') ||
-    content.startsWith('/* security-lint-ignore') ||
-    content.startsWith('# security-lint-ignore')
-  ) {
-    return true;
+  // Skip only when security-lint-ignore is both allowlisted and justified.
+  const ignoreDirective = extractSecurityLintIgnoreDirective(content);
+  if (ignoreDirective) {
+    const normalized = normalizePathForMatch(filePath);
+    const allowlisted = CONFIG.securityLintIgnoreAllowlist.some(allowed =>
+      normalized.endsWith(allowed)
+    );
+    if (allowlisted && ignoreDirective.reason.length > 0) {
+      return true;
+    }
   }
 
   const normalized = normalizePathForMatch(filePath);
@@ -422,12 +431,24 @@ function shouldSkipScanning(filePath, content) {
   // These files intentionally contain security issues as test data
   if (
     fileName.includes('.test.') &&
-    (content.includes('security-lint') || content.includes('SECURITY_RULES'))
+    (content.includes('SECURITY_RULES') ||
+      content.includes('scanFile') ||
+      content.includes('shouldSkipScanning') ||
+      content.includes('security-lint.cjs'))
   ) {
     return true;
   }
 
   return false;
+}
+
+function extractSecurityLintIgnoreDirective(content) {
+  const firstLine = String(content || '').split('\n', 1)[0] || '';
+  const match = firstLine.match(
+    /^\s*(?:\/\/|#|\/\*)\s*security-lint-ignore(?:\s*:\s*(.*?))?\s*(?:\*\/)?\s*$/i
+  );
+  if (!match) return null;
+  return { reason: String(match[1] || '').trim() };
 }
 
 /**
@@ -663,6 +684,7 @@ module.exports = {
   scanFile,
   shouldScanFile,
   shouldSkipScanning,
+  extractSecurityLintIgnoreDirective,
   normalizePathForMatch,
   isCodeFile,
   CONFIG,

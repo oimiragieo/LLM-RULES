@@ -60,11 +60,12 @@ describe('unified-creator-guard.cjs - Gate 4: Skill Artifact Protection', () => 
     assert.equal(result.pass, true);
   });
 
-  it('should allow Edit to existing SKILL.md without creator', () => {
+  it('should block Edit to protected SKILL.md without creator', () => {
     const result = creatorGuard.validateCreatorWorkflow('Edit', {
       file_path: '.claude/skills/existing-skill/SKILL.md',
     });
-    assert.equal(result.pass, true);
+    assert.equal(result.pass, false);
+    assert.equal(result.result, 'block');
   });
 
   it('should block write after creator TTL expires', () => {
