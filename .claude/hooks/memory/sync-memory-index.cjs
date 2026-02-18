@@ -157,7 +157,7 @@ function syncJsonMemory(absPath, dbPath) {
   }
 
   const base = path.basename(absPath);
-  const type = base === 'patterns.json' ? 'pattern' : 'issue';
+  const type = base === 'patterns.json' ? 'pattern' : 'gotcha';
 
   let raw;
   try {
@@ -179,61 +179,63 @@ function syncJsonMemory(absPath, dbPath) {
   const db = new DatabaseSync(dbPath);
   db.exec('PRAGMA foreign_keys = ON');
 
-  const insert = db.prepare(`
-    INSERT OR REPLACE INTO entities (
-      id, type, name, content, source_file, line_number,
-      created_at, updated_at, last_accessed, access_count, quality_score
-    )
-    VALUES (?, ?, ?, ?, ?, ?, COALESCE(
-      (SELECT created_at FROM entities WHERE id = ?),
-      strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-    ), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), ?, ?, ?)
-  `);
+  try {
+    const insert = db.prepare(`
+      INSERT OR REPLACE INTO entities (
+        id, type, name, content, source_file, line_number,
+        created_at, updated_at, last_accessed, access_count, quality_score
+      )
+      VALUES (?, ?, ?, ?, ?, ?, COALESCE(
+        (SELECT created_at FROM entities WHERE id = ?),
+        strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+      ), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), ?, ?, ?)
+    `);
 
-  const seenIds = new Set();
-  for (const item of items) {
-    const text = typeof item === 'string' ? item : item?.text;
-    if (!text) continue;
-    const content = typeof item === 'object' ? item?.content || null : null;
-    const ts = item?.timestamp || null;
-    const accessCount = Number.isFinite(item?.accessCount) ? item.accessCount : 0;
-    const lastAccessed = item?.lastAccessed || null;
-    const id = buildEntityId(type, text);
-    seenIds.add(id);
-    insert.run(
-      id,
-      type,
-      text,
-      content,
-      absPath,
-      null,
-      id,
-      lastAccessed,
-      accessCount,
-      qualityFromAccess(accessCount)
-    );
-    if (ts) {
+    const seenIds = new Set();
+    for (const item of items) {
+      const text = typeof item === 'string' ? item : item?.text;
+      if (!text) continue;
+      const content = typeof item === 'object' ? item?.content || null : null;
+      const ts = item?.timestamp || null;
+      const accessCount = Number.isFinite(item?.accessCount) ? item.accessCount : 0;
+      const lastAccessed = item?.lastAccessed || null;
+      const id = buildEntityId(type, text);
+      seenIds.add(id);
+      insert.run(
+        id,
+        type,
+        text,
+        content,
+        absPath,
+        null,
+        id,
+        lastAccessed,
+        accessCount,
+        qualityFromAccess(accessCount)
+      );
+      if (ts) {
+        try {
+          db.prepare('UPDATE entities SET created_at = ? WHERE id = ?').run(ts, id);
+        } catch (_e) {
+          // best-effort
+        }
+      }
+    }
+
+    if (seenIds.size > 0) {
       try {
-        db.prepare('UPDATE entities SET created_at = ? WHERE id = ?').run(ts, id);
+        const placeholders = Array.from({ length: seenIds.size }).fill('?').join(', ');
+        const params = Array.from(seenIds);
+        db.prepare(
+          `DELETE FROM entities WHERE source_file = ? AND type = ? AND id NOT IN (${placeholders})`
+        ).run(absPath, type, ...params);
       } catch (_e) {
         // best-effort
       }
     }
+  } finally {
+    db.close();
   }
-
-  if (seenIds.size > 0) {
-    try {
-      const placeholders = Array.from({ length: seenIds.size }).fill('?').join(', ');
-      const params = Array.from(seenIds);
-      db.prepare(
-        `DELETE FROM entities WHERE source_file = ? AND type = ? AND id NOT IN (${placeholders})`
-      ).run(absPath, type, ...params);
-    } catch (_e) {
-      // best-effort
-    }
-  }
-
-  db.close();
 }
 
 function maybeGenerateEmbeddingsForFile(absPath) {

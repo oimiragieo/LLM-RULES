@@ -31,7 +31,8 @@ class EntityExtractor {
     this.db.exec('PRAGMA foreign_keys = ON');
     this.db.exec('PRAGMA busy_timeout = 5000');
 
-    // Validate schema exists
+    // Validate schema exists — if initialization fails after opening the DB,
+    // ensure the handle is always closed to avoid resource leaks.
     try {
       const tableCheck = this.db
         .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='entities'")
@@ -48,6 +49,15 @@ class EntityExtractor {
         }
       }
     } catch (error) {
+      // Always close the DB handle before re-throwing to prevent resource leaks
+      if (this.db) {
+        try {
+          this.db.close();
+        } catch (_closeErr) {
+          // Best-effort close
+        }
+        this.db = null;
+      }
       // Re-throw specific errors, wrap others
       if (error.message.includes('memory:init')) throw error;
       throw new Error(
