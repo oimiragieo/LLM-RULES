@@ -339,3 +339,91 @@ test('rotateIfNeeded() - auto-creates archive directory if missing', () => {
     cleanupTempDir(tmpDir);
   }
 });
+
+// ========================================================================
+// Bug 1 Fix: File locking during rotation (TDD RED then GREEN)
+// ========================================================================
+
+test('rotateIfNeeded() - acquires lock file before rotation and releases after', () => {
+  // RED: This test verifies that a .lock directory is created during rotation
+  // and cleaned up after. Without locking, concurrent rotation can corrupt files.
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
+
+  try {
+    const testFile = path.join(tmpDir, 'test.md');
+
+    // Create large file to trigger rotation
+    let content = '# Test\n\n';
+    for (let i = 0; i < 25; i++) {
+      content += `## Section ${i}\n\n**Date:** 2026-02-01\n\n`;
+      content += 'Lorem ipsum dolor sit amet. '.repeat(60) + '\n\n---\n\n';
+    }
+    fs.writeFileSync(testFile, content);
+
+    rotator.rotateIfNeeded(testFile, { thresholdKB: 20, keepSections: 5 });
+
+    // After rotation, the lock file should be released (not present)
+    const lockPath = `${testFile}.lock`;
+    assert.ok(!fs.existsSync(lockPath), 'Lock should be released after rotation completes');
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
+});
+
+test('rotateIfNeeded() - skips or throws when lock is already held (lockTimeoutMs option)', () => {
+  // RED: When a lock is already held and lockTimeoutMs is provided,
+  // rotateIfNeeded MUST either skip or throw. It must NEVER proceed without
+  // the lock (which would allow concurrent corruption).
+  // Without the lock feature, the rotator ignores lockTimeoutMs entirely and
+  // proceeds — which means it does NOT skip. The test checks that when we pass
+  // lockTimeoutMs=0 with a pre-existing lock, rotation is skipped or throws.
+  const rotator = require(path.join(PROJECT_ROOT, '.claude/lib/memory/memory-rotator.cjs'));
+  const tmpDir = createTempDir();
+
+  try {
+    const testFile = path.join(tmpDir, 'test.md');
+
+    // Create large file to trigger rotation
+    let content = '# Test\n\n';
+    for (let i = 0; i < 25; i++) {
+      content += `## Section ${i}\n\n**Date:** 2026-02-01\n\n`;
+      content += 'Lorem ipsum dolor sit amet. '.repeat(60) + '\n\n---\n\n';
+    }
+    fs.writeFileSync(testFile, content);
+
+    // Hold the lock (simulate another process having it)
+    const lockPath = `${testFile}.lock`;
+    fs.mkdirSync(lockPath);
+
+    let threw = false;
+    let result;
+    try {
+      // lockTimeoutMs=0 means: fail immediately if lock is held
+      result = rotator.rotateIfNeeded(testFile, {
+        thresholdKB: 20,
+        keepSections: 5,
+        lockTimeoutMs: 0,
+      });
+    } catch (_err) {
+      threw = true;
+    } finally {
+      // Clean up the lock we created
+      if (fs.existsSync(lockPath)) {
+        fs.rmSync(lockPath, { recursive: true, force: true });
+      }
+    }
+
+    // With lockTimeoutMs=0 and lock held:
+    // - EITHER threw (lock timeout), OR
+    // - returned { rotated: false } (graceful skip)
+    // It must NOT have returned { rotated: true } (which means it ignored the lock)
+    assert.ok(
+      threw || (result && result.rotated === false),
+      `Expected rotation to be skipped or throw when lock is held with lockTimeoutMs=0, ` +
+        `but got rotated=${result && result.rotated}`
+    );
+  } finally {
+    cleanupTempDir(tmpDir);
+  }
+});

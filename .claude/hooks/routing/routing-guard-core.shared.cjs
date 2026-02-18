@@ -34,9 +34,12 @@ function getViolationTracker() {
 }
 
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 
 const ROUTING_RUNTIME_DIR = path.join(__dirname, '..', '..', 'context', 'runtime');
-const BLOCK_DEDUPE_STATE_PATH = path.join(ROUTING_RUNTIME_DIR, 'routing-block-dedupe.json');
+const BLOCK_DEDUPE_STATE_PATH =
+  process.env.ROUTING_BLOCK_DEDUPE_PATH ||
+  path.join(ROUTING_RUNTIME_DIR, 'routing-block-dedupe.json');
 const BLOCK_DEDUPE_THRESHOLD = Number(process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD || 2);
 const BLOCK_DEDUPE_WINDOW_MS = Number(process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS || 90000);
 let _blockDedupeStateCache = null;
@@ -62,12 +65,9 @@ function getBlockDedupeState() {
 function setBlockDedupeState(state) {
   _blockDedupeStateCache = state && typeof state === 'object' ? { ...state } : {};
   try {
-    fs.mkdirSync(ROUTING_RUNTIME_DIR, { recursive: true });
-    fs.writeFileSync(
-      BLOCK_DEDUPE_STATE_PATH,
-      JSON.stringify(_blockDedupeStateCache, null, 2),
-      'utf8'
-    );
+    const dir = require('path').dirname(BLOCK_DEDUPE_STATE_PATH);
+    fs.mkdirSync(dir, { recursive: true });
+    atomicWriteJSONSync(BLOCK_DEDUPE_STATE_PATH, _blockDedupeStateCache, { skipLock: true });
   } catch (_err) {
     // Best-effort: dedupe is optimization only.
   }

@@ -146,7 +146,7 @@ function checkTaskCreate(toolName, hookInput = null) {
       )
     : `[ROUTER-FIRST PROTOCOL VIOLATION][TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER first.`;
 
-  if (enforcement === 'block' && !dedupe.dedupe) {
+  if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
   }
   return { pass: true, result: 'warn', message };
