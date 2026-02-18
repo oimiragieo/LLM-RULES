@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 async function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'tool-creator' }) + '\n');
+  runSkillToolCli('tool-creator', 'tool-creator');
 }
 
 if (require.main === module) {

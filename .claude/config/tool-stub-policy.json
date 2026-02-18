@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-02-18T21:28:40.094Z",
+  "updatedAt": "2026-02-18T21:32:18.318Z",
   "policy": {
     "summary": "Stub tools are temporarily allowed only when explicitly allowlisted and tracked for remediation.",
     "enforcement": "Any newly introduced no-op tool stub must be rejected until this policy file is intentionally updated.",
@@ -9,7 +9,6 @@
   "allowlistedStubs": [
     ".claude/tools/accessibility/accessibility.cjs",
     ".claude/tools/advanced-elicitation/advanced-elicitation.cjs",
-    ".claude/tools/agent-creator/agent-creator.cjs",
     ".claude/tools/ai-ml-expert/ai-ml-expert.cjs",
     ".claude/tools/android-expert/android-expert.cjs",
     ".claude/tools/api-development-expert/api-development-expert.cjs",
@@ -28,7 +27,6 @@
     ".claude/tools/cloud-devops-expert/cloud-devops-expert.cjs",
     ".claude/tools/code-quality-expert/code-quality-expert.cjs",
     ".claude/tools/code-style-validator/code-style-validator.cjs",
-    ".claude/tools/command-creator/command-creator.cjs",
     ".claude/tools/complexity-assessment/complexity-assessment.cjs",
     ".claude/tools/composer-dependency-management/composer-dependency-management.cjs",
     ".claude/tools/comprehensive-type-annotations/comprehensive-type-annotations.cjs",
@@ -97,7 +95,6 @@
     ".claude/tools/postmortem-writing/postmortem-writing.cjs",
     ".claude/tools/prd-generator/prd-generator.cjs",
     ".claude/tools/prioritize-python-3-10-features/prioritize-python-3-10-features.cjs",
-    ".claude/tools/project-analyzer/project-analyzer.cjs",
     ".claude/tools/project-onboarding/project-onboarding.cjs",
     ".claude/tools/protocol-reverse-engineering/protocol-reverse-engineering.cjs",
     ".claude/tools/python-backend-expert/python-backend-expert.cjs",
@@ -111,9 +108,7 @@
     ".claude/tools/restcontroller-conventions/restcontroller-conventions.cjs",
     ".claude/tools/ripgrep/ripgrep.cjs",
     ".claude/tools/rule-auditor/rule-auditor.cjs",
-    ".claude/tools/rule-creator/rule-creator.cjs",
     ".claude/tools/rust-expert/rust-expert.cjs",
-    ".claude/tools/schema-creator/schema-creator.cjs",
     ".claude/tools/scientific-skills--skills--adaptyv/scientific-skills--skills--adaptyv.cjs",
     ".claude/tools/scientific-skills--skills--aeon/scientific-skills--skills--aeon.cjs",
     ".claude/tools/scientific-skills--skills--alphafold-database/scientific-skills--skills--alphafold-database.cjs",
@@ -261,8 +256,6 @@
     ".claude/tools/seo-and-meta-tags-in-sveltekit/seo-and-meta-tags-in-sveltekit.cjs",
     ".claude/tools/sequential-thinking/sequential-thinking.cjs",
     ".claude/tools/service-class-conventions/service-class-conventions.cjs",
-    ".claude/tools/skill-creator/skill-creator.cjs",
-    ".claude/tools/skill-discovery/skill-discovery.cjs",
     ".claude/tools/slack-notifications/slack-notifications.cjs",
     ".claude/tools/smart-debug/smart-debug.cjs",
     ".claude/tools/sparc-methodology/sparc-methodology.cjs",
@@ -278,12 +271,10 @@
     ".claude/tools/tauri-security-rules/tauri-security-rules.cjs",
     ".claude/tools/tauri-svelte-typescript-general/tauri-svelte-typescript-general.cjs",
     ".claude/tools/tauri-svelte-ui-components/tauri-svelte-ui-components.cjs",
-    ".claude/tools/template-creator/template-creator.cjs",
     ".claude/tools/template-renderer/template-renderer.cjs",
     ".claude/tools/terraform-infra/terraform-infra.cjs",
     ".claude/tools/text-to-sql/text-to-sql.cjs",
     ".claude/tools/thinking-tools/thinking-tools.cjs",
-    ".claude/tools/tool-creator/tool-creator.cjs",
     ".claude/tools/tool-search/tool-search.cjs",
     ".claude/tools/track-management/track-management.cjs",
     ".claude/tools/tsconfig-json-rules/tsconfig-json-rules.cjs",
@@ -294,7 +285,6 @@
     ".claude/tools/visual-and-observational-rules/visual-and-observational-rules.cjs",
     ".claude/tools/web-design-guidelines-vercel/web-design-guidelines-vercel.cjs",
     ".claude/tools/web3-expert/web3-expert.cjs",
-    ".claude/tools/workflow-creator/workflow-creator.cjs",
     ".claude/tools/writing-skills/writing-skills.cjs"
   ]
 }
