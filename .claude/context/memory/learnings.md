@@ -766,3 +766,19 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Created new agent: bool-action (2026-02-17)
 
 - Created new agent: repo-onboarder (2026-02-17)
+
+- Refreshed skill: accessibility (2026-02-18)
+
+- Refreshed skill: accessibility (2026-02-18)
+
+- Created new agent: qa-guardian (2026-02-18)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-18)
+
+- Created new agent: contract-check (2026-02-18)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-18)
+
+- Created new agent: bool-action (2026-02-18)
+
+- Created new agent: repo-onboarder (2026-02-18)

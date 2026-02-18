@@ -32,7 +32,7 @@ function stderrLog(message) {
 
 function runChildHook(hookPath, stdinData) {
   const absPath = path.isAbsolute(hookPath) ? hookPath : path.join(PROJECT_ROOT, hookPath);
-  
+
   if (!fs.existsSync(absPath)) {
     stderrLog(`CRITICAL: Hook not found: ${hookPath} (resolved to: ${absPath})`);
     return { status: 2, stdout: '', error: new Error(`Hook file missing: ${absPath}`) };
@@ -89,13 +89,13 @@ function main() {
     // NON-ZERO EXIT = BLOCK. Stop everything.
     if ((result.status ?? 0) !== 0) {
       stderrLog(`CRITICAL: Hook ${hookPath} failed or blocked with status ${result.status}`);
-      
+
       const payload = (result.stdout || '').trim();
       if (payload && payload.startsWith('{')) {
         // Forward the block/deny JSON payload
         process.stdout.write(payload.endsWith('\n') ? payload : payload + '\n');
       }
-      
+
       process.exit(result.status || 2);
       return;
     }
@@ -103,12 +103,12 @@ function main() {
     // SUCCESS = Check for tool_input modification
     if (result.stdout && result.stdout.trim().startsWith('{')) {
       const output = safeParseJSON(result.stdout);
-      
+
       // If hook returned a new tool_input, update our state for the next hook
       if (output.tool_input || output.input) {
         currentHookInput.tool_input = output.tool_input || output.input;
         modified = true;
-      } 
+      }
       // If it returned a permissionDecision:allow but no tool_input, we just continue with current state
     }
   }
@@ -117,7 +117,7 @@ function main() {
   if (modified) {
     process.stdout.write(JSON.stringify({ tool_input: currentHookInput.tool_input }) + '\n');
   }
-  
+
   process.exit(0);
 }
 

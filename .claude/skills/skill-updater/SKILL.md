@@ -80,15 +80,16 @@ Skill({ skill: 'assimilate' });
 
 Compare current skill against enterprise bundle expectations:
 
-- `SKILL.md` clarity + trigger rules
+- `SKILL.md` clarity + trigger rules + **CONTENT PRESERVATION** (Anti-Patterns, Workflows)
 - `scripts/main.cjs` deterministic output contract
-- `hooks/pre-execute.cjs` and `hooks/post-execute.cjs`
-- `schemas/input.schema.json` and `schemas/output.schema.json`
+- `hooks/pre-execute.cjs` and `hooks/post-execute.cjs` (MANDATORY: create if missing)
+- `schemas/input.schema.json` and `schemas/output.schema.json` (MANDATORY: create if missing)
 - `commands/<skill>.md` and top-level `.claude/commands/` delegator
 - `templates/implementation-template.md`
-- `rules/<skill>.md`
+- `rules/<skill>.md` (Check for and PRESERVE 'Anti-Patterns')
 - workflow doc in `.claude/workflows/*skill-workflow.md`
 - agent assignments, CLAUDE references, skill catalog coverage
+- Search tooling: Ensure `pnpm search:code` is mandated over generic `grep`
 
 ### Step 4: TDD Refresh Backlog
 

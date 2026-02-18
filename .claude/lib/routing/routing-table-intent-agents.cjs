@@ -117,6 +117,8 @@ const INTENT_TO_AGENT = {
 
   // Web3/Blockchain intent (routes to web3-blockchain-expert)
   web3: 'web3-blockchain-expert',
+  powershell_expert: 'powershell-expert',
+  'powershell-expert': 'powershell-expert',
 
   // Legacy intents (map to most appropriate agent)
   bug: 'developer',

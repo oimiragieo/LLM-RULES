@@ -71,26 +71,29 @@ function buildResearchChecklist(input) {
 function buildGapChecklist(skillName) {
   return [
     {
-      id: 'skill-md',
-      check: `Validate .claude/skills/${skillName}/SKILL.md trigger clarity + workflow completeness`,
+      id: 'skill-md-content',
+      check: `Validate .claude/skills/${skillName}/SKILL.md contains 'Memory Protocol', 'Anti-Patterns', and 'Integration Points' sections (PRESERVE existing content)`,
+    },
+    {
+      id: 'search-best-practice',
+      check: `Ensure SKILL.md mandates 'pnpm search:code' or 'ripgrep' over generic grep/glob for code discovery`,
+    },
+    {
+      id: 'enterprise-scaffold',
+      check: `Ensure .claude/skills/${skillName}/hooks/ (pre/post) and .claude/skills/${skillName}/schemas/ (input/output) exist. IF MISSING: Create them with enterprise defaults.`,
     },
     {
       id: 'script',
       check: `Validate .claude/skills/${skillName}/scripts/main.cjs deterministic output contract`,
     },
     {
-      id: 'schemas',
-      check: `Validate .claude/skills/${skillName}/schemas/input.schema.json and output.schema.json`,
-    },
-    {
-      id: 'hooks',
-      check: `Validate .claude/skills/${skillName}/hooks/pre-execute.cjs and post-execute.cjs`,
+      id: 'rules-preservation',
+      check: `Check .claude/rules/${skillName}.md for 'Anti-Patterns' and 'Workflows'. PRESERVE these sections if updating.`,
     },
     {
       id: 'command-surface',
       check: `Validate .claude/skills/${skillName}/commands/${skillName}.md plus .claude/commands delegator`,
     },
-    { id: 'template-rule', check: `Validate template/rules references and no stale defaults` },
     {
       id: 'workflow-doc',
       check: `Validate .claude/workflows/${skillName}-skill-workflow.md exists and matches behavior`,
@@ -156,22 +159,24 @@ function buildTddBacklog(skillName) {
     {
       phase: 'RED',
       items: [
-        `Add/update tests for ${skillName} script contract and trigger routing behavior`,
-        'Add regression tests for known stale wording/invalid references',
+        `Add test ensuring .claude/rules/${skillName}.md retains 'Anti-Patterns' section`,
+        `Add test verifying .claude/skills/${skillName}/schemas/input.schema.json exists and is valid`,
+        `Add test verifying .claude/skills/${skillName}/hooks/pre-execute.cjs exists`,
       ],
     },
     {
       phase: 'GREEN',
       items: [
-        'Apply minimal SKILL.md + script + schema updates to satisfy failing tests',
-        'Update command/workflow wiring only where required by tests',
+        'Update SKILL.md with 2026 standards while PRESERVING local patterns',
+        'Create/Update input.schema.json with strict validation',
+        'Create/Update pre-execute.cjs hook to enforce schema',
       ],
     },
     {
       phase: 'REFACTOR',
       items: [
-        'Tighten wording and remove duplicate instructions',
-        'Consolidate trigger rules and memory/search/token-saver decision branches',
+        'Deduplicate instructions between SKILL.md and rules/',
+        'Ensure pnpm search:code is the primary discovery tool',
       ],
     },
     {
@@ -179,8 +184,7 @@ function buildTddBacklog(skillName) {
       items: [
         `node .claude/tools/cli/validate-integration.cjs .claude/skills/${skillName}/SKILL.md`,
         'node .claude/tools/cli/generate-skill-index.cjs',
-        'node .claude/tools/cli/generate-agent-registry.cjs (if assignments changed)',
-        `node --test tests/skills/${skillName}-main.test.cjs`,
+        'node --test tests/skills/' + skillName + '-main.test.cjs',
       ],
     },
   ];

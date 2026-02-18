@@ -145,6 +145,30 @@
       "path": ".claude/skills/troubleshooting-regression/SKILL.md",
       "status": "completed",
       "completedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-18-skill-creator-skill",
+      "artifactType": "skill",
+      "name": "skill-creator",
+      "path": ".claude/skills/skill-creator/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-18T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-18-unified-creator-guard-hook",
+      "artifactType": "hook",
+      "name": "unified-creator-guard",
+      "path": ".claude/hooks/routing/unified-creator-guard.cjs",
+      "status": "completed",
+      "completedAt": "2026-02-18T00:00:00.000Z"
+    },
+    {
+      "id": "2026-02-18-accessibility-skill-upgrade",
+      "artifactType": "skill",
+      "name": "accessibility",
+      "path": ".claude/skills/accessibility/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-02-18T00:00:00.000Z"
     }
   ],
   "pendingProposals": [],

@@ -424,6 +424,16 @@ const INTENT_KEYWORDS = {
     'hardhat',
     'foundry',
   ],
+  'powershell-expert': [
+    'powershell-expert',
+    'powershell',
+    'expert',
+    'scripting',
+    'automation',
+    'module development',
+    'cross platform',
+    'pwsh',
+  ],
 };
 
 module.exports = { INTENT_KEYWORDS };

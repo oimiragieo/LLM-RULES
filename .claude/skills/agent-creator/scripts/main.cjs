@@ -107,6 +107,12 @@ function getOutputPath(name, category = 'domain') {
   return path.join(PROJECT_ROOT, '.claude', 'agents', category, `${name}.md`);
 }
 
+function findModuleExportInsertionPoint(content) {
+  const exportMatch = content.match(/\r?\n\r?\nmodule\.exports\s*=\s*\{/);
+  if (!exportMatch) return -1;
+  return exportMatch.index;
+}
+
 function updateRoutingTableKeywords(name, description) {
   const filePath = path.join(
     PROJECT_ROOT,
@@ -124,11 +130,14 @@ function updateRoutingTableKeywords(name, description) {
     new Set([name, ...name.split('-'), ...(description.toLowerCase().match(/\b\w{4,}\b/g) || [])])
   ).slice(0, 10);
 
-  const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\[/g, '[').replace(/\]/g, '],')},`;
-  const insertionPoint = content.lastIndexOf('};');
+  const formattedKeywords = keywords.map(keyword => `    '${keyword}'`).join(',\n');
+  const entry = `  '${name}': [\n${formattedKeywords},\n  ],`;
+  const insertionPoint = findModuleExportInsertionPoint(content);
   if (insertionPoint !== -1) {
     content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
     fs.writeFileSync(filePath, content, 'utf8');
+  } else {
+    throw new Error(`Unable to locate module.exports insertion point in ${filePath}`);
   }
 }
 
@@ -145,10 +154,12 @@ function updateRoutingTableAgents(name) {
   if (content.includes(`'${name}':`)) return;
 
   const entry = `  '${name}': '${name}',`;
-  const insertionPoint = content.lastIndexOf('};');
+  const insertionPoint = findModuleExportInsertionPoint(content);
   if (insertionPoint !== -1) {
     content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
     fs.writeFileSync(filePath, content, 'utf8');
+  } else {
+    throw new Error(`Unable to locate module.exports insertion point in ${filePath}`);
   }
 }
 

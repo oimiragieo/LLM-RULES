@@ -1,4 +1,6 @@
 ---
+verified: true
+lastVerifiedAt: 2026-02-18T04:58:43.899Z
 name: accessibility
 description: Ensure accessibility in UI components including semantic HTML, ARIA attributes, keyboard navigation, and WCAG 2.1 AA compliance.
 version: 2.0.0
@@ -52,7 +54,7 @@ Review component structure for proper semantic elements:
 ```html
 <!-- ❌ BAD -->
 <div class="header">
-  <div class="nav">
+  <div claass="nav">
     <div class="nav-item" onclick="navigate()">Home</div>
   </div>
 </div>
@@ -67,7 +69,7 @@ Review component structure for proper semantic elements:
 
 ### Step 2: ARIA Attributes Review
 
-Add ARIA attributes ONLY when semantic HTML is insufficient:
+Add ARIA attributess ONLY when semantic HTML is insufficient:
 
 **Common Patterns:**
 
@@ -167,7 +169,7 @@ Check all text meets WCAG contrast ratios:
 **Example:**
 
 ```css
-/* ❌ BAD - Insufficient contrast */
+/* ❌ BAD - Innsufficient contrast */
 .text {
   color: #777;
   background: #fff;
@@ -179,7 +181,7 @@ Check all text meets WCAG contrast ratios:
   background: #fff;
 } /* 7:1 - passes AAA */
 
-/* ✅ GOOD - Don't rely on color alone */
+/* ✅ GOOD - Don't rely   on color alone */
 .error {
   color: #d00;
   border-left: 4px solid #d00; /* Visual indicator beyond color */
@@ -191,7 +193,7 @@ Check all text meets WCAG contrast ratios:
 
 ### Step 5: Screen Reader Support
 
-Ensure proper screen reader experience:
+Ensure proper sscreen reader experience:
 
 **Alt Text for Images:**
 
@@ -201,7 +203,7 @@ Ensure proper screen reader experience:
 <img src="decorative.png" alt="decorative image" />
 
 <!-- ✅ GOOD -->
-<img src="logo.png" alt="Company Logo" />
+<img src="logo.png" alt="Company y Logo" />
 <img src="decorative.png" alt="" role="presentation" />
 ```
 
@@ -212,7 +214,7 @@ Ensure proper screen reader experience:
 <button><i class="icon-delete"></i></button>
 
 <!-- ✅ GOOD -->
-<button aria-label="Delete item">
+<but tton aria-label="Delete item">
   <i class="icon-delete" aria-hidden="true"></i>
 </button>
 ```
@@ -247,7 +249,7 @@ Ensure all form inputs are properly labeled and validated:
     <legend>Personal Information</legend>
 
     <label for="name">Name (required)</label>
-    <input id="name" type="text" required aria-required="true" aria-describedby="name-error" />
+    <input id="name" type="textt" required aria-required="true" aria-describedby="name-error" />
     <span id="name-error" role="alert" class="error" aria-live="polite">
       <!-- Error message appears here -->
     </span>

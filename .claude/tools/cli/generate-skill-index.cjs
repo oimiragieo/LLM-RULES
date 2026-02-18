@@ -238,6 +238,22 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
 
           // Extract frontmatter if exists
           const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+          let description = null;
+          let tools = null;
+
+          if (frontmatterMatch) {
+            const yaml = frontmatterMatch[1];
+            const descMatch = yaml.match(/^description:\s*(.*)$/m);
+            if (descMatch) description = descMatch[1].replace(/^["'](.*)["']$/, '$1').trim();
+
+            const toolsMatch = yaml.match(/^tools:\s*\[(.*)\]/m);
+            if (toolsMatch) {
+              tools = toolsMatch[1]
+                .split(',')
+                .map(t => t.trim().replace(/^["'](.*)["']$/, '$1'))
+                .filter(Boolean);
+            }
+          }
 
           // Use forward slashes for consistent keys (cross-platform)
           const skillKey = entryRelativePath.replace(/\\/g, '/');
@@ -246,6 +262,8 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
             name: skillKey,
             hasSkillFile: true,
             hasFrontmatter: !!frontmatterMatch,
+            description,
+            tools,
           };
         }
 
@@ -318,6 +336,7 @@ function resolveIndexInputs(options = {}) {
     resolvedSkillToAgents,
     resolvedAgentToSkills,
     includeArchived,
+    scannedSkills, // Add this
   };
 }
 
@@ -361,20 +380,35 @@ function resolveAgentsForSkill(name, canonicalName, resolvedSkillToAgents) {
   return { agentPrimary, agentSupporting };
 }
 
-function buildSkillEntry(name, creatorAliasToNested, resolvedSkillToAgents) {
+function buildSkillEntry(name, creatorAliasToNested, resolvedSkillToAgents, scannedSkills = {}) {
   const canonicalName = canonicalSkillLookupKey(name);
   const domain = DOMAIN_MAP[name] || DOMAIN_MAP[canonicalName] || 'other';
   const category = CATEGORY_MAP[name] || CATEGORY_MAP[canonicalName] || 'Other';
-  const requiredTools = SKILL_TOOLS[name] ||
+
+  // Extract metadata from scanned SKILL.md if available
+  const scannedMetadata = scannedSkills[name] || scannedSkills[canonicalName] || {};
+
+  const requiredTools = scannedMetadata.tools ||
+    SKILL_TOOLS[name] ||
     SKILL_TOOLS[canonicalName] || ['Read', 'Write', 'Edit'];
+
   const { agentPrimary, agentSupporting } = resolveAgentsForSkill(
     name,
     canonicalName,
     resolvedSkillToAgents
   );
   const aliasOf = creatorAliasToNested[name] || null;
+
+  // Description Priority:
+  // 1. Scanned frontmatter (Source of Truth)
+  // 2. Definitions map (Override)
+  // 3. Category fallback
   const description =
-    SKILL_DESCRIPTION_MAP[name] || SKILL_DESCRIPTION_MAP[canonicalName] || `${category} - ${name}`;
+    scannedMetadata.description ||
+    SKILL_DESCRIPTION_MAP[name] ||
+    SKILL_DESCRIPTION_MAP[canonicalName] ||
+    `${category} - ${name}`;
+
   const tags = [...new Set([domain, category.toLowerCase().replace(/\s+/g, '-'), name])];
 
   return {
@@ -475,6 +509,7 @@ function generateIndex(options = {}) {
     resolvedSkillToAgents,
     resolvedAgentToSkills,
     includeArchived,
+    scannedSkills, // Use this
   } = resolveIndexInputs(options);
 
   if (verbose) {
@@ -493,7 +528,12 @@ function generateIndex(options = {}) {
   ]);
 
   for (const name of allSkillNames) {
-    skills[name] = buildSkillEntry(name, creatorAliasToNested, resolvedSkillToAgents);
+    skills[name] = buildSkillEntry(
+      name,
+      creatorAliasToNested,
+      resolvedSkillToAgents,
+      scannedSkills
+    );
   }
 
   const { byDomain, byCategory, byTool, byAgent } = buildIndexes(skills, resolvedAgentToSkills);

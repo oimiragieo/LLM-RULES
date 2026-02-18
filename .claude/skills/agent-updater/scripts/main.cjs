@@ -84,6 +84,12 @@ function classifyRisk(changes) {
   return 'low';
 }
 
+function findModuleExportInsertionPoint(content) {
+  const exportMatch = content.match(/\r?\n\r?\nmodule\.exports\s*=\s*\{/);
+  if (!exportMatch) return -1;
+  return exportMatch.index;
+}
+
 function buildPatchPlan(target, agentName) {
   // POST-UPDATE INTEGRATION (Phase 4.3 Hardening)
   try {
@@ -159,11 +165,14 @@ function updateRoutingTableKeywords(name, _description) {
 
   const keywords = Array.from(new Set([name, ...name.split('-')])).slice(0, 10);
 
-  const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
-  const insertionPoint = content.lastIndexOf('};');
+  const formattedKeywords = keywords.map(keyword => `    '${keyword}'`).join(',\n');
+  const entry = `  '${name}': [\n${formattedKeywords},\n  ],`;
+  const insertionPoint = findModuleExportInsertionPoint(content);
   if (insertionPoint !== -1) {
     content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
     fs.writeFileSync(filePath, content, 'utf8');
+  } else {
+    throw new Error(`Unable to locate module.exports insertion point in ${filePath}`);
   }
 }
 

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "powershell-expert Output Schema",
+  "description": "Output validation schema for powershell-expert skill",
+  "type": "object",
+  "required": ["success"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the skill executed successfully"
+    },
+    "result": {
+      "type": "object",
+      "description": "The skill execution result",
+      "additionalProperties": true
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if execution failed"
+    }
+  },
+  "additionalProperties": true
+}
