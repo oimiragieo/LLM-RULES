@@ -350,3 +350,35 @@ test('P3: env restore keeps default behavior between tests (effective legacy def
   await memory.hybridMemoryQuery('query', { limit: 4, threshold: 0.1 });
   assert.equal(vectorLimit, 4);
 });
+
+test('T1: hybrid_fusion_used telemetry contains bounded fields and no raw query/content payloads', async () => {
+  setup();
+  const memory = createMemory();
+  const events = [];
+
+  memory._keywordSearch = async () => [
+    { content: 'auth gotcha', metadata: { id: 'k1' }, similarity: null },
+    { content: 'deploy note', metadata: { id: 'k2' }, similarity: null },
+  ];
+  memory._getVectorStore = async () => ({
+    search: async () => [
+      { content: 'auth gotcha', metadata: { id: 'k1' }, similarity: 0.91 },
+      { content: 'security pattern', metadata: { id: 'v2' }, similarity: 0.87 },
+    ],
+  });
+  memory._logLancedbEvent = (event, payload) => {
+    events.push({ event, payload });
+  };
+
+  await memory.hybridMemoryQuery('sensitive query text', { limit: 5, threshold: 0.2 });
+
+  const fusionEvent = events.find(e => e.event === 'hybrid_fusion_used');
+  assert.ok(fusionEvent);
+  assert.deepEqual(Object.keys(fusionEvent.payload).sort(), ['keyword_count', 'vector_count']);
+  assert.equal(typeof fusionEvent.payload.keyword_count, 'number');
+  assert.equal(typeof fusionEvent.payload.vector_count, 'number');
+  assert.ok(!('query' in fusionEvent.payload));
+  assert.ok(!('content' in fusionEvent.payload));
+  assert.ok(!('results' in fusionEvent.payload));
+  assert.ok(!('raw_results' in fusionEvent.payload));
+});
