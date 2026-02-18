@@ -11,12 +11,13 @@
  *   node assess-ecosystem.mjs --type skill --name "skill-name" --description "..."
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { assessHooks, generateHookContent } from './hook-assessor.mjs';
 import { discoverMcpMatches, getMcpToolsRef, getConversionCommand } from './mcp-discoverer.mjs';
+import { ecosystemHealthCheck as runEcosystemHealthCheck } from './ecosystem-health.mjs';
 
 const require = createRequire(import.meta.url);
 const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
@@ -459,85 +460,14 @@ export function reverseAssessSchema(config) {
  * Full bidirectional ecosystem health check
  * Detects orphaned components and missing connections
  */
-export function ecosystemHealthCheck() {
-  const issues = [];
-  const stats = {
-    agents: 0,
-    skills: 0,
-    hooks: 0,
-    workflows: 0,
-    orphanedSkills: [],
-    orphanedHooks: [],
-    missingDependencies: [],
-  };
-
-  // Count and check agents
-  const agentDirs = ['core', 'specialized', 'domain', 'orchestrators'];
-  for (const dir of agentDirs) {
-    const dirPath = join(AGENTS_DIR, dir);
-    if (existsSync(dirPath)) {
-      try {
-        const files = readdirSync(dirPath).filter(f => f.endsWith('.md'));
-        stats.agents += files.length;
-      } catch (_e) {
-        // Skip
-      }
-    }
-  }
-
-  // Count skills
-  if (existsSync(SKILLS_DIR)) {
-    try {
-      const skillDirs = readdirSync(SKILLS_DIR);
-      for (const skill of skillDirs) {
-        if (existsSync(join(SKILLS_DIR, skill, 'SKILL.md'))) {
-          stats.skills++;
-        }
-      }
-    } catch (_e) {
-      // Skip
-    }
-  }
-
-  // Count hooks from settings.json
-  if (existsSync(SETTINGS_PATH)) {
-    try {
-      const settings = safeParseJSON(readFileSync(SETTINGS_PATH, 'utf-8'));
-      for (const trigger of Object.keys(settings.hooks || {})) {
-        for (const entry of settings.hooks[trigger]) {
-          stats.hooks += entry.hooks?.length || 0;
-        }
-      }
-    } catch (_e) {
-      // Skip
-    }
-  }
-
-  // Count workflows
-  if (existsSync(WORKFLOWS_DIR)) {
-    try {
-      const categories = readdirSync(WORKFLOWS_DIR);
-      for (const cat of categories) {
-        const catPath = join(WORKFLOWS_DIR, cat);
-        try {
-          const files = readdirSync(catPath).filter(
-            f => f.endsWith('.yaml') || f.endsWith('.yml') || f.endsWith('.md')
-          );
-          stats.workflows += files.length;
-        } catch (_e) {
-          // Skip non-directories
-        }
-      }
-    } catch (_e) {
-      // Skip
-    }
-  }
-
-  return {
-    healthy: issues.length === 0,
-    stats,
-    issues,
-  };
+export function ecosystemHealthCheck(options = {}) {
+  return runEcosystemHealthCheck({
+    agentsDir: options.agentsDir || AGENTS_DIR,
+    skillsDir: options.skillsDir || SKILLS_DIR,
+    workflowsDir: options.workflowsDir || WORKFLOWS_DIR,
+    settingsPath: options.settingsPath || SETTINGS_PATH,
+    rootDir: ROOT,
+  });
 }
 
 /**

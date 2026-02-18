@@ -22,6 +22,8 @@ This specification defines a Code Indexing and Semantic Search System for Agent-
 
 **Target State:** Semantic code search with natural language queries, fast vector-based retrieval, intelligent chunking based on code structure (AST), and seamless agent integration via a dedicated skill.
 
+**Implementation Reality (2026-02 update):** Some originally named components in this draft were consolidated into production modules. `metadata-enricher`, `query-processor`, and `index-maintainer` responsibilities are currently implemented across `.claude/lib/code-indexing/hybrid-lazy-indexer*.cjs`, `.claude/lib/code-indexing/index-manager-*.cjs`, and `.claude/lib/code-indexing/hybrid-search.cjs`.
+
 ### 1.2 Business Value
 
 | Metric               | Current                     | Target                 | Improvement    |

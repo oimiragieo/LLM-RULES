@@ -123,6 +123,7 @@ const INTENT_TO_AGENT = {
   bug: 'developer',
   feature: 'developer',
   test: 'qa',
+  tdd: 'qa',
   security: 'security-architect',
   architecture: 'architect',
   incident: 'incident-responder',

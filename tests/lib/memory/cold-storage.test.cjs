@@ -162,11 +162,11 @@ test('getStorageStats - returns storage statistics', () => {
   cleanupTempDir(testDir);
 });
 
-// RED: Test 5 - searchCold() stub returns empty array
-test('searchCold - stub returns empty array', () => {
+// RED: Test 5 - searchCold() returns empty array when no cold files exist
+test('searchCold - returns empty array when no cold files exist', () => {
   const results = coldStorage.searchCold('test query');
   assert.ok(Array.isArray(results), 'Should return array');
-  assert.strictEqual(results.length, 0, 'Stub should return empty array');
+  assert.strictEqual(results.length, 0, 'Should return empty array when no data exists');
 });
 
 // RED: Test 6 - archiveWarmToCold() respects maxAgeDays option
@@ -225,6 +225,29 @@ test('archiveWarmToCold - deletes warm source file after successful cold archiva
   const result = coldStorage.archiveWarmToCold(testDir, { maxAgeDays: 30 });
   assert.ok(result.archivedFiles >= 1, 'Should archive at least one file');
   assert.equal(fs.existsSync(oldArchive), false, 'Warm archive source file should be removed');
+
+  cleanupTempDir(testDir);
+});
+
+test('searchCold - returns matching entries from cold jsonl files', () => {
+  const testDir = createTempDir();
+  const coldDir = path.join(testDir, 'archive', 'cold');
+  fs.mkdirSync(coldDir, { recursive: true });
+
+  const coldFile = path.join(coldDir, 'cold-2026-01.jsonl');
+  fs.writeFileSync(
+    coldFile,
+    [
+      JSON.stringify({ title: 'Auth fix', content: 'JWT token rotation implementation', date: '2026-01-10' }),
+      JSON.stringify({ title: 'Unrelated', content: 'Cache invalidation note', date: '2026-01-11' }),
+    ].join('\n') + '\n',
+    'utf8'
+  );
+
+  const results = coldStorage.searchCold('token rotation', { memoryDir: testDir, limit: 5 });
+  assert.ok(Array.isArray(results), 'searchCold should return an array');
+  assert.equal(results.length, 1, 'search should return the matching entry');
+  assert.match(results[0].title, /Auth fix/);
 
   cleanupTempDir(testDir);
 });

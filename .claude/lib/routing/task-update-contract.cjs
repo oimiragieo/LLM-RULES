@@ -27,6 +27,7 @@ function normalizeTaskUpdatePayload(payload = {}) {
 function validateTaskUpdatePayload(normalized, options = {}) {
   const requireTaskId = options.requireTaskId !== false;
   const requireStatus = options.requireStatus !== false;
+  const requireCompletionMetadata = options.requireCompletionMetadata === true;
   const errors = [];
 
   if (requireTaskId && !normalized.taskId) {
@@ -43,6 +44,24 @@ function validateTaskUpdatePayload(normalized, options = {}) {
     errors.push(
       `Invalid status value: "${normalized.status}". Valid statuses: ${(options.allowedStatuses || VALID_TASK_STATUSES).join(', ')}`
     );
+  }
+
+  if (requireCompletionMetadata && normalized.status === 'completed') {
+    const summary = normalized.metadata && normalized.metadata.summary;
+    if (typeof summary !== 'string' || summary.trim().length === 0) {
+      errors.push('Missing required completion metadata: metadata.summary');
+    }
+    const filesModified = Array.isArray(normalized.metadata?.filesModified)
+      ? normalized.metadata.filesModified
+      : [];
+    const filesCreated = Array.isArray(normalized.metadata?.filesCreated)
+      ? normalized.metadata.filesCreated
+      : [];
+    if (filesModified.length === 0 && filesCreated.length === 0) {
+      errors.push(
+        'Missing required completion metadata: metadata.filesModified or metadata.filesCreated'
+      );
+    }
   }
 
   return {

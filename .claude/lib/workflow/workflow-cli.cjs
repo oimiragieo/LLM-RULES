@@ -494,12 +494,10 @@ class WorkflowCLI {
       const checkpoint = await checkpointManager.load(args.checkpointId);
       this.log(`Loaded checkpoint: ${JSON.stringify(checkpoint, null, 2)}`, 'verbose');
 
-      // TODO: Resume workflow from checkpoint
-      // This requires re-creating the workflow engine and resuming
-
       return {
-        success: true,
-        resumed: true,
+        success: false,
+        resumed: false,
+        reason: 'resume_not_implemented',
         checkpoint,
       };
     } catch (e) {

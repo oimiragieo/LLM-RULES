@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const { scrubSensitiveContent } = require('../utils/sensitive-scrubber.cjs');
 
@@ -235,9 +236,46 @@ function getStorageStats(memoryDir) {
  * @param {string} query - Search query
  * @returns {Array} Empty array (stub)
  */
-function searchCold(_query) {
-  // Stub: return empty array
-  return [];
+function searchCold(query, opts = {}) {
+  const q = String(query || '').trim().toLowerCase();
+  if (!q) return [];
+
+  const memoryDir = opts.memoryDir || path.join(process.cwd(), '.claude', 'context', 'memory');
+  const limit = Number.isFinite(Number(opts.limit)) ? Math.max(1, Number(opts.limit)) : 20;
+  const coldDir = path.join(memoryDir, 'archive', 'cold');
+  if (!fs.existsSync(coldDir)) return [];
+
+  const files = fs.readdirSync(coldDir).filter(f => f.endsWith('.jsonl'));
+  const matches = [];
+
+  for (const fileName of files) {
+    const filePath = path.join(coldDir, fileName);
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const lines = raw.split('\n').filter(Boolean);
+
+    for (const line of lines) {
+      const entry = safeParseJSON(line, null);
+      if (!entry || typeof entry !== 'object') continue;
+
+      const haystack = `${entry.title || ''}\n${entry.content || ''}\n${entry.date || ''}`.toLowerCase();
+      if (!haystack.includes(q)) continue;
+
+      const content = String(entry.content || '');
+      const idx = haystack.indexOf(q);
+      const start = Math.max(0, idx - 60);
+      const end = Math.min(content.length, idx + q.length + 60);
+
+      matches.push({
+        file: fileName,
+        title: String(entry.title || 'Untitled'),
+        date: entry.date || null,
+        snippet: content.slice(start, end).trim(),
+      });
+      if (matches.length >= limit) return matches;
+    }
+  }
+
+  return matches;
 }
 
 module.exports = {

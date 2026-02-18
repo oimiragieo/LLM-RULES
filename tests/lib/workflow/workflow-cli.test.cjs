@@ -208,6 +208,28 @@ describe('WorkflowCLI Class', () => {
     const cli = new WorkflowCLI();
     assert(typeof cli.listWorkflows === 'function', 'Should have listWorkflows method');
   });
+
+  it('resume command returns explicit not-implemented response', async () => {
+    const { WorkflowCLI } = require('../../../.claude/lib/workflow/workflow-cli.cjs');
+    const cli = new WorkflowCLI({
+      checkpointDir: path.join(PROJECT_ROOT, '.claude', 'context', 'checkpoints'),
+      testMode: true,
+    });
+
+    const result = await cli.run({
+      command: 'resume',
+      checkpointId: 'definitely-missing-checkpoint',
+      options: {},
+    });
+
+    // Missing checkpoint still returns a failure, but if checkpoint exists we should never claim resumed=true.
+    if (result && result.reason === 'resume_not_implemented') {
+      assertEqual(result.resumed, false, 'resume should be false until implemented');
+      assertEqual(result.success, false, 'success should be false until implemented');
+    } else {
+      assert(result.success === false, 'resume should fail when checkpoint cannot be loaded');
+    }
+  });
 });
 
 describe('Workflow Path Resolution', () => {
