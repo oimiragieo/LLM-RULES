@@ -7,6 +7,7 @@
 
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 
 const { libRequire } = require('./pre-tool-unified.shared.cjs');
@@ -19,8 +20,21 @@ const readSafety = require('./pre-tool-unified.read-safety.cjs');
 const { parseHookInputAsync, getToolName, getToolInput, formatResult } = libRequire(
   path.join('utils', 'hook-input.cjs')
 );
+const { PROJECT_ROOT } = libRequire(path.join('utils', 'project-root.cjs'));
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
+const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
+
+const PRETOOL_CIRCUIT_STATE_FILE =
+  process.env.PRETOOL_CIRCUIT_STATE_FILE ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'pretool-circuit-state.json');
+const PRETOOL_CIRCUIT_BREAKER_THRESHOLD = Number(
+  process.env.PRETOOL_CIRCUIT_BREAKER_THRESHOLD || 10
+);
+const PRETOOL_CIRCUIT_BREAKER_WINDOW_MS = Number(
+  process.env.PRETOOL_CIRCUIT_BREAKER_WINDOW_MS || 10 * 60 * 1000
+);
+const PRETOOL_CIRCUIT_MAX_KEYS = Number(process.env.PRETOOL_CIRCUIT_MAX_KEYS || 200);
 
 async function emitToolBlocked(toolName, reason) {
   try {
@@ -41,6 +55,90 @@ async function emitToolBlocked(toolName, reason) {
   }
 }
 
+function getCircuitSessionId(hookInput) {
+  return (
+    hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || 'unknown'
+  );
+}
+
+function normalizeCircuitCategory(toolName, message) {
+  const msg = String(message || '');
+  if (/windows-incompatible bash heredoc\/tmp/i.test(msg)) return `${toolName}:bash_windows_guard`;
+  if (/router bash guard/i.test(msg)) return `${toolName}:router_bash_guard`;
+  if (/bash redirection\/heredoc/i.test(msg)) return `${toolName}:bash_artifact_write`;
+  if (/tasklist-first violation/i.test(msg)) return `${toolName}:tasklist_first_violation`;
+  return `${toolName}:${msg.slice(0, 120).toLowerCase()}`;
+}
+
+function readCircuitState() {
+  try {
+    if (!fs.existsSync(PRETOOL_CIRCUIT_STATE_FILE)) return { sessions: {} };
+    const raw = fs.readFileSync(PRETOOL_CIRCUIT_STATE_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !parsed.sessions ||
+      typeof parsed.sessions !== 'object'
+    ) {
+      return { sessions: {} };
+    }
+    return parsed;
+  } catch (_err) {
+    return { sessions: {} };
+  }
+}
+
+function writeCircuitState(state) {
+  try {
+    atomicWriteJSONSync(PRETOOL_CIRCUIT_STATE_FILE, state);
+  } catch (_err) {
+    // Best effort only.
+  }
+}
+
+function applyCircuitBreakerMessage(toolName, message, hookInput) {
+  const sessionId = getCircuitSessionId(hookInput);
+  const category = normalizeCircuitCategory(toolName, message);
+  const now = Date.now();
+  const state = readCircuitState();
+  const sessionState = state.sessions[sessionId] || {};
+  const entry = sessionState[category] || { count: 0, lastAt: 0, firstAt: now };
+  const withinWindow = now - Number(entry.lastAt || 0) <= PRETOOL_CIRCUIT_BREAKER_WINDOW_MS;
+  const next = {
+    count: withinWindow ? Number(entry.count || 0) + 1 : 1,
+    firstAt: withinWindow ? Number(entry.firstAt || now) : now,
+    lastAt: now,
+  };
+  sessionState[category] = next;
+
+  // Keep state bounded per session.
+  const keys = Object.keys(sessionState);
+  if (keys.length > PRETOOL_CIRCUIT_MAX_KEYS) {
+    keys
+      .sort((a, b) => Number(sessionState[b].lastAt || 0) - Number(sessionState[a].lastAt || 0))
+      .slice(PRETOOL_CIRCUIT_MAX_KEYS)
+      .forEach(k => delete sessionState[k]);
+  }
+  state.sessions[sessionId] = sessionState;
+  writeCircuitState(state);
+
+  if (next.count < PRETOOL_CIRCUIT_BREAKER_THRESHOLD) return message;
+
+  const repeatedWindowSec = Math.max(1, Math.round((now - Number(next.firstAt || now)) / 1000));
+  const genericPrefix =
+    `[CIRCUIT-BREAKER] Blocked ${next.count}x in ${repeatedWindowSec}s for the same policy violation. ` +
+    'Stop retrying the same command and switch strategy.';
+  if (String(toolName || '').toLowerCase() === 'bash') {
+    return (
+      `${genericPrefix} ` +
+      'For Windows sessions: avoid `/c/...`, heredoc (`<<`), `/tmp`, and shell redirection for artifacts. ' +
+      'Use Read/Grep for discovery and Write/Edit for artifact output with `C:/...` paths.'
+    );
+  }
+  return `${genericPrefix} Last violation: ${message}`;
+}
+
 async function main() {
   try {
     const hookInput = await parseHookInputAsync();
@@ -55,21 +153,24 @@ async function main() {
 
     const limitResult = execution.checkExecutionLimit(hookInput, toolName, toolInput);
     if (limitResult.action === 'block') {
-      console.log(formatResult('block', limitResult.message));
+      const message = applyCircuitBreakerMessage(toolName, limitResult.message, hookInput);
+      console.log(formatResult('block', message));
       await emitToolBlocked(toolName, 'execution_limit_exceeded');
       process.exit(2);
     }
 
     const scopeResult = execution.checkToolScope(hookInput, toolName);
     if (scopeResult.action === 'block') {
-      console.log(formatResult('block', scopeResult.message));
+      const message = applyCircuitBreakerMessage(toolName, scopeResult.message, hookInput);
+      console.log(formatResult('block', message));
       await emitToolBlocked(toolName, 'tool_scope_violation');
       process.exit(2);
     }
 
     const taskUpdateFirst = taskUpdate.checkTaskUpdateFirst(hookInput, toolName, toolInput);
     if (taskUpdateFirst.action === 'block') {
-      console.log(formatResult('block', taskUpdateFirst.message));
+      const message = applyCircuitBreakerMessage(toolName, taskUpdateFirst.message, hookInput);
+      console.log(formatResult('block', message));
       await emitToolBlocked(toolName, 'taskupdate_first_violation');
       process.exit(2);
     }
@@ -77,9 +178,18 @@ async function main() {
       console.warn(`[pre-tool-unified:taskupdate-first] ${taskUpdateFirst.warning}`);
     }
 
-    const bashArtifactWriteResult = guardrails.checkBashArtifactWriteSafety(toolName, toolInput);
+    const bashArtifactWriteResult = guardrails.checkBashArtifactWriteSafety(
+      toolName,
+      toolInput,
+      hookInput
+    );
     if (bashArtifactWriteResult.action === 'block') {
-      console.log(formatResult('block', bashArtifactWriteResult.message));
+      const message = applyCircuitBreakerMessage(
+        toolName,
+        bashArtifactWriteResult.message,
+        hookInput
+      );
+      console.log(formatResult('block', message));
       process.exit(2);
     }
     if (bashArtifactWriteResult.warning) {
@@ -91,7 +201,12 @@ async function main() {
       toolInput
     );
     if (structuredMemoryWriteResult.action === 'block') {
-      console.log(formatResult('block', structuredMemoryWriteResult.message));
+      const message = applyCircuitBreakerMessage(
+        toolName,
+        structuredMemoryWriteResult.message,
+        hookInput
+      );
+      console.log(formatResult('block', message));
       process.exit(2);
     }
     if (structuredMemoryWriteResult.warning) {
@@ -100,7 +215,8 @@ async function main() {
 
     const guardrailResult = guardrails.checkAgentGuardrails(hookInput, toolName, toolInput);
     if (guardrailResult.action === 'block') {
-      console.log(formatResult('block', guardrailResult.message));
+      const message = applyCircuitBreakerMessage(toolName, guardrailResult.message, hookInput);
+      console.log(formatResult('block', message));
       process.exit(2);
     }
     if (guardrailResult.action === 'rewrite' && guardrailResult.rewrittenCommand) {
@@ -118,7 +234,8 @@ async function main() {
 
     const readSafetyResult = readSafety.checkReadSafety(toolName, toolInput, hookInput);
     if (readSafetyResult.action === 'block') {
-      console.log(formatResult('block', readSafetyResult.message));
+      const message = applyCircuitBreakerMessage(toolName, readSafetyResult.message, hookInput);
+      console.log(formatResult('block', message));
       await emitToolBlocked(toolName, 'read_safety_violation');
       process.exit(2);
     }
@@ -185,6 +302,9 @@ module.exports = {
   checkBashArtifactWriteSafety: guardrails.checkBashArtifactWriteSafety,
   checkStructuredMemoryDirectWrite: guardrails.checkStructuredMemoryDirectWrite,
   checkAgentGuardrails: guardrails.checkAgentGuardrails,
+  applyCircuitBreakerMessage,
+  normalizeCircuitCategory,
+  getCircuitSessionId,
   extractTaskOutputPathsFromCommand: guardrails.extractTaskOutputPathsFromCommand,
   isTaskOutputPollingCommand: guardrails.isTaskOutputPollingCommand,
   hasTerminalTestSummary: guardrails.hasTerminalTestSummary,

@@ -1,4 +1,3 @@
- 
 /**
  * Tests for sync-memory-index.cjs
  * Bug 2: DB never closed after syncJsonMemory use
@@ -77,10 +76,7 @@ test('syncJsonMemory closes DB handle after successful sync', () => {
   );
 
   // Clear module cache to get fresh require
-  const syncPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/memory/sync-memory-index.cjs'
-  );
+  const syncPath = path.join(PROJECT_ROOT, '.claude/hooks/memory/sync-memory-index.cjs');
   delete require.cache[syncPath];
 
   const { syncJsonMemory } = require(syncPath);
@@ -126,10 +122,7 @@ test('syncJsonMemory closes DB when file contains empty array', () => {
   const patternsPath = path.join(tmpDir, 'patterns.json');
   fs.writeFileSync(patternsPath, JSON.stringify([]));
 
-  const syncPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/memory/sync-memory-index.cjs'
-  );
+  const syncPath = path.join(PROJECT_ROOT, '.claude/hooks/memory/sync-memory-index.cjs');
   delete require.cache[syncPath];
 
   const { syncJsonMemory } = require(syncPath);
@@ -169,10 +162,7 @@ test('syncJsonMemory classifies gotchas.json entries as type gotcha', () => {
     ])
   );
 
-  const syncPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/memory/sync-memory-index.cjs'
-  );
+  const syncPath = path.join(PROJECT_ROOT, '.claude/hooks/memory/sync-memory-index.cjs');
   delete require.cache[syncPath];
 
   const { syncJsonMemory } = require(syncPath);
@@ -208,10 +198,7 @@ test('syncJsonMemory classifies patterns.json entries as type pattern', () => {
     JSON.stringify([{ text: 'Use try/finally pattern', area: 'resource-management' }])
   );
 
-  const syncPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/memory/sync-memory-index.cjs'
-  );
+  const syncPath = path.join(PROJECT_ROOT, '.claude/hooks/memory/sync-memory-index.cjs');
   delete require.cache[syncPath];
 
   const { syncJsonMemory } = require(syncPath);
@@ -244,10 +231,7 @@ test('syncJsonMemory does NOT classify gotchas as issue', () => {
     JSON.stringify([{ text: 'This should not be classified as issue' }])
   );
 
-  const syncPath = path.join(
-    PROJECT_ROOT,
-    '.claude/hooks/memory/sync-memory-index.cjs'
-  );
+  const syncPath = path.join(PROJECT_ROOT, '.claude/hooks/memory/sync-memory-index.cjs');
   delete require.cache[syncPath];
 
   const { syncJsonMemory } = require(syncPath);

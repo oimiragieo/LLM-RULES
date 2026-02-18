@@ -113,7 +113,6 @@ test('deduplicateCandidate: LLM output with __proto__ key does not expose it as 
   // by JSON.parse gives an object where __proto__ is an OWN property.
   // safeParseJSON strips it so the result has no own __proto__ key.
 
-
   // We need to test the parse path. We can't directly intercept JSON.parse inside
   // the module, so instead we test the safeParseJSON function directly — since
   // that is what deduplicateCandidate MUST use after the fix.
@@ -142,11 +141,7 @@ test('deduplicateCandidate: LLM output with __proto__ key does not expose it as 
   );
 
   // And Object.prototype must remain clean
-  assert.equal(
-    ({}).x,
-    undefined,
-    'Object.prototype must not be polluted'
-  );
+  assert.equal({}.x, undefined, 'Object.prototype must not be polluted');
 });
 
 // Integration test: deduplicateCandidate uses safeParseJSON (not raw JSON.parse)
@@ -174,7 +169,7 @@ test('deduplicateCandidate returns valid decision even when LLM output contains 
 
   // Object.prototype.x must remain undefined — not polluted
   assert.equal(
-    ({}).x,
+    {}.x,
     undefined,
     'Object.prototype must not be polluted by __proto__ key in LLM output'
   );

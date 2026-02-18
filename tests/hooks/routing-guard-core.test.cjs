@@ -65,12 +65,9 @@ test('Bug 1: checkTaskCreate does NOT downgrade block→warn on retry', async t 
   );
 
   // Clear module cache so env vars take effect
-  const sharedPath = require.resolve(
-    '../../.claude/hooks/routing/routing-guard-core.shared.cjs'
-  );
-  const checksTaskPath = require.resolve(
-    '../../.claude/hooks/routing/routing-guard-core.checks-task.cjs'
-  );
+  const sharedPath = require.resolve('../../.claude/hooks/routing/routing-guard-core.shared.cjs');
+  const checksTaskPath =
+    require.resolve('../../.claude/hooks/routing/routing-guard-core.checks-task.cjs');
   const routerStatePath = require.resolve('../../.claude/lib/routing/router-state.cjs');
 
   delete require.cache[sharedPath];
@@ -84,7 +81,9 @@ test('Bug 1: checkTaskCreate does NOT downgrade block→warn on retry', async t 
   const shared = require('../../.claude/hooks/routing/routing-guard-core.shared.cjs');
   shared.resetBlockDedupeState();
 
-  const { checkTaskCreate } = require('../../.claude/hooks/routing/routing-guard-core.checks-task.cjs');
+  const {
+    checkTaskCreate,
+  } = require('../../.claude/hooks/routing/routing-guard-core.checks-task.cjs');
 
   const hookInput = { session_id: 'test-session-bug1' };
 
@@ -136,9 +135,7 @@ test('Bug 2: setBlockDedupeState uses atomic write (atomicWriteJSONSync)', async
     else process.env.CLAUDE_SESSION_ID = savedSessionId;
   });
 
-  const sharedPath = require.resolve(
-    '../../.claude/hooks/routing/routing-guard-core.shared.cjs'
-  );
+  const sharedPath = require.resolve('../../.claude/hooks/routing/routing-guard-core.shared.cjs');
   delete require.cache[sharedPath];
 
   const shared = require('../../.claude/hooks/routing/routing-guard-core.shared.cjs');
@@ -207,10 +204,7 @@ test('Bug 2 integration: shared.cjs uses atomicWriteJSONSync not fs.writeFileSyn
   // Read the source of routing-guard-core.shared.cjs and verify it imports and uses
   // atomicWriteJSONSync rather than bare fs.writeFileSync for the dedupe state.
   const sharedSource = fs.readFileSync(
-    path.join(
-      __dirname,
-      '../../.claude/hooks/routing/routing-guard-core.shared.cjs'
-    ),
+    path.join(__dirname, '../../.claude/hooks/routing/routing-guard-core.shared.cjs'),
     'utf8'
   );
 

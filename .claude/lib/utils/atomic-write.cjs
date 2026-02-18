@@ -121,7 +121,11 @@ function atomicWriteSync(filePath, content, options = {}) {
       try {
         fs.renameSync(tempFile, filePath);
       } catch (renameErr) {
-        if (renameErr.code === 'EBUSY' || renameErr.code === 'EPERM' || renameErr.code === 'EEXIST') {
+        if (
+          renameErr.code === 'EBUSY' ||
+          renameErr.code === 'EPERM' ||
+          renameErr.code === 'EEXIST'
+        ) {
           // Rename failed because dest is locked or exists and can't be replaced.
           // Fall back to unlink+rename, retrying unlinkSync up to 3 times.
           if (fs.existsSync(filePath)) {

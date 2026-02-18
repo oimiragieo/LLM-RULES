@@ -13,7 +13,13 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'safety', 'unified-pre-write-hook.cjs');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'safety',
+  'unified-pre-write-hook.cjs'
+);
 
 // ── Test framework ──────────────────────────────────────────────────────────
 let passed = 0;
@@ -35,13 +41,17 @@ function test(name, fn) {
 
 function assertEqual(actual, expected, message) {
   if (actual !== expected) {
-    throw new Error(`${message || 'Assertion failed'}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    throw new Error(
+      `${message || 'Assertion failed'}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`
+    );
   }
 }
 
 function assertNotEqual(actual, notExpected, message) {
   if (actual === notExpected) {
-    throw new Error(`${message || 'Assertion failed'}: expected value to NOT be ${JSON.stringify(notExpected)}`);
+    throw new Error(
+      `${message || 'Assertion failed'}: expected value to NOT be ${JSON.stringify(notExpected)}`
+    );
   }
 }
 
@@ -50,16 +60,12 @@ function assertNotEqual(actual, notExpected, message) {
  */
 function runHook(inputObj, env = {}) {
   const inputJson = JSON.stringify(inputObj);
-  const result = spawnSync(
-    process.execPath,
-    [HOOK_PATH],
-    {
-      input: inputJson,
-      encoding: 'utf8',
-      env: { ...process.env, ...env },
-      timeout: 5000,
-    }
-  );
+  const result = spawnSync(process.execPath, [HOOK_PATH], {
+    input: inputJson,
+    encoding: 'utf8',
+    env: { ...process.env, ...env },
+    timeout: 5000,
+  });
   return {
     exitCode: result.status,
     stdout: result.stdout || '',
@@ -100,24 +106,30 @@ function makeWriteInput(filePath, content = 'test content') {
 console.log('\n=== Bug 2: Creator Guard Regex — Agent Subdirectories ===\n');
 
 test('creator guard blocks write to .claude/agents/core/*.md', () => {
-  const result = runHook(
-    makeWriteInput('.claude/agents/core/test-agent.md', '# Test Agent'),
-    { CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
-  );
+  const result = runHook(makeWriteInput('.claude/agents/core/test-agent.md', '# Test Agent'), {
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: '',
+  });
   // Should be blocked (exit code 2) since not in creator workflow
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `Writing to .claude/agents/core/test-agent.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`);
+  assertEqual(
+    decision,
+    'deny',
+    `Writing to .claude/agents/core/test-agent.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`
+  );
 });
 
 test('creator guard blocks write to .claude/agents/domain/*.md', () => {
-  const result = runHook(
-    makeWriteInput('.claude/agents/domain/analyst.md', '# Domain Agent'),
-    { CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
-  );
+  const result = runHook(makeWriteInput('.claude/agents/domain/analyst.md', '# Domain Agent'), {
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: '',
+  });
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `Writing to .claude/agents/domain/analyst.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`);
+  assertEqual(
+    decision,
+    'deny',
+    `Writing to .claude/agents/domain/analyst.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`
+  );
 });
 
 test('creator guard blocks write to .claude/agents/specialized/python-pro.md', () => {
@@ -126,8 +138,11 @@ test('creator guard blocks write to .claude/agents/specialized/python-pro.md', (
     { CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
   );
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `Writing to .claude/agents/specialized/python-pro.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`);
+  assertEqual(
+    decision,
+    'deny',
+    `Writing to .claude/agents/specialized/python-pro.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`
+  );
 });
 
 test('creator guard blocks write to .claude/agents/orchestrators/master-orchestrator.md', () => {
@@ -136,54 +151,57 @@ test('creator guard blocks write to .claude/agents/orchestrators/master-orchestr
     { CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
   );
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `Writing to .claude/agents/orchestrators/master-orchestrator.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`);
+  assertEqual(
+    decision,
+    'deny',
+    `Writing to .claude/agents/orchestrators/master-orchestrator.md should be denied (got ${JSON.stringify(result.stdout)}, exit: ${result.exitCode})`
+  );
 });
 
 test('creator guard allows write to .claude/agents/ subdirectory when in creator workflow', () => {
-  const result = runHook(
-    makeWriteInput('.claude/agents/core/test-agent.md', '# Test Agent'),
-    { CREATOR_GUARD: 'block', CREATOR_WORKFLOW: 'active' }
-  );
+  const result = runHook(makeWriteInput('.claude/agents/core/test-agent.md', '# Test Agent'), {
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: 'active',
+  });
   // When CREATOR_WORKFLOW is active, it should NOT be denied by creator guard
   // (It may still be blocked by other checks, but not by creator guard specifically)
   // For this test, we set all other guards to 'off'
-  const result2 = runHook(
-    makeWriteInput('.claude/agents/core/test-agent.md', '# Test Agent'),
-    {
-      CREATOR_GUARD: 'block',
-      CREATOR_WORKFLOW: 'active',
-      FILE_PLACEMENT_GUARD: 'off',
-      ROUTER_WRITE_GUARD: 'off',
-      TDD_CHECK: 'off',
-      PLAN_EVOLUTION_GUARD: 'off',
-      PROJECT_ROOT_WRITE_GUARD: 'off',
-      WRITE_CONTENT_SCANNER: 'off',
-    }
-  );
+  const result2 = runHook(makeWriteInput('.claude/agents/core/test-agent.md', '# Test Agent'), {
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: 'active',
+    FILE_PLACEMENT_GUARD: 'off',
+    ROUTER_WRITE_GUARD: 'off',
+    TDD_CHECK: 'off',
+    PLAN_EVOLUTION_GUARD: 'off',
+    PROJECT_ROOT_WRITE_GUARD: 'off',
+    WRITE_CONTENT_SCANNER: 'off',
+  });
   // In creator workflow context, creator guard should not block
   const decision = parseDecision(result2.stdout);
-  assertNotEqual(decision, 'deny',
-    'Write to agent subdirectory should not be denied when CREATOR_WORKFLOW=active');
+  assertNotEqual(
+    decision,
+    'deny',
+    'Write to agent subdirectory should not be denied when CREATOR_WORKFLOW=active'
+  );
 });
 
 test('creator guard does NOT block write to .claude/lib/utils/foo.cjs', () => {
-  const result = runHook(
-    makeWriteInput('.claude/lib/utils/foo.cjs', '// util code'),
-    {
-      CREATOR_GUARD: 'block',
-      FILE_PLACEMENT_GUARD: 'off',
-      ROUTER_WRITE_GUARD: 'off',
-      TDD_CHECK: 'off',
-      PLAN_EVOLUTION_GUARD: 'off',
-      PROJECT_ROOT_WRITE_GUARD: 'off',
-      WRITE_CONTENT_SCANNER: 'off',
-    }
-  );
+  const result = runHook(makeWriteInput('.claude/lib/utils/foo.cjs', '// util code'), {
+    CREATOR_GUARD: 'block',
+    FILE_PLACEMENT_GUARD: 'off',
+    ROUTER_WRITE_GUARD: 'off',
+    TDD_CHECK: 'off',
+    PLAN_EVOLUTION_GUARD: 'off',
+    PROJECT_ROOT_WRITE_GUARD: 'off',
+    WRITE_CONTENT_SCANNER: 'off',
+  });
   // .claude/lib paths should not be blocked by creator guard (only agents/skills/workflows)
   const decision = parseDecision(result.stdout);
-  assertNotEqual(decision, 'deny',
-    `.claude/lib/utils/foo.cjs should NOT be denied by creator guard (got ${JSON.stringify(result.stdout)})`);
+  assertNotEqual(
+    decision,
+    'deny',
+    `.claude/lib/utils/foo.cjs should NOT be denied by creator guard (got ${JSON.stringify(result.stdout)})`
+  );
 });
 
 // ── Bug 1 Tests (HOOK_FAIL_OPEN security bypass) ────────────────────────────
@@ -194,70 +212,82 @@ test('creator guard does NOT block write to .claude/lib/utils/foo.cjs', () => {
 console.log('\n=== Bug 1: HOOK_FAIL_OPEN Security Bypass ===\n');
 
 test('HOOK_FAIL_OPEN=false blocks agent paths on normal input', () => {
-  const result = runHook(
-    makeWriteInput('.claude/agents/core/test-agent.md', '# Agent'),
-    { HOOK_FAIL_OPEN: 'false', CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
-  );
+  const result = runHook(makeWriteInput('.claude/agents/core/test-agent.md', '# Agent'), {
+    HOOK_FAIL_OPEN: 'false',
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: '',
+  });
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `With HOOK_FAIL_OPEN=false, agent path write must be denied`);
+  assertEqual(decision, 'deny', `With HOOK_FAIL_OPEN=false, agent path write must be denied`);
 });
 
 test('HOOK_FAIL_OPEN=true still blocks security-critical paths (agents)', () => {
   // Even with HOOK_FAIL_OPEN=true, writing to .claude/agents/** should be blocked
   // We test with valid input first - the FAIL_OPEN shouldn't change the outcome for
   // normally-blocked paths (it only affects error recovery, not normal check failures)
-  const result = runHook(
-    makeWriteInput('.claude/agents/core/test-agent.md', '# Agent'),
-    { HOOK_FAIL_OPEN: 'true', CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
-  );
+  const result = runHook(makeWriteInput('.claude/agents/core/test-agent.md', '# Agent'), {
+    HOOK_FAIL_OPEN: 'true',
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: '',
+  });
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `With HOOK_FAIL_OPEN=true, writing to .claude/agents/core/ must still be denied (got ${JSON.stringify(result.stdout)})`);
+  assertEqual(
+    decision,
+    'deny',
+    `With HOOK_FAIL_OPEN=true, writing to .claude/agents/core/ must still be denied (got ${JSON.stringify(result.stdout)})`
+  );
 });
 
 test('HOOK_FAIL_OPEN=true still blocks security-critical paths (.claude/hooks/)', () => {
   // Writing to .claude/hooks/ should always be blocked
-  const result = runHook(
-    makeWriteInput('.claude/hooks/safety/test.cjs', '// hook'),
-    { HOOK_FAIL_OPEN: 'true', CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
-  );
+  const result = runHook(makeWriteInput('.claude/hooks/safety/test.cjs', '// hook'), {
+    HOOK_FAIL_OPEN: 'true',
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: '',
+  });
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `With HOOK_FAIL_OPEN=true, writing to .claude/hooks/** must still be denied`);
+  assertEqual(
+    decision,
+    'deny',
+    `With HOOK_FAIL_OPEN=true, writing to .claude/hooks/** must still be denied`
+  );
 });
 
 test('HOOK_FAIL_OPEN=true still blocks security-critical paths (.claude/agents/ root)', () => {
-  const result = runHook(
-    makeWriteInput('.claude/agents/router.md', '# Router'),
-    { HOOK_FAIL_OPEN: 'true', CREATOR_GUARD: 'block', CREATOR_WORKFLOW: '' }
-  );
+  const result = runHook(makeWriteInput('.claude/agents/router.md', '# Router'), {
+    HOOK_FAIL_OPEN: 'true',
+    CREATOR_GUARD: 'block',
+    CREATOR_WORKFLOW: '',
+  });
   const decision = parseDecision(result.stdout);
-  assertEqual(decision, 'deny',
-    `With HOOK_FAIL_OPEN=true, writing to .claude/agents/router.md must still be denied`);
+  assertEqual(
+    decision,
+    'deny',
+    `With HOOK_FAIL_OPEN=true, writing to .claude/agents/router.md must still be denied`
+  );
 });
 
 test('HOOK_FAIL_OPEN=true allows non-security paths on normal input', () => {
   // Non-security paths with valid input and guards off should be allowed
-  const result = runHook(
-    makeWriteInput('src/utils/helper.js', '// helper'),
-    {
-      HOOK_FAIL_OPEN: 'true',
-      FILE_PLACEMENT_GUARD: 'off',
-      ROUTER_WRITE_GUARD: 'off',
-      TDD_CHECK: 'off',
-      PLAN_EVOLUTION_GUARD: 'off',
-      PROJECT_ROOT_WRITE_GUARD: 'off',
-      WRITE_CONTENT_SCANNER: 'off',
-      CREATOR_GUARD: 'off',
-    }
-  );
+  const result = runHook(makeWriteInput('src/utils/helper.js', '// helper'), {
+    HOOK_FAIL_OPEN: 'true',
+    FILE_PLACEMENT_GUARD: 'off',
+    ROUTER_WRITE_GUARD: 'off',
+    TDD_CHECK: 'off',
+    PLAN_EVOLUTION_GUARD: 'off',
+    PROJECT_ROOT_WRITE_GUARD: 'off',
+    WRITE_CONTENT_SCANNER: 'off',
+    CREATOR_GUARD: 'off',
+  });
   // With all guards off, a normal path should be allowed
   const decision = parseDecision(result.stdout);
   // Exit 0 means allow; we also accept if decision is 'allow' or null (passed through)
   const isAllowed = result.exitCode === 0 && decision !== 'deny';
-  assertEqual(isAllowed, true,
-    `Non-security path with all guards off and HOOK_FAIL_OPEN=true should be allowed (exit: ${result.exitCode}, decision: ${decision})`);
+  assertEqual(
+    isAllowed,
+    true,
+    `Non-security path with all guards off and HOOK_FAIL_OPEN=true should be allowed (exit: ${result.exitCode}, decision: ${decision})`
+  );
 });
 
 // ── Unit tests for CHECKS array (Bug 2 specifically) ───────────────────────
@@ -288,7 +318,9 @@ if (CHECKS) {
       process.env.CREATOR_GUARD = 'block';
 
       try {
-        const result = await creatorGuardCheck.run('Write', { file_path: '.claude/agents/core/foo.md' });
+        const result = await creatorGuardCheck.run('Write', {
+          file_path: '.claude/agents/core/foo.md',
+        });
         assertEqual(result.pass, false, 'Should block agent subdirectory write (core/)');
       } finally {
         process.env.CREATOR_WORKFLOW = origWorkflow;
@@ -304,7 +336,9 @@ if (CHECKS) {
       process.env.CREATOR_GUARD = 'block';
 
       try {
-        const result = await creatorGuardCheck.run('Write', { file_path: '.claude/agents/domain/analyst.md' });
+        const result = await creatorGuardCheck.run('Write', {
+          file_path: '.claude/agents/domain/analyst.md',
+        });
         assertEqual(result.pass, false, 'Should block agent subdirectory write (domain/)');
       } finally {
         process.env.CREATOR_WORKFLOW = origWorkflow;
@@ -320,7 +354,9 @@ if (CHECKS) {
       process.env.CREATOR_GUARD = 'block';
 
       try {
-        const result = await creatorGuardCheck.run('Write', { file_path: '.claude/agents/orchestrators/master.md' });
+        const result = await creatorGuardCheck.run('Write', {
+          file_path: '.claude/agents/orchestrators/master.md',
+        });
         assertEqual(result.pass, false, 'Should block agent subdirectory write (orchestrators/)');
       } finally {
         process.env.CREATOR_WORKFLOW = origWorkflow;
@@ -336,8 +372,14 @@ if (CHECKS) {
       process.env.CREATOR_GUARD = 'block';
 
       try {
-        const result = await creatorGuardCheck.run('Write', { file_path: '.claude/agents/core/foo.md' });
-        assertEqual(result.pass, true, 'Should allow agent subdirectory write when in creator workflow');
+        const result = await creatorGuardCheck.run('Write', {
+          file_path: '.claude/agents/core/foo.md',
+        });
+        assertEqual(
+          result.pass,
+          true,
+          'Should allow agent subdirectory write when in creator workflow'
+        );
       } finally {
         process.env.CREATOR_WORKFLOW = origWorkflow;
         if (origGuard !== undefined) process.env.CREATOR_GUARD = origGuard;
@@ -352,7 +394,9 @@ if (CHECKS) {
       process.env.CREATOR_GUARD = 'block';
 
       try {
-        const result = await creatorGuardCheck.run('Write', { file_path: '.claude/lib/utils/foo.cjs' });
+        const result = await creatorGuardCheck.run('Write', {
+          file_path: '.claude/lib/utils/foo.cjs',
+        });
         assertEqual(result.pass, true, 'Should NOT block non-creator paths like .claude/lib/');
       } finally {
         process.env.CREATOR_WORKFLOW = origWorkflow;
@@ -368,7 +412,9 @@ if (CHECKS) {
       process.env.CREATOR_GUARD = 'block';
 
       try {
-        const result = await creatorGuardCheck.run('Write', { file_path: '.claude/agents/router.md' });
+        const result = await creatorGuardCheck.run('Write', {
+          file_path: '.claude/agents/router.md',
+        });
         // The original regex /\.claude\/agents\/[^/]+\.md$/ matches files directly in agents/
         // The fixed regex should also still match these
         assertEqual(result.pass, false, 'Should still block direct .claude/agents/foo.md writes');

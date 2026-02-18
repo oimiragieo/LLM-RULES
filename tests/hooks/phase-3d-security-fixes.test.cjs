@@ -1,4 +1,3 @@
- 
 'use strict';
 
 /**
@@ -60,13 +59,11 @@ test('Bug 1: sanitizeTaskPrompt blocks unicode lookalike injection - mixed case 
   const result = sanitizeTaskPrompt(unicodeBypass);
   // After NFKC normalization, Cyrillic і → i, so "ignore" pattern should match
   // Note: current implementation doesn't normalize, so this SHOULD FAIL until fix applied
-  assert.ok(
-    typeof result === 'string',
-    'sanitizeTaskPrompt should return a string'
-  );
+  assert.ok(typeof result === 'string', 'sanitizeTaskPrompt should return a string');
   // With fix (NFKC normalization), this should be blocked
   assert.ok(
-    result.includes('[BLOCKED: Injection Pattern]') || !result.toLowerCase().includes('ignore previous'),
+    result.includes('[BLOCKED: Injection Pattern]') ||
+      !result.toLowerCase().includes('ignore previous'),
     `Unicode bypass should be caught or content stripped. Got: ${result}`
   );
 });
@@ -104,7 +101,9 @@ test('Bug 2: readTaskOutputContract handles prototype pollution via __proto__', 
   // We can test this by importing the module and checking behavior indirectly
   // by looking at what safeParseJSON provides vs raw JSON.parse
 
-  const { safeParseJSON } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'safe-json.cjs'));
+  const { safeParseJSON } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'safe-json.cjs')
+  );
 
   // Prototype pollution payload
   const maliciousJSON = JSON.stringify({
@@ -118,7 +117,7 @@ test('Bug 2: readTaskOutputContract handles prototype pollution via __proto__', 
 
   const result = safeParseJSON(maliciousJSON, null);
   // The result should NOT have isAdmin on Object.prototype
-  assert.equal(({}).isAdmin, undefined, 'Prototype pollution should be prevented by safeParseJSON');
+  assert.equal({}.isAdmin, undefined, 'Prototype pollution should be prevented by safeParseJSON');
   assert.ok(result, 'safeParseJSON should return a result');
 });
 
@@ -132,16 +131,14 @@ test('Bug 2: post-task-unified readTaskOutputContract uses safeParseJSON not raw
   // Find the readTaskOutputContract function
   const fnStart = hookSource.indexOf('function readTaskOutputContract');
   const fnEnd = hookSource.indexOf('\nfunction ', fnStart + 1);
-  const fnBody = fnEnd > fnStart ? hookSource.slice(fnStart, fnEnd) : hookSource.slice(fnStart, fnStart + 500);
+  const fnBody =
+    fnEnd > fnStart ? hookSource.slice(fnStart, fnEnd) : hookSource.slice(fnStart, fnStart + 500);
 
   assert.ok(
     !fnBody.includes('JSON.parse(raw)'),
     'readTaskOutputContract should NOT use raw JSON.parse(raw)'
   );
-  assert.ok(
-    fnBody.includes('safeParseJSON'),
-    'readTaskOutputContract should use safeParseJSON'
-  );
+  assert.ok(fnBody.includes('safeParseJSON'), 'readTaskOutputContract should use safeParseJSON');
 });
 
 test('Bug 2: post-task-unified handles malformed JSON in task output contract file', () => {
@@ -159,7 +156,9 @@ test('Bug 2: post-task-unified handles malformed JSON in task output contract fi
     // const _modulePath = path.join(PROJECT_ROOT, '.claude', 'hooks', 'routing', 'post-task-unified.cjs');
     // We can't easily re-require with different env, so test through the exported function logic
     // Instead verify safeParseJSON handles this gracefully
-    const { safeParseJSON } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'safe-json.cjs'));
+    const { safeParseJSON } = require(
+      path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'safe-json.cjs')
+    );
     const raw = fs.readFileSync(tmpContractsPath, 'utf8');
     const result = safeParseJSON(raw, null);
     // Should not throw, should return something (empty object or null)
@@ -188,20 +187,22 @@ test('Bug 3: incrementTaskOutputMetric uses safeParseJSON not raw JSON.parse', (
   // Find the incrementTaskOutputMetric function
   const fnStart = runtimeSource.indexOf('function incrementTaskOutputMetric');
   const fnEnd = runtimeSource.indexOf('\nfunction ', fnStart + 1);
-  const fnBody = fnEnd > fnStart ? runtimeSource.slice(fnStart, fnEnd) : runtimeSource.slice(fnStart, fnStart + 600);
+  const fnBody =
+    fnEnd > fnStart
+      ? runtimeSource.slice(fnStart, fnEnd)
+      : runtimeSource.slice(fnStart, fnStart + 600);
 
   assert.ok(
     !fnBody.includes('JSON.parse(fs.readFileSync'),
     'incrementTaskOutputMetric should NOT use raw JSON.parse(fs.readFileSync(...))'
   );
-  assert.ok(
-    fnBody.includes('safeParseJSON'),
-    'incrementTaskOutputMetric should use safeParseJSON'
-  );
+  assert.ok(fnBody.includes('safeParseJSON'), 'incrementTaskOutputMetric should use safeParseJSON');
 });
 
 test('Bug 3: incrementTaskOutputMetric handles prototype pollution in metrics file', () => {
-  const { safeParseJSON } = require(path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'safe-json.cjs'));
+  const { safeParseJSON } = require(
+    path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'safe-json.cjs')
+  );
 
   // Simulate what a poisoned metrics file might contain
   const poisonedMetrics = JSON.stringify({
@@ -213,7 +214,7 @@ test('Bug 3: incrementTaskOutputMetric handles prototype pollution in metrics fi
   });
 
   const parsed = safeParseJSON(poisonedMetrics, null);
-  assert.equal(({}).isAdmin, undefined, 'Prototype should not be polluted via metrics file');
+  assert.equal({}.isAdmin, undefined, 'Prototype should not be polluted via metrics file');
   assert.ok(parsed, 'Should parse successfully');
 });
 

@@ -623,11 +623,15 @@ if (require.main === module) {
           for (let i = 2; i <= 3; i++) {
             fs.writeFileSync(
               path.join(mtmDir, `session_00${i}.json`),
-              JSON.stringify({
-                session_id: `solo-session-00${i}`,
-                timestamp: new Date().toISOString(),
-                summary: `Session ${i}`,
-              }, null, 2)
+              JSON.stringify(
+                {
+                  session_id: `solo-session-00${i}`,
+                  timestamp: new Date().toISOString(),
+                  summary: `Session ${i}`,
+                },
+                null,
+                2
+              )
             );
           }
 
@@ -640,7 +644,11 @@ if (require.main === module) {
             threw = true;
           }
           assert(!threw, 'Should not throw when sessions.length < SUMMARY_MIN_SESSIONS');
-          assert.strictEqual(result.summarized, 0, 'Should return summarized:0 for insufficient batch');
+          assert.strictEqual(
+            result.summarized,
+            0,
+            'Should return summarized:0 for insufficient batch'
+          );
         } finally {
           cleanupTestDir();
         }
@@ -685,9 +693,17 @@ if (require.main === module) {
           );
 
           const sessions = [
-            { session_id: 'ts-001', timestamp: '2026-01-15T10:00:00.000Z', summary: 'Has timestamp' },
+            {
+              session_id: 'ts-001',
+              timestamp: '2026-01-15T10:00:00.000Z',
+              summary: 'Has timestamp',
+            },
             { session_id: 'no-ts-002', summary: 'No timestamp' },
-            { session_id: 'ts-003', timestamp: '2026-01-20T12:00:00.000Z', summary: 'Has timestamp' },
+            {
+              session_id: 'ts-003',
+              timestamp: '2026-01-20T12:00:00.000Z',
+              summary: 'Has timestamp',
+            },
           ];
 
           let threw = false;
@@ -730,10 +746,7 @@ if (require.main === module) {
             path.join(ltmDir, 'metadata.json'),
             JSON.stringify({ created: '2026-01-01' })
           );
-          fs.writeFileSync(
-            path.join(ltmDir, 'index.json'),
-            JSON.stringify({ count: 25 })
-          );
+          fs.writeFileSync(path.join(ltmDir, 'index.json'), JSON.stringify({ count: 25 }));
           fs.writeFileSync(
             path.join(ltmDir, 'promoted_session_abc.json'),
             JSON.stringify({ tier: 'LTM', promoted_at: '2026-01-01T00:00:00.000Z' })
@@ -780,7 +793,10 @@ if (require.main === module) {
             );
           }
           fs.writeFileSync(path.join(ltmDir, 'extra.json'), JSON.stringify({ extra: true }));
-          fs.writeFileSync(path.join(ltmDir, 'promoted_x.json'), JSON.stringify({ promoted: true }));
+          fs.writeFileSync(
+            path.join(ltmDir, 'promoted_x.json'),
+            JSON.stringify({ promoted: true })
+          );
 
           const result = evictOldLTMSummaries(TEST_PROJECT_ROOT);
 

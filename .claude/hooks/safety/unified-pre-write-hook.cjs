@@ -546,7 +546,9 @@ async function main() {
       const targetPath = targetFilePath;
       const isSecurityCritical = SECURITY_CRITICAL_PATTERNS.some(p => p.test(targetPath));
       if (isSecurityCritical) {
-        process.stdout.write(JSON.stringify({ allowed: false, reason: 'Security-critical path: fail-open disabled' }));
+        process.stdout.write(
+          JSON.stringify({ allowed: false, reason: 'Security-critical path: fail-open disabled' })
+        );
         process.exit(2);
       }
       auditLog('unified-pre-write-hook', 'fail_open_override', { error: err.message });

@@ -39,10 +39,7 @@ test('retryWithBackoff throws RangeError with descriptive message when maxRetrie
     () => retryWithBackoff(() => Promise.reject(new Error('fail')), { maxRetries: -1 }),
     err => {
       assert.ok(err instanceof RangeError, `Expected RangeError but got ${err?.constructor?.name}`);
-      assert.ok(
-        err.message.includes('-1'),
-        `Expected message to include -1, got: ${err.message}`
-      );
+      assert.ok(err.message.includes('-1'), `Expected message to include -1, got: ${err.message}`);
       return true;
     }
   );

@@ -53,11 +53,10 @@ function validatePathSafety(filePath) {
 
   // Check for path traversal patterns
   const dangerousPatterns = [
-    /\.\.\//, // Unix path traversal
-    /\.\.\\/, // Windows path traversal
+    /(^|[\\/])\.\.([\\/]|$)/, // Path traversal: bare ".." segment
     /^~\//, // Home directory reference
-    /^\/(?!\.)/, // Absolute Unix path (allow ./ prefix)
-    /^[A-Z]:\\/i, // Absolute Windows path
+    /^\//, // Absolute Unix path
+    /^[A-Za-z]:[\\/]/, // Absolute Windows path
     /\$\{.*\}/, // Template injection
     /%[0-9a-f]{2}/i, // URL encoding in path
     /\0/, // Null byte injection

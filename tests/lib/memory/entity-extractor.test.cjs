@@ -1,4 +1,3 @@
- 
 /**
  * Tests for entity-extractor.cjs
  * Bug 1: DB handle leaked on constructor failure
@@ -52,10 +51,7 @@ test('EntityExtractor constructor closes DB handle when initialization fails', (
 
   let _initCallCount = 0;
   Module._load = function (request, _parent, _isMain) {
-    if (
-      request.includes('init-memory-db') ||
-      request.endsWith('init-memory-db.cjs')
-    ) {
+    if (request.includes('init-memory-db') || request.endsWith('init-memory-db.cjs')) {
       _initCallCount++;
       return {
         initializeDatabase: () => {
@@ -69,10 +65,7 @@ test('EntityExtractor constructor closes DB handle when initialization fails', (
   let caughtError = null;
   try {
     // Clear module cache so fresh require picks up patched Module._load
-    const extractorPath = path.join(
-      PROJECT_ROOT,
-      '.claude/lib/memory/entity-extractor.cjs'
-    );
+    const extractorPath = path.join(PROJECT_ROOT, '.claude/lib/memory/entity-extractor.cjs');
     delete require.cache[extractorPath];
 
     const { EntityExtractor } = require(extractorPath);
@@ -85,10 +78,7 @@ test('EntityExtractor constructor closes DB handle when initialization fails', (
   }
 
   // Constructor MUST have thrown (the init was forced to fail)
-  assert.ok(
-    caughtError !== null,
-    'Constructor should throw when initialization fails'
-  );
+  assert.ok(caughtError !== null, 'Constructor should throw when initialization fails');
   assert.ok(
     caughtError.message.includes('Simulated init failure'),
     `Expected simulated init failure, got: ${caughtError.message}`

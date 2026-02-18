@@ -7,10 +7,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
-const {
-  safeParseJSON,
-  stripDangerousKeys,
-} = require('../../../.claude/lib/utils/safe-json.cjs');
+const { safeParseJSON, stripDangerousKeys } = require('../../../.claude/lib/utils/safe-json.cjs');
 
 // ========================================
 // Cycle 1: Valid JSON handling
@@ -157,8 +154,7 @@ test('BUG2: stripDangerousKeys does not mutate the original input object', () =>
   );
   // Specifically, __proto__ as an own property should still be present on input
   assert.ok(
-    Object.prototype.hasOwnProperty.call(input, '__proto__') ||
-      !keysBefore.includes('__proto__'),
+    Object.prototype.hasOwnProperty.call(input, '__proto__') || !keysBefore.includes('__proto__'),
     'If __proto__ was an own key before, it must still be an own key after (not mutated)'
   );
 });

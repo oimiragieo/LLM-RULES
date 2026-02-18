@@ -145,7 +145,49 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-18T06:42:55.537Z",
       "last_accessed": "2026-02-18T06:43:04.200Z"
+    },
+    "tests/lib/memory/observations.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T13:33:21.802Z",
+      "last_accessed": "2026-02-18T13:33:21.802Z"
+    },
+    "tests/lib/memory/findings-registry.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T13:33:41.072Z",
+      "last_accessed": "2026-02-18T13:35:32.049Z"
+    },
+    "tests/hooks/phase-3d-security-fixes.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T13:34:12.928Z",
+      "last_accessed": "2026-02-18T13:34:12.928Z"
+    },
+    "tests/lib/utils/path-validator.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T14:09:03.171Z",
+      "last_accessed": "2026-02-18T14:09:03.171Z"
+    },
+    "tests/lib/routing/task-claim-ledger.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T14:09:11.962Z",
+      "last_accessed": "2026-02-18T14:09:11.962Z"
+    },
+    "tests/lib/utils/project-root-regex.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T14:09:41.920Z",
+      "last_accessed": "2026-02-18T14:09:41.920Z"
+    },
+    ".claude/lib/routing/task-claim-ledger.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T14:11:01.556Z",
+      "last_accessed": "2026-02-18T14:11:01.556Z"
     }
   },
-  "last_updated": "2026-02-18T06:48:06.485Z"
+  "last_updated": "2026-02-18T14:11:01.556Z"
 }

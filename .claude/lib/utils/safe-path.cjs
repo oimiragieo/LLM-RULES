@@ -81,7 +81,7 @@ function hasPathTraversal(pathStr) {
   }
   // Split on both forward and backward slashes, check if any segment is '..'
   const segments = pathStr.split(/[/\\]/);
-  return segments.some((segment) => segment === '..');
+  return segments.some(segment => segment === '..');
 }
 
 /**
