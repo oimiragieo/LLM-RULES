@@ -20,6 +20,15 @@ Evidence IDs are stable per injected snippet and must be preserved verbatim in g
 3. Do not invent IDs that were not injected in the prompt.
 4. If no evidence was injected, state that explicitly and avoid fabricated citations.
 
+## Retrieval Behavior Contract
+
+Subagents should assume memory retrieval is hybrid by default (keyword + LanceDB vector fusion):
+
+1. Retrieval may return evidence sourced from `keyword`, `lancedb`, or fused `hybrid`.
+2. `MEMORY_SEMANTIC_SEARCH=off` forces keyword-only retrieval.
+3. Vector failures must be treated as graceful fallback (not task failure) when keyword evidence exists.
+4. Similarity thresholding applies to vector branch results only; keyword evidence remains eligible.
+
 ## Structured Memory Write Contract (Mandatory)
 
 When subagents persist structured learnings (patterns, gotchas, discoveries):

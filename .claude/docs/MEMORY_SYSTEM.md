@@ -859,9 +859,35 @@ Use:
 The CI variant asserts churn/stability thresholds on `memory-cache-stability.jsonl`.
 It also uses `--require-data true`, requiring at least one operational memory signal in the current metrics window and at least one cache-stability row in the cache metrics window.
 
+## Hybrid Memory Retrieval (Keyword + Vector)
+
+`ContextualMemory.search()` now uses a hybrid retrieval path when semantic mode is enabled:
+
+- Runs keyword and vector branches in parallel.
+- Uses `Promise.allSettled` for fail-safe branch isolation (vector failures do not cancel keyword results).
+- Fuses branch rankings with weighted RRF.
+- Deduplicates results by stable id (`metadata.id`, then path+position, then content hash).
+- Filters out empty-content items before returning results.
+
+Behavior details:
+
+- If `MEMORY_SEMANTIC_SEARCH=off`, search is keyword-only.
+- Threshold filtering applies to the vector branch only; keyword hits are not suppressed by threshold.
+- If LanceDB is unavailable, the system logs fallback telemetry and returns keyword results.
+
+### Hybrid retrieval tuning
+
+| Variable                         | Default | Description                                        |
+| -------------------------------- | ------- | -------------------------------------------------- |
+| `MEMORY_HYBRID_RRF_K`            | `60`    | RRF damping constant.                              |
+| `MEMORY_HYBRID_KEYWORD_WEIGHT`   | `0.4`   | Weight for keyword branch in fusion.               |
+| `MEMORY_HYBRID_VECTOR_WEIGHT`    | `0.6`   | Weight for vector branch in fusion.                |
+| `MEMORY_SEMANTIC_SEARCH`         | `on`    | Set to `off` to force keyword-only retrieval.      |
+| `MEMORY_SEMANTIC_SEARCH_THRESHOLD` | `0.72` | Default vector similarity threshold (vector only). |
+
 ## Keyword Search Fallback
 
-When semantic search (LanceDB) is unavailable, `ContextualMemory` falls back to keyword search with performance optimizations:
+When semantic search (LanceDB) is unavailable or disabled, `ContextualMemory` falls back to keyword search with performance optimizations:
 
 **Tool Priority**:
 
