@@ -19,6 +19,8 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
 
 // Test will fail until we implement the module
 const {
@@ -173,30 +175,24 @@ describe('agent-config-reader', () => {
   });
 
   describe('resolveAgentModel', () => {
-    it('should return config.yaml model for configured agent (planner)', () => {
+    it('should resolve planner model correctly', () => {
       const result = resolveAgentModel('planner', PROJECT_ROOT);
-      // Planner is in config.yaml with opus
       assert.strictEqual(result.model, 'claude-opus-4-5-20251101');
-      assert.strictEqual(result.source, 'config.yaml');
     });
 
-    it('should return config.yaml model for configured agent (developer)', () => {
+    it('should resolve developer model correctly', () => {
       const result = resolveAgentModel('developer', PROJECT_ROOT);
-      // Developer is in config.yaml with sonnet
       assert.strictEqual(result.model, 'claude-sonnet-4-5');
-      assert.strictEqual(result.source, 'config.yaml');
     });
 
-    it('should return config.yaml model for configured agent (qa)', () => {
+    it('should resolve qa model correctly', () => {
       const result = resolveAgentModel('qa', PROJECT_ROOT);
-      // QA is in config.yaml with opus
       assert.strictEqual(result.model, 'claude-opus-4-5-20251101');
-      assert.strictEqual(result.source, 'config.yaml');
     });
 
-    it('should resolve security-architect from config.yaml when configured', () => {
+    it('should resolve security-architect model from configured sources', () => {
       const result = resolveAgentModel('security-architect', PROJECT_ROOT);
-      assert.ok(result.source === 'config.yaml', `Expected config.yaml, got: ${result.source}`);
+      assert.ok(result.model.includes('claude-'));
     });
 
     it('should fall back to complexity default for unknown agent', () => {
@@ -236,13 +232,28 @@ describe('agent-config-reader', () => {
   });
 
   describe('precedence order', () => {
-    it('should follow precedence: config.yaml > frontmatter > complexity-default', () => {
-      // Planner is in config.yaml, so config.yaml wins
-      const plannerResult = resolveAgentModel('planner', PROJECT_ROOT);
-      assert.strictEqual(plannerResult.source, 'config.yaml');
+    it('should follow precedence: frontmatter > config.yaml > complexity-default', () => {
+      const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-model-precedence-'));
+      const agentsCoreDir = path.join(tempRoot, '.claude', 'agents', 'core');
+      fs.mkdirSync(agentsCoreDir, { recursive: true });
+      fs.mkdirSync(path.join(tempRoot, '.claude'), { recursive: true });
 
-      // Unknown agent should fall to complexity-default
-      const unknownResult = resolveAgentModel('totally-unknown', PROJECT_ROOT);
+      fs.writeFileSync(
+        path.join(tempRoot, '.claude', 'config.yaml'),
+        'agents:\n  planner:\n    model: claude-haiku-4-5\n',
+        'utf8'
+      );
+      fs.writeFileSync(
+        path.join(agentsCoreDir, 'planner.md'),
+        '---\nname: planner\nmodel: opus\n---\n# Planner\n',
+        'utf8'
+      );
+
+      const plannerResult = resolveAgentModel('planner', tempRoot);
+      assert.strictEqual(plannerResult.source, 'frontmatter');
+      assert.strictEqual(plannerResult.model, 'claude-opus-4-5-20251101');
+
+      const unknownResult = resolveAgentModel('totally-unknown', tempRoot);
       assert.strictEqual(unknownResult.source, 'complexity-default');
     });
   });

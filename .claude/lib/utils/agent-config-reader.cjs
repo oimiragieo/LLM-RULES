@@ -253,8 +253,8 @@ function getShorthand(model) {
  * Resolve the model for an agent type.
  *
  * Precedence order:
- * 1. config.yaml agents.{type}.model
- * 2. Agent frontmatter model: field
+ * 1. Agent frontmatter model: field
+ * 2. config.yaml agents.{type}.model
  * 3. Complexity-based default
  *
  * @param {string} agentType - Agent type (e.g., 'planner', 'developer')
@@ -274,18 +274,7 @@ function resolveAgentModel(agentType, projectRoot = process.cwd()) {
 
   const normalizedAgent = agentType.trim().toLowerCase();
 
-  // Step 1: Try config.yaml
-  const configModel = getModelFromConfig(normalizedAgent, projectRoot);
-  if (configModel) {
-    return {
-      model: normalizeModel(configModel),
-      shorthand: getShorthand(configModel),
-      source: 'config.yaml',
-      raw: configModel,
-    };
-  }
-
-  // Step 2: Try agent frontmatter
+  // Step 1: Try agent frontmatter
   const frontmatterModel = getModelFromFrontmatter(normalizedAgent, projectRoot);
   if (frontmatterModel) {
     return {
@@ -293,6 +282,17 @@ function resolveAgentModel(agentType, projectRoot = process.cwd()) {
       shorthand: getShorthand(frontmatterModel),
       source: 'frontmatter',
       raw: frontmatterModel,
+    };
+  }
+
+  // Step 2: Try config.yaml
+  const configModel = getModelFromConfig(normalizedAgent, projectRoot);
+  if (configModel) {
+    return {
+      model: normalizeModel(configModel),
+      shorthand: getShorthand(configModel),
+      source: 'config.yaml',
+      raw: configModel,
     };
   }
 

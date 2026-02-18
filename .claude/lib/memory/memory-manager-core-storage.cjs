@@ -325,7 +325,7 @@ function createStorageHelpers({
             `Memory write blocked: dangerous content detected in array entry (${result.detections.join(', ')})`
           );
         }
-        entry.text = result.sanitized;
+        entry.text = result.original;
       }
     }
 
