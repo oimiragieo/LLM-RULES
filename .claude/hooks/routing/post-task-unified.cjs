@@ -21,6 +21,7 @@ const loopStateManager = require('../../lib/self-healing/loop-state-manager.cjs'
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { logSpawnEnd } = require('../../lib/monitoring/spawn-log.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { createPostTaskUnifiedHelpers } = require('./post-task-unified.helpers.cjs');
 
 // Resolve project root deterministically from this file location:
@@ -84,7 +85,7 @@ function readTaskOutputContract(taskId) {
   try {
     if (!taskId || !fs.existsSync(TASK_OUTPUT_CONTRACTS_PATH)) return null;
     const raw = fs.readFileSync(TASK_OUTPUT_CONTRACTS_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw, null);
     const tasks = parsed && typeof parsed === 'object' ? parsed.tasks : null;
     if (!tasks || typeof tasks !== 'object') return null;
     return tasks[String(taskId)] || null;

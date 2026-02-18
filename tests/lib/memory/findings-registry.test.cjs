@@ -351,6 +351,94 @@ test('recordFindingsTrendSnapshot and summarizeFindingsTrend provide unresolved 
   }
 });
 
+test('resolveFindingsFromCompletion does not resolve findings based on false cue: "fix" as substring match resolves unrelated findings', () => {
+  const root = createTempProjectRoot();
+  try {
+    const reportRel = path.join('.claude', 'context', 'reports', 'codebase-audit-bug2.md');
+    writeReport(
+      root,
+      reportRel,
+      ['# Audit', 'P1 — High', '1. Missing authentication check in router flow'].join('\n')
+    );
+    ingestReportFindings(root, path.join(root, reportRel), {
+      taskId: 'task-bug2-1',
+      agentType: 'code-reviewer',
+    });
+
+    // "fixture" contains "fix" as a substring triggering hasResolutionCue.
+    // The completion also mentions enough overlapping tokens (authentication, check, router, flow)
+    // from the finding summary. This falsely resolves the unrelated finding.
+    const result = resolveFindingsFromCompletion(
+      root,
+      'Updated test fixture for authentication check router flow validation.',
+      { taskId: 'task-bug2-2', agentType: 'developer' }
+    );
+
+    // The finding must remain open; "fixture" must not trigger resolution
+    assert.equal(
+      result.resolved,
+      0,
+      'should not resolve when "fix" only appears as a substring in an unrelated word like "fixture"'
+    );
+    assert.equal(
+      getOpenFindings(root, { limit: 10 }).length,
+      1,
+      'finding must still be open after false-cue completion'
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
+test('makeFingerprint is stable across severity changes (severity excluded from fingerprint)', () => {
+  const { makeFingerprint } = require('../../../.claude/lib/memory/findings-registry.cjs');
+
+  const summary = 'Command injection gap in shell validator';
+  const fp1 = makeFingerprint(summary, 'critical');
+  const fp2 = makeFingerprint(summary, 'high');
+  const fp3 = makeFingerprint(summary, 'low');
+
+  assert.equal(fp1, fp2, 'fingerprints for the same summary with different severity must be equal');
+  assert.equal(fp2, fp3, 'fingerprints for the same summary with different severity must be equal');
+});
+
+test('re-classifying severity does not create a duplicate finding in the registry', () => {
+  const root = createTempProjectRoot();
+  try {
+    const reportRelCritical = path.join('.claude', 'context', 'reports', 'audit-critical.md');
+    writeReport(
+      root,
+      reportRelCritical,
+      ['# Audit', 'P0 — Critical', '1. Command injection gap in shell validator route'].join('\n')
+    );
+
+    const reportRelHigh = path.join('.claude', 'context', 'reports', 'audit-high.md');
+    writeReport(
+      root,
+      reportRelHigh,
+      ['# Audit', 'P1 — High', '1. Command injection gap in shell validator route'].join('\n')
+    );
+
+    ingestReportFindings(root, path.join(root, reportRelCritical), {
+      taskId: 'task-sev1',
+      agentType: 'code-reviewer',
+    });
+    ingestReportFindings(root, path.join(root, reportRelHigh), {
+      taskId: 'task-sev2',
+      agentType: 'code-reviewer',
+    });
+
+    const summary = getFindingsSummary(root);
+    assert.equal(
+      summary.total,
+      1,
+      'Re-classified finding must remain a single entry, not create a duplicate'
+    );
+  } finally {
+    cleanup(root);
+  }
+});
+
 test('pruneStaleOpenFindings resolves stale open findings when source report is missing', () => {
   const root = createTempProjectRoot();
   try {

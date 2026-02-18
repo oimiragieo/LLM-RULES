@@ -132,8 +132,12 @@ function incrementTaskOutputMetric(counterName) {
     let state = { counters: {}, updatedAt: now };
     if (fs.existsSync(TASK_OUTPUT_METRICS_PATH)) {
       try {
-        const parsed = JSON.parse(fs.readFileSync(TASK_OUTPUT_METRICS_PATH, 'utf8'));
-        if (parsed && typeof parsed === 'object') {
+        const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
+        const { success, data: parsed } = safeParseJSON(
+          fs.readFileSync(TASK_OUTPUT_METRICS_PATH, 'utf8'),
+          null
+        );
+        if (success && parsed && typeof parsed === 'object') {
           state = {
             counters: parsed.counters && typeof parsed.counters === 'object' ? parsed.counters : {},
             updatedAt: parsed.updatedAt || now,

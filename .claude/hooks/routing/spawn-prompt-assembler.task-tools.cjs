@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 'use strict';
 
 const fs = require('fs');
@@ -70,6 +71,32 @@ function sanitizeTaskPrompt(prompt) {
     return prompt;
   }
 
+  // Normalize NFKC + confusable Cyrillic/Greek lookalikes before injection pattern matching.
+  let normalizedPrompt = prompt;
+  try {
+    normalizedPrompt = prompt.normalize('NFKC');
+  } catch (_e) {
+    /* keep original */
+  }
+  normalizedPrompt = normalizedPrompt.replace(
+    /[ІіӀΙιοΟаеорсх]/g,
+    ch =>
+      ({
+        І: 'I',
+        і: 'i',
+        Ӏ: 'I',
+        Ι: 'I',
+        ι: 'i',
+        ο: 'o',
+        Ο: 'O',
+        а: 'a',
+        е: 'e',
+        о: 'o',
+        р: 'r',
+        с: 'c',
+        х: 'x',
+      })[ch] || ch
+  );
   const overridePatterns = [
     /IGNORE\s+(PREVIOUS|ALL\s+PRIOR|SYSTEM)\s+INSTRUCTIONS/gi,
     /DISREGARD\s+(EVERYTHING|ALL\s+PREVIOUS)/gi,
@@ -78,7 +105,7 @@ function sanitizeTaskPrompt(prompt) {
     /FORGET\s+(EVERYTHING|ALL\s+PREVIOUS)/gi,
   ];
 
-  let sanitized = prompt;
+  let sanitized = normalizedPrompt;
   for (const pattern of overridePatterns) {
     sanitized = sanitized.replace(pattern, '[BLOCKED: Injection Pattern]');
   }

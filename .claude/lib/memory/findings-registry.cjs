@@ -95,8 +95,8 @@ function extractFindingSummary(line) {
   return normalizeSummary(text);
 }
 
-function makeFingerprint(summary, severity = 'unknown') {
-  const base = `${normalizeSummary(summary).toLowerCase()}|${String(severity || 'unknown').toLowerCase()}`;
+function makeFingerprint(summary, _severity = 'unknown') {
+  const base = normalizeSummary(summary).toLowerCase();
   return crypto.createHash('sha1').update(base).digest('hex');
 }
 
@@ -110,16 +110,17 @@ function tokenize(text) {
 
 function hasResolutionCue(text) {
   const haystack = String(text || '').toLowerCase();
+  // Use split-based word check to avoid regex  issues across environments
+  const words = haystack.split(/[^a-z0-9]+/);
+  const hasFix = words.some(w => w === 'fix' || w === 'fixed' || w === 'fixes' || w === 'fixing');
   return (
-    haystack.includes('fix') ||
-    haystack.includes('fixed') ||
+    hasFix ||
     haystack.includes('patched') ||
     haystack.includes('resolved') ||
     haystack.includes('mitigated') ||
     haystack.includes('closed')
   );
 }
-
 function extractResolutionEvidence(completionText) {
   const text = String(completionText || '');
   const files = new Set();

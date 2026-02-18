@@ -80,8 +80,15 @@ function normalizeObservation(record) {
     }
   }
 
+  const now = Date.now();
+  const GRACE_MS = 5000;
+  let rawTimestamp = String(record.timestamp).trim();
+  const parsedTs = Date.parse(rawTimestamp);
+  if (!Number.isNaN(parsedTs) && parsedTs > now + GRACE_MS) {
+    rawTimestamp = new Date(now).toISOString();
+  }
   const normalized = {
-    timestamp: String(record.timestamp).trim(),
+    timestamp: rawTimestamp,
     topic: String(record.topic).trim(),
     fact: String(record.fact).trim(),
     confidence: Number(record.confidence),

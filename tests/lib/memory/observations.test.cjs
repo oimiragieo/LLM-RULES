@@ -394,3 +394,52 @@ test('appendObservation leaves supersedes unset by default when contradiction fe
     cleanup(projectRoot);
   }
 });
+
+test('appendObservation clamps future timestamps to now', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
+    const futureTs = new Date(Date.now() + 999999999).toISOString();
+    const beforeNow = Date.now();
+    const appended = appendObservation(projectRoot, {
+      timestamp: futureTs,
+      topic: 'routing',
+      fact: 'Some fact with a future timestamp.',
+      confidence: 0.9,
+      source_session: 'session-future',
+    });
+    const afterNow = Date.now();
+
+    const storedTs = Date.parse(appended.timestamp);
+    assert.equal(storedTs <= afterNow, true, 'timestamp should be <= now after clamping');
+    assert.equal(storedTs >= beforeNow, true, 'timestamp should be >= before-call time');
+    assert.notEqual(
+      appended.timestamp,
+      futureTs,
+      'stored timestamp must differ from the original future timestamp'
+    );
+  } finally {
+    cleanup(projectRoot);
+  }
+});
+
+test('appendObservation preserves timestamps within 5 second grace period', () => {
+  const projectRoot = createTempProjectRoot();
+  try {
+    const nearFutureTs = new Date(Date.now() + 1000).toISOString();
+    const appended = appendObservation(projectRoot, {
+      timestamp: nearFutureTs,
+      topic: 'routing',
+      fact: 'Slightly future timestamp within grace period.',
+      confidence: 0.9,
+      source_session: 'session-nearf',
+    });
+
+    assert.equal(
+      appended.timestamp,
+      nearFutureTs,
+      'near-future timestamp within grace should be preserved'
+    );
+  } finally {
+    cleanup(projectRoot);
+  }
+});
