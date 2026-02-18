@@ -303,6 +303,8 @@ const outputType = detectOutputType(task);
 
 ### Step 3: Correct (Generate Recommendations)
 
+Memory write policy note: structured memory updates are enforced in **Step 5** (`MemoryRecord` only for `patterns.json` and `gotchas.json`).
+
 If score < 0.7 (pass threshold), generate specific improvements:
 
 1. **Identify gaps**: Which rubric categories scored lowest?
