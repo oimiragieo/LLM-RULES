@@ -6,13 +6,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const HOOK_PATH = path.join(
-  process.cwd(),
-  '.claude',
-  'hooks',
-  'routing',
-  'pre-tool-unified.cjs'
-);
+const HOOK_PATH = path.join(process.cwd(), '.claude', 'hooks', 'routing', 'pre-tool-unified.cjs');
 
 test('pre-tool-unified exits non-zero when internal error occurs (fail-closed)', () => {
   const payload = JSON.stringify({
