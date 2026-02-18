@@ -14,7 +14,21 @@ permissionMode: default
 priority: high
 extended_thinking: true
 tools:
-  [Read, Write, Edit, Glob, Grep, Bash, WebSearch, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    WebSearch,
+    MemoryRecord,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    Skill,
+  ]
 skills:
   - task-management-protocol
   - auth-security-expert
@@ -44,3 +58,8 @@ context_files:
 
 See `.claude/agents/specialized/security-architect.md` for the full agent definition.
 This file ensures the agent is discoverable from the core agents directory.
+
+## Memory
+
+- For structured memory (patterns, gotchas, discoveries), use `MemoryRecord` with `type`, `content`, `area`, `source`, and optional `confidence`.
+- Do not use `Write`/`Edit` directly on `.claude/context/memory/patterns.json` or `.claude/context/memory/gotchas.json` (guard-enforced).

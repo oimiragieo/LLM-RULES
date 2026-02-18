@@ -13,9 +13,15 @@ function normalizeForCompare(value) {
 }
 
 test('S0: canonicalizePathForPlatform normalizes equivalent absolute paths', () => {
-  const forward = canonicalizePathForPlatform('C:/dev/projects/agent-studio/.claude/context/memory/patterns.json');
-  const back = canonicalizePathForPlatform('C:\\dev\\projects\\agent-studio\\.claude\\context\\memory\\patterns.json');
-  const mixed = canonicalizePathForPlatform('C:/dev\\projects/agent-studio\\.claude/context\\memory/patterns.json');
+  const forward = canonicalizePathForPlatform(
+    'C:/dev/projects/agent-studio/.claude/context/memory/patterns.json'
+  );
+  const back = canonicalizePathForPlatform(
+    'C:\\dev\\projects\\agent-studio\\.claude\\context\\memory\\patterns.json'
+  );
+  const mixed = canonicalizePathForPlatform(
+    'C:/dev\\projects/agent-studio\\.claude/context\\memory/patterns.json'
+  );
 
   assert.equal(normalizeForCompare(forward), normalizeForCompare(back));
   assert.equal(normalizeForCompare(forward), normalizeForCompare(mixed));

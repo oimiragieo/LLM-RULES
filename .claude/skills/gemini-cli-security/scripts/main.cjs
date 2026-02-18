@@ -79,27 +79,87 @@ function parseArgs(argv) {
  */
 const VULNERABILITY_PATTERNS = {
   secrets: [
-    { pattern: /(?:api[_-]?key|apikey)\s*[=:]\s*["'][^"']{10,}/gi, id: 'SEC-001', desc: 'Hardcoded API key' },
-    { pattern: /(?:password|passwd|pwd)\s*[=:]\s*["'][^"']{4,}/gi, id: 'SEC-002', desc: 'Hardcoded password' },
-    { pattern: /-----BEGIN\s+(?:RSA\s+)?PRIVATE KEY-----/g, id: 'SEC-003', desc: 'Private key in source' },
-    { pattern: /(?:secret[_-]?key|secret)\s*[=:]\s*["'][^"']{8,}/gi, id: 'SEC-004', desc: 'Hardcoded secret key' },
-    { pattern: /(?:token)\s*[=:]\s*["'][A-Za-z0-9\-._~+/]{20,}/gi, id: 'SEC-005', desc: 'Hardcoded token' },
+    {
+      pattern: /(?:api[_-]?key|apikey)\s*[=:]\s*["'][^"']{10,}/gi,
+      id: 'SEC-001',
+      desc: 'Hardcoded API key',
+    },
+    {
+      pattern: /(?:password|passwd|pwd)\s*[=:]\s*["'][^"']{4,}/gi,
+      id: 'SEC-002',
+      desc: 'Hardcoded password',
+    },
+    {
+      pattern: /-----BEGIN\s+(?:RSA\s+)?PRIVATE KEY-----/g,
+      id: 'SEC-003',
+      desc: 'Private key in source',
+    },
+    {
+      pattern: /(?:secret[_-]?key|secret)\s*[=:]\s*["'][^"']{8,}/gi,
+      id: 'SEC-004',
+      desc: 'Hardcoded secret key',
+    },
+    {
+      pattern: /(?:token)\s*[=:]\s*["'][A-Za-z0-9\-._~+/]{20,}/gi,
+      id: 'SEC-005',
+      desc: 'Hardcoded token',
+    },
   ],
   injection: [
-    { pattern: /execute\s*\(\s*["`'].*\+\s*(?:req|user|input|param)/gi, id: 'INJ-001', desc: 'SQL injection risk (string concatenation in query)' },
-    { pattern: /innerHTML\s*[+]?=\s*(?:req|user|input|param)/gi, id: 'INJ-002', desc: 'XSS risk (unsanitized user content in innerHTML)' },
-    { pattern: /exec(?:Sync)?\s*\([^)]*\$\{[^}]*(?:req|user|input|param)/gi, id: 'INJ-003', desc: 'Command injection risk' },
-    { pattern: /e\x76al\s*\([^)]*(?:req|user|input|param)/gi, id: 'INJ-004', desc: 'Dynamic code execution with user-controlled input' },
+    {
+      pattern: /execute\s*\(\s*["`'].*\+\s*(?:req|user|input|param)/gi,
+      id: 'INJ-001',
+      desc: 'SQL injection risk (string concatenation in query)',
+    },
+    {
+      pattern: /innerHTML\s*[+]?=\s*(?:req|user|input|param)/gi,
+      id: 'INJ-002',
+      desc: 'XSS risk (unsanitized user content in innerHTML)',
+    },
+    {
+      pattern: /exec(?:Sync)?\s*\([^)]*\$\{[^}]*(?:req|user|input|param)/gi,
+      id: 'INJ-003',
+      desc: 'Command injection risk',
+    },
+    {
+      pattern: /e\x76al\s*\([^)]*(?:req|user|input|param)/gi,
+      id: 'INJ-004',
+      desc: 'Dynamic code execution with user-controlled input',
+    },
   ],
   crypto: [
-    { pattern: /(?:md5|sha1)\s*\(/gi, id: 'CRY-001', desc: 'Weak hash algorithm (MD5/SHA1) for sensitive data' },
-    { pattern: /createCipher\s*\(\s*["'](?:des|rc4|aes-128-ecb)/gi, id: 'CRY-002', desc: 'Weak cipher (DES/RC4/ECB mode)' },
-    { pattern: /Math\.random\(\)/g, id: 'CRY-003', desc: 'Math.random() for security-sensitive value (non-cryptographic)' },
+    {
+      pattern: /(?:md5|sha1)\s*\(/gi,
+      id: 'CRY-001',
+      desc: 'Weak hash algorithm (MD5/SHA1) for sensitive data',
+    },
+    {
+      pattern: /createCipher\s*\(\s*["'](?:des|rc4|aes-128-ecb)/gi,
+      id: 'CRY-002',
+      desc: 'Weak cipher (DES/RC4/ECB mode)',
+    },
+    {
+      pattern: /Math\.random\(\)/g,
+      id: 'CRY-003',
+      desc: 'Math.random() for security-sensitive value (non-cryptographic)',
+    },
   ],
   llm: [
-    { pattern: /prompt\s*[+]=?\s*(?:req|user|input|message|content)/gi, id: 'LLM-001', desc: 'Potential prompt injection (user input concatenated into LLM prompt)' },
-    { pattern: /e\x76al\s*\([^)]*(?:response|completion|output).*llm/gi, id: 'LLM-002', desc: 'Unsafe LLM output in dynamic code execution' },
-    { pattern: /exec(?:Sync)?\s*\([^)]*(?:response|completion|output)/gi, id: 'LLM-003', desc: 'LLM output used in shell exec without validation' },
+    {
+      pattern: /prompt\s*[+]=?\s*(?:req|user|input|message|content)/gi,
+      id: 'LLM-001',
+      desc: 'Potential prompt injection (user input concatenated into LLM prompt)',
+    },
+    {
+      pattern: /e\x76al\s*\([^)]*(?:response|completion|output).*llm/gi,
+      id: 'LLM-002',
+      desc: 'Unsafe LLM output in dynamic code execution',
+    },
+    {
+      pattern: /exec(?:Sync)?\s*\([^)]*(?:response|completion|output)/gi,
+      id: 'LLM-003',
+      desc: 'LLM output used in shell exec without validation',
+    },
   ],
 };
 
@@ -129,7 +189,8 @@ function scanFile(filePath) {
 
         findings.push({
           id,
-          severity: category === 'secrets' ? 'CRITICAL' : category === 'injection' ? 'HIGH' : 'MEDIUM',
+          severity:
+            category === 'secrets' ? 'CRITICAL' : category === 'injection' ? 'HIGH' : 'MEDIUM',
           category,
           file: filePath,
           line: lineNumber,
@@ -157,7 +218,8 @@ function getRemediation(id) {
     'INJ-001': 'Use parameterized queries or ORM with named parameters',
     'INJ-002': 'Use textContent instead of innerHTML, or sanitize with DOMPurify',
     'INJ-003': 'Use shell: false with array args; validate and escape all inputs',
-    'INJ-004': 'Avoid dynamic code execution; use JSON.parse() for data and strict allowlists for behavior',
+    'INJ-004':
+      'Avoid dynamic code execution; use JSON.parse() for data and strict allowlists for behavior',
     'CRY-001': 'Use SHA-256+ for hashing; bcrypt/scrypt/Argon2 for passwords',
     'CRY-002': 'Use AES-256-GCM or ChaCha20-Poly1305',
     'CRY-003': 'Use crypto.randomBytes() or crypto.getRandomValues() for security tokens',
@@ -206,9 +268,7 @@ function findFiles(targetPath, scope) {
   // Apply scope filter if provided (simple keyword matching)
   if (scope) {
     const keywords = scope.toLowerCase().split(/\s+/);
-    return files.filter(f =>
-      keywords.some(kw => f.toLowerCase().includes(kw))
-    );
+    return files.filter(f => keywords.some(kw => f.toLowerCase().includes(kw)));
   }
 
   return files;
@@ -298,7 +358,9 @@ function formatMarkdown(findings, depResults, args) {
   lines.push(`- Low: ${bySeverity.LOW.length}`);
   lines.push(`- Total findings: ${total}`);
   lines.push('');
-  lines.push('*Analysis based on gemini-cli-extensions/security patterns (90% precision, 93% recall on TS/JS CVE dataset)*');
+  lines.push(
+    '*Analysis based on gemini-cli-extensions/security patterns (90% precision, 93% recall on TS/JS CVE dataset)*'
+  );
 
   return lines.join('\n');
 }
@@ -312,26 +374,30 @@ function formatJSON(findings, depResults) {
     bySeverity[f.severity] = (bySeverity[f.severity] || 0) + 1;
   }
 
-  return JSON.stringify({
-    findings: findings.map(f => ({
-      id: f.id,
-      severity: f.severity,
-      category: f.category,
-      file: path.relative(PROJECT_ROOT, f.file),
-      line: f.line,
-      description: f.description,
-      remediation: f.remediation,
-    })),
-    dependencies: depResults || [],
-    summary: {
-      critical: bySeverity.CRITICAL,
-      high: bySeverity.HIGH,
-      medium: bySeverity.MEDIUM,
-      low: bySeverity.LOW,
-      precision: 0.90,
-      recall: 0.93,
+  return JSON.stringify(
+    {
+      findings: findings.map(f => ({
+        id: f.id,
+        severity: f.severity,
+        category: f.category,
+        file: path.relative(PROJECT_ROOT, f.file),
+        line: f.line,
+        description: f.description,
+        remediation: f.remediation,
+      })),
+      dependencies: depResults || [],
+      summary: {
+        critical: bySeverity.CRITICAL,
+        high: bySeverity.HIGH,
+        medium: bySeverity.MEDIUM,
+        low: bySeverity.LOW,
+        precision: 0.9,
+        recall: 0.93,
+      },
     },
-  }, null, 2);
+    null,
+    2
+  );
 }
 
 /**

@@ -3,8 +3,12 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { createReflectionEventHandlers } = require('../../../.claude/hooks/reflection/unified-reflection-events.cjs');
-const { createReflectionActions } = require('../../../.claude/hooks/reflection/unified-reflection-actions.cjs');
+const {
+  createReflectionEventHandlers,
+} = require('../../../.claude/hooks/reflection/unified-reflection-events.cjs');
+const {
+  createReflectionActions,
+} = require('../../../.claude/hooks/reflection/unified-reflection-actions.cjs');
 const memoryManager = require('../../../.claude/lib/memory/memory-manager.cjs');
 const reflectionHandler = require('../../../.claude/hooks/reflection/unified-reflection-handler.cjs');
 
@@ -188,12 +192,13 @@ describe('reflection memory integration (S6-S8)', () => {
       };
       const enriched = await reflectionHandler.attachSemanticPriorLearnings(entry, {
         contextualMemory: {
-          search: async (_query, options) => [
-            {
-              content: 'Prior learning: enforce metadata.summary at TaskUpdate completion',
-              metadata: { area: 'validation' },
-            },
-          ].slice(0, options.limit || 5),
+          search: async (_query, options) =>
+            [
+              {
+                content: 'Prior learning: enforce metadata.summary at TaskUpdate completion',
+                metadata: { area: 'validation' },
+              },
+            ].slice(0, options.limit || 5),
         },
       });
 

@@ -48,7 +48,9 @@ function preExecute(input) {
     return { allow: true };
   } catch (err) {
     // Graceful degradation: allow execution even if hook fails
-    process.stderr.write(`[gemini-cli-security] Pre-execute hook error (non-fatal): ${err.message}\n`);
+    process.stderr.write(
+      `[gemini-cli-security] Pre-execute hook error (non-fatal): ${err.message}\n`
+    );
     return { allow: true };
   }
 }

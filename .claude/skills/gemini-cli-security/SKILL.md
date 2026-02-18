@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash, WebFetch, Glob, Grep]
-args: "[target-path] [--scan-deps] [--json] [--scope <natural-language-scope>]"
+args: '[target-path] [--scan-deps] [--json] [--scope <natural-language-scope>]'
 best_practices:
   - Analyze code changes in pull requests to catch vulnerabilities early
   - Always check dependencies for CVEs via OSV.dev integration
@@ -65,48 +65,48 @@ All code paths handling authentication, hardcoded values, external input, or AI 
 
 ### Category 1: Secrets Management
 
-| Pattern | Detection Method |
-|---------|-----------------|
-| Hardcoded API keys | Grep for key patterns + entropy analysis |
-| Hardcoded passwords | Credential keyword detection |
-| Private keys in source | PEM block / base64 key detection |
-| Encryption keys | Symmetric key constant patterns |
+| Pattern                | Detection Method                         |
+| ---------------------- | ---------------------------------------- |
+| Hardcoded API keys     | Grep for key patterns + entropy analysis |
+| Hardcoded passwords    | Credential keyword detection             |
+| Private keys in source | PEM block / base64 key detection         |
+| Encryption keys        | Symmetric key constant patterns          |
 
 ### Category 2: Injection Attacks
 
-| Attack Type | Examples |
-|-------------|---------|
-| SQL injection | String concatenation in queries |
-| XSS | Unescaped user content in HTML/JS output |
-| Command injection | Shell exec with user-controlled args |
-| SSRF | User-controlled URLs in server requests |
+| Attack Type        | Examples                                   |
+| ------------------ | ------------------------------------------ |
+| SQL injection      | String concatenation in queries            |
+| XSS                | Unescaped user content in HTML/JS output   |
+| Command injection  | Shell exec with user-controlled args       |
+| SSRF               | User-controlled URLs in server requests    |
 | Template injection | Unsanitized user input in template engines |
 
 ### Category 3: Authentication Flaws
 
-| Flaw | Detection |
-|------|-----------|
-| Session bypass | Missing auth middleware |
-| Weak tokens | Predictable token generation |
+| Flaw                    | Detection                       |
+| ----------------------- | ------------------------------- |
+| Session bypass          | Missing auth middleware         |
+| Weak tokens             | Predictable token generation    |
 | Insecure password reset | Token-less or email-only resets |
-| Missing MFA enforcement | Auth flows without 2FA checks |
+| Missing MFA enforcement | Auth flows without 2FA checks   |
 
 ### Category 4: Data Handling
 
-| Issue | Detection |
-|-------|-----------|
-| Weak cryptography | MD5/SHA1 for secrets; DES/RC4 usage |
-| Sensitive data in logs | PII/credential patterns in log statements |
-| PII violations | Unencrypted PII storage or transmission |
-| Insecure deserialization | Unsafe pickle/eval/deserialize calls |
+| Issue                    | Detection                                 |
+| ------------------------ | ----------------------------------------- |
+| Weak cryptography        | MD5/SHA1 for secrets; DES/RC4 usage       |
+| Sensitive data in logs   | PII/credential patterns in log statements |
+| PII violations           | Unencrypted PII storage or transmission   |
+| Insecure deserialization | Unsafe pickle/eval/deserialize calls      |
 
 ### Category 5: LLM Safety (Novel)
 
-| Risk | Detection |
-|------|-----------|
-| Prompt injection | User content injected into LLM prompts without sanitization |
-| Unsafe output handling | LLM output used in exec/eval/shell without validation |
-| Insecure tool integration | Tool calls with unchecked LLM-provided parameters |
+| Risk                      | Detection                                                   |
+| ------------------------- | ----------------------------------------------------------- |
+| Prompt injection          | User content injected into LLM prompts without sanitization |
+| Unsafe output handling    | LLM output used in exec/eval/shell without validation       |
+| Insecure tool integration | Tool calls with unchecked LLM-provided parameters           |
 
 ## Usage
 
@@ -144,16 +144,19 @@ node .claude/skills/gemini-cli-security/scripts/main.cjs --target src/auth/ --sc
 ## Security Analysis Report
 
 ### CRITICAL
+
 - [AUTH-001] Hardcoded API key found in src/config.ts:42
   Pattern: `const API_KEY = "sk-..."`
   Remediation: Move to environment variable
 
 ### HIGH
+
 - [INJ-002] SQL injection risk in src/db/users.ts:87
   Pattern: String concatenation in query builder
   Remediation: Use parameterized queries
 
 ### Dependencies
+
 - lodash@4.17.15 → CVE-2021-23337 (HIGH) - Prototype pollution
   Fix: Upgrade to lodash@4.17.21+
 ```
@@ -187,7 +190,7 @@ node .claude/skills/gemini-cli-security/scripts/main.cjs --target src/auth/ --sc
     "high": 2,
     "medium": 3,
     "low": 0,
-    "precision": 0.90,
+    "precision": 0.9,
     "recall": 0.93
   }
 }
@@ -201,7 +204,7 @@ The skill integrates with the [OSV.dev](https://osv.dev) API (no authentication 
 // OSV.dev batch query endpoint
 WebFetch({
   url: 'https://api.osv.dev/v1/querybatch',
-  prompt: 'Extract vulnerability IDs, severity, and affected versions for these packages'
+  prompt: 'Extract vulnerability IDs, severity, and affected versions for these packages',
 });
 ```
 
@@ -228,6 +231,7 @@ jobs:
 
 **Why native tools over MCP servers:**
 The original extension uses two MCP servers (security analysis server + OSV-Scanner binary). This skill uses native Claude Code tools instead:
+
 - WebFetch replaces OSV-Scanner for dependency CVE lookups (OSV.dev has a public REST API)
 - Grep/Bash replace the security analysis server for pattern-based detection
 - This approach works immediately without binary installation or session restart
@@ -236,11 +240,11 @@ The original extension uses two MCP servers (security analysis server + OSV-Scan
 
 ## Assigned Agents
 
-| Agent | Role |
-|-------|------|
+| Agent                | Role                                   |
+| -------------------- | -------------------------------------- |
 | `security-architect` | Primary: comprehensive security audits |
-| `developer` | Supporting: pre-commit security checks |
-| `code-reviewer` | Supporting: PR review security layer |
+| `developer`          | Supporting: pre-commit security checks |
+| `code-reviewer`      | Supporting: PR review security layer   |
 
 ## Memory Protocol (MANDATORY)
 

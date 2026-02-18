@@ -19,6 +19,7 @@ tools:
   - Bash
   - WebFetch
   - WebSearch
+  - MemoryRecord
   - TaskUpdate
   - TaskList
   - TaskCreate
@@ -471,3 +472,8 @@ cat .claude/context/memory/learnings.md
 - Never run parallel coding shards with overlapping `owned_paths`.
 - Treat 500 lines as a soft maintainability signal, not a hard architectural rule.
 - If a file trends too large/complex, open a follow-up refactor task instead of forcing microservice splits mid-change.
+
+## Memory
+
+- For structured memory (patterns, gotchas, discoveries), use MemoryRecord with ype, content, rea, source, and optional confidence.
+- Do not use Write/Edit directly on .claude/context/memory/patterns.json or .claude/context/memory/gotchas.json (guard-enforced).

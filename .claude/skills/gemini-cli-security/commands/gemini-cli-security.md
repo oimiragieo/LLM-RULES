@@ -18,12 +18,12 @@ Skill({ skill: 'gemini-cli-security', args: '[target] [options]' });
 
 ## Arguments
 
-| Argument | Description | Default |
-|----------|-------------|---------|
-| `[target]` | Directory or file to analyze | `.` (current directory) |
-| `--scan-deps` | Also scan package.json dependencies against OSV.dev | disabled |
-| `--json` | Output as JSON for CI/CD integration | disabled |
-| `--scope <text>` | Natural language scope restriction | none |
+| Argument         | Description                                         | Default                 |
+| ---------------- | --------------------------------------------------- | ----------------------- |
+| `[target]`       | Directory or file to analyze                        | `.` (current directory) |
+| `--scan-deps`    | Also scan package.json dependencies against OSV.dev | disabled                |
+| `--json`         | Output as JSON for CI/CD integration                | disabled                |
+| `--scope <text>` | Natural language scope restriction                  | none                    |
 
 ## Examples
 
@@ -113,19 +113,19 @@ Machine-parseable JSON for CI/CD integration:
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | No CRITICAL or HIGH findings |
-| `1` | CRITICAL or HIGH findings found (CI gate fails) |
+| Code | Meaning                                         |
+| ---- | ----------------------------------------------- |
+| `0`  | No CRITICAL or HIGH findings                    |
+| `1`  | CRITICAL or HIGH findings found (CI gate fails) |
 
 ## Vulnerability Categories
 
-| Category | Severity | Examples |
-|----------|----------|---------|
-| Secrets | CRITICAL | API keys, passwords, private keys, tokens |
-| Injection | HIGH | SQL injection, XSS, command injection, eval() |
-| Cryptography | MEDIUM | MD5/SHA1, DES/RC4, Math.random() for security |
-| LLM Safety | MEDIUM | Prompt injection, unsafe LLM output in exec |
+| Category     | Severity | Examples                                      |
+| ------------ | -------- | --------------------------------------------- |
+| Secrets      | CRITICAL | API keys, passwords, private keys, tokens     |
+| Injection    | HIGH     | SQL injection, XSS, command injection, eval() |
+| Cryptography | MEDIUM   | MD5/SHA1, DES/RC4, Math.random() for security |
+| LLM Safety   | MEDIUM   | Prompt injection, unsafe LLM output in exec   |
 
 ## Performance
 

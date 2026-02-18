@@ -10,10 +10,7 @@ const DEFAULT_PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 function getMemoryFiles(projectRoot) {
   const memoryDir = path.join(projectRoot, '.claude', 'context', 'memory');
-  return [
-    path.join(memoryDir, 'gotchas.json'),
-    path.join(memoryDir, 'patterns.json'),
-  ];
+  return [path.join(memoryDir, 'gotchas.json'), path.join(memoryDir, 'patterns.json')];
 }
 
 function readArrayJson(filePath) {

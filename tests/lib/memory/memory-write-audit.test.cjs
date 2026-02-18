@@ -40,7 +40,9 @@ describe('memory write audit and migration (S15-S16)', () => {
       { text: 'missing source field' },
       { text: 'direct write source', writeSource: 'direct_write' },
     ]);
-    writeJson(path.join(MEMORY_DIR, 'patterns.json'), [{ text: 'valid', writeSource: 'memory_api' }]);
+    writeJson(path.join(MEMORY_DIR, 'patterns.json'), [
+      { text: 'valid', writeSource: 'memory_api' },
+    ]);
 
     const result = auditMemoryWriteSources(TEST_ROOT);
     assert.equal(result.violationCount, 2);

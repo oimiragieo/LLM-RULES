@@ -11,7 +11,8 @@ maxTurns: 18
 permissionMode: default
 priority: high
 extended_thinking: true
-tools: [Read, Write, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  [Read, Write, Glob, Grep, Bash, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
   - checklist-generator
@@ -577,3 +578,8 @@ cat .claude/context/memory/learnings.md
   - `parallel_group`
 - Escalate as HIGH risk when overlapping ownership or missing dependency ordering is detected.
 - Treat 500 lines as a maintainability risk signal only; do not force architectural splits without design evidence.
+
+## Memory
+
+- For structured memory (patterns, gotchas, discoveries), use MemoryRecord with ype, content, rea, source, and optional confidence.
+- Do not use Write/Edit directly on .claude/context/memory/patterns.json or .claude/context/memory/gotchas.json (guard-enforced).

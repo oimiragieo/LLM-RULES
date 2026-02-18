@@ -63,7 +63,9 @@ function postExecute(input) {
     return { allow: true };
   } catch (err) {
     // Graceful degradation
-    process.stderr.write(`[gemini-cli-security] Post-execute hook error (non-fatal): ${err.message}\n`);
+    process.stderr.write(
+      `[gemini-cli-security] Post-execute hook error (non-fatal): ${err.message}\n`
+    );
     return { allow: true };
   }
 }

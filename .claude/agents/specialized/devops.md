@@ -18,6 +18,7 @@ tools:
   - Grep
   - Glob
   - Bash
+  - MemoryRecord
   - TaskUpdate
   - TaskList
   - TaskCreate
@@ -247,3 +248,8 @@ Check for infrastructure patterns, naming conventions, and past decisions.
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+## Memory
+
+- For structured memory (patterns, gotchas, discoveries), use MemoryRecord with ype, content, rea, source, and optional confidence.
+- Do not use Write/Edit directly on .claude/context/memory/patterns.json or .claude/context/memory/gotchas.json (guard-enforced).

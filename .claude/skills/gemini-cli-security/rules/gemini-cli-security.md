@@ -17,40 +17,40 @@ paths:
 
 ### Secrets Detection (CRITICAL severity)
 
-| Rule ID | Pattern | Action |
-|---------|---------|--------|
-| SEC-001 | Hardcoded API key | Flag and recommend env var |
-| SEC-002 | Hardcoded password | Flag and recommend secrets manager |
+| Rule ID | Pattern               | Action                             |
+| ------- | --------------------- | ---------------------------------- |
+| SEC-001 | Hardcoded API key     | Flag and recommend env var         |
+| SEC-002 | Hardcoded password    | Flag and recommend secrets manager |
 | SEC-003 | Private key in source | Flag immediately; highest priority |
-| SEC-004 | Hardcoded secret key | Flag and recommend vault |
-| SEC-005 | Hardcoded token | Flag and recommend env var |
+| SEC-004 | Hardcoded secret key  | Flag and recommend vault           |
+| SEC-005 | Hardcoded token       | Flag and recommend env var         |
 
 **SLA: CRITICAL findings must be reported before any code is merged.**
 
 ### Injection Detection (HIGH severity)
 
-| Rule ID | Pattern | Action |
-|---------|---------|--------|
-| INJ-001 | SQL string concatenation in queries | Recommend parameterized queries |
-| INJ-002 | innerHTML with user content | Recommend textContent or DOMPurify |
-| INJ-003 | exec() with user-controlled args | Recommend shell: false + array args |
-| INJ-004 | eval() with user input | Recommend JSON.parse() or safe alternatives |
+| Rule ID | Pattern                             | Action                                      |
+| ------- | ----------------------------------- | ------------------------------------------- |
+| INJ-001 | SQL string concatenation in queries | Recommend parameterized queries             |
+| INJ-002 | innerHTML with user content         | Recommend textContent or DOMPurify          |
+| INJ-003 | exec() with user-controlled args    | Recommend shell: false + array args         |
+| INJ-004 | eval() with user input              | Recommend JSON.parse() or safe alternatives |
 
 ### Cryptography Detection (MEDIUM severity)
 
-| Rule ID | Pattern | Action |
-|---------|---------|--------|
-| CRY-001 | MD5/SHA1 for sensitive data | Recommend SHA-256+ or bcrypt/Argon2 |
-| CRY-002 | DES/RC4/AES-ECB | Recommend AES-256-GCM or ChaCha20 |
-| CRY-003 | Math.random() for security values | Recommend crypto.randomBytes() |
+| Rule ID | Pattern                           | Action                              |
+| ------- | --------------------------------- | ----------------------------------- |
+| CRY-001 | MD5/SHA1 for sensitive data       | Recommend SHA-256+ or bcrypt/Argon2 |
+| CRY-002 | DES/RC4/AES-ECB                   | Recommend AES-256-GCM or ChaCha20   |
+| CRY-003 | Math.random() for security values | Recommend crypto.randomBytes()      |
 
 ### LLM Safety Detection (MEDIUM severity)
 
-| Rule ID | Pattern | Action |
-|---------|---------|--------|
+| Rule ID | Pattern                                 | Action                                    |
+| ------- | --------------------------------------- | ----------------------------------------- |
 | LLM-001 | User input concatenated into LLM prompt | Recommend prompt templates + sanitization |
-| LLM-002 | eval() of LLM output | Prohibit; use structured parsing |
-| LLM-003 | Shell exec with LLM-provided args | Require allowlisting + validation |
+| LLM-002 | eval() of LLM output                    | Prohibit; use structured parsing          |
+| LLM-003 | Shell exec with LLM-provided args       | Require allowlisting + validation         |
 
 ## Output Requirements
 

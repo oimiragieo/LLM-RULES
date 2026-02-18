@@ -19,6 +19,7 @@ tools:
     Bash,
     WebFetch,
     WebSearch,
+    MemoryRecord,
     TaskUpdate,
     TaskList,
     TaskCreate,
@@ -378,3 +379,8 @@ TaskList();
   - acceptance checks
 - Do not approve parallel readiness when shard ownership overlaps.
 - Treat 500 lines as a soft review threshold for readability risk, not a hard fail condition.
+
+## Memory
+
+- For structured memory (patterns, gotchas, discoveries), use MemoryRecord with ype, content, rea, source, and optional confidence.
+- Do not use Write/Edit directly on .claude/context/memory/patterns.json or .claude/context/memory/gotchas.json (guard-enforced).

@@ -509,7 +509,7 @@ All spawned agents:
    - `learnings.md` (patterns/solutions)
    - `decisions.md` (ADRs)
    - `issues.md` (blockers/workarounds)
-3. **Structured memory:** Use `recordGotcha()`, `recordPattern()`, `recordDiscovery()` via `memory-manager.cjs` for structured data.
+3. **Structured memory:** Use the `MemoryRecord` tool for structured memory updates (patterns/gotchas/discoveries). Do not use Write/Edit on `.claude/context/memory/patterns.json`, `.claude/context/memory/gotchas.json`, `.claude/context/memory/open-findings.json`, or `.claude/context/memory/access-stats.json`; direct writes are blocked by the memory guard.
 4. **Compression reminder (optional):** if `.claude/context/runtime/compression-reminder.txt` exists, spawn the `context-compressor` skill (or invoke `Skill({ skill: 'context-compressor' })`) and clear the reminder.
 5. **Named memory API (optional):** project-specific notes in `.claude/context/memory/named/` via `memory-manager.cjs`:
    - `readMemory(name)`
