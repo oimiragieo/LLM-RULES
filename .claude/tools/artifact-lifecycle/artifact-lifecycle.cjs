@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'artifact-lifecycle' }) + '\n');
+  runSkillToolCli('artifact-lifecycle', 'artifact-lifecycle');
 }
 
 if (require.main === module) {

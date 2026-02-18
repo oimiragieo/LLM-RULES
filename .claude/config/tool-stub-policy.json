@@ -1,22 +1,12 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-02-18T21:41:41.568Z",
+  "updatedAt": "2026-02-18T21:44:00.933Z",
   "policy": {
     "summary": "Stub tools are temporarily allowed only when explicitly allowlisted and tracked for remediation.",
     "enforcement": "Any newly introduced no-op tool stub must be rejected until this policy file is intentionally updated.",
     "signature": "process.stdout.write(JSON.stringify({ ok: true, tool: ... }) + \"\\n\")"
   },
   "allowlistedStubs": [
-    ".claude/tools/accessibility/accessibility.cjs",
-    ".claude/tools/advanced-elicitation/advanced-elicitation.cjs",
-    ".claude/tools/ai-ml-expert/ai-ml-expert.cjs",
-    ".claude/tools/android-expert/android-expert.cjs",
-    ".claude/tools/api-development-expert/api-development-expert.cjs",
-    ".claude/tools/architecture-review/architecture-review.cjs",
-    ".claude/tools/artifact-integrator/artifact-integrator.cjs",
-    ".claude/tools/artifact-lifecycle/artifact-lifecycle.cjs",
-    ".claude/tools/arxiv-mcp/arxiv-mcp.cjs",
-    ".claude/tools/async-operations/async-operations.cjs",
     ".claude/tools/auth-security-expert/auth-security-expert.cjs",
     ".claude/tools/aws-cloud-ops/aws-cloud-ops.cjs",
     ".claude/tools/best-practices-guidelines/best-practices-guidelines.cjs",

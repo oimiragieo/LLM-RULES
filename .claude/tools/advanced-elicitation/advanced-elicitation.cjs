@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'advanced-elicitation' }) + '\n');
+  runSkillToolCli('advanced-elicitation', 'advanced-elicitation');
 }
 
 if (require.main === module) {

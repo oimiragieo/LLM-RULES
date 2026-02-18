@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'arxiv-mcp' }) + '\n');
+  runSkillToolCli('arxiv-mcp', 'arxiv-mcp');
 }
 
 if (require.main === module) {

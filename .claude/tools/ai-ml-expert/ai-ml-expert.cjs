@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'ai-ml-expert' }) + '\n');
+  runSkillToolCli('ai-ml-expert', 'ai-ml-expert');
 }
 
 if (require.main === module) {
