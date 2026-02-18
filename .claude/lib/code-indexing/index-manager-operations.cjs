@@ -261,7 +261,11 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
   if (merkleTree.root) {
     await merkleTree.save(merklePath);
   } else {
-    await fs.rm(merklePath, { force: true }).catch(() => {});
+    await fs.rm(merklePath, { force: true }).catch(err => {
+      if (manager.options.verbose) {
+        console.warn(`[MERKLE] failed to remove stale tree: ${err.message}`);
+      }
+    });
   }
 
   await manager._clearCheckpoint();
@@ -301,7 +305,11 @@ async function incrementalUpdateImpl(manager, options = {}) {
       const fullPath = path.join(manager.options.projectRoot, filePath);
       await manager.vectorStore.deleteFile(fullPath);
     }
-    await fs.rm(merklePath, { force: true }).catch(() => {});
+    await fs.rm(merklePath, { force: true }).catch(err => {
+      if (manager.options.verbose) {
+        console.warn(`[MERKLE] failed to remove tree during incremental reset: ${err.message}`);
+      }
+    });
     return {
       updateType: 'incremental',
       filesAdded: 0,
