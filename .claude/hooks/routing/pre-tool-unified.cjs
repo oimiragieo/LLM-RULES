@@ -141,6 +141,10 @@ function applyCircuitBreakerMessage(toolName, message, hookInput) {
 
 async function main() {
   try {
+    if (process.env.PRETOOL_UNIFIED_TEST_FORCE_THROW === '1') {
+      throw new Error('Forced pre-tool-unified test failure');
+    }
+
     const hookInput = await parseHookInputAsync();
     if (!hookInput) {
       process.exit(0);
@@ -267,8 +271,8 @@ async function main() {
     if (err.stack) {
       console.error(`[pre-tool-unified] Stack: ${err.stack}`);
     }
-    // Exit 0 for non-critical errors (don't block tool pipeline)
-    process.exit(0);
+    // Security-critical hook must fail closed on internal errors.
+    process.exit(2);
   }
 }
 
