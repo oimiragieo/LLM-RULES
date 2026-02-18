@@ -23,7 +23,12 @@ test('swarm-coordination records join/heartbeat/leave lifecycle', async () => {
   const originalRead = fs.readFileSync;
   fs.readFileSync = (fd, enc) => {
     if (fd === 0) {
-      return JSON.stringify({ operation: 'join', agentId: 'agent-1', role: 'reviewer', runtimeDir });
+      return JSON.stringify({
+        operation: 'join',
+        agentId: 'agent-1',
+        role: 'reviewer',
+        runtimeDir,
+      });
     }
     return originalRead(fd, enc);
   };
@@ -47,4 +52,3 @@ test('swarm-coordination records join/heartbeat/leave lifecycle', async () => {
     cleanup(runtimeDir);
   }
 });
-

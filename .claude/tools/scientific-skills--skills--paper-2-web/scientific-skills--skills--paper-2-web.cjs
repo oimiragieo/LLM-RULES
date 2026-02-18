@@ -1,11 +1,13 @@
 'use strict';
-
 function main() {
   process.stdout.write(
-    JSON.stringify({ ok: true, tool: 'scientific-skills--skills--paper-2-web' }) + '\n'
+    JSON.stringify({
+      ok: true,
+      stub: true,
+      tool: process.argv[1] || require('path').basename(__dirname),
+    }) + '\n'
   );
 }
-
 if (require.main === module) {
   try {
     main();
@@ -14,5 +16,4 @@ if (require.main === module) {
     process.exit(1);
   }
 }
-
 module.exports = { main };

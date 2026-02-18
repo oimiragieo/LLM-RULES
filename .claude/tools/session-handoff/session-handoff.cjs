@@ -38,8 +38,7 @@ function saveEntries(listPath, entries) {
 
 function main() {
   const input = parseInput();
-  const runtimeDir =
-    input.runtimeDir || path.join(process.cwd(), '.claude', 'context', 'runtime');
+  const runtimeDir = input.runtimeDir || path.join(process.cwd(), '.claude', 'context', 'runtime');
   const { listPath } = getStorePaths(runtimeDir);
   const operation = String(input.operation || 'list').toLowerCase();
   const entries = loadEntries(listPath);

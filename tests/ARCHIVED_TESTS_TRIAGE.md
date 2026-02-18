@@ -21,4 +21,3 @@ Status: active triage baseline (PR14)
 1. `tests/hooks/*.archived` high-value runtime guards
 2. `tests/lib/memory/*.archived` memory subsystem history
 3. `tests/integration/*.archived` cross-feature regressions
-

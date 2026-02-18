@@ -48,4 +48,3 @@ if (archived.length > BASELINE_MAX) {
 process.stdout.write(
   `Archived test count OK: ${archived.length} (baseline max: ${BASELINE_MAX})\n`
 );
-

@@ -2,7 +2,9 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { HybridLazyIndexerMethodsC } = require('../../../.claude/lib/code-indexing/hybrid-lazy-indexer-methods-c.cjs');
+const {
+  HybridLazyIndexerMethodsC,
+} = require('../../../.claude/lib/code-indexing/hybrid-lazy-indexer-methods-c.cjs');
 
 class Harness extends HybridLazyIndexerMethodsC {}
 
@@ -23,7 +25,10 @@ test('storeEmbeddings deletes existing file vectors before adding new chunks', a
     { content: 'const a = 1;', filePath, lineStart: 0, lineEnd: 1 },
     { content: 'const b = 2;', filePath, lineStart: 2, lineEnd: 3 },
   ];
-  const embeddings = [[0.1, 0.2], [0.3, 0.4]];
+  const embeddings = [
+    [0.1, 0.2],
+    [0.3, 0.4],
+  ];
 
   await instance.storeEmbeddings(filePath, chunks, embeddings);
 
@@ -33,4 +38,3 @@ test('storeEmbeddings deletes existing file vectors before adding new chunks', a
   assert.ok(String(calls[0].where).includes('src/sample.js'));
   assert.equal(calls[1].rows.length, 2);
 });
-

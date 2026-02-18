@@ -141,4 +141,3 @@ export function ecosystemHealthCheck(options = {}) {
     issues,
   };
 }
-

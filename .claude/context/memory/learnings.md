@@ -800,3 +800,21 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Updated workflow: evolution-workflow (2026-02-18)
 
 - Updated workflow: missing-workflow-xyz (2026-02-18)
+
+- Created new agent: qa-guardian (2026-02-18)
+
+- Created new agent: contract-check (2026-02-18)
+
+- Created new agent: bool-action (2026-02-18)
+
+- Created new agent: repo-onboarder (2026-02-18)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-18)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-18)
+
+- Refreshed skill: tdd (2026-02-18)
+
+- Updated workflow: evolution-workflow (2026-02-18)
+
+- Updated workflow: missing-workflow-xyz (2026-02-18)

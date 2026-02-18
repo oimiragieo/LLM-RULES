@@ -86,8 +86,7 @@ function parseInput() {
 
 function main() {
   const input = parseInput();
-  const runtimeDir =
-    input.runtimeDir || path.join(process.cwd(), '.claude', 'context', 'runtime');
+  const runtimeDir = input.runtimeDir || path.join(process.cwd(), '.claude', 'context', 'runtime');
   const { filePath, state } = loadState(runtimeDir);
   const result = applyOperation(state, input);
   if (result.ok) {

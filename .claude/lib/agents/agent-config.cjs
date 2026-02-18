@@ -13,7 +13,8 @@ try {
 }
 
 const CONFIG_PATH =
-  process.env.AGENT_CONFIG_PATH || path.join(PROJECT_ROOT, '.claude', 'config', 'agent-config.json');
+  process.env.AGENT_CONFIG_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'config', 'agent-config.json');
 let _cache = null;
 let _cacheMeta = null;
 

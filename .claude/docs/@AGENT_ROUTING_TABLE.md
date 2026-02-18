@@ -73,7 +73,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | Chaos engineering/resilience         | `chaos-engineer`             | `.claude/agents/specialized/chaos-engineer.md`           |
 | Project orchestration                | `master-orchestrator`        | `.claude/agents/orchestrators/master-orchestrator.md`    |
 | Swarm coordination                   | `swarm-coordinator`          | `.claude/agents/orchestrators/swarm-coordinator.md`      |
-| Party mode orchestration             | `party-orchestrator`         | `.claude/agents/orchestrators/party-orchestrator.md`      |
+| Party mode orchestration             | `party-orchestrator`         | `.claude/agents/orchestrators/party-orchestrator.md`     |
 | Self-evolution                       | `evolution-orchestrator`     | `.claude/agents/orchestrators/evolution-orchestrator.md` |
 | Context compression                  | `context-compressor`         | `.claude/agents/core/context-compressor.md`              |
 | System routing                       | `router`                     | `.claude/agents/core/router.md` (Meta)                   |

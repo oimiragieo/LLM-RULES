@@ -63,4 +63,3 @@ test('ecosystemHealthCheck reports issues for orphaned skills and missing hooks'
     cleanup(root);
   }
 });
-

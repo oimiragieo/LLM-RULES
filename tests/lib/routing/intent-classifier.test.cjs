@@ -50,7 +50,9 @@ describe('intent-classifier', () => {
   });
 
   it('routes party mode prompts to party-orchestrator', () => {
-    const result = classifyIntent('Use party mode for a structured multi-agent collaboration session.');
+    const result = classifyIntent(
+      'Use party mode for a structured multi-agent collaboration session.'
+    );
     assert.strictEqual(result.defaultAgent, 'party-orchestrator');
   });
 

@@ -29,9 +29,14 @@ test('executeSkillBackedTool returns structured success payload', () => {
 });
 
 test('executeSkillBackedTool returns failure payload when skill missing', () => {
-  const result = executeSkillBackedTool('test-generator', 'test-generator', {}, {
-    skillFn: () => ({ success: false, error: 'missing' }),
-  });
+  const result = executeSkillBackedTool(
+    'test-generator',
+    'test-generator',
+    {},
+    {
+      skillFn: () => ({ success: false, error: 'missing' }),
+    }
+  );
 
   assert.equal(result.ok, false);
   assert.equal(result.tool, 'test-generator');

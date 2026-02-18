@@ -53,9 +53,7 @@ function main() {
     const duplicateKey = duplicate.agents.join('|');
     const allowedKey = (allowedAgents || []).join('|');
     if (!allowedAgents || duplicateKey !== allowedKey) {
-      errors.push(
-        `Unexpected overlap: "${duplicate.keyword}" => [${duplicate.agents.join(', ')}]`
-      );
+      errors.push(`Unexpected overlap: "${duplicate.keyword}" => [${duplicate.agents.join(', ')}]`);
     }
   }
 
@@ -79,7 +77,6 @@ function main() {
     process.exitCode = 1;
     return;
   }
-
 }
 
 main();

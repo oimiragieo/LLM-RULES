@@ -58,4 +58,3 @@ test('session-handoff can create and ack handoff entries', () => {
     cleanup(runtimeDir);
   }
 });
-

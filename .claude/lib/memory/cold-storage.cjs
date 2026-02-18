@@ -237,7 +237,9 @@ function getStorageStats(memoryDir) {
  * @returns {Array} Empty array (stub)
  */
 function searchCold(query, opts = {}) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = String(query || '')
+    .trim()
+    .toLowerCase();
   if (!q) return [];
 
   const memoryDir = opts.memoryDir || path.join(process.cwd(), '.claude', 'context', 'memory');
@@ -257,7 +259,8 @@ function searchCold(query, opts = {}) {
       const entry = safeParseJSON(line, null);
       if (!entry || typeof entry !== 'object') continue;
 
-      const haystack = `${entry.title || ''}\n${entry.content || ''}\n${entry.date || ''}`.toLowerCase();
+      const haystack =
+        `${entry.title || ''}\n${entry.content || ''}\n${entry.date || ''}`.toLowerCase();
       if (!haystack.includes(q)) continue;
 
       const content = String(entry.content || '');

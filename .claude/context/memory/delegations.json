@@ -7,9 +7,9 @@
     "timeoutMs": 100,
     "status": "reassigned",
     "traceId": "trace-orphan",
-    "createdAt": 1771395080583,
-    "updatedAt": 1771430586277,
-    "recoveredAt": 1771430586277
+    "createdAt": 1771451673850,
+    "updatedAt": 1771451674000,
+    "recoveredAt": 1771451674000
   },
   "t-3": {
     "taskId": "t-3",
@@ -17,13 +17,12 @@
     "targetAgent": "agent-b",
     "chain": ["agent-a", "agent-b"],
     "timeoutMs": 30000,
-    "status": "reassigned",
+    "status": "in_progress",
     "traceId": null,
-    "createdAt": 1771395080613,
-    "updatedAt": 1771430583596,
+    "createdAt": 1771451673881,
+    "updatedAt": 1771451673886,
     "updatePayload": {
       "status": "in_progress"
-    },
-    "recoveredAt": 1771430583596
+    }
   }
 }

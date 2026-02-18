@@ -76,7 +76,13 @@ const KEY_HOOKS = [
     input: {
       tool_name: 'Edit',
       tool_input: {
-        file_path: path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'profile-hooks-test.js'),
+        file_path: path.join(
+          PROJECT_ROOT,
+          '.claude',
+          'context',
+          'runtime',
+          'profile-hooks-test.js'
+        ),
         old_string: 'foo',
         new_string: 'bar',
       },

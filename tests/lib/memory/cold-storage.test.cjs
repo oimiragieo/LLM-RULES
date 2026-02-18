@@ -238,8 +238,16 @@ test('searchCold - returns matching entries from cold jsonl files', () => {
   fs.writeFileSync(
     coldFile,
     [
-      JSON.stringify({ title: 'Auth fix', content: 'JWT token rotation implementation', date: '2026-01-10' }),
-      JSON.stringify({ title: 'Unrelated', content: 'Cache invalidation note', date: '2026-01-11' }),
+      JSON.stringify({
+        title: 'Auth fix',
+        content: 'JWT token rotation implementation',
+        date: '2026-01-10',
+      }),
+      JSON.stringify({
+        title: 'Unrelated',
+        content: 'Cache invalidation note',
+        date: '2026-01-11',
+      }),
     ].join('\n') + '\n',
     'utf8'
   );

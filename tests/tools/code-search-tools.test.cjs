@@ -57,4 +57,3 @@ test('runStructuralSearch returns structure mode by default', async () => {
   assert.equal(result.mode, 'structure');
   assert.deepEqual(result.structure, { files: 10 });
 });
-
