@@ -113,29 +113,53 @@ function atomicWriteSync(filePath, content, options = {}) {
 
     // SEC-AUDIT-013 FIX: Windows-specific handling for atomic rename
     if (process.platform === 'win32') {
-      // On Windows, fs.renameSync can fail if destination exists or is locked
-      // Strategy: unlink destination first, with retry on EBUSY/EPERM
-      if (fs.existsSync(filePath)) {
-        let retries = 3;
-        while (retries > 0) {
-          try {
-            fs.unlinkSync(filePath);
-            break;
-          } catch (unlinkErr) {
-            if ((unlinkErr.code === 'EBUSY' || unlinkErr.code === 'EPERM') && retries > 1) {
-              // File is locked, wait and retry
-              sleep(50);
-              retries--;
-            } else {
-              throw unlinkErr;
+      // On Windows, NTFS supports atomic rename on the same volume.
+      // BUG FIX 1: Try direct rename first to avoid the non-atomic window
+      // that existed in the previous unlink-then-rename approach.
+      // BUG FIX 2: Fixed retry condition from `retries > 1` to `retries > 0`
+      // so that exactly maxRetries (3) attempts are made.
+      try {
+        fs.renameSync(tempFile, filePath);
+      } catch (renameErr) {
+        if (renameErr.code === 'EBUSY' || renameErr.code === 'EPERM' || renameErr.code === 'EEXIST') {
+          // Rename failed because dest is locked or exists and can't be replaced.
+          // Fall back to unlink+rename, retrying unlinkSync up to 3 times.
+          if (fs.existsSync(filePath)) {
+            // BUG FIX 2: Fixed retry condition from `retries > 1` to `retries > 0`
+            // so that exactly maxRetries (3) attempts are made.
+            const maxRetries = 3;
+            let retries = maxRetries;
+            let lastUnlinkErr = null;
+            while (retries > 0) {
+              try {
+                fs.unlinkSync(filePath);
+                lastUnlinkErr = null;
+                break;
+              } catch (unlinkErr) {
+                lastUnlinkErr = unlinkErr;
+                if ((unlinkErr.code === 'EBUSY' || unlinkErr.code === 'EPERM') && retries > 0) {
+                  // File is locked, wait and retry
+                  sleep(50);
+                  retries--;
+                } else {
+                  throw unlinkErr;
+                }
+              }
+            }
+            // If all retries exhausted (retries === 0 and lastUnlinkErr is set), throw
+            if (retries === 0 && lastUnlinkErr !== null) {
+              throw lastUnlinkErr;
             }
           }
+          fs.renameSync(tempFile, filePath);
+        } else {
+          throw renameErr;
         }
       }
+    } else {
+      // On non-Windows: fs.renameSync is atomic (POSIX guarantee on same filesystem)
+      fs.renameSync(tempFile, filePath);
     }
-
-    // Atomic rename
-    fs.renameSync(tempFile, filePath);
   } catch (e) {
     // Clean up temp file on error
     // CRITICAL-NEW-001 FIX: Remove TOCTOU race by handling ENOENT directly

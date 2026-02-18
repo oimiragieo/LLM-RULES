@@ -184,21 +184,25 @@ function stripDangerousKeys(obj, depth, maxDepth) {
   if (obj === null || obj === undefined || typeof obj !== 'object') return obj;
 
   if (Array.isArray(obj)) {
+    // Return a new array — do not mutate the original
+    const result = [];
     for (let i = 0; i < obj.length; i++) {
-      obj[i] = stripDangerousKeys(obj[i], depth + 1, maxDepth);
+      result[i] = stripDangerousKeys(obj[i], depth + 1, maxDepth);
     }
-    return obj;
+    return result;
   }
 
+  // Return a new null-prototype object — do not mutate the original
+  const result = Object.create(null);
   const keys = Object.keys(obj);
   for (const key of keys) {
     if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
-      delete obj[key];
-    } else {
-      obj[key] = stripDangerousKeys(obj[key], depth + 1, maxDepth);
+      // Skip dangerous keys — do not copy them to the result
+      continue;
     }
+    result[key] = stripDangerousKeys(obj[key], depth + 1, maxDepth);
   }
-  return obj;
+  return result;
 }
 
 /**
@@ -359,8 +363,10 @@ function safeParseJSON(content, schemaName, inlineSchema, inlineDefaults) {
     }
   }
 
-  // Convert back to regular object for compatibility
-  return Object.assign({}, validated);
+  // Return the null-prototype validated object directly.
+  // Do NOT use Object.assign({}, validated) — that would restore Object.prototype,
+  // defeating the null-prototype pollution protection created above (SEC-007).
+  return validated;
 }
 
 /**

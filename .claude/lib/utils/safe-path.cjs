@@ -44,7 +44,7 @@
  * Matches: CON, PRN, AUX, NUL, COM1-9, LPT1-9
  * Also matches with file extensions: CON.txt, NUL.md, etc.
  */
-const WINDOWS_RESERVED_NAME_REGEX = /^(CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])(\.|$)/i;
+const WINDOWS_RESERVED_NAME_REGEX = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)/i;
 
 /**
  * Check if a filename is a Windows reserved device name
@@ -79,8 +79,9 @@ function hasPathTraversal(pathStr) {
   if (typeof pathStr !== 'string') {
     return false;
   }
-  // Detect ../ or ..\ sequences
-  return pathStr.includes('../') || pathStr.includes('..\\');
+  // Split on both forward and backward slashes, check if any segment is '..'
+  const segments = pathStr.split(/[/\\]/);
+  return segments.some((segment) => segment === '..');
 }
 
 /**

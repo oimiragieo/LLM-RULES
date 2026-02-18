@@ -42,6 +42,11 @@ const PERMANENT_ERROR_TYPES = new Set(['SyntaxError', 'TypeError', 'ReferenceErr
  * @returns {boolean} True if error is transient, false if permanent
  */
 function isTransientError(error) {
+  // Guard against null/undefined error values
+  if (!error) {
+    return false;
+  }
+
   // Check for permanent error types first
   if (PERMANENT_ERROR_TYPES.has(error.constructor.name)) {
     return false;
@@ -86,6 +91,10 @@ function isTransientError(error) {
  */
 async function retryWithBackoff(operation, options = {}) {
   const { maxRetries = 5, baseDelay = 1000, onRetry = null } = options;
+
+  if (maxRetries < 0) {
+    throw new RangeError(`maxRetries must be >= 0, got: ${maxRetries}`);
+  }
 
   let lastError;
 

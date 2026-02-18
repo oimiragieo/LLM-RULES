@@ -57,6 +57,15 @@ describe('safe-path module', () => {
       assert.strictEqual(isWindowsReservedName('console.log'), false);
     });
 
+    // Bug 2 regression tests — COM0 and LPT0 are NOT reserved names
+    it('does NOT treat COM0 as reserved (only COM1-COM9 are reserved)', () => {
+      assert.strictEqual(isWindowsReservedName('COM0'), false);
+    });
+
+    it('does NOT treat LPT0 as reserved (only LPT1-LPT9 are reserved)', () => {
+      assert.strictEqual(isWindowsReservedName('LPT0'), false);
+    });
+
     it('allows normal filenames', () => {
       assert.strictEqual(isWindowsReservedName('README.md'), false);
       assert.strictEqual(isWindowsReservedName('index.cjs'), false);
@@ -78,6 +87,19 @@ describe('safe-path module', () => {
       assert.strictEqual(hasPathTraversal('foo/bar'), false);
       assert.strictEqual(hasPathTraversal('./foo'), false);
       assert.strictEqual(hasPathTraversal('a/b/c'), false);
+    });
+
+    // Bug 1 regression tests — bare .. at end of path / standalone ..
+    it('detects bare .. at end of path (foo/bar/..)', () => {
+      assert.strictEqual(hasPathTraversal('foo/bar/..'), true);
+    });
+
+    it('detects standalone .. segment', () => {
+      assert.strictEqual(hasPathTraversal('..'), true);
+    });
+
+    it('detects .. as a path segment with backslash prefix (foo\\bar\\..)', () => {
+      assert.strictEqual(hasPathTraversal('foo\\bar\\..'), true);
     });
   });
 
