@@ -20,6 +20,19 @@ Evidence IDs are stable per injected snippet and must be preserved verbatim in g
 3. Do not invent IDs that were not injected in the prompt.
 4. If no evidence was injected, state that explicitly and avoid fabricated citations.
 
+## Structured Memory Write Contract (Mandatory)
+
+When subagents persist structured learnings (patterns, gotchas, discoveries):
+
+1. Use `MemoryRecord` (tool/flow) for structured memory writes.
+2. Do not use `Write`/`Edit` directly on:
+   - `.claude/context/memory/patterns.json`
+   - `.claude/context/memory/gotchas.json`
+   - `.claude/context/memory/open-findings.json`
+   - `.claude/context/memory/access-stats.json`
+3. Direct writes to these files are blocked by pre-tool guardrails.
+4. Validation gate: run `pnpm validate:agent-memory`.
+
 ## Evaluation Requirements
 
 Live and fallback evals should measure:

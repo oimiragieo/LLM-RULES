@@ -1,6 +1,6 @@
 # Memory System Documentation
 
-**Last verified:** 2026-02-15 (paths: STM write on UserPromptSubmit, loadMemoryForContext MTM→LTM→legacy, sync-memory-index, reflection reminder, weekly maintenance fallback)
+**Last verified:** 2026-02-18 (paths: MemoryRecord structured-memory policy, STM write on UserPromptSubmit, loadMemoryForContext MTM→LTM→legacy, sync-memory-index, reflection reminder, weekly maintenance fallback)
 
 ## Why Memory Matters
 
@@ -25,6 +25,17 @@ All memory files live in `.claude/context/memory/`:
 | `mtm/`              | Recent sessions (MTM)         | JSON                      |
 | `ltm/`              | Long-term summaries (LTM)     | JSON                      |
 | `sessions/`         | Legacy per-session files      | JSON                      |
+
+### Structured Memory Policy (Mandatory)
+
+- For structured memory (`patterns`, `gotchas`, discoveries), use the `MemoryRecord` tool/flow.
+- Do not use `Write`/`Edit` directly on:
+  - `.claude/context/memory/patterns.json`
+  - `.claude/context/memory/gotchas.json`
+  - `.claude/context/memory/open-findings.json`
+  - `.claude/context/memory/access-stats.json`
+- Direct writes to those files are blocked by the pre-tool guard.
+- Validation gate: `pnpm validate:agent-memory`
 
 ### learnings.md size and archival
 
@@ -595,7 +606,7 @@ node .claude/lib/memory/memory-manager.cjs record-gotcha "Always validate user i
 node .claude/tools/cli/memory-record.cjs pattern "Use Zod schemas for API validation"
 ```
 
-Direct edits to `patterns.json` / `gotchas.json` via Write/Edit are blocked by default. Use `MemoryRecord` or set `MEMORY_JSON_WRITE_ENFORCEMENT=warn|off` to override.
+Direct edits to `patterns.json` / `gotchas.json` via Write/Edit are blocked by default. Use `MemoryRecord` or set `MEMORY_DIRECT_WRITE_ENFORCEMENT=warn|off` to override.
 
 **Record a pattern** (memory-manager fallback):
 
@@ -1233,6 +1244,8 @@ node -e "const fs=require('fs'); const data=JSON.parse(fs.readFileSync('.claude/
 ### Programmatic Access
 
 The memory-manager can be imported and used programmatically:
+
+> Agent guidance: agents should still use `MemoryRecord` for structured memory. The programmatic API below is for framework/library code paths.
 
 ```javascript
 const memoryManager = require('./.claude/lib/memory/memory-manager.cjs');
