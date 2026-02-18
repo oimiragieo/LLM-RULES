@@ -4,6 +4,7 @@
 const fsPromises = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { MemoryVectorStore } = require('./lancedb-client.cjs');
 const { EntityQuery } = require('./entity-query.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
@@ -285,42 +286,170 @@ class ContextualMemory {
       }
     }
 
-    try {
-      // Try LanceDB semantic search
-      const vectorStore = await this._getVectorStore();
-
-      if (!vectorStore) {
-        throw new Error('LanceDB unavailable - falling back to keyword search');
-      }
-
-      const results = await vectorStore.search(query, {
-        limit,
-        filters: effectiveFilters,
-      });
-
-      // Filter by threshold logic if needed (LanceDB returns similarity 0-1 from our client wrapper)
-      const validResults = results.filter(r => r.similarity >= threshold);
-
-      // Format results with source metadata
-      return validResults.map(result => ({
-        content: result.content,
-        metadata: result.metadata,
-        similarity: result.similarity,
-        source: 'lancedb',
-      }));
-    } catch (error) {
-      this._logLancedbEvent('semantic_fallback', {
-        message: error?.message || String(error),
-      });
-      if (!this._semanticFallbackWarned) {
-        logger.warn('Semantic search unavailable; falling back to keyword search', {
-          error: error?.message || String(error),
-        });
-        this._semanticFallbackWarned = true;
-      }
-      // Fallback: lightweight keyword search over key memory artifacts.
+    if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
       return await this._keywordSearch(query, { limit });
     }
+
+    return await this.hybridMemoryQuery(query, {
+      ...options,
+      limit,
+      threshold,
+      filters: effectiveFilters,
+    });
+  }
+
+  _buildHybridResultId(result) {
+    const metadata = result?.metadata && typeof result.metadata === 'object' ? result.metadata : {};
+    if (metadata.id) return `id:${metadata.id}`;
+
+    const position =
+      metadata.chunkPos ?? metadata.pos ?? metadata.position ?? metadata.line ?? metadata.lineNumber;
+    if (metadata.path && position !== undefined && position !== null) {
+      return `pathpos:${metadata.path}:${position}`;
+    }
+
+    const payload = `${metadata.path || ''}\n${String(result?.content || '').trim()}`;
+    const digest = crypto.createHash('sha256').update(payload).digest('hex');
+    return `hash:${digest}`;
+  }
+
+  _normalizeHybridResult(raw, source) {
+    const metadata = raw?.metadata && typeof raw.metadata === 'object' ? raw.metadata : {};
+    const similarity =
+      typeof raw?.similarity === 'number' && Number.isFinite(raw.similarity) ? raw.similarity : null;
+    const normalized = {
+      content: String(raw?.content || ''),
+      metadata: { ...metadata },
+      similarity,
+      source,
+    };
+    normalized.id = this._buildHybridResultId(normalized);
+    return normalized;
+  }
+
+  _recordSemanticFallback(error) {
+    this._logLancedbEvent('semantic_fallback', {
+      message: error?.message || String(error),
+    });
+    if (!this._semanticFallbackWarned) {
+      logger.warn('Semantic search unavailable; falling back to keyword search', {
+        error: error?.message || String(error),
+      });
+      this._semanticFallbackWarned = true;
+    }
+  }
+
+  _fuseHybridResultsRRF(keywordResults, vectorResults) {
+    const map = new Map();
+    const rrfK = Number(process.env.MEMORY_HYBRID_RRF_K || 60);
+    const keywordWeight = Number(process.env.MEMORY_HYBRID_KEYWORD_WEIGHT || 0.4);
+    const vectorWeight = Number(process.env.MEMORY_HYBRID_VECTOR_WEIGHT || 0.6);
+
+    for (let rank = 0; rank < keywordResults.length; rank++) {
+      const item = keywordResults[rank];
+      const score = keywordWeight / (rrfK + rank + 1);
+      const existing = map.get(item.id);
+      if (existing) {
+        existing.rrf_score += score;
+        existing.sourceSet.add('keyword');
+      } else {
+        map.set(item.id, { ...item, rrf_score: score, sourceSet: new Set(['keyword']) });
+      }
+    }
+
+    for (let rank = 0; rank < vectorResults.length; rank++) {
+      const item = vectorResults[rank];
+      const score = vectorWeight / (rrfK + rank + 1);
+      const existing = map.get(item.id);
+      if (existing) {
+        existing.rrf_score += score;
+        existing.sourceSet.add('lancedb');
+        if (typeof item.similarity === 'number') {
+          existing.similarity =
+            typeof existing.similarity === 'number'
+              ? Math.max(existing.similarity, item.similarity)
+              : item.similarity;
+        }
+      } else {
+        map.set(item.id, { ...item, rrf_score: score, sourceSet: new Set(['lancedb']) });
+      }
+    }
+
+    return Array.from(map.values())
+      .sort((a, b) => b.rrf_score - a.rrf_score)
+      .map(item => {
+        const source =
+          item.sourceSet.size > 1 ? 'hybrid' : item.sourceSet.has('lancedb') ? 'lancedb' : 'keyword';
+        return {
+          content: item.content,
+          metadata: item.metadata,
+          similarity: item.similarity,
+          source,
+          rrf_score: item.rrf_score,
+        };
+      });
+  }
+
+  /**
+   * Hybrid query (keyword + vector + RRF fusion) with fail-safe branch isolation.
+   *
+   * @param {string} query - Natural language query
+   * @param {Object} options - Search options
+   * @param {number} [options.limit=5] - Maximum final results
+   * @param {number} [options.threshold] - Vector similarity threshold
+   * @param {Object|string} [options.filters] - Vector metadata filters
+   * @returns {Promise<Array>} Fused results in standard memory search shape
+   */
+  async hybridMemoryQuery(query, options = {}) {
+    const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = require('./memory-constants.cjs');
+    const limit = typeof options.limit === 'number' ? options.limit : 5;
+    const threshold =
+      typeof options.threshold === 'number' ? options.threshold : SEMANTIC_SEARCH_DEFAULT_THRESHOLD;
+    const branchLimit = Math.max(limit * 2, 10);
+
+    if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
+      return await this._keywordSearch(query, { limit });
+    }
+
+    const keywordPromise = this._keywordSearch(query, { limit: branchLimit });
+    const vectorPromise = (async () => {
+      try {
+        const vectorStore = await this._getVectorStore();
+        if (!vectorStore) return [];
+        const results = await vectorStore.search(query, {
+          limit,
+          filters: options.filters,
+        });
+        return Array.isArray(results) ? results : [];
+      } catch (error) {
+        this._recordSemanticFallback(error);
+        return [];
+      }
+    })();
+
+    const [keywordSettled, vectorSettled] = await Promise.allSettled([keywordPromise, vectorPromise]);
+
+    const keywordRaw = keywordSettled.status === 'fulfilled' && Array.isArray(keywordSettled.value)
+      ? keywordSettled.value
+      : [];
+    const vectorRaw = vectorSettled.status === 'fulfilled' && Array.isArray(vectorSettled.value)
+      ? vectorSettled.value
+      : [];
+
+    const keywordNormalized = keywordRaw.map(item => this._normalizeHybridResult(item, 'keyword'));
+    const vectorNormalized = vectorRaw
+      .filter(item => typeof item?.similarity === 'number' && item.similarity >= threshold)
+      .map(item => this._normalizeHybridResult(item, 'lancedb'));
+
+    if (keywordNormalized.length > 0 && vectorNormalized.length > 0) {
+      this._logLancedbEvent('hybrid_fusion_used', {
+        keyword_count: keywordNormalized.length,
+        vector_count: vectorNormalized.length,
+      });
+    }
+
+    const fused = this._fuseHybridResultsRRF(keywordNormalized, vectorNormalized);
+    return fused.slice(0, limit);
   }
 
   /**
