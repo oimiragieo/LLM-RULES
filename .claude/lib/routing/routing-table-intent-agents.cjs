@@ -118,8 +118,6 @@ const INTENT_TO_AGENT = {
 
   // Web3/Blockchain intent (routes to web3-blockchain-expert)
   web3: 'web3-blockchain-expert',
-  powershell_expert: 'powershell-expert',
-  'powershell-expert': 'powershell-expert',
 
   // Legacy intents (map to most appropriate agent)
   bug: 'developer',
@@ -130,11 +128,6 @@ const INTENT_TO_AGENT = {
   incident: 'incident-responder',
   plan: 'planner',
   integration: 'developer',
-  'qa-guardian': 'qa-guardian',
-  'contract-check': 'contract-check',
-  'bool-action': 'bool-action',
-  'repo-onboarder': 'repo-onboarder',
-  'enterprise-skill-test-1771395136358': 'enterprise-skill-test-1771395136358',
 };
 
 module.exports = { INTENT_TO_AGENT };
