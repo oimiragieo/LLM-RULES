@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'debugging' }) + '\n');
+  runSkillToolCli('debugging', 'debugging');
 }
 
 if (require.main === module) {

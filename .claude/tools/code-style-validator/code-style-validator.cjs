@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'code-style-validator' }) + '\n');
+  runSkillToolCli('code-style-validator', 'code-style-validator');
 }
 
 if (require.main === module) {

@@ -1,7 +1,9 @@
 'use strict';
 
+const { runSkillToolCli } = require('../_shared/skill-wrapper.cjs');
+
 function main() {
-  process.stdout.write(JSON.stringify({ ok: true, tool: 'context-driven-development' }) + '\n');
+  runSkillToolCli('context-driven-development', 'context-driven-development');
 }
 
 if (require.main === module) {
