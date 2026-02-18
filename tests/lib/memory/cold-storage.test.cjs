@@ -206,3 +206,25 @@ test('archiveWarmToCold - handles empty archive directory', () => {
 
   cleanupTempDir(testDir);
 });
+
+test('archiveWarmToCold - deletes warm source file after successful cold archival', () => {
+  const testDir = createTempDir();
+  const archiveDir = path.join(testDir, 'archive');
+  fs.mkdirSync(archiveDir, { recursive: true });
+
+  const oldDate = new Date();
+  oldDate.setDate(oldDate.getDate() - 45);
+  const oldMonth = oldDate.toISOString().slice(0, 7);
+  const oldArchive = path.join(archiveDir, `decisions-${oldMonth}.md`);
+  fs.writeFileSync(
+    oldArchive,
+    `## Decision\n\n**Date:** ${oldDate.toISOString().slice(0, 10)}\n\nContent\n`,
+    'utf8'
+  );
+
+  const result = coldStorage.archiveWarmToCold(testDir, { maxAgeDays: 30 });
+  assert.ok(result.archivedFiles >= 1, 'Should archive at least one file');
+  assert.equal(fs.existsSync(oldArchive), false, 'Warm archive source file should be removed');
+
+  cleanupTempDir(testDir);
+});

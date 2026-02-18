@@ -121,7 +121,10 @@ class ConditionalExecutor {
         consume();
         return Number(tok);
       }
-      if ((tok.startsWith('"') && tok.endsWith('"')) || (tok.startsWith("'") && tok.endsWith("'"))) {
+      if (
+        (tok.startsWith('"') && tok.endsWith('"')) ||
+        (tok.startsWith("'") && tok.endsWith("'"))
+      ) {
         consume();
         return tok.slice(1, -1);
       }

@@ -77,6 +77,11 @@ class HybridLazyIndexerMethodsC {
   async storeEmbeddings(filePath, chunks, embeddings) {
     if (!this.table) return;
 
+    if (typeof this.table.delete === 'function') {
+      const escapedFilePath = String(filePath).replace(/\\/g, '\\\\').replace(/'/g, "''");
+      await this.table.delete(`id LIKE '${escapedFilePath}:%'`);
+    }
+
     const data = chunks.map((chunk, i) => ({
       id: `${filePath}:${chunk.lineStart}`,
       vector: embeddings[i],

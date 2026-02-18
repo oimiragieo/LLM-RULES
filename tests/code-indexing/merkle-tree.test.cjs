@@ -182,6 +182,27 @@ describe('MerkleTree', () => {
 
       await fs.writeFile(path.join(MERKLE_TEST_DIR, 'subdir', 'c.js'), 'const c = 3;\n');
     });
+
+    test('changes beyond first 1KB are detected', async () => {
+      const longFile = path.join(MERKLE_TEST_DIR, 'long-content.js');
+      const prefix = 'A'.repeat(1200);
+      const suffixA = 'TAIL_ALPHA';
+      const suffixB = 'TAIL_BETA';
+
+      await fs.writeFile(longFile, `${prefix}${suffixA}\n`);
+      const tree = new MerkleTree(MERKLE_TEST_DIR);
+      await tree.build();
+      const oldRoot = tree.root;
+
+      await fs.writeFile(longFile, `${prefix}${suffixB}\n`);
+      await tree.build();
+      const diff = MerkleTree.diff(oldRoot, tree.root, '');
+
+      assert.ok(
+        diff.modified.some(p => p === 'long-content.js' || p.endsWith('long-content.js')),
+        'Deep-tail content change should be detected as modified'
+      );
+    });
   });
 
   describe('exclude patterns', () => {

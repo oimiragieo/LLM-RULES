@@ -106,7 +106,7 @@ class MerkleTree {
 
       // Include content + metadata in hash
       const hashInput = JSON.stringify({
-        content: content.toString('base64').slice(0, 1000), // First 1KB for speed
+        content: content.toString('base64'),
         size: stats.size,
         mtime: stats.mtimeMs,
       });

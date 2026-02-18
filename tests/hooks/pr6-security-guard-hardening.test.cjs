@@ -41,7 +41,13 @@ function withEnv(overrides, fn) {
 }
 
 test('creator guard no longer trusts CLAUDE_AGENT_ID self-assertion alone', () => {
-  const statePath = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'active-creators.json');
+  const statePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'context',
+    'runtime',
+    'active-creators.json'
+  );
   if (fs.existsSync(statePath)) {
     fs.unlinkSync(statePath);
   }
@@ -61,10 +67,13 @@ test('fail-open override requires explicit acknowledgement and scope', () => {
   const creator = require(CREATOR_GUARD_PATH);
   const routing = require(ROUTING_GUARD_PATH);
 
-  withEnv({ HOOK_FAIL_OPEN: 'true', HOOK_FAIL_OPEN_ACK: undefined, HOOK_FAIL_OPEN_SCOPE: undefined }, () => {
-    assert.equal(creator.isFailOpenOverrideAuthorized(), false);
-    assert.equal(routing.isFailOpenOverrideAuthorized(), false);
-  });
+  withEnv(
+    { HOOK_FAIL_OPEN: 'true', HOOK_FAIL_OPEN_ACK: undefined, HOOK_FAIL_OPEN_SCOPE: undefined },
+    () => {
+      assert.equal(creator.isFailOpenOverrideAuthorized(), false);
+      assert.equal(routing.isFailOpenOverrideAuthorized(), false);
+    }
+  );
 
   withEnv(
     {

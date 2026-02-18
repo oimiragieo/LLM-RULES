@@ -96,9 +96,7 @@ function classifyRequest(requestText) {
     complexity = 'EPIC';
   }
   // MEDIUM: refactor, improve, multiple, files (SCOPE signals - take precedence over domain)
-  else if (
-    hasAnyWord(normalized, ['refactor', 'improve', 'multiple', 'files'])
-  ) {
+  else if (hasAnyWord(normalized, ['refactor', 'improve', 'multiple', 'files'])) {
     complexity = 'MEDIUM';
   }
   // HIGH: architecture, system, design, OR auth/security (ARCHITECTURE or DOMAIN signals, but only if no SCOPE)

@@ -33,7 +33,8 @@ const DANGEROUS_PATTERNS = {
     },
     { pattern: /\$\([^)]+\)/g, description: 'shell injection: $() execution' },
     {
-      pattern: /;\s*(rm|sudo|curl|wget|chmod|chown|mv|cp|cat|bash|sh|python|node|powershell|pwsh)\b/gi,
+      pattern:
+        /;\s*(rm|sudo|curl|wget|chmod|chown|mv|cp|cat|bash|sh|python|node|powershell|pwsh)\b/gi,
       description: 'shell injection: semicolon command chaining',
     },
     { pattern: /\|\s*sh\b/gi, description: 'shell injection: pipe to sh' },

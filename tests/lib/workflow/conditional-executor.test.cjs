@@ -32,4 +32,3 @@ test('ConditionalExecutor javascript evaluator blocks code injection expressions
     /unsafe|blocked|Cannot read property on undefined/i
   );
 });
-

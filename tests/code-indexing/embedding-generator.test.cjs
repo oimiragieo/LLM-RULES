@@ -317,6 +317,22 @@ describe('Embedding Generator Tests', () => {
       assert.equal(stats.enabled, true);
       assert.ok(stats.path.includes('test-embedding-cache.json'));
     });
+
+    test('cache is bounded and evicts oldest entries when maxCacheEntries exceeded', () => {
+      const gen = new EmbeddingGenerator({
+        cacheEnabled: true,
+        maxCacheEntries: 3,
+      });
+
+      gen.addToCache('k1', [1]);
+      gen.addToCache('k2', [2]);
+      gen.addToCache('k3', [3]);
+      gen.addToCache('k4', [4]);
+
+      assert.equal(gen.cache.size, 3, 'Cache should be bounded to maxCacheEntries');
+      assert.equal(gen.getFromCache('k1'), null, 'Oldest entry should be evicted');
+      assert.deepEqual(gen.getFromCache('k4'), [4], 'Newest entry should remain');
+    });
   });
 
   describe('39.6: Error Handling', () => {

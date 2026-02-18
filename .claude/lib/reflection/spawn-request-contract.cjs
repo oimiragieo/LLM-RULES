@@ -5,6 +5,7 @@ const path = require('path');
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 
 const DEFAULT_MAX_ENTRIES = Number(process.env.REFLECTION_SPAWN_REQUEST_MAX_ENTRIES || 200);
 const MAX_ID_LENGTH = 200;
@@ -114,7 +115,7 @@ function acknowledgeRequests(filePath, ids) {
     return req;
   });
 
-  fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf8');
+  atomicWriteJSONSync(filePath, updated);
 }
 
 function removeRequests(filePath, ids) {
@@ -124,7 +125,7 @@ function removeRequests(filePath, ids) {
 
   const filtered = requests.filter(req => !idSet.has(req.id));
 
-  fs.writeFileSync(filePath, JSON.stringify(filtered, null, 2), 'utf8');
+  atomicWriteJSONSync(filePath, filtered);
 }
 
 function parseSpawnRequests(content, options = {}) {

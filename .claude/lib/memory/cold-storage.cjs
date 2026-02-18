@@ -104,6 +104,9 @@ function archiveWarmToCold(memoryDir, opts = {}) {
       atomicWriteSync(coldFile, jsonlEntries, 'utf8');
     }
 
+    // Remove warm archive file only after cold write succeeds.
+    fs.unlinkSync(archiveFile);
+
     archivedFileCount++;
     archivedEntryCount += sections.length;
   }

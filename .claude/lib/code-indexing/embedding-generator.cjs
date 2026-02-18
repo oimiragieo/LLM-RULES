@@ -17,6 +17,7 @@ const DEFAULT_OPTIONS = {
   dimensions: 384,
   batchSize: 100,
   cacheEnabled: true,
+  maxCacheEntries: 5000,
   cachePath: '.claude/context/data/code-index/embedding-cache.json',
   gpu: {
     enabled: true,
@@ -320,7 +321,12 @@ class EmbeddingGenerator {
    */
   getFromCache(text) {
     const key = this.getCacheKey(text);
-    return this.cache.get(key) || null;
+    const cached = this.cache.get(key);
+    if (!cached) return null;
+    // LRU touch.
+    this.cache.delete(key);
+    this.cache.set(key, cached);
+    return cached;
   }
 
   /**
@@ -330,7 +336,21 @@ class EmbeddingGenerator {
    */
   addToCache(text, embedding) {
     const key = this.getCacheKey(text);
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
     this.cache.set(key, embedding);
+
+    const maxEntries =
+      Number.isFinite(Number(this.options.maxCacheEntries)) &&
+      Number(this.options.maxCacheEntries) > 0
+        ? Number(this.options.maxCacheEntries)
+        : DEFAULT_OPTIONS.maxCacheEntries;
+    while (this.cache.size > maxEntries) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey === undefined) break;
+      this.cache.delete(oldestKey);
+    }
   }
 
   /**
