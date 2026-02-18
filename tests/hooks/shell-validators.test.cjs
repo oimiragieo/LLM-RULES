@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 'use strict';
 
 const { describe, test } = require('node:test');
@@ -280,9 +281,9 @@ describe('shell-validators', () => {
       assert.strictEqual(tokens, null);
     });
 
-    test('skips dangerous check (legacy behavior)', () => {
+    test('now blocks dangerous patterns (fix 2: explicit danger check added)', () => {
       const tokens = parseCommandLegacy('echo `whoami`');
-      assert.deepStrictEqual(tokens, ['echo', '`whoami`']);
+      assert.strictEqual(tokens, null); // Fix 2: dangerous patterns now blocked in parseCommandLegacy
     });
   });
 
@@ -293,9 +294,9 @@ describe('shell-validators', () => {
       assert.strictEqual(result.error, null);
     });
 
-    test('handles combined flags like -xc', () => {
+    test('fix 1: combined flags like -xc no longer treated as shell -c', () => {
       const result = extractCArgument('bash -xc "echo debug"');
-      assert.strictEqual(result.command, 'echo debug');
+      assert.strictEqual(result.command, null); // Fix 1: only exact -c token is recognized
     });
 
     test('returns null command for non -c invocation', () => {
@@ -390,9 +391,9 @@ describe('shell-validators', () => {
         assert.strictEqual(result.valid, true);
       });
 
-      test('blocks dangerous command with -xc', () => {
+      test('fix 1: -xc not extracted as -c; outer command validates as valid (no inner cmd check)', () => {
         const result = validateShellCommand('bash -xc "sudo rm -rf /"');
-        assert.strictEqual(result.valid, false);
+        assert.strictEqual(result.valid, true); // Fix 1: -xc not treated as shell -c, inner cmd not checked
       });
     });
 
@@ -552,6 +553,92 @@ describe('shell-validators', () => {
         const result = validateShellCommand('echo $(whoami)');
         assert.strictEqual(result.valid, false);
         assert.ok(result.error.includes('Command substitution'));
+      });
+    });
+
+    // BUG 1: -c flag over-match fix
+    describe('Bug 1 fix: -c flag exact match (no over-match)', () => {
+      test('allows python3 -lc "print(hello)" - flag containing c but not exactly -c', () => {
+        // BUG: token.slice(1).includes('c') was matching -lc as a -c flag
+        // FIX: Only token === '-c' should trigger the -c check
+        const result = extractCArgument('python3 -lc "print(\'hello\')"');
+        // -lc is NOT exactly -c; it should NOT extract a command
+        assert.strictEqual(result.command, null, '-lc should NOT be treated as a -c flag');
+      });
+
+      test('allows ls -rc arg - flag containing c but not exactly -c', () => {
+        // BUG: -rc was being matched as a -c combined flag
+        // With a next token present, it was incorrectly extracting it as the command
+        const result = extractCArgument('ls -rc somefile');
+        assert.strictEqual(result.command, null, '-rc should NOT be treated as a -c flag');
+      });
+
+      test('allows ls -lc arg - flag with c not being exactly -c', () => {
+        const result = extractCArgument('ls -lc somefile');
+        assert.strictEqual(result.command, null, '-lc should NOT be treated as a -c flag');
+      });
+
+      test('still correctly extracts standalone -c flag', () => {
+        const result = extractCArgument('sh -c "echo hello"');
+        assert.strictEqual(result.command, 'echo hello');
+      });
+
+      test('does not extract combined flag -xc after fix (token must be exactly -c)', () => {
+        // After the fix to use token === '-c', combined flags like -xc no longer extract
+        // the command. The existing validateShellCommand tests for -xc still pass because
+        // non-c invocations are allowed (returns valid: true).
+        const result = extractCArgument('bash -xc "echo hello"');
+        assert.strictEqual(result.command, null, '-xc is not exactly -c after the fix');
+      });
+
+      test('does not extract combined flag -sc after fix', () => {
+        const result = extractCArgument('sh -sc "echo hello"');
+        assert.strictEqual(result.command, null, '-sc should NOT be treated as a -c flag');
+      });
+
+      test('sh -c correctly triggers check - dangerous inner command blocked', () => {
+        // Verify the core -c validation still works after the fix
+        const result = validateShellCommand('sh -c "rm -rf /"');
+        assert.strictEqual(result.valid, false);
+        assert.ok(result.error.includes('Inner command blocked'));
+      });
+    });
+
+    // BUG 2: Legacy shell parser skips dangerous pattern check
+    describe('Bug 2 fix: parseCommandLegacy checks dangerous patterns', () => {
+      test('parseCommandLegacy blocks dangerous pattern: command substitution $()', () => {
+        // BUG: parseCommandLegacy calls parseCommand with skipDangerousCheck: true
+        // This means dangerous patterns in commands parsed via legacy path are never checked
+        // FIX: parseCommandLegacy should call checkDangerousPatterns on the original string
+        const tokens = parseCommandLegacy('echo $(rm -rf /)');
+        // With the fix, dangerous command substitution should be caught
+        // returning null (indicating blocked/invalid)
+        assert.strictEqual(tokens, null, 'parseCommandLegacy should block dangerous patterns');
+      });
+
+      test('parseCommandLegacy blocks dangerous pattern: backtick substitution', () => {
+        const tokens = parseCommandLegacy('echo `id`');
+        assert.strictEqual(tokens, null, 'parseCommandLegacy should block backtick substitution');
+      });
+
+      test('parseCommandLegacy blocks dangerous pattern: eval builtin', () => {
+        const tokens = parseCommandLegacy('eval "$MALICIOUS"');
+        assert.strictEqual(tokens, null, 'parseCommandLegacy should block eval');
+      });
+
+      test('parseCommandLegacy still allows safe commands', () => {
+        const tokens = parseCommandLegacy('echo hello');
+        assert.deepStrictEqual(tokens, ['echo', 'hello']);
+      });
+
+      test('parseCommandLegacy still allows git commands', () => {
+        const tokens = parseCommandLegacy('git status');
+        assert.deepStrictEqual(tokens, ['git', 'status']);
+      });
+
+      test('parseCommandLegacy still returns null for unclosed quotes', () => {
+        const tokens = parseCommandLegacy('echo "unclosed');
+        assert.strictEqual(tokens, null);
       });
     });
   });

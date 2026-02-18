@@ -399,11 +399,13 @@ function generateSessionSummary(sessions) {
     return null;
   }
 
-  // Sort by timestamp
-  const sorted = [...sessions].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  // Sort by timestamp, treating missing timestamps as epoch 0
+  const sorted = [...sessions].sort(
+    (a, b) => new Date(a.timestamp ?? 0) - new Date(b.timestamp ?? 0)
+  );
 
-  const startDate = sorted[0].timestamp.split('T')[0];
-  const endDate = sorted[sorted.length - 1].timestamp.split('T')[0];
+  const startDate = (sorted[0].timestamp ?? '').split('T')[0] || 'unknown';
+  const endDate = (sorted[sorted.length - 1].timestamp ?? '').split('T')[0] || 'unknown';
 
   // Aggregate data
   const allLearnings = [];
@@ -490,7 +492,7 @@ function _summarizeOldSessions(projectRoot = PROJECT_ROOT, incomingSessions = 0)
   const toSummarize = effectiveCount - CONFIG.MTM_MAX_SESSIONS + CONFIG.SUMMARY_MIN_SESSIONS;
   const sessionsToSummarize = sessions.slice(
     0,
-    Math.min(toSummarize, sessions.length - CONFIG.SUMMARY_MIN_SESSIONS)
+    Math.min(toSummarize, Math.max(0, sessions.length - CONFIG.SUMMARY_MIN_SESSIONS))
   );
 
   if (sessionsToSummarize.length < CONFIG.SUMMARY_MIN_SESSIONS) {
@@ -577,7 +579,8 @@ function evictOldLTMSummaries(projectRoot) {
 
   const files = fs.readdirSync(ltmDir).filter(f => f.endsWith('.json'));
   const _promoted = files.filter(f => f.startsWith('promoted_'));
-  const regular = files.filter(f => !f.startsWith('promoted_'));
+  // Only summary_*.json files are candidates for eviction; other .json files are preserved
+  const regular = files.filter(f => f.startsWith('summary_'));
 
   // Sort regular files alphabetically (oldest first by naming convention)
   regular.sort();

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines */
 /**
  * Memory Tiers Tests - STM/MTM/LTM Implementation
  * ================================================
@@ -578,6 +579,218 @@ if (require.main === module) {
           const result = await summarizeOldSessions(TEST_PROJECT_ROOT);
 
           assert.strictEqual(result.summarized, 0, 'Should not summarize when under limit');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+    });
+
+    // Test Suite 5: Bug fixes
+    await describe('Bug 1 — negative slice index in _summarizeOldSessions', async function () {
+      await it('should return full sessions array when sessions.length < SUMMARY_MIN_SESSIONS', async function () {
+        setupTestDir();
+        try {
+          const { _summarizeOldSessions } = freshRequire(
+            '../../../.claude/lib/memory/memory-tiers.cjs'
+          );
+
+          // Create only 1 MTM session (less than SUMMARY_MIN_SESSIONS=5)
+          const mtmDir = path.join(MEMORY_DIR, 'mtm');
+          const sessionData = {
+            session_id: 'solo-session-001',
+            timestamp: new Date().toISOString(),
+            summary: 'Single session for slice test',
+          };
+          fs.writeFileSync(
+            path.join(mtmDir, 'session_001.json'),
+            JSON.stringify(sessionData, null, 2)
+          );
+
+          // With 1 session and incomingSessions=0, effectiveCount (1) <= MTM_MAX_SESSIONS (10)
+          // so it returns early with summarized=0 — that is correct behaviour.
+          // The negative-slice bug manifests only when effectiveCount > MTM_MAX_SESSIONS
+          // but sessions.length < SUMMARY_MIN_SESSIONS. Create that scenario:
+          // sessions.length=3, incomingSessions=8 → effectiveCount=11 > 10
+          // toSummarize = 11-10+5 = 6
+          // Math.min(6, 3-5) = Math.min(6, -2) = -2 → slice(0, -2) = [] (wrong!)
+          // After fix: Math.max(0, 3-5) = 0 → slice(0, 0) = [] which still triggers
+          // insufficient_batch guard (0 < 5). That is the correct safe path.
+
+          // First assert: slice with negative end must not throw and must return []
+          // We verify this by calling with 3 sessions + 8 incoming, and asserting
+          // that the result is { summarized: 0 } (skipped due to insufficient_batch)
+          // rather than a TypeError.
+          for (let i = 2; i <= 3; i++) {
+            fs.writeFileSync(
+              path.join(mtmDir, `session_00${i}.json`),
+              JSON.stringify({
+                session_id: `solo-session-00${i}`,
+                timestamp: new Date().toISOString(),
+                summary: `Session ${i}`,
+              }, null, 2)
+            );
+          }
+
+          // Should not throw; should return summarized:0 (insufficient batch)
+          let threw = false;
+          let result;
+          try {
+            result = _summarizeOldSessions(TEST_PROJECT_ROOT, 8);
+          } catch (_err) {
+            threw = true;
+          }
+          assert(!threw, 'Should not throw when sessions.length < SUMMARY_MIN_SESSIONS');
+          assert.strictEqual(result.summarized, 0, 'Should return summarized:0 for insufficient batch');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+    });
+
+    await describe('Bug 2 — unsafe timestamp access in generateSessionSummary', async function () {
+      await it('should not throw TypeError when session has no timestamp field', function () {
+        setupTestDir();
+        try {
+          const { generateSessionSummary } = freshRequire(
+            '../../../.claude/lib/memory/memory-tiers.cjs'
+          );
+
+          // Session objects with no timestamp field
+          const sessions = [
+            { session_id: 'no-ts-001', summary: 'Session without timestamp' },
+            { session_id: 'no-ts-002', summary: 'Another session without timestamp' },
+          ];
+
+          let threw = false;
+          let result;
+          try {
+            result = generateSessionSummary(sessions);
+          } catch (_err) {
+            threw = true;
+          }
+
+          assert(!threw, `Should not throw TypeError when no timestamp field; got: ${threw}`);
+          assert(result !== null && result !== undefined, 'Should return a summary object');
+          assert.strictEqual(result.type, 'session_summary', 'Should return session_summary type');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      await it('should handle mixed sessions where some have timestamp and some do not', function () {
+        setupTestDir();
+        try {
+          const { generateSessionSummary } = freshRequire(
+            '../../../.claude/lib/memory/memory-tiers.cjs'
+          );
+
+          const sessions = [
+            { session_id: 'ts-001', timestamp: '2026-01-15T10:00:00.000Z', summary: 'Has timestamp' },
+            { session_id: 'no-ts-002', summary: 'No timestamp' },
+            { session_id: 'ts-003', timestamp: '2026-01-20T12:00:00.000Z', summary: 'Has timestamp' },
+          ];
+
+          let threw = false;
+          let result;
+          try {
+            result = generateSessionSummary(sessions);
+          } catch (_err) {
+            threw = true;
+          }
+
+          assert(!threw, 'Should not throw with mixed session timestamp fields');
+          assert(result !== null, 'Should return a result');
+        } finally {
+          cleanupTestDir();
+        }
+      });
+    });
+
+    await describe('Bug 3 — LTM eviction deletes non-summary JSON files', async function () {
+      await it('should only delete summary_*.json files during eviction, not other .json files', function () {
+        setupTestDir();
+        try {
+          const { evictOldLTMSummaries } = freshRequire(
+            '../../../.claude/lib/memory/memory-tiers.cjs'
+          );
+
+          const ltmDir = path.join(MEMORY_DIR, 'ltm');
+
+          // Create 25 summary files (exceeds default LTM_MAX_SUMMARIES=20)
+          for (let i = 1; i <= 25; i++) {
+            const ts = String(i).padStart(3, '0');
+            fs.writeFileSync(
+              path.join(ltmDir, `summary_${ts}.json`),
+              JSON.stringify({ type: 'session_summary', index: i })
+            );
+          }
+
+          // Create non-summary .json files that must NOT be deleted
+          fs.writeFileSync(
+            path.join(ltmDir, 'metadata.json'),
+            JSON.stringify({ created: '2026-01-01' })
+          );
+          fs.writeFileSync(
+            path.join(ltmDir, 'index.json'),
+            JSON.stringify({ count: 25 })
+          );
+          fs.writeFileSync(
+            path.join(ltmDir, 'promoted_session_abc.json'),
+            JSON.stringify({ tier: 'LTM', promoted_at: '2026-01-01T00:00:00.000Z' })
+          );
+
+          evictOldLTMSummaries(TEST_PROJECT_ROOT);
+
+          const remaining = fs.readdirSync(ltmDir);
+
+          // Non-summary files must be preserved
+          assert(remaining.includes('metadata.json'), 'metadata.json must NOT be deleted');
+          assert(remaining.includes('index.json'), 'index.json must NOT be deleted');
+          assert(
+            remaining.includes('promoted_session_abc.json'),
+            'promoted_session_abc.json must NOT be deleted'
+          );
+
+          // Only summary files should be candidates for eviction
+          const summaryFiles = remaining.filter(f => f.startsWith('summary_'));
+          assert(
+            summaryFiles.length <= 20,
+            `At most 20 summary files should remain, got ${summaryFiles.length}`
+          );
+        } finally {
+          cleanupTestDir();
+        }
+      });
+
+      await it('should only count summary_*.json files against LTM_MAX_SUMMARIES limit', function () {
+        setupTestDir();
+        try {
+          const { evictOldLTMSummaries } = freshRequire(
+            '../../../.claude/lib/memory/memory-tiers.cjs'
+          );
+
+          const ltmDir = path.join(MEMORY_DIR, 'ltm');
+
+          // Create exactly 20 summary files + several non-summary files
+          for (let i = 1; i <= 20; i++) {
+            const ts = String(i).padStart(3, '0');
+            fs.writeFileSync(
+              path.join(ltmDir, `summary_${ts}.json`),
+              JSON.stringify({ type: 'session_summary', index: i })
+            );
+          }
+          fs.writeFileSync(path.join(ltmDir, 'extra.json'), JSON.stringify({ extra: true }));
+          fs.writeFileSync(path.join(ltmDir, 'promoted_x.json'), JSON.stringify({ promoted: true }));
+
+          const result = evictOldLTMSummaries(TEST_PROJECT_ROOT);
+
+          // 20 summary files is exactly at the limit — no summary eviction should happen
+          assert.strictEqual(result.evicted, 0, 'Should not evict when summary count is at limit');
+
+          // Non-summary files must remain
+          const remaining = fs.readdirSync(ltmDir);
+          assert(remaining.includes('extra.json'), 'extra.json must NOT be deleted');
+          assert(remaining.includes('promoted_x.json'), 'promoted_x.json must NOT be deleted');
         } finally {
           cleanupTestDir();
         }

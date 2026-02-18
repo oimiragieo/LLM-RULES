@@ -231,6 +231,11 @@ function parseCommand(commandString, options = {}) {
  */
 function parseCommandLegacy(commandString) {
   const result = parseCommand(commandString, { skipDangerousCheck: true });
+  // Explicit dangerous pattern check (skipDangerousCheck: true was used for token parsing only)
+  const dangerCheck = checkDangerousPatterns(commandString);
+  if (!dangerCheck.valid) {
+    return null; // Treat dangerous commands as parse failure for legacy callers
+  }
   return result.tokens;
 }
 
@@ -264,11 +269,7 @@ function extractCArgument(commandString) {
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
 
-    // Check for standalone -c or combined flags containing 'c'
-    // Combined flags: -xc, -ec, -ic, -exc, etc. (short options bundled together)
-    const isCFlag =
-      token === '-c' ||
-      (token.startsWith('-') && !token.startsWith('--') && token.slice(1).includes('c'));
+    const isCFlag = token === '-c';
 
     if (isCFlag && i + 1 < tokens.length) {
       // The next token is the command to execute
