@@ -31,6 +31,49 @@ function hasExplicitAgentContext(hookInput = null) {
   return false;
 }
 
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function checkTaskPayloadContract(toolName, toolInput = {}) {
+  if (toolName !== 'Task' && toolName !== 'TaskCreate') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('TASK_PAYLOAD_CONTRACT_ENFORCEMENT', 'block');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  const missing = [];
+  if (!isNonEmptyString(toolInput.description)) {
+    missing.push('description');
+  }
+
+  if (toolName === 'Task') {
+    if (!isNonEmptyString(toolInput.prompt)) {
+      missing.push('prompt');
+    }
+    if (!isNonEmptyString(toolInput.subagent_type || toolInput.agent_type)) {
+      missing.push('subagent_type');
+    }
+  }
+
+  if (missing.length === 0) {
+    return { pass: true };
+  }
+
+  const message =
+    `[ROUTER-FIRST PROTOCOL VIOLATION][TASK-PAYLOAD-CONTRACT] ${toolName} missing required field(s): ` +
+    `${missing.join(', ')}. ` +
+    `Use TaskList() first, then provide a complete ${toolName} payload with description.`;
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+  return { pass: true, result: 'warn', message };
+}
+
 function checkPlannerFirst(toolName, toolInput) {
   if (toolName !== 'Task') {
     return { pass: true };
@@ -505,6 +548,7 @@ function checkSkillAgentConfused(toolName, toolInput = {}) {
 }
 
 module.exports = {
+  checkTaskPayloadContract,
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,

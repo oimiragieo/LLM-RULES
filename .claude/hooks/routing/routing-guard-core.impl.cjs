@@ -51,6 +51,7 @@ const {
   checkMemoryPressure,
 } = require('./routing-guard-core.checks-router.cjs');
 const {
+  checkTaskPayloadContract,
   checkPlannerFirst,
   checkTaskCreate,
   checkSecurityReview,
@@ -105,6 +106,18 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       };
     }
     captureWarn('tasklist-first-gate', taskListCheck);
+
+    const payloadCheck = checkTaskPayloadContract(toolName, toolInput);
+    if (!payloadCheck.pass) {
+      return {
+        pass: false,
+        result: payloadCheck.result,
+        message: payloadCheck.message,
+        checkName: 'task-payload-contract',
+        warnings,
+      };
+    }
+    captureWarn('task-payload-contract', payloadCheck);
 
     const bashCheck = checkRouterBash(toolName, toolInput, hookInput);
     if (!bashCheck.pass) {
@@ -517,6 +530,7 @@ module.exports = {
   checkRouterSelfCheck,
   checkRouterReadGovernance,
   checkPlannerFirst,
+  checkTaskPayloadContract,
   checkTaskCreate,
   checkSecurityReview,
   checkCodeSimplifierArchitectReview,
