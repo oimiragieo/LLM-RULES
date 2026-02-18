@@ -6,6 +6,7 @@
 # JavaScript/Node scripts should use LF
 *.mjs text eol=lf
 *.js text eol=lf
+*.cjs text eol=lf
 
 # TypeScript files should use LF
 *.ts text eol=lf

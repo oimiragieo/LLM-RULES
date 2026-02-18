@@ -14,7 +14,7 @@ async function main() {
 
   if (!query) {
     console.error('Usage: node .claude/lib/memory/memory-search.cjs "search query"');
-    process.exit(1);
+    return 1;
   }
 
   try {
@@ -39,12 +39,23 @@ async function main() {
     }
   } catch (err) {
     console.error('Search failed:', err.message);
-    process.exit(1);
+    return 1;
   }
+
+  return 0;
 }
 
 if (require.main === module) {
-  main();
+  main()
+    .then(code => {
+      if (typeof code === 'number' && code !== 0) {
+        process.exitCode = code;
+      }
+    })
+    .catch(err => {
+      console.error('Search failed:', err?.message || err);
+      process.exitCode = 1;
+    });
 }
 
 module.exports = { main };

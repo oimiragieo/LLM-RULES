@@ -441,6 +441,7 @@ async function main() {
         console.error(
           'Types: daily, weekly, consolidation, healthCheck, summarization, deduplication, pruning, archiveOldLTM, extraction'
         );
+        return 1;
       }
       break;
 
@@ -458,6 +459,7 @@ async function main() {
         console.error(
           'Tasks: consolidation, healthCheck, metricsLog, summarization, deduplication, pruning, archiveOldLTM, extraction, weeklyReport'
         );
+        return 1;
       }
       break;
 
@@ -493,13 +495,21 @@ Examples:
   node memory-scheduler.cjs status
 `);
   }
+
+  return 0;
 }
 
 if (require.main === module) {
-  main().catch(err => {
-    console.error('Unhandled error:', err);
-    process.exit(1);
-  });
+  main()
+    .then(code => {
+      if (typeof code === 'number' && code !== 0) {
+        process.exitCode = code;
+      }
+    })
+    .catch(err => {
+      console.error('Unhandled error:', err);
+      process.exitCode = 1;
+    });
 }
 
 module.exports = {

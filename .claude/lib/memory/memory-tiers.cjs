@@ -639,7 +639,7 @@ if (require.main === module) {
     getMTMSessions,
   }).catch(err => {
     console.error('Unhandled error:', err);
-    process.exit(1);
+    process.exitCode = 1;
   });
 }
 

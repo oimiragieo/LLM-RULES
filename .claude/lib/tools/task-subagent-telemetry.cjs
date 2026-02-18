@@ -38,7 +38,7 @@ async function main() {
 if (require.main === module) {
   main().catch(error => {
     process.stderr.write(String(error?.message || error));
-    process.exit(1);
+    process.exitCode = 1;
   });
 }
 

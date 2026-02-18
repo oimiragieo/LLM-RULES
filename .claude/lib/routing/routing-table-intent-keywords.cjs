@@ -256,12 +256,7 @@ const INTENT_KEYWORDS = {
     'self-improvement',
     'extend capabilities',
   ],
-  party_mode: [
-    'party mode',
-    'multi-agent collaboration',
-    'consensus voting',
-    'agent debate',
-  ],
+  party_mode: ['party mode', 'multi-agent collaboration', 'consensus voting', 'agent debate'],
 
   // === ASSIMILATE INTENT (routes to evolution-orchestrator for codebase extraction) ===
   assimilate: [
@@ -435,4 +430,23 @@ const INTENT_KEYWORDS = {
   tdd: ['tdd'],
 };
 
-module.exports = { INTENT_KEYWORDS };
+// Deliberate overlaps must be explicitly tracked so new collisions are reviewed.
+const ALLOWED_INTENT_KEYWORD_OVERLAPS = {
+  a11y: ['accessibility_tester', 'frontend'],
+  aria: ['accessibility_tester', 'web_design'],
+  'bundle size': ['performance_engineer', 'react_performance'],
+  'core web vitals': ['performance_engineer', 'react_performance'],
+  etl: ['data_engineer', 'data_science'],
+  microservices: ['architect', 'microservices_architect'],
+  openapi: ['api_designer', 'documentation'],
+  pydantic: ['fastapi', 'python'],
+  'react native': ['expo', 'react_native'],
+  research: ['researcher', 'scientific'],
+  slo: ['incident_responder', 'sre_engineer'],
+  spark: ['data_engineer', 'data_science'],
+  tdd: ['developer', 'tdd'],
+  vercel: ['nextjs', 'vercel_deploy'],
+  wcag: ['accessibility_tester', 'web_design'],
+};
+
+module.exports = { INTENT_KEYWORDS, ALLOWED_INTENT_KEYWORD_OVERLAPS };
