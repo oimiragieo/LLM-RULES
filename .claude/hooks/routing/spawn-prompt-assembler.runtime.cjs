@@ -82,6 +82,7 @@ const {
 } = runtimeSupport;
 
 const { buildContextModePrompt } = libRequire(path.join('spawn', 'prompt-factory.cjs'));
+const { normalizeTaskSpawnInput } = libRequire(path.join('routing', 'task-spawn-builder.cjs'));
 const TASK_OUTPUT_CONTRACTS_PATH =
   process.env.TASK_OUTPUT_CONTRACTS_PATH ||
   path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'task-output-contracts.json');
@@ -162,11 +163,12 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
   const rawToolInput = getToolInput(hookInput);
   if (!rawToolInput || typeof rawToolInput !== 'object') return null;
 
-  const ensuredTask = ensureTaskId(rawToolInput, hookInput);
+  const ensuredTask = normalizeTaskSpawnInput(rawToolInput, hookInput);
   const toolInput = ensuredTask.toolInput;
   if (ensuredTask.modified) {
-    stderrLog('task_id_auto_injected', {
+    stderrLog('task_payload_auto_normalized', {
       task_id: ensuredTask.taskId,
+      description: toolInput.description,
     });
   }
 
