@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-02-18T21:09:01.549Z",
+  "updatedAt": "2026-02-18T21:28:40.094Z",
   "policy": {
     "summary": "Stub tools are temporarily allowed only when explicitly allowlisted and tracked for remediation.",
     "enforcement": "Any newly introduced no-op tool stub must be rejected until this policy file is intentionally updated.",
@@ -26,7 +26,6 @@
     ".claude/tools/checklist-generator/checklist-generator.cjs",
     ".claude/tools/ci-cd-implementation-rule/ci-cd-implementation-rule.cjs",
     ".claude/tools/cloud-devops-expert/cloud-devops-expert.cjs",
-    ".claude/tools/code-analyzer/code-analyzer.cjs",
     ".claude/tools/code-quality-expert/code-quality-expert.cjs",
     ".claude/tools/code-style-validator/code-style-validator.cjs",
     ".claude/tools/command-creator/command-creator.cjs",
@@ -94,7 +93,6 @@
     ".claude/tools/pandas-data-manipulation-rules/pandas-data-manipulation-rules.cjs",
     ".claude/tools/php-expert/php-expert.cjs",
     ".claude/tools/pipeline-reflection-ux/pipeline-reflection-ux.cjs",
-    ".claude/tools/plan-generator/plan-generator.cjs",
     ".claude/tools/planning-with-files/planning-with-files.cjs",
     ".claude/tools/postmortem-writing/postmortem-writing.cjs",
     ".claude/tools/prd-generator/prd-generator.cjs",
@@ -258,7 +256,6 @@
     ".claude/tools/scientific-skills--skills--zarr-python/scientific-skills--skills--zarr-python.cjs",
     ".claude/tools/scientific-skills--skills--zinc-database/scientific-skills--skills--zinc-database.cjs",
     ".claude/tools/scientific-skills/scientific-skills.cjs",
-    ".claude/tools/security-architect/security-architect.cjs",
     ".claude/tools/semgrep-rule-creator/semgrep-rule-creator.cjs",
     ".claude/tools/sentry-monitoring/sentry-monitoring.cjs",
     ".claude/tools/seo-and-meta-tags-in-sveltekit/seo-and-meta-tags-in-sveltekit.cjs",
@@ -274,7 +271,6 @@
     ".claude/tools/state-management-expert/state-management-expert.cjs",
     ".claude/tools/static-analysis/static-analysis.cjs",
     ".claude/tools/styling-expert/styling-expert.cjs",
-    ".claude/tools/summarize-changes/summarize-changes.cjs",
     ".claude/tools/svelte-expert/svelte-expert.cjs",
     ".claude/tools/tall-stack-general/tall-stack-general.cjs",
     ".claude/tools/task-management-protocol/task-management-protocol.cjs",
@@ -282,11 +278,9 @@
     ".claude/tools/tauri-security-rules/tauri-security-rules.cjs",
     ".claude/tools/tauri-svelte-typescript-general/tauri-svelte-typescript-general.cjs",
     ".claude/tools/tauri-svelte-ui-components/tauri-svelte-ui-components.cjs",
-    ".claude/tools/tdd/tdd.cjs",
     ".claude/tools/template-creator/template-creator.cjs",
     ".claude/tools/template-renderer/template-renderer.cjs",
     ".claude/tools/terraform-infra/terraform-infra.cjs",
-    ".claude/tools/test-generator/test-generator.cjs",
     ".claude/tools/text-to-sql/text-to-sql.cjs",
     ".claude/tools/thinking-tools/thinking-tools.cjs",
     ".claude/tools/tool-creator/tool-creator.cjs",
@@ -301,7 +295,6 @@
     ".claude/tools/web-design-guidelines-vercel/web-design-guidelines-vercel.cjs",
     ".claude/tools/web3-expert/web3-expert.cjs",
     ".claude/tools/workflow-creator/workflow-creator.cjs",
-    ".claude/tools/workflow-patterns/workflow-patterns.cjs",
     ".claude/tools/writing-skills/writing-skills.cjs"
   ]
 }
