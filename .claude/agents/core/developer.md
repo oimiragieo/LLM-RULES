@@ -42,6 +42,7 @@ skills:
   - tdd
   - token-saver-context-compression
   - verification-before-completion
+  - gemini-cli-security
 capabilities:
   - code-generation
   - refactoring

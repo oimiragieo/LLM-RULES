@@ -96,6 +96,69 @@ function queueReflection(entry, queueFile = QUEUE_FILE) {
   return actions.queueReflection(entry, queueFile);
 }
 
+async function appendReflectionLogEntry(entry, options = {}) {
+  const projectRoot = options.projectRoot || PROJECT_ROOT;
+  const appendFn = options.appendJsonl || appendJsonl;
+  const logPath = path.join(projectRoot, '.claude', 'context', 'memory', 'reflection-log.jsonl');
+  const payload = {
+    ...entry,
+    timestamp: entry?.timestamp || new Date().toISOString(),
+    memoryWrites: Array.isArray(entry?.memoryWrites) ? entry.memoryWrites : [],
+    memoryReadSource: entry?.memoryReadSource || 'static_only',
+  };
+  appendFn(logPath, payload, { maxLines: 5000 });
+}
+
+async function attachSemanticPriorLearnings(entry, options = {}) {
+  const baseEntry = entry && typeof entry === 'object' ? { ...entry } : {};
+  const semanticReadEnabled =
+    (process.env.REFLECTION_SEMANTIC_READ || 'on').toLowerCase() !== 'off';
+  if (!semanticReadEnabled) {
+    return {
+      ...baseEntry,
+      priorRelatedLearnings: [],
+      memoryReadSource: 'static_only',
+    };
+  }
+
+  const query = String(baseEntry.summary || baseEntry.error || baseEntry.tool || '').trim();
+  if (!query) {
+    return {
+      ...baseEntry,
+      priorRelatedLearnings: [],
+      memoryReadSource: 'static_only',
+    };
+  }
+
+  try {
+    const contextualMemory =
+      options.contextualMemory ||
+      new (require('../../lib/memory/contextual-memory.cjs').ContextualMemory)({
+        projectRoot: PROJECT_ROOT,
+      });
+    const limit = Number.isFinite(options.limit) ? options.limit : 5;
+    const results = await contextualMemory.search(query, { limit });
+    const priorRelatedLearnings = Array.isArray(results)
+      ? results
+          .map(item => String(item?.content || item?.text || '').trim())
+          .filter(Boolean)
+          .slice(0, limit)
+      : [];
+
+    return {
+      ...baseEntry,
+      priorRelatedLearnings,
+      memoryReadSource: priorRelatedLearnings.length > 0 ? 'semantic+static' : 'static_only',
+    };
+  } catch (_err) {
+    return {
+      ...baseEntry,
+      priorRelatedLearnings: [],
+      memoryReadSource: 'static_only',
+    };
+  }
+}
+
 async function main() {
   const startTime = Date.now();
   const outcome = {
@@ -128,7 +191,9 @@ async function main() {
     switch (eventType) {
       case 'task_completion': {
         const entry = eventHandlers.handleTaskCompletion(hookInput);
-        queueReflection(entry);
+        const enrichedEntry = await attachSemanticPriorLearnings(entry);
+        queueReflection(enrichedEntry);
+        await appendReflectionLogEntry(enrichedEntry);
         outcome.queued = true;
         break;
       }
@@ -139,13 +204,16 @@ async function main() {
       }
       case 'error_recovery': {
         const entry = eventHandlers.handleErrorRecovery(hookInput);
-        queueReflection(entry);
+        const enrichedEntry = await attachSemanticPriorLearnings(entry);
+        queueReflection(enrichedEntry);
+        await appendReflectionLogEntry(enrichedEntry);
         outcome.queued = true;
         break;
       }
       case 'session_end': {
         const result = eventHandlers.handleSessionEnd(hookInput);
         queueReflection(result.reflection);
+        await appendReflectionLogEntry(result.reflection);
         outcome.queued = true;
 
         await actions.recordSession(result.sessionData);
@@ -164,7 +232,12 @@ async function main() {
       }
       case 'memory_extraction': {
         const extracted = eventHandlers.handleMemoryExtraction(hookInput);
-        actions.recordMemoryItems(extracted);
+        const memoryResult = await actions.recordMemoryItems(extracted);
+        await appendReflectionLogEntry({
+          trigger: 'memory_extraction',
+          memoryWrites: memoryResult?.memoryWrites || [],
+          memoryReadSource: 'static_only',
+        });
         outcome.memoryItemsRecorded = true;
         break;
       }
@@ -224,6 +297,8 @@ module.exports = {
   getSessionStats: eventHandlers.getSessionStats,
 
   queueReflection,
+  appendReflectionLogEntry,
+  attachSemanticPriorLearnings,
   recordSession: actions.recordSession,
   triggerEmbeddingGeneration: actions.triggerEmbeddingGeneration,
   triggerMLSessionEnd: actions.triggerMLSessionEnd,

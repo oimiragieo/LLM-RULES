@@ -46,6 +46,12 @@ const TASKUPDATE_FIRST_WINDOW_MS = Number(
 const WINDOWS_BASH_GUARDRAIL_MESSAGE =
   '[ROUTER-FIRST PROTOCOL VIOLATION][AGENT-GUARDRAIL] Windows-incompatible Bash heredoc/tmp command blocked. ' +
   'Use Write/Edit tools for artifact content, avoid `cd /c/...` style prefixes, and use a Windows-safe Bash/PowerShell command.';
+const STRUCTURED_MEMORY_PATHS = new Set([
+  '.claude/context/memory/patterns.json',
+  '.claude/context/memory/gotchas.json',
+  '.claude/context/memory/open-findings.json',
+  '.claude/context/memory/access-stats.json',
+]);
 
 function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
   try {
@@ -370,6 +376,28 @@ function getMutationPath(toolName, toolInput) {
   return normalizeToolPath(filePath);
 }
 
+function checkStructuredMemoryDirectWrite(toolName, toolInput) {
+  const mode = (process.env.MEMORY_DIRECT_WRITE_ENFORCEMENT || 'block').toLowerCase();
+  if (mode === 'off') return { checked: false, reason: 'disabled' };
+
+  const mutationPath = getMutationPath(toolName, toolInput);
+  if (!mutationPath) return { checked: false, reason: 'no_mutation_path' };
+
+  const normalizedPath = mutationPath.toLowerCase();
+  if (!STRUCTURED_MEMORY_PATHS.has(normalizedPath)) {
+    return { checked: true, action: 'allow' };
+  }
+
+  const message =
+    `[MEMORY-GUARD] Direct ${toolName} to structured memory file "${mutationPath}" is not allowed. ` +
+    'Use MemoryRecord tool to write structured memory.';
+
+  if (mode === 'warn') {
+    return { checked: true, action: 'allow', warning: message };
+  }
+  return { checked: true, action: 'block', message };
+}
+
 function isAllowedByFilePolicy(targetPath, allowlist) {
   if (!targetPath || !Array.isArray(allowlist) || allowlist.length === 0) return true;
   const normalizedTarget = targetPath.toLowerCase();
@@ -573,6 +601,7 @@ module.exports = {
   isGitCommitCommand,
   isCheckpointCommand,
   normalizeToolPath,
+  checkStructuredMemoryDirectWrite,
   isAllowedByFilePolicy,
   isWindowsIncompatibleBashCommand,
   evaluateWindowsBashGuard,

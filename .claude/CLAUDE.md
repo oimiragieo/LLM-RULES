@@ -548,6 +548,8 @@ High-impact orchestration skills:
 
 - `artifact-integrator`
 - `github-ops`
+- `gemini-cli-security`
+- `enterprise-skill-test-1771395136358`
 - `framework-context`
 - `recommend-evolution`
 - `creation-feasibility-gate`

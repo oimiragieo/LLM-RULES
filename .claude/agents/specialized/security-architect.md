@@ -46,6 +46,7 @@ skills:
   - verification-before-completion
   - web3-expert
   - medusa-security
+  - gemini-cli-security
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

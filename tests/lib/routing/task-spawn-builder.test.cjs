@@ -9,7 +9,9 @@ const {
 } = require('../../../.claude/lib/routing/task-spawn-builder.cjs');
 
 test('deriveDescriptionFromPrompt strips leading "You are" prefix', () => {
-  const description = deriveDescriptionFromPrompt('You are DEVELOPER. Fix auth race condition.\nDo work');
+  const description = deriveDescriptionFromPrompt(
+    'You are DEVELOPER. Fix auth race condition.\nDo work'
+  );
   assert.equal(description, 'DEVELOPER. Fix auth race condition.');
 });
 

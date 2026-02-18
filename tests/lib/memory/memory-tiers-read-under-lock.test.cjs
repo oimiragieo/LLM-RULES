@@ -34,7 +34,7 @@ test('getMTMSessions remains stable under repeated concurrent consolidation writ
       const sessionId = `session-${i}`;
       writers.push(
         (async () => {
-          await memoryTiers.writeSTMEntry(
+          await memoryTiers.writeSTMEntryWithLock(
             {
               session_id: sessionId,
               summary: `Summary ${i}`,
@@ -42,7 +42,7 @@ test('getMTMSessions remains stable under repeated concurrent consolidation writ
             },
             projectRoot
           );
-          await memoryTiers.consolidateSession(sessionId, projectRoot);
+          await memoryTiers.consolidateSessionWithLock(sessionId, projectRoot);
         })()
       );
     }

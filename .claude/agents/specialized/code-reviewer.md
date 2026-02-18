@@ -29,6 +29,7 @@ skills:
   - security-architect
   - static-analysis
   - verification-before-completion
+  - gemini-cli-security
 context_files:
   - '@.claude/context/memory/learnings.md'
 hooks: {}

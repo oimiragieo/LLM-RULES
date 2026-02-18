@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines */
 /**
  * pre-completion-validation.cjs
  *
@@ -410,6 +411,27 @@ function incrementTaskOutputMetric(counterName) {
 }
 
 /**
+ * Validate that a summary string is meaningful and not a known fallback/placeholder.
+ * @param {*} summary - The summary value to validate
+ * @returns {boolean} true if valid, false if missing or placeholder
+ */
+function isValidSummary(summary) {
+  if (!summary || typeof summary !== 'string') return false;
+  const trimmed = summary.trim();
+  if (trimmed.length < 10) return false; // Too short to be meaningful
+  // Reject known fallback/placeholder strings
+  const FALLBACK_PATTERNS = [
+    /^task\s+\d+\s+completed\s+without\s+summary/i,
+    /^completed\s+without\s+summary/i,
+    /^no\s+summary\s+(provided|available|metadata)/i,
+    /^task\s+completed$/i,
+    /^done$/i,
+    /^finished$/i,
+  ];
+  return !FALLBACK_PATTERNS.some(pattern => pattern.test(trimmed));
+}
+
+/**
  * Main hook execution.
  */
 async function main() {
@@ -468,6 +490,51 @@ async function main() {
 
     if (parsedParams.normalized.status !== 'completed') process.exit(0);
 
+    // PRE_COMPLETION_SUMMARY_ENFORCEMENT: require metadata.summary on completed tasks
+    const summaryMode = getEnforcementMode('PRE_COMPLETION_SUMMARY_ENFORCEMENT', 'block');
+    if (summaryMode !== 'off') {
+      if (!isValidSummary(toolParams.metadata && toolParams.metadata.summary)) {
+        const summaryMsg =
+          'TaskUpdate(completed) requires metadata.summary. Set PRE_COMPLETION_SUMMARY_ENFORCEMENT=warn to downgrade.';
+        if (summaryMode === 'block') {
+          console.log(formatHookResult('block', summaryMsg));
+          process.exit(2);
+        } else {
+          process.stderr.write(
+            `[pre-completion-validation] WARNING: TaskUpdate(completed) missing metadata.summary — reflection will be blind\n`
+          );
+        }
+      }
+    }
+
+    // REFLECTION_SCORE_ENFORCEMENT: detect reflection agent fabricating scores without dataQuality field.
+    // If a TaskUpdate carries a numeric score (indicating a reflection completion) but has no
+    // dataQuality field, we cannot verify the score was not fabricated under context pressure.
+    // Default mode is 'warn' — existing reflections are not broken; harden to 'block' to enforce.
+    const isReflectionCompletion =
+      (toolParams.metadata &&
+        Array.isArray(toolParams.metadata.processedReflectionIds) &&
+        toolParams.metadata.processedReflectionIds.length > 0) ||
+      (toolParams.metadata && typeof toolParams.metadata.score === 'number');
+
+    if (isReflectionCompletion) {
+      const hasScore = toolParams.metadata && typeof toolParams.metadata.score === 'number';
+      const hasDataQuality = toolParams.metadata && toolParams.metadata.dataQuality !== undefined;
+
+      // If a numeric score is present but no dataQuality field, we cannot verify authenticity.
+      if (hasScore && !hasDataQuality) {
+        const reflectionMode = getEnforcementMode('REFLECTION_SCORE_ENFORCEMENT', 'warn');
+        const reflectionMsg =
+          '[pre-completion-validation] Reflection score emitted without dataQuality field — cannot verify score was not fabricated. Add metadata.dataQuality: "full"|"partial"|"insufficient"';
+        if (reflectionMode === 'block') {
+          console.log(formatHookResult('block', reflectionMsg));
+          process.exit(2);
+        } else if (reflectionMode !== 'off') {
+          process.stderr.write(reflectionMsg + '\n');
+        }
+      }
+    }
+
     const completionTaskId = parsedParams.normalized.taskId;
     const requiredOutputs = resolveRequiredOutputsForTask(completionTaskId, toolParams);
     const taskOutputMode = getEnforcementMode('TASK_OUTPUT_ENFORCEMENT', 'block');
@@ -502,7 +569,7 @@ async function main() {
       if (!ecosystem.passed) {
         const msg = ['CREATOR ECOSYSTEM ALIGNMENT FAILED', ...ecosystem.issues].join('\n');
         console.log(formatHookResult('block', msg));
-        process.exit(0);
+        process.exit(2);
       }
     }
 
@@ -524,7 +591,7 @@ async function main() {
       ...failed.map(f => `[${f.type}] ${f.path}`),
     ].join('\n');
     console.log(formatHookResult('block', blockMsg));
-    process.exit(0);
+    process.exit(2);
   } catch (err) {
     console.error(`[pre-completion-validation] Hook failed: ${err.message}`);
     process.exit(0);

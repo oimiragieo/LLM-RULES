@@ -436,11 +436,134 @@ function serializeQueueEntryWithCap(entry) {
  * @param {Object} hookData - Parsed hook input data
  * @returns {Promise<Object>} Result object
  */
+/**
+ * Handle Write tool events — catches Skill() invocations of skill-creator and agent-creator
+ * that never fire a TaskUpdate, so the original PostToolUse(TaskUpdate) hook misses them.
+ *
+ * @param {string} skillName - Name of the skill (extracted from path)
+ * @param {string} filePath - Normalized forward-slash path to the SKILL.md file
+ * @returns {Object} { allow: true }
+ */
+function handleSkillMdWrite(skillName, filePath) {
+  try {
+    const entry = {
+      id: `skill-write:${skillName}:${Date.now()}`,
+      type: 'skill',
+      artifactName: skillName,
+      artifactPath: filePath,
+      detectedVia: 'write-trigger',
+      timestamp: new Date().toISOString(),
+      processed: false,
+    };
+
+    const queueDir = path.dirname(QUEUE_PATH);
+    if (!fs.existsSync(queueDir)) {
+      fs.mkdirSync(queueDir, { recursive: true });
+    }
+
+    const serialized = serializeQueueEntryWithCap({
+      ...entry,
+      artifactId: `skill:${skillName}`,
+      creatorType: 'skill',
+      changeType: 'created',
+      source: 'post-creation-integration.cjs',
+      gaps: ['write-trigger-detected'],
+      priority: 'P1',
+      impactReport: null,
+    });
+    fs.appendFileSync(QUEUE_PATH, serialized + '\n', 'utf8');
+
+    process.stderr.write(
+      `[post-creation-integration] Queued skill ${skillName} for integration (detected via Write trigger)\n`
+    );
+  } catch (err) {
+    process.stderr.write(
+      `[post-creation-integration] Write trigger queue failed (non-blocking): ${err.message}\n`
+    );
+  }
+  return { allow: true };
+}
+
+/**
+ * Handle Write tool events for agent .md files
+ *
+ * @param {string} agentName - Name of the agent file (without extension)
+ * @param {string} filePath - Normalized forward-slash path to the agent .md file
+ * @returns {Object} { allow: true }
+ */
+function handleAgentMdWrite(agentName, filePath) {
+  try {
+    const entry = {
+      id: `agent-write:${agentName}:${Date.now()}`,
+      type: 'agent',
+      artifactName: agentName,
+      artifactPath: filePath,
+      detectedVia: 'write-trigger',
+      timestamp: new Date().toISOString(),
+      processed: false,
+    };
+
+    const queueDir = path.dirname(QUEUE_PATH);
+    if (!fs.existsSync(queueDir)) {
+      fs.mkdirSync(queueDir, { recursive: true });
+    }
+
+    const serialized = serializeQueueEntryWithCap({
+      ...entry,
+      artifactId: `agent:${agentName}`,
+      creatorType: 'agent',
+      changeType: 'created',
+      source: 'post-creation-integration.cjs',
+      gaps: ['write-trigger-detected'],
+      priority: 'P1',
+      impactReport: null,
+    });
+    fs.appendFileSync(QUEUE_PATH, serialized + '\n', 'utf8');
+
+    process.stderr.write(
+      `[post-creation-integration] Queued agent ${agentName} for integration (detected via Write trigger)\n`
+    );
+  } catch (err) {
+    process.stderr.write(
+      `[post-creation-integration] Write trigger queue failed (non-blocking): ${err.message}\n`
+    );
+  }
+  return { allow: true };
+}
+
 async function processCreatorCompletion(hookData) {
   const toolName = getToolName(hookData);
   const toolInput = getToolInput(hookData);
 
-  // Only process TaskUpdate
+  // NEW: Handle Write tool events (catches Skill() invocations of skill-creator)
+  if (toolName === 'Write' || toolName === 'write') {
+    const filePath = toolInput?.file_path || toolInput?.path || '';
+    // Normalize path separators (Windows uses backslashes)
+    const normalizedPath = filePath.replace(/\\/g, '/');
+
+    // Detect SKILL.md writes
+    const skillMdMatch = normalizedPath.match(/\.claude\/skills\/([^/]+)\/SKILL\.md$/);
+    if (skillMdMatch) {
+      const skillName = skillMdMatch[1];
+      const result = handleSkillMdWrite(skillName, normalizedPath);
+      process.stdout.write(formatHookResult(result));
+      return { result };
+    }
+
+    // Detect agent .md writes
+    const agentMdMatch = normalizedPath.match(/\.claude\/agents\/[^/]+\/([^/]+)\.md$/);
+    if (agentMdMatch) {
+      const result = handleAgentMdWrite(agentMdMatch[1], normalizedPath);
+      process.stdout.write(formatHookResult(result));
+      return { result };
+    }
+
+    // Not a creator path — allow
+    process.stdout.write(formatHookResult({ allow: true }));
+    return { result: { allow: true } };
+  }
+
+  // Only process TaskUpdate (original path)
   if (toolName !== 'TaskUpdate') {
     process.stderr.write('[post-creation-integration] Not a TaskUpdate, passing through\n');
     process.stdout.write(formatHookResult({ allow: true }));
@@ -577,6 +700,8 @@ module.exports = {
   serializeQueueEntryWithCap,
   appendToQueueWithImpact,
   rotateQueue,
+  handleSkillMdWrite,
+  handleAgentMdWrite,
   processCreatorCompletion,
   parseHookInputAsync,
   main,

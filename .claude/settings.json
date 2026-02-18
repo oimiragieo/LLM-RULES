@@ -225,6 +225,15 @@
         ]
       },
       {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow/post-creation-integration.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Edit",
         "hooks": [
           {
@@ -243,7 +252,7 @@
         ]
       },
       {
-        "matcher": "Task|TaskUpdate|Bash",
+        "matcher": "Task|TaskUpdate|Bash|MemoryRecord",
         "hooks": [
           {
             "type": "command",
@@ -263,7 +272,7 @@
         ]
       },
       {
-        "matcher": "Task|TaskUpdate|Bash",
+        "matcher": "Task|TaskUpdate|Bash|MemoryRecord",
         "hooks": [
           {
             "type": "command",

@@ -61,6 +61,7 @@ const INTENT_TO_AGENT = {
   reverse_engineer: 'reverse-engineer',
   researcher: 'researcher',
   security_architect: 'security-architect',
+  gemini_cli_security: 'security-architect', // gemini-cli-security skill routes to security-architect
 
   // Orchestrators
   master_orchestrator: 'master-orchestrator',
@@ -129,6 +130,11 @@ const INTENT_TO_AGENT = {
   incident: 'incident-responder',
   plan: 'planner',
   integration: 'developer',
+  'qa-guardian': 'qa-guardian',
+  'contract-check': 'contract-check',
+  'bool-action': 'bool-action',
+  'repo-onboarder': 'repo-onboarder',
+  'enterprise-skill-test-1771395136358': 'enterprise-skill-test-1771395136358',
 };
 
 module.exports = { INTENT_TO_AGENT };

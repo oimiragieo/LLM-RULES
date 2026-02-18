@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gemini-cli-security Input Schema",
+  "description": "Input parameters for the gemini-cli-security vulnerability analysis skill",
+  "type": "object",
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Directory or file path to analyze. Relative to project root.",
+      "default": ".",
+      "examples": ["src/", "src/auth/", "src/config.ts"]
+    },
+    "scanDeps": {
+      "type": "boolean",
+      "description": "Whether to scan package.json dependencies against OSV.dev vulnerability database",
+      "default": false
+    },
+    "json": {
+      "type": "boolean",
+      "description": "Output findings as structured JSON instead of markdown report",
+      "default": false
+    },
+    "scope": {
+      "type": ["string", "null"],
+      "description": "Natural language scope restriction to filter files by keyword match",
+      "examples": [
+        "focus on auth module",
+        "token handling and session management",
+        "database queries"
+      ],
+      "default": null
+    }
+  },
+  "additionalProperties": false
+}

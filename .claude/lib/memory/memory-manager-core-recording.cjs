@@ -8,6 +8,46 @@ const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
 const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
+function tokenize(text) {
+  return String(text || '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/u)
+    .filter(Boolean);
+}
+
+function similarityScore(a, b) {
+  const aTokens = new Set(tokenize(a));
+  const bTokens = new Set(tokenize(b));
+  if (aTokens.size === 0 || bTokens.size === 0) return 0;
+  let intersection = 0;
+  for (const token of aTokens) {
+    if (bTokens.has(token)) intersection += 1;
+  }
+  const union = new Set([...aTokens, ...bTokens]).size;
+  return union === 0 ? 0 : intersection / union;
+}
+
+function getEntryText(value) {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && typeof value.text === 'string') return value.text;
+  return '';
+}
+
+function isDuplicateEntry(entries, candidateText, threshold) {
+  const normalizedCandidate = String(candidateText || '').toLowerCase();
+  for (const entry of entries) {
+    const text = getEntryText(entry);
+    if (!text) continue;
+    if (text.toLowerCase() === normalizedCandidate) {
+      return { duplicate: true, reason: 'exact' };
+    }
+    if (similarityScore(text, normalizedCandidate) >= threshold) {
+      return { duplicate: true, reason: 'semantic' };
+    }
+  }
+  return { duplicate: false, reason: 'none' };
+}
+
 function createRecordingOps({
   PROJECT_ROOT,
   validateProjectRoot,
@@ -55,20 +95,56 @@ function createRecordingOps({
           return false;
         }
 
-        const isDuplicate = gotchas.some(
-          g =>
-            g.text.toLowerCase() === gotcha.text?.toLowerCase() ||
-            g.text.toLowerCase() === gotcha.toLowerCase?.()
-        );
+        const dedupEnabled = (process.env.MEMORY_DEDUP_ENABLED || 'on').toLowerCase() !== 'off';
+        const dedupThresholdRaw = Number(process.env.MEMORY_DEDUP_THRESHOLD || 0.7);
+        const dedupThreshold =
+          Number.isFinite(dedupThresholdRaw) && dedupThresholdRaw >= 0 && dedupThresholdRaw <= 1
+            ? dedupThresholdRaw
+            : 0.7;
+        const candidateText = getEntryText(gotcha);
+        let dedupStatus = 'dedup_disabled_create';
+        let isDuplicate = false;
+        try {
+          if (dedupEnabled) {
+            if (process.env.MEMORY_DEDUP_FORCE_ERROR === '1') {
+              throw new Error('forced dedup failure');
+            }
+            const decision = isDuplicateEntry(gotchas, candidateText, dedupThreshold);
+            isDuplicate = decision.duplicate;
+            dedupStatus =
+              decision.reason === 'exact'
+                ? 'duplicate_skipped'
+                : decision.reason === 'semantic'
+                  ? 'semantic_duplicate_skipped'
+                  : 'create';
+          } else {
+            const decision = isDuplicateEntry(gotchas, candidateText, 1);
+            isDuplicate = decision.duplicate;
+            dedupStatus = isDuplicate ? 'duplicate_skipped' : 'dedup_disabled_create';
+          }
+        } catch (_dedupErr) {
+          const decision = isDuplicateEntry(gotchas, candidateText, 1);
+          isDuplicate = decision.duplicate;
+          dedupStatus = isDuplicate ? 'duplicate_skipped' : 'error_fallback_create';
+        }
 
         if (!isDuplicate) {
           const now = new Date().toISOString();
           const area =
             typeof gotcha === 'object' && gotcha ? normalizeArea(gotcha.area) : DEFAULT_AREA;
-          const entry =
+          const entryBase =
             typeof gotcha === 'string'
               ? { text: gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area }
               : { ...gotcha, timestamp: now, accessCount: 0, lastAccessed: null, area };
+          const writeSource =
+            typeof entryBase.source === 'string' && entryBase.source.trim()
+              ? entryBase.source.trim()
+              : 'memory_api';
+          const entry = {
+            ...entryBase,
+            writeSource,
+            dedupStatus,
+          };
           entry.id = buildEntryId(entry);
 
           gotchas.push(entry);
@@ -145,20 +221,56 @@ function createRecordingOps({
           return false;
         }
 
-        const isDuplicate = patterns.some(
-          p =>
-            p.text.toLowerCase() === pattern.text?.toLowerCase() ||
-            p.text.toLowerCase() === pattern.toLowerCase?.()
-        );
+        const dedupEnabled = (process.env.MEMORY_DEDUP_ENABLED || 'on').toLowerCase() !== 'off';
+        const dedupThresholdRaw = Number(process.env.MEMORY_DEDUP_THRESHOLD || 0.7);
+        const dedupThreshold =
+          Number.isFinite(dedupThresholdRaw) && dedupThresholdRaw >= 0 && dedupThresholdRaw <= 1
+            ? dedupThresholdRaw
+            : 0.7;
+        const candidateText = getEntryText(pattern);
+        let dedupStatus = 'dedup_disabled_create';
+        let isDuplicate = false;
+        try {
+          if (dedupEnabled) {
+            if (process.env.MEMORY_DEDUP_FORCE_ERROR === '1') {
+              throw new Error('forced dedup failure');
+            }
+            const decision = isDuplicateEntry(patterns, candidateText, dedupThreshold);
+            isDuplicate = decision.duplicate;
+            dedupStatus =
+              decision.reason === 'exact'
+                ? 'duplicate_skipped'
+                : decision.reason === 'semantic'
+                  ? 'semantic_duplicate_skipped'
+                  : 'create';
+          } else {
+            const decision = isDuplicateEntry(patterns, candidateText, 1);
+            isDuplicate = decision.duplicate;
+            dedupStatus = isDuplicate ? 'duplicate_skipped' : 'dedup_disabled_create';
+          }
+        } catch (_dedupErr) {
+          const decision = isDuplicateEntry(patterns, candidateText, 1);
+          isDuplicate = decision.duplicate;
+          dedupStatus = isDuplicate ? 'duplicate_skipped' : 'error_fallback_create';
+        }
 
         if (!isDuplicate) {
           const now = new Date().toISOString();
           const area =
             typeof pattern === 'object' && pattern ? normalizeArea(pattern.area) : DEFAULT_AREA;
-          const entry =
+          const entryBase =
             typeof pattern === 'string'
               ? { text: pattern, timestamp: now, accessCount: 0, lastAccessed: null, area }
               : { ...pattern, timestamp: now, accessCount: 0, lastAccessed: null, area };
+          const writeSource =
+            typeof entryBase.source === 'string' && entryBase.source.trim()
+              ? entryBase.source.trim()
+              : 'memory_api';
+          const entry = {
+            ...entryBase,
+            writeSource,
+            dedupStatus,
+          };
           entry.id = buildEntryId(entry);
 
           patterns.push(entry);

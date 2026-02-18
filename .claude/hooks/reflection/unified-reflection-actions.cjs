@@ -312,9 +312,9 @@ function createReflectionActions({
     }
   }
 
-  function recordMemoryItems(extracted) {
+  async function recordMemoryItems(extracted) {
     if (!isEnabled()) {
-      return;
+      return { recorded: 0, memoryWrites: [] };
     }
 
     try {
@@ -327,16 +327,65 @@ function createReflectionActions({
       }
 
       let recorded = 0;
+      const memoryWrites = [];
+      let memoryTiers = null;
+      try {
+        memoryTiers = require('../../lib/memory/memory-tiers.cjs');
+      } catch (_e) {
+        memoryTiers = null;
+      }
 
       for (const pattern of extracted.patterns || []) {
-        if (memoryManager.recordPattern(pattern, projectRoot)) {
+        const patternEntry =
+          typeof pattern === 'string'
+            ? { text: pattern, source: 'memory_api' }
+            : { source: 'memory_api', ...pattern };
+        if (memoryManager.recordPattern(patternEntry, projectRoot)) {
           recorded++;
+          memoryWrites.push({
+            type: 'pattern',
+            source: patternEntry.source || 'memory_api',
+            dedup: patternEntry.dedupStatus || 'unknown',
+          });
+          if (memoryTiers && typeof memoryTiers.writeSTMEntry === 'function') {
+            await memoryTiers.writeSTMEntry(
+              {
+                type: 'pattern',
+                content: patternEntry.text,
+                source: patternEntry.source || 'memory_api',
+                taskId: patternEntry.taskId || null,
+                timestamp: new Date().toISOString(),
+              },
+              projectRoot
+            );
+          }
         }
       }
 
       for (const gotcha of extracted.gotchas || []) {
-        if (memoryManager.recordGotcha(gotcha, projectRoot)) {
+        const gotchaEntry =
+          typeof gotcha === 'string'
+            ? { text: gotcha, source: 'memory_api' }
+            : { source: 'memory_api', ...gotcha };
+        if (memoryManager.recordGotcha(gotchaEntry, projectRoot)) {
           recorded++;
+          memoryWrites.push({
+            type: 'gotcha',
+            source: gotchaEntry.source || 'memory_api',
+            dedup: gotchaEntry.dedupStatus || 'unknown',
+          });
+          if (memoryTiers && typeof memoryTiers.writeSTMEntry === 'function') {
+            await memoryTiers.writeSTMEntry(
+              {
+                type: 'gotcha',
+                content: gotchaEntry.text,
+                source: gotchaEntry.source || 'memory_api',
+                taskId: gotchaEntry.taskId || null,
+                timestamp: new Date().toISOString(),
+              },
+              projectRoot
+            );
+          }
         }
       }
 
@@ -350,14 +399,33 @@ function createReflectionActions({
           )
         ) {
           recorded++;
+          memoryWrites.push({
+            type: 'discovery',
+            source: discovery.source || 'memory_api',
+            dedup: 'n/a',
+          });
+          if (memoryTiers && typeof memoryTiers.writeSTMEntry === 'function') {
+            await memoryTiers.writeSTMEntry(
+              {
+                type: 'discovery',
+                content: discovery.description,
+                source: discovery.source || 'memory_api',
+                taskId: discovery.taskId || null,
+                timestamp: new Date().toISOString(),
+              },
+              projectRoot
+            );
+          }
         }
       }
 
       if (recorded > 0 && process.env.DEBUG_HOOKS) {
         debugLog('unified-reflection', `Recorded ${recorded} memory items`);
       }
+      return { recorded, memoryWrites };
     } catch (err) {
       debugLog('unified-reflection', 'Error recording memory items', err);
+      return { recorded: 0, memoryWrites: [] };
     }
   }
 

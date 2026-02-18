@@ -1,3 +1,25 @@
+## 2026-02-18: REFLECTION-BLIND-001 -- Reflection Agent Score Fabrication on Missing Metadata (P1)
+
+**Issue**: When artifact-integrator omits TaskUpdate metadata (recurring, 14+ occurrences), reflection-agent receives only the fallback string "Task X completed without summary metadata" and awards a passing score (0.79/1.0 observed) without independent verification. Integration health check (ADR-100 Phase 5.5) is silently bypassed because artifact ID is unavailable.
+
+**Root Causes** (4 layers):
+
+1. No data sufficiency gate in reflection agent before scoring
+2. No enforcement hook on TaskUpdate(completed) for metadata.summary
+3. Reflection does not independently verify artifacts in catalogs/registries
+4. Reflection queue entry is too sparse (no filesModified, outputArtifacts, agent)
+
+**Proposed Fixes**:
+
+- Fix A (P0): Add warn/block hook in pre-completion-validation.cjs for missing metadata.summary
+- Fix B (P1): Add INSUFFICIENT_DATA gate in reflection-agent.md prompt
+- Fix C (P1): Add independent artifact verification for creation tasks in Phase 5.5
+- Fix D (P2): Enrich reflection queue entries with task metadata at capture time
+
+**Report**: `.claude/context/reports/architecture/reflection-blindness-bug-2026-02-18.md`
+
+---
+
 ## 2026-02-13: VUL-BYPASS-001 -- Code Block Exemption Bypass (P1)
 
 **Issue**: Triple-backtick code blocks fully exempt from scanning. Wrapping malicious payload in backticks bypasses all detection.
@@ -189,3 +211,103 @@
 - Status: Minor lint warning, not enforced at deployment
 - Plan: Split to memory-tiers-core.cjs (300L) + memory-tiers-eviction.cjs (200L) in next sprint
 - Impact: Code organization, no functional change required
+
+---
+
+## Task Metadata Governance Critical Failure (2026-02-18) — P0 BLOCKER
+
+**CRITICAL**: 12+ task completions on 2026-02-17 without summary metadata block reflection quality assessment and pattern extraction.
+
+**Evidence**:
+
+- gotchas.json entry `missing-taskupdate-metadata-recurring` (lines 22-39) documents 12 confirmed failures in single session
+- 4+ tasks simultaneously stuck in `in_progress` status awaiting manual router updates
+- Reflection agent defaults to WARNING score (0.45) for undocumented tasks, masking actual work quality
+
+**Root Cause**:
+
+- 70-line TaskUpdate warning box in spawn templates insufficient; agents skip documentation for "small/fast tasks"
+- Training-based enforcement has permanently failed across 12+ sessions
+- No runtime validation enforces metadata requirements
+
+**Impact**:
+
+- Router forced to manually update task statuses after agent completions
+- Reflection cannot score output quality or extract patterns without metadata
+- Workflow stalls (4+ tasks stuck waiting for manual resolution on 2026-02-17 alone)
+
+**Solution**:
+
+- **MANDATORY**: Create/register `pre-completion-validation.cjs` hook with COMPLETION_METADATA_ENFORCEMENT enforcement
+- Hook must validate TaskUpdate(completed) contains `metadata.summary` (non-empty string, min 3 words) + `filesModified` array
+- Configuration: COMPLETION_METADATA_ENFORCEMENT={warn|block|off} with **default: block** (not warn)
+- Must block ALL agent TaskUpdate calls lacking required metadata fields
+
+**Required Actions**:
+
+1. Implement hook or verify if pre-completion-validation.cjs already exists (status TBD)
+2. Register hook in settings.json PreToolUse(TaskUpdate) chain
+3. Update agent spawn templates with explicit requirement: "SHORT TASKS STILL NEED METADATA: { summary: 'Fixed X in Y.cjs', filesModified: ['path/file'] }"
+4. Add checkbox validation to TaskUpdate warning box: "TaskUpdate called with metadata.summary and filesModified"
+
+**Report**: `.claude/context/reports/reflections/batch-reflection-2026-02-18.md` (Section: Task Metadata Governance Failure Pattern)
+
+---
+
+## Ghost Task Reflection Echo Pattern (2026-02-18) — P1
+
+**Medium Priority**: Reflection queue can re-trigger on task IDs previously identified as ghost tasks, creating duplicate reflection spawns.
+
+**Evidence**:
+
+- gotchas.json entry `ghost-task-reflection-echo` (lines 42-57)
+- 2026-02-17 22:23 batch: Task #2 flagged as ghost task in 22:14 batch, then re-triggered in 22:23 batch
+- Pure duplicate spawn with zero diagnostic value
+
+**Root Cause**:
+
+- reflection-cleanup.cjs processes completed reflection-agent TaskUpdate calls but may not fully clear processedReflectionIds before next reflection spawn
+- Ghost task IDs persist in reflection-spawn-request.json between reflection batches
+- No deduplication logic in reflection-queue-processor.cjs
+
+**Solution**:
+
+- Add ghost-task deduplication to reflection-queue-processor.cjs
+- Before spawning, check reflection-log.jsonl for prior entries with same reflectionId
+- If found with status 'ghost_task_detected', suppress spawn and log deduplication event
+- Implement REFLECTION_TASK_VALIDATION enforcement mode (warn|block|off)
+
+**Report**: `.claude/context/reports/reflections/batch-reflection-2026-02-18.md` (Section: Reflection 2)
+
+---
+
+## REFLECTION-AGENT INSUFFICIENT DATA GATE FAILURE (2026-02-18) — P0 CRITICAL
+
+**Critical Blocker**: Task 15 and Task 16 completed without metadata summaries, creating the IRONIC situation where tasks designed to FIX missing-metadata bugs themselves failed to include metadata.
+
+**Evidence**:
+
+- Task 15: pre-completion-validation.cjs bug fixes (3 bugs) — NO METADATA
+- Task 16: REFLECTION_SCORE_ENFORCEMENT check addition — NO METADATA
+- Pattern: 15th+ occurrence in this session alone
+- Irony: Both tasks are meant to PREVENT this exact pattern
+
+**Root Cause**:
+
+- pre-completion-validation.cjs enforcement mode is warn, not block (does not prevent completion)
+- Agents do not respect metadata requirements for "small/quick fixes"
+- No hard blocking mechanism exists for missing summaries
+
+**Impact**:
+
+- Reflection agent cannot compute scores (INSUFFICIENT_DATA gate triggers)
+- Pattern recurrence continues unabated despite fixes in task 15
+- Demonstrates that hook fixes alone are insufficient; requires runtime blocking
+
+**Immediate Action Required**:
+
+- Verify pre-completion-validation.cjs exists and check enforcement mode
+- If in WARN mode, escalate to BLOCK mode
+- If hook doesn't exist, implement immediately with hard blocking for missing metadata.summary
+
+**Report**: This batch reflection (task 17)

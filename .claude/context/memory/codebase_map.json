@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-02-17T18:27:01.930Z"
+      "last_accessed": "2026-02-18T06:04:51.387Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "description": "Memory facade storage layer (read/write memory files)",
@@ -109,7 +109,43 @@
       "wave": "Wave 4b, Task #12",
       "last_accessed": "2026-02-11",
       "accessDate": "2026-02-11T00:00:00.000Z"
+    },
+    ".claude/skills/gemini-cli-security/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T06:06:09.567Z",
+      "last_accessed": "2026-02-18T06:06:09.567Z"
+    },
+    ".claude/skills/gemini-cli-security/hooks/pre-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T06:07:46.587Z",
+      "last_accessed": "2026-02-18T06:07:46.587Z"
+    },
+    ".claude/skills/gemini-cli-security/hooks/post-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T06:08:04.092Z",
+      "last_accessed": "2026-02-18T06:08:04.092Z"
+    },
+    ".claude/lib/routing/routing-table-intent-agents.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T06:32:19.085Z",
+      "last_accessed": "2026-02-18T06:32:19.085Z"
+    },
+    ".claude/hooks/validation/pre-completion-validation.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T06:42:24.699Z",
+      "last_accessed": "2026-02-18T06:48:06.485Z"
+    },
+    ".claude/hooks/workflow/post-creation-integration.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-18T06:42:55.537Z",
+      "last_accessed": "2026-02-18T06:43:04.200Z"
     }
   },
-  "last_updated": "2026-02-17T18:27:01.930Z"
+  "last_updated": "2026-02-18T06:48:06.485Z"
 }

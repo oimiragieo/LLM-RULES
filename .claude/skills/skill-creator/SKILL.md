@@ -1072,6 +1072,35 @@ tail -20 .claude/context/memory/learnings.md | grep "{skill-name}"
 
 **BLOCKING**: All checkboxes must pass. If any fail, skill creation is INCOMPLETE.
 
+## IRON LAW: TaskUpdate Completion Metadata (MANDATORY)
+
+When calling TaskUpdate({ status: 'completed' }), you MUST include ALL of these metadata fields:
+
+```javascript
+TaskUpdate({
+  taskId: '<task-id>',
+  status: 'completed',
+  metadata: {
+    creatorType: 'skill', // MANDATORY — enables post-creation-integration.cjs detection
+    artifactName: '<skill-name>', // MANDATORY — the skill's name (e.g. 'gemini-cli-security')
+    artifactPath: '.claude/skills/<skill-name>/SKILL.md', // MANDATORY — path to SKILL.md
+    summary: 'Created skill <skill-name>: <one-line description>', // MANDATORY — for reflection
+    integrationStatus: 'pending', // Set to 'complete' only after all post-creation steps run
+    filesCreated: ['.claude/skills/<skill-name>/SKILL.md', '...'], // All files written
+  },
+});
+```
+
+**Why this is mandatory:**
+
+- `creatorType` is required by `post-creation-integration.cjs` to detect creation events
+- `summary` is required by reflection to avoid fabricating scores
+- Without these fields, the skill will be orphaned and reflection will be blind
+
+**Failure consequence:** Omitting these fields produces a fully orphaned skill invisible to the framework (confirmed bug 2026-02-18).
+
+---
+
 ### Step 10: Integration Verification (BLOCKING - DO NOT SKIP)
 
 **This step verifies the artifact is properly integrated into the ecosystem.**

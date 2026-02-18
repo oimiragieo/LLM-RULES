@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-18T05:53:35.512Z",
+  "generatedAt": "2026-02-18T07:45:18.774Z",
   "metadata": {
-    "totalSkills": 395,
+    "totalSkills": 397,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-18T05:53:35.513Z",
+    "lastValidated": "2026-02-18T07:45:18.775Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -421,28 +421,24 @@
       "priority": 3,
       "aliasOf": null
     },
-    "interactive-requirements-gathering": {
-      "name": "interactive-requirements-gathering",
-      "displayName": "Interactive Requirements Gathering",
+    "enterprise-skill-test-1771395136358": {
+      "name": "enterprise-skill-test-1771395136358",
+      "displayName": "Enterprise Skill Test 1771395136358",
       "category": "Other",
-      "domain": "requirements",
-      "description": "Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
+      "domain": "other",
+      "description": "Other - enterprise-skill-test-1771395136358",
       "requiredTools": [
         "Read",
         "Write",
-        "Edit",
-        "AskUserQuestion"
+        "Edit"
       ],
       "agentPrimary": [
         "developer"
       ],
-      "agentSupporting": [
-        "pm"
-      ],
+      "agentSupporting": [],
       "tags": [
-        "requirements",
         "other",
-        "interactive-requirements-gathering"
+        "enterprise-skill-test-1771395136358"
       ],
       "priority": 3,
       "aliasOf": null
@@ -1992,6 +1988,31 @@
       "priority": 3,
       "aliasOf": null
     },
+    "gemini-cli-security": {
+      "name": "gemini-cli-security",
+      "displayName": "Gemini Cli Security",
+      "category": "Other",
+      "domain": "other",
+      "description": "AI-powered code vulnerability analysis and dependency scanning using Gemini CLI security extension patterns. Detects hardcoded secrets, injection attacks, weak cryptography, authentication flaws, and LLM prompt injection. Also scans dependencies against the OSV.dev vulnerability database.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "WebFetch",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "gemini-cli-security"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "github-mcp": {
       "name": "github-mcp",
       "displayName": "Github Mcp",
@@ -2247,6 +2268,32 @@
       "tags": [
         "other",
         "integration/artifact-updater"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "interactive-requirements-gathering": {
+      "name": "interactive-requirements-gathering",
+      "displayName": "Interactive Requirements Gathering",
+      "category": "Other",
+      "domain": "requirements",
+      "description": "Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "AskUserQuestion"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "pm"
+      ],
+      "tags": [
+        "requirements",
+        "other",
+        "interactive-requirements-gathering"
       ],
       "priority": 3,
       "aliasOf": null
@@ -9628,6 +9675,7 @@
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
+        "enterprise-skill-test-1771395136358",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -9648,6 +9696,7 @@
         "eval-harness-updater",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
+        "gemini-cli-security",
         "insecure-defaults",
         "integration/artifact-updater",
         "medusa-security",
@@ -9883,13 +9932,6 @@
         "library-usage",
         "unit-testing-requirement"
       ],
-      "requirements": [
-        "interactive-requirements-gathering",
-        "spec-gathering",
-        "progressive-disclosure",
-        "spec-writing",
-        "spec-critique"
-      ],
       "styling": [
         "accessibility",
         "design-and-user-experience-guidelines",
@@ -9985,6 +10027,13 @@
         "context-files-rules",
         "history-and-next-task-rules"
       ],
+      "requirements": [
+        "interactive-requirements-gathering",
+        "spec-gathering",
+        "progressive-disclosure",
+        "spec-writing",
+        "spec-critique"
+      ],
       "scientific": [
         "scientific-skills"
       ]
@@ -10006,7 +10055,7 @@
         "code-style-validator",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771395136358",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -10050,6 +10099,7 @@
         "form-validation-with-zod",
         "frontend-expert",
         "gcloud-cli",
+        "gemini-cli-security",
         "gitops-workflow",
         "graphql-expert",
         "helm-chart-scaffolding",
@@ -10058,6 +10108,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "java-expert",
         "jupyter-notebook-best-practices",
         "k8s-manifest-generator",
@@ -10453,7 +10504,7 @@
         "code-style-validator",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771395136358",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -10513,6 +10564,7 @@
         "framework-context",
         "frontend-expert",
         "gcloud-cli",
+        "gemini-cli-security",
         "github-mcp",
         "gitops-workflow",
         "go-expert",
@@ -10523,6 +10575,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -10872,6 +10925,7 @@
         "filesystem",
         "frontend-expert",
         "gcloud-cli",
+        "gemini-cli-security",
         "github-mcp",
         "gitops-workflow",
         "go-expert",
@@ -10974,6 +11028,7 @@
         "eval-harness-updater",
         "filesystem",
         "frontend-expert",
+        "gemini-cli-security",
         "gitops-workflow",
         "go-expert",
         "graphql-expert",
@@ -11072,6 +11127,7 @@
         "eval-harness-updater",
         "filesystem",
         "frontend-expert",
+        "gemini-cli-security",
         "gitops-workflow",
         "go-expert",
         "graphql-expert",
@@ -11144,7 +11200,7 @@
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771395136358",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -11197,6 +11253,7 @@
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "frontend-expert",
+        "gemini-cli-security",
         "github-mcp",
         "gitops-workflow",
         "go-expert",
@@ -11207,6 +11264,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -11516,7 +11574,7 @@
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771395136358",
         "dynamic-api-integration",
         "code-structural-search",
         "function-length-and-responsibility",
@@ -11572,6 +11630,7 @@
         "html-tailwind-css-and-javascript-expert-rule",
         "insecure-defaults",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -11861,12 +11920,6 @@
         "agent-creator",
         "smart-debug"
       ],
-      "AskUserQuestion": [
-        "interactive-requirements-gathering",
-        "prd-generator",
-        "spec-gathering",
-        "progressive-disclosure"
-      ],
       "WebSearch": [
         "agent-creator",
         "agent-updater",
@@ -11887,6 +11940,7 @@
         "assimilate",
         "chrome-browser",
         "eval-harness-updater",
+        "gemini-cli-security",
         "powershell-expert",
         "research-synthesis",
         "scientific-skills",
@@ -11920,6 +11974,12 @@
       ],
       "mcp__Exa__web_search_exa": [
         "arxiv-mcp"
+      ],
+      "AskUserQuestion": [
+        "interactive-requirements-gathering",
+        "prd-generator",
+        "spec-gathering",
+        "progressive-disclosure"
       ],
       "TaskCreate": [
         "task-management-protocol",
@@ -11968,7 +12028,7 @@
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771395136358",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -12003,6 +12063,7 @@
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "gcloud-cli",
+        "gemini-cli-security",
         "gitops-workflow",
         "helm-chart-scaffolding",
         "hook-creator",
@@ -12010,6 +12071,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
@@ -12745,7 +12807,7 @@
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771395136358",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -12780,6 +12842,7 @@
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "gcloud-cli",
+        "gemini-cli-security",
         "gitops-workflow",
         "helm-chart-scaffolding",
         "hook-creator",
@@ -12787,6 +12850,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",

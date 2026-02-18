@@ -434,6 +434,31 @@ const INTENT_KEYWORDS = {
     'cross platform',
     'pwsh',
   ],
+  'qa-guardian': ['qa-guardian', 'qa', 'guardian', 'quality', 'gate', 'agent'],
+  'contract-check': ['contract-check', 'contract', 'check', 'agent'],
+  'bool-action': ['bool-action', 'bool', 'action', 'boolean', 'mode'],
+  'repo-onboarder': [
+    'repo-onboarder',
+    'repo',
+    'onboarder',
+    'repository',
+    'integration',
+    'orchestrator',
+  ],
+  'reflection-agent': ['reflection-agent', 'reflection', 'agent'],
+  'enterprise-skill-test-1771395136358': [
+    'enterprise-skill-test-1771395136358',
+    'enterprise',
+    'skill',
+    'test',
+    '1771395136358',
+    'scaffold',
+    'validation',
+    'coverage',
+    'reliability',
+    'checks',
+  ],
+  tdd: ['tdd'],
 };
 
 module.exports = { INTENT_KEYWORDS };

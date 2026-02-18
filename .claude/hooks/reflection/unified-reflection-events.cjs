@@ -61,6 +61,10 @@ function createReflectionEventHandlers({
       return null;
     }
 
+    if (toolName === 'MemoryRecord') {
+      return 'memory_extraction';
+    }
+
     if (toolResult && toolResult.error) {
       return 'error_recovery';
     }
@@ -268,6 +272,46 @@ function createReflectionEventHandlers({
   }
 
   function handleMemoryExtraction(input) {
+    const toolName = getToolName(input);
+    const toolInput = getToolInput(input) || {};
+    if (toolName === 'MemoryRecord') {
+      const type = String(toolInput.type || '').toLowerCase();
+      const content = typeof toolInput.content === 'string' ? toolInput.content.trim() : '';
+      if (!content) {
+        return { patterns: [], gotchas: [], discoveries: [] };
+      }
+      const memoryItem = {
+        text: content,
+        area: toolInput.area,
+        source: toolInput.source,
+        confidence: toolInput.confidence,
+        taskId: toolInput.taskId || toolInput.task_id,
+      };
+      if (type === 'pattern') {
+        return { patterns: [memoryItem], gotchas: [], discoveries: [] };
+      }
+      if (type === 'gotcha') {
+        return { patterns: [], gotchas: [memoryItem], discoveries: [] };
+      }
+      if (type === 'discovery') {
+        return {
+          patterns: [],
+          gotchas: [],
+          discoveries: [
+            {
+              path: toolInput.path || toolInput.filePath || 'unknown',
+              description: content,
+              area: toolInput.area,
+              source: toolInput.source,
+              confidence: toolInput.confidence,
+              taskId: toolInput.taskId || toolInput.task_id,
+            },
+          ],
+        };
+      }
+      return { patterns: [], gotchas: [], discoveries: [] };
+    }
+
     const toolResult = getToolOutput(input) || '';
     const output = typeof toolResult === 'string' ? toolResult : '';
     return {

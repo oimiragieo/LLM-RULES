@@ -86,6 +86,18 @@ async function main() {
       console.warn(`[pre-tool-unified:guardrail] ${bashArtifactWriteResult.warning}`);
     }
 
+    const structuredMemoryWriteResult = guardrails.checkStructuredMemoryDirectWrite(
+      toolName,
+      toolInput
+    );
+    if (structuredMemoryWriteResult.action === 'block') {
+      console.log(formatResult('block', structuredMemoryWriteResult.message));
+      process.exit(2);
+    }
+    if (structuredMemoryWriteResult.warning) {
+      console.warn(`[pre-tool-unified:memory-guard] ${structuredMemoryWriteResult.warning}`);
+    }
+
     const guardrailResult = guardrails.checkAgentGuardrails(hookInput, toolName, toolInput);
     if (guardrailResult.action === 'block') {
       console.log(formatResult('block', guardrailResult.message));
@@ -171,6 +183,7 @@ module.exports = {
   readAgentGuardrailsState: guardrails.readAgentGuardrailsState,
   writeAgentGuardrailsState: guardrails.writeAgentGuardrailsState,
   checkBashArtifactWriteSafety: guardrails.checkBashArtifactWriteSafety,
+  checkStructuredMemoryDirectWrite: guardrails.checkStructuredMemoryDirectWrite,
   checkAgentGuardrails: guardrails.checkAgentGuardrails,
   extractTaskOutputPathsFromCommand: guardrails.extractTaskOutputPathsFromCommand,
   isTaskOutputPollingCommand: guardrails.isTaskOutputPollingCommand,

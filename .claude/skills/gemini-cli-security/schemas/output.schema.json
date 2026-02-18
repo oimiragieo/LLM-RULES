@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gemini-cli-security Output Schema",
+  "description": "Output structure for the gemini-cli-security vulnerability analysis skill (JSON mode)",
+  "type": "object",
+  "required": ["findings", "summary"],
+  "properties": {
+    "findings": {
+      "type": "array",
+      "description": "List of detected vulnerability findings",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "category", "file", "line", "description", "remediation"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Finding identifier",
+            "examples": ["SEC-001", "INJ-002", "CRY-003", "LLM-001"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+            "description": "Severity level of the finding"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["secrets", "injection", "crypto", "llm"],
+            "description": "Vulnerability category"
+          },
+          "file": {
+            "type": "string",
+            "description": "Relative file path where the finding was detected"
+          },
+          "line": {
+            "type": "integer",
+            "description": "Line number of the finding",
+            "minimum": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the vulnerability"
+          },
+          "remediation": {
+            "type": "string",
+            "description": "Actionable remediation guidance"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Dependency vulnerability results from OSV.dev scan (populated when --scan-deps used)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "package": {
+            "type": "string",
+            "description": "Package name"
+          },
+          "version": {
+            "type": "string",
+            "description": "Package version"
+          },
+          "cve": {
+            "type": "string",
+            "description": "CVE identifier"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+          },
+          "fix": {
+            "type": "string",
+            "description": "Fixed version (if available)"
+          }
+        },
+        "additionalProperties": true
+      },
+      "default": []
+    },
+    "summary": {
+      "type": "object",
+      "required": ["critical", "high", "medium", "low"],
+      "properties": {
+        "critical": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of CRITICAL findings"
+        },
+        "high": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of HIGH findings"
+        },
+        "medium": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of MEDIUM findings"
+        },
+        "low": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of LOW findings"
+        },
+        "precision": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Precision metric (0.90 baseline from OpenSSF CVE benchmark)"
+        },
+        "recall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Recall metric (0.93 baseline from OpenSSF CVE benchmark)"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

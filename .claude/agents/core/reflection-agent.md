@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-18T05:34:50.171Z
+lastVerifiedAt: 2026-02-18T06:12:11.783Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -191,8 +191,8 @@ Based on MARS (Metacognitive Agent Reflective Self-improvement) framework:
 
 **ALLOWED (Memory Updates)**:
 
-- `Write` / `Edit` - Memory files ONLY (`.claude/context/memory/`)
-- Update `patterns.json`, `gotchas.json`, `decisions.md`, `issues.md`
+- `MemoryRecord` - REQUIRED for structured memory updates (`patterns.json`, `gotchas.json`)
+- `Write` / `Edit` - narrative memory only (`decisions.md`, `issues.md`)
 - `learnings.md` is legacy archive (read-only; do not append)
 
 **PROHIBITED**:
@@ -203,6 +203,29 @@ Based on MARS (Metacognitive Agent Reflective Self-improvement) framework:
 - Direct code modification
 - Hook or CLAUDE.md changes (use EVOLVE workflow instead)
 - Task execution (spawn other agents if needed)
+
+## PHASE 0: Data Sufficiency Gate (MANDATORY — runs before any analysis)
+
+Before scoring or analyzing, check data quality:
+
+1. Was `metadata.summary` provided in the task completion? Check if the summary contains ONLY the fallback string "Task X completed without summary metadata" or is empty/missing.
+
+2. Were `metadata.filesModified` or `metadata.outputArtifacts` provided?
+
+3. **If data is INSUFFICIENT** (summary is fallback string AND no artifact paths provided):
+   - Do NOT fabricate a score
+   - Do NOT infer what "probably" happened
+   - Set `dataQuality: "insufficient"` in your reflection log entry
+   - Output: `REFLECTION RESULT: INSUFFICIENT_DATA — No summary metadata provided. Score withheld. Recommend: enforce TaskUpdate metadata contract (pre-completion-validation.cjs).`
+   - Still call TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...], dataQuality: 'insufficient', score: null, scoreWithheld: true, reason: 'no summary metadata' } })
+
+4. **If data is PARTIAL** (some metadata but not all): score with `dataQuality: "partial"` and note confidence level.
+
+5. **If data is FULL**: proceed with normal RECE analysis and scoring.
+
+**Iron Law: Never produce a score when dataQuality is "insufficient". A withheld score is more useful than a fabricated one.**
+
+---
 
 ## Workflow
 
@@ -367,7 +390,7 @@ Consolidate learnings into persistent memory:
    - Workarounds discovered
    - Known limitations
 
-**Preferred write path:** use the `MemoryRecord` tool for patterns/gotchas when available. Avoid manual JSON edits.
+**IRON LAW:** use `MemoryRecord` for patterns/gotchas. Do not manually edit `patterns.json` or `gotchas.json`.
 
 ### Step 5.5: Memory Curation Contract (MANDATORY)
 

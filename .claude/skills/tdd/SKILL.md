@@ -1,4 +1,6 @@
 ---
+verified: true
+lastVerifiedAt: 2026-02-18T06:12:20.816Z
 name: tdd
 description: Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely.
 version: 1.2

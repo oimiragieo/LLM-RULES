@@ -4,7 +4,6 @@
 const fs = require('fs');
 const path = require('path');
 const { atomicWriteSync } = require('../utils/atomic-write.cjs');
-const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { withFileLock } = require('./memory-tiers-lock.cjs');
 const {
   isStructuredSummaryEnabled,
@@ -63,6 +62,18 @@ function ensureDir(dirPath) {
   }
 }
 
+function parseJSONObjectStrict(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null;
+    }
+    return parsed;
+  } catch (_e) {
+    return null;
+  }
+}
+
 function appendTierEvent(eventType, details = {}, projectRoot = PROJECT_ROOT) {
   appendTierEventBase(eventType, details, projectRoot, ensureDir);
 }
@@ -103,7 +114,11 @@ function _writeSTMEntry(sessionData, projectRoot = PROJECT_ROOT) {
  * Write current session data to Short-Term Memory (STM).
  * Thread-safe with file locking.
  */
-async function writeSTMEntry(sessionData, projectRoot = PROJECT_ROOT) {
+function writeSTMEntry(sessionData, projectRoot = PROJECT_ROOT) {
+  return _writeSTMEntry(sessionData, projectRoot);
+}
+
+async function writeSTMEntryWithLock(sessionData, projectRoot = PROJECT_ROOT) {
   return withFileLock(() => Promise.resolve(_writeSTMEntry(sessionData, projectRoot)), projectRoot);
 }
 
@@ -120,7 +135,7 @@ function readSTMEntry(projectRoot = PROJECT_ROOT) {
 
   try {
     const raw = fs.readFileSync(stmPath, 'utf8');
-    return safeParseJSON(raw);
+    return parseJSONObjectStrict(raw);
   } catch (e) {
     if (process.env.MEMORY_DEBUG) {
       console.error('[MEMORY_DEBUG]', 'readSTMEntry:', e.message);
@@ -157,7 +172,7 @@ function getMTMSessions(projectRoot = PROJECT_ROOT) {
     .map(f => {
       try {
         const raw = fs.readFileSync(path.join(mtmDir, f), 'utf8');
-        const data = safeParseJSON(raw);
+        const data = parseJSONObjectStrict(raw);
         if (!data || typeof data !== 'object') return null;
         return { ...data, _filename: f };
       } catch (e) {
@@ -188,7 +203,7 @@ function _consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
   let sessionData;
   try {
     const raw = fs.readFileSync(stmPath, 'utf8');
-    sessionData = safeParseJSON(raw);
+    sessionData = parseJSONObjectStrict(raw);
     if (!sessionData || typeof sessionData !== 'object') {
       throw new Error('Invalid STM JSON structure');
     }
@@ -280,7 +295,11 @@ function _consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
  * Consolidate session from STM to MTM (Mid-Term Memory).
  * Thread-safe with file locking.
  */
-async function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
+function consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
+  return _consolidateSession(sessionId, projectRoot);
+}
+
+async function consolidateSessionWithLock(sessionId, projectRoot = PROJECT_ROOT) {
   return withFileLock(
     () => Promise.resolve(_consolidateSession(sessionId, projectRoot)),
     projectRoot
@@ -364,7 +383,11 @@ function _promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
  * Promote a high-value session from MTM to LTM (Long-Term Memory).
  * Thread-safe with file locking.
  */
-async function promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
+function promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
+  return _promoteToLTM(sessionId, projectRoot);
+}
+
+async function promoteToLTMWithLock(sessionId, projectRoot = PROJECT_ROOT) {
   return withFileLock(() => Promise.resolve(_promoteToLTM(sessionId, projectRoot)), projectRoot);
 }
 
@@ -524,7 +547,11 @@ function _summarizeOldSessions(projectRoot = PROJECT_ROOT, incomingSessions = 0)
  * Summarize old sessions from MTM to LTM.
  * Thread-safe with file locking.
  */
-async function summarizeOldSessions(projectRoot = PROJECT_ROOT, incomingSessions = 0) {
+function summarizeOldSessions(projectRoot = PROJECT_ROOT, incomingSessions = 0) {
+  return _summarizeOldSessions(projectRoot, incomingSessions);
+}
+
+async function summarizeOldSessionsWithLock(projectRoot = PROJECT_ROOT, incomingSessions = 0) {
   return withFileLock(
     () => Promise.resolve(_summarizeOldSessions(projectRoot, incomingSessions)),
     projectRoot
@@ -622,16 +649,20 @@ module.exports = {
   getTierPath,
   // STM
   writeSTMEntry,
+  writeSTMEntryWithLock,
   readSTMEntry,
   clearSTM,
   // MTM
   getMTMSessions,
   consolidateSession,
+  consolidateSessionWithLock,
   findMTMSession,
   // LTM
   promoteToLTM,
+  promoteToLTMWithLock,
   generateSessionSummary,
   summarizeOldSessions,
+  summarizeOldSessionsWithLock,
   evictOldLTMSummaries,
   // Health
   getTierHealth,

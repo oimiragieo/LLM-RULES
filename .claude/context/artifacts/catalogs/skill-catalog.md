@@ -105,6 +105,7 @@ Security analysis and validation.
 | `semgrep-rule-creator`         | Create custom Semgrep rules                                                   | security-architect                                    |
 | `insecure-defaults`            | Detect hardcoded credentials, fail-open configs                               | security-architect                                    |
 | `medusa-security`              | AI-first SAST with 3,000+ patterns: prompt injection, MCP, agents, RAG, OWASP | security-architect, penetration-tester, code-reviewer |
+| `gemini-cli-security`          | AI-powered vulnerability analysis and OSV.dev dependency scanning             | security-architect, developer, code-reviewer          |
 
 ---
 
@@ -299,17 +300,18 @@ Quality validation skills.
 
 Advanced patterns and methodologies.
 
-| Skill                                | Description                                   | Primary Agents |
-| ------------------------------------ | --------------------------------------------- | -------------- |
-| `thinking-tools`                     | Self-reflection patterns (think-about-\*)     | all agents     |
-| `spec-gathering`                     | Requirements gathering                        | planner        |
-| `spec-init`                          | Unified spec creation                         | planner        |
-| `sequential-thinking`                | Structured problem solving                    | all agents     |
-| `consensus-voting`                   | Byzantine consensus for multi-agent decisions | orchestrators  |
-| `swarm-coordination`                 | Multi-agent swarm patterns                    | orchestrators  |
-| `interactive-requirements-gathering` | A/B/C/D/E questionnaire framework             | planner        |
-| `planning-with-files`                | Persistent planning files                     | planner        |
-| `sparc-methodology`                  | SPARC development methodology                 | architect      |
+| Skill                                 | Description                                                                    | Primary Agents |
+| ------------------------------------- | ------------------------------------------------------------------------------ | -------------- |
+| `thinking-tools`                      | Self-reflection patterns (think-about-\*)                                      | all agents     |
+| `spec-gathering`                      | Requirements gathering                                                         | planner        |
+| `spec-init`                           | Unified spec creation                                                          | planner        |
+| `sequential-thinking`                 | Structured problem solving                                                     | all agents     |
+| `consensus-voting`                    | Byzantine consensus for multi-agent decisions                                  | orchestrators  |
+| `swarm-coordination`                  | Multi-agent swarm patterns                                                     | orchestrators  |
+| `interactive-requirements-gathering`  | A/B/C/D/E questionnaire framework                                              | planner        |
+| `planning-with-files`                 | Persistent planning files                                                      | planner        |
+| `sparc-methodology`                   | SPARC development methodology                                                  | architect      |
+| `enterprise-skill-test-1771395136358` | Enterprise scaffold validation skill for test coverage and reliability checks. | Read           |
 
 ---
 
