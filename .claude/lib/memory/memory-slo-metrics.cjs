@@ -6,6 +6,7 @@ const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const DEFAULT_SLO_TARGETS = {
   writeP95Ms: Number(process.env.MEMORY_SLO_WRITE_P95_MS || 120),
@@ -65,9 +66,21 @@ function ensureMetricsDir(projectRoot = PROJECT_ROOT) {
 }
 
 function sleepSync(ms) {
-  const sab = new SharedArrayBuffer(4);
-  const ia = new Int32Array(sab);
-  Atomics.wait(ia, 0, 0, ms);
+  if (typeof SharedArrayBuffer !== 'undefined' && typeof Atomics !== 'undefined') {
+    try {
+      const sab = new SharedArrayBuffer(4);
+      const ia = new Int32Array(sab);
+      Atomics.wait(ia, 0, 0, ms);
+      return;
+    } catch (_err) {
+      // Fallback for runtimes without SharedArrayBuffer/Atomics.wait support.
+    }
+  }
+
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    // Busy wait fallback.
+  }
 }
 
 function withFileLockSync(filePath, callback) {
@@ -104,7 +117,7 @@ function loadOperationalMetrics(projectRoot = PROJECT_ROOT) {
     return createDefaultMetrics();
   }
   try {
-    const parsed = JSON.parse(fs.readFileSync(metricsPath, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(metricsPath, 'utf8'), null, null, {});
     if (!parsed || typeof parsed !== 'object') return createDefaultMetrics();
     return {
       ...createDefaultMetrics(),

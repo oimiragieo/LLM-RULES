@@ -18,13 +18,31 @@
  * - Check for missing notes
  */
 
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const _path = require('path');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 // Import hook for verification logic
 const gitNotesAudit = require('../../hooks/audit/git-notes-audit.cjs');
+
+function runGitCommand(args) {
+  const result = spawnSync('git', args, {
+    encoding: 'utf8',
+    shell: false,
+    windowsHide: true,
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    const stderr = String(result.stderr || '').trim();
+    throw new Error(stderr || `git command failed with exit code ${result.status}`);
+  }
+
+  return String(result.stdout || '');
+}
 
 /**
  * Get commits in range
@@ -34,7 +52,11 @@ const gitNotesAudit = require('../../hooks/audit/git-notes-audit.cjs');
  */
 function getCommits(range) {
   try {
-    const output = execSync(`git log --pretty=format:%H%x09%s ${range}`, { encoding: 'utf-8' });
+    const args = ['log', '--pretty=format:%H%x09%s'];
+    if (range && String(range).trim() !== '') {
+      args.push(String(range).trim());
+    }
+    const output = runGitCommand(args);
 
     if (!output.trim()) {
       return [];
@@ -61,7 +83,7 @@ function getCommits(range) {
  */
 function getNotes(commitHash) {
   try {
-    return execSync(`git notes show ${commitHash}`, { encoding: 'utf-8' });
+    return runGitCommand(['notes', 'show', String(commitHash).trim()]);
   } catch (_error) {
     return null; // No note for this commit
   }
@@ -312,4 +334,4 @@ if (require.main === module) {
 }
 
 // Export for testing
-module.exports = { verify, generateReport, getCommits, getNotes };
+module.exports = { verify, generateReport, getCommits, getNotes, runGitCommand };

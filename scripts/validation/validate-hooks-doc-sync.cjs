@@ -3,12 +3,13 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../.claude/lib/utils/safe-json.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 function collectActiveHookBasenames(settingsPath) {
   const raw = fs.readFileSync(settingsPath, 'utf8');
-  const parsed = JSON.parse(raw);
+  const parsed = safeParseJSON(raw, null, null, {});
   const basenames = new Set();
   const hookConfig = parsed?.hooks || {};
 

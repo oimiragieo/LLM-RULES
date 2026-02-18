@@ -6,10 +6,10 @@
 
 'use strict';
 
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { promisify } = require('util');
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 /**
  * Detects GPU availability and recommends optimal batch sizes
@@ -26,9 +26,10 @@ class GPUDetector {
   async detectNVIDIA() {
     try {
       // Query nvidia-smi for GPU name and memory
-      const { stdout } = await this._execCommand(
-        'nvidia-smi --query-gpu=name,memory.total --format=csv,noheader,nounits'
-      );
+      const { stdout } = await this._execCommand('nvidia-smi', [
+        '--query-gpu=name,memory.total',
+        '--format=csv,noheader,nounits',
+      ]);
 
       const lines = stdout.trim().split('\n');
       if (lines.length === 0 || !lines[0]) {
@@ -56,11 +57,12 @@ class GPUDetector {
   /**
    * Execute command (allows mocking in tests)
    * @param {string} command
+   * @param {string[]} args
    * @returns {Promise<{stdout: string, stderr: string}>}
    * @private
    */
-  async _execCommand(command) {
-    return execAsync(command);
+  async _execCommand(command, args = []) {
+    return execFileAsync(command, args, { windowsHide: true });
   }
 
   /**

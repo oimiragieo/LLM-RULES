@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { performance } = require('perf_hooks');
 const { ContextualMemory } = require('../../lib/memory/contextual-memory.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const MEMORY_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
@@ -148,8 +149,8 @@ function buildBenchmarkCases({ gotchas, patterns, maxQueries }) {
 function generateFixture(maxQueries) {
   const gotchasPath = path.join(MEMORY_DIR, 'gotchas.json');
   const patternsPath = path.join(MEMORY_DIR, 'patterns.json');
-  const gotchasRaw = JSON.parse(fs.readFileSync(gotchasPath, 'utf8'));
-  const patternsRaw = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
+  const gotchasRaw = safeParseJSON(fs.readFileSync(gotchasPath, 'utf8'), null, null, []);
+  const patternsRaw = safeParseJSON(fs.readFileSync(patternsPath, 'utf8'), null, null, []);
   const gotchas = Array.isArray(gotchasRaw.gotchas) ? gotchasRaw.gotchas : [];
   const patterns = Array.isArray(patternsRaw.patterns) ? patternsRaw.patterns : [];
   const cases = buildBenchmarkCases({ gotchas, patterns, maxQueries });
@@ -289,7 +290,7 @@ async function main() {
     ensureDir(path.dirname(fixturePath));
     fs.writeFileSync(fixturePath, JSON.stringify(fixture, null, 2), 'utf8');
   } else {
-    fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+    fixture = safeParseJSON(fs.readFileSync(fixturePath, 'utf8'), null, null, { cases: [] });
   }
 
   const cases = Array.isArray(fixture.cases) ? fixture.cases.slice(0, maxQueries) : [];

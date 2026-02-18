@@ -3,6 +3,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +21,7 @@ function readArrayJson(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
     const raw = fs.readFileSync(filePath, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw, null, null, []);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];

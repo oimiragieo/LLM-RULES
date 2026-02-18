@@ -375,7 +375,7 @@ function checkEnvCli() {
     const skillPath = path.join(skillsDir, skill);
     if (!fs.existsSync(skillPath)) continue;
 
-    const out = spawnSync(cmd, args, { encoding: 'utf8', shell: true });
+    const out = spawnSync(cmd, args, { encoding: 'utf8', shell: false, windowsHide: true });
     if (out.status !== 0 && out.status !== null) {
       log(
         'yellow',
