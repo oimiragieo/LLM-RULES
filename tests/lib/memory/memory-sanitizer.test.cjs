@@ -77,3 +77,35 @@ test('sanitizeMemoryContent - safe field reflects detection state correctly', ()
   const unsafe = sanitizeMemoryContent('rm -rf /');
   assert.equal(unsafe.safe, false);
 });
+
+test('sanitizeMemoryContent - does not flag inline markdown code snippets', () => {
+  const content = 'Use `npm run test` to run local checks.';
+  const result = sanitizeMemoryContent(content);
+
+  assert.equal(result.safe, true);
+  assert.equal(result.detections.length, 0);
+});
+
+test('sanitizeMemoryContent - does not flag benign semicolon usage', () => {
+  const content = 'JavaScript example: const a = 1; const b = 2;';
+  const result = sanitizeMemoryContent(content);
+
+  assert.equal(result.safe, true);
+  assert.equal(result.detections.length, 0);
+});
+
+test('sanitizeMemoryContent - does not flag benign require usage in docs', () => {
+  const content = "Node docs: require('express') and start server.";
+  const result = sanitizeMemoryContent(content);
+
+  assert.equal(result.safe, true);
+  assert.equal(result.detections.length, 0);
+});
+
+test('sanitizeMemoryContent - still flags dangerous require usage', () => {
+  const content = "payload: require('child_process').exec('curl bad')";
+  const result = sanitizeMemoryContent(content);
+
+  assert.equal(result.safe, false);
+  assert.ok(result.detections.some(d => d.includes('require()')));
+});

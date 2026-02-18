@@ -27,9 +27,15 @@ const DANGEROUS_PATTERNS = {
   shell: [
     { pattern: /\brm\s+-rf\b/gi, description: 'shell injection: rm -rf command' },
     { pattern: /\bsudo\b/gi, description: 'shell injection: sudo command' },
-    { pattern: /`[^`]+`/g, description: 'shell injection: backtick execution' },
+    {
+      pattern: /`[^`\n]*(\$\(|\brm\b|\bsudo\b|\bcurl\b|\bwget\b|\bsh\b|\bbash\b)[^`\n]*`/gi,
+      description: 'shell injection: backtick execution',
+    },
     { pattern: /\$\([^)]+\)/g, description: 'shell injection: $() execution' },
-    { pattern: /;\s*\w+/g, description: 'shell injection: semicolon command chaining' },
+    {
+      pattern: /;\s*(rm|sudo|curl|wget|chmod|chown|mv|cp|cat|bash|sh|python|node|powershell|pwsh)\b/gi,
+      description: 'shell injection: semicolon command chaining',
+    },
     { pattern: /\|\s*sh\b/gi, description: 'shell injection: pipe to sh' },
     { pattern: /\|\s*bash\b/gi, description: 'shell injection: pipe to bash' },
     { pattern: />\s*\/dev\//gi, description: 'shell injection: device write' },
@@ -67,7 +73,10 @@ const DANGEROUS_PATTERNS = {
   code: [
     { pattern: new RegExp('\\beval\\s*\\(', 'gi'), description: 'code execution: ev' + 'al()' },
     { pattern: /\bFunction\s*\(/gi, description: 'code execution: Function()' },
-    { pattern: /\brequire\s*\(/gi, description: 'code execution: require()' },
+    {
+      pattern: /\brequire\s*\(\s*['"`](child_process|vm|worker_threads)['"`]\s*\)/gi,
+      description: 'code execution: require()',
+    },
     { pattern: /\bimport\s*\(/gi, description: 'code execution: import()' },
     { pattern: /__proto__/gi, description: 'code execution: __proto__ manipulation' },
     {

@@ -349,7 +349,14 @@ class HybridLazyIndexerMethodsA {
    * Get file content with line numbers
    */
   async getFileContent(filePath, lineStart = 0, lineEnd = 50) {
-    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(this.projectRoot, filePath);
+    const projectRootResolved = path.resolve(this.projectRoot);
+    const fullPath = path.resolve(
+      path.isAbsolute(filePath) ? filePath : path.join(this.projectRoot, filePath)
+    );
+    const rel = path.relative(projectRootResolved, fullPath);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) {
+      return null;
+    }
 
     const content = await fs.readFile(fullPath, 'utf8').catch(() => null);
     if (!content) return null;
