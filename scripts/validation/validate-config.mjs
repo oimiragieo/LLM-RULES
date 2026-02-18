@@ -265,6 +265,8 @@ function validateSchemaFiles() {
 
   const schemaFiles = [
     'artifact_manifest.schema.json',
+    'database_architecture.schema.json',
+    'plan.schema.json',
     'product_requirements.schema.json',
     'project_brief.schema.json',
     'system_architecture.schema.json',

@@ -311,7 +311,6 @@ Advanced patterns and methodologies.
 | `interactive-requirements-gathering`  | A/B/C/D/E questionnaire framework                                              | planner        |
 | `planning-with-files`                 | Persistent planning files                                                      | planner        |
 | `sparc-methodology`                   | SPARC development methodology                                                  | architect      |
-| `enterprise-skill-test-1771395136358` | Enterprise scaffold validation skill for test coverage and reliability checks. | Read           |
 
 ---
 
