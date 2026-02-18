@@ -10,6 +10,13 @@ const { ContextualMemory } = require('../../../.claude/lib/memory/contextual-mem
 const TEST_ROOT = path.join(__dirname, '.test-hybrid-memory-query');
 const TEST_MEMORY_DIR = path.join(TEST_ROOT, '.claude', 'context', 'memory');
 const TEST_DB_PATH = path.join(TEST_ROOT, '.claude', 'data', 'memory.db');
+const MANAGED_ENV_KEYS = [
+  'MEMORY_SEMANTIC_SEARCH',
+  'MEMORY_HYBRID_RRF_K',
+  'MEMORY_HYBRID_KEYWORD_WEIGHT',
+  'MEMORY_HYBRID_VECTOR_WEIGHT',
+];
+let envSnapshot = null;
 
 function setup() {
   fs.rmSync(TEST_ROOT, { recursive: true, force: true });
@@ -54,7 +61,20 @@ function assertMemorySearchResultShape(item) {
   assert.ok('similarity' in item);
 }
 
+test.beforeEach(() => {
+  envSnapshot = {};
+  for (const key of MANAGED_ENV_KEYS) {
+    envSnapshot[key] = process.env[key];
+  }
+});
+
 test.afterEach(() => {
+  for (const key of MANAGED_ENV_KEYS) {
+    const prev = envSnapshot?.[key];
+    if (prev == null) delete process.env[key];
+    else process.env[key] = prev;
+  }
+  envSnapshot = null;
   teardown();
 });
 
@@ -68,7 +88,11 @@ test('H1: hybridMemoryQuery fuses keyword+vector results via RRF with result-sha
   ];
   memory._getVectorStore = async () => ({
     search: async () => [
-      { content: 'auth gotcha', metadata: { path: 'gotchas.json', chunkPos: 10 }, similarity: 0.91 },
+      {
+        content: 'auth gotcha',
+        metadata: { path: 'gotchas.json', chunkPos: 10 },
+        similarity: 0.91,
+      },
       { content: 'security pattern', metadata: { id: 'v-2' }, similarity: 0.87 },
     ],
   });
@@ -123,13 +147,21 @@ test('H4: deduplicates using id fallback ordering (metadata.id, path+chunkPos, c
   const memory = createMemory();
   memory._keywordSearch = async () => [
     { content: 'same text', metadata: { id: 'stable-1' }, similarity: null },
-    { content: 'same path snippet A', metadata: { path: 'file.md', chunkPos: 10 }, similarity: null },
+    {
+      content: 'same path snippet A',
+      metadata: { path: 'file.md', chunkPos: 10 },
+      similarity: null,
+    },
     { content: 'hash only', metadata: {}, similarity: null },
   ];
   memory._getVectorStore = async () => ({
     search: async () => [
       { content: 'same text', metadata: { id: 'stable-1' }, similarity: 0.8 },
-      { content: 'same path snippet A', metadata: { path: 'file.md', chunkPos: 10 }, similarity: 0.82 },
+      {
+        content: 'same path snippet A',
+        metadata: { path: 'file.md', chunkPos: 10 },
+        similarity: 0.82,
+      },
       { content: 'hash only', metadata: {}, similarity: 0.77 },
     ],
   });
@@ -226,7 +258,9 @@ test('contract: malformed branch items are normalized to result-shape', async ()
   setup();
   const memory = createMemory();
   memory._keywordSearch = async () => [{ metadata: null }];
-  memory._getVectorStore = async () => ({ search: async () => [{ content: 123, similarity: 0.9 }] });
+  memory._getVectorStore = async () => ({
+    search: async () => [{ content: 123, similarity: 0.9 }],
+  });
 
   const fused = await memory.hybridMemoryQuery('query', { limit: 3, threshold: 0.1 });
   assert.ok(fused.length >= 1);

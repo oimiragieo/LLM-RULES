@@ -94,7 +94,11 @@ function main() {
     if (!/MemoryRecord/i.test(section8)) {
       failures.push(`${CLAUDE_MD_PATH}: section 8 missing 'MemoryRecord' requirement`);
     }
-    if (!/(do not|forbid|blocked|block).*?(patterns\.json|gotchas\.json)|MemoryRecord.*?(patterns\.json|gotchas\.json)/i.test(section8)) {
+    if (
+      !/(do not|forbid|blocked|block).*?(patterns\.json|gotchas\.json)|MemoryRecord.*?(patterns\.json|gotchas\.json)/i.test(
+        section8
+      )
+    ) {
       failures.push(
         `${CLAUDE_MD_PATH}: section 8 missing structured-memory guard wording for patterns/gotchas`
       );

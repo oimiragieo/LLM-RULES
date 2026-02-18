@@ -303,7 +303,11 @@ class ContextualMemory {
     if (metadata.id) return `id:${metadata.id}`;
 
     const position =
-      metadata.chunkPos ?? metadata.pos ?? metadata.position ?? metadata.line ?? metadata.lineNumber;
+      metadata.chunkPos ??
+      metadata.pos ??
+      metadata.position ??
+      metadata.line ??
+      metadata.lineNumber;
     if (metadata.path && position !== undefined && position !== null) {
       return `pathpos:${metadata.path}:${position}`;
     }
@@ -316,7 +320,9 @@ class ContextualMemory {
   _normalizeHybridResult(raw, source) {
     const metadata = raw?.metadata && typeof raw.metadata === 'object' ? raw.metadata : {};
     const similarity =
-      typeof raw?.similarity === 'number' && Number.isFinite(raw.similarity) ? raw.similarity : null;
+      typeof raw?.similarity === 'number' && Number.isFinite(raw.similarity)
+        ? raw.similarity
+        : null;
     const normalized = {
       content: String(raw?.content || ''),
       metadata: { ...metadata },
@@ -379,7 +385,11 @@ class ContextualMemory {
       .sort((a, b) => b.rrf_score - a.rrf_score)
       .map(item => {
         const source =
-          item.sourceSet.size > 1 ? 'hybrid' : item.sourceSet.has('lancedb') ? 'lancedb' : 'keyword';
+          item.sourceSet.size > 1
+            ? 'hybrid'
+            : item.sourceSet.has('lancedb')
+              ? 'lancedb'
+              : 'keyword';
         return {
           content: item.content,
           metadata: item.metadata,
@@ -427,14 +437,19 @@ class ContextualMemory {
       }
     })();
 
-    const [keywordSettled, vectorSettled] = await Promise.allSettled([keywordPromise, vectorPromise]);
+    const [keywordSettled, vectorSettled] = await Promise.allSettled([
+      keywordPromise,
+      vectorPromise,
+    ]);
 
-    const keywordRaw = keywordSettled.status === 'fulfilled' && Array.isArray(keywordSettled.value)
-      ? keywordSettled.value
-      : [];
-    const vectorRaw = vectorSettled.status === 'fulfilled' && Array.isArray(vectorSettled.value)
-      ? vectorSettled.value
-      : [];
+    const keywordRaw =
+      keywordSettled.status === 'fulfilled' && Array.isArray(keywordSettled.value)
+        ? keywordSettled.value
+        : [];
+    const vectorRaw =
+      vectorSettled.status === 'fulfilled' && Array.isArray(vectorSettled.value)
+        ? vectorSettled.value
+        : [];
 
     const keywordNormalized = keywordRaw.map(item => this._normalizeHybridResult(item, 'keyword'));
     const vectorNormalized = vectorRaw
@@ -448,7 +463,9 @@ class ContextualMemory {
       });
     }
 
-    const fused = this._fuseHybridResultsRRF(keywordNormalized, vectorNormalized);
+    const fused = this._fuseHybridResultsRRF(keywordNormalized, vectorNormalized).filter(
+      item => typeof item.content === 'string' && item.content.trim().length > 0
+    );
     return fused.slice(0, limit);
   }
 
