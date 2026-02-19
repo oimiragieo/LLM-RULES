@@ -4,6 +4,8 @@ description: Query STRING API for protein-protein interactions (59M proteins, 20
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # STRING Database

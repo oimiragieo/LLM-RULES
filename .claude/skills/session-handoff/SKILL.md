@@ -14,6 +14,8 @@ best_practices:
   - Store handoffs in persistent memory location
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 <identity>

@@ -1166,6 +1166,65 @@ Main Process (index-manager)          Subprocess (embed-subprocess.cjs)
 | `LANCEDB_EMBEDDING_MODE`     | `fastembed` | Embedding engine (fastembed recommended)    |
 | `HYBRID_EMBEDDINGS`          | `on`        | Enable semantic search in hybrid search CLI |
 
+### Query Cache
+
+Repeated or semantically similar queries are served from a local in-memory cache, avoiding redundant LanceDB lookups and embedding computations. The cache keys on cosine similarity of query embeddings so that slight rephrasings ("auth middleware" vs "authentication middleware") still hit the cache.
+
+The cache integrates with the hybrid search daemon: when the daemon is running, cached results are returned directly without re-running ripgrep or LanceDB search.
+
+**BM25 Incremental Update:** After file edits (detected by post-tool hooks), the BM25 text index updates incrementally rather than requiring a full reindex. This keeps text search results fresh with near-zero latency cost.
+
+| Env var                   | Default  | Purpose                                                       |
+| ------------------------- | -------- | ------------------------------------------------------------- |
+| `SEARCH_CACHE_ENABLED`    | `on`     | Enable/disable semantic query cache. Set to `off` to disable. |
+| `SEARCH_CACHE_TTL_MS`     | `300000` | Cache entry time-to-live (5 min default)                      |
+| `SEARCH_CACHE_SIMILARITY` | `0.95`   | Cosine similarity threshold for cache hit. Higher = stricter. |
+| `BM25_INCREMENTAL_UPDATE` | `on`     | Enable post-edit BM25 fast update. Set to `off` to disable.   |
+
+---
+
+## Search + Compress Pipeline (2026-02-19)
+
+### `pnpm search:compress "query"`
+
+A single command that chains search → token analysis → adaptive compression → memory dedup:
+
+```
+search:code "query"  →  estimate tokens  →  adaptive ratio  →  Python compress  →  dedup vs memory
+      ↓                      ↓                   ↓                   ↓                    ↓
+  20 ranked files     corpus ~50K tokens    ratio = 0.2        65% savings         filter known patterns
+```
+
+### Adaptive Compression (ACC-RAG inspired)
+
+Instead of a fixed compression ratio, the pipeline auto-tunes based on corpus size:
+
+| Corpus tokens | Skeleton ratio | Keep % | Use case                            |
+| ------------- | -------------- | ------ | ----------------------------------- |
+| < 8K          | 0.8            | 80%    | Small context — keep most detail    |
+| 8-32K         | 0.5            | 50%    | Medium — balanced                   |
+| 32-100K       | 0.2            | 20%    | Large — aggressive compression      |
+| > 100K        | 0.1            | 10%    | Massive — extract only key insights |
+
+### Memory-Aware Dedup (COMI paper: Marginal Information Gain)
+
+After compression, extracted insights are deduplicated against existing memory:
+
+- Loads `patterns.json` + `gotchas.json` from `.claude/context/memory/`
+- Filters out records that already exist (case-insensitive exact match)
+- Only NEW information is persisted — prevents memory pollution
+- Returns dedup stats: `{ total, kept, filtered }`
+
+### Key files
+
+| File                                                                            | Purpose                                                |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `.claude/tools/cli/hybrid-search.cjs`                                           | `--compress` command handler                           |
+| `.claude/skills/token-saver-context-compression/scripts/main.cjs`               | Pipeline orchestration, dedup, adaptive ratio          |
+| `.claude/skills/token-saver-context-compression/scripts/_compression_engine.py` | Python compression engine (Jaccard + position scoring) |
+
+---
+
 ### Performance
 
 | Metric                 | Before (in-process) | After (subprocess)     |

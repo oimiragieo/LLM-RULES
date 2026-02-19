@@ -4,6 +4,8 @@ description: Access RCSB PDB for 3D protein/nucleic acid structures. Search by t
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PDB Database

@@ -4,6 +4,8 @@ description: Genomic file toolkit. Read/write SAM/BAM/CRAM alignments, VCF/BCF v
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Pysam

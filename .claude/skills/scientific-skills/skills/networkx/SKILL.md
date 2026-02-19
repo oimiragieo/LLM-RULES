@@ -4,6 +4,8 @@ description: Comprehensive toolkit for creating, analyzing, and visualizing comp
 license: 3-clause BSD license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # NetworkX

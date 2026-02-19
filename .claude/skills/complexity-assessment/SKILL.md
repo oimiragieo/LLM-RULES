@@ -13,6 +13,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 source: auto-claude
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Complexity Assessment Skill

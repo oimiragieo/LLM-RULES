@@ -8,6 +8,8 @@ user_invocable: true
 tools: [Read, Skill]
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Framework Context

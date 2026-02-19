@@ -1,7 +1,7 @@
 ---
 name: debugging
 description: Systematic 4-phase debugging with root cause investigation. Use when fixing bugs to prevent random fixes.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,6 +13,8 @@ best_practices:
   - Make one change at a time
 error_handling: strict
 streaming: supported
+verified: true
+lastVerifiedAt: 2026-02-19T07:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -125,6 +127,19 @@ You MUST complete each phase before proceeding to the next.
    ```
 
    **This reveals:** Which layer fails (secrets - workflow OK, workflow - build FAIL)
+
+   **For distributed/microservice systems — prefer OpenTelemetry traces:**
+
+   ```bash
+   # Query traces by component (preferred over manual echo/env logging)
+   pnpm trace:query --component <service-name> --event <event-name> --since <ISO-8601> --limit 200
+
+   # When trace ID is already known
+   pnpm trace:query --trace-id <traceId> --compact --since <ISO-8601> --limit 200
+   ```
+
+   **Fragmented traces** (each service has its own root span, trace IDs don't match across boundaries)
+   = broken context propagation. Fix `traceparent`/`tracestate` header forwarding before investigating business logic.
 
 5. **Trace Data Flow**
 
@@ -318,6 +333,36 @@ From debugging sessions:
 - Random fixes approach: 2-3 hours of thrashing
 - First-time fix rate: 95% vs 40%
 - New bugs introduced: Near zero vs common
+
+## AI-Assisted Debugging & Modern Observability (2025+)
+
+### OpenTelemetry: The New Stack Trace
+
+For distributed systems, OpenTelemetry traces replace manual `echo`/`env` evidence gathering. A trace shows the complete request journey across service boundaries via span IDs and trace IDs (W3C Trace Context standard: `traceparent`/`tracestate` headers).
+
+**Evidence hierarchy for distributed failures (prefer in order):**
+
+```
+1. Distributed traces (OpenTelemetry spans, correlated trace IDs)
+2. Structured logs with correlation IDs
+3. Metrics with timestamps
+4. Manual instrumentation (Phase 1 Step 4 bash examples)
+```
+
+**Common symptom — fragmented traces:**
+Each service shows its own root span, trace IDs don't match across boundaries. This means context propagation is broken — fix header forwarding before investigating business logic.
+
+### AI-Assisted Root Cause Analysis
+
+LLM-based debugging agents (2025 pattern) augment Phase 1 by reading production traces and correlating with codebase context to suggest minimal reproduction cases.
+
+**Use AI assistance for:**
+
+- High-complexity distributed failures with multi-service blast radius
+- On-call incidents requiring rapid root cause identification
+- Converting production traces into deterministic test reproducers
+
+**Do NOT skip Phase 1** when using AI assistance. AI suggestions are hypotheses — apply Phase 3 (hypothesis testing) before implementing any AI-suggested fix. AI cannot replace systematic investigation; it accelerates evidence gathering.
 
 ## Memory Protocol (MANDATORY)
 

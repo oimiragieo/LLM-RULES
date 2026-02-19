@@ -61,6 +61,8 @@ best_practices:
   - Dismiss modal dialogs manually if they appear
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Chrome Browser Automation

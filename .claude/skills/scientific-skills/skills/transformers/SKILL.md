@@ -5,6 +5,8 @@ license: Apache-2.0 license
 compatibility: Some features require an Huggingface token
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Transformers

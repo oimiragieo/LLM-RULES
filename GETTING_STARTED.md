@@ -86,9 +86,14 @@ Build the semantic code search index for concept-level queries:
 pnpm code:index:reindex    # ~12 min with GPU, ~17 min CPU-only
 ```
 
-This creates a BM25 text index + vector embeddings for all source files. Once built, `pnpm search:code "query"` uses hybrid text + semantic ranking. Without this step, text search still works but concept queries (e.g. "authentication flow for refresh tokens") will return poor results.
+This creates a BM25 text index + vector embeddings for all source files. Once built:
 
-The indexer uses subprocess isolation to prevent ONNX Runtime memory leaks. GPU (CUDA) is auto-detected. Only ~200MB of main process memory is used regardless of codebase size.
+- `pnpm search:code "query"` — hybrid text + semantic search with auto-caching (~5ms repeat queries)
+- `pnpm search:compress "query"` — search + adaptive compression + memory dedup in one shot
+- `pnpm search:structure` — project map with entry points, dependency graph, and Mermaid diagram
+- `pnpm search:tokens [path]` — token budget analysis with refactor recommendations
+
+The indexer uses subprocess isolation to prevent ONNX Runtime memory leaks. GPU (CUDA) is auto-detected. Only ~200MB of main process memory is used regardless of codebase size. BM25 text index auto-updates when files are edited (no manual reindex needed).
 
 If you need to reset runtime or memory state (e.g., after corruption or drift), run:
 

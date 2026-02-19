@@ -4,6 +4,8 @@ description: NGS analysis toolkit. BAM to bigWig conversion, QC (correlation, PC
 license: BSD license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # deepTools: NGS Data Analysis Toolkit

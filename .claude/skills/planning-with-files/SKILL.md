@@ -8,6 +8,8 @@ tools:
   - Edit
   - TaskUpdate
   - TaskList
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Planning with Files - Manus-Style File-Based Planning

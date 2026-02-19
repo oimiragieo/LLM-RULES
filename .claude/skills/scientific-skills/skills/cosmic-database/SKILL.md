@@ -4,6 +4,8 @@ description: Access COSMIC cancer mutation database. Query somatic mutations, Ca
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # COSMIC Database

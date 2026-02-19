@@ -13,6 +13,8 @@ best_practices:
   - Add system prompt guidance
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 **References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — embedding/semantic tool discovery from everything-claude-code backend-patterns, tdd-workflow.

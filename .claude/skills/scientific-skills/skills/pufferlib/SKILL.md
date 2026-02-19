@@ -4,6 +4,8 @@ description: High-performance reinforcement learning framework optimized for spe
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PufferLib - High-Performance Reinforcement Learning

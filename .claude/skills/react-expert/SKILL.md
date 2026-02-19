@@ -1,7 +1,7 @@
 ---
 name: react-expert
 description: React ecosystem expert including hooks, state management, component patterns, React 19 features, Shadcn UI, and Radix primitives
-version: 2.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -14,6 +14,8 @@ best_practices:
   - Use TypeScript for type safety
 error_handling: graceful
 streaming: supported
+verified: true
+lastVerifiedAt: 2026-02-19T06:00:00.000Z
 ---
 
 # React Expert
@@ -61,27 +63,197 @@ React ecosystem expert with deep knowledge of hooks, state management, component
 
 ## Performance
 
-- Implement proper memoization (useMemo, useCallback)
-- Use React.memo for expensive components
-- Avoid unnecessary re-renders
-- Implement proper lazy loading
+- Use React Compiler (available in React 19) for automatic memoization — remove manual `useMemo`/`useCallback` where the compiler can infer them
+- Only add `React.memo`, `useMemo`, `useCallback` when the compiler cannot help (complex object identity, external deps, stable callback refs for third-party libraries)
+- Avoid unnecessary re-renders; verify with React DevTools Profiler before adding manual memoization
+- Implement proper lazy loading with `React.lazy` and `Suspense`
 - Use proper key props in lists
-- Profile and optimize render performance
+- Keep components small and focused — small components maximize compiler optimization surface
 
 ## React 19 Features
 
-- Use `use` hook for consuming Promises and Context directly
-- Leverage `useFormStatus` hook for form state management
-- Use `useActionState` for form actions and state management
-- Implement Document Metadata API for better SEO
-- Use Actions for client-side mutations with automatic loading states
-- Leverage compiler optimizations like automatic memoization
-- Use `ref` as a prop directly without needing `forwardRef`
-- Use `useOptimistic` hook for optimistic UI updates
-- Use `startTransition` for non-urgent state updates
-- Use `useDeferredValue` for deferring UI updates
-- Use `useId` for generating unique IDs in server components
-- Use `useSyncExternalStore` for subscribing to external stores
+### React Compiler
+
+- The React Compiler (stable in React 19) performs automatic memoization at build time
+- Remove redundant `React.memo`, `useMemo`, `useCallback` wrappers — the compiler handles them
+- Compiler opt-out: add `// @no-react-compiler` pragma to a component/file when manual control is needed
+- Still use `useMemo`/`useCallback` for: stable refs passed to third-party libs, expensive computations with external deps the compiler cannot see
+
+### Actions
+
+- Use async functions as form `action` props for automatic pending/error state management
+- Actions replace the `onSubmit` + manual loading/error state boilerplate pattern
+- Server Actions (in Next.js / RSC frameworks) allow calling server-side code directly from forms
+
+```tsx
+// Form Action pattern (React 19)
+async function saveUser(formData: FormData) {
+  'use server'; // only in RSC frameworks; omit for client Actions
+  await db.users.update({ name: formData.get('name') });
+}
+<form action={saveUser}>
+  <input name="name" />
+  <button type="submit">Save</button>
+</form>;
+```
+
+### useActionState
+
+- Use `useActionState` to track the result and pending state of a form Action
+- Signature: `const [state, formAction, isPending] = useActionState(fn, initialState)`
+- `isPending` replaces the manual `useState(false)` loading flag pattern
+- `state` holds the return value of the last action invocation (success data or error)
+
+```tsx
+import { useActionState } from 'react';
+
+async function submitAction(prevState: State, formData: FormData) {
+  const result = await saveData(formData);
+  return result.error ? { error: result.error } : { success: true };
+}
+
+function MyForm() {
+  const [state, formAction, isPending] = useActionState(submitAction, null);
+  return (
+    <form action={formAction}>
+      {state?.error && <p>{state.error}</p>}
+      <button disabled={isPending}>{isPending ? 'Saving...' : 'Save'}</button>
+    </form>
+  );
+}
+```
+
+### useOptimistic
+
+- Use `useOptimistic` for instant UI feedback before a server response arrives
+- Signature: `const [optimisticState, setOptimistic] = useOptimistic(value, reducer?)`
+- The optimistic value automatically reverts to the real value when the Action resolves
+- Always pair with Actions (the optimistic state is scoped to the Action's lifetime)
+
+```tsx
+import { useOptimistic } from 'react';
+
+function TodoList({ todos, addTodo }: Props) {
+  const [optimisticTodos, addOptimistic] = useOptimistic(todos, (state, newTodo) => [
+    ...state,
+    { ...newTodo, pending: true },
+  ]);
+  async function action(formData: FormData) {
+    const newTodo = { text: formData.get('text') as string, id: crypto.randomUUID() };
+    addOptimistic(newTodo);
+    await addTodo(newTodo);
+  }
+  return (
+    <ul>
+      {optimisticTodos.map(todo => (
+        <li key={todo.id} style={{ opacity: todo.pending ? 0.5 : 1 }}>
+          {todo.text}
+        </li>
+      ))}
+      <form action={action}>
+        <input name="text" />
+        <button>Add</button>
+      </form>
+    </ul>
+  );
+}
+```
+
+### use() hook
+
+- `use(promise)` — read a Promise's resolved value during render (integrates with Suspense/ErrorBoundary)
+- `use(Context)` — replaces `useContext`; can be called conditionally (unlike other hooks)
+- Unlike `useEffect`, `use(promise)` does not create a new Promise on each render; pass a stable promise
+- Use `use(Context)` when you need context conditionally or inside loops
+
+```tsx
+import { use } from 'react';
+
+// Reading context conditionally (not possible with useContext)
+function Component({ show }: { show: boolean }) {
+  if (!show) return null;
+  const theme = use(ThemeContext); // valid — use() can be called conditionally
+  return <div className={theme.bg}>...</div>;
+}
+
+// Reading a promise (wrap in Suspense + ErrorBoundary)
+function UserProfile({ userPromise }: { userPromise: Promise<User> }) {
+  const user = use(userPromise); // suspends until resolved
+  return <p>{user.name}</p>;
+}
+```
+
+### Other React 19 API Changes
+
+- `ref` is now a plain prop — no `forwardRef` wrapper needed (`function Input({ ref }) { ... }`)
+- `useFormStatus` — read the pending/error state of the nearest parent `<form>` Action
+- Document Metadata API: render `<title>`, `<meta>`, `<link>` anywhere in the component tree; React hoists them to `<head>`
+- `startTransition` supports async functions (Transitions) in React 19
+- `useDeferredValue` now accepts an `initialValue` parameter for SSR hydration
+- `useId` stable for server components; use for accessibility IDs (label htmlFor / aria-labelledby)
+
+## React Server Components (RSC)
+
+RSC is an architectural boundary, not an optimization toggle. Understand the split before placing components.
+
+### Component Classification Rules
+
+- **Server Component (default in Next.js App Router):** no `useState`, no `useEffect`, no event handlers, no browser APIs — renders on server only, zero client JS shipped
+- **Client Component (`'use client'` directive):** interactive, uses hooks, event handlers, browser APIs — hydrates in browser
+- Mark a component `'use client'` at the top of the file; all imports below that boundary are also client-side
+
+### Data Fetching Patterns
+
+- Fetch data directly in Server Components using `async/await` — no `useEffect`, no loading state boilerplate
+- Co-locate data fetching with the component that needs it (avoid prop drilling fetched data)
+- Use `Suspense` boundaries to stream Server Component output progressively
+
+```tsx
+// Server Component — fetch directly, no useEffect
+async function UserCard({ userId }: { userId: string }) {
+  const user = await db.users.findById(userId); // direct DB / API call
+  return <div>{user.name}</div>;
+}
+
+// Client Component — interactive leaf
+('use client');
+function LikeButton({ postId }: { postId: string }) {
+  const [liked, setLiked] = useState(false);
+  return <button onClick={() => setLiked(l => !l)}>{liked ? 'Unlike' : 'Like'}</button>;
+}
+```
+
+### Composition Boundary Rules
+
+- Server Components **can** render Client Components
+- Client Components **cannot** import Server Components directly — pass Server Components as `children` props instead
+- Keep Client Components as small leaf nodes; push data fetching up into Server Components
+
+```tsx
+// WRONG: importing a Server Component inside a Client Component
+'use client'
+import { ServerComp } from './ServerComp' // breaks — ServerComp would be bundled client-side
+
+// CORRECT: pass as children prop
+'use client'
+function ClientShell({ children }: { children: React.ReactNode }) {
+  return <div onClick={...}>{children}</div>
+}
+// In a Server Component parent:
+<ClientShell><ServerComp /></ClientShell>
+```
+
+### Caching and Revalidation (Next.js App Router)
+
+- Use `revalidatePath` / `revalidateTag` in Server Actions to bust cache after mutations
+- Use `cache()` from React to deduplicate fetches within a single render pass
+- Avoid over-caching: fetch with `{ cache: 'no-store' }` for user-specific or real-time data
+
+### When NOT to Use RSC
+
+- Highly interactive components (modals, drag-and-drop, real-time) — use Client Components
+- Components relying on Web APIs (localStorage, geolocation, canvas) — use Client Components
+- When RSC adds complexity without bundle savings — do not force the pattern
 
 ## Radix UI & Shadcn
 
@@ -92,12 +264,13 @@ React ecosystem expert with deep knowledge of hooks, state management, component
 
 ## Forms
 
-- Use controlled components for form inputs
-- Implement proper form validation
-- Handle form submission states properly
-- Show appropriate loading and error states
-- Use form libraries for complex forms
-- Implement proper accessibility for forms
+- Prefer React 19 Actions (`action` prop on `<form>`) over manual `onSubmit` + `useState` loading boilerplate
+- Use `useActionState` to track pending, error, and result state from form Actions
+- Use `useFormStatus` inside child components to read the enclosing form's pending state
+- Use `useOptimistic` for instant feedback during async submissions
+- Fall back to controlled components (`value` + `onChange`) when fine-grained validation or character-level feedback is required
+- Use form libraries (React Hook Form, Zod) for complex multi-step forms with schema validation
+- Implement proper accessibility: associate labels with `htmlFor`, use `aria-describedby` for error messages, manage focus on error
 
 ## Error Handling
 
@@ -127,36 +300,77 @@ React ecosystem expert with deep knowledge of hooks, state management, component
 ## Templates
 
 <template name="component">
-import React, { memo } from 'react'
-
 interface {{Name}}Props {
 className?: string
 children?: React.ReactNode
 }
 
-export const {{Name}} = memo<{{Name}}Props>(({
-className,
-children
-}) => {
+export function {{Name}}({ className, children }: {{Name}}Props) {
 return (
 
 <div className={className}>
 {children}
 </div>
 )
-})
-
-{{Name}}.displayName = '{{Name}}'
+}
 </template>
 
-<template name="hook">
-import { useState, useEffect, useCallback } from 'react'
+<template name="action-form">
+'use client'
+import { useActionState } from 'react'
+
+type State = { error?: string; success?: boolean } | null
+
+async function {{actionName}}(prevState: State, formData: FormData): Promise<State> {
+try {
+// perform mutation
+return { success: true }
+} catch (err) {
+return { error: err instanceof Error ? err.message : 'Unknown error' }
+}
+}
+
+export function {{Name}}Form() {
+const [state, formAction, isPending] = useActionState({{actionName}}, null)
+return (
+
+<form action={formAction}>
+{state?.error && <p role="alert">{state.error}</p>}
+{state?.success && <p>Saved successfully.</p>}
+{/_ form fields _/}
+<button type="submit" disabled={isPending}>
+{isPending ? 'Saving...' : 'Save'}
+</button>
+</form>
+)
+}
+</template>
+
+<template name="hook-with-suspense">
+// React 19: use() + Suspense pattern (preferred for data fetching)
+import { use, Suspense } from 'react'
+
+// Create the promise OUTSIDE the component (stable reference)
+function fetch{{Name}}(): Promise<{{Type}}> {
+return fetch('/api/{{name}}').then(r => r.json())
+}
+
+export function {{Name}}Display({ dataPromise }: { dataPromise: Promise<{{Type}}> }) {
+const data = use(dataPromise) // suspends until resolved
+return <div>{/_ render data _/}</div>
+}
+
+// Usage: <Suspense fallback={<Spinner />}><{{Name}}Display dataPromise={fetch{{Name}}()} /></Suspense>
+</template>
+
+<template name="hook-classic">
+// Classic hook pattern (for non-Suspense or client-only use cases)
+import { useState, useEffect } from 'react'
 
 interface Use{{Name}}Result {
 data: {{Type}} | null
 loading: boolean
 error: Error | null
-refresh: () => void
 }
 
 export function use{{Name}}(): Use{{Name}}Result {
@@ -164,23 +378,24 @@ const [data, setData] = useState<{{Type}} | null>(null)
 const [loading, setLoading] = useState(true)
 const [error, setError] = useState<Error | null>(null)
 
-const fetchData = useCallback(async () => {
+useEffect(() => {
+let cancelled = false
+async function load() {
 try {
 setLoading(true)
-setError(null)
-// Add fetch logic here
+const result = await fetch('/api/{{name}}').then(r => r.json())
+if (!cancelled) setData(result)
 } catch (err) {
-setError(err instanceof Error ? err : new Error('Unknown error'))
+if (!cancelled) setError(err instanceof Error ? err : new Error('Unknown error'))
 } finally {
-setLoading(false)
+if (!cancelled) setLoading(false)
 }
+}
+load()
+return () => { cancelled = true }
 }, [])
 
-useEffect(() => {
-fetchData()
-}, [fetchData])
-
-return { data, loading, error, refresh: fetchData }
+return { data, loading, error }
 }
 </template>
 
@@ -197,6 +412,12 @@ forbidden_patterns:
   - pattern: "document\\.(getElementById|querySelector)"
     message: "Use React refs instead of direct DOM access"
     severity: "warning"
+  - pattern: "forwardRef"
+    message: "React 19: pass ref as a plain prop instead of using forwardRef"
+    severity: "info"
+  - pattern: "import.*useContext.*from 'react'"
+    message: "React 19: prefer use(Context) which supports conditional calls"
+    severity: "info"
 </validation>
 
 </instructions>

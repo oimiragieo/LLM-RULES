@@ -4,6 +4,8 @@ description: Graph Neural Networks (PyG). Node/graph classification, link predic
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PyTorch Geometric (PyG)

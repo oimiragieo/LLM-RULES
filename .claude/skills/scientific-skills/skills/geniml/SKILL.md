@@ -4,6 +4,8 @@ description: This skill should be used when working with genomic interval data (
 license: BSD-2-Clause license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Geniml: Genomic Interval Machine Learning

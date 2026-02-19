@@ -9,6 +9,8 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord]
 args: '--mode summary|full [--hours 24]'
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Memory Quality Auditor

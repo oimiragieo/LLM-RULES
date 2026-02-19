@@ -4,6 +4,8 @@ description: Comprehensive toolkit for survival analysis and time-to-event model
 license: GPL-3.0 license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # scikit-survival: Survival Analysis in Python

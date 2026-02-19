@@ -82,6 +82,8 @@ const CREATOR_CONFIGS = [
   // Original 6 artifact types
   {
     creator: 'skill-creator',
+    // skill-updater is also allowed to write SKILL.md (updates existing skills)
+    allowedCreators: ['skill-creator', 'skill-updater'],
     patterns: [/\.claude[/\\]skills[/\\][^/\\]+[/\\]SKILL\.md$/i],
     artifactType: 'skill',
     primaryFile: 'SKILL.md',
@@ -532,14 +534,20 @@ function validateCreatorWorkflow(toolName, toolInput) {
   const fullPath = path.isAbsolute(filePath) ? filePath : path.join(PROJECT_ROOT, filePath);
   const fileExists = fs.existsSync(fullPath);
 
-  // Write to existing file = editing, not creating - allow without creator token
-  if (toolName === 'Write' && fileExists && !requiresAlwaysOnCreator) {
+  // Write/Edit to existing file = updating, not creating - allow without creator token
+  // Skill-updater and similar updater workflows edit existing artifacts legitimately
+  if ((toolName === 'Write' || toolName === 'Edit') && fileExists && !requiresAlwaysOnCreator) {
     return { pass: true };
   }
 
   // Write to new file at creator output path - REQUIRE creator token
-  // Check if the required creator is active
-  const creatorState = isCreatorActive(required.creator);
+  // Check if the required creator (or any allowed creator) is active
+  const creatorsToCheck = required.allowedCreators || [required.creator];
+  let creatorState = { active: false };
+  for (const creator of creatorsToCheck) {
+    creatorState = isCreatorActive(creator);
+    if (creatorState.active) break;
+  }
 
   if (creatorState.active) {
     // LAYER 2B: Refresh TTL on each successful write to support batch operations

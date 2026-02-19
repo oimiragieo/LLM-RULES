@@ -14,6 +14,7 @@
 
 const path = require('path');
 const { AstGrepSearch } = require('./ast-grep-wrapper.cjs');
+const { QueryCache } = require('./query-cache.cjs');
 
 class HybridLazyIndexer {
   constructor(options = {}) {
@@ -83,6 +84,13 @@ class HybridLazyIndexer {
     this._astGrepBinCandidates = this.getAstGrepBinCandidates(
       options.astGrepBinPath || process.env.AST_GREP_BIN
     );
+
+    // Semantic query cache
+    this.queryCache = new QueryCache({
+      ttlMs: options.queryCacheTtlMs,
+      similarityThreshold: options.queryCacheSimilarityThreshold,
+      maxEntries: options.queryCacheMaxEntries,
+    });
   }
 }
 

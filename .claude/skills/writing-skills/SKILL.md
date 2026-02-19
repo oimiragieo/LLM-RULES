@@ -14,6 +14,8 @@ best_practices:
   - Description must be trigger conditions only
 error_handling: strict
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Writing Skills

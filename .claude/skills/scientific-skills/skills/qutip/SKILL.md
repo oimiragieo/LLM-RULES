@@ -4,6 +4,8 @@ description: Quantum physics simulation library for open quantum systems. Use wh
 license: BSD-3-Clause license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # QuTiP: Quantum Toolbox in Python

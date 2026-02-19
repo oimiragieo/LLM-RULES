@@ -4,6 +4,8 @@ description: Access USPTO APIs for patent/trademark searches, examination histor
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # USPTO Database

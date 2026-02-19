@@ -2,6 +2,8 @@
 name: xlsx
 description: Spreadsheet toolkit (.xlsx/.csv). Create/edit with formulas/formatting, analyze data, visualization, recalculate formulas, for spreadsheet processing and analysis.
 license: Proprietary. LICENSE.txt has complete terms
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Requirements for Outputs

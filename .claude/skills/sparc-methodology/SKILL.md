@@ -20,6 +20,8 @@ tools:
   - TaskUpdate
   - TaskList
   - Skill
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # SPARC Methodology - Comprehensive Development Framework

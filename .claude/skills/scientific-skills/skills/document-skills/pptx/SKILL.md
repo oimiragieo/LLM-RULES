@@ -2,6 +2,8 @@
 name: pptx
 description: Presentation toolkit (.pptx). Create/edit slides, layouts, content, speaker notes, comments, for programmatic presentation creation and modification.
 license: Proprietary. LICENSE.txt has complete terms
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PPTX creation, editing, and analysis

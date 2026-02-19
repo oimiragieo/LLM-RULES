@@ -4,6 +4,8 @@ description: Query NCBI ClinVar for variant clinical significance. Search by gen
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # ClinVar Database

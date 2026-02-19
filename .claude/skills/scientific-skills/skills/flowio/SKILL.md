@@ -4,6 +4,8 @@ description: Parse FCS (Flow Cytometry Standard) files v2.0-3.1. Extract events 
 license: BSD-3-Clause license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # FlowIO: Flow Cytometry Standard File Handler

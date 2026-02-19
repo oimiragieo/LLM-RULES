@@ -4,6 +4,8 @@ description: Low-level plotting library for full customization. Use when you nee
 license: https://github.com/matplotlib/matplotlib/tree/main/LICENSE
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Matplotlib

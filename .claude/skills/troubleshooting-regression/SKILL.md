@@ -2,6 +2,8 @@
 name: troubleshooting-regression
 description: Regression troubleshooting workflow for hook/router/memory/search failures with enforced evidence and fix validation
 argument-hint: '[--prompt "..."] [--log-path <path>] [--mode quick|full]'
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Troubleshooting Regression

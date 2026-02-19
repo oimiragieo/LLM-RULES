@@ -31,7 +31,8 @@ pnpm code:index:reindex    # builds BM25 + semantic vector index (~12 min with G
 Search immediately after indexing:
 
 ```bash
-pnpm search:code "authentication logic"   # hybrid text + semantic search
+pnpm search:code "authentication logic"   # hybrid text + semantic search (~5ms cached)
+pnpm search:compress "how routing works"   # search + compress + dedup pipeline
 pnpm search:structure                      # project structure + deps + Mermaid diagram
 pnpm search:tokens .claude/lib             # token budget analysis + refactor recommendations
 pnpm search:file .claude/lib/code-indexing/hybrid-lazy-indexer.cjs 1 60
@@ -39,6 +40,9 @@ pnpm search:file .claude/lib/code-indexing/hybrid-lazy-indexer.cjs 1 60
 
 Text search (`pnpm search:code`) works instantly even without the full index build.
 Running `code:index:reindex` adds semantic ranking for concept-level queries.
+Repeated queries are auto-cached (~5ms hit vs ~800ms miss). BM25 index auto-updates on file edits.
+
+`search:compress` combines search + adaptive compression + memory dedup into a single command — use it when a topic spans many files and you need a compressed summary.
 
 `search:tokens` shows file/directory sizes, token estimates, and recommends splitting oversized source files (>15K tokens) into smaller modules for better AI agent readability.
 
@@ -238,6 +242,19 @@ pnpm search:code "authentication logic"
 # Stop daemon when done
 pnpm search:daemon:stop
 ```
+
+### Query Cache and BM25 Incremental Updates
+
+Repeated or semantically similar queries are served from a local cache, avoiding redundant embedding lookups. The cache uses cosine similarity to match queries, so slight rephrasings still hit the cache.
+
+After file edits, the BM25 text index updates incrementally (no full reindex needed).
+
+| Variable                  | Default  | Purpose                                              |
+| ------------------------- | -------- | ---------------------------------------------------- |
+| `SEARCH_CACHE_ENABLED`    | `on`     | Semantic query cache (set to `off` to disable)       |
+| `SEARCH_CACHE_TTL_MS`     | `300000` | Cache entry TTL (5 min)                              |
+| `SEARCH_CACHE_SIMILARITY` | `0.95`   | Cosine threshold for cache hit                       |
+| `BM25_INCREMENTAL_UPDATE` | `on`     | Post-edit BM25 fast update (set to `off` to disable) |
 
 Disable daemon or semantic mode when you need deterministic baselines:
 

@@ -5,6 +5,8 @@ license: Unknown
 compatibility: Requires a DNAnexus account
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # DNAnexus Integration

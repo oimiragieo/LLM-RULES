@@ -14,6 +14,8 @@ best_practices:
   - Keep memories concise and well-organized
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 <identity>

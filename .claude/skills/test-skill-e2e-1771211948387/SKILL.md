@@ -6,6 +6,8 @@ tags:
   - testing
   - e2e
   - validation
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # test-skill-e2e-1771211948387

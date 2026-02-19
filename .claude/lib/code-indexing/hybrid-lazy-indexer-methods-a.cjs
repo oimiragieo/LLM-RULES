@@ -20,6 +20,20 @@ class HybridLazyIndexerMethodsA {
     const startTime = Date.now();
     const limit = options.limit || 20;
 
+    // 0. Check query cache for exact or semantic match
+    if (this.queryCache) {
+      const cached = this.queryCache.get(query, options.queryEmbedding || null);
+      if (cached) {
+        if (this.config.debug) {
+          console.log(
+            `[hybrid-search] Cache ${cached.matchType} hit for "${query.slice(0, 30)}..." ` +
+              `(age: ${cached.age}ms)`
+          );
+        }
+        return cached.results;
+      }
+    }
+
     // 1. Fast ripgrep search (always run)
     const textResults = await this.ripgrepSearch(query, {
       limit: Math.max(limit * 2, 50),
@@ -56,6 +70,11 @@ class HybridLazyIndexerMethodsA {
           `${textResults.length} text + ${semanticResults.length} semantic = ${fused.length} fused ` +
           `(${Date.now() - startTime}ms)`
       );
+    }
+
+    // 5. Cache the results for future queries
+    if (this.queryCache) {
+      this.queryCache.set(query, fused, options.queryEmbedding || null);
     }
 
     return fused;

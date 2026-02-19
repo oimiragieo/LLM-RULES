@@ -18,6 +18,8 @@ best_practices:
   - Warn on unused tokens provided
 error_handling: strict
 streaming: not_supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Template Renderer

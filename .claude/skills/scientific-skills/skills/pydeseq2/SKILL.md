@@ -4,6 +4,8 @@ description: Differential gene expression analysis (Python DESeq2). Identify DE 
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PyDESeq2

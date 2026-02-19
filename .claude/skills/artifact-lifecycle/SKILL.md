@@ -13,6 +13,8 @@ metadata:
   skill-author: Claude Code Enterprise Framework
   category: orchestration
   complexity: medium
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Artifact Lifecycle Skill

@@ -9,6 +9,8 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, WebSearch, WebFetch, MemoryR
 args: '--agent <name-or-path> [--trigger reflection|evolve|manual] [--mode plan|execute]'
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Agent Updater
@@ -37,7 +39,29 @@ Never modify agent prompts blind. Produce a diff plan with risk score and regres
 
 If lifecycle expectations drift (research gate, enterprise bundle, validation chain), update agent updater artifacts first before refreshing target agents.
 
+## Protected Sections Manifest
+
+These agent definition sections are protected and must survive updates:
+
+- `model:` frontmatter field (model assignment)
+- `tools:` frontmatter array (tool permissions)
+- `skills:` frontmatter array (skill assignments)
+- `Iron Laws` section
+- `Anti-Patterns` section
+- Any section tagged `[PERMANENT]`
+
 ## Workflow
+
+### Step 0.5: Companion Validation (MANDATORY)
+
+Before modifying any agent, validate companion artifacts:
+
+```javascript
+const { checkCompanions } = require('.claude/lib/creators/companion-check.cjs');
+const result = checkCompanions('agent', agentName, { projectRoot });
+```
+
+### Step 1-7: Core Workflow
 
 1. Resolve target agent path and verify existence.
 2. Invoke `framework-context` and `research-synthesis`.

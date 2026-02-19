@@ -37,7 +37,11 @@ test('INT-05: schema directory has no underscore-vs-kebab duplicate pairs', () =
     list => list.length > 1 && list.some(n => n.includes('_')) && list.some(n => n.includes('-'))
   );
 
-  assert.deepEqual(duplicates, [], `Found underscore/kebab duplicate schemas: ${JSON.stringify(duplicates)}`);
+  assert.deepEqual(
+    duplicates,
+    [],
+    `Found underscore/kebab duplicate schemas: ${JSON.stringify(duplicates)}`
+  );
 });
 
 test('INT-05: key validators reference kebab-case schema filenames', () => {

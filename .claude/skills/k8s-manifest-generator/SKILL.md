@@ -5,6 +5,8 @@ version: 1.0.0
 model: sonnet
 invoked_by: [devops]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Kubernetes Manifest Generator

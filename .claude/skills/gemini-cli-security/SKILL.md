@@ -15,6 +15,8 @@ best_practices:
   - Report precision and recall benchmarks when assessing coverage
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Gemini CLI Security Skill

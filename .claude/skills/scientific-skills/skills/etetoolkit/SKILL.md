@@ -4,6 +4,8 @@ description: Phylogenetic tree toolkit (ETE). Tree manipulation (Newick/NHX), ev
 license: GPL-3.0 license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # ETE Toolkit Skill

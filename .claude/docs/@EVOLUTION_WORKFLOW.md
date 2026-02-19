@@ -47,12 +47,12 @@ Before creating ANY artifact:
 
 ### Enforcement Hooks
 
-| Hook                        | Purpose                          | Location                   |
-| --------------------------- | -------------------------------- | -------------------------- |
-| `research-enforcement.cjs`  | Blocks creation without research | `.claude/hooks/evolution/` |
-| `evolution-state-guard.cjs` | Enforces state transitions       | `.claude/hooks/evolution/` |
-| `conflict-detector.cjs`     | Prevents naming conflicts        | `.claude/hooks/evolution/` |
-| `artifact-scoring-ledger-hook.cjs` | Logs artifact scoring outcomes | `.claude/hooks/quality/`   |
+| Hook                               | Purpose                          | Location                   |
+| ---------------------------------- | -------------------------------- | -------------------------- |
+| `research-enforcement.cjs`         | Blocks creation without research | `.claude/hooks/evolution/` |
+| `evolution-state-guard.cjs`        | Enforces state transitions       | `.claude/hooks/evolution/` |
+| `conflict-detector.cjs`            | Prevents naming conflicts        | `.claude/hooks/evolution/` |
+| `artifact-scoring-ledger-hook.cjs` | Logs artifact scoring outcomes   | `.claude/hooks/quality/`   |
 
 ### State Tracking
 

@@ -14,6 +14,8 @@ best_practices:
   - Use gathered answers (not options) as source of truth for generation
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Interactive Requirements Gathering

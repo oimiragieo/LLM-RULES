@@ -15,6 +15,7 @@
  * Controls:
  * - CODE_INDEX_AUTO_UPDATE=off -> disable automatic indexing
  * - CODE_INDEX_DEBOUNCE_MS=5000 -> debounce interval (default: 5000ms)
+ * - BM25_INCREMENTAL_UPDATE=off -> disable BM25 fast-path (default: on)
  *
  * Output:
  * - Silent success (no output) - indexing happens in background
@@ -232,6 +233,26 @@ async function triggerIndexUpdate(filePath) {
     if (!indexExists) {
       await removeLock();
       return;
+    }
+
+    // BM25 fast-path: update just this file's text index (~10ms)
+    // Runs synchronously before the heavy Merkle tree update
+    if (process.env.BM25_INCREMENTAL_UPDATE !== 'off') {
+      try {
+        const { VectorStore } = require('../../lib/code-indexing/vector-store.cjs');
+        const { updateFileInBM25 } = require('../../lib/code-indexing/bm25-incremental.cjs');
+        const vs = new VectorStore({ projectRoot, embeddingMode: 'off' });
+        await vs.loadBM25Index();
+        if (vs.bm25Index) {
+          const absPath = path.isAbsolute(filePath) ? filePath : path.join(projectRoot, filePath);
+          updateFileInBM25(absPath, vs.bm25Index, projectRoot);
+          await vs.saveBM25Index();
+          debugLog('code-index-updater', `BM25 fast-path updated: ${filePath}`);
+        }
+      } catch (_bm25Err) {
+        // Fail-open: BM25 update is best-effort
+        debugLog('code-index-updater', 'BM25 fast-path failed (non-blocking)', _bm25Err);
+      }
     }
 
     // Use incremental update (Merkle tree) if available, otherwise fall back to directory indexing

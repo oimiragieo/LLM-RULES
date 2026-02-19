@@ -4,6 +4,8 @@ description: Query Open Targets Platform for target-disease associations, drug t
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Open Targets Database

@@ -6,6 +6,7 @@
  *   hybrid-search "authentication logic"       # Search code
  *   hybrid-search --structure                  # Show project structure
  *   hybrid-search --file "src/auth.ts" 10 20   # Get file content
+ *   hybrid-search --compress "query"           # Search + compress + dedup (JSON)
  */
 
 'use strict';
@@ -156,6 +157,13 @@ async function daemonStatus() {
     console.log(chalk.gray(`  embedding cache: ${stats.embeddingCacheSize || 0}`));
     console.log(chalk.gray(`  embed queue: ${stats.embedQueueLength || 0}`));
     console.log(chalk.gray(`  lancedb connected: ${stats.lanceDBConnected ? 'yes' : 'no'}`));
+    if (stats.cache) {
+      console.log(
+        chalk.gray(
+          `  query cache: ${stats.cache.entries || 0} entries, ${stats.cache.hits || 0} hits, ${stats.cache.misses || 0} misses`
+        )
+      );
+    }
   } catch {
     console.log(chalk.yellow('Hybrid search daemon is not running.'));
   }
@@ -181,6 +189,53 @@ async function main() {
     }
     console.log('Usage: hybrid-search --daemon status|stop|prewarm');
     process.exit(1);
+  }
+
+  if (command === '--cache-stats') {
+    if (DAEMON_ENABLED) {
+      try {
+        const resp = await daemonCall({ id: Date.now(), command: 'cache-stats' });
+        const stats = resp.result || {};
+        console.log(chalk.blue('\nQuery Cache Statistics\n'));
+        console.log(chalk.gray(`  enabled:  ${stats.enabled !== false ? 'yes' : 'no'}`));
+        console.log(chalk.gray(`  entries:  ${stats.entries || 0}`));
+        console.log(chalk.gray(`  hits:     ${stats.hits || 0}`));
+        console.log(chalk.gray(`  misses:   ${stats.misses || 0}`));
+        const total = (stats.hits || 0) + (stats.misses || 0);
+        const hitRate = total > 0 ? (((stats.hits || 0) / total) * 100).toFixed(1) : '0.0';
+        console.log(chalk.gray(`  hit rate: ${hitRate}%`));
+        return;
+      } catch {
+        // Daemon not running — fall through to local indexer
+      }
+    }
+    const localIndexer = new HybridLazyIndexer({
+      embeddingEnabled: process.env.HYBRID_EMBEDDINGS !== 'off',
+    });
+    const stats = localIndexer.queryCache ? localIndexer.queryCache.getStats() : { enabled: false };
+    console.log(chalk.blue('\nQuery Cache Statistics (local)\n'));
+    console.log(chalk.gray(`  enabled:  ${stats.enabled !== false ? 'yes' : 'no'}`));
+    console.log(chalk.gray(`  entries:  ${stats.entries || 0}`));
+    console.log(chalk.gray(`  hits:     ${stats.hits || 0}`));
+    console.log(chalk.gray(`  misses:   ${stats.misses || 0}`));
+    console.log(chalk.yellow('  (fresh indexer — no accumulated stats)'));
+    return;
+  }
+
+  if (command === '--cache-clear') {
+    if (DAEMON_ENABLED) {
+      try {
+        const resp = await daemonCall({ id: Date.now(), command: 'cache-clear' });
+        if (resp.result?.cleared) {
+          console.log(chalk.green('Query cache cleared on daemon.'));
+        }
+        return;
+      } catch {
+        // Daemon not running — fall through to local
+      }
+    }
+    console.log(chalk.yellow('Daemon not running. Nothing to clear.'));
+    return;
   }
 
   const useDaemon = shouldUseDaemon(command);
@@ -530,6 +585,33 @@ async function main() {
       console.error(chalk.bold('\n❌ File not found or unreadable\n'));
       process.exit(1);
     }
+  } else if (command === '--compress' || command === '-c') {
+    const query = args.slice(1).join(' ').trim();
+    if (!query) {
+      console.error(JSON.stringify({ ok: false, error: 'query is required for --compress' }));
+      process.exit(1);
+    }
+
+    // Import token-saver main function
+    const tokenSaverPath = path.resolve(
+      __dirname,
+      '../../skills/token-saver-context-compression/scripts/main.cjs'
+    );
+    const { main: tokenSaverMain } = require(tokenSaverPath);
+
+    // Parse optional args
+    const limitIdx = args.indexOf('--limit');
+    const limit = limitIdx !== -1 ? Number(args[limitIdx + 1]) : 10;
+
+    const result = tokenSaverMain({
+      query,
+      mode: 'evidence_aware',
+      limit,
+      failOnInsufficientEvidence: false,
+    });
+
+    console.log(JSON.stringify(result, null, 2));
+    if (!result.ok) process.exit(1);
   } else if (command) {
     // Search
     const query = args.join(' ');
@@ -571,6 +653,9 @@ Usage:
   hybrid-search --structure          # Show project structure + deps + Mermaid
   hybrid-search --tokens [path]      # Token budget analysis for file or directory
   hybrid-search --file path 10 20    # Get file content (lines 10-20)
+  hybrid-search --compress "query"   # Search + compress + dedup (JSON output)
+  hybrid-search --cache-stats        # Show query cache statistics
+  hybrid-search --cache-clear        # Clear query cache on daemon
 
 Environment:
   HYBRID_EMBEDDINGS=on               # Semantic search (default, requires index)
@@ -584,7 +669,9 @@ Examples:
   hybrid-search --tokens .claude/lib
   hybrid-search --tokens .claude/lib/routing/router-state.cjs
   hybrid-search --file src/auth.ts 1 50
+  hybrid-search --compress "authentication" --limit 5
   hybrid-search --daemon status
+  hybrid-search --cache-stats
 `);
   }
 }

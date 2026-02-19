@@ -4,6 +4,8 @@ description: Query openFDA API for drugs, devices, adverse events, recalls, regu
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # FDA Database Access

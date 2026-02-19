@@ -4,6 +4,8 @@ description: Query Ensembl genome database REST API for 250+ species. Gene looku
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Ensembl Database

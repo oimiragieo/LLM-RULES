@@ -4,6 +4,8 @@ description: Direct REST API access to KEGG (academic use only). Pathway analysi
 license: Non-academic use of KEGG requires a commercial license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # KEGG Database

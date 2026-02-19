@@ -14,6 +14,8 @@ best_practices:
   - Implementation Phases table for traceability
 error_handling: standard
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PRD Generator Skill

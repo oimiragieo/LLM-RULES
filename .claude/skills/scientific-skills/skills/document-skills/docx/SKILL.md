@@ -2,6 +2,8 @@
 name: docx
 description: Document toolkit (.docx). Create/edit documents, tracked changes, comments, formatting preservation, text extraction, for professional document processing.
 license: Proprietary. LICENSE.txt has complete terms
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # DOCX creation, editing, and analysis

@@ -18,6 +18,8 @@ streaming: supported
 executable: .claude/tools/project-analyzer/analyzer.mjs
 test_suite: .claude/tools/project-analyzer/tests/analyzer.test.mjs
 output_schema: .claude/schemas/project-analysis.schema.json
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 **References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — ProjectAnalyzer monorepo/service detection from Auto-Claude-develop analysis/analyzers.

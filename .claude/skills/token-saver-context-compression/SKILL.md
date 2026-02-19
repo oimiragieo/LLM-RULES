@@ -2,6 +2,8 @@
 name: token-saver-context-compression
 description: Search-aware context compression workflow for agent-studio. Use pnpm hybrid search + token-saver compression, then persist distilled learnings via MemoryRecord.
 argument-hint: [file-or-text-and-query]
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Token Saver Context Compression
@@ -91,6 +93,10 @@ node .claude/skills/token-saver-context-compression/scripts/main.cjs \
 ```
 
 The tool reads actual file content from search results (not just file paths), compresses via the Python engine, and extracts memory records classified by type (patterns, gotchas, issues, decisions).
+
+## Adaptive Compression
+
+Adaptive compression (adjusting compression ratio based on corpus size) is automatic and requires no env var configuration. When the input corpus is small, compression is lighter; when it is large, compression is more aggressive. This is controlled internally by the Python engine based on token counts.
 
 ## Requirements
 

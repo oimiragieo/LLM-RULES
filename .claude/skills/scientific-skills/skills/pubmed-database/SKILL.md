@@ -4,6 +4,8 @@ description: Direct REST API access to PubMed. Advanced Boolean/MeSH queries, E-
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PubMed Database

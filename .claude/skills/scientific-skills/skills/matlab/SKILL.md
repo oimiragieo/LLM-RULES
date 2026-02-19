@@ -5,6 +5,8 @@ license: For MATLAB (https://www.mathworks.com/pricing-licensing.html) and for O
 compatibility: Requires either MATLAB or Octave to be installed for testing, but not required for just generating scripts.
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # MATLAB/Octave Scientific Computing

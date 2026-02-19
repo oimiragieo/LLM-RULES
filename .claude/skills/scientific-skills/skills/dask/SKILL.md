@@ -4,6 +4,8 @@ description: Distributed computing for larger-than-RAM pandas/NumPy workflows. U
 license: BSD-3-Clause license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Dask

@@ -4,6 +4,8 @@ description: Comprehensive toolkit for protein language models including ESM3 (g
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # ESM: Evolutionary Scale Modeling

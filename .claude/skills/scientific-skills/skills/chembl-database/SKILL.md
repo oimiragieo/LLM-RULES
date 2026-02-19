@@ -4,6 +4,8 @@ description: Query ChEMBL bioactive molecules and drug discovery data. Search co
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # ChEMBL Database

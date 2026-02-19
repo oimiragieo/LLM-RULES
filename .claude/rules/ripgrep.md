@@ -7,7 +7,9 @@ paths:
 
 ## Core Rules
 
-- `MUST` start with `pnpm search:code` for exploratory/code-understanding queries
+- `MUST` start with `pnpm search:structure` to orient, then `pnpm search:code` for discovery
+- `MUST` check `pnpm search:tokens` before reading files to know if they fit in context
+- `MUST` use `pnpm search:compress` when a topic spans >32K tokens and you need compressed understanding
 - `MUST` use raw `rg -F` for exact symbol/literal lookups when speed and determinism matter most
 - `MUST` respect `.gitignore` and default excludes unless explicitly justified
 - `MUST` constrain scope with globs/file types for repo-wide scans
@@ -15,17 +17,18 @@ paths:
 - `MUST` use `rg`/`Grep` (not hybrid search) for exhaustive audit sweeps where completeness matters
 - `SHOULD` prefer smaller, ranked outputs when context/token budget matters
 - `SHOULD` rely on wrapper auto-discovery for binaries (node_modules/.bin, Scoop shims, PATH) before hardcoding paths
+- Repeated `search:code` queries are auto-cached (~5ms hit). BM25 index auto-updates on file edits.
 
 ## Search Mode Selection (MANDATORY)
 
-| Mode                             | Primary use                                 | Determinism                 | Latency tendency   | Contract                         |
-| -------------------------------- | ------------------------------------------- | --------------------------- | ------------------ | -------------------------------- | ---------------------- |
-| `pnpm search:code "query"`       | Discovery and mixed intent                  | High                        | Fast               | Default first step               |
-| `pnpm search:code "ast:pattern"` | Structural intent (shape query)             | High                        | Moderate           | Only for structural requests     |
-| `pnpm search:structure`          | Architecture map and dependency orientation | High                        | Fast               | Run before large cross-cut edits |
-| `rg -F "literal"`                | Exact symbol/literal anchors                | Highest                     | Fastest            | Required before risky edits      |
-| `rga "query"`                    | Non-code content search                     | High                        | Medium             | Use when docs/pdf/archive matter |
-| `rg                              | rga -> fzf`                                 | Human interactive narrowing | Operator-dependent | Interactive                      | Optional UX layer only |
+| Mode                           | Primary use                                | Latency | Contract                     |
+| ------------------------------ | ------------------------------------------ | ------- | ---------------------------- |
+| `pnpm search:structure`        | Architecture map, dependency orientation   | Fast    | First step before any edit   |
+| `pnpm search:tokens [path]`    | Check if file/dir fits in context          | Fast    | Before reading files         |
+| `pnpm search:code "query"`     | Discovery and mixed intent (~5ms cached)   | Fast    | Default discovery step       |
+| `pnpm search:compress "query"` | Search + compress + dedup for large topics | ~2-5s   | When topic spans >32K tokens |
+| `rg -F "literal"`              | Exact symbol/literal anchors               | Fastest | Required before risky edits  |
+| `Grep` (built-in)              | Exhaustive pattern sweeps for audits       | Fast    | When completeness > ranking  |
 
 Enforcement:
 

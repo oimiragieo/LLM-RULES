@@ -4,6 +4,8 @@ description: Complete mass spectrometry analysis platform. Use for proteomics wo
 license: 3 clause BSD license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PyOpenMS

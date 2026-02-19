@@ -4,6 +4,8 @@ description: Access European Nucleotide Archive via API/FTP. Retrieve DNA/RNA se
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # ENA Database

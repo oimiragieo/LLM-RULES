@@ -4,6 +4,8 @@ description: Use this skill when working with symbolic mathematics in Python. Th
 license: https://github.com/sympy/sympy/blob/master/LICENSE
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # SymPy - Symbolic Mathematics in Python

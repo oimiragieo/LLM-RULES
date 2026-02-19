@@ -116,19 +116,19 @@ stateDiagram-v2
 
 ### Transitions
 
-| From         | To           | Condition                       | Enforcement Hook                 |
-| ------------ | ------------ | ------------------------------- | -------------------------------- |
-| `IDLE`       | `EVALUATING` | Evolution triggered             | `audit-skill-recency.cjs`        |
-| `EVALUATING` | `VALIDATING` | Gap confirmed                   | -                                |
-| `EVALUATING` | `ABORTED`    | No gap / Existing solution      | -                                |
-| `VALIDATING` | `OBTAINING`  | No conflicts                    | `conflict-detector.cjs`          |
-| `VALIDATING` | `ABORTED`    | Naming/capability conflict      | -                                |
-| `OBTAINING`  | `LOCKING`    | Research complete (3+ queries)  | `research-enforcement.cjs`       |
-| `OBTAINING`  | `OBTAINING`  | More research needed            | -                                |
-| `LOCKING`    | `VERIFYING`  | Schema validation passes        | `evolution-state-guard.cjs`      |
-| `LOCKING`    | `LOCKING`    | Schema validation fails (retry) | -                                |
-| `VERIFYING`  | `ENABLING`   | Quality gate passes             | `quality-gate-validator.cjs`     |
-| `VERIFYING`  | `LOCKING`    | Quality issues (fix)            | -                                |
+| From         | To           | Condition                       | Enforcement Hook                   |
+| ------------ | ------------ | ------------------------------- | ---------------------------------- |
+| `IDLE`       | `EVALUATING` | Evolution triggered             | `audit-skill-recency.cjs`          |
+| `EVALUATING` | `VALIDATING` | Gap confirmed                   | -                                  |
+| `EVALUATING` | `ABORTED`    | No gap / Existing solution      | -                                  |
+| `VALIDATING` | `OBTAINING`  | No conflicts                    | `conflict-detector.cjs`            |
+| `VALIDATING` | `ABORTED`    | Naming/capability conflict      | -                                  |
+| `OBTAINING`  | `LOCKING`    | Research complete (3+ queries)  | `research-enforcement.cjs`         |
+| `OBTAINING`  | `OBTAINING`  | More research needed            | -                                  |
+| `LOCKING`    | `VERIFYING`  | Schema validation passes        | `evolution-state-guard.cjs`        |
+| `LOCKING`    | `LOCKING`    | Schema validation fails (retry) | -                                  |
+| `VERIFYING`  | `ENABLING`   | Quality gate passes             | `quality-gate-validator.cjs`       |
+| `VERIFYING`  | `LOCKING`    | Quality issues (fix)            | -                                  |
 | `ENABLING`   | `IDLE`       | Deployment complete             | `artifact-scoring-ledger-hook.cjs` |
 
 ---
@@ -771,15 +771,15 @@ const gate6Passed = Object.values(gate6).every(v => v === true);
 
 ## Enforcement Hooks
 
-| Hook                               | Phase         | Type        | Trigger                         | Action                                           |
-| ---------------------------------- | ------------- | ----------- | ------------------------------- | ------------------------------------------------ |
-| `audit-skill-recency.cjs`          | IDLE→EVALUATE | UserPromptSubmit | Detects stale artifacts and emits runtime evolution signals | Initiates EVOLVE workflow                        |
-| `conflict-detector.cjs`            | VALIDATE      | PreToolUse  | Before creator skill invocation | Blocks if naming/capability conflict             |
-| `research-enforcement.cjs`         | OBTAIN→LOCK   | PreToolUse  | Before Write/Edit for artifacts | Blocks creation without research report          |
-| `evolution-state-guard.cjs`        | ALL           | PreToolUse  | Any phase transition            | Enforces state machine, prevents skipping        |
-| `quality-gate-validator.cjs`       | VERIFY        | PreToolUse  | Before ENABLE transition        | Blocks incomplete/placeholder artifacts          |
-| `artifact-scoring-ledger-hook.cjs` | VERIFY/ENABLE | PostToolUse | Completed TaskUpdate            | Writes score ledger + opens/resolves remediation |
-| `artifact-scoring-ledger-hook.cjs` | ENABLE        | PostToolUse | After deployment                | Logs artifact scoring outcomes and queues remediation |
+| Hook                               | Phase         | Type             | Trigger                                                     | Action                                                |
+| ---------------------------------- | ------------- | ---------------- | ----------------------------------------------------------- | ----------------------------------------------------- |
+| `audit-skill-recency.cjs`          | IDLE→EVALUATE | UserPromptSubmit | Detects stale artifacts and emits runtime evolution signals | Initiates EVOLVE workflow                             |
+| `conflict-detector.cjs`            | VALIDATE      | PreToolUse       | Before creator skill invocation                             | Blocks if naming/capability conflict                  |
+| `research-enforcement.cjs`         | OBTAIN→LOCK   | PreToolUse       | Before Write/Edit for artifacts                             | Blocks creation without research report               |
+| `evolution-state-guard.cjs`        | ALL           | PreToolUse       | Any phase transition                                        | Enforces state machine, prevents skipping             |
+| `quality-gate-validator.cjs`       | VERIFY        | PreToolUse       | Before ENABLE transition                                    | Blocks incomplete/placeholder artifacts               |
+| `artifact-scoring-ledger-hook.cjs` | VERIFY/ENABLE | PostToolUse      | Completed TaskUpdate                                        | Writes score ledger + opens/resolves remediation      |
+| `artifact-scoring-ledger-hook.cjs` | ENABLE        | PostToolUse      | After deployment                                            | Logs artifact scoring outcomes and queues remediation |
 
 ### Hook Implementation Pattern
 

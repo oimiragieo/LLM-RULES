@@ -17,6 +17,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/agents/
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 **Mode: Hybrid (Prompt + Scripted Guardrails)** — Use prompt workflow plus `scripts/main.cjs` for contract-safe generation/validation.

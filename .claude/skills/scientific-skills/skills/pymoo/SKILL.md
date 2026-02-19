@@ -4,6 +4,8 @@ description: Multi-objective optimization framework. NSGA-II, NSGA-III, MOEA/D, 
 license: Apache-2.0 license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Pymoo - Multi-Objective Optimization in Python

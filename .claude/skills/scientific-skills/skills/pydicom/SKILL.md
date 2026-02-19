@@ -4,6 +4,8 @@ description: Python library for working with DICOM (Digital Imaging and Communic
 license: https://github.com/pydicom/pydicom/blob/main/LICENSE
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Pydicom

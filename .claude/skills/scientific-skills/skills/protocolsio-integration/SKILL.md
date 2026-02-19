@@ -4,6 +4,8 @@ description: Integration with protocols.io API for managing scientific protocols
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Protocols.io Integration

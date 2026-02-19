@@ -18,6 +18,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/hooks/
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Hook Creator Skill

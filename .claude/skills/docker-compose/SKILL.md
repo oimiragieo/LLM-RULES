@@ -1,20 +1,27 @@
 ---
 name: docker-compose
 description: Docker Compose container orchestration and management. Manage multi-container applications, services, networks, and volumes. Use for local development, testing, and orchestration of containerized applications.
-version: 1.0
+version: 1.1
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Bash, Read, Glob]
 best_practices:
-  - Verify docker-compose.yml exists before operations
+  - Prefer compose.yaml (canonical V2 name) over docker-compose.yml
+  - Use `docker compose` (V2 plugin) never `docker-compose` (V1 binary)
+  - Verify compose.yaml exists before operations
   - Use project names for isolation
   - Check service status before destructive operations
   - Avoid volume removal without confirmation
   - Review logs before restarting failed services
+  - Define healthchecks on all stateful services
+  - Use profiles for environment-specific services
+  - Use watch + develop block for live development reloading
 error_handling: graceful
 streaming: supported
 safety_level: high
+verified: true
+lastVerifiedAt: 2026-02-19T06:00:00.000Z
 ---
 
 # Docker Compose Skill
@@ -25,7 +32,7 @@ The skill invokes `docker compose`. Easiest: install **Docker Desktop** (include
 
 - **Windows**: [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) (WSL 2 or Hyper-V)
 - **Mac**: [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/) (Apple Silicon or Intel)
-- **Linux**: [Docker Desktop for Linux](https://docs.docker.com/desktop/setup/install/linux/) or Docker Engine + Compose plugin from Docker’s repo
+- **Linux**: [Docker Desktop for Linux](https://docs.docker.com/desktop/setup/install/linux/) or Docker Engine + Compose plugin from Docker's repo
 
 Verify: `docker compose version`
 
@@ -70,8 +77,8 @@ This skill provides comprehensive Docker Compose management, enabling AI agents 
 ## Requirements
 
 - Docker Engine installed and running
-- Docker Compose V2 (docker compose) or V1 (docker-compose)
-- Valid docker-compose.yml file in project
+- Docker Compose V2 (`docker compose` plugin — V1 `docker-compose` is end-of-life)
+- Valid `compose.yaml` (preferred) or `compose.yml` / `docker-compose.yml` in project
 - Appropriate permissions for Docker socket access
 
 ## Quick Reference
@@ -94,6 +101,324 @@ docker compose build
 
 # Execute command in container
 docker compose exec <service> <command>
+
+# Live development reloading (Compose Watch)
+docker compose watch
+
+# Start with a profile active
+docker compose --profile debug up -d
+
+# Validate merged config
+docker compose config
+```
+
+## 2026 Feature Highlights
+
+### compose.yaml — Canonical Filename
+
+Docker Compose V2 prefers `compose.yaml` (and `compose.yml`) over the legacy `docker-compose.yml`.
+The `version:` top-level field is **deprecated** and should be omitted entirely in new files.
+
+```yaml
+# compose.yaml  (preferred — no version: field needed)
+services:
+  web:
+    build: .
+    ports:
+      - '8080:80'
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: example
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+### Compose Watch — Live Development Reloading
+
+Compose Watch (GA as of Compose 2.22+) replaces the manual rebuild-restart cycle during development. Configure a `develop.watch` block per service. Three actions are available:
+
+| Action         | Behavior                                                          |
+| -------------- | ----------------------------------------------------------------- |
+| `sync`         | Instantly copies changed files into the running container         |
+| `rebuild`      | Triggers `docker compose build` + recreates the container         |
+| `sync+restart` | Syncs files then restarts the container process (no full rebuild) |
+
+```yaml
+services:
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    develop:
+      watch:
+        # Sync source instantly — no rebuild needed for interpreted code
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+        # Rebuild when dependency manifest changes
+        - action: rebuild
+          path: package.json
+        # Restart only when config changes
+        - action: sync+restart
+          path: ./config
+          target: /app/config
+```
+
+Start with:
+
+```bash
+# Watch mode (keeps output in foreground)
+docker compose watch
+
+# Or combined with up
+docker compose up --watch
+```
+
+**When to use each action:**
+
+- `sync` — interpreted languages (Node.js, Python, Ruby) where the runtime picks up changes
+- `sync+restart` — config or template files that require a process restart but not a full rebuild
+- `rebuild` — dependency manifest changes (`package.json`, `requirements.txt`, `go.mod`)
+
+### Profiles — Environment-Specific Services
+
+Profiles allow a single `compose.yaml` to serve multiple environments. Services **without** a profile always start. Services **with** profiles only start when that profile is activated.
+
+```yaml
+services:
+  # Always starts — no profile
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # Only with --profile debug
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    profiles: ['debug']
+    ports:
+      - '5050:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+
+  # Only with --profile monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    profiles: ['monitoring']
+    ports:
+      - '9090:9090'
+
+  grafana:
+    image: grafana/grafana:latest
+    profiles: ['monitoring']
+    ports:
+      - '3001:3000'
+
+volumes:
+  db_data:
+```
+
+```bash
+# Default: api + db only
+docker compose up -d
+
+# Debug: api + db + pgadmin
+docker compose --profile debug up -d
+
+# Monitoring: api + db + prometheus + grafana
+docker compose --profile monitoring up -d
+
+# Multiple profiles
+docker compose --profile debug --profile monitoring up -d
+
+# Via environment variable
+COMPOSE_PROFILES=debug,monitoring docker compose up -d
+```
+
+**Profile naming rules:** `[a-zA-Z0-9][a-zA-Z0-9_.-]+` — lowercase kebab-case recommended.
+
+### Include — Composable Configs
+
+The `include` top-level key (introduced in Compose 2.20) allows you to split large compose files into modular, team-owned pieces. Each included file is loaded with its own project directory context, resolving relative paths correctly.
+
+```yaml
+# compose.yaml (root — application layer)
+include:
+  - ./infra/compose.yaml # DB, Redis, message broker
+  - ./monitoring/compose.yaml # Prometheus, Grafana
+
+services:
+  api:
+    build: .
+    depends_on:
+      - db # defined in infra/compose.yaml
+      - redis # defined in infra/compose.yaml
+```
+
+```yaml
+# infra/compose.yaml (infrastructure layer — owned by platform team)
+services:
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  db_data:
+```
+
+`include` is recursive — included files can themselves include other files. Conflicts between resource names cause an error (no silent merging).
+
+### Healthcheck Best Practices
+
+Always define healthchecks on stateful services so that `depends_on: condition: service_healthy` works correctly. Without healthchecks, dependent services may start before their dependency is ready.
+
+```yaml
+services:
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres}']
+      interval: 10s # How often to check
+      timeout: 5s # Time to wait for response
+      retries: 5 # Failures before marking unhealthy
+      start_period: 30s # Grace period during container startup
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy # waits until db passes healthcheck
+      redis:
+        condition: service_healthy
+```
+
+**Healthcheck guidelines:**
+
+- Use `CMD` (array form) not `CMD-SHELL` (string form) where possible — avoids shell injection risk
+- Use `CMD-SHELL` only when you need shell features (`pg_isready`, `curl -f`, etc.)
+- Set `start_period` for services with slow startup (JVM apps, first-run migrations)
+- Avoid `curl` in Alpine-based images unless explicitly installed; prefer `wget -q --spider` or native checks
+- For HTTP services: `test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/health || exit 1"]`
+
+### Multi-Stage Build Pattern
+
+Use multi-stage Dockerfiles to keep production images minimal and secure. Reference the specific build stage in compose.yaml for development.
+
+```dockerfile
+# Dockerfile
+# Stage 1: deps — install dependencies
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+# Stage 2: builder — compile/transpile
+FROM deps AS builder
+COPY . .
+RUN npm run build
+
+# Stage 3: runner — minimal production image
+FROM node:20-alpine AS runner
+RUN addgroup -g 1001 -S appgroup && adduser -S -u 1001 -G appgroup appuser
+WORKDIR /app
+COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+COPY --from=deps    --chown=appuser:appgroup /app/node_modules ./node_modules
+USER appuser
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD wget -q --spider http://localhost:3000/health || exit 1
+CMD ["node", "dist/index.js"]
+```
+
+```yaml
+# compose.yaml — dev targets the builder stage for faster iteration
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder # Stop at builder stage in dev (includes devDeps)
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+```
+
+```yaml
+# compose.prod.yaml — production uses the full runner stage
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner # Minimal, non-root production image
+    restart: unless-stopped
+```
+
+### Resource Limits (Best Practice)
+
+Always define resource limits to prevent container resource exhaustion:
+
+```yaml
+services:
+  api:
+    image: myapp:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    restart: unless-stopped
 ```
 
 ## Tools
@@ -104,7 +429,7 @@ The skill provides 15 tools across service management, monitoring, build operati
 
 #### up
 
-Start services defined in docker-compose.yml.
+Start services defined in compose.yaml.
 
 | Parameter        | Type    | Description                  | Default        |
 | ---------------- | ------- | ---------------------------- | -------------- |
@@ -113,6 +438,8 @@ Start services defined in docker-compose.yml.
 | `force_recreate` | boolean | Recreate containers          | false          |
 | `project_name`   | string  | Project name override        | directory name |
 | `services`       | array   | Specific services to start   | all services   |
+| `profiles`       | array   | Profiles to activate         | none           |
+| `watch`          | boolean | Enable Compose Watch mode    | false          |
 
 **Example**:
 
@@ -120,6 +447,8 @@ Start services defined in docker-compose.yml.
 docker compose up -d
 docker compose up --build
 docker compose up web api
+docker compose --profile debug up -d
+docker compose up --watch
 ```
 
 **Safety**: Requires confirmation for production environments.
@@ -232,7 +561,7 @@ View service logs with streaming support.
 ```bash
 docker compose logs web
 docker compose logs --tail 50 --follow api
-docker compose logs --since "2024-01-01T10:00:00"
+docker compose logs --since "2026-01-01T10:00:00"
 ```
 
 **Note**: Follow mode automatically terminates after 60 seconds to prevent indefinite streaming.
@@ -431,6 +760,19 @@ docker compose ps
 docker compose logs --tail 100
 ```
 
+### Live Development with Compose Watch
+
+```bash
+# 1. Ensure develop.watch blocks are configured in compose.yaml
+
+# 2. Start with watch mode (foreground, shows sync events)
+docker compose watch
+
+# 3. Or start detached then watch
+docker compose up -d
+docker compose watch --no-up
+```
+
 ### Troubleshoot a Failing Service
 
 ```bash
@@ -508,6 +850,25 @@ docker compose images
 # Volumes require manual cleanup with explicit confirmation
 ```
 
+### Use Profiles for Environment-Specific Services
+
+```bash
+# Development: default services only
+docker compose up -d
+
+# Development + debug tools
+docker compose --profile debug up -d
+
+# Start monitoring stack
+docker compose --profile monitoring up -d
+
+# Via env var (useful in CI)
+COMPOSE_PROFILES=monitoring docker compose up -d
+
+# Stop and clean a specific profile
+docker compose --profile debug down
+```
+
 ## Configuration
 
 ### Environment Variables
@@ -515,7 +876,8 @@ docker compose images
 | Variable                 | Description                       | Default                        |
 | ------------------------ | --------------------------------- | ------------------------------ |
 | `COMPOSE_PROJECT_NAME`   | Default project name              | directory name                 |
-| `COMPOSE_FILE`           | Compose file path                 | `docker-compose.yml`           |
+| `COMPOSE_FILE`           | Compose file path                 | `compose.yaml`                 |
+| `COMPOSE_PROFILES`       | Comma-separated active profiles   | (none)                         |
 | `COMPOSE_PATH_SEPARATOR` | Path separator for multiple files | `:` (Linux/Mac), `;` (Windows) |
 | `DOCKER_HOST`            | Docker daemon socket              | `unix:///var/run/docker.sock`  |
 | `COMPOSE_HTTP_TIMEOUT`   | HTTP timeout for API calls        | 60                             |
@@ -543,23 +905,30 @@ docker compose images
    # Check Docker version
    docker --version
 
-   # Check Compose version
+   # Check Compose version (must be V2, e.g. 2.24+)
    docker compose version
    ```
 
-3. **Create docker-compose.yml**:
+3. **Create compose.yaml** (no `version:` field — V2 does not require it):
 
    ```yaml
-   version: '3.8'
    services:
      web:
        build: .
        ports:
          - '8080:80'
+       depends_on:
+         db:
+           condition: service_healthy
      db:
-       image: postgres:14
+       image: postgres:16-alpine
        environment:
          POSTGRES_PASSWORD: example
+       healthcheck:
+         test: ['CMD-SHELL', 'pg_isready -U postgres']
+         interval: 10s
+         timeout: 5s
+         retries: 5
    ```
 
 4. **Test the skill**:
@@ -608,8 +977,10 @@ The following operations auto-terminate to prevent resource issues:
 | `Cannot connect to Docker daemon` | Docker not running    | Start Docker service                            |
 | `network ... not found`           | Network cleanup issue | Run `docker compose down` then `up`             |
 | `port is already allocated`       | Port conflict         | Change port mapping or stop conflicting service |
-| `no configuration file provided`  | Missing compose file  | Create `docker-compose.yml`                     |
+| `no configuration file provided`  | Missing compose file  | Create `compose.yaml`                           |
 | `service ... must be built`       | Image not built       | Run `docker compose build`                      |
+| `service unhealthy`               | Healthcheck failing   | Check `docker compose logs <service>`           |
+| `include path not found`          | Missing included file | Verify paths in `include:` block                |
 
 **Recovery**:
 
@@ -661,11 +1032,8 @@ The skill uses progressive disclosure to minimize context usage:
 # Check Docker Compose version
 docker compose version
 
-# If using V1, try:
-docker-compose version
-
-# Update to V2 (recommended)
-# Docker Compose V2 is integrated into Docker CLI
+# V1 (docker-compose) is end-of-life — upgrade to V2
+# Docker Compose V2 is integrated into Docker CLI as a plugin
 ```
 
 **Permission denied**:
@@ -685,7 +1053,7 @@ docker ps
 # Validate syntax
 docker compose config
 
-# Check for errors
+# Check for errors (quiet mode — exit code only)
 docker compose config -q
 
 # View resolved configuration
@@ -706,18 +1074,48 @@ docker compose down
 docker compose up -d
 ```
 
+**Healthcheck failures**:
+
+```bash
+# Inspect healthcheck status
+docker inspect <container_id> | grep -A 10 Health
+
+# View healthcheck output
+docker compose logs <service>
+
+# Manually run the healthcheck command
+docker compose exec <service> pg_isready -U postgres
+```
+
+**Compose Watch not syncing**:
+
+```bash
+# Verify develop.watch block is present in compose.yaml
+docker compose config | grep -A 20 develop
+
+# Ensure Compose version is 2.22+
+docker compose version
+
+# Watch requires build: attribute (not image: only)
+```
+
 ## Performance Considerations
 
 - **Build caching**: Use layer caching for faster builds; avoid `--no-cache` unless necessary
+- **Multi-stage builds**: Dramatically reduce production image size (often 80%+)
 - **Parallel operations**: Docker Compose V2 parallelizes by default; use `COMPOSE_PARALLEL_LIMIT` to control
 - **Resource limits**: Define CPU/memory limits in compose file to prevent resource exhaustion
 - **Log rotation**: Use logging drivers to prevent disk space issues
 - **Volume cleanup**: Regularly clean unused volumes (requires manual confirmation)
+- **Compose Watch vs bind mounts**: Prefer `develop.watch` for cross-platform development; bind mounts have I/O performance issues on macOS/Windows
 
 ## Related
 
 - **Docker Compose Documentation**: https://docs.docker.com/compose/
 - **Compose File Reference**: https://docs.docker.com/compose/compose-file/
+- **Compose Watch Docs**: https://docs.docker.com/compose/how-tos/file-watch/
+- **Compose Profiles Docs**: https://docs.docker.com/compose/how-tos/profiles/
+- **Compose Include Docs**: https://docs.docker.com/compose/how-tos/multiple-compose-files/include/
 - **Docker CLI**: https://docs.docker.com/engine/reference/commandline/cli/
 - **Kubernetes Migration**: `.claude/skills/kubernetes-flux/` (Kubernetes orchestration)
 
@@ -727,6 +1125,9 @@ docker compose up -d
 - [Docker Compose V2](https://github.com/docker/compose)
 - [Compose Specification](https://github.com/compose-spec/compose-spec)
 - [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+- [Use Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/)
+- [Use Compose Profiles](https://docs.docker.com/compose/how-tos/profiles/)
+- [Compose Include Directive](https://docs.docker.com/compose/how-tos/multiple-compose-files/include/)
 
 ## Related Skills
 

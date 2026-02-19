@@ -16,6 +16,8 @@ best_practices:
   - PKCE downgrade attack prevention
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Auth Security Expert

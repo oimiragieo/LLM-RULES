@@ -164,7 +164,9 @@ node .claude/tools/cli/run-skill-updates.cjs --skill <name> --json
 1. Run `validateEnterpriseBundle(skillName)` to check completeness:
 
 ```javascript
-const { validateEnterpriseBundle } = require('.claude/lib/creators/enterprise-bundle-validator.cjs');
+const {
+  validateEnterpriseBundle,
+} = require('.claude/lib/creators/enterprise-bundle-validator.cjs');
 const bundle = validateEnterpriseBundle(skillName, projectRoot);
 // bundle: { complete, missing, existing, score, scoreNum, scoreMax }
 ```
@@ -172,7 +174,9 @@ const bundle = validateEnterpriseBundle(skillName, projectRoot);
 2. If score < 100%: run `scaffoldMissingComponents(skillName)` to generate missing pieces:
 
 ```javascript
-const { scaffoldMissingComponents } = require('.claude/lib/creators/enterprise-bundle-scaffolder.cjs');
+const {
+  scaffoldMissingComponents,
+} = require('.claude/lib/creators/enterprise-bundle-scaffolder.cjs');
 const scaffold = scaffoldMissingComponents(skillName, projectRoot);
 // scaffold: { created: string[], skipped: string[] }
 ```

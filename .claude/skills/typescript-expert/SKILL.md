@@ -1,7 +1,7 @@
 ---
 name: typescript-expert
 description: TypeScript and JavaScript expert including type systems, patterns, and tooling
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,6 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
+verified: true
+lastVerifiedAt: 2026-02-19T06:00:00.000Z
 ---
 
 # Typescript Expert
@@ -83,6 +85,206 @@ When reviewing or writing code, apply these guidelines:
 - Provide clear, concise comments explaining complex logic or design decisions.
 - Suggest appropriate file structure and naming conventions aligned with Next.js 14 best practices.
 - Use the `'use client'` directive only w
+
+### TypeScript 5.5–5.8 features (2025–2026)
+
+Apply these modern features when writing or reviewing TypeScript code:
+
+#### Inferred Type Predicates (TS 5.5)
+
+TypeScript now infers type predicates from function bodies. No need to manually annotate `x is T` for simple filters.
+
+```typescript
+// Before 5.5 — manual predicate required
+const strings = values.filter((v): v is string => v !== null && typeof v === 'string');
+
+// TS 5.5+ — predicate is inferred automatically
+const strings = values.filter(v => v !== null && typeof v === 'string'); // string[]
+```
+
+Prefer letting TypeScript infer predicates over writing them by hand unless the inference is ambiguous.
+
+#### Isolated Declarations (TS 5.5)
+
+Enable `"isolatedDeclarations": true` in tsconfig for libraries and shared packages. This enforces that every exported symbol has an explicit type annotation, enabling parallel `.d.ts` generation by third-party tools (esbuild, oxc) without running `tsc`.
+
+```typescript
+// Required when isolatedDeclarations: true
+export function add(a: number, b: number): number {
+  return a + b;
+}
+// Omitting the return type annotation is an error under isolatedDeclarations
+```
+
+Use `isolatedDeclarations` for any published package or monorepo shared library. It also improves incremental build performance.
+
+#### Never-Initialized Variable Checks (TS 5.7)
+
+TS 5.7 catches variables that are declared but never assigned in any code path, even when accessed via inner functions.
+
+```typescript
+// TS 5.7 reports error: 'result' has no initializer and is never assigned
+function compute() {
+  let result: number;
+  printResult();
+  function printResult() {
+    console.log(result);
+  } // error
+}
+```
+
+Enable this by keeping `strict: true`. No extra flag needed.
+
+#### `--erasableSyntaxOnly` (TS 5.8)
+
+Add `"erasableSyntaxOnly": true` to tsconfig for Node.js projects that use native TypeScript stripping (Node 22.6+ with `--experimental-strip-types`, or Node 23+). This flag turns enums, namespaces, and constructor parameter properties into compile errors.
+
+```typescript
+// All three are errors under erasableSyntaxOnly: true
+enum Status {
+  Active,
+  Inactive,
+} // error — use const object instead
+namespace Utils {
+  export const x = 1;
+} // error — use a module instead
+class Foo {
+  constructor(private x: string) {}
+} // error — assign manually
+```
+
+Preferred replacements:
+
+```typescript
+// Enum → const object + typeof
+const Status = { Active: 'active', Inactive: 'inactive' } as const;
+type Status = (typeof Status)[keyof typeof Status];
+
+// Parameter property → explicit assignment
+class Foo {
+  private x: string;
+  constructor(x: string) {
+    this.x = x;
+  }
+}
+```
+
+#### `satisfies` Operator
+
+Use `satisfies` to validate an object against a type while keeping the narrowest literal type inference.
+
+```typescript
+type Config = { env: 'dev' | 'prod'; retries: number };
+
+// Plain annotation widens env to 'dev' | 'prod'
+const cfg1: Config = { env: 'dev', retries: 3 };
+// typeof cfg1.env → 'dev' | 'prod'
+
+// satisfies keeps literal but still validates the shape
+const cfg2 = { env: 'dev', retries: 3 } satisfies Config;
+// typeof cfg2.env → 'dev'  (narrower — use for keyof, typeof lookups)
+```
+
+Key use cases: configuration objects, i18n maps, event handler registries, route definitions.
+
+#### `const` Type Parameters (TS 5.0+)
+
+Annotate a generic with `const` to request literal-type inference from call sites without requiring `as const` at every call.
+
+```typescript
+// Without const — T infers as string[]
+function identity<T>(value: T): T {
+  return value;
+}
+identity(['a', 'b']); // T = string[]
+
+// With const — T infers as readonly ['a', 'b']
+function identity<const T>(value: T): T {
+  return value;
+}
+identity(['a', 'b']); // T = readonly ['a', 'b']
+```
+
+Useful for tuple factories, typed route builders, and fluent API chains.
+
+#### `NoInfer` Utility Type (TS 5.4+)
+
+Use `NoInfer<T>` to prevent a parameter from being used as an inference site, forcing TypeScript to resolve `T` from other arguments first.
+
+```typescript
+// Without NoInfer — TypeScript widens initial to string (wrong)
+function createFSM<T extends string>(states: T[], initial: T): void {}
+createFSM(['idle', 'running'], 'typo'); // no error — 'typo' widens T
+
+// With NoInfer — initial must match inferred T from states
+function createFSM<T extends string>(states: T[], initial: NoInfer<T>): void {}
+createFSM(['idle', 'running'], 'typo'); // error — 'typo' not in T
+```
+
+### tsconfig recommendations for Node 22+
+
+Use these settings for Node.js 22+ projects (native ESM or CJS):
+
+```jsonc
+{
+  "compilerOptions": {
+    // Target Node 22 supports ES2023 natively
+    "target": "ES2023",
+    "lib": ["ES2023"],
+
+    // Native Node ESM (files use .ts extension, output .js/.mjs)
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    // Strict + extras
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    // TS 5.5+ — enforce explicit exports for parallel d.ts gen (libraries)
+    // "isolatedDeclarations": true,
+
+    // TS 5.8 — disallow enums/namespaces/param-props (Node strip-types compat)
+    // "erasableSyntaxOnly": true,
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+  },
+}
+```
+
+For bundled apps (Vite, webpack, esbuild) use `"module": "ESNext"` and `"moduleResolution": "bundler"` instead.
+
+### ESM / CJS interop guidance
+
+Follow these rules to avoid module-system errors in Node 22+ projects:
+
+1. **`type` field drives defaults.** `"type": "module"` in package.json makes `.js` files ESM. Omit `type` or set `"commonjs"` for CJS defaults.
+2. **Extensions always win.** `.mjs` → ESM, `.cjs` → CJS, regardless of `type`.
+3. **`moduleResolution: NodeNext` requires explicit extensions** in relative imports:
+   ```typescript
+   import { foo } from './foo.js'; // correct — .js even for .ts source
+   import { bar } from './bar.cjs'; // correct for CJS output
+   ```
+4. **ESM cannot `require()` CJS synchronously.** ESM → CJS: use `createRequire`. CJS → ESM: use dynamic `import()`.
+5. **Dual-publishing (CJS + ESM):** Use the `exports` field in package.json with `"import"` and `"require"` conditions. Build with `tsc -p tsconfig.esm.json` and `tsc -p tsconfig.cjs.json`.
+6. **`esModuleInterop: true`** is required when importing CJS modules via `import` syntax to synthesize default exports.
+7. **For bundled apps**, use `"moduleResolution": "bundler"` — it permits extension-less imports and lets the bundler handle resolution. Do not set `"type": "module"` in bundled projects (TypeScript cannot fully analyze the bundler's CJS/ESM interop in that mode).
+
+### Anti-Patterns (do not use)
+
+- **Enums** — Use `const` objects with `typeof` instead. Enums generate runtime code, break tree-shaking, and are banned by `erasableSyntaxOnly`.
+- **`namespace` declarations** — Use ES modules. Namespaces are non-erasable and a legacy pattern.
+- **`any`** — Use `unknown` with type guards, or model the type properly.
+- **Type assertions (`as T`)** — Prefer `satisfies`, type guards, or proper generics.
+- **`!` non-null assertions** — Handle `null`/`undefined` explicitly.
+- **Class parameter properties** — Assign fields explicitly; banned by `erasableSyntaxOnly`.
 
 </instructions>
 

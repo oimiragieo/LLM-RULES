@@ -6,6 +6,8 @@ model: sonnet
 invoked_by: user
 user_invocable: true
 tools: [Read, Write, Edit]
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Ripgrep Skill
@@ -51,16 +53,24 @@ Without the index build, `pnpm search:code` falls back to text-only matching. Co
 # Project structure (directory tree + entry points + dependency graph + Mermaid)
 pnpm search:structure
 
-# Token budget analysis (file sizes + token estimates + read/search/compress advice)
+# Token budget analysis (file sizes + token estimates + refactor advice)
 pnpm search:tokens .claude/lib          # directory analysis
 pnpm search:tokens path/to/file.cjs     # single file analysis
 
 # Semantic + text hybrid search (concept discovery, ranked results)
+# Repeated/similar queries served from cache (~5ms hit vs ~800ms miss)
 pnpm search:code "authentication logic"
 pnpm search:code "export class User"
 
+# One-shot search + compress + dedup pipeline (for large context tasks)
+pnpm search:compress "how does routing work"
+
 # Get file content with line numbers
 pnpm search:file src/auth.ts 1 50
+
+# Cache observability (daemon must be running)
+pnpm search:code --cache-stats          # view hits, misses, entries
+pnpm search:code --cache-clear          # flush cached results
 ```
 
 ### `pnpm search:structure` — Know Where Things Are
@@ -135,26 +145,72 @@ pnpm search:tokens .claude/hooks/routing
 
 This only applies to source code files (`.js`, `.cjs`, `.mjs`, `.ts`, `.py`), not data files or configs. The pattern follows existing splits in the codebase (e.g., `routing-table.cjs` → `routing-table-data.cjs`, `index-manager.cjs` → `index-manager-operations.cjs`).
 
+### `pnpm search:compress "query"` — Search + Compress in One Shot
+
+**Use when `search:tokens` shows a topic spans >32K tokens and you need a compressed summary.**
+
+Combines the full pipeline in a single command:
+
+1. Hybrid search finds relevant files for your query
+2. Reads actual file content (not just file paths)
+3. Adaptively sets compression ratio based on corpus size (0.8 for small, 0.1 for huge)
+4. Compresses via the Python engine with evidence-aware mode
+5. Deduplicates extracted insights against existing memory (patterns.json, gotchas.json)
+6. Outputs JSON with compressed context + classified memory records
+
+```bash
+pnpm search:compress "how does the routing system work"
+# Returns JSON:
+# {
+#   "ok": true,
+#   "search": { "query": "...", "hits": 20 },
+#   "compression": { "mode": "evidence_aware", "skeletonRatio": 0.5 },
+#   "memoryRecords": { "patterns": [...], "gotchas": [...], "issues": [...], "decisions": [...] },
+#   "dedupStats": { "total": 24, "kept": 18, "filtered": 6 }
+# }
+```
+
+**Key features:**
+
+- **Adaptive compression**: small corpus (< 8K tokens) keeps 80%, huge corpus (>100K) keeps only 10%
+- **Memory dedup**: won't re-persist patterns/gotchas that already exist in your memory system
+- **Evidence gating**: use `--fail-on-insufficient-evidence` to abort if the query doesn't find strong matches
+
+### Automatic Optimizations (No Action Needed)
+
+These features work in the background with no commands required:
+
+**Query Cache** — Repeated or semantically similar `search:code` queries are served from an in-memory cache (~5ms vs ~800ms). The cache uses cosine similarity (threshold: 0.95) so "routing system" and "how routing works" share cached results. Entries expire after 5 minutes. The cache lives in the daemon process for persistence across queries.
+
+**BM25 Auto-Update** — When you edit a file, the BM25 text index updates incrementally (~10ms per file). This means `search:code` always reflects your latest changes without needing `code:index:reindex`. Only the text index updates; semantic embeddings require a full reindex.
+
+**Cache observability:**
+
+```bash
+pnpm search:code --cache-stats    # entries, hits, misses, hit rate
+pnpm search:code --cache-clear    # flush all cached results
+```
+
 ### Search Mode Contract (Deterministic)
 
-| Mode                             | Use when                                                   | Latency         | Output                                        |
-| -------------------------------- | ---------------------------------------------------------- | --------------- | --------------------------------------------- |
-| `pnpm search:structure`          | First step: understand project layout, find where to edit  | Fast            | Directory tree + exports + deps + Mermaid     |
-| `pnpm search:tokens [path]`      | Before reading: check if file/dir fits in context          | Fast            | Token estimates + read/search/compress advice |
-| `pnpm search:code "query"`       | Concept discovery, find unknown implementation paths       | ~0.2-0.8s       | Compact ranked top-20                         |
-| `pnpm search:code "ast:pattern"` | Structural pattern intent (AST shape)                      | Moderate        | Compact + structure-aware                     |
-| `rg -F "literal"`                | Exact symbol/literal lookup and anchor checks before edits | Fastest (~35ms) | ALL matches (not ranked)                      |
-| `Grep` (built-in)                | Exhaustive pattern sweeps for audits                       | Fast            | ALL matches with context                      |
-| `rga "query"`                    | Non-code assets (pdf/docs/archive)                         | Slower          | Can be noisy                                  |
+| Mode                           | Use when                                                         | Latency                          | Output                                    |
+| ------------------------------ | ---------------------------------------------------------------- | -------------------------------- | ----------------------------------------- |
+| `pnpm search:structure`        | First step: understand project layout, find where to edit        | Fast                             | Directory tree + exports + deps + Mermaid |
+| `pnpm search:tokens [path]`    | Before reading: check if file/dir fits in context                | Fast                             | Token estimates + refactor advice         |
+| `pnpm search:code "query"`     | Concept discovery, find unknown paths. Auto-cached (~5ms repeat) | ~0.2-0.8s (first), ~5ms (cached) | Compact ranked top-20                     |
+| `pnpm search:compress "query"` | Large context: search + compress + dedup in one shot             | ~2-5s                            | JSON: compressed context + memory records |
+| `rg -F "literal"`              | Exact symbol/literal lookup and anchor checks before edits       | Fastest (~35ms)                  | ALL matches (not ranked)                  |
+| `Grep` (built-in)              | Exhaustive pattern sweeps for audits                             | Fast                             | ALL matches with context                  |
 
 Required selection behavior:
 
 - **FIRST**: `pnpm search:structure` to orient — know the directory layout and dependency hotspots.
 - **CHECK SIZE**: `pnpm search:tokens` before reading — know if the file fits in context.
-- **THEN**: `pnpm search:code` for concept discovery — find files related to your task.
+- **THEN**: `pnpm search:code` for concept discovery — find files related to your task. Repeat queries are cached automatically.
+- **FOR LARGE CONTEXT**: `pnpm search:compress` when you need compressed understanding of a broad topic. Combines search + adaptive compression + memory dedup in one command.
 - **BEFORE EDITS**: `rg -F` to validate exact anchors — confirm the symbol/function exists where you think.
 - **FOR AUDITS**: `Grep` (built-in) for exhaustive sweeps — need ALL matches, not top-N.
-- **FOR LARGE FILES**: Use `token-saver-context-compression` skill when tokens exceed budget.
+- BM25 text index auto-updates when files are edited (no manual action needed).
 - `fzf` stays optional for human-in-the-loop workflows; do not require it for automation.
 
 ### Locate Before You Edit (MANDATORY workflow for agents)
@@ -268,9 +324,11 @@ ast-grep -p 'function $NAME($$$) { $$$ }' --lang javascript --files-with-matches
 1. `pnpm code:index:reindex` builds BM25 text index + LanceDB vector embeddings
 2. Embedding generation runs in an isolated subprocess (GPU-accelerated when available)
 3. Subprocess is restarted every 50 batches to reclaim ONNX native memory leaks
-4. `search:code` queries both BM25 (text) and vector (semantic) indexes
+4. `search:code` checks the query cache first (~5ms hit); on miss, queries BM25 + vector indexes
 5. RRF merges text and semantic rankings into a single ordered result set
-6. Post-edit hooks can incrementally update changed files
+6. Results are cached for future similar queries (cosine > 0.95 = cache hit)
+7. Post-edit hooks incrementally update the BM25 text index (~10ms per file)
+8. `search:compress` combines search + adaptive compression + memory dedup in one pipeline
 
 ### Configuration
 
@@ -284,17 +342,29 @@ LANCEDB_EMBEDDING_MODE=fastembed
 # Subprocess isolation for ONNX memory safety (default: on)
 EMBED_SUBPROCESS=on
 
+# Query cache (auto-caches repeated/similar queries)
+SEARCH_CACHE_ENABLED=on            # Kill switch: set to off to disable
+SEARCH_CACHE_TTL_MS=300000          # Cache TTL: 5 minutes
+SEARCH_CACHE_SIMILARITY=0.95        # Cosine threshold for semantic cache hit
+
+# BM25 incremental update after file edits
+BM25_INCREMENTAL_UPDATE=on          # Kill switch: set to off to disable
+
 # Disable semantic search (text-only, fastest, no index needed)
 # HYBRID_EMBEDDINGS=off
 
-# Optional binary overrides (normally auto-detected)
-# RG_BIN=/path/to/rg
-# AST_GREP_BIN=/path/to/ast-grep
-
-# Daemon transport for repeated queries
+# Daemon transport for repeated queries (cache lives here)
 HYBRID_SEARCH_DAEMON=on
 HYBRID_DAEMON_PREWARM=true
 HYBRID_DAEMON_IDLE_MS=600000
+
+# Query cache (caches repeated/similar queries by embedding similarity)
+SEARCH_CACHE_ENABLED=on          # set to off to disable
+SEARCH_CACHE_TTL_MS=300000       # cache entry TTL (5 min)
+SEARCH_CACHE_SIMILARITY=0.95     # cosine threshold for cache hit
+
+# BM25 incremental update after file edits
+BM25_INCREMENTAL_UPDATE=on       # set to off to disable
 ```
 
 ### Daemon + Prewarm Runbook

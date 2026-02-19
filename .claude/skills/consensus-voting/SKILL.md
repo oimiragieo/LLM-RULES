@@ -13,6 +13,8 @@ best_practices:
   - Escalate unresolved conflicts
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Consensus Voting Skill

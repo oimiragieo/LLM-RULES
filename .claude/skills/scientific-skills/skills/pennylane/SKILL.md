@@ -4,6 +4,8 @@ description: Hardware-agnostic quantum ML framework with automatic differentiati
 license: Apache-2.0 license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PennyLane

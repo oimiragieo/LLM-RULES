@@ -14,6 +14,8 @@ best_practices:
   - Check for blocked tasks after completing work
 error_handling: strict
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Task Management Protocol

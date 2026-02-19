@@ -4,6 +4,8 @@ description: Query NHGRI-EBI GWAS Catalog for SNP-trait associations. Search var
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # GWAS Catalog Database

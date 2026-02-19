@@ -29,6 +29,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/context/artifacts/research-reports/
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Research Synthesis Skill

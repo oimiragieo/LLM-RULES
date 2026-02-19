@@ -4,6 +4,8 @@ description: Access and analyze comprehensive drug information from the DrugBank
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # DrugBank Database

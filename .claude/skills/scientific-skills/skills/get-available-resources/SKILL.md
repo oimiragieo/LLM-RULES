@@ -4,6 +4,8 @@ description: This skill should be used at the start of any computationally inten
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Get Available Resources

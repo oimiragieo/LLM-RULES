@@ -12,6 +12,8 @@ best_practices:
   - Focus on hotspots first
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Code Analyzer Skill

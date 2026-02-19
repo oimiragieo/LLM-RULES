@@ -2,6 +2,8 @@
 name: pdf
 description: PDF manipulation toolkit. Extract text/tables, create PDFs, merge/split, fill forms, for programmatic document processing and analysis.
 license: Proprietary. LICENSE.txt has complete terms
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PDF Processing Guide

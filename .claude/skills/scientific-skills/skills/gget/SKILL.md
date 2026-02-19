@@ -4,6 +4,8 @@ description: 'Fast CLI/Python queries to 20+ bioinformatics databases. Use for q
 license: BSD-2-Clause license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # gget

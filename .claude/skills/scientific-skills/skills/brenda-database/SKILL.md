@@ -4,6 +4,8 @@ description: Access BRENDA enzyme database via SOAP API. Retrieve kinetic parame
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # BRENDA Database

@@ -14,6 +14,8 @@ best_practices:
   - Return markdown checklist with checkboxes
 error_handling: strict
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Quality Checklist Generator

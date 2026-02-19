@@ -13,6 +13,8 @@ best_practices:
   - Document architectural decisions
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Architecture Review Skill

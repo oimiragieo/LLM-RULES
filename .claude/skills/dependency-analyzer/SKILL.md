@@ -15,6 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 templates: [dependency-report, update-plan, security-audit]
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Dependency Analyzer Skill

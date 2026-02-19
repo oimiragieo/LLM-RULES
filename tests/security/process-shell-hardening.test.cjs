@@ -10,7 +10,10 @@ function read(relPath) {
 }
 
 test('SEC-03: testing scripts avoid shell:true and avoid execSync', () => {
-  const files = ['scripts/testing/test-version-validation.mjs', 'scripts/testing/count-all-tests.mjs'];
+  const files = [
+    'scripts/testing/test-version-validation.mjs',
+    'scripts/testing/count-all-tests.mjs',
+  ];
 
   for (const file of files) {
     const src = read(file);
@@ -32,7 +35,11 @@ test('SEC-05: security-lint uses spawnSync with shell:false for git queries', ()
   const file = '.claude/tools/cli/security-lint.cjs';
   const src = read(file);
 
-  assert.match(src, /spawnSync\('git',\s*\['diff',\s*'--cached'/, 'should use spawnSync for staged query');
+  assert.match(
+    src,
+    /spawnSync\('git',\s*\['diff',\s*'--cached'/,
+    'should use spawnSync for staged query'
+  );
   assert.match(src, /spawnSync\('git',\s*\['ls-files'\]/, 'should use spawnSync for tracked query');
   assert.doesNotMatch(src, /\bexecSync\s*\(/, `${file} must not use execSync`);
   assert.doesNotMatch(src, /shell\s*:\s*true/, `${file} must not use shell:true`);

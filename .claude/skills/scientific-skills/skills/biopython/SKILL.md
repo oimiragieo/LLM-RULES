@@ -4,6 +4,8 @@ description: Comprehensive molecular biology toolkit. Use for sequence manipulat
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Biopython: Computational Molecular Biology in Python

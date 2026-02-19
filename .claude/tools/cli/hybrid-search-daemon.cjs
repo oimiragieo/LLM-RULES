@@ -131,7 +131,16 @@ async function main() {
               Number(args.end || 50)
             );
           } else if (command === 'stats') {
-            result = indexer.getStats();
+            const base = indexer.getStats();
+            result = {
+              ...base,
+              cache: indexer.queryCache ? indexer.queryCache.getStats() : { enabled: false },
+            };
+          } else if (command === 'cache-stats') {
+            result = indexer.queryCache ? indexer.queryCache.getStats() : { enabled: false };
+          } else if (command === 'cache-clear') {
+            if (indexer.queryCache) indexer.queryCache.clear();
+            result = { cleared: true };
           } else if (command === 'shutdown') {
             socket.write(
               `${JSON.stringify({

@@ -13,6 +13,8 @@ best_practices:
   - Track scores over time
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Response Rater Skill

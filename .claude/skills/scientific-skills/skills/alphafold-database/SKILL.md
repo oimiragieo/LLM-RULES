@@ -4,6 +4,8 @@ description: Access AlphaFold 200M+ AI-predicted protein structures. Retrieve st
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # AlphaFold Database

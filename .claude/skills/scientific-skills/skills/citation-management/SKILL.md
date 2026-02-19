@@ -5,6 +5,8 @@ allowed-tools: [Read, Write, Edit, Bash]
 license: MIT License
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Citation Management

@@ -4,6 +4,8 @@ description: Query PubChem via PUG-REST API/PubChemPy (110M+ compounds). Search 
 license: Unknown
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PubChem Database

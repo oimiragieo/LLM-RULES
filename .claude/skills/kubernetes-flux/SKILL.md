@@ -15,6 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 safety_level: high
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Kubernetes Flux Skill

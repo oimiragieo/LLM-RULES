@@ -23,8 +23,7 @@ class FeatureFlags {
     this.rolloutPercentages = new Map();
     this.rollbackHistory = new Map();
     this.projectRoot = options.projectRoot || process.cwd();
-    this.configPath =
-      options.configPath || path.join(this.projectRoot, '.claude', 'config.yaml');
+    this.configPath = options.configPath || path.join(this.projectRoot, '.claude', 'config.yaml');
 
     // Initialize from environment variables
     this._initializeFromConfigAndEnv();

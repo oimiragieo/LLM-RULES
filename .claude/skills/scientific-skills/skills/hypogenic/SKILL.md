@@ -4,6 +4,8 @@ description: Automated LLM-driven hypothesis generation and testing on tabular d
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Hypogenic

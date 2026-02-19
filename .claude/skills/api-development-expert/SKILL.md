@@ -1,7 +1,7 @@
 ---
 name: api-development-expert
 description: API development expert including REST design, OpenAPI, and documentation
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -11,8 +11,13 @@ best_practices:
   - Follow domain-specific conventions
   - Apply patterns consistently
   - Prioritize type safety and testing
+  - Use OpenAPI 3.1 for full JSON Schema 2020-12 compliance and webhook support
+  - Apply versioning strategy consistently from day one
+  - Use HATEOAS links for discoverable APIs (Richardson Maturity Level 3)
 error_handling: graceful
 streaming: supported
+verified: true
+lastVerifiedAt: 2026-02-19T06:00:00.000Z
 ---
 
 # Api Development Expert
@@ -211,6 +216,185 @@ Protect against abuse and ensure fair usage:
 - Swagger UI / OpenAPI for interactive docs
 - Postman collections for testing
 - Code examples in multiple languages
+
+### OpenAPI 3.1 (2026 Best Practice)
+
+Upgrade from OpenAPI 3.0 to 3.1 for full JSON Schema 2020-12 compliance:
+
+**Key differences from 3.0:**
+
+| Feature                 | OpenAPI 3.0           | OpenAPI 3.1                |
+| ----------------------- | --------------------- | -------------------------- |
+| JSON Schema compliance  | Subset + extensions   | Full JSON Schema 2020-12   |
+| Nullable fields         | `nullable: true`      | `type: ["string", "null"]` |
+| Webhooks                | Not supported         | `webhooks` object at root  |
+| `$schema` declaration   | Not allowed           | Allowed at document root   |
+| `example` vs `examples` | Both allowed together | Mutually exclusive         |
+
+**OpenAPI 3.1 Webhook definition:**
+
+```yaml
+openapi: '3.1.0'
+info:
+  title: My API
+  version: '1.0.0'
+
+webhooks:
+  orderCreated:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderEvent'
+      responses:
+        '200':
+          description: Webhook received successfully
+```
+
+**OpenAPI Overlays (v1.1.0, Jan 2026):**
+
+Overlays are a companion spec that applies targeted transformations to an OpenAPI document without modifying the source. Use cases:
+
+- Adding environment-specific server URLs
+- Injecting partner-specific authentication metadata
+- Removing internal endpoints before publishing externally
+
+```yaml
+# overlay.yaml
+overlay: '1.0.0'
+info:
+  title: Partner API Overlay
+  version: '1.0.0'
+actions:
+  - target: "$.paths['/internal/**']"
+    remove: true
+  - target: '$.info'
+    update:
+      x-partner-id: 'acme-corp'
+```
+
+**OpenAPI 3.2 (September 2025)** adds:
+
+- Hierarchical tag metadata (`summary`, `parent`, `kind`)
+- Streaming-friendly media types with `itemSchema`
+- `query` HTTP operations and `querystring` parameters
+- OAuth2 device flow and metadata URL support
+
+### API Versioning Strategies (2026)
+
+Choose and document your versioning strategy before the first public release:
+
+**URI versioning (most common, most explicit):**
+
+```
+GET /v1/users
+GET /v2/users
+```
+
+- Easy to test, cache, and route
+- Consider: version only on breaking changes (additive changes are backward compatible)
+
+**Header versioning:**
+
+```
+Accept: application/vnd.myapi.v2+json
+```
+
+- Cleaner URIs; slightly harder for browser-based testing
+
+**Deprecation lifecycle:**
+
+```http
+Deprecation: true
+Sunset: Sat, 01 Jan 2027 00:00:00 GMT
+Link: <https://api.example.com/v2/users>; rel="successor-version"
+```
+
+**GraphQL schema evolution (no URI versioning needed):**
+
+- Use `@deprecated(reason: "Use newField instead")` to phase out fields
+- Add new fields without removing old ones (additive-only changes)
+- Never rename or remove fields from a live schema; deprecate and provide migration path
+
+### Rate Limiting — Advanced Patterns (2026)
+
+**Standardized headers (IETF draft `draft-ietf-httpapi-ratelimit-headers`):**
+
+```http
+RateLimit-Limit: 100
+RateLimit-Remaining: 87
+RateLimit-Reset: 1
+Retry-After: 30
+```
+
+**Algorithm comparison:**
+
+| Algorithm              | Burst Handling         | Accuracy | Use Case         |
+| ---------------------- | ---------------------- | -------- | ---------------- |
+| Fixed window           | Allows boundary bursts | Low      | Simple rate caps |
+| Sliding window log     | No burst               | High     | Strict SLAs      |
+| Sliding window counter | Small burst            | Medium   | General purpose  |
+| Token bucket           | Controlled burst       | High     | API gateways     |
+| Leaky bucket           | No burst (smoothed)    | High     | Traffic shaping  |
+
+**Tiered rate limiting** — differentiate by caller type:
+
+```yaml
+rate_limits:
+  anonymous: 60/hour
+  authenticated: 1000/hour
+  premium: 10000/hour
+  internal_service: unlimited
+```
+
+### HATEOAS & Richardson Maturity Model
+
+Design APIs for discoverability — include hypermedia links so clients can navigate state transitions:
+
+**Richardson Maturity Levels:**
+
+| Level | Description                     | Example                           |
+| ----- | ------------------------------- | --------------------------------- |
+| 0     | Single endpoint (RPC over HTTP) | `POST /api` with action field     |
+| 1     | Resource-based URIs             | `GET /users/123`                  |
+| 2     | HTTP verbs + status codes       | `DELETE /users/123` returns `204` |
+| 3     | HATEOAS (hypermedia controls)   | Response includes `_links`        |
+
+**Level 3 example response:**
+
+```json
+{
+  "id": "order-42",
+  "status": "pending",
+  "total": 99.99,
+  "_links": {
+    "self": { "href": "/orders/42" },
+    "confirm": { "href": "/orders/42/confirm", "method": "POST" },
+    "cancel": { "href": "/orders/42/cancel", "method": "DELETE" },
+    "customer": { "href": "/users/7" }
+  }
+}
+```
+
+Level 3 is aspirational; most production APIs operate at Level 2 and selectively add hypermedia links for complex workflows.
+
+### GraphQL Federation (2026)
+
+For microservices architectures using GraphQL, federation enables a unified supergraph from distributed subgraphs:
+
+**Core concepts:**
+
+- **Supergraph**: The combined schema exposed to clients
+- **Subgraph**: Individual service schemas that each own their type definitions
+- **Router**: Federates queries across subgraphs (Apollo Router, WunderGraph Cosmo)
+
+**Best practices:**
+
+- One entity (e.g., `User`) can be defined in its owning subgraph and extended in others using `@key` and `@extends`
+- Schema governance: use a schema registry (Apollo Studio, Cosmo Schema Registry) to validate changes before deployment
+- AI/LLM traffic reshaping architecture requirements in 2026 — plan for high-volume, streaming-friendly subgraph operations
 
 </instructions>
 

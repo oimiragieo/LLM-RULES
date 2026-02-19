@@ -62,15 +62,7 @@ test('loads party_mode from config.yaml when env is unset', () => {
 test('env variables override config values', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'feature-flags-'));
   try {
-    writeConfig(
-      root,
-      [
-        'features:',
-        '  partyMode:',
-        '    enabled: true',
-        '',
-      ].join('\n')
-    );
+    writeConfig(root, ['features:', '  partyMode:', '    enabled: true', ''].join('\n'));
 
     withEnv({ PARTY_MODE_ENABLED: 'false', PARTY_ROLLOUT_PERCENTAGE: '25' }, () => {
       const flags = new FeatureFlags({ projectRoot: root });
@@ -81,4 +73,3 @@ test('env variables override config values', () => {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
-

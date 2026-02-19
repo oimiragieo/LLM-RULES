@@ -210,6 +210,56 @@ function appendMarkdownEntries(filePath, heading, entries) {
   fs.writeFileSync(filePath, prior + block, 'utf8');
 }
 
+function deduplicateAgainstMemory(records, memoryDir) {
+  const existingTexts = new Set();
+
+  for (const file of ['patterns.json', 'gotchas.json']) {
+    const filePath = path.join(memoryDir, file);
+    try {
+      if (fs.existsSync(filePath)) {
+        const entries = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        if (Array.isArray(entries)) {
+          for (const entry of entries) {
+            const text = typeof entry === 'string' ? entry : entry?.text;
+            if (text) existingTexts.add(text.toLowerCase().trim());
+          }
+        }
+      }
+    } catch (_e) {
+      // Corrupt JSON or read error — skip this file, keep all incoming records for this category
+    }
+  }
+
+  let total = 0;
+  let filtered = 0;
+
+  const dedupedRecords = {};
+  for (const category of Object.keys(records)) {
+    dedupedRecords[category] = [];
+    for (const record of records[category]) {
+      total++;
+      const key = (record.text || '').toLowerCase().trim();
+      if (key && existingTexts.has(key)) {
+        filtered++;
+      } else {
+        dedupedRecords[category].push(record);
+      }
+    }
+  }
+
+  return {
+    dedupedRecords,
+    stats: { total, kept: total - filtered, filtered },
+  };
+}
+
+function computeAdaptiveRatio(corpusTokens) {
+  if (corpusTokens < 8000) return 0.8;
+  if (corpusTokens < 32000) return 0.5;
+  if (corpusTokens < 100000) return 0.2;
+  return 0.1;
+}
+
 function applyMemoryRecordsToFiles(records, memoryDir) {
   fs.mkdirSync(memoryDir, { recursive: true });
   mergeUniqueJsonEntries(path.join(memoryDir, 'patterns.json'), records.patterns);
@@ -222,7 +272,13 @@ function applyMemoryRecordsToFiles(records, memoryDir) {
   );
 }
 
-function runTokenSaverWorkflow({ corpusFile, query, mode, failOnInsufficientEvidence }) {
+function runTokenSaverWorkflow({
+  corpusFile,
+  query,
+  mode,
+  failOnInsufficientEvidence,
+  skeletonRatio,
+}) {
   const scriptPath = path.join(__dirname, 'run_skill_workflow.py');
   const args = [
     scriptPath,
@@ -236,6 +292,7 @@ function runTokenSaverWorkflow({ corpusFile, query, mode, failOnInsufficientEvid
     'json',
   ];
   if (failOnInsufficientEvidence) args.push('--fail-on-insufficient-evidence');
+  if (skeletonRatio != null) args.push('--skeleton-ratio', String(skeletonRatio));
   const proc = runCommand('python', args);
 
   // Try to parse JSON output even on non-zero exit codes.
@@ -339,11 +396,17 @@ function main(input = {}, deps = {}) {
   const corpus = corpusParts.join('\n\n---\n\n');
   fs.writeFileSync(corpusFile, corpus || String(searchCmd.stdout || ''), 'utf8');
 
+  // Compute adaptive skeleton ratio from corpus size unless user explicitly provided one
+  const corpusTokens = Math.ceil(corpus.length / 4);
+  const skeletonRatio =
+    input.skeletonRatio != null ? Number(input.skeletonRatio) : computeAdaptiveRatio(corpusTokens);
+
   const workflow = runWorkflow({
     corpusFile,
     query,
     mode,
     failOnInsufficientEvidence,
+    skeletonRatio,
   });
 
   if (!workflow.ok) {
@@ -365,9 +428,13 @@ function main(input = {}, deps = {}) {
     };
   }
 
-  const memoryRecords = mapCompressionToMemoryRecords(workflow.data, { query });
+  const rawMemoryRecords = mapCompressionToMemoryRecords(workflow.data, { query });
+  const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
+  const { dedupedRecords: memoryRecords, stats: dedupStats } = deduplicateAgainstMemory(
+    rawMemoryRecords,
+    memoryDir
+  );
   if (persistFiles) {
-    const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
     applyMemoryRecordsToFiles(memoryRecords, memoryDir);
   }
 
@@ -378,8 +445,10 @@ function main(input = {}, deps = {}) {
     compression: {
       mode,
       corpusFile,
+      skeletonRatio,
     },
     memoryRecords,
+    dedupStats,
     persistMode: persistFiles ? 'files' : 'memoryrecord_payload_only',
     memoryRecordHint:
       'Use MemoryRecord to persist these payloads so sync-memory-index hook updates the search index.',
@@ -394,7 +463,7 @@ token-saver-context-compression wrapper
 
 Usage:
   node main.cjs --query "<question>" [--mode evidence_aware|query_guided|baseline] [--limit 20]
-                [--no-fail-on-insufficient-evidence] [--persist-files]
+                [--no-fail-on-insufficient-evidence] [--persist-files] [--skeleton-ratio 0.5]
 `);
     process.exit(0);
   }
@@ -408,6 +477,7 @@ Usage:
       String(options['fail-on-insufficient-evidence']).toLowerCase() === 'false'
     ),
     persistFiles: options['persist-files'] === true,
+    skeletonRatio: options['skeleton-ratio'] ? Number(options['skeleton-ratio']) : undefined,
   });
 
   if (!result.ok) {
@@ -423,6 +493,8 @@ module.exports = {
   flattenEvidenceStrings,
   classifyMemoryTarget,
   mapCompressionToMemoryRecords,
+  deduplicateAgainstMemory,
+  computeAdaptiveRatio,
   applyMemoryRecordsToFiles,
   inferEvidenceSufficiency,
   runSearchQuery,

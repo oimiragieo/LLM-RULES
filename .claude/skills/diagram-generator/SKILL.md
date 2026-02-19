@@ -15,6 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 templates: [architecture-diagram, database-diagram, component-diagram, sequence-diagram]
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 **References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — Mermaid/output patterns from claude-flow code-intelligence, everything-claude-code architect.

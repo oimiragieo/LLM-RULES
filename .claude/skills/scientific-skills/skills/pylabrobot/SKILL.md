@@ -4,6 +4,8 @@ description: Vendor-agnostic lab automation framework. Use when controlling mult
 license: MIT license
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PyLabRobot

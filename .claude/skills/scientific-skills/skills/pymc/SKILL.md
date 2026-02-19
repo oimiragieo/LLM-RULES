@@ -4,6 +4,8 @@ description: Bayesian modeling with PyMC. Build hierarchical models, MCMC (NUTS)
 license: Apache License, Version 2.0
 metadata:
   skill-author: K-Dense Inc.
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # PyMC Bayesian Modeling

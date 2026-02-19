@@ -16,6 +16,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 related_skills: [template-renderer, writing-plans]
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Plan Generator Skill
