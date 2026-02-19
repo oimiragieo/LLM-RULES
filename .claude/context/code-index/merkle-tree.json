@@ -1,7 +1,7 @@
 {
   "type": "directory",
   "name": "agent-studio",
-  "hash": "0f373c689faf05b4b82fe9919b0428519bfca1713d246d96a99cc3c754605424",
+  "hash": "a477704ba26919fea9dcae549e714c91900fb865246404f5d5d2730731c6cd29",
   "metadata": {
     "path": ""
   },
@@ -9,7 +9,7 @@
     ".claude": {
       "type": "directory",
       "name": ".claude",
-      "hash": "f1eb89ddbe6c66ce405754790ba420c4c147497c7af4720986914801637659f1",
+      "hash": "da068d8ea698147363d7000983b8b75e5ee0fb9adbda6f98306d8aa5004f6f42",
       "metadata": {
         "path": ".claude"
       },
@@ -757,11 +757,11 @@
         "CLAUDE.md": {
           "type": "file",
           "name": "CLAUDE.md",
-          "hash": "c6f5d6188aa76685bf298c1b0e1cf9bea5fb596ca3c2723bfb88bbe50775d73a",
+          "hash": "5a2e593411076cc69ffabf65dfaa182f12a1450a8281e82798bfdef1dac5035b",
           "metadata": {
             "path": ".claude/CLAUDE.md",
-            "size": 33246,
-            "mtime": 1771465110499.9453
+            "size": 32889,
+            "mtime": 1771467441252.411
           }
         },
         "commands": {
@@ -1887,7 +1887,7 @@
         "config": {
           "type": "directory",
           "name": "config",
-          "hash": "7f9fda47b78c68d1436d254c0b684bf4719fe3be2593ee83d706e392eae7da2b",
+          "hash": "5a32c0332989cb961c9ef5d80221802f37f367908e9bd31fb43582e827b10246",
           "metadata": {
             "path": ".claude/config"
           },
@@ -1985,21 +1985,21 @@
             "skill-index.json": {
               "type": "file",
               "name": "skill-index.json",
-              "hash": "971f8a5fac79690767b0ec3321e0a608fd443aa27056dc0a0864e38e870885af",
+              "hash": "7144e723d1e6d105eeec0c0c31e6d75e2f593f5826f02115b65ed8cd1757e3eb",
               "metadata": {
                 "path": ".claude/config/skill-index.json",
-                "size": 423354,
-                "mtime": 1771465111502.8237
+                "size": 388819,
+                "mtime": 1771467444785.2268
               }
             },
             "tool-manifest.json": {
               "type": "file",
               "name": "tool-manifest.json",
-              "hash": "80dd4c713cada926aa782626a76a30c3577fb0ea91fb62521d564db7e8e27f1b",
+              "hash": "daeb90e6ac1dbde4faafaea9abf7539f88a075f179acde38d83235a2541a5dec",
               "metadata": {
                 "path": ".claude/config/tool-manifest.json",
                 "size": 22798,
-                "mtime": 1771454359232.6086
+                "mtime": 1771468834067.2925
               }
             },
             "tool-stub-policy.json": {
@@ -2117,7 +2117,7 @@
         "context": {
           "type": "directory",
           "name": "context",
-          "hash": "67b2188351105614a72b24a99a58929e1fe9233770d20df3020d931afafed1f6",
+          "hash": "a0b9151843b966da0b1568dd2ed581113ae37db5ea80c5b17583a9f57d273c33",
           "metadata": {
             "path": ".claude/context"
           },
@@ -2175,17 +2175,17 @@
             "agent-registry.json": {
               "type": "file",
               "name": "agent-registry.json",
-              "hash": "9c0163629f8116ade86338c0190c45c6a9064f5b579f63fc091b7c64fab66aae",
+              "hash": "7c7c6052ee5141b782f21c24a30c4df1b82f34fa9699e2c153239a658cfe47c9",
               "metadata": {
                 "path": ".claude/context/agent-registry.json",
                 "size": 169808,
-                "mtime": 1771465109114.4958
+                "mtime": 1771467542707.6594
               }
             },
             "artifacts": {
               "type": "directory",
               "name": "artifacts",
-              "hash": "2c9ab1a123fedaca09fe52169cae86506f32b112c975b7e64eb086632e47015a",
+              "hash": "ab862116633a939b18eb1393495f54812f42e44001bc8ac0074655453e927d7e",
               "metadata": {
                 "path": ".claude/context/artifacts"
               },
@@ -2443,7 +2443,7 @@
                 "catalogs": {
                   "type": "directory",
                   "name": "catalogs",
-                  "hash": "385aec3398c1e4b104b6651b4cac9cdb4075b2b709c08d1ed717ea61c45bf76d",
+                  "hash": "48e73b34a3e43481bbeb831ff46776eb9659bc9138d8ebfbcc1ec97a891bb653",
                   "metadata": {
                     "path": ".claude/context/artifacts/catalogs"
                   },
@@ -2491,11 +2491,11 @@
                     "skill-catalog.md": {
                       "type": "file",
                       "name": "skill-catalog.md",
-                      "hash": "cd036064b6a2e798c99f6a60e4f939bcd70e1f17e48a4c5ae7b3df374f4726b4",
+                      "hash": "4aff5c69375955eb2aaa4b75c7da6cca223246c7899a55030c7fd5682a722d61",
                       "metadata": {
                         "path": ".claude/context/artifacts/catalogs/skill-catalog.md",
-                        "size": 34735,
-                        "mtime": 1771465110501.5044
+                        "size": 35119,
+                        "mtime": 1771467445098.531
                       }
                     },
                     "template-catalog.md": {
@@ -4655,7 +4655,7 @@
             "memory": {
               "type": "directory",
               "name": "memory",
-              "hash": "cad1e78fcf5b53b4151ebf831edad195a66db84b858bfd504f2e43e584ecf969",
+              "hash": "28b0047c1c7d03fbe72321a01318dc64cbcc63d4b70523f96f99c3afa80963bd",
               "metadata": {
                 "path": ".claude/context/memory"
               },
@@ -4843,11 +4843,11 @@
                 "delegations.json": {
                   "type": "file",
                   "name": "delegations.json",
-                  "hash": "e18ec63a3166f5b1f10553f119654178a9df8be146e79490935038e3d0a3d3bd",
+                  "hash": "fa117230bf500e3849367d9a9c45b354a1e362f3ebca573e9cf5e8854df27e9f",
                   "metadata": {
                     "path": ".claude/context/memory/delegations.json",
-                    "size": 709,
-                    "mtime": 1771465060454.4426
+                    "size": 674,
+                    "mtime": 1771467450171.7305
                   }
                 },
                 "gotchas.json": {
@@ -5485,11 +5485,31 @@
             "plans": {
               "type": "directory",
               "name": "plans",
-              "hash": "1840ec4827a4258dc3508c6c6128404317b5afe23a37e049a57616310035523a",
+              "hash": "36b301c487453939f144d09e696a16bdf3fb46f81c245250ede0f5555434c58d",
               "metadata": {
                 "path": ".claude/context/plans"
               },
               "children": {
+                "impl-plan-7WN2s3": {
+                  "type": "directory",
+                  "name": "impl-plan-7WN2s3",
+                  "hash": "d8ecd3e0dcee583d5216dcf690e7c51f2715427231a9dc41c212557abd0a1ef0",
+                  "metadata": {
+                    "path": ".claude/context/plans/impl-plan-7WN2s3"
+                  },
+                  "children": {
+                    "implementation_plan.json": {
+                      "type": "file",
+                      "name": "implementation_plan.json",
+                      "hash": "c85dda232857b1e5c008ba45abbc86426e3bf854d72abd8a30eebb47c934c791",
+                      "metadata": {
+                        "path": ".claude/context/plans/impl-plan-7WN2s3/implementation_plan.json",
+                        "size": 135,
+                        "mtime": 1771471515712.952
+                      }
+                    }
+                  }
+                },
                 "impl-plan-qwFCu7": {
                   "type": "directory",
                   "name": "impl-plan-qwFCu7",
@@ -5510,6 +5530,26 @@
                     }
                   }
                 },
+                "impl-plan-uugLaJ": {
+                  "type": "directory",
+                  "name": "impl-plan-uugLaJ",
+                  "hash": "4c8a3c59250d81568dfe99ac0dd6564d5e3ef1f0a65146b11738fe4c57411ed5",
+                  "metadata": {
+                    "path": ".claude/context/plans/impl-plan-uugLaJ"
+                  },
+                  "children": {
+                    "implementation_plan.json": {
+                      "type": "file",
+                      "name": "implementation_plan.json",
+                      "hash": "fd9b251dd45a725cff0bef61f01476d809fafe85a139576a6b5d91aaf1268093",
+                      "metadata": {
+                        "path": ".claude/context/plans/impl-plan-uugLaJ/implementation_plan.json",
+                        "size": 135,
+                        "mtime": 1771471502884.8804
+                      }
+                    }
+                  }
+                },
                 "progress-16SkDI": {
                   "type": "directory",
                   "name": "progress-16SkDI",
@@ -5526,6 +5566,26 @@
                         "path": ".claude/context/plans/progress-16SkDI/implementation_plan.json",
                         "size": 247,
                         "mtime": 1771464970105.561
+                      }
+                    }
+                  }
+                },
+                "progress-MmGcdz": {
+                  "type": "directory",
+                  "name": "progress-MmGcdz",
+                  "hash": "be3f1fd437fcfdc16bf742f32fbeba3389c785b2a548284f6cae7ff694cc5748",
+                  "metadata": {
+                    "path": ".claude/context/plans/progress-MmGcdz"
+                  },
+                  "children": {
+                    "implementation_plan.json": {
+                      "type": "file",
+                      "name": "implementation_plan.json",
+                      "hash": "7ccfaf3cbdfa63f0405102ac1e4ea50cf0ca8a7df8a9d1802a9795aad548b340",
+                      "metadata": {
+                        "path": ".claude/context/plans/progress-MmGcdz/implementation_plan.json",
+                        "size": 247,
+                        "mtime": 1771471515720.1802
                       }
                     }
                   }
@@ -13627,7 +13687,7 @@
         "hooks": {
           "type": "directory",
           "name": "hooks",
-          "hash": "e39e4a820f149c5e3aa499ea439ef171368d4ed10bc45ae9cc536587aada5666",
+          "hash": "09d10c46466366ccc24edf4a716ebb0d9865a230cefd65b21244de27ec9caef5",
           "metadata": {
             "path": ".claude/hooks"
           },
@@ -13855,7 +13915,7 @@
             "reflection": {
               "type": "directory",
               "name": "reflection",
-              "hash": "ec8c2c98f2ba54b4a23f6af4126edfd3a137832e8c80d38a88a6ece190c83e9c",
+              "hash": "1f3bb6f373cab353ecbbbdb606067f4fcc7365b750641f437a1f063b76e3fef2",
               "metadata": {
                 "path": ".claude/hooks/reflection"
               },
@@ -13933,11 +13993,11 @@
                 "unified-reflection-handler.cjs": {
                   "type": "file",
                   "name": "unified-reflection-handler.cjs",
-                  "hash": "7421f4b351486c6fb6bcbadf4fc076870efad2de1b199e38e17b3fc10b82d7d1",
+                  "hash": "3bf12aaff4701cb7f120e9e9f877b22524e6f6d14e53627edaafe34a7ca1deeb",
                   "metadata": {
                     "path": ".claude/hooks/reflection/unified-reflection-handler.cjs",
-                    "size": 13924,
-                    "mtime": 1771463799623.4988
+                    "size": 14097,
+                    "mtime": 1771467885097.7856
                   }
                 },
                 "unified-reflection-insights.cjs": {
@@ -13955,7 +14015,7 @@
             "routing": {
               "type": "directory",
               "name": "routing",
-              "hash": "8940e93d50f0723642b65d66836463fca8ccbd3f8e660cc3b50b255274a16812",
+              "hash": "6066cf19d22266a2d64acb91b4b1588e6c42a142cef171374122871bc078c315",
               "metadata": {
                 "path": ".claude/hooks/routing"
               },
@@ -14063,11 +14123,11 @@
                 "pre-tool-unified.cjs": {
                   "type": "file",
                   "name": "pre-tool-unified.cjs",
-                  "hash": "42a4a66aef0dc7072d0e25dae01d6573700ee9f81e53a7835170af1c3188613c",
+                  "hash": "f7be2b115a37b7badba9674332825d22461bd8ca22e8d4598b3ccfa9cf34a88a",
                   "metadata": {
                     "path": ".claude/hooks/routing/pre-tool-unified.cjs",
-                    "size": 12452,
-                    "mtime": 1771426239207.8235
+                    "size": 12530,
+                    "mtime": 1771467891318.914
                   }
                 },
                 "pre-tool-unified.cleanup.cjs": {
@@ -15507,7 +15567,7 @@
         "lib": {
           "type": "directory",
           "name": "lib",
-          "hash": "1c2f3ef2769a8c9ac7b57518515bc32c907961eb64a5b2e5694be25dd3726e6e",
+          "hash": "de18cd5668cc710fef851275aeb639d324b7dcc8e148cfbbd7288a29880a8608",
           "metadata": {
             "path": ".claude/lib"
           },
@@ -15565,7 +15625,7 @@
             "code-indexing": {
               "type": "directory",
               "name": "code-indexing",
-              "hash": "2eaf2ef83d6c0241b0cc6b55f26925b03939b836ae8c76893afe5a52b1ac1ad5",
+              "hash": "86336021caad538ea38f228e6647c44a20165962858bc3f99bfbb95724970305",
               "metadata": {
                 "path": ".claude/lib/code-indexing"
               },
@@ -15608,6 +15668,16 @@
                     "path": ".claude/lib/code-indexing/code-parser.cjs",
                     "size": 3504,
                     "mtime": 1770405047715.7961
+                  }
+                },
+                "embed-subprocess.cjs": {
+                  "type": "file",
+                  "name": "embed-subprocess.cjs",
+                  "hash": "ca0d58962b8f45dee09ceb738fd4960c7116ece520424971308fcc290733824b",
+                  "metadata": {
+                    "path": ".claude/lib/code-indexing/embed-subprocess.cjs",
+                    "size": 6656,
+                    "mtime": 1771469944139.7654
                   }
                 },
                 "embedding-generator.cjs": {
@@ -15713,11 +15783,11 @@
                 "index-manager-operations.cjs": {
                   "type": "file",
                   "name": "index-manager-operations.cjs",
-                  "hash": "8da9652d58ead38f430a6957a427b3ddad61f24b3456789e8da18cfe078252ed",
+                  "hash": "23556a83af3920509d1690a0f3ab8178bddbd87a968142ca29e2f6f44278e961",
                   "metadata": {
                     "path": ".claude/lib/code-indexing/index-manager-operations.cjs",
-                    "size": 14309,
-                    "mtime": 1771438993199.7048
+                    "size": 14540,
+                    "mtime": 1771470694927.0437
                   }
                 },
                 "index-manager.cjs": {
@@ -15815,7 +15885,7 @@
             "config": {
               "type": "directory",
               "name": "config",
-              "hash": "880dc0613a42d0f3c1ce92952d193e47f9cc4733c73f29ddcc457478163ae032",
+              "hash": "b8a89f4460f7929e4be63e249bc209ecc17139be328335f9c0e418bc1c3a257c",
               "metadata": {
                 "path": ".claude/lib/config"
               },
@@ -15833,11 +15903,11 @@
                 "resolve-runtime-context.cjs": {
                   "type": "file",
                   "name": "resolve-runtime-context.cjs",
-                  "hash": "2ef46443a4ef54934a6208ab68930ad10a1738bd9ca1223b914b3bea8612d6cc",
+                  "hash": "082103d272d44fe4a81fd3d5da95a2532c71069ed4edc6c62534781590850fe9",
                   "metadata": {
                     "path": ".claude/lib/config/resolve-runtime-context.cjs",
-                    "size": 1780,
-                    "mtime": 1770510526369.6255
+                    "size": 1883,
+                    "mtime": 1771471425898.6145
                   }
                 }
               }
@@ -16065,7 +16135,7 @@
             "memory": {
               "type": "directory",
               "name": "memory",
-              "hash": "d9a6fe5a9e6b72ea086b92c6aa6a09a0e807169b20a14dee95615e3aa152e4b0",
+              "hash": "2a5a7992909593d52e13a6310aa8df26a6399e38ff2f74e7da1fa377c6fca9b2",
               "metadata": {
                 "path": ".claude/lib/memory"
               },
@@ -16093,21 +16163,21 @@
                 "contextual-memory-context-loader.cjs": {
                   "type": "file",
                   "name": "contextual-memory-context-loader.cjs",
-                  "hash": "c918d83de489cf851b8f2ee530eed33e56328de1fb339b18217ef9568a11a1f0",
+                  "hash": "01f59ef49187b2688bb6fdc04df42931d3346a82596cedab9d2b1affb4accaa6",
                   "metadata": {
                     "path": ".claude/lib/memory/contextual-memory-context-loader.cjs",
-                    "size": 13627,
-                    "mtime": 1771263721987.989
+                    "size": 13697,
+                    "mtime": 1771467896582.0254
                   }
                 },
                 "contextual-memory-search-fallback.cjs": {
                   "type": "file",
                   "name": "contextual-memory-search-fallback.cjs",
-                  "hash": "6355fc48b146c5e831392b37ad63992acbe3662045c7ce4e9d67261d43c6edb5",
+                  "hash": "071ac18051fe14a4802c2a363dc84090070e17c77fb83de417d5b3c6d6b15afd",
                   "metadata": {
                     "path": ".claude/lib/memory/contextual-memory-search-fallback.cjs",
-                    "size": 5244,
-                    "mtime": 1771147589867.848
+                    "size": 5418,
+                    "mtime": 1771469750179.6873
                   }
                 },
                 "contextual-memory.cjs": {
@@ -16243,11 +16313,11 @@
                 "lancedb-client-impl.cjs": {
                   "type": "file",
                   "name": "lancedb-client-impl.cjs",
-                  "hash": "ad29eabb91bfc4f6721ecd9b5d7ecf0f6177a9a3a4da561931b184f622f5b7e1",
+                  "hash": "b1dded45e71e4b8612b6fcc5ace733cdf06cfdb8583d73410ca7f231d262f5e8",
                   "metadata": {
                     "path": ".claude/lib/memory/lancedb-client-impl.cjs",
-                    "size": 33490,
-                    "mtime": 1771225912038.0244
+                    "size": 41456,
+                    "mtime": 1771469978261.4634
                   }
                 },
                 "lancedb-client.cjs": {
@@ -16805,7 +16875,7 @@
             "plan": {
               "type": "directory",
               "name": "plan",
-              "hash": "9b9bf1045ff8260af45eb481f382325fd781df3998c7f2ca7563c3e22466c016",
+              "hash": "e53389921de624459246c44ded9d916abd9ff5f411f0f214a2d0d6da36f0f7c2",
               "metadata": {
                 "path": ".claude/lib/plan"
               },
@@ -16813,11 +16883,11 @@
                 "implementation-plan.cjs": {
                   "type": "file",
                   "name": "implementation-plan.cjs",
-                  "hash": "a0c40de84afd91d2f1bcdf5e823457d35b5a0783fdf78c0c3a8dbc57301e4fcf",
+                  "hash": "559e2eee95dd86a3336f87f9817576137cf57f4c43c07c4f0398713cebe01c1e",
                   "metadata": {
                     "path": ".claude/lib/plan/implementation-plan.cjs",
-                    "size": 1291,
-                    "mtime": 1770405048831.3237
+                    "size": 1394,
+                    "mtime": 1771471510204.5767
                   }
                 },
                 "progress.cjs": {
@@ -17195,7 +17265,7 @@
             "safety": {
               "type": "directory",
               "name": "safety",
-              "hash": "e14af90506648b1476009f82575aac253f18d5c8e05e17eb74d477806b27c4b2",
+              "hash": "c44d2dbbccc55e834886b37101dd2e2de3b5727954f945f1b50ba19005a4ff73",
               "metadata": {
                 "path": ".claude/lib/safety"
               },
@@ -17203,11 +17273,11 @@
                 "command-allowlist.cjs": {
                   "type": "file",
                   "name": "command-allowlist.cjs",
-                  "hash": "3bdd857c0be66821155e7494dc1e594e430e42eaec6f29a802d7413d94003797",
+                  "hash": "fcfcc1dec5602a81485afba257598d61618410cd108beeb2d25f8290944919aa",
                   "metadata": {
                     "path": ".claude/lib/safety/command-allowlist.cjs",
-                    "size": 10470,
-                    "mtime": 1770405049002.4866
+                    "size": 11179,
+                    "mtime": 1771468578174.4395
                   }
                 }
               }
@@ -17355,7 +17425,7 @@
             "tools": {
               "type": "directory",
               "name": "tools",
-              "hash": "d3211fa8be63fbc780cfb4f48818322503bf3df65dab3a2c04a5c54f7d9c7fbd",
+              "hash": "da948e981406813f53f1b77d5dd064abab244986186b4a0f49a855d95594acbd",
               "metadata": {
                 "path": ".claude/lib/tools"
               },
@@ -17363,11 +17433,11 @@
                 "agent-health-tracker.cjs": {
                   "type": "file",
                   "name": "agent-health-tracker.cjs",
-                  "hash": "c56118160c48b17e78660b839d9b3b8664e500e2acecf91ec5cec7ead7d7ee69",
+                  "hash": "e2c42fd8d9373e16d265507e5f9bf11931edeb61978378962cccbfcc342db607",
                   "metadata": {
                     "path": ".claude/lib/tools/agent-health-tracker.cjs",
-                    "size": 12321,
-                    "mtime": 1771304425688.136
+                    "size": 12408,
+                    "mtime": 1771467311641.8577
                   }
                 },
                 "agent-registry-generator-config.cjs": {
@@ -17463,11 +17533,11 @@
                 "standard-tools.cjs": {
                   "type": "file",
                   "name": "standard-tools.cjs",
-                  "hash": "c3808bc7e2e5904474d9c902e8f0abd8eda082829df922e8be2565008f6d1056",
+                  "hash": "53793f0f167781cc8036d5f18edc583de90287898a49e5d04d45f94662222dc2",
                   "metadata": {
                     "path": ".claude/lib/tools/standard-tools.cjs",
-                    "size": 6375,
-                    "mtime": 1771467081992.026
+                    "size": 6579,
+                    "mtime": 1771468654332.7249
                   }
                 },
                 "task-subagent-runner.cjs": {
@@ -151757,7 +151827,7 @@
         "tools": {
           "type": "directory",
           "name": "tools",
-          "hash": "7122b6bfdac2fefacee9a08bbd8da57d04ec7e1d56b5c25661c48df7ed7c901f",
+          "hash": "09892f02497e1867a4e694254bfd3ee5a7d807dff0c24cc027cfcc1fbf1674aa",
           "metadata": {
             "path": ".claude/tools"
           },
@@ -152385,7 +152455,7 @@
             "cli": {
               "type": "directory",
               "name": "cli",
-              "hash": "f58d2de3bf81595ec27235333a75d4591613e0a0fc26ae65bc59f35df9c7fc9a",
+              "hash": "a3a1237cb9ed5cbfbea738e54d326371055eae0c9f2b72633ebe56f7106c2adf",
               "metadata": {
                 "path": ".claude/tools/cli"
               },
@@ -152453,11 +152523,11 @@
                 "doctor.mjs": {
                   "type": "file",
                   "name": "doctor.mjs",
-                  "hash": "22e7dc41b79cd5572a340e7c64c1b12b5a45c090cbd0ec33dda90236c184f6ad",
+                  "hash": "af60379cbcff616df8fd79efe608774fa97f8d89e5017b32ef39c4d18a66ef77",
                   "metadata": {
                     "path": ".claude/tools/cli/doctor.mjs",
-                    "size": 13693,
-                    "mtime": 1771427500700.1338
+                    "size": 14055,
+                    "mtime": 1771468255402.2356
                   }
                 },
                 "document-query.cjs": {
@@ -152833,11 +152903,11 @@
                 "security-lint.cjs": {
                   "type": "file",
                   "name": "security-lint.cjs",
-                  "hash": "b5f02efd317f3e21e43b3547acb5b510635aa116bedfa7cc811cf3cc779036c8",
+                  "hash": "ae542ff1b971d02b77c47452c3173131414442e10bfcca7ed8e63896534b6724",
                   "metadata": {
                     "path": ".claude/tools/cli/security-lint.cjs",
-                    "size": 20640,
-                    "mtime": 1771428001999.6655
+                    "size": 20828,
+                    "mtime": 1771467303225.04
                   }
                 },
                 "spawn-assembly-metrics-summary.cjs": {
@@ -154455,7 +154525,7 @@
             "maintenance": {
               "type": "directory",
               "name": "maintenance",
-              "hash": "51bc4e45fee043c2fc571804f2f3e573b764288e4224296d1601e8d91538f82d",
+              "hash": "4d7812aa546950e62e03bd9c0844f99597212c25ef8a8a37c8ab99a417bf29fc",
               "metadata": {
                 "path": ".claude/tools/maintenance"
               },
@@ -154463,11 +154533,11 @@
                 "memory-write-audit.mjs": {
                   "type": "file",
                   "name": "memory-write-audit.mjs",
-                  "hash": "580d9c512baa528c7770b2a4bd40c9c2b674fd7b5879920fb934c997ee0b2ece",
+                  "hash": "4abceeb78d9ef07291885152090eebce23d59c158d2abfebed5e2a8652002ce7",
                   "metadata": {
                     "path": ".claude/tools/maintenance/memory-write-audit.mjs",
-                    "size": 3698,
-                    "mtime": 1771427522363.0493
+                    "size": 3891,
+                    "mtime": 1771468803636.1814
                   }
                 }
               }
@@ -167809,7 +167879,7 @@
     "scripts": {
       "type": "directory",
       "name": "scripts",
-      "hash": "5e185a2457f377fbeb19acda58bf172acaa88952de05a0621b7c1f9ef978d6fd",
+      "hash": "cceb340905e2d007e4dbad000d8a4d8f300d0ba3c168c8c156a18d063575c995",
       "metadata": {
         "path": "scripts"
       },
@@ -167967,7 +168037,7 @@
         "testing": {
           "type": "directory",
           "name": "testing",
-          "hash": "7c115e798d1ebd00cb79dbc3d68665451cb18361e9583ed96955ab299c27bccb",
+          "hash": "e76f0c0f902a201fa1c8cf8886a78d55b3d05855a59fbeb123faee852765e899",
           "metadata": {
             "path": "scripts/testing"
           },
@@ -167975,21 +168045,21 @@
             "count-all-tests.mjs": {
               "type": "file",
               "name": "count-all-tests.mjs",
-              "hash": "693adffa37f9452a4c0bb50aa2753077d2f14994d0b4945294cd64e308ecf8c1",
+              "hash": "46a1409b0dd1ce1b353a8d39bbf88b2b9b6b91071893b15cd9144f7a22c61941",
               "metadata": {
                 "path": "scripts/testing/count-all-tests.mjs",
-                "size": 3337,
-                "mtime": 1770657077876.863
+                "size": 5063,
+                "mtime": 1771471304877.9548
               }
             },
             "test-version-validation.mjs": {
               "type": "file",
               "name": "test-version-validation.mjs",
-              "hash": "98bf2c307a2facee97057c80dafe18f77f281fa987a3b9d1042295a578cc9943",
+              "hash": "2b097ad0a3e871a99fedd25a72cee490148cc5afbac27867406c05b6915bd3a9",
               "metadata": {
                 "path": "scripts/testing/test-version-validation.mjs",
-                "size": 5040,
-                "mtime": 1770455044814.4578
+                "size": 5041,
+                "mtime": 1771467268703.2964
               }
             },
             "_archive": {
@@ -168407,11 +168477,11 @@
         "verify-dependencies.mjs": {
           "type": "file",
           "name": "verify-dependencies.mjs",
-          "hash": "119bde7897a3d4f82452b4701db7cf6c82a94fca922befed0e3f1b088b504cab",
+          "hash": "2fa7eac02945e436711eb51d6d6a940495dba3cb45117fad6b41e7e13507e729",
           "metadata": {
             "path": "scripts/verify-dependencies.mjs",
-            "size": 8087,
-            "mtime": 1770355815608.8838
+            "size": 8130,
+            "mtime": 1771467293082.7974
           }
         }
       }
@@ -168419,7 +168489,7 @@
     "tests": {
       "type": "directory",
       "name": "tests",
-      "hash": "e25899a71ab3ca70a8cbb6e74b12699a7bd03d6028a9484c7c9b8f284a695e58",
+      "hash": "d3e63138f2964eb59c231c04e1460242417517dde2355eb078a387b11b02e079",
       "metadata": {
         "path": "tests"
       },
@@ -171837,7 +171907,7 @@
         "lib": {
           "type": "directory",
           "name": "lib",
-          "hash": "2b004f7cf883355af2e20274afdba8bc9f1d41adaed7d3d5eed86a9df8728970",
+          "hash": "b38697df0bf7b2f162cd4accc01e9475c81c9a57eeef28b13eaecafc148e3ea4",
           "metadata": {
             "path": "tests/lib"
           },
@@ -172115,7 +172185,7 @@
             "config": {
               "type": "directory",
               "name": "config",
-              "hash": "df95bd3cf187cae062d39b721bd021826ade41ff7d75b1c491117c6c615ae4cb",
+              "hash": "c371ca73222e513f2e39dccfa37f26cdacf36a031b751412299dd9903b58a006",
               "metadata": {
                 "path": "tests/lib/config"
               },
@@ -172143,11 +172213,11 @@
                 "resolve-runtime-context.test.cjs": {
                   "type": "file",
                   "name": "resolve-runtime-context.test.cjs",
-                  "hash": "820ed396531aa39340830de0c2ec4c9673f9d9cfc459f41450f590b3fe783244",
+                  "hash": "5ad32efcc03ffa4883df888a91613be32ed2ffafc9c8150c0541afa071619ce6",
                   "metadata": {
                     "path": "tests/lib/config/resolve-runtime-context.test.cjs",
-                    "size": 5383,
-                    "mtime": 1770405208664.961
+                    "size": 5782,
+                    "mtime": 1771471415276.391
                   }
                 }
               }
@@ -172155,7 +172225,7 @@
             "context": {
               "type": "directory",
               "name": "context",
-              "hash": "d503fd9d477d0fc9e05cfb0a9fc89bdb72c453cfd0b5d3a0c4226967db927aaa",
+              "hash": "6d2e33ab917dbf85df90a04a00ad49acd3b8aceba9ab0121b9773de32817f6f1",
               "metadata": {
                 "path": "tests/lib/context"
               },
@@ -172163,7 +172233,7 @@
                 "memory": {
                   "type": "directory",
                   "name": "memory",
-                  "hash": "e6677f2ef091941ceea925269866bf5856596b58ba5411443a28553b3f3f9e7c",
+                  "hash": "f596468353dfaacc5268ccfcb7cb23c0b4b79c72fbaecd8d95e77272cae2fd37",
                   "metadata": {
                     "path": "tests/lib/context/memory"
                   },
@@ -172171,7 +172241,7 @@
                     ".nonexistent-project": {
                       "type": "directory",
                       "name": ".nonexistent-project",
-                      "hash": "0730355eec42b27df3ff660962edd0ea535da08555f3b52953e6fcb82c75a733",
+                      "hash": "031905873e5aef0392f110285f8094d251d9ce2af51afe19d30a7c6c32d829d9",
                       "metadata": {
                         "path": "tests/lib/context/memory/.nonexistent-project"
                       },
@@ -172179,7 +172249,7 @@
                         ".claude": {
                           "type": "directory",
                           "name": ".claude",
-                          "hash": "9345692eff46c5a579c3c8b8db32e9701c1965dec41a012cc6b5a41b4f3a3e57",
+                          "hash": "ae1de1ce320a2d752200a8ae417c7212b58510142eae727172bdf7529c36fac2",
                           "metadata": {
                             "path": "tests/lib/context/memory/.nonexistent-project/.claude"
                           },
@@ -172187,7 +172257,7 @@
                             "context": {
                               "type": "directory",
                               "name": "context",
-                              "hash": "1ebfe28f817404e2c21594cb52230735ad7869be122c6772729072341de093ba",
+                              "hash": "1106e39f37de773172aeca676a4977417991e0d13376ca40070ae629609f9666",
                               "metadata": {
                                 "path": "tests/lib/context/memory/.nonexistent-project/.claude/context"
                               },
@@ -172195,7 +172265,7 @@
                                 "memory": {
                                   "type": "directory",
                                   "name": "memory",
-                                  "hash": "64cb315ff5f417c2048bfa0d6796d98da2decdf0c37275794ba49b777d7201c6",
+                                  "hash": "f65848c005dec403574224d796a4c362c85f69955e819ca95018301ea51f25a3",
                                   "metadata": {
                                     "path": "tests/lib/context/memory/.nonexistent-project/.claude/context/memory"
                                   },
@@ -172203,7 +172273,7 @@
                                     "metrics": {
                                       "type": "directory",
                                       "name": "metrics",
-                                      "hash": "2dec84971317cea59b60b9c24a6a37266bc3d0475e30f8b9b38d3553c8a435a4",
+                                      "hash": "e59316b6145f00951b2089f4e792f84c4d99059f9c6eba70be101b537c8fa975",
                                       "metadata": {
                                         "path": "tests/lib/context/memory/.nonexistent-project/.claude/context/memory/metrics"
                                       },
@@ -172211,11 +172281,11 @@
                                         "memory-slo-operational.json": {
                                           "type": "file",
                                           "name": "memory-slo-operational.json",
-                                          "hash": "42f5d3d073a3041616051e9f1c9f109a06bd2125ad01d3648f60acfbf236bb64",
+                                          "hash": "e358398d18964977355a95aa3e2a0245db5d10d57c7a8bc19f7094267f13057e",
                                           "metadata": {
                                             "path": "tests/lib/context/memory/.nonexistent-project/.claude/context/memory/metrics/memory-slo-operational.json",
-                                            "size": 1310,
-                                            "mtime": 1771464790657.1265
+                                            "size": 854,
+                                            "mtime": 1771467511708.8704
                                           }
                                         }
                                       }
@@ -172345,7 +172415,7 @@
             "memory": {
               "type": "directory",
               "name": "memory",
-              "hash": "dae455dbbcc76434c93e36d2a342258fd65bd1f680896a0abfcc62ab266bd10c",
+              "hash": "6b5db2cf21ec53d08653d56ea3a06fad801d3e1ff93d2f933581c98ce9a3f324",
               "metadata": {
                 "path": "tests/lib/memory"
               },
@@ -172608,6 +172678,26 @@
                     "path": "tests/lib/memory/contextual-memory-entity-lifecycle.test.cjs",
                     "size": 2242,
                     "mtime": 1771225843799.5535
+                  }
+                },
+                "contextual-memory-search-fallback-guard.test.cjs": {
+                  "type": "file",
+                  "name": "contextual-memory-search-fallback-guard.test.cjs",
+                  "hash": "a93eddd9794eda8a48e4d0d130888d13b5e073310a0e5ffaaf857c114e85232f",
+                  "metadata": {
+                    "path": "tests/lib/memory/contextual-memory-search-fallback-guard.test.cjs",
+                    "size": 512,
+                    "mtime": 1771468099543.9712
+                  }
+                },
+                "contextual-memory-search-fallback-timer.test.cjs": {
+                  "type": "file",
+                  "name": "contextual-memory-search-fallback-timer.test.cjs",
+                  "hash": "a199eb5b3d6fc459c69423ad24a9c0121f095e83273dc25d1473e8fe8b9bc500",
+                  "metadata": {
+                    "path": "tests/lib/memory/contextual-memory-search-fallback-timer.test.cjs",
+                    "size": 543,
+                    "mtime": 1771469741123.7869
                   }
                 },
                 "contextual-memory-search.test.cjs": {
@@ -173535,7 +173625,7 @@
             "plan": {
               "type": "directory",
               "name": "plan",
-              "hash": "6ae06c28ab3c1f7ca875943d64176d82b89170fbbf577b0225c35187728dc9f4",
+              "hash": "112c88b35a9dea0d0b2ec34b6a6da0863bc1f0808c58f7fb8734d5d96f133df8",
               "metadata": {
                 "path": "tests/lib/plan"
               },
@@ -173543,11 +173633,11 @@
                 "implementation-plan.test.cjs": {
                   "type": "file",
                   "name": "implementation-plan.test.cjs",
-                  "hash": "89c381a10be102e988527d8ca2ec8afdaf25f16ecfeee25b391582ca572c9d79",
+                  "hash": "b63ccb1b37aa477fe7e988d6bd2d86fbfd715a7e896b953f0b4c748b77d1e2d5",
                   "metadata": {
                     "path": "tests/lib/plan/implementation-plan.test.cjs",
-                    "size": 799,
-                    "mtime": 1770405209292.5696
+                    "size": 1090,
+                    "mtime": 1771471497752.578
                   }
                 },
                 "progress.test.cjs": {
@@ -173852,6 +173942,26 @@
                 "mtime": 1771305592359.2158
               }
             },
+            "safety": {
+              "type": "directory",
+              "name": "safety",
+              "hash": "21d69dc9f25fa81199dc1f28586c4e522b0d01737d8075f591bda85380b97aac",
+              "metadata": {
+                "path": "tests/lib/safety"
+              },
+              "children": {
+                "command-allowlist.test.cjs": {
+                  "type": "file",
+                  "name": "command-allowlist.test.cjs",
+                  "hash": "4eeef926dd32b7d470de0acc8a43800c8169867aa0318c3cf295847fd24e008c",
+                  "metadata": {
+                    "path": "tests/lib/safety/command-allowlist.test.cjs",
+                    "size": 1226,
+                    "mtime": 1771468567096.6328
+                  }
+                }
+              }
+            },
             "scheduler": {
               "type": "directory",
               "name": "scheduler",
@@ -174055,7 +174165,7 @@
             "tools": {
               "type": "directory",
               "name": "tools",
-              "hash": "342e6dfbff462b7ad5d1892ba6fa47885774db1b23c457232244fb1c70910661",
+              "hash": "2f5477a29c862001063bc1c11004e28ce3653df320ac62d1851f9e9e3232eea2",
               "metadata": {
                 "path": "tests/lib/tools"
               },
@@ -174078,6 +174188,16 @@
                     "path": "tests/lib/tools/agent-health-tracker-edge.test.cjs",
                     "size": 8865,
                     "mtime": 1771137902060.853
+                  }
+                },
+                "agent-health-tracker-rolling-average.test.cjs": {
+                  "type": "file",
+                  "name": "agent-health-tracker-rolling-average.test.cjs",
+                  "hash": "96cf33e0016fb6d73314780e10c581075c5327f2e9a97929e2c772acdcf52b91",
+                  "metadata": {
+                    "path": "tests/lib/tools/agent-health-tracker-rolling-average.test.cjs",
+                    "size": 1645,
+                    "mtime": 1771467253962.2327
                   }
                 },
                 "agent-health-tracker.test.cjs": {
@@ -174223,11 +174343,11 @@
                 "standard-tools-security.test.cjs": {
                   "type": "file",
                   "name": "standard-tools-security.test.cjs",
-                  "hash": "33df86a2d6406d5635a2e5fcb290d639f8e9db3fe3bbaff0fadfc4de480c45a0",
+                  "hash": "a8dfd8e0df7e246a7407ccac6da3a8953fac7b3a5b4a455e8b99e9e727e03e62",
                   "metadata": {
                     "path": "tests/lib/tools/standard-tools-security.test.cjs",
-                    "size": 1168,
-                    "mtime": 1771467099697.5906
+                    "size": 1651,
+                    "mtime": 1771468644234.6125
                   }
                 },
                 "switch-modes.test.cjs.archived": {
@@ -175437,11 +175557,21 @@
         "scripts": {
           "type": "directory",
           "name": "scripts",
-          "hash": "3de7547fed388caf222d6744c4aa9ecc8b15f0389a3869ef91e85520f4ae49cd",
+          "hash": "de59f1eb08e272cb4d07e0c0d8a61addab45312d1a38017bbcd1432c0deb2019",
           "metadata": {
             "path": "tests/scripts"
           },
           "children": {
+            "count-all-tests.test.cjs": {
+              "type": "file",
+              "name": "count-all-tests.test.cjs",
+              "hash": "da502ac388209cba8b727f078a6e2294d554a2d45971e3802b0395b0d354d836",
+              "metadata": {
+                "path": "tests/scripts/count-all-tests.test.cjs",
+                "size": 2209,
+                "mtime": 1771471310022.979
+              }
+            },
             "install-security.test.cjs": {
               "type": "file",
               "name": "install-security.test.cjs",
@@ -175462,6 +175592,16 @@
                 "mtime": 1770518183706.5095
               }
             },
+            "validate-model-names.test.cjs": {
+              "type": "file",
+              "name": "validate-model-names.test.cjs",
+              "hash": "db0a5656a6579667d93dba2776172db874f0c446469967c3b181c47b443483cf",
+              "metadata": {
+                "path": "tests/scripts/validate-model-names.test.cjs",
+                "size": 847,
+                "mtime": 1771467135766.815
+              }
+            },
             "verify-hook-modules.test.cjs": {
               "type": "file",
               "name": "verify-hook-modules.test.cjs",
@@ -175477,7 +175617,7 @@
         "security": {
           "type": "directory",
           "name": "security",
-          "hash": "0426aa08dee9e4f5ec3345688d80add28467ae511ad0a57773a7561ee8cbc0c2",
+          "hash": "5aeb2c2514265eb6282a77a0f284c87c2c4b3bd85d00c966ab8978324a04e940",
           "metadata": {
             "path": "tests/security"
           },
@@ -175495,11 +175635,11 @@
             "json-remediation-sweep.test.cjs": {
               "type": "file",
               "name": "json-remediation-sweep.test.cjs",
-              "hash": "1c3d0525a7ce9f105ed282acb21498752e9616f7bf360bed8a283324052f9b77",
+              "hash": "3a0c82f3ae09580a1037469a662b097fdf439e38c7a06481330ff6466faa22a3",
               "metadata": {
                 "path": "tests/security/json-remediation-sweep.test.cjs",
-                "size": 2447,
-                "mtime": 1771280192016.1487
+                "size": 2617,
+                "mtime": 1771467900102.2458
               }
             },
             "json-remediation-tools.test.cjs": {
@@ -175520,6 +175660,16 @@
                 "path": "tests/security/memory-sanitization.test.cjs",
                 "size": 7967,
                 "mtime": 1771052605034.3044
+              }
+            },
+            "process-spawn-hardening.test.cjs": {
+              "type": "file",
+              "name": "process-spawn-hardening.test.cjs",
+              "hash": "dd100cefc50ab09f10f5013d37d83a7839dc93c91595669ec214320475e56a16",
+              "metadata": {
+                "path": "tests/security/process-spawn-hardening.test.cjs",
+                "size": 1237,
+                "mtime": 1771467245600.1475
               }
             },
             "prompt-injection.test.cjs": {
@@ -175937,7 +176087,7 @@
         "tools": {
           "type": "directory",
           "name": "tools",
-          "hash": "9ce963e6dd1316a108363313e68c58e7f9d4b5f15b1eafa1f30554565b1da291",
+          "hash": "365c9b65427f4e231c283d55150c146ac92858dc59093d81f332d7803b5b759c",
           "metadata": {
             "path": "tests/tools"
           },
@@ -175985,7 +176135,7 @@
             "cli": {
               "type": "directory",
               "name": "cli",
-              "hash": "47e7ac9b03db6a384ad475b36a5dc4c472a6448fa3e3b226314c15c906517e89",
+              "hash": "d114fc0c3314085837843562edc3cf288d38b2643f37f0ea883861ca636c337f",
               "metadata": {
                 "path": "tests/tools/cli"
               },
@@ -175998,6 +176148,16 @@
                     "path": "tests/tools/cli/cleanup-transient-artifacts.test.cjs",
                     "size": 2598,
                     "mtime": 1770938528083.6777
+                  }
+                },
+                "doctor-mcp-version-pin.test.cjs": {
+                  "type": "file",
+                  "name": "doctor-mcp-version-pin.test.cjs",
+                  "hash": "531e7bf32010aba2b5c6b4705950816aa60be23abef77dfab90344769d1df4e5",
+                  "metadata": {
+                    "path": "tests/tools/cli/doctor-mcp-version-pin.test.cjs",
+                    "size": 1025,
+                    "mtime": 1771468261786.826
                   }
                 },
                 "error-report.test.cjs": {
@@ -176230,6 +176390,26 @@
                 "path": "tests/tools/integration-health-dashboard.test.cjs",
                 "size": 5102,
                 "mtime": 1770518184021.293
+              }
+            },
+            "maintenance": {
+              "type": "directory",
+              "name": "maintenance",
+              "hash": "2f8b370fd0a8645003ca15775dadb7d45070dceb11b23cd3d678c71ce609eee7",
+              "metadata": {
+                "path": "tests/tools/maintenance"
+              },
+              "children": {
+                "memory-write-audit.test.cjs": {
+                  "type": "file",
+                  "name": "memory-write-audit.test.cjs",
+                  "hash": "eda6d7e5913bc0ed108ef9339cb5d444a781637a20f8210d074d5956bb19ea8f",
+                  "metadata": {
+                    "path": "tests/tools/maintenance/memory-write-audit.test.cjs",
+                    "size": 1479,
+                    "mtime": 1771468788526.203
+                  }
+                }
               }
             },
             "phantom-scripts.test.cjs": {
