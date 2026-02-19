@@ -378,6 +378,18 @@ Without these, the skill was NEVER invoked because Router couldn't find it.
 
 **Based on classification from Step 2, select appropriate agent(s):**
 
+### Step 6.1 Routing Resolution Order (Mandatory)
+
+When multiple routing signals match, resolve in this strict order:
+
+1. `ROUTING_TABLE` (explicit keyword-to-agent map, highest precedence)
+2. `ROUTING_PATTERNS` (regex/pattern routing, only if no `ROUTING_TABLE` match)
+3. `INTENT_KEYWORDS` (fuzzy intent fallback, only if 1 and 2 do not resolve)
+
+This precedence prevents generic regex matches from overriding explicit keyword routes.
+
+**Refactor precedence rule:** if user intent includes `refactor`/`simplify`/`cleanup`, route to `code-simplifier` via `ROUTING_TABLE` precedence, even if a broader architect-oriented regex in `ROUTING_PATTERNS` would also match.
+
 ### Core Development Agents
 
 | Request Type                             | Agent                       | File                                               |
