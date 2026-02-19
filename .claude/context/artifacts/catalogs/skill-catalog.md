@@ -300,17 +300,18 @@ Quality validation skills.
 
 Advanced patterns and methodologies.
 
-| Skill                                | Description                                   | Primary Agents |
-| ------------------------------------ | --------------------------------------------- | -------------- |
-| `thinking-tools`                     | Self-reflection patterns (think-about-\*)     | all agents     |
-| `spec-gathering`                     | Requirements gathering                        | planner        |
-| `spec-init`                          | Unified spec creation                         | planner        |
-| `sequential-thinking`                | Structured problem solving                    | all agents     |
-| `consensus-voting`                   | Byzantine consensus for multi-agent decisions | orchestrators  |
-| `swarm-coordination`                 | Multi-agent swarm patterns                    | orchestrators  |
-| `interactive-requirements-gathering` | A/B/C/D/E questionnaire framework             | planner        |
-| `planning-with-files`                | Persistent planning files                     | planner        |
-| `sparc-methodology`                  | SPARC development methodology                 | architect      |
+| Skill                                 | Description                                                                    | Primary Agents |
+| ------------------------------------- | ------------------------------------------------------------------------------ | -------------- |
+| `thinking-tools`                      | Self-reflection patterns (think-about-\*)                                      | all agents     |
+| `spec-gathering`                      | Requirements gathering                                                         | planner        |
+| `spec-init`                           | Unified spec creation                                                          | planner        |
+| `sequential-thinking`                 | Structured problem solving                                                     | all agents     |
+| `consensus-voting`                    | Byzantine consensus for multi-agent decisions                                  | orchestrators  |
+| `swarm-coordination`                  | Multi-agent swarm patterns                                                     | orchestrators  |
+| `interactive-requirements-gathering`  | A/B/C/D/E questionnaire framework                                              | planner        |
+| `planning-with-files`                 | Persistent planning files                                                      | planner        |
+| `sparc-methodology`                   | SPARC development methodology                                                  | architect      |
+| `enterprise-skill-test-1771465110431` | Enterprise scaffold validation skill for test coverage and reliability checks. | Read           |
 
 ---
 

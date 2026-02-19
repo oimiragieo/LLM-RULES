@@ -10,12 +10,14 @@
 
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
+const { exec, execFile } = require('child_process');
 const util = require('util');
 const { glob } = require('glob');
 const { sanitizePath, PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { isCommandAllowed } = require('../safety/command-allowlist.cjs');
 
 const execAsync = util.promisify(exec);
+const execFileAsync = util.promisify(execFile);
 
 // Helper to get ripgrep path
 function getRgPath() {
@@ -81,8 +83,11 @@ StandardTools.Edit = async function ({ path: filePath, edits, dryRun }) {
  * Execute Bash command
  */
 StandardTools.Bash = async function ({ command }) {
-  // SECURITY WARNING: In production, this needs strict sandboxing!
   if (!command) throw new Error('Command required');
+  const verdict = isCommandAllowed(command);
+  if (!verdict.allowed) {
+    throw new Error(`Command blocked by allowlist: ${verdict.reason}`);
+  }
 
   try {
     const { stdout, stderr } = await execAsync(command, {
@@ -141,13 +146,20 @@ StandardTools.Glob = async function ({ pattern, path: basePath = '.' }) {
  */
 StandardTools.Grep = async function ({ query, path: searchPath = '.' }) {
   const rg = getRgPath();
-  const cmd = `"${rg}" -i -n "${query}" "${searchPath}"`;
+  const safeSearchPath = sanitizePath(searchPath, PROJECT_ROOT);
 
   try {
-    const { stdout } = await execAsync(cmd, { cwd: PROJECT_ROOT });
+    const { stdout } = await execFileAsync(rg, ['-i', '-n', String(query), safeSearchPath], {
+      cwd: PROJECT_ROOT,
+      maxBuffer: 1024 * 1024,
+      shell: false,
+    });
     return stdout;
   } catch (e) {
     // grep returns non-zero if no matches
+    if (e && Number(e.code) === 1) {
+      return '';
+    }
     return e.stdout || '';
   }
 };

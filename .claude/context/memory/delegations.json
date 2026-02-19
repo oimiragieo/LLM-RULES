@@ -3,33 +3,26 @@
     "taskId": "t-2",
     "parentAgent": "master-orchestrator",
     "targetAgent": "developer",
-    "chain": [
-      "master-orchestrator",
-      "developer"
-    ],
+    "chain": ["master-orchestrator", "developer"],
     "timeoutMs": 100,
     "status": "reassigned",
     "traceId": "trace-orphan",
-    "createdAt": 1771451673850,
-    "updatedAt": 1771464797457,
-    "recoveredAt": 1771464797457
+    "createdAt": 1771465060407,
+    "updatedAt": 1771465060557,
+    "recoveredAt": 1771465060557
   },
   "t-3": {
     "taskId": "t-3",
     "parentAgent": "agent-a",
     "targetAgent": "agent-b",
-    "chain": [
-      "agent-a",
-      "agent-b"
-    ],
+    "chain": ["agent-a", "agent-b"],
     "timeoutMs": 30000,
-    "status": "reassigned",
+    "status": "in_progress",
     "traceId": null,
-    "createdAt": 1771451673881,
-    "updatedAt": 1771464795058,
+    "createdAt": 1771465060441,
+    "updatedAt": 1771465060446,
     "updatePayload": {
       "status": "in_progress"
-    },
-    "recoveredAt": 1771464795058
+    }
   }
 }

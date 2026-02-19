@@ -125,6 +125,18 @@ function extractModelNames(config) {
     }
   }
 
+  // Extract from agents map (primary config source in this repo)
+  if (config.agents && typeof config.agents === 'object') {
+    for (const [agentName, agentConfig] of Object.entries(config.agents)) {
+      if (agentConfig && agentConfig.model) {
+        models.push({
+          source: `agents.${agentName}`,
+          model: agentConfig.model,
+        });
+      }
+    }
+  }
+
   return models;
 }
 
