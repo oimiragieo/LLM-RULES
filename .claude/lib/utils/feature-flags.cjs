@@ -13,35 +13,76 @@
  */
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const yaml = require('js-yaml');
 
 class FeatureFlags {
-  constructor() {
+  constructor(options = {}) {
     this.flags = new Map();
     this.rolloutPercentages = new Map();
     this.rollbackHistory = new Map();
+    this.projectRoot = options.projectRoot || process.cwd();
+    this.configPath =
+      options.configPath || path.join(this.projectRoot, '.claude', 'config.yaml');
 
     // Initialize from environment variables
-    this._initializeFromEnv();
+    this._initializeFromConfigAndEnv();
   }
 
   /**
-   * Initialize feature flags from environment variables
+   * Initialize feature flags from config and environment variables.
+   * Priority: Environment Variables > Config File > Defaults
    * @private
    */
-  _initializeFromEnv() {
+  _initializeFromConfigAndEnv() {
+    const configFeatures = this._readConfigFeatures();
+    const partyConfigEnabled = configFeatures.partyMode?.enabled === true;
+    const elicitationConfigEnabled = configFeatures.advancedElicitation?.enabled === true;
+
+    const partyEnvEnabled = process.env.PARTY_MODE_ENABLED;
+    const partyEnvRollout = process.env.PARTY_ROLLOUT_PERCENTAGE;
+    const elicitationEnvEnabled = process.env.ELICITATION_ENABLED;
+    const memoryEnvEnabled = process.env.MEMORY_SYSTEM_ENABLED;
+    const memoryEnvRollout = process.env.MEMORY_ROLLOUT_PERCENTAGE;
+
     // Memory System feature
     this._registerFeature(
       'memory_system',
-      process.env.MEMORY_SYSTEM_ENABLED === 'true',
-      this._parsePercentage(process.env.MEMORY_ROLLOUT_PERCENTAGE, 0)
+      memoryEnvEnabled === 'true',
+      this._parsePercentage(memoryEnvRollout, 0)
     );
 
     // Party Mode feature
     this._registerFeature(
       'party_mode',
-      process.env.PARTY_MODE_ENABLED === 'true',
-      this._parsePercentage(process.env.PARTY_ROLLOUT_PERCENTAGE, 0)
+      partyEnvEnabled ? partyEnvEnabled === 'true' : partyConfigEnabled,
+      this._parsePercentage(partyEnvRollout, partyConfigEnabled ? 100 : 0)
     );
+
+    // Advanced Elicitation feature
+    this._registerFeature(
+      'advanced_elicitation',
+      elicitationEnvEnabled ? elicitationEnvEnabled === 'true' : elicitationConfigEnabled,
+      elicitationConfigEnabled ? 100 : 0
+    );
+  }
+
+  /**
+   * Read feature section from .claude/config.yaml
+   * @private
+   * @returns {object} feature flags from config or empty object
+   */
+  _readConfigFeatures() {
+    try {
+      if (!fs.existsSync(this.configPath)) return {};
+      const parsed = yaml.load(fs.readFileSync(this.configPath, 'utf8'));
+      if (!parsed || typeof parsed !== 'object') return {};
+      const features = parsed.features;
+      return features && typeof features === 'object' ? features : {};
+    } catch (_err) {
+      return {};
+    }
   }
 
   /**
