@@ -32,3 +32,15 @@ test('Grep treats query as data and does not execute shell payload', async () =>
     }
   }
 });
+
+test('exec wrapper blocks commands outside allowlist', async () => {
+  const result = await StandardTools.exec({ command: 'rm -rf /tmp/agent-studio-test' });
+  assert.equal(result.exitCode, 126);
+  assert.match(result.stderr, /Command blocked by allowlist/);
+});
+
+test('exec wrapper allows allowlisted commands', async () => {
+  const result = await StandardTools.exec({ command: 'node --version' });
+  assert.equal(result.exitCode, 0);
+  assert.match(result.stdout, /v\d+\./);
+});

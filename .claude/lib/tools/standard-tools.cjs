@@ -186,6 +186,14 @@ StandardTools.readFile = async function (args) {
 // exec: Agents expect { exitCode, stdout, stderr } -> Bash returns string
 StandardTools.exec = async function (args) {
   if (!args.command) throw new Error('Command required');
+  const verdict = isCommandAllowed(args.command);
+  if (!verdict.allowed) {
+    return {
+      exitCode: 126,
+      stdout: '',
+      stderr: `Command blocked by allowlist: ${verdict.reason}`,
+    };
+  }
   try {
     const { stdout, stderr } = await execAsync(args.command, {
       cwd: PROJECT_ROOT,
