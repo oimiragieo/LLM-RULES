@@ -89,7 +89,7 @@
     "test:framework": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs .claude/lib/**/*.test.cjs tests/hooks/*.test.cjs tests/lib/agents/*.test.cjs tests/lib/config/*.test.cjs tests/lib/qa/*.test.cjs tests/lib/plan/*.test.cjs tests/lib/memory/*.test.cjs tests/lib/monitoring/*.test.cjs tests/lib/routing/*.test.cjs tests/lib/spawn/*.test.cjs tests/lib/text-processing/*.test.cjs tests/lib/tools/*.test.cjs tests/lib/scheduler/*.test.cjs tests/lib/reflection/*.test.cjs",
     "test:framework:memory": "node --test --test-concurrency=1 tests/lib/memory/*.test.cjs",
     "test:framework:hooks": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs",
-    "test:framework:lib": "node --test --test-concurrency=1 tests/lib/**/*.test.cjs",
+    "test:framework:lib": "node --test --test-concurrency=1 tests/lib/**/*.test.cjs tests/cli/*.test.cjs",
     "test:memory:ci": "node --test tests/lib/memory/observations.test.cjs tests/lib/evolution/evolution-request-router.test.cjs tests/integration/evolution-stale-skill-flow.test.cjs tests/hooks/spawn-prompt-memory-mode.test.cjs tests/hooks/unified-reflection-handler.test.cjs tests/hooks/unified-reflection-stale-evolution.test.cjs tests/hooks/audit-skill-recency.test.cjs tests/skills/skill-updater-doc-contract.test.cjs tests/skills/recommend-evolution-main.test.cjs",
     "test:code-indexing": "node --test --test-concurrency=1 tests/code-indexing/ripgrep-integration.test.cjs tests/code-indexing/ast-grep-wrapper.test.cjs tests/code-indexing/merkle-tree.test.cjs tests/code-indexing/incremental-indexing.test.cjs tests/code-indexing/search-tools-integration.test.cjs tests/code-indexing/vector-store-lancedb.test.cjs tests/hooks/code-index-updater.test.cjs",
     "test:all": "pnpm test && pnpm test:framework && pnpm test:tools",
@@ -120,6 +120,10 @@
     "routing:status": "node .claude/scripts/quick-status.cjs",
     "skills:index": "node .claude/tools/cli/generate-skill-index.cjs",
     "skills:validate": "node .claude/tools/cli/generate-skill-index.cjs --validate",
+    "skills:freshness": "node .claude/tools/cli/skill-freshness-report.cjs",
+    "skills:process-stale": "node .claude/tools/cli/process-stale-skills.cjs",
+    "skills:backfill-verification": "node .claude/tools/cli/backfill-skill-verification.cjs",
+    "skills:update-headless": "node .claude/tools/cli/skill-update-headless.cjs",
     "agents:registry": "node .claude/tools/cli/generate-agent-registry.cjs",
     "agents:registry:validate": "node .claude/tools/cli/generate-agent-registry.cjs --validate",
     "agents:catalog": "node .claude/tools/cli/generate-agent-catalog.cjs",
@@ -130,6 +134,7 @@
     "gen:all-registries": "npm run gen:tool-manifest && npm run gen:skill-index && npm run gen:agent-registry",
     "code:index:reindex": "node --max-old-space-size=4096 --expose-gc .claude/tools/cli/index-codebase.cjs index",
     "search:code": "node .claude/tools/cli/hybrid-search.cjs",
+    "search:compress": "node .claude/tools/cli/hybrid-search.cjs --compress",
     "trace:query": "node .claude/tools/cli/trace-query.cjs",
     "search:structure": "node .claude/tools/cli/hybrid-search.cjs --structure",
     "search:tokens": "node .claude/tools/cli/hybrid-search.cjs --tokens",
@@ -160,7 +165,8 @@
     "quality:daemon:start": "node .claude/tools/cli/artifact-quality-daemon.cjs --mode daemon",
     "quality:daemon:status": "node .claude/tools/cli/artifact-quality-daemon.cjs --mode status --json",
     "validate:status-check-governance": "node --test tests/workflows/required-status-checks-config.test.cjs tests/workflows/branch-protection-audit.test.cjs",
-    "validate:agent-memory": "node .claude/tools/validation/validate-agent-memory.cjs"
+    "validate:agent-memory": "node .claude/tools/validation/validate-agent-memory.cjs",
+    "skills:update-stale": "node .claude/tools/cli/run-skill-updates.cjs"
   },
   "keywords": [
     "claude",
@@ -204,7 +210,8 @@
   },
   "pnpm": {
     "overrides": {
-      "tar": ">=7.5.7"
+      "tar": ">=7.5.7",
+      "minimatch": ">=10.2.1"
     }
   },
   "devDependencies": {
