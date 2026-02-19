@@ -48,7 +48,7 @@ Analyze feature requirements for: $FEATURE_NAME
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/planner.md
-2. **Invoke brainstorming skill**: Skill({ skill: "brainstorming" })
+2. **Invoke skills**: Skill({ skill: "interactive-requirements-gathering" })
 3. Define user stories, acceptance criteria, success metrics, and business value
 4. Identify stakeholders, dependencies, and risks
 5. Create feature specification document with clear scope boundaries

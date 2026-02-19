@@ -900,7 +900,7 @@ Explore codebase to understand {area_of_interest}.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/architect.md
-2. **Invoke skills**: Skill({ skill: "repo-rag" })
+2. **Invoke skills**: Skill({ skill: "project-analyzer" })
 3. Document findings in: .claude/context/exploration/{area}-exploration.md
 
 ## Memory Protocol
@@ -1073,7 +1073,7 @@ Run full test suite and report results.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/qa.md
-2. **Invoke skills**: Skill({ skill: "qa-workflow" })
+2. **Invoke skills**: Skill({ skill: "verification-before-completion" })
 3. Run tests, document failures
 4. Save results to: .claude/context/reports/test-results.md
 
