@@ -130,6 +130,16 @@ describe('Skill Updater Workflow - Metadata', () => {
     expect(workflow.updater_config).toBeTruthy();
     expect(workflow.updater_config.backup_enabled).toBe(true);
   });
+
+  it('should protect critical sections in updater_config', () => {
+    const content = fs.readFileSync(WORKFLOW_PATH, 'utf-8');
+    const workflow = parseWorkflow(content);
+    const protectedSections = workflow.updater_config?.protected_sections || [];
+    expect(protectedSections.includes('Memory Protocol')).toBeTruthy();
+    expect(protectedSections.includes('Iron Laws')).toBeTruthy();
+    expect(protectedSections.includes('Anti-Patterns')).toBeTruthy();
+    expect(protectedSections.includes('Error Handling')).toBeTruthy();
+  });
 });
 
 describe('Skill Updater Workflow - EVOLVE Phases', () => {

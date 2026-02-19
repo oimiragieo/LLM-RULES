@@ -26,6 +26,10 @@ updater_config:
     - '.claude/context/memory/learnings.md'
   protected_sections:
     - 'Memory Protocol'
+    - 'Iron Laws'
+    - 'Anti-Patterns'
+    - 'Error Handling'
+    - '[PERMANENT]'
 
 phases:
   evaluate:

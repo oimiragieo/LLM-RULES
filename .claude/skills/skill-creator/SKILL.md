@@ -1605,3 +1605,14 @@ For new patterns, templates, or workflows, research is mandatory:
 - Run targeted tests for changed modules.
 - Run lint/format on changed files.
 - Keep commits scoped by concern (logic/docs/generated artifacts).
+
+## Router Gap Detection
+
+When router analysis has no matching agent/skill for recurring intent:
+
+1. Route evidence to planner or evolution-orchestrator.
+2. Run creation-feasibility gate.
+3. Invoke `skill-creator` (or `agent-creator` if skill is not the right artifact).
+4. Complete integration wiring and validation before closing the gap.
+
+Do not bypass this flow with direct unmanaged artifact writes.

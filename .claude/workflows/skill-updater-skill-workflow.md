@@ -1,6 +1,8 @@
 # skill-updater Skill Workflow
 
-1. Resolve target skill and classify trigger (`reflection`, `evolve`, `manual`).
+> Source of truth: `.claude/workflows/updaters/skill-updater-workflow.yaml`. This file is a short summary.
+
+1. Resolve target skill and classify trigger (`reflection`, `evolve`, `manual`, `stale_skill`).
 2. Ground with `framework-context` + memory files.
 3. Run `research-synthesis` (Exa/arXiv/internal parity checks).
 4. Optionally run `assimilate` for external benchmark parity.

@@ -35,7 +35,7 @@ Evolution recommendation skill for reflection/planning agents.
 </identity>
 
 <capabilities>
-- Trigger classification (`repeated_error`, `no_agent`, `integration_gap`, `user_request`, `rubric_regression`, `other`)
+- Trigger classification (`repeated_error`, `no_agent`, `integration_gap`, `user_request`, `rubric_regression`, `stale_skill`, `other`)
 - Recommendation-vs-integration decision branching
 - Dual recording mode: JSONL runtime queue + reflection report block
 </capabilities>
@@ -52,6 +52,7 @@ Use these thresholds:
 - `no_agent`: recurring need with no valid routing match
 - `integration_gap`: existing artifact integration missing (prefer artifact-integrator)
 - `user_request`: explicit request for capability not available
+- `stale_skill`: audit pipeline reports verified artifact older than 6 months or invalid `lastVerifiedAt`
 
 ### Step 1: Decide Recommendation Path
 
@@ -126,9 +127,7 @@ Skill({ skill: 'recommend-evolution', args: '--trigger no_agent --suggestedArtif
 
 **Before starting:**
 
-```powershell
-Get-Content .claude/context/memory/learnings.md -TotalCount 120
-```
+Read `.claude/context/memory/learnings.md` using `Read` or Node `fs.readFileSync` (cross-platform).
 
 **After completing:**
 

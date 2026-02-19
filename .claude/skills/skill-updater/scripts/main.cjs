@@ -3,6 +3,8 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+const yaml = require('js-yaml');
 
 const PROJECT_ROOT = findProjectRoot();
 
@@ -109,52 +111,58 @@ function updateSkillMetadata(skillPath) {
   const absolutePath = path.join(PROJECT_ROOT, skillPath);
   if (!fs.existsSync(absolutePath)) return;
 
-  let content = fs.readFileSync(absolutePath, 'utf8');
+  const content = fs.readFileSync(absolutePath, 'utf8');
   const now = new Date().toISOString();
+  const parsed = parseFrontmatter(content);
+  if (!parsed) return;
 
-  if (content.includes('lastVerifiedAt:')) {
-    content = content.replace(/lastVerifiedAt: .*/, `lastVerifiedAt: ${now}`);
-  } else {
-    content = content.replace(/---\n/, `---\nlastVerifiedAt: ${now}\n`);
+  parsed.attributes.lastVerifiedAt = now;
+  parsed.attributes.verified = true;
+
+  fs.writeFileSync(absolutePath, serializeFrontmatter(parsed.attributes, parsed.body), 'utf8');
+}
+
+function parseFrontmatter(content) {
+  const normalized = content.replace(/\r\n/g, '\n');
+  if (!normalized.startsWith('---\n')) return null;
+  const closeIndex = normalized.indexOf('\n---\n', 4);
+  if (closeIndex === -1) return null;
+
+  const rawFrontmatter = normalized.slice(4, closeIndex);
+  const body = normalized.slice(closeIndex + 5);
+  const attributes = yaml.load(rawFrontmatter) || {};
+  if (typeof attributes !== 'object' || Array.isArray(attributes)) return null;
+  return { attributes, body };
+}
+
+function serializeFrontmatter(attributes, body) {
+  const dumped = yaml.dump(attributes, {
+    lineWidth: 120,
+    noRefs: true,
+    sortKeys: false,
+  });
+  return `---\n${dumped}---\n${body}`;
+}
+
+function applyPostUpdateIntegration(skillName) {
+  const scriptPath = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'generate-skill-index.cjs');
+  if (fs.existsSync(scriptPath)) {
+    spawnSync('node', [scriptPath], { windowsHide: true, shell: false });
   }
 
-  if (content.includes('verified:')) {
-    content = content.replace(/verified: .*/, `verified: true`);
-  } else {
-    content = content.replace(/---\n/, `---\nverified: true\n`);
-  }
+  updateRoutingTableKeywords(skillName, '');
 
-  fs.writeFileSync(absolutePath, content, 'utf8');
+  const learningsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
+  if (fs.existsSync(learningsPath)) {
+    fs.appendFileSync(
+      learningsPath,
+      `\n- Refreshed skill: ${skillName} (${new Date().toISOString().split('T')[0]})\n`,
+      'utf8'
+    );
+  }
 }
 
 function buildTddBacklog(skillName) {
-  // POST-UPDATE INTEGRATION (Phase 4.3 Hardening)
-  try {
-    const scriptPath = path.join(
-      PROJECT_ROOT,
-      '.claude',
-      'tools',
-      'cli',
-      'generate-skill-index.cjs'
-    );
-    const { spawnSync } = require('child_process');
-    spawnSync('node', [scriptPath], { windowsHide: true });
-
-    // Sync routing keywords if they exist or need refresh
-    updateRoutingTableKeywords(skillName, '');
-
-    const learningsPath = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'learnings.md');
-    if (fs.existsSync(learningsPath)) {
-      fs.appendFileSync(
-        learningsPath,
-        `\n- Refreshed skill: ${skillName} (${new Date().toISOString().split('T')[0]})\n`,
-        'utf8'
-      );
-    }
-  } catch (err) {
-    console.error(`Warning: Post-update integration partial: ${err.message}`);
-  }
-
   return [
     {
       phase: 'RED',
@@ -204,8 +212,10 @@ function updateRoutingTableKeywords(name, _description) {
 
   const keywords = Array.from(new Set([name, ...name.split('-')])).slice(0, 10);
 
-  const entry = `  '${name}': ${JSON.stringify(keywords, null, 2).replace(/\]/g, '],')},`;
-  const insertionPoint = content.lastIndexOf('};');
+  const entry = `  '${name}': ${JSON.stringify(keywords)},`;
+  const anchor =
+    '\n};\n\n// Deliberate overlaps must be explicitly tracked so new collisions are reviewed.';
+  const insertionPoint = content.indexOf(anchor);
   if (insertionPoint !== -1) {
     content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
     fs.writeFileSync(filePath, content, 'utf8');
@@ -213,7 +223,7 @@ function updateRoutingTableKeywords(name, _description) {
 }
 
 function buildResult(input) {
-  const trigger = ['reflection', 'evolve', 'manual'].includes(input.trigger)
+  const trigger = ['reflection', 'evolve', 'manual', 'stale_skill'].includes(input.trigger)
     ? input.trigger
     : 'manual';
   const mode = input.mode === 'execute' ? 'execute' : 'plan';
@@ -247,8 +257,15 @@ function buildResult(input) {
 
   const skillDir = path.dirname(absoluteSkillPath);
 
-  // Apply metadata updates (verified=true, lastVerifiedAt=now)
-  updateSkillMetadata(resolved.skillPath);
+  const isExecuteMode = mode === 'execute';
+  if (isExecuteMode) {
+    updateSkillMetadata(resolved.skillPath);
+    try {
+      applyPostUpdateIntegration(resolved.skillName);
+    } catch (err) {
+      console.error(`Warning: Post-update integration partial: ${err.message}`);
+    }
+  }
 
   const bundle = {
     commands: fs.existsSync(path.join(skillDir, 'commands')),
@@ -302,7 +319,7 @@ function main(input = null) {
     return {
       ok: true,
       usage:
-        'node .claude/skills/skill-updater/scripts/main.cjs --skill <name-or-path> [--trigger reflection|evolve|manual] [--mode plan|execute] [--topic <research-topic>]',
+        'node .claude/skills/skill-updater/scripts/main.cjs --skill <name-or-path> [--trigger reflection|evolve|manual|stale_skill] [--mode plan|execute] [--topic <research-topic>]',
     };
   }
   return buildResult(options);
@@ -323,6 +340,11 @@ module.exports = {
   normalizeSkillRef,
   buildResearchChecklist,
   buildGapChecklist,
+  parseFrontmatter,
+  serializeFrontmatter,
+  updateSkillMetadata,
+  updateRoutingTableKeywords,
+  applyPostUpdateIntegration,
   buildTddBacklog,
   buildResult,
   main,

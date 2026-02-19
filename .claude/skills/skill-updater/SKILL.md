@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord, WebSearch, WebFetch]
-args: '--skill <name-or-path> [--trigger reflection|evolve|manual] [--mode plan|execute]'
+args: '--skill <name-or-path> [--trigger reflection|evolve|manual|stale_skill] [--mode plan|execute]'
 error_handling: graceful
 streaming: supported
 ---
@@ -27,6 +27,44 @@ Use this skill to refresh an existing skill safely: research current best practi
 ## The Iron Law
 
 Never update a skill blindly. Every refresh must be evidence-backed, TDD-gated, and integration-validated.
+
+## Workflow Contract
+
+- Canonical workflow source: `.claude/workflows/updaters/skill-updater-workflow.yaml`
+- EVOLVE mapping:
+  - Step 0 -> Evaluate
+  - Step 1 -> Validate
+  - Step 2 -> Obtain
+  - Step 3 -> Lock
+  - Step 4 -> Verify
+  - Step 5 -> Enable
+
+## Protected Sections Manifest
+
+These sections are protected and must not be removed or replaced wholesale during updates:
+
+- `Memory Protocol`
+- `Iron Laws`
+- `Anti-Patterns`
+- `Error Handling`
+- Any section tagged `[PERMANENT]`
+
+## Risk Scoring Model
+
+- `low`: wording/examples only, no script/schema/hook/tool contract changes.
+- `medium`: workflow steps, validation behavior, integration points, or trigger semantics.
+- `high`: script execution behavior, tool schemas, hook policy, or routing/evolution side effects.
+
+For `medium` and `high`, require a diff-first summary and explicit confirmation before apply mode.
+
+## Enterprise Acceptance Checklist (Blocking)
+
+- [ ] Patch plan includes RED -> GREEN -> REFACTOR -> VERIFY mapping.
+- [ ] Protected sections are preserved.
+- [ ] `validate-skill-ecosystem` passes for target skill.
+- [ ] Integration generators run (`generate-skill-index`, registry/catalog updates as needed).
+- [ ] Memory updates recorded (`learnings`, `issues`, `decisions`) with concrete outcome.
+- [ ] `lastVerifiedAt` and `verified` are updated in execute mode only.
 
 ## Workflow
 
@@ -90,6 +128,13 @@ Compare current skill against enterprise bundle expectations:
 - workflow doc in `.claude/workflows/*skill-workflow.md`
 - agent assignments, CLAUDE references, skill catalog coverage
 - Search tooling: Ensure `pnpm search:code` is mandated over generic `grep`
+- Run `node .claude/tools/cli/validate-skill-ecosystem.cjs` and treat failures as blocking.
+
+### Step 3B: External Codebase Assimilation (When Needed)
+
+- Invoke `Skill({ skill: 'assimilate' })` only when parity against external repos/benchmarks is required.
+- Convert assimilate output into concrete backlog entries under RED/GREEN/REFACTOR.
+- Do not overwrite local protected sections with imported content.
 
 ### Step 4: TDD Refresh Backlog
 
@@ -116,6 +161,7 @@ Create RED/GREEN/REFACTOR/VERIFY plan for the target skill:
 
 - `.claude/context/memory/learnings.md`
 - `.claude/context/evolution-state.json` (if EVOLVE-triggered)
+- Ensure target `SKILL.md` frontmatter has `verified: true` and `lastVerifiedAt: <ISO-8601>` (execute mode only).
 
 3. If new capability gap remains after refresh, invoke:
 
@@ -128,6 +174,7 @@ Skill({ skill: 'recommend-evolution' });
 - **Reflection trigger:** repeated low rubric scores tied to one skill, stale references, failing update hooks/tests
 - **EVOLVE trigger:** request maps to existing skill but requires material refresh instead of net-new skill
 - **Manual trigger:** user requests audit/refresh directly
+- **Stale trigger:** `audit-skill-recency --json` identifies stale artifacts -> recommend-evolution (`trigger: stale_skill`) -> evolution-orchestrator -> skill-updater
 
 ## Token Saver Invocation Rule
 
@@ -148,9 +195,7 @@ Invoke `Skill({ skill: 'token-saver-context-compression' })` only when evidence 
 
 Before work:
 
-```bash
-cat .claude/context/memory/learnings.md
-```
+- Read `.claude/context/memory/learnings.md` using `Read` or Node `fs.readFileSync` (cross-platform).
 
 After work:
 
