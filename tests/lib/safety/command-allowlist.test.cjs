@@ -21,3 +21,13 @@ test('blocks dangerous token usage for git', () => {
   assert.equal(verdict.allowed, false);
   assert.match(verdict.reason || '', /(dangerous flag|does not match allowed patterns)/i);
 });
+
+test('blocks command substitution with $() even for allowlisted commands', () => {
+  const verdict = isCommandAllowed('echo $(rm -rf /tmp/demo)');
+  assert.equal(verdict.allowed, false);
+});
+
+test('blocks backtick command substitution even for allowlisted commands', () => {
+  const verdict = isCommandAllowed('echo `whoami`');
+  assert.equal(verdict.allowed, false);
+});

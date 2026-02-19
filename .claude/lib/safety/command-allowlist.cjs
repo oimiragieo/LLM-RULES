@@ -361,12 +361,26 @@ function hasDangerousFlag(segment, flag) {
   return tokenPattern.test(segment);
 }
 
+function hasCommandSubstitution(command) {
+  const text = String(command || '');
+  if (text.includes('$(')) return true;
+  return /(^|[^\\])`/.test(text);
+}
+
 /**
  * Check if command is allowed
  * @param {string} command - Full shell command
  * @returns {{allowed: boolean, reason?: string, command?: string}}
  */
 function isCommandAllowed(command) {
+  if (hasCommandSubstitution(command)) {
+    return {
+      allowed: false,
+      reason: 'Command substitution is not allowed in background commands',
+      command: '',
+    };
+  }
+
   const segments = splitShellCommandSegments(command || '');
   if (segments.length === 0) {
     return { allowed: false, reason: 'Could not extract command from input', command: '' };
