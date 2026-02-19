@@ -21,6 +21,7 @@ import { ecosystemHealthCheck as runEcosystemHealthCheck } from './ecosystem-hea
 
 const require = createRequire(import.meta.url);
 const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
+const { atomicWriteJSONSync } = require('../../../lib/utils/atomic-write.cjs');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -187,7 +188,7 @@ export function createHookFile(templateName, hookName, category = 'custom') {
 export function registerHook(hookPath, trigger, matcher = '') {
   let settings = {};
   if (existsSync(SETTINGS_PATH)) {
-    settings = safeParseJSON(readFileSync(SETTINGS_PATH, 'utf-8'));
+    settings = safeParseJSON(readFileSync(SETTINGS_PATH, 'utf-8'), null, null, {});
   }
 
   if (!settings.hooks) settings.hooks = {};
@@ -204,7 +205,7 @@ export function registerHook(hookPath, trigger, matcher = '') {
       hooks: [{ type: 'command', command: `node ${hookPath}` }],
     });
 
-    writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2));
+    atomicWriteJSONSync(SETTINGS_PATH, settings);
     return true;
   }
 
