@@ -25,7 +25,10 @@ test('walkTests discovers nested test files recursively', async () => {
     fs.writeFileSync(path.join(root, 'tests', 'unit', 'deep', 'nested.test.mjs'), 'test', 'utf8');
     fs.writeFileSync(path.join(root, 'tests', 'unit', 'deep', 'not-a-test.txt'), 'ignore', 'utf8');
 
-    const found = mod.walkTests(path.join(root, 'tests')).map(f => path.basename(f)).sort();
+    const found = mod
+      .walkTests(path.join(root, 'tests'))
+      .map(f => path.basename(f))
+      .sort();
     assert.deepEqual(found, ['nested.test.mjs', 'top.test.cjs']);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

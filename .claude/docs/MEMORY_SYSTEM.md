@@ -73,7 +73,7 @@ It is used by `.claude/lib/memory/entity-extractor.cjs` (writes) and `.claude/li
 - Initialize schema: `pnpm run memory:init` (or `node .claude/tools/cli/init-memory-db.cjs`).
 - Check memory health (JSON): `pnpm run memory:health` (or `node .claude/lib/memory/memory-manager.cjs health`).
 
-The entity index is populated by `sync-memory-index` from `decisions.md` and `issues.md`, and from `patterns.json` / `gotchas.json` when those JSON files are edited. `learnings.md` is a legacy archive and is **not** synced into the entity index. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). Config model is validated by config-model-validator (block by default); the spawn prompt is augmented with the configured model so the Router should pass it into Task() when invoking. Extracted memories can also be linked to skill entities when SessionEnd provides `tools_used`, creating memory→skill relationships for later graph queries. The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
+The entity index is populated by `sync-memory-index` from `decisions.md` and `issues.md`, and from `patterns.json` / `gotchas.json` when those JSON files are edited. `learnings.md` is a legacy archive and is **not** synced into the entity index. Agent-visible patterns, gotchas, and decisions are loaded via `loadMemoryForContext()` (direct SQL). The `ContextualMemory` methods `findEntities()` and `getRelated()` are now used in the spawn prompt pipeline: `spawn-prompt-assembler.cjs` can append an **Entity Graph (SQLite)** section by default (set `SPAWN_PROMPT_ENTITY_GRAPH=off` to disable). Config model validation is handled by the routing guard hooks; the spawn prompt is augmented with the configured model so the Router should pass it into Task() when invoking. Extracted memories can also be linked to skill entities when SessionEnd provides `tools_used`, creating memory→skill relationships for later graph queries. The entity DB is created on first `pnpm run memory:init` or first sync when editing these files. Code that uses `findEntities`/`getRelated` ensures the DB is initialized (ContextualMemory lazily initializes schema) or handles missing schema by returning empty results.
 
 ### Troubleshooting
 
@@ -87,6 +87,33 @@ The entity index is populated by `sync-memory-index` from `decisions.md` and `is
 Entity extraction is format-based. Supported heading styles include `###` or `##` followed by `Pattern:`, `Concept:`, or `Issue:`; decisions use `## [ADR-NNN]` or `## ADR-NNN:` or `## Decision:`. Over-relaxing patterns can pollute the entity graph.
 
 **Project root:** Memory and hooks should use `PROJECT_ROOT` from `.claude/lib/utils/project-root.cjs` when available; fallback to `process.cwd()` or `CLAUDE_PROJECT_DIR` where documented.
+
+## Code Index Vector Store (LanceDB)
+
+The code indexing system shares the LanceDB infrastructure with the memory system but uses a separate table (`code_index` vs `agent_memory`):
+
+| Table          | Purpose                                     | Location                                           |
+| -------------- | ------------------------------------------- | -------------------------------------------------- |
+| `agent_memory` | Memory embeddings (patterns, gotchas, etc.) | `.claude/context/data/lancedb/agent_memory.lance/` |
+| `code_index`   | Code chunk embeddings for semantic search   | `.claude/context/data/lancedb/code_index.lance/`   |
+
+**BM25 index:** `.claude/context/data/lancedb/bm25-index.json` — text-based search index alongside the vector store.
+
+### Building the index
+
+```bash
+pnpm code:index:reindex    # Full rebuild: BM25 + vector embeddings
+```
+
+This builds both the BM25 text index and LanceDB vector index. Embedding generation uses **subprocess isolation** to work around ONNX Runtime's native memory leak (`embed-subprocess.cjs`). The subprocess is automatically restarted every 50 batches to reclaim leaked native memory. GPU (CUDA) is auto-detected and used when available.
+
+| Config                   | Default     | Notes                                                      |
+| ------------------------ | ----------- | ---------------------------------------------------------- |
+| `LANCEDB_EMBEDDING_MODE` | `fastembed` | Embedding engine (`fastembed` recommended for speed + GPU) |
+| `HYBRID_EMBEDDINGS`      | `on`        | Enable semantic ranking in `pnpm search:code`              |
+| `EMBED_SUBPROCESS`       | `on`        | Subprocess isolation for ONNX memory safety                |
+
+See `.claude/docs/CODE_INDEXING_DESIGN.md` for full architecture.
 
 ## Hook Wiring (What Runs When)
 

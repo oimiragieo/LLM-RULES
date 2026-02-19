@@ -1,9 +1,9 @@
 # Code Indexing and Semantic Search System Design
 
-**Version:** 1.0
-**Status:** DRAFT
+**Version:** 1.1
+**Status:** PRODUCTION
 **Author:** Architect Agent (Task #35)
-**Date:** 2026-01-31
+**Date:** 2026-01-31 (updated 2026-02-19)
 **References:**
 
 - Cursor Architecture: https://towardsdatascience.com/how-cursor-actually-indexes-your-codebase/
@@ -1114,3 +1114,63 @@ const CONFIGURATIONS = {
   },
 };
 ```
+
+---
+
+## Subprocess Embedding Architecture (2026-02-19)
+
+### Problem: ONNX Runtime Native Memory Leak
+
+ONNX Runtime's memory arena allocator pools native memory and never returns it to the OS. Each `Run()` call (each embedding batch) grows the arena. V8's garbage collector cannot reclaim this memory because it is allocated outside the V8 heap via native bindings.
+
+**Impact:** The code indexer OOMed at 32GB after processing only 30 of 2834 files.
+
+**Root cause:** Known upstream bugs:
+
+- [microsoft/onnxruntime#25325](https://github.com/microsoft/onnxruntime/issues/25325) — Node.js binding memory leak after releasing inference session
+- [microsoft/onnxruntime#26831](https://github.com/microsoft/onnxruntime/issues/26831) — Memory not released by ReleaseSession or ReleaseEnv
+- [qdrant/fastembed#570](https://github.com/qdrant/fastembed/issues/570) — Memory leak traced to ONNX Runtime's CPU memory arena
+- FastEmbed does not expose `SessionOptions.enable_cpu_mem_arena` so the leak cannot be mitigated in-process
+
+### Solution: Subprocess Isolation
+
+Embeddings are generated in an isolated child process (`embed-subprocess.cjs`). When the subprocess exits, the OS reclaims ALL native memory including the ONNX arena.
+
+```
+Main Process (index-manager)          Subprocess (embed-subprocess.cjs)
+┌──────────────────────────┐          ┌──────────────────────────┐
+│ Parse files (Piscina)    │          │ Load fastembed + ONNX    │
+│ Chunk code               │  JSON   │ GPU detection (CUDA)     │
+│ Build BM25 index         │◄──IPC──►│ Generate embeddings      │
+│ Write to LanceDB         │  lines  │ Return vectors           │
+│ ~200MB peak memory       │          │ ~500MB (isolated)        │
+└──────────────────────────┘          └──────────────────────────┘
+                                       ↑ Restarted every 50 batches
+                                         to reclaim ONNX arena memory
+```
+
+### Key files
+
+| File                                                     | Purpose                                                                                            |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `.claude/lib/code-indexing/embed-subprocess.cjs`         | Subprocess worker: loads fastembed/transformers, GPU detection, JSON-line IPC                      |
+| `.claude/lib/memory/lancedb-client-impl.cjs`             | `_embedViaSubprocess()`, `_spawnEmbedWorker()`, `_killEmbedWorker()`, micro-batch `addDocuments()` |
+| `.claude/lib/code-indexing/index-manager-operations.cjs` | Backpressure fix, forced Piscina path when embeddings active                                       |
+
+### Configuration
+
+| Env var                      | Default     | Purpose                                     |
+| ---------------------------- | ----------- | ------------------------------------------- |
+| `EMBED_SUBPROCESS`           | `on`        | Enable subprocess embedding isolation       |
+| `EMBED_SUBPROCESS_MAX_CALLS` | `50`        | Batches before worker restart               |
+| `LANCEDB_EMBEDDING_MODE`     | `fastembed` | Embedding engine (fastembed recommended)    |
+| `HYBRID_EMBEDDINGS`          | `on`        | Enable semantic search in hybrid search CLI |
+
+### Performance
+
+| Metric                 | Before (in-process) | After (subprocess)     |
+| ---------------------- | ------------------- | ---------------------- |
+| Peak memory            | 32GB+ OOM           | ~200MB                 |
+| Indexing time (GPU)    | N/A (crashed)       | ~12 min / 2843 files   |
+| Indexing time (CPU)    | N/A (crashed)       | ~17 min / 2843 files   |
+| Heap allocation needed | 32GB+ (still fails) | 4GB (plenty of margin) |

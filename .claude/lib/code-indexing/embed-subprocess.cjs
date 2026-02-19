@@ -80,9 +80,7 @@ async function initFastembed() {
   } catch (e) {
     // If GPU init fails, retry CPU-only
     if (deviceInfo.device === 'gpu') {
-      process.stderr.write(
-        `[embed-worker] GPU init failed (${e.message}), retrying with CPU...\n`
-      );
+      process.stderr.write(`[embed-worker] GPU init failed (${e.message}), retrying with CPU...\n`);
       deviceInfo.device = 'cpu';
       fastembedModel = await fastembed.FlagEmbedding.init(initOptions);
       process.stderr.write('[embed-worker] FastEmbed initialized (CPU fallback)\n');

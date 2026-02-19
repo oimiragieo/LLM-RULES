@@ -78,6 +78,18 @@ your-project/
 3. Point to `.claude/hooks` directory
 4. Enable security hooks
 
+### Step 4: Build Code Index (Recommended)
+
+Build the semantic code search index for concept-level queries:
+
+```bash
+pnpm code:index:reindex    # ~12 min with GPU, ~17 min CPU-only
+```
+
+This creates a BM25 text index + vector embeddings for all source files. Once built, `pnpm search:code "query"` uses hybrid text + semantic ranking. Without this step, text search still works but concept queries (e.g. "authentication flow for refresh tokens") will return poor results.
+
+The indexer uses subprocess isolation to prevent ONNX Runtime memory leaks. GPU (CUDA) is auto-detected. Only ~200MB of main process memory is used regardless of codebase size.
+
 If you need to reset runtime or memory state (e.g., after corruption or drift), run:
 
 ```bash

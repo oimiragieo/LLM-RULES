@@ -282,42 +282,55 @@ class HybridLazyIndexerMethodsB {
   async getEntryPoints() {
     try {
       const rgPath = await this.getRgPath();
-      // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
-      const result = spawnSync(
-        rgPath,
-        [
-          '^export\\s+(default\\s+)?(class|function|interface|type|const)',
-          '-g',
-          '*.js',
-          '-g',
-          '*.ts',
-          '-g',
-          '*.cjs',
-          '-g',
-          '*.mjs',
-          '-n',
-          this.projectRoot,
-        ],
-        { encoding: 'utf8', timeout: 3000, shell: false, windowsHide: true }
-      );
 
-      if (result.error) {
-        throw result.error;
+      // Search both ESM exports and CJS module.exports
+      const patterns = [
+        '^export\\s+(default\\s+)?(class|function|interface|type|const)',
+        '^module\\.exports\\s*=',
+        '^exports\\.',
+      ];
+
+      const allResults = [];
+
+      for (const pattern of patterns) {
+        const result = spawnSync(
+          rgPath,
+          [
+            pattern,
+            '-g',
+            '*.js',
+            '-g',
+            '*.ts',
+            '-g',
+            '*.cjs',
+            '-g',
+            '*.mjs',
+            '-g',
+            '!node_modules/**',
+            '-g',
+            '!.git/**',
+            '-n',
+            this.projectRoot,
+          ],
+          { encoding: 'utf8', timeout: 5000, shell: false, windowsHide: true }
+        );
+
+        if (result.error || result.status > 1) continue;
+        const output = result.stdout || '';
+        allResults.push(...output.split('\n').filter(Boolean));
       }
 
-      const output = result.stdout || '';
-
-      return output
-        .split('\n')
-        .filter(Boolean)
-        .slice(0, 50)
-        .map(line => {
-          const [file, num, ...rest] = line.split(':');
-          return { file, line: parseInt(num), code: rest.join(':').trim() };
-        });
-    } catch (err) {
-      // ripgrep exits with code 1 when no matches - not an error
-      if (err.status === 1) return [];
+      return allResults.slice(0, 50).map(line => {
+        // Handle Windows paths (C:\path\file.cjs:123:code)
+        // Split on :<number>: pattern to avoid breaking on drive letter colon
+        const match = line.match(/^(.+?):(\d+):(.*)$/);
+        if (match) {
+          const rel = path.relative(this.projectRoot, match[1]).replace(/\\/g, '/');
+          return { file: rel, line: parseInt(match[2]), code: match[3].trim() };
+        }
+        return { file: line, line: 0, code: '' };
+      });
+    } catch (_err) {
       return [];
     }
   }
@@ -325,38 +338,40 @@ class HybridLazyIndexerMethodsB {
   async getDependencies() {
     try {
       const rgPath = await this.getRgPath();
-      // SEC-LIB-001 FIX: Use spawnSync with array args to prevent command injection
-      const result = spawnSync(
-        rgPath,
-        [
-          '^import .* from',
-          '-g',
-          '*.js',
-          '-g',
-          '*.ts',
-          '-g',
-          '*.cjs',
-          '-g',
-          '*.mjs',
-          this.projectRoot,
-        ],
-        { encoding: 'utf8', timeout: 3000, shell: false, windowsHide: true }
-      );
 
-      if (result.error) {
-        throw result.error;
-      }
-
-      const output = result.stdout || '';
+      // Search both ESM imports and CJS require() calls.
+      // Use -F (fixed string) for require( to avoid regex escaping hell.
+      const searches = [
+        { args: ['from ', '-g', '*.js', '-g', '*.ts', '-g', '*.mjs'] },
+        { args: ['-F', 'require(', '-g', '*.js', '-g', '*.cjs', '-g', '*.mjs'] },
+      ];
 
       const imports = {};
-      output.split('\n').forEach(line => {
-        const match = line.match(/from ['"]([^'"]+)['"]/);
-        if (match) {
-          const dep = match[1];
-          imports[dep] = (imports[dep] || 0) + 1;
-        }
-      });
+
+      for (const search of searches) {
+        const result = spawnSync(
+          rgPath,
+          [...search.args, '-g', '!node_modules/**', '-g', '!.git/**', this.projectRoot],
+          { encoding: 'utf8', timeout: 5000, shell: false, windowsHide: true }
+        );
+
+        if (result.error || result.status > 1) continue;
+        const output = result.stdout || '';
+
+        output.split('\n').forEach(line => {
+          // Match ESM: from 'module' or from "module"
+          const esmMatch = line.match(/from ['"]([^'"]+)['"]/);
+          if (esmMatch) {
+            imports[esmMatch[1]] = (imports[esmMatch[1]] || 0) + 1;
+            return;
+          }
+          // Match CJS: require('module') or require("module")
+          const cjsMatch = line.match(/require\(['"]([^'"]+)['"]\)/);
+          if (cjsMatch) {
+            imports[cjsMatch[1]] = (imports[cjsMatch[1]] || 0) + 1;
+          }
+        });
+      }
 
       return Object.entries(imports)
         .sort((a, b) => b[1] - a[1])
@@ -369,22 +384,57 @@ class HybridLazyIndexerMethodsB {
   generateMermaid([_tree, entryPoints, deps]) {
     const lines = ['graph TD'];
 
-    // Add entry points as nodes
-    entryPoints.slice(0, 10).forEach((ep, i) => {
-      const name = ep.file
-        .split('/')
-        .pop()
-        .replace(/\.[jt]sx?$/, '');
-      const nodeId = `ep${i}`;
-      lines.push(`  ${nodeId}["${name}"]`);
+    // Group entry points by top-level directory
+    const dirGroups = {};
+    for (const ep of entryPoints.slice(0, 30)) {
+      const parts = (ep.file || '').split('/');
+      const dir = parts.length > 1 ? parts[0] : '(root)';
+      if (!dirGroups[dir]) dirGroups[dir] = [];
+      dirGroups[dir].push(ep);
+    }
+
+    // Create subgraph per directory
+    const dirIds = {};
+    Object.entries(dirGroups).forEach(([dir, eps], gi) => {
+      const safeDir = dir.replace(/[^a-zA-Z0-9_]/g, '_');
+      dirIds[dir] = `dir_${safeDir}`;
+      lines.push(`  subgraph ${dirIds[dir]}["${dir} (${eps.length} exports)"]`);
+      eps.slice(0, 5).forEach((ep, i) => {
+        const name = (ep.file || '')
+          .split('/')
+          .pop()
+          .replace(/\.[jt]sx?$/, '')
+          .replace(/\.cjs$/, '');
+        const nodeId = `ep_${gi}_${i}`;
+        lines.push(`    ${nodeId}["${name}"]`);
+      });
+      lines.push('  end');
     });
 
-    // Add simple connections
-    if (deps.length > 0) {
-      deps.slice(0, 5).forEach(([dep], i) => {
-        lines.push(`  ep0 -->|uses| dep${i}["${dep.split('/').pop() || dep}"]`);
+    // Add top dependencies as external nodes
+    const topDeps = deps.filter(([dep]) => !dep.startsWith('.') && !dep.startsWith('/'));
+    const localDeps = deps.filter(([dep]) => dep.startsWith('.') || dep.startsWith('/'));
+
+    if (topDeps.length > 0) {
+      lines.push('  subgraph ext["External Dependencies"]');
+      topDeps.slice(0, 8).forEach(([dep, count], i) => {
+        const name = dep.split('/').pop() || dep;
+        lines.push(`    ext${i}["${name} (${count})"]`);
       });
+      lines.push('  end');
     }
+
+    // Add local dependency connections (top 5 most-imported local modules)
+    localDeps.slice(0, 5).forEach(([dep, count], i) => {
+      const name = dep
+        .split('/')
+        .pop()
+        .replace(/\.[jt]sx?$/, '')
+        .replace(/\.cjs$/, '');
+      lines.push(`  local${i}(("${name} (${count})")):::local`);
+    });
+
+    lines.push('  classDef local fill:#e8f5e9,stroke:#388e3c');
 
     return lines.join('\n');
   }

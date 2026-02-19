@@ -23,13 +23,7 @@ test('implementation-plan save/load roundtrip', () => {
 });
 
 test('implementation-plan uses safeParseJSON when loading files', () => {
-  const modulePath = path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'lib',
-    'plan',
-    'implementation-plan.cjs'
-  );
+  const modulePath = path.join(PROJECT_ROOT, '.claude', 'lib', 'plan', 'implementation-plan.cjs');
   const src = fs.readFileSync(modulePath, 'utf8');
   assert.match(src, /safeParseJSON/);
 });

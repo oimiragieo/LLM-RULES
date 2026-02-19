@@ -252,61 +252,61 @@ class MemoryVectorStore {
           this._mockMode = false;
           logger.info('FastEmbed will use subprocess isolation (ONNX memory leak workaround)');
         } else {
-        try {
-          const fastembed = require('fastembed');
+          try {
+            const fastembed = require('fastembed');
 
-          // Initialize with GPU support if available
-          const initOptions = {
-            model: fastembed.EmbeddingModel.BGESmallENV15,
-            // FastEmbed handles execution providers automatically
-            // GPU will be used if CUDA is available, otherwise falls back to CPU
-          };
+            // Initialize with GPU support if available
+            const initOptions = {
+              model: fastembed.EmbeddingModel.BGESmallENV15,
+              // FastEmbed handles execution providers automatically
+              // GPU will be used if CUDA is available, otherwise falls back to CPU
+            };
 
-          if (this.device === 'gpu' && this.gpuDetected) {
-            logger.info('FastEmbed initializing with GPU (CUDA) support');
-          } else {
-            logger.info('FastEmbed initializing with CPU');
-          }
+            if (this.device === 'gpu' && this.gpuDetected) {
+              logger.info('FastEmbed initializing with GPU (CUDA) support');
+            } else {
+              logger.info('FastEmbed initializing with CPU');
+            }
 
-          this._fastembedModel = await fastembed.FlagEmbedding.init(initOptions);
-          this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
-          this._mockMode = false;
-          logger.info(
-            `FastEmbed initialized successfully (${this.device === 'gpu' ? 'GPU' : 'CPU'} mode)`
-          );
-        } catch (e) {
-          // Try CPU fallback if GPU initialization fails
-          logger.warn(`FastEmbed initialization failed: ${e.message}`);
+            this._fastembedModel = await fastembed.FlagEmbedding.init(initOptions);
+            this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
+            this._mockMode = false;
+            logger.info(
+              `FastEmbed initialized successfully (${this.device === 'gpu' ? 'GPU' : 'CPU'} mode)`
+            );
+          } catch (e) {
+            // Try CPU fallback if GPU initialization fails
+            logger.warn(`FastEmbed initialization failed: ${e.message}`);
 
-          if (this.device === 'gpu') {
-            logger.info('Retrying FastEmbed initialization with CPU fallback...');
-            try {
-              const fastembed = require('fastembed');
-              this._fastembedModel = await fastembed.FlagEmbedding.init({
-                model: fastembed.EmbeddingModel.BGESmallENV15,
-              });
-              this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
-              this._mockMode = false;
-              this.device = 'cpu'; // Update device after fallback
-              logger.info('FastEmbed initialized with CPU fallback');
-            } catch (cpuErr) {
-              logger.warn('FastEmbed CPU fallback also failed', { error: cpuErr.message });
+            if (this.device === 'gpu') {
+              logger.info('Retrying FastEmbed initialization with CPU fallback...');
+              try {
+                const fastembed = require('fastembed');
+                this._fastembedModel = await fastembed.FlagEmbedding.init({
+                  model: fastembed.EmbeddingModel.BGESmallENV15,
+                });
+                this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
+                this._mockMode = false;
+                this.device = 'cpu'; // Update device after fallback
+                logger.info('FastEmbed initialized with CPU fallback');
+              } catch (cpuErr) {
+                logger.warn('FastEmbed CPU fallback also failed', { error: cpuErr.message });
+                this._fastembedModel = null;
+                this._embeddingStatus = {
+                  status: 'unavailable',
+                  mode: 'fastembed',
+                  reason: cpuErr.message || 'Install optional dependency: pnpm add fastembed',
+                };
+              }
+            } else {
               this._fastembedModel = null;
               this._embeddingStatus = {
                 status: 'unavailable',
                 mode: 'fastembed',
-                reason: cpuErr.message || 'Install optional dependency: pnpm add fastembed',
+                reason: e.message || 'Install optional dependency: pnpm add fastembed',
               };
             }
-          } else {
-            this._fastembedModel = null;
-            this._embeddingStatus = {
-              status: 'unavailable',
-              mode: 'fastembed',
-              reason: e.message || 'Install optional dependency: pnpm add fastembed',
-            };
           }
-        }
         } // end !useSubprocess
       } else if (this.config.embeddingMode === 'off') {
         this.embedder = null;
@@ -359,6 +359,17 @@ class MemoryVectorStore {
         return Array.from(batch[0] || []);
       }
       return [];
+    }
+
+    // Subprocess embedding path supports single-query generation too.
+    // This keeps behavior consistent when fastembed/transformers is configured
+    // for subprocess isolation and no in-process model is loaded.
+    const useSubprocess =
+      process.env.EMBED_SUBPROCESS !== 'off' &&
+      (this.config.embeddingMode === 'fastembed' || this.config.embeddingMode === 'transformers');
+    if (useSubprocess) {
+      const vectors = await this._embedViaSubprocess([text], this.config.embedBatchSize || 32);
+      return Array.isArray(vectors) && Array.isArray(vectors[0]) ? vectors[0] : [];
     }
 
     if (!this.embedder) throw new Error('Embedder not initialized');
@@ -420,9 +431,7 @@ class MemoryVectorStore {
         }
       };
       this._embedProc.stdout.on('data', onData);
-      this._embedProc.stdin.write(
-        JSON.stringify({ action: 'embed', texts, batchSize }) + '\n'
-      );
+      this._embedProc.stdin.write(JSON.stringify({ action: 'embed', texts, batchSize }) + '\n');
     });
   }
 
@@ -1195,6 +1204,7 @@ class MemoryVectorStore {
 
   async close() {
     if (this._shared) return;
+    await this._killEmbedWorker();
     // Best-effort (LanceDB doesn't require explicit close in typical usage)
     this.db = null;
     this.table = null;

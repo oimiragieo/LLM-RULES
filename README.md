@@ -25,15 +25,22 @@ pnpm memory:init
 pnpm agents:registry
 pnpm routing:prototypes
 pnpm agents:catalog
+pnpm code:index:reindex    # builds BM25 + semantic vector index (~12 min with GPU)
 ```
 
-Search immediately (no batch indexing wait):
+Search immediately after indexing:
 
 ```bash
-pnpm search:code "authentication logic"
-pnpm search:structure
+pnpm search:code "authentication logic"   # hybrid text + semantic search
+pnpm search:structure                      # project structure + deps + Mermaid diagram
+pnpm search:tokens .claude/lib             # token budget analysis + refactor recommendations
 pnpm search:file .claude/lib/code-indexing/hybrid-lazy-indexer.cjs 1 60
 ```
+
+Text search (`pnpm search:code`) works instantly even without the full index build.
+Running `code:index:reindex` adds semantic ranking for concept-level queries.
+
+`search:tokens` shows file/directory sizes, token estimates, and recommends splitting oversized source files (>15K tokens) into smaller modules for better AI agent readability.
 
 ## Current Footprint
 
@@ -171,15 +178,23 @@ CI workflows:
 Agent Studio uses a hybrid lazy search model:
 
 - Instant text retrieval via ripgrep (no upfront full indexing)
-- Optional semantic ranking in the background
+- Semantic vector ranking via fastembed (BGE-small) with GPU acceleration
 - Reciprocal Rank Fusion (RRF) to combine lexical and semantic candidates
+- Subprocess embedding isolation to prevent ONNX Runtime memory leaks
 
-Configuration:
+Setup:
 
 ```bash
-HYBRID_EMBEDDINGS=off   # text-only, fastest startup
-HYBRID_EMBEDDINGS=on    # text + semantic ranking (requires LanceDB path)
+# Build the full index (BM25 text + semantic vectors)
+pnpm code:index:reindex    # ~12 min with GPU, ~17 min CPU-only
+
+# Enable semantic search in .env
+HYBRID_EMBEDDINGS=on       # text + semantic ranking (default after setup)
+EMBED_SUBPROCESS=on        # ONNX memory leak workaround (default)
 ```
+
+Without `code:index:reindex`, text search still works but semantic/concept queries
+(e.g. "authentication flow for refresh tokens") will return poor results.
 
 Guidance:
 

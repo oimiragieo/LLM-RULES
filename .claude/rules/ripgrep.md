@@ -11,7 +11,8 @@ paths:
 - `MUST` use raw `rg -F` for exact symbol/literal lookups when speed and determinism matter most
 - `MUST` respect `.gitignore` and default excludes unless explicitly justified
 - `MUST` constrain scope with globs/file types for repo-wide scans
-- `SHOULD` enable semantic mode only when lexical search is weak or intent-heavy
+- `MUST` ensure `pnpm code:index:reindex` has been run before relying on semantic results
+- `MUST` use `rg`/`Grep` (not hybrid search) for exhaustive audit sweeps where completeness matters
 - `SHOULD` prefer smaller, ranked outputs when context/token budget matters
 - `SHOULD` rely on wrapper auto-discovery for binaries (node_modules/.bin, Scoop shims, PATH) before hardcoding paths
 
@@ -69,11 +70,11 @@ ast-grep -p 'function $NAME($$$) { $$$ }' --lang javascript --files-with-matches
     --preview "bat --color=always --style=numbers --line-range=:220 {}"
 ```
 
-## Recommended: Hybrid Lazy Code Search (Instant, No Batch Indexing)
+## Recommended: Hybrid Code Search
 
-Use the hybrid lazy search system for day-to-day code discovery:
+Use the hybrid search system for day-to-day code discovery:
 
-- **Instant**: search works immediately with no warm-up indexing pass
+- **Text search works instantly** with no setup (ripgrep-based BM25)
 - **No upfront indexing**: Search immediately with no multi-hour batch index build
 - **Lazy embeddings**: Semantic vectors update incrementally in background as files are edited
 - **Hybrid scoring**: Reciprocal Rank Fusion (RRF) combines text matches + semantic similarity
@@ -95,25 +96,29 @@ pnpm search:file src/auth.ts 1 50
 
 ### How It Works
 
-1. Pre-prompt hook analyzes repository structure using ripgrep (~0.5s)
-2. `search:code` executes fast text matching via ripgrep
-3. Optional semantic embeddings add similarity-based ranking
-4. Post-edit hook incrementally embeds only changed files
-5. RRF merges text and semantic rankings into a single ordered result set
+1. `pnpm code:index:reindex` builds BM25 text index + LanceDB vector embeddings
+2. Embeddings generated in isolated subprocess (GPU-accelerated, restarted every 50 batches for ONNX memory safety)
+3. `search:code` queries both BM25 (text) and vector (semantic) indexes
+4. RRF merges text and semantic rankings into a single ordered result set
+5. Post-edit hooks can incrementally update changed files
 
 ### Configuration
 
 ```bash
-# Disable semantic search (text-only, fastest)
-HYBRID_EMBEDDINGS=off
-
-# Enable semantic search (requires LanceDB)
+# Semantic search (default: on, requires index build)
 HYBRID_EMBEDDINGS=on
 
-# Disable daemon transport (direct mode)
-HYBRID_SEARCH_DAEMON=off
+# Embedding engine (fastembed recommended, GPU-accelerated)
+LANCEDB_EMBEDDING_MODE=fastembed
 
-# Auto-prewarm daemon at startup
+# Subprocess embedding isolation (ONNX memory leak workaround, default: on)
+EMBED_SUBPROCESS=on
+
+# Disable semantic search (text-only, fastest, no index needed)
+# HYBRID_EMBEDDINGS=off
+
+# Daemon transport for repeated queries
+HYBRID_SEARCH_DAEMON=on
 HYBRID_DAEMON_PREWARM=true
 
 # Daemon idle timeout (ms)
@@ -144,12 +149,13 @@ Expected latency profile on this repository:
 - Warm repeated daemon queries: ~0.18-0.19s
 - Direct mode (`HYBRID_SEARCH_DAEMON=off`): ~0.73s avg for repeated CLI calls
 
-### Comparison with Batch Indexing
+### Index Build Performance
 
-| Approach           | Startup   | First Search        | Memory | Disk   |
-| ------------------ | --------- | ------------------- | ------ | ------ |
-| Old Batch Indexing | 2+ hours  | Instant after index | 8-16GB | 2-5GB  |
-| Hybrid Lazy Search | 0 seconds | ~0.5s               | <500MB | <100MB |
+| Metric                  | With GPU (RTX 4070) | CPU-only |
+| ----------------------- | ------------------- | -------- |
+| Index time (2843 files) | ~12 min             | ~17 min  |
+| Main process memory     | ~200MB              | ~200MB   |
+| Heap allocation needed  | 4GB                 | 4GB      |
 
 ### Measured Performance and Output (This Repo)
 

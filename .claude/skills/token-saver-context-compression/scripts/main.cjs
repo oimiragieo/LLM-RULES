@@ -36,7 +36,8 @@ function runCommand(cmd, args, cwd = PROJECT_ROOT) {
     shell: false,
     env: {
       ...process.env,
-      PYTHONIOENCODING: process.env.PYTHONIOENCODING || 'utf-8',
+      PYTHONIOENCODING: 'utf-8', // Force UTF-8 on Windows (cp1252 breaks on unicode)
+      PYTHONUTF8: '1', // Python 3.15+ UTF-8 mode
     },
   });
 }
@@ -59,10 +60,19 @@ function runSearchQuery(run, query) {
   };
 }
 
+function stripAnsi(str) {
+  // Strip ANSI escape codes and common emoji byte sequences
+  return str
+    .replace(/\x1b\[[0-9;]*m/g, '') // ANSI color codes
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu, '') // Emoji unicode
+    .replace(/[^\x20-\x7E\t]/g, '') // Non-printable
+    .trim();
+}
+
 function normalizeSearchResults(rawText, limit) {
   const lines = String(rawText || '')
     .split(/\r?\n/)
-    .map(line => line.trim())
+    .map(line => stripAnsi(line))
     .filter(Boolean);
 
   const filePattern = /^\d+\.\s+(.+?)\s+\(\d+(\.\d+)?%\)$/;
@@ -95,7 +105,19 @@ function flattenEvidenceStrings(value, bucket = []) {
     return bucket;
   }
   if (typeof value === 'object') {
+    // Python workflow output: extract compressed segments as evidence
+    // Structure: { profile, compressed: { compressed_text, segments: [{ text }] }, evidence_validation }
+    if (value.compressed && Array.isArray(value.compressed.segments)) {
+      for (const seg of value.compressed.segments) {
+        if (seg.text && seg.text.length > 20 && seg.selected !== false) {
+          bucket.push(seg.text.trim());
+        }
+      }
+      if (bucket.length > 0) return bucket;
+    }
+
     const preferredKeys = [
+      'compressed_text',
       'text',
       'content',
       'summary',
@@ -215,6 +237,19 @@ function runTokenSaverWorkflow({ corpusFile, query, mode, failOnInsufficientEvid
   ];
   if (failOnInsufficientEvidence) args.push('--fail-on-insufficient-evidence');
   const proc = runCommand('python', args);
+
+  // Try to parse JSON output even on non-zero exit codes.
+  // Python returns exit 1 for insufficient evidence (valid result, not a crash)
+  // and exit 2 for actual errors (missing input, bad args).
+  const stdout = (proc.stdout || '').trim();
+  if (stdout.startsWith('{')) {
+    try {
+      return { ok: true, data: JSON.parse(stdout) };
+    } catch (_parseErr) {
+      // Fall through to error handling
+    }
+  }
+
   if (proc.status !== 0) {
     return {
       ok: false,
@@ -223,8 +258,9 @@ function runTokenSaverWorkflow({ corpusFile, query, mode, failOnInsufficientEvid
       stderr: proc.stderr || '',
     };
   }
+
   try {
-    return { ok: true, data: JSON.parse(proc.stdout || '{}') };
+    return { ok: true, data: JSON.parse(stdout || '{}') };
   } catch (error) {
     return {
       ok: false,
@@ -280,9 +316,27 @@ function main(input = {}, deps = {}) {
     RUNTIME_DIR,
     `corpus-${Date.now()}-${Math.random().toString(16).slice(2)}.txt`
   );
-  const corpus = hits
-    .map(hit => `FILE: ${hit.file}\n${hit.snippets.join('\n')}`.trim())
-    .join('\n\n---\n\n');
+
+  // Build corpus: for each hit, include file content (not just path)
+  // Semantic search results often have no inline snippets — read the files directly
+  const MAX_FILE_CHARS = 8000; // ~2K tokens per file to keep corpus bounded
+  const corpusParts = [];
+  for (const hit of hits) {
+    let content = hit.snippets.join('\n').trim();
+    if (!content && hit.file) {
+      // Read actual file content for files with no inline snippets
+      try {
+        const filePath = path.isAbsolute(hit.file) ? hit.file : path.join(PROJECT_ROOT, hit.file);
+        const raw = fs.readFileSync(filePath, 'utf8');
+        content = raw.slice(0, MAX_FILE_CHARS);
+        if (raw.length > MAX_FILE_CHARS) content += '\n[... truncated]';
+      } catch (_e) {
+        content = '(file not readable)';
+      }
+    }
+    corpusParts.push(`FILE: ${hit.file}\n${content}`);
+  }
+  const corpus = corpusParts.join('\n\n---\n\n');
   fs.writeFileSync(corpusFile, corpus || String(searchCmd.stdout || ''), 'utf8');
 
   const workflow = runWorkflow({

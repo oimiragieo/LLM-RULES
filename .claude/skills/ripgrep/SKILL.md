@@ -1,7 +1,7 @@
 ---
 name: ripgrep
 description: Enhanced code search with custom ripgrep binary supporting ES module extensions and advanced patterns.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: user
 user_invocable: true
@@ -15,53 +15,210 @@ Enhanced code search with ripgrep binary. NOTE: Prefer `pnpm search:code` for di
 </identity>
 
 <capabilities>
-- **DEPRECATED**: Use `pnpm search:code "query"` instead (hybrid ripgrep + embeddings)
-- Raw ripgrep access for advanced regex patterns (PCRE2 with -P flag)
+- Hybrid code search via `pnpm search:code` (BM25 text + semantic vector ranking)
+- Raw ripgrep for exhaustive pattern sweeps (every match, not ranked top-N)
+- Advanced regex patterns (PCRE2 with -P flag)
 - Custom file type definitions via .ripgreprc
 - Integration with .gitignore and custom ignore patterns
 </capabilities>
 
-## ⚡ RECOMMENDED: Hybrid Lazy Code Search (Instant, No Batch Indexing)
+## ⚡ RECOMMENDED: Hybrid Code Search
 
-Use the hybrid lazy search system for day-to-day code discovery:
+Use the hybrid search system for day-to-day code discovery:
 
-- **Instant**: search works immediately with no warm-up indexing pass
-- **No upfront indexing**: Search immediately with no multi-hour batch index build
-- **Lazy embeddings**: Semantic vectors update incrementally in background as files are edited
+- **Text search works instantly** with no setup (ripgrep-based BM25)
+- **Semantic search** requires a one-time index build: `pnpm code:index:reindex` (~12 min with GPU, ~17 min CPU)
+- **GPU-accelerated** embedding via fastembed (NVIDIA CUDA auto-detected)
+- **Memory-safe**: embeddings run in isolated subprocess to work around ONNX Runtime memory leak
 - **Hybrid scoring**: Reciprocal Rank Fusion (RRF) combines text matches + semantic similarity
+
+### Prerequisites
+
+```bash
+# Build the semantic index (one-time, or after major codebase changes)
+pnpm code:index:reindex
+
+# Verify .env has embeddings enabled (should be default)
+# HYBRID_EMBEDDINGS=on
+# LANCEDB_EMBEDDING_MODE=fastembed
+```
+
+Without the index build, `pnpm search:code` falls back to text-only matching. Concept queries like "authentication flow" will return poor results without embeddings.
 
 ### Search Commands
 
 ```bash
-# Search code instantly (ripgrep-based)
+# Project structure (directory tree + entry points + dependency graph + Mermaid)
+pnpm search:structure
+
+# Token budget analysis (file sizes + token estimates + read/search/compress advice)
+pnpm search:tokens .claude/lib          # directory analysis
+pnpm search:tokens path/to/file.cjs     # single file analysis
+
+# Semantic + text hybrid search (concept discovery, ranked results)
 pnpm search:code "authentication logic"
 pnpm search:code "export class User"
-pnpm search:code "import react"
-
-# View project structure
-pnpm search:structure
 
 # Get file content with line numbers
 pnpm search:file src/auth.ts 1 50
 ```
 
+### `pnpm search:structure` — Know Where Things Are
+
+**Run this FIRST before any edit, refactor, or onboarding task.** It gives a complete map:
+
+1. **Directory Tree** — folder hierarchy up to 3 levels deep (excludes node_modules, .git)
+2. **Entry Points** — all ESM `export` and CJS `module.exports` declarations with file:line references
+3. **Top Dependencies** — most-imported modules (both `import` and `require`) with counts, split by:
+   - `📦` External packages (node:test, path, fs, child_process)
+   - `📁` Local modules (which internal files are imported most — these are the architectural hotspots)
+4. **Mermaid Diagram** — visual dependency graph with:
+   - Directory subgraphs showing export counts per folder
+   - External dependency subgraph
+   - Most-imported local modules highlighted as hub nodes
+
+**How agents should use this:**
+
+- **Before editing**: run `pnpm search:structure` to find which directory owns the code you need to change
+- **To find hotspots**: the `📁` local dependencies with highest counts are the most-connected modules — changes there have the widest blast radius
+- **To find entry points**: the exports list shows which files expose public APIs — start reading there
+- **To understand architecture**: the Mermaid diagram shows which directories are most interconnected
+- **Before refactoring**: the dependency counts tell you how many files will be affected by a rename/move
+
+### `pnpm search:tokens [path]` — Know What Fits in Context
+
+**Run this before deciding HOW to read a file or directory.** It tells you:
+
+- **Token estimates** per file and per directory (~4 chars per token)
+- **Actionable advice** on whether to Read directly, use offset/limit, or use search:code instead
+- **Largest files** that need special handling
+- **Directory rankings** by token size — prioritize which subdirs to explore
+
+```bash
+# Check a specific file
+pnpm search:tokens .claude/lib/memory/lancedb-client-impl.cjs
+# Output: Size: 41.1KB | Tokens: ~10.5K | Advice: △ MEDIUM — use Read with offset/limit
+
+# Check a directory
+pnpm search:tokens .claude/lib
+# Output: 333 files, 2.0MB, ~527K tokens (too large to read all — use search:code)
+
+# Check the whole project
+pnpm search:tokens .
+# Output: 12478 files, 61MB, ~16M tokens with per-directory breakdown
+```
+
+**Token Budget Legend:**
+
+- `✓ OK` (<8K tokens) — safe to `Read` the entire file
+- `△ MEDIUM` (8-32K) — use `Read` with `offset`/`limit` parameters, or `search:file`
+- `⚠ LARGE` (32-100K) — prefer `search:code` over full Read; only read targeted sections
+- `⚠ OVER` (>100K) — MUST use `search:code` or invoke `token-saver-context-compression` skill
+
+**When to invoke `token-saver-context-compression`:**
+
+- Directory total exceeds 100K tokens and you need to understand the whole subsystem
+- File exceeds 32K tokens and you need a summary rather than specific lines
+- You're building a prompt that would exceed context window limits
+
+**Refactor recommendations** — for source code files >15K tokens, the tool recommends splitting:
+
+```bash
+pnpm search:tokens .claude/hooks/routing
+# Output includes:
+#   ✂ REFACTOR RECOMMENDED: user-prompt-unified.core.cjs (18.2K tokens)
+#     Split into ~3 modules of ~8K tokens each:
+#       user-prompt-unified.cjs          — thin facade (re-exports)
+#       user-prompt-unified-impl.cjs     — main logic
+#       user-prompt-unified-helpers.cjs  — extracted helpers
+```
+
+This only applies to source code files (`.js`, `.cjs`, `.mjs`, `.ts`, `.py`), not data files or configs. The pattern follows existing splits in the codebase (e.g., `routing-table.cjs` → `routing-table-data.cjs`, `index-manager.cjs` → `index-manager-operations.cjs`).
+
 ### Search Mode Contract (Deterministic)
 
-| Mode                             | Use when                                          | Latency tendency               | Determinism | Output/token impact             |
-| -------------------------------- | ------------------------------------------------- | ------------------------------ | ----------- | ------------------------------- | -------------------- |
-| `pnpm search:code "query"`       | Concept discovery, unknown implementation paths   | Fast                           | High        | Compact ranked output           |
-| `pnpm search:code "ast:pattern"` | Structural pattern intent (AST shape)             | Moderate                       | High        | Compact + structure-aware       |
-| `pnpm search:structure`          | System map: entrypoints, dependencies, boundaries | Fast                           | High        | Very low                        |
-| `rg -F "literal"`                | Exact symbol/literal lookup and anchor checks     | Fastest                        | Highest     | Potentially large unless scoped |
-| `rga "query"`                    | Non-code assets (pdf/docs/archive)                | Slower than `rg`               | High        | Can be high noise               |
-| `rg                              | rga -> fzf`                                       | Manual narrowing and selection | Interactive | Operator-dependent              | Good human triage UX |
+| Mode                             | Use when                                                   | Latency         | Output                                        |
+| -------------------------------- | ---------------------------------------------------------- | --------------- | --------------------------------------------- |
+| `pnpm search:structure`          | First step: understand project layout, find where to edit  | Fast            | Directory tree + exports + deps + Mermaid     |
+| `pnpm search:tokens [path]`      | Before reading: check if file/dir fits in context          | Fast            | Token estimates + read/search/compress advice |
+| `pnpm search:code "query"`       | Concept discovery, find unknown implementation paths       | ~0.2-0.8s       | Compact ranked top-20                         |
+| `pnpm search:code "ast:pattern"` | Structural pattern intent (AST shape)                      | Moderate        | Compact + structure-aware                     |
+| `rg -F "literal"`                | Exact symbol/literal lookup and anchor checks before edits | Fastest (~35ms) | ALL matches (not ranked)                      |
+| `Grep` (built-in)                | Exhaustive pattern sweeps for audits                       | Fast            | ALL matches with context                      |
+| `rga "query"`                    | Non-code assets (pdf/docs/archive)                         | Slower          | Can be noisy                                  |
 
 Required selection behavior:
 
-- Agents must default to `pnpm search:code` for discovery.
-- Agents must use `rg -F` before edits/refactors to validate exact anchors.
-- Agents should use `ast:` only for explicitly structural requests.
+- **FIRST**: `pnpm search:structure` to orient — know the directory layout and dependency hotspots.
+- **CHECK SIZE**: `pnpm search:tokens` before reading — know if the file fits in context.
+- **THEN**: `pnpm search:code` for concept discovery — find files related to your task.
+- **BEFORE EDITS**: `rg -F` to validate exact anchors — confirm the symbol/function exists where you think.
+- **FOR AUDITS**: `Grep` (built-in) for exhaustive sweeps — need ALL matches, not top-N.
+- **FOR LARGE FILES**: Use `token-saver-context-compression` skill when tokens exceed budget.
 - `fzf` stays optional for human-in-the-loop workflows; do not require it for automation.
+
+### Locate Before You Edit (MANDATORY workflow for agents)
+
+Before writing or editing ANY file, agents must locate it first. Blind edits waste tokens and cause errors.
+
+**Step 1 — Orient** (run once per task):
+
+```bash
+pnpm search:structure
+```
+
+Read the output to understand:
+
+- Which directories exist and what they contain
+- Which modules are most-imported (`📁` local deps with high counts)
+- Where the public APIs are (Entry Points list)
+
+**Step 2 — Check token budget** (before reading files):
+
+```bash
+# Is this file safe to Read in full, or do I need search:code?
+pnpm search:tokens .claude/lib/memory/lancedb-client-impl.cjs
+# Output: △ MEDIUM (10.5K tokens) — use Read with offset/limit
+
+# How big is this directory? Can I read all files?
+pnpm search:tokens .claude/lib/routing
+# If >32K total → use search:code for discovery, don't try to read everything
+```
+
+**Step 3 — Discover** (per subtask):
+
+```bash
+# Find files related to your task concept
+pnpm search:code "hook validation pre-tool"
+```
+
+This returns ranked files most relevant to the concept. Note the file paths.
+
+**Step 4 — Pinpoint** (before each edit):
+
+```bash
+# Confirm exact symbol location with line numbers
+rg -F "validateHookInput" -g "*.cjs" -n
+
+# Read the file to understand context (use offset/limit for MEDIUM+ files)
+pnpm search:file .claude/lib/utils/hook-input.cjs 1 50
+```
+
+**Step 5 — Check blast radius** (before refactors):
+
+```bash
+# How many files import the module you're about to change?
+rg -F "hook-input.cjs" -g "*.cjs" -c
+# If 40+ files import it, consider backward-compatible changes
+```
+
+This workflow prevents:
+
+- Wasting tokens on files too large for context (check tokens first)
+- Editing the wrong file (there may be similarly-named files in different directories)
+- Missing callsites during refactors (rg -c shows exact counts)
+- Breaking high-import modules without knowing the blast radius
+- Triggering context compression unnecessarily (know sizes upfront)
 
 ### Interactive Narrowing with fzf (Operator UX)
 
@@ -108,34 +265,35 @@ ast-grep -p 'function $NAME($$$) { $$$ }' --lang javascript --files-with-matches
 
 ### How It Works
 
-1. Pre-prompt hook analyzes repository structure using ripgrep (~0.5s)
-2. `search:code` executes fast text matching via ripgrep
-3. Optional semantic embeddings add similarity-based ranking
-4. Post-edit hook incrementally embeds only changed files
+1. `pnpm code:index:reindex` builds BM25 text index + LanceDB vector embeddings
+2. Embedding generation runs in an isolated subprocess (GPU-accelerated when available)
+3. Subprocess is restarted every 50 batches to reclaim ONNX native memory leaks
+4. `search:code` queries both BM25 (text) and vector (semantic) indexes
 5. RRF merges text and semantic rankings into a single ordered result set
+6. Post-edit hooks can incrementally update changed files
 
 ### Configuration
 
 ```bash
-# Optional binary overrides (normally auto-detected)
-RG_BIN=/path/to/rg
-AST_GREP_BIN=/path/to/ast-grep
-RGA_BIN=/path/to/rga
-FZF_BIN=/path/to/fzf
-
-# Disable semantic search (text-only, fastest)
-HYBRID_EMBEDDINGS=off
-
-# Enable semantic search (requires LanceDB)
+# Semantic search (default: on after running code:index:reindex)
 HYBRID_EMBEDDINGS=on
 
-# Disable daemon transport (direct CLI execution)
-HYBRID_SEARCH_DAEMON=off
+# Embedding engine (fastembed recommended for speed + GPU support)
+LANCEDB_EMBEDDING_MODE=fastembed
 
-# Auto-prewarm daemon on startup
+# Subprocess isolation for ONNX memory safety (default: on)
+EMBED_SUBPROCESS=on
+
+# Disable semantic search (text-only, fastest, no index needed)
+# HYBRID_EMBEDDINGS=off
+
+# Optional binary overrides (normally auto-detected)
+# RG_BIN=/path/to/rg
+# AST_GREP_BIN=/path/to/ast-grep
+
+# Daemon transport for repeated queries
+HYBRID_SEARCH_DAEMON=on
 HYBRID_DAEMON_PREWARM=true
-
-# Daemon idle timeout in ms (default 600000)
 HYBRID_DAEMON_IDLE_MS=600000
 ```
 
@@ -161,12 +319,15 @@ Expected latency profile on this repository:
 - Warm repeated daemon queries: ~0.18-0.19s
 - Direct mode (`HYBRID_SEARCH_DAEMON=off`): ~0.73s avg for repeated CLI calls
 
-### Comparison with Batch Indexing
+### Index Build Performance
 
-| Approach           | Startup   | First Search        | Memory | Disk   |
-| ------------------ | --------- | ------------------- | ------ | ------ |
-| Old Batch Indexing | 2+ hours  | Instant after index | 8-16GB | 2-5GB  |
-| Hybrid Lazy Search | 0 seconds | ~0.5s               | <500MB | <100MB |
+| Metric                       | With GPU (RTX 4070)           | CPU-only |
+| ---------------------------- | ----------------------------- | -------- |
+| Index time (2843 files)      | ~12 min                       | ~17 min  |
+| Main process memory          | ~200MB                        | ~200MB   |
+| Subprocess memory (isolated) | ~500MB                        | ~300MB   |
+| Heap allocation needed       | 4GB                           | 4GB      |
+| Index size on disk           | ~6MB (BM25) + ~10MB (vectors) | Same     |
 
 ### Measured Performance and Output (This Repo)
 
@@ -252,73 +413,155 @@ Pattern:
 
 #### Scenario 3: Safe Refactor Prep
 
-Goal: enumerate callsites before renaming or behavior changes.
+Goal: enumerate callsites and assess blast radius before renaming or behavior changes.
 
 ```bash
-# 1) Gather broad callsites
+# 1) Check blast radius — how many files import this module?
+pnpm search:structure
+# Look at 📁 local deps: "📁 router-state (22)" = 22 files affected by changes
+
+# 2) Gather broad callsites with semantic search
 pnpm search:code "TaskUpdate completed status workflow"
 
-# 2) Confirm exact callsites and edge usage
-rg -F "TaskUpdate(" -g "*.cjs" -g "*.js" -g "*.ts"
+# 3) Get EXACT callsite inventory (every match, not ranked)
+rg -F "TaskUpdate(" -g "*.cjs" -g "*.js" -g "*.ts" -c
+# Shows count per file — plan your edits across all files
+
+# 4) Verify the specific lines before editing
+rg -F "TaskUpdate(" -g "*.cjs" -n -C 2
 ```
 
 Pattern:
 
-- Hybrid first to find semantic variants.
-- Raw `rg` second for deterministic callsite inventory.
+- `search:structure` first to check dependency counts (blast radius).
+- Hybrid search to find semantic variants you might miss.
+- Raw `rg -c` for exact callsite count per file.
+- Raw `rg -n -C 2` for line numbers + context before making edits.
 
 #### Scenario 4: Security Audit Sweep
 
 Goal: detect risky patterns and confirm exact high-confidence matches.
 
-```bash
-# Concept discovery (broad)
-pnpm search:code "command injection shell true spawn"
+**For exhaustive sweeps (auditing), use `rg` or `Grep` (built-in) as primary tool.**
+Hybrid search returns ranked top-N results, which is great for discovery but can miss matches.
+Security audits need ALL instances of a pattern, not a ranked sample.
 
-# Exact dangerous usage checks
-rg -F "shell: true" -g "*.cjs" -g "*.js"
-rg -F "spawnSync(" -g "*.cjs" -g "*.js"
+```bash
+# EXHAUSTIVE sweep first (every match, not ranked)
+rg -F "shell: true" -g "*.cjs" -g "*.js" -g "*.mjs"
+rg -F "JSON.parse(" -g "*.cjs" -g "*.js" --no-heading
+rg "eval\(|new Function\(" -g "*.cjs" -g "*.js"
+rg -F "child_process" -g "*.cjs" -g "*.js"
+
+# THEN use hybrid for concept discovery (find patterns you didn't think to grep for)
+pnpm search:code "command injection shell execution security"
+pnpm search:code "prototype pollution unsafe parsing"
+
+# Verify specific findings with file-level rg
+rg -F "exec(" .claude/lib/tools/standard-tools.cjs
 ```
 
 Pattern:
 
-- Hybrid surfaces related risky code.
-- Exact `rg` validates actionable matches for remediation.
+- `rg`/`Grep` for exhaustive sweeps where completeness matters (security, compliance).
+- Hybrid search for concept discovery to find patterns you didn't know to grep for.
+- Never rely solely on hybrid top-N results for security claims.
 
 #### Scenario 5: Architecture Onboarding (New Contributor/Agent)
 
-Goal: understand structure before making changes.
+Goal: understand structure and know where to make changes.
 
 ```bash
-# High-level map
+# 1) Get the full project map (directory tree + exports + deps + Mermaid)
 pnpm search:structure
 
-# Focused concept entry points
+# From the output, you'll see:
+#   - Directory tree: which folders exist and their nesting
+#   - Entry points: which files export APIs (with file:line)
+#   - Top dependencies: most-imported local modules (📁) = architectural hotspots
+#     e.g. "📁 memory-manager.cjs (56)" means 56 files import it — high blast radius
+#   - Mermaid diagram: visual module graph
+
+# 2) Drill into subsystems by concept
 pnpm search:code "routing guard task lifecycle"
 pnpm search:code "memory scheduler session context"
+
+# 3) Once you find candidate files, read them
+pnpm search:file .claude/lib/routing/router-state.cjs 1 50
+
+# 4) Before editing, confirm exact locations with rg
+rg -F "resetToRouterMode" -g "*.cjs" -n
 ```
 
 Pattern:
 
-- Use structure first, then concept search by subsystem intent.
+- `search:structure` first — know the landscape before touching anything.
+- Look at `📁` local dependencies with highest counts — those are the modules where changes have the widest impact.
+- Use `search:code` to find files related to your concept.
+- Use `search:file` to read specific files with line numbers.
+- Use `rg -F` to confirm exact symbol locations before editing.
 
-#### Scenario 6: Token-Constrained Agent Workflow
+#### Scenario 6: Codebase Audit / Deep Dive
+
+Goal: systematic audit of a codebase for bugs, security issues, and dead code.
+
+```bash
+# 1) Map the project — identify architectural hotspots FIRST
+pnpm search:structure
+# Key things to note from the output:
+#   - 📁 local deps with high counts = audit priority (most connected = most risk)
+#   - Entry points list = public API surface to review
+#   - Directory tree = scope of what needs auditing
+
+# 2) Exhaustive pattern sweeps with rg (need ALL matches, not top-N)
+rg -F "JSON.parse(" -g "*.cjs" -g "*.js" --no-heading
+rg -F "shell: true" -g "*.cjs" -g "*.js"
+rg "eval\(|new Function\(" -g "*.cjs" -g "*.js"
+rg "TODO|FIXME|HACK|STUB" -g "*.cjs" -g "*.js" -g "*.mjs"
+rg -F "catch" -A1 -g "*.cjs" | rg "^\s*\}"  # empty catch blocks
+
+# 3) Concept discovery for patterns you didn't think to grep
+pnpm search:code "prototype pollution unsafe parsing"
+pnpm search:code "race condition concurrent file write"
+pnpm search:code "hardcoded secret credential password"
+
+# 4) Cross-reference: find what calls a specific module
+pnpm search:code "routing-table-intent"
+rg -F "standard-tools" -g "*.cjs" -c  # exact import count per file
+
+# 5) Check for dead code: find exports that are never imported
+# Compare entry points from search:structure against rg import counts
+rg -F "orchestrator-tool.cjs" -g "*.cjs" -c  # 0 results = dead module
+```
+
+Pattern:
+
+- `search:structure` first to identify hotspots (high-import modules = audit priority).
+- `rg`/`Grep` for exhaustive sweeps (security, dead code, pattern matching).
+- `search:code` for concept discovery (find things you didn't know to grep for).
+- Cross-reference `search:structure` entry points against `rg` import counts to find dead code.
+- Never rely solely on hybrid search for audit completeness; it returns ranked top-N, not all matches.
+
+#### Scenario 7: Token-Constrained Agent Workflow
 
 Goal: minimize prompt/context bloat while maintaining retrieval quality.
 
 ```bash
-# Keep semantic off by default for speed and concise output
-HYBRID_EMBEDDINGS=off pnpm search:code "workflow task completion guard"
+# Default: semantic search on (compact ranked output, good for agents)
+pnpm search:code "workflow task completion guard"
 
-# Enable semantic only when lexical matches are weak
-HYBRID_EMBEDDINGS=on pnpm search:code "why task completion silently fails"
+# For fastest possible response when you know exact terms
+HYBRID_EMBEDDINGS=off pnpm search:code "TaskUpdate completed"
+
+# For intent-heavy queries where exact terms are unknown
+pnpm search:code "why does the task get stuck after agent finishes"
 ```
 
 Pattern:
 
-- Default to `HYBRID_EMBEDDINGS=off`.
-- Turn on embeddings only for intent-heavy or poor lexical queries.
-- If `HYBRID_EMBEDDINGS=off` returns no hits, re-run immediately with `HYBRID_EMBEDDINGS=on`.
+- Default to `HYBRID_EMBEDDINGS=on` (compact ranked output is already token-efficient).
+- Use `HYBRID_EMBEDDINGS=off` override only when exact keyword match is sufficient and speed is critical.
+- Hybrid search output is typically smaller than raw `rg` output (ranked top-N vs all matches).
 
 ### Reusable Query Patterns
 
@@ -348,16 +591,20 @@ This skill provides access to ripgrep (rg) via the `@vscode/ripgrep` npm package
 
 **Optional Config**: `bin/.ripgreprc` (if present, automatically used)
 
-## Why Use This Over Built-in Grep Tool?
+## When to Use What
 
-| Feature                | Ripgrep Skill             | Built-in Grep Tool         |
-| ---------------------- | ------------------------- | -------------------------- |
-| ES Module Support      | ✅ .mjs, .cjs, .mts, .cts | ❌ Limited                 |
-| Performance            | ✅ 10-100x faster         | ⚠️ Slower on large repos   |
-| Gitignore Respect      | ✅ Automatic              | ⚠️ Manual filtering needed |
-| Binary File Detection  | ✅ Automatic              | ❌ None                    |
-| PCRE2 Advanced Regexes | ✅ With `-P` flag         | ❌ Limited                 |
-| Custom Config          | ✅ .ripgreprc support     | ❌ None                    |
+| Tool                 | Best for                                              | Tradeoff                                               |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| `pnpm search:code`   | Concept discovery, ranked results, agent workflows    | Top-N ranked, not exhaustive; needs index for semantic |
+| Built-in `Grep` tool | Exhaustive pattern sweeps, audits, exact counts       | Returns ALL matches; higher token output               |
+| Raw `rg` via Bash    | PCRE2 regex, pipeline integration, `.ripgreprc` types | Requires Bash tool; larger raw output                  |
+| Built-in `Glob` tool | Finding files by name pattern                         | No content search                                      |
+
+**For audits and security sweeps**: prefer `Grep` (built-in) — it returns every match, not ranked top-N. You need completeness, not ranking.
+
+**For discovery and onboarding**: prefer `pnpm search:code` — compact ranked output, semantic understanding, low token pressure.
+
+**For exact symbol lookups before edits**: prefer raw `rg -F` — fastest possible, deterministic.
 
 ## Quick Start Commands
 

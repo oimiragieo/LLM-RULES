@@ -15,9 +15,11 @@ Use this skill to reduce token usage while preserving grounded evidence. This in
 
 ## When to Use
 
-- Context is large or expensive.
-- You need query-targeted compression before synthesis.
-- You need hard evidence sufficiency gating before persisting memory.
+- `pnpm search:tokens` shows a file/directory exceeds 32K tokens
+- Context is large or expensive and you need a compressed summary
+- You need query-targeted compression before synthesis
+- You need hard evidence sufficiency gating before persisting memory
+- You're building a prompt and `search:code` results alone aren't enough context
 
 ## Iron Law
 
@@ -73,6 +75,22 @@ python .claude/skills/token-saver-context-compression/scripts/run_skill_workflow
 - Citation format is unchanged:
   - memory entries become `[mem:xxxxxxxx]`
   - RAG entries remain `[rag:xxxxxxxx]`
+
+## Integration with search:tokens
+
+Use `pnpm search:tokens` to decide when to invoke this skill:
+
+```bash
+# Check if you need compression
+pnpm search:tokens .claude/lib/memory
+# Output: 60 files, 500KB, ~128K tokens ⚠ OVER CONTEXT
+
+# Then compress with a targeted query
+node .claude/skills/token-saver-context-compression/scripts/main.cjs \
+  --query "how does memory persistence work" --mode evidence_aware --limit 10
+```
+
+The tool reads actual file content from search results (not just file paths), compresses via the Python engine, and extracts memory records classified by type (patterns, gotchas, issues, decisions).
 
 ## Requirements
 

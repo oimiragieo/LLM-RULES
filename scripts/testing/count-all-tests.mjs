@@ -95,7 +95,12 @@ export function runCountAllTests(baseDir = process.cwd()) {
     }
   }
 
-  return { testFiles, results, totals: { totalTests, totalPass, totalFail, totalSkip }, failedFiles };
+  return {
+    testFiles,
+    results,
+    totals: { totalTests, totalPass, totalFail, totalSkip },
+    failedFiles,
+  };
 }
 
 export function printSummary(runResult) {

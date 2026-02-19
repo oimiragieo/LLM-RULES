@@ -6,13 +6,25 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 
 async function loadDoctorModule() {
-  const doctorPath = path.join(__dirname, '..', '..', '..', '.claude', 'tools', 'cli', 'doctor.mjs');
+  const doctorPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '.claude',
+    'tools',
+    'cli',
+    'doctor.mjs'
+  );
   return import(pathToFileURL(doctorPath).href);
 }
 
 test('detects unpinned @modelcontextprotocol package args', async () => {
   const doctor = await loadDoctorModule();
-  assert.equal(doctor.hasUnpinnedMcpPackageArg(['-y', '@modelcontextprotocol/server-filesystem']), true);
+  assert.equal(
+    doctor.hasUnpinnedMcpPackageArg(['-y', '@modelcontextprotocol/server-filesystem']),
+    true
+  );
 });
 
 test('does not flag pinned @modelcontextprotocol package args', async () => {

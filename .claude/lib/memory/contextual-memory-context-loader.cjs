@@ -269,7 +269,7 @@ function loadContextSync(memory, options = {}) {
   const gotchasFile = path.join(memoryDir, 'gotchas.json');
   if (!dbGotchasLoaded) {
     const allGotchas = safeParseWithCache(gotchasFile);
-    if (allGotchas) {
+    if (Array.isArray(allGotchas)) {
       const selectedGotchas = allGotchas.slice(-maxItems.gotchas);
       result.gotchas = memory._truncateItems(selectedGotchas, maxChars.gotchas);
       applyAccessStats(result.gotchas, accessStats);
@@ -279,7 +279,7 @@ function loadContextSync(memory, options = {}) {
   const patternsFile = path.join(memoryDir, 'patterns.json');
   if (!dbPatternsLoaded) {
     const allPatterns = safeParseWithCache(patternsFile);
-    if (allPatterns) {
+    if (Array.isArray(allPatterns)) {
       const selectedPatterns = allPatterns.slice(-maxItems.patterns);
       result.patterns = memory._truncateItems(selectedPatterns, maxChars.patterns);
       applyAccessStats(result.patterns, accessStats);
