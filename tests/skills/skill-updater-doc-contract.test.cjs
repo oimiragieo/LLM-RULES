@@ -7,10 +7,6 @@ const fs = require('node:fs');
 
 const skillUpdaterDoc = fs.readFileSync('.claude/skills/skill-updater/SKILL.md', 'utf8');
 const recommendDoc = fs.readFileSync('.claude/skills/recommend-evolution/SKILL.md', 'utf8');
-const summaryWorkflow = fs.readFileSync(
-  '.claude/workflows/skill-updater-skill-workflow.md',
-  'utf8'
-);
 const skillCreatorDoc = fs.readFileSync('.claude/skills/skill-creator/SKILL.md', 'utf8');
 
 test('skill-updater documents workflow contract and risk/checklist sections', () => {
@@ -27,9 +23,9 @@ test('memory protocol docs are cross-platform and avoid shell-specific cat/get-c
   assert.doesNotMatch(skillCreatorDoc, /\bcat\s+\.claude\//i);
 });
 
-test('summary workflow points to yaml source of truth', () => {
-  assert.match(summaryWorkflow, /Source of truth/i);
-  assert.match(summaryWorkflow, /updaters\/skill-updater-workflow\.yaml/i);
+test('skill-updater uses yaml workflow as single source of truth', () => {
+  assert.equal(fs.existsSync('.claude/workflows/skill-updater-skill-workflow.md'), false);
+  assert.match(skillUpdaterDoc, /updaters\/skill-updater-workflow\.yaml/i);
 });
 
 test('skill-creator includes router gap detection guidance', () => {
