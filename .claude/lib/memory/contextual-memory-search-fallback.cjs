@@ -40,11 +40,18 @@ function checkBinaryAvailable(binPath) {
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
     });
-    proc.on('error', () => resolve(false));
-    proc.on('close', code => resolve(code === 0));
-    setTimeout(() => {
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(value);
+    };
+    proc.on('error', () => finish(false));
+    proc.on('close', code => finish(code === 0));
+    const timeout = setTimeout(() => {
       proc.kill();
-      resolve(false);
+      finish(false);
     }, 5000);
   });
 }
