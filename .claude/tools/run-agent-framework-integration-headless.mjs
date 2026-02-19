@@ -174,9 +174,9 @@ function testSchemas() {
     // Check critical schemas
     const criticalSchemas = [
       'plan.schema.json',
-      'project_brief.schema.json',
-      'product_requirements.schema.json',
-      'system_architecture.schema.json',
+      'project-brief.schema.json',
+      'product-requirements.schema.json',
+      'system-architecture.schema.json',
     ];
 
     for (const schema of criticalSchemas) {

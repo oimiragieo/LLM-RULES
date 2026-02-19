@@ -264,14 +264,14 @@ function validateSchemaFiles() {
   checkDirectory(schemasDir, 'schemas directory');
 
   const schemaFiles = [
-    'artifact_manifest.schema.json',
+    'artifact-manifest.schema.json',
     'database_architecture.schema.json',
     'plan.schema.json',
-    'product_requirements.schema.json',
-    'project_brief.schema.json',
-    'system_architecture.schema.json',
-    'test_plan.schema.json',
-    'ux_spec.schema.json',
+    'product-requirements.schema.json',
+    'project-brief.schema.json',
+    'system-architecture.schema.json',
+    'test-plan.schema.json',
+    'ux-spec.schema.json',
   ];
 
   for (const schemaFile of schemaFiles) {

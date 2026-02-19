@@ -509,13 +509,13 @@ function validateSchemas() {
   // Check critical schemas
   const criticalSchemas = [
     'plan.schema.json',
-    'project_brief.schema.json',
-    'product_requirements.schema.json',
-    'system_architecture.schema.json',
+    'project-brief.schema.json',
+    'product-requirements.schema.json',
+    'system-architecture.schema.json',
     'database_architecture.schema.json',
-    'ux_spec.schema.json',
-    'test_plan.schema.json',
-    'artifact_manifest.schema.json',
+    'ux-spec.schema.json',
+    'test-plan.schema.json',
+    'artifact-manifest.schema.json',
   ];
 
   criticalSchemas.forEach(schema => {
