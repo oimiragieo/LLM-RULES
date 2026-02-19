@@ -6,6 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const cp = require('node:child_process');
 
 const audit = require('../../.claude/hooks/session/audit-skill-recency.cjs');
 
@@ -89,4 +90,46 @@ test('audit writes stale-artifacts.json with machine-readable shape', () => {
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('audit CLI writes stale-artifacts.json without --json flag', () => {
+  const root = setupTempProject();
+  try {
+    fs.writeFileSync(
+      path.join(root, '.claude', 'skills', 'sample', 'SKILL.md'),
+      ['---', 'verified: false', '---'].join('\n'),
+      'utf8'
+    );
+
+    const sourceScript = path.join(
+      __dirname,
+      '..',
+      '..',
+      '.claude',
+      'hooks',
+      'session',
+      'audit-skill-recency.cjs'
+    );
+    const copiedScript = path.join(root, '.claude', 'hooks', 'session', 'audit-skill-recency.cjs');
+    fs.mkdirSync(path.dirname(copiedScript), { recursive: true });
+    fs.copyFileSync(sourceScript, copiedScript);
+
+    const run = cp.spawnSync(process.execPath, [copiedScript], { cwd: root, encoding: 'utf8' });
+    assert.equal(run.status, 0, run.stderr || run.stdout);
+
+    const runtimePath = path.join(root, '.claude', 'context', 'runtime', 'stale-artifacts.json');
+    assert.equal(fs.existsSync(runtimePath), true);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('isLikelyIso8601 accepts strict UTC ISO and rejects boundary invalid formats', () => {
+  assert.equal(audit.isLikelyIso8601('2026-02-18T00:00:00.000Z'), true);
+  assert.equal(audit.isLikelyIso8601('2026-02-18T00:00:00Z'), true);
+  assert.equal(audit.isLikelyIso8601('2026-02-18T00:00:00+00:00'), false);
+  assert.equal(audit.isLikelyIso8601('2026-02-18'), false);
+  assert.equal(audit.isLikelyIso8601('2026-2-18T00:00:00Z'), false);
+  assert.equal(audit.isLikelyIso8601('"2026-02-18T00:00:00.000Z"'), false);
+  assert.equal(audit.isLikelyIso8601('last-week'), false);
 });

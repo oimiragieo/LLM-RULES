@@ -808,8 +808,12 @@ await queueCrossCreatorReview('skill', '.claude/skills/<category>/<skill-name>/S
 
 **Before starting:**
 
+Read `.claude/context/memory/learnings.md` using the `Read` tool.
+
+If you need a truncated preview in scripts, use Node.js (cross-platform):
+
 ```bash
-cat .claude/context/memory/learnings.md
+node -e "const fs=require('fs');const p='.claude/context/memory/learnings.md';const t=fs.existsSync(p)?fs.readFileSync(p,'utf8'):'';console.log(t.split(/\\r?\\n/).slice(0,120).join('\\n'));"
 ```
 
 Check for:

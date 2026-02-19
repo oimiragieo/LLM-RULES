@@ -175,7 +175,7 @@ function auditArtifacts(options = {}) {
 if (require.main === module) {
   const args = process.argv.slice(2);
   const jsonMode = args.includes('--json');
-  const result = auditArtifacts({ json: jsonMode, writeRuntimeFile: jsonMode });
+  const result = auditArtifacts({ json: jsonMode, writeRuntimeFile: true });
   if (jsonMode) {
     console.log(JSON.stringify(result, null, 2));
   }

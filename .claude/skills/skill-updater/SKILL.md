@@ -174,7 +174,7 @@ Skill({ skill: 'recommend-evolution' });
 - **Reflection trigger:** repeated low rubric scores tied to one skill, stale references, failing update hooks/tests
 - **EVOLVE trigger:** request maps to existing skill but requires material refresh instead of net-new skill
 - **Manual trigger:** user requests audit/refresh directly
-- **Stale trigger:** `audit-skill-recency --json` identifies stale artifacts -> recommend-evolution (`trigger: stale_skill`) -> evolution-orchestrator -> skill-updater
+- **Stale trigger:** `audit-skill-recency` writes `.claude/context/runtime/stale-artifacts.json` -> reflection ingest queues recommend-evolution (`trigger: stale_skill`) -> evolution-orchestrator -> skill-updater
 
 ## Token Saver Invocation Rule
 
