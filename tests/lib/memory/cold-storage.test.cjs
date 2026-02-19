@@ -259,3 +259,41 @@ test('searchCold - returns matching entries from cold jsonl files', () => {
 
   cleanupTempDir(testDir);
 });
+
+test('archiveWarmToCold - appends without reading existing cold file content', () => {
+  const testDir = createTempDir();
+  const archiveDir = path.join(testDir, 'archive');
+  const coldDir = path.join(archiveDir, 'cold');
+  fs.mkdirSync(coldDir, { recursive: true });
+
+  const oldDate = new Date();
+  oldDate.setDate(oldDate.getDate() - 45);
+  const oldMonth = oldDate.toISOString().slice(0, 7);
+
+  // Seed an existing cold file so archive path uses append behavior.
+  const coldFile = path.join(coldDir, `cold-${oldMonth}.jsonl`);
+  fs.writeFileSync(coldFile, JSON.stringify({ title: 'seed', content: 'seed' }) + '\n', 'utf8');
+
+  const oldArchive = path.join(archiveDir, `issues-${oldMonth}.md`);
+  fs.writeFileSync(
+    oldArchive,
+    `## Archived issue\n\n**Date:** ${oldDate.toISOString().slice(0, 10)}\n\nBody\n`,
+    'utf8'
+  );
+
+  const originalReadFileSync = fs.readFileSync;
+  fs.readFileSync = function patchedReadFileSync(targetPath, ...args) {
+    if (path.resolve(targetPath) === path.resolve(coldFile)) {
+      throw new Error('archiveWarmToCold must not read existing cold file before append');
+    }
+    return originalReadFileSync.call(fs, targetPath, ...args);
+  };
+
+  try {
+    const result = coldStorage.archiveWarmToCold(testDir, { maxAgeDays: 30 });
+    assert.ok(result.archivedFiles >= 1, 'Should archive file into existing cold jsonl');
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+    cleanupTempDir(testDir);
+  }
+});

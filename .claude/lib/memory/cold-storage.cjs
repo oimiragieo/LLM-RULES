@@ -95,13 +95,11 @@ function archiveWarmToCold(memoryDir, opts = {}) {
     // Append entries to cold JSONL (one JSON object per line)
     const jsonlEntries = sections.map(section => JSON.stringify(section)).join('\n') + '\n';
 
-    // Append to cold file (or create if doesn't exist)
+    // Append to cold file (or create if doesn't exist).
+    // Avoid read-modify-write on existing files to reduce race windows.
     if (fs.existsSync(coldFile)) {
-      // Append
-      const existing = fs.readFileSync(coldFile, 'utf8');
-      atomicWriteSync(coldFile, existing + jsonlEntries, 'utf8');
+      fs.appendFileSync(coldFile, jsonlEntries, 'utf8');
     } else {
-      // Create new
       atomicWriteSync(coldFile, jsonlEntries, 'utf8');
     }
 
