@@ -68,7 +68,7 @@ function searchWithRipgrep(memory, query, files, limit) {
       }
     }
 
-    if (args.length === 5) return [];
+    if (args.length <= 5) return [];
 
     return new Promise(resolve => {
       const proc = spawn(rgPath, args, {

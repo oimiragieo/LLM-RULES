@@ -25,7 +25,7 @@ function runValidation(args = []) {
   return new Promise((resolve, reject) => {
     const child = spawn('node', ['scripts/validate-rule-index-paths.mjs', ...args], {
       cwd: ROOT,
-      shell: true,
+      shell: false,
     });
 
     let stdout = '';

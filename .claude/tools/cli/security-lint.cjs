@@ -21,7 +21,7 @@ const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 // =============================================================================
 // Configuration
@@ -279,26 +279,31 @@ const SECURITY_RULES = [
 function getFilesToScan(args) {
   // Check for --staged flag (git staged files)
   if (args.includes('--staged')) {
-    try {
-      const output = execSync('git diff --cached --name-only --diff-filter=ACMR', {
-        encoding: 'utf8',
-      });
-      return output.trim().split('\n').filter(Boolean);
-    } catch (err) {
-      console.error('Error getting staged files:', err.message);
+    const result = spawnSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMR'], {
+      encoding: 'utf8',
+      shell: false,
+    });
+    if (result.status !== 0) {
+      console.error('Error getting staged files:', result.stderr || `exit ${result.status}`);
       return [];
     }
+    return String(result.stdout || '')
+      .trim()
+      .split('\n')
+      .filter(Boolean);
   }
 
   // Check for --all flag (all tracked files)
   if (args.includes('--all')) {
-    try {
-      const output = execSync('git ls-files', { encoding: 'utf8' });
-      return output.trim().split('\n').filter(Boolean);
-    } catch (err) {
-      console.error('Error getting tracked files:', err.message);
+    const result = spawnSync('git', ['ls-files'], { encoding: 'utf8', shell: false });
+    if (result.status !== 0) {
+      console.error('Error getting tracked files:', result.stderr || `exit ${result.status}`);
       return [];
     }
+    return String(result.stdout || '')
+      .trim()
+      .split('\n')
+      .filter(Boolean);
   }
 
   // Specific files provided

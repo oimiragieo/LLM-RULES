@@ -8,7 +8,7 @@
  * Usage: node scripts/verify-dependencies.mjs [--fix]
  */
 
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
@@ -85,7 +85,7 @@ async function checkRipgrep() {
       return { ok: false, error: `Binary not found at ${rgPath}` };
     }
     // Try to run it
-    execSync(`"${rgPath}" --version`, { stdio: 'ignore' });
+    execFileSync(rgPath, ['--version'], { stdio: 'ignore', shell: false });
     return { ok: true, path: rgPath };
   } catch (error) {
     return { ok: false, error: error.message };
@@ -94,7 +94,7 @@ async function checkRipgrep() {
 
 async function checkAstgrep() {
   try {
-    execSync('ast-grep --version', { stdio: 'ignore' });
+    execFileSync('ast-grep', ['--version'], { stdio: 'ignore', shell: false });
     return { ok: true };
   } catch {
     // Check if installed locally

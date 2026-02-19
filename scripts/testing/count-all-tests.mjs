@@ -1,11 +1,25 @@
 #!/usr/bin/env node
-import { execSync } from 'child_process';
-import { readdirSync } from 'fs';
+import { spawnSync } from 'child_process';
+import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
-const testFiles = readdirSync('tests')
-  .filter(f => f.endsWith('.test.cjs') || f.endsWith('.test.mjs'))
-  .map(f => join('tests', f));
+function walkTests(dir) {
+  const files = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    const stat = statSync(full);
+    if (stat.isDirectory()) {
+      files.push(...walkTests(full));
+      continue;
+    }
+    if (name.endsWith('.test.cjs') || name.endsWith('.test.mjs')) {
+      files.push(full);
+    }
+  }
+  return files;
+}
+
+const testFiles = walkTests('tests');
 
 let totalTests = 0;
 let totalPass = 0;
@@ -17,21 +31,30 @@ const results = [];
 
 for (const file of testFiles) {
   try {
-    const output = execSync(`node --test "${file}" 2>&1`, { encoding: 'utf-8' });
+    const result = spawnSync(process.execPath, ['--test', file], {
+      encoding: 'utf-8',
+      shell: false,
+    });
+    const output = `${result.stdout || ''}\n${result.stderr || ''}`;
     const testsMatch = output.match(/# tests (\d+)/);
     const passMatch = output.match(/# pass (\d+)/);
     const failMatch = output.match(/# fail (\d+)/);
     const skipMatch = output.match(/# skip(?:ped)? (\d+)/);
 
-    const tests = testsMatch ? parseInt(testsMatch[1]) : 0;
-    const pass = passMatch ? parseInt(passMatch[1]) : 0;
-    const fail = failMatch ? parseInt(failMatch[1]) : 0;
-    const skip = skipMatch ? parseInt(skipMatch[1]) : 0;
+    const tests = testsMatch ? parseInt(testsMatch[1], 10) : 0;
+    const pass = passMatch ? parseInt(passMatch[1], 10) : 0;
+    const fail = failMatch ? parseInt(failMatch[1], 10) : 0;
+    const skip = skipMatch ? parseInt(skipMatch[1], 10) : 0;
 
     totalTests += tests;
     totalPass += pass;
     totalFail += fail;
     totalSkip += skip;
+
+    if (result.status !== 0) {
+      console.error(`Error running ${file}: exit ${result.status}`);
+      failedFiles.push(file.replace(/^tests[\\/]/, ''));
+    }
 
     results.push({
       file: file.replace(/^tests[\\/]/, ''),
@@ -40,10 +63,10 @@ for (const file of testFiles) {
       fail,
       skip,
       passRate: tests > 0 ? ((pass / tests) * 100).toFixed(1) : '0.0',
+      error: result.status !== 0,
     });
   } catch (error) {
     console.error(`Error running ${file}:`, error.message);
-    // Track failed files - they count as 0 passing tests
     failedFiles.push(file.replace(/^tests[\\/]/, ''));
     results.push({
       file: file.replace(/^tests[\\/]/, ''),
@@ -72,7 +95,7 @@ results
 
 console.log('|-----------|-------|------|------|------|-----------|');
 console.log(
-  `| **TOTAL** | **${totalTests}** | **${totalPass}** | **${totalFail}** | **${totalSkip}** | **${((totalPass / totalTests) * 100).toFixed(1)}%** |`
+  `| **TOTAL** | **${totalTests}** | **${totalPass}** | **${totalFail}** | **${totalSkip}** | **${totalTests > 0 ? ((totalPass / totalTests) * 100).toFixed(1) : '0.0'}%** |`
 );
 
 console.log(`\n## Summary Stats\n`);

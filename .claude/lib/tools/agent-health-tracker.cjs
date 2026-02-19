@@ -131,6 +131,7 @@ class AgentHealthTracker {
     }
 
     // Update counters
+    const previousSuccessCount = agent.health.successCount;
     agent.health.successCount++;
     agent.health.consecutiveFailures = 0;
     agent.health.lastSuccessAt = new Date().toISOString();
@@ -138,13 +139,14 @@ class AgentHealthTracker {
 
     // Update execution time (rolling average)
     if (executionMs !== null) {
-      const total = agent.health.successCount + agent.health.failureCount;
       const currentAvg = agent.health.averageExecutionMs || 0;
       // Calculate new average (weighted)
-      if (total === 1) {
+      if (previousSuccessCount === 0) {
         agent.health.averageExecutionMs = executionMs;
       } else {
-        agent.health.averageExecutionMs = (currentAvg * (total - 1) + executionMs) / total;
+        const newSuccessCount = previousSuccessCount + 1;
+        agent.health.averageExecutionMs =
+          (currentAvg * previousSuccessCount + executionMs) / newSuccessCount;
       }
     }
 
