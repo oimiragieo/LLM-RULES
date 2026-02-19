@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  tar: '>=7.5.7'
+  tar: 7.5.8
   minimatch: '>=10.2.1'
 
 importers:
@@ -2550,8 +2550,8 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
-  tar@7.5.7:
-    resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
+  tar@7.5.8:
+    resolution: {integrity: sha512-SYkBtK99u0yXa+IWL0JRzzcl7RxNpvX/U08Z+8DKnysfno7M+uExnTZH8K+VGgShf2qFPKtbNr9QBl8n7WBP6Q==}
     engines: {node: '>=18'}
 
   test-exclude@6.0.0:
@@ -4243,7 +4243,7 @@ snapshots:
       '@huggingface/hub': 2.8.1
       onnxruntime-node: 1.21.0
       progress: 2.0.3
-      tar: 7.5.7
+      tar: 7.5.8
 
   fb-watchman@2.0.2:
     dependencies:
@@ -4965,7 +4965,7 @@ snapshots:
     dependencies:
       global-agent: 3.0.0
       onnxruntime-common: 1.21.0
-      tar: 7.5.7
+      tar: 7.5.8
 
   onnxruntime-web@1.14.0:
     dependencies:
@@ -5350,7 +5350,7 @@ snapshots:
       - bare-abort-controller
       - react-native-b4a
 
-  tar@7.5.7:
+  tar@7.5.8:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
