@@ -9,6 +9,8 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord, WebSearch, Web
 args: '--skill <name-or-path> [--trigger reflection|evolve|manual|stale_skill] [--mode plan|execute]'
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Skill Updater
@@ -149,7 +151,43 @@ Create RED/GREEN/REFACTOR/VERIFY plan for the target skill:
    - `node .claude/tools/cli/generate-agent-registry.cjs` (if agent skill arrays changed)
    - targeted tests + lint for touched files
 
-### Step 5: Integration + Evolution Recording
+### Step 5: TDD Refresh Backlog (continued)
+
+Run post-update integration after TDD changes:
+
+```bash
+node .claude/tools/cli/run-skill-updates.cjs --skill <name> --json
+```
+
+### Step 6: Enterprise Bundle Validation
+
+1. Run `validateEnterpriseBundle(skillName)` to check completeness:
+
+```javascript
+const { validateEnterpriseBundle } = require('.claude/lib/creators/enterprise-bundle-validator.cjs');
+const bundle = validateEnterpriseBundle(skillName, projectRoot);
+// bundle: { complete, missing, existing, score, scoreNum, scoreMax }
+```
+
+2. If score < 100%: run `scaffoldMissingComponents(skillName)` to generate missing pieces:
+
+```javascript
+const { scaffoldMissingComponents } = require('.claude/lib/creators/enterprise-bundle-scaffolder.cjs');
+const scaffold = scaffoldMissingComponents(skillName, projectRoot);
+// scaffold: { created: string[], skipped: string[] }
+```
+
+3. Log created components in TaskUpdate metadata.
+4. Run integration validation on new components.
+
+### Step 7: Cascade Analysis
+
+- Check if skill gained new tool capabilities → trigger agent-updater for assigned agents
+- Check if skill gained a new domain → trigger recommend-evolution for potential new agent
+- Check if skill needs a dedicated workflow → trigger workflow-creator recommendation
+- Use `findAssignedAgents(skillName, projectRoot)` from `run-skill-updates.cjs` for cascade detection
+
+### Step 8: Integration + Evolution Recording
 
 1. Update references:
 
@@ -175,6 +213,12 @@ Skill({ skill: 'recommend-evolution' });
 - **EVOLVE trigger:** request maps to existing skill but requires material refresh instead of net-new skill
 - **Manual trigger:** user requests audit/refresh directly
 - **Stale trigger:** `audit-skill-recency` writes `.claude/context/runtime/stale-artifacts.json` -> reflection ingest queues recommend-evolution (`trigger: stale_skill`) -> evolution-orchestrator -> skill-updater
+
+### Trigger Taxonomy Note
+
+`skill-updater` uses a **caller-oriented trigger taxonomy** (`reflection`, `evolve`, `manual`, `stale_skill`) to represent initiation context.
+
+`recommend-evolution` uses a **cause-oriented trigger taxonomy** (`repeated_error`, `no_agent`, `integration_gap`, `user_request`, `rubric_regression`, `stale_skill`) to represent root cause classification.
 
 ## Token Saver Invocation Rule
 

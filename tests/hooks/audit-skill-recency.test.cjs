@@ -92,6 +92,28 @@ test('audit writes stale-artifacts.json with machine-readable shape', () => {
   }
 });
 
+test('auditArtifacts writes stale-artifacts.json by default (opt-out via writeRuntimeFile=false)', () => {
+  const root = setupTempProject();
+  try {
+    fs.writeFileSync(
+      path.join(root, '.claude', 'skills', 'sample', 'SKILL.md'),
+      ['---', 'verified: false', '---'].join('\n'),
+      'utf8'
+    );
+
+    const result = audit.auditArtifacts({ projectRoot: root, json: true });
+    assert.equal(result.unverified.length, 1);
+    const runtimePath = path.join(root, '.claude', 'context', 'runtime', 'stale-artifacts.json');
+    assert.equal(fs.existsSync(runtimePath), true);
+
+    fs.rmSync(runtimePath, { force: true });
+    audit.auditArtifacts({ projectRoot: root, json: true, writeRuntimeFile: false });
+    assert.equal(fs.existsSync(runtimePath), false);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('audit CLI writes stale-artifacts.json without --json flag', () => {
   const root = setupTempProject();
   try {

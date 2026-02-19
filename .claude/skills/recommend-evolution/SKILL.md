@@ -8,6 +8,8 @@ user_invocable: true
 tools: [Read, Write, Edit, Skill]
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Recommend Evolution
@@ -39,6 +41,12 @@ Evolution recommendation skill for reflection/planning agents.
 - Recommendation-vs-integration decision branching
 - Dual recording mode: JSONL runtime queue + reflection report block
 </capabilities>
+
+## Trigger Taxonomy Note
+
+`recommend-evolution` uses a **cause-oriented trigger taxonomy** (`repeated_error`, `no_agent`, `integration_gap`, `user_request`, `rubric_regression`, `stale_skill`, `other`).
+
+This intentionally differs from `skill-updater`, which uses a **caller-oriented trigger taxonomy** (`reflection`, `evolve`, `manual`, `stale_skill`) to describe who/what initiated the update path.
 
 <instructions>
 <execution_process>

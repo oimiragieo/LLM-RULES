@@ -84,7 +84,7 @@ function writeRuntimeArtifact(projectRoot, payload) {
 function auditArtifacts(options = {}) {
   const projectRoot = options.projectRoot || PROJECT_ROOT;
   const jsonMode = options.json === true;
-  const writeRuntimeFile = options.writeRuntimeFile === true;
+  const writeRuntimeFile = options.writeRuntimeFile !== false;
   const skillFiles = collectSkillFiles(projectRoot);
   const agentFiles = collectAgentFiles(projectRoot);
 

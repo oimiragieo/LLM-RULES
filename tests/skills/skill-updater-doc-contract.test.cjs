@@ -32,3 +32,8 @@ test('skill-creator includes router gap detection guidance', () => {
   assert.match(skillCreatorDoc, /Router Gap Detection/i);
   assert.match(skillCreatorDoc, /no matching agent\/skill/i);
 });
+
+test('trigger taxonomy cross-reference is documented between recommend-evolution and skill-updater', () => {
+  assert.match(recommendDoc, /cause-oriented trigger taxonomy/i);
+  assert.match(skillUpdaterDoc, /caller-oriented trigger taxonomy/i);
+});
