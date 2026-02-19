@@ -12,6 +12,16 @@ const { getCurrentContextName, getCurrentModeNames } = require(
 const RUNTIME_DIR = path.join(__dirname, '..', '..', '..', '.claude', 'context', 'runtime');
 const CURRENT_CONTEXT_PATH = path.join(RUNTIME_DIR, 'current-context.json');
 const CURRENT_MODES_PATH = path.join(RUNTIME_DIR, 'current-modes.json');
+const RUNTIME_CONTEXT_MODULE_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '.claude',
+  'lib',
+  'config',
+  'resolve-runtime-context.cjs'
+);
 
 function readFileOrNull(filePath) {
   if (!fs.existsSync(filePath)) return null;
@@ -130,4 +140,9 @@ test('resolve runtime context returns empty when no files or env', () => {
     if (prevEnvContext !== undefined) process.env.AGENT_STUDIO_CONTEXT = prevEnvContext;
     if (prevEnvModes !== undefined) process.env.AGENT_STUDIO_MODES = prevEnvModes;
   }
+});
+
+test('resolve-runtime-context uses safeParseJSON for runtime files', () => {
+  const src = fs.readFileSync(RUNTIME_CONTEXT_MODULE_PATH, 'utf8');
+  assert.ok(src.includes('safeParseJSON'), 'resolve-runtime-context should use safeParseJSON');
 });

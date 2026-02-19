@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const CURRENT_CONTEXT_PATH = path.join(RUNTIME_DIR, 'current-context.json');
@@ -12,7 +13,8 @@ const CURRENT_MODES_PATH = path.join(RUNTIME_DIR, 'current-modes.json');
 function readJsonFile(filePath) {
   if (!fs.existsSync(filePath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const raw = fs.readFileSync(filePath, 'utf8');
+    return safeParseJSON(raw, null, null, null);
   } catch (err) {
     console.warn(`[context-mode] Failed to read ${filePath}: ${err.message}`);
     return null;
