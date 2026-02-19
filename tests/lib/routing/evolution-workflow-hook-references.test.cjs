@@ -7,6 +7,8 @@ const fs = require('node:fs');
 const files = [
   '.claude/workflows/core/evolution-workflow.md',
   '.claude/docs/@EVOLUTION_WORKFLOW.md',
+  '.claude/context/artifacts/diagrams/03-hook-system-flow.md',
+  '.claude/context/artifacts/diagrams/05-evolve-state-machine.md',
 ];
 
 const forbidden = ['evolution-trigger-detector.cjs', 'evolution-audit.cjs'];

@@ -226,14 +226,11 @@ Triggered when user submits a prompt, before any processing.
 
 ```
 hooks/
-├── evolution/           # Evolution workflow enforcement (6 hooks)
+├── evolution/           # Evolution workflow enforcement (4 hooks)
 │   ├── conflict-detector.cjs
-│   ├── evolution-audit.cjs
 │   ├── evolution-state-guard.cjs
-│   ├── evolution-trigger-detector.cjs
 │   ├── quality-gate-validator.cjs
 │   ├── research-enforcement.cjs
-│   └── unified-evolution-guard.cjs
 ├── memory/              # Memory management (active hooks)
 │   ├── format-memory.cjs
 │   ├── memory-health-check.cjs

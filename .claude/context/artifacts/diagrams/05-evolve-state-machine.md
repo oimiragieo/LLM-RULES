@@ -144,12 +144,12 @@ flowchart LR
 
     subgraph Hooks["Enforcement Hooks"]
         direction TB
-        H1[evolution-trigger-detector.cjs<br/>Detects evolution keywords]
+        H1[user-prompt-unified.core.cjs<br/>Detects evolution keywords]
         H2[conflict-detector.cjs<br/>Checks naming conflicts]
         H3[research-enforcement.cjs<br/>BLOCKS without research]
         H4[evolution-state-guard.cjs<br/>Enforces state machine]
         H5[quality-gate-validator.cjs<br/>Validates completeness]
-        H6[evolution-audit.cjs<br/>Logs all evolutions]
+        H6[unified-reflection-handler.cjs<br/>Ingests stale artifacts into evolution queue]
     end
 
     subgraph States["State File"]
