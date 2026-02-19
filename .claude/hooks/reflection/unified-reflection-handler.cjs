@@ -26,6 +26,10 @@ const { EventTypes } = require('../../lib/events/event-types.cjs');
 const routerState = require('../../lib/routing/router-state.cjs');
 const { parseAndValidateTaskUpdate } = require('../../lib/routing/task-update-contract.cjs');
 const taskClaimLedger = require('../../lib/routing/task-claim-ledger.cjs');
+const {
+  generateAndPersistDispatchPlan,
+  DEFAULT_DISPATCH_PATH,
+} = require('../../lib/evolution/evolution-request-router.cjs');
 
 const {
   gatherSessionInsights: gatherSessionInsightsBase,
@@ -262,6 +266,10 @@ function ingestStaleArtifactRecommendations(options = {}) {
       trigger: 'stale_skill',
       evidence: `${type} ${name} flagged as ${status} by stale-artifacts audit (${timestamp}).`,
       suggestedArtifactType: type === 'agent' ? 'agent' : 'skill',
+      targetArtifact: {
+        type,
+        name,
+      },
       summary: `Refresh ${type} ${name} due to ${status} verification state.`,
       status: 'proposed',
     };
@@ -315,6 +323,13 @@ async function main() {
 
     const staleIngest = ingestStaleArtifactRecommendations();
     outcome.staleSkillRecommendations = staleIngest.created || 0;
+    const dispatchPlan = generateAndPersistDispatchPlan({
+      queuePath: EVOLUTION_REQUESTS_FILE,
+      outputPath: DEFAULT_DISPATCH_PATH,
+    });
+    outcome.evolutionDispatchActions = Array.isArray(dispatchPlan?.actions)
+      ? dispatchPlan.actions.length
+      : 0;
     outcome.eventType = eventType;
 
     switch (eventType) {

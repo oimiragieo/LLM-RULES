@@ -13,13 +13,17 @@
     "status"
   ],
   "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 4
+    },
     "timestamp": {
       "type": "string",
       "format": "date-time"
     },
     "source": {
       "type": "string",
-      "enum": ["reflection-agent", "planner", "architect", "router", "other"]
+      "enum": ["reflection-agent", "recommend-evolution", "planner", "architect", "router", "other"]
     },
     "trigger": {
       "type": "string",
@@ -29,6 +33,7 @@
         "integration_gap",
         "user_request",
         "rubric_regression",
+        "stale_skill",
         "other"
       ]
     },
@@ -38,7 +43,7 @@
     },
     "suggestedArtifactType": {
       "type": ["string", "null"],
-      "enum": ["skill", "agent", "workflow", "hook", null]
+      "enum": ["skill", "agent", "workflow", "hook", "schema", "command", null]
     },
     "summary": {
       "type": "string",
@@ -47,6 +52,21 @@
     "status": {
       "type": "string",
       "enum": ["proposed"]
+    },
+    "targetArtifact": {
+      "type": "object",
+      "required": ["type", "name"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["skill", "agent", "workflow", "hook", "schema", "command", "unknown"]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

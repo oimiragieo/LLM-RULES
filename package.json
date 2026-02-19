@@ -90,7 +90,7 @@
     "test:framework:memory": "node --test --test-concurrency=1 tests/lib/memory/*.test.cjs",
     "test:framework:hooks": "node --test --test-concurrency=1 .claude/hooks/**/*.test.cjs",
     "test:framework:lib": "node --test --test-concurrency=1 tests/lib/**/*.test.cjs",
-    "test:memory:ci": "node --test tests/lib/memory/observations.test.cjs tests/hooks/spawn-prompt-memory-mode.test.cjs tests/hooks/unified-reflection-handler.test.cjs tests/hooks/unified-reflection-stale-evolution.test.cjs tests/hooks/audit-skill-recency.test.cjs tests/skills/skill-updater-doc-contract.test.cjs tests/skills/recommend-evolution-main.test.cjs",
+    "test:memory:ci": "node --test tests/lib/memory/observations.test.cjs tests/lib/evolution/evolution-request-router.test.cjs tests/integration/evolution-stale-skill-flow.test.cjs tests/hooks/spawn-prompt-memory-mode.test.cjs tests/hooks/unified-reflection-handler.test.cjs tests/hooks/unified-reflection-stale-evolution.test.cjs tests/hooks/audit-skill-recency.test.cjs tests/skills/skill-updater-doc-contract.test.cjs tests/skills/recommend-evolution-main.test.cjs",
     "test:code-indexing": "node --test --test-concurrency=1 tests/code-indexing/ripgrep-integration.test.cjs tests/code-indexing/ast-grep-wrapper.test.cjs tests/code-indexing/merkle-tree.test.cjs tests/code-indexing/incremental-indexing.test.cjs tests/code-indexing/search-tools-integration.test.cjs tests/code-indexing/vector-store-lancedb.test.cjs tests/hooks/code-index-updater.test.cjs",
     "test:all": "pnpm test && pnpm test:framework && pnpm test:tools",
     "test:ci": "node --test --test-concurrency=1 --test-reporter=spec \"tests/**/*.test.{mjs,cjs}\"",
