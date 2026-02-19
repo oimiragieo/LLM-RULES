@@ -50,7 +50,9 @@ function checkBinaryAvailable(binPath) {
     proc.on('error', () => finish(false));
     proc.on('close', code => finish(code === 0));
     const timeout = setTimeout(() => {
-      proc.kill();
+      if (proc.exitCode === null && !proc.killed) {
+        proc.kill();
+      }
       finish(false);
     }, 5000);
   });
