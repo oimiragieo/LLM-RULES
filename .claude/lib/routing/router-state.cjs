@@ -342,11 +342,7 @@ function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
  * Uses saveStateWithRetry for safe concurrent updates.
  */
 function resetToRouterMode() {
-  // Get current version to preserve it
-  const current = loadStateFromFile();
-  const currentVersion = validateVersion(current.version);
-
-  const state = {
+  return saveStateWithRetry({
     mode: 'router',
     lastReset: new Date().toISOString(),
     taskSpawned: false,
@@ -366,11 +362,9 @@ function resetToRouterMode() {
     lastTaskUpdateTaskId: null,
     lastTaskUpdateStatus: null,
     taskUpdatesThisSession: 0,
-    // Increment version
-    version: currentVersion + 1,
-  };
-  saveState(state);
-  return state;
+    // Reset spawn task tracker for a new prompt cycle
+    currentSpawnTaskId: null,
+  });
 }
 
 /**
