@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-19T06:20:39.499Z",
+  "generatedAt": "2026-02-19T07:03:10.172Z",
   "metadata": {
     "totalSkills": 397,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-19T06:20:39.500Z",
+    "lastValidated": "2026-02-19T07:03:10.173Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -766,14 +766,9 @@
       "displayName": "Artifact Updater",
       "category": "Other",
       "domain": "other",
-      "description": "Unified maintenance workflow for updating existing framework artifacts (agents, skills, hooks, workflows). Enforces regression-safe delivery and automatic integration updates.",
+      "description": "[DEPRECATED] Route through type-specific updaters: skill-updater, agent-updater, workflow-updater.",
       "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash",
-        "Glob",
-        "Grep"
+        "Read"
       ],
       "agentPrimary": [
         "developer"
@@ -10906,7 +10901,6 @@
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
-        "artifact-updater",
         "assimilate",
         "auth-security-expert",
         "aws-cloud-ops",
@@ -11007,7 +11001,6 @@
         "android-expert",
         "api-development-expert",
         "architecture-review",
-        "artifact-updater",
         "assimilate",
         "auth-security-expert",
         "binary-analysis-patterns",
@@ -11107,7 +11100,6 @@
         "android-expert",
         "api-development-expert",
         "architecture-review",
-        "artifact-updater",
         "assimilate",
         "auth-security-expert",
         "binary-analysis-patterns",
@@ -11217,7 +11209,6 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
-        "artifact-updater",
         "assimilate",
         "async-operations",
         "auth-security-expert",
@@ -11590,7 +11581,6 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
-        "artifact-updater",
         "assimilate",
         "async-operations",
         "auth-security-expert",

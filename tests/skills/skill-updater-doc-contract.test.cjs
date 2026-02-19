@@ -24,6 +24,7 @@ test('skill-updater documents workflow contract and risk/checklist sections', ()
 test('memory protocol docs are cross-platform and avoid shell-specific cat/get-content', () => {
   assert.doesNotMatch(skillUpdaterDoc, /cat \.claude\/context\/memory\/learnings\.md/i);
   assert.doesNotMatch(recommendDoc, /Get-Content .*learnings\.md/i);
+  assert.doesNotMatch(skillCreatorDoc, /\bcat\s+\.claude\//i);
 });
 
 test('summary workflow points to yaml source of truth', () => {

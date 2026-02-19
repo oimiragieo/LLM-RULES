@@ -17,6 +17,8 @@ best_practices:
   - Validate after creation
 error_handling: graceful
 streaming: supported
+verified: false
+lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -336,8 +338,10 @@ If your skill uses tools prefixed with `mcp__<server>__*`, add the server to `.c
 
 2. **Read current settings.json:**
 
+   Use `Read` on `.claude/settings.json` (preferred), or Node if needed:
+
    ```bash
-   cat .claude/settings.json
+   node -e "const fs=require('fs');const p='.claude/settings.json';if(fs.existsSync(p))console.log(fs.readFileSync(p,'utf8'));"
    ```
 
 3. **Add mcpServers section if missing, or add to existing:**
@@ -991,8 +995,10 @@ Update the skill catalog to ensure the new skill is discoverable.
 
 1. **Read current catalog:**
 
+   Use `Read` on `.claude/context/artifacts/catalogs/skill-catalog.md` (preferred), or Node if needed:
+
    ```bash
-   cat .claude/context/artifacts/catalogs/skill-catalog.md
+   node -e "const fs=require('fs');const p='.claude/context/artifacts/catalogs/skill-catalog.md';if(fs.existsSync(p))console.log(fs.readFileSync(p,'utf8'));"
    ```
 
 2. **Determine skill category** based on domain:
