@@ -14,5 +14,5 @@ test('ripgrep candidate guard treats base arg length as no-file case', () => {
     'contextual-memory-search-fallback.cjs'
   );
   const content = fs.readFileSync(filePath, 'utf8');
-  assert.match(content, /if\s*\(args\.length\s*<=\s*5\)\s*return\s*\[\]/);
+  assert.match(content, /if\s*\(args\.length\s*<=\s*6\)\s*return\s*\[\]/);
 });
