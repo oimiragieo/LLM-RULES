@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-19T04:32:54.471Z",
+  "generatedAt": "2026-02-19T06:20:39.499Z",
   "metadata": {
     "totalSkills": 397,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-19T04:32:54.472Z",
+    "lastValidated": "2026-02-19T06:20:39.500Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -448,11 +448,14 @@
       "displayName": "Dynamic Api Integration",
       "category": "Other",
       "domain": "other",
-      "description": "Other - dynamic-api-integration",
+      "description": "Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Adapted from UTCP (Universal Tool Calling Protocol) patterns for Node.js and Claude Code agents.",
       "requiredTools": [
         "Read",
         "Write",
-        "Edit"
+        "Edit",
+        "Bash",
+        "WebFetch",
+        "WebSearch"
       ],
       "agentPrimary": [
         "developer"
@@ -535,7 +538,7 @@
       "displayName": "Accessibility",
       "category": "Other",
       "domain": "styling",
-      "description": "Ensure accessibility in UI components including semantic HTML, ARIA attributes, keyboard navigation, and WCAG 2.1 AA compliance.",
+      "description": "Ensure accessibility in UI components including semantic HTML, ARIA attributes, keyboard navigation, and WCAG 2.2 AA compliance.",
       "requiredTools": [
         "Read",
         "Write",
@@ -6473,7 +6476,7 @@
       "displayName": "Security Architect",
       "category": "Security",
       "domain": "security",
-      "description": "Security architecture and threat modeling. OWASP Top 10 analysis, security pattern implementation, vulnerability assessment, and security review for code and infrastructure.",
+      "description": "Security architecture and threat modeling. OWASP Top 10 2025 analysis, OWASP Agentic AI Top 10 (ASI01-ASI10), AI/LLM security patterns, supply chain security, modern API authentication (OAuth 2.1, DPoP, Passkeys/WebAuthn), vulnerability assessment, and security review for code and infrastructure.",
       "requiredTools": [
         "Read",
         "Write",
@@ -10897,6 +10900,7 @@
         "git-expert",
         "github-ops",
         "code-style-validator",
+        "dynamic-api-integration",
         "agent-creator",
         "agent-updater",
         "ai-ml-expert",
@@ -11920,20 +11924,8 @@
         "agent-creator",
         "smart-debug"
       ],
-      "WebSearch": [
-        "agent-creator",
-        "agent-updater",
-        "ai-ml-expert",
-        "assimilate",
-        "eval-harness-updater",
-        "powershell-expert",
-        "research-synthesis",
-        "scientific-skills",
-        "skill-creator",
-        "skill-updater",
-        "workflow-updater"
-      ],
       "WebFetch": [
+        "dynamic-api-integration",
         "agent-creator",
         "agent-updater",
         "arxiv-mcp",
@@ -11949,6 +11941,20 @@
         "skill-updater",
         "slack-notifications",
         "web-design-guidelines-vercel",
+        "workflow-updater"
+      ],
+      "WebSearch": [
+        "dynamic-api-integration",
+        "agent-creator",
+        "agent-updater",
+        "ai-ml-expert",
+        "assimilate",
+        "eval-harness-updater",
+        "powershell-expert",
+        "research-synthesis",
+        "scientific-skills",
+        "skill-creator",
+        "skill-updater",
         "workflow-updater"
       ],
       "Skill": [

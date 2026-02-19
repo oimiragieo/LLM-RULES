@@ -1,23 +1,20 @@
-## <!-- Agent: skill-creator | Task: #1 | Session: 2026-02-17 -->
-
+---
 name: dynamic-api-integration
-description: Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Adapted from UTCP (Universal Tool Calling Protocol) patterns for Node.js / Claude Code agents.
+description: Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Adapted from UTCP (Universal Tool Calling Protocol) patterns for Node.js and Claude Code agents.
 version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, WebFetch, WebSearch]
 best_practices:
-
-- Always fetch and validate the OpenAPI spec before constructing requests
-- Use environment variables for all API keys and secrets — never hardcode
-- Apply max_iterations guard to prevent infinite API call loops
-- Truncate or summarize large API responses to stay within context budget
-- Match user intent to API endpoints semantically before calling
-- Handle errors explicitly with retry logic for transient failures
-  error_handling: strict
-  streaming: supported
-
+  - Always fetch and validate the OpenAPI spec before constructing requests
+  - Use environment variables for all API keys and secrets; never hardcode
+  - Apply max_iterations guard to prevent infinite API call loops
+  - Truncate or summarize large API responses to stay within context budget
+  - Match user intent to API endpoints semantically before calling
+  - Handle errors explicitly with retry logic for transient failures
+error_handling: strict
+streaming: supported
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
