@@ -40,21 +40,27 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
   const flushSize = manager.options.chunkFlushSize;
 
   const chunkBuffer = [];
-  let flushPromise = Promise.resolve();
+  const flushPromise = Promise.resolve();
 
   // Worker setup moved outside loop
   const workerPath = path.resolve(__dirname, 'parse-chunk-worker.cjs');
   let pool = null;
   let parseInProcess = null;
 
-  if (concurrency <= 1) {
+  // OOM FIX: When embeddings are active, always use Piscina worker pool
+  // (min concurrency 2). The in-process path leaks memory through LanceDB's
+  // Arrow IPC buffers because the event loop never yields for GC.
+  const embeddingActive = manager.vectorStore && manager.vectorStore.embeddingMode !== 'off';
+  const effectiveConcurrency = embeddingActive ? Math.max(concurrency, 2) : concurrency;
+
+  if (effectiveConcurrency <= 1) {
     console.log('[INDEX] Using in-process parsing (no worker threads)');
     parseInProcess = require(workerPath);
   } else {
-    console.log(`[INDEX] Using Piscina worker pool (${concurrency} threads)`);
+    console.log(`[INDEX] Using Piscina worker pool (${effectiveConcurrency} threads)`);
     pool = new Piscina({
       filename: workerPath,
-      maxThreads: concurrency,
+      maxThreads: effectiveConcurrency,
       minThreads: 1,
       resourceLimits: {
         maxOldGenerationSizeMb: manager.memoryConfig.maxOldGenerationSizeMb,
@@ -146,7 +152,6 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
         }
       }
     } else {
-      const inFlight = new Set();
       const runOne = async (filePath, index) => {
         const stats = await fs.stat(filePath);
         if (stats.size > manager.options.maxFileSize) {
@@ -162,52 +167,42 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
         return { ...result, index };
       };
 
+      // OOM FIX: Process files sequentially with synchronous flush to apply
+      // backpressure. The previous fire-and-forget `.then()` chain let file
+      // reads race ahead of embedding/LanceDB writes, causing unbounded
+      // memory growth from queued chunks + native ONNX/LanceDB allocations
+      // invisible to V8's GC (OOM at 32GB after only 30 files).
       for (let i = 0; i < currentBatch.length; i++) {
         const filePath = currentBatch[i];
         const globalIndex = startIndex + b + i + 1;
 
-        // Memory backpressure logic
-        const mem = process.memoryUsage();
-        const rssGB = mem.rss / 1024 / 1024 / 1024;
+        try {
+          const result = await runOne(filePath, globalIndex);
 
-        if (rssGB > manager.memoryConfig.emergencyThresholdGB) {
-          console.warn(`🚨 EMERGENCY: Memory critical (rss:${rssGB.toFixed(2)}GB), draining...`);
-          await Promise.all(Array.from(inFlight));
-          await flushPromise;
-          await flushBuffer();
-          if (typeof global.gc === 'function') global.gc();
-          await new Promise(r => setTimeout(r, 1000));
-        }
+          filesProcessed++;
+          fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
+          totalChunks += result.chunks.length;
+          totalEmbeddings += result.chunks.length;
 
-        while (inFlight.size >= concurrency) {
-          await Promise.race(Array.from(inFlight));
-        }
+          if (onProgress) {
+            onProgress('parse', result.index, totalFilesCount);
+            onProgress('chunk', result.index, totalFilesCount);
+          }
 
-        const task = runOne(filePath, globalIndex);
-        inFlight.add(task);
-
-        task
-          .then(async result => {
-            filesProcessed++;
-            fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
-            totalChunks += result.chunks.length;
-            totalEmbeddings += result.chunks.length;
-
-            if (onProgress) {
-              onProgress('parse', result.index, totalFilesCount);
-              onProgress('chunk', result.index, totalFilesCount);
+          if (result.chunks.length > 0) {
+            chunkBuffer.push(...result.chunks);
+            if (chunkBuffer.length >= flushSize) {
+              // Synchronously await flush — this is the key backpressure point.
+              // Embedding + LanceDB write must complete before we read more files.
+              await flushBuffer();
             }
-
-            if (result.chunks.length > 0) {
-              chunkBuffer.push(...result.chunks);
-              if (chunkBuffer.length >= flushSize) {
-                flushPromise = flushPromise.then(() => flushBuffer());
-              }
-            }
-          })
-          .finally(() => inFlight.delete(task));
+          }
+        } catch (err) {
+          if (manager.options.verbose) {
+            console.error(`[INDEX] Error processing ${filePath}: ${err.message}`);
+          }
+        }
       }
-      await Promise.all(Array.from(inFlight));
     }
 
     // End of batch maintenance

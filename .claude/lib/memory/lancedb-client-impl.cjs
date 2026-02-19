@@ -241,6 +241,17 @@ class MemoryVectorStore {
         this._mockMode = true;
       } else if (this.config.embeddingMode === 'fastembed') {
         this.embedder = null;
+        // When subprocess embedding is active (default for bulk indexing),
+        // skip loading fastembed in the main process entirely. The subprocess
+        // worker handles model loading in its own isolated memory space.
+        // This avoids the 300MB+ ONNX native memory allocation in main process.
+        const useSubprocess = process.env.EMBED_SUBPROCESS !== 'off';
+        if (useSubprocess) {
+          this._fastembedModel = null;
+          this._embeddingStatus = { status: 'ready', mode: 'fastembed', reason: null };
+          this._mockMode = false;
+          logger.info('FastEmbed will use subprocess isolation (ONNX memory leak workaround)');
+        } else {
         try {
           const fastembed = require('fastembed');
 
@@ -296,6 +307,7 @@ class MemoryVectorStore {
             };
           }
         }
+        } // end !useSubprocess
       } else if (this.config.embeddingMode === 'off') {
         this.embedder = null;
         this._embeddingStatus = {
@@ -357,17 +369,185 @@ class MemoryVectorStore {
   }
 
   /**
-   * Generate embeddings for multiple texts in batches.
-   * Tries pipeline batch input (one forward pass per batch) when texts.length > 1;
-   * falls back to parallel single-text calls if batch API is unsupported.
+   * Generate embeddings via an isolated subprocess.
+   *
+   * Works around ONNX Runtime's native memory arena leak
+   * (microsoft/onnxruntime#25325, qdrant/fastembed#570) by running
+   * the embedding model in a child process. After maxCallsBeforeRestart
+   * batches the child is killed and a fresh one spawned, reclaiming all
+   * leaked native memory.
+   *
    * @param {string[]} texts
-   * @param {number} [batchSize=32]
-   * @returns {Promise<Array<number[]>>} Array of vectors in same order as texts
+   * @param {number} batchSize
+   * @returns {Promise<number[][]>}
+   * @private
    */
+  async _embedViaSubprocess(texts, batchSize) {
+    if (!this._embedProc || this._embedProc.killed || !this._embedProc.stdin?.writable) {
+      await this._spawnEmbedWorker();
+    }
+
+    // Restart worker periodically to reclaim ONNX arena memory
+    this._embedCallCount = (this._embedCallCount || 0) + 1;
+    if (this._embedCallCount > (this._embedMaxCalls || 50)) {
+      await this._killEmbedWorker();
+      await this._spawnEmbedWorker();
+      this._embedCallCount = 1;
+    }
+
+    return new Promise((resolve, reject) => {
+      const onData = chunk => {
+        this._embedStdoutBuf = (this._embedStdoutBuf || '') + chunk;
+        let idx;
+        while ((idx = this._embedStdoutBuf.indexOf('\n')) !== -1) {
+          const line = this._embedStdoutBuf.slice(0, idx).trim();
+          this._embedStdoutBuf = this._embedStdoutBuf.slice(idx + 1);
+          if (!line) continue;
+          try {
+            const msg = JSON.parse(line);
+            if (msg.ready) continue; // Initial ready signal
+            this._embedProc.stdout.removeListener('data', onData);
+            if (msg.ok && msg.vectors) {
+              resolve(msg.vectors);
+            } else {
+              reject(new Error(msg.error || 'Embed subprocess returned error'));
+            }
+          } catch (e) {
+            this._embedProc.stdout.removeListener('data', onData);
+            reject(e);
+          }
+          return;
+        }
+      };
+      this._embedProc.stdout.on('data', onData);
+      this._embedProc.stdin.write(
+        JSON.stringify({ action: 'embed', texts, batchSize }) + '\n'
+      );
+    });
+  }
+
+  async _spawnEmbedWorker() {
+    const { spawn } = require('child_process');
+    const workerPath = require('path').resolve(
+      __dirname,
+      '..',
+      'code-indexing',
+      'embed-subprocess.cjs'
+    );
+
+    this._embedStdoutBuf = '';
+    this._embedCallCount = 0;
+    this._embedMaxCalls = 50; // Restart every 50 batches to reclaim ONNX memory
+
+    this._embedProc = spawn(process.execPath, [workerPath], {
+      stdio: ['pipe', 'pipe', 'inherit'],
+      shell: false,
+      windowsHide: true,
+    });
+
+    this._embedProc.stdout.setEncoding('utf-8');
+
+    // Wait for ready signal
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Embed worker start timeout')), 30000);
+      const onData = chunk => {
+        this._embedStdoutBuf += chunk;
+        let idx;
+        while ((idx = this._embedStdoutBuf.indexOf('\n')) !== -1) {
+          const line = this._embedStdoutBuf.slice(0, idx).trim();
+          this._embedStdoutBuf = this._embedStdoutBuf.slice(idx + 1);
+          if (!line) continue;
+          try {
+            const msg = JSON.parse(line);
+            if (msg.ready) {
+              clearTimeout(timeout);
+              this._embedProc.stdout.removeListener('data', onData);
+              resolve();
+              return;
+            }
+          } catch (_e) {
+            // ignore parse errors during startup
+          }
+        }
+      };
+      this._embedProc.stdout.on('data', onData);
+      this._embedProc.on('error', err => {
+        clearTimeout(timeout);
+        reject(err);
+      });
+    });
+
+    // Send init command
+    const initResult = await new Promise((resolve, reject) => {
+      const onData = chunk => {
+        this._embedStdoutBuf += chunk;
+        let idx;
+        while ((idx = this._embedStdoutBuf.indexOf('\n')) !== -1) {
+          const line = this._embedStdoutBuf.slice(0, idx).trim();
+          this._embedStdoutBuf = this._embedStdoutBuf.slice(idx + 1);
+          if (!line) continue;
+          try {
+            const msg = JSON.parse(line);
+            this._embedProc.stdout.removeListener('data', onData);
+            if (msg.ok) {
+              resolve(msg);
+            } else {
+              reject(new Error(msg.error || 'Init failed'));
+            }
+          } catch (e) {
+            this._embedProc.stdout.removeListener('data', onData);
+            reject(e);
+          }
+          return;
+        }
+      };
+      this._embedProc.stdout.on('data', onData);
+      this._embedProc.stdin.write(
+        JSON.stringify({
+          action: 'init',
+          mode: this.config.embeddingMode,
+          model: this.config.embeddingModel,
+        }) + '\n'
+      );
+    });
+
+    logger.info('Embed subprocess worker started', {
+      mode: this.config.embeddingMode,
+      device: initResult?.device || 'unknown',
+      gpuName: initResult?.gpuName || null,
+    });
+  }
+
+  async _killEmbedWorker() {
+    if (this._embedProc && !this._embedProc.killed) {
+      try {
+        this._embedProc.stdin.end();
+        this._embedProc.kill();
+      } catch (_e) {
+        // ignore
+      }
+      // Wait for exit
+      await new Promise(resolve => {
+        if (this._embedProc.killed) return resolve();
+        this._embedProc.on('exit', resolve);
+        setTimeout(resolve, 2000); // Force continue after 2s
+      });
+      logger.info('Embed subprocess worker restarted (ONNX memory reclaim)');
+    }
+    this._embedProc = null;
+    this._embedStdoutBuf = '';
+  }
+
   /**
+   * Generate embeddings for multiple texts in batches.
+   *
+   * Uses subprocess isolation for fastembed/transformers modes to prevent
+   * ONNX Runtime native memory leaks from accumulating in the main process.
+   *
    * @param {string[]} texts
    * @param {number} [batchSize=32]
    * @param {{ onBatchComplete?: (batchDone: number, totalBatches: number) => void }} [progressOptions]
+   * @returns {Promise<Array<number[]>>} Array of vectors in same order as texts
    */
   async generateEmbeddingsBatch(texts, batchSize = 32, progressOptions) {
     if (!texts || texts.length === 0) return [];
@@ -377,6 +557,19 @@ class MemoryVectorStore {
     if (this.config.embeddingMode === 'off' || this._embeddingStatus?.status === 'unavailable') {
       throw new Error('Embedder not available for batch');
     }
+
+    // Use subprocess isolation for sustained embedding workloads to avoid
+    // ONNX Runtime native memory leak (microsoft/onnxruntime#25325).
+    // The env var EMBED_SUBPROCESS=off disables this for single-query use.
+    const useSubprocess =
+      process.env.EMBED_SUBPROCESS !== 'off' &&
+      (this.config.embeddingMode === 'fastembed' || this.config.embeddingMode === 'transformers');
+
+    if (useSubprocess) {
+      return this._embedViaSubprocess(texts, batchSize);
+    }
+
+    // In-process fallback (for single queries / search, not bulk indexing)
     const totalBatches = Math.ceil(texts.length / batchSize) || 1;
     if (this.config.embeddingMode === 'fastembed' && this._fastembedModel) {
       return this._fastembedBatch(texts, batchSize, progressOptions, totalBatches);
@@ -694,83 +887,112 @@ class MemoryVectorStore {
 
   /**
    * Add documents to the store (batch embedding: one forward pass per batch when pipeline supports it).
+   *
+   * OOM FIX: Embeds and writes in small micro-batches to prevent unbounded
+   * memory growth from ONNX runtime native allocations. Previously, all
+   * documents were embedded into a single vectors array before writing,
+   * causing OOM at 32GB with only 30/2834 files.
+   *
    * @param {Array<{id: string, text: string, metadata: Object}>} documents
    * @param {number} [embedBatchSize] - Default from config or 64
    * @param {{ onEmbedProgress?: (batchDone: number, totalBatches: number) => void }} [options]
    */
   async addDocuments(documents, embedBatchSize, options) {
-    const batchSize = Number.isFinite(embedBatchSize)
+    // Cap batch size to prevent ONNX runtime from accumulating too much
+    // native memory per forward pass. GPU auto-tune can set this to 128
+    // which is too large for sustained indexing.
+    const maxSafeBatch = 16;
+    const requestedBatch = Number.isFinite(embedBatchSize)
       ? embedBatchSize
       : this.config.embedBatchSize || 64;
+    const batchSize = Math.min(requestedBatch, maxSafeBatch);
+
     if (!documents || documents.length === 0) return;
     if (!this.isInitialized) await this.initialize();
 
     const toEmbed = documents.filter(d => (d.text || d.content || '').trim());
     if (toEmbed.length === 0) return;
 
-    const texts = toEmbed.map(d => d.text || d.content || '');
-    const progressOptions = options?.onEmbedProgress
-      ? { onBatchComplete: options.onEmbedProgress }
-      : undefined;
-    const vectors = await this.generateEmbeddingsBatch(texts, batchSize, progressOptions);
-
     const tableDim = await this.getTableVectorDimension();
-    const data = toEmbed.map((doc, i) => {
-      const vector = vectors[i];
-      if (Number.isFinite(tableDim) && vector.length !== tableDim) {
-        const mismatch = this._buildDimensionMismatchStatus(tableDim, vector.length, 'vector');
-        this._embeddingStatus = {
-          status: 'unavailable',
-          mode: this._embeddingStatus?.mode || this.config.embeddingMode,
-          reason: mismatch.reason,
-        };
-        const err = new Error(mismatch.reason);
-        err.code = 'LANCEDB_REINDEX_REQUIRED';
-        err.reindexRequired = true;
-        err.status = mismatch;
-        throw err;
-      }
-      const text = doc.text || doc.content || '';
-      const metadataObj = typeof doc.metadata === 'object' && doc.metadata ? doc.metadata : {};
-      const typedMetadata = this._toTypedMetadataColumns(metadataObj);
-      return {
-        id: doc.id || `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        vector,
-        text,
-        metadata: JSON.stringify(metadataObj),
-        ...typedMetadata,
-        timestamp: Date.now(),
-      };
-    });
+    const totalBatches = Math.ceil(toEmbed.length / batchSize) || 1;
+    let batchesDone = 0;
 
-    if (!this.table) {
-      this.table = await this.db.createTable(this.config.collectionName, data);
-      const firstVector = data[0]?.vector;
-      if (Array.isArray(firstVector)) {
-        this._tableVectorDim = firstVector.length;
-      }
-      this._typedMetadataSupported = true;
-    } else {
-      try {
-        await this.table.add(data);
-        if (this._typedMetadataSupported === null) {
-          this._typedMetadataSupported = true;
-        }
-      } catch (err) {
-        // Existing tables may predate typed metadata columns; retry with legacy row shape.
-        const message = err instanceof Error ? err.message : String(err);
-        if (this._typedMetadataSupported === false || !/schema|column|field|arrow/i.test(message)) {
+    // Process in micro-batches: embed a small batch, build rows, write to
+    // LanceDB, then release references before the next batch. This keeps
+    // peak memory proportional to batchSize instead of toEmbed.length.
+    for (let start = 0; start < toEmbed.length; start += batchSize) {
+      const slice = toEmbed.slice(start, start + batchSize);
+      const texts = slice.map(d => d.text || d.content || '');
+
+      // Embed just this micro-batch
+      const vectors = await this.generateEmbeddingsBatch(texts, batchSize);
+
+      // Build rows for this micro-batch
+      const data = slice.map((doc, i) => {
+        const vector = vectors[i];
+        if (Number.isFinite(tableDim) && vector.length !== tableDim) {
+          const mismatch = this._buildDimensionMismatchStatus(tableDim, vector.length, 'vector');
+          this._embeddingStatus = {
+            status: 'unavailable',
+            mode: this._embeddingStatus?.mode || this.config.embeddingMode,
+            reason: mismatch.reason,
+          };
+          const err = new Error(mismatch.reason);
+          err.code = 'LANCEDB_REINDEX_REQUIRED';
+          err.reindexRequired = true;
+          err.status = mismatch;
           throw err;
         }
-        this._typedMetadataSupported = false;
-        const legacyData = data.map(row => {
-          const clone = { ...row };
-          for (const col of Object.values(TYPED_METADATA_FIELDS)) {
-            delete clone[col];
+        const text = doc.text || doc.content || '';
+        const metadataObj = typeof doc.metadata === 'object' && doc.metadata ? doc.metadata : {};
+        const typedMetadata = this._toTypedMetadataColumns(metadataObj);
+        return {
+          id: doc.id || `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          vector,
+          text,
+          metadata: JSON.stringify(metadataObj),
+          ...typedMetadata,
+          timestamp: Date.now(),
+        };
+      });
+
+      // Write this micro-batch to LanceDB immediately
+      if (!this.table) {
+        this.table = await this.db.createTable(this.config.collectionName, data);
+        const firstVector = data[0]?.vector;
+        if (Array.isArray(firstVector)) {
+          this._tableVectorDim = firstVector.length;
+        }
+        this._typedMetadataSupported = true;
+      } else {
+        try {
+          await this.table.add(data);
+          if (this._typedMetadataSupported === null) {
+            this._typedMetadataSupported = true;
           }
-          return clone;
-        });
-        await this.table.add(legacyData);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          if (
+            this._typedMetadataSupported === false ||
+            !/schema|column|field|arrow/i.test(message)
+          ) {
+            throw err;
+          }
+          this._typedMetadataSupported = false;
+          const legacyData = data.map(row => {
+            const clone = { ...row };
+            for (const col of Object.values(TYPED_METADATA_FIELDS)) {
+              delete clone[col];
+            }
+            return clone;
+          });
+          await this.table.add(legacyData);
+        }
+      }
+
+      batchesDone++;
+      if (options?.onEmbedProgress) {
+        options.onEmbedProgress(batchesDone, totalBatches);
       }
     }
   }
