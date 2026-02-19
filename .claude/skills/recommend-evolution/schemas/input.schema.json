@@ -3,7 +3,50 @@
   "title": "recommend-evolution Input Schema",
   "description": "Input validation schema for recommend-evolution skill",
   "type": "object",
-  "required": [],
-  "properties": {},
+  "required": ["trigger"],
+  "properties": {
+    "trigger": {
+      "type": "string",
+      "enum": [
+        "repeated_error",
+        "no_agent",
+        "integration_gap",
+        "user_request",
+        "rubric_regression",
+        "stale_skill",
+        "other"
+      ]
+    },
+    "evidence": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "suggestedArtifactType": {
+      "type": "string",
+      "enum": ["skill", "agent", "workflow", "hook", "schema", "command"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "trigger": {
+            "const": "stale_skill"
+          }
+        }
+      },
+      "then": {
+        "required": ["evidence"]
+      }
+    }
+  ],
   "additionalProperties": true
 }

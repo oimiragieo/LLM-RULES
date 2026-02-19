@@ -7,7 +7,9 @@
 
 'use strict';
 
+const fs = require('node:fs');
 const path = require('path');
+const crypto = require('node:crypto');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
@@ -50,6 +52,27 @@ let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue
 const REFLECTION_QUEUE_MAX_LINES = Number(process.env.REFLECTION_QUEUE_MAX_LINES || 5000);
 const SESSION_END_EVENTS = ['Stop', 'SessionEnd'];
 const MIN_OUTPUT_LENGTH = 50;
+const STALE_ARTIFACTS_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'stale-artifacts.json'
+);
+const EVOLUTION_REQUESTS_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'evolution-requests.jsonl'
+);
+const STALE_CONSUMPTION_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'stale-artifacts-consumed.json'
+);
 
 function isEnabled() {
   if (process.env.REFLECTION_ENABLED === 'false') {
@@ -159,6 +182,110 @@ async function attachSemanticPriorLearnings(entry, options = {}) {
   }
 }
 
+function safeReadJson(filePath, fallback = null) {
+  try {
+    if (!fs.existsSync(filePath)) return fallback;
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (_err) {
+    return fallback;
+  }
+}
+
+function readExistingEvolutionRequestIds(queuePath) {
+  try {
+    if (!fs.existsSync(queuePath)) return new Set();
+    const content = fs.readFileSync(queuePath, 'utf8');
+    const ids = new Set();
+    for (const line of content.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (parsed && typeof parsed.id === 'string' && parsed.id.trim()) {
+          ids.add(parsed.id.trim());
+        }
+      } catch (_e) {
+        // Ignore malformed lines
+      }
+    }
+    return ids;
+  } catch (_err) {
+    return new Set();
+  }
+}
+
+function ingestStaleArtifactRecommendations(options = {}) {
+  const staleArtifactsPath = options.staleArtifactsPath || STALE_ARTIFACTS_FILE;
+  const queuePath = options.queuePath || EVOLUTION_REQUESTS_FILE;
+  const statePath = options.statePath || STALE_CONSUMPTION_STATE_FILE;
+  const source = options.source || 'reflection-agent';
+
+  const stalePayload = safeReadJson(staleArtifactsPath, null);
+  if (!stalePayload || typeof stalePayload !== 'object') {
+    return { created: 0, reason: 'no_stale_artifacts' };
+  }
+
+  const timestamp = String(stalePayload.timestamp || '').trim();
+  if (!timestamp) {
+    return { created: 0, reason: 'missing_timestamp' };
+  }
+
+  const priorState = safeReadJson(statePath, {});
+  if (priorState && priorState.lastProcessedTimestamp === timestamp) {
+    return { created: 0, reason: 'already_processed' };
+  }
+
+  const stale = Array.isArray(stalePayload.stale) ? stalePayload.stale : [];
+  const unverified = Array.isArray(stalePayload.unverified) ? stalePayload.unverified : [];
+  const artifacts = [...stale, ...unverified];
+  if (artifacts.length === 0) {
+    return { created: 0, reason: 'no_candidates' };
+  }
+
+  const existingIds = readExistingEvolutionRequestIds(queuePath);
+  const now = new Date().toISOString();
+  const lines = [];
+  let created = 0;
+
+  for (const artifact of artifacts) {
+    const type = String(artifact?.type || 'unknown').trim() || 'unknown';
+    const name = String(artifact?.name || 'unknown').trim() || 'unknown';
+    const status = String(artifact?.status || 'stale').trim() || 'stale';
+    const fingerprint = `${type}:${name}:${timestamp}:${status}`;
+    const id = `evo_${crypto.createHash('sha1').update(fingerprint).digest('hex').slice(0, 12)}`;
+    if (existingIds.has(id)) continue;
+
+    const entry = {
+      id,
+      timestamp: now,
+      source,
+      trigger: 'stale_skill',
+      evidence: `${type} ${name} flagged as ${status} by stale-artifacts audit (${timestamp}).`,
+      suggestedArtifactType: type === 'agent' ? 'agent' : 'skill',
+      summary: `Refresh ${type} ${name} due to ${status} verification state.`,
+      status: 'proposed',
+    };
+
+    lines.push(`${JSON.stringify(entry)}\n`);
+    existingIds.add(id);
+    created++;
+  }
+
+  if (created > 0) {
+    fs.mkdirSync(path.dirname(queuePath), { recursive: true });
+    fs.appendFileSync(queuePath, lines.join(''), 'utf8');
+  }
+
+  const state = {
+    lastProcessedTimestamp: timestamp,
+    processedAt: now,
+    created,
+  };
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify(state, null, 2), 'utf8');
+  return { created };
+}
+
 async function main() {
   const startTime = Date.now();
   const outcome = {
@@ -186,6 +313,8 @@ async function main() {
       process.exit(0);
     }
 
+    const staleIngest = ingestStaleArtifactRecommendations();
+    outcome.staleSkillRecommendations = staleIngest.created || 0;
     outcome.eventType = eventType;
 
     switch (eventType) {
@@ -299,6 +428,7 @@ module.exports = {
   queueReflection,
   appendReflectionLogEntry,
   attachSemanticPriorLearnings,
+  ingestStaleArtifactRecommendations,
   recordSession: actions.recordSession,
   triggerEmbeddingGeneration: actions.triggerEmbeddingGeneration,
   triggerMLSessionEnd: actions.triggerMLSessionEnd,

@@ -7,7 +7,10 @@ const fs = require('node:fs');
 
 const skillUpdaterDoc = fs.readFileSync('.claude/skills/skill-updater/SKILL.md', 'utf8');
 const recommendDoc = fs.readFileSync('.claude/skills/recommend-evolution/SKILL.md', 'utf8');
-const summaryWorkflow = fs.readFileSync('.claude/workflows/skill-updater-skill-workflow.md', 'utf8');
+const summaryWorkflow = fs.readFileSync(
+  '.claude/workflows/skill-updater-skill-workflow.md',
+  'utf8'
+);
 const skillCreatorDoc = fs.readFileSync('.claude/skills/skill-creator/SKILL.md', 'utf8');
 
 test('skill-updater documents workflow contract and risk/checklist sections', () => {
