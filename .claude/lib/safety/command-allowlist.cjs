@@ -349,6 +349,18 @@ function splitShellCommandSegments(command) {
   return segments.map(s => s.trim()).filter(Boolean);
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function hasDangerousFlag(segment, flag) {
+  if (!segment || !flag) return false;
+  const escaped = escapeRegExp(flag.trim());
+  if (!escaped) return false;
+  const tokenPattern = new RegExp(`(^|\\s)${escaped}(?=\\s|$)`);
+  return tokenPattern.test(segment);
+}
+
 /**
  * Check if command is allowed
  * @param {string} command - Full shell command
@@ -401,7 +413,7 @@ function isCommandAllowed(command) {
     // Check dangerous flags
     if (allowlistEntry.dangerous_flags) {
       for (const flag of allowlistEntry.dangerous_flags) {
-        if (segment.includes(flag)) {
+        if (hasDangerousFlag(segment, flag)) {
           return {
             allowed: false,
             reason: `Command "${primaryCommand}" contains dangerous flag: ${flag}`,
