@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from 'child_process';
 import { existsSync, readdirSync, statSync } from 'fs';
-import { join, relative, sep } from 'path';
+import { join, relative, resolve, sep } from 'path';
 import { pathToFileURL } from 'url';
 
 export function walkTests(dir) {
@@ -135,10 +135,9 @@ export function printSummary(runResult) {
   );
 }
 
-function isDirectRun() {
-  const mainArg = process.argv[1];
+export function isDirectRun(mainArg = process.argv[1], moduleUrl = import.meta.url) {
   if (!mainArg) return false;
-  return import.meta.url === pathToFileURL(mainArg).href;
+  return moduleUrl === pathToFileURL(resolve(mainArg)).href;
 }
 
 if (isDirectRun()) {

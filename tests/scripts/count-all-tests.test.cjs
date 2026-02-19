@@ -45,3 +45,11 @@ test('normalizeTestPath strips tests prefix and normalizes separators', async ()
   const winPath = path.join(baseDir, 'tests', 'foo', 'bar.test.cjs');
   assert.equal(mod.normalizeTestPath(winPath, baseDir), 'foo/bar.test.cjs');
 });
+
+test('isDirectRun resolves relative argv paths before comparison', async () => {
+  const mod = await loadModule();
+  const modulePath = path.join(__dirname, '..', '..', 'scripts', 'testing', 'count-all-tests.mjs');
+  const moduleUrl = pathToFileURL(modulePath).href;
+  const relativeArg = path.relative(process.cwd(), modulePath);
+  assert.equal(mod.isDirectRun(relativeArg, moduleUrl), true);
+});
