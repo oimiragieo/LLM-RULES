@@ -11,7 +11,23 @@ const checks = [
   },
   {
     file: '.claude/workflows/enterprise/feature-development-workflow.md',
-    forbidden: ['Skill({ skill: "brainstorming" })'],
+    forbidden: ['Skill({ skill: "brainstorming" })', 'brainstorming'],
+  },
+  {
+    file: '.claude/workflows/core/enterprise-workflow.md',
+    forbidden: ['Skill({ skill: "qa-workflow" })'],
+  },
+  {
+    file: '.claude/workflows/core/external-integration.md',
+    forbidden: ['Skill({ skill: "repo-rag" })', 'Skill({ skill: "qa-workflow" })'],
+  },
+  {
+    file: '.claude/workflows/core/skill-lifecycle.md',
+    forbidden: ['Skill({ skill: "qa-workflow" })'],
+  },
+  {
+    file: '.claude/workflows/database-architect-skill-workflow.md',
+    forbidden: ['Skill({ skill: "brainstorming" })', 'brainstorming'],
   },
 ];
 

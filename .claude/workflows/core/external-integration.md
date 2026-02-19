@@ -119,7 +119,7 @@ Check if artifact already exists in the framework before integration.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/architect.md
-2. **Invoke skills**: Skill({ skill: "repo-rag" })
+2. **Invoke skills**: Skill({ skill: "code-semantic-search" })
 3. Search for artifact by name in:
    - .claude/agents/ (if integrating agent)
    - .claude/skills/ (if integrating skill)
@@ -256,7 +256,7 @@ Analyze the structure and contents of the isolated external artifact.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/architect.md
-2. **Invoke skills**: Skill({ skill: "repo-rag" })
+2. **Invoke skills**: Skill({ skill: "code-semantic-search" })
 3. Explore .claude/context/tmp/<repo-name>/:
    - Identify artifact type (skill, agent, workflow, template, hook, mixed)
    - Map file structure and dependencies
@@ -303,7 +303,7 @@ Analyze the target location in the framework where artifact will be integrated.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/architect.md
-2. **Invoke skills**: Skill({ skill: "repo-rag" })
+2. **Invoke skills**: Skill({ skill: "code-semantic-search" })
 3. Based on artifact type, explore target location:
    - Skills: .claude/skills/
    - Agents: .claude/agents/
@@ -764,7 +764,7 @@ Verify the integrated artifact works correctly in the framework.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/qa.md
-2. **Invoke skills**: Skill({ skill: "qa-workflow" })
+2. **Invoke skills**: Skill({ skill: "tdd" })
 3. Run verification tests:
    - For skills: Test Skill({ skill: "<name>" }) invocation
    - For agents: Test agent definition can be read

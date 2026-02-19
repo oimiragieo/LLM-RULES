@@ -32,7 +32,7 @@ Orchestrate end-to-end feature development from requirements to production deplo
 
 ### Step 1: Business Analysis & Requirements
 
-**Agent**: Planner with brainstorming skill
+**Agent**: Planner with plan-generator skill
 
 **Task Spawn**:
 
@@ -569,7 +569,7 @@ Execute each phase sequentially, spawning appropriate agents with correct skills
 
 | Original Agent Type                                | Framework Agent    | Required Skills                    |
 | -------------------------------------------------- | ------------------ | ---------------------------------- |
-| `business-analytics::business-analyst`             | planner            | brainstorming                      |
+| `business-analytics::business-analyst`             | planner            | plan-generator                     |
 | `comprehensive-review::architect-review`           | architect          | -                                  |
 | `security-scanning::security-auditor`              | security-architect | security-architect                 |
 | `backend-architect`                                | developer          | backend-expert, tdd                |

@@ -685,7 +685,7 @@ Subject: Test artifact integration: $ARTIFACT_NAME
 ## Instructions
 1. Read your agent definition: .claude/agents/core/qa.md
 2. **Claim task**: TaskUpdate({ taskId: "$TASK_ID", status: "in_progress" })
-3. **Invoke qa-workflow skill**: Skill({ skill: "qa-workflow" })
+3. **Invoke tdd skill**: Skill({ skill: "tdd" })
 4. Test artifact invocation:
    - For skills: Skill({ skill: "$ARTIFACT_NAME" }) - verify it loads
    - For agents: Verify agent file is readable and well-formed

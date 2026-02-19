@@ -544,7 +544,7 @@ The Router selects domain specialists based on project detection:
 - Edge case identification
 - Regression test verification
 - Missing test scenarios
-- Skill: `Skill({ skill: "qa-workflow" })`
+- Skill: `Skill({ skill: "tdd" })`
 - Output: `.claude/context/reports/qa/{feature}-qa-report-{date}.md`
 
 **Security-Architect** (HIGH+ or any auth/security):

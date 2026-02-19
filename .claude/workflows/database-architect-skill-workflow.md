@@ -88,7 +88,7 @@ Analyze data requirements for: $PROJECT_NAME
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/planner.md
-2. **Invoke skill**: Skill({ skill: "brainstorming" })
+2. **Invoke skill**: Skill({ skill: "plan-generator" })
 3. Identify data entities, relationships, and access patterns
 4. Document data volume estimates and growth projections
 5. List compliance requirements (GDPR, HIPAA, SOC2, etc.)
@@ -838,7 +838,7 @@ This workflow implements the structured process for the corresponding skill:
 
 | Phase                  | Agent              | Required Skills                                         |
 | ---------------------- | ------------------ | ------------------------------------------------------- |
-| 1.1 Requirements       | planner            | brainstorming                                           |
+| 1.1 Requirements       | planner            | plan-generator                                          |
 | 1.2 Current Analysis   | database-architect | database-expert, sequential-thinking                    |
 | 2.1 Logical Model      | database-architect | database-expert, diagram-generator, sequential-thinking |
 | 2.1 Security Review    | security-architect | security-architect                                      |
