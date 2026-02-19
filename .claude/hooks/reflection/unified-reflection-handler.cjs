@@ -13,6 +13,7 @@ const crypto = require('node:crypto');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const {
   parseHookInputAsync,
   getToolName,
@@ -189,7 +190,8 @@ async function attachSemanticPriorLearnings(entry, options = {}) {
 function safeReadJson(filePath, fallback = null) {
   try {
     if (!fs.existsSync(filePath)) return fallback;
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const parsed = safeParseJSON(fs.readFileSync(filePath, 'utf8'), null, null, fallback);
+    return parsed && typeof parsed === 'object' ? parsed : fallback;
   } catch (_err) {
     return fallback;
   }
@@ -204,7 +206,7 @@ function readExistingEvolutionRequestIds(queuePath) {
       const trimmed = line.trim();
       if (!trimmed) continue;
       try {
-        const parsed = JSON.parse(trimmed);
+        const parsed = safeParseJSON(trimmed);
         if (parsed && typeof parsed.id === 'string' && parsed.id.trim()) {
           ids.add(parsed.id.trim());
         }

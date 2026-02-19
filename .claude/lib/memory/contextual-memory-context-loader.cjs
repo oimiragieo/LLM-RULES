@@ -6,6 +6,7 @@ const { DatabaseSync } = require('node:sqlite');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('contextual-memory');
 
@@ -23,7 +24,7 @@ function safeParseWithCache(filePath) {
     if (cached && cached.mtime === stats.mtimeMs) {
       return cached.data;
     }
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const data = safeParseJSON(fs.readFileSync(filePath, 'utf8'));
     PARSED_MEMORY_CACHE.set(filePath, { mtime: stats.mtimeMs, data });
     return data;
   } catch (e) {
@@ -131,7 +132,7 @@ function loadAccessStats(memoryDir) {
   const statsPath = getAccessStatsPath(memoryDir);
   try {
     if (fs.existsSync(statsPath)) {
-      const parsed = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+      const parsed = safeParseJSON(fs.readFileSync(statsPath, 'utf8'));
       if (parsed && typeof parsed === 'object') {
         return {
           version: parsed.version || '1.0',
@@ -348,7 +349,7 @@ function loadContextSync(memory, options = {}) {
             .slice(-2);
           for (const file of ltmFiles) {
             try {
-              const summary = JSON.parse(fs.readFileSync(path.join(ltmDir, file), 'utf8'));
+              const summary = safeParseJSON(fs.readFileSync(path.join(ltmDir, file), 'utf8'));
               if (summary.type === 'session_summary') {
                 result.recent_sessions.unshift({
                   session_number: 0,

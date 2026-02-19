@@ -24,6 +24,7 @@ const { PROJECT_ROOT } = libRequire(path.join('utils', 'project-root.cjs'));
 const eventBus = libRequire(path.join('events', 'event-bus.cjs'));
 const { EventTypes } = libRequire(path.join('events', 'event-types.cjs'));
 const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
+const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 
 const PRETOOL_CIRCUIT_STATE_FILE =
   process.env.PRETOOL_CIRCUIT_STATE_FILE ||
@@ -74,7 +75,7 @@ function readCircuitState() {
   try {
     if (!fs.existsSync(PRETOOL_CIRCUIT_STATE_FILE)) return { sessions: {} };
     const raw = fs.readFileSync(PRETOOL_CIRCUIT_STATE_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = safeParseJSON(raw);
     if (
       !parsed ||
       typeof parsed !== 'object' ||
