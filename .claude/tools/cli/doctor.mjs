@@ -19,7 +19,7 @@
 import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'child_process';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -95,6 +95,11 @@ const results = {
   errors: 0,
   fixed: 0,
 };
+
+function hasUnpinnedMcpPackageArg(args = []) {
+  if (!Array.isArray(args)) return false;
+  return args.some(arg => /^@modelcontextprotocol\/[^@\s]+$/.test(String(arg || '').trim()));
+}
 
 /**
  * Check if directory exists, optionally create it
@@ -329,10 +334,7 @@ function validateMcp() {
     // Check for version pins
     let unpinned = 0;
     for (const [name, config] of Object.entries(servers)) {
-      if (
-        config.args &&
-        config.args.some(a => a.includes('@modelcontextprotocol') && !a.includes('@'))
-      ) {
+      if (hasUnpinnedMcpPackageArg(config.args)) {
         unpinned++;
         log('yellow', `  ⚠ ${name}: no version pin`);
       } else {
@@ -349,6 +351,12 @@ function validateMcp() {
     log('red', `  ✗ Error parsing .mcp.json: ${e.message}`);
     results.errors++;
   }
+}
+
+function isDirectRun() {
+  const mainArg = process.argv[1];
+  if (!mainArg) return false;
+  return import.meta.url === pathToFileURL(path.resolve(mainArg)).href;
 }
 
 /**
@@ -497,4 +505,8 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+if (isDirectRun()) {
+  main().catch(console.error);
+}
+
+export { hasUnpinnedMcpPackageArg, isDirectRun };
