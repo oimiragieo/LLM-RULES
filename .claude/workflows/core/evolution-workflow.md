@@ -118,7 +118,7 @@ stateDiagram-v2
 
 | From         | To           | Condition                       | Enforcement Hook                 |
 | ------------ | ------------ | ------------------------------- | -------------------------------- |
-| `IDLE`       | `EVALUATING` | Evolution triggered             | `evolution-trigger-detector.cjs` |
+| `IDLE`       | `EVALUATING` | Evolution triggered             | `audit-skill-recency.cjs`        |
 | `EVALUATING` | `VALIDATING` | Gap confirmed                   | -                                |
 | `EVALUATING` | `ABORTED`    | No gap / Existing solution      | -                                |
 | `VALIDATING` | `OBTAINING`  | No conflicts                    | `conflict-detector.cjs`          |
@@ -129,7 +129,7 @@ stateDiagram-v2
 | `LOCKING`    | `LOCKING`    | Schema validation fails (retry) | -                                |
 | `VERIFYING`  | `ENABLING`   | Quality gate passes             | `quality-gate-validator.cjs`     |
 | `VERIFYING`  | `LOCKING`    | Quality issues (fix)            | -                                |
-| `ENABLING`   | `IDLE`       | Deployment complete             | `evolution-audit.cjs`            |
+| `ENABLING`   | `IDLE`       | Deployment complete             | `artifact-scoring-ledger-hook.cjs` |
 
 ---
 
@@ -773,13 +773,13 @@ const gate6Passed = Object.values(gate6).every(v => v === true);
 
 | Hook                               | Phase         | Type        | Trigger                         | Action                                           |
 | ---------------------------------- | ------------- | ----------- | ------------------------------- | ------------------------------------------------ |
-| `evolution-trigger-detector.cjs`   | IDLE→EVALUATE | PostToolUse | Detects evolution keywords      | Initiates EVOLVE workflow                        |
+| `audit-skill-recency.cjs`          | IDLE→EVALUATE | UserPromptSubmit | Detects stale artifacts and emits runtime evolution signals | Initiates EVOLVE workflow                        |
 | `conflict-detector.cjs`            | VALIDATE      | PreToolUse  | Before creator skill invocation | Blocks if naming/capability conflict             |
 | `research-enforcement.cjs`         | OBTAIN→LOCK   | PreToolUse  | Before Write/Edit for artifacts | Blocks creation without research report          |
 | `evolution-state-guard.cjs`        | ALL           | PreToolUse  | Any phase transition            | Enforces state machine, prevents skipping        |
 | `quality-gate-validator.cjs`       | VERIFY        | PreToolUse  | Before ENABLE transition        | Blocks incomplete/placeholder artifacts          |
 | `artifact-scoring-ledger-hook.cjs` | VERIFY/ENABLE | PostToolUse | Completed TaskUpdate            | Writes score ledger + opens/resolves remediation |
-| `evolution-audit.cjs`              | ENABLE        | PostToolUse | After deployment                | Logs all evolutions, verifies registration       |
+| `artifact-scoring-ledger-hook.cjs` | ENABLE        | PostToolUse | After deployment                | Logs artifact scoring outcomes and queues remediation |
 
 ### Hook Implementation Pattern
 
