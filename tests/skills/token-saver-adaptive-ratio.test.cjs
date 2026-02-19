@@ -4,9 +4,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { computeAdaptiveRatio } = require(
-  '../../.claude/skills/token-saver-context-compression/scripts/main.cjs'
-);
+const {
+  computeAdaptiveRatio,
+} = require('../../.claude/skills/token-saver-context-compression/scripts/main.cjs');
 
 test('returns 0.8 for corpus <8K tokens', () => {
   assert.equal(computeAdaptiveRatio(0), 0.8);

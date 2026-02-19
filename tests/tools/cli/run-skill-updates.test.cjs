@@ -27,13 +27,7 @@ function scaffoldProjectRoot(root) {
 
 /** Write JSONL entries to the evolution-requests queue file. */
 function writeEvolutionRequests(root, entries) {
-  const queuePath = path.join(
-    root,
-    '.claude',
-    'context',
-    'runtime',
-    'evolution-requests.jsonl'
-  );
+  const queuePath = path.join(root, '.claude', 'context', 'runtime', 'evolution-requests.jsonl');
   const content = entries.map(e => JSON.stringify(e)).join('\n') + (entries.length ? '\n' : '');
   fs.writeFileSync(queuePath, content, 'utf8');
   return queuePath;
@@ -124,9 +118,24 @@ describe('run-skill-updates orchestrator', () => {
       try {
         scaffoldProjectRoot(root);
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
-          { id: 'req_2', trigger: 'stale_skill', targetArtifact: { name: 'debugging' }, status: 'proposed' },
-          { id: 'req_3', trigger: 'stale_skill', targetArtifact: { name: 'verification-before-completion' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_2',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'debugging' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_3',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'verification-before-completion' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
 
@@ -147,16 +156,39 @@ describe('run-skill-updates orchestrator', () => {
       try {
         scaffoldProjectRoot(root);
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
-          { id: 'req_2', trigger: 'user_request', targetArtifact: { name: 'debugging' }, status: 'proposed' },
-          { id: 'req_3', trigger: 'stale_skill', targetArtifact: { name: 'research-synthesis' }, status: 'proposed' },
-          { id: 'req_4', trigger: 'evolve', targetArtifact: { name: 'assimilate' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_2',
+            trigger: 'user_request',
+            targetArtifact: { name: 'debugging' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_3',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'research-synthesis' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_4',
+            trigger: 'evolve',
+            targetArtifact: { name: 'assimilate' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
 
         const filtered = mod.filterStaleSkillRequests(mod.readEvolutionRequests(root));
         assert.equal(filtered.length, 2, 'Should only include stale_skill triggers');
-        assert.ok(filtered.every(r => r.trigger === 'stale_skill'), 'All entries should have stale_skill trigger');
+        assert.ok(
+          filtered.every(r => r.trigger === 'stale_skill'),
+          'All entries should have stale_skill trigger'
+        );
       } finally {
         fs.rmSync(root, { recursive: true, force: true });
       }
@@ -256,7 +288,11 @@ describe('run-skill-updates orchestrator', () => {
       ].join('\n');
 
       const changes = mod.detectChanges(beforeContent, afterContent);
-      assert.equal(changes.domainChanged, true, 'Should detect domain change when description changed significantly');
+      assert.equal(
+        changes.domainChanged,
+        true,
+        'Should detect domain change when description changed significantly'
+      );
     });
 
     it('should not flag minor description edits as domain change', () => {
@@ -277,7 +313,11 @@ describe('run-skill-updates orchestrator', () => {
       ].join('\n');
 
       const changes = mod.detectChanges(beforeContent, afterContent);
-      assert.equal(changes.domainChanged, false, 'Minor edits should not be flagged as domain change');
+      assert.equal(
+        changes.domainChanged,
+        false,
+        'Minor edits should not be flagged as domain change'
+      );
     });
   });
 
@@ -370,7 +410,12 @@ describe('run-skill-updates orchestrator', () => {
       try {
         scaffoldProjectRoot(root);
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
 
@@ -381,7 +426,13 @@ describe('run-skill-updates orchestrator', () => {
         mod.runSkillUpdates(root, { dryRun: false });
 
         // Re-read the JSONL
-        const queuePath = path.join(root, '.claude', 'context', 'runtime', 'evolution-requests.jsonl');
+        const queuePath = path.join(
+          root,
+          '.claude',
+          'context',
+          'runtime',
+          'evolution-requests.jsonl'
+        );
         const raw = fs.readFileSync(queuePath, 'utf8');
         const lines = raw.split('\n').filter(Boolean);
         assert.equal(lines.length, 1, 'Should still have 1 entry');
@@ -401,14 +452,25 @@ describe('run-skill-updates orchestrator', () => {
       try {
         scaffoldProjectRoot(root);
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
         writeSkillMd(root, 'tdd', { tools: ['Read', 'Write'], description: 'TDD skill' });
 
         mod.runSkillUpdates(root, { dryRun: true });
 
-        const queuePath = path.join(root, '.claude', 'context', 'runtime', 'evolution-requests.jsonl');
+        const queuePath = path.join(
+          root,
+          '.claude',
+          'context',
+          'runtime',
+          'evolution-requests.jsonl'
+        );
         const raw = fs.readFileSync(queuePath, 'utf8');
         const lines = raw.split('\n').filter(Boolean);
         const entry = JSON.parse(lines[0]);
@@ -426,11 +488,24 @@ describe('run-skill-updates orchestrator', () => {
       try {
         scaffoldProjectRoot(root);
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
-          { id: 'req_2', trigger: 'stale_skill', targetArtifact: { name: 'debugging' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_2',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'debugging' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
-        writeSkillMd(root, 'tdd', { tools: ['Read', 'Write'], description: 'Test-driven development' });
+        writeSkillMd(root, 'tdd', {
+          tools: ['Read', 'Write'],
+          description: 'Test-driven development',
+        });
         writeSkillMd(root, 'debugging', { tools: ['Read', 'Bash'], description: 'Debug workflow' });
         writeAgentRegistry(root, {
           developer: ['tdd', 'debugging'],
@@ -443,8 +518,10 @@ describe('run-skill-updates orchestrator', () => {
         assert.equal(typeof summary.processed, 'number', 'processed should be number');
         assert.equal(typeof summary.failed, 'number', 'failed should be number');
         assert.ok(Array.isArray(summary.agentCascades), 'agentCascades should be array');
-        assert.ok(typeof summary.summary === 'string' || typeof summary.summary === 'object',
-          'summary should be string or object');
+        assert.ok(
+          typeof summary.summary === 'string' || typeof summary.summary === 'object',
+          'summary should be string or object'
+        );
 
         // Value checks
         assert.equal(summary.processed, 2, 'Should have processed 2 skills');
@@ -459,10 +536,18 @@ describe('run-skill-updates orchestrator', () => {
       try {
         scaffoldProjectRoot(root);
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
-        writeSkillMd(root, 'tdd', { tools: ['Read', 'Write'], description: 'Test-driven development' });
+        writeSkillMd(root, 'tdd', {
+          tools: ['Read', 'Write'],
+          description: 'Test-driven development',
+        });
         writeAgentRegistry(root, {
           developer: ['tdd', 'debugging'],
           qa: ['tdd'],
@@ -474,7 +559,8 @@ describe('run-skill-updates orchestrator', () => {
         assert.ok(summary.agentCascades.length > 0, 'Should have agent cascades');
         const cascadeAgentNames = summary.agentCascades.map(c => c.agent || c);
         assert.ok(
-          cascadeAgentNames.includes('developer') || summary.agentCascades.some(c => c.agent === 'developer'),
+          cascadeAgentNames.includes('developer') ||
+            summary.agentCascades.some(c => c.agent === 'developer'),
           'Should include developer in cascades'
         );
         assert.ok(
@@ -491,9 +577,24 @@ describe('run-skill-updates orchestrator', () => {
       try {
         scaffoldProjectRoot(root);
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
-          { id: 'req_2', trigger: 'stale_skill', targetArtifact: { name: 'debugging' }, status: 'proposed' },
-          { id: 'req_3', trigger: 'stale_skill', targetArtifact: { name: 'research-synthesis' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_2',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'debugging' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_3',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'research-synthesis' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
         writeSkillMd(root, 'tdd', { tools: ['Read'], description: 'TDD' });
@@ -513,8 +614,18 @@ describe('run-skill-updates orchestrator', () => {
         scaffoldProjectRoot(root);
         // Even with JSONL containing multiple entries, --skill targets one
         const entries = [
-          { id: 'req_1', trigger: 'stale_skill', targetArtifact: { name: 'tdd' }, status: 'proposed' },
-          { id: 'req_2', trigger: 'stale_skill', targetArtifact: { name: 'debugging' }, status: 'proposed' },
+          {
+            id: 'req_1',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'tdd' },
+            status: 'proposed',
+          },
+          {
+            id: 'req_2',
+            trigger: 'stale_skill',
+            targetArtifact: { name: 'debugging' },
+            status: 'proposed',
+          },
         ];
         writeEvolutionRequests(root, entries);
         writeSkillMd(root, 'tdd', { tools: ['Read', 'Write'], description: 'TDD' });
@@ -522,6 +633,132 @@ describe('run-skill-updates orchestrator', () => {
 
         const summary = mod.runSkillUpdates(root, { dryRun: true, skill: 'tdd' });
         assert.equal(summary.processed, 1, 'Should process only the specified skill');
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
+  });
+
+  // Test 9: Cascade entry propagation
+  describe('cascade entry propagation to evolution queue', () => {
+    it('runSkillUpdates writes cascade entries to evolution-requests.jsonl when agents assigned', () => {
+      const root = makeTmpDir();
+      try {
+        scaffoldProjectRoot(root);
+        writeSkillMd(root, 'tdd', {
+          tools: ['Read', 'Write'],
+          description: 'Test-driven development',
+        });
+        writeAgentRegistry(root, {
+          developer: ['tdd', 'debugging'],
+          qa: ['tdd'],
+        });
+
+        // Run with dryRun=false so entries are written
+        const result = mod.runSkillUpdates(root, { dryRun: false, skill: 'tdd' });
+
+        assert.ok(result.cascadeResult, 'Should have cascadeResult');
+        assert.equal(result.cascadeResult.written, 2, 'Should write 2 cascade entries');
+
+        // Verify JSONL file contains skill_cascade entries
+        const queuePath = path.join(
+          root,
+          '.claude',
+          'context',
+          'runtime',
+          'evolution-requests.jsonl'
+        );
+        const raw = fs.readFileSync(queuePath, 'utf8');
+        const lines = raw.split('\n').filter(Boolean);
+        const cascadeEntries = lines
+          .map(l => {
+            try {
+              return JSON.parse(l);
+            } catch {
+              return null;
+            }
+          })
+          .filter(e => e && e.trigger === 'skill_cascade');
+
+        assert.equal(cascadeEntries.length, 2, 'JSONL should contain 2 skill_cascade entries');
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
+
+    it('dry-run does not write cascade entries to file', () => {
+      const root = makeTmpDir();
+      try {
+        scaffoldProjectRoot(root);
+        writeSkillMd(root, 'tdd', {
+          tools: ['Read', 'Write'],
+          description: 'Test-driven development',
+        });
+        writeAgentRegistry(root, {
+          developer: ['tdd'],
+        });
+
+        const result = mod.runSkillUpdates(root, { dryRun: true, skill: 'tdd' });
+
+        assert.ok(result.cascadeResult, 'Should have cascadeResult');
+        assert.equal(result.cascadeResult.written, 1, 'Should report 1 entry would be written');
+
+        // Queue file should not exist (no entries were written, no prior JSONL)
+        const queuePath = path.join(
+          root,
+          '.claude',
+          'context',
+          'runtime',
+          'evolution-requests.jsonl'
+        );
+        assert.equal(fs.existsSync(queuePath), false, 'Queue file should not exist in dry-run');
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
+
+    it('cascade entries reference correct agent names from registry', () => {
+      const root = makeTmpDir();
+      try {
+        scaffoldProjectRoot(root);
+        writeSkillMd(root, 'accessibility', {
+          tools: ['Read'],
+          description: 'Accessibility testing',
+        });
+        writeAgentRegistry(root, {
+          'accessibility-tester': ['accessibility'],
+          'frontend-pro': ['accessibility', 'react-expert'],
+          developer: ['tdd', 'debugging'],
+        });
+
+        const result = mod.runSkillUpdates(root, { dryRun: false, skill: 'accessibility' });
+
+        assert.ok(result.cascadeResult);
+        assert.equal(result.cascadeResult.written, 2, 'Should write 2 cascade entries');
+
+        // Read entries and verify agent names
+        const queuePath = path.join(
+          root,
+          '.claude',
+          'context',
+          'runtime',
+          'evolution-requests.jsonl'
+        );
+        const raw = fs.readFileSync(queuePath, 'utf8');
+        const entries = raw
+          .split('\n')
+          .filter(Boolean)
+          .map(l => {
+            try {
+              return JSON.parse(l);
+            } catch {
+              return null;
+            }
+          })
+          .filter(e => e && e.trigger === 'skill_cascade');
+
+        const agentNames = entries.map(e => e.targetArtifact.name).sort();
+        assert.deepStrictEqual(agentNames, ['accessibility-tester', 'frontend-pro']);
       } finally {
         fs.rmSync(root, { recursive: true, force: true });
       }

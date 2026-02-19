@@ -36,7 +36,9 @@ test('counts verified vs unverified skills', () => {
     createSkill(root, 'beta', { verified: 'false' });
     createSkill(root, 'gamma', { verified: 'false' });
 
-    const { generateFreshnessReport } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
+    const {
+      generateFreshnessReport,
+    } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
     const report = generateFreshnessReport(root);
 
     assert.equal(report.summary.verified, 1);
@@ -54,7 +56,9 @@ test('groups skills by age bucket', () => {
     createSkill(root, 'medium', { verified: 'true', lastVerifiedAt: daysAgo(60) });
     createSkill(root, 'old', { verified: 'true', lastVerifiedAt: daysAgo(150) });
 
-    const { generateFreshnessReport } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
+    const {
+      generateFreshnessReport,
+    } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
     const report = generateFreshnessReport(root);
 
     assert.equal(report.buckets['<1mo'], 1);
@@ -72,7 +76,9 @@ test('identifies stale skills (>6 months)', () => {
   try {
     createSkill(root, 'ancient', { verified: 'true', lastVerifiedAt: daysAgo(210) });
 
-    const { generateFreshnessReport } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
+    const {
+      generateFreshnessReport,
+    } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
     const report = generateFreshnessReport(root);
 
     assert.equal(report.buckets['>6mo'], 1);
@@ -92,7 +98,9 @@ test('lists top oldest skills', () => {
     createSkill(root, 'middle', { verified: 'true', lastVerifiedAt: daysAgo(50) });
     createSkill(root, 'old', { verified: 'true', lastVerifiedAt: daysAgo(200) });
 
-    const { generateFreshnessReport } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
+    const {
+      generateFreshnessReport,
+    } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
     const report = generateFreshnessReport(root);
 
     assert.ok(report.topOldest.length <= 5);
@@ -113,7 +121,9 @@ test('handles skills with no date', () => {
     createSkill(root, 'dated', { verified: 'true', lastVerifiedAt: daysAgo(5) });
     createSkill(root, 'undated', { verified: 'true' });
 
-    const { generateFreshnessReport } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
+    const {
+      generateFreshnessReport,
+    } = require('../../../.claude/tools/cli/skill-freshness-report.cjs');
     const report = generateFreshnessReport(root);
 
     assert.equal(report.buckets['no-date'], 1);

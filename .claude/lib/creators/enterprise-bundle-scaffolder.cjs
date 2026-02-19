@@ -171,53 +171,66 @@ module.exports = { postExecute };
  * Generate schemas/input.schema.json content.
  */
 function generateInputSchema(skillName, description) {
-  return JSON.stringify({
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    title: skillName + 'Input',
-    description: 'Input schema for ' + (description || skillName),
-    type: 'object',
-    additionalProperties: true,
-    properties: {
-      target: {
-        type: 'string',
-        description: 'Target file or path for the skill to operate on',
-      },
-      options: {
+  return (
+    JSON.stringify(
+      {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        title: skillName + 'Input',
+        description: 'Input schema for ' + (description || skillName),
         type: 'object',
-        description: 'Additional options for skill execution',
         additionalProperties: true,
+        properties: {
+          target: {
+            type: 'string',
+            description: 'Target file or path for the skill to operate on',
+          },
+          options: {
+            type: 'object',
+            description: 'Additional options for skill execution',
+            additionalProperties: true,
+          },
+        },
       },
-    },
-  }, null, 2) + '\n';
+      null,
+      2
+    ) + '\n'
+  );
 }
 
 /**
  * Generate schemas/output.schema.json content.
  */
 function generateOutputSchema(skillName) {
-  return JSON.stringify({
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    title: skillName + 'Output',
-    type: 'object',
-    additionalProperties: true,
-    properties: {
-      ok: {
-        type: 'boolean',
+  return (
+    JSON.stringify(
+      {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        title: skillName + 'Output',
+        type: 'object',
+        additionalProperties: true,
+        properties: {
+          ok: {
+            type: 'boolean',
+          },
+          summary: {
+            type: 'string',
+          },
+        },
       },
-      summary: {
-        type: 'string',
-      },
-    },
-  }, null, 2) + '\n';
+      null,
+      2
+    ) + '\n'
+  );
 }
 
 /**
  * Generate rules/<skill-name>.md content.
  */
 function generateRule(skillName, description, bestPractices) {
-  const bpSection = bestPractices.length > 0
-    ? bestPractices.map(bp => '- ' + bp).join('\n')
-    : '- Follow established patterns\n- Validate inputs at boundaries';
+  const bpSection =
+    bestPractices.length > 0
+      ? bestPractices.map(bp => '- ' + bp).join('\n')
+      : '- Follow established patterns\n- Validate inputs at boundaries';
 
   return `# ${skillName} Rules
 
@@ -293,31 +306,6 @@ ${description || 'Research requirements for ' + skillName + '.'}
 
 - To be populated by skill-updater research phase
 `;
-}
-
-// ---------------------------------------------------------------------------
-// Component name → generator mapping
-// ---------------------------------------------------------------------------
-
-/**
- * Map component template names to their generators.
- */
-function getGenerator(componentName) {
-  const generators = {
-    'scripts/main.cjs': (name, desc) => generateMainScript(name, desc),
-    'hooks/pre-execute.cjs': (name) => generatePreExecuteHook(name),
-    'hooks/post-execute.cjs': (name) => generatePostExecuteHook(name),
-    'schemas/input.schema.json': (name, desc) => generateInputSchema(name, desc),
-    'schemas/output.schema.json': (name) => generateOutputSchema(name),
-    'templates/implementation-template.md': (name) => generateTemplate(name),
-    'references/research-requirements.md': (name, desc) => generateReference(name, desc),
-  };
-
-  // For rules/<skill-name>.md and commands/<skill-name>.md, match the prefix
-  if (componentName.startsWith('rules/')) return 'rule';
-  if (componentName.startsWith('commands/')) return 'command';
-
-  return generators[componentName] || null;
 }
 
 // ---------------------------------------------------------------------------

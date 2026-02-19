@@ -7,9 +7,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const {
-  backfillSkills,
-} = require('../../../.claude/tools/cli/backfill-skill-verification.cjs');
+const { backfillSkills } = require('../../../.claude/tools/cli/backfill-skill-verification.cjs');
 
 /** Create a temp directory that mimics a project root with .claude/skills/ */
 function makeTempProject() {
@@ -97,13 +95,7 @@ verified: true
   });
 
   test('skips archived skills (_archive/)', () => {
-    const archiveDir = path.join(
-      tmpDir,
-      '.claude',
-      'skills',
-      '_archive',
-      'old-skill'
-    );
+    const archiveDir = path.join(tmpDir, '.claude', 'skills', '_archive', 'old-skill');
     fs.mkdirSync(archiveDir, { recursive: true });
     const content = `---
 name: old-skill
@@ -119,10 +111,7 @@ description: Archived
     });
 
     // File should be unchanged
-    const unchanged = fs.readFileSync(
-      path.join(archiveDir, 'SKILL.md'),
-      'utf8'
-    );
+    const unchanged = fs.readFileSync(path.join(archiveDir, 'SKILL.md'), 'utf8');
     assert.equal(unchanged, content);
     assert.equal(result.total, 0);
     assert.equal(result.updated, 0);

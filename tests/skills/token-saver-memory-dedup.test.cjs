@@ -7,9 +7,9 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const { deduplicateAgainstMemory } = require(
-  '../../.claude/skills/token-saver-context-compression/scripts/main.cjs'
-);
+const {
+  deduplicateAgainstMemory,
+} = require('../../.claude/skills/token-saver-context-compression/scripts/main.cjs');
 
 function makeTempMemoryDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'token-saver-dedup-'));
@@ -81,18 +81,10 @@ test('keeps records that are genuinely new', () => {
   );
 
   const records = {
-    patterns: [
-      { text: 'Completely new pattern', timestamp: '2026-01-01', source: 'test' },
-    ],
-    gotchas: [
-      { text: 'Completely new gotcha', timestamp: '2026-01-01', source: 'test' },
-    ],
-    issues: [
-      { text: 'Some issue', timestamp: '2026-01-01', source: 'test' },
-    ],
-    decisions: [
-      { text: 'Some decision', timestamp: '2026-01-01', source: 'test' },
-    ],
+    patterns: [{ text: 'Completely new pattern', timestamp: '2026-01-01', source: 'test' }],
+    gotchas: [{ text: 'Completely new gotcha', timestamp: '2026-01-01', source: 'test' }],
+    issues: [{ text: 'Some issue', timestamp: '2026-01-01', source: 'test' }],
+    decisions: [{ text: 'Some decision', timestamp: '2026-01-01', source: 'test' }],
   };
 
   const { dedupedRecords } = deduplicateAgainstMemory(records, dir);
@@ -110,12 +102,8 @@ test('handles empty existing memory gracefully', () => {
   // No patterns.json or gotchas.json created — directory is empty
 
   const records = {
-    patterns: [
-      { text: 'Pattern A', timestamp: '2026-01-01', source: 'test' },
-    ],
-    gotchas: [
-      { text: 'Gotcha B', timestamp: '2026-01-01', source: 'test' },
-    ],
+    patterns: [{ text: 'Pattern A', timestamp: '2026-01-01', source: 'test' }],
+    gotchas: [{ text: 'Gotcha B', timestamp: '2026-01-01', source: 'test' }],
     issues: [],
     decisions: [],
   };
@@ -138,12 +126,8 @@ test('handles corrupt patterns.json gracefully', () => {
   );
 
   const records = {
-    patterns: [
-      { text: 'Pattern C', timestamp: '2026-01-01', source: 'test' },
-    ],
-    gotchas: [
-      { text: 'Valid gotcha', timestamp: '2026-01-01', source: 'test' },
-    ],
+    patterns: [{ text: 'Pattern C', timestamp: '2026-01-01', source: 'test' }],
+    gotchas: [{ text: 'Valid gotcha', timestamp: '2026-01-01', source: 'test' }],
     issues: [],
     decisions: [],
   };
@@ -167,9 +151,7 @@ test('dedup is case-insensitive', () => {
   );
 
   const records = {
-    patterns: [
-      { text: 'use shell: false', timestamp: '2026-01-01', source: 'test' },
-    ],
+    patterns: [{ text: 'use shell: false', timestamp: '2026-01-01', source: 'test' }],
     gotchas: [],
     issues: [],
     decisions: [],
@@ -200,12 +182,8 @@ test('returns dedup stats', () => {
       { text: 'Existing pattern', timestamp: '2026-01-01', source: 'test' },
       { text: 'New pattern', timestamp: '2026-01-01', source: 'test' },
     ],
-    gotchas: [
-      { text: 'Existing gotcha', timestamp: '2026-01-01', source: 'test' },
-    ],
-    issues: [
-      { text: 'An issue', timestamp: '2026-01-01', source: 'test' },
-    ],
+    gotchas: [{ text: 'Existing gotcha', timestamp: '2026-01-01', source: 'test' }],
+    issues: [{ text: 'An issue', timestamp: '2026-01-01', source: 'test' }],
     decisions: [],
   };
 

@@ -16,11 +16,15 @@ function writeStaleArtifacts(root, entries) {
   const runtimeDir = path.join(root, '.claude', 'context', 'runtime');
   fs.writeFileSync(
     path.join(runtimeDir, 'stale-artifacts.json'),
-    JSON.stringify({
-      timestamp: new Date().toISOString(),
-      unverified: [],
-      stale: entries,
-    }, null, 2),
+    JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        unverified: [],
+        stale: entries,
+      },
+      null,
+      2
+    ),
     'utf8'
   );
 }
@@ -174,7 +178,13 @@ test('handles empty stale-artifacts.json', () => {
     assert.equal(result.skipped, 0);
     assert.equal(result.total, 0);
 
-    const requestsPath = path.join(root, '.claude', 'context', 'runtime', 'evolution-requests.jsonl');
+    const requestsPath = path.join(
+      root,
+      '.claude',
+      'context',
+      'runtime',
+      'evolution-requests.jsonl'
+    );
     // File should either not exist or be empty
     if (fs.existsSync(requestsPath)) {
       const content = fs.readFileSync(requestsPath, 'utf8').trim();

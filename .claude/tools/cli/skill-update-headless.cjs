@@ -22,7 +22,9 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const { validateEnterpriseBundle } = require('../../lib/creators/enterprise-bundle-validator.cjs');
-const { scaffoldMissingComponents } = require('../../lib/creators/enterprise-bundle-scaffolder.cjs');
+const {
+  scaffoldMissingComponents,
+} = require('../../lib/creators/enterprise-bundle-scaffolder.cjs');
 const { findAssignedAgents, runPostUpdateIntegration } = require('./run-skill-updates.cjs');
 
 // ---------------------------------------------------------------------------
@@ -42,6 +44,7 @@ function parseHeadlessArgs(argv) {
     dryRun: false,
     batch: 0,
     json: false,
+    processCascades: false,
   };
 
   for (let i = 0; i < argv.length; i++) {
@@ -56,6 +59,8 @@ function parseHeadlessArgs(argv) {
       args.batch = parseInt(argv[++i], 10) || 0;
     } else if (arg === '--json') {
       args.json = true;
+    } else if (arg === '--process-cascades') {
+      args.processCascades = true;
     }
   }
 
@@ -76,9 +81,10 @@ function parseHeadlessArgs(argv) {
 function buildUpdatePrompt(skillName, bundleInfo) {
   const timestamp = new Date().toISOString();
   const scoreInfo = bundleInfo.score ? ` (current bundle: ${bundleInfo.score})` : '';
-  const missingInfo = bundleInfo.missing && bundleInfo.missing.length > 0
-    ? `\nMissing components: ${bundleInfo.missing.join(', ')}`
-    : '';
+  const missingInfo =
+    bundleInfo.missing && bundleInfo.missing.length > 0
+      ? `\nMissing components: ${bundleInfo.missing.join(', ')}`
+      : '';
 
   return `Update the '${skillName}' skill using the skill-updater workflow${scoreInfo}:
 1. Read .claude/skills/${skillName}/SKILL.md
@@ -161,6 +167,41 @@ function findStalestSkills(count, projectRoot) {
 }
 
 // ---------------------------------------------------------------------------
+// Cascade Queue Consumer
+// ---------------------------------------------------------------------------
+
+const QUEUE_RELATIVE_PATH = path.join('.claude', 'context', 'runtime', 'evolution-requests.jsonl');
+
+/**
+ * Read pending skill_cascade entries from the evolution-requests queue.
+ *
+ * @param {string} projectRoot - Absolute path to the project root
+ * @param {Object} [options]
+ * @param {number} [options.maxCascades=20] - Maximum cascades to return
+ * @returns {{ pending: Array<Object>, count: number }}
+ */
+function processCascadeQueue(projectRoot, options = {}) {
+  const { maxCascades = 20 } = options;
+  const queuePath = path.join(projectRoot, QUEUE_RELATIVE_PATH);
+  if (!fs.existsSync(queuePath)) return { pending: [], count: 0 };
+
+  const raw = fs.readFileSync(queuePath, 'utf8');
+  const entries = raw
+    .split('\n')
+    .filter(Boolean)
+    .map(line => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(e => e && e.trigger === 'skill_cascade' && e.status === 'proposed');
+
+  return { pending: entries.slice(0, maxCascades), count: entries.length };
+}
+
+// ---------------------------------------------------------------------------
 // Main Headless Update
 // ---------------------------------------------------------------------------
 
@@ -211,20 +252,28 @@ function runHeadlessUpdate(skillName, options = {}) {
   if (!skipClaude && !dryRun) {
     const prompt = buildUpdatePrompt(skillName, beforeBundle);
     try {
-      const result = spawnSync('claude', [
-        '-p', prompt,
-        '--dangerously-skip-permissions',
-        '--model', model,
-        '-d', projectRoot,
-        '--output-format', 'json',
-      ], {
-        cwd: projectRoot,
-        encoding: 'utf8',
-        timeout: 300000, // 5 min
-        shell: false,
-        windowsHide: true,
-        env: { ...process.env, CLAUDECODE: '' },
-      });
+      const result = spawnSync(
+        'claude',
+        [
+          '-p',
+          prompt,
+          '--dangerously-skip-permissions',
+          '--model',
+          model,
+          '-d',
+          projectRoot,
+          '--output-format',
+          'json',
+        ],
+        {
+          cwd: projectRoot,
+          encoding: 'utf8',
+          timeout: 300000, // 5 min
+          shell: false,
+          windowsHide: true,
+          env: { ...process.env, CLAUDECODE: '' },
+        }
+      );
 
       cliOutput = (result.stdout || '') + (result.stderr || '');
       contentUpdated = result.status === 0;
@@ -255,9 +304,8 @@ function runHeadlessUpdate(skillName, options = {}) {
   }
 
   // 5. Re-validate after scaffolding
-  const finalBundle = scaffolded.length > 0
-    ? validateEnterpriseBundle(skillName, projectRoot)
-    : afterBundle;
+  const finalBundle =
+    scaffolded.length > 0 ? validateEnterpriseBundle(skillName, projectRoot) : afterBundle;
 
   // 6. Run integration (only for real project root, skip for test tmp dirs)
   let integration = { steps: [], errors: [] };
@@ -307,7 +355,9 @@ function main() {
   }
 
   if (skills.length === 0) {
-    console.error('Usage: node skill-update-headless.cjs --skill <name> [--model sonnet] [--dry-run]');
+    console.error(
+      'Usage: node skill-update-headless.cjs --skill <name> [--model sonnet] [--dry-run]'
+    );
     console.error('       node skill-update-headless.cjs --batch <N> [--model sonnet]');
     process.exitCode = 1;
     return;
@@ -326,8 +376,20 @@ function main() {
     results.push(result);
   }
 
+  // Include cascade queue if requested
+  let cascadeQueue = null;
+  if (args.processCascades) {
+    cascadeQueue = processCascadeQueue(projectRoot);
+  }
+
   if (args.json) {
-    process.stdout.write(JSON.stringify(results.length === 1 ? results[0] : results, null, 2) + '\n');
+    const output = results.length === 1 ? results[0] : results;
+    const finalOutput = cascadeQueue
+      ? Array.isArray(output)
+        ? { results: output, cascadeQueue }
+        : { ...output, cascadeQueue }
+      : output;
+    process.stdout.write(JSON.stringify(finalOutput, null, 2) + '\n');
   } else {
     for (const r of results) {
       process.stdout.write(`\n${r.skill}: bundle ${r.bundleBefore} → ${r.bundleAfter}`);
@@ -352,4 +414,5 @@ module.exports = {
   runHeadlessUpdate,
   checkDebugLogs,
   findStalestSkills,
+  processCascadeQueue,
 };

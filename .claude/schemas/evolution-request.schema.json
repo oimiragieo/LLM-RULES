@@ -34,6 +34,7 @@
         "user_request",
         "rubric_regression",
         "stale_skill",
+        "skill_cascade",
         "other"
       ]
     },

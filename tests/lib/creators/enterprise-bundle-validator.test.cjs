@@ -96,10 +96,7 @@ describe('Enterprise Bundle Validator', () => {
   });
 
   it('returns complete: false with list of missing components', () => {
-    createFakeSkill('partial-skill', [
-      'scripts/main.cjs',
-      'schemas/output.schema.json',
-    ]);
+    createFakeSkill('partial-skill', ['scripts/main.cjs', 'schemas/output.schema.json']);
 
     const result = validateEnterpriseBundle('partial-skill', TMP_DIR);
 

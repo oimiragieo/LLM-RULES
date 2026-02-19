@@ -16,8 +16,12 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { performance } = require('node:perf_hooks');
 const { BM25Indexer } = require('../../.claude/lib/code-indexing/bm25-indexer.cjs');
-const { updateFileInBM25, incrementalUpdateFile } = require('../../.claude/lib/code-indexing/bm25-incremental.cjs');
+const {
+  updateFileInBM25,
+  incrementalUpdateFile,
+} = require('../../.claude/lib/code-indexing/bm25-incremental.cjs');
 
 describe('BM25 Incremental Update', () => {
   let tmpDir;
@@ -74,7 +78,10 @@ describe('BM25 Incremental Update', () => {
     // New content should be searchable
     const newResults = bm25Index.search('quantum computing');
     const newHits = newResults.filter(r => r.id.startsWith('moduleA.js'));
-    assert.ok(newHits.length > 0, 'New content "quantum computing" should be searchable in moduleA');
+    assert.ok(
+      newHits.length > 0,
+      'New content "quantum computing" should be searchable in moduleA'
+    );
   });
 
   it('removes old chunks for the file before adding new ones', () => {
@@ -93,7 +100,11 @@ describe('BM25 Incremental Update', () => {
 
   it('new content is searchable after update', () => {
     // Write completely new content to fileA
-    fs.writeFileSync(fileA, 'class NeuralNetwork {\n  train(data) {\n    return this.layers.forward(data);\n  }\n}\n', 'utf8');
+    fs.writeFileSync(
+      fileA,
+      'class NeuralNetwork {\n  train(data) {\n    return this.layers.forward(data);\n  }\n}\n',
+      'utf8'
+    );
 
     updateFileInBM25(fileA, bm25Index, tmpDir);
 

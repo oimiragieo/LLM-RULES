@@ -21,6 +21,7 @@ const {
   parseHeadlessArgs,
   runHeadlessUpdate,
   checkDebugLogs,
+  processCascadeQueue,
 } = require('../../.claude/tools/cli/skill-update-headless.cjs');
 
 // Test fixtures
@@ -122,7 +123,8 @@ describe('checkDebugLogs', () => {
   });
 
   it('detects guard violations in output', () => {
-    const output = 'BLOCKED by routing-guard: planner-first violation\nSome other output\nBLOCKED by creator-guard: unauthorized write';
+    const output =
+      'BLOCKED by routing-guard: planner-first violation\nSome other output\nBLOCKED by creator-guard: unauthorized write';
     const violations = checkDebugLogs(output, TMP_DIR);
     assert.ok(violations.length >= 2);
   });
@@ -230,5 +232,122 @@ describe('runHeadlessUpdate', () => {
     assert.ok(result.bundleBefore !== '9/9' || result.scaffolded);
     // After scaffolding, bundle should be complete
     assert.equal(result.bundleAfter, '9/9');
+  });
+});
+
+// =============================================================================
+// processCascadeQueue
+// =============================================================================
+
+describe('processCascadeQueue', () => {
+  beforeEach(() => {
+    ensureTmpDir();
+  });
+
+  afterEach(() => {
+    cleanTmpDir();
+  });
+
+  it('reads skill_cascade entries from evolution queue', () => {
+    const queueDir = path.join(TMP_DIR, '.claude', 'context', 'runtime');
+    fs.mkdirSync(queueDir, { recursive: true });
+
+    const entries = [
+      {
+        id: 'cascade_dev_1',
+        timestamp: new Date().toISOString(),
+        source: 'other',
+        trigger: 'skill_cascade',
+        evidence: 'Skill "tdd" updated',
+        suggestedArtifactType: 'agent',
+        summary: 'Cascade: update agent "developer"',
+        status: 'proposed',
+        targetArtifact: { type: 'agent', name: 'developer' },
+      },
+      {
+        id: 'cascade_qa_1',
+        timestamp: new Date().toISOString(),
+        source: 'other',
+        trigger: 'skill_cascade',
+        evidence: 'Skill "tdd" updated',
+        suggestedArtifactType: 'agent',
+        summary: 'Cascade: update agent "qa"',
+        status: 'proposed',
+        targetArtifact: { type: 'agent', name: 'qa' },
+      },
+    ];
+    fs.writeFileSync(
+      path.join(queueDir, 'evolution-requests.jsonl'),
+      entries.map(e => JSON.stringify(e)).join('\n') + '\n',
+      'utf8'
+    );
+
+    const result = processCascadeQueue(TMP_DIR);
+    assert.equal(result.count, 2);
+    assert.equal(result.pending.length, 2);
+    assert.equal(result.pending[0].targetArtifact.name, 'developer');
+  });
+
+  it('ignores non-cascade and processed entries', () => {
+    const queueDir = path.join(TMP_DIR, '.claude', 'context', 'runtime');
+    fs.mkdirSync(queueDir, { recursive: true });
+
+    const entries = [
+      {
+        id: 'req_stale_1',
+        timestamp: new Date().toISOString(),
+        source: 'other',
+        trigger: 'stale_skill',
+        evidence: 'Skill is stale',
+        suggestedArtifactType: 'skill',
+        summary: 'Update tdd',
+        status: 'proposed',
+      },
+      {
+        id: 'cascade_dev_old',
+        timestamp: new Date().toISOString(),
+        source: 'other',
+        trigger: 'skill_cascade',
+        evidence: 'Already processed',
+        suggestedArtifactType: 'agent',
+        summary: 'Cascade done',
+        status: 'processed',
+        targetArtifact: { type: 'agent', name: 'developer' },
+      },
+      {
+        id: 'cascade_qa_pending',
+        timestamp: new Date().toISOString(),
+        source: 'other',
+        trigger: 'skill_cascade',
+        evidence: 'Skill "debugging" updated',
+        suggestedArtifactType: 'agent',
+        summary: 'Cascade: update qa',
+        status: 'proposed',
+        targetArtifact: { type: 'agent', name: 'qa' },
+      },
+    ];
+    fs.writeFileSync(
+      path.join(queueDir, 'evolution-requests.jsonl'),
+      entries.map(e => JSON.stringify(e)).join('\n') + '\n',
+      'utf8'
+    );
+
+    const result = processCascadeQueue(TMP_DIR);
+    assert.equal(result.count, 1, 'Only 1 proposed skill_cascade entry');
+    assert.equal(result.pending.length, 1);
+    assert.equal(result.pending[0].targetArtifact.name, 'qa');
+  });
+
+  it('returns empty for missing queue file', () => {
+    const result = processCascadeQueue(TMP_DIR);
+    assert.equal(result.count, 0);
+    assert.equal(result.pending.length, 0);
+  });
+
+  it('parseHeadlessArgs recognizes --process-cascades flag', () => {
+    const args = parseHeadlessArgs(['--skill', 'tdd', '--process-cascades', '--json']);
+    assert.equal(args.processCascades, true);
+    assert.equal(args.skill, 'tdd');
+    assert.equal(args.json, true);
   });
 });

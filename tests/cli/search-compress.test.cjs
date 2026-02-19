@@ -19,14 +19,22 @@ function runCompress(query, extraArgs = []) {
 describe('search:compress pipeline command', () => {
   test('--compress with query returns JSON with ok:true', () => {
     const result = runCompress('authentication');
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+    );
     const parsed = JSON.parse(result.stdout);
     assert.equal(parsed.ok, true, 'Expected ok to be true');
   });
 
   test('output includes search section with query and hits', () => {
     const result = runCompress('authentication');
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+    );
     const parsed = JSON.parse(result.stdout);
     assert.ok(parsed.search, 'Expected search section in output');
     assert.equal(parsed.search.query, 'authentication', 'Expected search.query to match input');
@@ -35,7 +43,11 @@ describe('search:compress pipeline command', () => {
 
   test('output includes compression section with adaptive ratio', () => {
     const result = runCompress('authentication');
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+    );
     const parsed = JSON.parse(result.stdout);
     assert.ok(parsed.compression, 'Expected compression section in output');
     assert.ok(
@@ -46,7 +58,11 @@ describe('search:compress pipeline command', () => {
 
   test('output includes memoryRecords with expected keys', () => {
     const result = runCompress('authentication');
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+    );
     const parsed = JSON.parse(result.stdout);
     assert.ok(parsed.memoryRecords, 'Expected memoryRecords in output');
     assert.ok('patterns' in parsed.memoryRecords, 'Expected patterns key in memoryRecords');
@@ -57,7 +73,11 @@ describe('search:compress pipeline command', () => {
 
   test('output includes dedupStats', () => {
     const result = runCompress('authentication');
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+    );
     const parsed = JSON.parse(result.stdout);
     assert.ok(parsed.dedupStats, 'Expected dedupStats in output');
     assert.ok(parsed.dedupStats.total >= 0, 'Expected dedupStats.total >= 0');

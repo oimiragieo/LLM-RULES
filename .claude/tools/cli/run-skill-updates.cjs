@@ -23,6 +23,14 @@ try {
   scaffoldMissingComponents = null;
 }
 
+// Cascade entry writer
+let writeCascadeEntries;
+try {
+  ({ writeCascadeEntries } = require('../../lib/creators/cascade-entry-writer.cjs'));
+} catch {
+  writeCascadeEntries = null;
+}
+
 // ---------------------------------------------------------------------------
 // Frontmatter Parsing
 // ---------------------------------------------------------------------------
@@ -253,9 +261,11 @@ function runPostUpdateIntegration(skillName, projectRoot, dryRun = false) {
   // Step 1: Update skill catalog (regenerate skill index)
   try {
     if (!dryRun) {
-      const result = spawnSync(process.execPath, [
-        path.join(projectRoot, '.claude/tools/cli/generate-skill-index.cjs'),
-      ], { cwd: projectRoot, encoding: 'utf8', timeout: 30000, shell: false, windowsHide: true });
+      const result = spawnSync(
+        process.execPath,
+        [path.join(projectRoot, '.claude/tools/cli/generate-skill-index.cjs')],
+        { cwd: projectRoot, encoding: 'utf8', timeout: 30000, shell: false, windowsHide: true }
+      );
       if (result.status === 0) {
         steps.push('skill-index regenerated');
       } else {
@@ -285,7 +295,13 @@ function runPostUpdateIntegration(skillName, projectRoot, dryRun = false) {
 
   // Step 3: Queue integration check
   try {
-    const queuePath = path.join(projectRoot, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
+    const queuePath = path.join(
+      projectRoot,
+      '.claude',
+      'context',
+      'runtime',
+      'integration-queue.jsonl'
+    );
     if (!dryRun) {
       const entry = JSON.stringify({
         timestamp: new Date().toISOString(),
@@ -429,7 +445,9 @@ function runSkillUpdates(projectRoot, options = {}) {
           scaffolded: scaffold.created,
           skipped: scaffold.skipped,
         };
-        integration.steps.push(`enterprise bundle scaffolded (${scaffold.created.length} components)`);
+        integration.steps.push(
+          `enterprise bundle scaffolded (${scaffold.created.length} components)`
+        );
       } else if (!bundle.complete && dryRun) {
         bundleResult = { before: bundle.score, missing: bundle.missing };
         integration.steps.push(`enterprise bundle incomplete: ${bundle.score} (dry-run skipped)`);
@@ -448,6 +466,16 @@ function runSkillUpdates(projectRoot, options = {}) {
     allIntegration.push({ skill: skillName, bundle: bundleResult, ...integration });
   }
 
+  // Propagate cascades to evolution queue
+  let cascadeResult = null;
+  if (agentCascades.length > 0 && writeCascadeEntries) {
+    try {
+      cascadeResult = writeCascadeEntries(agentCascades, projectRoot, { dryRun });
+    } catch {
+      // Graceful degradation — cascade writing is non-blocking
+    }
+  }
+
   // Mark processed entries in the JSONL (unless dry-run)
   if (!dryRun && processedIds.size > 0) {
     markProcessedEntries(projectRoot, processedIds);
@@ -459,6 +487,7 @@ function runSkillUpdates(projectRoot, options = {}) {
     processed,
     failed,
     agentCascades,
+    cascadeResult,
     integration: allIntegration,
     summary: summaryText,
   };

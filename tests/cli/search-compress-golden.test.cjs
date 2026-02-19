@@ -14,12 +14,7 @@ const os = require('node:os');
 // ---------------------------------------------------------------------------
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
-const {
-  main,
-  computeAdaptiveRatio,
-  deduplicateAgainstMemory,
-  classifyMemoryTarget,
-} = require(
+const { main, computeAdaptiveRatio, deduplicateAgainstMemory, classifyMemoryTarget } = require(
   path.join(PROJECT_ROOT, '.claude/skills/token-saver-context-compression/scripts/main.cjs')
 );
 
@@ -72,7 +67,7 @@ describe('search:compress golden — schema validation', () => {
     });
 
     // Mock runTokenSaverWorkflow to return canned compression
-    const mockRunWorkflow = (_opts) => ({
+    const mockRunWorkflow = _opts => ({
       ok: true,
       data: {
         evidence_sufficient: true,
@@ -272,15 +267,9 @@ describe('search:compress golden — dedup with empty memory', () => {
         { text: 'Pattern A', timestamp: '2026-02-01T00:00:00.000Z' },
         { text: 'Pattern B', timestamp: '2026-02-01T00:00:00.000Z' },
       ],
-      gotchas: [
-        { text: 'Gotcha A', timestamp: '2026-02-01T00:00:00.000Z' },
-      ],
-      issues: [
-        { text: 'Issue A', timestamp: '2026-02-01T00:00:00.000Z' },
-      ],
-      decisions: [
-        { text: 'Decision A', timestamp: '2026-02-01T00:00:00.000Z' },
-      ],
+      gotchas: [{ text: 'Gotcha A', timestamp: '2026-02-01T00:00:00.000Z' }],
+      issues: [{ text: 'Issue A', timestamp: '2026-02-01T00:00:00.000Z' }],
+      decisions: [{ text: 'Decision A', timestamp: '2026-02-01T00:00:00.000Z' }],
     };
 
     const { dedupedRecords, stats } = deduplicateAgainstMemory(records, tmpDir);
@@ -297,9 +286,7 @@ describe('search:compress golden — dedup with empty memory', () => {
   test('missing memory files -> all records kept', () => {
     // Do not write any files at all — the memory dir exists but has no JSON
     const records = {
-      patterns: [
-        { text: 'Pattern X', timestamp: '2026-02-01T00:00:00.000Z' },
-      ],
+      patterns: [{ text: 'Pattern X', timestamp: '2026-02-01T00:00:00.000Z' }],
       gotchas: [],
       issues: [],
       decisions: [],
@@ -362,7 +349,7 @@ describe('search:compress golden — full round-trip with mocked deps', () => {
       stderr: '',
     });
 
-    const mockRunWorkflow = (_opts) => ({
+    const mockRunWorkflow = _opts => ({
       ok: true,
       data: cannedCompressionOutput,
     });
@@ -416,10 +403,7 @@ describe('search:compress golden — full round-trip with mocked deps', () => {
       stderr: 'search index not found',
     });
 
-    const result = main(
-      { query: 'something' },
-      { runCommand: mockRunCommand }
-    );
+    const result = main({ query: 'something' }, { runCommand: mockRunCommand });
 
     assert.equal(result.ok, false);
     assert.equal(result.stage, 'search');

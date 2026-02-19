@@ -129,7 +129,7 @@ describe('QueryCache', () => {
     // Add an entry and trigger a miss + a hit
     cache.set('test query', [{ file: 'a.js' }]);
     cache.get('missing query'); // miss
-    cache.get('test query');    // hit
+    cache.get('test query'); // hit
 
     stats = cache.getStats();
     assert.equal(stats.entries, 1);

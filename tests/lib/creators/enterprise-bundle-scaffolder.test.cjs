@@ -12,6 +12,7 @@ const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 
 const { PROJECT_ROOT } = require('../../../.claude/lib/utils/project-root.cjs');
 
@@ -46,27 +47,29 @@ function cleanTmpDir() {
 function createMinimalSkill(skillName, skillContent) {
   const skillDir = path.join(TMP_DIR, '.claude', 'skills', skillName);
   fs.mkdirSync(skillDir, { recursive: true });
-  const defaultContent = skillContent || [
-    '---',
-    'name: ' + skillName,
-    'description: Test skill for ' + skillName,
-    'tools: [Read, Write, Bash]',
-    'best_practices:',
-    '  - Follow TDD methodology',
-    '  - Validate inputs at boundaries',
-    '---',
-    '',
-    '# ' + skillName,
-    '',
-    '## Purpose',
-    '',
-    'This is a test skill.',
-    '',
-    '## Best Practices',
-    '',
-    '- Follow TDD',
-    '- Validate inputs',
-  ].join('\n');
+  const defaultContent =
+    skillContent ||
+    [
+      '---',
+      'name: ' + skillName,
+      'description: Test skill for ' + skillName,
+      'tools: [Read, Write, Bash]',
+      'best_practices:',
+      '  - Follow TDD methodology',
+      '  - Validate inputs at boundaries',
+      '---',
+      '',
+      '# ' + skillName,
+      '',
+      '## Purpose',
+      '',
+      'This is a test skill.',
+      '',
+      '## Best Practices',
+      '',
+      '- Follow TDD',
+      '- Validate inputs',
+    ].join('\n');
 
   fs.writeFileSync(path.join(skillDir, 'SKILL.md'), defaultContent, 'utf8');
   return skillDir;
@@ -105,7 +108,14 @@ describe('Enterprise Bundle Scaffolder', () => {
 
     assert.ok(result.created.some(f => f.includes('scripts/main.cjs')));
 
-    const mainPath = path.join(TMP_DIR, '.claude', 'skills', 'test-script-gen', 'scripts', 'main.cjs');
+    const mainPath = path.join(
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'test-script-gen',
+      'scripts',
+      'main.cjs'
+    );
     assert.ok(fs.existsSync(mainPath));
 
     const content = fs.readFileSync(mainPath, 'utf8');
@@ -121,7 +131,12 @@ describe('Enterprise Bundle Scaffolder', () => {
     assert.ok(result.created.some(f => f.includes('schemas/output.schema.json')));
 
     const schemaPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-schema-gen', 'schemas', 'output.schema.json'
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'test-schema-gen',
+      'schemas',
+      'output.schema.json'
     );
     const content = fs.readFileSync(schemaPath, 'utf8');
     const schema = JSON.parse(content);
@@ -139,7 +154,12 @@ describe('Enterprise Bundle Scaffolder', () => {
     assert.ok(result.created.some(f => f.includes('commands/')));
 
     const cmdPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-cmd-gen', 'commands', 'test-cmd-gen.md'
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'test-cmd-gen',
+      'commands',
+      'test-cmd-gen.md'
     );
     const content = fs.readFileSync(cmdPath, 'utf8');
 
@@ -155,12 +175,19 @@ describe('Enterprise Bundle Scaffolder', () => {
     assert.ok(result.created.some(f => f.includes('templates/')));
 
     const tplPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-tpl-gen', 'templates', 'implementation-template.md'
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'test-tpl-gen',
+      'templates',
+      'implementation-template.md'
     );
     const content = fs.readFileSync(tplPath, 'utf8');
 
     assert.ok(content.includes('test-tpl-gen'));
-    assert.ok(content.includes('TDD') || content.includes('Goal') || content.includes('Verification'));
+    assert.ok(
+      content.includes('TDD') || content.includes('Goal') || content.includes('Verification')
+    );
   });
 
   it('generates references/research-requirements.md', () => {
@@ -171,7 +198,12 @@ describe('Enterprise Bundle Scaffolder', () => {
     assert.ok(result.created.some(f => f.includes('references/')));
 
     const refPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-ref-gen', 'references', 'research-requirements.md'
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'test-ref-gen',
+      'references',
+      'research-requirements.md'
     );
     const content = fs.readFileSync(refPath, 'utf8');
 
@@ -190,26 +222,39 @@ describe('Enterprise Bundle Scaffolder', () => {
 
     // Verify content was not overwritten
     const mainPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-no-overwrite', 'scripts', 'main.cjs'
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'test-no-overwrite',
+      'scripts',
+      'main.cjs'
     );
     const content = fs.readFileSync(mainPath, 'utf8');
     assert.equal(content, existingContent);
   });
 
   it('uses skill name and description in generated content', () => {
-    createMinimalSkill('my-custom-skill', [
-      '---',
-      'name: my-custom-skill',
-      'description: A specialized tool for custom operations',
-      '---',
-      '# my-custom-skill',
-    ].join('\n'));
+    createMinimalSkill(
+      'my-custom-skill',
+      [
+        '---',
+        'name: my-custom-skill',
+        'description: A specialized tool for custom operations',
+        '---',
+        '# my-custom-skill',
+      ].join('\n')
+    );
 
     const result = scaffoldMissingComponents('my-custom-skill', TMP_DIR);
 
     // Check main script uses skill name
     const mainPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'my-custom-skill', 'scripts', 'main.cjs'
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'my-custom-skill',
+      'scripts',
+      'main.cjs'
     );
     const mainContent = fs.readFileSync(mainPath, 'utf8');
     assert.ok(mainContent.includes('my-custom-skill'));
@@ -220,16 +265,14 @@ describe('Enterprise Bundle Scaffolder', () => {
 
     scaffoldMissingComponents('test-syntax', TMP_DIR);
 
-    const mainPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-syntax', 'scripts', 'main.cjs'
-    );
+    const mainPath = path.join(TMP_DIR, '.claude', 'skills', 'test-syntax', 'scripts', 'main.cjs');
     const content = fs.readFileSync(mainPath, 'utf8');
 
-    // Strip shebang line before parsing (shebang is valid for Node.js but not for new Function)
+    // Strip shebang line before parsing.
     const strippedContent = content.replace(/^#!.*\n/, '');
-    // Verify it parses without syntax error
+    // Verify it parses without syntax error.
     assert.doesNotThrow(() => {
-      new Function(strippedContent);
+      new vm.Script(strippedContent, { filename: 'generated-main.cjs' });
     }, 'Generated main.cjs has syntax errors');
   });
 
@@ -239,7 +282,12 @@ describe('Enterprise Bundle Scaffolder', () => {
     scaffoldMissingComponents('test-valid-schema', TMP_DIR);
 
     const schemaPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-valid-schema', 'schemas', 'output.schema.json'
+      TMP_DIR,
+      '.claude',
+      'skills',
+      'test-valid-schema',
+      'schemas',
+      'output.schema.json'
     );
     const content = fs.readFileSync(schemaPath, 'utf8');
     const schema = JSON.parse(content);
@@ -268,9 +316,7 @@ describe('Enterprise Bundle Scaffolder', () => {
     assert.ok(result.created.length > 0, 'should report what would be created');
 
     // Verify no files were actually created
-    const mainPath = path.join(
-      TMP_DIR, '.claude', 'skills', 'test-dry-run', 'scripts', 'main.cjs'
-    );
+    const mainPath = path.join(TMP_DIR, '.claude', 'skills', 'test-dry-run', 'scripts', 'main.cjs');
     assert.ok(!fs.existsSync(mainPath), 'main.cjs should not exist in dry-run mode');
   });
 

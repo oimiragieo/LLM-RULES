@@ -184,7 +184,8 @@ function prettyPrint(report) {
   if (report.topOldest.length > 0) {
     console.log(`${bold}Top Oldest Skills:${reset}`);
     for (const skill of report.topOldest.slice(0, 10)) {
-      const color = skill.ageMs > SIX_MONTHS_MS ? red : skill.ageMs > THREE_MONTHS_MS ? yellow : green;
+      const color =
+        skill.ageMs > SIX_MONTHS_MS ? red : skill.ageMs > THREE_MONTHS_MS ? yellow : green;
       console.log(`  ${color}- ${skill.name} (${formatDays(skill.ageMs)} old)${reset}`);
     }
     console.log();

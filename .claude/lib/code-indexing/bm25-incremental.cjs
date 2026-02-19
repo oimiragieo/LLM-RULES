@@ -40,7 +40,10 @@ function updateFileInBM25(filePath, bm25Index, projectRoot) {
   const lines = content.split('\n');
   const chunks = [];
   for (let i = 0; i < lines.length; i += LINES_PER_CHUNK) {
-    const text = lines.slice(i, i + LINES_PER_CHUNK).join('\n').trim();
+    const text = lines
+      .slice(i, i + LINES_PER_CHUNK)
+      .join('\n')
+      .trim();
     if (!text) continue;
     chunks.push({
       id: `${relPath}:${i}`,
