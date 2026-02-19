@@ -17,6 +17,11 @@ function getMemoryFiles(projectRoot) {
   return [path.join(memoryDir, 'gotchas.json'), path.join(memoryDir, 'patterns.json')];
 }
 
+function toProjectRelativePosix(filePath, projectRoot) {
+  const relative = path.relative(projectRoot, filePath);
+  return relative.replace(/\\/g, '/');
+}
+
 function readArrayJson(filePath) {
   if (!fs.existsSync(filePath)) return [];
   try {
@@ -42,7 +47,7 @@ export function auditMemoryWriteSources(projectRoot = DEFAULT_PROJECT_ROOT) {
       const source = entry?.writeSource;
       if (source === 'direct_write' || typeof source !== 'string' || source.trim() === '') {
         violations.push({
-          file: filePath,
+          file: toProjectRelativePosix(filePath, projectRoot),
           index,
           writeSource: source,
           reason: source === 'direct_write' ? 'direct_write_forbidden' : 'missing_write_source',
