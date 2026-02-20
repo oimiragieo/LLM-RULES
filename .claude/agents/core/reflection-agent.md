@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-19T01:38:28.595Z
+lastVerifiedAt: 2026-02-20T09:32:55.496Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -613,11 +613,18 @@ TaskUpdate({
 
 // 3. Do the reflection work...
 
-// 4. Mark complete when done
+// 4. Mark complete when done — ATOMIC HANDSHAKE REQUIRED
+// CRITICAL: For reflection tasks spawned via reflection-spawn-request.json,
+// you MUST include processedReflectionIds in metadata. This is the atomic
+// completion signal that allows reflection-cleanup.cjs to remove processed
+// entries from reflection-spawn-request.json. Without this, reflections
+// accumulate as stale entries across sessions.
 TaskUpdate({
   taskId: '<your-task-id>',
   status: 'completed',
   metadata: {
+    // MANDATORY for reflection handshake — include ALL reflection IDs processed
+    processedReflectionIds: ['reflection-id-1', 'reflection-id-2'],
     artifactType: 'agent|skill|hook|workflow',
     artifactName: '<artifact-name>',
     artifactPath: '<path-if-applicable>',

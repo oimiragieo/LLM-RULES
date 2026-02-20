@@ -22,7 +22,13 @@ const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 
 const PROJECT_ROOT = path.join(__dirname, '..', '..');
-const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'reflection', 'reflection-cleanup.cjs');
+const HOOK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'hooks',
+  'reflection',
+  'reflection-cleanup.cjs'
+);
 const CONTRACT_PATH = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -316,7 +322,10 @@ describe('spawn-request-contract: stale cleanup (age-based, cross-session scenar
     const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
 
     // Simulate prior-session stale entry: 26 hours old
-    const staleEntry = makeSpawnRequest('prior-session-reflection', (maxAgeHours + 2) * 60 * 60 * 1000);
+    const staleEntry = makeSpawnRequest(
+      'prior-session-reflection',
+      (maxAgeHours + 2) * 60 * 60 * 1000
+    );
     writeSpawnRequests(spawnRequestPath, [staleEntry]);
 
     const contract = loadContract();

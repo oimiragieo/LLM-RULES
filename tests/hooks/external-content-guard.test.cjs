@@ -23,13 +23,7 @@ const guard = require('../../.claude/hooks/safety/external-content-guard.cjs');
 // ---------------------------------------------------------------------------
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
-const QUARANTINE_DIR = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'runtime',
-  'quarantine'
-);
+const QUARANTINE_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'quarantine');
 
 /**
  * Minimal trusted config for tests — github.com trusted, untrusted-org.com not.
@@ -103,11 +97,7 @@ describe('GAP-A: EXTERNAL_CONTENT_GUARD_MODE env var', () => {
       { url: 'https://untrusted-evil-org.com/payload' },
       MOCK_CONFIG
     );
-    assert.strictEqual(
-      result.action,
-      'warn',
-      `Expected action 'warn' but got '${result.action}'`
-    );
+    assert.strictEqual(result.action, 'warn', `Expected action 'warn' but got '${result.action}'`);
   });
 
   test('GAP-A-3: mode=block causes handleWebFetch to block (same as hardcoded behavior)', () => {
@@ -221,10 +211,7 @@ describe('GAP-B: Quarantine file writing', () => {
   test('GAP-B-4: untrusted gh api call writes quarantine file', () => {
     process.env.EXTERNAL_CONTENT_GUARD_MODE = 'warn';
     const before = listQuarantineFiles();
-    guard.handleBash(
-      { command: 'gh api repos/gemini-cli-extensions/security' },
-      MOCK_CONFIG
-    );
+    guard.handleBash({ command: 'gh api repos/gemini-cli-extensions/security' }, MOCK_CONFIG);
 
     const after = listQuarantineFiles();
     assert.ok(
@@ -372,10 +359,7 @@ describe('GAP-C: gh api enforcement parity', () => {
       { url: 'https://untrusted-org.malicious.io/file' },
       MOCK_CONFIG
     );
-    const ghResult = guard.handleBash(
-      { command: 'gh api repos/untrusted-org/repo' },
-      MOCK_CONFIG
-    );
+    const ghResult = guard.handleBash({ command: 'gh api repos/untrusted-org/repo' }, MOCK_CONFIG);
 
     // Both should block when mode=block
     assert.strictEqual(webResult.action, 'block', 'WebFetch should block in block mode');
@@ -400,10 +384,7 @@ describe('Regression: existing warn/allow behavior preserved', () => {
 
   test('trusted WebFetch domain is always allowed', () => {
     process.env.EXTERNAL_CONTENT_GUARD_MODE = 'warn';
-    const result = guard.handleWebFetch(
-      { url: 'https://github.com/VoltAgent/repo' },
-      MOCK_CONFIG
-    );
+    const result = guard.handleWebFetch({ url: 'https://github.com/VoltAgent/repo' }, MOCK_CONFIG);
     assert.strictEqual(result.action, 'allow');
   });
 
