@@ -1,36 +1,3 @@
-## ADR-136: Runtime State Unification (2026-02-16)
-
-**Status:** PROPOSED
-**Decision:** Unify 14 runtime state JSON files into a single `runtime-state.json` with namespaced sections, managed by a `RuntimeStateManager` class that uses `proper-lockfile` for all writes.
-
-**Context:**
-
-- Architecture audit (2026-02-16) identified C3: 14 concurrent-writable runtime state files without unified locking.
-- `proper-lockfile` is already a production dependency but used only in LanceDB initialization.
-- Hook processes can execute concurrently (multiple hooks registered for same event), creating race conditions.
-- Files affected: router-state.json, task-status.json, spawn-assembly-cache.json, routing-block-dedupe.json, agent-guardrails-state.json, drift-state.json, edit-counter.json, tool-governance-state.json, reflection-step0-state.json, token-slo-state.json, and 4 more.
-
-**Decision:**
-
-1. Create `.claude/lib/runtime/runtime-state-manager.cjs` — single class for all runtime state reads/writes
-2. Uses `proper-lockfile` for write operations (lock timeout: 5s, stale: 10s)
-3. Single `runtime-state.json` with namespaced sections: `{ routing: {}, tasks: {}, reflection: {}, workflow: {}, telemetry: {} }`
-4. Migrate hooks incrementally (start with highest-frequency hooks: routing-guard, post-task-unified)
-5. Backward-compatible: old file paths remain as shims that delegate to RuntimeStateManager during migration
-
-**Consequences:**
-
-**Positive:** Eliminates concurrency bugs; reduces file I/O from 14 reads to 1; enables atomic multi-property updates; single debugging point for session state.
-
-**Negative:** Migration effort (~1 week); transient period where some hooks use old files and some use new manager.
-
-**Related:**
-
-- Architecture Audit 2026-02-16: Finding C3
-- Architecture Audit 2026-02-16: BACKWARD_PROPAGATION (schema:runtime-state-unified)
-
----
-
 ## ADR-136: safeParseJSON Migration and ESLint Enforcement (2026-02-16)
 
 **Status:** ACCEPTED
@@ -433,6 +400,38 @@ Training-based enforcement is exhausted (12+ failures on 2026-02-17). Hook enfor
 
 - gotchas.json: `ghost-task-reflection-echo` (pattern description)
 - Report: `.claude/context/reports/reflections/batch-reflection-2026-02-18.md`
+
+---
+
+## ADR-2026-02-20-001: Enterprise Pipeline Two-Commit & APPROVED_WITH_NOTES Pattern (REFLECTION DECISION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-20
+**Trigger:** Enterprise supply chain security pipeline completion (Tasks 4, 10, 11, 12)
+
+**Decision:** Adopt two-commit deployment strategy and APPROVED_WITH_NOTES security review outcome as enterprise SOP for high-stakes deployments.
+
+**Evidence:**
+
+- Task 4 (Pipeline Parent): 12 tasks executed without rework, 100% gap resolution (4/4), aggregate score 0.90 (EXCELLENT)
+- Task 11 (Security Review): APPROVED_WITH_NOTES with 0 critical/high, 3 LOW findings, 30/30 checklist pass
+- Task 12 (Deploy & Commit): Two clean commits (c4022e7d security, c5c8e3938 churn), 7130 files validated, zero unexpected modifications
+
+**Implementation:**
+
+1. **Two-Commit Model**: Separate git commits for (a) security fixes + environment configuration, (b) catalog/memory/skill updates
+2. **Whitespace Exclusion**: Document whitespace-only diffs in commit messages; validate with `git diff --check`
+3. **APPROVED_WITH_NOTES**: Formal security review outcome for mixed-severity findings (0 critical/high, N LOW)
+4. **30/30 Checklist Standard**: Security reviews must pass complete checklist items
+
+**Consequences:**
+
+- **Positive**: Audit trail clarity, zero false positives in compliance scanning, deployment-safe approvals, reduced rework
+- **Negative**: Requires commit discipline, increases total commit count, team training needed
+
+**Applicability:** HIGH/EPIC deployments with security gates, compliance reviews, or governance changes. Consider for MEDIUM+ in regulated environments.
+
+**Related:** Enterprise pipeline architecture, security review protocol, git workflow governance
 
 ---
 

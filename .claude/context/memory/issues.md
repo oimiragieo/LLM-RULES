@@ -1,3 +1,55 @@
+## 2026-02-20: Session Review #2 — New Bugs Found (Task #13)
+
+**P1: spawn-request-contract.cjs TOCTOU race** — `acknowledgeRequests()` and `removeRequests()` read file WITHOUT lock, then write WITH lock. Two simultaneous completions cause lost updates. Fix: wrap read-modify-write in single lock.
+
+**P1: _MAX_REFLECTION_AGE_HOURS unused in reflection-step0-guard.cjs** — Variable defined at line 59 but never referenced in main(). Staleness pruning effectively disabled. Fix: call `removeStaleRequests()` in main() before enforcement.
+
+**P1: Hook blocks not enforced in bypassPermissions mode** — 51 ROUTER WRITE BLOCKED events logged but files written anyway. The permission mode nullifies hook enforcement. Document this trade-off prominently.
+
+**P1: Agent output files growing (617KB peak)** — Agents producing 400-617KB report files that exceed FileTooLargeError (256KB) and MaxFileReadToken (25K) limits. Need output-size validator hook.
+
+**Report**: `.claude/context/reports/security/session-review-2-2026-02-20.md`
+
+---
+
+## 2026-02-20: Security Review LOW Findings from Enterprise Pipeline Task #11 (P2 MAINTENANCE)
+
+**Issue**: Enterprise supply chain security pipeline Wave 2 review (Task #11, 2026-02-20) identified 3 LOW-severity findings during security-architect review. All non-blocking (0 critical/high), but tracked for next maintenance cycle.
+
+**Findings**:
+
+1. **Quarantine Directory Permissions**: Review and tighten file permissions on quarantine directories (sensitivity: low, risk: low)
+2. **.env.example Missing 'off' Documentation**: EXTERNAL_CONTENT_GUARD_MODE, HYBRID_EMBEDDINGS, BM25_INCREMENTAL_UPDATE, and other boolean env vars document 'on' state but not 'off'. Add inline comments explaining 'off' behavior.
+3. **Filename Collision Edge Case**: Schema naming pattern doesn't explicitly validate against existing filenames. Potential for collision if user creates artifact with reserved name (e.g., `task` as skill name collides with built-in `task` command).
+
+**Status**: APPROVED_WITH_NOTES — security review passed all 30/30 checklist items. Findings are non-blocking and safe for deployment. Scheduled for next maintenance cycle.
+
+**Prevention**: Include filename collision validator in schema-creator. Add env var documentation template to .env.example generation script.
+
+**Priority**: P2 (maintenance, not blocking)
+
+**Related**: Task #11 Security-Architect Wave 2 (2026-02-20), Enterprise Pipeline Reflection Report
+
+---
+
+## 2026-02-20: Configuration .env Vars Missing From .env.example (P1 BLOCKER)
+
+**Issue**: Supply Chain Security Pipeline Tasks #6-9 discovered that EXTERNAL_CONTENT_GUARD_MODE env var introduced in Task #6 (developer implementation) was not added to .env.example. Code-review (Task #8) identified this as a BLOCKING issue. QA (Task #9) confirmed independently. Feature cannot merge without .env.example update.
+
+**Root Cause**: Pre-implementation specification did not capture configuration pattern. Developer Task #6 completed with 21 passing tests (score 0.89) but feature is incomplete without .env.example entry.
+
+**Pattern**: Multi-agent convergence (code-review + QA independently found same blocker) indicates systemic specification gap — configuration requirements should be captured upfront in developer handoff.
+
+**Action Required**: Add to initial task specification: "If code introduces new env vars, add them to .env.example with documentation."
+
+**Prevention**: code-review automated check should grep for getenv/process.env patterns and validate .env.example entries exist.
+
+**Priority**: P1 (blocks feature merge)
+
+**Related**: ADR-139 (TaskUpdate enforcement), Tasks #6-9 reflection (2026-02-20)
+
+---
+
 ## 2026-02-20: content-security-scan Skill Integration Queue Unprocessed (P1)
 
 **Issue**: The `skill:content-security-scan` artifact created on 2026-02-20 at 08:21:42 has an UNPROCESSED entry in integration-queue.jsonl (line 9, `processed: false`). The skill was created by Task 9 but artifact-integrator was never spawned. As a result, the skill may be missing catalog entry, agent registry entry, and skill-index.json registration.

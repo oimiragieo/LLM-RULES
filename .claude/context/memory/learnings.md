@@ -57,3 +57,5 @@
 - Pattern: external-content-guard tests cleanup operates on real quarantine dir rather than temp dir — creates side-effect risk.
 - safeParseJSON without schema name uses fallback path; acceptable for trusted-sources.json but worth documenting as conscious decision.
 - Report: `.claude/context/reports/security/code-review-supply-chain-fixes-2026-02-20.md`
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-20)

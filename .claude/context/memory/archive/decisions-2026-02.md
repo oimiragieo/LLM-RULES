@@ -907,3 +907,73 @@ async function recordLearning(text, source = 'user') {
 **Rationale**: Separating analysis from implementation enables higher-quality outputs in both phases. security-architect focuses on threat modeling without implementation pressure; developer has a precise specification to implement against.
 
 **Consequence**: Post-creation integration steps (catalog, artifact-graph, CLAUDE.md, command) may be skipped — artifact-integrator must be queued after every such implementation task.
+
+---
+
+## ADR-2026-02-20-001: Enterprise Pipeline Two-Commit & APPROVED_WITH_NOTES Pattern
+
+**Status:** ACCEPTED
+**Decision:** Adopt two-commit deployment strategy and APPROVED_WITH_NOTES security review outcome as enterprise SOP for high-stakes deployments.
+
+**Context:**
+
+- Enterprise supply chain security pipeline (Task 4, 2026-02-20) executed 12 tasks across Plan → Impl → Wave1 Review → Blocker Fix → Wave2 Security → Deploy phases
+- Successful execution without rework cycles required clear separation of concerns in git history
+- Security audit requirements necessitated clean audit trails (security commits separate from churn)
+- Security-architect review (Task 11) produced mixed-severity findings (0 critical/high, 3 LOW) requiring deployment-safe approval mechanism
+
+**Decision:**
+
+1. **Two-Commit Model**: Separate git commits for (a) security fixes + environment configuration, (b) catalog/memory/skill updates (churn)
+2. **Explicit Whitespace Exclusion**: Document whitespace-only diffs (e.g., `trusted-sources.json`) in commit messages; validate with `git diff --check` before final push
+3. **APPROVED_WITH_NOTES Outcome**: Formal security review result acknowledging non-blocking findings + LOW findings queue for next maintenance cycle
+4. **30/30 Checklist Confidence**: Security review must pass all checklist items (e.g., 30/30 in Task 11) for deployment confidence
+
+**Consequences:**
+
+**Positive:** Audit trail clarity; zero false positives in compliance scanning; deployment-safe approvals without blocking on cosmetic issues; reduced rework cycles.
+
+**Negative:** Requires discipline in commit separation; increases total commit count (2 vs 1 for simple deployments); training required for teams unfamiliar with pattern.
+
+**Evidence:**
+
+- Task 12 (Deploy & Commit): Two clean commits (c4022e7d security, c5c8e3938 churn), 7130 files validated, zero unexpected modifications
+- Task 11 (Security Review): APPROVED_WITH_NOTES with 0 critical/high, 3 LOW findings, 30/30 checklist pass
+- Task 4 (Pipeline Parent): 12 tasks completed, 100% gap resolution (4/4), aggregate score 0.90 (EXCELLENT), zero rework cycles
+
+**Applicability:** All HIGH/EPIC deployments with security gates, compliance reviews, or governance changes. Consider for MEDIUM+ deployments in regulated environments.
+
+**Related:** Enterprise pipeline ADR, security review protocol, git workflow governance
+
+---
+
+## ADR-136: Runtime State Unification (2026-02-16)
+
+**Status:** PROPOSED
+**Decision:** Unify 14 runtime state JSON files into a single `runtime-state.json` with namespaced sections, managed by a `RuntimeStateManager` class that uses `proper-lockfile` for all writes.
+
+**Context:**
+
+- Architecture audit (2026-02-16) identified C3: 14 concurrent-writable runtime state files without unified locking.
+- `proper-lockfile` is already a production dependency but used only in LanceDB initialization.
+- Hook processes can execute concurrently (multiple hooks registered for same event), creating race conditions.
+- Files affected: router-state.json, task-status.json, spawn-assembly-cache.json, routing-block-dedupe.json, agent-guardrails-state.json, drift-state.json, edit-counter.json, tool-governance-state.json, reflection-step0-state.json, token-slo-state.json, and 4 more.
+
+**Decision:**
+
+1. Create `.claude/lib/runtime/runtime-state-manager.cjs` — single class for all runtime state reads/writes
+2. Uses `proper-lockfile` for write operations (lock timeout: 5s, stale: 10s)
+3. Single `runtime-state.json` with namespaced sections: `{ routing: {}, tasks: {}, reflection: {}, workflow: {}, telemetry: {} }`
+4. Migrate hooks incrementally (start with highest-frequency hooks: routing-guard, post-task-unified)
+5. Backward-compatible: old file paths remain as shims that delegate to RuntimeStateManager during migration
+
+**Consequences:**
+
+**Positive:** Eliminates concurrency bugs; reduces file I/O from 14 reads to 1; enables atomic multi-property updates; single debugging point for session state.
+
+**Negative:** Migration effort (~1 week); transient period where some hooks use old files and some use new manager.
+
+**Related:**
+
+- Architecture Audit 2026-02-16: Finding C3
+- Architecture Audit 2026-02-16: BACKWARD_PROPAGATION (schema:runtime-state-unified)
