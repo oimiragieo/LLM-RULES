@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "compound-engineering": {
+      "enabled": true
+    },
+    "vercel": {
+      "enabled": true
+    }
+  }
+}
