@@ -42,6 +42,15 @@
         ]
       },
       {
+        "matcher": "WebFetch|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/safety/external-content-guard.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -296,6 +305,17 @@
           {
             "type": "command",
             "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/pre-compact.cjs"
           }
         ]
       }

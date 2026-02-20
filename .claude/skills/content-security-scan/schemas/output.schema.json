@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "content-security-scan-output",
+  "title": "Content Security Scan Output",
+  "description": "Output schema for the content-security-scan skill",
+  "type": "object",
+  "required": ["verdict", "source_url", "scan_steps", "red_flags", "provenance_logged"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"],
+      "description": "Overall scan result"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL the content was fetched from"
+    },
+    "scan_steps": {
+      "type": "object",
+      "description": "Per-step results",
+      "properties": {
+        "size_check": { "type": "string", "enum": ["PASS", "FAIL"] },
+        "binary_check": { "type": "string", "enum": ["PASS", "FAIL"] },
+        "tool_invocation": { "type": "string", "enum": ["PASS", "FAIL"] },
+        "prompt_injection": { "type": "string", "enum": ["PASS", "FAIL"] },
+        "exfiltration": { "type": "string", "enum": ["PASS", "FAIL"] },
+        "privilege": { "type": "string", "enum": ["PASS", "FAIL"] }
+      }
+    },
+    "red_flags": {
+      "type": "array",
+      "description": "List of detected red flags",
+      "items": {
+        "type": "object",
+        "required": ["step", "pattern", "severity"],
+        "properties": {
+          "step": {
+            "type": "string",
+            "enum": ["size_check", "binary_check", "tool_invocation", "prompt_injection", "exfiltration", "privilege"]
+          },
+          "pattern": { "type": "string" },
+          "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
+          "line": { "type": "integer" },
+          "excerpt": { "type": "string", "maxLength": 200 }
+        }
+      }
+    },
+    "provenance_logged": {
+      "type": "boolean",
+      "description": "Whether audit record was written to external-fetch-audit.jsonl"
+    },
+    "audit_record": {
+      "type": "object",
+      "description": "The audit record written to external-fetch-audit.jsonl"
+    }
+  },
+  "additionalProperties": false
+}

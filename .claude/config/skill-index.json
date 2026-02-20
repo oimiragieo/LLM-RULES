@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-20T07:44:01.237Z",
+  "generatedAt": "2026-02-20T08:33:37.881Z",
   "metadata": {
-    "totalSkills": 398,
+    "totalSkills": 399,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-20T07:44:01.238Z",
+    "lastValidated": "2026-02-20T08:33:37.882Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -1380,6 +1380,30 @@
         "containerization-rules"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "content-security-scan": {
+      "name": "content-security-scan",
+      "displayName": "Content Security Scan",
+      "category": "Other",
+      "domain": "other",
+      "description": "Automated security scanner for external skill/agent content fetched from GitHub or web sources. Runs a 7-step PASS/FAIL security gate against fetched markdown/text content.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "content-security-scan"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "context-compressor": {
@@ -9714,6 +9738,7 @@
         "command-creator",
         "compliance-policy-check",
         "composer-dependency-management",
+        "content-security-scan",
         "creation-feasibility-gate",
         "differential-review",
         "dry-principle",
@@ -10108,6 +10133,7 @@
         "configuration-management",
         "container-expert",
         "containerization-rules",
+        "content-security-scan",
         "context-driven-development",
         "cpp",
         "creation-feasibility-gate",
@@ -10568,6 +10594,7 @@
         "consensus-voting",
         "container-expert",
         "containerization-rules",
+        "content-security-scan",
         "context-compressor",
         "context-driven-development",
         "cpp",
@@ -10942,6 +10969,7 @@
         "comprehensive-unit-testing-with-pytest",
         "consensus-voting",
         "container-expert",
+        "content-security-scan",
         "cpp",
         "data-expert",
         "database-expert",
@@ -11043,6 +11071,7 @@
         "compliance-policy-check",
         "consensus-voting",
         "container-expert",
+        "content-security-scan",
         "cpp",
         "creation-feasibility-gate",
         "data-expert",
@@ -11143,6 +11172,7 @@
         "compliance-policy-check",
         "consensus-voting",
         "container-expert",
+        "content-security-scan",
         "cpp",
         "creation-feasibility-gate",
         "data-expert",
@@ -11262,6 +11292,7 @@
         "consensus-voting",
         "container-expert",
         "containerization-rules",
+        "content-security-scan",
         "context-compressor",
         "context-driven-development",
         "cpp",
@@ -12081,6 +12112,7 @@
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "configuration-management",
+        "content-security-scan",
         "cpp",
         "creation-feasibility-gate",
         "dependency-analyzer",
@@ -12862,6 +12894,7 @@
         "composer-dependency-management",
         "comprehensive-type-annotations",
         "configuration-management",
+        "content-security-scan",
         "cpp",
         "creation-feasibility-gate",
         "dependency-analyzer",

@@ -803,3 +803,95 @@ Evidence:
 **Critical Success Factor:** Anti-regression mechanisms must be wave-specific (not post-hoc). Stub detection validators needed for Wave 4+ to catch generation quality drift early.
 
 **Integration Constraint:** Artifact-integrator must run AFTER all 9 waves complete (not concurrent) to prevent registry desync. Alternatively, integrator must be designed idempotent (re-run safe per wave).
+
+---
+
+## ADR-135: Memory Input Validation Layer (2026-02-16)
+
+**Status:** ACCEPTED
+**Decision:** Implement `MemoryInputValidator` to sanitize all writes to memory files and prevent agent memory poisoning attacks.
+
+**Context:**
+
+- Security report (2026-02-16) identified H-01: Agent Memory Poisoning via Unconstrained User Input
+- User input flows directly into agent memory files (`learnings.md`, `decisions.md`, `issues.md`) without sanitization
+- Attack scenario:
+  1. Attacker submits prompt with embedded instructions disguised as learnings
+  2. Agent writes to `memory/learnings.md` without sanitization
+  3. Future agents read poisoned memory and follow malicious instructions
+  4. Attacker gains persistent control over agent behavior
+- CVSS: 7.5 (HIGH)
+- OWASP Agentic AI: ASI06 (Memory & Context Poisoning)
+
+**Decision:**
+
+Implement pre-write validation for all memory file writes with three layers:
+
+1. **Instruction pattern detection:**
+   - Detect instruction markers: `always|never|ignore|bypass|override|disable`
+   - Detect shell injection patterns: `shell\s*:\s*true`, `process\.env\[`
+   - Flag for manual review instead of auto-writing
+
+2. **Code block sanitization:**
+   - Strip markdown code blocks to prevent code injection: `\`\`\`[\s\S]\*?\`\`\``→`[code block removed]`
+   - Preserve narrative content while removing executable code
+
+3. **Source attribution:**
+   - Track source of memory writes: `user|agent|system`
+   - User-provided learnings flagged for review
+   - Agent-generated learnings auto-approved
+
+**Implementation:**
+
+````javascript
+// New utility: .claude/lib/memory/memory-input-validator.cjs
+async function recordLearning(text, source = 'user') {
+  const instructionPatterns = [
+    /always|never|ignore|bypass|override|disable/i,
+    /\bshell\s*:\s*true\b/i,
+    /process\.env\[/i,
+  ];
+
+  const isInstruction = instructionPatterns.some(p => p.test(text));
+
+  if (isInstruction && source === 'user') {
+    await fs.appendFile(FLAGGED_FILE, `[REVIEW REQUIRED] ${text}\n`);
+    return;
+  }
+
+  const sanitized = text.replace(/```[\s\S]*?```/g, '[code block removed]');
+  await fs.appendFile(LEARNINGS_FILE, `- ${sanitized}\n`);
+}
+````
+
+**Detection:**
+
+- Monitor `memory/*.md` for suspicious patterns
+- Implement pre-write validation hook for memory files
+- Flag user-provided "learnings" for manual review
+
+**Timeline:**
+
+- P1 priority: 2 weeks
+- Remediation priority: High (CVSS 7.5)
+
+**Consequences:**
+
+**Positive:**
+
+- Blocks memory poisoning attacks (OWASP ASI06)
+- Preserves memory integrity
+- Maintains audit trail of flagged entries
+- Graceful degradation (flags instead of blocking)
+
+**Negative:**
+
+- Additional validation overhead (~10ms per memory write)
+- May flag legitimate technical instructions (false positives)
+- Requires manual review queue management
+
+**Related:**
+
+- Security Report 2026-02-16: Finding H-01
+- OWASP Agentic AI Top 10: ASI06
+- `.claude/rules/security.md`: Memory Poisoning Prevention section

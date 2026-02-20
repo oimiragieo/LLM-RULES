@@ -1,0 +1,44 @@
+{
+  "$schema": "../schemas/trusted-sources.schema.json",
+  "version": "1.0.0",
+  "description": "Allowlist of trusted external sources for skill content ingestion (SEC-EXT-001)",
+  "lastUpdated": "2026-02-20",
+  "trusted_organizations": [
+    "VoltAgent",
+    "anthropics"
+  ],
+  "trusted_repositories": [
+    {
+      "repo": "VoltAgent/awesome-agent-skills",
+      "description": "Community skill registry",
+      "pinned_sha": null,
+      "last_audited": "2026-02-20",
+      "audit_notes": "Initial trust grant — pin SHA after first security audit"
+    }
+  ],
+  "trusted_domains": [
+    "github.com",
+    "raw.githubusercontent.com",
+    "api.github.com",
+    "arxiv.org",
+    "huggingface.co"
+  ],
+  "fetch_policy": {
+    "trusted": "scan_and_incorporate",
+    "untrusted": "scan_and_quarantine",
+    "unknown": "block_and_escalate"
+  },
+  "quarantine_dir": ".claude/context/runtime/quarantine/",
+  "audit_log": ".claude/context/runtime/external-fetch-audit.jsonl",
+  "limits": {
+    "max_content_size_kb": 50,
+    "max_fetch_depth": 1,
+    "fetch_timeout_ms": 30000
+  },
+  "escalation": {
+    "on_fail": "invoke_security_architect",
+    "on_unknown_source": "block_and_log",
+    "on_size_exceeded": "block_and_log"
+  },
+  "notes": "Even trusted sources MUST pass the 7-step Security Review Gate. Trust level only affects response to FAIL results (escalate vs block)."
+}

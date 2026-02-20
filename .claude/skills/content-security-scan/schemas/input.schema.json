@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "content-security-scan-input",
+  "title": "Content Security Scan Input",
+  "description": "Input schema for the content-security-scan skill",
+  "type": "object",
+  "required": ["content", "source_url"],
+  "properties": {
+    "content": {
+      "type": "string",
+      "description": "Raw fetched content string to scan (markdown/text)",
+      "minLength": 1
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL the content was fetched from (for provenance logging)"
+    },
+    "trusted_sources_config_path": {
+      "type": "string",
+      "description": "Optional path to trusted-sources.json config. Defaults to .claude/config/trusted-sources.json"
+    },
+    "strict": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, treat MEDIUM severity flags as FAIL (default: only HIGH/CRITICAL cause FAIL)"
+    },
+    "json_output": {
+      "type": "boolean",
+      "default": false,
+      "description": "Return result as JSON object (default: human-readable text)"
+    }
+  },
+  "additionalProperties": false
+}

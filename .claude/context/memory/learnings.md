@@ -1,3 +1,16 @@
+## 2026-02-20: External Skill Content Ingestion Threat Model
+
+- **Supply chain attack surface**: 9 skills ingest external content via `gh api`, `WebFetch`, `git clone`. Most critical: skill-creator Step 2A, skill-updater Step 2A, skill-creator --install action.
+- **Core gap**: Research Gate bypasses the 8-phase external-integration.md workflow. Content fetched and incorporated without security scanning.
+- **STRIDE analysis**: 16 threats identified. Most critical: T-1 (prompt injection in SKILL.md, CRITICAL), T-2 (embedded Bash commands, CRITICAL), E-1 (tool escalation via frontmatter, CRITICAL).
+- **Red Flag Checklist**: 35 patterns across 6 categories (shell/exec, prompt injection, tool invocation, exfiltration, obfuscation, privilege escalation).
+- **Security Review Gate**: 20-line embeddable template with 7-step PASS/FAIL scan. Designed for direct insertion into creator/updater Research Gate steps.
+- **New controls proposed**: SEC-EXT-001 (Trusted Source Allowlist), SEC-EXT-002 (Content Pattern Scanner), SEC-EXT-003 (Provenance Audit Log), SEC-EXT-004 (Exfiltration Detection), SEC-EXT-005 (Tool Allowlist Validation), SEC-EXT-006 (Content Size Limit), SEC-EXT-007 (External Content Guard Hook).
+- **OWASP Agentic AI mapping**: ASI01 (Goal Hijacking), ASI02 (Tool Misuse), ASI04 (Supply Chain) are CRITICAL relevance.
+- **Report**: `.claude/context/reports/security/external-skill-security-protocol-2026-02-20.md`
+
+---
+
 - Updated workflow: evolution-workflow (2026-02-19)
 
 - Updated workflow: missing-workflow-xyz (2026-02-19)

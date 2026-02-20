@@ -217,7 +217,31 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-19T22:07:55.619Z",
       "last_accessed": "2026-02-19T22:07:55.619Z"
+    },
+    ".claude/skills/content-security-scan/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T08:22:46.823Z",
+      "last_accessed": "2026-02-20T08:27:02.608Z"
+    },
+    ".claude/skills/content-security-scan/hooks/pre-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T08:22:59.631Z",
+      "last_accessed": "2026-02-20T08:22:59.631Z"
+    },
+    ".claude/skills/content-security-scan/hooks/post-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T08:23:07.403Z",
+      "last_accessed": "2026-02-20T08:23:07.403Z"
+    },
+    ".claude/hooks/safety/external-content-guard.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T08:25:51.332Z",
+      "last_accessed": "2026-02-20T08:25:51.332Z"
     }
   },
-  "last_updated": "2026-02-19T22:07:55.619Z"
+  "last_updated": "2026-02-20T08:27:02.608Z"
 }

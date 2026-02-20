@@ -1,133 +1,3 @@
-## 2026-02-20: Reflection Spawn Deduplication Gap (P1)
-
-**Issue**: The same three reflection IDs (task_completion:2026-02-20T03:21:47.545Z:1, :2, :3) were processed in THREE separate reflection batches (approx 05:00, 05:30, and a third pass). The reflection-cleanup.cjs atomic handshake should prevent reprocessing, but the IDs are reappearing in reflection-spawn-request.json across sessions.
-
-**Root Cause**: Likely a race condition in reflection-cleanup.cjs where the spawn-request.json is not fully cleared before the next session starts, or the cleanup hook is not running when reflection-agent marks its task completed.
-
-**Action Needed**:
-
-1. Verify reflection-cleanup.cjs is registered in settings.json PostToolUse(TaskUpdate)
-2. Add deduplication check in reflection-step0-guard.cjs: before spawning, grep reflection-log.jsonl for processedReflectionIds that match pending IDs
-3. Consider implementing REFLECTION_TASK_VALIDATION=warn|block|off mode (ADR-138)
-
-**Priority**: P1 — wastes reflection-agent spawn budget on zero-value re-reflections
-
----
-
-## 2026-02-20: pre-completion-validation.cjs Warn Mode Escalation Needed (P1)
-
-**Issue**: Task 2 (2026-02-20) completed without TaskUpdate summary metadata — the 15th+ confirmed occurrence. ADR-139 mandates BLOCK mode for `COMPLETION_METADATA_ENFORCEMENT`. The pre-completion-validation.cjs hook appears to be in warn mode or not registering fully.
-
-**Action Needed**: Check `.claude/hooks/` for `pre-completion-validation.cjs`, verify enforcement mode, escalate to `COMPLETION_METADATA_ENFORCEMENT=block` if currently in warn mode.
-
-**Priority**: P1 — prevents reflection scoring, stalls pipeline
-
----
-
-## 2026-02-20: wave-executor skill-index.json Entry Still Stale (P1)
-
-**Issue**: Despite Task 2 (2026-02-20) updating SKILL.md frontmatter and Task 3 adding skill-creator guidance to prevent recurrence, the `wave-executor` entry in `skill-index.json` still shows `agentPrimary: ["developer"]`, `category: "Other"`. This is an outstanding stale entry that needs direct remediation.
-
-**Action Needed**: Run `node .claude/tools/cli/generate-skill-index.cjs` and verify wave-executor entry, OR update `agent-skill-matrix.json` lookup table to include wave-executor under router/master-orchestrator/planner.
-
-**Priority**: P1 — affects skill routing accuracy
-
----
-
-## 2026-02-20: skill-index.json Silent Stale After Regeneration (P1)
-
-**Issue**: `skill-index.json` can appear freshly generated (generatedAt timestamp advances) while retaining stale agentPrimary/category/domain values for a specific skill entry. The regeneration ran but the skill entry was not updated — silent failure.
-
-**Evidence**: wave-executor task (2026-02-20). SKILL.md frontmatter updated (`agents: [router, master-orchestrator, planner]`), skill-catalog.md correct, but skill-index.json still showed `agentPrimary: ["developer"]`, `category: "Other"` after regeneration at 04:26:33Z.
-
-**Impact**: Downstream agents using skill-index.json for routing/discovery still receive wrong agentPrimary. Router may misroute skill invocations.
-
-**Investigation Needed**:
-
-- Check `generate-skill-index.cjs` catalog row parsing for wave-executor row format
-- Verify whether agentPrimary is sourced from skill-catalog.md table OR SKILL.md frontmatter `agents:` field
-- Add post-generation spot-check validation against catalog
-
-**Priority**: P1 — affects skill routing accuracy
-
----
-
-## 2026-02-18: REFLECTION-BLIND-001 -- Reflection Agent Score Fabrication on Missing Metadata (P1)
-
-**Issue**: When artifact-integrator omits TaskUpdate metadata (recurring, 14+ occurrences), reflection-agent receives only the fallback string "Task X completed without summary metadata" and awards a passing score (0.79/1.0 observed) without independent verification. Integration health check (ADR-100 Phase 5.5) is silently bypassed because artifact ID is unavailable.
-
-**Root Causes** (4 layers):
-
-1. No data sufficiency gate in reflection agent before scoring
-2. No enforcement hook on TaskUpdate(completed) for metadata.summary
-3. Reflection does not independently verify artifacts in catalogs/registries
-4. Reflection queue entry is too sparse (no filesModified, outputArtifacts, agent)
-
-**Proposed Fixes**:
-
-- Fix A (P0): Add warn/block hook in pre-completion-validation.cjs for missing metadata.summary
-- Fix B (P1): Add INSUFFICIENT_DATA gate in reflection-agent.md prompt
-- Fix C (P1): Add independent artifact verification for creation tasks in Phase 5.5
-- Fix D (P2): Enrich reflection queue entries with task metadata at capture time
-
-**Report**: `.claude/context/reports/architecture/reflection-blindness-bug-2026-02-18.md`
-
----
-
-## 2026-02-19: Enterprise Bundle Generation Plan Risks (P1-P2)
-
-**Source**: Task #12 reflection analysis
-
-**Critical Planning Gaps** (identified during plan review):
-
-1. **Token Cost Unvalidated** (P1-BUDGET): Phase 2 estimate of 3-4M tokens lacks verification. At current rates (~$0.08/1M input tokens), generation phase alone costs $240+. Plan does not lock cost guardrail before proceeding. Recommendation: Run Phase 0 inventory first, calculate actual cost, obtain approval before generation.
-
-2. **Stub Detection False Negatives** (P1-CORRECTNESS): Stub detection algorithm may incorrectly flag legitimate skill files as stubs. Example: a skill with intentional `action`/`target` schema would match stub signature but should not be replaced. Recommendation: Phase 0 logs all detected stubs for manual review; developers must approve each replacement target before Phase 2 begins.
-
-3. **LLM Generation Prompts Unspecified** (P1-QUALITY): Phase 2 assigns "developer agent" to generate domain-specific bundle files, but exact LLM prompts are not written. Risk: generated files may be generic stubs with domain-sounding language (hallucination). Recommendation: Write explicit generation prompt templates for each file type (input schema, output schema, pre-execute hook, etc.) before Phase 2 Wave 1.
-
-4. **Protected Skills Governance at Wrong Layer** (P2-SAFETY): Plan lists 5-10 protected skills (ai-ml-expert, android-expert, rust-expert, accessibility) with instruction "skip non-stub files," but protection is in Phase 3 QA (post-write). Risk: developers might miss protection during Phase 2 generation. Recommendation: enforce protection in generation script itself (fail-closed on attempts to write protected skill non-stub files).
-
-5. **Wave Stopping Condition Undefined** (P2-PROCESS): Plan allows parallelizing waves but has no defined gate: "if Wave 1 fails >10% targets, pause before Wave 2." Workflow is unclear on escalation path if early waves produce poor results. Recommendation: add explicit stopping criteria to Phase 3 QA report.
-
-6. **Reflection Agent Model Mismatch** (P2-DOCUMENTATION): Plan Phase FINAL specifies reflection-agent with "haiku" model, but reflection-agent.md frontmatter declares model: sonnet. Recommendation: verify and update plan or agent definition.
-
-**Mitigation Strategy**:
-
-- Phase 0 must complete with manual approval of stub inventory before any writes
-- Create explicit LLM generation prompts for Phase 2 before execution
-- Add cost validation gate (Phase 0 → Phase 1 approval checkpoint)
-- Hardcode protected skills in generation script (not in QA validation)
-- Define wave quality thresholds and stopping conditions
-
----
-
-## 2026-02-13: VUL-BYPASS-001 -- Code Block Exemption Bypass (P1)
-
-**Issue**: Triple-backtick code blocks fully exempt from scanning. Wrapping malicious payload in backticks bypasses all detection.
-
-**Priority**: P1
-
----
-
-## 2026-02-13: VUL-BYPASS-003 -- Only 1 of 5+ Memory Write Paths Sanitized (P1)
-
-**Issue**: Sanitizer only protects writeMemory(). Four other paths bypass sanitization.
-
-**Priority**: P1
-
----
-
-## 2026-02-11: Test Failures in Comprehensive Suites (P2)
-
-**Issue**: 3 test failures in new comprehensive test suites. 98/101 tests pass (97%).
-
-**Details**: routing-guard-comprehensive (2 failures), unified-creator-guard-comprehensive (1 failure).
-
-**Priority**: P2 (non-blocking)
-
----
-
 ## 2026-02-11: Memory Sanitizer Not Yet Implemented (P1)
 
 **Issue**: HIGH-004 (Memory poisoning) identified in security audit but deferred from Wave 2b.
@@ -393,3 +263,27 @@
 - If hook doesn't exist, implement immediately with hard blocking for missing metadata.summary
 
 **Report**: This batch reflection (task 17)
+
+---
+
+## Security Gate Insertion Integration Verification Gap (2026-02-20) — P1
+
+**Issue**: Supply chain security controls (SEC-EXT-001–007) were inserted into 4 creator skills (skill-creator, skill-updater, agent-creator, agent-updater) but integration verification is incomplete.
+
+**Evidence**:
+
+- Tasks 4–7 (2026-02-20T08:02–08:12) reported "Security Gate insertion" but provided no filesModified or line references
+- external-fetch-audit.jsonl runtime file existence unconfirmed
+- No automated tests for Security Gate scan effectiveness (7 checks: size, binary, tool-invocation, prompt-injection, exfiltration, privilege, provenance)
+- skill-catalog.md and agent-registry.json update status unknown post-insertion
+
+**Impact**: If Security Gate is absent or malformed in any creator skill, supply chain attack vectors remain open. The insertion work may be correct but is unverifiable without filesystem confirmation.
+
+**Required Actions**:
+
+1. Grep for "SEC-EXT-001" in `.claude/skills/skill-creator/SKILL.md`, `.claude/skills/skill-updater/SKILL.md`, `.claude/skills/agent-creator/SKILL.md`, `.claude/skills/agent-updater/SKILL.md`
+2. Confirm `external-fetch-audit.jsonl` exists at `.claude/context/runtime/`
+3. Write automated tests for each SEC-EXT-00N check in `.claude/skills/skill-updater/tests/`
+4. Run artifact-integrator on the 4 updated skills
+
+**Report**: `.claude/context/reports/reflections/batch-reflection-2026-02-20-fifth.md`
