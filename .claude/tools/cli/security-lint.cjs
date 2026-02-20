@@ -79,6 +79,7 @@ const CONFIG = {
     { pathSubstring: 'force-step0-execution.test.cjs', ruleId: 'SEC-040' }, // path.join test fixture path (constants)
     { pathSubstring: 'pre-tool-unified.cjs', ruleId: 'SEC-040' }, // path.join REFLECTION_RUNTIME_DIR + constants only
     { pathSubstring: 'pre-tool-unified-read-safety.test.cjs', ruleId: 'SEC-040' }, // path.join test fixture (constants)
+    { pathSubstring: 'pre-tool-unified.read-safety.cjs', ruleId: 'SEC-040' }, // path.join REFLECTION_RUNTIME_DIR + literals only, no user input
     { pathSubstring: 'unified-pre-write-hook.cjs', ruleId: 'SEC-012' }, // regex pattern that detects eval in content, does not call eval()
     { pathSubstring: 'spawn-assembly-metrics-summary.cjs', ruleId: 'SEC-030' }, // CLI metrics summary (aggregates, not secrets)
     { pathSubstring: 'step-validators.cjs', ruleId: 'SEC-013' }, // new Function() for dynamic workflow validation (controlled input)
@@ -86,6 +87,8 @@ const CONFIG = {
     { pathSubstring: 'run-workflow-tests.cjs', ruleId: 'SEC-030' }, // CLI test suite help output (not sensitive)
     { pathSubstring: 'ecosystem-assessor/', ruleId: 'SEC-030' }, // CLI analysis tool diagnostic output
     { pathSubstring: 'project-analyzer/', ruleId: 'SEC-030' }, // CLI analysis tool diagnostic output
+    { pathSubstring: 'python-backend-expert/scripts/main.cjs', ruleId: 'SEC-030' }, // CLI help text only, no credentials
+    { pathSubstring: 'typescript-expert/scripts/main.cjs', ruleId: 'SEC-030' }, // CLI help/diagnostic output only, no credentials
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
     { pathSubstring: 'count-all-tests.mjs', ruleId: 'SEC-011' }, // internal test counter with controlled input
   ],

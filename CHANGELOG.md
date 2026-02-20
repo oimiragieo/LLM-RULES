@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Memory sanitizer false positive**: Narrowed "code execution: **proto** manipulation" pattern so only real manipulation (e.g. `.__proto__ =` or `"__proto__":`) is flagged; documentation/archive content that merely mentions "strip **proto**" no longer triggers a false positive.
 - **Read-safety (EISDIR)**: Documented in `pre-tool-unified.read-safety.cjs` that Read on a directory causes EISDIR and that Glob should be used for discovery; existing block/rewrite behavior unchanged.
 - **Routing tables**: Fixed corrupt syntax in `routing-table-intent-agents.cjs` and `routing-table-intent-keywords.cjs` (duplicate entries left after `};`); moved `qa-guardian`, `contract-check`, `bool-action`, `repo-onboarder` inside the exported objects so ESLint parses correctly.
+- **Security lint allowlist**: Allowlisted known false positives in `security-lint.cjs`: SEC-040 for `pre-tool-unified.read-safety.cjs` (path.join with constants only), SEC-030 for `python-backend-expert/scripts/main.cjs` and `typescript-expert/scripts/main.cjs` (CLI help/diagnostic output only). Pre-commit security scan now passes for these files.
 - Fixed `run-hook.cmd` on Windows by replacing the fragile batch/bash wrapper with a robust Node.js script (`run-hook.cjs`). This ensures hooks can be executed reliably across platforms without path separator issues.
 - Documented missing `memory-reminder` hook in `.claude/hooks/README.md` as a known issue (file is missing).
 
