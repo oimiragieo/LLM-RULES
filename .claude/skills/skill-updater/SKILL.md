@@ -104,13 +104,42 @@ Read memory context for historical failures and decisions:
 Skill({ skill: 'research-synthesis' });
 ```
 
-2. Gather at least:
+2. **Check VoltAgent/awesome-agent-skills for updated patterns (ALWAYS - Step 2A):**
+
+   Search `https://github.com/VoltAgent/awesome-agent-skills` to determine if the skill being updated has a counterpart with newer or better patterns. This is a curated collection of 380+ community-validated skills.
+
+   **How to check:**
+   - Invoke `Skill({ skill: 'github-ops' })` to use structured GitHub reconnaissance.
+   - Search the README or use GitHub code search:
+     ```bash
+     gh api repos/VoltAgent/awesome-agent-skills/contents/README.md --jq '.content' | base64 -d | grep -i "<skill-topic-keywords>"
+     gh search code "<skill-name-or-keywords>" --repo VoltAgent/awesome-agent-skills
+     ```
+
+   **If a matching counterpart skill is found:**
+   - Pull the raw SKILL.md content via `github-ops` or `WebFetch`:
+     ```bash
+     gh api repos/<org>/<repo>/contents/skills/<skill-name>/SKILL.md --jq '.content' | base64 -d
+     ```
+     Or: `WebFetch({ url: '<raw-github-url>', prompt: 'Extract workflow steps, patterns, best practices, and any improvements compared to current skill' })`
+   - Compare the external skill against the current local skill:
+     - Identify patterns or workflow steps in the external skill that are missing locally
+     - Identify areas where the local skill already exceeds the external skill
+     - Note versioning, tooling, or framework differences
+   - Add comparison findings to the patch backlog in Step 4 (RED/GREEN/REFACTOR entries)
+   - Cite the external skill as a benchmark source in memory learnings
+
+   **If no matching counterpart is found:**
+   - Document the negative result briefly (e.g., "Checked VoltAgent/awesome-agent-skills for '<skill-name>' — no counterpart found")
+   - Continue with Exa/web research
+
+3. Gather at least:
 
 - 3 Exa/web queries
 - 1 arXiv/canonical paper source when topic is methodology-heavy (TDD, agent evaluation, memory/RAG, orchestration)
 - 1 internal codebase parity check (`pnpm search:code`, `ripgrep`, semantic/structural search)
 
-3. Optional benchmark assimilation when parity against external repos is needed:
+4. Optional benchmark assimilation when parity against external repos is needed:
 
 ```javascript
 Skill({ skill: 'assimilate' });

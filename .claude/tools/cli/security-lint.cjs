@@ -89,6 +89,9 @@ const CONFIG = {
     { pathSubstring: 'project-analyzer/', ruleId: 'SEC-030' }, // CLI analysis tool diagnostic output
     { pathSubstring: 'python-backend-expert/scripts/main.cjs', ruleId: 'SEC-030' }, // CLI help text only, no credentials
     { pathSubstring: 'typescript-expert/scripts/main.cjs', ruleId: 'SEC-030' }, // CLI help/diagnostic output only, no credentials
+    { pathSubstring: 'reflection-cleanup.cjs', ruleId: 'SEC-040' }, // path.join RUNTIME_DIR + literal only, no user input
+    { pathSubstring: 'token-saver-context-compression/scripts/main.cjs', ruleId: 'SEC-030' }, // CLI token/stats output, not credentials
+    { pathSubstring: 'hybrid-search.cjs', ruleId: 'SEC-030' }, // CLI token stats and help output, not credentials
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
     { pathSubstring: 'count-all-tests.mjs', ruleId: 'SEC-011' }, // internal test counter with controlled input
   ],

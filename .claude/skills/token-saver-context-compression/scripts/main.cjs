@@ -210,25 +210,27 @@ function appendMarkdownEntries(filePath, heading, entries) {
   fs.writeFileSync(filePath, prior + block, 'utf8');
 }
 
-function deduplicateAgainstMemory(records, memoryDir) {
+function loadExistingTextsFromMemory(memoryDir) {
   const existingTexts = new Set();
-
   for (const file of ['patterns.json', 'gotchas.json']) {
     const filePath = path.join(memoryDir, file);
     try {
-      if (fs.existsSync(filePath)) {
-        const entries = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        if (Array.isArray(entries)) {
-          for (const entry of entries) {
-            const text = typeof entry === 'string' ? entry : entry?.text;
-            if (text) existingTexts.add(text.toLowerCase().trim());
-          }
-        }
+      if (!fs.existsSync(filePath)) continue;
+      const entries = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      if (!Array.isArray(entries)) continue;
+      for (const entry of entries) {
+        const text = typeof entry === 'string' ? entry : entry?.text;
+        if (text) existingTexts.add(text.toLowerCase().trim());
       }
     } catch (_e) {
       // Corrupt JSON or read error — skip this file, keep all incoming records for this category
     }
   }
+  return existingTexts;
+}
+
+function deduplicateAgainstMemory(records, memoryDir) {
+  const existingTexts = loadExistingTextsFromMemory(memoryDir);
 
   let total = 0;
   let filtered = 0;

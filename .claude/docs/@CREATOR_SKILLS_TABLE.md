@@ -28,9 +28,9 @@ Complete mapping of creator skills invoked via `Skill()` tool for creating new a
 | **New hook**                  | `hook-creator`\*       | `.claude/skills/hook-creator/SKILL.md`                                               |
 | **New template**              | `template-creator`\*   | `.claude/skills/template-creator/SKILL.md`                                           |
 | **New schema**                | `schema-creator`\*     | `.claude/skills/schema-creator/SKILL.md`                                             |
-| **New command**               | `command-creator`\*    | `.claude/skills/creators/command-creator/SKILL.md`                                   |
-| **New rule**                  | `rule-creator`\*       | `.claude/skills/creators/rule-creator/SKILL.md`                                      |
-| **New tool**                  | `tool-creator`\*       | `.claude/skills/creators/tool-creator/SKILL.md`                                      |
+| **New command**               | `command-creator`\*    | `.claude/skills/command-creator/SKILL.md`                                            |
+| **New rule**                  | `rule-creator`\*       | `.claude/skills/rule-creator/SKILL.md`                                               |
+| **New tool**                  | `tool-creator`\*       | `.claude/skills/tool-creator/SKILL.md`                                               |
 | **After ANY creation**        | `artifact-integrator`  | Post-creation hook → integration-queue.jsonl → artifact-integrator → follow-up tasks |
 
 \*Spawn a general-purpose agent that invokes the skill via `Skill({ skill: "..." })`.

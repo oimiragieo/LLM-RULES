@@ -1,3 +1,19 @@
+## 2026-02-20: Reflection Spawn Deduplication Gap (P1)
+
+**Issue**: The same three reflection IDs (task_completion:2026-02-20T03:21:47.545Z:1, :2, :3) were processed in THREE separate reflection batches (approx 05:00, 05:30, and a third pass). The reflection-cleanup.cjs atomic handshake should prevent reprocessing, but the IDs are reappearing in reflection-spawn-request.json across sessions.
+
+**Root Cause**: Likely a race condition in reflection-cleanup.cjs where the spawn-request.json is not fully cleared before the next session starts, or the cleanup hook is not running when reflection-agent marks its task completed.
+
+**Action Needed**:
+
+1. Verify reflection-cleanup.cjs is registered in settings.json PostToolUse(TaskUpdate)
+2. Add deduplication check in reflection-step0-guard.cjs: before spawning, grep reflection-log.jsonl for processedReflectionIds that match pending IDs
+3. Consider implementing REFLECTION_TASK_VALIDATION=warn|block|off mode (ADR-138)
+
+**Priority**: P1 — wastes reflection-agent spawn budget on zero-value re-reflections
+
+---
+
 ## 2026-02-20: pre-completion-validation.cjs Warn Mode Escalation Needed (P1)
 
 **Issue**: Task 2 (2026-02-20) completed without TaskUpdate summary metadata — the 15th+ confirmed occurrence. ADR-139 mandates BLOCK mode for `COMPLETION_METADATA_ENFORCEMENT`. The pre-completion-validation.cjs hook appears to be in warn mode or not registering fully.

@@ -127,7 +127,7 @@ description: [unclosed bracket
 
 # Broken Skill
 `;
-    const filePath = writeSkill(tmpDir, 'broken-skill', content);
+    const _filePath = writeSkill(tmpDir, 'broken-skill', content);
 
     const result = backfillSkills(tmpDir, {
       timestamp: '2026-02-19T00:00:00.000Z',

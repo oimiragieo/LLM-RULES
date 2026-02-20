@@ -9,6 +9,7 @@
  *   hybrid-search --compress "query"           # Search + compress + dedup (JSON)
  */
 
+/* eslint-disable max-lines -- CLI with many subcommands and helpers */
 'use strict';
 
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
@@ -169,6 +170,7 @@ async function daemonStatus() {
   }
 }
 
+/* eslint-disable complexity -- main CLI dispatch with many subcommands */
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0];

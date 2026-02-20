@@ -21,10 +21,14 @@ const {
   removeRequests,
   readSpawnRequestsFile,
 } = require('../../lib/reflection/spawn-request-contract.cjs');
+const { appendJsonl } = require('../../lib/utils/jsonl-utils.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
 const REMINDER_PATH = path.join(RUNTIME_DIR, 'reflection-reminder.txt');
+const REFLECTION_LOG_PATH =
+  process.env.REFLECTION_LOG_FILE_PATH ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'reflection-log.jsonl');
 
 async function main() {
   try {
@@ -48,10 +52,24 @@ async function main() {
     if (Array.isArray(processedIds) && processedIds.length > 0) {
       removeRequests(SPAWN_REQUEST_PATH, processedIds);
       auditLog('reflection-cleanup', 'removed_processed_requests', { count: processedIds.length });
+      // Append to reflection log so step0-guard can filter these IDs on the next run,
+      // even if the spawn-request.json update races with session startup.
+      appendJsonl(REFLECTION_LOG_PATH, {
+        trigger: 'cleanup',
+        timestamp: new Date().toISOString(),
+        processedReflectionIds: processedIds,
+        source: 'cleanup',
+      });
     } else if (taskId.startsWith('task_completion:') || taskId.startsWith('session_end:')) {
       // Legacy fallback
       removeRequests(SPAWN_REQUEST_PATH, [taskId]);
       auditLog('reflection-cleanup', 'removed_legacy_request', { taskId });
+      appendJsonl(REFLECTION_LOG_PATH, {
+        trigger: 'cleanup',
+        timestamp: new Date().toISOString(),
+        processedReflectionIds: [taskId],
+        source: 'cleanup_legacy',
+      });
     }
 
     // Clean up reminder file if no pending requests remain

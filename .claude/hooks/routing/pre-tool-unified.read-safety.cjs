@@ -616,23 +616,21 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       };
     }
 
-    // Read on a directory causes EISDIR at host; block or rewrite to listing so agent uses Glob for discovery
+    // Read on a directory causes EISDIR at host. Rewrite to a listing file using an absolute path
+    // so the host never receives a directory path (fixes EISDIR when host or resolver uses wrong base).
     if (stats.isDirectory()) {
-      if (isBypassPermissionsMode(hookInput)) {
-        const listingPath = createDirectoryListingFile(targetPath);
-        if (listingPath) {
+      const listingPath = createDirectoryListingFile(targetPath);
+      if (listingPath) {
+        const absoluteListingPath = path.resolve(listingPath);
+        if (fs.existsSync(absoluteListingPath) && !fs.statSync(absoluteListingPath).isDirectory()) {
           return {
             checked: true,
             action: 'rewrite',
             rewrittenToolInput: {
               ...toolInput,
-              file_path: listingPath,
-              offset: 0,
-              limit: getReadSafetyAutoWindowLimit(),
+              file_path: absoluteListingPath,
             },
-            bypassWarning:
-              `[READ SAFETY][bypass] "${targetPath}" is a directory. Rewrote Read to ` +
-              `generated directory listing "${listingPath}".`,
+            bypassWarning: `[READ SAFETY] "${targetPath}" is a directory. Rewrote Read to listing file "${absoluteListingPath}".`,
           };
         }
       }
@@ -641,7 +639,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
         action: 'block',
         message:
           `${isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '}"${targetPath}" is a directory. ` +
-          'Use Glob/rg --files for directory listing, then Read a specific file.',
+          'Use Glob or list_dir for directory listing, then Read a specific file.',
       };
     }
 

@@ -107,9 +107,44 @@ Use `--no-enterprise` only when the request explicitly asks for a minimal scaffo
 
 Before finalizing a new skill, gather current best practices and constraints:
 
-1. Use Exa MCP first (`mcp__exa__get_code_context_exa` and/or `mcp__exa__web_search_exa`).
-2. If Exa is unavailable or insufficient, use `WebFetch` against primary docs and arXiv.
-3. Record findings in `references/research-requirements.md` and keep hooks/rules/schemas aligned with those findings.
+1. **Check VoltAgent/awesome-agent-skills for prior art (ALWAYS - Step 2A):**
+
+   Search `https://github.com/VoltAgent/awesome-agent-skills` for skills matching the requested topic/keywords. This is a curated collection of 380+ community-validated skills organized by organization and domain.
+
+   **How to search:**
+   - Invoke `Skill({ skill: 'github-ops' })` to use the structured GitHub reconnaissance workflow.
+   - List the README to find relevant entries:
+     ```bash
+     gh api repos/VoltAgent/awesome-agent-skills/contents --jq '.[].name'
+     gh api repos/VoltAgent/awesome-agent-skills/contents/README.md --jq '.content' | base64 -d | grep -i "<keyword>"
+     ```
+   - Or use GitHub code search:
+     ```bash
+     gh search code "<skill-topic-keywords>" --repo VoltAgent/awesome-agent-skills
+     ```
+
+   **If a matching skill is found:**
+   - Identify the raw SKILL.md URL. Skills in this repo typically follow the pattern:
+     `https://raw.githubusercontent.com/<org>/<repo>/main/skills/<skill-name>/SKILL.md`
+     or the GitHub tree URL linked from the README listing.
+   - Pull the raw content via `github-ops` or `WebFetch`:
+     ```bash
+     gh api repos/<org>/<repo>/contents/skills/<skill-name>/SKILL.md --jq '.content' | base64 -d
+     ```
+     Or: `WebFetch({ url: '<raw-github-url>', prompt: 'Extract skill structure, workflow steps, patterns, and best practices' })`
+   - Incorporate the discovered skill content as **prior art research context**:
+     - Merge insights and patterns into `references/research-requirements.md`
+     - Cite the source URL and organization as prior art
+     - Do NOT copy the content wholesale — extract patterns and best practices only
+     - Note how the local skill will extend, improve, or differ from the discovered skill
+
+   **If no matching skill is found:**
+   - Document the search in `references/research-requirements.md` (e.g., "Searched VoltAgent/awesome-agent-skills for 'X' — no matching skill found")
+   - Proceed with Exa/WebFetch research
+
+2. Use Exa MCP for broader web research (`mcp__exa__get_code_context_exa` and/or `mcp__exa__web_search_exa`).
+3. If Exa is unavailable or insufficient, use `WebFetch` against primary docs and arXiv.
+4. Record findings in `references/research-requirements.md` and keep hooks/rules/schemas aligned with those findings.
 
 Do not finalize a skill without evidence-backed guidance for tooling, workflow, and guardrails.
 

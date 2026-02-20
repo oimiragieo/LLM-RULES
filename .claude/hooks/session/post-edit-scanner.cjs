@@ -74,6 +74,32 @@ const BINARY_EXTENSIONS = new Set([
 const MAX_ISSUES = 5;
 const MAX_LINES = 500;
 
+/** Max bytes for hook stdout response to avoid host JSON parse truncation. */
+const MAX_PASSTHROUGH_BYTES = Number(process.env.POST_EDIT_SCANNER_MAX_PASSTHROUGH_BYTES || 150000);
+const TRUNCATED_PLACEHOLDER = '[truncated for hook response]';
+
+/**
+ * Recursively trim large string values in obj so JSON.stringify stays under size limit.
+ * Preserves structure; replaces long strings with a short placeholder.
+ */
+function trimLargeStrings(obj, maxLength = 2000) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => trimLargeStrings(item, maxLength));
+  }
+  const out = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'string') {
+      out[key] = value.length > maxLength ? TRUNCATED_PLACEHOLDER : value;
+    } else {
+      out[key] = trimLargeStrings(value, maxLength);
+    }
+  }
+  return out;
+}
+
 /**
  * Main hook logic
  */
@@ -139,8 +165,15 @@ function main() {
           process.stderr.write('\n');
         }
 
-        // Always passthrough original input
-        process.stdout.write(input);
+        // Passthrough: if payload is small enough, use original; otherwise trim large
+        // fields to avoid host JSON parse truncation (Unterminated string).
+        const inputBytes = Buffer.byteLength(input, 'utf8');
+        if (inputBytes <= MAX_PASSTHROUGH_BYTES) {
+          process.stdout.write(input);
+        } else {
+          const trimmed = trimLargeStrings(data, 500);
+          process.stdout.write(JSON.stringify(trimmed));
+        }
         process.exit(0);
       } catch (_error) {
         // Parse error or other error - fail open (passthrough)

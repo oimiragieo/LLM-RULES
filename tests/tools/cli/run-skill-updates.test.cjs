@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines -- test file with many cases */
 'use strict';
 
 const { describe, it, before, after, beforeEach } = require('node:test');

@@ -30,11 +30,14 @@ function runValidation(input) {
   const payload = getToolInput(input);
   const effectivePayload =
     payload && Object.keys(payload).length > 0 ? payload : parseLegacyInput(input) || {};
+  const isReflectionCompletion =
+    Array.isArray(effectivePayload.metadata?.processedReflectionIds) &&
+    effectivePayload.metadata.processedReflectionIds.length > 0;
   const result = parseAndValidateTaskUpdate(effectivePayload, {
     allowedStatuses: VALID_TASK_STATUSES,
     requireTaskId: true,
     requireStatus: true,
-    requireCompletionMetadata: true,
+    requireCompletionMetadata: !isReflectionCompletion,
   });
 
   if (result.valid) {

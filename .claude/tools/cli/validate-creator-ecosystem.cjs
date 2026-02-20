@@ -15,9 +15,9 @@ const REQUIRED_MARKERS = [
 
 const CREATOR_SKILL_FILES = {
   'agent-creator': '.claude/skills/agent-creator/SKILL.md',
-  'command-creator': '.claude/skills/creators/command-creator/SKILL.md',
-  'rule-creator': '.claude/skills/creators/rule-creator/SKILL.md',
-  'tool-creator': '.claude/skills/creators/tool-creator/SKILL.md',
+  'command-creator': '.claude/skills/command-creator/SKILL.md',
+  'rule-creator': '.claude/skills/rule-creator/SKILL.md',
+  'tool-creator': '.claude/skills/tool-creator/SKILL.md',
   'hook-creator': '.claude/skills/hook-creator/SKILL.md',
   'semgrep-rule-creator': '.claude/skills/semgrep-rule-creator/SKILL.md',
   'skill-creator': '.claude/skills/skill-creator/SKILL.md',

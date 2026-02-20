@@ -8,6 +8,16 @@
  * but recommended fields.
  */
 
+function validateOneOf(input, key, validList, errors) {
+  const value = input[key];
+  if (value === undefined) return;
+  const list = validList.map(String);
+  const strVal = String(value);
+  if (!list.includes(strVal)) {
+    errors.push(`Invalid "${key}" value "${value}": must be one of ${list.join(', ')}`);
+  }
+}
+
 function preExecute(input = {}) {
   const warnings = [];
   const errors = [];
@@ -37,37 +47,9 @@ function preExecute(input = {}) {
     );
   }
 
-  // ── Optional: edition validation ────────────────────────────────────────────
-  if (input.edition !== undefined) {
-    const validEditions = ['2021', '2024'];
-    if (!validEditions.includes(String(input.edition))) {
-      errors.push(
-        `Invalid "edition" value "${input.edition}": must be one of ${validEditions.join(', ')}`
-      );
-    }
-  }
-
-  // ── Optional: asyncRuntime validation ───────────────────────────────────────
-  if (input.asyncRuntime !== undefined) {
-    const validRuntimes = ['tokio', 'async-std', 'none'];
-    if (!validRuntimes.includes(input.asyncRuntime)) {
-      errors.push(
-        `Invalid "asyncRuntime" value "${input.asyncRuntime}": ` +
-          `must be one of ${validRuntimes.join(', ')}`
-      );
-    }
-  }
-
-  // ── Optional: errorStrategy validation ─────────────────────────────────────
-  if (input.errorStrategy !== undefined) {
-    const validStrategies = ['thiserror', 'anyhow', 'custom', 'none'];
-    if (!validStrategies.includes(input.errorStrategy)) {
-      errors.push(
-        `Invalid "errorStrategy" value "${input.errorStrategy}": ` +
-          `must be one of ${validStrategies.join(', ')}`
-      );
-    }
-  }
+  validateOneOf(input, 'edition', ['2021', '2024'], errors);
+  validateOneOf(input, 'asyncRuntime', ['tokio', 'async-std', 'none'], errors);
+  validateOneOf(input, 'errorStrategy', ['thiserror', 'anyhow', 'custom', 'none'], errors);
 
   // ── Warning: no error strategy specified ───────────────────────────────────
   if (!input.errorStrategy) {

@@ -238,6 +238,23 @@ Recommended workflow:
 1. Commit only intentional code/test/doc edits.
 2. Restore runtime artifacts before commit if they were not part of work.
 
+### L. shadcn MCP HTTP 500
+
+Symptoms:
+
+- MCP server `shadcn` returns HTTP 500 on every connect attempt (e.g. `https://www.shadcn.io/api/mcp`).
+- Connection never recovers; stderr shows MCP startup/auth noise.
+
+Root cause:
+
+- External shadcn MCP endpoint may be down, rate-limited, or misconfigured in Cursor/user MCP settings.
+
+Fix:
+
+1. If you do not need shadcn/ui component lookups, **disable the shadcn MCP server** in your Cursor MCP configuration (user or project). Disabling an unused MCP server is safe and stops the 500 errors.
+2. If the project uses `.claude/.mcp.json`, you can add `shadcn` to `disabledMcpServers` if your host supports that.
+3. See also `.claude/docs/GETTING_STARTED.md` (MCP server timeouts) for general guidance on disabling unused servers.
+
 ## 4. Distinguish Framework vs External Noise
 
 Framework-actionable:

@@ -75,6 +75,47 @@ function readSpawnRequests(filePath) {
   return readSpawnRequestsFile(filePath);
 }
 
+function readProcessedIdsFromReflectionLog() {
+  const processed = new Set();
+  try {
+    if (!fs.existsSync(REFLECTION_LOG_PATH)) return processed;
+    const raw = fs.readFileSync(REFLECTION_LOG_PATH, 'utf8');
+    if (!raw.trim()) return processed;
+    for (const line of raw.split('\n')) {
+      const entry = safeParseJSON(line, null);
+      if (!entry || typeof entry !== 'object') continue;
+      const ids = entry.processedReflectionIds;
+      if (!Array.isArray(ids)) continue;
+      for (const id of ids) {
+        if (typeof id === 'string' && id.trim()) {
+          processed.add(id.trim());
+        }
+      }
+    }
+  } catch (_err) {
+    // Best effort only.
+  }
+  return processed;
+}
+
+function pruneAlreadyProcessedRequests(requests) {
+  if (!Array.isArray(requests) || requests.length === 0) {
+    return { requests: [], prunedCount: 0 };
+  }
+  const processedIds = readProcessedIdsFromReflectionLog();
+  if (processedIds.size === 0) {
+    return { requests, prunedCount: 0 };
+  }
+  const filtered = requests.filter(req => {
+    const id = req?.id != null ? String(req.id).trim() : '';
+    return !id || !processedIds.has(id);
+  });
+  return {
+    requests: filtered,
+    prunedCount: requests.length - filtered.length,
+  };
+}
+
 function readGhostTaskIdsFromReflectionLog() {
   const ghosts = new Set();
   try {
@@ -262,6 +303,17 @@ async function main() {
       atomicWriteJSONSync(SPAWN_REQUEST_PATH, requests);
       stderrLog('pruned_ghost_spawn_requests', { pruned: pruned.prunedCount });
     }
+
+    // Filter out IDs already recorded as processed in reflection-log.jsonl.
+    // This handles the race where cleanup ran in a previous session but the
+    // spawn-request.json was not fully cleared before the next session started.
+    const prunedProcessed = pruneAlreadyProcessedRequests(requests);
+    requests = prunedProcessed.requests;
+    if (prunedProcessed.prunedCount > 0) {
+      atomicWriteJSONSync(SPAWN_REQUEST_PATH, requests);
+      stderrLog('pruned_already_processed_requests', { pruned: prunedProcessed.prunedCount });
+    }
+
     if (!Array.isArray(requests) || requests.length === 0) {
       // Clean stale reminder so we do not deadlock on "0 pending" conditions.
       clearReminderIfStale();

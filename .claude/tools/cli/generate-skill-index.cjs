@@ -19,6 +19,7 @@
  *   .claude/config/skill-index.json
  */
 
+/* eslint-disable max-lines -- single CLI script; splitting would obscure flow */
 'use strict';
 
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');

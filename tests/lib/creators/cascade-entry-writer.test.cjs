@@ -9,8 +9,8 @@ const path = require('node:path');
 
 const {
   writeCascadeEntries,
-  readExistingEntries,
-  hasPendingCascade,
+  readExistingEntries: _readExistingEntries,
+  hasPendingCascade: _hasPendingCascade,
 } = require('../../../.claude/lib/creators/cascade-entry-writer.cjs');
 
 // ---------------------------------------------------------------------------
