@@ -151,6 +151,39 @@ Create RED/GREEN/REFACTOR/VERIFY plan for the target skill:
    - `node .claude/tools/cli/generate-agent-registry.cjs` (if agent skill arrays changed)
    - targeted tests + lint for touched files
 
+#### Gap D: Post-Update Registration Consistency Check (MANDATORY)
+
+After any SKILL.md update that touches frontmatter fields (`agents`, `category`, `tags`, `description`, `tools`), you MUST verify that the skill-index.json entry is consistent with the updated frontmatter. The index is not automatically regenerated on SKILL.md edits.
+
+**Run this check immediately after SKILL.md edits:**
+
+```bash
+# Step 1: Regenerate the index to pick up frontmatter changes
+node .claude/tools/cli/generate-skill-index.cjs
+
+# Step 2: Compare agentPrimary in index vs agents in frontmatter
+SKILL_NAME="<skill-name>"
+echo "=== SKILL.md frontmatter agents ==="
+grep -A5 "^agents:" .claude/skills/${SKILL_NAME}/SKILL.md
+
+echo "=== skill-index.json agentPrimary ==="
+node -e "const idx=require('./.claude/config/skill-index.json');const s=idx.skills['${SKILL_NAME}'];if(!s){console.log('NOT FOUND in index')}else{console.log('agentPrimary:',JSON.stringify(s.agentPrimary));console.log('category:',s.category);console.log('domain:',s.domain);}"
+
+# Step 3: Flag mismatch
+echo "=== SKILL.md frontmatter category ==="
+grep "^category:" .claude/skills/${SKILL_NAME}/SKILL.md
+```
+
+**Mismatch resolution:**
+
+| Mismatch                                                    | Root Cause                                                                      | Fix                                                                                                              |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `agentPrimary: ["developer"]` but skill isn't for developer | Index fallback applied; `agents` not read from frontmatter                      | Add skill to `agent-skill-matrix.json` under correct agent(s)                                                    |
+| `category` differs between index and frontmatter            | Index sources category from `CATEGORY_MAP` in definitions file, not frontmatter | Update `CATEGORY_MAP` in `.claude/tools/cli/generate-skill-index-definitions.cjs` OR update frontmatter to match |
+| Skill not found in index at all                             | SKILL.md path not scanned or name mismatch                                      | Verify skill is in catalog and SKILL.md has `name:` field                                                        |
+
+**This check is mandatory** because `generate-skill-index.cjs` does not automatically read `agents` from SKILL.md frontmatter — it uses lookup tables and defaults to `["developer"]` when no mapping is found. Updating the frontmatter alone is insufficient; the index must be regenerated AND verified.
+
 ### Step 5: TDD Refresh Backlog (continued)
 
 Run post-update integration after TDD changes:

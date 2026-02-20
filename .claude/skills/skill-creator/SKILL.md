@@ -660,10 +660,15 @@ Skills use YAML frontmatter in SKILL.md:
 ---
 name: skill-name
 description: What the skill does
+version: 1.0.0
+model: sonnet
 invoked_by: user | agent | both
 user_invocable: true | false
 tools: [Read, Write, Bash, ...]
 args: "<required> [optional]"
+agents: [developer, qa]      # REQUIRED — list of agents that use this skill
+category: "Quality"          # REQUIRED — maps to skill-catalog category
+tags: [testing, validation]  # REQUIRED — used for discovery filtering in skill-index.json
 ---
 
 # Skill Name
@@ -676,6 +681,31 @@ How to invoke and use the skill.
 
 ## Examples
 Concrete usage examples.
+```
+
+#### Required Frontmatter Fields (Gap B — MANDATORY)
+
+The following frontmatter fields are REQUIRED and must be set explicitly during creation. Omitting them causes silent integration failures:
+
+| Field            | Required | Purpose                                                                   | Example                               |
+| ---------------- | -------- | ------------------------------------------------------------------------- | ------------------------------------- |
+| `name`           | YES      | Unique skill identifier (kebab-case)                                      | `wave-executor`                       |
+| `description`    | YES      | One-line description for index/catalog                                    | `"Orchestrates parallel agent waves"` |
+| `version`        | YES      | Semantic version                                                          | `1.0.0`                               |
+| `agents`         | **YES**  | Agents that invoke this skill (drives `agentPrimary` in skill-index.json) | `[developer, qa]`                     |
+| `category`       | **YES**  | Catalog category for discovery                                            | `"Orchestration"`                     |
+| `tags`           | **YES**  | Tags for skill-index.json filtering                                       | `[orchestration, wave, parallel]`     |
+| `tools`          | YES      | Tools the skill requires                                                  | `[Read, Write, Bash]`                 |
+| `invoked_by`     | YES      | Who invokes: `user`, `agent`, or `both`                                   | `both`                                |
+| `user_invocable` | YES      | Whether users can invoke via `/skill-name`                                | `true`                                |
+
+**Why `agents`, `category`, and `tags` are critical:** The skill-index regenerator reads these fields when building the discovery index. Without them, skills get incorrect `agentPrimary` defaults (`["developer"]`), wrong category assignments, and no tags — making them undiscoverable by non-developer agents.
+
+**Verification:**
+
+```bash
+# After creation, confirm all required fields are present
+grep -E "^(name|description|agents|category|tags):" .claude/skills/<skill-name>/SKILL.md
 ```
 
 ## Directory Structure
@@ -897,6 +927,47 @@ Before proceeding with creation, run the ecosystem companion check:
 5. Include companion findings in post-creation integration notes
 
 This step is **informational** (does not block creation) but ensures the full artifact ecosystem is considered.
+
+#### Gap C: Companion Rules File for Agent-Invoked Skills (IMPORTANT)
+
+If the skill is intended for invocation by agents that use rule injection (i.e., the skill provides runtime guidance that should influence agent behavior), it SHOULD have a companion rules file at `.claude/rules/{skill-name}.md`.
+
+**Check during companion review:**
+
+```bash
+ls .claude/rules/<skill-name>.md 2>/dev/null && echo "Rules file exists" || echo "Rules file MISSING"
+```
+
+**When a rules file is needed:**
+
+- The skill instructs agents on coding standards, security practices, or behavioral constraints
+- The skill's guidance should be available to agents even when not explicitly invoked
+- The skill is used by the `developer`, `qa`, `code-reviewer`, or `security-architect` agents
+
+**When a rules file is NOT needed:**
+
+- The skill is a pure execution script (no agent behavioral guidance)
+- The skill is only invoked on-demand with explicit `Skill({ skill: '...' })` calls and has no persistent behavioral effect
+
+**Template for companion rules file:**
+
+```markdown
+# {Skill Name} Rules
+
+## Core Principles
+
+[Key principles the skill enforces]
+
+## Anti-Patterns
+
+[What to avoid when using this skill]
+
+## Integration Points
+
+[Related agents, skills, workflows]
+```
+
+Record the missing rules file in post-creation integration notes if you skip creation.
 
 ---
 
@@ -1192,6 +1263,29 @@ If skill doesn't appear in index:
 - Check skill file is readable and in correct location
 - Re-run generator with verbose output: `node .claude/tools/cli/generate-skill-index.cjs --verbose`
 - Check agent assignments from Step 7 are valid (agents must exist)
+
+#### Gap A: agentPrimary Sourcing from SKILL.md Frontmatter (CRITICAL)
+
+**The index regenerator (`generate-skill-index.cjs`) defaults `agentPrimary` to `["developer"]` when no agent mapping is found in the agent-skill-matrix or AGENT_SKILLS lookup table.** It does NOT automatically read the `agents` field from SKILL.md frontmatter.
+
+**What this means for you as the creator:**
+
+After running `generate-skill-index.cjs`, you MUST verify that `agentPrimary` in the generated index entry matches the `agents` field in SKILL.md frontmatter:
+
+```bash
+# Check what the index has for this skill
+node -e "const idx=require('./.claude/config/skill-index.json');const s=idx.skills['<skill-name>'];console.log('agentPrimary:',s?.agentPrimary);"
+
+# Check what the SKILL.md frontmatter declares
+grep -A2 "^agents:" .claude/skills/<skill-name>/SKILL.md
+```
+
+If they differ, you must either:
+
+1. Add the skill to the `agent-skill-matrix.json` under the correct agent(s), **OR**
+2. Manually add the skill to the `AGENT_SKILLS` mapping in `generate-skill-index-definitions.cjs`
+
+**NEVER rely on the default `["developer"]` fallback for a skill intended for non-developer agents.** The fallback exists only as a last resort; explicit agent assignment is required.
 
 **Integration Diagram:**
 
