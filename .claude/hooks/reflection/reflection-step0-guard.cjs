@@ -315,6 +315,32 @@ async function main() {
       stderrLog('pruned_already_processed_requests', { pruned: prunedProcessed.prunedCount });
     }
 
+    // Filter out stale requests older than _MAX_REFLECTION_AGE_HOURS.
+    // Prevents stale entries from accumulating across sessions and blocking
+    // TaskList indefinitely.
+    const maxAgeMs = _MAX_REFLECTION_AGE_HOURS * 60 * 60 * 1000;
+    const cutoffMs = Date.now() - maxAgeMs;
+    const freshRequests = requests.filter(req => {
+      const ts = req?.source?.timestamp || req?.timestamp;
+      if (!ts) return true; // No timestamp: keep (cannot determine age)
+      const parsed = Date.parse(ts);
+      if (!Number.isFinite(parsed)) return true; // Unparseable: keep
+      return parsed >= cutoffMs;
+    });
+    const staleCount = requests.length - freshRequests.length;
+    if (staleCount > 0) {
+      try {
+        fs.writeFileSync(SPAWN_REQUEST_PATH, JSON.stringify(freshRequests, null, 2), 'utf8');
+        stderrLog('pruned_stale_reflections', {
+          staleCount,
+          maxAgeHours: _MAX_REFLECTION_AGE_HOURS,
+        });
+      } catch (err) {
+        stderrLog('stale_prune_write_failed', { error: err.message });
+      }
+      requests = freshRequests;
+    }
+
     if (!Array.isArray(requests) || requests.length === 0) {
       // Clean stale reminder so we do not deadlock on "0 pending" conditions.
       clearReminderIfStale();

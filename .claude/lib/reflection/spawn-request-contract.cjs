@@ -105,6 +105,7 @@ function sanitizeSpawnRequest(entry, index) {
 
 function acknowledgeRequests(filePath, ids) {
   if (!Array.isArray(ids) || ids.length === 0) return;
+  if (!fs.existsSync(filePath)) return;
   const requests = readSpawnRequestsFile(filePath);
   const idSet = new Set(ids);
 
@@ -120,6 +121,7 @@ function acknowledgeRequests(filePath, ids) {
 
 function removeRequests(filePath, ids) {
   if (!Array.isArray(ids) || ids.length === 0) return;
+  if (!fs.existsSync(filePath)) return;
   const requests = readSpawnRequestsFile(filePath);
   const idSet = new Set(ids);
 

@@ -221,6 +221,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/safety/bypass-audit-hook.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/memory/sync-memory-index.cjs"
           },
           {
