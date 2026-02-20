@@ -51,6 +51,26 @@ const AUDIT_LOG_PATH = path.join(
 );
 
 // ---------------------------------------------------------------------------
+// GAP-A: Enforcement mode from environment variable
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the current enforcement mode.
+ * Reads EXTERNAL_CONTENT_GUARD_MODE each time so tests can override it per-test.
+ * Values: 'block' | 'warn' | 'off'
+ * Default: 'warn' (backward-compatible)
+ *
+ * @returns {'block'|'warn'|'off'}
+ */
+function getEnforcementMode() {
+  const raw = process.env.EXTERNAL_CONTENT_GUARD_MODE;
+  if (!raw) return 'warn';
+  const mode = raw.toLowerCase().trim();
+  if (mode === 'block' || mode === 'warn' || mode === 'off') return mode;
+  return 'warn';
+}
+
+// ---------------------------------------------------------------------------
 // In-process cache for trusted-sources.json (reset per process start)
 // ---------------------------------------------------------------------------
 
@@ -116,6 +136,52 @@ function ensureQuarantineDir() {
     }
   } catch (_err) {
     // Best-effort; do not block hook execution on directory creation failure
+  }
+}
+
+/**
+ * GAP-B: Write a quarantine metadata file for an intercepted untrusted request.
+ * Best-effort — failure must NOT affect hook behavior or exit code.
+ *
+ * File naming: {ISO-date}-{domain-slug}.json
+ * e.g. 2026-02-20T09-15-22-123Z-untrusted-org-com.json
+ *
+ * @param {{ tool: string, url_or_command: string, domain: string|null, trust_level: string, action: string }} entry
+ */
+function writeQuarantineFile(entry) {
+  try {
+    ensureQuarantineDir();
+    const domainRaw = entry.domain || 'unknown';
+    // Sanitize domain for safe filename: only alphanumeric, dots, hyphens
+    const domainSlug = domainRaw.replace(/[^a-z0-9.-]/gi, '-').slice(0, 50);
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `${ts}-${domainSlug}.json`;
+    const filepath = path.join(QUARANTINE_DIR, filename);
+
+    // Validate path stays inside quarantine dir (prevent path traversal)
+    const resolvedFilepath = path.resolve(filepath);
+    const resolvedDir = path.resolve(QUARANTINE_DIR);
+    if (!resolvedFilepath.startsWith(resolvedDir + path.sep) && resolvedFilepath !== resolvedDir) {
+      // Path traversal attempt — log to stderr and abort write
+      process.stderr.write(`[${HOOK_NAME}] SECURITY: quarantine path traversal attempt blocked\n`);
+      return;
+    }
+
+    const payload = JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        tool: entry.tool || null,
+        url_or_command: entry.url_or_command || null,
+        domain: entry.domain || null,
+        trust_level: entry.trust_level || null,
+        action_taken: entry.action || null,
+      },
+      null,
+      2
+    );
+    fs.writeFileSync(resolvedFilepath, payload, 'utf-8');
+  } catch (_err) {
+    // Best-effort: quarantine write failure must NOT change hook exit code or behavior
   }
 }
 
@@ -221,19 +287,36 @@ function handleWebFetch(toolInput, config) {
   }
 
   if (!domain) {
-    // Cannot parse domain — block as untrusted
+    // Cannot parse domain — apply enforcement mode to unparseable domains
+    const mode = getEnforcementMode();
+    const action = mode === 'block' ? 'blocked' : 'warned';
     appendAuditLog({
       tool: 'WebFetch',
       url_or_command: url,
       domain: null,
       trust_level: 'untrusted',
-      action: 'blocked',
+      action,
     });
-    ensureQuarantineDir();
+    // GAP-B: Write quarantine file for unresolvable domains
+    writeQuarantineFile({
+      tool: 'WebFetch',
+      url_or_command: url,
+      domain: null,
+      trust_level: 'untrusted',
+      action,
+    });
+    if (mode === 'block') {
+      return {
+        action: 'block',
+        message:
+          'External fetch blocked: URL domain could not be determined. ' +
+          'Verify the URL is valid and the domain is listed in .claude/config/trusted-sources.json.',
+      };
+    }
     return {
-      action: 'block',
+      action: 'warn',
       message:
-        'External fetch blocked: URL domain could not be determined. ' +
+        'External fetch warning: URL domain could not be determined. ' +
         'Verify the URL is valid and the domain is listed in .claude/config/trusted-sources.json.',
     };
   }
@@ -250,21 +333,43 @@ function handleWebFetch(toolInput, config) {
     return { action: 'allow' };
   }
 
-  // Untrusted domain — block
+  // GAP-A: Apply enforcement mode for untrusted domain
+  const mode = getEnforcementMode();
+  const action = mode === 'block' ? 'blocked' : 'warned';
+
   appendAuditLog({
     tool: 'WebFetch',
     url_or_command: url,
     domain,
     trust_level: 'untrusted',
-    action: 'blocked',
+    action,
   });
-  ensureQuarantineDir();
-  auditLog(HOOK_NAME, 'block', { tool: 'WebFetch', domain, url });
 
+  // GAP-B: Write quarantine file for untrusted domain
+  writeQuarantineFile({
+    tool: 'WebFetch',
+    url_or_command: url,
+    domain,
+    trust_level: 'untrusted',
+    action,
+  });
+
+  if (mode === 'block') {
+    auditLog(HOOK_NAME, 'block', { tool: 'WebFetch', domain, url });
+    return {
+      action: 'block',
+      message:
+        `External fetch blocked: domain "${domain}" is not in the trusted-sources.json allowlist. ` +
+        'Add domain to .claude/config/trusted-sources.json to allow.',
+    };
+  }
+
+  // warn mode
+  auditLog(HOOK_NAME, 'warn', { tool: 'WebFetch', domain, url });
   return {
-    action: 'block',
+    action: 'warn',
     message:
-      `External fetch blocked: domain "${domain}" is not in the trusted-sources.json allowlist. ` +
+      `External fetch warning: domain "${domain}" is not in the trusted-sources.json allowlist. ` +
       'Add domain to .claude/config/trusted-sources.json to allow.',
   };
 }
@@ -331,20 +436,45 @@ function handleBash(toolInput, config) {
     if (org && config) {
       const trustedOrgs = config.trusted_organizations.map(o => o.toLowerCase());
       if (!trustedOrgs.includes(org.toLowerCase())) {
+        // GAP-A + GAP-C: Apply enforcement mode to gh api untrusted org
+        const mode = getEnforcementMode();
+        const action = mode === 'block' ? 'blocked' : 'warned';
+
         appendAuditLog({
           tool: 'Bash',
           url_or_command: command,
           domain: `github.com/${org}`,
           trust_level: 'unverified_org',
-          action: 'warned',
+          action,
         });
+
+        // GAP-B: Write quarantine file for untrusted gh api org
+        writeQuarantineFile({
+          tool: 'Bash',
+          url_or_command: command,
+          domain: `github.com/${org}`,
+          trust_level: 'unverified_org',
+          action,
+        });
+
         auditLog(HOOK_NAME, 'warn_gh_api_org', { org, command });
-        results.push({
-          action: 'warn',
-          message:
-            `gh api call references org "${org}" which is not in the trusted_organizations list ` +
-            'in .claude/config/trusted-sources.json. Verify this is an intentional external call.',
-        });
+
+        if (mode === 'block') {
+          results.push({
+            action: 'block',
+            message:
+              `gh api call blocked: org "${org}" is not in the trusted_organizations list ` +
+              'in .claude/config/trusted-sources.json. ' +
+              'Set EXTERNAL_CONTENT_GUARD_MODE=warn or add org to trusted list.',
+          });
+        } else {
+          results.push({
+            action: 'warn',
+            message:
+              `gh api call references org "${org}" which is not in the trusted_organizations list ` +
+              'in .claude/config/trusted-sources.json. Verify this is an intentional external call.',
+          });
+        }
       } else {
         appendAuditLog({
           tool: 'Bash',
@@ -403,21 +533,44 @@ function handleBash(toolInput, config) {
         });
         auditLog(HOOK_NAME, 'allow', { tool: 'Bash', domain, url });
       } else {
+        // GAP-A: Apply enforcement mode for untrusted curl/wget domain
+        const mode = getEnforcementMode();
+        const action = mode === 'block' ? 'blocked' : 'warned';
+
         appendAuditLog({
           tool: 'Bash',
           url_or_command: command,
           domain: domain || 'unknown',
           trust_level: 'untrusted',
-          action: 'blocked',
+          action,
         });
-        ensureQuarantineDir();
-        auditLog(HOOK_NAME, 'block', { tool: 'Bash', domain, command });
-        results.push({
-          action: 'block',
-          message:
-            `Bash command blocked: ${hasCurl ? 'curl' : 'wget'} to "${domain || url}" is not in the ` +
-            'trusted-sources.json allowlist. Add the domain to .claude/config/trusted-sources.json to allow.',
+
+        // GAP-B: Write quarantine file for untrusted curl/wget domain
+        writeQuarantineFile({
+          tool: 'Bash',
+          url_or_command: command,
+          domain: domain || 'unknown',
+          trust_level: 'untrusted',
+          action,
         });
+
+        if (mode === 'block') {
+          auditLog(HOOK_NAME, 'block', { tool: 'Bash', domain, command });
+          results.push({
+            action: 'block',
+            message:
+              `Bash command blocked: ${hasCurl ? 'curl' : 'wget'} to "${domain || url}" is not in the ` +
+              'trusted-sources.json allowlist. Add the domain to .claude/config/trusted-sources.json to allow.',
+          });
+        } else {
+          auditLog(HOOK_NAME, 'warn', { tool: 'Bash', domain, command });
+          results.push({
+            action: 'warn',
+            message:
+              `Bash command warning: ${hasCurl ? 'curl' : 'wget'} to "${domain || url}" is not in the ` +
+              'trusted-sources.json allowlist. Add the domain to .claude/config/trusted-sources.json to allow.',
+          });
+        }
       }
     }
   }
@@ -438,6 +591,11 @@ function handleBash(toolInput, config) {
 
 async function main() {
   try {
+    // GAP-A: Check enforcement mode — 'off' exits immediately (hook disabled)
+    if (getEnforcementMode() === 'off') {
+      process.exit(0);
+    }
+
     const hookInput = await parseHookInputAsync();
 
     if (!hookInput) {
@@ -499,6 +657,10 @@ module.exports = {
   extractCurlWgetUrls,
   ensureQuarantineDir,
   appendAuditLog,
+  // GAP-A: Enforcement mode helper
+  getEnforcementMode,
+  // GAP-B: Quarantine file writer
+  writeQuarantineFile,
   // Reset cache for test isolation
   _resetCache: () => {
     _cachedConfig = null;

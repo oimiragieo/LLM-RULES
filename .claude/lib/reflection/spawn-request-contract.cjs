@@ -151,9 +151,51 @@ function readSpawnRequestsFile(filePath, options = {}) {
   try {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
-    return parseSpawnRequests(content, options);
+    const parsed = parseSpawnRequests(content, options);
+    if (options.maxAge != null) {
+      const maxAgeMs = Number(options.maxAge);
+      if (Number.isFinite(maxAgeMs) && maxAgeMs > 0) {
+        const cutoff = Date.now() - maxAgeMs;
+        return parsed.filter(req => {
+          const ts = Date.parse(req?.source?.timestamp || '');
+          return Number.isFinite(ts) ? ts >= cutoff : true;
+        });
+      }
+    }
+    return parsed;
   } catch (_err) {
     return [];
+  }
+}
+
+/**
+ * Remove reflection spawn requests older than the specified age.
+ * Used to prune stale cross-session requests that were never cleaned up
+ * because agents completed without emitting processedReflectionIds.
+ *
+ * @param {string} filePath - Path to reflection-spawn-request.json
+ * @param {number} maxAgeMs - Maximum age in milliseconds; entries older than this are removed
+ * @returns {number} Count of removed entries
+ */
+function removeStaleRequests(filePath, maxAgeMs) {
+  try {
+    if (!fs.existsSync(filePath)) return 0;
+    const requests = readSpawnRequestsFile(filePath);
+    if (!Array.isArray(requests) || requests.length === 0) return 0;
+
+    const cutoff = Date.now() - Number(maxAgeMs);
+    const fresh = requests.filter(req => {
+      const ts = Date.parse(req?.source?.timestamp || '');
+      return Number.isFinite(ts) ? ts >= cutoff : true;
+    });
+
+    const removedCount = requests.length - fresh.length;
+    if (removedCount > 0) {
+      atomicWriteJSONSync(filePath, fresh);
+    }
+    return removedCount;
+  } catch (_err) {
+    return 0;
   }
 }
 
@@ -162,6 +204,7 @@ module.exports = {
   readSpawnRequestsFile,
   acknowledgeRequests,
   removeRequests,
+  removeStaleRequests,
   sanitizeSpawnRequest,
   normalizeRawToArray,
   DEFAULT_MAX_ENTRIES,

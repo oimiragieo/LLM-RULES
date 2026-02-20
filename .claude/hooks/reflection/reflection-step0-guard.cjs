@@ -56,6 +56,7 @@ const STEP0_LOOP_BREAKER_MODE = String(process.env.REFLECTION_STEP0_LOOP_BREAKER
   .toLowerCase();
 const STEP0_EVENT_TIMEOUT_MS = Number(process.env.REFLECTION_STEP0_EVENT_TIMEOUT_MS || 250);
 const REFLECTION_GHOST_SUPPRESS_HOURS = Number(process.env.REFLECTION_GHOST_SUPPRESS_HOURS || 24);
+const _MAX_REFLECTION_AGE_HOURS = Number(process.env.MAX_REFLECTION_AGE_HOURS || 24);
 
 /** Log to stderr only (stdout reserved for single formatResult line). */
 function stderrLog(message, meta = {}) {
