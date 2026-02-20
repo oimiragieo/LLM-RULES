@@ -1,4 +1,6 @@
 ---
+verified: true
+lastVerifiedAt: 2026-02-20T14:39:48.595Z
 name: code-reviewer
 version: 1.0.0
 description: >-
