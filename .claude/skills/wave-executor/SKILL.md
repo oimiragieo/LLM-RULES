@@ -40,12 +40,14 @@ This is the framework's implementation of the Ralph Wiggum pattern: iteration ov
 ## When to Use
 
 **Use this skill when:**
+
 - EPIC-tier batch work: >10 artifacts, >5 waves
 - Multi-wave skill updates, bundle generation, or mass refactoring
 - Any pipeline expected to run >30 minutes with parallel subagents
 - Work that previously crashed due to Bun segfaults
 
 **Do NOT use for:**
+
 - Simple 1-3 skill updates (use `skill-updater` directly)
 - Single-skill work (use `Task()` subagent)
 - Work that fits in one context window (just do it inline)
@@ -77,25 +79,27 @@ Key invariant: no single Bun process accumulates more than ~100 spawns.
 ## Invocation
 
 **Via Bash (agents):**
+
 ```bash
 node .claude/tools/cli/wave-executor.mjs --plan <path> --json
 ```
 
 **Via slash command (users):**
+
 ```
 /wave-executor --plan .claude/context/plans/my-plan.json
 ```
 
 **CLI flags:**
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--plan <path>` | required | Path to wave plan JSON |
-| `--model <model>` | `claude-sonnet-4-6` | Model for wave execution |
-| `--max-turns <n>` | `50` | Max conversation turns per wave |
-| `--start-from <n>` | `1` | Resume from wave N |
-| `--dry-run` | `false` | Preview without executing |
-| `--json` | `false` | Machine-readable output |
+| Flag               | Default             | Description                     |
+| ------------------ | ------------------- | ------------------------------- |
+| `--plan <path>`    | required            | Path to wave plan JSON          |
+| `--model <model>`  | `claude-sonnet-4-6` | Model for wave execution        |
+| `--max-turns <n>`  | `50`                | Max conversation turns per wave |
+| `--start-from <n>` | `1`                 | Resume from wave N              |
+| `--dry-run`        | `false`             | Preview without executing       |
+| `--json`           | `false`             | Machine-readable output         |
 
 ## Plan File Format
 
@@ -148,10 +152,12 @@ The router's Bun process stays idle during execution (single Bash call) — no s
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+
 - Read `.claude/context/memory/learnings.md` for prior wave execution learnings
 - Check inventory file for resume state
 
 **After completing:**
+
 - Append wave execution summary to `.claude/context/memory/learnings.md`
 - Record any errors to `.claude/context/memory/issues.md`
 - Record architecture decisions to `.claude/context/memory/decisions.md`

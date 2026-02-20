@@ -21,7 +21,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -126,7 +125,11 @@ export function readPlanFile(planPath) {
       return { ok: false, plan: null, error: 'Each wave must have an "id" field' };
     }
     if (!wave.skills || !Array.isArray(wave.skills) || wave.skills.length === 0) {
-      return { ok: false, plan: null, error: `Wave ${wave.id} must have a non-empty "skills" array` };
+      return {
+        ok: false,
+        plan: null,
+        error: `Wave ${wave.id} must have a non-empty "skills" array`,
+      };
     }
   }
 
@@ -225,7 +228,7 @@ export function buildWavePrompt(wave, plan) {
     `Domain: ${domain}`,
     '',
     'For each skill:',
-    '1. Read the skill\'s SKILL.md and any .claude/rules/ file for domain context',
+    "1. Read the skill's SKILL.md and any .claude/rules/ file for domain context",
     '2. Perform the required work as described in the plan',
     '3. Validate results (JSON schema parse, Node.js syntax check where applicable)',
     '4. Commit changes with a clear message',
@@ -387,10 +390,7 @@ async function main() {
   const model = args.model || config.model || 'claude-sonnet-4-6';
   const maxTurns = args.maxTurnsPerWave || config.maxTurnsPerWave || 50;
   const sleepMs = config.sleepBetweenWaves || 3000;
-  const inventoryPath = path.resolve(
-    projectRoot,
-    config.inventoryPath || DEFAULT_INVENTORY_PATH
-  );
+  const inventoryPath = path.resolve(projectRoot, config.inventoryPath || DEFAULT_INVENTORY_PATH);
 
   // Read inventory for resume support
   const inventory = readInventory(inventoryPath);
@@ -402,7 +402,9 @@ async function main() {
 
   if (!args.json) {
     process.stdout.write(`\nWave Executor — ${plan.name || 'unnamed plan'}\n`);
-    process.stdout.write(`Total waves: ${plan.waves.length} | Pending: ${pendingWaves.length} | Already completed: ${inventory.completedWaves.length}\n`);
+    process.stdout.write(
+      `Total waves: ${plan.waves.length} | Pending: ${pendingWaves.length} | Already completed: ${inventory.completedWaves.length}\n`
+    );
     process.stdout.write(`Model: ${model} | Max turns/wave: ${maxTurns}\n\n`);
   }
 
@@ -443,7 +445,9 @@ async function main() {
 
   for (const wave of pendingWaves) {
     if (!args.json) {
-      process.stdout.write(`\n=== Wave ${wave.id}/${plan.waves.length}: ${wave.skills.join(', ')} ===\n`);
+      process.stdout.write(
+        `\n=== Wave ${wave.id}/${plan.waves.length}: ${wave.skills.join(', ')} ===\n`
+      );
     }
 
     const result = await executeWave(wave, plan, projectRoot, { model, maxTurns });
@@ -456,7 +460,9 @@ async function main() {
       updateInventory(inventoryPath, plan.name || 'unnamed', wave.id, result);
 
       if (!args.json) {
-        process.stdout.write(`\n  Wave ${wave.id} complete: ${result.skillsProcessed} skills, ${result.cost}, ${(result.durationMs / 1000).toFixed(1)}s\n`);
+        process.stdout.write(
+          `\n  Wave ${wave.id} complete: ${result.skillsProcessed} skills, ${result.cost}, ${(result.durationMs / 1000).toFixed(1)}s\n`
+        );
       }
     } else {
       errors.push(`Wave ${wave.id}: ${result.error}`);
@@ -486,7 +492,9 @@ async function main() {
     process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
   } else {
     process.stdout.write(`\n--- Wave Executor Complete ---\n`);
-    process.stdout.write(`Waves: ${wavesCompleted}/${plan.waves.length} | Skills: ${totalSkills} | Cost: $${totalCost.toFixed(2)}\n`);
+    process.stdout.write(
+      `Waves: ${wavesCompleted}/${plan.waves.length} | Skills: ${totalSkills} | Cost: $${totalCost.toFixed(2)}\n`
+    );
     if (errors.length > 0) {
       process.stdout.write(`Errors: ${errors.length}\n`);
       for (const e of errors) process.stdout.write(`  - ${e}\n`);
@@ -497,10 +505,9 @@ async function main() {
 }
 
 // Only run main when executed directly (not when imported for testing)
-const isDirectRun = process.argv[1] && (
-  process.argv[1].endsWith('wave-executor.mjs') ||
-  process.argv[1].endsWith('wave-executor')
-);
+const isDirectRun =
+  process.argv[1] &&
+  (process.argv[1].endsWith('wave-executor.mjs') || process.argv[1].endsWith('wave-executor'));
 
 if (isDirectRun) {
   main().catch(err => {

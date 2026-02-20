@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-20T05:05:58.693Z",
+  "generatedAt": "2026-02-20T06:25:02.481Z",
   "metadata": {
     "totalSkills": 398,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-20T05:05:58.694Z",
+    "lastValidated": "2026-02-20T06:25:02.482Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7607,7 +7607,7 @@
     "wave-executor": {
       "name": "wave-executor",
       "displayName": "Wave Executor",
-      "category": "Other",
+      "category": "Orchestration",
       "domain": "other",
       "description": "Fresh-process orchestration for EPIC-tier batch pipelines. Spawns a new Bun process per wave via the Claude Agent SDK, preventing GC-related crashes in long-running sessions.",
       "requiredTools": [
@@ -7618,14 +7618,17 @@
         "Grep"
       ],
       "agentPrimary": [
-        "developer"
+        "master-orchestrator"
       ],
-      "agentSupporting": [],
+      "agentSupporting": [
+        "planner"
+      ],
       "tags": [
         "other",
+        "orchestration",
         "wave-executor"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "web-design-guidelines-vercel": {
@@ -10336,7 +10339,6 @@
         "ui-components-expert",
         "variant-analysis",
         "visual-and-observational-rules",
-        "wave-executor",
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
@@ -10472,7 +10474,8 @@
       ],
       "Orchestration": [
         "consensus-voting",
-        "swarm-coordination"
+        "swarm-coordination",
+        "wave-executor"
       ],
       "Memory": [
         "context-compressor",
@@ -12288,7 +12291,6 @@
         "ui-components-expert",
         "variant-analysis",
         "visual-and-observational-rules",
-        "wave-executor",
         "web-design-guidelines-vercel",
         "web3-expert",
         "workflow-creator",
@@ -12379,6 +12381,7 @@
         "framework-context",
         "recommend-evolution",
         "thinking-tools",
+        "wave-executor",
         "task-breakdown",
         "progressive-disclosure"
       ],
@@ -12773,7 +12776,8 @@
         "swarm-coordination",
         "dispatching-parallel-agents",
         "track-management",
-        "workflow-creator"
+        "workflow-creator",
+        "wave-executor"
       ],
       "swarm-coordinator": [
         "swarm-coordination",
@@ -13068,7 +13072,6 @@
         "ui-components-expert",
         "variant-analysis",
         "visual-and-observational-rules",
-        "wave-executor",
         "web-design-guidelines-vercel",
         "web3-expert",
         "workflow-creator",
@@ -13159,6 +13162,7 @@
         "framework-context",
         "recommend-evolution",
         "thinking-tools",
+        "wave-executor",
         "task-breakdown",
         "progressive-disclosure"
       ],
@@ -13553,7 +13557,8 @@
         "swarm-coordination",
         "dispatching-parallel-agents",
         "track-management",
-        "workflow-creator"
+        "workflow-creator",
+        "wave-executor"
       ],
       "swarm-coordinator": [
         "swarm-coordination",

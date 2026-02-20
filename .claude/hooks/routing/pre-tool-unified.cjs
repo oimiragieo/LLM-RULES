@@ -133,8 +133,8 @@ function applyCircuitBreakerMessage(toolName, message, hookInput) {
   if (String(toolName || '').toLowerCase() === 'bash') {
     return (
       `${genericPrefix} ` +
-      'For Windows sessions: avoid `/c/...`, heredoc (`<<`), `/tmp`, and shell redirection for artifacts. ' +
-      'Use Read/Grep for discovery and Write/Edit for artifact output with `C:/...` paths.'
+      'Do not retry with Bash. Use the Write tool for file content: Write({ file_path: "<path>", content: "..." }). ' +
+      'Avoid heredoc, `/tmp`, and `/c/...` on Windows.'
     );
   }
   return `${genericPrefix} Last violation: ${message}`;

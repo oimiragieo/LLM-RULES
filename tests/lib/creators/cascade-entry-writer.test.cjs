@@ -33,7 +33,8 @@ function queuePath(root) {
 function readQueue(root) {
   const p = queuePath(root);
   if (!fs.existsSync(p)) return [];
-  return fs.readFileSync(p, 'utf8')
+  return fs
+    .readFileSync(p, 'utf8')
     .split('\n')
     .filter(Boolean)
     .map(line => JSON.parse(line));
@@ -42,7 +43,11 @@ function readQueue(root) {
 function writeQueue(root, entries) {
   const p = queuePath(root);
   fs.mkdirSync(path.dirname(p), { recursive: true });
-  fs.writeFileSync(p, entries.map(e => JSON.stringify(e)).join('\n') + (entries.length ? '\n' : ''), 'utf8');
+  fs.writeFileSync(
+    p,
+    entries.map(e => JSON.stringify(e)).join('\n') + (entries.length ? '\n' : ''),
+    'utf8'
+  );
 }
 
 function makeCascade(agent, skill, reason) {
@@ -92,7 +97,10 @@ describe('Cascade Entry Writer', () => {
 
     const entries = readQueue(root);
     assert.ok(entries[0].evidence.includes('tdd'), 'evidence should mention the skill name');
-    assert.ok(entries[0].evidence.includes('Tool changes detected'), 'evidence should include reason');
+    assert.ok(
+      entries[0].evidence.includes('Tool changes detected'),
+      'evidence should include reason'
+    );
   });
 
   it('entries have targetArtifact with type: "agent" and agent name', () => {
@@ -122,22 +130,21 @@ describe('Cascade Entry Writer', () => {
 
   it('does not write duplicates if agent already has pending cascade', () => {
     // Pre-populate queue with an existing pending cascade for developer
-    writeQueue(root, [{
-      id: 'cascade_developer_existing',
-      timestamp: new Date().toISOString(),
-      source: 'other',
-      trigger: 'skill_cascade',
-      evidence: 'Skill "tdd" updated previously',
-      suggestedArtifactType: 'agent',
-      summary: 'Cascade: update agent "developer"',
-      status: 'proposed',
-      targetArtifact: { type: 'agent', name: 'developer' },
-    }]);
+    writeQueue(root, [
+      {
+        id: 'cascade_developer_existing',
+        timestamp: new Date().toISOString(),
+        source: 'other',
+        trigger: 'skill_cascade',
+        evidence: 'Skill "tdd" updated previously',
+        suggestedArtifactType: 'agent',
+        summary: 'Cascade: update agent "developer"',
+        status: 'proposed',
+        targetArtifact: { type: 'agent', name: 'developer' },
+      },
+    ]);
 
-    const cascades = [
-      makeCascade('developer', 'debugging'),
-      makeCascade('qa', 'debugging'),
-    ];
+    const cascades = [makeCascade('developer', 'debugging'), makeCascade('qa', 'debugging')];
     const result = writeCascadeEntries(cascades, root);
 
     assert.equal(result.written, 1, 'Should write only qa (developer already pending)');
@@ -157,7 +164,11 @@ describe('Cascade Entry Writer', () => {
     assert.equal(result.entries[0].trigger, 'skill_cascade');
 
     // File should NOT exist
-    assert.equal(fs.existsSync(queuePath(root)), false, 'Queue file should not be written in dryRun');
+    assert.equal(
+      fs.existsSync(queuePath(root)),
+      false,
+      'Queue file should not be written in dryRun'
+    );
   });
 
   it('appends to existing JSONL without corrupting prior entries', () => {
@@ -197,10 +208,7 @@ describe('Cascade Entry Writer', () => {
   });
 
   it('returns { written: number, skipped: number, entries: object[] }', () => {
-    const cascades = [
-      makeCascade('developer', 'tdd'),
-      makeCascade('qa', 'tdd'),
-    ];
+    const cascades = [makeCascade('developer', 'tdd'), makeCascade('qa', 'tdd')];
     const result = writeCascadeEntries(cascades, root);
 
     assert.equal(typeof result.written, 'number');

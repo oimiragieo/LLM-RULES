@@ -49,7 +49,9 @@ function validateInput(input) {
         } else if (content.waves.length === 0) {
           errors.push('Plan file "waves" array is empty');
         } else {
-          warnings.push(`Plan loaded: ${content.waves.length} waves, ${content.waves.reduce((sum, w) => sum + (w.skills?.length || 0), 0)} total skills`);
+          warnings.push(
+            `Plan loaded: ${content.waves.length} waves, ${content.waves.reduce((sum, w) => sum + (w.skills?.length || 0), 0)} total skills`
+          );
         }
       } catch (err) {
         errors.push(`Invalid plan file: ${err.message}`);

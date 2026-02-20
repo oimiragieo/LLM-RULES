@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Pre-completion summary enforcement**: Tightened `isValidSummary()` in `pre-completion-validation.cjs` so placeholder completions are blocked. Minimum summary length increased from 10 to 20 characters; added fallback pattern `/^completed\s+task\s+\d+$/i` to reject "Completed task N"–style summaries. TaskUpdate(completed) without a real `metadata.summary` (or with a minimal placeholder) now blocks when `PRE_COMPLETION_SUMMARY_ENFORCEMENT=block` (default).
+- **Agent template YAML**: Fixed agent-template.md frontmatter so it parses correctly: scalar placeholders quoted, `skills` converted to block scalar (`skills: |` + `{{skills_yaml}}`). Added `normalizeSkills()` in `agent-template-contract.cjs` so `skills` can be a string (block scalar) and is normalized to an array.
+- **Memory sanitizer false positive**: Narrowed "code execution: **proto** manipulation" pattern so only real manipulation (e.g. `.__proto__ =` or `"__proto__":`) is flagged; documentation/archive content that merely mentions "strip **proto**" no longer triggers a false positive.
+- **Read-safety (EISDIR)**: Documented in `pre-tool-unified.read-safety.cjs` that Read on a directory causes EISDIR and that Glob should be used for discovery; existing block/rewrite behavior unchanged.
+- **Routing tables**: Fixed corrupt syntax in `routing-table-intent-agents.cjs` and `routing-table-intent-keywords.cjs` (duplicate entries left after `};`); moved `qa-guardian`, `contract-check`, `bool-action`, `repo-onboarder` inside the exported objects so ESLint parses correctly.
 - Fixed `run-hook.cmd` on Windows by replacing the fragile batch/bash wrapper with a robust Node.js script (`run-hook.cjs`). This ensures hooks can be executed reliably across platforms without path separator issues.
 - Documented missing `memory-reminder` hook in `.claude/hooks/README.md` as a known issue (file is missing).
 

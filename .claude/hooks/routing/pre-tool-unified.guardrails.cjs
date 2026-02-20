@@ -45,7 +45,8 @@ const TASKUPDATE_FIRST_WINDOW_MS = Number(
 );
 const WINDOWS_BASH_GUARDRAIL_MESSAGE =
   '[ROUTER-FIRST PROTOCOL VIOLATION][AGENT-GUARDRAIL] Windows-incompatible Bash heredoc/tmp command blocked. ' +
-  'Use Write/Edit tools for artifact content, avoid `cd /c/...` style prefixes, and use a Windows-safe Bash/PowerShell command.';
+  'Do not retry with Bash, node -e, or Python in Bash. Use Write/Edit tools: Write({ file_path: "<path>", content: "<content>" }). ' +
+  'Avoid `cd /c/...` style prefixes and heredoc (`<<`); use a Windows-safe Bash/PowerShell command or Write/Edit for artifact content.';
 const STRUCTURED_MEMORY_PATHS = new Set([
   '.claude/context/memory/patterns.json',
   '.claude/context/memory/gotchas.json',

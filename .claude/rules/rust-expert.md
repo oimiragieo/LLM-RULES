@@ -8,6 +8,7 @@ paths:
 ## When to Invoke
 
 Use the `rust-expert` skill when:
+
 - Implementing Rust libraries, CLIs, or systems-level components
 - Reviewing Rust code for ownership, borrowing, or lifetime correctness
 - Designing async Rust services (Tokio, async-std)

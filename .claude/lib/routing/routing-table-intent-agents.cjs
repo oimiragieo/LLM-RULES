@@ -130,6 +130,10 @@ const INTENT_TO_AGENT = {
   incident: 'incident-responder',
   plan: 'planner',
   integration: 'developer',
+  'qa-guardian': 'qa-guardian',
+  'contract-check': 'contract-check',
+  'bool-action': 'bool-action',
+  'repo-onboarder': 'repo-onboarder',
 };
 
 module.exports = { INTENT_TO_AGENT };

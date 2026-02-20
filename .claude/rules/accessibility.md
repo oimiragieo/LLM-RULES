@@ -11,7 +11,7 @@ paths:
 - Design for all users including those with disabilities
 - Use semantic HTML as the foundation
 - Test with real assistive technologies
-- Follow WCAG 2.1 AA standards minimum
+- Follow WCAG 2.2 AA standards minimum
 
 ## Input Requirements
 
@@ -31,7 +31,7 @@ paths:
 5. **Color Contrast**: WCAG ratios (4.5:1 for normal text, 3:1 for large text)
 6. **Focus Indicators**: Visible focus states for all interactive elements
 
-### WCAG 2.1 Levels
+### WCAG 2.2 Levels
 
 | Level   | Description                    | Examples                         |
 | ------- | ------------------------------ | -------------------------------- |
@@ -276,5 +276,5 @@ Any UI change must pass accessibility review before deployment.
 ## Related References
 
 - `.claude/skills/accessibility/SKILL.md` - Complete skill documentation
-- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [WCAG 2.2 Guidelines](https://www.w3.org/WAI/WCAG22/quickref/)
 - [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)

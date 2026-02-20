@@ -42,6 +42,9 @@ const ENFORCEMENT_DEFAULTS = {
   // Reflection enforcement
   REFLECTION_STEP0_ENFORCEMENT: 'block',
 
+  // Completion metadata (ADR-139)
+  PRE_COMPLETION_SUMMARY_ENFORCEMENT: 'block',
+
   // Task management enforcement
   TASKLIST_FIRST_ENFORCEMENT: 'block',
   TASKUPDATE_FIRST_ENFORCEMENT: 'block',

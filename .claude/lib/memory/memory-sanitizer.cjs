@@ -79,7 +79,11 @@ const DANGEROUS_PATTERNS = {
       description: 'code execution: require()',
     },
     { pattern: /\bimport\s*\(/gi, description: 'code execution: import()' },
-    { pattern: /__proto__/gi, description: 'code execution: __proto__ manipulation' },
+    // Only flag actual manipulation (assignment or JSON key), not documentation mentioning __proto__
+    {
+      pattern: /\.__proto__\s*=|["'`]__proto__["'`]\s*:/gi,
+      description: 'code execution: __proto__ manipulation',
+    },
     {
       pattern: /constructor\.prototype/gi,
       description: 'code execution: constructor.prototype manipulation',

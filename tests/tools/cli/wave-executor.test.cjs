@@ -22,9 +22,7 @@ let mod;
 
 async function loadModule() {
   if (!mod) {
-    mod = await import(
-      '../../../.claude/tools/cli/wave-executor.mjs'
-    );
+    mod = await import('../../../.claude/tools/cli/wave-executor.mjs');
   }
   return mod;
 }
@@ -80,12 +78,16 @@ describe('wave-executor', () => {
   it('parseWaveArgs parses --plan, --model, --dry-run, --json flags', async () => {
     const { parseWaveArgs } = await loadModule();
     const args = parseWaveArgs([
-      '--plan', '/tmp/my-plan.json',
-      '--model', 'claude-opus-4-6',
+      '--plan',
+      '/tmp/my-plan.json',
+      '--model',
+      'claude-opus-4-6',
       '--dry-run',
       '--json',
-      '--start-from', '5',
-      '--max-turns', '100',
+      '--start-from',
+      '5',
+      '--max-turns',
+      '100',
     ]);
 
     assert.equal(args.plan, '/tmp/my-plan.json');
@@ -171,9 +173,17 @@ describe('wave-executor', () => {
     const invPath = path.join(tmpDir, 'inventory.json');
 
     // Write wave 1
-    updateInventory(invPath, 'test-plan', 1, { status: 'completed', skillsProcessed: 2, cost: '$0.40' });
+    updateInventory(invPath, 'test-plan', 1, {
+      status: 'completed',
+      skillsProcessed: 2,
+      cost: '$0.40',
+    });
     // Write wave 2
-    updateInventory(invPath, 'test-plan', 2, { status: 'completed', skillsProcessed: 3, cost: '$0.55' });
+    updateInventory(invPath, 'test-plan', 2, {
+      status: 'completed',
+      skillsProcessed: 3,
+      cost: '$0.55',
+    });
 
     const inv = readInventory(invPath);
     assert.deepStrictEqual(inv.completedWaves, [1, 2]);

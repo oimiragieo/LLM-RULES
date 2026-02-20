@@ -72,11 +72,16 @@ function writeAgentRegistry(root, agentSkillMap) {
 function readQueueEntries(root) {
   const queuePath = path.join(root, '.claude', 'context', 'runtime', 'evolution-requests.jsonl');
   if (!fs.existsSync(queuePath)) return [];
-  return fs.readFileSync(queuePath, 'utf8')
+  return fs
+    .readFileSync(queuePath, 'utf8')
     .split('\n')
     .filter(Boolean)
     .map(line => {
-      try { return JSON.parse(line); } catch { return null; }
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
     })
     .filter(Boolean);
 }
@@ -152,7 +157,10 @@ describe('Cascade Propagation E2E', () => {
     assert.equal(queue.pending.length, 2);
 
     const queueAgentNames = queue.pending.map(e => e.targetArtifact.name).sort();
-    assert.deepStrictEqual(queueAgentNames, ['accessibility-tester', 'frontend-pro'],
-      'Queue should contain exactly the agents assigned to test-skill');
+    assert.deepStrictEqual(
+      queueAgentNames,
+      ['accessibility-tester', 'frontend-pro'],
+      'Queue should contain exactly the agents assigned to test-skill'
+    );
   });
 });

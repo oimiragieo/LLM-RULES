@@ -1,3 +1,15 @@
+## Skill Created: wave-executor (2026-02-19)
+
+- Created `wave-executor` skill — fresh-process orchestration for EPIC-tier batch pipelines
+- Uses Claude Agent SDK `query()` to spawn a new Bun process per wave, preventing JSC GC use-after-free crash (anthropics/claude-code#21875, #27003)
+- Implements Ralph Wiggum pattern inside the framework as a proper enterprise skill (9/9 bundle)
+- Core engine at `.claude/tools/cli/wave-executor.mjs` (ESM, runs on system Node.js)
+- Plan file format: JSON with `waves` array, each wave has `id`, `skills`, `domain`, optional `promptTemplate`
+- Inventory tracking at `.claude/context/runtime/wave-inventory.json` enables resume after crash
+- Assigned to: router, master-orchestrator, planner
+- Key design decision: outer loop runs on Node.js (not Bun) so it is not subject to the same GC bug
+- 10 unit tests covering plan parsing, inventory management, prompt building, CLI args
+
 ## Enterprise Pipeline Execution Learnings (2026-02-15)
 
 **Reflection on Full 8-Phase Pipeline:**
@@ -835,6 +847,16 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 
 - Updated workflow: missing-workflow-xyz (2026-02-19)
 
+## Integration Queue Batch — 2026-02-19 (skills: ai-ml-expert, rust-expert, android-expert)
+
+- Processed 3 P1 queue entries from skill-updater-pipeline via post-creation-integration.cjs write-trigger.
+- All 3 skills (ai-ml-expert, rust-expert, android-expert) had valid catalog entries and agent assignments — no P1 (blocking) gaps.
+- **ai-ml-expert**: Catalog primary agent listed as `ai-ml-pro` but no such agent exists; actual consumer is `ai-ml-specialist`. P2 fix needed in skill-catalog.md.
+- **rust-expert**: Missing `.claude/rules/rust-expert.md` rules file (ai-ml-expert and android-expert both have rules files). Catalog entry is in secondary "Restored Compatibility Skills" table, not primary "Languages" table. Two P2 tasks proposed.
+- **android-expert**: Cleanest integration. One P3 documentation-only note: references non-existent `kotlin-expert` skill in Integration Points.
+- Pattern: Skills restored/updated from "Restored Compatibility Skills" catalog section have lower discoverability than skills in primary category tables. Consider promoting Rust to the Languages primary table.
+- Report: `.claude/context/reports/integration-analysis-2026-02-19.md`
+
 ## Skill Updated: git-expert (2026-02-19)
 
 - Skill `git-expert` was reviewed and updated by the skill-updater pipeline.
@@ -852,3 +874,21 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Key implementation patterns added: scroll-margin-top for sticky headers, min-width/height 24px for targets, drag alternatives via Up/Down buttons, no onpaste blocking on password fields
 - European Accessibility Act (EAA) came into law June 28, 2025 — WCAG 2.2 AA is now legally required in EU
 - Updated version 2.0.0 → 2.1.0, description and identity updated to reference WCAG 2.2
+
+- Created new agent: qa-guardian (2026-02-20)
+
+- Created new agent: contract-check (2026-02-20)
+
+- Created new agent: bool-action (2026-02-20)
+
+- Created new agent: repo-onboarder (2026-02-20)
+
+- Created new agent: qa-guardian (2026-02-20)
+
+- Created new agent: qa-guardian (2026-02-20)
+
+- Created new agent: contract-check (2026-02-20)
+
+- Created new agent: bool-action (2026-02-20)
+
+- Created new agent: repo-onboarder (2026-02-20)

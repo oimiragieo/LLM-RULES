@@ -187,7 +187,37 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-18T14:11:01.556Z",
       "last_accessed": "2026-02-18T14:11:01.556Z"
+    },
+    ".claude/skills/rust-expert/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-19T22:07:16.521Z",
+      "last_accessed": "2026-02-19T22:07:16.521Z"
+    },
+    ".claude/skills/rust-expert/hooks/pre-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-19T22:07:32.911Z",
+      "last_accessed": "2026-02-19T22:07:32.911Z"
+    },
+    ".claude/skills/python-backend-expert/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-19T22:07:42.183Z",
+      "last_accessed": "2026-02-19T22:07:42.183Z"
+    },
+    ".claude/skills/python-backend-expert/hooks/pre-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-19T22:07:55.263Z",
+      "last_accessed": "2026-02-19T22:07:55.263Z"
+    },
+    ".claude/skills/typescript-expert/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-19T22:07:55.619Z",
+      "last_accessed": "2026-02-19T22:07:55.619Z"
     }
   },
-  "last_updated": "2026-02-19T01:31:27.951Z"
+  "last_updated": "2026-02-19T22:07:55.619Z"
 }

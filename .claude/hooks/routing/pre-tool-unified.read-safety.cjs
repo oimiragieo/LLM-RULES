@@ -616,6 +616,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       };
     }
 
+    // Read on a directory causes EISDIR at host; block or rewrite to listing so agent uses Glob for discovery
     if (stats.isDirectory()) {
       if (isBypassPermissionsMode(hookInput)) {
         const listingPath = createDirectoryListingFile(targetPath);

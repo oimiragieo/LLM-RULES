@@ -418,13 +418,14 @@ function incrementTaskOutputMetric(counterName) {
 function isValidSummary(summary) {
   if (!summary || typeof summary !== 'string') return false;
   const trimmed = summary.trim();
-  if (trimmed.length < 10) return false; // Too short to be meaningful
+  if (trimmed.length < 20) return false; // Require substantive summary (was 10; minimal "Completed task 2" slipped through)
   // Reject known fallback/placeholder strings
   const FALLBACK_PATTERNS = [
     /^task\s+\d+\s+completed\s+without\s+summary/i,
     /^completed\s+without\s+summary/i,
     /^no\s+summary\s+(provided|available|metadata)/i,
     /^task\s+completed$/i,
+    /^completed\s+task\s+\d+$/i, // "Completed task 2" etc.
     /^done$/i,
     /^finished$/i,
   ];

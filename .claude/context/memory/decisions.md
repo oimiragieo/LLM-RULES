@@ -1,63 +1,3 @@
-## ADR-134: Dead Hook Cleanup and Settings.json Sync (2026-02-16)
-
-**Status:** ACCEPTED
-**Decision:** Remove all dead hook references from `.claude/settings.json` and implement automated validation to prevent future registry drift.
-
-**Context:**
-
-- Architecture report (2026-02-16) identified 20+ hook commands in settings.json referencing archived files that no longer execute
-- Dead references cause:
-  - Wasted execution time (~15-20ms per session from failed hook invocations)
-  - stderr pollution with "file not found" errors
-  - Cognitive load (developers can't distinguish active hooks from dead references)
-  - Maintenance confusion (which hooks are actually running?)
-- Root cause: 2026-02-08 hook consolidation archived 25+ hooks without updating settings.json registrations
-
-**Decision:**
-
-1. **Immediate (1 hour):** Remove all dead hook references from `.claude/settings.json`
-   - Remove references to files in `.claude/hooks/_archive/`
-   - Verify settings.json is valid JSON after cleanup
-   - Document removed hooks in `.claude/hooks/_archive/README.md`
-
-2. **Short-term (1 week):** Implement automated validation hook (`settings-hook-sync-validator.cjs`)
-   - Runs on postinstall
-   - Validates all hook command paths exist
-   - Warns/blocks if orphaned registrations detected
-
-3. **Long-term (backlog):** Add pre-hook-execution validation in hook runner
-   - Skip non-existent files with warning (fail-open)
-   - Prevents runtime errors from dead references
-
-**Consequences:**
-
-**Positive:**
-
-- Faster session startup (eliminate 15-20ms overhead)
-- Cleaner error logs (no more "file not found" noise)
-- Lower maintenance burden (clear active hook inventory)
-- Prevents future registry drift (automated validation)
-
-**Negative:**
-
-- One-time cleanup effort (1 hour)
-- Risk of removing hooks still referenced elsewhere (mitigated by thorough search)
-
-**Implementation:**
-
-- Architect report provides evidence: `.claude/settings.json` lines 10-150+
-- Examples of dead references:
-  - `.claude/hooks/_archive/safety/bash-cwd-validator.cjs`
-  - `.claude/hooks/_archive/safety/security-trigger.cjs`
-  - `.claude/hooks/_archive/validation/agent-tools-validator.cjs`
-
-**Related:**
-
-- Architecture Report 2026-02-16: Critical Issue #1 (P0)
-- ADR-132: Sequential remediation (dead hooks block other work)
-
----
-
 ## ADR-135: Memory Input Validation Layer (2026-02-16)
 
 **Status:** ACCEPTED
@@ -307,6 +247,91 @@ if (!success) {
 - Timeline: 3.5 days to close all P0 gaps
 
 **Pattern:** High test pass rate ≠ comprehensive coverage → use audit findings as coverage proxy, not just pass rate.
+
+---
+
+## ADR-137: Enterprise Bundle Generation Multi-Gate Approval (2026-02-19 REFLECTION DECISION)
+
+**Status:** PROPOSED (Task #12 reflection analysis)
+
+**Decision:** Enterprise bundle generation (Plan Phase 2 execution) requires three sequential approval gates before proceeding past Phase 0.
+
+**Context:**
+
+- Task #12 plan proposes generating domain-specific bundle files for ~177 skills
+- Phase 2 execution (150+ skills × 8 files = 1,200+ file writes, 3-4M tokens, ~$240+ cost)
+- Multiple risk vectors identified during plan review:
+  1. Token cost unvalidated against budget
+  2. Stub detection false negatives (legitimate stub-like files may be incorrectly flagged for replacement)
+  3. LLM generation prompts unspecified (hallucination risk for domain specificity)
+  4. Protected skills governance at wrong layer (protection in QA phase, not generation phase)
+
+**Decision:**
+
+**Gate 1: Inventory Approval (BLOCKING Phase 1)**
+
+- Phase 0 completes stub inventory enumeration
+- Output: `.claude/context/artifacts/analysis/skill-bundle-inventory-2026-02-19.json` with all detected stubs and tier classification
+- **Manual review required:** Router/Planner reviews inventory, approves scope, documents approval in commit message
+- Approval form: "Reviewed {N} stub files for replacement. Approved {M} for replacement. Deferred {K} for manual review."
+
+**Gate 2: Cost and LLM Specification Validation (BLOCKING Phase 2)**
+
+- Phase 1 research completes
+- Phase 2 LLM generation prompts written for each file type (input schema, output schema, hooks, commands, templates, scripts)
+- Prompts validated on 3-5 test skills (language experts: rust-expert, go-expert, typescript-expert)
+- **Validation criteria:** Generated files are domain-specific (not generic stubs with domain-sounding language), pass JSON validation, pass node --check for .cjs files
+- Cost re-estimated based on Phase 0 + Phase 1 actual usage
+- **Approval required:** Developer reports test results + cost estimate. Proceeds only if test quality meets gold standard (TDD example).
+
+**Gate 3: Protected Skills Enforcement (BLOCKING Phase 2)**
+
+- Hardcode protected skills list (ai-ml-expert, android-expert, rust-expert, accessibility, + any others identified in Phase 0)
+- Generation script fails-closed on attempts to write protected non-stub files
+- **Validation:** QA verifies script enforcement via code review + test case (attempt to replace protected file → script rejects with error)
+
+**Gate 4: Wave Quality Threshold (WITHIN Phase 2)**
+
+- After each wave completes validation: if >10% of generation targets fail specificity/syntax checks, pause pipeline
+- Report findings to planner; requires decision to (a) revise LLM prompts and retry, (b) defer problematic skills to manual review, or (c) proceed with documented exceptions
+
+**Rationale:**
+
+- Phase 0 approval prevents executing against incorrect inventory
+- Cost + LLM validation prevent expensive mistakes (token overspend, hallucination)
+- Protected skills enforcement prevents data loss
+- Wave quality thresholds enable early course correction
+
+**Consequences:**
+
+**Positive:**
+
+- Reduces risk of 1,200+ file writes on incorrect/speculative inventory
+- Forces LLM prompt specification before generation (quality assurance)
+- Cost visibility enables budget discussion upfront
+- Protected skills governance is fail-closed
+
+**Negative:**
+
+- Adds 3-4 days to Phase 2 timeline for approval/validation cycles
+- Requires manual review touchpoints (not fully automated)
+
+**Acceptance Criteria:**
+
+- [ ] Phase 0 inventory JSON complete
+- [ ] Manual approval documented for stub replacement scope
+- [ ] Cost estimated and logged
+- [ ] LLM generation prompts written for all 8 file types
+- [ ] Test generation validated on 3+ test skills (gold standard quality confirmed)
+- [ ] Protected skills hardcoded in generation script
+- [ ] QA verifies protection enforcement via code review
+- [ ] All gates satisfied before Phase 1 begins
+
+**Related:**
+
+- Task #12 Reflection Analysis (2026-02-19)
+- Enterprise Bundle Generation Plan (`.claude/context/plans/enterprise-bundle-gen-plan-2026-02-19.md`)
+- Issues.md: Enterprise Bundle Generation Plan Risks (2026-02-19)
 
 **Evidence:** QA report documented 6 critical gaps despite 100% test pass rate; architect and security independently flagged routing-guard untested.
 

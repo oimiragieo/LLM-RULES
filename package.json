@@ -183,6 +183,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.49",
     "@ast-grep/cli": "^0.40.5",
     "@jest/globals": "^30.2.0",
     "@lancedb/lancedb": "^0.24.1",
@@ -212,7 +213,13 @@
     "overrides": {
       "tar": "7.5.8",
       "minimatch": ">=10.2.1"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@vscode/ripgrep",
+      "msw",
+      "onnxruntime-node",
+      "sharp"
+    ]
   },
   "devDependencies": {
     "@types/node": "^20.19.30",

@@ -447,6 +447,17 @@ const ALLOWED_INTENT_KEYWORD_OVERLAPS = {
   tdd: ['developer', 'tdd'],
   vercel: ['nextjs', 'vercel_deploy'],
   wcag: ['accessibility_tester', 'web_design'],
+  'qa-guardian': ['qa-guardian', 'qa', 'guardian', 'quality', 'gate', 'agent'],
+  'contract-check': ['contract-check', 'contract', 'check', 'agent'],
+  'bool-action': ['bool-action', 'bool', 'action', 'boolean', 'mode'],
+  'repo-onboarder': [
+    'repo-onboarder',
+    'repo',
+    'onboarder',
+    'repository',
+    'integration',
+    'orchestrator',
+  ],
 };
 
 module.exports = { INTENT_KEYWORDS, ALLOWED_INTENT_KEYWORD_OVERLAPS };

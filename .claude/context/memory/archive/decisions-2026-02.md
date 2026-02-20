@@ -722,3 +722,84 @@ Evidence:
 - Change must be coordinated with reflection-cleanup.cjs hook (atomic handshake protocol)
 - Add unit tests for deduplication logic in reflection-queue-processor.test.cjs
 - Update `.claude/context/memory/reflection-log.jsonl` to use batch-{timestamp} format going forward
+
+---
+
+## ADR-134: Dead Hook Cleanup and Settings.json Sync (2026-02-16)
+
+**Status:** ACCEPTED
+**Decision:** Remove all dead hook references from `.claude/settings.json` and implement automated validation to prevent future registry drift.
+
+**Context:**
+
+- Architecture report (2026-02-16) identified 20+ hook commands in settings.json referencing archived files that no longer execute
+- Dead references cause:
+  - Wasted execution time (~15-20ms per session from failed hook invocations)
+  - stderr pollution with "file not found" errors
+  - Cognitive load (developers can't distinguish active hooks from dead references)
+  - Maintenance confusion (which hooks are actually running?)
+- Root cause: 2026-02-08 hook consolidation archived 25+ hooks without updating settings.json registrations
+
+**Decision:**
+
+1. **Immediate (1 hour):** Remove all dead hook references from `.claude/settings.json`
+   - Remove references to files in `.claude/hooks/_archive/`
+   - Verify settings.json is valid JSON after cleanup
+   - Document removed hooks in `.claude/hooks/_archive/README.md`
+
+2. **Short-term (1 week):** Implement automated validation hook (`settings-hook-sync-validator.cjs`)
+   - Runs on postinstall
+   - Validates all hook command paths exist
+   - Warns/blocks if orphaned registrations detected
+
+3. **Long-term (backlog):** Add pre-hook-execution validation in hook runner
+   - Skip non-existent files with warning (fail-open)
+   - Prevents runtime errors from dead references
+
+**Consequences:**
+
+**Positive:**
+
+- Faster session startup (eliminate 15-20ms overhead)
+- Cleaner error logs (no more "file not found" noise)
+- Lower maintenance burden (clear active hook inventory)
+- Prevents future registry drift (automated validation)
+
+**Negative:**
+
+- One-time cleanup effort (1 hour)
+- Risk of removing hooks still referenced elsewhere (mitigated by thorough search)
+
+**Implementation:**
+
+- Architect report provides evidence: `.claude/settings.json` lines 10-150+
+- Examples of dead references:
+  - `.claude/hooks/_archive/safety/bash-cwd-validator.cjs`
+  - `.claude/hooks/_archive/safety/security-trigger.cjs`
+  - `.claude/hooks/_archive/validation/agent-tools-validator.cjs`
+
+**Related:**
+
+- Architecture Report 2026-02-16: Critical Issue #1 (P0)
+- ADR-132: Sequential remediation (dead hooks block other work)
+
+---
+
+## ADR-136: Enterprise Bundle Generation 5-Phase Pattern (2026-02-19)
+
+**Status:** DOCUMENTED (Task #12 analysis)
+**Decision:** For future bulk artifact generation (100+ artifacts), adopt 5-phase structure proven in Task #12 planning exercise.
+
+**Phases:**
+
+1. **Inventory/Classification**: Map source materials into domain tiers (enables parallel waves)
+2. **Research Layer**: Benchmark against external patterns (quality reference)
+3. **LLM Generation**: 9 waves with progressive complexity (risk reduction via incremental generation)
+4. **Validation/Anti-Regression**: 6 mechanisms to catch quality drift before completion
+5. **Integration**: Ecosystem wiring with catalog updates and agent assignments
+
+**Key Insight:** Pre-generation audit of existing documentation (90+ `.claude/rules/` files) reveals latent source material — reduces external research bootstrap from 6 weeks to 2 weeks.
+
+**Critical Success Factor:** Anti-regression mechanisms must be wave-specific (not post-hoc). Stub detection validators needed for Wave 4+ to catch generation quality drift early.
+
+**Integration Constraint:** Artifact-integrator must run AFTER all 9 waves complete (not concurrent) to prevent registry desync. Alternatively, integrator must be designed idempotent (re-run safe per wave).

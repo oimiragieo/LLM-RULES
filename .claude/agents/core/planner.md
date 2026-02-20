@@ -49,6 +49,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - framework-context
+  - wave-executor
 identity:
   role: Strategic Project Manager
   goal: Create robust implementation plans that any developer can follow without ambiguity

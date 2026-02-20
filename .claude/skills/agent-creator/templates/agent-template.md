@@ -1,18 +1,18 @@
 ---
-name: {{name}}
+name: "{{name}}"
 version: 1.0.0
-description: {{description}}
-model: {{model}}
-temperature: {{temperature}}
+description: "{{description}}"
+model: "{{model}}"
+temperature: "{{temperature}}"
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
 priority: high
 verified: true
-lastVerifiedAt: {{lastVerifiedAt}}
+lastVerifiedAt: "{{lastVerifiedAt}}"
 tools:
   [{{tools_csv}}]
-skills:
+skills: |
 {{skills_yaml}}
 context_files:
   - '@.claude/context/memory/learnings.md'

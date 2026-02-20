@@ -35,10 +35,23 @@ function parseFrontmatter(content) {
   }
 }
 
-function isSearchHeavyAgent(content, frontmatter) {
-  if (frontmatter && Array.isArray(frontmatter.skills)) {
-    if (frontmatter.skills.some(skill => REQUIRED_SKILLS_SEARCH_HEAVY.includes(skill))) return true;
+function normalizeSkills(frontmatter) {
+  if (!frontmatter || frontmatter.skills == null) return [];
+  if (Array.isArray(frontmatter.skills)) return frontmatter.skills.filter(Boolean);
+  if (typeof frontmatter.skills === 'string') {
+    try {
+      const parsed = yaml.load(frontmatter.skills);
+      return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+    } catch {
+      return [];
+    }
   }
+  return [];
+}
+
+function isSearchHeavyAgent(content, frontmatter) {
+  const skills = normalizeSkills(frontmatter);
+  if (skills.some(skill => REQUIRED_SKILLS_SEARCH_HEAVY.includes(skill))) return true;
   return SEARCH_HEAVY_PATTERNS.some(pattern => pattern.test(content));
 }
 
@@ -66,7 +79,7 @@ function validateAgentContent(content, { requireMarker = true } = {}) {
     };
   }
 
-  const skills = Array.isArray(frontmatter.skills) ? frontmatter.skills.filter(Boolean) : [];
+  const skills = normalizeSkills(frontmatter);
   for (const skill of REQUIRED_SKILLS_BASE) {
     if (!skills.includes(skill)) {
       errors.push(`Missing required skill: ${skill}`);

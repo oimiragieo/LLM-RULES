@@ -35,6 +35,7 @@ skills:
   - ripgrep
   - code-semantic-search
   - token-saver-context-compression
+  - wave-executor
 ---
 
 <!-- agent-template-contract:v1 -->
