@@ -2,6 +2,13 @@
 'use strict';
 /* eslint-disable max-lines */
 
+let _emitBlockVerdict;
+try {
+  _emitBlockVerdict = require('../safety/bypass-audit-hook.cjs').emitBlockVerdict;
+} catch (_) {
+  /* best-effort */
+}
+
 const {
   parseHookInputAsync,
   getToolName,
@@ -336,6 +343,7 @@ function isFailOpenOverrideAuthorized() {
   return scope.includes('all') || scope.includes('routing-guard');
 }
 
+// eslint-disable-next-line complexity
 async function main() {
   const startTime = Date.now();
   try {
@@ -466,6 +474,19 @@ async function main() {
           check: result.checkName || 'unknown',
         },
       });
+      try {
+        const _inputHash = JSON.stringify(toolInput || {}).slice(0, 64);
+        result.result === 'block' &&
+          _emitBlockVerdict &&
+          _emitBlockVerdict({
+            hook: 'routing-guard.cjs',
+            tool: toolName || 'unknown',
+            filePath: _inputHash,
+            reason: result.message || '',
+          });
+      } catch (_) {
+        /* best-effort */
+      }
       process.exit(result.result === 'block' ? 2 : 0);
     }
 
@@ -542,6 +563,17 @@ async function main() {
       extra: { error: err.message },
     });
 
+    try {
+      if (_emitBlockVerdict)
+        _emitBlockVerdict({
+          hook: 'routing-guard.cjs',
+          tool: 'unknown',
+          filePath: '',
+          reason: `error_fail_closed: ${err.message}`,
+        });
+    } catch (_) {
+      /* best-effort */
+    }
     process.exit(2);
   }
 }

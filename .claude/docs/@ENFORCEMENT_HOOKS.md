@@ -34,6 +34,7 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 | `adaptive-quality-gate.cjs`     | `.claude/hooks/session/`    | PreToolUse(Edit, Write, NotebookEdit)       | N/A     | None (always enabled, informational)                                                                                 |
 | `post-edit-scanner.cjs`         | `.claude/hooks/session/`    | PostToolUse(Edit)                           | N/A     | None (always enabled, informational)                                                                                 |
 | `pre-compact.cjs`               | `.claude/hooks/session/`    | Stop                                        | N/A     | None (always enabled, informational)                                                                                 |
+| `bypass-audit-hook.cjs`         | `.claude/hooks/safety/`     | PostToolUse(Edit, Write, NotebookEdit)      | N/A     | `BYPASS_AUDIT_ENABLED`, `BYPASS_AUDIT_PATH`, `BYPASS_AUDIT_*_THRESHOLD`, `BYPASS_AUDIT_CORRELATION_WINDOW_MS`        |
 
 **Note:** `config-model-validator.cjs` and `intent-agent-match.cjs` were consolidated into `routing-guard.cjs` (Check 11 and Check 10 respectively) as of 2026-02-09. `task-status-enforcement.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09. `creator-compliance-validator.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09.
 
@@ -1486,6 +1487,93 @@ After editing auth.ts:
 - Logs to stderr (not stdout)
 
 **No Environment Variables** - Always enabled, runs on Stop event
+
+---
+
+---
+
+## 19. bypass-audit-hook.cjs
+
+**Location:** `.claude/hooks/safety/bypass-audit-hook.cjs`
+**Event Type:** PostToolUse(Edit, Write, NotebookEdit)
+**Default Enforcement:** N/A (monitoring only, never blocks)
+**Purpose:** Audits `bypassPermissions` block-then-succeed patterns; provides an immutable audit trail when PreToolUse block verdicts are overridden by Claude Code's `bypassPermissions` mode
+
+### Problem Solved (SEC-AUDIT-020)
+
+When Claude Code runs with `bypassPermissions` mode active, exit code 2 from PreToolUse hooks becomes advisory only — the tool call proceeds regardless. This hook detects those bypasses and writes an append-only audit record so security teams can investigate after the fact.
+
+### How It Works (Option C design)
+
+1. **PreToolUse hooks** call `emitBlockVerdict()` to write a structured `block_verdict` record to `bypass-audit.jsonl` before returning exit code 2.
+2. **This PostToolUse hook** reads recent records, correlates them with the completed tool call by matching correlation IDs within a configurable time window, and confirms that the tool succeeded despite the block verdict.
+3. Confirmed bypasses emit a tiered alert record back to the same JSONL file.
+
+### Alert Thresholds
+
+| Bypass count | Severity |
+| ------------ | -------- |
+| 1–5          | INFO     |
+| 6–20         | WARN     |
+| 21–50        | ALERT    |
+| 51+          | CRITICAL |
+
+Default thresholds: WARN@6, ALERT@21, CRITICAL@51.
+
+### Output File
+
+- **Path:** `.claude/context/runtime/bypass-audit.jsonl`
+- **Format:** Append-only JSONL (one JSON record per line)
+- **Records:** `block_verdict` (from PreToolUse callers), `bypass_confirmed` (from this hook), and tiered `alert` records
+
+### Environment Variables
+
+```bash
+# Enable / disable the audit hook
+BYPASS_AUDIT_ENABLED=true|false            # Default: true
+
+# Override the audit file path
+BYPASS_AUDIT_PATH=<absolute-path>          # Default: .claude/context/runtime/bypass-audit.jsonl
+
+# Tiered alert thresholds
+BYPASS_AUDIT_WARN_THRESHOLD=number        # Default: 6
+BYPASS_AUDIT_ALERT_THRESHOLD=number       # Default: 21
+BYPASS_AUDIT_CRITICAL_THRESHOLD=number    # Default: 51
+
+# Correlation window (how far back to scan for block verdicts)
+BYPASS_AUDIT_CORRELATION_WINDOW_MS=number  # Default: 5000
+
+# Maximum tail lines to read from JSONL when correlating
+BYPASS_AUDIT_MAX_TAIL_LINES=number         # Default: 100
+```
+
+### Enforcement Mode
+
+This hook is **monitoring only**. It always exits 0 and never blocks a tool call. There is no `block` or `warn` enforcement mode — it is a pure audit log.
+
+**Override:** N/A (disable entirely with `BYPASS_AUDIT_ENABLED=false`)
+
+### OWASP References
+
+- **A09:2025** — Security Logging and Monitoring Failures
+- **ASI02** — Tool Misuse (OWASP Agentic AI Top 10)
+- **ASI10** — Rogue Agents (OWASP Agentic AI Top 10)
+
+### Example Audit Record
+
+```json
+{
+  "type": "bypass_confirmed",
+  "hook": "bypass-audit-hook",
+  "correlationId": "1740038400000-Write-a3b4c5d6e7",
+  "tool": "Write",
+  "filePath": ".claude/hooks/safety/example.cjs",
+  "blockReason": "Creator path requires hook-creator skill",
+  "timestamp": "2026-02-20T12:00:00.000Z",
+  "severity": "WARN",
+  "bypassCount": 7
+}
+```
 
 ---
 

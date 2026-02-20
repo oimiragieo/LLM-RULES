@@ -43,6 +43,14 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 // MED-001 FIX: Use shared PROJECT_ROOT utility instead of duplicating
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
+// SEC-AUDIT-020: Bypass audit instrumentation (best-effort)
+let _emitBlockVerdict;
+try {
+  _emitBlockVerdict = require('../safety/bypass-audit-hook.cjs').emitBlockVerdict;
+} catch (_) {
+  /* best-effort: bypass-audit-hook unavailable, continue without instrumentation */
+}
+
 // Event Bus integration (P1-6.4)
 let eventBus;
 try {
@@ -657,6 +665,23 @@ async function main() {
         reason: 'Direct artifact write without creator workflow',
       });
 
+      // SEC-AUDIT-020: Emit block verdict before exit(2) for bypass audit trail
+      if (result.result === 'block' && _emitBlockVerdict) {
+        try {
+          _emitBlockVerdict({
+            hook: 'unified-creator-guard.cjs',
+            tool: toolName,
+            filePath: filePath || '',
+            reason: 'Direct artifact write without creator workflow',
+            artifactType: required?.artifactType,
+            requiredCreator: required?.creator,
+            enforcementMode: 'block',
+          });
+        } catch (_) {
+          /* best-effort, never block on audit */
+        }
+      }
+
       // Output block/warn result
       console.log(formatResult(result.result, result.message));
       process.exit(result.result === 'block' ? 2 : 0);
@@ -684,6 +709,21 @@ async function main() {
 
     // Audit log the error
     auditLog('unified-creator-guard', 'error_fail_closed', { error: err.message });
+
+    // SEC-AUDIT-020: Emit block verdict before fail-closed exit(2)
+    if (_emitBlockVerdict) {
+      try {
+        _emitBlockVerdict({
+          hook: 'unified-creator-guard.cjs',
+          tool: 'unknown',
+          filePath: '',
+          reason: `Fail-closed on error: ${err.message}`,
+          enforcementMode: 'block',
+        });
+      } catch (_) {
+        /* best-effort, never block on audit */
+      }
+    }
 
     // SEC-008: Fail closed - deny when security state unknown
     process.exit(2);

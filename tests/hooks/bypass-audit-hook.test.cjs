@@ -24,10 +24,7 @@ const os = require('os');
 // Lazy load the hook module (will be missing until hook-creator creates it)
 // ---------------------------------------------------------------------------
 
-const HOOK_PATH = path.resolve(
-  __dirname,
-  '../../.claude/hooks/safety/bypass-audit-hook.cjs'
-);
+const HOOK_PATH = path.resolve(__dirname, '../../.claude/hooks/safety/bypass-audit-hook.cjs');
 
 let hook;
 try {
@@ -131,11 +128,7 @@ describe('bypass-audit-hook.cjs', () => {
 
     test('exports detectBypass function', () => {
       assert.ok(hook, 'Hook module must be loadable');
-      assert.strictEqual(
-        typeof hook.detectBypass,
-        'function',
-        'detectBypass must be exported'
-      );
+      assert.strictEqual(typeof hook.detectBypass, 'function', 'detectBypass must be exported');
     });
 
     test('exports getAlertSeverity function', () => {
@@ -305,7 +298,9 @@ describe('bypass-audit-hook.cjs', () => {
       Object.assign(process.env, origEnv);
       try {
         fs.rmSync(tmpDir, { recursive: true, force: true });
-      } catch (_) { /* best effort */ }
+      } catch (_) {
+        /* best effort */
+      }
     });
 
     test('POST-1: detectBypass returns null when no block_verdict exists for this tool+path', () => {
@@ -550,7 +545,9 @@ describe('bypass-audit-hook.cjs', () => {
       Object.assign(process.env, origEnv);
       try {
         fs.rmSync(tmpDir, { recursive: true, force: true });
-      } catch (_) { /* best effort */ }
+      } catch (_) {
+        /* best effort */
+      }
     });
 
     test('INT-1: emitBlockVerdict then detectBypass produces a matching bypass record', () => {

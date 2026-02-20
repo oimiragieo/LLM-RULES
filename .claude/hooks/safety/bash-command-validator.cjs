@@ -30,6 +30,37 @@ const {
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 
+// SEC-AUDIT-020: Import emitBlockVerdict for bypass audit trail
+let _emitBlockVerdict;
+try {
+  const bypassAudit = require('./bypass-audit-hook.cjs');
+  _emitBlockVerdict = bypassAudit.emitBlockVerdict;
+} catch (_) {
+  // best-effort: audit hook unavailable, continue without it
+}
+
+/**
+ * Emit a block verdict to the bypass audit log before exit(2).
+ * Best-effort: never throws, never blocks the hook pipeline.
+ *
+ * @param {string} command - The blocked bash command
+ * @param {string} reason - The reason for blocking
+ */
+function emitBashBlockVerdict(command, reason) {
+  if (typeof _emitBlockVerdict !== 'function') return;
+  try {
+    const inputHash = typeof command === 'string' ? command.slice(0, 40) : '';
+    _emitBlockVerdict({
+      hook: 'bash-command-validator',
+      tool: 'Bash',
+      filePath: inputHash,
+      reason,
+    });
+  } catch (_) {
+    // best-effort
+  }
+}
+
 /**
  * Detect shell commands that commonly trigger "bad substitution" because they
  * contain JavaScript-style template expressions inside ${...}.
@@ -304,24 +335,28 @@ async function main() {
 
     const badSubstitutionReason = detectBadSubstitutionRisk(command);
     if (badSubstitutionReason) {
+      emitBashBlockVerdict(command, badSubstitutionReason);
       console.error(formatBlockedMessage(command, badSubstitutionReason));
       process.exit(2);
     }
 
     const ripgrepTypeReason = detectUnsupportedRipgrepType(command);
     if (ripgrepTypeReason) {
+      emitBashBlockVerdict(command, ripgrepTypeReason);
       console.error(formatBlockedMessage(command, ripgrepTypeReason));
       process.exit(2);
     }
 
     const ripgrepMissingReason = detectRipgrepUnavailable(command);
     if (ripgrepMissingReason) {
+      emitBashBlockVerdict(command, ripgrepMissingReason);
       console.error(formatBlockedMessage(command, ripgrepMissingReason));
       process.exit(2);
     }
 
     const reportWriteReason = detectBashArtifactWrite(command);
     if (reportWriteReason) {
+      emitBashBlockVerdict(command, reportWriteReason);
       console.error(formatBlockedMessage(command, reportWriteReason));
       process.exit(2);
     }
@@ -334,6 +369,7 @@ async function main() {
         );
         process.exit(0);
       }
+      emitBashBlockVerdict(command, brittleCountReason);
       console.error(formatBlockedMessage(command, brittleCountReason));
       process.exit(2);
     }
@@ -346,6 +382,7 @@ async function main() {
         );
         process.exit(0);
       }
+      emitBashBlockVerdict(command, searchBypassReason);
       console.error(formatBlockedMessage(command, searchBypassReason));
       process.exit(2);
     }
@@ -365,6 +402,7 @@ async function main() {
       } catch (_err) {
         // Best-effort
       }
+      emitBashBlockVerdict(command, result.error || 'Unknown safety violation');
       console.error(formatBlockedMessage(command, result.error || 'Unknown safety violation'));
       process.exit(2);
     }
@@ -401,6 +439,7 @@ async function main() {
     } catch (_err) {
       // Best-effort
     }
+    emitBashBlockVerdict('', `error_fail_closed: ${err.message}`);
     process.exit(2);
   }
 }
