@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "wave-executor Output Schema",
+  "description": "Output contract for wave-executor skill execution",
+  "type": "object",
+  "required": ["success", "wavesCompleted", "wavesTotal"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "True when all waves completed without errors."
+    },
+    "wavesCompleted": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of waves successfully completed."
+    },
+    "wavesTotal": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of waves in the plan."
+    },
+    "skillsProcessed": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of skills processed across all waves."
+    },
+    "totalCost": {
+      "type": "string",
+      "description": "Total cost in USD format (e.g. '$4.20')."
+    },
+    "inventoryPath": {
+      "type": "string",
+      "description": "Path to the inventory JSON file for resume support."
+    },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of error messages from failed waves."
+    }
+  },
+  "additionalProperties": false
+}

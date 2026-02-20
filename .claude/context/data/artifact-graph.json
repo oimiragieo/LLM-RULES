@@ -1,7 +1,29 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-02-08T02:04:00.402Z",
+  "lastUpdated": "2026-02-19T09:30:00.000Z",
   "nodes": {
+    "skill:rust-expert": {
+      "type": "skill",
+      "path": ".claude/skills/rust-expert/SKILL.md",
+      "created": "2026-02-08T01:16:57.425Z",
+      "lastUpdated": "2026-02-19T09:08:52.076Z",
+      "integrationStatus": "integrated",
+      "version": "2.0.0",
+      "assignedAgents": ["rust-pro", "developer", "code-reviewer", "qa"],
+      "catalogEntry": true,
+      "catalogSection": "Restored Compatibility Skills",
+      "rulesFile": null,
+      "gaps": [
+        {
+          "priority": "P2",
+          "description": "No .claude/rules/rust-expert.md rules file exists. Should be created for runtime rule injection."
+        },
+        {
+          "priority": "P2",
+          "description": "Catalog entry is in 'Restored Compatibility Skills' secondary section, not primary 'Languages' table. Discoverability is lower."
+        }
+      ]
+    },
     "skill:accessibility": {
       "type": "skill",
       "path": ".claude/skills/accessibility/SKILL.md",
@@ -24,13 +46,41 @@
       "type": "skill",
       "path": ".claude/skills/ai-ml-expert/SKILL.md",
       "created": "2026-02-08T01:16:57.425Z",
-      "integrationStatus": "created"
+      "lastUpdated": "2026-02-19T09:06:05.583Z",
+      "integrationStatus": "integrated",
+      "version": "2.0.0",
+      "assignedAgents": [
+        "ai-ml-specialist",
+        "developer",
+        "researcher",
+        "architect",
+        "security-architect"
+      ],
+      "catalogEntry": true,
+      "rulesFile": ".claude/rules/ai-ml-expert.md",
+      "gaps": [
+        {
+          "priority": "P2",
+          "description": "Skill catalog primary agent listed as 'ai-ml-pro' but actual agent is 'ai-ml-specialist'"
+        }
+      ]
     },
     "skill:android-expert": {
       "type": "skill",
       "path": ".claude/skills/android-expert/SKILL.md",
       "created": "2026-02-08T01:16:57.425Z",
-      "integrationStatus": "created"
+      "lastUpdated": "2026-02-19T09:09:33.424Z",
+      "integrationStatus": "integrated",
+      "version": "2.0.0",
+      "assignedAgents": ["android-pro", "developer", "code-reviewer", "architect", "qa"],
+      "catalogEntry": true,
+      "rulesFile": ".claude/rules/android-expert.md",
+      "gaps": [
+        {
+          "priority": "P3",
+          "description": "SKILL.md references 'kotlin-expert' related skill which does not exist in catalog"
+        }
+      ]
     },
     "skill:api-development-expert": {
       "type": "skill",

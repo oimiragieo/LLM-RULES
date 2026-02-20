@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "wave-executor Input Schema",
+  "description": "Input contract for wave-executor skill — fresh-process batch orchestration",
+  "type": "object",
+  "required": ["plan"],
+  "properties": {
+    "plan": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to wave plan JSON file containing wave definitions."
+    },
+    "model": {
+      "type": "string",
+      "default": "claude-sonnet-4-6",
+      "description": "Claude model to use for wave execution."
+    },
+    "maxTurnsPerWave": {
+      "type": "integer",
+      "default": 50,
+      "minimum": 5,
+      "maximum": 200,
+      "description": "Maximum conversation turns per wave before forcing completion."
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "description": "Preview plan without executing waves."
+    },
+    "startFromWave": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Resume execution from a specific wave ID."
+    }
+  },
+  "additionalProperties": false
+}

@@ -18,7 +18,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | Category                                           | Count | Key Skills                                                                                                                                                                                             |
 | -------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                            |
-| [Planning & Architecture](#planning--architecture) | 9     | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator                                                                                                           |
+| [Planning & Architecture](#planning--architecture) | 10    | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator, wave-executor                                                                                            |
 | [Security](#security)                              | 12    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults, medusa-security |
 | [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                             |
 | [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                        |
@@ -73,17 +73,18 @@ Skill({ skill: 'debugging' });
 
 Design and planning skills.
 
-| Skill                   | Description                                                             | Primary Agents     |
-| ----------------------- | ----------------------------------------------------------------------- | ------------------ |
-| `plan-generator`        | Structured implementation plans with dependencies                       | planner            |
-| `prd-generator`         | Hypothesis-driven PRDs with Implementation Phases tracking              | pm                 |
-| `architecture-review`   | Architecture validation and design review                               | architect          |
-| `complexity-assessment` | AI-based task complexity classification                                 | router, planner    |
-| `diagram-generator`     | Mermaid architecture and flow diagrams                                  | architect, planner |
-| `planning-with-files`   | Manus-style file-based planning (task_plan.md, findings.md)             | planner            |
-| `spec-gathering`        | Requirements gathering workflow                                         | planner            |
-| `spec-init`             | Unified spec creation process                                           | planner            |
-| `sparc-methodology`     | SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) | architect          |
+| Skill                   | Description                                                                      | Primary Agents                       |
+| ----------------------- | -------------------------------------------------------------------------------- | ------------------------------------ |
+| `plan-generator`        | Structured implementation plans with dependencies                                | planner                              |
+| `prd-generator`         | Hypothesis-driven PRDs with Implementation Phases tracking                       | pm                                   |
+| `architecture-review`   | Architecture validation and design review                                        | architect                            |
+| `complexity-assessment` | AI-based task complexity classification                                          | router, planner                      |
+| `diagram-generator`     | Mermaid architecture and flow diagrams                                           | architect, planner                   |
+| `planning-with-files`   | Manus-style file-based planning (task_plan.md, findings.md)                      | planner                              |
+| `spec-gathering`        | Requirements gathering workflow                                                  | planner                              |
+| `spec-init`             | Unified spec creation process                                                    | planner                              |
+| `sparc-methodology`     | SPARC (Specification, Pseudocode, Architecture, Refinement, Completion)          | architect                            |
+| `wave-executor`         | Fresh-process orchestration for EPIC-tier batch pipelines (SDK-based Ralph loop) | router, master-orchestrator, planner |
 
 ---
 
@@ -128,15 +129,16 @@ Cloud, containers, and infrastructure.
 
 Language-specific expertise.
 
-| Skill                   | Description                          | Primary Agents |
-| ----------------------- | ------------------------------------ | -------------- |
-| `python-backend-expert` | Django, FastAPI, Flask, SQLAlchemy   | python-pro     |
-| `typescript-expert`     | TypeScript patterns and type systems | typescript-pro |
-| `go-expert`             | Go APIs, gRPC, concurrency           | go-pro         |
-| `nodejs-expert`         | Node.js, Express, NestJS             | nodejs-pro     |
-| `java-expert`           | Java and Spring Boot                 | java-pro       |
-| `php-expert`            | PHP, Laravel, WordPress              | php-pro        |
-| `web3-expert`           | Solidity, Ethereum, smart contracts  | web3-pro       |
+| Skill                   | Description                            | Primary Agents |
+| ----------------------- | -------------------------------------- | -------------- |
+| `python-backend-expert` | Django, FastAPI, Flask, SQLAlchemy     | python-pro     |
+| `typescript-expert`     | TypeScript patterns and type systems   | typescript-pro |
+| `go-expert`             | Go APIs, gRPC, concurrency             | go-pro         |
+| `nodejs-expert`         | Node.js, Express, NestJS               | nodejs-pro     |
+| `java-expert`           | Java and Spring Boot                   | java-pro       |
+| `rust-expert`           | Rust ownership, safety, async patterns | rust-pro       |
+| `php-expert`            | PHP, Laravel, WordPress                | php-pro        |
+| `web3-expert`           | Solidity, Ethereum, smart contracts    | web3-pro       |
 
 ---
 
@@ -173,13 +175,13 @@ Mobile development skills.
 
 Data processing and database skills.
 
-| Skill                | Description                                   | Primary Agents |
-| -------------------- | --------------------------------------------- | -------------- |
-| `database-architect` | Schema design, query optimization, migrations | architect      |
-| `database-expert`    | Prisma, Supabase, SQL/NoSQL patterns          | developer      |
-| `data-expert`        | Data parsing, transformation, validation      | developer      |
-| `text-to-sql`        | Natural language to SQL conversion            | developer      |
-| `ai-ml-expert`       | PyTorch, LangChain, LLM integration           | ai-ml-pro      |
+| Skill                | Description                                   | Primary Agents   |
+| -------------------- | --------------------------------------------- | ---------------- |
+| `database-architect` | Schema design, query optimization, migrations | architect        |
+| `database-expert`    | Prisma, Supabase, SQL/NoSQL patterns          | developer        |
+| `data-expert`        | Data parsing, transformation, validation      | developer        |
+| `text-to-sql`        | Natural language to SQL conversion            | developer        |
+| `ai-ml-expert`       | PyTorch, LangChain, LLM integration           | ai-ml-specialist |
 
 ---
 
@@ -404,24 +406,23 @@ Miscellaneous skills.
 
 Skills restored from archive for backward compatibility and agent reference continuity.
 
-| Skill                                | Description                                                      | Primary Agents |
-| ------------------------------------ | ---------------------------------------------------------------- | -------------- |
-| `build-tools-expert`                 | Build tooling patterns and optimization workflows                | developer      |
-| `composer-dependency-management`     | Composer dependency governance and update safety checks          | php-pro        |
-| `dto-conventions`                    | DTO design conventions and mapping consistency                   | developer      |
-| `form-and-actions-in-sveltekit`      | SvelteKit form/action patterns and validation flow               | svelte-pro     |
-| `form-validation-with-zod`           | Zod-based validation patterns for form input safety              | svelte-pro     |
-| `function-length-and-responsibility` | Function sizing and single-responsibility enforcement            | code-reviewer  |
-| `restcontroller-conventions`         | REST controller contract and endpoint structure conventions      | developer      |
-| `rule-auditor`                       | Rule quality audit and governance checks                         | architect      |
-| `rust-expert`                        | Rust implementation patterns and idiomatic architecture guidance | rust-pro       |
-| `seo-and-meta-tags-in-sveltekit`     | SEO metadata and head management patterns for SvelteKit          | svelte-pro     |
-| `service-class-conventions`          | Service-layer structure and responsibility boundaries            | developer      |
-| `tall-stack-general`                 | TALL stack conventions for Laravel/Alpine/Livewire workflows     | fullstack-pro  |
-| `tauri-security-rules`               | Tauri desktop security rules and hardening patterns              | tauri-pro      |
-| `tauri-svelte-typescript-general`    | Tauri + Svelte + TypeScript integration conventions              | tauri-pro      |
-| `tauri-svelte-ui-components`         | UI component architecture patterns for Tauri/Svelte projects     | tauri-pro      |
-| `tsconfig-json-rules`                | TypeScript compiler configuration conventions and guardrails     | typescript-pro |
+| Skill                                | Description                                                  | Primary Agents |
+| ------------------------------------ | ------------------------------------------------------------ | -------------- |
+| `build-tools-expert`                 | Build tooling patterns and optimization workflows            | developer      |
+| `composer-dependency-management`     | Composer dependency governance and update safety checks      | php-pro        |
+| `dto-conventions`                    | DTO design conventions and mapping consistency               | developer      |
+| `form-and-actions-in-sveltekit`      | SvelteKit form/action patterns and validation flow           | svelte-pro     |
+| `form-validation-with-zod`           | Zod-based validation patterns for form input safety          | svelte-pro     |
+| `function-length-and-responsibility` | Function sizing and single-responsibility enforcement        | code-reviewer  |
+| `restcontroller-conventions`         | REST controller contract and endpoint structure conventions  | developer      |
+| `rule-auditor`                       | Rule quality audit and governance checks                     | architect      |
+| `seo-and-meta-tags-in-sveltekit`     | SEO metadata and head management patterns for SvelteKit      | svelte-pro     |
+| `service-class-conventions`          | Service-layer structure and responsibility boundaries        | developer      |
+| `tall-stack-general`                 | TALL stack conventions for Laravel/Alpine/Livewire workflows | fullstack-pro  |
+| `tauri-security-rules`               | Tauri desktop security rules and hardening patterns          | tauri-pro      |
+| `tauri-svelte-typescript-general`    | Tauri + Svelte + TypeScript integration conventions          | tauri-pro      |
+| `tauri-svelte-ui-components`         | UI component architecture patterns for Tauri/Svelte projects | tauri-pro      |
+| `tsconfig-json-rules`                | TypeScript compiler configuration conventions and guardrails | typescript-pro |
 
 ---
 
