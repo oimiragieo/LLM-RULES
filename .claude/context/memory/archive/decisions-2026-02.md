@@ -895,3 +895,15 @@ async function recordLearning(text, source = 'user') {
 - Security Report 2026-02-16: Finding H-01
 - OWASP Agentic AI Top 10: ASI06
 - `.claude/rules/security.md`: Memory Poisoning Prevention section
+
+---
+
+## Security Hardening Two-Task Pipeline Pattern (2026-02-20)
+
+**Decision**: Use a two-task pipeline for security hardening: (1) security-architect produces a threat model report with Red Flag Checklist and gate template; (2) developer implements the automated enforcement artifacts (skill + hook + config). The threat model section headings directly drive SKILL.md step numbers and hook detection patterns.
+
+**Context**: Task #2 (security-architect) produced `external-skill-security-protocol-2026-02-20.md` identifying supply-chain risk in creator/updater Research Gate steps. Task #9 (developer) implemented `content-security-scan` skill and `external-content-guard` hook. Score: 0.856.
+
+**Rationale**: Separating analysis from implementation enables higher-quality outputs in both phases. security-architect focuses on threat modeling without implementation pressure; developer has a precise specification to implement against.
+
+**Consequence**: Post-creation integration steps (catalog, artifact-graph, CLAUDE.md, command) may be skipped — artifact-integrator must be queued after every such implementation task.

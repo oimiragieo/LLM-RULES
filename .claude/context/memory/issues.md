@@ -1,3 +1,25 @@
+## 2026-02-20: content-security-scan Skill Integration Queue Unprocessed (P1)
+
+**Issue**: The `skill:content-security-scan` artifact created on 2026-02-20 at 08:21:42 has an UNPROCESSED entry in integration-queue.jsonl (line 9, `processed: false`). The skill was created by Task 9 but artifact-integrator was never spawned. As a result, the skill may be missing catalog entry, agent registry entry, and skill-index.json registration.
+
+**Action Required**: Spawn artifact-integrator for `skill:content-security-scan`. Also verify `external-fetch-audit.jsonl` exists at `.claude/context/runtime/external-fetch-audit.jsonl` (required for SEC-EXT-007 provenance logging).
+
+**Priority**: P1
+
+---
+
+## 2026-02-20: Missing TaskUpdate Metadata Systemic Failure — 18th+ Occurrence (P0 ESCALATION)
+
+**Issue**: Tasks 8, 9, and 10 all completed on 2026-02-20 without TaskUpdate summary metadata. This is the 18th+ confirmed instance across sessions. ADR-139 ACCEPTED and pre-completion-validation.cjs exists, but BLOCK mode is not active. Reflection agent cannot score outputs. Router stalls when agents do not call TaskUpdate.
+
+**Action Required**: Set `COMPLETION_METADATA_ENFORCEMENT=block` in `.env` file. The warning-mode approach has failed 18+ times. This requires an immediate human-decision to activate blocking enforcement.
+
+**Escalation**: Router/user must authorize BLOCK mode activation. Training-based enforcement is permanently exhausted.
+
+**Priority**: P0 (ESCALATION)
+
+---
+
 ## 2026-02-11: Memory Sanitizer Not Yet Implemented (P1)
 
 **Issue**: HIGH-004 (Memory poisoning) identified in security audit but deferred from Wave 2b.
@@ -263,6 +285,31 @@
 - If hook doesn't exist, implement immediately with hard blocking for missing metadata.summary
 
 **Report**: This batch reflection (task 17)
+
+---
+
+## scan_and_quarantine Policy Gap — external-content-guard in warn mode (2026-02-20) — P1
+
+**Issue**: The `external-content-guard` hook fires warnings (5 entries confirmed in external-fetch-audit.jsonl during supply chain test 2026-02-20T08:43) but does NOT prevent external content from being incorporated. The hook operates in warn mode, not quarantine/block mode. This means the SEC-EXT security gate warns but does not enforce quarantine on content from unverified organizations.
+
+**Evidence**:
+
+- Task 2 (08:43:19Z): external-content-guard fired 5x on gh api calls to gemini-cli-extensions — all warn, none blocked
+- Task 1 (08:43:51Z): Root cause identified as hook mode = warn, not quarantine/block
+- `EXTERNAL_CONTENT_GUARD_MODE` is not set to `block` or `quarantine` in current environment
+
+**Impact**: External content from unverified organizations can flow through creator skills despite security gate warnings. Supply chain attack vector remains partially open.
+
+**Action Required**:
+
+1. Verify `external-content-guard.cjs` has block/quarantine mode implementation
+2. Set `EXTERNAL_CONTENT_GUARD_MODE=block` in `.env` (requires human authorization)
+3. Write automated tests: verify flagged content is rejected when mode=block
+4. Document approved org domains (github.com/anthropics, github.com/VoltAgent) vs review-required domains
+
+**Priority**: P1
+
+**Report**: `.claude/context/reports/reflections/batch-reflection-supply-chain-test-2026-02-20.md`
 
 ---
 

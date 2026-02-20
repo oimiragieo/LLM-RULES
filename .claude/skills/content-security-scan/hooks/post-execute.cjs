@@ -22,7 +22,8 @@ try {
     event: 'content_security_scan_complete',
     timestamp: new Date().toISOString(),
     verdict: tool_output && tool_output.verdict ? tool_output.verdict : 'unknown',
-    red_flag_count: tool_output && Array.isArray(tool_output.red_flags) ? tool_output.red_flags.length : 0,
+    red_flag_count:
+      tool_output && Array.isArray(tool_output.red_flags) ? tool_output.red_flags.length : 0,
   };
 
   const metricsDir = path.join(__dirname, '../../../../context/runtime');

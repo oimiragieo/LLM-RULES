@@ -49,14 +49,11 @@
 
 - Created new agent: bool-action (2026-02-20)
 
-- Created new agent: repo-onboarder (2026-02-20)
+## 2026-02-20: Supply Chain Security Gap Fixes Code Review
 
-- Created new agent: qa-guardian (2026-02-20)
-
-- Created new agent: qa-guardian (2026-02-20)
-
-- Created new agent: contract-check (2026-02-20)
-
-- Created new agent: bool-action (2026-02-20)
-
-- Created new agent: repo-onboarder (2026-02-20)
+- external-content-guard.cjs GAP-A/B/C correctly implemented with safeParseJSON, path traversal validation in writeQuarantineFile, and env var enforcement mode.
+- reflection-cleanup.cjs GAP-D correctly delegates to spawn-request-contract.cjs which exports removeStaleRequests() and maxAge option on readSpawnRequestsFile.
+- BLOCKING gap: EXTERNAL_CONTENT_GUARD_MODE env var missing from .env.example — must be added to Section 6a before commit.
+- Pattern: external-content-guard tests cleanup operates on real quarantine dir rather than temp dir — creates side-effect risk.
+- safeParseJSON without schema name uses fallback path; acceptable for trusted-sources.json but worth documenting as conscious decision.
+- Report: `.claude/context/reports/security/code-review-supply-chain-fixes-2026-02-20.md`

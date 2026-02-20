@@ -19,14 +19,8 @@ const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
 // ---------------------------------------------------------------------------
 
 const MAX_CONTENT_BYTES = 51200; // 50KB
-const AUDIT_LOG_PATH = path.join(
-  __dirname,
-  '../../../context/runtime/external-fetch-audit.jsonl'
-);
-const TRUSTED_SOURCES_PATH = path.join(
-  __dirname,
-  '../../../config/trusted-sources.json'
-);
+const AUDIT_LOG_PATH = path.join(__dirname, '../../../context/runtime/external-fetch-audit.jsonl');
+const TRUSTED_SOURCES_PATH = path.join(__dirname, '../../../config/trusted-sources.json');
 
 // Red flag patterns per step
 const TOOL_INVOCATION_PATTERNS = [
@@ -38,37 +32,68 @@ const TOOL_INVOCATION_PATTERNS = [
   /WebSearch\s*\(\s*\{/,
 ];
 
-const SKILL_INVOCATION_PATTERN = /Skill\s*\(\s*\{[^}]*skill\s*:\s*['"](?!research-synthesis|framework-context|github-ops|tdd|debugging)[^'"]+['"]/;
+const SKILL_INVOCATION_PATTERN =
+  /Skill\s*\(\s*\{[^}]*skill\s*:\s*['"](?!research-synthesis|framework-context|github-ops|tdd|debugging)[^'"]+['"]/;
 
 const PROMPT_INJECTION_PATTERNS = [
-  { re: /ignore\s+(all\s+)?(previous\s+)?(instructions|rules|constraints)/i, label: 'instruction_override' },
-  { re: /disregard\s+(all\s+)?(previous\s+)?(instructions|rules|constraints)/i, label: 'instruction_override' },
-  { re: /forget\s+(all\s+)?(previous\s+)?(instructions|rules|constraints)/i, label: 'instruction_override' },
+  {
+    re: /ignore\s+(all\s+)?(previous\s+)?(instructions|rules|constraints)/i,
+    label: 'instruction_override',
+  },
+  {
+    re: /disregard\s+(all\s+)?(previous\s+)?(instructions|rules|constraints)/i,
+    label: 'instruction_override',
+  },
+  {
+    re: /forget\s+(all\s+)?(previous\s+)?(instructions|rules|constraints)/i,
+    label: 'instruction_override',
+  },
   { re: /you\s+are\s+now\b/i, label: 'role_assumption' },
   { re: /act\s+as\b/i, label: 'role_assumption' },
   { re: /pretend\s+to\s+be\b/i, label: 'role_assumption' },
   { re: /your\s+new\s+role\s+is\b/i, label: 'role_assumption' },
-  { re: /<!--[^>]*(instruction|execute|run|invoke|call|spawn)[^>]*-->/i, label: 'hidden_html_instruction' },
-  { re: /\b(DAN|do\s+anything\s+now|developer\s+mode|unrestricted\s+mode)\b/i, label: 'jailbreak_marker' },
-  { re: /(system\s+prompt|initial\s+instructions|original\s+prompt|show\s+me\s+your)/i, label: 'system_prompt_extraction' },
+  {
+    re: /<!--[^>]*(instruction|execute|run|invoke|call|spawn)[^>]*-->/i,
+    label: 'hidden_html_instruction',
+  },
+  {
+    re: /\b(DAN|do\s+anything\s+now|developer\s+mode|unrestricted\s+mode)\b/i,
+    label: 'jailbreak_marker',
+  },
+  {
+    re: /(system\s+prompt|initial\s+instructions|original\s+prompt|show\s+me\s+your)/i,
+    label: 'system_prompt_extraction',
+  },
   { re: /[\u200B-\u200F\u2028-\u202F\uFEFF]/, label: 'zero_width_obfuscation' },
 ];
 
 const EXFILTRATION_PATTERNS = [
   { re: /process\.env\.[A-Z_]{3,}/i, label: 'env_access' },
-  { re: /(curl|wget)\s+[^\s]*(?!github\.com|raw\.githubusercontent\.com|arxiv\.org)[^\s]+\.(com|net|org|io|dev)/i, label: 'outbound_http' },
-  { re: /fetch\s*\([^)]*https?:\/\/(?!github\.com|raw\.githubusercontent\.com|arxiv\.org)/i, label: 'outbound_fetch' },
+  {
+    re: /(curl|wget)\s+[^\s]*(?!github\.com|raw\.githubusercontent\.com|arxiv\.org)[^\s]+\.(com|net|org|io|dev)/i,
+    label: 'outbound_http',
+  },
+  {
+    re: /fetch\s*\([^)]*https?:\/\/(?!github\.com|raw\.githubusercontent\.com|arxiv\.org)/i,
+    label: 'outbound_fetch',
+  },
   { re: /(readFile|fs\.read)[^;]*https?:\/\//i, label: 'file_plus_http' },
   { re: /(nslookup|dig|host)\s+[^\s]*\$\{/i, label: 'dns_exfiltration' },
   { re: /https?:\/\/[^\s]*\?(data|payload|content|body)=/i, label: 'encoded_url_data' },
 ];
 
 const PRIVILEGE_PATTERNS = [
-  { re: /(CREATOR_GUARD|PLANNER_FIRST|SECURITY_REVIEW|ROUTING_GUARD)\s*=\s*(off|false|0)/i, label: 'hook_disable' },
+  {
+    re: /(CREATOR_GUARD|PLANNER_FIRST|SECURITY_REVIEW|ROUTING_GUARD)\s*=\s*(off|false|0)/i,
+    label: 'hook_disable',
+  },
   { re: /settings\.json/i, label: 'settings_write' },
   { re: /CLAUDE\.md/i, label: 'claude_md_reference' },
   { re: /memory\/(patterns|gotchas|access-stats)\.json/i, label: 'memory_direct_write' },
-  { re: /agents:\s*\[(?:[^\]]*\b(router|master-orchestrator|evolution-orchestrator)\b[^\]]*)\]/i, label: 'privileged_agent_assignment' },
+  {
+    re: /agents:\s*\[(?:[^\]]*\b(router|master-orchestrator|evolution-orchestrator)\b[^\]]*)\]/i,
+    label: 'privileged_agent_assignment',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -81,7 +106,7 @@ const PRIVILEGE_PATTERNS = [
  */
 function splitCodeFences(content) {
   const fences = [];
-  const prose = content.replace(/```[\s\S]*?```/g, (match) => {
+  const prose = content.replace(/```[\s\S]*?```/g, match => {
     fences.push(match);
     return '<<CODEFENCE>>';
   });
@@ -97,7 +122,7 @@ function isFenceActiveTool(fence, surroundingProse) {
   const docKeywords = /(example|do\s+not\s+run|template|for\s+reference|documentation)/i;
   if (!activeKeywords.test(surroundingProse)) return false;
   if (docKeywords.test(surroundingProse)) return false;
-  return TOOL_INVOCATION_PATTERNS.some((p) => p.test(fence));
+  return TOOL_INVOCATION_PATTERNS.some(p => p.test(fence));
 }
 
 /**
@@ -161,20 +186,35 @@ function stepBinaryCheck(content) {
     if (rt !== content) {
       return {
         passed: false,
-        flag: { step: 'binary_check', pattern: 'non_utf8_bytes', severity: 'HIGH', excerpt: 'Content contains non-UTF-8 bytes' },
+        flag: {
+          step: 'binary_check',
+          pattern: 'non_utf8_bytes',
+          severity: 'HIGH',
+          excerpt: 'Content contains non-UTF-8 bytes',
+        },
       };
     }
     // Also check for null bytes
     if (content.includes('\u0000')) {
       return {
         passed: false,
-        flag: { step: 'binary_check', pattern: 'null_byte', severity: 'HIGH', excerpt: 'Content contains null bytes' },
+        flag: {
+          step: 'binary_check',
+          pattern: 'null_byte',
+          severity: 'HIGH',
+          excerpt: 'Content contains null bytes',
+        },
       };
     }
   } catch {
     return {
       passed: false,
-      flag: { step: 'binary_check', pattern: 'encoding_error', severity: 'HIGH', excerpt: 'Content encoding validation failed' },
+      flag: {
+        step: 'binary_check',
+        pattern: 'encoding_error',
+        severity: 'HIGH',
+        excerpt: 'Content encoding validation failed',
+      },
     };
   }
   return { passed: true };
@@ -447,4 +487,12 @@ if (require.main === module) {
   process.exit(result.verdict === 'PASS' ? 0 : 1);
 }
 
-module.exports = { scan, stepSizeCheck, stepBinaryCheck, stepToolInvocationScan, stepPromptInjectionScan, stepExfiltrationScan, stepPrivilegeScan };
+module.exports = {
+  scan,
+  stepSizeCheck,
+  stepBinaryCheck,
+  stepToolInvocationScan,
+  stepPromptInjectionScan,
+  stepExfiltrationScan,
+  stepPrivilegeScan,
+};

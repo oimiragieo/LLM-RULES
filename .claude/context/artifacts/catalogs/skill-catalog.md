@@ -15,18 +15,18 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 ## Quick Reference by Category
 
-| Category                                           | Count | Key Skills                                                                                                                                                                                             |
-| -------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                            |
-| [Planning & Architecture](#planning--architecture) | 10    | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator, wave-executor                                                                                            |
-| [Security](#security)                              | 12    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults, medusa-security |
-| [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                             |
-| [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                        |
-| [Frameworks](#frameworks)                          | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                             |
-| [Mobile](#mobile)                                  | 5     | ios-expert, android-expert, expo-framework-rule, tauri-native-api-integration, mobile-first-design-rules                                                                                               |
-| [Data & Database](#data--database)                 | 4     | database-architect, database-expert, data-expert, text-to-sql                                                                                                                                          |
-| [Documentation](#documentation)                    | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                                                  |
-| [Git & Version Control](#git--version-control)     | 2     | git-expert, github-ops                                                                                                                                                                                 |
+| Category                                           | Count | Key Skills                                                                                                                                                                                                                    |
+| -------------------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                                                   |
+| [Planning & Architecture](#planning--architecture) | 10    | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator, wave-executor                                                                                                                   |
+| [Security](#security)                              | 13    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults, medusa-security, content-security-scan |
+| [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                                                    |
+| [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                                               |
+| [Frameworks](#frameworks)                          | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                                                    |
+| [Mobile](#mobile)                                  | 5     | ios-expert, android-expert, expo-framework-rule, tauri-native-api-integration, mobile-first-design-rules                                                                                                                      |
+| [Data & Database](#data--database)                 | 4     | database-architect, database-expert, data-expert, text-to-sql                                                                                                                                                                 |
+| [Documentation](#documentation)                    | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                                                                         |
+| [Git & Version Control](#git--version-control)     | 2     | git-expert, github-ops                                                                                                                                                                                                        |
 
 | [Code Style & Linting](#code-style--linting) | 2 | code-style-validator, dry-principle |
 | [Creator Tools](#creator-tools) | 15 | research-synthesis, agent-creator, agent-updater, skill-creator, skill-updater, workflow-updater, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator |
@@ -92,21 +92,22 @@ Design and planning skills.
 
 Security analysis and validation.
 
-| Skill                          | Description                                                                   | Primary Agents                                        |
-| ------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `security-architect`           | OWASP Top 10, threat modeling, STRIDE analysis                                | security-architect                                    |
-| `auth-security-expert`         | OAuth 2.1, JWT (RFC 8725), encryption                                         | security-architect                                    |
-| `binary-analysis-patterns`     | Disassembly, decompilation, reverse engineering                               | security-architect                                    |
-| `memory-forensics`             | Memory acquisition and artifact extraction                                    | security-architect                                    |
-| `protocol-reverse-engineering` | Network protocol analysis                                                     | security-architect                                    |
-| `accessibility`                | WCAG 2.1 AA compliance, semantic HTML, ARIA                                   | frontend-expert                                       |
-| `static-analysis`              | CodeQL and Semgrep SARIF analysis                                             | security-architect                                    |
-| `variant-analysis`             | Discover vulnerability variants                                               | security-architect                                    |
-| `differential-review`          | Security-focused diff/PR review                                               | security-architect                                    |
-| `semgrep-rule-creator`         | Create custom Semgrep rules                                                   | security-architect                                    |
-| `insecure-defaults`            | Detect hardcoded credentials, fail-open configs                               | security-architect                                    |
-| `medusa-security`              | AI-first SAST with 3,000+ patterns: prompt injection, MCP, agents, RAG, OWASP | security-architect, penetration-tester, code-reviewer |
-| `gemini-cli-security`          | AI-powered vulnerability analysis and OSV.dev dependency scanning             | security-architect, developer, code-reviewer          |
+| Skill                          | Description                                                                                                                     | Primary Agents                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `security-architect`           | OWASP Top 10, threat modeling, STRIDE analysis                                                                                  | security-architect                                    |
+| `auth-security-expert`         | OAuth 2.1, JWT (RFC 8725), encryption                                                                                           | security-architect                                    |
+| `binary-analysis-patterns`     | Disassembly, decompilation, reverse engineering                                                                                 | security-architect                                    |
+| `memory-forensics`             | Memory acquisition and artifact extraction                                                                                      | security-architect                                    |
+| `protocol-reverse-engineering` | Network protocol analysis                                                                                                       | security-architect                                    |
+| `accessibility`                | WCAG 2.1 AA compliance, semantic HTML, ARIA                                                                                     | frontend-expert                                       |
+| `static-analysis`              | CodeQL and Semgrep SARIF analysis                                                                                               | security-architect                                    |
+| `variant-analysis`             | Discover vulnerability variants                                                                                                 | security-architect                                    |
+| `differential-review`          | Security-focused diff/PR review                                                                                                 | security-architect                                    |
+| `semgrep-rule-creator`         | Create custom Semgrep rules                                                                                                     | security-architect                                    |
+| `insecure-defaults`            | Detect hardcoded credentials, fail-open configs                                                                                 | security-architect                                    |
+| `medusa-security`              | AI-first SAST with 3,000+ patterns: prompt injection, MCP, agents, RAG, OWASP                                                   | security-architect, penetration-tester, code-reviewer |
+| `gemini-cli-security`          | AI-powered vulnerability analysis and OSV.dev dependency scanning                                                               | security-architect, developer, code-reviewer          |
+| `content-security-scan`        | 7-step security gate for external content: size, binary, tool invocation, prompt injection, exfiltration, privilege, provenance | security-architect, skill-creator, agent-creator      |
 
 ---
 

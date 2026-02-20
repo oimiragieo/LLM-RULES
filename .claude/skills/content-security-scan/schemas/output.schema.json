@@ -36,7 +36,14 @@
         "properties": {
           "step": {
             "type": "string",
-            "enum": ["size_check", "binary_check", "tool_invocation", "prompt_injection", "exfiltration", "privilege"]
+            "enum": [
+              "size_check",
+              "binary_check",
+              "tool_invocation",
+              "prompt_injection",
+              "exfiltration",
+              "privilege"
+            ]
           },
           "pattern": { "type": "string" },
           "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
