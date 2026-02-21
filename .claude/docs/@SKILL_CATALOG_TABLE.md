@@ -52,6 +52,13 @@ Catalog of active workflow-enhancement skills available via `Skill()` tool for i
 | `code-analyzer`                      | static code analysis and metrics                        |
 | `code-quality-expert`                | clean code, style guides, refactoring                   |
 | `code-style-validator`               | programmatic style validation (AST-based)               |
+| `agent-evaluation`                   | LLM-as-judge 5-dimension rubric for agent output quality |
+| `context-degradation`                | token severity zones, early-warning indicators, corrective routing |
+| `property-based-testing`             | fast-check patterns for JS/TS, 6 canonical property categories |
+| `multi-agent-architecture-reference` | 6-topology decision matrix with token economics and failure modes |
+| `agent-tool-design`                  | Agent Tool Contract: 5 principles and anti-pattern table |
+| `sharp-edges`                        | catalogue of confirmed SE-01–SE-07 hazards (paths, prototype pollution, ReDoS, etc.) |
+| `debug-log-analysis`                 | structured debug log workflow: copy, reduce, categorize, cross-reference, report |
 
 ### Skill Discovery
 

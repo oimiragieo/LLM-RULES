@@ -428,6 +428,13 @@ const INTENT_KEYWORDS = {
   ],
   'reflection-agent': ['reflection-agent', 'reflection', 'agent'],
   tdd: ['tdd'],
+
+  // New skills added 2026-02-21
+  'agent-evaluation': ['agent-evaluation', 'agent', 'evaluation', 'judge', 'framework', 'dimension', 'rubric', 'scoring'],
+  'context-degradation': ['context-degradation', 'context', 'degradation', 'token', 'range', 'severity', 'zones', 'detection'],
+  'property-based-testing': ['property-based-testing', 'property', 'based', 'testing', 'fast-check', 'canonical', 'categories'],
+  'agent-tool-design': ['agent-tool-design', 'agent', 'tool', 'design', 'contract', 'principles', 'designing'],
+  'sharp-edges': ['sharp-edges', 'sharp', 'edges', 'living', 'catalogue', 'known', 'hazard'],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.
@@ -447,17 +454,6 @@ const ALLOWED_INTENT_KEYWORD_OVERLAPS = {
   tdd: ['developer', 'tdd'],
   vercel: ['nextjs', 'vercel_deploy'],
   wcag: ['accessibility_tester', 'web_design'],
-  'qa-guardian': ['qa-guardian', 'qa', 'guardian', 'quality', 'gate', 'agent'],
-  'contract-check': ['contract-check', 'contract', 'check', 'agent'],
-  'bool-action': ['bool-action', 'bool', 'action', 'boolean', 'mode'],
-  'repo-onboarder': [
-    'repo-onboarder',
-    'repo',
-    'onboarder',
-    'repository',
-    'integration',
-    'orchestrator',
-  ],
 };
 
 module.exports = { INTENT_KEYWORDS, ALLOWED_INTENT_KEYWORD_OVERLAPS };

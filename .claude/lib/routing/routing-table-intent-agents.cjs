@@ -130,10 +130,13 @@ const INTENT_TO_AGENT = {
   incident: 'incident-responder',
   plan: 'planner',
   integration: 'developer',
-  'qa-guardian': 'qa-guardian',
-  'contract-check': 'contract-check',
-  'bool-action': 'bool-action',
-  'repo-onboarder': 'repo-onboarder',
+
+  // New skills added 2026-02-21
+  'agent-evaluation': 'agent-evaluation',
+  'context-degradation': 'context-degradation',
+  'property-based-testing': 'property-based-testing',
+  'agent-tool-design': 'agent-tool-design',
+  'sharp-edges': 'sharp-edges',
 };
 
 module.exports = { INTENT_TO_AGENT };

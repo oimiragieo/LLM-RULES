@@ -308,7 +308,7 @@
         ]
       },
       "devops-troubleshooter": {
-        "primary": ["debugging", "docker-compose", "k8s-manifest-generator"],
+        "primary": ["debugging", "debug-log-analysis", "docker-compose", "k8s-manifest-generator"],
         "secondary": [
           "incident-runbook-templates",
           "on-call-handoff-patterns",
