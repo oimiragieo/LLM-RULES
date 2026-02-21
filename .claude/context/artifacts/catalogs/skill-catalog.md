@@ -135,12 +135,12 @@ Language-specific expertise.
 | ----------------------- | -------------------------------------- | -------------- |
 | `python-backend-expert` | Django, FastAPI, Flask, SQLAlchemy     | python-pro     |
 | `typescript-expert`     | TypeScript patterns and type systems   | typescript-pro |
-| `go-expert`             | Go APIs, gRPC, concurrency             | go-pro         |
+| `go-expert`             | Go APIs, gRPC, concurrency             | golang-pro     |
 | `nodejs-expert`         | Node.js, Express, NestJS               | nodejs-pro     |
 | `java-expert`           | Java and Spring Boot                   | java-pro       |
 | `rust-expert`           | Rust ownership, safety, async patterns | rust-pro       |
 | `php-expert`            | PHP, Laravel, WordPress                | php-pro        |
-| `web3-expert`           | Solidity, Ethereum, smart contracts    | web3-pro       |
+| `web3-expert`           | Solidity, Ethereum, smart contracts    | developer      |
 
 ---
 
@@ -148,14 +148,14 @@ Language-specific expertise.
 
 Framework-specific expertise.
 
-| Skill                 | Description                                        | Primary Agents |
-| --------------------- | -------------------------------------------------- | -------------- |
-| `react-expert`        | React hooks, state management, React 19, Shadcn UI | react-pro      |
-| `nextjs-expert`       | Next.js App Router, Server Components              | nextjs-pro     |
-| `svelte-expert`       | Svelte and SvelteKit                               | svelte-pro     |
-| `graphql-expert`      | GraphQL schema, Apollo Client/Server               | graphql-pro    |
-| `expo-framework-rule` | Expo Framework guidelines                          | mobile-pro     |
-| `frontend-expert`     | UI/UX patterns, responsive design                  | frontend-pro   |
+| Skill                 | Description                                        | Primary Agents        |
+| --------------------- | -------------------------------------------------- | --------------------- |
+| `react-expert`        | React hooks, state management, React 19, Shadcn UI | frontend-pro          |
+| `nextjs-expert`       | Next.js App Router, Server Components              | nextjs-pro            |
+| `svelte-expert`       | Svelte and SvelteKit                               | sveltekit-expert      |
+| `graphql-expert`      | GraphQL schema, Apollo Client/Server               | graphql-pro           |
+| `expo-framework-rule` | Expo Framework guidelines                          | expo-mobile-developer |
+| `frontend-expert`     | UI/UX patterns, responsive design                  | frontend-pro          |
 
 ---
 
@@ -163,13 +163,13 @@ Framework-specific expertise.
 
 Mobile development skills.
 
-| Skill                          | Description                              | Primary Agents |
-| ------------------------------ | ---------------------------------------- | -------------- |
-| `ios-expert`                   | SwiftUI, UIKit, Apple frameworks         | ios-pro        |
-| `android-expert`               | Jetpack Compose, Kotlin, Material Design | android-pro    |
-| `expo-framework-rule`          | Expo Framework patterns                  | mobile-pro     |
-| `tauri-native-api-integration` | Tauri native APIs                        | mobile-pro     |
-| `mobile-first-design-rules`    | Mobile-first design patterns             | frontend-pro   |
+| Skill                          | Description                              | Primary Agents          |
+| ------------------------------ | ---------------------------------------- | ----------------------- |
+| `ios-expert`                   | SwiftUI, UIKit, Apple frameworks         | ios-pro                 |
+| `android-expert`               | Jetpack Compose, Kotlin, Material Design | developer               |
+| `expo-framework-rule`          | Expo Framework patterns                  | expo-mobile-developer   |
+| `tauri-native-api-integration` | Tauri native APIs                        | tauri-desktop-developer |
+| `mobile-first-design-rules`    | Mobile-first design patterns             | frontend-pro            |
 
 ---
 
@@ -177,13 +177,13 @@ Mobile development skills.
 
 Data processing and database skills.
 
-| Skill                | Description                                   | Primary Agents   |
-| -------------------- | --------------------------------------------- | ---------------- |
-| `database-architect` | Schema design, query optimization, migrations | architect        |
-| `database-expert`    | Prisma, Supabase, SQL/NoSQL patterns          | developer        |
-| `data-expert`        | Data parsing, transformation, validation      | developer        |
-| `text-to-sql`        | Natural language to SQL conversion            | developer        |
-| `ai-ml-expert`       | PyTorch, LangChain, LLM integration           | ai-ml-specialist |
+| Skill                | Description                                   | Primary Agents                |
+| -------------------- | --------------------------------------------- | ----------------------------- |
+| `database-architect` | Schema design, query optimization, migrations | architect, database-architect |
+| `database-expert`    | Prisma, Supabase, SQL/NoSQL patterns          | database-architect            |
+| `data-expert`        | Data parsing, transformation, validation      | data-engineer                 |
+| `text-to-sql`        | Natural language to SQL conversion            | database-architect            |
+| `ai-ml-expert`       | PyTorch, LangChain, LLM integration           | ai-ml-specialist              |
 
 ---
 
@@ -196,7 +196,7 @@ Documentation generation skills.
 | `doc-generator`  | API documentation, developer guides | technical-writer |
 | `writing-skills` | TDD applied to documentation        | technical-writer |
 | `readme`         | README and project documentation    | technical-writer |
-| `gamedev-expert` | Game development documentation      | gamedev-pro      |
+| `gamedev-expert` | Game development documentation      | developer        |
 
 ---
 
@@ -229,18 +229,18 @@ Framework artifact creators. All 9 creator skills now include **Step 0.5 (Compan
 | Skill                 | Description                                                             | Primary Agents                           |
 | --------------------- | ----------------------------------------------------------------------- | ---------------------------------------- |
 | `research-synthesis`  | Research synthesis for artifact creation (invoke BEFORE other creators) | all creators                             |
-| `agent-creator`       | Creates specialized AI agents (with Step 0.5 companion check)           | router                                   |
+| `agent-creator`       | Creates specialized AI agents (with Step 0.5 companion check)           | evolution-orchestrator                   |
 | `agent-updater`       | Refreshes existing agent prompts/frontmatter with risk scoring          | reflection-agent, evolution-orchestrator |
-| `skill-creator`       | Creates and validates skills (with Step 0.5 companion check)            | router                                   |
+| `skill-creator`       | Creates and validates skills (with Step 0.5 companion check)            | evolution-orchestrator                   |
 | `skill-updater`       | Refreshes existing skills with research + TDD + integration validation  | reflection-agent, evolution-orchestrator |
 | `workflow-updater`    | Refreshes existing workflows with phase-gate idempotency checks         | evolution-orchestrator, planner          |
-| `hook-creator`        | Creates framework hooks (with Step 0.5 companion check)                 | router                                   |
-| `workflow-creator`    | Creates orchestration workflows (with Step 0.5 companion check)         | router                                   |
-| `template-creator`    | Creates templates (with Step 0.5 companion check)                       | router                                   |
-| `schema-creator`      | Creates JSON Schema validators (with Step 0.5 companion check)          | router                                   |
-| `command-creator`     | Creates thin-delegator slash commands (with Step 0.5 companion check)   | router                                   |
-| `rule-creator`        | Creates workspace convention rules (with Step 0.5 companion check)      | router                                   |
-| `tool-creator`        | Creates CLI tools and utilities (with Step 0.5 companion check)         | router                                   |
+| `hook-creator`        | Creates framework hooks (with Step 0.5 companion check)                 | evolution-orchestrator                   |
+| `workflow-creator`    | Creates orchestration workflows (with Step 0.5 companion check)         | evolution-orchestrator                   |
+| `template-creator`    | Creates templates (with Step 0.5 companion check)                       | evolution-orchestrator                   |
+| `schema-creator`      | Creates JSON Schema validators (with Step 0.5 companion check)          | evolution-orchestrator                   |
+| `command-creator`     | Creates thin-delegator slash commands (with Step 0.5 companion check)   | evolution-orchestrator                   |
+| `rule-creator`        | Creates workspace convention rules (with Step 0.5 companion check)      | evolution-orchestrator                   |
+| `tool-creator`        | Creates CLI tools and utilities (with Step 0.5 companion check)         | evolution-orchestrator                   |
 | `artifact-updater`    | Updates existing artifacts (unified updater for all types)              | all creators                             |
 | `artifact-integrator` | Deep integration analysis for newly created artifacts                   | architect, planner, developer            |
 
@@ -304,18 +304,17 @@ Quality validation skills.
 
 Advanced patterns and methodologies.
 
-| Skill                                 | Description                                                                    | Primary Agents |
-| ------------------------------------- | ------------------------------------------------------------------------------ | -------------- |
-| `thinking-tools`                      | Self-reflection patterns (think-about-\*)                                      | all agents     |
-| `spec-gathering`                      | Requirements gathering                                                         | planner        |
-| `spec-init`                           | Unified spec creation                                                          | planner        |
-| `sequential-thinking`                 | Structured problem solving                                                     | all agents     |
-| `consensus-voting`                    | Byzantine consensus for multi-agent decisions                                  | orchestrators  |
-| `swarm-coordination`                  | Multi-agent swarm patterns                                                     | orchestrators  |
-| `interactive-requirements-gathering`  | A/B/C/D/E questionnaire framework                                              | planner        |
-| `planning-with-files`                 | Persistent planning files                                                      | planner        |
-| `sparc-methodology`                   | SPARC development methodology                                                  | architect      |
-| `enterprise-skill-test-1771465110431` | Enterprise scaffold validation skill for test coverage and reliability checks. | Read           |
+| Skill                                | Description                                   | Primary Agents |
+| ------------------------------------ | --------------------------------------------- | -------------- |
+| `thinking-tools`                     | Self-reflection patterns (think-about-\*)     | all agents     |
+| `spec-gathering`                     | Requirements gathering                        | planner        |
+| `spec-init`                          | Unified spec creation                         | planner        |
+| `sequential-thinking`                | Structured problem solving                    | all agents     |
+| `consensus-voting`                   | Byzantine consensus for multi-agent decisions | orchestrators  |
+| `swarm-coordination`                 | Multi-agent swarm patterns                    | orchestrators  |
+| `interactive-requirements-gathering` | A/B/C/D/E questionnaire framework             | planner        |
+| `planning-with-files`                | Persistent planning files                     | planner        |
+| `sparc-methodology`                  | SPARC development methodology                 | architect      |
 
 ---
 
