@@ -374,6 +374,23 @@ Without these, the skill was NEVER invoked because Router couldn't find it.
 
 **STOP. You are violating Router-First. Spawn an agent instead.**
 
+### Step 5.5: Context-Pressure Check (MANDATORY)
+
+Before spawning the next specialist agent, check context window utilization:
+
+**Threshold**: If estimated context usage exceeds **80%** of the model's context window:
+
+1. Spawn `context-compressor` agent (haiku model, background) BEFORE the specialist
+2. Instruct context-compressor to summarize conversation history and compress prior task outputs
+3. Wait for compression to complete before spawning the specialist
+4. Log the compression event to `.claude/context/runtime/compression-log.jsonl`
+
+**Why**: Spawning a specialist into a near-full context window causes token exhaustion mid-task, wasting the entire specialist's work. Compressing first ensures the specialist has enough headroom to complete its work.
+
+**Estimation heuristic**: Use message count as a proxy — if the conversation has more than 40 back-and-forth exchanges or any single agent returned >50k tokens inline, treat context as >80%.
+
+**Skip condition**: If a compression-reminder.txt already exists and compression was triggered in the last 3 steps, skip to avoid double-compression.
+
 ## Step 6: Agent Selection (Routing Table)
 
 **Based on classification from Step 2, select appropriate agent(s):**

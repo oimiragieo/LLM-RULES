@@ -495,6 +495,39 @@ Include integration assessment in reflection report:
 
 ---
 
+## Phase 5.6: Anomaly Detection Gate (Pre-Analysis)
+
+**Purpose**: Validate the completed task against credibility checks before writing memory updates.
+
+Before processing a reflection, validate the completed task against credibility checks:
+
+**Hallucination Signals** (any ONE triggers investigation):
+
+1. HIGH or EPIC complexity task completed in **< 5 seconds** elapsed time
+2. Task reported as completed with **0 file modifications** (git diff shows no changes)
+3. Task summary metadata is missing or contains only generic text ("Task completed successfully")
+4. Tool use count is 0 or 1 for a task expected to require 5+ tool calls
+
+**When anomaly detected**:
+
+1. Set reflection confidence score to LOW
+2. Log anomaly to `.claude/context/memory/issues.md`:
+   ```
+   ## Hallucinated Completion Suspected: Task {id} ({date})
+   Signal: {which signal triggered}
+   Task: {subject}
+   Expected: {complexity}-level work with file modifications
+   Actual: Completed in {duration}s with {file_count} file changes
+   ```
+3. Include "ANOMALY DETECTED" banner in reflection report
+4. Cross-reference against historical baselines in `.claude/context/memory/learnings.md` to determine if pattern is known
+
+**Baseline Reference**: Track completion times in reflection-log.jsonl. After 10+ reflections, the P10 completion time for HIGH complexity tasks forms the anomaly threshold floor.
+
+**Note**: This gate does NOT block completion — it flags for human review and lowers the confidence score.
+
+---
+
 ## Phase 6: Memory Update
 
 **Purpose**: Persist learnings into appropriate memory files.
