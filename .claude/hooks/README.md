@@ -70,6 +70,25 @@ Injects memory context (Gotchas, Patterns) into agent spawn prompts.
 **When it runs:** PreToolUse (Task)
 **What it does:** Enhances agent prompts with relevant memory context.
 
+### Git Hooks
+
+Located in `.claude/hooks/git/`
+
+#### Changelog Reminder (`changelog-reminder.cjs`)
+
+Warns when code files are staged for commit but `CHANGELOG.md` [Unreleased] section was not also staged.
+
+**When it runs:** git pre-commit (called from `.git/hooks/pre-commit`)
+**What it checks:**
+
+- Detects staged code files matching `*.ts`, `*.js`, `*.cjs`, `*.mjs`, `*.json` (excluding lock files)
+- Checks whether `CHANGELOG.md` is included in the staged files
+- If code is staged but CHANGELOG.md is not: prints a warning to stderr
+
+**Enforcement mode:** `CHANGELOG_REMINDER_MODE=warn|off` (default: `warn`, always exits 0)
+**ADR reference:** ADR-2026-02-21-004 and ADR-2026-02-21-006 (CHANGELOG inline with code commits)
+**Test file:** `.claude/hooks/git/changelog-reminder.test.cjs`
+
 ### Memory Hooks
 
 Located in `.claude/hooks/memory/`

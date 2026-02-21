@@ -32,10 +32,18 @@ describe('Path Constants — structural invariants', () => {
 
   test('all constants use forward slashes (Windows compatible)', () => {
     const constants = [
-      PROJECT_ROOT, HOOKS_DIR, SKILLS_DIR, AGENTS_DIR,
-      CONFIG_DIR, CONTEXT_DIR, SCHEMAS_DIR,
-      SKILL_INDEX_PATH, CATALOG_PATH, AGENT_REGISTRY_PATH,
-      ACTIVE_CREATORS_PATH, INTEGRATION_QUEUE_PATH,
+      PROJECT_ROOT,
+      HOOKS_DIR,
+      SKILLS_DIR,
+      AGENTS_DIR,
+      CONFIG_DIR,
+      CONTEXT_DIR,
+      SCHEMAS_DIR,
+      SKILL_INDEX_PATH,
+      CATALOG_PATH,
+      AGENT_REGISTRY_PATH,
+      ACTIVE_CREATORS_PATH,
+      INTEGRATION_QUEUE_PATH,
     ];
     for (const p of constants) {
       assert.strictEqual(p.includes('\\'), false, `Path has backslashes: ${p}`);

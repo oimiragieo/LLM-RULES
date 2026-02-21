@@ -494,6 +494,25 @@ Sources:
 - `https://ast-grep.github.io/reference/cli.html` (ast-grep CLI options)
 - `https://github.com/sharkdp/bat` (fzf preview examples)
 
+## Debug Log Utilities
+
+When a session produces unexpected behavior, reduce the raw Claude Code debug log to signal-only lines:
+
+```bash
+pnpm debug:reduce    # Auto-find most recent ~/.claude/debug/*.txt, copy to .tmp/, and reduce to signal-only lines
+```
+
+The reduced file lands at `.tmp/<session-id>-reduced.txt`. Kept lines include `[ERROR]`, `[WARN]`, failed/blocked/timeout messages, and stack traces. Repeated identical lines are collapsed.
+
+You can also pass an explicit path:
+
+```bash
+pnpm reduce-debug-log -- .tmp/session-abc.txt
+pnpm reduce-debug-log -- .tmp/session-abc.txt --output .tmp/session-abc.cleaned.txt
+```
+
+The `debug-log-analysis` skill (`Skill({ skill: 'debug-log-analysis' })`) documents the full structured workflow for working with these reduced logs.
+
 ## Operational Notes
 
 - `.claude/context/` stores runtime artifacts and persistent operational memory.

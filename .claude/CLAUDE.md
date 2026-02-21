@@ -308,7 +308,7 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 **Quick Routing (high-frequency):**
 
 | Task Type                    | Agent                 |
-| ---------------------------- | --------------------- | ------------------------------------------------ |
+| ---------------------------- | --------------------- |
 | Bug fixes / implementation   | `developer`           |
 | Documentation updates        | `technical-writer`    |
 | Refactor/simplify            | `code-simplifier`     |
@@ -320,10 +320,6 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Infra / CI / deploy          | `devops`              |
 | Planning / decomposition     | `planner`             |
 | External research            | `researcher`          |
-| Qa Guardian                  | `qa-guardian`         | `.claude/agents/domain/qa-guardian.md`           |
-| Contract Check               | `contract-check`      | `.claude/agents/domain/contract-check.md`        |
-| Bool Action                  | `bool-action`         | `.claude/agents/domain/bool-action.md`           |
-| Repo Onboarder               | `repo-onboarder`      | `.claude/agents/orchestrators/repo-onboarder.md` |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
@@ -550,6 +546,11 @@ High-impact orchestration skills:
 - `artifact-integrator`
 - `github-ops`
 - `gemini-cli-security`
+- `agent-evaluation`
+- `context-degradation`
+- `property-based-testing`
+- `agent-tool-design`
+- `sharp-edges`
 - `framework-context`
 - `recommend-evolution`
 - `creation-feasibility-gate`

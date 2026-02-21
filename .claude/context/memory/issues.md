@@ -1,61 +1,14 @@
-## 2026-02-21: SEC-ICE-002 Enforcement Verification Gap in routing-guard.cjs (P1)
+## 2026-02-21 — Reflection Cleanup Atomic Handshake Fails for Background Agents
 
-**Status**: OPEN
-**Severity**: MEDIUM (security control documented but implementation not confirmed)
+**Root cause:** Background reflection agents spawned without `task_id` cannot call `TaskUpdate({ taskId: '...', metadata: { processedReflectionIds: [...] } })` because they don't know their task ID. Without this call, `reflection-cleanup.cjs` never fires, leaving `reflection-spawn-request.json` permanently dirty.
 
-**Issue**: ecosystem-creation-workflow.md SEC-ICE-002 (Task #25, commit 056c659d) documents that `routing-guard.cjs` reads `spawnDepth` from parent task metadata via TaskGet before allowing Task() calls, blocking spawns at depth >= 5. However, no test or code review confirmed this enforcement path exists in the hook. This is a documentation-implementation gap that could allow unbounded recursive spawning despite the documented control.
+**Workaround:** Router must either:
 
-**Impact**:
-- If routing-guard.cjs does NOT implement spawnDepth check, SEC-ICE-002 is a paper control only
-- Unbounded recursive auto-spawning remains possible (amplification attack surface)
-- Security review would pass based on documentation without verifying implementation
+1. Create a Task first (`TaskCreate`), capture the ID, pass `task_id` to the reflection spawn
+2. OR: Spawn reflection agents in foreground (not background)
+3. OR: After confirmed completion, manually write `[]` to spawn-request.json (this fix)
 
-**Resolution**:
-1. Read `.claude/hooks/routing/routing-guard.cjs` and grep for `spawnDepth` or `TaskGet`
-2. If implementation missing: file developer task to add spawnDepth enforcement
-3. If implementation exists: write test to verify depth >= 5 blocks Task() call
-4. Add verification step to SEC-ICE-002 protocol: "Verify enforcement via routing-guard-staleness tests"
-
-**Priority**: P1 (security control)
-
----
-
-## 2026-02-21: debugging + smart-debug Skills Absent from artifact-graph.json (P2)
-
-**Status**: OPEN
-**Severity**: LOW-MEDIUM (skills are discoverable via skill-catalog.md and developer.md, but not tracked in dependency graph)
-
-**Issue**: Neither `skill:debugging` nor `skill:smart-debug` have nodes in `.claude/context/data/artifact-graph.json`. Both skills were updated as part of Phase 1 skill wiring (Tasks 7-8, 2026-02-21).
-
-**Impact**:
-
-- Integration health checks (ADR-100) cannot report status for these two core skills
-- artifact-integrator cannot detect missing companions or compute integration scores
-- Cross-reference validation and orphan detection will miss these artifacts
-
-**Resolution**:
-
-1. Add `skill:debugging` node with `assignedAgents: ["developer", "devops-troubleshooter", "qa"]`, `integrationStatus: "integrated"`
-2. Add `skill:smart-debug` node with `assignedAgents: ["developer", "devops-troubleshooter", "qa"]`, `integrationStatus: "integrated"`
-3. Add edges from these nodes to agent nodes in artifact-graph.json
-4. Verify `skill-index.json` agentPrimary arrays are correct post-update (ADR-2026-02-21-003)
-
-**Priority**: P2 (non-blocking; discoverability exists via other indexes)
-
----
-
-## 2026-02-21: Rules File Lags Behind SKILL.md (when-to-use table not in debugging.md rules) (P2)
-
-**Status**: OPEN
-**Severity**: LOW
-
-**Issue**: The when-to-use comparison table added to `.claude/skills/debugging/SKILL.md` (debugging vs smart-debug escalation criteria) is NOT present in `.claude/rules/debugging.md`. The rules file has a condensed reference but not the full table.
-
-**Impact**: Agents loaded with system-prompt rules injection will not see the escalation table. They only see it when `Skill({ skill: 'debugging' })` is explicitly invoked. This creates a gap for agents that apply debugging rules at the prompt level without invoking the skill.
-
-**Resolution**: Add the when-to-use comparison table from debugging SKILL.md (lines 66-81) to `.claude/rules/debugging.md`.
-
-**Priority**: P2
+**Fix needed:** Router should always assign explicit task_ids to reflection spawns.
 
 ---
 

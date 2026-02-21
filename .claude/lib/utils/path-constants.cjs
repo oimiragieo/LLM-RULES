@@ -17,24 +17,24 @@ const { PROJECT_ROOT: _rawRoot } = require('./project-root.cjs');
 const norm = p => p.replace(/\\/g, '/');
 
 const _root = norm(_rawRoot);
-const _dot  = norm(path.join(_rawRoot, '.claude'));
-const _ctx  = norm(path.join(_rawRoot, '.claude', 'context'));
-const _cfg  = norm(path.join(_rawRoot, '.claude', 'config'));
+const _dot = norm(path.join(_rawRoot, '.claude'));
+const _ctx = norm(path.join(_rawRoot, '.claude', 'context'));
+const _cfg = norm(path.join(_rawRoot, '.claude', 'config'));
 
 // --- Directory constants ---
-const HOOKS_DIR   = norm(path.join(_dot, 'hooks'));
-const SKILLS_DIR  = norm(path.join(_dot, 'skills'));
-const AGENTS_DIR  = norm(path.join(_dot, 'agents'));
-const CONFIG_DIR  = _cfg;
+const HOOKS_DIR = norm(path.join(_dot, 'hooks'));
+const SKILLS_DIR = norm(path.join(_dot, 'skills'));
+const AGENTS_DIR = norm(path.join(_dot, 'agents'));
+const CONFIG_DIR = _cfg;
 const CONTEXT_DIR = _ctx;
 const SCHEMAS_DIR = norm(path.join(_dot, 'schemas'));
-const TOOLS_DIR   = norm(path.join(_dot, 'tools'));
+const TOOLS_DIR = norm(path.join(_dot, 'tools'));
 
 // --- File constants ---
-const SKILL_INDEX_PATH       = norm(path.join(_cfg, 'skill-index.json'));
-const CATALOG_PATH           = norm(path.join(_ctx, 'artifacts', 'catalogs', 'skill-catalog.md'));
-const AGENT_REGISTRY_PATH    = norm(path.join(_ctx, 'agent-registry.json'));
-const ACTIVE_CREATORS_PATH   = norm(path.join(_ctx, 'runtime', 'active-creators.json'));
+const SKILL_INDEX_PATH = norm(path.join(_cfg, 'skill-index.json'));
+const CATALOG_PATH = norm(path.join(_ctx, 'artifacts', 'catalogs', 'skill-catalog.md'));
+const AGENT_REGISTRY_PATH = norm(path.join(_ctx, 'agent-registry.json'));
+const ACTIVE_CREATORS_PATH = norm(path.join(_ctx, 'runtime', 'active-creators.json'));
 const INTEGRATION_QUEUE_PATH = norm(path.join(_ctx, 'runtime', 'integration-queue.jsonl'));
 
 /**

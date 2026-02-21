@@ -132,7 +132,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-18T06:32:19.085Z",
-      "last_accessed": "2026-02-18T06:32:19.085Z"
+      "last_accessed": "2026-02-21T07:54:30.503Z"
     },
     ".claude/hooks/validation/pre-completion-validation.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -337,7 +337,61 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-21T03:55:09.821Z",
       "last_accessed": "2026-02-21T03:56:08.698Z"
+    },
+    ".claude/hooks/git/changelog-reminder.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T05:40:42.783Z",
+      "last_accessed": "2026-02-21T05:40:42.783Z"
+    },
+    ".claude/hooks/git/changelog-reminder.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T05:41:01.213Z",
+      "last_accessed": "2026-02-21T05:41:01.213Z"
+    },
+    ".claude/tools/cli/generate-skill-index-definitions.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T06:11:17.771Z",
+      "last_accessed": "2026-02-21T06:11:52.463Z"
+    },
+    ".claude/lib/routing/routing-table-intent-keywords.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T06:34:10.540Z",
+      "last_accessed": "2026-02-21T07:54:59.609Z"
+    },
+    ".claude/skills/multi-agent-architecture-reference/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T07:02:51.525Z",
+      "last_accessed": "2026-02-21T07:02:51.525Z"
+    },
+    ".claude/skills/multi-agent-architecture-reference/hooks/pre-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T07:02:56.958Z",
+      "last_accessed": "2026-02-21T07:02:56.958Z"
+    },
+    ".claude/skills/multi-agent-architecture-reference/hooks/post-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T07:03:00.940Z",
+      "last_accessed": "2026-02-21T07:03:00.940Z"
+    },
+    ".claude/tools/multi-agent-architecture-reference/multi-agent-architecture-reference.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T07:04:20.727Z",
+      "last_accessed": "2026-02-21T07:04:20.727Z"
+    },
+    "scripts/reduce-debug-log.mjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T07:46:03.044Z",
+      "last_accessed": "2026-02-21T07:55:11.820Z"
     }
   },
-  "last_updated": "2026-02-21T04:54:01.631Z"
+  "last_updated": "2026-02-21T07:55:11.820Z"
 }

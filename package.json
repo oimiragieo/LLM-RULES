@@ -50,6 +50,8 @@
     "validate:verbose": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs --verbose && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs --verbose",
     "validate:sync": "node scripts/validation/validate-sync.mjs",
     "reduce-debug-log": "node scripts/reduce-debug-log.mjs",
+    "debug:reduce": "node scripts/reduce-debug-log.mjs",
+    "debug:analyze": "node scripts/reduce-debug-log.mjs && echo 'Reduced log at .tmp/'",
     "validate:models": "node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
     "validate:workflow": "node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs",
     "validate:docs:stale": "node scripts/validate-doc-stale-patterns.mjs",

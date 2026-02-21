@@ -1,3 +1,123 @@
+## ADR-2026-02-21-010: Commit-Checkpoint Mandatory for Multi-File Pipelines (2026-02-21 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Task #13 reflection — 13 files stranded in working tree after pipeline stall
+
+**Decision:** Any agent workflow that modifies 5 or more files MUST include an explicit `git commit` step as the final action before calling `TaskUpdate({ status: 'completed' })`. Pipelines that skip the commit step leave work stranded and at risk.
+
+**Implementation:**
+
+1. Add `commitCheckpoint: true` to TaskUpdate metadata for tasks that made git commits
+2. Add "git commit" as explicit step in pipeline templates for MEDIUM+ complexity tasks
+3. Task summaries MUST distinguish "modified + committed" from "modified but not committed"
+4. Router should check git status before declaring pipeline phase complete
+
+**Evidence:** Task #13 (2026-02-21) modified 13 files across implementation, tests, and memory — all correct work — but commit agent stalled. Work survived (working tree intact), but best practice requires commit-before-complete for all multi-file tasks.
+
+**Detection pattern:** TaskUpdate summary containing "modified in working tree but not committed" signals this anti-pattern.
+
+**Related:** Issues.md: Pipeline Stall Before VCS Commit (2026-02-21, P1)
+
+---
+
+## ADR-2026-02-21-009: Hook Documentation Accuracy as Security Control Property (2026-02-21 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Task #3 — SEC-ICE-002 spawnDepth audit revealed enforcement in wrong hook vs documentation
+
+**Decision:** When a security control's enforcement location is documented (in ADRs, workflow docs, or @ENFORCEMENT_HOOKS.md), that documentation accuracy is itself a security property. Controls documented in hook A but implemented in hook B create a discoverability gap: future auditors and maintainers will look in the documented location, find nothing, and may incorrectly conclude the control is a "paper control."
+
+**Rationale:**
+
+- SEC-ICE-002 was documented as living in routing-guard.cjs, but enforcement is in pre-task-unified-core.cjs via loop-state-manager.cjs
+- The control works correctly, but the documentation mismatch misleads future auditors
+- In security engineering, auditability and discoverability are as important as the control itself
+
+**Implementation:**
+
+1. After any hook refactor or module relocation, update all documentation references naming the hook as an enforcement location
+2. @ENFORCEMENT_HOOKS.md, ADRs, and workflow docs must agree with actual file locations
+3. SEC-ICE-002 in ecosystem-creation-workflow.md should be updated to name pre-task-unified-core.cjs (P2 doc fix)
+
+**Related:**
+
+- Issues.md: SEC-ICE-002 RESOLVED → P2 documentation fix (2026-02-21)
+- Task #3 audit report: `.claude/context/reports/reflections/spawn-depth-audit-2026-02-21.md`
+
+---
+
+## ADR-2026-02-21-007: Validate:Skills CI Gate as Mandatory Post-Creation Check (2026-02-21 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Task #4 — validate:skills CI wiring discovered 177 registration drift errors on first run
+
+**Decision:** `pnpm validate:skills` MUST be run after every skill/agent creation or update as a mandatory post-creation integration check. The script catches catalog/index/agent-file drift before it accumulates. With 177 errors found on first run, this tool surfaced latent ecosystem debt that other checks missed.
+
+**Rationale:**
+
+- 177 errors on first run demonstrates the scale of drift possible without systematic checking
+- CI-gate-ready output means this can be wired into `pnpm metrics:ci` or `pnpm ci` script chains
+- Complements reflection-agent Step 4.7 (post-creation check) with a repeatable CLI baseline
+
+**Implementation:**
+
+1. Script: `.claude/tools/cli/validate-skill-agent-consistency.mjs` (already exists)
+2. pnpm script: `validate:skills` (wired in Task #4)
+3. tool-catalog.md entry: added (Task #4)
+4. Trigger: Run after any creator skill completes OR manually before commits touching .claude/skills or .claude/agents
+
+**Consequences:**
+
+- **Positive**: Drift caught before accumulation; ecosystem health verifiable in CI
+- **Negative**: 177 existing errors require remediation sprint before gate can be enforced in block mode
+
+**Related:**
+
+- Issues.md: 177 Skill/Agent Registration Drift Errors (2026-02-21)
+- Task #4 (2026-02-21)
+
+---
+
+## ADR-2026-02-21-008: Dep Scan Command Canonicalization (SEC-ICE-002) (2026-02-21 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Task #6 — SEC-ICE-002 P1 paper control: canonical dep scan command documented
+
+**Decision:** The canonical dependency vulnerability scan command for this project is `pnpm audit --audit-level=high`. This command is now referenced in `ecosystem-creation-workflow.md` post-creation-validation.md Item 7. All teams must use this exact command when performing dep scans to ensure consistent severity thresholds.
+
+**Rationale:**
+
+- Different audit-level settings produce inconsistent results (critical vs high vs moderate)
+- Canonicalizing the command eliminates ambiguity in security reviews
+- ecosystem-creation-workflow.md is the authoritative lifecycle doc; referencing Item 7 there ensures visibility
+
+**Related:**
+
+- SEC-ICE-002 P1 paper control (dependency scanning gap)
+- Task #6 (2026-02-21)
+
+---
+
+## ADR-2026-02-21-006: CHANGELOG Pre-Commit Hook Enforcement Recommendation (2026-02-21 REFLECTION)
+
+**Status:** PROPOSED
+**Date:** 2026-02-21
+**Trigger:** Batch reflection tasks #19-25 — Task #22 was a standalone CHANGELOG update task
+
+**Observation:** When CHANGELOG update is a separate task (Task #22), it signals that developers do not update it inline with their commits. ADR-2026-02-21-004 mandates CHANGELOG for ALL, but no hook enforces this at commit time.
+
+**Recommendation:** Add lightweight pre-commit hook check: verify CHANGELOG.md [Unreleased] section modified in any commit that includes non-trivial source code changes. If CHANGELOG not updated, emit warning (not block — to preserve developer velocity).
+
+**Pattern evidence:** Task #22 existence proves the gap. A pre-commit warn mode would surface this gap in-flow without blocking.
+
+**Related:** ADR-2026-02-21-004, Task #22 (2026-02-21)
+
+---
+
 ## ADR-2026-02-21-004: Changelog-Mandatory-for-ALL Gate (2026-02-21 REFLECTION DECISION)
 
 **Status:** ACCEPTED
@@ -75,197 +195,6 @@ Status: PENDING Phase 2 review
 
 - Reflection report: `.claude/context/reports/reflections/reflection-smart-debug-lint-2026-02-21.md`
 - Issues.md: smart-debug CLAUDE.md Reference Gap (2026-02-21)
-
----
-
-## ADR-140: Supply Chain Security Gate for Creator Skills (2026-02-20 REFLECTION DECISION)
-
-**Status:** ACCEPTED (security-architect Task #2, 2026-02-20)
-
-**Decision:** All 4 creator/updater skills (skill-creator, skill-updater, agent-creator, agent-updater) that fetch external content MUST execute a mandatory 7-check Security Gate (SEC-EXT-001–007) before incorporating any fetched content.
-
-**Context:**
-
-- STRIDE threat model identified 16 threats against creator lifecycle, including adversarial skill injection via VoltAgent community benchmarks
-- External content fetch step (introduced in skill-updater + agent-updater for VoltAgent prior-art check) creates supply chain attack surface
-- 35 red flag patterns documented across 9 security gaps
-
-**Security Gate Checks (SEC-EXT-001–007)**:
-
-1. **SEC-EXT-001 SIZE CHECK**: Reject content > 50KB (DoS risk)
-2. **SEC-EXT-002 BINARY CHECK**: Reject content with non-UTF-8 bytes
-3. **SEC-EXT-003 TOOL INVOCATION SCAN**: Search for `Bash(`, `Task(`, `Write(`, `Edit(`, `WebFetch(`, `Skill(` outside code examples — FAIL if found in prose
-4. **SEC-EXT-004 PROMPT INJECTION SCAN**: Search for "ignore previous", "you are now", "act as", "disregard instructions", hidden HTML comments — FAIL if found
-5. **SEC-EXT-005 EXFILTRATION SCAN**: Search for curl/wget/fetch to non-github.com domains, `process.env` access + outbound HTTP — FAIL if found
-6. **SEC-EXT-006 PRIVILEGE SCAN**: Search for `CREATOR_GUARD=off`, `settings.json` writes, `CLAUDE.md` modifications — FAIL if found
-7. **SEC-EXT-007 PROVENANCE LOG**: Record `{ source_url, fetch_time, scan_result }` to `.claude/context/runtime/external-fetch-audit.jsonl`
-
-**Policy**: On ANY FAIL — do NOT incorporate content. Log failure reason. Invoke `security-architect` for manual review.
-
-**Enforcement**: Gate content IDENTICAL across all 4 skills. Named control IDs enable audit cross-reference.
-
-**Related:**
-
-- Batch reflection report: `.claude/context/reports/reflections/batch-reflection-2026-02-20-fifth.md`
-- Issues.md: Security Gate Insertion Integration Verification Gap (2026-02-20)
-- `.claude/context/runtime/external-fetch-audit.jsonl` (runtime audit file)
-
----
-
-## ADR-137: Structured Repository Reconnaissance Pattern (2026-02-17)
-
-**Status:** ACCEPTED
-**Decision:** Mandate a tiered reconnaissance pattern (`Map -> Identify -> Fetch`) for all repository ingestion and onboarding tasks, implemented via the `github-ops` skill.
-
-**Context:**
-
-- Repository onboarding tasks often enter "failure loops" where agents guess file paths or attempt to fetch large files blindly.
-- Log analysis (session `d8c6d343`) showed 60+ tool uses wasted on "File does not exist" errors and streaming stalls due to blind fetching.
-- Agents frequently use Linux-style paths (`/c/dev/...`) on Windows, triggering security blocks or tool crashes.
-- High token waste: fetching a 26KB `CHANGELOG.md` when only the version string was needed.
-
-**Decision:**
-
-1. **Mandatory Reconnaissance Phase:** Agents MUST list directory contents using `gh api` before reading specific files.
-2. **Tiered Ingestion:**
-   - Tier 1: List root and core directories (metadata only).
-   - Tier 2: Identify and read entrypoints (`README.md`, `package.json`, `gemini-extension.json`).
-   - Tier 3: Targeted deep dive into logic files based on Tier 2 findings.
-3. **Filtering**: Use `--jq` to filter API responses to minimize context bloat.
-4. **Platform Safety**: Enforce native Windows paths and block Linux-specific constructs in `gh` commands via `github-ops` hooks.
-
-**Consequences:**
-
-**Positive:**
-
-- Eliminates "failure loops" from incorrect file path guesses.
-- Significantly reduces token usage during discovery phase.
-- Improves stability on Windows by enforcing native path patterns.
-- Higher success rate for `artifact-integrator` agent.
-
-**Negative:**
-
-- Requires one extra tool call (`gh api`) before reading files.
-- Agents must be trained/prompted to use the new `github-ops` skill.
-
-**Related:**
-
-- `github-ops` skill bundle
-- `artifact-integrator` specialized agent
-- `user-prompt-unified` Platform Awareness Rule
-
----
-
-## ADR-139: Task Metadata Enforcement via Pre-Completion Hook (2026-02-18)
-
-**Status:** ACCEPTED — CRITICAL P0, MANDATORY IMPLEMENTATION
-
-**Decision:** Implement `pre-completion-validation.cjs` hook to enforce TaskUpdate metadata requirements. Training-based enforcement failed 12+ times on 2026-02-17 alone. Runtime hook-based validation is non-negotiable.
-
-**Context:**
-
-- 12+ task completions on 2026-02-17 without TaskUpdate summary metadata blocked reflection quality assessment
-- 70-line TaskUpdate warning box in spawn templates failed to prevent metadata omissions
-- Agents skip documentation for "small/fast tasks" despite template guidance
-- Router forced to manually update 4+ stuck tasks, stalling enterprise pipeline
-- Reflection agent unable to score outputs or extract patterns without metadata
-- Prior learning (gotchas.json `missing-taskupdate-metadata-recurring`) noted "training-based approaches have failed across 12+ confirmed sessions"
-
-**Decision:**
-
-1. **Create `pre-completion-validation.cjs` hook** (if missing; status TBD)
-   - Validates ALL TaskUpdate(completed) calls contain non-empty metadata.summary
-   - Validates metadata.filesModified is array with ≥1 entry
-   - Blocks completion if metadata missing (exit code 2, fail-closed)
-   - Minimum metadata: `{ summary: "Fixed X in Y.cjs", filesModified: ["path/file"] }`
-
-2. **Register in settings.json PreToolUse(TaskUpdate) chain**
-   - Hook must run BEFORE any other PreToolUse hooks
-   - Must be fail-fast: first non-zero exit halts chain
-   - Configuration: `COMPLETION_METADATA_ENFORCEMENT={warn|block|off}` with **default: block**
-
-3. **Update agent spawn templates**
-   - Add explicit line: "ALWAYS call TaskUpdate(completed) with metadata, even for small tasks"
-   - Change 70-line warning box to include checkbox: "☑️ TaskUpdate called with summary and filesModified"
-   - Example: `{ summary: "Fixed race condition in memory-tiers.cjs", filesModified: [".claude/lib/memory/memory-tiers.cjs"] }`
-
-4. **Prevent silent defaults**
-   - No auto-generated summaries (forces agents to be explicit)
-   - No auto-populated filesModified (requires actual git diff awareness)
-   - If metadata missing, TaskUpdate MUST be retried with explicit fields
-
-**Consequences:**
-
-**Positive:**
-
-- Reflection agent can score ALL task outputs (100% metadata coverage)
-- Router no longer needs manual task status updates
-- Enterprise pipeline never stalls on metadata gaps
-- Pattern extraction enabled for all work
-- Enforcement automatic (no training burden)
-
-**Negative:**
-
-- Agents may initially fail completion attempts when metadata missing
-- Requires hook implementation + settings.json registration
-- May cause brief adoption friction (agents learn new requirement)
-
-**Rationale:**
-
-Training-based enforcement is exhausted (12+ failures on 2026-02-17). Hook enforcement is:
-
-- Deterministic (always enforced)
-- Automated (no training required)
-- Fail-closed (defaults to safety)
-- Reversible (COMPLETION_METADATA_ENFORCEMENT can be set to warn/off if needed)
-
-**Related Artifacts:**
-
-- gotchas.json: `missing-taskupdate-metadata-recurring` (root cause analysis)
-- issues.md: Task Metadata Governance Critical Failure (2026-02-18)
-- Report: `.claude/context/reports/reflections/batch-reflection-2026-02-18.md`
-
----
-
-## ADR-138: Ghost-Task Deduplication in Reflection Queue (2026-02-18)
-
-**Status:** PROPOSED — P1 MEDIUM PRIORITY
-
-**Decision:** Implement ghost-task deduplication in reflection-queue-processor.cjs to prevent duplicate reflection spawns on previously-identified ghost tasks.
-
-**Context:**
-
-- Reflection queue can re-trigger on task IDs previously identified as ghost tasks (gotcha: `ghost-task-reflection-echo`)
-- 2026-02-17 22:23 batch: Task #2 flagged as ghost task in 22:14 batch, then re-triggered in 22:23 batch
-- Pure duplicate spawn with zero diagnostic value; wastes spawn budget and context
-
-**Decision:**
-
-1. **Add deduplication check** in reflection-queue-processor.cjs (or reflection-step0-guard.cjs)
-   - Before spawning reflection-agent for each taskId, check reflection-log.jsonl
-   - If prior entry found with same reflectionId AND status 'ghost_task_detected', suppress spawn
-   - Log deduplication event (informational, not error)
-
-2. **Configuration:** REFLECTION_TASK_VALIDATION={warn|block|off}
-   - warn (default): Log deduplication, allow batch to continue
-   - block: Stop batch processing if duplicate detected
-   - off: No deduplication check
-
-3. **Ghost-Task Definition** (from reflection logs):
-   - TaskId exists but has no meaningful completion context
-   - Task metadata.summary is empty or generic placeholder
-   - No files modified (orphaned task ID)
-
-**Prevention (Future):**
-
-- Add TaskGet validation at queue processing time (reject ghost tasks BEFORE entering spawn queue)
-- Implement REFLECTION_TASK_VALIDATION enforcement mode in queue processor
-- Document ghost-task detection heuristics in `.claude/workflows/core/reflection-workflow.md`
-
-**Related Artifacts:**
-
-- gotchas.json: `ghost-task-reflection-echo` (pattern description)
-- Report: `.claude/context/reports/reflections/batch-reflection-2026-02-18.md`
 
 ---
 
@@ -384,10 +313,6 @@ NO COMPLETION BEFORE INSTRUMENTATION CLEANUP.
 
 - smart-debug SKILL.md v2.0: `.claude/skills/smart-debug/SKILL.md`
 - Reflection report: `.claude/context/reports/reflections/reflection-smart-debug-v2-2026-02-21.md`
-
----
-
-## ADR-131: Enforce TaskUpdate via Hook Rather Than Developer Training (2026-02-16 REFLECTION DECISION)
 
 ---
 

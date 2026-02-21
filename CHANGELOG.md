@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — VoltAgent Research: 7 New Skills and Debug Log Enhancement (2026-02-21)
+
+#### New Skills from VoltAgent research
+
+Seven skills added based on VoltAgent awesome-agent-skills research. Each addresses a confirmed gap in agent quality, observability, or architecture guidance.
+
+- `agent-evaluation` — LLM-as-judge rubric covering five dimensions: accuracy, groundedness, coherence, completeness, and helpfulness. Assigned to: `qa`, `code-reviewer`, `reflection-agent`.
+- `context-degradation` — Token severity zones Green/Yellow/Orange/Red/Critical with early-warning indicators and corrective routing before context collapse. Assigned to: `context-compressor`, `planner`, `router`.
+- `property-based-testing` — `fast-check` patterns for JS/TS with six canonical property categories and agent-studio-specific examples. Assigned to: `qa`, `developer`.
+- `multi-agent-architecture-reference` — Six-topology decision matrix (Supervisor/Swarm/Hierarchical/Conductor/Fan-out/Consensus) with token economics and failure modes. Assigned to: `architect`, `planner`, `master-orchestrator`.
+- `agent-tool-design` — The Agent Tool Contract: five principles plus an eight-entry anti-pattern table for tool authors. Assigned to: `developer`, `tool-creator`, `architect`.
+- `sharp-edges` — Living catalogue of confirmed hazards SE-01 through SE-07: backslash paths on Windows, prototype pollution, hook exit codes, async exception swallowing, ReDoS, DST arithmetic, and array mutation. Assigned to: `developer`, `code-reviewer`, `qa`, `security-architect`.
+- `debug-log-analysis` — Structured debug log workflow: copy, reduce, categorize, cross-reference, report. Documents five known observability gaps with workarounds. Assigned to: `reflection-agent`, `devops-troubleshooter`, `developer`.
+
+#### `scripts/reduce-debug-log.mjs` — Enhanced
+
+- **Auto-detect mode**: when called with no arguments, finds the most recent `~/.claude/debug/*.txt` file by modification time.
+- **Auto-copy**: copies the selected file to `.tmp/<session-id>.txt` in the project root before reducing.
+- **Default output**: `.tmp/<session-id>-reduced.txt`.
+- **New pnpm script**: `pnpm debug:reduce` (zero-argument shortcut for auto-detect mode).
+- Backward compatible: explicit path argument still works as before.
+
+#### Process fix: reflection atomic handshake root cause documented
+
+Root cause identified for reflection cleanup failures: background reflection agents spawned without a `task_id` cannot trigger the atomic handshake cleanup. Fix: reflection spawns must use `TaskCreate` first, capture the returned ID, then pass it to the spawn prompt.
+
 ### Added
 
 - `path-constants.cjs` — New utility at `.claude/lib/utils/path-constants.cjs` centralizing all framework path constants; includes property-based and unit tests
