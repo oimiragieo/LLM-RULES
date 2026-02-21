@@ -17,6 +17,12 @@ const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const {
+  CATALOG_PATH,
+  AGENT_REGISTRY_PATH,
+  INTEGRATION_QUEUE_PATH,
+  SKILLS_DIR,
+} = require('../utils/path-constants.cjs');
 
 // Schema file mapping: artifactType -> schema filename
 const SCHEMA_MAP = {
@@ -144,9 +150,7 @@ function updateCatalog(catalogPath, entry) {
  * @returns {{ success: boolean, error?: string }}
  */
 function queueCrossCreatorReview(artifactType, artifactPath, options = {}) {
-  const queuePath =
-    options.queuePath ||
-    path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'integration-queue.jsonl');
+  const queuePath = options.queuePath || INTEGRATION_QUEUE_PATH;
 
   const entry = {
     artifactType,
@@ -364,9 +368,7 @@ function enhancedIntegrationChecklist(artifactType, artifactPath, options = {}) 
 
   // Catalog entry check (for skills)
   if (artifactType === 'skill' && artifactName) {
-    const catalogPath =
-      options.catalogPath ||
-      path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'catalogs', 'skill-catalog.md');
+    const catalogPath = options.catalogPath || CATALOG_PATH;
 
     if (fs.existsSync(catalogPath)) {
       try {
@@ -388,8 +390,7 @@ function enhancedIntegrationChecklist(artifactType, artifactPath, options = {}) 
 
   // Agent-registry check (for agent artifacts)
   if (artifactType === 'agent' && artifactName) {
-    const registryPath =
-      options.registryPath || path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+    const registryPath = options.registryPath || AGENT_REGISTRY_PATH;
 
     if (fs.existsSync(registryPath)) {
       try {
@@ -455,7 +456,7 @@ function verifySkillCreation(skillName, options = {}) {
   }
 
   // Check 2: SKILL.md exists
-  const skillsDir = options.skillsDir || path.join(PROJECT_ROOT, '.claude', 'skills');
+  const skillsDir = options.skillsDir || SKILLS_DIR;
   const skillDir = path.join(skillsDir, skillName);
   const skillMdPath = path.join(skillDir, 'SKILL.md');
 
@@ -479,9 +480,7 @@ function verifySkillCreation(skillName, options = {}) {
   }
 
   // Check 3: Skill catalog entry
-  const catalogPath =
-    options.catalogPath ||
-    path.join(PROJECT_ROOT, '.claude', 'context', 'artifacts', 'catalogs', 'skill-catalog.md');
+  const catalogPath = options.catalogPath || CATALOG_PATH;
 
   if (fs.existsSync(catalogPath)) {
     try {
@@ -512,8 +511,7 @@ function verifySkillCreation(skillName, options = {}) {
   }
 
   // Check 5: Agent assignment
-  const registryPath =
-    options.registryPath || path.join(PROJECT_ROOT, '.claude', 'context', 'agent-registry.json');
+  const registryPath = options.registryPath || AGENT_REGISTRY_PATH;
 
   if (fs.existsSync(registryPath)) {
     try {

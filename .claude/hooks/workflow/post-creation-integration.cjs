@@ -32,17 +32,10 @@ const {
 } = require('../../lib/utils/hook-input.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { DEFAULT_ARTIFACT_GRAPH_PATH } = require('../../lib/workflow/artifact-graph.cjs');
+const { INTEGRATION_QUEUE_PATH } = require('../../lib/utils/path-constants.cjs');
 
-// Resolve project root
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const GRAPH_PATH = DEFAULT_ARTIFACT_GRAPH_PATH;
-const QUEUE_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'runtime',
-  'integration-queue.jsonl'
-);
+const QUEUE_PATH = INTEGRATION_QUEUE_PATH;
 const MAX_QUEUE_LINES = 500;
 const MAX_QUEUE_ENTRY_BYTES = 10 * 1024; // 10KB per JSONL line
 const ENFORCEMENT_MODE = process.env.INTEGRATION_ENFORCEMENT || 'warn';
