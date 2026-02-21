@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MultiAgentArchitectureReferenceInput",
+  "description": "Input schema for multi-agent-architecture-reference skill",
+  "type": "object",
+  "properties": {
+    "taskDescription": {
+      "type": "string",
+      "description": "Description of the task or project requiring multi-agent orchestration"
+    },
+    "complexity": {
+      "type": "string",
+      "enum": ["TRIVIAL", "LOW", "MEDIUM", "HIGH", "EPIC"],
+      "description": "Complexity level of the task (if known)"
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "tokenBudget": {
+          "type": "string",
+          "description": "Token budget constraint (e.g., 'minimal', 'standard', 'unlimited')"
+        },
+        "faultTolerance": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "description": "Required fault tolerance level"
+        },
+        "orderingRequired": {
+          "type": "boolean",
+          "description": "Whether sequential ordering of results is required"
+        }
+      }
+    },
+    "preferredTopology": {
+      "type": "string",
+      "enum": ["conductor", "supervisor", "fan-out", "swarm", "consensus", "hierarchical"],
+      "description": "Preferred topology if already known"
+    }
+  }
+}

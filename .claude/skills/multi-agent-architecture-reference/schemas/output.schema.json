@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MultiAgentArchitectureReferenceOutput",
+  "description": "Output schema for multi-agent-architecture-reference skill",
+  "type": "object",
+  "required": ["recommendedTopology", "tokenCost", "rationale"],
+  "properties": {
+    "recommendedTopology": {
+      "type": "string",
+      "enum": ["conductor", "supervisor", "fan-out", "swarm", "consensus", "hierarchical"],
+      "description": "Recommended topology for the task"
+    },
+    "tokenCost": {
+      "type": "string",
+      "description": "Estimated token cost multiplier relative to single-agent baseline (e.g., '~6x')"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Explanation for the topology recommendation"
+    },
+    "failureModesToWatch": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SE-M0[1-5]$"
+      },
+      "description": "Failure mode codes relevant to this topology selection"
+    },
+    "existingSkill": {
+      "type": "string",
+      "description": "Existing agent-studio skill or pattern to use for this topology"
+    },
+    "escalationPath": {
+      "type": "string",
+      "description": "Next topology to consider if this one proves insufficient"
+    },
+    "alternativeTopologies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Alternative topologies considered and why they were not recommended"
+    }
+  }
+}
