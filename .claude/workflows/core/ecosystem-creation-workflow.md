@@ -157,7 +157,7 @@ Missing companions queued to `.claude/context/runtime/integration-queue.jsonl`:
 
 **Auto-Spawn Suggestions (SEC-ICE-002 controls):**
 
-- **Depth Limit:** 2 (prevents infinite recursion)
+- **Depth Limit:** 5 via distributed trace context header (`spawnDepth` in task metadata, enforced by `routing-guard.cjs`)
 - **Per-Event Cap:** 5 (prevents amplification attacks)
 - **Cycle Detection:** Track DAG of spawns, block if cycle detected
 - **Kill Switch:** `AUTO_SPAWN_COMPANIONS=off` disables all auto-spawning
@@ -167,10 +167,12 @@ Missing companions queued to `.claude/context/runtime/integration-queue.jsonl`:
 If must-have companion missing and auto-spawn enabled:
 
 1. Generate companion creation task
-2. Check depth limit (current depth < 2)
-3. Check per-event cap (spawns this event < 5)
-4. Check cycle detection (no circular dependencies)
-5. Spawn companion creator if all checks pass
+2. Read parent task metadata to extract `spawnDepth` and `traceId` (via TaskGet)
+3. Check depth limit (`spawnDepth < 5`)
+4. Check per-event cap (spawns this event < 5)
+5. Check cycle detection (no circular dependencies)
+6. Set `spawnDepth: parentDepth + 1` and pass `traceId` in new task metadata
+7. Spawn companion creator if all checks pass
 
 **Manual Review for Recommended/Optional:**
 
@@ -207,34 +209,67 @@ hook-creator → settings.json update → schema-creator (ALLOWED - no cycle)
 
 ### SEC-ICE-002: Auto-Spawn Amplification Limits
 
-**Threat:** Recursive companion spawning creates exponential agent proliferation.
+**Problem**: Local variable tracking of spawn depth breaks across distributed agent nodes — each node starts its own counter, allowing unbounded recursive spawning.
 
-**Protection:**
+**Solution**: Track spawn depth via a **distributed trace context header** in task metadata.
 
-1. **Depth Limit:** Maximum 2 levels of auto-spawn (creator → companion → stop)
-2. **Per-Event Cap:** Maximum 5 auto-spawns per creation event
-3. **Cycle Detection:** DAG tracking prevents circular companion creation
-4. **Kill Switch:** `AUTO_SPAWN_COMPANIONS=off` environment variable disables all auto-spawning
+**Protocol**:
+
+1. Root orchestrator sets `spawnDepth: 0` and `traceId: <uuid>` in its TaskUpdate metadata when starting
+2. Each spawned agent MUST read its parent task's metadata to extract `spawnDepth` and `traceId`
+3. Each spawned agent increments `spawnDepth` by 1 before spawning its own children
+4. **Hard limit**: If `spawnDepth >= 5`, the agent MUST NOT spawn further sub-agents — log the limit hit to `.claude/context/runtime/spawn-trace-{traceId}.jsonl` and return with partial results
+5. Spawned agents pass `{ spawnDepth: parentDepth + 1, traceId }` in their TaskUpdate metadata so their children can read it
+
+**Enforcement**: `routing-guard.cjs` reads `spawnDepth` from parent task metadata (via TaskGet) before allowing Task() calls. If depth >= 5, blocks spawn with error.
+
+**Trace log format** (`.claude/context/runtime/spawn-trace-{traceId}.jsonl`):
+
+```json
+{
+  "traceId": "abc123",
+  "depth": 3,
+  "agentType": "developer",
+  "taskId": "15",
+  "parentTaskId": "12",
+  "timestamp": "2026-02-21T..."
+}
+```
+
+**Why distributed header > local variable**:
+
+- Survives context resets and agent restarts
+- Visible to enforcement hooks via TaskGet
+- Provides audit trail for spawn trees
+- Works across parallel agent groups
+
+**Additional safeguards (unchanged)**:
+
+- **Per-Event Cap:** Maximum 5 auto-spawns per creation event
+- **Cycle Detection:** DAG tracking prevents circular companion creation
+- **Kill Switch:** `AUTO_SPAWN_COMPANIONS=off` environment variable disables all auto-spawning
 
 **Example Attack (Blocked):**
 
 ```
 User creates skill A
-  → Auto-spawns agent B (depth 1)
-    → Auto-spawns skill C (depth 2)
-      → Would auto-spawn agent D (BLOCKED - depth limit 2)
+  → Auto-spawns agent B (spawnDepth=1)
+    → Auto-spawns skill C (spawnDepth=2)
+      → Auto-spawns agent D (spawnDepth=3)
+        → Auto-spawns skill E (spawnDepth=4)
+          → Would auto-spawn agent F (BLOCKED - spawnDepth >= 5, logged to spawn-trace-{traceId}.jsonl)
 ```
 
 **Example Normal Use (Allowed):**
 
 ```
-User creates skill A
-  → Auto-spawns catalog entry (depth 1, companion 1)
-  → Auto-spawns agent assignment (depth 1, companion 2)
+User creates skill A (spawnDepth=0, traceId=abc123)
+  → Auto-spawns catalog entry (spawnDepth=1, companion 1)
+  → Auto-spawns agent assignment (spawnDepth=1, companion 2)
   → Manual review for remaining companions
 ```
 
-**Enforcement:** companion-check.cjs enforces limits before spawning. Kill switch checked first (fail-safe).
+**Enforcement:** `routing-guard.cjs` reads `spawnDepth` from parent task metadata via TaskGet before each Task() call. Kill switch checked first (fail-safe). companion-check.cjs enforces per-event cap and cycle detection.
 
 **Test Coverage:** 6 tests covering kill switch, depth limit, per-event cap, cycle detection.
 

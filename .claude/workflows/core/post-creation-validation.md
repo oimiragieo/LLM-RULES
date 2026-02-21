@@ -170,6 +170,31 @@ npm test -- --grep "<artifact-name>"
 - Tests written but not run before completion
 - Tests passing locally but not in CI
 
+#### Item 7 (Addition): Dependency Vulnerability Scan
+
+**Trigger**: Any artifact that imports or requires external libraries (npm packages, pip packages, cargo crates, etc.)
+
+**Required scan**: Before marking the artifact complete, run a dependency vulnerability scan:
+
+```bash
+# For npm/Node.js artifacts
+pnpm audit --audit-level=high
+
+# For Python artifacts
+pip audit --vulnerability-service pypi
+
+# For Rust artifacts
+cargo audit
+```
+
+**Block condition**: Artifact MUST NOT be considered complete if the scan reports any **HIGH** or **CRITICAL** severity CVE via an imported dependency.
+
+**Pass condition**: Either (a) scan returns 0 high/critical vulnerabilities, OR (b) vulnerable dependency has been replaced with a safe alternative, OR (c) a documented risk acceptance exists in `.claude/context/memory/decisions.md` with explicit human approval.
+
+**Exception**: Pure markdown/documentation artifacts with no code imports are exempt.
+
+**Log**: Record scan results in artifact's post-creation report. Include CVE IDs if any found.
+
 #### Item 8: Documentation Complete
 
 **Applies to:** All artifacts
