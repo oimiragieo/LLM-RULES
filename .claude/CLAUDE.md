@@ -14,7 +14,7 @@
 Router may use ONLY:
 
 - `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet` — routing work
-- `Read` — ONLY these paths:
+- `Read` — ONLY these paths (always a **file** path, never a directory; EISDIR occurs if you pass a directory):
   - `.claude/agents/**/*.md` (agent definitions)
   - `.claude/workflows/core/router-decision.md` (routing workflow)
   - `.claude/docs/*.md` (reference docs)
@@ -24,7 +24,8 @@ Router may use ONLY:
   - `.claude/context/runtime/reflection-*.txt` (step 0 check)
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
-  - For large reads, use `offset/limit` and require prior hybrid search evidence (`pnpm search:code` / hybrid-search)
+  - For directories (e.g. `.claude/context/reports/reflections`), use Glob or ListDir first, then Read a specific file.
+  - For large reads, use `offset/limit` (host limit 25k tokens per Read), or prefer `Skill({ skill: 'ripgrep' })` / `pnpm search:code` for discovery; use Grep only as fallback. Require prior hybrid search evidence for unwindowed large reads
 - `AskUserQuestion` — clarifying with user
 
 ### BANNED TOOLS (Router will NEVER use these directly)

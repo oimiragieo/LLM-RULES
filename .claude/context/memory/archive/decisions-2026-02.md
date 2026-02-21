@@ -977,3 +977,329 @@ async function recordLearning(text, source = 'user') {
 
 - Architecture Audit 2026-02-16: Finding C3
 - Architecture Audit 2026-02-16: BACKWARD_PROPAGATION (schema:runtime-state-unified)
+
+---
+
+## ADR-128: Audit Trail Implementation Cycle Pattern (2026-02-20)
+
+**Status**: PROPOSED (validated by Tasks 31-35)
+
+**Pattern**: 4-step cycle for implementing audit trail and security enforcement features:
+
+1. **BUG IDENTIFICATION** (Task 32): Trace root cause with evidence (1117 events, no records)
+2. **CODE IMPLEMENTATION** (Task 33): Wire instrumentation before exit points (emitBlockVerdict → exit)
+3. **DOCUMENTATION** (Task 34): Update governance docs (ENFORCEMENT_HOOKS.md Section 19)
+4. **E2E TESTING** (Task 35): Validate integration with RED phase (failure mode) before GREEN (success)
+
+**Evidence**: Tasks 32-35 demonstrate complete cycle validating this pattern. Skipping any step creates gaps.
+
+**Decision**: Use this 4-step cycle as template for ALL enforcement work going forward.
+
+**Application**: Audit trail closures, security boundary implementations, all future hook instrumentation.
+
+**Related**: Reflection batch 31-37 (2026-02-20)
+
+---
+
+## ADR-129: Bypass Permissions Mode Semantics Clarification (2026-02-20)
+
+**Status**: PROPOSED (identified in Task 32, BUG-4)
+
+**Finding**: `bypassPermissions=true` mode executes enforcement hooks but silently fails on writes, creating false confidence that enforcement is active when it is actually disabled.
+
+**Security Risk**: Operators may believe enforcement is in effect when it is completely bypassed at the write layer.
+
+**Decision**:
+
+1. Document explicitly in rules/security.md that bypassPermissions mode disables write enforcement (not hook execution)
+2. Add logs when write enforcement is bypassed
+3. Consider renaming to `dryRunMode` or `auditOnlyMode` to clarify intent
+4. Never allow write suppression without explicit operator visibility
+
+**Application**: Never again allow silent write suppression. All bypass modes must be explicitly logged and documented.
+
+**Related**: Task 32 BUG-4, Reflection batch 31-37 (2026-02-20)
+
+---
+
+## ADR-137: Skill Lifecycle verified Flag and Verified Timestamp (2026-02-20)
+
+**Status:** ACCEPTED
+**Decision:** Set `verified: true` and `lastVerifiedAt: <ISO-8601>` in skill frontmatter only after implementation is complete, tools/schemas are wired, and the skill is integrated into the ecosystem.
+
+**Context:**
+
+- smart-debug v2.0 implementation (Tasks 1-3, 2026-02-20) needed clear signal of implementation maturity
+- skill-updater workflow uses `lastVerifiedAt` to detect stale skills (>6 months without update)
+- Current framework lacks standardized maturity indicator for skills
+
+**Decision:**
+
+1. **verified: true** signals: (a) all new capabilities fully implemented, (b) tool/schema updates applied, (c) skill is discoverable in catalog, (d) at least one agent assigned, (e) skill-index.json regenerated
+2. **lastVerifiedAt: <ISO-8601>** records timestamp when verification completed
+3. skill-updater monitors lastVerifiedAt > 6 months to identify stale guidance candidates
+4. Timestamp enables trend analysis of skill update frequency
+
+**Implementation:**
+
+```yaml
+---
+verified: true
+lastVerifiedAt: 2026-02-20T23:59:04.548Z
+
+---
+```
+
+**Benefits:**
+
+- Prevents skills from silently degrading over time
+- Enables system-wide skill health audits
+- Signals implementation completion to auditing systems
+
+---
+
+## ADR-137: Sequential Skill-Update Workflow Pattern for Major Versions (2026-02-21)
+
+**Status:** ESTABLISHED
+**Decision:** For skill updates with 5+ capability additions or major behavior changes (v1.x → v2.0), use sequential workflow: Research → Implementation → Integration → Configuration. Each phase gates the next, preventing rework and ensuring dependencies are satisfied.
+
+**Context:**
+
+- Evidence from smart-debug skill v2.0 update (Tasks 1–4, 2026-02-20)
+- Research phase (Task 1) identified 7 capability gaps + Cursor Debug Mode methodology
+- Implementation phase (Task 2) added capabilities, set verified flag, regenerated indexes
+- Integration phase (Task 3) added catalog entry, assigned to 3 agents, validated cross-refs
+- Configuration phase (Task 4) added env vars with thoughtful defaults (SMART_DEBUG_HITL=false)
+- All phases completed efficiently with zero rework
+
+**Pattern Benefits:**
+
+- Prevents out-of-order work (can't integrate before implementation)
+- Clear phase ownership (researcher, developer, integrator, config specialist)
+- Dependencies satisfied before downstream phases
+- Higher quality outcomes (less rework)
+
+**Applicability:** Use for any skill/workflow/agent update with major version bumps (5+ features added). Not needed for minor updates (documentation, wording only).
+
+---
+
+## ADR-136: safeParseJSON Migration and ESLint Enforcement (2026-02-16)
+
+**Status:** ACCEPTED
+**Decision:** Migrate all `JSON.parse()` calls in hook files to `safeParseJSON()` utility and add ESLint rule to prevent future unsafe usage.
+
+**Context:**
+
+- Security report (2026-02-16) documented JSON parsing safety as existing control (SEC-LIB-001 standard)
+- Code reviewer (Wave 1) identified 68+ JSON.parse issues in codebase
+- Risk:
+  - Invalid JSON in hook input crashes entire hook process
+  - Prototype pollution attacks via `__proto__`, `constructor`, `prototype` keys
+  - Malicious JSON: `{ "__proto__": { isAdmin: true } }` could escalate privileges
+- `safeParseJSON` provides:
+  - Try-catch wrapping (prevents crash)
+  - Prototype pollution protection
+  - Structured return `{ success, data, error }`
+  - Optional fallback value
+
+**Decision:**
+
+1. **Immediate (included in security hardening):**
+   - Audit all hook files for `JSON.parse()` calls
+   - Migrate to `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs`
+   - Test error handling paths
+
+2. **Short-term (1 week):**
+   - Add ESLint rule: `no-restricted-syntax` to block `JSON.parse()` in hook files
+   - Configure rule in `.eslintrc.cjs`:
+     ```javascript
+     'no-restricted-syntax': [
+       'error',
+       {
+         selector: 'CallExpression[callee.object.name="JSON"][callee.property.name="parse"]',
+         message: 'Use safeParseJSON() instead of JSON.parse() in hook files for safety'
+       }
+     ]
+     ```
+
+3. **Documentation:**
+   - Update `.claude/rules/security.md` with safeParseJSON usage
+   - Add examples to security documentation
+
+**Implementation:**
+
+```javascript
+// BEFORE (unsafe):
+const data = JSON.parse(hookInput);
+
+// AFTER (safe):
+const { safeParseJSON } = require('.claude/lib/utils/safe-json.cjs');
+const { success, data, error } = safeParseJSON(hookInput, {});
+if (!success) {
+  console.error('Parse error:', error);
+  return {};
+}
+```
+
+**Consequences:**
+
+**Positive:**
+
+- Hook reliability improved (no crashes on malformed JSON)
+- Prototype pollution attacks blocked
+- Audit trail for parse errors
+- ESLint enforcement prevents regressions
+
+**Negative:**
+
+- Slightly more verbose code (~3 lines vs 1)
+- Existing code requires migration (68+ sites)
+
+**Related:**
+
+- Security Report 2026-02-16: JSON Parsing Safety (existing control validated)
+- Code Review Wave 1: 68+ JSON.parse findings
+- `.claude/lib/utils/safe-json.cjs`: Implementation
+- `.claude/rules/security.md`: JSON Parsing Safety section
+
+---
+
+## ADR-132: Sequential Remediation for Convergent Audit Findings (2026-02-16 REFLECTION DECISION)
+
+**Status:** ACCEPTED (Phase 0 Reflection, Task #5)
+**Decision:** When multiple independent audits converge on the same issue, remediate sequentially (not parallel) to avoid merge conflicts in shared files.
+
+**Rationale:**
+
+- Evidence: Dead hooks (P0.1) blocks other work; must clean settings.json registry before adding tests
+- Parallel work causes merge conflicts in central config files (settings.json, agent-registry.json)
+- Sequential ordering enables dependency resolution (e.g., clean hooks → add hook tests → validate)
+- Trade-off: Slower timeline but lower risk of rework
+
+**Implementation:**
+
+- Week 1: Clean dead hooks from settings.json (1 hour)
+- Week 2: Add integration tests for routing/state/cycle (3.5 days)
+- Week 3: Harden security (memory validation + JSON.parse migration, 3 weeks)
+
+**Pattern:** Convergent audit findings signal systemic issues → prioritize P0 cleanup before adding tests/features.
+
+**Evidence:** 4-wave analysis (architect, security, qa, qa) identified 17 findings with 3-way convergence on dead hooks, JSON.parse, and routing gaps.
+
+---
+
+## ADR-133: Integration Tests Before Feature Work (2026-02-16 REFLECTION DECISION)
+
+**Status:** ACCEPTED (Phase 0 Reflection, Task #5)
+**Decision:** Block all feature work until 6 P0 integration test gaps are closed (routing Check 7, task state machine, cycle detection).
+
+**Rationale:**
+
+- Evidence: 100% test pass rate (211/211) masks critical coverage gaps in routing logic, state machine, cycle detection
+- Impact: Gaps could corrupt workflows under load (tasks stuck, infinite loops, specialist misrouting)
+- "Test later" approach failed (memory shows 3 late-discovered bugs in previous pipeline)
+- Deployment blockers take precedence over feature velocity
+
+**Implementation:**
+
+- Block all feature PRs until P0 tests pass
+- QA must validate routing-guard Check 7 (20 tests), task-lifecycle-state (15 tests), cycle-detector (10 tests)
+- Timeline: 3.5 days to close all P0 gaps
+
+**Pattern:** High test pass rate ≠ comprehensive coverage → use audit findings as coverage proxy, not just pass rate.
+
+---
+
+## ADR: Post-Session Skill Validation Harness (2026-02-21)
+
+Status: Implemented
+Decision: Dual-component validation approach — CLI tool for CI (validate-skill-agent-consistency.mjs) + reflection-agent Step 4.7 for runtime detection.
+Rationale: Smart-debug audit revealed catalog/index/agent-file can drift silently. CLI tool catches drift in CI; reflection-agent catches it post-creation.
+Impact: .claude/tools/cli/validate-skill-agent-consistency.mjs, .claude/agents/core/reflection-agent.md
+
+---
+
+## ADR-137: Enterprise Bundle Generation Multi-Gate Approval (2026-02-19 REFLECTION DECISION)
+
+**Status:** PROPOSED (Task #12 reflection analysis)
+
+**Decision:** Enterprise bundle generation (Plan Phase 2 execution) requires three sequential approval gates before proceeding past Phase 0.
+
+**Context:**
+
+- Task #12 plan proposes generating domain-specific bundle files for ~177 skills
+- Phase 2 execution (150+ skills × 8 files = 1,200+ file writes, 3-4M tokens, ~$240+ cost)
+- Multiple risk vectors identified during plan review:
+  1. Token cost unvalidated against budget
+  2. Stub detection false negatives (legitimate stub-like files may be incorrectly flagged for replacement)
+  3. LLM generation prompts unspecified (hallucination risk for domain specificity)
+  4. Protected skills governance at wrong layer (protection in QA phase, not generation phase)
+
+**Decision:**
+
+**Gate 1: Inventory Approval (BLOCKING Phase 1)**
+
+- Phase 0 completes stub inventory enumeration
+- Output: `.claude/context/artifacts/analysis/skill-bundle-inventory-2026-02-19.json` with all detected stubs and tier classification
+- **Manual review required:** Router/Planner reviews inventory, approves scope, documents approval in commit message
+- Approval form: "Reviewed {N} stub files for replacement. Approved {M} for replacement. Deferred {K} for manual review."
+
+**Gate 2: Cost and LLM Specification Validation (BLOCKING Phase 2)**
+
+- Phase 1 research completes
+- Phase 2 LLM generation prompts written for each file type (input schema, output schema, hooks, commands, templates, scripts)
+- Prompts validated on 3-5 test skills (language experts: rust-expert, go-expert, typescript-expert)
+- **Validation criteria:** Generated files are domain-specific (not generic stubs with domain-sounding language), pass JSON validation, pass node --check for .cjs files
+- Cost re-estimated based on Phase 0 + Phase 1 actual usage
+- **Approval required:** Developer reports test results + cost estimate. Proceeds only if test quality meets gold standard (TDD example).
+
+**Gate 3: Protected Skills Enforcement (BLOCKING Phase 2)**
+
+- Hardcode protected skills list (ai-ml-expert, android-expert, rust-expert, accessibility, + any others identified in Phase 0)
+- Generation script fails-closed on attempts to write protected non-stub files
+- **Validation:** QA verifies script enforcement via code review + test case (attempt to replace protected file → script rejects with error)
+
+**Gate 4: Wave Quality Threshold (WITHIN Phase 2)**
+
+- After each wave completes validation: if >10% of generation targets fail specificity/syntax checks, pause pipeline
+- Report findings to planner; requires decision to (a) revise LLM prompts and retry, (b) defer problematic skills to manual review, or (c) proceed with documented exceptions
+
+**Rationale:**
+
+- Phase 0 approval prevents executing against incorrect inventory
+- Cost + LLM validation prevent expensive mistakes (token overspend, hallucination)
+- Protected skills enforcement prevents data loss
+- Wave quality thresholds enable early course correction
+
+**Consequences:**
+
+**Positive:**
+
+- Reduces risk of 1,200+ file writes on incorrect/speculative inventory
+- Forces LLM prompt specification before generation (quality assurance)
+- Cost visibility enables budget discussion upfront
+- Protected skills governance is fail-closed
+
+**Negative:**
+
+- Adds 3-4 days to Phase 2 timeline for approval/validation cycles
+- Requires manual review touchpoints (not fully automated)
+
+**Acceptance Criteria:**
+
+- [ ] Phase 0 inventory JSON complete
+- [ ] Manual approval documented for stub replacement scope
+- [ ] Cost estimated and logged
+- [ ] LLM generation prompts written for all 8 file types
+- [ ] Test generation validated on 3+ test skills (gold standard quality confirmed)
+- [ ] Protected skills hardcoded in generation script
+- [ ] QA verifies protection enforcement via code review
+- [ ] All gates satisfied before Phase 1 begins
+
+**Related:**
+
+- Task #12 Reflection Analysis (2026-02-19)
+- Enterprise Bundle Generation Plan (`.claude/context/plans/enterprise-bundle-gen-plan-2026-02-19.md`)
+- Issues.md: Enterprise Bundle Generation Plan Risks (2026-02-19)
+
+**Evidence:** QA report documented 6 critical gaps despite 100% test pass rate; architect and security independently flagged routing-guard untested.

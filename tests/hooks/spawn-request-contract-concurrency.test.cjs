@@ -242,8 +242,24 @@ describe('spawn-request-contract concurrency safety', () => {
     const NOW = new Date().toISOString();
 
     writeRequests(filePath, [
-      makeSpawnRequest('stale-req', { source: { trigger: 'test', timestamp: TWO_HOURS_AGO, taskId: null, context: null, priority: 'medium' } }),
-      makeSpawnRequest('fresh-req', { source: { trigger: 'test', timestamp: NOW, taskId: null, context: null, priority: 'medium' } }),
+      makeSpawnRequest('stale-req', {
+        source: {
+          trigger: 'test',
+          timestamp: TWO_HOURS_AGO,
+          taskId: null,
+          context: null,
+          priority: 'medium',
+        },
+      }),
+      makeSpawnRequest('fresh-req', {
+        source: {
+          trigger: 'test',
+          timestamp: NOW,
+          taskId: null,
+          context: null,
+          priority: 'medium',
+        },
+      }),
     ]);
 
     const removed = removeStaleRequests(filePath, ONE_HOUR_MS);

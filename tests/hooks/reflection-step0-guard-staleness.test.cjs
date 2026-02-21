@@ -115,9 +115,7 @@ Module._load = function(request, parent, isMain) {
 test('staleness pruning: stale entries older than MAX_REFLECTION_AGE_HOURS are pruned and not enforced', () => {
   const maxAgeHours = 1;
   // Create entries with source.timestamp that is clearly stale (maxAgeHours+2 hours ago)
-  const staleTimestamp = new Date(
-    Date.now() - (maxAgeHours + 2) * 60 * 60 * 1000
-  ).toISOString();
+  const staleTimestamp = new Date(Date.now() - (maxAgeHours + 2) * 60 * 60 * 1000).toISOString();
 
   const staleEntries = [
     makeEntry('stale-req-1', staleTimestamp),

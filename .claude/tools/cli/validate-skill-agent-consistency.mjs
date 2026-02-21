@@ -367,10 +367,9 @@ function checkAgentFileVsIndex(agentToSkills, indexMap, skillFilter) {
       const indexEntry = indexMap.get(skill);
       if (!indexEntry) continue; // will be caught by ghost-skill check
 
-      const allIndexAgents = [
-        ...indexEntry.agentPrimary,
-        ...indexEntry.agentSupporting,
-      ].map(normaliseAgent);
+      const allIndexAgents = [...indexEntry.agentPrimary, ...indexEntry.agentSupporting].map(
+        normaliseAgent
+      );
 
       if (!allIndexAgents.includes(normaliseAgent(agentName))) {
         findings.push({

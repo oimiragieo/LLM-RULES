@@ -316,6 +316,24 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
     return { pass: true };
   }
 
+  // Step 0 deadlock fix: allow Task(reflection-agent) before TaskList() so Router can
+  // process pending reflections; otherwise tasklist-first blocks Task() while
+  // reflection-step0-guard blocks TaskList(), causing a 5-turn deadlock.
+  const toolInput =
+    hookInput?.tool_input || hookInput?.input || hookInput?.parameters || hookInput || {};
+  const subagentType = String(toolInput.subagent_type || toolInput.agent_type || '')
+    .trim()
+    .toLowerCase();
+  if (toolName === 'Task' && subagentType === 'reflection-agent') {
+    return {
+      pass: true,
+      result: 'warn',
+      message:
+        '[TASKLIST-FIRST STEP0 EXEMPTION] Allowing Task(reflection-agent) before TaskList() to process pending reflections. ' +
+        'After spawning reflection-agent(s), call TaskList() then continue routing.',
+    };
+  }
+
   const state = getCachedRouterState();
   if (state.taskListCalledSincePrompt) {
     return { pass: true };

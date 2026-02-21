@@ -1,120 +1,94 @@
-## 2026-02-20: Session Review #2 — New Bugs Found (Task #13)
+## 2026-02-21: debugging + smart-debug Skills Absent from artifact-graph.json (P2)
 
-**P1: spawn-request-contract.cjs TOCTOU race** — `acknowledgeRequests()` and `removeRequests()` read file WITHOUT lock, then write WITH lock. Two simultaneous completions cause lost updates. Fix: wrap read-modify-write in single lock.
+**Status**: OPEN
+**Severity**: LOW-MEDIUM (skills are discoverable via skill-catalog.md and developer.md, but not tracked in dependency graph)
 
-**P1: _MAX_REFLECTION_AGE_HOURS unused in reflection-step0-guard.cjs** — Variable defined at line 59 but never referenced in main(). Staleness pruning effectively disabled. Fix: call `removeStaleRequests()` in main() before enforcement.
+**Issue**: Neither `skill:debugging` nor `skill:smart-debug` have nodes in `.claude/context/data/artifact-graph.json`. Both skills were updated as part of Phase 1 skill wiring (Tasks 7-8, 2026-02-21).
 
-**P1: Hook blocks not enforced in bypassPermissions mode** — 51 ROUTER WRITE BLOCKED events logged but files written anyway. The permission mode nullifies hook enforcement. Document this trade-off prominently.
+**Impact**:
 
-**P1: Agent output files growing (617KB peak)** — Agents producing 400-617KB report files that exceed FileTooLargeError (256KB) and MaxFileReadToken (25K) limits. Need output-size validator hook.
+- Integration health checks (ADR-100) cannot report status for these two core skills
+- artifact-integrator cannot detect missing companions or compute integration scores
+- Cross-reference validation and orphan detection will miss these artifacts
 
-**Report**: `.claude/context/reports/security/session-review-2-2026-02-20.md`
+**Resolution**:
 
----
+1. Add `skill:debugging` node with `assignedAgents: ["developer", "devops-troubleshooter", "qa"]`, `integrationStatus: "integrated"`
+2. Add `skill:smart-debug` node with `assignedAgents: ["developer", "devops-troubleshooter", "qa"]`, `integrationStatus: "integrated"`
+3. Add edges from these nodes to agent nodes in artifact-graph.json
+4. Verify `skill-index.json` agentPrimary arrays are correct post-update (ADR-2026-02-21-003)
 
-## 2026-02-20: Security Review LOW Findings from Enterprise Pipeline Task #11 (P2 MAINTENANCE)
-
-**Issue**: Enterprise supply chain security pipeline Wave 2 review (Task #11, 2026-02-20) identified 3 LOW-severity findings during security-architect review. All non-blocking (0 critical/high), but tracked for next maintenance cycle.
-
-**Findings**:
-
-1. **Quarantine Directory Permissions**: Review and tighten file permissions on quarantine directories (sensitivity: low, risk: low)
-2. **.env.example Missing 'off' Documentation**: EXTERNAL_CONTENT_GUARD_MODE, HYBRID_EMBEDDINGS, BM25_INCREMENTAL_UPDATE, and other boolean env vars document 'on' state but not 'off'. Add inline comments explaining 'off' behavior.
-3. **Filename Collision Edge Case**: Schema naming pattern doesn't explicitly validate against existing filenames. Potential for collision if user creates artifact with reserved name (e.g., `task` as skill name collides with built-in `task` command).
-
-**Status**: APPROVED_WITH_NOTES — security review passed all 30/30 checklist items. Findings are non-blocking and safe for deployment. Scheduled for next maintenance cycle.
-
-**Prevention**: Include filename collision validator in schema-creator. Add env var documentation template to .env.example generation script.
-
-**Priority**: P2 (maintenance, not blocking)
-
-**Related**: Task #11 Security-Architect Wave 2 (2026-02-20), Enterprise Pipeline Reflection Report
+**Priority**: P2 (non-blocking; discoverability exists via other indexes)
 
 ---
 
-## 2026-02-20: Configuration .env Vars Missing From .env.example (P1 BLOCKER)
+## 2026-02-21: Rules File Lags Behind SKILL.md (when-to-use table not in debugging.md rules) (P2)
 
-**Issue**: Supply Chain Security Pipeline Tasks #6-9 discovered that EXTERNAL_CONTENT_GUARD_MODE env var introduced in Task #6 (developer implementation) was not added to .env.example. Code-review (Task #8) identified this as a BLOCKING issue. QA (Task #9) confirmed independently. Feature cannot merge without .env.example update.
+**Status**: OPEN
+**Severity**: LOW
 
-**Root Cause**: Pre-implementation specification did not capture configuration pattern. Developer Task #6 completed with 21 passing tests (score 0.89) but feature is incomplete without .env.example entry.
+**Issue**: The when-to-use comparison table added to `.claude/skills/debugging/SKILL.md` (debugging vs smart-debug escalation criteria) is NOT present in `.claude/rules/debugging.md`. The rules file has a condensed reference but not the full table.
 
-**Pattern**: Multi-agent convergence (code-review + QA independently found same blocker) indicates systemic specification gap — configuration requirements should be captured upfront in developer handoff.
+**Impact**: Agents loaded with system-prompt rules injection will not see the escalation table. They only see it when `Skill({ skill: 'debugging' })` is explicitly invoked. This creates a gap for agents that apply debugging rules at the prompt level without invoking the skill.
 
-**Action Required**: Add to initial task specification: "If code introduces new env vars, add them to .env.example with documentation."
+**Resolution**: Add the when-to-use comparison table from debugging SKILL.md (lines 66-81) to `.claude/rules/debugging.md`.
 
-**Prevention**: code-review automated check should grep for getenv/process.env patterns and validate .env.example entries exist.
-
-**Priority**: P1 (blocks feature merge)
-
-**Related**: ADR-139 (TaskUpdate enforcement), Tasks #6-9 reflection (2026-02-20)
+**Priority**: P2
 
 ---
 
-## 2026-02-20: content-security-scan Skill Integration Queue Unprocessed (P1)
+## Skill Index Regeneration After Tool Changes (CONFIRMED 2026-02-21)
 
-**Issue**: The `skill:content-security-scan` artifact created on 2026-02-20 at 08:21:42 has an UNPROCESSED entry in integration-queue.jsonl (line 9, `processed: false`). The skill was created by Task 9 but artifact-integrator was never spawned. As a result, the skill may be missing catalog entry, agent registry entry, and skill-index.json registration.
+**Status**: OPEN (workaround established, should automate)
+**Severity**: MEDIUM
 
-**Action Required**: Spawn artifact-integrator for `skill:content-security-scan`. Also verify `external-fetch-audit.jsonl` exists at `.claude/context/runtime/external-fetch-audit.jsonl` (required for SEC-EXT-007 provenance logging).
+**Confirmation**: smart-debug v2.0 update (Task 2–3) confirmed the pattern. Frontmatter changes (Write/Edit tools added) required explicit `generate-skill-index.cjs` call; index does not auto-sync.
 
-**Priority**: P1
+**Evidence**:
 
----
+- Task 2 updated `.claude/skills/smart-debug/SKILL.md` frontmatter
+- Task 3 ran `generate-skill-index.cjs` explicitly to pick up new tools
+- Without regeneration, skill-index.json would show stale tool list
 
-## 2026-02-20: Missing TaskUpdate Metadata Systemic Failure — 18th+ Occurrence (P0 ESCALATION)
+**Root Cause**: SKILL.md frontmatter is not watched; index generation is manual/explicit.
 
-**Issue**: Tasks 8, 9, and 10 all completed on 2026-02-20 without TaskUpdate summary metadata. This is the 18th+ confirmed instance across sessions. ADR-139 ACCEPTED and pre-completion-validation.cjs exists, but BLOCK mode is not active. Reflection agent cannot score outputs. Router stalls when agents do not call TaskUpdate.
+**Workaround**: Pre-completion checklist: "Regenerate skill index with `pnpm skill:index:regenerate` and verify changes appear in skill-index.json before marking complete."
 
-**Action Required**: Set `COMPLETION_METADATA_ENFORCEMENT=block` in `.env` file. The warning-mode approach has failed 18+ times. This requires an immediate human-decision to activate blocking enforcement.
-
-**Escalation**: Router/user must authorize BLOCK mode activation. Training-based enforcement is permanently exhausted.
-
-**Priority**: P0 (ESCALATION)
-
----
-
-## 2026-02-11: Memory Sanitizer Not Yet Implemented (P1)
-
-**Issue**: HIGH-004 (Memory poisoning) identified in security audit but deferred from Wave 2b.
-
-**Priority**: P1
+**Long-term Fix**: Auto-watch `.claude/skills/*/SKILL.md` frontmatter changes; trigger `generate-skill-index.cjs` on post-write hook when frontmatter modified.
 
 ---
 
-## 2026-02-09: Remaining Ecosystem Gaps (61 gaps)
+## 2026-02-20: Batch Reflection Failure - Tasks 38-43 Missing Metadata (P1 - RECURRING)
 
-**Distribution**: 0 CRITICAL, 13 HIGH, 48 MEDIUM.
+**Issue**: 6 task completions (38-43) marked complete with ONLY fallback summary strings. No `filesModified`, `outputArtifacts`, or meaningful work context provided.
 
-**Key Patterns**: Extended Thinking (13 agents), ROUTING_TABLE Gaps (10 agents), Skill Assignments (several), Model Mismatches (8 agents).
+**Pattern**: This is a RECURRING issue. Similar pattern in Task #14 (2026-02-20T09:35:33.866Z) and earlier batch reflections.
 
-**Priority Actions**: Enable extended_thinking for 7 analysis agents, add ROUTING_TABLE entries for pm/reflection-agent, quarterly audit cadence.
+**Root Cause**: Tasks were completed without proper `TaskUpdate()` calls including:
 
----
+- `metadata.summary` (non-fallback)
+- `metadata.filesModified` (array of file paths)
+- `metadata.outputArtifacts` (report/artifact paths)
 
-## 2026-02-11: CRITICAL SECURITY FINDINGS - Wave 2 Hooks (11 vulnerabilities)
+**Impact**:
 
-**Report**: `.claude/context/reports/security/security-audit-wave2-2026-02-11.md`
+- Reflection scores WITHHELD (6/6 tasks cannot be assessed)
+- Memory learnings LOST (patterns, gotchas, decisions not extracted)
+- Quality audit trail BROKEN (no record of actual work)
 
-**P0 (Fix Immediately)**:
+**Solution**:
 
-- VUL-TAM-001: Loop-State TOCTOU Race Condition (2h)
-- VUL-DOS-001: Whitespace Bomb DoS (1h)
-- VUL-ELEV-001: Router Mode Bypass via Env Override (1h)
+1. **Immediate**: Investigate post-completion-chain.cjs behavior; may be allowing tasks to complete without validation
+2. **Enforce**: Set `COMPLETION_METADATA_ENFORCEMENT=block` (default currently: off)
+3. **Retroactive**: Manually update task 38-43 metadata with actual work context, then re-run reflection
 
-**P1 (Fix This Week)**:
+**Evidence**:
 
-- VUL-TAM-002: Unicode Normalization Bypass
-- VUL-DOS-002: Regex Backtracking Loop
-- VUL-ELEV-002: Creator Intent Guard Bypass
-- ASI01-SPOOF-001: Session ID Environment Override
+- Reflection report: `.claude/context/reports/reflections/reflection-batch-38-43-2026-02-20.md`
+- Reflection log entries: 6 lines with `dataQuality: "insufficient"`
+- Fallback string signature: "Task X completed without summary metadata" in all 6 summaries
 
----
-
-## 2026-02-13: RESOLVED - Security Fixes (Commits 1-4)
-
-✅ CRITICAL-002 (shell injection): shell: false adopted
-✅ CRITICAL-001 (JSON.parse safety): safeParseJSON adopted
-✅ HIGH-002 (DB race): File-based locking added
-✅ P0 (nul file): Windows reserved filename deleted
+**Priority**: P1 (ELEVATED - recurring pattern affects quality auditing and memory consolidation)
 
 ---
 

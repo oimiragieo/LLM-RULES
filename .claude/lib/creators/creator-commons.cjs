@@ -63,7 +63,11 @@ function validatePostCreation(artifactType, artifactPath, _options = {}) {
 
   // Check 1: File exists
   if (!artifactPath || !fs.existsSync(artifactPath)) {
-    failed.push('File does not exist at specified path');
+    failed.push(
+      artifactPath
+        ? `File does not exist at specified path: ${artifactPath}`
+        : 'File does not exist at specified path'
+    );
     return { passed, failed, warnings };
   }
   passed.push('File exists at specified path');
@@ -107,7 +111,12 @@ function validatePostCreation(artifactType, artifactPath, _options = {}) {
  */
 function updateCatalog(catalogPath, entry) {
   if (!catalogPath || !fs.existsSync(catalogPath)) {
-    return { success: false, error: 'Catalog file does not exist' };
+    return {
+      success: false,
+      error: catalogPath
+        ? `Catalog file does not exist: ${catalogPath}`
+        : 'Catalog file does not exist',
+    };
   }
 
   try {

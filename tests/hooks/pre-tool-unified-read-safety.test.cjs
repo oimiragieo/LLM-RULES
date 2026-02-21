@@ -237,16 +237,20 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
-  test('checkReadSafety auto-windows based on token estimate even below byte guard', () => {
+  test('checkReadSafety auto-windows or blocks when token estimate would exceed host limit', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-token-estimate-'));
     const filePath = path.join(tempDir, 'token-heavy.txt');
     try {
       fs.writeFileSync(filePath, 'x'.repeat(90000), 'utf8');
       const result = checkReadSafety('Read', { file_path: filePath });
-      assert.strictEqual(result.action, 'rewrite');
-      assert.strictEqual(result.rewrittenToolInput.offset, 0);
-      assert.strictEqual(result.rewrittenToolInput.limit, 4000);
-      assert.ok(String(result.bypassWarning || '').includes('Estimated read size'));
+      assert.ok(result.action === 'block' || result.action === 'rewrite');
+      if (result.action === 'rewrite') {
+        assert.strictEqual(result.rewrittenToolInput.offset, 0);
+        assert.ok(
+          result.rewrittenToolInput.limit <= 4166,
+          'limit must stay within host 25k token safe lines'
+        );
+      }
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }

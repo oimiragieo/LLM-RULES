@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "description": "Allowlist of trusted external sources for skill content ingestion (SEC-EXT-001)",
   "lastUpdated": "2026-02-20",
-  "trusted_organizations": [
-    "VoltAgent",
-    "anthropics"
-  ],
+  "trusted_organizations": ["VoltAgent", "anthropics"],
   "trusted_repositories": [
     {
       "repo": "VoltAgent/awesome-agent-skills",

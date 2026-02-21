@@ -1,3 +1,42 @@
+## Pattern: Dual-Layer Drift Detection for Skill Registration (2026-02-21)
+
+**Context**: 14-microtask skill-wiring initiative (M14 final reflection, task-20)
+
+- CLI tool (validate-skill-agent-consistency.mjs) catches accumulated drift at CI gate (before merge)
+- Reflection-agent Step 4.7 catches fresh drift immediately post-creation (runtime)
+- Neither layer alone is sufficient — together they cover the full lifecycle
+- CLI tool proven functional: detected 177 errors + 1242 warnings in live codebase (M12 QA gate)
+- Pattern is reusable for any artifact type requiring consistency across multiple authoritative sources (catalog, index, agent-file)
+- Source: `.claude/context/reports/reflections/skill-wiring-initiative-2026-02-21.md`
+
+---
+
+## Gotcha: Skill Index Generation Indirection (ADR-2026-02-21-003) (2026-02-21)
+
+**Context**: smart-debug agentPrimary drift diagnosis
+
+- `generate-skill-index.cjs` sources `agentPrimary` from `agent-skill-matrix.json` (lookup table), NOT from SKILL.md frontmatter
+- Updating SKILL.md `agents:` frontmatter field alone produces NO change in skill-index.json
+- Resolution chain (MANDATORY after frontmatter updates):
+  1. Update `agent-skill-matrix.json` to add new agent → skill mappings
+  2. Run `node .claude/tools/cli/generate-skill-index.cjs`
+  3. Verify: `node -e "const idx=require('./.claude/config/skill-index.json'); console.log(idx.skills['<skill-name>'].agentPrimary)"`
+- Applies to ALL skills with multi-agent assignments; critical when assigning non-developer agents
+- Source: ADR-2026-02-21-003, `.claude/context/reports/reflections/skill-wiring-initiative-2026-02-21.md`
+
+---
+
+## Pattern: Validation Tool Proven by Live Codebase Detection (2026-02-21)
+
+**Context**: M12 QA gate for validate-skill-agent-consistency.mjs
+
+- A validation tool's value is proven when it finds real errors in the live codebase, not just synthetic tests
+- 177 errors + 1242 warnings found in real codebase = strong functional validation signal
+- Pattern: always run a new consistency/validation tool against the full live codebase before marking implementation complete
+- Source: M12 QA gate outcome, `.claude/context/reports/reflections/skill-wiring-initiative-2026-02-21.md`
+
+---
+
 ## Skill Updated: smart-debug HITL opt-in (2026-02-20)
 
 - `SMART_DEBUG_HITL` env var added (default: `false`) — agent auto-reproduces by default via tests/scripts; HITL only if env var is `true` or auto-reproduction fails.

@@ -11,6 +11,10 @@
 
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
+const path = require('path');
+const fs = require('fs');
+
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // Load modules under test
 let routingGuard;
@@ -296,6 +300,31 @@ describe('Fix 3 / Check 8: checkTaskListFirstGate', () => {
     const result = routingGuard.checkTaskListFirstGate('Task');
     assert.strictEqual(result.pass, false, 'Default block mode should block');
     assert.strictEqual(result.result, 'block');
+  });
+
+  it('should allow Task(reflection-agent) before TaskList (Step 0 deadlock fix)', () => {
+    assert.ok(routingGuard, 'Module should be loadable');
+
+    process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
+    const stateFile = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
+    fs.mkdirSync(path.dirname(stateFile), { recursive: true });
+    fs.writeFileSync(
+      stateFile,
+      JSON.stringify({
+        mode: 'router',
+        taskSpawned: false,
+        taskListCalledSincePrompt: false,
+      }),
+      'utf8'
+    );
+    routingGuard.invalidateCachedState();
+
+    const result = routingGuard.checkTaskListFirstGate('Task', {
+      tool_input: { subagent_type: 'reflection-agent', prompt: 'Process reflection request.' },
+    });
+    assert.strictEqual(result.pass, true, 'reflection-agent should be allowed before TaskList');
+    assert.strictEqual(result.result, 'warn');
+    assert.match(result.message, /STEP0 EXEMPTION|reflection-agent/);
   });
 
   it('should always pass when TASKLIST_FIRST_ENFORCEMENT=off', () => {

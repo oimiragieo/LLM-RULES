@@ -106,6 +106,7 @@ export default [
       '.next/',
       '.nuxt/',
       'tests/fixtures/',
+      'tests/**/fixtures/', // code-indexing and other test fixtures (created/removed by tests)
       '.claude/lib/utils/.claude/staging/',
       '.claude/staging/',
       'vendor/',

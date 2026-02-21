@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-02-19T01:31:27.951Z"
+      "last_accessed": "2026-02-21T04:07:59.635Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "description": "Memory facade storage layer (read/write memory files)",
@@ -241,7 +241,103 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-20T08:25:51.332Z",
       "last_accessed": "2026-02-20T08:25:51.332Z"
+    },
+    ".claude/hooks/reflection/reflection-step0-guard.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:14:29.994Z",
+      "last_accessed": "2026-02-20T10:18:35.657Z"
+    },
+    "tmp-test-path-norm.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:29:53.565Z",
+      "last_accessed": "2026-02-20T10:29:53.565Z"
+    },
+    "tests/hooks/debug-staleness-test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:36:00.512Z",
+      "last_accessed": "2026-02-20T10:36:00.512Z"
+    },
+    "tests/debug-staleness-temp.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:44:25.847Z",
+      "last_accessed": "2026-02-20T10:44:35.705Z"
+    },
+    "tests/debug-staleness2-temp.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:45:35.966Z",
+      "last_accessed": "2026-02-20T10:45:35.966Z"
+    },
+    "tests/debug-fresh-preload.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:48:59.522Z",
+      "last_accessed": "2026-02-20T10:48:59.522Z"
+    },
+    "tests/debug-fresh-preload2.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:49:57.637Z",
+      "last_accessed": "2026-02-20T10:49:57.637Z"
+    },
+    "tests/hooks/reflection-step0-guard-staleness.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:53:19.071Z",
+      "last_accessed": "2026-02-20T10:53:19.071Z"
+    },
+    ".claude/lib/reflection/spawn-request-contract.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:53:48.747Z",
+      "last_accessed": "2026-02-20T10:53:48.747Z"
+    },
+    "tests/hooks/bypass-audit-hook.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T10:58:06.687Z",
+      "last_accessed": "2026-02-20T10:58:11.967Z"
+    },
+    "tests/hooks/bypass-audit-integration.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T22:53:04.852Z",
+      "last_accessed": "2026-02-20T23:04:37.244Z"
+    },
+    ".claude/hooks/routing/routing-guard-core.impl.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T22:56:06.203Z",
+      "last_accessed": "2026-02-20T23:04:12.912Z"
+    },
+    ".claude/hooks/routing/unified-creator-guard.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T22:56:06.668Z",
+      "last_accessed": "2026-02-20T22:57:59.406Z"
+    },
+    ".claude/hooks/safety/bash-command-validator.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-20T23:03:28.957Z",
+      "last_accessed": "2026-02-20T23:03:59.225Z"
+    },
+    ".claude/hooks/routing/pre-tool-unified.read-safety.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T00:34:01.648Z",
+      "last_accessed": "2026-02-21T00:34:13.294Z"
+    },
+    ".claude/tools/cli/validate-skill-agent-consistency.mjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-21T03:55:09.821Z",
+      "last_accessed": "2026-02-21T03:56:08.698Z"
     }
   },
-  "last_updated": "2026-02-20T08:27:02.608Z"
+  "last_updated": "2026-02-21T04:07:59.635Z"
 }

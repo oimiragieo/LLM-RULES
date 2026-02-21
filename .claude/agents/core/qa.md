@@ -33,6 +33,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - debugging
+  - smart-debug
   - ripgrep
   - task-management-protocol
   - tdd

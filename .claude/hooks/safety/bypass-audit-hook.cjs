@@ -329,7 +329,9 @@ function detectBypass(params) {
     try {
       const r = JSON.parse(line);
       if (r.type === 'bypass_confirmed') cumulativeBypassCount++;
-    } catch (_) { /* skip */ }
+    } catch (_) {
+      /* skip */
+    }
   }
   cumulativeBypassCount++; // include this one
 
