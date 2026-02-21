@@ -10,12 +10,12 @@ Use this template when documenting a topology decision.
 
 ## Decision Matrix Evaluation
 
-| Question | Answer | Implication |
-|----------|--------|-------------|
-| Tasks independent? | {YES/NO} | {Swarm/Fan-out if YES} |
-| Task types known at design time? | {YES/NO} | {Supervisor if YES} |
-| Multi-stage sub-orchestration needed? | {YES/NO} | {Hierarchical/Conductor if YES} |
-| High-stakes decision requiring agreement? | {YES/NO} | {Consensus Voting if YES} |
+| Question                                  | Answer   | Implication                     |
+| ----------------------------------------- | -------- | ------------------------------- |
+| Tasks independent?                        | {YES/NO} | {Swarm/Fan-out if YES}          |
+| Task types known at design time?          | {YES/NO} | {Supervisor if YES}             |
+| Multi-stage sub-orchestration needed?     | {YES/NO} | {Hierarchical/Conductor if YES} |
+| High-stakes decision requiring agreement? | {YES/NO} | {Consensus Voting if YES}       |
 
 ## Selected Topology
 
@@ -25,9 +25,9 @@ Use this template when documenting a topology decision.
 
 ## Failure Mode Mitigations
 
-| Code | Failure Mode | Mitigation Applied |
-|------|-------------|-------------------|
-| {SE-M0N} | {Name} | {How it is addressed} |
+| Code     | Failure Mode | Mitigation Applied    |
+| -------- | ------------ | --------------------- |
+| {SE-M0N} | {Name}       | {How it is addressed} |
 
 ## Existing Skill/Pattern
 

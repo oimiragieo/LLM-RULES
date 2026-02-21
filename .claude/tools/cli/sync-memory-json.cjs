@@ -14,6 +14,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
+const { MEMORY_DB_PATH } = require('../../lib/memory/memory-paths.cjs');
 const {
   syncJsonMemory,
   ensureEntityDbInitialized,
@@ -28,7 +29,7 @@ function parseArgs() {
 
 function main() {
   const { dryRun } = parseArgs();
-  const dbPath = path.join(PROJECT_ROOT, '.claude', 'data', 'memory.db');
+  const dbPath = MEMORY_DB_PATH;
   ensureEntityDbInitialized(dbPath);
 
   const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');

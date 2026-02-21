@@ -21,6 +21,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 
 const { PROJECT_ROOT, validatePathWithinProject } = require('../../lib/utils/project-root.cjs');
+const { MEMORY_DB_PATH } = require('../../lib/memory/memory-paths.cjs');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const {
   parseHookInputAsync,
@@ -37,6 +38,7 @@ const { EventTypes } = require('../../lib/events/event-types.cjs');
 const CORE_MEMORY_MARKDOWN_FILES = new Set(['decisions.md', 'issues.md']);
 const CORE_MEMORY_JSON_FILES = new Set(['patterns.json', 'gotchas.json']);
 const EMBEDDING_MEMORY_FILES = new Set([
+  'learnings.md',
   'decisions.md',
   'issues.md',
   'patterns.json',
@@ -289,7 +291,7 @@ async function main() {
   toolName = getToolName(hookInput);
 
   if (toolName === 'MemoryRecord') {
-    const dbPath = path.join(PROJECT_ROOT, '.claude', 'data', 'memory.db');
+    const dbPath = MEMORY_DB_PATH;
     ensureEntityDbInitialized(dbPath);
     const memoryDir = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
     for (const fileName of CORE_MEMORY_JSON_FILES) {
@@ -339,7 +341,7 @@ async function main() {
   // REMEDIATION-FIX: Allow JSON sync for all tools (e.g. manual edits by agents)
   // if (fileType === 'json' && toolName !== 'MemoryRecord' && !allowJsonHookSync) { ... }
 
-  const dbPath = path.join(PROJECT_ROOT, '.claude', 'data', 'memory.db');
+  const dbPath = MEMORY_DB_PATH;
   ensureEntityDbInitialized(dbPath);
 
   try {

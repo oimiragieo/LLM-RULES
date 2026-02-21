@@ -1,6 +1,6 @@
 ---
 name: debug-log-analysis
-description: "Structured debug log analysis for Claude Code sessions — copy log, run reducer, extract error patterns, correlate with full log, produce observability report. Fills 5 identified gaps: hook error body capture, agent identity, file path tracking, stall correlation, success visibility."
+description: 'Structured debug log analysis for Claude Code sessions — copy log, run reducer, extract error patterns, correlate with full log, produce observability report. Fills 5 identified gaps: hook error body capture, agent identity, file path tracking, stall correlation, success visibility.'
 version: 1.0.0
 model: sonnet
 invoked_by: both
@@ -65,19 +65,20 @@ Read `.claude/context/tmp/debug-session-{date}-reduced.txt` in full.
 
 For each line in the reduced log, classify into:
 
-| Category | Signal Pattern | Action |
-|----------|----------------|--------|
-| **Hook Block (Write)** | `PreToolUse:Write` + block | Count; find triggering agent + file path |
-| **Hook Block (TaskUpdate)** | `PreToolUse:TaskUpdate` + burst | Count; find looping agent |
-| **Read Miss** | `File does not exist` or placeholder text | Count; list missing files |
-| **Token Overflow** | `FileTooLargeError` or `token limit` | Count; identify large files |
-| **Streaming Stall** | Gap > 60s between log entries | Sum duration; note what preceded stall |
-| **Agent Drop** | `TaskUpdate not called` or `agent returned` without completion | List by task ID |
-| **Tool Error** | `EISDIR`, `ENOENT`, `sibling tool call errored` | Categorize by tool |
+| Category                    | Signal Pattern                                                 | Action                                   |
+| --------------------------- | -------------------------------------------------------------- | ---------------------------------------- |
+| **Hook Block (Write)**      | `PreToolUse:Write` + block                                     | Count; find triggering agent + file path |
+| **Hook Block (TaskUpdate)** | `PreToolUse:TaskUpdate` + burst                                | Count; find looping agent                |
+| **Read Miss**               | `File does not exist` or placeholder text                      | Count; list missing files                |
+| **Token Overflow**          | `FileTooLargeError` or `token limit`                           | Count; identify large files              |
+| **Streaming Stall**         | Gap > 60s between log entries                                  | Sum duration; note what preceded stall   |
+| **Agent Drop**              | `TaskUpdate not called` or `agent returned` without completion | List by task ID                          |
+| **Tool Error**              | `EISDIR`, `ENOENT`, `sibling tool call errored`                | Categorize by tool                       |
 
 ## Step 5: Cross-Reference Top Errors in Full Log
 
 For the top 3 most frequent error categories:
+
 1. Grep the FULL (unreduced) log copy for the error signature
 2. Find the 10 lines before and after each occurrence
 3. Identify: which tool call triggered it, which agent was running, what it was trying to do
@@ -99,15 +100,16 @@ Write to `.claude/context/reports/debug-log-analysis-{date}.md`:
 
 ## Error Summary
 
-| Category | Count | Severity | Root Cause |
-|----------|-------|----------|------------|
-| Hook Block (Write) | N | CRITICAL | ... |
-| Read Miss | N | HIGH | ... |
-| ... | | | |
+| Category           | Count | Severity | Root Cause |
+| ------------------ | ----- | -------- | ---------- |
+| Hook Block (Write) | N     | CRITICAL | ...        |
+| Read Miss          | N     | HIGH     | ...        |
+| ...                |       |          |            |
 
 ## Top 3 Deep Dives
 
 ### 1. {Most frequent error}
+
 **Frequency:** N occurrences
 **First occurrence:** line {N}, timestamp {T}
 **Context:** {what the agent was doing}
@@ -115,6 +117,7 @@ Write to `.claude/context/reports/debug-log-analysis-{date}.md`:
 **Fix:** {concrete recommendation}
 
 ### 2. ...
+
 ### 3. ...
 
 ## Observability Gaps Found
@@ -162,6 +165,7 @@ if (priority === 'high' && debugLogPath) {
 ## Memory Protocol (MANDATORY)
 
 **After completing:**
+
 - New error pattern found → `.claude/context/memory/issues.md`
 - New observability gap found → `.claude/context/memory/issues.md`
 - Pattern that recurs across sessions → `.claude/context/memory/learnings.md`

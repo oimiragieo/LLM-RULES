@@ -137,68 +137,61 @@ function appendQueryMemories(prompt, results) {
   return prompt + `\n\n${section}\n`;
 }
 
+function pushEntitySection(lines, entities, label, type) {
+  if (entities.length === 0) return;
+  lines.push(`**${label}**`);
+  for (const e of entities.slice(0, 3)) {
+    const name = sanitizeMemoryContent(String(e?.name || e?.id || type), `entity:${type}`);
+    const raw = e?.content ? String(e.content) : '';
+    const sanitized = raw ? sanitizeMemoryContent(raw, `entity:${type}`) : '';
+    const suffix = sanitized ? `: ${sanitized.slice(0, 140)}` : '';
+    lines.push(`- ${name}${suffix}${suffix.length >= 140 ? '...' : ''}`);
+  }
+  lines.push('');
+}
+
+function pushRelatedSection(lines, related) {
+  if (related.length === 0) return;
+  lines.push('**Related**');
+  for (const r of related.slice(0, 4)) {
+    const ent = r?.entity || r;
+    const relType = r?.relationship_type ? ` (${r.relationship_type})` : '';
+    lines.push(`- ${ent?.name || ent?.id || 'entity'}${relType}`);
+  }
+  lines.push('');
+}
+
+function insertSectionIntoPrompt(prompt, section) {
+  const marker = '## Memory Context (Auto-Loaded)';
+  if (!prompt.includes(marker)) return prompt + `\n\n${section}\n`;
+  const nextHeaderIdx = prompt.indexOf('\n## ', prompt.indexOf(marker) + marker.length);
+  if (nextHeaderIdx !== -1) {
+    return prompt.slice(0, nextHeaderIdx) + `\n\n${section}\n` + prompt.slice(nextHeaderIdx);
+  }
+  return prompt + `\n\n${section}\n`;
+}
+
 function appendEntityGraph(prompt, data) {
   const decisions = Array.isArray(data?.decisions) ? data.decisions : [];
   const issues = Array.isArray(data?.issues) ? data.issues : [];
   const related = Array.isArray(data?.related) ? data.related : [];
+  const patterns = Array.isArray(data?.patterns) ? data.patterns : [];
+  const gotchas = Array.isArray(data?.gotchas) ? data.gotchas : [];
 
-  if (decisions.length === 0 && issues.length === 0 && related.length === 0) {
-    return prompt;
-  }
+  if ([decisions, issues, related, patterns, gotchas].every(a => a.length === 0)) return prompt;
 
   const lines = [];
   lines.push('### Entity Graph (SQLite)');
   lines.push('_Best-effort structured memory from entities/relationships_');
   lines.push('');
-
-  if (decisions.length > 0) {
-    lines.push('**Decisions**');
-    for (const d of decisions.slice(0, 3)) {
-      const name = sanitizeMemoryContent(String(d?.name || d?.id || 'decision'), 'entity:decision');
-      const rawContent = d?.content ? String(d.content) : '';
-      const sanitizedContent = rawContent
-        ? sanitizeMemoryContent(rawContent, 'entity:decision')
-        : '';
-      const content = sanitizedContent ? `: ${sanitizedContent.slice(0, 140)}` : '';
-      lines.push(`- ${name}${content}${content.length >= 140 ? '...' : ''}`);
-    }
-    lines.push('');
-  }
-
-  if (issues.length > 0) {
-    lines.push('**Issues**');
-    for (const i of issues.slice(0, 3)) {
-      const name = sanitizeMemoryContent(String(i?.name || i?.id || 'issue'), 'entity:issue');
-      const rawContent = i?.content ? String(i.content) : '';
-      const sanitizedContent = rawContent ? sanitizeMemoryContent(rawContent, 'entity:issue') : '';
-      const content = sanitizedContent ? `: ${sanitizedContent.slice(0, 140)}` : '';
-      lines.push(`- ${name}${content}${content.length >= 140 ? '...' : ''}`);
-    }
-    lines.push('');
-  }
-
-  if (related.length > 0) {
-    lines.push('**Related**');
-    for (const r of related.slice(0, 4)) {
-      const ent = r?.entity || r;
-      const name = ent?.name || ent?.id || 'entity';
-      const relType = r?.relationship_type ? ` (${r.relationship_type})` : '';
-      lines.push(`- ${name}${relType}`);
-    }
-    lines.push('');
-  }
+  pushEntitySection(lines, decisions, 'Decisions', 'decision');
+  pushEntitySection(lines, issues, 'Issues', 'issue');
+  pushEntitySection(lines, patterns, 'Patterns', 'pattern');
+  pushEntitySection(lines, gotchas, 'Gotchas', 'gotcha');
+  pushRelatedSection(lines, related);
 
   const section = capTierBSection(lines.join('\n').trimEnd() + '\n');
-  const marker = '## Memory Context (Auto-Loaded)';
-  if (prompt.includes(marker)) {
-    const nextHeaderIdx = prompt.indexOf('\n## ', prompt.indexOf(marker) + marker.length);
-    if (nextHeaderIdx !== -1) {
-      return prompt.slice(0, nextHeaderIdx) + `\n\n${section}\n` + prompt.slice(nextHeaderIdx);
-    }
-    return prompt + `\n\n${section}\n`;
-  }
-
-  return prompt + `\n\n${section}\n`;
+  return insertSectionIntoPrompt(prompt, section);
 }
 
 function insertContextModeSection(prompt, fragment) {
@@ -387,6 +380,8 @@ async function applyEntityGraphToPrompt(assembled) {
     const cm = new ContextualMemory();
     const decisions = await cm.findEntities('decision', { limit: 3 });
     const issues = await cm.findEntities('issue', { limit: 3 });
+    const patterns = await cm.findEntities('pattern', { limit: 3 });
+    const gotchas = await cm.findEntities('gotcha', { limit: 3 });
     const related = [];
     for (const d of decisions.slice(0, 2)) {
       const rel = await cm.getRelated(d.id, { depth: 1 });
@@ -395,7 +390,7 @@ async function applyEntityGraphToPrompt(assembled) {
       }
     }
     cm.close();
-    return appendEntityGraph(assembled, { decisions, issues, related });
+    return appendEntityGraph(assembled, { decisions, issues, patterns, gotchas, related });
   } catch (err) {
     debugLog('spawn-prompt-assembler', 'Entity graph retrieval failed (ignored)', err);
     return assembled;

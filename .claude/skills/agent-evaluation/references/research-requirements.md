@@ -7,12 +7,12 @@
 
 ## Research Methodology
 
-| Query | Source | Findings |
-|-------|--------|---------|
-| "LLM-as-judge evaluation framework best practices 2025" | researcher agent context | 5-dimension rubric pattern established |
-| "AI output quality evaluation rubric scoring" | researcher agent context | 1-5 scale, weighted composite |
-| "agent evaluation groundedness accuracy coherence" | researcher agent context | Evidence citation requirement |
-| VoltAgent/awesome-agent-skills search | GitHub (no match found) | No matching skill in curated collection |
+| Query                                                   | Source                   | Findings                                |
+| ------------------------------------------------------- | ------------------------ | --------------------------------------- |
+| "LLM-as-judge evaluation framework best practices 2025" | researcher agent context | 5-dimension rubric pattern established  |
+| "AI output quality evaluation rubric scoring"           | researcher agent context | 1-5 scale, weighted composite           |
+| "agent evaluation groundedness accuracy coherence"      | researcher agent context | Evidence citation requirement           |
+| VoltAgent/awesome-agent-skills search                   | GitHub (no match found)  | No matching skill in curated collection |
 
 ## Key Findings
 

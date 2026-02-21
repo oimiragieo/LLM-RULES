@@ -6,11 +6,13 @@
 ## Research Summary
 
 **Queries executed (3/5 max)**:
+
 1. WebSearch: "Multi-agent architecture patterns supervisor swarm hierarchical 2025"
 2. WebFetch: docs.swarms.world — multi-agent orchestration topology guide
 3. Codebase scan: .claude/skills/ — existing topology-related skills
 
 **Sources consulted**:
+
 - Multiple web sources on multi-agent systems (2025 papers and guides)
 - docs.swarms.world detailed failure modes and selection criteria
 - agent-studio codebase: consensus-voting, swarm-coordination, wave-executor skills
@@ -23,14 +25,14 @@ Exa MCP not available in this session. Used WebSearch + WebFetch as fallback (pe
 
 ### Topology Token Economics (as of 2026)
 
-| Topology | Token Multiplier | Source |
-|----------|-----------------|--------|
-| Supervisor | ~5x | Swarms documentation + web sources |
-| Conductor | ~6x | agent-studio master-orchestrator pattern |
-| Fan-out/Fan-in | ~8x | wave-executor implementation analysis |
-| Swarm | ~8x | Swarms documentation |
-| Consensus Voting | ~12x | consensus-voting skill analysis |
-| Hierarchical | ~15x | web research + swarms.world |
+| Topology         | Token Multiplier | Source                                   |
+| ---------------- | ---------------- | ---------------------------------------- |
+| Supervisor       | ~5x              | Swarms documentation + web sources       |
+| Conductor        | ~6x              | agent-studio master-orchestrator pattern |
+| Fan-out/Fan-in   | ~8x              | wave-executor implementation analysis    |
+| Swarm            | ~8x              | Swarms documentation                     |
+| Consensus Voting | ~12x             | consensus-voting skill analysis          |
+| Hierarchical     | ~15x             | web research + swarms.world              |
 
 ### Design Constraints Mapped to Rules/Schemas
 
@@ -51,6 +53,7 @@ Searched VoltAgent/awesome-agent-skills for topology/architecture reference skil
 ## agent-studio Pattern Analysis
 
 Existing skills that implement specific topologies:
+
 - `.claude/skills/consensus-voting/SKILL.md` — Consensus/voting topology
 - `.claude/skills/swarm-coordination/SKILL.md` — Swarm topology
 - `.claude/skills/wave-executor/SKILL.md` — Fan-out/Fan-in topology

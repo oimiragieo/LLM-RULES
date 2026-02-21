@@ -7,7 +7,7 @@
 'use strict';
 
 let input = '';
-process.stdin.on('data', (chunk) => {
+process.stdin.on('data', chunk => {
   input += chunk;
 });
 

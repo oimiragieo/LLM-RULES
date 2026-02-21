@@ -1,8 +1,8 @@
 ---
 name: context-degradation
-description: "Token-range severity zones (Green/Yellow/Orange/Red/Critical) with detection checklist, early warning indicators, and corrective routing actions for context window degradation"
+description: 'Token-range severity zones (Green/Yellow/Orange/Red/Critical) with detection checklist, early warning indicators, and corrective routing actions for context window degradation'
 version: 1.0.0
-category: "Performance & Optimization"
+category: 'Performance & Optimization'
 agents: [context-compressor, planner, router]
 user_invocable: true
 invoked_by: both
@@ -21,13 +21,13 @@ Detects context window degradation and prescribes corrective actions before accu
 
 ## Severity Zones
 
-| Zone | Token Range | Status | Action |
-|------|-------------|--------|--------|
-| Green | < 32K | Healthy | Normal operation |
-| Yellow | 32K - 64K | Caution | Begin selective compression |
-| Orange | 64K - 100K | Warning | Compress aggressively; summarize completed phases |
-| Red | 100K - 140K | Danger | Spawn fresh subagent for remaining work; pass only essential context |
-| Critical | > 140K | Severe | Halt complex reasoning; compress immediately; do not attempt multi-step tasks |
+| Zone     | Token Range | Status  | Action                                                                        |
+| -------- | ----------- | ------- | ----------------------------------------------------------------------------- |
+| Green    | < 32K       | Healthy | Normal operation                                                              |
+| Yellow   | 32K - 64K   | Caution | Begin selective compression                                                   |
+| Orange   | 64K - 100K  | Warning | Compress aggressively; summarize completed phases                             |
+| Red      | 100K - 140K | Danger  | Spawn fresh subagent for remaining work; pass only essential context          |
+| Critical | > 140K      | Severe  | Halt complex reasoning; compress immediately; do not attempt multi-step tasks |
 
 Reference: Models advertise 200K but reliability drops past 32K. "Lost in the middle" effect: middle tokens have 20-40% lower recall past 100K.
 
@@ -46,21 +46,25 @@ If 2+ indicators are present, treat as one zone higher than token count suggests
 ## Corrective Routing by Zone
 
 **Yellow (32-64K):**
+
 - Invoke `Skill({ skill: 'token-saver-context-compression' })` at the current phase boundary
 - Remove completed phase content from active context
 - Keep: current task spec, key decisions, in-progress file list
 
 **Orange (64-100K):**
+
 - Invoke `Skill({ skill: 'context-compressor' })` — aggressive summarization
 - Write phase summary to `.claude/context/tmp/phase-summary-{date}.md`
 - Prune: all resolved task details, intermediate research, superseded plans
 
 **Red (100-140K):**
+
 - Do NOT continue complex multi-step tasks in current agent
 - Spawn a fresh subagent with only the compressed summary as context
 - Current agent: write handoff doc → call TaskUpdate(completed) with handoff path in metadata
 
 **Critical (>140K):**
+
 - Halt immediately
 - Write emergency summary: what was done, what remains, key decisions
 - Route to `session-handoff` skill
@@ -89,6 +93,7 @@ If 2+ indicators are present, treat as one zone higher than token count suggests
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New pattern -> `.claude/context/memory/learnings.md`
 - Issue found -> `.claude/context/memory/issues.md`
 - Decision made -> `.claude/context/memory/decisions.md`

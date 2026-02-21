@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash, Glob, Grep]
 agents: [qa, code-reviewer, reflection-agent]
-category: "Validation & Quality"
+category: 'Validation & Quality'
 tags: [evaluation, llm-judge, quality, rubric, scoring, ai-output]
 verified: true
 lastVerifiedAt: 2026-02-21T07:00:00.000Z
@@ -49,23 +49,23 @@ LLM-as-judge evaluation framework that scores AI-generated content on 5 dimensio
 
 Every evaluation scores all 5 dimensions on a 1-5 scale:
 
-| Dimension | Weight | What It Measures |
-|-----------|--------|-----------------|
-| **Accuracy** | 30% | Factual correctness; no hallucinations; claims are verifiable |
-| **Groundedness** | 25% | Claims are supported by citations, file references, or evidence from the codebase |
-| **Coherence** | 15% | Logical flow; internally consistent; no contradictions |
-| **Completeness** | 20% | All required aspects addressed; no critical gaps |
-| **Helpfulness** | 10% | Actionable; provides concrete next steps; reduces ambiguity |
+| Dimension        | Weight | What It Measures                                                                  |
+| ---------------- | ------ | --------------------------------------------------------------------------------- |
+| **Accuracy**     | 30%    | Factual correctness; no hallucinations; claims are verifiable                     |
+| **Groundedness** | 25%    | Claims are supported by citations, file references, or evidence from the codebase |
+| **Coherence**    | 15%    | Logical flow; internally consistent; no contradictions                            |
+| **Completeness** | 20%    | All required aspects addressed; no critical gaps                                  |
+| **Helpfulness**  | 10%    | Actionable; provides concrete next steps; reduces ambiguity                       |
 
 ### Scoring Scale (1-5)
 
-| Score | Meaning |
-|-------|---------|
+| Score | Meaning                                                       |
+| ----- | ------------------------------------------------------------- |
 | **5** | Excellent — fully meets the dimension's criteria with no gaps |
-| **4** | Good — meets criteria with minor gaps |
-| **3** | Adequate — partially meets criteria; some gaps present |
-| **2** | Poor — significant gaps or errors in this dimension |
-| **1** | Failing — does not meet the dimension's criteria |
+| **4** | Good — meets criteria with minor gaps                         |
+| **3** | Adequate — partially meets criteria; some gaps present        |
+| **2** | Poor — significant gaps or errors in this dimension           |
+| **1** | Failing — does not meet the dimension's criteria              |
 
 ## Execution Process
 
@@ -147,13 +147,13 @@ composite = (accuracy × 0.30) + (groundedness × 0.25) + (completeness × 0.20)
 
 ### Step 4: Determine Verdict
 
-| Composite Score | Verdict | Action |
-|----------------|---------|--------|
-| 4.5 – 5.0 | EXCELLENT | Approve; proceed |
-| 3.5 – 4.4 | GOOD | Approve with minor notes |
-| 2.5 – 3.4 | ADEQUATE | Request targeted improvements |
-| 1.5 – 2.4 | POOR | Reject; requires significant rework |
-| 1.0 – 1.4 | FAILING | Reject; restart task |
+| Composite Score | Verdict   | Action                              |
+| --------------- | --------- | ----------------------------------- |
+| 4.5 – 5.0       | EXCELLENT | Approve; proceed                    |
+| 3.5 – 4.4       | GOOD      | Approve with minor notes            |
+| 2.5 – 3.4       | ADEQUATE  | Request targeted improvements       |
+| 1.5 – 2.4       | POOR      | Reject; requires significant rework |
+| 1.0 – 1.4       | FAILING   | Reject; restart task                |
 
 ### Step 5: Emit Structured Verdict
 
@@ -168,42 +168,48 @@ Output the verdict in this format:
 
 ### Dimension Scores
 
-| Dimension | Score | Weight | Weighted Score |
-|-----------|-------|--------|---------------|
-| Accuracy | X/5 | 30% | X.X |
-| Groundedness | X/5 | 25% | X.X |
-| Completeness | X/5 | 20% | X.X |
-| Coherence | X/5 | 15% | X.X |
-| Helpfulness | X/5 | 10% | X.X |
-| **Composite** | | | **X.X / 5.0** |
+| Dimension     | Score | Weight | Weighted Score |
+| ------------- | ----- | ------ | -------------- |
+| Accuracy      | X/5   | 30%    | X.X            |
+| Groundedness  | X/5   | 25%    | X.X            |
+| Completeness  | X/5   | 20%    | X.X            |
+| Coherence     | X/5   | 15%    | X.X            |
+| Helpfulness   | X/5   | 10%    | X.X            |
+| **Composite** |       |        | **X.X / 5.0**  |
 
 ### Evidence Citations
 
 **Accuracy (X/5)**:
+
 > [Direct quote or file:line reference]
-Rationale: [Why this score]
+> Rationale: [Why this score]
 
 **Groundedness (X/5)**:
+
 > [Direct quote or file:line reference]
-Rationale: [Why this score]
+> Rationale: [Why this score]
 
 **Completeness (X/5)**:
+
 > [Direct quote or file:line reference]
-Rationale: [Why this score]
+> Rationale: [Why this score]
 
 **Coherence (X/5)**:
+
 > [Direct quote or file:line reference]
-Rationale: [Why this score]
+> Rationale: [Why this score]
 
 **Helpfulness (X/5)**:
+
 > [Direct quote or file:line reference]
-Rationale: [Why this score]
+> Rationale: [Why this score]
 
 ### Verdict: [EXCELLENT | GOOD | ADEQUATE | POOR | FAILING]
 
 **Summary**: [1-2 sentence overall assessment]
 
 **Required Actions** (if verdict is ADEQUATE or worse):
+
 1. [Specific improvement needed]
 2. [Specific improvement needed]
 ```

@@ -430,10 +430,44 @@ const INTENT_KEYWORDS = {
   tdd: ['tdd'],
 
   // New skills added 2026-02-21
-  'agent-evaluation': ['agent-evaluation', 'agent', 'evaluation', 'judge', 'framework', 'dimension', 'rubric', 'scoring'],
-  'context-degradation': ['context-degradation', 'context', 'degradation', 'token', 'range', 'severity', 'zones', 'detection'],
-  'property-based-testing': ['property-based-testing', 'property', 'based', 'testing', 'fast-check', 'canonical', 'categories'],
-  'agent-tool-design': ['agent-tool-design', 'agent', 'tool', 'design', 'contract', 'principles', 'designing'],
+  'agent-evaluation': [
+    'agent-evaluation',
+    'agent',
+    'evaluation',
+    'judge',
+    'framework',
+    'dimension',
+    'rubric',
+    'scoring',
+  ],
+  'context-degradation': [
+    'context-degradation',
+    'context',
+    'degradation',
+    'token',
+    'range',
+    'severity',
+    'zones',
+    'detection',
+  ],
+  'property-based-testing': [
+    'property-based-testing',
+    'property',
+    'based',
+    'testing',
+    'fast-check',
+    'canonical',
+    'categories',
+  ],
+  'agent-tool-design': [
+    'agent-tool-design',
+    'agent',
+    'tool',
+    'design',
+    'contract',
+    'principles',
+    'designing',
+  ],
   'sharp-edges': ['sharp-edges', 'sharp', 'edges', 'living', 'catalogue', 'known', 'hazard'],
 };
 

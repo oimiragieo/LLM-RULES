@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { LANCEDB_DIR } = require('../../lib/memory/memory-paths.cjs');
 
 function createReflectionActions({
   projectRoot,
@@ -101,8 +102,7 @@ function createReflectionActions({
       const embeddings = require('../../tools/cli/generate-embeddings.cjs');
 
       const vectorStore = new MemoryVectorStore({
-        persistDirectory:
-          process.env.LANCEDB_URI || path.join(projectRoot, '.claude', 'data', 'lancedb'),
+        persistDirectory: process.env.LANCEDB_URI || LANCEDB_DIR,
         collectionName: process.env.LANCEDB_TABLE || 'agent_memory',
       });
 

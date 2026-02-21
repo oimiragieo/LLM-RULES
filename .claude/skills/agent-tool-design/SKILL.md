@@ -1,8 +1,8 @@
 ---
 name: agent-tool-design
-description: "The Agent Tool Contract — 5 principles for designing tools agents call reliably: predictable signature, rich errors, token-efficient output, idempotency, graceful degradation. Includes anti-pattern table with 8 common mistakes."
+description: 'The Agent Tool Contract — 5 principles for designing tools agents call reliably: predictable signature, rich errors, token-efficient output, idempotency, graceful degradation. Includes anti-pattern table with 8 common mistakes.'
 version: 1.0.0
-category: "Development"
+category: 'Development'
 agents: [developer, architect, tool-creator]
 user_invocable: true
 invoked_by: both
@@ -48,13 +48,17 @@ Errors must include: error code (machine-readable), message (human-readable), co
 **Good:**
 
 ```javascript
-throw { code: 'FILE_NOT_FOUND', message: `File not found: ${path}`, context: { path, cwd: process.cwd() } };
+throw {
+  code: 'FILE_NOT_FOUND',
+  message: `File not found: ${path}`,
+  context: { path, cwd: process.cwd() },
+};
 ```
 
 **Bad:**
 
 ```javascript
-throw new Error('not found');  // No context for agent to act on
+throw new Error('not found'); // No context for agent to act on
 ```
 
 ### Principle 3: Token-Efficient Output
@@ -106,7 +110,7 @@ Partial success > hard failure. Return what succeeded with a clear indication of
 return {
   succeeded: ['file1.js', 'file2.js'],
   failed: [{ file: 'file3.js', reason: 'PERMISSION_DENIED' }],
-  partial: true
+  partial: true,
 };
 ```
 
@@ -119,16 +123,16 @@ throw new Error('Failed to process file3.js');
 
 ## Anti-Pattern Table
 
-| Anti-Pattern | Problem | Fix |
-|-------------|---------|-----|
-| Verbose status wrapping | Wastes tokens; agent re-parses to extract data | Return data directly |
-| Positional args | Ambiguous; breaks on refactor | Named params with types |
-| Swallowed exceptions | Agent thinks success; work is lost | Always surface errors explicitly |
-| Non-idempotent mutations | Retry causes duplicate data or errors | Upsert semantics; check-then-set |
-| Hard failures on partial input | One bad item breaks entire batch | Return partial results |
-| Side-effect-heavy reads | Read tools that trigger writes confuse agents | Separate reads from writes |
-| String error messages only | Agent can't programmatically handle errors | Include machine-readable error codes |
-| Untyped return shape | Agent can't reliably destructure output | Document and enforce return schema |
+| Anti-Pattern                   | Problem                                        | Fix                                  |
+| ------------------------------ | ---------------------------------------------- | ------------------------------------ |
+| Verbose status wrapping        | Wastes tokens; agent re-parses to extract data | Return data directly                 |
+| Positional args                | Ambiguous; breaks on refactor                  | Named params with types              |
+| Swallowed exceptions           | Agent thinks success; work is lost             | Always surface errors explicitly     |
+| Non-idempotent mutations       | Retry causes duplicate data or errors          | Upsert semantics; check-then-set     |
+| Hard failures on partial input | One bad item breaks entire batch               | Return partial results               |
+| Side-effect-heavy reads        | Read tools that trigger writes confuse agents  | Separate reads from writes           |
+| String error messages only     | Agent can't programmatically handle errors     | Include machine-readable error codes |
+| Untyped return shape           | Agent can't reliably destructure output        | Document and enforce return schema   |
 
 ## Review Checklist
 
@@ -158,6 +162,7 @@ Before shipping any tool:
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New pattern -> `.claude/context/memory/learnings.md`
 - Issue found -> `.claude/context/memory/issues.md`
 - Decision made -> `.claude/context/memory/decisions.md`

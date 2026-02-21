@@ -36,14 +36,14 @@ Skill({ skill: 'multi-agent-architecture-reference' });
 
 Before finalizing topology, check applicable failure modes from the reference:
 
-| Selected Topology | Must Check |
-|------------------|-----------|
-| Conductor | SE-M01 |
-| Supervisor | SE-M01 |
-| Fan-out | (aggregation complexity) |
-| Swarm | SE-M02, SE-M05 |
-| Consensus | SE-M02 |
-| Hierarchical | SE-M03, SE-M04 |
+| Selected Topology | Must Check               |
+| ----------------- | ------------------------ |
+| Conductor         | SE-M01                   |
+| Supervisor        | SE-M01                   |
+| Fan-out           | (aggregation complexity) |
+| Swarm             | SE-M02, SE-M05           |
+| Consensus         | SE-M02                   |
+| Hierarchical      | SE-M03, SE-M04           |
 
 ## Phase 4: Map to Existing Skill
 
@@ -64,6 +64,7 @@ Skill({ skill: 'consensus-voting' });
 ## Phase 5: Document Decision
 
 Use `.claude/skills/multi-agent-architecture-reference/templates/implementation-template.md` to record:
+
 - Selected topology and rationale
 - Token cost estimate
 - Failure mode mitigations

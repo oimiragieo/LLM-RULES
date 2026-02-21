@@ -1,8 +1,8 @@
 ---
 name: sharp-edges
-description: "Living catalogue of 7 known hazard entries (SE-01 through SE-07) specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS in glob-to-regex, DST arithmetic, array mutation during iteration. Each entry: symptom, root cause, fix, test assertion."
+description: 'Living catalogue of 7 known hazard entries (SE-01 through SE-07) specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS in glob-to-regex, DST arithmetic, array mutation during iteration. Each entry: symptom, root cause, fix, test assertion.'
 version: 1.0.0
-category: "Debugging"
+category: 'Debugging'
 agents: [developer, code-reviewer, qa, security-architect]
 user_invocable: true
 invoked_by: both
@@ -62,7 +62,7 @@ const { success, data } = safeParseJSON(rawInput, {});
 ```javascript
 const before = Object.getPrototypeOf({});
 safeParseJSON('{"__proto__":{"evil":true}}', {});
-assert(!({}).evil);
+assert(!{}.evil);
 ```
 
 **Files affected:** Any hook that calls `JSON.parse()` on stdin input.
@@ -79,12 +79,12 @@ assert(!({}).evil);
 
 ```javascript
 // CORRECT
-if (shouldBlock) process.exit(2);  // Block tool execution
-process.exit(0);  // Allow tool execution
+if (shouldBlock) process.exit(2); // Block tool execution
+process.exit(0); // Allow tool execution
 
 // WRONG
-if (shouldBlock) process.exit(1);  // Not a valid block code
-process.exit(false);  // Not valid
+if (shouldBlock) process.exit(1); // Not a valid block code
+process.exit(false); // Not valid
 ```
 
 **Test assertion:**
@@ -142,8 +142,8 @@ function globToRegex(glob) {
   const escaped = glob.replace(/[.+^${}()|[\]\\]/g, '\\$&');
   return escaped
     .replace(/\*\*/g, '___DOUBLE___')
-    .replace(/\*/g, '[^/]*')           // Single * -> no path separators
-    .replace(/___DOUBLE___/g, '.*');   // ** -> any path
+    .replace(/\*/g, '[^/]*') // Single * -> no path separators
+    .replace(/___DOUBLE___/g, '.*'); // ** -> any path
 }
 ```
 
@@ -163,7 +163,7 @@ assert(Date.now() - start < 100); // Must complete in <100ms
 
 **Symptom:** Date calculations are off by 1 hour for events that cross daylight saving time boundaries.
 
-**Root cause:** Adding 24 * 60 * 60 * 1000ms to a timestamp does not always equal "tomorrow" — DST transitions can make a day 23 or 25 hours long.
+**Root cause:** Adding 24 _ 60 _ 60 \* 1000ms to a timestamp does not always equal "tomorrow" — DST transitions can make a day 23 or 25 hours long.
 
 **Fix:**
 
@@ -228,7 +228,7 @@ assert(result.length === 3); // Original not mutated, all items processed
 Invoke at the START of any debugging session:
 
 ```javascript
-Skill({ skill: 'sharp-edges' })
+Skill({ skill: 'sharp-edges' });
 ```
 
 Then match your symptom against SE-01 through SE-07. If your bug is new and reproducible, add it to this catalogue.
@@ -256,6 +256,7 @@ After invoking: if you find a new sharp edge, append it here via technical-write
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New pattern -> `.claude/context/memory/learnings.md`
 - Issue found -> `.claude/context/memory/issues.md`
 - Decision made -> `.claude/context/memory/decisions.md`

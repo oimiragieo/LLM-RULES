@@ -3,9 +3,7 @@
   "title": "agent-evaluation Output Schema",
   "description": "Output validation schema for agent-evaluation skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",
