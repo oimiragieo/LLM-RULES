@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `path-constants.cjs` — New utility at `.claude/lib/utils/path-constants.cjs` centralizing all framework path constants; includes property-based and unit tests
+- Context-pressure check in `router-decision.md` Step 5.5 — automatically injects `context-compressor` when conversation exceeds 80% context window before spawning next specialist
+- Anomaly detection gate in `reflection-workflow.md` — flags suspected hallucinated completions (HIGH task <5s with 0 file mods) with LOW confidence score and `issues.md` entry
+- Distributed spawn-depth tracing and dependency vulnerability gate — `ecosystem-creation-workflow.md` SEC-ICE-002 rewritten to use distributed trace context header (`spawnDepth` + `traceId` in task metadata) with hard limit at depth 5; `post-creation-validation.md` Item 7 adds dependency vulnerability scan blocking on HIGH/CRITICAL CVEs
+
 ### Added — Skill-Wiring Improvement Initiative (2026-02-21, commit fdaff9f1)
 
 - `pnpm validate:skill-consistency` — new CLI tool (`.claude/tools/cli/validate-skill-agent-consistency.mjs`) that detects catalog/index/agent-file drift across all skills; exits non-zero for CI gating
@@ -14,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When-to-use comparison tables added to `debugging/SKILL.md` and `smart-debug/SKILL.md` with cross-references between the two skills
 - Debugging skill selection decision tree added to `@SKILL_USAGE_GUIDE.md`
 - Phase 2 gap reports: creator/updater skills architecture review and post-creation validation research (`.claude/context/artifacts/research-reports/`)
+
+### Changed
+
+- `post-creation-integration.cjs` and `creator-commons.cjs` updated during skill-wiring initiative for improved artifact lifecycle consistency
+- Agent registry regenerated; memory files updated from session reflections
 
 ### Fixed — Skill-Wiring Improvement Initiative (2026-02-21, commit fdaff9f1)
 
