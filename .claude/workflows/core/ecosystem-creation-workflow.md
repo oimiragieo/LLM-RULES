@@ -273,6 +273,8 @@ User creates skill A (spawnDepth=0, traceId=abc123)
 
 **Test Coverage:** 6 tests covering kill switch, depth limit, per-event cap, cycle detection.
 
+**Companion Security Gate:** See `post-creation-validation.md` Item 7 for the **dependency vulnerability scan** requirement. All created artifacts that import external libraries MUST pass `pnpm audit --audit-level=high` (or language-specific equivalent) before completion. Block on HIGH/CRITICAL CVEs.
+
 ## Companion Matrix Reference
 
 See `ecosystem-impact-graph.json` for the complete companion matrix defining required/recommended/optional companions for all 9 artifact types:

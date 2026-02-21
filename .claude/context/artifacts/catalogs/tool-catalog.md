@@ -42,11 +42,12 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 
 **Purpose:** Validation utilities for CLI operations
 
-| Tool                  | Location | Purpose                         | Wiring Status                                            |
-| --------------------- | -------- | ------------------------------- | -------------------------------------------------------- |
-| `doctor.mjs`          | `cli/`   | System health diagnostics       | package.json: `doctor`                                   |
-| `validate-agents.mjs` | `cli/`   | Validate agent definitions      | package.json: `validate:agents` (was phantom, now fixed) |
-| `security-lint.cjs`   | `cli/`   | Security vulnerability scanning | package.json: `lint:security`                            |
+| Tool                                   | Location | Purpose                                       | Wiring Status                                            |
+| -------------------------------------- | -------- | --------------------------------------------- | -------------------------------------------------------- |
+| `doctor.mjs`                           | `cli/`   | System health diagnostics                     | package.json: `doctor`                                   |
+| `validate-agents.mjs`                  | `cli/`   | Validate agent definitions                    | package.json: `validate:agents` (was phantom, now fixed) |
+| `security-lint.cjs`                    | `cli/`   | Security vulnerability scanning               | package.json: `lint:security`                            |
+| `validate-skill-agent-consistency.mjs` | `cli/`   | Validate skill/agent registration consistency | package.json: `validate:skills`                          |
 
 ### CLI Utilities
 
