@@ -144,7 +144,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-18T06:42:55.537Z",
-      "last_accessed": "2026-02-18T06:43:04.200Z"
+      "last_accessed": "2026-02-21T04:54:01.631Z"
     },
     "tests/lib/memory/observations.test.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -339,5 +339,5 @@
       "last_accessed": "2026-02-21T03:56:08.698Z"
     }
   },
-  "last_updated": "2026-02-21T04:07:59.635Z"
+  "last_updated": "2026-02-21T04:54:01.631Z"
 }

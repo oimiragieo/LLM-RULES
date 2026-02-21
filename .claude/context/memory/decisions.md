@@ -1,3 +1,47 @@
+## ADR-2026-02-21-004: Changelog-Mandatory-for-ALL Gate (2026-02-21 REFLECTION DECISION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Task #23 — enterprise-workflow.md Document phase update
+
+**Decision:** CHANGELOG update is a blocking Quality Gate 5 requirement for ALL complexity levels. `changelogUpdated: true` is required in TaskUpdate metadata for all Document phase completions.
+
+**Rationale:**
+
+- Previously, CHANGELOG was listed as a Document phase step but was only explicitly blocking for HIGH/EPIC in practice
+- Making it blocking for ALL prevents the "too small to document" skip pattern (same root logic as missing-taskupdate-metadata-recurring)
+- `changelogUpdated: true` metadata field enables machine-verifiable completion by the reflection-agent
+
+**Evidence:** enterprise-workflow.md Quality Gate 5, line 722: `CHANGELOG updated (Keep a Changelog) | ALL | YES`
+
+**Related:** Task #23 (2026-02-21), batch reflection report: `.claude/context/reports/reflections/batch-reflection-tasks-20-23-2026-02-21.md`
+
+---
+
+## ADR-2026-02-21-005: Documentation-as-Contract Pattern (2026-02-21 REFLECTION DECISION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Cross-task analysis of Tasks #20 and #23
+
+**Decision:** Workflow quality gate tables with explicit "Required For" and "Blocking?" columns function as machine-readable contracts. New phases MUST pair gate table conditions with corresponding TaskUpdate metadata fields to enable objective reflection scoring.
+
+**Pattern:**
+
+1. Workflow phase defines required outputs
+2. Gate table specifies scope (ALL/MEDIUM+/HIGH+/EPIC) and blocking conditions
+3. TaskUpdate metadata field provides verifiable completion signal
+4. Reflection-agent checks metadata against gate requirements
+
+**Examples:**
+
+- Task #23: CHANGELOG → Quality Gate 5 (ALL, blocking) → `changelogUpdated: true`
+- Existing: docs → Quality Gate 5 → `docsUpdated: [...]`
+
+**Related:** Task #23 and Task #20 batch reflection (2026-02-21), `.claude/context/reports/reflections/batch-reflection-tasks-20-23-2026-02-21.md`
+
+---
+
 ## ADR: smart-debug scope — domain developer agents (2026-02-21)
 
 Decision: Add smart-debug to core developer.md only. Domain developer agents (python-pro, nodejs-pro, etc.) deferred to Phase 2 architect review to determine if they need it.

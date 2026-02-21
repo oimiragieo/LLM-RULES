@@ -1,3 +1,25 @@
+## 2026-02-21: SEC-ICE-002 Enforcement Verification Gap in routing-guard.cjs (P1)
+
+**Status**: OPEN
+**Severity**: MEDIUM (security control documented but implementation not confirmed)
+
+**Issue**: ecosystem-creation-workflow.md SEC-ICE-002 (Task #25, commit 056c659d) documents that `routing-guard.cjs` reads `spawnDepth` from parent task metadata via TaskGet before allowing Task() calls, blocking spawns at depth >= 5. However, no test or code review confirmed this enforcement path exists in the hook. This is a documentation-implementation gap that could allow unbounded recursive spawning despite the documented control.
+
+**Impact**:
+- If routing-guard.cjs does NOT implement spawnDepth check, SEC-ICE-002 is a paper control only
+- Unbounded recursive auto-spawning remains possible (amplification attack surface)
+- Security review would pass based on documentation without verifying implementation
+
+**Resolution**:
+1. Read `.claude/hooks/routing/routing-guard.cjs` and grep for `spawnDepth` or `TaskGet`
+2. If implementation missing: file developer task to add spawnDepth enforcement
+3. If implementation exists: write test to verify depth >= 5 blocks Task() call
+4. Add verification step to SEC-ICE-002 protocol: "Verify enforcement via routing-guard-staleness tests"
+
+**Priority**: P1 (security control)
+
+---
+
 ## 2026-02-21: debugging + smart-debug Skills Absent from artifact-graph.json (P2)
 
 **Status**: OPEN
