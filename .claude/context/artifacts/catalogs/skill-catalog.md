@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 109** (1 deprecated alias) | Last Updated: 2026-02-17
+> **Total Skills: 110** (1 deprecated alias) | Last Updated: 2026-02-20
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 106 (maintained and invoked)
+- **Active Skills:** 107 (maintained and invoked)
 - **Deprecated Aliases:** 1 (`testing-expert` → `tdd`)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -17,7 +17,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 | Category                                           | Count | Key Skills                                                                                                                                                                                                                    |
 | -------------------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Core Development](#core-development)              | 11    | tdd, debugging, ripgrep, code-quality-expert, code-analyzer                                                                                                                                                                   |
+| [Core Development](#core-development)              | 12    | tdd, debugging, smart-debug, ripgrep, code-quality-expert, code-analyzer                                                                                                                                                      |
 | [Planning & Architecture](#planning--architecture) | 10    | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator, wave-executor                                                                                                                   |
 | [Security](#security)                              | 13    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults, medusa-security, content-security-scan |
 | [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                                                    |
@@ -45,19 +45,20 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 Essential development workflow skills.
 
-| Skill                            | Description                                                                    | Primary Agents                 |
-| -------------------------------- | ------------------------------------------------------------------------------ | ------------------------------ |
-| `tdd`                            | Canon TDD with scenario backlog and RED/GREEN proof (alias: `testing-expert`). | developer, qa                  |
-| `debugging`                      | Systematic 4-phase debugging with root cause investigation                     | developer                      |
-| `ripgrep`                        | Enhanced code search with ES module support (.mjs, .cjs, .mts, .cts)           | 36+ agents (all domain agents) |
-| `code-quality-expert`            | Clean code principles, style guides, refactoring patterns                      | code-reviewer, developer       |
-| `code-analyzer`                  | Static code analysis and complexity metrics                                    | code-reviewer, architect       |
-| `code-semantic-search`           | Semantic code search using Phase 1 vectors + Phase 2 hybrid                    | 36+ agents (all domain agents) |
-| `code-structural-search`         | AST-based pattern matching with ast-grep                                       | 36+ agents (all domain agents) |
-| `code-style-validator`           | Programmatic AST-based style validation                                        | code-reviewer                  |
-| `dry-principle`                  | Don't Repeat Yourself enforcement                                              | code-reviewer                  |
-| `verification-before-completion` | Gate function preventing unverified claims                                     | all agents                     |
-| `best-practices-guidelines`      | Cross-cutting best practices                                                   | all agents                     |
+| Skill                            | Description                                                                                                                                                                                                                         | Primary Agents                       |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `tdd`                            | Canon TDD with scenario backlog and RED/GREEN proof (alias: `testing-expert`).                                                                                                                                                      | developer, qa                        |
+| `debugging`                      | Systematic 4-phase debugging with root cause investigation                                                                                                                                                                          | developer                            |
+| `smart-debug`                    | AI-assisted runtime debugging with hypothesis ranking, structured instrumentation, human-in-the-loop reproduction gate, and evidence-driven root cause analysis. 11-step workflow from hypothesis through fix, verify, and cleanup. | developer, devops-troubleshooter, qa |
+| `ripgrep`                        | Enhanced code search with ES module support (.mjs, .cjs, .mts, .cts)                                                                                                                                                                | 36+ agents (all domain agents)       |
+| `code-quality-expert`            | Clean code principles, style guides, refactoring patterns                                                                                                                                                                           | code-reviewer, developer             |
+| `code-analyzer`                  | Static code analysis and complexity metrics                                                                                                                                                                                         | code-reviewer, architect             |
+| `code-semantic-search`           | Semantic code search using Phase 1 vectors + Phase 2 hybrid                                                                                                                                                                         | 36+ agents (all domain agents)       |
+| `code-structural-search`         | AST-based pattern matching with ast-grep                                                                                                                                                                                            | 36+ agents (all domain agents)       |
+| `code-style-validator`           | Programmatic AST-based style validation                                                                                                                                                                                             | code-reviewer                        |
+| `dry-principle`                  | Don't Repeat Yourself enforcement                                                                                                                                                                                                   | code-reviewer                        |
+| `verification-before-completion` | Gate function preventing unverified claims                                                                                                                                                                                          | all agents                           |
+| `best-practices-guidelines`      | Cross-cutting best practices                                                                                                                                                                                                        | all agents                           |
 
 **Invocation:**
 

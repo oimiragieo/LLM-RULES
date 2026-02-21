@@ -1339,10 +1339,10 @@ grep -A2 "^agents:" .claude/skills/<skill-name>/SKILL.md
 
 If they differ, you must either:
 
-1. Add the skill to the `agent-skill-matrix.json` under the correct agent(s), **OR**
+1. Add the skill to the **canonical** agent-skill matrix at `.claude/context/config/agent-skill-matrix.json` under the correct agent(s), then run `node .claude/tools/cli/generate-skill-index.cjs` (this regenerates the index and syncs the matrix to `.claude/config/agent-skill-matrix.json`), **OR**
 2. Manually add the skill to the `AGENT_SKILLS` mapping in `generate-skill-index-definitions.cjs`
 
-**NEVER rely on the default `["developer"]` fallback for a skill intended for non-developer agents.** The fallback exists only as a last resort; explicit agent assignment is required.
+**NEVER rely on the default `["developer"]` fallback for a skill intended for non-developer agents.** Always edit `.claude/context/config/agent-skill-matrix.json` (canonical); do not edit `.claude/config/agent-skill-matrix.json` (synced copy only). The fallback exists only as a last resort; explicit agent assignment is required.
 
 **Integration Diagram:**
 

@@ -49,6 +49,7 @@
     "validate:full": "pnpm validate && node scripts/validate-package-scripts.mjs && node scripts/validate-env-budget.mjs && node scripts/validation/validate-no-silent-catch.cjs && node scripts/validation/validate-archived-tests.mjs && node scripts/validation/validate-intent-keyword-overlap.cjs && node scripts/validation/validate-tool-stub-policy.cjs && node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs && node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs && pnpm validate:docs:stale && pnpm validate:hooks:docs && pnpm validate:env:enforcement && pnpm validate:module-size && pnpm validate:windows-hide && pnpm validate:workflow-skill-contracts && pnpm validate:cujs && pnpm validate:index && pnpm index-rules && pnpm validate:schemas && pnpm validate:commands && pnpm validate:agent-skill-refs && pnpm validate:agent-template-contract && pnpm validate:artifact-regression && pnpm validate:status-check-governance && pnpm validate:agent-memory",
     "validate:verbose": "node --max-old-space-size=4096 --expose-gc scripts/validate-config.mjs --verbose && node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs --verbose",
     "validate:sync": "node scripts/validation/validate-sync.mjs",
+    "reduce-debug-log": "node scripts/reduce-debug-log.mjs",
     "validate:models": "node --max-old-space-size=4096 --expose-gc scripts/validate-model-names.mjs",
     "validate:workflow": "node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs",
     "validate:docs:stale": "node scripts/validate-doc-stale-patterns.mjs",
@@ -166,7 +167,8 @@
     "quality:daemon:status": "node .claude/tools/cli/artifact-quality-daemon.cjs --mode status --json",
     "validate:status-check-governance": "node --test tests/workflows/required-status-checks-config.test.cjs tests/workflows/branch-protection-audit.test.cjs",
     "validate:agent-memory": "node .claude/tools/validation/validate-agent-memory.cjs",
-    "skills:update-stale": "node .claude/tools/cli/run-skill-updates.cjs"
+    "skills:update-stale": "node .claude/tools/cli/run-skill-updates.cjs",
+    "validate:skill-consistency": "node .claude/tools/cli/validate-skill-agent-consistency.mjs"
   },
   "keywords": [
     "claude",

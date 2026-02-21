@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-20T09:32:55.496Z
+lastVerifiedAt: 2026-02-21T04:08:11.974Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -367,6 +367,68 @@ If score < 0.7 (pass threshold), generate specific improvements:
 }
 ```
 
+### Step 4.7: Skill-Agent Consistency Check (Post-Creation)
+
+**Purpose**: Detect catalog/index/agent-file registration drift for recently-created or modified artifacts.
+
+**Trigger Condition**: Only execute when the reflected task involved a creator or updater skill. Detect via:
+
+- Task metadata contains `artifactType` field, OR
+- Task subject or description contains any of these keywords: `creator`, `updater`, `skill-creator`, `agent-creator`, `hook-creator`, `workflow-creator`, `schema-creator`, `template-creator`, `skill-updater`, `agent-updater`
+
+If trigger condition is NOT met, log `"Step 4.7 skipped (non-creator task)"` and skip this step entirely.
+
+**Resilience requirements** (all file reads must be wrapped in try/catch):
+
+- Must NOT crash if task metadata is missing or null (stale reflection-spawn-request.json entries)
+- Must NOT crash if skill files, catalog, or index are missing
+- If no artifact names can be determined from metadata or task subject, log `"Step 4.7 skipped (no artifact names detected)"` and skip
+
+**Checks to perform** (when triggered) for each artifact created or updated in the task:
+
+1. **Catalog Presence** — Read `.claude/context/artifacts/catalogs/skill-catalog.md`
+   - Search for `` `skill-name` `` pattern in table rows
+   - If missing: flag as `CATALOG_MISSING`
+
+2. **Index Presence** — Read `.claude/config/skill-index.json`
+   - Check `skills[name]` exists
+   - Check `agentPrimary` is non-empty
+   - If entry missing: flag as `INDEX_MISSING`
+   - If entry present but `agentPrimary` is empty: flag as `INDEX_NO_AGENTS`
+
+3. **Agent Assignment** — Use Glob to scan `.claude/agents/**/*.md`
+   - For each agent file found, check YAML frontmatter `skills:` array for the skill name
+   - If at least one agent lists the skill: flag as `AGENT_ASSIGNED` (with agent name)
+   - If no agent lists the skill: flag as `AGENT_MISSING`
+
+4. **Orphan Detection** — If skill is in catalog or index but NO agent lists it in `skills:` frontmatter:
+   - Flag as `ORPHANED_SKILL`
+
+**Recording findings**:
+
+- Findings with `CATALOG_MISSING` or `INDEX_MISSING` → add to **Thorns** in RBT diagnosis
+- Findings with `AGENT_MISSING`, `INDEX_NO_AGENTS`, or `ORPHANED_SKILL` → add to **Buds** in RBT diagnosis
+- No findings → add to **Roses**: "All registration checks passed for newly-created artifact"
+- All findings (regardless of severity) → append to `.claude/context/memory/issues.md` using this format:
+
+```
+## Skill Registration Gap: {skill-name} ({date})
+- [ ] Catalog: {PRESENT/MISSING}
+- [ ] Index: {PRESENT/MISSING}
+- [ ] Agent assignment: {PRESENT (agent-name) / MISSING}
+Source: reflection of task {taskId}
+```
+
+- Include a "Skill-Agent Consistency (Step 4.7)" section in the reflection report (Step 6)
+
+**Example skip log**:
+
+```
+Step 4.7 skipped (non-creator task): subject='Fix bug in routing-guard.cjs' contains no creator keywords
+```
+
+---
+
 ### Step 5: Execute (Update Memory)
 
 Consolidate learnings into persistent memory:
@@ -512,6 +574,31 @@ Agent: developer
 {if score < 50%}
 🚨 Critical gaps - artifact may be invisible to Router
 
+## Skill-Agent Consistency (Step 4.7)
+
+{if Step 4.7 was triggered}
+
+**Artifacts checked**: {list of skill/agent names from this session}
+**Findings**: {count} issues found
+
+| Skill  | Check            | Status                                   |
+| ------ | ---------------- | ---------------------------------------- |
+| {name} | Catalog presence | OK / MISSING                             |
+| {name} | Index presence   | OK / MISSING / NO_AGENTS                 |
+| {name} | Agent assignment | OK / MISSING (no agent lists this skill) |
+| {name} | Orphan status    | OK / ORPHANED                            |
+
+{if issues found}
+Issues appended to `.claude/context/memory/issues.md`.
+Run `pnpm validate:skill-consistency --skill {skill-name}` for full diagnosis.
+
+{if no issues}
+All registration checks passed. No gaps detected.
+
+{if Step 4.7 was skipped}
+
+**Status**: Skipped — task did not involve creator or updater work.
+
 ## Recommendations
 
 1. [High Priority] Add edge case tests for null/empty inputs
@@ -593,7 +680,7 @@ To prevent runaway self-healing loops:
 
 ## Output Locations
 
-- **Reflection Reports**: `.claude/context/reports/reflections/`
+- **Reflection Reports**: `.claude/context/reports/reflections/` — **Do not pass this path to Read** (it is a directory; Read requires a file). Use Glob or ListDir to list files in this directory, then Read specific `.md` files.
 - **Reflection Log**: `.claude/context/memory/reflection-log.jsonl`
 - **Memory Updates**: `.claude/context/memory/` (patterns.json, gotchas.json, decisions.md, issues.md; learnings.md is legacy read-only)
 

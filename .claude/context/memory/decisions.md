@@ -1,214 +1,36 @@
-## ADR-136: safeParseJSON Migration and ESLint Enforcement (2026-02-16)
+## ADR: smart-debug scope — domain developer agents (2026-02-21)
+
+Decision: Add smart-debug to core developer.md only. Domain developer agents (python-pro, nodejs-pro, etc.) deferred to Phase 2 architect review to determine if they need it.
+Rationale: Domain agents inherit from core developer patterns; architect should evaluate if the debugging upgrade is universal or role-specific.
+Status: PENDING Phase 2 review
+
+## ADR-2026-02-21-003: Skill-Index agentPrimary Must Be Verified After SKILL.md Frontmatter Updates (2026-02-21 REFLECTION DECISION)
 
 **Status:** ACCEPTED
-**Decision:** Migrate all `JSON.parse()` calls in hook files to `safeParseJSON()` utility and add ESLint rule to prevent future unsafe usage.
+**Date:** 2026-02-21
+**Trigger:** smart-debug audit reflection (Task #4)
 
-**Context:**
+**Decision:** When updating SKILL.md frontmatter `agents:` field (or skill-catalog.md primary agents), the skill-index.json MUST be regenerated AND verified. Frontmatter updates alone are insufficient because `generate-skill-index.cjs` sources `agentPrimary` from `agent-skill-matrix.json` lookup tables, not directly from SKILL.md frontmatter.
 
-- Security report (2026-02-16) documented JSON parsing safety as existing control (SEC-LIB-001 standard)
-- Code reviewer (Wave 1) identified 68+ JSON.parse issues in codebase
-- Risk:
-  - Invalid JSON in hook input crashes entire hook process
-  - Prototype pollution attacks via `__proto__`, `constructor`, `prototype` keys
-  - Malicious JSON: `{ "__proto__": { isAdmin: true } }` could escalate privileges
-- `safeParseJSON` provides:
-  - Try-catch wrapping (prevents crash)
-  - Prototype pollution protection
-  - Structured return `{ success, data, error }`
-  - Optional fallback value
+**Root Cause Observed:**
 
-**Decision:**
+- smart-debug SKILL.md frontmatter: `agents: [developer, devops-troubleshooter, qa]`
+- skill-catalog.md: `developer, devops-troubleshooter, qa`
+- skill-index.json agentPrimary: `["developer"]` — only one agent, missing two
 
-1. **Immediate (included in security hardening):**
-   - Audit all hook files for `JSON.parse()` calls
-   - Migrate to `safeParseJSON()` from `.claude/lib/utils/safe-json.cjs`
-   - Test error handling paths
+**Resolution Chain:**
 
-2. **Short-term (1 week):**
-   - Add ESLint rule: `no-restricted-syntax` to block `JSON.parse()` in hook files
-   - Configure rule in `.eslintrc.cjs`:
-     ```javascript
-     'no-restricted-syntax': [
-       'error',
-       {
-         selector: 'CallExpression[callee.object.name="JSON"][callee.property.name="parse"]',
-         message: 'Use safeParseJSON() instead of JSON.parse() in hook files for safety'
-       }
-     ]
-     ```
+1. Update SKILL.md frontmatter agents field
+2. Update `agent-skill-matrix.json` to add explicit agent → skill mappings
+3. Run `node .claude/tools/cli/generate-skill-index.cjs`
+4. Verify with: `node -e "const idx=require('./.claude/config/skill-index.json'); console.log(idx.skills['smart-debug'].agentPrimary)"`
 
-3. **Documentation:**
-   - Update `.claude/rules/security.md` with safeParseJSON usage
-   - Add examples to security documentation
-
-**Implementation:**
-
-```javascript
-// BEFORE (unsafe):
-const data = JSON.parse(hookInput);
-
-// AFTER (safe):
-const { safeParseJSON } = require('.claude/lib/utils/safe-json.cjs');
-const { success, data, error } = safeParseJSON(hookInput, {});
-if (!success) {
-  console.error('Parse error:', error);
-  return {};
-}
-```
-
-**Consequences:**
-
-**Positive:**
-
-- Hook reliability improved (no crashes on malformed JSON)
-- Prototype pollution attacks blocked
-- Audit trail for parse errors
-- ESLint enforcement prevents regressions
-
-**Negative:**
-
-- Slightly more verbose code (~3 lines vs 1)
-- Existing code requires migration (68+ sites)
+**Applicability:** All skills with multi-agent assignments. Especially critical for skills that should be invoked by non-developer agents (devops-troubleshooter, qa, architect, security-architect) as the index mismatch makes them invisible to those agents' skill discovery.
 
 **Related:**
 
-- Security Report 2026-02-16: JSON Parsing Safety (existing control validated)
-- Code Review Wave 1: 68+ JSON.parse findings
-- `.claude/lib/utils/safe-json.cjs`: Implementation
-- `.claude/rules/security.md`: JSON Parsing Safety section
-
----
-
-## ADR-132: Sequential Remediation for Convergent Audit Findings (2026-02-16 REFLECTION DECISION)
-
-**Status:** ACCEPTED (Phase 0 Reflection, Task #5)
-**Decision:** When multiple independent audits converge on the same issue, remediate sequentially (not parallel) to avoid merge conflicts in shared files.
-
-**Rationale:**
-
-- Evidence: Dead hooks (P0.1) blocks other work; must clean settings.json registry before adding tests
-- Parallel work causes merge conflicts in central config files (settings.json, agent-registry.json)
-- Sequential ordering enables dependency resolution (e.g., clean hooks → add hook tests → validate)
-- Trade-off: Slower timeline but lower risk of rework
-
-**Implementation:**
-
-- Week 1: Clean dead hooks from settings.json (1 hour)
-- Week 2: Add integration tests for routing/state/cycle (3.5 days)
-- Week 3: Harden security (memory validation + JSON.parse migration, 3 weeks)
-
-**Pattern:** Convergent audit findings signal systemic issues → prioritize P0 cleanup before adding tests/features.
-
-**Evidence:** 4-wave analysis (architect, security, qa, qa) identified 17 findings with 3-way convergence on dead hooks, JSON.parse, and routing gaps.
-
----
-
-## ADR-133: Integration Tests Before Feature Work (2026-02-16 REFLECTION DECISION)
-
-**Status:** ACCEPTED (Phase 0 Reflection, Task #5)
-**Decision:** Block all feature work until 6 P0 integration test gaps are closed (routing Check 7, task state machine, cycle detection).
-
-**Rationale:**
-
-- Evidence: 100% test pass rate (211/211) masks critical coverage gaps in routing logic, state machine, cycle detection
-- Impact: Gaps could corrupt workflows under load (tasks stuck, infinite loops, specialist misrouting)
-- "Test later" approach failed (memory shows 3 late-discovered bugs in previous pipeline)
-- Deployment blockers take precedence over feature velocity
-
-**Implementation:**
-
-- Block all feature PRs until P0 tests pass
-- QA must validate routing-guard Check 7 (20 tests), task-lifecycle-state (15 tests), cycle-detector (10 tests)
-- Timeline: 3.5 days to close all P0 gaps
-
-**Pattern:** High test pass rate ≠ comprehensive coverage → use audit findings as coverage proxy, not just pass rate.
-
----
-
-## ADR-137: Enterprise Bundle Generation Multi-Gate Approval (2026-02-19 REFLECTION DECISION)
-
-**Status:** PROPOSED (Task #12 reflection analysis)
-
-**Decision:** Enterprise bundle generation (Plan Phase 2 execution) requires three sequential approval gates before proceeding past Phase 0.
-
-**Context:**
-
-- Task #12 plan proposes generating domain-specific bundle files for ~177 skills
-- Phase 2 execution (150+ skills × 8 files = 1,200+ file writes, 3-4M tokens, ~$240+ cost)
-- Multiple risk vectors identified during plan review:
-  1. Token cost unvalidated against budget
-  2. Stub detection false negatives (legitimate stub-like files may be incorrectly flagged for replacement)
-  3. LLM generation prompts unspecified (hallucination risk for domain specificity)
-  4. Protected skills governance at wrong layer (protection in QA phase, not generation phase)
-
-**Decision:**
-
-**Gate 1: Inventory Approval (BLOCKING Phase 1)**
-
-- Phase 0 completes stub inventory enumeration
-- Output: `.claude/context/artifacts/analysis/skill-bundle-inventory-2026-02-19.json` with all detected stubs and tier classification
-- **Manual review required:** Router/Planner reviews inventory, approves scope, documents approval in commit message
-- Approval form: "Reviewed {N} stub files for replacement. Approved {M} for replacement. Deferred {K} for manual review."
-
-**Gate 2: Cost and LLM Specification Validation (BLOCKING Phase 2)**
-
-- Phase 1 research completes
-- Phase 2 LLM generation prompts written for each file type (input schema, output schema, hooks, commands, templates, scripts)
-- Prompts validated on 3-5 test skills (language experts: rust-expert, go-expert, typescript-expert)
-- **Validation criteria:** Generated files are domain-specific (not generic stubs with domain-sounding language), pass JSON validation, pass node --check for .cjs files
-- Cost re-estimated based on Phase 0 + Phase 1 actual usage
-- **Approval required:** Developer reports test results + cost estimate. Proceeds only if test quality meets gold standard (TDD example).
-
-**Gate 3: Protected Skills Enforcement (BLOCKING Phase 2)**
-
-- Hardcode protected skills list (ai-ml-expert, android-expert, rust-expert, accessibility, + any others identified in Phase 0)
-- Generation script fails-closed on attempts to write protected non-stub files
-- **Validation:** QA verifies script enforcement via code review + test case (attempt to replace protected file → script rejects with error)
-
-**Gate 4: Wave Quality Threshold (WITHIN Phase 2)**
-
-- After each wave completes validation: if >10% of generation targets fail specificity/syntax checks, pause pipeline
-- Report findings to planner; requires decision to (a) revise LLM prompts and retry, (b) defer problematic skills to manual review, or (c) proceed with documented exceptions
-
-**Rationale:**
-
-- Phase 0 approval prevents executing against incorrect inventory
-- Cost + LLM validation prevent expensive mistakes (token overspend, hallucination)
-- Protected skills enforcement prevents data loss
-- Wave quality thresholds enable early course correction
-
-**Consequences:**
-
-**Positive:**
-
-- Reduces risk of 1,200+ file writes on incorrect/speculative inventory
-- Forces LLM prompt specification before generation (quality assurance)
-- Cost visibility enables budget discussion upfront
-- Protected skills governance is fail-closed
-
-**Negative:**
-
-- Adds 3-4 days to Phase 2 timeline for approval/validation cycles
-- Requires manual review touchpoints (not fully automated)
-
-**Acceptance Criteria:**
-
-- [ ] Phase 0 inventory JSON complete
-- [ ] Manual approval documented for stub replacement scope
-- [ ] Cost estimated and logged
-- [ ] LLM generation prompts written for all 8 file types
-- [ ] Test generation validated on 3+ test skills (gold standard quality confirmed)
-- [ ] Protected skills hardcoded in generation script
-- [ ] QA verifies protection enforcement via code review
-- [ ] All gates satisfied before Phase 1 begins
-
-**Related:**
-
-- Task #12 Reflection Analysis (2026-02-19)
-- Enterprise Bundle Generation Plan (`.claude/context/plans/enterprise-bundle-gen-plan-2026-02-19.md`)
-- Issues.md: Enterprise Bundle Generation Plan Risks (2026-02-19)
-
-**Evidence:** QA report documented 6 critical gaps despite 100% test pass rate; architect and security independently flagged routing-guard untested.
+- Reflection report: `.claude/context/reports/reflections/reflection-smart-debug-lint-2026-02-21.md`
+- Issues.md: smart-debug CLAUDE.md Reference Gap (2026-02-21)
 
 ---
 
@@ -435,4 +257,99 @@ Training-based enforcement is exhausted (12+ failures on 2026-02-17). Hook enfor
 
 ---
 
+## ADR-2026-02-21-001: Opt-in HITL Pattern for Debugging Skills (2026-02-21 REFLECTION DECISION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** smart-debug v2.0 update (Tasks 4-5)
+
+**Decision:** Debugging skills that include a human-in-the-loop reproduction gate MUST default to auto-reproduction (HITL=false) and provide HITL as opt-in via environment variable. Pattern: `SMART_DEBUG_HITL=false` (or unset) = auto-reproduce; `SMART_DEBUG_HITL=true` = pause for human reproduction.
+
+**Rationale:**
+
+- AI debugging agents can auto-reproduce most bugs (~80%) via existing tests/scripts
+- Mandatory HITL blocks every debugging session waiting for human, even when unnecessary
+- Opt-in HITL preserves escape hatch for UI-dependent bugs, hardware-specific conditions, race conditions requiring specific user timing
+- Consistent with framework convention: features default to autonomous, humans opt-in
+
+**Implementation:**
+
+- SKILL.md frontmatter: document SMART_DEBUG_HITL env var in Configuration table
+- .env: `SMART_DEBUG_HITL=false` in Section 2 (Feature Flags) with descriptive comment
+- .env.example: same — ensures operators can discover and override
+
+**Auto-reproduction fallback behavior:**
+
+1. Run existing tests covering affected code path
+2. Execute reproduction scripts if present
+3. Trigger code path directly via CLI/API/unit invocation
+4. If auto-reproduction succeeds: proceed to log analysis (no human pause)
+5. If auto-reproduction fails: fall back to HITL — ask user to reproduce
+
+**Applicability:** Any skill/agent that includes a human-gated step that could be automated. Default to autonomous; human-gate is opt-in.
+
+**Related:**
+
+- smart-debug SKILL.md v2.0: `.claude/skills/smart-debug/SKILL.md`
+- Reflection report: `.claude/context/reports/reflections/reflection-smart-debug-v2-2026-02-21.md`
+
+---
+
+## ADR-2026-02-21-002: Hypothesis-Ranking Gate as Mandatory Debugging Pre-condition (2026-02-21 REFLECTION DECISION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** smart-debug v2.0 Cursor Debug Mode implementation
+
+**Decision:** Debugging skills MUST enforce a hypothesis-ranking gate before any code instrumentation. The gate is an Iron Law, not a guideline.
+
+**Required hypothesis format:**
+
+- Probability % (estimated likelihood)
+- Supporting evidence (already observed)
+- Falsification criteria (what would disprove it)
+- Testing approach (how instrumentation confirms/denies)
+- Expected symptoms (observable behavior if true)
+
+**Minimum**: 3 hypotheses. Maximum: 5. Forces prioritization.
+
+**Rationale:**
+
+- Broad "exploratory logging" generates noise rather than signal
+- Hypothesis-first constrains each log line to test a specific theory
+- Probability ranking prevents spending instrumentation budget on low-probability causes first
+- Falsification criteria enable definitive root cause confirmation (not just confirmation bias)
+
+**Implementation (smart-debug v2.0 Iron Law):**
+
+```
+NO INSTRUMENTATION BEFORE RANKED HYPOTHESES.
+NO FIX BEFORE LOG-CONFIRMED ROOT CAUSE.
+NO COMPLETION BEFORE INSTRUMENTATION CLEANUP.
+```
+
+**Session-scoped instrumentation pattern:**
+
+- Each log line must reference a hypothesis ID (H1, H2, etc.)
+- Log to `debug-{sessionId}.log` in `.claude/context/tmp/`
+- Cleanup: grep for session ID in source files, delete log file
+
+**Applicability:** All debugging workflows where the root cause is not immediately obvious from static analysis.
+
+**Related:**
+
+- smart-debug SKILL.md v2.0: `.claude/skills/smart-debug/SKILL.md`
+- Reflection report: `.claude/context/reports/reflections/reflection-smart-debug-v2-2026-02-21.md`
+
+---
+
 ## ADR-131: Enforce TaskUpdate via Hook Rather Than Developer Training (2026-02-16 REFLECTION DECISION)
+
+---
+
+## ADR: Post-Session Skill Validation Harness (2026-02-21)
+
+Status: Implemented
+Decision: Dual-component validation approach — CLI tool for CI (validate-skill-agent-consistency.mjs) + reflection-agent Step 4.7 for runtime detection.
+Rationale: Smart-debug audit revealed catalog/index/agent-file can drift silently. CLI tool catches drift in CI; reflection-agent catches it post-creation.
+Impact: .claude/tools/cli/validate-skill-agent-consistency.mjs, .claude/agents/core/reflection-agent.md

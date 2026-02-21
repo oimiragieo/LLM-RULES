@@ -227,11 +227,11 @@ grep "^category:" .claude/skills/${SKILL_NAME}/SKILL.md
 
 **Mismatch resolution:**
 
-| Mismatch                                                    | Root Cause                                                                      | Fix                                                                                                              |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `agentPrimary: ["developer"]` but skill isn't for developer | Index fallback applied; `agents` not read from frontmatter                      | Add skill to `agent-skill-matrix.json` under correct agent(s)                                                    |
-| `category` differs between index and frontmatter            | Index sources category from `CATEGORY_MAP` in definitions file, not frontmatter | Update `CATEGORY_MAP` in `.claude/tools/cli/generate-skill-index-definitions.cjs` OR update frontmatter to match |
-| Skill not found in index at all                             | SKILL.md path not scanned or name mismatch                                      | Verify skill is in catalog and SKILL.md has `name:` field                                                        |
+| Mismatch                                                    | Root Cause                                                                      | Fix                                                                                                                                                             |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agentPrimary: ["developer"]` but skill isn't for developer | Index fallback applied; `agents` not read from frontmatter                      | Edit `.claude/context/config/agent-skill-matrix.json` (canonical), add skill under correct agent(s), then run `node .claude/tools/cli/generate-skill-index.cjs` |
+| `category` differs between index and frontmatter            | Index sources category from `CATEGORY_MAP` in definitions file, not frontmatter | Update `CATEGORY_MAP` in `.claude/tools/cli/generate-skill-index-definitions.cjs` OR update frontmatter to match                                                |
+| Skill not found in index at all                             | SKILL.md path not scanned or name mismatch                                      | Verify skill is in catalog and SKILL.md has `name:` field                                                                                                       |
 
 **This check is mandatory** because `generate-skill-index.cjs` does not automatically read `agents` from SKILL.md frontmatter — it uses lookup tables and defaults to `["developer"]` when no mapping is found. Updating the frontmatter alone is insufficient; the index must be regenerated AND verified.
 

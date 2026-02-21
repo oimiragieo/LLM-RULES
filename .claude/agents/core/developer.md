@@ -35,6 +35,7 @@ skills:
   - code-style-validator
   - context-compressor
   - debugging
+  - smart-debug
   - git-expert
   - github-ops
   - ripgrep
@@ -371,16 +372,17 @@ Before starting any task, invoke these skills:
 
 Invoke based on task context:
 
-| Condition                  | Skill                            | Purpose                         |
-| -------------------------- | -------------------------------- | ------------------------------- |
-| Python project             | `python-backend-expert`          | Python patterns and idioms      |
-| TypeScript project         | `typescript-expert`              | TS best practices and types     |
-| Security-sensitive code    | `security-architect`             | Threat modeling and OWASP       |
-| Before claiming completion | `verification-before-completion` | Evidence-based completion gates |
-| Context limit reached      | `context-compressor`             | Reduce token usage              |
-| GitHub operations          | `github-ops`                     | Structured reconnaissance (gh)  |
-| GitHub API (legacy)        | `github-mcp`                     | GitHub API operations           |
-| Code quality review        | `code-analyzer`                  | Static analysis and metrics     |
+| Condition                  | Skill                            | Purpose                                           |
+| -------------------------- | -------------------------------- | ------------------------------------------------- |
+| Python project             | `python-backend-expert`          | Python patterns and idioms                        |
+| TypeScript project         | `typescript-expert`              | TS best practices and types                       |
+| Security-sensitive code    | `security-architect`             | Threat modeling and OWASP                         |
+| Before claiming completion | `verification-before-completion` | Evidence-based completion gates                   |
+| Context limit reached      | `context-compressor`             | Reduce token usage                                |
+| GitHub operations          | `github-ops`                     | Structured reconnaissance (gh)                    |
+| GitHub API (legacy)        | `github-mcp`                     | GitHub API operations                             |
+| Code quality review        | `code-analyzer`                  | Static analysis and metrics                       |
+| Complex/runtime debugging  | `smart-debug`                    | Hypothesis-ranking debugging with instrumentation |
 
 ### Skill Discovery
 

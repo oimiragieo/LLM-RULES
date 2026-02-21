@@ -15,6 +15,13 @@ const { ensureDir } = require('./pre-tool-unified.execution.cjs');
 const READ_CHUNK_GUARD_BYTES = Number(process.env.READ_CHUNK_GUARD_BYTES || 60000);
 const READ_CHUNK_GUARD_TOKENS = Number(process.env.READ_CHUNK_GUARD_TOKENS || 12000);
 const READ_ESTIMATED_CHARS_PER_TOKEN = Number(process.env.READ_ESTIMATED_CHARS_PER_TOKEN || 5);
+// Host (Cursor/Claude Code) throws MaxFileReadTokenExceededError when Read output exceeds this
+const READ_HOST_MAX_FILE_READ_TOKENS = Number(
+  process.env.READ_HOST_MAX_FILE_READ_TOKENS ||
+    process.env.CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS ||
+    25000
+);
+const READ_HOST_MAX_SAFE_LINES = Math.floor(READ_HOST_MAX_FILE_READ_TOKENS / 6);
 const READ_HARD_BLOCK_LARGE_DIRECT = String(process.env.READ_HARD_BLOCK_LARGE_DIRECT || 'on')
   .trim()
   .toLowerCase();
@@ -86,15 +93,15 @@ function isReadSafetyAutoWindowEnabled() {
 
 function getReadSafetyAutoWindowLimit() {
   const parsed = Number(process.env.READ_SAFETY_AUTOWINDOW_LIMIT || 4000);
-  if (!Number.isFinite(parsed) || parsed <= 0) return 4000;
-  return Math.floor(parsed);
+  const raw = !Number.isFinite(parsed) || parsed <= 0 ? 4000 : Math.floor(parsed);
+  return Math.min(raw, READ_HOST_MAX_SAFE_LINES);
 }
 
 function getReadSafetyMaxWindowLimit() {
   const fallback = getReadSafetyAutoWindowLimit();
   const parsed = Number(process.env.READ_SAFETY_MAX_WINDOW_LIMIT || fallback);
-  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
-  return Math.floor(parsed);
+  const raw = !Number.isFinite(parsed) || parsed <= 0 ? fallback : Math.floor(parsed);
+  return Math.min(raw, READ_HOST_MAX_SAFE_LINES);
 }
 
 function resolveSessionId(hookInput = null) {
@@ -256,8 +263,7 @@ function hasReadWindow(toolInput) {
 
 function isReadWindowOversized(toolInput) {
   const limit = getReadWindowLimit(toolInput);
-  // 40,000 tokens is approx 200KB, well within the 256KB host limit
-  return Number.isFinite(limit) && limit > 40000;
+  return Number.isFinite(limit) && limit > READ_HOST_MAX_SAFE_LINES;
 }
 
 function getReadWindowLimit(toolInput) {
@@ -441,6 +447,20 @@ function createDirectoryListingFile(targetDir) {
       }
     }
 
+    // Fallback: write to os.tmpdir() so we never return null for a valid directory.
+    // Ensures directory Read is always rewritten (avoids EISDIR at host when rewrite is applied).
+    try {
+      const tmpPath = path.join(
+        os.tmpdir(),
+        `claude-read-safety-dir-listing-${process.pid}-${Date.now()}.txt`
+      );
+      fs.writeFileSync(tmpPath, lines.join('\n'), 'utf8');
+      if (fs.existsSync(tmpPath) && !fs.statSync(tmpPath).isDirectory()) {
+        return tmpPath;
+      }
+    } catch (_tmpErr) {
+      // Fall through to null.
+    }
     return null;
   } catch (_err) {
     return null;
@@ -508,6 +528,10 @@ function createBlockedReadPlaceholder(targetPath, reason) {
   } catch (_err) {
     return null;
   }
+}
+
+function isLargeUnwindowedFile(stats, hasWindow) {
+  return stats.size > READ_CHUNK_GUARD_BYTES && !hasWindow;
 }
 
 function checkReadSafety(toolName, toolInput, hookInput = null) {
@@ -607,12 +631,17 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       isProjectFile && !hasWindow && stats.size > READ_REQUIRE_SEARCH_FIRST_BYTES;
 
     if (hasWindow && isReadWindowOversized(toolInput)) {
+      const maxAllowed = getReadSafetyMaxWindowLimit();
       return {
         checked: true,
-        action: 'block',
-        message:
-          `[READ SAFETY] Requested read window is too large. ` +
-          `Limit your request to 40,000 tokens or 10,000 lines max to avoid host failure.`,
+        action: 'rewrite',
+        rewrittenToolInput: {
+          ...toolInput,
+          limit: maxAllowed,
+        },
+        bypassWarning: `${
+          isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '
+        }Requested read window exceeded safe max (${READ_HOST_MAX_FILE_READ_TOKENS} tokens); limit clamped to ${maxAllowed}. Prefer ripgrep skill or pnpm search:code for very large files; use Grep only as fallback.`,
       };
     }
 
@@ -638,8 +667,8 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
         checked: true,
         action: 'block',
         message:
-          `${isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '}"${targetPath}" is a directory. ` +
-          'Use Glob or list_dir for directory listing, then Read a specific file.',
+          `${isBypassPermissionsMode(hookInput) ? '[READ SAFETY][bypass] ' : '[READ SAFETY] '}"${targetPath}" is a directory (Read causes EISDIR). ` +
+          'Use Glob or ListDir to list files, then Read a specific file path.',
       };
     }
 
@@ -731,7 +760,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
       }
     }
 
-    if (stats.size > READ_CHUNK_GUARD_BYTES && !hasWindow) {
+    if (isLargeUnwindowedFile(stats, hasWindow)) {
       if (isReadSafetyAutoWindowEnabled()) {
         const limit = getReadSafetyAutoWindowLimit();
         return {
@@ -760,7 +789,8 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
 
     if (!hasWindow) {
       const estimatedTokens = Math.ceil(stats.size / Math.max(1, READ_ESTIMATED_CHARS_PER_TOKEN));
-      if (estimatedTokens > READ_CHUNK_GUARD_TOKENS) {
+      const tokenCap = Math.min(READ_CHUNK_GUARD_TOKENS, READ_HOST_MAX_FILE_READ_TOKENS);
+      if (estimatedTokens > tokenCap) {
         if (isReadSafetyAutoWindowEnabled()) {
           const limit = getReadSafetyAutoWindowLimit();
           return {

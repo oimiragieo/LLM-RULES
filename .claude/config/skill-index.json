@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-20T09:25:54.492Z",
+  "generatedAt": "2026-02-21T04:14:26.820Z",
   "metadata": {
     "totalSkills": 399,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-20T09:25:54.493Z",
+    "lastValidated": "2026-02-21T04:14:26.821Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -6778,13 +6778,15 @@
       "displayName": "Smart Debug",
       "category": "Other",
       "domain": "specialized",
-      "description": "AI-assisted debugging specialist with deep knowledge of modern debugging tools, observability platforms, and automated root cause analysis.",
+      "description": "AI-assisted debugging specialist with deep knowledge of modern debugging tools, observability platforms, and automated root cause analysis. Implements Cursor Debug Mode methodology — structured hypothesis ranking, targeted code instrumentation, human-in-the-loop reproduction gate, log-confirmed root cause, and mandatory cleanup.",
       "requiredTools": [
         "Read",
         "Grep",
         "Glob",
         "Bash",
-        "Task"
+        "Task",
+        "Write",
+        "Edit"
       ],
       "agentPrimary": [
         "developer"
@@ -11514,6 +11516,7 @@
         "session-handoff",
         "skill-creator",
         "skill-updater",
+        "smart-debug",
         "sparc-methodology",
         "spec-gathering",
         "spec-init",
@@ -11872,6 +11875,7 @@
         "service-class-conventions",
         "skill-creator",
         "skill-updater",
+        "smart-debug",
         "sparc-methodology",
         "spec-gathering",
         "spec-init",

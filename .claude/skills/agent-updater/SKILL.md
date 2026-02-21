@@ -95,7 +95,7 @@ invoke `Skill({ skill: 'security-architect' })` for manual review.
    - validation commands to run
 4. Build prompt/frontmatter diff plan with risk score (`low|medium|high`).
 5. Generate RED/GREEN/REFACTOR/VERIFY backlog.
-6. Validate integration and regenerate agent registry if assignments changed.
+6. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
 7. Record learnings and unresolved risks in memory.
 
 ## Orchestrator Update Contract (MANDATORY)
@@ -150,7 +150,7 @@ Do not introduce prompt rules that contradict active hook behavior.
 - [ ] Risk-scored diff completed
 - [ ] RED/GREEN/REFACTOR/VERIFY backlog documented
 - [ ] Integration validation run
-- [ ] Agent registry regenerated when skill assignments/frontmatter changed
+- [ ] Agent registry regenerated when skill assignments/frontmatter changed (`node .claude/tools/cli/generate-agent-registry.cjs` → `.claude/context/agent-registry.json`)
 - [ ] Memory learnings/decisions/issues updated
 
 ## Memory Protocol

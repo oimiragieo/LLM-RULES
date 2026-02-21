@@ -205,6 +205,49 @@ Complex + security-relevant? YES
 -> Use Ripgrep: Skill({ skill: 'ripgrep', args: "socket\\.on.*{" --type js })
 ```
 
+## Debugging Skill Selection
+
+### When to Use Each Debugging Skill
+
+**Quick rule**: Start with `debugging` for straightforward bugs. Escalate to `smart-debug` when the bug is intermittent, production-only, or needs hypothesis ranking before any fix.
+
+### Decision Tree
+
+```
+Bug to debug?
+├── Is it locally reproducible and straightforward?
+│   ├── YES → Use `debugging` (4-phase systematic)
+│   └── NO → Is it intermittent or production-only?
+│       ├── YES → Use `smart-debug` (hypothesis-first, instrumented)
+│       └── NO → Is it multi-component or requires observability data?
+│           ├── YES → Use `smart-debug`
+│           └── NO → Start with `debugging`, escalate if stuck after Phase 2
+```
+
+### Comparison Table
+
+| Feature                | `debugging`              | `smart-debug`                        |
+| ---------------------- | ------------------------ | ------------------------------------ |
+| **Approach**           | 4-phase systematic       | 11-step Cursor Debug Mode            |
+| **Hypothesis ranking** | No                       | Yes (blocking gate)                  |
+| **Instrumentation**    | Manual                   | Structured with session scoping      |
+| **Log confirmation**   | Optional                 | Mandatory before fix                 |
+| **Best for**           | Local, reproducible bugs | Runtime, intermittent, production    |
+| **Agents**             | All developer agents     | developer, devops-troubleshooter, qa |
+| **Complexity**         | Low-Medium               | Medium-High                          |
+
+### Invocation
+
+```javascript
+// Simple/local bug
+Skill({ skill: 'debugging' });
+
+// Runtime/production/intermittent bug
+Skill({ skill: 'smart-debug' });
+```
+
+---
+
 ## Agent-Specific Skill Recommendations
 
 | Agent                  | Primary Skills                            | When Applicable        |

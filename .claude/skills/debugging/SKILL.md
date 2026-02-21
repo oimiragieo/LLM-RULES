@@ -62,6 +62,23 @@ Use for ANY technical issue:
 - You're in a hurry (rushing guarantees rework)
 - Manager wants it fixed NOW (systematic is faster than thrashing)
 
+## When to Use: debugging vs smart-debug
+
+| Scenario                             | Use `debugging` | Use `smart-debug` |
+| ------------------------------------ | --------------- | ----------------- |
+| Simple, locally reproducible bug     | Yes             | Overkill          |
+| Root cause area already known        | Yes             | Optional          |
+| Static analysis / code review bug    | Yes             | No                |
+| Runtime / production issue           | Start here      | Preferred         |
+| Intermittent / hard-to-reproduce     | Escalate        | Yes               |
+| Needs hypothesis ranking gate        | No              | Yes (blocking)    |
+| Needs instrumentation + log analysis | No              | Yes               |
+| Observability-driven (traces, APM)   | No              | Yes               |
+
+**Rule of thumb**: Start with `debugging` for straightforward bugs. Escalate to `smart-debug` when you need hypothesis ranking, structured instrumentation, or the bug is intermittent/production-only.
+
+**See also**: `.claude/skills/smart-debug/SKILL.md`
+
 ## The Four Phases
 
 You MUST complete each phase before proceeding to the next.
@@ -140,6 +157,8 @@ You MUST complete each phase before proceeding to the next.
 
    **Fragmented traces** (each service has its own root span, trace IDs don't match across boundaries)
    = broken context propagation. Fix `traceparent`/`tracestate` header forwarding before investigating business logic.
+
+   > **Instrumentation Gate (before hypothesis generation):** If runtime behavior remains unclear after static analysis, add targeted log statements at key decision nodes before generating hypotheses. Use session-scoped log files (`.claude/context/tmp/debug-{sessionId}.log`) to capture runtime state. Human-in-the-loop: ask the user to reproduce the bug after instrumentation is added, before analyzing results. Only proceed to Phase 2 once runtime evidence is collected.
 
 5. **Trace Data Flow**
 
@@ -223,14 +242,19 @@ You MUST complete each phase before proceeding to the next.
    - No other tests broken?
    - Issue actually resolved?
 
-4. **If Fix Doesn't Work**
+4. **Cleanup**
+   - Remove all instrumentation added for this debug session (log statements, temporary diagnostics)
+   - Verify cleanup: grep for the session debug ID or instrumentation markers to confirm no debug artifacts remain in production code
+   - Example: `rg "debug-{sessionId}" --type-add 'src:*.{js,ts,cjs,mjs}' -tsrc .`
+
+5. **If Fix Doesn't Work**
    - STOP
    - Count: How many fixes have you tried?
    - If < 3: Return to Phase 1, re-analyze with new information
-   - **If >= 3: STOP and question the architecture (step 5 below)**
+   - **If >= 3: STOP and question the architecture (step 6 below)**
    - DON'T attempt Fix #4 without architectural discussion
 
-5. **If 3+ Fixes Failed: Question Architecture**
+6. **If 3+ Fixes Failed: Question Architecture**
 
    **Pattern indicating architectural problem:**
    - Each fix reveals new shared state/coupling/problem in different place

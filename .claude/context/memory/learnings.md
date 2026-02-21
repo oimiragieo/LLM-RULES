@@ -1,3 +1,25 @@
+## Skill Updated: smart-debug HITL opt-in (2026-02-20)
+
+- `SMART_DEBUG_HITL` env var added (default: `false`) — agent auto-reproduces by default via tests/scripts; HITL only if env var is `true` or auto-reproduction fails.
+- Configuration section added near top of SKILL.md (before Iron Law, after Context section).
+- Step 6 renamed from "HUMAN-IN-THE-LOOP REPRODUCTION GATE (MANDATORY STOP)" to "REPRODUCTION GATE (SMART_DEBUG_HITL-conditional)" with two code paths.
+- `best_practices` frontmatter updated to reflect auto-reproduction default.
+- Risk level: LOW (wording + workflow step only; no script/schema/hook changes).
+- lint:fix and format: 0 errors, 0 changes. Skill index regenerated.
+
+---
+
+## Skill Updated: smart-debug (2026-02-20)
+
+- Skill `smart-debug` updated to version 2.0 with Cursor Debug Mode methodology.
+- **7 capability additions**: (1) Hypothesis generation with probability ranking as blocking gate before instrumentation; (2) Structured instrumentation phase with session-scoped log files (`debug-{sessionId}.log` in `.claude/context/tmp/`); (3) Human-in-the-loop reproduction gate — agent stops and waits for user to reproduce before proceeding to log analysis; (4) Log analysis before fix — root cause must be confirmed from log evidence, no speculation; (5) Instrumentation cleanup as mandatory final step with grep verification; (6) Write/Edit tools added to frontmatter (was blocking gap — skill couldn't instrument code); (7) `verified: true` set.
+- **Pattern**: Cursor Debug Mode = hypothesis-first, instrument-then-wait, log-confirmed root cause, cleanup-mandatory. This prevents symptom-fixing and ensures evidence-backed debugging.
+- **Worked example reference**: `.claude.archive/.tmp/DEBUG/cursor_structural_deadlock_in_task_proc.md` — shows the full methodology applied to a real deadlock (H1–H5 hypotheses, instrumentation at step0-guard + tasklist-first gate, reproduction gate, log analysis confirming H5, cleanup).
+- **Skill index regenerated**: `generate-skill-index.cjs` run — smart-debug entry now shows `Write`/`Edit` in `requiredTools` and updated description.
+- **Sequential skill update workflow** (reflection: Tasks 1-3, 2026-02-20): For major skill updates (v1.x → v2.0 with 5+ capabilities), use sequential phases: (1) Research (audit existing skill, identify gaps); (2) Implement (add capabilities, set verified: true, update tool/schema); (3) Integrate (catalog entry, agent assignment ≥3 agents, docs cross-ref). Each phase gates the next. Pattern is repeatable and more efficient than parallel when dependencies exist.
+
+---
+
 ## 2026-02-20: External Skill Content Ingestion Threat Model
 
 - **Supply chain attack surface**: 9 skills ingest external content via `gh api`, `WebFetch`, `git clone`. Most critical: skill-creator Step 2A, skill-updater Step 2A, skill-creator --install action.
@@ -59,3 +81,39 @@
 - Report: `.claude/context/reports/security/code-review-supply-chain-fixes-2026-02-20.md`
 
 - Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-20)
+
+- Refreshed agent: .claude/agents/specialized/code-reviewer.md (2026-02-20)
+
+## Task #31: Code-Reviewer Tool Expansion (2026-02-20)
+
+- **Action**: Added Write tool to code-reviewer agent (code-reviewer.md tools array)
+- **Motivation**: Enable code-reviewer to write report files directly instead of delegating I/O to developer
+- **Corruption Reverted**: Removed malformed routing-table change that was introduced during earlier task
+- **Quality Score**: 0.9075 (EXCELLENT)
+- **Pattern**: Agent tool scope expansion requires verification that downstream code paths use the new capability. Recommend: After tool additions, grep for Write() calls in agent role definition to ensure new tool is being leveraged.
+- **Gotcha**: Agent tool changes affect both tools array AND agent prompt usage. Refreshing tools without updating agent prompt to use them creates "phantom capability" (tool present but unused).
+- **Integration Note**: code-reviewer can now write directly to `.claude/context/reports/` directories per workspace-conventions.md rules. Verify file paths are scoped correctly (no creator paths, temp dirs, or user home directories).
+
+---
+
+## Skill Registration Consistency Pattern (2026-02-21)
+
+Three sources must agree for any skill: (1) skill-catalog.md Primary Agents column, (2) skill-index.json agentPrimary array, (3) actual agent .md files skills: frontmatter.
+Tool: pnpm validate:skill-consistency
+Lesson: Validate at creation time (creator skills) AND at review time (reflection-agent Step 4.7).
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-21)
+
+- Created new agent: qa-guardian (2026-02-21)
+
+- Updated workflow: evolution-workflow (2026-02-21)
+
+- Updated workflow: missing-workflow-xyz (2026-02-21)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-21)
+
+- Created new agent: contract-check (2026-02-21)
+
+- Created new agent: bool-action (2026-02-21)
+
+- Created new agent: repo-onboarder (2026-02-21)
