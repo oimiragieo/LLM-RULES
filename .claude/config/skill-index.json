@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-21T08:31:06.209Z",
+  "generatedAt": "2026-02-21T20:58:44.230Z",
   "metadata": {
-    "totalSkills": 327,
+    "totalSkills": 336,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-21T08:31:06.209Z",
+    "lastValidated": "2026-02-21T20:58:44.230Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -852,6 +852,28 @@
       "priority": 1,
       "aliasOf": null
     },
+    "ask-questions-if-underspecified": {
+      "name": "ask-questions-if-underspecified",
+      "displayName": "Ask Questions If Underspecified",
+      "category": "Other",
+      "domain": "other",
+      "description": "Ask the minimum clarifying questions before implementation when requirements are ambiguous or missing crucial details",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "ask-questions-if-underspecified"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "assimilate": {
       "name": "assimilate",
       "displayName": "Assimilate",
@@ -899,6 +921,30 @@
         "development",
         "other",
         "async-operations"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "audit-context-building": {
+      "name": "audit-context-building",
+      "displayName": "Audit Context Building",
+      "category": "Other",
+      "domain": "other",
+      "description": "Ultra-granular code analysis for deep architectural context building. Line-by-line and block-by-block analysis using First Principles, 5 Whys, 5 Hows methodology at micro scale. Builds mental models, tracks invariants and assumptions, and maps cross-function call flows for security audit preparation.",
+      "requiredTools": [
+        "Read",
+        "Glob",
+        "Grep",
+        "Bash",
+        "Write"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "audit-context-building"
       ],
       "priority": 3,
       "aliasOf": null
@@ -1025,6 +1071,30 @@
       "tags": [
         "other",
         "build-tools-expert"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "building-secure-contracts": {
+      "name": "building-secure-contracts",
+      "displayName": "Building Secure Contracts",
+      "category": "Other",
+      "domain": "other",
+      "description": "Smart contract and secure API contract security analysis — invariant checking, access control, reentrancy, and integer overflow patterns",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Grep",
+        "Bash",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "building-secure-contracts"
       ],
       "priority": 3,
       "aliasOf": null
@@ -1960,6 +2030,29 @@
       "priority": 3,
       "aliasOf": null
     },
+    "feature-flag-management": {
+      "name": "feature-flag-management",
+      "displayName": "Feature Flag Management",
+      "category": "Other",
+      "domain": "other",
+      "description": "Feature flag lifecycle management — toggling features safely, gradual rollouts, A/B testing patterns, and flag cleanup to prevent technical debt",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "feature-flag-management"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "filesystem": {
       "name": "filesystem",
       "displayName": "Filesystem",
@@ -1984,6 +2077,30 @@
         "filesystem"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "fix-review": {
+      "name": "fix-review",
+      "displayName": "Fix Review",
+      "category": "Other",
+      "domain": "other",
+      "description": "Verify fix commits address security findings without introducing new bugs or regressions. Analyzes diffs for anti-patterns like removed validation, weakened access control, reduced error handling, reordered external calls, and changed integer operations. Generates structured FIX_REVIEW_REPORT with finding status tracking.",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Grep",
+        "Glob",
+        "Write"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "fix-review"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "form-and-actions-in-sveltekit": {
@@ -2696,6 +2813,30 @@
         "mobile-ui-development-rule"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "modern-python": {
+      "name": "modern-python",
+      "displayName": "Modern Python",
+      "category": "Other",
+      "domain": "other",
+      "description": "Modern Python tooling best practices using uv, ruff, ty, and pytest. Mandates the Trail of Bits Python coding standards for project setup, dependency management, linting, type checking, and testing. Based on patterns from trailofbits/cookiecutter-python.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "modern-python"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "multi-agent-architecture-reference": {
@@ -7005,6 +7146,29 @@
       "priority": 3,
       "aliasOf": null
     },
+    "spec-to-code-compliance": {
+      "name": "spec-to-code-compliance",
+      "displayName": "Spec To Code Compliance",
+      "category": "Other",
+      "domain": "other",
+      "description": "Verify that implementation code faithfully implements its specification — checks function contracts, API contracts, and protocol compliance against source specifications",
+      "requiredTools": [
+        "Read",
+        "Grep",
+        "Bash",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "spec-to-code-compliance"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "state-management-expert": {
       "name": "state-management-expert",
       "displayName": "State Management Expert",
@@ -7841,6 +8005,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "webapp-testing": {
+      "name": "webapp-testing",
+      "displayName": "Webapp Testing",
+      "category": "Other",
+      "domain": "other",
+      "description": "Test local web applications using Playwright with Python. Verify frontend functionality, debug UI behavior, capture screenshots, and view browser console logs. Supports static HTML files, dynamic webapps with running servers, and automated test generation.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "webapp-testing"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "workflow-creator": {
       "name": "workflow-creator",
       "displayName": "Workflow Creator",
@@ -7921,6 +8109,30 @@
       ],
       "priority": 3,
       "aliasOf": null
+    },
+    "yara-authoring": {
+      "name": "yara-authoring",
+      "displayName": "Yara Authoring",
+      "category": "Other",
+      "domain": "other",
+      "description": "YARA-X detection rule authoring with expert judgment, linting, atom analysis, and best practices. Teaches how to think like an expert YARA author for malware detection, threat hunting, and indicator-of-compromise identification using YARA-X (the Rust-based successor to legacy YARA).",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "yara-authoring"
+      ],
+      "priority": 3,
+      "aliasOf": null
     }
   },
   "index": {
@@ -7994,9 +8206,12 @@
         "agent-tool-design",
         "agent-updater",
         "artifact-updater",
+        "ask-questions-if-underspecified",
         "assimilate",
+        "audit-context-building",
         "best-practices-guidelines",
         "build-tools-expert",
+        "building-secure-contracts",
         "code-semantic-search",
         "command-creator",
         "compliance-policy-check",
@@ -8009,6 +8224,8 @@
         "dry-principle",
         "dto-conventions",
         "eval-harness-updater",
+        "feature-flag-management",
+        "fix-review",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "gemini-cli-security",
@@ -8016,6 +8233,7 @@
         "integration/artifact-updater",
         "medusa-security",
         "memory-quality-auditor",
+        "modern-python",
         "multi-agent-architecture-reference",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -8175,6 +8393,7 @@
         "skill-updater",
         "sparc-methodology",
         "spec-init",
+        "spec-to-code-compliance",
         "static-analysis",
         "tall-stack-general",
         "tauri-security-rules",
@@ -8186,7 +8405,9 @@
         "tsconfig-json-rules",
         "variant-analysis",
         "wave-executor",
-        "workflow-updater"
+        "webapp-testing",
+        "workflow-updater",
+        "yara-authoring"
       ],
       "database": [
         "database-architect",
@@ -8325,11 +8546,14 @@
         "api-development-expert",
         "artifact-lifecycle",
         "artifact-updater",
+        "ask-questions-if-underspecified",
         "assimilate",
         "async-operations",
+        "audit-context-building",
         "best-practices-guidelines",
         "binary-analysis-patterns",
         "build-tools-expert",
+        "building-secure-contracts",
         "ci-cd-implementation-rule",
         "cloud-devops-expert",
         "code-analyzer",
@@ -8357,7 +8581,9 @@
         "dto-conventions",
         "eval-harness-updater",
         "expo-mobile-app-rule",
+        "feature-flag-management",
         "filesystem",
+        "fix-review",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "frontend-expert",
@@ -8381,6 +8607,7 @@
         "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
+        "modern-python",
         "multi-agent-architecture-reference",
         "nodejs-expert",
         "on-call-handoff-patterns",
@@ -8557,6 +8784,7 @@
         "smart-debug",
         "sparc-methodology",
         "spec-init",
+        "spec-to-code-compliance",
         "state-management-expert",
         "static-analysis",
         "summarize-changes",
@@ -8579,9 +8807,11 @@
         "variant-analysis",
         "visual-and-observational-rules",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
         "workflow-patterns",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "Languages": [
         "python-backend-expert",
@@ -8709,13 +8939,16 @@
         "architecture-review",
         "artifact-lifecycle",
         "artifact-updater",
+        "ask-questions-if-underspecified",
         "assimilate",
         "async-operations",
+        "audit-context-building",
         "auth-security-expert",
         "aws-cloud-ops",
         "best-practices-guidelines",
         "binary-analysis-patterns",
         "build-tools-expert",
+        "building-secure-contracts",
         "checklist-generator",
         "chrome-browser",
         "ci-cd-implementation-rule",
@@ -8752,7 +8985,9 @@
         "dto-conventions",
         "eval-harness-updater",
         "expo-mobile-app-rule",
+        "feature-flag-management",
         "filesystem",
+        "fix-review",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "framework-context",
@@ -8781,6 +9016,7 @@
         "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
+        "modern-python",
         "multi-agent-architecture-reference",
         "nextjs-expert",
         "nodejs-expert",
@@ -8970,6 +9206,7 @@
         "sparc-methodology",
         "spec-gathering",
         "spec-init",
+        "spec-to-code-compliance",
         "state-management-expert",
         "static-analysis",
         "styling-expert",
@@ -9001,9 +9238,11 @@
         "wave-executor",
         "web-design-guidelines-vercel",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
         "workflow-patterns",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "Bash": [
         "verification-before-completion",
@@ -9024,11 +9263,14 @@
         "ai-ml-expert",
         "android-expert",
         "api-development-expert",
+        "ask-questions-if-underspecified",
         "assimilate",
+        "audit-context-building",
         "auth-security-expert",
         "aws-cloud-ops",
         "binary-analysis-patterns",
         "build-tools-expert",
+        "building-secure-contracts",
         "cloud-devops-expert",
         "code-analyzer",
         "code-quality-expert",
@@ -9045,7 +9287,9 @@
         "differential-review",
         "docker-compose",
         "eval-harness-updater",
+        "feature-flag-management",
         "filesystem",
+        "fix-review",
         "frontend-expert",
         "gcloud-cli",
         "gemini-cli-security",
@@ -9067,6 +9311,7 @@
         "medusa-security",
         "memory-forensics",
         "memory-quality-auditor",
+        "modern-python",
         "nextjs-expert",
         "nodejs-expert",
         "on-call-handoff-patterns",
@@ -9094,6 +9339,7 @@
         "slack-notifications",
         "smart-debug",
         "spec-gathering",
+        "spec-to-code-compliance",
         "state-management-expert",
         "static-analysis",
         "styling-expert",
@@ -9109,8 +9355,10 @@
         "variant-analysis",
         "wave-executor",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "Glob": [
         "complexity-assessment",
@@ -9127,6 +9375,7 @@
         "api-development-expert",
         "architecture-review",
         "assimilate",
+        "audit-context-building",
         "auth-security-expert",
         "binary-analysis-patterns",
         "build-tools-expert",
@@ -9150,6 +9399,7 @@
         "docker-compose",
         "eval-harness-updater",
         "filesystem",
+        "fix-review",
         "frontend-expert",
         "gemini-cli-security",
         "gitops-workflow",
@@ -9166,6 +9416,7 @@
         "medusa-security",
         "memory-forensics",
         "memory-quality-auditor",
+        "modern-python",
         "nextjs-expert",
         "nodejs-expert",
         "php-expert",
@@ -9206,8 +9457,10 @@
         "variant-analysis",
         "wave-executor",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "Grep": [
         "complexity-assessment",
@@ -9224,9 +9477,11 @@
         "api-development-expert",
         "architecture-review",
         "assimilate",
+        "audit-context-building",
         "auth-security-expert",
         "binary-analysis-patterns",
         "build-tools-expert",
+        "building-secure-contracts",
         "checklist-generator",
         "cloud-devops-expert",
         "code-analyzer",
@@ -9247,6 +9502,7 @@
         "doc-generator",
         "eval-harness-updater",
         "filesystem",
+        "fix-review",
         "frontend-expert",
         "gemini-cli-security",
         "gitops-workflow",
@@ -9263,6 +9519,7 @@
         "medusa-security",
         "memory-forensics",
         "memory-quality-auditor",
+        "modern-python",
         "nextjs-expert",
         "nodejs-expert",
         "php-expert",
@@ -9285,6 +9542,7 @@
         "skill-discovery",
         "skill-updater",
         "smart-debug",
+        "spec-to-code-compliance",
         "state-management-expert",
         "static-analysis",
         "styling-expert",
@@ -9302,8 +9560,10 @@
         "variant-analysis",
         "wave-executor",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "Write": [
         "protocol-reverse-engineering",
@@ -9331,12 +9591,15 @@
         "api-development-expert",
         "architecture-review",
         "artifact-lifecycle",
+        "ask-questions-if-underspecified",
         "assimilate",
         "async-operations",
+        "audit-context-building",
         "auth-security-expert",
         "best-practices-guidelines",
         "binary-analysis-patterns",
         "build-tools-expert",
+        "building-secure-contracts",
         "checklist-generator",
         "chrome-browser",
         "ci-cd-implementation-rule",
@@ -9369,7 +9632,9 @@
         "dto-conventions",
         "eval-harness-updater",
         "expo-mobile-app-rule",
+        "feature-flag-management",
         "filesystem",
+        "fix-review",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "frontend-expert",
@@ -9396,6 +9661,7 @@
         "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
+        "modern-python",
         "nextjs-expert",
         "nodejs-expert",
         "on-call-handoff-patterns",
@@ -9607,9 +9873,11 @@
         "visual-and-observational-rules",
         "wave-executor",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
         "workflow-patterns",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "Edit": [
         "protocol-reverse-engineering",
@@ -9903,8 +10171,10 @@
         "agent-updater",
         "arxiv-mcp",
         "assimilate",
+        "building-secure-contracts",
         "chrome-browser",
         "eval-harness-updater",
+        "feature-flag-management",
         "gemini-cli-security",
         "multi-agent-architecture-reference",
         "powershell-expert",
@@ -9914,6 +10184,7 @@
         "skill-creator",
         "skill-updater",
         "slack-notifications",
+        "spec-to-code-compliance",
         "web-design-guidelines-vercel",
         "workflow-updater"
       ],
@@ -10007,11 +10278,14 @@
         "ai-ml-expert",
         "android-expert",
         "artifact-updater",
+        "ask-questions-if-underspecified",
         "assimilate",
         "async-operations",
+        "audit-context-building",
         "aws-cloud-ops",
         "best-practices-guidelines",
         "build-tools-expert",
+        "building-secure-contracts",
         "checklist-generator",
         "chrome-browser",
         "ci-cd-implementation-rule",
@@ -10033,6 +10307,8 @@
         "dto-conventions",
         "eval-harness-updater",
         "expo-mobile-app-rule",
+        "feature-flag-management",
+        "fix-review",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "gcloud-cli",
@@ -10049,6 +10325,7 @@
         "logging-module-usage",
         "medusa-security",
         "memory-quality-auditor",
+        "modern-python",
         "multi-agent-architecture-reference",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
@@ -10219,6 +10496,7 @@
         "smart-debug",
         "sparc-methodology",
         "spec-init",
+        "spec-to-code-compliance",
         "state-management-expert",
         "static-analysis",
         "tall-stack-general",
@@ -10237,8 +10515,10 @@
         "variant-analysis",
         "visual-and-observational-rules",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "planner": [
         "plan-generator",
@@ -10691,11 +10971,14 @@
         "ai-ml-expert",
         "android-expert",
         "artifact-updater",
+        "ask-questions-if-underspecified",
         "assimilate",
         "async-operations",
+        "audit-context-building",
         "aws-cloud-ops",
         "best-practices-guidelines",
         "build-tools-expert",
+        "building-secure-contracts",
         "checklist-generator",
         "chrome-browser",
         "ci-cd-implementation-rule",
@@ -10717,6 +11000,8 @@
         "dto-conventions",
         "eval-harness-updater",
         "expo-mobile-app-rule",
+        "feature-flag-management",
+        "fix-review",
         "form-and-actions-in-sveltekit",
         "form-validation-with-zod",
         "gcloud-cli",
@@ -10733,6 +11018,7 @@
         "logging-module-usage",
         "medusa-security",
         "memory-quality-auditor",
+        "modern-python",
         "multi-agent-architecture-reference",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
@@ -10903,6 +11189,7 @@
         "smart-debug",
         "sparc-methodology",
         "spec-init",
+        "spec-to-code-compliance",
         "state-management-expert",
         "static-analysis",
         "tall-stack-general",
@@ -10921,8 +11208,10 @@
         "variant-analysis",
         "visual-and-observational-rules",
         "web3-expert",
+        "webapp-testing",
         "workflow-creator",
-        "workflow-updater"
+        "workflow-updater",
+        "yara-authoring"
       ],
       "planner": [
         "plan-generator",
