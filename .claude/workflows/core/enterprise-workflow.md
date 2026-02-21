@@ -682,6 +682,11 @@ The Router selects domain specialists based on project detection:
 | ---------------- | ---------------------------------------- |
 | technical-writer | Update docs, README, API docs, CHANGELOG |
 
+### Document Phase — Mandatory Steps
+
+1. **Changelog Update (technical-writer)**: Update `CHANGELOG.md` with all changes made during this initiative. Use [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format. Group by: Added, Changed, Fixed, Deprecated, Removed, Security. Required before any commit to main.
+2. **Documentation Updates (technical-writer)**: Update relevant @docs files, README, and inline docs as needed.
+
 ### Agent Context
 
 ```
@@ -693,27 +698,29 @@ The Router selects domain specialists based on project detection:
 - Workflow ID: {workflowId}
 
 ## Instructions
-1. Update README.md if public API changed
-2. Update CHANGELOG.md with feature entry
+1. Update CHANGELOG.md with all changes (MANDATORY — use Keep a Changelog format:
+   Added / Changed / Fixed / Deprecated / Removed / Security sections)
+2. Update README.md if public API changed
 3. Update API documentation if endpoints changed
 4. Update architecture diagrams if structure changed
 5. Create/update user-facing documentation
 
 ## Mandatory Outputs
-- TaskUpdate({ taskId: X, status: "completed", metadata: { docsUpdated: [...] } })
+- TaskUpdate({ taskId: X, status: "completed", metadata: { docsUpdated: [...], changelogUpdated: true } })
 ```
 
 ### Exit Criteria
 
-- Documentation updated
+- CHANGELOG.md updated with all changes from this initiative (mandatory)
+- Other documentation updated as needed
 - Agent called TaskUpdate(completed)
 
 ### Quality Gate 5: DOCS MATCH IMPLEMENTATION
 
 | Check                                  | Required For | Blocking?    |
 | -------------------------------------- | ------------ | ------------ |
+| CHANGELOG updated (Keep a Changelog)   | ALL          | YES          |
 | README updated (if public API changed) | MEDIUM+      | NO (warning) |
-| CHANGELOG updated                      | MEDIUM+      | NO (warning) |
 | API docs match implementation          | HIGH+        | YES          |
 | Architecture diagrams current          | EPIC         | YES          |
 

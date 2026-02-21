@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — Skill-Wiring Improvement Initiative (2026-02-21, commit fdaff9f1)
+
+- `pnpm validate:skill-consistency` — new CLI tool (`.claude/tools/cli/validate-skill-agent-consistency.mjs`) that detects catalog/index/agent-file drift across all skills; exits non-zero for CI gating
+- `reflection-agent` Step 4.7 — automatic catalog/index/agent-assignment consistency checks run after any creator or updater task reflection; gaps recorded to `issues.md`
+- When-to-use comparison tables added to `debugging/SKILL.md` and `smart-debug/SKILL.md` with cross-references between the two skills
+- Debugging skill selection decision tree added to `@SKILL_USAGE_GUIDE.md`
+- Phase 2 gap reports: creator/updater skills architecture review and post-creation validation research (`.claude/context/artifacts/research-reports/`)
+
+### Fixed — Skill-Wiring Improvement Initiative (2026-02-21, commit fdaff9f1)
+
+- `developer.md` skills array: added `smart-debug` entry with contextual skills table row (was missing despite catalog claiming it as a primary agent)
+- `skill-index.json` and `skill-catalog.md`: aligned `agentPrimary` / Primary Agents columns for `smart-debug` (catalog and index were inconsistent with each other)
+- `pre-tool-unified.read-safety.cjs`: reduced cyclomatic complexity from 51 to 50 by extracting `isLargeUnwindowedFile()` helper function
+
 ### Fixed
 
 - **ESLint warnings (lint:fix clean)**: Resolved all 10 lint warnings: rust-expert `pre-execute.cjs` complexity via `validateOneOf()` helper; token-saver-context-compression nesting via `loadExistingTextsFromMemory()`; unused vars in cascade-entry-writer and backfill-skill-verification tests (underscore prefix); file-level `max-lines` / `complexity` disables for generate-skill-index, hybrid-search, and run-skill-updates.test with comments. `pnpm lint:fix` now exits with 0 and no warnings.
