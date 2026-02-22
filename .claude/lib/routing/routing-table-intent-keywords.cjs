@@ -469,6 +469,31 @@ const INTENT_KEYWORDS = {
     'designing',
   ],
   'sharp-edges': ['sharp-edges', 'sharp', 'edges', 'living', 'catalogue', 'known', 'hazard'],
+
+  // === MEDICAL RESEARCH TRIAGE ===
+  medical_research_triage: [
+    'medical',
+    'symptom',
+    'symptoms',
+    'health',
+    'diagnosis',
+    'triage',
+    'drug interaction',
+    'clinical',
+    'pharmacology',
+    'biomedical',
+    'disease',
+    'condition',
+    'treatment',
+    'medication',
+    'patient',
+    'doctor',
+    'emergency symptoms',
+    'differential',
+    'differential diagnosis',
+    'prescription',
+    'side effects',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

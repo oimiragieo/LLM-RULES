@@ -35,7 +35,7 @@ function runValidation(input) {
     effectivePayload.metadata.processedReflectionIds.length > 0;
   const result = parseAndValidateTaskUpdate(effectivePayload, {
     allowedStatuses: VALID_TASK_STATUSES,
-    requireTaskId: true,
+    requireTaskId: !isReflectionCompletion, // Reflection completions don't carry a traditional taskId
     requireStatus: true,
     requireCompletionMetadata: !isReflectionCompletion,
   });

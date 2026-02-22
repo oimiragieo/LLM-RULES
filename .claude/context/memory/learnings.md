@@ -28,6 +28,31 @@ Source: post-session audit 2026-02-21 — 6 skills (enhance-prompt, next-upgrade
 
 ---
 
+## Systemic Learning: Router Gap Observation Validation (2026-02-22)
+
+When Router appends gaps to session-gap-log.jsonl, **three categories have different validation maturity**:
+
+1. **Integration gaps** (integration_gap type) — Reliable
+   - Examples: missing catalog entry, unwired artifact, missing agent assignment
+   - Validation: Direct file checks (catalog exists, artifact-graph shows edges)
+   - False positive rate: LOW
+
+2. **Placeholder output** (placeholder_output type) — UNRELIABLE without content validation
+   - Example: router flagged task-27-research as "TEST_STUB" based on file metadata
+   - Reality: File contained 200+ lines of complete research report
+   - Root cause: Router checked file size/existence, not content
+   - Fix: Reflection-agent MUST read file content when evaluating placeholder claims
+   - False positive rate: HIGH (observable rate: 100% on this session)
+
+3. **Missing metadata** (missing_metadata type) — Reliable
+   - Examples: TaskUpdate failed (tool unavailable), task summary is fallback string
+   - Validation: Direct task metadata checks
+   - False positive rate: LOW
+
+**Practical Implication**: Reflection-agent should treat placeholder_output gaps with skepticism — verify by reading actual file content before accepting the classification.
+
+---
+
 ## Pattern: Dual-Layer Drift Detection for Skill Registration (2026-02-21)
 
 **Context**: 14-microtask skill-wiring initiative (M14 final reflection, task-20)

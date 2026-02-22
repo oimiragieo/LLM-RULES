@@ -19,21 +19,24 @@ const {
   shouldAutoReroute,
   getTaskListAutoRerouteConfig,
 } = require('./routing-guard-core.shared.cjs');
-
-function hasExplicitAgentContext(hookInput = null) {
-  if (!hookInput || typeof hookInput !== 'object') return false;
-  const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
-  if (taskId) return true;
-  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
-    .trim()
-    .toLowerCase();
-  if (agentId && agentId !== 'router') return true;
-  return false;
-}
-
-function isNonEmptyString(value) {
-  return typeof value === 'string' && value.trim().length > 0;
-}
+const {
+  hasExplicitAgentContext,
+  isNonEmptyString,
+  buildMissingFieldsMessage,
+  buildPlannerFirstMessage,
+  buildTaskCreateMessage,
+  buildSecurityReviewMessage,
+  buildCodeSimplifierMessage,
+  buildHighRiskSpecialistMessage,
+  buildSpecialistOverrideMessage,
+  buildTaskListFirstBypassMessage,
+  buildTaskListFirstMessage,
+  buildTaskListFirstAutoRerouteMessage,
+  buildTaskListFirstRepeatedRerouteMessage,
+  buildCreatorIntentGuardMessage,
+  buildReflectionBackgroundMessage,
+  buildSkillAgentConfusionMessage,
+} = require('./routing-guard-core.helpers.cjs');
 
 function checkTaskPayloadContract(toolName, toolInput = {}) {
   if (toolName !== 'Task' && toolName !== 'TaskCreate') {
@@ -63,10 +66,7 @@ function checkTaskPayloadContract(toolName, toolInput = {}) {
     return { pass: true };
   }
 
-  const message =
-    `[ROUTER-FIRST PROTOCOL VIOLATION][TASK-PAYLOAD-CONTRACT] ${toolName} missing required field(s): ` +
-    `${missing.join(', ')}. ` +
-    `Use TaskList() first, then provide a complete ${toolName} payload with description.`;
+  const message = buildMissingFieldsMessage(toolName, missing);
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -103,7 +103,7 @@ function checkPlannerFirst(toolName, toolInput) {
   }
 
   const complexity = state.complexity || 'unknown';
-  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][PLANNER-FIRST VIOLATION] Complexity=${complexity}. Spawn PLANNER first via Task().`;
+  const message = buildPlannerFirstMessage(complexity);
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -144,7 +144,7 @@ function checkTaskCreate(toolName, hookInput = null) {
         dedupe.count,
         'Spawn PLANNER via Task() before creating additional tasks.'
       )
-    : `[ROUTER-FIRST PROTOCOL VIOLATION][TASK-CREATE VIOLATION] Complex task (${complexity}) requires PLANNER first.`;
+    : buildTaskCreateMessage(complexity);
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -176,8 +176,7 @@ function checkSecurityReview(toolName, toolInput) {
     return { pass: true };
   }
 
-  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][SEC-004] Security review required before implementation.
-Spawn SECURITY-ARCHITECT first to review security implications.`;
+  const message = buildSecurityReviewMessage();
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -204,8 +203,7 @@ function checkCodeSimplifierArchitectReview(toolName, toolInput = {}) {
     return { pass: true };
   }
 
-  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][ARCH-001] Code simplification requires architect review first.
-Spawn ARCHITECT first to validate structural safety, then run CODE-SIMPLIFIER.`;
+  const message = buildCodeSimplifierMessage();
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -233,8 +231,7 @@ function checkHighRiskSpecialistArchitectReview(toolName, toolInput = {}) {
   }
 
   const agentType = extractSpawnAgentType(toolInput) || 'specialist';
-  const message = `[ROUTER-FIRST PROTOCOL VIOLATION][ARCH-002] ${agentType} requires architect review first for high-risk changes.
-Spawn ARCHITECT first to validate system-level safety, then run ${agentType}.`;
+  const message = buildHighRiskSpecialistMessage(agentType);
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -272,13 +269,7 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
       const regex = new RegExp('\\b' + escaped + '\\b', 'i');
 
       if (regex.test(combined)) {
-        const canonicalHint = specialist === 'qa' ? '\nCanonical trigger: "run tests"' : '';
-        const message = `[ROUTER-FIRST PROTOCOL VIOLATION][SPECIALIST-OVERRIDE] Developer spawn detected for ${specialist} task.
-Keyword: "${phrase}"
-Suggestion: Use ${specialist} agent instead for better results.
-${canonicalHint}
-
-Developer should be LAST RESORT. Specialists have domain-specific prompts and skills.`;
+        const message = buildSpecialistOverrideMessage(specialist, phrase);
 
         const tracker = getViolationTracker();
         if (tracker) {
@@ -354,9 +345,7 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
     return {
       pass: true,
       result: 'warn',
-      message:
-        `[TASKLIST-FIRST BYPASS] Allowing ${toolName} before TaskList() in bypassPermissions mode. ` +
-        'Call TaskList() as soon as possible to sync task state.',
+      message: buildTaskListFirstBypassMessage(toolName),
     };
   }
 
@@ -369,8 +358,7 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
         dedupe.count,
         'TaskList() once, then continue with Task()/tool call'
       )
-    : `[ROUTER-FIRST PROTOCOL VIOLATION][TASKLIST-FIRST VIOLATION] Router must call TaskList() before using ${toolName}.
-Call TaskList() first to check existing tasks, then proceed with your operation.`;
+    : buildTaskListFirstMessage(toolName);
 
   const tracker = getViolationTracker();
   if (tracker) {
@@ -388,9 +376,7 @@ Call TaskList() first to check existing tasks, then proceed with your operation.
       return {
         pass: true,
         result: 'warn',
-        message:
-          `[TASKLIST-FIRST AUTO-REROUTE] ${toolName} attempted before TaskList(). ` +
-          'Auto-reroute mode engaged. Call TaskList() now, then continue with exploration tools.',
+        message: buildTaskListFirstAutoRerouteMessage(toolName),
       };
     }
     const autoReroute = getTaskListAutoRerouteConfig();
@@ -400,10 +386,7 @@ Call TaskList() first to check existing tasks, then proceed with your operation.
       return {
         pass: true,
         result: 'warn',
-        message:
-          `[TASKLIST-FIRST AUTO-REROUTE] Repeated violation (${dedupe.count}x) for ${toolName}. ` +
-          'Auto-reroute mode engaged to break denial loops. Next step: call TaskList() immediately, ' +
-          'then continue with TaskGet/TaskUpdate for existing work or Task() for new work.',
+        message: buildTaskListFirstRepeatedRerouteMessage(dedupe.count, toolName),
       };
     }
     return { pass: false, result: 'block', message };
@@ -448,31 +431,7 @@ function checkCreatorIntentGuard(toolName, toolInput = {}) {
   const creatorType = state.detectedCreatorType || 'creator';
   const requiredSkill = state.requiredCreatorSkill || creatorType;
 
-  const message = `
-+======================================================================+
-|  ROUTER-FIRST PROTOCOL VIOLATION                                     |
-|  CREATOR ROUTING VIOLATION                                           |
-+======================================================================+
-|  Creator intent detected: ${creatorType.padEnd(40)}|
-|  You are spawning a non-creator agent for artifact creation.         |
-|                                                                      |
-|  Artifact creation MUST use creator skills to ensure:                |
-|    - CLAUDE.md is updated with routing/documentation                 |
-|    - Relevant catalogs are updated for discoverability               |
-|    - Related agents are assigned the artifact                        |
-|    - Proper validation and testing occurs                            |
-|                                                                      |
-|  CORRECT APPROACH: Spawn general-purpose agent with creator skill    |
-|                                                                      |
-|  Task({                                                              |
-  task_id: 'task-5',
-|    subagent_type: 'general-purpose',                                 |
-|    prompt: \`You are a general-purpose agent.                         |
-|      Invoke Skill({ skill: "${requiredSkill}" }) and follow it...\`   |
-|  })                                                                  |
-|                                                                      |
-+======================================================================+
-`;
+  const message = buildCreatorIntentGuardMessage(creatorType, requiredSkill);
 
   const tracker = getViolationTracker();
   if (tracker) {
@@ -489,6 +448,37 @@ function checkCreatorIntentGuard(toolName, toolInput = {}) {
       },
     });
   }
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+  return { pass: true, result: 'warn', message };
+}
+
+function checkReflectionBackgroundSpawn(toolName, toolInput = {}) {
+  if (toolName !== 'Task') {
+    return { pass: true };
+  }
+
+  const enforcement = getEnforcementMode('REFLECTION_BACKGROUND_ENFORCEMENT', 'block');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  const subagentType = String(toolInput.subagent_type || toolInput.agent_type || '')
+    .trim()
+    .toLowerCase();
+  if (subagentType !== 'reflection-agent') {
+    return { pass: true };
+  }
+
+  // run_in_background strips the tool whitelist, making TaskUpdate unavailable
+  // which causes the atomic handshake to fail silently
+  if (toolInput.run_in_background !== true) {
+    return { pass: true };
+  }
+
+  const message = buildReflectionBackgroundMessage();
 
   if (enforcement === 'block') {
     return { pass: false, result: 'block', message };
@@ -526,24 +516,7 @@ function checkSkillAgentConfused(toolName, toolInput = {}) {
   ];
 
   if (skillNames.includes(subagentType)) {
-    const message = `
-+======================================================================+
-|  ROUTER-FIRST PROTOCOL VIOLATION                                     |
-|  SKILL-AGENT CONFUSION DETECTED                                      |
-+======================================================================+
-|  Requested subagent_type: '${subagentType.padEnd(25)}'               |
-|                                                                      |
-|  '${subagentType}' is a SKILL, not an agent type.                    |
-|  You cannot spawn a skill via Task().                                |
-|                                                                      |
-|  CORRECT APPROACH:                                                   |
-|  1. Spawn a valid agent (e.g., 'developer' or 'general-purpose')     |
-|  2. That agent must invoke the skill via Skill():                    |
-|                                                                      |
-|  Skill({ skill: "${subagentType}" })                                 |
-|                                                                      |
-+======================================================================+
-`;
+    const message = buildSkillAgentConfusionMessage(subagentType);
 
     const tracker = getViolationTracker();
     if (tracker) {
@@ -576,4 +549,5 @@ module.exports = {
   checkTaskListFirstGate,
   checkCreatorIntentGuard,
   checkSkillAgentConfused,
+  checkReflectionBackgroundSpawn,
 };

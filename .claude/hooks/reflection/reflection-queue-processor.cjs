@@ -405,6 +405,10 @@ function buildTaskPrompt(entry) {
   const timestamp = entry.timestamp || new Date().toISOString();
   const priority = entry.priority || 'medium';
   const id = `${trigger}:${timestamp}:${entry.taskId || entry.context || ''}`;
+  // Derive a stable, contract-compliant taskId for the reflection agent.
+  // Since reflection tasks are not created via TaskCreate, we derive an ID
+  // from the queue entry so the TaskUpdate atomic handshake can include it.
+  const reflectionTaskId = `reflection-${id.replace(/[^a-z0-9-]/gi, '-').toLowerCase().slice(0, 40)}`;
 
   let context = '';
   switch (trigger) {
@@ -437,8 +441,9 @@ Instructions:
 2. Analyze the context and extract learnings
 3. Update memory files as appropriate
 4. Document any patterns or issues discovered
-5. ATOMIC COMPLETION: In your final TaskUpdate({ status: "completed" }), you MUST include the following in metadata:
-   metadata: { processedReflectionIds: ["${id}"] }`;
+5. ATOMIC COMPLETION: In your final TaskUpdate call, you MUST use this exact format:
+   TaskUpdate({ taskId: "${reflectionTaskId}", status: "completed", metadata: { processedReflectionIds: ["${id}"] } })
+   Your reflection task ID is: ${reflectionTaskId}`;
 }
 
 /**

@@ -68,6 +68,7 @@ const {
   checkTaskListFirstGate,
   checkCreatorIntentGuard,
   checkSkillAgentConfused,
+  checkReflectionBackgroundSpawn,
 } = require('./routing-guard-core.checks-task.cjs');
 const {
   INTENT_PATTERNS,
@@ -284,6 +285,18 @@ function runAllChecks(toolName, toolInput, hookInput = null) {
       };
     }
     captureWarn('creator-intent-guard', creatorCheck);
+
+    const reflectionBgCheck = checkReflectionBackgroundSpawn(toolName, toolInput);
+    if (!reflectionBgCheck.pass) {
+      return {
+        pass: false,
+        result: reflectionBgCheck.result,
+        message: reflectionBgCheck.message,
+        checkName: 'reflection-background-spawn',
+        warnings,
+      };
+    }
+    captureWarn('reflection-background-spawn', reflectionBgCheck);
 
     const skillAgentConfusedCheck = checkSkillAgentConfused(toolName, toolInput);
     if (!skillAgentConfusedCheck.pass) {
