@@ -312,7 +312,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-20T22:56:06.203Z",
-      "last_accessed": "2026-02-20T23:04:12.912Z"
+      "last_accessed": "2026-02-22T03:29:17.726Z"
     },
     ".claude/hooks/routing/unified-creator-guard.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -360,7 +360,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-21T06:34:10.540Z",
-      "last_accessed": "2026-02-22T01:06:11.211Z"
+      "last_accessed": "2026-02-22T02:41:15.834Z"
     },
     ".claude/skills/multi-agent-architecture-reference/scripts/main.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -396,7 +396,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-22T00:48:02.838Z",
-      "last_accessed": "2026-02-22T00:57:51.797Z"
+      "last_accessed": "2026-02-22T03:28:44.158Z"
     },
     ".claude/hooks/workflow/post-completion-chain.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -415,7 +415,37 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-22T00:53:17.511Z",
       "last_accessed": "2026-02-22T00:58:17.659Z"
+    },
+    ".claude/skills/webmcp-browser-tools/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T02:12:28.217Z",
+      "last_accessed": "2026-02-22T02:12:28.217Z"
+    },
+    ".claude/hooks/validation/taskupdate-contract-validator.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T03:28:21.258Z",
+      "last_accessed": "2026-02-22T03:28:21.258Z"
+    },
+    ".claude/hooks/routing/routing-guard-core.checks-task.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T03:28:54.904Z",
+      "last_accessed": "2026-02-22T03:43:52.752Z"
+    },
+    "tests/hooks/validation/reflection-taskupdate.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T03:30:37.296Z",
+      "last_accessed": "2026-02-22T03:30:37.296Z"
+    },
+    ".claude/hooks/routing/routing-guard-core.helpers.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T03:42:37.626Z",
+      "last_accessed": "2026-02-22T03:42:37.626Z"
     }
   },
-  "last_updated": "2026-02-22T01:06:11.211Z"
+  "last_updated": "2026-02-22T03:43:52.752Z"
 }

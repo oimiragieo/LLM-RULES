@@ -408,7 +408,10 @@ function buildTaskPrompt(entry) {
   // Derive a stable, contract-compliant taskId for the reflection agent.
   // Since reflection tasks are not created via TaskCreate, we derive an ID
   // from the queue entry so the TaskUpdate atomic handshake can include it.
-  const reflectionTaskId = `reflection-${id.replace(/[^a-z0-9-]/gi, '-').toLowerCase().slice(0, 40)}`;
+  const reflectionTaskId = `reflection-${id
+    .replace(/[^a-z0-9-]/gi, '-')
+    .toLowerCase()
+    .slice(0, 40)}`;
 
   let context = '';
   switch (trigger) {

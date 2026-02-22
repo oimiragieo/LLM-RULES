@@ -157,23 +157,23 @@ Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. I
 
 ### Common Misrouting (MANDATORY CHECK — verify EVERY spawn)
 
-| User Request Contains        | WRONG     | CORRECT                   |
-| ---------------------------- | --------- | ------------------------- |
-| "update docs/README"         | developer | **technical-writer**      |
-| "clean up/refactor/simplify" | developer | **code-simplifier**       |
-| "review code/PR"             | developer | **code-reviewer**         |
-| "run/write tests"            | developer | **qa**                    |
-| "set up Docker/CI/deploy"    | developer | **devops**                |
-| "design database/schema"     | developer | **database-architect**    |
-| "research/investigate"       | developer | **researcher**            |
-| "debug production/incident"  | developer | **devops-troubleshooter** |
-| "git push / commit / deploy" | developer | **devops** |
-| "web performance / core web vitals" | developer | **frontend-pro** + `web-perf` skill |
-| "upgrade Next.js / migrate framework" | developer | **nextjs-pro** + `next-upgrade` skill |
-| "deploy to Vercel" | developer | **devops** + `vercel-deploy` skill |
-| "audit / security review / pentest" | developer | **security-architect** |
-| "refactor / clean up / simplify" | developer | **code-simplifier** |
-| "medical / symptoms / diagnosis / drug interaction" | researcher | **medical-research-triage** |
+| User Request Contains                               | WRONG      | CORRECT                               |
+| --------------------------------------------------- | ---------- | ------------------------------------- |
+| "update docs/README"                                | developer  | **technical-writer**                  |
+| "clean up/refactor/simplify"                        | developer  | **code-simplifier**                   |
+| "review code/PR"                                    | developer  | **code-reviewer**                     |
+| "run/write tests"                                   | developer  | **qa**                                |
+| "set up Docker/CI/deploy"                           | developer  | **devops**                            |
+| "design database/schema"                            | developer  | **database-architect**                |
+| "research/investigate"                              | developer  | **researcher**                        |
+| "debug production/incident"                         | developer  | **devops-troubleshooter**             |
+| "git push / commit / deploy"                        | developer  | **devops**                            |
+| "web performance / core web vitals"                 | developer  | **frontend-pro** + `web-perf` skill   |
+| "upgrade Next.js / migrate framework"               | developer  | **nextjs-pro** + `next-upgrade` skill |
+| "deploy to Vercel"                                  | developer  | **devops** + `vercel-deploy` skill    |
+| "audit / security review / pentest"                 | developer  | **security-architect**                |
+| "refactor / clean up / simplify"                    | developer  | **code-simplifier**                   |
+| "medical / symptoms / diagnosis / drug interaction" | researcher | **medical-research-triage**           |
 
 **CRITICAL**
 
@@ -198,14 +198,14 @@ Whitelist/blacklist tables: see `router-decision.md` Steps 5–6 and Section 0 a
 
 Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **spawn required agent(s)**.
 
-| Gate                    | Trigger (ANY YES)                                                                                   | Required Routing                       |
-| ----------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **1: Complexity**       | multi-step (>1 operation), multi-file changes, architecture decisions                               | **Spawn PLANNER first**                |
-| **2: Security**         | auth/authz/credentials, security-critical code, external data handling/integrations                 | include **SECURITY-ARCHITECT**         |
-| **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                                               | spawn appropriate agent                |
-| **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts                    | invoke correct **creator skill** first |
-| **5: Architect Review** | spawning code-simplifier/devops/devops-troubleshooter/chaos-engineer without prior architect review | spawn **ARCHITECT** first              |
-| **6: Proactive Audit** | pipeline completed that touched `.claude/hooks/`, `.claude/skills/`, `.claude/agents/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/` | spawn **QA** with `proactive-audit` skill |
+| Gate                    | Trigger (ANY YES)                                                                                                                                      | Required Routing                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| **1: Complexity**       | multi-step (>1 operation), multi-file changes, architecture decisions                                                                                  | **Spawn PLANNER first**                   |
+| **2: Security**         | auth/authz/credentials, security-critical code, external data handling/integrations                                                                    | include **SECURITY-ARCHITECT**            |
+| **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                                                                                                  | spawn appropriate agent                   |
+| **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts                                                                       | invoke correct **creator skill** first    |
+| **5: Architect Review** | spawning code-simplifier/devops/devops-troubleshooter/chaos-engineer without prior architect review                                                    | spawn **ARCHITECT** first                 |
+| **6: Proactive Audit**  | pipeline completed that touched `.claude/hooks/`, `.claude/skills/`, `.claude/agents/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/` | spawn **QA** with `proactive-audit` skill |
 
 Gate detail and decision tree live in `.claude/workflows/core/router-decision.md` (Step 4-6). Keep this section as the short enforcement checklist.
 
@@ -357,24 +357,24 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 **Quick Routing (high-frequency):**
 
-| Task Type                    | Agent                 |
-| ---------------------------- | --------------------- | ------------------------------------------------ |
-| Bug fixes / implementation   | `developer`           |
-| Documentation updates        | `technical-writer`    |
-| Refactor/simplify            | `code-simplifier`     |
-| Code review / audit          | `code-reviewer`       |
-| Testing / QA / coverage      | `qa`                  |
-| Architecture / system design | `architect`           |
-| External Integration         | `artifact-integrator` |
-| Security-sensitive work      | `security-architect`  |
-| Infra / CI / deploy          | `devops`              |
-| Planning / decomposition     | `planner`             |
-| External research            | `researcher`          |
-| Git push / deploy / release  | `devops`              |
-| Qa Guardian                  | `qa-guardian`         | `.claude/agents/domain/qa-guardian.md`           |
-| Contract Check               | `contract-check`      | `.claude/agents/domain/contract-check.md`        |
-| Bool Action                  | `bool-action`         | `.claude/agents/domain/bool-action.md`           |
-| Repo Onboarder               | `repo-onboarder`      | `.claude/agents/orchestrators/repo-onboarder.md` |
+| Task Type                                         | Agent                     |
+| ------------------------------------------------- | ------------------------- | -------------------------------------------------- |
+| Bug fixes / implementation                        | `developer`               |
+| Documentation updates                             | `technical-writer`        |
+| Refactor/simplify                                 | `code-simplifier`         |
+| Code review / audit                               | `code-reviewer`           |
+| Testing / QA / coverage                           | `qa`                      |
+| Architecture / system design                      | `architect`               |
+| External Integration                              | `artifact-integrator`     |
+| Security-sensitive work                           | `security-architect`      |
+| Infra / CI / deploy                               | `devops`                  |
+| Planning / decomposition                          | `planner`                 |
+| External research                                 | `researcher`              |
+| Git push / deploy / release                       | `devops`                  |
+| Qa Guardian                                       | `qa-guardian`             | `.claude/agents/domain/qa-guardian.md`             |
+| Contract Check                                    | `contract-check`          | `.claude/agents/domain/contract-check.md`          |
+| Bool Action                                       | `bool-action`             | `.claude/agents/domain/bool-action.md`             |
+| Repo Onboarder                                    | `repo-onboarder`          | `.claude/agents/orchestrators/repo-onboarder.md`   |
 | Medical / symptoms / drug interactions / clinical | `medical-research-triage` | `.claude/agents/domain/medical-research-triage.md` |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.

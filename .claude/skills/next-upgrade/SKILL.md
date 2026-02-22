@@ -59,11 +59,11 @@ node --version
 **Version Requirements:**
 
 | Next.js | Minimum Node.js | Minimum React |
-|---------|----------------|---------------|
-| 13      | 16.14          | 18.2.0        |
-| 14      | 18.17          | 18.2.0        |
-| 15      | 18.18          | 19.0.0        |
-| 16      | 20.0           | 19.0.0        |
+| ------- | --------------- | ------------- |
+| 13      | 16.14           | 18.2.0        |
+| 14      | 18.17           | 18.2.0        |
+| 15      | 18.18           | 19.0.0        |
+| 16      | 20.0            | 19.0.0        |
 
 ### Step 2: Create Upgrade Branch
 
@@ -151,14 +151,14 @@ export default nextConfig;
 
 **Configuration Changes by Version:**
 
-| Version | Change |
-|---------|--------|
-| 14 | `appDir` removed from experimental (now default) |
-| 14 | `serverActions` removed from experimental (now stable) |
-| 15 | `bundlePagesRouterDependencies` now default true |
-| 15 | `swcMinify` removed (now always enabled) |
-| 16 | `dynamicIO` replaces several caching behaviors |
-| 16 | `cacheComponents: true` enables component caching |
+| Version | Change                                                 |
+| ------- | ------------------------------------------------------ |
+| 14      | `appDir` removed from experimental (now default)       |
+| 14      | `serverActions` removed from experimental (now stable) |
+| 15      | `bundlePagesRouterDependencies` now default true       |
+| 15      | `swcMinify` removed (now always enabled)               |
+| 16      | `dynamicIO` replaces several caching behaviors         |
+| 16      | `cacheComponents: true` enables component caching      |
 
 ### Step 6: Resolve Breaking Changes
 
@@ -167,6 +167,7 @@ After running codemods, manually resolve remaining breaking changes.
 **Common Breaking Changes (15 to 16):**
 
 1. **Async Request APIs**: `cookies()`, `headers()`, `params`, `searchParams` are now async
+
    ```typescript
    // Before (Next.js 14)
    export default function Page({ params }: { params: { id: string } }) {
@@ -180,6 +181,7 @@ After running codemods, manually resolve remaining breaking changes.
    ```
 
 2. **Caching Default Changed**: `fetch()` requests are no longer cached by default in Next.js 15+
+
    ```typescript
    // Before: cached by default
    fetch('https://api.example.com/data');

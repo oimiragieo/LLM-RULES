@@ -75,55 +75,55 @@ For each changed artifact, apply the relevant checks from this matrix:
 
 ### Hook Files (`.claude/hooks/**/*.cjs`)
 
-| Check ID | Check | Command | Severity |
-|----------|-------|---------|----------|
-| H-01 | Syntax validity | `node --check <file>` | CRITICAL |
-| H-02 | SE-02: raw JSON.parse without safeParseJSON | `grep -n "JSON.parse(" <file>` then verify safeParseJSON import | HIGH |
-| H-03 | SE-01: shell injection via shell: true | `grep -n "shell:\\s*true" <file>` | HIGH |
-| H-04 | Hook registered in settings.json | `grep "<hook-filename>" .claude/settings.json` | MEDIUM |
-| H-05 | Exit code correctness | Verify try/catch wrapping, exit 0 on non-critical errors | MEDIUM |
+| Check ID | Check                                       | Command                                                         | Severity |
+| -------- | ------------------------------------------- | --------------------------------------------------------------- | -------- |
+| H-01     | Syntax validity                             | `node --check <file>`                                           | CRITICAL |
+| H-02     | SE-02: raw JSON.parse without safeParseJSON | `grep -n "JSON.parse(" <file>` then verify safeParseJSON import | HIGH     |
+| H-03     | SE-01: shell injection via shell: true      | `grep -n "shell:\\s*true" <file>`                               | HIGH     |
+| H-04     | Hook registered in settings.json            | `grep "<hook-filename>" .claude/settings.json`                  | MEDIUM   |
+| H-05     | Exit code correctness                       | Verify try/catch wrapping, exit 0 on non-critical errors        | MEDIUM   |
 
 **H-02 detail:** If `JSON.parse(` is found, check if the file also imports `safeParseJSON` from `.claude/lib/utils/safe-json.cjs`. If not, flag as HIGH finding. Exclude test files (`*.test.cjs`).
 
 ### Skill Files (`.claude/skills/**/SKILL.md`)
 
-| Check ID | Check | Command | Severity |
-|----------|-------|---------|----------|
-| S-01 | Skill appears in skill-catalog.md | `grep "<skill-name>" .claude/context/artifacts/catalogs/skill-catalog.md` | HIGH |
-| S-02 | At least one agent has skill in frontmatter | `grep -r "<skill-name>" .claude/agents/ --include="*.md"` | MEDIUM |
-| S-03 | Skill appears in CLAUDE.md Section 8.5 | `grep "<skill-name>" .claude/CLAUDE.md` | MEDIUM |
-| S-04 | SKILL.md has valid frontmatter | Verify `name:`, `description:`, `version:` fields exist | MEDIUM |
-| S-05 | Validate skills (if available) | `pnpm validate:skills 2>&1` | LOW |
+| Check ID | Check                                       | Command                                                                   | Severity |
+| -------- | ------------------------------------------- | ------------------------------------------------------------------------- | -------- |
+| S-01     | Skill appears in skill-catalog.md           | `grep "<skill-name>" .claude/context/artifacts/catalogs/skill-catalog.md` | HIGH     |
+| S-02     | At least one agent has skill in frontmatter | `grep -r "<skill-name>" .claude/agents/ --include="*.md"`                 | MEDIUM   |
+| S-03     | Skill appears in CLAUDE.md Section 8.5      | `grep "<skill-name>" .claude/CLAUDE.md`                                   | MEDIUM   |
+| S-04     | SKILL.md has valid frontmatter              | Verify `name:`, `description:`, `version:` fields exist                   | MEDIUM   |
+| S-05     | Validate skills (if available)              | `pnpm validate:skills 2>&1`                                               | LOW      |
 
 ### Agent Files (`.claude/agents/**/*.md`)
 
-| Check ID | Check | Command | Severity |
-|----------|-------|---------|----------|
-| A-01 | Agent appears in agent-registry.json | `grep "<agent-name>" .claude/context/agent-registry.json` | HIGH |
-| A-02 | Agent's skills: list references existing skills | For each skill in frontmatter, verify `.claude/skills/<skill>/SKILL.md` exists | MEDIUM |
-| A-03 | Agent's tools: list contains only valid tools | Verify each tool name against known tool list | MEDIUM |
-| A-04 | Agent appears in CLAUDE.md routing table | `grep "<agent-name>" .claude/CLAUDE.md` | MEDIUM |
+| Check ID | Check                                           | Command                                                                        | Severity |
+| -------- | ----------------------------------------------- | ------------------------------------------------------------------------------ | -------- |
+| A-01     | Agent appears in agent-registry.json            | `grep "<agent-name>" .claude/context/agent-registry.json`                      | HIGH     |
+| A-02     | Agent's skills: list references existing skills | For each skill in frontmatter, verify `.claude/skills/<skill>/SKILL.md` exists | MEDIUM   |
+| A-03     | Agent's tools: list contains only valid tools   | Verify each tool name against known tool list                                  | MEDIUM   |
+| A-04     | Agent appears in CLAUDE.md routing table        | `grep "<agent-name>" .claude/CLAUDE.md`                                        | MEDIUM   |
 
 ### Workflow Files (`.claude/workflows/**/*.md`)
 
-| Check ID | Check | Command | Severity |
-|----------|-------|---------|----------|
-| W-01 | Workflow referenced in WORKFLOW_AGENT_MAP.md | `grep "<workflow-name>" .claude/docs/@WORKFLOW_AGENT_MAP.md` | MEDIUM |
-| W-02 | Referenced agents exist | For each agent name in workflow, verify agent file exists | MEDIUM |
+| Check ID | Check                                        | Command                                                      | Severity |
+| -------- | -------------------------------------------- | ------------------------------------------------------------ | -------- |
+| W-01     | Workflow referenced in WORKFLOW_AGENT_MAP.md | `grep "<workflow-name>" .claude/docs/@WORKFLOW_AGENT_MAP.md` | MEDIUM   |
+| W-02     | Referenced agents exist                      | For each agent name in workflow, verify agent file exists    | MEDIUM   |
 
 ### Schema Files (`.claude/schemas/**/*.json`)
 
-| Check ID | Check | Command | Severity |
-|----------|-------|---------|----------|
-| SC-01 | Valid JSON syntax | `node -e "JSON.parse(require('fs').readFileSync('<file>', 'utf8'))"` | CRITICAL |
-| SC-02 | Schema appears in schema-catalog.md | `grep "<schema-name>" .claude/context/artifacts/catalogs/schema-catalog.md` | MEDIUM |
+| Check ID | Check                               | Command                                                                     | Severity |
+| -------- | ----------------------------------- | --------------------------------------------------------------------------- | -------- |
+| SC-01    | Valid JSON syntax                   | `node -e "JSON.parse(require('fs').readFileSync('<file>', 'utf8'))"`        | CRITICAL |
+| SC-02    | Schema appears in schema-catalog.md | `grep "<schema-name>" .claude/context/artifacts/catalogs/schema-catalog.md` | MEDIUM   |
 
 ### Routing Files (`.claude/lib/routing/routing-table.cjs`, `.claude/CLAUDE.md`)
 
-| Check ID | Check | Command | Severity |
-|----------|-------|---------|----------|
-| R-01 | routing-table.cjs syntax | `node --check .claude/lib/routing/routing-table.cjs` | CRITICAL |
-| R-02 | Validate skills (full) | `pnpm validate:skills 2>&1` | MEDIUM |
+| Check ID | Check                    | Command                                              | Severity |
+| -------- | ------------------------ | ---------------------------------------------------- | -------- |
+| R-01     | routing-table.cjs syntax | `node --check .claude/lib/routing/routing-table.cjs` | CRITICAL |
+| R-02     | Validate skills (full)   | `pnpm validate:skills 2>&1`                          | MEDIUM   |
 
 ## Step 3: Generate Report
 
@@ -148,14 +148,14 @@ Write a structured report to `.claude/context/reports/proactive-audit-{ISO-date}
 
 ### CRITICAL
 
-| ID | File | Check | Detail | Remediation |
-|----|------|-------|--------|-------------|
+| ID   | File          | Check  | Detail                 | Remediation      |
+| ---- | ------------- | ------ | ---------------------- | ---------------- |
 | H-01 | hooks/foo.cjs | Syntax | SyntaxError at line 42 | Fix syntax error |
 
 ### HIGH
 
-| ID | File | Check | Detail | Remediation |
-|----|------|-------|--------|-------------|
+| ID   | File          | Check | Detail                                      | Remediation                                               |
+| ---- | ------------- | ----- | ------------------------------------------- | --------------------------------------------------------- |
 | H-02 | hooks/bar.cjs | SE-02 | JSON.parse at line 15 without safeParseJSON | Import safeParseJSON from .claude/lib/utils/safe-json.cjs |
 
 ### MEDIUM
@@ -164,9 +164,9 @@ Write a structured report to `.claude/context/reports/proactive-audit-{ISO-date}
 
 ### PASS
 
-| ID | File | Check | Result |
-|----|------|-------|--------|
-| H-01 | hooks/baz.cjs | Syntax | OK |
+| ID   | File          | Check  | Result |
+| ---- | ------------- | ------ | ------ |
+| H-01 | hooks/baz.cjs | Syntax | OK     |
 
 ## Summary
 
@@ -195,12 +195,12 @@ After generating the report:
 
 ## Severity Guide
 
-| Severity | Meaning | Action Required |
-|----------|---------|-----------------|
-| CRITICAL | Framework will break | Fix immediately, block pipeline completion |
-| HIGH | Security risk or invisible artifact | Fix before next session, warn user |
-| MEDIUM | Missing integration, incomplete wiring | Fix in follow-up task |
-| LOW | Best practice violation, cosmetic | Track for future improvement |
+| Severity | Meaning                                | Action Required                            |
+| -------- | -------------------------------------- | ------------------------------------------ |
+| CRITICAL | Framework will break                   | Fix immediately, block pipeline completion |
+| HIGH     | Security risk or invisible artifact    | Fix before next session, warn user         |
+| MEDIUM   | Missing integration, incomplete wiring | Fix in follow-up task                      |
+| LOW      | Best practice violation, cosmetic      | Track for future improvement               |
 
 ## Integration with Router Step 0.7
 

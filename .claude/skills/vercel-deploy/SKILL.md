@@ -28,24 +28,24 @@ Use this skill when:
 
 Vercel auto-detects and configures builds for these frameworks:
 
-| Framework | Detection | Build Command |
-|-----------|-----------|---------------|
-| Next.js | `next.config.*` | `next build` |
-| Vite | `vite.config.*` | `vite build` |
-| Remix | `remix.config.*` | `remix build` |
-| SvelteKit | `svelte.config.*` | `vite build` |
-| Astro | `astro.config.*` | `astro build` |
-| Nuxt | `nuxt.config.*` | `nuxt build` |
-| Gatsby | `gatsby-config.*` | `gatsby build` |
-| Angular | `angular.json` | `ng build` |
-| Vue CLI | `vue.config.*` | `vue-cli-service build` |
-| Create React App | `react-scripts` in deps | `react-scripts build` |
-| Ember | `ember-cli-build.js` | `ember build` |
-| Hugo | `config.toml` / `hugo.toml` | `hugo` |
-| Jekyll | `_config.yml` | `jekyll build` |
-| Eleventy | `.eleventy.js` | `eleventy` |
-| Docusaurus | `docusaurus.config.*` | `docusaurus build` |
-| Static HTML | `index.html` at root | None |
+| Framework        | Detection                   | Build Command           |
+| ---------------- | --------------------------- | ----------------------- |
+| Next.js          | `next.config.*`             | `next build`            |
+| Vite             | `vite.config.*`             | `vite build`            |
+| Remix            | `remix.config.*`            | `remix build`           |
+| SvelteKit        | `svelte.config.*`           | `vite build`            |
+| Astro            | `astro.config.*`            | `astro build`           |
+| Nuxt             | `nuxt.config.*`             | `nuxt build`            |
+| Gatsby           | `gatsby-config.*`           | `gatsby build`          |
+| Angular          | `angular.json`              | `ng build`              |
+| Vue CLI          | `vue.config.*`              | `vue-cli-service build` |
+| Create React App | `react-scripts` in deps     | `react-scripts build`   |
+| Ember            | `ember-cli-build.js`        | `ember build`           |
+| Hugo             | `config.toml` / `hugo.toml` | `hugo`                  |
+| Jekyll           | `_config.yml`               | `jekyll build`          |
+| Eleventy         | `.eleventy.js`              | `eleventy`              |
+| Docusaurus       | `docusaurus.config.*`       | `docusaurus build`      |
+| Static HTML      | `index.html` at root        | None                    |
 
 ## Deployment Workflow
 
@@ -167,9 +167,7 @@ Override auto-detected settings in `vercel.json`:
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": "vite",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
 
@@ -196,6 +194,7 @@ vercel alias <deployment-url> example.com
 ```
 
 Next.js deployments automatically enable:
+
 - Edge Runtime for middleware
 - ISR (Incremental Static Regeneration)
 - Image Optimization via `next/image`
@@ -208,9 +207,7 @@ Next.js deployments automatically enable:
   "framework": "vite",
   "buildCommand": "vite build",
   "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
 
@@ -272,9 +269,7 @@ Add rewrites for SPA frameworks:
 
 ```json
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
 

@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-22T02:43:47.882Z",
+  "generatedAt": "2026-02-22T03:49:56.929Z",
   "metadata": {
     "totalSkills": 346,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-22T02:43:47.883Z",
+    "lastValidated": "2026-02-22T03:49:56.930Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -169,29 +169,6 @@
       "tags": [
         "languages",
         "python-backend-expert"
-      ],
-      "priority": 1,
-      "aliasOf": null
-    },
-    "expo-framework-rule": {
-      "name": "expo-framework-rule",
-      "displayName": "Expo Framework Rule",
-      "category": "Other",
-      "domain": "mobile",
-      "description": "Expo Framework-specific guidelines. Includes best practices for Views, Blueprints, and Extensions.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
-      "agentPrimary": [
-        "expo-mobile-developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "mobile",
-        "other",
-        "expo-framework-rule"
       ],
       "priority": 1,
       "aliasOf": null
@@ -2086,6 +2063,29 @@
         "eval-harness-updater"
       ],
       "priority": 3,
+      "aliasOf": null
+    },
+    "expo-framework-rule": {
+      "name": "expo-framework-rule",
+      "displayName": "Expo Framework Rule",
+      "category": "Other",
+      "domain": "mobile",
+      "description": "Expo Framework-specific guidelines. Includes best practices for Views, Blueprints, and Extensions.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "expo-mobile-developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "mobile",
+        "other",
+        "expo-framework-rule"
+      ],
+      "priority": 1,
       "aliasOf": null
     },
     "expo-mobile-app-rule": {
@@ -8405,15 +8405,6 @@
         "prioritize-python-3-10-features",
         "typescript-expert"
       ],
-      "mobile": [
-        "expo-framework-rule",
-        "android-expert",
-        "expo-mobile-app-rule",
-        "ios-expert",
-        "mobile-first-design-rules",
-        "mobile-ui-development-rule",
-        "react-native-skills-vercel"
-      ],
       "other": [
         "webmcp-browser-tools",
         "next-cache-components",
@@ -8697,6 +8688,15 @@
       "ai-ml": [
         "ai-ml-expert"
       ],
+      "mobile": [
+        "android-expert",
+        "expo-framework-rule",
+        "expo-mobile-app-rule",
+        "ios-expert",
+        "mobile-first-design-rules",
+        "mobile-ui-development-rule",
+        "react-native-skills-vercel"
+      ],
       "frameworks": [
         "api-development-expert",
         "frontend-expert",
@@ -8758,7 +8758,6 @@
         "complexity-assessment",
         "protocol-reverse-engineering",
         "incident-runbook-templates",
-        "expo-framework-rule",
         "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
@@ -8815,6 +8814,7 @@
         "dto-conventions",
         "enhance-prompt",
         "eval-harness-updater",
+        "expo-framework-rule",
         "expo-mobile-app-rule",
         "feature-flag-management",
         "filesystem",
@@ -9154,7 +9154,6 @@
         "protocol-reverse-engineering",
         "incident-runbook-templates",
         "python-backend-expert",
-        "expo-framework-rule",
         "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
@@ -9229,6 +9228,7 @@
         "dto-conventions",
         "enhance-prompt",
         "eval-harness-updater",
+        "expo-framework-rule",
         "expo-mobile-app-rule",
         "feature-flag-management",
         "filesystem",
@@ -9823,7 +9823,6 @@
         "protocol-reverse-engineering",
         "incident-runbook-templates",
         "python-backend-expert",
-        "expo-framework-rule",
         "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
@@ -9889,6 +9888,7 @@
         "dto-conventions",
         "enhance-prompt",
         "eval-harness-updater",
+        "expo-framework-rule",
         "expo-mobile-app-rule",
         "feature-flag-management",
         "filesystem",
@@ -10145,7 +10145,6 @@
       "Edit": [
         "protocol-reverse-engineering",
         "python-backend-expert",
-        "expo-framework-rule",
         "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
@@ -10198,6 +10197,7 @@
         "dto-conventions",
         "enhance-prompt",
         "eval-harness-updater",
+        "expo-framework-rule",
         "expo-mobile-app-rule",
         "filesystem",
         "form-and-actions-in-sveltekit",

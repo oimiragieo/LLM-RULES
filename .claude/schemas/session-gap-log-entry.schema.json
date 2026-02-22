@@ -13,7 +13,15 @@
     },
     "type": {
       "type": "string",
-      "enum": ["retry", "placeholder_output", "integration_gap", "hook_warning", "missing_metadata", "stall", "agent_reported"],
+      "enum": [
+        "retry",
+        "placeholder_output",
+        "integration_gap",
+        "hook_warning",
+        "missing_metadata",
+        "stall",
+        "agent_reported"
+      ],
       "description": "Category of gap observed"
     },
     "taskId": {

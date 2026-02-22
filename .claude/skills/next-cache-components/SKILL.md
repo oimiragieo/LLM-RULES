@@ -31,13 +31,13 @@ Use this skill when:
 
 Next.js 16 introduces a fundamentally new caching model:
 
-| Feature | Next.js 14 | Next.js 15 | Next.js 16 |
-|---------|------------|------------|------------|
-| fetch() caching | Cached by default | Not cached by default | Not cached by default |
-| Route caching | Automatic | Opt-in | `'use cache'` directive |
-| Data caching | `revalidate` option | `revalidate` option | `cacheLife()` API |
-| Invalidation | `revalidateTag()` | `revalidateTag()` | `cacheTag()` + `revalidateTag()` |
-| Component caching | Not available | Experimental | `cacheComponents: true` |
+| Feature           | Next.js 14          | Next.js 15            | Next.js 16                       |
+| ----------------- | ------------------- | --------------------- | -------------------------------- |
+| fetch() caching   | Cached by default   | Not cached by default | Not cached by default            |
+| Route caching     | Automatic           | Opt-in                | `'use cache'` directive          |
+| Data caching      | `revalidate` option | `revalidate` option   | `cacheLife()` API                |
+| Invalidation      | `revalidateTag()`   | `revalidateTag()`     | `cacheTag()` + `revalidateTag()` |
+| Component caching | Not available       | Experimental          | `cacheComponents: true`          |
 
 ### Key Principle
 
@@ -141,12 +141,12 @@ export async function UserProfile({ userId }: { userId: string }) {
 import { cacheLife } from 'next/cache';
 
 // Predefined profiles
-cacheLife('seconds');  // stale: 0, revalidate: 1s, expire: 60s
-cacheLife('minutes');  // stale: 5min, revalidate: 1min, expire: 1h
-cacheLife('hours');    // stale: 5min, revalidate: 1h, expire: 1d
-cacheLife('days');     // stale: 5min, revalidate: 1d, expire: 1w
-cacheLife('weeks');    // stale: 5min, revalidate: 1w, expire: 30d
-cacheLife('max');      // stale: 5min, revalidate: 30d, expire: 365d
+cacheLife('seconds'); // stale: 0, revalidate: 1s, expire: 60s
+cacheLife('minutes'); // stale: 5min, revalidate: 1min, expire: 1h
+cacheLife('hours'); // stale: 5min, revalidate: 1h, expire: 1d
+cacheLife('days'); // stale: 5min, revalidate: 1d, expire: 1w
+cacheLife('weeks'); // stale: 5min, revalidate: 1w, expire: 30d
+cacheLife('max'); // stale: 5min, revalidate: 30d, expire: 365d
 ```
 
 ### Custom Profiles
@@ -158,19 +158,19 @@ Define custom cache profiles in `next.config.ts`:
 const nextConfig = {
   cacheLife: {
     'blog-post': {
-      stale: 300,        // 5 minutes -- serve stale while revalidating
-      revalidate: 3600,  // 1 hour -- revalidate in background
-      expire: 86400,     // 1 day -- maximum cache lifetime
+      stale: 300, // 5 minutes -- serve stale while revalidating
+      revalidate: 3600, // 1 hour -- revalidate in background
+      expire: 86400, // 1 day -- maximum cache lifetime
     },
     'user-session': {
-      stale: 0,          // Never serve stale
-      revalidate: 60,    // Revalidate every minute
-      expire: 300,       // Expire after 5 minutes
+      stale: 0, // Never serve stale
+      revalidate: 60, // Revalidate every minute
+      expire: 300, // Expire after 5 minutes
     },
     'static-content': {
-      stale: 3600,       // 1 hour stale tolerance
+      stale: 3600, // 1 hour stale tolerance
       revalidate: 86400, // Revalidate daily
-      expire: 604800,    // Expire after 1 week
+      expire: 604800, // Expire after 1 week
     },
   },
 };
@@ -190,14 +190,14 @@ async function getBlogPost(slug: string) {
 
 ### Profile Selection Guide
 
-| Content Type | Profile | Rationale |
-|-------------|---------|-----------|
-| Static pages | `'max'` or `'weeks'` | Content rarely changes |
-| Blog posts | `'days'` or custom | Updated occasionally |
-| Product listings | `'hours'` | Prices/stock change moderately |
-| User dashboards | `'minutes'` | Data updates frequently |
-| Real-time feeds | `'seconds'` or no cache | Data changes constantly |
-| Auth-dependent | custom (stale: 0) | Must never serve stale auth data |
+| Content Type     | Profile                 | Rationale                        |
+| ---------------- | ----------------------- | -------------------------------- |
+| Static pages     | `'max'` or `'weeks'`    | Content rarely changes           |
+| Blog posts       | `'days'` or custom      | Updated occasionally             |
+| Product listings | `'hours'`               | Prices/stock change moderately   |
+| User dashboards  | `'minutes'`             | Data updates frequently          |
+| Real-time feeds  | `'seconds'` or no cache | Data changes constantly          |
+| Auth-dependent   | custom (stale: 0)       | Must never serve stale auth data |
 
 ## Cache Invalidation with cacheTag()
 
@@ -249,9 +249,9 @@ entity-type-relation-id      -> 'product-123-reviews'
 
 ```typescript
 // Tag hierarchy for a blog
-cacheTag('blog');                    // All blog content
-cacheTag('blog', `blog-${slug}`);   // Specific post
-cacheTag('blog', 'blog-comments');  // All comments
+cacheTag('blog'); // All blog content
+cacheTag('blog', `blog-${slug}`); // Specific post
+cacheTag('blog', 'blog-comments'); // All comments
 cacheTag('blog', `blog-comments-${postId}`); // Post comments
 
 // Invalidate all blog content
@@ -322,7 +322,7 @@ export async function ProductDetails({ productId }: { productId: string }) {
 ```typescript
 // next.config.ts
 const nextConfig = {
-  ppr: true,            // Enable Partial Prerendering
+  ppr: true, // Enable Partial Prerendering
   cacheComponents: true, // Enable component-level caching
 };
 ```
@@ -360,7 +360,7 @@ async function getUser(id: string) {
 ```typescript
 // Before (Next.js 14)
 const data = await fetch('https://api.example.com/data', {
-  next: { revalidate: 3600, tags: ['data'] }
+  next: { revalidate: 3600, tags: ['data'] },
 });
 
 // After (Next.js 16)
@@ -385,7 +385,7 @@ export async function generateStaticParams() {
 }
 
 // After (Next.js 16) -- use 'use cache' at page level
-'use cache';
+('use cache');
 
 import { cacheLife } from 'next/cache';
 

@@ -26,7 +26,9 @@ const GAP_LOG_PATH = path.join(
 process.env.GAP_LOG_PATH_OVERRIDE = GAP_LOG_PATH;
 
 // Module under test — exports processTaskCompletion
-const { processTaskCompletion } = require('../../../.claude/hooks/workflow/post-completion-chain.cjs');
+const {
+  processTaskCompletion,
+} = require('../../../.claude/hooks/workflow/post-completion-chain.cjs');
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -154,7 +156,11 @@ describe('agent-gap-extraction: appendAgentGapsToSessionLog via processTaskCompl
 
     const entries = readGapLog();
     const inserted = entries.filter(e => e.taskId === 'task-22');
-    assert.strictEqual(inserted.length, 2, `Expected 2 entries for task-22, got ${inserted.length}`);
+    assert.strictEqual(
+      inserted.length,
+      2,
+      `Expected 2 entries for task-22, got ${inserted.length}`
+    );
 
     for (const e of inserted) {
       assert.strictEqual(
@@ -242,11 +248,7 @@ describe('agent-gap-extraction: appendAgentGapsToSessionLog via processTaskCompl
 
     const entries = readGapLog();
     const forTask = entries.filter(e => e.taskId === 'task-100');
-    assert.strictEqual(
-      forTask.length,
-      0,
-      'Expected no gap entries when gapLog is an empty array'
-    );
+    assert.strictEqual(forTask.length, 0, 'Expected no gap entries when gapLog is an empty array');
   });
 
   it('skips entries that lack a description field', async () => {

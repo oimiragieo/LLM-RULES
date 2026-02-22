@@ -91,16 +91,16 @@ Transform the raw request by applying these enhancement layers:
 
 Replace vague terms with specific component names and patterns:
 
-| Vague Term | Specific Replacement |
-|------------|---------------------|
-| "nice" | Clean layout with consistent spacing, proper visual hierarchy |
-| "modern" | Card-based layout, rounded corners, subtle shadows, micro-interactions |
-| "responsive" | Mobile-first grid (1-col mobile, 2-col tablet, 3-col desktop) |
-| "fast" | Skeleton loading states, optimistic updates, prefetched data |
+| Vague Term      | Specific Replacement                                                      |
+| --------------- | ------------------------------------------------------------------------- |
+| "nice"          | Clean layout with consistent spacing, proper visual hierarchy             |
+| "modern"        | Card-based layout, rounded corners, subtle shadows, micro-interactions    |
+| "responsive"    | Mobile-first grid (1-col mobile, 2-col tablet, 3-col desktop)             |
+| "fast"          | Skeleton loading states, optimistic updates, prefetched data              |
 | "user-friendly" | Clear labels, inline validation, helpful error messages, focus management |
-| "beautiful" | Design-system-compliant colors, balanced whitespace, typography scale |
-| "simple" | Single-column layout, minimal navigation, progressive disclosure |
-| "interactive" | Hover states, transitions, keyboard navigation, ARIA attributes |
+| "beautiful"     | Design-system-compliant colors, balanced whitespace, typography scale     |
+| "simple"        | Single-column layout, minimal navigation, progressive disclosure          |
+| "interactive"   | Hover states, transitions, keyboard navigation, ARIA attributes           |
 
 #### 3b. Inject Design Tokens
 
@@ -146,33 +146,40 @@ Produce the enhanced prompt in this structured format:
 ## Enhanced Specification: [Feature Name]
 
 ### Objective
+
 [1-2 sentences describing the precise goal]
 
 ### Design System Integration
+
 - Colors: [specific tokens]
 - Typography: [specific presets]
 - Spacing: [specific scale values]
 - Components: [reusable components to use]
 
 ### Layout Structure
+
 [ASCII or markdown layout diagram]
 
 ### Component Breakdown
+
 1. [Component name] - [purpose] - [key props/state]
 2. [Component name] - [purpose] - [key props/state]
 
 ### Interaction States
+
 - Loading: [description]
 - Error: [description]
 - Empty: [description]
 - Success: [description]
 
 ### Accessibility Requirements
+
 - Keyboard navigation: [specifics]
 - Screen reader: [ARIA labels/roles]
 - Focus management: [focus trap/restore behavior]
 
 ### Responsive Behavior
+
 - Mobile (< 640px): [layout]
 - Tablet (640-1024px): [layout]
 - Desktop (> 1024px): [layout]
@@ -188,10 +195,12 @@ Produce the enhanced prompt in this structured format:
 ## Enhanced Specification: Analytics Dashboard
 
 ### Objective
+
 Build a data visualization dashboard displaying key business metrics
 with real-time updates, date range filtering, and exportable reports.
 
 ### Design System Integration
+
 - Colors: --color-primary for active states, --color-success/warning/danger
   for metric status indicators
 - Typography: heading-1 for page title, heading-3 for card titles,
@@ -200,13 +209,15 @@ with real-time updates, date range filtering, and exportable reports.
 - Components: Card, Select (date picker), Button, Badge, Skeleton
 
 ### Layout Structure
-  [Nav]
-  [Page Title + Date Range Selector + Export Button]
-  [KPI Card] [KPI Card] [KPI Card] [KPI Card]    <- 4-col grid
-  [Line Chart (2/3 width)] [Pie Chart (1/3 width)] <- 2-col split
-  [Data Table (full width)]                         <- sortable, paginated
+
+[Nav]
+[Page Title + Date Range Selector + Export Button]
+[KPI Card] [KPI Card] [KPI Card] [KPI Card] <- 4-col grid
+[Line Chart (2/3 width)] [Pie Chart (1/3 width)] <- 2-col split
+[Data Table (full width)] <- sortable, paginated
 
 ### Component Breakdown
+
 1. KPICard - Displays single metric with trend indicator - { label, value, change, status }
 2. DateRangeSelector - Preset ranges + custom date picker - { range, onRangeChange }
 3. TrendChart - Line/area chart for time series data - { data, dateRange, metric }
@@ -214,17 +225,20 @@ with real-time updates, date range filtering, and exportable reports.
 5. MetricsTable - Sortable, paginated data table - { columns, data, sortBy, page }
 
 ### Interaction States
+
 - Loading: Skeleton cards (pulse animation) matching final dimensions
 - Error: Error banner with retry button, individual chart error boundaries
 - Empty: "No data for selected range" with suggestion to expand range
 - Success: Smooth number transitions (count-up animation) on data refresh
 
 ### Accessibility Requirements
+
 - Keyboard navigation: Tab through cards, charts have data table alternatives
 - Screen reader: Chart descriptions via aria-label, live region for metric updates
 - Focus management: Date picker focus trap, return focus on close
 
 ### Responsive Behavior
+
 - Mobile (< 640px): Single column, KPI cards stack vertically, charts full width
 - Tablet (640-1024px): 2-col KPI grid, charts stack vertically
 - Desktop (> 1024px): 4-col KPI grid, side-by-side charts
@@ -246,7 +260,7 @@ After using this skill, record learnings using `MemoryRecord`:
 MemoryRecord({
   type: 'pattern',
   text: 'enhance-prompt: [describe what design system pattern or prompt structure worked well]',
-  area: 'frontend'
+  area: 'frontend',
 });
 ```
 

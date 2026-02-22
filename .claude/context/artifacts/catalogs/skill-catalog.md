@@ -150,14 +150,14 @@ Language-specific expertise.
 
 Framework-specific expertise.
 
-| Skill                 | Description                                        | Primary Agents        |
-| --------------------- | -------------------------------------------------- | --------------------- |
-| `react-expert`        | React hooks, state management, React 19, Shadcn UI | frontend-pro          |
-| `nextjs-expert`       | Next.js App Router, Server Components              | nextjs-pro            |
-| `svelte-expert`       | Svelte and SvelteKit                               | sveltekit-expert      |
-| `graphql-expert`      | GraphQL schema, Apollo Client/Server               | graphql-pro           |
-| `expo-framework-rule` | Expo Framework guidelines                          | expo-mobile-developer |
-| `frontend-expert`     | UI/UX patterns, responsive design                  | frontend-pro          |
+| Skill                  | Description                                                                 | Primary Agents                      |
+| ---------------------- | --------------------------------------------------------------------------- | ----------------------------------- |
+| `react-expert`         | React hooks, state management, React 19, Shadcn UI                          | frontend-pro                        |
+| `nextjs-expert`        | Next.js App Router, Server Components                                       | nextjs-pro                          |
+| `svelte-expert`        | Svelte and SvelteKit                                                        | sveltekit-expert                    |
+| `graphql-expert`       | GraphQL schema, Apollo Client/Server                                        | graphql-pro                         |
+| `expo-framework-rule`  | Expo Framework guidelines                                                   | expo-mobile-developer               |
+| `frontend-expert`      | UI/UX patterns, responsive design                                           | frontend-pro                        |
 | `webmcp-browser-tools` | W3C WebMCP browser-side MCP tools proposal (draft — no browser support yet) | frontend-pro, developer, researcher |
 
 ---
@@ -307,15 +307,15 @@ Memory and context management.
 
 Quality validation skills.
 
-| Skill                            | Description                                      | Primary Agents       |
-| -------------------------------- | ------------------------------------------------ | -------------------- |
-| `verification-before-completion` | Pre-completion gate                              | all agents           |
-| `checklist-generator`            | IEEE 1028 + contextual checklists                | qa, code-reviewer    |
+| Skill                            | Description                                                       | Primary Agents           |
+| -------------------------------- | ----------------------------------------------------------------- | ------------------------ |
+| `verification-before-completion` | Pre-completion gate                                               | all agents               |
+| `checklist-generator`            | IEEE 1028 + contextual checklists                                 | qa, code-reviewer        |
 | `proactive-audit`                | Framework artifact health checks (hooks, skills, agents, routing) | qa, developer, architect |
-| `response-rater`                 | Plan and response quality audits                 | qa                   |
-| `test-generator`                 | Test code generation                             | developer, qa        |
-| `accessibility`                  | WCAG compliance validation                       | frontend-expert      |
-| `eval-harness-updater`           | Refreshes eval harness reliability and SLO gates | qa, reflection-agent |
+| `response-rater`                 | Plan and response quality audits                                  | qa                       |
+| `test-generator`                 | Test code generation                                              | developer, qa            |
+| `accessibility`                  | WCAG compliance validation                                        | frontend-expert          |
+| `eval-harness-updater`           | Refreshes eval harness reliability and SLO gates                  | qa, reflection-agent     |
 
 ---
 

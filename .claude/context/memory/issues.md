@@ -5,16 +5,19 @@
 **Root Cause**: Background task spawning (`run_in_background: true`) does not properly initialize tool whitelist for reflection-agent. When Router spawns reflection-agent in background mode, the TaskUpdate tool becomes unavailable at runtime despite being listed in frontmatter.
 
 **Evidence**:
+
 - session-gap-log.jsonl entry (2026-02-22T01:30:00Z): "Background-spawned reflection-agent (run_in_background:true) reported TaskUpdate unavailable"
 - Entry context: "Root cause: run_in_background spawns may not receive full tool whitelist"
 - Mitigation note: "never spawn reflection-agent with run_in_background:true — always foreground"
 
 **Affected Components**:
+
 1. **tool-scope-validator.cjs** — may not handle background vs foreground context correctly
 2. **pre-completion-validation.cjs** — may block metadata-only TaskUpdate calls from reflection-agent
 3. **reflection-step0-guard.cjs** — cannot clean up processed requests without atomic handshake
 
 **Fix Strategy**:
+
 1. Audit tool-scope-validator.cjs line-by-line for background context handling
 2. Test pre-completion-validation.cjs with reflection-agent metadata payload
 3. Add foreground-only enforcement to CLAUDE.md Step 0 routing-guard.cjs
@@ -64,6 +67,7 @@ TaskUpdate({
 **Observed Gap**: Router flagged task-27-research as "researcher produced TEST_STUB instead of actual research report for webmcp/Claude features"
 
 **Reality**: `.claude/context/artifacts/research-reports/claude-features-webmcp-research-2026-02-22.md` is a **complete 200+ line report** with:
+
 - Executive summary on 4 Claude features
 - Research methodology (6 queries documented)
 - 9 sources with credibility ratings
@@ -89,6 +93,7 @@ TaskUpdate({
 **Expected**: CLAUDE.md Section 1 Common Misrouting table clearly documents: "git push / commit / deploy" → **devops specialist**
 
 **Pattern**: This is a recurring misrouting risk:
+
 - ✗ developer for deploy/CI/git operations
 - ✓ devops for git push, commit, deployment, infrastructure
 
@@ -107,6 +112,7 @@ TaskUpdate({
 **Root Cause**: Reflection-agent spawned with `run_in_background: true` loses TaskUpdate tool in whitelist
 
 **Evidence**:
+
 - From session-gap-log: "Root cause: run_in_background spawns may not receive full tool whitelist"
 - Mitigation documented: "never spawn reflection-agent with run_in_background: true — always foreground"
 
@@ -114,9 +120,7 @@ TaskUpdate({
 
 **Mitigation**: CLAUDE.md Step 0 must enforce reflection-agent ALWAYS foreground (no background spawns)
 
-**Related**: May affect other background spawn patterns; check if run_in_background affects tool whitelist globally
-2. Tool whitelist configuration missing TaskUpdate for reflection-agent
-3. Skill framework overrides standard tool availability
+**Related**: May affect other background spawn patterns; check if run_in_background affects tool whitelist globally 2. Tool whitelist configuration missing TaskUpdate for reflection-agent 3. Skill framework overrides standard tool availability
 
 **Workaround**: None — requires Router or system configuration fix.
 
@@ -148,11 +152,13 @@ TaskUpdate({
 **Observed**: Task-26 used developer agent for git commit + push to main instead of devops specialist agent.
 
 **Impact**:
+
 - Suboptimal agent selection; developer has limited deployment expertise
 - Devops agent has proper deployment/CI/CD skills (vercel-deploy, gitops-workflow, etc.)
 - Router's specialist-first routing law not enforced for git operations
 
 **CLAUDE.md Requirement** (Section 1 — Specialist-First Routing Law):
+
 ```
 | User Request Contains        | WRONG     | CORRECT   |
 | "set up Docker/CI/deploy"    | developer | devops    |
@@ -163,11 +169,13 @@ TaskUpdate({
 **Expected Behavior**: Route all git commit/push/deploy operations → devops agent, NOT developer.
 
 **Fix Required**:
+
 1. Check routing-guard.cjs for git operation detection
 2. OR add to CLAUDE.md routing table with explicit git-push example
 3. OR update router self-check gates (Section 1.2) to detect git operations
 
 **Evidence**:
+
 - Task ID: task-26
 - Actual agent: developer
 - Expected agent: devops (from `@AGENT_ROUTING_TABLE.md`)
@@ -183,7 +191,7 @@ TaskUpdate({
 - [ ] Catalog: PRESENT (skill-catalog.md line 161)
 - [ ] Index: MISSING (skill-index.json has no entry)
 - [ ] Agent assignment: PRESENT (frontend-pro, developer, researcher)
-Source: reflection of tasks #28-31 (2026-02-22)
+      Source: reflection of tasks #28-31 (2026-02-22)
 
 **Fix**: Run `node .claude/tools/cli/generate-skill-index.cjs` after any manual SKILL.md creation.
 
@@ -194,7 +202,7 @@ Source: reflection of tasks #28-31 (2026-02-22)
 - [ ] Catalog: PRESENT (skill-catalog.md line 314)
 - [ ] Index: MISSING (skill-index.json has no entry)
 - [ ] Agent assignment: PRESENT (qa, developer, architect)
-Source: reflection of tasks #28-31 (2026-02-22)
+      Source: reflection of tasks #28-31 (2026-02-22)
 
 **Fix**: Run `node .claude/tools/cli/generate-skill-index.cjs` after any manual SKILL.md creation.
 

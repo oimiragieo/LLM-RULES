@@ -144,11 +144,13 @@ export function cn(...inputs: ClassValue[]) {
 `cn()` combines `clsx` (conditional classes) with `tailwind-merge` (resolves Tailwind conflicts):
 
 ```tsx
-<Button className={cn(
-  'bg-primary text-white',
-  isDisabled && 'opacity-50 cursor-not-allowed',
-  size === 'lg' && 'px-8 py-4 text-lg'
-)}>
+<Button
+  className={cn(
+    'bg-primary text-white',
+    isDisabled && 'opacity-50 cursor-not-allowed',
+    size === 'lg' && 'px-8 py-4 text-lg'
+  )}
+>
   Submit
 </Button>
 ```
@@ -354,22 +356,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -380,9 +374,9 @@ export function DataTable<TData, TValue>({
     <div className="rounded-md border">
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
+          {table.getHeaderGroups().map(headerGroup => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
+              {headerGroup.headers.map(header => (
                 <TableHead key={header.id}>
                   {flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
@@ -391,9 +385,9 @@ export function DataTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
+          {table.getRowModel().rows.map(row => (
             <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
+              {row.getVisibleCells().map(cell => (
                 <TableCell key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
@@ -455,15 +449,15 @@ shadcn/ui components are built on Radix UI, which provides:
 
 ### Key Accessibility Features by Component
 
-| Component | Keyboard | ARIA | Focus Trap |
-|-----------|----------|------|------------|
-| Button | Enter/Space to activate | role="button" | No |
-| Dialog | Escape to close | role="dialog", aria-modal | Yes |
-| Dropdown Menu | Arrow keys to navigate | role="menu", role="menuitem" | Yes |
-| Select | Arrow keys, type-ahead | role="listbox", role="option" | Yes |
-| Tabs | Arrow keys between tabs | role="tablist", role="tab" | No |
-| Toast | Auto-announce | role="status", aria-live | No |
-| Tooltip | Focus/hover to show | role="tooltip" | No |
+| Component     | Keyboard                | ARIA                          | Focus Trap |
+| ------------- | ----------------------- | ----------------------------- | ---------- |
+| Button        | Enter/Space to activate | role="button"                 | No         |
+| Dialog        | Escape to close         | role="dialog", aria-modal     | Yes        |
+| Dropdown Menu | Arrow keys to navigate  | role="menu", role="menuitem"  | Yes        |
+| Select        | Arrow keys, type-ahead  | role="listbox", role="option" | Yes        |
+| Tabs          | Arrow keys between tabs | role="tablist", role="tab"    | No         |
+| Toast         | Auto-announce           | role="status", aria-live      | No         |
+| Tooltip       | Focus/hover to show     | role="tooltip"                | No         |
 
 ### Custom Accessibility Enhancements
 

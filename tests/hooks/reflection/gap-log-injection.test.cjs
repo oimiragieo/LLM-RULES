@@ -124,10 +124,7 @@ describe('gap-log-injection: readSessionGapLog() via buildTaskPrompt()', () => {
     // generateSpawnInstruction calls buildTaskPrompt internally
     const instruction = generateSpawnInstruction(entry);
 
-    assert.ok(
-      typeof instruction === 'string',
-      'generateSpawnInstruction should return a string'
-    );
+    assert.ok(typeof instruction === 'string', 'generateSpawnInstruction should return a string');
     assert.ok(
       instruction.includes('Router Gap Observations'),
       `Expected prompt to contain "Router Gap Observations". Got:\n${instruction}`
@@ -152,10 +149,7 @@ describe('gap-log-injection: readSessionGapLog() via buildTaskPrompt()', () => {
       typeof request === 'object' && request !== null,
       'generateSpawnRequest should return an object'
     );
-    assert.ok(
-      typeof request.prompt === 'string',
-      'spawn request should have a prompt string'
-    );
+    assert.ok(typeof request.prompt === 'string', 'spawn request should have a prompt string');
     assert.ok(
       request.prompt.includes('Router Gap Observations'),
       `Expected spawn request prompt to contain "Router Gap Observations". Got:\n${request.prompt}`
@@ -221,10 +215,7 @@ describe('gap-log-injection: readSessionGapLog() via buildTaskPrompt()', () => {
     const entry = makeEntry();
     const instruction = generateSpawnInstruction(entry);
 
-    assert.ok(
-      instruction.includes('task-5'),
-      'Expected taskId to appear in gap section'
-    );
+    assert.ok(instruction.includes('task-5'), 'Expected taskId to appear in gap section');
     assert.ok(
       instruction.includes('artifact-integrator'),
       'Expected agent name to appear in gap section'

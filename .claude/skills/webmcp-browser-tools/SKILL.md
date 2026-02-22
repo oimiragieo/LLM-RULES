@@ -1,6 +1,6 @@
 ---
 name: webmcp-browser-tools
-description: "WebMCP (W3C Web Machine Learning Working Group proposal) — browser-side standard for web apps to expose functionality as MCP tools to AI agents. Draft status only; no production browser support yet."
+description: 'WebMCP (W3C Web Machine Learning Working Group proposal) — browser-side standard for web apps to expose functionality as MCP tools to AI agents. Draft status only; no production browser support yet.'
 version: 1.0.0
 model: sonnet
 invoked_by: agent
@@ -13,7 +13,7 @@ agents:
   - frontend-pro
   - developer
   - researcher
-category: "Web Development"
+category: 'Web Development'
 tags:
   - webmcp
   - browser
@@ -51,23 +51,23 @@ navigator.mcp.registerTool({
   inputSchema: {
     type: 'object',
     properties: {
-      query: { type: 'string', description: 'Natural language filter' }
-    }
+      query: { type: 'string', description: 'Natural language filter' },
+    },
   },
   handler: async ({ query }) => {
     return await productService.filter(query);
-  }
+  },
 });
 ```
 
 ## Key Differences from Standard MCP
 
-| Aspect | Standard MCP | WebMCP |
-|--------|-------------|--------|
-| Location | Separate server process | Browser client-side JS |
-| Context | Isolated from UI | Shares user interface state |
-| Status | Production-ready | W3C proposal (draft) |
-| Installation | npm package | Browser API (future) |
+| Aspect       | Standard MCP            | WebMCP                      |
+| ------------ | ----------------------- | --------------------------- |
+| Location     | Separate server process | Browser client-side JS      |
+| Context      | Isolated from UI        | Shares user interface state |
+| Status       | Production-ready        | W3C proposal (draft)        |
+| Installation | npm package             | Browser API (future)        |
 
 ## Use Cases (Future)
 
@@ -79,6 +79,7 @@ navigator.mcp.registerTool({
 ## agent-studio Integration Path
 
 When WebMCP ships in browsers:
+
 1. Update `chrome-browser` skill to include WebMCP tool discovery
 2. Add WebMCP tool enumeration to browser automation workflow
 3. Create bridge skill: `Skill({ skill: 'webmcp-browser-tools' })` → enumerate page tools → call them via Claude tool use
@@ -86,6 +87,7 @@ When WebMCP ships in browsers:
 ## Monitoring
 
 Watch: https://github.com/webmachinelearning/webmcp for:
+
 - W3C Working Draft publication
 - Browser implementation flags (Chrome/Firefox intent-to-implement)
 - npm package releases
@@ -98,11 +100,11 @@ Watch: https://github.com/webmachinelearning/webmcp for:
 
 ## Assigned Agents
 
-| Agent | Role |
-|-------|------|
+| Agent          | Role                                            |
+| -------------- | ----------------------------------------------- |
 | `frontend-pro` | Primary — browser-side tool design and planning |
-| `developer` | Supporting — integration architecture |
-| `researcher` | Supporting — W3C proposal monitoring |
+| `developer`    | Supporting — integration architecture           |
+| `researcher`   | Supporting — W3C proposal monitoring            |
 
 ## Memory Protocol (MANDATORY)
 

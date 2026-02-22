@@ -15,7 +15,20 @@ isolation: worktree
 priority: high
 extended_thinking: true
 tools:
-  [Read, Write, Edit, Glob, Grep, Bash, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    MemoryRecord,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    Skill,
+  ]
 skills:
   - task-management-protocol
   - checklist-generator

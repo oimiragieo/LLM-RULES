@@ -27,20 +27,20 @@ Use this skill when:
 
 ## Core Web Vitals Thresholds
 
-| Metric | Good | Needs Improvement | Poor | What It Measures |
-|--------|------|-------------------|------|------------------|
-| **LCP** | <= 2.5s | 2.5s - 4.0s | > 4.0s | Loading performance |
-| **CLS** | <= 0.1 | 0.1 - 0.25 | > 0.25 | Visual stability |
-| **INP** | <= 200ms | 200ms - 500ms | > 500ms | Interactivity (replaced FID) |
+| Metric  | Good     | Needs Improvement | Poor    | What It Measures             |
+| ------- | -------- | ----------------- | ------- | ---------------------------- |
+| **LCP** | <= 2.5s  | 2.5s - 4.0s       | > 4.0s  | Loading performance          |
+| **CLS** | <= 0.1   | 0.1 - 0.25        | > 0.25  | Visual stability             |
+| **INP** | <= 200ms | 200ms - 500ms     | > 500ms | Interactivity (replaced FID) |
 
 ### Additional Performance Metrics
 
-| Metric | Good | Poor | What It Measures |
-|--------|------|------|------------------|
-| **FCP** | <= 1.8s | > 3.0s | First content rendered |
-| **TTFB** | <= 800ms | > 1800ms | Server response time |
-| **TBT** | <= 200ms | > 600ms | Main thread blocking |
-| **Speed Index** | <= 3.4s | > 5.8s | Visual completeness over time |
+| Metric          | Good     | Poor     | What It Measures              |
+| --------------- | -------- | -------- | ----------------------------- |
+| **FCP**         | <= 1.8s  | > 3.0s   | First content rendered        |
+| **TTFB**        | <= 800ms | > 1800ms | Server response time          |
+| **TBT**         | <= 200ms | > 600ms  | Main thread blocking          |
+| **Speed Index** | <= 3.4s  | > 5.8s   | Visual completeness over time |
 
 ## 5-Phase Audit Workflow
 
@@ -88,6 +88,7 @@ Measure each Core Web Vital and identify specific causes.
 LCP measures loading performance -- when the largest content element becomes visible.
 
 **Common LCP Elements:**
+
 - `<img>` elements (hero images)
 - `<video>` poster images
 - Block-level elements with background images
@@ -96,11 +97,13 @@ LCP measures loading performance -- when the largest content element becomes vis
 **LCP Optimization Checklist:**
 
 1. **Preload the LCP resource**
+
    ```html
    <link rel="preload" as="image" href="/hero.webp" fetchpriority="high" />
    ```
 
 2. **Eliminate render-blocking resources**
+
    ```html
    <!-- Defer non-critical CSS -->
    <link rel="stylesheet" href="/non-critical.css" media="print" onload="this.media='all'" />
@@ -121,8 +124,14 @@ LCP measures loading performance -- when the largest content element becomes vis
    <picture>
      <source srcset="/hero.avif" type="image/avif" />
      <source srcset="/hero.webp" type="image/webp" />
-     <img src="/hero.jpg" alt="Hero" width="1200" height="600"
-          fetchpriority="high" decoding="async" />
+     <img
+       src="/hero.jpg"
+       alt="Hero"
+       width="1200"
+       height="600"
+       fetchpriority="high"
+       decoding="async"
+     />
    </picture>
    ```
 
@@ -131,6 +140,7 @@ LCP measures loading performance -- when the largest content element becomes vis
 CLS measures visual stability -- unexpected layout shifts during page load.
 
 **Common CLS Causes:**
+
 - Images without explicit dimensions
 - Ads or embeds without reserved space
 - Dynamically injected content above the fold
@@ -139,21 +149,34 @@ CLS measures visual stability -- unexpected layout shifts during page load.
 **CLS Optimization Checklist:**
 
 1. **Always set image dimensions**
+
    ```html
    <img src="/photo.jpg" width="800" height="600" alt="Photo" />
    ```
+
    Or use CSS aspect-ratio:
+
    ```css
-   .hero-image { aspect-ratio: 16 / 9; width: 100%; }
+   .hero-image {
+     aspect-ratio: 16 / 9;
+     width: 100%;
+   }
    ```
 
 2. **Reserve space for dynamic content**
+
    ```css
-   .ad-slot { min-height: 250px; }
-   .skeleton { height: 200px; background: #f0f0f0; }
+   .ad-slot {
+     min-height: 250px;
+   }
+   .skeleton {
+     height: 200px;
+     background: #f0f0f0;
+   }
    ```
 
 3. **Use `font-display: swap` with size-adjust**
+
    ```css
    @font-face {
      font-family: 'CustomFont';
@@ -172,6 +195,7 @@ CLS measures visual stability -- unexpected layout shifts during page load.
 INP measures interactivity -- the delay between user interaction and visual response.
 
 **Common INP Causes:**
+
 - Long JavaScript tasks blocking the main thread
 - Synchronous layout/style recalculations
 - Heavy event handlers
@@ -180,10 +204,13 @@ INP measures interactivity -- the delay between user interaction and visual resp
 **INP Optimization Checklist:**
 
 1. **Break up long tasks**
+
    ```javascript
    // Instead of one long task
    function processAllItems(items) {
-     for (const item of items) { /* heavy work */ }
+     for (const item of items) {
+       /* heavy work */
+     }
    }
 
    // Break into chunks with scheduler
@@ -197,18 +224,23 @@ INP measures interactivity -- the delay between user interaction and visual resp
    ```
 
 2. **Debounce/throttle event handlers**
+
    ```javascript
    // Throttle scroll handler
    let ticking = false;
-   window.addEventListener('scroll', () => {
-     if (!ticking) {
-       requestAnimationFrame(() => {
-         updateUI();
-         ticking = false;
-       });
-       ticking = true;
-     }
-   }, { passive: true });
+   window.addEventListener(
+     'scroll',
+     () => {
+       if (!ticking) {
+         requestAnimationFrame(() => {
+           updateUI();
+           ticking = false;
+         });
+         ticking = true;
+       }
+     },
+     { passive: true }
+   );
    ```
 
 3. **Use `requestIdleCallback` for non-urgent work**
@@ -238,6 +270,7 @@ Analyze network waterfall for optimization opportunities.
    - Check `Content-Encoding` header in response
 
 4. **Caching headers**
+
    ```
    # Immutable assets (hashed filenames)
    Cache-Control: public, max-age=31536000, immutable
@@ -268,7 +301,9 @@ Performance optimizations must not degrade accessibility.
 ```css
 /* Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
@@ -294,9 +329,7 @@ module.exports = {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name(module) {
-            const packageName = module.context.match(
-              /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-            )[1];
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
             return `vendor.${packageName.replace('@', '')}`;
           },
         },
@@ -343,15 +376,15 @@ const nextConfig = {
 
 #### Common Code Anti-Patterns
 
-| Anti-Pattern | Impact | Fix |
-|-------------|--------|-----|
-| Barrel file imports | Bundle bloat | Import directly from module |
-| Synchronous `localStorage` in render | Main thread block | Move to `useEffect` or worker |
-| Unoptimized images | LCP, bandwidth | Use `next/image` or `<picture>` |
-| Inline `<script>` in body | Render blocking | Use `async` or `defer` |
-| CSS `@import` chains | CSSOM blocking | Concatenate or inline critical CSS |
-| Unthrottled scroll listeners | INP | Use `passive: true` + `requestAnimationFrame` |
-| `document.querySelectorAll` in loops | Layout thrashing | Cache DOM references |
+| Anti-Pattern                         | Impact            | Fix                                           |
+| ------------------------------------ | ----------------- | --------------------------------------------- |
+| Barrel file imports                  | Bundle bloat      | Import directly from module                   |
+| Synchronous `localStorage` in render | Main thread block | Move to `useEffect` or worker                 |
+| Unoptimized images                   | LCP, bandwidth    | Use `next/image` or `<picture>`               |
+| Inline `<script>` in body            | Render blocking   | Use `async` or `defer`                        |
+| CSS `@import` chains                 | CSSOM blocking    | Concatenate or inline critical CSS            |
+| Unthrottled scroll listeners         | INP               | Use `passive: true` + `requestAnimationFrame` |
+| `document.querySelectorAll` in loops | Layout thrashing  | Cache DOM references                          |
 
 ## Audit Report Template
 
@@ -364,27 +397,31 @@ const nextConfig = {
 
 ## Core Web Vitals Summary
 
-| Metric | Score | Rating | Target |
-|--------|-------|--------|--------|
-| LCP    | X.Xs  | GOOD/NEEDS IMPROVEMENT/POOR | <= 2.5s |
-| CLS    | X.XX  | GOOD/NEEDS IMPROVEMENT/POOR | <= 0.1  |
+| Metric | Score | Rating                      | Target   |
+| ------ | ----- | --------------------------- | -------- |
+| LCP    | X.Xs  | GOOD/NEEDS IMPROVEMENT/POOR | <= 2.5s  |
+| CLS    | X.XX  | GOOD/NEEDS IMPROVEMENT/POOR | <= 0.1   |
 | INP    | Xms   | GOOD/NEEDS IMPROVEMENT/POOR | <= 200ms |
-| FCP    | X.Xs  | -      | <= 1.8s |
-| TTFB   | Xms   | -      | <= 800ms |
-| TBT    | Xms   | -      | <= 200ms |
+| FCP    | X.Xs  | -                           | <= 1.8s  |
+| TTFB   | Xms   | -                           | <= 800ms |
+| TBT    | Xms   | -                           | <= 200ms |
 
 ## Critical Findings
 
 ### P0 (Immediate Action Required)
+
 1. [Finding] - [Impact] - [Recommended Fix]
 
 ### P1 (Address This Sprint)
+
 1. [Finding] - [Impact] - [Recommended Fix]
 
 ### P2 (Address This Quarter)
+
 1. [Finding] - [Impact] - [Recommended Fix]
 
 ## Optimization Recommendations (Priority Order)
+
 1. [Recommendation with estimated impact]
 2. [Recommendation with estimated impact]
 3. [Recommendation with estimated impact]

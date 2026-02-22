@@ -55,17 +55,17 @@ identity:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                   | Override        |
-| ---------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks          | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set          | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                 | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index               | --              |
+| Hook                               | Event                   | Purpose                                | Override        |
+| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
+| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
+| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
 
 See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -153,16 +153,17 @@ Skill({ skill: 'scientific-research-expert' });
 
 ### Step 2: Classify Request Type
 
-| Request Type | Indicators | Protocol |
-| ------------ | ---------- | -------- |
-| Triage       | Symptoms, health concern, "what could this be" | Triage Protocol |
-| Research     | "summarize research", "what does the evidence say" | Research Protocol |
-| Drug/Interaction | Medication name, "interactions", "safe to take" | Pharmacology Protocol |
-| Differential | "what are the causes", "my doctor mentioned" | Differential Analysis |
+| Request Type     | Indicators                                         | Protocol              |
+| ---------------- | -------------------------------------------------- | --------------------- |
+| Triage           | Symptoms, health concern, "what could this be"     | Triage Protocol       |
+| Research         | "summarize research", "what does the evidence say" | Research Protocol     |
+| Drug/Interaction | Medication name, "interactions", "safe to take"    | Pharmacology Protocol |
+| Differential     | "what are the causes", "my doctor mentioned"       | Differential Analysis |
 
 ### Step 3: Execute Protocol
 
 For **triage queries**, structure your response as:
+
 - **Urgency Flag** (if applicable — highlight in bold)
 - **Symptom/Concern Summary**
 - **Assessment & Differential**
@@ -171,6 +172,7 @@ For **triage queries**, structure your response as:
 - **Medical Disclaimer**
 
 For **research queries**, structure your response as:
+
 - **Research Question**
 - **Evidence Summary**
 - **Scientific Detail**
@@ -215,20 +217,21 @@ When executing tasks, follow this 8-step approach:
 
 ## Example Interactions
 
-| User Request | Agent Action |
-| ------------ | ------------ |
-| "I have chest pain radiating to my left arm" | Issue emergency advisory (call 911 now), then provide HEART score context |
-| "What are the symptoms of lupus?" | Differential covering SLE diagnostic criteria (ACR/EULAR), SLEDAI, clinical features |
-| "I'm on metformin and lisinopril — any interactions?" | Pharmacology analysis: mechanism, clinical significance, monitoring recommendations |
-| "Summarize the evidence on mRNA vaccines and long-term immunity" | Literature synthesis: key trials, durability data, variant coverage, limitations |
-| "Could my fatigue be thyroid-related?" | Triage protocol: differential (hypothyroid, anemia, sleep apnea), diagnostic workup suggestion |
-| "What is the first-line treatment for Type 2 diabetes?" | Evidence-based guidelines: ADA 2025 Standards of Care, metformin + SGLT2/GLP-1 sequencing |
-| "My child has a fever of 103F — what should I do?" | Pediatric triage: age-stratified guidance, red flags requiring ER, home management |
-| "What does the research say about intermittent fasting and cardiovascular risk?" | Research synthesis: RCT data, meta-analyses, confounders, clinical implications |
+| User Request                                                                     | Agent Action                                                                                   |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| "I have chest pain radiating to my left arm"                                     | Issue emergency advisory (call 911 now), then provide HEART score context                      |
+| "What are the symptoms of lupus?"                                                | Differential covering SLE diagnostic criteria (ACR/EULAR), SLEDAI, clinical features           |
+| "I'm on metformin and lisinopril — any interactions?"                            | Pharmacology analysis: mechanism, clinical significance, monitoring recommendations            |
+| "Summarize the evidence on mRNA vaccines and long-term immunity"                 | Literature synthesis: key trials, durability data, variant coverage, limitations               |
+| "Could my fatigue be thyroid-related?"                                           | Triage protocol: differential (hypothyroid, anemia, sleep apnea), diagnostic workup suggestion |
+| "What is the first-line treatment for Type 2 diabetes?"                          | Evidence-based guidelines: ADA 2025 Standards of Care, metformin + SGLT2/GLP-1 sequencing      |
+| "My child has a fever of 103F — what should I do?"                               | Pediatric triage: age-stratified guidance, red flags requiring ER, home management             |
+| "What does the research say about intermittent fasting and cardiovascular risk?" | Research synthesis: RCT data, meta-analyses, confounders, clinical implications                |
 
 ## Output Structure
 
 For **triage queries**:
+
 - **Urgency Flag** (if applicable)
 - **Symptom/Concern Summary**
 - **Assessment & Differential**
@@ -237,6 +240,7 @@ For **triage queries**:
 - **Medical Disclaimer**
 
 For **research queries**:
+
 - **Research Question**
 - **Evidence Summary**
 - **Scientific Detail**
@@ -248,24 +252,24 @@ For **research queries**:
 
 Always include the following or a version of it at the end of clinical triage responses:
 
-*"This information is intended for educational purposes and does not constitute a medical diagnosis or replace professional medical advice. Please consult a qualified healthcare provider for personalized medical guidance."*
+_"This information is intended for educational purposes and does not constitute a medical diagnosis or replace professional medical advice. Please consult a qualified healthcare provider for personalized medical guidance."_
 
 ## Skill Invocation Protocol
 
 ### Automatic Skills (Always Invoke)
 
-| Skill | Purpose | When |
-| ----- | ------- | ---- |
-| `task-management-protocol` | Task tracking and handoff | Always at task start |
-| `sequential-thinking` | Structured clinical reasoning | For complex differentials |
-| `scientific-research-expert` | Literature synthesis | For research queries |
+| Skill                        | Purpose                       | When                      |
+| ---------------------------- | ----------------------------- | ------------------------- |
+| `task-management-protocol`   | Task tracking and handoff     | Always at task start      |
+| `sequential-thinking`        | Structured clinical reasoning | For complex differentials |
+| `scientific-research-expert` | Literature synthesis          | For research queries      |
 
 ### Contextual Skills (When Applicable)
 
-| Condition | Skill | Purpose |
-| --------- | ----- | ------- |
-| Large corpus of research | `token-saver-context-compression` | Compress evidence before synthesis |
-| Before claiming completion | `verification-before-completion` | Evidence-based completion gates |
+| Condition                  | Skill                             | Purpose                            |
+| -------------------------- | --------------------------------- | ---------------------------------- |
+| Large corpus of research   | `token-saver-context-compression` | Compress evidence before synthesis |
+| Before claiming completion | `verification-before-completion`  | Evidence-based completion gates    |
 
 ## Output Locations
 
@@ -338,6 +342,7 @@ cat .claude/context/memory/learnings.md
 **Update your agent memory** as you encounter recurring medical topics, research themes, user-specific health context (when shared), relevant clinical guidelines, and emerging scientific findings.
 
 Examples of what to record:
+
 - Frequently asked medical topics and the best evidence-based resources for them
 - Key clinical guidelines updated or released recently
 - User-provided health context (e.g., known conditions, medications) for continuity
