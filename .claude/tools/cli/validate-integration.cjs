@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { parseMarkdownTable } = require('../../lib/utils/markdown-table-parser.cjs');
 /**
  * validate-integration.cjs
  *
@@ -133,7 +134,23 @@ function checkSkillCatalog(artifactPath, artifactType, artifactName) {
     return { applicable: true, passed: false, message: 'Could not read skill-catalog.md' };
   }
 
-  const hasEntry = catalog.toLowerCase().includes(artifactName.toLowerCase());
+  // Attempt structured table parse first (Track 4.1: AST Markdown Table Validation)
+  // Falls back to plain string search for robustness
+  let hasEntry = false;
+  try {
+    const rows = parseMarkdownTable(catalog);
+    hasEntry = rows.some(row =>
+      Object.values(row).some(v => String(v).toLowerCase().includes(artifactName.toLowerCase()))
+    );
+  } catch (_parseErr) {
+    // fallback: plain string search
+    hasEntry = catalog.toLowerCase().includes(artifactName.toLowerCase());
+  }
+
+  if (!hasEntry) {
+    // Fallback: plain string search in case table parser misses it
+    hasEntry = catalog.toLowerCase().includes(artifactName.toLowerCase());
+  }
 
   if (hasEntry) {
     return { applicable: true, passed: true, message: `Found "${artifactName}" in skill catalog` };

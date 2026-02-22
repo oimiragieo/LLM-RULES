@@ -611,6 +611,9 @@ High-impact orchestration skills:
 - `sharp-edges`
 - `enterprise-skill-test-1771722088465`
 - `enterprise-skill-test-1771722182676`
+- `enterprise-skill-test-1771736541519`
+- `enterprise-skill-test-1771737759020`
+- `enterprise-skill-test-1771738405049`
 - `framework-context`
 - `recommend-evolution`
 - `creation-feasibility-gate`

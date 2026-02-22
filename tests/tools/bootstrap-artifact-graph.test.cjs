@@ -21,6 +21,7 @@ function runTool(args = '') {
       encoding: 'utf-8',
       cwd: PROJECT_ROOT,
       stdio: ['pipe', 'pipe', 'pipe'],
+      maxBuffer: 10 * 1024 * 1024, // 10MB — verbose mode output exceeds 1MB default
     });
     return result;
   } catch (err) {

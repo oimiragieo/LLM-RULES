@@ -25,9 +25,7 @@ describe('router-tool-lockdown hook', () => {
 
     try {
       // Clear module cache to get fresh state
-      const modPath = require.resolve(
-        '../../.claude/hooks/routing/router-tool-lockdown.cjs'
-      );
+      const modPath = require.resolve('../../.claude/hooks/routing/router-tool-lockdown.cjs');
       delete require.cache[modPath];
       checkRouterToolLockdown =
         require('../../.claude/hooks/routing/router-tool-lockdown.cjs').checkRouterToolLockdown;
@@ -57,14 +55,8 @@ describe('router-tool-lockdown hook', () => {
     const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {});
     assert.strictEqual(result.pass, true, 'warn mode should pass (not block)');
     assert.strictEqual(result.result, 'warn');
-    assert.ok(
-      result.message.includes('ROUTER-LOCKDOWN'),
-      'Message should contain ROUTER-LOCKDOWN'
-    );
-    assert.ok(
-      result.message.includes('Bash'),
-      'Message should mention the banned tool'
-    );
+    assert.ok(result.message.includes('ROUTER-LOCKDOWN'), 'Message should contain ROUTER-LOCKDOWN');
+    assert.ok(result.message.includes('Bash'), 'Message should mention the banned tool');
   });
 
   it('should block when router calls Bash in block mode', () => {

@@ -279,3 +279,63 @@ The session gap log (`.claude/context/runtime/session-gap-log.jsonl`) bridges th
 **Gap types:** `retry` | `placeholder_output` | `integration_gap` | `hook_warning` | `missing_metadata` | `stall` | `agent_reported`
 
 **This pattern was motivated by a concrete failure (2026-02-21):** artifact-integrator was spawned twice producing placeholder reports, evolution-orchestrator stalled after Phase 1, 3 total agent retries needed to wire 9 files — none of this was captured in reflection because the router had no gap log mechanism.
+
+## Track 1.1–5.2 Implementation: 6-Module TDD Batch (2026-02-21)
+
+- **Pattern:** safeParseJSON returns the value directly (not `{ data, success }`) when called with a plain fallback or no schema — this is the codebase's actual API, not the documented pattern in security.md
+- **Pattern:** appendJsonl(filePath, entry) takes a plain object — serializes internally — do NOT pre-stringify
+- **Pattern:** atomicWriteJSONSync for all state/alert file writes to prevent corruption on crash
+- **Pattern:** wrapCLITool(fn, 'tool-name') wraps all CLI entry points in .claude/tools/cli/
+- **Decision:** workflow-watchdog-hook.cjs wire step requires hook-creator skill (creator-guard blocks direct edits to .claude/hooks/)
+- **Decision:** research-synthesis SKILL.md wire step requires skill-updater skill (creator-guard blocks direct edits to .claude/skills/)
+- **Pattern:** Object.create(null) from safeParseJSON is NOT strictly deep-equal to {} in node:assert/strict — use plain `{}` in own function returns
+- **Pattern:** SE-01 compliance: CRLF normalization in text parsers via `content.replace(/\r\n/g, '\n').replace(/\r/g, '\n')`
+- **Decision:** computeAgentAverages uses plain `{}` (not Object.create(null)) for return value so tests using assert.deepEqual work
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-22)
+
+- Created new agent: qa-guardian (2026-02-22)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-22)
+
+- Created new agent: contract-check (2026-02-22)
+
+- Created new agent: bool-action (2026-02-22)
+
+- Created new agent: repo-onboarder (2026-02-22)
+
+- Updated workflow: evolution-workflow (2026-02-22)
+
+- Updated workflow: missing-workflow-xyz (2026-02-22)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-22)
+
+- Created new agent: qa-guardian (2026-02-22)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-22)
+
+- Created new agent: contract-check (2026-02-22)
+
+- Created new agent: bool-action (2026-02-22)
+
+- Created new agent: repo-onboarder (2026-02-22)
+
+- Updated workflow: evolution-workflow (2026-02-22)
+
+- Updated workflow: missing-workflow-xyz (2026-02-22)
+
+- Created new agent: qa-guardian (2026-02-22)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-22)
+
+- Created new agent: contract-check (2026-02-22)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-22)
+
+- Created new agent: bool-action (2026-02-22)
+
+- Created new agent: repo-onboarder (2026-02-22)
+
+- Updated workflow: evolution-workflow (2026-02-22)
+
+- Updated workflow: missing-workflow-xyz (2026-02-22)

@@ -276,9 +276,14 @@ function resetCompressionCounters() {
   operationCounter = 0;
 }
 
+// Track 1.1: Re-export checkContextPressure from context-pressure module.
+// Allows consumers to use a single import for compression-related pressure logic.
+const { checkContextPressure } = require('./context-pressure.cjs');
+
 module.exports = {
   checkCompressionNeeded,
   triggerCompression,
   getCompressionStats,
   resetCompressionCounters,
+  checkContextPressure,
 };

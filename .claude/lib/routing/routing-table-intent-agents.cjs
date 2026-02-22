@@ -143,6 +143,9 @@ const INTENT_TO_AGENT = {
   'repo-onboarder': 'repo-onboarder',
   'enterprise-skill-test-1771722088465': 'enterprise-skill-test-1771722088465',
   'enterprise-skill-test-1771722182676': 'enterprise-skill-test-1771722182676',
+  'enterprise-skill-test-1771736541519': 'enterprise-skill-test-1771736541519',
+  'enterprise-skill-test-1771737759020': 'enterprise-skill-test-1771737759020',
+  'enterprise-skill-test-1771738405049': 'enterprise-skill-test-1771738405049',
 };
 
 module.exports = { INTENT_TO_AGENT };

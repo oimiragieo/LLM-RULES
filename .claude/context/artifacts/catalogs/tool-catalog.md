@@ -91,6 +91,14 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 | `token-optimizer/`     | `optimization/` | Monitor and optimize token usage | Not scripted                                            |
 | `sequential-thinking/` | `optimization/` | Step-by-step reasoning helper    | MCP skill: mcp**sequential-thinking**sequentialthinking |
 
+### Metrics
+
+**Purpose:** Observability metrics, health checks, and alerting
+
+| Tool                               | Location | Purpose                                                                                    | Wiring Status                            |
+| ---------------------------------- | -------- | ------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| `reflection-degradation-alert.cjs` | `cli/`   | Reads reflection-log.jsonl, writes reflection-alert.json when agents score below threshold | package.json: `metrics:reflection:alert` |
+
 ### Runtime
 
 **Purpose:** Runtime coordination and monitoring

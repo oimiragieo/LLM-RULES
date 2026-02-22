@@ -41,10 +41,35 @@ const { safeParseJSON } = require('./safe-json.cjs');
 const DEFAULT_TTL_MS = 1000;
 
 /**
+ * Sentinel object used to detect JSON parse failures from safeParseJSON.
+ * safeParseJSON returns its inlineDefaults argument on parse error; by passing
+ * this unique sentinel we can distinguish failure from a valid empty-object result.
+ */
+const PARSE_ERROR_SENTINEL = Object.freeze({ __stateCacheParseError: true });
+
+/**
  * In-memory cache storage
  * Structure: Map<filePath, { data: any, timestamp: number }>
  */
 const cache = new Map();
+
+/**
+ * Deep-convert a value that may contain null-prototype objects (returned by
+ * safeParseJSON's prototype-pollution protection) into standard plain objects.
+ * Primitives, null, and arrays are handled correctly.
+ *
+ * @param {any} value
+ * @returns {any}
+ */
+function toPlainObject(value) {
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map(toPlainObject);
+  const result = {};
+  for (const key of Object.keys(value)) {
+    result[key] = toPlainObject(value[key]);
+  }
+  return result;
+}
 
 /**
  * Get cached state from a JSON file.
@@ -75,7 +100,22 @@ function getCachedState(filePath, defaultValue = {}, ttlMs = DEFAULT_TTL_MS) {
     }
 
     const fileContent = fs.readFileSync(filePath, 'utf8');
-    const data = safeParseJSON(fileContent, null);
+
+    // safeParseJSON with PARSE_ERROR_SENTINEL as inlineDefaults:
+    //   - on valid JSON object: returns Object.create(null) (null-prototype object)
+    //   - on valid JSON array/primitive: returns the value directly
+    //   - on parse failure: returns PARSE_ERROR_SENTINEL
+    // We then convert null-prototype objects to plain objects via toPlainObject.
+    const rawData = safeParseJSON(fileContent, null, null, PARSE_ERROR_SENTINEL);
+
+    if (rawData === PARSE_ERROR_SENTINEL) {
+      // JSON parse failed — return default without caching
+      return defaultValue;
+    }
+
+    // Convert any null-prototype objects from safeParseJSON to plain objects
+    // so callers can use deepStrictEqual and standard property checks without issues.
+    const data = toPlainObject(rawData);
 
     // Cache the result
     cache.set(filePath, { data, timestamp: now });

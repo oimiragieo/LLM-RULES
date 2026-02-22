@@ -30,9 +30,7 @@ describe('stale-task-detector hook', () => {
     originalEnv = { ...process.env };
 
     try {
-      const modPath = require.resolve(
-        '../../.claude/hooks/session/stale-task-detector.cjs'
-      );
+      const modPath = require.resolve('../../.claude/hooks/session/stale-task-detector.cjs');
       delete require.cache[modPath];
       staleTaskDetector = require('../../.claude/hooks/session/stale-task-detector.cjs');
     } catch (_err) {
