@@ -7,6 +7,7 @@ temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
+isolation: worktree
 priority: high
 extended_thinking: true
 tools:
@@ -39,6 +40,7 @@ skills:
   - tdd
   - test-generator
   - verification-before-completion
+  - proactive-audit
   - token-saver-context-compression
   - troubleshooting-regression
   - web-perf

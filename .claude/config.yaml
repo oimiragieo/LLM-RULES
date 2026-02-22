@@ -8,6 +8,11 @@ metadata:
   updated_by: 'developer-agent'
   config_modernization: 'Task #2 - Auto-compression enabled, env vars documented, agent models expanded'
 
+# --- Claude API Beta Headers (Context Management) ---
+# Enables auto-clearing of stale tool results from context window (84% token reduction)
+apiHeaders:
+  - 'context-management-2025-06-27'
+
 # --- Router Configuration (The Gatekeeper) ---
 agent_routing:
   router:

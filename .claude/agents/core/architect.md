@@ -44,6 +44,7 @@ skills:
   - swarm-coordination
   - task-management-protocol
   - verification-before-completion
+  - proactive-audit
   - token-saver-context-compression
 identity:
   role: Principal Software Architect

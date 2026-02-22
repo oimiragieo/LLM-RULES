@@ -15,11 +15,13 @@ priority: medium
 extended_thinking: true
 tools:
   - Read
+  - Write
   - Grep
   - Glob
   - WebSearch
   - WebFetch
   - Bash
+  - MemoryRecord
   - TaskUpdate
   - TaskList
   - TaskCreate
@@ -237,7 +239,9 @@ This is faster than reading the entire codebase.
 
 ## Security Constraints (SEC-REMEDIATION-003)
 
-**This agent is designed for READING and RESEARCH only. It does NOT have Write/Edit tools.**
+**This agent can write research reports to disk and record structured memory, but does NOT have the Edit tool.**
+
+Write access is intentionally scoped: use Write only for report files in `.claude/context/artifacts/research-reports/` and `.claude/context/tmp/research/`. MemoryRecord is local-only and carries no exfiltration risk.
 
 ### URL Domain Allowlist (for WebFetch)
 
@@ -267,15 +271,15 @@ When fetching content, prioritize these trusted research domains:
 4. **Report generation only**: Save research reports to `.claude/context/artifacts/research-reports/`
 5. **Rate limiting**: Maximum 20 requests per minute to any single domain
 
-### Why No Write/Edit Tools?
+### Why No Edit Tool?
 
-The researcher agent lacks Write/Edit tools to prevent data exfiltration attacks where a malicious prompt could:
+The researcher agent lacks the Edit tool to prevent data exfiltration attacks where a malicious prompt could:
 
 1. Read sensitive project files
 2. Construct an HTTP request with that data
-3. POST it to an attacker-controlled URL
+3. POST it to an attacker-controlled URL via targeted file edits
 
-By removing write capabilities, the attack surface is limited to read-only operations within the project.
+Write is permitted for report output to designated paths only. Edit is withheld because it enables surgical in-place modifications that could modify routing, hooks, or credentials files. MemoryRecord is safe because it writes only to local structured memory stores.
 
 ## Query Limits (Memory Safeguards)
 

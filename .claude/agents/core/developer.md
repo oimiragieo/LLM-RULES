@@ -9,6 +9,7 @@ temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
+isolation: worktree
 priority: high
 tools:
   - Read
@@ -44,6 +45,7 @@ skills:
   - tdd
   - token-saver-context-compression
   - verification-before-completion
+  - proactive-audit
   - gemini-cli-security
   - enhance-prompt
   - next-cache-components

@@ -18,6 +18,8 @@ tools:
   - Grep
   - Glob
   - Bash
+  - WebFetch
+  - WebSearch
   - MemoryRecord
   - TaskUpdate
   - TaskList

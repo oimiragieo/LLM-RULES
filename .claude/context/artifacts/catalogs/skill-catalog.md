@@ -1,6 +1,6 @@
 # Skill Catalog
 
-> **Total Skills: 111** (1 deprecated alias) | Last Updated: 2026-02-21
+> **Total Skills: 112** (1 deprecated alias) | Last Updated: 2026-02-22
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
@@ -32,7 +32,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Code Style & Linting](#code-style--linting) | 2 | code-style-validator, dry-principle |
 | [Creator Tools](#creator-tools) | 15 | research-synthesis, agent-creator, agent-updater, skill-creator, skill-updater, workflow-updater, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator |
 | [Memory & Context](#memory--context) | 15 | context-compressor, token-saver-context-compression, memory-quality-auditor, session-handoff, task-management-protocol, context-driven-development, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution, assimilate, creation-feasibility-gate, compliance-policy-check, troubleshooting-regression |
-| [Validation & Quality](#validation--quality) | 6 | verification-before-completion, checklist-generator, response-rater, test-generator, accessibility, eval-harness-updater |
+| [Validation & Quality](#validation--quality) | 7 | verification-before-completion, checklist-generator, proactive-audit, response-rater, test-generator, accessibility, eval-harness-updater |
 | [Specialized Patterns](#specialized-patterns) | 9 | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology |
 | [External Integrations](#external-integrations) | 2 | project-onboarding, dynamic-api-integration |
 | [Scientific Research](#scientific-research) | 1 | scientific-skills (parent with 139 sub-skills) |
@@ -158,6 +158,7 @@ Framework-specific expertise.
 | `graphql-expert`      | GraphQL schema, Apollo Client/Server               | graphql-pro           |
 | `expo-framework-rule` | Expo Framework guidelines                          | expo-mobile-developer |
 | `frontend-expert`     | UI/UX patterns, responsive design                  | frontend-pro          |
+| `webmcp-browser-tools` | W3C WebMCP browser-side MCP tools proposal (draft — no browser support yet) | frontend-pro, developer, researcher |
 
 ---
 
@@ -310,6 +311,7 @@ Quality validation skills.
 | -------------------------------- | ------------------------------------------------ | -------------------- |
 | `verification-before-completion` | Pre-completion gate                              | all agents           |
 | `checklist-generator`            | IEEE 1028 + contextual checklists                | qa, code-reviewer    |
+| `proactive-audit`                | Framework artifact health checks (hooks, skills, agents, routing) | qa, developer, architect |
 | `response-rater`                 | Plan and response quality audits                 | qa                   |
 | `test-generator`                 | Test code generation                             | developer, qa        |
 | `accessibility`                  | WCAG compliance validation                       | frontend-expert      |

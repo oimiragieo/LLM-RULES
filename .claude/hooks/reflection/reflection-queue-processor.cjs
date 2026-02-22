@@ -377,12 +377,8 @@ function readSessionGapLog() {
     if (lines.length === 0) return '';
     const entries = [];
     for (const line of lines) {
-      try {
-        const parsed = JSON.parse(line);
-        if (parsed && typeof parsed === 'object') entries.push(parsed);
-      } catch (_e) {
-        /* skip malformed lines */
-      }
+      const parsed = safeParseJSON(line, null);
+      if (parsed && typeof parsed === 'object') entries.push(parsed);
     }
     if (entries.length === 0) return '';
     // Cap at 20 most recent to avoid prompt bloat

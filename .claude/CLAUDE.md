@@ -58,6 +58,7 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
    **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
    **STEP 0.6 — CREATION PREFLIGHT:** For artifact creation/evolution requests, spawn planner/TPM to run `creation-feasibility-gate` and `compliance-policy-check` before creator execution. **EXCEPTION**: skip for external repositories; spawn `artifact-integrator` instead.
+   **STEP 0.7 — PROACTIVE AUDIT (MANDATORY after framework changes):** After any pipeline that creates, modifies, or deletes framework artifacts (hooks, skills, agents, workflows, schemas, routing files), the router MUST spawn a qa agent with `Skill({ skill: 'proactive-audit' })` as the FINAL pipeline step before claiming completion. This audit checks: hook syntax validity and SE-02/SE-01 security patterns; skill wiring completeness (catalog, CLAUDE.md Section 8.5, agent frontmatter); agent tool/skill assignment consistency; routing mismatches introduced by the session changes. If no framework artifacts were changed, skip this step.
 
 1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed).
@@ -166,6 +167,13 @@ Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. I
 | "design database/schema"     | developer | **database-architect**    |
 | "research/investigate"       | developer | **researcher**            |
 | "debug production/incident"  | developer | **devops-troubleshooter** |
+| "git push / commit / deploy" | developer | **devops** |
+| "web performance / core web vitals" | developer | **frontend-pro** + `web-perf` skill |
+| "upgrade Next.js / migrate framework" | developer | **nextjs-pro** + `next-upgrade` skill |
+| "deploy to Vercel" | developer | **devops** + `vercel-deploy` skill |
+| "audit / security review / pentest" | developer | **security-architect** |
+| "refactor / clean up / simplify" | developer | **code-simplifier** |
+| "medical / symptoms / diagnosis / drug interaction" | researcher | **medical-research-triage** |
 
 **CRITICAL**
 
@@ -197,6 +205,7 @@ Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **
 | **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                                               | spawn appropriate agent                |
 | **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts                    | invoke correct **creator skill** first |
 | **5: Architect Review** | spawning code-simplifier/devops/devops-troubleshooter/chaos-engineer without prior architect review | spawn **ARCHITECT** first              |
+| **6: Proactive Audit** | pipeline completed that touched `.claude/hooks/`, `.claude/skills/`, `.claude/agents/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/` | spawn **QA** with `proactive-audit` skill |
 
 Gate detail and decision tree live in `.claude/workflows/core/router-decision.md` (Step 4-6). Keep this section as the short enforcement checklist.
 
@@ -361,10 +370,12 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Infra / CI / deploy          | `devops`              |
 | Planning / decomposition     | `planner`             |
 | External research            | `researcher`          |
+| Git push / deploy / release  | `devops`              |
 | Qa Guardian                  | `qa-guardian`         | `.claude/agents/domain/qa-guardian.md`           |
 | Contract Check               | `contract-check`      | `.claude/agents/domain/contract-check.md`        |
 | Bool Action                  | `bool-action`         | `.claude/agents/domain/bool-action.md`           |
 | Repo Onboarder               | `repo-onboarder`      | `.claude/agents/orchestrators/repo-onboarder.md` |
+| Medical / symptoms / drug interactions / clinical | `medical-research-triage` | `.claude/agents/domain/medical-research-triage.md` |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
@@ -610,6 +621,7 @@ High-impact orchestration skills:
 - `eval-harness-updater`
 - `token-saver-context-compression`
 - `troubleshooting-regression`
+- `proactive-audit`
 - `wave-executor`
 - `enhance-prompt`
 - `next-cache-components`
@@ -617,6 +629,7 @@ High-impact orchestration skills:
 - `shadcn-ui`
 - `vercel-deploy`
 - `web-perf`
+- `webmcp-browser-tools`
 
 For usage details and full inventory, use `@SKILL_CATALOG_TABLE.md`.
 

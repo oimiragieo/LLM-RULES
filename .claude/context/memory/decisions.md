@@ -1,3 +1,41 @@
+## ADR-2026-02-22-003: Proactive-Audit as Mandatory Final Pipeline Step (2026-02-22 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-22
+**Trigger:** Reflection of tasks #28-31 — proactive-audit skill created, CLAUDE.md Step 0.7 added
+
+**Decision:** Whenever a pipeline session creates, modifies, or deletes framework artifacts (hooks, skills, agents, workflows, schemas, templates, CLAUDE.md, routing-table.cjs), the router MUST spawn a QA agent with `Skill({ skill: 'proactive-audit' })` as the final pipeline step before claiming completion.
+
+**Rationale:**
+- Framework artifacts have integration dependencies (catalog, index, settings.json, agent frontmatter) that are easy to miss
+- No prior mechanism existed to detect broken hooks, missing skill registrations, or routing gaps post-pipeline
+- Router Step 0.7 provides automatic invocation via CLAUDE.md enforcement
+
+**Evidence:** Tasks #29 and #30 created skills that appear in catalog but not in skill-index.json — proactive-audit check S-05 would have caught this.
+
+**Scope:** All pipelines touching `.claude/hooks/`, `.claude/skills/`, `.claude/agents/`, `.claude/workflows/`, `.claude/schemas/`, `.claude/CLAUDE.md`, `.claude/lib/routing/routing-table.cjs`
+
+**Related:**
+- CLAUDE.md Section 0.1 Step 0.7
+- `.claude/skills/proactive-audit/SKILL.md`
+- `.claude/context/plans/proactive-audit-design-2026-02-22.md`
+
+---
+
+## ADR-2026-02-22-004: skill-index.json Requires Manual Regeneration After SKILL.md Creation (2026-02-22)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-22
+**Trigger:** Both webmcp-browser-tools and proactive-audit missing from skill-index.json despite SKILL.md files existing
+
+**Decision:** skill-index.json is NOT auto-populated when SKILL.md files are created manually. The `generate-skill-index.cjs` script must be run explicitly as part of post-creation integration. This is now a mandatory step in skill-creator workflow.
+
+**Command:** `node .claude/tools/cli/generate-skill-index.cjs`
+
+**When to run:** After any new SKILL.md creation, OR after updating `agents:` field in existing SKILL.md frontmatter.
+
+---
+
 ## ADR-2026-02-22-001: Post-Creation Integration Documentation Pattern (2026-02-22 REFLECTION)
 
 **Status:** ACCEPTED

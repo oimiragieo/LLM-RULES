@@ -11,10 +11,11 @@ temperature: 0.3
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
+isolation: worktree
 priority: high
 extended_thinking: true
 tools:
-  [Read, Write, Glob, Grep, Bash, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+  [Read, Write, Edit, Glob, Grep, Bash, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills:
   - task-management-protocol
   - checklist-generator

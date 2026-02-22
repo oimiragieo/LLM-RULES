@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-22T01:42:50.071Z",
+  "generatedAt": "2026-02-22T02:43:47.882Z",
   "metadata": {
-    "totalSkills": 344,
+    "totalSkills": 346,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-22T01:42:50.072Z",
+    "lastValidated": "2026-02-22T02:43:47.883Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -194,6 +194,28 @@
         "expo-framework-rule"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "webmcp-browser-tools": {
+      "name": "webmcp-browser-tools",
+      "displayName": "Webmcp Browser Tools",
+      "category": "Other",
+      "domain": "other",
+      "description": "WebMCP (W3C Web Machine Learning Working Group proposal) — browser-side standard for web apps to expose functionality as MCP tools to AI agents. Draft status only; no production browser support yet.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "webmcp-browser-tools"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "next-cache-components": {
@@ -3266,6 +3288,29 @@
         "languages",
         "other",
         "prioritize-python-3-10-features"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "proactive-audit": {
+      "name": "proactive-audit",
+      "displayName": "Proactive Audit",
+      "category": "Other",
+      "domain": "other",
+      "description": ">-",
+      "requiredTools": [
+        "Read",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "proactive-audit"
       ],
       "priority": 3,
       "aliasOf": null
@@ -8370,6 +8415,7 @@
         "react-native-skills-vercel"
       ],
       "other": [
+        "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
         "gamedev-expert",
@@ -8420,6 +8466,7 @@
         "planning-with-files",
         "powershell-expert",
         "prd-generator",
+        "proactive-audit",
         "property-based-testing",
         "restcontroller-conventions",
         "rule-auditor",
@@ -8712,6 +8759,7 @@
         "protocol-reverse-engineering",
         "incident-runbook-templates",
         "expo-framework-rule",
+        "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
         "gamedev-expert",
@@ -8808,6 +8856,7 @@
         "powershell-expert",
         "prd-generator",
         "prioritize-python-3-10-features",
+        "proactive-audit",
         "project-analyzer",
         "project-onboarding",
         "property-based-testing",
@@ -9106,6 +9155,7 @@
         "incident-runbook-templates",
         "python-backend-expert",
         "expo-framework-rule",
+        "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
         "database-architect",
@@ -9227,6 +9277,7 @@
         "powershell-expert",
         "prd-generator",
         "prioritize-python-3-10-features",
+        "proactive-audit",
         "project-analyzer",
         "project-onboarding",
         "property-based-testing",
@@ -9519,6 +9570,7 @@
         "plan-generator",
         "postmortem-writing",
         "powershell-expert",
+        "proactive-audit",
         "project-analyzer",
         "project-onboarding",
         "property-based-testing",
@@ -9622,6 +9674,7 @@
         "php-expert",
         "plan-generator",
         "powershell-expert",
+        "proactive-audit",
         "project-analyzer",
         "project-onboarding",
         "react-expert",
@@ -9725,6 +9778,7 @@
         "php-expert",
         "plan-generator",
         "powershell-expert",
+        "proactive-audit",
         "project-analyzer",
         "project-onboarding",
         "react-expert",
@@ -9770,6 +9824,7 @@
         "incident-runbook-templates",
         "python-backend-expert",
         "expo-framework-rule",
+        "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
         "database-architect",
@@ -10091,6 +10146,7 @@
         "protocol-reverse-engineering",
         "python-backend-expert",
         "expo-framework-rule",
+        "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
         "database-architect",
@@ -10478,6 +10534,7 @@
         "typescript-expert",
         "security-architect",
         "context-compressor",
+        "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
         "writing-skills",
@@ -10554,6 +10611,7 @@
         "powershell-expert",
         "prd-generator",
         "prioritize-python-3-10-features",
+        "proactive-audit",
         "project-analyzer",
         "project-onboarding",
         "property-based-testing",
@@ -11179,6 +11237,7 @@
         "typescript-expert",
         "security-architect",
         "context-compressor",
+        "webmcp-browser-tools",
         "next-cache-components",
         "tauri-native-api-integration",
         "writing-skills",
@@ -11255,6 +11314,7 @@
         "powershell-expert",
         "prd-generator",
         "prioritize-python-3-10-features",
+        "proactive-audit",
         "project-analyzer",
         "project-onboarding",
         "property-based-testing",
