@@ -15,8 +15,11 @@ let searchInternalContext, rankResults, formatContext;
 
 describe('internal-rag — pure functions', () => {
   before(() => {
-    ({ searchInternalContext, rankResults, formatContext } =
-      require('../../../.claude/lib/memory/internal-rag.cjs'));
+    ({
+      searchInternalContext,
+      rankResults,
+      formatContext,
+    } = require('../../../.claude/lib/memory/internal-rag.cjs'));
   });
 
   describe('rankResults', () => {
@@ -126,8 +129,9 @@ describe('SE-XX compliance — internal-rag', () => {
   });
 
   it('SE-04: no await-in-forEach patterns (async functions complete correctly)', async () => {
-    const { searchInternalContext: search } =
-      require('../../../.claude/lib/memory/internal-rag.cjs');
+    const {
+      searchInternalContext: search,
+    } = require('../../../.claude/lib/memory/internal-rag.cjs');
     const result = await search('test', { limit: 1 });
     assert.ok(typeof result === 'object');
   });

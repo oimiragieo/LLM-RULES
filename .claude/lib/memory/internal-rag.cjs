@@ -36,7 +36,8 @@ function rankResults(results, opts = {}) {
   // Normalize similarity: use similarity field, fall back to score, then 0
   const withSim = results.map(r => ({
     ...r,
-    similarity: typeof r.similarity === 'number' ? r.similarity : (typeof r.score === 'number' ? r.score : 0),
+    similarity:
+      typeof r.similarity === 'number' ? r.similarity : typeof r.score === 'number' ? r.score : 0,
   }));
 
   // Filter by threshold, sort descending
@@ -63,9 +64,8 @@ function formatContext(results, opts = {}) {
 
   for (const result of results) {
     const source = result.source || 'memory';
-    const sim = typeof result.similarity === 'number'
-      ? ` (${(result.similarity * 100).toFixed(0)}%)`
-      : '';
+    const sim =
+      typeof result.similarity === 'number' ? ` (${(result.similarity * 100).toFixed(0)}%)` : '';
     const content = String(result.content || '');
     const entry = `[${source}]${sim}\n${content}\n`;
 
@@ -104,7 +104,10 @@ async function searchInternalContext(query, opts = {}) {
     }
 
     const rawResults = await memoryManager.searchMemory(q, { limit, threshold });
-    const results = rankResults(Array.isArray(rawResults) ? rawResults : [], { maxResults: limit, threshold: 0 });
+    const results = rankResults(Array.isArray(rawResults) ? rawResults : [], {
+      maxResults: limit,
+      threshold: 0,
+    });
     const context = formatContext(results, { maxChars });
 
     return { results, context };

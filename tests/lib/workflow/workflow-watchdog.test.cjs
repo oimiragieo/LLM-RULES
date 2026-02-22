@@ -19,8 +19,11 @@ let runWatchdogOnce, detectStalledPhases, writeToDLQ;
 
 describe('workflow-watchdog — pure functions', () => {
   before(() => {
-    ({ runWatchdogOnce, detectStalledPhases, writeToDLQ } =
-      require('../../../.claude/lib/workflow/workflow-watchdog.cjs'));
+    ({
+      runWatchdogOnce,
+      detectStalledPhases,
+      writeToDLQ,
+    } = require('../../../.claude/lib/workflow/workflow-watchdog.cjs'));
   });
 
   describe('detectStalledPhases', () => {
@@ -31,8 +34,8 @@ describe('workflow-watchdog — pure functions', () => {
 
     it('returns empty array when all phases are completed', () => {
       const phases = {
-        'triage': { status: 'completed', startedAt: new Date(Date.now() - 120_000).toISOString() },
-        'design': { status: 'completed', startedAt: new Date(Date.now() - 60_000).toISOString() },
+        triage: { status: 'completed', startedAt: new Date(Date.now() - 120_000).toISOString() },
+        design: { status: 'completed', startedAt: new Date(Date.now() - 60_000).toISOString() },
       };
       const result = detectStalledPhases(phases, Date.now(), 30_000);
       assert.deepEqual(result, []);
@@ -41,7 +44,7 @@ describe('workflow-watchdog — pure functions', () => {
     it('identifies phases running longer than threshold', () => {
       const now = Date.now();
       const phases = {
-        'implement': {
+        implement: {
           status: 'in_progress',
           startedAt: new Date(now - 120_000).toISOString(), // 2 min ago
         },
@@ -55,7 +58,7 @@ describe('workflow-watchdog — pure functions', () => {
     it('does not flag phases within threshold', () => {
       const now = Date.now();
       const phases = {
-        'implement': {
+        implement: {
           status: 'in_progress',
           startedAt: new Date(now - 30_000).toISOString(), // 30s ago
         },
@@ -66,7 +69,7 @@ describe('workflow-watchdog — pure functions', () => {
 
     it('handles invalid startedAt gracefully (skips phase)', () => {
       const phases = {
-        'weird': { status: 'in_progress', startedAt: 'not-a-date' },
+        weird: { status: 'in_progress', startedAt: 'not-a-date' },
       };
       const result = detectStalledPhases(phases, Date.now(), 1_000);
       assert.deepEqual(result, []);
@@ -75,7 +78,7 @@ describe('workflow-watchdog — pure functions', () => {
     it('flags pending phases stuck for too long', () => {
       const now = Date.now();
       const phases = {
-        'review': {
+        review: {
           status: 'pending',
           startedAt: new Date(now - 200_000).toISOString(),
         },
@@ -98,7 +101,11 @@ describe('workflow-watchdog — pure functions', () => {
 
     it('creates DLQ file and writes valid JSONL', () => {
       const dlqPath = path.join(tmpDir, 'test-dlq.jsonl');
-      const entry = { phaseKey: 'implement', elapsedMs: 120_000, timestamp: new Date().toISOString() };
+      const entry = {
+        phaseKey: 'implement',
+        elapsedMs: 120_000,
+        timestamp: new Date().toISOString(),
+      };
 
       writeToDLQ(dlqPath, entry);
 

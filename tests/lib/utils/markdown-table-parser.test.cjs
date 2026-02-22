@@ -14,8 +14,11 @@ let parseMarkdownTable, findTableByHeader, extractTableRows;
 
 describe('markdown-table-parser — parseMarkdownTable', () => {
   before(() => {
-    ({ parseMarkdownTable, findTableByHeader, extractTableRows } =
-      require('../../../.claude/lib/utils/markdown-table-parser.cjs'));
+    ({
+      parseMarkdownTable,
+      findTableByHeader,
+      extractTableRows,
+    } = require('../../../.claude/lib/utils/markdown-table-parser.cjs'));
   });
 
   it('returns empty array for empty string', () => {

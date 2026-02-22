@@ -342,8 +342,8 @@ Advanced patterns and methodologies.
 | `enterprise-skill-test-1771722088465` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
 | `enterprise-skill-test-1771722182676` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
 | `enterprise-skill-test-1771736541519` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
-| `enterprise-skill-test-1771737759020` | Enterprise scaffold validation skill for test coverage and reliability checks. | Read |
-| `enterprise-skill-test-1771738405049` | Enterprise scaffold validation skill for test coverage and reliability checks. | Read |
+| `enterprise-skill-test-1771737759020` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
+| `enterprise-skill-test-1771738405049` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
 
 ---
 

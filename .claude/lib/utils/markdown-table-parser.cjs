@@ -17,7 +17,10 @@
  * @returns {string[]}
  */
 function splitLines(content) {
-  return String(content || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  return String(content || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .split('\n');
 }
 
 /**

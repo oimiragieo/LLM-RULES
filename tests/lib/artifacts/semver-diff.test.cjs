@@ -14,8 +14,11 @@ let computeSemverDiff, classifyChange, parseSemver;
 
 describe('semver-diff — parseSemver', () => {
   before(() => {
-    ({ computeSemverDiff, classifyChange, parseSemver } =
-      require('../../../.claude/lib/artifacts/semver-diff.cjs'));
+    ({
+      computeSemverDiff,
+      classifyChange,
+      parseSemver,
+    } = require('../../../.claude/lib/artifacts/semver-diff.cjs'));
   });
 
   it('parses valid semver string', () => {
@@ -42,28 +45,46 @@ describe('semver-diff — parseSemver', () => {
 
 describe('semver-diff — classifyChange', () => {
   it('classifies major bump correctly', () => {
-    assert.equal(classifyChange({ major: 1, minor: 0, patch: 0 }, { major: 2, minor: 0, patch: 0 }), 'major');
+    assert.equal(
+      classifyChange({ major: 1, minor: 0, patch: 0 }, { major: 2, minor: 0, patch: 0 }),
+      'major'
+    );
   });
 
   it('classifies minor bump correctly', () => {
-    assert.equal(classifyChange({ major: 1, minor: 0, patch: 0 }, { major: 1, minor: 1, patch: 0 }), 'minor');
+    assert.equal(
+      classifyChange({ major: 1, minor: 0, patch: 0 }, { major: 1, minor: 1, patch: 0 }),
+      'minor'
+    );
   });
 
   it('classifies patch bump correctly', () => {
-    assert.equal(classifyChange({ major: 1, minor: 2, patch: 3 }, { major: 1, minor: 2, patch: 4 }), 'patch');
+    assert.equal(
+      classifyChange({ major: 1, minor: 2, patch: 3 }, { major: 1, minor: 2, patch: 4 }),
+      'patch'
+    );
   });
 
   it('classifies identical versions as none', () => {
-    assert.equal(classifyChange({ major: 1, minor: 2, patch: 3 }, { major: 1, minor: 2, patch: 3 }), 'none');
+    assert.equal(
+      classifyChange({ major: 1, minor: 2, patch: 3 }, { major: 1, minor: 2, patch: 3 }),
+      'none'
+    );
   });
 
   it('classifies downgrade as downgrade', () => {
-    assert.equal(classifyChange({ major: 2, minor: 0, patch: 0 }, { major: 1, minor: 0, patch: 0 }), 'downgrade');
+    assert.equal(
+      classifyChange({ major: 2, minor: 0, patch: 0 }, { major: 1, minor: 0, patch: 0 }),
+      'downgrade'
+    );
   });
 
   it('returns unknown when either parsed version is invalid', () => {
     assert.equal(
-      classifyChange({ major: 0, minor: 0, patch: 0, valid: false }, { major: 1, minor: 0, patch: 0 }),
+      classifyChange(
+        { major: 0, minor: 0, patch: 0, valid: false },
+        { major: 1, minor: 0, patch: 0 }
+      ),
       'unknown'
     );
   });

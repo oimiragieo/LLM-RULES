@@ -46,10 +46,7 @@ describe('reflection-degradation-alert — pure functions', () => {
     });
 
     it('skips entries without agentType', () => {
-      const entries = [
-        { qualityScore: 0.5 },
-        { agentType: 'developer', qualityScore: 0.8 },
-      ];
+      const entries = [{ qualityScore: 0.5 }, { agentType: 'developer', qualityScore: 0.8 }];
       const result = computeAgentAverages(entries);
       assert.ok(!result[undefined]);
       assert.ok(result.developer);
@@ -222,9 +219,14 @@ describe('SE-XX compliance — reflection-degradation-alert', () => {
   });
 
   it('SE-04: no await-in-forEach patterns (async functions complete correctly)', async () => {
-    const { runDegradationCheck: check } = require('../../../.claude/tools/cli/reflection-degradation-alert.cjs');
+    const {
+      runDegradationCheck: check,
+    } = require('../../../.claude/tools/cli/reflection-degradation-alert.cjs');
     // Should not throw or leak unhandled promise
-    const result = await check({ logFile: '/nonexistent-path/log.jsonl', alertFile: '/nonexistent-path/alert.json' });
+    const result = await check({
+      logFile: '/nonexistent-path/log.jsonl',
+      alertFile: '/nonexistent-path/alert.json',
+    });
     assert.ok(result === null || result === undefined || typeof result === 'object');
   });
 });

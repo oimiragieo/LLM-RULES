@@ -29,13 +29,7 @@ const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
-const DEFAULT_LOG = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'memory',
-  'reflection-log.jsonl'
-);
+const DEFAULT_LOG = path.join(PROJECT_ROOT, '.claude', 'context', 'memory', 'reflection-log.jsonl');
 const DEFAULT_ALERT = path.join(
   PROJECT_ROOT,
   '.claude',
@@ -132,9 +126,7 @@ async function runDegradationCheck(opts = {}) {
   const threshold = typeof opts.threshold === 'number' ? opts.threshold : DEFAULT_THRESHOLD;
   const minSamples = typeof opts.minSamples === 'number' ? opts.minSamples : DEFAULT_MIN_SAMPLES;
   const windowMs =
-    typeof opts.windowMs === 'number'
-      ? opts.windowMs
-      : DEFAULT_WINDOW_HOURS * 60 * 60 * 1000;
+    typeof opts.windowMs === 'number' ? opts.windowMs : DEFAULT_WINDOW_HOURS * 60 * 60 * 1000;
 
   if (!fs.existsSync(logFile)) return null;
 
@@ -201,13 +193,9 @@ const wrappedMain = wrapCLITool(async () => {
   if (!result) {
     console.log('No reflection degradation detected.');
   } else {
-    console.log(
-      `Alert written: ${result.degradedAgents.length} degraded agent(s) → ${alertFile}`
-    );
+    console.log(`Alert written: ${result.degradedAgents.length} degraded agent(s) → ${alertFile}`);
     for (const agent of result.degradedAgents) {
-      console.log(
-        `  ${agent.agentType}: avg=${agent.average.toFixed(3)} (n=${agent.count})`
-      );
+      console.log(`  ${agent.agentType}: avg=${agent.average.toFixed(3)} (n=${agent.count})`);
     }
   }
 }, 'reflection-degradation-alert');
