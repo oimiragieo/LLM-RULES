@@ -15,18 +15,26 @@ const HIGH_BUDGET_THRESHOLD = 90; // %
 const MEDIUM_BUDGET_THRESHOLD = 70; // %
 const HIGH_LARGE_READ_COUNT = 3;
 const MEDIUM_OPERATION_COUNT = 10;
+const CONTEXT_WINDOW_TOKENS = 200_000;
 
 /**
  * Evaluate whether context is under pressure and at what level.
  *
  * @param {object} context
- * @param {number} [context.tokenBudgetPercent=0]  - % of token budget consumed
+ * @param {string} [context.text]                  - Raw text to estimate token usage from (takes precedence over tokenBudgetPercent)
+ * @param {number} [context.tokenBudgetPercent=0]  - % of token budget consumed (ignored when text is provided)
  * @param {number} [context.operationCount=0]      - total operations in session
  * @param {number} [context.largeReadCount=0]      - number of reads > 10 KB
  * @returns {{ needed: boolean, pressure: 'low'|'medium'|'high', reason: string }}
  */
 function checkContextPressure(context = {}) {
-  const tokenBudgetPercent = Number(context.tokenBudgetPercent) || 0;
+  let tokenBudgetPercent;
+  if (typeof context.text === 'string') {
+    const estimatedTokens = Math.ceil(context.text.length / 4);
+    tokenBudgetPercent = (estimatedTokens / CONTEXT_WINDOW_TOKENS) * 100;
+  } else {
+    tokenBudgetPercent = Number(context.tokenBudgetPercent) || 0;
+  }
   const operationCount = Number(context.operationCount) || 0;
   const largeReadCount = Number(context.largeReadCount) || 0;
 
@@ -80,4 +88,5 @@ module.exports = {
   MEDIUM_BUDGET_THRESHOLD,
   HIGH_LARGE_READ_COUNT,
   MEDIUM_OPERATION_COUNT,
+  CONTEXT_WINDOW_TOKENS,
 };

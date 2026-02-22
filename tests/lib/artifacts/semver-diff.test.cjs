@@ -10,7 +10,7 @@
 const { describe, it, before } = require('node:test');
 const assert = require('node:assert/strict');
 
-let computeSemverDiff, classifyChange, parseSemver;
+let computeSemverDiff, classifyChange, parseSemver, computeSemverBump;
 
 describe('semver-diff — parseSemver', () => {
   before(() => {
@@ -18,6 +18,7 @@ describe('semver-diff — parseSemver', () => {
       computeSemverDiff,
       classifyChange,
       parseSemver,
+      computeSemverBump,
     } = require('../../../.claude/lib/artifacts/semver-diff.cjs'));
   });
 
@@ -122,6 +123,89 @@ describe('semver-diff — computeSemverDiff', () => {
   it('handles "none" when versions are equal', () => {
     const result = computeSemverDiff('1.0.0', '1.0.0');
     assert.equal(result.changeType, 'none');
+  });
+});
+
+describe('semver-diff — computeSemverBump (content-based, Track 4.2)', () => {
+  // Skill / Agent artifacts: YAML frontmatter with tools: array
+
+  it('Test A: removed tool from YAML frontmatter → major', () => {
+    const old = '---\nname: my-skill\ntools: [Read, Write]\n---\nContent';
+    const updated = '---\nname: my-skill\ntools: [Read]\n---\nContent';
+    assert.equal(computeSemverBump(old, updated, 'skill'), 'major');
+  });
+
+  it('Test B: added tool to YAML frontmatter → minor', () => {
+    const old = '---\nname: my-skill\ntools: [Read]\n---\nContent';
+    const updated = '---\nname: my-skill\ntools: [Read, Write]\n---\nContent';
+    assert.equal(computeSemverBump(old, updated, 'skill'), 'minor');
+  });
+
+  it('Test C: same tools list → patch', () => {
+    const old = '---\nname: my-skill\ntools: [Read, Write]\n---\nContent';
+    const updated = '---\nname: my-skill\ntools: [Read, Write]\n---\nContent changed';
+    assert.equal(computeSemverBump(old, updated, 'skill'), 'patch');
+  });
+
+  it('Test D: no frontmatter in either → patch', () => {
+    assert.equal(computeSemverBump('plain text', 'other text', 'skill'), 'patch');
+  });
+
+  it('Test E: old tools block-style list, new removes one → major', () => {
+    const old = '---\nname: agent\ntools:\n  - Read\n  - Write\n  - Edit\n---\nBody';
+    const updated = '---\nname: agent\ntools:\n  - Read\n  - Write\n---\nBody';
+    assert.equal(computeSemverBump(old, updated, 'agent'), 'major');
+  });
+
+  // JSON Schema artifacts: required[] and property types
+
+  it('Test F: removed required property from JSON schema → major', () => {
+    const old = JSON.stringify({
+      required: ['name', 'type'],
+      properties: { name: { type: 'string' }, type: { type: 'string' } },
+    });
+    const updated = JSON.stringify({
+      required: ['name'],
+      properties: { name: { type: 'string' } },
+    });
+    assert.equal(computeSemverBump(old, updated, 'schema'), 'major');
+  });
+
+  it('Test G: property type changed in JSON schema → major', () => {
+    const old = JSON.stringify({ properties: { count: { type: 'string' } } });
+    const updated = JSON.stringify({ properties: { count: { type: 'number' } } });
+    assert.equal(computeSemverBump(old, updated, 'schema'), 'major');
+  });
+
+  it('Test H: added new required property to JSON schema → major', () => {
+    const old = JSON.stringify({ required: ['name'], properties: { name: { type: 'string' } } });
+    const updated = JSON.stringify({
+      required: ['name', 'id'],
+      properties: { name: { type: 'string' }, id: { type: 'string' } },
+    });
+    assert.equal(computeSemverBump(old, updated, 'schema'), 'major');
+  });
+
+  it('Test I: added optional property to JSON schema → minor', () => {
+    const old = JSON.stringify({ properties: { name: { type: 'string' } } });
+    const updated = JSON.stringify({
+      properties: { name: { type: 'string' }, label: { type: 'string' } },
+    });
+    assert.equal(computeSemverBump(old, updated, 'schema'), 'minor');
+  });
+
+  it('Test J: no structural change in JSON schema → patch', () => {
+    const schema = JSON.stringify({ required: ['name'], properties: { name: { type: 'string' } } });
+    assert.equal(computeSemverBump(schema, schema, 'schema'), 'patch');
+  });
+
+  it('Test K: invalid JSON for schema → patch (safe fallback)', () => {
+    assert.equal(computeSemverBump('not json', 'also not json', 'schema'), 'patch');
+  });
+
+  it('returns string result', () => {
+    const result = computeSemverBump('---\ntools: []\n---', '---\ntools: []\n---', 'skill');
+    assert.ok(['major', 'minor', 'patch'].includes(result));
   });
 });
 

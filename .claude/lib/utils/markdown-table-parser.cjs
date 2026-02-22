@@ -68,8 +68,14 @@ function extractTableRows(markdown) {
   const rows = [];
   let headerFound = false;
   let separatorFound = false;
+  let inFence = false;
 
   for (const line of lines) {
+    if (/^[ \t]*(`{3,}|~{3,})/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
     if (!isTableRow(line)) {
       // Reset if we leave the table region (blank line after data rows)
       if (rows.length > 0 && line.trim() === '') break;
@@ -102,8 +108,14 @@ function parseMarkdownTable(markdown) {
   let headers = null;
   let separatorFound = false;
   const rows = [];
+  let inFence = false;
 
   for (const line of lines) {
+    if (/^[ \t]*(`{3,}|~{3,})/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
     if (!isTableRow(line)) {
       if (headers !== null && separatorFound && line.trim() === '') break;
       continue;
