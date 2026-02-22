@@ -27,6 +27,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/session/audit-skill-recency.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/stale-task-detector.cjs"
           }
         ]
       }
@@ -38,6 +42,15 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/pre-tool-unified.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Glob|Grep|Edit|Write|WebSearch|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/router-tool-lockdown.cjs"
           }
         ]
       },

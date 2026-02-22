@@ -42,6 +42,8 @@ Router may NEVER use:
 - `WebSearch` — SPAWN a researcher
 - `mcp__*` — SPAWN appropriate specialist
 
+**Hook Enforcement:** `router-tool-lockdown.cjs` (PreToolUse Bash|Glob|Grep|Edit|Write|WebSearch|WebFetch) — warns/blocks router from using banned tools. Set `ROUTER_TOOL_LOCKDOWN_ENFORCEMENT=block` to hard-enforce.
+
 ### SELF-CHECK (before EVERY response)
 
 Am I about to use a banned tool? → STOP → Spawn an agent instead.
