@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — 6 New Skills, Gap-Capture Mechanism, and Skill Wiring (2026-02-21)
+
+#### New skills from VoltAgent awesome-agent-skills (Vercel Labs, Google Labs Stitch, Cloudflare)
+
+- `enhance-prompt` — transforms vague UI/feature requests into structured, optimized prompts with design system awareness (Google Labs Stitch)
+- `next-upgrade` — 9-step Next.js version migration workflow with codemod automation (13→14→15→16) (Vercel Labs)
+- `vercel-deploy` — zero-auth Vercel deployment with automatic framework detection for 20+ frameworks (Vercel Labs)
+- `shadcn-ui` — shadcn/ui deep expertise: Tailwind CSS v4, Radix UI primitives, dark mode, Next.js App Router setup (Google Labs Stitch)
+- `web-perf` — 5-phase web performance audit with Core Web Vitals thresholds (LCP, CLS, INP) and Chrome DevTools integration (Cloudflare)
+- `next-cache-components` — Next.js 16 `'use cache'` directive, `cacheLife()`, `cacheTag()`, and PPR integration patterns (Vercel Labs)
+
+#### Gap-capture mechanism for systemic pipeline observability
+
+- Router Gap Observation Protocol in `CLAUDE.md §0.1` — mandates writing to `session-gap-log.jsonl` on retry/stall/integration gap/missing metadata
+- `router-decision.md` Step 9.5 — gap logging trigger rules and entry format
+- `reflection-queue-processor.cjs` — auto-injects last 20 gap log entries into every reflection spawn prompt
+- `post-completion-chain.cjs` — extracts `metadata.gapLog[]` from agent TaskUpdate calls
+- `reflection-agent.md` Step 1.5 — explicit gap log analysis before quality evaluation
+- `session-gap-log-entry.schema.json` — JSON schema for gap log entries (`.claude/schemas/`)
+- 15 integration tests (gap-log-injection, agent-gap-extraction) all passing
+
+#### Skill wiring
+
+- 7 agent frontmatter files updated with new skill assignments: `developer`, `devops`, `qa`, `planner`, `architect`, `frontend-pro`, `nextjs-pro`
+- New "Vercel & Web Performance" category added to `skill-catalog.md`
+- ADR-2026-02-21-012: Gap Capture via Session Gap Log recorded in `decisions.md`
+
 ### Added — VoltAgent Research: 7 New Skills and Debug Log Enhancement (2026-02-21)
 
 #### New Skills from VoltAgent research

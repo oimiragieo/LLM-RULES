@@ -287,13 +287,13 @@ playwright install chromium
 
 ### Complementary Skills
 
-| Skill | Relationship |
-| --- | --- |
-| `tdd` | Generate test suites from webapp-testing discoveries |
-| `accessibility` | WCAG compliance verification after functional testing |
-| `frontend-expert` | UI/UX pattern guidance for test design |
-| `chrome-browser` | Alternative browser automation approach |
-| `test-generator` | Generate test code from testing patterns |
+| Skill             | Relationship                                          |
+| ----------------- | ----------------------------------------------------- |
+| `tdd`             | Generate test suites from webapp-testing discoveries  |
+| `accessibility`   | WCAG compliance verification after functional testing |
+| `frontend-expert` | UI/UX pattern guidance for test design                |
+| `chrome-browser`  | Alternative browser automation approach               |
+| `test-generator`  | Generate test code from testing patterns              |
 
 ## Memory Protocol
 

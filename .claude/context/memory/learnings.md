@@ -1,3 +1,33 @@
+## Reflection Gate: Phase 0 Data Sufficiency Enforcement (2026-02-22)
+
+When reflection-agent cannot access task summary metadata (filesModified, outputArtifacts), Phase 0 gate MUST block scoring with WITHHELD rather than FABRICATED.
+
+- Withheld scores enable root-cause investigation (tasks missing metadata evidence)
+- Fabricated scores hide quality gaps and prevent audit trail closure
+- Phase 0 check: Is summary non-fallback? Are filesModified/outputArtifacts provided? If 2+ missing → INSUFFICIENT_DATA
+- Pattern applies to all reflection scenarios where task context is unavailable
+- Reflection report should indicate which metadata was missing and why it matters for subsequent phases
+- Source: Reflection tasks 21, 22, 14 (2026-02-22) — all three lacked accessible metadata, triggering Phase 0 failure
+
+---
+
+## LEARNING: Post-skill-creation integration checklist (2026-02-21)
+
+After skill-creator completes, ALWAYS do these 4 steps immediately (not after audit):
+
+1. Add skill to CLAUDE.md §8.5 bullet list
+2. Add row to skill-catalog.md in correct category section
+3. Add skill name to each target agent's `skills:` frontmatter list
+4. Verify with Grep that all insertions landed
+
+artifact-integrator is NOT reliable for this wiring work. Use developer agent with exact Edit specs.
+
+evolution-orchestrator needs explicit phase separation — "Phase 1: research" and "Phase 2: create" must be in separate Task() spawns if the orchestrator stalls after Phase 1.
+
+Source: post-session audit 2026-02-21 — 6 skills (enhance-prompt, next-upgrade, vercel-deploy, shadcn-ui, web-perf, next-cache-components) created without any auto-wiring.
+
+---
+
 ## Pattern: Dual-Layer Drift Detection for Skill Registration (2026-02-21)
 
 **Context**: 14-microtask skill-wiring initiative (M14 final reflection, task-20)
@@ -156,3 +186,51 @@ Lesson: Validate at creation time (creator skills) AND at review time (reflectio
 - Created new agent: bool-action (2026-02-21)
 
 - Created new agent: repo-onboarder (2026-02-21)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-22)
+
+- Created new agent: qa-guardian (2026-02-22)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-22)
+
+- Created new agent: contract-check (2026-02-22)
+
+- Created new agent: bool-action (2026-02-22)
+
+- Updated workflow: evolution-workflow (2026-02-22)
+
+- Updated workflow: missing-workflow-xyz (2026-02-22)
+
+- Created new agent: repo-onboarder (2026-02-22)
+
+- Created new agent: qa-guardian (2026-02-22)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-02-22)
+
+- Created new agent: contract-check (2026-02-22)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-22)
+
+- Created new agent: bool-action (2026-02-22)
+
+- Created new agent: repo-onboarder (2026-02-22)
+
+- Updated workflow: evolution-workflow (2026-02-22)
+
+- Updated workflow: missing-workflow-xyz (2026-02-22)
+
+## Gap Capture Pattern: Router → Session Gap Log → Reflection (2026-02-21)
+
+The session gap log (`.claude/context/runtime/session-gap-log.jsonl`) bridges the router's cross-agent observations to the reflection learning system. Without it, retries, stalls, and integration gaps identified by the router are permanently invisible to memory.
+
+**How it works:**
+
+1. Router observes gap during pipeline → appends JSON line to `session-gap-log.jsonl` via Bash (per CLAUDE.md Gap Observation Protocol and router-decision.md Step 9.5)
+2. `reflection-queue-processor.cjs` reads gap log → injects formatted entries into reflection spawn prompt automatically
+3. Agents can report gaps via `TaskUpdate({ metadata: { gapLog: [{type, description, context}] } })`
+4. `post-completion-chain.cjs` extracts agent gapLog entries → appends to session-gap-log.jsonl
+5. Reflection agent Step 1.5 → classifies each entry → writes systemic patterns to learnings/issues
+
+**Gap types:** `retry` | `placeholder_output` | `integration_gap` | `hook_warning` | `missing_metadata` | `stall` | `agent_reported`
+
+**This pattern was motivated by a concrete failure (2026-02-21):** artifact-integrator was spawned twice producing placeholder reports, evolution-orchestrator stalled after Phase 1, 3 total agent retries needed to wire 9 files — none of this was captured in reflection because the router had no gap log mechanism.

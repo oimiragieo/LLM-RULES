@@ -362,6 +362,44 @@ function buildReason(entry) {
 }
 
 /**
+ * Read the session gap log and return a formatted section for injection into prompts.
+ * @returns {string} Formatted gap log section, or empty string if none.
+ */
+function readSessionGapLog() {
+  const gapLogPath =
+    process.env.GAP_LOG_PATH_OVERRIDE ||
+    path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'session-gap-log.jsonl');
+  try {
+    if (!fs.existsSync(gapLogPath)) return '';
+    const raw = fs.readFileSync(gapLogPath, 'utf8').trim();
+    if (!raw) return '';
+    const lines = raw.split('\n').filter(l => l.trim());
+    if (lines.length === 0) return '';
+    const entries = [];
+    for (const line of lines) {
+      try {
+        const parsed = JSON.parse(line);
+        if (parsed && typeof parsed === 'object') entries.push(parsed);
+      } catch (_e) {
+        /* skip malformed lines */
+      }
+    }
+    if (entries.length === 0) return '';
+    // Cap at 20 most recent to avoid prompt bloat
+    const capped = entries.slice(-20);
+    const formatted = capped
+      .map(
+        e =>
+          `- [${e.type || 'unknown'}] ${e.description || '(no description)'}${e.taskId ? ` (task: ${e.taskId})` : ''}${e.agent ? ` (agent: ${e.agent})` : ''}${e.context ? `\n  context: ${e.context}` : ''}`
+      )
+      .join('\n');
+    return `\n## Router Gap Observations (${entries.length} total, showing last ${capped.length})\nThe Router observed these gaps/issues during this session:\n${formatted}\n\nFor each entry above: determine if it is a systemic pattern or one-off. Record systemic patterns to learnings.md. Record recurring issues to issues.md.\n`;
+  } catch (_err) {
+    return '';
+  }
+}
+
+/**
  * Build the task prompt for spawning reflection-agent
  * @param {object} entry - Queue entry
  * @returns {string} Task prompt
@@ -397,7 +435,7 @@ Timestamp: ${timestamp}
 Priority: ${priority}
 
 ${context}
-
+${readSessionGapLog()}
 Instructions:
 1. Read your agent definition: .claude/agents/core/reflection-agent.md
 2. Analyze the context and extract learnings

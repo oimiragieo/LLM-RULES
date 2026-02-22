@@ -41,6 +41,10 @@ skills:
   - tdd
   - typescript-expert
   - verification-before-completion
+  - next-cache-components
+  - next-upgrade
+  - shadcn-ui
+  - web-perf
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

@@ -59,6 +59,12 @@ Catalog of active workflow-enhancement skills available via `Skill()` tool for i
 | `agent-tool-design`                  | Agent Tool Contract: 5 principles and anti-pattern table                             |
 | `sharp-edges`                        | catalogue of confirmed SE-01–SE-07 hazards (paths, prototype pollution, ReDoS, etc.) |
 | `debug-log-analysis`                 | structured debug log workflow: copy, reduce, categorize, cross-reference, report     |
+| `enhance-prompt`                     | transform vague UI/feature requests into structured specs with design system awareness |
+| `next-upgrade`                       | 9-step Next.js version migration workflow with codemod automation (13→14→15→16)      |
+| `vercel-deploy`                      | zero-auth Vercel deployment with framework auto-detection for 20+ frameworks         |
+| `shadcn-ui`                          | shadcn/ui: Tailwind CSS v4, Radix UI, dark mode, Next.js App Router setup            |
+| `web-perf`                           | 5-phase Core Web Vitals audit: LCP, CLS, INP thresholds and Chrome DevTools          |
+| `next-cache-components`              | Next.js 16 `'use cache'` directive, `cacheLife()`, `cacheTag()`, PPR patterns        |
 
 ### Skill Discovery
 

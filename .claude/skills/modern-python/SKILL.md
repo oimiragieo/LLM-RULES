@@ -69,13 +69,13 @@ ALL PYTHON TOOLING CONFIGURED IN pyproject.toml — NO SEPARATE CONFIG FILES
 
 ## The Modern Python Stack
 
-| Tool | Replaces | Purpose | Speed |
-| --- | --- | --- | --- |
-| **uv** | pip, Poetry, pipenv, pip-tools | Package & project management | 10-100x faster |
-| **ruff** | flake8, isort, black, pyflakes, pycodestyle, pydocstyle | Linting + formatting | 10-100x faster |
-| **ty** | mypy, pyright, pytype | Type checking | 5-10x faster |
-| **pytest** | unittest | Testing | -- |
-| **hypothesis** | (manual property tests) | Property-based testing | -- |
+| Tool           | Replaces                                                | Purpose                      | Speed          |
+| -------------- | ------------------------------------------------------- | ---------------------------- | -------------- |
+| **uv**         | pip, Poetry, pipenv, pip-tools                          | Package & project management | 10-100x faster |
+| **ruff**       | flake8, isort, black, pyflakes, pycodestyle, pydocstyle | Linting + formatting         | 10-100x faster |
+| **ty**         | mypy, pyright, pytype                                   | Type checking                | 5-10x faster   |
+| **pytest**     | unittest                                                | Testing                      | --             |
+| **hypothesis** | (manual property tests)                                 | Property-based testing       | --             |
 
 ## Project Setup
 
@@ -342,14 +342,14 @@ jobs:
 # .github/dependabot.yml
 version: 2
 updates:
-  - package-ecosystem: "uv"
-    directory: "/"
+  - package-ecosystem: 'uv'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     groups:
       all:
         patterns:
-          - "*"
+          - '*'
 ```
 
 ## Pre-commit Hooks
@@ -434,14 +434,14 @@ my-project/
 
 ### Complementary Skills
 
-| Skill | Relationship |
-| --- | --- |
-| `python-backend-expert` | Framework-specific patterns (Django, FastAPI, Flask) |
-| `comprehensive-unit-testing-with-pytest` | Testing strategies and patterns |
-| `comprehensive-type-annotations` | Type annotation best practices |
-| `prioritize-python-3-10-features` | Modern Python language features |
-| `tdd` | Test-driven development methodology |
-| `property-based-testing` | Hypothesis-based testing patterns |
+| Skill                                    | Relationship                                         |
+| ---------------------------------------- | ---------------------------------------------------- |
+| `python-backend-expert`                  | Framework-specific patterns (Django, FastAPI, Flask) |
+| `comprehensive-unit-testing-with-pytest` | Testing strategies and patterns                      |
+| `comprehensive-type-annotations`         | Type annotation best practices                       |
+| `prioritize-python-3-10-features`        | Modern Python language features                      |
+| `tdd`                                    | Test-driven development methodology                  |
+| `property-based-testing`                 | Hypothesis-based testing patterns                    |
 
 ## Memory Protocol
 

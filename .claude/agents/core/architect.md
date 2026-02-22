@@ -29,6 +29,7 @@ tools:
   - Skill
 skills:
   - api-development-expert
+  - enhance-prompt
   - architecture-review
   - checklist-generator
   - code-semantic-search

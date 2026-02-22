@@ -74,8 +74,9 @@ flowchart TD
 4. **CRITICAL**: DO NOT manually delete the reminder file or clear the JSON file.
 5. The system uses an **Atomic Handshake**: the `reflection-agent` MUST call `TaskUpdate` with `metadata: { processedReflectionIds: [...] }`.
 6. The `reflection-cleanup.cjs` hook will then automatically remove the processed requests.
+7. **When constructing the reflection spawn prompt**, include: `Read .claude/context/runtime/session-gap-log.jsonl for router gap observations this session.`
 
-**Why**: Ensures no reflection data is lost if the agent fails or crashes.
+**Why**: Ensures no reflection data is lost if the agent fails or crashes. Gap observations capture cross-agent pipeline failures that individual agents cannot see.
 
 ## Step 0.5: CHECK INTEGRATION QUEUE (Non-Blocking)
 
@@ -1176,7 +1177,39 @@ TaskList(); // Check for metadata updates from agents
 TaskList();
 ```
 
-### 9.4 Final-Summary Drain Gate (MANDATORY)
+### 9.4 Gap Observation Logging (MANDATORY)
+
+When the Router observes failures, retries, warnings, or integration gaps during pipeline monitoring, it MUST log each observation to `.claude/context/runtime/session-gap-log.jsonl` **immediately — before proceeding to the next step**.
+
+**Log triggers (MUST log when ANY occurs):**
+
+1. Router decides to re-spawn an agent (any reason: stall, empty output, wrong scope, incomplete work)
+2. Agent output is empty, a placeholder, or missing expected files/artifacts
+3. Router identifies integration gaps (missing catalog entries, unwired artifacts, missing agent assignments)
+4. Enforcement hook warning appears in spawn output
+5. `TaskUpdate(completed)` metadata lacks `summary` or `filesModified` or equivalent output fields
+6. Pipeline phase stalls (downstream artifacts do not exist after agent completion)
+
+**How to append (Bash — write inline, do not spawn an agent for this):**
+
+```bash
+echo '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","type":"retry","taskId":"task-N","agent":"agent-type","description":"What was observed","context":"Optional context"}' >> .claude/context/runtime/session-gap-log.jsonl
+```
+
+**Valid `type` values:** `retry` | `placeholder_output` | `integration_gap` | `hook_warning` | `missing_metadata` | `stall`
+
+**When spawning reflection-agent** (Step 0 or pipeline closeout), always include in the spawn prompt:
+
+```
+## Router Gap Observations
+Gap log for this session: .claude/context/runtime/session-gap-log.jsonl
+Read this file and incorporate all gap entries into your reflection analysis.
+Each entry is a router-observed cross-agent problem invisible to individual task analysis.
+```
+
+**Why this step exists:** The Router is the ONLY component with cross-agent pipeline visibility. Without this logging step, retries, stalls, and integration gaps are invisible to reflection and permanently lost from the learning system.
+
+### 9.5 Final-Summary Drain Gate (MANDATORY)
 
 Before any "pipeline complete" or final summary statement:
 
@@ -1197,7 +1230,7 @@ Rules:
 - If task output is still pending fan-in, continue polling with `TaskList()` until settled.
 - If blocked tasks remain, report blockers explicitly in the status update.
 
-### 9.5 Late-Notification Dedupe (MANDATORY)
+### 9.6 Late-Notification Dedupe (MANDATORY)
 
 When background tasks finish after a phase summary:
 
@@ -1205,11 +1238,11 @@ When background tasks finish after a phase summary:
 - Dedupe notifications by `task_id` + `agent/session id`.
 - Do not emit repeated notifications for already-acknowledged completions.
 
-## Step 9.6: Template Loading and Validation
+## Step 9.7: Template Loading and Validation
 
 **After selecting model, before spawning:**
 
-### 9.6.1 Select Appropriate Template
+### 9.7.1 Select Appropriate Template
 
 | Agent Type                               | Template File                                                           |
 | ---------------------------------------- | ----------------------------------------------------------------------- |
@@ -1217,7 +1250,7 @@ When background tasks finish after a phase summary:
 | Orchestrators (master, swarm, evolution) | `.claude/templates/spawn/orchestrator-spawn.md`                         |
 | Agents with identity fields              | `.claude/templates/spawn/agent-identity-integration.md` + base template |
 
-### 9.6.2 Load Template
+### 9.7.2 Load Template
 
 ```javascript
 // Load template file
@@ -1230,7 +1263,7 @@ if (!template) {
 }
 ```
 
-### 9.6.3 Populate Template Placeholders
+### 9.7.3 Populate Template Placeholders
 
 Replace these placeholders in template:
 
@@ -1243,7 +1276,7 @@ Replace these placeholders in template:
 | `<agent-file-path>`          | Path to agent definition file               |
 | `<SUBJECT>`                  | Task subject from TaskGet                   |
 
-### 9.6.4 Validation Check
+### 9.7.4 Validation Check
 
 Spawn prompt will be validated by `spawn-prompt-validator.cjs` hook.
 Ensure prompt contains:
@@ -1256,7 +1289,7 @@ Ensure prompt contains:
 
 **If validation fails in 'block' mode, spawn will be rejected.**
 
-### 9.6.5 Execute Spawn
+### 9.7.5 Execute Spawn
 
 ```javascript
 Task({

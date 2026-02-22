@@ -77,6 +77,47 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 - Enterprise search policy: for enterprise sweeps, require hybrid search first (`pnpm search:code`, semantic/structural search skills, `ripgrep` skill), with `Grep` as fallback-only. **Router NEVER runs these; always spawn an agent.**
 - Enterprise planner contract: planner must invoke `Skill({ skill: 'tdd' })`, produce a detailed TDD plan, emit microtask DAG metadata (`owned_paths`, `forbidden_paths`, `depends_on`, `dependency_type`, `parallel_group`) for MEDIUM+ work, and call `researcher`/`architect` when uncertain.
 
+### Gap Observation Protocol (MANDATORY)
+
+When the Router observes ANY of the following during a pipeline, it MUST append a structured entry to `.claude/context/runtime/session-gap-log.jsonl` using Bash:
+
+- Agent retry (agent failed, stalled, or produced empty/placeholder output — router re-spawned)
+- Agent produced placeholder output (report file is stub, missing expected files, or zero writes despite being tasked to write)
+- Integration gap identified (missing catalog entry, unwired artifact, missing agent assignment found post-creation)
+- Warning from enforcement hook appearing in spawn output
+- Task completed without expected metadata (`summary`, `filesModified`, or equivalent fields missing from TaskUpdate)
+- Pipeline phase stall (agent completes but expected downstream artifacts do not exist)
+
+**How to append (Bash — Router writes this inline before proceeding to next step):**
+
+```bash
+echo '{"timestamp":"2026-02-21T00:00:00Z","type":"retry","taskId":"task-N","agent":"artifact-integrator","description":"artifact-integrator produced placeholder report, no file writes","context":"skill-catalog.md missing 6 entries"}' >> .claude/context/runtime/session-gap-log.jsonl
+```
+
+**Entry format:**
+
+```json
+{
+  "timestamp": "ISO-8601",
+  "type": "retry|placeholder_output|integration_gap|hook_warning|missing_metadata|stall",
+  "taskId": "task-N or null",
+  "agent": "agent-type or null",
+  "description": "What the Router observed",
+  "context": "Optional: file paths, error messages, gap list"
+}
+```
+
+**When spawning reflection-agent** (Step 0 or any reflection spawn), the Router MUST include in the spawn prompt:
+
+```
+## Router Gap Observations
+Gap log for this session: .claude/context/runtime/session-gap-log.jsonl
+You MUST read this file and incorporate all entries into your reflection analysis.
+Each entry is a router-observed problem invisible to individual task analysis.
+```
+
+**Why non-negotiable:** The Router is the ONLY component with cross-agent pipeline visibility. Without this step, retries, stalls, and integration gaps are permanently invisible to the learning system.
+
 ### Template Loading Protocol
 
 **Templates:** universal-agent-spawn.md (standard) | orchestrator-spawn.md (orchestrators) | agent-identity-integration.md (with personality)
@@ -308,7 +349,7 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 **Quick Routing (high-frequency):**
 
 | Task Type                    | Agent                 |
-| ---------------------------- | --------------------- |
+| ---------------------------- | --------------------- | ------------------------------------------------ |
 | Bug fixes / implementation   | `developer`           |
 | Documentation updates        | `technical-writer`    |
 | Refactor/simplify            | `code-simplifier`     |
@@ -320,6 +361,10 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Infra / CI / deploy          | `devops`              |
 | Planning / decomposition     | `planner`             |
 | External research            | `researcher`          |
+| Qa Guardian                  | `qa-guardian`         | `.claude/agents/domain/qa-guardian.md`           |
+| Contract Check               | `contract-check`      | `.claude/agents/domain/contract-check.md`        |
+| Bool Action                  | `bool-action`         | `.claude/agents/domain/bool-action.md`           |
+| Repo Onboarder               | `repo-onboarder`      | `.claude/agents/orchestrators/repo-onboarder.md` |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
@@ -551,6 +596,8 @@ High-impact orchestration skills:
 - `property-based-testing`
 - `agent-tool-design`
 - `sharp-edges`
+- `enterprise-skill-test-1771722088465`
+- `enterprise-skill-test-1771722182676`
 - `framework-context`
 - `recommend-evolution`
 - `creation-feasibility-gate`
@@ -564,6 +611,12 @@ High-impact orchestration skills:
 - `token-saver-context-compression`
 - `troubleshooting-regression`
 - `wave-executor`
+- `enhance-prompt`
+- `next-cache-components`
+- `next-upgrade`
+- `shadcn-ui`
+- `vercel-deploy`
+- `web-perf`
 
 For usage details and full inventory, use `@SKILL_CATALOG_TABLE.md`.
 

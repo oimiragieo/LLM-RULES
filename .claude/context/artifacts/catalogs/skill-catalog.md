@@ -15,18 +15,19 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 ## Quick Reference by Category
 
-| Category                                           | Count | Key Skills                                                                                                                                                                                                                    |
-| -------------------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Core Development](#core-development)              | 13    | tdd, debug-log-analysis, debugging, smart-debug, ripgrep, code-quality-expert, code-analyzer                                                                                                                                  |
-| [Planning & Architecture](#planning--architecture) | 10    | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator, wave-executor                                                                                                                   |
-| [Security](#security)                              | 13    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults, medusa-security, content-security-scan |
-| [DevOps & Infrastructure](#devops--infrastructure) | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                                                    |
-| [Languages](#languages)                            | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                                               |
-| [Frameworks](#frameworks)                          | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                                                    |
-| [Mobile](#mobile)                                  | 5     | ios-expert, android-expert, expo-framework-rule, tauri-native-api-integration, mobile-first-design-rules                                                                                                                      |
-| [Data & Database](#data--database)                 | 4     | database-architect, database-expert, data-expert, text-to-sql                                                                                                                                                                 |
-| [Documentation](#documentation)                    | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                                                                         |
-| [Git & Version Control](#git--version-control)     | 2     | git-expert, github-ops                                                                                                                                                                                                        |
+| Category                                             | Count | Key Skills                                                                                                                                                                                                                    |
+| ---------------------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Core Development](#core-development)                | 13    | tdd, debug-log-analysis, debugging, smart-debug, ripgrep, code-quality-expert, code-analyzer                                                                                                                                  |
+| [Planning & Architecture](#planning--architecture)   | 10    | plan-generator, prd-generator, architecture-review, complexity-assessment, diagram-generator, wave-executor                                                                                                                   |
+| [Security](#security)                                | 13    | security-architect, auth-security-expert, binary-analysis-patterns, memory-forensics, static-analysis, variant-analysis, differential-review, semgrep-rule-creator, insecure-defaults, medusa-security, content-security-scan |
+| [DevOps & Infrastructure](#devops--infrastructure)   | 6     | docker-compose, terraform-infra, k8s-manifest-generator, sentry-monitoring                                                                                                                                                    |
+| [Languages](#languages)                              | 7     | python-backend-expert, typescript-expert, go-expert, nodejs-expert, java-expert                                                                                                                                               |
+| [Frameworks](#frameworks)                            | 6     | react-expert, nextjs-expert, svelte-expert, graphql-expert                                                                                                                                                                    |
+| [Vercel & Web Performance](#vercel--web-performance) | 6     | enhance-prompt, next-upgrade, vercel-deploy, shadcn-ui, web-perf, next-cache-components                                                                                                                                       |
+| [Mobile](#mobile)                                    | 5     | ios-expert, android-expert, expo-framework-rule, tauri-native-api-integration, mobile-first-design-rules                                                                                                                      |
+| [Data & Database](#data--database)                   | 4     | database-architect, database-expert, data-expert, text-to-sql                                                                                                                                                                 |
+| [Documentation](#documentation)                      | 4     | doc-generator, writing-skills, readme, gamedev-expert                                                                                                                                                                         |
+| [Git & Version Control](#git--version-control)       | 2     | git-expert, github-ops                                                                                                                                                                                                        |
 
 | [Code Style & Linting](#code-style--linting) | 2 | code-style-validator, dry-principle |
 | [Creator Tools](#creator-tools) | 15 | research-synthesis, agent-creator, agent-updater, skill-creator, skill-updater, workflow-updater, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, artifact-updater, command-creator, rule-creator, tool-creator |
@@ -157,6 +158,21 @@ Framework-specific expertise.
 | `graphql-expert`      | GraphQL schema, Apollo Client/Server               | graphql-pro           |
 | `expo-framework-rule` | Expo Framework guidelines                          | expo-mobile-developer |
 | `frontend-expert`     | UI/UX patterns, responsive design                  | frontend-pro          |
+
+---
+
+## Vercel & Web Performance
+
+Skills sourced from VoltAgent awesome-agent-skills (Vercel Labs, Google Labs, Cloudflare).
+
+| Skill                   | Description                                                                                          | Primary Agents                              |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `enhance-prompt`        | Transforms vague UI/feature requests into structured, optimized prompts with design system awareness | planner, frontend-pro, architect, developer |
+| `next-upgrade`          | 9-step Next.js version migration workflow with codemod automation (13→14→15→16)                      | nextjs-pro, developer, devops               |
+| `vercel-deploy`         | Zero-auth Vercel deployment with auto framework detection for 20+ frameworks                         | devops, developer, frontend-pro             |
+| `shadcn-ui`             | shadcn/ui component library deep expertise — Tailwind v4, Radix primitives, dark mode, App Router    | frontend-pro, developer, nextjs-pro         |
+| `web-perf`              | 5-phase web performance audit (Core Web Vitals: LCP, CLS, INP) with Chrome DevTools integration      | frontend-pro, developer, qa, devops         |
+| `next-cache-components` | Next.js 16 `'use cache'` directive, `cacheLife()`, `cacheTag()`, PPR integration patterns            | nextjs-pro, developer                       |
 
 ---
 
@@ -305,22 +321,24 @@ Quality validation skills.
 
 Advanced patterns and methodologies.
 
-| Skill                                | Description                                                                                                                                                                                 | Primary Agents            |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `thinking-tools`                     | Self-reflection patterns (think-about-\*)                                                                                                                                                   | all agents                |
-| `spec-gathering`                     | Requirements gathering                                                                                                                                                                      | planner                   |
-| `spec-init`                          | Unified spec creation                                                                                                                                                                       | planner                   |
-| `sequential-thinking`                | Structured problem solving                                                                                                                                                                  | all agents                |
-| `consensus-voting`                   | Byzantine consensus for multi-agent decisions                                                                                                                                               | orchestrators             |
-| `swarm-coordination`                 | Multi-agent swarm patterns                                                                                                                                                                  | orchestrators             |
-| `interactive-requirements-gathering` | A/B/C/D/E questionnaire framework                                                                                                                                                           | planner                   |
-| `planning-with-files`                | Persistent planning files                                                                                                                                                                   | planner                   |
-| `sparc-methodology`                  | SPARC development methodology                                                                                                                                                               | architect                 |
-| `agent-evaluation`                   | LLM-as-judge evaluation framework with 5-dimension rubric for scoring AI-generated content quality                                                                                          | Read,Write,Bash,Glob,Grep |
-| `context-degradation`                | Token-range severity zones with detection checklist and corrective routing actions for context window degradation                                                                           | Read                      |
-| `property-based-testing`             | fast-check patterns for JS/TS — 6 canonical property categories with worked examples targeting agent-studio utilities                                                                       | Read                      |
-| `agent-tool-design`                  | The Agent Tool Contract — 5 principles for designing tools agents call reliably with anti-pattern table                                                                                     | Read                      |
-| `sharp-edges`                        | Living catalogue of 7 known hazard entries specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS, DST arithmetic, array mutation | Read                      |
+| Skill                                 | Description                                                                                                                                                                                 | Primary Agents            |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `thinking-tools`                      | Self-reflection patterns (think-about-\*)                                                                                                                                                   | all agents                |
+| `spec-gathering`                      | Requirements gathering                                                                                                                                                                      | planner                   |
+| `spec-init`                           | Unified spec creation                                                                                                                                                                       | planner                   |
+| `sequential-thinking`                 | Structured problem solving                                                                                                                                                                  | all agents                |
+| `consensus-voting`                    | Byzantine consensus for multi-agent decisions                                                                                                                                               | orchestrators             |
+| `swarm-coordination`                  | Multi-agent swarm patterns                                                                                                                                                                  | orchestrators             |
+| `interactive-requirements-gathering`  | A/B/C/D/E questionnaire framework                                                                                                                                                           | planner                   |
+| `planning-with-files`                 | Persistent planning files                                                                                                                                                                   | planner                   |
+| `sparc-methodology`                   | SPARC development methodology                                                                                                                                                               | architect                 |
+| `agent-evaluation`                    | LLM-as-judge evaluation framework with 5-dimension rubric for scoring AI-generated content quality                                                                                          | Read,Write,Bash,Glob,Grep |
+| `context-degradation`                 | Token-range severity zones with detection checklist and corrective routing actions for context window degradation                                                                           | Read                      |
+| `property-based-testing`              | fast-check patterns for JS/TS — 6 canonical property categories with worked examples targeting agent-studio utilities                                                                       | Read                      |
+| `agent-tool-design`                   | The Agent Tool Contract — 5 principles for designing tools agents call reliably with anti-pattern table                                                                                     | Read                      |
+| `sharp-edges`                         | Living catalogue of 7 known hazard entries specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS, DST arithmetic, array mutation | Read                      |
+| `enterprise-skill-test-1771722088465` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
+| `enterprise-skill-test-1771722182676` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
 
 ---
 

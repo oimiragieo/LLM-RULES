@@ -49,11 +49,14 @@ skills:
   - k8s-manifest-generator
   - k8s-security-policies
   - kubernetes-flux
+  - next-upgrade
   - ripgrep
   - sentry-monitoring
   - template-renderer
   - terraform-infra
+  - vercel-deploy
   - verification-before-completion
+  - web-perf
 ---
 
 <!-- agent-template-contract:v1 -->

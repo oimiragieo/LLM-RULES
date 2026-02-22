@@ -24,6 +24,8 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
+const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const {
   parseHookInputAsync,
   getToolName,
@@ -36,6 +38,30 @@ const { evaluateGate } = require('../../lib/workflow/quality-gates.cjs');
 const { withWorkflowStateLock } = require('../../lib/workflow/workflow-state-lock.cjs');
 const { readWorkflowStateFile } = require('../../lib/runtime/state-contracts.cjs');
 const { getWorkflowStatePath, getPhaseAdvancePath } = require('../../lib/utils/workflow-paths.cjs');
+
+function appendAgentGapsToSessionLog(gaps, taskId) {
+  const gapLogPath =
+    process.env.GAP_LOG_PATH_OVERRIDE ||
+    path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'session-gap-log.jsonl');
+  try {
+    const validGaps = gaps.filter(gap => gap && typeof gap === 'object' && gap.description);
+    if (validGaps.length === 0) return;
+    const lines = validGaps.map(gap =>
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        type: gap.type || 'agent_reported',
+        taskId: taskId || null,
+        agent: gap.agent || null,
+        description: gap.description,
+        context: gap.context || null,
+        source: 'agent_metadata',
+      })
+    );
+    fs.appendFileSync(gapLogPath, lines.join('\n') + '\n');
+  } catch (_err) {
+    // Non-critical: gap logging failure must NOT break the completion chain
+  }
+}
 
 function normalizeTaskUpdateFields(toolInput) {
   const input = toolInput && typeof toolInput === 'object' ? toolInput : {};
@@ -76,6 +102,12 @@ async function processTaskCompletion(hookData) {
 
   if (update.status !== 'completed') {
     return { result: {} };
+  }
+
+  // Extract agent-reported gaps and append to session gap log
+  const metadata = toolInput.metadata || {};
+  if (Array.isArray(metadata.gapLog) && metadata.gapLog.length > 0) {
+    appendAgentGapsToSessionLog(metadata.gapLog, toolInput.taskId || null);
   }
 
   // Resolve paths at call time so env-var overrides work even when set after module load

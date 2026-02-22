@@ -41,6 +41,7 @@ skills:
   - verification-before-completion
   - token-saver-context-compression
   - troubleshooting-regression
+  - web-perf
 identity:
   role: Quality Gatekeeper
   goal: Break the code before users do through comprehensive testing and edge case analysis

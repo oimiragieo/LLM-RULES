@@ -1498,3 +1498,137 @@ Training-based enforcement is exhausted (12+ failures on 2026-02-17). Hook enfor
 ---
 
 ## ADR-131: Enforce TaskUpdate via Hook Rather Than Developer Training (2026-02-16 REFLECTION DECISION)
+
+---
+
+## ADR: Post-Session Skill Validation Harness (2026-02-21)
+
+Status: Implemented
+Decision: Dual-component validation approach — CLI tool for CI (validate-skill-agent-consistency.mjs) + reflection-agent Step 4.7 for runtime detection.
+Rationale: Smart-debug audit revealed catalog/index/agent-file can drift silently. CLI tool catches drift in CI; reflection-agent catches it post-creation.
+Impact: .claude/tools/cli/validate-skill-agent-consistency.mjs, .claude/agents/core/reflection-agent.md
+
+---
+
+## ADR-2026-02-20-001: Enterprise Pipeline Two-Commit & APPROVED_WITH_NOTES Pattern (REFLECTION DECISION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-20
+**Trigger:** Enterprise supply chain security pipeline completion (Tasks 4, 10, 11, 12)
+
+**Decision:** Adopt two-commit deployment strategy and APPROVED_WITH_NOTES security review outcome as enterprise SOP for high-stakes deployments.
+
+**Evidence:**
+
+- Task 4 (Pipeline Parent): 12 tasks executed without rework, 100% gap resolution (4/4), aggregate score 0.90 (EXCELLENT)
+- Task 11 (Security Review): APPROVED_WITH_NOTES with 0 critical/high, 3 LOW findings, 30/30 checklist pass
+- Task 12 (Deploy & Commit): Two clean commits (c4022e7d security, c5c8e3938 churn), 7130 files validated, zero unexpected modifications
+
+**Implementation:**
+
+1. **Two-Commit Model**: Separate git commits for (a) security fixes + environment configuration, (b) catalog/memory/skill updates
+2. **Whitespace Exclusion**: Document whitespace-only diffs in commit messages; validate with `git diff --check`
+3. **APPROVED_WITH_NOTES**: Formal security review outcome for mixed-severity findings (0 critical/high, N LOW)
+4. **30/30 Checklist Standard**: Security reviews must pass complete checklist items
+
+**Consequences:**
+
+- **Positive**: Audit trail clarity, zero false positives in compliance scanning, deployment-safe approvals, reduced rework
+- **Negative**: Requires commit discipline, increases total commit count, team training needed
+
+**Applicability:** HIGH/EPIC deployments with security gates, compliance reviews, or governance changes. Consider for MEDIUM+ in regulated environments.
+
+**Related:** Enterprise pipeline architecture, security review protocol, git workflow governance
+
+---
+
+## ADR-2026-02-21-011: VoltAgent Batch Skill Intake — Two-Phase Quality Protocol (2026-02-21 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Reflection of tasks 12, 13, 3, 4, 5 — VoltAgent awesome-agent-skills batch intake producing scaffold-quality skills
+
+**Decision:** Batch skill creation from external repositories (VoltAgent/awesome-agent-skills or similar curated collections) MUST follow a two-phase quality protocol:
+
+**Phase 1: Scaffold Creation (skill-creator)**
+
+- Creates SKILL.md with accurate frontmatter (name, description, tools, agents)
+- Scaffolds directory structure (scripts/, commands/, workflow stub)
+- Registers in skill-index.json with agent assignments
+- Sets `verified: false` (NOT true — scaffold is not production-ready)
+- Does NOT set `lastVerifiedAt`
+
+**Phase 2: Content Enrichment (skill-updater)**
+
+- Invokes Exa research (minimum 2 queries) for domain-specific best practices
+- Populates substantive workflow steps (minimum 100 lines, domain-specific)
+- Adds Iron Laws, Anti-Patterns, Error Handling sections
+- Updates skill-catalog.md with appropriate category
+- Sets `verified: true` and `lastVerifiedAt` ONLY after content passes quality review
+
+**Rationale:**
+
+- Tasks 12, 13, 3, 4, 5 produced 3 skills with `verified: true` but scaffold-only content
+- Premature `verified: true` misleads quality metrics and audit tools
+- Without Phase 2, skills are discoverable but not actionable
+
+**Implementation:**
+
+- skill-creator: never set `verified: true` for batch/scaffold mode (only for single-skill deep research mode)
+- post-creation hook: check if SKILL.md content is scaffold-only (< 100 lines, generic 3-step pattern); if yes, flag for skill-updater queue
+- skill-updater: queued automatically for all scaffold-quality skills before marking as verified
+
+**Related:**
+
+- Issues.md: Premature verified:true Flag on Scaffold-Quality SKILL.md Content (2026-02-21)
+- Reflection report: `.claude/context/reports/reflections/batch-reflection-tasks-12-13-3-4-5-2026-02-21.md`
+
+---
+
+## ADR-2026-02-21-010: Commit-Checkpoint Mandatory for Multi-File Pipelines (2026-02-21 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Task #13 reflection — 13 files stranded in working tree after pipeline stall
+
+**Decision:** Any agent workflow that modifies 5 or more files MUST include an explicit `git commit` step as the final action before calling `TaskUpdate({ status: 'completed' })`. Pipelines that skip the commit step leave work stranded and at risk.
+
+**Implementation:**
+
+1. Add `commitCheckpoint: true` to TaskUpdate metadata for tasks that made git commits
+2. Add "git commit" as explicit step in pipeline templates for MEDIUM+ complexity tasks
+3. Task summaries MUST distinguish "modified + committed" from "modified but not committed"
+4. Router should check git status before declaring pipeline phase complete
+
+**Evidence:** Task #13 (2026-02-21) modified 13 files across implementation, tests, and memory — all correct work — but commit agent stalled. Work survived (working tree intact), but best practice requires commit-before-complete for all multi-file tasks.
+
+**Detection pattern:** TaskUpdate summary containing "modified in working tree but not committed" signals this anti-pattern.
+
+**Related:** Issues.md: Pipeline Stall Before VCS Commit (2026-02-21, P1)
+
+---
+
+## ADR-2026-02-21-009: Hook Documentation Accuracy as Security Control Property (2026-02-21 REFLECTION)
+
+**Status:** ACCEPTED
+**Date:** 2026-02-21
+**Trigger:** Task #3 — SEC-ICE-002 spawnDepth audit revealed enforcement in wrong hook vs documentation
+
+**Decision:** When a security control's enforcement location is documented (in ADRs, workflow docs, or @ENFORCEMENT_HOOKS.md), that documentation accuracy is itself a security property. Controls documented in hook A but implemented in hook B create a discoverability gap: future auditors and maintainers will look in the documented location, find nothing, and may incorrectly conclude the control is a "paper control."
+
+**Rationale:**
+
+- SEC-ICE-002 was documented as living in routing-guard.cjs, but enforcement is in pre-task-unified-core.cjs via loop-state-manager.cjs
+- The control works correctly, but the documentation mismatch misleads future auditors
+- In security engineering, auditability and discoverability are as important as the control itself
+
+**Implementation:**
+
+1. After any hook refactor or module relocation, update all documentation references naming the hook as an enforcement location
+2. @ENFORCEMENT_HOOKS.md, ADRs, and workflow docs must agree with actual file locations
+3. SEC-ICE-002 in ecosystem-creation-workflow.md should be updated to name pre-task-unified-core.cjs (P2 doc fix)
+
+**Related:**
+
+- Issues.md: SEC-ICE-002 RESOLVED → P2 documentation fix (2026-02-21)
+- Task #3 audit report: `.claude/context/reports/reflections/spawn-depth-audit-2026-02-21.md`

@@ -110,7 +110,8 @@ context/
 ├── runtime/
 │   ├── router-state.json
 │   ├── compression-reminder.txt
-│   └── reflection-reminder.txt
+│   ├── reflection-reminder.txt
+│   └── session-gap-log.jsonl   # Router gap observations: retries, stalls, integration gaps, missing metadata
 ├── self-healing/            # Self-healing state (anomaly-detector and loop-state-manager write here)
 ├── sessions/                # Session data (used by consensus-voting and swarm-coordinator for session state)
 ├── teams/

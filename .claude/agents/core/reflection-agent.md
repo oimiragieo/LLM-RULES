@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-21T04:08:11.974Z
+lastVerifiedAt: 2026-02-22T01:03:02.016Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -261,6 +261,25 @@ Gather context about the completed task:
 - Output artifacts
 - Trace evidence artifacts (`pnpm trace:query` output, flight-recorder references)
 - Duration and token metrics
+
+### Step 1.5: Read Router Gap Observations
+
+Before evaluating task quality, check for router-observed pipeline gaps:
+
+1. Check if `.claude/context/runtime/session-gap-log.jsonl` exists and has content
+2. If it contains entries — each represents a **cross-agent observation** the Router made during pipeline execution. These are INVISIBLE to individual task analysis because they span multiple agents:
+   - `retry` — the Router had to re-spawn an agent
+   - `placeholder_output` — an agent produced an empty or stub output
+   - `integration_gap` — a post-creation artifact was missing catalog/agent wiring
+   - `hook_warning` — an enforcement hook fired a warning
+   - `missing_metadata` — an agent completed without proper TaskUpdate metadata
+   - `stall` — an agent completed but expected artifacts did not exist
+3. For each entry, classify:
+   - **Recurring type or same agent failing repeatedly** → append pattern to `learnings.md`
+   - **Integration gaps (missing wiring, catalog entries)** → append entry to `issues.md`
+   - **Metadata failures (TaskUpdate without summary)** → append entry to `issues.md`
+   - **One-off stall with no recurrence** → note in reflection report only, no memory write needed
+4. If gap log is empty or file does not exist: note "No router gap observations logged this session" and proceed
 
 ### Step 2: Evaluate (Rubric Scoring)
 

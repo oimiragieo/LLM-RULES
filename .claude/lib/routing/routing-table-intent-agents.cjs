@@ -137,6 +137,12 @@ const INTENT_TO_AGENT = {
   'property-based-testing': 'property-based-testing',
   'agent-tool-design': 'agent-tool-design',
   'sharp-edges': 'sharp-edges',
+  'qa-guardian': 'qa-guardian',
+  'contract-check': 'contract-check',
+  'bool-action': 'bool-action',
+  'repo-onboarder': 'repo-onboarder',
+  'enterprise-skill-test-1771722088465': 'enterprise-skill-test-1771722088465',
+  'enterprise-skill-test-1771722182676': 'enterprise-skill-test-1771722182676',
 };
 
 module.exports = { INTENT_TO_AGENT };

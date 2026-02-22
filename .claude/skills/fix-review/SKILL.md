@@ -67,13 +67,13 @@ A finding is not fixed until the fix has been reviewed against the original find
 
 ## Fix Status Categories
 
-| Status | Meaning |
-| --- | --- |
-| `FIXED` | Finding is fully addressed. Root cause eliminated. No regressions introduced. |
-| `PARTIALLY_FIXED` | Some aspects addressed but gaps remain. More dangerous than unfixed. |
-| `NOT_ADDRESSED` | Fix does not relate to the finding, or finding location unchanged. |
-| `CANNOT_DETERMINE` | Insufficient context or code complexity prevents definitive assessment. |
-| `NEW_ISSUE` | Fix introduces a new vulnerability or regression. |
+| Status             | Meaning                                                                       |
+| ------------------ | ----------------------------------------------------------------------------- |
+| `FIXED`            | Finding is fully addressed. Root cause eliminated. No regressions introduced. |
+| `PARTIALLY_FIXED`  | Some aspects addressed but gaps remain. More dangerous than unfixed.          |
+| `NOT_ADDRESSED`    | Fix does not relate to the finding, or finding location unchanged.            |
+| `CANNOT_DETERMINE` | Insufficient context or code complexity prevents definitive assessment.       |
+| `NEW_ISSUE`        | Fix introduces a new vulnerability or regression.                             |
 
 ## Anti-Pattern Detection
 
@@ -86,6 +86,7 @@ ALERT: Input validation was removed or weakened in the fix.
 ```
 
 **Indicators**:
+
 - Deleted input sanitization calls
 - Relaxed regex patterns
 - Removed length/type checks
@@ -98,6 +99,7 @@ ALERT: Authorization checks were reduced or bypassed in the fix.
 ```
 
 **Indicators**:
+
 - Removed authentication middleware
 - Changed role checks from strict to permissive
 - Added bypass conditions to access control
@@ -110,6 +112,7 @@ ALERT: Error handling was simplified or removed, potentially hiding failures.
 ```
 
 **Indicators**:
+
 - Replaced specific catch blocks with generic catch-all
 - Added empty catch blocks
 - Removed error logging
@@ -122,6 +125,7 @@ ALERT: Order of external calls changed, potentially creating race conditions or 
 ```
 
 **Indicators**:
+
 - Authorization check moved after data access
 - Validation moved after processing
 - Lock acquisition moved or removed
@@ -134,6 +138,7 @@ ALERT: Integer arithmetic modified, check for overflow/underflow/truncation.
 ```
 
 **Indicators**:
+
 - Changed integer types (int64 to int32, uint to int)
 - Added/removed overflow checks
 - Changed comparison operators (> to >=, == to !=)
@@ -146,6 +151,7 @@ ALERT: Cryptographic operations were changed in a potentially weakening way.
 ```
 
 **Indicators**:
+
 - Algorithm changed (AES-256 to AES-128, SHA-256 to SHA-1)
 - Key length reduced
 - Removed salt/nonce/IV
@@ -206,13 +212,13 @@ For each finding-fix pair:
 
 ## Summary
 
-| Status | Count |
-| --- | --- |
-| FIXED | N |
-| PARTIALLY_FIXED | N |
-| NOT_ADDRESSED | N |
-| CANNOT_DETERMINE | N |
-| NEW_ISSUE | N |
+| Status           | Count |
+| ---------------- | ----- |
+| FIXED            | N     |
+| PARTIALLY_FIXED  | N     |
+| NOT_ADDRESSED    | N     |
+| CANNOT_DETERMINE | N     |
+| NEW_ISSUE        | N     |
 
 ## Finding Reviews
 
@@ -237,12 +243,14 @@ For each finding-fix pair:
 [Explanation of potential regressions]
 
 **Remaining Gaps** (if PARTIALLY_FIXED):
+
 - [ ] Gap 1: [description]
 - [ ] Gap 2: [description]
 
 ---
 
 ### Finding F-002: [Title]
+
 [Same structure as above]
 
 ---
@@ -250,6 +258,7 @@ For each finding-fix pair:
 ## New Issues Introduced
 
 ### NI-001: [Title]
+
 - **Introduced By**: `<commit-hash>`
 - **Location**: `file:line`
 - **Severity**: Critical/High/Medium/Low
@@ -273,13 +282,13 @@ For each finding-fix pair:
 
 ### Complementary Skills
 
-| Skill | Relationship |
-| --- | --- |
-| `audit-context-building` | Provides deep context for understanding fixes |
-| `differential-review` | Security-focused diff review (lower granularity) |
-| `variant-analysis` | Finds unpatched variants of fixed vulnerabilities |
-| `static-analysis` | Automated confirmation of fix effectiveness |
-| `code-reviewer` | General code quality review of fix commits |
+| Skill                    | Relationship                                      |
+| ------------------------ | ------------------------------------------------- |
+| `audit-context-building` | Provides deep context for understanding fixes     |
+| `differential-review`    | Security-focused diff review (lower granularity)  |
+| `variant-analysis`       | Finds unpatched variants of fixed vulnerabilities |
+| `static-analysis`        | Automated confirmation of fix effectiveness       |
+| `code-reviewer`          | General code quality review of fix commits        |
 
 ## Memory Protocol
 

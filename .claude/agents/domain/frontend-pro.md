@@ -43,6 +43,10 @@ skills:
   - ui-components-expert
   - verification-before-completion
   - web-design-guidelines-vercel
+  - enhance-prompt
+  - shadcn-ui
+  - vercel-deploy
+  - web-perf
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

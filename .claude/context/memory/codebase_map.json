@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-02-21T04:07:59.635Z"
+      "last_accessed": "2026-02-22T01:02:31.967Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "description": "Memory facade storage layer (read/write memory files)",
@@ -132,7 +132,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-18T06:32:19.085Z",
-      "last_accessed": "2026-02-21T07:54:30.503Z"
+      "last_accessed": "2026-02-22T01:05:54.206Z"
     },
     ".claude/hooks/validation/pre-completion-validation.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -360,7 +360,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-21T06:34:10.540Z",
-      "last_accessed": "2026-02-21T07:54:59.609Z"
+      "last_accessed": "2026-02-22T01:06:11.211Z"
     },
     ".claude/skills/multi-agent-architecture-reference/scripts/main.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -391,7 +391,31 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-21T07:46:03.044Z",
       "last_accessed": "2026-02-21T07:55:11.820Z"
+    },
+    ".claude/hooks/reflection/reflection-queue-processor.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T00:48:02.838Z",
+      "last_accessed": "2026-02-22T00:57:51.797Z"
+    },
+    ".claude/hooks/workflow/post-completion-chain.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T00:48:23.801Z",
+      "last_accessed": "2026-02-22T00:57:56.563Z"
+    },
+    "tests/hooks/reflection/gap-log-injection.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T00:52:35.029Z",
+      "last_accessed": "2026-02-22T00:58:08.761Z"
+    },
+    "tests/hooks/workflow/agent-gap-extraction.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T00:53:17.511Z",
+      "last_accessed": "2026-02-22T00:58:17.659Z"
     }
   },
-  "last_updated": "2026-02-21T07:55:11.820Z"
+  "last_updated": "2026-02-22T01:06:11.211Z"
 }

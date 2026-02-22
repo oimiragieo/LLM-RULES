@@ -2,8 +2,8 @@
 
 # Schema Catalog
 
-**Last Updated:** 2026-02-09
-**Total Active Schemas:** 103
+**Last Updated:** 2026-02-21
+**Total Active Schemas:** 104
 **Archived Schemas:** 37 (see `.claude/schemas/_archive/README.md` + 12 hollow stubs deleted in Phase 1)
 
 This catalog documents all active JSON schemas in the agent-studio framework with their wiring status, consumers, and validation categories.
@@ -23,8 +23,8 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | ---------------- | ----- | --------------------------------------------- |
 | **WIRED (Ajv)**  | 8     | Actively validated via Ajv at runtime         |
 | **SOFT-WIRED**   | 3     | Path referenced in code, validation optional  |
-| **DOCS ONLY**    | 92    | Referenced in documentation or templates only |
-| **Total Active** | 103   | All schemas in `.claude/schemas/`             |
+| **DOCS ONLY**    | 93    | Referenced in documentation or templates only |
+| **Total Active** | 104   | All schemas in `.claude/schemas/`             |
 
 ## Schema Categories
 

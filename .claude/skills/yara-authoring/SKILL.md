@@ -72,14 +72,14 @@ A YARA rule without efficient atoms will degrade scanner performance across the 
 
 ### Key Differences
 
-| Feature | Legacy YARA | YARA-X |
-| --- | --- | --- |
-| Language | C | Rust |
-| Safety | Manual memory management | Memory-safe |
-| Performance | Good | Better (parallelism) |
-| Modules | PE, ELF, math, etc. | Same + new modules |
-| Syntax | YARA syntax | Compatible + extensions |
-| Toolchain | `yara`, `yarac` | `yr` CLI |
+| Feature     | Legacy YARA              | YARA-X                  |
+| ----------- | ------------------------ | ----------------------- |
+| Language    | C                        | Rust                    |
+| Safety      | Manual memory management | Memory-safe             |
+| Performance | Good                     | Better (parallelism)    |
+| Modules     | PE, ELF, math, etc.      | Same + new modules      |
+| Syntax      | YARA syntax              | Compatible + extensions |
+| Toolchain   | `yara`, `yarac`          | `yr` CLI                |
 
 ### YARA-X CLI Commands
 
@@ -141,15 +141,15 @@ rule MalwareFamily_Variant : tag1 tag2 {
 
 ### Metadata Fields (Required)
 
-| Field | Purpose | Example |
-| --- | --- | --- |
-| `author` | Who wrote the rule | `"Trail of Bits"` |
-| `date` | When rule was created | `"2026-02-21"` |
-| `description` | What the rule detects | `"Detects XYZ malware loader"` |
-| `reference` | Source analysis/report | `"https://..."` |
-| `hash` | Sample hash for validation | `"sha256:abc123..."` |
-| `tlp` | Traffic Light Protocol | `"WHITE"`, `"GREEN"`, `"AMBER"`, `"RED"` |
-| `score` | Confidence (0-100) | `75` |
+| Field         | Purpose                    | Example                                  |
+| ------------- | -------------------------- | ---------------------------------------- |
+| `author`      | Who wrote the rule         | `"Trail of Bits"`                        |
+| `date`        | When rule was created      | `"2026-02-21"`                           |
+| `description` | What the rule detects      | `"Detects XYZ malware loader"`           |
+| `reference`   | Source analysis/report     | `"https://..."`                          |
+| `hash`        | Sample hash for validation | `"sha256:abc123..."`                     |
+| `tlp`         | Traffic Light Protocol     | `"WHITE"`, `"GREEN"`, `"AMBER"`, `"RED"` |
+| `score`       | Confidence (0-100)         | `75`                                     |
 
 ## String Pattern Best Practices
 
@@ -213,12 +213,12 @@ yr debug atoms rule.yar
 
 ### Atom Quality Guidelines
 
-| Atom Length | Quality | Action |
-| --- | --- | --- |
-| 1-2 bytes | Poor | Rewrite pattern with more specific bytes |
-| 3 bytes | Acceptable | Consider extending if possible |
-| 4+ bytes | Good | Ideal for efficient scanning |
-| Common bytes (00, FF, 90) | Poor | Avoid patterns starting with common bytes |
+| Atom Length               | Quality    | Action                                    |
+| ------------------------- | ---------- | ----------------------------------------- |
+| 1-2 bytes                 | Poor       | Rewrite pattern with more specific bytes  |
+| 3 bytes                   | Acceptable | Consider extending if possible            |
+| 4+ bytes                  | Good       | Ideal for efficient scanning              |
+| Common bytes (00, FF, 90) | Poor       | Avoid patterns starting with common bytes |
 
 ## Condition Logic
 
@@ -361,13 +361,13 @@ Before deploying any rule:
 
 ### Complementary Skills
 
-| Skill | Relationship |
-| --- | --- |
-| `binary-analysis-patterns` | Extract indicators from malware for rule authoring |
-| `memory-forensics` | Extract memory artifacts for memory-scanning rules |
-| `variant-analysis` | Find malware variants to tune rule coverage |
-| `static-analysis` | Automated analysis to complement YARA detection |
-| `protocol-reverse-engineering` | Extract network signatures for YARA rules |
+| Skill                          | Relationship                                       |
+| ------------------------------ | -------------------------------------------------- |
+| `binary-analysis-patterns`     | Extract indicators from malware for rule authoring |
+| `memory-forensics`             | Extract memory artifacts for memory-scanning rules |
+| `variant-analysis`             | Find malware variants to tune rule coverage        |
+| `static-analysis`              | Automated analysis to complement YARA detection    |
+| `protocol-reverse-engineering` | Extract network signatures for YARA rules          |
 
 ## Memory Protocol
 

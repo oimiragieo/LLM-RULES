@@ -215,7 +215,10 @@ async function testNoSignalWhenCountsMissing() {
       .split('\n')
       .filter(l => l.trim()).length > 0;
 
-  assert(!hasSignal, 'No failure signal should be emitted when requestedCount/deliveredCount are absent');
+  assert(
+    !hasSignal,
+    'No failure signal should be emitted when requestedCount/deliveredCount are absent'
+  );
 
   clearSignalFileEnv();
 }
@@ -359,7 +362,10 @@ async function testAppendNotOverwrite() {
         .filter(l => l.trim()).length
     : 0;
 
-  assert(linesAfterFirst === 1, `Should have 1 line after first underdelivery, got ${linesAfterFirst}`);
+  assert(
+    linesAfterFirst === 1,
+    `Should have 1 line after first underdelivery, got ${linesAfterFirst}`
+  );
 
   // Second underdelivery: reset workflow with different taskId
   cleanupWorkflow();

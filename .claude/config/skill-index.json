@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-21T20:58:44.230Z",
+  "generatedAt": "2026-02-22T01:42:50.071Z",
   "metadata": {
-    "totalSkills": 336,
+    "totalSkills": 344,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-21T20:58:44.230Z",
+    "lastValidated": "2026-02-22T01:42:50.072Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -194,6 +194,28 @@
         "expo-framework-rule"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "next-cache-components": {
+      "name": "next-cache-components",
+      "displayName": "Next Cache Components",
+      "category": "Other",
+      "domain": "other",
+      "description": "Next.js 16 caching model expertise covering the 'use cache' directive, cacheLife() API, cacheTag() for invalidation, cacheComponents configuration, and Partial Prerendering (PPR). Use when implementing caching strategies in Next.js 16+ applications, migrating from unstable_cache, or optimizing server component rendering.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "next-cache-components"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "tauri-native-api-integration": {
@@ -421,28 +443,46 @@
       "priority": 3,
       "aliasOf": null
     },
-    "interactive-requirements-gathering": {
-      "name": "interactive-requirements-gathering",
-      "displayName": "Interactive Requirements Gathering",
+    "enterprise-skill-test-1771722088465": {
+      "name": "enterprise-skill-test-1771722088465",
+      "displayName": "Enterprise Skill Test 1771722088465",
       "category": "Other",
-      "domain": "requirements",
-      "description": "Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
+      "domain": "other",
+      "description": "Other - enterprise-skill-test-1771722088465",
       "requiredTools": [
         "Read",
         "Write",
-        "Edit",
-        "AskUserQuestion"
+        "Edit"
       ],
       "agentPrimary": [
         "developer"
       ],
-      "agentSupporting": [
-        "pm"
-      ],
+      "agentSupporting": [],
       "tags": [
-        "requirements",
         "other",
-        "interactive-requirements-gathering"
+        "enterprise-skill-test-1771722088465"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "enterprise-skill-test-1771722182676": {
+      "name": "enterprise-skill-test-1771722182676",
+      "displayName": "Enterprise Skill Test 1771722182676",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - enterprise-skill-test-1771722182676",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "enterprise-skill-test-1771722182676"
       ],
       "priority": 3,
       "aliasOf": null
@@ -1975,6 +2015,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "enhance-prompt": {
+      "name": "enhance-prompt",
+      "displayName": "Enhance Prompt",
+      "category": "Other",
+      "domain": "other",
+      "description": "Transforms vague UI/feature requests into structured, optimized prompts with design system awareness. Use when generating prompts for UI implementation, feature specification, or design-to-code translation. Triggers on tasks requiring prompt refinement, UI specification, or design system integration.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "enhance-prompt"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "eval-harness-updater": {
       "name": "eval-harness-updater",
       "displayName": "Eval Harness Updater",
@@ -2506,6 +2568,32 @@
       "priority": 3,
       "aliasOf": null
     },
+    "interactive-requirements-gathering": {
+      "name": "interactive-requirements-gathering",
+      "displayName": "Interactive Requirements Gathering",
+      "category": "Other",
+      "domain": "requirements",
+      "description": "Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "AskUserQuestion"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "pm"
+      ],
+      "tags": [
+        "requirements",
+        "other",
+        "interactive-requirements-gathering"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "ios-expert": {
       "name": "ios-expert",
       "displayName": "Ios Expert",
@@ -2857,6 +2945,28 @@
       "tags": [
         "other",
         "multi-agent-architecture-reference"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "next-upgrade": {
+      "name": "next-upgrade",
+      "displayName": "Next Upgrade",
+      "category": "Other",
+      "domain": "other",
+      "description": "Structured workflow for upgrading Next.js applications across major versions. Use when migrating a Next.js project from one major version to another (e.g., 13 to 14, 14 to 15, 15 to 16). Covers codemod automation, breaking change detection, incremental migration paths, and post-upgrade validation.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "next-upgrade"
       ],
       "priority": 3,
       "aliasOf": null
@@ -6924,6 +7034,28 @@
       "priority": 1,
       "aliasOf": null
     },
+    "shadcn-ui": {
+      "name": "shadcn-ui",
+      "displayName": "Shadcn Ui",
+      "category": "Other",
+      "domain": "other",
+      "description": "Deep expertise on shadcn/ui component library including installation, customization, theming, and accessibility patterns. Use when building UI with shadcn/ui components, integrating Radix UI primitives, configuring Tailwind CSS v4 themes, or implementing dark mode. Covers Next.js App Router, Pages Router, and Vite setups.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "shadcn-ui"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "sharp-edges": {
       "name": "sharp-edges",
       "displayName": "Sharp Edges",
@@ -7906,6 +8038,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "vercel-deploy": {
+      "name": "vercel-deploy",
+      "displayName": "Vercel Deploy",
+      "category": "Other",
+      "domain": "other",
+      "description": "Zero-auth Vercel deployment workflow with automatic framework detection for 20+ frameworks. Use when deploying web applications to Vercel, creating preview deployments, or setting up deployment pipelines. Supports Next.js, Vite, Remix, SvelteKit, Astro, Nuxt, and more.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "vercel-deploy"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "visual-and-observational-rules": {
       "name": "visual-and-observational-rules",
       "displayName": "Visual And Observational Rules",
@@ -7975,6 +8129,28 @@
         "web-design-guidelines-vercel"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "web-perf": {
+      "name": "web-perf",
+      "displayName": "Web Perf",
+      "category": "Other",
+      "domain": "other",
+      "description": "Structured 5-phase web performance audit workflow with Core Web Vitals thresholds and actionable optimization recommendations. Use when auditing website performance, diagnosing slow page loads, optimizing Core Web Vitals scores, or reviewing frontend performance patterns. Covers Webpack, Vite, Next.js, and Nuxt optimization.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "web-perf"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "web3-expert": {
@@ -8194,10 +8370,13 @@
         "react-native-skills-vercel"
       ],
       "other": [
+        "next-cache-components",
         "tauri-native-api-integration",
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
+        "enterprise-skill-test-1771722088465",
+        "enterprise-skill-test-1771722182676",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -8223,6 +8402,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "enhance-prompt",
         "eval-harness-updater",
         "feature-flag-management",
         "fix-review",
@@ -8235,6 +8415,7 @@
         "memory-quality-auditor",
         "modern-python",
         "multi-agent-architecture-reference",
+        "next-upgrade",
         "pipeline-reflection-ux",
         "planning-with-files",
         "powershell-expert",
@@ -8389,6 +8570,7 @@
         "semgrep-rule-creator",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "shadcn-ui",
         "sharp-edges",
         "skill-updater",
         "sparc-methodology",
@@ -8404,7 +8586,9 @@
         "troubleshooting-regression",
         "tsconfig-json-rules",
         "variant-analysis",
+        "vercel-deploy",
         "wave-executor",
+        "web-perf",
         "webapp-testing",
         "workflow-updater",
         "yara-authoring"
@@ -8443,10 +8627,6 @@
         "ripgrep",
         "tdd",
         "test-generator"
-      ],
-      "requirements": [
-        "interactive-requirements-gathering",
-        "spec-gathering"
       ],
       "styling": [
         "accessibility",
@@ -8514,6 +8694,10 @@
         "recovery",
         "session-handoff"
       ],
+      "requirements": [
+        "interactive-requirements-gathering",
+        "spec-gathering"
+      ],
       "scientific": [
         "scientific-skills"
       ]
@@ -8528,13 +8712,15 @@
         "protocol-reverse-engineering",
         "incident-runbook-templates",
         "expo-framework-rule",
+        "next-cache-components",
         "tauri-native-api-integration",
         "gamedev-expert",
         "github-ops",
         "code-style-validator",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771722088465",
+        "enterprise-skill-test-1771722182676",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -8579,6 +8765,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "enhance-prompt",
         "eval-harness-updater",
         "expo-mobile-app-rule",
         "feature-flag-management",
@@ -8597,6 +8784,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "java-expert",
         "jupyter-notebook-best-practices",
         "k8s-manifest-generator",
@@ -8609,6 +8797,7 @@
         "mobile-ui-development-rule",
         "modern-python",
         "multi-agent-architecture-reference",
+        "next-upgrade",
         "nodejs-expert",
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
@@ -8777,6 +8966,7 @@
         "sentry-monitoring",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "shadcn-ui",
         "sharp-edges",
         "skill-discovery",
         "skill-updater",
@@ -8805,7 +8995,9 @@
         "tsconfig-json-rules",
         "ui-components-expert",
         "variant-analysis",
+        "vercel-deploy",
         "visual-and-observational-rules",
+        "web-perf",
         "web3-expert",
         "webapp-testing",
         "workflow-creator",
@@ -8914,6 +9106,7 @@
         "incident-runbook-templates",
         "python-backend-expert",
         "expo-framework-rule",
+        "next-cache-components",
         "tauri-native-api-integration",
         "database-architect",
         "writing-skills",
@@ -8923,7 +9116,8 @@
         "code-style-validator",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771722088465",
+        "enterprise-skill-test-1771722182676",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -8983,6 +9177,7 @@
         "docker-compose",
         "dry-principle",
         "dto-conventions",
+        "enhance-prompt",
         "eval-harness-updater",
         "expo-mobile-app-rule",
         "feature-flag-management",
@@ -9004,6 +9199,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -9018,6 +9214,7 @@
         "mobile-ui-development-rule",
         "modern-python",
         "multi-agent-architecture-reference",
+        "next-upgrade",
         "nextjs-expert",
         "nodejs-expert",
         "on-call-handoff-patterns",
@@ -9197,6 +9394,7 @@
         "sequential-thinking",
         "service-class-conventions",
         "session-handoff",
+        "shadcn-ui",
         "sharp-edges",
         "skill-creator",
         "skill-discovery",
@@ -9234,9 +9432,11 @@
         "typescript-expert",
         "ui-components-expert",
         "variant-analysis",
+        "vercel-deploy",
         "visual-and-observational-rules",
         "wave-executor",
         "web-design-guidelines-vercel",
+        "web-perf",
         "web3-expert",
         "webapp-testing",
         "workflow-creator",
@@ -9570,13 +9770,15 @@
         "incident-runbook-templates",
         "python-backend-expert",
         "expo-framework-rule",
+        "next-cache-components",
         "tauri-native-api-integration",
         "database-architect",
         "writing-skills",
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771722088465",
+        "enterprise-skill-test-1771722182676",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -9630,6 +9832,7 @@
         "doc-generator",
         "dry-principle",
         "dto-conventions",
+        "enhance-prompt",
         "eval-harness-updater",
         "expo-mobile-app-rule",
         "feature-flag-management",
@@ -9649,6 +9852,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -9662,6 +9866,7 @@
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
         "modern-python",
+        "next-upgrade",
         "nextjs-expert",
         "nodejs-expert",
         "on-call-handoff-patterns",
@@ -9839,6 +10044,7 @@
         "sequential-thinking",
         "service-class-conventions",
         "session-handoff",
+        "shadcn-ui",
         "sharp-edges",
         "skill-creator",
         "skill-updater",
@@ -9870,8 +10076,10 @@
         "typescript-expert",
         "ui-components-expert",
         "variant-analysis",
+        "vercel-deploy",
         "visual-and-observational-rules",
         "wave-executor",
+        "web-perf",
         "web3-expert",
         "webapp-testing",
         "workflow-creator",
@@ -9883,13 +10091,15 @@
         "protocol-reverse-engineering",
         "python-backend-expert",
         "expo-framework-rule",
+        "next-cache-components",
         "tauri-native-api-integration",
         "database-architect",
         "writing-skills",
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771722088465",
+        "enterprise-skill-test-1771722182676",
         "dynamic-api-integration",
         "code-structural-search",
         "function-length-and-responsibility",
@@ -9930,6 +10140,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "enhance-prompt",
         "eval-harness-updater",
         "expo-mobile-app-rule",
         "filesystem",
@@ -9944,6 +10155,7 @@
         "html-tailwind-css-and-javascript-expert-rule",
         "insecure-defaults",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -9955,6 +10167,7 @@
         "memory-quality-auditor",
         "mobile-first-design-rules",
         "mobile-ui-development-rule",
+        "next-upgrade",
         "nextjs-expert",
         "nodejs-expert",
         "pandas-data-manipulation-rules",
@@ -10124,6 +10337,7 @@
         "semgrep-rule-creator",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "shadcn-ui",
         "skill-creator",
         "skill-updater",
         "smart-debug",
@@ -10149,7 +10363,9 @@
         "typescript-expert",
         "ui-components-expert",
         "variant-analysis",
+        "vercel-deploy",
         "visual-and-observational-rules",
+        "web-perf",
         "web3-expert",
         "workflow-creator",
         "workflow-patterns",
@@ -10159,11 +10375,6 @@
         "writing-skills",
         "agent-creator",
         "smart-debug"
-      ],
-      "AskUserQuestion": [
-        "interactive-requirements-gathering",
-        "prd-generator",
-        "spec-gathering"
       ],
       "WebFetch": [
         "dynamic-api-integration",
@@ -10227,6 +10438,11 @@
       "mcp__Exa__web_search_exa": [
         "arxiv-mcp"
       ],
+      "AskUserQuestion": [
+        "interactive-requirements-gathering",
+        "prd-generator",
+        "spec-gathering"
+      ],
       "TaskCreate": [
         "task-management-protocol"
       ],
@@ -10262,12 +10478,14 @@
         "typescript-expert",
         "security-architect",
         "context-compressor",
+        "next-cache-components",
         "tauri-native-api-integration",
         "writing-skills",
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771722088465",
+        "enterprise-skill-test-1771722182676",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -10305,6 +10523,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "enhance-prompt",
         "eval-harness-updater",
         "expo-mobile-app-rule",
         "feature-flag-management",
@@ -10320,6 +10539,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
@@ -10327,6 +10547,7 @@
         "memory-quality-auditor",
         "modern-python",
         "multi-agent-architecture-reference",
+        "next-upgrade",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -10490,6 +10711,7 @@
         "sentry-monitoring",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "shadcn-ui",
         "sharp-edges",
         "skill-updater",
         "slack-notifications",
@@ -10513,7 +10735,9 @@
         "tsconfig-json-rules",
         "ui-components-expert",
         "variant-analysis",
+        "vercel-deploy",
         "visual-and-observational-rules",
+        "web-perf",
         "web3-expert",
         "webapp-testing",
         "workflow-creator",
@@ -10955,12 +11179,14 @@
         "typescript-expert",
         "security-architect",
         "context-compressor",
+        "next-cache-components",
         "tauri-native-api-integration",
         "writing-skills",
         "gamedev-expert",
         "artifact-integrator",
         "token-saver-context-compression",
-        "interactive-requirements-gathering",
+        "enterprise-skill-test-1771722088465",
+        "enterprise-skill-test-1771722182676",
         "dynamic-api-integration",
         "code-structural-search",
         "advanced-elicitation",
@@ -10998,6 +11224,7 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
+        "enhance-prompt",
         "eval-harness-updater",
         "expo-mobile-app-rule",
         "feature-flag-management",
@@ -11013,6 +11240,7 @@
         "insecure-defaults",
         "insight-extraction",
         "integration/artifact-updater",
+        "interactive-requirements-gathering",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "logging-module-usage",
@@ -11020,6 +11248,7 @@
         "memory-quality-auditor",
         "modern-python",
         "multi-agent-architecture-reference",
+        "next-upgrade",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -11183,6 +11412,7 @@
         "sentry-monitoring",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
+        "shadcn-ui",
         "sharp-edges",
         "skill-updater",
         "slack-notifications",
@@ -11206,7 +11436,9 @@
         "tsconfig-json-rules",
         "ui-components-expert",
         "variant-analysis",
+        "vercel-deploy",
         "visual-and-observational-rules",
+        "web-perf",
         "web3-expert",
         "webapp-testing",
         "workflow-creator",

@@ -49,9 +49,9 @@ Repeated queries are auto-cached (~5ms hit vs ~800ms miss). BM25 index auto-upda
 ## Current Footprint
 
 - Agents: 62 files
-- Skills: 454 `SKILL.md` definitions
+- Skills: 460 `SKILL.md` definitions
 - Rules: 105 docs
-- Schemas: 147 `*.schema.json`
+- Schemas: 148 `*.schema.json`
 - Commands: 102 `.claude/commands/*.md`
 
 ## Repository Layout

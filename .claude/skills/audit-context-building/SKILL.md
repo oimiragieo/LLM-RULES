@@ -93,15 +93,18 @@ Every claim about code behavior MUST be backed by specific line references. If y
 ## Reconnaissance Report
 
 ### Entry Points
+
 - [ ] `path/to/file.ts:42` - HTTP handler `POST /api/login`
 - [ ] `path/to/file.ts:89` - HTTP handler `GET /api/users/:id`
 
 ### Trust Boundaries
+
 - [ ] External input at: [list locations]
 - [ ] Privilege escalation at: [list locations]
 - [ ] Serialization/deserialization at: [list locations]
 
 ### Data Stores
+
 - [ ] Database: [type, access patterns]
 - [ ] File system: [paths, permissions]
 - [ ] Environment: [variables accessed]
@@ -128,22 +131,26 @@ For each function/method under analysis:
 ### Function: `authenticateUser(req, res)` at `src/auth.ts:45-92`
 
 #### Line-by-Line Notes
+
 - L45-48: Extracts `email` and `password` from `req.body`. **Assumption**: body is parsed JSON. **Verified**: Yes, middleware at `app.ts:12`.
 - L50: Queries DB for user by email. **Assumption**: email is sanitized. **Verified**: No -- raw string interpolation. **FINDING: SQL injection risk**.
 - L55-60: Compares password hash. Uses `bcrypt.compare()`. **OK**: timing-safe comparison.
 - L62: Creates JWT token. **Assumption**: secret is strong. **Unverified**: need to check env config.
 
 #### Invariants
+
 - User must exist in DB before authentication succeeds
 - Password comparison is timing-safe (bcrypt)
 - JWT secret strength is unverified
 
 #### Assumptions (Unverified)
+
 - [ ] Email input is sanitized before DB query
 - [ ] JWT secret is cryptographically random
 - [ ] Session duration is bounded
 
 #### Call Flow
+
 authenticateUser() → findUserByEmail() → bcrypt.compare() → jwt.sign()
 ```
 
@@ -209,27 +216,34 @@ The final output is a structured context report:
 # Audit Context Report: [Component Name]
 
 ## Summary
+
 - Files analyzed: N
 - Functions analyzed: N
 - Findings: N (Critical: X, High: Y, Medium: Z)
 - Unverified assumptions: N
 
 ## Mental Model
+
 [High-level description of how the component works, backed by line references]
 
 ## Findings
+
 [Each finding with line references, 5 Whys analysis, severity]
 
 ## Invariants
+
 [All tracked invariants with verification status]
 
 ## Unverified Assumptions
+
 [All assumptions that require further investigation]
 
 ## Call Flow Maps
+
 [All traced data/control flows]
 
 ## Recommendations
+
 [Prioritized list of actions based on findings]
 ```
 
@@ -244,13 +258,13 @@ The final output is a structured context report:
 
 ### Complementary Skills
 
-| Skill | Relationship |
-| --- | --- |
-| `security-architect` | Consumes context reports for threat modeling |
-| `variant-analysis` | Finds pattern variants across codebase |
-| `static-analysis` | Automated confirmation of manual findings |
-| `differential-review` | Reviews fixes for completeness |
-| `code-analyzer` | Provides complexity metrics for prioritization |
+| Skill                 | Relationship                                   |
+| --------------------- | ---------------------------------------------- |
+| `security-architect`  | Consumes context reports for threat modeling   |
+| `variant-analysis`    | Finds pattern variants across codebase         |
+| `static-analysis`     | Automated confirmation of manual findings      |
+| `differential-review` | Reviews fixes for completeness                 |
+| `code-analyzer`       | Provides complexity metrics for prioritization |
 
 ## Memory Protocol
 

@@ -1,50 +1,67 @@
-## ADR-2026-02-21-010: Commit-Checkpoint Mandatory for Multi-File Pipelines (2026-02-21 REFLECTION)
+## ADR-2026-02-22-001: Post-Creation Integration Documentation Pattern (2026-02-22 REFLECTION)
 
 **Status:** ACCEPTED
-**Date:** 2026-02-21
-**Trigger:** Task #13 reflection — 13 files stranded in working tree after pipeline stall
+**Date:** 2026-02-22
+**Trigger:** Meta-reflection of Task #12 (Task #13) — Task 12 documented skill-creator post-creation integration failures using a systematic template
 
-**Decision:** Any agent workflow that modifies 5 or more files MUST include an explicit `git commit` step as the final action before calling `TaskUpdate({ status: 'completed' })`. Pipelines that skip the commit step leave work stranded and at risk.
+**Decision:** When documenting creation-phase or post-creation workflow failures, use a six-step documentation structure that combines problem analysis with actionable solutions:
 
-**Implementation:**
+**Documentation Template**:
 
-1. Add `commitCheckpoint: true` to TaskUpdate metadata for tasks that made git commits
-2. Add "git commit" as explicit step in pipeline templates for MEDIUM+ complexity tasks
-3. Task summaries MUST distinguish "modified + committed" from "modified but not committed"
-4. Router should check git status before declaring pipeline phase complete
+1. **Observed Behavior** — What happened (specific examples, counts, dates)
+2. **Impact Assessment** — Why it matters (consequences, scope, affected users/systems)
+3. **Root Cause** — Why it happened (mechanism, systemic factors)
+4. **Workaround** — How to fix now (step-by-step checklist, agent selection guidance)
+5. **Pattern** — How to prevent future (reusable process, applicable contexts)
+6. **Agent Selection** — Which tool to use (explicit guidance on agents to use vs. avoid, with empirical evidence)
 
-**Evidence:** Task #13 (2026-02-21) modified 13 files across implementation, tests, and memory — all correct work — but commit agent stalled. Work survived (working tree intact), but best practice requires commit-before-complete for all multi-file tasks.
+**Rationale**:
 
-**Detection pattern:** TaskUpdate summary containing "modified in working tree but not committed" signals this anti-pattern.
+- Task 12 reflection used this template and achieved 0.90 rubric score (EXCELLENT)
+- Structure balances diagnosis (steps 1-3) with action (steps 4-6)
+- Empirical evidence in step 6 (artifact-integrator ran twice, zero changes) prevents theoretical assumptions
+- Template is reusable for all future creator-workflow issues
 
-**Related:** Issues.md: Pipeline Stall Before VCS Commit (2026-02-21, P1)
+**Implementation**:
+
+- Document in `.claude/context/memory/learnings.md` as reusable pattern
+- Train reflection-agent to use this template for all creation-phase issues
+- Include examples: skill-creator gaps, agent-creator gaps, workflow issues
+
+**Related**:
+
+- Task #12 Reflection: Skill-Creator Post-Creation Integration Failures (exemplar)
+- Reflection Report: `.claude/context/reports/reflections/reflection-task-13-meta-reflection-2026-02-22.md`
 
 ---
 
-## ADR-2026-02-21-009: Hook Documentation Accuracy as Security Control Property (2026-02-21 REFLECTION)
+## ADR-2026-02-22-002: Reflection-Agent Spawning via Skill() Breaks Atomic Handshake (2026-02-22 REFLECTION)
 
-**Status:** ACCEPTED
-**Date:** 2026-02-21
-**Trigger:** Task #3 — SEC-ICE-002 spawnDepth audit revealed enforcement in wrong hook vs documentation
+**Status:** OPEN (BLOCKER)
+**Date:** 2026-02-22
+**Trigger:** Reflection-agent invoked for tasks 21, 22, 14; cannot call TaskUpdate for atomic completion
 
-**Decision:** When a security control's enforcement location is documented (in ADRs, workflow docs, or @ENFORCEMENT_HOOKS.md), that documentation accuracy is itself a security property. Controls documented in hook A but implemented in hook B create a discoverability gap: future auditors and maintainers will look in the documented location, find nothing, and may incorrectly conclude the control is a "paper control."
+**Issue**: Reflection-agent needs TaskUpdate tool to complete atomic handshake (processedReflectionIds metadata). When spawned via Skill() instead of Task(), tool whitelist does not include TaskUpdate.
 
-**Rationale:**
+**Analysis**:
 
-- SEC-ICE-002 was documented as living in routing-guard.cjs, but enforcement is in pre-task-unified-core.cjs via loop-state-manager.cjs
-- The control works correctly, but the documentation mismatch misleads future auditors
-- In security engineering, auditability and discoverability are as important as the control itself
+- Reflection-agent should be spawned as `Task()` with full task-lifecycle tool access
+- Router Step 0 specifies: "reflection-agent MUST call TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })"
+- If spawned as a skill instead of agent task, tool restrictions prevent handshake completion
+- Results in orphaned reflection-spawn-request.json entries (marked processed: false forever)
 
-**Implementation:**
+**Decision**: Reflection-agent MUST always be spawned as `Task()`, never as `Skill()`.
 
-1. After any hook refactor or module relocation, update all documentation references naming the hook as an enforcement location
-2. @ENFORCEMENT_HOOKS.md, ADRs, and workflow docs must agree with actual file locations
-3. SEC-ICE-002 in ecosystem-creation-workflow.md should be updated to name pre-task-unified-core.cjs (P2 doc fix)
+**Evidence**:
 
-**Related:**
+- Error: "No such tool available: TaskUpdate" when reflection-agent calls TaskUpdate()
+- Briefing requirement CLAUDE.md Section 0.1: "reflection-agent MUST call TaskUpdate"
+- Atomic handshake pattern (MANDATORY): processedReflectionIds in metadata
 
-- Issues.md: SEC-ICE-002 RESOLVED → P2 documentation fix (2026-02-21)
-- Task #3 audit report: `.claude/context/reports/reflections/spawn-depth-audit-2026-02-21.md`
+**Related**:
+
+- ISSUE: Reflection-Agent Cannot Complete Atomic Handshake (2026-02-22)
+- `.claude/context/reports/reflections/reflection-tasks-21-22-14-insufficient-data-2026-02-22.md`
 
 ---
 
@@ -198,38 +215,6 @@ Status: PENDING Phase 2 review
 
 ---
 
-## ADR-2026-02-20-001: Enterprise Pipeline Two-Commit & APPROVED_WITH_NOTES Pattern (REFLECTION DECISION)
-
-**Status:** ACCEPTED
-**Date:** 2026-02-20
-**Trigger:** Enterprise supply chain security pipeline completion (Tasks 4, 10, 11, 12)
-
-**Decision:** Adopt two-commit deployment strategy and APPROVED_WITH_NOTES security review outcome as enterprise SOP for high-stakes deployments.
-
-**Evidence:**
-
-- Task 4 (Pipeline Parent): 12 tasks executed without rework, 100% gap resolution (4/4), aggregate score 0.90 (EXCELLENT)
-- Task 11 (Security Review): APPROVED_WITH_NOTES with 0 critical/high, 3 LOW findings, 30/30 checklist pass
-- Task 12 (Deploy & Commit): Two clean commits (c4022e7d security, c5c8e3938 churn), 7130 files validated, zero unexpected modifications
-
-**Implementation:**
-
-1. **Two-Commit Model**: Separate git commits for (a) security fixes + environment configuration, (b) catalog/memory/skill updates
-2. **Whitespace Exclusion**: Document whitespace-only diffs in commit messages; validate with `git diff --check`
-3. **APPROVED_WITH_NOTES**: Formal security review outcome for mixed-severity findings (0 critical/high, N LOW)
-4. **30/30 Checklist Standard**: Security reviews must pass complete checklist items
-
-**Consequences:**
-
-- **Positive**: Audit trail clarity, zero false positives in compliance scanning, deployment-safe approvals, reduced rework
-- **Negative**: Requires commit discipline, increases total commit count, team training needed
-
-**Applicability:** HIGH/EPIC deployments with security gates, compliance reviews, or governance changes. Consider for MEDIUM+ in regulated environments.
-
-**Related:** Enterprise pipeline architecture, security review protocol, git workflow governance
-
----
-
 ## ADR-2026-02-21-001: Opt-in HITL Pattern for Debugging Skills (2026-02-21 REFLECTION DECISION)
 
 **Status:** ACCEPTED
@@ -316,9 +301,32 @@ NO COMPLETION BEFORE INSTRUMENTATION CLEANUP.
 
 ---
 
-## ADR: Post-Session Skill Validation Harness (2026-02-21)
+## ADR-2026-02-21-012: Gap Capture via Session Gap Log
 
-Status: Implemented
-Decision: Dual-component validation approach — CLI tool for CI (validate-skill-agent-consistency.mjs) + reflection-agent Step 4.7 for runtime detection.
-Rationale: Smart-debug audit revealed catalog/index/agent-file can drift silently. CLI tool catches drift in CI; reflection-agent catches it post-creation.
-Impact: .claude/tools/cli/validate-skill-agent-consistency.mjs, .claude/agents/core/reflection-agent.md
+**Status:** Accepted
+**Date:** 2026-02-21
+
+**Context:** The router regularly identifies gaps, failures, retries, and warnings during pipeline execution but had no mechanism to persist these observations. Reflection agents received "Task N completed without summary metadata" — completely blind to what the router observed. This caused learnings to be silently dropped.
+
+**Decision:** Implement a session-scoped JSONL gap log at `.claude/context/runtime/session-gap-log.jsonl`. The router writes gap entries inline using Bash. `reflection-queue-processor.cjs` auto-injects gap context into every reflection spawn prompt. `post-completion-chain.cjs` extracts agent-reported gaps from `TaskUpdate` metadata. `reflection-agent.md` includes an explicit Step 1.5 to analyze gap entries.
+
+**Approach A+B+D(partial):**
+
+- **A (contract):** CLAUDE.md Gap Observation Protocol + router-decision.md Step 9.5 mandate router to write gap entries
+- **B (automation):** `reflection-queue-processor.cjs` reads and injects gap log into every reflection prompt automatically
+- **D partial:** `post-completion-chain.cjs` extracts `metadata.gapLog` arrays from agent TaskUpdate calls
+
+**Files changed:** CLAUDE.md, router-decision.md, reflection-queue-processor.cjs, post-completion-chain.cjs, reflection-agent.md, session-gap-log-entry.schema.json, schema-catalog.md
+
+**Consequences:**
+
+- Reflection agents now receive full cross-agent pipeline context automatically
+- Router observations (retries, stalls, integration gaps, placeholder outputs) are no longer silently lost
+- `session-gap-log.jsonl` is session-scoped runtime file (not committed to git)
+- Reflection prompts capped at 20 most recent gap entries to control prompt size
+- Gap extraction in post-completion-chain.cjs is wrapped in try/catch — non-critical path
+
+**Rejected approaches:**
+
+- Approach C (capture-issue skill): Router cannot invoke Skill() per Tool Lockdown
+- Approach D standalone: Only captures agent-reported gaps, not router-observed gaps

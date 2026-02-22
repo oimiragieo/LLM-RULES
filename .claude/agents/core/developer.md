@@ -45,6 +45,12 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - gemini-cli-security
+  - enhance-prompt
+  - next-cache-components
+  - next-upgrade
+  - shadcn-ui
+  - vercel-deploy
+  - web-perf
 capabilities:
   - code-generation
   - refactoring

@@ -29,6 +29,7 @@ maxTurns: 18
 permissionMode: default
 skills:
   - checklist-generator
+  - enhance-prompt
   - code-semantic-search
   - compliance-policy-check
   - complexity-assessment

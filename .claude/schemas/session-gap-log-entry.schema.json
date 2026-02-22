@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session-gap-log-entry",
+  "title": "SessionGapLogEntry",
+  "description": "A single router-observed gap, failure, retry, or warning during a pipeline session. Written by the router to .claude/context/runtime/session-gap-log.jsonl (one entry per line).",
+  "type": "object",
+  "required": ["timestamp", "type", "description"],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp when the router observed this gap"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["retry", "placeholder_output", "integration_gap", "hook_warning", "missing_metadata", "stall", "agent_reported"],
+      "description": "Category of gap observed"
+    },
+    "taskId": {
+      "type": ["string", "null"],
+      "description": "Task ID associated with the gap, if applicable"
+    },
+    "agent": {
+      "type": ["string", "null"],
+      "description": "Agent type that exhibited the gap behavior"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable description of what the router observed"
+    },
+    "context": {
+      "type": ["string", "null"],
+      "description": "Additional context such as file paths, error messages, or gap lists"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["router", "agent_metadata", "hook"],
+      "default": "router",
+      "description": "Who created this entry: router (default), agent via TaskUpdate metadata, or a hook"
+    }
+  },
+  "additionalProperties": false
+}
