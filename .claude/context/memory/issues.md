@@ -78,6 +78,52 @@ TaskUpdate({
 
 **Root Cause**: Router likely checked file metadata (size/modification time) rather than content verification
 
+---
+
+## ISSUE: Router Violated Tool Lockdown — Direct Bash Execution (2026-02-22 CRITICAL)
+
+**Status**: OBSERVED — Router ran 9 Bash commands directly to debug reflection-agent issues instead of spawning developer
+
+**Violation**: CLAUDE.md Section 0 (ROUTER TOOL LOCKDOWN) — Router is FORBIDDEN from running Bash directly except read-only git commands
+
+**Evidence**: Session context from Router shows direct investigation instead of spawning qa/developer agent with debugging skill
+
+**Impact**:
+
+- Router became debugger instead of orchestrator (violates separation of concerns)
+- Task #38 left stale (`in_progress` after work completed) due to manual router investigation
+- Undermines specialist-first routing law — debugging should use qa or troubleshooting-regression skill
+- Sets precedent for future rule violations
+
+**Mitigation**:
+
+- Enforce CLAUDE.md Section 0 via pre-completion-validation
+- When Router detects agent issues, spawn qa agent with `troubleshooting-regression` skill INSTEAD of running Bash
+- Add explicit audit rule: "If Router runs Bash (except git status/log), mark session AUDIT_REQUIRED"
+
+---
+
+## ISSUE: Task #38 Left Stale (in_progress after completion) (2026-02-22)
+
+**Status**: UNRESOLVED — TaskUpdate metadata contract violated
+
+**Observed**: Router completed work on task #38 but did not call TaskUpdate to mark it completed or update metadata
+
+**Impact**:
+
+- Task appears "stuck" in task list
+- Blocks downstream tasks that depend on task #38
+- Reflection spawn includes task #38 but without proper completion context
+- Memory state inconsistent (work done, task status not updated)
+
+**Root Cause**: Router did not follow mandatory task tracking protocol (CLAUDE.md Section 5.5-5.6):
+
+- FIRST: `TaskUpdate(in_progress)`
+- LAST: `TaskUpdate(completed)` with metadata
+- Then: `TaskList()` to check for unblocked work
+
+**Fix**: Manual cleanup — update task #38 metadata before closing session
+
 **Learning**: Router gap observations need content validation before recording as systemic issues. File existence and size are insufficient signals for placeholder detection.
 
 **Mitigation**: When router flags placeholder output, require reflection-agent to read file content before classifying as blocked/incomplete.
@@ -138,6 +184,33 @@ TaskUpdate({
 4. Manually update reflection-spawn-request.json entries to mark processed: true if automated cleanup cannot run
 
 **Priority**: P1 (blocks reflection completion handshake across entire system)
+
+---
+
+## ISSUE: Router Gap-Detection False Positives from File-Level Checks (2026-02-22 REFLECTION)
+
+**Status**: OPEN — P2 (reliability risk, not blocking)
+
+**Observed**: task-27-research flagged by router as "placeholder_output: researcher produced TEST_STUB" but file was a complete 200+ line research report on 4 Claude features (WebMCP, Memory Tool, Worktrees, Healthcare).
+
+**Root Cause**: Router's gap-detection checks file existence/metadata (size, modification time) instead of validating content. Heuristic is unreliable — any non-empty file can pass even when it contains only a stub.
+
+**Systemic Risk**: Gap log entries that are false positives degrade signal quality for the entire learning system. Reflection-agent wastes analysis effort on non-issues. Genuine gaps may be dismissed as false positives.
+
+**Fix Strategy**:
+
+1. Router gap detection for `placeholder_output` must read file content (first 5 lines) before recording
+2. Add content heuristic: if file contains only TEST_STUB, PLACEHOLDER, or is <50 bytes, flag as placeholder
+3. Document threshold in gap-detection protocol: file must have >200 bytes AND no stub markers
+
+**Evidence**:
+
+- session-gap-log.jsonl entry (2026-02-22T02:15:00Z): placeholder_output flagged for task-27-research
+- Actual file: `.claude/context/artifacts/research-reports/claude-features-webmcp-research-2026-02-22.md` — 200+ lines, complete report
+
+**Related**: CLAUDE.md Section 0.1 Gap Observation Protocol, session-gap-log.jsonl
+
+**Recommendation**: Reflection-agent should verify gap-log entries against file content before classifying as systemic. Router should implement content-level validation before recording `placeholder_output` entries.
 
 ---
 

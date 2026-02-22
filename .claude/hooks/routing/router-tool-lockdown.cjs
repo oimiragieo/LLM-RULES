@@ -80,7 +80,9 @@ const ROUTER_BASH_WHITELIST = [
  */
 function isRouterSession(hookInput) {
   // Check CLAUDE_AGENT_ID — set in sub-agents, empty/absent in router
-  const agentId = String(process.env.CLAUDE_AGENT_ID || '').trim().toLowerCase();
+  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
+    .trim()
+    .toLowerCase();
   if (agentId && agentId !== 'router') {
     return false; // It's a sub-agent, not the router
   }

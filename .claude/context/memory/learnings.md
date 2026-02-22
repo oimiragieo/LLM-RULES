@@ -11,6 +11,26 @@ When reflection-agent cannot access task summary metadata (filesModified, output
 
 ---
 
+## Pattern: Router Gap Observation Reliability Matrix (2026-02-22)
+
+**Context**: Reflection processing of 3 router-observed gap entries (session-gap-log.jsonl) revealed differential reliability
+
+**Findings**:
+
+| Gap Type               | Reliability | False Positive Rate      | Validation Method                               | Recommendation                            |
+| ---------------------- | ----------- | ------------------------ | ----------------------------------------------- | ----------------------------------------- |
+| **integration_gap**    | HIGH        | LOW (rare)               | File existence checks (catalog, artifact-graph) | TRUST and act on immediately              |
+| **missing_metadata**   | HIGH        | LOW (rare)               | Task metadata inspection (summary check)        | TRUST and escalate as blocker             |
+| **placeholder_output** | LOW         | HIGH (100% this session) | File metadata only (size/time)                  | VERIFY by reading content before trusting |
+| **retry**              | MEDIUM      | MEDIUM                   | Agent completion status + output inspection     | Review actual work, not just retry count  |
+| **hook_warning**       | MEDIUM      | MEDIUM                   | Parse hook stderr/stdout                        | Validate hook code matches warning        |
+
+**Implication**: Reflection-agent should apply skepticism filter to placeholder_output gaps — require content verification, not metadata-only assessment.
+
+**Source**: Task completion reflections (2026-02-22) — placeholder_output gap on task-27-research was 100% false positive (actual file had complete 200+ line report)
+
+---
+
 ## LEARNING: Post-skill-creation integration checklist (2026-02-21)
 
 After skill-creator completes, ALWAYS do these 4 steps immediately (not after audit):

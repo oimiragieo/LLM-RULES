@@ -445,7 +445,31 @@
       "category": "code-indexing",
       "discovered_at": "2026-02-22T03:42:37.626Z",
       "last_accessed": "2026-02-22T03:42:37.626Z"
+    },
+    "tests/hooks/router-tool-lockdown.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T04:00:22.587Z",
+      "last_accessed": "2026-02-22T04:00:22.587Z"
+    },
+    ".claude/hooks/routing/router-tool-lockdown.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T04:01:08.375Z",
+      "last_accessed": "2026-02-22T04:01:08.375Z"
+    },
+    "tests/hooks/stale-task-detector.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T04:01:46.008Z",
+      "last_accessed": "2026-02-22T04:01:46.008Z"
+    },
+    ".claude/hooks/session/stale-task-detector.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-02-22T04:04:55.209Z",
+      "last_accessed": "2026-02-22T04:04:55.209Z"
     }
   },
-  "last_updated": "2026-02-22T03:43:52.752Z"
+  "last_updated": "2026-02-22T04:04:55.209Z"
 }

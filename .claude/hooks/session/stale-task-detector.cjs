@@ -25,8 +25,20 @@ const PROJECT_ROOT = (() => {
 })();
 
 const STALE_THRESHOLD_MS = Number(process.env.STALE_TASK_THRESHOLD_MS || 15 * 60 * 1000); // 15 min
-const GAP_LOG_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'session-gap-log.jsonl');
-const TASKUPDATE_STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'taskupdate-first-state.json');
+const GAP_LOG_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'session-gap-log.jsonl'
+);
+const TASKUPDATE_STATE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'taskupdate-first-state.json'
+);
 
 function readJSON(filePath) {
   try {
@@ -76,8 +88,9 @@ function main() {
           type: 'missing_metadata',
           taskId,
           description: `Stale in_progress task detected: "${taskId}" has been in_progress for ${ageMin} minutes without completion`,
-          context: 'Detected by stale-task-detector.cjs on UserPromptSubmit. Router must call TaskUpdate({ status: "completed" }) when work is done.',
-          source: 'stale-task-detector'
+          context:
+            'Detected by stale-task-detector.cjs on UserPromptSubmit. Router must call TaskUpdate({ status: "completed" }) when work is done.',
+          source: 'stale-task-detector',
         });
       }
     }
