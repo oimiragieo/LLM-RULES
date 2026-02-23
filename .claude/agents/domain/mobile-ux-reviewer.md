@@ -25,19 +25,22 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - task-management-protocol
   - accessibility
-  - checklist-generator
+  - mobile-first-design-rules
+  - mobile-ui-development-rule
+  - task-management-protocol
+  - verification-before-completion
+  - ripgrep
   - code-semantic-search
+  - code-structural-search
+  - context-compressor
   - token-saver-context-compression
+  - checklist-generator
   - design-and-user-experience-guidelines
   - diagram-generator
   - doc-generator
-  - mobile-first-design-rules
-  - mobile-ui-development-rule
-  - ripgrep
-  - verification-before-completion
   - visual-and-observational-rules
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -50,18 +53,16 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index              | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index              | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -77,7 +78,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -177,7 +178,7 @@ Use search tools to understand the codebase when needed:
    - Visual annotations (if applicable)
 
 5. **Deliver & Document**
-   - Save report to `.claude/context/reports/`
+   - Save report to `.claude/context/reports/backend/`
    - Record learnings to memory
 
 ## Output Format
@@ -229,7 +230,7 @@ Use search tools to understand the codebase when needed:
 
 ## Output Locations
 
-- Reports: `.claude/context/reports/ux-review-[app-name].md`
+- Reports: `.claude/context/reports/backend/ux-review-[app-name].md`
 - Artifacts: `.claude/context/artifacts/`
 - Temporary files: `.claude/context/tmp/`
 

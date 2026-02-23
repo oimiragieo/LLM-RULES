@@ -63,7 +63,7 @@ TaskUpdate({
     filesCreated: ['path/to/new.ts'],
     testsAdded: true,
     testsPassing: true,
-    outputArtifacts: ['.claude/context/reports/my-report.md'],
+    outputArtifacts: ['.claude/context/reports/backend/my-report.md'],
     completedAt: new Date().toISOString(),
   },
 });

@@ -23,15 +23,18 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - task-management-protocol
   - architecture-review
-  - code-analyzer
   - diagram-generator
-  - doc-generator
-  - ripgrep
+  - task-management-protocol
   - verification-before-completion
-  - token-saver-context-compression
+  - ripgrep
   - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
+  - code-analyzer
+  - doc-generator
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -44,13 +47,11 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event              | Purpose                               | Override        |
-| ---------------------------------- | ------------------ | ------------------------------------- | --------------- |
-| `unified-creator-guard.cjs`        | PreToolUse(Write)  | Blocks direct writes to creator paths | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write)  | Consolidated write safety checks      | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)    | Validates tool is in allowed set      | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)    | Monitors execution limits             | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Write) | Updates memory search index           | --              |
+| Hook                         | Event              | Purpose                               | Override        |
+| ---------------------------- | ------------------ | ------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`  | PreToolUse(Write)  | Blocks direct writes to creator paths | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs` | PreToolUse(Write)  | Consolidated write safety checks      | --              |
+| `sync-memory-index.cjs`      | PostToolUse(Write) | Updates memory search index           | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -65,7 +66,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix

@@ -29,32 +29,35 @@ tools:
   - WebFetch
 skills:
   - agent-creator
+  - artifact-lifecycle
+  - command-creator
+  - research-synthesis
+  - rule-creator
+  - skill-creator
+  - task-management-protocol
+  - verification-before-completion
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
   - agent-updater
   - assimilate
   - artifact-integrator
-  - artifact-lifecycle
   - compliance-policy-check
-  - command-creator
   - creation-feasibility-gate
-  - rule-creator
   - tool-creator
   - hook-creator
   - semgrep-rule-creator
   - plan-generator
-  - research-synthesis
-  - ripgrep
   - schema-creator
-  - skill-creator
   - skill-updater
   - workflow-updater
-  - task-management-protocol
   - template-creator
-  - verification-before-completion
   - workflow-creator
   - eval-harness-updater
   - memory-quality-auditor
-  - code-semantic-search
-  - token-saver-context-compression
+  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -65,13 +68,10 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event            | Purpose                                 | Override                    |
-| ---------------------------------- | ---------------- | --------------------------------------- | --------------------------- |
-| `routing-guard.cjs`                | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
-| `spawn-prompt-assembler.cjs`       | PreToolUse(Task) | Enriches spawn prompts                  | --                          |
-| `config-model-validator.cjs`       | PreToolUse(Task) | Validates model matches config.yaml     | `CONFIG_MODEL_VALIDATOR`    |
-| `tool-scope-validator.cjs`         | PreToolUse(All)  | Validates tool is in allowed set        | --                          |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)  | Monitors execution limits               | --                          |
+| Hook                         | Event            | Purpose                                 | Override                    |
+| ---------------------------- | ---------------- | --------------------------------------- | --------------------------- |
+| `routing-guard.cjs`          | PreToolUse(Task) | Enforces planner-first, security review | `PLANNER_FIRST_ENFORCEMENT` |
+| `spawn-prompt-assembler.cjs` | PreToolUse(Task) | Enriches spawn prompts                  | --                          |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -88,7 +88,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix

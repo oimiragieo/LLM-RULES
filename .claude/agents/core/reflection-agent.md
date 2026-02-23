@@ -26,27 +26,29 @@ tools:
   - TaskGet
   - Skill
 skills:
+  - framework-context
+  - recommend-evolution
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
   - artifact-integrator
   - compliance-policy-check
   - creation-feasibility-gate
   - assimilate
   - code-analyzer
-  - context-compressor
-  - framework-context
   - insight-extraction
   - memory-quality-auditor
   - eval-harness-updater
   - agent-updater
   - workflow-updater
-  - recommend-evolution
   - skill-updater
   - summarize-changes
   - task-management-protocol
-  - token-saver-context-compression
   - troubleshooting-regression
   - verification-before-completion
-  - ripgrep
-  - code-semantic-search
+  - memory-search
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'
@@ -62,15 +64,13 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                     | Purpose                                                    | Override        |
-| ---------------------------------- | ------------------------- | ---------------------------------------------------------- | --------------- |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)    | Blocks direct writes to creator paths                      | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)    | 11 consolidated write safety checks (allows memory writes) | --              |
-| `unified-reflection-handler.cjs`   | PostToolUse(MemoryRecord) | Processes reflection requests and updates memory           | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write)   | Updates memory search index                                | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)           | Validates tool is in allowed set                           | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)           | Monitors execution limits                                  | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)    | Validates work before marking complete                     | --              |
+| Hook                             | Event                     | Purpose                                                    | Override        |
+| -------------------------------- | ------------------------- | ---------------------------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`      | PreToolUse(Write/Edit)    | Blocks direct writes to creator paths                      | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`     | PreToolUse(Write/Edit)    | 11 consolidated write safety checks (allows memory writes) | --              |
+| `unified-reflection-handler.cjs` | PostToolUse(MemoryRecord) | Processes reflection requests and updates memory           | --              |
+| `sync-memory-index.cjs`          | PostToolUse(Edit/Write)   | Updates memory search index                                | --              |
+| `pre-completion-validation.cjs`  | PreToolUse(TaskUpdate)    | Validates work before marking complete                     | --              |
 
 Note: `unified-reflection-handler.cjs` monitors Bash errors for reflection triggers (error recovery reflection), but reflection-agent does NOT have Bash tool permission (observation only).
 
@@ -87,7 +87,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix

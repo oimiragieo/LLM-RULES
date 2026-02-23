@@ -27,38 +27,45 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - task-management-protocol
-  - code-semantic-search
-  - token-saver-context-compression
-  - dependency-analyzer
-  - git-expert
-  - github-mcp
   - architecture-review
-  - aws-cloud-ops
-  - ci-cd-implementation-rule
-  - cloud-devops-expert
-  - configuration-management
+  - commit-validator
   - consensus-voting
-  - container-expert
   - containerization-rules
   - context-compressor
   - database-architect
   - docker-compose
+  - kafka-development-practices
+  - monorepo-and-tooling
   - filesystem
+  - finishing-a-development-branch
+  - git-expert
+  - github-mcp
+  - k8s-manifest-generator
+  - kubernetes-flux
+  - smart-revert
+  - task-management-protocol
+  - terraform-infra
+  - verification-before-completion
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - token-saver-context-compression
+  - dependency-analyzer
+  - aws-cloud-ops
+  - ci-cd-implementation-rule
+  - cloud-devops-expert
+  - configuration-management
+  - container-expert
   - gcloud-cli
   - gitops-workflow
   - helm-chart-scaffolding
-  - k8s-manifest-generator
   - k8s-security-policies
-  - kubernetes-flux
   - next-upgrade
-  - ripgrep
   - sentry-monitoring
   - template-renderer
-  - terraform-infra
   - vercel-deploy
-  - verification-before-completion
   - web-perf
+  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -69,18 +76,16 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index              | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index              | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -97,7 +102,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix

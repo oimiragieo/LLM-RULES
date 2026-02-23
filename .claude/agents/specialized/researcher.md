@@ -28,16 +28,18 @@ tools:
   - TaskGet
   - Skill
 skills:
+  - arxiv-mcp
+  - ripgrep
   - code-semantic-search
-  - token-saver-context-compression
   - code-structural-search
   - context-compressor
+  - token-saver-context-compression
   - doc-generator
   - research-synthesis
-  - ripgrep
   - sequential-thinking
   - task-management-protocol
   - thinking-tools
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -50,11 +52,9 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event            | Purpose                          | Override |
-| ---------------------------------- | ---------------- | -------------------------------- | -------- |
-| `tool-scope-validator.cjs`         | PreToolUse(All)  | Validates tool is in allowed set | --       |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)  | Monitors execution limits        | --       |
-| `validate-skill-invocation.cjs`    | PreToolUse(Read) | Warns about Read vs Skill()      | --       |
+| Hook                            | Event            | Purpose                     | Override |
+| ------------------------------- | ---------------- | --------------------------- | -------- |
+| `validate-skill-invocation.cjs` | PreToolUse(Read) | Warns about Read vs Skill() | --       |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -70,7 +70,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -525,7 +525,7 @@ For browser automation, researcher creates a task for router to spawn specialize
 **What NOT to Include**:
 
 - Do not return research only in response (must save to file)
-- Do not save to `.claude/context/reports/` (that's for operational reports)
+- Do not save to `.claude/context/reports/backend/` (that's for operational reports)
 - Do not omit the `-research-` suffix in filename
 - Do not skip the provenance header
 

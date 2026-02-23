@@ -27,14 +27,16 @@ tools:
   - TaskOutput
   - Skill
 skills:
-  - debugging
-  - code-semantic-search
-  - token-saver-context-compression
   - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
+  - debugging
   - verification-before-completion
   - task-management-protocol
   - tdd
-  - context-compressor
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 capabilities:
@@ -110,21 +112,19 @@ SAFETY VERIFICATION CHECKLIST:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                   | Override        |
-| ---------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
-| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes           | --              |
-| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set          | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                 | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
-| `check-console-log.cjs`            | Stop                    | Checks for console.log in production code | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index               | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index                 | --              |
+| Hook                            | Event                   | Purpose                                   | Override        |
+| ------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
+| `conflict-detector.cjs`         | PreToolUse(Write)       | Detects conflicting file writes           | --              |
+| `validate-skill-invocation.cjs` | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
+| `check-console-log.cjs`         | Stop                    | Checks for console.log in production code | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index               | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index                 | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 

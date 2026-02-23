@@ -25,15 +25,18 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - diagram-generator
   - doc-generator
   - readme
-  - task-management-protocol
   - verification-before-completion
-  - writing-skills
   - ripgrep
   - code-semantic-search
+  - code-structural-search
+  - context-compressor
   - token-saver-context-compression
+  - diagram-generator
+  - task-management-protocol
+  - writing-skills
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -46,16 +49,14 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks    | --              |
-| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes        | --              |
-| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | 11 consolidated write safety checks    | --              |
+| `conflict-detector.cjs`         | PreToolUse(Write)       | Detects conflicting file writes        | --              |
+| `validate-skill-invocation.cjs` | PreToolUse(Read)        | Warns about Read vs Skill() for skills | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
 
 Note: `routing-guard.cjs` ensures this agent IS spawned for documentation tasks (prevents developer collapse).
 
@@ -74,7 +75,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -213,7 +214,7 @@ Invoke based on task context:
 
 - Project docs: As specified in request
 - Generated docs: `.claude/context/artifacts/docs/`
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 
 ## Quality Checklist
 

@@ -1,4 +1,6 @@
 ---
+verified: true
+lastVerifiedAt: 2026-02-22T19:27:49.887Z
 name: developer
 version: 1.1.0
 description: >-
@@ -28,31 +30,40 @@ tools:
   - TaskOutput
   - Skill
 skills:
-  - checklist-generator
-  - code-analyzer
-  - code-quality-expert
-  - code-semantic-search
-  - code-structural-search
-  - code-style-validator
-  - context-compressor
-  - debugging
-  - smart-debug
-  - git-expert
-  - github-ops
-  - ripgrep
-  - security-architect
+  - ecosystem-integrity-scanner
+  - stale-module-pruner
   - task-management-protocol
-  - tdd
+  - ripgrep
+  - code-semantic-search
   - token-saver-context-compression
   - verification-before-completion
-  - proactive-audit
-  - gemini-cli-security
-  - enhance-prompt
-  - next-cache-components
-  - next-upgrade
-  - shadcn-ui
-  - vercel-deploy
-  - web-perf
+  - memory-search
+  - tdd
+  - debugging
+  - code-structural-search
+  - code-quality-expert
+  - best-practices-guidelines
+  - dry-principle
+  - async-operations
+  - smart-debug
+  - sequential-thinking
+  - requesting-code-review
+  - receiving-code-review
+  - commit-validator
+  - code-style-validator
+  - function-length-and-responsibility
+  - typescript-expert
+  - nodejs-expert
+  - api-development-expert
+  - brainstorming
+  - spec-to-code-compliance
+  - sharp-edges
+  - context-driven-development
+  - qa-workflow
+  - finishing-a-development-branch
+  - using-git-worktrees
+  - git-expert
+  - workflow-patterns
 capabilities:
   - code-generation
   - refactoring
@@ -84,21 +95,19 @@ identity:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                   | Override        |
-| ---------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
-| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes           | --              |
-| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set          | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                 | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
-| `check-console-log.cjs`            | Stop                    | Checks for console.log in production code | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index               | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index                 | --              |
+| Hook                            | Event                   | Purpose                                   | Override        |
+| ------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
+| `conflict-detector.cjs`         | PreToolUse(Write)       | Detects conflicting file writes           | --              |
+| `validate-skill-invocation.cjs` | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
+| `check-console-log.cjs`         | Stop                    | Checks for console.log in production code | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index               | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index                 | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -115,7 +124,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix

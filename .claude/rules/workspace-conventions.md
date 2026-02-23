@@ -8,7 +8,7 @@ Rules for file placement, naming, provenance, and cleanup in the agent-studio wo
 
 **Operational Reports** (agent execution reports):
 
-- Location: `.claude/context/reports/`
+- Location: `.claude/context/reports/backend/`
 - Subdirectories by domain: `reports/security/`, `reports/qa/`, `reports/architecture/`, `reports/database/`, `reports/reflections/`
 - Naming: `{topic}-report-{YYYY-MM-DD}.md`
 - Types: Security audits, QA reports, architecture reviews, reflection reports

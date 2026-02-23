@@ -18,6 +18,13 @@ context_strategy: minimal
 maxTurns: 28
 permissionMode: default
 skills:
+  - complexity-assessment
+  - skill-discovery
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
   - agent-creator
   - command-creator
   - rule-creator
@@ -27,15 +34,12 @@ skills:
   - skill-creator
   - template-creator
   - workflow-creator
-  - skill-discovery
   - swarm-coordination
   - task-management-protocol
   - tool-search
   - verification-before-completion
-  - ripgrep
-  - code-semantic-search
-  - token-saver-context-compression
   - wave-executor
+  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -46,18 +50,14 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                                     | Purpose                                                                 | Override                                                   |
-| ---------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `routing-guard.cjs`                | PreToolUse(Task/Bash/Glob/Grep/WebSearch) | Enforces planner-first, security review, bash whitelist, tool blacklist | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
-| `intent-agent-match.cjs`           | PreToolUse(Task)                          | Warns when spawned agent mismatches intent                              | `INTENT_AGENT_ENFORCEMENT`                                 |
-| `spawn-prompt-assembler.cjs`       | PreToolUse(Task)                          | Enriches spawn prompts with memory/constitution                         | --                                                         |
-| `config-model-validator.cjs`       | PreToolUse(Task)                          | Validates model matches config.yaml                                     | `CONFIG_MODEL_VALIDATOR`                                   |
-| `spawn-prompt-validator.cjs`       | PreToolUse(Task)                          | Validates spawn prompt structure                                        | `SPAWN_PROMPT_VALIDATOR`                                   |
-| `reflection-step0-guard.cjs`       | PreToolUse(TaskList)                      | Blocks TaskList when pending reflections                                | `REFLECTION_STEP0_ENFORCEMENT`                             |
-| `tool-scope-validator.cjs`         | PreToolUse(All)                           | Validates tool is in allowed set                                        | --                                                         |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)                           | Monitors execution limits                                               | --                                                         |
-| `user-prompt-unified.cjs`          | UserPromptSubmit                          | Router analysis, token monitoring                                       | --                                                         |
-| `state-reset.cjs`                  | UserPromptSubmit                          | Resets router state per prompt                                          | --                                                         |
+| Hook                         | Event                                     | Purpose                                                                 | Override                                                   |
+| ---------------------------- | ----------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `routing-guard.cjs`          | PreToolUse(Task/Bash/Glob/Grep/WebSearch) | Enforces planner-first, security review, bash whitelist, tool blacklist | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT` |
+| `spawn-prompt-assembler.cjs` | PreToolUse(Task)                          | Enriches spawn prompts with memory/constitution                         | --                                                         |
+| `spawn-prompt-validator.cjs` | PreToolUse(Task)                          | Validates spawn prompt structure                                        | `SPAWN_PROMPT_VALIDATOR`                                   |
+| `reflection-step0-guard.cjs` | PreToolUse(TaskList)                      | Blocks TaskList when pending reflections                                | `REFLECTION_STEP0_ENFORCEMENT`                             |
+| `user-prompt-unified.cjs`    | UserPromptSubmit                          | Router analysis, token monitoring                                       | --                                                         |
+| `state-reset.cjs`            | UserPromptSubmit                          | Resets router state per prompt                                          | --                                                         |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -74,7 +74,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -409,7 +409,7 @@ Task({
   subagent_type: "general-purpose",
   model: "opus",
   description: "Architect reviewing payment architecture",
-  prompt: "You are ARCHITECT. Read @.claude/agents/core/architect.md. Review the plan in @.claude/context/plans/ for architectural concerns: scalability, patterns, integration points, technical debt. Save review to @.claude/context/reports/architect-review.md"
+  prompt: "You are ARCHITECT. Read @.claude/agents/core/architect.md. Review the plan in @.claude/context/plans/ for architectural concerns: scalability, patterns, integration points, technical debt. Save review to @.claude/context/reports/architecture/architect-review.md"
 })
 
 Task({
@@ -417,7 +417,7 @@ Task({
   subagent_type: "general-purpose",
   model: "opus",
   description: "Security reviewing payment design",
-  prompt: "You are SECURITY-ARCHITECT. Read @.claude/agents/specialized/security-architect.md. Review the plan in @.claude/context/plans/ for security concerns: OWASP, PCI-DSS, encryption, auth. Save review to @.claude/context/reports/security-review.md"
+  prompt: "You are SECURITY-ARCHITECT. Read @.claude/agents/specialized/security-architect.md. Review the plan in @.claude/context/plans/ for security concerns: OWASP, PCI-DSS, encryption, auth. Save review to @.claude/context/reports/security/security-review.md"
 })
 ```
 
@@ -620,7 +620,7 @@ Task({
 ```javascript
 const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.cjs');
 const modelResult = resolveAgentModel('developer', PROJECT_ROOT);
-// modelResult: { model: 'claude-sonnet-4-5', shorthand: 'sonnet', source: 'config.yaml' }
+// modelResult: { model: 'sonnet', shorthand: 'sonnet', source: 'config.yaml' }
 
 Task({
   task_id: 'task-9',

@@ -33,11 +33,14 @@ skills:
   - plan-generator
   - recommend-evolution
   - research-synthesis
-  - ripgrep
   - sequential-thinking
   - task-management-protocol
-  - token-saver-context-compression
   - verification-before-completion
+  - ripgrep
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
+  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -86,7 +89,7 @@ Skill({ skill: 'task-management-protocol' });
 
 - Program tracking artifact: `.claude/context/artifacts/programs/{initiative}-program-plan-{YYYY-MM-DD}.md`
 - RAID log: `.claude/context/artifacts/programs/{initiative}-raid-{YYYY-MM-DD}.md`
-- Gate report: `.claude/context/reports/program/{initiative}-phase-gates-{YYYY-MM-DD}.md`
+- Gate report: `.claude/context/reports/backend/program/{initiative}-phase-gates-{YYYY-MM-DD}.md`
 
 ## Token Saver Invocation Rule
 

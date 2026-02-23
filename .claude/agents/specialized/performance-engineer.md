@@ -27,15 +27,16 @@ tools:
   - TaskOutput
   - Skill
 skills:
-  - code-analyzer
+  - ripgrep
   - code-semantic-search
-  - token-saver-context-compression
   - code-structural-search
   - context-compressor
+  - token-saver-context-compression
+  - code-analyzer
   - debugging
-  - ripgrep
   - task-management-protocol
   - verification-before-completion
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 capabilities:
@@ -74,21 +75,19 @@ identity:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                   | Override        |
-| ---------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
-| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes           | --              |
-| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set          | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                 | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
-| `check-console-log.cjs`            | Stop                    | Checks for console.log in production code | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index               | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index                 | --              |
+| Hook                            | Event                   | Purpose                                   | Override        |
+| ------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
+| `conflict-detector.cjs`         | PreToolUse(Write)       | Detects conflicting file writes           | --              |
+| `validate-skill-invocation.cjs` | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
+| `check-console-log.cjs`         | Stop                    | Checks for console.log in production code | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index               | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index                 | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -104,7 +103,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/analysis/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -618,7 +617,7 @@ TaskUpdate({
   metadata: {
     summary: 'Optimized user search endpoint: P95 latency reduced 73% (450ms to 120ms)',
     filesModified: ['src/services/user-search.ts', 'src/database/indexes.sql'],
-    outputArtifacts: ['.claude/context/reports/performance-analysis.md'],
+    outputArtifacts: ['.claude/context/reports/backend/performance-analysis.md'],
     performanceGains: 'P95 latency reduced 73% (450ms -> 120ms), throughput +300%',
     completedAt: new Date().toISOString(),
   },

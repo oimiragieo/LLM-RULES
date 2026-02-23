@@ -21,11 +21,14 @@ tools:
 skills:
   - context-compressor
   - session-handoff
+  - summarize-changes
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
   - token-saver-context-compression
   - task-management-protocol
   - verification-before-completion
-  - ripgrep
-  - code-semantic-search
+  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -36,13 +39,11 @@ skills:
 
 The following hooks govern this agent's behavior at runtime (minimal subset):
 
-| Hook                               | Event                  | Purpose                                | Override        |
-| ---------------------------------- | ---------------------- | -------------------------------------- | --------------- |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit) | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit) | 11 consolidated write safety checks    | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)        | Validates tool is in allowed set       | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)        | Monitors execution limits              | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate) | Validates work before marking complete | --              |
+| Hook                            | Event                  | Purpose                                | Override        |
+| ------------------------------- | ---------------------- | -------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit) | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit) | 11 consolidated write safety checks    | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | --              |
 
 Note: Context-compressor has minimal hook enforcement (no Bash, conflict-detector, or index updates) as it focuses on read-only compression and summary writing.
 
@@ -59,7 +60,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix

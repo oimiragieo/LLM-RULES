@@ -36,10 +36,12 @@ tools:
     WebFetch,
   ]
 skills:
-  - task-management-protocol
   - ripgrep
   - code-semantic-search
+  - code-structural-search
+  - context-compressor
   - token-saver-context-compression
+  - task-management-protocol
   - verification-before-completion
   - agent-creator
   - command-creator
@@ -55,6 +57,7 @@ skills:
   - skill-updater
   - workflow-updater
   - artifact-updater
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -67,15 +70,13 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime (Implementer archetype):
 
-| Hook                               | Event                  | Purpose                                | Override |
-| ---------------------------------- | ---------------------- | -------------------------------------- | -------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)       | Blocks dangerous shell commands        | --       |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)       | Blocks shell injection patterns        | --       |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)       | Prevents Windows reserved name issues  | --       |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit) | 11 consolidated write safety checks    | --       |
-| `tool-scope-validator.cjs`         | PreToolUse(All)        | Validates tool is in allowed set       | --       |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)        | Monitors execution limits              | --       |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate) | Validates work before marking complete | --       |
+| Hook                            | Event                  | Purpose                                | Override |
+| ------------------------------- | ---------------------- | -------------------------------------- | -------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)       | Blocks dangerous shell commands        | --       |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)       | Blocks shell injection patterns        | --       |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)       | Prevents Windows reserved name issues  | --       |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit) | 11 consolidated write safety checks    | --       |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate) | Validates work before marking complete | --       |
 
 See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -91,7 +92,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -198,7 +199,7 @@ Skill({ skill: 'verification-before-completion' });
 ## Output Locations
 
 - Deliverables: `@.claude/context/artifacts/`
-- Reports: `@.claude/context/reports/`
+- Reports: `@.claude/context/reports/backend/`
 - Plans: `@.claude/context/plans/`
 - Memory: `@.claude/context/memory/`
 

@@ -28,26 +28,29 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - task-management-protocol
   - auth-security-expert
+  - fiber-routing-and-csrf-protection
+  - security-architect
+  - task-management-protocol
+  - verification-before-completion
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
   - binary-analysis-patterns
   - checklist-generator
   - code-analyzer
-  - code-semantic-search
-  - token-saver-context-compression
-  - code-structural-search
   - doc-generator
   - insecure-defaults
   - memory-forensics
   - protocol-reverse-engineering
-  - ripgrep
-  - security-architect
   - semgrep-rule-creator
   - variant-analysis
-  - verification-before-completion
   - web3-expert
   - medusa-security
   - gemini-cli-security
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -60,18 +63,16 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index              | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index              | --              |
 
 **Note:** `routing-guard.cjs` security review enforcement ensures this agent IS spawned for security work.
 
@@ -91,7 +92,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -117,7 +118,7 @@ The following workflows guide this agent's execution:
 
 - **Extended Thinking**: MANDATORY for architecture decisions and threat assessments.
 - **Tools**: Use `Skill({ skill: 'sequential-thinking' })` for deep analysis. Use `dependency-analyzer` for vulnerability scans.
-- **Output**: Security reports go to `.claude/context/reports/`. Structured data to `.claude/context/artifacts/`.
+- **Output**: Security reports go to `.claude/context/reports/backend/`. Structured data to `.claude/context/artifacts/`.
 - **Collaboration**: You advise the Architect and Developer. You do not implement non-security code.
 
 ## Key Frameworks

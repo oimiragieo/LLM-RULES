@@ -28,18 +28,19 @@ tools:
   - TaskOutput
   - Skill
 skills:
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
   - security-architect
   - auth-security-expert
-  - code-semantic-search
-  - token-saver-context-compression
-  - code-structural-search
-  - ripgrep
   - verification-before-completion
   - task-management-protocol
   - tdd
   - debugging
-  - context-compressor
   - medusa-security
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 capabilities:
@@ -108,21 +109,19 @@ AUTHORIZATION VERIFICATION CHECKLIST:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                   | Override        |
-| ---------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
-| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes           | --              |
-| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set          | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits                 | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
-| `check-console-log.cjs`            | Stop                    | Checks for console.log in production code | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index               | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index                 | --              |
+| Hook                            | Event                   | Purpose                                   | Override        |
+| ------------------------------- | ----------------------- | ----------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands           | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns           | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues     | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths     | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | 11 consolidated write safety checks       | --              |
+| `conflict-detector.cjs`         | PreToolUse(Write)       | Detects conflicting file writes           | --              |
+| `validate-skill-invocation.cjs` | PreToolUse(Read)        | Warns about Read vs Skill() for skills    | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete    | --              |
+| `check-console-log.cjs`         | Stop                    | Checks for console.log in production code | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index               | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index                 | --              |
 
 **Additional authorization note:** The `bash-command-validator.cjs` hook provides an extra safety layer by blocking potentially destructive commands. For penetration testing, commands must be explicitly authorized and scoped to in-scope targets only.
 

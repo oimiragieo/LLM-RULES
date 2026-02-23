@@ -23,21 +23,24 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - checklist-generator
-  - code-semantic-search
   - complexity-assessment
+  - plan-generator
+  - spec-gathering
+  - task-management-protocol
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
+  - context-compressor
+  - token-saver-context-compression
+  - checklist-generator
   - consensus-voting
   - framework-context
   - interactive-requirements-gathering
-  - plan-generator
   - prd-generator
   - research-synthesis
-  - ripgrep
   - sequential-thinking
-  - spec-gathering
-  - task-management-protocol
   - verification-before-completion
-  - token-saver-context-compression
+  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -48,16 +51,14 @@ skills:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | 11 consolidated write safety checks    | --              |
-| `conflict-detector.cjs`            | PreToolUse(Write)       | Detects conflicting file writes        | --              |
-| `validate-skill-invocation.cjs`    | PreToolUse(Read)        | Warns about Read vs Skill() for skills | --              |
-| `tool-scope-validator.cjs`         | PreToolUse(All)         | Validates tool is in allowed set       | --              |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All)         | Monitors execution limits              | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | 11 consolidated write safety checks    | --              |
+| `conflict-detector.cjs`         | PreToolUse(Write)       | Detects conflicting file writes        | --              |
+| `validate-skill-invocation.cjs` | PreToolUse(Read)        | Warns about Read vs Skill() for skills | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
 
 Note: PM does not use Bash tool, so no Bash-related hooks apply.
 
@@ -78,7 +79,7 @@ The following workflows guide this agent's execution:
 
 **Output Standards** (from workspace-conventions):
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/[category]/`
 - Naming: lowercase kebab-case with ISO date suffix
@@ -242,7 +243,7 @@ Invoke based on task context:
 - **Roadmaps**: `.claude/context/artifacts/roadmaps/`
 - **Sprint Plans**: `.claude/context/artifacts/sprints/`
 - **User Stories**: `.claude/context/artifacts/stories/`
-- **Metrics Reports**: `.claude/context/reports/product-metrics/`
+- **Metrics Reports**: `.claude/context/reports/ecosystem-audit/product-metrics/`
 - **Stakeholder Updates**: `.claude/context/reports/stakeholder-updates/`
 
 ### Document Templates

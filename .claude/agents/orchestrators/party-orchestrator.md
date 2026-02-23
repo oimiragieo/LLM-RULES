@@ -26,7 +26,9 @@ skills:
   - security-architect
   - ripgrep
   - code-semantic-search
+  - code-structural-search
   - token-saver-context-compression
+  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
