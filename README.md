@@ -48,6 +48,8 @@ Repeated queries are auto-cached (~5ms hit vs ~800ms miss). BM25 index auto-upda
 
 Agent Studio dynamically supports Git Worktree isolation for dangerous/massive subagent tasks. The orchestrator spawns `isolated-*` agents (e.g., `isolated-developer`, `isolated-architect`) for high-risk or sweeping refactors. These agents inherently use the `-w` flag in Claude Code to sandbox their work in isolated branches—preventing race conditions during parallel execution.
 
+**Important for Worktrees:** The ecosystem setup wizard automatically enables Git optimization (`core.untrackedCache true` and `core.fsmonitor true`). This prevents Git from hanging or triggering "too many active changes" warnings during massive parallel file generation or background vector indexing operations.
+
 ## Current Footprint
 
 - Agents: 74 files (includes 12 isolated worktree variants)

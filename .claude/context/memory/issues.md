@@ -270,17 +270,6 @@ TaskUpdate({
 
 ---
 
-## Skill Registration Gap: proactive-audit (2026-02-22)
-
-- [ ] Catalog: PRESENT (skill-catalog.md line 314)
-- [ ] Index: MISSING (skill-index.json has no entry)
-- [ ] Agent assignment: PRESENT (qa, developer, architect)
-      Source: reflection of tasks #28-31 (2026-02-22)
-
-**Fix**: Run `node .claude/tools/cli/generate-skill-index.cjs` after any manual SKILL.md creation.
-
----
-
 ## ISSUE: skill-index.json not auto-regenerated after manual SKILL.md creation (2026-02-22)
 
 **Status**: OPEN — P2 (recurring)

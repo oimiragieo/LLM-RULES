@@ -61,6 +61,7 @@ console.log(`${c.gray}CUDA / GPUs: Nvidia CUDA Toolkit 13.x is OPTIONAL but reco
 
 // 2. Setup Pipeline Definition
 const steps = [
+    { name: 'Enable Git Optimizations', cmd: 'git config --local core.untrackedCache true && git config --local core.fsmonitor true', est: '1s' },
     { name: 'Install Dependencies', cmd: 'pnpm install', est: '30-60s' },
     { name: 'Initialize SQLite Memory & Context', cmd: 'pnpm memory:init', est: '2s' },
     { name: 'Compile Agent Registry', cmd: 'pnpm agents:registry', est: '2s' },

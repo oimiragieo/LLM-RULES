@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 133** (1 deprecated alias) | Last Updated: 2026-02-22
+> **Total Skills: 134** (1 deprecated alias) | Last Updated: 2026-02-23
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 129 (maintained and invoked)
+- **Active Skills:** 130 (maintained and invoked)
 - **Deprecated Aliases:** 1 (`testing-expert` → `tdd`)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -33,7 +33,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Memory & Context](#memory--context)                 | 17    | context-compressor, token-saver-context-compression, memory-quality-auditor, session-handoff, task-management-protocol, context-driven-development, context-degradation, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution, assimilate, creation-feasibility-gate, compliance-policy-check, troubleshooting-regression, memory-search |
 | [Validation & Quality](#validation--quality)         | 12    | verification-before-completion, checklist-generator, proactive-audit, ecosystem-integrity-scanner, response-rater, test-generator, accessibility, eval-harness-updater, qa-workflow, spec-critique, strict-user-requirements-adherence, agent-evaluation                                                                                                                                 |
 | [Specialized Patterns](#specialized-patterns)        | 10    | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology, dispatching-parallel-agents                                                                                                                                                                            |
-| [External Integrations](#external-integrations)      | 5     | project-onboarding, dynamic-api-integration, medusa, convex-development-general, starknet-react-rules                                                                                                                                                                                                                                                                                    |
+| [External Integrations](#external-integrations)      | 7     | project-onboarding, dynamic-api-integration, medusa, convex-development-general, starknet-react-rules, omega-codex-cli, omega-cursor-cli                                                                                                                                                                                                                                                  |
 | [Scientific Research](#scientific-research)          | 1     | scientific-skills (parent with 139 sub-skills)                                                                                                                                                                                                                                                                                                                                           |
 | [Incident Response](#incident-response)              | 3     | incident-runbook-templates, on-call-handoff-patterns, postmortem-writing                                                                                                                                                                                                                                                                                                                 |
 | [Search](#search)                                    | 4     | ripgrep, code-semantic-search, code-structural-search, frontend-expert                                                                                                                                                                                                                                                                                                                   |
@@ -411,6 +411,9 @@ External tools and systems.
 | | Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system fields. | developer |
 | `convex-development-general` | Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system fields. | developer |
 | `starknet-react-rules` | Starknet React blockchain integration rules with hooks, error handling, and UI feedback patterns | developer |
+| `omega-codex-cli` | Headless wrapper for OpenAI Codex CLI; positional prompt delivery via `codex exec "PROMPT"`; OPENAI_API_KEY required; supports --json JSONL stream, --sandbox, --timeout-ms | developer, multi-llm-consultant |
+| `omega-cursor-cli` | Headless wrapper for Cursor Agent CLI; multi-model routing via --model auto; Cursor Pro/Business subscription required; supports --yolo, --trust, --timeout-ms | developer, multi-llm-consultant |
+| `omega-gemini-cli` | Headless wrapper for Google Gemini CLI; stdin-based prompt delivery to `gemini -p "" --yolo`; free tier via Google OAuth; supports --model, --json, --sandbox; npx fallback when gemini not on PATH | researcher, developer, planner, multi-llm-consultant |
 
 ---
 

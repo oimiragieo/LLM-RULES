@@ -1,7 +1,83 @@
 {
-  "lastDaily": "2026-02-22T00:06:44.888Z",
-  "lastWeekly": "2026-02-16T00:34:12.572Z",
+  "lastDaily": "2026-02-23T04:52:14.978Z",
+  "lastWeekly": "2026-02-23T04:52:14.978Z",
   "history": [
+    {
+      "type": "weekly",
+      "timestamp": "2026-02-23T04:52:14.978Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        },
+        {
+          "type": "rotation",
+          "success": true
+        },
+        {
+          "type": "summarization",
+          "success": true
+        },
+        {
+          "type": "deduplication",
+          "success": true
+        },
+        {
+          "type": "pruning",
+          "success": true
+        },
+        {
+          "type": "archiveOldLTM",
+          "success": true
+        },
+        {
+          "type": "extraction",
+          "success": true
+        },
+        {
+          "type": "vectorMaintenance",
+          "success": true
+        },
+        {
+          "type": "weeklyReport",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "daily",
+      "timestamp": "2026-02-23T04:52:14.692Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        }
+      ]
+    },
     {
       "type": "daily",
       "timestamp": "2026-02-22T00:06:44.888Z",
@@ -549,6 +625,6 @@
       ]
     }
   ],
-  "lastRun": "2026-02-22T00:06:44.888Z",
-  "lastColdArchive": "2026-02-16T00:34:12.667Z"
+  "lastRun": "2026-02-23T04:52:14.978Z",
+  "lastColdArchive": "2026-02-23T04:52:15.154Z"
 }

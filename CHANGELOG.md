@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Track 1: Orchestration & State
 
+- **Git Worktree Optimizations for Sandboxed Agents**: Setup script (`scripts/setup.cjs`) automatically runs `git config --local core.untrackedCache true && git config --local core.fsmonitor true`. This solves the issue where Git-for-Windows or MSYS threw "too many active changes" warnings during massive parallel file modifications or background index builds across multiple agent worktrees.
 - **Precise Tokenizer (Context-Pressure Check)**: Added `.claude/lib/utils/context-token-estimator.cjs` to estimate tokens and calculate context pressure index. Highly integrated into `.claude/hooks/routing/user-prompt-unified.core.cjs` to aggressively govern the auto-compression engine when limits are reached. Tested in `tests/lib/utils/context-token-estimator.test.cjs`.
 - **Watchdog DLQ (Service Level Agreement Protection)**: Engineered `.claude/lib/workflow/workflow-watchdog.cjs` operating under protected state locks to enforce strict SLA guarantees over Phase transitions. Any `in_progress` phase exceeding the SLA timeout is forcefully relocated to an atomic `dlq.jsonl` Dead Letter Queue and flagged with `BLOCKED_TIMEOUT`. Created `.claude/tools/cli/workflow-watchdog-run.cjs` to facilitate automated sweeping. Fully tested in `tests/lib/workflow/workflow-watchdog.test.cjs`.
 
