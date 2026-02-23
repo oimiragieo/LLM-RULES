@@ -71,6 +71,7 @@ const {
   extractAgentType,
   isEvolutionTrigger,
   detectEvolutionType,
+  hasUpdateIntent,
   getDepthLimit,
   getPatternThreshold,
   getPatternWindowMs,
@@ -336,7 +337,9 @@ This is a safety mechanism to prevent infinite loops.`;
     console.warn(message);
   }
 
-  if (isEvolutionTrigger(prompt)) {
+  // Skip evolution budget/cooldown checks when the prompt has update intent.
+  // Updater spawns are not creation events and should not start or be blocked by cooldowns.
+  if (isEvolutionTrigger(prompt) && !hasUpdateIntent(prompt)) {
     const budget = getEvolutionBudget();
     if (loopState.evolutionCount >= budget) {
       const message = `[LOOP PREVENTION] Evolution budget exhausted (${loopState.evolutionCount}/${budget}). Session limit reached.
@@ -382,7 +385,9 @@ function updateLoopStateAfterAllow(hookInput) {
     const agentType = extractAgentType(prompt, description, toolInput);
     loopStateManager.recordSpawn(agentType);
 
-    if (isEvolutionTrigger(prompt)) {
+    // Do not record an evolution event for update-intent spawns.
+    // Updater spawns are not creation events and must not start the evolution cooldown.
+    if (isEvolutionTrigger(prompt) && !hasUpdateIntent(prompt)) {
       const evolutionType = detectEvolutionType(prompt) || 'unknown';
       loopStateManager.recordEvolution(evolutionType);
     }

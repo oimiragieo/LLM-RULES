@@ -48,17 +48,14 @@ describe('checks-router — worktree bypass gap (D1 RED)', () => {
     delete process.env.CLAUDE_AGENT_ID;
 
     // Invalidate shared state cache so each test starts fresh
-    const sharedPath = require.resolve(
-      '../../.claude/hooks/routing/routing-guard-core.shared.cjs'
-    );
+    const sharedPath = require.resolve('../../.claude/hooks/routing/routing-guard-core.shared.cjs');
     if (require.cache[sharedPath]) {
       require(sharedPath).invalidateCachedState();
     }
 
     // Fresh module load to avoid stale require.cache
-    const checksRouterPath = require.resolve(
-      '../../.claude/hooks/routing/routing-guard-core.checks-router.cjs'
-    );
+    const checksRouterPath =
+      require.resolve('../../.claude/hooks/routing/routing-guard-core.checks-router.cjs');
     delete require.cache[checksRouterPath];
     const mod = require('../../.claude/hooks/routing/routing-guard-core.checks-router.cjs');
     checkRouterBash = mod.checkRouterBash;
@@ -111,8 +108,7 @@ describe('checks-router — worktree bypass gap (D1 RED)', () => {
     assert.strictEqual(
       result.pass,
       true,
-      `checkRouterBash must bypass for nested (depth-2) worktree CWD; ` +
-        `got pass=${result.pass}`
+      `checkRouterBash must bypass for nested (depth-2) worktree CWD; ` + `got pass=${result.pass}`
     );
   });
 
@@ -154,11 +150,7 @@ describe('checks-router — worktree bypass gap (D1 RED)', () => {
 
   it('checkRouterSelfCheck: still blocks blacklisted tool from non-worktree CWD', () => {
     const result = checkRouterSelfCheck('Edit', {}, {}, '/project');
-    assert.strictEqual(
-      result.pass,
-      false,
-      'Non-worktree Edit must still be blocked for router'
-    );
+    assert.strictEqual(result.pass, false, 'Non-worktree Edit must still be blocked for router');
     assert.strictEqual(result.result, 'block');
   });
 

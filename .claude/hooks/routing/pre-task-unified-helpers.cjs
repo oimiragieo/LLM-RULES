@@ -407,6 +407,26 @@ function checkSpawnRoleGuardrails(toolInput) {
   return { pass: true };
 }
 
+/**
+ * Returns true when the prompt signals update/refresh intent (not creation intent).
+ * Used to bypass creator-specialist cooldowns and routing blocks for updater spawns.
+ * Checks for -updater suffix or update/updating + artifact word in the same sentence.
+ */
+function hasUpdateIntent(prompt) {
+  if (!prompt) return false;
+  const lower = prompt.toLowerCase();
+  return (
+    /-updater\b/.test(lower) ||
+    lower
+      .split(/[.!?\n]+/)
+      .some(
+        sentence =>
+          /\bupdat/.test(sentence) &&
+          /\b(?:skill|agent|hook|workflow|template|schema)\b/.test(sentence)
+      )
+  );
+}
+
 module.exports = {
   PLANNER_PATTERNS,
   SECURITY_PATTERNS,
@@ -426,6 +446,7 @@ module.exports = {
   extractAgentType,
   isEvolutionTrigger,
   detectEvolutionType,
+  hasUpdateIntent,
   getDepthLimit,
   getPatternThreshold,
   getPatternWindowMs,

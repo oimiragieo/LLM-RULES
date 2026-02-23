@@ -23,7 +23,9 @@ const {
   compactFallbackMessage,
   buildRouterSelfCheckMessage,
 } = require('./routing-guard-core.shared.cjs');
-const { hasExplicitAgentContext: _hasExplicitAgentContextCore } = require('./routing-guard-core.helpers.cjs');
+const {
+  hasExplicitAgentContext: _hasExplicitAgentContextCore,
+} = require('./routing-guard-core.helpers.cjs');
 
 function hasExplicitAgentContext(hookInput = null, cwd = process.cwd()) {
   if (_hasExplicitAgentContextCore(hookInput, cwd)) return true;

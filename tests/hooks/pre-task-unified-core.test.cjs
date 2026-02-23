@@ -170,4 +170,63 @@ describe('pre-task-unified exports and context tracker', () => {
     assert.strictEqual(result.pass, true);
     assert.strictEqual(result.exitCode, 0);
   });
+
+  // Fix B: Update-intent bypass for evolution cooldown in checkLoopPrevention
+  it('should allow Task when update intent present despite active evolution cooldown', () => {
+    // RED: currently fails — cooldown blocks task even when the prompt has update (not create) intent
+    writeState(LOOP_STATE_FILE, {
+      lastEvolutions: {
+        skill: new Date().toISOString(), // just recorded — cooldown is active
+      },
+      evolutionCount: 1,
+      spawnDepth: 0,
+      actionHistory: [],
+    });
+    process.env.LOOP_PREVENTION_MODE = 'block';
+
+    const result = preTaskUnified.checkLoopPrevention({
+      tool_name: 'Task',
+      tool_input: {
+        prompt:
+          'Use skill-updater to update the omega-gemini-cli skill. Note: skill-creator was previously used to create it.',
+      },
+    });
+
+    assert.strictEqual(
+      result.pass,
+      true,
+      'Should allow task with update intent despite active evolution cooldown'
+    );
+  });
+
+  it('should still block Task when evolution cooldown active and no update intent', () => {
+    // GREEN: pure creation intent should still be blocked when cooldown is active
+    writeState(LOOP_STATE_FILE, {
+      lastEvolutions: {
+        skill: new Date().toISOString(), // just recorded — cooldown is active
+      },
+      evolutionCount: 1,
+      spawnDepth: 0,
+      actionHistory: [],
+    });
+    process.env.LOOP_PREVENTION_MODE = 'block';
+
+    const result = preTaskUnified.checkLoopPrevention({
+      tool_name: 'Task',
+      tool_input: {
+        prompt: 'You are skill-creator. Create a new skill for handling API versioning.',
+      },
+    });
+
+    assert.strictEqual(
+      result.pass,
+      false,
+      'Should block task when cooldown active and no update intent'
+    );
+    assert.match(
+      String(result.message || ''),
+      /\[LOOP PREVENTION\]/,
+      'Should report loop prevention'
+    );
+  });
 });

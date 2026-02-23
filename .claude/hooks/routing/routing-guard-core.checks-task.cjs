@@ -263,7 +263,36 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
   const description = (toolInput.description || '').toLowerCase();
   const combined = `${prompt} ${description}`;
 
+  // Creator specialists whose keywords should be bypassed when the spawn has update intent.
+  // Non-creator specialists (technical-writer, qa, etc.) always apply.
+  const CREATOR_SPECIALISTS = new Set([
+    'skill-creator',
+    'agent-creator',
+    'hook-creator',
+    'workflow-creator',
+    'template-creator',
+    'schema-creator',
+  ]);
+
+  // Detect update intent: -updater suffix OR update/updating + artifact word in same sentence.
+  // Split by sentence boundary so we don't cross-match unrelated sentences.
+  const hasUpdateIntent =
+    /-updater\b/.test(combined) ||
+    combined
+      .split(/[.!?\n]+/)
+      .some(
+        sentence =>
+          /\bupdat/.test(sentence) &&
+          /\b(?:skill|agent|hook|workflow|template|schema)\b/.test(sentence)
+      );
+
   for (const [specialist, phrases] of Object.entries(SPECIALIST_KEYWORD_MAP)) {
+    // If the spawn has update intent, skip creator-type specialist keyword checks
+    // so incidental creator references don't redirect to a creator specialist.
+    if (hasUpdateIntent && CREATOR_SPECIALISTS.has(specialist)) {
+      continue;
+    }
+
     for (const phrase of phrases) {
       const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp('\\b' + escaped + '\\b', 'i');

@@ -85,4 +85,60 @@ describe('Routing Guard Integration - Check 7: Specialist Override', () => {
 
     assert.strictEqual(result.pass, true, 'Should allow specialist spawns');
   });
+
+  // Fix A: Update-intent bypass for creator specialist keywords
+  test('should allow developer when update intent present even if creator keyword appears incidentally', () => {
+    // RED: currently fails — "new skill" triggers skill-creator SPECIALIST-OVERRIDE block
+    const toolInput = {
+      subagent_type: 'developer',
+      prompt:
+        'You are developer. Update the omega-gemini-cli skill to support gemini 2.0. Note: omega-gemini-cli is a new skill added recently to the catalog.',
+      description: 'Updating omega-gemini-cli skill',
+    };
+
+    const result = checkSpecialistOverride('Task', toolInput);
+
+    assert.strictEqual(
+      result.pass,
+      true,
+      'Should allow developer when update intent overrides incidental creator keyword'
+    );
+  });
+
+  test('should allow developer when skill-updater suffix in prompt even if skill-creator appears as context', () => {
+    // RED: currently fails — "skill-creator" triggers SPECIALIST-OVERRIDE block
+    const toolInput = {
+      subagent_type: 'developer',
+      prompt:
+        'You are developer. Use skill-updater to refresh the tdd skill. The tdd skill was originally built with skill-creator.',
+      description: 'Updating tdd skill via skill-updater',
+    };
+
+    const result = checkSpecialistOverride('Task', toolInput);
+
+    assert.strictEqual(
+      result.pass,
+      true,
+      'Should allow developer when -updater suffix detects update intent overriding incidental creator keyword'
+    );
+  });
+
+  test('should still block developer when creator keyword present with genuine creation intent', () => {
+    // GREEN: this should continue to fail as intended (no update intent)
+    const toolInput = {
+      subagent_type: 'developer',
+      prompt: 'You are developer. Create a new skill for handling gemini API calls.',
+      description: 'Creating a new gemini skill',
+    };
+
+    const result = checkSpecialistOverride('Task', toolInput);
+
+    assert.strictEqual(
+      result.pass,
+      false,
+      'Should still block developer for genuine skill creation'
+    );
+    assert.match(result.message, /\[SPECIALIST-OVERRIDE\]/, 'Should report specialist override');
+    assert.match(result.message, /skill-creator/, 'Should suggest skill-creator');
+  });
 });

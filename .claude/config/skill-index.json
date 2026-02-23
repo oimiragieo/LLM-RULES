@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-23T06:05:25.087Z",
+  "generatedAt": "2026-02-23T07:49:21.651Z",
   "metadata": {
     "totalSkills": 391,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-23T06:05:25.088Z",
+    "lastValidated": "2026-02-23T07:49:21.652Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -863,7 +863,7 @@
       "displayName": "Omega Gemini Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Shell out to Google Gemini CLI for headless AI queries, code analysis, and brainstorming. Uses stdin-based prompt delivery for cross-platform reliability. Free tier available via personal Google account.",
+      "description": "Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on \"use Gemini\", \"analyze with Gemini\", \"large file\", \"sandbox\", \"brainstorm with Gemini\".",
       "requiredTools": [
         "Bash",
         "Read"
