@@ -17,15 +17,13 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Quick Start (TL;DR)
 
-Runtime: Node `>=22.5.0`, pnpm.
+Runtime: Node `>=22.5.0`, pnpm. Optional: Nvidia CUDA Toolkit for 40% faster indexing.
+Agent Studio runs seamlessly on Windows PowerShell, WSL, macOS, and Linux.
+
+Initialize the entire ecosystem (installs deps, compiles registries, indexes code):
 
 ```bash
-pnpm install
-pnpm memory:init
-pnpm agents:registry
-pnpm routing:prototypes
-pnpm agents:catalog
-pnpm code:index:reindex    # builds BM25 + semantic vector index (~12 min with GPU)
+pnpm run setup
 ```
 
 Search immediately after indexing:
@@ -46,9 +44,13 @@ Repeated queries are auto-cached (~5ms hit vs ~800ms miss). BM25 index auto-upda
 
 `search:tokens` shows file/directory sizes, token estimates, and recommends splitting oversized source files (>15K tokens) into smaller modules for better AI agent readability.
 
+### Dynamic Agent Worktrees
+
+Agent Studio dynamically supports Git Worktree isolation for dangerous/massive subagent tasks. The orchestrator spawns `isolated-*` agents (e.g., `isolated-developer`, `isolated-architect`) for high-risk or sweeping refactors. These agents inherently use the `-w` flag in Claude Code to sandbox their work in isolated branches—preventing race conditions during parallel execution.
+
 ## Current Footprint
 
-- Agents: 62 files
+- Agents: 74 files (includes 12 isolated worktree variants)
 - Skills: 460 `SKILL.md` definitions
 - Rules: 105 docs
 - Schemas: 148 `*.schema.json`
@@ -71,8 +73,7 @@ Use this path if you are proposing changes to the ecosystem itself.
 1. Install and bootstrap:
 
 ```bash
-pnpm install
-pnpm memory:init
+pnpm run setup
 ```
 
 2. Run baseline validation:
