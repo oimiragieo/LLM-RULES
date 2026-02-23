@@ -6,8 +6,10 @@ metadata:
   author: vercel-labs
   version: '1.0.0'
   source: vercel-labs/agent-skills
-verified: false
-lastVerifiedAt: 2026-02-21T00:00:00.000Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
+version: '1.0.0'
+tools: []
 ---
 
 # Vercel Deploy
@@ -308,3 +310,32 @@ Add rewrites for SPA frameworks:
 - [Vercel CLI Documentation](https://vercel.com/docs/cli)
 - [Vercel Deployment Documentation](https://vercel.com/docs/deployments)
 - [Framework-Specific Guides](https://vercel.com/docs/frameworks)
+
+## Iron Laws
+
+1. **ALWAYS** test the build locally before deploying to ensure the deployment will succeed
+2. **NEVER** deploy to production without first creating and validating a preview deployment
+3. **ALWAYS** verify environment variables are configured in the Vercel project before deploying
+4. **NEVER** store sensitive secrets in deployment commands or public URLs
+5. **ALWAYS** check the deployment logs immediately after deployment to confirm the build succeeded
+
+## Anti-Patterns
+
+| Anti-Pattern                         | Why It Fails                                     | Correct Approach                                 |
+| ------------------------------------ | ------------------------------------------------ | ------------------------------------------------ |
+| Deploying without local build test   | Build fails in Vercel, wasted deployment attempt | Run `build` locally before `vercel deploy`       |
+| Skipping preview before production   | Regressions reach users before detection         | Always validate preview URL first                |
+| Hardcoded env vars in deploy command | Secrets exposed in shell history and logs        | Configure env vars in Vercel project settings    |
+| Ignoring post-deploy build logs      | Silent failures go undetected                    | Always check logs after deployment               |
+| No framework detection verification  | Wrong settings cause build failures              | Verify auto-detected framework in project config |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+Read `.claude/context/memory/learnings.md`
+
+**After completing:**
+
+- New pattern -> `.claude/context/memory/learnings.md`
+- Issue found -> `.claude/context/memory/issues.md`
+- Decision made -> `.claude/context/memory/decisions.md`

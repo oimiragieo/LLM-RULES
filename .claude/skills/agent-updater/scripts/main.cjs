@@ -16,6 +16,14 @@ function findProjectRoot() {
 
 const PROJECT_ROOT = findProjectRoot();
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
+const MANDATORY_SKILLS = Object.freeze([
+  'task-management-protocol',
+  'ripgrep',
+  'code-semantic-search',
+  'token-saver-context-compression',
+  'verification-before-completion',
+  'memory-search',
+]);
 const ORCHESTRATOR_REQUIRED_FILES = Object.freeze([
   '.claude/CLAUDE.md',
   '.claude/workflows/core/router-decision.md',
@@ -82,6 +90,22 @@ function classifyRisk(changes) {
   if (/(permission|model|tool|security|hook|orchestrator)/.test(text)) return 'high';
   if (/(skills|routing|keyword|workflow|protocol)/.test(text)) return 'medium';
   return 'low';
+}
+
+function checkMandatorySkills(agentPath) {
+  const absolutePath = path.join(PROJECT_ROOT, agentPath);
+  if (!fs.existsSync(absolutePath)) {
+    return { present: [], missing: MANDATORY_SKILLS.slice() };
+  }
+  const content = fs.readFileSync(absolutePath, 'utf8');
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!fmMatch) return { present: [], missing: MANDATORY_SKILLS.slice() };
+  const frontmatter = fmMatch[1];
+  const skillLines = frontmatter.match(/^\s*-\s+\S+/gm) || [];
+  const presentSkills = skillLines.map(l => l.replace(/^\s*-\s+/, '').trim());
+  const missing = MANDATORY_SKILLS.filter(s => !presentSkills.includes(s));
+  const present = MANDATORY_SKILLS.filter(s => presentSkills.includes(s));
+  return { present, missing, allPresent: missing.length === 0 };
 }
 
 function findModuleExportInsertionPoint(content) {
@@ -227,12 +251,14 @@ function main(input = null) {
   updateAgentMetadata(resolved.agentPath);
 
   const risk = classifyRisk(options.changes || '');
+  const mandatorySkillsCheck = checkMandatorySkills(resolved.agentPath);
   const patchPlan = buildPatchPlan(resolved.agentPath, resolved.agentName);
   return {
     ok: true,
     trigger,
     target: resolved,
     risk,
+    mandatorySkillsCheck,
     mode:
       String(options.mode || 'plan')
         .trim()
@@ -242,6 +268,7 @@ function main(input = null) {
       "Skill({ skill: 'research-synthesis' })",
       "Skill({ skill: 'skill-updater' }) // if skill parity changes are needed",
       "Skill({ skill: 'verification-before-completion' })",
+      "Skill({ skill: 'memory-search' })",
     ],
     patchPlan,
     tddBacklog: [
@@ -269,4 +296,4 @@ if (require.main === module) {
   process.exit(result.ok ? 0 : 1);
 }
 
-module.exports = { parseArgs, resolveAgentPath, classifyRisk, main };
+module.exports = { parseArgs, resolveAgentPath, classifyRisk, checkMandatorySkills, main };

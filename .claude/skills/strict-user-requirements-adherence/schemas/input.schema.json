@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "strict-user-requirements-adherence Input Schema",
+  "description": "Input validation schema for strict-user-requirements-adherence skill",
+  "type": "object",
+  "required": [],
+  "properties": {},
+  "additionalProperties": true
+}

@@ -1,7 +1,7 @@
 ---
 name: security-architect
 description: Security architecture and threat modeling. OWASP Top 10 2025 analysis, OWASP Agentic AI Top 10 (ASI01-ASI10), AI/LLM security patterns, supply chain security, modern API authentication (OAuth 2.1, DPoP, Passkeys/WebAuthn), vulnerability assessment, and security review for code and infrastructure.
-version: 1.1
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -16,7 +16,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-19T06:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Security Architect Skill
@@ -487,13 +487,23 @@ Review the LLM agent pipeline in src/agents/ for agentic AI security risks
 </usage_example>
 </examples>
 
-## Rules
+## Iron Laws
 
-- Always prioritize findings by severity (CRITICAL > HIGH > MEDIUM > LOW)
-- Provide specific remediation steps with code examples where applicable
-- Consider business context when assessing risk
-- For AI/agentic systems, always run both OWASP Top 10 2025 AND ASI01-ASI10 assessments
-- Never approve production deployment for code handling auth/PII/external data without completed security review
+1. **NEVER** approve production deployment for code handling auth, PII, or external data without a completed security review
+2. **ALWAYS** run both OWASP Top 10 2025 AND ASI01-ASI10 assessments for AI/agentic systems
+3. **ALWAYS** fail securely — design all error paths to deny by default, never allow
+4. **NEVER** trust any input without validation, including data from internal services
+5. **ALWAYS** prioritize findings by severity (CRITICAL > HIGH > MEDIUM > LOW) with specific remediation steps and code examples
+
+## Anti-Patterns
+
+| Anti-Pattern                                | Why It Fails                                                               | Correct Approach                                                             |
+| ------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Approving code without full security review | Partial reviews miss exploitable paths in auth/PII/external data flows     | Complete all STRIDE + OWASP phases before approving production deployment    |
+| Using OWASP 2021 for AI/agentic systems     | AI-specific threats (ASI01-ASI10) are not covered by the standard web list | Always run both OWASP Top 10 2025 and ASI01-ASI10 for any agentic component  |
+| Failing open on security errors             | Error paths become exploitable bypass conditions                           | Design every failure mode to deny access by default                          |
+| Providing vague remediation guidance        | Developers cannot act without specifics                                    | Provide exact code examples and parameterized fix patterns for every finding |
+| Missing severity prioritization             | Critical findings are buried in noise with informational findings          | Triage all findings as CRITICAL > HIGH > MEDIUM > LOW before delivery        |
 
 ## Related Skills
 

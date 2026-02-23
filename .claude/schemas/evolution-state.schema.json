@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://claude-code.anthropic.com/schemas/evolution-state",
   "title": "Evolution State",
   "description": "Tracks the state of self-evolution operations in the Claude Code Enterprise Framework",
@@ -134,7 +134,7 @@
     },
     "researchEntry": {
       "type": "object",
-      "unevaluatedProperties": false,
+      "additionalProperties": false,
       "required": ["query", "source", "findings", "timestamp"],
       "properties": {
         "query": {
@@ -167,7 +167,7 @@
     },
     "completedEvolution": {
       "type": "object",
-      "unevaluatedProperties": false,
+      "additionalProperties": false,
       "required": ["id", "type", "name", "createdAt", "filesCreated"],
       "properties": {
         "id": {
@@ -235,7 +235,7 @@
         },
         "rollbackInfo": {
           "type": "object",
-          "unevaluatedProperties": false,
+          "additionalProperties": false,
           "properties": {
             "canRollback": {
               "type": "boolean"
@@ -251,7 +251,7 @@
     },
     "pattern": {
       "type": "object",
-      "unevaluatedProperties": false,
+      "additionalProperties": false,
       "required": ["id", "description", "frequency", "lastSeen"],
       "properties": {
         "id": {
@@ -311,7 +311,7 @@
     },
     "suggestion": {
       "type": "object",
-      "unevaluatedProperties": false,
+      "additionalProperties": false,
       "required": ["id", "type", "name", "reason", "confidence"],
       "properties": {
         "id": {

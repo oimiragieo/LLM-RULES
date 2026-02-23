@@ -1,7 +1,7 @@
 ---
 name: audit-context-building
 description: Ultra-granular code analysis for deep architectural context building. Line-by-line and block-by-block analysis using First Principles, 5 Whys, 5 Hows methodology at micro scale. Builds mental models, tracks invariants and assumptions, and maps cross-function call flows for security audit preparation.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -15,8 +15,9 @@ best_practices:
   - Document what the code ACTUALLY does, not what comments say it does
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: null
+agents: [security-architect, code-reviewer, developer]
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Audit Context Building Skill
@@ -60,13 +61,13 @@ This skill implements Trail of Bits' audit context building methodology for the 
 - When preparing for threat modeling with concrete code evidence
 - When onboarding to a new codebase section that handles sensitive operations
 
-## Iron Law
+## Iron Laws
 
-```
-NO CONCLUSION WITHOUT LINE-BY-LINE EVIDENCE
-```
-
-Every claim about code behavior MUST be backed by specific line references. If you have not read the code, you do not know what it does.
+1. **NEVER form conclusions without line-by-line evidence** — every claim about code behavior MUST be backed by specific line references; if you have not read the code, you do not know what it does.
+2. **NEVER trust comments over actual code** — comments describe intent, code describes behavior; when they conflict, the code is authoritative; always verify what comments claim.
+3. **NEVER skip error handling paths** — error paths frequently contain security-relevant behavior (fallback auth, leaked stack traces, privilege bypass) that is invisible to happy-path analysis.
+4. **ALWAYS map cross-function call flows before analyzing individual functions** — isolated function analysis misses inter-function trust assumptions; understand the full call chain first.
+5. **ALWAYS record unverified assumptions explicitly** — an unverified assumption is an unexamined risk; mark every assumption with `[UNVERIFIED]` and track it until confirmed or disproven.
 
 ## Anti-Hallucination Rules
 
@@ -266,9 +267,19 @@ The final output is a structured context report:
 | `differential-review` | Reviews fixes for completeness                 |
 | `code-analyzer`       | Provides complexity metrics for prioritization |
 
+## Anti-Patterns
+
+| Anti-Pattern                                  | Why It Fails                                                 | Correct Approach                                           |
+| --------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------- |
+| Skipping to conclusions from function names   | Names describe intent, not behavior; leads to false findings | Read the code line-by-line before forming conclusions      |
+| Trusting comments without reading code        | Comments are often wrong, stale, or misleading               | Treat comments as hypotheses to verify against actual code |
+| Skipping error paths in analysis              | Security bugs often live in error handlers, not happy paths  | Explicitly trace all error branches with equal rigor       |
+| Analyzing functions before mapping call flows | Misses cross-function trust assumptions and data flow        | Map module/call graph in Phase 1 before deep analysis      |
+| Leaving assumptions untracked                 | Unverified assumptions silently become false findings        | Mark every assumption [UNVERIFIED] until confirmed         |
+
 ## Memory Protocol
 
-**Before starting**: Read existing audit context from `.claude/context/reports/` for prior analysis of the same codebase area.
+**Before starting**: Read existing audit context from `.claude/context/reports/backend/` for prior analysis of the same codebase area.
 
 **During analysis**: Write incremental findings to context report file as you discover them. Do not wait until the end.
 

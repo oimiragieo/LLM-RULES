@@ -1,7 +1,7 @@
 ---
 name: postmortem-writing
 description: Write effective blameless postmortems with root cause analysis, timelines, and action items. Use when conducting incident reviews, writing postmortem documents, or improving incident response processes.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Assign owners to action items
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -376,6 +376,14 @@ Don't full-flush cache in production; use targeted invalidation.
 - Document dissenting views
 - Time-box tangents
 ```
+
+## Iron Laws
+
+1. **ALWAYS** write the postmortem within 48 hours of incident resolution — memory fades and operational context is permanently lost after that window.
+2. **NEVER** blame individuals in a postmortem — focus on system conditions, process gaps, and tooling failures that allowed the incident to occur.
+3. **ALWAYS** trace root cause through at least 3 levels of "why" before concluding — proximate causes are symptoms, not the systemic roots that need fixing.
+4. **ALWAYS** assign every action item a specific owner, priority level, and due date — unowned or undated action items are never completed.
+5. **NEVER** skip the "What Went Well" section — reinforcing positive behaviors and successful responses is as critical as fixing the failures.
 
 ## Anti-Patterns to Avoid
 

@@ -14,8 +14,8 @@ best_practices:
   - Store handoffs in persistent memory location
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <identity>
@@ -367,6 +367,24 @@ When you resume, use this prompt:
 - `thinking-tools` - Use think-about-whether-you-are-done before handoff
 - `summarize-changes` - Include summary in handoff document
 </integration>
+
+## Iron Laws
+
+1. **NEVER** create a handoff with vague next steps — always provide a single, immediately actionable step
+2. **ALWAYS** include absolute file paths and copy-pasteable commands, not relative references
+3. **NEVER** assume the receiving agent has any prior context — the document must be fully self-contained
+4. **ALWAYS** capture decisions and their rationale, not just the outcome
+5. **NEVER** skip handoff creation when context approaches 150K tokens or a session boundary is reached
+
+## Anti-Patterns
+
+| Anti-Pattern                                     | Why It Fails                                       | Correct Approach                                                           |
+| ------------------------------------------------ | -------------------------------------------------- | -------------------------------------------------------------------------- |
+| Vague next steps ("continue the implementation") | Receiving agent cannot resume without guessing     | Provide a single, specific immediate action with file path and line number |
+| Missing file paths                               | Receiving agent wastes time re-discovering context | Include absolute paths to all key files and artifacts                      |
+| Assuming prior context                           | Receiving agent starts from wrong state            | Write every section as if the reader has zero prior knowledge              |
+| Skipping decisions rationale                     | Context loss leads to re-debating settled choices  | Document WHY decisions were made alongside WHAT was decided                |
+| Creating handoff after session ends              | Context already lost; handoff is incomplete        | Trigger handoff at 150K tokens, not at context failure                     |
 
 ## Memory Protocol (MANDATORY)
 

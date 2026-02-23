@@ -1,7 +1,7 @@
 ---
 name: code-quality-expert
 description: Code quality expert including clean code, style guides, and refactoring
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Code Quality Expert
@@ -132,6 +132,24 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 This expert skill consolidates 1 individual skills:
 
 - code-quality-expert
+
+## Iron Laws
+
+1. **ALWAYS leave code cleaner than you found it** — every change is an opportunity for progressive improvement; accumulating small improvements prevents large-scale refactors from becoming necessary.
+2. **NEVER use magic numbers** — hard-coded values without context make code unreadable and unmaintainable; always extract to named constants with descriptive names that explain the purpose.
+3. **ALWAYS write self-documenting code first, then add comments only for "why"** — comments explaining "what" the code does are redundant and become stale; reserve comments for non-obvious design decisions.
+4. **NEVER allow functions to do more than one thing** — single responsibility is the strongest predictor of testability and maintainability; a function needing a "and" in its name should be split.
+5. **NEVER optimize prematurely** — write clear, correct code first; profile to identify actual bottlenecks before optimizing; premature optimization produces complex code with unmeasured benefit.
+
+## Anti-Patterns
+
+| Anti-Pattern                                 | Why It Fails                                        | Correct Approach                                           |
+| -------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------- |
+| Magic numbers in logic                       | `if (status === 200)` is opaque; value could change | Extract to `const HTTP_OK = 200` with clear name           |
+| Comments explaining "what" not "why"         | Code changes make comments stale and misleading     | Write self-documenting code; comment only design rationale |
+| God functions (>50 lines, multiple concerns) | Hard to test, debug, and modify independently       | Extract single-purpose functions with clear names          |
+| Premature optimization                       | Adds complexity before proving a bottleneck exists  | Profile first; only optimize measured hot paths            |
+| Duplicated code blocks                       | Bug fixes must be applied in N places               | Extract to reusable function; DRY principle                |
 
 ## Memory Protocol (MANDATORY)
 

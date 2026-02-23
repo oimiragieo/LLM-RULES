@@ -14,7 +14,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-19T06:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Python Backend Expert
@@ -232,6 +232,24 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 This expert skill consolidates 1 individual skills:
 
 - python-backend-expert
+
+## Iron Laws
+
+1. **ALWAYS** use the `lifespan` context manager for FastAPI startup/shutdown resource management — `@app.on_event` is deprecated and will be removed in a future release.
+2. **NEVER** use `session.query()` in SQLAlchemy 2.0+ — use `select()` with the 2.0-style API; legacy query API will be removed.
+3. **ALWAYS** use parameterized queries or the ORM for all database operations — never construct SQL with string interpolation or f-strings (SQL injection vector).
+4. **NEVER** perform blocking I/O in async FastAPI routes — use `async def` with awaitable drivers or `run_in_executor` for blocking operations to avoid event loop starvation.
+5. **ALWAYS** validate all request data at the boundary using Pydantic v2 models — never pass raw request dicts into business logic layers.
+
+## Anti-Patterns
+
+| Anti-Pattern                                          | Why It Fails                                            | Correct Approach                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------- |
+| Using `@app.on_event` for startup/shutdown            | Deprecated in FastAPI; will break on version upgrade    | Use `@asynccontextmanager` with `lifespan` parameter                |
+| Using `session.query()` in SQLAlchemy 2.0+            | Legacy query API is deprecated and will be removed      | Use `select()` statements with `session.execute()`                  |
+| Building SQL strings with f-strings or `%` formatting | SQL injection vulnerability; critical security flaw     | Use parameterized queries via ORM or `text()` with bound params     |
+| Calling blocking I/O directly in `async def` routes   | Blocks the entire event loop; causes cascading latency  | Use awaitable async drivers; `loop.run_in_executor()` for sync code |
+| Putting business logic in FastAPI path functions      | Couples routing to logic; makes unit testing impossible | Extract logic to service/repository layer; inject via `Depends()`   |
 
 ## Memory Protocol (MANDATORY)
 

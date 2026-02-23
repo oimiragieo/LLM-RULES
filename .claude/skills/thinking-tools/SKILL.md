@@ -14,8 +14,8 @@ best_practices:
   - Document gaps found during reflection
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <identity>
@@ -162,7 +162,7 @@ If user wants those improvements, they can request them separately.
    - [ ] Checked for lint/type errors
 
 5. **Loose Ends**:
-   - Any TODOs introduced?
+   - Any open tasks introduced?
    - Any known limitations?
    - Any follow-up work needed?
 
@@ -295,6 +295,24 @@ Decision: Add regression test, then complete.
 - `tdd` - Test-driven development integrates with completion checks
 - `sequential-thinking` - Structured problem decomposition
 </integration>
+
+## Iron Laws
+
+1. **ALWAYS** run think-about-collected-information after any research or exploration phase before proceeding to implementation
+2. **NEVER** skip checkpoints when "almost done" — apply them most rigorously near completion
+3. **ALWAYS** answer checkpoint questions honestly; rationalization defeats the purpose of self-reflection
+4. **NEVER** use checkpoints as ceremony — if a checkpoint reveals a gap, stop and resolve it before continuing
+5. **ALWAYS** document checkpoint failures and resolutions in task metadata for traceability
+
+## Anti-Patterns
+
+| Anti-Pattern                          | Why It Fails                                      | Correct Approach                                   |
+| ------------------------------------- | ------------------------------------------------- | -------------------------------------------------- |
+| Skipping checkpoints when nearly done | Most errors surface late; skipping hides them     | Apply all three checkpoints regardless of progress |
+| Rushing through checkpoint questions  | Superficial answers produce false confidence      | Take 30 seconds per checkpoint, answer honestly    |
+| Rationalizing away red flags          | Excuses mask genuine problems                     | Stop and fix any issue the checkpoint reveals      |
+| Using checkpoints as ceremony         | Checkbox ticking without reflection adds no value | Genuinely assess each question and act on findings |
+| Running only a final checkpoint       | Earlier checkpoints prevent expensive rework      | Use all three at their designated trigger points   |
 
 ## Memory Protocol (MANDATORY)
 

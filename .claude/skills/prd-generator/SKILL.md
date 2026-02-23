@@ -1,7 +1,7 @@
 ---
 name: prd-generator
 description: Generate structured Product Requirements Documents using hypothesis-driven methodology with Implementation Phases tracking.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: agent
 user_invocable: false
@@ -14,8 +14,8 @@ best_practices:
   - Implementation Phases table for traceability
 error_handling: standard
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # PRD Generator Skill
@@ -460,13 +460,23 @@ Add decision to log:
 - Let PRD become stale (update as phases progress)
 - Write PRD for trivial changes
 
-## Iron Law
+## Iron Laws
 
-```
-NO SOLUTION BEFORE PROBLEM DEFINITION
-```
+1. **NEVER** define a solution before articulating the problem with evidence — solution-first thinking generates features no one needs and hypotheses that cannot be validated.
+2. **ALWAYS** include at least one "Won't" item in MoSCoW prioritization — explicit exclusions are what prevent scope creep and uncontrolled feature growth.
+3. **ALWAYS** make the success hypothesis measurable with specific numeric targets — vague outcomes like "better UX" or "faster performance" cannot be validated or refuted.
+4. **ALWAYS** map phase dependencies before implementation begins — undiscovered dependencies cause mid-sprint blockers and cascade delays across the entire roadmap.
+5. **NEVER** let a PRD go stale during implementation — update phase statuses and the decisions log continuously as work progresses and discoveries are made.
 
-If you don't understand the problem, you can't create a valid PRD. Use Progressive Disclosure for unclear requirements.
+## Anti-Patterns
+
+| Anti-Pattern                                        | Why It Fails                                                         | Correct Approach                                                  |
+| --------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Jumping to solution without a problem statement     | Builds the wrong thing; no baseline to measure success               | Define problem with evidence before proposing any solution        |
+| Vague success metrics ("improve UX", "make faster") | Cannot validate hypothesis; no way to know if feature succeeded      | Specify numeric targets: "-50% support tickets", "<2s load time"  |
+| Marking everything as "Must" in MoSCoW              | No prioritization leads to impossible scope and missed deadlines     | Explicitly mark Won't items; treat Could/Should as negotiable     |
+| Phases without dependency mapping                   | Parallel execution assumptions break when dependencies surface       | Map "Depends" column before implementation; block accordingly     |
+| Letting PRD go stale after kickoff                  | Developers lose context; decisions become invisible tribal knowledge | Update phase statuses and decisions log throughout implementation |
 
 ## Example: Complete PRD
 

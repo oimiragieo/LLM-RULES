@@ -58,6 +58,7 @@ function getStagedFiles() {
     cwd: PROJECT_ROOT,
     encoding: 'utf8',
     shell: false,
+    windowsHide: true,
   });
   if (result.status !== 0 || result.error) {
     return [];

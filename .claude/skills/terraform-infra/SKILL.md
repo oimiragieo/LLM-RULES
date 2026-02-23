@@ -12,8 +12,8 @@ best_practices:
   - Never force push to production
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Terraform Infrastructure Skill
@@ -135,6 +135,24 @@ terraform apply tfplan
 | Init failed  | Check provider credentials    |
 | State locked | Check for other operations    |
 | Plan failed  | Review error output carefully |
+
+## Iron Laws
+
+1. **ALWAYS** run `terraform plan` and review the output before executing `terraform apply`
+2. **NEVER** hardcode credentials or secrets in `.tf` files — use secret managers (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
+3. **ALWAYS** use remote state with encryption and state locking to prevent concurrent modifications
+4. **NEVER** edit state files directly — use `terraform state` commands exclusively
+5. **ALWAYS** pin provider and module versions for fully reproducible infrastructure deployments
+
+## Anti-Patterns
+
+| Anti-Pattern                          | Why It Fails                                 | Correct Approach                                      |
+| ------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
+| Hardcoded credentials in .tf files    | Secret exposure in VCS, compliance failure   | Use variables with secret manager backend             |
+| No state locking                      | Concurrent applies corrupt state             | Enable backend locking (S3+DynamoDB, Azure Blob, GCS) |
+| `terraform apply` without plan review | Unexpected resource deletion or recreation   | Always `plan` first, review diff, then `apply`        |
+| Unversioned providers and modules     | Non-reproducible builds and breaking changes | Pin versions: `version = "~> 4.0"`                    |
+| Untagged resources                    | Untrackable costs and compliance failure     | Tag all resources with env, owner, cost-center        |
 
 ## Memory Protocol (MANDATORY)
 

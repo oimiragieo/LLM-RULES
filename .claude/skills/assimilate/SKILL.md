@@ -1,15 +1,15 @@
 ---
 name: assimilate
 description: Benchmark external agent frameworks and convert findings into a concrete TDD upgrade backlog for agent-studio evolution.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch, Skill]
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Assimilate
@@ -24,9 +24,23 @@ Use this skill when the user asks the framework to improve itself, or when EVOLV
 - EVOLVE phase where external pattern benchmarking is needed before creating new artifacts
 - Reflection/recommend-evolution output calls for concrete upgrade candidates
 
-## The Iron Law
+## Iron Laws
 
-Do not implement borrowed ideas directly. First produce a comparable feature map, explicit gap list, and TDD backlog with checkpoints.
+1. **NEVER implement borrowed ideas directly** — always produce a comparable feature map, explicit gap list, and TDD backlog with checkpoints before writing any code; direct copying without analysis creates undetected regressions.
+2. **ALWAYS create workspace under `.claude/context/runtime/assimilate/<run-id>/`** — never clone repos to arbitrary or project-root locations; contained workspaces enable clean teardown and prevent accidental overwrites.
+3. **ALWAYS use shallow clones (`--depth=1`) when possible** — full history is unnecessary for feature analysis and wastes disk; only use full clone when commit history is part of the comparison surface.
+4. **NEVER execute external project scripts during assimilation** — no `npm install`, `make`, or `./setup.sh` from cloned repos; analysis is read-only; untrusted scripts can modify the host environment.
+5. **ALWAYS score gaps by impact×feasibility before writing the TDD backlog** — an unordered backlog wastes implementation effort on low-value items; prioritize by expected benefit divided by complexity.
+
+## Anti-Patterns
+
+| Anti-Pattern                                          | Why It Fails                                         | Correct Approach                                                |
+| ----------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------- |
+| Implementing external patterns without gap analysis   | Blind copying introduces incompatible assumptions    | Always produce feature map and gap list first                   |
+| Cloning repos outside assimilate workspace            | Leftover files pollute project root, hard to clean   | Use `.claude/context/runtime/assimilate/<run-id>/`              |
+| Running `npm install` / project scripts from clones   | Untrusted scripts can modify host environment        | Read-only analysis only; never execute external scripts         |
+| Writing TDD backlog items without acceptance criteria | Developers can't verify completion objectively       | Every backlog item needs RED test + measurable GREEN criteria   |
+| Including gaps without complexity/risk scoring        | Low-value work gets implemented over high-value gaps | Score all gaps: impact, complexity (S/M/L), risk (low/med/high) |
 
 ## Four-Phase Execution
 

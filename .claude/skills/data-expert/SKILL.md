@@ -1,7 +1,7 @@
 ---
 name: data-expert
 description: Data processing expert including parsing, transformation, and validation
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Data Expert
@@ -103,6 +103,24 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 This expert skill consolidates 1 individual skills:
 
 - data-expert
+
+## Iron Laws
+
+1. **ALWAYS** validate all external data at system boundaries using a schema validator (Zod, Pydantic, Joi) — never trust API responses, user input, or file contents without validation.
+2. **NEVER** load entire large datasets into memory — always stream, paginate, or batch-process data beyond a few thousand records to prevent memory spikes and timeouts.
+3. **ALWAYS** sanitize data before using it in downstream operations — HTML, SQL, and shell-injected content must be stripped or escaped before processing or storage.
+4. **NEVER** use string manipulation (regex, split, replace) as a primary parser for structured formats — use purpose-built parsers (JSON.parse, csv-parse, xml2js) for reliable type-safe results.
+5. **ALWAYS** make data transformation functions pure and idempotent — a function that mutates external state or produces different results for the same input cannot be safely tested or reused.
+
+## Anti-Patterns
+
+| Anti-Pattern                                  | Why It Fails                                                                  | Correct Approach                                                       |
+| --------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Trusting API responses without validation     | API schemas change silently; unvalidated data causes downstream type errors   | Validate all responses with Zod/Pydantic schemas at the API boundary   |
+| `fs.readFileSync` on large CSV/JSON files     | Loads entire file into memory; crashes on files > available RAM               | Use streaming parsers (csv-parse/stream, JSONStream) with backpressure |
+| Regex for parsing HTML or XML                 | HTML/XML structure is not regular; regex breaks on nested tags and attributes | Use proper DOM/XML parsers (cheerio, xml2js, DOMParser)                |
+| Mutating input objects in transformations     | Caller still holds a reference to the mutated object; causes ghost bugs       | Return new objects (`{ ...input, newField }`) instead of mutating      |
+| Logging full request/response bodies with PII | PII ends up in log aggregators readable by non-authorized users               | Redact PII fields before logging; log schemas and IDs only             |
 
 ## Memory Protocol (MANDATORY)
 

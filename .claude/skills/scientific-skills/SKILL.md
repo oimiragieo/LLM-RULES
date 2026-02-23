@@ -22,8 +22,8 @@ tools:
   - WebSearch
   - WebFetch
   - Task
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Claude Scientific Skills
@@ -328,6 +328,37 @@ Analyze the molecular dataset for drug-likeness properties.
 - [RDKit Documentation](https://www.rdkit.org/docs/)
 - [Scanpy Documentation](https://scanpy.readthedocs.io/)
 - [BioPython Tutorial](https://biopython.org/wiki/Tutorial)
+
+## Iron Laws
+
+1. **ALWAYS** query scientific databases (PubMed, ChEMBL, UniProt) before performing any analysis — raw analysis without literature and database context produces uninformed conclusions that duplicate prior work.
+2. **NEVER** perform analysis without documenting all steps (data sources, parameters, library versions, transformations) — undocumented research is irreproducible and cannot be peer-reviewed or extended.
+3. **ALWAYS** chain multiple domain-specific skills for complex workflows — single-tool analysis misses interdependencies across biology, chemistry, and clinical domains.
+4. **NEVER** report findings without statistical validation — scientific claims require appropriately sized samples, validated methods, and quantified uncertainty.
+5. **ALWAYS** visualize intermediate results after each major processing step — data errors and outliers surface in visualizations before propagating silently to final conclusions.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                | Why It Fails                                                                        | Correct Approach                                                                                            |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Performing analysis without querying databases first        | Missing context from existing literature duplicates known work and misses prior art | Query PubMed/ChEMBL/UniProt before analysis to ground work in existing scientific knowledge                 |
+| Using a single tool for complex multi-domain analysis       | Single-tool analysis misses domain boundary interdependencies                       | Chain multiple domain-specific skills (rdkit for chemistry, scanpy for single-cell, biopython for genomics) |
+| Skipping intermediate visualization during data processing  | Errors and outliers propagate silently from preprocessing to final results          | Visualize data distribution and quality metrics after each major transformation step                        |
+| Generating hypotheses without reviewing existing literature | Reinvents known solutions and ignores contradictory prior findings                  | Always invoke literature-review skill first; only generate hypotheses after reviewing existing evidence     |
+| Reporting findings without documenting analysis provenance  | Research cannot be reproduced, verified, or extended by other researchers           | Log all data sources, version numbers, parameters, and transformation steps in the research report          |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+Read `.claude/context/memory/learnings.md`
+
+**After completing:**
+
+- New pattern → `.claude/context/memory/learnings.md`
+- Issue found → `.claude/context/memory/issues.md`
+- Decision made → `.claude/context/memory/decisions.md`
+
+> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
 
 ## Version History
 

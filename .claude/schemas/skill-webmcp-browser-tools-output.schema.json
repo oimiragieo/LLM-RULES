@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-webmcp-browser-tools-output.schema.json",
+  "title": "WebMCP Browser Tools Skill Output",
+  "description": "Validates output from webmcp-browser-tools skill invocation",
+  "type": "object",
+  "required": ["output", "status"],
+  "properties": {
+    "output": {
+      "type": "object",
+      "description": "WebMCP skill execution results",
+      "properties": {
+        "toolDefinitions": {
+          "type": "array",
+          "description": "Generated WebMCP tool definitions",
+          "items": {
+            "type": "object",
+            "required": ["name", "description", "inputSchema"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "inputSchema": { "type": "object" },
+              "executeSnippet": { "type": "string" }
+            }
+          }
+        },
+        "integrationAdvice": {
+          "type": "string",
+          "description": "Framework-specific integration guidance"
+        },
+        "browserSupportStatus": {
+          "type": "object",
+          "properties": {
+            "chrome": { "type": "string" },
+            "firefox": { "type": "string" },
+            "safari": { "type": "string" },
+            "polyfillAvailable": { "type": "boolean" },
+            "polyfillPackage": { "type": "string" }
+          }
+        },
+        "filesModified": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files created or modified during integration"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Human-readable summary of what was produced"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed"],
+      "description": "Execution status of the skill"
+    }
+  },
+  "additionalProperties": false
+}

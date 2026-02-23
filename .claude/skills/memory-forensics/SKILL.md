@@ -1,12 +1,12 @@
 ---
 name: memory-forensics
 description: Master memory forensics techniques including memory acquisition, process analysis, and artifact extraction using Volatility and related tools. Use when analyzing memory dumps, investigating incidents, or performing malware analysis from RAM captures.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: [reverse-engineer, security-architect, incident-responder]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Memory Forensics
@@ -505,15 +505,33 @@ floss pid.1234.dmp
 - **Smear**: Memory may change during acquisition
 - **Encryption**: Some data may be encrypted in memory
 
+## Iron Laws
+
+1. **ALWAYS** hash the memory dump immediately after acquisition — memory is volatile and can be challenged in court without a cryptographic integrity record proving the dump was not modified post-capture.
+2. **NEVER** analyze from the live system that produced the dump — writing analysis tool artifacts to the suspect system contaminates volatile evidence and invalidates forensic chain of custody.
+3. **ALWAYS** verify the OS profile before running plugins — wrong profile produces silently incorrect results; `vol -f memory.raw windows.info` must confirm OS version before any plugin output is trusted.
+4. **NEVER** use a single plugin to confirm a finding — `pslist` misses DKOM-hidden processes; cross-validate with `psscan` and `pstree` before reporting any process as hidden.
+5. **ALWAYS** work from a forensic copy, never the original dump — all analysis writes output files to the working directory; working on the original risks accidental modification of the evidence artifact.
+
+## Anti-Patterns
+
+| Anti-Pattern                         | Why It Fails                                                                                               | Correct Approach                                                                              |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Skipping acquisition hash            | Dump integrity cannot be proven in court or peer review; challenges invalidate all findings                | Hash immediately: `sha256sum memory.raw > memory.raw.sha256` before any analysis              |
+| Wrong OS profile                     | Incorrect offsets produce garbage output with no error — findings appear valid but are fabricated          | Run `vol -f memory.raw windows.info` first; confirm OS version and build before other plugins |
+| Analyzing on the live suspect system | Tool artifacts contaminate volatile evidence; file timestamps change; live-response tools modify RAM state | Acquire dump, transfer to isolated analysis workstation, analyze the copy only                |
+| Trusting a single plugin             | DKOM rootkits hide from `pslist` linked-list traversal but appear in `psscan` pool scan                    | Cross-validate process lists with at least `pslist`, `psscan`, and `pstree` before reporting  |
+| Missing timeline correlation         | Memory artifacts without disk/network context cannot establish causality or attacker timeline              | Correlate memory findings with event logs and PCAP before writing the incident report         |
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
-Read `C:\dev\projects\agent-studio\.claude\context\memory\learnings.md`
+Read `.claude/context/memory/learnings.md`
 
 **After completing:**
 
-- New pattern -> `C:\dev\projects\agent-studio\.claude\context\memory\learnings.md`
-- Issue found -> `C:\dev\projects\agent-studio\.claude\context\memory\issues.md`
-- Decision made -> `C:\dev\projects\agent-studio\.claude\context\memory\decisions.md`
+- New pattern -> `.claude/context/memory/learnings.md`
+- Issue found -> `.claude/context/memory/issues.md`
+- Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.

@@ -1,7 +1,7 @@
 ---
 name: agent-evaluation
 description: LLM-as-judge evaluation framework with 5-dimension rubric (accuracy, groundedness, coherence, completeness, helpfulness) for scoring AI-generated content quality with weighted composite scores and evidence citations
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -270,13 +270,24 @@ Skill({ skill: 'verification-before-completion' });
 TaskUpdate({ taskId: 'X', status: 'completed' });
 ```
 
-## Iron Law
+## Iron Laws
 
-```
-NO COMPLETION CLAIM WITHOUT EVALUATION EVIDENCE
-```
+1. **NO COMPLETION CLAIM WITHOUT EVALUATION EVIDENCE** — If composite score < 2.5 (POOR or FAILING), rework the output before marking any task complete.
+2. **ALWAYS score all 5 dimensions** — never skip dimensions to save time; each dimension catches different failure modes (accuracy ≠ completeness ≠ groundedness).
+3. **ALWAYS cite specific evidence** for every dimension score — `"Evidence: [file:line or direct quote]"` is mandatory, not optional. Assertions without grounding are invalid.
+4. **ALWAYS use the weighted composite** — `accuracy×0.30 + groundedness×0.25 + completeness×0.20 + coherence×0.15 + helpfulness×0.10`. Never use simple average.
+5. **NEVER evaluate before the work is complete** — evaluating incomplete outputs produces falsely low scores and wastes context budget.
 
-If composite score < 2.5 (POOR or FAILING), the output MUST be reworked before task completion. Do not skip evaluation under time pressure — systematic evaluation is faster than discovering quality failures post-completion.
+## Anti-Patterns
+
+| Anti-Pattern                       | Why It Fails                                                 | Correct Approach                                         |
+| ---------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
+| Skipping dimensions to save time   | Each dimension catches different failures                    | Always score all 5 dimensions                            |
+| No evidence citation per dimension | Assertions without grounding are invalid                     | Quote specific text or file:line for every score         |
+| Using simple average for composite | Accuracy (30%) matters more than helpfulness (10%)           | Use the weighted composite formula                       |
+| Only checking EXCELLENT vs FAILING | ADEQUATE outputs need targeted improvements, not full rework | Use all 5 verdict tiers with appropriate action per tier |
+| Evaluating before work is done     | Incomplete outputs score falsely low                         | Evaluate completed outputs only                          |
+| Treating evaluation as binary gate | Quality is a spectrum; binary pass/fail loses nuance         | Use composite score + per-dimension breakdown together   |
 
 ## Assigned Agents
 

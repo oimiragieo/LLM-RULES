@@ -1,15 +1,15 @@
 ---
 name: planning-with-files
 description: Manus-style file-based planning for complex tasks. Use task_plan.md, findings.md, and progress.md to maintain persistent context. Use for multi-step tasks, research, or work spanning many tool calls.
-version: 1.0.0
+version: 1.1.0
 tools:
   - Read
   - Write
   - Edit
   - TaskUpdate
   - TaskList
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Planning with Files - Manus-Style File-Based Planning
@@ -315,15 +315,15 @@ Phase 1
 
 ## Requirements
 
-## <!-- Captured from user request -->
+_Add requirements captured from user request here._
 
 ## Research Findings
 
-## <!-- Key discoveries during exploration -->
+_Document key discoveries during exploration here._
 
 ## Technical Decisions
 
-<!-- Decisions made with rationale -->
+_Record decisions made with rationale._
 
 | Decision | Rationale |
 | -------- | --------- |
@@ -331,7 +331,7 @@ Phase 1
 
 ## Issues Encountered
 
-<!-- Errors and how they were resolved -->
+_Document errors and how they were resolved._
 
 | Issue | Resolution |
 | ----- | ---------- |
@@ -339,11 +339,11 @@ Phase 1
 
 ## Resources
 
-## <!-- URLs, file paths, API references -->
+_Add URLs, file paths, and API references here._
 
 ## Visual/Browser Findings
 
-## <!-- CRITICAL: Update after every 2 view/browser operations -->
+_CRITICAL: Update after every 2 view/browser operations._
 ```
 
 ### progress.md Template
@@ -357,8 +357,8 @@ Phase 1
 
 - **Status:** in_progress
 - **Started:** [timestamp]
-- ## Actions taken:
-- ## Files created/modified:
+- Actions taken:
+- Files created/modified:
 
 ## Test Results
 
@@ -383,16 +383,23 @@ Phase 1
 | What have I done?    | See above        |
 ```
 
+## Iron Laws
+
+1. **ALWAYS** create `task_plan.md`, `findings.md`, and `progress.md` before starting any complex task — filesystem memory survives context resets, working memory does not.
+2. **ALWAYS** re-read `task_plan.md` before making major decisions — context windows are volatile, files persist indefinitely.
+3. **NEVER** retry a failed action with identical inputs — log the failure in the plan file, diagnose the root cause, and mutate the approach.
+4. **ALWAYS** write multimodal findings (screenshots, browser data) to `findings.md` immediately after capture — visual context cannot be retrieved once it leaves the attention window.
+5. **NEVER** mark a task complete without verifying all phases are `complete` and all deliverables are present in the progress file.
+
 ## Anti-Patterns
 
-| Don't                          | Do Instead                      |
-| ------------------------------ | ------------------------------- |
-| Use TodoWrite for persistence  | Create task_plan.md file        |
-| State goals once and forget    | Re-read plan before decisions   |
-| Hide errors and retry silently | Log errors to plan file         |
-| Stuff everything in context    | Store large content in files    |
-| Start executing immediately    | Create plan file FIRST          |
-| Repeat failed actions          | Track attempts, mutate approach |
+| Anti-Pattern                             | Why It Fails                                               | Correct Approach                                        |
+| ---------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------- |
+| Using session task tools for persistence | In-memory task tracking is volatile; lost on context reset | Create `task_plan.md` file on disk — survives resets    |
+| Stating goals once and forgetting them   | Context fills; goals drift without anchoring               | Re-read plan file before every major decision           |
+| Hiding errors and retrying silently      | Silent retries repeat the same failure endlessly           | Log every error to plan file with attempt count         |
+| Stuffing all research into context       | Context window fills; earlier content gets lost            | Store large content and discoveries in `findings.md`    |
+| Starting execution without a plan        | Undefined scope leads to wasted work and missed steps      | Create all three planning files FIRST before any action |
 
 ## The Manus Principles
 

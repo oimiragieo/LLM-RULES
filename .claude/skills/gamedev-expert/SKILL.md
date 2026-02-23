@@ -1,7 +1,7 @@
 ---
 name: gamedev-expert
 description: Game development expert including DragonRuby, Unity, and game mechanics
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Gamedev Expert
@@ -75,6 +75,24 @@ User: "Review this code for gamedev best practices"
 Agent: [Analyzes code against consolidated guidelines and provides specific feedback]
 ```
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** use object pooling for frequently instantiated game objects (bullets, particles, enemies) — creating and destroying objects every frame triggers garbage collection pauses that cause visible frame drops.
+2. **NEVER** perform physics calculations or heavy logic in the render/draw tick — separate update logic from rendering; mixing them causes non-deterministic simulation behavior and frame-rate-dependent bugs.
+3. **ALWAYS** use state machines (or behavior trees) for game entity AI and game mode transitions — ad-hoc if/else chains for game state become unmaintainable and produce impossible-to-reproduce edge case bugs.
+4. **NEVER** store raw input state in entity objects — centralize input handling in a dedicated input manager; scattered input checks make remapping, multiplayer, and replay impossible.
+5. **ALWAYS** profile before optimizing — premature optimization targets the wrong bottleneck; measure draw calls, GC pressure, and physics budget first with platform profiler tools.
+
+## Anti-Patterns
+
+| Anti-Pattern                                 | Why It Fails                                                             | Correct Approach                                                                |
+| -------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Instantiating/destroying objects every frame | GC pressure causes frame hitches; performance degrades with entity count | Use object pools; reuse pre-allocated instances by resetting and re-enabling    |
+| Game logic in the render step                | Frame-rate-dependent behavior; desync between logic and display          | Separate fixed-rate update loop from variable-rate render loop                  |
+| Ad-hoc if/else for entity states             | Impossible edge cases; transitions undefined for unexpected state combos | Use explicit state machine with defined transitions and entry/exit hooks        |
+| Direct input polling in entity update        | Breaks remapping, replay, and multiplayer input sync                     | Route all input through centralized input manager updated once per frame        |
+| Optimizing without profiling                 | Wrong bottleneck targeted; CPU/GPU budget guesses are often wrong        | Profile with Unity Profiler or platform tools; optimize measured hot paths only |
 
 ## Consolidated Skills
 

@@ -1,11 +1,11 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://claude-code.anthropic.com/schemas/agent-definition",
   "title": "Agent Definition Schema",
   "description": "Schema for validating Claude Code agent definition files",
   "type": "object",
   "required": ["frontmatter", "content"],
-  "unevaluatedProperties": false,
+  "additionalProperties": false,
   "properties": {
     "frontmatter": {
       "type": "object",
@@ -123,11 +123,11 @@
               "maxItems": 50
             }
           },
-          "unevaluatedProperties": false,
+          "additionalProperties": false,
           "description": "Hooks for tool use events"
         }
       },
-      "unevaluatedProperties": false
+      "additionalProperties": false
     },
     "content": {
       "type": "string",

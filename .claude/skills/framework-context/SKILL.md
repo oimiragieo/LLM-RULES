@@ -1,15 +1,15 @@
 ---
 name: framework-context
 description: Load and synthesize framework architecture context for reflection and planning tasks.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Skill]
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Framework Context
@@ -24,11 +24,23 @@ Provide a consistent, source-anchored model of this framework so agents can reas
 - Planning tasks that depend on routing/memory/workflow architecture
 - Capability-gap analysis before recommending ecosystem evolution
 
-## The Iron Law
+## Iron Laws
 
-```
-NO SYSTEM-LEVEL REFLECTION WITHOUT LOADING FRAMEWORK CONTEXT FIRST.
-```
+1. **ALWAYS** load framework context before any system-level reflection, planning, or capability-gap analysis — reasoning about architecture without grounding produces hallucinated paths and phantom agents.
+2. **NEVER** fabricate file paths or agent names that are not confirmed by reading canonical sources — invented paths break downstream agents that try to use them.
+3. **ALWAYS** scope the context load to only what the consuming task needs (`memory`, `agents`, `workflows`, `hooks`, or `all`) — loading all sources for a narrow task wastes tokens and buries relevant signals.
+4. **NEVER** write or modify framework files from within this skill — framework-context is read-only; mutations require the appropriate creator/updater skill.
+5. **ALWAYS** report missing sources explicitly as `missing source: <path>` rather than silently omitting a section — silent omissions cause downstream agents to make decisions on incomplete context.
+
+## Anti-Patterns
+
+| Anti-Pattern                                      | Why It Fails                                                     | Correct Approach                                                           |
+| ------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Skipping context load before reflection           | Reflection uses stale or hallucinated routing/memory assumptions | Always invoke framework-context first; never reflect from memory alone     |
+| Loading full `all` scope for a narrow task        | Token budget consumed by irrelevant sections; key signal buried  | Pass `--scope memory` or `--scope agents` to limit output to what's needed |
+| Inferring file paths from naming conventions      | Paths change; inferred paths break agent pipelines               | Always read canonical sources and report actual paths found                |
+| Writing to framework files inside this skill      | Bypasses creator workflow and post-creation integration steps    | Use appropriate creator/updater skill for any write operations             |
+| Silently omitting sections when source is missing | Consumer assumes context is complete; makes decisions on gaps    | Report `missing source: <path>` explicitly for every unresolvable section  |
 
 <identity>
 Framework grounding skill for memory architecture, routing, workflows, hooks, and directory layout.

@@ -1,15 +1,15 @@
 ---
 name: readme
 description: Use when creating, updating, or generating README and documentation files for projects and libraries
-version: 1.0.0
+version: 1.1.0
 tools:
   - Read
   - Write
   - Edit
   - Grep
   - Glob
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Readme Skill
@@ -238,6 +238,24 @@ option2: 'value'
 | No table of contents | Hard to navigate      | Add section links at top          |
 | Broken links         | Poor user experience  | Test all external links           |
 | Marketing fluff      | Lacks substance       | Focus on what it does, not hype   |
+
+## Iron Laws
+
+1. **ALWAYS** lead with the value proposition — the first paragraph must answer "what problem does this solve?" before any installation or setup instructions.
+2. **NEVER** write a Quick Start section longer than 10 lines — if setup requires more, link to a detailed guide rather than overwhelming the first-time reader.
+3. **ALWAYS** include working, copy-paste-ready code examples — non-runnable pseudocode examples are worse than no examples because they waste the reader's time.
+4. **NEVER** let a README become stale after a feature release — outdated installation commands and broken examples destroy user trust immediately.
+5. **ALWAYS** test all external links and code examples before considering the README complete — dead links and broken examples are the most common README failure mode.
+
+## Anti-Patterns
+
+| Anti-Pattern                                             | Why It Fails                                                             | Correct Approach                                                                 |
+| -------------------------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Starting with a long feature list before the description | Readers don't know what the project is, so features are meaningless      | Lead with a 1-2 sentence value proposition before listing features               |
+| Using pseudocode or placeholder examples                 | Forces readers to infer the real API; causes frustration and abandonment | Show actual runnable code with real imports, function names, and expected output |
+| Putting a 20-step installation guide in Quick Start      | Overwhelming setup drives users away; contradicts "quick" start          | Quick Start must be 1-3 commands; link detailed setup to a separate guide        |
+| Writing marketing copy instead of technical facts        | Vague statements like "blazing fast" give no actionable information      | Use specific claims with data: "reduces build time by 40% (measured on 10k LOC)" |
+| Not updating README when features change                 | Outdated commands fail silently; users blame the project, not the docs   | Treat README as code: update it in the same PR as every feature change           |
 
 ## Integration Points
 

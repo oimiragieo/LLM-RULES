@@ -231,8 +231,8 @@ const DISAMBIGUATION_RULES = {
   swarm_coordinator: [
     {
       condition: ['party mode', 'consensus voting', 'agent debate'],
-      prefer: 'party_mode',
-      deprioritize: 'swarm_coordinator',
+      prefer: 'party-orchestrator',
+      deprioritize: 'swarm-coordinator',
     },
   ],
 };

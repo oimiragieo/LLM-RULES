@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "memory-search Input Schema",
+  "description": "Input validation schema for memory-search skill",
+  "type": "object",
+  "required": [
+    "query"
+  ],
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "The search query to look up in memory context."
+    }
+  },
+  "additionalProperties": false
+}

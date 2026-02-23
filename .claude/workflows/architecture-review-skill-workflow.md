@@ -179,7 +179,7 @@ Analyze architectural patterns and quality metrics.
    - DRY/KISS/YAGNI compliance
 5. Assess coupling, cohesion, and modularity
 6. Identify architectural anti-patterns and smell indicators
-7. Save analysis to: .claude/context/reports/architecture-review-patterns.md
+7. Save analysis to: .claude/context/reports/architecture/architecture-review-patterns.md
 
 ## Analysis Framework
 | Dimension | Indicators | Rating Scale |
@@ -222,7 +222,7 @@ Assess technical debt and maintenance burden.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/architect.md
-2. Read pattern analysis: .claude/context/reports/architecture-review-patterns.md
+2. Read pattern analysis: .claude/context/reports/architecture/architecture-review-patterns.md
 3. **Invoke skill**: Skill({ skill: "code-analyzer" })
 4. Identify and categorize technical debt:
    - Code debt (duplication, complexity, outdated patterns)
@@ -231,7 +231,7 @@ Assess technical debt and maintenance burden.
    - Documentation debt (stale docs, missing comments)
 5. Estimate remediation effort for each item
 6. Prioritize based on impact and effort
-7. Save assessment to: .claude/context/reports/architecture-review-techdebt.md
+7. Save assessment to: .claude/context/reports/architecture/architecture-review-techdebt.md
 
 ## Debt Categorization Matrix
 | Category | Impact | Effort | Priority |
@@ -301,7 +301,7 @@ Perform comprehensive security architecture review.
 6. Review authentication and authorization patterns
 7. Assess data protection (encryption, masking, retention)
 8. Identify attack surfaces and trust boundaries
-9. Save findings to: .claude/context/reports/architecture-review-security.md
+9. Save findings to: .claude/context/reports/architecture/architecture-review-security.md
 
 ## Security Checklist
 - [ ] Authentication mechanisms reviewed
@@ -352,7 +352,7 @@ Scan dependencies for security vulnerabilities.
 4. Identify outdated dependencies with known vulnerabilities
 5. Assess transitive dependency risks
 6. Create upgrade recommendations
-7. Save scan results to: .claude/context/reports/architecture-review-deps.md
+7. Save scan results to: .claude/context/reports/architecture/architecture-review-deps.md
 
 ## Output Format
 - Dependency inventory with versions
@@ -403,10 +403,10 @@ Consolidate all architecture review findings into actionable recommendations.
 2. Read all previous phase outputs:
    - .claude/context/exploration/architecture-review-structure.md
    - .claude/context/exploration/architecture-review-docs.md
-   - .claude/context/reports/architecture-review-patterns.md
-   - .claude/context/reports/architecture-review-techdebt.md
-   - .claude/context/reports/architecture-review-security.md
-   - .claude/context/reports/architecture-review-deps.md
+   - .claude/context/reports/architecture/architecture-review-patterns.md
+   - .claude/context/reports/architecture/architecture-review-techdebt.md
+   - .claude/context/reports/architecture/architecture-review-security.md
+   - .claude/context/reports/architecture/architecture-review-deps.md
 3. Synthesize findings across all dimensions
 4. Remove duplicates and consolidate related issues
 5. Create unified prioritization based on:
@@ -414,7 +414,7 @@ Consolidate all architecture review findings into actionable recommendations.
    - Security risk (vulnerability severity)
    - Technical debt cost (maintenance burden)
 6. Generate executive summary for stakeholders
-7. Save consolidated report to: .claude/context/reports/architecture-review-final.md
+7. Save consolidated report to: .claude/context/reports/architecture/architecture-review-final.md
 
 ## Output Format (architecture-review-final.md)
 

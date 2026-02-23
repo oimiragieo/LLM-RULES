@@ -1,6 +1,6 @@
 ---
 name: next-upgrade
-version: '1.0.0'
+version: '1.1.0'
 description: Structured workflow for upgrading Next.js applications across major versions. Use when migrating a Next.js project from one major version to another (e.g., 13 to 14, 14 to 15, 15 to 16). Covers codemod automation, breaking change detection, incremental migration paths, and post-upgrade validation.
 license: MIT
 category: Frameworks
@@ -19,13 +19,13 @@ tools:
   - Write
   - Edit
   - Bash
-invoked_by: Skill({ skill: 'next-upgrade' })
+invoked_by: "Skill({ skill: 'next-upgrade' })"
 user_invocable: true
 metadata:
   author: vercel-labs
   source: vercel-labs/next-skills
-verified: false
-lastVerifiedAt: 2026-02-21T00:00:00.000Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Next.js Upgrade Workflow
@@ -305,6 +305,24 @@ Next.js 13 -> 14 -> 15 -> 16
 1. Middleware API changed in Next.js 13 (moved to root)
 2. `NextResponse.rewrite()` behavior changed in 15
 3. Check matcher configuration syntax
+
+## Iron Laws
+
+1. **ALWAYS** upgrade on a dedicated branch, never on main directly — upgrade branches can be rebased or reverted without disrupting production; direct main upgrades risk deploying half-migrated code.
+2. **NEVER** skip intermediate versions in a multi-version jump — Next.js codemods are version-specific and do not compose correctly across major versions; skipping steps leaves un-migrated breaking changes.
+3. **ALWAYS** run official codemods before making manual changes — codemods handle the bulk of mechanical migrations; manual-first approaches miss patterns and create divergence from the reference migration path.
+4. **NEVER** use `--legacy-peer-deps` without documenting the specific conflict and resolution plan — suppressing peer errors hides version conflicts that will cause runtime failures.
+5. **ALWAYS** validate with a full build plus test suite before merging — the dev server does not exercise SSG, edge runtime, or build optimizations that can fail silently post-upgrade.
+
+## Anti-Patterns
+
+| Anti-Pattern                                     | Why It Fails                                                                                  | Correct Approach                                                                        |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Upgrading on the main branch directly            | Half-migrated code can reach production; rollback requires a revert commit                    | Always create `upgrade/nextjs-{version}` branch; merge only after full validation       |
+| Skipping intermediate versions                   | Version-specific codemods are not composable; skipped breaking changes cause runtime failures | Upgrade one major version at a time: 13→14→15→16; commit a checkpoint at each step      |
+| Manual migration before running codemods         | Creates divergence from codemod output; codemods cannot merge cleanly with manual edits       | Run codemods first; apply manual fixes only for patterns codemods could not handle      |
+| Using `--legacy-peer-deps` without documentation | Hidden version conflicts cause runtime failures not visible at install time                   | Resolve conflicts explicitly; use the flag only with a documented justification         |
+| Validating only in dev mode                      | Dev server skips SSG, edge runtime, and build optimizations that can fail post-upgrade        | Run `npm run build` plus the full test suite; check SSR, SSG, and API routes explicitly |
 
 ## References
 

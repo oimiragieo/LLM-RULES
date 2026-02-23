@@ -1,11 +1,11 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://claude-code.anthropic.com/schemas/hook-definition",
   "title": "Hook Definition Schema",
   "description": "Schema for validating Claude Code hook definition and registration",
   "type": "object",
   "required": ["name", "type", "purpose"],
-  "unevaluatedProperties": false,
+  "additionalProperties": false,
   "properties": {
     "name": {
       "type": "string",
@@ -21,6 +21,7 @@
         "PostToolUseFailure",
         "UserPromptSubmit",
         "SessionEnd",
+        "PreCompact",
         "Stop"
       ],
       "description": "Hook trigger type"
@@ -63,7 +64,7 @@
     },
     "exitCodes": {
       "type": "object",
-      "unevaluatedProperties": false,
+      "additionalProperties": false,
       "properties": {
         "allow": {
           "type": "integer",

@@ -1,7 +1,7 @@
 ---
 name: writing-skills
 description: TDD applied to documentation - create production-ready skills. Use when authoring new skills. Includes writing style guidelines for clear prose.
-version: 1.1
+version: 1.1.0
 aliases: [writing]
 model: opus
 invoked_by: both
@@ -14,8 +14,8 @@ best_practices:
   - Description must be trigger conditions only
 error_handling: strict
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Writing Skills
@@ -666,7 +666,7 @@ Deploying untested skills = deploying untested code. It's a violation of quality
 
 ## Skill Creation Checklist (TDD Adapted)
 
-**IMPORTANT: Use TodoWrite to create todos for EACH checklist item below.**
+**IMPORTANT: Use TaskCreate to create tasks for EACH checklist item below.**
 
 **RED Phase - Write Failing Test:**
 
@@ -844,6 +844,24 @@ When writing skill content, follow these prose guidelines for clear, direct comm
 - Use periods instead of commas when possible for clarity.
 
 ---
+
+## Iron Laws
+
+1. **ALWAYS** apply TDD: start with a RED baseline (document current behavior without the skill) before writing any skill
+2. **NEVER** include implementation details or "how" instructions in the skill description — it must be trigger conditions only
+3. **ALWAYS** close loopholes from new rationalizations in the REFACTOR phase before marking a skill complete
+4. **NEVER** publish a skill without validating it passes the validator (8/0/3 minimum)
+5. **ALWAYS** write in plain, active voice; eliminate passive constructions and vague phrases in skill content
+
+## Anti-Patterns
+
+| Anti-Pattern                             | Why It Fails                                     | Correct Approach                                   |
+| ---------------------------------------- | ------------------------------------------------ | -------------------------------------------------- |
+| Skipping the RED baseline                | Can't measure improvement without a baseline     | Run test without skill first, document failures    |
+| Descriptions with implementation details | Triggers on wrong conditions, confuses routing   | Limit description to trigger conditions only       |
+| Soft, hedged language in skill content   | Ambiguous rules don't change agent behavior      | Use imperative ALWAYS/NEVER with specific criteria |
+| No loophole-closing REFACTOR phase       | Agents find edge cases and rationalize them away | Iterate on skill after observing failure modes     |
+| Publishing without validator check       | Integration gaps go undetected                   | Run validate-integration.cjs, target 8/0/3         |
 
 ## Memory Protocol (MANDATORY)
 

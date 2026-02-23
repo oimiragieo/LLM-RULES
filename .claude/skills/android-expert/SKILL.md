@@ -1,7 +1,7 @@
 ---
 name: android-expert
 description: Comprehensive Android development expert covering Jetpack Compose, Kotlin coroutines/Flow, Architecture Components, Hilt DI, Navigation, testing, performance, Material Design 3, and modern Android patterns (MVI, Clean Architecture).
-version: 2.0.0
+version: 2.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -325,7 +325,7 @@ Use `Flow` for reactive streams. Prefer `StateFlow`/`SharedFlow` in ViewModels.
 ```kotlin
 // Repository: expose cold Flow
 fun observeOrders(): Flow<List<Order>> = dao.observeAll().map { entities ->
-    entities.map { it.toDomain() }
+    entities.map { it.toModel() }
 }
 
 // ViewModel: convert to StateFlow for UI
@@ -1111,6 +1111,14 @@ signingConfigs {
 -keepattributes Signature, Exceptions
 -keep class retrofit2.** { *; }
 ```
+
+## Iron Laws
+
+1. **ALWAYS collect Flow in Compose with `collectAsStateWithLifecycle()`** — never use `collectAsState()` which ignores lifecycle; `collectAsStateWithLifecycle()` pauses collection when the app is backgrounded, preventing resource waste.
+2. **NEVER expose mutable state from ViewModel** — expose `StateFlow`/`SharedFlow` via `asStateFlow()`/`asSharedFlow()`; keep `MutableStateFlow`/`MutableSharedFlow` private to prevent external mutation.
+3. **ALWAYS provide content descriptions for icon-only buttons** — screen readers cannot convey icon meaning without `contentDescription`; never pass `null` to icons in interactive elements.
+4. **NEVER use `runBlocking` in production code** — `runBlocking` blocks the calling thread; use `viewModelScope.launch` or `lifecycleScope.launch` for all coroutine launches.
+5. **ALWAYS provide stable keys in `LazyColumn`/`LazyRow`** — missing `key` lambda causes full list recomposition on any data change; always use `key = { item.id }`.
 
 ## Anti-Patterns to Avoid
 

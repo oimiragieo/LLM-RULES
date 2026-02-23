@@ -3,8 +3,9 @@
 
 const fs = require('fs');
 const path = require('path');
+const { findProjectRoot } = require('../../lib/utils/project-root.cjs');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+const PROJECT_ROOT = findProjectRoot(__dirname);
 const CLAUDE_MD_PATH = path.join(PROJECT_ROOT, '.claude', 'CLAUDE.md');
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
 

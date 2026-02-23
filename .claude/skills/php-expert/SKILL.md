@@ -1,7 +1,7 @@
 ---
 name: php-expert
 description: PHP expert including Laravel, WordPress, and Drupal development
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Php Expert
@@ -97,6 +97,24 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 This expert skill consolidates 1 individual skills:
 
 - php-expert
+
+## Iron Laws
+
+1. **ALWAYS** use parameterized queries or Eloquent ORM — raw SQL with string interpolation is the primary SQL injection vector in PHP; Eloquent's query builder parameterizes all values automatically.
+2. **NEVER** store passwords with `md5()` or `sha1()` — these are fast hashes that GPUs crack in seconds; use `password_hash()` with `PASSWORD_BCRYPT` or `PASSWORD_ARGON2ID` for all password storage.
+3. **ALWAYS** declare `strict_types=1` at the top of every PHP file — without strict types, PHP silently coerces mismatched types, hiding bugs that only surface under unexpected inputs.
+4. **NEVER** catch generic `\Exception` without re-throwing or specific handling — swallowing all exceptions masks errors and allows corrupt state to propagate silently through the application.
+5. **ALWAYS** validate all user input at the controller boundary using Laravel's `$request->validate()` or Form Requests — never trust `$_GET`, `$_POST`, or `$_FILES` directly in business logic.
+
+## Anti-Patterns
+
+| Anti-Pattern                                       | Why It Fails                                                         | Correct Approach                                                              |
+| -------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Raw SQL with string interpolation                  | Primary SQL injection vector; user input executed as SQL             | Use Eloquent ORM or PDO parameterized queries for all database access         |
+| Passwords stored with md5() or sha1()              | Fast hashes cracked in seconds by GPU rainbow tables                 | Use `password_hash()` with `PASSWORD_BCRYPT` or `PASSWORD_ARGON2ID`           |
+| Missing `strict_types=1`                           | PHP silently coerces types; bugs hide until unexpected inputs arrive | Declare `<?php declare(strict_types=1);` at the top of every PHP file         |
+| Catching generic `\Exception` silently             | Masks errors; corrupt state propagates; impossible to debug          | Catch specific exceptions; log with context; re-throw or handle explicitly    |
+| Directly using `$_GET`/`$_POST` without validation | Enables injection, XSS, and business logic bypass                    | Validate at controller boundary using `$request->validate()` or Form Requests |
 
 ## Memory Protocol (MANDATORY)
 

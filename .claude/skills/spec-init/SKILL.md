@@ -6,8 +6,8 @@ model: sonnet
 invoked_by: user
 user_invocable: true
 tools: [Read, Write, Edit]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # SKILL: spec-init
@@ -231,6 +231,24 @@ spec-init workflow:
 - spec-validator (schema validation)
 - plan-generator (next step)
 - track-metadata schema (metadata)
+
+## Iron Laws
+
+1. **NEVER** ask more than 7 clarifying questions — detect optimal stopping and generate the spec
+2. **ALWAYS** detect the intent type (feature/bug/chore/refactor/docs) before any questioning
+3. **NEVER** generate a spec without validating all required sections are populated
+4. **ALWAYS** save the spec to `.claude/context/artifacts/specs/` with the correct naming convention
+5. **NEVER** skip track metadata — every spec must include trackId, type, status, and created_at
+
+## Anti-Patterns
+
+| Anti-Pattern                       | Why It Fails                                              | Correct Approach                                                             |
+| ---------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Asking 10-12 fixed questions       | Over-questioning reduces user engagement                  | Use progressive disclosure; stop at 5-7 questions when context is sufficient |
+| Skipping intent type detection     | Questions don't adapt to the task type                    | Always classify the request as feature/bug/chore/refactor/docs first         |
+| Generating spec without validation | Incomplete specs reach the planner                        | Validate all required sections before saving the spec                        |
+| Missing track metadata             | Spec cannot be tracked or referenced by downstream agents | Always populate trackId, type, status, and created_at fields                 |
+| Saving to wrong location           | Specs are not discoverable by other agents                | Always save to `.claude/context/artifacts/specs/` with standard naming       |
 
 ## Memory Protocol (MANDATORY)
 

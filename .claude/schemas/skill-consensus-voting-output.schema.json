@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://agent-studio.dev/schemas/skill-consensus-voting-output.json",
   "title": "Consensus Voting Skill Output",
   "description": "Output structure for consensus-voting skill implementing Byzantine consensus protocols",

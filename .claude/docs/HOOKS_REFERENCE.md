@@ -69,6 +69,13 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `code-index-updater.cjs`: Updates code index after writes.
 - `post-edit-scanner.cjs`: Scans files after editing.
 - `unified-reflection-handler.cjs`: Handles reflection logic.
+- `audit-skill-recency.cjs`: Audits skill usage recency.
+- `bypass-audit-hook.cjs`: Manages bypass audit.
+- `external-content-guard.cjs`: Guards against unsafe external content.
+- `router-tool-lockdown.cjs`: Locks down router tools.
+- `stale-task-detector.cjs`: Detects stale tasks.
+- `task-pretool-orchestrator.cjs`: Orchestrates pretool tasks.
+- `workflow-watchdog-hook.cjs`: Watchdog for workflows.
 
 ### SessionEnd
 

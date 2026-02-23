@@ -4,7 +4,7 @@ description: >-
   AI-first security scanning with Medusa. 3,000+ detection patterns covering AI/ML, agents, MCP,
   RAG, prompt injection, and traditional SAST vulnerabilities. Wraps Medusa CLI with SARIF/JSON
   parsing, structured finding output, OWASP mapping, and remediation guidance.
-version: 1.0.0
+version: 1.1.0
 category: security
 model: sonnet
 invoked_by: agent
@@ -20,8 +20,8 @@ best_practices:
   - Use --fail-on high in CI/CD pipelines
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Medusa Security Skill
@@ -137,7 +137,7 @@ node .claude/skills/medusa-security/scripts/security-review.cjs
 
 This writes:
 
-`/.claude/context/reports/security-review-medusa-scan-2026-02-17.md`
+`/.claude/context/reports/security/security-review-medusa-scan-2026-02-17.md`
 
 and performs fixed-path checks on:
 
@@ -188,6 +188,24 @@ Findings are automatically mapped to:
   with:
     sarif_file: reports/medusa-results.sarif
 ```
+
+## Iron Laws
+
+1. **ALWAYS** verify Medusa installation before scanning — `python -m medusa --version` first; a missing install produces no output instead of an error, silently masking all vulnerabilities.
+2. **NEVER** rely on AI-only mode as the release gate — AI-only mode misses traditional SAST patterns (SQLi, XSS, path traversal); full scan covering all 76 scanners is required for release-gate decisions.
+3. **ALWAYS** set `--fail-on high` in CI/CD pipelines — without a fail threshold, pipelines pass even when CRITICAL findings exist, creating false confidence in the security posture.
+4. **NEVER** skip SARIF upload to GitHub Code Scanning — local-only SARIF is lost after the build; uploading via `github/codeql-action/upload-sarif@v3` persists findings for PR review, trend tracking, and compliance audit trails.
+5. **ALWAYS** fix CRITICAL and HIGH findings before merging — deploying with unresolved high-severity findings expands the attack surface and nullifies the security posture gain from scanning.
+
+## Anti-Patterns
+
+| Anti-Pattern                         | Why It Fails                                                                                                | Correct Approach                                                                                |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Skipping installation check          | Missing Medusa produces no output, not an error — all vulnerabilities silently missed                       | Run `python -m medusa --version` first; abort on non-zero exit                                  |
+| Using AI-only mode as a release gate | AI-only misses traditional SAST patterns (SQLi, XSS, path traversal) — 76 scanners needed for full coverage | Use full-scan mode for CI/CD gates; AI-only mode for rapid dev-time feedback only               |
+| No fail-on threshold in CI           | Pipeline passes even when CRITICAL findings exist — false confidence in security posture                    | Always use `--fail-on high` in CI pipelines; adjust to `--fail-on critical` for high-risk repos |
+| Ignoring MEDIUM findings             | MEDIUM findings compound into exploitable chains when combined with HIGH findings                           | Triage MEDIUM findings each sprint; never allow them to accumulate without a tracking issue     |
+| Not uploading SARIF to Code Scanning | Findings live only in local files, lost after build — no PR-level review or trend tracking                  | Upload SARIF via `github/codeql-action/upload-sarif@v3` in every CI run                         |
 
 ## Memory Protocol
 

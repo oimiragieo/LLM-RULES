@@ -1,9 +1,9 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-19T22:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 name: wave-executor
 description: Fresh-process orchestration for EPIC-tier batch pipelines. Spawns a new Bun process per wave via the Claude Agent SDK, preventing GC-related crashes in long-running sessions.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -148,6 +148,24 @@ The router should use this skill when the planner classifies work as EPIC-tier:
 4. Router reads JSON result for success/failure
 
 The router's Bun process stays idle during execution (single Bash call) — no subagent spawning, no hook accumulation.
+
+## Iron Laws
+
+1. **ALWAYS** spawn each wave in a fresh Bun process to prevent GC-related crashes in long-running sessions
+2. **NEVER** batch more concurrent waves than the configured `MAX_PARALLEL_WAVES` limit
+3. **ALWAYS** await wave completion acknowledgment before spawning the next wave
+4. **NEVER** proceed to the next wave if the current wave has any failed or incomplete agents
+5. **ALWAYS** log wave metadata (wave number, agent count, duration) for pipeline observability
+
+## Anti-Patterns
+
+| Anti-Pattern                                | Why It Fails                                    | Correct Approach                                 |
+| ------------------------------------------- | ----------------------------------------------- | ------------------------------------------------ |
+| Reusing the same process across waves       | GC pressure causes crashes in long pipelines    | Spawn a fresh Bun process per wave               |
+| Exceeding MAX_PARALLEL_WAVES                | Resource exhaustion and flaky failures          | Respect the configured concurrency limit         |
+| Starting next wave before current completes | Race conditions and incomplete pipeline state   | Await wave completion signal before advancing    |
+| Ignoring failed agents in a wave            | Partial state propagates incorrect data forward | Halt and surface failures before continuing      |
+| No wave metadata logging                    | Can't diagnose which wave caused issues         | Log wave number, agents, and duration to context |
 
 ## Memory Protocol (MANDATORY)
 

@@ -20,8 +20,8 @@ tools:
   - TaskUpdate
   - TaskList
   - Skill
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # SPARC Methodology - Comprehensive Development Framework
@@ -137,7 +137,7 @@ SPARC methodology emphasizes:
 
 #### `orchestrator`
 
-Multi-agent task orchestration with TodoWrite/Task/Memory coordination.
+Multi-agent task orchestration with TaskCreate/Task/Memory coordination.
 
 **Capabilities**:
 
@@ -782,12 +782,12 @@ mcp__claude-flow__memory_usage {
   mcp__claude-flow__agent_spawn { type: "researcher" }
   mcp__claude-flow__agent_spawn { type: "coder" }
   mcp__claude-flow__agent_spawn { type: "tester" }
-  TodoWrite { todos: [8-10 todos] }
+  TaskCreate { tasks: [8-10 tasks] }
 
 // ❌ WRONG: Multiple messages
 Message 1: mcp__claude-flow__agent_spawn { type: "researcher" }
 Message 2: mcp__claude-flow__agent_spawn { type: "coder" }
-Message 3: TodoWrite { todos: [...] }
+Message 3: TaskCreate { tasks: [...] }
 ```
 
 ### 3. Hook Integration
@@ -888,9 +888,9 @@ mcp__claude-flow__sparc_mode {
   options: { security_check: true }
 }
 
-// Batch todos
-TodoWrite {
-  todos: [
+// Batch task creation
+TaskCreate {
+  tasks: [
     {content: "Design API schema", status: "completed"},
     {content: "Research JWT implementation", status: "completed"},
     {content: "Implement authentication", status: "in_progress"},
@@ -1179,5 +1179,36 @@ mcp__claude-flow__memory_usage { action: "store", key: "...", value: "..." }
 ```
 
 ---
+
+## Iron Laws
+
+1. **NEVER** write implementation code before completing the Specification phase
+2. **ALWAYS** write failing tests before any implementation in the Refinement phase
+3. **NEVER** advance to the next SPARC phase without completing all review gates of the current phase
+4. **ALWAYS** decompose complex tasks into subtasks with explicit dependencies before spawning agents
+5. **NEVER** claim phase completion without documented evidence of passing quality gates
+
+## Anti-Patterns
+
+| Anti-Pattern                               | Why It Fails                                           | Correct Approach                                                         |
+| ------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------ |
+| Skipping Specification phase               | Implementation targets wrong requirements              | Define requirements, user stories, and constraints before any code       |
+| Implementing before tests                  | No way to verify correctness; regressions slip through | Write failing tests in Refinement before writing any feature code        |
+| Phase-skipping under time pressure         | Quality gates missed; downstream phases fail           | Complete all review gates before advancing; gates exist for good reasons |
+| Spawning agents without dependency mapping | Agents block each other or duplicate work              | Map task dependencies and parallel groups before spawning agents         |
+| Marking phases complete without evidence   | Incomplete work propagates to later phases             | Require explicit gate evidence (test results, review sign-off) per phase |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+Read `.claude/context/memory/learnings.md`
+
+**After completing:**
+
+- New pattern -> `.claude/context/memory/learnings.md`
+- Issue found -> `.claude/context/memory/issues.md`
+- Decision made -> `.claude/context/memory/decisions.md`
+
+> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
 
 Remember: **SPARC = Systematic, Parallel, Agile, Refined, Complete**

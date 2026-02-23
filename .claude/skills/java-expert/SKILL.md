@@ -1,7 +1,7 @@
 ---
 name: java-expert
 description: Java and Spring Boot expert including REST APIs, JPA, and microservices
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Java Expert
@@ -472,6 +472,24 @@ User: "Review this code for java best practices"
 Agent: [Analyzes code against consolidated guidelines and provides specific feedback]
 ```
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** use constructor injection over field injection with `@Autowired` — field injection hides dependencies, makes testing harder, and creates partially-initialized objects that crash at runtime if the context isn't fully loaded.
+2. **NEVER** use `Optional.get()` without a preceding `isPresent()` check or `orElse()`/`orElseThrow()` — unconditional `get()` throws `NoSuchElementException` on empty optionals, silently defeating Optional's entire purpose.
+3. **ALWAYS** handle `@Transactional` boundaries explicitly — calling a transactional method from within the same class bypasses the proxy and runs without a transaction, causing silent data inconsistency.
+4. **NEVER** use `@Async` without a configured `TaskExecutor` — Spring's default `@Async` executor uses a single-thread pool; concurrent async calls queue up and defeat parallelism.
+5. **ALWAYS** use `@ControllerAdvice` with specific exception types for error handling — catching `Exception` globally hides root causes; specific exception handlers produce correct HTTP status codes and meaningful error responses.
+
+## Anti-Patterns
+
+| Anti-Pattern                                | Why It Fails                                                                 | Correct Approach                                                                     |
+| ------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Field injection with `@Autowired`           | Hidden dependencies; untestable without Spring context; null in unit tests   | Constructor injection; all required dependencies declared as final fields            |
+| `Optional.get()` without check              | `NoSuchElementException` at runtime; defeats Optional's null-safety contract | Use `orElseThrow()`, `orElse()`, or `map()`/`flatMap()` chains                       |
+| `@Transactional` on same-class method calls | Spring proxy bypassed; method runs outside transaction; data integrity lost  | Move transactional methods to a separate service bean; inject and call from outside  |
+| Default `@Async` thread pool                | Single-thread pool queues all tasks; async calls run sequentially            | Configure `ThreadPoolTaskExecutor` with pool size, queue, and rejection policy       |
+| Global `@ExceptionHandler(Exception.class)` | Swallows specific exceptions; all errors return same generic 500 response    | Map specific exception types to HTTP status codes; use `@ResponseStatus` annotations |
 
 ## Consolidated Skills
 

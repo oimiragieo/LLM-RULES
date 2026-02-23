@@ -1,15 +1,15 @@
 ---
 name: insecure-defaults
 description: Detect hardcoded credentials, default passwords, fail-open configurations, insecure default settings, and other security misconfigurations that ship as default behavior in applications.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: agent
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: trailofbits/skills
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/insecure-defaults
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->
@@ -431,6 +431,24 @@ When auditing for default credentials, check against known defaults:
 - **code-reviewer** (primary): Configuration review in PRs
 - **penetration-tester** (secondary): Credential verification
 - **devops** (secondary): Infrastructure configuration auditing
+
+## Iron Laws
+
+1. **ALWAYS** treat any hardcoded credential or token as a CRITICAL finding regardless of context — "test" or "example" credentials are regularly copied into production and must be remediated immediately.
+2. **NEVER** use `rejectUnauthorized: false` or equivalent TLS bypass even temporarily — TLS verification disabled "temporarily" frequently ships to production; there is no safe exception.
+3. **ALWAYS** scan configuration files (`.env`, YAML, JSON, TOML) in addition to source code — credentials are more commonly embedded in config files than in application code.
+4. **NEVER** report a "no findings" result without running automated scanning tools (Semgrep, Trufflehog, git-secrets) — manual review alone misses encoded, encoded, or obfuscated credentials.
+5. **ALWAYS** verify that security checks fail-secure (deny access) by default — fail-open configurations (where auth errors allow access) are the most dangerous class of insecure default.
+
+## Anti-Patterns
+
+| Anti-Pattern                                   | Why It Fails                                                                                                                   | Correct Approach                                                                                  |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Treating "example" credentials as low-severity | Example values are copy-pasted into production; JIRA/Slack contain real production secrets "temporarily"                       | Flag all hardcoded credentials CRITICAL; rotate immediately if in git history                     |
+| Manual-only credential scan                    | Human eyes miss base64-encoded secrets, multi-line keys, and rotation-obscured patterns                                        | Run Trufflehog + Semgrep + git-secrets on every commit; manual review supplements, never replaces |
+| `rejectUnauthorized: false` in test code       | Test configs leak into production via copy-paste; TLS bypass is invisible to runtime monitoring                                | Use `NODE_EXTRA_CA_CERTS` for custom CAs; never disable peer verification                         |
+| Not checking configuration files               | 60%+ of credential leaks originate in config files, not source code                                                            | Explicitly scan `.env`, `*.yaml`, `*.json`, `*.toml`, `docker-compose.yml`                        |
+| Assuming framework defaults are secure         | Flask debug=True, Django DEBUG=True, Spring Boot actuators — framework defaults are developer-optimized, not production-secure | Enumerate framework-specific insecure defaults; validate each for production environment          |
 
 ## Memory Protocol (MANDATORY)
 

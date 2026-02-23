@@ -1,13 +1,13 @@
 ---
 name: code-semantic-search
 description: Semantic code search using Phase 1 vector embeddings and Phase 2 hybrid search.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: user
 user_invocable: true
 tools: [Read, Write, Edit]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Code Semantic Search
@@ -124,6 +124,24 @@ Skill({
 - **code-reviewer**: Finding similar patterns, consistency checks
 - **reverse-engineer**: Understanding unfamiliar codebases
 - **researcher**: Research existing implementations
+
+## Iron Laws
+
+1. **ALWAYS use hybrid mode (semantic + structural) for general searches** — semantic-only misses exact matches; structural-only misses conceptual variants; hybrid provides 95% accuracy vs 85% for single mode.
+2. **ALWAYS use ripgrep/keyword search first for fast keyword discovery** — semantic search is for meaning-based queries; exact strings, function names, and filenames are found faster with ripgrep.
+3. **NEVER use semantic search without a meaningful natural-language query** — single-word or code-syntax queries produce poor semantic results; describe what the code does, not what it's called.
+4. **ALWAYS combine with code-structural-search for precision refinement** — start broad with semantic discovery, then use ast-grep patterns to find exact structural matches from the semantic results.
+5. **NEVER ignore low-similarity results without checking them** — similarity scores are approximations; a 0.7 score result may be more relevant than a 0.9 score result for uncommon patterns.
+
+## Anti-Patterns
+
+| Anti-Pattern                                          | Why It Fails                                       | Correct Approach                                                            |
+| ----------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------- |
+| Semantic search for exact string matching             | Slower and less accurate than text search          | Use ripgrep/Grep for exact keyword matching                                 |
+| Single-word queries ("auth")                          | Too vague for semantic matching; returns noise     | Use natural-language descriptions ("authentication token validation logic") |
+| Using semantic-only mode for general searches         | Misses structural variants; 85% vs 95% accuracy    | Use hybrid mode (default) for general queries                               |
+| Ignoring search results that don't match expectations | Semantic results find surprising-but-relevant code | Read all results; unexpected matches are often the most valuable            |
+| Not combining with structural search                  | Finds concepts but not exact patterns              | Use semantic for discovery → structural for precision                       |
 
 ## Memory Protocol (MANDATORY)
 

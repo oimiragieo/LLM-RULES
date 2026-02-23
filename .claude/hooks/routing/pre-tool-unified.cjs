@@ -16,6 +16,7 @@ const execution = require('./pre-tool-unified.execution.cjs');
 const taskUpdate = require('./pre-tool-unified.taskupdate.cjs');
 const guardrails = require('./pre-tool-unified.guardrails.cjs');
 const readSafety = require('./pre-tool-unified.read-safety.cjs');
+const memorySync = require('./pre-tool-unified.memory-sync.cjs');
 
 const { parseHookInputAsync, getToolName, getToolInput, formatResult } = libRequire(
   path.join('utils', 'hook-input.cjs')
@@ -181,6 +182,11 @@ async function main() {
     }
     if (taskUpdateFirst.warning) {
       console.warn(`[pre-tool-unified:taskupdate-first] ${taskUpdateFirst.warning}`);
+    }
+
+    const memorySyncResult = memorySync.checkDynamicMemorySync(hookInput);
+    if (memorySyncResult.hasUpdate && memorySyncResult.warning) {
+      console.warn(`[pre-tool-unified:memory-sync] ${memorySyncResult.warning}`);
     }
 
     const bashArtifactWriteResult = guardrails.checkBashArtifactWriteSafety(

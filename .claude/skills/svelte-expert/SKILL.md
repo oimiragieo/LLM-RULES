@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Svelte Expert
@@ -93,6 +93,24 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 This expert skill consolidates 1 individual skills:
 
 - svelte-expert
+
+## Iron Laws
+
+1. **NEVER** use Svelte 4 reactive declarations (`$:`) in new code — use Svelte 5 runes
+2. **ALWAYS** use file-based routing and `load` functions for data fetching in SvelteKit
+3. **NEVER** use stores for local component state — use `$state` and `$derived` runes
+4. **ALWAYS** implement `+error.svelte` error boundaries for every route group that can fail
+5. **NEVER** skip accessibility semantics — ensure ARIA attributes and keyboard navigation
+
+## Anti-Patterns
+
+| Anti-Pattern                           | Why It Fails                                        | Correct Approach                                                    |
+| -------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
+| Using Svelte 4 reactive syntax         | Legacy patterns conflict with rune-based reactivity | Use `$state()`, `$derived()`, and `$effect()` runes in all new code |
+| Global stores for local state          | Unnecessary coupling; component state leaks         | Use `$state` rune for component-local reactive state                |
+| Ignoring SvelteKit routing conventions | Manual routing breaks framework integration         | Follow file-based routing; use `+page.svelte` and `+layout.svelte`  |
+| Missing `+error.svelte` handlers       | Unhandled route errors produce blank pages          | Add `+error.svelte` to every route group that can fail              |
+| Skipping accessibility attributes      | Screen readers and keyboard users cannot use the UI | Always add ARIA labels and test keyboard navigation                 |
 
 ## Memory Protocol (MANDATORY)
 

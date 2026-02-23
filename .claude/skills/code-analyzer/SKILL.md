@@ -1,7 +1,7 @@
 ---
 name: code-analyzer
 description: Static code analysis and complexity metrics
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -12,8 +12,8 @@ best_practices:
   - Focus on hotspots first
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Code Analyzer Skill
@@ -79,6 +79,24 @@ Static code analysis and metrics. 90%+ context savings.
 - **code-reviewer** (primary): Code review
 - **refactoring-specialist** (primary): Tech debt analysis
 - **architect** (secondary): Architecture assessment
+
+## Iron Laws
+
+1. **ALWAYS run project-wide analysis before drilling into individual files** — local analysis without context misses which files are actually the highest-priority hotspots; start broad, then focus.
+2. **ALWAYS focus on high-complexity AND high-churn files** — a complex but rarely-changed file is lower priority than a moderately complex but frequently-changed one; intersection matters most.
+3. **NEVER set complexity thresholds above 20** — cyclomatic complexity >20 is demonstrably correlated with defects; teams that allow >20 accumulate unmaintainable code without noticing.
+4. **ALWAYS track metrics over time, not just once** — a single analysis snapshot is meaningless; track trends weekly to detect gradual degradation before it becomes a crisis.
+5. **NEVER report metrics without actionable next steps** — complexity numbers without refactoring targets provide no value; every high-complexity finding must include a specific suggested improvement.
+
+## Anti-Patterns
+
+| Anti-Pattern                               | Why It Fails                                            | Correct Approach                                      |
+| ------------------------------------------ | ------------------------------------------------------- | ----------------------------------------------------- |
+| Analyzing only changed files               | Misses cross-file complexity accumulation               | Run project-wide then filter to changed hot spots     |
+| Ignoring high-complexity files over time   | Gradual degradation invisible in point-in-time analysis | Track weekly trends; alert on any increase            |
+| Complexity threshold >20                   | Research shows defect rate spikes sharply above 20      | Set ESLint complexity rule to ≤15 for enforcement     |
+| Reporting metrics without action items     | Metrics without remediation don't reduce complexity     | Attach specific refactoring suggestion per hotspot    |
+| Running analysis once and ignoring results | Technical debt silently accumulates                     | Schedule automated weekly analysis with trend reports |
 
 ## Memory Protocol (MANDATORY)
 

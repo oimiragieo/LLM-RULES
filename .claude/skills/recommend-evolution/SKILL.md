@@ -1,15 +1,15 @@
 ---
 name: recommend-evolution
 description: Detect capability gaps and record standardized evolution recommendations.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Skill]
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Recommend Evolution
@@ -25,12 +25,13 @@ Recommend ecosystem evolution when repeated evidence indicates missing capabilit
 - Repeated integration gaps imply missing artifact type or policy
 - User explicitly requests a new capability path
 
-## The Iron Law
+## Iron Laws
 
-```
-DO NOT SPAWN EVOLUTION-ORCHESTRATOR DIRECTLY FROM THIS SKILL.
-RECOMMEND AND RECORD ONLY.
-```
+1. **NEVER** spawn evolution-orchestrator directly from this skill — this skill records recommendations only; execution decisions belong to the orchestrator and approval pipeline.
+2. **ALWAYS** validate trigger type against defined thresholds before recording a recommendation — vague observations are not triggers; require concrete failure counts or routing misses.
+3. **NEVER** create a new evolution request when artifact-integrator or skill-updater would address the gap — reserve evolution for net-new capabilities, not integration or update gaps.
+4. **ALWAYS** append the recommendation to the JSONL queue AND include the required report block in the current output — dual recording ensures the recommendation is discoverable at both runtime and review time.
+5. **NEVER** proceed with a recommendation without evidence — single failures are noise; trigger thresholds exist for a reason.
 
 <identity>
 Evolution recommendation skill for reflection/planning agents.
@@ -130,6 +131,16 @@ Skill({ skill: 'recommend-evolution', args: '--trigger no_agent --suggestedArtif
 
 </usage_example>
 </examples>
+
+## Anti-Patterns
+
+| Anti-Pattern                                                                     | Why It Fails                                                                               | Correct Approach                                                                                   |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Spawning evolution-orchestrator directly from this skill                         | Violates single-responsibility; bypasses approval and resource gates                       | Record recommendation to JSONL queue only; let the orchestrator decide on execution                |
+| Recording an evolution request for an integration gap that already has artifacts | Creates unnecessary new artifacts when an integration fix would suffice                    | Check artifact-integrator path first; escalate only if gap requires net-new capability             |
+| Submitting a recommendation without trigger evidence                             | Uninformed evolution wastes resources and pollutes the queue with noise                    | Require concrete evidence: failure counts, routing miss logs, or explicit user request             |
+| Routing stale-skill triggers through this skill instead of skill-updater         | Wrong escalation path; creates evolution requests for work that belongs in an update cycle | Route stale_skill triggers directly to skill-updater; only escalate if the skill cannot be updated |
+| Triggering evolution after a single failure instance                             | Single failures are noise; premature evolution wastes build capacity                       | Apply defined thresholds: 5+ repeated errors, consistent routing misses across sessions            |
 
 ## Memory Protocol (MANDATORY)
 

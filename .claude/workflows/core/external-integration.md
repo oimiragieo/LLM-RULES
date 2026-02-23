@@ -263,7 +263,7 @@ Analyze the structure and contents of the isolated external artifact.
    - Identify entry points (SKILL.md, agent.md, etc.)
    - Check for package.json, requirements.txt, dependencies
    - Look for README, documentation
-4. Document findings in: .claude/context/reports/source-analysis.md
+4. Document findings in: .claude/context/reports/backend/source-analysis.md
 
 ## Analysis Checklist
 - [ ] Artifact type identified
@@ -273,7 +273,7 @@ Analyze the structure and contents of the isolated external artifact.
 - [ ] File structure mapped
 
 ## Output
-- .claude/context/reports/source-analysis.md
+- .claude/context/reports/backend/source-analysis.md
 
 ## Memory Protocol
 1. Read .claude/context/memory/learnings.md first
@@ -315,7 +315,7 @@ Analyze the target location in the framework where artifact will be integrated.
    - Naming conventions
    - Structural patterns
    - Integration requirements
-5. Save findings to: .claude/context/reports/target-analysis.md
+5. Save findings to: .claude/context/reports/backend/target-analysis.md
 
 ## Analysis Checklist
 - [ ] Target location identified
@@ -324,7 +324,7 @@ Analyze the target location in the framework where artifact will be integrated.
 - [ ] Integration patterns identified
 
 ## Output
-- .claude/context/reports/target-analysis.md
+- .claude/context/reports/backend/target-analysis.md
 
 ## Memory Protocol
 1. Read .claude/context/memory/learnings.md first
@@ -362,8 +362,8 @@ Create a detailed plan for integrating the external artifact into the framework.
    - Skill({ skill: "plan-generator" })
    - Skill({ skill: "complexity-assessment" })
 3. Read analysis reports:
-   - .claude/context/reports/source-analysis.md
-   - .claude/context/reports/target-analysis.md
+   - .claude/context/reports/backend/source-analysis.md
+   - .claude/context/reports/backend/target-analysis.md
    - .claude/context/tmp/pre-check-results.md
 4. Create integration plan covering:
    - File mapping (source → target)
@@ -428,7 +428,7 @@ Review integration plan for framework structural alignment and compatibility.
    - Dependency conflicts
    - Missing framework integrations
    - Documentation gaps
-5. Document findings in: .claude/context/reports/architect-review.md
+5. Document findings in: .claude/context/reports/architecture/architect-review.md
 
 ## Review Checklist
 - [ ] Framework structure alignment
@@ -438,7 +438,7 @@ Review integration plan for framework structural alignment and compatibility.
 - [ ] Integration points identified
 
 ## Output
-- .claude/context/reports/architect-review.md with structural concerns
+- .claude/context/reports/architecture/architect-review.md with structural concerns
 
 ## Memory Protocol
 1. Read .claude/context/memory/learnings.md first
@@ -495,7 +495,7 @@ Review external artifact for security vulnerabilities and supply chain risks.
    - Verify no credential harvesting (.ssh, .aws, .npmrc scanning)
    - Check for suspicious network calls in init code
    - Flag any telemetry that collects sensitive data
-8. Document findings in: .claude/context/reports/security-review.md
+8. Document findings in: .claude/context/reports/security/security-review.md
 
 ## Security Checklist
 - [ ] No malicious code detected
@@ -546,7 +546,7 @@ Review external artifact for security vulnerabilities and supply chain risks.
 - [ ] Check for clipboard access or keylogging patterns
 
 ## Output
-- .claude/context/reports/security-review.md with security assessment
+- .claude/context/reports/security/security-review.md with security assessment
 
 ## CRITICAL
 - Flag ANY security concerns as BLOCKING issues
@@ -588,8 +588,8 @@ Update integration plan based on architect and security reviews.
 ## Instructions
 1. Read your agent definition: .claude/agents/core/planner.md
 2. Read review outputs:
-   - .claude/context/reports/architect-review.md
-   - .claude/context/reports/security-review.md
+   - .claude/context/reports/architecture/architect-review.md
+   - .claude/context/reports/security/security-review.md
 3. For each concern:
    - Assess severity (BLOCKING, HIGH, MEDIUM, LOW)
    - Add mitigation steps to plan
@@ -662,7 +662,7 @@ Execute the integration plan to move artifact from temp to framework location.
    - Check files exist in target location
    - Verify CLAUDE.md updated
    - Verify registry updated
-6. Document completion in: .claude/context/reports/integration-complete.md
+6. Document completion in: .claude/context/reports/backend/integration-complete.md
 
 ## Integration Checklist
 - [ ] Files copied to correct location
@@ -679,7 +679,7 @@ Execute the integration plan to move artifact from temp to framework location.
 
 ## Output
 - Artifact integrated into framework
-- .claude/context/reports/integration-complete.md
+- .claude/context/reports/backend/integration-complete.md
 
 ## Memory Protocol
 1. Read .claude/context/memory/learnings.md first
@@ -714,7 +714,7 @@ Clean up temporary directory after successful integration.
 ## Instructions
 1. Read your agent definition: .claude/agents/core/developer.md
 2. Verify integration succeeded:
-   - Read .claude/context/reports/integration-complete.md
+   - Read .claude/context/reports/backend/integration-complete.md
    - Confirm artifact exists in target location
 3. Remove temporary directory:
    - Delete .claude/context/tmp/<repo-name>/
@@ -775,7 +775,7 @@ Verify the integrated artifact works correctly in the framework.
    - grep "<artifact-name>" .claude/CLAUDE.md
    - Check creator-registry.json includes artifact
    - Check skill-catalog.md (if skill)
-5. Document verification results in: .claude/context/reports/verification-results.md
+5. Document verification results in: .claude/context/reports/backend/verification-results.md
 
 ## Verification Checklist
 - [ ] Artifact is functional
@@ -785,7 +785,7 @@ Verify the integrated artifact works correctly in the framework.
 - [ ] Documentation is accessible
 
 ## Output
-- .claude/context/reports/verification-results.md
+- .claude/context/reports/backend/verification-results.md
 
 ## Memory Protocol
 1. Record verification results to .claude/context/memory/learnings.md
@@ -794,7 +794,7 @@ Verify the integrated artifact works correctly in the framework.
 });
 ```
 
-**Expected Output**: `.claude/context/reports/verification-results.md` confirming successful integration
+**Expected Output**: `.claude/context/reports/backend/verification-results.md` confirming successful integration
 
 ## Workflow Verification
 
@@ -854,7 +854,7 @@ After each phase, verify:
 - [ ] `.claude/context/artifacts/catalogs/creator-registry.json` updated
 - [ ] `.claude/context/artifacts/catalogs/skill-catalog.md` updated (if skill)
 - [ ] `.claude/context/memory/learnings.md` updated
-- [ ] `.claude/context/reports/verification-results.md` confirms success
+- [ ] `.claude/context/reports/backend/verification-results.md` confirms success
 
 ## Error Recovery
 
@@ -873,7 +873,7 @@ After each phase, verify:
 
 ### If Phase 4 review finds BLOCKING issues:
 
-1. Document BLOCKING issues in .claude/context/reports/blockers.md
+1. Document BLOCKING issues in .claude/context/reports/backend/blockers.md
 2. Planner marks plan as BLOCKED
 3. STOP workflow
 4. Notify user with blocker details and recommended actions
@@ -881,7 +881,7 @@ After each phase, verify:
 
 ### If Phase 5 consolidation finds conflicts:
 
-1. Document conflicts in .claude/context/reports/conflicts.md
+1. Document conflicts in .claude/context/reports/backend/conflicts.md
 2. Attempt automatic resolution if possible
 3. If manual resolution needed, pause workflow
 4. Request user input for conflict resolution
@@ -1046,7 +1046,7 @@ Rollback failed integration to restore framework to pre-integration state.
 
 ## Output
 - Framework restored to pre-integration state
-- .claude/context/reports/rollback-complete.md
+- .claude/context/reports/backend/rollback-complete.md
 
 ## Memory Protocol
 1. Record rollback reason to .claude/context/memory/issues.md
@@ -1090,7 +1090,6 @@ These rules are INVIOLABLE:
 
 ## Related Workflows
 
-- **Codebase Integration Skill**: For integrating entire codebases, use `Skill({ skill: "codebase-integration" })`
 - **Skill Lifecycle Workflow**: For managing artifact creation/update/deprecation, see `.claude/workflows/core/skill-lifecycle.md`
 - **Feature Development Workflow**: May spawn external-integration as sub-workflow for third-party libraries (`.claude/workflows/enterprise/feature-development-workflow.md`)
 - **Router Decision Workflow**: Master routing workflow that may invoke this workflow (`.claude/workflows/core/router-decision.md`)

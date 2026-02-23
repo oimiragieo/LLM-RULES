@@ -1,8 +1,9 @@
 ---
 name: context-driven-development
 description: Context-Driven Development methodology - treating project context as managed artifacts alongside code for consistent AI interactions and team alignment.
-version: 1.0
+version: 1.1.0
 model: sonnet
+agents: [developer, planner, architect]
 invoked_by: both
 tools:
   - Read
@@ -10,8 +11,8 @@ tools:
   - Edit
   - Glob
   - Grep
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Context-Driven Development
@@ -387,6 +388,14 @@ If interrupted mid-task:
 8. **Preserve history**: Use git to track context evolution over time
 9. **Question staleness**: If context feels wrong, investigate and update
 10. **Keep it actionable**: Every context item should inform a decision or behavior
+
+## Iron Laws
+
+1. **ALWAYS** read all relevant context artifacts (product.md, tech-stack.md, workflow.md) before starting any implementation track — never begin coding against stale or unverified context.
+2. **NEVER** create a new artifact type or document location when an existing category in the defined directory structure already fits — resist context sprawl.
+3. **ALWAYS** update context artifacts atomically with code changes in the same commit — context updates in separate PRs create drift and stale references.
+4. **NEVER** let any context file exceed 20KB without rotating or archiving — unbounded growth makes context unusable and slows AI interactions.
+5. **ALWAYS** flag stale or contradictory context before implementation — an outdated tech-stack.md or wrong product.md is technical debt that compounds with every AI interaction.
 
 ## Memory Protocol (MANDATORY)
 

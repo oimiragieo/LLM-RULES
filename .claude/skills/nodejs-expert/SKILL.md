@@ -1,7 +1,7 @@
 ---
 name: nodejs-expert
 description: Node.js backend expert including Express, NestJS, and async patterns
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Nodejs Expert
@@ -118,6 +118,24 @@ This expert skill consolidates 1 individual skills:
 ## Related Skills
 
 - [`typescript-expert`](../typescript-expert/SKILL.md) - TypeScript type systems, patterns, and tooling for Node.js development
+
+## Iron Laws
+
+1. **ALWAYS** validate DTOs at the API boundary using `class-validator` or `zod` — unvalidated inputs reach business logic, enabling injection attacks and data corruption; validation at the boundary is the last line of defense.
+2. **NEVER** use callbacks in new Node.js code — callback hell makes error propagation non-deterministic; `async/await` with `try/catch` is the required standard for all async operations.
+3. **ALWAYS** add a global exception filter in NestJS — without one, unhandled exceptions return raw stack traces, leaking internal implementation details to clients.
+4. **NEVER** block the Node.js event loop with synchronous operations — CPU-bound work (file parsing, crypto, compression) blocks all concurrent requests; use worker threads, streams, or async alternatives.
+5. **ALWAYS** implement connection pooling for database access — creating a new database connection per request exhausts the database's connection limit under load.
+
+## Anti-Patterns
+
+| Anti-Pattern                             | Why It Fails                                                                | Correct Approach                                                                          |
+| ---------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Missing DTO validation at API boundary   | Unvalidated inputs enable injection and data corruption                     | Use `class-validator` on DTOs; reject invalid inputs at the controller boundary           |
+| Using callbacks in new code              | Error propagation non-deterministic; unhandled rejections crash the process | Use `async/await` with `try/catch` for all async operations                               |
+| No global exception filter in NestJS     | Unhandled exceptions expose raw stack traces to clients                     | Add a global `ExceptionFilter` that logs internally and returns sanitized error responses |
+| Synchronous operations on the event loop | Blocks all concurrent requests; latency spikes under any load               | Use async alternatives (`fsPromises`, streams); offload CPU-bound work to worker threads  |
+| New database connection per request      | Exhausts connection limit under load; adds connection overhead latency      | Pool connections at startup with `pg.Pool`, `Knex`, or ORM connection pooling             |
 
 ## Memory Protocol (MANDATORY)
 

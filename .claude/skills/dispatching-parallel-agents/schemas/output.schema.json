@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "dispatching-parallel-agents Output Schema",
+  "description": "Output validation schema for dispatching-parallel-agents skill",
+  "type": "object",
+  "required": [
+    "success"
+  ],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the skill executed successfully"
+    },
+    "result": {
+      "type": "object",
+      "description": "The skill execution result",
+      "additionalProperties": true
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if execution failed"
+    }
+  },
+  "additionalProperties": true
+}

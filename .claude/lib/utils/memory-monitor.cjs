@@ -158,20 +158,12 @@ class MemoryMonitor {
   checkHeap() {
     const mem = process.memoryUsage();
 
-    // Calculate heap percentage
-    // Note: heapTotal is the current allocated heap, not the max
-    // For max heap, we need to use v8.getHeapStatistics() which provides heap_size_limit
-    let heapLimit;
-    try {
-      const v8 = require('v8');
-      const heapStats = v8.getHeapStatistics();
-      heapLimit = heapStats.heap_size_limit;
-    } catch (_err) {
-      // Fallback: estimate based on heapTotal with a safety margin
-      // This is less accurate but works in environments without v8 module
-      heapLimit = mem.heapTotal * 2;
-    }
-
+    // Calculate heap percentage using heapTotal as denominator.
+    // heapTotal is the currently allocated heap — this ratio reflects
+    // actual GC pressure and is always a meaningful 0-1 value regardless
+    // of the theoretical V8 heap_size_limit (which can be 8GB+ on modern
+    // systems, making heapUsed/heap_size_limit near-zero for small processes).
+    const heapLimit = mem.heapTotal;
     const heapPercent = mem.heapUsed / heapLimit;
 
     const entry = {

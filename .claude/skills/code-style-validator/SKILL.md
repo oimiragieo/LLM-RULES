@@ -1,7 +1,7 @@
 ---
 name: code-style-validator
 description: Programmatic code style validation using AST analysis. Complements (not replaces) code-style rules by providing automated checking and instant feedback.
-version: 1.0.0
+version: 1.1.0
 model: haiku
 invoked_by: both
 user_invocable: true
@@ -12,8 +12,8 @@ best_practices:
   - Integrate with pre-commit hooks
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 ## Installation
@@ -253,6 +253,24 @@ done
 5. **Clear Messages**: Show clear error messages with line numbers and suggestions
 </best_practices>
 </instructions>
+
+## Iron Laws
+
+1. **ALWAYS use AST-based validation over regex** — regex-based style checking breaks on multi-line constructs, comments, and strings; AST-based tools (ESLint, Prettier) are format-independent and semantically accurate.
+2. **ALWAYS check for existing ESLint/Prettier rules before writing custom ones** — custom rules are expensive to maintain; 95% of style needs are covered by existing rules with configuration.
+3. **NEVER block commits for style warnings, only errors** — warnings are informational; blocking CI on warnings creates friction that leads teams to disable style checks entirely.
+4. **ALWAYS provide auto-fix suggestions alongside findings** — reports without auto-fix require manual intervention for each issue; auto-fixable violations have near-100% resolution rates vs 30% for manual.
+5. **ALWAYS run style validation in both pre-commit hooks and CI** — pre-commit catches issues locally before they reach the repository; CI catches cases where hooks were bypassed or aren't installed.
+
+## Anti-Patterns
+
+| Anti-Pattern                       | Why It Fails                                            | Correct Approach                                    |
+| ---------------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
+| Regex-based style checking         | Breaks on multi-line, strings, and comments             | Use AST-based tools (ESLint, Prettier)              |
+| Custom rules for covered standards | High maintenance; inconsistent with community           | Configure existing ESLint/Prettier rules first      |
+| Blocking CI on warnings            | Excessive friction causes teams to disable style checks | Block only on errors; log warnings                  |
+| Style validation without auto-fix  | Manual fixes have low resolution rate                   | Always provide auto-fix commands alongside findings |
+| Running only locally, not in CI    | Developers bypass pre-commit hooks regularly            | Run in both pre-commit and CI pipeline              |
 
 ## Memory Protocol (MANDATORY)
 

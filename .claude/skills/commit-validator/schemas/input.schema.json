@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "commit-validator Input Schema",
+  "description": "Input validation schema for commit-validator skill",
+  "type": "object",
+  "required": [],
+  "properties": {},
+  "additionalProperties": true
+}

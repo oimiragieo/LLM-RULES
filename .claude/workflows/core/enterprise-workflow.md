@@ -868,7 +868,7 @@ Operational requirements for this profile:
 | QA report           | `.claude/context/reports/qa/{feature}-qa-report-{date}.md`                | qa                 |
 | Security review     | `.claude/context/reports/security/{feature}-security-review-{date}.md`    | security-architect |
 | Architecture review | `.claude/context/reports/architecture/{feature}-arch-review-{date}.md`    | architect          |
-| Deployment log      | `.claude/context/reports/{feature}-deploy-log-{date}.md`                  | devops             |
+| Deployment log      | `.claude/context/reports/backend/{feature}-deploy-log-{date}.md`          | devops             |
 
 ### Handoff Metadata via TaskUpdate
 

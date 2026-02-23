@@ -134,7 +134,7 @@ Analyze existing database schema for: $PROJECT_NAME
 4. Identify normalization issues, missing indexes, constraint gaps
 5. Document current data model strengths and weaknesses
 6. Map current schema to new requirements from Step 1.1
-7. Save analysis to: .claude/context/reports/database-$PROJECT_NAME-current-analysis.md
+7. Save analysis to: .claude/context/reports/backend/database-$PROJECT_NAME-current-analysis.md
 
 ## Context
 - Current schema location: $SCHEMA_LOCATION
@@ -220,7 +220,7 @@ Review data security requirements for: $PROJECT_NAME
 6. Define access control requirements (row-level security, roles)
 7. Document audit trail requirements
 8. Verify compliance alignment (GDPR, HIPAA, SOC2)
-9. Save security requirements to: .claude/context/reports/database-$PROJECT_NAME-security-requirements.md
+9. Save security requirements to: .claude/context/reports/security/database-$PROJECT_NAME-security-requirements.md
 
 ## Context
 - Requirements from Phase 1
@@ -327,7 +327,7 @@ Analyze and optimize query patterns for: $PROJECT_NAME
    - Composite indexes for multi-column queries
    - Partial indexes for filtered queries
 8. Document query patterns and expected performance
-9. Save analysis to: .claude/context/reports/database-$PROJECT_NAME-query-optimization.md
+9. Save analysis to: .claude/context/reports/backend/database-$PROJECT_NAME-query-optimization.md
 
 ## Context
 - Schema from Phase 2
@@ -657,7 +657,7 @@ Test database migrations for: $PROJECT_NAME
    - Partial migration state
    - Concurrent migration attempt
 6. Document test results
-7. Save test report to: .claude/context/reports/database-$PROJECT_NAME-migration-tests.md
+7. Save test report to: .claude/context/reports/qa/database-$PROJECT_NAME-migration-tests.md
 
 ## Context
 - Migrations from Phase 4
@@ -680,13 +680,13 @@ Upon workflow completion, the following artifacts will be available:
 
 ### Documentation
 
-| Artifact              | Location                                                                  |
-| --------------------- | ------------------------------------------------------------------------- |
-| Requirements          | `.claude/context/plans/database-$PROJECT_NAME-requirements.md`            |
-| Current Analysis      | `.claude/context/reports/database-$PROJECT_NAME-current-analysis.md`      |
-| Security Requirements | `.claude/context/reports/database-$PROJECT_NAME-security-requirements.md` |
-| Query Optimization    | `.claude/context/reports/database-$PROJECT_NAME-query-optimization.md`    |
-| Migration Test Report | `.claude/context/reports/database-$PROJECT_NAME-migration-tests.md`       |
+| Artifact              | Location                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| Requirements          | `.claude/context/plans/database-$PROJECT_NAME-requirements.md`                     |
+| Current Analysis      | `.claude/context/reports/backend/database-$PROJECT_NAME-current-analysis.md`       |
+| Security Requirements | `.claude/context/reports/security/database-$PROJECT_NAME-security-requirements.md` |
+| Query Optimization    | `.claude/context/reports/backend/database-$PROJECT_NAME-query-optimization.md`     |
+| Migration Test Report | `.claude/context/reports/qa/database-$PROJECT_NAME-migration-tests.md`             |
 
 ### Schema Artifacts
 

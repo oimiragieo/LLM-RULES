@@ -111,13 +111,13 @@ After spawning agents, Router should:
 
 ### Enforcement Hooks
 
-**Pre-spawn hook:** `.claude/hooks/routing/pre-spawn-task-validator.cjs`
+**Pre-spawn hook:** `pre-task-unified.cjs`
 
 - Blocks spawn without TaskCreate
 - Validates task ID in spawn prompt
 - Default: `block`
 
-**Post-spawn hook:** `.claude/hooks/routing/post-spawn-task-updater.cjs`
+**Post-spawn hook:** `post-task-unified.cjs`
 
 - Detects tasks not updated after 1 hour
 - Auto-escalates stuck tasks

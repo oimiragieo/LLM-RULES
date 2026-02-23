@@ -24,6 +24,7 @@ const HOOK_ORDER = [
   '.claude/hooks/session/state-reset.cjs',
   '.claude/hooks/routing/user-prompt-unified.cjs',
   '.claude/hooks/session/drift-detector.cjs',
+  '.claude/hooks/session/vector-db-warmstart.cjs',
 ];
 
 function ensureFileIfMissing(filePath, content) {

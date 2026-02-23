@@ -28,7 +28,7 @@ const { invalidateCache } = require('../../lib/utils/state-cache.cjs');
 const { readRouterStateFile } = require('../../lib/runtime/state-contracts.cjs');
 
 // Resolve project root deterministically from this file location:
-// <project>/.claude/hooks/routing/router-state.cjs -> <project>
+// <project>/.claude/lib/routing/router-state.cjs -> <project>
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 /**

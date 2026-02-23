@@ -270,8 +270,8 @@ async function main() {
   try {
     // Read hook input from stdin
     const hookInput = await readStdin();
-    const { success, data: input } = safeParseJSON(hookInput, 'hook-input');
-    if (!success || !input) {
+    const input = safeParseJSON(hookInput, 'hook-input');
+    if (!input || typeof input !== 'object') {
       console.log(formatResult(true));
       process.exit(0);
       return;

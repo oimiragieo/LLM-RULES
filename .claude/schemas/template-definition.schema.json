@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/template-definition.schema.json",
+  "title": "Template Definition Schema",
+  "description": "Schema for validating Claude Code template file metadata (.claude/templates/**/*.md). Templates use {{PLACEHOLDER}} syntax for variable substitution.",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": true,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Template name matching the filename (without .md extension)",
+      "maxLength": 100
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500,
+      "description": "What this template produces and when to use it"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "spawn",
+        "plan",
+        "report",
+        "workflow",
+        "agent",
+        "skill",
+        "specification",
+        "code-style",
+        "task",
+        "security",
+        "ui",
+        "generic"
+      ],
+      "description": "Template category for organization and discovery"
+    },
+    "placeholders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Placeholder token as it appears in the template (e.g., AGENT_NAME)"
+          },
+          "description": {
+            "type": "string",
+            "description": "What value should be substituted here",
+            "maxLength": 200
+          },
+          "required": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether this placeholder must be substituted before use"
+          },
+          "example": {
+            "type": "string",
+            "description": "Example value for this placeholder",
+            "maxLength": 200
+          }
+        }
+      },
+      "description": "List of {{PLACEHOLDER}} tokens in this template"
+    },
+    "output_type": {
+      "type": "string",
+      "description": "What artifact type this template produces (e.g., 'agent.md', 'spawn-prompt', 'report.md')",
+      "maxLength": 100
+    },
+    "consumer": {
+      "type": "string",
+      "description": "Which agent, skill, or workflow uses this template",
+      "maxLength": 200
+    },
+    "version": {
+      "type": "string",
+      "description": "Template version (semver)",
+      "maxLength": 20
+    }
+  }
+}

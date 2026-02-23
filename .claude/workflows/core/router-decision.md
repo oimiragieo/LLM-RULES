@@ -755,7 +755,7 @@ Review payment feature design for security best practices.
 1. Read your agent definition: .claude/agents/specialized/security-architect.md
 2. **Invoke skills**: Skill({ skill: "security-architect" })
 3. Wait for planner output, then review: .claude/context/plans/payment-feature-plan.md
-4. Save review to: .claude/context/reports/security-review.md
+4. Save review to: .claude/context/reports/security/security-review.md
 
 ## Memory Protocol
 1. Read .claude/context/memory/learnings.md first
@@ -992,7 +992,7 @@ Review plan for architectural concerns.
 1. Read your agent definition: .claude/agents/core/architect.md
 2. Review plan: .claude/context/plans/{feature_name}-plan.md
 3. **Invoke skills**: Skill({ skill: "architecture-review" })
-4. Save review to: .claude/context/reports/architect-review.md
+4. Save review to: .claude/context/reports/architecture/architect-review.md
 
 ## Memory Protocol
 1. Record architectural decisions to .claude/context/memory/decisions.md
@@ -1016,7 +1016,7 @@ Review plan for security concerns.
 1. Read your agent definition: .claude/agents/specialized/security-architect.md
 2. Review plan: .claude/context/plans/{feature_name}-plan.md
 3. **Invoke skills**: Skill({ skill: "security-architect" })
-4. Save review to: .claude/context/reports/security-review.md
+4. Save review to: .claude/context/reports/security/security-review.md
 
 ## Memory Protocol
 1. Record security considerations to .claude/context/memory/decisions.md
@@ -1045,8 +1045,8 @@ Update plan based on architect and security reviews.
 ## Instructions
 1. Read plan: .claude/context/plans/{feature_name}-plan.md
 2. Read reviews:
-   - .claude/context/reports/architect-review.md
-   - .claude/context/reports/security-review.md
+   - .claude/context/reports/architecture/architect-review.md
+   - .claude/context/reports/security/security-review.md
 3. Update plan incorporating feedback
 4. Save final plan to: .claude/context/plans/{feature_name}-plan-final.md
 
@@ -1105,7 +1105,7 @@ Run full test suite and report results.
 1. Read your agent definition: .claude/agents/core/qa.md
 2. **Invoke skills**: Skill({ skill: "verification-before-completion" })
 3. Run tests, document failures
-4. Save results to: .claude/context/reports/test-results.md
+4. Save results to: .claude/context/reports/qa/test-results.md
 
 ## Memory Protocol
 1. Record test failures to .claude/context/memory/issues.md

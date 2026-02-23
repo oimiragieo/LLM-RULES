@@ -1,7 +1,7 @@
 ---
 name: debugging
 description: Systematic 4-phase debugging with root cause investigation. Use when fixing bugs to prevent random fixes.
-version: 1.1.0
+version: 1.1.1
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -14,7 +14,7 @@ best_practices:
 error_handling: strict
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-19T07:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -29,13 +29,15 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 
 **Violating the letter of this process is violating the spirit of debugging.**
 
-## The Iron Law
+## Iron Laws
 
-```
-NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
-```
+1. **NEVER** propose or implement a fix before completing Phase 1 root cause investigation — a fix without root cause is a guess that will fail or create new bugs.
+2. **ALWAYS** reproduce the bug reliably before debugging — if you can't reproduce it consistently, you're not debugging the real issue.
+3. **NEVER** make more than one change at a time when testing a hypothesis — multiple simultaneous changes make it impossible to determine which change fixed the problem.
+4. **ALWAYS** stop and question the architecture after 3 failed fix attempts — if each fix reveals a new problem, the issue is architectural, not symptomatic.
+5. **NEVER** skip creating a failing test case before implementing the fix — without a test, you cannot verify the fix worked or that it won't regress.
 
-If you haven't completed Phase 1, you cannot propose fixes.
+## When to Use
 
 ## When to Use
 
@@ -387,6 +389,16 @@ LLM-based debugging agents (2025 pattern) augment Phase 1 by reading production 
 - Converting production traces into deterministic test reproducers
 
 **Do NOT skip Phase 1** when using AI assistance. AI suggestions are hypotheses — apply Phase 3 (hypothesis testing) before implementing any AI-suggested fix. AI cannot replace systematic investigation; it accelerates evidence gathering.
+
+## Anti-Patterns
+
+| Anti-Pattern                                 | Why It Fails                                                                      | Correct Approach                                                     |
+| -------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| "Quick fix for now, investigate later"       | The quick fix becomes permanent; the root cause resurfaces as a different symptom | Always complete Phase 1 before touching production code              |
+| Making multiple changes at once              | Can't determine which change fixed or broke the system; creates regressions       | One change per hypothesis test; verify before the next change        |
+| Proposing AI-suggested fixes without testing | AI suggestions are hypotheses, not facts; applying them blindly skips Phase 3     | Treat AI suggestions as hypotheses to test, not answers to implement |
+| Attempting a 4th fix after 3 failures        | N+1 fix attempts on a broken approach compound the problem                        | After 3 failed fixes, escalate to architecture review                |
+| Skipping the failing test before the fix     | You can't verify the fix worked, and regressions are invisible                    | Create the failing test first; it proves root cause and verifies fix |
 
 ## Memory Protocol (MANDATORY)
 

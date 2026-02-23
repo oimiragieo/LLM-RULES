@@ -529,8 +529,8 @@ Cycle Time = Date story completed - Date story started
 
 ### Reports
 
-- **Sprint Reviews:** `.claude/context/reports/product/sprint-{number}-review-{YYYY-MM-DD}.md`
-- **Metrics:** `.claude/context/reports/product/metrics-{YYYY-MM-DD}.md`
+- **Sprint Reviews:** `.claude/context/reports/stakeholder-updates/product/sprint-{number}-review-{YYYY-MM-DD}.md`
+- **Metrics:** `.claude/context/reports/ecosystem-audit/product/metrics-{YYYY-MM-DD}.md`
 
 ### Provenance Headers
 

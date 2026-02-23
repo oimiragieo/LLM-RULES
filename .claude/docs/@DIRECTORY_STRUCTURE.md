@@ -406,7 +406,7 @@ See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog
 | Creator              | Output Location                               |
 | -------------------- | --------------------------------------------- |
 | `research-synthesis` | `.claude/context/artifacts/research-reports/` |
-| `plan-generator`     | `.claude/context/plans/`                      |
+| `plan-generator`     | `.claude/context/artifacts/plans/`            |
 | `agent-creator`      | `.claude/agents/<category>/`                  |
 | `skill-creator`      | `.claude/skills/<skill-name>/`                |
 | `hook-creator`       | `.claude/hooks/<category>/`                   |
@@ -421,7 +421,7 @@ See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog
 - **Pattern**: `{descriptive-name}-{YYYY-MM-DD}.{ext}`
 - **Provenance**: All generated files include `<!-- Agent: {type} | Task: #{id} | Session: {date} -->`
 - **Temp files**: `.claude/context/tmp/` only (auto-cleaned 24h)
-- **Reports**: `.claude/context/reports/{domain}/` (security, qa, architecture, database)
+- **Reports**: `.claude/context/reports/backend/{domain}/` (security, qa, architecture, database)
 - **Full rules**: `.claude/rules/workspace-conventions.md`
 
 ### Deleted/Deprecated Directories
@@ -429,7 +429,7 @@ See `.claude/context/artifacts/catalogs/command-catalog.md` for the full catalog
 | Old Path                         | Status                                                           | Date       |
 | -------------------------------- | ---------------------------------------------------------------- | ---------- |
 | `.claude/temp/`                  | Deleted (was empty)                                              | 2026-01-28 |
-| `.claude/tests/`                 | Moved to root `tests/` directory                                 | 2026-01-28 |
+| `tests/`                         | Moved to root `tests/` directory                                 | 2026-01-28 |
 | `.claude/scripts/`               | Consolidated into `.claude/lib/workflow/`                        | 2026-01-28 |
 | `.claude/data/`                  | Moved to `.claude/context/data/`                                 | 2026-02-06 |
 | `.claude/staging/`               | Deleted (test artifacts and temp files)                          | 2026-02-06 |

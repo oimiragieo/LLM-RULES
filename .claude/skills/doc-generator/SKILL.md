@@ -1,7 +1,7 @@
 ---
 name: doc-generator
 description: Generates comprehensive documentation from code, APIs, and specifications. Creates API documentation, developer guides, architecture docs, and user manuals with examples and tutorials.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -15,8 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 templates: [api-docs, developer-guide, architecture-docs, user-manual]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -204,6 +204,24 @@ Generate OpenAPI specification from API routes
 ```
 </usage_example>
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** extract documentation from code as the source of truth — never write documentation that describes how you wish the code worked rather than how it actually works.
+2. **NEVER** publish documentation with non-runnable examples — every code example must be copy-paste ready and verified to work before the documentation is written.
+3. **ALWAYS** structure documentation with the progressive disclosure pattern (Setup → Quick Start → Reference → Troubleshooting) — readers need orientation before details.
+4. **NEVER** document internal implementation details that consumers don't need to know — documentation of private internals creates false contracts and maintenance burden.
+5. **ALWAYS** regenerate documentation when the code it describes changes — stale documentation is worse than no documentation because it actively misleads users.
+
+## Anti-Patterns
+
+| Anti-Pattern | Why It Fails | Correct Approach |
+|---|---|---|
+| No working code examples | Users can't understand how to use the API without runnable examples | Include minimal copy-paste examples verified to work for every public API |
+| Aspirational documentation (describes intended behavior) | Creates false contracts; users file bugs when docs don't match code | Read the actual implementation first; document only observed behavior |
+| Documenting private/internal APIs | Creates implicit dependencies; refactoring breaks "documented" behavior | Only document public APIs; mark internal functions with `@internal` if needed |
+| Monolithic reference dumps without Quick Start | Users abandon before finding what they need | Always include a Quick Start section with the simplest possible working example |
+| Documentation in a separate PR from code change | Docs drift immediately; often abandoned | Require documentation updates in the same PR as API changes |
 
 ## Memory Protocol (MANDATORY)
 

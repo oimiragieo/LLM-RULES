@@ -6,8 +6,10 @@ metadata:
   author: vercel-labs
   version: '1.0.0'
   source: vercel-labs/next-skills
-verified: false
-lastVerifiedAt: 2026-02-21T00:00:00.000Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
+version: '1.1.0'
+tools: []
 ---
 
 # Next.js Cache Components
@@ -450,15 +452,23 @@ async function UserCartStatus({ userId }: { userId: string }) {
 }
 ```
 
+## Iron Laws
+
+1. **ALWAYS** use `'use cache'` explicitly on every component or function you intend to cache — in Next.js 16, nothing is cached unless you opt in; implicit caching assumptions from Next.js 14 are gone.
+2. **NEVER** use `'use cache'` on components that render user-specific or auth-dependent data — the cache key does not include session context; different users will receive each other's cached content.
+3. **ALWAYS** call `cacheTag()` on every cached function that reads mutable data — without tags, there is no way to invalidate stale data after a mutation; the only recourse is waiting for expiry.
+4. **NEVER** cache Server Actions that perform mutations — `'use cache'` returns a cached response instead of executing the mutation; data changes are silently discarded.
+5. **ALWAYS** call `revalidateTag()` in Server Actions or Route Handlers immediately after a mutation — forgetting invalidation means stale data persists for the full cache lifetime after every write.
+
 ## Anti-Patterns
 
-- Do NOT use `'use cache'` with user-specific or auth-dependent data without careful tag design
-- Do NOT cache Server Actions that perform mutations -- only cache read operations
-- Do NOT mix `revalidate` export with `'use cache'` in the same file -- choose one approach
-- Do NOT forget to call `revalidateTag()` after mutations -- stale data will persist
-- Do NOT use overly broad tags -- `revalidateTag('all')` defeats the purpose of granular caching
-- Do NOT cache components that depend on cookies/headers without understanding the cache key implications
-- Do NOT set `stale: 0` on high-traffic endpoints without understanding the load implications
+| Anti-Pattern                                     | Why It Fails                                                                            | Correct Approach                                                                  |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Using `'use cache'` on auth-dependent components | Cache key excludes session context; different users receive each other's cached data    | Keep auth-dependent components dynamic; cache only public, user-agnostic data     |
+| Caching Server Actions that mutate data          | Returns cached response instead of executing mutation; writes are silently discarded    | Never put `'use cache'` on mutation actions; only cache read operations           |
+| Missing `cacheTag()` on mutable data             | No invalidation path; stale data persists until expiry with no way to purge on mutation | Always tag cached data: `cacheTag('entity', 'entity-id')`                         |
+| Forgetting `revalidateTag()` after mutations     | Stale data persists for full cache lifetime after every write                           | Call `revalidateTag()` in every Server Action or Route Handler that modifies data |
+| Overly broad cache tag names                     | `revalidateTag('all')` invalidates the entire cache on every mutation — defeats purpose | Use granular hierarchical tags: `'products'`, `'product-{id}'`                    |
 
 ## References
 

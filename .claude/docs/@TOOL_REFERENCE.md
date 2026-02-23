@@ -379,7 +379,7 @@ Task({ task_id: 'task-11', subagent_type: best.id, prompt: ... });
 
 ### Tool Validation and Enforcement
 
-**Hook:** `.claude/hooks/routing/tool-availability-validator.cjs`
+**Hook:** `router-tool-lockdown.cjs`
 
 **Purpose:**
 

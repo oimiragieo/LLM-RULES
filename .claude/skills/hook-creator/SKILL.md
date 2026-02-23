@@ -1,7 +1,7 @@
 ---
 name: hook-creator
 description: 'Creates and registers hooks for the Claude Code framework. Handles pre/post tool execution, validation, memory, and session hooks. Use when new validation, safety, or automation hooks are needed.'
-version: 2.1.0
+version: 2.3.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -238,7 +238,7 @@ function parseHookInput() {
  * @param {Object} context - Hook context with tool info
  * @param {string} context.tool - Tool name (Bash, Write, Edit, Read)
  * @param {Object} context.parameters - Tool parameters
- * @returns {{ valid: boolean, error: string, warning?: string }}
+ * @returns {Object} Validation result with valid (boolean), error (string), and optional warning (string)
  */
 function validate(context) {
   const { tool, parameters } = context;
@@ -641,7 +641,7 @@ node .claude/tools/hook-creator/create-hook.mjs --assign "name" --agents "agent1
 node .claude/tools/hook-creator/create-hook.mjs --unregister "<path>"
 
 # Test with sample input
-node .claude/hooks/<category>/<hook-name>.cjs '{"tool_name":"Edit","tool_input":{"file_path":"test.js"}}'
+echo '{"tool_name":"Edit","tool_input":{"file_path":"test.js"} }' | node .claude/hooks/<category>/<hook-name>.cjs
 ```
 
 ---
@@ -915,13 +915,19 @@ This skill is part of the unified artifact lifecycle. For complete multi-agent o
 
 This skill is part of the **Creator Ecosystem**. After creating a hook, consider if companion artifacts are needed:
 
-| Need                           | Creator to Invoke  | Command                             |
-| ------------------------------ | ------------------ | ----------------------------------- |
-| Dedicated skill for hook logic | `skill-creator`    | `Skill({ skill: 'skill-creator' })` |
-| Agent that uses this hook      | `agent-creator`    | `Skill({ skill: 'agent-creator' })` |
-| Workflow for hook testing      | `workflow-creator` | Create in `.claude/workflows/`      |
-| Schema for hook config         | `schema-creator`   | Create in `.claude/schemas/`        |
-| Template for hook scaffold     | `template-creator` | Create in `.claude/templates/`      |
+| Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
+| ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | `Skill({ skill: 'skill-updater' })`    | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | `Skill({ skill: 'agent-creator' })`    | Agent to own the capability       |
+| Existing agent needs capability update   | agent update      | `Skill({ skill: 'agent-updater' })`    | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | `Skill({ skill: 'command-creator' })`  | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
 
 ### Integration Workflow
 
@@ -997,6 +1003,21 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
    - Update affected agents' Enforcement Hooks sections (MANDATORY)
    - Check if related hooks need updating
    - Document all system changes made
+
+9. IRON LAW I: PRE-TOOL HOOKS MUST VALIDATE AGAINST JSON SCHEMA
+   - PreToolUse hooks MUST compile and validate input against the companion
+     schemas/input.schema.json using AJV or equivalent before allowing execution
+   - Pattern: compile(schema) → validate(input) → exit 2 on schema failure
+   - Never block (exit 2) on schema-load errors — fail open, not closed
+   - Search: site:github.com "preToolUse" "ajv" "validate" filetype:cjs
+
+10. IRON LAW III: POST-TOOL HOOKS MUST EMIT OBSERVABILITY EVENTS
+    - PostToolUse hooks MUST append a structured JSON line to
+      .claude/context/runtime/tool-events.jsonl via the centralized emitter:
+      const { sendEvent } = require('.claude/tools/observability/send-event.cjs')
+    - Required fields: tool_name, agent_id, session_id, outcome, timestamp
+    - Never crash on emit failure (try/catch, fail open)
+    - Inspect events: node .claude/tools/observability/send-event.cjs --tail 20
 ```
 
 ---
@@ -1115,14 +1136,20 @@ Before completion, verify all relevant handshakes:
 4. `validate-integration.cjs` passes for the created artifact.
 5. Skill index is regenerated when skill metadata changes.
 
-### Research Gate (Exa First, arXiv Fallback)
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
 
 For new patterns, templates, or workflows, research is mandatory:
 
-1. Use Exa first for implementation and ecosystem patterns.
-2. If Exa is insufficient, use `WebFetch` plus arXiv references.
+1. Use Exa for implementation and ecosystem patterns:
+   - `mcp__Exa__web_search_exa({ query: '<topic> 2025 best practices' })`
+   - `mcp__Exa__get_code_context_exa({ query: '<topic> implementation examples' })`
+2. Search arXiv for academic research (mandatory for AI/ML, agents, evaluation, orchestration, memory/RAG, security):
+   - Via Exa: `mcp__Exa__web_search_exa({ query: 'site:arxiv.org <topic> 2024 2025' })`
+   - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
 3. Record decisions, constraints, and non-goals in artifact references/docs.
 4. Keep updates minimal and avoid overengineering.
+
+**arXiv is mandatory (not fallback) when topic involves:** AI agents, LLM evaluation, orchestration, memory/RAG, security, static analysis, or any emerging methodology.
 
 ### Regression-Safe Delivery
 

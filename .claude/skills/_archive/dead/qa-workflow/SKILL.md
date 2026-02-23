@@ -53,7 +53,7 @@ Every acceptance criterion must be verified before approval.
 cat .claude/context/specs/[task-name]-spec.md
 
 # Read any previous QA reports
-cat .claude/context/reports/qa-report.md 2>/dev/null || echo "No previous report"
+cat .claude/context/reports/qa/qa-report.md 2>/dev/null || echo "No previous report"
 
 # See what files were changed
 git diff main...HEAD --name-status
@@ -256,7 +256,7 @@ REGRESSION CHECK:
 - [If rejected: List of fixes needed]
 ```
 
-Save report to `.claude/context/reports/qa-report.md`
+Save report to `.claude/context/reports/qa/qa-report.md`
 
 ### Phase 8: Decision
 
@@ -290,10 +290,10 @@ Create fix request and proceed to Part 2.
 
 ```bash
 # Read the QA report with issues
-cat .claude/context/reports/qa-report.md
+cat .claude/context/reports/qa/qa-report.md
 
 # Identify issues to fix
-grep -A 50 "## Issues Found" .claude/context/reports/qa-report.md
+grep -A 50 "## Issues Found" .claude/context/reports/qa/qa-report.md
 ```
 
 Extract from report:

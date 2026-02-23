@@ -1,7 +1,7 @@
 ---
 name: project-onboarding
 description: Guided project onboarding for new codebases. Helps agents understand project structure, build systems, test commands, and development workflows by creating persistent knowledge memories.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -14,8 +14,8 @@ best_practices:
   - Keep memories concise and well-organized
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <identity>
@@ -329,6 +329,24 @@ Output a concise summary:
 - `repo-rag` - Semantic search for patterns
 - `session-handoff` - Prepare context for new sessions
 </integration>
+
+## Iron Laws
+
+1. **ALWAYS** check for existing onboarding memories before running discovery — duplicate onboarding creates contradictory knowledge entries that mislead future agents.
+2. **NEVER** assume standard conventions without verification — run commands to confirm what actually works in this specific project environment.
+3. **ALWAYS** write discovered commands and paths to persistent memory files — session context resets, but named memory files survive indefinitely.
+4. **ALWAYS** verify discovered commands with a safe test step before documenting — incorrect commands in onboarding memories mislead every agent that reads them.
+5. **NEVER** complete onboarding without revisiting memories when the project evolves — stale onboarding artifacts are more dangerous than no onboarding.
+
+## Anti-Patterns
+
+| Anti-Pattern                                       | Why It Fails                                                                               | Correct Approach                                                              |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Assuming standard conventions without checking     | Every project has unique build/test/lint commands; wrong assumptions cause silent failures | Read package.json, Makefile, or pyproject.toml and run `--version` to confirm |
+| Skipping verification of discovered commands       | Documented-but-wrong commands mislead every future agent session                           | Run each command with a safe no-op or `--help` flag to confirm it works       |
+| Storing onboarding only in session context         | Context resets on every new conversation; discoveries are permanently lost                 | Write all findings to named memory files in `.claude/context/memory/named/`   |
+| Treating onboarding as a one-time event            | Projects evolve; stale commands fail silently and waste agent time                         | Update onboarding memories after any significant project structure change     |
+| Over-documenting without prioritizing key commands | Long files with low-priority info bury the critical build/test commands                    | Structure memories with Quick Start commands at the top, details below        |
 
 ## Memory Protocol (MANDATORY)
 

@@ -1,7 +1,7 @@
 ---
 name: dynamic-api-integration
 description: Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Adapted from UTCP (Universal Tool Calling Protocol) patterns for Node.js and Claude Code agents.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -50,13 +50,13 @@ This skill teaches agents how to dynamically discover, parse, and call external 
 - The API requires OAuth 2.0 authorization code flow with user-interactive redirect
 - The API uses WebSocket or streaming-only protocols (not HTTP REST)
 
-## The Iron Law
+## Iron Laws
 
-```
-NEVER HARDCODE API KEYS IN REQUESTS — USE ENVIRONMENT VARIABLES ONLY
-```
-
-If you find yourself typing an API key in a curl command, STOP. Use `$ENV_VAR` syntax.
+1. **NEVER** hardcode API keys, tokens, or secrets in requests, curl commands, or source files — always use environment variables (`$ENV_VAR`) or a secrets manager.
+2. **ALWAYS** discover the API spec (OpenAPI/Swagger) before writing any integration code — guessing endpoint shapes without spec evidence produces broken integrations.
+3. **NEVER** skip pagination handling when the API returns list responses — assuming single-page results silently drops data for any dataset above the page limit.
+4. **ALWAYS** implement retry logic with exponential backoff for transient failures (429, 503) — dynamic APIs are unreliable by nature and integrations without retries fail under normal production conditions.
+5. **NEVER** trust API responses without validating the schema of each response before use — dynamic API shapes change without notice; unvalidated responses cause runtime crashes in callers.
 
 ---
 

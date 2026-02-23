@@ -125,5 +125,5 @@ If you need to restore an archived hook:
 ## Related Documentation
 
 - Hook Alignment Plan: `.claude/context/plans/hook-alignment-plan-2026-02-06.md`
-- Hooks Audit Report: `.claude/context/reports/hooks-audit-2026-02-06.md`
+- Hooks Audit Report: `.claude/context/reports/ecosystem-audit/hooks-audit-2026-02-06.md`
 - Hook Consolidation Workflow: `.claude/workflows/operations/hook-consolidation.md`

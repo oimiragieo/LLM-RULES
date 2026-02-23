@@ -385,16 +385,16 @@ function generateViolationMessage(filePath, requiredCreator, artifactType) {
  * null means no schema exists for that type (skip validation)
  */
 const SCHEMA_MAP = {
-  skill: 'skill-definition.schema.json',
+  skill: 'skill-output.schema.json',
   agent: 'agent-definition.schema.json',
   hook: 'hook-definition.schema.json',
   workflow: 'workflow-definition.schema.json',
   schema: null, // self-referential
   'config:settings': null,
   'config:agent-registry': 'agent-config.schema.json',
-  template: null,
-  rule: null,
-  command: null,
+  template: 'template-definition.schema.json',
+  rule: 'rule-definition.schema.json',
+  command: 'command-definition.schema.json',
   tool: null,
 };
 

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "finishing-a-development-branch Input Schema",
+  "description": "Input validation schema for finishing-a-development-branch skill",
+  "type": "object",
+  "required": [],
+  "properties": {},
+  "additionalProperties": true
+}

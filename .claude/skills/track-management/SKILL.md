@@ -1,7 +1,7 @@
 ---
 name: track-management
 description: Track management methodology - creating and managing logical work units (features, bugs, refactors) through specification, planning, and implementation phases.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 tools:
@@ -11,8 +11,8 @@ tools:
   - Bash
   - Glob
   - Grep
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Track Management
@@ -480,6 +480,24 @@ Phase 3: Cleanup
 8. **Archive, don't delete**: Preserve completed tracks for reference
 9. **Size appropriately**: Keep tracks between 1-5 days of work
 10. **Clear acceptance criteria**: Every requirement must be testable
+
+## Iron Laws
+
+1. **ALWAYS** create the track directory and spec.md before writing any implementation code
+2. **NEVER** begin implementation without a committed plan.md with task breakdown and dependencies
+3. **ALWAYS** record session progress in progress.md at the end of every working session
+4. **NEVER** mark a task `[x]` complete without a commit SHA proving the work was committed
+5. **ALWAYS** move blocked tasks to `[!]` with a description of the blocker rather than leaving them in-progress
+
+## Anti-Patterns
+
+| Anti-Pattern                            | Why It Fails                                | Correct Approach                                     |
+| --------------------------------------- | ------------------------------------------- | ---------------------------------------------------- |
+| Implementation without spec.md          | Undefined requirements and scope creep      | Write spec.md first; block implementation until done |
+| plan.md not updated as tasks complete   | Stale plan misleads next session            | Update task states in real time as work progresses   |
+| No progress.md entries between sessions | Lost context on resume, duplicate work      | Append session log to progress.md before stopping    |
+| Marking `[x]` without commit SHA        | No traceability; can't verify what was done | Record commit SHA with every completed task          |
+| Ignoring blocked tasks                  | Silent blockers derail the track            | Escalate `[!]` blockers immediately; don't skip      |
 
 ## Memory Protocol (MANDATORY)
 

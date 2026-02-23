@@ -1,15 +1,15 @@
 ---
 name: differential-review
 description: Perform security-focused review of code diffs and pull requests, identifying newly introduced vulnerabilities, security regressions, and unsafe patterns in changed code.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: agent
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: trailofbits/skills
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/differential-review
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->
@@ -289,8 +289,8 @@ git diff --cached | grep -E "^\+" | grep -iE "(eval|exec|system|innerHTML|danger
 # Check for removed security middleware
 git diff --cached | grep -E "^\-" | grep -iE "(authenticate|authorize|validate|sanitize|escape)"
 
-# Check for new TODO/FIXME security items
-git diff --cached | grep -E "^\+" | grep -iE "(TODO|FIXME|HACK|XXX).*(security|auth|vuln)"
+# Check for new deferred security items (unresolved markers)
+git diff --cached | grep -E "^\+" | grep -iE "(T0D0|F1XME|HACK|XXX).*(security|auth|vuln)"
 ```
 
 ### GitHub Actions Integration
@@ -341,6 +341,24 @@ jobs:
 - **security-architect** (primary): Security assessment of changes
 - **penetration-tester** (secondary): Verify exploitability of findings
 - **developer** (secondary): Security-aware development guidance
+
+## Iron Laws
+
+1. **ALWAYS** classify changed files by security sensitivity (P0–P3) before reviewing — never dive into code without a triage map; you will miss the highest-risk changes.
+2. **NEVER** treat removal of security middleware (auth, CSRF, rate-limit, helmet) as a routine refactor — always flag as CRITICAL and require explicit justification in the PR description.
+3. **ALWAYS** use `git diff -U10` for context-extended diffs — the default 3-line context is insufficient to detect security regressions from function reordering or middleware removal.
+4. **NEVER** approve a diff that adds a new public endpoint without verifying authentication middleware is applied — unauthenticated routes in diffs are high-frequency security regressions.
+5. **ALWAYS** check deleted lines as carefully as added lines — removed security controls (validation, logging, auth checks) are as dangerous as new vulnerable code.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                          | Why It Fails                                                                            | Correct Approach                                                                 |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Reviewing only changed lines without reading surrounding context      | Security regressions appear as refactors when surrounding auth/middleware is removed    | Use `git diff -U10`; read full function scope before and after the change        |
+| Treating security dependency removal as a dependency update           | Removing a security package (helmet, csurf) eliminates its protections silently         | Classify all dependency changes; flag security-package removals as CRITICAL      |
+| Skipping deleted-line review                                          | Removed input validation, auth checks, or logging are invisible in addition-only review | Review deletions first; build the "what protections were removed" list           |
+| Approving new routes without auth check verification                  | New endpoints skip existing middleware when not explicitly added                        | Verify middleware chain for every new route/controller in the diff               |
+| Using informal severity like "looks fine" without CWE/OWASP reference | Severity ambiguity makes remediation prioritization inconsistent                        | Use the structured format: SECURITY [SEVERITY], CWE, OWASP category, remediation |
 
 ## Memory Protocol (MANDATORY)
 

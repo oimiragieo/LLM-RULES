@@ -8,8 +8,8 @@ tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: trailofbits/skills
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/static-analysis
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->
@@ -315,6 +315,24 @@ jobs:
 - **code-reviewer** (secondary): Automated code review augmentation
 - **penetration-tester** (secondary): Vulnerability verification
 - **qa** (secondary): Quality gate enforcement
+
+## Iron Laws
+
+1. **NEVER** deploy to production without running both Semgrep and CodeQL analysis
+2. **ALWAYS** create a fresh CodeQL database — stale databases miss recently added code
+3. **NEVER** suppress a finding without documenting the false positive rationale in a code comment
+4. **ALWAYS** block on CRITICAL/HIGH findings in CI/CD; never merge with unresolved critical issues
+5. **NEVER** run analysis on test/fixture directories — always exclude non-production code paths
+
+## Anti-Patterns
+
+| Anti-Pattern                           | Why It Fails                                            | Correct Approach                                                                   |
+| -------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Using outdated CodeQL database         | Analysis misses code added since last build             | Always create a fresh database before each analysis run                            |
+| Using generic rule suites              | Generic rules miss language-specific security patterns  | Use language-specific security suites (e.g., `codeql/javascript-queries:Security`) |
+| Suppressing findings without rationale | Creates silent security debt and audit gaps             | Document false positive reason in code comment before suppressing                  |
+| Scanning test/fixture code             | False positives from intentionally vulnerable test code | Exclude test/ and fixture/ directories from all scans                              |
+| Not re-running after fixes             | Remediation not confirmed; same finding recurs          | Always re-run analysis after each fix to verify resolution                         |
 
 ## Memory Protocol (MANDATORY)
 

@@ -8,8 +8,8 @@ tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: trailofbits/skills
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/variant-analysis
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->
@@ -332,6 +332,24 @@ For each discovered instance, classify:
 - **security-architect** (primary): Threat modeling and vulnerability assessment
 - **code-reviewer** (secondary): Pattern-aware code review
 - **penetration-tester** (secondary): Exploit verification for variants
+
+## Iron Laws
+
+1. **ALWAYS** start from a confirmed seed vulnerability before writing any pattern queries
+2. **NEVER** broaden a query without first verifying it matches the known seed vulnerability
+3. **ALWAYS** test pattern queries against at least one known-vulnerable instance before scanning broadly
+4. **NEVER** report a variant finding without manual triage confirming reachability and exploitability
+5. **ALWAYS** check all related repositories when a variant is confirmed in one codebase
+
+## Anti-Patterns
+
+| Anti-Pattern                       | Why It Fails                                           | Correct Approach                                          |
+| ---------------------------------- | ------------------------------------------------------ | --------------------------------------------------------- |
+| Exact-match queries only           | Misses refactored and syntactically different variants | Abstract the pattern and test all four abstraction levels |
+| No seed verification step          | Query may not match the known vulnerability            | Test query against seed instance first                    |
+| Overly broad patterns              | High false positive rate wastes triage time            | Narrow with `pattern-not` for known-safe patterns         |
+| Single-repo scan                   | Variant may exist in sibling repositories              | Scan all related repos with the same framework            |
+| Stopping after first variant found | Leaves the bug class partially patched                 | Perform exhaustive search across the full codebase        |
 
 ## Memory Protocol (MANDATORY)
 

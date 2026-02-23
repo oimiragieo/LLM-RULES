@@ -131,21 +131,27 @@ const INTENT_TO_AGENT = {
   plan: 'planner',
   integration: 'developer',
 
-  // New skills added 2026-02-21
-  'agent-evaluation': 'agent-evaluation',
-  'context-degradation': 'context-degradation',
-  'property-based-testing': 'property-based-testing',
-  'agent-tool-design': 'agent-tool-design',
-  'sharp-edges': 'sharp-edges',
-  'qa-guardian': 'qa-guardian',
-  'contract-check': 'contract-check',
-  'bool-action': 'bool-action',
-  'repo-onboarder': 'repo-onboarder',
-  'enterprise-skill-test-1771722088465': 'enterprise-skill-test-1771722088465',
-  'enterprise-skill-test-1771722182676': 'enterprise-skill-test-1771722182676',
-  'enterprise-skill-test-1771736541519': 'enterprise-skill-test-1771736541519',
-  'enterprise-skill-test-1771737759020': 'enterprise-skill-test-1771737759020',
-  'enterprise-skill-test-1771738405049': 'enterprise-skill-test-1771738405049',
+  // Skills routed to their owning agents (not self-referential)
+  'agent-evaluation': 'qa',
+  'context-degradation': 'context-compressor',
+  'property-based-testing': 'qa',
+  'agent-tool-design': 'architect',
+  'sharp-edges': 'developer',
+
+  // Reflection agent (hyphen key matches INTENT_KEYWORDS)
+  'reflection-agent': 'reflection-agent',
+
+  // Medical research triage
+  medical_research_triage: 'medical-research-triage',
+
+  // Kubernetes Specialist
+  kubernetes_specialist: 'kubernetes-specialist',
+
+  // PM Coordinator
+  pm_coordinator: 'pm-coordinator',
+
+  // Advanced Debugging
+  advanced_debugging: 'advanced-debugging',
 };
 
 module.exports = { INTENT_TO_AGENT };

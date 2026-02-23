@@ -14,8 +14,8 @@ best_practices:
   - Check for blocked tasks after completing work
 error_handling: strict
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Task Management Protocol
@@ -166,7 +166,7 @@ TaskUpdate({
     filesCreated: ['path/to/new.ts'],
     testsAdded: true,
     testsPassing: true,
-    outputArtifacts: ['.claude/context/reports/my-report.md'],
+    outputArtifacts: ['.claude/context/reports/backend/my-report.md'],
     nextSteps: ['Optional follow-up', 'Another consideration'],
     completedAt: new Date().toISOString(),
   },
@@ -469,7 +469,7 @@ TaskUpdate({
   status: 'completed',
   metadata: {
     summary: 'Security scan complete: 12 issues found (3 critical)',
-    outputArtifacts: ['.claude/context/reports/security-scan.md'],
+    outputArtifacts: ['.claude/context/reports/security/security-scan.md'],
     criticalFindings: 3,
     highFindings: 5,
     mediumFindings: 4,
@@ -514,6 +514,24 @@ TaskGet({ taskId: '2' }); // Gets design context from task 1's metadata
 - `session-handoff` - Creates full session handoff documents (use for complex handoffs)
 - `operational-modes` - Self-regulates tool usage during task execution
 - `thinking-tools` - Checkpoints for verifying task completion quality
+
+## Iron Laws
+
+1. **NEVER** mark a task completed without structured metadata (summary, filesModified, completedAt)
+2. **ALWAYS** call `TaskUpdate(in_progress)` before starting any work — never start without claiming
+3. **NEVER** complete work without calling `TaskList()` to check for newly unblocked tasks
+4. **ALWAYS** update task metadata with discoveries as they happen, not retrospectively
+5. **NEVER** put structured data in description prose — use the `metadata` field for machine-readable fields
+
+## Anti-Patterns
+
+| Anti-Pattern                           | Why It Fails                                           | Correct Approach                                                              |
+| -------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| No summary metadata on completion      | Future agents have no context for continuation         | Always include summary, filesModified, and completedAt in completion metadata |
+| Skipping in_progress before work       | Task appears unowned; duplicate work begins            | Always call TaskUpdate(in_progress) before starting                           |
+| Not checking TaskList after completion | Newly unblocked tasks remain stalled                   | Always call TaskList() after every task completion                            |
+| Structured data in description prose   | Cannot be parsed by agents; context lost               | Use metadata field for structured data, description for narrative             |
+| Missing discovery updates              | Context accumulated during work is lost on session end | Update metadata with discoveries as they happen, not retrospectively          |
 
 ## Memory Protocol (MANDATORY)
 

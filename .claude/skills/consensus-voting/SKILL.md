@@ -1,7 +1,7 @@
 ---
 name: consensus-voting
 description: Byzantine consensus voting for multi-agent decision making. Implements voting protocols, conflict resolution, and agreement algorithms for reaching consensus among multiple agents.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Escalate unresolved conflicts
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Consensus Voting Skill
@@ -238,6 +238,24 @@ This skill enables decision-making in multi-agent orchestration:
 - Security reviews in `.claude/workflows/enterprise/` require security-architect consensus
 
 ---
+
+## Iron Laws
+
+1. **NEVER accept a decision without meeting minimum quorum** — decisions made without quorum are illegitimate; if quorum is not met, postpone the decision or escalate to human intervention.
+2. **ALWAYS weight votes by domain expertise** — equal weights give a generalist developer the same influence as a domain expert; weight by expertise relevance to the decision domain.
+3. **NEVER discard dissenting opinions** — minority perspectives contain the most important signal about edge cases and risks; document all rationales, including the losing side.
+4. **ALWAYS require re-vote with deliberation before escalating** — a split vote without deliberation wastes the consensus mechanism; agents must share reasoning and vote again before escalating to human.
+5. **NEVER allow abstentions in critical decisions** — abstentions on high-stakes decisions mean agents are avoiding responsibility; all participants must vote on CRITICAL/UNANIMOUS-threshold decisions.
+
+## Anti-Patterns
+
+| Anti-Pattern                               | Why It Fails                                       | Correct Approach                                                     |
+| ------------------------------------------ | -------------------------------------------------- | -------------------------------------------------------------------- |
+| No quorum requirement                      | Tiny group decides for all; illegitimate consensus | Set minimum participation threshold per decision type                |
+| Equal weights for all agents               | Ignores domain expertise; reduces signal quality   | Weight by domain expertise relevance (1.0–2.0 range)                 |
+| Discarding dissenting rationales           | Loses edge case awareness and risk signals         | Document all votes and rationales, majority and minority             |
+| Immediate escalation on split vote         | Skips deliberation that could resolve disagreement | Require deliberation + re-vote before human escalation               |
+| Allowing abstentions on critical decisions | Agents avoid accountability on hard decisions      | Require participation from all eligible voters on CRITICAL decisions |
 
 ## Memory Protocol (MANDATORY)
 

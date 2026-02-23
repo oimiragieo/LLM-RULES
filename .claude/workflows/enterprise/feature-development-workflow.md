@@ -126,7 +126,7 @@ Assess security implications and risks for feature: $FEATURE_NAME
 3. Review architecture: .claude/context/plans/feature-$FEATURE_NAME-architecture.md
 4. Identify security requirements, compliance needs, data privacy concerns
 5. Create security assessment with risk matrix, compliance checklist
-6. Save output to: .claude/context/reports/feature-$FEATURE_NAME-security.md
+6. Save output to: .claude/context/reports/security/feature-$FEATURE_NAME-security.md
 
 ## Context
 - Technical design from Step 2
@@ -145,7 +145,7 @@ Assess security implications and risks for feature: $FEATURE_NAME
 
 ### Step 4: Backend Services Implementation
 
-**Agent**: Developer with backend-expert and tdd skills
+**Agent**: Developer with python-backend-expert and tdd skills
 
 **Task Spawn**:
 
@@ -162,7 +162,7 @@ Implement backend services for: $FEATURE_NAME
 ## Instructions
 1. Read your agent definition: .claude/agents/core/developer.md
 2. **Invoke skills**:
-   - Skill({ skill: "backend-expert" })
+   - Skill({ skill: "python-backend-expert" })
    - Skill({ skill: "tdd" }) // If methodology=tdd
 3. Follow technical design: .claude/context/plans/feature-$FEATURE_NAME-architecture.md
 4. Build RESTful/GraphQL APIs, implement business logic
@@ -224,7 +224,7 @@ Build frontend components for: $FEATURE_NAME
 
 ### Step 6: Data Pipeline & Integration
 
-**Agent**: Developer with data-engineering-expert skill
+**Agent**: Developer with data-expert skill
 
 **Task Spawn**:
 
@@ -240,7 +240,7 @@ Build data pipelines for: $FEATURE_NAME
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/developer.md
-2. **Invoke skill**: Skill({ skill: "data-engineering-expert" })
+2. **Invoke skill**: Skill({ skill: "data-expert" })
 3. Design ETL/ELT processes, implement data validation
 4. Create analytics events, set up data quality monitoring
 5. Integrate with product analytics platforms for feature usage tracking
@@ -324,7 +324,7 @@ Perform security testing for: $FEATURE_NAME
 4. Run OWASP checks, penetration testing, dependency scanning
 5. Verify data encryption, authentication, and authorization
 6. Create vulnerability report with remediation actions
-7. Save output to: .claude/context/reports/feature-$FEATURE_NAME-security-validation.md
+7. Save output to: .claude/context/reports/security/feature-$FEATURE_NAME-security-validation.md
 
 ## Context
 - Implementation code from Steps 4-5
@@ -341,7 +341,7 @@ Perform security testing for: $FEATURE_NAME
 
 ### Step 9: Performance Optimization
 
-**Agent**: Developer with performance-optimization skill
+**Agent**: Developer with web-perf skill
 
 **Task Spawn**:
 
@@ -357,7 +357,7 @@ Optimize performance for: $FEATURE_NAME
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/developer.md
-2. **Invoke skill**: Skill({ skill: "performance-optimization" })
+2. **Invoke skill**: Skill({ skill: "web-perf" })
 3. Analyze backend services and frontend from Steps 4-5
 4. Profile code, optimize queries, implement caching
 5. Reduce bundle sizes, improve load times
@@ -398,8 +398,8 @@ Prepare deployment for: $FEATURE_NAME
 ## Instructions
 1. Read your agent definition: .claude/agents/specialized/devops.md
 2. **Invoke skills**:
-   - Skill({ skill: "cicd-expert" })
-   - Skill({ skill: "deployment-strategies" })
+   - Skill({ skill: "ci-cd-implementation-rule" })
+   - Skill({ skill: "containerization-rules" })
 3. Create CI/CD pipeline with automated tests from Step 7
 4. Configure feature flags for gradual rollout
 5. Implement $DEPLOYMENT_STRATEGY deployment strategy
@@ -439,7 +439,7 @@ Set up observability for: $FEATURE_NAME
 
 ## Instructions
 1. Read your agent definition: .claude/agents/specialized/devops.md
-2. **Invoke skill**: Skill({ skill: "observability-expert" })
+2. **Invoke skill**: Skill({ skill: "sentry-monitoring" })
 3. Implement distributed tracing, custom metrics, error tracking
 4. Create dashboards for feature usage, performance, error rates, KPIs
 5. Set up SLOs/SLIs with automated alerts
@@ -477,7 +477,7 @@ Generate comprehensive documentation for: $FEATURE_NAME
 
 ## Instructions
 1. Read your agent definition: .claude/agents/core/developer.md
-2. **Invoke skill**: Skill({ skill: "documentation-expert" })
+2. **Invoke skill**: Skill({ skill: "doc-generator" })
 3. Create API documentation, user guides, deployment guides
 4. Include troubleshooting runbooks
 5. Add architecture diagrams, data flow diagrams, integration guides
@@ -567,19 +567,19 @@ Execute each phase sequentially, spawning appropriate agents with correct skills
 
 ## Agent-Skill Mapping Reference
 
-| Original Agent Type                                | Framework Agent    | Required Skills                    |
-| -------------------------------------------------- | ------------------ | ---------------------------------- |
-| `business-analytics::business-analyst`             | planner            | plan-generator                     |
-| `comprehensive-review::architect-review`           | architect          | -                                  |
-| `security-scanning::security-auditor`              | security-architect | security-architect                 |
-| `backend-architect`                                | developer          | backend-expert, tdd                |
-| `frontend-mobile-development::frontend-developer`  | developer          | frontend-expert, react-expert      |
-| `data-engineering::data-engineer`                  | developer          | data-engineering-expert            |
-| `unit-testing::test-automator`                     | qa                 | tdd                                |
-| `application-performance::performance-engineer`    | developer          | performance-optimization           |
-| `deployment-strategies::deployment-engineer`       | devops             | cicd-expert, deployment-strategies |
-| `observability-monitoring::observability-engineer` | devops             | observability-expert               |
-| `documentation-generation::docs-architect`         | developer          | documentation-expert               |
+| Original Agent Type                                | Framework Agent    | Required Skills                                   |
+| -------------------------------------------------- | ------------------ | ------------------------------------------------- |
+| `business-analytics::business-analyst`             | planner            | plan-generator                                    |
+| `comprehensive-review::architect-review`           | architect          | -                                                 |
+| `security-scanning::security-auditor`              | security-architect | security-architect                                |
+| `backend-architect`                                | developer          | python-backend-expert, tdd                        |
+| `frontend-mobile-development::frontend-developer`  | developer          | frontend-expert, react-expert                     |
+| `data-engineering::data-engineer`                  | developer          | data-expert                                       |
+| `unit-testing::test-automator`                     | qa                 | tdd                                               |
+| `application-performance::performance-engineer`    | developer          | web-perf                                          |
+| `containerization-rules::deployment-engineer`      | devops             | ci-cd-implementation-rule, containerization-rules |
+| `observability-monitoring::observability-engineer` | devops             | sentry-monitoring                                 |
+| `documentation-generation::docs-architect`         | developer          | doc-generator                                     |
 
 ## Notes
 

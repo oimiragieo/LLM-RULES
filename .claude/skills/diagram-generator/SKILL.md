@@ -1,7 +1,7 @@
 ---
 name: diagram-generator
 description: Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system architecture, database schemas, component relationships, and data flows.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -15,8 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 templates: [architecture-diagram, database-diagram, component-diagram, sequence-diagram]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — Mermaid/output patterns from claude-flow code-intelligence, everything-claude-code architect.
@@ -271,6 +271,24 @@ node .claude/tools/diagram-generator/scripts/generate.mjs --type sequence "user 
 
 </usage_example>
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** use Mermaid syntax for all generated diagrams — never produce free-form ASCII art or PlantUML; only Mermaid is portable and version-controllable.
+2. **NEVER** exceed 200 nodes in a single diagram — beyond that threshold the diagram becomes cognitively unreadable; split large systems into multiple focused diagrams by subsystem.
+3. **ALWAYS** enforce the 1000-file hard limit per diagram generation run — analyzing more files without chunking causes context explosion and memory exhaustion.
+4. **NEVER** write diagram files to project root or arbitrary locations — all diagrams go to `.claude/context/artifacts/diagrams/` with the naming convention `{subject}-{type}-{YYYY-MM-DD}.mmd`.
+5. **ALWAYS** label connections that are not self-evidently directional — an unlabeled arrow between two ambiguously-named nodes is indistinguishable from any other relationship.
+
+## Anti-Patterns
+
+| Anti-Pattern                                      | Why It Fails                                                                 | Correct Approach                                                                |
+| ------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Generating a single diagram for 500+ node systems | Unreadable; cognitive overload; renders as noise                             | Split by subsystem: overview diagram (10-20 nodes) + detail diagrams per module |
+| Using free-form ASCII art instead of Mermaid      | Not renderable in standard tools; not version-diffable                       | Use Mermaid syntax exclusively; all tools that render code docs support it      |
+| Analyzing all files without chunking              | >1000 files causes context explosion and timeouts                            | Enforce 1000-file hard limit; spawn multiple diagram tasks for large codebases  |
+| Writing diagrams to arbitrary paths               | Diagrams become unfindable; no catalog integration                           | Always write to `.claude/context/artifacts/diagrams/{subdir}/`                  |
+| Defaulting to `graph TB` for every diagram type   | Wrong layout for sequence/ER/class content; forces readers to mentally remap | Use the Diagram Type Selection Matrix to pick the correct type for the content  |
 
 ## Memory Protocol (MANDATORY)
 

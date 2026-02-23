@@ -49,7 +49,6 @@ const INVALID_SUBAGENT_TYPES = new Set([
 ]);
 
 const STALE_PATH_REWRITES = Object.freeze({
-  '.claude/lib/memory/memory-query.cjs': '.claude/lib/memory/core/memory-query.cjs',
   '.claude/lib/utils/safe-json-parse.cjs': '.claude/lib/utils/safe-json.cjs',
   'tests/metrics/metrics-schema-contract.test.cjs':
     'tests/lib/monitoring/metrics-schema-contract.test.cjs',

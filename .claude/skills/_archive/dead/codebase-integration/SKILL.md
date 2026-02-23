@@ -188,7 +188,7 @@ Skill({ skill: '<skill-name>' });
 
 Create integration report and update memory.
 
-**Integration Report** (`.claude/context/reports/<source>-integration-report.md`):
+**Integration Report** (`.claude/context/reports/backend/<source>-integration-report.md`):
 
 ```markdown
 # <Source> Integration Report

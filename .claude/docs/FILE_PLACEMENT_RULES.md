@@ -29,8 +29,8 @@ This document defines the MANDATORY rules for where agents must place files they
 | Agent definition     | `.claude/agents/{category}/`                  |
 | Skill definition     | `.claude/skills/{name}/SKILL.md`              |
 | Workflow definition  | `.claude/workflows/{category}/`               |
-| Plan                 | `.claude/context/plans/`                      |
-| Report               | `.claude/context/reports/{domain}/`           |
+| Plan                 | `.claude/context/artifacts/plans/`            |
+| Report               | `.claude/context/reports/backend/{domain}/`   |
 | Research report      | `.claude/context/artifacts/research-reports/` |
 | Architecture doc     | `.claude/context/artifacts/architecture/`     |
 | Schema               | `.claude/schemas/`                            |
@@ -51,7 +51,7 @@ This document defines the MANDATORY rules for where agents must place files they
 
 ### Enforcement
 
-- **Hook**: `.claude/hooks/safety/file-placement-guard.cjs`
+- **Hook**: `unified-pre-write-hook.cjs`
 - **Trigger**: PreToolUse on Write and Edit operations
 - **Default Mode**: Block (prevents writes to invalid locations)
 - **Override**: Set `FILE_PLACEMENT_OVERRIDE=true` environment variable
@@ -217,7 +217,7 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 **Example Paths**:
 
 ```
-.claude/context/plans/auth-feature-plan-2026-02-07.md
+.claude/context/artifacts/plans/auth-feature-plan-2026-02-07.md
 .claude/context/reports/security/security-audit-2026-02-06.md
 .claude/context/reports/architecture/agent-utilization-audit-2026-02-06.md
 .claude/context/artifacts/research-reports/oauth-research.md
@@ -379,8 +379,8 @@ tests/fixtures/sample-agent.md            # Test fixture data
 | E2E tests                    | `tests/e2e/`                                  | `{workflow}.test.mjs`                       |
 | Test fixtures                | `tests/fixtures/`                             | Any                                         |
 | Workflows (`*.md`, `*.yaml`) | `.claude/workflows/{category}/`               | `{workflow-name}.md`                        |
-| Plans                        | `.claude/context/plans/`                      | `{feature}-plan-YYYY-MM-DD.md`              |
-| Reports                      | `.claude/context/reports/{domain}/`           | `{task}-report-YYYY-MM-DD.md`               |
+| Plans                        | `.claude/context/artifacts/plans/`            | `{feature}-plan-YYYY-MM-DD.md`              |
+| Reports                      | `.claude/context/reports/backend/{domain}/`   | `{task}-report-YYYY-MM-DD.md`               |
 | Research                     | `.claude/context/artifacts/research-reports/` | `{topic}-research.md`                       |
 | Architecture docs            | `.claude/context/artifacts/architecture/`     | `{topic}-ARCHITECTURE.md`                   |
 | Memory                       | `.claude/context/memory/`                     | `learnings.md`, `decisions.md`, `issues.md` |
@@ -456,7 +456,7 @@ Incorrect: .claude/agents/my-agent.md (missing category)
 ### Creating a Plan
 
 ```
-Correct:   .claude/context/plans/feature-x-plan-2026-02-07.md
+Correct:   .claude/context/artifacts/plans/feature-x-plan-2026-02-07.md
 Incorrect: .claude/context/artifacts/plans/feature-x-plan.md (old path before ADR-078)
 Incorrect: .claude/context/artifacts/feature-x-plan.md (missing plans/)
 ```

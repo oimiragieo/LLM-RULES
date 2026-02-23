@@ -1,7 +1,7 @@
 ---
 name: text-to-sql
 description: Convert natural language queries to SQL. Use for database queries, data analysis, and reporting.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Test queries on sample data
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -234,3 +234,32 @@ Use RAG to retrieve relevant schema information:
 - [Classification Patterns](../docs/CLASSIFICATION_PATTERNS.md) - Classification guide
 - [Evaluation Guide](../docs/EVALUATION_GUIDE.md) - Comprehensive evaluation
 - [Claude Cookbooks - Text-to-SQL](https://github.com/anthropics/anthropic-cookbook/tree/main/capabilities/text_to_sql)
+
+## Iron Laws
+
+1. **ALWAYS** validate all table and column names against the provided schema before generating SQL
+2. **NEVER** use string interpolation for query values — parameterized queries are mandatory without exception
+3. **ALWAYS** apply a `LIMIT` clause (default 100) to SELECT queries unless the user explicitly overrides it
+4. **NEVER** execute DROP, DELETE, TRUNCATE, or UPDATE statements without explicit user confirmation
+5. **ALWAYS** explain the generated query logic in plain language so the user understands what will execute
+
+## Anti-Patterns
+
+| Anti-Pattern                         | Why It Fails                                | Correct Approach                                        |
+| ------------------------------------ | ------------------------------------------- | ------------------------------------------------------- |
+| String interpolation for values      | SQL injection vulnerability                 | Use parameterized queries with `?` or `$N` placeholders |
+| No LIMIT clause on SELECT            | Returns all rows, risk of OOM and timeout   | Default `LIMIT 100`, require explicit user override     |
+| Destructive SQL without confirmation | Irreversible data loss                      | Gate DROP/DELETE/TRUNCATE behind user confirmation      |
+| No schema validation                 | References non-existent tables or columns   | Validate all identifiers against the provided schema    |
+| SELECT \* without column list        | Unpredictable results and performance waste | Always specify an explicit column list                  |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+Read `.claude/context/memory/learnings.md`
+
+**After completing:**
+
+- New pattern -> `.claude/context/memory/learnings.md`
+- Issue found -> `.claude/context/memory/issues.md`
+- Decision made -> `.claude/context/memory/decisions.md`

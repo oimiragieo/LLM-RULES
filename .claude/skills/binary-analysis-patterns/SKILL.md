@@ -1,12 +1,12 @@
 ---
 name: binary-analysis-patterns
 description: Master binary analysis patterns including disassembly, decompilation, control flow analysis, and code pattern recognition. Use when analyzing executables, understanding compiled code, or performing static analysis on binaries.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: [reverse-engineer, security-architect]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Binary Analysis Patterns
@@ -460,6 +460,24 @@ def auto_rename():
 - **Tail call optimization**: `jmp` instead of `call` + `ret`
 - **Dead code**: Unreachable code from optimization
 - **Position-independent code**: RIP-relative addressing
+
+## Iron Laws
+
+1. **ALWAYS perform static analysis before any dynamic execution** — disassemble and map control flow first; executing untrusted binaries without prior static analysis is a security risk and destroys reproducible evidence.
+2. **NEVER trust decompiler output as ground truth** — decompilers produce approximations; always cross-reference decompiled output with the raw disassembly for security-critical paths.
+3. **NEVER assume sequential execution** — indirect jumps, virtual dispatch tables, and JIT-compiled code all break linear flow; always check cross-references and jump tables before tracing a code path.
+4. **ALWAYS document architecture and calling convention at the start** — x86, x64, ARM, and MIPS have different calling conventions; misidentifying them causes every parameter and return-value analysis to be wrong.
+5. **ALWAYS mark assumptions as unverified until confirmed by dynamic analysis** — static analysis is incomplete; flag every inferred behavior with `[STATIC-ONLY]` and validate with dynamic trace evidence when possible.
+
+## Anti-Patterns
+
+| Anti-Pattern                            | Why It Fails                                       | Correct Approach                                        |
+| --------------------------------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Executing binary before static analysis | Destroys forensic state; safety risk               | Map entry points and control flow statically first      |
+| Trusting decompiler output verbatim     | Decompilers introduce artifacts and errors         | Cross-reference with raw disassembly for critical paths |
+| Assuming linear code flow               | Misses indirect jumps, vtables, JIT paths          | Check all xrefs and jump tables before tracing          |
+| Skipping architecture documentation     | Wrong calling convention invalidates all analysis  | Document arch + ABI before starting any analysis        |
+| Treating static inferences as confirmed | Inferences can be wrong without dynamic validation | Mark as [STATIC-ONLY] until runtime trace confirms      |
 
 ## Memory Protocol (MANDATORY)
 

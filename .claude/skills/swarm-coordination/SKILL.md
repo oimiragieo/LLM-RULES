@@ -1,7 +1,7 @@
 ---
 name: swarm-coordination
 description: Multi-agent swarm coordination patterns. Orchestrates parallel agent execution, manages agent communication, handles task distribution, and coordinates results aggregation.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Handle partial failures gracefully
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Swarm Coordination Skill
@@ -220,6 +220,24 @@ This skill powers multi-agent orchestration patterns across the framework:
 - Enterprise workflows in `.claude/workflows/enterprise/` use swarm patterns
 
 ---
+
+## Iron Laws
+
+1. **NEVER** spawn workers sequentially — all independent agents must be dispatched in a single message
+2. **ALWAYS** implement failure detection; never let a hung worker block the swarm indefinitely
+3. **NEVER** allow cross-worker communication — all coordination must flow through the Queen
+4. **ALWAYS** use structured handoff format for worker reports to enable programmatic aggregation
+5. **NEVER** spawn more than 7 workers in a single fan-out — coordination overhead dominates beyond that
+
+## Anti-Patterns
+
+| Anti-Pattern               | Why It Fails                                           | Correct Approach                                           |
+| -------------------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
+| Sequential spawning        | No parallelism; swarm executes like a queue            | Spawn all independent workers in a single message          |
+| Cross-worker communication | O(N²) coordination chaos                               | All worker-to-worker communication flows through the Queen |
+| No failure handling        | One worker crash stalls the swarm                      | Detect hung/failed workers and re-spawn with fresh state   |
+| Unbounded parallelism      | Coordination overhead exceeds speedup beyond 7 workers | Limit to 5-7 workers per fan-out for optimal throughput    |
+| Free-form worker reports   | Cannot aggregate results programmatically              | Require all workers to use the structured handoff template |
 
 ## Memory Protocol (MANDATORY)
 

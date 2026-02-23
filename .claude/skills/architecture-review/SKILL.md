@@ -1,7 +1,7 @@
 ---
 name: architecture-review
 description: Architecture review and design validation. Evaluates system designs against best practices, identifies anti-patterns, and ensures architectural decisions align with non-functional requirements.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -11,10 +11,11 @@ best_practices:
   - Check for anti-patterns and code smells
   - Verify non-functional requirements
   - Document architectural decisions
+  - Always document trade-offs explicitly
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Architecture Review Skill
@@ -143,6 +144,25 @@ The service layer follows a reasonable structure but has some coupling issues...
 
 </usage_example>
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS review architecture before COMPLEX or EPIC implementation starts** — architectural problems discovered after implementation cost 10-100x more to fix; review in the design phase.
+2. **NEVER approve an architecture with undocumented single points of failure** — every SPOF must be explicitly identified and have a documented mitigation plan.
+3. **ALWAYS evaluate against non-functional requirements** — performance, security, scalability, maintainability, and observability are non-optional; functional correctness without NFR compliance is incomplete.
+4. **NEVER treat architectural trade-offs as implicit** — every trade-off must be explicitly documented with rationale; hidden trade-offs become future surprises and unowned technical debt.
+5. **ALWAYS check for circular dependencies before approving a design** — circular module dependencies make testing, refactoring, and deployment order unpredictable and progressively harder to resolve.
+
+## Anti-Patterns
+
+| Anti-Pattern                                    | Why It Fails                                                       | Correct Approach                                                                    |
+| ----------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| No NFR evaluation                               | Design may pass functional tests but fail at scale or under attack | Always evaluate performance, security, scalability, observability                   |
+| Reviewing only the happy path                   | Systems fail at error boundaries, not in the happy path            | Review failure modes, retry behavior, and circuit breakers                          |
+| Approving without trade-off documentation       | Hidden trade-offs become future surprises                          | Explicitly document all trade-offs with rationale                                   |
+| Single point of failure left undocumented       | System has silent fragility that surfaces under load               | Map all SPOFs; require mitigation plans for each                                    |
+| Checking SOLID without anti-pattern catalog     | Principle adherence doesn't guarantee absence of anti-patterns     | Check both principles AND concrete anti-patterns (God Class, Shotgun Surgery, etc.) |
+| Architecture review after implementation starts | Too late to fix structural issues without major rework             | Review in design phase, before any code is written                                  |
 
 ## Rules
 

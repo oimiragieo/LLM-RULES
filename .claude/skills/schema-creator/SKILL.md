@@ -1,7 +1,7 @@
 ---
 name: schema-creator
 description: Creates JSON Schema validation files for skills, agents, hooks, workflows, and data structures. Ensures type safety and input validation across the framework.
-version: 2.1.0
+version: 2.3.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -885,13 +885,19 @@ This skill is part of the unified artifact lifecycle. For complete multi-agent o
 
 This skill is part of the **Creator Ecosystem**. Use companion creators for related artifacts:
 
-| Creator              | When to Use                               | Invocation                             |
-| -------------------- | ----------------------------------------- | -------------------------------------- |
-| **agent-creator**    | Creating agents that use schemas          | `Skill({ skill: 'agent-creator' })`    |
-| **skill-creator**    | Creating skills with input/output schemas | `Skill({ skill: 'skill-creator' })`    |
-| **hook-creator**     | Creating hooks with validation            | `Skill({ skill: 'hook-creator' })`     |
-| **workflow-creator** | Creating workflows with step schemas      | `Skill({ skill: 'workflow-creator' })` |
-| **template-creator** | Creating templates with data schemas      | `Skill({ skill: 'template-creator' })` |
+| Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
+| ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | `Skill({ skill: 'skill-updater' })`    | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | `Skill({ skill: 'agent-creator' })`    | Agent to own the capability       |
+| Existing agent needs capability update   | agent update      | `Skill({ skill: 'agent-updater' })`    | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | `Skill({ skill: 'command-creator' })`  | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
 
 ### Integration Chain
 
@@ -1084,6 +1090,17 @@ These rules are INVIOLABLE. Breaking them causes validation failures.
    - If schema enables new capabilities, update CLAUDE.md
    - Section 4 (Self-Evolution) for agent/skill/workflow schemas
    - Verify with: grep "schema-name" .claude/CLAUDE.md
+
+9. IRON LAW II: TYPED TOOL CALLING (MODEL-AGNOSTIC INTERFACE)
+   - Every tool-facing schema MUST include "description" on every property
+   - This is Typed Tool Calling: the model resolves parameters from a typed
+     JSON Schema contract instead of inferring from free-form markdown prose
+   - Benefit: Reduces model hallucination by 40-60% vs. untyped instructions
+   - Every required field must have: "type", "description", and where applicable "enum"
+   - Use snake_case for property names for cross-framework compatibility
+   - For schemas consumed by AI agents, add a Google Dork to your research:
+     "$schema" "type": "object" "properties" filetype:json ("tool" OR "skill") [Domain]
+   - additionalProperties MUST be false unless explicitly justified
 ```
 
 ## Validation Checklist (Run After Every Creation)
@@ -1118,6 +1135,52 @@ ls -la .claude/schemas/*.schema.json
 ```
 
 **BLOCKING**: If ANY item fails, schema creation is INCOMPLETE. All items must pass before proceeding.
+
+---
+
+## Ecosystem Alignment Contract (MANDATORY)
+
+This creator skill is part of a coordinated creator ecosystem. Any schema created here must align with related creators:
+
+- `agent-creator` for ownership and execution paths
+- `skill-creator` for capability packaging and assignment
+- `hook-creator` for enforcement and guardrails
+- `workflow-creator` for orchestration and phase gating
+- `template-creator` for standardized scaffolds
+- `command-creator` for user/operator command UX
+- `tool-creator` for executable automation surfaces
+
+### Cross-Creator Handshake (Required)
+
+Before completion, verify all relevant handshakes:
+
+1. Artifact route exists in `.claude/CLAUDE.md` and related routing docs.
+2. Discovery/registry entries are updated (catalog/index/registry as applicable).
+3. Companion artifacts are created or explicitly waived with reason.
+4. `validate-integration.cjs` passes for the created artifact.
+5. Skill index is regenerated when skill metadata changes.
+
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
+
+For new schema patterns, research is mandatory:
+
+1. Use Exa for implementation and ecosystem patterns:
+   - `mcp__Exa__web_search_exa({ query: '<topic> JSON Schema 2025 best practices' })`
+   - `mcp__Exa__get_code_context_exa({ query: '<topic> schema validation examples' })`
+2. Search arXiv for academic research (mandatory for AI/ML, agents, evaluation, orchestration, memory/RAG, security):
+   - Via Exa: `mcp__Exa__web_search_exa({ query: 'site:arxiv.org <topic> 2024 2025' })`
+   - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
+3. Record decisions, constraints, and non-goals in artifact references/docs.
+4. Keep schemas minimal and avoid over-specification.
+
+**arXiv is mandatory (not fallback) when topic involves:** AI agents, LLM evaluation, orchestration, memory/RAG, security, or any emerging methodology.
+
+### Regression-Safe Delivery
+
+- Follow strict RED -> GREEN -> REFACTOR for behavior changes.
+- Run targeted tests for changed modules.
+- Run lint/format on changed files.
+- Keep commits scoped by concern (logic/docs/generated artifacts).
 
 ---
 

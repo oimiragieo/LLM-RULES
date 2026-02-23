@@ -3,7 +3,7 @@ verified: true
 lastVerifiedAt: 2026-02-19T07:30:00.000Z
 name: accessibility
 description: Ensure accessibility in UI components including semantic HTML, ARIA attributes, keyboard navigation, and WCAG 2.2 AA compliance.
-version: 2.1.0
+version: 2.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -558,6 +558,14 @@ Before finalizing accessibility review:
 - [ ] Password fields allow paste (do not block paste with onpaste="return false")
 - [ ] Focus scroll margin set to prevent sticky UI from hiding keyboard focus
       </best_practices>
+
+## Iron Laws
+
+1. **ALWAYS start with semantic HTML** — never reach for ARIA before using the right native element (`<button>`, `<nav>`, `<main>`, etc.).
+2. **NEVER remove focus indicators** — `outline: none` without a replacement is an immediate WCAG failure. Keyboard users become completely lost.
+3. **ALWAYS test with real assistive technology** — automated tools (axe, Lighthouse) catch at most 30% of issues. NVDA, JAWS, or VoiceOver testing is mandatory.
+4. **NEVER convey information by color alone** — always pair color with text, icons, or patterns for users with color vision deficiencies.
+5. **ALWAYS apply WCAG 2.2 AA criteria** — 2.4.11 (focus not obscured), 2.5.7 (drag alternatives), 2.5.8 (24×24 target size), 3.3.8 (no cognitive auth barriers) are mandatory, not optional.
 
 ## Integration Points
 

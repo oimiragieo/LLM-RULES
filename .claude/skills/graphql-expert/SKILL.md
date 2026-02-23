@@ -1,7 +1,7 @@
 ---
 name: graphql-expert
 description: GraphQL expert including schema design, Apollo Client/Server, and caching
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Graphql Expert
@@ -96,6 +96,24 @@ User: "Review this code for graphql best practices"
 Agent: [Analyzes code against consolidated guidelines and provides specific feedback]
 ```
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** implement query depth and complexity limits in production GraphQL servers — unbounded queries allow clients to construct exponentially expensive nested queries that exhaust server resources (DoS via query complexity).
+2. **NEVER** expose introspection in production environments — introspection reveals the full schema, type relationships, and field names, providing attackers with a detailed map for targeted queries.
+3. **ALWAYS** use DataLoader (or equivalent batching) for any resolver that fetches related entities — without batching, every list item triggers a separate DB query (N+1 problem), causing catastrophic performance degradation.
+4. **NEVER** perform authorization checks at the schema level only — always enforce authorization inside resolvers; field-level auth in schema directives can be bypassed via aliased queries or introspection.
+5. **ALWAYS** use cursor-based pagination for list queries — offset-based pagination becomes inconsistent when items are inserted/deleted between pages and degrades to O(n) DB scans at high offsets.
+
+## Anti-Patterns
+
+| Anti-Pattern                            | Why It Fails                                                             | Correct Approach                                                            |
+| --------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| No query depth/complexity limits        | Single deeply-nested query can DoS the server                            | Configure `graphql-depth-limit` and `graphql-query-complexity` middleware   |
+| Introspection enabled in production     | Exposes full schema to attackers; aids targeted exploitation             | Disable via `introspection: false` in Apollo Server config for production   |
+| N+1 resolver queries                    | Each list item triggers separate DB query; 100 users = 100 queries       | Use DataLoader to batch and deduplicate DB fetches per request              |
+| Authorization only in schema directives | Directives can be bypassed by aliasing fields or crafting custom queries | Check permissions inside every resolver; use context for user/role          |
+| Offset-based pagination                 | Inconsistent pages when data changes; O(n) scan at large offsets         | Use cursor-based pagination with `first`, `after`, and opaque cursor tokens |
 
 ## Consolidated Skills
 

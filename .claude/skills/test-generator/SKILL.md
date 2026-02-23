@@ -1,7 +1,7 @@
 ---
 name: test-generator
 description: Generates test code from specifications, components, and API endpoints. Creates unit tests, integration tests, and E2E tests following project testing patterns and conventions.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -15,8 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 templates: [unit-test, integration-test, e2e-test, api-test]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -249,6 +249,24 @@ node .claude/skills/test-generator/scripts/main.cjs src/components/UserProfile.t
 
 </usage_example>
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** analyze existing test patterns and framework conventions before generating any test code
+2. **NEVER** generate tests that inspect implementation details — test only public behavior and outputs
+3. **ALWAYS** include edge cases: null/undefined inputs, boundary values, and error scenarios for every tested unit
+4. **NEVER** produce tests with shared mutable state — use beforeEach/afterEach to isolate every test
+5. **ALWAYS** verify generated tests are syntactically valid and runnable before marking generation complete
+
+## Anti-Patterns
+
+| Anti-Pattern                       | Why It Fails                                       | Correct Approach                                |
+| ---------------------------------- | -------------------------------------------------- | ----------------------------------------------- |
+| Testing implementation details     | Breaks on refactor even when behavior is unchanged | Test public API behavior and observable outputs |
+| No assertions in test body         | Test always passes, catches nothing                | Add explicit assertions for every test case     |
+| Shared mutable state between tests | Tests fail depending on execution order            | Use beforeEach/afterEach for full isolation     |
+| Magic numbers in assertions        | Unclear expected values, brittle tests             | Use named constants or descriptive fixture data |
+| Missing error path tests           | Half coverage, silent failures in production       | Test both success and failure scenarios         |
 
 ## Memory Protocol (MANDATORY)
 

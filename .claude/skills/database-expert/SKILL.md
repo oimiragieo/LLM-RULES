@@ -1,7 +1,7 @@
 ---
 name: database-expert
 description: Database expert including Prisma, Supabase, SQL, and NoSQL patterns
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Database Expert
@@ -116,6 +116,24 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 This expert skill consolidates 1 individual skills:
 
 - database-expert
+
+## Iron Laws
+
+1. **ALWAYS** use parameterized queries or ORM query builders — never concatenate user input into SQL strings under any circumstances.
+2. **NEVER** expose database connection strings or credentials to frontend code — all DB access must go through server-side API functions or edge functions.
+3. **ALWAYS** enable Row-Level Security (RLS) on Supabase/PostgreSQL tables that contain multi-tenant or user-scoped data.
+4. **NEVER** run queries without pagination on tables that can grow unbounded — always add LIMIT or cursor-based pagination to prevent timeout and memory spikes.
+5. **ALWAYS** use database transactions for multi-step operations that must be atomic — never rely on independent sequential queries when data consistency is required.
+
+## Anti-Patterns
+
+| Anti-Pattern                                      | Why It Fails                                                              | Correct Approach                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| String-concatenated SQL queries                   | SQL injection vector; one unsanitized input compromises the database      | Use ORM query builders or parameterized prepared statements          |
+| No RLS on multi-tenant tables                     | Any authenticated user can read/write other users' data                   | Enable RLS policies scoped to `auth.uid()` on all user-scoped tables |
+| Unbounded `.findAll()` / `SELECT *` without LIMIT | Returns entire table; causes timeouts and memory spikes on large datasets | Always paginate with LIMIT/OFFSET or cursor-based pagination         |
+| No connection pooling                             | Serverless functions exhaust database connections under load              | Use PgBouncer / Supavisor in transaction mode                        |
+| Logging full query strings with values            | Leaks PII and credentials into log aggregators                            | Log query templates only; redact all bound parameter values          |
 
 ## Memory Protocol (MANDATORY)
 

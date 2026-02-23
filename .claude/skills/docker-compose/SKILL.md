@@ -1,7 +1,7 @@
 ---
 name: docker-compose
 description: Docker Compose container orchestration and management. Manage multi-container applications, services, networks, and volumes. Use for local development, testing, and orchestration of containerized applications.
-version: 1.1
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -1132,6 +1132,24 @@ docker compose version
 ## Related Skills
 
 - [`cloud-devops-expert`](../cloud-devops-expert/SKILL.md) - Cloud platforms (AWS, GCP, Azure) and Terraform infrastructure
+
+## Iron Laws
+
+1. **ALWAYS** use `docker compose` (V2 plugin) — never use `docker-compose` (V1 standalone), which is deprecated and will be removed.
+2. **NEVER** include secrets or credentials directly in compose files or committed `.env` files — use external secret management or `.env.example` templates for documentation only.
+3. **ALWAYS** define health checks on services that other services depend on — without health checks, dependent services start before their dependencies are actually ready.
+4. **NEVER** expose a service port to the host unless it must be accessed from outside the compose network — unnecessary host port exposure increases attack surface.
+5. **ALWAYS** specify resource limits (CPU and memory) on services intended for production — unlimited containers can starve other services and crash the host.
+
+## Anti-Patterns
+
+| Anti-Pattern                                | Why It Fails                                                                        | Correct Approach                                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Using `docker-compose` V1 command           | V1 is deprecated; missing V2 features (profiles, merge, watch) and will be removed  | Use `docker compose` (space, not hyphen); verify `docker compose version`                       |
+| Hardcoded secrets in compose file           | Secrets committed to git are permanently exposed in history                         | Use environment variable references (`${SECRET}`) loaded from untracked `.env`                  |
+| No health checks on database/cache services | App containers start before DB is ready; causes startup race conditions and crashes | Add `healthcheck:` with appropriate test commands; use `depends_on: condition: service_healthy` |
+| Exposing all ports to host (`0.0.0.0`)      | Services accessible from any network interface including public interfaces          | Bind to `127.0.0.1` for dev; use internal networks for service-to-service communication         |
+| No restart policy                           | Containers stay down after crash or host reboot in production                       | Use `restart: unless-stopped` for services that should auto-recover                             |
 
 ## Memory Protocol (MANDATORY)
 

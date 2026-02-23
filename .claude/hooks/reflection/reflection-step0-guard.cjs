@@ -34,7 +34,6 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { atomicWriteJSONSync } = require('../../lib/utils/atomic-write.cjs');
 let eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
-const { readSpawnRequestsFile } = require('../../lib/reflection/spawn-request-contract.cjs');
 
 const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'reflection-spawn-request.json');
@@ -72,8 +71,36 @@ function stderrLog(message, meta = {}) {
   );
 }
 
+/**
+ * Read spawn request entries from a JSON file as raw objects.
+ * Returns any object present in the JSON array without schema-level filtering,
+ * so that hasPendingReflections() can accurately count entries regardless of
+ * whether they carry the full subagent_type/prompt fields required for execution.
+ * Full sanitization is deferred to the reflection-agent at processing time.
+ */
 function readSpawnRequests(filePath) {
-  return readSpawnRequestsFile(filePath);
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const content = fs.readFileSync(filePath, 'utf8');
+    const parsed = safeParseJSON(content, null);
+    if (Array.isArray(parsed)) {
+      return parsed.filter(e => e !== null && typeof e === 'object' && !Array.isArray(e));
+    }
+    // Legacy format: object with numeric string keys (e.g. {"0": {...}, "1": {...}})
+    if (parsed && typeof parsed === 'object') {
+      const numericKeys = Object.keys(parsed)
+        .filter(key => /^\d+$/.test(key))
+        .sort((a, b) => Number(a) - Number(b));
+      if (numericKeys.length > 0) {
+        return numericKeys
+          .map(key => parsed[key])
+          .filter(e => e !== null && typeof e === 'object' && !Array.isArray(e));
+      }
+    }
+    return [];
+  } catch (_err) {
+    return [];
+  }
 }
 
 function readProcessedIdsFromReflectionLog() {

@@ -1,0 +1,4 @@
+interface:
+  display_name: Stale Module Pruner
+  short_description: Rigorous deep dive dependency-crawler to flush out stale,
+  default_prompt: Use the $stale-module-pruner skill to complete this task safely and efficiently.

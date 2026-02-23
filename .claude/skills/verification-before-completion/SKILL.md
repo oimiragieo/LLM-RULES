@@ -1,7 +1,7 @@
 ---
 name: verification-before-completion
 description: Gate function preventing unverified completion claims. Use before claiming any task is done.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -12,8 +12,8 @@ best_practices:
   - Never claim completion without evidence
 error_handling: strict
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Verification Before Completion
@@ -167,6 +167,24 @@ From failure analysis:
 Run the command. Read the output. THEN claim the result.
 
 This is non-negotiable.
+
+## Iron Laws
+
+1. **NEVER** claim task completion without running fresh verification commands in the current session
+2. **ALWAYS** read the full command output before asserting a result — not just the last line or exit code
+3. **NEVER** use hedging language ("should pass", "probably works") as a substitute for running verification
+4. **ALWAYS** apply the red-green-refactor cycle: verify test fails, fix passes, revert fails again
+5. **NEVER** commit, push, or close a task without verified evidence that all gates (tests, lint, format) pass
+
+## Anti-Patterns
+
+| Anti-Pattern                              | Why It Fails                                    | Correct Approach                                     |
+| ----------------------------------------- | ----------------------------------------------- | ---------------------------------------------------- |
+| Claiming success before running commands  | No evidence the claim is true                   | Run the command, read full output, then claim        |
+| Trusting results from a prior run         | State may have changed since last execution     | Always run fresh verification in the current session |
+| Partial verification (tests but not lint) | Lint failures fail CI even when tests pass      | Run all gates: tests, `pnpm lint:fix`, `pnpm format` |
+| Using "should" or "probably" language     | Implies assumption, not verification            | Eliminate hedging; verify then state the fact        |
+| Skipping red-green-refactor cycle         | Regression tests that always pass catch nothing | Verify test fails on revert before marking complete  |
 
 ## Memory Protocol (MANDATORY)
 

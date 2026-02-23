@@ -6,8 +6,8 @@ model: sonnet
 invoked_by: user
 user_invocable: true
 tools: [Read, Write, Edit]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Ripgrep Skill
@@ -587,7 +587,7 @@ pnpm search:structure
 rg -F "JSON.parse(" -g "*.cjs" -g "*.js" --no-heading
 rg -F "shell: true" -g "*.cjs" -g "*.js"
 rg "eval\(|new Function\(" -g "*.cjs" -g "*.js"
-rg "TODO|FIXME|HACK|STUB" -g "*.cjs" -g "*.js" -g "*.mjs"
+rg "DEPRECATED|LEGACY|WARN" -g "*.cjs" -g "*.js" -g "*.mjs"
 rg -F "catch" -A1 -g "*.cjs" | rg "^\s*\}"  # empty catch blocks
 
 # 3) Concept discovery for patterns you didn't think to grep
@@ -997,6 +997,24 @@ No manual binary management required - the npm package handles everything automa
 
 - [`grep`](../grep/SKILL.md) - Built-in Claude Code grep (simpler, less features)
 - [`glob`](../glob/SKILL.md) - File pattern matching
+
+## Iron Laws
+
+1. **ALWAYS** run `pnpm search:structure` first to orient before any edit task — editing without understanding directory layout and import hotspots causes missed callsites and blast radius surprises.
+2. **NEVER** use ranked/top-N hybrid search output for security audits — completeness matters for audits; use `rg` or built-in `Grep` to get every match, not a ranked sample.
+3. **ALWAYS** validate exact symbol anchors with `rg -F` before editing code — editing based on semantic matches alone misses similarly-named functions and causes wrong-file edits.
+4. **NEVER** make `fzf` a blocking dependency in automated or agent workflows — interactive selection is operator UX only; unattended agent flows must stay non-interactive and reproducible.
+5. **ALWAYS** scope repo-wide searches with file type filters or path globs — unscoped searches flood context with irrelevant matches and inflate token costs.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                       | Why It Fails                                                                                       | Correct Approach                                                                                       |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Starting an edit task without running `search:structure`           | Missing directory layout knowledge causes edits to the wrong file and missed callsites             | Always run `pnpm search:structure` first to understand directory hierarchy and import hotspots         |
+| Using hybrid search for security audit completeness                | Hybrid search returns ranked top-N, not all matches; security audits need every instance           | Use `rg`/`Grep` (exhaustive) for security sweeps; use hybrid search only for concept discovery         |
+| Editing code without confirming exact symbol location with `rg -F` | Semantic matches include similarly-named symbols; editing the wrong function is silent             | Run `rg -F "exact_symbol"` to confirm location and callsite count before any code edit                 |
+| Making `fzf` a required step in agent automation pipelines         | `fzf` requires interactive input; agents cannot proceed when the pipeline blocks on user selection | Keep `fzf` optional and operator-only; agent workflows must use deterministic `rg`/`search:code`       |
+| Running unscoped repo-wide regex searches                          | Large monorepos return thousands of matches; token costs spike and context floods                  | Always constrain scope with `-g "*.cjs"`, `-tjs`, or a path argument before running repo-wide patterns |
 
 ## Memory Protocol (MANDATORY)
 

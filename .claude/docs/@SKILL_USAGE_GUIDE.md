@@ -285,4 +285,4 @@ Skill({ skill: 'smart-debug' });
 
 ## Back to Main
 
-← [Return to CLAUDE.md](./CLAUDE.md)
+← Return to CLAUDE.md

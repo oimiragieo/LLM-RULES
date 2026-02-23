@@ -1,7 +1,7 @@
 ---
 name: git-expert
 description: Advanced Git operations wrapper. Optimizes token usage by guiding complex git workflows into efficient CLI commands.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -17,7 +17,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-19T06:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Git Expert Skill
@@ -87,11 +87,23 @@ git reset --soft HEAD~1
 3. `git add <file>`
 4. `git commit --no-edit`
 
-## 🛡️ Safety Rules
+## Iron Laws
 
-- NEVER use `git push --force`.
-- NEVER commit secrets.
-- ALWAYS run tests before pushing.
+1. **NEVER** use `git push --force` on shared branches — force-pushing rewrites history for all collaborators, causes lost commits, and breaks in-progress rebases silently; use `--force-with-lease` when truly necessary.
+2. **NEVER** commit secrets, credentials, or tokens to the repository — once pushed, secrets are visible in all forks and clones forever even after deletion from HEAD.
+3. **ALWAYS** run the test suite and verify it passes before pushing to shared branches — broken code in shared branches blocks everyone and triggers emergency rollbacks.
+4. **ALWAYS** rebase feature branches onto the base branch before merging — merging with a stale base creates avoidable conflicts and produces noisy merge commits in shared history.
+5. **NEVER** rebase or rewrite history on commits that have already been pushed to a shared remote — teammates' local branches will diverge and produce duplicate commits on next pull.
+
+## Anti-Patterns
+
+| Anti-Pattern                            | Why It Fails                                                              | Correct Approach                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `git push --force` on shared branches   | Overwrites teammates' commits; destroys in-progress rebase branches       | Use `--force-with-lease` for personal branches only; never on main/develop |
+| Committing `.env` or credentials        | Permanently visible in history even after deletion; requires key rotation | Add sensitive files to `.gitignore`; use pre-commit secret-scanning hooks  |
+| Long-lived feature branches (>5 days)   | Massive merge conflicts; integration bugs discovered too late             | Use short-lived branches with daily rebases onto main (trunk-based dev)    |
+| `git commit -m "fix"` or `wip` messages | Makes `git log` useless for bisect and changelog generation               | Use conventional commits: `fix: resolve null pointer in user auth`         |
+| Merging without pulling latest base     | Stale merge base; CI catches conflicts only after the merge lands         | `git fetch && git rebase origin/main` before any merge or PR               |
 
 ## Git 2.45–2.50 Features (2024–2025)
 

@@ -5,7 +5,7 @@ description: >-
   Validates hook syntax, security patterns (SE-01/SE-02), skill wiring, agent
   consistency, and routing correctness. Invoked as the final pipeline step
   when framework artifacts were created, modified, or deleted.
-version: 1.0.0
+version: 1.2.0
 model: sonnet
 category: validation
 invoked_by: both
@@ -22,7 +22,8 @@ best_practices:
   - Report findings with severity and remediation steps
 error_handling: strict
 streaming: supported
-verified: false
+verified: true
+lastVerifiedAt: 2026-02-23T00:00:00.000Z
 ---
 
 # Proactive Audit
@@ -51,6 +52,17 @@ Invoke this skill as the **final pipeline step** whenever ANY of the following p
 ```javascript
 Skill({ skill: 'proactive-audit' });
 ```
+
+## Mandatory Skills
+
+| Skill                             | Purpose                            | When                 |
+| --------------------------------- | ---------------------------------- | -------------------- |
+| `task-management-protocol`        | Track audit progress               | Always               |
+| `ripgrep`                         | Fast targeted artifact search      | During checks        |
+| `code-semantic-search`            | Pattern discovery across artifacts | When investigating   |
+| `token-saver-context-compression` | Compress large audit results       | When output is large |
+| `verification-before-completion`  | Gate completion on zero CRITICAL   | Before marking done  |
+| `memory-search`                   | Check prior audit patterns         | At start             |
 
 ## Step 1: Detect Changed Artifacts
 
@@ -127,7 +139,7 @@ For each changed artifact, apply the relevant checks from this matrix:
 
 ## Step 3: Generate Report
 
-Write a structured report to `.claude/context/reports/proactive-audit-{ISO-date}.md` with this format:
+Write a structured report to `.claude/context/reports/ecosystem-audit/proactive-audit-{ISO-date}.md` with this format:
 
 ```markdown
 <!-- Agent: qa | Task: #N | Session: YYYY-MM-DD -->
@@ -185,13 +197,23 @@ After generating the report:
 - If only MEDIUM/LOW findings: return `PASS` with the report path and note about medium findings
 - If no findings: return `PASS` with the report path
 
+## Iron Laws
+
+1. **ALWAYS** run every applicable check from the check matrix — skipping "small" changes is how undetected wiring failures accumulate across sessions.
+2. **NEVER** trust task metadata alone for change detection — use `git diff` as the primary source of changed artifact paths.
+3. **NEVER** report PASS without actually executing each check command — self-attested PASS without evidence violates verification-before-completion.
+4. **NEVER** ignore SE-02 (prototype pollution) findings in hook files — a single compromised hook can corrupt all subsequent tool calls in the pipeline.
+5. **ALWAYS** validate hook syntax with `node --check` before reporting findings — broken hooks silently block the entire tool pipeline.
+
 ## Anti-Patterns
 
-- **Never skip checks because "the change was small"** -- small changes cause big breakage
-- **Never trust task metadata alone for change detection** -- use git diff as primary
-- **Never report PASS without actually running the checks** -- this violates verification-before-completion
-- **Never ignore SE-02 findings** -- prototype pollution in hooks can compromise the entire framework
-- **Never skip syntax checks on hooks** -- broken hooks break every tool invocation
+| Anti-Pattern                                  | Why It Fails                                                                 | Correct Approach                                                        |
+| --------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Skipping checks for "small" changes           | Small wiring failures accumulate silently until a pipeline breaks            | Run all checks regardless of perceived change size                      |
+| Trusting task metadata for change detection   | Metadata can be incomplete or stale; misses unstaged changes                 | Use `git diff --name-only` + `git ls-files --others` as primary source  |
+| Self-attesting PASS without running commands  | Unverified PASS masks real failures; violates verification-before-completion | Execute every check command and capture output as evidence              |
+| Ignoring SE-02 (prototype pollution) in hooks | One polluted hook corrupts `Object.prototype` globally across all tool calls | Flag SE-02 as HIGH severity and block pipeline until fixed              |
+| Reporting findings without remediation steps  | Developers know what broke but not how to fix it                             | Include specific remediation for every finding with file+line reference |
 
 ## Severity Guide
 

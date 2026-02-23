@@ -170,9 +170,9 @@ LAST: TaskUpdate({ taskId: "<ID>", status: "completed", metadata: {...} });`,
 
 ## Sources Consulted
 
-1. [Source 1 Title](URL) - <key takeaways>
-2. [Source 2 Title](URL) - <key takeaways>
-3. [Source 3 Title](URL) - <key takeaways>
+1. Source 1 Title - <key takeaways>
+2. Source 2 Title - <key takeaways>
+3. Source 3 Title - <key takeaways>
 
 ## Key Findings
 

@@ -1,8 +1,9 @@
 ---
 name: artifact-lifecycle
 description: Unified lifecycle management for all framework artifacts (skills, agents, hooks, workflows, templates, schemas)
-version: 1.0.0
+version: 1.1.0
 author: Claude Code Enterprise Framework
+agents: [architect, planner, developer]
 triggers:
   - 'create skill'
   - 'create agent'
@@ -13,8 +14,9 @@ metadata:
   skill-author: Claude Code Enterprise Framework
   category: orchestration
   complexity: medium
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
 # Artifact Lifecycle Skill
@@ -146,6 +148,25 @@ Validates: no broken references
 | artifact_type | skill, agent, hook, workflow, template, schema | auto-detect |
 | operation     | create, update, deprecate, integrate           | auto-detect |
 | version_bump  | major, minor, patch                            | minor       |
+
+## Iron Laws
+
+1. **ALWAYS use type-specific creator skills** — never treat artifact-lifecycle as a shortcut that bypasses research-synthesis, companion-check, or validation; each phase exists for a reason.
+2. **ALWAYS determine operation mode before starting action** (CREATE/UPDATE/DEPRECATE) — never begin Phase 3 without a confirmed Phase 2 decision; wrong operation = wasted or dangerous work.
+3. **NEVER skip Phase 5 validation** — artifacts must be verified as invocable before the lifecycle task is marked complete; broken artifacts delivered as complete are worse than none.
+4. **ALWAYS update catalog and CLAUDE.md in Phase 4** — artifacts without catalog/routing entries are invisible to agents and the router; integration without registration is incomplete.
+5. **NEVER use artifact-lifecycle for simple single-artifact updates** — use type-specific updaters (skill-updater, agent-updater, workflow-updater); lifecycle is for multi-phase orchestration only.
+
+## Anti-Patterns
+
+| Anti-Pattern                                      | Why It Fails                                       | Correct Approach                                  |
+| ------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------- |
+| Skipping research-synthesis before CREATE         | Risk of creating a duplicate or outdated artifact  | Always run research-synthesis first               |
+| Starting action before Phase 2 decision           | Wrong operation applied; CREATE when UPDATE needed | Complete Phase 2 before Phase 3                   |
+| Skipping Phase 5 validation                       | Broken artifacts delivered as complete             | Always run invocability check                     |
+| No catalog/registry update in Phase 4             | Artifact is invisible to agents and router         | Always update catalog, registry, and CLAUDE.md    |
+| Using artifact-lifecycle for simple version bumps | Heavyweight process for lightweight work           | Use skill-updater/agent-updater for UPDATE mode   |
+| Not specifying artifact_type                      | Wrong creator skill invoked silently               | Always specify or verify artifact_type in Phase 1 |
 
 ## Memory Protocol
 

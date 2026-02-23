@@ -1,7 +1,7 @@
 ---
 name: expo-framework-rule
 description: Expo Framework-specific guidelines. Includes best practices for Views, Blueprints, and Extensions.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Use as reference when writing new code
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Expo Framework Rule Skill
@@ -67,7 +67,7 @@ function CameraScreen() {
 
   return (
     <CameraView
-      style={{ flex: 1 }}
+      style={styles.camera}
       onBarcodeScanned={({ data }) => console.log(data)}
     />
   );
@@ -135,7 +135,7 @@ await Asset.loadAsync([
   source={require('./assets/photo.jpg')}
   contentFit="cover"
   transition={200}
-  style={{ width: 200, height: 200 }}
+  style={styles.image}
 />
 ```
 
@@ -578,6 +578,24 @@ User: "Review this code for expo framework rule compliance"
 Agent: [Analyzes code against guidelines and provides specific feedback]
 ```
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** use Expo Router for navigation — never use React Navigation directly in new Expo projects; Expo Router provides file-based routing that integrates with native navigation and deep linking.
+2. **NEVER** eject to bare workflow unless the required native module is genuinely unavailable through Expo SDK, config plugins, or EAS Build — ejecting increases maintenance burden by orders of magnitude.
+3. **ALWAYS** use EAS Build for production builds — never use local `expo build` (deprecated) or `react-native run-ios/android` for release builds; EAS ensures consistent reproducible builds.
+4. **NEVER** use `expo-av` for camera in new projects — use `expo-camera` directly; `expo-av` is audio/video focused and the camera integration is deprecated.
+5. **ALWAYS** use `expo-image` instead of React Native's built-in `<Image>` — `expo-image` provides lazy loading, caching, and blurhash placeholder support out of the box.
+
+## Anti-Patterns
+
+| Anti-Pattern                                               | Why It Fails                                                                        | Correct Approach                                                            |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Using React Navigation instead of Expo Router              | Misses file-based routing, native tab/stack integration, and automatic deep linking | Use Expo Router; it wraps React Navigation with file-system conventions     |
+| Ejecting early "just in case"                              | Loses OTA updates, managed builds, and Expo SDK updates forever                     | Exhaust all Expo SDK/config plugin options first; eject only as last resort |
+| Using deprecated `expo build` command                      | Removed in SDK 46+; fails silently or produces broken artifacts                     | Use `eas build` with a properly configured `eas.json`                       |
+| Direct `require()` for images in performance-critical code | Large bundles; no lazy loading; no progressive blur placeholder                     | Use `expo-image` with `contentFit` and `blurhash` for optimized loading     |
+| Using `expo-constants` for secrets                         | Constants are bundled into the app binary and visible in source maps                | Use EAS secrets or server-side environment variables; never bundle secrets  |
 
 ## Memory Protocol (MANDATORY)
 

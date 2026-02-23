@@ -1,7 +1,7 @@
 ---
 name: interactive-requirements-gathering
 description: Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -14,8 +14,8 @@ best_practices:
   - Use gathered answers (not options) as source of truth for generation
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Interactive Requirements Gathering
@@ -257,6 +257,24 @@ AGENT: "Understood - the product automates code review feedback for developers a
 - Summarize understanding frequently
 - Include escape hatches (D, E options)
 - Respect user's custom inputs
+
+## Iron Laws
+
+1. **ALWAYS** ask exactly one question at a time and wait for a response before asking the next — presenting multiple questions simultaneously overwhelms users, produces ambiguous answers, and breaks the sequential state machine.
+2. **NEVER** use unselected option text in generated content — generated output must be built from the user's actual selected answers, not from the full list of options presented.
+3. **ALWAYS** classify each question as Additive (multi-select) or Exclusive (single choice) before asking — misclassification produces contradictory answers (user selects "B and D" when only one was valid).
+4. **NEVER** skip the confirmation step after generating content — presenting content without approval ignores refinements the user needed; always loop until the user explicitly approves.
+5. **ALWAYS** include a "Type your own" escape hatch option in every question — constrained option sets fail when the user's context doesn't fit any presented option; custom input prevents stalled workflows.
+
+## Anti-Patterns
+
+| Anti-Pattern                                             | Why It Fails                                                                             | Correct Approach                                                         |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Presenting multiple questions at once                    | Ambiguous responses; breaks sequential state; users answer partially                     | Ask one question; wait for answer; then ask the next                     |
+| Using option text verbatim in generated docs             | Docs include options the user didn't choose; inaccurate requirements                     | Use only the selected answer values, not the full option list            |
+| Skipping question classification (Additive vs Exclusive) | Multi-select question treated as single choice or vice versa; contradictory requirements | Classify first; use `multiSelect: true` for Additive questions           |
+| Proceeding without confirmation                          | Generated content doesn't match user intent; rework required                             | Always present output for review; provide Approve / Suggest Changes loop |
+| No custom input option                                   | User's context doesn't fit any option; session stalls or forces wrong choice             | Always include "D) Type your own" in every question                      |
 
 ## Related Skills
 

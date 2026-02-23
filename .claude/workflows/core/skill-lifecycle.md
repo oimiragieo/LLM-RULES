@@ -128,7 +128,7 @@ Subject: Discover artifact: $ARTIFACT_NAME
 3. Check creator registry: .claude/context/artifacts/catalogs/creator-registry.json
 4. Search skill catalog: .claude/context/artifacts/catalogs/skill-catalog.md
 5. Check learnings.md for similar artifacts: .claude/context/memory/learnings.md
-6. Save findings to: .claude/context/reports/artifact-discovery-$ARTIFACT_NAME.md
+6. Save findings to: .claude/context/reports/backend/artifact-discovery-$ARTIFACT_NAME.md
 
 ## Output Format
 - **Exists**: [Yes/No]
@@ -149,7 +149,7 @@ Subject: Discover artifact: $ARTIFACT_NAME
 
 ## Memory Protocol
 1. Read .claude/context/memory/learnings.md first
-2. Record findings to .claude/context/reports/artifact-discovery-$ARTIFACT_NAME.md
+2. Record findings to .claude/context/reports/backend/artifact-discovery-$ARTIFACT_NAME.md
 `,
 });
 ```
@@ -193,7 +193,7 @@ Subject: Compare versions for: $ARTIFACT_NAME
    - **Patch**: Bug fixes (no behavioral changes)
 7. Check backward compatibility requirements
 8. Identify migration needs for dependent artifacts
-9. Save analysis to: .claude/context/reports/version-analysis-$ARTIFACT_NAME.md
+9. Save analysis to: .claude/context/reports/backend/version-analysis-$ARTIFACT_NAME.md
 
 ## Output Format
 - **Current Version**: [X.Y.Z]
@@ -252,8 +252,8 @@ Subject: Plan lifecycle action for: $ARTIFACT_NAME
 1. Read your agent definition: .claude/agents/core/planner.md
 2. **Claim task**: TaskUpdate({ taskId: "$TASK_ID", status: "in_progress" })
 3. **Invoke planning skill**: Skill({ skill: "plan-generator" })
-4. Review discovery report: .claude/context/reports/artifact-discovery-$ARTIFACT_NAME.md
-5. Review version analysis (if exists): .claude/context/reports/version-analysis-$ARTIFACT_NAME.md
+4. Review discovery report: .claude/context/reports/backend/artifact-discovery-$ARTIFACT_NAME.md
+5. Review version analysis (if exists): .claude/context/reports/backend/version-analysis-$ARTIFACT_NAME.md
 6. Apply decision matrix:
 
    **If artifact does NOT exist:**
@@ -349,7 +349,7 @@ Subject: Create artifact: $ARTIFACT_NAME
 4. Create artifact at correct location
 5. Initialize version as 1.0.0
 6. Create CHANGELOG.md with creation entry
-7. Save creation summary to: .claude/context/reports/created-$ARTIFACT_NAME.md
+7. Save creation summary to: .claude/context/reports/backend/created-$ARTIFACT_NAME.md
 
 ## System Impact Analysis (MANDATORY)
 Before creating, verify:
@@ -407,7 +407,7 @@ Subject: Update artifact: $ARTIFACT_NAME
 2. **Claim task**: TaskUpdate({ taskId: "$TASK_ID", status: "in_progress" })
 3. **Invoke skills**: Skill({ skill: "tdd" })
 4. Read current artifact: [path from discovery]
-5. Read version analysis: .claude/context/reports/version-analysis-$ARTIFACT_NAME.md
+5. Read version analysis: .claude/context/reports/backend/version-analysis-$ARTIFACT_NAME.md
 6. Apply changes: $DESIRED_CHANGES
 7. Update version number based on change type:
    - Major: X+1.0.0 (breaking changes)
@@ -418,7 +418,7 @@ Subject: Update artifact: $ARTIFACT_NAME
    - If breaking: Create MIGRATION.md guide
    - If breaking: Update dependent artifacts
 10. Run validation tests if available
-11. Save update summary to: .claude/context/reports/updated-$ARTIFACT_NAME.md
+11. Save update summary to: .claude/context/reports/backend/updated-$ARTIFACT_NAME.md
 
 ## Backward Compatibility Check
 - [ ] Existing API signatures unchanged (or documented)
@@ -486,7 +486,7 @@ Subject: Deprecate artifact: $ARTIFACT_NAME
 8. Update CLAUDE.md: Add deprecation note (do NOT remove entry)
 9. Notify dependent artifacts (add deprecation warnings)
 10. Set removal timeline (e.g., 3 months, 6 months)
-11. Save deprecation summary to: .claude/context/reports/deprecated-$ARTIFACT_NAME.md
+11. Save deprecation summary to: .claude/context/reports/backend/deprecated-$ARTIFACT_NAME.md
 
 ## Deprecation Checklist
 - [ ] Deprecation notice added to artifact
@@ -562,7 +562,7 @@ Subject: Update catalogs/registries for: $ARTIFACT_NAME
    grep "$ARTIFACT_NAME" .claude/CLAUDE.md || echo "ERROR: NOT IN CLAUDE.md"
    grep "$ARTIFACT_NAME" .claude/context/artifacts/catalogs/creator-registry.json || echo "ERROR: NOT IN REGISTRY"
 
-7. Save integration summary to: .claude/context/reports/integrated-$ARTIFACT_NAME.md
+7. Save integration summary to: .claude/context/reports/backend/integrated-$ARTIFACT_NAME.md
 
 ## BLOCKING Verification (CRITICAL)
 This step BLOCKS completion until:
@@ -630,7 +630,7 @@ Subject: Assign skill $SKILL_NAME to agents
 8. Update relationships in creator registry:
    - agentToSkills mapping
    - skillToAgents mapping
-9. Save assignment plan to: .claude/context/reports/skill-assignment-$SKILL_NAME.md
+9. Save assignment plan to: .claude/context/reports/ecosystem-audit/skill-assignment-$SKILL_NAME.md
 
 ## Assignment Criteria
 - **Relevance**: Skill aligns with agent's domain
@@ -707,7 +707,7 @@ Subject: Test artifact integration: $ARTIFACT_NAME
    # Validate skill schema
    node .claude/skills/schema-creator/scripts/main.cjs --validate .claude/skills/$ARTIFACT_NAME/schemas/
 
-8. Save test report to: .claude/context/reports/test-$ARTIFACT_NAME.md
+8. Save test report to: .claude/context/reports/qa/test-$ARTIFACT_NAME.md
 
 ## Test Checklist
 - [ ] Artifact file is readable and well-formed
@@ -796,7 +796,7 @@ Subject: Final verification: $ARTIFACT_NAME
 
 5. If ANY gate fails: Report blockers and required fixes
 6. If all gates pass: Mark lifecycle as COMPLETE
-7. Save final verification to: .claude/context/reports/verified-$ARTIFACT_NAME.md
+7. Save final verification to: .claude/context/reports/backend/verified-$ARTIFACT_NAME.md
 
 ## Final Checklist (ALL must pass)
 - [ ] Artifact exists and is well-formed
@@ -870,8 +870,8 @@ Record lifecycle completion to .claude/context/memory/learnings.md
 - [ ] Artifact file at `.claude/{type}/{name}/` or `.claude/{type}/{category}/{name}.md`
 - [ ] Creator registry updated: `.claude/context/artifacts/catalogs/creator-registry.json`
 - [ ] CLAUDE.md updated with artifact reference
-- [ ] Test report: `.claude/context/reports/test-{name}.md`
-- [ ] Verification report: `.claude/context/reports/verified-{name}.md`
+- [ ] Test report: `.claude/context/reports/qa/test-{name}.md`
+- [ ] Verification report: `.claude/context/reports/backend/verified-{name}.md`
 - [ ] Memory files updated: `.claude/context/memory/learnings.md`
 
 ## Error Recovery

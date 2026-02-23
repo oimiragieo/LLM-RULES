@@ -1,7 +1,7 @@
 ---
 name: arxiv-mcp
 description: Search and retrieve academic papers from arXiv.org using WebFetch and Exa. No MCP server required - uses existing tools to access arXiv API directly.
-version: 2.0.0
+version: 2.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -18,8 +18,8 @@ best_practices:
   - Check multiple related papers for comprehensive research
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -347,6 +347,24 @@ This skill is automatically assigned to:
 - **researcher** - Academic research, literature review
 - **scientific-research-expert** - Deep scientific analysis
 - **developer** - Finding technical papers for implementation
+
+## Iron Laws
+
+1. **ALWAYS enforce max_results=20** — never allow unlimited or >20 result queries; context explosion from 100+ papers is a known failure mode that stalls agent pipelines.
+2. **NEVER fetch full paper PDFs during literature review** — extract metadata and abstracts only; full papers are 100KB+ each and will exhaust context budget in minutes.
+3. **ALWAYS use Exa for semantic discovery, WebFetch for precision retrieval** — Exa finds semantically related papers; WebFetch gets specific IDs or category feeds; use both in sequence, not interchangeably.
+4. **NEVER use broad queries without field prefixes** — `search_query=neural+networks` returns thousands of results; always scope with `ti:`, `au:`, `cat:`, or `abs:` prefixes to target the query.
+5. **ALWAYS cite arXiv IDs (e.g., 2301.07041) when referencing papers** — titles alone are ambiguous and change; IDs are stable, machine-readable, and enable instant retrieval.
+
+## Anti-Patterns
+
+| Anti-Pattern                             | Why It Fails                                                | Correct Approach                               |
+| ---------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------- |
+| Using `max_results=100` or no limit      | Context explosion; 100 papers × 300 bytes = 30KB+ metadata  | Always set `max_results=20` (hard limit)       |
+| Fetching full paper PDFs                 | Single paper can be 100KB+; kills context budget            | Extract abstract + metadata only via API       |
+| Broad query without field prefix         | Returns irrelevant results across all fields                | Use `ti:`, `au:`, `cat:`, or `abs:` prefix     |
+| Using only WebFetch for discovery        | Misses semantically related papers not matching exact terms | Use Exa for semantic discovery first           |
+| Citing paper titles instead of arXiv IDs | Titles can be ambiguous or duplicated                       | Always include the arXiv ID (e.g., 1706.03762) |
 
 ## Memory Protocol (MANDATORY)
 

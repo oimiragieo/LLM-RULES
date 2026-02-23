@@ -6,8 +6,10 @@ metadata:
   author: cloudflare
   version: '1.0.0'
   source: cloudflare/skills
-verified: false
-lastVerifiedAt: 2026-02-21T00:00:00.000Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
+version: '1.0.0'
+tools: []
 ---
 
 # Web Performance Audit
@@ -443,3 +445,32 @@ const nextConfig = {
 - [Chrome User Experience Report](https://developer.chrome.com/docs/crux/)
 - [Lighthouse Performance Scoring](https://developer.chrome.com/docs/lighthouse/performance/performance-scoring/)
 - [Web Almanac Performance Chapter](https://almanac.httparchive.org/en/2024/performance)
+
+## Iron Laws
+
+1. **ALWAYS** measure Core Web Vitals (LCP, INP, CLS) with field data (CrUX) before proposing optimizations
+2. **NEVER** optimize based on lab data alone — real user metrics determine actual user experience
+3. **ALWAYS** prioritize LCP ≤2.5s, INP ≤200ms, CLS ≤0.1 as the primary performance targets
+4. **NEVER** ship a performance fix without a before/after measurement proving improvement
+5. **ALWAYS** address critical rendering path issues before layout or paint optimizations
+
+## Anti-Patterns
+
+| Anti-Pattern                            | Why It Fails                                        | Correct Approach                                |
+| --------------------------------------- | --------------------------------------------------- | ----------------------------------------------- |
+| Optimizing without baseline measurement | Can't prove improvement, may optimize wrong thing   | Measure CWV with Lighthouse and CrUX first      |
+| Lab-only metrics (Lighthouse only)      | Doesn't reflect real user network/device conditions | Combine lab data with CrUX field data           |
+| Fixing CLS before LCP is addressed      | LCP impacts far more users than CLS                 | Prioritize in order: LCP → INP → CLS            |
+| Shipping without before/after metrics   | No evidence of improvement for stakeholders         | Record pre-fix and post-fix CWV scores          |
+| Adding polyfills without code splitting | Bloats JS bundle for all users                      | Use dynamic `import()` with target browserslist |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+Read `.claude/context/memory/learnings.md`
+
+**After completing:**
+
+- New pattern -> `.claude/context/memory/learnings.md`
+- Issue found -> `.claude/context/memory/issues.md`
+- Decision made -> `.claude/context/memory/decisions.md`

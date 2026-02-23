@@ -1,7 +1,7 @@
 ---
 name: rule-creator
 description: Creates rule files for the Claude Code framework. Rules are markdown files in .claude/rules/ that are auto-loaded by Claude Code.
-version: 1.0.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -31,7 +31,7 @@ Before creating, check if rule already exists:
 test -f .claude/rules/<rule-name>.md && echo "EXISTS" || echo "NEW"
 ```
 
-If EXISTS → invoke `Skill({ skill: "artifact-updater", args: "--type rule --path .claude/rules/<rule-name>.md --changes '...'" })`
+If EXISTS → use `Read` to inspect the current rule file, then `Edit` to apply changes directly. Run the post-creation integration steps (Step 4) after updating.
 
 If NEW → continue with Step 0.5.
 
@@ -213,8 +213,8 @@ Skill({
 
 ## Related Skills
 
-- `artifact-updater` - Update existing rules
-- `skill-creator` - Create detailed workflows (for complex guidance)
+- `skill-creator` - Create detailed workflows (for complex guidance needing a full SKILL.md)
+- `hook-creator` - Create enforcement hooks that accompany governance rules
 
 ## Memory Protocol (MANDATORY)
 
@@ -228,6 +228,26 @@ Read `.claude/context/memory/learnings.md`
 - Guideline decision → `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## Cross-Reference: Creator Ecosystem
+
+This skill is part of the **Creator Ecosystem**. When research uncovers gaps, trigger the appropriate companion creator:
+
+| Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
+| ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | `Skill({ skill: 'skill-updater' })`    | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | `Skill({ skill: 'agent-creator' })`    | Agent to own the capability       |
+| Existing agent needs capability update   | agent update      | `Skill({ skill: 'agent-updater' })`    | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | `Skill({ skill: 'command-creator' })`  | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
+
+---
 
 ## Ecosystem Alignment Contract (MANDATORY)
 
@@ -252,14 +272,20 @@ Before completion, verify all relevant handshakes:
 4. `validate-integration.cjs` passes for the created artifact.
 5. Skill index is regenerated when skill metadata changes.
 
-### Research Gate (Exa First, arXiv Fallback)
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
 
 For new patterns, templates, or workflows, research is mandatory:
 
-1. Use Exa first for implementation and ecosystem patterns.
-2. If Exa is insufficient, use `WebFetch` plus arXiv references.
+1. Use Exa for implementation and ecosystem patterns:
+   - `mcp__Exa__web_search_exa({ query: '<topic> 2025 best practices' })`
+   - `mcp__Exa__get_code_context_exa({ query: '<topic> implementation examples' })`
+2. Search arXiv for academic research (mandatory for AI/ML, agents, evaluation, orchestration, memory/RAG, security):
+   - Via Exa: `mcp__Exa__web_search_exa({ query: 'site:arxiv.org <topic> 2024 2025' })`
+   - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
 3. Record decisions, constraints, and non-goals in artifact references/docs.
 4. Keep updates minimal and avoid overengineering.
+
+**arXiv is mandatory (not fallback) when topic involves:** AI agents, LLM evaluation, orchestration, memory/RAG, security, static analysis, or any emerging methodology.
 
 ### Regression-Safe Delivery
 

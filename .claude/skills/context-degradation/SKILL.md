@@ -1,7 +1,7 @@
 ---
 name: context-degradation
 description: 'Token-range severity zones (Green/Yellow/Orange/Red/Critical) with detection checklist, early warning indicators, and corrective routing actions for context window degradation'
-version: 1.0.0
+version: 1.1.0
 category: 'Performance & Optimization'
 agents: [context-compressor, planner, router]
 user_invocable: true
@@ -13,6 +13,8 @@ best_practices:
   - Treat 2+ early warning indicators as one zone higher
   - Spawn fresh subagent rather than continuing in critical zone
 error_handling: graceful
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Context Degradation Monitor
@@ -86,6 +88,24 @@ If 2+ indicators are present, treat as one zone higher than token count suggests
 - Pairs with: `context-compressor`, `token-saver-context-compression`, `session-handoff`
 - Called by: `planner` (at plan start), `developer` (after each phase), `router` (before large spawns)
 - Trigger: Check at every phase boundary, not just when problems appear
+
+## Iron Laws
+
+1. **ALWAYS** check token count at every phase boundary — not just when problems appear or after completing a large task.
+2. **NEVER** continue complex multi-step tasks past 100K tokens in the same agent context — spawn a fresh subagent with a compressed handoff instead.
+3. **ALWAYS** treat 2+ early warning indicators as one severity zone higher than the raw token count suggests.
+4. **ALWAYS** invoke `token-saver-context-compression` at Yellow zone (32–64K) before context bloat becomes severe — prevention is cheaper than recovery.
+5. **NEVER** claim a task complete without writing a context summary when operating in Red or Critical zone — if it's not written down, the next agent won't know it happened.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                          | Why It Fails                                                                                          | Correct Approach                                                     |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Waiting until output quality degrades before checking context         | By the time quality drops, the context is already in Red/Critical zone                                | Run detection checklist at every phase boundary proactively          |
+| Continuing multi-step tasks past 100K tokens                          | "Lost in the middle" effect causes 20–40% recall drop; decisions made early are forgotten             | Spawn fresh subagent at 100K with compressed context summary         |
+| Ignoring early warning indicators because token count looks fine      | Indicators are more reliable than raw token counts; a 30K session with 3 indicators is already Yellow | Treat 2+ indicators as one zone higher regardless of token count     |
+| Spawning a subagent without a written handoff document                | Subagent starts from scratch, duplicating work or missing constraints                                 | Always write phase summary to `.claude/context/tmp/` before spawning |
+| Compressing context by deleting tool call results without summarizing | Compression without summarization loses critical findings from earlier phases                         | Summarize completed phase outputs before pruning raw tool results    |
 
 ## Memory Protocol (MANDATORY)
 

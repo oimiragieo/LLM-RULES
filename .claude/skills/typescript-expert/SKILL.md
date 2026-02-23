@@ -14,7 +14,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-19T06:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Typescript Expert
@@ -305,6 +305,24 @@ This expert skill consolidates 1 individual skills:
 ## Related Skills
 
 - [`nodejs-expert`](../nodejs-expert/SKILL.md) - Node.js backend patterns (Express, NestJS) that use TypeScript
+
+## Iron Laws
+
+1. **ALWAYS** prefer interfaces over type aliases and use strict TypeScript compiler settings for all new code
+2. **NEVER** use `any` types — use proper type annotations, `unknown`, or generics instead
+3. **ALWAYS** use type guards for runtime type narrowing rather than casting with `as`
+4. **NEVER** use enums — use const maps or literal union types for better tree-shaking and clarity
+5. **ALWAYS** apply functional patterns with immutable data; avoid class-based patterns when functions suffice
+
+## Anti-Patterns
+
+| Anti-Pattern                       | Why It Fails                                        | Correct Approach                                        |
+| ---------------------------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| `any` types everywhere             | Defeats type safety, hides bugs at compile time     | Use `unknown`, generics, or proper interfaces           |
+| TypeScript enums                   | Poor tree-shaking, runtime overhead, confusing emit | Use const maps or literal union types                   |
+| Type casting with `as`             | Bypasses type checking, creates false confidence    | Use type guards (`typeof`, `instanceof`, discriminants) |
+| Mutable shared state in classes    | Unpredictable behavior, hard to test                | Use functional patterns with immutable data             |
+| Loose tsconfig without strict mode | Misses entire categories of type errors             | Enable `"strict": true` in all TypeScript configs       |
 
 ## Memory Protocol (MANDATORY)
 

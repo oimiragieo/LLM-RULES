@@ -1,7 +1,7 @@
 ---
 name: response-rater
 description: Rates responses and plans against quality rubrics. Used for plan validation, response quality audits, and multi-agent consensus.
-version: 2.0
+version: 2.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Track scores over time
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Response Rater Skill
@@ -183,11 +183,23 @@ Rate this plan for user authentication implementation
 </usage_example>
 </examples>
 
-## Rules
+## Iron Laws
 
-- Always use consistent rubric dimensions
-- Provide specific, actionable recommendations
-- Document score justifications
+1. **ALWAYS** use the same rubric dimensions when rating comparable content — inconsistent dimensions make scores meaningless and prevent valid comparison across sessions.
+2. **NEVER** issue a pass/fail decision without documenting score justification for each dimension — unjustified scores cannot be reviewed, challenged, or improved.
+3. **ALWAYS** apply defined minimum thresholds (7/10 standard, 8/10 enterprise, 9/10 critical) — ad-hoc thresholds produce inconsistent approval gates that erode trust in the rating system.
+4. **NEVER** provide vague recommendations — every recommendation must reference the specific dimension it addresses and state the concrete change required.
+5. **ALWAYS** prioritize recommendations by impact — high-priority items that would materially improve the score must be clearly distinguished from low-impact suggestions.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                           | Why It Fails                                                                              | Correct Approach                                                                                  |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Using different rubric dimensions for comparable content               | Scores cannot be compared across sessions; the rating loses its evaluative value          | Always use the same rubric (plans rubric for plans, responses rubric for responses)               |
+| Omitting score justification for individual dimensions                 | Scores without justification cannot be reviewed, verified, or acted upon                  | Document specific evidence for each dimension score (what was present, what was missing)          |
+| Setting thresholds arbitrarily per session                             | Inconsistent thresholds invalidate the pass/fail gate; teams lose confidence in approvals | Always apply the defined thresholds: 7/10 standard, 8/10 enterprise, 9/10 critical                |
+| Providing vague recommendations ("improve quality", "add more detail") | Vague feedback cannot be acted upon; no change results from the review                    | Reference the specific dimension, score gap, and required concrete change for each recommendation |
+| Listing recommendations without priority ordering                      | Equal-weight feedback causes raters to address low-impact items first                     | Always order by impact: High (affects pass/fail threshold) before Medium before Low               |
 
 ## Memory Protocol (MANDATORY)
 

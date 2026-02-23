@@ -1,15 +1,15 @@
 ---
 name: creation-feasibility-gate
 description: Validate whether a proposed new artifact is feasible in the current stack before creator workflows run.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Glob, Grep, Skill]
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Creation Feasibility Gate
@@ -24,12 +24,23 @@ Run a fast preflight feasibility check before creating a new agent/skill/workflo
 - User asks for net-new capability
 - Reflection/evolution recommends artifact creation
 
-## The Iron Law
+## Iron Laws
 
-```
-DO NOT CREATE ARTIFACTS IN THIS SKILL.
-ONLY RETURN PASS/BLOCK/WARN WITH EVIDENCE.
-```
+1. **NEVER** create artifacts inside this skill — return PASS/WARN/BLOCK with evidence only; all actual creation happens in the appropriate creator skill downstream.
+2. **ALWAYS** run the existence/duplication check first — never proceed toward PASS if a functionally identical artifact already exists in any catalog or registry.
+3. **ALWAYS** include concrete file-level evidence for every decision — a bare PASS or BLOCK without referencing specific paths or catalog entries is a spec violation.
+4. **NEVER** let WARN silently become PASS — every WARN must list exact caveats that the calling agent must acknowledge before creation proceeds.
+5. **ALWAYS** resolve BLOCK status with actionable next steps and recommended target agents — a BLOCK without remediation tasks is an incomplete gate decision.
+
+## Anti-Patterns
+
+| Anti-Pattern                                         | Why It Fails                                                                                      | Correct Approach                                                         |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Returning PASS without running the duplication check | Creates duplicate artifacts that split agent traffic and inflate catalogs                         | Always query catalog + registry + filesystem before PASS                 |
+| Returning BLOCK without remediation tasks            | Calling agent stalls with no path forward                                                         | Include `nextActions` with specific agents/skills to unblock             |
+| Skipping the security/creator boundary check         | Creator paths may be blocked by governance hooks; silently bypassing them causes runtime failures | Always verify creator skill chain is reachable before PASS               |
+| Treating WARN as informational only                  | WARN caveats are not surfaced to the user; creation proceeds with unresolved risks                | WARN must be acknowledged explicitly by the caller in its task metadata  |
+| Running creation steps inside the gate skill         | Violates separation of concerns; gate outputs can't be validated independently                    | Gate outputs only the decision JSON; delegate creation to creator skills |
 
 ## Workflow
 

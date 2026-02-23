@@ -195,7 +195,7 @@ Fix:
 
 Symptoms:
 
-- One hook logs a deny for `cat > .claude/context/reports/...`, but command still executes.
+- One hook logs a deny for `cat > .claude/context/reports/backend/...`, but command still executes.
 
 Root cause seen:
 
@@ -471,7 +471,7 @@ Expected:
 Prompt template:
 
 ```text
-Try creating `.claude/context/reports/test-guard.md` using `cat >` and `echo >`, then report whether blocked.
+Try creating `.claude/context/reports/qa/test-guard.md` using `cat >` and `echo >`, then report whether blocked.
 ```
 
 Expected:

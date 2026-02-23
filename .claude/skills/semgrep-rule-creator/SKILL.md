@@ -1,15 +1,15 @@
 ---
 name: semgrep-rule-creator
 description: Create custom Semgrep rules for detecting project-specific vulnerabilities, enforcing coding standards, and building domain-specific security checks with proper testing and metadata.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: agent
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 source: trailofbits/skills
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/semgrep-rule-creator
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->
@@ -425,6 +425,24 @@ semgrep --validate --config=rules/
 - **penetration-tester** (secondary): Vulnerability detection rule creation
 - **qa** (secondary): Quality enforcement rule authoring
 
+## Iron Laws
+
+1. **NEVER** publish a rule without at least 2 true positive and 2 true negative test cases
+2. **ALWAYS** validate rule syntax with `semgrep --validate` before committing
+3. **NEVER** set confidence to HIGH without testing the rule against a real codebase
+4. **ALWAYS** include WHAT was found, WHY it matters, and HOW to fix it in every rule message
+5. **NEVER** use `pattern-regex` as the primary matcher — use structural patterns and constrain with `metavariable-regex`
+
+## Anti-Patterns
+
+| Anti-Pattern                               | Why It Fails                                                      | Correct Approach                                                                     |
+| ------------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Publishing untested rules                  | False positives erode developer trust and rules get ignored       | Write test cases with `// ruleid:` and `// ok:` annotations and run `semgrep --test` |
+| Setting HIGH confidence without validation | Overconfident rules mislead reviewers into trusting bad signal    | Calibrate confidence based on measured false positive rate on real codebases         |
+| Vague rule messages                        | Developers cannot remediate without specific guidance             | Include WHAT was found, WHY it matters, and HOW to fix it in every message           |
+| Overly broad patterns with no exclusions   | High false positive rate causes rule fatigue                      | Add `pattern-not` clauses for all known-safe alternatives                            |
+| Using `pattern-regex` as primary matcher   | Regex is slower and less precise than structural pattern matching | Use structural patterns as primary; constrain with `metavariable-regex` only         |
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
@@ -437,6 +455,26 @@ Read `.claude/context/memory/learnings.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## Cross-Reference: Creator Ecosystem
+
+This skill is part of the **Creator Ecosystem**. When research uncovers gaps, trigger the appropriate companion creator:
+
+| Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
+| ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | `Skill({ skill: 'skill-updater' })`    | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | `Skill({ skill: 'agent-creator' })`    | Agent to own the capability       |
+| Existing agent needs capability update   | agent update      | `Skill({ skill: 'agent-updater' })`    | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | `Skill({ skill: 'command-creator' })`  | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
+
+---
 
 ## Ecosystem Alignment Contract (MANDATORY)
 
@@ -461,14 +499,20 @@ Before completion, verify all relevant handshakes:
 4. `validate-integration.cjs` passes for the created artifact.
 5. Skill index is regenerated when skill metadata changes.
 
-### Research Gate (Exa First, arXiv Fallback)
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
 
 For new patterns, templates, or workflows, research is mandatory:
 
-1. Use Exa first for implementation and ecosystem patterns.
-2. If Exa is insufficient, use `WebFetch` plus arXiv references.
+1. Use Exa for implementation and ecosystem patterns:
+   - `mcp__Exa__web_search_exa({ query: '<topic> 2025 best practices' })`
+   - `mcp__Exa__get_code_context_exa({ query: '<topic> implementation examples' })`
+2. Search arXiv for academic research (mandatory for AI/ML, agents, evaluation, orchestration, memory/RAG, security):
+   - Via Exa: `mcp__Exa__web_search_exa({ query: 'site:arxiv.org <topic> 2024 2025' })`
+   - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
 3. Record decisions, constraints, and non-goals in artifact references/docs.
 4. Keep updates minimal and avoid overengineering.
+
+**arXiv is mandatory (not fallback) when topic involves:** AI agents, LLM evaluation, orchestration, memory/RAG, security, static analysis, or any emerging methodology.
 
 ### Regression-Safe Delivery
 

@@ -38,7 +38,7 @@ function validateSchemaFiles() {
     const filePath = resolve(schemasDir, file);
     try {
       const content = readFileSync(filePath, 'utf-8');
-      safeParseJSON(content);
+      safeParseJSON(content, file);
       validCount++;
       log(`✅ ${file} - valid`);
     } catch (error) {

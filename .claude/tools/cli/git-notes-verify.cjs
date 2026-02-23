@@ -23,8 +23,13 @@ const fs = require('fs');
 const _path = require('path');
 const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
-// Import hook for verification logic
-const gitNotesAudit = require('../../hooks/audit/git-notes-audit.cjs');
+// Import hook for verification logic (archived — load conditionally)
+let gitNotesAudit;
+try {
+  gitNotesAudit = require('../../hooks/audit/git-notes-audit.cjs');
+} catch (_e) {
+  gitNotesAudit = null; // Hook archived; note signature verification unavailable
+}
 
 function runGitCommand(args) {
   const result = spawnSync('git', args, {
@@ -114,7 +119,15 @@ function verify(range) {
       continue;
     }
 
-    const verification = gitNotesAudit.verifyNote(notes, commit.hash);
+    const verification = gitNotesAudit
+      ? gitNotesAudit.verifyNote(notes, commit.hash)
+      : {
+          verified: false,
+          timestamp: null,
+          taskId: null,
+          agentName: null,
+          error: 'git-notes-audit hook archived',
+        };
 
     results.push({
       hash: commit.hash.substring(0, 7),

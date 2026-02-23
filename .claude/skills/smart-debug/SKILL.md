@@ -1,7 +1,7 @@
 ---
 name: smart-debug
 description: AI-assisted debugging specialist with deep knowledge of modern debugging tools, observability platforms, and automated root cause analysis. Implements Cursor Debug Mode methodology — structured hypothesis ranking, targeted code instrumentation, human-in-the-loop reproduction gate, log-confirmed root cause, and mandatory cleanup.
-version: 2.0
+version: 2.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -16,7 +16,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-20T00:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -412,6 +412,24 @@ Focus on actionable insights. Use AI assistance throughout for pattern recogniti
 ---
 
 Issue to debug: $ARGUMENTS
+
+## Iron Laws
+
+1. **NEVER** write a fix before reading collected logs and confirming root cause from evidence
+2. **ALWAYS** generate 3–5 ranked hypotheses with probability percentages BEFORE any instrumentation
+3. **NEVER** leave debug instrumentation in code after the fix is verified and committed
+4. **ALWAYS** reproduce the bug before attempting any fix — confirmation via tests or scripts
+5. **NEVER** report root cause until trace evidence and log evidence agree independently
+
+## Anti-Patterns
+
+| Anti-Pattern                         | Why It Fails                                            | Correct Approach                                                   |
+| ------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------ |
+| Fixing before diagnosing             | Fix targets the wrong cause; bug persists or regresses  | Collect logs, confirm root cause from evidence, then write the fix |
+| Single hypothesis                    | Miss the actual root cause by anchoring on first idea   | Generate 3–5 ranked hypotheses before any instrumentation          |
+| Skipping reproduction                | Cannot verify fix worked; same bug resurfaces           | Auto-reproduce or pause for HITL before proceeding to fix          |
+| Leaving debug instrumentation        | Debug noise in production logs; performance degradation | Remove ALL log statements and debug code after fix is verified     |
+| Claiming root cause without evidence | Premature conclusion leads to wrong fix and lost time   | Require trace evidence and log evidence to agree before concluding |
 
 ## Memory Protocol (MANDATORY)
 

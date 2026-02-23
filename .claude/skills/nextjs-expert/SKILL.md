@@ -1,7 +1,7 @@
 ---
 name: nextjs-expert
 description: Next.js framework expert including App Router, Server Components, and API routes
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Nextjs Expert
@@ -90,6 +90,24 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 This expert skill consolidates 1 individual skills:
 
 - nextjs-expert
+
+## Iron Laws
+
+1. **ALWAYS** use the App Router (`app/` directory) for all new Next.js 13+ routes — the Pages Router is legacy; mixing both creates conflicting rendering contexts and blocks Server Components.
+2. **NEVER** add `'use client'` by default — every component is a Server Component unless it needs browser APIs, event listeners, or client state; unnecessary `'use client'` negates streaming and server caching.
+3. **ALWAYS** await async Request APIs (`cookies()`, `headers()`, `params`, `searchParams`) in Next.js 15+ — synchronous access throws in strict mode and breaks PPR behavior.
+4. **NEVER** omit `error.tsx` and `loading.tsx` at route segments — without them, errors bubble to root and unmount the entire page; segment-level files enable granular error recovery and streaming UI.
+5. **ALWAYS** use `next/image` with `fill` and `sizes` for fluid images — hard-coded width/height on fluid images causes layout shift that fails Core Web Vitals (CLS).
+
+## Anti-Patterns
+
+| Anti-Pattern                                         | Why It Fails                                                               | Correct Approach                                                                           |
+| ---------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Using Pages Router for new routes                    | Cannot use Server Components, streaming, or cacheComponents                | Use App Router (`app/` directory) for all new routes; migrate incrementally                |
+| Adding `'use client'` by default                     | Forces client-side rendering; inflates bundle; loses streaming and caching | Keep server-only; add `'use client'` only when browser APIs or event handlers are required |
+| Synchronous `cookies()` / `headers()` in Next.js 15+ | Throws in strict mode; breaks PPR; deprecated API                          | Await all Request APIs: `const cookieStore = await cookies()`                              |
+| Hard-coded width/height on fluid images              | Layout shifts fail CLS Core Web Vitals                                     | Use `fill` with `sizes` for fluid containers; exact dimensions only for fixed-size images  |
+| Missing `error.tsx` at route segments                | Errors bubble to root; entire page unmounts on any error                   | Add `error.tsx` and `loading.tsx` at each segment; use `Suspense` for streaming            |
 
 ## Memory Protocol (MANDATORY)
 

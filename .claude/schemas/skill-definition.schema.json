@@ -2,127 +2,117 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://agent-studio.dev/schemas/skill-definition.schema.json",
   "title": "Skill Definition Schema",
-  "description": "Schema for validating Claude Code skill definitions (SKILL.md frontmatter)",
+  "description": "Schema for validating Claude Code SKILL.md YAML frontmatter fields",
   "type": "object",
-  "required": ["status", "output"],
-  "unevaluatedProperties": false,
+  "required": ["name", "description"],
+  "additionalProperties": true,
   "properties": {
-    "status": {
+    "name": {
       "type": "string",
-      "enum": ["success", "partial", "failed"],
-      "description": "Execution status of the skill"
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Skill name in lowercase-with-hyphens format",
+      "maxLength": 100
     },
-    "output": {
-      "type": "object",
-      "description": "Skill-specific output data",
-      "properties": {
-        "name": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]*$",
-          "description": "Skill name in lowercase-with-hyphens format",
-          "maxLength": 100
-        },
-        "description": {
-          "type": "string",
-          "minLength": 20,
-          "maxLength": 500,
-          "description": "Clear description of what the skill does"
-        },
-        "model": {
-          "type": "string",
-          "enum": ["sonnet", "opus", "haiku", "inherit"],
-          "default": "sonnet",
-          "description": "Preferred model for this skill"
-        },
-        "invoked_by": {
-          "type": "string",
-          "enum": ["user", "agent", "both"],
-          "default": "both",
-          "description": "Who can invoke this skill"
-        },
-        "user_invocable": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether users can invoke directly via /skill-name"
-        },
-        "tools": {
-          "type": "array",
-          "maxItems": 100,
-          "items": {
-            "type": "string",
-            "maxLength": 100
-          },
-          "description": "Tools this skill uses"
-        },
-        "allowed-tools": {
-          "type": "string",
-          "description": "Comma-separated list of allowed tools (alternative format)",
-          "maxLength": 1000
-        },
-        "args": {
-          "type": "string",
-          "description": "Argument format for skill invocation",
-          "maxLength": 500
-        },
-        "best_practices": {
-          "type": "array",
-          "maxItems": 50,
-          "items": {
-            "type": "string",
-            "maxLength": 500
-          },
-          "description": "List of best practices for this skill"
-        },
-        "templates": {
-          "type": "array",
-          "maxItems": 50,
-          "items": {
-            "type": "string",
-            "maxLength": 200
-          },
-          "description": "Available templates this skill can generate"
-        },
-        "error_handling": {
-          "type": "string",
-          "enum": ["graceful", "strict", "warn"],
-          "default": "graceful",
-          "description": "How errors are handled"
-        },
-        "streaming": {
-          "type": "string",
-          "enum": ["supported", "required", "disabled"],
-          "default": "supported",
-          "description": "Streaming output support"
-        },
-        "context_fork": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether skill runs in forked context"
-        },
-        "source": {
-          "type": "string",
-          "description": "Origin of skill (e.g., mcp-npm, custom, converted)",
-          "maxLength": 200
-        },
-        "original_server": {
-          "type": "string",
-          "description": "Original MCP server name if converted",
-          "maxLength": 200
-        },
-        "verified": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether the skill has been verified by the creator/updater workflow"
-        },
-        "lastVerifiedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "ISO timestamp of when the skill was last verified or updated"
-        }
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 1000,
+      "description": "Clear description of what the skill does and when to invoke it"
+    },
+    "version": {
+      "type": ["string", "number"],
+      "description": "Skill version (e.g., '1.0.0' or 1.2)"
+    },
+    "model": {
+      "type": "string",
+      "enum": ["sonnet", "opus", "haiku", "inherit"],
+      "default": "sonnet",
+      "description": "Preferred model for this skill"
+    },
+    "invoked_by": {
+      "type": "string",
+      "enum": ["user", "agent", "both"],
+      "default": "both",
+      "description": "Who can invoke this skill"
+    },
+    "user_invocable": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether users can invoke directly via /skill-name"
+    },
+    "tools": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "string",
+        "maxLength": 100
       },
-      "additionalProperties": false,
-      "required": ["name", "description"]
+      "description": "Tools this skill is allowed to use"
+    },
+    "allowed-tools": {
+      "type": "string",
+      "description": "Comma-separated list of allowed tools (alternative to tools array)",
+      "maxLength": 1000
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "Alternative names for this skill"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "description": "Categorization tags for skill discovery"
+    },
+    "best_practices": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "string",
+        "maxLength": 500
+      },
+      "description": "Key best practices for this skill"
+    },
+    "error_handling": {
+      "type": "string",
+      "enum": ["graceful", "strict", "warn"],
+      "default": "graceful",
+      "description": "How errors are handled"
+    },
+    "streaming": {
+      "type": "string",
+      "enum": ["supported", "required", "disabled"],
+      "default": "supported",
+      "description": "Streaming output support"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the skill has been verified by the creator/updater workflow"
+    },
+    "lastVerifiedAt": {
+      "type": "string",
+      "description": "ISO timestamp of when the skill was last verified or updated"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of skill (e.g., mcp-npm, custom, converted)",
+      "maxLength": 200
+    },
+    "original_server": {
+      "type": "string",
+      "description": "Original MCP server name if converted from MCP tool",
+      "maxLength": 200
+    },
+    "disable-model-invocation": {
+      "type": "boolean",
+      "description": "If true, the skill content is injected directly without LLM invocation"
     }
-  },
-  "additionalProperties": false
+  }
 }

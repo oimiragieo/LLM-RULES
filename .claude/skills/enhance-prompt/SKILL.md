@@ -1,6 +1,6 @@
 ---
 name: enhance-prompt
-version: '1.0.0'
+version: '1.1.0'
 description: Transforms vague UI/feature requests into structured, optimized prompts with design system awareness. Use when generating prompts for UI implementation, feature specification, or design-to-code translation. Triggers on tasks requiring prompt refinement, UI specification, or design system integration.
 license: MIT
 category: Frameworks
@@ -18,13 +18,13 @@ agents:
 tools:
   - Read
   - Write
-invoked_by: Skill({ skill: 'enhance-prompt' })
+invoked_by: "Skill({ skill: 'enhance-prompt' })"
 user_invocable: true
 metadata:
   author: google-labs-code
   source: google-labs-code/stitch-skills
 verified: false
-lastVerifiedAt: 2026-02-21T00:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Enhance Prompt
@@ -251,6 +251,14 @@ with real-time updates, date range filtering, and exportable reports.
 - Do NOT generate prompts without interaction states -- every view has loading, error, and empty states
 - Do NOT ignore accessibility -- every enhanced prompt must include keyboard and screen reader specs
 - Do NOT hardcode pixel values -- always reference design system tokens or relative units
+
+## Iron Laws
+
+1. **ALWAYS** analyze the original prompt for ambiguities and implicit assumptions before enhancing — never enhance a prompt whose scope you haven't verified with the caller.
+2. **NEVER** add requirements that weren't implicit or explicit in the original — enhancement clarifies and structures; it does not invent scope.
+3. **ALWAYS** preserve the original intent — an enhanced prompt that redirects to a different goal is a rewrite, not an enhancement.
+4. **NEVER** produce an enhanced prompt longer than necessary to resolve ambiguities — verbosity in prompts reduces AI response quality; keep it focused.
+5. **ALWAYS** include success criteria in the enhanced prompt — a prompt without acceptance criteria cannot be evaluated as done or not done.
 
 ## Memory Protocol (MANDATORY)
 

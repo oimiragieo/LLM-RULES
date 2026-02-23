@@ -33,8 +33,8 @@ Variables controlling Router-First protocol enforcement.
 
 **Used By**:
 
-- `.claude/hooks/routing/task-create-guard.cjs`
-- `.claude/hooks/routing/planner-first-guard.cjs`
+- `routing-guard.cjs`
+- `routing-guard.cjs`
 
 **Example**:
 
@@ -57,7 +57,7 @@ export PLANNER_FIRST_ENFORCEMENT=block # Production (default)
 
 **Used By**:
 
-- `.claude/hooks/safety/router-write-guard.cjs`
+- `unified-pre-write-hook.cjs`
 
 **Example**:
 
@@ -79,7 +79,7 @@ export ROUTER_WRITE_GUARD=off  # Allow Router to write (dangerous)
 
 **Used By**:
 
-- `.claude/hooks/routing/security-review-guard.cjs`
+- `routing-guard.cjs`
 
 **Example**:
 
@@ -104,7 +104,7 @@ Variables controlling the self-evolution system.
 
 **Used By**:
 
-- `.claude/hooks/safety/file-placement-guard.cjs`
+- `unified-pre-write-hook.cjs`
 
 **Example**:
 
@@ -127,7 +127,7 @@ export EVOLVE_AUTO_START=true   # Enable auto-evolution
 
 **Used By**:
 
-- `.claude/hooks/safety/file-placement-guard.cjs` (circuit breaker logic)
+- `unified-pre-write-hook.cjs` (circuit breaker logic)
 
 **Example**:
 
@@ -148,7 +148,7 @@ export EVOLVE_RATE_LIMIT=5  # Allow 5 evolutions per hour
 
 **Used By**:
 
-- `.claude/hooks/safety/file-placement-guard.cjs`
+- `unified-pre-write-hook.cjs`
 
 **Example**:
 
@@ -219,8 +219,8 @@ export REFLECTION_HOOK_MODE=warn
 **Used By**:
 
 - Most hooks with error handling
-- `.claude/hooks/safety/file-placement-guard.cjs`
-- `.claude/hooks/routing/task-create-guard.cjs`
+- `unified-pre-write-hook.cjs`
+- `routing-guard.cjs`
 
 **Example**:
 
@@ -241,7 +241,7 @@ export HOOK_FAIL_OPEN=true  # Debugging only - DANGEROUS
 
 **Used By**:
 
-- `.claude/hooks/safety/file-placement-guard.cjs`
+- `unified-pre-write-hook.cjs`
 
 **Example**:
 
@@ -398,7 +398,7 @@ Variables controlling safety and validation systems.
 
 **Used By**:
 
-- `.claude/hooks/safety/loop-prevention.cjs`
+- `pre-task-unified.cjs`
 
 **Example**:
 

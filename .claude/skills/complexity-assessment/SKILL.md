@@ -1,7 +1,7 @@
 ---
 name: complexity-assessment
 description: 'AI-based complexity assessment for task analysis. Use when determining the appropriate workflow, phases, and validation depth for a task.'
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 source: auto-claude
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Complexity Assessment Skill
@@ -38,13 +38,13 @@ Analyze a task description and determine its true complexity to ensure the right
 - Obvious simple fixes (typos, color changes)
 - Tasks where complexity is explicitly specified
 
-## The Iron Law
+## Iron Laws
 
-```
-NO PLANNING WITHOUT COMPLEXITY ASSESSMENT FOR NEW TASKS
-```
-
-New tasks must be assessed before selecting a workflow approach.
+1. **NEVER begin planning without complexity assessment** — wrong complexity tier = wrong workflow = failed implementation; always assess first, then select the appropriate workflow phases and validation depth.
+2. **ALWAYS be conservative when uncertain — go higher** — underestimating complexity is more dangerous than overestimating; a COMPLEX task mis-classified as STANDARD skips security review, architecture design, and comprehensive testing.
+3. **ALWAYS count affected files before assigning a tier** — gut-feel estimates are unreliable; scan the codebase to count files actually touched by the change before assigning SIMPLE/STANDARD/COMPLEX/EPIC.
+4. **ALWAYS flag unfamiliar technologies for research** — unknown tech has hidden complexity; mark any unfamiliar framework, library, or service as requiring research before proceeding with the complexity estimate.
+5. **NEVER let the user's casual language lower the tier** — "just a quick fix" or "small change" reflects the user's perception, not the actual technical scope; assess objectively regardless of how it is described.
 
 ## Workflow Types
 
@@ -402,6 +402,16 @@ This skill works well with:
 - **spec-gathering**: Provides requirements for assessment
 - **spec-writing**: Uses assessment to determine spec depth
 - **qa-workflow**: Uses validation recommendations
+
+## Anti-Patterns
+
+| Anti-Pattern                            | Why It Fails                                  | Correct Approach                                  |
+| --------------------------------------- | --------------------------------------------- | ------------------------------------------------- |
+| Assigning SIMPLE without file scan      | Underestimates actual affected file count     | Count affected files before assigning tier        |
+| "Quick fix" language lowers tier        | User perception ≠ technical scope             | Assess objectively; ignore casual user framing    |
+| Ignoring integrations and external APIs | External dependencies add risk and complexity | List all external services/APIs in the assessment |
+| Skipping research flag for unknown tech | Unfamiliar tech has invisible complexity      | Flag any unfamiliar technology for research       |
+| Not considering rollback complexity     | COMPLEX/EPIC need recovery plans              | Include rollback difficulty in complexity scoring |
 
 ## Memory Protocol
 

@@ -1,7 +1,7 @@
 ---
 name: insight-extraction
 description: 'Extract actionable insights from completed coding sessions. Use when a session completes to capture learnings for future sessions.'
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 source: auto-claude
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Insight Extraction Skill
@@ -292,6 +292,24 @@ This skill works well with:
 - **session-handoff**: Use insights in handoff documents
 - **summarize-changes**: Complement change summaries with insights
 - **debugging**: Extract insights from debugging sessions
+
+## Iron Laws
+
+1. **ALWAYS** extract insights immediately after task completion — delayed extraction loses context; the "what" can be reconstructed but the "why" evaporates within the session.
+2. **NEVER** record what was done — only record what was learned; activity logs belong in task metadata, not in the learning system.
+3. **ALWAYS** check for duplicate insights before writing — appending a near-duplicate insight pollutes the memory index and degrades future retrieval quality.
+4. **NEVER** write vague insights like "X is good" without concrete context, file path, or example — vague insights are unfindable and unhelpful to future sessions.
+5. **ALWAYS** tag insights with domain category (`[CODE]`, `[WORKFLOW]`, `[SECURITY]`, etc.) — untagged insights are effectively invisible to agents searching by domain.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                 | Why It Fails                                                                     | Correct Approach                                                                                     |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Recording activity ("implemented auth") instead of learnings | Agents can reconstruct history from git; they cannot reconstruct tacit knowledge | Record "why" and "gotcha": "Fiber's CSRF middleware must be before route registration, not after"    |
+| Skipping deduplication check                                 | Duplicate entries inflate memory size and confuse retrieval                      | `grep -i "keyword" learnings.md` before appending; update existing entry if found                    |
+| Vague insights without file/function context                 | Future sessions can't locate or apply the insight                                | Include concrete path: "In `.claude/hooks/routing/routing-guard.cjs` line 47: exit 0 on parse error" |
+| Extracting only at session end                               | Long sessions lose early context; critical gotchas forgotten                     | Extract after each significant task completion, not just at session boundary                         |
+| Storing insights only in task metadata                       | Task metadata is not read by future sessions or agents                           | Always write to `.claude/context/memory/learnings.md` with tagged format                             |
 
 ## Memory Protocol
 

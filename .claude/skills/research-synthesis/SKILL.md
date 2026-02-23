@@ -1,7 +1,7 @@
 ---
 name: research-synthesis
 description: Research best practices and synthesize into design decisions for artifact creation. Invoke BEFORE any creator skill to ensure research-backed decisions.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -29,8 +29,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/context/artifacts/research-reports/
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Research Synthesis Skill
@@ -133,6 +133,68 @@ Exceeding this limit causes:
 ---
 
 ## MANDATORY Research Protocol
+
+### Step 0: Internal Memory Lookup + Context Pressure Check (MANDATORY - FIRST STEP)
+
+**BEFORE executing any external research queries**, first search internal project memory.
+If sufficient high-confidence results exist internally, skip external queries entirely.
+Then check context pressure before proceeding.
+
+```javascript
+// Sub-step 0a: Query internal RAG for cached research on the topic
+const { searchInternalContext } = require('.claude/lib/memory/internal-rag.cjs');
+const internalResults = await searchInternalContext(researchTopic, { limit: 5, threshold: 0.6 });
+const avgSimilarity =
+  internalResults.results.length > 0
+    ? internalResults.results.reduce((sum, r) => sum + (r.similarity || 0), 0) /
+      internalResults.results.length
+    : 0;
+if (internalResults.results.length >= 3 && avgSimilarity > 0.7) {
+  // High-confidence internal hit — synthesize from internal results and skip external search
+  console.log(
+    '[research-synthesis] Internal RAG hit (avg similarity:',
+    avgSimilarity.toFixed(2),
+    ') — skipping external search'
+  );
+}
+// Otherwise proceed to external queries below
+
+// Sub-step 0b: Context pressure check
+const { checkContextPressure } = require('.claude/lib/utils/context-pressure.cjs');
+
+// Option A — token-budget-based (if budget info available)
+const pressure = checkContextPressure({
+  tokenBudgetPercent: currentTokenBudgetPercent,
+});
+
+// Option B — text-based estimate (when budget % not available)
+// const pressure = checkContextPressure({ text: recentContextSnapshot });
+
+if (pressure.pressure === 'high') {
+  // STOP — compress context before researching
+  console.warn('[research-synthesis] High context pressure:', pressure.reason);
+  console.warn('Run context-compressor skill first, then re-invoke research-synthesis.');
+  // Return early without executing research queries
+  process.exit(0);
+}
+
+if (pressure.pressure === 'medium') {
+  // Proceed but limit to 3 queries (simple budget)
+  console.warn('[research-synthesis] Medium context pressure:', pressure.reason);
+  console.warn('Limiting to 3 queries. Consider compressing after research.');
+}
+// Low pressure → proceed normally with full query budget
+```
+
+**Enforcement:**
+
+| Pressure | Action                                                |
+| -------- | ----------------------------------------------------- |
+| `high`   | STOP — invoke `context-compressor` skill, then retry  |
+| `medium` | Limit to 3 queries, warn caller                       |
+| `low`    | Proceed normally with full query budget (3–5 queries) |
+
+---
 
 ### Step 1: Define Research Scope & Plan Queries
 
@@ -650,32 +712,20 @@ This skill integrates with the Creator Ecosystem:
 
 ---
 
-## Iron Laws of Research Synthesis
+## Iron Laws
 
-```
-1. NO CREATION WITHOUT RESEARCH FIRST
-   - Skip research = uninformed decisions = bugs and rework
-   - Research ALWAYS precedes creation
+1. **NEVER** create any artifact without completing the research protocol first — uninformed creation produces decisions that conflict with existing patterns and require expensive rework.
+2. **NEVER** execute more than 5 queries per research session — exceeding the limit causes memory exhaustion and context window overflow where later findings are silently lost.
+3. **NEVER** produce a research report exceeding 10 KB — oversized reports overflow the context window and force truncation of findings at the most critical sections.
+4. **ALWAYS** analyze at least 2 existing codebase artifacts before synthesizing external research — external best practices alone miss project-specific conventions and produce inconsistent implementations.
+5. **ALWAYS** document a source and rationale for every design decision — decisions without evidence cannot be evaluated, challenged, or traced during future refactoring.
 
-2. NO MORE THAN 5 QUERIES PER RESEARCH SESSION
-   - Execute exactly 3-5 queries (no more)
-   - >5 queries = memory exhaustion, context loss
-   - If need more → split into multi-phase research
+## Anti-Patterns
 
-3. NO RESEARCH REPORTS >10 KB
-   - Maximum 10 KB per report (~2500 words)
-   - Exceeding limit → context window overflow
-   - Use bullet points, reference URLs, summarize findings
-
-4. NO SYNTHESIS WITHOUT CODEBASE ANALYSIS
-   - External research is necessary but not sufficient
-   - MUST examine existing patterns for consistency
-
-5. NO DECISIONS WITHOUT RATIONALE
-   - Every decision needs a source
-   - "I think" is not a source. Link to evidence.
-
-6. NO PROCEEDING WITHOUT QUALITY GATE
-   - All checklist items must pass (including query/size limits)
-   - BLOCKING: Incomplete research = no creation
-```
+| Anti-Pattern                                                       | Why It Fails                                                                                       | Correct Approach                                                                                             |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Starting artifact creation before running research protocol        | Produces uninformed decisions that conflict with existing patterns and require rework              | Always invoke research-synthesis and pass the quality gate before calling any creator skill                  |
+| Executing 10+ queries to "be thorough"                             | Causes memory exhaustion and context overflow; later findings are silently lost                    | Plan exactly 3–5 targeted queries before starting; split complex topics into separate research phases        |
+| Writing exhaustive research reports exceeding 10 KB                | Oversized reports truncate in the context window, hiding sections the creator skill most needs     | Use bullet points, reference URLs instead of copying content, and summarize each source in under 3 sentences |
+| Synthesizing external findings without examining existing codebase | External best practices may conflict with established project patterns and naming conventions      | Always glob and read at least 2 similar existing artifacts before writing design decisions                   |
+| Recording design decisions without source citations                | Undocumented decisions cannot be validated, challenged, or traced during future refactoring cycles | Every decision row in the Design Decisions table must include a source URL or authoritative reference name   |

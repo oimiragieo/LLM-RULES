@@ -83,7 +83,7 @@ function buildParams(options) {
     new Set(
       String(
         options.skills ||
-          'task-management-protocol,ripgrep,code-semantic-search,token-saver-context-compression,verification-before-completion'
+          'task-management-protocol,ripgrep,code-semantic-search,token-saver-context-compression,verification-before-completion,memory-search'
       )
         .split(',')
         .map(v => v.trim())

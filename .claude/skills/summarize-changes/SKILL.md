@@ -14,8 +14,8 @@ best_practices:
   - Keep summaries concise but complete
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 <identity>
@@ -324,6 +324,24 @@ Closes #789
 - `git-expert` - For commit and PR workflows
 - `commit-message-guidelines` - For conventional commits
 </integration>
+
+## Iron Laws
+
+1. **NEVER** write a file list without explaining WHAT changed and WHY for each entry
+2. **ALWAYS** include a verification checklist so reviewers can confirm quality
+3. **NEVER** omit the breaking changes section — always include it explicitly, even if "None"
+4. **ALWAYS** use conventional commit format for commit messages attached to summaries
+5. **NEVER** skip the summary step after non-trivial coding tasks — it is mandatory
+
+## Anti-Patterns
+
+| Anti-Pattern                         | Why It Fails                                | Correct Approach                                               |
+| ------------------------------------ | ------------------------------------------- | -------------------------------------------------------------- |
+| Just listing filenames               | No context for what changed or why          | Explain what changed and the reason for each modification      |
+| Missing verification checklist       | Reviewers have no guidance on what to test  | Always include a checklist of what to verify                   |
+| Omitting breaking changes section    | Users surprised by compatibility breaks     | Add explicit "Breaking Changes: None" when there are none      |
+| Vague commit messages ("Updates")    | Commit history loses traceability           | Use conventional commit format with type, scope, and rationale |
+| Skipping summary under time pressure | Missing context causes rework during review | Always produce a summary after non-trivial tasks               |
 
 ## Memory Protocol (MANDATORY)
 

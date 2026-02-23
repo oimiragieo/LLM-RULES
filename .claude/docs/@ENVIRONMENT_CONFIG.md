@@ -287,6 +287,17 @@ WORKER_ENABLED=true claude
 AGENT_STUDIO_ENV=staging claude
 ```
 
+### New Enforcement Variables
+
+| Variable                          | Values | Default | Purpose                                                           |
+| --------------------------------- | ------ | ------- | ----------------------------------------------------------------- |
+| `CREATOR_GUARD_TEST_FORCE_THROW`  | bool   | false   | Internal testing force throw toggle for creator guard.            |
+| `HOOK_FAIL_OPEN_ACK`              | bool   | false   | Acknowledgment flag for fail-open hooks.                          |
+| `HOOK_FAIL_OPEN_SCOPE`            | string | local   | Scope definitions for hook fail-open behaviors.                   |
+| `MEMORY_DIRECT_WRITE_ENFORCEMENT` | string | block   | Block direct writes to memory JSON files to enforce memory tools. |
+| `ROUTER_GIT_COMMIT_ENFORCEMENT`   | string | warn    | Enforcement behavior for git commit usage by the router.          |
+| `ROUTING_GUARD_TEST_FORCE_THROW`  | bool   | false   | Internal testing force throw toggle for routing guard.            |
+
 ### Live Eval Harness Variables (Test/Eval)
 
 These variables are used by `tests/evals/subagent-memory-rag-live.eval.cjs` (they are eval harness toggles, not runtime hook controls):

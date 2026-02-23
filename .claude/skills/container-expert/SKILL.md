@@ -1,7 +1,7 @@
 ---
 name: container-expert
 description: Container orchestration expert including Docker, Kubernetes, Helm, and service mesh
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Prioritize type safety and testing
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Container Expert
@@ -107,6 +107,24 @@ This expert skill consolidates 5 individual skills:
 - istio-specific-rules
 - knative-service-guidance
 - knative-specific-rules
+
+## Iron Laws
+
+1. **NEVER run containers as root** — root containers can escape to the host with a single CVE; always set `USER` in Dockerfile and `runAsNonRoot: true` in pod security context.
+2. **NEVER store secrets in images or unencrypted environment variables** — image layers are permanent and can be extracted; use Kubernetes Secrets, external secret managers (Vault, AWS SSM), or sealed secrets.
+3. **ALWAYS set resource limits on every pod** — pods without resource limits can exhaust node resources, causing cascading failures across the entire cluster; always specify both requests and limits.
+4. **ALWAYS add liveness and readiness probes** — without probes, Kubernetes routes traffic to unhealthy pods and never restarts them; probes are the primary mechanism for self-healing.
+5. **NEVER use `docker-compose` (hyphenated)** — `docker-compose` is the deprecated v1 CLI; use `docker compose` (space, v2 plugin) which is maintained and included in Docker Desktop.
+
+## Anti-Patterns
+
+| Anti-Pattern                                     | Why It Fails                                        | Correct Approach                                           |
+| ------------------------------------------------ | --------------------------------------------------- | ---------------------------------------------------------- |
+| Running as root in container                     | Privilege escalation via any CVE in the container   | Set `USER nonroot` in Dockerfile; `runAsNonRoot: true`     |
+| Secrets in environment variables or image layers | Leaked in `docker inspect`, logs, and image exports | Use Kubernetes Secrets with RBAC; external secret managers |
+| No resource limits on pods                       | One pod starves the node; cascading failures        | Set CPU/memory requests AND limits on all pods             |
+| Missing health probes                            | Traffic routed to unhealthy pods indefinitely       | Add livenessProbe and readinessProbe to all containers     |
+| Using `docker-compose` (deprecated v1)           | Deprecated; lacks compose v2 features and fixes     | Use `docker compose` (space, Docker Engine plugin)         |
 
 ## Memory Protocol (MANDATORY)
 

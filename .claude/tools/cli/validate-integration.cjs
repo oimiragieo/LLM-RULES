@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines */
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { parseMarkdownTable } = require('../../lib/utils/markdown-table-parser.cjs');
+const { parseSemver } = require('../../lib/artifacts/semver-diff.cjs');
 /**
  * validate-integration.cjs
  *
@@ -95,30 +97,113 @@ function readFileSafe(filePath) {
 }
 
 /**
- * Check 1: CLAUDE.md Routing Entry
+ * Strip fenced code blocks and heading lines from a Markdown string.
+ * Used to prevent false positives when searching for names in documents
+ * like CLAUDE.md where names may appear in code examples or section headers.
+ *
+ * @param {string} content
+ * @returns {string}
  */
-function checkClaudeMdRouting(artifactPath, artifactType, artifactName) {
+function stripFencesAndHeadings(content) {
+  if (typeof content !== 'string') return '';
+  const lines = content.split('\n');
+  const result = [];
+  let inFence = false;
+
+  for (const line of lines) {
+    if (/^[ \t]*(`{3,}|~{3,})/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+    if (/^#{1,6}\s/.test(line.trim())) continue;
+    result.push(line);
+  }
+
+  return result.join('\n');
+}
+
+/**
+ * Core logic: check if any Markdown table in catalog contains artifactName.
+ * Uses parseMarkdownTable — no unconditional str.includes fallback.
+ * Falls back to str.includes ONLY on a parse throw (malformed content).
+ *
+ * Exported for integration-level testing with controlled content.
+ *
+ * @param {string} catalog - catalog Markdown content
+ * @param {string} artifactName
+ * @returns {boolean}
+ */
+function _catalogHasEntry(catalog, artifactName) {
+  try {
+    const rows = parseMarkdownTable(catalog);
+    return rows.some(row =>
+      Object.values(row).some(v => String(v).toLowerCase().includes(artifactName.toLowerCase()))
+    );
+  } catch (_parseErr) {
+    return catalog.toLowerCase().includes(artifactName.toLowerCase());
+  }
+}
+
+/**
+ * Core logic: check if CLAUDE.md (outside code fences and headings) contains artifactName.
+ *
+ * Exported for integration-level testing with controlled content.
+ *
+ * @param {string} claudeMd - CLAUDE.md content
+ * @param {string} artifactName
+ * @returns {boolean}
+ */
+function _claudeMdHasEntry(claudeMd, artifactName) {
+  const stripped = stripFencesAndHeadings(claudeMd);
+  return stripped.toLowerCase().includes(artifactName.toLowerCase());
+}
+
+/**
+ * Check 1: CLAUDE.md Routing Entry (AST)
+ */
+async function checkClaudeMdRouting(artifactPath, artifactType, artifactName) {
   if (!['agent', 'workflow'].includes(artifactType)) {
     return { applicable: false, passed: true, message: 'Not applicable for this artifact type' };
   }
 
-  const claudeMd = readFileSafe(CLAUDE_MD);
-  if (!claudeMd) {
-    return { applicable: true, passed: false, message: 'Could not read CLAUDE.md' };
+  try {
+    const { validateAgentInMarkdownTables } = await import('./validate-agent-ast.mjs');
+    const result = await validateAgentInMarkdownTables(artifactName, CLAUDE_MD);
+
+    // Fallback exactly to traditional scan if AST scan fails but traditional passes (transitional safety)
+    if (!result.passed) {
+      const claudeMd = readFileSafe(CLAUDE_MD);
+      if (_claudeMdHasEntry(claudeMd || '', artifactName)) {
+        // Still passed using traditional mechanism
+        return {
+          applicable: true,
+          passed: true,
+          message: `Found "${artifactName}" in CLAUDE.md (traditional)`,
+        };
+      }
+    }
+
+    return {
+      applicable: true,
+      passed: result.passed,
+      message: result.message || `AST check for "${artifactName}"`,
+    };
+  } catch (_err) {
+    const claudeMd = readFileSafe(CLAUDE_MD);
+    const hasEntry = _claudeMdHasEntry(claudeMd || '', artifactName);
+    if (hasEntry)
+      return {
+        applicable: true,
+        passed: true,
+        message: `Found "${artifactName}" in CLAUDE.md (fallback)`,
+      };
+    return {
+      applicable: true,
+      passed: false,
+      message: `No routing entry found for "${artifactName}" in CLAUDE.md`,
+    };
   }
-
-  // Check if artifact name appears in routing table area
-  const hasEntry = claudeMd.toLowerCase().includes(artifactName.toLowerCase());
-
-  if (hasEntry) {
-    return { applicable: true, passed: true, message: `Found "${artifactName}" in CLAUDE.md` };
-  }
-
-  return {
-    applicable: true,
-    passed: false,
-    message: `No routing entry found for "${artifactName}" in CLAUDE.md`,
-  };
 }
 
 /**
@@ -134,23 +219,7 @@ function checkSkillCatalog(artifactPath, artifactType, artifactName) {
     return { applicable: true, passed: false, message: 'Could not read skill-catalog.md' };
   }
 
-  // Attempt structured table parse first (Track 4.1: AST Markdown Table Validation)
-  // Falls back to plain string search for robustness
-  let hasEntry = false;
-  try {
-    const rows = parseMarkdownTable(catalog);
-    hasEntry = rows.some(row =>
-      Object.values(row).some(v => String(v).toLowerCase().includes(artifactName.toLowerCase()))
-    );
-  } catch (_parseErr) {
-    // fallback: plain string search
-    hasEntry = catalog.toLowerCase().includes(artifactName.toLowerCase());
-  }
-
-  if (!hasEntry) {
-    // Fallback: plain string search in case table parser misses it
-    hasEntry = catalog.toLowerCase().includes(artifactName.toLowerCase());
-  }
+  const hasEntry = _catalogHasEntry(catalog, artifactName);
 
   if (hasEntry) {
     return { applicable: true, passed: true, message: `Found "${artifactName}" in skill catalog` };
@@ -164,37 +233,47 @@ function checkSkillCatalog(artifactPath, artifactType, artifactName) {
 }
 
 /**
- * Check 3: Router Enforcer Keywords
+ * Check 3: Router Enforcer Keywords (AST)
  */
-function checkRoutingTable(artifactPath, artifactType, artifactName) {
+async function checkRoutingTable(artifactPath, artifactType, artifactName) {
   if (artifactType !== 'agent') {
     return { applicable: false, passed: true, message: 'Not applicable for this artifact type' };
   }
 
-  // Scan all files in routing directory
   try {
-    const files = fs.readdirSync(ROUTING_DIR);
-    for (const file of files) {
-      if (file.endsWith('.cjs') || file.endsWith('.js')) {
+    const { validateAgentInJsRouting } = await import('./validate-agent-ast.mjs');
+    const result = await validateAgentInJsRouting(artifactName);
+
+    if (!result.passed) {
+      // Transitional safety: fallback to traditional text scan
+      const files = fs
+        .readdirSync(ROUTING_DIR)
+        .filter(f => f.endsWith('.cjs') || f.endsWith('.js'));
+      let traditionalPassed = false;
+      for (const file of files) {
         const content = readFileSafe(path.join(ROUTING_DIR, file));
         if (content && content.toLowerCase().includes(artifactName.toLowerCase())) {
-          return {
-            applicable: true,
-            passed: true,
-            message: `Found "${artifactName}" in ${file}`,
-          };
+          traditionalPassed = true;
+          break;
         }
       }
+      if (traditionalPassed) {
+        return {
+          applicable: true,
+          passed: true,
+          message: `Found "${artifactName}" via traditional string scan`,
+        };
+      }
     }
-  } catch (_err) {
-    return { applicable: true, passed: false, message: 'Could not read routing directory' };
-  }
 
-  return {
-    applicable: true,
-    passed: false,
-    message: `No keywords/mapping found for "${artifactName}" in routing directory`,
-  };
+    return {
+      applicable: true,
+      passed: result.passed,
+      message: result.message,
+    };
+  } catch (_err) {
+    return { applicable: true, passed: false, message: `AST verification failed: ${_err.message}` };
+  }
 }
 
 /**
@@ -401,7 +480,7 @@ function checkEvolutionState(artifactPath, artifactType, artifactName) {
 /**
  * Check 10: Router Discoverability (heuristic check)
  */
-function checkRouterDiscoverability(artifactPath, artifactType, artifactName) {
+async function checkRouterDiscoverability(artifactPath, artifactType, artifactName) {
   if (!['agent', 'skill'].includes(artifactType)) {
     return { applicable: false, passed: true, message: 'Not applicable for this artifact type' };
   }
@@ -410,8 +489,8 @@ function checkRouterDiscoverability(artifactPath, artifactType, artifactName) {
   // For skills: need catalog + agent assignment
 
   if (artifactType === 'agent') {
-    const claudeCheck = checkClaudeMdRouting(artifactPath, artifactType, artifactName);
-    const routerCheck = checkRoutingTable(artifactPath, artifactType, artifactName);
+    const claudeCheck = await checkClaudeMdRouting(artifactPath, artifactType, artifactName);
+    const routerCheck = await checkRoutingTable(artifactPath, artifactType, artifactName);
 
     if (claudeCheck.passed && routerCheck.passed) {
       return { applicable: true, passed: true, message: 'Agent is discoverable by Router' };
@@ -443,9 +522,46 @@ function checkRouterDiscoverability(artifactPath, artifactType, artifactName) {
 }
 
 /**
+ * Check 11: Semver Version Field (validates version field is valid semver)
+ */
+function checkSemverVersion(artifactPath, _artifactType, _artifactName) {
+  const content = readFileSafe(artifactPath);
+  if (!content) {
+    return { applicable: false, passed: true, message: 'Could not read file' };
+  }
+
+  // Extract version from YAML frontmatter
+  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!frontmatterMatch) {
+    return { applicable: false, passed: true, message: 'No frontmatter — version check skipped' };
+  }
+
+  const versionMatch = frontmatterMatch[1].match(/^version:\s*(.+)$/m);
+  if (!versionMatch) {
+    return { applicable: false, passed: true, message: 'No version field in frontmatter' };
+  }
+
+  const versionStr = versionMatch[1].trim().replace(/^['"]|['"]$/g, '');
+  const parsed = parseSemver(versionStr);
+  if (!parsed.valid) {
+    return {
+      applicable: true,
+      passed: false,
+      message: `Invalid semver in version field: '${versionStr}' — expected MAJOR.MINOR.PATCH`,
+    };
+  }
+
+  return {
+    applicable: true,
+    passed: true,
+    message: `Version field valid: ${versionStr}`,
+  };
+}
+
+/**
  * Run all checks for an artifact.
  */
-function validateArtifact(artifactPath) {
+async function validateArtifact(artifactPath) {
   // Resolve to absolute path
   const absolutePath = path.isAbsolute(artifactPath)
     ? artifactPath
@@ -479,6 +595,7 @@ function validateArtifact(artifactPath) {
     { name: '8. Documentation Complete', fn: checkDocumentationComplete },
     { name: '9. Evolution State Updated', fn: checkEvolutionState },
     { name: '10. Router Discoverability', fn: checkRouterDiscoverability },
+    { name: '11. Semver Version Field', fn: checkSemverVersion },
   ];
 
   let failedCount = 0;
@@ -486,7 +603,17 @@ function validateArtifact(artifactPath) {
   let skippedCount = 0;
 
   for (const check of checks) {
-    const result = check.fn(absolutePath, artifactType, artifactName);
+    let result;
+    if (
+      check.fn.constructor.name === 'AsyncFunction' ||
+      check.name === '1. CLAUDE.md Routing Entry' ||
+      check.name === '3. Routing Table Keywords' ||
+      check.name === '10. Router Discoverability'
+    ) {
+      result = await check.fn(absolutePath, artifactType, artifactName);
+    } else {
+      result = check.fn(absolutePath, artifactType, artifactName);
+    }
 
     let status;
     if (!result.applicable) {
@@ -559,7 +686,7 @@ function getRecentArtifacts(hoursAgo = 24) {
 /**
  * Main entry point.
  */
-function main() {
+async function main() {
   const args = process.argv.slice(2);
 
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
@@ -594,7 +721,7 @@ Exit codes:
     let anyFailed = false;
     for (const artifactPath of recent) {
       if (fs.existsSync(artifactPath)) {
-        const result = validateArtifact(artifactPath);
+        const result = await validateArtifact(artifactPath);
         if (!result.passed) anyFailed = true;
       } else {
         console.log(`Skipping (not found): ${artifactPath}\n`);
@@ -605,7 +732,7 @@ Exit codes:
   }
 
   // Validate single artifact
-  const result = validateArtifact(args[0]);
+  const result = await validateArtifact(args[0]);
   process.exit(result.exitCode);
 }
 
@@ -616,4 +743,11 @@ if (require.main === module) {
   wrappedMain();
 }
 
-module.exports = { validateArtifact, getRecentArtifacts };
+module.exports = {
+  validateArtifact,
+  getRecentArtifacts,
+  // Exported for integration-level testing (Bug 1 & Bug 2 regression guards)
+  _catalogHasEntry,
+  _claudeMdHasEntry,
+  stripFencesAndHeadings,
+};

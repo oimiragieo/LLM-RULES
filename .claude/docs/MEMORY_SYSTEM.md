@@ -215,7 +215,7 @@ Semantic embeddings can be generated automatically on memory file edits when `ME
 
 ### loop-prevention.cjs (Deprecated)
 
-The standalone `.claude/archive/hooks/self-healing/loop-prevention.cjs` file remains for history but is marked `@deprecated` and must not be re-wired, otherwise you risk double-counting.
+The standalone `pre-task-unified.cjs` file remains for history but is marked `@deprecated` and must not be re-wired, otherwise you risk double-counting.
 
 ### state-cache.cjs
 
@@ -223,7 +223,7 @@ The repo still contains `.claude/lib/utils/state-cache.cjs`, but `router-state.j
 
 ### Execution Limits
 
-- Execution limits are wired via a persistent wrapper hook: `.claude/hooks/monitoring/execution-limit-monitor-hook.cjs` (the original `execution-limit-monitor.cjs` module is in-memory and does not persist across hook processes).
+- Execution limits are wired via a persistent wrapper hook: `user-prompt-unified.cjs` (the original `execution-limit-monitor.cjs` module is in-memory and does not persist across hook processes).
 - Cost-based limits are not strictly enforceable from hook input (no reliable per-call cost), so cost is recorded/logged best-effort rather than enforced hard.
 
 ## Session Memory (STM/MTM/LTM)
@@ -296,7 +296,7 @@ A weekly CI soak regimen runs memory chaos/stress tests and archives a report ar
 
 - Workflow: `.github/workflows/memory-soak-regimen.yml`
 - Script: `pnpm run metrics:soak:run`
-- Report: `.claude/context/reports/memory-soak-regimen-latest.json`
+- Report: `.claude/context/reports/qa/memory-soak-regimen-latest.json`
 
 ### Tunables
 
@@ -924,7 +924,7 @@ pnpm metrics:retrieval:baseline
 Artifacts:
 
 - Benchmark fixture: `tests/evals/fixtures/retrieval-quality-benchmark.json`
-- Baseline report: `.claude/context/reports/retrieval-quality-baseline-latest.json`
+- Baseline report: `.claude/context/reports/qa/retrieval-quality-baseline-latest.json`
 
 Metrics tracked:
 

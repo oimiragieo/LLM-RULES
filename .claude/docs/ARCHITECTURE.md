@@ -179,7 +179,7 @@ Task({ task_id: 'task-7', description: 'Explore codebase B', prompt: '...' }); /
 Task({
   task_id: 'task-8',
   description: 'Planner creating plan',
-  prompt: '...Save plan to .claude/context/plans/',
+  prompt: '...Save plan to .claude/context/artifacts/plans/',
 });
 ```
 
@@ -190,13 +190,13 @@ Task({
   task_id: 'task-9',
   description: 'Architect reviewing plan',
   prompt:
-    'Review .claude/context/plans/ for architectural concerns. Save to .claude/context/reports/architect-review.md',
+    'Review .claude/context/artifacts/plans/ for architectural concerns. Save to .claude/context/artifacts/architecture/architect-review.md',
 });
 Task({
   task_id: 'task-10',
   description: 'Security reviewing plan',
   prompt:
-    'Review .claude/context/plans/ for security concerns. Save to .claude/context/reports/security-review.md',
+    'Review .claude/context/artifacts/plans/ for security concerns. Save to .claude/context/reports/security/security-review.md',
 });
 ```
 

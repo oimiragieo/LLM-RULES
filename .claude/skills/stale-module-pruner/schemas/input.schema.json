@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "stale-module-pruner Input Schema",
+  "description": "Cross-references all files in targetDir with all searchDirs. Any file base name not found inside another file is marked stale.",
+  "type": "object",
+  "properties": {
+    "targetDir": {
+      "type": "string",
+      "description": "Directory to scan for potentially stale files. Default: .claude/lib"
+    },
+    "searchDirs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Directories to search via rg for the file references. Default: [.claude, tests, scripts, package.json]"
+    },
+    "extensions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "File extensions to target. Default: [.cjs, .mjs, .js]"
+    },
+    "delete": {
+      "type": "boolean",
+      "description": "If true, it deletes the file. If false, it simply lists them. Default: false"
+    }
+  },
+  "additionalProperties": false
+}

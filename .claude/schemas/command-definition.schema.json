@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/command-definition.schema.json",
+  "title": "Command Definition Schema",
+  "description": "Schema for validating Claude Code slash command definitions (.claude/commands/*.md frontmatter)",
+  "type": "object",
+  "required": ["description"],
+  "additionalProperties": true,
+  "properties": {
+    "description": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 500,
+      "description": "Short description of what the command does, shown in /help listings"
+    },
+    "disable-model-invocation": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, command content is injected directly into context without LLM invocation"
+    },
+    "allowed-tools": {
+      "type": "string",
+      "description": "Comma-separated list of tools the command is allowed to use",
+      "maxLength": 1000
+    },
+    "args": {
+      "type": "string",
+      "description": "Description of accepted arguments format (e.g., '<filename> [--flag]')",
+      "maxLength": 200
+    },
+    "skill": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Name of the skill this command delegates to",
+      "maxLength": 100
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "development",
+        "testing",
+        "review",
+        "planning",
+        "security",
+        "documentation",
+        "devops",
+        "orchestration",
+        "research",
+        "utility"
+      ],
+      "description": "Command category for organization and discovery"
+    }
+  }
+}

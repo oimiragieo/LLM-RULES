@@ -1,7 +1,7 @@
 ---
 name: database-architect
 description: Database design and optimization specialist. Schema design, query optimization, indexing strategies, data modeling, and migration planning for relational and NoSQL databases.
-version: 1.1.0
+version: 1.1.1
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -16,7 +16,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-19T06:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Database Architect Skill
@@ -352,6 +352,24 @@ This skill has a corresponding workflow for complex multi-agent scenarios:
 - **Workflow**: `.claude/workflows/database-architect-skill-workflow.md`
 - **When to use workflow**: For comprehensive database design including requirements analysis, schema design, query optimization, migration planning, and testing (multi-phase, multi-agent)
 - **When to use skill directly**: For quick schema reviews or single-agent database tasks
+
+## Iron Laws
+
+1. **NEVER** make schema changes without versioned migrations that include both UP and DOWN scripts — manual DDL in production is not recoverable.
+2. **ALWAYS** normalize to at least 3NF before considering denormalization — never prematurely optimize without measured performance evidence.
+3. **ALWAYS** plan indexes based on actual query patterns from EXPLAIN ANALYZE — never add indexes speculatively before profiling real workloads.
+4. **NEVER** test or deploy a migration without running it against production-like data first — schema issues surface under realistic volume, not on empty tables.
+5. **ALWAYS** use connection pooling (Supavisor or PgBouncer) in production — direct connections from serverless functions exhaust the database connection limit under load.
+
+## Anti-Patterns
+
+| Anti-Pattern                                 | Why It Fails                                               | Correct Approach                                                           |
+| -------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Manual DDL directly on production            | No rollback path; breaks migration history                 | Always use versioned migrations with DOWN scripts                          |
+| Premature denormalization                    | Adds complexity before profiling; often no measurable gain | Normalize first, denormalize only after EXPLAIN ANALYZE reveals bottleneck |
+| Indexing every column                        | Slows writes; wastes storage; misleads query planner       | Index only columns that appear in WHERE, JOIN, and ORDER BY clauses        |
+| Adding NOT NULL column without default       | Locks entire table during migration on large datasets      | Add nullable column, backfill in batches, then add NOT NULL constraint     |
+| Direct connections from serverless functions | Connection limit exhausted under load spike                | Use PgBouncer or Supavisor in transaction-pooling mode                     |
 
 ## Memory Protocol (MANDATORY)
 

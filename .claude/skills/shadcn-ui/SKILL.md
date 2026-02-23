@@ -6,8 +6,10 @@ metadata:
   author: google-labs-code
   version: '1.0.0'
   source: google-labs-code/stitch-skills
-verified: false
-lastVerifiedAt: 2026-02-21T00:00:00.000Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
+version: '1.0.0'
+tools: []
 ---
 
 # shadcn/ui Expert
@@ -484,6 +486,37 @@ shadcn/ui components are built on Radix UI, which provides:
 - Do NOT skip the `cn()` utility -- it prevents Tailwind class conflicts
 - Do NOT forget `suppressHydrationWarning` on `<html>` when using next-themes
 - Do NOT nest interactive elements (button inside button, link inside button)
+
+## Iron Laws
+
+1. **NEVER** install shadcn/ui as a package dependency — components must be copied into the project for full ownership
+2. **ALWAYS** use the `cn()` utility for conditional class names to prevent Tailwind class conflicts
+3. **NEVER** hardcode colors — always use CSS variable theme tokens for theming consistency
+4. **ALWAYS** use Radix UI primitives through the shadcn/ui abstraction, not directly
+5. **NEVER** nest interactive elements (button inside button, link inside button) — violates accessibility standards
+
+## Anti-Patterns
+
+| Anti-Pattern                       | Why It Fails                                          | Correct Approach                                                      |
+| ---------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------- |
+| Installing as a package            | Component source is locked; no customization possible | Use `npx shadcn@latest add` to copy components into your project      |
+| Hardcoding color values            | Theme switching breaks; dark mode fails               | Use CSS variable tokens (`bg-background`, `text-foreground`, etc.)    |
+| Skipping `cn()` utility            | Tailwind class conflicts produce unpredictable styles | Always merge classes with `cn()` from `@/lib/utils`                   |
+| Direct Radix UI primitive use      | Missing shadcn styling and accessibility wiring       | Use shadcn components that wrap Radix primitives with correct classes |
+| Missing `suppressHydrationWarning` | Hydration mismatch errors with next-themes dark mode  | Add `suppressHydrationWarning` to `<html>` when using next-themes     |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+Read `.claude/context/memory/learnings.md`
+
+**After completing:**
+
+- New pattern -> `.claude/context/memory/learnings.md`
+- Issue found -> `.claude/context/memory/issues.md`
+- Decision made -> `.claude/context/memory/decisions.md`
+
+> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
 
 ## References
 

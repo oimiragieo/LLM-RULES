@@ -1,12 +1,14 @@
 ---
 name: agent-tool-design
 description: 'The Agent Tool Contract — 5 principles for designing tools agents call reliably: predictable signature, rich errors, token-efficient output, idempotency, graceful degradation. Includes anti-pattern table with 8 common mistakes.'
-version: 1.0.0
+version: 1.1.0
 category: 'Development'
 agents: [developer, architect, tool-creator]
 user_invocable: true
 invoked_by: both
 tools: [Read, Write, Bash]
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 tags: [tools, design, api, contract, idempotency, errors, agent-tools]
 best_practices:
   - Parameters are named not positional
@@ -148,6 +150,14 @@ Before shipping any tool:
 [ ] Return shape is documented in JSDoc or TypeScript types
 [ ] Token budget for output estimated (< 500 tokens for standard tools)
 ```
+
+## Iron Laws
+
+1. **ALWAYS use named parameters** — never positional arguments in tool signatures; positional args break on refactor and create ambiguity for agents.
+2. **ALWAYS include machine-readable error codes** — never surface plain string errors only; agents need `{ code, message, context }` to handle errors programmatically.
+3. **NEVER mix reads and writes in the same tool** — read tools that trigger side effects confuse agents and prevent safe retries.
+4. **ALWAYS design for idempotency** — retry must produce the same result as the first call; use upsert semantics and `mkdir -p` patterns.
+5. **ALWAYS return partial results on partial failure** — never let one failing item abort the entire batch; return `{ succeeded, failed, partial: true }`.
 
 ## Integration
 

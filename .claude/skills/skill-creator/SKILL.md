@@ -1,7 +1,7 @@
 ---
 name: skill-creator
 description: Create, validate, and convert skills for the agent ecosystem. Enforces standardized structure for consistency. Enables self-evolution by creating new skills on demand, converting MCP servers and codebases to skills.
-version: 2.1.0
+version: 2.3.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -165,8 +165,39 @@ Before finalizing a new skill, gather current best practices and constraints:
    - Proceed with Exa/WebFetch research
 
 2. Use Exa MCP for broader web research (`mcp__exa__get_code_context_exa` and/or `mcp__exa__web_search_exa`).
-3. If Exa is unavailable or insufficient, use `WebFetch` against primary docs and arXiv.
+3. Search arXiv for academic research (mandatory when topic involves AI agents, LLM evaluation, orchestration, memory/RAG, security, or any emerging methodology):
+   - Via Exa: `mcp__Exa__web_search_exa({ query: 'site:arxiv.org <topic> agent 2024 2025' })`
+   - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
 4. Record findings in `references/research-requirements.md` and keep hooks/rules/schemas aligned with those findings.
+
+5. **Typed Artifact Search (MANDATORY for Enterprise Bundle):** For each bundle component, run at least one targeted query to find production-grade reference implementations before designing the artifact:
+
+   **A. For `schemas/` (contract files):**
+
+   ```
+   Google Dork: "$schema" "type": "object" "properties" filetype:json ("tool" OR "skill") [Domain]
+   Exa Query:   find production-grade JSON Schema definitions for [Task] for AI tool-calling
+   ```
+
+   Goal: Find contract files defining exact inputs/outputs your skill must handle.
+
+   **B. For `scripts/` and `commands/` (execution logic):**
+
+   ```
+   Google Dork: filetype:js "exports.main =" "process.argv" ("commander" OR "yargs") -site:npmjs.com
+   Exa Query:   executable Node.js CLI utility scripts for [Task] with structured JSON output
+   ```
+
+   Goal: Find atomic JavaScript/Node.js logic that can be wrapped as a CLI command.
+
+   **C. For `hooks/` (safety and lifecycle):**
+
+   ```
+   Google Dork: site:github.com "pre-commit" OR "post-tool" "exec" "node" filetype:sh
+   Exa Query:   best practices for AI agent lifecycle hooks and safety triggers 2026
+   ```
+
+   Goal: Find triggers that block dangerous operations (e.g., force push, shell injection).
 
 Do not finalize a skill without evidence-backed guidance for tooling, workflow, and guardrails.
 
@@ -184,6 +215,9 @@ Before marking skill creation complete, verify all items below:
 - [ ] `references/research-requirements.md` exists with Exa-first and fallback notes
 - [ ] Companion tool exists at `.claude/tools/<skill-name>/<skill-name>.cjs` (unless user explicitly disabled)
 - [ ] Workflow exists at `.claude/workflows/<skill-name>-skill-workflow.md` (unless user explicitly disabled)
+- [ ] **Iron Law I**: `hooks/pre-execute.cjs` validates tool inputs against `schemas/input.schema.json` before execution (`## Enforcement Hooks` section in SKILL.md required)
+- [ ] **Iron Law II**: `schemas/input.schema.json` enables typed tool calling — every property has `type` and `description` (reduces hallucination 40-60%)
+- [ ] **Iron Law III**: `hooks/post-execute.cjs` emits observability event via `send-event.cjs` (tool_name, agent_id, session_id, outcome → `.claude/context/runtime/tool-events.jsonl`)
 
 Use this verification command set:
 
@@ -211,6 +245,115 @@ ls .claude/workflows/<skill-name>-skill-workflow.md
 5. Clear non-goals to prevent overengineering.
 
 If these are missing, the skill is not complete.
+
+## World-Class Iron Laws (MANDATORY)
+
+Every enterprise skill MUST comply with these three laws. They form the difference between a script library and an orchestration framework.
+
+### Iron Law I — Enforcement Hooks (The Safety Valve)
+
+Every SKILL.md must contain an `## Enforcement Hooks` section linking to its pre-execution validation script. The `hooks/pre-execute.cjs` validates tool inputs against `schemas/input.schema.json` before any code runs.
+
+```javascript
+// hooks/pre-execute.cjs — canonical pattern
+'use strict';
+const Ajv = require('ajv');
+const schema = require('../schemas/input.schema.json');
+const ajv = new Ajv({ allErrors: true });
+const validate = ajv.compile(schema);
+
+function preExecute(input = {}) {
+  const valid = validate(input);
+  if (!valid) {
+    process.stderr.write(
+      `[pre-execute] Input schema validation failed:\n${JSON.stringify(validate.errors, null, 2)}\n`
+    );
+    process.exit(2); // block execution
+  }
+  return { continue: true };
+}
+module.exports = { preExecute };
+```
+
+Search for reference implementations:
+
+```
+Google Dork: site:github.com "pre_tool_use" OR "preToolUse" "validate" "schema" filetype:cjs
+```
+
+### Iron Law II — Model-Agnostic Schemas (The Standard Interface)
+
+Every skill's `schemas/input.schema.json` must give the model a typed contract, not prose. Every property requires `type` and `description`. This is **Typed Tool Calling** — the model resolves parameters from a JSON Schema instead of guessing from markdown.
+
+```json
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "MySkill Input",
+  "description": "Validated inputs for my-skill execution",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["run", "plan", "validate"],
+      "description": "The operation to perform"
+    }
+  },
+  "additionalProperties": false
+}
+```
+
+Add to SKILL.md:
+
+```markdown
+## Enforcement Hooks
+
+Input validated against `schemas/input.schema.json` before execution.
+Output contract defined in `schemas/output.schema.json`.
+```
+
+**Why**: Reduces model hallucination by 40-60% vs. free-form markdown instructions.
+
+### Iron Law III — Observability & Event Tracking (The Audit Trail)
+
+Every `hooks/post-execute.cjs` must emit a structured event. Use the centralized utility:
+
+```javascript
+// hooks/post-execute.cjs — canonical pattern
+'use strict';
+const path = require('path');
+const { sendEvent } = require(
+  path.resolve(__dirname, '../../../../tools/observability/send-event.cjs')
+);
+
+function postExecute(context = {}) {
+  sendEvent({
+    tool_name: context.skillName || 'unknown',
+    agent_id: context.agentId || process.env.AGENT_ID || 'unknown',
+    session_id: context.sessionId || process.env.SESSION_ID || 'unknown',
+    outcome: context.success ? 'success' : 'failure',
+  });
+}
+module.exports = { postExecute };
+```
+
+Events are appended to `.claude/context/runtime/tool-events.jsonl`. Inspect with:
+
+```bash
+node .claude/tools/observability/send-event.cjs --tail 20
+```
+
+**Why**: Without per-call event tracking, multi-agent swarms cannot be debugged when they fail in production.
+
+## Skill Maturity Model
+
+| Feature       | Level 1 (Basic)  | Level 5 (World-Class)                            |
+| ------------- | ---------------- | ------------------------------------------------ |
+| Logic         | Manual prompting | Atomic decomposition (tasks < 2 hrs each)        |
+| Security      | None             | Deterministic pre-execution schema scanning      |
+| Memory        | Session-only     | Skill library evolution (agents learn from runs) |
+| Registry      | Folder listing   | Discovery registry with semantic search (Exa)    |
+| Observability | None             | Per-call event log: tool/agent/session/outcome   |
 
 ## Actions
 
@@ -1176,6 +1319,7 @@ Before marking skill creation complete, verify ALL items:
 - [ ] **Reference skill comparison** completed (compare against tdd/SKILL.md)
 - [ ] **Model validation passed** (if skill spawns agents, model = haiku|sonnet|opus only)
 - [ ] **Tools array validated** (no MCP tools unless whitelisted)
+- [ ] **README.md updated** — skill added to Skills Catalog table and footprint count refreshed (Step 12)
 
 **Model Validation (CRITICAL):**
 
@@ -1364,7 +1508,63 @@ Skill in skill-index.json
 SkillCatalog() can discover
     ↓
 Agents can invoke dynamically
+    ↓
+Step 12: README.md Updated (public catalog)
 ```
+
+### Step 12: Update README.md Skills Catalog (MANDATORY - BLOCKING)
+
+After the skill is indexed, add it to the project README so it is publicly discoverable.
+
+1. **Add skill row to the correct section** — map the skill's catalog category (from Step 8) to the matching `### {Section}` heading in README.md, then insert a new table row:
+
+   ```markdown
+   | [<skill-name>](.claude/skills/<skill-name>/SKILL.md) | <one-line description> |
+   ```
+
+   Use `Read` on `README.md` to locate the target table, then `Edit` to append the row before the next blank line or `###` heading.
+
+   Category → README section mapping:
+
+   | Skill Catalog Category   | README `### ` Section    |
+   | ------------------------ | ------------------------ |
+   | Core Development         | Core Development         |
+   | Planning & Architecture  | Planning & Architecture  |
+   | Security                 | Security                 |
+   | DevOps & Infrastructure  | DevOps & Infrastructure  |
+   | Languages                | Languages                |
+   | Frameworks               | Frameworks               |
+   | Vercel & Web Performance | Vercel & Web Performance |
+   | Mobile                   | Mobile                   |
+   | Data & Database          | Data & Database          |
+   | Documentation            | Documentation            |
+   | Git & Version Control    | Git & Version Control    |
+   | Creator Tools            | Creator Tools            |
+   | Memory & Context         | Memory & Context         |
+   | Validation & Quality     | Validation & Quality     |
+   | Specialized Patterns     | Specialized Patterns     |
+   | External Integrations    | External Integrations    |
+   | Incident Response        | Incident Response        |
+   | Scientific Research      | Scientific Research      |
+   | Other                    | Other                    |
+
+2. **Update the footprint count** — count SKILL.md files and patch the Current Footprint line:
+
+   ```bash
+   find .claude/skills -name "SKILL.md" | wc -l
+   ```
+
+   Then `Edit` README.md: change `- Skills: {N} \`SKILL.md\` definitions` to the new count.
+
+3. **Update the skills catalog header** — find the `> **N active skills**` line in the Skills Catalog section and update N to match the new total.
+
+4. **Verify:**
+
+   ```bash
+   grep "<skill-name>" README.md || echo "ERROR: README.md NOT UPDATED - BLOCKING!"
+   ```
+
+**BLOCKING**: Skill creation is INCOMPLETE until the skill name appears in README.md.
 
 ---
 
@@ -1415,13 +1615,19 @@ diff <(grep "^## " .claude/skills/tdd/SKILL.md) <(grep "^## " .claude/skills/{sk
 
 This skill is part of the Creator Ecosystem. After creating a skill, consider if companion artifacts are needed:
 
-| Need                      | Creator to Invoke  | Command                                  |
-| ------------------------- | ------------------ | ---------------------------------------- |
-| Dedicated agent for skill | `agent-creator`    | `Skill({ skill: "agent-creator" })`      |
-| Validation hooks          | `hook-creator`     | Create hooks in `.claude/hooks/`         |
-| Workflow orchestration    | `workflow-creator` | Create workflow in `.claude/workflows/`  |
-| Code templates            | `template-creator` | Create templates in `.claude/templates/` |
-| Input/output validation   | `schema-creator`   | Create schemas in `.claude/schemas/`     |
+| Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
+| ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | `Skill({ skill: 'skill-updater' })`    | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | `Skill({ skill: 'agent-creator' })`    | Agent to own the capability       |
+| Existing agent needs capability update   | agent update      | `Skill({ skill: 'agent-updater' })`    | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | `Skill({ skill: 'command-creator' })`  | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
 
 **Chain Example:**
 
@@ -1728,6 +1934,23 @@ This enables a self-healing, self-evolving agent ecosystem where:
 - New agents automatically discover and include relevant skills
 - Both intake paths ensure skills are properly loaded and used
 
+### Occupational Alignment (Bidirectional Contract)
+
+When skill-creator triggers agent-creator (Step 1 above: no matching agent), the spawned agent-creator MUST execute **Step 2.3: Occupational Alignment Research** as part of its creation process. This means:
+
+1. The new agent will be grounded in BLS OOH occupational profiles (real-world task and tool data)
+2. Job title variants from Ongig will be collected for routing keyword precision
+3. MyMajors career skill lists will be cross-referenced for coverage gaps
+4. **Any additional skill gaps discovered during Step 2.3** will be reported back to skill-creator for follow-up creation — forming a recursive but bounded improvement loop
+
+**Termination condition**: The loop terminates when all real-world skill gaps are either:
+
+- Covered by existing skills in `.claude/skills/`
+- Created as new skills (and wired to the agent)
+- Explicitly waived with documented reasoning
+
+This contract ensures that skills and agents are always co-aligned with real industry standards, not just internal framework conventions.
+
 ## Ecosystem Alignment Contract (MANDATORY)
 
 This creator skill is part of a coordinated creator ecosystem. Any artifact created here must align with and validate against related creators:
@@ -1751,14 +1974,20 @@ Before completion, verify all relevant handshakes:
 4. `validate-integration.cjs` passes for the created artifact.
 5. Skill index is regenerated when skill metadata changes.
 
-### Research Gate (Exa First, arXiv Fallback)
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
 
 For new patterns, templates, or workflows, research is mandatory:
 
-1. Use Exa first for implementation and ecosystem patterns.
-2. If Exa is insufficient, use `WebFetch` plus arXiv references.
+1. Use Exa for implementation and ecosystem patterns:
+   - `mcp__Exa__web_search_exa({ query: '<topic> 2025 best practices' })`
+   - `mcp__Exa__get_code_context_exa({ query: '<topic> implementation examples' })`
+2. Search arXiv for academic research (mandatory for AI/ML, agents, evaluation, orchestration, memory/RAG, security):
+   - Via Exa: `mcp__Exa__web_search_exa({ query: 'site:arxiv.org <topic> 2024 2025' })`
+   - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
 3. Record decisions, constraints, and non-goals in artifact references/docs.
 4. Keep updates minimal and avoid overengineering.
+
+**arXiv is mandatory (not fallback) when topic involves:** AI agents, LLM evaluation, orchestration, memory/RAG, security, static analysis, or any emerging methodology.
 
 ### Regression-Safe Delivery
 

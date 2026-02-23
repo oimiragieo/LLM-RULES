@@ -1,7 +1,7 @@
 ---
 name: github-ops
 description: Workflow for repository reconnaissance and operations using GitHub CLI (gh). Optimizes token usage by using structured API queries instead of blind file fetching.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -12,8 +12,8 @@ best_practices:
   - Combine multiple checks into single API calls where possible
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # GitHub Ops Skill
@@ -70,6 +70,24 @@ gh repo view {owner}/{repo} --json description,stargazerCount,updatedAt
 - When using `base64 -d`, ensure the output is redirected to a file using the `Write` tool if it's large.
 - Avoid Linux-style `/dev/stdin` patterns in complex pipes.
 - Use native paths for any local storage.
+
+## Iron Laws
+
+1. **ALWAYS** follow the Map → Identify → Fetch sequence before reading any file — blindly fetching files by guessed path wastes tokens, triggers 404s, and produces hallucinated repo structure.
+2. **NEVER** fetch a file without first listing its parent directory or confirming it exists via `gh api` — large files fetched unnecessarily can exhaust the context window.
+3. **ALWAYS** use `--jq` to filter `gh api` JSON output to only the fields needed — unfiltered API responses contain hundreds of irrelevant fields that inflate token usage.
+4. **NEVER** use `gh search code` without a scoping qualifier (repo, org, or path) — unscoped code search returns results from all of GitHub, producing irrelevant noise.
+5. **ALWAYS** prefer `gh api` structured queries over reading repository files directly when repository metadata is needed — API queries are faster, structured, and don't require authentication context for public repos.
+
+## Anti-Patterns
+
+| Anti-Pattern                                   | Why It Fails                                                    | Correct Approach                                                                         |
+| ---------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Guessing file paths and fetching them directly | High 404 rate; wasted tokens on non-existent paths              | Map root tree first: `gh api repos/{owner}/{repo}/git/trees/HEAD --jq '.tree[].path'`    |
+| Fetching entire files for a single field       | Large files exhaust context; slow and imprecise                 | Use `--jq` to extract only the required field from API response                          |
+| Unscoped `gh search code` queries              | Returns GitHub-wide results; noise overwhelms signal            | Always add `--repo owner/name` or `--owner org` scope qualifier                          |
+| Reading binary or generated files              | Binary content is unreadable; generated files change frequently | Identify file type first; skip binaries; read source files only                          |
+| Sequential API calls for each file             | Unnecessary round-trips inflate latency                         | Batch: use `gh api` trees or search to identify multiple targets, then fetch in parallel |
 
 ## Assigned Agents
 

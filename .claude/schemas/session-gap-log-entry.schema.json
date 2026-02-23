@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "session-gap-log-entry",
   "title": "SessionGapLogEntry",
   "description": "A single router-observed gap, failure, retry, or warning during a pipeline session. Written by the router to .claude/context/runtime/session-gap-log.jsonl (one entry per line).",

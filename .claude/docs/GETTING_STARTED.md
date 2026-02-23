@@ -357,11 +357,11 @@ Agent Studio:
 ## Where to Learn More
 
 - **[CLAUDE.md](../CLAUDE.md)**: Complete framework reference
-- **[ROUTER_PROTOCOL.md](./ROUTER_PROTOCOL.md)**: Router decision-making process
+- **ROUTER_PROTOCOL.md**: Router decision-making process
 - **[Skill Catalog](../context/artifacts/catalogs/skill-catalog.md)**: Browse all 426 skills
 - **[Agent Directory](../agents/)**: Explore agent definitions
 - **[Workflows](../workflows/)**: Multi-agent coordination patterns
-- **[HOOKS_AND_SAFETY.md](./HOOKS_AND_SAFETY.md)**: Safety validators and hooks
+- **HOOKS_AND_SAFETY.md**: Safety validators and hooks
 
 ## Troubleshooting
 

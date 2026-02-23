@@ -72,6 +72,8 @@ const CONFIG = {
   // Known false positives: { pathSubstring, ruleId } - excluded from blocking
   skipFindings: [
     { pathSubstring: 'user-prompt-unified.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request"
+    { pathSubstring: 'user-prompt-unified.core.cjs', ruleId: 'SEC-040' }, // path.join PROJECT_ROOT + .claude/context/runtime + literals only
+    { pathSubstring: 'user-prompt-orchestrator.cjs', ruleId: 'SEC-040' }, // path.join runtimeDir (PROJECT_ROOT) + literals only
     { pathSubstring: 'memory-health-check.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request.json"
     { pathSubstring: 'reflection-step0-guard.cjs', ruleId: 'SEC-040' }, // path.join with literal "reflection-spawn-request"
     { pathSubstring: 'reflection-step0-guard.test.cjs', ruleId: 'SEC-040' }, // path.join with literal in test

@@ -1,7 +1,7 @@
 ---
 name: api-development-expert
 description: API development expert including REST design, OpenAPI, and documentation
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -405,6 +405,25 @@ User: "Review this code for api-development best practices"
 Agent: [Analyzes code against consolidated guidelines and provides specific feedback]
 ```
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS version your API from day 1** — never introduce breaking changes without a version bump; use URI versioning (`/v1/`, `/v2/`) so clients can migrate on their schedule.
+2. **NEVER return 200 OK for errors** — use proper HTTP status codes: 400 (bad request), 401 (unauthorized), 403 (forbidden), 404 (not found), 422 (validation failed), 500 (server error).
+3. **ALWAYS document every endpoint in OpenAPI 3.1** — undocumented APIs cannot be safely consumed; OpenAPI 3.1 provides JSON Schema 2020-12 compliance and webhook support.
+4. **NEVER include sensitive data in error responses** — stack traces, database schema, and internal file paths are attack vectors; return only machine-readable error codes and safe messages.
+5. **ALWAYS implement rate limiting on all public endpoints** — unauthenticated endpoints without rate limiting are DoS vectors; respond with 429 and `Retry-After` header.
+
+## Anti-Patterns
+
+| Anti-Pattern                               | Why It Fails                                                    | Correct Approach                                 |
+| ------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------ |
+| Verbs in URIs (`/getUser`, `/createOrder`) | Violates REST constraints; HTTP method conveys the verb         | Use nouns: `/users`, `/orders` with `GET`/`POST` |
+| No API versioning from day 1               | Breaking changes instantly break all existing clients           | URI versioning: `/v1/resource` from the start    |
+| Returning 200 OK for errors                | Clients can't distinguish success from failure programmatically | Use correct HTTP status codes                    |
+| No rate limiting on public endpoints       | DoS vulnerability; single client can exhaust resources          | Rate limit with `X-RateLimit-*` headers + 429    |
+| Leaking server internals in errors         | Stack traces and DB errors are attack vectors                   | Return error codes + safe messages only          |
+| No OpenAPI specification                   | Clients must guess request/response format                      | Document all endpoints in OpenAPI 3.1            |
 
 ## Consolidated Skills
 

@@ -83,7 +83,7 @@ function formatDirectory(dirPath, cwd) {
 
 function loadSchemaValidator() {
   try {
-    return require('../../lib/utils/schema-validator.cjs').validateData;
+    return require('../../../lib/utils/schema-validator.cjs').validateData;
   } catch (_e) {
     return null;
   }

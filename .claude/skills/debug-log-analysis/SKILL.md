@@ -1,7 +1,7 @@
 ---
 name: debug-log-analysis
 description: 'Structured debug log analysis for Claude Code sessions — copy log, run reducer, extract error patterns, correlate with full log, produce observability report. Fills 5 identified gaps: hook error body capture, agent identity, file path tracking, stall correlation, success visibility.'
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -11,8 +11,8 @@ tags: [debugging, observability, debug-log, errors, reflection, telemetry]
 tools: [Read, Write, Bash, Grep]
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-21T00:00:00.000Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -89,7 +89,7 @@ grep -n "PreToolUse:Write" ".claude/context/tmp/debug-session-{date}.txt" | head
 
 ## Step 6: Produce Structured Report
 
-Write to `.claude/context/reports/debug-log-analysis-{date}.md`:
+Write to `.claude/context/reports/reflections/debug-log-analysis-{date}.md`:
 
 ```markdown
 # Debug Log Analysis — {date}
@@ -161,6 +161,24 @@ if (priority === 'high' && debugLogPath) {
   // Include findings in reflection report
 }
 ```
+
+## Iron Laws
+
+1. **ALWAYS** copy the debug log before any analysis — never operate on the original file; in-place operations corrupt the forensic artifact.
+2. **NEVER** report a root cause based on a single grep match — always read at least 10 lines of context before and after the match to understand what the agent was actually doing.
+3. **ALWAYS** run the reducer script (Step 2) before attempting to read a full debug log — unfiltered debug logs contain 98%+ noise that obscures real signals.
+4. **NEVER** skip the structured error report (Step 6) — an informal verbal summary is not a deliverable; the markdown report is required for reflection-agent to incorporate findings.
+5. **ALWAYS** write new recurring error patterns to `.claude/context/memory/issues.md` — patterns not written to memory will recur invisibly across sessions.
+
+## Anti-Patterns
+
+| Anti-Pattern                              | Why It Fails                                                         | Correct Approach                                                                    |
+| ----------------------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Grepping the original log file directly   | Modifies timestamps, corrupts forensic artifact, no rollback         | Always copy first: `cp debug.txt .claude/context/tmp/debug-{date}.txt`              |
+| Reading the full unreduced log            | 98%+ noise-to-signal ratio; analysis takes hours and misses patterns | Run `reduce-debug-log.mjs` first; work from the reduced output                      |
+| Reporting root cause from single grep hit | Single matches are often false positives from unrelated tool calls   | Read ±10 lines of context for every match before concluding root cause              |
+| Informal verbal summary instead of report | Reflection agent can't parse informal summaries into memory entries  | Write the full structured markdown report to `.claude/context/reports/reflections/` |
+| Skipping memory writes after analysis     | Error patterns recur invisibly; no institutional learning            | Write every new pattern to issues.md or learnings.md before task complete           |
 
 ## Memory Protocol (MANDATORY)
 

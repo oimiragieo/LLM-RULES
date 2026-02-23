@@ -266,7 +266,7 @@ const HOOK_TEMPLATES = {
 const fs = require('fs');
 
 function parseHookInput() {
-  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+  const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
   try { return process.argv[2] ? safeParseJSON(process.argv[2]) : null; }
   catch { return null; }
 }
@@ -308,7 +308,7 @@ main();
 const fs = require('fs');
 
 function parseHookInput() {
-  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+  const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
   try { return process.argv[2] ? safeParseJSON(process.argv[2]) : null; }
   catch { return null; }
 }
@@ -353,7 +353,7 @@ const fs = require('fs');
 const path = require('path');
 
 function parseHookInput() {
-  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+  const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
   try { return process.argv[2] ? safeParseJSON(process.argv[2]) : null; }
   catch { return null; }
 }

@@ -1,7 +1,7 @@
 ---
 name: skill-updater
 description: Research-backed skill refresh workflow for updating existing skills with TDD checkpoints, memory-aware integration, and EVOLVE/reflection trigger handling.
-version: 1.0.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -158,7 +158,9 @@ Skill({ skill: 'research-synthesis' });
 3. Gather at least:
 
 - 3 Exa/web queries
-- 1 arXiv/canonical paper source when topic is methodology-heavy (TDD, agent evaluation, memory/RAG, orchestration)
+- 1+ arXiv papers (mandatory when topic involves AI/ML, agents, evaluation, orchestration, memory/RAG, security — not optional):
+  - Via Exa: `mcp__Exa__web_search_exa({ query: 'site:arxiv.org <topic> 2024 2025' })`
+  - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
 - 1 internal codebase parity check (`pnpm search:code`, `ripgrep`, semantic/structural search)
 
 4. Optional benchmark assimilation when parity against external repos is needed:
@@ -268,12 +270,29 @@ const scaffold = scaffoldMissingComponents(skillName, projectRoot);
 3. Log created components in TaskUpdate metadata.
 4. Run integration validation on new components.
 
-### Step 7: Cascade Analysis
+### Step 7: Cascade Analysis + Companion Artifact Gap Resolution (MANDATORY)
 
-- Check if skill gained new tool capabilities → trigger agent-updater for assigned agents
-- Check if skill gained a new domain → trigger recommend-evolution for potential new agent
-- Check if skill needs a dedicated workflow → trigger workflow-creator recommendation
-- Use `findAssignedAgents(skillName, projectRoot)` from `run-skill-updates.cjs` for cascade detection
+After updating the skill, scan for capability gaps and resolve each using the appropriate creator:
+
+| Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
+| ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
+| Domain knowledge needs a reusable skill  | skill             | `Skill({ skill: 'skill-creator' })`    | Gap is a full skill domain        |
+| Existing skill has incomplete coverage   | skill update      | `Skill({ skill: 'skill-updater' })`    | Close skill exists but incomplete |
+| Capability needs a dedicated agent       | agent             | `Skill({ skill: 'agent-creator' })`    | Agent to own the capability       |
+| Existing agent needs capability update   | agent update      | `Skill({ skill: 'agent-updater' })`    | Close agent exists but incomplete |
+| Domain needs code/project scaffolding    | template          | `Skill({ skill: 'template-creator' })` | Reusable code patterns needed     |
+| Behavior needs pre/post execution guards | hook              | `Skill({ skill: 'hook-creator' })`     | Enforcement behavior required     |
+| Process needs multi-phase orchestration  | workflow          | `Skill({ skill: 'workflow-creator' })` | Multi-step coordination needed    |
+| Artifact needs structured I/O validation | schema            | `Skill({ skill: 'schema-creator' })`   | JSON schema for artifact I/O      |
+| User interaction needs a slash command   | command           | `Skill({ skill: 'command-creator' })`  | User-facing shortcut needed       |
+| Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
+| Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
+
+**Cascade checks (after applying table above):**
+
+- Skill gained new tool capabilities → check assigned agents via `findAssignedAgents(skillName, projectRoot)` from `run-skill-updates.cjs`, then trigger `agent-updater` for each
+- Skill's existing workflow is now stale → trigger `workflow-updater`
+- New gap remains after refresh and no table row fits → `Skill({ skill: 'recommend-evolution' })`
 
 ### Step 8: Integration + Evolution Recording
 

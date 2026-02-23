@@ -1,7 +1,7 @@
 ---
 name: on-call-handoff-patterns
 description: Master on-call shift handoffs with context transfer, escalation procedures, and documentation. Use when transitioning on-call responsibilities, documenting shift summaries, or improving on-call processes.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Test setup before incidents
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -496,6 +496,24 @@ I'll be available on Slack until 17:00 today.
 - [Google SRE - Being On-Call](https://sre.google/sre-book/being-on-call/)
 - [PagerDuty On-Call Guide](https://www.pagerduty.com/resources/learn/on-call-management/)
 - [Increment On-Call Issue](https://increment.com/on-call/)
+
+## Iron Laws
+
+1. **ALWAYS** write a handoff document before ending a shift — sync calls alone are insufficient; spoken context is forgotten within hours; the document is the durable record the incoming engineer can return to at 3am.
+2. **NEVER** skip the sync call for on-call handoffs — async-only handoffs lose nuance, tone, and the ability to answer questions; 15 minutes of overlap prevents hours of confusion for the incoming engineer.
+3. **ALWAYS** escalate within 30 minutes of being stuck on an incident — spending hours debugging alone delays resolution and exhausts the on-call engineer; escalation is a sign of good judgment, not weakness.
+4. **NEVER** skip verification of alerting setup before a shift begins — discovering a misconfigured PagerDuty routing during an active incident is too late; test the full alert path before every shift.
+5. **ALWAYS** document every open investigation with explicit next steps — handing off without next steps forces the incoming engineer to restart from zero; written action items reduce handoff ramp-up from hours to minutes.
+
+## Anti-Patterns
+
+| Anti-Pattern                                  | Why It Fails                                                         | Correct Approach                                                                        |
+| --------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Async-only handoff (no sync call)             | Context loss causes incidents; nuance lost; questions go unanswered  | Always do a sync call (minimum 15 min overlap) plus a written document                  |
+| No handoff document                           | New on-call engineer blind to ongoing issues; 3am ramp-up impossible | Write full handoff document before ending every shift                                   |
+| Skipping alerting verification before shift   | Misconfigured routing discovered during incident — too late to fix   | Test PagerDuty routing and Slack notifications before every shift starts                |
+| Hero culture (not escalating)                 | Individual burnout; delayed resolution; poor decisions under fatigue | Escalate within 30 minutes of being stuck; escalation is good judgment                  |
+| Handing off investigations without next steps | Incoming engineer must restart investigation from scratch            | Document current state, theories, evidence, and explicit next steps for every open item |
 
 ## Memory Protocol (MANDATORY)
 

@@ -1,7 +1,7 @@
 ---
 name: plan-generator
 description: Creates structured plans from requirements. Generates comprehensive plans with steps, dependencies, risks, and success criteria. Coordinates with specialist agents for planning input and validates plan completeness. Uses template-renderer for formatted output.
-version: 1.1
+version: 1.1.0
 model: opus
 invoked_by: both
 user_invocable: true
@@ -340,7 +340,7 @@ npm test -- --grep "auth" && echo "All auth tests passing"
 
 - [ ] **3.1** Security audit (~20 min) [⚡ parallel OK]
   - **Command**: `Task({ task_id: 'task-5', agent: "security-architect", prompt: "Audit auth implementation" })`
-  - **Verify**: `ls .claude/context/reports/security-audit.md`
+  - **Verify**: `ls .claude/context/reports/security/security-audit.md`
 
 - [ ] **3.2** Run security tests (~5 min) [⚡ parallel OK]
   - **Command**: `npm run test:security`
@@ -400,6 +400,14 @@ Skill({
 
 </formatting_example>
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** include an executable command in every task — a task without a command is a wish, not an action; plans with wishes stall at execution because agents have nothing to run.
+2. **NEVER** create a phase with more than 7 tasks — phases exceeding 7 tasks cause cognitive overload, lose parallel opportunities, and make rollback scoping impossible.
+3. **ALWAYS** include a verification gate between every phase — proceeding without verification means failures in Phase N are discovered in Phase N+3, making rollback exponentially more complex.
+4. **NEVER** generate a plan without explicit rollback commands for destructive operations — a plan without rollback paths is unrecoverable; rollback must be specified before the operation is attempted.
+5. **ALWAYS** coordinate specialist input (Analyst, PM, Architect) before finalizing a plan — plans generated without domain expert review routinely miss implicit requirements, producing incomplete execution paths.
 
 ## Rules
 

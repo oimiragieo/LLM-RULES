@@ -13,8 +13,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 source: auto-claude
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Requirements Gathering Skill
@@ -256,7 +256,7 @@ SPEC_FILE=".claude/context/artifacts/specifications/[feature-name]-spec.md"
 test -f "$SPEC_FILE" && echo "✓ Spec created" || echo "✗ Spec creation failed"
 
 # Check no unresolved tokens
-grep "{{" "$SPEC_FILE" && echo "✗ Unresolved tokens found" || echo "✓ All tokens resolved"
+grep -E '[{]{2}' "$SPEC_FILE" && echo "✗ Unresolved tokens found" || echo "✓ All tokens resolved"
 
 # Check YAML frontmatter valid
 YAML_COUNT=$(head -50 "$SPEC_FILE" | grep -E "^---$" | wc -l)
@@ -431,6 +431,24 @@ Skill({
 **Symptoms:** Every answer adds new features.
 
 **Solution:** Document "Out of Scope" explicitly. Confirm: "Should we include this in this task or save for later?"
+
+## Iron Laws
+
+1. **NEVER** begin implementation before a validated specification exists for STANDARD+ complexity
+2. **ALWAYS** capture non-functional requirements (performance, security, scalability) explicitly
+3. **NEVER** accept vague success criteria — require measurable, testable numbers
+4. **ALWAYS** document what is explicitly out of scope, not just what is in scope
+5. **NEVER** hand off to planner without explicit user confirmation of requirements
+
+## Anti-Patterns
+
+| Anti-Pattern                        | Why It Fails                                           | Correct Approach                                                     |
+| ----------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------- |
+| Vague requirements ("make it fast") | Not measurable or testable                             | Specify exact metrics: "P95 response time <100ms"                    |
+| Missing NFRs                        | Quality attributes forgotten until too late            | Always capture performance, security, scalability requirements       |
+| No out-of-scope section             | Scope creep during implementation                      | Explicitly document what this task does NOT include                  |
+| Skipping user confirmation          | Requirements misunderstood and implemented incorrectly | Confirm all requirements with the user before handoff                |
+| No edge cases documented            | Error handling gaps discovered during QA               | Document empty input, bad data, timeout, and concurrent access cases |
 
 ## Memory Protocol
 

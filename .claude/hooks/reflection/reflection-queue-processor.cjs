@@ -558,6 +558,9 @@ async function main() {
       process.exit(0);
     }
 
+    // Proactively trim queue file on every invocation to prevent unbounded growth
+    trimJsonlFile(QUEUE_FILE, REFLECTION_QUEUE_MAX_LINES);
+
     // Process the queue
     const result = processQueue(QUEUE_FILE);
 

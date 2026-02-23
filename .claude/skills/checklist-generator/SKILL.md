@@ -1,7 +1,7 @@
 ---
 name: checklist-generator
 description: Generate context-aware quality checklists for code review and QA using IEEE 1028 base standards plus LLM contextual additions
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -14,8 +14,8 @@ best_practices:
   - Return markdown checklist with checkboxes
 error_handling: strict
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Quality Checklist Generator
@@ -429,13 +429,23 @@ Context: TypeScript, React, REST API
 - Include items that can't be verified
 - Make checklist too long (>50 items)
 
-## Iron Law
+## Iron Laws
 
-```
-NO TASK COMPLETION WITHOUT CHECKLIST VALIDATION
-```
+1. **NEVER complete a task without checklist validation** — use `verification-before-completion` to enforce this gate; skipping checklist validation defeats the entire purpose of the skill.
+2. **ALWAYS analyze project context before generating the checklist** — detect framework, language, and patterns first; a generic checklist without context misses stack-specific items and includes irrelevant ones.
+3. **NEVER exceed 50 checklist items** — checklists longer than 50 items are not completed in practice; be ruthlessly selective and prioritize blocking items over nice-to-haves.
+4. **ALWAYS mark LLM-generated items with [AI-GENERATED] prefix** — IEEE 1028 base items are verified standards; AI-generated items are contextual suggestions requiring human judgment.
+5. **NEVER include non-verifiable items** — every checklist item must be objectively checkable with a yes/no answer; vague items like "code is clean" cannot be definitively validated.
 
-Use `verification-before-completion` skill to enforce this.
+## Anti-Patterns
+
+| Anti-Pattern                                 | Why It Fails                                 | Correct Approach                                |
+| -------------------------------------------- | -------------------------------------------- | ----------------------------------------------- |
+| Generating without context analysis          | Produces generic, irrelevant checklist items | Detect framework/language/patterns first        |
+| Exceeding 50 items                           | Long checklists are abandoned mid-review     | Cut ruthlessly; keep to ≤50 high-value items    |
+| No [AI-GENERATED] prefix on contextual items | Conflates standards with suggestions         | Mark all AI-contextual items clearly            |
+| Non-verifiable items ("code is clean")       | Can't be definitively checked off            | Only include objectively pass/fail items        |
+| Skipping checklist for "small" changes       | Small changes introduce large bugs           | Apply checklist proportionally for every change |
 
 ## Related Skills
 

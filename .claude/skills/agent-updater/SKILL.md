@@ -1,7 +1,7 @@
 ---
 name: agent-updater
 description: Research-backed workflow to refresh existing agent prompts/frontmatter with diff-based risk scoring, TDD gates, and ecosystem validation.
-version: 1.0.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -95,8 +95,29 @@ invoke `Skill({ skill: 'security-architect' })` for manual review.
    - validation commands to run
 4. Build prompt/frontmatter diff plan with risk score (`low|medium|high`).
 5. Generate RED/GREEN/REFACTOR/VERIFY backlog.
-6. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
-7. Record learnings and unresolved risks in memory.
+6. **Resolve companion artifact gaps (MANDATORY):**
+
+   Scan the RED backlog for items that represent missing reusable capabilities — not just wording changes. For each such item, determine the required companion artifact and invoke the appropriate creator before applying the agent update.
+
+   | Gap Type                                   | Required Artifact | Creator to Invoke                      |
+   | ------------------------------------------ | ----------------- | -------------------------------------- |
+   | Substantial new reusable domain skill      | skill             | `Skill({ skill: 'skill-creator' })`    |
+   | Existing skill with missing coverage       | skill update      | `Skill({ skill: 'skill-updater' })`    |
+   | Agent needs code/project scaffolding       | template          | `Skill({ skill: 'template-creator' })` |
+   | Agent needs pre/post execution guards      | hook              | `Skill({ skill: 'hook-creator' })`     |
+   | Agent needs orchestration/multi-phase flow | workflow          | `Skill({ skill: 'workflow-creator' })` |
+   | Agent needs structured I/O validation      | schema            | `Skill({ skill: 'schema-creator' })`   |
+   | Narrow agent-specific capability           | inline            | Add to Capabilities section only       |
+
+   **Protocol:**
+   1. For each RED item that describes a missing capability (not a wording fix), classify using the table above
+   2. Invoke the appropriate creator for every non-inline gap
+   3. After each creator completes, record the artifact name it produced
+   4. Wire created artifacts into the agent's frontmatter (`skills:`) or Capabilities/body before applying the main patch
+   5. Record created companion artifacts in `evolution-state.json` and `decisions.md`
+
+7. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
+8. Record learnings and unresolved risks in memory.
 
 ## Orchestrator Update Contract (MANDATORY)
 
@@ -149,8 +170,12 @@ Do not introduce prompt rules that contradict active hook behavior.
 - [ ] Exact patch plan generated
 - [ ] Risk-scored diff completed
 - [ ] RED/GREEN/REFACTOR/VERIFY backlog documented
+- [ ] Companion artifact gaps resolved (skill-creator/skill-updater/template-creator/hook-creator/workflow-creator/schema-creator invoked as needed — Step 6)
+- [ ] Newly created companion artifacts wired into agent frontmatter/body
 - [ ] Integration validation run
 - [ ] Agent registry regenerated when skill assignments/frontmatter changed (`node .claude/tools/cli/generate-agent-registry.cjs` → `.claude/context/agent-registry.json`)
+- [ ] `evolution-state.json` updated if EVOLVE-triggered (add entry with artifactType, name, path, status, completedAt)
+- [ ] `pnpm lint:fix && pnpm format` clean on touched files
 - [ ] Memory learnings/decisions/issues updated
 
 ## Memory Protocol

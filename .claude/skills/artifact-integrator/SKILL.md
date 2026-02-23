@@ -1,7 +1,7 @@
 ---
 name: artifact-integrator
 description: Deep integration analysis for newly created artifacts
-version: 1.0.0
+version: 1.1.0
 category: workflow
 agents:
   - architect
@@ -15,8 +15,8 @@ tools:
   - TaskList
   - TaskUpdate
   - Bash
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Artifact Integrator
@@ -301,6 +301,25 @@ if (integrationQueueHasUnprocessedEntries()) {
   });
 }
 ```
+
+## Iron Laws
+
+1. **ALWAYS check the integration queue before starting any new artifact creation** — Step 0.5 is mandatory; unprocessed entries compound into orphan debt that accumulates silently.
+2. **NEVER create more than 3 auto-spawned companion tasks per artifact** — SEC-ICE-002 hard limit; exceeding it overwhelms the agent pipeline; queue remaining companions for manual review.
+3. **ALWAYS validate backward-propagation claims against actual code** — require >= 3 confirmed duplicate instances AND >= 30 LOC reduction before queuing; never queue unverified claims.
+4. **ALWAYS mark queue entries as `processed: true` before reporting complete** — unprocessed entries persist indefinitely and will be retried on every subsequent invocation.
+5. **NEVER report integration gaps without updating the artifact graph** — the graph is the system of record for artifact relationships; gap reports without graph updates are invisible to future runs.
+
+## Anti-Patterns
+
+| Anti-Pattern                                         | Why It Fails                                         | Correct Approach                                  |
+| ---------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------- |
+| Skipping integration queue check                     | Unprocessed entries accumulate silently              | Always read `integration-queue.jsonl` at Step 1   |
+| Creating >3 companion tasks per artifact             | Task explosion overwhelms the agent pipeline         | Enforce SEC-ICE-002: max 3 per artifact, 10 total |
+| Queuing backward-propagation without code validation | False positives create unnecessary artifacts         | Verify >= 3 instances AND >= 30 LOC reduction     |
+| Not marking queue entries processed                  | Entries retry indefinitely on next invocation        | Set `processed: true` before reporting completion |
+| Reporting gaps without updating artifact graph       | Graph becomes stale; future analysis uses wrong data | Always update graph edges after gap analysis      |
+| Running integration on unverified artifact IDs       | Invalid IDs cause silent failures                    | Verify artifact file exists before analysis       |
 
 ## Related Skills
 

@@ -1,11 +1,11 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://claude-code.anthropic.com/schemas/workflow-definition",
   "title": "Workflow Definition Schema",
   "description": "Schema for validating Claude Code workflow definition files",
   "type": "object",
   "required": ["name", "steps"],
-  "unevaluatedProperties": false,
+  "additionalProperties": false,
   "properties": {
     "name": {
       "type": "string",
@@ -37,7 +37,7 @@
           {
             "type": "object",
             "required": ["id"],
-            "unevaluatedProperties": false,
+            "additionalProperties": false,
             "properties": {
               "id": {
                 "type": "string",
@@ -84,7 +84,7 @@
               },
               "validation": {
                 "type": "object",
-                "unevaluatedProperties": false,
+                "additionalProperties": false,
                 "properties": {
                   "schema": {
                     "type": "string",
@@ -115,7 +115,7 @@
     },
     "hooks": {
       "type": "object",
-      "unevaluatedProperties": false,
+      "additionalProperties": false,
       "properties": {
         "entry": {
           "type": "array",

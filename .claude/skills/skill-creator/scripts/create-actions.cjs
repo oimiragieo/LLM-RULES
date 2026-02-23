@@ -362,7 +362,7 @@ function createActions(ctx) {
         }
         const result = validateData(
           { status: 'success', output },
-          path.join(CLAUDE_DIR, 'schemas', 'skill-definition.schema.json')
+          path.join(CLAUDE_DIR, 'schemas', 'skill-output.schema.json')
         );
         if (!result.valid) {
           console.error('Schema validation failed');

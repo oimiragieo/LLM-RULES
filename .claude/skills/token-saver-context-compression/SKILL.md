@@ -2,8 +2,10 @@
 name: token-saver-context-compression
 description: Search-aware context compression workflow for agent-studio. Use pnpm hybrid search + token-saver compression, then persist distilled learnings via MemoryRecord.
 argument-hint: [file-or-text-and-query]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
+version: '1.0.0'
+tools: []
 ---
 
 # Token Saver Context Compression
@@ -102,6 +104,24 @@ Adaptive compression (adjusting compression ratio based on corpus size) is autom
 
 - Node.js 18+
 - Python 3.10+
+
+## Iron Laws
+
+1. **ALWAYS** run hybrid search (`pnpm search:code`) before compressing to retrieve grounded evidence for the distilled output
+2. **NEVER** compress context that still has open uncertainties — resolve ambiguities before compressing
+3. **ALWAYS** persist distilled learnings via MemoryRecord immediately after compression
+4. **NEVER** discard evidence that contradicts the current working hypothesis during compression
+5. **ALWAYS** inject `[mem:*]` and `[rag:*]` citations in the compressed output for downstream spawn prompt grounding
+
+## Anti-Patterns
+
+| Anti-Pattern                             | Why It Fails                                       | Correct Approach                                  |
+| ---------------------------------------- | -------------------------------------------------- | ------------------------------------------------- |
+| Compressing without prior hybrid search  | Output lacks grounded evidence, hallucination risk | Run `pnpm search:code` first, embed citations     |
+| Discarding contradicting evidence        | Creates false confidence in distilled output       | Preserve all conflicting signals in summary       |
+| No MemoryRecord after compression        | Learnings lost on next context reset               | Persist key findings immediately via MemoryRecord |
+| Compressing too late (past 80K tokens)   | Severe accuracy degradation before compression     | Trigger compression at 80K tokens, not at limit   |
+| Skipping `[mem:*]` / `[rag:*]` citations | Downstream agents cannot verify claims             | Always annotate evidence sources in output        |
 
 ## Memory Protocol (MANDATORY)
 

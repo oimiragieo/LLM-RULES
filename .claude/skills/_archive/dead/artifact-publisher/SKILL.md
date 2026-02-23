@@ -35,13 +35,13 @@ Artifact Publisher - Handles the lifecycle of artifacts, ensuring they are prope
 
 Determine the artifact type and appropriate location:
 
-| Type         | Location                     | Format                    |
-| ------------ | ---------------------------- | ------------------------- |
-| Plan         | `.claude/context/plans/`     | `plan-{id}.md`            |
-| Report       | `.claude/context/reports/`   | `report-{type}-{date}.md` |
-| Architecture | `.claude/context/artifacts/` | `architecture-{name}.md`  |
-| Schema       | `.claude/context/artifacts/` | `schema-{name}.json`      |
-| Config       | `.claude/context/artifacts/` | `config-{name}.yaml`      |
+| Type         | Location                           | Format                    |
+| ------------ | ---------------------------------- | ------------------------- |
+| Plan         | `.claude/context/plans/`           | `plan-{id}.md`            |
+| Report       | `.claude/context/reports/backend/` | `report-{type}-{date}.md` |
+| Architecture | `.claude/context/artifacts/`       | `architecture-{name}.md`  |
+| Schema       | `.claude/context/artifacts/`       | `schema-{name}.json`      |
+| Config       | `.claude/context/artifacts/`       | `config-{name}.yaml`      |
 
 ### Step 2: Add Metadata
 

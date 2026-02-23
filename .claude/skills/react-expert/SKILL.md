@@ -15,7 +15,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-19T06:00:00.000Z
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # React Expert
@@ -133,21 +133,21 @@ function MyForm() {
 ```tsx
 import { useOptimistic } from 'react';
 
-function TodoList({ todos, addTodo }: Props) {
-  const [optimisticTodos, addOptimistic] = useOptimistic(todos, (state, newTodo) => [
+function ItemList({ items, addItem }: Props) {
+  const [optimisticItems, addOptimistic] = useOptimistic(items, (state, newItem) => [
     ...state,
-    { ...newTodo, pending: true },
+    { ...newItem, pending: true },
   ]);
   async function action(formData: FormData) {
-    const newTodo = { text: formData.get('text') as string, id: crypto.randomUUID() };
-    addOptimistic(newTodo);
-    await addTodo(newTodo);
+    const newItem = { text: formData.get('text') as string, id: crypto.randomUUID() };
+    addOptimistic(newItem);
+    await addItem(newItem);
   }
   return (
     <ul>
-      {optimisticTodos.map(todo => (
-        <li key={todo.id} style={{ opacity: todo.pending ? 0.5 : 1 }}>
-          {todo.text}
+      {optimisticItems.map(item => (
+        <li key={item.id} className={item.pending ? 'opacity-50' : ''}>
+          {item.text}
         </li>
       ))}
       <form action={action}>
@@ -300,12 +300,12 @@ function ClientShell({ children }: { children: React.ReactNode }) {
 ## Templates
 
 <template name="component">
-interface {{Name}}Props {
+interface ButtonProps {
 className?: string
 children?: React.ReactNode
 }
 
-export function {{Name}}({ className, children }: {{Name}}Props) {
+export function Button({ className, children }: ButtonProps) {
 return (
 
 <div className={className}>
@@ -321,7 +321,7 @@ import { useActionState } from 'react'
 
 type State = { error?: string; success?: boolean } | null
 
-async function {{actionName}}(prevState: State, formData: FormData): Promise<State> {
+async function submitContact(prevState: State, formData: FormData): Promise<State> {
 try {
 // perform mutation
 return { success: true }
@@ -330,14 +330,14 @@ return { error: err instanceof Error ? err.message : 'Unknown error' }
 }
 }
 
-export function {{Name}}Form() {
-const [state, formAction, isPending] = useActionState({{actionName}}, null)
+export function ContactForm() {
+const [state, formAction, isPending] = useActionState(submitContact, null)
 return (
 
 <form action={formAction}>
 {state?.error && <p role="alert">{state.error}</p>}
 {state?.success && <p>Saved successfully.</p>}
-{/_ form fields _/}
+{/* form fields */}
 <button type="submit" disabled={isPending}>
 {isPending ? 'Saving...' : 'Save'}
 </button>
@@ -351,30 +351,30 @@ return (
 import { use, Suspense } from 'react'
 
 // Create the promise OUTSIDE the component (stable reference)
-function fetch{{Name}}(): Promise<{{Type}}> {
-return fetch('/api/{{name}}').then(r => r.json())
+function fetchUserProfile(): Promise<UserProfile> {
+return fetch('/api/users').then(r => r.json())
 }
 
-export function {{Name}}Display({ dataPromise }: { dataPromise: Promise<{{Type}}> }) {
+export function UserProfileDisplay({ dataPromise }: { dataPromise: Promise<UserProfile> }) {
 const data = use(dataPromise) // suspends until resolved
 return <div>{/_ render data _/}</div>
 }
 
-// Usage: <Suspense fallback={<Spinner />}><{{Name}}Display dataPromise={fetch{{Name}}()} /></Suspense>
+// Usage: <Suspense fallback={<Spinner />}><UserProfileDisplay dataPromise={fetchUserProfile()} /></Suspense>
 </template>
 
 <template name="hook-classic">
 // Classic hook pattern (for non-Suspense or client-only use cases)
 import { useState, useEffect } from 'react'
 
-interface Use{{Name}}Result {
-data: {{Type}} | null
+interface UseUserDataResult {
+data: UserData | null
 loading: boolean
 error: Error | null
 }
 
-export function use{{Name}}(): Use{{Name}}Result {
-const [data, setData] = useState<{{Type}} | null>(null)
+export function useUserData(): UseUserDataResult {
+const [data, setData] = useState<UserData | null>(null)
 const [loading, setLoading] = useState(true)
 const [error, setError] = useState<Error | null>(null)
 
@@ -383,7 +383,7 @@ let cancelled = false
 async function load() {
 try {
 setLoading(true)
-const result = await fetch('/api/{{name}}').then(r => r.json())
+const result = await fetch('/api/users').then(r => r.json())
 if (!cancelled) setData(result)
 } catch (err) {
 if (!cancelled) setError(err instanceof Error ? err : new Error('Unknown error'))
@@ -431,6 +431,24 @@ Agent: [Analyzes hooks, memoization, accessibility, and provides feedback]
 ```
 </usage_example>
 </examples>
+
+## Iron Laws
+
+1. **ALWAYS** use functional components with hooks — class components are legacy code and incompatible with React Compiler, Server Components, and future concurrent features.
+2. **NEVER** violate the Rules of Hooks — hooks must always be called at the top level of a component, never inside conditions, loops, or nested functions.
+3. **ALWAYS** push state down to the lowest component that needs it — lifting state unnecessarily causes excessive re-renders and couples unrelated components.
+4. **NEVER** perform side effects directly in component render — use `useEffect` for post-render effects or Server Components for async data fetching.
+5. **ALWAYS** keep Client Components as small leaf nodes — the more code in `'use client'` components, the more JavaScript shipped to the browser.
+
+## Anti-Patterns
+
+| Anti-Pattern                               | Why It Fails                                                                  | Correct Approach                                                                         |
+| ------------------------------------------ | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Using class components in new code         | Incompatible with React Compiler, Server Components, and concurrent features  | Always use functional components with hooks                                              |
+| Calling hooks conditionally or in loops    | Violates Rules of Hooks; React depends on call order stability across renders | Always call hooks at the top level; use conditions inside the hook body                  |
+| Manual `useMemo`/`useCallback` everywhere  | Premature optimization; adds noise and complexity without measurable benefit  | Profile first; use React Compiler; only memoize when DevTools shows real re-render cost  |
+| Fetching data in `useEffect`               | Causes request waterfalls, loading flicker, and race conditions               | Use Server Components for async fetch; React Query for client-side caching               |
+| Marking large components as `'use client'` | Bundles entire component tree including server data into client JS            | Push `'use client'` to small interactive leaf components; keep data components as Server |
 
 ## Memory Protocol (MANDATORY)
 

@@ -193,7 +193,7 @@ Read('../agents/core/developer.md'); // ❌
 | ----------- | --------------------------------------------- | --------------------- |
 | Source code | Project structure                             | `src/feature.ts`      |
 | Tests       | Co-located with source                        | `src/feature.test.ts` |
-| Plans       | `.claude/context/plans/`                      | `feature-plan.md`     |
+| Plans       | `.claude/context/artifacts/plans/`            | `feature-plan.md`     |
 | Reports     | `.claude/context/artifacts/reports/`          | `qa-report.md`        |
 | Research    | `.claude/context/artifacts/research-reports/` | `topic-research.md`   |
 | Memory      | `.claude/context/memory/`                     | `learnings.md`        |
@@ -624,7 +624,7 @@ Skill({ skill: '<skill-name>' });
 ## Related Documentation
 
 - [FILE_PLACEMENT_RULES.md](./FILE_PLACEMENT_RULES.md) - Where to place files
-- [CLAUDE.md](../.claude/CLAUDE.md) - Main framework documentation
+- CLAUDE.md - Main framework documentation
 - [developer.md](../agents/core/developer.md) - Developer agent definition
 
 ---

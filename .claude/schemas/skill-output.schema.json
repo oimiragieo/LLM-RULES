@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agent-studio.dev/schemas/skill-output.schema.json",
+  "title": "Skill Output Schema",
+  "description": "Schema for validating Claude Code skill creator output (the {status, output} envelope returned by skill-creator)",
+  "type": "object",
+  "required": ["status", "output"],
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed"],
+      "description": "Execution status of the skill creator"
+    },
+    "output": {
+      "type": "object",
+      "description": "Skill-specific output data",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Skill name in lowercase-with-hyphens format",
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 20,
+          "maxLength": 500,
+          "description": "Clear description of what the skill does"
+        },
+        "model": {
+          "type": "string",
+          "enum": ["sonnet", "opus", "haiku", "inherit"],
+          "default": "sonnet",
+          "description": "Preferred model for this skill"
+        },
+        "invoked_by": {
+          "type": "string",
+          "enum": ["user", "agent", "both"],
+          "default": "both",
+          "description": "Who can invoke this skill"
+        },
+        "user_invocable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether users can invoke directly via /skill-name"
+        },
+        "tools": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": "Tools this skill uses"
+        },
+        "allowed-tools": {
+          "type": "string",
+          "description": "Comma-separated list of allowed tools (alternative format)",
+          "maxLength": 1000
+        },
+        "args": {
+          "type": "string",
+          "description": "Argument format for skill invocation",
+          "maxLength": 500
+        },
+        "best_practices": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "description": "List of best practices for this skill"
+        },
+        "templates": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "description": "Available templates this skill can generate"
+        },
+        "error_handling": {
+          "type": "string",
+          "enum": ["graceful", "strict", "warn"],
+          "default": "graceful",
+          "description": "How errors are handled"
+        },
+        "streaming": {
+          "type": "string",
+          "enum": ["supported", "required", "disabled"],
+          "default": "supported",
+          "description": "Streaming output support"
+        },
+        "context_fork": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether skill runs in forked context"
+        },
+        "source": {
+          "type": "string",
+          "description": "Origin of skill (e.g., mcp-npm, custom, converted)",
+          "maxLength": 200
+        },
+        "original_server": {
+          "type": "string",
+          "description": "Original MCP server name if converted",
+          "maxLength": 200
+        },
+        "verified": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the skill has been verified by the creator/updater workflow"
+        },
+        "lastVerifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of when the skill was last verified or updated"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["name", "description"]
+    }
+  }
+}

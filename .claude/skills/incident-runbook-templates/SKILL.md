@@ -1,7 +1,7 @@
 ---
 name: incident-runbook-templates
 description: Create structured incident response runbooks with step-by-step procedures, escalation paths, and recovery actions. Use when building runbooks, responding to incidents, or establishing incident response procedures.
-version: 1.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Document assumptions
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -420,6 +420,24 @@ psql -c "VACUUM FULL large_table;"
 - [Google SRE Book - Incident Management](https://sre.google/sre-book/managing-incidents/)
 - [PagerDuty Incident Response](https://response.pagerduty.com/)
 - [Atlassian Incident Management](https://www.atlassian.com/incident-management)
+
+## Iron Laws
+
+1. **ALWAYS** write and test runbooks before an incident occurs — an untested runbook written during an active P0 incident introduces errors when cognitive load is highest.
+2. **NEVER** assume operator knowledge in a runbook — write every step as if for a new on-call engineer at 3 AM with no context; assumed knowledge creates fatal gaps under stress.
+3. **ALWAYS** include a rollback step for every mitigation action — mitigation steps that cannot be reversed trap teams in a worse state when the fix makes the incident worse.
+4. **NEVER** resolve an incident without updating the runbook if a step failed or was missing — unupdated runbooks repeat the same failures in the next incident.
+5. **ALWAYS** define explicit escalation triggers with time bounds and contact owners — runbooks without escalation criteria leave operators guessing when to escalate, causing under-escalation or over-escalation.
+
+## Anti-Patterns
+
+| Anti-Pattern | Why It Fails | Correct Approach |
+|---|---|---|
+| Runbooks written during the incident | High stress + cognitive load = errors and gaps; untested steps fail | Write and game-day runbooks before incidents; update post-incident |
+| Steps that assume domain knowledge | New on-call engineers fail; team knowledge is a single point of failure | Write each step as a complete command with expected output and failure signal |
+| No rollback steps | Mitigation makes incident worse; team is stuck without recovery path | Every `change X` step must have a matching `revert X` step with commands |
+| Runbook not updated after incident | Same failure mode repeated in next incident | Mandate runbook review as part of postmortem action items |
+| Vague escalation criteria ("escalate if needed") | Under-escalation extends MTTR; over-escalation burns on-call | Define triggers: "escalate after 15 minutes without mitigation progress" |
 
 ## Memory Protocol (MANDATORY)
 

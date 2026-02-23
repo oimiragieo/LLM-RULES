@@ -148,7 +148,7 @@ All domain agents MUST follow workspace-conventions for file placement:
 
 - **Test Results**: `.claude/context/tmp/test-results-{YYYY-MM-DD}.json`
 - **Coverage Reports**: `.claude/context/tmp/coverage-{YYYY-MM-DD}.html`
-- **Implementation Notes**: `.claude/context/reports/domain/{language}-implementation-{YYYY-MM-DD}.md`
+- **Implementation Notes**: `.claude/context/reports/backend/domain/{language}-implementation-{YYYY-MM-DD}.md`
 
 ### Provenance Headers (All Generated Files)
 
@@ -221,7 +221,7 @@ Domain specialists are spawned during PHASE_2_IMPLEMENT of the enterprise featur
 ```
 
 2. **Output artifacts:**
-   - Implementation notes: `.claude/context/reports/domain/{language}-implementation-{YYYY-MM-DD}.md`
+   - Implementation notes: `.claude/context/reports/backend/domain/{language}-implementation-{YYYY-MM-DD}.md`
    - Test results: `.claude/context/tmp/test-results-{YYYY-MM-DD}.json`
 
 ## Example: Python TDD Session

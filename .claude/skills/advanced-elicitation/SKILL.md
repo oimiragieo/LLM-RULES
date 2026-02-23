@@ -1,7 +1,7 @@
 ---
 name: advanced-elicitation
 description: Use when you want to improve response quality through meta-cognitive reasoning. Applies 15+ reasoning methods to reconsider and refine initial outputs.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -13,8 +13,8 @@ best_practices:
   - Budget 2x LLM cost vs regular responses
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Advanced Elicitation
@@ -853,6 +853,25 @@ cat .claude/context/memory/learnings.md
 - Decision made → `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## Iron Laws
+
+1. **NEVER apply elicitation automatically** — it is always opt-in. Never invoke without explicit user request or clear agent intent signal.
+2. **ALWAYS emit a confidence level** for every method output — `HIGH / MEDIUM / LOW` is mandatory. Outputs without calibration are not actionable.
+3. **NEVER exceed 5 methods per invocation** (SEC-AE-001) — over-elicitation produces noise, not signal. Select 1-3 most relevant methods.
+4. **ALWAYS check session budget** before invoking — fail gracefully with a clear message when `ELICITATION_BUDGET_LIMIT` is exceeded (SEC-AE-002).
+5. **NEVER treat elicitation as a substitute for evidence** — it refines reasoning; it does not produce facts. Always ground conclusions in codebase evidence.
+
+## Anti-Patterns
+
+| Anti-Pattern                     | Why It Fails                                  | Correct Approach                                         |
+| -------------------------------- | --------------------------------------------- | -------------------------------------------------------- |
+| Auto-applying to every response  | 2× cost with no benefit for simple tasks      | Opt-in only for important/complex decisions              |
+| Running all 15 methods at once   | Diminishing returns, token explosion          | Select 1–3 most relevant methods                         |
+| Skipping confidence rating       | Evaluation without calibration is useless     | Always emit `**Confidence Level:** HIGH/MEDIUM/LOW`      |
+| Elicitation replaces evidence    | Reasoning without facts is speculation        | Pair with grounded codebase evidence before eliciting    |
+| No budget check                  | Session cost spirals undetected               | Always verify `ELICITATION_BUDGET_LIMIT` before invoking |
+| Running after deadline/emergency | High cost with no time to act on improvements | Skip for time-critical fixes; use for strategic work     |
 
 ## Related Skills
 

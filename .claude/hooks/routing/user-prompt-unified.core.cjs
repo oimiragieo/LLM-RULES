@@ -50,6 +50,9 @@ const { estimateTokens: estimateTokens } = libRequire(
 );
 const { checkCompressionNeeded: checkCompressionNeeded, triggerCompression: triggerCompression } =
   libRequire(path.join('utils', 'compression-trigger.cjs'));
+const { getContextPressure: getContextPressure } = libRequire(
+  path.join('utils', 'context-token-estimator.cjs')
+);
 const logger = createLogger('user-prompt-unified');
 let findingsRegistry = null;
 try {
@@ -495,6 +498,7 @@ function checkTokenMonitoring(hookInput) {
   const result = {
     enabled: true,
     promptTokens: estimate.tokens,
+    prompt: prompt,
     maxTokens: maxTokens,
     hardLimit: hardLimit,
     sessionId: sessionId,
@@ -596,6 +600,7 @@ function maybeAutoCompress(tokenStatus) {
   if (currentCount >= maxCompressions) {
     return { enabled: true, needed: false, skipped: 'max_compressions' };
   }
+
   const trigger = checkCompressionNeeded({
     tokenBudgetStatus: {
       percentUsed: percentUsed,
@@ -603,6 +608,18 @@ function maybeAutoCompress(tokenStatus) {
     },
     operationCount: 0,
   });
+
+  // Track 1.1: Precise Tokenizer Context-Pressure Check
+  const pressureRatio = getContextPressure({
+    incomingTaskPrompt: tokenStatus?.prompt || '',
+  });
+  const pressureThreshold = Number(process.env.CONTEXT_PRESSURE_THRESHOLD) || 0.8;
+  if (pressureRatio >= pressureThreshold) {
+    trigger.needed = true;
+    trigger.reason = `Context pressure ratio ${pressureRatio.toFixed(2)} exceeds threshold ${pressureThreshold}`;
+    trigger.urgency = 'high';
+  }
+
   if (!trigger.needed) {
     return { enabled: true, needed: false };
   }

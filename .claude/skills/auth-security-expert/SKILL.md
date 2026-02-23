@@ -1,7 +1,7 @@
 ---
 name: auth-security-expert
 description: OAuth 2.1, JWT (RFC 8725), encryption, and authentication security expert. Enforces 2026 security standards.
-version: 2.0.0
+version: 2.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -16,8 +16,8 @@ best_practices:
   - PKCE downgrade attack prevention
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Auth Security Expert
@@ -839,6 +839,24 @@ This expert skill consolidates 1 individual skills:
 ## Related Skills
 
 - [`security-architect`](../security-architect/SKILL.md) - Threat modeling (STRIDE), OWASP Top 10, and security architecture patterns
+
+## Iron Laws
+
+1. **NEVER store JWTs in localStorage** — localStorage is accessible to any JavaScript on the page, making it trivially vulnerable to XSS; always use httpOnly secure cookies.
+2. **ALWAYS validate JWT signature before using any claims** — an unvalidated JWT can be forged; never decode claims without first verifying the signature against the expected algorithm and key.
+3. **NEVER use HS256 with a client-accessible secret** — HS256 shared secrets are exposed when the client holds them; use RS256 or ES256 so only the server can sign.
+4. **NEVER allow the implicit OAuth grant** — the implicit grant is deprecated in OAuth 2.1 due to token leakage in redirect fragments; always use authorization code + PKCE.
+5. **ALWAYS set JWT access token expiry to 15 minutes or less** — long-lived access tokens remain valid after compromise; use refresh token rotation to maintain sessions without long-lived tokens.
+
+## Anti-Patterns
+
+| Anti-Pattern                      | Why It Fails                                           | Correct Approach                                    |
+| --------------------------------- | ------------------------------------------------------ | --------------------------------------------------- |
+| JWT stored in localStorage        | XSS-accessible; any script can steal the token         | Use httpOnly secure cookies                         |
+| No JWT signature validation       | Forged tokens are accepted silently                    | Always call verify(), never just decode()           |
+| HS256 with client secret          | Secret is embedded in client code; trivially extracted | Use RS256/ES256 with server-side private key        |
+| Implicit OAuth grant              | Token in URL fragment leaks via referrer headers       | Authorization code + PKCE flow                      |
+| Access token lifetime >15 minutes | Stolen tokens remain valid too long after breach       | Set exp to 5-15 minutes; use refresh token rotation |
 
 ## Memory Protocol (MANDATORY)
 

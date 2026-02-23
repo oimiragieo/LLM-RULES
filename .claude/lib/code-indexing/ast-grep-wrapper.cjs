@@ -74,6 +74,10 @@ class AstGrepSearch {
     this.binPath = options.binPath || 'ast-grep';
     this.projectRoot = options.projectRoot || process.cwd();
     this.timeout = options.timeout || 30000;
+
+    // Aggressive AST-Grep Caching (Optimization #1)
+    this.cache = new Map();
+    this.cacheTtl = options.cacheTtl || parseInt(process.env.AST_GREP_CACHE_TTL) || 120000; // 2 minutes default
   }
 
   /**
@@ -159,6 +163,13 @@ class AstGrepSearch {
       throw new Error('Language must be a non-empty string');
     }
 
+    // Check cache first (Optimization #1)
+    const cacheKey = JSON.stringify({ pattern, language, options });
+    const cached = this.cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.cacheTtl) {
+      return cached.results;
+    }
+
     // Check if binary is available
     const available = await this.isAvailable();
     if (!available) {
@@ -222,7 +233,12 @@ class AstGrepSearch {
         if (code === 0 || code === 1) {
           try {
             const results = JSON.parse(stdout || '[]');
-            resolve(this._formatResults(results, options.maxResults));
+            const formatted = this._formatResults(results, options.maxResults);
+
+            // Cache the results before returning
+            this.cache.set(cacheKey, { timestamp: Date.now(), results: formatted });
+
+            resolve(formatted);
           } catch (e) {
             reject(new Error(`Failed to parse ast-grep output: ${e.message}`));
           }

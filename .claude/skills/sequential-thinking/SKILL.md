@@ -1,7 +1,7 @@
 ---
 name: sequential-thinking
 description: Sequential thinking and structured problem solving. Break down complex problems into steps with revision and branching capabilities. Use for multi-step analysis, planning, and hypothesis verification.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -12,8 +12,8 @@ best_practices:
   - Generate and verify hypotheses
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Sequential Thinking Skill
@@ -143,6 +143,24 @@ MCP server configuration stored in `config.json`:
 
 - Original MCP server: `@modelcontextprotocol/server-sequential-thinking`
 - MCP Converter Skill: `.claude/skills/mcp-converter/`
+
+## Iron Laws
+
+1. **NEVER** set `nextThoughtNeeded: false` before the solution hypothesis has been verified
+2. **ALWAYS** adjust `totalThoughts` dynamically as problem complexity becomes clear
+3. **NEVER** commit to the first approach without exploring at least one alternative via branching
+4. **ALWAYS** mark corrections explicitly with `isRevision: true` and `revisesThought: N`
+5. **NEVER** stop at the estimated thought count if the hypothesis remains unverified
+
+## Anti-Patterns
+
+| Anti-Pattern           | Why It Fails                                                              | Correct Approach                                                                 |
+| ---------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Fixed thought count    | Thinking stops at an arbitrary estimate regardless of solution confidence | Set `needsMoreThoughts: true` and increase `totalThoughts` when complexity grows |
+| No branching           | Commits to the first approach without considering alternatives            | Use `branchFromThought` to explore multiple solution paths before choosing       |
+| Skipping revisions     | Incorrect assumptions propagate uncorrected through downstream thoughts   | Mark all corrections with `isRevision: true` and `revisesThought: N`             |
+| Premature termination  | Unverified hypothesis leads to incorrect or incomplete solutions          | Verify the hypothesis explicitly before setting `nextThoughtNeeded: false`       |
+| No uncertainty markers | Overconfident conclusions mislead execution agents                        | Mark tentative thoughts explicitly; distinguish confident vs uncertain reasoning |
 
 ## Memory Protocol (MANDATORY)
 

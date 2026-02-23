@@ -2,8 +2,10 @@
 name: troubleshooting-regression
 description: Regression troubleshooting workflow for hook/router/memory/search failures with enforced evidence and fix validation
 argument-hint: '[--prompt "..."] [--log-path <path>] [--mode quick|full]'
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
+version: '1.0.0'
+tools: []
 ---
 
 # Troubleshooting Regression
@@ -85,6 +87,24 @@ node .claude/skills/troubleshooting-regression/scripts/main.cjs --mode quick
 # Analyze specific log and fail when critical findings exist
 node .claude/skills/troubleshooting-regression/scripts/main.cjs --log-path "<path>" --strict
 ```
+
+## Iron Laws
+
+1. **ALWAYS** collect evidence (logs, trace IDs, error messages) before making any configuration changes
+2. **NEVER** modify hook or routing configuration without first reproducing the failure deterministically
+3. **ALWAYS** validate the fix by running the full regression test suite after each change
+4. **NEVER** mark a regression resolved until the exact failure scenario passes end-to-end
+5. **ALWAYS** document the root cause, fix, and validation evidence in issues.md for future reference
+
+## Anti-Patterns
+
+| Anti-Pattern                                | Why It Fails                                  | Correct Approach                                    |
+| ------------------------------------------- | --------------------------------------------- | --------------------------------------------------- |
+| Making changes without reproducing failure  | Can't verify the change fixed the right thing | Reproduce deterministically first, then fix         |
+| Fixing symptoms without root cause analysis | Problem recurs under different conditions     | Use 5 Whys to trace to the root cause               |
+| Skipping regression suite after fix         | Fix may break other functionality             | Run full test suite after every change              |
+| Undocumented fixes                          | Same regression returns in future sessions    | Record root cause, fix, and validation in issues.md |
+| Resolving without end-to-end validation     | Integration issues are missed                 | Validate the exact failure path end-to-end          |
 
 ## Memory Protocol
 

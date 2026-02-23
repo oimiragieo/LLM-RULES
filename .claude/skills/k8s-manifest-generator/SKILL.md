@@ -1,12 +1,12 @@
 ---
 name: k8s-manifest-generator
 description: Create production-ready Kubernetes manifests for Deployments, Services, ConfigMaps, and Secrets following best practices and security standards. Use when generating Kubernetes YAML manifests, creating K8s resources, or implementing production-grade Kubernetes configurations.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: [devops]
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: 2026-02-22T00:00:00.000Z
 ---
 
 # Kubernetes Manifest Generator
@@ -532,6 +532,24 @@ After creating manifests:
 3. Consider using Helm or Kustomize for templating
 4. Implement GitOps with ArgoCD or Flux
 5. Add monitoring and observability
+
+## Iron Laws
+
+1. **ALWAYS** set CPU and memory resource `requests` and `limits` on every container — pods without resource limits consume unbounded node resources, cause node pressure evictions, and starve neighboring workloads.
+2. **NEVER** run containers as root (`runAsNonRoot: false` or omitted) in production — root containers can escape containment via kernel exploits; always set `securityContext.runAsNonRoot: true` with a specific `runAsUser`.
+3. **ALWAYS** define liveness and readiness probes on every workload — without probes, Kubernetes cannot distinguish a deadlocked container from a healthy one; failing probes block deployments and traffic incorrectly.
+4. **NEVER** store secrets in ConfigMaps — ConfigMaps are stored in plaintext in etcd; use Kubernetes Secrets (with etcd encryption at rest) or an external secrets manager (Vault, AWS Secrets Manager).
+5. **ALWAYS** set a `PodDisruptionBudget` for production workloads — without PDBs, node drains during upgrades can terminate all replicas simultaneously, causing complete service outages.
+
+## Anti-Patterns
+
+| Anti-Pattern                      | Why It Fails                                                                    | Correct Approach                                                                             |
+| --------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| No resource limits                | Pod consumes all node memory; node OOM kills other pods; cluster destabilized   | Set `requests` (scheduling) and `limits` (enforcement) for CPU and memory on every container |
+| Running as root                   | Kernel exploits allow container escape; file system writes as root corrupt host | Set `runAsNonRoot: true`, `runAsUser: 1000`, `readOnlyRootFilesystem: true`                  |
+| Missing liveness/readiness probes | Deadlocked pods serve traffic; new pods receive traffic before ready            | Add `/health` liveness and `/ready` readiness probes with appropriate initialDelaySeconds    |
+| Secrets in ConfigMaps             | Plaintext in etcd; visible in `kubectl get configmap`; audit log exposes values | Use `kind: Secret` with base64 encoding; enable etcd encryption; prefer external secrets     |
+| Single replica for production     | Pod restart = service outage; zero tolerance for node failure                   | Minimum 2 replicas + PodAntiAffinity rules to spread across nodes; PodDisruptionBudget       |
 
 ## Related Skills
 
