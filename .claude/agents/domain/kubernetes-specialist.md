@@ -59,16 +59,16 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index              | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index              | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -300,28 +300,28 @@ Skill({ skill: 'container-expert' }); // Container best practices
 
 ### Automatic Skills (Always Invoke)
 
-| Skill                    | Purpose                           | When                 |
-| ------------------------ | --------------------------------- | -------------------- |
-| `k8s-manifest-generator` | Manifest scaffolding + validation | Always at task start |
-| `debugging`              | Systematic 4-phase debugging      | For debugging tasks  |
-| `verification-before-completion` | Quality gates              | Before completing    |
+| Skill                            | Purpose                           | When                 |
+| -------------------------------- | --------------------------------- | -------------------- |
+| `k8s-manifest-generator`         | Manifest scaffolding + validation | Always at task start |
+| `debugging`                      | Systematic 4-phase debugging      | For debugging tasks  |
+| `verification-before-completion` | Quality gates                     | Before completing    |
 
 ### Contextual Skills (When Applicable)
 
-| Condition                           | Skill                            | Purpose                              |
-| ----------------------------------- | -------------------------------- | ------------------------------------ |
-| Docker/compose work                 | `docker-compose`                 | Container orchestration              |
-| Container issues                    | `container-expert`               | Runtime debugging                    |
-| AWS cloud resources                 | `aws-cloud-ops`                  | EKS/ECR/IAM operations               |
-| Cloud DevOps patterns               | `cloud-devops-expert`            | Cloud-native best practices          |
-| Session management                  | `task-management-protocol`       | Multi-step task tracking             |
-| Context pressure high               | `token-saver-context-compression`| Context compression                  |
-| Terraform/Pulumi provisioning       | `terraform-infra`                | Cluster IaC with safety controls     |
-| GitOps workflow design              | `gitops-workflow`                | ArgoCD/Flux declarative patterns     |
-| Helm chart authoring                | `helm-chart-scaffolding`         | Helm chart design and best practices |
-| K8s security policies               | `k8s-security-policies`          | NetworkPolicy, PSP, RBAC authoring   |
-| Flux v2 management                  | `kubernetes-flux`                | Flux GitOps troubleshooting          |
-| Incident/runbook authoring          | `incident-runbook-templates`     | Operational runbook creation         |
+| Condition                     | Skill                             | Purpose                              |
+| ----------------------------- | --------------------------------- | ------------------------------------ |
+| Docker/compose work           | `docker-compose`                  | Container orchestration              |
+| Container issues              | `container-expert`                | Runtime debugging                    |
+| AWS cloud resources           | `aws-cloud-ops`                   | EKS/ECR/IAM operations               |
+| Cloud DevOps patterns         | `cloud-devops-expert`             | Cloud-native best practices          |
+| Session management            | `task-management-protocol`        | Multi-step task tracking             |
+| Context pressure high         | `token-saver-context-compression` | Context compression                  |
+| Terraform/Pulumi provisioning | `terraform-infra`                 | Cluster IaC with safety controls     |
+| GitOps workflow design        | `gitops-workflow`                 | ArgoCD/Flux declarative patterns     |
+| Helm chart authoring          | `helm-chart-scaffolding`          | Helm chart design and best practices |
+| K8s security policies         | `k8s-security-policies`           | NetworkPolicy, PSP, RBAC authoring   |
+| Flux v2 management            | `kubernetes-flux`                 | Flux GitOps troubleshooting          |
+| Incident/runbook authoring    | `incident-runbook-templates`      | Operational runbook creation         |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 
@@ -340,6 +340,7 @@ Skill({ skill: 'container-expert' }); // Container best practices
 Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high.
 
 Invoke token-saver when ANY of these hold:
+
 - Synthesizing across many search hits (10+ candidates)
 - Retrieved snippets/logs too large for working context
 - Preparing evidence-heavy handoff/review output

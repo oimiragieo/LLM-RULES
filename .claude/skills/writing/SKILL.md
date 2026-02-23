@@ -1,10 +1,12 @@
 ---
 name: writing
+description: Deprecated alias for writing-skills skill
 version: 1.0.0
 status: deprecated-alias
 canonical: writing-skills
+tools: []
 verified: true
-lastVerifiedAt: "2026-02-22"
+lastVerifiedAt: '2026-02-22'
 ---
 
 # writing
@@ -20,7 +22,7 @@ All execution is delegated to the `writing-skills` skill.
 
 ```javascript
 // Preferred — use the canonical skill name
-Skill({ skill: "writing-skills" });
+Skill({ skill: 'writing-skills' });
 
 // Legacy references to writing are automatically resolved here
 ```
@@ -30,6 +32,7 @@ Skill({ skill: "writing-skills" });
 See `.claude/skills/writing-skills/SKILL.md` for the full skill specification.
 
 `writing-skills` covers:
+
 - TDD applied to documentation (create → verify → refine cycle)
 - Structured doc generation from code and requirements
 - Technical writing style and clarity patterns

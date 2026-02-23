@@ -9,7 +9,7 @@
 function postExecute(_input = {}, result = {}) {
   process.stderr.write(
     '[webmcp-browser-tools] Reminder: Chrome 146 Canary (Feb 2026) — ' +
-      'use @mcp-b/webmcp-polyfill for cross-browser support today.\n',
+      'use @mcp-b/webmcp-polyfill for cross-browser support today.\n'
   );
   return result;
 }

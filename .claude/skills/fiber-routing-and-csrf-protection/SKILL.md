@@ -1,7 +1,7 @@
 ---
 name: fiber-routing-and-csrf-protection
 version: 1.1.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, golang-pro, security-architect]
 tags: [fiber, go, routing, csrf, security]
 description: Focuses on routing, CSRF protection, context handling, and template usage within the internal handlers directory.
@@ -61,13 +61,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Skipping CSRF middleware on "safe" routes | Attackers escalate via chained requests; partial protection = no protection | Apply `csrf.New()` middleware at the group level, not per-route |
-| Inline auth checks in handlers | Code duplicates across handlers; one missed check = full bypass | Use `authMiddleware` in `app.Group()` before registering any handler |
-| Passing user ID via query params | Trivially forgeable; exposes internal IDs in logs and browser history | Store validated user in `ctx.Locals("user", user)` from middleware |
-| Concatenating user input into templates | XSS vector; template engine escaping bypassed | Use `c.Render()` with template variables; never `fmt.Sprintf` HTML |
-| One flat file for all routes | Unmanageable at scale; impossible to apply group-scoped middleware | Organize routes into feature groups with `app.Group("/feature")` |
+| Anti-Pattern                              | Why It Fails                                                                | Correct Approach                                                     |
+| ----------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Skipping CSRF middleware on "safe" routes | Attackers escalate via chained requests; partial protection = no protection | Apply `csrf.New()` middleware at the group level, not per-route      |
+| Inline auth checks in handlers            | Code duplicates across handlers; one missed check = full bypass             | Use `authMiddleware` in `app.Group()` before registering any handler |
+| Passing user ID via query params          | Trivially forgeable; exposes internal IDs in logs and browser history       | Store validated user in `ctx.Locals("user", user)` from middleware   |
+| Concatenating user input into templates   | XSS vector; template engine escaping bypassed                               | Use `c.Render()` with template variables; never `fmt.Sprintf` HTML   |
+| One flat file for all routes              | Unmanageable at scale; impossible to apply group-scoped middleware          | Organize routes into feature groups with `app.Group("/feature")`     |
 
 ## Memory Protocol (MANDATORY)
 

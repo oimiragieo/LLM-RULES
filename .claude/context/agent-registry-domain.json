@@ -1,9 +1,9 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-11T15:23:42.409Z",
+  "generatedAt": "2026-02-23T01:55:25.550Z",
   "metadata": {
     "category": "domain",
-    "agentCount": 47
+    "agentCount": 50
   },
   "agents": {
     "accessibility-tester": {
@@ -3399,89 +3399,6 @@
         "updatedAt": "2026-02-11T00:35:03.888Z"
       }
     },
-    "swarm-coordinator": {
-      "id": "swarm-coordinator",
-      "displayName": "swarm-coordinator",
-      "category": "orchestrator",
-      "filePath": ".claude/agents/orchestrators/swarm-coordinator.md",
-      "capabilities": [
-        {
-          "name": "swarm-coordinator",
-          "domain": "orchestration",
-          "description": "Manages multi-agent swarms (Queen/Worker topology). Handles consensus, task distribution, and result aggregation.",
-          "triggerPhrases": [
-            "swarm",
-            "coordinator",
-            "consensus-voting",
-            "context-compressor",
-            "dispatching-parallel-agents",
-            "plan-generator",
-            "ripgrep",
-            "subagent-driven-development",
-            "swarm-coordination",
-            "task-management-protocol"
-          ],
-          "requiredTools": [
-            "Task",
-            "Read",
-            "TaskUpdate",
-            "TaskList",
-            "TaskCreate",
-            "TaskGet",
-            "Skill",
-            "Write",
-            "Edit",
-            "Bash",
-            "Glob",
-            "Grep"
-          ],
-          "skills": [
-            "consensus-voting",
-            "context-compressor",
-            "dispatching-parallel-agents",
-            "plan-generator",
-            "ripgrep",
-            "subagent-driven-development",
-            "swarm-coordination",
-            "task-management-protocol",
-            "verification-before-completion"
-          ],
-          "examples": [],
-          "tags": [
-            "swarm",
-            "coordinator",
-            "consensus-voting",
-            "context-compressor",
-            "dispatching-parallel-agents",
-            "plan-generator",
-            "ripgrep",
-            "subagent-driven-development",
-            "swarm-coordination",
-            "task-management-protocol",
-            "verification-before-completion"
-          ]
-        }
-      ],
-      "constraints": {
-        "maxConcurrentTasks": 5,
-        "preferredModel": "opus"
-      },
-      "health": {
-        "status": "healthy",
-        "consecutiveFailures": 0,
-        "successCount": 0,
-        "failureCount": 0,
-        "successRate": 1,
-        "lastUpdate": "2026-02-11T00:35:03.888Z",
-        "isolatedAt": null,
-        "isolationReason": null
-      },
-      "metadata": {
-        "version": "1.0.0",
-        "createdAt": "2026-02-11T00:35:03.888Z",
-        "updatedAt": "2026-02-11T00:35:03.888Z"
-      }
-    },
     "code-reviewer": {
       "id": "code-reviewer",
       "displayName": "code-reviewer",
@@ -4079,6 +3996,363 @@
         "version": "1.0.0",
         "createdAt": "2026-02-11T00:35:03.887Z",
         "updatedAt": "2026-02-11T00:35:03.887Z"
+      }
+    },
+    "kubernetes-specialist": {
+      "id": "kubernetes-specialist",
+      "displayName": "kubernetes-specialist",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/kubernetes-specialist.md",
+      "capabilities": [
+        {
+          "name": "kubernetes-specialist",
+          "domain": "code",
+          "description": "Expert Kubernetes platform engineer specializing in cluster operations, workload design, GitOps, and production hardening. Deep knowledge of K8s networking, RBAC, operators, Helm, Kustomize, ArgoCD...",
+          "triggerPhrases": [
+            "kubernetes",
+            "specialist",
+            "design",
+            "debugging",
+            "k8s-manifest-generator",
+            "docker-compose",
+            "container-expert",
+            "cloud-devops-expert",
+            "aws-cloud-ops",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "MemoryRecord",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "k8s-manifest-generator",
+            "debugging",
+            "docker-compose",
+            "container-expert",
+            "cloud-devops-expert",
+            "aws-cloud-ops",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "kubernetes",
+            "specialist",
+            "design",
+            "debugging",
+            "k8s-manifest-generator",
+            "docker-compose",
+            "container-expert",
+            "cloud-devops-expert",
+            "aws-cloud-ops",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:52:12.200Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-02-23T01:52:12.200Z",
+        "updatedAt": "2026-02-23T01:52:12.200Z"
+      }
+    },
+    "medical-research-triage": {
+      "id": "medical-research-triage",
+      "displayName": "medical-research-triage",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/medical-research-triage.md",
+      "capabilities": [
+        {
+          "name": "medical-research-triage",
+          "domain": "research",
+          "description": "Medical triage and research specialist (Dr. Aria Voss). Use when user describes symptoms, asks about medications or drug interactions, needs medical literature synthesized, or has clinical / pharma...",
+          "triggerPhrases": [
+            "medical",
+            "research",
+            "triage",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "arxiv-mcp",
+            "scientific-skills"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "WebFetch",
+            "WebSearch",
+            "MemoryRecord",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "TaskOutput",
+            "Skill"
+          ],
+          "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "arxiv-mcp",
+            "scientific-skills",
+            "sequential-thinking",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "medical",
+            "research",
+            "triage",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "arxiv-mcp",
+            "scientific-skills",
+            "sequential-thinking",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:52:12.200Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-23T01:52:12.200Z",
+        "updatedAt": "2026-02-23T01:52:12.200Z"
+      }
+    },
+    "pm-coordinator": {
+      "id": "pm-coordinator",
+      "displayName": "pm-coordinator",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/pm-coordinator.md",
+      "capabilities": [
+        {
+          "name": "pm-coordinator",
+          "domain": "code",
+          "description": "Expert project manager and cross-team coordinator specializing in sprint planning, roadmap management, stakeholder communication, and delivery coordination. Masters Jira, Linear, and GitHub Project...",
+          "triggerPhrases": [
+            "coordinator",
+            "planning",
+            "jira-pm",
+            "linear-pm",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "context-compressor",
+            "token-saver-context-compression",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "MemoryRecord",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "jira-pm",
+            "linear-pm",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "context-compressor",
+            "token-saver-context-compression",
+            "ripgrep",
+            "code-semantic-search",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "coordinator",
+            "planning",
+            "jira-pm",
+            "linear-pm",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "context-compressor",
+            "token-saver-context-compression",
+            "ripgrep",
+            "code-semantic-search",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:52:12.201Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-02-23T01:52:12.201Z",
+        "updatedAt": "2026-02-23T01:52:12.201Z"
+      }
+    },
+    "advanced-debugging": {
+      "id": "advanced-debugging",
+      "displayName": "advanced-debugging",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/advanced-debugging.md",
+      "capabilities": [
+        {
+          "name": "advanced-debugging",
+          "domain": "code",
+          "description": "Master debugger specializing in multi-layer systematic investigation — application code, runtime internals, distributed systems, memory/performance profiling, and infrastructure. Applies structured...",
+          "triggerPhrases": [
+            "advanced",
+            "debugging",
+            "debugger",
+            "tests",
+            "smart-debug",
+            "troubleshooting-regression",
+            "recovery",
+            "logging-module-usage",
+            "task-management-protocol",
+            "tdd"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "MemoryRecord",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "debugging",
+            "smart-debug",
+            "troubleshooting-regression",
+            "recovery",
+            "logging-module-usage",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
+          ],
+          "examples": [],
+          "tags": [
+            "advanced",
+            "debugging",
+            "debugger",
+            "tests",
+            "smart-debug",
+            "troubleshooting-regression",
+            "recovery",
+            "logging-module-usage",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:52:12.196Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-02-23T01:52:12.196Z",
+        "updatedAt": "2026-02-23T01:52:12.196Z"
       }
     }
   }

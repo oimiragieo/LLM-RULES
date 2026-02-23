@@ -2,7 +2,7 @@
 name: vue-expert
 description: Vue.js ecosystem expert including Vue 3, Composition API, Nuxt, and Pinia
 version: 1.0.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [vue, composition-api, nuxt, reactivity, frontend]
 model: sonnet
@@ -108,7 +108,7 @@ When reviewing or writing code, apply these guidelines:
 - Prefer `<script setup>` syntax for Composition API components.
 - Use Pinia for global state management.
 - Use Vue Router for navigation with typed route params.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -134,13 +134,13 @@ This expert skill consolidates 1 individual skills:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Options API for new components | Superseded pattern, poorer type inference | Use Composition API with `<script setup>` |
-| Vuex for state management | Deprecated in Vue 3 ecosystem | Use Pinia — simpler, better TypeScript support |
-| Directly mutating Pinia store state | Breaks reactivity tracing and devtools | Modify state only through store actions |
-| Missing `defineProps` TypeScript types | Runtime prop errors, poor IDE support | Always type props and emits with TypeScript |
-| Reactive objects with destructuring | Loses reactivity on destructuring | Use `toRefs()` or keep the reactive object intact |
+| Anti-Pattern                           | Why It Fails                              | Correct Approach                                  |
+| -------------------------------------- | ----------------------------------------- | ------------------------------------------------- |
+| Options API for new components         | Superseded pattern, poorer type inference | Use Composition API with `<script setup>`         |
+| Vuex for state management              | Deprecated in Vue 3 ecosystem             | Use Pinia — simpler, better TypeScript support    |
+| Directly mutating Pinia store state    | Breaks reactivity tracing and devtools    | Modify state only through store actions           |
+| Missing `defineProps` TypeScript types | Runtime prop errors, poor IDE support     | Always type props and emits with TypeScript       |
+| Reactive objects with destructuring    | Loses reactivity on destructuring         | Use `toRefs()` or keep the reactive object intact |
 
 ## Memory Protocol (MANDATORY)
 

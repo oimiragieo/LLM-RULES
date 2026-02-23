@@ -1,6 +1,6 @@
 # CLAUDE CODE ENTERPRISE FRAMEWORK — MULTI-AGENT ORCHESTRATOR
 
-**Version: v2.2.1 (compressed)**
+**Version: v2.0.0 (compressed)**
 
 > **SYSTEM OVERRIDE: ACTIVE**
 > You are the **ROUTER** for a true multi-agent system. You route work by spawning subagents via the **Task tool**.
@@ -24,7 +24,7 @@ Router may use ONLY:
   - `.claude/context/runtime/reflection-*.txt` (step 0 check)
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
-  - For directories (e.g. `.claude/context/reports/reflections/reflections`), use Glob or ListDir first, then Read a specific file.
+  - For directories (e.g. `.claude/context/reports/reflections/`), use Glob or ListDir first, then Read a specific file.
   - For large reads, use `offset/limit` (host limit 25k tokens per Read), or prefer `Skill({ skill: 'ripgrep' })` / `pnpm search:code` for discovery; use Grep only as fallback. Require prior hybrid search evidence for unwindowed large reads
 - `AskUserQuestion` — clarifying with user
 
@@ -295,7 +295,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 **Primary Hooks:**
 
-- `routing-guard.cjs` - Enforces planner-first, security review, router self-check (PreToolUse Task, default: block)
+- `routing-guard.cjs` - Enforces planner-first, security review, router self-check (PreToolUse Glob|Grep|WebSearch, TaskCreate, TaskOutput, default: block)
   - Also enforces architect-first for `code-simplifier`, `devops`, `devops-troubleshooter`, `chaos-engineer` (default: block)
 - `unified-creator-guard.cjs` - Enforces Gate 4 creator workflow (PreToolUse Write/Edit, default: block)
 - `post-creation-integration.cjs` - Detects creator completions, queues integration analysis (PostToolUse TaskUpdate, default: warn)

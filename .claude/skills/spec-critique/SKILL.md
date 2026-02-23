@@ -8,7 +8,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Glob, Grep]
 agents: [planner, architect, developer]
-category: "Planning & Architecture"
+category: 'Planning & Architecture'
 tags: [spec, critique, validation, requirements, extended-thinking, review]
 
 verified: true
@@ -335,13 +335,13 @@ This skill works well with:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Approving specs with contradictions | Downstream implementation resolves contradictions incorrectly | Flag all contradictions, even minor ones, before approval |
-| Missing hidden assumptions | Assumptions become mismatched requirements during implementation | Explicitly surface every assumption the spec relies on |
-| Skipping edge case review | Error scenarios discovered too late during implementation | Validate all boundary conditions and error paths in the spec |
-| Critiquing implementation details | Distracts from specification quality; spec defines WHAT not HOW | Focus critique on completeness, consistency, and testability |
-| Accepting vague success criteria | Delivery cannot be verified as complete | Require measurable, testable acceptance criteria for every requirement |
+| Anti-Pattern                        | Why It Fails                                                     | Correct Approach                                                       |
+| ----------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Approving specs with contradictions | Downstream implementation resolves contradictions incorrectly    | Flag all contradictions, even minor ones, before approval              |
+| Missing hidden assumptions          | Assumptions become mismatched requirements during implementation | Explicitly surface every assumption the spec relies on                 |
+| Skipping edge case review           | Error scenarios discovered too late during implementation        | Validate all boundary conditions and error paths in the spec           |
+| Critiquing implementation details   | Distracts from specification quality; spec defines WHAT not HOW  | Focus critique on completeness, consistency, and testability           |
+| Accepting vague success criteria    | Delivery cannot be verified as complete                          | Require measurable, testable acceptance criteria for every requirement |
 
 ## Memory Protocol
 

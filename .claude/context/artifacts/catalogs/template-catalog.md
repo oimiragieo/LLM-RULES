@@ -428,7 +428,7 @@ This catalog documents all active templates in the agent-studio framework with t
 - Planning templates (3): findings.md, progress.md, task_plan.md
 - Example templates (2): example-adr-050.md, example-specification.md
 - Code style templates (3): dart.md, csharp.md, go.md
-- Root-level templates (4): claude-md-template.md, project-brief.md, prd.md, ui-spec.md
+- Root-level templates (0): _(claude-md-template.md, project-brief.md, prd.md, ui-spec.md moved to \_archive/ — 2026-02-23)_
 
 **Restoration:** See `.claude/templates/_archive/README.md` for restoration instructions (uses `git mv` to preserve history).
 

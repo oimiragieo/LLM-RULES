@@ -12,6 +12,7 @@ paths:
 WebMCP flows **web app → exposes tools → AI agent calls them**.
 
 This is NOT:
+
 - Web scraping (`WebFetch` is for that)
 - External page fetching (`mcp__Exa__web_search_exa` is for that)
 - Browser automation (Playwright / `mcp__chrome-devtools__*` is for that)

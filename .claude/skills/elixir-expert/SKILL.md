@@ -1,7 +1,7 @@
 ---
 name: elixir-expert
 version: 1.1.0
-category: "Languages"
+category: 'Languages'
 agents: [developer]
 tags: [elixir, phoenix, erlang, functional, otp]
 description: Elixir and Phoenix expert including OTP, Ecto, and functional programming
@@ -490,13 +490,13 @@ This expert skill consolidates 1 individual skills:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Nested if/cond chains instead of pattern matching | Harder to read; misses the power of Elixir's pattern matching; doesn't scale | Use function clauses with pattern matching heads and guard clauses |
-| Bare `spawn` without supervision | Crashed processes disappear silently; no restart, no visibility | Always use `Supervisor` trees; use `Task.Supervisor` for dynamic tasks |
-| `Enum.map/filter` on large streams | Loads entire collection into memory; causes OOM on large datasets | Use `Stream.map/filter` for lazy, memory-efficient pipeline processing |
-| Global mutable state via Process dictionary | Process dictionary is implicit state; makes code unpredictable and untestable | Use `Agent`, `GenServer`, or `ETS` explicitly when shared state is required |
-| No doctests for public functions | Public API has no runnable specification; behavior drifts from documentation | Always add `iex>` examples in `@doc`; run with `mix test` |
+| Anti-Pattern                                      | Why It Fails                                                                  | Correct Approach                                                            |
+| ------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Nested if/cond chains instead of pattern matching | Harder to read; misses the power of Elixir's pattern matching; doesn't scale  | Use function clauses with pattern matching heads and guard clauses          |
+| Bare `spawn` without supervision                  | Crashed processes disappear silently; no restart, no visibility               | Always use `Supervisor` trees; use `Task.Supervisor` for dynamic tasks      |
+| `Enum.map/filter` on large streams                | Loads entire collection into memory; causes OOM on large datasets             | Use `Stream.map/filter` for lazy, memory-efficient pipeline processing      |
+| Global mutable state via Process dictionary       | Process dictionary is implicit state; makes code unpredictable and untestable | Use `Agent`, `GenServer`, or `ETS` explicitly when shared state is required |
+| No doctests for public functions                  | Public API has no runnable specification; behavior drifts from documentation  | Always add `iex>` examples in `@doc`; run with `mix test`                   |
 
 ## Memory Protocol (MANDATORY)
 

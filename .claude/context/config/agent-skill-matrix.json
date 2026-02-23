@@ -25,7 +25,7 @@
       },
       "planner": {
         "primary": ["plan-generator", "sequential-thinking", "complexity-assessment"],
-        "secondary": ["context-compressor", "spec-gathering", "spec-writing"],
+        "secondary": ["context-compressor", "spec-gathering"],
         "contextual": {
           "large_project": ["brainstorming", "diagram-generator"],
           "multi_agent": ["dispatching-parallel-agents", "swarm-coordination"]
@@ -97,7 +97,7 @@
         "primary": ["tdd", "debugging", "git-expert"],
         "secondary": ["testing-expert", "code-quality-expert"],
         "contextual": {
-          "async_project": ["asynchronous-programming-preference"],
+          "async_project": [],
           "systems_project": ["memory-forensics"]
         },
         "always": ["verification-before-completion", "task-management-protocol"]
@@ -110,7 +110,7 @@
             "fiber-logging-and-project-structure",
             "fiber-routing-and-csrf-protection"
           ],
-          "grpc_project": ["protocol-buffer-definitions-rule"]
+          "grpc_project": []
         },
         "always": ["verification-before-completion", "task-management-protocol"]
       },
@@ -127,7 +127,7 @@
         "primary": ["python-backend-expert", "api-development-expert", "tdd"],
         "secondary": ["debugging", "testing-expert", "database-expert"],
         "contextual": {
-          "async_project": ["asynchronous-programming-preference"],
+          "async_project": [],
           "auth_project": ["auth-security-expert", "authentication-flow-rules"]
         },
         "always": ["verification-before-completion", "task-management-protocol"]
@@ -136,7 +136,7 @@
         "primary": ["frontend-expert", "react-expert", "styling-expert"],
         "secondary": ["ui-components-expert", "accessibility", "testing-expert"],
         "contextual": {
-          "vue_project": ["vue-expert", "vueuse-library-rule"],
+          "vue_project": ["vue-expert"],
           "svelte_project": ["svelte-expert"],
           "mobile_first": ["mobile-first-design-rules"]
         },
@@ -146,8 +146,8 @@
         "primary": ["nodejs-expert", "typescript-expert", "tdd"],
         "secondary": ["api-development-expert", "debugging", "testing-expert"],
         "contextual": {
-          "express_project": ["backend-expert"],
-          "nestjs_project": ["backend-expert"]
+          "express_project": [],
+          "nestjs_project": []
         },
         "always": ["verification-before-completion", "task-management-protocol"]
       },
@@ -166,9 +166,7 @@
         "contextual": {
           "spring_project": [
             "dto-conventions",
-            "entity-class-conventions",
             "service-class-conventions",
-            "repository-class-conventions",
             "restcontroller-conventions"
           ]
         },
@@ -178,8 +176,8 @@
         "primary": ["nextjs-expert", "react-expert", "typescript-expert"],
         "secondary": ["styling-expert", "testing-expert", "seo-and-meta-tags-in-sveltekit"],
         "contextual": {
-          "vercel_deployment": ["vercel-ai-sdk-best-practices", "vercel-kv-database-rules"],
-          "trpc_project": ["trpc-api-rule"]
+          "vercel_deployment": ["vercel-ai-sdk-best-practices"],
+          "trpc_project": []
         },
         "always": ["verification-before-completion", "task-management-protocol"]
       },
@@ -187,7 +185,7 @@
         "primary": ["php-expert", "tdd", "debugging"],
         "secondary": ["testing-expert", "api-development-expert"],
         "contextual": {
-          "laravel_project": ["livewire-implementation-rules", "tall-stack-general"],
+          "laravel_project": ["tall-stack-general"],
           "composer_project": ["composer-dependency-management"]
         },
         "always": ["verification-before-completion", "task-management-protocol"]
@@ -215,10 +213,7 @@
         "primary": ["react-expert", "expo-framework-rule", "tdd"],
         "secondary": ["mobile-ui-development-rule", "expo-mobile-app-rule", "testing-expert"],
         "contextual": {
-          "nativewind_styling": [
-            "nativewind-and-tailwind-css-compatibility",
-            "babel-configuration-for-nativewind"
-          ]
+          "nativewind_styling": ["nativewind-and-tailwind-css-compatibility"]
         },
         "always": ["verification-before-completion", "task-management-protocol"]
       },
@@ -273,12 +268,7 @@
           "web3_project": ["web3-expert"],
           "reverse_engineering": ["binary-analysis-patterns", "memory-forensics"]
         },
-        "always": [
-          "verification-before-completion",
-          "task-management-protocol",
-          "repo-rag",
-          "explaining-rules"
-        ]
+        "always": ["verification-before-completion", "task-management-protocol"]
       },
       "devops": {
         "primary": ["docker-compose", "terraform-infra", "k8s-manifest-generator"],
@@ -373,7 +363,7 @@
         "secondary": ["architecture-review", "diagram-generator"],
         "contextual": {
           "drizzle_project": ["drizzle-orm-rules"],
-          "vercel_kv": ["vercel-kv-database-rules"]
+          "vercel_kv": []
         },
         "always": ["verification-before-completion", "task-management-protocol"]
       }
@@ -381,7 +371,7 @@
     "orchestrators": {
       "master-orchestrator": {
         "primary": ["plan-generator", "task-management-protocol", "response-rater"],
-        "secondary": ["artifact-publisher", "recovery", "swarm-coordination"],
+        "secondary": ["recovery", "swarm-coordination"],
         "contextual": {
           "parallel_execution": ["dispatching-parallel-agents"],
           "track_based": ["track-management"],
@@ -397,13 +387,7 @@
       },
       "evolution-orchestrator": {
         "primary": ["research-synthesis", "agent-creator", "skill-creator"],
-        "secondary": [
-          "workflow-creator",
-          "hook-creator",
-          "template-creator",
-          "schema-creator",
-          "mcp-converter"
-        ],
+        "secondary": ["workflow-creator", "hook-creator", "template-creator", "schema-creator"],
         "contextual": {},
         "always": [
           "verification-before-completion",
@@ -429,7 +413,6 @@
       "description": "Design, planning, and architecture skills",
       "skills": [
         "plan-generator",
-        "spec-writing",
         "spec-gathering",
         "spec-critique",
         "complexity-assessment",
@@ -561,7 +544,6 @@
         "hook-creator",
         "template-creator",
         "schema-creator",
-        "mcp-converter",
         "artifact-lifecycle"
       ]
     },

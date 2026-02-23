@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-02-22T22:47:48.029Z",
+  "generated_at": "2026-02-23T03:23:38.828Z",
   "prebuilt": false,
   "total_rules": 113,
   "master_rules": 113,
@@ -1220,8 +1220,8 @@
       "priority": "",
       "technologies": ["api", "java", "javascript", "playwright", "react", "svelte", "vue"],
       "type": "master",
-      "size": 2004,
-      "line_count": 63
+      "size": 2005,
+      "line_count": 64
     },
     {
       "path": ".claude/rules/workflow-creator.md",

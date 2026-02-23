@@ -1,7 +1,7 @@
 ---
 name: astro-expert
 version: 1.1.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [astro, static-site, islands, web, frontend]
 description: Astro framework expert including components, content collections, and integrations
@@ -126,13 +126,13 @@ This expert skill consolidates 1 individual skills:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Using React/Vue for static-only UI | Ships unnecessary JS; kills Astro's zero-JS default | Use `.astro` components for static content |
-| Raw `<img>` tags instead of `<Image>` | Misses LCP optimization, format conversion, lazy loading | Use `<Image>` from `astro:assets` always |
-| Content without Zod schema | Frontmatter errors surface at runtime, not build time | Define schema in `src/content/config.ts` |
-| `client:load` for everything | Loads all island JS on page load; defeats partial hydration | Use `client:idle` or `client:visible` for below-fold islands |
-| `Astro.glob()` for structured content | Returns untyped; no schema validation | Use `getCollection()` from `astro:content` |
+| Anti-Pattern                          | Why It Fails                                                | Correct Approach                                             |
+| ------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------ |
+| Using React/Vue for static-only UI    | Ships unnecessary JS; kills Astro's zero-JS default         | Use `.astro` components for static content                   |
+| Raw `<img>` tags instead of `<Image>` | Misses LCP optimization, format conversion, lazy loading    | Use `<Image>` from `astro:assets` always                     |
+| Content without Zod schema            | Frontmatter errors surface at runtime, not build time       | Define schema in `src/content/config.ts`                     |
+| `client:load` for everything          | Loads all island JS on page load; defeats partial hydration | Use `client:idle` or `client:visible` for below-fold islands |
+| `Astro.glob()` for structured content | Returns untyped; no schema validation                       | Use `getCollection()` from `astro:content`                   |
 
 ## Memory Protocol (MANDATORY)
 

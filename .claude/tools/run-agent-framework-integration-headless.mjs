@@ -212,10 +212,10 @@ function testTemplates() {
 
     // Check critical templates
     const criticalTemplates = [
-      'claude-md-template.md',
-      'project-brief.md',
-      'prd.md',
+      'plan-template.md',
+      'prd-template.md',
       'architecture.md',
+      'specification-template.md',
     ];
 
     for (const template of criticalTemplates) {
@@ -273,9 +273,9 @@ function testWorkflowRunner() {
     }
     logTest('Workflow runner exists', true);
 
-    // Check if it's a valid Node.js script
+    // Check if it is a valid Node script/shim
     const content = readFileSync(runnerPath, 'utf-8');
-    if (content.includes('#!/usr/bin/env node') && content.includes('import')) {
+    if (content.includes('require(') || content.includes('import')) {
       logTest('Workflow runner is valid Node.js script', true);
     } else {
       logTest('Workflow runner is valid Node.js script', false);

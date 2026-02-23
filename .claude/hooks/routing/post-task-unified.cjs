@@ -409,6 +409,25 @@ async function main() {
       // Non-critical error - log to stderr but don't block
       console.error(`[post-task-unified:Task] Event emission error: ${err.message}`);
     }
+
+    // --- Token Saver Chat Update ---
+    try {
+      const { execSync } = require('child_process');
+      const statsCmd = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'token-saver-stats.cjs');
+      if (fs.existsSync(statsCmd)) {
+        const stats = execSync('node', [statsCmd], {
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'ignore'],
+          windowsHide: true,
+        });
+        if (stats && stats.trim() && !stats.includes('No telemetry data found yet')) {
+          console.error('\n' + stats);
+        }
+      }
+    } catch (_statErr) {
+      // Non-blocking telemetry
+    }
+
     process.exit(0);
   } catch (err) {
     // Log ALL errors to stderr with context

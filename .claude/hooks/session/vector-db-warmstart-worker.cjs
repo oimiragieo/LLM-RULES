@@ -10,30 +10,32 @@ const { MemoryVectorStore } = require('../../lib/memory/lancedb-client-impl.cjs'
 const { createLogger } = require('../../lib/utils/logger.cjs');
 
 async function main() {
-    const logger = createLogger('vector-db-warmstart');
-    try {
-        const start = Date.now();
-        const store = new MemoryVectorStore();
+  const logger = createLogger('vector-db-warmstart');
+  try {
+    const start = Date.now();
+    const store = new MemoryVectorStore();
 
-        // Background initialization -> downloads models, compiles native code, primes OS cache
-        await store.initialize();
+    // Background initialization -> downloads models, compiles native code, primes OS cache
+    await store.initialize();
 
-        // Request a dummy embedding to ensure the pipeline is fully compiled
-        await store.generateEmbedding('hello world');
+    // Request a dummy embedding to ensure the pipeline is fully compiled
+    await store.generateEmbedding('hello world');
 
-        logger.debug(`[Background] LanceDB and Embedder pipeline pre-compiled in ${Date.now() - start}ms.`);
+    logger.debug(
+      `[Background] LanceDB and Embedder pipeline pre-compiled in ${Date.now() - start}ms.`
+    );
 
-        // Graceful cleanup
-        if (typeof store.close === 'function') {
-            await store.close();
-        }
-        process.exit(0);
-    } catch (err) {
-        logger.warn(`[Background] Embedder preload failed: ${err.message}`);
-        process.exit(0);
+    // Graceful cleanup
+    if (typeof store.close === 'function') {
+      await store.close();
     }
+    process.exit(0);
+  } catch (err) {
+    logger.warn(`[Background] Embedder preload failed: ${err.message}`);
+    process.exit(0);
+  }
 }
 
 if (require.main === module) {
-    main().catch(() => process.exit(0));
+  main().catch(() => process.exit(0));
 }

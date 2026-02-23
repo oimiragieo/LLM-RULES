@@ -2,7 +2,7 @@
 name: linear-pm
 description: Linear project management - issues, projects, cycles, and roadmaps. Use for Linear-related tasks like managing issues, tracking sprints, and organizing projects.
 version: 1.1.0
-category: "Other"
+category: 'Other'
 agents: [planner, developer]
 tags: [linear, project-management, issues, agile, roadmap]
 model: sonnet
@@ -92,11 +92,11 @@ Context Savings: ~92% reduction
 
 ### Label & State Operations
 
-| Tool         | Description                                             | Confirmation |
-| ------------ | ------------------------------------------------------- | ------------ |
-| list-labels  | List all labels for a team                              | No           |
+| Tool         | Description                                              | Confirmation |
+| ------------ | -------------------------------------------------------- | ------------ |
+| list-labels  | List all labels for a team                               | No           |
 | list-states  | List workflow states (backlog, to-do, in-progress, done) | No           |
-| create-label | Create new label                                        | Yes          |
+| create-label | Create new label                                         | Yes          |
 
 ## Security
 
@@ -152,13 +152,13 @@ Context Savings: ~92% reduction
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Creating issues without deduplication check | Duplicate issues split tracking; team velocity metrics skewed | Search with a title filter (`issues` query with `filter.title.eq` field) before creating |
-| Using state names in transitions | Case-sensitive; breaks when team renames state; locale issues | Use `workflowState { id }` query to get stable IDs; transition by ID |
-| Fetching all team issues without filter | Thousands of results; rate limit hit; unusable output | Filter by `state`, `assignee`, `cycle`, or `label` in GraphQL query |
-| Re-fetching team/project metadata per operation | Multiple identical API calls; rate limit waste; slow execution | Fetch team and project IDs once at session start; reuse for all subsequent calls |
-| Ignoring pagination cursors | Only first page returned; missed issues cause incomplete reports | Use `pageInfo { hasNextPage, endCursor }` and paginate until `hasNextPage: false` |
+| Anti-Pattern                                    | Why It Fails                                                     | Correct Approach                                                                         |
+| ----------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Creating issues without deduplication check     | Duplicate issues split tracking; team velocity metrics skewed    | Search with a title filter (`issues` query with `filter.title.eq` field) before creating |
+| Using state names in transitions                | Case-sensitive; breaks when team renames state; locale issues    | Use `workflowState { id }` query to get stable IDs; transition by ID                     |
+| Fetching all team issues without filter         | Thousands of results; rate limit hit; unusable output            | Filter by `state`, `assignee`, `cycle`, or `label` in GraphQL query                      |
+| Re-fetching team/project metadata per operation | Multiple identical API calls; rate limit waste; slow execution   | Fetch team and project IDs once at session start; reuse for all subsequent calls         |
+| Ignoring pagination cursors                     | Only first page returned; missed issues cause incomplete reports | Use `pageInfo { hasNextPage, endCursor }` and paginate until `hasNextPage: false`        |
 
 ## Memory Protocol (MANDATORY)
 

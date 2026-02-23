@@ -1,10 +1,12 @@
 ---
 name: testing-expert
+description: Deprecated alias for tdd skill
 version: 1.0.0
 status: deprecated-alias
 canonical: tdd
+tools: []
 verified: true
-lastVerifiedAt: "2026-02-22"
+lastVerifiedAt: '2026-02-22'
 ---
 
 # testing-expert
@@ -20,7 +22,7 @@ All execution is delegated to the `tdd` skill.
 
 ```javascript
 // Preferred — use the canonical skill name
-Skill({ skill: "tdd" });
+Skill({ skill: 'tdd' });
 
 // Legacy references to testing-expert are automatically resolved here
 ```
@@ -30,6 +32,7 @@ Skill({ skill: "tdd" });
 See `.claude/skills/tdd/SKILL.md` for the full skill specification.
 
 `tdd` covers:
+
 - Canon Test-Driven Development (Red-Green-Refactor)
 - Unit, integration, and e2e test patterns
 - Test fixture design and mock strategies

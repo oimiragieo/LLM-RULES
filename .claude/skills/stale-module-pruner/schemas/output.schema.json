@@ -3,9 +3,7 @@
   "title": "stale-module-pruner Output Schema",
   "description": "Output validation schema for stale-module-pruner skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

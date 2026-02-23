@@ -14,7 +14,7 @@ try {
   postExecuteFn = postHooks.postExecute;
 } catch (_e) {
   preExecuteFn = () => ({ continue: true });
-  postExecuteFn = () => { };
+  postExecuteFn = () => {};
 }
 
 function walk(dir, out = []) {
@@ -41,16 +41,13 @@ function main(args = {}) {
   const searchDirs = args.searchDirs || ['.claude', 'tests', 'scripts', 'package.json'];
   const doDelete = !!args.delete;
 
-
   console.log(`Pruning stale modules in ${targetDir}...`);
   if (doDelete) {
-
     console.log('WARNING: DELETION IS ENABLED.');
   }
 
   const targetAbsDir = path.resolve(process.cwd(), targetDir);
   if (!fs.existsSync(targetAbsDir)) {
-
     console.log(`Target directory ${targetDir} does not exist. Skipping.`);
     postExecuteFn({ skillName: 'stale-module-pruner', success: true });
     return;
@@ -69,7 +66,9 @@ function main(args = {}) {
     try {
       const cmd = `rg -lF "${nameWithoutExt}" ${sDirsCmdStr}`;
 
-      const res = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim().split('\n');
+      const res = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] })
+        .trim()
+        .split('\n');
 
       let hasUsage = false;
       for (const r of res) {
@@ -86,27 +85,22 @@ function main(args = {}) {
       if (!hasUsage) {
         unusedCount += 1;
         if (doDelete) {
-
           console.log(`DELETED (NO VALID REFERENCES): ${path.relative(process.cwd(), file)}`);
           fs.unlinkSync(file);
         } else {
-
           console.log(`STALE: ${path.relative(process.cwd(), file)}`);
         }
       }
     } catch (_e) {
       unusedCount += 1;
       if (doDelete) {
-
         console.log(`DELETED (NO REFERENCES AT ALL): ${path.relative(process.cwd(), file)}`);
         fs.unlinkSync(file);
       } else {
-
         console.log(`STALE: ${path.relative(process.cwd(), file)}`);
       }
     }
   }
-
 
   console.log(`\nTotal stale items processed: ${unusedCount}`);
 
@@ -121,7 +115,7 @@ if (require.main === module) {
     targetDir: '.claude/lib',
     extensions: ['.cjs', '.mjs', '.js'],
     searchDirs: ['.claude', 'tests', 'scripts', 'package.json'],
-    delete: false
+    delete: false,
   };
 
   for (let i = 2; i < process.argv.length; i += 1) {

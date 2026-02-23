@@ -50,14 +50,14 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -261,18 +261,18 @@ Skill({ skill: 'task-management-protocol' }); // Session task tracking
 
 ### Automatic Skills (Always Invoke)
 
-| Skill                            | Purpose                       | When                  |
-| -------------------------------- | ----------------------------- | --------------------- |
-| `task-management-protocol`       | Multi-step task coordination  | Always at task start  |
-| `verification-before-completion` | Quality gates before output   | Before completing     |
+| Skill                            | Purpose                      | When                 |
+| -------------------------------- | ---------------------------- | -------------------- |
+| `task-management-protocol`       | Multi-step task coordination | Always at task start |
+| `verification-before-completion` | Quality gates before output  | Before completing    |
 
 ### Contextual Skills (When Applicable)
 
-| Condition            | Skill       | Purpose                     |
-| -------------------- | ----------- | --------------------------- |
-| Jira operations      | `jira-pm`   | Jira board/issue management |
-| Linear operations    | `linear-pm` | Linear cycle/roadmap mgmt   |
-| Context pressure high | `token-saver-context-compression` | Context compression |
+| Condition             | Skill                             | Purpose                     |
+| --------------------- | --------------------------------- | --------------------------- |
+| Jira operations       | `jira-pm`                         | Jira board/issue management |
+| Linear operations     | `linear-pm`                       | Linear cycle/roadmap mgmt   |
+| Context pressure high | `token-saver-context-compression` | Context compression         |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 
@@ -281,6 +281,7 @@ Skill({ skill: 'task-management-protocol' }); // Session task tracking
 Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high.
 
 Invoke token-saver when ANY of these hold:
+
 - Synthesizing across many backlog items or roadmap documents (10+ items)
 - Retrieved planning documents too large for working context
 - Preparing evidence-heavy delivery report or stakeholder briefing

@@ -445,9 +445,55 @@ async function main() {
       }
       break;
 
-    case 'status':
-      console.log(JSON.stringify(getMaintenanceStatus(), null, 2));
+    case 'status': {
+      const chalk = {
+        green: t => `\x1b[32m${t}\x1b[0m`,
+        red: t => `\x1b[31m${t}\x1b[0m`,
+        yellow: t => `\x1b[33m${t}\x1b[0m`,
+        blue: t => `\x1b[34m${t}\x1b[0m`,
+        gray: t => `\x1b[90m${t}\x1b[0m`,
+        bold: t => `\x1b[1m${t}\x1b[0m`,
+      };
+      chalk.green.bold = t => chalk.bold(chalk.green(t));
+      chalk.red.bold = t => chalk.bold(chalk.red(t));
+      chalk.yellow.bold = t => chalk.bold(chalk.yellow(t));
+
+      const status = getMaintenanceStatus();
+
+      console.log(chalk.bold('\n🧠 Memory Scheduler Status'));
+      console.log(chalk.gray('================================================='));
+      console.log(
+        `⏱️  ${chalk.blue('Last Run')}:      ${status.lastRun ? new Date(status.lastRun).toLocaleString() : 'Never'}`
+      );
+      console.log(
+        `📅 ${chalk.blue('Last Daily')}:    ${status.lastDaily ? new Date(status.lastDaily).toLocaleString() : 'Never'}`
+      );
+      console.log(
+        `📆 ${chalk.blue('Last Weekly')}:   ${status.lastWeekly ? new Date(status.lastWeekly).toLocaleString() : 'Never'}`
+      );
+
+      if (status.history && status.history.length > 0) {
+        console.log(chalk.gray('-------------------------------------------------'));
+        console.log(chalk.bold(`Recent Operations (Last ${Math.min(status.history.length, 5)}):`));
+
+        for (const entry of status.history.slice(0, 5)) {
+          const timeStr = new Date(entry.timestamp).toLocaleTimeString();
+          const typeStr = entry.type.padEnd(6);
+
+          if (entry.tasks && Array.isArray(entry.tasks)) {
+            const fails = entry.tasks.filter(t => !t.success).map(t => t.type);
+            const statusIcon = fails.length === 0 ? chalk.green('✅ OK') : chalk.red('❌ FAIL');
+            const failStr = fails.length > 0 ? chalk.red(`(Failed: ${fails.join(', ')})`) : '';
+            console.log(`  [${chalk.gray(timeStr)}] ${typeStr} ${statusIcon} ${failStr}`);
+          } else {
+            const statusIcon = entry.success ? chalk.green('✅ OK') : chalk.red('❌ FAIL');
+            console.log(`  [${chalk.gray(timeStr)}] ${typeStr} ${statusIcon}`);
+          }
+        }
+      }
+      console.log(chalk.gray('=================================================\n'));
       break;
+    }
 
     case 'task':
       if (args[1]) {

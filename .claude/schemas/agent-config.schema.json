@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://claude-code.anthropic.com/schemas/agent-config",
   "title": "Agent Config",
   "description": "Per-agent default tools and thinking levels",

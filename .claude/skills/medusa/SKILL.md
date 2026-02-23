@@ -1,7 +1,7 @@
 ---
 name: medusa
 version: 1.1.0
-category: "External Integrations"
+category: 'External Integrations'
 agents: [developer]
 tags: [medusa, headless-commerce, ecommerce, nodejs, api]
 description: Medusa rules and best practices. These rules should be used when building applications with Medusa.
@@ -80,7 +80,7 @@ You are an expert senior software engineer specializing in modern web developmen
 # Additional Resources
 
 - [Medusa Documentation](https://docs.medusajs.com/llms-full.txt)
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -100,13 +100,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Modifying Medusa core source | Breaks on every `npm update`; cannot receive security patches; unsupportable | Extend via module overrides or custom modules using `@medusajs/modules-sdk` |
-| Direct database queries bypassing services | Skips inventory reservations, pricing calculations, event hooks, and audit trail | Call Medusa services (e.g., `productService.create()`) for all data mutations |
-| Untyped custom API route handlers | Missing container injection; no access to registered services; no transaction scope | Import and use `MedusaRequest`, `MedusaResponse` from `@medusajs/medusa` |
-| Duplicating payment data in custom tables | Expands PCI DSS scope to custom tables; compliance burden explodes | Use Medusa's built-in payment providers; store only non-sensitive references |
-| Direct service calls in async background jobs | No distributed transaction; partial failures leave data in inconsistent state | Use `createWorkflow()` with `compensateSteps` for any multi-step async operation |
+| Anti-Pattern                                  | Why It Fails                                                                        | Correct Approach                                                                 |
+| --------------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Modifying Medusa core source                  | Breaks on every `npm update`; cannot receive security patches; unsupportable        | Extend via module overrides or custom modules using `@medusajs/modules-sdk`      |
+| Direct database queries bypassing services    | Skips inventory reservations, pricing calculations, event hooks, and audit trail    | Call Medusa services (e.g., `productService.create()`) for all data mutations    |
+| Untyped custom API route handlers             | Missing container injection; no access to registered services; no transaction scope | Import and use `MedusaRequest`, `MedusaResponse` from `@medusajs/medusa`         |
+| Duplicating payment data in custom tables     | Expands PCI DSS scope to custom tables; compliance burden explodes                  | Use Medusa's built-in payment providers; store only non-sensitive references     |
+| Direct service calls in async background jobs | No distributed transaction; partial failures leave data in inconsistent state       | Use `createWorkflow()` with `compensateSteps` for any multi-step async operation |
 
 ## Memory Protocol (MANDATORY)
 

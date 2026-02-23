@@ -3,9 +3,7 @@
   "title": "spec-critique Output Schema",
   "description": "Output validation schema for spec-critique skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

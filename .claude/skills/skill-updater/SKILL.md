@@ -314,6 +314,16 @@ After updating the skill, scan for capability gaps and resolve each using the ap
 Skill({ skill: 'recommend-evolution' });
 ```
 
+### Step 9: Global Ecosystem Sync (MANDATORY)
+
+To guarantee that all registries and indexes are perfectly synchronized across the entire framework following your updates, you must run the composite registry command as your final action:
+
+```bash
+npm run gen:all-registries
+```
+
+This ensures the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
+
 ## Trigger Rules (Reflection + EVOLVE)
 
 - **Reflection trigger:** repeated low rubric scores tied to one skill, stale references, failing update hooks/tests

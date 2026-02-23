@@ -61,13 +61,13 @@ This workflow guides agents through using the `webmcp-browser-tools` skill to de
 
 ## Decision Matrix
 
-| Scenario | Use WebMCP? | Alternative |
-|----------|------------|-------------|
-| App exposes search/filter to agents | YES | Backend MCP if stateless |
-| App needs agent to read external news | NO | `WebFetch` / Exa |
-| Agent needs to click through forms | NO | `mcp__chrome-devtools__*` |
-| App wants human-in-the-loop agent workflow | YES | — |
-| Backend data queries (no UI state needed) | NO | Backend MCP server |
+| Scenario                                   | Use WebMCP? | Alternative               |
+| ------------------------------------------ | ----------- | ------------------------- |
+| App exposes search/filter to agents        | YES         | Backend MCP if stateless  |
+| App needs agent to read external news      | NO          | `WebFetch` / Exa          |
+| Agent needs to click through forms         | NO          | `mcp__chrome-devtools__*` |
+| App wants human-in-the-loop agent workflow | YES         | —                         |
+| Backend data queries (no UI state needed)  | NO          | Backend MCP server        |
 
 ## Output
 

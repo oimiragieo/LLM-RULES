@@ -162,8 +162,8 @@ Glob: .claude/workflows/**/*.md
 **2. Research workflow patterns** (minimum 2 queries):
 
 ```javascript
-WebSearch({ query: '[workflow-type] orchestration best practices' });
-WebSearch({ query: '[domain] multi-agent workflow patterns' });
+WebSearch({ query: 'best <domain/topic name> agent workflow process 2026' });
+WebSearch({ query: 'industry standard <workflow-type> orchestration phases 2026' });
 ```
 
 **3. Document patterns found** in workflow comments

@@ -3,9 +3,7 @@
   "title": "smart-revert Output Schema",
   "description": "Output validation schema for smart-revert skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

@@ -3,9 +3,7 @@
   "title": "memory-search Input Schema",
   "description": "Input validation schema for memory-search skill",
   "type": "object",
-  "required": [
-    "query"
-  ],
+  "required": ["query"],
   "properties": {
     "query": {
       "type": "string",

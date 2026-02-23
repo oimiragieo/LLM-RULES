@@ -1,7 +1,7 @@
 ---
 name: using-git-worktrees
 version: 1.0.0
-category: "Git & Version Control"
+category: 'Git & Version Control'
 agents: [developer, devops]
 tags: [git, worktrees, isolation, parallel-development, workspace]
 description: Create isolated development workspaces with safety verification. Use when needing parallel development branches.
@@ -247,13 +247,13 @@ Ready to implement auth feature
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Creating worktree with dirty working tree | Uncommitted changes risk loss or confusion | Stash or commit changes before creating worktree |
-| Worktree outside project directory | Not covered by .gitignore, leaks to VCS | Use project-local paths inside the repo |
-| No .gitignore entry for worktree directory | Worktree files pollute `git status` output | Add worktree path pattern to .gitignore first |
-| Deleting worktree without checking changes | Uncommitted work silently lost | Check for uncommitted changes before removal |
-| Forgetting `git worktree prune` | Stale lock files block future worktree creation | Always prune after removing worktrees |
+| Anti-Pattern                               | Why It Fails                                    | Correct Approach                                 |
+| ------------------------------------------ | ----------------------------------------------- | ------------------------------------------------ |
+| Creating worktree with dirty working tree  | Uncommitted changes risk loss or confusion      | Stash or commit changes before creating worktree |
+| Worktree outside project directory         | Not covered by .gitignore, leaks to VCS         | Use project-local paths inside the repo          |
+| No .gitignore entry for worktree directory | Worktree files pollute `git status` output      | Add worktree path pattern to .gitignore first    |
+| Deleting worktree without checking changes | Uncommitted work silently lost                  | Check for uncommitted changes before removal     |
+| Forgetting `git worktree prune`            | Stale lock files block future worktree creation | Always prune after removing worktrees            |
 
 ## Memory Protocol (MANDATORY)
 

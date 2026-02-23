@@ -3,9 +3,7 @@
   "title": "dispatching-parallel-agents Output Schema",
   "description": "Output validation schema for dispatching-parallel-agents skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

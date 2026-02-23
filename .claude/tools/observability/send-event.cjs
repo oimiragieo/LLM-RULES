@@ -54,9 +54,11 @@ const EVENTS_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'to
 function sendEvent(payload) {
   const event = {
     tool_name: String(payload.tool_name || 'unknown'),
-    agent_id:  String(payload.agent_id  || process.env.AGENT_ID  || 'unknown'),
-    session_id: String(payload.session_id || process.env.SESSION_ID || process.env.CLAUDE_SESSION_ID || 'unknown'),
-    outcome:   String(payload.outcome   || 'unknown'),
+    agent_id: String(payload.agent_id || process.env.AGENT_ID || 'unknown'),
+    session_id: String(
+      payload.session_id || process.env.SESSION_ID || process.env.CLAUDE_SESSION_ID || 'unknown'
+    ),
+    outcome: String(payload.outcome || 'unknown'),
     timestamp: payload.timestamp || new Date().toISOString(),
     ...(payload.meta ? { meta: payload.meta } : {}),
   };
@@ -139,16 +141,16 @@ if (require.main === module) {
     process.exit(0);
   }
 
-  const get = (flag) => {
+  const get = flag => {
     const i = args.indexOf(flag);
     return i !== -1 ? args[i + 1] : undefined;
   };
 
-  const tool_name  = get('--tool');
-  const agent_id   = get('--agent');
+  const tool_name = get('--tool');
+  const agent_id = get('--agent');
   const session_id = get('--session');
-  const outcome    = get('--outcome');
-  const metaStr    = get('--meta');
+  const outcome = get('--outcome');
+  const metaStr = get('--meta');
 
   if (!tool_name || !outcome) {
     process.stderr.write('Error: --tool and --outcome are required.\n');
@@ -158,7 +160,11 @@ if (require.main === module) {
 
   let meta;
   if (metaStr) {
-    try { meta = JSON.parse(metaStr); } catch { meta = { raw: metaStr }; }
+    try {
+      meta = JSON.parse(metaStr);
+    } catch {
+      meta = { raw: metaStr };
+    }
   }
 
   const event = sendEvent({ tool_name, agent_id, session_id, outcome, meta });

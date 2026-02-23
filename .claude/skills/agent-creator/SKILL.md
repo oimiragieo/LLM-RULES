@@ -1557,7 +1557,17 @@ Router can route by capability
 Step 13: README.md Updated (footprint count)
 ```
 
-### Step 13: Update README.md Footprint Count (MANDATORY)
+### Step 13: Global Ecosystem Sync (MANDATORY)
+
+To guarantee that all registries and indexes are perfectly synchronized across the entire framework, you must run the composite registry command as your final action:
+
+```bash
+npm run gen:all-registries
+```
+
+This ensures the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
+
+### Step 14: Update README.md Footprint Count (MANDATORY)
 
 After all registries are updated, refresh the agent count in README.md so the Current Footprint stays accurate.
 

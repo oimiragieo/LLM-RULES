@@ -440,6 +440,53 @@ function main(input = {}, deps = {}) {
     applyMemoryRecordsToFiles(memoryRecords, memoryDir);
   }
 
+  // --- Token & Cost Savings Telemetry ---
+  const outputTokens = Math.ceil(JSON.stringify(workflow.data).length / 4);
+  const savedTokens = Math.max(0, corpusTokens - outputTokens);
+
+  let activeModelStr = 'claude-sonnet-4.6';
+  try {
+    const { getState } = require('../../../lib/routing/router-state.cjs');
+    const { resolveAgentModel } = require('../../../lib/utils/agent-config-reader.cjs');
+
+    const state = getState();
+    const agentName = state.mode === 'agent' ? state.taskDescription : 'router';
+    const resolved = resolveAgentModel(agentName);
+
+    if (resolved && resolved.model) {
+      activeModelStr = resolved.model;
+    }
+  } catch (_e) {
+    // Graceful fallback
+  }
+
+  const model = String(input.model || activeModelStr).toLowerCase();
+  let costPerMillion = 3.0; // Default: Sonnet 4.6
+  if (model.includes('opus')) {
+    costPerMillion = 5.0;
+  } else if (model.includes('haiku')) {
+    costPerMillion = 1.0;
+  }
+
+  const costSavingsUsd = (savedTokens / 1_000_000) * costPerMillion;
+
+  const telemetryData = {
+    timestamp: new Date().toISOString(),
+    query,
+    model,
+    originalTokens: corpusTokens,
+    compressedTokens: outputTokens,
+    savedTokens,
+    estimatedSavingsUsd: costSavingsUsd,
+  };
+
+  try {
+    const statsFile = path.join(RUNTIME_DIR, 'token-saver-telemetry.jsonl');
+    fs.appendFileSync(statsFile, JSON.stringify(telemetryData) + '\n', 'utf8');
+  } catch (_e) {
+    // Non-blocking telemetry
+  }
+
   return {
     ok: true,
     search: { query, hits: hits.length, limit },
@@ -449,6 +496,7 @@ function main(input = {}, deps = {}) {
       corpusFile,
       skeletonRatio,
     },
+    telemetry: telemetryData,
     memoryRecords,
     dedupStats,
     persistMode: persistFiles ? 'files' : 'memoryrecord_payload_only',
@@ -466,6 +514,7 @@ token-saver-context-compression wrapper
 Usage:
   node main.cjs --query "<question>" [--mode evidence_aware|query_guided|baseline] [--limit 20]
                 [--no-fail-on-insufficient-evidence] [--persist-files] [--skeleton-ratio 0.5]
+                [--model claude-sonnet-4.6]
 `);
     process.exit(0);
   }
@@ -480,6 +529,7 @@ Usage:
     ),
     persistFiles: options['persist-files'] === true,
     skeletonRatio: options['skeleton-ratio'] ? Number(options['skeleton-ratio']) : undefined,
+    model: options.model,
   });
 
   if (!result.ok) {

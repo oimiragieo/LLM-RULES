@@ -3,9 +3,7 @@
   "title": "subagent-driven-development Output Schema",
   "description": "Output validation schema for subagent-driven-development skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

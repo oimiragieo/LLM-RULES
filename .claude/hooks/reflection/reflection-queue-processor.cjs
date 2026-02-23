@@ -450,8 +450,9 @@ Instructions:
 }
 
 /**
- * Mark entries as processed in the queue file
- * @param {Array<object>} processedEntries - Entries that were processed
+ * Remove processed entries from the queue file (drop instead of mark).
+ * Keeps only unprocessed entries, preventing unbounded file growth.
+ * @param {Array<object>} processedEntries - Entries that were just processed
  * @param {string} queueFile - Path to queue file
  */
 function markEntriesProcessed(processedEntries, queueFile) {
@@ -470,34 +471,29 @@ function markEntriesProcessed(processedEntries, queueFile) {
     }
 
     const lines = content.split('\n').filter(line => line.trim());
-    const updatedLines = [];
 
-    // Create a set of processed entry identifiers for fast lookup
+    // Build set of identifiers for entries just processed
     const processedSet = new Set(
       processedEntries.map(e => `${e.trigger}:${e.timestamp}:${e.taskId || e.context || ''}`)
     );
 
+    // Keep only entries that were NOT processed in this run and are not already marked processed
+    const remainingLines = [];
     for (const line of lines) {
       const entry = safeParseJSON(line, null);
       if (entry && typeof entry === 'object' && Object.keys(entry).length > 0) {
         const identifier = `${entry.trigger}:${entry.timestamp}:${entry.taskId || entry.context || ''}`;
-
-        if (processedSet.has(identifier)) {
-          entry.processed = true;
+        if (!processedSet.has(identifier) && !entry.processed) {
+          remainingLines.push(JSON.stringify(entry));
         }
-
-        updatedLines.push(JSON.stringify(entry));
-      } else {
-        // Keep malformed lines as-is
-        updatedLines.push(line);
+        // processed entries are dropped — not written back
       }
+      // malformed lines are also dropped
     }
 
-    // ATOMIC-001 FIX: Use atomicWriteSync utility for safe atomic writes
-    // This handles temp file creation, writing, and atomic rename internally
-    atomicWriteSync(queueFile, updatedLines.join('\n') + '\n');
+    atomicWriteSync(queueFile, remainingLines.length > 0 ? remainingLines.join('\n') + '\n' : '');
   } catch (err) {
-    debugLog('reflection-queue-processor', 'Error marking entries as processed', err);
+    debugLog('reflection-queue-processor', 'Error removing processed entries', err);
   }
 }
 

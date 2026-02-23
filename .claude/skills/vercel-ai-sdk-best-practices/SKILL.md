@@ -2,7 +2,7 @@
 name: vercel-ai-sdk-best-practices
 description: Best practices for using the Vercel AI SDK in Next.js 15 applications with React Server Components and streaming capabilities.
 version: 1.0.0
-category: "Vercel & Web Performance"
+category: 'Vercel & Web Performance'
 agents: [developer, frontend-pro]
 tags: [vercel-ai, ai-sdk, streaming, llm, next.js]
 model: sonnet
@@ -51,7 +51,7 @@ When reviewing or writing code, apply these guidelines:
 - Use environment variables for API keys and sensitive configuration.
 - Cache AI responses when appropriate to reduce costs.
 - Implement proper logging for debugging and monitoring.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -71,13 +71,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Blocking `generateText` in UI routes | Hangs the request, poor UX for long responses | Use `streamText` with streaming response |
-| API keys in client-side code | Secret exposure, security vulnerability | Move AI calls to Server Actions or API routes |
-| No error boundary for streaming | Uncaught errors break the entire component tree | Wrap streaming components in error boundaries |
-| Calling AI SDK in Client Components | Exposes provider keys, breaks SSR | Use Server Actions (`"use server"`) or route handlers |
-| No token or timeout limits | Runaway calls exhaust credits and stall users | Always set `maxTokens` and request timeout |
+| Anti-Pattern                         | Why It Fails                                    | Correct Approach                                      |
+| ------------------------------------ | ----------------------------------------------- | ----------------------------------------------------- |
+| Blocking `generateText` in UI routes | Hangs the request, poor UX for long responses   | Use `streamText` with streaming response              |
+| API keys in client-side code         | Secret exposure, security vulnerability         | Move AI calls to Server Actions or API routes         |
+| No error boundary for streaming      | Uncaught errors break the entire component tree | Wrap streaming components in error boundaries         |
+| Calling AI SDK in Client Components  | Exposes provider keys, breaks SSR               | Use Server Actions (`"use server"`) or route handlers |
+| No token or timeout limits           | Runaway calls exhaust credits and stall users   | Always set `maxTokens` and request timeout            |
 
 ## Memory Protocol (MANDATORY)
 

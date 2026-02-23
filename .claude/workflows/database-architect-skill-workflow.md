@@ -503,7 +503,7 @@ Set up migration deployment pipeline for: $PROJECT_NAME
 
 ## Instructions
 1. Read your agent definition: .claude/agents/specialized/devops.md
-2. **Invoke skill**: Skill({ skill: "cicd-expert" })
+2. **Invoke skill**: Skill({ skill: "ci-cd-implementation-rule" })
 3. Review migrations from Step 4.1
 4. Create CI/CD pipeline for migrations:
    - Test migrations on staging environment
@@ -847,7 +847,7 @@ This workflow implements the structured process for the corresponding skill:
 | 3.2 Benchmarking       | developer          | database-expert, tdd                                    |
 | 4.1 Migration Scripts  | database-architect | database-expert, sequential-thinking                    |
 | 4.2 Rollback Docs      | database-architect | database-expert, doc-generator                          |
-| 4.2 Deploy Pipeline    | devops             | cicd-expert                                             |
+| 4.2 Deploy Pipeline    | devops             | ci-cd-implementation-rule                               |
 | 5.1 Schema Tests       | qa                 | tdd                                                     |
 | 5.2 Test Data          | developer          | database-expert, tdd                                    |
 | 5.3 Migration Tests    | qa                 | tdd                                                     |

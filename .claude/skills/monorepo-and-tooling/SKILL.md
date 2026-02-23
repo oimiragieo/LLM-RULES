@@ -1,7 +1,7 @@
 ---
 name: monorepo-and-tooling
 version: 1.1.0
-category: "DevOps & Infrastructure"
+category: 'DevOps & Infrastructure'
 agents: [developer, devops]
 tags: [monorepo, turborepo, nx, workspace, tooling]
 description: Outlines the monorepo structure and tooling conventions, emphasizing the use of Taskfile.yml, and proper handling of environment variables.
@@ -40,7 +40,7 @@ When reviewing or writing code, apply these guidelines:
 - If using a monorepo structure, place shared code in a `packages/` directory and app-specific code in `app/`.
 - Use `Taskfile.yml` commands for development, testing, and deployment tasks.
 - Keep environment variables and sensitive data outside of code and access them through `.env` files or similar configuration.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -60,13 +60,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Mixing app and shared code in flat root | Breaks dependency graph; caching incorrect; circular imports likely | Place shared modules in `packages/`; app entry points in `app/`; enforce with import rules |
-| Committing `.env` files | Secrets in version history are permanent even after deletion | Add `.env*` to `.gitignore`; use `.env.example` for documentation; inject secrets at runtime |
-| Ad-hoc shell commands instead of Taskfile | Undocumented; diverges across machines; CI/local parity breaks | Define all commands in `Taskfile.yml`; contributors run `task <name>` |
-| Running build tools directly, bypassing workspace | Bypasses cache graph; produces stale or incorrect cross-package artifacts | Always use workspace-level commands (`pnpm -w build`, `nx run`, `turbo run`) |
-| Installing dependencies outside their owning package | Duplication in bundles; deduplication breaks; version conflicts between packages | Install to the specific package with `pnpm add --filter @scope/pkg dep` |
+| Anti-Pattern                                         | Why It Fails                                                                     | Correct Approach                                                                             |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Mixing app and shared code in flat root              | Breaks dependency graph; caching incorrect; circular imports likely              | Place shared modules in `packages/`; app entry points in `app/`; enforce with import rules   |
+| Committing `.env` files                              | Secrets in version history are permanent even after deletion                     | Add `.env*` to `.gitignore`; use `.env.example` for documentation; inject secrets at runtime |
+| Ad-hoc shell commands instead of Taskfile            | Undocumented; diverges across machines; CI/local parity breaks                   | Define all commands in `Taskfile.yml`; contributors run `task <name>`                        |
+| Running build tools directly, bypassing workspace    | Bypasses cache graph; produces stale or incorrect cross-package artifacts        | Always use workspace-level commands (`pnpm -w build`, `nx run`, `turbo run`)                 |
+| Installing dependencies outside their owning package | Duplication in bundles; deduplication breaks; version conflicts between packages | Install to the specific package with `pnpm add --filter @scope/pkg dep`                      |
 
 ## Memory Protocol (MANDATORY)
 

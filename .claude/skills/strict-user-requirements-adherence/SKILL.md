@@ -1,7 +1,7 @@
 ---
 name: strict-user-requirements-adherence
 version: 1.0.0
-category: "Validation & Quality"
+category: 'Validation & Quality'
 agents: [qa, planner, developer]
 tags: [requirements, scope, adherence, validation, anti-scope-creep]
 description: Strictly adheres to specified user flow and game rules, making sure to follow documented features.
@@ -9,7 +9,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit]
-globs: "**/*.*"
+globs: '**/*.*'
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
 best_practices:
@@ -58,13 +58,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Implementing assumed requirements | Code diverges from what user actually wanted | Implement only what is explicitly documented; surface assumptions |
-| Skipping acceptance criteria review | "Done" declared before user requirement is satisfied | Check every acceptance criterion before marking work complete |
-| Silently accepting scope creep | Feature grows beyond agreed scope; delivery delayed | Flag any extension beyond documented requirements for user approval |
-| Resolving ambiguity by guessing | Wrong interpretation leads to rework | Surface ambiguities immediately and wait for explicit clarification |
-| No requirements traceability | Cannot audit which code change satisfies which requirement | Link every significant code change to the requirement it satisfies |
+| Anti-Pattern                        | Why It Fails                                               | Correct Approach                                                    |
+| ----------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| Implementing assumed requirements   | Code diverges from what user actually wanted               | Implement only what is explicitly documented; surface assumptions   |
+| Skipping acceptance criteria review | "Done" declared before user requirement is satisfied       | Check every acceptance criterion before marking work complete       |
+| Silently accepting scope creep      | Feature grows beyond agreed scope; delivery delayed        | Flag any extension beyond documented requirements for user approval |
+| Resolving ambiguity by guessing     | Wrong interpretation leads to rework                       | Surface ambiguities immediately and wait for explicit clarification |
+| No requirements traceability        | Cannot audit which code change satisfies which requirement | Link every significant code change to the requirement it satisfies  |
 
 ## Memory Protocol (MANDATORY)
 

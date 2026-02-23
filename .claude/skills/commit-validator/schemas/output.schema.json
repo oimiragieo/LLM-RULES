@@ -3,9 +3,7 @@
   "title": "commit-validator Output Schema",
   "description": "Output validation schema for commit-validator skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

@@ -2,7 +2,7 @@
 name: requesting-code-review
 description: Dispatch code-reviewer agent for two-stage review. Use after completing implementation tasks.
 version: 1.1.0
-category: "Development Workflow"
+category: 'Development Workflow'
 agents: [developer, code-reviewer]
 tags: [code-review, git, diff, pull-request, review-request]
 model: sonnet
@@ -178,13 +178,13 @@ See template at: requesting-code-review/code-reviewer.md
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| ------------ | ------------ | ---------------- |
-| Skipping review for "small" changes | Small changes introduce the same classes of bugs as large ones; "simple" is subjective and unreliable | Request review at every mandatory checkpoint regardless of perceived complexity |
-| Dispatching reviewer without git SHAs | Reviewer cannot produce an accurate diff without a commit range; the review is inaccurate or incomplete | Capture BASE_SHA and HEAD_SHA before every review dispatch |
-| Proceeding past Critical issues | Critical issues compound; later tasks build on broken foundations that are expensive to fix retroactively | Fix all Critical issues before advancing to the next task |
-| Treating reviewer feedback as optional | Optional review degrades code quality over time and compounds technical debt that can't be traced | Follow severity escalation: Critical → fix now, Important → fix before next task, Minor → note for later |
-| Requesting review after batches of tasks instead of after each task | Errors from Task 1 contaminate Tasks 2–N; reviewers cannot isolate which task introduced which issue | Review after each individual task before starting the next one |
+| Anti-Pattern                                                        | Why It Fails                                                                                              | Correct Approach                                                                                         |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Skipping review for "small" changes                                 | Small changes introduce the same classes of bugs as large ones; "simple" is subjective and unreliable     | Request review at every mandatory checkpoint regardless of perceived complexity                          |
+| Dispatching reviewer without git SHAs                               | Reviewer cannot produce an accurate diff without a commit range; the review is inaccurate or incomplete   | Capture BASE_SHA and HEAD_SHA before every review dispatch                                               |
+| Proceeding past Critical issues                                     | Critical issues compound; later tasks build on broken foundations that are expensive to fix retroactively | Fix all Critical issues before advancing to the next task                                                |
+| Treating reviewer feedback as optional                              | Optional review degrades code quality over time and compounds technical debt that can't be traced         | Follow severity escalation: Critical → fix now, Important → fix before next task, Minor → note for later |
+| Requesting review after batches of tasks instead of after each task | Errors from Task 1 contaminate Tasks 2–N; reviewers cannot isolate which task introduced which issue      | Review after each individual task before starting the next one                                           |
 
 ## Memory Protocol (MANDATORY)
 

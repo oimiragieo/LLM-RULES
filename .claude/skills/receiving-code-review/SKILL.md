@@ -2,7 +2,7 @@
 name: receiving-code-review
 description: Process and act on code review feedback. Use when receiving review results.
 version: 1.1.0
-category: "Development Workflow"
+category: 'Development Workflow'
 agents: [developer, code-reviewer]
 tags: [code-review, feedback, fixes, resolution, sign-off]
 model: sonnet
@@ -253,13 +253,13 @@ No performative agreement. Technical rigor always.
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| ------------ | ------------ | ---------------- |
-| Implementing all feedback without verification | Reviewer may lack full context; suggestion may break existing functionality | Verify each item against codebase before implementing |
-| Starting implementation with unclear items | Missing context on item 4 corrupts items 1-3 that depend on it | Clarify all unclear items first; implement nothing until all items are understood |
-| Expressing gratitude for feedback | Performative responses waste tokens and add no technical value | Respond with the technical fact (what was wrong, what was fixed) or just the code change |
-| Batch-implementing without testing | One wrong fix corrupts the entire batch; regressions become invisible | Implement and test each item individually; commit checkpoints after each |
-| Adding suggested features without checking usage | Implements dead code that must be maintained forever | Grep for actual usage first; if unused, confirm removal is the right answer |
+| Anti-Pattern                                     | Why It Fails                                                                | Correct Approach                                                                         |
+| ------------------------------------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Implementing all feedback without verification   | Reviewer may lack full context; suggestion may break existing functionality | Verify each item against codebase before implementing                                    |
+| Starting implementation with unclear items       | Missing context on item 4 corrupts items 1-3 that depend on it              | Clarify all unclear items first; implement nothing until all items are understood        |
+| Expressing gratitude for feedback                | Performative responses waste tokens and add no technical value              | Respond with the technical fact (what was wrong, what was fixed) or just the code change |
+| Batch-implementing without testing               | One wrong fix corrupts the entire batch; regressions become invisible       | Implement and test each item individually; commit checkpoints after each                 |
+| Adding suggested features without checking usage | Implements dead code that must be maintained forever                        | Grep for actual usage first; if unused, confirm removal is the right answer              |
 
 ## Memory Protocol (MANDATORY)
 

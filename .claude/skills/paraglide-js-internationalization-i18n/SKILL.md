@@ -1,7 +1,7 @@
 ---
 name: paraglide-js-internationalization-i18n
 version: 1.0.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [i18n, paraglide, internationalization, sveltekit, translation]
 description: Details Paraglide.js i18n implementations.
@@ -43,7 +43,7 @@ When reviewing or writing code, apply these guidelines:
   import { t } from '@inlang/paraglide-js';
   ```
 - Support multiple languages and RTL layouts.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:

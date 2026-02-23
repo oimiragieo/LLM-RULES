@@ -1,7 +1,7 @@
 ---
 name: htmx-expert
 version: 1.0.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [htmx, hypermedia, html, server-side, web]
 description: HTMX expert including hypermedia patterns, Django/Flask integration
@@ -99,7 +99,7 @@ When reviewing or writing code, apply these guidelines:
 - Enforce the folder structure conventions for your backend framework
 - Keep HTMX partials/fragments in dedicated template directories
 - Separate full-page templates from partial responses
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:

@@ -23,12 +23,7 @@
     },
     "sqlite": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sqlite@0",
-        "--db",
-        ".claude/context/memory/vectors.db"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-sqlite@0", "--db", ".claude/data/memory.db"]
     }
   }
 }

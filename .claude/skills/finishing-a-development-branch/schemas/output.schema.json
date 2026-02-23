@@ -3,9 +3,7 @@
   "title": "finishing-a-development-branch Output Schema",
   "description": "Output validation schema for finishing-a-development-branch skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

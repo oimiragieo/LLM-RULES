@@ -2,7 +2,7 @@
 name: starknet-react-rules
 description: Specific rules for Starknet React projects, focusing on blockchain integration.
 version: 1.0.0
-category: "External Integrations"
+category: 'External Integrations'
 agents: [developer, web3-blockchain-expert]
 tags: [starknet, web3, blockchain, react, cairo]
 model: sonnet
@@ -42,7 +42,7 @@ When reviewing or writing code, apply these guidelines:
 - Use React hooks for transaction status management
 - Provide clear UI feedback for blockchain interactions
 - Implement comprehensive error handling for blockchain operations
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -62,13 +62,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Skipping chain ID validation | Wallet connected to wrong network silently corrupts transactions | Always validate chainId matches expected Starknet network |
-| Hardcoding contract addresses | Breaking changes when deploying to different environments | Use environment variables or config files for all contract addresses |
-| Missing transaction state handling | Users see blank UI during pending/rejected states | Implement loading, confirmed, and rejected state for all transactions |
-| Direct ABI calls without TypeScript types | Runtime errors from wrong argument types | Use TypeScript types generated from ABI for all contract calls |
-| Ignoring wallet connection errors | Silent failures create confusing UX | Always handle ConnectionError, UserRejectedRequestError, and RejectedRequestError |
+| Anti-Pattern                              | Why It Fails                                                     | Correct Approach                                                                  |
+| ----------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Skipping chain ID validation              | Wallet connected to wrong network silently corrupts transactions | Always validate chainId matches expected Starknet network                         |
+| Hardcoding contract addresses             | Breaking changes when deploying to different environments        | Use environment variables or config files for all contract addresses              |
+| Missing transaction state handling        | Users see blank UI during pending/rejected states                | Implement loading, confirmed, and rejected state for all transactions             |
+| Direct ABI calls without TypeScript types | Runtime errors from wrong argument types                         | Use TypeScript types generated from ABI for all contract calls                    |
+| Ignoring wallet connection errors         | Silent failures create confusing UX                              | Always handle ConnectionError, UserRejectedRequestError, and RejectedRequestError |
 
 ## Memory Protocol (MANDATORY)
 

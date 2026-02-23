@@ -2,7 +2,7 @@
 name: qwik-expert
 description: Qwik framework expert including resumability, lazy loading, and optimization
 version: 1.1.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [qwik, resumability, performance, react, frontend]
 model: sonnet
@@ -125,7 +125,7 @@ When reviewing or writing code, apply these guidelines:
 - Use TypeScript for type safety
 - Leverage Qwik's resumability model for optimal performance
 - Minimize client-side JavaScript via lazy loading
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -151,13 +151,13 @@ This expert skill consolidates 1 individual skills:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| ------------ | ------------ | ---------------- |
-| Using event handlers without `$` suffix | Handler cannot be lazy-extracted; forces hydration and defeats resumability | Always use `onClick$`, `onInput$`, `useTask$()` etc. with `$` suffix |
-| Accessing `window`/`document` in component body | Throws during SSR where browser globals don't exist | Wrap browser-only code in `useVisibleTask$()` which runs client-side only |
-| Using plain variables for reactive state | Variable changes don't trigger UI updates; components become stale | Use `useSignal()` for primitives; `useStore()` for objects |
-| Top-level importing of large client libraries | Bundles library into initial JS payload; destroys zero-JS advantage | Use dynamic `import()` inside task handlers; lazy-load with `$` |
-| Writing class-based components | Not supported by Qwik's serialization and resumability pipeline | Always use functional components with `component$()` |
+| Anti-Pattern                                    | Why It Fails                                                                | Correct Approach                                                          |
+| ----------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Using event handlers without `$` suffix         | Handler cannot be lazy-extracted; forces hydration and defeats resumability | Always use `onClick$`, `onInput$`, `useTask$()` etc. with `$` suffix      |
+| Accessing `window`/`document` in component body | Throws during SSR where browser globals don't exist                         | Wrap browser-only code in `useVisibleTask$()` which runs client-side only |
+| Using plain variables for reactive state        | Variable changes don't trigger UI updates; components become stale          | Use `useSignal()` for primitives; `useStore()` for objects                |
+| Top-level importing of large client libraries   | Bundles library into initial JS payload; destroys zero-JS advantage         | Use dynamic `import()` inside task handlers; lazy-load with `$`           |
+| Writing class-based components                  | Not supported by Qwik's serialization and resumability pipeline             | Always use functional components with `component$()`                      |
 
 ## Memory Protocol (MANDATORY)
 

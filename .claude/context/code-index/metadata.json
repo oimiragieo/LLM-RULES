@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-02-19T03:28:16.691Z",
+  "timestamp": "2026-02-23T03:00:06.452Z",
   "stats": {
-    "files": 2843,
-    "chunks": 5777,
-    "embeddings": 5777,
+    "files": 2994,
+    "chunks": 5980,
+    "embeddings": 5980,
     "byLanguage": {
-      "javascript": 2637,
+      "javascript": 2788,
       "typescript": 1,
       "python": 205
     }
@@ -23,16 +23,64 @@
       "hash": "018af65eed73eb781c3b7e359482065f4856c99b8530403d8de3a990dbf1a2fd",
       "chunks": 2
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\check-hooks.cjs": {
-      "hash": "20a67de995215a1274da5a4f5bc77e3a58e166ead81b8c2753aca4bfd714a9c1",
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\add-nativescript.cjs": {
+      "hash": "6a8ec2b2f5fdf15d230df93fa4d259f1d6ef5af0821cd28ff1c74602985bb027",
       "chunks": 0
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\fix-bug1.cjs": {
-      "hash": "ac0f60f5b65f8ed03775e26320904521e98e77808ef1a4bcb998b257430ed6cd",
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\audit3.cjs": {
+      "hash": "3b7688baf0215cdf6d985d6e60eaa5917f2af28d9b40c8d6c5e8d1c4cb588e65",
       "chunks": 1
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\fix-bug2.cjs": {
-      "hash": "ceaf69ef5a23fee3e65010aa7700c05759f825c04a824de4ad63122448aa5b96",
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\audit4.cjs": {
+      "hash": "8b65e661b87cf2f191391f2d3f0e0673fc9a124af2328db7d34bcc1e2e4b0b5d",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\audit5.cjs": {
+      "hash": "cb6524e11def67b4bca6662460b35181333526b769af5b0649f1c0c21fbde453",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\audit6.cjs": {
+      "hash": "4a1bea557f02e968acbfdd5e13ce7c87ce1e7c153b3383ffeb9c51bc22e73fce",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\test-catalog.cjs": {
+      "hash": "e7f3478b26434390439d148a58bfc2d636c0798ad1941dbd3ae90f94c13f2106",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\test-catalog2.cjs": {
+      "hash": "db41f61a3cbcc714122d27a3a7714e7b8ac5de8d504af9f01431a79d011e7be0",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\test-catalog3.cjs": {
+      "hash": "6d5abaefec50285f762b00c891cab75b3b5471293ff0ffa3742ea034df2c05cd",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\update-agents.cjs": {
+      "hash": "6b0472d2319aaf47f8c7b0448b9f3b3f1089630ccbf360d0dffe9dd847f2519e",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\update-catalog.cjs": {
+      "hash": "a1e68b3ad8552f06f681e20aef45fab60dab00a8fac56ab500f7676eef06df5f",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\update-catalog2.cjs": {
+      "hash": "475431d7256459e088ea39efcb508b041a1a3c77590c77ec0990c35aff25f7f5",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\update-counts.cjs": {
+      "hash": "c4a27f6428dbf9b8ac6c1e284e6fe97c5bf71b50120c29d67b5f465fe13c1827",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\update-evolution.cjs": {
+      "hash": "13fe8f398a8112dca4a63cdae38d96e2ae3dca72c20bba3cd3aadbb3f466251c",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\update-quickref.cjs": {
+      "hash": "f5ddeca55140f590b57c0587ce91d22e6cbd8b0208ec616639fc6590d1832ba8",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\context\\tmp\\validate-gap-log.cjs": {
+      "hash": "77ae63bb1e755d07f5be85d1520edcd0693c30940832896292a3d28288f93e1d",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\benchmarks\\perf-gate.cjs": {
@@ -55,8 +103,16 @@
       "hash": "aa14c41f1ef642c607fe8e0610eea80c7ed4153cc5b474e847616979dd7eb7cd",
       "chunks": 6
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\git\\changelog-reminder.cjs": {
+      "hash": "9f1f328d548667d568bb85911877fc3be92abfd6a5655c170d3f080abd69d4c1",
+      "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\git\\changelog-reminder.test.cjs": {
+      "hash": "3559f8249066ccabfaf2aed66bbf0ba3fffdd1319031b36c591e1a1cac4cd52a",
+      "chunks": 1
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\memory\\sync-memory-index.cjs": {
-      "hash": "07a9e1c33da847a6dcb7a085915b54daabe4a7eb295ab4658ee8aa16720dd6ee",
+      "hash": "d787fc3678c273b1eb4d702307c387b5c4fb34f76afbbfc776536cb39b46b4ac",
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\metrics\\post-tool-metrics-unified.cjs": {
@@ -71,9 +127,9 @@
       "hash": "52dc99ae496ede2feb29148825720280507bf21456ece77ff832a0d56a5ef75f",
       "chunks": 8
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\slo-alert-gate.cjs": {
-      "hash": "c5f9c5a5516b445c16789dc15b6add04e1c7f84a21cbb7c46eeb469c37e33558",
-      "chunks": 1
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\_archive\\error-tracker-active.cjs": {
+      "hash": "69d17eebcb273571474702367601b392719d958fc6026ae72310c64210ac1244",
+      "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\_archive\\error-tracker-hook.cjs": {
       "hash": "9e40348068a75ca37609ab8cb41d737f5fafceac2eee229b5badb347864dc4e8",
@@ -83,8 +139,16 @@
       "hash": "745ece19e5367c9c0f6ce5ba11ea8ef7bdd13ea9ca372d289fc0617181753925",
       "chunks": 13
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\_archive\\metrics-collector-active.cjs": {
+      "hash": "52dc99ae496ede2feb29148825720280507bf21456ece77ff832a0d56a5ef75f",
+      "chunks": 8
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\_archive\\metrics-collector-hook.cjs": {
       "hash": "f01013ef3ac41c7689b1f8323c5e68f7204105e97a0a018201f48907d9dbd1b0",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\monitoring\\_archive\\slo-alert-gate.cjs": {
+      "hash": "c5f9c5a5516b445c16789dc15b6add04e1c7f84a21cbb7c46eeb469c37e33558",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\quality\\artifact-scoring-ledger-hook.cjs": {
@@ -100,19 +164,19 @@
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\reflection-cleanup.cjs": {
-      "hash": "d82582dd88c49d49a9c255d0cf3184f0218ac60433226f35c4200506a195e6bf",
+      "hash": "0f32d49fc3474ba6325a5e7e5aa9dd4154d332e3a1f3d203dfdef763d7968a14",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\reflection-queue-processor.cjs": {
-      "hash": "f66daf3b402cb1f9ff02aab5ed98f98d9b45a32622d14c63185c02bb4012ae81",
-      "chunks": 19
+      "hash": "e2895282934a565da6b1ed6729cf51652fad7ceda0cb2849538b2338a8cbfcdb",
+      "chunks": 20
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\reflection-step0-guard.cjs": {
-      "hash": "418a2597f4cf8b996086cb5b6f7da5bfd659f747d2bc22ba84d97cf3b8c7ba52",
-      "chunks": 13
+      "hash": "2ccd14c8488ce111be20730825c71300910ec7029271ccbdb35f807e0417c59a",
+      "chunks": 15
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\unified-reflection-actions.cjs": {
-      "hash": "f5c48de7e139ccd9ea5e13d0157d3e50c54ca73e80488192559f61854e9f2bd9",
+      "hash": "2029f9bf182747ede25162f5f2230398b75676476ae59e4de2468d793e2f52e8",
       "chunks": 8
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\reflection\\unified-reflection-events.cjs": {
@@ -132,7 +196,7 @@
       "chunks": 8
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\code-index-updater.cjs": {
-      "hash": "f880580bd5c9abc07dd563a6ae592c4f1981a4d4f888aa5529b4f46e881d3e5e",
+      "hash": "999d561da4ce5b3915ea0ef2306d3198cfb9e4b9b2ad23c386c6d4686122e503",
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\post-task-unified-completion.helpers.cjs": {
@@ -140,7 +204,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\post-task-unified.cjs": {
-      "hash": "a645c8246dc3ac59e180b29f534298f3d5aaa39594a25b569fe4c100502041f7",
+      "hash": "beb1a84e4202397a8ad8c05c87fe8d9d8885f8d7152230f8163d392e0d2b6395",
       "chunks": 10
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-task-unified-core.cjs": {
@@ -164,7 +228,7 @@
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-tool-unified.cjs": {
-      "hash": "2314861bf5ef281ebed124319cef3e6a219f633d65b812229076ac596e0ddc94",
+      "hash": "4e5c4ba1e8c4605ac1eca1a086bac3f33a9bb21f2b4c9d940a4df91292f904eb",
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-tool-unified.cleanup.cjs": {
@@ -176,8 +240,12 @@
       "chunks": 14
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-tool-unified.guardrails.cjs": {
-      "hash": "58a682d750fc8635bf731d4398cc43adc9cf0c434e88a53db71368b321cabfa4",
+      "hash": "1e05c41291bab675beb515511520882c8a2dfa062d5ec8dd1f90235056ce8929",
       "chunks": 24
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-tool-unified.memory-sync.cjs": {
+      "hash": "3373a493c54fa24d3140f906c8a0d10b8c9398ae9d0763795af013ee107fce8a",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\pre-tool-unified.shared.cjs": {
       "hash": "cd37cf00ca12aa4e80b29096d8e7324a8325a9d9cfe2839ee78d41828ff7d5dd",
@@ -187,20 +255,28 @@
       "hash": "3a27ba0b0b9f11bfb5eece741f7e5687a2b462e1318b8004fa8dcfe08df53a34",
       "chunks": 17
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\router-tool-lockdown.cjs": {
+      "hash": "2e9bb208f044f50566e098468fc90af0020016cb6d553ffb955e62bfa2d9f0ef",
+      "chunks": 5
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\routing-guard-core.checks-router.cjs": {
       "hash": "1c9f6ec4ef30d04c64c7eed63ca288b79f9920792246615163b8d07dda7c742e",
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\routing-guard-core.checks-task.cjs": {
-      "hash": "bc1ee2ef12bf62cb01342722a37281069a96c113be1502b1c4878d6d96181dda",
-      "chunks": 15
+      "hash": "96183d7d18bf920a12c2b0306fc46b66ebbc3dff4d77b89cce94dec672bad8e3",
+      "chunks": 14
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\routing-guard-core.cjs": {
       "hash": "f4dc1462e7877898157f1272eb0fbbb399c8f4a44e7d3c9f0d7de500120eee7a",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\routing-guard-core.helpers.cjs": {
+      "hash": "42c688ab69186ca6069bb79351e07e8d538724c7cef17416a21673d5d3f5bbe7",
+      "chunks": 16
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\routing-guard-core.impl.cjs": {
-      "hash": "b3f5e7ff2aa8e4cb3333f3d35ed3fdd733b3435f82cfb8893ebbdbef66bea38b",
+      "hash": "90e9ba1518083a2ba438feda60fa9947c1b06ed9bb551e8fbbc325bd7c9754ce",
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\routing-guard-core.intent-model.cjs": {
@@ -232,8 +308,8 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\spawn-prompt-assembler.memory.cjs": {
-      "hash": "699dfbe501bca97e5a9b942eeb5a4eaefcb014d40413e9a058519b21308785ae",
-      "chunks": 8
+      "hash": "455caaa02ff741ba1ffd17716f6a98b6cb872dbb914b4ca6a62d75e27f37db1e",
+      "chunks": 11
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\spawn-prompt-assembler.runtime-support.cjs": {
       "hash": "13146f56f0bc0a4edd2992693249b2ca23d6db6639051ce0813270c260d3178d",
@@ -244,7 +320,7 @@
       "chunks": 10
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\spawn-prompt-assembler.task-tools.cjs": {
-      "hash": "d6ce3bf901772152660400ac83c0a6d1837491841f34773987472aa4f580bdc8",
+      "hash": "b3438fe026bb2126e0df0ce1dc1e5972ce6a4e9def46d6b81cec9ef80e1f8b76",
       "chunks": 25
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\task-pretool-orchestrator.cjs": {
@@ -252,7 +328,7 @@
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\unified-creator-guard.cjs": {
-      "hash": "f14db246fbda6cfbfd1819c13dbd6dc46c2564b40d9ac5d9192e42c670ed75dd",
+      "hash": "66edf238d8ff964609e967155a0ed5d584a7bf748ddb0214323e15390aea0474",
       "chunks": 10
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\routing\\user-prompt-unified.cjs": {
@@ -268,12 +344,20 @@
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\bash-command-validator.cjs": {
-      "hash": "0825a830287e12dc7a9e0f3a354617a1e0ee688b8f7b081ff3607495f111527f",
-      "chunks": 12
+      "hash": "ccefbe75c9cb967f30d7f43f339439ec2fe39d3fca04c2412eb7efa41c6d7b2d",
+      "chunks": 13
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\bash-pretool-bundle.cjs": {
       "hash": "960b673c7f32f1e6f1a1746242e85b6c2a2938975517d019c2882f0f7729c18d",
       "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\bypass-audit-hook.cjs": {
+      "hash": "be415b1c09db8f207baef48b2cda5b15cb262555f7fba3e0a65142b68aff0452",
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\external-content-guard.cjs": {
+      "hash": "eb695ab4b6cf617ac695bd8be085ee006de2b82950d4808af470da93238ebf41",
+      "chunks": 12
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\safety\\hybrid-search-enforcer.cjs": {
       "hash": "9d512765accb36a78eeb493db2548b046bc3f410c83066509b19575d7851ef03",
@@ -340,7 +424,7 @@
       "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\audit-skill-recency.cjs": {
-      "hash": "9284cef5acdb3baf21e4e26f9460be66713302c729ff18fa018832d8fecfec42",
+      "hash": "0a531ea8c88b3308ee2b2def249d20d3c35d7f75c9178e16044b0a78309455ed",
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\drift-detector.cjs": {
@@ -348,20 +432,32 @@
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\post-edit-scanner.cjs": {
-      "hash": "f5815d1223d9e542fd9627fc86f458e25e476ccef87a549e9c1ad460e8d778ce",
-      "chunks": 2
+      "hash": "e1fe486dffaf0490b49ecd93e002c4d91bf5dd1aaf06267aba89b59417887ba1",
+      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\pre-compact.cjs": {
       "hash": "ecf49fc1af80a1fc9e2c468286f8d584b71442047f43049d362a441bd06fc947",
       "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\stale-task-detector.cjs": {
+      "hash": "795e30c5da4a3e883ae9933fd1fc1c84ddde79bf1a42e8aa9ed944dcb7403376",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\state-reset.cjs": {
       "hash": "3e6e88cc0c27d8367c88f088ec8c5cf598ff0884732c5dd728cdf8a2755c9385",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\user-prompt-orchestrator.cjs": {
-      "hash": "d87e05ebb8132711c41474b07ee277f3694d523c5f401c629a1b63b33f1402f8",
+      "hash": "bcb93fd5616dacdef5dc0a9d03c635e8a39c07846339cb73324d4386e0c2e388",
       "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\vector-db-warmstart-worker.cjs": {
+      "hash": "ba454f102b3c456a4e2fd17913e3f3f329ba5b05578c92612c01ad3fb536b0e5",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\vector-db-warmstart.cjs": {
+      "hash": "268c9e47323770d3ad0985ee97481d65e21d7cbe4adc6204766fad4846745ea4",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\session\\_archive\\session-cleanup.cjs": {
       "hash": "ee813667b4c490919f89a624006e9102801bdf24c87ec5a1b5455567cd64a3bd",
@@ -376,7 +472,7 @@
       "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\creator-compliance-validator.cjs": {
-      "hash": "2b5f2261fa5e64c819193a325b31c1ac3fd907f42f12adf1a52890b22351e710",
+      "hash": "692c0972f04f10d6783d5b0be8dfcbc334913ce8bd956a4e2dabb479a107ac50",
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\flight-recorder-schema-gate.cjs": {
@@ -384,7 +480,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\pre-completion-validation.cjs": {
-      "hash": "29ee050ef15e76756495ee178bddcb72045b5e055d177eb001d9e1b76526337d",
+      "hash": "bd68fcac707a23b88ceaf9f19389d9fbef9cf53fb37bd90464bc255f40992fb5",
       "chunks": 20
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\subagent-citation-guard.cjs": {
@@ -392,24 +488,28 @@
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\validation\\taskupdate-contract-validator.cjs": {
-      "hash": "f6c1d589157a27c542be0bbed7ab8ec2232184a584c1d1e159f52fdb317eb32e",
+      "hash": "702d318acb46b06696b8468518424942a478eefc58756bf73e9b3355ee6b4d3b",
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\workflow\\post-completion-chain.cjs": {
-      "hash": "7592db1df65b792c11e292e62adceafd2470ced2641c077356b1fd00f51e5700",
-      "chunks": 3
+      "hash": "899872bc843ea849f38dc3ec0bb0bb4d5da6170c5b0b3eee6548110f7eb74341",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\workflow\\post-creation-integration-edge-cases.test.cjs": {
       "hash": "de5b2bef2f8e473ec7d0861f4a0ee869ae3c0afc3bce272052c79fb4f07967e0",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\workflow\\post-creation-integration.cjs": {
-      "hash": "8a6d6e5d69fa3fac717bedc755bdd8f54b9b74d0d8cedff12a60834faf3014f1",
+      "hash": "84f75ff7a31bf62d27a79f6e5f504829abafddd3f96ffaf0a47e107bffec7cc3",
       "chunks": 16
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\workflow\\post-creation-integration.test.cjs": {
       "hash": "53972eeb2be040aa3deff61f3b9e7360a71490c6d143e39051554fe284803ee1",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\workflow\\workflow-watchdog-hook.cjs": {
+      "hash": "b2ee81d696a4a0f94ffb188084a3630d54a341f7f532c4899db72157af9dd9d7",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\hooks\\_archive\\audit\\git-notes-audit.cjs": {
       "hash": "418e00f3491bb3ac726ea6dd72d193ac52c1ed18b1a76220ed0229e8f5c3435c",
@@ -616,20 +716,28 @@
       "chunks": 12
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\agents\\agent-template-contract.cjs": {
-      "hash": "ff950d71f48d28e0b447c8b9d466c1f83501c64e9ec151049ebec4a1fb6e4dd4",
-      "chunks": 9
+      "hash": "1e196a643259244b184ceccf343a36dc553d73d84e72fbc27025f2d9a89eee94",
+      "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\artifacts\\semver-diff.cjs": {
+      "hash": "c2592fe5ed0c86c06b7149d0c304db4929b9b6cbe5b29787bdc34d7275a35f9d",
+      "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\clients\\model-client.cjs": {
       "hash": "1698cbf1467f37b903754825a2a198be82a71fe47fc3ba3ef1dc2fb0d0c80a59",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\ast-grep-wrapper.cjs": {
-      "hash": "a48cf92ca79e1d4bf58deea2305bff5efb80249406cb2ae13a1b605d5c8ce237",
+      "hash": "e5203a0b0afbdac34d50bbec8cdee5d40052502d7e32f07049c8020364ead3a5",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\bm25-health.cjs": {
       "hash": "9310aa9d3461398b93863397158851b569543899d308b4a5de19e5fcf050388f",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\bm25-incremental.cjs": {
+      "hash": "255e1ef11fed5f1034ca77ff8675337f9bd0c3e0e59c7899853c11daf7f2a013",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\bm25-indexer.cjs": {
       "hash": "97f796f43a1fb3ca5e5222f62178a114349cbc726b6d5f7f8399a307cadfadb2",
@@ -640,7 +748,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\embed-subprocess.cjs": {
-      "hash": "53e2c94489c11f89ae2ba439ad5ee75d2a5d0b284286791786e72e843567a31f",
+      "hash": "bd756780c33bfdb583a276b7f8d30ef99380c49daa2cec032fd15fc3d3d2acd3",
       "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\embedding-generator.cjs": {
@@ -652,11 +760,11 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\hybrid-lazy-indexer-methods-a.cjs": {
-      "hash": "1b1339136f4d1d9b2fa63934392ae3309ad6a79ff4a8bae7b38af2a8a2bb8c74",
+      "hash": "115e8f198951c1cb7c9a07f970183a1d0043c2cf2414402218504cddf7e824ff",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\hybrid-lazy-indexer-methods-b.cjs": {
-      "hash": "d66e99ef9bae95dabaa8fced99a1b169c00f76fd005aa65b7f0a731375aeda63",
+      "hash": "f7a21772c3a65b223816e9e9f3ffcb60da420681a854947d47507c01a8baeffe",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\hybrid-lazy-indexer-methods-c.cjs": {
@@ -668,7 +776,7 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\hybrid-lazy-indexer.impl.cjs": {
-      "hash": "959954f1f2413ef6c99e925db35bdfa96d36d3b691a1ae0308d9743c8a2d2e14",
+      "hash": "036b728bf567160ae8630be436711fa74c7015a2123939a7495052c21f39bfd4",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\hybrid-search.cjs": {
@@ -684,7 +792,7 @@
       "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\index-manager-operations.cjs": {
-      "hash": "1f1b9050b2989131550e48401135123cad4e7a4752b28a9f3103a5d79be89d20",
+      "hash": "025d30afe250fbd523250b0edec29e3962cac11f2d4472be64b5f3cc0927e5fa",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\index-manager.cjs": {
@@ -711,6 +819,10 @@
       "hash": "c87eeeb23c64513ceded0fb43c2e9ec322d296955f0c090071d0e0f20f56a9af",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\query-cache.cjs": {
+      "hash": "d0a8386cc9e3ae344ba49146961df5a6205ec149f4f8f7986391d33ecec28e87",
+      "chunks": 1
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\code-indexing\\result-ranker.cjs": {
       "hash": "15d2be3b10b5680287dfb49a55b10abc285786628cab94f3784871b3fa0a3725",
       "chunks": 1
@@ -728,20 +840,32 @@
       "chunks": 10
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\config\\resolve-runtime-context.cjs": {
-      "hash": "2e1a4efda6a410355f8c2231dfab4cd34b40495232f9d4b6a8e65663dda0053f",
+      "hash": "142fa441756b5e034f9fd5728536aa3e21b477e82b0754c798ae7d8c75bad23c",
       "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\creators\\cascade-entry-writer.cjs": {
+      "hash": "a5ae8a81a40a9838a96281e28d8134486669a06b57a1811a2f108ff2746547c4",
+      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\creators\\companion-check.cjs": {
       "hash": "588da17bd37bf8d2970254a8e115c119bbf398efcd2fc39b8a8504ff974e5c30",
       "chunks": 15
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\creators\\creator-commons.cjs": {
-      "hash": "afcb7a099552fa5ae80a94146f74d56f9428dfe77db9ed6644290e782740562a",
+      "hash": "65dfdfa2f0d5cb3f60533659d5a00b56cdf477fd4b9207433c754397847f3ee9",
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\creators\\ecosystem-impact-analyzer.cjs": {
       "hash": "a3faa398e4ff62b6dc42752240381dac81c9517a0a8e55c760414cf1430ac535",
       "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\creators\\enterprise-bundle-scaffolder.cjs": {
+      "hash": "31ae8cdfc93c4f574059f114aecac1519a7e459c3e6f3a4cf5d4bccd0674461f",
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\creators\\enterprise-bundle-validator.cjs": {
+      "hash": "523ff3a6aa16c704dd0d26e17f233892d8a009b9d5f633da3f2e520e8a5e3913",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\error-pattern-detector.cjs": {
       "hash": "31d717f99c322085222d4002075658fc9e2a4442d77dfdfb8902e84d471fa285",
@@ -771,49 +895,29 @@
       "hash": "a8a0bb003f039e4eacb54650c247dbb46d3f33cd1f76d39f7369416da1cafbea",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\hooks\\hook-error-logger.cjs": {
+      "hash": "859c58a8abe9bf1e956e27605740c3474d3fa47df0bc2d4280d4001b4720c95e",
+      "chunks": 1
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\audit-trail-integration.cjs": {
       "hash": "0c20cba6b21866ae50b3f4deeef65f5093b1dbeee67fe8ca7529ec8306da8580",
       "chunks": 13
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\cold-storage.cjs": {
-      "hash": "1cf738779c3b61cd21d8365f303142b8770a8be5c1dafce4a504f1964b11a4d7",
+      "hash": "674fc5e05923cb2e4eface11c0800d1fc0ebe3cff39c179af15cf9f2ea00ac89",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\contextual-memory-context-loader.cjs": {
-      "hash": "a98429cd9ba9c119b7c82baf69ab32ef6055a63980f55b42529472be0e07246e",
+      "hash": "c030586f34a7e6fed41f3bd36773414a5a74cc6fd34027483f47d20f7e506b79",
       "chunks": 16
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\contextual-memory-search-fallback.cjs": {
-      "hash": "870210027892f7c57dd5c27af0756f031e6dda2e415f149e6296e091105ec3e8",
+      "hash": "abc8c2c0d9de26bab498d775302e8b2e670cd481bbb9a20e7ed50c25846205da",
       "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\contextual-memory.cjs": {
       "hash": "bea5b7644ebcc29ad8c2ddfa4e7460a2a6ca655ebddd637b37882a4e0ef8a134",
       "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\core\\index.cjs": {
-      "hash": "f01ff166ec27930da8201c0f0f12caf8ffb73dd157002b238f37b7103c090873",
-      "chunks": 0
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\core\\memory-extraction.cjs": {
-      "hash": "c23b9003350d72c5631c11036ff169809428ea82eb3ce802861c0669051bf182",
-      "chunks": 11
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\core\\memory-lifecycle.cjs": {
-      "hash": "d7dd0d8e1a1246007f8ea1c967c1d3ba465a4f91b38df34384ebe3f77a8264b7",
-      "chunks": 13
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\core\\memory-query.cjs": {
-      "hash": "5c4f4cd592f9fe347d5d95737830330af9719f42915cca2b9c2fa090a4b7e6b2",
-      "chunks": 15
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\core\\memory-storage.cjs": {
-      "hash": "94e6c7535530f5e5bda1ca6e650c8d6ef1484335e4cfb4586f99c2836cdddcba",
-      "chunks": 12
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\core\\memory-utils.cjs": {
-      "hash": "8229314b6cdf53e638ed3a63be79667dee8f611b2c005dcabb9ba78cc7876526",
-      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\entity-extractor.cjs": {
       "hash": "3aa486e58a0b2630ddd2575044f59d78dd379ae509ee99d8d60dd40dfee0c79b",
@@ -831,12 +935,16 @@
       "hash": "60f58d8ed809405064ce09964f631cc7d7b0b8355a7a9694561182829f6d4eca",
       "chunks": 5
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\internal-rag.cjs": {
+      "hash": "e2962ad385820f5cd01b44301a5a644201bda12dd3f6118f09ea03a34f7e89ec",
+      "chunks": 3
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\lancedb-client-helpers.cjs": {
       "hash": "0f76f4ca5793a3eb0fece79cb4226d7df86d3b13596de942d6fcb11da77af8e4",
       "chunks": 8
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\lancedb-client-impl.cjs": {
-      "hash": "e553b277f176b0007dbc024fb25a91219f4dd73750252e9fff4cb4586712402a",
+      "hash": "4449d2f2544f2ab14d65bc648977ac3dfd4646eb17a3f71ba94d8d8836c8d83a",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\lancedb-client.cjs": {
@@ -907,6 +1015,10 @@
       "hash": "f7045aa458e5d20dea62876f27e47765f5555077950ef11dcfa4a4aec8f2f343",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-paths.cjs": {
+      "hash": "e2cd73fd078ec3083f60ca01b2de107b37fe55d23df69bd3d76c1abdc1c6600d",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-retention-config.cjs": {
       "hash": "8fe5966e70a795f4b0174a4a787f82571afb173157e6a50622b7789795cc9999",
       "chunks": 4
@@ -916,7 +1028,7 @@
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-sanitizer.cjs": {
-      "hash": "c2429a11b51156bff8930137dc50745f657227a5967b8f8ba0cbe615321cc479",
+      "hash": "1480f962bd0e5decb0151554aabef7e5e76363e1b13ddcb3d457824c851b4411",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\memory-scheduler.cjs": {
@@ -983,6 +1095,30 @@
       "hash": "fe2cb0de4cc8064bf0483577a9cfa3172f0d784267b2d0dc438766b5ace5d4b2",
       "chunks": 4
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\_archive\\core\\index.cjs": {
+      "hash": "f01ff166ec27930da8201c0f0f12caf8ffb73dd157002b238f37b7103c090873",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\_archive\\core\\memory-extraction.cjs": {
+      "hash": "c23b9003350d72c5631c11036ff169809428ea82eb3ce802861c0669051bf182",
+      "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\_archive\\core\\memory-lifecycle.cjs": {
+      "hash": "d7dd0d8e1a1246007f8ea1c967c1d3ba465a4f91b38df34384ebe3f77a8264b7",
+      "chunks": 13
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\_archive\\core\\memory-query.cjs": {
+      "hash": "5c4f4cd592f9fe347d5d95737830330af9719f42915cca2b9c2fa090a4b7e6b2",
+      "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\_archive\\core\\memory-storage.cjs": {
+      "hash": "94e6c7535530f5e5bda1ca6e650c8d6ef1484335e4cfb4586f99c2836cdddcba",
+      "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\memory\\_archive\\core\\memory-utils.cjs": {
+      "hash": "8229314b6cdf53e638ed3a63be79667dee8f611b2c005dcabb9ba78cc7876526",
+      "chunks": 3
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ml\\index.cjs": {
       "hash": "8ac798efdb20cabce7e008c9f295bd697a56514ba0bfc4c92d84f555a9030fc6",
       "chunks": 7
@@ -1036,7 +1172,7 @@
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\plan\\implementation-plan.cjs": {
-      "hash": "79a05d80e801de9ecc1a9a7f874f03a5046ac1c070f69e527cc1768a27b5e8c9",
+      "hash": "481c5238859ceff0c1307047a7b5d6ff2ae79b891eb40807a992f95819bba392",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\plan\\progress.cjs": {
@@ -1072,8 +1208,8 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\reflection\\spawn-request-contract.cjs": {
-      "hash": "1476f019bf049a9fb27b1c56d7de52a0963614e378c3990f1ce6542f8c9174cb",
-      "chunks": 9
+      "hash": "6d355d00440b0ff2d1679b2f3a3b8cde6b4b990c2ded6a576573975f84b6e01d",
+      "chunks": 10
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\agent-registry-loader.cjs": {
       "hash": "7150de16dc187d207c5e9544733bbe181d70b1d6c736ab9960ed20bf77e178a6",
@@ -1100,11 +1236,11 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\router-state.cjs": {
-      "hash": "868289dfb45638dda3ad35c888675517bff42edf5ecd2f7c972529e812d1a0ed",
+      "hash": "ecab2a45f2bdff5f56b9fe28e9f7b8addc30e27dd375670f79015b116c096fa5",
       "chunks": 37
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-core-map.cjs": {
-      "hash": "522e9d5a705ce017a9e2222aca6214b4b610c0a734f69e8dced1de2df9d147a2",
+      "hash": "90b1770ab0fca52a0d198a5db85f43f0f9b31392397552f3d49bce46c2361647",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-data.cjs": {
@@ -1112,16 +1248,20 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-disambiguation.cjs": {
-      "hash": "d385d564631d607425548ea106e5ec0a76c6216b623110908257a846d96a6701",
+      "hash": "e5b31e67eac3b960e9583ed585d14912892af19a8cdb940745d0b1539c2bbc28",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-intent-agents.cjs": {
-      "hash": "16df8a031e349be17a0fae4f7d22d0ad26b8774aa059eedc968ed951f6a03362",
+      "hash": "52eda5d39e07159948cd695c400d6dcd520510d516c2dd45a8e4e2edb7548550",
       "chunks": 0
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-intent-keywords.cjs": {
-      "hash": "d8bdc25d74fe475cc343b38375061edc61c4e8104fe5dfb9b6795611ed495dec",
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-intent-keywords-data.cjs": {
+      "hash": "522036fa1678a2cc71f38160c4eef9783d01d742cf278a16f16b700fe26d3cfe",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-intent-keywords.cjs": {
+      "hash": "31dd5256312e296377e5229025d4da9f5845eb2f1bde7fee7b065d591b9b1306",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\routing\\routing-table-patterns.cjs": {
       "hash": "6de8e73e2ccf32d4b81dc7fa15c2a92e588aaacc41dfbbc9c00116298f827abc",
@@ -1235,10 +1375,6 @@
       "hash": "b1d9ead45b3d2740678fed2afabc69ad8fec86c615a70de9dd90a71d8ca6659e",
       "chunks": 7
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\orchestrator-tool.cjs": {
-      "hash": "579ea81050ee9c33a517dcb1c0610a97d6fa1e7400f680d633da1ca4fa7eb728",
-      "chunks": 2
-    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\skill-catalog.cjs": {
       "hash": "6ce040349c95cfdab069e5a071bbc5a70d3dc101ae58098691cbb07184710b85",
       "chunks": 2
@@ -1251,10 +1387,6 @@
       "hash": "983a03f28d97d5043dcf193d9e58b6ab2e86fba4f0d0296a7552795e107805a5",
       "chunks": 1
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\task-subagent-runner.cjs": {
-      "hash": "e719267f1928660ede9e795d99e7f72a83d85daeb60f5892f5544f573435f79c",
-      "chunks": 0
-    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\task-subagent-telemetry.cjs": {
       "hash": "88dc9be67624c24c738d5050ca16c4f015792f570a63660b37eb0625bc9b096f",
       "chunks": 1
@@ -1266,6 +1398,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\tool-set.cjs": {
       "hash": "b2342d77043a89d2e5e6d52c62a5669a4002fc6438ce8deade530e482f3c2d5e",
       "chunks": 12
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\tools\\_archive\\orchestrator-tool.cjs": {
+      "hash": "579ea81050ee9c33a517dcb1c0610a97d6fa1e7400f680d633da1ca4fa7eb728",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\ui\\formatter.cjs": {
       "hash": "34ce7d5d9d564f7dcae6b09da6b894c8362c75fd8d185e80a936770198e82998",
@@ -1312,7 +1448,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\compression-trigger.cjs": {
-      "hash": "0415820c0f91de9622a60125fbd04aee0695def3c22dd57a3a08585427584c04",
+      "hash": "3738c9f14424e2ef948dc3b4391a582f773271907f7b7e9acfb0e5e96c8aefbf",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\config-loader.cjs": {
@@ -1327,16 +1463,20 @@
       "hash": "4bd068f5a0052b65b11ec198111c53779bde448fb5fddc588fe7f08be5f8ebcd",
       "chunks": 8
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\context-pressure.cjs": {
+      "hash": "74e8bdf4401e3e747ab913f9117ce1980de79fd5b59e251d93ab5f43297edee2",
+      "chunks": 1
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\context-reset.cjs": {
       "hash": "f35d5970e5cee7d5bde24db3084af55b6c61b35156eb35f1ac0c810d56b7b53f",
       "chunks": 4
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\cost-calculator.cjs": {
-      "hash": "e9e79863a4b54ed07a052782cfbfbc4dcf3b1ff411dd676e03f5e1190aa0a112",
-      "chunks": 7
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\context-token-estimator.cjs": {
+      "hash": "b84b30f07c02808d6263639d4957d192266e5edb9298a4ac6a22c258964dcec0",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\enforcement-defaults.cjs": {
-      "hash": "144e3e2c644696df7343e6d2a2886e5b9171b70e55bcf5ee09b281f00223db21",
+      "hash": "45c069b14a123c7d1d74e3afa5f3b0fef7ee1af1cb8a33a5777f7f120e9fbce3",
       "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\env-guard-audit.cjs": {
@@ -1352,7 +1492,7 @@
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\feature-flags.cjs": {
-      "hash": "e465326aceadfa38eb617e9cf3bab2fb732aacd96d21927dd44df7e187fe03b6",
+      "hash": "24730cb86e8939135d5292b9825dd55ff995a05292b9d3cb78a4ea0ec4a4eb32",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\file-cache.cjs": {
@@ -1370,10 +1510,6 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\hook-input.cjs": {
       "hash": "e0f2a5e45de2f83cf34ba15373bf97dda2eb5590b0c5952c3b3b90ce00b70ae9",
       "chunks": 18
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\hook-logger.cjs": {
-      "hash": "fb8b931b308ca9be71f2df1515119e0edd91f5f050ecc51c99ab74ba5cf9f376",
-      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\hook-resolver.cjs": {
       "hash": "029d38bac41702ca92522246ae377668b57aacdfba49af6ace6a00a235b67a5a",
@@ -1403,12 +1539,16 @@
       "hash": "744b0288217d160157ded99be696c78430b67db813a930a3b109076b0a8506cf",
       "chunks": 8
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\markdown-table-parser.cjs": {
+      "hash": "981d3a5d52f0871db036b96b7d02a07d397b783dd2945f3b37d299819026be39",
+      "chunks": 7
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\memory-integrated-suggester.cjs": {
       "hash": "52eaa2dec8b429bcec5ae47b661acc083be9fd9292321b9a693fa4e74da53777",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\memory-monitor.cjs": {
-      "hash": "1e070e2130d6812bec25d1f8a1160041620a4ad28c48cc6beb4bde036ebd6c96",
+      "hash": "c47a455ace98047e8c00ba09a26cec884210c0b34cfbcedd2deff657c05e42e9",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\optimization-targets.cjs": {
@@ -1422,6 +1562,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\path-canonicalizer.cjs": {
       "hash": "cdca7e36da1450326d29b09d7719c9ff6f3d345add229f9bdc3acdc5111c7ace",
       "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\path-constants.cjs": {
+      "hash": "481d560080395a0f7a8f2d9aac4e2d315e144a2aad10800c041a9ea719a81d94",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\path-helpers.cjs": {
       "hash": "3cca891402034146e098f91e9df223a22e3a2637708084f59c290a8926c7a95f",
@@ -1492,8 +1636,8 @@
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\state-cache.cjs": {
-      "hash": "2544d6fffd1e3c1b7474299d407d5ab181d1009858e8676be50af0d3cea2ed05",
-      "chunks": 3
+      "hash": "1307e4ca1929f2e444a30a10b189171141fe6d69e80ac6a3410d6e45539df926",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\utils\\tech-stack-detector.cjs": {
       "hash": "2734ebb50f030fbcb5b943ae41011c4477af8c2c73842c3c88da77fb897657d0",
@@ -1512,8 +1656,8 @@
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\validation\\ci-gate-layers.cjs": {
-      "hash": "57fd3df94f6db3538e7951ae93f08ffc40a87c9ab16ad07f6f4d465b3de0e678",
-      "chunks": 5
+      "hash": "0d457c75d6578079cc034c4dbc13fb53f538a1b905933626d28034a9327e56eb",
+      "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\artifact-graph.cjs": {
       "hash": "7e4e03172f19384a990044e02a5cf58728a8d2c2ca79b2b47d0b5bd6534464c2",
@@ -1599,10 +1743,6 @@
       "hash": "5b40c60c668dbbd27a41cad7a570e0f9671e18da1bdf86b5e3e06315d75d2e1c",
       "chunks": 1
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\verify-workflows.mjs": {
-      "hash": "e2cb8f51c121f2247c56a3c40c2e4ac705199788f3001ec5736597614bf8cab4",
-      "chunks": 9
-    },
     "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-cli.cjs": {
       "hash": "a5438b58df86f4e648bd02260de915760f0ed528fe7a3dc3e58ced750bbe930c",
       "chunks": 4
@@ -1663,168 +1803,8 @@
       "hash": "0225afe28f4fc5b6a0145a67f58d5055a3ed9d8e3c9f79e19978ef39ef74323e",
       "chunks": 1
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\agent-config.cjs": {
-      "hash": "e0988f0718d14f6eae2f5f81f802e84fa14ab3fd60eed899de5cf8a71abb2e72",
-      "chunks": 10
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\agent-parser.cjs": {
-      "hash": "a1873f0a4bcc08ae0c0b141528d771611d5d1409c1283393a0053442ecaffe57",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\architect\\index.cjs": {
-      "hash": "02bb2a541f1dd903e90aa58c398ab742a707f372849c4a0abb42713b97f29551",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\base-agent.cjs": {
-      "hash": "a64e88354b4946fbb5a5c96d483870a94376f05ccd99e3fbc07b464551acb549",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\developer\\index.cjs": {
-      "hash": "54064341da1e9e38a4bd01002944741b207353214e0bca60b61b228403fc1b2a",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\factory.cjs": {
-      "hash": "f84833c1e7306f601ff1521a541414a3abe4291b9f81c1fb461e4bddae4e46ec",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\orchestrator.cjs": {
-      "hash": "b44263aac1b929495453680c4cfa85d661a4adb47e550cf1d21c97235ee3af33",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\agents\\modules\\qa\\index.cjs": {
-      "hash": "c6696c38306f5d7e121669fdf5c7c7ac815735e7213a6c31a93e5595ff208687",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\boot\\modules\\production-agent.js": {
-      "hash": "360cb5cd7353b11cfe14a08dbf9437bec0baac021446362666205054049cf412",
-      "chunks": 0
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\boot\\modules\\worker-agent.cjs": {
-      "hash": "924694c5d54498731692be58aa2a5bf84aeada0d313e1a87550d3ae100c73d71",
-      "chunks": 16
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\clients\\modules\\model-client.cjs": {
-      "hash": "f903d012d231438272cc7396c57a6a476680eff6730ad37a69729108ce059b24",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\config\\modules\\context-mode-loader.cjs": {
-      "hash": "970ed3310ae2243981fcc17fdaed4f1bbe33ae87065232e65c9cc79152ab4203",
-      "chunks": 10
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\config\\modules\\phase-config.cjs": {
-      "hash": "2e36ca7633bc9a3744e6e42ff0b3019b77fb31dfdf28842fdba4596cdbbef011",
-      "chunks": 5
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\config\\modules\\resolve-runtime-context.cjs": {
-      "hash": "2e1a4efda6a410355f8c2231dfab4cd34b40495232f9d4b6a8e65663dda0053f",
-      "chunks": 4
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\coordination\\modules\\swarm-coordination.cjs": {
-      "hash": "5bf26b9af67039eb1108238db4b894410ea0fab658203ec81ab3e93da89fd583",
-      "chunks": 6
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\integration\\modules\\conductor-gap-analyzer.cjs": {
-      "hash": "7a0d49f5d1ea391bb83532f98b445d8306f4ed02d6065eeda5ac27361fc22893",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\integration\\modules\\feature-compatibility.cjs": {
-      "hash": "c823489e847fbbb5b021826b4ac5e2c7fcc99ed724ff8b7e9eace0fc0be747c3",
-      "chunks": 5
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\integration\\modules\\migration-strategy.cjs": {
-      "hash": "d4597d1ef4864507d79a66b5da7dbffee37b8a5f4552bfa213c38f2c36f18cec",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\integration\\modules\\safety-rollback-manager.cjs": {
-      "hash": "2ded254772246f16578f18332e419e420a0d83f71c4409c8890602efdc4f1ef4",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\integration\\modules\\system-registration-handler.cjs": {
-      "hash": "06c1333fa0dff0dbef0f1666f27c643751f1921806a0f102ea5a70b039e8f0b8",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\consensus\\response-aggregator.cjs": {
-      "hash": "2f600b57364a73eddb6851907bc528ec3783cc50c910bc0f585747d0505aaef4",
-      "chunks": 5
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\orchestration\\lifecycle-manager.cjs": {
-      "hash": "44afb9b78d60133713e9c5cfc6ec7ded26c9fe747fc4404dc18583989487581c",
-      "chunks": 5
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\orchestration\\round-manager.cjs": {
-      "hash": "c807a89489c73999e66382c3b5726a4fe5c0e8bc756baf9591e7a3e2c2a8f7a0",
-      "chunks": 5
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\orchestration\\team-loader.cjs": {
-      "hash": "204f93183c783ab29f4ea48e436b909fe1b47f3ff396837a03229a3798c1f74e",
-      "chunks": 4
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\protocol\\context-isolator.cjs": {
-      "hash": "7f023f8dd8186cf86d923101e34cfdb6a67fa3ac2ad422f8b691cfc71a7c756a",
-      "chunks": 4
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\protocol\\message-router.cjs": {
-      "hash": "fd8c20fed3145be84cee34db674cd48f8b301496a01f3891df0b86f770521dd4",
-      "chunks": 5
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\protocol\\sidecar-manager.cjs": {
-      "hash": "b044ce07992955fa1d6a229f60343375f9da937db7342b77b6aac71056889fc1",
-      "chunks": 5
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\security\\agent-identity.cjs": {
-      "hash": "3cb25f3a56297deeb97364e4b2c9159f892beca00cdca1938b0b0af69c6790d8",
-      "chunks": 3
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\security\\response-integrity.cjs": {
-      "hash": "3a7ccaf6c91676b8eb4b3c3933f417b7c785b1d9651750b21b9dffc424732ed6",
-      "chunks": 4
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\party-mode\\modules\\security\\session-audit.cjs": {
-      "hash": "65462ef6f68358f00479890231685aa4b819e5de8b974df81d36d6c19c068092",
-      "chunks": 6
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\scheduler\\modules\\scheduler-store.cjs": {
-      "hash": "77abc3cffb55ec71d5843edaca10473c55bb96e3f4c83d85cd548afa9dee08ec",
-      "chunks": 9
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\scheduler\\modules\\scheduler-tick.cjs": {
-      "hash": "78fcd8f2f42a57cdd633a25aa03ba1393fca9e94e26adb422a9315f95e759c43",
-      "chunks": 2
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\skills\\modules\\skills-core.js": {
-      "hash": "7e8696002e6521b98346f8a97427ef41b240a2901f980ea8bc472dc682dcad15",
-      "chunks": 7
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\chaos-engineer.cjs": {
-      "hash": "e70179f5e4d89fedbb0c0790a91ceb33096253b414445e32c36b2c5a406ad377",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\failure-scenarios.cjs": {
-      "hash": "27f1c94d4db4a70bfe94974ee2159fd3561c7842dfd3d4e47cf4148535767893",
-      "chunks": 9
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\feature-interaction-validator.cjs": {
-      "hash": "de5e08a572ea225228d28a9047b64b3899880c2ef87b9fc44b5730333a6a591c",
-      "chunks": 14
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\integration-scenarios.cjs": {
-      "hash": "cddac2ddc3bf0c97ab161dcb3133e5bfb12b874c094192b6d7aac13c381480d9",
-      "chunks": 7
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\integration-test-suite.cjs": {
-      "hash": "881703a1e316f8ea9bee321b706a0b6c51bc1214bd479c840c5aed3805db7a67",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\load-test-framework.cjs": {
-      "hash": "1ab8cf4a02376628723a2098980871deaae979779d32ea32fc9506aa812a6858",
-      "chunks": 1
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\performance-integration-tester.cjs": {
-      "hash": "49a8b54a3116a2908998a142a6ddd319d454551bb4357fc9c5f353acc201a27d",
-      "chunks": 9
-    },
-    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\_archive\\testing\\modules\\resilience-validator.cjs": {
-      "hash": "e95fc5947fe4bf9ee7241558337a17ed29d5b52f1043b4ba9a3ac91fc11d34d6",
+    "C:\\dev\\projects\\agent-studio\\.claude\\lib\\workflow\\workflow-watchdog.cjs": {
+      "hash": "f9c61d9d22ed1f504203840b87f23c0bbce9fa79235a7f4d1715aa30c3b8be7b",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\ensure-routing-prototypes.cjs": {
@@ -1844,7 +1824,7 @@
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\scripts\\verify-hook-modules.cjs": {
-      "hash": "e4c75034bd812979fc7fc1c55a40a5a92a1222fc61c39804c246c701c52ef405",
+      "hash": "31ba0c1029d8fd11242c139e0727f854943dd8a6fc6fa961ccca74477fce84d7",
       "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\accessibility\\hooks\\post-execute.cjs": {
@@ -1880,8 +1860,24 @@
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-creator\\scripts\\main.cjs": {
-      "hash": "97eb4c6fe6bc7e47d2eedde3dfd7b77b567dd997e2d8316de4f16b2be32ce674",
+      "hash": "e6a53bec8e4da15e354dacd092c2c62fe901ad131be4a0b29ece2711e6a9510a",
       "chunks": 15
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-evaluation\\hooks\\post-execute.cjs": {
+      "hash": "de02e3fc507024b726e5c8e072e46c08f6f2b83f3f2173e4c0be857b43c2fb07",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-evaluation\\hooks\\pre-execute.cjs": {
+      "hash": "b8a26275cb153985bdc4f51ecfcb1d3f263920ef28dd8a98475c4df797c771d0",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-evaluation\\scripts\\main.cjs": {
+      "hash": "b0a3a10ebf232cca470a1db749dd7eefe964fbed47bbfecdca270378752781b5",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-tool-design\\scripts\\main.cjs": {
+      "hash": "ab01cb7e796556f90cc9b767144d8c9db7ea138b988f298bfa8312de78c626ed",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-updater\\hooks\\post-execute.cjs": {
       "hash": "240a5473eb1a22738319cd6d0b9bed30a9298720c2d14f126f4b8c1aba27a400",
@@ -1892,8 +1888,8 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\agent-updater\\scripts\\main.cjs": {
-      "hash": "94c4fb2c9158d2541ebe1cfd5885aaffbf701015766e60f06e219b9ef36469a9",
-      "chunks": 10
+      "hash": "92d3c9d8135c6b38dcb39844fbd4f06873f7389bd60f244814db16f237e9da87",
+      "chunks": 11
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ai-ml-expert\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
@@ -1983,6 +1979,10 @@
       "hash": "da593592221b623bc420b8fc42706c1be13ac95b3848fbf9df6aa282445414e4",
       "chunks": 2
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ask-questions-if-underspecified\\scripts\\main.cjs": {
+      "hash": "b2eaf74be8d954d905325470b955c2d85db2bf3306a74e0cd424f3e9bd61d98f",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\assimilate\\hooks\\post-execute.cjs": {
       "hash": "642d7c614118ef4bbdd0ab4019e5996f8e45159edbfcf3aae2a179658859a3a8",
       "chunks": 0
@@ -2017,6 +2017,10 @@
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\auth-security-expert\\scripts\\main.cjs": {
       "hash": "3553672467603b268b0032a1cffcd94c784895bb8d391b96ea89699602fbbc13",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\authentication-flow-rules\\scripts\\main.cjs": {
+      "hash": "3765dec5b2947263f8aa8caec02c4a683677269573e48961be74ec306fd8e2d8",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\aws-cloud-ops\\hooks\\post-execute.cjs": {
@@ -2055,6 +2059,18 @@
       "hash": "b076490e0ca14c80fc587163e31deb204e5c12cdfdc5e5a6d09fe22f0f4f1662",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\brainstorming\\hooks\\post-execute.cjs": {
+      "hash": "f40ebb94c1c41f25f88a22ca6fb7b15ca489b9b3be91c6e6280194ee307b8d00",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\brainstorming\\hooks\\pre-execute.cjs": {
+      "hash": "6adb4dfd606395d4390316e6010ffe4e4342bf57655e2572f7fc961287467d63",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\brainstorming\\scripts\\main.cjs": {
+      "hash": "6be17bc9698109e1da96a06063152099e7b388b71caf85420e90509c67a7b48c",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\build-tools-expert\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -2065,6 +2081,10 @@
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\build-tools-expert\\scripts\\main.cjs": {
       "hash": "44541f8be61cd39a7823101aa99e8f94a6d8f4c0743173fefb748cfbf14f35a5",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\building-secure-contracts\\scripts\\main.cjs": {
+      "hash": "82a6cc5ac0bc310e1b60df92f8ea7dc90f73f94080031b729dc6629c568470ed",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\checklist-generator\\hooks\\post-execute.cjs": {
@@ -2187,6 +2207,18 @@
       "hash": "2903ec16fe69cf8a434db24676f7abf6752ffd1805e8d7ae5f2600dfa2613041",
       "chunks": 7
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\commit-validator\\hooks\\post-execute.cjs": {
+      "hash": "a2239625a33cd9bd24a29e7d45ed11dd7c4ee1dfedefc82cfbcb728a9e7d7123",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\commit-validator\\hooks\\pre-execute.cjs": {
+      "hash": "59c9e11e20137f2378305c1ae3217f6b12862decfb634d5f7c1f3006c30e8a12",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\commit-validator\\scripts\\main.cjs": {
+      "hash": "b384a8fa1650c3d3df53ac8a3838bfd9a8c25923a13b1fbaa8ace6584d0f3680",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\complexity-assessment\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -2283,6 +2315,18 @@
       "hash": "b7ff01844ef34aa56d173ead7d457f48b62f2a81d6bae77ad20b0330879e48f8",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\content-security-scan\\hooks\\post-execute.cjs": {
+      "hash": "e00640e0444313e31c7ba051302dd34b8e465e8618b88ec27fa45304ffcee6ac",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\content-security-scan\\hooks\\pre-execute.cjs": {
+      "hash": "0e3c5d3d96379d6721ef5449019e3660193ae77c2520edaf8b70480ebf935dd2",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\content-security-scan\\scripts\\main.cjs": {
+      "hash": "c87f595888981753a4d09d9dd62f8e5465c9076d2adb37bd30782904f0e0fe6d",
+      "chunks": 15
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\context-compressor\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -2294,6 +2338,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\context-compressor\\scripts\\main.cjs": {
       "hash": "14b4d31a3b46de3e91e9a546b215319813fd973f0b329de0255a010c6fd22b0b",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\context-degradation\\scripts\\main.cjs": {
+      "hash": "18bafbad6a24c8ce585a40cca084a25fd9dffc4909bfed525d7fc131cc7f0916",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\context-driven-development\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
@@ -2419,6 +2467,18 @@
       "hash": "e73242b7d9127bb736fa1ddea31aae1aeb2359ed3e8ba3f8392017b903b2f4bd",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\dispatching-parallel-agents\\hooks\\post-execute.cjs": {
+      "hash": "ef32818917d3405cd4cd43909beab5fe21d22f76d9e3b129146cc79cd386350a",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\dispatching-parallel-agents\\hooks\\pre-execute.cjs": {
+      "hash": "4a16077586effba4f2ca2a9bc24752de2f45c245700158e9d7c70e31edf498ca",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\dispatching-parallel-agents\\scripts\\main.cjs": {
+      "hash": "b062b23bb8b8d518b614b045c1a2f44ad1df956f1e638355ab9b434c99b8b19a",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\doc-generator\\hooks\\post-execute.cjs": {
       "hash": "a3d846a3d02195352f30b34ec28d3a32ddc3d05001e3cb8b513ac3cf41374620",
       "chunks": 1
@@ -2467,6 +2527,18 @@
       "hash": "4f3beac77b72918074c9b9b9c88fb051ee43b204a7c47f53465312811c536191",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ecosystem-integrity-scanner\\hooks\\post-execute.cjs": {
+      "hash": "b18788311957e14769df479b697a5efdd191187948bf17276bd08fc68e49f019",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ecosystem-integrity-scanner\\hooks\\pre-execute.cjs": {
+      "hash": "07e0535718cbf706e9fa781102c43056b28b658b66d2d02379bdbafa97018551",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ecosystem-integrity-scanner\\scripts\\main.cjs": {
+      "hash": "32c232ea2c0336fd0e91d9f63358cc0adae5c93809108cac6e510090f3508269",
+      "chunks": 1
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\eval-harness-updater\\hooks\\post-execute.cjs": {
       "hash": "62c5a6a9ec884ced3b4c2f61a36098ffab3fb5fe06927659a8c1f1916d045a74",
       "chunks": 0
@@ -2503,6 +2575,10 @@
       "hash": "8f6a7cd0a6f019de2a9bea8d695c176abf989500fc45423a3733f3de5ad87f46",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\feature-flag-management\\scripts\\main.cjs": {
+      "hash": "229e33d401a784bca25cc3b6ed0b3000ce5f9ce7186df90013583ae4678d6274",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\filesystem\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -2514,6 +2590,18 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\filesystem\\scripts\\main.cjs": {
       "hash": "b9d83c4023b25063b42f066d608159c2baed0e3b3c7d108b789f12d057d232e7",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\finishing-a-development-branch\\hooks\\post-execute.cjs": {
+      "hash": "bff1206f328a8762e23317fb264ee14a462e6424467afc90d2e31b1968cadfc9",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\finishing-a-development-branch\\hooks\\pre-execute.cjs": {
+      "hash": "f58e48aeb7ccc850ab65f3d1b756a2dfdde05300dd869d6b903050bac2506b6b",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\finishing-a-development-branch\\scripts\\main.cjs": {
+      "hash": "ff6bb9ad911d773c9184189664cceb5687b23bc67ef6c7ff5f814f518632cc70",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\form-and-actions-in-sveltekit\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
@@ -2911,6 +2999,18 @@
       "hash": "a996d12b593e4318aca21ed2488aa5ab0a713529313b104fe28a22dcb98a4418",
       "chunks": 5
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\memory-search\\hooks\\post-execute.cjs": {
+      "hash": "be49b40609d351dc516fac166cb94e6cc5abc7cbf8c8a3ca66df9ccf4b6a7a0c",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\memory-search\\hooks\\pre-execute.cjs": {
+      "hash": "41b864931df919434eb2c3d36b493deafcc8da3b0b03360d76e8b3eef8d0e2a0",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\memory-search\\scripts\\main.cjs": {
+      "hash": "6fca67ee7a8a810e80f2ce1c31441212273dae5f8986c25ffd8197e18cfd03fb",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mobile-first-design-rules\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -2934,6 +3034,18 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\mobile-ui-development-rule\\scripts\\main.cjs": {
       "hash": "db26d4167c4cf23a2128b1d8157bd6111fb223f81fd511f1d90ef28d48748c5f",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\multi-agent-architecture-reference\\hooks\\post-execute.cjs": {
+      "hash": "abb48a761aacdc1d4da59eaf17209f3f7448cba70278dd5e5a4f355bdc95b212",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\multi-agent-architecture-reference\\hooks\\pre-execute.cjs": {
+      "hash": "69d5930c13c8c494a81354c26b6e9613b57c1a4d1b25c7077acdda8e34f1881f",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\multi-agent-architecture-reference\\scripts\\main.cjs": {
+      "hash": "496a8c4014f42e13ea2b6f6ee73c997a41cc8798864f1cf15706b5b699b0f914",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\nextjs-expert\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
@@ -3103,6 +3215,10 @@
       "hash": "bcc9fa8eae60d1116841e9b4f5ea08e61b29e6699e9d86f83b6b26c96bd118f9",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\property-based-testing\\scripts\\main.cjs": {
+      "hash": "b145d3c8d917da88002c78299cc5e8e8834378e1c097bd732f8679eb3aa77c97",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\protocol-reverse-engineering\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -3120,11 +3236,23 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\python-backend-expert\\hooks\\pre-execute.cjs": {
-      "hash": "9b6d5d57615074a254f82c2ffeb44b496abac8991de4f16ee2cdf716b18f7b73",
+      "hash": "88bd59abf62798da13b3aed03e3d7d9fe0247daad06ba902f46794f4a4badea2",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\python-backend-expert\\scripts\\main.cjs": {
-      "hash": "abd38e0fc9aafe25dd23e7ba204b7cedb84483911173e55f36389e9a62644fa9",
+      "hash": "eea893781ce42940ebe46a3bd02598f4a16d8551162074f2be269fda94f1f957",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\qa-workflow\\hooks\\post-execute.cjs": {
+      "hash": "1332b6bce58439572a92001a8db2f7bbb75db6f498ab5b99756a36e662a70e3a",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\qa-workflow\\hooks\\pre-execute.cjs": {
+      "hash": "0f05e4874cbf238a6a9862adf7ef6e28c65f85c254d317b39ffe29122bf0e7f3",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\qa-workflow\\scripts\\main.cjs": {
+      "hash": "d275a030676fb7349ef3c33bb75c2749663bca48e89ad4a9b3e18752253ee66b",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\react-best-practices-vercel\\hooks\\post-execute.cjs": {
@@ -3175,6 +3303,18 @@
       "hash": "d7014ccaeb18e6abdd7e6cf742857d35eccbbc6230c361de7a82edc5b18c2961",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\receiving-code-review\\hooks\\post-execute.cjs": {
+      "hash": "27a2aa59ad88929c853028d8aecf277fb8195c5df92ffe2b78264487dddfa2d7",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\receiving-code-review\\hooks\\pre-execute.cjs": {
+      "hash": "c307482bd833496889eefecbc880c3eafde84fa6f30757fc8f0549c22ca97903",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\receiving-code-review\\scripts\\main.cjs": {
+      "hash": "0b7c9db62ed45e6952b1e9b1ca883747885b6ca061b2fe725568d70fa88f25da",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\recommend-evolution\\hooks\\post-execute.cjs": {
       "hash": "611a30c5f9c57696e5400eb2b685769b8a6358992210c3ccc39dafc5b0f9205f",
       "chunks": 1
@@ -3198,6 +3338,18 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\recovery\\scripts\\main.cjs": {
       "hash": "f539bcb721ddd61d747b2f1003d10c3f74c40a2718a668b4d001babf828cb748",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\requesting-code-review\\hooks\\post-execute.cjs": {
+      "hash": "4fd1768a64f3b548f88bc8ef31fe9a7bd574474d69e3447f1d62f7b3a71cd420",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\requesting-code-review\\hooks\\pre-execute.cjs": {
+      "hash": "c1cd56a679cefcc6c0a7bed2080d296b07ffe5672983b3ba4e2a4fb060eb60f5",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\requesting-code-review\\scripts\\main.cjs": {
+      "hash": "5f95223202a70d0e407b66bf7d26eab86147b3293952146d46045a34be6edf2d",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\research-synthesis\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
@@ -3284,12 +3436,12 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\rust-expert\\hooks\\pre-execute.cjs": {
-      "hash": "9b6d5d57615074a254f82c2ffeb44b496abac8991de4f16ee2cdf716b18f7b73",
-      "chunks": 1
+      "hash": "ad6b95f49934aa30d1f5d57960cc68883d36e0045a8e16ad976d7957decec2ec",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\rust-expert\\scripts\\main.cjs": {
-      "hash": "e0074b5553d714a754741bd8f9586e5c370e974306d1c0944c99ebf4f8142d0a",
-      "chunks": 1
+      "hash": "a68f390413964e716ae5e913f8f17bd142db53e4508473dfa6302b211d099a79",
+      "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\schema-creator\\hooks\\post-execute.cjs": {
       "hash": "6491ad32a85cef69a6d4b4e9f13bf5751dbeb11ec9e2b360ab2ecdb763c447cc",
@@ -5855,6 +6007,10 @@
       "hash": "458de883ed29820466825b8988c50b97b131b51ee13b4b70328459fbe3ec8331",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sharp-edges\\scripts\\main.cjs": {
+      "hash": "f1180ba2cdcfaca742791be342754996200584a8302d431468c8783de06dbd83",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\hooks\\post-execute.cjs": {
       "hash": "84f75060f5f42c53fce4296efcb1abc54a077987bf23071ec070930e6a619281",
       "chunks": 3
@@ -5884,7 +6040,7 @@
       "chunks": 12
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\create-actions.cjs": {
-      "hash": "6644d9bb44d5e0f9c6f1fdc193aa2a50d70da2068aff46a0497846cb4eee4112",
+      "hash": "f58a86beac4e24dfc18c1a096a1a4d58c872dfadd329bf5413a2a33dc7218812",
       "chunks": 11
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\create-templates.cjs": {
@@ -5892,7 +6048,7 @@
       "chunks": 15
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\create-utils.cjs": {
-      "hash": "18342a855daf930a76d2510bf837a605a90be6a6a28a81ee8a5b4a33210218ab",
+      "hash": "9aedc36e250b8e0925d18745531fe93eeb6ef39e668fbac88202204aa2e32ef1",
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\skill-creator\\scripts\\create.cjs": {
@@ -5959,6 +6115,18 @@
       "hash": "23e65e37e3c4ed63d370830884b54ab8a5fa0ab2bdf8d84569c12a55e2323813",
       "chunks": 2
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\smart-revert\\hooks\\post-execute.cjs": {
+      "hash": "8ea3a42ac70ef855fc70172a033a363289d2e8e258afb082291b3a3dc5b76edb",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\smart-revert\\hooks\\pre-execute.cjs": {
+      "hash": "9508fa1b05fae34517e09360cd281a387048774121c13721d72ffb5077c5c916",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\smart-revert\\scripts\\main.cjs": {
+      "hash": "cebfd0981a992c9b6b48d2807c886d86de07059e142c97e2c143d40da3e2e3b7",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sparc-methodology\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -5970,6 +6138,18 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\sparc-methodology\\scripts\\main.cjs": {
       "hash": "e25020e783fc77d526cccc5a480edecfbe4e5b30cb0736e56c94c4a0f81cb81b",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\spec-critique\\hooks\\post-execute.cjs": {
+      "hash": "d5a10845d674bf00aaecc81d2533b37330fe6bef991983204c910742624bcfd0",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\spec-critique\\hooks\\pre-execute.cjs": {
+      "hash": "59af6d28ce7cd28c1bc8b2ff6cee5ba91a950aaa0b82638b486643e97bce8d18",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\spec-critique\\scripts\\main.cjs": {
+      "hash": "ff0310eabb63e10a2de81c97ba5210031857b7a8480c07f803fa4f9d5bd1391e",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\spec-gathering\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
@@ -5995,6 +6175,22 @@
       "hash": "ca9cb81c336d98933a13dbb2d81cabaf0b72f018fa5f6ce6e8baaa57564bcb00",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\spec-to-code-compliance\\scripts\\main.cjs": {
+      "hash": "474328314cab001d8f30c1a83f0f8df6c32267efa2c3fcf1f14aca35f575e124",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\stale-module-pruner\\hooks\\post-execute.cjs": {
+      "hash": "a7ef5ec3b01f33e58f62454cd394de53ef6f6f27677a157853b384a33c62a14d",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\stale-module-pruner\\hooks\\pre-execute.cjs": {
+      "hash": "786c9d79df1d2f0052dcf6041de2b76813524928883a541ed4fed054835fdc18",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\stale-module-pruner\\scripts\\main.cjs": {
+      "hash": "b2b7bc7bc5fbf3090928092a41eb750a3c4d660d0b1493e1adbaede444a5543f",
+      "chunks": 2
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\state-management-expert\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -6019,6 +6215,18 @@
       "hash": "2c51b7e37d80e29a7b6c4abcc13b0a2fd2def4737f121e21be134166c7b5fb76",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\strict-user-requirements-adherence\\hooks\\post-execute.cjs": {
+      "hash": "05b2e4869c1033e45cffb7c04bb56958f980dfb34bd37eed3a77aee29221bc58",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\strict-user-requirements-adherence\\hooks\\pre-execute.cjs": {
+      "hash": "66154f5d0a11ef44bb8a60f594050536730c605de6d4f9bd1e62758d99fa0aa9",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\strict-user-requirements-adherence\\scripts\\main.cjs": {
+      "hash": "1107f2f0948fb3b784b291046f983f0f5fa9b9cde344b88849ff2c71b4c053b4",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\styling-expert\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -6029,6 +6237,18 @@
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\styling-expert\\scripts\\main.cjs": {
       "hash": "503823d1211d6c72ad621c096ab7ff4a0462f054f384641762396139690b0a7a",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\subagent-driven-development\\hooks\\post-execute.cjs": {
+      "hash": "56ed4f5a4c643e5d4891eae59d2e013cea67eae1073a652428a321fb5f4f3e32",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\subagent-driven-development\\hooks\\pre-execute.cjs": {
+      "hash": "eade42d738fc5fc138b215855a9705f1ffbcb97d3867cbdeff4525da09fd4b2e",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\subagent-driven-development\\scripts\\main.cjs": {
+      "hash": "8d9af350118522a60839f0bbbccbe6e1617aa02e60f5c55dc41e810b308b1933",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\summarize-changes\\hooks\\post-execute.cjs": {
@@ -6240,8 +6460,8 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\token-saver-context-compression\\scripts\\main.cjs": {
-      "hash": "1dd535cd47b619d8dbc63e9ee8ac37006583829b826bbce4296aad92dc33e59f",
-      "chunks": 13
+      "hash": "83b62fb3c5b8aa6eda1f3b0392ff6575719e07be1b669277e8763e9dbae6bf5b",
+      "chunks": 19
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\token-saver-context-compression\\scripts\\profile_tokens.py": {
       "hash": "17c754345b5670a12f9d9d8d5bccc0d9e787b24adbd528d896afa90fae325790",
@@ -6344,7 +6564,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\typescript-expert\\scripts\\main.cjs": {
-      "hash": "9efdaa8c5ab901d3873000caad111ce0469ee9192432d2248278253667130ac1",
+      "hash": "c16016c3bdc7ef73de34e07c639319250d24c6803065254a7cf54d12a09e88c3",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ui-components-expert\\hooks\\post-execute.cjs": {
@@ -6357,6 +6577,18 @@
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\ui-components-expert\\scripts\\main.cjs": {
       "hash": "caec660a3b0411e1864c394d9d2fb7c27655635a5458775f02851721ef41ca93",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\using-git-worktrees\\hooks\\post-execute.cjs": {
+      "hash": "3967271accd72aa1e792b3b46ce77571fb59c8b98ddd38aab6a01f9be8443bc1",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\using-git-worktrees\\hooks\\pre-execute.cjs": {
+      "hash": "2b6b2151b29ba59087184972f31c5a2e2cb7646ed10f46ea7b42b058c2c08171",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\using-git-worktrees\\scripts\\main.cjs": {
+      "hash": "e8f029354c0a13cbab366ba2802d72d6686874174fcaded4aaab358adf9e01e0",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\variant-analysis\\hooks\\post-execute.cjs": {
@@ -6395,6 +6627,18 @@
       "hash": "c5cbb1de44c79d851ac7c6f4d142c1787c589922c919a1fc01e2fdd26e4c5856",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\wave-executor\\hooks\\post-execute.cjs": {
+      "hash": "f4afd03a6efda62e1d0fcc2d985a10e79afb2d13c39c42ff185771b46a9d6bcc",
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\wave-executor\\hooks\\pre-execute.cjs": {
+      "hash": "b08abf2f695e36f560b2786b421ec8dfd8e3cba00bb70b402ecd8e8ae04247a3",
+      "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\wave-executor\\scripts\\main.cjs": {
+      "hash": "0b6eb09417c94e66edd9c7d1f46f7a442045e8b9ec027a57bf159b451488e3ca",
+      "chunks": 3
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\web-design-guidelines-vercel\\hooks\\post-execute.cjs": {
       "hash": "e6d45fb008b2b18b278b2456bbbc73a70b7389a7569ee0a67dbf74a20aa00481",
       "chunks": 1
@@ -6418,6 +6662,18 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\web3-expert\\scripts\\main.cjs": {
       "hash": "eab07fa1223888b80f7e48a1154ec794d62f4f5c03859357c776500487b1138f",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\webmcp-browser-tools\\hooks\\post-execute.cjs": {
+      "hash": "3e715dc3e3a31279470048fc4bb4181f4b1faf343ce6ef1bb971d337b4120c7e",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\webmcp-browser-tools\\hooks\\pre-execute.cjs": {
+      "hash": "3b100e09c05b510bbfdb108039bcd0a01749ba84e033039751bf51024ce0abd2",
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\webmcp-browser-tools\\scripts\\main.cjs": {
+      "hash": "635d6ef555a0025a7eb1542f9b9d932c3aa8843078919eed123d243302d621b6",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\workflow-creator\\hooks\\post-execute.cjs": {
       "hash": "d7c9b721e1357e27f23aaafa720de615d498295036866c71451b62fc5bebd639",
@@ -6470,6 +6726,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\writing-skills\\scripts\\main.cjs": {
       "hash": "0c7a136cfb2b9296463f95e21a2546fe6c705bcea1332ced01fd56dc98708f5c",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\skills\\_archive\\artifact-updater\\scripts\\main.cjs": {
+      "hash": "4c0c350d07ebb49b53b6013889f767c156b12e78867e5457e5385673ce341d12",
+      "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\skills\\_archive\\dead\\aceternity-ui-configuration\\scripts\\main.cjs": {
       "hash": "077e2da07196fb0d6947f914ddd0955710388a995e2ff2cf7664a8467f0d9036",
@@ -7091,12 +7351,16 @@
       "hash": "fa5bb79aa3f83e559037c1018e99b07ccae2259b6644de673527faa31e719d94",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\agent-evaluation\\agent-evaluation.cjs": {
+      "hash": "b22af3d0dd211735f2dfdc9f8afbe954092efb8762e7b1ad84ee70d5b6eb2eca",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\ai-ml-expert\\ai-ml-expert.cjs": {
       "hash": "8a53a82fef8813b1a5176bbe84cbaa48f9a81a3a5c34059c9f54b97da0465bb7",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\ecosystem-assessor\\assess-ecosystem.mjs": {
-      "hash": "dfac4e117c253d4adb17ddbcd5706957f5868fed439690405bf588c3b6fb5827",
+      "hash": "cc5e926928654194370e914212e039453149437c26adb0de7b8f0929e579cd0d",
       "chunks": 10
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\ecosystem-assessor\\ecosystem-health.mjs": {
@@ -7104,7 +7368,7 @@
       "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\ecosystem-assessor\\hook-assessor.mjs": {
-      "hash": "6b1c0d252451f9e237d2a316f2f921d3906df8dbae5bcba732f91824db65c7f3",
+      "hash": "55948b69e92aa9fa225549db4a286bbf0f54575388e12688a18e643fc42df361",
       "chunks": 13
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\analysis\\ecosystem-assessor\\mcp-discoverer.mjs": {
@@ -7187,6 +7451,10 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\brainstorming\\brainstorming.cjs": {
+      "hash": "dcd585c24ba9926f72165be0ced22c42cd9a8d1d760861a258fd04aa43a56512",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\build-tools-expert\\build-tools-expert.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
@@ -7210,6 +7478,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\backfill-agent-template-contract.cjs": {
       "hash": "af9991341ea3d72177bee4ae794aefa882a9acc7878bf5dec4547e77460a5c01",
       "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\backfill-skill-verification.cjs": {
+      "hash": "b9df8d4762bf9e284ae254c74f5d2ff240a34a1a82534196e624ca7338e5ea6a",
+      "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\bootstrap-artifact-graph.cjs": {
       "hash": "4d39cfeea19afe3a26d3af24d351bf810cab8af9126683a99c54b276e437d3ee",
@@ -7260,7 +7532,7 @@
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-skill-index-definitions.cjs": {
-      "hash": "dcdec6d9ac8cec3e6ad40488d256a9485385afff94f3eac24d9c8e7ab07a74b2",
+      "hash": "8b054e8fdcdc07265c1f8088df8fceaefb737219386a20e1234b960944a2cecc",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-skill-index-validators.cjs": {
@@ -7268,7 +7540,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-skill-index.cjs": {
-      "hash": "0a9e188c2bf787a4ef18e830c060dcb3ef1588368b938cb0c5090e5478575975",
+      "hash": "468e21c48f954c2bcf5217be93f0e9390279531ae5d5b111f05d9247c859cf7d",
       "chunks": 15
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\generate-tool-manifest.cjs": {
@@ -7280,19 +7552,15 @@
       "chunks": 15
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\git-notes-verify.cjs": {
-      "hash": "bdfce67473f6f711df7c9e2857d4b41ed95a83a52cef326bb09f4ef80dfb79b6",
+      "hash": "6d832b7363a5183e41b3d5361f6ab7e6176b171a896757713569e227663e0acf",
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\hybrid-search-daemon.cjs": {
-      "hash": "3c3bc6db34157a806e8560c8b7baa2c65805297bb99dab8b9b2a06d2431190e6",
+      "hash": "9c4862b521784bf96e0e55cbd2b7690ea29e082927972019b3d4046651acde8f",
       "chunks": 4
     },
-    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\hybrid-search.cjs": {
-      "hash": "db5eb921c89f8f0f3690cff33c158223e07227f0f560b480d3602fae8f777668",
-      "chunks": 9
-    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\index-codebase.cjs": {
-      "hash": "f4fe62c6e557140b4c9262b52a83e334ce17c05ae6d794be3bd948aafc517781",
+      "hash": "c97118b9a4e5ca65c0dbcc05b26a55efed1021ab3bd9963310dec8d393c56b2c",
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\init-memory-db.cjs": {
@@ -7351,9 +7619,21 @@
       "hash": "f8f7da4228ff831b484f43e7234394b2e9bc8da2b5131310fae4573ae9d24dbf",
       "chunks": 4
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\process-stale-skills.cjs": {
+      "hash": "b902cc74c076450c6085107a0150c90dc123cb6fefc7124dd180f154ff733d61",
+      "chunks": 3
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\profile-hooks.cjs": {
       "hash": "9e36ac86c534d952a992765ee2d637e8f23586b1d390dd07f43708d943fbf3c8",
       "chunks": 7
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\reflection-degradation-alert.cjs": {
+      "hash": "9e82d9367a80a1433038701d297b3b20d4444a9b780117a5a9d212267ea1429e",
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\repro-pre-completion-no-summary.cjs": {
+      "hash": "2bab16845dde0c78318c0b5125e429442b126248517d8f0131fd559057daa7f9",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\retrieval-quality-eval.cjs": {
       "hash": "0b1e567df05c3e21e5deee14e9b8d2582b25af5fd098d3e8d489277f4c34f7e6",
@@ -7366,6 +7646,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\run-memory-soak-regimen.cjs": {
       "hash": "5b4a1487ca8d9223301e5245ad8d61cc2bb2091805a7b0ff680721ea9c3ed35d",
       "chunks": 6
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\run-skill-updates.cjs": {
+      "hash": "3505ad991cf6b67778d7047a9b9723dd5def5971be13241e876bae7ab7edd755",
+      "chunks": 11
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\runtime-health-snapshot.cjs": {
       "hash": "391ad5a9d1a034e8d3f472214dc956742b49f949098094718697d24f8f7decfd",
@@ -7380,16 +7664,32 @@
       "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\security-lint.cjs": {
-      "hash": "8abf67f0bee09c8c9e32ecb005a25d667f89e28d450a75b2abc7b2b00a3e6661",
+      "hash": "f565532c81a0fcbf0e3071eb6a25831722c9445be630b88fe6ef51ffa3fc0f21",
       "chunks": 11
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\semver-bump-calculator.cjs": {
+      "hash": "29cac3915d066e2fdf7e8cce70b92406aa581bb324466c4f531f735c2f876bc3",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\skill-freshness-report.cjs": {
+      "hash": "8fdef28b0cdc847b906447d6398ed9d8d6cf1c9511201dff83d977297812dcee",
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\skill-update-headless.cjs": {
+      "hash": "8bfaca811ffefc2771fe3c0dd55969f65d4b15e74042d963de45385f9a089271",
+      "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\spawn-assembly-metrics-summary.cjs": {
       "hash": "8a7fc57a5b30219af1323822c76e844f962df865f5d8349262b756397ee0fa80",
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\sync-memory-json.cjs": {
-      "hash": "7945f6db6d3815d8c80430442812d4f06a0e345ae445f33ea4e2bf12f52da0c2",
+      "hash": "80eb9e68ff9b801382011fa276ca9923c3181658c6fa8fac3351f47e47ac6b5c",
       "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\token-saver-stats.cjs": {
+      "hash": "df6684e8302bc62f82e6dd3ac060f9a4f0b84a0a6036ddfa5d8bf234ca34ac32",
+      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\tool-manifest-definitions.cjs": {
       "hash": "75d9b3e8bcb70dc1082d1fffebda82c23fc2fb01ab8e56683ea03fce1a753958",
@@ -7398,6 +7698,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\trace-query.cjs": {
       "hash": "36a495d60a57dd80f58372f3846253df4adaef6263987214a133cd3c202c7018",
       "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-agent-ast.mjs": {
+      "hash": "f2621a55799e0a93d2413cf6d534252d4c65b05c3a2eade912384a992f87eb32",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-agent-skill-references.cjs": {
       "hash": "877de8e28c21de42864a6d1a7986ab68ca9360df36679e54f2d7b02f666bdb90",
@@ -7420,11 +7724,15 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-creator-ecosystem.cjs": {
-      "hash": "c34f42b9d67235f3affd35aacfb0244e366ffa09c343bcf76fa02edbc6c0f019",
+      "hash": "e20e38a06ccd437c99d08fd38b449b8f65e615f5a81eca73fa40cdce429c4ecb",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-integration.cjs": {
-      "hash": "263b16a1e3b84d9f0e9aee68a7cc1daff357515696d103286e9ad5132f01a5ff",
+      "hash": "28ce05e108f1ba5db9ec793ae67e4ca9622af7984838c3ec2171ab447db1fef3",
+      "chunks": 20
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-skill-agent-consistency.mjs": {
+      "hash": "db30bcb03057186fe706affba0ac4894d63a9c12f79cbfd69972a273fc5c3164",
       "chunks": 16
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\validate-skill-ecosystem.cjs": {
@@ -7439,6 +7747,10 @@
       "hash": "250e9381af7aa429b225cb983eaadcd0f2ba7ec7b0ff566e48bb03bb7dfab19b",
       "chunks": 2
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\wave-executor.mjs": {
+      "hash": "69a1e482b0da2bd2b83234152781196fb88120c975abc01b5d3547b5bc1bff56",
+      "chunks": 9
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\weekly-error-analysis.cjs": {
       "hash": "7e0fbcfa49bb5a4e17606e2209b01c0ffd26d69cb674661a4a88f152d8fc199f",
       "chunks": 16
@@ -7446,6 +7758,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\worker-metrics-summary.cjs": {
       "hash": "a092c78f31d41f5a29afce6890353f1ac0c98a40d4adb80bb2dbe8f4d7bd1d91",
       "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cli\\workflow-watchdog-run.cjs": {
+      "hash": "9f5d5c5ed27a7ef4d9da5438feb50cd81eb5f4a1425a8408377c088541220d08",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\cloud-devops-expert\\cloud-devops-expert.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
@@ -7474,6 +7790,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\command-creator\\command-creator.cjs": {
       "hash": "e1f825e671b086fc9d7d93c35d57f9e62b9814c2946b2616507674c7c9787ac3",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\commit-validator\\commit-validator.cjs": {
+      "hash": "5727b3c26074e96e09b87974acfa916a06a586b645340ca31e63b5658ac83eb4",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\complexity-assessment\\complexity-assessment.cjs": {
       "hash": "251dcf5e5e32d63e84d96f6b26804ad3ebaefa7e441f9004db7a099cc851093d",
@@ -7505,6 +7825,10 @@
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\containerization-rules\\containerization-rules.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\content-security-scan\\content-security-scan.cjs": {
+      "hash": "4a4bf62f515973ed4951dd4a091d4786d702a546c5fa58b0d38992d72bc6c03c",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\context-compressor\\context-compressor.cjs": {
@@ -7567,6 +7891,10 @@
       "hash": "8efd000a8107d8c6758dc0fea68ec0a8e9f90beef05bd0a152189a523aed7fd7",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\dispatching-parallel-agents\\dispatching-parallel-agents.cjs": {
+      "hash": "f9b262292a27a8f50820e49f9594639d8c41bf98d1930bf29d1b54dd0ae08f60",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\doc-generator\\doc-generator.cjs": {
       "hash": "bd005245624755bc36a8ef32ca613b185a0ebb7fc34ab94fe6bfedb0ad71e84a",
       "chunks": 1
@@ -7594,6 +7922,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\filesystem\\filesystem.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\finishing-a-development-branch\\finishing-a-development-branch.cjs": {
+      "hash": "37fffac386afab1c38b3557e7efa3dcf7a098398af148cdd0fd2f9b12d29f6b8",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\form-and-actions-in-sveltekit\\form-and-actions-in-sveltekit.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
@@ -7735,6 +8067,10 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\memory-search\\memory-search.cjs": {
+      "hash": "328961c4f0fd8791792609ac87031069bc35fb62e30ac7049e840eb0b80d28c8",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\mobile-first-design-rules\\mobile-first-design-rules.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
@@ -7743,6 +8079,10 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\multi-agent-architecture-reference\\multi-agent-architecture-reference.cjs": {
+      "hash": "20ac7f3f6b6baf5d66eea149e02e5eb6a2d88a0361c203289de85e2303a3999d",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\nextjs-expert\\nextjs-expert.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
@@ -7750,6 +8090,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\nodejs-expert\\nodejs-expert.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\observability\\send-event.cjs": {
+      "hash": "887ef5a6ed2d60fbdaec96c9aa7ac293513955ab0a18b12d9fa60b062045ab13",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\on-call-handoff-patterns\\on-call-handoff-patterns.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
@@ -7811,6 +8155,10 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\qa-workflow\\qa-workflow.cjs": {
+      "hash": "de51fd1af37e5424d7517abbdf1b7844db541756b518640ce60f56c617622184",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\react-best-practices-vercel\\react-best-practices-vercel.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
@@ -7827,9 +8175,17 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\receiving-code-review\\receiving-code-review.cjs": {
+      "hash": "1472c063ab20b6fa6c250e7f69fd845f0b37f28e6a48bde448712ffe2bd67fb7",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\recovery\\recovery.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\requesting-code-review\\requesting-code-review.cjs": {
+      "hash": "503ec7afd8396dea76c6c27fc449f8c9eaed940fe715cc202c226c329d638c8d",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\research-synthesis\\research-synthesis.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
@@ -7856,7 +8212,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\run-agent-framework-integration-headless.mjs": {
-      "hash": "06c5d208dfe4745b79d7d76d47682df2a8b842b70b90b72938654da252d8208f",
+      "hash": "411fcb2bd20bbe5ebd8c9fcba32dd79ce071c459d13803e8d434dda37622cfea",
       "chunks": 12
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\rust-expert\\rust-expert.cjs": {
@@ -8483,9 +8839,17 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\smart-revert\\smart-revert.cjs": {
+      "hash": "29a3735649333c33fa216bc95f1607040818f8335eeeb644a14b56933b940d64",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\sparc-methodology\\sparc-methodology.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\spec-critique\\spec-critique.cjs": {
+      "hash": "cc721d4645dab417d16fd7c7b25dfde8307e7ab380d784ea15b50ed3056bbdca",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\spec-gathering\\spec-gathering.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
@@ -8495,6 +8859,10 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\stale-module-pruner\\stale-module-pruner.cjs": {
+      "hash": "05762a45d651f68b09e08e37e0dbd3433f7d0931158b7ac0edc73aa990530e49",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\state-management-expert\\state-management-expert.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
@@ -8503,9 +8871,17 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\strict-user-requirements-adherence\\strict-user-requirements-adherence.cjs": {
+      "hash": "702048bd0e78f67cc3d9eeeaba44964c1c9f3fc7b2c1ad3f23ffd059673ab297",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\styling-expert\\styling-expert.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\subagent-driven-development\\subagent-driven-development.cjs": {
+      "hash": "cd61a8f6e2aad1add7ee5a7aa3264fb6e84ca4e70df48037453ecaa476f9a3c6",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\summarize-changes\\summarize-changes.cjs": {
       "hash": "3a205204146bebcb4b8286225144a21968f0a08d64b69b905835715e0e253c6f",
@@ -8603,16 +8979,20 @@
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\using-git-worktrees\\using-git-worktrees.cjs": {
+      "hash": "89e6efb0dbdcde7a33753622bb1b293ae69e7b0d0145627537fdebcea3b53035",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\validate-commands.mjs": {
       "hash": "a3ed93e60d65fa452a2adee1ac8a543484ea371d2fc5c313a30d4b66114de6ef",
       "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\validate-latest-integration-artifacts.mjs": {
-      "hash": "99acec27cf485dd617a1de8d6c0369806c37fbaa6bdf344ff1777bd7af566b17",
+      "hash": "2d968f0c78f3d7bf70e9df7b4891c63ee9eebc59db67f4284e52c1f9cb84cec9",
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\validation\\validate-agent-memory.cjs": {
-      "hash": "06451020ccb712535c0b2805d26d283d86e9cd023d693e7d852f04d34fa42961",
+      "hash": "771776b3f5224ce3eed8c2581c526e99c013976876e2d92738c5ab7299676a09",
       "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\variant-analysis\\variant-analysis.cjs": {
@@ -8646,6 +9026,10 @@
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\web3-expert\\web3-expert.cjs": {
       "hash": "bae74bc7afa4137716438fc4d8cc088322bd5fc71a4da39a071e86ebbd1927c4",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\.claude\\tools\\webmcp-browser-tools\\webmcp-browser-tools.cjs": {
+      "hash": "aa6858b66864f276b112be0a60a15ea7d09e0a9719cf079a24ffcd6583283b74",
+      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\.claude\\tools\\workflow-creator\\workflow-creator.cjs": {
       "hash": "0bb3515dbd357b99c55d05ff01ecf3ffad9c832d0b2cc05b40a25aaa94f26ee0",
@@ -8792,8 +9176,12 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\eslint.config.js": {
-      "hash": "b5f681a82005a95e5963406af10a9fb0afe6383b00cd9ca291b8f839edfdb745",
+      "hash": "d7f7199fe1a36f2ade71ea83a91750d58525ae7993af2f88d25ff2ab0cf6087a",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\find-stale-modules.cjs": {
+      "hash": "b8d5866754619a1b546ef188efbfeac6fbd5f76ff31cda603d726e4cc230366b",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\jest.config.cjs": {
       "hash": "20292a63602984c5726f14216eb2e68f60cd14e72300fff15898dfeefea65eb4",
@@ -8823,6 +9211,10 @@
       "hash": "3726f114fd4adc1f0c4e19c3c52e19bf88980162a2642a7e8824a79acf26830e",
       "chunks": 12
     },
+    "C:\\dev\\projects\\agent-studio\\scripts\\heal-docs.cjs": {
+      "hash": "def83c63a6c0c9f6f6d5067a1bd9df380ef39c67935153bb74941a26f8da3efb",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\scripts\\install.mjs": {
       "hash": "fd699647f747a05113351f7a854c776af30a030d6b4d47f84902516a62a481b7",
       "chunks": 0
@@ -8835,6 +9227,10 @@
       "hash": "8886c2c10dd9af104c26b6c3bb34fc6d94694a81883de6439f3aa25dbd48f110",
       "chunks": 6
     },
+    "C:\\dev\\projects\\agent-studio\\scripts\\reduce-debug-log.mjs": {
+      "hash": "f5c14a0c24f1671d336081ea6298e8dab22a808b9a53c52aba60709bf43e192f",
+      "chunks": 7
+    },
     "C:\\dev\\projects\\agent-studio\\scripts\\reset-context.cjs": {
       "hash": "927e2d67cafa65da58ed1cbbcee6bc0a6766011ccf7259af5f8504db17737861",
       "chunks": 5
@@ -8844,7 +9240,7 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\testing\\count-all-tests.mjs": {
-      "hash": "8d392ee75a9da43844062c5030fd3dca812ec37e75e6d7e16efd618f26f02533",
+      "hash": "9a4b8c731da7ec4af780c249521f0a96a1fe3192ce429759ad591c41f8416df5",
       "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\testing\\test-version-validation.mjs": {
@@ -8866,6 +9262,10 @@
     "C:\\dev\\projects\\agent-studio\\scripts\\validate-doc-stale-patterns.mjs": {
       "hash": "7ff1fb0e5ac4a55340197496212fcff2c23ee8181f57226b8d923bb8f996ff96",
       "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validate-docs.cjs": {
+      "hash": "a6a5beb6bcb23cd6b7a235c6e5fa4505ed1b590cf8c4c21b00eebf4e7f2f25f5",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\validate-env-budget.mjs": {
       "hash": "c53da9d39f92ec0e32f11208c5c5957f48bc1f4f8d6bfccbf6058d9c76f744e3",
@@ -8895,8 +9295,16 @@
       "hash": "d7a1bed352ded2d392f2ca9324bc914824607df329f6eaa3ed3060e476412594",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\fix-primary-agent-skills.cjs": {
+      "hash": "ecdc3c21fd24890cf73d352534326daf3337b0254ab94a10b935fefa76998b0d",
+      "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\sync-skill-catalog.mjs": {
+      "hash": "f75970fb551f6227398e0361a23247fb6b3945c8e97b7f5f07f57f4fca312713",
+      "chunks": 2
+    },
     "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-all-references.mjs": {
-      "hash": "f40ad1ff94e260d3f72bf22f2bfc3752492c465df4ce1f09974aa75c0894a515",
+      "hash": "7647abe5c32892d0bc4142bfc788cf44275bdbb6f8eeaecf6cb5824c8c8ab518",
       "chunks": 14
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-archived-tests.mjs": {
@@ -8920,8 +9328,12 @@
       "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-config.mjs": {
-      "hash": "496f0ef2a0ce53d98a640c5103ea2d92f4158771906ad09a4f31ac4296ba4d2e",
+      "hash": "6f4e4fd5cf32a67e1fb4e6e2ed18db4d86d7d97ef299411f192f2268ac6ee6d1",
       "chunks": 10
+    },
+    "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-ecosystem-integrity.cjs": {
+      "hash": "36b5516f13bd60dea71d6ced4dc3674fc0c1adbe842494c1508b1bf6857e8f5a",
+      "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-enforcement-env-sync.cjs": {
       "hash": "58c9a75d5f5d8cab3a4658f6694d84d457f2e19a39a3c22ba64e8c1af985c699",
@@ -8936,7 +9348,7 @@
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-model-names.mjs": {
-      "hash": "ecdc399eb329ee1b5b7c0b00326fdb23b84f7f436a8c806baa2607e94d105672",
+      "hash": "cb10d6fe841ef459b9a65a90c0291b3ed54079592e57cf856c6f428a57669b2b",
       "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\scripts\\validation\\validate-module-size-guardrail.cjs": {
@@ -9020,7 +9432,7 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\checkpoint-manager.test.cjs": {
-      "hash": "11a75c1424c020a3acb96f294392afc7962270ecc0ea2b9301fb019717fa9c4b",
+      "hash": "4dc361175effe18d9101595b26b1f43167d302a779ba60493da93f4c6b0efdca",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\cli\\generate-tool-manifest.test.cjs": {
@@ -9031,9 +9443,21 @@
       "hash": "a166cd7f81e139fd81a5e37a60cfcd75a942b8c6748b3be9c601a4a96f63d5e9",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\cli\\search-compress-golden.test.cjs": {
+      "hash": "edca1c115588c6ad90e13418ba0c4f17ee8e6e230a81e5fa55f104abd5bfbbb7",
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\cli\\search-compress.test.cjs": {
+      "hash": "0fd4df0f8ee73c17222a8f15889ff9023dd59f1ad6bbbefe7dd4bc249585c8b3",
+      "chunks": 2
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\cli\\setup-package-manager.test.cjs": {
       "hash": "b51cbbb94c54883774325344951de854b53f51f4879ada2dd2505c9f423a2243",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\cli\\skill-update-headless.test.cjs": {
+      "hash": "524bb29c8014bb432ba63dbef63b936178aed1fcee4e486ee61550013b8a0831",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\cli\\standard-error-compliance.test.cjs": {
       "hash": "2632557e7a28d4682d5d1c7699e4a9893ecc2c7a7447aad49ef2e7745d44a384",
@@ -9041,6 +9465,10 @@
     },
     "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\ast-grep-wrapper.test.cjs": {
       "hash": "6a84d4cd3231049cbdae79cb8f1b08f27d8dbf421fa7fe703a8e35286f362aac",
+      "chunks": 9
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\bm25-incremental.test.cjs": {
+      "hash": "6d4865c9f152a8dd16f38f1d1cfcde99a34d3781eebc3333eae0b7d07aecf4a1",
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\cli.test.cjs": {
@@ -9098,6 +9526,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\query-analyzer.test.cjs": {
       "hash": "062966d916a82ab07d6f59e63e17630b1292c00b65fcae6951efe68ee31b9d3a",
       "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\query-cache.test.cjs": {
+      "hash": "8a87f587dbfc2cf5a8dd2193f642a4ee791efe79ed6a2a43f2f3712bf2c99723",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\code-indexing\\result-ranker.test.cjs": {
       "hash": "5fb4ea1058499e4fc60dfee19f76caa6542a57f3ec3e2d95ac82a916d956888e",
@@ -9208,7 +9640,7 @@
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\audit-skill-recency.test.cjs": {
-      "hash": "118efe2a57040f8eb7dcf2c598ba6fd70edfb8c50d69da7ee2f3ea4aca6b93fb",
+      "hash": "c4deafbda2bca7dd982d27c1e7a7875980683213c1c4ea990f4a71ca769a312b",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\bash-command-validator-allowlist.test.cjs": {
@@ -9242,6 +9674,14 @@
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\benchmarks\\perf-regression-gate.test.cjs": {
       "hash": "4be909bab54954a529754b6baeecad678b593bea779eab9ab67aee8538e1b69b",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\bypass-audit-hook.test.cjs": {
+      "hash": "6e680f0442eb2d7f2bc23acaafe89a7fbcf7ebc2b2700c682a60a284efd46832",
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\bypass-audit-integration.test.cjs": {
+      "hash": "856a7ed81b718e7326f520469ddf6c5bc487f015c4d340009482ff58f4155a09",
+      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\check-console-log.test.cjs": {
       "hash": "d255208c0ef4fe753f6720c5e40087d1f4ab751b9710598897e7684910047eaa",
@@ -9281,6 +9721,10 @@
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\evolution-state-guard.test.cjs": {
       "hash": "17b72853e34087fec3f8987a3afc42d1b3780dae7a4a177b5c7f3afc82aab37d",
+      "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\external-content-guard.test.cjs": {
+      "hash": "f22ccf87e6623b0197849decb90a5afebe235bcde1435b9ab19ec1efaafbcf4d",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\filesystem-validators.test.cjs": {
@@ -9323,10 +9767,6 @@
       "hash": "4d9cfad7f9704e5b36e9b2357740e5b418858f001250250dcaf2424a4310b7f4",
       "chunks": 1
     },
-    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\metrics-collector.test.cjs": {
-      "hash": "175dec1c3501a5b1c9524797c838b0237c85d77882cda938ec70f7d98a5b6bb6",
-      "chunks": 0
-    },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\monitoring\\slo-alert-gate.test.cjs": {
       "hash": "4ac6e8972bc1c6108fcb2ecd7dda86b7ed133c643adbf1b2ca7c119e6e337ba5",
       "chunks": 0
@@ -9350,6 +9790,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\post-completion-chain-error-logging.test.cjs": {
       "hash": "1a7bb6584d02e19cac983b86a9df4ddbee1d05f033151cfc95e42fe084d8cda7",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\post-completion-chain-failure-signals.test.cjs": {
+      "hash": "a9990999c22e692909a958440f2b7e38994764d14312d37ca21a899f128e3121",
+      "chunks": 13
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\post-completion-chain-fix.test.cjs": {
       "hash": "baed7bba618c3cecc13d10cc2833729f2f98d027e1f9e1e36ecc073c6337bd9e",
@@ -9436,7 +9880,7 @@
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\pre-tool-unified-read-safety.test.cjs": {
-      "hash": "1cf81975ad833ae1dc01f64353673e913b20a8ad899912fec98be6b84853c2d8",
+      "hash": "102b6293eecd991027d1079ef26d2330edd35caf75c6c2bb19b08d8e0827a0a6",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\pre-tool-unified-taskupdate-first-router-session.test.cjs": {
@@ -9459,9 +9903,17 @@
       "hash": "83959175ba7f623dc7e3bcc54162374b712f018df35abaa169c1a0d0ecb29a77",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\reflection\\gap-log-injection.test.cjs": {
+      "hash": "a78a395a6390a58224d63a46fa98209d8f72574c0b969b40275a8efbb79c32d6",
+      "chunks": 4
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\reflection-cleanup-import.test.cjs": {
       "hash": "a432d0089adfdf0ffcfae70eac8e3f1f28d370188791883bb84336a556d33e74",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\reflection-cleanup.test.cjs": {
+      "hash": "0b118960d31584d5c4897b9f26db6b83190d3b90e35d460a5e8e2f10d9bc5a98",
+      "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\reflection-deadlock-fix.test.cjs": {
       "hash": "9a91a2e3d1e76c76d45304e055b10207d8414d7a9c2f00b9885f9c7812b82d7b",
@@ -9479,6 +9931,10 @@
       "hash": "58119e2109c2dceacea5f1f106179a18c343ddc22424c0e21cb178e1264eb905",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\reflection-step0-guard-staleness.test.cjs": {
+      "hash": "69293eb4d4380a05a11e93358d4d8f544ae396a66772be0cf782abe053b4e1a3",
+      "chunks": 2
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\reflection-step0-guard.test.cjs": {
       "hash": "d288085924e02cf7cbe4b3f70483aff542835ab400d5976439514fa609d8caed",
       "chunks": 1
@@ -9490,6 +9946,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\research-enforcement.test.cjs": {
       "hash": "9c513e4438e67a8106ed259d053749d0c0c1d8721248df09d2e13cbc7710e9b7",
       "chunks": 3
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\router-tool-lockdown.test.cjs": {
+      "hash": "3dd455f54a2aff2d44ce6073841adb93a3f724ddb2f1334c89c4a6ac5193d34c",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\routing-guard-architect-gates.test.cjs": {
       "hash": "60df0b3b2924f5992d621a42f3ae82a40c833d9307771119fab94299ae9f5194",
@@ -9540,7 +10000,7 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\routing-guard-staleness-tasklist.test.cjs": {
-      "hash": "7a391e96622ac64d1bb485fc2cd6adbbc9f060ecb85db476b43a31892e1fda10",
+      "hash": "7f386b3fe5e7e9166a4aed7c1cf1e1c898e425f4f831b058f79941260022c4bb",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\routing-guard-tasklist-specialist.test.cjs": {
@@ -9655,9 +10115,17 @@
       "hash": "21d45abd7525d6995e38cae54ecb400bcfbf52534f801e6e5fc6c1f32d406610",
       "chunks": 2
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-request-contract-concurrency.test.cjs": {
+      "hash": "830851e7e31c3f835a2fbee458cba0621b4da607406c4e1382e9da018dd1b9c9",
+      "chunks": 5
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\spawn-required-output-tools.test.cjs": {
       "hash": "a5a088972ad770c5fb4457b5f1ef33eefba6c74e8a7d2324d2d92189fecf6984",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\stale-task-detector.test.cjs": {
+      "hash": "af33ced50b866cc9fe9c72bca29e7f57a5264f7842a0d58ecba0f4c076490a8f",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\state-reset-fields.test.cjs": {
       "hash": "97d32473ac59b48ecaeb58aced8ade684eb30cbeeff34f9b689a746360712cee",
@@ -9748,15 +10216,15 @@
       "chunks": 6
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\unified-reflection-handler-activations.test.cjs": {
-      "hash": "3ac73386f4acd3f0853f132af90b11da1a587fad6472fd506e92dd762404515a",
+      "hash": "8db9b76773af1cce6a21699b021cde334f58ecfc6b1409516e03e8ab8871ae03",
       "chunks": 8
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\unified-reflection-handler-io.test.cjs": {
-      "hash": "8ce1ae617f595a7aba4ae893a99438459672553405611db5411c279042ef38fc",
+      "hash": "19d5438bf10f4c6f1e1e1e4968ce8ad8f68625a422b961bd9dc3b4d035267d2e",
       "chunks": 9
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\unified-reflection-handler.test.cjs": {
-      "hash": "2188ea73679761f8c58738382145b7fbe527e3f18ae9fc36558afcf2dbe21d57",
+      "hash": "901ef27ead65d0a859267634fe3d93d0bd3479c17c2737d5a8ef42849b7a26af",
       "chunks": 7
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\unified-reflection-stale-evolution.test.cjs": {
@@ -9791,6 +10259,10 @@
       "hash": "73f4fc67eca50345c5bc17bc11cb36779e633cdf3d185d65d2e1e3ac6c4825d9",
       "chunks": 5
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\validation\\reflection-taskupdate.test.cjs": {
+      "hash": "c9c0b324a22c1feeccf47f638dd383a7e261efe9c1b60f827b42a2624c6b1576",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\weekly-maintenance-overdue-contract.test.cjs": {
       "hash": "ebd862b7bf48e076786770557dba5f93dc528c347b53f7a74f5a755e72850bfb",
       "chunks": 0
@@ -9802,6 +10274,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\windows-null-sanitizer.test.cjs": {
       "hash": "e0e1e357e9ca616b11cc93cd222b22cfcbe78de9e67bab4d2dbb5ebff293677f",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\hooks\\workflow\\agent-gap-extraction.test.cjs": {
+      "hash": "daebf5e4db166d14f0b7ff7703094941c5776ebd3129124f892ccae97f916772",
+      "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\tests\\hooks\\workflow-cycle-detector.test.cjs": {
       "hash": "e816b7f916a2bdce63a148834c35a47e0465288440f22d4b342162cc5e8f6fa5",
@@ -9822,6 +10298,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\integration\\artifact-graph.test.cjs": {
       "hash": "1cb6d65ec6ebe4b5b15f1dffafb35e1f6375ec9e1e3c5ab68a6bdd33f39823d7",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\integration\\cascade-propagation-e2e.test.cjs": {
+      "hash": "926f1d2c6110c2ff00049a31b92f4f1bb84987bf2bfb0edcfec1bde192429679",
+      "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\tests\\integration\\e2e\\phase1a-e2e.test.cjs": {
       "hash": "1697bfc4a9097d587890eb5b9ce66f9a3e2a170ab881c06e97ed89648f291406",
@@ -9903,6 +10383,10 @@
       "hash": "c7859f55abae670f487f90243908a6a9ca79b47bbe1eada288fe02e5c8d2b9da",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\artifacts\\semver-diff.test.cjs": {
+      "hash": "326677fd2490860b066393c329a65302eb867f7d23c137ad37a699033a4d58c1",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\atomic-writes.test.cjs": {
       "hash": "484a00d5a46a277be9d8e1a6faf7c94197aeed6dbe0e77134550399e154f4ab9",
       "chunks": 3
@@ -9959,6 +10443,10 @@
       "hash": "02b0a3db2d5fc36e6bcc7267e06034d002a25398c9ec2afd375e179ba882ec8c",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\creators\\cascade-entry-writer.test.cjs": {
+      "hash": "e665be4911bf71a54dae866caac8a67a90a079f3e3a0802e4efb097f9b1890f3",
+      "chunks": 6
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\creators\\companion-check.test.cjs": {
       "hash": "bb5c8165fd15d44c4955fdafbf5d74a5739b320f52ff46529fdd1e4491ffc0ec",
       "chunks": 0
@@ -9975,6 +10463,14 @@
       "hash": "17b6eb449c0496014174aeabc29c3060cbf65d05ca4fc5f186845d3ef0f9d8dc",
       "chunks": 8
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\creators\\enterprise-bundle-scaffolder.test.cjs": {
+      "hash": "d532cb7713290c6c103124711ceabef5779ccd031a652cc5538e8145d60de903",
+      "chunks": 4
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\creators\\enterprise-bundle-validator.test.cjs": {
+      "hash": "c8b710001a140bd69cc8847ff45fe82a3b0d299f36c80aabeae00816a759660d",
+      "chunks": 3
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\creators\\verify-skill-creation.test.cjs": {
       "hash": "749e8c0187c5e5cb13ef6de8da8e391757e9f1100bf0aaa07bb9b740a2cddafd",
       "chunks": 8
@@ -9987,16 +10483,24 @@
       "hash": "c76520f2766480adceb22062f54f1581f4ee115017c0e0c90f30935ffee2e763",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\hooks\\hook-error-logger.test.cjs": {
+      "hash": "3971f62619a745c735c9a8bd17ceb50b559a65553040e2f9b0ea57acc08c9705",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\audit-trail-integration.test.cjs": {
       "hash": "8c417d0eb1df081a00f8e7ff53d73ad89f42efac033f249349d6cd9faa49f8a8",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\cold-storage.test.cjs": {
-      "hash": "8d2c3d749fbafeddaaa5b5ce9d526303aa6305f2f457f7864e7a0bbbcf1600a0",
-      "chunks": 2
+      "hash": "514aa0579f8a38cef68fc97e839e38a3a2c0e0032dcc76875a26080550785729",
+      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\contextual-memory-entity-lifecycle.test.cjs": {
       "hash": "e3646a081afee6bae9b7aaaafadc7c914a110b34a91d6b9db4e53ec6d54c2578",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\contextual-memory-search-fallback-exit-guard.test.cjs": {
+      "hash": "0d5596404230b30e03209e9ff576112dd9814cba0b9cc994b3f3c9e393422886",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\contextual-memory-search-fallback-guard.test.cjs": {
@@ -10019,10 +10523,6 @@
       "hash": "ce5d8f474701402cc8e07431205605840cd11fe1828e967ac4f6e763662f3d00",
       "chunks": 7
     },
-    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\core\\memory-utils.test.cjs": {
-      "hash": "9dfc9ac114ed948b4da281f14836b8ffe1e5eaf03b84005f62e78a33f903f734",
-      "chunks": 0
-    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\entity-extractor.test.cjs": {
       "hash": "301f5cac5707bc1b31b91866e6e244f95ff270d9088b5ed56a341ff03a2cf4a1",
       "chunks": 2
@@ -10042,6 +10542,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\hybrid-memory-query.test.cjs": {
       "hash": "2a3263836cee5f76d647a1612a8b3437871960d478c96682b9394dc506d03c75",
       "chunks": 5
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\internal-rag.test.cjs": {
+      "hash": "9c27c051f0c40bab08036ebdb290cb88097c5b0d0cbbb76c318553ba920d7f94",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\memory\\lancedb-client-gpu-integration.test.cjs": {
       "hash": "f712797dc09acf876e37d05fc6b0b597e3e0d3ec37cae0136e24d51d20e910dc",
@@ -10287,16 +10791,12 @@
       "hash": "cb9cd643922726862a378f4bef49b12d76230dbdf54a4ef913593af919ae53fc",
       "chunks": 1
     },
-    "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\consensus\\response-aggregator.cjs": {
-      "hash": "3c45c446e3f697b2dc0c2b07dd290a65ed6a791b32e424a3f0b1f6efd01714ad",
-      "chunks": 0
-    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\party-mode\\consensus\\__tests__\\response-aggregator.test.cjs": {
       "hash": "f164d23e3f3b0bde8acdd6b4b85a3b3d6025ba04087d6a4f90949f75ed3baf5d",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\plan\\implementation-plan.test.cjs": {
-      "hash": "4556596d215dd91d5cdc2a82604b39073d953201c524e69751428a421de4fe73",
+      "hash": "5c24ad94f0a6bfc36341a962e9222007502f76d1f70e3c774e601af11ae186da",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\plan\\progress.test.cjs": {
@@ -10339,6 +10839,10 @@
       "hash": "b860f0797b7ad60f97e927dc86eb6de15e9ec72bd142afd5520c2f5d1aa93810",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\evolution-workflow-hook-references.test.cjs": {
+      "hash": "d519bd9fb88a28e1ebd60002bdc22e4b4df44fd9f8b12818942b064a5a6168b7",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\external-integration-routing.test.cjs": {
       "hash": "9102ac4c06f69515a93e6dc66706f5bdee70cacbbd5fd3d81db0d7769d113ff4",
       "chunks": 0
@@ -10371,6 +10875,14 @@
       "hash": "fe7317cfa3b0ee76de1dfbb122e0c8c04dce4174f74ecdde77f964d0eebf33d0",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\router-state-reset.test.cjs": {
+      "hash": "0dd58925d666b9d4fb111218c5e07b6e37a2660b4ea7d5c72297a4475bea4538",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\routing-resolution-order-doc.test.cjs": {
+      "hash": "b69c9c555bfbc3658dd31c9a0879c67686cdd70d52a3339a31abea1a44d7f322",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\semantic-router.test.cjs": {
       "hash": "71fbace161d81102ccecc507e15ae073c0f5ba10946c17c2fbe6b94c3d95a14b",
       "chunks": 0
@@ -10397,6 +10909,10 @@
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\validate-routing-consistency.test.cjs": {
       "hash": "f5beeb1474f033edc692474bcbead121a76a60464e51c86fa7901f436cb696ee",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing\\workflow-phantom-skill-references.test.cjs": {
+      "hash": "da7eb75370cb96b4e16ac06951712d411befce6babf55cc2cf558650bc954b89",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\routing-table-equivalence.test.mjs": {
@@ -10551,13 +11067,25 @@
       "hash": "fbb3ea14223c9ef2a7d1cf5cae3e4d9382d318f68d1ace0a27443e944923e153",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\context-pressure.test.cjs": {
+      "hash": "f834e0f1c52a0f74794b7d0f1acb910cdc4d9124c163ca0dc1c8825403f66067",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\context-reset.test.cjs": {
       "hash": "378837ce7eb09a6aa38a30a50d7295837bd6de0fa531a62af7bf42e55ccb769a",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\context-token-estimator.test.cjs": {
+      "hash": "9de6f18938edb2adcee57e4c264ad21416f6936e6ec9718f0b300fa347a5ad5e",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\error-sanitizer.test.cjs": {
       "hash": "90dbdf197b36837404fedc5902483805dedc7bf179b8bd64147736d2941fc2d3",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\feature-flags-config.test.cjs": {
+      "hash": "6905a2e75d463dba1227a7842553f6fb03a5897f35a3dec6061522e85e2b3dbc",
+      "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\file-cache.test.cjs": {
       "hash": "52f76b048e554d1eff4b845f191d69fa5885156433d25f77f0dcf8ef5bc9a53c",
@@ -10594,6 +11122,18 @@
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\logical-unit-tracker.test.cjs": {
       "hash": "e6c10add19630adeace75f1f762c5af72e069fdaf59477a7d23e7d3354a98ce1",
       "chunks": 1
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\markdown-table-parser.test.cjs": {
+      "hash": "d5d09e27095c88077c03bbfe3b203f509fd83f11e45e1239557ccd7251786510",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\path-constants.property.test.cjs": {
+      "hash": "785b005f573eff37edb031a25fd9b0b7c7a85ab6d2e210570b62b920909e2cee",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\path-constants.test.cjs": {
+      "hash": "d3c32c194613613e5e1bd88ae0f6dcd098402dcd0f328dd86835ac39aa670736",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\lib\\utils\\path-helpers.test.cjs": {
       "hash": "9761116c9792880827d514f47a2962925b56891ee1476baaf87be6fc52119a30",
@@ -10787,6 +11327,10 @@
       "hash": "20471b8b6f752ff8bf9e2f24e9f17f820b33cd5a216143e31d7fc833a3bfc4c3",
       "chunks": 2
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\lib\\workflow\\workflow-watchdog.test.cjs": {
+      "hash": "d662d4517dda6fb478c2606a9f7af36ab22874107424c70fca4e11a4875967d0",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\lint\\max-lines-rule.test.cjs": {
       "hash": "e6d350990f01239456121c2d3631d93d86205431dabe459769fc0793b9770548",
       "chunks": 2
@@ -10852,11 +11396,15 @@
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\scripts\\count-all-tests.test.cjs": {
-      "hash": "c603cb073381a9ad2aeea6343ae7a6e536e5709451fdca66fa621d50e6a4e744",
+      "hash": "79c0975d402a308e6c4726530a879b6e0daa234093c855bb4adbcabe1b90ff32",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\scripts\\install-security.test.cjs": {
       "hash": "53309301ebcb803dc9ee805a7205ded9e6c0e45bf4323bdd3adf795707ca2b1c",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\scripts\\schema-naming-consistency.test.cjs": {
+      "hash": "26aaf8a058fb1d004078447e19f2f2d6b06b6ef1aa2201f8ce1c60623e8995b4",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\scripts\\script-imports.test.cjs": {
@@ -10886,6 +11434,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\security\\memory-sanitization.test.cjs": {
       "hash": "16baff3544633dfeced4b2c20ce77a9e4722edc2365c717f80632da24587654b",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\security\\process-shell-hardening.test.cjs": {
+      "hash": "6f3e2d19b8ea8ba54ac0ce70498f02d61ac0183b50f53c3bc81907bb4bbaebc9",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\tests\\security\\process-spawn-hardening.test.cjs": {
       "hash": "15cf34298dcd2eeb1d2088abed4d669bc03e0c29c49931c087c755139c73cf43",
@@ -10972,7 +11524,7 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\skills\\skill-updater-doc-contract.test.cjs": {
-      "hash": "a2b8ce07591c6a02587521ff26590576feae761280a2e8a306fd8070e50a6283",
+      "hash": "f051c2c22d64860e063d4dce6e4d2ed3602e103ae6edd98aa1598b0b41748976",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\skills\\skill-updater-hooks.test.cjs": {
@@ -10983,13 +11535,25 @@
       "hash": "f35976bdae8cc6b2c653f62050b7cd11c728618a86cc53b6f484906ac9c4c44d",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\stale-module-pruner.test.cjs": {
+      "hash": "028317789ba4b44bd40f862c8e6764517229fe46ce423623f4ecccb33423c849",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\skills\\tdd-skill-contract.test.cjs": {
       "hash": "7dad3c2e182a7ab8191795731dc88756600a63d63d50bc3c300a887cf68e158d",
       "chunks": 1
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\token-saver-adaptive-ratio.test.cjs": {
+      "hash": "1b47c9ae0550173621bece19c65d7401ca35442c6a30a08a35f2a87d1812e14b",
+      "chunks": 0
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\skills\\token-saver-context-compression.test.cjs": {
       "hash": "66e83e587b5a22906bf087e8f198b5d6674c6b08b2d66efebc6f532789020c1d",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\skills\\token-saver-memory-dedup.test.cjs": {
+      "hash": "e77a5c0958166f5542522c1919f09cbbf8e40416aa333eeac8c93dbdeea57c1c",
+      "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\tests\\skills\\tool-search-main.test.cjs": {
       "hash": "de85835781c96eebfc319116d1a9c58504129fb7da63b07343b17847e4fb8150",
@@ -11028,15 +11592,23 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\bootstrap-artifact-graph.test.cjs": {
-      "hash": "223f0d376ae1bec823217c032537fb29c83485e138fd805d9f31722de562ed72",
+      "hash": "ace9ee342a37a0196f95b2abe1d5fb3ff64638d916f3a93d2fa2035d748fe579",
       "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\ast-validation.test.mjs": {
+      "hash": "ebd94c9b3b282cc79fb2253a755fa4b2c279c90d8c45618a1d0b62a5ea47ecce",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\backfill-skill-verification.test.cjs": {
+      "hash": "5687711bb72ae15b688664fa83b769bc7b11e563115f5103fcbf490dcdedd282",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\cleanup-transient-artifacts.test.cjs": {
       "hash": "8cef10021b560a157f8671a9f2c7f768c875e70c4e888dce725a6ef67d83b32c",
       "chunks": 2
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\doctor-mcp-version-pin.test.cjs": {
-      "hash": "27f64c4dcbf213a433abfa94eaca3c4f3a6318a36d30b68c25a9834b8188440e",
+      "hash": "4fa19d33d49c3f1b9bcfa26a0ed3b34ab63585669dce71b1fa4e7b73c1487f0a",
       "chunks": 1
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\error-report.test.cjs": {
@@ -11071,13 +11643,25 @@
       "hash": "234cd69b84ca5ee0a938a0a46a1484aa417a586eda26b113d415ee5c9bfd3bde",
       "chunks": 0
     },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\process-stale-skills.test.cjs": {
+      "hash": "cfa4c122e800fd2fcc970a90a2f611b47638d0aeaf86b991179efad43fa9f56d",
+      "chunks": 4
+    },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\profile-hooks.test.cjs": {
       "hash": "f61026a979f63263fc7670240527a43ba166cc672f84e809bb50bfa280076e37",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\reflection-degradation-alert.test.cjs": {
+      "hash": "aaa9ef1669c78ea01660d4ca588412b3abfaca1f0b92b5b4453c13007206877a",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\run-memory-soak-regimen.test.cjs": {
       "hash": "ad557d9a53a9199795e3696c089d3380510cc716fe938c8a074aaa5f4ebc1e29",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\run-skill-updates.test.cjs": {
+      "hash": "46785c74b224c986aa3cc1190f1adbc25cb2d90be43497f16824911415ba599a",
+      "chunks": 5
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\runtime-health-snapshot.test.cjs": {
       "hash": "7f117bf4a47691aa83635e4a86a4ffe4a6363bb3d0767b37c70c4cc7e73c315a",
@@ -11086,6 +11670,14 @@
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\security-lint.test.cjs": {
       "hash": "06db91adf281b8a7a72f813327d3c858374f24f3e7b5e44cbd813cc328f1b96c",
       "chunks": 32
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\semver-bump-calculator.test.cjs": {
+      "hash": "6bf3f0220c8afd884a1b867829a8e80569b99965e5a2d9a71d095d37c034c0a9",
+      "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\skill-freshness-report.test.cjs": {
+      "hash": "ede6a1eafa047ebe699740885823efd475e492dc6c1b2b236c6192cec71a7536",
+      "chunks": 3
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\validate-agent-skill-references.test.cjs": {
       "hash": "668138537659530a469806663a6ff12d46cabbd013dcf1dbe6ca66c1348b23e9",
@@ -11096,12 +11688,16 @@
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\validate-integration.test.cjs": {
-      "hash": "5e1eed2935fcbd1f5420d8b50ac62e37088f39ff4c93aef45246378c4e1a892c",
+      "hash": "87d66720f9e01fa0937bfa142fe9777b3d2c99e1a57d4b8de0e88383e2f6681b",
       "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\validate-skill-ecosystem.test.cjs": {
       "hash": "dfda468a66fb41bf4bfcba18484f0af7ce08dd30b2fd542f2de9cdd0808cc019",
       "chunks": 0
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\cli\\wave-executor.test.cjs": {
+      "hash": "b42f80664c8e4fb82a36d0ffb91589ddfa59cfcce564b6021f9868388e068ebe",
+      "chunks": 4
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\code-search-tools.test.cjs": {
       "hash": "acd4d759174db2b3fe082818af6249a1ddcb0adbce7eb4e15fd25e16d17e1d56",
@@ -11114,6 +11710,10 @@
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\ecosystem-assessor-health.test.mjs": {
       "hash": "2ad01cc3e77d61edae7a8f34e8ab91ae1e61781dc0cbbf0fbda33941f17c8781",
       "chunks": 2
+    },
+    "C:\\dev\\projects\\agent-studio\\tests\\tools\\ecosystem-assessor-settings-atomicity.test.cjs": {
+      "hash": "20143d91c8d4c6a8ca3724df72b7fe68488a0d9b921609f7f9a4e5c414defb31",
+      "chunks": 0
     },
     "C:\\dev\\projects\\agent-studio\\tests\\tools\\flight-recorder-maintenance-cli.test.cjs": {
       "hash": "4799261d2e4609cc57696ee9d3efe913cea73cbc5fc67f401ffbf477e606d3cd",

@@ -52,12 +52,14 @@ Memory Search is the live recall layer for all agents in the ecosystem. It perfo
 Identify the specific knowledge gap before invoking. Good queries target a concrete decision, pattern, or error — not a broad topic.
 
 **Good queries:**
+
 - `"JWT refresh token rotation pattern"`
 - `"Windows path normalization in hooks"`
 - `"BM25 index rebuild performance"`
 - `"agent spawning without task_id error"`
 
 **Bad queries (too broad):**
+
 - `"authentication"` — too generic, returns noise
 - `"everything about routing"` — unfocused
 - `"what have we done before"` — meaningless for semantic search
@@ -71,6 +73,7 @@ node .claude/lib/memory/memory-search.cjs "your focused search query"
 ```
 
 **Full invocation:**
+
 ```bash
 node .claude/lib/memory/memory-search.cjs "JWT refresh token rotation pattern"
 ```
@@ -90,6 +93,7 @@ Found N results for: "<query>"
 ```
 
 **Example real output:**
+
 ```
 Found 3 results for: "JWT refresh token rotation pattern"
 
@@ -105,12 +109,12 @@ Known issue: JWT expiry not propagated to frontend — workaround in auth.middle
 
 ### Step 4: Interpret Similarity Scores
 
-| Similarity | Interpretation | Action |
-|---|---|---|
-| >80% | Highly relevant — directly matches the query | Read the full source file for complete context |
-| 60–80% | Likely relevant — related topic or adjacent pattern | Skim and use if applicable |
-| 40–60% | Possibly relevant — tangentially related | Use judgment, may be noise |
-| <40% | Probably not relevant | Discard unless nothing better exists |
+| Similarity | Interpretation                                      | Action                                         |
+| ---------- | --------------------------------------------------- | ---------------------------------------------- |
+| >80%       | Highly relevant — directly matches the query        | Read the full source file for complete context |
+| 60–80%     | Likely relevant — related topic or adjacent pattern | Skim and use if applicable                     |
+| 40–60%     | Possibly relevant — tangentially related            | Use judgment, may be noise                     |
+| <40%       | Probably not relevant                               | Discard unless nothing better exists           |
 
 ### Step 5: Follow Up on High-Similarity Results
 
@@ -179,6 +183,7 @@ node .claude/lib/memory/memory-search.cjs "routing table keyword patterns"
 # Any decisions I should be aware of?
 node .claude/lib/memory/memory-search.cjs "agent model selection ADR"
 ```
+
 </usage_example>
 
 <usage_example title="Debugging — check for known workarounds">
@@ -222,6 +227,7 @@ node .claude/lib/memory/memory-search.cjs "reflection agent findings skills gap"
 # What did the security audit reveal?
 node .claude/lib/memory/memory-search.cjs "security audit prompt injection findings"
 ```
+
 </usage_example>
 </examples>
 
@@ -239,23 +245,23 @@ node .claude/lib/memory/memory-search.cjs "security audit prompt injection findi
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| `"everything about auth"` broad query | Too generic — returns unrelated noise | `"JWT refresh token rotation"` |
-| Skipping search because "context is fresh" | In-session context is NOT the same as memory | Always search at task start |
-| Treating 200-char preview as full record | Preview truncates at 200 chars — critical detail may be cut | Follow up with `Read` on the source file |
-| Running search AFTER making the decision | Memory lookup must happen before your design choice | Search first, decide second |
-| Single query for multiple unknowns | One query can't cover multiple semantic dimensions | Run one query per knowledge gap |
-| Ignoring <60% results entirely | Sometimes tangential info is still actionable | Skim low-similarity results before discarding |
+| Anti-Pattern                               | Why It Fails                                                | Correct Approach                              |
+| ------------------------------------------ | ----------------------------------------------------------- | --------------------------------------------- |
+| `"everything about auth"` broad query      | Too generic — returns unrelated noise                       | `"JWT refresh token rotation"`                |
+| Skipping search because "context is fresh" | In-session context is NOT the same as memory                | Always search at task start                   |
+| Treating 200-char preview as full record   | Preview truncates at 200 chars — critical detail may be cut | Follow up with `Read` on the source file      |
+| Running search AFTER making the decision   | Memory lookup must happen before your design choice         | Search first, decide second                   |
+| Single query for multiple unknowns         | One query can't cover multiple semantic dimensions          | Run one query per knowledge gap               |
+| Ignoring <60% results entirely             | Sometimes tangential info is still actionable               | Skim low-similarity results before discarding |
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|---|---|---|
-| `Usage: node .claude/lib/memory/memory-search.cjs "search query"` | Query argument missing | Always pass a quoted query string |
-| `Search failed: <error message>` | Memory manager unavailable or index not built | Check `.claude/lib/memory/memory-manager.cjs` and ensure memory system is initialized |
-| `Found 0 results` | Query too specific or topic not yet documented | Rephrase query; fall back to direct file search |
-| Very slow response (>3s) | Vector similarity computation on cold index | Expected on first call; subsequent calls are faster |
+| Error                                                             | Cause                                          | Resolution                                                                            |
+| ----------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `Usage: node .claude/lib/memory/memory-search.cjs "search query"` | Query argument missing                         | Always pass a quoted query string                                                     |
+| `Search failed: <error message>`                                  | Memory manager unavailable or index not built  | Check `.claude/lib/memory/memory-manager.cjs` and ensure memory system is initialized |
+| `Found 0 results`                                                 | Query too specific or topic not yet documented | Rephrase query; fall back to direct file search                                       |
+| Very slow response (>3s)                                          | Vector similarity computation on cold index    | Expected on first call; subsequent calls are faster                                   |
 
 ## Integration Patterns
 
@@ -299,23 +305,25 @@ node .claude/lib/memory/memory-search.cjs "last session learnings"
 
 ## When to Use
 
-| Trigger | Query Strategy | Expected Benefit |
-|---|---|---|
-| **Long-running session** — context may be stale | `"<domain> recent decisions"` | Re-sync with documented state |
-| **New error encountered** | `"<exact error message>"` | Find documented workaround |
-| **Before architectural decision** | `"ADR <topic>"` or `"<decision> trade-off"` | Avoid re-litigating settled decisions |
-| **After context compression** | `"<current task domain>"` | Restore working context |
-| **Cross-agent handoff** | `"<previous agent task> findings"` | Continue from where other agent left off |
-| **Before writing a new pattern** | `"<pattern name> existing"` | Avoid duplicating documented guidance |
+| Trigger                                         | Query Strategy                              | Expected Benefit                         |
+| ----------------------------------------------- | ------------------------------------------- | ---------------------------------------- |
+| **Long-running session** — context may be stale | `"<domain> recent decisions"`               | Re-sync with documented state            |
+| **New error encountered**                       | `"<exact error message>"`                   | Find documented workaround               |
+| **Before architectural decision**               | `"ADR <topic>"` or `"<decision> trade-off"` | Avoid re-litigating settled decisions    |
+| **After context compression**                   | `"<current task domain>"`                   | Restore working context                  |
+| **Cross-agent handoff**                         | `"<previous agent task> findings"`          | Continue from where other agent left off |
+| **Before writing a new pattern**                | `"<pattern name> existing"`                 | Avoid duplicating documented guidance    |
 
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+
 ```bash
 node .claude/lib/memory/memory-search.cjs "memory-search usage patterns"
 ```
 
 **After completing:**
+
 - New search pattern discovered → `.claude/context/memory/learnings.md`
 - Memory index issue found → `.claude/context/memory/issues.md`
 - Decision about when to use memory-search → `.claude/context/memory/decisions.md`

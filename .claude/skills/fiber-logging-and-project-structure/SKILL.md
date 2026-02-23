@@ -1,7 +1,7 @@
 ---
 name: fiber-logging-and-project-structure
 version: 1.1.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, golang-pro]
 tags: [fiber, go, logging, structure, middleware]
 description: Applies best practices for logging, project structure, and environment variable usage specifically to the main application file.
@@ -58,13 +58,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| `fmt.Println` for logging in Fiber handlers | Unstructured; no log levels; no correlation IDs; breaks log aggregation | Use zerolog or logrus with `zap.String("key", value)` structured fields |
-| Business logic in route handlers | Logic becomes untestable and non-reusable; couples HTTP layer to domain | Move to service layer; handler calls service method, formats response |
-| Global state for request context | Concurrent requests overwrite each other's context; race conditions | Use `ctx.Locals("key", value)` for all request-scoped data |
-| Hardcoded config values | No environment-specific deployments; credentials in source history | Use `envconfig` or `viper` with `.env.example`; never commit real values |
-| All files in project root | Impossible to separate public/internal APIs; package import cycles | Use standard Go layout: `cmd/`, `internal/`, `pkg/`, `api/` |
+| Anti-Pattern                                | Why It Fails                                                            | Correct Approach                                                         |
+| ------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `fmt.Println` for logging in Fiber handlers | Unstructured; no log levels; no correlation IDs; breaks log aggregation | Use zerolog or logrus with `zap.String("key", value)` structured fields  |
+| Business logic in route handlers            | Logic becomes untestable and non-reusable; couples HTTP layer to domain | Move to service layer; handler calls service method, formats response    |
+| Global state for request context            | Concurrent requests overwrite each other's context; race conditions     | Use `ctx.Locals("key", value)` for all request-scoped data               |
+| Hardcoded config values                     | No environment-specific deployments; credentials in source history      | Use `envconfig` or `viper` with `.env.example`; never commit real values |
+| All files in project root                   | Impossible to separate public/internal APIs; package import cycles      | Use standard Go layout: `cmd/`, `internal/`, `pkg/`, `api/`              |
 
 ## Memory Protocol (MANDATORY)
 

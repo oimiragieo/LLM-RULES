@@ -95,7 +95,12 @@ Minimum 2 Exa queries + 1 arXiv search via `research-synthesis` before proposing
 Skill({ skill: 'research-synthesis' });
 ```
 
-Queries must cover: current best practices for the workflow's domain, comparable patterns in the community.
+Queries must be highly specific to the workflow's domain, e.g.:
+
+```javascript
+WebSearch({ query: 'best <domain/topic name> agent workflow process 2026' });
+WebSearch({ query: 'industry standard <workflow-type> orchestration phases 2026' });
+```
 
 **arXiv search (mandatory when topic involves AI agents, orchestration, memory/RAG, evaluation, or security):**
 

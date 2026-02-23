@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines -- security rule definitions and CLI; splitting would obscure flow */
 /**
  * Security Lint Tool
  *
@@ -94,6 +95,10 @@ const CONFIG = {
     { pathSubstring: 'reflection-cleanup.cjs', ruleId: 'SEC-040' }, // path.join RUNTIME_DIR + literal only, no user input
     { pathSubstring: 'token-saver-context-compression/scripts/main.cjs', ruleId: 'SEC-030' }, // CLI token/stats output, not credentials
     { pathSubstring: 'hybrid-search.cjs', ruleId: 'SEC-030' }, // CLI token stats and help output, not credentials
+    { pathSubstring: 'token-saver-stats.cjs', ruleId: 'SEC-030' }, // CLI token/stats output, not credentials
+    { pathSubstring: 'agent-registry.json', ruleId: 'SEC-031' }, // generated; "debugger" in capability text, not statement
+    { pathSubstring: 'agent-registry-domain.json', ruleId: 'SEC-031' }, // generated; "debugger" in capability text
+    { pathSubstring: 'post-task-unified.cjs', ruleId: 'SEC-011' }, // execSync node with project path (controlled)
     { pathSubstring: 'tests/migration/', ruleId: 'SEC-011' }, // test harness execSync with controlled input
     { pathSubstring: 'count-all-tests.mjs', ruleId: 'SEC-011' }, // internal test counter with controlled input
   ],

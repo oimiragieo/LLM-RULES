@@ -47,6 +47,7 @@ Skill({ skill: 'ecosystem-integrity-scanner' });
 ```
 
 Invoke proactively after:
+
 - Bulk framework changes (batch skill/agent/hook creation or archiving)
 - Refactoring module paths or directory structure
 - Running a major audit or cleanup pass
@@ -57,14 +58,14 @@ Invoke proactively after:
 
 Invoke before starting this skill:
 
-| Skill                            | Purpose                         | When                  |
-| -------------------------------- | ------------------------------- | --------------------- |
-| `task-management-protocol`       | Track scan progress             | Always                |
-| `ripgrep`                        | Fast targeted code search       | When investigating    |
-| `code-semantic-search`           | Concept discovery               | When pattern hunting  |
-| `token-saver-context-compression`| Compress large audit results    | When output is large  |
-| `verification-before-completion` | Gate completion on zero errors  | Before marking done   |
-| `memory-search`                  | Check prior audit patterns      | At start              |
+| Skill                             | Purpose                        | When                 |
+| --------------------------------- | ------------------------------ | -------------------- |
+| `task-management-protocol`        | Track scan progress            | Always               |
+| `ripgrep`                         | Fast targeted code search      | When investigating   |
+| `code-semantic-search`            | Concept discovery              | When pattern hunting |
+| `token-saver-context-compression` | Compress large audit results   | When output is large |
+| `verification-before-completion`  | Gate completion on zero errors | Before marking done  |
+| `memory-search`                   | Check prior audit patterns     | At start             |
 
 ## Iron Laws
 
@@ -90,13 +91,13 @@ Invoke before starting this skill:
 
 ## Anti-Patterns
 
-| Anti-Pattern                                          | Risk                                                   | Correct Approach                                        |
-| ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------- |
-| Treating `[STALE_CATALOG]` as informational noise     | Registry drifts from reality; agents get wrong counts  | Always update agent-registry.json when agent files change |
-| Skipping scan after bulk framework batch ops          | Batch ops most commonly create phantom refs            | Run scan as the FINAL step of every batch operation     |
-| Manually patching require() paths without re-scanning | One fix may mask three new breaks                      | Always re-run full scan after patching paths            |
-| Running scanner against `_archive/` subtrees          | Archive content has intentionally broken refs; false positives | Scanner skip rules handle this; trust the skip list |
-| Adding to `DYNAMIC_SCRIPT_GENERATORS` without review  | Accidentally suppressing real phantom detections       | Only add files that provably generate child scripts     |
+| Anti-Pattern                                          | Risk                                                           | Correct Approach                                          |
+| ----------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------- |
+| Treating `[STALE_CATALOG]` as informational noise     | Registry drifts from reality; agents get wrong counts          | Always update agent-registry.json when agent files change |
+| Skipping scan after bulk framework batch ops          | Batch ops most commonly create phantom refs                    | Run scan as the FINAL step of every batch operation       |
+| Manually patching require() paths without re-scanning | One fix may mask three new breaks                              | Always re-run full scan after patching paths              |
+| Running scanner against `_archive/` subtrees          | Archive content has intentionally broken refs; false positives | Scanner skip rules handle this; trust the skip list       |
+| Adding to `DYNAMIC_SCRIPT_GENERATORS` without review  | Accidentally suppressing real phantom detections               | Only add files that provably generate child scripts       |
 
 ## Step 1: Run the Integrity Audit Engine
 
@@ -126,20 +127,25 @@ Parse outputs into a structured report at
 
 ```markdown
 # Ecosystem Integrity Report
+
 <!-- Agent: qa | Task: #{id} | Session: {date} -->
+
 **Date:** YYYY-MM-DD
 **Overall Status:** PASS / FAIL
 **Errors:** N | **Warnings:** N
 
 ## HIGH — Runtime Blocking (must fix before deployment)
+
 - `[PHANTOM_REQUIRE]` — Module resolution failures that crash hooks/scripts
 - `[PHANTOM_SKILL]` — Missing skills that break agent workflows silently
 
 ## MEDIUM — Structural Integrity (fix in current sprint)
+
 - `[ARCHIVED_REF]` — Active code pointing at archived/dead modules
 - `[STALE_CATALOG]` — Registry count mismatch with actual agent files
 
 ## LOW — Housekeeping (fix in next maintenance window)
+
 - `[EMPTY_DIR]` — Ghost directories creating registry noise
 - `[ENCODING]` — UTF-16 files that may break parsers
 ```
@@ -148,14 +154,14 @@ Parse outputs into a structured report at
 
 Delegate fixes to the correct specialist:
 
-| Error Type          | Spawn Agent   | Task Description                               |
-| ------------------- | ------------- | ---------------------------------------------- |
-| `[PHANTOM_REQUIRE]` | `developer`   | Fix broken require() path in `{file}`          |
-| `[PHANTOM_SKILL]`   | `qa`          | Remove or create missing skill `{name}`        |
-| `[ARCHIVED_REF]`    | `developer`   | Replace archive reference in `{file}`          |
-| `[STALE_CATALOG]`   | `developer`   | Regenerate agent-registry.json                 |
-| `[EMPTY_DIR]`       | `developer`   | Remove empty directory `{path}`                |
-| `[ENCODING]`        | `developer`   | Re-encode `{file}` as UTF-8                    |
+| Error Type          | Spawn Agent | Task Description                        |
+| ------------------- | ----------- | --------------------------------------- |
+| `[PHANTOM_REQUIRE]` | `developer` | Fix broken require() path in `{file}`   |
+| `[PHANTOM_SKILL]`   | `qa`        | Remove or create missing skill `{name}` |
+| `[ARCHIVED_REF]`    | `developer` | Replace archive reference in `{file}`   |
+| `[STALE_CATALOG]`   | `developer` | Regenerate agent-registry.json          |
+| `[EMPTY_DIR]`       | `developer` | Remove empty directory `{path}`         |
+| `[ENCODING]`        | `developer` | Re-encode `{file}` as UTF-8             |
 
 After fixes, re-run the scanner and verify errors reach zero before completion.
 

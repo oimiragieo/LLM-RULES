@@ -1,7 +1,7 @@
 ---
 name: kafka-development-practices
 version: 1.1.0
-category: "DevOps & Infrastructure"
+category: 'DevOps & Infrastructure'
 agents: [developer, devops]
 tags: [kafka, streaming, messaging, events, distributed]
 description: Applies general coding standards and best practices for Kafka development with Scala.
@@ -40,7 +40,7 @@ When reviewing or writing code, apply these guidelines:
 - All topic names config values (Typesafe Config or pure-config).
 - Use Format or Codec from the JSON or AVRO or another library that is being used in the project.
 - Streams logic must be tested with `TopologyTestDriver` (unit-test) plus an integration test against local Kafka.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -60,13 +60,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| `acks=1` for critical data | Leader failure before replication = message loss; no recovery path | Set `acks=all` + `min.insync.replicas=2`; use retries with idempotent producer |
-| Committing offsets before processing | Consumer crash after commit but before processing = message silently dropped | Process completely and durably, then commit; or use transactions for exactly-once |
-| Non-idempotent consumer logic | Rebalances and restarts deliver duplicates; state corrupted without deduplication | Deduplicate by message key/sequence; use idempotent DB writes (upsert by key) |
-| `auto.offset.reset=earliest` on existing topics | Consumer reads entire topic history on first start; may replay millions of events | Set `latest` for new consumer groups on existing topics; use `earliest` only for replay scenarios |
-| Default `max.poll.interval.ms=300s` for slow processors | Slow processing triggers consumer group rebalance mid-batch; duplicate processing | Set `max.poll.interval.ms` > worst-case processing time; reduce batch size if needed |
+| Anti-Pattern                                            | Why It Fails                                                                      | Correct Approach                                                                                  |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `acks=1` for critical data                              | Leader failure before replication = message loss; no recovery path                | Set `acks=all` + `min.insync.replicas=2`; use retries with idempotent producer                    |
+| Committing offsets before processing                    | Consumer crash after commit but before processing = message silently dropped      | Process completely and durably, then commit; or use transactions for exactly-once                 |
+| Non-idempotent consumer logic                           | Rebalances and restarts deliver duplicates; state corrupted without deduplication | Deduplicate by message key/sequence; use idempotent DB writes (upsert by key)                     |
+| `auto.offset.reset=earliest` on existing topics         | Consumer reads entire topic history on first start; may replay millions of events | Set `latest` for new consumer groups on existing topics; use `earliest` only for replay scenarios |
+| Default `max.poll.interval.ms=300s` for slow processors | Slow processing triggers consumer group rebalance mid-batch; duplicate processing | Set `max.poll.interval.ms` > worst-case processing time; reduce batch size if needed              |
 
 ## Memory Protocol (MANDATORY)
 

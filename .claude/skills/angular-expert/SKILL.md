@@ -1,7 +1,7 @@
 ---
 name: angular-expert
 version: 1.1.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [angular, typescript, rxjs, components, frontend]
 description: Angular framework expert including components, services, RxJS, templates, and testing
@@ -102,14 +102,14 @@ Agent: [Analyzes code against consolidated guidelines and provides specific feed
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Using NgModule for new components | Legacy pattern deprecated since Angular 17 | Use standalone components |
-| Direct DOM manipulation with ElementRef | Breaks SSR and web worker compatibility | Use Angular renderer or signals |
-| Not unsubscribing from Observables | Memory leaks accumulate across component lifecycle | Use `async` pipe or `takeUntilDestroyed()` |
-| Default change detection on data-heavy components | Unnecessary full-tree checks on every event | Use `OnPush` change detection strategy |
-| Deeply nested imperative subscriptions | Hard to test, lifecycle leak risk | Prefer `async` pipe in template |
-| Using `any` type to bypass compiler | Runtime errors that TypeScript would prevent | Use proper types or `unknown` with type guards |
+| Anti-Pattern                                      | Why It Fails                                       | Correct Approach                               |
+| ------------------------------------------------- | -------------------------------------------------- | ---------------------------------------------- |
+| Using NgModule for new components                 | Legacy pattern deprecated since Angular 17         | Use standalone components                      |
+| Direct DOM manipulation with ElementRef           | Breaks SSR and web worker compatibility            | Use Angular renderer or signals                |
+| Not unsubscribing from Observables                | Memory leaks accumulate across component lifecycle | Use `async` pipe or `takeUntilDestroyed()`     |
+| Default change detection on data-heavy components | Unnecessary full-tree checks on every event        | Use `OnPush` change detection strategy         |
+| Deeply nested imperative subscriptions            | Hard to test, lifecycle leak risk                  | Prefer `async` pipe in template                |
+| Using `any` type to bypass compiler               | Runtime errors that TypeScript would prevent       | Use proper types or `unknown` with type guards |
 
 ## Consolidated Skills
 

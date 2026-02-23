@@ -15,7 +15,8 @@ const STATUS = {
   specUrl: 'https://github.com/webmachinelearning/webmcp',
   lastUpdated: '2026-02-22',
   browsers: {
-    chrome: 'Early preview in Chrome 146 Canary (Feb 2026) — flag: Experimental Web Platform Features',
+    chrome:
+      'Early preview in Chrome 146 Canary (Feb 2026) — flag: Experimental Web Platform Features',
     firefox: 'Not shipped — no intent-to-implement filed',
     safari: 'Not shipped — no intent-to-implement filed',
   },
@@ -24,12 +25,32 @@ const STATUS = {
 };
 
 const PACKAGES = [
-  { name: '@mcp-b/react-webmcp', version: '1.1.1', purpose: 'React hooks for WebMCP tool registration' },
-  { name: '@mcp-b/webmcp-polyfill', version: 'latest', purpose: 'Strict WebMCP polyfill for any framework' },
+  {
+    name: '@mcp-b/react-webmcp',
+    version: '1.1.1',
+    purpose: 'React hooks for WebMCP tool registration',
+  },
+  {
+    name: '@mcp-b/webmcp-polyfill',
+    version: 'latest',
+    purpose: 'Strict WebMCP polyfill for any framework',
+  },
   { name: '@mcp-b/webmcp-types', version: 'latest', purpose: 'TypeScript type definitions' },
-  { name: '@mcp-b/transports', version: 'latest', purpose: 'Browser transport layer (WebSocket/postMessage)' },
-  { name: '@mcp-b/webmcp-ts-sdk', version: 'latest', purpose: 'Adapts official MCP TypeScript SDK for browsers' },
-  { name: '@mcp-b/create-webmcp-app', version: 'latest', purpose: 'Scaffolding tool for new WebMCP apps' },
+  {
+    name: '@mcp-b/transports',
+    version: 'latest',
+    purpose: 'Browser transport layer (WebSocket/postMessage)',
+  },
+  {
+    name: '@mcp-b/webmcp-ts-sdk',
+    version: 'latest',
+    purpose: 'Adapts official MCP TypeScript SDK for browsers',
+  },
+  {
+    name: '@mcp-b/create-webmcp-app',
+    version: 'latest',
+    purpose: 'Scaffolding tool for new WebMCP apps',
+  },
 ];
 
 function printStatus() {

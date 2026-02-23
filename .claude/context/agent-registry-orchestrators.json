@@ -1,9 +1,9 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-11T15:23:42.409Z",
+  "generatedAt": "2026-02-23T01:55:25.550Z",
   "metadata": {
     "category": "orchestrators",
-    "agentCount": 3
+    "agentCount": 5
   },
   "agents": {
     "evolution-orchestrator": {
@@ -258,6 +258,178 @@
         "version": "2.0.0",
         "createdAt": "2026-02-11T00:35:03.888Z",
         "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "swarm-coordinator": {
+      "id": "swarm-coordinator",
+      "displayName": "swarm-coordinator",
+      "category": "orchestrator",
+      "filePath": ".claude/agents/orchestrators/swarm-coordinator.md",
+      "capabilities": [
+        {
+          "name": "swarm-coordinator",
+          "domain": "orchestration",
+          "description": "Manages multi-agent swarms (Queen/Worker topology). Handles consensus, task distribution, and result aggregation.",
+          "triggerPhrases": [
+            "swarm",
+            "coordinator",
+            "consensus-voting",
+            "context-compressor",
+            "dispatching-parallel-agents",
+            "plan-generator",
+            "ripgrep",
+            "subagent-driven-development",
+            "swarm-coordination",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Task",
+            "Read",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "Write",
+            "Edit",
+            "Bash",
+            "Glob",
+            "Grep"
+          ],
+          "skills": [
+            "consensus-voting",
+            "context-compressor",
+            "dispatching-parallel-agents",
+            "plan-generator",
+            "ripgrep",
+            "subagent-driven-development",
+            "swarm-coordination",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "swarm",
+            "coordinator",
+            "consensus-voting",
+            "context-compressor",
+            "dispatching-parallel-agents",
+            "plan-generator",
+            "ripgrep",
+            "subagent-driven-development",
+            "swarm-coordination",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-11T00:35:03.888Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-11T00:35:03.888Z",
+        "updatedAt": "2026-02-11T00:35:03.888Z"
+      }
+    },
+    "artifact-integrator": {
+      "id": "artifact-integrator",
+      "displayName": "artifact-integrator",
+      "category": "orchestrator",
+      "filePath": ".claude/agents/orchestrators/artifact-integrator.md",
+      "capabilities": [
+        {
+          "name": "artifact-integrator",
+          "domain": "orchestration",
+          "description": "Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces a security-first multi-agent pipeline.",
+          "triggerPhrases": [
+            "artifact",
+            "integrator",
+            "github.com/",
+            "https://",
+            "repository",
+            "repo",
+            "integrate",
+            "onboard",
+            "ingest",
+            "onboard repo"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Glob",
+            "Grep",
+            "Bash",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Task",
+            "Skill",
+            "WebFetch"
+          ],
+          "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol",
+            "verification-before-completion",
+            "agent-creator",
+            "command-creator",
+            "hook-creator"
+          ],
+          "examples": [],
+          "tags": [
+            "artifact",
+            "integrator",
+            "github.com/",
+            "https://",
+            "repository",
+            "repo",
+            "integrate",
+            "onboard",
+            "ingest",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:52:12.202Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-02-23T01:52:12.202Z",
+        "updatedAt": "2026-02-23T01:52:12.202Z"
       }
     }
   }

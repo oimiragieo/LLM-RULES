@@ -2,7 +2,7 @@
 name: subagent-driven-development
 description: Execute plans via autonomous agents with two-stage review per task. Use for complex implementations requiring quality gates.
 version: 1.0.0
-category: "Development Workflow"
+category: 'Development Workflow'
 agents: [developer, master-orchestrator, planner]
 tags: [subagents, parallel-execution, dispatch, orchestration, delegation]
 model: sonnet
@@ -278,13 +278,13 @@ Done!
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Sparse spawn prompts | Subagent lacks context; produces incorrect output | Include full task text, file paths, and constraints in every spawn prompt |
-| Skipping two-stage review | Low-quality output reaches completion without validation | Always run spec compliance check then quality gate before accepting output |
-| Reusing subagents for multiple tasks | State contamination between unrelated tasks | Spawn a fresh subagent for each independent task |
-| Not checking TaskUpdate completion | Orchestrator advances before work is done | Verify `TaskUpdate(completed)` from each subagent before proceeding |
-| Marking done before all stages pass | Incomplete or failing tasks considered complete | Only mark orchestration done when all tasks pass both review stages |
+| Anti-Pattern                         | Why It Fails                                             | Correct Approach                                                           |
+| ------------------------------------ | -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Sparse spawn prompts                 | Subagent lacks context; produces incorrect output        | Include full task text, file paths, and constraints in every spawn prompt  |
+| Skipping two-stage review            | Low-quality output reaches completion without validation | Always run spec compliance check then quality gate before accepting output |
+| Reusing subagents for multiple tasks | State contamination between unrelated tasks              | Spawn a fresh subagent for each independent task                           |
+| Not checking TaskUpdate completion   | Orchestrator advances before work is done                | Verify `TaskUpdate(completed)` from each subagent before proceeding        |
+| Marking done before all stages pass  | Incomplete or failing tasks considered complete          | Only mark orchestration done when all tasks pass both review stages        |
 
 ## Memory Protocol (MANDATORY)
 

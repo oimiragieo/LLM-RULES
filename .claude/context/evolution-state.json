@@ -1200,29 +1200,5 @@
     }
   ],
   "pendingProposals": [],
-  "status": "locking",
-  "currentEvolution": {
-    "type": "batch-skills",
-    "name": "voltAgent-batch-skills",
-    "phase": "lock",
-    "startedAt": "2026-02-21T00:00:00.000Z",
-    "researchReport": ".claude/context/artifacts/research-reports/voltAgent-skills-research-2026-02-21.md",
-    "skills": [
-      "enhance-prompt",
-      "next-upgrade",
-      "vercel-deploy",
-      "shadcn-ui",
-      "web-perf",
-      "next-cache-components"
-    ],
-    "completed": [],
-    "queriesExecuted": 5,
-    "sourcesConsulted": [
-      "https://github.com/VoltAgent/awesome-agent-skills",
-      "https://github.com/vercel-labs/agent-skills",
-      "https://github.com/vercel-labs/next-skills",
-      "https://github.com/google-labs-code/stitch-skills",
-      "https://github.com/cloudflare/skills"
-    ]
-  }
+  "status": "idle"
 }

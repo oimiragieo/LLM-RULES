@@ -1512,7 +1512,17 @@ Agents can invoke dynamically
 Step 12: README.md Updated (public catalog)
 ```
 
-### Step 12: Update README.md Skills Catalog (MANDATORY - BLOCKING)
+### Step 12: Global Ecosystem Sync (MANDATORY)
+
+To guarantee that all registries and indexes are perfectly synchronized across the entire framework, you must run the composite registry command as your final action:
+
+```bash
+npm run gen:all-registries
+```
+
+This ensures the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
+
+### Step 13: Update README.md Skills Catalog (MANDATORY - BLOCKING)
 
 After the skill is indexed, add it to the project README so it is publicly discoverable.
 

@@ -1,7 +1,7 @@
 ---
 name: finishing-a-development-branch
 version: 1.1.0
-category: "Git & Version Control"
+category: 'Git & Version Control'
 agents: [developer, devops]
 tags: [git, branch, merge, pull-request, completion, lint, tests]
 description: Complete development with structured merge/PR options. Use when ready to merge or submit work.
@@ -238,13 +238,13 @@ git worktree remove <worktree-path>
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Skipping test verification before merge | Broken code lands on main; CI fails after the fact | Always run test suite first; gate options on passing tests |
-| Presenting open-ended completion questions | Developer doesn't know available paths; worktrees left orphaned | Present exactly 4 numbered options with clear labels |
-| Deleting branch without confirmation | Developer loses in-progress work permanently | Require typed "discard" confirmation for Option 4 |
-| Cleaning up worktree for Option 2 (PR) | Kills local context before PR review is complete | Only remove worktree for Options 1 and 4 |
-| Merging directly without pulling latest base | Merge conflicts or stale base; CI detects drift | `git pull` on base branch before `git merge` |
+| Anti-Pattern                                 | Why It Fails                                                    | Correct Approach                                           |
+| -------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
+| Skipping test verification before merge      | Broken code lands on main; CI fails after the fact              | Always run test suite first; gate options on passing tests |
+| Presenting open-ended completion questions   | Developer doesn't know available paths; worktrees left orphaned | Present exactly 4 numbered options with clear labels       |
+| Deleting branch without confirmation         | Developer loses in-progress work permanently                    | Require typed "discard" confirmation for Option 4          |
+| Cleaning up worktree for Option 2 (PR)       | Kills local context before PR review is complete                | Only remove worktree for Options 1 and 4                   |
+| Merging directly without pulling latest base | Merge conflicts or stale base; CI detects drift                 | `git pull` on base branch before `git merge`               |
 
 ## Memory Protocol (MANDATORY)
 

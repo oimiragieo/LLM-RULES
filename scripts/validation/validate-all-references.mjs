@@ -477,12 +477,11 @@ function validateTemplates() {
   // Check critical templates
   const criticalTemplates = [
     'plan-template.md',
-    'claude-md-template.md',
-    'project-brief.md',
-    'prd.md',
+    'specification-template.md',
     'architecture.md',
-    'ui-spec.md',
+    'prd-template.md',
     'test-plan.md',
+    'tasks-template.md',
   ];
 
   criticalTemplates.forEach(template => {

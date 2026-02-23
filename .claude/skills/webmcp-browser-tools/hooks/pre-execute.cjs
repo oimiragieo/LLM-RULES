@@ -20,7 +20,7 @@ function preExecute(input = {}) {
       process.stderr.write(
         `[webmcp-browser-tools] WARNING: Input contains "${signal}" — ` +
           'WebMCP exposes web app functionality TO agents; it does not scrape external pages. ' +
-          'Use WebFetch or mcp__Exa__web_search_exa for fetching external content.\n',
+          'Use WebFetch or mcp__Exa__web_search_exa for fetching external content.\n'
       );
     }
   }

@@ -59,27 +59,56 @@ async function main() {
     return { ok: true };
   }
 
-  console.log('Worker metrics summary');
-  console.log(`- File: ${metricsPath}`);
-  console.log(`- Total ticks: ${summary.total}`);
-  console.log(`- OK: ${summary.ok}`);
-  console.log(`- Partial fail: ${summary.partialFail}`);
-  console.log(`- Last tick: ${summary.lastTick || 'n/a'}`);
-  console.log(`- Last status: ${summary.lastStatus || 'n/a'}`);
-  console.log('');
-  console.log(`Last ${recent.length} tick(s):`);
+  const chalk = {
+    green: t => `\x1b[32m${t}\x1b[0m`,
+    red: t => `\x1b[31m${t}\x1b[0m`,
+    yellow: t => `\x1b[33m${t}\x1b[0m`,
+    blue: t => `\x1b[34m${t}\x1b[0m`,
+    gray: t => `\x1b[90m${t}\x1b[0m`,
+    bold: t => `\x1b[1m${t}\x1b[0m`,
+  };
+  chalk.green.bold = t => chalk.bold(chalk.green(t));
+  chalk.red.bold = t => chalk.bold(chalk.red(t));
+  chalk.yellow.bold = t => chalk.bold(chalk.yellow(t));
 
-  for (const entry of recent) {
-    const tasks = entry.tasks || {};
-    const parts = [
-      entry.timestamp,
-      entry.status,
-      tasks.maintenance?.ok === false ? 'maintenance:fail' : null,
-      tasks.index?.ok === false ? 'index:fail' : null,
-      tasks.reflection?.ok === false ? 'reflection:fail' : null,
-    ].filter(Boolean);
-    console.log(`- ${parts.join(' | ')}`);
+  console.log(chalk.bold('\n🤖 Worker Metrics Summary'));
+  console.log(chalk.gray('================================================='));
+  console.log(`📂 ${chalk.blue('File')}: ${metricsPath}`);
+  console.log(`⏱️  ${chalk.blue('Total ticks')}: ${summary.total}`);
+  console.log(`✅ ${chalk.green('OK')}: ${summary.ok}`);
+  console.log(`⚠️  ${chalk.yellow('Partial fail')}: ${summary.partialFail}`);
+  console.log(
+    `🕒 ${chalk.blue('Last tick')}: ${summary.lastTick ? new Date(summary.lastTick).toLocaleString() : 'n/a'}`
+  );
+  console.log(
+    `📈 ${chalk.blue('Last status')}: ${
+      summary.lastStatus === 'ok'
+        ? chalk.green.bold('OK')
+        : summary.lastStatus
+          ? chalk.yellow.bold(summary.lastStatus)
+          : 'n/a'
+    }`
+  );
+
+  if (recent.length > 0) {
+    console.log(chalk.gray('-------------------------------------------------'));
+    console.log(chalk.bold(`Recent Activity (Last ${recent.length} ticks):`));
+
+    for (const entry of recent) {
+      const timeStr = new Date(entry.timestamp).toLocaleTimeString();
+      const statusIcon = entry.status === 'ok' ? chalk.green('✅ OK') : chalk.red('❌ FAIL');
+
+      const tasks = entry.tasks || {};
+      const fails = [];
+      if (tasks.maintenance?.ok === false) fails.push('maintenance');
+      if (tasks.index?.ok === false) fails.push('index');
+      if (tasks.reflection?.ok === false) fails.push('reflection');
+
+      const failStr = fails.length > 0 ? chalk.red(`(Failed: ${fails.join(', ')})`) : '';
+      console.log(`  [${chalk.gray(timeStr)}] ${statusIcon} ${failStr}`);
+    }
   }
+  console.log(chalk.gray('=================================================\n'));
 
   return { ok: true };
 }

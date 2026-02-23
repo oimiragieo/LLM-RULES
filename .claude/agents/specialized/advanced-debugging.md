@@ -56,16 +56,16 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook                               | Event                   | Purpose                                | Override        |
-| ---------------------------------- | ----------------------- | -------------------------------------- | --------------- |
-| `bash-command-validator.cjs`       | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
-| `shell-injection-validator.cjs`    | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
-| `windows-null-sanitizer.cjs`       | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
-| `unified-creator-guard.cjs`        | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
-| `unified-pre-write-hook.cjs`       | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
-| `pre-completion-validation.cjs`    | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
-| `sync-memory-index.cjs`            | PostToolUse(Edit/Write) | Updates memory search index            | --              |
-| `code-index-updater.cjs`           | PostToolUse(Edit/Write) | Updates code search index              | --              |
+| Hook                            | Event                   | Purpose                                | Override        |
+| ------------------------------- | ----------------------- | -------------------------------------- | --------------- |
+| `bash-command-validator.cjs`    | PreToolUse(Bash)        | Blocks dangerous shell commands        | --              |
+| `shell-injection-validator.cjs` | PreToolUse(Bash)        | Blocks shell injection patterns        | --              |
+| `windows-null-sanitizer.cjs`    | PreToolUse(Bash)        | Prevents Windows reserved name issues  | --              |
+| `unified-creator-guard.cjs`     | PreToolUse(Write/Edit)  | Blocks direct writes to creator paths  | `CREATOR_GUARD` |
+| `unified-pre-write-hook.cjs`    | PreToolUse(Write/Edit)  | Consolidated write safety checks       | --              |
+| `pre-completion-validation.cjs` | PreToolUse(TaskUpdate)  | Validates work before marking complete | --              |
+| `sync-memory-index.cjs`         | PostToolUse(Edit/Write) | Updates memory search index            | --              |
+| `code-index-updater.cjs`        | PostToolUse(Edit/Write) | Updates code search index              | --              |
 
 See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -274,22 +274,22 @@ Skill({ skill: 'troubleshooting-regression' }); // Regression investigation
 
 ### Automatic Skills (Always Invoke)
 
-| Skill                            | Purpose                             | When                   |
-| -------------------------------- | ----------------------------------- | ---------------------- |
-| `debugging`                      | Structured 4-phase debugging        | Always at task start   |
-| `smart-debug`                    | AI-assisted hypothesis ranking      | After initial triage   |
-| `verification-before-completion` | Evidence-based completion gates     | Before completing      |
+| Skill                            | Purpose                         | When                 |
+| -------------------------------- | ------------------------------- | -------------------- |
+| `debugging`                      | Structured 4-phase debugging    | Always at task start |
+| `smart-debug`                    | AI-assisted hypothesis ranking  | After initial triage |
+| `verification-before-completion` | Evidence-based completion gates | Before completing    |
 
 ### Contextual Skills (When Applicable)
 
-| Condition                  | Skill                          | Purpose                          |
-| -------------------------- | ------------------------------ | -------------------------------- |
-| Regression introduced      | `troubleshooting-regression`   | Structured regression bisect     |
-| Recovery needed            | `recovery`                     | System recovery procedures       |
-| Log analysis               | `logging-module-usage`         | Structured log analysis          |
-| Writing fix with tests     | `tdd`                          | RED/GREEN/REFACTOR cycle         |
-| Session task tracking      | `task-management-protocol`     | Multi-step investigation mgmt    |
-| Context pressure high      | `token-saver-context-compression` | Context compression           |
+| Condition              | Skill                             | Purpose                       |
+| ---------------------- | --------------------------------- | ----------------------------- |
+| Regression introduced  | `troubleshooting-regression`      | Structured regression bisect  |
+| Recovery needed        | `recovery`                        | System recovery procedures    |
+| Log analysis           | `logging-module-usage`            | Structured log analysis       |
+| Writing fix with tests | `tdd`                             | RED/GREEN/REFACTOR cycle      |
+| Session task tracking  | `task-management-protocol`        | Multi-step investigation mgmt |
+| Context pressure high  | `token-saver-context-compression` | Context compression           |
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
 
@@ -308,6 +308,7 @@ Skill({ skill: 'troubleshooting-regression' }); // Regression investigation
 Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high.
 
 Invoke token-saver when ANY of these hold:
+
 - Synthesizing across many log entries, traces, or heap dumps (10+ items)
 - Retrieved stack traces or profiler outputs too large for working context
 - Preparing evidence-heavy root cause analysis report

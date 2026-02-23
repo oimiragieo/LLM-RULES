@@ -1,7 +1,7 @@
 ---
 name: flutter-expert
 version: 1.1.0
-category: "Mobile"
+category: 'Mobile'
 agents: [developer, expo-mobile-developer]
 tags: [flutter, dart, mobile, cross-platform, widgets]
 description: Flutter and Dart expert including widgets, state management, and platform integration
@@ -123,13 +123,13 @@ This expert skill consolidates 1 individual skills:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Non-const stateless widgets | Rebuilt on every parent setState; wastes frame budget | Add `const` to all stateless widget constructors and their instantiation |
-| Calling `Future` in `build()` | Re-fires on every rebuild; duplicates API calls and causes flickering | Use `FutureBuilder` with a stored `Future` field initialized in `initState` |
-| Business logic in widgets | Untestable; coupled to widget lifecycle; duplicated across screens | Move logic to BLoC/Cubit or Riverpod providers; widgets observe state only |
-| `setState` for cross-widget state | Only rebuilds local subtree; sibling widgets stay stale | Use `InheritedWidget`, `Provider`, or BLoC streams for shared state |
-| Force-unwrapping nullable API data | Runtime null crash with no recovery path | Use null-aware operators (`?.`, `??`) and handle null states explicitly in UI |
+| Anti-Pattern                       | Why It Fails                                                          | Correct Approach                                                              |
+| ---------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Non-const stateless widgets        | Rebuilt on every parent setState; wastes frame budget                 | Add `const` to all stateless widget constructors and their instantiation      |
+| Calling `Future` in `build()`      | Re-fires on every rebuild; duplicates API calls and causes flickering | Use `FutureBuilder` with a stored `Future` field initialized in `initState`   |
+| Business logic in widgets          | Untestable; coupled to widget lifecycle; duplicated across screens    | Move logic to BLoC/Cubit or Riverpod providers; widgets observe state only    |
+| `setState` for cross-widget state  | Only rebuilds local subtree; sibling widgets stay stale               | Use `InheritedWidget`, `Provider`, or BLoC streams for shared state           |
+| Force-unwrapping nullable API data | Runtime null crash with no recovery path                              | Use null-aware operators (`?.`, `??`) and handle null states explicitly in UI |
 
 ## Memory Protocol (MANDATORY)
 

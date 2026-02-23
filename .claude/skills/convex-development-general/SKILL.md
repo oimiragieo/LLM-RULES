@@ -1,7 +1,7 @@
 ---
 name: convex-development-general
 version: 1.1.0
-category: "External Integrations"
+category: 'External Integrations'
 agents: [developer]
 tags: [convex, backend, realtime, database, serverless]
 description: Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system fields.
@@ -9,7 +9,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit]
-globs: "**/convex/**/*.*"
+globs: '**/convex/**/*.*'
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review
@@ -58,13 +58,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Using plain TypeScript interfaces as schema definitions | TypeScript types are compile-time only; Convex `v` validators enforce runtime shape and generate type-safe accessors | Define all table schemas with `defineTable(v.object({...}))` |
-| Adding `_id` or `_creationTime` to defineTable schemas | Convex rejects schemas that include system fields, causing runtime initialization errors | Omit system fields; access them via `doc._id` and `doc._creationTime` after query |
-| Storing cross-document references as plain `v.string()` | Loses Convex's cross-reference validation and type inference for joined queries | Use `v.id("tableName")` so Convex validates the reference type |
-| Running `.collect()` on large tables without pagination | Returns all documents, causing memory spikes and timeouts on large datasets | Use `.paginate(opts)` or `.take(100)` with cursor-based pagination |
-| Writing to the database from React client code directly | Bypasses access control, validation, and audit trail; creates untraceable mutations | All writes must go through a Convex `mutation` function in `convex/` |
+| Anti-Pattern                                            | Why It Fails                                                                                                         | Correct Approach                                                                  |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Using plain TypeScript interfaces as schema definitions | TypeScript types are compile-time only; Convex `v` validators enforce runtime shape and generate type-safe accessors | Define all table schemas with `defineTable(v.object({...}))`                      |
+| Adding `_id` or `_creationTime` to defineTable schemas  | Convex rejects schemas that include system fields, causing runtime initialization errors                             | Omit system fields; access them via `doc._id` and `doc._creationTime` after query |
+| Storing cross-document references as plain `v.string()` | Loses Convex's cross-reference validation and type inference for joined queries                                      | Use `v.id("tableName")` so Convex validates the reference type                    |
+| Running `.collect()` on large tables without pagination | Returns all documents, causing memory spikes and timeouts on large datasets                                          | Use `.paginate(opts)` or `.take(100)` with cursor-based pagination                |
+| Writing to the database from React client code directly | Bypasses access control, validation, and audit trail; creates untraceable mutations                                  | All writes must go through a Convex `mutation` function in `convex/`              |
 
 ## Memory Protocol (MANDATORY)
 

@@ -2,7 +2,7 @@
 name: jira-pm
 description: Jira project management and issue tracking integration
 version: 1.1.0
-category: "Other"
+category: 'Other'
 agents: [planner, developer]
 tags: [jira, project-management, tickets, agile, sprint]
 model: sonnet
@@ -47,7 +47,7 @@ Optional:
 
 - JIRA_DEFAULT_PROJECT - Default project key for operations (e.g., PROJ)
 - JIRA_API_VERSION - API version (default: 3)
-</requirements>
+  </requirements>
 
 <instructions>
 <execution_process>
@@ -61,34 +61,34 @@ Optional:
 
 ## Issues
 
-| Tool             | Description                        | Confirmation Required |
-| ---------------- | ---------------------------------- | --------------------- |
-| search           | Search issues using JQL            | No                    |
-| get-issue        | Get detailed issue information     | No                    |
-| create-issue     | Create a new issue                 | Yes                   |
-| update-issue     | Update existing issue fields       | Yes                   |
-| transition       | Change issue status/workflow state | Yes                   |
+| Tool         | Description                        | Confirmation Required |
+| ------------ | ---------------------------------- | --------------------- |
+| search       | Search issues using JQL            | No                    |
+| get-issue    | Get detailed issue information     | No                    |
+| create-issue | Create a new issue                 | Yes                   |
+| update-issue | Update existing issue fields       | Yes                   |
+| transition   | Change issue status/workflow state | Yes                   |
 
 ## Projects
 
-| Tool              | Description                      |
-| ----------------- | -------------------------------- |
-| list-projects     | List all accessible projects     |
-| project-info      | Get detailed project information |
+| Tool          | Description                      |
+| ------------- | -------------------------------- |
+| list-projects | List all accessible projects     |
+| project-info  | Get detailed project information |
 
 ## Sprints
 
-| Tool              | Description                             |
-| ----------------- | --------------------------------------- |
-| active-sprint     | Get currently active sprint for a board |
-| sprint-issues     | List all issues in a specific sprint    |
+| Tool          | Description                             |
+| ------------- | --------------------------------------- |
+| active-sprint | Get currently active sprint for a board |
+| sprint-issues | List all issues in a specific sprint    |
 
 ## Comments
 
-| Tool             | Description                       |
-| ---------------- | --------------------------------- |
-| get-comments     | Retrieve all comments on an issue |
-| add-comment      | Add a comment to an issue         |
+| Tool         | Description                       |
+| ------------ | --------------------------------- |
+| get-comments | Retrieve all comments on an issue |
+| add-comment  | Add a comment to an issue         |
 
 </tool_categories>
 
@@ -182,13 +182,13 @@ See https://developer.atlassian.com/cloud/jira/platform/rest/v3/ for full refere
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Updating status via field PUT | Bypasses workflow guards; invalid state transitions succeed silently; automation rules don't fire | Use `POST /issue/{key}/transitions` with the correct transition ID |
-| Fetching all issues and filtering locally | Times out on large projects; wastes API quota; slow for paginated results | Always use JQL with specific project/sprint/status filters |
-| Creating issues without duplication check | Splits work tracking; team sees multiple tickets for same task | Search with JQL (`project = X AND summary ~ "keyword"`) before creating |
-| Hardcoding field IDs (e.g., `customfield_10016`) | Field IDs differ between Jira instances and cloud/server; breaks across projects | Discover field IDs dynamically via `/rest/api/3/field` endpoint |
-| No error handling for rate limits (429) | Jira Cloud rate limits at ~300 requests/minute; unhandled 429 crashes automation | Implement exponential backoff; check `Retry-After` header on 429 responses |
+| Anti-Pattern                                     | Why It Fails                                                                                      | Correct Approach                                                           |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Updating status via field PUT                    | Bypasses workflow guards; invalid state transitions succeed silently; automation rules don't fire | Use `POST /issue/{key}/transitions` with the correct transition ID         |
+| Fetching all issues and filtering locally        | Times out on large projects; wastes API quota; slow for paginated results                         | Always use JQL with specific project/sprint/status filters                 |
+| Creating issues without duplication check        | Splits work tracking; team sees multiple tickets for same task                                    | Search with JQL (`project = X AND summary ~ "keyword"`) before creating    |
+| Hardcoding field IDs (e.g., `customfield_10016`) | Field IDs differ between Jira instances and cloud/server; breaks across projects                  | Discover field IDs dynamically via `/rest/api/3/field` endpoint            |
+| No error handling for rate limits (429)          | Jira Cloud rate limits at ~300 requests/minute; unhandled 429 crashes automation                  | Implement exponential backoff; check `Retry-After` header on 429 responses |
 
 ## Memory Protocol (MANDATORY)
 

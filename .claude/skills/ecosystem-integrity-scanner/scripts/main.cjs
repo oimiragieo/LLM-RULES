@@ -72,7 +72,9 @@ if (options.json) {
   // Extract individual findings
   const findingLines = (stdout + stderr)
     .split('\n')
-    .filter(l => /\[(PHANTOM_REQUIRE|PHANTOM_SKILL|EMPTY_DIR|ENCODING|ARCHIVED_REF|STALE_CATALOG)\]/.test(l))
+    .filter(l =>
+      /\[(PHANTOM_REQUIRE|PHANTOM_SKILL|EMPTY_DIR|ENCODING|ARCHIVED_REF|STALE_CATALOG)\]/.test(l)
+    )
     .map(l => l.trim());
 
   const result = {

@@ -3,9 +3,7 @@
   "title": "requesting-code-review Output Schema",
   "description": "Output validation schema for requesting-code-review skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

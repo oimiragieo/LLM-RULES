@@ -93,7 +93,11 @@ function createReportingOps({ PROJECT_ROOT, CONFIG, getMemoryDir }) {
     if (fs.existsSync(gotchasFile)) {
       try {
         const gotchas = JSON.parse(fs.readFileSync(gotchasFile, 'utf8'));
-        stats.gotchas_count = gotchas.length;
+        stats.gotchas_count = Array.isArray(gotchas)
+          ? gotchas.length
+          : gotchas.gotchas
+            ? gotchas.gotchas.length
+            : 0;
         stats.total_size_bytes += fs.statSync(gotchasFile).size;
       } catch (e) {
         if (process.env.METRICS_DEBUG === 'true') {
@@ -106,7 +110,11 @@ function createReportingOps({ PROJECT_ROOT, CONFIG, getMemoryDir }) {
     if (fs.existsSync(patternsFile)) {
       try {
         const patterns = JSON.parse(fs.readFileSync(patternsFile, 'utf8'));
-        stats.patterns_count = patterns.length;
+        stats.patterns_count = Array.isArray(patterns)
+          ? patterns.length
+          : patterns.patterns
+            ? patterns.patterns.length
+            : 0;
         stats.total_size_bytes += fs.statSync(patternsFile).size;
       } catch (e) {
         if (process.env.MEMORY_DEBUG) {

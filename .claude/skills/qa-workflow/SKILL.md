@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 agents: [qa, developer, code-reviewer]
-category: "Validation & Quality"
+category: 'Validation & Quality'
 tags: [qa, testing, validation, fix-loop, quality-assurance, sign-off]
 
 verified: true
@@ -51,13 +51,13 @@ Comprehensive quality assurance workflow that validates implementation completen
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| ------------ | ------------ | ---------------- |
-| Approving before checking all acceptance criteria | Ships bugs disguised as features; breaks the quality contract | Verify every criterion in the spec before writing the verdict |
-| Writing vague issue reports ("tests fail", "broken") | Developer cannot reproduce or fix what is not precisely described | Include file path, line number, exact error message, and reproduction steps |
-| Signing off with known failing tests | Failing tests are documented bugs being shipped to production | All tests must pass; if tests are wrong, fix them first and document the change |
-| Only running new tests, not the full regression suite | New code breaking old functionality is invisible without full suite | Always run full suite with `--coverage`; regressions block approval |
-| Fixing more than QA found to "clean things up" | Over-fixing introduces new bugs and scope creep into the fix loop | Apply minimal changes; fix only what QA identified, nothing more |
+| Anti-Pattern                                          | Why It Fails                                                        | Correct Approach                                                                |
+| ----------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Approving before checking all acceptance criteria     | Ships bugs disguised as features; breaks the quality contract       | Verify every criterion in the spec before writing the verdict                   |
+| Writing vague issue reports ("tests fail", "broken")  | Developer cannot reproduce or fix what is not precisely described   | Include file path, line number, exact error message, and reproduction steps     |
+| Signing off with known failing tests                  | Failing tests are documented bugs being shipped to production       | All tests must pass; if tests are wrong, fix them first and document the change |
+| Only running new tests, not the full regression suite | New code breaking old functionality is invisible without full suite | Always run full suite with `--coverage`; regressions block approval             |
+| Fixing more than QA found to "clean things up"        | Over-fixing introduces new bugs and scope creep into the fix loop   | Apply minimal changes; fix only what QA identified, nothing more                |
 
 Every acceptance criterion must be verified before approval.
 

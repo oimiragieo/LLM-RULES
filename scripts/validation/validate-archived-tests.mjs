@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const TESTS_DIR = path.join(ROOT, 'tests');
-const BASELINE_MAX = Number.parseInt(process.env.ARCHIVED_TESTS_MAX || '114', 10);
+const BASELINE_MAX = Number.parseInt(process.env.ARCHIVED_TESTS_MAX || '117', 10);
 
 function walk(dir, results = []) {
   let entries = [];

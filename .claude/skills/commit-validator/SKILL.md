@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Grep, Bash]
 agents: [developer, devops]
-category: "Git & Version Control"
+category: 'Git & Version Control'
 tags: [git, commit, conventional-commits, validation, pre-commit]
 
 verified: true
@@ -226,13 +226,13 @@ echo "fix: incorrect variable name" | node .claude/tools/validate-commit.mjs
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Validating only in CI (not pre-commit) | Developers don't discover format issues until after push | Add pre-commit hook for local instant feedback |
-| Blocking on body/footer format | Excessive friction leads developers to bypass hooks | Only block on missing type prefix and subject length |
-| Rejection without format example | Developer must guess the correct format | Always show a passing example in the error message |
-| Allowing freeform subject without type | Breaks changelog generation and semantic versioning | Require `type: subject` format unconditionally |
-| Single-line validation (no body check) | Missing Co-Authored-By and footer go undetected | Validate presence of required footers when configured |
+| Anti-Pattern                           | Why It Fails                                             | Correct Approach                                      |
+| -------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- |
+| Validating only in CI (not pre-commit) | Developers don't discover format issues until after push | Add pre-commit hook for local instant feedback        |
+| Blocking on body/footer format         | Excessive friction leads developers to bypass hooks      | Only block on missing type prefix and subject length  |
+| Rejection without format example       | Developer must guess the correct format                  | Always show a passing example in the error message    |
+| Allowing freeform subject without type | Breaks changelog generation and semantic versioning      | Require `type: subject` format unconditionally        |
+| Single-line validation (no body check) | Missing Co-Authored-By and footer go undetected          | Validate presence of required footers when configured |
 
 ## Memory Protocol (MANDATORY)
 

@@ -117,7 +117,8 @@ invoke `Skill({ skill: 'security-architect' })` for manual review.
    5. Record created companion artifacts in `evolution-state.json` and `decisions.md`
 
 7. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
-8. Record learnings and unresolved risks in memory.
+8. **Global Ecosystem Sync (MANDATORY):** Run `npm run gen:all-registries` as your final action to ensure the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
+9. Record learnings and unresolved risks in memory.
 
 ## Orchestrator Update Contract (MANDATORY)
 
@@ -174,6 +175,7 @@ Do not introduce prompt rules that contradict active hook behavior.
 - [ ] Newly created companion artifacts wired into agent frontmatter/body
 - [ ] Integration validation run
 - [ ] Agent registry regenerated when skill assignments/frontmatter changed (`node .claude/tools/cli/generate-agent-registry.cjs` → `.claude/context/agent-registry.json`)
+- [ ] Global Ecosystem Sync run (`npm run gen:all-registries`) to ensure `agent-registry`, `skill-index`, and `tool-manifest` consistency
 - [ ] `evolution-state.json` updated if EVOLVE-triggered (add entry with artifactType, name, path, status, completedAt)
 - [ ] `pnpm lint:fix && pnpm format` clean on touched files
 - [ ] Memory learnings/decisions/issues updated

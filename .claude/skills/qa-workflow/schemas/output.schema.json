@@ -3,9 +3,7 @@
   "title": "qa-workflow Output Schema",
   "description": "Output validation schema for qa-workflow skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

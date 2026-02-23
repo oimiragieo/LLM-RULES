@@ -1,7 +1,7 @@
 ---
 name: nativewind-and-tailwind-css-compatibility
 version: 1.1.0
-category: "Mobile"
+category: 'Mobile'
 agents: [developer, expo-mobile-developer]
 tags: [nativewind, tailwind, react-native, mobile, styling]
 description: Provides specific version compatibility notes for NativeWind and Tailwind CSS to prevent common installation errors.
@@ -43,7 +43,7 @@ When reviewing or writing code, apply these guidelines:
   - If errors occur, remove both packages and reinstall specific versions:
     npm remove nativewind tailwindcss
     npm install nativewind@2.0.11 tailwindcss@3.3.2
-</instructions>
+    </instructions>
 
 <examples>
 Example usage:
@@ -63,13 +63,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Using nativewind above 2.0.11 with tailwindcss 3.3.2 | PostCSS API mismatch triggers `process(css).then(cb)` runtime error; styles fail silently | Pin to `nativewind@2.0.11` + `tailwindcss@3.3.2`; do not upgrade without migration guide |
-| Upgrading only one of the two packages | Mismatched peer dependencies cause cryptic PostCSS errors | Remove both and reinstall together: `npm remove nativewind tailwindcss && npm install nativewind@2.0.11 tailwindcss@3.3.2` |
-| Missing `nativewind/preset` in tailwind.config.js | Tailwind compiles classes but NativeWind cannot inject them into React Native StyleSheet; no styles applied | Add `presets: [require('nativewind/preset')]` to `tailwind.config.js` |
-| Mixing NativeWind v2 and v4 documentation | v4 uses a Babel-free architecture; v2 patterns cause crashes under v4 | Decide on a single version; follow only that version's setup guide exclusively |
-| Using Tailwind CSS v4 with NativeWind v2 | v4 dropped JIT configuration API that NativeWind v2 relies on; styles silently never apply | Stay on Tailwind v3 with NativeWind v2, or migrate to NativeWind v4 with Tailwind v4 |
+| Anti-Pattern                                         | Why It Fails                                                                                                | Correct Approach                                                                                                           |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Using nativewind above 2.0.11 with tailwindcss 3.3.2 | PostCSS API mismatch triggers `process(css).then(cb)` runtime error; styles fail silently                   | Pin to `nativewind@2.0.11` + `tailwindcss@3.3.2`; do not upgrade without migration guide                                   |
+| Upgrading only one of the two packages               | Mismatched peer dependencies cause cryptic PostCSS errors                                                   | Remove both and reinstall together: `npm remove nativewind tailwindcss && npm install nativewind@2.0.11 tailwindcss@3.3.2` |
+| Missing `nativewind/preset` in tailwind.config.js    | Tailwind compiles classes but NativeWind cannot inject them into React Native StyleSheet; no styles applied | Add `presets: [require('nativewind/preset')]` to `tailwind.config.js`                                                      |
+| Mixing NativeWind v2 and v4 documentation            | v4 uses a Babel-free architecture; v2 patterns cause crashes under v4                                       | Decide on a single version; follow only that version's setup guide exclusively                                             |
+| Using Tailwind CSS v4 with NativeWind v2             | v4 dropped JIT configuration API that NativeWind v2 relies on; styles silently never apply                  | Stay on Tailwind v3 with NativeWind v2, or migrate to NativeWind v4 with Tailwind v4                                       |
 
 ## Memory Protocol (MANDATORY)
 

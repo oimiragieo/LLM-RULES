@@ -104,7 +104,7 @@ function validate(context) {
 }
 
 function main() {
-  const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+  const { safeParseJSON } = require('../../../lib/utils/safe-json.cjs');
   let input;
   try {
     input = process.argv[2] ? JSON.parse(process.argv[2]) : null;

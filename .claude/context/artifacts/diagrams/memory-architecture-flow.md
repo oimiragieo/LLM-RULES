@@ -40,10 +40,10 @@ graph TD
         MTM[MTM: mtm/session_*.json]
         LTM[LTM: ltm/summary_*.json]
         COLD[Cold: cold/ltm-*.jsonl.gz]
-        
+
         SJSON[Structured: gotchas, patterns, open-findings.json]
         MD[Markdown: decisions, issues.md, active_context.md]
-        
+
         SQL[(SQLite: Entity Graph memory.db)]
         LDB[(LanceDB: agent_memory \n & code_index vectors)]
         RQ[Reflection Queue jsonl/json]
@@ -93,12 +93,12 @@ graph TD
     URH -->|Passes Payload| MT
     URH -->|Queues Evolution| RQ
     URH -->|Triggers Maintenance| MS
-    
+
     %% Tiers & Scheduling
     MT -->|Clears| STM
     MT -->|Writes Recent| MTM
     MT -->|Summarizes older MTM to| LTM
-    
+
     MS -->|Triggers LTM Retention| CS
     CS -->|Compresses & Archives| COLD
     CS -->|Prunes Hot| LTM

@@ -2,7 +2,7 @@
 name: dispatching-parallel-agents
 description: Concurrent investigation of independent failures. Use when multiple unrelated issues need parallel resolution.
 version: 1.1.0
-category: "Orchestration & Coordination"
+category: 'Orchestration & Coordination'
 agents: [planner, master-orchestrator, developer]
 tags: [parallel-agents, fan-out, diagnosis, concurrent, synthesis]
 model: sonnet
@@ -214,13 +214,13 @@ From debugging session (2025-10-03):
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Spawning parallel agents on the same files | Race condition; last write wins; one agent's fix silently overwrites another's | Define `owned_paths` per agent; ensure no overlap before spawning |
-| Acting on the first agent result without waiting for all | Creates partial, conflicting state before synthesis is done | Wait for all parallel agents to complete; synthesize before any implementation |
-| Parallelizing sequential dependencies | Agent B depends on Agent A's output; parallel execution causes B to work on stale data | Map dependencies first; only parallelize truly independent domains |
-| No conflict verification step after integration | Conflicting changes are silently accepted; system is left in invalid state | Always run a conflict-check pass after all parallel agents complete |
-| Using parallel dispatch for simple 2-step tasks | Parallelism overhead exceeds benefit for short tasks | Use parallel dispatch only when each investigation domain requires 3+ independent steps |
+| Anti-Pattern                                             | Why It Fails                                                                           | Correct Approach                                                                        |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Spawning parallel agents on the same files               | Race condition; last write wins; one agent's fix silently overwrites another's         | Define `owned_paths` per agent; ensure no overlap before spawning                       |
+| Acting on the first agent result without waiting for all | Creates partial, conflicting state before synthesis is done                            | Wait for all parallel agents to complete; synthesize before any implementation          |
+| Parallelizing sequential dependencies                    | Agent B depends on Agent A's output; parallel execution causes B to work on stale data | Map dependencies first; only parallelize truly independent domains                      |
+| No conflict verification step after integration          | Conflicting changes are silently accepted; system is left in invalid state             | Always run a conflict-check pass after all parallel agents complete                     |
+| Using parallel dispatch for simple 2-step tasks          | Parallelism overhead exceeds benefit for short tasks                                   | Use parallel dispatch only when each investigation domain requires 3+ independent steps |
 
 ## Memory Protocol (MANDATORY)
 

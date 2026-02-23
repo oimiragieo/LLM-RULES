@@ -1,7 +1,7 @@
 ---
 name: nativescript
 version: 1.1.0
-category: "Mobile"
+category: 'Mobile'
 agents: [developer]
 tags: [nativescript, mobile, native, javascript, cross-platform]
 description: NativeScript best practices and patterns for mobile applications
@@ -80,7 +80,7 @@ When reviewing or writing code, apply these guidelines:
 - Minimize heavy computations in UI bindings or methods.
 - Only if using plain xml bindings, use `Observable` or `ObservableArray` properties to reflect state changes efficiently.
 - When using Angular, React, Solid, Svelte or Vue, always leverage their respective state management, lifecycle hooks, rendering optimizations and reactive bindings for optimal performance.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -100,13 +100,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Mixing platform branches in a single file | Cannot code-split by platform; all native APIs loaded on both platforms | Use `.ios.ts` and `.android.ts` files when platform-specific code exceeds 20 lines |
-| Direct visual tree manipulation at runtime | Bypasses rendering pipeline; causes race conditions and layout flicker | Use data-binding and reactive state to drive layout updates |
-| Unreferenced delegate instances | iOS GC collects them mid-execution; silent callback failures | Always retain delegates in class scope: `this.delegate = MyDelegate.new()` |
-| Deeply nested layout containers | Each level adds layout passes; janky scrolling on mid-range devices | Use GridLayout for complex layouts; StackLayout only for simple linear arrangements |
-| Leaking timers and event listeners | NativeScript does not GC native references; leaks accumulate across navigation | Always cancel timers and remove listeners in component teardown lifecycle |
+| Anti-Pattern                               | Why It Fails                                                                   | Correct Approach                                                                    |
+| ------------------------------------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Mixing platform branches in a single file  | Cannot code-split by platform; all native APIs loaded on both platforms        | Use `.ios.ts` and `.android.ts` files when platform-specific code exceeds 20 lines  |
+| Direct visual tree manipulation at runtime | Bypasses rendering pipeline; causes race conditions and layout flicker         | Use data-binding and reactive state to drive layout updates                         |
+| Unreferenced delegate instances            | iOS GC collects them mid-execution; silent callback failures                   | Always retain delegates in class scope: `this.delegate = MyDelegate.new()`          |
+| Deeply nested layout containers            | Each level adds layout passes; janky scrolling on mid-range devices            | Use GridLayout for complex layouts; StackLayout only for simple linear arrangements |
+| Leaking timers and event listeners         | NativeScript does not GC native references; leaks accumulate across navigation | Always cancel timers and remove listeners in component teardown lifecycle           |
 
 ## Memory Protocol (MANDATORY)
 

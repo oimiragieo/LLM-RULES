@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash]
 agents: [developer, planner, architect]
-category: "Planning & Architecture"
+category: 'Planning & Architecture'
 tags: [brainstorming, design, planning, ideation, socratic]
 
 verified: true
@@ -85,13 +85,13 @@ Start by understanding the current project context, then ask questions one at a 
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Proposing only one solution | Anchors user; forecloses better alternatives | Always offer 2-3 approaches with explicit trade-offs |
-| Accepting first requirement as complete | First articulation rarely captures all constraints | Ask at least one clarifying question about scope |
-| Asking 3+ questions at once | User answers the easy ones; skips the hard ones | One question per response; wait for answer |
-| Jumping to implementation | Design flaws found late are expensive to fix | Confirm design decisions before writing code |
-| Skipping YAGNI challenge | Unneeded features accumulate as tech debt | Explicitly challenge each feature not strictly required |
+| Anti-Pattern                            | Why It Fails                                       | Correct Approach                                        |
+| --------------------------------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Proposing only one solution             | Anchors user; forecloses better alternatives       | Always offer 2-3 approaches with explicit trade-offs    |
+| Accepting first requirement as complete | First articulation rarely captures all constraints | Ask at least one clarifying question about scope        |
+| Asking 3+ questions at once             | User answers the easy ones; skips the hard ones    | One question per response; wait for answer              |
+| Jumping to implementation               | Design flaws found late are expensive to fix       | Confirm design decisions before writing code            |
+| Skipping YAGNI challenge                | Unneeded features accumulate as tech debt          | Explicitly challenge each feature not strictly required |
 
 ## Memory Protocol (MANDATORY)
 

@@ -2,7 +2,7 @@
 name: poetry-rye-dependency-management
 description: Specifies Poetry or Rye for dependency management in Python projects.
 version: 1.0.0
-category: "Languages"
+category: 'Languages'
 agents: [developer]
 tags: [python, poetry, rye, dependency-management, packaging]
 model: sonnet
@@ -36,7 +36,7 @@ You help developers write better code by applying established guidelines and bes
 When reviewing or writing code, apply these guidelines:
 
 - **Dependency Management:** Poetry / Rye
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:

@@ -4,15 +4,13 @@
   "agents": {
     "router": {
       "tools": [
-        "Edit",
+        "AskUserQuestion",
         "Read",
-        "Skill",
         "Task",
         "TaskCreate",
         "TaskGet",
         "TaskList",
-        "TaskUpdate",
-        "Write"
+        "TaskUpdate"
       ],
       "model": "claude-haiku-4-5",
       "phase": "routing"

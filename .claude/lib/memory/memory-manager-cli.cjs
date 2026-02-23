@@ -1,5 +1,18 @@
 'use strict';
 
+const originalEmit = process.emit;
+process.emit = function (name, data, ...args) {
+  if (
+    name === 'warning' &&
+    typeof data === 'object' &&
+    data.name === 'ExperimentalWarning' &&
+    data.message.includes('SQLite')
+  ) {
+    return false;
+  }
+  return originalEmit.apply(process, [name, data, ...args]);
+};
+
 function runMemoryManagerCli({ args, manager, logger, projectRoot }) {
   const command = args[0];
 
@@ -98,9 +111,63 @@ function runMemoryManagerCli({ args, manager, logger, projectRoot }) {
       process.exit(1);
       break;
 
-    case 'health':
-      console.log(JSON.stringify(manager.getMemoryHealth(), null, 2));
+    case 'health': {
+      const chalk = {
+        green: t => `\x1b[32m${t}\x1b[0m`,
+        red: t => `\x1b[31m${t}\x1b[0m`,
+        yellow: t => `\x1b[33m${t}\x1b[0m`,
+        blue: t => `\x1b[34m${t}\x1b[0m`,
+        gray: t => `\x1b[90m${t}\x1b[0m`,
+        bold: t => `\x1b[1m${t}\x1b[0m`,
+      };
+      chalk.green.bold = t => chalk.bold(chalk.green(t));
+      chalk.red.bold = t => chalk.bold(chalk.red(t));
+      chalk.yellow.bold = t => chalk.bold(chalk.yellow(t));
+
+      const health = manager.getMemoryHealth();
+
+      console.log(chalk.bold('\n🏥 Memory Manager Health'));
+      console.log(chalk.gray('================================================='));
+
+      const statusIcon =
+        health.status === 'ok'
+          ? chalk.green.bold('✅ OK')
+          : health.status === 'warning'
+            ? chalk.yellow.bold('⚠️  WARNING')
+            : chalk.red.bold('❌ ERROR');
+
+      const stats = manager.getMemoryStats();
+
+      console.log(`🩺 ${chalk.blue('Overall Status')}:    ${statusIcon}`);
+      console.log(
+        `📁 ${chalk.blue('Total Payload Size')}: ${(stats.total_size_bytes / 1024).toFixed(2)} KB`
+      );
+      console.log(
+        `🧠 ${chalk.blue('Knowledge Items')}:   ${stats.gotchas_count + stats.patterns_count} items (Gotchas/Patterns)`
+      );
+      console.log(`🗺️  ${chalk.blue('Codebase Entries')}:  ${health.codebaseMapEntries} synced`);
+      console.log(`📓 ${chalk.blue('Decision Log Size')}: ${health.decisionsSizeKB} KB`);
+      console.log(`📚 ${chalk.blue('Learning Log Size')}: ${health.learningsSizeKB} KB`);
+      console.log(`👥 ${chalk.blue('Legacy Sessions')}:   ${health.sessionsCount} sessions`);
+
+      if (health.warnings && health.warnings.length > 0) {
+        console.log(chalk.gray('-------------------------------------------------'));
+        console.log(chalk.yellow.bold('Alerts & Warnings:'));
+        for (const w of health.warnings) {
+          console.log(`  🔸 ${chalk.yellow(w)}`);
+        }
+      }
+
+      if (health.errors && health.errors.length > 0) {
+        console.log(chalk.gray('-------------------------------------------------'));
+        console.log(chalk.red.bold('Critical Errors:'));
+        for (const e of health.errors) {
+          console.log(`  🚨 ${chalk.red(e)}`);
+        }
+      }
+      console.log(chalk.gray('=================================================\n'));
       break;
+    }
 
     case 'archive-learnings':
       const archiveResult = manager.checkAndArchiveLearnings();

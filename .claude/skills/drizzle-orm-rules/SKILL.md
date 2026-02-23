@@ -1,7 +1,7 @@
 ---
 name: drizzle-orm-rules
 version: 1.0.0
-category: "Data & Database"
+category: 'Data & Database'
 agents: [developer, database-architect]
 tags: [drizzle, orm, typescript, database, migrations]
 description: Rules for using Drizzle ORM within the src/lib/db directory. Ensures consistent data modeling and database interactions.

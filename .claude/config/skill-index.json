@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-23T01:44:35.617Z",
+  "generatedAt": "2026-02-23T03:47:13.450Z",
   "metadata": {
     "totalSkills": 386,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-23T01:44:35.633Z",
+    "lastValidated": "2026-02-23T03:47:13.451Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -2502,11 +2502,12 @@
       "displayName": "Ecosystem Integrity Scanner",
       "category": "Other",
       "domain": "other",
-      "description": "Other - ecosystem-integrity-scanner",
+      "description": ">-",
       "requiredTools": [
         "Read",
-        "Write",
-        "Edit"
+        "Bash",
+        "Glob",
+        "Grep"
       ],
       "agentPrimary": [
         "developer"
@@ -8677,12 +8678,8 @@
       "displayName": "Testing Expert",
       "category": "Other",
       "domain": "other",
-      "description": "Other - testing-expert",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
+      "description": "Deprecated alias for tdd skill",
+      "requiredTools": [],
       "agentPrimary": [
         "qa"
       ],
@@ -9244,12 +9241,8 @@
       "displayName": "Writing",
       "category": "Other",
       "domain": "other",
-      "description": "Other - writing",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
-      ],
+      "description": "Deprecated alias for writing-skills skill",
+      "requiredTools": [],
       "agentPrimary": [
         "technical-writer"
       ],
@@ -10512,7 +10505,6 @@
         "template-renderer",
         "terraform-infra",
         "test-generator",
-        "testing-expert",
         "text-to-sql",
         "thinking-tools",
         "tool-creator",
@@ -10531,7 +10523,6 @@
         "workflow-creator",
         "workflow-patterns",
         "workflow-updater",
-        "writing",
         "yara-authoring"
       ],
       "Bash": [
@@ -10587,6 +10578,7 @@
         "dependency-analyzer",
         "differential-review",
         "docker-compose",
+        "ecosystem-integrity-scanner",
         "eval-harness-updater",
         "feature-flag-management",
         "filesystem",
@@ -10720,6 +10712,7 @@
         "differential-review",
         "doc-generator",
         "docker-compose",
+        "ecosystem-integrity-scanner",
         "eval-harness-updater",
         "filesystem",
         "fix-review",
@@ -10839,6 +10832,7 @@
         "diagram-generator",
         "differential-review",
         "doc-generator",
+        "ecosystem-integrity-scanner",
         "eval-harness-updater",
         "filesystem",
         "fix-review",
@@ -10995,7 +10989,6 @@
         "doc-generator",
         "dry-principle",
         "dto-conventions",
-        "ecosystem-integrity-scanner",
         "enhance-prompt",
         "eval-harness-updater",
         "expo-framework-rule",
@@ -11235,7 +11228,6 @@
         "template-creator",
         "template-renderer",
         "test-generator",
-        "testing-expert",
         "text-to-sql",
         "tool-creator",
         "tool-search",
@@ -11252,7 +11244,6 @@
         "workflow-creator",
         "workflow-patterns",
         "workflow-updater",
-        "writing",
         "yara-authoring"
       ],
       "Edit": [
@@ -11325,7 +11316,6 @@
         "differential-review",
         "dry-principle",
         "dto-conventions",
-        "ecosystem-integrity-scanner",
         "enhance-prompt",
         "eval-harness-updater",
         "expo-framework-rule",
@@ -11546,7 +11536,6 @@
         "tauri-svelte-ui-components",
         "tdd",
         "template-creator",
-        "testing-expert",
         "tool-creator",
         "track-management",
         "tsconfig-json-rules",
@@ -11558,8 +11547,7 @@
         "webmcp-browser-tools",
         "workflow-creator",
         "workflow-patterns",
-        "workflow-updater",
-        "writing"
+        "workflow-updater"
       ],
       "Task": [
         "writing-skills",

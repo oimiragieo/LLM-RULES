@@ -46,6 +46,7 @@ Skill({ skill: 'stale-module-pruner' });
 ```
 
 Invoke when:
+
 - Post-archival cleanup: after moving modules to `_archive/`, run pruner on `lib/`
 - After bulk refactors that relocated or merged modules
 - Before running `validate-ecosystem-integrity.cjs` to reduce noise
@@ -53,14 +54,14 @@ Invoke when:
 
 ## Mandatory Skills
 
-| Skill                            | Purpose                         | When                  |
-| -------------------------------- | ------------------------------- | --------------------- |
-| `task-management-protocol`       | Track pruning progress          | Always                |
-| `ripgrep`                        | Search for module references    | During scan           |
-| `code-semantic-search`           | Verify intent when uncertain    | On ambiguous hits     |
-| `token-saver-context-compression`| Compress large result sets      | When output is large  |
-| `verification-before-completion` | Gate completion                 | Before marking done   |
-| `memory-search`                  | Check prior pruning patterns    | At start              |
+| Skill                             | Purpose                      | When                 |
+| --------------------------------- | ---------------------------- | -------------------- |
+| `task-management-protocol`        | Track pruning progress       | Always               |
+| `ripgrep`                         | Search for module references | During scan          |
+| `code-semantic-search`            | Verify intent when uncertain | On ambiguous hits    |
+| `token-saver-context-compression` | Compress large result sets   | When output is large |
+| `verification-before-completion`  | Gate completion              | Before marking done  |
+| `memory-search`                   | Check prior pruning patterns | At start             |
 
 ## Iron Laws
 
@@ -87,13 +88,13 @@ Invoke when:
 
 ## Anti-Patterns
 
-| Anti-Pattern                                     | Risk                                                       | Correct Approach                                         |
-| ------------------------------------------------ | ---------------------------------------------------------- | -------------------------------------------------------- |
-| Running with `--delete` on first invocation      | Destroys modules with barrel/index re-exports              | Always dry-run first, review candidates, then delete     |
-| Treating zero-reference as definitive stale      | Barrel imports and test-only references create false stale | Verify each STALE candidate against index files + tests  |
-| Running from a non-project-root CWD             | All path resolution breaks; misleading output              | Always run from project root (`process.cwd()`)           |
-| Pointing `--targetDir` at `.claude/lib` only     | Misses stale modules in `scripts/` or `tools/`             | Run separate passes with different `--targetDir` values  |
-| Deleting without a prune report artifact         | No audit trail; next session can't identify what was lost  | Always save report before deletion                       |
+| Anti-Pattern                                 | Risk                                                       | Correct Approach                                        |
+| -------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------- |
+| Running with `--delete` on first invocation  | Destroys modules with barrel/index re-exports              | Always dry-run first, review candidates, then delete    |
+| Treating zero-reference as definitive stale  | Barrel imports and test-only references create false stale | Verify each STALE candidate against index files + tests |
+| Running from a non-project-root CWD          | All path resolution breaks; misleading output              | Always run from project root (`process.cwd()`)          |
+| Pointing `--targetDir` at `.claude/lib` only | Misses stale modules in `scripts/` or `tools/`             | Run separate passes with different `--targetDir` values |
+| Deleting without a prune report artifact     | No audit trail; next session can't identify what was lost  | Always save report before deletion                      |
 
 ## Step 1: Dry-Run Scan
 
@@ -110,6 +111,7 @@ node .claude/skills/stale-module-pruner/scripts/main.cjs --targetDir .claude/lib
 ```
 
 The script outputs one line per stale module:
+
 ```
 STALE: .claude/lib/utils/old-helper.cjs
 STALE: .claude/lib/routing/deprecated-matcher.cjs
@@ -120,6 +122,7 @@ Total stale items processed: 2
 ## Step 2: Review Candidates
 
 For each `STALE:` line:
+
 1. Open the file — understand its purpose
 2. Search for indirect references: barrel imports, `require('./')`, `index.cjs` re-exports
 3. Check test files: `grep -r "{filename}" tests/`
@@ -129,15 +132,19 @@ Create a prune report at `.claude/context/reports/qa/stale-module-prune-{ISO-dat
 
 ```markdown
 # Stale Module Prune Report
+
 <!-- Agent: developer | Task: #{id} | Session: {date} -->
+
 **Date:** YYYY-MM-DD
 **Target:** .claude/lib
 **Candidates:** N
 
 ## Confirmed Stale (delete)
+
 - .claude/lib/utils/old-helper.cjs — no references, no tests, no barrel export
 
 ## Kept (false positive)
+
 - .claude/lib/utils/common.cjs — referenced by index.cjs barrel (not caught by name match)
 ```
 
@@ -156,6 +163,7 @@ After deletion, re-run `validate-ecosystem-integrity.cjs` to confirm no new
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
+
 ```bash
 cat .claude/context/memory/learnings.md
 cat .claude/context/memory/issues.md
@@ -164,6 +172,7 @@ cat .claude/context/memory/issues.md
 Review prior pruning patterns and known barrel-import false positives.
 
 **After completing:**
+
 - Pruning pattern → `.claude/context/memory/learnings.md`
 - False positive suppression decision → `.claude/context/memory/decisions.md`
 - Unresolved stale candidate needing owner review → `.claude/context/memory/issues.md`

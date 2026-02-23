@@ -1,7 +1,7 @@
 ---
 name: smart-revert
 version: 1.0.0
-category: "Git & Version Control"
+category: 'Git & Version Control'
 agents: [developer, devops]
 tags: [git, revert, rollback, safety, impact-analysis]
 description: Git-aware smart revert for tracks, phases, and tasks. Handles rewritten history, finds related commits, and provides safe rollback with multiple confirmation gates.
@@ -453,13 +453,13 @@ This enables:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Reverting without impact analysis | Unintended commits or files are also reverted | Always analyze related commits, open files, and uncommitted changes first |
-| Force-pushing after revert | Destroys upstream history for other collaborators | Use non-destructive revert commits instead of force-push |
-| Skipping confirmation gate | Accidental revert of critical work | Always present a summary and require confirmation before executing |
-| Reverting across multiple features | Entangles unrelated changes in a single revert | Split revert into targeted per-feature commits |
-| Not running tests after revert | Revert introduces new breakage | Verify automated tests pass before marking revert complete |
+| Anti-Pattern                       | Why It Fails                                      | Correct Approach                                                          |
+| ---------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------- |
+| Reverting without impact analysis  | Unintended commits or files are also reverted     | Always analyze related commits, open files, and uncommitted changes first |
+| Force-pushing after revert         | Destroys upstream history for other collaborators | Use non-destructive revert commits instead of force-push                  |
+| Skipping confirmation gate         | Accidental revert of critical work                | Always present a summary and require confirmation before executing        |
+| Reverting across multiple features | Entangles unrelated changes in a single revert    | Split revert into targeted per-feature commits                            |
+| Not running tests after revert     | Revert introduces new breakage                    | Verify automated tests pass before marking revert complete                |
 
 ## Memory Protocol (MANDATORY)
 

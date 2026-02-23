@@ -16,7 +16,7 @@
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Default to BM25-only mode to avoid async pipeline OOM
-// Override with LANCEDB_EMBEDDING_MODE=hybrid for dense vectors
+// Override with LANCEDB_EMBEDDING_MODE=transformers or LANCEDB_EMBEDDING_MODE=fastembed for dense vectors
 if (!process.env.LANCEDB_EMBEDDING_MODE) {
   process.env.LANCEDB_EMBEDDING_MODE = 'off';
 }

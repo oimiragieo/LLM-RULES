@@ -2,7 +2,7 @@
 name: solidjs-expert
 description: SolidJS expert including reactivity, components, and store patterns
 version: 1.0.0
-category: "Frameworks"
+category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [solidjs, reactive, signals, frontend, performance]
 model: sonnet
@@ -135,7 +135,7 @@ When reviewing or writing code, apply these guidelines:
 - Use createSignal() for simple reactive state
 - Use createEffect() for side effects that depend on reactive state
 - Leverage fine-grained reactivity — avoid unnecessary re-renders
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -161,13 +161,13 @@ This expert skill consolidates 1 individual skills:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| --- | --- | --- |
-| Using React mental model | SolidJS uses fine-grained reactivity, not virtual DOM diffing | Learn SolidJS signals, memos, and effects as distinct primitives |
-| Destructuring props | Loses reactivity tracking on accessed properties | Access props directly: `props.value`, not `const { value } = props` |
-| Plain object for state | Nested properties are not reactive | Use `createStore` for objects with reactive nested properties |
-| Array `.map()` in JSX | Non-reactive; full re-render on any array change | Use the `<For>` component for reactive list rendering |
-| Reading signals outside tracking scope | Effect does not re-run when signal changes | Access signals only inside `createEffect`, `createMemo`, or JSX |
+| Anti-Pattern                           | Why It Fails                                                  | Correct Approach                                                    |
+| -------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Using React mental model               | SolidJS uses fine-grained reactivity, not virtual DOM diffing | Learn SolidJS signals, memos, and effects as distinct primitives    |
+| Destructuring props                    | Loses reactivity tracking on accessed properties              | Access props directly: `props.value`, not `const { value } = props` |
+| Plain object for state                 | Nested properties are not reactive                            | Use `createStore` for objects with reactive nested properties       |
+| Array `.map()` in JSX                  | Non-reactive; full re-render on any array change              | Use the `<For>` component for reactive list rendering               |
+| Reading signals outside tracking scope | Effect does not re-run when signal changes                    | Access signals only inside `createEffect`, `createMemo`, or JSX     |
 
 ## Memory Protocol (MANDATORY)
 

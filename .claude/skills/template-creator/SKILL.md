@@ -178,7 +178,11 @@ Skill({ skill: 'research-synthesis' });
 - Search existing templates: `Glob: .claude/templates/**/*.md`
 - Review template catalog: Read `.claude/context/artifacts/catalogs/template-catalog.md`
 - Check if similar template already exists in the ecosystem
-- If creating for a new domain, research best-practice template structures via WebSearch
+- **Research domain-specific template structures** (minimum 2 queries required):
+  ```javascript
+  WebSearch({ query: 'best <domain/topic name> template report or files 2026' });
+  WebSearch({ query: 'industry standard <template type> format <domain/tool> 2026' });
+  ```
 
 **BLOCKING**: Template creation CANNOT proceed without research-synthesis invocation.
 

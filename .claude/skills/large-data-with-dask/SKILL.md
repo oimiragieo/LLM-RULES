@@ -1,7 +1,7 @@
 ---
 name: large-data-with-dask
 version: 1.1.0
-category: "Data & Database"
+category: 'Data & Database'
 agents: [developer, data-engineer]
 tags: [dask, python, parallel, big-data, dataframe]
 description: Specific optimization strategies for Python scripts working with larger-than-memory datasets via Dask.
@@ -38,7 +38,7 @@ You help developers write better code by applying established guidelines and bes
 When reviewing or writing code, apply these guidelines:
 
 - Consider using dask for larger-than-memory datasets.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -58,13 +58,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Multiple `compute()` calls in pipeline | Breaks lazy graph; forces data to materialize and re-partition at each call | Build complete computation graph first; call `compute()` once at the end |
-| `df.apply(lambda ...)` on large DataFrames | Row-by-row Python; GIL contention; slower than equivalent Pandas on single core | Use vectorized Dask operations (`map_partitions`, `assign`, arithmetic operators) |
-| Default blocksize on large CSV files | 128MB default creates thousands of partitions for 100GB files; scheduler overhead dominates | Set `blocksize="256MB"` or `blocksize="1GB"` for large files; profile optimal size |
-| `len(df)` without `compute()` | Triggers full dataset read and count; defeats lazy evaluation | Use `df.shape[0].compute()` explicitly; only compute when size is truly needed |
-| Threaded scheduler for CPU-bound work | Python GIL serializes CPU computation across threads; no true parallelism | Use `dask.distributed.LocalCluster()` or process-based scheduler for CPU tasks |
+| Anti-Pattern                               | Why It Fails                                                                                | Correct Approach                                                                   |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Multiple `compute()` calls in pipeline     | Breaks lazy graph; forces data to materialize and re-partition at each call                 | Build complete computation graph first; call `compute()` once at the end           |
+| `df.apply(lambda ...)` on large DataFrames | Row-by-row Python; GIL contention; slower than equivalent Pandas on single core             | Use vectorized Dask operations (`map_partitions`, `assign`, arithmetic operators)  |
+| Default blocksize on large CSV files       | 128MB default creates thousands of partitions for 100GB files; scheduler overhead dominates | Set `blocksize="256MB"` or `blocksize="1GB"` for large files; profile optimal size |
+| `len(df)` without `compute()`              | Triggers full dataset read and count; defeats lazy evaluation                               | Use `df.shape[0].compute()` explicitly; only compute when size is truly needed     |
+| Threaded scheduler for CPU-bound work      | Python GIL serializes CPU computation across threads; no true parallelism                   | Use `dask.distributed.LocalCluster()` or process-based scheduler for CPU tasks     |
 
 ## Memory Protocol (MANDATORY)
 

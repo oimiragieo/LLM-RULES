@@ -2,7 +2,7 @@
 name: pyqt6-ui-development-rules
 description: Specific rules for PyQt6 based UI development focusing on UI/UX excellence and performance.
 version: 1.1.0
-category: "Languages"
+category: 'Languages'
 agents: [developer]
 tags: [pyqt6, python, gui, desktop, qt]
 model: sonnet
@@ -43,7 +43,7 @@ When reviewing or writing code, apply these guidelines:
 - Craft visually appealing interfaces with attention to color theory and layout.
 - Ensure accessibility and cross-platform compatibility.
 - Implement responsive designs that adapt to various screen sizes.
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:
@@ -63,13 +63,13 @@ Agent: [Analyzes code against guidelines and provides specific feedback]
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-| ------------ | ------------ | ---------------- |
-| Calling business logic directly from UI slots | Couples UI to logic; makes testing impossible and breaks MVC architecture | Emit signals from UI; connect to controller/service methods via slot |
-| Running network or file I/O on the main thread | Blocks the Qt event loop; UI freezes until operation completes | Use QThread, QRunnable, or asyncio with quamash for background operations |
-| Hardcoding pixel sizes and positions | Breaks on high-DPI displays and different OS DPI scaling settings | Use layout managers and size policies; use `logicalDpiX()` for DPI-aware sizing |
-| Setting styles inline on individual widgets | Creates visual inconsistency; extremely difficult to theme or maintain | Define a single QSS stylesheet at QApplication level and use object names/classes |
-| Ignoring cross-platform rendering differences | Widget sizes, fonts, and margins differ significantly between Windows/macOS/Linux | Test on all target platforms; use platform-conditional logic where rendering diverges |
+| Anti-Pattern                                   | Why It Fails                                                                      | Correct Approach                                                                      |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Calling business logic directly from UI slots  | Couples UI to logic; makes testing impossible and breaks MVC architecture         | Emit signals from UI; connect to controller/service methods via slot                  |
+| Running network or file I/O on the main thread | Blocks the Qt event loop; UI freezes until operation completes                    | Use QThread, QRunnable, or asyncio with quamash for background operations             |
+| Hardcoding pixel sizes and positions           | Breaks on high-DPI displays and different OS DPI scaling settings                 | Use layout managers and size policies; use `logicalDpiX()` for DPI-aware sizing       |
+| Setting styles inline on individual widgets    | Creates visual inconsistency; extremely difficult to theme or maintain            | Define a single QSS stylesheet at QApplication level and use object names/classes     |
+| Ignoring cross-platform rendering differences  | Widget sizes, fonts, and margins differ significantly between Windows/macOS/Linux | Test on all target platforms; use platform-conditional logic where rendering diverges |
 
 ## Memory Protocol (MANDATORY)
 
