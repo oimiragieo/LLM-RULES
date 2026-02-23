@@ -444,6 +444,8 @@ function validateAgents() {
       contextFiles.forEach(contextFile => {
         const normalized = contextFile.replace(/^@/, '');
         if (!normalized.startsWith('.claude/')) return;
+        // Skip stale agent-memory checks since we use our own memory system
+        if (normalized.startsWith('.claude/agent-memory/')) return;
         if (!existsSync(resolve(rootDir, normalized))) {
           errors.push(`Missing context file referenced by agent: ${normalized} (agent ${file})`);
         }

@@ -37,12 +37,16 @@ const VALID_MODEL_PATTERNS = {
   legacy_v3: /^claude-(?:3-opus|3-5-sonnet|3-5-haiku)-(\d{8})$/,
 };
 
-// Known valid model names (current + legacy)
 const KNOWN_VALID_MODELS = [
   // Canonical v4.5 era
   'claude-opus-4-5-20251101',
   'claude-sonnet-4-5',
   'claude-haiku-4-5',
+
+  // Short alias names used in configuration
+  'sonnet',
+  'opus',
+  'haiku',
 
   // Legacy snapshots that remain accepted for backward compatibility
   'claude-sonnet-4-20250514',
