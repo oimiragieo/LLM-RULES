@@ -96,7 +96,7 @@
     "test:framework:lib": "node --test --test-concurrency=1 tests/lib/**/*.test.cjs tests/cli/*.test.cjs",
     "test:memory:ci": "node --test tests/lib/memory/observations.test.cjs tests/lib/evolution/evolution-request-router.test.cjs tests/integration/evolution-stale-skill-flow.test.cjs tests/hooks/spawn-prompt-memory-mode.test.cjs tests/hooks/unified-reflection-handler.test.cjs tests/hooks/unified-reflection-stale-evolution.test.cjs tests/hooks/audit-skill-recency.test.cjs tests/skills/skill-updater-doc-contract.test.cjs tests/skills/recommend-evolution-main.test.cjs",
     "test:code-indexing": "node --test --test-concurrency=1 tests/code-indexing/ripgrep-integration.test.cjs tests/code-indexing/ast-grep-wrapper.test.cjs tests/code-indexing/merkle-tree.test.cjs tests/code-indexing/incremental-indexing.test.cjs tests/code-indexing/search-tools-integration.test.cjs tests/code-indexing/vector-store-lancedb.test.cjs tests/hooks/code-index-updater.test.cjs",
-    "test:all": "pnpm test && pnpm test:framework && pnpm test:tools",
+    "test:all": "concurrently -n test,framework,tools \"pnpm test\" \"pnpm test:framework\" \"pnpm test:tools\" --max-processes=3",
     "test:ci": "node --test --test-concurrency=1 --test-reporter=spec \"tests/**/*.test.{mjs,cjs}\"",
     "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage tests/*.test.mjs",
     "lint": "node -e \"console.log('Linting .js, .cjs, .mjs...')\" && eslint . --ext .js,.cjs,.mjs --max-warnings 0 && node -e \"console.log('Done. No issues found.')\"",
@@ -231,11 +231,16 @@
   "devDependencies": {
     "@types/node": "^20.19.30",
     "@vscode/ripgrep": "^1.17.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.2",
     "fast-check": "^4.5.3",
     "jest": "^30.2.0",
     "prettier": "^3.7.4",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0"
   }
 }

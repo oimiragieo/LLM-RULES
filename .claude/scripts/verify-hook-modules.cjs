@@ -71,7 +71,15 @@ function crossReferenceSettings(projectRoot, settingsPath, results) {
     }
 
     // Check all hook types
-    const hookTypes = ['preToolUse', 'postToolUse', 'onMessage', 'onComplete'];
+    const hookTypes = [
+      'UserPromptSubmit',
+      'PreToolUse',
+      'PostToolUse',
+      'PostToolUseFailure',
+      'SessionEnd',
+      'PreCompact',
+      'Stop',
+    ];
     for (const hookType of hookTypes) {
       const hooks = settings.hooks[hookType];
       if (!Array.isArray(hooks)) {

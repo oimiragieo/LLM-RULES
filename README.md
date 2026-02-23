@@ -513,6 +513,283 @@ pnpm reduce-debug-log -- .tmp/session-abc.txt --output .tmp/session-abc.cleaned.
 
 The `debug-log-analysis` skill (`Skill({ skill: 'debug-log-analysis' })`) documents the full structured workflow for working with these reduced logs.
 
+## Skills Catalog
+
+> **129 active skills** across 21 categories. Full details: [`.claude/context/artifacts/catalogs/skill-catalog.md`](.claude/context/artifacts/catalogs/skill-catalog.md)
+>
+> Invoke any skill: `Skill({ skill: 'name' })`
+
+### Core Development
+
+| Skill                                                                                    | Description                                                   |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [tdd](.claude/skills/tdd/SKILL.md)                                                       | TDD with RED/GREEN/REFACTOR cycle                             |
+| [debugging](.claude/skills/debugging/SKILL.md)                                           | Systematic 4-phase root cause investigation                   |
+| [smart-debug](.claude/skills/smart-debug/SKILL.md)                                       | AI-assisted hypothesis ranking and structured instrumentation |
+| [debug-log-analysis](.claude/skills/debug-log-analysis/SKILL.md)                         | Structured debug log analysis for Claude Code sessions        |
+| [ripgrep](.claude/skills/ripgrep/SKILL.md)                                               | Enhanced code search with ES module support                   |
+| [code-quality-expert](.claude/skills/code-quality-expert/SKILL.md)                       | Clean code principles and refactoring                         |
+| [code-analyzer](.claude/skills/code-analyzer/SKILL.md)                                   | Static analysis and complexity metrics                        |
+| [code-semantic-search](.claude/skills/code-semantic-search/SKILL.md)                     | Semantic code search with vector index                        |
+| [code-structural-search](.claude/skills/code-structural-search/SKILL.md)                 | AST-based structural pattern matching                         |
+| [verification-before-completion](.claude/skills/verification-before-completion/SKILL.md) | Evidence-based completion gate function                       |
+| [subagent-driven-development](.claude/skills/subagent-driven-development/SKILL.md)       | Implementation via autonomous subagents with two-stage review |
+| [requesting-code-review](.claude/skills/requesting-code-review/SKILL.md)                 | Dispatch structured two-stage code review                     |
+| [receiving-code-review](.claude/skills/receiving-code-review/SKILL.md)                   | Process and act on code review feedback                       |
+| [best-practices-guidelines](.claude/skills/best-practices-guidelines/SKILL.md)           | Cross-cutting development best practices                      |
+
+### Planning & Architecture
+
+| Skill                                                                              | Description                                                    |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [brainstorming](.claude/skills/brainstorming/SKILL.md)                             | Structured ideation with convergence                           |
+| [plan-generator](.claude/skills/plan-generator/SKILL.md)                           | Implementation plan generation                                 |
+| [prd-generator](.claude/skills/prd-generator/SKILL.md)                             | Product requirements document creation                         |
+| [architecture-review](.claude/skills/architecture-review/SKILL.md)                 | System architecture analysis                                   |
+| [complexity-assessment](.claude/skills/complexity-assessment/SKILL.md)             | Task complexity classification                                 |
+| [diagram-generator](.claude/skills/diagram-generator/SKILL.md)                     | Mermaid diagram generation                                     |
+| [wave-executor](.claude/skills/wave-executor/SKILL.md)                             | EPIC-tier batch pipeline orchestration via fresh Bun processes |
+| [sparc-methodology](.claude/skills/sparc-methodology/SKILL.md)                     | SPARC methodology workflow                                     |
+| [spec-critique](.claude/skills/spec-critique/SKILL.md)                             | Specification review and gap analysis                          |
+| [spec-gathering](.claude/skills/spec-gathering/SKILL.md)                           | Requirements elicitation                                       |
+| [spec-init](.claude/skills/spec-init/SKILL.md)                                     | Specification bootstrapping                                    |
+| [dispatching-parallel-agents](.claude/skills/dispatching-parallel-agents/SKILL.md) | Parallel agent dispatch patterns                               |
+
+### Security
+
+| Skill                                                                        | Description                              |
+| ---------------------------------------------------------------------------- | ---------------------------------------- |
+| [security-architect](.claude/skills/security-architect/SKILL.md)             | OWASP/STRIDE/AI threat modeling          |
+| [auth-security-expert](.claude/skills/auth-security-expert/SKILL.md)         | OAuth 2.1 and JWT security patterns      |
+| [static-analysis](.claude/skills/static-analysis/SKILL.md)                   | Semgrep and CodeQL pipelines             |
+| [variant-analysis](.claude/skills/variant-analysis/SKILL.md)                 | Vulnerability variant discovery          |
+| [semgrep-rule-creator](.claude/skills/semgrep-rule-creator/SKILL.md)         | Custom Semgrep rule authoring            |
+| [binary-analysis-patterns](.claude/skills/binary-analysis-patterns/SKILL.md) | Binary analysis and reverse engineering  |
+| [memory-forensics](.claude/skills/memory-forensics/SKILL.md)                 | Memory forensics workflows               |
+| [differential-review](.claude/skills/differential-review/SKILL.md)           | Security-focused diff review             |
+| [insecure-defaults](.claude/skills/insecure-defaults/SKILL.md)               | Insecure default detection               |
+| [content-security-scan](.claude/skills/content-security-scan/SKILL.md)       | Content security scanning                |
+| [audit-context-building](.claude/skills/audit-context-building/SKILL.md)     | Security audit context assembly          |
+| [fix-review](.claude/skills/fix-review/SKILL.md)                             | Security fix regression verification     |
+| [yara-authoring](.claude/skills/yara-authoring/SKILL.md)                     | YARA rule authoring for threat detection |
+| [medusa-security](.claude/skills/medusa-security/SKILL.md)                   | Medusa security patterns                 |
+
+### DevOps & Infrastructure
+
+| Skill                                                                              | Description                        |
+| ---------------------------------------------------------------------------------- | ---------------------------------- |
+| [terraform-infra](.claude/skills/terraform-infra/SKILL.md)                         | Terraform IaC with safety controls |
+| [docker-compose](.claude/skills/docker-compose/SKILL.md)                           | Docker Compose workflows           |
+| [k8s-manifest-generator](.claude/skills/k8s-manifest-generator/SKILL.md)           | Kubernetes manifest generation     |
+| [sentry-monitoring](.claude/skills/sentry-monitoring/SKILL.md)                     | Sentry error monitoring setup      |
+| [kafka-development-practices](.claude/skills/kafka-development-practices/SKILL.md) | Kafka patterns and best practices  |
+| [monorepo-and-tooling](.claude/skills/monorepo-and-tooling/SKILL.md)               | Monorepo setup and tooling         |
+| [cloud-devops-expert](.claude/skills/cloud-devops-expert/SKILL.md)                 | Cloud DevOps workflows             |
+| [container-expert](.claude/skills/container-expert/SKILL.md)                       | Container orchestration patterns   |
+
+### Languages
+
+| Skill                                                                                        | Description                               |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [typescript-expert](.claude/skills/typescript-expert/SKILL.md)                               | TypeScript type systems and patterns      |
+| [python-backend-expert](.claude/skills/python-backend-expert/SKILL.md)                       | Python backend development                |
+| [go-expert](.claude/skills/go-expert/SKILL.md)                                               | Go idioms and patterns                    |
+| [nodejs-expert](.claude/skills/nodejs-expert/SKILL.md)                                       | Node.js patterns and tooling              |
+| [java-expert](.claude/skills/java-expert/SKILL.md)                                           | Java development                          |
+| [rust-expert](.claude/skills/rust-expert/SKILL.md)                                           | Rust safety patterns                      |
+| [php-expert](.claude/skills/php-expert/SKILL.md)                                             | PHP development                           |
+| [elixir-expert](.claude/skills/elixir-expert/SKILL.md)                                       | Elixir/OTP patterns                       |
+| [cpp](.claude/skills/cpp/SKILL.md)                                                           | C++ development                           |
+| [poetry-rye-dependency-management](.claude/skills/poetry-rye-dependency-management/SKILL.md) | Python dependency management (Poetry/Rye) |
+| [modern-python](.claude/skills/modern-python/SKILL.md)                                       | Modern Python with uv/ruff/ty             |
+
+### Frameworks
+
+| Skill                                                                            | Description                                    |
+| -------------------------------------------------------------------------------- | ---------------------------------------------- |
+| [react-expert](.claude/skills/react-expert/SKILL.md)                             | React patterns and hooks                       |
+| [nextjs-expert](.claude/skills/nextjs-expert/SKILL.md)                           | Next.js App Router and RSC                     |
+| [svelte-expert](.claude/skills/svelte-expert/SKILL.md)                           | SvelteKit patterns                             |
+| [vue-expert](.claude/skills/vue-expert/SKILL.md)                                 | Vue 3 Composition API and Pinia                |
+| [angular-expert](.claude/skills/angular-expert/SKILL.md)                         | Angular patterns                               |
+| [astro-expert](.claude/skills/astro-expert/SKILL.md)                             | Astro framework                                |
+| [qwik-expert](.claude/skills/qwik-expert/SKILL.md)                               | Qwik resumability patterns                     |
+| [solidjs-expert](.claude/skills/solidjs-expert/SKILL.md)                         | SolidJS fine-grained reactivity                |
+| [graphql-expert](.claude/skills/graphql-expert/SKILL.md)                         | GraphQL schema and resolvers                   |
+| [htmx-expert](.claude/skills/htmx-expert/SKILL.md)                               | HTMX hypermedia patterns                       |
+| [webmcp-browser-tools](.claude/skills/webmcp-browser-tools/SKILL.md)             | WebMCP browser-side tool exposure to AI agents |
+| [starknet-react-rules](.claude/skills/starknet-react-rules/SKILL.md)             | StarkNet React blockchain integration          |
+| [drizzle-orm-rules](.claude/skills/drizzle-orm-rules/SKILL.md)                   | Drizzle ORM patterns                           |
+| [convex-development-general](.claude/skills/convex-development-general/SKILL.md) | Convex backend development                     |
+
+### Vercel & Web Performance
+
+| Skill                                                                                | Description                                    |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| [vercel-deploy](.claude/skills/vercel-deploy/SKILL.md)                               | Zero-auth Vercel deployment for 20+ frameworks |
+| [vercel-ai-sdk-best-practices](.claude/skills/vercel-ai-sdk-best-practices/SKILL.md) | Vercel AI SDK streaming patterns               |
+| [web-perf](.claude/skills/web-perf/SKILL.md)                                         | 5-phase Core Web Vitals audit workflow         |
+| [next-upgrade](.claude/skills/next-upgrade/SKILL.md)                                 | Next.js upgrade migration                      |
+| [next-cache-components](.claude/skills/next-cache-components/SKILL.md)               | Next.js caching strategies                     |
+| [shadcn-ui](.claude/skills/shadcn-ui/SKILL.md)                                       | shadcn/ui component integration                |
+| [enhance-prompt](.claude/skills/enhance-prompt/SKILL.md)                             | AI prompt enhancement patterns                 |
+
+### Mobile
+
+| Skill                                                                                                          | Description                        |
+| -------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| [ios-expert](.claude/skills/ios-expert/SKILL.md)                                                               | iOS SwiftUI development            |
+| [android-expert](.claude/skills/android-expert/SKILL.md)                                                       | Android Compose development        |
+| [flutter-expert](.claude/skills/flutter-expert/SKILL.md)                                                       | Flutter cross-platform development |
+| [expo-framework-rule](.claude/skills/expo-framework-rule/SKILL.md)                                             | Expo framework patterns            |
+| [tauri-native-api-integration](.claude/skills/tauri-native-api-integration/SKILL.md)                           | Tauri native API integration       |
+| [mobile-first-design-rules](.claude/skills/mobile-first-design-rules/SKILL.md)                                 | Mobile-first design patterns       |
+| [nativewind-and-tailwind-css-compatibility](.claude/skills/nativewind-and-tailwind-css-compatibility/SKILL.md) | NativeWind Tailwind compatibility  |
+| [nativescript](.claude/skills/nativescript/SKILL.md)                                                           | NativeScript patterns              |
+
+### Data & Database
+
+| Skill                                                                | Description                        |
+| -------------------------------------------------------------------- | ---------------------------------- |
+| [database-architect](.claude/skills/database-architect/SKILL.md)     | Database schema design             |
+| [database-expert](.claude/skills/database-expert/SKILL.md)           | Database query optimization        |
+| [data-expert](.claude/skills/data-expert/SKILL.md)                   | Data engineering patterns          |
+| [text-to-sql](.claude/skills/text-to-sql/SKILL.md)                   | Natural language to SQL conversion |
+| [large-data-with-dask](.claude/skills/large-data-with-dask/SKILL.md) | Large dataset processing with Dask |
+
+### Documentation
+
+| Skill                                                          | Description                        |
+| -------------------------------------------------------------- | ---------------------------------- |
+| [doc-generator](.claude/skills/doc-generator/SKILL.md)         | Technical documentation generation |
+| [writing-skills](.claude/skills/writing-skills/SKILL.md)       | TDD applied to skill authoring     |
+| [readme](.claude/skills/readme/SKILL.md)                       | README generation patterns         |
+| [summarize-changes](.claude/skills/summarize-changes/SKILL.md) | Change summary generation          |
+
+### Git & Version Control
+
+| Skill                                                                                    | Description                        |
+| ---------------------------------------------------------------------------------------- | ---------------------------------- |
+| [commit-validator](.claude/skills/commit-validator/SKILL.md)                             | Conventional commit validation     |
+| [git-expert](.claude/skills/git-expert/SKILL.md)                                         | Advanced Git workflows             |
+| [github-ops](.claude/skills/github-ops/SKILL.md)                                         | GitHub operations and PR workflows |
+| [finishing-a-development-branch](.claude/skills/finishing-a-development-branch/SKILL.md) | Branch completion checklist        |
+| [using-git-worktrees](.claude/skills/using-git-worktrees/SKILL.md)                       | Isolated development workspaces    |
+| [smart-revert](.claude/skills/smart-revert/SKILL.md)                                     | Safe revert with impact analysis   |
+
+### Creator Tools
+
+| Skill                                                              | Description                                       |
+| ------------------------------------------------------------------ | ------------------------------------------------- |
+| [research-synthesis](.claude/skills/research-synthesis/SKILL.md)   | Multi-source research and synthesis               |
+| [skill-creator](.claude/skills/skill-creator/SKILL.md)             | Create new skills                                 |
+| [skill-updater](.claude/skills/skill-updater/SKILL.md)             | Update existing skills to production-ready status |
+| [agent-creator](.claude/skills/agent-creator/SKILL.md)             | Create new agents                                 |
+| [agent-updater](.claude/skills/agent-updater/SKILL.md)             | Update existing agents                            |
+| [workflow-creator](.claude/skills/workflow-creator/SKILL.md)       | Create new workflows                              |
+| [workflow-updater](.claude/skills/workflow-updater/SKILL.md)       | Update existing workflows                         |
+| [hook-creator](.claude/skills/hook-creator/SKILL.md)               | Create new hooks                                  |
+| [template-creator](.claude/skills/template-creator/SKILL.md)       | Create new templates                              |
+| [schema-creator](.claude/skills/schema-creator/SKILL.md)           | Create new schemas                                |
+| [rule-creator](.claude/skills/rule-creator/SKILL.md)               | Create new rules                                  |
+| [command-creator](.claude/skills/command-creator/SKILL.md)         | Create new commands                               |
+| [tool-creator](.claude/skills/tool-creator/SKILL.md)               | Create new framework tools                        |
+| [artifact-integrator](.claude/skills/artifact-integrator/SKILL.md) | Integrate artifacts into framework                |
+| [artifact-updater](.claude/skills/artifact-updater/SKILL.md)       | Update existing artifacts                         |
+
+### Memory & Context
+
+| Skill                                                                                      | Description                                        |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| [context-compressor](.claude/skills/context-compressor/SKILL.md)                           | Context window compression                         |
+| [token-saver-context-compression](.claude/skills/token-saver-context-compression/SKILL.md) | Search-aware context compression with MemoryRecord |
+| [memory-quality-auditor](.claude/skills/memory-quality-auditor/SKILL.md)                   | Memory file quality audit                          |
+| [session-handoff](.claude/skills/session-handoff/SKILL.md)                                 | Cross-session handoff artifacts                    |
+| [task-management-protocol](.claude/skills/task-management-protocol/SKILL.md)               | Task tracking and structured handoff               |
+| [track-management](.claude/skills/track-management/SKILL.md)                               | Work unit lifecycle management                     |
+| [context-degradation](.claude/skills/context-degradation/SKILL.md)                         | Context degradation detection                      |
+| [framework-context](.claude/skills/framework-context/SKILL.md)                             | Framework context loading                          |
+| [recommend-evolution](.claude/skills/recommend-evolution/SKILL.md)                         | Framework evolution recommendations                |
+| [assimilate](.claude/skills/assimilate/SKILL.md)                                           | External repository assimilation                   |
+| [creation-feasibility-gate](.claude/skills/creation-feasibility-gate/SKILL.md)             | Pre-creation feasibility check                     |
+| [compliance-policy-check](.claude/skills/compliance-policy-check/SKILL.md)                 | Policy compliance validation                       |
+| [troubleshooting-regression](.claude/skills/troubleshooting-regression/SKILL.md)           | Regression diagnosis and fix verification          |
+| [memory-search](.claude/skills/memory-search/SKILL.md)                                     | Semantic memory search                             |
+| [insight-extraction](.claude/skills/insight-extraction/SKILL.md)                           | Knowledge extraction from context                  |
+
+### Validation & Quality
+
+| Skill                                                                                            | Description                                      |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| [checklist-generator](.claude/skills/checklist-generator/SKILL.md)                               | Quality checklist generation                     |
+| [proactive-audit](.claude/skills/proactive-audit/SKILL.md)                                       | Proactive framework audit after pipeline changes |
+| [response-rater](.claude/skills/response-rater/SKILL.md)                                         | Agent response quality rating                    |
+| [test-generator](.claude/skills/test-generator/SKILL.md)                                         | Automated test code generation                   |
+| [accessibility](.claude/skills/accessibility/SKILL.md)                                           | Accessibility audit and fixes                    |
+| [eval-harness-updater](.claude/skills/eval-harness-updater/SKILL.md)                             | Evaluation harness maintenance                   |
+| [qa-workflow](.claude/skills/qa-workflow/SKILL.md)                                               | Systematic QA validation with fix loops          |
+| [agent-evaluation](.claude/skills/agent-evaluation/SKILL.md)                                     | Agent capability evaluation                      |
+| [strict-user-requirements-adherence](.claude/skills/strict-user-requirements-adherence/SKILL.md) | Requirements traceability                        |
+| [property-based-testing](.claude/skills/property-based-testing/SKILL.md)                         | Property-based test generation                   |
+
+### Specialized Patterns
+
+| Skill                                                                                            | Description                               |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| [thinking-tools](.claude/skills/thinking-tools/SKILL.md)                                         | Structured self-reflection checkpoints    |
+| [sequential-thinking](.claude/skills/sequential-thinking/SKILL.md)                               | Dynamic step-by-step hypothesis reasoning |
+| [consensus-voting](.claude/skills/consensus-voting/SKILL.md)                                     | Multi-perspective decision voting         |
+| [swarm-coordination](.claude/skills/swarm-coordination/SKILL.md)                                 | Multi-agent swarm patterns                |
+| [interactive-requirements-gathering](.claude/skills/interactive-requirements-gathering/SKILL.md) | Guided requirements elicitation           |
+| [planning-with-files](.claude/skills/planning-with-files/SKILL.md)                               | File-based planning patterns              |
+| [context-driven-development](.claude/skills/context-driven-development/SKILL.md)                 | Context-aware development workflow        |
+| [pipeline-reflection-ux](.claude/skills/pipeline-reflection-ux/SKILL.md)                         | Pipeline reflection UX patterns           |
+
+### External Integrations
+
+| Skill                                                                      | Description                        |
+| -------------------------------------------------------------------------- | ---------------------------------- |
+| [jira-pm](.claude/skills/jira-pm/SKILL.md)                                 | Jira project management            |
+| [linear-pm](.claude/skills/linear-pm/SKILL.md)                             | Linear project management          |
+| [medusa](.claude/skills/medusa/SKILL.md)                                   | Medusa e-commerce platform         |
+| [dynamic-api-integration](.claude/skills/dynamic-api-integration/SKILL.md) | Dynamic API integration patterns   |
+| [project-onboarding](.claude/skills/project-onboarding/SKILL.md)           | Project onboarding workflow        |
+| [github-mcp](.claude/skills/github-mcp/SKILL.md)                           | GitHub MCP integration             |
+| [arxiv-mcp](.claude/skills/arxiv-mcp/SKILL.md)                             | arXiv paper retrieval              |
+| [slack-notifications](.claude/skills/slack-notifications/SKILL.md)         | Slack notification patterns        |
+| [gemini-cli-security](.claude/skills/gemini-cli-security/SKILL.md)         | Gemini CLI security audit patterns |
+
+### Incident Response
+
+| Skill                                                                            | Description                  |
+| -------------------------------------------------------------------------------- | ---------------------------- |
+| [incident-runbook-templates](.claude/skills/incident-runbook-templates/SKILL.md) | Incident runbook templates   |
+| [on-call-handoff-patterns](.claude/skills/on-call-handoff-patterns/SKILL.md)     | On-call handoff protocols    |
+| [postmortem-writing](.claude/skills/postmortem-writing/SKILL.md)                 | Blameless postmortem writing |
+
+### Scientific Research
+
+| Skill                                                          | Description                                       |
+| -------------------------------------------------------------- | ------------------------------------------------- |
+| [scientific-skills](.claude/skills/scientific-skills/SKILL.md) | Scientific computing (parent with 139 sub-skills) |
+
+### Other
+
+| Skill                                                                                      | Description                             |
+| ------------------------------------------------------------------------------------------ | --------------------------------------- |
+| [advanced-elicitation](.claude/skills/advanced-elicitation/SKILL.md)                       | Advanced prompt elicitation techniques  |
+| [ai-ml-expert](.claude/skills/ai-ml-expert/SKILL.md)                                       | AI/ML patterns and best practices       |
+| [agent-tool-design](.claude/skills/agent-tool-design/SKILL.md)                             | Agent tool API design                   |
+| [api-development-expert](.claude/skills/api-development-expert/SKILL.md)                   | REST API development patterns           |
+| [ask-questions-if-underspecified](.claude/skills/ask-questions-if-underspecified/SKILL.md) | Requirements clarification              |
+| [sharp-edges](.claude/skills/sharp-edges/SKILL.md)                                         | Known codebase hazard patterns          |
+| [webapp-testing](.claude/skills/webapp-testing/SKILL.md)                                   | Playwright browser automation testing   |
+| [stale-module-pruner](.claude/skills/stale-module-pruner/SKILL.md)                         | Stale module detection and pruning      |
+| [skill-discovery](.claude/skills/skill-discovery/SKILL.md)                                 | Skill discovery and selection           |
+| [code-style-validator](.claude/skills/code-style-validator/SKILL.md)                       | Programmatic AST-based style validation |
+| [dry-principle](.claude/skills/dry-principle/SKILL.md)                                     | DRY enforcement patterns                |
+| [async-operations](.claude/skills/async-operations/SKILL.md)                               | Async/await patterns and anti-patterns  |
+
 ## Operational Notes
 
 - `.claude/context/` stores runtime artifacts and persistent operational memory.

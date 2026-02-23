@@ -217,6 +217,11 @@
             "type": "command",
             "command": "node .claude/hooks/workflow/post-creation-integration.cjs",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow/workflow-watchdog-hook.cjs",
+            "timeout": 3000
           }
         ]
       },
@@ -255,7 +260,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/workflow/post-creation-integration.cjs"
+            "command": "node .claude/hooks/workflow/post-creation-integration.cjs",
+            "timeout": 5000
           }
         ]
       },

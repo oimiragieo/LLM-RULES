@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — Orchestration & State and Post-Creation Validation Refinements (2026-02-22)
+
+#### Track 1: Orchestration & State
+
+- **Precise Tokenizer (Context-Pressure Check)**: Added `.claude/lib/utils/context-token-estimator.cjs` to estimate tokens and calculate context pressure index. Highly integrated into `.claude/hooks/routing/user-prompt-unified.core.cjs` to aggressively govern the auto-compression engine when limits are reached. Tested in `tests/lib/utils/context-token-estimator.test.cjs`.
+- **Watchdog DLQ (Service Level Agreement Protection)**: Engineered `.claude/lib/workflow/workflow-watchdog.cjs` operating under protected state locks to enforce strict SLA guarantees over Phase transitions. Any `in_progress` phase exceeding the SLA timeout is forcefully relocated to an atomic `dlq.jsonl` Dead Letter Queue and flagged with `BLOCKED_TIMEOUT`. Created `.claude/tools/cli/workflow-watchdog-run.cjs` to facilitate automated sweeping. Fully tested in `tests/lib/workflow/workflow-watchdog.test.cjs`.
+
+#### Track 4: Post-Creation Validation
+
+- **AST-based Agent Route Validator**: Replaced brittle string matching methods in CI. Authored `.claude/tools/cli/validate-agent-ast.mjs` with dual checks: JS AST-equivalent module loading (`.claude/lib/routing/routing-table-data.cjs`) and robust tree parsing for Markdown using `remark-parse`. Converted `.claude/tools/cli/validate-integration.cjs` validation matrix elements to async flows. Supported by `tests/tools/cli/ast-validation.test.mjs`.
+- **Scoped Semver Automation Hub**: Packaged `.claude/tools/cli/semver-bump-calculator.cjs` to abstract away direct `semver-diff` functionality execution for CLI integration inside robust automated CI checks with structured validation in `tests/tools/cli/semver-bump-calculator.test.cjs`.
+
 ### Added — 6 New Skills, Gap-Capture Mechanism, and Skill Wiring (2026-02-21)
 
 #### New skills from VoltAgent awesome-agent-skills (Vercel Labs, Google Labs Stitch, Cloudflare)
