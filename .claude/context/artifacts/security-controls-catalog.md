@@ -324,7 +324,7 @@ function generateChecklist(projectContext) {
 - **STRIDE Threat Model**: https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats
 - **CWE (Common Weakness Enumeration)**: https://cwe.mitre.org/
 - **Template System Security Review**: `.claude/context/artifacts/security-reviews/spec-kit-integration-security-review-2026-01-28.md`
-- **Security Assessment (Reflection Enhancements)**: `.claude/context/reports/security-assessment-reflection-enhancements-2026-01-28.md`
+- **Security Assessment (Reflection Enhancements)**: `.claude/context/reports/security/security-assessment-reflection-enhancements-2026-01-28.md`
 
 ---
 

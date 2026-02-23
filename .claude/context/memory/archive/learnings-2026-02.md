@@ -2883,7 +2883,7 @@ find . -type f \( -name "*.md" -o -name "*.cjs" -o -name "*.json" \) \
 **Related Workspace Conventions**:
 
 - See `.claude/rules/workspace-conventions.md` for file placement rules
-- Reports → `.claude/context/reports/` (by domain)
+- Reports → `.claude/context/reports/backend/` (by domain)
 - Plans → `.claude/context/plans/`
 - Artifacts → `.claude/context/artifacts/` (by type: catalogs, analysis, summaries, specs)
 
@@ -3095,7 +3095,7 @@ Candidates for deletion (if confirmed unused):
 ### Actions Taken
 
 1. ✅ Deleted empty directory: `.claude/hooks/session/__tests__/`
-2. ✅ Created audit report: `.claude/context/reports/hooks-audit-2026-02-06.md`
+2. ✅ Created audit report: `.claude/context/reports/ecosystem-audit/hooks-audit-2026-02-06.md`
 3. ⏳ Documented 53 unregistered hooks for future review
 
 ### Key Learnings
@@ -3156,7 +3156,7 @@ test -d path && echo "Still exists" || echo "Deleted"
 ### Files Modified
 
 1. `.claude/hooks/session/__tests__/` (directory) - DELETED
-2. `.claude/context/reports/hooks-audit-2026-02-06.md` - CREATED
+2. `.claude/context/reports/ecosystem-audit/hooks-audit-2026-02-06.md` - CREATED
 3. `.claude/context/memory/learnings.md` - UPDATED (this entry)
 
 ### Verification
@@ -3337,7 +3337,7 @@ Complete audit and cleanup of `.claude/context/` directory (Task #30).
 Per `.claude/rules/workspace-conventions.md`:
 
 - Plans: `.claude/context/plans/` (not artifacts/plans/)
-- Reports: `.claude/context/reports/{domain}/` (architecture, qa, security, database)
+- Reports: `.claude/context/reports/backend/{domain}/` (architecture, qa, security, database)
 - Artifacts: `.claude/context/artifacts/{type}/` (catalogs, analysis, summaries, specs, research-reports, diagrams, database)
 - Temp files: `.claude/context/tmp/` (auto-cleaned after 24 hours)
 
@@ -4288,7 +4288,7 @@ Per instructions, NOT marking task complete as other agents are working in paral
 
 - Uses `atomicWriteJSONSync` from `atomic-write.cjs` for safe workflow state updates
 - Uses `parseHookInputAsync` and `formatResult` from `hook-input.cjs` for hook protocol
-- Quality gates check artifact paths from workspace conventions (`.claude/context/plans/`, `.claude/context/reports/`)
+- Quality gates check artifact paths from workspace conventions (`.claude/context/plans/`, `.claude/context/reports/backend/`)
 
 **Next Steps (per plan):**
 
@@ -12676,12 +12676,12 @@ grep -r "orchestrator.cjs\|factory.cjs\|base-agent.cjs" tests/ --include="*.test
 
 ## Research Report Output Standardization (2026-02-09)
 
-**Problem Solved**: Research reports had inconsistent naming, locations, and structure (some to `.claude/context/reports/`, some to `.claude/context/artifacts/research-reports/`, inconsistent naming conventions).
+**Problem Solved**: Research reports had inconsistent naming, locations, and structure (some to `.claude/context/reports/backend/`, some to `.claude/context/artifacts/research-reports/`, inconsistent naming conventions).
 
 **Solution Implemented**:
 
 1. **Location Clarification (workspace-conventions.md)**:
-   - Operational reports (security/QA/architecture audits): `.claude/context/reports/`
+   - Operational reports (security/QA/architecture audits): `.claude/context/reports/backend/`
    - Research reports (external research artifacts): `.claude/context/artifacts/research-reports/`
 
 2. **Naming Convention Standardized**: `{topic}-research-{YYYY-MM-DD}.md`
@@ -13370,7 +13370,7 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
 
 **Context**: Static memory profiling of entire codebase to identify OOM crash root causes.
 
-**Report**: `.claude/context/reports/performance-memory-profiling-analysis-2026-02-09.md`
+**Report**: `.claude/context/reports/backend/performance-memory-profiling-analysis-2026-02-09.md`
 
 **Root Cause**: Code indexing subsystem loads ENTIRE BM25 corpus into RAM (`this.documents[]` in bm25-indexer.cjs:91, 50-200MB), serializes to single JSON string (doubling peak memory at vector-store.cjs:176), while async pipeline fragments V8 heap via Promise.race pattern (index-manager.cjs:523-648). Combined with tree-sitter grammars (10-80MB) and ML models (25-100MB), total exceeds 4GB default heap.
 
@@ -13446,7 +13446,7 @@ Catalog updates are CRITICAL after batch artifact creation. Without catalog entr
 - Node.js script to update agent-registry.json programmatically
 - Comparison workflow to find skills in filesystem but not in registry
 
-**Report**: `.claude/context/reports/skill-agent-wiring-2026-02-09.md`
+**Report**: `.claude/context/reports/ecosystem-audit/skill-agent-wiring-2026-02-09.md`
 
 **Next Steps**:
 
@@ -13624,7 +13624,7 @@ Test triage as a learning tool:
 **Prevention Rules (IRON LAW)**:
 
 1. **Max 2 heavy agents in parallel** - Never spawn more than 2 agents that will do extensive analysis (code review, QA, security review) at the same time
-2. **Agents MUST write reports to files** - Detailed findings go to `.claude/context/reports/`. Return to router: file path + 5-line summary only (max 500 chars)
+2. **Agents MUST write reports to files** - Detailed findings go to `.claude/context/reports/backend/`. Return to router: file path + 5-line summary only (max 500 chars)
 3. **Sequential waves for review cycles** - Wave 1 (code-review + QA), Wave 2 (security + devops), Wave 3 (architect). Wait for wave completion before next.
 4. **Use haiku for simple reviews** - Only use opus/sonnet for complex security or architecture reviews
 5. **Monitor token budget** - If agents return >1000 chars, something is wrong
@@ -13771,7 +13771,7 @@ The expansion created 299 artifacts (90 schemas, 86 rules, 92 commands) with 100
 
 - Hook correctly blocked .claude/hooks/, .claude/agents/ direct writes (protection works)
 - **Over-protection**: May have blocked .claude/context/reports/ paths (legitimate agent output)
-- **Fix**: Whitelist .claude/context/reports/\*_/_.md in hook OR use "warn" mode for reports subdirectory
+- **Fix**: Whitelist .claude/context/reports/backend/\*_/_.md in hook OR use "warn" mode for reports subdirectory
 
 **Quality Metric**: 0.78/1.0 (PASS). Rubric: Completeness 0.75, Accuracy 0.82, Clarity 0.80, Consistency 0.72, Actionability 0.75. Score held back by 2 test failures + incomplete test files + deferred integration analysis.
 
@@ -14124,7 +14124,7 @@ Apply tiering BEFORE batch creation starts, not after. Prevents mechanical templ
 
 **Cross-References:**
 
-- Architecture Review: `.claude/context/reports/architecture-review-2026-02-11.md`
+- Architecture Review: `.claude/context/reports/architecture/architecture-review-2026-02-11.md`
 - QA Report: `.claude/context/reports/qa/qa-audit-fixes-2026-02-11.md`
 - Audit Reflection: `.claude/context/reports/reflections/audit-reflection-2026-02-11.md`
 - learnings.md: This entry
@@ -14331,7 +14331,7 @@ Pattern: When adding subprocess calls, always consider both Windows and Unix beh
    - Rule: For security-sensitive pipelines, security phase BEFORE implementation
 
 3. **Reports to Files, Summaries to Chat:**
-   - Pattern: Agents write full report to `.claude/context/reports/`, return 5-bullet summary (max 500 chars)
+   - Pattern: Agents write full report to `.claude/context/reports/backend/`, return 5-bullet summary (max 500 chars)
    - Why: Prevents context overflow (report in file, not inline)
    - Evidence: Wave 0 reflection (805 lines), QA report (245 lines), docs report (234 lines) all written to files
    - Rule: MANDATORY for all heavy agents (architect, security, qa, code-reviewer, planner)
@@ -14440,7 +14440,7 @@ Pattern: When adding subprocess calls, always consider both Windows and Unix beh
 - Memory learnings: "99.3% test pass rate can mask critical coverage gaps (routing logic, loop detection untested)"
 - Fix: Add P0 tests first (45 tests, 3.5 days), then P1 tests (40 tests, 6 days)
 
-**Report:** `.claude/context/reports/qa-audit-2026-02-15.md`
+**Report:** `.claude/context/reports/qa/qa-audit-2026-02-15.md`
 
 ## Memory Documentation Alignment (2026-02-15)
 
@@ -14448,7 +14448,7 @@ Pattern: When adding subprocess calls, always consider both Windows and Unix beh
 - Key fixes: learnings.md is legacy archive (not active), thresholds are 40KB/80KB (not 20KB), session files use timestamps (not numbers)
 - Pattern: When documentation references implementation details (thresholds, file formats), verify against source code and MEMORY_SYSTEM.md
 - Updated `.claude/rules/memory-protocol.md`, `@DIRECTORY_STRUCTURE.md`, and `MEMORY_SYSTEM.md`
-- Report: `.claude/context/reports/memory-docs-alignment-2026-02-15.md`
+- Report: `.claude/context/reports/docs/memory-docs-alignment-2026-02-15.md`
 
 ## Enterprise Pipeline Final Reflection (2026-02-16 Phase 10)
 
@@ -14784,7 +14784,7 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - Full retrospective: `.claude/context/reports/reflections/pipeline-retrospective-2026-02-11.md`
 - Audit reflection: `.claude/context/reports/reflections/audit-reflection-2026-02-11.md`
 - QA validation: `.claude/context/reports/qa/qa-audit-fixes-2026-02-11.md`
-- Documentation: `.claude/context/reports/docs-update-2026-02-11.md`
+- Documentation: `.claude/context/reports/docs/docs-update-2026-02-11.md`
 
 ---
 
@@ -14876,7 +14876,7 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 - task-tracking.md: Agent-to-agent coordination with structured metadata schema
 - All 5 new ADRs (114-116, 113, 112) added to decisions.md
 
-**Report**: `.claude/context/reports/docs-update-2026-02-13.md`
+**Report**: `.claude/context/reports/docs/docs-update-2026-02-13.md`
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-02-14T00:40:57.351Z",
+  "generatedAt": "2026-02-23T00:13:49.058Z",
   "agents": [
     {
       "id": "architect",
@@ -15,19 +15,19 @@
           "tags": [
             "architect",
             "designer",
-            "api-development-expert",
             "architecture-review",
-            "checklist-generator",
-            "code-semantic-search",
-            "code-structural-search",
-            "complexity-assessment",
+            "brainstorming",
             "database-architect",
             "diagram-generator",
+            "spec-critique",
+            "task-management-protocol",
+            "verification-before-completion",
             "ripgrep",
-            "security-architect",
-            "sequential-thinking",
-            "spec-gathering",
-            "swarm-coordination"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert"
           ],
           "examples": []
         }
@@ -48,8 +48,15 @@
             "compressor",
             "context-compressor",
             "session-handoff",
+            "summarize-changes",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "token-saver-context-compression",
             "task-management-protocol",
-            "verification-before-completion"
+            "verification-before-completion",
+            "memory-search",
+            "insight-extraction"
           ],
           "examples": []
         }
@@ -71,16 +78,16 @@
             "tests",
             "refactors",
             "refactor",
-            "checklist-generator",
-            "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "context-compressor",
-            "debugging",
-            "git-expert",
-            "ripgrep"
+            "stale-module-pruner",
+            "advanced-elicitation",
+            "agent-evaluation",
+            "agent-tool-design",
+            "agent-updater",
+            "ai-ml-expert",
+            "android-expert",
+            "angular-expert",
+            "artifact-integrator",
+            "artifact-updater"
           ],
           "examples": []
         }
@@ -90,7 +97,7 @@
       "id": "planner",
       "name": "planner",
       "description": "Strategic thinker. Breaks down complex goals into atomic, actionable steps. Use for new features, large refactors, or ambiguous requests.",
-      "version": "1.1.0",
+      "version": "1.4.0",
       "skills": [
         {
           "id": "planner",
@@ -99,19 +106,19 @@
           "tags": [
             "planner",
             "refactors",
-            "checklist-generator",
-            "code-semantic-search",
+            "brainstorming",
+            "jira-pm",
+            "linear-pm",
             "complexity-assessment",
-            "context-compressor",
+            "dispatching-parallel-agents",
+            "framework-context",
             "plan-generator",
-            "planning-with-files",
-            "project-onboarding",
-            "ripgrep",
-            "sparc-methodology",
+            "recommend-evolution",
             "sequential-thinking",
-            "spec-gathering",
-            "spec-init",
-            "task-management-protocol"
+            "spec-critique",
+            "strict-user-requirements-adherence",
+            "task-management-protocol",
+            "ripgrep"
           ],
           "examples": []
         }
@@ -121,7 +128,7 @@
       "id": "pm",
       "name": "pm",
       "description": "Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use for roadmap planning, user story creation, stakeholder updates, and agile work...",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "skills": [
         {
           "id": "pm",
@@ -129,16 +136,20 @@
           "description": "Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use for roadmap planning, user story creation, stakeholder updates, and agile work...",
           "tags": [
             "planning",
-            "checklist-generator",
-            "code-semantic-search",
-            "consensus-voting",
-            "interactive-requirements-gathering",
+            "complexity-assessment",
             "plan-generator",
-            "prd-generator",
-            "ripgrep",
-            "sequential-thinking",
+            "spec-gathering",
             "task-management-protocol",
-            "verification-before-completion"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "checklist-generator",
+            "consensus-voting",
+            "framework-context",
+            "interactive-requirements-gathering",
+            "prd-generator"
           ],
           "examples": []
         }
@@ -158,16 +169,18 @@
             "test",
             "testing",
             "validates",
-            "checklist-generator",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "ripgrep",
+            "qa-workflow",
+            "strict-user-requirements-adherence",
             "task-management-protocol",
             "tdd",
             "test-generator",
-            "verification-before-completion"
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "checklist-generator"
           ],
           "examples": []
         }
@@ -177,7 +190,7 @@
       "id": "reflection-agent",
       "name": "reflection-agent",
       "description": "Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against rubrics, extracts patterns, and updates memory. Use after task completion for m...",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "skills": [
         {
           "id": "reflection-agent",
@@ -186,13 +199,19 @@
           "tags": [
             "reflection",
             "agent",
-            "artifact-integrator",
-            "code-analyzer",
+            "framework-context",
+            "recommend-evolution",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "context-compressor",
-            "insight-extraction",
-            "summarize-changes",
-            "task-management-protocol",
-            "verification-before-completion"
+            "token-saver-context-compression",
+            "artifact-integrator",
+            "compliance-policy-check",
+            "creation-feasibility-gate",
+            "assimilate",
+            "code-analyzer",
+            "insight-extraction"
           ],
           "examples": []
         }
@@ -211,13 +230,50 @@
           "tags": [
             "router",
             "orchestrates",
-            "agent-creator",
-            "skill-creator",
+            "complexity-assessment",
             "skill-discovery",
-            "swarm-coordination",
-            "task-management-protocol",
-            "tool-search",
-            "verification-before-completion"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "agent-creator",
+            "command-creator",
+            "rule-creator",
+            "tool-creator",
+            "hook-creator",
+            "semgrep-rule-creator"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "technical-program-manager",
+      "name": "technical-program-manager",
+      "description": "Technical Program Manager. Coordinates multi-team delivery, dependency/risk tracking, and phase-gate execution. Use for cross-team programs, EPIC execution governance, and milestone recovery.",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "technical-program-manager",
+          "name": "technical-program-manager",
+          "description": "Technical Program Manager. Coordinates multi-team delivery, dependency/risk tracking, and phase-gate execution. Use for cross-team programs, EPIC execution governance, and milestone recovery.",
+          "tags": [
+            "technical",
+            "program",
+            "manager",
+            "coordinates",
+            "checklist-generator",
+            "code-semantic-search",
+            "compliance-policy-check",
+            "complexity-assessment",
+            "creation-feasibility-gate",
+            "framework-context",
+            "plan-generator",
+            "recommend-evolution",
+            "research-synthesis",
+            "sequential-thinking",
+            "task-management-protocol"
           ],
           "examples": []
         }
@@ -237,12 +293,18 @@
             "technical",
             "writer",
             "creates",
-            "diagram-generator",
             "doc-generator",
             "readme",
-            "task-management-protocol",
             "verification-before-completion",
-            "writing-skills"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "diagram-generator",
+            "task-management-protocol",
+            "writing-skills",
+            "memory-search"
           ],
           "examples": []
         }
@@ -264,14 +326,46 @@
             "testing",
             "auditing",
             "design",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "ripgrep",
+            "context-compressor",
+            "token-saver-context-compression",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
             "debugging",
-            "code-analyzer",
+            "code-analyzer"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "advanced-debugging",
+      "name": "advanced-debugging",
+      "description": "Master debugger specializing in multi-layer systematic investigation — application code, runtime internals, distributed systems, memory/performance profiling, and infrastructure. Applies structured...",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "advanced-debugging",
+          "name": "advanced-debugging",
+          "description": "Master debugger specializing in multi-layer systematic investigation — application code, runtime internals, distributed systems, memory/performance profiling, and infrastructure. Applies structured...",
+          "tags": [
+            "advanced",
+            "debugging",
+            "debugger",
+            "tests",
+            "smart-debug",
+            "troubleshooting-regression",
+            "recovery",
+            "logging-module-usage",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "context-compressor"
           ],
           "examples": []
@@ -292,12 +386,17 @@
             "code",
             "analyzes",
             "create",
-            "task-management-protocol",
             "code-analyzer",
-            "code-structural-search",
-            "doc-generator",
+            "diagram-generator",
+            "task-management-protocol",
+            "verification-before-completion",
             "ripgrep",
-            "verification-before-completion"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "doc-generator",
+            "memory-search"
           ],
           "examples": []
         }
@@ -316,13 +415,18 @@
           "tags": [
             "component",
             "creates",
-            "task-management-protocol",
             "architecture-review",
-            "code-analyzer",
             "diagram-generator",
-            "doc-generator",
+            "task-management-protocol",
+            "verification-before-completion",
             "ripgrep",
-            "verification-before-completion"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "code-analyzer",
+            "doc-generator",
+            "memory-search"
           ],
           "examples": []
         }
@@ -341,13 +445,19 @@
           "tags": [
             "container",
             "deployment",
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "api-development-expert",
-            "ripgrep",
+            "container-expert",
+            "diagram-generator",
+            "task-management-protocol",
             "verification-before-completion",
-            "diagram-generator"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "doc-generator",
+            "api-development-expert",
+            "memory-search"
           ],
           "examples": []
         }
@@ -367,13 +477,18 @@
             "context",
             "creates",
             "create",
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "ripgrep",
-            "verification-before-completion",
             "diagram-generator",
-            "project-analyzer"
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "doc-generator",
+            "project-analyzer",
+            "memory-search"
           ],
           "examples": []
         }
@@ -395,13 +510,16 @@
             "designs",
             "validates",
             "testing",
-            "debugging",
-            "code-semantic-search",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "debugging",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
-            "context-compressor"
+            "memory-search"
           ],
           "examples": []
         }
@@ -423,16 +541,16 @@
             "review",
             "reviews",
             "implementation",
-            "task-management-protocol",
-            "checklist-generator",
             "code-analyzer",
             "code-quality-expert",
+            "qa-workflow",
+            "receiving-code-review",
+            "requesting-code-review",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "differential-review",
-            "dry-principle",
-            "git-expert"
+            "code-structural-search"
           ],
           "examples": []
         }
@@ -452,18 +570,18 @@
             "code",
             "simplifier",
             "refactoring",
+            "stale-module-pruner",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "best-practices-guidelines",
             "code-analyzer",
             "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
             "code-style-validator",
-            "debugging",
-            "dry-principle",
-            "function-length-and-responsibility",
-            "ripgrep",
-            "verification-before-completion"
+            "debugging"
           ],
           "examples": []
         }
@@ -484,12 +602,16 @@
             "validator",
             "validates",
             "implementation",
-            "task-management-protocol",
             "context-driven-development",
-            "ripgrep",
+            "task-management-protocol",
             "track-management",
-            "workflow-patterns",
             "verification-before-completion",
+            "workflow-patterns",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "rule-auditor"
           ],
           "examples": []
@@ -512,16 +634,16 @@
             "design",
             "planning",
             "designing",
-            "task-management-protocol",
-            "architecture-review",
-            "code-semantic-search",
-            "data-expert",
             "database-architect",
             "database-expert",
-            "diagram-generator",
-            "doc-generator",
+            "task-management-protocol",
+            "text-to-sql",
+            "verification-before-completion",
             "ripgrep",
-            "sequential-thinking"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -541,18 +663,18 @@
             "devops",
             "troubleshooter",
             "debugging",
+            "docker-compose",
+            "k8s-manifest-generator",
             "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "aws-cloud-ops",
             "chrome-browser",
-            "cloud-devops-expert",
-            "code-semantic-search",
-            "container-expert",
-            "context-compressor",
-            "incident-runbook-templates",
-            "logging-module-usage",
-            "postmortem-writing",
-            "recovery",
-            "ripgrep"
+            "cloud-devops-expert"
           ],
           "examples": []
         }
@@ -572,18 +694,18 @@
             "devops",
             "design",
             "deployment",
-            "task-management-protocol",
-            "code-semantic-search",
-            "dependency-analyzer",
-            "git-expert",
-            "github-mcp",
             "architecture-review",
-            "aws-cloud-ops",
-            "ci-cd-implementation-rule",
-            "cloud-devops-expert",
-            "configuration-management",
+            "commit-validator",
             "consensus-voting",
-            "container-expert"
+            "containerization-rules",
+            "context-compressor",
+            "database-architect",
+            "docker-compose",
+            "kafka-development-practices",
+            "monorepo-and-tooling",
+            "filesystem",
+            "finishing-a-development-branch",
+            "git-expert"
           ],
           "examples": []
         }
@@ -602,19 +724,19 @@
           "tags": [
             "incident",
             "responder",
-            "task-management-protocol",
-            "code-semantic-search",
-            "configuration-management",
-            "container-expert",
-            "debugging",
             "incident-runbook-templates",
-            "logging-module-usage",
             "on-call-handoff-patterns",
             "postmortem-writing",
-            "recovery",
+            "task-management-protocol",
+            "verification-before-completion",
             "ripgrep",
-            "sentry-monitoring",
-            "slack-notifications"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "configuration-management",
+            "container-expert",
+            "debugging"
           ],
           "examples": []
         }
@@ -634,16 +756,18 @@
             "penetration",
             "tester",
             "testing",
-            "security-architect",
-            "auth-security-expert",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "ripgrep",
+            "context-compressor",
+            "token-saver-context-compression",
+            "security-architect",
+            "auth-security-expert",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
             "debugging",
-            "context-compressor"
+            "medusa-security"
           ],
           "examples": []
         }
@@ -663,14 +787,16 @@
             "performance",
             "engineer",
             "testing",
-            "code-analyzer",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "code-analyzer",
             "debugging",
-            "ripgrep",
             "task-management-protocol",
-            "verification-before-completion"
+            "verification-before-completion",
+            "memory-search"
           ],
           "examples": []
         }
@@ -689,15 +815,18 @@
           "tags": [
             "researcher",
             "building",
+            "arxiv-mcp",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
             "doc-generator",
             "research-synthesis",
-            "ripgrep",
             "sequential-thinking",
             "task-management-protocol",
-            "thinking-tools"
+            "thinking-tools",
+            "memory-search"
           ],
           "examples": []
         }
@@ -716,19 +845,19 @@
           "tags": [
             "reverse",
             "engineer",
-            "task-management-protocol",
             "binary-analysis-patterns",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "memory-forensics",
             "protocol-reverse-engineering",
+            "task-management-protocol",
+            "verification-before-completion",
             "ripgrep",
-            "security-architect",
-            "tdd",
-            "verification-before-completion"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "code-analyzer",
+            "debugging",
+            "git-expert"
           ],
           "examples": []
         }
@@ -751,15 +880,15 @@
             "review",
             "testing",
             "planning",
-            "task-management-protocol",
             "auth-security-expert",
-            "binary-analysis-patterns",
-            "checklist-generator",
-            "code-analyzer",
+            "fiber-routing-and-csrf-protection",
+            "security-architect",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "doc-generator",
-            "insecure-defaults"
+            "context-compressor"
           ],
           "examples": []
         }
@@ -780,16 +909,17 @@
             "engineer",
             "reviews",
             "design",
+            "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
             "debugging",
             "incident-runbook-templates",
             "on-call-handoff-patterns",
             "postmortem-writing",
-            "ripgrep",
             "sentry-monitoring",
-            "task-management-protocol",
-            "verification-before-completion"
+            "task-management-protocol"
           ],
           "examples": []
         }
@@ -808,19 +938,19 @@
           "tags": [
             "specialist",
             "deployment",
-            "task-management-protocol",
-            "ai-ml-expert",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol",
+            "ai-ml-expert",
             "comprehensive-type-annotations",
             "data-expert",
             "debugging",
             "git-expert",
             "jupyter-notebook-best-practices",
-            "logging-module-usage",
-            "python-backend-expert",
-            "ripgrep",
-            "scientific-skills"
+            "logging-module-usage"
           ],
           "examples": []
         }
@@ -841,17 +971,17 @@
             "pro",
             "building",
             "design",
-            "task-management-protocol",
-            "android-expert",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol",
+            "android-expert",
             "debugging",
             "git-expert",
             "mobile-first-design-rules",
-            "mobile-ui-development-rule",
-            "ripgrep",
-            "tdd",
-            "verification-before-completion"
+            "mobile-ui-development-rule"
           ],
           "examples": []
         }
@@ -873,16 +1003,16 @@
             "designs",
             "review",
             "design",
-            "api-development-expert",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
             "doc-generator",
             "diagram-generator",
-            "ripgrep",
             "security-architect",
-            "spec-gathering",
-            "task-management-protocol"
+            "spec-gathering"
           ],
           "examples": []
         }
@@ -902,18 +1032,18 @@
             "data",
             "engineer",
             "building",
+            "data-expert",
+            "large-data-with-dask",
+            "python-backend-expert",
             "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "data-expert",
-            "database-expert",
-            "debugging",
-            "diagram-generator",
-            "git-expert",
-            "pandas-data-manipulation-rules",
-            "python-backend-expert",
-            "ripgrep",
-            "tdd"
+            "context-compressor",
+            "token-saver-context-compression",
+            "database-expert"
           ],
           "examples": []
         }
@@ -934,17 +1064,17 @@
             "mobile",
             "developer",
             "building",
+            "expo-framework-rule",
+            "nativewind-and-tailwind-css-compatibility",
+            "flutter-expert",
+            "react-expert",
             "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
-            "expo-framework-rule",
-            "expo-mobile-app-rule",
-            "git-expert",
-            "mobile-ui-development-rule",
-            "react-expert",
-            "react-native-skills-vercel",
-            "ripgrep"
+            "context-compressor"
           ],
           "examples": []
         }
@@ -964,18 +1094,18 @@
             "fastapi",
             "pro",
             "build",
-            "task-management-protocol",
             "api-development-expert",
+            "python-backend-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "comprehensive-type-annotations",
-            "database-expert",
-            "debugging",
-            "form-validation-with-zod",
-            "git-expert",
-            "python-backend-expert",
-            "ripgrep",
-            "security-architect"
+            "database-expert"
           ],
           "examples": []
         }
@@ -997,16 +1127,16 @@
             "implementation",
             "building",
             "designs",
-            "task-management-protocol",
-            "accessibility",
-            "build-tools-expert",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
+            "angular-expert",
+            "astro-expert",
             "frontend-expert",
-            "git-expert",
-            "html-tailwind-css-and-javascript-expert-rule",
-            "react-expert"
+            "htmx-expert",
+            "paraglide-js-internationalization-i18n",
+            "react-best-practices-vercel",
+            "react-expert",
+            "qwik-expert",
+            "solidjs-expert",
+            "vercel-ai-sdk-best-practices"
           ],
           "examples": []
         }
@@ -1026,18 +1156,18 @@
             "gamedev",
             "pro",
             "implementation",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
             "cpp",
             "debugging",
             "gamedev-expert",
-            "git-expert",
-            "ripgrep",
-            "tdd",
-            "verification-before-completion"
+            "git-expert"
           ],
           "examples": []
         }
@@ -1057,18 +1187,18 @@
             "golang",
             "pro",
             "design",
+            "debugging",
+            "fiber-routing-and-csrf-protection",
+            "go-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "build-tools-expert",
-            "code-quality-expert",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
-            "git-expert",
-            "go-expert",
-            "ripgrep",
-            "tdd",
-            "verification-before-completion"
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert"
           ],
           "examples": []
         }
@@ -1090,16 +1220,16 @@
             "design",
             "building",
             "implementing",
-            "task-management-protocol",
             "api-development-expert",
-            "code-quality-expert",
+            "graphql-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
-            "git-expert",
-            "graphql-expert",
-            "ripgrep",
-            "tdd"
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -1119,17 +1249,18 @@
             "ios",
             "pro",
             "building",
+            "debugging",
+            "ios-expert",
             "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
+            "context-compressor",
+            "token-saver-context-compression",
             "git-expert",
-            "ios-expert",
-            "mobile-first-design-rules",
-            "mobile-ui-development-rule",
-            "ripgrep",
-            "tdd",
-            "verification-before-completion"
+            "mobile-first-design-rules"
           ],
           "examples": []
         }
@@ -1149,18 +1280,49 @@
             "java",
             "pro",
             "building",
+            "debugging",
+            "java-expert",
             "task-management-protocol",
-            "api-development-expert",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
+            "doc-generator"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "kubernetes-specialist",
+      "name": "kubernetes-specialist",
+      "description": "Expert Kubernetes platform engineer specializing in cluster operations, workload design, GitOps, and production hardening. Deep knowledge of K8s networking, RBAC, operators, Helm, Kustomize, ArgoCD...",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "kubernetes-specialist",
+          "name": "kubernetes-specialist",
+          "description": "Expert Kubernetes platform engineer specializing in cluster operations, workload design, GitOps, and production hardening. Deep knowledge of K8s networking, RBAC, operators, Helm, Kustomize, ArgoCD...",
+          "tags": [
+            "kubernetes",
+            "specialist",
+            "design",
             "debugging",
-            "doc-generator",
-            "dto-conventions",
-            "git-expert",
-            "java-expert",
-            "restcontroller-conventions",
+            "k8s-manifest-generator",
+            "docker-compose",
+            "container-expert",
+            "cloud-devops-expert",
+            "aws-cloud-ops",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
             "ripgrep",
-            "service-class-conventions"
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "examples": []
         }
@@ -1180,9 +1342,11 @@
             "llm",
             "architect",
             "design",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "ripgrep",
+            "context-compressor",
+            "token-saver-context-compression",
             "architecture-review",
             "verification-before-completion",
             "task-management-protocol",
@@ -1210,15 +1374,47 @@
             "developer",
             "implementation",
             "design",
-            "tdd",
-            "debugging",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "ripgrep",
+            "context-compressor",
+            "token-saver-context-compression",
+            "tdd",
+            "debugging",
             "verification-before-completion",
             "task-management-protocol",
             "git-expert",
             "code-analyzer"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "medical-research-triage",
+      "name": "medical-research-triage",
+      "description": "Medical triage and research specialist (Dr. Aria Voss). Use when user describes symptoms, asks about medications or drug interactions, needs medical literature synthesized, or has clinical / pharma...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "medical-research-triage",
+          "name": "medical-research-triage",
+          "description": "Medical triage and research specialist (Dr. Aria Voss). Use when user describes symptoms, asks about medications or drug interactions, needs medical literature synthesized, or has clinical / pharma...",
+          "tags": [
+            "medical",
+            "research",
+            "triage",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "arxiv-mcp",
+            "scientific-skills",
+            "sequential-thinking",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
           ],
           "examples": []
         }
@@ -1238,15 +1434,17 @@
             "microservices",
             "architect",
             "design",
-            "architecture-review",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "architecture-review",
             "diagram-generator",
-            "ripgrep",
             "sequential-thinking",
             "task-management-protocol",
-            "verification-before-completion"
+            "verification-before-completion",
+            "memory-search"
           ],
           "examples": []
         }
@@ -1268,16 +1466,16 @@
             "reviewing",
             "design",
             "audits",
-            "task-management-protocol",
             "accessibility",
-            "checklist-generator",
-            "code-semantic-search",
-            "design-and-user-experience-guidelines",
-            "diagram-generator",
-            "doc-generator",
             "mobile-first-design-rules",
             "mobile-ui-development-rule",
-            "ripgrep"
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -1297,18 +1495,18 @@
             "nextjs",
             "pro",
             "building",
+            "nextjs-expert",
+            "react-expert",
             "task-management-protocol",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "debugging",
-            "git-expert",
-            "nextjs-expert",
-            "react-best-practices-vercel",
-            "react-expert",
-            "ripgrep",
-            "state-management-expert",
-            "styling-expert",
-            "tdd"
+            "git-expert"
           ],
           "examples": []
         }
@@ -1328,18 +1526,18 @@
             "nodejs",
             "pro",
             "building",
+            "nodejs-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "async-operations",
-            "code-quality-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
-            "git-expert",
-            "nodejs-expert",
-            "ripgrep",
-            "tdd",
-            "typescript-expert"
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
+            "async-operations"
           ],
           "examples": []
         }
@@ -1359,18 +1557,46 @@
             "php",
             "pro",
             "building",
+            "debugging",
+            "php-expert",
             "task-management-protocol",
-            "api-development-expert",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "composer-dependency-management",
-            "debugging",
-            "doc-generator",
-            "git-expert",
-            "php-expert",
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
+            "composer-dependency-management"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "pm-coordinator",
+      "name": "pm-coordinator",
+      "description": "Expert project manager and cross-team coordinator specializing in sprint planning, roadmap management, stakeholder communication, and delivery coordination. Masters Jira, Linear, and GitHub Project...",
+      "version": "1.1.0",
+      "skills": [
+        {
+          "id": "pm-coordinator",
+          "name": "pm-coordinator",
+          "description": "Expert project manager and cross-team coordinator specializing in sprint planning, roadmap management, stakeholder communication, and delivery coordination. Masters Jira, Linear, and GitHub Project...",
+          "tags": [
+            "coordinator",
+            "planning",
+            "jira-pm",
+            "linear-pm",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "context-compressor",
+            "token-saver-context-compression",
             "ripgrep",
-            "tall-stack-general",
-            "tdd"
+            "code-semantic-search",
+            "memory-search"
           ],
           "examples": []
         }
@@ -1394,14 +1620,14 @@
             "optimizes",
             "testing",
             "design",
-            "advanced-elicitation",
-            "code-semantic-search",
             "ripgrep",
-            "verification-before-completion",
-            "task-management-protocol",
-            "code-analyzer",
+            "code-semantic-search",
             "code-structural-search",
-            "git-expert"
+            "context-compressor",
+            "token-saver-context-compression",
+            "advanced-elicitation",
+            "verification-before-completion",
+            "task-management-protocol"
           ],
           "examples": []
         }
@@ -1420,19 +1646,19 @@
           "tags": [
             "python",
             "pro",
+            "debugging",
+            "python-backend-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "code-quality-expert",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "comprehensive-type-annotations",
-            "comprehensive-unit-testing-with-pytest",
-            "debugging",
-            "git-expert",
-            "prioritize-python-3-10-features",
-            "python-backend-expert",
-            "ripgrep",
-            "tdd"
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
+            "code-quality-expert",
+            "comprehensive-type-annotations"
           ],
           "examples": []
         }
@@ -1451,17 +1677,19 @@
           "tags": [
             "rust",
             "pro",
-            "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
             "debugging",
             "git-expert",
-            "ripgrep",
-            "rust-expert",
+            "task-management-protocol",
             "tdd",
-            "verification-before-completion"
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "build-tools-expert",
+            "code-quality-expert",
+            "rust-expert"
           ],
           "examples": []
         }
@@ -1482,17 +1710,17 @@
             "research",
             "expert",
             "reviews",
-            "task-management-protocol",
-            "arxiv-mcp",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol",
+            "arxiv-mcp",
             "debugging",
             "diagram-generator",
             "doc-generator",
-            "jupyter-notebook-best-practices",
-            "python-backend-expert",
-            "research-synthesis",
-            "ripgrep"
+            "jupyter-notebook-best-practices"
           ],
           "examples": []
         }
@@ -1512,18 +1740,18 @@
             "sveltekit",
             "expert",
             "building",
+            "svelte-expert",
             "task-management-protocol",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "debugging",
-            "form-and-actions-in-sveltekit",
-            "git-expert",
-            "ripgrep",
-            "seo-and-meta-tags-in-sveltekit",
-            "styling-expert",
-            "svelte-expert",
-            "tdd",
-            "typescript-expert"
+            "form-and-actions-in-sveltekit"
           ],
           "examples": []
         }
@@ -1544,17 +1772,17 @@
             "desktop",
             "developer",
             "building",
+            "svelte-expert",
             "task-management-protocol",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
-            "git-expert",
-            "ripgrep",
-            "rust-expert",
-            "tauri-native-api-integration",
-            "tauri-security-rules",
-            "tauri-svelte-typescript-general",
-            "tauri-svelte-ui-components"
+            "context-compressor",
+            "token-saver-context-compression",
+            "debugging"
           ],
           "examples": []
         }
@@ -1573,19 +1801,19 @@
           "tags": [
             "typescript",
             "pro",
+            "debugging",
             "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
-            "git-expert",
-            "ripgrep",
-            "state-management-expert",
-            "tdd",
-            "tsconfig-json-rules",
-            "typescript-expert",
-            "verification-before-completion"
+            "context-compressor",
+            "token-saver-context-compression",
+            "build-tools-expert",
+            "code-quality-expert",
+            "git-expert"
           ],
           "examples": []
         }
@@ -1607,16 +1835,47 @@
             "expert",
             "auditing",
             "review",
+            "starknet-react-rules",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "auth-security-expert",
             "code-quality-expert",
+            "debugging"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "artifact-integrator",
+      "name": "artifact-integrator",
+      "description": "Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces a security-first multi-agent pipeline.",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "artifact-integrator",
+          "name": "artifact-integrator",
+          "description": "Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces a security-first multi-agent pipeline.",
+          "tags": [
+            "artifact",
+            "integrator",
+            "github.com/",
+            "https://",
+            "repository",
+            "repo",
+            "integrate",
+            "onboard",
+            "ingest",
+            "ripgrep",
             "code-semantic-search",
             "code-structural-search",
-            "debugging",
-            "git-expert",
-            "ripgrep",
-            "security-architect",
-            "tdd"
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol"
           ],
           "examples": []
         }
@@ -1626,7 +1885,7 @@
       "id": "evolution-orchestrator",
       "name": "evolution-orchestrator",
       "description": "Meta-agent that orchestrates the EVOLVE workflow for creating new agents, skills, workflows, hooks, and schemas. Ensures research-first, validation-gated artifact creation.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "skills": [
         {
           "id": "evolution-orchestrator",
@@ -1637,17 +1896,17 @@
             "orchestrator",
             "orchestrates",
             "agent-creator",
-            "artifact-integrator",
             "artifact-lifecycle",
-            "hook-creator",
-            "plan-generator",
+            "command-creator",
             "research-synthesis",
-            "ripgrep",
-            "schema-creator",
+            "rule-creator",
             "skill-creator",
             "task-management-protocol",
-            "template-creator",
-            "verification-before-completion"
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ],
           "examples": []
         }
@@ -1668,17 +1927,17 @@
             "orchestrator",
             "coordinates",
             "implements",
-            "artifact-integrator",
-            "complexity-assessment",
             "plan-generator",
             "response-rater",
-            "ripgrep",
-            "sequential-thinking",
-            "session-handoff",
-            "swarm-coordination",
+            "subagent-driven-development",
             "task-management-protocol",
-            "track-management",
-            "verification-before-completion"
+            "verification-before-completion",
+            "wave-executor",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -1702,7 +1961,11 @@
             "context-compressor",
             "verification-before-completion",
             "security-architect",
-            "ripgrep"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "token-saver-context-compression",
+            "memory-search"
           ],
           "examples": []
         }
@@ -1722,12 +1985,17 @@
             "swarm",
             "coordinator",
             "consensus-voting",
-            "context-compressor",
-            "plan-generator",
-            "ripgrep",
             "swarm-coordination",
             "task-management-protocol",
-            "verification-before-completion"
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "plan-generator",
+            "memory-search",
+            "dispatching-parallel-agents"
           ],
           "examples": []
         }

@@ -3,7 +3,7 @@
   "generatedAt": "2026-02-11T15:23:42.408Z",
   "metadata": {
     "category": "core",
-    "agentCount": 12
+    "agentCount": 9
   },
   "agents": {
     "architect": {
@@ -614,8 +614,7 @@
             "TaskCreate",
             "TaskGet",
             "Skill",
-            "Bash",
-            "Task"
+            "Bash"
           ],
           "skills": [
             "diagram-generator",
@@ -659,249 +658,66 @@
         "updatedAt": "2026-02-11T00:35:03.885Z"
       }
     },
-    "code-reviewer": {
-      "id": "code-reviewer",
-      "displayName": "code-reviewer",
-      "category": "specialized",
-      "filePath": ".claude/agents/specialized/code-reviewer.md",
+    "reflection-agent": {
+      "id": "reflection-agent",
+      "displayName": "reflection-agent",
+      "category": "core",
+      "filePath": ".claude/agents/core/reflection-agent.md",
       "capabilities": [
         {
-          "name": "code-reviewer",
+          "name": "reflection-agent",
           "domain": "code",
-          "description": "Senior code reviewer with two-stage review process - spec compliance first, then code quality. Use for code reviews, PR reviews, and implementation verification. Uses ripgrep for fast codebase anal...",
+          "description": "Quality assessor and learning consolidator using RECE loop (Reflect-Evaluate-Correct-Execute). Scores outputs against rubrics, extracts patterns, and updates memory. Use after task completion for m...",
           "triggerPhrases": [
-            "code",
-            "reviewer",
-            "review",
-            "reviews",
-            "implementation",
-            "task-management-protocol",
-            "checklist-generator",
+            "reflection",
+            "agent",
+            "artifact-integrator",
             "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search"
-          ],
-          "requiredTools": [
-            "Read",
-            "Glob",
-            "Grep",
-            "Bash",
-            "TaskUpdate",
-            "TaskList",
-            "TaskCreate",
-            "TaskGet",
-            "Skill",
-            "Write",
-            "Edit"
-          ],
-          "skills": [
+            "context-compressor",
+            "insight-extraction",
+            "summarize-changes",
             "task-management-protocol",
-            "checklist-generator",
-            "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "dry-principle",
-            "git-expert",
-            "ripgrep"
-          ],
-          "examples": [],
-          "tags": [
-            "code",
-            "reviewer",
-            "review",
-            "reviews",
-            "implementation",
-            "task-management-protocol",
-            "checklist-generator",
-            "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "dry-principle",
-            "git-expert",
-            "ripgrep"
-          ]
-        }
-      ],
-      "constraints": {
-        "maxConcurrentTasks": 5,
-        "preferredModel": "sonnet"
-      },
-      "health": {
-        "status": "healthy",
-        "consecutiveFailures": 0,
-        "successCount": 0,
-        "failureCount": 0,
-        "successRate": 1,
-        "lastUpdate": "2026-02-11T00:35:03.886Z",
-        "isolatedAt": null,
-        "isolationReason": null
-      },
-      "metadata": {
-        "version": "1.0.0",
-        "createdAt": "2026-02-11T00:35:03.886Z",
-        "updatedAt": "2026-02-11T00:35:03.886Z"
-      }
-    },
-    "code-simplifier": {
-      "id": "code-simplifier",
-      "displayName": "code-simplifier",
-      "category": "specialized",
-      "filePath": ".claude/agents/specialized/code-simplifier.md",
-      "capabilities": [
-        {
-          "name": "code-simplifier",
-          "domain": "code",
-          "description": "Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses on recently modified code unless instructed otherwise. Use for code cleanup, re...",
-          "triggerPhrases": [
-            "code",
-            "simplifier",
-            "refactoring",
-            "task-management-protocol",
-            "best-practices-guidelines",
-            "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator"
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
             "Write",
             "Edit",
-            "Bash",
             "Grep",
             "Glob",
+            "MemoryRecord",
             "TaskUpdate",
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Bash"
           ],
           "skills": [
-            "task-management-protocol",
-            "best-practices-guidelines",
+            "artifact-integrator",
             "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "debugging",
-            "dry-principle",
-            "function-length-and-responsibility"
+            "context-compressor",
+            "insight-extraction",
+            "summarize-changes",
+            "task-management-protocol",
+            "verification-before-completion"
           ],
           "examples": [],
           "tags": [
-            "code",
-            "simplifier",
-            "refactoring",
-            "task-management-protocol",
-            "best-practices-guidelines",
+            "reflection",
+            "agent",
+            "artifact-integrator",
             "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "debugging",
-            "dry-principle",
-            "function-length-and-responsibility",
-            "ripgrep",
+            "context-compressor",
+            "insight-extraction",
+            "summarize-changes",
+            "task-management-protocol",
             "verification-before-completion"
           ]
         }
       ],
       "constraints": {
         "maxConcurrentTasks": 5,
-        "preferredModel": "opus"
-      },
-      "health": {
-        "status": "healthy",
-        "consecutiveFailures": 0,
-        "successCount": 0,
-        "failureCount": 0,
-        "successRate": 1,
-        "lastUpdate": "2026-02-11T00:35:03.886Z",
-        "isolatedAt": null,
-        "isolationReason": null
-      },
-      "metadata": {
-        "version": "1.0.0",
-        "createdAt": "2026-02-11T00:35:03.886Z",
-        "updatedAt": "2026-02-11T00:35:03.886Z"
-      }
-    },
-    "devops": {
-      "id": "devops",
-      "displayName": "devops",
-      "category": "specialized",
-      "filePath": ".claude/agents/specialized/devops.md",
-      "capabilities": [
-        {
-          "name": "devops",
-          "domain": "devops",
-          "description": "Infrastructure as Code, CI/CD pipeline design, deployment automation, SRE practices, release management, and observability. Use for containerization, orchestration (Kubernetes), cloud architecture ...",
-          "triggerPhrases": [
-            "devops",
-            "design",
-            "deployment",
-            "task-management-protocol",
-            "code-semantic-search",
-            "dependency-analyzer",
-            "git-expert",
-            "github-mcp",
-            "architecture-review",
-            "aws-cloud-ops"
-          ],
-          "requiredTools": [
-            "Read",
-            "Write",
-            "Edit",
-            "Grep",
-            "Glob",
-            "Bash",
-            "TaskUpdate",
-            "TaskList",
-            "TaskCreate",
-            "TaskGet",
-            "Skill"
-          ],
-          "skills": [
-            "task-management-protocol",
-            "code-semantic-search",
-            "dependency-analyzer",
-            "git-expert",
-            "github-mcp",
-            "architecture-review",
-            "aws-cloud-ops",
-            "ci-cd-implementation-rule",
-            "cloud-devops-expert",
-            "configuration-management"
-          ],
-          "examples": [],
-          "tags": [
-            "devops",
-            "design",
-            "deployment",
-            "task-management-protocol",
-            "code-semantic-search",
-            "dependency-analyzer",
-            "git-expert",
-            "github-mcp",
-            "architecture-review",
-            "aws-cloud-ops",
-            "ci-cd-implementation-rule",
-            "cloud-devops-expert",
-            "configuration-management",
-            "consensus-voting",
-            "container-expert"
-          ]
-        }
-      ],
-      "constraints": {
-        "maxConcurrentTasks": 5,
         "preferredModel": "sonnet"
       },
       "health": {
@@ -910,101 +726,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-11T00:35:03.887Z",
+        "lastUpdate": "2026-02-11T00:35:03.885Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-11T00:35:03.887Z",
-        "updatedAt": "2026-02-11T00:35:03.887Z"
-      }
-    },
-    "security-architect": {
-      "id": "security-architect",
-      "displayName": "security-architect",
-      "category": "specialized",
-      "filePath": ".claude/agents/specialized/security-architect.md",
-      "capabilities": [
-        {
-          "name": "security-architect",
-          "domain": "code",
-          "description": "Security architecture, threat modeling, compliance validation, and security assessment. Use for designing authentication systems, evaluating vulnerabilities, security code review, penetration testi...",
-          "triggerPhrases": [
-            "security",
-            "architect",
-            "designing",
-            "review",
-            "testing",
-            "planning",
-            "task-management-protocol",
-            "auth-security-expert",
-            "binary-analysis-patterns",
-            "checklist-generator"
-          ],
-          "requiredTools": [
-            "Read",
-            "Write",
-            "Edit",
-            "Glob",
-            "Grep",
-            "Bash",
-            "TaskUpdate",
-            "TaskList",
-            "TaskCreate",
-            "TaskGet",
-            "Skill"
-          ],
-          "skills": [
-            "task-management-protocol",
-            "auth-security-expert",
-            "binary-analysis-patterns",
-            "checklist-generator",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "doc-generator",
-            "memory-forensics",
-            "protocol-reverse-engineering"
-          ],
-          "examples": [],
-          "tags": [
-            "security",
-            "architect",
-            "designing",
-            "review",
-            "testing",
-            "planning",
-            "task-management-protocol",
-            "auth-security-expert",
-            "binary-analysis-patterns",
-            "checklist-generator",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "doc-generator",
-            "memory-forensics"
-          ]
-        }
-      ],
-      "constraints": {
-        "maxConcurrentTasks": 5,
-        "preferredModel": "opus"
-      },
-      "health": {
-        "status": "healthy",
-        "consecutiveFailures": 0,
-        "successCount": 0,
-        "failureCount": 0,
-        "successRate": 1,
-        "lastUpdate": "2026-02-11T00:35:03.887Z",
-        "isolatedAt": null,
-        "isolationReason": null
-      },
-      "metadata": {
-        "version": "1.0.0",
-        "createdAt": "2026-02-11T00:35:03.887Z",
-        "updatedAt": "2026-02-11T00:35:03.887Z"
+        "createdAt": "2026-02-11T00:35:03.885Z",
+        "updatedAt": "2026-02-11T00:35:03.885Z"
       }
     }
   }

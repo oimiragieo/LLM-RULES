@@ -197,7 +197,7 @@ Essential framework operation rules.
 
 **Key Rules:**
 
-- Reports: `.claude/context/reports/{domain}/`
+- Reports: `.claude/context/reports/backend/{domain}/`
 - Research reports: `.claude/context/artifacts/research-reports/`
 - Plans: `.claude/context/plans/`
 - Naming: lowercase kebab-case + ISO date suffix

@@ -24,7 +24,7 @@ Router may use ONLY:
   - `.claude/context/runtime/reflection-*.txt` (step 0 check)
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
-  - For directories (e.g. `.claude/context/reports/reflections`), use Glob or ListDir first, then Read a specific file.
+  - For directories (e.g. `.claude/context/reports/reflections/reflections`), use Glob or ListDir first, then Read a specific file.
   - For large reads, use `offset/limit` (host limit 25k tokens per Read), or prefer `Skill({ skill: 'ripgrep' })` / `pnpm search:code` for discovery; use Grep only as fallback. Require prior hybrid search evidence for unwindowed large reads
 - `AskUserQuestion` — clarifying with user
 
@@ -359,25 +359,24 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 
 **Quick Routing (high-frequency):**
 
-| Task Type                                         | Agent                     |
-| ------------------------------------------------- | ------------------------- | -------------------------------------------------- |
-| Bug fixes / implementation                        | `developer`               |
-| Documentation updates                             | `technical-writer`        |
-| Refactor/simplify                                 | `code-simplifier`         |
-| Code review / audit                               | `code-reviewer`           |
-| Testing / QA / coverage                           | `qa`                      |
-| Architecture / system design                      | `architect`               |
-| External Integration                              | `artifact-integrator`     |
-| Security-sensitive work                           | `security-architect`      |
-| Infra / CI / deploy                               | `devops`                  |
-| Planning / decomposition                          | `planner`                 |
-| External research                                 | `researcher`              |
-| Git push / deploy / release                       | `devops`                  |
-| Qa Guardian                                       | `qa-guardian`             | `.claude/agents/domain/qa-guardian.md`             |
-| Contract Check                                    | `contract-check`          | `.claude/agents/domain/contract-check.md`          |
-| Bool Action                                       | `bool-action`             | `.claude/agents/domain/bool-action.md`             |
-| Repo Onboarder                                    | `repo-onboarder`          | `.claude/agents/orchestrators/repo-onboarder.md`   |
-| Medical / symptoms / drug interactions / clinical | `medical-research-triage` | `.claude/agents/domain/medical-research-triage.md` |
+| Task Type                                                      | Agent                     |
+| -------------------------------------------------------------- | ------------------------- | -------------------------------------------------- |
+| Bug fixes / implementation                                     | `developer`               |
+| Documentation updates                                          | `technical-writer`        |
+| Refactor/simplify                                              | `code-simplifier`         |
+| Code review / audit                                            | `code-reviewer`           |
+| Testing / QA / coverage                                        | `qa`                      |
+| Architecture / system design                                   | `architect`               |
+| External Integration                                           | `artifact-integrator`     |
+| Security-sensitive work                                        | `security-architect`      |
+| Infra / CI / deploy                                            | `devops`                  |
+| Planning / decomposition                                       | `planner`                 |
+| External research                                              | `researcher`              |
+| Git push / deploy / release                                    | `devops`                  |
+| Medical / symptoms / drug interactions / clinical              | `medical-research-triage` | `.claude/agents/domain/medical-research-triage.md` |
+| Kubernetes / K8s / Helm / ArgoCD / GitOps                      | `kubernetes-specialist`   | `.claude/agents/domain/kubernetes-specialist.md`   |
+| Sprint planning / roadmap / backlog / Jira/Linear              | `pm-coordinator`          | `.claude/agents/domain/pm-coordinator.md`          |
+| Memory leak / race condition / profiling / root cause analysis | `advanced-debugging`      | `.claude/agents/specialized/advanced-debugging.md` |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
@@ -472,8 +471,6 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 | developer | claude-sonnet-4-5 | ❌ No |
 | qa | claude-opus-4-5-20251101 | ❌ No |
 | architect | claude-opus-4-5-20251101 | ❌ No |
-
-**Validation:** `config-model-validator.cjs` hook validates spawn model matches config (default: warn mode)
 
 **Quick Reference:** haiku (simple/low) | sonnet (standard/default) | opus (complex/security/high)
 
@@ -609,11 +606,20 @@ High-impact orchestration skills:
 - `property-based-testing`
 - `agent-tool-design`
 - `sharp-edges`
-- `enterprise-skill-test-1771722088465`
-- `enterprise-skill-test-1771722182676`
-- `enterprise-skill-test-1771736541519`
-- `enterprise-skill-test-1771737759020`
-- `enterprise-skill-test-1771738405049`
+- `brainstorming`
+- `commit-validator`
+- `qa-workflow`
+- `spec-critique`
+- `subagent-driven-development`
+- `requesting-code-review`
+- `receiving-code-review`
+- `finishing-a-development-branch`
+- `using-git-worktrees`
+- `strict-user-requirements-adherence`
+- `smart-revert`
+- `dispatching-parallel-agents`
+- `memory-search`
+- `stale-module-pruner`
 - `framework-context`
 - `recommend-evolution`
 - `creation-feasibility-gate`
@@ -635,6 +641,15 @@ High-impact orchestration skills:
 - `vercel-deploy`
 - `web-perf`
 - `webmcp-browser-tools`
+- `poetry-rye-dependency-management`
+- `pyqt6-ui-development-rules`
+- `qwik-expert`
+- `solidjs-expert`
+- `starknet-react-rules`
+- `vercel-ai-sdk-best-practices`
+- `vue-expert`
+- `jira-pm`
+- `linear-pm`
 
 For usage details and full inventory, use `@SKILL_CATALOG_TABLE.md`.
 

@@ -7,7 +7,7 @@ environment: staging
 # --- Router Configuration (The Gatekeeper) ---
 agent_routing:
   router:
-    model: claude-haiku-4-5
+    model: haiku
     complexity: low
     priority: highest
     context_strategy: minimal
@@ -110,14 +110,14 @@ testData:
 agents:
   planner:
     path: agents/core/planner.md
-    model: claude-opus-4-5-20251101
+    model: opus
     extended_thinking: true
   developer:
     path: agents/core/developer.md
-    model: claude-sonnet-4-5
+    model: sonnet
   qa:
     path: agents/core/qa.md
-    model: claude-opus-4-5-20251101
+    model: opus
   architect:
     path: agents/core/architect.md
-    model: claude-opus-4-5-20251101
+    model: opus

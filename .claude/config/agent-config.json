@@ -1057,6 +1057,101 @@
         "Grep"
       ],
       "model": "claude-opus-4-5-20251101"
+    },
+    "advanced-debugging": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-5-20251101"
+    },
+    "artifact-integrator": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "Read",
+        "Skill",
+        "Task",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "Write"
+      ],
+      "model": "claude-opus-4-5-20251101"
+    },
+    "kubernetes-specialist": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-5-20251101"
+    },
+    "medical-research-triage": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskOutput",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-opus-4-5-20251101"
+    },
+    "pm-coordinator": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "WebFetch",
+        "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-5"
     }
   },
   "thinkingBudgetMap": {

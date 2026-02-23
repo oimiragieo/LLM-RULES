@@ -1,3 +1,57 @@
+## stale-module-pruner + proactive-audit Skills Updated (2026-02-23)
+
+`stale-module-pruner` wired into framework (was stub + missing from Quick Reference catalog):
+
+- SKILL.md rewritten v1.0.0: Iron Laws, Anti-Patterns, Memory Protocol, 6 mandatory skills, real workflow
+- Catalog: moved from Specialized Patterns section to Core Development (Quick Reference count 16→17)
+- Agent assignment: added `developer` (code-simplifier already had it)
+- Key pruner pattern: walks targetDir, uses `rg -lF {filename}` across searchDirs, flags zero-reference files as STALE
+- Iron Law 1: Always dry-run first — barrel imports and index re-exports create false stale without --delete review
+
+`proactive-audit` upgraded v1.1.0 → v1.2.0:
+
+- Added Mandatory Skills table (6 skills)
+- lastVerifiedAt updated to 2026-02-23
+
+Root cause of stale-module-pruner catalog failure: validate-integration Check 2 uses parseMarkdownTable() which only parses the FIRST table (Quick Reference). Skills must appear in Quick Reference to pass, not just in section tables.
+
+---
+
+## ecosystem-integrity-scanner Skill Installed (2026-02-22)
+
+New skill `ecosystem-integrity-scanner` created, debugged, and wired into the framework:
+
+- Script: `scripts/validation/validate-ecosystem-integrity.cjs` — zero errors after 4 fix rounds
+- Fixed false-positive sources: `_archive/` dirs skipped in walk(), checkArchiveRefs() scoped to `.claude/` only, DYNAMIC_SCRIPT_GENERATORS skip set, test file require() filter for `.claude/` paths only, agent registry catalog count fixed to use `catalog.agents` key
+- Enterprise bundle: 9 components scaffolded + SKILL.md updated to v1.1.0 with Iron Laws, Anti-Patterns, Memory Protocol, 6 mandatory skills
+- Assigned to: qa, developer, architect agents
+- Category: Validation & Quality (12 total)
+- Key scanner pattern: PHANTOM_REQUIRE = runtime crash, PHANTOM_SKILL = silent agent failure, ARCHIVED_REF = dead module reference
+
+---
+
+## Skills Installed: qa-workflow and spec-critique (2026-02-22)
+
+Archived skills `qa-workflow` and `spec-critique` installed into the active framework via skill-installer workflow.
+
+- `qa-workflow`: QA validation and fix loop skill — assigned to qa, developer, code-reviewer agents. Category: Validation & Quality.
+- `spec-critique`: Specification self-critique skill using extended thinking — assigned to planner, architect, developer agents. Category: Planning & Architecture.
+- Both skills merged from `.claude/skills/_archive/dead/` into scaffolded SKILL.md at `.claude/skills/`.
+- Catalog entries added to skill-catalog.md Quick Reference table rows and section tables.
+- Agent frontmatter `skills:` arrays updated for all target agents.
+
+## Skills Installed: brainstorming and commit-validator (2026-02-22)
+
+Archived skills `brainstorming` and `commit-validator` installed into the active framework via skill-installer workflow.
+
+- `brainstorming`: Socratic design refinement skill — assigned to developer, planner, architect agents. Category: Planning & Architecture.
+- `commit-validator`: Conventional Commits validation skill — assigned to developer, devops agents. Category: Git & Version Control.
+- Both skills merged from `.claude/skills/_archive/dead/` into scaffolded SKILL.md at `.claude/skills/`.
+- Catalog entries added to skill-catalog.md Quick Reference table rows and section tables.
+- Agent frontmatter `skills:` arrays updated for all target agents.
+
+---
+
 ## Reflection Gate: Phase 0 Data Sufficiency Enforcement (2026-02-22)
 
 When reflection-agent cannot access task summary metadata (filesModified, outputArtifacts), Phase 0 gate MUST block scoring with WITHHELD rather than FABRICATED.
@@ -159,7 +213,7 @@ When Router appends gaps to session-gap-log.jsonl, **three categories have diffe
 - **rust-expert**: Missing `.claude/rules/rust-expert.md` rules file (ai-ml-expert and android-expert both have rules files). Catalog entry is in secondary "Restored Compatibility Skills" table, not primary "Languages" table. Two P2 tasks proposed.
 - **android-expert**: Cleanest integration. One P3 documentation-only note: references non-existent `kotlin-expert` skill in Integration Points.
 - Pattern: Skills restored/updated from "Restored Compatibility Skills" catalog section have lower discoverability than skills in primary category tables. Consider promoting Rust to the Languages primary table.
-- Report: `.claude/context/reports/integration-analysis-2026-02-19.md`
+- Report: `.claude/context/reports/backend/integration-analysis-2026-02-19.md`
 
 ## Skill Updated: git-expert (2026-02-19)
 
@@ -206,7 +260,7 @@ When Router appends gaps to session-gap-log.jsonl, **three categories have diffe
 - **Quality Score**: 0.9075 (EXCELLENT)
 - **Pattern**: Agent tool scope expansion requires verification that downstream code paths use the new capability. Recommend: After tool additions, grep for Write() calls in agent role definition to ensure new tool is being leveraged.
 - **Gotcha**: Agent tool changes affect both tools array AND agent prompt usage. Refreshing tools without updating agent prompt to use them creates "phantom capability" (tool present but unused).
-- **Integration Note**: code-reviewer can now write directly to `.claude/context/reports/` directories per workspace-conventions.md rules. Verify file paths are scoped correctly (no creator paths, temp dirs, or user home directories).
+- **Integration Note**: code-reviewer can now write directly to `.claude/context/reports/backend/` directories per workspace-conventions.md rules. Verify file paths are scoped correctly (no creator paths, temp dirs, or user home directories).
 
 ---
 
@@ -339,3 +393,198 @@ The session gap log (`.claude/context/runtime/session-gap-log.jsonl`) bridges th
 - Updated workflow: evolution-workflow (2026-02-22)
 
 - Updated workflow: missing-workflow-xyz (2026-02-22)
+
+## Skill Installation: subagent-driven-development (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/subagent-driven-development/
+- Category: Development Workflow
+- Agents: developer, master-orchestrator, planner
+- Validated: 8/8 checks pass
+
+## Skill Installation: requesting-code-review (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/requesting-code-review/
+- Category: Development Workflow
+- Agents: developer, code-reviewer
+- Validated: 8/8 checks pass
+
+## Skill Installation: receiving-code-review (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/receiving-code-review/
+- Category: Development Workflow
+- Agents: developer, code-reviewer
+- Validated: 8/8 checks pass
+
+## Skill Installation: dispatching-parallel-agents (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/dispatching-parallel-agents/
+- Category: Orchestration & Coordination
+- Agents: planner, master-orchestrator, developer
+- Validated: 8/8 checks pass
+
+## Skill Installation: finishing-a-development-branch (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/finishing-a-development-branch/
+- Category: Git & Version Control
+- Agents: developer, devops
+- Validated: 8/8 checks pass
+
+## Skill Installation: using-git-worktrees (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/using-git-worktrees/
+- Category: Git & Version Control
+- Agents: developer, devops
+- Validated: 8/8 checks pass
+
+## Skill Installation: smart-revert (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/smart-revert/
+- Category: Git & Version Control
+- Agents: developer, devops
+- Validated: 8/8 checks pass
+
+## Skill Installation: strict-user-requirements-adherence (2026-02-22)
+
+- Installed from archive/dead to .claude/skills/strict-user-requirements-adherence/
+- Category: Validation & Quality
+- Agents: qa, planner, developer
+- Validated: 8/8 checks pass
+
+## Skill Installation: angular-expert (2026-02-22)
+
+- Installed from archive/dead, Category: Frameworks, Agents: developer, frontend-pro
+
+## Skill Installation: astro-expert (2026-02-22)
+
+- Installed from archive/dead, Category: Frameworks, Agents: developer, frontend-pro
+
+## Skill Installation: convex-development-general (2026-02-22)
+
+- Installed from archive/dead, Category: External Integrations, Agents: developer
+
+## Skill Installation: drizzle-orm-rules (2026-02-22)
+
+- Installed from archive/dead, Category: Data & Database, Agents: developer, database-architect
+
+## Skill Installation: elixir-expert (2026-02-22)
+
+- Installed from archive/dead, Category: Languages, Agents: developer
+
+## Skill Installation: fiber-logging-and-project-structure (2026-02-22)
+
+- Installed from archive/dead, Category: Frameworks, Agents: developer, golang-pro
+
+## Skill Installation: fiber-routing-and-csrf-protection (2026-02-22)
+
+- Installed from archive/dead, Category: Frameworks, Agents: developer, golang-pro, security-architect
+
+## Skill Installation: flutter-expert (2026-02-22)
+
+- Installed from archive/dead, Category: Mobile, Agents: developer, expo-mobile-developer
+
+## Skill Installation Batch: 8 Archive Restores (2026-02-22)
+
+Restored 8 skills from `.claude/skills/_archive/dead/` to active `.claude/skills/`:
+
+### htmx-expert
+
+- Category: Frameworks
+- Agents: developer, frontend-pro
+- Tags: htmx, hypermedia, html, server-side, web
+- Content: HTMX hypermedia patterns, Django/Flask/Go server-side integration guidelines
+- Validated: catalog entry added to Frameworks section
+
+### kafka-development-practices
+
+- Category: DevOps & Infrastructure
+- Agents: developer, devops
+- Tags: kafka, streaming, messaging, events, distributed
+- Content: Kafka/Scala standards — Typesafe Config for topic names, TopologyTestDriver for stream testing
+- Validated: catalog entry added to DevOps & Infrastructure section
+
+### large-data-with-dask
+
+- Category: Data & Database
+- Agents: developer, data-engineer
+- Tags: dask, python, parallel, big-data, dataframe
+- Content: Optimization strategies for larger-than-memory Python datasets via Dask
+- Validated: catalog entry added to Data & Database section
+
+### medusa
+
+- Category: External Integrations
+- Agents: developer
+- Tags: medusa, headless-commerce, ecommerce, nodejs, api
+- Content: Full Medusa headless commerce rules — workflows SDK, data models, services, admin SDK
+- Validated: catalog entry added to External Integrations section
+
+### monorepo-and-tooling
+
+- Category: DevOps & Infrastructure
+- Agents: developer, devops
+- Tags: monorepo, turborepo, nx, workspace, tooling
+- Content: Monorepo structure conventions (packages/, app/), Taskfile.yml, env var handling
+- Validated: catalog entry added to DevOps & Infrastructure section
+
+### nativewind-and-tailwind-css-compatibility
+
+- Category: Mobile
+- Agents: developer, expo-mobile-developer
+- Tags: nativewind, tailwind, react-native, mobile, styling
+- Content: Version pinning — nativewind@2.0.11 + tailwindcss@3.3.2 to prevent process(css) errors
+- Validated: catalog entry added to Mobile section
+
+### nativescript
+
+- Category: Mobile
+- Agents: developer
+- Tags: nativescript, mobile, native, javascript, cross-platform
+- Content: NativeScript patterns — platform files, @NativeClass(), TailwindCSS, GridLayout, delegate retention
+- Validated: catalog entry added to Mobile section
+
+### paraglide-js-internationalization-i18n
+
+- Category: Frameworks
+- Agents: developer, frontend-pro
+- Tags: i18n, paraglide, internationalization, sveltekit, translation
+- Content: Paraglide.js i18n for SvelteKit — @inlang/paraglide-js, t() function, RTL support
+- Validated: catalog entry added to Frameworks section
+
+**Pattern:** Archive restore workflow: read archived SKILL.md → write to active path with updated frontmatter (name, version, category, agents, tags) → add catalog entries → update evolution-state.json → validate.
+**Note:** skill scaffold directories did not pre-exist; created them as part of the install process.
+
+## Skill Installation: 9 Archived Skills Batch (2026-02-22)
+
+Installed 9 skills from `.claude/skills/_archive/dead/` into active framework.
+
+### Skills Installed
+
+| Skill                              | Category                 | Agents                            |
+| ---------------------------------- | ------------------------ | --------------------------------- |
+| `poetry-rye-dependency-management` | Languages                | developer                         |
+| `pyqt6-ui-development-rules`       | Languages                | developer                         |
+| `qwik-expert`                      | Frameworks               | developer, frontend-pro           |
+| `solidjs-expert`                   | Frameworks               | developer, frontend-pro           |
+| `starknet-react-rules`             | External Integrations    | developer, web3-blockchain-expert |
+| `vercel-ai-sdk-best-practices`     | Vercel & Web Performance | developer, frontend-pro           |
+| `vue-expert`                       | Frameworks               | developer, frontend-pro           |
+| `jira-pm`                          | Other                    | planner, developer                |
+| `linear-pm`                        | Other                    | planner, developer                |
+
+### Integration Actions
+
+- Merged archived SKILL.md content with updated frontmatter (name, version, category, agents, tags)
+- Added 9 catalog entries to skill-catalog.md in correct sections
+- Appended 9 evolution entries to evolution-state.json
+- Updated Quick Reference category counts (Languages: +2, Frameworks: +3, Vercel: +1, External Integrations: +1, Other: +2)
+- Updated total skill count header: 124 -> 133
+
+### Validation
+
+All 9 skills validated via `validate-integration.cjs --type skill`.
+
+- Refreshed agent: .claude/agents/core/developer.md (2026-02-22)
+
+- Refreshed agent: .claude/agents/core/developer.md (2026-02-22)
+
+- Refreshed agent: .claude/agents/core/developer.md (2026-02-22)

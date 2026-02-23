@@ -1,12 +1,12 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-22T05:56:04.410Z",
+  "generatedAt": "2026-02-22T08:40:39.053Z",
   "metadata": {
     "totalTools": 31,
     "totalCoreTools": 22,
     "totalMcpTools": 9,
     "totalAgents": 62,
-    "lastValidated": "2026-02-22T05:56:04.411Z",
+    "lastValidated": "2026-02-22T08:40:39.054Z",
     "source": ".claude/CLAUDE.md sections 1.1-1.4"
   },
   "tools": {
@@ -734,9 +734,22 @@
         "maxTools": 12
       },
       "code-reviewer": {
-        "toolset": "READ_ONLY",
-        "tools": ["Read", "Glob", "Grep", "TaskUpdate", "TaskList", "Skill", "MemoryRecord"],
-        "maxTools": 6
+        "toolset": "DEVELOPER",
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Glob",
+          "Grep",
+          "TaskUpdate",
+          "TaskList",
+          "TaskCreate",
+          "TaskGet",
+          "Skill",
+          "MemoryRecord"
+        ],
+        "maxTools": 12
       },
       "researcher": {
         "toolset": "RESEARCHER",

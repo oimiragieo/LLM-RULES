@@ -4,8 +4,8 @@
 
 Complete inventory of all tools in the `.claude/tools/` directory, including active tools, archived tools, and relocated library modules.
 
-**Last Updated:** 2026-02-07
-**Total Source Files:** 66 active + 25 archived + 8 relocated = 99 total
+**Last Updated:** 2026-02-22
+**Total Source Files:** 124 active + 25 archived + 8 relocated = 157 total
 
 ---
 
@@ -13,10 +13,10 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 
 | Category              | Count | Percentage |
 | --------------------- | ----- | ---------- |
-| **Active Tools**      | 66    | 67%        |
-| **Archived Tools**    | 25    | 25%        |
-| **Relocated to lib/** | 8     | 8%         |
-| **TOTAL**             | 99    | 100%       |
+| **Active Tools**      | 124   | 78%        |
+| **Archived Tools**    | 25    | 16%        |
+| **Relocated to lib/** | 8     | 5%         |
+| **TOTAL**             | 157   | 100%       |
 
 ### Active Tools by Category
 
@@ -126,12 +126,6 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 
 ### Context
 
-**Purpose:** Context management and resolution
-
-| Tool                  | Location   | Purpose                | Wiring Status |
-| --------------------- | ---------- | ---------------------- | ------------- |
-| `context-cleanup.cjs` | `context/` | Clean up context files | Not scripted  |
-
 ### Gates
 
 **Purpose:** Quality and validation gates
@@ -150,6 +144,75 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 | `run-agent-framework-integration-headless.mjs` | `tools/` | Headless integration tests     | package.json: `validate:framework-integration` |
 | `validate-commands.mjs`                        | `tools/` | Validate command definitions   | package.json: `validate:commands`              |
 | `validate-latest-integration-artifacts.mjs`    | `tools/` | Validate integration artifacts | package.json: `validate:latest-integration`    |
+
+---
+
+### CLI Operational Tools
+
+**Purpose:** Metrics, observability, memory, search, generation, and validation CLI tools added after 2026-02-07.
+
+| Tool                                       | Location | Purpose                                  | Wiring Status                                    |
+| ------------------------------------------ | -------- | ---------------------------------------- | ------------------------------------------------ |
+| `artifact-quality-daemon.cjs`              | `cli/`   | Artifact quality scoring daemon          | package.json: `metrics:artifact`                 |
+| `backfill-agent-template-contract.cjs`     | `cli/`   | Backfill agent template contracts        | Not scripted                                     |
+| `backfill-skill-verification.cjs`          | `cli/`   | Backfill skill verification records      | Not scripted                                     |
+| `bootstrap-artifact-graph.cjs`             | `cli/`   | Initialize artifact dependency graph     | Not scripted                                     |
+| `check-gpu.cjs`                            | `cli/`   | Check GPU availability for embeddings    | Not scripted                                     |
+| `cleanup-transient-artifacts.cjs`          | `cli/`   | Remove stale transient context artifacts | package.json: `cleanup:transient`                |
+| `dlq-health-summary.cjs`                   | `cli/`   | Dead-letter queue health summary         | Not scripted                                     |
+| `document-query.cjs`                       | `cli/`   | Query document store                     | Not scripted                                     |
+| `error-report.cjs`                         | `cli/`   | Error report generator                   | Not scripted                                     |
+| `flight-recorder-maintenance.cjs`          | `cli/`   | Flight recorder log maintenance          | Not scripted                                     |
+| `generate-agent-catalog.cjs`               | `cli/`   | Generate agent catalog markdown          | Not scripted                                     |
+| `generate-agent-registry.cjs`              | `cli/`   | Generate agent-registry.json             | Not scripted                                     |
+| `generate-embeddings.cjs`                  | `cli/`   | Generate vector embeddings for search    | Not scripted                                     |
+| `generate-routing-prototypes.cjs`          | `cli/`   | Generate routing table prototypes        | package.json: `postinstall`                      |
+| `generate-skill-index.cjs`                 | `cli/`   | Generate skill index for search          | Not scripted                                     |
+| `generate-skill-index-definitions.cjs`     | `cli/`   | Generate skill definitions index         | Not scripted                                     |
+| `generate-skill-index-validators.cjs`      | `cli/`   | Generate skill validators index          | Not scripted                                     |
+| `generate-tool-manifest.cjs`               | `cli/`   | Generate tool manifest JSON              | Not scripted                                     |
+| `generate-workflow-registry.cjs`           | `cli/`   | Generate workflow registry               | Not scripted                                     |
+| `hybrid-search.cjs`                        | `cli/`   | BM25+semantic hybrid search              | package.json: `search:code`                      |
+| `hybrid-search-daemon.cjs`                 | `cli/`   | Persistent hybrid search daemon          | Not scripted                                     |
+| `index-codebase.cjs`                       | `cli/`   | Index codebase for BM25 search           | Not scripted                                     |
+| `init-memory-db.cjs`                       | `cli/`   | Initialize memory database               | Not scripted                                     |
+| `init-staging.cjs`                         | `cli/`   | Initialize staging environment           | package.json: `init:staging`                     |
+| `integration-health-dashboard.cjs`         | `cli/`   | Integration health dashboard             | Not scripted                                     |
+| `memory-cache-stability-summary.cjs`       | `cli/`   | Memory cache stability metrics           | package.json: `metrics:memory-cache:summary`     |
+| `memory-dashboard.cjs`                     | `cli/`   | Memory system dashboard                  | Not scripted                                     |
+| `memory-extract.cjs`                       | `cli/`   | Extract memory entries                   | Not scripted                                     |
+| `memory-record.cjs`                        | `cli/`   | Record memory entries                    | Not scripted                                     |
+| `memory-slo-summary.cjs`                   | `cli/`   | Memory SLO metrics summary               | package.json: `metrics:memory:slo:summary`       |
+| `migrate-legacy-sessions.cjs`              | `cli/`   | Migrate legacy session format            | Not scripted                                     |
+| `open-findings-strict-rollout-monitor.cjs` | `cli/`   | Strict open-findings rollout monitor     | package.json: `metrics:findings:strict-rollout`  |
+| `open-findings-summary.cjs`                | `cli/`   | Open findings summary with CI assertions | package.json: `metrics:findings:summary`         |
+| `open-findings-trend-admin.cjs`            | `cli/`   | Admin baseline reset for findings trend  | package.json: `metrics:findings:trend:baseline`  |
+| `open-findings-trend-snapshot.cjs`         | `cli/`   | Snapshot findings trend data             | package.json: `metrics:findings:trend:snapshot`  |
+| `open-findings-trend-summary.cjs`          | `cli/`   | Findings trend summary with deltas       | package.json: `metrics:findings:trend:summary`   |
+| `process-stale-skills.cjs`                 | `cli/`   | Archive stale/unused skills              | Not scripted                                     |
+| `profile-hooks.cjs`                        | `cli/`   | Profile hook execution times             | Not scripted                                     |
+| `repro-pre-completion-no-summary.cjs`      | `cli/`   | Reproduce pre-completion validation      | Not scripted                                     |
+| `retrieval-quality-eval.cjs`               | `cli/`   | Evaluate retrieval quality metrics       | package.json: `metrics:retrieval:baseline`       |
+| `router-churn-summary.cjs`                 | `cli/`   | Router churn/block rate metrics          | package.json: `metrics:routing:summary`          |
+| `run-memory-soak-regimen.cjs`              | `cli/`   | Run memory soak test regimen             | package.json: `metrics:soak:run`                 |
+| `run-skill-updates.cjs`                    | `cli/`   | Run batch skill updates                  | Not scripted                                     |
+| `runtime-health-snapshot.cjs`              | `cli/`   | Write runtime health snapshot            | package.json: `metrics:runtime:snapshot`         |
+| `runtime-health-summary.cjs`               | `cli/`   | Runtime health metrics summary           | package.json: `metrics:runtime:summary`          |
+| `sanitize-debug-log.cjs`                   | `cli/`   | Sanitize debug log for sharing           | Not scripted                                     |
+| `skill-freshness-report.cjs`               | `cli/`   | Report on skill freshness/staleness      | Not scripted                                     |
+| `skill-update-headless.cjs`                | `cli/`   | Headless skill update executor           | Not scripted                                     |
+| `spawn-assembly-metrics-summary.cjs`       | `cli/`   | Spawn assembly performance metrics       | package.json: `metrics:spawn:summary`            |
+| `sync-memory-json.cjs`                     | `cli/`   | Sync memory JSON stores                  | Not scripted                                     |
+| `tool-manifest-definitions.cjs`            | `cli/`   | Tool manifest definition helpers         | Not scripted                                     |
+| `trace-query.cjs`                          | `cli/`   | Query execution traces                   | Not scripted                                     |
+| `validate-agent-skill-references.cjs`      | `cli/`   | Validate agent→skill references          | package.json: `validate:agent-skill-refs`        |
+| `validate-agent-template-contract.cjs`     | `cli/`   | Validate agent template contracts        | package.json: `validate:agent-template-contract` |
+| `validate-artifact-regression-gate.cjs`    | `cli/`   | Artifact regression gate checks          | package.json: `validate:artifact-regression`     |
+| `validate-creator-ecosystem.cjs`           | `cli/`   | Validate creator skill ecosystem         | Not scripted                                     |
+| `validate-integration.cjs`                 | `cli/`   | Validate integration artifacts           | Not scripted                                     |
+| `validate-skill-ecosystem.cjs`             | `cli/`   | Validate skill ecosystem health          | Not scripted                                     |
+| `weekly-error-analysis.cjs`                | `cli/`   | Weekly error pattern analysis            | Not scripted                                     |
+| `worker-metrics-summary.cjs`               | `cli/`   | Worker thread metrics summary            | package.json: `worker:summary`                   |
 
 ---
 

@@ -578,7 +578,7 @@ The skill-centric universal expansion created 94 new rules files in `.claude/rul
 
 **Priority:** P0 -- Most urgent finding from architecture review.
 
-**Full Report:** `.claude/context/reports/architecture-review-skill-expansion-2026-02-09.md`
+**Full Report:** `.claude/context/reports/architecture/architecture-review-skill-expansion-2026-02-09.md`
 
 ---
 
@@ -596,7 +596,7 @@ The skill-centric universal expansion created 94 new rules files in `.claude/rul
 
 **Priority:** P1
 
-**Full Report:** `.claude/context/reports/architecture-review-skill-expansion-2026-02-09.md`
+**Full Report:** `.claude/context/reports/architecture/architecture-review-skill-expansion-2026-02-09.md`
 
 ---
 
