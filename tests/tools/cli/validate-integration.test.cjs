@@ -12,6 +12,9 @@ const assert = require('node:assert/strict');
 const {
   validateArtifact,
   getRecentArtifacts,
+  _catalogHasEntry,
+  _claudeMdHasEntry,
+  stripFencesAndHeadings,
 } = require('../../../.claude/tools/cli/validate-integration.cjs');
 const { parseMarkdownTable } = require('../../../.claude/lib/utils/markdown-table-parser.cjs');
 
@@ -144,5 +147,123 @@ describe('parseMarkdownTable — false positive prevention (Track 4.1 regression
       );
       assert.ok(hasEntry, 'SE-01: finds entry in CRLF-encoded catalog');
     });
+  });
+});
+
+describe('validate-integration — Bug 1 & Bug 2 regression guard (end-to-end check logic)', () => {
+  // These tests call the exported check-logic helpers directly with controlled content,
+  // proving the integration path (_catalogHasEntry / _claudeMdHasEntry) prevents
+  // false positives that the old str.includes fallback would have allowed through.
+
+  it('Bug 2: _catalogHasEntry rejects skill name that appears only in a fenced code block', () => {
+    const catalog = [
+      '# Skill Catalog',
+      '',
+      '```',
+      '| Skill Name | Category |',
+      '|------------|----------|',
+      '| code-fence-only-skill | example |',
+      '```',
+      '',
+      '| Skill Name | Category |',
+      '|------------|----------|',
+      '| other-skill | real entry |',
+    ].join('\n');
+
+    // Old fallback would have returned true via str.includes — this is the regression
+    assert.ok(
+      catalog.includes('code-fence-only-skill'),
+      'str.includes confirms the false-positive scenario exists'
+    );
+    assert.ok(
+      !_catalogHasEntry(catalog, 'code-fence-only-skill'),
+      'Bug 2 fixed: _catalogHasEntry rejects skill in code fence'
+    );
+  });
+
+  it('Bug 1: _claudeMdHasEntry rejects agent name that appears only in a fenced code block', () => {
+    const claudeMd = [
+      '# Routing',
+      '',
+      '```javascript',
+      '// Route to code-fence-only-agent for this',
+      'Task({ subagent_type: "code-fence-only-agent" })',
+      '```',
+      '',
+      'Use other-agent for real routing.',
+    ].join('\n');
+
+    assert.ok(
+      claudeMd.includes('code-fence-only-agent'),
+      'str.includes confirms the false-positive scenario exists'
+    );
+    assert.ok(
+      !_claudeMdHasEntry(claudeMd, 'code-fence-only-agent'),
+      'Bug 1 fixed: _claudeMdHasEntry rejects agent in code fence'
+    );
+  });
+
+  it('Bug 1: _claudeMdHasEntry rejects agent name that appears only in a heading', () => {
+    const claudeMd = [
+      '# heading-only-agent Documentation',
+      '',
+      '## Overview',
+      '',
+      'Use other-agent for actual routing.',
+    ].join('\n');
+
+    assert.ok(
+      claudeMd.includes('heading-only-agent'),
+      'str.includes confirms the false-positive scenario exists'
+    );
+    assert.ok(
+      !_claudeMdHasEntry(claudeMd, 'heading-only-agent'),
+      'Bug 1 fixed: _claudeMdHasEntry rejects agent in heading'
+    );
+  });
+
+  it('true positive: _catalogHasEntry finds skill in a real table row', () => {
+    const catalog = [
+      '| Skill Name | Category |',
+      '|------------|----------|',
+      '| real-table-skill | utility |',
+    ].join('\n');
+
+    assert.ok(
+      _catalogHasEntry(catalog, 'real-table-skill'),
+      'true positive preserved: skill in table row is found'
+    );
+  });
+
+  it('true positive: _claudeMdHasEntry finds agent name in plain text body', () => {
+    const claudeMd = [
+      '# Routing Overview',
+      '',
+      'Use plain-text-agent for implementation tasks.',
+    ].join('\n');
+
+    assert.ok(
+      _claudeMdHasEntry(claudeMd, 'plain-text-agent'),
+      'true positive preserved: agent in plain text is found'
+    );
+  });
+
+  it('stripFencesAndHeadings removes fences and headings but preserves table rows', () => {
+    const content = [
+      '# Section Heading',
+      '',
+      '```',
+      'code-block-content',
+      '```',
+      '',
+      '| Col | Val |',
+      '|-----|-----|',
+      '| real-row | data |',
+    ].join('\n');
+
+    const stripped = stripFencesAndHeadings(content);
+    assert.ok(!stripped.includes('Section Heading'), 'heading removed');
+    assert.ok(!stripped.includes('code-block-content'), 'code block content removed');
+    assert.ok(stripped.includes('real-row'), 'table row preserved');
   });
 });

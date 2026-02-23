@@ -53,6 +53,31 @@ describe('reflection-degradation-alert — pure functions', () => {
       assert.equal(result.developer.count, 1);
     });
 
+    it('E: skips cleanup-type entries that have no agentType or qualityScore', () => {
+      // Cleanup entries written by reflection-cleanup.cjs have shape:
+      //   { trigger: 'cleanup', timestamp, processedReflectionIds, source }
+      // Task-based reflection entries have shape:
+      //   { taskId, trigger, timestamp, priority, summary, ... }
+      // Neither has agentType/qualityScore — they must not create undefined buckets.
+      const entries = [
+        { trigger: 'cleanup', timestamp: new Date().toISOString(), processedReflectionIds: ['x'] },
+        {
+          taskId: '42',
+          trigger: 'task_complete',
+          timestamp: new Date().toISOString(),
+          priority: 'high',
+        },
+        { agentType: 'developer', qualityScore: 0.55, timestamp: new Date().toISOString() },
+      ];
+      const avgs = computeAgentAverages(entries);
+      assert.ok(
+        !('undefined' in avgs),
+        'cleanup/task entries must not create undefined agent bucket'
+      );
+      assert.ok('developer' in avgs, 'real agentType entry should be counted');
+      assert.equal(avgs.developer.count, 1);
+    });
+
     it('skips entries with non-numeric qualityScore', () => {
       const entries = [
         { agentType: 'developer', qualityScore: 'high' },

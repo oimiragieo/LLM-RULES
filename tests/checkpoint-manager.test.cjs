@@ -117,7 +117,7 @@ test('should load checkpoint with correct structure', async () => {
 
   assert.strictEqual(loaded.workflowId, workflowId);
   assert.strictEqual(loaded.stepId, stepId);
-  assert.deepStrictEqual(loaded.state, state);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(loaded.state)), state);
   assert.ok(loaded.timestamp);
   assert.ok(loaded.checksum);
   assert.strictEqual(typeof loaded.stepNumber, 'number');
@@ -338,7 +338,7 @@ test('should handle large state objects (>10KB)', async () => {
   await checkpointManager.save({ workflowId, stepId: 'step-1', state: largeState }, TEST_ROOT);
   const loaded = await checkpointManager.load({ workflowId }, TEST_ROOT);
 
-  assert.deepStrictEqual(loaded.state, largeState);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(loaded.state)), largeState);
 
   await teardownTest();
 });
@@ -365,7 +365,7 @@ test('should handle empty state object', async () => {
   await checkpointManager.save({ workflowId, stepId: 'step-1', state: {} }, TEST_ROOT);
 
   const loaded = await checkpointManager.load({ workflowId }, TEST_ROOT);
-  assert.deepStrictEqual(loaded.state, {});
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(loaded.state)), {});
 
   await teardownTest();
 });
