@@ -33,21 +33,25 @@ opinions without sharing the current agent's context window.
 ## Usage
 
 ### Ask a question
+
 ```bash
 node .claude/skills/omega-claude-cli/scripts/ask-claude.mjs "What are the security implications of this auth design?"
 ```
 
 ### Specify model
+
 ```bash
 node .claude/skills/omega-claude-cli/scripts/ask-claude.mjs "Review this code" --model sonnet
 ```
 
 ### JSON output (with text stripping)
+
 ```bash
 node .claude/skills/omega-claude-cli/scripts/ask-claude.mjs "Analyze dependencies" --json
 ```
 
 ### With timeout
+
 ```bash
 node .claude/skills/omega-claude-cli/scripts/ask-claude.mjs "Deep security review of auth.ts" --timeout-ms 300000
 ```
@@ -62,29 +66,29 @@ node .claude/skills/omega-claude-cli/scripts/verify-setup.mjs
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `ask-claude.mjs` | Core headless wrapper — prompt as positional arg to -p |
-| `parse-args.mjs` | Argument parser (--model, --json, --sandbox, --timeout-ms) |
-| `verify-setup.mjs` | Availability check with npx fallback |
-| `format-output.mjs` | Output normalization with extractJsonResponse() |
+| Script              | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `ask-claude.mjs`    | Core headless wrapper — prompt as positional arg to -p     |
+| `parse-args.mjs`    | Argument parser (--model, --json, --sandbox, --timeout-ms) |
+| `verify-setup.mjs`  | Availability check with npx fallback                       |
+| `format-output.mjs` | Output normalization with extractJsonResponse()            |
 
 ## Flags
 
-| Flag | Description |
-|------|-------------|
-| `--model MODEL` | opus (Opus 4.6), sonnet (4.5), haiku (4.5), or full model ID |
-| `--json` | JSON output (strips conversational text via extractJsonResponse) |
-| `--sandbox` | Code execution sandbox mode |
-| `--timeout-ms N` | Timeout in milliseconds (exit code 124 on expiry) |
+| Flag             | Description                                                      |
+| ---------------- | ---------------------------------------------------------------- |
+| `--model MODEL`  | opus (Opus 4.6), sonnet (4.5), haiku (4.5), or full model ID     |
+| `--json`         | JSON output (strips conversational text via extractJsonResponse) |
+| `--sandbox`      | Code execution sandbox mode                                      |
+| `--timeout-ms N` | Timeout in milliseconds (exit code 124 on expiry)                |
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Error (CLI failure, auth issue) |
-| 124 | Timeout (--timeout-ms exceeded) |
+| Code | Meaning                         |
+| ---- | ------------------------------- |
+| 0    | Success                         |
+| 1    | Error (CLI failure, auth issue) |
+| 124  | Timeout (--timeout-ms exceeded) |
 
 ## Iron Laws
 

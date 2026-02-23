@@ -52,7 +52,7 @@ export function getExecutables(cliArgs, isWin) {
 }
 
 function runCandidate(candidate, runOptions, timeoutMs) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     let proc;
     try {
       proc = spawn(candidate.executable, candidate.args, runOptions);
@@ -85,10 +85,10 @@ function runCandidate(candidate, runOptions, timeoutMs) {
     proc.stdout.setEncoding('utf8');
     proc.stderr.setEncoding('utf8');
 
-    proc.stdout.on('data', (chunk) => {
+    proc.stdout.on('data', chunk => {
       stdout += chunk;
     });
-    proc.stderr.on('data', (chunk) => {
+    proc.stderr.on('data', chunk => {
       stderr += chunk;
     });
 
@@ -96,7 +96,7 @@ function runCandidate(candidate, runOptions, timeoutMs) {
       timer = setTimeout(() => {
         timedOut = true;
         if (process.platform === 'win32') {
-          killPromise = new Promise((done) => {
+          killPromise = new Promise(done => {
             if (!proc.pid) {
               done();
               return;
@@ -113,7 +113,7 @@ function runCandidate(candidate, runOptions, timeoutMs) {
       }, timeoutMs);
     }
 
-    proc.on('error', (err) => {
+    proc.on('error', err => {
       if (timer) clearTimeout(timer);
       if (err && err.code === 'ENOENT') {
         finish({ enoent: true });
@@ -128,7 +128,7 @@ function runCandidate(candidate, runOptions, timeoutMs) {
       });
     });
 
-    proc.on('close', (code) => {
+    proc.on('close', code => {
       if (timer) clearTimeout(timer);
       if (killPromise) {
         killPromise.finally(() => {
@@ -234,7 +234,7 @@ async function main() {
   let stdinBytes = 0;
   let stdinLimitExceeded = false;
   const newlineBytes = process.platform === 'win32' ? 2 : 1;
-  rl.on('line', (line) => {
+  rl.on('line', line => {
     if (stdinLimitExceeded) return;
     const separatorBytes = lines.length > 0 ? newlineBytes : 0;
     const nextBytes = stdinBytes + separatorBytes + Buffer.byteLength(line, 'utf8');

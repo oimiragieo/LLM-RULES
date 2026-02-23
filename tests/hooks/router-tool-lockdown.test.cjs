@@ -199,4 +199,53 @@ describe('router-tool-lockdown hook', () => {
     assert.strictEqual(result.pass, false);
     assert.strictEqual(result.result, 'block');
   });
+
+  // ── Fix 1: Worktree CWD bypass tests ────────────────────────────────────────
+
+  it('should allow subagent in depth-1 worktree to call Bash (CWD bypass)', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const fakeCwd = '/project/.claude/worktrees/agent-abc123';
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {}, fakeCwd);
+    assert.strictEqual(result.pass, true, 'Worktree subagent should bypass lockdown');
+    assert.strictEqual(result.result, undefined, 'Should produce no warn/block result');
+  });
+
+  it('should allow subagent in depth-2 nested worktree to call Edit (CWD bypass)', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const fakeCwd = '/project/.claude/worktrees/outer/.claude/worktrees/inner';
+    const result = checkRouterToolLockdown(
+      'Edit',
+      { file_path: 'foo.js', old_string: 'a', new_string: 'b' },
+      {},
+      fakeCwd
+    );
+    assert.strictEqual(result.pass, true, 'Nested worktree subagent should bypass lockdown');
+  });
+
+  it('should still block router in non-worktree CWD from calling Bash (block mode)', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const fakeCwd = '/project'; // not in a worktree
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {}, fakeCwd);
+    assert.strictEqual(result.pass, false, 'Non-worktree router should still be blocked');
+    assert.strictEqual(result.result, 'block');
+  });
+
+  it('should allow subagent in Windows worktree path to call Grep (CWD bypass)', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const fakeCwd = 'C:\\dev\\projects\\.claude\\worktrees\\agent-abc';
+    const result = checkRouterToolLockdown('Grep', { pattern: 'foo' }, {}, fakeCwd);
+    assert.strictEqual(result.pass, true, 'Windows worktree path should bypass lockdown');
+  });
+
+  it('should allow subagent in worktree to call Write (CWD bypass)', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const fakeCwd = '/project/.claude/worktrees/agent-xyz';
+    const result = checkRouterToolLockdown('Write', { file_path: 'src/foo.js' }, {}, fakeCwd);
+    assert.strictEqual(result.pass, true, 'Worktree subagent should bypass Write lockdown');
+  });
 });

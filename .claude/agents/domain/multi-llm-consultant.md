@@ -94,6 +94,7 @@ results into a comprehensive response.
 ## Routing Triggers
 
 This agent should be spawned when user requests contain:
+
 - "multiple perspectives" / "different perspectives"
 - "ask all LLMs" / "ask Gemini" / "ask Codex" / "ask GPT" / "ask Cursor"
 - "compare what [model] vs [model]"

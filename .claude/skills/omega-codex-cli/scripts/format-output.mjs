@@ -12,7 +12,7 @@
 export function extractFinalMessageFromJsonl(stdout) {
   const lines = String(stdout)
     .split(/\r?\n/)
-    .map((line) => line.trim())
+    .map(line => line.trim())
     .filter(Boolean);
 
   for (let i = lines.length - 1; i >= 0; i--) {

@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Track 1: Orchestration & State
 
+- **Multi-Agent Crash Prevention (Worktree Guards)**: Implemented 4 critical fixes to eliminate massive memory pressure and orchestrator `segfault` crashes during highly parallel subagent operations:
+  1. **Router Lockdown Bypass**: `router-tool-lockdown.cjs` now correctly detects if executed inside a subagent worktree and bypasses lock logic, eliminating 60+ wasted node process spawns per session.
+  2. **Tasklist-First Bypass**: `hasExplicitAgentContext()` inside `routing-guard-core.helpers.cjs` prevents subagents from being wrongly blocked by orchestrator rules.
+  3. **Nested Worktree Prevention**: `pre-task-unified-core.cjs` blocks agents from recursively spawning nested task worktrees if the current depth is `≥ 1`.
+  4. **Concurrent Worker Cap**: Added `MAX_CONCURRENT_WORKTREES` guard (default 3) to prevent the orchestrator from blowing past Node.js/Bun heap limits.
+  *All fixes deployed with 100% test coverage via `tests/hooks/pre-task-unified-worktree.test.cjs` and a new `worktree-context.cjs` utility.*
 - **Git Worktree Optimizations for Sandboxed Agents**: Setup script (`scripts/setup.cjs`) automatically runs `git config --local core.untrackedCache true && git config --local core.fsmonitor true`. This solves the issue where Git-for-Windows or MSYS threw "too many active changes" warnings during massive parallel file modifications or background index builds across multiple agent worktrees.
 - **Precise Tokenizer (Context-Pressure Check)**: Added `.claude/lib/utils/context-token-estimator.cjs` to estimate tokens and calculate context pressure index. Highly integrated into `.claude/hooks/routing/user-prompt-unified.core.cjs` to aggressively govern the auto-compression engine when limits are reached. Tested in `tests/lib/utils/context-token-estimator.test.cjs`.
 - **Watchdog DLQ (Service Level Agreement Protection)**: Engineered `.claude/lib/workflow/workflow-watchdog.cjs` operating under protected state locks to enforce strict SLA guarantees over Phase transitions. Any `in_progress` phase exceeding the SLA timeout is forcefully relocated to an atomic `dlq.jsonl` Dead Letter Queue and flagged with `BLOCKED_TIMEOUT`. Created `.claude/tools/cli/workflow-watchdog-run.cjs` to facilitate automated sweeping. Fully tested in `tests/lib/workflow/workflow-watchdog.test.cjs`.

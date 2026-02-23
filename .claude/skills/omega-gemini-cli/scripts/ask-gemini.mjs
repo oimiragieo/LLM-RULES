@@ -99,18 +99,18 @@ function run(promptText) {
     const proc = spawn(exe, args, runOptions);
     const stdoutChunks = [];
     const stderrChunks = [];
-    proc.stdout.on('data', (chunk) => {
+    proc.stdout.on('data', chunk => {
       stdoutChunks.push(chunk);
     });
-    proc.stderr.on('data', (chunk) => {
+    proc.stderr.on('data', chunk => {
       stderrChunks.push(chunk);
     });
-    proc.on('close', (code) => {
+    proc.on('close', code => {
       const stdout = Buffer.concat(stdoutChunks).toString('utf8');
       const stderr = Buffer.concat(stderrChunks).toString('utf8');
       onClose(stdout, stderr, code, exe);
     });
-    proc.on('error', (err) => {
+    proc.on('error', err => {
       if (err.code === 'ENOENT' && exe === 'gemini' && !isWin) {
         console.error(
           'Warning: gemini not found in PATH, falling back to npx (this may be slow)...'
@@ -138,6 +138,6 @@ if (prompt) {
 } else {
   const rl = createInterface({ input: process.stdin });
   const lines = [];
-  rl.on('line', (line) => lines.push(line));
+  rl.on('line', line => lines.push(line));
   rl.on('close', () => run(lines.join('\n')));
 }

@@ -32,26 +32,31 @@ Free tier available — no API key required (Google OAuth only).
 ## Usage
 
 ### Ask a question
+
 ```bash
 node .claude/skills/omega-gemini-cli/scripts/ask-gemini.mjs "What is the best caching strategy for a Node.js API?"
 ```
 
 ### Specify model
+
 ```bash
 node .claude/skills/omega-gemini-cli/scripts/ask-gemini.mjs "Explain async/await" --model gemini-2.5-pro
 ```
 
 ### JSON output
+
 ```bash
 node .claude/skills/omega-gemini-cli/scripts/ask-gemini.mjs "List 5 design patterns" --json
 ```
 
 ### Code sandbox
+
 ```bash
 node .claude/skills/omega-gemini-cli/scripts/ask-gemini.mjs "Write and run a fibonacci function" --sandbox
 ```
 
 ### File review (embed content in prompt)
+
 ```bash
 node .claude/skills/omega-gemini-cli/scripts/ask-gemini.mjs "Review this code: $(cat src/auth.ts)"
 ```
@@ -65,27 +70,27 @@ node .claude/skills/omega-gemini-cli/scripts/verify-setup.mjs
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `ask-gemini.mjs` | Core headless wrapper — sends prompt via stdin |
-| `parse-args.mjs` | Argument parser (--model, --json, --sandbox) |
-| `verify-setup.mjs` | Availability check with npx fallback |
-| `format-output.mjs` | Output normalization (JSON stream handling) |
+| Script              | Purpose                                        |
+| ------------------- | ---------------------------------------------- |
+| `ask-gemini.mjs`    | Core headless wrapper — sends prompt via stdin |
+| `parse-args.mjs`    | Argument parser (--model, --json, --sandbox)   |
+| `verify-setup.mjs`  | Availability check with npx fallback           |
+| `format-output.mjs` | Output normalization (JSON stream handling)    |
 
 ## Flags
 
-| Flag | Description |
-|------|-------------|
+| Flag            | Description                                           |
+| --------------- | ----------------------------------------------------- |
 | `--model MODEL` | Gemini model (e.g., gemini-2.5-flash, gemini-2.5-pro) |
-| `--json` | Machine-readable JSON output |
-| `--sandbox` | Code execution sandbox mode |
+| `--json`        | Machine-readable JSON output                          |
+| `--sandbox`     | Code execution sandbox mode                           |
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Error (CLI failure, auth issue) |
+| Code | Meaning                                        |
+| ---- | ---------------------------------------------- |
+| 0    | Success                                        |
+| 1    | Error (CLI failure, auth issue)                |
 | 9009 | Windows: command not found (falls back to npx) |
 
 ## Iron Laws

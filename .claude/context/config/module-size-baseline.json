@@ -20,7 +20,7 @@
   ".claude\\hooks\\validation\\pre-completion-validation.cjs": 620,
   ".claude\\hooks\\routing\\pre-tool-unified.guardrails.cjs": 612,
   ".claude\\lib\\routing\\routing-table-intent-keywords-data.cjs": 599,
-  ".claude\\hooks\\routing\\pre-task-unified-core.cjs": 589,
+  ".claude\\hooks\\routing\\pre-task-unified-core.cjs": 693,
   ".claude\\lib\\memory\\memory-scheduler.cjs": 586,
   ".claude\\lib\\error-pattern-detector.cjs": 580,
   ".claude\\hooks\\safety\\validators\\database-validators.cjs": 579,

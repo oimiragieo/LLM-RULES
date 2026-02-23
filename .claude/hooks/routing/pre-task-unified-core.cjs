@@ -5,6 +5,10 @@ const path = require('path');
 const fs = require('fs');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+
+const { getWorktreeDepth, getActiveWorktreeCount } = require(
+  path.join(PROJECT_ROOT, '.claude', 'lib', 'utils', 'worktree-context.cjs')
+);
 const LIB_DIR = path.join(PROJECT_ROOT, '.claude', 'lib');
 
 function libRequire(modulePath) {
@@ -428,6 +432,78 @@ async function updateTaskLifecycleStateAfterAllow(hookInput) {
   }
 }
 
+/**
+ * Fix 3: Block Task() spawns from inside a worktree (depth >= 1).
+ * Prevents recursive nesting which causes memory exhaustion.
+ *
+ * Env: NESTED_WORKTREE_ENFORCEMENT=block|warn|off (default: block)
+ *
+ * @param {Object} hookInput - Hook input context
+ * @param {string} [cwd] - Current working directory override for testing
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkNestedWorktreeSpawn(hookInput, cwd = process.cwd()) {
+  const enforcement = getEnforcementMode('NESTED_WORKTREE_ENFORCEMENT', 'block');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  const depth = getWorktreeDepth(cwd);
+  if (depth < 1) {
+    return { pass: true }; // Not in a worktree — router context, allow
+  }
+
+  const message =
+    `[NESTED-WORKTREE] Task() spawn blocked: current process is running inside ` +
+    `a worktree (depth=${depth}). Nested worktrees cause memory exhaustion. ` +
+    `Sub-agents must not spawn further sub-agents. ` +
+    `Set NESTED_WORKTREE_ENFORCEMENT=warn to downgrade to a warning.`;
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+  // warn mode — pass but emit warning
+  return { pass: true, result: 'warn', message };
+}
+
+/**
+ * Fix 4: Cap concurrent agents by counting active worktree directories.
+ * Prevents spawning too many parallel agents which exhausts memory.
+ *
+ * Env: CONCURRENT_AGENT_CAP=N (default: 3)
+ *      CONCURRENT_AGENT_CAP_ENFORCEMENT=block|warn|off (default: warn)
+ *
+ * @param {Object} hookInput - Hook input context
+ * @param {string} [projectRoot] - Project root override for testing
+ * @returns {{ pass: boolean, result?: string, message?: string }}
+ */
+function checkConcurrentAgentCap(hookInput, projectRoot) {
+  const enforcement = getEnforcementMode('CONCURRENT_AGENT_CAP_ENFORCEMENT', 'warn');
+  if (enforcement === 'off') {
+    return { pass: true };
+  }
+
+  const cap = Math.max(1, Number(process.env.CONCURRENT_AGENT_CAP || 3));
+  const root = projectRoot || PROJECT_ROOT;
+  const activeCount = getActiveWorktreeCount(root);
+
+  if (activeCount <= cap) {
+    return { pass: true }; // Within cap
+  }
+
+  const message =
+    `[CONCURRENT-AGENT-CAP] Task() spawn blocked: ${activeCount} active worktrees exceed ` +
+    `the cap of ${cap}. Too many parallel agents cause memory exhaustion. ` +
+    `Wait for agents to complete, or set CONCURRENT_AGENT_CAP=${activeCount + 1} to raise the cap. ` +
+    `Set CONCURRENT_AGENT_CAP_ENFORCEMENT=off to disable this check.`;
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+  // warn mode — pass but emit warning
+  return { pass: true, result: 'warn', message };
+}
+
 function runAllChecks(hookInput) {
   const toolName = getToolName(hookInput);
   if (toolName !== 'Task') {
@@ -436,6 +512,32 @@ function runAllChecks(hookInput) {
 
   invalidateCachedState();
   const toolInput = getToolInput(hookInput);
+
+  // Fix 3: Block nested worktree spawns (subagent trying to spawn a sub-subagent)
+  const nestedWorktreeResult = checkNestedWorktreeSpawn(hookInput);
+  if (!nestedWorktreeResult.pass) {
+    return {
+      pass: false,
+      exitCode: 2,
+      message: nestedWorktreeResult.message,
+    };
+  }
+  if (nestedWorktreeResult.result === 'warn' && nestedWorktreeResult.message) {
+    console.warn(nestedWorktreeResult.message);
+  }
+
+  // Fix 4: Cap concurrent agents by active worktree count
+  const concurrentCapResult = checkConcurrentAgentCap(hookInput);
+  if (!concurrentCapResult.pass) {
+    return {
+      pass: false,
+      exitCode: 2,
+      message: concurrentCapResult.message,
+    };
+  }
+  if (concurrentCapResult.result === 'warn' && concurrentCapResult.message) {
+    console.warn(concurrentCapResult.message);
+  }
 
   const taskListFirstResult = checkTaskListFirst(toolName, hookInput);
   if (!taskListFirstResult.pass) {
@@ -545,6 +647,8 @@ module.exports = {
   checkCoreMemoryReadBeforeTask,
   checkRoutingGuard,
   checkLoopPrevention,
+  checkNestedWorktreeSpawn,
+  checkConcurrentAgentCap,
   isPlannerSpawn,
   isSecuritySpawn,
   isArchitectSpawn,

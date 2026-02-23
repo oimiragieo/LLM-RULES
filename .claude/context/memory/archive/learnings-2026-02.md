@@ -15185,7 +15185,6 @@ Research (parallel) → PM (PRDs) → Architecture + Security (parallel) → Pla
 
 - Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-02-19)
 
-
 ---
 
 ## stale-module-pruner + proactive-audit Skills Updated (2026-02-23)

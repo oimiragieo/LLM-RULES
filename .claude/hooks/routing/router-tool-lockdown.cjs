@@ -23,6 +23,8 @@ const {
   getEnforcementMode,
 } = require('../../lib/utils/hook-input.cjs');
 
+const { isInWorktree } = require('../../lib/utils/worktree-context.cjs');
+
 /**
  * Tools the router is ALLOWED to use.
  * Everything else is banned when in router mode.
@@ -76,9 +78,16 @@ const ROUTER_BASH_WHITELIST = [
  * Returns true if we believe the caller is the router session.
  *
  * @param {Object} hookInput - Hook input context
+ * @param {string} [cwd] - Current working directory (defaults to process.cwd()).
+ *   Injected for testability; production uses the real CWD.
  * @returns {boolean}
  */
-function isRouterSession(hookInput) {
+function isRouterSession(hookInput, cwd = process.cwd()) {
+  // CWD check — hooks running inside .claude/worktrees/ are subagents
+  if (isInWorktree(cwd)) {
+    return false; // Running in a worktree = subagent, not the router
+  }
+
   // Check CLAUDE_AGENT_ID — set in sub-agents, empty/absent in router
   const agentId = String(process.env.CLAUDE_AGENT_ID || '')
     .trim()
@@ -143,9 +152,11 @@ function suggestAgent(toolName) {
  * @param {string} toolName - Tool being invoked
  * @param {Object} toolInput - Tool input parameters
  * @param {Object} hookInput - Full hook input context
+ * @param {string} [cwd] - Current working directory override for testing.
+ *   Defaults to process.cwd() in production.
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
-function checkRouterToolLockdown(toolName, toolInput, hookInput) {
+function checkRouterToolLockdown(toolName, toolInput, hookInput, cwd = process.cwd()) {
   try {
     const enforcement = getEnforcementMode('ROUTER_TOOL_LOCKDOWN_ENFORCEMENT', 'warn');
 
@@ -165,7 +176,7 @@ function checkRouterToolLockdown(toolName, toolInput, hookInput) {
     }
 
     // If this is a sub-agent (not the router), always allow
-    if (!isRouterSession(hookInput)) {
+    if (!isRouterSession(hookInput, cwd)) {
       return { pass: true };
     }
 

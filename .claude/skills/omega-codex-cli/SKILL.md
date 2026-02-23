@@ -31,21 +31,25 @@ Optimized for code generation and analysis. Requires OPENAI_API_KEY.
 ## Usage
 
 ### Ask a question
+
 ```bash
 node .claude/skills/omega-codex-cli/scripts/ask-codex.mjs "Implement a Redis caching layer for Express"
 ```
 
 ### With timeout
+
 ```bash
 node .claude/skills/omega-codex-cli/scripts/ask-codex.mjs "Refactor this module" --timeout-ms 120000
 ```
 
 ### JSONL streaming output
+
 ```bash
 node .claude/skills/omega-codex-cli/scripts/ask-codex.mjs "Generate unit tests" --json
 ```
 
 ### Sandbox mode
+
 ```bash
 node .claude/skills/omega-codex-cli/scripts/ask-codex.mjs "Write and test a sort algorithm" --sandbox
 ```
@@ -60,29 +64,29 @@ node .claude/skills/omega-codex-cli/scripts/verify-setup.mjs
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `ask-codex.mjs` | Core headless wrapper — prompt as positional arg |
-| `parse-args.mjs` | Argument parser (--model, --json, --sandbox, --timeout-ms) |
-| `verify-setup.mjs` | Availability check (CLI + OPENAI_API_KEY) |
-| `format-output.mjs` | JSONL event stream normalization |
+| Script              | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `ask-codex.mjs`     | Core headless wrapper — prompt as positional arg           |
+| `parse-args.mjs`    | Argument parser (--model, --json, --sandbox, --timeout-ms) |
+| `verify-setup.mjs`  | Availability check (CLI + OPENAI_API_KEY)                  |
+| `format-output.mjs` | JSONL event stream normalization                           |
 
 ## Flags
 
-| Flag | Description |
-|------|-------------|
-| `--model MODEL` | Codex model to use |
-| `--json` | JSONL event stream output |
-| `--sandbox` | Workspace-write sandbox mode |
+| Flag             | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `--model MODEL`  | Codex model to use                                |
+| `--json`         | JSONL event stream output                         |
+| `--sandbox`      | Workspace-write sandbox mode                      |
 | `--timeout-ms N` | Timeout in milliseconds (exit code 124 on expiry) |
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Error (CLI failure, auth issue, API error) |
-| 124 | Timeout (--timeout-ms exceeded) |
+| Code | Meaning                                    |
+| ---- | ------------------------------------------ |
+| 0    | Success                                    |
+| 1    | Error (CLI failure, auth issue, API error) |
+| 124  | Timeout (--timeout-ms exceeded)            |
 
 ## Iron Laws
 

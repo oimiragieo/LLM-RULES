@@ -42,21 +42,25 @@ Requires paid Cursor subscription.
 ## Usage
 
 ### Ask a question (auto model selection)
+
 ```bash
 node .claude/skills/omega-cursor-cli/scripts/ask-cursor.mjs "How should I structure this React component?" --yolo --trust
 ```
 
 ### Specific model
+
 ```bash
 node .claude/skills/omega-cursor-cli/scripts/ask-cursor.mjs "Review this API design" --model claude-4.6-opus --yolo --trust
 ```
 
 ### With timeout
+
 ```bash
 node .claude/skills/omega-cursor-cli/scripts/ask-cursor.mjs "Refactor authentication" --yolo --trust --timeout-ms 180000
 ```
 
 ### JSON output
+
 ```bash
 node .claude/skills/omega-cursor-cli/scripts/ask-cursor.mjs "Generate types" --json --yolo --trust
 ```
@@ -86,30 +90,30 @@ node .claude/skills/omega-cursor-cli/scripts/verify-setup.mjs
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why Bad | Correct Approach |
-|---|---|---|
-| Running without --yolo | Blocks on tool approval prompts | Always pass --yolo |
-| Running without --trust | Blocks on workspace trust prompt | Always pass --trust |
-| Assuming auto model is available | Depends on subscription tier | Check with cursor-agent --list-models |
-| Hardcoding cursor-agent path | PATH differs across OS/install methods | Wrapper handles resolution |
-| Ignoring WSL requirements | Some Windows installs are WSL-only | Document in setup instructions |
+| Anti-Pattern                     | Why Bad                                | Correct Approach                      |
+| -------------------------------- | -------------------------------------- | ------------------------------------- |
+| Running without --yolo           | Blocks on tool approval prompts        | Always pass --yolo                    |
+| Running without --trust          | Blocks on workspace trust prompt       | Always pass --trust                   |
+| Assuming auto model is available | Depends on subscription tier           | Check with cursor-agent --list-models |
+| Hardcoding cursor-agent path     | PATH differs across OS/install methods | Wrapper handles resolution            |
+| Ignoring WSL requirements        | Some Windows installs are WSL-only     | Document in setup instructions        |
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `ask-cursor.mjs` | Core headless wrapper -- prompt as last positional arg |
-| `parse-args.mjs` | Argument parser (--model, --json, --yolo, --trust, --timeout-ms) |
-| `verify-setup.mjs` | Availability check (multi-path resolution) |
-| `format-output.mjs` | Output normalization |
+| Script              | Purpose                                                          |
+| ------------------- | ---------------------------------------------------------------- |
+| `ask-cursor.mjs`    | Core headless wrapper -- prompt as last positional arg           |
+| `parse-args.mjs`    | Argument parser (--model, --json, --yolo, --trust, --timeout-ms) |
+| `verify-setup.mjs`  | Availability check (multi-path resolution)                       |
+| `format-output.mjs` | Output normalization                                             |
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Error (CLI failure, subscription issue) |
-| 124 | Timeout (--timeout-ms exceeded) |
+| Code | Meaning                                 |
+| ---- | --------------------------------------- |
+| 0    | Success                                 |
+| 1    | Error (CLI failure, subscription issue) |
+| 124  | Timeout (--timeout-ms exceeded)         |
 
 ## Integration Notes
 

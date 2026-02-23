@@ -116,12 +116,14 @@ Highlight areas of consensus and dissent. Provide the strongest possible answer.
 ## Usage
 
 ### Full council (all available models)
+
 ```bash
 Skill({ skill: 'llm-council' })
 # Then in agent: run full council protocol above
 ```
 
 ### Quick consultation (skip peer review)
+
 ```bash
 # Stage 1 only -- parallel dispatch, collect responses, skip ranking
 # Use when speed matters more than rigorous evaluation
@@ -146,28 +148,28 @@ Skill({ skill: 'llm-council' })
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why Bad | Correct Approach |
-|---|---|---|
-| Dispatching to unavailable CLIs | Silent failure, missing responses | Run verify-setup.mjs first |
-| Showing model names during peer review | Introduces identity bias | Use anonymous labels (Response A, B, C) |
-| Using only 2 models for council | Peer review meaningless with 2 | Require minimum 3 for ranking value |
-| Ignoring failed model responses | May miss degradation | Log failures, include in metadata |
-| Running council for simple questions | Massive overhead for trivial queries | Reserve for high-stakes decisions |
+| Anti-Pattern                           | Why Bad                              | Correct Approach                        |
+| -------------------------------------- | ------------------------------------ | --------------------------------------- |
+| Dispatching to unavailable CLIs        | Silent failure, missing responses    | Run verify-setup.mjs first              |
+| Showing model names during peer review | Introduces identity bias             | Use anonymous labels (Response A, B, C) |
+| Using only 2 models for council        | Peer review meaningless with 2       | Require minimum 3 for ranking value     |
+| Ignoring failed model responses        | May miss degradation                 | Log failures, include in metadata       |
+| Running council for simple questions   | Massive overhead for trivial queries | Reserve for high-stakes decisions       |
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Council completed successfully (at least 2 models responded) |
-| 1 | Council failed (fewer than 2 models available or all timed out) |
+| Code | Meaning                                                         |
+| ---- | --------------------------------------------------------------- |
+| 0    | Council completed successfully (at least 2 models responded)    |
+| 1    | Council failed (fewer than 2 models available or all timed out) |
 
 ## Configuration
 
-| Env Var | Default | Purpose |
-|---------|---------|---------|
-| `LLM_COUNCIL_TIMEOUT_MS` | 120000 | Per-model timeout for Stage 1 and Stage 2 |
-| `LLM_COUNCIL_MIN_MODELS` | 2 | Minimum models required for council to proceed |
-| `LLM_COUNCIL_CHAIRMAN` | (current session) | Chairman model for Stage 3 synthesis |
+| Env Var                  | Default           | Purpose                                        |
+| ------------------------ | ----------------- | ---------------------------------------------- |
+| `LLM_COUNCIL_TIMEOUT_MS` | 120000            | Per-model timeout for Stage 1 and Stage 2      |
+| `LLM_COUNCIL_MIN_MODELS` | 2                 | Minimum models required for council to proceed |
+| `LLM_COUNCIL_CHAIRMAN`   | (current session) | Chairman model for Stage 3 synthesis           |
 
 ## Integration Notes
 
