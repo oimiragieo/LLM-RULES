@@ -13,6 +13,27 @@ const fs = require('fs');
 const path = require('path');
 
 /**
+ * Extract .cjs file paths from settings.json hook entries.
+ * Handles nested format: { matcher, hooks: [{ type, command }] }
+ */
+function extractHookPaths(settings) {
+  const paths = [];
+  if (!settings.hooks) return paths;
+  for (const [, hookList] of Object.entries(settings.hooks)) {
+    if (!Array.isArray(hookList)) continue;
+    for (const hookGroup of hookList) {
+      const innerHooks = Array.isArray(hookGroup.hooks) ? hookGroup.hooks : [hookGroup];
+      for (const hook of innerHooks) {
+        const hookCmd = hook.command || hook.path || '';
+        const match = hookCmd.match(/\.claude\/[^\s]+\.cjs/);
+        if (match) paths.push(match[0]);
+      }
+    }
+  }
+  return paths;
+}
+
+/**
  * Layer 1: Validate file existence
  * Checks that all files referenced in registries exist on disk
  *
@@ -34,14 +55,18 @@ async function validateExistence(projectRoot, options = {}) {
     const registryData = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
 
     // Validate agent paths
-    if (registryData.agents && Array.isArray(registryData.agents)) {
-      for (const agent of registryData.agents) {
-        if (agent.path && !fs.existsSync(agent.path)) {
+    if (registryData.agents && typeof registryData.agents === 'object') {
+      const agentList = Array.isArray(registryData.agents)
+        ? registryData.agents
+        : Object.values(registryData.agents);
+      for (const agent of agentList) {
+        const agentPath = agent.filePath || agent.path;
+        if (agentPath && !fs.existsSync(agentPath)) {
           errors.push({
             layer: 'existence',
-            file: agent.path,
+            file: agentPath,
             reason: 'missing',
-            message: `Agent file not found: ${agent.path}`,
+            message: `Agent file not found: ${agentPath}`,
           });
         }
       }
@@ -117,18 +142,15 @@ async function validateForwardRefs(projectRoot, options = {}) {
       const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 
       if (settings.hooks) {
-        for (const [, hookList] of Object.entries(settings.hooks)) {
-          if (Array.isArray(hookList)) {
-            for (const hook of hookList) {
-              if (hook.path && !fs.existsSync(hook.path)) {
-                errors.push({
-                  layer: 'forward-ref',
-                  source: settingsPath,
-                  target: hook.path,
-                  message: `Hook references non-existent module: ${hook.path}`,
-                });
-              }
-            }
+        for (const hookRelPath of extractHookPaths(settings)) {
+          const hookAbsPath = path.join(projectRoot, hookRelPath);
+          if (!fs.existsSync(hookAbsPath)) {
+            errors.push({
+              layer: 'forward-ref',
+              source: settingsPath,
+              target: hookRelPath,
+              message: `Hook references non-existent module: ${hookRelPath}`,
+            });
           }
         }
       }
@@ -210,20 +232,15 @@ async function validateBackwardRefs(projectRoot, options = {}) {
       const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 
       if (settings.hooks) {
-        for (const [hookType, hookList] of Object.entries(settings.hooks)) {
-          if (Array.isArray(hookList)) {
-            for (const hook of hookList) {
-              if (hook.path && fs.existsSync(hook.path)) {
-                // Hook is registered - for this test, we just report it as a warning
-                warnings.push({
-                  layer: 'backward-ref',
-                  artifact: hook.path,
-                  hookType,
-                  reason: 'registered',
-                  message: `Hook registered in settings: ${path.basename(hook.path)}`,
-                });
-              }
-            }
+        for (const hookRelPath of extractHookPaths(settings)) {
+          if (fs.existsSync(path.join(projectRoot, hookRelPath))) {
+            warnings.push({
+              layer: 'backward-ref',
+              artifact: hookRelPath,
+              hookType: 'registered',
+              reason: 'registered',
+              message: `Hook registered in settings: ${path.basename(hookRelPath)}`,
+            });
           }
         }
       }
