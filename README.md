@@ -50,10 +50,14 @@ Agent Studio dynamically supports Git Worktree isolation for dangerous/massive s
 
 **Important for Worktrees:** The ecosystem setup wizard automatically enables Git optimization (`core.untrackedCache true` and `core.fsmonitor true`). This prevents Git from hanging or triggering "too many active changes" warnings during massive parallel file generation or background vector indexing operations.
 
+### Multi-LLM Consulting & Council
+
+Agent Studio natively supports integrating with other headless LLM Code CLIs (Gemini, Codex, Cursor, and Claude Code). The `multi-llm-consultant` agent can dynamically detect which of these CLIs are authenticated on your system and distribute prompts in parallel. It also features a built-in `llm-council` skill that automatically runs a robust 3-stage deliberation protocol (independent completions -> anonymized peer review & ranking -> chairman synthesis) for complex architectural decisions.
+
 ## Current Footprint
 
-- Agents: 74 files (includes 12 isolated worktree variants)
-- Skills: 460 `SKILL.md` definitions
+- Agents: 75 files (includes 12 isolated worktree variants)
+- Skills: 465 `SKILL.md` definitions
 - Rules: 105 docs
 - Schemas: 148 `*.schema.json`
 - Commands: 102 `.claude/commands/*.md`
