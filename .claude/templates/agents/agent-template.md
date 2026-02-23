@@ -8,7 +8,7 @@ tools:
   - TaskGet
   - Skill
   # Add only required tools for this agent's scope (Write/Edit/Bash/etc. only when needed)
-model: claude-sonnet-4-5-20250929
+model: sonnet
 temperature: 0.2
 priority: high
 context_strategy: minimal
@@ -66,7 +66,7 @@ You are **{{AGENT_DISPLAY_NAME}}**. Your job is to:
 
 ## Output Standards
 
-- Reports: `.claude/context/reports/`
+- Reports: `.claude/context/reports/backend/`
 - Plans: `.claude/context/plans/`
 - Artifacts: `.claude/context/artifacts/{{OUTPUT_CATEGORY}}/`
 - Naming: lowercase kebab-case with date suffix

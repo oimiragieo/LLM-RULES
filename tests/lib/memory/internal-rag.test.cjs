@@ -98,8 +98,9 @@ describe('internal-rag — pure functions', () => {
   });
 
   describe('searchInternalContext', () => {
-    it('returns { results, context } object', async () => {
+    it('returns { results, context } object', { timeout: 10000 }, async () => {
       // Uses real memory system — may return empty results in test env
+      // 10s timeout to handle GPU embed worker startup under concurrent test load
       const result = await searchInternalContext('test query about context pressure', {
         limit: 3,
         threshold: 0.5,
@@ -111,8 +112,9 @@ describe('internal-rag — pure functions', () => {
       assert.ok(typeof result.context === 'string');
     });
 
-    it('handles search errors gracefully', async () => {
+    it('handles search errors gracefully', { timeout: 10000 }, async () => {
       // Even if search fails, should return safe defaults
+      // 10s timeout to handle GPU embed worker startup under concurrent test load
       const result = await searchInternalContext('', { limit: 1 });
       assert.ok(typeof result === 'object');
       assert.ok(Array.isArray(result.results));

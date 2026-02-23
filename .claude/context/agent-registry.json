@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-22T05:51:58.796Z",
+  "generatedAt": "2026-02-23T01:39:07.230Z",
   "metadata": {
-    "totalAgents": 62,
-    "healthyAgents": 62,
+    "totalAgents": 65,
+    "healthyAgents": 65,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-02-22T05:51:58.796Z",
-    "lastFullScan": "2026-02-22T05:51:58.796Z"
+    "lastHealthCheck": "2026-02-23T01:39:07.230Z",
+    "lastFullScan": "2026-02-23T01:39:07.230Z"
   },
   "agents": {
     "architect": {
@@ -23,14 +23,14 @@
           "triggerPhrases": [
             "architect",
             "designer",
-            "api-development-expert",
-            "enhance-prompt",
+            "ecosystem-integrity-scanner",
             "architecture-review",
-            "checklist-generator",
-            "code-semantic-search",
-            "code-structural-search",
-            "complexity-assessment",
-            "database-architect"
+            "brainstorming",
+            "database-architect",
+            "diagram-generator",
+            "spec-critique",
+            "task-management-protocol",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -50,34 +50,34 @@
             "Skill"
           ],
           "skills": [
-            "api-development-expert",
-            "enhance-prompt",
+            "ecosystem-integrity-scanner",
             "architecture-review",
-            "checklist-generator",
-            "code-semantic-search",
-            "code-structural-search",
-            "complexity-assessment",
+            "brainstorming",
             "database-architect",
             "diagram-generator",
-            "ripgrep"
+            "spec-critique",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "examples": [],
           "tags": [
             "architect",
             "designer",
-            "api-development-expert",
-            "enhance-prompt",
+            "ecosystem-integrity-scanner",
             "architecture-review",
-            "checklist-generator",
-            "code-semantic-search",
-            "code-structural-search",
-            "complexity-assessment",
+            "brainstorming",
             "database-architect",
             "diagram-generator",
+            "spec-critique",
+            "task-management-protocol",
+            "verification-before-completion",
             "ripgrep",
-            "security-architect",
-            "sequential-thinking",
-            "spec-gathering"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ]
         }
       ],
@@ -91,14 +91,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.790Z",
+        "lastUpdate": "2026-02-23T01:39:07.220Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-22T05:51:58.791Z",
-        "updatedAt": "2026-02-22T05:51:58.791Z"
+        "createdAt": "2026-02-23T01:39:07.221Z",
+        "updatedAt": "2026-02-23T01:39:07.221Z"
       }
     },
     "context-compressor": {
@@ -116,11 +116,12 @@
             "compressor",
             "context-compressor",
             "session-handoff",
-            "token-saver-context-compression",
-            "task-management-protocol",
-            "verification-before-completion",
+            "summarize-changes",
             "ripgrep",
-            "code-semantic-search"
+            "code-semantic-search",
+            "code-structural-search",
+            "token-saver-context-compression",
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Read",
@@ -137,13 +138,14 @@
           "skills": [
             "context-compressor",
             "session-handoff",
+            "summarize-changes",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "token-saver-context-compression",
             "task-management-protocol",
             "verification-before-completion",
-            "ripgrep",
-            "code-semantic-search",
-            "summarize-changes",
-            "insight-extraction"
+            "memory-search"
           ],
           "examples": [],
           "tags": [
@@ -151,12 +153,14 @@
             "compressor",
             "context-compressor",
             "session-handoff",
+            "summarize-changes",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
             "token-saver-context-compression",
             "task-management-protocol",
             "verification-before-completion",
-            "ripgrep",
-            "code-semantic-search",
-            "summarize-changes",
+            "memory-search",
             "insight-extraction"
           ]
         }
@@ -171,14 +175,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.791Z",
+        "lastUpdate": "2026-02-23T01:39:07.221Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.791Z",
-        "updatedAt": "2026-02-22T05:51:58.791Z"
+        "createdAt": "2026-02-23T01:39:07.221Z",
+        "updatedAt": "2026-02-23T01:39:07.221Z"
       }
     },
     "developer": {
@@ -197,11 +201,11 @@
             "tests",
             "refactors",
             "refactor",
-            "checklist-generator",
-            "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "code-structural-search"
+            "ecosystem-integrity-scanner",
+            "stale-module-pruner",
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -221,16 +225,16 @@
             "Skill"
           ],
           "skills": [
-            "checklist-generator",
-            "code-analyzer",
-            "code-quality-expert",
+            "ecosystem-integrity-scanner",
+            "stale-module-pruner",
+            "task-management-protocol",
+            "ripgrep",
             "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "context-compressor",
-            "debugging",
-            "smart-debug",
-            "git-expert"
+            "token-saver-context-compression",
+            "verification-before-completion",
+            "memory-search",
+            "tdd",
+            "debugging"
           ],
           "examples": [],
           "tags": [
@@ -239,16 +243,16 @@
             "tests",
             "refactors",
             "refactor",
-            "checklist-generator",
-            "code-analyzer",
-            "code-quality-expert",
+            "ecosystem-integrity-scanner",
+            "stale-module-pruner",
+            "task-management-protocol",
+            "ripgrep",
             "code-semantic-search",
-            "code-structural-search",
-            "code-style-validator",
-            "context-compressor",
-            "debugging",
-            "smart-debug",
-            "git-expert"
+            "token-saver-context-compression",
+            "verification-before-completion",
+            "memory-search",
+            "tdd",
+            "debugging"
           ]
         }
       ],
@@ -262,14 +266,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.222Z",
+        "updatedAt": "2026-02-23T01:39:07.222Z"
       }
     },
     "planner": {
@@ -285,14 +289,14 @@
           "triggerPhrases": [
             "planner",
             "refactors",
-            "checklist-generator",
-            "enhance-prompt",
-            "code-semantic-search",
-            "compliance-policy-check",
+            "brainstorming",
+            "jira-pm",
+            "linear-pm",
             "complexity-assessment",
-            "context-compressor",
-            "creation-feasibility-gate",
-            "tdd"
+            "dispatching-parallel-agents",
+            "framework-context",
+            "plan-generator",
+            "recommend-evolution"
           ],
           "requiredTools": [
             "Read",
@@ -310,37 +314,38 @@
             "TaskGet",
             "TaskOutput",
             "Skill",
-            "AskUserQuestion"
+            "AskUserQuestion",
+            "Task"
           ],
           "skills": [
-            "checklist-generator",
-            "enhance-prompt",
-            "code-semantic-search",
-            "compliance-policy-check",
+            "brainstorming",
+            "jira-pm",
+            "linear-pm",
             "complexity-assessment",
-            "context-compressor",
-            "creation-feasibility-gate",
-            "tdd",
+            "dispatching-parallel-agents",
+            "framework-context",
             "plan-generator",
-            "planning-with-files"
+            "recommend-evolution",
+            "sequential-thinking",
+            "spec-critique"
           ],
           "examples": [],
           "tags": [
             "planner",
             "refactors",
-            "checklist-generator",
-            "enhance-prompt",
-            "code-semantic-search",
-            "compliance-policy-check",
+            "brainstorming",
+            "jira-pm",
+            "linear-pm",
             "complexity-assessment",
-            "context-compressor",
-            "creation-feasibility-gate",
-            "tdd",
+            "dispatching-parallel-agents",
+            "framework-context",
             "plan-generator",
-            "planning-with-files",
-            "project-onboarding",
             "recommend-evolution",
-            "research-synthesis"
+            "sequential-thinking",
+            "spec-critique",
+            "strict-user-requirements-adherence",
+            "task-management-protocol",
+            "ripgrep"
           ]
         }
       ],
@@ -354,14 +359,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.4.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.222Z",
+        "updatedAt": "2026-02-23T01:39:07.222Z"
       }
     },
     "pm": {
@@ -376,15 +381,15 @@
           "description": "Product Manager. Manages product backlogs, sprint planning, stakeholder communication, and feature prioritization. Use for roadmap planning, user story creation, stakeholder updates, and agile work...",
           "triggerPhrases": [
             "planning",
-            "checklist-generator",
-            "code-semantic-search",
             "complexity-assessment",
-            "consensus-voting",
-            "framework-context",
-            "interactive-requirements-gathering",
             "plan-generator",
-            "prd-generator",
-            "research-synthesis"
+            "spec-gathering",
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "requiredTools": [
             "Read",
@@ -398,37 +403,38 @@
             "TaskGet",
             "Skill",
             "Bash",
-            "AskUserQuestion"
+            "AskUserQuestion",
+            "WebFetch"
           ],
           "skills": [
-            "checklist-generator",
-            "code-semantic-search",
             "complexity-assessment",
-            "consensus-voting",
-            "framework-context",
-            "interactive-requirements-gathering",
             "plan-generator",
-            "prd-generator",
-            "research-synthesis",
-            "ripgrep"
+            "spec-gathering",
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "checklist-generator"
           ],
           "examples": [],
           "tags": [
             "planning",
-            "checklist-generator",
-            "code-semantic-search",
             "complexity-assessment",
+            "plan-generator",
+            "spec-gathering",
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "checklist-generator",
             "consensus-voting",
             "framework-context",
             "interactive-requirements-gathering",
-            "plan-generator",
-            "prd-generator",
-            "research-synthesis",
-            "ripgrep",
-            "sequential-thinking",
-            "spec-gathering",
-            "task-management-protocol",
-            "verification-before-completion"
+            "prd-generator"
           ]
         }
       ],
@@ -442,14 +448,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.222Z",
+        "updatedAt": "2026-02-23T01:39:07.222Z"
       }
     },
     "qa": {
@@ -460,19 +466,19 @@
       "capabilities": [
         {
           "name": "qa",
-          "domain": "code",
+          "domain": "testing",
           "description": "Quality Assurance specialist. Writes comprehensive test suites, performs regression testing, and validates releases.",
           "triggerPhrases": [
             "test",
             "testing",
             "validates",
-            "checklist-generator",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "smart-debug",
-            "ripgrep"
+            "ecosystem-integrity-scanner",
+            "qa-workflow",
+            "strict-user-requirements-adherence",
+            "task-management-protocol",
+            "tdd",
+            "test-generator",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -492,34 +498,34 @@
             "Skill"
           ],
           "skills": [
-            "checklist-generator",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "smart-debug",
-            "ripgrep",
+            "ecosystem-integrity-scanner",
+            "qa-workflow",
+            "strict-user-requirements-adherence",
             "task-management-protocol",
             "tdd",
-            "test-generator"
+            "test-generator",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "examples": [],
           "tags": [
             "test",
             "testing",
             "validates",
-            "checklist-generator",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "smart-debug",
-            "ripgrep",
+            "ecosystem-integrity-scanner",
+            "qa-workflow",
+            "strict-user-requirements-adherence",
             "task-management-protocol",
             "tdd",
             "test-generator",
             "verification-before-completion",
-            "proactive-audit"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ]
         }
       ],
@@ -533,14 +539,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.222Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.222Z",
+        "updatedAt": "2026-02-23T01:39:07.222Z"
       }
     },
     "reflection-agent": {
@@ -556,14 +562,14 @@
           "triggerPhrases": [
             "reflection",
             "agent",
-            "artifact-integrator",
-            "compliance-policy-check",
-            "creation-feasibility-gate",
-            "assimilate",
-            "code-analyzer",
-            "context-compressor",
             "framework-context",
-            "insight-extraction"
+            "recommend-evolution",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "artifact-integrator"
           ],
           "requiredTools": [
             "Read",
@@ -580,34 +586,34 @@
             "Bash"
           ],
           "skills": [
+            "framework-context",
+            "recommend-evolution",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "artifact-integrator",
             "compliance-policy-check",
-            "creation-feasibility-gate",
-            "assimilate",
-            "code-analyzer",
-            "context-compressor",
-            "framework-context",
-            "insight-extraction",
-            "memory-quality-auditor",
-            "eval-harness-updater"
+            "creation-feasibility-gate"
           ],
           "examples": [],
           "tags": [
             "reflection",
             "agent",
+            "framework-context",
+            "recommend-evolution",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "artifact-integrator",
             "compliance-policy-check",
             "creation-feasibility-gate",
             "assimilate",
             "code-analyzer",
-            "context-compressor",
-            "framework-context",
-            "insight-extraction",
-            "memory-quality-auditor",
-            "eval-harness-updater",
-            "agent-updater",
-            "workflow-updater",
-            "recommend-evolution"
+            "insight-extraction"
           ]
         }
       ],
@@ -621,14 +627,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.223Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.223Z",
+        "updatedAt": "2026-02-23T01:39:07.223Z"
       }
     },
     "router": {
@@ -644,14 +650,14 @@
           "triggerPhrases": [
             "router",
             "orchestrates",
-            "agent-creator",
-            "command-creator",
-            "rule-creator",
-            "tool-creator",
-            "hook-creator",
-            "semgrep-rule-creator",
-            "skill-creator",
-            "template-creator"
+            "complexity-assessment",
+            "skill-discovery",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "agent-creator"
           ],
           "requiredTools": [
             "Read",
@@ -666,34 +672,34 @@
             "Write"
           ],
           "skills": [
+            "complexity-assessment",
+            "skill-discovery",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "agent-creator",
             "command-creator",
-            "rule-creator",
-            "tool-creator",
-            "hook-creator",
-            "semgrep-rule-creator",
-            "skill-creator",
-            "template-creator",
-            "workflow-creator",
-            "skill-discovery"
+            "rule-creator"
           ],
           "examples": [],
           "tags": [
             "router",
             "orchestrates",
+            "complexity-assessment",
+            "skill-discovery",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "agent-creator",
             "command-creator",
             "rule-creator",
             "tool-creator",
             "hook-creator",
-            "semgrep-rule-creator",
-            "skill-creator",
-            "template-creator",
-            "workflow-creator",
-            "skill-discovery",
-            "swarm-coordination",
-            "task-management-protocol",
-            "tool-search"
+            "semgrep-rule-creator"
           ]
         }
       ],
@@ -707,14 +713,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.223Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.223Z",
+        "updatedAt": "2026-02-23T01:39:07.223Z"
       }
     },
     "technical-program-manager": {
@@ -763,7 +769,7 @@
             "plan-generator",
             "recommend-evolution",
             "research-synthesis",
-            "ripgrep"
+            "sequential-thinking"
           ],
           "examples": [],
           "tags": [
@@ -780,8 +786,8 @@
             "plan-generator",
             "recommend-evolution",
             "research-synthesis",
-            "ripgrep",
-            "sequential-thinking"
+            "sequential-thinking",
+            "task-management-protocol"
           ]
         }
       ],
@@ -795,14 +801,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.223Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.223Z",
+        "updatedAt": "2026-02-23T01:39:07.223Z"
       }
     },
     "technical-writer": {
@@ -819,13 +825,13 @@
             "technical",
             "writer",
             "creates",
-            "diagram-generator",
             "doc-generator",
             "readme",
-            "task-management-protocol",
             "verification-before-completion",
-            "writing-skills",
-            "ripgrep"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ],
           "requiredTools": [
             "Read",
@@ -845,34 +851,34 @@
             "Task"
           ],
           "skills": [
-            "diagram-generator",
             "doc-generator",
             "readme",
-            "task-management-protocol",
             "verification-before-completion",
-            "writing-skills",
             "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "writing"
+            "diagram-generator",
+            "task-management-protocol"
           ],
           "examples": [],
           "tags": [
             "technical",
             "writer",
             "creates",
-            "diagram-generator",
             "doc-generator",
             "readme",
-            "task-management-protocol",
             "verification-before-completion",
-            "writing-skills",
             "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "writing",
-            "api-development-expert",
-            "architecture-review"
+            "diagram-generator",
+            "task-management-protocol",
+            "writing-skills",
+            "memory-search"
           ]
         }
       ],
@@ -886,14 +892,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.223Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.223Z",
+        "updatedAt": "2026-02-23T01:39:07.223Z"
       }
     },
     "accessibility-tester": {
@@ -912,11 +918,11 @@
             "testing",
             "auditing",
             "design",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "ripgrep",
-            "verification-before-completion"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "requiredTools": [
             "Read",
@@ -935,16 +941,16 @@
             "Skill"
           ],
           "skills": [
-            "accessibility",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "accessibility",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
-            "debugging",
-            "code-analyzer"
+            "debugging"
           ],
           "examples": [],
           "tags": [
@@ -953,16 +959,16 @@
             "testing",
             "auditing",
             "design",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
             "debugging",
-            "code-analyzer",
-            "context-compressor"
+            "code-analyzer"
           ]
         }
       ],
@@ -976,14 +982,104 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.223Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.223Z",
+        "updatedAt": "2026-02-23T01:39:07.223Z"
+      }
+    },
+    "advanced-debugging": {
+      "id": "advanced-debugging",
+      "displayName": "advanced-debugging",
+      "category": "specialized",
+      "filePath": ".claude/agents/specialized/advanced-debugging.md",
+      "capabilities": [
+        {
+          "name": "advanced-debugging",
+          "domain": "code",
+          "description": "Master debugger specializing in multi-layer systematic investigation — application code, runtime internals, distributed systems, memory/performance profiling, and infrastructure. Applies structured...",
+          "triggerPhrases": [
+            "advanced",
+            "debugging",
+            "debugger",
+            "tests",
+            "smart-debug",
+            "troubleshooting-regression",
+            "recovery",
+            "logging-module-usage",
+            "task-management-protocol",
+            "tdd"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "MemoryRecord",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "debugging",
+            "smart-debug",
+            "troubleshooting-regression",
+            "recovery",
+            "logging-module-usage",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
+          ],
+          "examples": [],
+          "tags": [
+            "advanced",
+            "debugging",
+            "debugger",
+            "tests",
+            "smart-debug",
+            "troubleshooting-regression",
+            "recovery",
+            "logging-module-usage",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:39:07.223Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-02-23T01:39:07.223Z",
+        "updatedAt": "2026-02-23T01:39:07.223Z"
       }
     },
     "c4-code": {
@@ -1000,13 +1096,13 @@
             "code",
             "analyzes",
             "create",
-            "task-management-protocol",
             "code-analyzer",
-            "code-structural-search",
-            "doc-generator",
-            "ripgrep",
+            "diagram-generator",
+            "task-management-protocol",
             "verification-before-completion",
-            "token-saver-context-compression"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -1021,30 +1117,33 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
             "code-analyzer",
-            "code-structural-search",
-            "doc-generator",
-            "ripgrep",
+            "diagram-generator",
+            "task-management-protocol",
             "verification-before-completion",
-            "token-saver-context-compression",
+            "ripgrep",
             "code-semantic-search",
-            "diagram-generator"
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "doc-generator"
           ],
           "examples": [],
           "tags": [
             "code",
             "analyzes",
             "create",
-            "task-management-protocol",
             "code-analyzer",
-            "code-structural-search",
-            "doc-generator",
-            "ripgrep",
+            "diagram-generator",
+            "task-management-protocol",
             "verification-before-completion",
-            "token-saver-context-compression",
+            "ripgrep",
             "code-semantic-search",
-            "diagram-generator"
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "doc-generator",
+            "memory-search"
           ]
         }
       ],
@@ -1058,14 +1157,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.792Z",
+        "lastUpdate": "2026-02-23T01:39:07.223Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.792Z",
-        "updatedAt": "2026-02-22T05:51:58.792Z"
+        "createdAt": "2026-02-23T01:39:07.223Z",
+        "updatedAt": "2026-02-23T01:39:07.223Z"
       }
     },
     "c4-component": {
@@ -1081,14 +1180,14 @@
           "triggerPhrases": [
             "component",
             "creates",
-            "task-management-protocol",
             "architecture-review",
-            "code-analyzer",
             "diagram-generator",
-            "doc-generator",
-            "ripgrep",
+            "task-management-protocol",
             "verification-before-completion",
-            "token-saver-context-compression"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ],
           "requiredTools": [
             "Read",
@@ -1104,29 +1203,33 @@
             "Edit"
           ],
           "skills": [
-            "task-management-protocol",
             "architecture-review",
-            "code-analyzer",
             "diagram-generator",
-            "doc-generator",
-            "ripgrep",
+            "task-management-protocol",
             "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "code-semantic-search"
+            "code-analyzer"
           ],
           "examples": [],
           "tags": [
             "component",
             "creates",
-            "task-management-protocol",
             "architecture-review",
-            "code-analyzer",
             "diagram-generator",
-            "doc-generator",
-            "ripgrep",
+            "task-management-protocol",
             "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "code-semantic-search"
+            "code-analyzer",
+            "doc-generator",
+            "memory-search"
           ]
         }
       ],
@@ -1140,14 +1243,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.224Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.224Z",
+        "updatedAt": "2026-02-23T01:39:07.224Z"
       }
     },
     "c4-container": {
@@ -1163,14 +1266,14 @@
           "triggerPhrases": [
             "container",
             "deployment",
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "api-development-expert",
-            "ripgrep",
-            "verification-before-completion",
+            "container-expert",
             "diagram-generator",
-            "token-saver-context-compression"
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -1186,32 +1289,34 @@
             "Edit"
           ],
           "skills": [
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "api-development-expert",
-            "ripgrep",
-            "verification-before-completion",
+            "container-expert",
             "diagram-generator",
-            "token-saver-context-compression",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "container-expert"
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "container",
             "deployment",
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "api-development-expert",
-            "ripgrep",
-            "verification-before-completion",
-            "diagram-generator",
-            "token-saver-context-compression",
-            "code-semantic-search",
             "container-expert",
-            "project-analyzer"
+            "diagram-generator",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "doc-generator",
+            "api-development-expert",
+            "memory-search"
           ]
         }
       ],
@@ -1225,14 +1330,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.224Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.224Z",
+        "updatedAt": "2026-02-23T01:39:07.224Z"
       }
     },
     "c4-context": {
@@ -1249,13 +1354,13 @@
             "context",
             "creates",
             "create",
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "ripgrep",
-            "verification-before-completion",
             "diagram-generator",
-            "project-analyzer"
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -1271,30 +1376,34 @@
             "Edit"
           ],
           "skills": [
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "ripgrep",
-            "verification-before-completion",
             "diagram-generator",
-            "project-analyzer",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "code-semantic-search"
+            "doc-generator"
           ],
           "examples": [],
           "tags": [
             "context",
             "creates",
             "create",
-            "task-management-protocol",
-            "doc-generator",
             "architecture-review",
-            "ripgrep",
-            "verification-before-completion",
             "diagram-generator",
-            "project-analyzer",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "code-semantic-search"
+            "doc-generator",
+            "project-analyzer",
+            "memory-search"
           ]
         }
       ],
@@ -1308,14 +1417,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.224Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.224Z",
+        "updatedAt": "2026-02-23T01:39:07.224Z"
       }
     },
     "chaos-engineer": {
@@ -1334,11 +1443,11 @@
             "designs",
             "validates",
             "testing",
-            "debugging",
-            "code-semantic-search",
-            "token-saver-context-compression",
             "ripgrep",
-            "verification-before-completion"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "requiredTools": [
             "Read",
@@ -1357,14 +1466,16 @@
             "Skill"
           ],
           "skills": [
-            "debugging",
-            "code-semantic-search",
-            "token-saver-context-compression",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "debugging",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
-            "context-compressor"
+            "memory-search"
           ],
           "examples": [],
           "tags": [
@@ -1373,14 +1484,16 @@
             "designs",
             "validates",
             "testing",
-            "debugging",
-            "code-semantic-search",
-            "token-saver-context-compression",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "debugging",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
-            "context-compressor"
+            "memory-search"
           ]
         }
       ],
@@ -1394,14 +1507,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.224Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.224Z",
+        "updatedAt": "2026-02-23T01:39:07.224Z"
       }
     },
     "code-reviewer": {
@@ -1420,11 +1533,11 @@
             "review",
             "reviews",
             "implementation",
-            "task-management-protocol",
-            "checklist-generator",
             "code-analyzer",
             "code-quality-expert",
-            "code-semantic-search"
+            "qa-workflow",
+            "receiving-code-review",
+            "requesting-code-review"
           ],
           "requiredTools": [
             "Read",
@@ -1438,19 +1551,20 @@
             "TaskList",
             "TaskCreate",
             "TaskGet",
-            "Skill"
+            "Skill",
+            "Task"
           ],
           "skills": [
-            "task-management-protocol",
-            "checklist-generator",
             "code-analyzer",
             "code-quality-expert",
+            "qa-workflow",
+            "receiving-code-review",
+            "requesting-code-review",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
-            "troubleshooting-regression",
-            "code-structural-search",
-            "code-style-validator",
-            "differential-review"
+            "code-structural-search"
           ],
           "examples": [],
           "tags": [
@@ -1459,16 +1573,16 @@
             "review",
             "reviews",
             "implementation",
-            "task-management-protocol",
-            "checklist-generator",
             "code-analyzer",
             "code-quality-expert",
+            "qa-workflow",
+            "receiving-code-review",
+            "requesting-code-review",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
-            "troubleshooting-regression",
-            "code-structural-search",
-            "code-style-validator",
-            "differential-review"
+            "code-structural-search"
           ]
         }
       ],
@@ -1482,14 +1596,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.224Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.224Z",
+        "updatedAt": "2026-02-23T01:39:07.224Z"
       }
     },
     "code-simplifier": {
@@ -1506,13 +1620,13 @@
             "code",
             "simplifier",
             "refactoring",
-            "task-management-protocol",
-            "best-practices-guidelines",
-            "code-analyzer",
-            "code-quality-expert",
+            "stale-module-pruner",
+            "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "code-structural-search"
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Read",
@@ -1529,34 +1643,34 @@
             "Skill"
           ],
           "skills": [
+            "stale-module-pruner",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "best-practices-guidelines",
             "code-analyzer",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "code-style-validator",
-            "debugging",
-            "dry-principle"
+            "code-quality-expert"
           ],
           "examples": [],
           "tags": [
             "code",
             "simplifier",
             "refactoring",
+            "stale-module-pruner",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "best-practices-guidelines",
             "code-analyzer",
             "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "code-style-validator",
-            "debugging",
-            "dry-principle",
-            "function-length-and-responsibility",
-            "ripgrep"
+            "debugging"
           ]
         }
       ],
@@ -1570,14 +1684,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.225Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.225Z",
+        "updatedAt": "2026-02-23T01:39:07.225Z"
       }
     },
     "conductor-validator": {
@@ -1595,12 +1709,12 @@
             "validator",
             "validates",
             "implementation",
-            "task-management-protocol",
             "context-driven-development",
-            "ripgrep",
+            "task-management-protocol",
             "track-management",
+            "verification-before-completion",
             "workflow-patterns",
-            "verification-before-completion"
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -1616,16 +1730,16 @@
             "Edit"
           ],
           "skills": [
-            "task-management-protocol",
             "context-driven-development",
-            "ripgrep",
+            "task-management-protocol",
             "track-management",
-            "workflow-patterns",
             "verification-before-completion",
-            "rule-auditor",
-            "token-saver-context-compression",
+            "workflow-patterns",
+            "ripgrep",
             "code-semantic-search",
-            "project-analyzer"
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
@@ -1633,16 +1747,17 @@
             "validator",
             "validates",
             "implementation",
-            "task-management-protocol",
             "context-driven-development",
-            "ripgrep",
+            "task-management-protocol",
             "track-management",
-            "workflow-patterns",
             "verification-before-completion",
-            "rule-auditor",
-            "token-saver-context-compression",
+            "workflow-patterns",
+            "ripgrep",
             "code-semantic-search",
-            "project-analyzer"
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "rule-auditor"
           ]
         }
       ],
@@ -1656,14 +1771,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.225Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.225Z",
+        "updatedAt": "2026-02-23T01:39:07.225Z"
       }
     },
     "database-architect": {
@@ -1682,11 +1797,11 @@
             "design",
             "planning",
             "designing",
+            "database-architect",
+            "database-expert",
             "task-management-protocol",
-            "architecture-review",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "data-expert"
+            "text-to-sql",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -1703,16 +1818,16 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "architecture-review",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "data-expert",
             "database-architect",
             "database-expert",
-            "diagram-generator",
-            "doc-generator",
-            "ripgrep"
+            "task-management-protocol",
+            "text-to-sql",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
@@ -1721,16 +1836,16 @@
             "design",
             "planning",
             "designing",
-            "task-management-protocol",
-            "architecture-review",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "data-expert",
             "database-architect",
             "database-expert",
-            "diagram-generator",
-            "doc-generator",
-            "ripgrep"
+            "task-management-protocol",
+            "text-to-sql",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ]
         }
       ],
@@ -1744,14 +1859,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.225Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.225Z",
+        "updatedAt": "2026-02-23T01:39:07.225Z"
       }
     },
     "devops-troubleshooter": {
@@ -1768,13 +1883,13 @@
             "devops",
             "troubleshooter",
             "debugging",
+            "docker-compose",
+            "k8s-manifest-generator",
             "task-management-protocol",
-            "aws-cloud-ops",
-            "chrome-browser",
-            "cloud-devops-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
-            "troubleshooting-regression"
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -1791,34 +1906,34 @@
             "Skill"
           ],
           "skills": [
+            "debugging",
+            "docker-compose",
+            "k8s-manifest-generator",
             "task-management-protocol",
-            "aws-cloud-ops",
-            "chrome-browser",
-            "cloud-devops-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
-            "troubleshooting-regression",
-            "container-expert",
+            "code-structural-search",
             "context-compressor",
-            "debugging"
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "devops",
             "troubleshooter",
             "debugging",
+            "docker-compose",
+            "k8s-manifest-generator",
             "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "aws-cloud-ops",
             "chrome-browser",
-            "cloud-devops-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "troubleshooting-regression",
-            "container-expert",
-            "context-compressor",
-            "incident-runbook-templates",
-            "logging-module-usage",
-            "postmortem-writing"
+            "cloud-devops-expert"
           ]
         }
       ],
@@ -1832,14 +1947,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.225Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.225Z",
+        "updatedAt": "2026-02-23T01:39:07.225Z"
       }
     },
     "devops": {
@@ -1856,13 +1971,13 @@
             "devops",
             "design",
             "deployment",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "dependency-analyzer",
-            "git-expert",
-            "github-mcp",
-            "architecture-review"
+            "architecture-review",
+            "commit-validator",
+            "consensus-voting",
+            "containerization-rules",
+            "context-compressor",
+            "database-architect",
+            "docker-compose"
           ],
           "requiredTools": [
             "Read",
@@ -1881,34 +1996,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "dependency-analyzer",
-            "git-expert",
-            "github-mcp",
             "architecture-review",
-            "aws-cloud-ops",
-            "ci-cd-implementation-rule",
-            "cloud-devops-expert"
+            "commit-validator",
+            "consensus-voting",
+            "containerization-rules",
+            "context-compressor",
+            "database-architect",
+            "docker-compose",
+            "kafka-development-practices",
+            "monorepo-and-tooling",
+            "filesystem"
           ],
           "examples": [],
           "tags": [
             "devops",
             "design",
             "deployment",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "dependency-analyzer",
-            "git-expert",
-            "github-mcp",
             "architecture-review",
-            "aws-cloud-ops",
-            "ci-cd-implementation-rule",
-            "cloud-devops-expert",
-            "configuration-management",
-            "consensus-voting"
+            "commit-validator",
+            "consensus-voting",
+            "containerization-rules",
+            "context-compressor",
+            "database-architect",
+            "docker-compose",
+            "kafka-development-practices",
+            "monorepo-and-tooling",
+            "filesystem",
+            "finishing-a-development-branch",
+            "git-expert"
           ]
         }
       ],
@@ -1922,14 +2037,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "incident-responder": {
@@ -1945,14 +2060,14 @@
           "triggerPhrases": [
             "incident",
             "responder",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "configuration-management",
-            "container-expert",
-            "debugging",
             "incident-runbook-templates",
-            "logging-module-usage"
+            "on-call-handoff-patterns",
+            "postmortem-writing",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -1970,34 +2085,34 @@
             "WebFetch"
           ],
           "skills": [
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "configuration-management",
-            "container-expert",
-            "debugging",
             "incident-runbook-templates",
-            "logging-module-usage",
             "on-call-handoff-patterns",
-            "postmortem-writing"
+            "postmortem-writing",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "incident",
             "responder",
+            "incident-runbook-templates",
+            "on-call-handoff-patterns",
+            "postmortem-writing",
             "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
             "configuration-management",
             "container-expert",
-            "debugging",
-            "incident-runbook-templates",
-            "logging-module-usage",
-            "on-call-handoff-patterns",
-            "postmortem-writing",
-            "recovery",
-            "ripgrep",
-            "sentry-monitoring"
+            "debugging"
           ]
         }
       ],
@@ -2011,14 +2126,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "penetration-tester": {
@@ -2035,13 +2150,13 @@
             "penetration",
             "tester",
             "testing",
-            "security-architect",
-            "auth-security-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "ripgrep",
-            "verification-before-completion"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "security-architect",
+            "auth-security-expert"
           ],
           "requiredTools": [
             "Read",
@@ -2060,33 +2175,33 @@
             "Skill"
           ],
           "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "security-architect",
             "auth-security-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "ripgrep",
             "verification-before-completion",
             "task-management-protocol",
-            "tdd",
-            "debugging"
+            "tdd"
           ],
           "examples": [],
           "tags": [
             "penetration",
             "tester",
             "testing",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "security-architect",
             "auth-security-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "ripgrep",
             "verification-before-completion",
             "task-management-protocol",
             "tdd",
             "debugging",
-            "context-compressor",
             "medusa-security"
           ]
         }
@@ -2101,14 +2216,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "performance-engineer": {
@@ -2125,13 +2240,13 @@
             "performance",
             "engineer",
             "testing",
-            "code-analyzer",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
-            "debugging",
-            "ripgrep"
+            "token-saver-context-compression",
+            "code-analyzer",
+            "debugging"
           ],
           "requiredTools": [
             "Read",
@@ -2150,30 +2265,32 @@
             "Skill"
           ],
           "skills": [
-            "code-analyzer",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "code-analyzer",
             "debugging",
-            "ripgrep",
             "task-management-protocol",
-            "verification-before-completion"
+            "verification-before-completion",
+            "memory-search"
           ],
           "examples": [],
           "tags": [
             "performance",
             "engineer",
             "testing",
-            "code-analyzer",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "code-analyzer",
             "debugging",
-            "ripgrep",
             "task-management-protocol",
-            "verification-before-completion"
+            "verification-before-completion",
+            "memory-search"
           ]
         }
       ],
@@ -2187,14 +2304,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "researcher": {
@@ -2210,14 +2327,14 @@
           "triggerPhrases": [
             "researcher",
             "building",
+            "arxiv-mcp",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
             "doc-generator",
-            "research-synthesis",
-            "ripgrep",
-            "sequential-thinking"
+            "research-synthesis"
           ],
           "requiredTools": [
             "Read",
@@ -2236,31 +2353,33 @@
             "Edit"
           ],
           "skills": [
+            "arxiv-mcp",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
             "doc-generator",
             "research-synthesis",
-            "ripgrep",
             "sequential-thinking",
-            "task-management-protocol",
-            "thinking-tools"
+            "task-management-protocol"
           ],
           "examples": [],
           "tags": [
             "researcher",
             "building",
+            "arxiv-mcp",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
             "doc-generator",
             "research-synthesis",
-            "ripgrep",
             "sequential-thinking",
             "task-management-protocol",
-            "thinking-tools"
+            "thinking-tools",
+            "memory-search"
           ]
         }
       ],
@@ -2274,14 +2393,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "reverse-engineer": {
@@ -2297,14 +2416,14 @@
           "triggerPhrases": [
             "reverse",
             "engineer",
-            "task-management-protocol",
             "binary-analysis-patterns",
-            "code-analyzer",
+            "memory-forensics",
+            "protocol-reverse-engineering",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
-            "memory-forensics"
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -2320,34 +2439,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
             "binary-analysis-patterns",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "memory-forensics",
             "protocol-reverse-engineering",
-            "ripgrep"
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "reverse",
             "engineer",
-            "task-management-protocol",
             "binary-analysis-patterns",
-            "code-analyzer",
-            "code-semantic-search",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "memory-forensics",
             "protocol-reverse-engineering",
+            "task-management-protocol",
+            "verification-before-completion",
             "ripgrep",
-            "security-architect",
-            "tdd",
-            "token-saver-context-compression"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "code-analyzer",
+            "debugging",
+            "git-expert"
           ]
         }
       ],
@@ -2361,14 +2480,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.793Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.793Z",
-        "updatedAt": "2026-02-22T05:51:58.793Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "security-architect": {
@@ -2379,7 +2498,7 @@
       "capabilities": [
         {
           "name": "security-architect",
-          "domain": "code",
+          "domain": "security",
           "description": "Security architecture, threat modeling, compliance validation, and security assessment. Use for designing authentication systems, evaluating vulnerabilities, security code review, penetration testi...",
           "triggerPhrases": [
             "security",
@@ -2388,10 +2507,10 @@
             "review",
             "testing",
             "planning",
-            "task-management-protocol",
             "auth-security-expert",
-            "binary-analysis-patterns",
-            "checklist-generator"
+            "fiber-routing-and-csrf-protection",
+            "security-architect",
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Read",
@@ -2409,16 +2528,16 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
             "auth-security-expert",
-            "binary-analysis-patterns",
-            "checklist-generator",
-            "code-analyzer",
+            "fiber-routing-and-csrf-protection",
+            "security-architect",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "doc-generator",
-            "insecure-defaults"
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
@@ -2428,15 +2547,15 @@
             "review",
             "testing",
             "planning",
-            "task-management-protocol",
             "auth-security-expert",
-            "binary-analysis-patterns",
-            "checklist-generator",
-            "code-analyzer",
+            "fiber-routing-and-csrf-protection",
+            "security-architect",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "doc-generator"
+            "context-compressor"
           ]
         }
       ],
@@ -2450,14 +2569,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "sre-engineer": {
@@ -2475,12 +2594,12 @@
             "engineer",
             "reviews",
             "design",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
+            "code-structural-search",
             "context-compressor",
-            "debugging",
-            "incident-runbook-templates",
-            "on-call-handoff-patterns"
+            "token-saver-context-compression",
+            "debugging"
           ],
           "requiredTools": [
             "Read",
@@ -2499,16 +2618,16 @@
             "Skill"
           ],
           "skills": [
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
+            "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
             "debugging",
             "incident-runbook-templates",
             "on-call-handoff-patterns",
             "postmortem-writing",
-            "ripgrep",
-            "sentry-monitoring",
-            "task-management-protocol"
+            "sentry-monitoring"
           ],
           "examples": [],
           "tags": [
@@ -2516,17 +2635,17 @@
             "engineer",
             "reviews",
             "design",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
+            "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
             "debugging",
             "incident-runbook-templates",
             "on-call-handoff-patterns",
             "postmortem-writing",
-            "ripgrep",
             "sentry-monitoring",
-            "task-management-protocol",
-            "verification-before-completion"
+            "task-management-protocol"
           ]
         }
       ],
@@ -2540,14 +2659,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "ai-ml-specialist": {
@@ -2563,14 +2682,14 @@
           "triggerPhrases": [
             "specialist",
             "deployment",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "ai-ml-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "comprehensive-type-annotations",
-            "data-expert",
-            "debugging"
+            "comprehensive-type-annotations"
           ],
           "requiredTools": [
             "Read",
@@ -2588,34 +2707,34 @@
             "Skill"
           ],
           "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "ai-ml-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "comprehensive-type-annotations",
             "data-expert",
-            "debugging",
-            "git-expert",
-            "jupyter-notebook-best-practices"
+            "debugging"
           ],
           "examples": [],
           "tags": [
             "specialist",
             "deployment",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "ai-ml-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "comprehensive-type-annotations",
             "data-expert",
             "debugging",
             "git-expert",
             "jupyter-notebook-best-practices",
-            "logging-module-usage",
-            "python-backend-expert",
-            "ripgrep"
+            "logging-module-usage"
           ]
         }
       ],
@@ -2629,14 +2748,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "android-pro": {
@@ -2654,12 +2773,12 @@
             "pro",
             "building",
             "design",
-            "task-management-protocol",
-            "android-expert",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "debugging"
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Read",
@@ -2677,16 +2796,16 @@
             "Skill"
           ],
           "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "android-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
             "git-expert",
-            "mobile-first-design-rules",
-            "mobile-ui-development-rule",
-            "ripgrep"
+            "mobile-first-design-rules"
           ],
           "examples": [],
           "tags": [
@@ -2694,17 +2813,17 @@
             "pro",
             "building",
             "design",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "android-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
             "git-expert",
             "mobile-first-design-rules",
-            "mobile-ui-development-rule",
-            "ripgrep",
-            "tdd"
+            "mobile-ui-development-rule"
           ]
         }
       ],
@@ -2718,14 +2837,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "api-designer": {
@@ -2744,11 +2863,11 @@
             "designs",
             "review",
             "design",
-            "api-development-expert",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "context-compressor"
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "requiredTools": [
             "Read",
@@ -2767,14 +2886,14 @@
             "Skill"
           ],
           "skills": [
-            "api-development-expert",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
             "doc-generator",
             "diagram-generator",
-            "ripgrep",
             "security-architect",
             "spec-gathering"
           ],
@@ -2785,14 +2904,14 @@
             "designs",
             "review",
             "design",
-            "api-development-expert",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
             "doc-generator",
             "diagram-generator",
-            "ripgrep",
             "security-architect",
             "spec-gathering"
           ]
@@ -2808,14 +2927,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "data-engineer": {
@@ -2832,13 +2951,13 @@
             "data",
             "engineer",
             "building",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "data-expert",
-            "database-expert",
-            "debugging"
+            "large-data-with-dask",
+            "python-backend-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -2856,34 +2975,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "data-expert",
-            "database-expert",
-            "debugging",
-            "diagram-generator",
-            "git-expert",
-            "pandas-data-manipulation-rules"
+            "large-data-with-dask",
+            "python-backend-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ],
           "examples": [],
           "tags": [
             "data",
             "engineer",
             "building",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "data-expert",
-            "database-expert",
-            "debugging",
-            "diagram-generator",
-            "git-expert",
-            "pandas-data-manipulation-rules",
-            "pipeline-reflection-ux",
-            "python-backend-expert"
+            "large-data-with-dask",
+            "python-backend-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "database-expert"
           ]
         }
       ],
@@ -2897,14 +3016,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.226Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.226Z",
+        "updatedAt": "2026-02-23T01:39:07.226Z"
       }
     },
     "expo-mobile-developer": {
@@ -2922,12 +3041,12 @@
             "mobile",
             "developer",
             "building",
+            "expo-framework-rule",
+            "nativewind-and-tailwind-css-compatibility",
+            "flutter-expert",
+            "react-expert",
             "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "expo-framework-rule"
+            "tdd"
           ],
           "requiredTools": [
             "Read",
@@ -2945,16 +3064,16 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
             "expo-framework-rule",
-            "expo-mobile-app-rule",
-            "git-expert",
-            "mobile-ui-development-rule",
-            "react-expert"
+            "nativewind-and-tailwind-css-compatibility",
+            "flutter-expert",
+            "react-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "examples": [],
           "tags": [
@@ -2962,17 +3081,17 @@
             "mobile",
             "developer",
             "building",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
             "expo-framework-rule",
-            "expo-mobile-app-rule",
-            "git-expert",
-            "mobile-ui-development-rule",
+            "nativewind-and-tailwind-css-compatibility",
+            "flutter-expert",
             "react-expert",
-            "react-native-skills-vercel"
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ]
         }
       ],
@@ -2986,14 +3105,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "fastapi-pro": {
@@ -3010,13 +3129,13 @@
             "fastapi",
             "pro",
             "build",
-            "task-management-protocol",
             "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "comprehensive-type-annotations",
-            "database-expert"
+            "python-backend-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -3034,34 +3153,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
             "api-development-expert",
+            "python-backend-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "comprehensive-type-annotations",
-            "database-expert",
-            "debugging",
-            "form-validation-with-zod",
-            "git-expert"
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "fastapi",
             "pro",
             "build",
-            "task-management-protocol",
             "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "comprehensive-type-annotations",
-            "database-expert",
-            "debugging",
-            "form-validation-with-zod",
-            "git-expert",
             "python-backend-expert",
-            "ripgrep"
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "comprehensive-type-annotations",
+            "database-expert"
           ]
         }
       ],
@@ -3075,14 +3194,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "frontend-pro": {
@@ -3101,11 +3220,11 @@
             "implementation",
             "building",
             "designs",
-            "task-management-protocol",
-            "accessibility",
-            "build-tools-expert",
-            "code-semantic-search",
-            "token-saver-context-compression"
+            "angular-expert",
+            "astro-expert",
+            "frontend-expert",
+            "htmx-expert",
+            "paraglide-js-internationalization-i18n"
           ],
           "requiredTools": [
             "Read",
@@ -3121,16 +3240,16 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "accessibility",
-            "build-tools-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
+            "angular-expert",
+            "astro-expert",
             "frontend-expert",
-            "git-expert",
-            "html-tailwind-css-and-javascript-expert-rule"
+            "htmx-expert",
+            "paraglide-js-internationalization-i18n",
+            "react-best-practices-vercel",
+            "react-expert",
+            "qwik-expert",
+            "solidjs-expert",
+            "vercel-ai-sdk-best-practices"
           ],
           "examples": [],
           "tags": [
@@ -3139,16 +3258,16 @@
             "implementation",
             "building",
             "designs",
-            "task-management-protocol",
-            "accessibility",
-            "build-tools-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
+            "angular-expert",
+            "astro-expert",
             "frontend-expert",
-            "git-expert",
-            "html-tailwind-css-and-javascript-expert-rule"
+            "htmx-expert",
+            "paraglide-js-internationalization-i18n",
+            "react-best-practices-vercel",
+            "react-expert",
+            "qwik-expert",
+            "solidjs-expert",
+            "vercel-ai-sdk-best-practices"
           ]
         }
       ],
@@ -3162,14 +3281,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "gamedev-pro": {
@@ -3186,13 +3305,13 @@
             "gamedev",
             "pro",
             "implementation",
-            "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "cpp"
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol",
+            "build-tools-expert"
           ],
           "requiredTools": [
             "Read",
@@ -3210,34 +3329,34 @@
             "Skill"
           ],
           "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "cpp",
-            "debugging",
-            "gamedev-expert",
-            "git-expert"
+            "debugging"
           ],
           "examples": [],
           "tags": [
             "gamedev",
             "pro",
             "implementation",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "build-tools-expert",
             "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "cpp",
             "debugging",
             "gamedev-expert",
-            "git-expert",
-            "ripgrep",
-            "tdd"
+            "git-expert"
           ]
         }
       ],
@@ -3251,14 +3370,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "golang-pro": {
@@ -3275,13 +3394,13 @@
             "golang",
             "pro",
             "design",
+            "debugging",
+            "fiber-routing-and-csrf-protection",
+            "go-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search"
+            "tdd",
+            "verification-before-completion",
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -3299,34 +3418,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "api-development-expert",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert",
-            "go-expert"
+            "fiber-routing-and-csrf-protection",
+            "go-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ],
           "examples": [],
           "tags": [
             "golang",
             "pro",
             "design",
-            "task-management-protocol",
-            "api-development-expert",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert",
+            "fiber-routing-and-csrf-protection",
             "go-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
             "ripgrep",
-            "tdd"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert"
           ]
         }
       ],
@@ -3340,14 +3459,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "graphql-pro": {
@@ -3366,11 +3485,11 @@
             "design",
             "building",
             "implementing",
-            "task-management-protocol",
             "api-development-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression"
+            "graphql-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -3388,16 +3507,16 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
             "api-development-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "graphql-expert",
-            "ripgrep"
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
@@ -3406,16 +3525,16 @@
             "design",
             "building",
             "implementing",
-            "task-management-protocol",
             "api-development-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "graphql-expert",
-            "ripgrep"
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ]
         }
       ],
@@ -3429,14 +3548,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "ios-pro": {
@@ -3453,13 +3572,13 @@
             "ios",
             "pro",
             "building",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert",
-            "ios-expert"
+            "ios-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -3477,34 +3596,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert",
             "ios-expert",
-            "mobile-first-design-rules",
-            "mobile-ui-development-rule",
-            "ripgrep"
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "ios",
             "pro",
             "building",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert",
             "ios-expert",
-            "mobile-first-design-rules",
-            "mobile-ui-development-rule",
-            "ripgrep",
+            "task-management-protocol",
             "tdd",
-            "verification-before-completion"
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "git-expert",
+            "mobile-first-design-rules"
           ]
         }
       ],
@@ -3518,14 +3637,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.794Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.794Z",
-        "updatedAt": "2026-02-22T05:51:58.794Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "java-pro": {
@@ -3542,13 +3661,13 @@
             "java",
             "pro",
             "building",
-            "task-management-protocol",
-            "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "doc-generator"
+            "java-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -3566,34 +3685,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "doc-generator",
-            "dto-conventions",
-            "git-expert",
-            "java-expert"
+            "java-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "java",
             "pro",
             "building",
-            "task-management-protocol",
-            "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "doc-generator",
-            "dto-conventions",
-            "git-expert",
             "java-expert",
-            "restcontroller-conventions",
-            "ripgrep"
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
+            "doc-generator"
           ]
         }
       ],
@@ -3607,14 +3726,104 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
+      }
+    },
+    "kubernetes-specialist": {
+      "id": "kubernetes-specialist",
+      "displayName": "kubernetes-specialist",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/kubernetes-specialist.md",
+      "capabilities": [
+        {
+          "name": "kubernetes-specialist",
+          "domain": "code",
+          "description": "Expert Kubernetes platform engineer specializing in cluster operations, workload design, GitOps, and production hardening. Deep knowledge of K8s networking, RBAC, operators, Helm, Kustomize, ArgoCD...",
+          "triggerPhrases": [
+            "kubernetes",
+            "specialist",
+            "design",
+            "debugging",
+            "k8s-manifest-generator",
+            "docker-compose",
+            "container-expert",
+            "cloud-devops-expert",
+            "aws-cloud-ops",
+            "task-management-protocol"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "MemoryRecord",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "k8s-manifest-generator",
+            "debugging",
+            "docker-compose",
+            "container-expert",
+            "cloud-devops-expert",
+            "aws-cloud-ops",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep"
+          ],
+          "examples": [],
+          "tags": [
+            "kubernetes",
+            "specialist",
+            "design",
+            "debugging",
+            "k8s-manifest-generator",
+            "docker-compose",
+            "container-expert",
+            "cloud-devops-expert",
+            "aws-cloud-ops",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "opus"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "llm-architect": {
@@ -3631,13 +3840,13 @@
             "llm",
             "architect",
             "design",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "architecture-review",
-            "verification-before-completion",
-            "task-management-protocol"
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -3655,26 +3864,27 @@
             "Skill"
           ],
           "skills": [
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "architecture-review",
             "verification-before-completion",
             "task-management-protocol",
             "sequential-thinking",
-            "doc-generator",
-            "diagram-generator"
+            "doc-generator"
           ],
           "examples": [],
           "tags": [
             "llm",
             "architect",
             "design",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "architecture-review",
             "verification-before-completion",
             "task-management-protocol",
@@ -3695,14 +3905,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "mcp-developer": {
@@ -3720,12 +3930,12 @@
             "developer",
             "implementation",
             "design",
-            "tdd",
-            "debugging",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "ripgrep"
+            "context-compressor",
+            "token-saver-context-compression",
+            "tdd"
           ],
           "requiredTools": [
             "Read",
@@ -3743,16 +3953,16 @@
             "Skill"
           ],
           "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "tdd",
             "debugging",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "ripgrep",
             "verification-before-completion",
             "task-management-protocol",
-            "git-expert",
-            "code-analyzer"
+            "git-expert"
           ],
           "examples": [],
           "tags": [
@@ -3760,12 +3970,13 @@
             "developer",
             "implementation",
             "design",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "tdd",
             "debugging",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "ripgrep",
             "verification-before-completion",
             "task-management-protocol",
             "git-expert",
@@ -3783,14 +3994,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "medical-research-triage": {
@@ -3807,13 +4018,13 @@
             "medical",
             "research",
             "triage",
-            "scientific-research-expert",
-            "arxiv-mcp",
-            "scientific-skills",
-            "sequential-thinking",
-            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "verification-before-completion"
+            "arxiv-mcp",
+            "scientific-skills"
           ],
           "requiredTools": [
             "Read",
@@ -3833,12 +4044,15 @@
             "Skill"
           ],
           "skills": [
-            "scientific-research-expert",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "arxiv-mcp",
             "scientific-skills",
             "sequential-thinking",
             "task-management-protocol",
-            "token-saver-context-compression",
             "verification-before-completion"
           ],
           "examples": [],
@@ -3846,13 +4060,17 @@
             "medical",
             "research",
             "triage",
-            "scientific-research-expert",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "arxiv-mcp",
             "scientific-skills",
             "sequential-thinking",
             "task-management-protocol",
-            "token-saver-context-compression",
-            "verification-before-completion"
+            "verification-before-completion",
+            "memory-search"
           ]
         }
       ],
@@ -3866,14 +4084,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.227Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.227Z",
+        "updatedAt": "2026-02-23T01:39:07.227Z"
       }
     },
     "microservices-architect": {
@@ -3890,13 +4108,13 @@
             "microservices",
             "architect",
             "design",
-            "architecture-review",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
-            "diagram-generator",
-            "ripgrep"
+            "token-saver-context-compression",
+            "architecture-review",
+            "diagram-generator"
           ],
           "requiredTools": [
             "Read",
@@ -3915,13 +4133,13 @@
             "Skill"
           ],
           "skills": [
-            "architecture-review",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "architecture-review",
             "diagram-generator",
-            "ripgrep",
             "sequential-thinking",
             "task-management-protocol",
             "verification-before-completion"
@@ -3931,16 +4149,17 @@
             "microservices",
             "architect",
             "design",
-            "architecture-review",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
             "context-compressor",
+            "token-saver-context-compression",
+            "architecture-review",
             "diagram-generator",
-            "ripgrep",
             "sequential-thinking",
             "task-management-protocol",
-            "verification-before-completion"
+            "verification-before-completion",
+            "memory-search"
           ]
         }
       ],
@@ -3954,14 +4173,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "mobile-ux-reviewer": {
@@ -3980,11 +4199,11 @@
             "reviewing",
             "design",
             "audits",
-            "task-management-protocol",
             "accessibility",
-            "checklist-generator",
-            "code-semantic-search",
-            "token-saver-context-compression"
+            "mobile-first-design-rules",
+            "mobile-ui-development-rule",
+            "task-management-protocol",
+            "verification-before-completion"
           ],
           "requiredTools": [
             "Read",
@@ -4002,16 +4221,16 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
             "accessibility",
-            "checklist-generator",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "design-and-user-experience-guidelines",
-            "diagram-generator",
-            "doc-generator",
             "mobile-first-design-rules",
-            "mobile-ui-development-rule"
+            "mobile-ui-development-rule",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
@@ -4020,16 +4239,16 @@
             "reviewing",
             "design",
             "audits",
-            "task-management-protocol",
             "accessibility",
-            "checklist-generator",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "design-and-user-experience-guidelines",
-            "diagram-generator",
-            "doc-generator",
             "mobile-first-design-rules",
-            "mobile-ui-development-rule"
+            "mobile-ui-development-rule",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ]
         }
       ],
@@ -4043,14 +4262,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "nextjs-pro": {
@@ -4067,13 +4286,13 @@
             "nextjs",
             "pro",
             "building",
+            "nextjs-expert",
+            "react-expert",
             "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
-            "nextjs-expert"
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -4091,34 +4310,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "nextjs-expert",
-            "react-best-practices-vercel",
             "react-expert",
-            "ripgrep"
+            "task-management-protocol",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "nextjs",
             "pro",
             "building",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "nextjs-expert",
-            "react-best-practices-vercel",
             "react-expert",
+            "task-management-protocol",
+            "typescript-expert",
+            "verification-before-completion",
             "ripgrep",
-            "state-management-expert",
-            "styling-expert"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "debugging",
+            "git-expert"
           ]
         }
       ],
@@ -4132,14 +4351,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "nodejs-pro": {
@@ -4156,13 +4375,13 @@
             "nodejs",
             "pro",
             "building",
+            "nodejs-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "async-operations",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search"
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -4180,34 +4399,34 @@
             "Skill"
           ],
           "skills": [
+            "nodejs-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "async-operations",
-            "code-quality-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "debugging",
-            "git-expert",
-            "nodejs-expert"
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "nodejs",
             "pro",
             "building",
-            "task-management-protocol",
-            "api-development-expert",
-            "async-operations",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
             "nodejs-expert",
+            "task-management-protocol",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
             "ripgrep",
-            "tdd"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
+            "async-operations"
           ]
         }
       ],
@@ -4221,14 +4440,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "php-pro": {
@@ -4245,13 +4464,13 @@
             "php",
             "pro",
             "building",
+            "debugging",
+            "php-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "composer-dependency-management",
-            "debugging"
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -4269,34 +4488,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "composer-dependency-management",
             "debugging",
-            "doc-generator",
-            "git-expert",
-            "php-expert"
+            "php-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "php",
             "pro",
             "building",
-            "task-management-protocol",
-            "api-development-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "composer-dependency-management",
             "debugging",
-            "doc-generator",
-            "git-expert",
             "php-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
             "ripgrep",
-            "tall-stack-general"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "api-development-expert",
+            "composer-dependency-management"
           ]
         }
       ],
@@ -4310,14 +4529,101 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
+      }
+    },
+    "pm-coordinator": {
+      "id": "pm-coordinator",
+      "displayName": "pm-coordinator",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/pm-coordinator.md",
+      "capabilities": [
+        {
+          "name": "pm-coordinator",
+          "domain": "code",
+          "description": "Expert project manager and cross-team coordinator specializing in sprint planning, roadmap management, stakeholder communication, and delivery coordination. Masters Jira, Linear, and GitHub Project...",
+          "triggerPhrases": [
+            "coordinator",
+            "planning",
+            "jira-pm",
+            "linear-pm",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "context-compressor",
+            "token-saver-context-compression",
+            "ripgrep"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "MemoryRecord",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill"
+          ],
+          "skills": [
+            "jira-pm",
+            "linear-pm",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "context-compressor",
+            "token-saver-context-compression",
+            "ripgrep",
+            "code-semantic-search",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "coordinator",
+            "planning",
+            "jira-pm",
+            "linear-pm",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "context-compressor",
+            "token-saver-context-compression",
+            "ripgrep",
+            "code-semantic-search",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.1.0",
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "prompt-engineer": {
@@ -4338,9 +4644,9 @@
             "optimizes",
             "testing",
             "design",
-            "advanced-elicitation",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression"
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -4358,14 +4664,15 @@
             "Skill"
           ],
           "skills": [
-            "advanced-elicitation",
-            "code-semantic-search",
-            "token-saver-context-compression",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "advanced-elicitation",
             "verification-before-completion",
             "task-management-protocol",
             "code-analyzer",
-            "code-structural-search",
             "git-expert"
           ],
           "examples": [],
@@ -4377,14 +4684,14 @@
             "optimizes",
             "testing",
             "design",
-            "advanced-elicitation",
-            "code-semantic-search",
-            "token-saver-context-compression",
             "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "advanced-elicitation",
             "verification-before-completion",
-            "task-management-protocol",
-            "code-analyzer",
-            "code-structural-search"
+            "task-management-protocol"
           ]
         }
       ],
@@ -4398,14 +4705,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "python-pro": {
@@ -4421,14 +4728,14 @@
           "triggerPhrases": [
             "python",
             "pro",
+            "debugging",
+            "python-backend-expert",
             "task-management-protocol",
-            "api-development-expert",
-            "code-quality-expert",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "comprehensive-type-annotations",
-            "comprehensive-unit-testing-with-pytest"
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -4446,34 +4753,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "api-development-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "comprehensive-type-annotations",
-            "comprehensive-unit-testing-with-pytest",
             "debugging",
-            "git-expert"
+            "python-backend-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "python",
             "pro",
+            "debugging",
+            "python-backend-expert",
             "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "api-development-expert",
             "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "comprehensive-type-annotations",
-            "comprehensive-unit-testing-with-pytest",
-            "debugging",
-            "git-expert",
-            "prioritize-python-3-10-features",
-            "python-backend-expert",
-            "ripgrep"
+            "comprehensive-type-annotations"
           ]
         }
       ],
@@ -4487,14 +4794,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "rust-pro": {
@@ -4510,14 +4817,14 @@
           "triggerPhrases": [
             "rust",
             "pro",
-            "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert"
+            "git-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -4535,34 +4842,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
             "git-expert",
+            "task-management-protocol",
+            "tdd",
+            "verification-before-completion",
             "ripgrep",
-            "rust-expert"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "rust",
             "pro",
-            "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
             "git-expert",
-            "ripgrep",
-            "rust-expert",
+            "task-management-protocol",
             "tdd",
             "verification-before-completion",
-            "testing-expert"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "build-tools-expert",
+            "code-quality-expert",
+            "rust-expert"
           ]
         }
       ],
@@ -4576,14 +4883,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "scientific-research-expert": {
@@ -4601,12 +4908,12 @@
             "research",
             "expert",
             "reviews",
-            "task-management-protocol",
-            "arxiv-mcp",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression",
             "code-structural-search",
-            "debugging"
+            "context-compressor",
+            "token-saver-context-compression",
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Read",
@@ -4624,16 +4931,16 @@
             "Skill"
           ],
           "skills": [
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "arxiv-mcp",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
             "diagram-generator",
-            "doc-generator",
-            "jupyter-notebook-best-practices",
-            "python-backend-expert"
+            "doc-generator"
           ],
           "examples": [],
           "tags": [
@@ -4641,17 +4948,17 @@
             "research",
             "expert",
             "reviews",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "arxiv-mcp",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
             "diagram-generator",
             "doc-generator",
-            "jupyter-notebook-best-practices",
-            "python-backend-expert",
-            "research-synthesis"
+            "jupyter-notebook-best-practices"
           ]
         }
       ],
@@ -4665,14 +4972,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.228Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.228Z",
+        "updatedAt": "2026-02-23T01:39:07.228Z"
       }
     },
     "sveltekit-expert": {
@@ -4689,13 +4996,13 @@
             "sveltekit",
             "expert",
             "building",
+            "svelte-expert",
             "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "form-and-actions-in-sveltekit",
-            "git-expert"
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "requiredTools": [
             "Read",
@@ -4713,34 +5020,34 @@
             "Skill"
           ],
           "skills": [
+            "svelte-expert",
             "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "form-and-actions-in-sveltekit",
-            "git-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
             "ripgrep",
-            "seo-and-meta-tags-in-sveltekit",
-            "styling-expert"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "sveltekit",
             "expert",
             "building",
-            "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "form-and-actions-in-sveltekit",
-            "git-expert",
-            "ripgrep",
-            "seo-and-meta-tags-in-sveltekit",
-            "styling-expert",
             "svelte-expert",
-            "tdd"
+            "task-management-protocol",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "debugging",
+            "form-and-actions-in-sveltekit"
           ]
         }
       ],
@@ -4754,14 +5061,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.229Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.229Z",
+        "updatedAt": "2026-02-23T01:39:07.229Z"
       }
     },
     "tauri-desktop-developer": {
@@ -4779,12 +5086,12 @@
             "desktop",
             "developer",
             "building",
+            "svelte-expert",
             "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert"
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep"
           ],
           "requiredTools": [
             "Read",
@@ -4802,16 +5109,16 @@
             "Skill"
           ],
           "skills": [
+            "svelte-expert",
             "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
             "ripgrep",
-            "rust-expert",
-            "tauri-native-api-integration",
-            "tauri-security-rules"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
@@ -4819,17 +5126,17 @@
             "desktop",
             "developer",
             "building",
+            "svelte-expert",
             "task-management-protocol",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
             "ripgrep",
-            "rust-expert",
-            "tauri-native-api-integration",
-            "tauri-security-rules",
-            "tauri-svelte-typescript-general"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
+            "debugging"
           ]
         }
       ],
@@ -4843,14 +5150,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.229Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.229Z",
+        "updatedAt": "2026-02-23T01:39:07.229Z"
       }
     },
     "typescript-pro": {
@@ -4866,14 +5173,14 @@
           "triggerPhrases": [
             "typescript",
             "pro",
-            "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert"
+            "task-management-protocol",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -4891,34 +5198,34 @@
             "Skill"
           ],
           "skills": [
-            "task-management-protocol",
-            "build-tools-expert",
-            "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
             "debugging",
-            "git-expert",
+            "task-management-protocol",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
             "ripgrep",
-            "state-management-expert"
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ],
           "examples": [],
           "tags": [
             "typescript",
             "pro",
+            "debugging",
             "task-management-protocol",
+            "tdd",
+            "typescript-expert",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "build-tools-expert",
             "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
-            "ripgrep",
-            "state-management-expert",
-            "tdd",
-            "tsconfig-json-rules",
-            "typescript-expert"
+            "git-expert"
           ]
         }
       ],
@@ -4932,14 +5239,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.229Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.229Z",
+        "updatedAt": "2026-02-23T01:39:07.229Z"
       }
     },
     "web3-blockchain-expert": {
@@ -4958,11 +5265,11 @@
             "expert",
             "auditing",
             "review",
-            "task-management-protocol",
-            "auth-security-expert",
-            "code-quality-expert",
+            "starknet-react-rules",
+            "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression"
+            "code-structural-search",
+            "context-compressor"
           ],
           "requiredTools": [
             "Read",
@@ -4980,16 +5287,16 @@
             "Skill"
           ],
           "skills": [
+            "starknet-react-rules",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "auth-security-expert",
             "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
-            "ripgrep",
-            "security-architect"
+            "debugging"
           ],
           "examples": [],
           "tags": [
@@ -4998,16 +5305,16 @@
             "expert",
             "auditing",
             "review",
+            "starknet-react-rules",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression",
             "task-management-protocol",
             "auth-security-expert",
             "code-quality-expert",
-            "code-semantic-search",
-            "token-saver-context-compression",
-            "code-structural-search",
-            "debugging",
-            "git-expert",
-            "ripgrep",
-            "security-architect"
+            "debugging"
           ]
         }
       ],
@@ -5021,14 +5328,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.229Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.229Z",
+        "updatedAt": "2026-02-23T01:39:07.229Z"
       }
     },
     "artifact-integrator": {
@@ -5069,16 +5376,16 @@
             "WebFetch"
           ],
           "skills": [
-            "task-management-protocol",
             "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
+            "task-management-protocol",
             "verification-before-completion",
             "agent-creator",
             "command-creator",
-            "hook-creator",
-            "rule-creator",
-            "schema-creator"
+            "hook-creator"
           ],
           "examples": [],
           "tags": [
@@ -5091,12 +5398,12 @@
             "integrate",
             "onboard",
             "ingest",
-            "task-management-protocol",
             "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "verification-before-completion",
-            "agent-creator"
+            "task-management-protocol"
           ]
         }
       ],
@@ -5110,14 +5417,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.795Z",
+        "lastUpdate": "2026-02-23T01:39:07.229Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.795Z",
-        "updatedAt": "2026-02-22T05:51:58.795Z"
+        "createdAt": "2026-02-23T01:39:07.229Z",
+        "updatedAt": "2026-02-23T01:39:07.229Z"
       }
     },
     "evolution-orchestrator": {
@@ -5135,12 +5442,12 @@
             "orchestrator",
             "orchestrates",
             "agent-creator",
-            "agent-updater",
-            "assimilate",
-            "artifact-integrator",
             "artifact-lifecycle",
-            "compliance-policy-check",
-            "command-creator"
+            "command-creator",
+            "research-synthesis",
+            "rule-creator",
+            "skill-creator",
+            "task-management-protocol"
           ],
           "requiredTools": [
             "Read",
@@ -5161,15 +5468,15 @@
           ],
           "skills": [
             "agent-creator",
-            "agent-updater",
-            "assimilate",
-            "artifact-integrator",
             "artifact-lifecycle",
-            "compliance-policy-check",
             "command-creator",
-            "creation-feasibility-gate",
+            "research-synthesis",
             "rule-creator",
-            "tool-creator"
+            "skill-creator",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search"
           ],
           "examples": [],
           "tags": [
@@ -5177,17 +5484,17 @@
             "orchestrator",
             "orchestrates",
             "agent-creator",
-            "agent-updater",
-            "assimilate",
-            "artifact-integrator",
             "artifact-lifecycle",
-            "compliance-policy-check",
             "command-creator",
-            "creation-feasibility-gate",
+            "research-synthesis",
             "rule-creator",
-            "tool-creator",
-            "hook-creator",
-            "semgrep-rule-creator"
+            "skill-creator",
+            "task-management-protocol",
+            "verification-before-completion",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ]
         }
       ],
@@ -5201,14 +5508,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.796Z",
+        "lastUpdate": "2026-02-23T01:39:07.230Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-02-22T05:51:58.796Z",
-        "updatedAt": "2026-02-22T05:51:58.796Z"
+        "createdAt": "2026-02-23T01:39:07.230Z",
+        "updatedAt": "2026-02-23T01:39:07.230Z"
       }
     },
     "master-orchestrator": {
@@ -5226,12 +5533,12 @@
             "orchestrator",
             "coordinates",
             "implements",
-            "artifact-integrator",
-            "complexity-assessment",
             "plan-generator",
             "response-rater",
-            "ripgrep",
-            "sequential-thinking"
+            "subagent-driven-development",
+            "task-management-protocol",
+            "verification-before-completion",
+            "wave-executor"
           ],
           "requiredTools": [
             "Task",
@@ -5250,16 +5557,16 @@
             "Bash"
           ],
           "skills": [
-            "artifact-integrator",
-            "complexity-assessment",
             "plan-generator",
             "response-rater",
-            "ripgrep",
-            "sequential-thinking",
-            "session-handoff",
-            "swarm-coordination",
+            "subagent-driven-development",
             "task-management-protocol",
-            "track-management"
+            "verification-before-completion",
+            "wave-executor",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ],
           "examples": [],
           "tags": [
@@ -5267,17 +5574,17 @@
             "orchestrator",
             "coordinates",
             "implements",
-            "artifact-integrator",
-            "complexity-assessment",
             "plan-generator",
             "response-rater",
-            "ripgrep",
-            "sequential-thinking",
-            "session-handoff",
-            "swarm-coordination",
+            "subagent-driven-development",
             "task-management-protocol",
-            "track-management",
-            "verification-before-completion"
+            "verification-before-completion",
+            "wave-executor",
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
+            "token-saver-context-compression"
           ]
         }
       ],
@@ -5291,14 +5598,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.796Z",
+        "lastUpdate": "2026-02-23T01:39:07.230Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.796Z",
-        "updatedAt": "2026-02-22T05:51:58.796Z"
+        "createdAt": "2026-02-23T01:39:07.230Z",
+        "updatedAt": "2026-02-23T01:39:07.230Z"
       }
     },
     "party-orchestrator": {
@@ -5321,7 +5628,7 @@
             "security-architect",
             "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression"
+            "code-structural-search"
           ],
           "requiredTools": [
             "Read",
@@ -5345,7 +5652,9 @@
             "security-architect",
             "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression"
+            "code-structural-search",
+            "token-saver-context-compression",
+            "memory-search"
           ],
           "examples": [],
           "tags": [
@@ -5358,7 +5667,9 @@
             "security-architect",
             "ripgrep",
             "code-semantic-search",
-            "token-saver-context-compression"
+            "code-structural-search",
+            "token-saver-context-compression",
+            "memory-search"
           ]
         }
       ],
@@ -5372,14 +5683,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.796Z",
+        "lastUpdate": "2026-02-23T01:39:07.230Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-02-22T05:51:58.796Z",
-        "updatedAt": "2026-02-22T05:51:58.796Z"
+        "createdAt": "2026-02-23T01:39:07.230Z",
+        "updatedAt": "2026-02-23T01:39:07.230Z"
       }
     },
     "swarm-coordinator": {
@@ -5396,13 +5707,13 @@
             "swarm",
             "coordinator",
             "consensus-voting",
-            "context-compressor",
-            "plan-generator",
-            "ripgrep",
             "swarm-coordination",
             "task-management-protocol",
             "verification-before-completion",
-            "code-semantic-search"
+            "ripgrep",
+            "code-semantic-search",
+            "code-structural-search",
+            "context-compressor"
           ],
           "requiredTools": [
             "Task",
@@ -5420,29 +5731,31 @@
           ],
           "skills": [
             "consensus-voting",
-            "context-compressor",
-            "plan-generator",
-            "ripgrep",
             "swarm-coordination",
             "task-management-protocol",
             "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
-            "dispatching-parallel-agents"
+            "plan-generator"
           ],
           "examples": [],
           "tags": [
             "swarm",
             "coordinator",
             "consensus-voting",
-            "context-compressor",
-            "plan-generator",
-            "ripgrep",
             "swarm-coordination",
             "task-management-protocol",
             "verification-before-completion",
+            "ripgrep",
             "code-semantic-search",
+            "code-structural-search",
+            "context-compressor",
             "token-saver-context-compression",
+            "plan-generator",
+            "memory-search",
             "dispatching-parallel-agents"
           ]
         }
@@ -5457,93 +5770,232 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-02-22T05:51:58.796Z",
+        "lastUpdate": "2026-02-23T01:39:07.230Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-02-22T05:51:58.796Z",
-        "updatedAt": "2026-02-22T05:51:58.796Z"
+        "createdAt": "2026-02-23T01:39:07.230Z",
+        "updatedAt": "2026-02-23T01:39:07.230Z"
       }
     }
   },
   "index": {
     "byCapability": {
-      "architect": ["architect"],
-      "context-compressor": ["context-compressor"],
-      "developer": ["developer"],
-      "planner": ["planner"],
-      "pm": ["pm"],
-      "qa": ["qa"],
-      "reflection-agent": ["reflection-agent"],
-      "router": ["router"],
-      "technical-program-manager": ["technical-program-manager"],
-      "technical-writer": ["technical-writer"],
-      "accessibility-tester": ["accessibility-tester"],
-      "c4-code": ["c4-code"],
-      "c4-component": ["c4-component"],
-      "c4-container": ["c4-container"],
-      "c4-context": ["c4-context"],
-      "chaos-engineer": ["chaos-engineer"],
-      "code-reviewer": ["code-reviewer"],
-      "code-simplifier": ["code-simplifier"],
-      "conductor-validator": ["conductor-validator"],
-      "database-architect": ["database-architect"],
-      "devops-troubleshooter": ["devops-troubleshooter"],
-      "devops": ["devops"],
-      "incident-responder": ["incident-responder"],
-      "penetration-tester": ["penetration-tester"],
-      "performance-engineer": ["performance-engineer"],
-      "researcher": ["researcher"],
-      "reverse-engineer": ["reverse-engineer"],
-      "security-architect": ["security-architect"],
-      "sre-engineer": ["sre-engineer"],
-      "ai-ml-specialist": ["ai-ml-specialist"],
-      "android": ["android-pro"],
-      "api-designer": ["api-designer"],
-      "data-engineer": ["data-engineer"],
-      "expo-mobile-developer": ["expo-mobile-developer"],
-      "fastapi": ["fastapi-pro"],
-      "frontend": ["frontend-pro"],
-      "gamedev": ["gamedev-pro"],
-      "golang": ["golang-pro"],
-      "graphql": ["graphql-pro"],
-      "ios": ["ios-pro"],
-      "java": ["java-pro"],
-      "llm-architect": ["llm-architect"],
-      "mcp-developer": ["mcp-developer"],
-      "medical-research-triage": ["medical-research-triage"],
-      "microservices-architect": ["microservices-architect"],
-      "mobile-ux-reviewer": ["mobile-ux-reviewer"],
-      "nextjs": ["nextjs-pro"],
-      "nodejs": ["nodejs-pro"],
-      "php": ["php-pro"],
-      "prompt-engineer": ["prompt-engineer"],
-      "python": ["python-pro"],
-      "rust": ["rust-pro"],
-      "scientific-research": ["scientific-research-expert"],
-      "sveltekit": ["sveltekit-expert"],
-      "tauri-desktop-developer": ["tauri-desktop-developer"],
-      "typescript": ["typescript-pro"],
-      "web3-blockchain": ["web3-blockchain-expert"],
-      "artifact-integrator": ["artifact-integrator"],
-      "evolution-orchestrator": ["evolution-orchestrator"],
-      "master-orchestrator": ["master-orchestrator"],
-      "party-orchestrator": ["party-orchestrator"],
-      "swarm-coordinator": ["swarm-coordinator"]
+      "architect": [
+        "architect"
+      ],
+      "context-compressor": [
+        "context-compressor"
+      ],
+      "developer": [
+        "developer"
+      ],
+      "planner": [
+        "planner"
+      ],
+      "pm": [
+        "pm"
+      ],
+      "qa": [
+        "qa"
+      ],
+      "reflection-agent": [
+        "reflection-agent"
+      ],
+      "router": [
+        "router"
+      ],
+      "technical-program-manager": [
+        "technical-program-manager"
+      ],
+      "technical-writer": [
+        "technical-writer"
+      ],
+      "accessibility-tester": [
+        "accessibility-tester"
+      ],
+      "advanced-debugging": [
+        "advanced-debugging"
+      ],
+      "c4-code": [
+        "c4-code"
+      ],
+      "c4-component": [
+        "c4-component"
+      ],
+      "c4-container": [
+        "c4-container"
+      ],
+      "c4-context": [
+        "c4-context"
+      ],
+      "chaos-engineer": [
+        "chaos-engineer"
+      ],
+      "code-reviewer": [
+        "code-reviewer"
+      ],
+      "code-simplifier": [
+        "code-simplifier"
+      ],
+      "conductor-validator": [
+        "conductor-validator"
+      ],
+      "database-architect": [
+        "database-architect"
+      ],
+      "devops-troubleshooter": [
+        "devops-troubleshooter"
+      ],
+      "devops": [
+        "devops"
+      ],
+      "incident-responder": [
+        "incident-responder"
+      ],
+      "penetration-tester": [
+        "penetration-tester"
+      ],
+      "performance-engineer": [
+        "performance-engineer"
+      ],
+      "researcher": [
+        "researcher"
+      ],
+      "reverse-engineer": [
+        "reverse-engineer"
+      ],
+      "security-architect": [
+        "security-architect"
+      ],
+      "sre-engineer": [
+        "sre-engineer"
+      ],
+      "ai-ml-specialist": [
+        "ai-ml-specialist"
+      ],
+      "android": [
+        "android-pro"
+      ],
+      "api-designer": [
+        "api-designer"
+      ],
+      "data-engineer": [
+        "data-engineer"
+      ],
+      "expo-mobile-developer": [
+        "expo-mobile-developer"
+      ],
+      "fastapi": [
+        "fastapi-pro"
+      ],
+      "frontend": [
+        "frontend-pro"
+      ],
+      "gamedev": [
+        "gamedev-pro"
+      ],
+      "golang": [
+        "golang-pro"
+      ],
+      "graphql": [
+        "graphql-pro"
+      ],
+      "ios": [
+        "ios-pro"
+      ],
+      "java": [
+        "java-pro"
+      ],
+      "kubernetes-specialist": [
+        "kubernetes-specialist"
+      ],
+      "llm-architect": [
+        "llm-architect"
+      ],
+      "mcp-developer": [
+        "mcp-developer"
+      ],
+      "medical-research-triage": [
+        "medical-research-triage"
+      ],
+      "microservices-architect": [
+        "microservices-architect"
+      ],
+      "mobile-ux-reviewer": [
+        "mobile-ux-reviewer"
+      ],
+      "nextjs": [
+        "nextjs-pro"
+      ],
+      "nodejs": [
+        "nodejs-pro"
+      ],
+      "php": [
+        "php-pro"
+      ],
+      "pm-coordinator": [
+        "pm-coordinator"
+      ],
+      "prompt-engineer": [
+        "prompt-engineer"
+      ],
+      "python": [
+        "python-pro"
+      ],
+      "rust": [
+        "rust-pro"
+      ],
+      "scientific-research": [
+        "scientific-research-expert"
+      ],
+      "sveltekit": [
+        "sveltekit-expert"
+      ],
+      "tauri-desktop-developer": [
+        "tauri-desktop-developer"
+      ],
+      "typescript": [
+        "typescript-pro"
+      ],
+      "web3-blockchain": [
+        "web3-blockchain-expert"
+      ],
+      "artifact-integrator": [
+        "artifact-integrator"
+      ],
+      "evolution-orchestrator": [
+        "evolution-orchestrator"
+      ],
+      "master-orchestrator": [
+        "master-orchestrator"
+      ],
+      "party-orchestrator": [
+        "party-orchestrator"
+      ],
+      "swarm-coordinator": [
+        "swarm-coordinator"
+      ]
     },
     "byDomain": {
-      "security": ["architect", "penetration-tester", "api-designer", "party-orchestrator"],
+      "security": [
+        "architect",
+        "penetration-tester",
+        "security-architect",
+        "api-designer",
+        "party-orchestrator"
+      ],
       "code": [
         "context-compressor",
         "developer",
         "planner",
-        "qa",
         "reflection-agent",
         "router",
         "technical-program-manager",
         "accessibility-tester",
+        "advanced-debugging",
         "c4-code",
         "c4-component",
         "chaos-engineer",
@@ -5554,7 +6006,6 @@
         "incident-responder",
         "performance-engineer",
         "reverse-engineer",
-        "security-architect",
         "sre-engineer",
         "ai-ml-specialist",
         "android-pro",
@@ -5567,10 +6018,12 @@
         "graphql-pro",
         "ios-pro",
         "java-pro",
+        "kubernetes-specialist",
         "mcp-developer",
         "nextjs-pro",
         "nodejs-pro",
         "php-pro",
+        "pm-coordinator",
         "prompt-engineer",
         "python-pro",
         "rust-pro",
@@ -5580,8 +6033,15 @@
         "typescript-pro",
         "web3-blockchain-expert"
       ],
-      "planning": ["pm"],
-      "documentation": ["technical-writer"],
+      "planning": [
+        "pm"
+      ],
+      "testing": [
+        "qa"
+      ],
+      "documentation": [
+        "technical-writer"
+      ],
       "architecture": [
         "c4-container",
         "c4-context",
@@ -5589,9 +6049,16 @@
         "llm-architect",
         "microservices-architect"
       ],
-      "devops": ["devops"],
-      "research": ["researcher", "medical-research-triage"],
-      "mobile": ["mobile-ux-reviewer"],
+      "devops": [
+        "devops"
+      ],
+      "research": [
+        "researcher",
+        "medical-research-triage"
+      ],
+      "mobile": [
+        "mobile-ux-reviewer"
+      ],
       "orchestration": [
         "artifact-integrator",
         "evolution-orchestrator",
@@ -5614,6 +6081,7 @@
       ],
       "specialized": [
         "accessibility-tester",
+        "advanced-debugging",
         "c4-code",
         "c4-component",
         "c4-container",
@@ -5646,6 +6114,7 @@
         "graphql-pro",
         "ios-pro",
         "java-pro",
+        "kubernetes-specialist",
         "llm-architect",
         "mcp-developer",
         "medical-research-triage",
@@ -5654,6 +6123,7 @@
         "nextjs-pro",
         "nodejs-pro",
         "php-pro",
+        "pm-coordinator",
         "prompt-engineer",
         "python-pro",
         "rust-pro",
@@ -5685,6 +6155,7 @@
       "technical-program-manager",
       "technical-writer",
       "accessibility-tester",
+      "advanced-debugging",
       "c4-code",
       "c4-component",
       "c4-container",
@@ -5715,6 +6186,7 @@
       "graphql-pro",
       "ios-pro",
       "java-pro",
+      "kubernetes-specialist",
       "llm-architect",
       "mcp-developer",
       "medical-research-triage",
@@ -5723,6 +6195,7 @@
       "nextjs-pro",
       "nodejs-pro",
       "php-pro",
+      "pm-coordinator",
       "prompt-engineer",
       "python-pro",
       "rust-pro",

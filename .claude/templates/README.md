@@ -91,7 +91,7 @@ Structured report output templates for agent deliverables.
 
 **Usage:**
 
-Agents copy these templates to `.claude/context/reports/<category>/` and fill in sections. Reports follow workspace conventions with provenance headers and ISO date suffixes.
+Agents copy these templates to `.claude/context/reports/backend/<category>/` and fill in sections. Reports follow workspace conventions with provenance headers and ISO date suffixes.
 
 ### Code Style Templates (`code-styles/`)
 
@@ -361,20 +361,20 @@ The agent template is optimized for current subagent behavior:
 
 ## Quick Reference
 
-| Creating      | Template                         | CLAUDE.md Section         | Output Path                                 | Count |
-| ------------- | -------------------------------- | ------------------------- | ------------------------------------------- | ----- |
-| Agent         | `agents/agent-template.md`       | Section 3 (Routing Table) | `.claude/agents/<category>/`                | 1     |
-| Skill         | `skills/skill-template.md`       | Section 8.5 (Skills)      | `.claude/skills/<name>/SKILL.md`            | 1     |
-| Workflow      | `workflows/workflow-template.md` | Section 3 (Workflows)     | `.claude/workflows/<category>/`             | 1     |
-| Spawn         | `spawn/<spawn-type>.md`          | Section 2 (Spawning)      | Used by router (not copied)                 | 4     |
-| Report        | `reports/<report-type>.md`       | N/A                       | `.claude/context/reports/<category>/`       | 5     |
-| Specification | `specification-template.md`      | N/A                       | `.claude/context/artifacts/specifications/` | 1     |
-| Plan          | `plan-template.md`               | N/A                       | `.claude/context/plans/`                    | 1     |
-| Tasks         | `tasks-template.md`              | N/A                       | `.claude/context/artifacts/plans/`          | 1     |
-| Code Style    | `code-styles/<language>.md`      | N/A                       | Used as reference (not copied)              | 3     |
-| Hook          | `hooks/<hook-type>.md`           | N/A                       | `.claude/hooks/<category>/`                 | 0     |
-| Code Pattern  | `code/<language>-<pattern>.md`   | N/A                       | Project source                              | 0     |
-| Schema        | `schemas/<schema-type>.md`       | N/A                       | `.claude/schemas/`                          | 0     |
+| Creating      | Template                         | CLAUDE.md Section         | Output Path                                   | Count |
+| ------------- | -------------------------------- | ------------------------- | --------------------------------------------- | ----- |
+| Agent         | `agents/agent-template.md`       | Section 3 (Routing Table) | `.claude/agents/<category>/`                  | 1     |
+| Skill         | `skills/skill-template.md`       | Section 8.5 (Skills)      | `.claude/skills/<name>/SKILL.md`              | 1     |
+| Workflow      | `workflows/workflow-template.md` | Section 3 (Workflows)     | `.claude/workflows/<category>/`               | 1     |
+| Spawn         | `spawn/<spawn-type>.md`          | Section 2 (Spawning)      | Used by router (not copied)                   | 4     |
+| Report        | `reports/<report-type>.md`       | N/A                       | `.claude/context/reports/backend/<category>/` | 5     |
+| Specification | `specification-template.md`      | N/A                       | `.claude/context/artifacts/specifications/`   | 1     |
+| Plan          | `plan-template.md`               | N/A                       | `.claude/context/plans/`                      | 1     |
+| Tasks         | `tasks-template.md`              | N/A                       | `.claude/context/artifacts/plans/`            | 1     |
+| Code Style    | `code-styles/<language>.md`      | N/A                       | Used as reference (not copied)                | 3     |
+| Hook          | `hooks/<hook-type>.md`           | N/A                       | `.claude/hooks/<category>/`                   | 0     |
+| Code Pattern  | `code/<language>-<pattern>.md`   | N/A                       | Project source                                | 0     |
+| Schema        | `schemas/<schema-type>.md`       | N/A                       | `.claude/schemas/`                            | 0     |
 
 ## Template Catalog
 

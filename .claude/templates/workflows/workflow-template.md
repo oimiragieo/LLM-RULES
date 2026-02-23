@@ -134,7 +134,7 @@ Review {{ARTIFACT}} for {{REVIEW_FOCUS_A}}.
 ## Instructions
 1. Read your agent definition: .claude/agents/{{CATEGORY}}/{{AGENT_A_FILE}}.md
 2. Review: .claude/context/{{ARTIFACT_PATH}}
-3. Document findings in: .claude/context/reports/{{AGENT_A}}-review.md
+3. Document findings in: .claude/context/reports/ecosystem-audit/{{AGENT_A}}-review.md
 `,
 });
 
@@ -150,7 +150,7 @@ Review {{ARTIFACT}} for {{REVIEW_FOCUS_B}}.
 ## Instructions
 1. Read your agent definition: .claude/agents/{{CATEGORY}}/{{AGENT_B_FILE}}.md
 2. Review: .claude/context/{{ARTIFACT_PATH}}
-3. Document findings in: .claude/context/reports/{{AGENT_B}}-review.md
+3. Document findings in: .claude/context/reports/ecosystem-audit/{{AGENT_B}}-review.md
 `,
 });
 ```
@@ -180,8 +180,8 @@ Task({
 ## Instructions
 1. Read your agent definition: .claude/agents/{{CATEGORY}}/{{AGENT_FILE}}.md
 2. Read review outputs:
-   - .claude/context/reports/{{AGENT_A}}-review.md
-   - .claude/context/reports/{{AGENT_B}}-review.md
+   - .claude/context/reports/ecosystem-audit/{{AGENT_A}}-review.md
+   - .claude/context/reports/ecosystem-audit/{{AGENT_B}}-review.md
 3. {{CONSOLIDATION_INSTRUCTION}}
 4. Save final output to: .claude/context/{{FINAL_OUTPUT_PATH}}
 

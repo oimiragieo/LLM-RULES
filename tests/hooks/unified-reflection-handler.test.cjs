@@ -78,9 +78,10 @@ function assertDeepEqual(actual, expected, message) {
   }
 }
 
-// Test setup/teardown helpers
-const TEST_QUEUE_FILE = path.join(__dirname, '../../context/test-unified-reflection-queue.jsonl');
-
+const TEST_QUEUE_FILE = path.join(
+  __dirname,
+  '../../.claude/context/test-unified-reflection-queue.jsonl'
+);
 function cleanupTestQueue() {
   if (fs.existsSync(TEST_QUEUE_FILE)) {
     fs.unlinkSync(TEST_QUEUE_FILE);
