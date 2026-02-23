@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-23T05:19:18.842Z",
+  "generatedAt": "2026-02-23T05:31:18.603Z",
   "metadata": {
-    "totalSkills": 390,
+    "totalSkills": 391,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-23T05:19:18.843Z",
+    "lastValidated": "2026-02-23T05:31:18.604Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -842,11 +842,10 @@
       "displayName": "Omega Cursor Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Other - omega-cursor-cli",
+      "description": "Shell out to Cursor Agent CLI for headless IDE-aware code tasks. Supports multi-model routing (auto mode routes to Claude, Gemini, GPT). Requires Cursor Pro/Business subscription.",
       "requiredTools": [
-        "Read",
-        "Write",
-        "Edit"
+        "Bash",
+        "Read"
       ],
       "agentPrimary": [
         "developer"
@@ -3410,6 +3409,28 @@
       "tags": [
         "other",
         "linear-pm"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "llm-council": {
+      "name": "llm-council",
+      "displayName": "Llm Council",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - llm-council",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "llm-council"
       ],
       "priority": 3,
       "aliasOf": null
@@ -9445,6 +9466,7 @@
         "integration/artifact-updater",
         "jira-pm",
         "linear-pm",
+        "llm-council",
         "medusa",
         "medusa-security",
         "memory-quality-auditor",
@@ -9916,6 +9938,7 @@
         "k8s-manifest-generator",
         "k8s-security-policies",
         "linear-pm",
+        "llm-council",
         "logging-module-usage",
         "medusa",
         "medusa-security",
@@ -10378,6 +10401,7 @@
         "k8s-security-policies",
         "kubernetes-flux",
         "linear-pm",
+        "llm-council",
         "logging-module-usage",
         "medusa",
         "medusa-security",
@@ -10640,6 +10664,7 @@
         "code-style-validator",
         "dynamic-api-integration",
         "omega-codex-cli",
+        "omega-cursor-cli",
         "omega-gemini-cli",
         "incident-runbook-templates",
         "html-tailwind-css-and-javascript-expert-rule",
@@ -11032,7 +11057,6 @@
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
-        "omega-cursor-cli",
         "incident-runbook-templates",
         "code-structural-search",
         "advanced-elicitation",
@@ -11117,6 +11141,7 @@
         "k8s-manifest-generator",
         "k8s-security-policies",
         "kubernetes-flux",
+        "llm-council",
         "logging-module-usage",
         "medusa",
         "medusa-security",
@@ -11375,7 +11400,6 @@
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
-        "omega-cursor-cli",
         "code-structural-search",
         "function-length-and-responsibility",
         "html-tailwind-css-and-javascript-expert-rule",
@@ -11439,6 +11463,7 @@
         "jupyter-notebook-best-practices",
         "k8s-manifest-generator",
         "k8s-security-policies",
+        "llm-council",
         "logging-module-usage",
         "medusa",
         "medusa-security",
@@ -11855,6 +11880,7 @@
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "linear-pm",
+        "llm-council",
         "logging-module-usage",
         "medusa",
         "medusa-security",
@@ -12635,6 +12661,7 @@
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
         "linear-pm",
+        "llm-council",
         "logging-module-usage",
         "medusa",
         "medusa-security",

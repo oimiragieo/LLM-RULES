@@ -1,4 +1,4 @@
-# Agent Routing Card (60 Agents)
+# Agent Routing Card (61 Agents)
 
 > Compact reference for planners and orchestrators. Read this BEFORE assigning agents to tasks.
 > Source of truth: `.claude/context/agent-registry.json`
@@ -75,6 +75,7 @@
 | web3-blockchain-expert     | Solidity, DeFi, smart contracts, security auditing             |
 | scientific-research-expert | Computational biology, cheminformatics, scientific workflows   |
 | gamedev-pro                | Unity, Unreal, Godot, ECS, game loops, shaders                 |
+| multi-llm-consultant       | Multi-model perspectives, LLM council, cross-validate models   |
 
 ## UX & Research (2)
 

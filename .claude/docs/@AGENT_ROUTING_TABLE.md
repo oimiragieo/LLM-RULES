@@ -57,6 +57,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | GraphQL APIs                         | `graphql-pro`                | `.claude/agents/domain/graphql-pro.md`                   |
 | Mobile UX review                     | `mobile-ux-reviewer`         | `.claude/agents/domain/mobile-ux-reviewer.md`            |
 | Scientific research                  | `scientific-research-expert` | `.claude/agents/domain/scientific-research-expert.md`    |
+| Multi-LLM consultation               | `multi-llm-consultant`       | `.claude/agents/domain/multi-llm-consultant.md`          |
 | Session analysis                     | `reflection-agent`           | `.claude/agents/core/reflection-agent.md`                |
 | AI/ML/Deep Learning                  | `ai-ml-specialist`           | `.claude/agents/domain/ai-ml-specialist.md`              |
 | Web3/Blockchain/DeFi                 | `web3-blockchain-expert`     | `.claude/agents/domain/web3-blockchain-expert.md`        |

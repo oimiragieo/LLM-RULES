@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-02-23T00:13:49.058Z",
+  "generatedAt": "2026-02-23T05:30:33.529Z",
   "agents": [
     {
       "id": "architect",
@@ -15,6 +15,7 @@
           "tags": [
             "architect",
             "designer",
+            "ecosystem-integrity-scanner",
             "architecture-review",
             "brainstorming",
             "database-architect",
@@ -26,8 +27,7 @@
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
-            "token-saver-context-compression",
-            "api-development-expert"
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -78,16 +78,16 @@
             "tests",
             "refactors",
             "refactor",
+            "ecosystem-integrity-scanner",
             "stale-module-pruner",
-            "advanced-elicitation",
-            "agent-evaluation",
-            "agent-tool-design",
-            "agent-updater",
-            "ai-ml-expert",
-            "android-expert",
-            "angular-expert",
-            "artifact-integrator",
-            "artifact-updater"
+            "task-management-protocol",
+            "ripgrep",
+            "code-semantic-search",
+            "token-saver-context-compression",
+            "verification-before-completion",
+            "memory-search",
+            "tdd",
+            "debugging"
           ],
           "examples": []
         }
@@ -169,6 +169,7 @@
             "test",
             "testing",
             "validates",
+            "ecosystem-integrity-scanner",
             "qa-workflow",
             "strict-user-requirements-adherence",
             "task-management-protocol",
@@ -179,8 +180,7 @@
             "code-semantic-search",
             "code-structural-search",
             "context-compressor",
-            "token-saver-context-compression",
-            "checklist-generator"
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -1476,6 +1476,37 @@
             "code-structural-search",
             "context-compressor",
             "token-saver-context-compression"
+          ],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "multi-llm-consultant",
+      "name": "multi-llm-consultant",
+      "description": "Orchestrates multi-LLM consultation workflows by detecting available external LLM CLIs, dispatching prompts in parallel, and synthesizing results. Supports single-model queries (e.g., \"ask Gemini a...",
+      "version": "1.0.0",
+      "skills": [
+        {
+          "id": "multi-llm-consultant",
+          "name": "multi-llm-consultant",
+          "description": "Orchestrates multi-LLM consultation workflows by detecting available external LLM CLIs, dispatching prompts in parallel, and synthesizing results. Supports single-model queries (e.g., \"ask Gemini a...",
+          "tags": [
+            "multi",
+            "llm",
+            "consultant",
+            "multiple",
+            "perspectives",
+            "ask",
+            "all",
+            "llms",
+            "compare",
+            "what",
+            "claude",
+            "gemini",
+            "council",
+            "multi-llm",
+            "review"
           ],
           "examples": []
         }
