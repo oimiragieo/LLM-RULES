@@ -23,15 +23,10 @@ const {
   compactFallbackMessage,
   buildRouterSelfCheckMessage,
 } = require('./routing-guard-core.shared.cjs');
+const { hasExplicitAgentContext: _hasExplicitAgentContextCore } = require('./routing-guard-core.helpers.cjs');
 
-function hasExplicitAgentContext(hookInput = null) {
-  if (!hookInput || typeof hookInput !== 'object') return false;
-  const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
-  if (taskId) return true;
-  const agentId = String(process.env.CLAUDE_AGENT_ID || '')
-    .trim()
-    .toLowerCase();
-  if (agentId && agentId !== 'router') return true;
+function hasExplicitAgentContext(hookInput = null, cwd = process.cwd()) {
+  if (_hasExplicitAgentContextCore(hookInput, cwd)) return true;
 
   // Fallback: check persistent router state
   try {
@@ -70,7 +65,7 @@ function extractPrimaryShellCommand(command) {
     .toLowerCase();
 }
 
-function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
+function checkRouterBash(toolName, toolInput = {}, hookInput = null, cwd = process.cwd()) {
   if (toolName !== 'Bash') {
     return { pass: true };
   }
@@ -86,7 +81,7 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
     return { pass: true };
   }
 
-  if (hasExplicitAgentContext(hookInput)) {
+  if (hasExplicitAgentContext(hookInput, cwd)) {
     return { pass: true };
   }
   try {
@@ -220,7 +215,7 @@ function checkRouterBash(toolName, toolInput = {}, hookInput = null) {
   }
 }
 
-function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
+function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null, cwd = process.cwd()) {
   const DEBUG = process.env.ROUTER_DEBUG === 'true';
 
   function debugLog(message, data = null) {
@@ -271,7 +266,7 @@ function checkRouterSelfCheck(toolName, toolInput = {}, hookInput = null) {
     lastReset: state.lastReset,
   });
 
-  if (hasExplicitAgentContext(hookInput)) {
+  if (hasExplicitAgentContext(hookInput, cwd)) {
     debugLog('ALLOW: Agent mode or task spawned', {
       mode: state.mode,
       taskSpawned: state.taskSpawned,
