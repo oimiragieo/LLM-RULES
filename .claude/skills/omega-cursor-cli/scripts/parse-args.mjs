@@ -16,6 +16,7 @@ export function assertNonEmptyPrompt(prompt) {
  * @param {string[]} argv - process.argv.slice(2)
  * @returns {{ prompt: string, model: string, outputJson: boolean, yolo: boolean, trust: boolean, approveMcps: boolean, timeoutMs: number, help: boolean }}
  */
+/* eslint-disable-next-line complexity -- CLI arg parser with many flags */
 export function parseCliArgs(argv) {
   const opts = {
     model: '',

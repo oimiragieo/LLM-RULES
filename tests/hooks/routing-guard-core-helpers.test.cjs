@@ -20,9 +20,7 @@ describe('routing-guard-core helpers — hasExplicitAgentContext', () => {
     delete process.env.CLAUDE_AGENT_ID;
 
     // Fresh module load for each test to reset any cached state
-    const modPath = require.resolve(
-      '../../.claude/hooks/routing/routing-guard-core.helpers.cjs'
-    );
+    const modPath = require.resolve('../../.claude/hooks/routing/routing-guard-core.helpers.cjs');
     delete require.cache[modPath];
     hasExplicitAgentContext =
       require('../../.claude/hooks/routing/routing-guard-core.helpers.cjs').hasExplicitAgentContext;
