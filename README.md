@@ -216,13 +216,13 @@ Guidance:
 ### Search Mode Comparison
 
 | Tool/Mode                        | What it does best                                   | Latency profile                                                      | Determinism                 | Token/output profile                    |
-| -------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------- | --------------------------- | --------------------------------------- | ----------------------------------------------- |
+| -------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------- | --------------------------- | --------------------------------------- |
 | `pnpm search:code "query"`       | Conceptual discovery and ranked candidates          | Fast (`~0.2-0.7s` on this repo)                                      | High                        | Compact ranked output (good for agents) |
 | `pnpm search:code "ast:pattern"` | Structural intent with optional ast-grep refinement | Moderate (`~0.18s` warm daemon baseline, higher for explicit `ast:`) | High if pattern is explicit | Compact, structure-aware candidates     |
 | `pnpm search:structure`          | Repo map, entrypoints, dependency orientation       | Fast one-shot structure pass                                         | High                        | Very low output volume                  |
 | `rg -F "literal"`                | Exact symbol/literal lookup                         | Fastest (`~15-35ms` measured)                                        | Highest                     | Larger raw output unless scoped         |
 | `rga "query"`                    | Cross-file search (pdf/docs/archives)               | Slower than `rg`                                                     | High                        | Can be noisy; scope early               |
-| `rg                              | rga -> fzf`                                         | Human interactive narrowing/selection                                | Interactive                 | Operator-dependent                      | Great for manual triage, not default agent path |
+| `rg` → `fzf`                     | Human interactive narrowing/selection               | Interactive                                                          | Operator-dependent          | Great for manual triage, not default agent path |
 
 Selection contract:
 
