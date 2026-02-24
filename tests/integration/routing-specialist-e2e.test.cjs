@@ -134,10 +134,10 @@ describe('E2E: Specialist-First Routing — Check 7 (Misrouting Detection)', () 
       });
 
       if (tc.shouldWarn) {
-        // Misrouting detected: should block and suggest the specialist
-        assert.strictEqual(result.pass, false, `Expected pass=false (block mode) for: ${tc.name}`);
-        assert.strictEqual(result.result, 'block', `Expected result='block' for: ${tc.name}`);
-        assert.ok(result.message, `Expected a blocking message for: ${tc.name}`);
+        // Misrouting detected: should warn and suggest the specialist
+        assert.strictEqual(result.pass, true, `Expected pass=true (warn mode) for: ${tc.name}`);
+        assert.strictEqual(result.result, 'warn', `Expected result='warn' for: ${tc.name}`);
+        assert.ok(result.message, `Expected a warning message for: ${tc.name}`);
         assert.ok(
           result.message.includes(tc.expectedSpecialist),
           `Expected message to mention '${tc.expectedSpecialist}', got: ${result.message}`
@@ -185,6 +185,17 @@ describe('E2E: Specialist-First Routing — Check 7 (Misrouting Detection)', () 
     });
     assert.strictEqual(result.pass, true);
     assert.strictEqual(result.result, undefined);
+  });
+
+  it('should warn by default', () => {
+    delete process.env.SPECIALIST_ROUTING_ENFORCEMENT;
+    const result = checkSpecialistOverride('Task', {
+      prompt: 'You are the developer. Write documentation for the API.',
+      description: 'Documentation task',
+    });
+    assert.strictEqual(result.pass, true, 'Should warn in default warn mode');
+    assert.strictEqual(result.result, 'warn');
+    assert.ok(result.message.includes('technical-writer'));
   });
 
   it('should block when enforcement=block', () => {
@@ -354,7 +365,7 @@ describe('E2E: Cross-Module Integration (Check 7 + Domain Specialist)', () => {
       prompt: 'You are the developer. Write documentation for the new Python API endpoints.',
       description: 'API documentation',
     });
-    assert.strictEqual(check7.result, 'block', 'Check 7 should block docs misrouting');
+    assert.strictEqual(check7.result, 'warn', 'Check 7 should warn docs misrouting');
     assert.ok(
       check7.message.includes('technical-writer'),
       'Check 7 should suggest technical-writer'

@@ -139,11 +139,11 @@ function checkTaskCreate(toolName, hookInput = null) {
   const dedupe = registerBlockAttempt('task-create-guard', toolName, hookInput);
   const message = dedupe.dedupe
     ? compactFallbackMessage(
-        'ROUTER-FIRST PROTOCOL VIOLATION | TASK-CREATE VIOLATION',
-        toolName,
-        dedupe.count,
-        'Spawn PLANNER via Task() before creating additional tasks.'
-      )
+      'ROUTER-FIRST PROTOCOL VIOLATION | TASK-CREATE VIOLATION',
+      toolName,
+      dedupe.count,
+      'Spawn PLANNER via Task() before creating additional tasks.'
+    )
     : buildTaskCreateMessage(complexity);
 
   if (enforcement === 'block') {
@@ -318,6 +318,23 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
         if (enforcement === 'block') {
           return { pass: false, result: 'block', message };
         }
+
+        try {
+          const fs = require('node:fs');
+          const path = require('node:path');
+          let currentDir = __dirname;
+          while (currentDir !== path.parse(currentDir).root && !fs.existsSync(path.join(currentDir, '.claude'))) {
+            currentDir = path.dirname(currentDir);
+          }
+          const issuesPath = path.join(currentDir, '.claude', 'context', 'memory', 'issues.md');
+          if (fs.existsSync(issuesPath)) {
+            const entry = `\n- [ROUTING WARN] Developer task routing warned. Keyword "${phrase}" suggests specialist "${specialist}". Prompt triggered warning instead of block. Date: ${new Date().toISOString()}`;
+            fs.appendFileSync(issuesPath, entry + '\n', 'utf8');
+          }
+        } catch (_err) {
+          // Best effort logging
+        }
+
         return { pass: true, result: 'warn', message };
       }
     }
@@ -382,11 +399,11 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
   const isReadOnlyDiscoveryTool = toolName === 'Glob' || toolName === 'Grep' || toolName === 'Read';
   const message = dedupe.dedupe
     ? compactFallbackMessage(
-        'ROUTER-FIRST PROTOCOL VIOLATION | TASKLIST-FIRST VIOLATION',
-        toolName,
-        dedupe.count,
-        'TaskList() once, then continue with Task()/tool call'
-      )
+      'ROUTER-FIRST PROTOCOL VIOLATION | TASKLIST-FIRST VIOLATION',
+      toolName,
+      dedupe.count,
+      'TaskList() once, then continue with Task()/tool call'
+    )
     : buildTaskListFirstMessage(toolName);
 
   const tracker = getViolationTracker();

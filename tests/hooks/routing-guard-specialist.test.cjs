@@ -249,11 +249,11 @@ test('Check7: empty prompt → no match, allow', () => {
   assert.strictEqual(result.pass, true, 'Should pass (empty prompt, no keywords)');
 });
 
-test('Check7: warn mode instead of block', () => {
+test('Check7: block mode instead of warn', () => {
   const originalMode = process.env.SPECIALIST_ROUTING_ENFORCEMENT;
 
   try {
-    process.env.SPECIALIST_ROUTING_ENFORCEMENT = 'warn';
+    process.env.SPECIALIST_ROUTING_ENFORCEMENT = 'block';
 
     const toolInput = {
       subagent_type: 'developer',
@@ -263,9 +263,9 @@ test('Check7: warn mode instead of block', () => {
 
     const result = checkSpecialistOverride('Task', toolInput);
 
-    assert.strictEqual(result.pass, true, 'Should pass in warn mode');
-    assert.strictEqual(result.result, 'warn', 'Should return warn result');
-    assert.ok(result.message.includes('technical-writer'), 'Should still provide warning message');
+    assert.strictEqual(result.pass, false, 'Should fail in block mode');
+    assert.strictEqual(result.result, 'block', 'Should return block result');
+    assert.ok(result.message.includes('technical-writer'), 'Should provide blocking message');
   } finally {
     if (originalMode !== undefined) {
       process.env.SPECIALIST_ROUTING_ENFORCEMENT = originalMode;
