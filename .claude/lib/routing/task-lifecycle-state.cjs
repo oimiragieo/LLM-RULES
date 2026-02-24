@@ -57,8 +57,8 @@ async function writeTaskStatus(taskId, status) {
       data[taskId] = status;
       atomicWriteJSONSync(TASK_STATUS_FILE, data);
     });
-  } catch (_err) {
-    // Best effort only.
+  } catch (err) {
+    process.stderr.write(`[task-lifecycle] writeTaskStatus error: ${err.message}\n`);
   }
 }
 

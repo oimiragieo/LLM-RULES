@@ -1,8 +1,8 @@
 'use strict';
 
 const DISAMBIGUATION_RULES = {
-  // "llm" could be llm-architect (architecture) or ai-ml-specialist (training)
-  llm: [
+  // "llm_architect" could be llm-architect (architecture) or ai-ml-specialist (training)
+  llm_architect: [
     {
       condition: ['architecture', 'pipeline', 'rag', 'serving', 'design', 'system'],
       prefer: 'llm-architect',
@@ -14,8 +14,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'llm-architect',
     },
   ],
-  // "design" could be architect (system design) or planner (design plan)
-  design: [
+  // "architect" could be architect (system design) or planner (design plan)
+  architect: [
     {
       condition: ['system', 'architecture', 'scalab', 'pattern', 'microservice'],
       prefer: 'architect',
@@ -32,8 +32,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'architect',
     },
   ],
-  // "test" could be qa (testing) or developer (TDD)
-  test: [
+  // "qa" could be qa (testing) or developer (TDD)
+  qa: [
     {
       condition: ['tdd', 'test-driven', 'red-green', 'failing test'],
       prefer: 'developer',
@@ -45,8 +45,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'developer',
     },
   ],
-  // "refactor" could be developer (code) or architect (architecture)
-  refactor: [
+  // "code_simplifier" could be developer (code) or architect (architecture)
+  code_simplifier: [
     {
       condition: ['architecture', 'restructure', 'pattern', 'microservice', 'monolith'],
       prefer: 'architect',
@@ -58,8 +58,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'architect',
     },
   ],
-  // "api" could be many different frameworks
-  api: [
+  // "api_designer" could be many different frameworks
+  api_designer: [
     {
       condition: ['fastapi', 'pydantic', 'python', 'starlette'],
       prefer: 'fastapi-pro',
@@ -81,8 +81,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'graphql-pro',
     },
   ],
-  // "migration" could be database, data engineering, or devops
-  migration: [
+  // "database_architect" could be database, data engineering, or devops
+  database_architect: [
     {
       condition: ['database', 'schema', 'sql', 'table', 'column', 'index'],
       prefer: 'database-architect',
@@ -99,8 +99,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'database-architect',
     },
   ],
-  // "mobile" could be expo, ios, android-pro, or mobile-ux-reviewer
-  mobile: [
+  // "expo" could be expo, ios, android-pro, or mobile-ux-reviewer
+  expo: [
     {
       condition: ['expo', 'react native', 'cross-platform'],
       prefer: 'expo-mobile-developer',
@@ -122,8 +122,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'expo-mobile-developer',
     },
   ],
-  // "component" could be frontend or c4-component
-  component: [
+  // "c4_component" could be frontend or c4-component
+  c4_component: [
     {
       condition: ['c4', 'diagram', 'architecture'],
       prefer: 'c4-component',
@@ -135,8 +135,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'c4-component',
     },
   ],
-  // "debug" could be developer or devops-troubleshooter
-  debug: [
+  // "developer" could be developer or devops-troubleshooter (when debug matches)
+  developer: [
     {
       condition: ['code', 'function', 'test', 'bug', 'exception'],
       prefer: 'developer',
@@ -148,8 +148,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'developer',
     },
   ],
-  // "review" could be code-reviewer or mobile-ux-reviewer
-  review: [
+  // "code_reviewer" could be code-reviewer or mobile-ux-reviewer
+  code_reviewer: [
     {
       condition: ['pr', 'pull request', 'code', 'merge', 'implementation'],
       prefer: 'code-reviewer',
@@ -166,8 +166,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'code-reviewer',
     },
   ],
-  // "database" could be database-architect or data-engineer
-  database: [
+  // "data_engineer" could be database-architect or data-engineer
+  data_engineer: [
     {
       condition: ['schema', 'table', 'index', 'query optimization', 'normalize'],
       prefer: 'database-architect',
@@ -179,8 +179,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'database-architect',
     },
   ],
-  // "performance" could be performance-engineer (optimization/profiling/load-test) or developer (general development)
-  performance: [
+  // "performance_engineer" could be performance-engineer (optimization/profiling/load-test) or developer (general development)
+  performance_engineer: [
     {
       condition: ['optimization', 'profiling', 'load-test', 'benchmark', 'bottleneck', 'latency'],
       prefer: 'performance-engineer',
@@ -192,8 +192,8 @@ const DISAMBIGUATION_RULES = {
       deprioritize: 'performance-engineer',
     },
   ],
-  // "accessibility" could be accessibility-tester (testing/audit/wcag) or frontend-pro (frontend implementation)
-  accessibility: [
+  // "accessibility_tester" could be accessibility-tester (testing/audit/wcag) or frontend-pro (frontend implementation)
+  accessibility_tester: [
     {
       condition: ['testing', 'audit', 'wcag', 'screen-reader', 'compliance'],
       prefer: 'accessibility-tester',

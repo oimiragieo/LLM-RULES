@@ -124,6 +124,14 @@ class MemoryVectorStore {
     return store;
   }
 
+  static clearSharedStores() {
+    for (const [, store] of MemoryVectorStore._sharedStores) {
+      store._shared = false;
+      try { if (typeof store.close === 'function') store.close(); } catch (_e) { /* ignore */ }
+    }
+    MemoryVectorStore._sharedStores.clear();
+  }
+
   /**
    * Initialize GPU detection and configuration
    * @returns {Promise<void>}

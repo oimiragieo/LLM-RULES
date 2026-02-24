@@ -15,50 +15,12 @@ const {
 } = require('./routing-table.cjs');
 const { resolveByPattern } = require('./pattern-router.cjs');
 const { fuzzyMatchIntent, fuzzyMatchIntentAlternatives } = require('./fuzzy-intent-matcher.cjs');
+const { loadCapabilityRouting } = require('./capability-routing-loader.cjs');
 
-const CAPABILITY_ROUTING_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'config',
-  'capability-routing.json'
-);
 const INTENT_FEEDBACK_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'intent-feedback.json');
 
-let capabilityRoutingCache = null;
-
 function loadCapabilityRoutingForClassifier() {
-  if (capabilityRoutingCache) return capabilityRoutingCache;
-  try {
-    const raw = fs.readFileSync(CAPABILITY_ROUTING_PATH, 'utf8');
-    const parsed = safeParseJSON(raw);
-    capabilityRoutingCache = {
-      capabilityMap:
-        parsed && parsed.capabilityMap && typeof parsed.capabilityMap === 'object'
-          ? parsed.capabilityMap
-          : null,
-      defaultAgents:
-        parsed && parsed.defaultAgents && typeof parsed.defaultAgents === 'object'
-          ? parsed.defaultAgents
-          : null,
-      capabilityPriorityOrder:
-        parsed && parsed.capabilityPriority && Array.isArray(parsed.capabilityPriority.order)
-          ? parsed.capabilityPriority.order
-          : [],
-      routingConditions:
-        parsed && parsed.routingConditions && typeof parsed.routingConditions === 'object'
-          ? parsed.routingConditions
-          : null,
-    };
-    return capabilityRoutingCache;
-  } catch (_err) {
-    capabilityRoutingCache = {
-      capabilityMap: null,
-      defaultAgents: null,
-      capabilityPriorityOrder: [],
-      routingConditions: null,
-    };
-    return capabilityRoutingCache;
-  }
+  return loadCapabilityRouting();
 }
 
 function evaluateRoutingCondition(capability, prompt, conditions) {
@@ -79,29 +41,47 @@ function evaluateRoutingCondition(capability, prompt, conditions) {
 }
 
 function matchIntentFromKeywords(promptLower) {
+  let bestMatch = null;
+  let bestScore = 0;
+
   for (const [intentKey, phrases] of Object.entries(INTENT_KEYWORDS)) {
     if (!Array.isArray(phrases)) continue;
+    let matchCount = 0;
+    let longestMatchLen = 0;
+
     for (const phrase of phrases) {
       const kw = String(phrase || '').toLowerCase();
       if (!kw) continue;
 
-      // Use broad matching for URLs and technical patterns, word-boundary for others
       const isTechnical = kw.includes('.') || kw.includes('/') || kw.includes('://');
+      let matched = false;
       if (isTechnical) {
-        if (promptLower.includes(kw)) {
-          return { intent: intentKey, source: 'intent_keywords_broad' };
-        }
+        matched = promptLower.includes(kw);
       } else {
-        // Use word-boundary matching to prevent false positives (e.g. 'going' matching 'go')
         const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const re = new RegExp(`\\b${escaped}\\b`);
-        if (re.test(promptLower)) {
-          return { intent: intentKey, source: 'intent_keywords' };
+        matched = re.test(promptLower);
+      }
+
+      if (matched) {
+        matchCount++;
+        if (kw.length > longestMatchLen) {
+          longestMatchLen = kw.length;
         }
       }
     }
+
+    if (matchCount > 0) {
+      // Score: prioritize more keyword matches, then longer matches
+      const score = matchCount * 100 + longestMatchLen;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = { intent: intentKey, source: 'intent_keywords' };
+      }
+    }
   }
-  return null;
+
+  return bestMatch;
 }
 
 function matchIntentFromRoutingTable(promptLower) {
@@ -190,7 +170,7 @@ function classifyIntent(prompt, options = {}) {
     if (Array.isArray(rules)) {
       for (const rule of rules) {
         if (rule.condition.some(cond => promptLower.includes(cond.toLowerCase()))) {
-          intent = rule.prefer;
+          defaultAgent = rule.prefer;
           source = 'disambiguation';
           // No break here, allow later rules to further disambiguate if needed
         }

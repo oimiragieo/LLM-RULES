@@ -6,7 +6,7 @@
 
 ### Core Technologies
 
-- **Runtime:** Node.js (>=22.5.0), pnpm.
+- **Runtime:** Node.js (>=18.0.0), pnpm.
 - **Search:** Hybrid lazy search model combining **ripgrep** (literal/text) and **LanceDB** (semantic ranking via `@xenova/transformers` or `fastembed`).
 - **Memory:** SQLite entity graph + LanceDB vector store for persistent findings, decisions, and observational memory.
 - **Validation:** **ast-grep** for structural checks, **ajv** for schema validation, and custom JS scripts for ecosystem consistency.

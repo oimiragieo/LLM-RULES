@@ -1,44 +1,10 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { getPreferredAgent } = require('./routing-table.cjs');
-const { safeParseJSON } = require('../utils/safe-json.cjs');
-
-const CAPABILITY_ROUTING_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'config',
-  'capability-routing.json'
-);
-
-let capabilityRoutingCache = null;
+const { loadCapabilityRouting } = require('./capability-routing-loader.cjs');
 
 function loadCapabilityRoutingForResolver() {
-  if (capabilityRoutingCache) return capabilityRoutingCache;
-  try {
-    const raw = fs.readFileSync(CAPABILITY_ROUTING_PATH, 'utf8');
-    const parsed = safeParseJSON(raw);
-    capabilityRoutingCache = {
-      capabilityMap:
-        parsed && parsed.capabilityMap && typeof parsed.capabilityMap === 'object'
-          ? parsed.capabilityMap
-          : null,
-      defaultAgents:
-        parsed && parsed.defaultAgents && typeof parsed.defaultAgents === 'object'
-          ? parsed.defaultAgents
-          : null,
-      domainFallbacks:
-        parsed && parsed.domainFallbacks && typeof parsed.domainFallbacks === 'object'
-          ? parsed.domainFallbacks
-          : null,
-    };
-    return capabilityRoutingCache;
-  } catch (_err) {
-    capabilityRoutingCache = { capabilityMap: null, defaultAgents: null, domainFallbacks: null };
-    return capabilityRoutingCache;
-  }
+  return loadCapabilityRouting();
 }
 
 const CAPABILITY_TO_DOMAIN = {

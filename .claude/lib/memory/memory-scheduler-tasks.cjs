@@ -45,7 +45,7 @@ function createMemorySchedulerTaskRunners(deps) {
         result.details = { skipped: true, reason: 'No active STM session' };
         return result;
       }
-      const consolidateResult = await memoryTiers.consolidateSession('current', projectRoot);
+      const consolidateResult = await memoryTiers.consolidateSessionWithLock('current', projectRoot);
       result.success =
         consolidateResult.success === true || consolidateResult.error === 'No STM session found';
       result.details = consolidateResult;
@@ -452,7 +452,9 @@ function createMemorySchedulerTaskRunners(deps) {
         return result;
       }
 
-      const store = new MemoryVectorStore();
+      const store = new MemoryVectorStore({
+        persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
+      });
       const maintenanceResult = await store.optimize();
       result.success = maintenanceResult.status !== 'failed';
       result.details = maintenanceResult;

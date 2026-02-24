@@ -434,43 +434,29 @@ const INTENT_KEYWORDS = {
   // New skills added 2026-02-21
   'agent-evaluation': [
     'agent-evaluation',
-    'agent',
-    'evaluation',
-    'judge',
-    'framework',
-    'dimension',
-    'rubric',
-    'scoring',
+    'agent evaluation',
+    'evaluation rubric',
+    'agent scoring',
   ],
   'context-degradation': [
     'context-degradation',
-    'context',
-    'degradation',
-    'token',
-    'range',
-    'severity',
-    'zones',
-    'detection',
+    'context degradation',
+    'token degradation',
+    'context window overflow',
   ],
   'property-based-testing': [
     'property-based-testing',
-    'property',
-    'based',
-    'testing',
+    'property based testing',
     'fast-check',
-    'canonical',
-    'categories',
+    'property testing',
   ],
   'agent-tool-design': [
     'agent-tool-design',
-    'agent',
-    'tool',
-    'design',
-    'contract',
-    'principles',
-    'designing',
+    'agent tool design',
+    'tool contract',
+    'tool design principles',
   ],
-  'sharp-edges': ['sharp-edges', 'sharp', 'edges', 'living', 'catalogue', 'known', 'hazard'],
+  'sharp-edges': ['sharp-edges', 'sharp edges', 'known hazard', 'hazard catalogue'],
 
   // === MEDICAL RESEARCH TRIAGE ===
   medical_research_triage: [
@@ -591,7 +577,6 @@ const ALLOWED_INTENT_KEYWORD_OVERLAPS = {
   'user story': ['pm', 'pm_coordinator'],
   vercel: ['nextjs', 'vercel_deploy'],
   wcag: ['accessibility_tester', 'web_design'],
-  agent: ['agent-evaluation', 'agent-tool-design', 'reflection-agent'],
   testing: ['property-based-testing', 'qa'],
 };
 

@@ -1,12 +1,15 @@
 {
-  "$schema": "../../../schemas/agent-skill-matrix.schema.json",
   "version": "1.0.0",
   "description": "Maps agents to their recommended skills by category. Primary skills are essential, secondary are supporting, and contextual are conditionally loaded based on project type.",
-  "lastUpdated": "2026-01-25T00:00:00Z",
+  "lastUpdated": "2026-02-24T15:34:54.846Z",
   "agents": {
     "core": {
       "developer": {
-        "primary": ["tdd", "debugging", "git-expert"],
+        "primary": [
+          "tdd",
+          "debugging",
+          "git-expert"
+        ],
         "secondary": [
           "code-quality-expert",
           "code-analyzer",
@@ -16,95 +19,264 @@
           "github-ops"
         ],
         "contextual": {
-          "python_project": ["python-backend-expert", "comprehensive-unit-testing-with-pytest"],
-          "typescript_project": ["typescript-expert", "testing-expert"],
-          "security_review": ["security-architect"],
-          "context_limited": ["context-compressor"]
+          "python_project": [
+            "python-backend-expert",
+            "comprehensive-unit-testing-with-pytest"
+          ],
+          "typescript_project": [
+            "typescript-expert",
+            "testing-expert"
+          ],
+          "security_review": [
+            "security-architect"
+          ],
+          "context_limited": [
+            "context-compressor"
+          ]
         },
-        "always": ["verification-before-completion", "github-mcp"]
+        "always": [
+          "verification-before-completion",
+          "github-mcp"
+        ]
       },
       "planner": {
-        "primary": ["plan-generator", "sequential-thinking", "complexity-assessment"],
-        "secondary": ["context-compressor", "spec-gathering"],
+        "primary": [
+          "plan-generator",
+          "sequential-thinking",
+          "complexity-assessment"
+        ],
+        "secondary": [
+          "context-compressor",
+          "spec-gathering"
+        ],
         "contextual": {
-          "large_project": ["brainstorming", "diagram-generator"],
-          "multi_agent": ["dispatching-parallel-agents", "swarm-coordination"]
+          "large_project": [
+            "brainstorming",
+            "diagram-generator"
+          ],
+          "multi_agent": [
+            "dispatching-parallel-agents",
+            "swarm-coordination"
+          ]
         },
-        "always": ["task-management-protocol"]
+        "always": [
+          "task-management-protocol"
+        ]
       },
       "architect": {
-        "primary": ["architecture-review", "diagram-generator", "database-architect"],
-        "secondary": ["security-architect", "project-analyzer", "brainstorming"],
+        "primary": [
+          "architecture-review",
+          "diagram-generator",
+          "database-architect"
+        ],
+        "secondary": [
+          "security-architect",
+          "project-analyzer",
+          "brainstorming"
+        ],
         "contextual": {
-          "distributed_system": ["swarm-coordination", "consensus-voting"],
-          "api_design": ["api-development-expert", "graphql-expert"]
+          "distributed_system": [
+            "swarm-coordination",
+            "consensus-voting"
+          ],
+          "api_design": [
+            "api-development-expert",
+            "graphql-expert"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "qa": {
-        "primary": ["tdd", "test-generator", "testing-expert"],
-        "secondary": ["code-analyzer", "rule-auditor", "qa-workflow"],
+        "primary": [
+          "tdd",
+          "test-generator",
+          "testing-expert"
+        ],
+        "secondary": [
+          "code-analyzer",
+          "rule-auditor",
+          "qa-workflow"
+        ],
         "contextual": {
-          "python_project": ["comprehensive-unit-testing-with-pytest"],
-          "security_testing": ["security-architect"],
-          "browser_testing": ["chrome-browser"]
+          "python_project": [
+            "comprehensive-unit-testing-with-pytest"
+          ],
+          "security_testing": [
+            "security-architect"
+          ],
+          "browser_testing": [
+            "chrome-browser"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "technical-writer": {
-        "primary": ["doc-generator", "writing", "readme"],
-        "secondary": ["diagram-generator", "writing-skills"],
+        "primary": [
+          "doc-generator",
+          "writing",
+          "readme"
+        ],
+        "secondary": [
+          "diagram-generator",
+          "writing-skills"
+        ],
         "contextual": {
-          "api_docs": ["api-development-expert"],
-          "architecture_docs": ["architecture-review"]
+          "api_docs": [
+            "api-development-expert"
+          ],
+          "architecture_docs": [
+            "architecture-review"
+          ]
         },
-        "always": ["verification-before-completion"]
+        "always": [
+          "verification-before-completion"
+        ]
       },
       "pm": {
-        "primary": ["plan-generator", "spec-gathering", "complexity-assessment"],
-        "secondary": ["interactive-requirements-gathering", "brainstorming"],
+        "primary": [
+          "plan-generator",
+          "spec-gathering",
+          "complexity-assessment"
+        ],
+        "secondary": [
+          "interactive-requirements-gathering",
+          "brainstorming"
+        ],
         "contextual": {
-          "jira_integration": ["jira-pm"],
-          "linear_integration": ["linear-pm"]
+          "jira_integration": [
+            "jira-pm"
+          ],
+          "linear_integration": [
+            "linear-pm"
+          ]
         },
-        "always": ["task-management-protocol"]
+        "always": [
+          "task-management-protocol"
+        ]
       },
       "context-compressor": {
-        "primary": ["context-compressor", "session-handoff", "summarize-changes"],
-        "secondary": ["insight-extraction"],
+        "primary": [
+          "context-compressor",
+          "session-handoff",
+          "summarize-changes"
+        ],
+        "secondary": [
+          "insight-extraction"
+        ],
         "contextual": {},
         "always": []
       },
       "router": {
-        "primary": ["skill-discovery", "complexity-assessment"],
-        "secondary": ["task-management-protocol"],
+        "primary": [
+          "skill-discovery",
+          "complexity-assessment"
+        ],
+        "secondary": [
+          "task-management-protocol"
+        ],
         "contextual": {},
         "always": []
+      },
+      "reflection-agent": {
+        "primary": [
+          "insight-extraction",
+          "session-handoff"
+        ],
+        "secondary": [
+          "context-compressor",
+          "summarize-changes"
+        ],
+        "contextual": {},
+        "always": []
+      },
+      "technical-program-manager": {
+        "primary": [
+          "plan-generator",
+          "task-management-protocol",
+          "complexity-assessment"
+        ],
+        "secondary": [
+          "sequential-thinking",
+          "spec-gathering"
+        ],
+        "contextual": {
+          "multi_team": [
+            "dispatching-parallel-agents",
+            "swarm-coordination"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
       }
     },
     "domain": {
       "python-pro": {
-        "primary": ["python-backend-expert", "tdd", "debugging"],
-        "secondary": ["testing-expert", "api-development-expert", "git-expert"],
+        "primary": [
+          "python-backend-expert",
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "api-development-expert",
+          "git-expert"
+        ],
         "contextual": {
-          "fastapi_project": ["api-development-expert"],
-          "scientific_project": ["scientific-skills"],
-          "data_project": ["data-expert", "pandas-data-manipulation-rules"]
+          "fastapi_project": [
+            "api-development-expert"
+          ],
+          "scientific_project": [
+            "scientific-skills"
+          ],
+          "data_project": [
+            "data-expert",
+            "pandas-data-manipulation-rules"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "rust-pro": {
-        "primary": ["tdd", "debugging", "git-expert"],
-        "secondary": ["testing-expert", "code-quality-expert"],
+        "primary": [
+          "tdd",
+          "debugging",
+          "git-expert"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-quality-expert"
+        ],
         "contextual": {
           "async_project": [],
-          "systems_project": ["memory-forensics"]
+          "systems_project": [
+            "memory-forensics"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "golang-pro": {
-        "primary": ["go-expert", "tdd", "debugging"],
-        "secondary": ["testing-expert", "api-development-expert", "git-expert"],
+        "primary": [
+          "go-expert",
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "api-development-expert",
+          "git-expert"
+        ],
         "contextual": {
           "fiber_project": [
             "fiber-logging-and-project-structure",
@@ -112,57 +284,139 @@
           ],
           "grpc_project": []
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "typescript-pro": {
-        "primary": ["typescript-expert", "tdd", "debugging"],
-        "secondary": ["testing-expert", "code-quality-expert", "git-expert"],
+        "primary": [
+          "typescript-expert",
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-quality-expert",
+          "git-expert"
+        ],
         "contextual": {
-          "react_project": ["react-expert", "state-management-expert"],
-          "node_project": ["nodejs-expert"]
+          "react_project": [
+            "react-expert",
+            "state-management-expert"
+          ],
+          "node_project": [
+            "nodejs-expert"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "fastapi-pro": {
-        "primary": ["python-backend-expert", "api-development-expert", "tdd"],
-        "secondary": ["debugging", "testing-expert", "database-expert"],
+        "primary": [
+          "python-backend-expert",
+          "api-development-expert",
+          "tdd"
+        ],
+        "secondary": [
+          "debugging",
+          "testing-expert",
+          "database-expert"
+        ],
         "contextual": {
           "async_project": [],
-          "auth_project": ["auth-security-expert", "authentication-flow-rules"]
+          "auth_project": [
+            "auth-security-expert",
+            "authentication-flow-rules"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "frontend-pro": {
-        "primary": ["frontend-expert", "react-expert", "styling-expert"],
-        "secondary": ["ui-components-expert", "accessibility", "testing-expert"],
+        "primary": [
+          "frontend-expert",
+          "react-expert",
+          "styling-expert"
+        ],
+        "secondary": [
+          "ui-components-expert",
+          "accessibility",
+          "testing-expert"
+        ],
         "contextual": {
-          "vue_project": ["vue-expert"],
-          "svelte_project": ["svelte-expert"],
-          "mobile_first": ["mobile-first-design-rules"]
+          "vue_project": [
+            "vue-expert"
+          ],
+          "svelte_project": [
+            "svelte-expert"
+          ],
+          "mobile_first": [
+            "mobile-first-design-rules"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "nodejs-pro": {
-        "primary": ["nodejs-expert", "typescript-expert", "tdd"],
-        "secondary": ["api-development-expert", "debugging", "testing-expert"],
+        "primary": [
+          "nodejs-expert",
+          "typescript-expert",
+          "tdd"
+        ],
+        "secondary": [
+          "api-development-expert",
+          "debugging",
+          "testing-expert"
+        ],
         "contextual": {
           "express_project": [],
           "nestjs_project": []
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "ios-pro": {
-        "primary": ["ios-expert", "tdd", "debugging"],
-        "secondary": ["mobile-ui-development-rule", "testing-expert"],
+        "primary": [
+          "ios-expert",
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "mobile-ui-development-rule",
+          "testing-expert"
+        ],
         "contextual": {
-          "swiftui_project": ["ui-components-expert"],
-          "security_focus": ["security-architect"]
+          "swiftui_project": [
+            "ui-components-expert"
+          ],
+          "security_focus": [
+            "security-architect"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "java-pro": {
-        "primary": ["java-expert", "tdd", "debugging"],
-        "secondary": ["testing-expert", "api-development-expert"],
+        "primary": [
+          "java-expert",
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "api-development-expert"
+        ],
         "contextual": {
           "spring_project": [
             "dto-conventions",
@@ -170,90 +424,428 @@
             "restcontroller-conventions"
           ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "nextjs-pro": {
-        "primary": ["nextjs-expert", "react-expert", "typescript-expert"],
-        "secondary": ["styling-expert", "testing-expert", "seo-and-meta-tags-in-sveltekit"],
+        "primary": [
+          "nextjs-expert",
+          "react-expert",
+          "typescript-expert"
+        ],
+        "secondary": [
+          "styling-expert",
+          "testing-expert",
+          "seo-and-meta-tags-in-sveltekit"
+        ],
         "contextual": {
-          "vercel_deployment": ["vercel-ai-sdk-best-practices"],
+          "vercel_deployment": [
+            "vercel-ai-sdk-best-practices"
+          ],
           "trpc_project": []
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "php-pro": {
-        "primary": ["php-expert", "tdd", "debugging"],
-        "secondary": ["testing-expert", "api-development-expert"],
+        "primary": [
+          "php-expert",
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "api-development-expert"
+        ],
         "contextual": {
-          "laravel_project": ["tall-stack-general"],
-          "composer_project": ["composer-dependency-management"]
+          "laravel_project": [
+            "tall-stack-general"
+          ],
+          "composer_project": [
+            "composer-dependency-management"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "sveltekit-expert": {
-        "primary": ["svelte-expert", "typescript-expert", "tdd"],
-        "secondary": ["styling-expert", "testing-expert"],
+        "primary": [
+          "svelte-expert",
+          "typescript-expert",
+          "tdd"
+        ],
+        "secondary": [
+          "styling-expert",
+          "testing-expert"
+        ],
         "contextual": {
-          "i18n_project": ["paraglide-js-internationalization-i18n"],
-          "form_handling": ["form-and-actions-in-sveltekit"],
-          "seo_focus": ["seo-and-meta-tags-in-sveltekit"]
+          "i18n_project": [
+            "paraglide-js-internationalization-i18n"
+          ],
+          "form_handling": [
+            "form-and-actions-in-sveltekit"
+          ],
+          "seo_focus": [
+            "seo-and-meta-tags-in-sveltekit"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "tauri-desktop-developer": {
-        "primary": ["svelte-expert", "typescript-expert", "tdd"],
-        "secondary": ["tauri-svelte-typescript-general", "tauri-svelte-ui-components"],
+        "primary": [
+          "svelte-expert",
+          "typescript-expert",
+          "tdd"
+        ],
+        "secondary": [
+          "tauri-svelte-typescript-general",
+          "tauri-svelte-ui-components"
+        ],
         "contextual": {
-          "security_focus": ["tauri-security-rules"],
-          "native_api": ["tauri-native-api-integration"]
+          "security_focus": [
+            "tauri-security-rules"
+          ],
+          "native_api": [
+            "tauri-native-api-integration"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "expo-mobile-developer": {
-        "primary": ["react-expert", "expo-framework-rule", "tdd"],
-        "secondary": ["mobile-ui-development-rule", "expo-mobile-app-rule", "testing-expert"],
+        "primary": [
+          "react-expert",
+          "expo-framework-rule",
+          "tdd"
+        ],
+        "secondary": [
+          "mobile-ui-development-rule",
+          "expo-mobile-app-rule",
+          "testing-expert"
+        ],
         "contextual": {
-          "nativewind_styling": ["nativewind-and-tailwind-css-compatibility"]
+          "nativewind_styling": [
+            "nativewind-and-tailwind-css-compatibility"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "data-engineer": {
-        "primary": ["data-expert", "python-backend-expert", "tdd"],
-        "secondary": ["database-expert", "pandas-data-manipulation-rules"],
+        "primary": [
+          "data-expert",
+          "python-backend-expert",
+          "tdd"
+        ],
+        "secondary": [
+          "database-expert",
+          "pandas-data-manipulation-rules"
+        ],
         "contextual": {
-          "large_data": ["large-data-with-dask"],
-          "ml_project": ["ai-ml-expert"],
-          "scientific_project": ["scientific-skills"]
+          "large_data": [
+            "large-data-with-dask"
+          ],
+          "ml_project": [
+            "ai-ml-expert"
+          ],
+          "scientific_project": [
+            "scientific-skills"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "graphql-pro": {
-        "primary": ["graphql-expert", "api-development-expert", "tdd"],
-        "secondary": ["typescript-expert", "testing-expert"],
+        "primary": [
+          "graphql-expert",
+          "api-development-expert",
+          "tdd"
+        ],
+        "secondary": [
+          "typescript-expert",
+          "testing-expert"
+        ],
         "contextual": {
-          "apollo_project": ["state-management-expert"],
-          "relay_project": ["react-expert"]
+          "apollo_project": [
+            "state-management-expert"
+          ],
+          "relay_project": [
+            "react-expert"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "mobile-ux-reviewer": {
-        "primary": ["mobile-ui-development-rule", "mobile-first-design-rules", "accessibility"],
-        "secondary": ["design-and-user-experience-guidelines", "ui-components-expert"],
+        "primary": [
+          "mobile-ui-development-rule",
+          "mobile-first-design-rules",
+          "accessibility"
+        ],
+        "secondary": [
+          "design-and-user-experience-guidelines",
+          "ui-components-expert"
+        ],
         "contextual": {
-          "ios_project": ["ios-expert"],
-          "android_project": ["android-expert"],
-          "react_native_project": ["expo-mobile-app-rule"]
+          "ios_project": [
+            "ios-expert"
+          ],
+          "android_project": [
+            "android-expert"
+          ],
+          "react_native_project": [
+            "expo-mobile-app-rule"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
+      },
+      "ai-ml-specialist": {
+        "primary": [
+          "ai-ml-expert",
+          "python-backend-expert"
+        ],
+        "secondary": [
+          "debugging",
+          "testing-expert"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "android-pro": {
+        "primary": [
+          "android-expert",
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "git-expert"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "gamedev-pro": {
+        "primary": [
+          "gamedev-expert",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-quality-expert"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "scientific-research-expert": {
+        "primary": [
+          "scientific-skills",
+          "research-synthesis"
+        ],
+        "secondary": [
+          "python-backend-expert",
+          "data-expert"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "multi-llm-consultant": {
+        "primary": [
+          "omega-gemini-cli",
+          "omega-codex-cli",
+          "omega-claude-cli"
+        ],
+        "secondary": [
+          "llm-council",
+          "ripgrep"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "web3-blockchain-expert": {
+        "primary": [
+          "web3-expert"
+        ],
+        "secondary": [
+          "security-architect",
+          "testing-expert"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "api-designer": {
+        "primary": [
+          "api-development-expert"
+        ],
+        "secondary": [
+          "code-quality-expert",
+          "testing-expert"
+        ],
+        "contextual": {
+          "graphql_project": [
+            "graphql-expert"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "llm-architect": {
+        "primary": [
+          "ai-ml-expert"
+        ],
+        "secondary": [
+          "architecture-review",
+          "diagram-generator"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "mcp-developer": {
+        "primary": [
+          "tdd",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-quality-expert"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "microservices-architect": {
+        "primary": [
+          "architecture-review",
+          "diagram-generator",
+          "api-development-expert"
+        ],
+        "secondary": [
+          "container-expert",
+          "security-architect"
+        ],
+        "contextual": {
+          "kubernetes_project": [
+            "kubernetes-troubleshooter"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "prompt-engineer": {
+        "primary": [
+          "advanced-elicitation"
+        ],
+        "secondary": [
+          "thinking-tools",
+          "context-compressor"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "pm-coordinator": {
+        "primary": [
+          "plan-generator",
+          "task-management-protocol",
+          "spec-gathering"
+        ],
+        "secondary": [
+          "interactive-requirements-gathering",
+          "brainstorming"
+        ],
+        "contextual": {
+          "jira_integration": [
+            "jira-pm"
+          ],
+          "linear_integration": [
+            "linear-pm"
+          ]
+        },
+        "always": [
+          "task-management-protocol"
+        ]
+      },
+      "kubernetes-specialist": {
+        "primary": [
+          "container-expert",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "incident-runbook-templates"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "medical-research-triage": {
+        "primary": [
+          "research-synthesis",
+          "scientific-skills"
+        ],
+        "secondary": [
+          "insight-extraction"
+        ],
+        "contextual": {},
+        "always": []
       }
     },
     "specialized": {
       "code-reviewer": {
-        "primary": ["code-analyzer", "code-quality-expert", "tdd"],
-        "secondary": ["code-style-validator", "rule-auditor"],
+        "primary": [
+          "code-analyzer",
+          "code-quality-expert",
+          "tdd"
+        ],
+        "secondary": [
+          "code-style-validator",
+          "rule-auditor"
+        ],
         "contextual": {
-          "security_review": ["security-architect"],
-          "performance_review": ["debugging"]
+          "security_review": [
+            "security-architect"
+          ],
+          "performance_review": [
+            "debugging"
+          ]
         },
         "always": [
           "verification-before-completion",
@@ -262,16 +854,36 @@
         ]
       },
       "security-architect": {
-        "primary": ["security-architect", "auth-security-expert", "authentication-flow-rules"],
-        "secondary": ["rule-auditor", "dependency-analyzer", "doc-generator"],
+        "primary": [
+          "security-architect",
+          "auth-security-expert",
+          "authentication-flow-rules"
+        ],
+        "secondary": [
+          "rule-auditor",
+          "dependency-analyzer",
+          "doc-generator"
+        ],
         "contextual": {
-          "web3_project": ["web3-expert"],
-          "reverse_engineering": ["binary-analysis-patterns", "memory-forensics"]
+          "web3_project": [
+            "web3-expert"
+          ],
+          "reverse_engineering": [
+            "binary-analysis-patterns",
+            "memory-forensics"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "devops": {
-        "primary": ["docker-compose", "terraform-infra", "k8s-manifest-generator"],
+        "primary": [
+          "docker-compose",
+          "terraform-infra",
+          "k8s-manifest-generator"
+        ],
         "secondary": [
           "helm-chart-scaffolding",
           "gitops-workflow",
@@ -279,9 +891,15 @@
           "ci-cd-implementation-rule"
         ],
         "contextual": {
-          "aws_project": ["aws-cloud-ops"],
-          "gcp_project": ["gcloud-cli"],
-          "monitoring_focus": ["sentry-monitoring"]
+          "aws_project": [
+            "aws-cloud-ops"
+          ],
+          "gcp_project": [
+            "gcloud-cli"
+          ],
+          "monitoring_focus": [
+            "sentry-monitoring"
+          ]
         },
         "always": [
           "verification-before-completion",
@@ -298,101 +916,395 @@
         ]
       },
       "devops-troubleshooter": {
-        "primary": ["debugging", "docker-compose", "k8s-manifest-generator"],
+        "primary": [
+          "debugging",
+          "docker-compose",
+          "k8s-manifest-generator"
+        ],
         "secondary": [
           "incident-runbook-templates",
           "on-call-handoff-patterns",
           "postmortem-writing"
         ],
         "contextual": {
-          "cloud_issue": ["aws-cloud-ops", "gcloud-cli"],
-          "database_issue": ["database-expert"]
+          "cloud_issue": [
+            "aws-cloud-ops",
+            "gcloud-cli"
+          ],
+          "database_issue": [
+            "database-expert"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "incident-responder": {
-        "primary": ["incident-runbook-templates", "on-call-handoff-patterns", "postmortem-writing"],
-        "secondary": ["debugging", "sentry-monitoring"],
+        "primary": [
+          "incident-runbook-templates",
+          "on-call-handoff-patterns",
+          "postmortem-writing"
+        ],
+        "secondary": [
+          "debugging",
+          "sentry-monitoring"
+        ],
         "contextual": {
-          "security_incident": ["security-architect", "memory-forensics"],
-          "database_incident": ["database-expert"]
+          "security_incident": [
+            "security-architect",
+            "memory-forensics"
+          ],
+          "database_incident": [
+            "database-expert"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "c4-context": {
-        "primary": ["diagram-generator", "architecture-review"],
-        "secondary": ["doc-generator", "project-analyzer"],
+        "primary": [
+          "diagram-generator",
+          "architecture-review"
+        ],
+        "secondary": [
+          "doc-generator",
+          "project-analyzer"
+        ],
         "contextual": {},
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "c4-container": {
-        "primary": ["diagram-generator", "architecture-review", "container-expert"],
-        "secondary": ["doc-generator", "project-analyzer"],
+        "primary": [
+          "diagram-generator",
+          "architecture-review",
+          "container-expert"
+        ],
+        "secondary": [
+          "doc-generator",
+          "project-analyzer"
+        ],
         "contextual": {},
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "c4-component": {
-        "primary": ["diagram-generator", "architecture-review"],
-        "secondary": ["doc-generator", "code-analyzer"],
+        "primary": [
+          "diagram-generator",
+          "architecture-review"
+        ],
+        "secondary": [
+          "doc-generator",
+          "code-analyzer"
+        ],
         "contextual": {},
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "c4-code": {
-        "primary": ["diagram-generator", "code-analyzer"],
-        "secondary": ["doc-generator"],
+        "primary": [
+          "diagram-generator",
+          "code-analyzer"
+        ],
+        "secondary": [
+          "doc-generator"
+        ],
         "contextual": {},
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "conductor-validator": {
-        "primary": ["context-driven-development", "track-management", "workflow-patterns"],
-        "secondary": ["rule-auditor", "project-analyzer"],
+        "primary": [
+          "context-driven-development",
+          "track-management",
+          "workflow-patterns"
+        ],
+        "secondary": [
+          "rule-auditor",
+          "project-analyzer"
+        ],
         "contextual": {},
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "reverse-engineer": {
-        "primary": ["binary-analysis-patterns", "memory-forensics", "protocol-reverse-engineering"],
-        "secondary": ["debugging", "code-analyzer"],
+        "primary": [
+          "binary-analysis-patterns",
+          "memory-forensics",
+          "protocol-reverse-engineering"
+        ],
+        "secondary": [
+          "debugging",
+          "code-analyzer"
+        ],
         "contextual": {
-          "malware_analysis": ["security-architect"],
-          "network_analysis": ["protocol-reverse-engineering"]
+          "malware_analysis": [
+            "security-architect"
+          ],
+          "network_analysis": [
+            "protocol-reverse-engineering"
+          ]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
       },
       "database-architect": {
-        "primary": ["database-architect", "database-expert", "text-to-sql"],
-        "secondary": ["architecture-review", "diagram-generator"],
+        "primary": [
+          "database-architect",
+          "database-expert",
+          "text-to-sql"
+        ],
+        "secondary": [
+          "architecture-review",
+          "diagram-generator"
+        ],
         "contextual": {
-          "drizzle_project": ["drizzle-orm-rules"],
+          "drizzle_project": [
+            "drizzle-orm-rules"
+          ],
           "vercel_kv": []
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol"
+        ]
+      },
+      "accessibility-tester": {
+        "primary": [
+          "accessibility"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-analyzer"
+        ],
+        "contextual": {
+          "browser_testing": [
+            "chrome-browser"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "chaos-engineer": {
+        "primary": [
+          "tdd",
+          "testing-expert"
+        ],
+        "secondary": [
+          "debugging",
+          "container-expert"
+        ],
+        "contextual": {
+          "kubernetes_project": [
+            "kubernetes-troubleshooter"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "penetration-tester": {
+        "primary": [
+          "security-architect"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-analyzer"
+        ],
+        "contextual": {
+          "web_project": [
+            "auth-security-expert"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "performance-engineer": {
+        "primary": [
+          "debugging",
+          "code-analyzer"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-quality-expert"
+        ],
+        "contextual": {
+          "browser_testing": [
+            "chrome-browser"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "sre-engineer": {
+        "primary": [
+          "container-expert",
+          "debugging"
+        ],
+        "secondary": [
+          "testing-expert",
+          "incident-runbook-templates"
+        ],
+        "contextual": {
+          "kubernetes_project": [
+            "kubernetes-troubleshooter"
+          ]
+        },
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "advanced-debugging": {
+        "primary": [
+          "debugging",
+          "memory-forensics",
+          "code-analyzer"
+        ],
+        "secondary": [
+          "testing-expert",
+          "code-quality-expert"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "code-simplifier": {
+        "primary": [
+          "code-quality-expert",
+          "code-analyzer",
+          "code-style-validator"
+        ],
+        "secondary": [
+          "tdd",
+          "debugging"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
+        ]
+      },
+      "researcher": {
+        "primary": [
+          "research-synthesis",
+          "insight-extraction"
+        ],
+        "secondary": [
+          "ripgrep",
+          "context-compressor"
+        ],
+        "contextual": {
+          "scientific_project": [
+            "scientific-skills"
+          ]
+        },
+        "always": []
       }
     },
     "orchestrators": {
       "master-orchestrator": {
-        "primary": ["plan-generator", "task-management-protocol", "response-rater"],
-        "secondary": ["recovery", "swarm-coordination"],
+        "primary": [
+          "plan-generator",
+          "task-management-protocol",
+          "response-rater"
+        ],
+        "secondary": [
+          "recovery",
+          "swarm-coordination"
+        ],
         "contextual": {
-          "parallel_execution": ["dispatching-parallel-agents"],
-          "track_based": ["track-management"],
-          "workflow_creation": ["workflow-creator"]
+          "parallel_execution": [
+            "dispatching-parallel-agents"
+          ],
+          "track_based": [
+            "track-management"
+          ],
+          "workflow_creation": [
+            "workflow-creator"
+          ]
         },
-        "always": ["verification-before-completion", "subagent-driven-development"]
+        "always": [
+          "verification-before-completion",
+          "subagent-driven-development"
+        ]
       },
       "swarm-coordinator": {
-        "primary": ["swarm-coordination", "consensus-voting", "task-management-protocol"],
-        "secondary": ["dispatching-parallel-agents", "context-compressor"],
+        "primary": [
+          "swarm-coordination",
+          "consensus-voting",
+          "task-management-protocol"
+        ],
+        "secondary": [
+          "dispatching-parallel-agents",
+          "context-compressor"
+        ],
         "contextual": {},
-        "always": ["verification-before-completion"]
+        "always": [
+          "verification-before-completion"
+        ]
       },
       "evolution-orchestrator": {
-        "primary": ["research-synthesis", "agent-creator", "skill-creator"],
-        "secondary": ["workflow-creator", "hook-creator", "template-creator", "schema-creator"],
+        "primary": [
+          "research-synthesis",
+          "agent-creator",
+          "skill-creator"
+        ],
+        "secondary": [
+          "workflow-creator",
+          "hook-creator",
+          "template-creator",
+          "schema-creator"
+        ],
         "contextual": {},
         "always": [
           "verification-before-completion",
           "task-management-protocol",
           "artifact-lifecycle"
+        ]
+      },
+      "party-orchestrator": {
+        "primary": [
+          "swarm-coordination",
+          "consensus-voting"
+        ],
+        "secondary": [
+          "dispatching-parallel-agents"
+        ],
+        "contextual": {},
+        "always": [
+          "task-management-protocol"
+        ]
+      },
+      "artifact-integrator": {
+        "primary": [
+          "project-onboarding",
+          "repo-rag"
+        ],
+        "secondary": [
+          "context-compressor",
+          "ripgrep"
+        ],
+        "contextual": {},
+        "always": [
+          "verification-before-completion"
         ]
       }
     }
@@ -499,7 +1411,13 @@
     },
     "documentation": {
       "description": "Documentation and writing skills",
-      "skills": ["doc-generator", "writing", "writing-skills", "readme", "diagram-generator"]
+      "skills": [
+        "doc-generator",
+        "writing",
+        "writing-skills",
+        "readme",
+        "diagram-generator"
+      ]
     },
     "git": {
       "description": "Version control skills",
@@ -549,7 +1467,11 @@
     },
     "testing": {
       "description": "Browser and E2E testing skills",
-      "skills": ["chrome-browser", "testing-expert", "qa-workflow"]
+      "skills": [
+        "chrome-browser",
+        "testing-expert",
+        "qa-workflow"
+      ]
     },
     "orchestration": {
       "description": "Multi-agent coordination skills",
@@ -564,62 +1486,122 @@
     },
     "scientific": {
       "description": "Scientific research and analysis skills",
-      "skills": ["scientific-skills", "ai-ml-expert", "data-expert"]
+      "skills": [
+        "scientific-skills",
+        "ai-ml-expert",
+        "data-expert"
+      ]
     },
     "web3": {
       "description": "Blockchain and Web3 skills",
-      "skills": ["web3-expert", "starknet-react-rules"]
+      "skills": [
+        "web3-expert",
+        "starknet-react-rules"
+      ]
     }
   },
   "contextualTriggers": {
     "python_project": {
-      "filePatterns": ["*.py", "pyproject.toml", "requirements.txt", "Pipfile", "setup.py"],
+      "filePatterns": [
+        "*.py",
+        "pyproject.toml",
+        "requirements.txt",
+        "Pipfile",
+        "setup.py"
+      ],
       "description": "Python project detected"
     },
     "typescript_project": {
-      "filePatterns": ["*.ts", "*.tsx", "tsconfig.json"],
+      "filePatterns": [
+        "*.ts",
+        "*.tsx",
+        "tsconfig.json"
+      ],
       "description": "TypeScript project detected"
     },
     "react_project": {
-      "filePatterns": ["*.jsx", "*.tsx"],
-      "packageDependencies": ["react", "react-dom"],
+      "filePatterns": [
+        "*.jsx",
+        "*.tsx"
+      ],
+      "packageDependencies": [
+        "react",
+        "react-dom"
+      ],
       "description": "React project detected"
     },
     "vue_project": {
-      "filePatterns": ["*.vue"],
-      "packageDependencies": ["vue"],
+      "filePatterns": [
+        "*.vue"
+      ],
+      "packageDependencies": [
+        "vue"
+      ],
       "description": "Vue.js project detected"
     },
     "svelte_project": {
-      "filePatterns": ["*.svelte"],
-      "packageDependencies": ["svelte"],
+      "filePatterns": [
+        "*.svelte"
+      ],
+      "packageDependencies": [
+        "svelte"
+      ],
       "description": "Svelte project detected"
     },
     "spring_project": {
-      "filePatterns": ["pom.xml", "build.gradle"],
-      "packageDependencies": ["spring-boot"],
+      "filePatterns": [
+        "pom.xml",
+        "build.gradle"
+      ],
+      "packageDependencies": [
+        "spring-boot"
+      ],
       "description": "Spring Boot project detected"
     },
     "laravel_project": {
-      "filePatterns": ["artisan", "composer.json"],
+      "filePatterns": [
+        "artisan",
+        "composer.json"
+      ],
       "description": "Laravel project detected"
     },
     "fastapi_project": {
-      "packageDependencies": ["fastapi"],
+      "packageDependencies": [
+        "fastapi"
+      ],
       "description": "FastAPI project detected"
     },
     "scientific_project": {
-      "packageDependencies": ["numpy", "pandas", "scipy", "scikit-learn", "rdkit", "biopython"],
+      "packageDependencies": [
+        "numpy",
+        "pandas",
+        "scipy",
+        "scikit-learn",
+        "rdkit",
+        "biopython"
+      ],
       "description": "Scientific/research project detected"
     },
     "aws_project": {
-      "filePatterns": ["*.tf", "cloudformation*.yaml", "serverless.yml"],
-      "packageDependencies": ["boto3", "@aws-sdk/*"],
+      "filePatterns": [
+        "*.tf",
+        "cloudformation*.yaml",
+        "serverless.yml"
+      ],
+      "packageDependencies": [
+        "boto3",
+        "@aws-sdk/*"
+      ],
       "description": "AWS project detected"
     },
     "gcp_project": {
-      "filePatterns": ["*.tf"],
-      "packageDependencies": ["google-cloud-*", "@google-cloud/*"],
+      "filePatterns": [
+        "*.tf"
+      ],
+      "packageDependencies": [
+        "google-cloud-*",
+        "@google-cloud/*"
+      ],
       "description": "Google Cloud project detected"
     },
     "security_review": {
@@ -635,21 +1617,34 @@
       "description": "Security-focused request"
     },
     "browser_testing": {
-      "keywords": ["e2e", "browser", "chrome", "playwright", "cypress", "selenium", "devtools"],
+      "keywords": [
+        "e2e",
+        "browser",
+        "chrome",
+        "playwright",
+        "cypress",
+        "selenium",
+        "devtools"
+      ],
       "description": "Browser or E2E testing request"
     },
     "web3_project": {
-      "packageDependencies": ["ethers", "web3", "hardhat", "foundry"],
+      "packageDependencies": [
+        "ethers",
+        "web3",
+        "hardhat",
+        "foundry"
+      ],
       "description": "Web3/blockchain project detected"
     }
   },
   "metadata": {
-    "totalAgents": 40,
+    "totalAgents": 66,
     "agentsByCategory": {
-      "core": 8,
-      "domain": 17,
-      "specialized": 12,
-      "orchestrators": 3
+      "core": 10,
+      "domain": 31,
+      "specialized": 20,
+      "orchestrators": 5
     },
     "skillMappingCoverage": "100%",
     "generatedBy": "developer-agent",

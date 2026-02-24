@@ -50,8 +50,6 @@ const INTENT_TO_AGENT = {
   c4_context: 'c4-context',
   code_reviewer: 'code-reviewer',
   'artifact-integrator': 'artifact-integrator',
-  external_integration: 'artifact-integrator',
-  artifact_integrator: 'artifact-integrator',
   code_simplifier: 'code-simplifier',
   conductor_validator: 'conductor-validator',
   database_architect: 'database-architect',
@@ -61,7 +59,6 @@ const INTENT_TO_AGENT = {
   reverse_engineer: 'reverse-engineer',
   researcher: 'researcher',
   security_architect: 'security-architect',
-  gemini_cli_security: 'security-architect', // gemini-cli-security skill routes to security-architect
 
   // Orchestrators
   master_orchestrator: 'master-orchestrator',
@@ -71,9 +68,6 @@ const INTENT_TO_AGENT = {
 
   // Assimilate intent (codebase extraction, benchmarking - uses assimilate skill)
   assimilate: 'evolution-orchestrator',
-
-  // Artifact Integration (routes to artifact-integrator for analysis)
-  'artifact-integration': 'artifact-integrator',
 
   // Scientific intent (dedicated agent with 139 scientific sub-skills)
   scientific: 'scientific-research-expert',
@@ -120,16 +114,7 @@ const INTENT_TO_AGENT = {
   // Web3/Blockchain intent (routes to web3-blockchain-expert)
   web3: 'web3-blockchain-expert',
 
-  // Legacy intents (map to most appropriate agent)
-  bug: 'developer',
-  feature: 'planner',
-  test: 'qa',
   tdd: 'qa',
-  security: 'security-architect',
-  architecture: 'architect',
-  incident: 'incident-responder',
-  plan: 'planner',
-  integration: 'developer',
 
   // Skills routed to their owning agents (not self-referential)
   'agent-evaluation': 'qa',

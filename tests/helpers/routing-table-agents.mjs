@@ -57,6 +57,12 @@ export const ROUTING_TABLE_AGENT_NAMES = [
   'accessibility-tester',
   'chaos-engineer',
   'reflection-agent',
+  'party-orchestrator',
+  'artifact-integrator',
+  'medical-research-triage',
+  'kubernetes-specialist',
+  'pm-coordinator',
+  'advanced-debugging',
 ];
 
 export const INTENT_TO_AGENT_NAMES = [
@@ -118,4 +124,11 @@ export const INTENT_TO_AGENT_NAMES = [
   'chaos-engineer',
   'gamedev-pro',
   'web3-blockchain-expert',
+  'artifact-integrator',
+  'party-orchestrator',
+  'reflection-agent',
+  'medical-research-triage',
+  'kubernetes-specialist',
+  'pm-coordinator',
+  'advanced-debugging',
 ];

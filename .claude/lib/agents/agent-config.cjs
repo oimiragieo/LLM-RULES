@@ -41,8 +41,8 @@ function load() {
       _cacheMeta = nextMeta;
       return _cache;
     }
-  } catch (_e) {
-    // ignore and fall through to defaults
+  } catch (e) {
+    process.stderr.write(`[agent-config] Warning: failed to load ${CONFIG_PATH}: ${e.message}\n`);
   }
   _cache = { version: '1.0.0', agents: {}, thinkingBudgetMap: {} };
   _cacheMeta = null;

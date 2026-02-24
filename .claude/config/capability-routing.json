@@ -1,5 +1,5 @@
 {
-  "$schema": "../schemas/capability-routing.schema.json",
+  "$schema": "../schemas/_archive/capability-routing.schema.json",
   "version": "1.0.0",
   "description": "Maps common request patterns to capabilities and default agents for router capability discovery",
   "lastUpdated": "2026-01-31",
@@ -101,7 +101,7 @@
     "architecture-design": "architect",
     "documentation": "technical-writer",
     "devops": "devops",
-    "kubernetes": "kubernetes-specialist",
+    "kubernetes-specialist": "kubernetes-specialist",
     "incident-response": "incident-responder",
     "planning": "planner",
     "product-planning": "pm",

@@ -84,7 +84,8 @@ async function main() {
     }
 
     process.exit(0);
-  } catch (_err) {
+  } catch (err) {
+    process.stderr.write(`[reflection-cleanup] Error: ${err.message}\n`);
     process.exit(0);
   }
 }

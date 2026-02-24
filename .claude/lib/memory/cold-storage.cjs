@@ -22,6 +22,7 @@ const { atomicWriteSync } = require('../utils/atomic-write.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const { scrubSensitiveContent } = require('../utils/sensitive-scrubber.cjs');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 
 // Default options
 const DEFAULT_MAX_AGE_DAYS = 30;
@@ -96,9 +97,21 @@ function archiveWarmToCold(memoryDir, opts = {}) {
     const jsonlEntries = sections.map(section => JSON.stringify(section)).join('\n') + '\n';
 
     // Append to cold file (or create if doesn't exist).
-    // Avoid read-modify-write on existing files to reduce race windows.
+    // Use file lock for append to prevent concurrent interleaving.
     if (fs.existsSync(coldFile)) {
-      fs.appendFileSync(coldFile, jsonlEntries, 'utf8');
+      let release;
+      try {
+        const lockfile = require('proper-lockfile');
+        release = lockfile.lockSync(coldFile, { stale: 15000, retries: 3 });
+      } catch (_lockErr) {
+        // Fall through to best-effort append if locking fails
+        release = null;
+      }
+      try {
+        fs.appendFileSync(coldFile, jsonlEntries, 'utf8');
+      } finally {
+        if (release) release();
+      }
     } else {
       atomicWriteSync(coldFile, jsonlEntries, 'utf8');
     }
@@ -240,7 +253,7 @@ function searchCold(query, opts = {}) {
     .toLowerCase();
   if (!q) return [];
 
-  const memoryDir = opts.memoryDir || path.join(process.cwd(), '.claude', 'context', 'memory');
+  const memoryDir = opts.memoryDir || path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
   const limit = Number.isFinite(Number(opts.limit)) ? Math.max(1, Number(opts.limit)) : 20;
   const coldDir = path.join(memoryDir, 'archive', 'cold');
   if (!fs.existsSync(coldDir)) return [];

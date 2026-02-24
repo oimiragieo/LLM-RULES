@@ -278,73 +278,73 @@ describe('Routing Table Equivalence Tests', () => {
       }
     });
 
-    it('should have "llm" disambiguation rule', () => {
+    it('should have "llm_architect" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'llm'),
-        'Should have disambiguation rule for "llm"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'llm_architect'),
+        'Should have disambiguation rule for "llm_architect"'
       );
     });
 
-    it('should have "test" disambiguation rule', () => {
+    it('should have "qa" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'test'),
-        'Should have disambiguation rule for "test"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'qa'),
+        'Should have disambiguation rule for "qa"'
       );
     });
 
-    it('should have "mobile" disambiguation rule', () => {
+    it('should have "expo" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'mobile'),
-        'Should have disambiguation rule for "mobile"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'expo'),
+        'Should have disambiguation rule for "expo"'
       );
     });
 
-    it('should have "api" disambiguation rule', () => {
+    it('should have "api_designer" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'api'),
-        'Should have disambiguation rule for "api"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'api_designer'),
+        'Should have disambiguation rule for "api_designer"'
       );
     });
 
-    it('should have "design" disambiguation rule', () => {
+    it('should have "architect" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'design'),
-        'Should have disambiguation rule for "design"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'architect'),
+        'Should have disambiguation rule for "architect"'
       );
     });
 
-    it('should have "component" disambiguation rule', () => {
+    it('should have "c4_component" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'component'),
-        'Should have disambiguation rule for "component"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'c4_component'),
+        'Should have disambiguation rule for "c4_component"'
       );
     });
 
-    it('should have "debug" disambiguation rule', () => {
+    it('should have "developer" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'debug'),
-        'Should have disambiguation rule for "debug"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'developer'),
+        'Should have disambiguation rule for "developer"'
       );
     });
 
-    it('should have "review" disambiguation rule', () => {
+    it('should have "code_reviewer" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'review'),
-        'Should have disambiguation rule for "review"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'code_reviewer'),
+        'Should have disambiguation rule for "code_reviewer"'
       );
     });
 
-    it('should have "performance" disambiguation rule', () => {
+    it('should have "performance_engineer" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'performance'),
-        'Should have disambiguation rule for "performance"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'performance_engineer'),
+        'Should have disambiguation rule for "performance_engineer"'
       );
     });
 
-    it('should have "accessibility" disambiguation rule', () => {
+    it('should have "accessibility_tester" disambiguation rule', () => {
       assert.ok(
-        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'accessibility'),
-        'Should have disambiguation rule for "accessibility"'
+        Object.hasOwn(routingTable.DISAMBIGUATION_RULES, 'accessibility_tester'),
+        'Should have disambiguation rule for "accessibility_tester"'
       );
     });
 

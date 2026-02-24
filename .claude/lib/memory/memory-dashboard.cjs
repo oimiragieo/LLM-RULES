@@ -109,11 +109,11 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
   } catch (_e) {
     // ignore
   }
-  const coldDir = path.join(memoryDir, 'cold');
+  const coldDir = path.join(memoryDir, 'archive', 'cold');
   const coldFileCount = fs.existsSync(coldDir)
-    ? fs.readdirSync(coldDir).filter(f => /\.jsonl\.gz$/.test(f)).length
+    ? fs.readdirSync(coldDir).filter(f => /\.jsonl$/.test(f)).length
     : 0;
-  const coldSizeKB = getDirSizeKB(coldDir, /\.jsonl\.gz$/);
+  const coldSizeKB = getDirSizeKB(coldDir, /\.jsonl$/);
 
   let entityCount = 0;
   let relationshipCount = 0;
@@ -348,22 +348,28 @@ async function getLanceDBStatus(projectRoot = PROJECT_ROOT) {
       persistDirectory: path.join(projectRoot, '.claude', 'context', 'data', 'lancedb'),
     });
     await store.initialize();
-    if (typeof store.getEmbeddingStatus === 'function') {
-      const status = store.getEmbeddingStatus();
-      if (status && status.status !== 'ready') return status;
-      if (typeof store.getTableVectorDimension === 'function') {
-        const tableDim = await store.getTableVectorDimension();
-        const embedDim = await store.getEmbeddingDimension();
-        if (Number.isFinite(tableDim) && Number.isFinite(embedDim) && tableDim !== embedDim) {
-          return {
-            status: 'unavailable',
-            reason: `embedding dimension mismatch (table ${tableDim} vs model ${embedDim})`,
-          };
+    try {
+      if (typeof store.getEmbeddingStatus === 'function') {
+        const status = store.getEmbeddingStatus();
+        if (status && status.status !== 'ready') return status;
+        if (typeof store.getTableVectorDimension === 'function') {
+          const tableDim = await store.getTableVectorDimension();
+          const embedDim = await store.getEmbeddingDimension();
+          if (Number.isFinite(tableDim) && Number.isFinite(embedDim) && tableDim !== embedDim) {
+            return {
+              status: 'unavailable',
+              reason: `embedding dimension mismatch (table ${tableDim} vs model ${embedDim})`,
+            };
+          }
         }
+        return status;
       }
-      return status;
+      return null;
+    } finally {
+      if (typeof store.close === 'function') {
+        await store.close().catch(() => {});
+      }
     }
-    return null;
   } catch (e) {
     return { status: 'unavailable', reason: e.message };
   }
