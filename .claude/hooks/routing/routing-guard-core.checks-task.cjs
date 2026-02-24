@@ -140,11 +140,11 @@ function checkTaskCreate(toolName, hookInput = null) {
   const dedupe = registerBlockAttempt('task-create-guard', toolName, hookInput);
   const message = dedupe.dedupe
     ? compactFallbackMessage(
-      'ROUTER-FIRST PROTOCOL VIOLATION | TASK-CREATE VIOLATION',
-      toolName,
-      dedupe.count,
-      'Spawn PLANNER via Task() before creating additional tasks.'
-    )
+        'ROUTER-FIRST PROTOCOL VIOLATION | TASK-CREATE VIOLATION',
+        toolName,
+        dedupe.count,
+        'Spawn PLANNER via Task() before creating additional tasks.'
+      )
     : buildTaskCreateMessage(complexity);
 
   if (enforcement === 'block') {
@@ -403,11 +403,11 @@ function checkTaskListFirstGate(toolName, hookInput = null) {
   const isReadOnlyDiscoveryTool = toolName === 'Glob' || toolName === 'Grep' || toolName === 'Read';
   const message = dedupe.dedupe
     ? compactFallbackMessage(
-      'ROUTER-FIRST PROTOCOL VIOLATION | TASKLIST-FIRST VIOLATION',
-      toolName,
-      dedupe.count,
-      'TaskList() once, then continue with Task()/tool call'
-    )
+        'ROUTER-FIRST PROTOCOL VIOLATION | TASKLIST-FIRST VIOLATION',
+        toolName,
+        dedupe.count,
+        'TaskList() once, then continue with Task()/tool call'
+      )
     : buildTaskListFirstMessage(toolName);
 
   const tracker = getViolationTracker();
