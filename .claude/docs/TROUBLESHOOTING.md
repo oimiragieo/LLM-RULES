@@ -520,3 +520,50 @@ Select-String -Path $log -Pattern `
 ```
 
 Treat `File does not exist` and `MaxFileReadTokenExceededError` as actionable unless intentionally induced by the test.
+
+## 13. Recent Session Learnings & Fixes (2026-02-23/24)
+
+### A. Specialist Routing Keyword Lockout & Deadlocks
+
+Symptoms:
+- Repeated loops where the Router fails to spawn `Task(developer)` because of `SPECIALIST-OVERRIDE` keyword blocks in the prompt (e.g., prompt contains "research options", triggering the `researcher` lockdown).
+- Eventual timeout or out-of-memory crash (Bun panic) as token counts climb over 160K when the Router falls back to running tools (like bash) directly to bypass the lockdown.
+
+Root Cause:
+- `SPECIALIST_ROUTING_ENFORCEMENT` was defaulted to `block`, which hard-blocked any request that accidentally mentioned a phrase matching a specialist without actually needing them. 
+
+Fix Applied:
+- Default `SPECIALIST_ROUTING_ENFORCEMENT` changed to `warn` in `.claude/lib/utils/enforcement-defaults.cjs`.
+- Subagent misroutings are now appended locally to `.claude/context/memory/issues.md` to feed into the Reflection Agent analysis cycle without completely blocking execution.
+
+### B. Bun Panics under Memory Pressure
+
+Symptoms:
+- Spawning nested `claude` (Bun) subprocesses over large artifact repositories causes memory explosions, resulting in complete failure: `panic(main thread): switch on corrupt value`.
+
+Root Cause:
+- Heavy headless updates (like `skill-update-headless.cjs` orchestrating deep repository changes and spawning CLI subprocesses) saturate Node/Bun memory bounds under Windows concurrency.
+
+Mitigation Applied:
+- Bypass `skill-update-headless.cjs` orchestrator where possible using pure single-threaded functional replacements or run integrations synchronously and selectively instead of en masse.
+
+### C. Orphaned Git Worktrees Cleanup
+
+Symptoms:
+- Dozens of residual git `worktree-agent-[id]` branches left behind after interrupted runs, polluting `git branch` and `git worktree list`.
+
+Fix Applied:
+- Cleaned the environment using:
+  - `git worktree prune`
+  - `git branch | Select-String "worktree-agent-" | ForEach-Object { git branch -D $_.ToString().Trim(' +*') }`
+- Always verify worktree bounds are clear if tests unexpectedly abort or the main thread crashes.
+
+### D. ESLint Scaffolding Stubs
+
+Symptoms:
+- `pnpm lint:fix` fails with `no-unused-vars` on `context` in newly scaffolded skill hooks (`post-execute.cjs`).
+- Fails with `max-lines` inside core routing implementation logic like `routing-guard-core.checks-task.cjs`.
+
+Fix Applied:
+- Scaffolder function stubs modified to use `_context` or explicitly ignored. 
+- Logically cohesive routing files suppressed with `/* eslint-disable max-lines */`.
