@@ -27,53 +27,64 @@
 // ============================================================================
 
 /**
- * All event types (32+ across 6 categories)
+ * All event types (35 across 8 categories).
+ *
+ * Events marked @reserved are defined for forward-compatibility but not yet
+ * emitted by any runtime code. They are retained so that future consumers
+ * can subscribe without a breaking change to this module.
  */
 const EventTypes = {
-  // Agent Events (6)
+  // Agent Events (6) — AGENT_STARTED active; rest @reserved
   AGENT_STARTED: 'AGENT_STARTED',
-  AGENT_COMPLETED: 'AGENT_COMPLETED',
-  AGENT_FAILED: 'AGENT_FAILED',
-  AGENT_PAUSED: 'AGENT_PAUSED',
-  AGENT_RESUMED: 'AGENT_RESUMED',
-  AGENT_SPAWNED: 'AGENT_SPAWNED',
+  /** @reserved */ AGENT_COMPLETED: 'AGENT_COMPLETED',
+  /** @reserved */ AGENT_FAILED: 'AGENT_FAILED',
+  /** @reserved */ AGENT_PAUSED: 'AGENT_PAUSED',
+  /** @reserved */ AGENT_RESUMED: 'AGENT_RESUMED',
+  /** @reserved */ AGENT_SPAWNED: 'AGENT_SPAWNED',
 
-  // Task Events (7)
-  TASK_CREATED: 'TASK_CREATED',
+  // Task Events (8) — TASK_UPDATED, TASK_HEARTBEAT active; rest @reserved
+  /** @reserved */ TASK_CREATED: 'TASK_CREATED',
   TASK_UPDATED: 'TASK_UPDATED',
-  TASK_COMPLETED: 'TASK_COMPLETED',
-  TASK_FAILED: 'TASK_FAILED',
-  TASK_BLOCKED: 'TASK_BLOCKED',
-  TASK_UNBLOCKED: 'TASK_UNBLOCKED',
-  TASK_DELETED: 'TASK_DELETED',
+  /** @reserved */ TASK_COMPLETED: 'TASK_COMPLETED',
+  /** @reserved */ TASK_FAILED: 'TASK_FAILED',
+  /** @reserved */ TASK_BLOCKED: 'TASK_BLOCKED',
+  /** @reserved */ TASK_UNBLOCKED: 'TASK_UNBLOCKED',
+  /** @reserved */ TASK_DELETED: 'TASK_DELETED',
   TASK_HEARTBEAT: 'TASK_HEARTBEAT',
 
-  // Tool Events (5)
+  // Tool Events (5) — TOOL_INVOKED, TOOL_COMPLETED, TOOL_FAILED, TOOL_BLOCKED active
   TOOL_INVOKED: 'TOOL_INVOKED',
   TOOL_COMPLETED: 'TOOL_COMPLETED',
   TOOL_FAILED: 'TOOL_FAILED',
   TOOL_BLOCKED: 'TOOL_BLOCKED',
-  TOOL_RETRIED: 'TOOL_RETRIED',
+  /** @reserved */ TOOL_RETRIED: 'TOOL_RETRIED',
 
-  // Memory Events (5)
+  // Memory Events (5) — MEMORY_SAVED, MEMORY_QUERIED active; rest @reserved
   MEMORY_SAVED: 'MEMORY_SAVED',
   MEMORY_QUERIED: 'MEMORY_QUERIED',
-  MEMORY_UPDATED: 'MEMORY_UPDATED',
-  MEMORY_DELETED: 'MEMORY_DELETED',
-  MEMORY_INDEXED: 'MEMORY_INDEXED',
+  /** @reserved */ MEMORY_UPDATED: 'MEMORY_UPDATED',
+  /** @reserved */ MEMORY_DELETED: 'MEMORY_DELETED',
+  /** @reserved */ MEMORY_INDEXED: 'MEMORY_INDEXED',
 
-  // LLM Events (4)
-  LLM_CALLED: 'LLM_CALLED',
-  LLM_COMPLETED: 'LLM_COMPLETED',
-  LLM_FAILED: 'LLM_FAILED',
-  LLM_CACHED: 'LLM_CACHED',
+  // Security Events (1) — active
+  SECURITY_VIOLATION: 'SECURITY_VIOLATION',
 
-  // MCP Events (5)
-  MCP_TOOL_DISCOVERED: 'MCP_TOOL_DISCOVERED',
-  MCP_TOOL_INVOKED: 'MCP_TOOL_INVOKED',
-  MCP_TOOL_COMPLETED: 'MCP_TOOL_COMPLETED',
-  MCP_TOOL_FAILED: 'MCP_TOOL_FAILED',
-  MCP_SERVER_CONNECTED: 'MCP_SERVER_CONNECTED',
+  // Agent Limit Events (2) — both active
+  AGENT_LIMIT_WARNING: 'AGENT_LIMIT_WARNING',
+  AGENT_LIMIT_EXCEEDED: 'AGENT_LIMIT_EXCEEDED',
+
+  // LLM Events (4) — all @reserved
+  /** @reserved */ LLM_CALLED: 'LLM_CALLED',
+  /** @reserved */ LLM_COMPLETED: 'LLM_COMPLETED',
+  /** @reserved */ LLM_FAILED: 'LLM_FAILED',
+  /** @reserved */ LLM_CACHED: 'LLM_CACHED',
+
+  // MCP Events (5) — all @reserved
+  /** @reserved */ MCP_TOOL_DISCOVERED: 'MCP_TOOL_DISCOVERED',
+  /** @reserved */ MCP_TOOL_INVOKED: 'MCP_TOOL_INVOKED',
+  /** @reserved */ MCP_TOOL_COMPLETED: 'MCP_TOOL_COMPLETED',
+  /** @reserved */ MCP_TOOL_FAILED: 'MCP_TOOL_FAILED',
+  /** @reserved */ MCP_SERVER_CONNECTED: 'MCP_SERVER_CONNECTED',
 };
 
 /**
@@ -114,6 +125,8 @@ const MEMORY_EVENTS = [
   'MEMORY_DELETED',
   'MEMORY_INDEXED',
 ];
+
+const SECURITY_EVENTS = ['SECURITY_VIOLATION'];
 
 const LLM_EVENTS = ['LLM_CALLED', 'LLM_COMPLETED', 'LLM_FAILED', 'LLM_CACHED'];
 
@@ -269,6 +282,14 @@ function validateEvent(eventType, payload) {
       }
     }
 
+    // Security events
+    if (SECURITY_EVENTS.includes(eventType)) {
+      if (eventType === 'SECURITY_VIOLATION') {
+        if (!payload.toolName) errors.push({ path: '/toolName', message: 'toolName is required' });
+        if (!payload.reason) errors.push({ path: '/reason', message: 'reason is required' });
+      }
+    }
+
     // LLM events
     if (LLM_EVENTS.includes(eventType)) {
       if (!payload.model)
@@ -330,6 +351,7 @@ module.exports = {
   TASK_EVENTS,
   TOOL_EVENTS,
   MEMORY_EVENTS,
+  SECURITY_EVENTS,
   LLM_EVENTS,
   MCP_EVENTS,
   validateEvent,

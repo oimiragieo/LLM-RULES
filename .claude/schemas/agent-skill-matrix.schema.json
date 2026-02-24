@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Skill Matrix",
+  "description": "Maps agents to their recommended skills by category (primary, secondary, contextual, always).",
+  "type": "object",
+  "required": ["version", "agents", "metadata"],
+  "properties": {
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "lastUpdated": { "type": "string", "format": "date-time" },
+    "agents": {
+      "type": "object",
+      "properties": {
+        "core": { "$ref": "#/definitions/agentCategory" },
+        "domain": { "$ref": "#/definitions/agentCategory" },
+        "specialized": { "$ref": "#/definitions/agentCategory" },
+        "orchestrators": { "$ref": "#/definitions/agentCategory" }
+      }
+    },
+    "contextTriggers": { "type": "object" },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "totalAgents": { "type": "integer", "minimum": 0 },
+        "agentsByCategory": { "type": "object" },
+        "skillMappingCoverage": { "type": "string" }
+      }
+    }
+  },
+  "definitions": {
+    "agentCategory": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/agentSkillMapping"
+      }
+    },
+    "agentSkillMapping": {
+      "type": "object",
+      "required": ["primary"],
+      "properties": {
+        "primary": { "type": "array", "items": { "type": "string" } },
+        "secondary": { "type": "array", "items": { "type": "string" } },
+        "contextual": { "type": "object" },
+        "always": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

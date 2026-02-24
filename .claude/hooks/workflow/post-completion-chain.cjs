@@ -74,16 +74,17 @@ function normalizeTaskUpdateFields(toolInput) {
 }
 
 /**
- * Phase progression map
+ * Phase progression map — aligned with EVOLVE phases from workflow-engine-constants.cjs
  */
-const PHASE_PROGRESSION = {
-  PHASE_1_DESIGN: 'PHASE_2_IMPLEMENT',
-  PHASE_2_IMPLEMENT: 'PHASE_3_REVIEW',
-  PHASE_3_REVIEW: 'PHASE_4_DEPLOY',
-  PHASE_4_DEPLOY: 'PHASE_5_DOCUMENT',
-  PHASE_5_DOCUMENT: 'PHASE_6_REFLECT',
-  PHASE_6_REFLECT: 'COMPLETE',
-};
+const { PHASE_ORDER } = require('../../lib/workflow/workflow-engine-constants.cjs');
+const PHASE_PROGRESSION = (() => {
+  const map = {};
+  for (let i = 0; i < PHASE_ORDER.length - 1; i++) {
+    map[PHASE_ORDER[i]] = PHASE_ORDER[i + 1];
+  }
+  map[PHASE_ORDER[PHASE_ORDER.length - 1]] = 'COMPLETE';
+  return map;
+})();
 
 /**
  * Process task completion and potentially advance workflow phase

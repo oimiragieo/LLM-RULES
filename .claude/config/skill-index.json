@@ -1,11 +1,12 @@
 {
+  "$schema": "../schemas/skill-index.schema.json",
   "version": "1.0.0",
-  "generatedAt": "2026-02-24T05:47:20.291Z",
+  "generatedAt": "2026-02-24T15:37:41.793Z",
   "metadata": {
     "totalSkills": 392,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-24T05:47:20.292Z",
+    "lastValidated": "2026-02-24T15:37:41.794Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -22,6 +23,7 @@
         "architect",
         "qa",
         "technical-writer",
+        "technical-program-manager",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -39,6 +41,18 @@
         "data-engineer",
         "graphql-pro",
         "mobile-ux-reviewer",
+        "ai-ml-specialist",
+        "android-pro",
+        "gamedev-pro",
+        "scientific-research-expert",
+        "multi-llm-consultant",
+        "web3-blockchain-expert",
+        "api-designer",
+        "llm-architect",
+        "mcp-developer",
+        "microservices-architect",
+        "prompt-engineer",
+        "kubernetes-specialist",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -51,9 +65,17 @@
         "conductor-validator",
         "reverse-engineer",
         "database-architect",
+        "accessibility-tester",
+        "chaos-engineer",
+        "penetration-tester",
+        "performance-engineer",
+        "sre-engineer",
+        "advanced-debugging",
+        "code-simplifier",
         "master-orchestrator",
         "swarm-coordinator",
-        "evolution-orchestrator"
+        "evolution-orchestrator",
+        "artifact-integrator"
       ],
       "agentSupporting": [],
       "tags": ["quality", "verification-before-completion"],
@@ -67,7 +89,7 @@
       "domain": "planning",
       "description": "AI-based complexity assessment for task analysis. Use when determining the appropriate workflow, phases, and validation depth for a task.",
       "requiredTools": ["Read", "Glob", "Grep"],
-      "agentPrimary": ["planner", "pm", "router"],
+      "agentPrimary": ["planner", "pm", "router", "technical-program-manager"],
       "agentSupporting": [],
       "tags": ["planning", "other", "complexity-assessment"],
       "priority": 1,
@@ -119,8 +141,8 @@
       "domain": "languages",
       "description": "Python backend expert including Django, FastAPI, Flask, SQLAlchemy, and async patterns",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "agentPrimary": ["python-pro", "fastapi-pro", "data-engineer"],
-      "agentSupporting": ["developer"],
+      "agentPrimary": ["python-pro", "fastapi-pro", "data-engineer", "ai-ml-specialist"],
+      "agentSupporting": ["developer", "scientific-research-expert"],
       "tags": ["languages", "python-backend-expert"],
       "priority": 1,
       "aliasOf": null
@@ -340,10 +362,10 @@
       "domain": "other",
       "description": "Game development expert including DragonRuby, Unity, and game mechanics",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "agentPrimary": ["developer"],
+      "agentPrimary": ["gamedev-pro"],
       "agentSupporting": [],
       "tags": ["other", "gamedev-expert"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "finishing-a-development-branch": {
@@ -366,10 +388,10 @@
       "domain": "development",
       "description": "Programmatic code style validation using AST analysis. Complements (not replaces) code-style rules by providing automated checking and instant feedback.",
       "requiredTools": ["Read", "Grep", "Bash", "Glob"],
-      "agentPrimary": ["developer"],
+      "agentPrimary": ["code-simplifier"],
       "agentSupporting": ["developer", "code-reviewer"],
       "tags": ["development", "other", "code-style-validator"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "artifact-integrator": {
@@ -419,8 +441,21 @@
       "description": "Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
       "requiredTools": ["Read", "Write", "Edit", "AskUserQuestion"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["pm"],
+      "agentSupporting": ["pm", "pm-coordinator"],
       "tags": ["requirements", "other", "interactive-requirements-gathering"],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "enterprise-skill-test-1771947459945": {
+      "name": "enterprise-skill-test-1771947459945",
+      "displayName": "Enterprise Skill Test 1771947459945",
+      "category": "Other",
+      "domain": "other",
+      "description": "Enterprise scaffold validation skill for test coverage and reliability checks.",
+      "requiredTools": ["Read", "Write", "Bash"],
+      "agentPrimary": ["developer"],
+      "agentSupporting": [],
+      "tags": ["other", "enterprise-skill-test-1771947459945"],
       "priority": 3,
       "aliasOf": null
     },
@@ -468,12 +503,12 @@
       "displayName": "Omega Codex Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Other - omega-codex-cli",
-      "requiredTools": ["Read", "Write", "Edit"],
-      "agentPrimary": ["developer"],
+      "description": "Shell out to OpenAI Codex CLI for headless code generation, analysis, and question-answering. Optimized for code tasks. Requires OPENAI_API_KEY env var.",
+      "requiredTools": ["Bash", "Read"],
+      "agentPrimary": ["multi-llm-consultant"],
       "agentSupporting": [],
       "tags": ["other", "omega-codex-cli"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "omega-cursor-cli": {
@@ -494,12 +529,12 @@
       "displayName": "Omega Gemini Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Other - omega-gemini-cli",
-      "requiredTools": ["Read", "Write", "Edit"],
-      "agentPrimary": ["developer"],
+      "description": "Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on \"use Gemini\", \"analyze with Gemini\", \"large file\", \"sandbox\", \"brainstorm with Gemini\".",
+      "requiredTools": ["Bash", "Read"],
+      "agentPrimary": ["multi-llm-consultant"],
       "agentSupporting": [],
       "tags": ["other", "omega-gemini-cli"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "incident-runbook-templates": {
@@ -510,7 +545,7 @@
       "description": "Create structured incident response runbooks with step-by-step procedures, escalation paths, and recovery actions. Use when building runbooks, responding to incidents, or establishing incident response procedures.",
       "requiredTools": ["Read", "Write", "Bash"],
       "agentPrimary": ["incident-responder"],
-      "agentSupporting": ["devops-troubleshooter"],
+      "agentSupporting": ["kubernetes-specialist", "devops-troubleshooter", "sre-engineer"],
       "tags": ["devops", "other", "incident-runbook-templates"],
       "priority": 1,
       "aliasOf": null
@@ -535,10 +570,10 @@
       "domain": "other",
       "description": "Use when you want to improve response quality through meta-cognitive reasoning. Applies 15+ reasoning methods to reconsider and refine initial outputs.",
       "requiredTools": ["Read", "Write"],
-      "agentPrimary": ["developer"],
+      "agentPrimary": ["prompt-engineer"],
       "agentSupporting": [],
       "tags": ["other", "advanced-elicitation"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "function-length-and-responsibility": {
@@ -574,7 +609,7 @@
       "domain": "styling",
       "description": "Ensure accessibility in UI components including semantic HTML, ARIA attributes, keyboard navigation, and WCAG 2.2 AA compliance.",
       "requiredTools": ["Read", "Write", "Edit"],
-      "agentPrimary": ["mobile-ux-reviewer"],
+      "agentPrimary": ["mobile-ux-reviewer", "accessibility-tester"],
       "agentSupporting": ["frontend-pro"],
       "tags": ["styling", "other", "accessibility"],
       "priority": 1,
@@ -660,10 +695,10 @@
       "domain": "ai-ml",
       "description": "AI and ML expert covering PyTorch, TensorFlow, Hugging Face, scikit-learn, LLM integration, RAG pipelines, MLOps, and production ML systems",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch"],
-      "agentPrimary": ["developer"],
+      "agentPrimary": ["ai-ml-specialist", "llm-architect"],
       "agentSupporting": ["data-engineer"],
       "tags": ["ai-ml", "ai/ml", "ai-ml-expert"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "android-expert": {
@@ -673,10 +708,10 @@
       "domain": "mobile",
       "description": "Comprehensive Android development expert covering Jetpack Compose, Kotlin coroutines/Flow, Architecture Components, Hilt DI, Navigation, testing, performance, Material Design 3, and modern Android patterns (MVI, Clean Architecture).",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "agentPrimary": ["developer"],
+      "agentPrimary": ["android-pro"],
       "agentSupporting": ["mobile-ux-reviewer"],
       "tags": ["mobile", "android-expert"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "api-development-expert": {
@@ -686,7 +721,7 @@
       "domain": "frameworks",
       "description": "API development expert including REST design, OpenAPI, and documentation",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "agentPrimary": ["fastapi-pro", "graphql-pro"],
+      "agentPrimary": ["fastapi-pro", "graphql-pro", "api-designer", "microservices-architect"],
       "agentSupporting": [
         "architect",
         "technical-writer",
@@ -707,8 +742,15 @@
       "domain": "architecture",
       "description": "Architecture review and design validation. Evaluates system designs against best practices, identifies anti-patterns, and ensures architectural decisions align with non-functional requirements.",
       "requiredTools": ["Read", "Write", "Edit", "Glob", "Grep"],
-      "agentPrimary": ["architect", "devops", "c4-context", "c4-container", "c4-component"],
-      "agentSupporting": ["technical-writer", "database-architect"],
+      "agentPrimary": [
+        "architect",
+        "microservices-architect",
+        "devops",
+        "c4-context",
+        "c4-container",
+        "c4-component"
+      ],
+      "agentSupporting": ["technical-writer", "llm-architect", "database-architect"],
       "tags": ["architecture", "architecture-review"],
       "priority": 1,
       "aliasOf": null
@@ -822,7 +864,7 @@
       "description": "OAuth 2.1, JWT (RFC 8725), encryption, and authentication security expert. Enforces 2026 security standards.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
       "agentPrimary": ["security-architect"],
-      "agentSupporting": ["fastapi-pro"],
+      "agentSupporting": ["fastapi-pro", "penetration-tester"],
       "tags": ["security", "auth-security-expert"],
       "priority": 1,
       "aliasOf": null
@@ -887,7 +929,7 @@
       "description": "Socratic design refinement before implementation — challenges assumptions, surfaces alternatives, identifies risks before code is written",
       "requiredTools": ["Read", "Write", "Bash"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["planner", "architect", "pm"],
+      "agentSupporting": ["planner", "architect", "pm", "pm-coordinator"],
       "tags": ["other", "brainstorming"],
       "priority": 3,
       "aliasOf": null
@@ -939,7 +981,7 @@
       "description": "Browser automation with two integrations - Chrome DevTools MCP (always available, performance tracing) and Claude-in-Chrome extension (authenticated sessions, GIF recording). Use DevTools for testing/debugging, Claude-in-Chrome for authenticated workflows.",
       "requiredTools": ["Read", "Write", "WebFetch"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["qa"],
+      "agentSupporting": ["qa", "accessibility-tester", "performance-engineer"],
       "tags": ["integration", "chrome-browser"],
       "priority": 3,
       "aliasOf": null
@@ -977,8 +1019,21 @@
       "domain": "development",
       "description": "Static code analysis and complexity metrics",
       "requiredTools": ["Bash", "Read", "Glob", "Grep"],
-      "agentPrimary": ["code-reviewer", "c4-code"],
-      "agentSupporting": ["developer", "qa", "c4-component", "reverse-engineer"],
+      "agentPrimary": [
+        "code-reviewer",
+        "c4-code",
+        "performance-engineer",
+        "advanced-debugging",
+        "code-simplifier"
+      ],
+      "agentSupporting": [
+        "developer",
+        "qa",
+        "c4-component",
+        "reverse-engineer",
+        "accessibility-tester",
+        "penetration-tester"
+      ],
       "tags": ["development", "other", "code-analyzer"],
       "priority": 1,
       "aliasOf": null
@@ -990,8 +1045,17 @@
       "domain": "development",
       "description": "Code quality expert including clean code, style guides, and refactoring",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "agentPrimary": ["code-reviewer"],
-      "agentSupporting": ["developer", "rust-pro", "typescript-pro"],
+      "agentPrimary": ["code-reviewer", "code-simplifier"],
+      "agentSupporting": [
+        "developer",
+        "rust-pro",
+        "typescript-pro",
+        "gamedev-pro",
+        "api-designer",
+        "mcp-developer",
+        "performance-engineer",
+        "advanced-debugging"
+      ],
       "tags": ["development", "code-quality", "code-quality-expert"],
       "priority": 1,
       "aliasOf": null
@@ -1107,7 +1171,7 @@
       "domain": "specialized",
       "description": "Byzantine consensus voting for multi-agent decision making. Implements voting protocols, conflict resolution, and agreement algorithms for reaching consensus among multiple agents.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-      "agentPrimary": ["devops", "swarm-coordinator"],
+      "agentPrimary": ["devops", "swarm-coordinator", "party-orchestrator"],
       "agentSupporting": ["architect"],
       "tags": ["specialized", "orchestration", "consensus-voting"],
       "priority": 1,
@@ -1120,8 +1184,8 @@
       "domain": "devops",
       "description": "Container orchestration expert including Docker, Kubernetes, Helm, and service mesh",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "agentPrimary": ["c4-container"],
-      "agentSupporting": [],
+      "agentPrimary": ["kubernetes-specialist", "c4-container", "sre-engineer"],
+      "agentSupporting": ["microservices-architect", "chaos-engineer"],
       "tags": ["devops", "other", "container-expert"],
       "priority": 1,
       "aliasOf": null
@@ -1160,7 +1224,15 @@
       "description": "Context compression and summarization methodology. Techniques for reducing token usage while preserving decision-critical information.",
       "requiredTools": ["Read", "Write"],
       "agentPrimary": ["context-compressor", "devops"],
-      "agentSupporting": ["developer", "planner", "swarm-coordinator"],
+      "agentSupporting": [
+        "developer",
+        "planner",
+        "reflection-agent",
+        "prompt-engineer",
+        "researcher",
+        "swarm-coordinator",
+        "artifact-integrator"
+      ],
       "tags": ["memory", "context-compressor"],
       "priority": 1,
       "aliasOf": null
@@ -1225,7 +1297,7 @@
       "description": "Data processing expert including parsing, transformation, and validation",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
       "agentPrimary": ["data-engineer"],
-      "agentSupporting": ["python-pro"],
+      "agentSupporting": ["python-pro", "scientific-research-expert"],
       "tags": ["database", "other", "data-expert"],
       "priority": 1,
       "aliasOf": null
@@ -1290,14 +1362,24 @@
         "ios-pro",
         "java-pro",
         "php-pro",
-        "devops-troubleshooter"
+        "android-pro",
+        "gamedev-pro",
+        "mcp-developer",
+        "kubernetes-specialist",
+        "devops-troubleshooter",
+        "performance-engineer",
+        "sre-engineer",
+        "advanced-debugging"
       ],
       "agentSupporting": [
         "fastapi-pro",
         "nodejs-pro",
+        "ai-ml-specialist",
         "code-reviewer",
         "incident-responder",
-        "reverse-engineer"
+        "reverse-engineer",
+        "chaos-engineer",
+        "code-simplifier"
       ],
       "tags": ["development", "troubleshooting", "debugging"],
       "priority": 1,
@@ -1336,8 +1418,15 @@
       "domain": "architecture",
       "description": "Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system architecture, database schemas, component relationships, and data flows.",
       "requiredTools": ["Read", "Write", "Glob", "Grep"],
-      "agentPrimary": ["architect", "c4-context", "c4-container", "c4-component", "c4-code"],
-      "agentSupporting": ["planner", "technical-writer", "database-architect"],
+      "agentPrimary": [
+        "architect",
+        "microservices-architect",
+        "c4-context",
+        "c4-container",
+        "c4-component",
+        "c4-code"
+      ],
+      "agentSupporting": ["planner", "technical-writer", "llm-architect", "database-architect"],
       "tags": ["architecture", "diagram-generator"],
       "priority": 1,
       "aliasOf": null
@@ -1363,7 +1452,13 @@
       "description": "Concurrent investigation of independent failures. Use when multiple unrelated issues need parallel resolution.",
       "requiredTools": ["Task", "Read"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["planner", "master-orchestrator", "swarm-coordinator"],
+      "agentSupporting": [
+        "planner",
+        "technical-program-manager",
+        "master-orchestrator",
+        "swarm-coordinator",
+        "party-orchestrator"
+      ],
       "tags": ["other", "dispatching-parallel-agents"],
       "priority": 3,
       "aliasOf": null
@@ -1627,7 +1722,7 @@
       "description": "Advanced Git operations wrapper. Optimizes token usage by guiding complex git workflows into efficient CLI commands.",
       "requiredTools": ["Bash", "Read"],
       "agentPrimary": ["developer", "rust-pro", "devops"],
-      "agentSupporting": ["python-pro", "golang-pro", "typescript-pro"],
+      "agentSupporting": ["python-pro", "golang-pro", "typescript-pro", "android-pro"],
       "tags": ["git", "version-control", "git-expert"],
       "priority": 1,
       "aliasOf": null
@@ -1692,7 +1787,7 @@
       "description": "GraphQL expert including schema design, Apollo Client/Server, and caching",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
       "agentPrimary": ["graphql-pro"],
-      "agentSupporting": ["architect"],
+      "agentSupporting": ["architect", "api-designer"],
       "tags": ["frameworks", "other", "graphql-expert"],
       "priority": 1,
       "aliasOf": null
@@ -1756,10 +1851,10 @@
       "domain": "specialized",
       "description": "Extract actionable insights from completed coding sessions. Use when a session completes to capture learnings for future sessions.",
       "requiredTools": ["Read", "Write", "Bash", "Glob", "Grep"],
-      "agentPrimary": ["developer"],
-      "agentSupporting": ["context-compressor"],
+      "agentPrimary": ["reflection-agent", "researcher"],
+      "agentSupporting": ["context-compressor", "medical-research-triage"],
       "tags": ["specialized", "other", "insight-extraction"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "integration/artifact-updater": {
@@ -1809,7 +1904,7 @@
       "description": "Jira project management and issue tracking integration",
       "requiredTools": ["Bash", "Read", "WebFetch"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["pm"],
+      "agentSupporting": ["pm", "pm-coordinator"],
       "tags": ["other", "jira-pm"],
       "priority": 3,
       "aliasOf": null
@@ -1874,7 +1969,7 @@
       "description": "Linear project management - issues, projects, cycles, and roadmaps. Use for Linear-related tasks like managing issues, tracking sprints, and organizing projects.",
       "requiredTools": ["Read", "Bash", "WebFetch"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["pm"],
+      "agentSupporting": ["pm", "pm-coordinator"],
       "tags": ["other", "linear-pm"],
       "priority": 3,
       "aliasOf": null
@@ -1887,7 +1982,7 @@
       "description": "Orchestrate multi-LLM parallel debate and synthesis. Dispatches prompts to available omega CLI wrappers in parallel, collects independent responses, runs anonymized peer review ranking, and synthesizes via a chairman model. No server required.",
       "requiredTools": ["Bash", "Read", "Write"],
       "agentPrimary": ["developer"],
-      "agentSupporting": [],
+      "agentSupporting": ["multi-llm-consultant"],
       "tags": ["other", "llm-council"],
       "priority": 3,
       "aliasOf": null
@@ -1938,7 +2033,7 @@
       "domain": "security",
       "description": "Master memory forensics techniques including memory acquisition, process analysis, and artifact extraction using Volatility and related tools. Use when analyzing memory dumps, investigating incidents, or performing malware analysis from RAM captures.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-      "agentPrimary": ["reverse-engineer"],
+      "agentPrimary": ["reverse-engineer", "advanced-debugging"],
       "agentSupporting": ["rust-pro", "security-architect", "incident-responder"],
       "tags": ["security", "other", "memory-forensics"],
       "priority": 1,
@@ -2105,12 +2200,12 @@
       "displayName": "Omega Claude Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Other - omega-claude-cli",
-      "requiredTools": ["Read", "Write", "Edit"],
-      "agentPrimary": ["developer"],
+      "description": "Shell out to Claude Code CLI to invoke a second Claude session headlessly. Useful for cross-validation, second opinions, and isolated analysis without sharing current agent context. Requires Anthropic account.",
+      "requiredTools": ["Bash", "Read"],
+      "agentPrimary": ["multi-llm-consultant"],
       "agentSupporting": [],
       "tags": ["other", "omega-claude-cli"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "on-call-handoff-patterns": {
@@ -2172,7 +2267,13 @@
       "domain": "planning",
       "description": "Creates structured plans from requirements. Generates comprehensive plans with steps, dependencies, risks, and success criteria. Coordinates with specialist agents for planning input and validates plan completeness. Uses template-renderer for formatted output.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Skill"],
-      "agentPrimary": ["planner", "pm", "master-orchestrator"],
+      "agentPrimary": [
+        "planner",
+        "pm",
+        "technical-program-manager",
+        "pm-coordinator",
+        "master-orchestrator"
+      ],
       "agentSupporting": [],
       "tags": ["planning", "plan-generator"],
       "priority": 1,
@@ -2276,10 +2377,10 @@
       "domain": "memory",
       "description": "Guided project onboarding for new codebases. Helps agents understand project structure, build systems, test commands, and development workflows by creating persistent knowledge memories.",
       "requiredTools": ["Read", "Glob", "Grep", "Bash", "Write"],
-      "agentPrimary": ["developer"],
+      "agentPrimary": ["artifact-integrator"],
       "agentSupporting": [],
       "tags": ["memory", "other", "project-onboarding"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "property-based-testing": {
@@ -2419,7 +2520,12 @@
       "domain": "research",
       "description": "Research best practices and synthesize into design decisions for artifact creation. Invoke BEFORE any creator skill to ensure research-backed decisions.",
       "requiredTools": ["WebSearch", "WebFetch", "Read", "Write", "Glob", "Grep"],
-      "agentPrimary": ["evolution-orchestrator"],
+      "agentPrimary": [
+        "scientific-research-expert",
+        "medical-research-triage",
+        "researcher",
+        "evolution-orchestrator"
+      ],
       "agentSupporting": [],
       "tags": ["research", "research-synthesis"],
       "priority": 1,
@@ -2459,7 +2565,7 @@
       "description": "Enhanced code search with custom ripgrep binary supporting ES module extensions and advanced patterns.",
       "requiredTools": ["Read", "Write", "Edit"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["developer"],
+      "agentSupporting": ["multi-llm-consultant", "researcher", "artifact-integrator"],
       "tags": ["development", "other", "ripgrep"],
       "priority": 3,
       "aliasOf": null
@@ -2523,10 +2629,10 @@
       "domain": "scientific",
       "description": "Comprehensive scientific research toolkit with 139 specialized skills for biology, chemistry, medicine, data science, and computational research. Transforms Claude into an AI research assistant with access to scientific databases, analysis tools, and domain-specific workflows.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"],
-      "agentPrimary": ["developer"],
-      "agentSupporting": ["python-pro", "data-engineer"],
+      "agentPrimary": ["scientific-research-expert", "medical-research-triage"],
+      "agentSupporting": ["python-pro", "data-engineer", "researcher"],
       "tags": ["scientific", "scientific-skills"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "scientific-skills/skills/adaptyv": {
@@ -4382,12 +4488,14 @@
       "domain": "security",
       "description": "Security architecture and threat modeling. OWASP Top 10 2025 analysis, OWASP Agentic AI Top 10 (ASI01-ASI10), AI/LLM security patterns, supply chain security, modern API authentication (OAuth 2.1, DPoP, Passkeys/WebAuthn), vulnerability assessment, and security review for code and infrastructure.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-      "agentPrimary": ["security-architect"],
+      "agentPrimary": ["security-architect", "penetration-tester"],
       "agentSupporting": [
         "developer",
         "architect",
         "qa",
         "ios-pro",
+        "web3-blockchain-expert",
+        "microservices-architect",
         "code-reviewer",
         "incident-responder",
         "reverse-engineer"
@@ -4443,7 +4551,7 @@
       "description": "Sequential thinking and structured problem solving. Break down complex problems into steps with revision and branching capabilities. Use for multi-step analysis, planning, and hypothesis verification.",
       "requiredTools": ["Read", "Write", "Bash"],
       "agentPrimary": ["planner"],
-      "agentSupporting": [],
+      "agentSupporting": ["technical-program-manager"],
       "tags": ["specialized", "sequential-thinking"],
       "priority": 1,
       "aliasOf": null
@@ -4468,7 +4576,7 @@
       "domain": "memory",
       "description": "Prepare context for new conversations when session is lost or ending. Creates handoff documents that capture current state, progress, and next steps for seamless continuation.",
       "requiredTools": ["Read", "Write", "Glob", "Grep"],
-      "agentPrimary": ["context-compressor"],
+      "agentPrimary": ["context-compressor", "reflection-agent"],
       "agentSupporting": [],
       "tags": ["memory", "session-handoff"],
       "priority": 1,
@@ -4622,8 +4730,8 @@
       "domain": "requirements",
       "description": "Requirements gathering workflow for specification creation. Use when starting a new feature, task, or project that needs structured requirements.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "AskUserQuestion"],
-      "agentPrimary": ["pm"],
-      "agentSupporting": ["planner"],
+      "agentPrimary": ["pm", "pm-coordinator"],
+      "agentSupporting": ["planner", "technical-program-manager"],
       "tags": ["requirements", "spec-gathering"],
       "priority": 1,
       "aliasOf": null
@@ -4727,7 +4835,7 @@
       "description": "Structured workflow for summarizing code changes after completing tasks. Creates clear, actionable summaries of what was changed, why, and what to verify.",
       "requiredTools": ["Read", "Glob", "Grep", "Bash"],
       "agentPrimary": ["context-compressor"],
-      "agentSupporting": [],
+      "agentSupporting": ["reflection-agent"],
       "tags": ["specialized", "other", "summarize-changes"],
       "priority": 1,
       "aliasOf": null
@@ -4752,8 +4860,13 @@
       "domain": "specialized",
       "description": "Multi-agent swarm coordination patterns. Orchestrates parallel agent execution, manages agent communication, handles task distribution, and coordinates results aggregation.",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-      "agentPrimary": ["swarm-coordinator"],
-      "agentSupporting": ["planner", "architect", "master-orchestrator"],
+      "agentPrimary": ["swarm-coordinator", "party-orchestrator"],
+      "agentSupporting": [
+        "planner",
+        "architect",
+        "technical-program-manager",
+        "master-orchestrator"
+      ],
       "tags": ["specialized", "orchestration", "swarm-coordination"],
       "priority": 1,
       "aliasOf": null
@@ -4783,6 +4896,7 @@
         "architect",
         "qa",
         "pm",
+        "technical-program-manager",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -4800,6 +4914,7 @@
         "data-engineer",
         "graphql-pro",
         "mobile-ux-reviewer",
+        "pm-coordinator",
         "security-architect",
         "devops",
         "devops-troubleshooter",
@@ -4813,7 +4928,8 @@
         "database-architect",
         "master-orchestrator",
         "swarm-coordinator",
-        "evolution-orchestrator"
+        "evolution-orchestrator",
+        "party-orchestrator"
       ],
       "agentSupporting": ["router"],
       "tags": ["specialized", "other", "task-management-protocol"],
@@ -4896,9 +5012,12 @@
         "expo-mobile-developer",
         "data-engineer",
         "graphql-pro",
-        "code-reviewer"
+        "android-pro",
+        "mcp-developer",
+        "code-reviewer",
+        "chaos-engineer"
       ],
-      "agentSupporting": [],
+      "agentSupporting": ["code-simplifier"],
       "tags": ["development", "testing", "tdd"],
       "priority": 1,
       "aliasOf": null
@@ -4960,19 +5079,6 @@
       "priority": 1,
       "aliasOf": null
     },
-    "test-skill-modify-1771908233896": {
-      "name": "test-skill-modify-1771908233896",
-      "displayName": "Test Skill Modify 1771908233896",
-      "category": "Other",
-      "domain": "other",
-      "description": "Old description",
-      "requiredTools": ["Read", "Write", "Edit"],
-      "agentPrimary": ["developer"],
-      "agentSupporting": [],
-      "tags": ["other", "test-skill-modify-1771908233896"],
-      "priority": 3,
-      "aliasOf": null
-    },
     "testing-expert": {
       "name": "testing-expert",
       "displayName": "Testing Expert",
@@ -4980,7 +5086,7 @@
       "domain": "other",
       "description": "Deprecated alias for tdd skill",
       "requiredTools": [],
-      "agentPrimary": ["qa"],
+      "agentPrimary": ["qa", "chaos-engineer"],
       "agentSupporting": [
         "developer",
         "python-pro",
@@ -4996,7 +5102,19 @@
         "php-pro",
         "sveltekit-expert",
         "expo-mobile-developer",
-        "graphql-pro"
+        "graphql-pro",
+        "ai-ml-specialist",
+        "android-pro",
+        "gamedev-pro",
+        "web3-blockchain-expert",
+        "api-designer",
+        "mcp-developer",
+        "kubernetes-specialist",
+        "accessibility-tester",
+        "penetration-tester",
+        "performance-engineer",
+        "sre-engineer",
+        "advanced-debugging"
       ],
       "tags": ["other", "testing-expert"],
       "priority": 1,
@@ -5023,7 +5141,7 @@
       "description": "Structured thinking patterns for agent self-reflection. Includes think-about-collected-information (validate research), think-about-task-adherence (stay on track), and think-about-whether-you-are-done (completion validation).",
       "requiredTools": ["Read", "Glob", "Grep"],
       "agentPrimary": ["developer"],
-      "agentSupporting": ["planner"],
+      "agentSupporting": ["prompt-engineer"],
       "tags": ["specialized", "thinking-tools"],
       "priority": 3,
       "aliasOf": null
@@ -5223,10 +5341,10 @@
       "domain": "integration",
       "description": "Web3 and blockchain expert including Solidity, Ethereum, and smart contracts",
       "requiredTools": ["Read", "Write", "Edit", "Bash", "Grep", "Glob"],
-      "agentPrimary": ["developer"],
+      "agentPrimary": ["web3-blockchain-expert"],
       "agentSupporting": ["security-architect"],
       "tags": ["integration", "other", "web3-expert"],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "webapp-testing": {
@@ -5359,6 +5477,7 @@
         "artifact-integrator",
         "token-saver-context-compression",
         "strict-user-requirements-adherence",
+        "enterprise-skill-test-1771947459945",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -5592,7 +5711,6 @@
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
-        "test-skill-modify-1771908233896",
         "testing-expert",
         "tool-creator",
         "troubleshooting-regression",
@@ -5773,6 +5891,7 @@
         "token-saver-context-compression",
         "strict-user-requirements-adherence",
         "interactive-requirements-gathering",
+        "enterprise-skill-test-1771947459945",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -6070,7 +6189,6 @@
         "template-creator",
         "template-renderer",
         "test-generator",
-        "test-skill-modify-1771908233896",
         "testing-expert",
         "tool-creator",
         "tool-search",
@@ -6151,6 +6269,7 @@
         "artifact-integrator",
         "strict-user-requirements-adherence",
         "interactive-requirements-gathering",
+        "enterprise-skill-test-1771947459945",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -6481,7 +6600,6 @@
         "template-renderer",
         "terraform-infra",
         "test-generator",
-        "test-skill-modify-1771908233896",
         "text-to-sql",
         "thinking-tools",
         "tool-creator",
@@ -6518,8 +6636,11 @@
         "gamedev-expert",
         "finishing-a-development-branch",
         "code-style-validator",
+        "enterprise-skill-test-1771947459945",
         "dynamic-api-integration",
+        "omega-codex-cli",
         "omega-cursor-cli",
+        "omega-gemini-cli",
         "incident-runbook-templates",
         "html-tailwind-css-and-javascript-expert-rule",
         "agent-creator",
@@ -6592,6 +6713,7 @@
         "monorepo-and-tooling",
         "nextjs-expert",
         "nodejs-expert",
+        "omega-claude-cli",
         "on-call-handoff-patterns",
         "php-expert",
         "plan-generator",
@@ -6908,11 +7030,10 @@
         "artifact-integrator",
         "strict-user-requirements-adherence",
         "interactive-requirements-gathering",
+        "enterprise-skill-test-1771947459945",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
-        "omega-codex-cli",
-        "omega-gemini-cli",
         "incident-runbook-templates",
         "code-structural-search",
         "advanced-elicitation",
@@ -7011,7 +7132,6 @@
         "next-upgrade",
         "nextjs-expert",
         "nodejs-expert",
-        "omega-claude-cli",
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
@@ -7211,7 +7331,6 @@
         "template-creator",
         "template-renderer",
         "test-generator",
-        "test-skill-modify-1771908233896",
         "text-to-sql",
         "tool-creator",
         "tool-search",
@@ -7258,8 +7377,6 @@
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
-        "omega-codex-cli",
-        "omega-gemini-cli",
         "code-structural-search",
         "function-length-and-responsibility",
         "html-tailwind-css-and-javascript-expert-rule",
@@ -7335,7 +7452,6 @@
         "next-upgrade",
         "nextjs-expert",
         "nodejs-expert",
-        "omega-claude-cli",
         "pandas-data-manipulation-rules",
         "php-expert",
         "plan-generator",
@@ -7523,7 +7639,6 @@
         "tauri-svelte-ui-components",
         "tdd",
         "template-creator",
-        "test-skill-modify-1771908233896",
         "tool-creator",
         "track-management",
         "tsconfig-json-rules",
@@ -7651,27 +7766,22 @@
         "flutter-expert",
         "large-data-with-dask",
         "writing-skills",
-        "gamedev-expert",
         "finishing-a-development-branch",
         "artifact-integrator",
         "token-saver-context-compression",
         "strict-user-requirements-adherence",
         "interactive-requirements-gathering",
+        "enterprise-skill-test-1771947459945",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
-        "omega-codex-cli",
         "omega-cursor-cli",
-        "omega-gemini-cli",
         "code-structural-search",
-        "advanced-elicitation",
         "function-length-and-responsibility",
         "html-tailwind-css-and-javascript-expert-rule",
         "agent-evaluation",
         "agent-tool-design",
         "agent-updater",
-        "ai-ml-expert",
-        "android-expert",
         "artifact-updater",
         "ask-questions-if-underspecified",
         "assimilate",
@@ -7717,7 +7827,6 @@
         "hook-creator",
         "htmx-expert",
         "insecure-defaults",
-        "insight-extraction",
         "integration/artifact-updater",
         "jira-pm",
         "jupyter-notebook-best-practices",
@@ -7735,7 +7844,6 @@
         "nativescript",
         "next-cache-components",
         "next-upgrade",
-        "omega-claude-cli",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -7744,7 +7852,6 @@
         "prioritize-python-3-10-features",
         "proactive-audit",
         "project-analyzer",
-        "project-onboarding",
         "property-based-testing",
         "qa-workflow",
         "react-native-skills-vercel",
@@ -7754,7 +7861,6 @@
         "rule-auditor",
         "rust-expert",
         "schema-creator",
-        "scientific-skills",
         "scientific-skills/skills/adaptyv",
         "scientific-skills/skills/aeon",
         "scientific-skills/skills/alphafold-database",
@@ -7920,7 +8026,6 @@
         "tauri-svelte-ui-components",
         "template-creator",
         "template-renderer",
-        "test-skill-modify-1771908233896",
         "thinking-tools",
         "tool-creator",
         "tool-search",
@@ -7932,7 +8037,6 @@
         "vercel-deploy",
         "visual-and-observational-rules",
         "web-perf",
-        "web3-expert",
         "webapp-testing",
         "webmcp-browser-tools",
         "workflow-creator",
@@ -7952,7 +8056,6 @@
         "swarm-coordination",
         "framework-context",
         "recommend-evolution",
-        "thinking-tools",
         "wave-executor"
       ],
       "architect": [
@@ -8010,6 +8113,24 @@
         "insight-extraction"
       ],
       "router": ["skill-discovery", "complexity-assessment", "task-management-protocol"],
+      "reflection-agent": [
+        "insight-extraction",
+        "session-handoff",
+        "context-compressor",
+        "summarize-changes",
+        "framework-context",
+        "recommend-evolution"
+      ],
+      "technical-program-manager": [
+        "plan-generator",
+        "task-management-protocol",
+        "complexity-assessment",
+        "verification-before-completion",
+        "sequential-thinking",
+        "spec-gathering",
+        "dispatching-parallel-agents",
+        "swarm-coordination"
+      ],
       "python-pro": [
         "python-backend-expert",
         "tdd",
@@ -8209,6 +8330,100 @@
         "android-expert",
         "expo-mobile-app-rule"
       ],
+      "ai-ml-specialist": [
+        "ai-ml-expert",
+        "python-backend-expert",
+        "verification-before-completion",
+        "debugging",
+        "testing-expert"
+      ],
+      "android-pro": [
+        "android-expert",
+        "tdd",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "git-expert"
+      ],
+      "gamedev-pro": [
+        "gamedev-expert",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert"
+      ],
+      "scientific-research-expert": [
+        "scientific-skills",
+        "research-synthesis",
+        "verification-before-completion",
+        "python-backend-expert",
+        "data-expert"
+      ],
+      "multi-llm-consultant": [
+        "omega-gemini-cli",
+        "omega-codex-cli",
+        "omega-claude-cli",
+        "verification-before-completion",
+        "llm-council",
+        "ripgrep"
+      ],
+      "web3-blockchain-expert": [
+        "web3-expert",
+        "verification-before-completion",
+        "security-architect",
+        "testing-expert"
+      ],
+      "api-designer": [
+        "api-development-expert",
+        "verification-before-completion",
+        "code-quality-expert",
+        "testing-expert",
+        "graphql-expert"
+      ],
+      "llm-architect": [
+        "ai-ml-expert",
+        "verification-before-completion",
+        "architecture-review",
+        "diagram-generator"
+      ],
+      "mcp-developer": [
+        "tdd",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert"
+      ],
+      "microservices-architect": [
+        "architecture-review",
+        "diagram-generator",
+        "api-development-expert",
+        "verification-before-completion",
+        "container-expert",
+        "security-architect"
+      ],
+      "prompt-engineer": [
+        "advanced-elicitation",
+        "verification-before-completion",
+        "thinking-tools",
+        "context-compressor"
+      ],
+      "pm-coordinator": [
+        "plan-generator",
+        "task-management-protocol",
+        "spec-gathering",
+        "interactive-requirements-gathering",
+        "brainstorming",
+        "jira-pm",
+        "linear-pm"
+      ],
+      "kubernetes-specialist": [
+        "container-expert",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "incident-runbook-templates"
+      ],
+      "medical-research-triage": ["research-synthesis", "scientific-skills", "insight-extraction"],
       "code-reviewer": [
         "code-analyzer",
         "code-quality-expert",
@@ -8343,6 +8558,66 @@
         "diagram-generator",
         "drizzle-orm-rules"
       ],
+      "accessibility-tester": [
+        "accessibility",
+        "verification-before-completion",
+        "testing-expert",
+        "code-analyzer",
+        "chrome-browser"
+      ],
+      "chaos-engineer": [
+        "tdd",
+        "testing-expert",
+        "verification-before-completion",
+        "debugging",
+        "container-expert"
+      ],
+      "penetration-tester": [
+        "security-architect",
+        "verification-before-completion",
+        "testing-expert",
+        "code-analyzer",
+        "auth-security-expert"
+      ],
+      "performance-engineer": [
+        "debugging",
+        "code-analyzer",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert",
+        "chrome-browser"
+      ],
+      "sre-engineer": [
+        "container-expert",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "incident-runbook-templates"
+      ],
+      "advanced-debugging": [
+        "debugging",
+        "memory-forensics",
+        "code-analyzer",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert"
+      ],
+      "code-simplifier": [
+        "code-quality-expert",
+        "code-analyzer",
+        "code-style-validator",
+        "verification-before-completion",
+        "tdd",
+        "debugging"
+      ],
+      "researcher": [
+        "research-synthesis",
+        "insight-extraction",
+        "ripgrep",
+        "context-compressor",
+        "scientific-skills",
+        "arxiv-mcp"
+      ],
       "master-orchestrator": [
         "plan-generator",
         "task-management-protocol",
@@ -8380,8 +8655,18 @@
         "semgrep-rule-creator",
         "tool-creator"
       ],
-      "researcher": ["arxiv-mcp"],
-      "reflection-agent": ["framework-context", "recommend-evolution"]
+      "party-orchestrator": [
+        "swarm-coordination",
+        "consensus-voting",
+        "task-management-protocol",
+        "dispatching-parallel-agents"
+      ],
+      "artifact-integrator": [
+        "project-onboarding",
+        "verification-before-completion",
+        "context-compressor",
+        "ripgrep"
+      ]
     }
   },
   "discovery": {
@@ -8424,27 +8709,22 @@
         "flutter-expert",
         "large-data-with-dask",
         "writing-skills",
-        "gamedev-expert",
         "finishing-a-development-branch",
         "artifact-integrator",
         "token-saver-context-compression",
         "strict-user-requirements-adherence",
         "interactive-requirements-gathering",
+        "enterprise-skill-test-1771947459945",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
-        "omega-codex-cli",
         "omega-cursor-cli",
-        "omega-gemini-cli",
         "code-structural-search",
-        "advanced-elicitation",
         "function-length-and-responsibility",
         "html-tailwind-css-and-javascript-expert-rule",
         "agent-evaluation",
         "agent-tool-design",
         "agent-updater",
-        "ai-ml-expert",
-        "android-expert",
         "artifact-updater",
         "ask-questions-if-underspecified",
         "assimilate",
@@ -8490,7 +8770,6 @@
         "hook-creator",
         "htmx-expert",
         "insecure-defaults",
-        "insight-extraction",
         "integration/artifact-updater",
         "jira-pm",
         "jupyter-notebook-best-practices",
@@ -8508,7 +8787,6 @@
         "nativescript",
         "next-cache-components",
         "next-upgrade",
-        "omega-claude-cli",
         "pandas-data-manipulation-rules",
         "pipeline-reflection-ux",
         "planning-with-files",
@@ -8517,7 +8795,6 @@
         "prioritize-python-3-10-features",
         "proactive-audit",
         "project-analyzer",
-        "project-onboarding",
         "property-based-testing",
         "qa-workflow",
         "react-native-skills-vercel",
@@ -8527,7 +8804,6 @@
         "rule-auditor",
         "rust-expert",
         "schema-creator",
-        "scientific-skills",
         "scientific-skills/skills/adaptyv",
         "scientific-skills/skills/aeon",
         "scientific-skills/skills/alphafold-database",
@@ -8693,7 +8969,6 @@
         "tauri-svelte-ui-components",
         "template-creator",
         "template-renderer",
-        "test-skill-modify-1771908233896",
         "thinking-tools",
         "tool-creator",
         "tool-search",
@@ -8705,7 +8980,6 @@
         "vercel-deploy",
         "visual-and-observational-rules",
         "web-perf",
-        "web3-expert",
         "webapp-testing",
         "webmcp-browser-tools",
         "workflow-creator",
@@ -8725,7 +8999,6 @@
         "swarm-coordination",
         "framework-context",
         "recommend-evolution",
-        "thinking-tools",
         "wave-executor"
       ],
       "architect": [
@@ -8783,6 +9056,24 @@
         "insight-extraction"
       ],
       "router": ["skill-discovery", "complexity-assessment", "task-management-protocol"],
+      "reflection-agent": [
+        "insight-extraction",
+        "session-handoff",
+        "context-compressor",
+        "summarize-changes",
+        "framework-context",
+        "recommend-evolution"
+      ],
+      "technical-program-manager": [
+        "plan-generator",
+        "task-management-protocol",
+        "complexity-assessment",
+        "verification-before-completion",
+        "sequential-thinking",
+        "spec-gathering",
+        "dispatching-parallel-agents",
+        "swarm-coordination"
+      ],
       "python-pro": [
         "python-backend-expert",
         "tdd",
@@ -8982,6 +9273,100 @@
         "android-expert",
         "expo-mobile-app-rule"
       ],
+      "ai-ml-specialist": [
+        "ai-ml-expert",
+        "python-backend-expert",
+        "verification-before-completion",
+        "debugging",
+        "testing-expert"
+      ],
+      "android-pro": [
+        "android-expert",
+        "tdd",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "git-expert"
+      ],
+      "gamedev-pro": [
+        "gamedev-expert",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert"
+      ],
+      "scientific-research-expert": [
+        "scientific-skills",
+        "research-synthesis",
+        "verification-before-completion",
+        "python-backend-expert",
+        "data-expert"
+      ],
+      "multi-llm-consultant": [
+        "omega-gemini-cli",
+        "omega-codex-cli",
+        "omega-claude-cli",
+        "verification-before-completion",
+        "llm-council",
+        "ripgrep"
+      ],
+      "web3-blockchain-expert": [
+        "web3-expert",
+        "verification-before-completion",
+        "security-architect",
+        "testing-expert"
+      ],
+      "api-designer": [
+        "api-development-expert",
+        "verification-before-completion",
+        "code-quality-expert",
+        "testing-expert",
+        "graphql-expert"
+      ],
+      "llm-architect": [
+        "ai-ml-expert",
+        "verification-before-completion",
+        "architecture-review",
+        "diagram-generator"
+      ],
+      "mcp-developer": [
+        "tdd",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert"
+      ],
+      "microservices-architect": [
+        "architecture-review",
+        "diagram-generator",
+        "api-development-expert",
+        "verification-before-completion",
+        "container-expert",
+        "security-architect"
+      ],
+      "prompt-engineer": [
+        "advanced-elicitation",
+        "verification-before-completion",
+        "thinking-tools",
+        "context-compressor"
+      ],
+      "pm-coordinator": [
+        "plan-generator",
+        "task-management-protocol",
+        "spec-gathering",
+        "interactive-requirements-gathering",
+        "brainstorming",
+        "jira-pm",
+        "linear-pm"
+      ],
+      "kubernetes-specialist": [
+        "container-expert",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "incident-runbook-templates"
+      ],
+      "medical-research-triage": ["research-synthesis", "scientific-skills", "insight-extraction"],
       "code-reviewer": [
         "code-analyzer",
         "code-quality-expert",
@@ -9116,6 +9501,66 @@
         "diagram-generator",
         "drizzle-orm-rules"
       ],
+      "accessibility-tester": [
+        "accessibility",
+        "verification-before-completion",
+        "testing-expert",
+        "code-analyzer",
+        "chrome-browser"
+      ],
+      "chaos-engineer": [
+        "tdd",
+        "testing-expert",
+        "verification-before-completion",
+        "debugging",
+        "container-expert"
+      ],
+      "penetration-tester": [
+        "security-architect",
+        "verification-before-completion",
+        "testing-expert",
+        "code-analyzer",
+        "auth-security-expert"
+      ],
+      "performance-engineer": [
+        "debugging",
+        "code-analyzer",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert",
+        "chrome-browser"
+      ],
+      "sre-engineer": [
+        "container-expert",
+        "debugging",
+        "verification-before-completion",
+        "testing-expert",
+        "incident-runbook-templates"
+      ],
+      "advanced-debugging": [
+        "debugging",
+        "memory-forensics",
+        "code-analyzer",
+        "verification-before-completion",
+        "testing-expert",
+        "code-quality-expert"
+      ],
+      "code-simplifier": [
+        "code-quality-expert",
+        "code-analyzer",
+        "code-style-validator",
+        "verification-before-completion",
+        "tdd",
+        "debugging"
+      ],
+      "researcher": [
+        "research-synthesis",
+        "insight-extraction",
+        "ripgrep",
+        "context-compressor",
+        "scientific-skills",
+        "arxiv-mcp"
+      ],
       "master-orchestrator": [
         "plan-generator",
         "task-management-protocol",
@@ -9153,8 +9598,18 @@
         "semgrep-rule-creator",
         "tool-creator"
       ],
-      "researcher": ["arxiv-mcp"],
-      "reflection-agent": ["framework-context", "recommend-evolution"]
+      "party-orchestrator": [
+        "swarm-coordination",
+        "consensus-voting",
+        "task-management-protocol",
+        "dispatching-parallel-agents"
+      ],
+      "artifact-integrator": [
+        "project-onboarding",
+        "verification-before-completion",
+        "context-compressor",
+        "ripgrep"
+      ]
     }
   }
 }

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Agent Config Reader
- * ====================
+ * Agent Model Resolver (reads config.yaml)
+ * ==========================================
  *
  * Resolves agent models from configuration sources with proper precedence.
+ * NOT to be confused with agents/agent-config.cjs (which reads agent-config.json for tool lists).
  *
  * ADR-075: Router Model Selection from Configuration
  *

@@ -4,6 +4,11 @@
  * ===============
  *
  * Production-grade workflow engine for the EVOLVE self-evolution system.
+ *
+ * Two-tier workflow architecture:
+ *   1. YAML workflows (.claude/workflows/creators/*.yaml) — parsed and executed by this engine.
+ *   2. Markdown workflows (.claude/workflows/*.md) — prose/reference guides read by agents as
+ *      instructions, NOT parsed by this engine.  Agent .md files reference these for context.
  */
 
 'use strict';

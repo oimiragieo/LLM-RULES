@@ -117,11 +117,35 @@ function isPathInside(baseDir, targetPath) {
   return target === base || target.startsWith(`${base}${path.sep}`);
 }
 
-function computeQualityScore(accessCount) {
+/**
+ * Compute quality/relevance score for an entity based on access frequency.
+ * Score range: [0.5, 1.0] — higher means more frequently accessed.
+ *
+ * @param {number} accessCount - Number of times the entity has been accessed
+ * @param {Object} [opts] - Optional factors for initial seeding
+ * @param {string} [opts.source] - Source type (e.g., 'decision', 'learning', 'issue')
+ * @param {number} [opts.contentLength] - Length of content in characters
+ * @returns {number} Score between 0.5 and 1.0
+ */
+function computeQualityScore(accessCount, opts) {
   const count = Number.isFinite(accessCount) ? accessCount : 0;
   const max = 20;
-  const ratio = Math.min(Math.log1p(count) / Math.log1p(max), 1);
-  return Math.round((0.5 + ratio * 0.5) * 1000) / 1000;
+  const accessRatio = Math.min(Math.log1p(count) / Math.log1p(max), 1);
+
+  // Source-type seed bonus (bumps initial score for high-signal sources)
+  let seedBonus = 0;
+  if (opts && opts.source) {
+    const SOURCE_WEIGHTS = { decision: 0.1, learning: 0.08, issue: 0.05, gotcha: 0.05 };
+    seedBonus = SOURCE_WEIGHTS[opts.source] || 0;
+  }
+
+  // Content length bonus (entities with substantive content get a small boost)
+  if (opts && typeof opts.contentLength === 'number' && opts.contentLength > 200) {
+    seedBonus += 0.03;
+  }
+
+  const base = 0.5 + seedBonus;
+  return Math.round(Math.min(base + accessRatio * (1.0 - base), 1.0) * 1000) / 1000;
 }
 
 function getAccessStatsPath(memoryDir) {

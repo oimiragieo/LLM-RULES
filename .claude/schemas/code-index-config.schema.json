@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Code Index Configuration",
+  "description": "Configuration for the code indexing and search subsystem.",
+  "type": "object",
+  "required": ["version", "indexing"],
+  "properties": {
+    "version": { "type": "string" },
+    "indexing": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "projectRoot": { "type": "string" },
+        "excludePatterns": { "type": "array", "items": { "type": "string" } },
+        "includePatterns": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

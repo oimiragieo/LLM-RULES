@@ -2,6 +2,8 @@
 /* eslint-disable max-lines -- data-only module; splitting would obscure routing tables */
 
 // Intent keyword map and allowed overlaps (data only). Main module: routing-table-intent-keywords.cjs
+// Key naming: snake_case for multi-word intents (e.g., ai_ml), bare for single-word intents (e.g., researcher).
+// Kebab-case keys (e.g., 'reflection-agent') are used when the key matches an agent name verbatim.
 const INTENT_KEYWORDS = {
   // === HIGH PRIORITY INTENTS ===
   researcher: [

@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Required Status Checks",
+  "description": "Defines which CI status checks are required before merging.",
+  "type": "object",
+  "required": ["version", "required_checks"],
+  "properties": {
+    "version": { "type": ["integer", "string"] },
+    "owner": { "type": "string" },
+    "required_checks": { "type": "array", "items": { "type": "string" } }
+  }
+}

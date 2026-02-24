@@ -41,17 +41,17 @@ const {
   getPlannerFirstLoopBreakerThreshold,
   invalidateCachedState,
   getLoopState,
-  readTaskListLoopState,
-  writeTaskListLoopState,
-  registerTaskListFirstViolation,
-  clearTaskListFirstViolation,
-  readPlannerFirstLoopState,
-  writePlannerFirstLoopState,
-  registerPlannerFirstViolation,
-  clearPlannerFirstViolation,
+  readTaskListLoopStateAsync,
+  writeTaskListLoopStateAsync,
+  registerTaskListFirstViolationAsync,
+  clearTaskListFirstViolationAsync,
+  readPlannerFirstLoopStateAsync,
+  writePlannerFirstLoopStateAsync,
+  registerPlannerFirstViolationAsync,
+  clearPlannerFirstViolationAsync,
   resolveStableSessionId,
-  readAgentGuardrailsState,
-  writeAgentGuardrailsState,
+  readAgentGuardrailsStateAsync,
+  writeAgentGuardrailsStateAsync,
 } = state;
 
 const {
@@ -86,7 +86,7 @@ const {
   checkSpawnRoleGuardrails,
 } = helpers;
 
-function checkTaskListFirst(toolName, hookInput = null) {
+async function checkTaskListFirst(toolName, hookInput = null) {
   if (toolName !== 'Task') {
     return { pass: true };
   }
@@ -102,11 +102,11 @@ function checkTaskListFirst(toolName, hookInput = null) {
   }
   if (routerState.isTaskListCalledSincePrompt()) {
     const sessionId = resolveStableSessionId(hookInput);
-    clearTaskListFirstViolation(sessionId);
+    await clearTaskListFirstViolationAsync(sessionId);
     return { pass: true };
   }
   const sessionId = resolveStableSessionId(hookInput);
-  const repeated = registerTaskListFirstViolation(sessionId);
+  const repeated = await registerTaskListFirstViolationAsync(sessionId);
   if (repeated >= TASKLIST_LOOP_BREAKER_THRESHOLD) {
     const message = `[TASKLIST-FIRST LOOP-BREAKER] TaskList-first violation repeated ${repeated}x in this session window.
 Temporarily allowing Task spawn to avoid autonomous deadlock.`;
@@ -133,7 +133,7 @@ function checkAgentContextPreTracker(hookInput) {
   return { pass: true };
 }
 
-function checkCoreMemoryReadBeforeTask(hookInput) {
+async function checkCoreMemoryReadBeforeTask(hookInput) {
   const memReadMode = String(process.env.TASK_REQUIRE_CORE_MEMORY_READ || 'on')
     .trim()
     .toLowerCase();
@@ -163,9 +163,14 @@ function checkCoreMemoryReadBeforeTask(hookInput) {
         '`.claude/context/memory/decisions.md`, and `.claude/context/memory/issues.md` before Task spawn.',
     };
   }
-  const content = fs.readFileSync(TOOL_GOVERNANCE_STATE_FILE, 'utf8');
-  const parsed = safeParseJSON(content, null);
-  sessions = parsed?.sessions || {};
+  try {
+    const content = await fs.promises.readFile(TOOL_GOVERNANCE_STATE_FILE, 'utf8');
+    const parsed = safeParseJSON(content, null);
+    sessions = parsed?.sessions || {};
+  } catch (_e) {
+    // Treat as missing file or corrupted
+    sessions = {};
+  }
 
   const entry = sessions[sessionId];
   const lastReadAt = Number(entry?.lastCoreMemoryReadAt || 0);
@@ -184,7 +189,7 @@ function checkCoreMemoryReadBeforeTask(hookInput) {
   };
 }
 
-function checkRoutingGuard(toolName, toolInput, hookInput = null) {
+async function checkRoutingGuard(toolName, toolInput, hookInput = null) {
   if (toolName !== 'Task') {
     return { pass: true };
   }
@@ -199,12 +204,12 @@ function checkRoutingGuard(toolName, toolInput, hookInput = null) {
     if (isPlannerRequired && !plannerAlreadySpawned) {
       if (isPlannerSpawn(toolInput)) {
         const sessionId = resolveStableSessionId(hookInput);
-        clearPlannerFirstViolation(sessionId);
+        await clearPlannerFirstViolationAsync(sessionId);
         return { pass: true, markPlanner: true };
       }
 
       const sessionId = resolveStableSessionId(hookInput);
-      const repeated = registerPlannerFirstViolation(sessionId);
+      const repeated = await registerPlannerFirstViolationAsync(sessionId);
       if (repeated >= getPlannerFirstLoopBreakerThreshold()) {
         const message =
           `[PLANNER-FIRST LOOP-BREAKER] Planner-first violation repeated ${repeated}x in this session window.\n` +
@@ -396,7 +401,7 @@ function updateLoopStateAfterAllow(hookInput) {
   }
 }
 
-function persistGuardrailPolicy(hookInput, toolInput) {
+async function persistGuardrailPolicy(hookInput, toolInput) {
   try {
     const sessionId =
       hookInput?.session_id || hookInput?.sessionId || process.env.CLAUDE_SESSION_ID || null;
@@ -404,7 +409,7 @@ function persistGuardrailPolicy(hookInput, toolInput) {
 
     const taskId = extractTaskIdFromTaskInput(toolInput);
     const policy = extractGuardrailPolicy(toolInput);
-    const stateSnapshot = readAgentGuardrailsState();
+    const stateSnapshot = await readAgentGuardrailsStateAsync();
     stateSnapshot.sessions[sessionId] = {
       taskId: taskId || stateSnapshot.sessions[sessionId]?.taskId || null,
       allowGitCommit: Boolean(policy.allowGitCommit),
@@ -414,7 +419,7 @@ function persistGuardrailPolicy(hookInput, toolInput) {
       touchedFiles: [],
       updatedAt: Date.now(),
     };
-    writeAgentGuardrailsState(stateSnapshot);
+    await writeAgentGuardrailsStateAsync(stateSnapshot);
   } catch (err) {
     auditLog('pre-task-unified', 'guardrail_policy_persist_failed', { error: err.message });
   }
@@ -476,14 +481,14 @@ function checkNestedWorktreeSpawn(hookInput, cwd = process.cwd()) {
  * Prevents spawning too many parallel agents which exhausts memory.
  *
  * Env: CONCURRENT_AGENT_CAP=N (default: 3)
- *      CONCURRENT_AGENT_CAP_ENFORCEMENT=block|warn|off (default: warn)
+ *      CONCURRENT_AGENT_CAP_ENFORCEMENT=block|warn|off (default: block)
  *
  * @param {Object} hookInput - Hook input context
  * @param {string} [projectRoot] - Project root override for testing
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
 function checkConcurrentAgentCap(hookInput, projectRoot) {
-  const enforcement = getEnforcementMode('CONCURRENT_AGENT_CAP_ENFORCEMENT', 'warn');
+  const enforcement = getEnforcementMode('CONCURRENT_AGENT_CAP_ENFORCEMENT', 'block');
   if (enforcement === 'off') {
     return { pass: true };
   }
@@ -509,7 +514,7 @@ function checkConcurrentAgentCap(hookInput, projectRoot) {
   return { pass: true, result: 'warn', message };
 }
 
-function runAllChecks(hookInput) {
+async function runAllChecks(hookInput) {
   const toolName = getToolName(hookInput);
   if (toolName !== 'Task') {
     return { pass: true, exitCode: 0 };
@@ -544,7 +549,7 @@ function runAllChecks(hookInput) {
     console.warn(concurrentCapResult.message);
   }
 
-  const taskListFirstResult = checkTaskListFirst(toolName, hookInput);
+  const taskListFirstResult = await checkTaskListFirst(toolName, hookInput);
   if (!taskListFirstResult.pass) {
     return {
       pass: false,
@@ -558,7 +563,7 @@ function runAllChecks(hookInput) {
 
   checkAgentContextPreTracker(hookInput);
 
-  const memoryFirstResult = checkCoreMemoryReadBeforeTask(hookInput);
+  const memoryFirstResult = await checkCoreMemoryReadBeforeTask(hookInput);
   if (!memoryFirstResult.pass) {
     return {
       pass: false,
@@ -567,7 +572,7 @@ function runAllChecks(hookInput) {
     };
   }
 
-  const routingResult = checkRoutingGuard(toolName, toolInput, hookInput);
+  const routingResult = await checkRoutingGuard(toolName, toolInput, hookInput);
   if (!routingResult.pass) {
     return {
       pass: false,
@@ -637,11 +642,11 @@ function runAllChecks(hookInput) {
   }
 
   updateLoopStateAfterAllow(hookInput);
-  // Preserve synchronous return contract for test and hook callers.
+  // Preserve synchronous return contract for test and hook callers where possible.
   // Task lifecycle persistence is best-effort and can continue asynchronously.
   void updateTaskLifecycleStateAfterAllow(hookInput);
   ownership.registerTaskOwnershipClaimAfterAllow(hookInput, toolInput);
-  persistGuardrailPolicy(hookInput, toolInput);
+  await persistGuardrailPolicy(hookInput, toolInput);
   return { pass: true, exitCode: 0 };
 }
 
@@ -666,14 +671,14 @@ module.exports = {
   isEvolutionTrigger,
   detectEvolutionType,
   getLoopState,
-  readTaskListLoopState,
-  writeTaskListLoopState,
-  registerTaskListFirstViolation,
-  clearTaskListFirstViolation,
-  readPlannerFirstLoopState,
-  writePlannerFirstLoopState,
-  registerPlannerFirstViolation,
-  clearPlannerFirstViolation,
+  readTaskListLoopStateAsync,
+  writeTaskListLoopStateAsync,
+  registerTaskListFirstViolationAsync,
+  clearTaskListFirstViolationAsync,
+  readPlannerFirstLoopStateAsync,
+  writePlannerFirstLoopStateAsync,
+  registerPlannerFirstViolationAsync,
+  clearPlannerFirstViolationAsync,
   invalidateCachedState,
   updateLoopStateAfterAllow,
   checkParallelOwnershipRequired: ownership.checkParallelOwnershipRequired,
@@ -684,8 +689,8 @@ module.exports = {
   hasMultiWaveDirective,
   parseAllowedFilesFromPrompt,
   extractGuardrailPolicy,
-  readAgentGuardrailsState,
-  writeAgentGuardrailsState,
+  readAgentGuardrailsStateAsync,
+  writeAgentGuardrailsStateAsync,
   persistGuardrailPolicy,
   PLANNER_PATTERNS,
   SECURITY_PATTERNS,

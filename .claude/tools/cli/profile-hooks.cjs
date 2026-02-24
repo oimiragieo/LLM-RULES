@@ -134,28 +134,8 @@ const KEY_HOOKS = [
       prompt: 'Fix the bug in auth.js',
     },
   },
-  // Self-healing - anomaly-detector
-  {
-    name: 'anomaly-detector.cjs',
-    path: 'self-healing/anomaly-detector.cjs',
-    trigger: 'PostToolUse',
-    input: {
-      tool_name: 'Bash',
-      tool_output: 'npm test passed',
-    },
-  },
-  // Self-healing - loop-prevention
-  {
-    name: 'loop-prevention.cjs',
-    path: 'self-healing/loop-prevention.cjs',
-    trigger: 'PreToolUse(Task)',
-    input: {
-      tool_name: 'Task',
-      tool_input: {
-        prompt: 'Retry task...',
-      },
-    },
-  },
+  // Self-healing hooks archived — anomaly-detector and loop-prevention
+  // moved to _archive/ (C-6 audit fix). loop-state-manager.cjs remains active.
 ];
 
 // =============================================================================

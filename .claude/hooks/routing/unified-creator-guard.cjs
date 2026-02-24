@@ -407,7 +407,9 @@ const SCHEMA_MAP = {
  * @returns {{ valid: boolean, errors: string[], mode: string }}
  */
 function validateArtifactContent(artifactType, content) {
-  const result = { valid: true, errors: [], mode: 'warn' };
+  const rawMode = (process.env.SCHEMA_ENFORCEMENT || '').trim().toLowerCase();
+  const mode = ['block', 'warn', 'off'].includes(rawMode) ? rawMode : 'warn';
+  const result = { valid: true, errors: [], mode };
 
   // Look up schema
   const schemaFile = SCHEMA_MAP[artifactType];

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Trusted Sources",
+  "description": "Allowlist of trusted domains, organizations, and patterns for security enforcement.",
+  "type": "object",
+  "properties": {
+    "version": { "type": "string" },
+    "trusted_domains": { "type": "array", "items": { "type": "string" } },
+    "trusted_orgs": { "type": "array", "items": { "type": "string" } },
+    "blocked_patterns": { "type": "array", "items": { "type": "string" } },
+    "enforcement_mode": { "type": "string", "enum": ["block", "warn", "off"] }
+  }
+}

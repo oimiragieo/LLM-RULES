@@ -1,3 +1,9 @@
+/**
+ * Agent Tools & Thinking Config (reads agent-config.json)
+ *
+ * Provides per-agent tool lists and thinking budget mappings.
+ * NOT to be confused with agent-config-reader.cjs (which reads config.yaml for model selection).
+ */
 'use strict';
 
 const fs = require('fs');

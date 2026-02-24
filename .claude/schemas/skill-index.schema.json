@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Skill Index",
+  "description": "Auto-generated index of all available skills, their metadata, and agent assignments.",
+  "type": "object",
+  "required": ["version", "generatedAt", "metadata", "skills"],
+  "properties": {
+    "version": { "type": "string" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "metadata": {
+      "type": "object",
+      "required": ["totalSkills", "totalDomains", "totalCategories"],
+      "properties": {
+        "totalSkills": { "type": "integer", "minimum": 0 },
+        "totalDomains": { "type": "integer", "minimum": 0 },
+        "totalCategories": { "type": "integer", "minimum": 0 },
+        "lastValidated": { "type": "string" },
+        "source": { "type": "string" },
+        "archivedIncluded": { "type": "boolean" }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "category", "domain"],
+        "properties": {
+          "name": { "type": "string" },
+          "displayName": { "type": "string" },
+          "category": { "type": "string" },
+          "domain": { "type": "string" },
+          "description": { "type": "string" },
+          "requiredTools": { "type": "array", "items": { "type": "string" } },
+          "agentPrimary": { "type": "array", "items": { "type": "string" } },
+          "agentSupporting": { "type": "array", "items": { "type": "string" } },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "priority": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "aliasOf": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

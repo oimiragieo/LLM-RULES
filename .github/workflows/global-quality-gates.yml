@@ -62,5 +62,17 @@ jobs:
       - name: Validate full configuration
         run: pnpm validate:full
 
+      - name: Validate sync
+        if: always()
+        run: pnpm validate:sync
+
+      - name: Validate routing
+        if: always()
+        run: pnpm validate:routing
+
+      - name: Validate CI gate
+        if: always()
+        run: pnpm validate:ci-gate
+
       - name: Run full tests
         run: pnpm test

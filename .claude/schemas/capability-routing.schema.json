@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-code.anthropic.com/schemas/capability-routing",
+  "title": "Capability Routing",
+  "description": "Schema for capability routing configuration",
+  "type": "object",
+  "properties": {
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "lastUpdated": { "type": "string" },
+    "capabilityMap": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "defaultAgents": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "domainFallbacks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "capabilityPriority": {
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "order": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "routingConditions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "minPromptLength": { "type": "integer", "minimum": 0 },
+          "requireAnyKeyword": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "notes": { "type": "object" }
+  },
+  "additionalProperties": false
+}

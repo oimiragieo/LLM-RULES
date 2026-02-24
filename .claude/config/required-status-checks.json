@@ -1,4 +1,5 @@
 {
+  "$schema": "../schemas/required-status-checks.schema.json",
   "version": 1,
   "owner": "ci-governance",
   "required_checks": [
