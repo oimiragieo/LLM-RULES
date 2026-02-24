@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 'use strict';
 
 const { getEnforcementMode, auditSecurityOverride } = require('../../lib/utils/hook-input.cjs');
@@ -323,7 +324,10 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
           const fs = require('node:fs');
           const path = require('node:path');
           let currentDir = __dirname;
-          while (currentDir !== path.parse(currentDir).root && !fs.existsSync(path.join(currentDir, '.claude'))) {
+          while (
+            currentDir !== path.parse(currentDir).root &&
+            !fs.existsSync(path.join(currentDir, '.claude'))
+          ) {
             currentDir = path.dirname(currentDir);
           }
           const issuesPath = path.join(currentDir, '.claude', 'context', 'memory', 'issues.md');

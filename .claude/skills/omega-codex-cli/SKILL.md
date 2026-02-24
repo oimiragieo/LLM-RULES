@@ -1,4 +1,5 @@
----
+## lastVerifiedAt: 2026-02-24T04:26:35.324Z
+
 name: omega-codex-cli
 description: Shell out to OpenAI Codex CLI for headless code generation, analysis, and question-answering. Optimized for code tasks. Requires OPENAI_API_KEY env var.
 version: 1.0.0
@@ -7,13 +8,15 @@ invoked_by: both
 user_invocable: true
 tools: [Bash, Read]
 best_practices:
-  - Always run verify-setup.mjs before first invocation
-  - Ensure OPENAI_API_KEY env var is set before use
-  - Use --json for JSONL event stream output in automation pipelines
-  - Use --timeout-ms for long-running tasks to prevent hangs
-  - Use --sandbox for isolated workspace-write mode
-error_handling: graceful
-streaming: supported
+
+- Always run verify-setup.mjs before first invocation
+- Ensure OPENAI_API_KEY env var is set before use
+- Use --json for JSONL event stream output in automation pipelines
+- Use --timeout-ms for long-running tasks to prevent hangs
+- Use --sandbox for isolated workspace-write mode
+  error_handling: graceful
+  streaming: supported
+
 ---
 
 # Codex CLI Skill
@@ -88,7 +91,7 @@ node .claude/skills/omega-codex-cli/scripts/verify-setup.mjs
 | 1    | Error (CLI failure, auth issue, API error) |
 | 124  | Timeout (--timeout-ms exceeded)            |
 
-## Iron Laws
+## Anti-Patterns & Iron Laws
 
 1. ALWAYS verify OPENAI_API_KEY is set before invocation
 2. NEVER use stdin for prompt delivery — Codex uses positional arg
@@ -114,3 +117,5 @@ Read `.claude/context/memory/learnings.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+_Note: Use `pnpm search:code` to discover references to this skill codebase-wide._

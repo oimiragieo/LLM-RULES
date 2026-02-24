@@ -90,9 +90,9 @@ TaskUpdate({
 
 **Impact**:
 
-- Router became debugger instead of orchestrator (violates separation of concerns)
+- Router became troubleshooter instead of orchestrator (violates separation of concerns)
 - Task #38 left stale (`in_progress` after work completed) due to manual router investigation
-- Undermines specialist-first routing law — debugging should use qa or troubleshooting-regression skill
+- Undermines specialist-first routing law — troubleshooting should use qa or troubleshooting-regression skill
 - Sets precedent for future rule violations
 
 **Mitigation**:
@@ -281,3 +281,23 @@ TaskUpdate({
 **Fix**: After every new SKILL.md creation, run: `node .claude/tools/cli/generate-skill-index.cjs`
 
 **Prevention**: Add to skill-creator post-creation checklist and proactive-audit S-05 check (pnpm validate:skills).
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.563Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "simplify the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.582Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "review code" suggests specialist "code-reviewer". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.603Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.621Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "set up docker" suggests specialist "devops". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.644Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "database schema" suggests specialist "database-architect". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.668Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "research" suggests specialist "researcher". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.694Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.718Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.769Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.789Z

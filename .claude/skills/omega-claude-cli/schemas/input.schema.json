@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "omega-claude-cliInput",
+  "description": "Input schema for Shell out to Claude Code CLI to invoke a second Claude session headlessly. Useful for cross-validation, second opinions, and isolated analysis without sharing current agent context. Requires Anthropic account.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

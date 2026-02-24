@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "omega-cursor-cliInput",
+  "description": "Input schema for Shell out to Cursor Agent CLI for headless IDE-aware code tasks. Supports multi-model routing (auto mode routes to Claude, Gemini, GPT). Requires Cursor Pro/Business subscription.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

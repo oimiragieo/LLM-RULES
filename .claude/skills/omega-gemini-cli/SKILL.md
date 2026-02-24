@@ -1,4 +1,5 @@
----
+## lastVerifiedAt: 2026-02-24T04:26:35.324Z
+
 name: omega-gemini-cli
 description: Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on "use Gemini", "analyze with Gemini", "large file", "sandbox", "brainstorm with Gemini".
 version: 2.0.0
@@ -7,15 +8,17 @@ invoked_by: both
 user_invocable: true
 tools: [Bash, Read]
 best_practices:
-  - Always run verify-setup.mjs before first invocation to check CLI availability
-  - Use stdin prompt delivery (built into ask-gemini.mjs) -- never pass prompt as positional arg directly to gemini CLI
-  - For file review, embed file content in prompt text -- no dedicated --file flag exists
-  - Use --json flag for machine-parseable output (wraps response in {"response":"..."} envelope)
-  - Use --sandbox / -s flag for code execution tasks requiring isolated sandbox
-  - Use --model gemini-2.5-flash or gemini-2.5-flash-lite to reduce quota/latency
-  - Set user expectations: simple queries ~2 min, large file/codebase review ~5-10 min
-error_handling: graceful
-streaming: not_supported
+
+- Always run verify-setup.mjs before first invocation to check CLI availability
+- Use stdin prompt delivery (built into ask-gemini.mjs) -- never pass prompt as positional arg directly to gemini CLI
+- For file review, embed file content in prompt text -- no dedicated --file flag exists
+- Use --json flag for machine-parseable output (wraps response in {"response":"..."} envelope)
+- Use --sandbox / -s flag for code execution tasks requiring isolated sandbox
+- Use --model gemini-2.5-flash or gemini-2.5-flash-lite to reduce quota/latency
+- Set user expectations: simple queries ~2 min, large file/codebase review ~5-10 min
+  error_handling: graceful
+  streaming: not_supported
+
 ---
 
 # Gemini CLI Skill
@@ -136,7 +139,7 @@ node .claude/skills/omega-gemini-cli/scripts/verify-setup.mjs
 | `/brainstorm`         | Brainstorm mode (build prompt with challenge + optional methodology)    |
 | `/omega-gemini-setup` | Verify Node and Gemini CLI; guide user to install and auth. No MCP.     |
 
-## Iron Laws
+## Anti-Patterns & Iron Laws
 
 1. ALWAYS use verify-setup.mjs before first use
 2. NEVER pass prompt as positional arg to raw gemini CLI — use ask-gemini.mjs wrapper
@@ -159,3 +162,10 @@ node .claude/skills/omega-gemini-cli/scripts/verify-setup.mjs
 
 - **Node.js 18+** to run the scripts
 - **Google Gemini CLI** (`npm install -g @google/gemini-cli`) with one-time Google sign-in
+
+## Memory Protocol
+
+Before work: Read `.claude/context/memory/learnings.md`
+After work: Append findings to learnings or issues as needed.
+
+_Note: Use `pnpm search:code` to discover references to this skill codebase-wide._

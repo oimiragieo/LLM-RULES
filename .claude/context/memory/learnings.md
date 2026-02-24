@@ -63,3 +63,19 @@
 ## Skill Updated: ci-cd-implementation-rule (2026-02-23)
 
 - Skill `ci-cd-implementation-rule` was reviewed and updated by the skill-updater pipeline.
+
+## Skill Updated: omega-gemini-cli (2026-02-24)
+
+- Skill `omega-gemini-cli` was reviewed and updated by the skill-updater pipeline.
+
+## Skill Updated: omega-cursor-cli (2026-02-24)
+
+- Skill `omega-cursor-cli` was reviewed and updated by the skill-updater pipeline.
+
+## Skill Updated: omega-codex-cli (2026-02-24)
+
+- Skill `omega-codex-cli` was reviewed and updated by the skill-updater pipeline.
+
+## Skill Updated: omega-claude-cli (2026-02-24)
+
+- Skill `omega-claude-cli` was reviewed and updated by the skill-updater pipeline.

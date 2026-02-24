@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-23T07:49:21.651Z",
+  "generatedAt": "2026-02-24T05:02:13.416Z",
   "metadata": {
-    "totalSkills": 391,
+    "totalSkills": 392,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-23T07:49:21.652Z",
+    "lastValidated": "2026-02-24T05:02:13.417Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -821,10 +821,11 @@
       "displayName": "Omega Codex Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Shell out to OpenAI Codex CLI for headless code generation, analysis, and question-answering. Optimized for code tasks. Requires OPENAI_API_KEY env var.",
+      "description": "Other - omega-codex-cli",
       "requiredTools": [
-        "Bash",
-        "Read"
+        "Read",
+        "Write",
+        "Edit"
       ],
       "agentPrimary": [
         "developer"
@@ -863,10 +864,11 @@
       "displayName": "Omega Gemini Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on \"use Gemini\", \"analyze with Gemini\", \"large file\", \"sandbox\", \"brainstorm with Gemini\".",
+      "description": "Other - omega-gemini-cli",
       "requiredTools": [
-        "Bash",
-        "Read"
+        "Read",
+        "Write",
+        "Edit"
       ],
       "agentPrimary": [
         "developer"
@@ -3822,10 +3824,11 @@
       "displayName": "Omega Claude Cli",
       "category": "Other",
       "domain": "other",
-      "description": "Shell out to Claude Code CLI to invoke a second Claude session headlessly. Useful for cross-validation, second opinions, and isolated analysis without sharing current agent context. Requires Anthropic account.",
+      "description": "Other - omega-claude-cli",
       "requiredTools": [
-        "Bash",
-        "Read"
+        "Read",
+        "Write",
+        "Edit"
       ],
       "agentPrimary": [
         "developer"
@@ -8779,6 +8782,28 @@
       "priority": 1,
       "aliasOf": null
     },
+    "test-skill-modify-1771908233896": {
+      "name": "test-skill-modify-1771908233896",
+      "displayName": "Test Skill Modify 1771908233896",
+      "category": "Other",
+      "domain": "other",
+      "description": "Old description",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "test-skill-modify-1771908233896"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "testing-expert": {
       "name": "testing-expert",
       "displayName": "Testing Expert",
@@ -9652,6 +9677,7 @@
         "tauri-security-rules",
         "tauri-svelte-typescript-general",
         "tauri-svelte-ui-components",
+        "test-skill-modify-1771908233896",
         "testing-expert",
         "tool-creator",
         "troubleshooting-regression",
@@ -10152,6 +10178,7 @@
         "template-creator",
         "template-renderer",
         "test-generator",
+        "test-skill-modify-1771908233896",
         "testing-expert",
         "tool-creator",
         "tool-search",
@@ -10626,6 +10653,7 @@
         "template-renderer",
         "terraform-infra",
         "test-generator",
+        "test-skill-modify-1771908233896",
         "text-to-sql",
         "thinking-tools",
         "tool-creator",
@@ -10663,9 +10691,7 @@
         "finishing-a-development-branch",
         "code-style-validator",
         "dynamic-api-integration",
-        "omega-codex-cli",
         "omega-cursor-cli",
-        "omega-gemini-cli",
         "incident-runbook-templates",
         "html-tailwind-css-and-javascript-expert-rule",
         "agent-creator",
@@ -10738,7 +10764,6 @@
         "monorepo-and-tooling",
         "nextjs-expert",
         "nodejs-expert",
-        "omega-claude-cli",
         "on-call-handoff-patterns",
         "php-expert",
         "plan-generator",
@@ -11058,6 +11083,8 @@
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
+        "omega-codex-cli",
+        "omega-gemini-cli",
         "incident-runbook-templates",
         "code-structural-search",
         "advanced-elicitation",
@@ -11156,6 +11183,7 @@
         "next-upgrade",
         "nextjs-expert",
         "nodejs-expert",
+        "omega-claude-cli",
         "on-call-handoff-patterns",
         "pandas-data-manipulation-rules",
         "php-expert",
@@ -11355,6 +11383,7 @@
         "template-creator",
         "template-renderer",
         "test-generator",
+        "test-skill-modify-1771908233896",
         "text-to-sql",
         "tool-creator",
         "tool-search",
@@ -11401,6 +11430,8 @@
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
+        "omega-codex-cli",
+        "omega-gemini-cli",
         "code-structural-search",
         "function-length-and-responsibility",
         "html-tailwind-css-and-javascript-expert-rule",
@@ -11476,6 +11507,7 @@
         "next-upgrade",
         "nextjs-expert",
         "nodejs-expert",
+        "omega-claude-cli",
         "pandas-data-manipulation-rules",
         "php-expert",
         "plan-generator",
@@ -11663,6 +11695,7 @@
         "tauri-svelte-ui-components",
         "tdd",
         "template-creator",
+        "test-skill-modify-1771908233896",
         "tool-creator",
         "track-management",
         "tsconfig-json-rules",
@@ -12077,6 +12110,7 @@
         "tauri-svelte-ui-components",
         "template-creator",
         "template-renderer",
+        "test-skill-modify-1771908233896",
         "thinking-tools",
         "tool-creator",
         "tool-search",
@@ -12858,6 +12892,7 @@
         "tauri-svelte-ui-components",
         "template-creator",
         "template-renderer",
+        "test-skill-modify-1771908233896",
         "thinking-tools",
         "tool-creator",
         "tool-search",

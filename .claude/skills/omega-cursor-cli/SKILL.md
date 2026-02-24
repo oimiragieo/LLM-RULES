@@ -16,7 +16,7 @@ best_practices:
 error_handling: graceful
 streaming: not_supported
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: 2026-02-24T04:26:35.324Z
 ---
 
 # Cursor CLI Skill
@@ -122,3 +122,10 @@ node .claude/skills/omega-cursor-cli/scripts/verify-setup.mjs
 - **Available models:** claude-4.6-opus, claude-4.6-sonnet, composer-1.5, gemini-3.1-pro, gpt-5.3-codex, auto
 - **Platform:** Partial cross-platform (WSL issues on some Windows configurations)
 - **PATH resolution order:** agent -> cursor-agent -> %LOCALAPPDATA%\cursor-agent\cursor-agent.cmd -> npx @cursor/agent
+
+## Memory Protocol
+
+Before work: Read `.claude/context/memory/learnings.md`
+After work: Append findings to learnings or issues as needed.
+
+_Note: Use `pnpm search:code` to discover references to this skill codebase-wide._

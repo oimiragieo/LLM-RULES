@@ -1,4 +1,5 @@
----
+## lastVerifiedAt: 2026-02-24T04:26:35.324Z
+
 name: omega-claude-cli
 description: Shell out to Claude Code CLI to invoke a second Claude session headlessly. Useful for cross-validation, second opinions, and isolated analysis without sharing current agent context. Requires Anthropic account.
 version: 1.0.0
@@ -7,13 +8,15 @@ invoked_by: both
 user_invocable: true
 tools: [Bash, Read]
 best_practices:
-  - Always run verify-setup.mjs before first invocation
-  - Use for second-opinion validation where context isolation matters
-  - Use --timeout-ms to prevent indefinite hangs
-  - --dangerously-skip-permissions is required for headless mode (already in wrapper)
-  - Use format-output.mjs to strip conversational text framing from JSON responses
-error_handling: graceful
-streaming: not_supported
+
+- Always run verify-setup.mjs before first invocation
+- Use for second-opinion validation where context isolation matters
+- Use --timeout-ms to prevent indefinite hangs
+- --dangerously-skip-permissions is required for headless mode (already in wrapper)
+- Use format-output.mjs to strip conversational text framing from JSON responses
+  error_handling: graceful
+  streaming: not_supported
+
 ---
 
 # Claude CLI Skill
@@ -90,7 +93,7 @@ node .claude/skills/omega-claude-cli/scripts/verify-setup.mjs
 | 1    | Error (CLI failure, auth issue) |
 | 124  | Timeout (--timeout-ms exceeded) |
 
-## Iron Laws
+## Anti-Patterns & Iron Laws
 
 1. ALWAYS use --dangerously-skip-permissions for headless mode (built into wrapper)
 2. NEVER expect to share context between this CLI session and the current agent
@@ -104,3 +107,10 @@ node .claude/skills/omega-claude-cli/scripts/verify-setup.mjs
 - **Models:** opus, sonnet, haiku, or full model IDs
 - **Security:** --dangerously-skip-permissions allows all tool execution; intended for trusted automation only
 - **Platform:** Full cross-platform (Windows uses cmd.exe /d /s /c wrapper)
+
+## Memory Protocol
+
+Before work: Read `.claude/context/memory/learnings.md`
+After work: Append findings to learnings or issues as needed.
+
+_Note: Use `pnpm search:code` to discover references to this skill codebase-wide._
