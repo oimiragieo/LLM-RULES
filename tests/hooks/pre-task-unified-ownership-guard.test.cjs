@@ -77,7 +77,7 @@ describe('pre-task-unified ownership guard', () => {
     preTaskUnified.invalidateCachedState();
   });
 
-  it('blocks parallel task spawn when ownership overlaps active claim', () => {
+  it('blocks parallel task spawn when ownership overlaps active claim', async () => {
     preTaskUnified.registerTaskOwnershipClaimAfterAllow({
       session_id: 'session-a',
       tool_input: {
@@ -87,7 +87,7 @@ describe('pre-task-unified ownership guard', () => {
       },
     });
 
-    const result = preTaskUnified.checkTaskOwnershipConflicts({
+    const result = await preTaskUnified.checkTaskOwnershipConflicts({
       task_id: 'task-2',
       owned_paths: ['src/auth/login'],
       subagent_type: 'qa',
@@ -98,7 +98,7 @@ describe('pre-task-unified ownership guard', () => {
     assert.match(result.message, /OWNERSHIP-CONFLICT/);
   });
 
-  it('allows parallel spawn when ownership paths are disjoint', () => {
+  it('allows parallel spawn when ownership paths are disjoint', async () => {
     preTaskUnified.registerTaskOwnershipClaimAfterAllow({
       session_id: 'session-a',
       tool_input: {
@@ -108,7 +108,7 @@ describe('pre-task-unified ownership guard', () => {
       },
     });
 
-    const result = preTaskUnified.checkTaskOwnershipConflicts({
+    const result = await preTaskUnified.checkTaskOwnershipConflicts({
       task_id: 'task-2',
       owned_paths: ['src/payments'],
       subagent_type: 'qa',
@@ -117,7 +117,7 @@ describe('pre-task-unified ownership guard', () => {
     assert.equal(result.pass, true);
   });
 
-  it('records beads-style dependency metadata in task claim ledger', () => {
+  it('records beads-style dependency metadata in task claim ledger', async () => {
     preTaskUnified.registerTaskOwnershipClaimAfterAllow({
       session_id: 'session-b',
       tool_input: {
@@ -136,8 +136,8 @@ describe('pre-task-unified ownership guard', () => {
     assert.equal(claim.dependencyType, 'related');
   });
 
-  it('runAllChecks registers ownership claim after allowed spawn', () => {
-    const result = preTaskUnified.runAllChecks({
+  it('runAllChecks registers ownership claim after allowed spawn', async () => {
+    const result = await preTaskUnified.runAllChecks({
       tool_name: 'Task',
       session_id: 'session-c',
       tool_input: {
@@ -154,7 +154,7 @@ describe('pre-task-unified ownership guard', () => {
     assert.deepEqual(match.ownedPaths, ['src/worker']);
   });
 
-  it('blocks MEDIUM+ parallel spawn when ownership metadata is missing', () => {
+  it('blocks MEDIUM+ parallel spawn when ownership metadata is missing', async () => {
     writeRouterState({
       mode: 'router',
       complexity: 'medium',
@@ -163,7 +163,7 @@ describe('pre-task-unified ownership guard', () => {
       taskListCalledSincePrompt: true,
     });
 
-    const result = preTaskUnified.runAllChecks({
+    const result = await preTaskUnified.runAllChecks({
       tool_name: 'Task',
       session_id: 'session-d',
       tool_input: {
@@ -178,7 +178,7 @@ describe('pre-task-unified ownership guard', () => {
     assert.match(result.message, /PARALLEL-OWNERSHIP-REQUIRED/);
   });
 
-  it('allows MEDIUM+ parallel spawn when owned_paths exists', () => {
+  it('allows MEDIUM+ parallel spawn when owned_paths exists', async () => {
     writeRouterState({
       mode: 'router',
       complexity: 'high',
@@ -187,7 +187,7 @@ describe('pre-task-unified ownership guard', () => {
       taskListCalledSincePrompt: true,
     });
 
-    const result = preTaskUnified.runAllChecks({
+    const result = await preTaskUnified.runAllChecks({
       tool_name: 'Task',
       session_id: 'session-e',
       tool_input: {
@@ -201,7 +201,7 @@ describe('pre-task-unified ownership guard', () => {
     assert.equal(result.pass, true);
   });
 
-  it('does not enforce ownership requirement for low complexity parallel spawn', () => {
+  it('does not enforce ownership requirement for low complexity parallel spawn', async () => {
     writeRouterState({
       mode: 'router',
       complexity: 'low',
@@ -210,7 +210,7 @@ describe('pre-task-unified ownership guard', () => {
       taskListCalledSincePrompt: true,
     });
 
-    const result = preTaskUnified.runAllChecks({
+    const result = await preTaskUnified.runAllChecks({
       tool_name: 'Task',
       session_id: 'session-f',
       tool_input: {

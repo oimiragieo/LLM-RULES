@@ -79,6 +79,36 @@ class SemanticChunker {
   }
 
   /**
+   * Safe iteration over AST node children using TreeCursor if available,
+   * falling back to array iteration.
+   * @param {SyntaxNode} node - AST node
+   * @param {Function} callback - Callback(type, getNode): boolean
+   */
+  _walkChildren(node, callback) {
+    if (!node) return;
+
+    // Fast path: use TreeCursor if available (C++ native)
+    if (typeof node.walk === 'function') {
+      const cursor = node.walk();
+      if (cursor.gotoFirstChild()) {
+        do {
+          const shouldBreak = callback(cursor.nodeType, () => cursor.currentNode);
+          if (shouldBreak) break;
+        } while (cursor.gotoNextSibling());
+      }
+    }
+    // Slow path: use .children array (JS fallback)
+    else if (node.children && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        if (child) {
+          const shouldBreak = callback(child.type, () => child);
+          if (shouldBreak) break;
+        }
+      }
+    }
+  }
+
+  /**
    * Estimate token count for text (GPT-4 approximation)
    * Rule: ~4 characters per token for code
    * @param {string} text - Text to count
@@ -142,19 +172,21 @@ class SemanticChunker {
    * @returns {string|null} Extracted name or null
    */
   extractName(node, language) {
-    // Safety check
-    if (!node || !node.children || !Array.isArray(node.children)) {
-      return null;
-    }
+    if (!node) return null;
 
     // Try common name child types
     const nameTypes = ['identifier', 'name', 'property_identifier'];
+    let extractedName = null;
 
-    for (const child of node.children) {
-      if (child && nameTypes.includes(child.type)) {
-        return child.text;
+    this._walkChildren(node, (type, getNode) => {
+      if (nameTypes.includes(type)) {
+        extractedName = getNode().text;
+        return true; // break
       }
-    }
+      return false;
+    });
+
+    if (extractedName) return extractedName;
 
     // Language-specific extraction
     if (language === 'python') {
@@ -201,27 +233,24 @@ class SemanticChunker {
     const chunks = [];
     const { content, language, rootNode } = parseResult;
 
-    // Safety check: ensure rootNode has children
-    if (!rootNode || !rootNode.children || !Array.isArray(rootNode.children)) {
-      return chunks;
-    }
+    if (!rootNode) return chunks;
 
     // Process top-level nodes
-    for (const node of rootNode.children) {
-      const chunkType = this.getChunkType(node.type, language);
+    this._walkChildren(rootNode, (type, getNode) => {
+      const chunkType = this.getChunkType(type, language);
 
-      // Skip trivial nodes
-      if (
-        chunkType === CHUNK_TYPES.OTHER &&
-        this.estimateTokens(node.text) < this.options.minTokens
-      ) {
-        continue;
-      }
-
-      // Handle classes specially (extract methods)
       if (chunkType === CHUNK_TYPES.CLASS) {
-        chunks.push(...this.chunkClass(node, language, filePath, content));
+        chunks.push(...this.chunkClass(getNode(), language, filePath, content));
       } else {
+        const node = getNode();
+        // Skip trivial nodes
+        if (
+          chunkType === CHUNK_TYPES.OTHER &&
+          this.estimateTokens(node.text) < this.options.minTokens
+        ) {
+          return false;
+        }
+
         const chunk = this.createChunk(node, chunkType, language, filePath, content);
         if (chunk) {
           // Split if too large
@@ -232,7 +261,8 @@ class SemanticChunker {
           }
         }
       }
-    }
+      return false;
+    });
 
     return chunks;
   }
@@ -281,10 +311,7 @@ class SemanticChunker {
   chunkClass(classNode, language, filePath, content) {
     const chunks = [];
 
-    // Safety check
-    if (!classNode || !classNode.children || !Array.isArray(classNode.children)) {
-      return chunks;
-    }
+    if (!classNode) return chunks;
 
     // Create class header chunk
     const className = this.extractName(classNode, language);
@@ -305,21 +332,21 @@ class SemanticChunker {
     const childrenToProcess = [];
 
     // Collect children to process (avoid recursive loops)
-    for (const child of classNode.children) {
-      if (!child) continue; // Skip null/undefined
-
-      if (child.type === 'class_body' && child.children && Array.isArray(child.children)) {
+    this._walkChildren(classNode, (type, getNode) => {
+      if (type === 'class_body') {
         // JavaScript/TypeScript class_body contains methods
-        childrenToProcess.push(...child.children.filter(c => c)); // Filter out nulls
+        this._walkChildren(getNode(), (bodyType, getBodyNode) => {
+          childrenToProcess.push({ type: bodyType, node: getBodyNode() });
+          return false;
+        });
       } else {
-        childrenToProcess.push(child);
+        childrenToProcess.push({ type, node: getNode() });
       }
-    }
+      return false;
+    });
 
-    for (const child of childrenToProcess) {
-      if (!child) continue; // Skip null/undefined
-
-      if (methodTypes.includes(child.type)) {
+    for (const { type, node: child } of childrenToProcess) {
+      if (methodTypes.includes(type)) {
         const methodChunk = this.createChunk(
           child,
           CHUNK_TYPES.METHOD,
@@ -339,7 +366,7 @@ class SemanticChunker {
       }
       // Recursively handle nested classes (but not class_body to avoid infinite loop)
       else if (
-        (child.type === 'class_declaration' || child.type === 'class_definition') &&
+        (type === 'class_declaration' || type === 'class_definition') &&
         child !== classNode // Prevent infinite loop
       ) {
         chunks.push(...this.chunkClass(child, language, filePath, content));
@@ -363,12 +390,13 @@ class SemanticChunker {
     let firstMethodStart = classNode.endPosition.row;
     const methodTypes = ['method_definition', 'function_definition'];
 
-    for (const child of classNode.children) {
-      if (methodTypes.includes(child.type)) {
-        firstMethodStart = Math.min(firstMethodStart, child.startPosition.row);
-        break;
+    this._walkChildren(classNode, (type, getNode) => {
+      if (methodTypes.includes(type)) {
+        firstMethodStart = Math.min(firstMethodStart, getNode().startPosition.row);
+        return true; // break
       }
-    }
+      return false;
+    });
 
     const lines = content.split('\n');
     const headerLines = lines.slice(classNode.startPosition.row, firstMethodStart);

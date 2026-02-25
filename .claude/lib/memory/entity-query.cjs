@@ -313,7 +313,7 @@ class EntityQuery {
         continue;
       }
 
-      // Get direct relationships from current entity
+      // Get direct relationships from current entity (both outgoing and incoming)
       const stmt = this.db.prepare(`
         SELECT
           r.from_entity_id,
@@ -329,12 +329,13 @@ class EntityQuery {
         FROM entity_relationships r
         JOIN entities e_from ON e_from.id = r.from_entity_id
         JOIN entities e_to ON e_to.id = r.to_entity_id
-        WHERE r.from_entity_id = ?
+        WHERE r.from_entity_id = ? OR r.to_entity_id = ?
       `);
-      const relationships = stmt.all(entityId);
+      const relationships = stmt.all(entityId, entityId);
 
       for (const rel of relationships) {
-        const nextId = rel.to_entity_id;
+        // Follow the edge in the direction away from current entity
+        const nextId = rel.from_entity_id === entityId ? rel.to_entity_id : rel.from_entity_id;
 
         // Found target - return path
         if (nextId === toId) {

@@ -97,6 +97,7 @@ describe('search:compress golden — schema validation', () => {
       'dedupStats',
       'persistMode',
       'memoryRecordHint',
+      'telemetry',
     ];
 
     const actualKeys = Object.keys(result).sort();

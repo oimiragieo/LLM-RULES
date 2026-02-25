@@ -377,6 +377,10 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Kubernetes / K8s / Helm / ArgoCD / GitOps                      | `kubernetes-specialist`   | `.claude/agents/domain/kubernetes-specialist.md`   |
 | Sprint planning / roadmap / backlog / Jira/Linear              | `pm-coordinator`          | `.claude/agents/domain/pm-coordinator.md`          |
 | Memory leak / race condition / profiling / root cause analysis | `advanced-debugging`      | `.claude/agents/specialized/advanced-debugging.md` |
+| Qa Guardian                                                    | `qa-guardian`             | `.claude/agents/domain/qa-guardian.md`             |
+| Contract Check                                                 | `contract-check`          | `.claude/agents/domain/contract-check.md`          |
+| Bool Action                                                    | `bool-action`             | `.claude/agents/domain/bool-action.md`             |
+| Repo Onboarder                                                 | `repo-onboarder`          | `.claude/agents/orchestrators/repo-onboarder.md`   |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
@@ -620,6 +624,7 @@ High-impact orchestration skills:
 - `dispatching-parallel-agents`
 - `memory-search`
 - `stale-module-pruner`
+- `enterprise-skill-test-1771947459945`
 - `framework-context`
 - `recommend-evolution`
 - `creation-feasibility-gate`

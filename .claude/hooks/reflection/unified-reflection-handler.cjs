@@ -54,7 +54,7 @@ try {
 }
 
 let QUEUE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'reflection-queue.jsonl');
-const REFLECTION_QUEUE_MAX_LINES = Number(process.env.REFLECTION_QUEUE_MAX_LINES || 5000);
+const REFLECTION_QUEUE_MAX_LINES = Number(process.env.REFLECTION_QUEUE_MAX_LINES || 2000);
 const SESSION_END_EVENTS = ['Stop', 'SessionEnd'];
 const MIN_OUTPUT_LENGTH = 50;
 const STALE_ARTIFACTS_FILE = path.join(

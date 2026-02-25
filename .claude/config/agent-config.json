@@ -226,7 +226,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-haiku-4-5"
+      "model": "claude-sonnet-4-5"
     },
     "c4-component": {
       "tools": [
@@ -242,7 +242,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-haiku-4-5"
+      "model": "claude-sonnet-4-5"
     },
     "c4-container": {
       "tools": [
@@ -258,7 +258,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-haiku-4-5"
+      "model": "claude-sonnet-4-5"
     },
     "c4-context": {
       "tools": [
@@ -274,7 +274,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-haiku-4-5"
+      "model": "claude-sonnet-4-5"
     },
     "code-simplifier": {
       "tools": [
@@ -306,7 +306,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-haiku-4-5"
+      "model": "claude-sonnet-4-5"
     },
     "database-architect": {
       "tools": [
@@ -776,6 +776,21 @@
         "TaskUpdate",
         "WebFetch",
         "WebSearch",
+        "Write"
+      ],
+      "model": "claude-sonnet-4-5"
+    },
+    "multi-llm-consultant": {
+      "tools": [
+        "Bash",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
         "Write"
       ],
       "model": "claude-sonnet-4-5"

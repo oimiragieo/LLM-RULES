@@ -40,7 +40,9 @@ function main() {
     const manifestDefault = agentDefaults[agentName];
 
     if (!manifestDefault) {
-      warnings.push(`[DRIFT] ${agentName}: exists in agent-config.json but not in tool-manifest.json agentDefaults`);
+      warnings.push(
+        `[DRIFT] ${agentName}: exists in agent-config.json but not in tool-manifest.json agentDefaults`
+      );
       continue;
     }
 
@@ -54,10 +56,14 @@ function main() {
     const inManifestNotConfig = manifestTools.filter(t => !configSet.has(t));
 
     if (inConfigNotManifest.length > 0) {
-      warnings.push(`[DRIFT] ${agentName}: tools in config but not manifest: ${inConfigNotManifest.join(', ')}`);
+      warnings.push(
+        `[DRIFT] ${agentName}: tools in config but not manifest: ${inConfigNotManifest.join(', ')}`
+      );
     }
     if (inManifestNotConfig.length > 0) {
-      warnings.push(`[DRIFT] ${agentName}: tools in manifest but not config: ${inManifestNotConfig.join(', ')}`);
+      warnings.push(
+        `[DRIFT] ${agentName}: tools in manifest but not config: ${inManifestNotConfig.join(', ')}`
+      );
     }
   }
 

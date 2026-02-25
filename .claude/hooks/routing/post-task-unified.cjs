@@ -412,10 +412,10 @@ async function main() {
 
     // --- Token Saver Chat Update ---
     try {
-      const { execSync } = require('child_process');
+      const { execFileSync } = require('child_process');
       const statsCmd = path.join(PROJECT_ROOT, '.claude', 'tools', 'cli', 'token-saver-stats.cjs');
       if (fs.existsSync(statsCmd)) {
-        const stats = execSync('node', [statsCmd], {
+        const stats = execFileSync('node', [statsCmd], {
           encoding: 'utf8',
           stdio: ['ignore', 'pipe', 'ignore'],
           windowsHide: true,

@@ -538,6 +538,46 @@ describe('post-task-unified.cjs', () => {
     it('should export main function', () => {
       assert.strictEqual(typeof unifiedHook.main, 'function');
     });
+
+    it('should execute token-saver stats on Task completion', async () => {
+      const oldArgv = process.argv;
+      process.argv = [
+        'node',
+        'script.js',
+        JSON.stringify({
+          tool_name: 'Task',
+          tool_input: { task_id: 'test-123' },
+          tool_output: { status: 'completed' },
+        }),
+      ];
+
+      const child_process = require('child_process');
+      const originalExecFileSync = child_process.execFileSync;
+      let executedCommand = null;
+      let executedArgs = null;
+
+      child_process.execFileSync = (cmd, args, opts) => {
+        if (args && Array.isArray(args) && args[0] && args[0].endsWith('token-saver-stats.cjs')) {
+          executedCommand = cmd;
+          executedArgs = args;
+          return 'mock stats';
+        }
+        return originalExecFileSync ? originalExecFileSync(cmd, args, opts) : '';
+      };
+
+      try {
+        await unifiedHook.main();
+      } catch (_err) {
+        // mock process.exit ignores throws typically or ends early
+      }
+
+      assert.strictEqual(executedCommand, 'node');
+      assert.ok(executedArgs);
+      assert.ok(executedArgs[0].includes('token-saver-stats.cjs'));
+
+      child_process.execFileSync = originalExecFileSync;
+      process.argv = oldArgv;
+    });
   });
 });
 

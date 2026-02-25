@@ -270,6 +270,22 @@ function atomicWriteJSONSync(filePath, data, options = {}) {
 }
 
 /**
+ * Write JSON atomically with pretty printing (async)
+ *
+ * @param {string} filePath - Absolute path to target file
+ * @param {*} data - Data to serialize to JSON
+ * @param {Object} [options] - fs.promises.writeFile options (encoding, mode, flag)
+ * @param {Object} [options.lockOptions] - proper-lockfile options override
+ * @throws {Error} If serialization, write, or rename fails
+ */
+async function atomicWriteJSONAsync(filePath, data, options = {}) {
+  const content = JSON.stringify(data, null, 2) + '\n';
+  const writeOptions =
+    typeof options === 'string' ? { encoding: options } : { encoding: 'utf8', ...options };
+  await atomicWriteAsync(filePath, content, writeOptions);
+}
+
+/**
  * HOOK-006 FIX: Create a backup of existing file before modification
  * Creates a .bak file with timestamp to preserve previous state
  *
@@ -367,6 +383,7 @@ module.exports = {
   atomicWriteSync,
   atomicWriteAsync, // SEC-AUDIT-013/014 FIX: async version with proper-lockfile
   atomicWriteJSONSync,
+  atomicWriteJSONAsync,
   atomicWriteJSONSyncWithBackup,
   createBackup,
   restoreFromBackup,

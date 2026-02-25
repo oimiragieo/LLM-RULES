@@ -16,10 +16,19 @@ const VALIDATIONS = [
   { name: 'env-budget', cmd: 'node scripts/validate-env-budget.mjs' },
   { name: 'no-silent-catch', cmd: 'node scripts/validation/validate-no-silent-catch.cjs' },
   { name: 'archived-tests', cmd: 'node scripts/validation/validate-archived-tests.mjs' },
-  { name: 'intent-keyword-overlap', cmd: 'node scripts/validation/validate-intent-keyword-overlap.cjs' },
+  {
+    name: 'intent-keyword-overlap',
+    cmd: 'node scripts/validation/validate-intent-keyword-overlap.cjs',
+  },
   { name: 'tool-stub-policy', cmd: 'node scripts/validation/validate-tool-stub-policy.cjs' },
-  { name: 'workflow', cmd: 'node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs' },
-  { name: 'all-references', cmd: 'node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs' },
+  {
+    name: 'workflow',
+    cmd: 'node --max-old-space-size=4096 --expose-gc scripts/validate-workflow.mjs',
+  },
+  {
+    name: 'all-references',
+    cmd: 'node --max-old-space-size=4096 --expose-gc scripts/validate-all-references.mjs',
+  },
   { name: 'docs-stale', cmd: 'pnpm validate:docs:stale' },
   { name: 'hooks-docs', cmd: 'pnpm validate:hooks:docs' },
   { name: 'env-enforcement', cmd: 'pnpm validate:env:enforcement' },
@@ -68,7 +77,13 @@ async function main() {
   const failed = results.filter(r => !r.passed);
 
   if (json) {
-    console.log(JSON.stringify({ total: results.length, passed: passed.length, failed: failed.length, failures: failed }, null, 2));
+    console.log(
+      JSON.stringify(
+        { total: results.length, passed: passed.length, failed: failed.length, failures: failed },
+        null,
+        2
+      )
+    );
   } else {
     process.stderr.write(`\n${'='.repeat(60)}\n`);
     process.stderr.write(`Results: ${passed.length}/${results.length} passed\n`);

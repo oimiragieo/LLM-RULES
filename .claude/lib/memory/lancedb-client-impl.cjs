@@ -127,7 +127,11 @@ class MemoryVectorStore {
   static clearSharedStores() {
     for (const [, store] of MemoryVectorStore._sharedStores) {
       store._shared = false;
-      try { if (typeof store.close === 'function') store.close(); } catch (_e) { /* ignore */ }
+      try {
+        if (typeof store.close === 'function') store.close();
+      } catch (_e) {
+        /* ignore */
+      }
     }
     MemoryVectorStore._sharedStores.clear();
   }
@@ -186,7 +190,9 @@ class MemoryVectorStore {
       // 2. GPU Detection (if enabled)
       if (
         this.config.gpu?.enabled &&
-        (this.config.embeddingMode === 'transformers' || this.config.embeddingMode === 'fastembed')
+        (this.config.embeddingMode === 'transformers' ||
+          this.config.embeddingMode === 'fastembed' ||
+          this.config.embeddingMode === 'test')
       ) {
         await this._initializeGPU();
       }
@@ -415,6 +421,28 @@ class MemoryVectorStore {
     }
 
     return new Promise((resolve, reject) => {
+      let resolved = false;
+
+      const cleanup = () => {
+        this._embedProc.stdout.removeListener('data', onData);
+        this._embedProc.removeListener('error', onError);
+        this._embedProc.removeListener('exit', onExit);
+      };
+
+      const onError = err => {
+        if (resolved) return;
+        resolved = true;
+        cleanup();
+        reject(err);
+      };
+
+      const onExit = code => {
+        if (resolved) return;
+        resolved = true;
+        cleanup();
+        reject(new Error(`Embed subprocess exited unexpectedly (code ${code})`));
+      };
+
       const onData = chunk => {
         this._embedStdoutBuf = (this._embedStdoutBuf || '') + chunk;
         let idx;
@@ -425,21 +453,37 @@ class MemoryVectorStore {
           try {
             const msg = JSON.parse(line);
             if (msg.ready) continue; // Initial ready signal
-            this._embedProc.stdout.removeListener('data', onData);
+            if (resolved) return;
+            resolved = true;
+            cleanup();
             if (msg.ok && msg.vectors) {
               resolve(msg.vectors);
             } else {
               reject(new Error(msg.error || 'Embed subprocess returned error'));
             }
           } catch (e) {
-            this._embedProc.stdout.removeListener('data', onData);
+            if (resolved) return;
+            resolved = true;
+            cleanup();
             reject(e);
           }
           return;
         }
       };
+
       this._embedProc.stdout.on('data', onData);
-      this._embedProc.stdin.write(JSON.stringify({ action: 'embed', texts, batchSize }) + '\n');
+      this._embedProc.on('error', onError);
+      this._embedProc.on('exit', onExit);
+
+      try {
+        this._embedProc.stdin.write(JSON.stringify({ action: 'embed', texts, batchSize }) + '\n');
+      } catch (e) {
+        if (!resolved) {
+          resolved = true;
+          cleanup();
+          reject(e);
+        }
+      }
     });
   }
 
@@ -583,7 +627,19 @@ class MemoryVectorStore {
       (this.config.embeddingMode === 'fastembed' || this.config.embeddingMode === 'transformers');
 
     if (useSubprocess) {
-      return this._embedViaSubprocess(texts, batchSize);
+      const results = [];
+      const totalBatches = Math.ceil(texts.length / batchSize) || 1;
+      let batchDone = 0;
+      for (let i = 0; i < texts.length; i += batchSize) {
+        const batchTexts = texts.slice(i, i + batchSize);
+        const batchVectors = await this._embedViaSubprocess(batchTexts, batchSize);
+        results.push(...batchVectors);
+        batchDone += 1;
+        if (progressOptions?.onBatchComplete) {
+          progressOptions.onBatchComplete(batchDone, totalBatches);
+        }
+      }
+      return results;
     }
 
     // In-process fallback (for single queries / search, not bulk indexing)
@@ -975,12 +1031,25 @@ class MemoryVectorStore {
 
       // Write this micro-batch to LanceDB immediately
       if (!this.table) {
-        this.table = await this.db.createTable(this.config.collectionName, data);
-        const firstVector = data[0]?.vector;
-        if (Array.isArray(firstVector)) {
-          this._tableVectorDim = firstVector.length;
+        try {
+          this.table = await this.db.createTable(this.config.collectionName, data);
+          const firstVector = data[0]?.vector;
+          if (Array.isArray(firstVector)) {
+            this._tableVectorDim = firstVector.length;
+          }
+          this._typedMetadataSupported = true;
+        } catch (err) {
+          if (err.message && err.message.includes('already exists')) {
+            this.table = await this.db.openTable(this.config.collectionName);
+            await this.table.add(data);
+            const firstVector = data[0]?.vector;
+            if (Array.isArray(firstVector)) {
+              this._tableVectorDim = firstVector.length;
+            }
+          } else {
+            throw err;
+          }
         }
-        this._typedMetadataSupported = true;
       } else {
         try {
           await this.table.add(data);

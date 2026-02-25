@@ -114,8 +114,8 @@ function main() {
     stdin.on('end', () => {
       try {
         const input = chunks.join('');
-        const { success, data } = safeParseJSON(input, 'edit-result');
-        if (!success || !data) {
+        const data = safeParseJSON(input, 'edit-result');
+        if (!data || Object.keys(data).length === 0) {
           process.stdout.write(input);
           process.exit(0);
           return;

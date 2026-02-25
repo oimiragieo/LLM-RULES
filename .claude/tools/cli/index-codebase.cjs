@@ -138,6 +138,9 @@ program
       console.log(`  Chunks: ${result.chunksCreated}`);
       console.log(`  Embeddings: ${result.embeddingsGenerated}`);
       console.log(`  Time: ${Math.floor(result.timeMs / 1000)} seconds`);
+
+      await manager.close();
+      process.exit(0);
     } catch (error) {
       console.error(chalk.red('Error indexing:'), error.message);
       process.exit(1);
@@ -165,6 +168,8 @@ program
 
       if (results.length === 0) {
         console.log(chalk.yellow('No results found'));
+        await manager.close();
+        process.exit(0);
         return;
       }
 
@@ -185,6 +190,8 @@ program
         }
         console.log('');
       });
+      await manager.close();
+      process.exit(0);
     } catch (error) {
       console.error(chalk.red('Error searching:'), error.message);
       process.exit(1);
@@ -300,6 +307,8 @@ program
       // Display results
       if (!results || results.length === 0) {
         console.log(chalk.yellow('No results found'));
+        await manager.close();
+        process.exit(0);
         return;
       }
 
@@ -329,6 +338,8 @@ program
         }
         console.log('');
       });
+      await manager.close();
+      process.exit(0);
     } catch (error) {
       console.error(chalk.red('Error in hybrid search:'), error.message);
       if (error.stack) {
@@ -397,6 +408,14 @@ program
       } catch (_error) {
         console.log(`\nHybrid Search: ${chalk.yellow('○ Partially available (semantic only)')}`);
       }
+      // The original code had a malformed block here, removing it and adding the requested exit.
+      // if (isTerminal) {
+      //  console.log(chalk.cyan('File Index Checkpoint:'));
+      //  console.log(JSON.stringify(stats.files, null, 2));
+      // }
+
+      // The status command does not create an IndexManager, so manager.close() is not applicable.
+      process.exit(0);
     } catch (error) {
       console.error(chalk.red('Error getting status:'), error.message);
       process.exit(1);

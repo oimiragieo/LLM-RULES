@@ -13,7 +13,6 @@ function libRequire(modulePath) {
 const routerState = libRequire(path.join('routing', 'router-state.cjs'));
 const loopStateManager = libRequire(path.join('self-healing', 'loop-state-manager.cjs'));
 const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
-const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
 
 const LOOP_STATE_FILE = loopStateManager.LOOP_STATE_FILE;
 const TASKLIST_LOOP_STATE_FILE = path.join(
@@ -63,32 +62,38 @@ function getLoopState() {
   return loopStateManager.getState();
 }
 
-function readTaskListLoopState(stateFile = TASKLIST_LOOP_STATE_FILE) {
-  if (!fs.existsSync(stateFile)) return { sessions: {} };
-  const content = fs.readFileSync(stateFile, 'utf8');
-  const parsed = safeParseJSON(content, null);
-  if (
-    !parsed ||
-    typeof parsed !== 'object' ||
-    !parsed.sessions ||
-    typeof parsed.sessions !== 'object'
-  ) {
-    return { sessions: {} };
+async function readTaskListLoopStateAsync(stateFile = TASKLIST_LOOP_STATE_FILE) {
+  try {
+    const content = await fs.promises.readFile(stateFile, 'utf8');
+    const parsed = safeParseJSON(content, null);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      parsed.sessions &&
+      typeof parsed.sessions === 'object'
+    ) {
+      return parsed;
+    }
+  } catch (_err) {
+    // Return default below
   }
-  return parsed;
+  return { sessions: {} };
 }
 
-function writeTaskListLoopState(state, stateFile = TASKLIST_LOOP_STATE_FILE) {
+async function writeTaskListLoopStateAsync(state, stateFile = TASKLIST_LOOP_STATE_FILE) {
   try {
-    atomicWriteJSONSync(stateFile, state);
+    const { atomicWriteJSONAsync } = libRequire(path.join('utils', 'atomic-write.cjs'));
+    await atomicWriteJSONAsync(stateFile, state);
   } catch (_err) {
     // Best-effort
   }
 }
 
-function registerTaskListFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID || 'unknown') {
+async function registerTaskListFirstViolationAsync(
+  sessionId = process.env.CLAUDE_SESSION_ID || 'unknown'
+) {
   const now = Date.now();
-  const state = readTaskListLoopState();
+  const state = await readTaskListLoopStateAsync();
   const prev = state.sessions[sessionId] || { count: 0, updatedAt: 0 };
   const withinWindow = now - Number(prev.updatedAt || 0) <= TASKLIST_LOOP_BREAKER_WINDOW_MS;
   const next = {
@@ -96,44 +101,52 @@ function registerTaskListFirstViolation(sessionId = process.env.CLAUDE_SESSION_I
     updatedAt: now,
   };
   state.sessions[sessionId] = next;
-  writeTaskListLoopState(state);
+  await writeTaskListLoopStateAsync(state);
   return next.count;
 }
 
-function clearTaskListFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID || 'unknown') {
-  const state = readTaskListLoopState();
+async function clearTaskListFirstViolationAsync(
+  sessionId = process.env.CLAUDE_SESSION_ID || 'unknown'
+) {
+  const state = await readTaskListLoopStateAsync();
   if (state.sessions[sessionId]) {
     delete state.sessions[sessionId];
-    writeTaskListLoopState(state);
+    await writeTaskListLoopStateAsync(state);
   }
 }
 
-function readPlannerFirstLoopState(stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
-  if (!fs.existsSync(stateFile)) return { sessions: {} };
-  const content = fs.readFileSync(stateFile, 'utf8');
-  const parsed = safeParseJSON(content, null);
-  if (
-    !parsed ||
-    typeof parsed !== 'object' ||
-    !parsed.sessions ||
-    typeof parsed.sessions !== 'object'
-  ) {
-    return { sessions: {} };
-  }
-  return parsed;
-}
-
-function writePlannerFirstLoopState(state, stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
+async function readPlannerFirstLoopStateAsync(stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
   try {
-    atomicWriteJSONSync(stateFile, state);
+    const content = await fs.promises.readFile(stateFile, 'utf8');
+    const parsed = safeParseJSON(content, null);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      parsed.sessions &&
+      typeof parsed.sessions === 'object'
+    ) {
+      return parsed;
+    }
+  } catch (_err) {
+    // Return default below
+  }
+  return { sessions: {} };
+}
+
+async function writePlannerFirstLoopStateAsync(state, stateFile = PLANNER_FIRST_LOOP_STATE_FILE) {
+  try {
+    const { atomicWriteJSONAsync } = libRequire(path.join('utils', 'atomic-write.cjs'));
+    await atomicWriteJSONAsync(stateFile, state);
   } catch (_err) {
     // Best-effort
   }
 }
 
-function registerPlannerFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID || 'unknown') {
+async function registerPlannerFirstViolationAsync(
+  sessionId = process.env.CLAUDE_SESSION_ID || 'unknown'
+) {
   const now = Date.now();
-  const state = readPlannerFirstLoopState();
+  const state = await readPlannerFirstLoopStateAsync();
   const prev = state.sessions[sessionId] || { count: 0, updatedAt: 0 };
   const withinWindow = now - Number(prev.updatedAt || 0) <= getPlannerFirstLoopBreakerWindowMs();
   const next = {
@@ -141,15 +154,17 @@ function registerPlannerFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID
     updatedAt: now,
   };
   state.sessions[sessionId] = next;
-  writePlannerFirstLoopState(state);
+  await writePlannerFirstLoopStateAsync(state);
   return next.count;
 }
 
-function clearPlannerFirstViolation(sessionId = process.env.CLAUDE_SESSION_ID || 'unknown') {
-  const state = readPlannerFirstLoopState();
+async function clearPlannerFirstViolationAsync(
+  sessionId = process.env.CLAUDE_SESSION_ID || 'unknown'
+) {
+  const state = await readPlannerFirstLoopStateAsync();
   if (state.sessions[sessionId]) {
     delete state.sessions[sessionId];
-    writePlannerFirstLoopState(state);
+    await writePlannerFirstLoopStateAsync(state);
   }
 }
 
@@ -159,24 +174,28 @@ function resolveStableSessionId(hookInput = null) {
   );
 }
 
-function readAgentGuardrailsState(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
-  if (!fs.existsSync(stateFile)) return { sessions: {} };
-  const content = fs.readFileSync(stateFile, 'utf8');
-  const parsed = safeParseJSON(content, null);
-  if (
-    !parsed ||
-    typeof parsed !== 'object' ||
-    !parsed.sessions ||
-    typeof parsed.sessions !== 'object'
-  ) {
-    return { sessions: {} };
+async function readAgentGuardrailsStateAsync(stateFile = AGENT_GUARDRAILS_STATE_FILE) {
+  try {
+    const content = await fs.promises.readFile(stateFile, 'utf8');
+    const parsed = safeParseJSON(content, null);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      parsed.sessions &&
+      typeof parsed.sessions === 'object'
+    ) {
+      return parsed;
+    }
+  } catch (_err) {
+    // Return default below
   }
-  return parsed;
+  return { sessions: {} };
 }
 
-function writeAgentGuardrailsState(state, stateFile = AGENT_GUARDRAILS_STATE_FILE) {
+async function writeAgentGuardrailsStateAsync(state, stateFile = AGENT_GUARDRAILS_STATE_FILE) {
   try {
-    atomicWriteJSONSync(stateFile, state);
+    const { atomicWriteJSONAsync } = libRequire(path.join('utils', 'atomic-write.cjs'));
+    await atomicWriteJSONAsync(stateFile, state);
   } catch (_err) {
     // Best-effort.
   }
@@ -189,15 +208,15 @@ module.exports = {
   getPlannerFirstLoopBreakerThreshold,
   invalidateCachedState,
   getLoopState,
-  readTaskListLoopState,
-  writeTaskListLoopState,
-  registerTaskListFirstViolation,
-  clearTaskListFirstViolation,
-  readPlannerFirstLoopState,
-  writePlannerFirstLoopState,
-  registerPlannerFirstViolation,
-  clearPlannerFirstViolation,
+  readTaskListLoopStateAsync,
+  writeTaskListLoopStateAsync,
+  registerTaskListFirstViolationAsync,
+  clearTaskListFirstViolationAsync,
+  readPlannerFirstLoopStateAsync,
+  writePlannerFirstLoopStateAsync,
+  registerPlannerFirstViolationAsync,
+  clearPlannerFirstViolationAsync,
   resolveStableSessionId,
-  readAgentGuardrailsState,
-  writeAgentGuardrailsState,
+  readAgentGuardrailsStateAsync,
+  writeAgentGuardrailsStateAsync,
 };

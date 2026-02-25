@@ -159,7 +159,7 @@ describe('pre-task-unified.cjs', () => {
   // ---------------------------------------------------------------------------
 
   describe('checkRoutingGuard', () => {
-    it('should pass for Task tool when planner not required', () => {
+    it('should pass for Task tool when planner not required', async () => {
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: false,
@@ -173,11 +173,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkRoutingGuard('Task', input.tool_input);
+      const result = await preTaskUnified.checkRoutingGuard('Task', input.tool_input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should block Task when planner required but not spawned', () => {
+    it('should block Task when planner required but not spawned', async () => {
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: true,
@@ -192,12 +192,12 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkRoutingGuard('Task', input.tool_input);
+      const result = await preTaskUnified.checkRoutingGuard('Task', input.tool_input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('PLANNER'));
     });
 
-    it('should pass when spawning PLANNER agent', () => {
+    it('should pass when spawning PLANNER agent', async () => {
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: true,
@@ -212,11 +212,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkRoutingGuard('Task', input.tool_input);
+      const result = await preTaskUnified.checkRoutingGuard('Task', input.tool_input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should pass when security required and spawning security-architect', () => {
+    it('should pass when security required and spawning security-architect', async () => {
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresSecurityReview: true,
@@ -231,7 +231,7 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkRoutingGuard('Task', input.tool_input);
+      const result = await preTaskUnified.checkRoutingGuard('Task', input.tool_input);
       assert.strictEqual(result.pass, true);
     });
   });
@@ -241,7 +241,7 @@ describe('pre-task-unified.cjs', () => {
   // ---------------------------------------------------------------------------
 
   describe('checkLoopPrevention', () => {
-    it('should pass for first spawn', () => {
+    it('should pass for first spawn', async () => {
       writeState(LOOP_STATE_FILE, {
         sessionId: 'test-session',
         evolutionCount: 0,
@@ -257,11 +257,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should block when spawn depth exceeds limit', () => {
+    it('should block when spawn depth exceeds limit', async () => {
       writeState(LOOP_STATE_FILE, {
         sessionId: 'test-session',
         spawnDepth: 10, // Exceeds default of 5
@@ -275,12 +275,12 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('depth'));
     });
 
-    it('should block when action pattern repeats too many times', () => {
+    it('should block when action pattern repeats too many times', async () => {
       writeState(LOOP_STATE_FILE, {
         sessionId: 'test-session',
         spawnDepth: 1,
@@ -294,12 +294,12 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('pattern') || result.message.includes('Pattern'));
     });
 
-    it('should allow repeated action pattern for sequential non-nested spawns', () => {
+    it('should allow repeated action pattern for sequential non-nested spawns', async () => {
       writeState(LOOP_STATE_FILE, {
         sessionId: 'test-session',
         spawnDepth: 0,
@@ -313,11 +313,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should allow stale repeated action pattern outside recency window', () => {
+    it('should allow stale repeated action pattern outside recency window', async () => {
       const staleTime = new Date(Date.now() - 31 * 60 * 1000).toISOString();
       writeState(LOOP_STATE_FILE, {
         sessionId: 'test-session',
@@ -332,11 +332,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should ignore malformed/empty session state and allow fresh run', () => {
+    it('should ignore malformed/empty session state and allow fresh run', async () => {
       process.env.CLAUDE_SESSION_ID = 'current-session';
       writeState(LOOP_STATE_FILE, {
         sessionId: '',
@@ -351,11 +351,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should pass when enforcement is off', () => {
+    it('should pass when enforcement is off', async () => {
       process.env.LOOP_PREVENTION_MODE = 'off';
 
       writeState(LOOP_STATE_FILE, {
@@ -369,11 +369,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should ignore stale loop state from a different session', () => {
+    it('should ignore stale loop state from a different session', async () => {
       process.env.CLAUDE_SESSION_ID = 'current-session';
 
       writeState(LOOP_STATE_FILE, {
@@ -392,7 +392,7 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.checkLoopPrevention(input);
+      const result = await preTaskUnified.checkLoopPrevention(input);
       assert.strictEqual(result.pass, true);
     });
   });
@@ -402,7 +402,7 @@ describe('pre-task-unified.cjs', () => {
   // ---------------------------------------------------------------------------
 
   describe('runAllChecks', () => {
-    it('should run all 3 checks in order', () => {
+    it('should run all 3 checks in order', async () => {
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
 
       // Set up clean state
@@ -427,7 +427,7 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, true);
 
       const loopState = readState(LOOP_STATE_FILE);
@@ -443,7 +443,7 @@ describe('pre-task-unified.cjs', () => {
       assert.ok(router.currentSpawnTaskId == null);
     });
 
-    it('should record in_progress lifecycle when task_id is provided', () => {
+    it('should record in_progress lifecycle when task_id is provided', async () => {
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
 
       writeState(ROUTER_STATE_FILE, {
@@ -468,7 +468,7 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, true);
 
       const router = readState(ROUTER_STATE_FILE);
@@ -478,7 +478,7 @@ describe('pre-task-unified.cjs', () => {
       assert.ok(Number(router.taskUpdatesThisSession || 0) >= 1);
     });
 
-    it('should stop on first failure', () => {
+    it('should stop on first failure', async () => {
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
 
       // Set up state that will fail routing-guard check
@@ -502,12 +502,12 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('PLANNER'));
     });
 
-    it('should check loop prevention last', () => {
+    it('should check loop prevention last', async () => {
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
 
       // Set up state that passes all but loop-prevention
@@ -529,12 +529,12 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('depth') || result.message.includes('loop'));
     });
 
-    it('should pass for non-Task tools', () => {
+    it('should pass for non-Task tools', async () => {
       const input = {
         tool_name: 'Read',
         tool_input: {
@@ -542,11 +542,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should block resume-style Task spawns by default', () => {
+    it('should block resume-style Task spawns by default', async () => {
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
 
       writeState(ROUTER_STATE_FILE, {
@@ -568,12 +568,12 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('Resume-style spawn detected'));
     });
 
-    it('should allow resume-style spawn when override is explicitly enabled', () => {
+    it('should allow resume-style spawn when override is explicitly enabled', async () => {
       process.env.TASK_ALLOW_AGENT_RESUME = 'true';
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off'; // Disable memory read requirement
       writeState(ROUTER_STATE_FILE, {
@@ -595,11 +595,11 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, true);
     });
 
-    it('should block multi-wave spawn prompts in single-purpose block mode', () => {
+    it('should block multi-wave spawn prompts in single-purpose block mode', async () => {
       process.env.TASK_SINGLE_PURPOSE_ENFORCEMENT = 'block';
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off'; // Disable memory read requirement
       writeState(ROUTER_STATE_FILE, {
@@ -621,7 +621,7 @@ describe('pre-task-unified.cjs', () => {
         },
       };
 
-      const result = preTaskUnified.runAllChecks(input);
+      const result = await preTaskUnified.runAllChecks(input);
       assert.strictEqual(result.pass, false);
       assert.ok(result.message.includes('Multi-wave task'));
     });

@@ -78,12 +78,12 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
   });
 
   describe('TaskList-first loop-breaker', () => {
-    it('should bypass TaskList-first enforcement in bypassPermissions mode', () => {
+    it('should bypass TaskList-first enforcement in bypassPermissions mode', async () => {
       process.env.CLAUDE_SESSION_ID = 'tasklist-bypass-test';
       process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
       writeState(ROUTER_STATE_FILE, { mode: 'router', taskListCalledSincePrompt: false });
 
-      const result = preTaskUnified.checkTaskListFirst('Task', {
+      const result = await preTaskUnified.checkTaskListFirst('Task', {
         session_id: 'tasklist-bypass-test',
         permission_mode: 'bypassPermissions',
       });
@@ -91,41 +91,45 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       assert.strictEqual(result.result, undefined);
     });
 
-    it('should warn-allow by default when TASKLIST_FIRST_ENFORCEMENT is unset', () => {
-      process.env.CLAUDE_SESSION_ID = 'tasklist-default-warn-test';
+    it('should block by default when TASKLIST_FIRST_ENFORCEMENT is unset', async () => {
+      process.env.CLAUDE_SESSION_ID = 'tasklist-default-block-test';
       delete process.env.TASKLIST_FIRST_ENFORCEMENT;
       writeState(ROUTER_STATE_FILE, { mode: 'router', taskListCalledSincePrompt: false });
-      const result = preTaskUnified.checkTaskListFirst('Task', {
-        session_id: 'tasklist-default-warn-test',
+      const result = await preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-default-block-test',
       });
-      assert.strictEqual(result.pass, true);
-      assert.strictEqual(result.result, 'warn');
+      assert.strictEqual(result.pass, false);
+      assert.strictEqual(result.result, 'block');
       assert.ok(result.message.includes('TaskList() must be called before Task()'));
-      preTaskUnified.clearTaskListFirstViolation('tasklist-default-warn-test');
+      preTaskUnified.clearTaskListFirstViolationAsync('tasklist-default-block-test');
     });
 
-    it('should block initial TaskList-first violations, then warn-allow repeated loops', () => {
+    it('should block initial TaskList-first violations, then warn-allow repeated loops', async () => {
       process.env.CLAUDE_SESSION_ID = 'tasklist-loop-test';
       process.env.TASKLIST_FIRST_ENFORCEMENT = 'block';
       writeState(ROUTER_STATE_FILE, { mode: 'router', taskListCalledSincePrompt: false });
 
-      const first = preTaskUnified.checkTaskListFirst('Task', { session_id: 'tasklist-loop-test' });
-      const second = preTaskUnified.checkTaskListFirst('Task', {
+      const first = await preTaskUnified.checkTaskListFirst('Task', {
         session_id: 'tasklist-loop-test',
       });
-      const third = preTaskUnified.checkTaskListFirst('Task', { session_id: 'tasklist-loop-test' });
+      const second = await preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-loop-test',
+      });
+      const third = await preTaskUnified.checkTaskListFirst('Task', {
+        session_id: 'tasklist-loop-test',
+      });
 
       assert.strictEqual(first.pass, false);
       assert.strictEqual(second.pass, false);
       assert.strictEqual(third.pass, true);
       assert.strictEqual(third.result, 'warn');
       assert.ok(third.message.includes('LOOP-BREAKER'));
-      preTaskUnified.clearTaskListFirstViolation('tasklist-loop-test');
+      preTaskUnified.clearTaskListFirstViolationAsync('tasklist-loop-test');
     });
   });
 
   describe('Planner-first loop-breaker', () => {
-    it('allows Task spawn after threshold violations in window', () => {
+    it('allows Task spawn after threshold violations in window', async () => {
       process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
       process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '3';
       process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
@@ -138,13 +142,13 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const first = preTaskUnified.checkRoutingGuard('Task', {
+      const first = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
-      const second = preTaskUnified.checkRoutingGuard('Task', {
+      const second = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
-      const third = preTaskUnified.checkRoutingGuard('Task', {
+      const third = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
 
@@ -155,7 +159,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       assert.ok(third.message.includes('LOOP-BREAKER'));
     });
 
-    it('blocks until threshold when enforcement is block', () => {
+    it('blocks until threshold when enforcement is block', async () => {
       process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
       process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '4';
       process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
@@ -167,13 +171,13 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const first = preTaskUnified.checkRoutingGuard('Task', {
+      const first = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
-      const second = preTaskUnified.checkRoutingGuard('Task', {
+      const second = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
-      const third = preTaskUnified.checkRoutingGuard('Task', {
+      const third = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
 
@@ -184,7 +188,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       assert.ok(third.message.includes('PLANNER-FIRST VIOLATION'));
     });
 
-    it('resets count when planner is spawned', () => {
+    it('resets count when planner is spawned', async () => {
       process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
       process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '2';
       process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
@@ -197,12 +201,12 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const blockOnce = preTaskUnified.checkRoutingGuard('Task', {
+      const blockOnce = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
       assert.strictEqual(blockOnce.pass, false);
 
-      const plannerSpawn = preTaskUnified.checkRoutingGuard('Task', {
+      const plannerSpawn = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are planner. design the complex feature.',
       });
       assert.strictEqual(plannerSpawn.pass, true);
@@ -214,14 +218,14 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const afterReset = preTaskUnified.checkRoutingGuard('Task', {
+      const afterReset = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
       assert.strictEqual(afterReset.pass, false);
       assert.strictEqual(afterReset.result, 'block');
     });
 
-    it('respects threshold env override', () => {
+    it('respects threshold env override', async () => {
       process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
       process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '2';
       process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
@@ -234,10 +238,10 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const first = preTaskUnified.checkRoutingGuard('Task', {
+      const first = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
-      const second = preTaskUnified.checkRoutingGuard('Task', {
+      const second = await preTaskUnified.checkRoutingGuard('Task', {
         prompt: 'You are developer. implement complex feature.',
       });
 
@@ -247,7 +251,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       assert.ok(second.message.includes('LOOP-BREAKER'));
     });
 
-    it('uses stable env session id for loop-breaker when hook session ids vary', () => {
+    it('uses stable env session id for loop-breaker when hook session ids vary', async () => {
       process.env.PLANNER_FIRST_ENFORCEMENT = 'block';
       process.env.PLANNER_FIRST_LOOP_BREAKER_THRESHOLD = '2';
       process.env.PLANNER_FIRST_LOOP_BREAKER_WINDOW_MS = '60000';
@@ -260,12 +264,12 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         complexity: 'high',
       });
 
-      const first = preTaskUnified.checkRoutingGuard(
+      const first = await preTaskUnified.checkRoutingGuard(
         'Task',
         { prompt: 'You are developer. implement complex feature.' },
         { session_id: 'ephemeral-1' }
       );
-      const second = preTaskUnified.checkRoutingGuard(
+      const second = await preTaskUnified.checkRoutingGuard(
         'Task',
         { prompt: 'You are developer. implement complex feature.' },
         { session_id: 'ephemeral-2' }
@@ -279,7 +283,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
   });
 
   describe('exit codes', () => {
-    it('should return exit code 0 when all checks pass', () => {
+    it('should return exit code 0 when all checks pass', async () => {
       process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
       process.env.PLANNER_FIRST_ENFORCEMENT = 'off';
       process.env.SECURITY_REVIEW_ENFORCEMENT = 'off';
@@ -293,7 +297,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       });
       writeState(LOOP_STATE_FILE, { spawnDepth: 0, actionHistory: [] });
 
-      const result = preTaskUnified.runAllChecks({
+      const result = await preTaskUnified.runAllChecks({
         tool_name: 'Task',
         tool_input: { prompt: 'You are DEVELOPER. Fix a bug.' },
       });
@@ -302,7 +306,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
       assert.strictEqual(result.exitCode, 0);
     });
 
-    it('should return exit code 2 when check fails in block mode', () => {
+    it('should return exit code 2 when check fails in block mode', async () => {
       writeState(ROUTER_STATE_FILE, {
         mode: 'router',
         requiresPlannerFirst: true,
@@ -311,7 +315,7 @@ describe('pre-task-unified loop-breakers and exit codes', () => {
         taskListCalledSincePrompt: true,
       });
 
-      const result = preTaskUnified.runAllChecks({
+      const result = await preTaskUnified.runAllChecks({
         tool_name: 'Task',
         tool_input: { prompt: 'You are DEVELOPER.' },
       });

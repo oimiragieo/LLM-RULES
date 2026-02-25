@@ -167,17 +167,26 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
         return { ...result, index };
       };
 
-      // OOM FIX: Process files sequentially with synchronous flush to apply
-      // backpressure. The previous fire-and-forget `.then()` chain let file
-      // reads race ahead of embedding/LanceDB writes, causing unbounded
-      // memory growth from queued chunks + native ONNX/LanceDB allocations
-      // invisible to V8's GC (OOM at 32GB after only 30 files).
-      for (let i = 0; i < currentBatch.length; i++) {
-        const filePath = currentBatch[i];
-        const globalIndex = startIndex + b + i + 1;
+      // OOM FIX: Process files with controlled concurrency + synchronous flush.
+      // We chunk the batch into subBatches of size `effectiveConcurrency` so that
+      // all Piscina worker threads are busy, but we still apply backpressure and
+      // completely avoid race conditions during `flushBuffer()`.
+      for (let i = 0; i < currentBatch.length; i += effectiveConcurrency) {
+        const subBatch = currentBatch.slice(i, i + effectiveConcurrency);
+        const results = await Promise.all(
+          subBatch.map((filePath, j) => {
+            const globalIndex = startIndex + b + i + j + 1;
+            return runOne(filePath, globalIndex).catch(err => {
+              if (manager.options.verbose) {
+                console.error(`[INDEX] Error processing ${filePath}: ${err.message}`);
+              }
+              return null;
+            });
+          })
+        );
 
-        try {
-          const result = await runOne(filePath, globalIndex);
+        for (const result of results) {
+          if (!result) continue;
 
           filesProcessed++;
           fileHashes[result.filePath] = { hash: result.hash, chunks: result.chunks.length };
@@ -191,16 +200,13 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
 
           if (result.chunks.length > 0) {
             chunkBuffer.push(...result.chunks);
-            if (chunkBuffer.length >= flushSize) {
-              // Synchronously await flush — this is the key backpressure point.
-              // Embedding + LanceDB write must complete before we read more files.
-              await flushBuffer();
-            }
           }
-        } catch (err) {
-          if (manager.options.verbose) {
-            console.error(`[INDEX] Error processing ${filePath}: ${err.message}`);
-          }
+        }
+
+        // Synchronously await flush — this is the key backpressure point.
+        // Embedding + LanceDB write must complete before we read more files.
+        while (chunkBuffer.length >= flushSize) {
+          await flushBuffer();
         }
       }
     }

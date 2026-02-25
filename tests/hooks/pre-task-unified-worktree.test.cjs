@@ -52,7 +52,7 @@ describe('Fix 3 — checkNestedWorktreeSpawn', () => {
     Object.assign(process.env, originalEnv);
   });
 
-  it('blocks Task() from a depth-1 worktree (would create depth-2)', () => {
+  it('blocks Task() from a depth-1 worktree (would create depth-2)', async () => {
     const fakeCwd = '/project/.claude/worktrees/agent-abc';
     const hookInput = { tool: 'Task' };
     const result = checkNestedWorktreeSpawn(hookInput, fakeCwd);
@@ -64,18 +64,18 @@ describe('Fix 3 — checkNestedWorktreeSpawn', () => {
     );
   });
 
-  it('blocks Task() from a depth-2 worktree (would create depth-3)', () => {
+  it('blocks Task() from a depth-2 worktree (would create depth-3)', async () => {
     const fakeCwd = '/project/.claude/worktrees/outer/.claude/worktrees/inner';
     const result = checkNestedWorktreeSpawn({}, fakeCwd);
     assert.strictEqual(result.pass, false, 'Depth-2 worktree should also block');
   });
 
-  it('allows Task() from router context (depth-0, no worktree)', () => {
+  it('allows Task() from router context (depth-0, no worktree)', async () => {
     const result = checkNestedWorktreeSpawn({}, '/project');
     assert.strictEqual(result.pass, true, 'Router context should be allowed');
   });
 
-  it('warns (not blocks) when enforcement is warn', () => {
+  it('warns (not blocks) when enforcement is warn', async () => {
     process.env.NESTED_WORKTREE_ENFORCEMENT = 'warn';
     const fakeCwd = '/project/.claude/worktrees/agent-abc';
     const result = checkNestedWorktreeSpawn({}, fakeCwd);
@@ -84,7 +84,7 @@ describe('Fix 3 — checkNestedWorktreeSpawn', () => {
     assert.ok(result.message.includes('NESTED-WORKTREE'));
   });
 
-  it('allows everything when enforcement is off', () => {
+  it('allows everything when enforcement is off', async () => {
     process.env.NESTED_WORKTREE_ENFORCEMENT = 'off';
     const fakeCwd = '/project/.claude/worktrees/agent-abc';
     const result = checkNestedWorktreeSpawn({}, fakeCwd);
@@ -92,7 +92,7 @@ describe('Fix 3 — checkNestedWorktreeSpawn', () => {
     assert.strictEqual(result.result, undefined);
   });
 
-  it('handles Windows worktree paths (SE-01)', () => {
+  it('handles Windows worktree paths (SE-01)', async () => {
     process.env.NESTED_WORKTREE_ENFORCEMENT = 'block';
     const fakeCwd = 'C:\\dev\\projects\\.claude\\worktrees\\agent-abc';
     const result = checkNestedWorktreeSpawn({}, fakeCwd);
@@ -127,7 +127,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     Object.assign(process.env, originalEnv);
   });
 
-  it('allows spawn when active worktrees < cap', () => {
+  it('allows spawn when active worktrees < cap', async () => {
     // Create 2 worktrees, cap is 3
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-aaa'));
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-bbb'));
@@ -135,7 +135,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     assert.strictEqual(result.pass, true, '2 active worktrees < cap of 3 should be allowed');
   });
 
-  it('allows spawn when active worktrees equals cap (boundary)', () => {
+  it('allows spawn when active worktrees equals cap (boundary)', async () => {
     // Create exactly 3 worktrees, cap is 3 — at cap, not over
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-aaa'));
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-bbb'));
@@ -144,7 +144,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     assert.strictEqual(result.pass, true, 'Exactly at cap should be allowed (not exceeded)');
   });
 
-  it('blocks spawn when active worktrees exceed cap', () => {
+  it('blocks spawn when active worktrees exceed cap', async () => {
     // Create 4 worktrees, cap is 3
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-aaa'));
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-bbb'));
@@ -159,7 +159,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     );
   });
 
-  it('warns (not blocks) when enforcement is warn', () => {
+  it('warns (not blocks) when enforcement is warn', async () => {
     process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'warn';
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-aaa'));
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-bbb'));
@@ -170,7 +170,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     assert.strictEqual(result.result, 'warn');
   });
 
-  it('allows everything when enforcement is off', () => {
+  it('allows everything when enforcement is off', async () => {
     process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
     for (let i = 0; i < 10; i++) {
       fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', `agent-${i}`));
@@ -179,7 +179,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     assert.strictEqual(result.pass, true, 'off mode should allow even 10 agents');
   });
 
-  it('allows spawn when no .claude/worktrees directory exists', () => {
+  it('allows spawn when no .claude/worktrees directory exists', async () => {
     // tmpDir has no worktrees created
     const emptyRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'cap-empty-'));
     try {
@@ -190,7 +190,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     }
   });
 
-  it('uses cap from CONCURRENT_AGENT_CAP env var', () => {
+  it('uses cap from CONCURRENT_AGENT_CAP env var', async () => {
     process.env.CONCURRENT_AGENT_CAP = '2';
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-aaa'));
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-bbb'));
@@ -200,7 +200,7 @@ describe('Fix 4 — checkConcurrentAgentCap', () => {
     assert.strictEqual(result.pass, false, 'Should respect custom cap of 2');
   });
 
-  it('includes active count and cap in error message', () => {
+  it('includes active count and cap in error message', async () => {
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-aaa'));
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-bbb'));
     fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees', 'agent-ccc'));

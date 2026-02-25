@@ -106,6 +106,12 @@ class IndexManager {
   async semanticSearch(query, options = {}) {
     return semanticSearchImpl(this, query, options);
   }
+
+  async close() {
+    if (this.vectorStore) {
+      await this.vectorStore.close();
+    }
+  }
 }
 
 module.exports = { IndexManager, calculateSafeMemoryConfig };

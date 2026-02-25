@@ -158,6 +158,9 @@ agents:
   reflection-agent:
     path: .claude/agents/core/reflection-agent.md
     model: sonnet
+  technical-program-manager:
+    path: .claude/agents/core/technical-program-manager.md
+    model: sonnet
 
   # Specialized agents (high-stakes decisions)
   security-architect:
@@ -202,6 +205,9 @@ agents:
   accessibility-tester:
     path: .claude/agents/specialized/accessibility-tester.md
     model: sonnet
+  advanced-debugging:
+    path: .claude/agents/specialized/advanced-debugging.md
+    model: opus
   conductor-validator:
     path: .claude/agents/specialized/conductor-validator.md
     model: sonnet
@@ -295,6 +301,22 @@ agents:
     path: .claude/agents/domain/mcp-developer.md
     model: sonnet
 
+  # Domain specialists with specialized roles
+  kubernetes-specialist:
+    path: .claude/agents/domain/kubernetes-specialist.md
+    model: opus
+  pm-coordinator:
+    path: .claude/agents/domain/pm-coordinator.md
+    model: sonnet
+  medical-research-triage:
+    path: .claude/agents/domain/medical-research-triage.md
+    model: opus
+
+  # Multi-LLM consultation
+  multi-llm-consultant:
+    path: .claude/agents/domain/multi-llm-consultant.md
+    model: sonnet
+
   # Data specialists
   data-engineer:
     path: .claude/agents/domain/data-engineer.md
@@ -325,4 +347,7 @@ agents:
     model: opus
   swarm-coordinator:
     path: .claude/agents/orchestrators/swarm-coordinator.md
+    model: opus
+  artifact-integrator:
+    path: .claude/agents/orchestrators/artifact-integrator.md
     model: opus

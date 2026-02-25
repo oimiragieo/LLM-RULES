@@ -1,5 +1,5 @@
-## lastVerifiedAt: 2026-02-24T04:26:35.324Z
-
+---
+lastVerifiedAt: 2026-02-24T04:26:35.324Z
 name: omega-claude-cli
 description: Shell out to Claude Code CLI to invoke a second Claude session headlessly. Useful for cross-validation, second opinions, and isolated analysis without sharing current agent context. Requires Anthropic account.
 version: 1.0.0
@@ -8,15 +8,13 @@ invoked_by: both
 user_invocable: true
 tools: [Bash, Read]
 best_practices:
-
-- Always run verify-setup.mjs before first invocation
-- Use for second-opinion validation where context isolation matters
-- Use --timeout-ms to prevent indefinite hangs
-- --dangerously-skip-permissions is required for headless mode (already in wrapper)
-- Use format-output.mjs to strip conversational text framing from JSON responses
-  error_handling: graceful
-  streaming: not_supported
-
+  - Always run verify-setup.mjs before first invocation
+  - Use for second-opinion validation where context isolation matters
+  - Use --timeout-ms to prevent indefinite hangs
+  - --dangerously-skip-permissions is required for headless mode (already in wrapper)
+  - Use format-output.mjs to strip conversational text framing from JSON responses
+error_handling: graceful
+streaming: not_supported
 ---
 
 # Claude CLI Skill

@@ -26,24 +26,31 @@ function simpleChunk(content, filePath, language) {
   const lines = content.split('\n');
   const chunks = [];
   const chunkSize = 50; // lines per chunk
+  const maxChars = 4000; // max characters per chunk to prevent ONNX tokenizer crashes
 
   for (let i = 0; i < lines.length; i += chunkSize) {
     const chunkLines = lines.slice(i, i + chunkSize);
-    const text = chunkLines.join('\n').trim();
+    let text = chunkLines.join('\n').trim();
 
     if (text.length === 0) continue;
 
-    chunks.push({
-      id: `${filePath}:${i}`,
-      text,
-      metadata: {
-        filePath,
-        language,
-        type: 'text_block',
-        lineStart: i + 1,
-        lineEnd: Math.min(i + chunkSize, lines.length),
-      },
-    });
+    // Hard character split for minified files that use 1 massive line
+    while (text.length > 0) {
+      const splitText = text.substring(0, maxChars);
+      text = text.substring(maxChars);
+
+      chunks.push({
+        id: `${filePath}:${i}${text.length > 0 ? '_part' : ''}`,
+        text: splitText,
+        metadata: {
+          filePath,
+          language,
+          type: 'text_block',
+          lineStart: i + 1,
+          lineEnd: Math.min(i + chunkSize, lines.length),
+        },
+      });
+    }
   }
 
   return chunks;
@@ -55,7 +62,16 @@ function simpleChunk(content, filePath, language) {
  * @returns {boolean} True if file should use simple chunking
  */
 function shouldUseSimpleChunking(filePath) {
-  const ext = filePath.toLowerCase().match(/\.[^.]+$/)?.[0];
+  const lowerPath = filePath.toLowerCase();
+  if (
+    lowerPath.endsWith('.min.js') ||
+    lowerPath.endsWith('.min.css') ||
+    lowerPath.endsWith('.map')
+  ) {
+    return true;
+  }
+
+  const ext = lowerPath.match(/\.[^.]+$/)?.[0];
   // Non-code file extensions that don't benefit from AST parsing
   const simpleExtensions = [
     '.json',
@@ -75,6 +91,8 @@ function shouldUseSimpleChunking(filePath) {
     '.gitignore',
     '.dockerignore',
     '.editorconfig',
+    '.csv',
+    '.tsv',
   ];
   return ext && simpleExtensions.includes(ext);
 }

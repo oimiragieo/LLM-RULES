@@ -393,8 +393,8 @@ async function main() {
     if (!result.valid) {
       // Command is dangerous - block it
       try {
-        await eventBus.emit(EventTypes.TOOL_BLOCKED, {
-          type: EventTypes.TOOL_BLOCKED,
+        await eventBus.emit(EventTypes.SECURITY_VIOLATION, {
+          type: EventTypes.SECURITY_VIOLATION,
           timestamp: new Date().toISOString(),
           toolName: 'Bash',
           reason: result.error || 'bash_command_blocked',

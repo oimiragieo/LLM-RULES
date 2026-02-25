@@ -61,10 +61,10 @@ describe('pre-task-unified architect gate for code-simplifier', () => {
     preTaskUnified.invalidateCachedState();
   });
 
-  it('blocks code-simplifier when architect has not been spawned', () => {
+  it('blocks code-simplifier when architect has not been spawned', async () => {
     writeState({ mode: 'router', architectSpawned: false });
 
-    const result = preTaskUnified.checkRoutingGuard('Task', {
+    const result = await preTaskUnified.checkRoutingGuard('Task', {
       subagent_type: 'code-simplifier',
       prompt: 'You are code-simplifier. Simplify this module.',
     });
@@ -74,10 +74,10 @@ describe('pre-task-unified architect gate for code-simplifier', () => {
     assert.match(result.message, /ARCH-001/);
   });
 
-  it('marks architect spawn when architect agent is selected', () => {
+  it('marks architect spawn when architect agent is selected', async () => {
     writeState({ mode: 'router', architectSpawned: false });
 
-    const result = preTaskUnified.checkRoutingGuard('Task', {
+    const result = await preTaskUnified.checkRoutingGuard('Task', {
       subagent_type: 'architect',
       prompt: 'You are architect. Review architecture before simplification.',
     });
@@ -86,10 +86,10 @@ describe('pre-task-unified architect gate for code-simplifier', () => {
     assert.equal(result.markArchitect, true);
   });
 
-  it('allows code-simplifier after architect has already spawned', () => {
+  it('allows code-simplifier after architect has already spawned', async () => {
     writeState({ mode: 'router', architectSpawned: true });
 
-    const result = preTaskUnified.checkRoutingGuard('Task', {
+    const result = await preTaskUnified.checkRoutingGuard('Task', {
       subagent_type: 'code-simplifier',
       prompt: 'You are code-simplifier. Simplify this module.',
     });
@@ -97,10 +97,10 @@ describe('pre-task-unified architect gate for code-simplifier', () => {
     assert.equal(result.pass, true);
   });
 
-  it('blocks high-risk specialist (devops) when architect has not been spawned', () => {
+  it('blocks high-risk specialist (devops) when architect has not been spawned', async () => {
     writeState({ mode: 'router', architectSpawned: false });
 
-    const result = preTaskUnified.checkRoutingGuard('Task', {
+    const result = await preTaskUnified.checkRoutingGuard('Task', {
       subagent_type: 'devops',
       prompt: 'You are devops. Apply deployment pipeline changes.',
     });
@@ -110,10 +110,10 @@ describe('pre-task-unified architect gate for code-simplifier', () => {
     assert.match(result.message, /ARCH-002/);
   });
 
-  it('allows high-risk specialist after architect has already spawned', () => {
+  it('allows high-risk specialist after architect has already spawned', async () => {
     writeState({ mode: 'router', architectSpawned: true });
 
-    const result = preTaskUnified.checkRoutingGuard('Task', {
+    const result = await preTaskUnified.checkRoutingGuard('Task', {
       subagent_type: 'devops-troubleshooter',
       prompt: 'You are devops-troubleshooter. Investigate production drift.',
     });

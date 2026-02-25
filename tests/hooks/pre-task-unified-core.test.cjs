@@ -85,7 +85,7 @@ describe('pre-task-unified exports and context tracker', () => {
     clearAllCache();
   });
 
-  it('should export expected consolidated functions', () => {
+  it('should export expected consolidated functions', async () => {
     assert.strictEqual(typeof preTaskUnified.runAllChecks, 'function');
     assert.strictEqual(typeof preTaskUnified.checkAgentContextPreTracker, 'function');
     assert.strictEqual(typeof preTaskUnified.checkRoutingGuard, 'function');
@@ -93,9 +93,9 @@ describe('pre-task-unified exports and context tracker', () => {
     assert.strictEqual(typeof preTaskUnified.main, 'function');
   });
 
-  it('should always pass context pre-tracker and set agent mode', () => {
+  it('should always pass context pre-tracker and set agent mode', async () => {
     writeState(ROUTER_STATE_FILE, { mode: 'router', taskSpawned: false });
-    const result = preTaskUnified.checkAgentContextPreTracker({
+    const result = await preTaskUnified.checkAgentContextPreTracker({
       tool_name: 'Task',
       tool_input: {
         prompt: 'You are DEVELOPER. Fix the bug.',
@@ -105,15 +105,15 @@ describe('pre-task-unified exports and context tracker', () => {
     assert.strictEqual(result.pass, true);
   });
 
-  it('should pass context pre-tracker with prompt-only task descriptions', () => {
-    const result = preTaskUnified.checkAgentContextPreTracker({
+  it('should pass context pre-tracker with prompt-only task descriptions', async () => {
+    const result = await preTaskUnified.checkAgentContextPreTracker({
       tool_name: 'Task',
       tool_input: { prompt: 'You are DEVELOPER. Fix the login bug in authentication module.' },
     });
     assert.strictEqual(result.pass, true);
   });
 
-  it('should block Task when no recent core memory read evidence exists', () => {
+  it('should block Task when no recent core memory read evidence exists', async () => {
     writeState(ROUTER_STATE_FILE, {
       mode: 'router',
       requiresPlannerFirst: false,
@@ -125,7 +125,7 @@ describe('pre-task-unified exports and context tracker', () => {
     process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
 
     restoreState(TOOL_GOVERNANCE_STATE_FILE, null);
-    const result = preTaskUnified.runAllChecks({
+    const result = await preTaskUnified.runAllChecks({
       tool_name: 'Task',
       tool_input: {
         prompt: 'You are DEVELOPER. Implement a small fix.',
@@ -137,7 +137,7 @@ describe('pre-task-unified exports and context tracker', () => {
     assert.ok(String(result.message || '').includes('[MEMORY-FIRST]'));
   });
 
-  it('should allow Task when recent core memory read evidence exists', () => {
+  it('should allow Task when recent core memory read evidence exists', async () => {
     const sessionId = `memory-allow-${Date.now()}`;
     writeState(ROUTER_STATE_FILE, {
       mode: 'router',
@@ -159,7 +159,7 @@ describe('pre-task-unified exports and context tracker', () => {
       },
     });
 
-    const result = preTaskUnified.runAllChecks({
+    const result = await preTaskUnified.runAllChecks({
       tool_name: 'Task',
       tool_input: {
         task_id: 'task-123',
@@ -172,7 +172,7 @@ describe('pre-task-unified exports and context tracker', () => {
   });
 
   // Fix B: Update-intent bypass for evolution cooldown in checkLoopPrevention
-  it('should allow Task when update intent present despite active evolution cooldown', () => {
+  it('should allow Task when update intent present despite active evolution cooldown', async () => {
     // RED: currently fails — cooldown blocks task even when the prompt has update (not create) intent
     writeState(LOOP_STATE_FILE, {
       lastEvolutions: {
@@ -181,10 +181,13 @@ describe('pre-task-unified exports and context tracker', () => {
       evolutionCount: 1,
       spawnDepth: 0,
       actionHistory: [],
+      sessionId: 'test-session',
     });
+    process.env.CLAUDE_SESSION_ID = 'test-session';
     process.env.LOOP_PREVENTION_MODE = 'block';
+    process.env.LOOP_COOLDOWN_MS = '600000';
 
-    const result = preTaskUnified.checkLoopPrevention({
+    const result = await preTaskUnified.checkLoopPrevention({
       tool_name: 'Task',
       tool_input: {
         prompt:
@@ -199,7 +202,7 @@ describe('pre-task-unified exports and context tracker', () => {
     );
   });
 
-  it('should still block Task when evolution cooldown active and no update intent', () => {
+  it('should still block Task when evolution cooldown active and no update intent', async () => {
     // GREEN: pure creation intent should still be blocked when cooldown is active
     writeState(LOOP_STATE_FILE, {
       lastEvolutions: {
@@ -208,10 +211,13 @@ describe('pre-task-unified exports and context tracker', () => {
       evolutionCount: 1,
       spawnDepth: 0,
       actionHistory: [],
+      sessionId: 'test-session',
     });
+    process.env.CLAUDE_SESSION_ID = 'test-session';
     process.env.LOOP_PREVENTION_MODE = 'block';
+    process.env.LOOP_COOLDOWN_MS = '600000';
 
-    const result = preTaskUnified.checkLoopPrevention({
+    const result = await preTaskUnified.checkLoopPrevention({
       tool_name: 'Task',
       tool_input: {
         prompt: 'You are skill-creator. Create a new skill for handling API versioning.',

@@ -45,7 +45,10 @@ function createMemorySchedulerTaskRunners(deps) {
         result.details = { skipped: true, reason: 'No active STM session' };
         return result;
       }
-      const consolidateResult = await memoryTiers.consolidateSessionWithLock('current', projectRoot);
+      const consolidateResult = await memoryTiers.consolidateSessionWithLock(
+        'current',
+        projectRoot
+      );
       result.success =
         consolidateResult.success === true || consolidateResult.error === 'No STM session found';
       result.details = consolidateResult;
