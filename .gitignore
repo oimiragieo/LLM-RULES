@@ -266,6 +266,8 @@ tests/temp/
 # Keep fixtures directory structure  (contains static test data)
 !tests/fixtures/.gitkeep
 tests/fixtures/hybrid-search-cli/
+tests/fixtures/install-security-test/
+tests/fixtures/outside-target/
 tests/fixtures/code-indexing/hook-test/.claude/context/code-index/
 
 # Old fragmented test directories (DEPRECATED - moved to tests/)
