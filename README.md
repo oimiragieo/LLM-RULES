@@ -17,7 +17,9 @@ If you want a local-first, reproducible agent stack with strict validation and h
 
 ## Quick Start (TL;DR)
 
-Runtime: Node `>=22.5.0`, pnpm. Optional: Nvidia CUDA Toolkit for 40% faster indexing.
+Runtime: Node `>=22.5.0`, pnpm.
+Windows Setup: Requires **Python** and **C++ Build Tools** installed for compiling native AST add-ons during setup.
+Optional: Nvidia CUDA Toolkit for 40% faster indexing.
 Agent Studio runs seamlessly on Windows PowerShell, WSL, macOS, and Linux.
 
 Initialize the entire ecosystem (installs deps, compiles registries, indexes code):

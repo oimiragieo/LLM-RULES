@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-02-23T05:30:33.529Z",
+  "generatedAt": "2026-02-25T03:02:31.949Z",
   "agents": [
     {
       "id": "architect",
@@ -796,7 +796,9 @@
             "debugging",
             "task-management-protocol",
             "verification-before-completion",
-            "memory-search"
+            "memory-search",
+            "testing-expert",
+            "code-quality-expert"
           ],
           "examples": []
         }
@@ -826,7 +828,8 @@
             "sequential-thinking",
             "task-management-protocol",
             "thinking-tools",
-            "memory-search"
+            "memory-search",
+            "insight-extraction"
           ],
           "examples": []
         }
@@ -1414,7 +1417,8 @@
             "sequential-thinking",
             "task-management-protocol",
             "verification-before-completion",
-            "memory-search"
+            "memory-search",
+            "research-synthesis"
           ],
           "examples": []
         }
@@ -1444,7 +1448,8 @@
             "sequential-thinking",
             "task-management-protocol",
             "verification-before-completion",
-            "memory-search"
+            "memory-search",
+            "api-development-expert"
           ],
           "examples": []
         }
@@ -1627,7 +1632,10 @@
             "token-saver-context-compression",
             "ripgrep",
             "code-semantic-search",
-            "memory-search"
+            "memory-search",
+            "plan-generator",
+            "spec-gathering",
+            "interactive-requirements-gathering"
           ],
           "examples": []
         }
@@ -1996,7 +2004,9 @@
             "code-semantic-search",
             "code-structural-search",
             "token-saver-context-compression",
-            "memory-search"
+            "memory-search",
+            "consensus-voting",
+            "dispatching-parallel-agents"
           ],
           "examples": []
         }

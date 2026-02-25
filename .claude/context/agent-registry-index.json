@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "generatedAt": "2026-02-23T01:55:25.550Z",
   "metadata": {
-    "totalAgents": 65,
+    "totalAgents": 66,
     "registryFiles": [
       {
         "path": "agent-registry-core.json",
@@ -13,7 +13,7 @@
       {
         "path": "agent-registry-domain.json",
         "category": "domain",
-        "agentCount": 50,
+        "agentCount": 51,
         "description": "Domain and specialized agents"
       },
       {

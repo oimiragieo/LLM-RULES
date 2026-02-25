@@ -25,6 +25,7 @@ Agent Studio transforms Claude Code from a single assistant into an entire devel
 - Node.js 18+ (for some tooling)
 - Git (recommended)
 - **ANTHROPIC_API_KEY** (required for memory extraction, deduplication, and intelligent summaries)
+- **Python & C++ Build Tools**: Required on Windows specifically for compiling native C addons (like the `tree-sitter` AST parser) during `pnpm install`.
 
 ## Quick Start
 

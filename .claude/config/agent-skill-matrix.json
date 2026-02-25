@@ -1,5 +1,5 @@
 {
-  "$schema": "../schemas/agent-skill-matrix.schema.json",
+  "$schema": "../../schemas/agent-skill-matrix.schema.json",
   "version": "1.0.0",
   "description": "Maps agents to their recommended skills by category. Primary skills are essential, secondary are supporting, and contextual are conditionally loaded based on project type.",
   "lastUpdated": "2026-02-24T15:34:54.846Z",
