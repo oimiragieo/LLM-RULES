@@ -27,7 +27,11 @@ async function indexDirectoryImpl(manager, projectPath, options = {}) {
 
   if (onProgress) onProgress('scan', allFiles.length, allFiles.length);
 
-  await manager.vectorStore.dropCodeTable();
+  if (startIndex === 0) {
+    await manager.vectorStore.dropCodeTable();
+  } else if (manager.options.verbose) {
+    console.log(`[CHECKPOINT] Resuming from file ${startIndex}, skipping dropCodeTable()`);
+  }
 
   const batchSize = manager.options.batchSize || 100;
   const totalFilesCount = allFiles.length;
