@@ -2,7 +2,7 @@
   "version": "1.0.0",
   "dimensions": 384,
   "model": "Xenova/all-MiniLM-L6-v2",
-  "generatedAt": "2026-02-25T03:02:31.552Z",
+  "generatedAt": "2026-02-25T03:46:19.680Z",
   "prototypes": {
     "developer": [
       -0.09811271733649089,

@@ -36,11 +36,20 @@ class GPUDetector {
         return { available: false, gpuName: null, totalMemoryMB: 0 };
       }
 
-      // Parse first GPU (multi-GPU systems use first one for name/mem metrics)
-      const parts = lines[0].split(',');
+      const gpuCount = lines.filter(line => line.trim().length > 0).length;
+
+      // Respect CUDA_VISIBLE_DEVICES if set, otherwise default to first GPU
+      let targetIdx = 0;
+      if (process.env.CUDA_VISIBLE_DEVICES) {
+        const parsedIdx = parseInt(process.env.CUDA_VISIBLE_DEVICES.split(',')[0], 10);
+        if (!isNaN(parsedIdx) && parsedIdx >= 0 && parsedIdx < gpuCount) {
+          targetIdx = parsedIdx;
+        }
+      }
+
+      const parts = lines[targetIdx].split(',');
       const gpuName = parts[0]?.trim();
       const totalMemoryMB = parseInt(parts[1]?.trim(), 10);
-      const gpuCount = lines.filter(line => line.trim().length > 0).length;
 
       if (!gpuName || !totalMemoryMB) {
         return { available: false, gpuName: null, totalMemoryMB: 0, gpuCount: 0 };
