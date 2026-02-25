@@ -1,4 +1,0 @@
-interface:
-  display_name: Tall Stack General
-  short_description: General guidelines for TALL stack development, emphasizing
-  default_prompt: Use the $tall-stack-general skill to complete this task safely and efficiently.

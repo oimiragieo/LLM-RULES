@@ -1,4 +1,0 @@
-interface:
-  display_name: Configuration Management
-  short_description: Configuration management techniques
-  default_prompt: Use the $configuration-management skill to complete this task safely and efficiently.

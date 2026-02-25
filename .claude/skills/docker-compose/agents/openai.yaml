@@ -1,4 +1,0 @@
-interface:
-  display_name: Docker Compose
-  short_description: Docker Compose container orchestration and management. Manage
-  default_prompt: Use the $docker-compose skill to complete this task safely and efficiently.

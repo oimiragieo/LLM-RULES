@@ -1,4 +1,0 @@
-interface:
-  display_name: Session Handoff
-  short_description: Prepare context for new conversations when session is lost or
-  default_prompt: Use the $session-handoff skill to complete this task safely and efficiently.

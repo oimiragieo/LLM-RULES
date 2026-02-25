@@ -211,7 +211,7 @@ class AgentRegistryGenerator {
    * @returns {Promise<Map>} Map of agent ID to agent info
    */
   async scanAgents(agentsDir) {
-    const categories = ['core', 'specialized', 'domain', 'orchestrators'];
+    const categories = ['core', 'specialized', 'domain', 'orchestrators', 'isolated'];
     const agents = new Map();
 
     for (const category of categories) {

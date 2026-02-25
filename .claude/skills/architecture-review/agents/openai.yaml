@@ -1,4 +1,0 @@
-interface:
-  display_name: Architecture Review
-  short_description: Architecture review and design validation. Evaluates system
-  default_prompt: Use the $architecture-review skill to complete this task safely and efficiently.

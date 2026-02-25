@@ -1,4 +1,0 @@
-interface:
-  display_name: Filesystem
-  short_description: File system operations guidance - read, write, search, and
-  default_prompt: Use the $filesystem skill to complete this task safely and efficiently.

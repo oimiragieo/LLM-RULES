@@ -1,4 +1,0 @@
-interface:
-  display_name: Form Validation With Zod
-  short_description: Enforces the use of Zod for form validation throughout the
-  default_prompt: Use the $form-validation-with-zod skill to complete this task safely and efficiently.

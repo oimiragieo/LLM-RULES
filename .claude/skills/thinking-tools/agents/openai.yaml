@@ -1,4 +1,0 @@
-interface:
-  display_name: Thinking Tools
-  short_description: Structured thinking patterns for agent self-reflection.
-  default_prompt: Use the $thinking-tools skill to complete this task safely and efficiently.

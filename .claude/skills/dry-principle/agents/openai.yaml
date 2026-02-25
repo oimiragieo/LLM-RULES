@@ -1,4 +1,0 @@
-interface:
-  display_name: Dry Principle
-  short_description: This rule enforces the Don't Repeat Yourself principle to avoid
-  default_prompt: Use the $dry-principle skill to complete this task safely and efficiently.

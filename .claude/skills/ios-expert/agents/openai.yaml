@@ -1,4 +1,0 @@
-interface:
-  display_name: Ios Expert
-  short_description: iOS development expert including SwiftUI, UIKit, and Apple
-  default_prompt: Use the $ios-expert skill to complete this task safely and efficiently.

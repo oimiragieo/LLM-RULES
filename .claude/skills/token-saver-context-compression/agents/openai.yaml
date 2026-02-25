@@ -1,4 +1,0 @@
-interface:
-  display_name: Token Saver Context Compression
-  short_description: Hybrid-search + evidence-gated context compression that emits MemoryRecord-ready payloads.
-  default_prompt: Use the $token-saver-context-compression skill to retrieve, compress, and return memory-ready evidence payloads.

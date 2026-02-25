@@ -1,4 +1,0 @@
-interface:
-  display_name: Database Architect
-  short_description: Database design and optimization specialist. Schema design,
-  default_prompt: Use the $database-architect skill to complete this task safely and efficiently.

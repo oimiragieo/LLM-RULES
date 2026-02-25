@@ -1,4 +1,0 @@
-interface:
-  display_name: Expo Framework Rule
-  short_description: Expo Framework-specific guidelines. Includes best practices for
-  default_prompt: Use the $expo-framework-rule skill to complete this task safely and efficiently.

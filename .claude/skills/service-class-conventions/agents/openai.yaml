@@ -1,4 +1,0 @@
-interface:
-  display_name: Service Class Conventions
-  short_description: Defines the structure and implementation of service classes,
-  default_prompt: Use the $service-class-conventions skill to complete this task safely and efficiently.

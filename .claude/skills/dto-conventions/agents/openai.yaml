@@ -1,4 +1,0 @@
-interface:
-  display_name: Dto Conventions
-  short_description: Sets standards for Data Transfer Objects (DTOs), typically
-  default_prompt: Use the $dto-conventions skill to complete this task safely and efficiently.

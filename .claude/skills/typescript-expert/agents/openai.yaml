@@ -1,4 +1,0 @@
-interface:
-  display_name: Typescript Expert
-  short_description: TypeScript and JavaScript expert including type systems,
-  default_prompt: Use the $typescript-expert skill to complete this task safely and efficiently.

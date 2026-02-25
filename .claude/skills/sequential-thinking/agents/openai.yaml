@@ -1,4 +1,0 @@
-interface:
-  display_name: Sequential Thinking
-  short_description: Sequential thinking and structured problem solving. Break down
-  default_prompt: Use the $sequential-thinking skill to complete this task safely and efficiently.

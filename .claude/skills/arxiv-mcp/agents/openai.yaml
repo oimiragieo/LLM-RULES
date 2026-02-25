@@ -1,8 +1,0 @@
-interface:
-  display_name: Arxiv Mcp
-  short_description: Search and retrieve academic papers from arXiv.org using
-  default_prompt: Use the $arxiv-mcp skill to complete this task safely and efficiently.
-dependencies:
-  tools:
-    - type: mcp
-      value: Exa

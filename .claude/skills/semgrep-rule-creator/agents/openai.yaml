@@ -1,4 +1,0 @@
-interface:
-  display_name: Semgrep Rule Creator
-  short_description: Create custom Semgrep rules for detecting project-specific
-  default_prompt: Use the $semgrep-rule-creator skill to complete this task safely and efficiently.

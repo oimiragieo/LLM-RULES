@@ -1,4 +1,0 @@
-interface:
-  display_name: K8s Manifest Generator
-  short_description: Create production-ready Kubernetes manifests for Deployments,
-  default_prompt: Use the $k8s-manifest-generator skill to complete this task safely and efficiently.

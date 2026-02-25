@@ -1,4 +1,0 @@
-interface:
-  display_name: Comprehensive Type Annotations
-  short_description: Requires detailed type annotations for all Python functions,
-  default_prompt: Use the $comprehensive-type-annotations skill to complete this task safely and efficiently.

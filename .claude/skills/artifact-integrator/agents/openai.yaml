@@ -1,4 +1,0 @@
-interface:
-  display_name: Artifact Integrator
-  short_description: Deep integration analysis for newly created artifacts
-  default_prompt: Use the $artifact-integrator skill to complete this task safely and efficiently.

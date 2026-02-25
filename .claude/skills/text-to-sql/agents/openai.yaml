@@ -1,4 +1,0 @@
-interface:
-  display_name: Text To Sql
-  short_description: Convert natural language queries to SQL. Use for database
-  default_prompt: Use the $text-to-sql skill to complete this task safely and efficiently.

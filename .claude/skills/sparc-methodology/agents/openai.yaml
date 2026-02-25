@@ -1,8 +1,0 @@
-interface:
-  display_name: Sparc Methodology
-  short_description: SPARC (Specification, Pseudocode, Architecture, Refinement,
-  default_prompt: Use the $sparc-methodology skill to complete this task safely and efficiently.
-dependencies:
-  tools:
-    - type: mcp
-      value: claude-flow

@@ -1,4 +1,0 @@
-interface:
-  display_name: Frontend Expert
-  short_description: Frontend development expert including UI/UX patterns,
-  default_prompt: Use the $frontend-expert skill to complete this task safely and efficiently.

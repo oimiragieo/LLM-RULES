@@ -1,4 +1,0 @@
-interface:
-  display_name: Vercel React Native Skills
-  short_description: React Native and Expo best practices for building performant
-  default_prompt: Use the $vercel-react-native-skills skill to complete this task safely and efficiently.

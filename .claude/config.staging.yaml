@@ -1,7 +1,7 @@
 # Staging Environment Configuration
 # This configuration is used when AGENT_STUDIO_ENV=staging
 
-version: '2.2.1'
+version: '2.2.2'
 environment: staging
 
 # --- Router Configuration (The Gatekeeper) ---

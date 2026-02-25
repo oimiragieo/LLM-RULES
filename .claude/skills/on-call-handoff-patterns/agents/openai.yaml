@@ -1,4 +1,0 @@
-interface:
-  display_name: On Call Handoff Patterns
-  short_description: Master on-call shift handoffs with context transfer, escalation
-  default_prompt: Use the $on-call-handoff-patterns skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Github Mcp
-  short_description: GitHub API operations - repositories, issues, pull requests,
-  default_prompt: Use the $github-mcp skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Differential Review
-  short_description: Perform security-focused review of code diffs and pull
-  default_prompt: Use the $differential-review skill to complete this task safely and efficiently.

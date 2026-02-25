@@ -1,4 +1,0 @@
-interface:
-  display_name: Spec Init
-  short_description: Unified skill that guides spec creation through structured,
-  default_prompt: Use the $spec-init skill to complete this task safely and efficiently.

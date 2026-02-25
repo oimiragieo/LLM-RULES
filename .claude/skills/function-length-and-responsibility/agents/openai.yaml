@@ -1,4 +1,0 @@
-interface:
-  display_name: Function Length And Responsibility
-  short_description: This rule enforces the single responsibility principle,
-  default_prompt: Use the $function-length-and-responsibility skill to complete this task safely and efficiently.

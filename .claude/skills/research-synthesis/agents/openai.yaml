@@ -1,8 +1,0 @@
-interface:
-  display_name: Research Synthesis
-  short_description: Research best practices and synthesize into design decisions
-  default_prompt: Use the $research-synthesis skill to complete this task safely and efficiently.
-dependencies:
-  tools:
-    - type: mcp
-      value: Exa

@@ -1,4 +1,0 @@
-interface:
-  display_name: Advanced Elicitation
-  short_description: Use when you want to improve response quality through
-  default_prompt: Use the $advanced-elicitation skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Diagram Generator
-  short_description: Generates architecture, database, and system diagrams using
-  default_prompt: Use the $diagram-generator skill to complete this task safely and efficiently.

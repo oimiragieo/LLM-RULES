@@ -6,6 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Glob, Grep, Skill]
+agents: [planner, technical-program-manager, reflection-agent, evolution-orchestrator]
 error_handling: graceful
 streaming: supported
 verified: true

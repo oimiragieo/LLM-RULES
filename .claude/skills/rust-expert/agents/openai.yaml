@@ -1,4 +1,0 @@
-interface:
-  display_name: Rust Expert
-  short_description: Rust programming expert including ownership, async Tokio
-  default_prompt: Use the $rust-expert skill to complete this task safely and efficiently.

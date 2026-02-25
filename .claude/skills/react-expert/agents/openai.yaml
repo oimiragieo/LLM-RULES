@@ -1,4 +1,0 @@
-interface:
-  display_name: React Expert
-  short_description: React ecosystem expert including hooks, state management,
-  default_prompt: Use the $react-expert skill to complete this task safely and efficiently.

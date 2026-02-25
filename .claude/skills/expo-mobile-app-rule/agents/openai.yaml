@@ -1,4 +1,0 @@
-interface:
-  display_name: Expo Mobile App Rule
-  short_description: Specifies best practices and conventions for Expo-based mobile
-  default_prompt: Use the $expo-mobile-app-rule skill to complete this task safely and efficiently.

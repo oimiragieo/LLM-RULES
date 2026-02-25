@@ -1,4 +1,0 @@
-interface:
-  display_name: Workflow Patterns
-  short_description: TDD task implementation patterns - red-green-refactor cycle,
-  default_prompt: Use the $workflow-patterns skill to complete this task safely and efficiently.

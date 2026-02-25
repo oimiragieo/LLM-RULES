@@ -1,4 +1,0 @@
-interface:
-  display_name: Mobile First Design Rules
-  short_description: Focuses on rules and best practices for mobile-first design and
-  default_prompt: Use the $mobile-first-design-rules skill to complete this task safely and efficiently.

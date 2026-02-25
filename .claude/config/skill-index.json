@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-02-25T06:37:42.582Z",
+  "generatedAt": "2026-02-25T19:05:53.087Z",
   "metadata": {
     "totalSkills": 392,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-02-25T06:37:42.583Z",
+    "lastValidated": "2026-02-25T19:05:53.088Z",
     "source": ".claude/context/artifacts/catalogs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -741,6 +741,33 @@
       "tags": [
         "other",
         "strict-user-requirements-adherence"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "interactive-requirements-gathering": {
+      "name": "interactive-requirements-gathering",
+      "displayName": "Interactive Requirements Gathering",
+      "category": "Other",
+      "domain": "requirements",
+      "description": "Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "AskUserQuestion"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [
+        "pm",
+        "pm-coordinator"
+      ],
+      "tags": [
+        "requirements",
+        "other",
+        "interactive-requirements-gathering"
       ],
       "priority": 3,
       "aliasOf": null
@@ -3280,33 +3307,6 @@
       "tags": [
         "other",
         "integration/artifact-updater"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "interactive-requirements-gathering": {
-      "name": "interactive-requirements-gathering",
-      "displayName": "Interactive Requirements Gathering",
-      "category": "Other",
-      "domain": "requirements",
-      "description": "Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "AskUserQuestion"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [
-        "pm",
-        "pm-coordinator"
-      ],
-      "tags": [
-        "requirements",
-        "other",
-        "interactive-requirements-gathering"
       ],
       "priority": 3,
       "aliasOf": null
@@ -9850,6 +9850,10 @@
         "tdd",
         "test-generator"
       ],
+      "requirements": [
+        "interactive-requirements-gathering",
+        "spec-gathering"
+      ],
       "devops": [
         "incident-runbook-templates",
         "aws-cloud-ops",
@@ -9962,10 +9966,6 @@
         "git-expert",
         "gitops-workflow"
       ],
-      "requirements": [
-        "interactive-requirements-gathering",
-        "spec-gathering"
-      ],
       "scientific": [
         "scientific-skills"
       ]
@@ -10001,6 +10001,7 @@
         "artifact-integrator",
         "token-saver-context-compression",
         "strict-user-requirements-adherence",
+        "interactive-requirements-gathering",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -10079,7 +10080,6 @@
         "insight-extraction",
         "integration",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "java-expert",
         "jira-pm",
         "jupyter-notebook-best-practices",
@@ -10443,6 +10443,7 @@
         "code-style-validator",
         "artifact-integrator",
         "strict-user-requirements-adherence",
+        "interactive-requirements-gathering",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -10541,7 +10542,6 @@
         "insight-extraction",
         "integration",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jira-pm",
@@ -11203,6 +11203,7 @@
         "gamedev-expert",
         "artifact-integrator",
         "strict-user-requirements-adherence",
+        "interactive-requirements-gathering",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -11285,7 +11286,6 @@
         "insight-extraction",
         "integration",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -11547,6 +11547,7 @@
         "gamedev-expert",
         "artifact-integrator",
         "strict-user-requirements-adherence",
+        "interactive-requirements-gathering",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -11609,7 +11610,6 @@
         "insecure-defaults",
         "integration",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "ios-expert",
         "java-expert",
         "jupyter-notebook-best-practices",
@@ -11835,6 +11835,11 @@
         "smart-debug",
         "subagent-driven-development"
       ],
+      "AskUserQuestion": [
+        "interactive-requirements-gathering",
+        "prd-generator",
+        "spec-gathering"
+      ],
       "WebFetch": [
         "dynamic-api-integration",
         "agent-creator",
@@ -11898,11 +11903,6 @@
       "mcp__Exa__web_search_exa": [
         "arxiv-mcp"
       ],
-      "AskUserQuestion": [
-        "interactive-requirements-gathering",
-        "prd-generator",
-        "spec-gathering"
-      ],
       "TaskCreate": [
         "task-management-protocol"
       ],
@@ -11963,6 +11963,7 @@
         "artifact-integrator",
         "token-saver-context-compression",
         "strict-user-requirements-adherence",
+        "interactive-requirements-gathering",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -12020,7 +12021,6 @@
         "insecure-defaults",
         "integration",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "jira-pm",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",
@@ -12914,6 +12914,7 @@
         "artifact-integrator",
         "token-saver-context-compression",
         "strict-user-requirements-adherence",
+        "interactive-requirements-gathering",
         "dynamic-api-integration",
         "convex-development-general",
         "starknet-react-rules",
@@ -12971,7 +12972,6 @@
         "insecure-defaults",
         "integration",
         "integration/artifact-updater",
-        "interactive-requirements-gathering",
         "jira-pm",
         "jupyter-notebook-best-practices",
         "k8s-security-policies",

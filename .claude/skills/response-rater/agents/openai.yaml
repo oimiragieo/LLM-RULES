@@ -1,4 +1,0 @@
-interface:
-  display_name: Response Rater
-  short_description: Rates responses and plans against quality rubrics. Used for
-  default_prompt: Use the $response-rater skill to complete this task safely and efficiently.

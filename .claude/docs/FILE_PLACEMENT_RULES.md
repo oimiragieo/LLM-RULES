@@ -117,12 +117,12 @@ This document defines the MANDATORY rules for where agents must place files they
 
 **Purpose**: Pre/post tool execution hooks (CODE ONLY - NO TESTS)
 
-| Attribute     | Value                                                                                                               |
-| ------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Allowed files | `*.cjs` (hook code ONLY)                                                                                            |
-| NOT allowed   | `*.test.cjs`, `*.test.mjs` (tests go in `tests/hooks/`)                                                             |
-| Structure     | `routing/`, `safety/`, `memory/`, `evolution/`, `session/`, `validation/`, `reflection/`, `self-healing/`, `audit/` |
-| Naming        | `{hook-name}.cjs` (kebab-case)                                                                                      |
+| Attribute     | Value                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| Allowed files | `*.cjs` (hook code ONLY)                                                                           |
+| NOT allowed   | `*.test.cjs`, `*.test.mjs` (tests go in `tests/hooks/`)                                            |
+| Structure     | `routing/`, `safety/`, `memory/`, `evolution/`, `session/`, `validation/`, `reflection/`, `audit/` |
+| Naming        | `{hook-name}.cjs` (kebab-case)                                                                     |
 
 **Subdirectory Categories**:
 
@@ -133,7 +133,6 @@ This document defines the MANDATORY rules for where agents must place files they
 - `session/` - Session management
 - `validation/` - Input/output validation
 - `reflection/` - Self-reflection triggers
-- `self-healing/` - Anomaly detection, recovery
 - `audit/` - Audit trail management
 
 **Example**:
@@ -208,7 +207,6 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | `runtime/checkpoints/`        | Workflow checkpoints           | `*.json`                                                                  |
 | `data/`                       | Code index data files          | `*.db`, `*.sqlite`, `*.json`, `*.lance`                                   |
 | `code-index/`                 | Code indexing metadata         | `*.json`, `*.jsonl`                                                       |
-| `self-healing/`               | Anomaly detection and recovery | `*.json`, `*.jsonl`                                                       |
 | `sessions/`                   | Session data                   | `*.json`                                                                  |
 | `teams/`                      | Party mode team definitions    | `*.json`                                                                  |
 | `tmp/`                        | Temporary files (auto-cleaned) | Any                                                                       |
@@ -287,7 +285,7 @@ tests/hooks/my-guard.test.cjs           # Hook test (in tests/ directory!)
 | ------------- | ----------------------------------------------------------------- |
 | Allowed files | `*.cjs`, `*.mjs` (code ONLY)                                      |
 | NOT allowed   | `*.test.cjs`, `*.test.mjs` (tests go in `tests/unit/{category}/`) |
-| Structure     | `workflow/`, `memory/`, `integration/`, `self-healing/`, `utils/` |
+| Structure     | `workflow/`, `memory/`, `integration/`, `utils/`                  |
 | Access        | Framework internals ONLY - agents should NOT write here           |
 
 **Example**:
@@ -544,7 +542,6 @@ const PLACEMENT_RULES = {
   'hooks/session/': /\.cjs$/,
   'hooks/validation/': /\.cjs$/,
   'hooks/reflection/': /\.cjs$/,
-  'hooks/self-healing/': /\.cjs$/,
 
   // Workflows
   'workflows/core/': /\.(md|yaml)$/,

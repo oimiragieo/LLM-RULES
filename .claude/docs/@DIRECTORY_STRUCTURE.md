@@ -112,7 +112,6 @@ context/
 │   ├── compression-reminder.txt
 │   ├── reflection-reminder.txt
 │   └── session-gap-log.jsonl   # Router gap observations: retries, stalls, integration gaps, missing metadata
-├── self-healing/            # Self-healing state (anomaly-detector and loop-state-manager write here)
 ├── sessions/                # Session data (used by consensus-voting and swarm-coordinator for session state)
 ├── teams/
 │   └── [team-name].csv
@@ -151,7 +150,6 @@ hooks/
 ├── routing/
 ├── safety/
 │   └── validators/
-├── self-healing/
 ├── session/
 └── validation/
 ```
@@ -198,10 +196,6 @@ lib/
 │   ├── routing-table.cjs   # Intent-to-agent mapping (20+ consumers)
 │   └── router-state.cjs    # Router/agent mode state machine (3 hooks)
 ├── safety/                 # Safety utilities
-├── self-healing/           # Self-healing system
-│   ├── dashboard.cjs
-│   ├── rollback-manager.cjs
-│   └── validator.cjs
 ├── skill-build/            # Skill building utilities
 ├── spawn/                  # Agent spawning utilities
 ├── text-processing/        # Text processing utilities

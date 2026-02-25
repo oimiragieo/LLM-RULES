@@ -1,4 +1,0 @@
-interface:
-  display_name: Seo And Meta Tags In Sveltekit
-  short_description: Provides SEO and Meta Tags guidelines in SvelteKit.
-  default_prompt: Use the $seo-and-meta-tags-in-sveltekit skill to complete this task safely and efficiently.

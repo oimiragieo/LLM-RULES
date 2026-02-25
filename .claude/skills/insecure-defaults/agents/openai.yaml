@@ -1,4 +1,0 @@
-interface:
-  display_name: Insecure Defaults
-  short_description: Detect hardcoded credentials, default passwords, fail-open
-  default_prompt: Use the $insecure-defaults skill to complete this task safely and efficiently.

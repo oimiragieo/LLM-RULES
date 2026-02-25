@@ -1,4 +1,0 @@
-interface:
-  display_name: Rule Auditor
-  short_description: Validates code against coding standards and best practices.
-  default_prompt: Use the $rule-auditor skill to complete this task safely and efficiently.

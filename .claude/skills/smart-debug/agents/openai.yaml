@@ -1,4 +1,0 @@
-interface:
-  display_name: Smart Debug
-  short_description: AI-assisted debugging specialist with deep knowledge of modern
-  default_prompt: Use the $smart-debug skill to complete this task safely and efficiently.

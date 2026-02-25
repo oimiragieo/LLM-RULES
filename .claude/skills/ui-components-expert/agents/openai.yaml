@@ -1,4 +1,0 @@
-interface:
-  display_name: Ui Components Expert
-  short_description: UI component library expert including Chakra, Material UI, and
-  default_prompt: Use the $ui-components-expert skill to complete this task safely and efficiently.

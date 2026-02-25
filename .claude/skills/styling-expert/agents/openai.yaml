@@ -1,4 +1,0 @@
-interface:
-  display_name: Styling Expert
-  short_description: CSS and styling expert including Tailwind, CSS-in-JS, and
-  default_prompt: Use the $styling-expert skill to complete this task safely and efficiently.

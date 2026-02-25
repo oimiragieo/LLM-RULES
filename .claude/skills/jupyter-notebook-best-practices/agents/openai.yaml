@@ -1,4 +1,0 @@
-interface:
-  display_name: Jupyter Notebook Best Practices
-  short_description: Guidelines for structuring and documenting Jupyter notebooks
-  default_prompt: Use the $jupyter-notebook-best-practices skill to complete this task safely and efficiently.

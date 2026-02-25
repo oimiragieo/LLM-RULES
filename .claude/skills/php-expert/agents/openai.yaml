@@ -1,4 +1,0 @@
-interface:
-  display_name: Php Expert
-  short_description: PHP expert including Laravel, WordPress, and Drupal development
-  default_prompt: Use the $php-expert skill to complete this task safely and efficiently.

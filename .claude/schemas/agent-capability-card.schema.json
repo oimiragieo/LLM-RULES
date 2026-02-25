@@ -21,13 +21,13 @@
     },
     "category": {
       "type": "string",
-      "enum": ["core", "specialized", "domain", "orchestrator"],
-      "description": "Agent category based on directory location"
+      "enum": ["core", "specialized", "domain", "orchestrator", "isolated"],
+      "description": "Organizational category"
     },
     "filePath": {
       "type": "string",
-      "description": "Relative path to agent definition file",
-      "pattern": "^\\.claude/agents/(core|specialized|domain|orchestrators)/[a-z0-9-]+\\.md$",
+      "description": "Relative path to agent file from project root",
+      "pattern": "^\\.claude/agents/(core|specialized|domain|orchestrators|isolated)/[a-z0-9-]+\\.md$",
       "maxLength": 500
     },
     "capabilities": {

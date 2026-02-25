@@ -1,4 +1,0 @@
-interface:
-  display_name: Verification Before Completion
-  short_description: Gate function preventing unverified completion claims. Use
-  default_prompt: Use the $verification-before-completion skill to complete this task safely and efficiently.

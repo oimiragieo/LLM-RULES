@@ -1,4 +1,0 @@
-interface:
-  display_name: Android Expert
-  short_description: Android development expert including Jetpack Compose, Kotlin,
-  default_prompt: Use the $android-expert skill to complete this task safely and efficiently.

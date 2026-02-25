@@ -1,4 +1,0 @@
-interface:
-  display_name: Test Generator
-  short_description: Generates test code from specifications, components, and API
-  default_prompt: Use the $test-generator skill to complete this task safely and efficiently.

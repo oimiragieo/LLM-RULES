@@ -367,7 +367,7 @@ async function getLanceDBStatus(projectRoot = PROJECT_ROOT) {
       return null;
     } finally {
       if (typeof store.close === 'function') {
-        await store.close().catch((_e) => { });
+        await store.close().catch(_e => {});
       }
     }
   } catch (_e) {

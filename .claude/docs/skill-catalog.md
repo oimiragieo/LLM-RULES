@@ -323,24 +323,24 @@ Skill({ skill: 'artifact-integrator' });
 
 Memory and context management.
 
-| Skill                             | Description                                                  | Primary Agents            |
-| --------------------------------- | ------------------------------------------------------------ | ------------------------- |
-| `context-compressor`              | Context compression methodology                              | all agents                |
-| `token-saver-context-compression` | Search-aware context compression with MemoryRecord mapping   | developer                 |
-| `memory-quality-auditor`          | Audits retrieval drift, staleness, and citation groundedness | developer                 |
-| `session-handoff`                 | Handoff document creation                                    | all agents                |
-| `task-management-protocol`        | Task synchronization protocol                                | all agents                |
-| `context-driven-development`      | Context as managed artifacts                                 | all agents                |
-| `insight-extraction`              | Extract session learnings                                    | all agents                |
-| `track-management`                | Logical work unit management                                 | conductor-validator       |
-| `pipeline-reflection-ux`          | Step 0/reflection UX and pipeline-noise control              | developer                 |
-| `framework-context`               | Structured framework context for reflection/planning         | reflection-agent, planner |
-| `recommend-evolution`             | Trigger-based evolution recommendation and request recording | reflection-agent, planner |
-| `assimilate`                      | External benchmark assimilation into TDD upgrade backlog     | developer                 |
-| `creation-feasibility-gate`       | Preflight viability check before creator/evolution execution | developer                 |
-| `compliance-policy-check`         | Rule/policy compliance gate for high-risk design/evolution   | developer                 |
-| `troubleshooting-regression`      | Debug-log-first regression triage and remediation validation | developer                 |
-| `memory-search`                   | Semantic search over global memory for active context lookup | developer                 |
+| Skill                             | Description                                                  | Primary Agents                                                               |
+| --------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `context-compressor`              | Context compression methodology                              | all agents                                                                   |
+| `token-saver-context-compression` | Search-aware context compression with MemoryRecord mapping   | developer                                                                    |
+| `memory-quality-auditor`          | Audits retrieval drift, staleness, and citation groundedness | developer                                                                    |
+| `session-handoff`                 | Handoff document creation                                    | all agents                                                                   |
+| `task-management-protocol`        | Task synchronization protocol                                | all agents                                                                   |
+| `context-driven-development`      | Context as managed artifacts                                 | all agents                                                                   |
+| `insight-extraction`              | Extract session learnings                                    | all agents                                                                   |
+| `track-management`                | Logical work unit management                                 | conductor-validator                                                          |
+| `pipeline-reflection-ux`          | Step 0/reflection UX and pipeline-noise control              | developer                                                                    |
+| `framework-context`               | Structured framework context for reflection/planning         | reflection-agent, planner                                                    |
+| `recommend-evolution`             | Trigger-based evolution recommendation and request recording | reflection-agent, planner                                                    |
+| `assimilate`                      | External benchmark assimilation into TDD upgrade backlog     | developer                                                                    |
+| `creation-feasibility-gate`       | Preflight viability check before creator/evolution execution | planner, technical-program-manager, reflection-agent, evolution-orchestrator |
+| `compliance-policy-check`         | Rule/policy compliance gate for high-risk design/evolution   | planner, technical-program-manager, reflection-agent, evolution-orchestrator |
+| `troubleshooting-regression`      | Debug-log-first regression triage and remediation validation | developer                                                                    |
+| `memory-search`                   | Semantic search over global memory for active context lookup | developer                                                                    |
 
 ---
 
@@ -352,7 +352,7 @@ Quality validation skills.
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
 | `verification-before-completion`     | Pre-completion gate                                                                                                                                         | all agents               |
 | `checklist-generator`                | IEEE 1028 + contextual checklists                                                                                                                           | developer                |
-| `proactive-audit`                    | Framework artifact health checks (hooks, skills, agents, routing)                                                                                           | developer                |
+| `proactive-audit`                    | Framework artifact health checks (hooks, skills, agents, routing)                                                                                           | qa                       |
 | `ecosystem-integrity-scanner`        | Deep structural health scan: phantom require() paths, missing skills, archive refs, stale catalog counts, encoding issues, empty directories                | qa, developer, architect |
 | `response-rater`                     | Plan and response quality audits                                                                                                                            | master-orchestrator      |
 | `test-generator`                     | Test code generation                                                                                                                                        | qa                       |
@@ -367,34 +367,34 @@ Quality validation skills.
 
 Advanced patterns and methodologies.
 
-| Skill                                 | Description                                                                                                                                                                                 | Primary Agents            |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `thinking-tools`                      | Self-reflection patterns (think-about-\*)                                                                                                                                                   | all agents                |
-| `spec-gathering`                      | Requirements gathering                                                                                                                                                                      | pm                        |
-| `spec-init`                           | Unified spec creation                                                                                                                                                                       | developer                 |
-| `sequential-thinking`                 | Structured problem solving                                                                                                                                                                  | all agents                |
-| `consensus-voting`                    | Byzantine consensus for multi-agent decisions                                                                                                                                               | devops, swarm-coordinator |
-| `swarm-coordination`                  | Multi-agent swarm patterns                                                                                                                                                                  | swarm-coordinator         |
-| `interactive-requirements-gathering`  | A/B/C/D/E questionnaire framework                                                                                                                                                           | developer                 |
-| `planning-with-files`                 | Persistent planning files                                                                                                                                                                   | developer                 |
-| `sparc-methodology`                   | SPARC development methodology                                                                                                                                                               | developer                 |
-| `agent-evaluation`                    | LLM-as-judge evaluation framework with 5-dimension rubric for scoring AI-generated content quality                                                                                          | developer                 |
-| `context-degradation`                 | Token-range severity zones with detection checklist and corrective routing actions for context window degradation                                                                           | developer                 |
-| `property-based-testing`              | fast-check patterns for JS/TS — 6 canonical property categories with worked examples targeting agent-studio utilities                                                                       | developer                 |
-| `agent-tool-design`                   | The Agent Tool Contract — 5 principles for designing tools agents call reliably with anti-pattern table                                                                                     | developer                 |
-| `sharp-edges`                         | Living catalogue of 7 known hazard entries specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS, DST arithmetic, array mutation | developer                 |
-| `brainstorming`                       | Socratic design refinement before implementation — challenges assumptions, surfaces alternatives, identifies risks before code is written                                                   | developer                 |
-| `commit-validator`                    | Validate commit messages against Conventional Commits specification — provides instant feedback with types, scope, and subject rules enforcement                                            | developer                 |
-| `qa-workflow`                         | QA validation and fix loop workflow — validates implementation completeness then iterates fix cycles until all acceptance criteria pass and quality gates clear                             | developer                 |
-| `spec-critique`                       | Self-critique specification documents using extended thinking — surfaces hidden assumptions, contradictions, missing edge cases, and scope creep before implementation                      | developer                 |
-| `subagent-driven-development`         | Execute implementation plans via autonomous subagents with two-stage review per task — dispatches specialist agents for each task and gates on quality before proceeding                    | master-orchestrator       |
-| `requesting-code-review`              | Dispatch code-reviewer agent for structured two-stage code review — prepares diff context, submits review request, and tracks feedback to resolution                                        | code-reviewer             |
-| `receiving-code-review`               | Process and act on code review feedback — parses reviewer findings, prioritizes fixes by severity, implements changes, and confirms resolution before sign-off                              | code-reviewer             |
-| `finishing-a-development-branch`      | Complete a development branch with structured merge or PR options — verifies tests pass, lint is clean, reviews diff summary, then commits and opens PR or merges                           | developer                 |
-| `using-git-worktrees`                 | Create isolated development workspaces with safety verification — sets up git worktrees for parallel feature work without affecting main working tree                                       | developer                 |
-| `strict-user-requirements-adherence`  | Enforce strict adherence to user-specified flows and documented features — prevents scope creep by gating every change against explicit requirements                                        | developer                 |
-| `smart-revert`                        | Git-aware smart revert for tracks, phases, and tasks — safely rolls back changes with impact analysis and rollback gate validation before execution                                         | developer                 |
-| `dispatching-parallel-agents`         | Concurrent investigation of independent failures using parallel subagents — fans out diagnosis tasks to specialist agents and synthesizes findings for coordinated resolution               | developer                 |
+| Skill                                | Description                                                                                                                                                                                 | Primary Agents            |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `thinking-tools`                     | Self-reflection patterns (think-about-\*)                                                                                                                                                   | all agents                |
+| `spec-gathering`                     | Requirements gathering                                                                                                                                                                      | pm                        |
+| `spec-init`                          | Unified spec creation                                                                                                                                                                       | developer                 |
+| `sequential-thinking`                | Structured problem solving                                                                                                                                                                  | all agents                |
+| `consensus-voting`                   | Byzantine consensus for multi-agent decisions                                                                                                                                               | devops, swarm-coordinator |
+| `swarm-coordination`                 | Multi-agent swarm patterns                                                                                                                                                                  | swarm-coordinator         |
+| `interactive-requirements-gathering` | A/B/C/D/E questionnaire framework                                                                                                                                                           | developer                 |
+| `planning-with-files`                | Persistent planning files                                                                                                                                                                   | developer                 |
+| `sparc-methodology`                  | SPARC development methodology                                                                                                                                                               | developer                 |
+| `agent-evaluation`                   | LLM-as-judge evaluation framework with 5-dimension rubric for scoring AI-generated content quality                                                                                          | developer                 |
+| `context-degradation`                | Token-range severity zones with detection checklist and corrective routing actions for context window degradation                                                                           | developer                 |
+| `property-based-testing`             | fast-check patterns for JS/TS — 6 canonical property categories with worked examples targeting agent-studio utilities                                                                       | developer                 |
+| `agent-tool-design`                  | The Agent Tool Contract — 5 principles for designing tools agents call reliably with anti-pattern table                                                                                     | developer                 |
+| `sharp-edges`                        | Living catalogue of 7 known hazard entries specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS, DST arithmetic, array mutation | developer                 |
+| `brainstorming`                      | Socratic design refinement before implementation — challenges assumptions, surfaces alternatives, identifies risks before code is written                                                   | developer                 |
+| `commit-validator`                   | Validate commit messages against Conventional Commits specification — provides instant feedback with types, scope, and subject rules enforcement                                            | developer                 |
+| `qa-workflow`                        | QA validation and fix loop workflow — validates implementation completeness then iterates fix cycles until all acceptance criteria pass and quality gates clear                             | developer                 |
+| `spec-critique`                      | Self-critique specification documents using extended thinking — surfaces hidden assumptions, contradictions, missing edge cases, and scope creep before implementation                      | developer                 |
+| `subagent-driven-development`        | Execute implementation plans via autonomous subagents with two-stage review per task — dispatches specialist agents for each task and gates on quality before proceeding                    | master-orchestrator       |
+| `requesting-code-review`             | Dispatch code-reviewer agent for structured two-stage code review — prepares diff context, submits review request, and tracks feedback to resolution                                        | code-reviewer             |
+| `receiving-code-review`              | Process and act on code review feedback — parses reviewer findings, prioritizes fixes by severity, implements changes, and confirms resolution before sign-off                              | code-reviewer             |
+| `finishing-a-development-branch`     | Complete a development branch with structured merge or PR options — verifies tests pass, lint is clean, reviews diff summary, then commits and opens PR or merges                           | developer                 |
+| `using-git-worktrees`                | Create isolated development workspaces with safety verification — sets up git worktrees for parallel feature work without affecting main working tree                                       | developer                 |
+| `strict-user-requirements-adherence` | Enforce strict adherence to user-specified flows and documented features — prevents scope creep by gating every change against explicit requirements                                        | developer                 |
+| `smart-revert`                       | Git-aware smart revert for tracks, phases, and tasks — safely rolls back changes with impact analysis and rollback gate validation before execution                                         | developer                 |
+| `dispatching-parallel-agents`        | Concurrent investigation of independent failures using parallel subagents — fans out diagnosis tasks to specialist agents and synthesizes findings for coordinated resolution               | developer                 |
 
 ---
 

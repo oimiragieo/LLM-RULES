@@ -1,4 +1,0 @@
-interface:
-  display_name: Consensus Voting
-  short_description: Byzantine consensus voting for multi-agent decision making.
-  default_prompt: Use the $consensus-voting skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Complexity Assessment
-  short_description: AI-based complexity assessment for task analysis. Use when
-  default_prompt: Use the $complexity-assessment skill to complete this task safely and efficiently.

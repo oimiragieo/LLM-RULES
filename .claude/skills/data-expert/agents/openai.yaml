@@ -1,4 +1,0 @@
-interface:
-  display_name: Data Expert
-  short_description: Data processing expert including parsing, transformation, and
-  default_prompt: Use the $data-expert skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Postmortem Writing
-  short_description: Write effective blameless postmortems with root cause analysis,
-  default_prompt: Use the $postmortem-writing skill to complete this task safely and efficiently.

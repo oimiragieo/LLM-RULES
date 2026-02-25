@@ -1,4 +1,0 @@
-interface:
-  display_name: Ai Ml Expert
-  short_description: AI and ML expert including PyTorch, LangChain, LLM integration,
-  default_prompt: Use the $ai-ml-expert skill to complete this task safely and efficiently.

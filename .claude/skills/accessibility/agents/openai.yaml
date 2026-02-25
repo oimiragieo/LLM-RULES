@@ -1,4 +1,0 @@
-interface:
-  display_name: Accessibility
-  short_description: Ensure accessibility in UI components including semantic HTML,
-  default_prompt: Use the $accessibility skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Tool Search
-  short_description: Semantic tool search with embeddings for scalable tool
-  default_prompt: Use the $tool-search skill to complete this task safely and efficiently.

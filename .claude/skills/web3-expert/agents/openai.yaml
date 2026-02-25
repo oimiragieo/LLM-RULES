@@ -1,4 +1,0 @@
-interface:
-  display_name: Web3 Expert
-  short_description: Web3 and blockchain expert including Solidity, Ethereum, and
-  default_prompt: Use the $web3-expert skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Gcloud Cli
-  short_description: Google Cloud CLI operations and resource management
-  default_prompt: Use the $gcloud-cli skill to complete this task safely and efficiently.

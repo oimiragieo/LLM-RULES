@@ -1,4 +1,0 @@
-interface:
-  display_name: Tauri Security Rules
-  short_description: Security-related rules for Tauri application development.
-  default_prompt: Use the $tauri-security-rules skill to complete this task safely and efficiently.

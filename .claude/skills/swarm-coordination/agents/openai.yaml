@@ -1,4 +1,0 @@
-interface:
-  display_name: Swarm Coordination
-  short_description: Multi-agent swarm coordination patterns. Orchestrates parallel
-  default_prompt: Use the $swarm-coordination skill to complete this task safely and efficiently.

@@ -127,27 +127,27 @@ Classify the request:
 
 **CRITICAL**: Complex tasks require multiple perspectives. Use this matrix:
 
-| Task Type                   | Primary Agent            | Required Review Agents                          | Spawn Strategy           |
-| --------------------------- | ------------------------ | ----------------------------------------------- | ------------------------ |
-| Bug fix (simple)            | developer                | -                                               | Single                   |
-| Bug fix (security-related)  | isolated-developer       | isolated-security-architect                     | Sequential (Worktrees)   |
-| New feature                 | isolated-planner         | isolated-architect, isolated-security-architect | Parallel review          |
-| Codebase integration        | artifact-integrator      | isolated-security-architect                     | Background Orchestration |
-| Architecture change         | isolated-architect       | isolated-security-architect                     | Parallel (Worktrees)     |
-| External API integration    | isolated-planner         | isolated-architect, isolated-security-architect | Parallel review          |
-| Database changes            | isolated-planner         | isolated-architect                              | Parallel (Worktrees)     |
-| Authentication/Auth changes | isolated-planner         | isolated-security-architect, isolated-architect | Parallel review          |
-| Performance optimization    | architect                | developer                                       | Sequential               |
-| Code review/audit           | architect                | security-architect                              | Parallel                 |
-| Refactoring (large)         | isolated-code-simplifier | isolated-architect                              | Parallel review          |
-| Chaos/Penetration Testing   | isolated-chaos-engineer  | -                                               | Single (Worktree)        |
-| Documentation (new/update)  | technical-writer         | -                                               | Single                   |
-| Research/Context Building   | isolated-researcher      | -                                               | Single (Worktree)        |
+| Task Type                   | Primary Agent       | Required Review Agents        | Spawn Strategy           |
+| --------------------------- | ------------------- | ----------------------------- | ------------------------ |
+| Bug fix (simple)            | developer           | -                             | Single                   |
+| Bug fix (security-related)  | developer           | security-architect            | Sequential               |
+| New feature                 | planner             | architect, security-architect | Parallel review          |
+| Codebase integration        | artifact-integrator | security-architect            | Background Orchestration |
+| Architecture change         | architect           | security-architect            | Parallel                 |
+| External API integration    | planner             | architect, security-architect | Parallel review          |
+| Database changes            | planner             | architect                     | Parallel                 |
+| Authentication/Auth changes | planner             | security-architect, architect | Parallel review          |
+| Performance optimization    | architect           | developer                     | Sequential               |
+| Code review/audit           | architect           | security-architect            | Parallel                 |
+| Refactoring (large)         | code-simplifier     | architect                     | Parallel review          |
+| Chaos/Penetration Testing   | chaos-engineer      | -                             | Single                   |
+| Documentation (new/update)  | technical-writer    | -                             | Single                   |
+| Research/Context Building   | researcher          | -                             | Single                   |
 
 **Review Protocol for Planning Tasks**:
 
-1. **Phase 1 - Exploration**: Spawn Explore agents (parallel) to gather context (Use `isolated-researcher` for deep rabbit holes).
-2. **Phase 2 - Planning**: Spawn Planner to create initial plan (Use `isolated-planner` for massive architectures).
+1. **Phase 1 - Exploration**: Spawn Explore agents (parallel) to gather context (Use `researcher` for deep rabbit holes).
+2. **Phase 2 - Planning**: Spawn Planner to create initial plan (Use `planner` for massive architectures).
 3. **Phase 3 - Review**: Spawn Architect AND Security-Architect to review plan (parallel).
 4. **Phase 4 - Consolidation**: Planner incorporates feedback into final plan.
 
@@ -169,20 +169,6 @@ Classify the request:
 | `devops` | `.claude/agents/specialized/devops.md` | Infrastructure, CI/CD |
 | `devops-troubleshooter` | `.claude/agents/specialized/devops-troubleshooter.md` | Debugging, incidents |
 | `incident-responder` | `.claude/agents/specialized/incident-responder.md` | Production incidents |
-
-**Isolated Agents (Git Worktrees):**
-For highly destructive, risky, or large-scale tasks, always spawn the `isolated-X` variants. These agents natively launch inside completely isolated Git Worktrees (`isolation: worktree`), allowing them to refactor code or run destructive tests without breaking the main branch or stomping on parallel subagents.
-
-| Isolated Agent                | Use For                                                |
-| ----------------------------- | ------------------------------------------------------ |
-| `isolated-developer`          | Dangerous refactors, complex bug fixes                 |
-| `isolated-planner`            | Deep multi-source research requiring local git commits |
-| `isolated-architect`          | Deep architectural refactors spanning multiple files   |
-| `isolated-security-architect` | Security reviews and penetration testing               |
-| `isolated-devops`             | Destructive CI/CD or infra changes                     |
-| `isolated-chaos-engineer`     | Active fault injection that shouldn't leak to main     |
-| `isolated-code-simplifier`    | Massive codebase cleanups                              |
-| `isolated-researcher`         | Checking out stale branches or deep git log analysis   |
 
 **Domain Agents:** Check `.claude/agents/domain/` for specialized agents.
 

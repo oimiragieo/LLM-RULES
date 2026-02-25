@@ -1,4 +1,0 @@
-interface:
-  display_name: Project Onboarding
-  short_description: Guided project onboarding for new codebases. Helps agents
-  default_prompt: Use the $project-onboarding skill to complete this task safely and efficiently.

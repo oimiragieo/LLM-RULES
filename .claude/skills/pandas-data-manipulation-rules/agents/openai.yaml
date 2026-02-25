@@ -1,4 +1,0 @@
-interface:
-  display_name: Pandas Data Manipulation Rules
-  short_description: Focuses on pandas-specific rules for data manipulation,
-  default_prompt: Use the $pandas-data-manipulation-rules skill to complete this task safely and efficiently.

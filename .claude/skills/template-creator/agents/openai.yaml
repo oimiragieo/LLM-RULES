@@ -1,4 +1,0 @@
-interface:
-  display_name: Template Creator
-  short_description: Creates and registers templates for agents, skills, workflows,
-  default_prompt: Use the $template-creator skill to complete this task safely and efficiently.

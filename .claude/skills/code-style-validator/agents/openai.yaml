@@ -1,4 +1,0 @@
-interface:
-  display_name: Code Style Validator
-  short_description: Programmatic code style validation using AST analysis.
-  default_prompt: Use the $code-style-validator skill to complete this task safely and efficiently.

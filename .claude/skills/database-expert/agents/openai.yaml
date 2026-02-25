@@ -1,4 +1,0 @@
-interface:
-  display_name: Database Expert
-  short_description: Database expert including Prisma, Supabase, SQL, and NoSQL
-  default_prompt: Use the $database-expert skill to complete this task safely and efficiently.

@@ -1,4 +1,0 @@
-interface:
-  display_name: Static Analysis
-  short_description: Run CodeQL and Semgrep static analysis with SARIF output for
-  default_prompt: Use the $static-analysis skill to complete this task safely and efficiently.

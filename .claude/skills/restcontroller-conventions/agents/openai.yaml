@@ -1,4 +1,0 @@
-interface:
-  display_name: Restcontroller Conventions
-  short_description: Specifies standards for RestController classes, including API
-  default_prompt: Use the $restcontroller-conventions skill to complete this task safely and efficiently.

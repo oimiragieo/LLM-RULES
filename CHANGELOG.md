@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Cleaned up obsolete `isolated-agents` architecture and related tools.
+- Removed legacy `self-healing` directory references.
+- Removed orphaned `agent-registry-*.json` index files.
+
+### Fixed
+
+- Fixed command parsing bug in `shell-validators.cjs` for combined flags inside `-c` evaluation.
+- Fixed version mismatch in `config.staging.yaml`.
+- Resolved ownership discrepancies in `skill-catalog.md` (`creation-feasibility-gate`, `compliance-policy-check`).
+
+### Added
+
 ### Added — Multi-GPU Indexing Acceleration (2026-02-24)
 
 - **Scalable Process Distribution (Multi-GPU/CPU)**: Completely refactored `MemoryVectorStore` subprocessing and `gpu-detector.cjs` within `.claude/lib/code-indexing/` to support distributed LanceDB bulk embedding. The client dynamically queries host metrics during codebase indexing (`nvidia-smi` GPU counts via `CUDA_VISIBLE_DEVICES`) and spawns a synchronous round-robin worker pool. Substantially reduces inference time during initial code indexing by unlocking multi-GPU scalability or automatically defaulting to fully-parallel CPU isolation when no hardware accelerators are present.

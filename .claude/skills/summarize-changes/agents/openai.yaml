@@ -1,4 +1,0 @@
-interface:
-  display_name: Summarize Changes
-  short_description: Structured workflow for summarizing code changes after
-  default_prompt: Use the $summarize-changes skill to complete this task safely and efficiently.

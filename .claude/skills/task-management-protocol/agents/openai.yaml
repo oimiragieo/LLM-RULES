@@ -1,4 +1,0 @@
-interface:
-  display_name: Task Management Protocol
-  short_description: Protocol for task synchronization, context handoff, and
-  default_prompt: Use the $task-management-protocol skill to complete this task safely and efficiently.

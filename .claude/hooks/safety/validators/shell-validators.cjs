@@ -269,7 +269,7 @@ function extractCArgument(commandString) {
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
 
-    const isCFlag = token === '-c';
+    const isCFlag = token.startsWith('-') && !token.startsWith('--') && token.includes('c');
 
     if (isCFlag && i + 1 < tokens.length) {
       // The next token is the command to execute
