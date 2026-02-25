@@ -36,16 +36,17 @@ class GPUDetector {
         return { available: false, gpuName: null, totalMemoryMB: 0 };
       }
 
-      // Parse first GPU (multi-GPU systems use first one)
+      // Parse first GPU (multi-GPU systems use first one for name/mem metrics)
       const parts = lines[0].split(',');
       const gpuName = parts[0]?.trim();
       const totalMemoryMB = parseInt(parts[1]?.trim(), 10);
+      const gpuCount = lines.filter(line => line.trim().length > 0).length;
 
       if (!gpuName || !totalMemoryMB) {
-        return { available: false, gpuName: null, totalMemoryMB: 0 };
+        return { available: false, gpuName: null, totalMemoryMB: 0, gpuCount: 0 };
       }
 
-      this._gpuInfo = { available: true, gpuName, totalMemoryMB };
+      this._gpuInfo = { available: true, gpuName, totalMemoryMB, gpuCount };
       return this._gpuInfo;
     } catch (_error) {
       // nvidia-smi not found or execution failed
