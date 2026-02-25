@@ -6,11 +6,11 @@ function calculateSafeMemoryConfig() {
   const _totalSystemMemoryGB = os.totalmem() / 1024 / 1024 / 1024;
   const availableMemoryGB = os.freemem() / 1024 / 1024 / 1024;
 
-  const maxIndexingMemoryGB = Math.min(availableMemoryGB * 0.5, 8);
-  const safeConcurrency = Math.min(4, Math.max(1, Math.floor(maxIndexingMemoryGB / 2)));
+  const maxIndexingMemoryGB = Math.min(availableMemoryGB * 0.5, 12);
+  const safeConcurrency = Math.min(8, Math.max(1, Math.floor(maxIndexingMemoryGB / 1.5)));
   const maxOldGenMB = Math.min(
     2048,
-    Math.floor((maxIndexingMemoryGB * 1024) / safeConcurrency / 2)
+    Math.floor((maxIndexingMemoryGB * 1024) / safeConcurrency / 1.5)
   );
   const memoryThresholdGB = Math.max(2, maxIndexingMemoryGB * 0.6);
 
