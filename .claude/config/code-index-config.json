@@ -38,7 +38,6 @@
       "**/*.rs"
     ],
     "maxFileSize": 524288,
-    "concurrency": 1,
     "batchSize": 10
   },
   "chunking": {
@@ -94,23 +93,38 @@
   },
   "languages": {
     "javascript": {
-      "extensions": [".js", ".mjs", ".cjs"],
+      "extensions": [
+        ".js",
+        ".mjs",
+        ".cjs"
+      ],
       "grammar": "tree-sitter-javascript"
     },
     "typescript": {
-      "extensions": [".ts", ".tsx", ".mts", ".cts"],
+      "extensions": [
+        ".ts",
+        ".tsx",
+        ".mts",
+        ".cts"
+      ],
       "grammar": "tree-sitter-typescript"
     },
     "python": {
-      "extensions": [".py"],
+      "extensions": [
+        ".py"
+      ],
       "grammar": "tree-sitter-python"
     },
     "go": {
-      "extensions": [".go"],
+      "extensions": [
+        ".go"
+      ],
       "grammar": "tree-sitter-go"
     },
     "rust": {
-      "extensions": [".rs"],
+      "extensions": [
+        ".rs"
+      ],
       "grammar": "tree-sitter-rust"
     }
   }
