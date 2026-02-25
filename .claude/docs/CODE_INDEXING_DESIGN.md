@@ -337,6 +337,8 @@ ALGORITHM: SemanticChunking(AST)
 **Recommendation: Local-First with Optional Cloud Enhancement**
 
 - **Primary:** sentence-transformers/all-MiniLM-L6-v2 (local, free, fast)
+  * Natively supports automatic Multi-GPU distribution for semantic indexing dynamically spreading LanceDB embeddings via ONNX across all detected NVIDIA GPUs.
+  * Defaults gracefully to fully parallelized CPU parsing if GPUs are unavailable or disabled.
 - **Optional:** OpenAI text-embedding-3-small (cloud, higher quality for critical searches)
 
 **Interface:**

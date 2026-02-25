@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — Multi-GPU Indexing Acceleration (2026-02-24)
+
+- **Scalable Process Distribution (Multi-GPU/CPU)**: Completely refactored `MemoryVectorStore` subprocessing and `gpu-detector.cjs` within `.claude/lib/code-indexing/` to support distributed LanceDB bulk embedding. The client dynamically queries host metrics during codebase indexing (`nvidia-smi` GPU counts via `CUDA_VISIBLE_DEVICES`) and spawns a synchronous round-robin worker pool. Substantially reduces inference time during initial code indexing by unlocking multi-GPU scalability or automatically defaulting to fully-parallel CPU isolation when no hardware accelerators are present.
+- **Dynamic Thread Resizing Override**: Dropped rigid single-thread constraints from `.claude/config/code-index-config.json` baseline settings (`"concurrency": 1`) which artificially bottlenecked Piscina workers. Deep semantic chunking will now leverage dynamic `freemem` analysis to size the process pool optimally (up to 8 threads).
+
 ### Fixed — Code Indexing Worker Subprocesses, Testing CI Hanging, and Result Validation (2026-02-24)
 
 - **Embed Worker Worker/Subprocess Hanging**: Discovered `node:test` CI pipelines stalling indefinitely on `tests/code-indexing/integration.test.cjs`. Added explicit `IndexManager.close()` resource teardown propagating downward to `.claude/lib/code-indexing/vector-store.cjs` and `.claude/lib/memory/lancedb-client-impl.cjs` to force explicit `process.kill()` signals against active `fastembed` worker isolates.
