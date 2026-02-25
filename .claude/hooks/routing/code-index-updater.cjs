@@ -342,6 +342,7 @@ async function triggerIndexUpdate(filePath) {
           }
         }
       } finally {
+        if (manager) await manager.close();
         await removeLock();
       }
     });

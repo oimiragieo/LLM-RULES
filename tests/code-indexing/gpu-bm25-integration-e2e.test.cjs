@@ -144,6 +144,7 @@ function generateToken(userId) {
       );
       console.log(`[E2E] Top result RRF score: ${firstResult.rrf_score || firstResult.score}`);
     }
+    await manager.close();
   });
 
   test('E2E: Verify semantic search still works', async () => {
@@ -164,5 +165,6 @@ function generateToken(userId) {
       assert.ok(typeof first.similarity === 'number', 'Results should have similarity score');
       console.log(`[E2E] Top result similarity: ${first.similarity.toFixed(3)}`);
     }
+    await manager.close();
   });
 });

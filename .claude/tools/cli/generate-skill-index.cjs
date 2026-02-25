@@ -32,14 +32,7 @@ const path = require('path');
 const PROJECT_ROOT = process.cwd();
 const CONFIG_DIR = path.join(PROJECT_ROOT, '.claude', 'config');
 const INDEX_PATH = path.join(CONFIG_DIR, 'skill-index.json');
-const CATALOG_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'artifacts',
-  'catalogs',
-  'skill-catalog.md'
-);
+const CATALOG_PATH = path.join(PROJECT_ROOT, '.claude', 'docs', 'skill-catalog.md');
 const CATALOG_PATH_LEGACY = path.join(
   PROJECT_ROOT,
   '.claude',

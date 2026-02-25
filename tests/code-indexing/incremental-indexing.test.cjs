@@ -16,7 +16,9 @@ const path = require('path');
 const { IndexManager } = require('../../.claude/lib/code-indexing/index-manager.cjs');
 const { MerkleTree } = require('../../.claude/lib/code-indexing/merkle-tree.cjs');
 
-const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing');
+const os = require('os');
+
+const FIXTURES_DIR = path.join(os.tmpdir(), `incremental-indexing-fixtures-${process.pid}`);
 const INCREMENTAL_TEST_DIR = path.join(FIXTURES_DIR, 'incremental-test');
 const LANCEDB_DIR = path.join(INCREMENTAL_TEST_DIR, 'lancedb-test');
 const TABLE_NAME = `code_index_test_${process.pid}`;
@@ -40,6 +42,7 @@ describe('Incremental indexing', () => {
   });
 
   after(async () => {
+    if (manager) await manager.close();
     await fs.rm(FIXTURES_DIR, { recursive: true, force: true }).catch(() => {});
   });
 
@@ -146,6 +149,8 @@ describe('Incremental indexing', () => {
       const result = await mgr.incrementalUpdate();
       assert.ok(result.updateType === 'full' || result.updateType === 'incremental');
       assert.ok(result.filesIndexed >= 1 || result.filesAdded >= 1);
+
+      await mgr.close();
 
       await fs
         .rm(path.join(isolatedRoot, '.claude'), { recursive: true, force: true })

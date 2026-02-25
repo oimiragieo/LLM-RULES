@@ -1,5 +1,5 @@
 ---
-name: isolated-
+name: isolated-planner
 isolation: worktree
 version: 1.4.0
 description: >-

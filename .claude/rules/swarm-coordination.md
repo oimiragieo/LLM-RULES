@@ -213,4 +213,4 @@ ELSE
 
 - `.claude/skills/swarm-coordination/SKILL.md` - Complete implementation patterns
 - `.claude/agents/orchestrators/master-orchestrator.md` - Uses swarm for parallel execution
-- `.claude/workflows/enterprise/enterprise-workflow.md` - Multi-phase swarm coordination
+- `.claude/workflows/core/enterprise-workflow.md` - Multi-phase swarm coordination

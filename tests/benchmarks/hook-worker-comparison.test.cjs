@@ -20,7 +20,7 @@ async function runBenchmark(mode, iterations = 10) {
     await new Promise((resolve, reject) => {
       const child = spawn(process.execPath, [HOOK_DISPATCHER, TEST_HOOK, '--dry-run'], {
         stdio: 'inherit',
-        env: { ...process.env, HOOK_RUNNER_MODE: mode },
+        env: { ...process.env, HOOK_RUNNER_MODE: mode, LANCEDB_EMBEDDING_MODE: 'test' },
       });
       child.on('close', code => {
         if (code === 0 || code === null) resolve();

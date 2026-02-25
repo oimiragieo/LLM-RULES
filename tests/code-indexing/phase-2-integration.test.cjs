@@ -14,7 +14,7 @@
 
 'use strict';
 
-const { test, suite } = require('node:test');
+const { test, suite, after } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
@@ -452,6 +452,7 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
       console.log(`  Indexed ${result.filesIndexed} files in ${duration}ms`);
 
       // Cleanup
+      if (largeIndexManager) await largeIndexManager.close();
       if (largeTempDir && fs.existsSync(largeTempDir)) {
         fs.rmSync(largeTempDir, { recursive: true, force: true });
       }
@@ -641,10 +642,10 @@ suite('Phase 2: Hybrid Search Integration (Task #55)', () => {
   });
 
   // Cleanup
-  test('cleanup - remove test environment', () => {
+  after(async () => {
+    if (indexManager) await indexManager.close();
     if (tempDir && fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
-    assert.ok(!fs.existsSync(tempDir), 'Test environment cleaned up');
   });
 });

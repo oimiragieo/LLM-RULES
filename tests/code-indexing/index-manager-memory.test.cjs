@@ -44,6 +44,7 @@ function test() { return ${i}; }`
         saveBM25Index: async () => {},
         dropCodeTable: async () => {},
         deleteFile: async () => {},
+        close: async () => {},
       };
     };
 
@@ -55,6 +56,7 @@ function test() { return ${i}; }`
   });
 
   // Clean up
+  await manager.close();
   try {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   } catch (_err) {

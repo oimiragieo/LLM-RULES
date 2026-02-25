@@ -137,6 +137,9 @@ const INTENT_TO_AGENT = {
 
   // Advanced Debugging
   advanced_debugging: 'advanced-debugging',
+
+  // Multi-LLM Consultant
+  multi_llm_consultant: 'multi-llm-consultant',
 };
 
 module.exports = { INTENT_TO_AGENT };

@@ -24,7 +24,9 @@ const { MerkleTree } = require('../../.claude/lib/code-indexing/merkle-tree.cjs'
 const { ContextualMemory } = require('../../.claude/lib/memory/contextual-memory.cjs');
 const { AstGrepSearch } = require('../../.claude/lib/code-indexing/ast-grep-wrapper.cjs');
 
-const FIXTURES_DIR = path.join(__dirname, '..', 'fixtures', 'code-indexing');
+const os = require('os');
+
+const FIXTURES_DIR = path.join(os.tmpdir(), `code-indexing-fixtures-${process.pid}`);
 const E2E_PROJECT = path.join(FIXTURES_DIR, 'e2e-project');
 
 describe('Search tools and indexing E2E', () => {
@@ -43,6 +45,7 @@ describe('Search tools and indexing E2E', () => {
   });
 
   after(async () => {
+    if (manager) await manager.close();
     await fs.rm(FIXTURES_DIR, { recursive: true, force: true }).catch(() => {});
   });
 

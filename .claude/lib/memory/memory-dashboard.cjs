@@ -367,11 +367,11 @@ async function getLanceDBStatus(projectRoot = PROJECT_ROOT) {
       return null;
     } finally {
       if (typeof store.close === 'function') {
-        await store.close().catch(() => {});
+        await store.close().catch((_e) => { });
       }
     }
-  } catch (e) {
-    return { status: 'unavailable', reason: e.message };
+  } catch (_e) {
+    return { status: 'unavailable', reason: _e.message };
   }
 }
 

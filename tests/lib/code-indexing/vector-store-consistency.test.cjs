@@ -85,6 +85,8 @@ async function testConsistency() {
     const search2 = await store.hybridSearch('test');
     if (search2.length !== 0)
       throw new Error(`BM25 Index still contains deleted file. Found: ${search2.length}`);
+
+    await store.close();
   });
 
   console.log(`

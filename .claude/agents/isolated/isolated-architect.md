@@ -1,5 +1,5 @@
 ---
-name: isolated-
+name: isolated-architect
 isolation: worktree
 version: 1.1.0
 description: >-

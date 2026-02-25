@@ -10,6 +10,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const os = require('os');
 const { VectorStore } = require('../../.claude/lib/code-indexing/vector-store.cjs');
+const { MemoryVectorStore } = require('../../.claude/lib/memory/lancedb-client.cjs');
 
 describe('VectorStore (LanceDB)', () => {
   const lancedbDir = path.join(os.tmpdir(), `code-index-lancedb-${process.pid}`);
@@ -24,6 +25,7 @@ describe('VectorStore (LanceDB)', () => {
   });
 
   after(async () => {
+    MemoryVectorStore.clearSharedStores();
     await fs.rm(lancedbDir, { recursive: true, force: true }).catch(() => {});
   });
 

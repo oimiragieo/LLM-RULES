@@ -8,13 +8,14 @@
 
 'use strict';
 
-const { test, suite } = require('node:test');
+const { test, suite, after } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
 const { IndexManager } = require('../../.claude/lib/code-indexing/index.cjs');
+const { MemoryVectorStore } = require('../../.claude/lib/memory/lancedb-client.cjs');
 
 suite('End-to-End Integration Tests (43.1)', () => {
   let tempDir;
@@ -233,8 +234,9 @@ suite('End-to-End Integration Tests (43.1)', () => {
     }
   });
 
-  test('cleanup - remove test environment', async () => {
+  after(async () => {
     if (manager) await manager.close();
+    MemoryVectorStore.clearSharedStores();
     // Clean up temp directory
     if (tempDir && fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
@@ -242,7 +244,6 @@ suite('End-to-End Integration Tests (43.1)', () => {
     if (fs.existsSync(lancedbDir)) {
       fs.rmSync(lancedbDir, { recursive: true, force: true });
     }
-    assert.ok(!fs.existsSync(tempDir), 'Temp directory should be removed');
   });
 });
 
@@ -251,6 +252,9 @@ suite('Multi-Language Support Tests (43.2)', () => {
   let manager;
 
   test('setup - create multi-language test project', () => {
+    process.env.LANCEDB_EMBEDDING_MODE = 'test';
+    process.env.LANCEDB_URI = path.join(os.tmpdir(), `code-index-lang-lancedb-${process.pid}`);
+    process.env.LANCEDB_TABLE_CODE = `code_index_lang_${process.pid}`;
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'code-index-multi-lang-'));
 
     const files = {
@@ -313,8 +317,9 @@ suite('Multi-Language Support Tests (43.2)', () => {
     assert.ok(languages.size >= 1, 'Should return results from at least one language');
   });
 
-  test('cleanup - remove multi-language test environment', async () => {
+  after(async () => {
     if (manager) await manager.close();
+    MemoryVectorStore.clearSharedStores();
     if (tempDir && fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }

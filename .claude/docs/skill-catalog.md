@@ -395,7 +395,6 @@ Advanced patterns and methodologies.
 | `strict-user-requirements-adherence`  | Enforce strict adherence to user-specified flows and documented features — prevents scope creep by gating every change against explicit requirements                                        | developer                 |
 | `smart-revert`                        | Git-aware smart revert for tracks, phases, and tasks — safely rolls back changes with impact analysis and rollback gate validation before execution                                         | developer                 |
 | `dispatching-parallel-agents`         | Concurrent investigation of independent failures using parallel subagents — fans out diagnosis tasks to specialist agents and synthesizes findings for coordinated resolution               | developer                 |
-| `enterprise-skill-test-1771947459945` | Enterprise scaffold validation skill for test coverage and reliability checks.                                                                                                              | Read                      |
 
 ---
 

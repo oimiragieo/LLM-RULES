@@ -507,7 +507,7 @@ class MemoryVectorStore {
       proc: null,
       stdoutBuf: '',
       callCount: 0,
-      maxCalls: 50
+      maxCalls: 50,
     }));
 
     await Promise.all(this._embedWorkers.map(w => this._initSingleWorker(w)));

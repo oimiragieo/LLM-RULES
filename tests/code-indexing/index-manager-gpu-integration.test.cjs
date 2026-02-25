@@ -74,6 +74,7 @@ class AuthService {
     assert.ok(manager.vectorStore.store.isInitialized, 'Store should be initialized');
 
     // This test documents that initialization happened and GPU detection was attempted
+    await manager.close();
   });
 
   test('RED: BM25 index should be built during indexing', async () => {
@@ -110,6 +111,7 @@ class AuthService {
       assert.ok(bm25Data.documents, 'BM25 index should have documents');
       assert.ok(bm25Data.documents.length > 0, 'BM25 index should have indexed documents');
     }
+    await manager.close();
   });
 
   test('RED: BM25 index should be saved incrementally', async () => {
@@ -132,6 +134,7 @@ class AuthService {
 
     // THIS SHOULD FAIL initially
     assert.ok(bm25Exists, 'BM25 index should be saved after indexing');
+    await manager.close();
   });
 
   test('GREEN: After fix - hybrid search should work', async () => {
@@ -155,5 +158,6 @@ class AuthService {
     if (manager.vectorStore.bm25Index) {
       assert.ok(hybridResults.length > 0, 'Hybrid search should find results when BM25 is wired');
     }
+    await manager.close();
   });
 });

@@ -1,5 +1,5 @@
 ---
-name: isolated-
+name: isolated-technical-writer
 isolation: worktree
 version: 1.0.0
 description: >-

@@ -1,5 +1,5 @@
 ---
-name: isolated-
+name: isolated-chaos-engineer
 isolation: worktree
 version: 2.0.0
 description: >-

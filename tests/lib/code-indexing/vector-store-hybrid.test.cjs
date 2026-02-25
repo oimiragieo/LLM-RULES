@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { VectorStore } = require('../../../.claude/lib/code-indexing/vector-store.cjs');
+const { MemoryVectorStore } = require('../../../.claude/lib/memory/lancedb-client.cjs');
 const { BM25Indexer } = require('../../../.claude/lib/code-indexing/bm25-indexer.cjs');
 
 describe('VectorStore Hybrid Search Integration', () => {
@@ -28,6 +29,7 @@ describe('VectorStore Hybrid Search Integration', () => {
     if (vectorStore) {
       await vectorStore.close();
     }
+    MemoryVectorStore.clearSharedStores();
     if (testDir && fs.existsSync(testDir)) {
       fs.rmSync(testDir, { recursive: true, force: true });
     }

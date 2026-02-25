@@ -6,6 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { VectorStore } = require('../../.claude/lib/code-indexing/vector-store.cjs');
+const { MemoryVectorStore } = require('../../.claude/lib/memory/lancedb-client.cjs');
 
 describe('Search fallback resilience', () => {
   test('corrupted BM25 index does not crash and hybrid search still returns sparse results', async () => {
@@ -40,6 +41,7 @@ describe('Search fallback resilience', () => {
     assert.ok(results.some(r => r.id === 'chunk-1' || r.metadata?.filePath === 'src/auth.js'));
 
     await store.close();
+    MemoryVectorStore.clearSharedStores();
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
@@ -71,6 +73,7 @@ describe('Search fallback resilience', () => {
     assert.ok(results.length > 0);
 
     await store.close();
+    MemoryVectorStore.clearSharedStores();
     fs.rmSync(tmpDir, { recursive: true, force: true });
     if (prevMode === undefined) delete process.env.LANCEDB_EMBEDDING_MODE;
     else process.env.LANCEDB_EMBEDDING_MODE = prevMode;

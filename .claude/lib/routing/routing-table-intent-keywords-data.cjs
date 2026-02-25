@@ -547,6 +547,22 @@ const INTENT_KEYWORDS = {
     'thread safety',
     'concurrency bug',
   ],
+  multi_llm_consultant: [
+    'multiple perspectives',
+    'ask all llms',
+    'compare what claude',
+    'llm council',
+    'multi-llm',
+    'consensus from multiple models',
+    'second opinion',
+    'cross-validate',
+    'ask gemini',
+    'ask codex',
+    'ask gpt',
+    'ask cursor',
+    'council debate',
+    'multi-model',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.
@@ -579,7 +595,6 @@ const ALLOWED_INTENT_KEYWORD_OVERLAPS = {
   'user story': ['pm', 'pm_coordinator'],
   vercel: ['nextjs', 'vercel_deploy'],
   wcag: ['accessibility_tester', 'web_design'],
-  testing: ['property-based-testing', 'qa'],
 };
 
 module.exports = { INTENT_KEYWORDS, ALLOWED_INTENT_KEYWORD_OVERLAPS };

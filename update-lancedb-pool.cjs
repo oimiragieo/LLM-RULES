@@ -279,13 +279,17 @@ const newCode = `  async _embedViaSubprocessWorker(worker, texts, batchSize) {
     }`;
 
 const startIndex = content.indexOf('  async _embedViaSubprocess(texts, batchSize) {');
-const endIndex = content.indexOf('    // In-process fallback (for single queries / search, not bulk indexing)', startIndex);
+const endIndex = content.indexOf(
+  '    // In-process fallback (for single queries / search, not bulk indexing)',
+  startIndex
+);
 
 if (startIndex === -1 || endIndex === -1) {
-    console.error('Could not find boundaries');
-    process.exit(1);
+  console.error('Could not find boundaries');
+  process.exit(1);
 }
 
-const updatedContent = content.substring(0, startIndex) + newCode + '\n\n' + content.substring(endIndex);
+const updatedContent =
+  content.substring(0, startIndex) + newCode + '\n\n' + content.substring(endIndex);
 fs.writeFileSync(file, updatedContent);
 console.log('Update successful');

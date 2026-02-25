@@ -28,20 +28,22 @@ describe('IndexManager', () => {
   });
 
   describe('41.1: Class skeleton', () => {
-    test('should construct with default config', () => {
+    test('should construct with default config', async () => {
       const manager = new IndexManager();
       assert.ok(manager, 'Manager created');
       assert.strictEqual(typeof manager.indexDirectory, 'function', 'Has indexDirectory method');
       assert.strictEqual(typeof manager.semanticSearch, 'function', 'Has semanticSearch method');
+      await manager.close();
     });
 
-    test('should construct with custom config', () => {
+    test('should construct with custom config', async () => {
       const manager = new IndexManager({
         maxFileSize: 2 * 1024 * 1024, // 2MB
         batchSize: 10,
         verbose: true,
       });
       assert.ok(manager, 'Manager created with options');
+      await manager.close();
     });
   });
 
@@ -107,6 +109,7 @@ class Handler${i} {
 
       // Cleanup
       await fs.rm(testDir, { recursive: true, force: true });
+      await manager.close();
     });
 
     test('should discover files in sample directory', async () => {
@@ -153,6 +156,7 @@ class Greeter {
 
       // Cleanup
       await fs.rm(testDir, { recursive: true, force: true });
+      await manager.close();
     });
   });
 });
