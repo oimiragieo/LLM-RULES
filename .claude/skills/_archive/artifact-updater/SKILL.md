@@ -1,51 +1,39 @@
 ---
 name: artifact-updater
-description: Unified maintenance workflow for updating existing framework artifacts (agents, skills, hooks, workflows). Enforces regression-safe delivery and automatic integration updates.
-version: 1.0.0
+description: '[DEPRECATED] Route through type-specific updaters: skill-updater, agent-updater, workflow-updater.'
+version: 2.0.0
 model: sonnet
 invoked_by: both
-user_invocable: true
-tools: [Read, Write, Edit, Bash, Glob, Grep]
-best_practices:
-  - Always verify artifact exists before updating
-  - Use TDD: write regression tests for the reported issue/drift
-  - Regenerate relevant registries after update
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+user_invocable: false
+tools: [Read]
+verified: true
+lastVerifiedAt: 2026-02-19T12:00:00.000Z
 ---
 
-# Artifact Updater Skill
+# Artifact Updater (Deprecated)
 
-Unified maintenance for all framework artifacts.
+This skill has been superseded by type-specific updaters with full enterprise bundle support:
 
-## Overview
+| Artifact Type | Use Instead                              |
+| ------------- | ---------------------------------------- |
+| Skills        | `skill-updater`                          |
+| Agents        | `agent-updater`                          |
+| Workflows     | `workflow-updater`                       |
+| Hooks         | `hook-creator` (create) or manual update |
 
-As the ecosystem evolves, artifacts drift from current standards. This skill provides a single point of entry for refreshing any artifact while ensuring all downstream registries and documentation remain in sync.
+## Why Deprecated
 
-## Workflow
+The generic artifact-updater lacked:
 
-### Step 0: Existence Check
+- Research gates (Exa/arXiv queries)
+- Enterprise bundle validation and scaffolding
+- Risk scoring specific to each artifact type
+- Protected sections manifests
+- Cascade detection
+- Companion validation
 
-```bash
-test -f {{ARTIFACT_PATH}} && echo "EXISTS" || echo "NOT_FOUND"
-```
+Type-specific updaters provide all of these features.
 
-### Step 1: Research
+## Archive
 
-Research best practices for the target domain if the update is complex.
-
-### Step 2: Update
-
-Apply changes using `Edit` or `Write` tools.
-
-### Step 3: Integrate
-
-Regenerate relevant registries:
-
-- Agent registry for agents
-- Skill index for skills
-- Command catalog for commands
-
-## Memory Protocol (MANDATORY)
-
-Standard memory protocol applies.
+Original stub archived to `.claude/skills/_archive/artifact-updater/`.
