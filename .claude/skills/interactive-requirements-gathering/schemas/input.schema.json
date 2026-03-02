@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "interactive-requirements-gatheringInput",
+  "description": "Input schema for Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice patterns with additive vs exclusive question classification.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

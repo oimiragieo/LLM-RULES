@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "service-class-conventionsInput",
+  "description": "Input schema for Defines the structure and implementation of service classes, enforcing the use of interfaces, ServiceImpl classes, DTOs for data transfer, and transactional management.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

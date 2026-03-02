@@ -1,0 +1,6 @@
+---
+description: "Ultra-granular code analysis for deep architectural context building. Line-by-line and block-by-block analysis using First Principles, 5 Whys, 5 Hows methodology at micro scale. Builds mental models, tracks invariants and assumptions, and maps cross-function call flows for security audit preparation."
+disable-model-invocation: true
+---
+
+Invoke the audit-context-building skill and follow it exactly as presented to you

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Ralph Loop Skill Output",
+  "description": "Output schema for ralph-loop skill execution results",
+  "type": "object",
+  "required": ["status", "output"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed"],
+      "description": "Overall execution status"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Human-readable summary of ralph loop outcome"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
+              "status": { "type": "string", "enum": ["OPEN", "FIXED_THIS_ITERATION"] },
+              "description": { "type": "string" }
+            }
+          },
+          "description": "Findings from the audit loop"
+        },
+        "filesModified": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files modified during the loop"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "yara-authoringInput",
+  "description": "Input schema for YARA-X detection rule authoring with expert judgment, linting, atom analysis, and best practices. Teaches how to think like an expert YARA author for malware detection, threat hunting, and indicator-of-compromise identification using YARA-X (the Rust-based successor to legacy YARA).",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

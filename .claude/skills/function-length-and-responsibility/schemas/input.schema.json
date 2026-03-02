@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "function-length-and-responsibilityInput",
+  "description": "Input schema for This rule enforces the single responsibility principle, ensuring functions are short and focused.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

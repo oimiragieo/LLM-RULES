@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "complexity-assessmentInput",
+  "description": "Input schema for 'AI-based complexity assessment for task analysis. Use when determining the appropriate workflow, phases, and validation depth for a task.'",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

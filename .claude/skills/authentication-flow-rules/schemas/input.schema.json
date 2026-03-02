@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "authentication-flow-rulesInput",
+  "description": "Input schema for OAuth 2.1 compliant authentication flows (MANDATORY Q2 2026). PKCE required for ALL clients, Implicit Flow removed, modern token security.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

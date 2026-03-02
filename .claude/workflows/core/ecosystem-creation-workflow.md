@@ -336,4 +336,4 @@ Processes integration queue entries. Performs Step 3.1 (companion matrix analysi
 
 **Override Integration Queue:** Delete `.claude/context/runtime/integration-queue.jsonl` to clear pending integration tasks.
 
-**Override Research-First:** Research-synthesis can be skipped if artifact is trivial (update existing artifact, minor documentation change). Use artifact-updater skill instead of creator skills for updates.
+**Override Research-First:** Research-synthesis can be skipped if artifact is trivial (update existing artifact, minor documentation change). Use type-specific updater skills (skill-updater, agent-updater, workflow-updater) instead of creator skills for updates.

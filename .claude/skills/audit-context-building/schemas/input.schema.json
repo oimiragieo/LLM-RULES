@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "audit-context-buildingInput",
+  "description": "Input schema for Ultra-granular code analysis for deep architectural context building. Line-by-line and block-by-block analysis using First Principles, 5 Whys, 5 Hows methodology at micro scale. Builds mental models, tracks invariants and assumptions, and maps cross-function call flows for security audit preparation.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

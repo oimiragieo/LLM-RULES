@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skill-authentication-flow-rules-output",
+  "title": "authentication-flow-rules Skill Output",
+  "description": "Output schema for: OAuth 2.1 compliant authentication flows (MANDATORY Q2 2026). PKCE required for ALL clients, Implicit Flow removed, modern token security.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Summary of skill execution"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "CRITICAL",
+                  "HIGH",
+                  "MEDIUM",
+                  "LOW",
+                  "INFO"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "severity",
+              "message"
+            ]
+          }
+        },
+        "filesModified": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "summary"
+      ]
+    }
+  },
+  "required": [
+    "status",
+    "output"
+  ]
+}

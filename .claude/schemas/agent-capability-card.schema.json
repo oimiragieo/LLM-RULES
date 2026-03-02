@@ -21,7 +21,7 @@
     },
     "category": {
       "type": "string",
-      "enum": ["core", "specialized", "domain", "orchestrator", "isolated"],
+      "enum": ["core", "specialized", "domain", "orchestrators", "isolated"],
       "description": "Organizational category"
     },
     "filePath": {

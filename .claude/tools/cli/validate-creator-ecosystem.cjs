@@ -9,7 +9,7 @@ const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 const REQUIRED_MARKERS = [
   '## Ecosystem Alignment Contract (MANDATORY)',
   '### Cross-Creator Handshake (Required)',
-  '### Research Gate (Exa First, arXiv Fallback)',
+  '### Research Gate (Exa + arXiv — BOTH MANDATORY)',
   '### Regression-Safe Delivery',
 ];
 

@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skill-omega-gemini-cli-output",
+  "title": "omega-gemini-cli Skill Output",
+  "description": "Output schema for: Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on \"use Gemini\", \"analyze with Gemini\", \"large file\", \"sandbox\", \"brainstorm with Gemini\".",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Summary of skill execution"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "CRITICAL",
+                  "HIGH",
+                  "MEDIUM",
+                  "LOW",
+                  "INFO"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "severity",
+              "message"
+            ]
+          }
+        },
+        "filesModified": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "summary"
+      ]
+    }
+  },
+  "required": [
+    "status",
+    "output"
+  ]
+}

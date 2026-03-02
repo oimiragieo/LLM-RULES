@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "web-perfInput",
+  "description": "Input schema for Structured 5-phase web performance audit workflow with Core Web Vitals thresholds and actionable optimization recommendations. Use when auditing website performance, diagnosing slow page loads, optimizing Core Web Vitals scores, or reviewing frontend performance patterns. Covers Webpack, Vite, Next.js, and Nuxt optimization.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

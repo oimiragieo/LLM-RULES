@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "android-expertInput",
+  "description": "Input schema for Comprehensive Android development expert covering Jetpack Compose, Kotlin coroutines/Flow, Architecture Components, Hilt DI, Navigation, testing, performance, Material Design 3, and modern Android patterns (MVI, Clean Architecture).",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

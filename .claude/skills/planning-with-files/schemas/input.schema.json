@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "planning-with-filesInput",
+  "description": "Input schema for Manus-style file-based planning for complex tasks. Use task_plan.md, findings.md, and progress.md to maintain persistent context. Use for multi-step tasks, research, or work spanning many tool calls.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

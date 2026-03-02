@@ -126,7 +126,7 @@ Subject: Discover artifact: $ARTIFACT_NAME
    - Templates: Glob pattern ".claude/templates/**/$ARTIFACT_NAME.md"
    - Schemas: Glob pattern ".claude/schemas/$ARTIFACT_NAME.schema.json"
 3. Check creator registry: .claude/context/artifacts/catalogs/creator-registry.json
-4. Search skill catalog: .claude/context/artifacts/catalogs/skill-catalog.md
+4. Search skill catalog: .claude/docs/skill-catalog.md
 5. Check learnings.md for similar artifacts: .claude/context/memory/learnings.md
 6. Save findings to: .claude/context/reports/backend/artifact-discovery-$ARTIFACT_NAME.md
 
@@ -549,7 +549,7 @@ Subject: Update catalogs/registries for: $ARTIFACT_NAME
    - Add artifact to appropriate array (agents/skills/hooks/workflows)
    - Update summary counts
    - Add relationships (agentToSkills, skillToAgents, etc.)
-4. Update skill catalog (if skill): .claude/context/artifacts/catalogs/skill-catalog.md
+4. Update skill catalog (if skill): .claude/docs/skill-catalog.md
    - Add skill to category section
    - Include description and key features
 5. Update CLAUDE.md (BLOCKING - MANDATORY):

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "dynamic-api-integrationInput",
+  "description": "Input schema for Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Adapted from UTCP (Universal Tool Calling Protocol) patterns for Node.js and Claude Code agents.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

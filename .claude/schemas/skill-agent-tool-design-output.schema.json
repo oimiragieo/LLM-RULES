@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skill-agent-tool-design-output",
+  "title": "agent-tool-design Skill Output",
+  "description": "Output schema for: The Agent Tool Contract — 5 principles for designing tools agents call reliably: predictable signature, rich errors, token-efficient output, idempotency, graceful degradation. Includes anti-pattern table with 8 common mistakes.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "description": "Execution status"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Summary of skill execution"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "CRITICAL",
+                  "HIGH",
+                  "MEDIUM",
+                  "LOW",
+                  "INFO"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "severity",
+              "message"
+            ]
+          }
+        },
+        "filesModified": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "summary"
+      ]
+    }
+  },
+  "required": [
+    "status",
+    "output"
+  ]
+}

@@ -41,14 +41,7 @@ function findProjectRoot() {
 }
 
 const PROJECT_ROOT = findProjectRoot();
-const CATALOG_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'artifacts',
-  'catalogs',
-  'skill-catalog.md'
-);
+const CATALOG_PATH = path.join(PROJECT_ROOT, '.claude', 'docs', 'skill-catalog.md');
 const INDEX_PATH = path.join(PROJECT_ROOT, '.claude', 'config', 'skill-index.json');
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude', 'agents');
 const SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');

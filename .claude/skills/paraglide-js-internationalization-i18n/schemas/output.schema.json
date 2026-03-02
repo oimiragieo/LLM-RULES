@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "paraglide-js-internationalization-i18nOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "summary": {
+      "type": "string"
+    }
+  }
+}

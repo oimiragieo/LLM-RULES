@@ -98,9 +98,9 @@
   },
   "examples": [
     {
-      "name": "tdd-check",
+      "name": "unified-pre-write-hook",
       "type": "PreToolUse",
-      "purpose": "Enforces Test-Driven Development by checking for test files",
+      "purpose": "Consolidated write safety checks including TDD enforcement, file placement, and content scanning",
       "category": "safety",
       "matcher": "Edit|Write|NotebookEdit",
       "environment": {

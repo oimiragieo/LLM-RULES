@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "security-architectInput",
+  "description": "Input schema for Security architecture and threat modeling. OWASP Top 10 2025 analysis, OWASP Agentic AI Top 10 (ASI01-ASI10), AI/LLM security patterns, supply chain security, modern API authentication (OAuth 2.1, DPoP, Passkeys/WebAuthn), vulnerability assessment, and security review for code and infrastructure.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

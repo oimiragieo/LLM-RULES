@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Ralph Loop Output",
+  "description": "Output contract for ralph-loop skill execution",
+  "type": "object",
+  "required": ["status", "output"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failed"],
+      "description": "Overall execution status"
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Human-readable summary of what happened"
+        },
+        "iteration": {
+          "type": "number",
+          "description": "Current iteration number"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether a ralph loop is currently active"
+        },
+        "findingsRemaining": {
+          "type": "number",
+          "description": "Number of open findings remaining"
+        },
+        "completionSignalDetected": {
+          "type": "boolean",
+          "description": "Whether the completion signal was found in the transcript"
+        }
+      }
+    }
+  }
+}

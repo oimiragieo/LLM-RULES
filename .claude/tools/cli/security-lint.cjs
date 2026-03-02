@@ -308,7 +308,11 @@ function getFilesToScan(args) {
 
   // Check for --all flag (all tracked files)
   if (args.includes('--all')) {
-    const result = spawnSync('git', ['ls-files'], { encoding: 'utf8', shell: false });
+    const result = spawnSync('git', ['ls-files'], {
+      encoding: 'utf8',
+      shell: false,
+      windowsHide: true,
+    });
     if (result.status !== 0) {
       console.error('Error getting tracked files:', result.stderr || `exit ${result.status}`);
       return [];

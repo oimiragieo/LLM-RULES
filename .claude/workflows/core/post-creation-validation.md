@@ -68,7 +68,7 @@ grep -i "<workflow-name>" .claude/CLAUDE.md | grep -i "workflow"
 **How to validate:**
 
 ```bash
-grep -i "<skill-name>" .claude/context/artifacts/catalogs/skill-catalog.md
+grep -i "<skill-name>" .claude/docs/skill-catalog.md
 ```
 
 **Common failures:**

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Ralph Loop Input",
+  "description": "Validated inputs for ralph-loop skill execution",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["status", "reset", "config"],
+      "description": "The ralph-loop operation to perform (status: check loop state, reset: clear state, config: show/set config)"
+    },
+    "maxIterations": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 25,
+      "description": "Maximum number of loop iterations before forced stop"
+    },
+    "completionSignal": {
+      "type": "string",
+      "default": "RALPH_AUDIT_COMPLETE_NO_FINDINGS",
+      "description": "String that must appear in transcript to signal genuine completion"
+    },
+    "promptPath": {
+      "type": "string",
+      "description": "Path to the PROMPT.md file to re-inject each iteration"
+    },
+    "circuitBreakerThreshold": {
+      "type": "number",
+      "minimum": 2,
+      "maximum": 10,
+      "default": 3,
+      "description": "Number of identical consecutive states before circuit breaker triggers"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "debug-log-analysisInput",
+  "description": "Input schema for 'Structured debug log analysis for Claude Code sessions — copy log, run reducer, extract error patterns, correlate with full log, produce observability report. Fills 5 identified gaps: hook error body capture, agent identity, file path tracking, stall correlation, success visibility.'",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,6 @@
+---
+description: "Verify fix commits address security findings without introducing new bugs or regressions. Analyzes diffs for anti-patterns like removed validation, weakened access control, reduced error handling, reordered external calls, and changed integer operations. Generates structured FIX_REVIEW_REPORT with finding status tracking."
+disable-model-invocation: true
+---
+
+Invoke the fix-review skill and follow it exactly as presented to you

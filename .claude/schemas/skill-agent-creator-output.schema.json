@@ -22,7 +22,7 @@
         },
         "agentType": {
           "type": "string",
-          "enum": ["core", "domain", "specialized", "orchestrator"],
+          "enum": ["core", "domain", "specialized", "orchestrators"],
           "description": "Agent classification"
         },
         "agentPath": {

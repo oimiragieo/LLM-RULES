@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "modern-pythonInput",
+  "description": "Input schema for Modern Python tooling best practices using uv, ruff, ty, and pytest. Mandates the Trail of Bits Python coding standards for project setup, dependency management, linting, type checking, and testing. Based on patterns from trailofbits/cookiecutter-python.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

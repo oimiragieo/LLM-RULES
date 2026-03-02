@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "enhance-promptInput",
+  "description": "Input schema for Transforms vague UI/feature requests into structured, optimized prompts with design system awareness. Use when generating prompts for UI implementation, feature specification, or design-to-code translation. Triggers on tasks requiring prompt refinement, UI specification, or design system integration.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

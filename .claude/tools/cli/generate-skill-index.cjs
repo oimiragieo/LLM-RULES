@@ -138,8 +138,8 @@ function parseSkillCatalog() {
     if (existingCatalogPath) {
       const content = fs.readFileSync(existingCatalogPath, 'utf8');
 
-      // Extract skill names from table rows
-      const skillPattern = /\| `([^`]+)` \|/g;
+      // Extract skill names from table rows (allowing for padding spaces)
+      const skillPattern = /\|\s*`([^`]+)`\s*\|/g;
       let match;
 
       while ((match = skillPattern.exec(content)) !== null) {
@@ -238,7 +238,28 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
           if (frontmatterMatch) {
             const yaml = frontmatterMatch[1];
             const descMatch = yaml.match(/^description:\s*(.*)$/m);
-            if (descMatch) description = descMatch[1].replace(/^["'](.*)["']$/, '$1').trim();
+            if (descMatch) {
+              const rawDesc = descMatch[1].trim();
+              // Handle YAML block scalars (>-, >-, |-, |)
+              if (/^[>|]-?$/.test(rawDesc)) {
+                // Collect indented continuation lines after the block scalar indicator
+                const afterDesc = yaml.slice(descMatch.index + descMatch[0].length);
+                const continuationLines = [];
+                for (const line of afterDesc.split('\n')) {
+                  if (/^\s{2,}/.test(line)) {
+                    continuationLines.push(line.trim());
+                  } else if (line.trim() === '') {
+                    // Blank lines within block scalar are preserved
+                    continue;
+                  } else {
+                    break; // Non-indented, non-empty line ends the block
+                  }
+                }
+                description = continuationLines.join(' ').trim() || null;
+              } else {
+                description = rawDesc.replace(/^["'](.*)["']$/, '$1').trim();
+              }
+            }
 
             const toolsMatch = yaml.match(/^tools:\s*\[(.*)\]/m);
             if (toolsMatch) {
@@ -250,7 +271,11 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
           }
 
           // Use forward slashes for consistent keys (cross-platform)
-          const skillKey = entryRelativePath.replace(/\\/g, '/');
+          let skillKey = entryRelativePath.replace(/\\/g, '/');
+
+          // Fix SKL-002: Remove intermediate '/skills/' directories from nested skills
+          // e.g. 'scientific-skills/skills/rdkit' -> 'scientific-skills/rdkit'
+          skillKey = skillKey.replace(/\/skills\//g, '/');
 
           skills[skillKey] = {
             name: skillKey,
@@ -259,9 +284,12 @@ function scanSkillFilesRecursively(baseDir, relativePath = '') {
             description,
             tools,
           };
+
+          // Stop recursing if this is already a full skill to avoid phantom sub-skills in its subdirectories
+          continue;
         }
 
-        // Recursively scan subdirectories
+        // Recursively scan subdirectories if no SKILL.md found at this level
         const nestedSkills = scanSkillFilesRecursively(baseDir, entryRelativePath);
         Object.assign(skills, nestedSkills);
       }
@@ -540,7 +568,7 @@ function generateIndex(options = {}) {
       totalDomains: Object.keys(byDomain).length,
       totalCategories: Object.keys(byCategory).length,
       lastValidated: new Date().toISOString(),
-      source: '.claude/context/artifacts/catalogs/skill-catalog.md',
+      source: '.claude/docs/skill-catalog.md',
       archivedIncluded: includeArchived,
     },
     skills,

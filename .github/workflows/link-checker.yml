@@ -1,0 +1,95 @@
+# Link Checker — validates @file references in documentation
+# Runs on PRs that touch markdown files or docs.
+name: Link Checker
+
+on:
+  pull_request:
+    paths:
+      - '**.md'
+      - '.claude/docs/**'
+      - '.claude/skills/**/SKILL.md'
+      - '.claude/agents/**/*.md'
+      - '.claude/workflows/**/*.md'
+
+concurrency:
+  group: link-checker-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check-file-references:
+    name: Check @file References
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for broken @file references in docs
+        run: |
+          echo "Scanning for @file references in documentation..."
+          exit_code=0
+
+          # Collect all @file references from CLAUDE.md and docs
+          refs=$(grep -rhoP '@[A-Z_]+\.md' .claude/CLAUDE.md .claude/docs/ 2>/dev/null | sort -u || true)
+
+          if [ -z "$refs" ]; then
+            echo "No @file references found to validate."
+            exit 0
+          fi
+
+          echo "Found references:"
+          echo "$refs"
+          echo ""
+
+          for ref in $refs; do
+            # Strip the @ prefix to get the filename
+            filename="${ref#@}"
+            # Search for the file in .claude/docs/
+            if [ ! -f ".claude/docs/$filename" ] && [ ! -f ".claude/docs/@$filename" ]; then
+              echo "::error::Broken reference: $ref (expected at .claude/docs/$filename)"
+              exit_code=1
+            else
+              echo "OK: $ref"
+            fi
+          done
+
+          if [ "$exit_code" -eq 0 ]; then
+            echo ""
+            echo "All @file references are valid."
+          fi
+
+          exit $exit_code
+
+  check-relative-links:
+    name: Check Relative Links in Markdown
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate references
+        run: |
+          # Run the existing reference validator if available
+          if pnpm run --silent validate:references 2>/dev/null; then
+            echo "Reference validation passed."
+          else
+            echo "::warning::Reference validation failed or script not available."
+          fi

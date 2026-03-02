@@ -653,7 +653,7 @@ Execute the integration plan to move artifact from temp to framework location.
    - Install dependencies (if any)
    - Update catalogs/registries:
      * .claude/context/artifacts/catalogs/creator-registry.json
-     * .claude/context/artifacts/catalogs/skill-catalog.md (if skill)
+     * .claude/docs/skill-catalog.md (if skill)
    - Update CLAUDE.md (MANDATORY):
      * Section 3 (if new agent)
      * Section 8.5/8.6 (if skill/workflow)
@@ -852,7 +852,7 @@ After each phase, verify:
 - [ ] Artifact integrated at target location
 - [ ] `.claude/CLAUDE.md` updated with references
 - [ ] `.claude/context/artifacts/catalogs/creator-registry.json` updated
-- [ ] `.claude/context/artifacts/catalogs/skill-catalog.md` updated (if skill)
+- [ ] `.claude/docs/skill-catalog.md` updated (if skill)
 - [ ] `.claude/context/memory/learnings.md` updated
 - [ ] `.claude/context/reports/backend/verification-results.md` confirms success
 
@@ -983,7 +983,7 @@ Rollback failed integration to restore framework to pre-integration state.
    # Restore specific files
    git restore .claude/CLAUDE.md
    git restore .claude/context/artifacts/catalogs/creator-registry.json
-   git restore .claude/context/artifacts/catalogs/skill-catalog.md
+   git restore .claude/docs/skill-catalog.md
 
    # Remove new untracked files (integration artifacts)
    rm -rf <target-artifact-path>

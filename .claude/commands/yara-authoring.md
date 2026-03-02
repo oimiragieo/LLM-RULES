@@ -1,0 +1,6 @@
+---
+description: "YARA-X detection rule authoring with expert judgment, linting, atom analysis, and best practices. Teaches how to think like an expert YARA author for malware detection, threat hunting, and indicator-of-compromise identification using YARA-X (the Rust-based successor to legacy YARA)."
+disable-model-invocation: true
+---
+
+Invoke the yara-authoring skill and follow it exactly as presented to you

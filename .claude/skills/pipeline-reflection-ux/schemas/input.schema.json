@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "pipeline-reflection-uxInput",
+  "description": "Input schema for Improve router-facing pipeline and reflection narration to reduce noisy status churn and make Step 0/Reflection outcomes explicit. Use when updating Router output contract, reflection reminder wording, or post-pipeline notification batching.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

@@ -220,6 +220,11 @@ const CATEGORY_MAP = {
   'web-design-guidelines-vercel': 'Styling',
   'styling-expert': 'Styling',
   'scientific-skills': 'Scientific',
+  'modern-python': 'Languages',
+  'poetry-rye-dependency-management': 'Languages',
+  'pyqt6-ui-development-rules': 'Languages',
+  'powershell-expert': 'Languages',
+  'feature-flag-management': 'DevOps',
 };
 
 // Agent assignments
@@ -281,6 +286,12 @@ const AGENT_SKILLS = {
   ],
   'data-engineer': ['database-architect', 'ai-ml-expert', 'scientific-skills'],
   'ai-ml-specialist': ['ai-ml-expert', 'scientific-skills'],
+  'python-pro': [
+    'python-backend-expert',
+    'modern-python',
+    'poetry-rye-dependency-management',
+    'pyqt6-ui-development-rules',
+  ],
 };
 
 // Tool requirements for key skills

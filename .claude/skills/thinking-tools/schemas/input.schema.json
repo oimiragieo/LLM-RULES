@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "thinking-toolsInput",
+  "description": "Input schema for Structured thinking patterns for agent self-reflection. Includes think-about-collected-information (validate research), think-about-task-adherence (stay on track), and think-about-whether-you-are-done (completion validation).",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

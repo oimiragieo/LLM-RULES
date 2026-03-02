@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "sharp-edgesInput",
+  "description": "Input schema for 'Living catalogue of 7 known hazard entries (SE-01 through SE-07) specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS in glob-to-regex, DST arithmetic, array mutation during iteration. Each entry: symptom, root cause, fix, test assertion.'",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

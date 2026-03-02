@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "property-based-testingInput",
+  "description": "Input schema for 'fast-check patterns for JS/TS — 6 canonical property categories with worked examples targeting agent-studio utilities (path normalization, safe-json, glob-to-regex, routing logic)'",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target": {
+      "type": "string",
+      "description": "Target file or path for the skill to operate on"
+    },
+    "options": {
+      "type": "object",
+      "description": "Additional options for skill execution",
+      "additionalProperties": true
+    }
+  }
+}

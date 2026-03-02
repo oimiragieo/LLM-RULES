@@ -31,19 +31,13 @@ const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 // Paths relative to project root
 const CLAUDE_MD = path.join(PROJECT_ROOT, '.claude', 'CLAUDE.md');
-const SKILL_CATALOG = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'artifacts',
-  'catalogs',
-  'skill-catalog.md'
-);
+const SKILL_CATALOG = path.join(PROJECT_ROOT, '.claude', 'docs', 'skill-catalog.md');
 const SKILL_CATALOG_LEGACY = path.join(
   PROJECT_ROOT,
   '.claude',
   'context',
   'artifacts',
+  'catalogs',
   'skill-catalog.md'
 );
 const ROUTING_DIR = path.join(PROJECT_ROOT, '.claude', 'lib', 'routing');
