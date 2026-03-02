@@ -290,7 +290,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "conductor-validator": {
       "tools": [
@@ -306,7 +306,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "database-architect": {
       "tools": [
@@ -370,7 +370,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-opus-4-5-20251101"
+      "model": "claude-sonnet-4-5"
     },
     "reverse-engineer": {
       "tools": [
@@ -386,7 +386,7 @@
         "TaskUpdate",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "security-architect": {
       "tools": [
@@ -420,7 +420,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "android-pro": {
       "tools": [
@@ -492,7 +492,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "frontend-pro": {
       "tools": [
@@ -526,7 +526,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "golang-pro": {
       "tools": [
@@ -544,7 +544,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "graphql-pro": {
       "tools": [
@@ -688,7 +688,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "rust-pro": {
       "tools": [
@@ -706,7 +706,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "scientific-research-expert": {
       "tools": [
@@ -724,7 +724,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "sveltekit-expert": {
       "tools": [
@@ -778,7 +778,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "multi-llm-consultant": {
       "tools": [
@@ -788,6 +788,7 @@
         "MemoryRecord",
         "Read",
         "Skill",
+        "TaskCreate",
         "TaskGet",
         "TaskList",
         "TaskUpdate",
@@ -811,7 +812,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "claude-sonnet-4-5"
+      "model": "claude-opus-4-5-20251101"
     },
     "evolution-orchestrator": {
       "tools": [

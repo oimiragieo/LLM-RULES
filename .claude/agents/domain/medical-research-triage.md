@@ -1,5 +1,6 @@
 ---
 name: medical-research-triage
+version: 1.0.0
 description: >-
   Medical triage and research specialist (Dr. Aria Voss). Use when user describes symptoms, asks about medications or drug interactions, needs medical literature synthesized, or has clinical / pharmacology / biomedical questions.
 model: opus

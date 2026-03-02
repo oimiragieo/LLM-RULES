@@ -15,8 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/rules/
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 # Rule Creator
@@ -215,6 +215,14 @@ Skill({
 
 - `skill-creator` - Create detailed workflows (for complex guidance needing a full SKILL.md)
 - `hook-creator` - Create enforcement hooks that accompany governance rules
+
+## Iron Laws
+
+1. **Every artifact MUST have a companion schema** — Rules without a schema have no contract for structured validation. Create a JSON schema in `.claude/schemas/` if the rule produces structured output or has configurable parameters.
+2. **Every artifact MUST be wired to at least one agent** — A rule not referenced by any agent or skill is orphaned. Verify the rule is relevant to at least one agent's context (rules in `.claude/rules/` are auto-loaded, but domain-specific rules should be referenced in agent prompts).
+3. **Every artifact MUST be indexed in its catalog** — Rules not tracked in the catalog are hard to discover and audit. Add an entry or verify presence in the appropriate catalog.
+4. **Every artifact MUST pass integration validation** — Run `node .claude/tools/cli/validate-integration.cjs <rule-path>` before marking creation complete. A rule that fails validation may have broken references or conflicts.
+5. **Every artifact MUST record a memory entry** — Write the rule creation pattern, decisions, and any issues to `.claude/context/memory/` (learnings.md, decisions.md, issues.md). Without memory, the creation is invisible to future sessions.
 
 ## Memory Protocol (MANDATORY)
 

@@ -5,6 +5,8 @@ version: 2.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true
+verified: true
+lastVerifiedAt: '2026-02-28'
 tools:
   # Chrome DevTools MCP (always available)
   - mcp__chrome-devtools__click
@@ -61,8 +63,6 @@ best_practices:
   - Dismiss modal dialogs manually if they appear
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
 ---
 
 # Chrome Browser Automation

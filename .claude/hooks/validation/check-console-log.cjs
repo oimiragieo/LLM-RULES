@@ -18,6 +18,7 @@ function getCandidateFiles() {
   const gitDirResult = spawnSync('git', ['rev-parse', '--git-dir'], {
     cwd: PROJECT_ROOT,
     encoding: 'utf8',
+    shell: false,
     windowsHide: true,
   });
   if (gitDirResult.status !== 0 || gitDirResult.error) {
@@ -27,6 +28,7 @@ function getCandidateFiles() {
   const diffResult = spawnSync('git', ['diff', '--name-only', 'HEAD'], {
     cwd: PROJECT_ROOT,
     encoding: 'utf8',
+    shell: false,
     windowsHide: true,
   });
   if (diffResult.status !== 0 || diffResult.error) {

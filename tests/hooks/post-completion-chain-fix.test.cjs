@@ -3,24 +3,18 @@
  * Test: Post-completion chain integration
  *
  * Verifies that TaskUpdate(completed) triggers workflow phase advancement.
+ * Uses the processTaskCompletion API directly (no child process needed).
  */
 
 'use strict';
 
-const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
-
-const HOOK_PATH = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'hooks',
-  'workflow',
-  'post-completion-chain.cjs'
-);
-const TEST_STATE = path.join(PROJECT_ROOT, '.claude', 'tmp', 'test-wf-state.json');
-const TEST_SIGNAL = path.join(PROJECT_ROOT, '.claude', 'tmp', 'test-phase-advance.json');
+const {
+  processTaskCompletion,
+  WORKFLOW_STATE_FILE,
+  PHASE_ADVANCE_FILE,
+} = require('../../.claude/hooks/workflow/post-completion-chain.cjs');
 
 async function testPostCompletion() {
   console.log('--- Post-completion Chain Test ---');
@@ -39,26 +33,18 @@ async function testPostCompletion() {
     }
   }
 
-  if (fs.existsSync(TEST_STATE)) fs.unlinkSync(TEST_STATE);
-  if (fs.existsSync(TEST_SIGNAL)) fs.unlinkSync(TEST_SIGNAL);
+  if (fs.existsSync(WORKFLOW_STATE_FILE)) fs.unlinkSync(WORKFLOW_STATE_FILE);
+  if (fs.existsSync(PHASE_ADVANCE_FILE)) fs.unlinkSync(PHASE_ADVANCE_FILE);
 
   await test('should advance workflow phase on completion', async () => {
     const taskId = 'task-42';
 
-    // 1. Setup initial workflow state
-    const dummyPlan = path.join(PROJECT_ROOT, '.claude', 'tmp', 'dummy-plan.md');
-    if (!fs.existsSync(path.dirname(dummyPlan)))
-      fs.mkdirSync(path.dirname(dummyPlan), { recursive: true });
-    fs.writeFileSync(dummyPlan, '# Dummy Plan');
-
+    // 1. Setup initial workflow state with EVOLVE phases
     const initialState = {
       workflowId: 'wf-test',
-      currentPhase: 'PHASE_1_DESIGN',
-      artifacts: {
-        implementationPlan: '.claude/tmp/dummy-plan.md',
-      },
+      currentPhase: 'evaluate',
       phases: {
-        PHASE_1_DESIGN: {
+        evaluate: {
           status: 'in_progress',
           agents: {
             planner: {
@@ -67,53 +53,50 @@ async function testPostCompletion() {
             },
           },
         },
+        validate: {
+          status: 'pending',
+        },
       },
     };
-    if (!fs.existsSync(path.dirname(TEST_STATE)))
-      fs.mkdirSync(path.dirname(TEST_STATE), { recursive: true });
-    fs.writeFileSync(TEST_STATE, JSON.stringify(initialState));
+    fs.mkdirSync(path.dirname(WORKFLOW_STATE_FILE), { recursive: true });
+    fs.writeFileSync(WORKFLOW_STATE_FILE, JSON.stringify(initialState));
 
-    // 2. Simulate completion hook input
-    const hookInput = {
-      tool_name: 'TaskUpdate',
-      tool_input: {
-        taskId,
-        status: 'completed',
-      },
-    };
-
-    // 3. Run hook
-    const child = spawn(process.execPath, [HOOK_PATH, JSON.stringify(hookInput)], {
-      stdio: ['pipe', 'inherit', 'inherit'],
-      env: {
-        ...process.env,
-        WORKFLOW_STATE_FILE: TEST_STATE,
-        PHASE_ADVANCE_FILE: TEST_SIGNAL,
+    // 2. Simulate completion via processTaskCompletion
+    await processTaskCompletion({
+      toolUse: {
+        tool: 'TaskUpdate',
+        input: {
+          taskId,
+          status: 'completed',
+          metadata: { summary: 'Design complete' },
+        },
       },
     });
 
-    await new Promise(r => child.on('close', r));
-
-    // 4. Verify state update
-    const state = JSON.parse(fs.readFileSync(TEST_STATE, 'utf8'));
-    if (state.phases.PHASE_1_DESIGN.status !== 'completed') {
-      throw new Error(`Expected phase status completed, got ${state.phases.PHASE_1_DESIGN.status}`);
+    // 3. Verify state update
+    const state = JSON.parse(fs.readFileSync(WORKFLOW_STATE_FILE, 'utf8'));
+    if (state.phases.evaluate.status !== 'completed') {
+      throw new Error(`Expected phase status completed, got ${state.phases.evaluate.status}`);
     }
-    if (state.phases.PHASE_1_DESIGN.agents.planner.status !== 'completed') {
+    if (state.phases.evaluate.agents.planner.status !== 'completed') {
       throw new Error(
-        `Expected agent status completed, got ${state.phases.PHASE_1_DESIGN.agents.planner.status}`
+        `Expected agent status completed, got ${state.phases.evaluate.agents.planner.status}`
       );
     }
 
-    // 5. Verify signal creation
-    if (!fs.existsSync(TEST_SIGNAL)) {
+    // 4. Verify signal creation
+    if (!fs.existsSync(PHASE_ADVANCE_FILE)) {
       throw new Error('Phase advance signal was not created');
     }
-    const signal = JSON.parse(fs.readFileSync(TEST_SIGNAL, 'utf8'));
-    if (signal.advanceTo !== 'PHASE_2_IMPLEMENT') {
-      throw new Error(`Expected advanceTo PHASE_2_IMPLEMENT, got ${signal.advanceTo}`);
+    const signal = JSON.parse(fs.readFileSync(PHASE_ADVANCE_FILE, 'utf8'));
+    if (signal.advanceTo !== 'validate') {
+      throw new Error(`Expected advanceTo validate, got ${signal.advanceTo}`);
     }
   });
+
+  // Cleanup
+  if (fs.existsSync(WORKFLOW_STATE_FILE)) fs.unlinkSync(WORKFLOW_STATE_FILE);
+  if (fs.existsSync(PHASE_ADVANCE_FILE)) fs.unlinkSync(PHASE_ADVANCE_FILE);
 
   console.log(`
 Result: ${passed} passed, ${failed} failed`);

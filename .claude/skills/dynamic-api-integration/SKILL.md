@@ -1,11 +1,16 @@
 ---
 name: dynamic-api-integration
 description: Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Adapted from UTCP (Universal Tool Calling Protocol) patterns for Node.js and Claude Code agents.
-version: 1.1.0
+version: 1.2.0
+category: 'API & Integrations'
+agents: [developer, architect]
+verified: true
+lastVerifiedAt: '2026-03-01'
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, WebFetch, WebSearch]
+tags: [api, rest, openapi, http, integration, dynamic, utcp, authentication, curl]
 best_practices:
   - Always fetch and validate the OpenAPI spec before constructing requests
   - Use environment variables for all API keys and secrets; never hardcode

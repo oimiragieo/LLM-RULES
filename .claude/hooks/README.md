@@ -17,11 +17,11 @@ Hooks are JavaScript modules that execute at specific points in the agent lifecy
 
 Located in `.claude/hooks/safety/`
 
-#### TDD Check (`tdd-check.cjs`)
+#### TDD Check (consolidated into `unified-pre-write-hook.cjs`)
 
-Validates that code changes follow Test-Driven Development workflow.
+Validates that code changes follow Test-Driven Development workflow. Previously a standalone `tdd-check.cjs` hook, now consolidated as a check within `unified-pre-write-hook.cjs`.
 
-**When it runs:** Before code edits
+**When it runs:** Before code edits (via `unified-pre-write-hook.cjs`)
 **What it checks:** Test exists, test fails (RED), implementation passes (GREEN)
 
 #### Validators (`safety/validators/`)
@@ -249,7 +249,7 @@ Hooks are executed via `run-hook.cmd` (Windows) or shell scripts (Unix):
 
 ```bash
 # Execute a hook
-.claude/hooks/run-hook.cmd safety/tdd-check
+.claude/hooks/run-hook.cmd safety/unified-pre-write-hook
 
 # With arguments
 .claude/hooks/run-hook.cmd routing/router-enforcer --user-message "Fix the bug"

@@ -102,7 +102,8 @@ function collectMetrics(projectRoot = PROJECT_ROOT) {
   try {
     const statusPath = path.join(memoryDir, 'maintenance-status.json');
     if (fs.existsSync(statusPath)) {
-      const status = JSON.parse(fs.readFileSync(statusPath, 'utf8'));
+      const { safeParseJSON } = require('../utils/safe-json.cjs');
+      const status = safeParseJSON(fs.readFileSync(statusPath, 'utf8'), null);
       lastColdArchive = status.lastColdArchive ?? null;
       lastWeekly = status.lastWeekly ?? null;
     }
@@ -271,7 +272,8 @@ function getMetricsHistory(days = 7, projectRoot = PROJECT_ROOT) {
 
     for (const file of files) {
       try {
-        const data = JSON.parse(fs.readFileSync(path.join(metricsDir, file), 'utf8'));
+        const { safeParseJSON: safeParse } = require('../utils/safe-json.cjs');
+        const data = safeParse(fs.readFileSync(path.join(metricsDir, file), 'utf8'), null);
         history.push({
           date: file.replace('.json', ''),
           ...data,

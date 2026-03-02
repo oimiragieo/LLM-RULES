@@ -8,7 +8,7 @@ metadata:
   source: cloudflare/skills
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
-version: '1.0.0'
+version: 1.0.0
 tools: []
 ---
 

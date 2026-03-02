@@ -9,7 +9,7 @@ source: trailofbits/skills
 source_license: CC-BY-SA-4.0
 source_url: https://github.com/trailofbits/skills/tree/main/skills/semgrep-rule-creator
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: '2026-02-28'
 ---
 
 <!-- Source: Trail of Bits | License: CC-BY-SA-4.0 | Adapted: 2026-02-09 -->

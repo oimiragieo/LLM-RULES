@@ -32,6 +32,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ---------------------------------------------------------------------------
 // Resolve project root and default audit path
@@ -466,9 +467,8 @@ async function main() {
     }
 
     let input;
-    try {
-      input = JSON.parse(raw.trim());
-    } catch (_) {
+    input = safeParseJSON(raw.trim(), null);
+    if (!input) {
       process.exit(0);
     }
 

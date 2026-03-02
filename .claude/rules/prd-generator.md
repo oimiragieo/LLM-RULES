@@ -47,7 +47,7 @@ paths:
 
 ## Integration Points
 
-- Uses `progressive-disclosure` for unclear requirements
+- Uses `context-compressor` (progressive disclosure mode) for unclear requirements
 - Feeds into `planner` via Implementation Phases table
 - Developers read PRD for "why" context
 - Updates phases table as work progresses

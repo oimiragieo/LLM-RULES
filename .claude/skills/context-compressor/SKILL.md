@@ -1,7 +1,7 @@
 ---
 name: context-compressor
 description: Context compression and summarization methodology. Techniques for reducing token usage while preserving decision-critical information.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true

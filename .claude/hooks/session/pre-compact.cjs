@@ -17,6 +17,12 @@ const EDIT_COUNTER_FILE = path.join(RUNTIME_DIR, 'edit-counter.json');
 const SESSION_METRICS_FILE = path.join(RUNTIME_DIR, 'session-metrics.json');
 const DRIFT_STATE_FILE = path.join(RUNTIME_DIR, 'drift-state.json');
 
+// Reflection log rotation
+const MEMORY_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
+const REFLECTION_LOG = path.join(MEMORY_DIR, 'reflection-log.jsonl');
+const ARCHIVE_DIR = path.join(MEMORY_DIR, 'archive');
+const REFLECTION_LOG_MAX_BYTES = 500 * 1024; // 500KB
+
 /**
  * Safely read and parse a JSON file, returning defaults on error
  * @param {string} filePath - Path to JSON file
@@ -82,6 +88,29 @@ function main() {
 
     // Atomic write
     atomicWrite(SNAPSHOT_FILE, JSON.stringify(snapshot, null, 2));
+
+    // Rotate reflection-log.jsonl if over threshold
+    try {
+      if (fs.existsSync(REFLECTION_LOG)) {
+        const stats = fs.statSync(REFLECTION_LOG);
+        if (stats.size > REFLECTION_LOG_MAX_BYTES) {
+          fs.mkdirSync(ARCHIVE_DIR, { recursive: true });
+          const lines = fs.readFileSync(REFLECTION_LOG, 'utf8').split('\n').filter(Boolean);
+          const half = Math.ceil(lines.length / 2);
+          const archiveLines = lines.slice(0, half);
+          const keepLines = lines.slice(half);
+          const dateStr = new Date().toISOString().slice(0, 10);
+          const archivePath = path.join(ARCHIVE_DIR, `reflection-log-${dateStr}.jsonl`);
+          fs.appendFileSync(archivePath, archiveLines.join('\n') + '\n');
+          fs.writeFileSync(REFLECTION_LOG, keepLines.join('\n') + '\n');
+          process.stderr.write(
+            `[PreCompact] Rotated ${archiveLines.length} reflection-log entries to ${archivePath}\n`
+          );
+        }
+      }
+    } catch (rotateErr) {
+      process.stderr.write(`[PreCompact] Reflection log rotation error: ${rotateErr.message}\n`);
+    }
 
     // Log to stderr (non-blocking, informational)
     process.stderr.write(

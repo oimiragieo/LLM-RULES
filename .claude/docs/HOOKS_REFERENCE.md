@@ -47,6 +47,8 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `routing-guard.cjs`: Core router enforcement (Planner-first, specialist-first).
 - `write-pretool-bundle.cjs`: Consolidated bundle for Write/Edit tools (includes creator guard, contract validator, etc.).
 - `conflict-detector.cjs`: Detects Write conflicts.
+- `evolution-state-guard.cjs`: Enforces valid EVOLVE workflow state machine transitions (blocks invalid Write transitions to evolution-state.json).
+- `research-enforcement.cjs`: Enforces research phase completion before artifact creation (Write/Edit to agent/skill/workflow paths blocked without 3+ research entries).
 - `validate-skill-invocation.cjs`: Validates Skill usage.
 - `reflection-step0-guard.cjs`: Blocks TaskList if reflections are pending.
 - `spawn-prompt-validator.cjs`: Validates Task spawn prompts.
@@ -54,6 +56,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `pre-completion-validation.cjs`: Validates task completion quality.
 - `creator-compliance-validator.cjs`: Validates post-creation compliance.
 - `quality-gate-validator.cjs`: Enforces workflow quality gates.
+- `adaptive-quality-gate.cjs`: Non-blocking edit counter; suggests quality checkpoints at adaptive thresholds based on correction rate.
 
 ### PostToolUse
 

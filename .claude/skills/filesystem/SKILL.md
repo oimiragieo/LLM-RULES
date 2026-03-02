@@ -1,7 +1,7 @@
 ---
 name: filesystem
 description: File system operations guidance - read, write, search, and manage files using Claude Code's built-in tools.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true

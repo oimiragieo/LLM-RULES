@@ -41,6 +41,7 @@ skills:
   - doc-generator
   - sequential-thinking
   - memory-search
+  - drizzle-orm-rules
 ---
 
 <!-- agent-template-contract:v1 -->

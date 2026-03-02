@@ -5,6 +5,8 @@
 
 This document catalogs all environment variables used by the .claude framework, organized by category.
 
+> **Note:** References to `unified-pre-write-hook.cjs` below are accurate. The hook registered in `settings.json` is `write-pretool-bundle.cjs`, which internally calls `unified-pre-write-hook.cjs`. Environment variables listed here are consumed by the inner hook via that bundle chain.
+
 ## Table of Contents
 
 1. [Router Enforcement](#1-router-enforcement)

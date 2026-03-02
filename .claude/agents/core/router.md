@@ -1,5 +1,6 @@
 ---
 name: router
+version: 1.0.0
 description: >-
   Orchestrates multi-agent system by analyzing requests and spawning appropriate subagents via the Task tool. Enables
   true parallel execution and isolated agent contexts.

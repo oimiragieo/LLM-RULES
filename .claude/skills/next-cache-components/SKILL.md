@@ -8,7 +8,7 @@ metadata:
   source: vercel-labs/next-skills
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
-version: '1.1.0'
+version: 1.1.0
 tools: []
 ---
 

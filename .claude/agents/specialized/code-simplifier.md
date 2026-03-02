@@ -1,5 +1,6 @@
 ---
 name: code-simplifier
+version: 1.0.0
 description: >-
   Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Focuses
   on recently modified code unless instructed otherwise. Use for code cleanup, refactoring for readability, eliminating

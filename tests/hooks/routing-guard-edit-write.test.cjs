@@ -208,7 +208,7 @@ describe('Fix 1: routing-guard blocks Edit/Write/NotebookEdit in router mode', (
   // Settings.json registration verification
   // =========================================================================
 
-  it('should have routing-guard.cjs registered as FIRST hook for Edit|Write|NotebookEdit in settings.json', () => {
+  it('should have write-pretool-bundle.cjs as the ONLY hook for Edit|Write|NotebookEdit in settings.json', () => {
     const settingsPath = path.join(PROJECT_ROOT, '.claude', 'settings.json');
     assert.ok(fs.existsSync(settingsPath), 'settings.json should exist');
 
@@ -220,13 +220,18 @@ describe('Fix 1: routing-guard blocks Edit/Write/NotebookEdit in router mode', (
     const editWriteMatcher = preToolUse.find(m => m.matcher === 'Edit|Write|NotebookEdit');
     assert.ok(editWriteMatcher, 'Edit|Write|NotebookEdit matcher should exist');
     assert.ok(Array.isArray(editWriteMatcher.hooks), 'Matcher should have hooks array');
-    assert.ok(editWriteMatcher.hooks.length > 0, 'Matcher should have at least one hook');
+    assert.strictEqual(
+      editWriteMatcher.hooks.length,
+      1,
+      'Matcher should have exactly one hook (bundle)'
+    );
 
-    // Verify routing-guard.cjs is the FIRST hook
-    const firstHook = editWriteMatcher.hooks[0];
+    // Verify write-pretool-bundle.cjs is the only hook (it chains unified-creator-guard,
+    // research-enforcement, adaptive-quality-gate, and evolution-state-guard internally)
+    const onlyHook = editWriteMatcher.hooks[0];
     assert.ok(
-      firstHook.command.includes('routing-guard.cjs'),
-      `First hook should be routing-guard.cjs but got: ${firstHook.command}`
+      onlyHook.command.includes('write-pretool-bundle.cjs'),
+      `Only hook should be write-pretool-bundle.cjs but got: ${onlyHook.command}`
     );
   });
 });

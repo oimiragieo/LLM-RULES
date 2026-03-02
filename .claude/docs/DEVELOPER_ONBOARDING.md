@@ -253,7 +253,6 @@ The library contains production code:
 │   ├── workflow-engine.cjs      # Main engine
 │   ├── workflow-validator.cjs   # Validation
 │   ├── checkpoint-manager.cjs   # Checkpoints
-│   ├── state-sync-manager.cjs   # State sync
 │   ├── task-router.cjs          # Task routing
 │   └── result-normalizer.cjs    # Result normalization
 │
@@ -711,7 +710,7 @@ Write learnings after completing.
 
 **Step 3: Add to Skill Catalog**
 
-Update `.claude/context/artifacts/catalogs/skill-catalog.md`
+Update `.claude/docs/skill-catalog.md`
 
 **Step 4: Assign to Agents**
 

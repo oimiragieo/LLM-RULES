@@ -51,6 +51,9 @@ skills:
   - swarm-coordination
   - proactive-audit
   - memory-search
+  - agent-tool-design
+  - multi-agent-architecture-reference
+  - dynamic-api-integration
 identity:
   role: Principal Software Architect
   goal: Design systems that scale gracefully and remain maintainable as requirements evolve
@@ -450,7 +453,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
+1. Consult skill catalog: `.claude/docs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

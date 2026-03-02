@@ -1,6 +1,6 @@
 ---
 name: enhance-prompt
-version: '1.1.0'
+version: 1.1.0
 description: Transforms vague UI/feature requests into structured, optimized prompts with design system awareness. Use when generating prompts for UI implementation, feature specification, or design-to-code translation. Triggers on tasks requiring prompt refinement, UI specification, or design system integration.
 license: MIT
 category: Frameworks

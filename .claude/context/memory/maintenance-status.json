@@ -1,7 +1,127 @@
 {
-  "lastDaily": "2026-02-25T04:44:52.339Z",
-  "lastWeekly": "2026-02-23T04:52:14.978Z",
+  "lastDaily": "2026-03-02T00:32:55.491Z",
+  "lastWeekly": "2026-03-02T00:32:55.491Z",
   "history": [
+    {
+      "type": "weekly",
+      "timestamp": "2026-03-02T00:32:55.491Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        },
+        {
+          "type": "rotation",
+          "success": true
+        },
+        {
+          "type": "summarization",
+          "success": true
+        },
+        {
+          "type": "deduplication",
+          "success": true
+        },
+        {
+          "type": "pruning",
+          "success": true
+        },
+        {
+          "type": "archiveOldLTM",
+          "success": true
+        },
+        {
+          "type": "extraction",
+          "success": true
+        },
+        {
+          "type": "vectorMaintenance",
+          "success": true
+        },
+        {
+          "type": "weeklyReport",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "daily",
+      "timestamp": "2026-03-02T00:32:55.142Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "daily",
+      "timestamp": "2026-03-01T01:16:41.379Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        }
+      ]
+    },
+    {
+      "type": "daily",
+      "timestamp": "2026-02-27T01:41:49.219Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        }
+      ]
+    },
     {
       "type": "daily",
       "timestamp": "2026-02-25T04:44:52.339Z",
@@ -629,68 +749,8 @@
           "success": true
         }
       ]
-    },
-    {
-      "type": "weekly",
-      "timestamp": "2026-02-05T16:19:16.766Z",
-      "tasks": [
-        {
-          "type": "consolidation",
-          "success": true
-        },
-        {
-          "type": "healthCheck",
-          "success": true
-        },
-        {
-          "type": "metricsLog",
-          "success": true
-        },
-        {
-          "type": "summarization",
-          "success": true
-        },
-        {
-          "type": "deduplication",
-          "success": true
-        },
-        {
-          "type": "pruning",
-          "success": true
-        },
-        {
-          "type": "archiveOldLTM",
-          "success": false
-        },
-        {
-          "type": "extraction",
-          "success": false
-        },
-        {
-          "type": "weeklyReport",
-          "success": true
-        }
-      ]
-    },
-    {
-      "type": "daily",
-      "timestamp": "2026-02-05T16:19:16.518Z",
-      "tasks": [
-        {
-          "type": "consolidation",
-          "success": true
-        },
-        {
-          "type": "healthCheck",
-          "success": true
-        },
-        {
-          "type": "metricsLog",
-          "success": true
-        }
-      ]
     }
   ],
-  "lastRun": "2026-02-25T04:44:52.339Z",
-  "lastColdArchive": "2026-02-23T04:52:15.154Z"
+  "lastRun": "2026-03-02T00:32:55.491Z",
+  "lastColdArchive": "2026-03-02T00:32:55.623Z"
 }

@@ -1,7 +1,7 @@
 ---
 name: rule-auditor
 description: Validates code against coding standards and best practices. Reports compliance violations and suggests fixes.
-version: 2.0
+version: 2.0.0
 model: haiku
 invoked_by: both
 user_invocable: true

@@ -316,7 +316,7 @@ The cold directory (default `.claude/context/memory/cold`) is created by the arc
 
 ### Retention Configuration (Env Vars)
 
-The following environment variables control retention behavior (defined in `.claude/lib/memory/memory-retention-config.cjs`):
+The following environment variables control retention behavior (originally defined in `.claude/lib/memory/_archive/memory-retention-config.cjs`, now archived):
 
 | Variable                         | Default                       | Description                                                              |
 | :------------------------------- | :---------------------------- | :----------------------------------------------------------------------- |

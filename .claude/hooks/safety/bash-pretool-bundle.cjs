@@ -18,6 +18,7 @@ function runHook(scriptPath, input) {
     cwd: PROJECT_ROOT,
     input,
     encoding: 'utf8',
+    shell: false,
     windowsHide: true,
     maxBuffer: 10 * 1024 * 1024,
   });

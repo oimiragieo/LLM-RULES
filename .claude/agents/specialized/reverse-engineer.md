@@ -28,6 +28,7 @@ skills:
   - binary-analysis-patterns
   - memory-forensics
   - protocol-reverse-engineering
+  - yara-authoring
   - task-management-protocol
   - verification-before-completion
   - ripgrep

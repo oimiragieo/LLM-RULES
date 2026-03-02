@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-02-25T15:24:51.884Z",
+  "generated_at": "2026-02-27T00:40:46.026Z",
   "prebuilt": false,
   "total_rules": 113,
   "master_rules": 113,
@@ -104,8 +104,8 @@
       "line_count": 121
     },
     {
-      "path": ".claude/rules/artifact-integration.md",
-      "name": "artifact-integration",
+      "path": ".claude/rules/artifact-integrator.md",
+      "name": "artifact-integrator",
       "description": "",
       "globs": "",
       "priority": "",
@@ -956,7 +956,7 @@
       "priority": "",
       "technologies": ["typescript"],
       "type": "master",
-      "size": 2455,
+      "size": 2433,
       "line_count": 86
     },
     {

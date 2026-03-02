@@ -1,7 +1,7 @@
 ---
 name: audit-context-building
 description: Ultra-granular code analysis for deep architectural context building. Line-by-line and block-by-block analysis using First Principles, 5 Whys, 5 Hows methodology at micro scale. Builds mental models, tracks invariants and assumptions, and maps cross-function call flows for security audit preparation.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -17,7 +17,7 @@ error_handling: graceful
 streaming: supported
 agents: [security-architect, code-reviewer, developer]
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: 2026-03-01T00:00:00.000Z
 ---
 
 # Audit Context Building Skill

@@ -114,8 +114,8 @@ describe('SCHEMA_MAP', () => {
     assert.ok('workflow' in guard.SCHEMA_MAP, 'should have workflow mapping');
   });
 
-  it('maps skill to skill-definition.schema.json', () => {
-    assert.strictEqual(guard.SCHEMA_MAP.skill, 'skill-definition.schema.json');
+  it('maps skill to skill-output.schema.json', () => {
+    assert.strictEqual(guard.SCHEMA_MAP.skill, 'skill-output.schema.json');
   });
 
   it('maps config:settings to null (no schema)', () => {

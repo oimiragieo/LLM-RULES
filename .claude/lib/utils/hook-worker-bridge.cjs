@@ -35,10 +35,14 @@ parentPort.on('message', async request => {
 
       parentPort.postMessage({ type: 'success', code: 0 });
     } catch (error) {
+      const message =
+        error && typeof error.message === 'string' && error.message.trim()
+          ? error.message.trim()
+          : String(error || 'Unknown hook worker error');
       parentPort.postMessage({
         type: 'error',
-        message: error.message,
-        stack: error.stack,
+        message,
+        stack: error && error.stack ? error.stack : '',
         code: error.code || 1,
       });
     }

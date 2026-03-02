@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-24T15:37:39.256Z
+lastVerifiedAt: 2026-02-27T02:53:45.248Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -49,6 +49,8 @@ skills:
   - troubleshooting-regression
   - verification-before-completion
   - memory-search
+  - agent-evaluation
+  - debug-log-analysis
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'
@@ -405,7 +407,7 @@ If trigger condition is NOT met, log `"Step 4.7 skipped (non-creator task)"` and
 
 **Checks to perform** (when triggered) for each artifact created or updated in the task:
 
-1. **Catalog Presence** — Read `.claude/context/artifacts/catalogs/skill-catalog.md`
+1. **Catalog Presence** — Read `.claude/docs/skill-catalog.md`
    - Search for `` `skill-name` `` pattern in table rows
    - If missing: flag as `CATALOG_MISSING`
 

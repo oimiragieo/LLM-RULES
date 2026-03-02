@@ -915,7 +915,8 @@
     {
       "name": "tdd-check",
       "category": "safety",
-      "path": ".claude/hooks/safety/tdd-check.cjs"
+      "path": ".claude/hooks/safety/unified-pre-write-hook.cjs",
+      "note": "Consolidated into unified-pre-write-hook.cjs as check 'tdd-check'"
     },
     {
       "name": "validate-skill-invocation",

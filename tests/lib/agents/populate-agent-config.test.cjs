@@ -126,8 +126,10 @@ test('each agent should have tools from registry capabilities or fallback', () =
     );
 
     // Verify essential tools are present (TaskUpdate, TaskList, TaskCreate, TaskGet, Skill, Read)
+    // Router is restricted to routing tools only (CLAUDE.md Section 0); Skill is not in its allowed set
     const essentialTools = ['TaskUpdate', 'TaskList', 'TaskCreate', 'TaskGet', 'Skill', 'Read'];
     for (const tool of essentialTools) {
+      if (agentId === 'router' && tool === 'Skill') continue;
       assert.ok(
         agentData.tools.includes(tool),
         `Agent "${agentId}" missing essential tool: ${tool}`

@@ -391,7 +391,7 @@ describe('reflection-queue-processor', () => {
   });
 
   describe('markEntriesProcessed', () => {
-    it('should mark entries as processed in the queue file', () => {
+    it('should remove processed entries from the queue file', () => {
       const entry1 = { taskId: '1', trigger: 'task_completion', timestamp: '2026-01-26T10:00:00Z' };
       const entry2 = { taskId: '2', trigger: 'task_completion', timestamp: '2026-01-26T10:05:00Z' };
       fs.writeFileSync(
@@ -401,19 +401,16 @@ describe('reflection-queue-processor', () => {
 
       processor.markEntriesProcessed([entry1], processor.QUEUE_FILE);
 
-      // Re-read and verify
+      // Re-read and verify - processed entries are removed, not marked
       const content = fs.readFileSync(processor.QUEUE_FILE, 'utf8');
       const lines = content
         .trim()
         .split('\n')
         .filter(line => line.trim());
-      assert.strictEqual(lines.length, 2);
+      assert.strictEqual(lines.length, 1);
 
-      const updated1 = JSON.parse(lines[0]);
-      const updated2 = JSON.parse(lines[1]);
-
-      assert.strictEqual(updated1.processed, true);
-      assert.strictEqual(updated2.processed, undefined); // Not marked
+      const remaining = JSON.parse(lines[0]);
+      assert.strictEqual(remaining.taskId, '2'); // Only unprocessed entry remains
     });
 
     it('should handle empty entries array', () => {
@@ -452,16 +449,16 @@ describe('reflection-queue-processor', () => {
       assert.strictEqual(result.instructions.length, 0);
     });
 
-    it('should mark entries as processed after processing', () => {
+    it('should remove processed entries after processing', () => {
       const entry = { taskId: '1', trigger: 'task_completion', timestamp: '2026-01-26T10:00:00Z' };
       fs.writeFileSync(processor.QUEUE_FILE, JSON.stringify(entry) + '\n');
 
       processor.processQueue(processor.QUEUE_FILE);
 
-      // Re-read and verify marked as processed
-      const content = fs.readFileSync(processor.QUEUE_FILE, 'utf8');
-      const updated = JSON.parse(content.trim());
-      assert.strictEqual(updated.processed, true);
+      // Re-read and verify processed entries are removed
+      const content = fs.readFileSync(processor.QUEUE_FILE, 'utf8').trim();
+      const lines = content.split('\n').filter(l => l.trim());
+      assert.strictEqual(lines.length, 0, 'Queue should be empty after processing all entries');
     });
   });
 

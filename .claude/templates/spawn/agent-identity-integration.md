@@ -6,8 +6,8 @@ use_cases:
   - Ensuring consistent agent behavior across invocations
 optional: true
 requires:
-  - Agent files with identity fields (see .claude/docs/AGENT_IDENTITY.md)
-  - AgentParser library (.claude/lib/agents/agent-parser.cjs)
+  - Agent files with identity fields (see agent-identity.schema.json)
+  - AgentConfig library (.claude/lib/agents/agent-config.cjs)
 ---
 
 # Agent Identity Integration (Optional Enhancement)
@@ -25,10 +25,10 @@ When spawning agents with identity fields, enhance prompts with structured perso
 ```javascript
 // 1. Read and parse agent file
 const fs = require('fs');
-const { AgentParser } = require('./.claude/lib/agents/agent-parser.cjs');
+const { AgentConfig } = require('./.claude/lib/agents/agent-config.cjs');
 
 const agentFilePath = '.claude/agents/core/developer.md';
-const parser = new AgentParser();
+const parser = new AgentConfig();
 const agentData = parser.parseAgentFile(agentFilePath);
 
 // 2. Generate identity prompt section (if identity exists)
@@ -139,10 +139,9 @@ Apply these traits when evaluating options and communicating results.
 
 - Agents without `identity` fields work unchanged (identitySection = '')
 - Identity is optional - no breaking changes to existing spawns
-- Validation via AgentParser ensures identity fields are schema-compliant
+- Validation via AgentConfig ensures identity fields are schema-compliant
 
 ## See Also
 
-- `.claude/docs/AGENT_IDENTITY.md` - Full design specification
 - `.claude/schemas/agent-identity.schema.json` - JSON Schema for identity validation
-- `.claude/lib/agents/agent-parser.cjs` - Parser with identity validation
+- `.claude/lib/agents/agent-config.cjs` - Config parser with identity support

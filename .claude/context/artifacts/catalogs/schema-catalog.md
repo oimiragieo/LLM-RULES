@@ -2,8 +2,8 @@
 
 # Schema Catalog
 
-**Last Updated:** 2026-02-21
-**Total Active Schemas:** 139
+**Last Updated:** 2026-02-26
+**Total Active Schemas:** 297
 **Archived Schemas:** 37 (see `.claude/schemas/_archive/README.md` + 12 hollow stubs deleted in Phase 1)
 
 This catalog documents all active JSON schemas in the agent-studio framework with their wiring status, consumers, and validation categories.
@@ -23,22 +23,22 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 | ---------------- | ----- | --------------------------------------------- |
 | **WIRED (Ajv)**  | 8     | Actively validated via Ajv at runtime         |
 | **SOFT-WIRED**   | 3     | Path referenced in code, validation optional  |
-| **DOCS ONLY**    | 93    | Referenced in documentation or templates only |
-| **Total Active** | 139   | All schemas in `.claude/schemas/`             |
+| **DOCS ONLY**    | 286   | Referenced in documentation or templates only |
+| **Total Active** | 297   | All schemas in `.claude/schemas/`             |
 
 ## Schema Categories
 
 | Category     | Count | Pattern                      |
 | ------------ | ----- | ---------------------------- |
-| **Agent**    | 4     | `agent-*.schema.json`        |
-| **Skill**    | 95    | `skill-*-output.schema.json` |
+| **Agent**    | 5     | `agent-*.schema.json`        |
+| **Skill**    | 254   | `skill-*-output.schema.json` |
 | **Hook**     | 1     | `hook-*.schema.json`         |
-| **Workflow** | 1     | `workflow-*.schema.json`     |
-| **Other**    | 19    | Various                      |
+| **Workflow** | 2     | `workflow-*.schema.json`     |
+| **Other**    | 35    | Various                      |
 
 ---
 
-## 1. Agent Schemas (5 schemas)
+## 1. Agent Schemas (4 schemas)
 
 ### agent-capability-card.schema.json
 
@@ -101,21 +101,6 @@ This catalog documents all active JSON schemas in the agent-studio framework wit
 **Note:** Renamed from `agent-identity.json` to `agent-identity.schema.json` in Phase 2 for naming consistency.
 
 ---
-
-### agent-spawn-params.json
-
-| Field             | Value                                     |
-| ----------------- | ----------------------------------------- |
-| **Path**          | `.claude/schemas/agent-spawn-params.json` |
-| **Category**      | Agent                                     |
-| **Wiring Status** | DOCS ONLY                                 |
-| **Consumer**      | None (documentation reference only)       |
-| **Validation**    | Not validated at runtime                  |
-| **$schema**       | http://json-schema.org/draft-07/schema#   |
-
-**Purpose:** Documents agent spawn parameter structure for reference.
-
-**Note:** Missing `.schema` suffix (documented naming inconsistency).
 
 ---
 

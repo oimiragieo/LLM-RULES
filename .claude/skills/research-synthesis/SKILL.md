@@ -30,7 +30,7 @@ error_handling: graceful
 streaming: supported
 output_location: .claude/context/artifacts/research-reports/
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: '2026-02-28'
 ---
 
 # Research Synthesis Skill

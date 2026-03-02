@@ -20,9 +20,7 @@ tools:
   - TaskList
   - TaskCreate
   - TaskGet
-  - AvailableAgents
   - Skill
-  - Orchestrator
 skills:
   - plan-generator
   - response-rater
@@ -41,6 +39,7 @@ skills:
   - session-handoff
   - swarm-coordination
   - track-management
+  - ralph-loop
   - workflow-creator
   - agent-creator
   - skill-creator
@@ -95,7 +94,7 @@ Before coordinating any multi-agent work, read the full agent catalog:
 Read('.claude/docs/AGENT_ROUTING_CARD.md')
 ```
 
-**59 agents are available.** Do NOT default to `developer` for implementation. Match the task domain to the correct specialist:
+**66 agents are available.** Do NOT default to `developer` for implementation. Match the task domain to the correct specialist:
 
 - Python task -> `python-pro` (not developer)
 - React/frontend -> `frontend-pro` (not developer)
@@ -157,7 +156,7 @@ Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 ## Standard Flow
 
 1.  **User Request**: "Build X."
-2.  **Orchestrate**: Call `Orchestrator({ task: "Build X" })`.
+2.  **Orchestrate**: Call `Task({ task_id: 'task-1', subagent_type: 'developer', prompt: 'Build X' })`.
 3.  **Finish**: Publish artifacts.
 
 ## Skill Invocation Protocol (MANDATORY)
@@ -195,12 +194,12 @@ Skill({ skill: 'response-rater' }); // Quality assessment of outputs
 
 ## Capability-Based Agent Selection (Phase 3)
 
-The orchestrator uses `AvailableAgents` to discover the best agent for each task:
+The orchestrator reads the agent registry to discover the best agent for each task:
 
 ### Discovery Process
 
 1. **Analyze task**: Determine required capability (e.g., 'code-review', 'implementation', 'testing')
-2. **Query agents**: `AvailableAgents({ capability: '...' })`
+2. **Query registry**: `Read('.claude/context/agent-registry.json')` and filter by capability
 3. **Select best**: Pick agent with highest success rate
 4. **Spawn agent**: `Task({ task_id: 'task-1', subagent_type: best.id })`
 
@@ -208,14 +207,13 @@ The orchestrator uses `AvailableAgents` to discover the best agent for each task
 
 ```javascript
 // Task: "Review this code"
-const agents = AvailableAgents({
-  capability: 'code-review',
-  excludeFailed: true,
-  minSuccessRate: 0.7
-});
+const registry = Read('.claude/context/agent-registry.json');
+const agents = registry.agents.filter(a =>
+  a.capabilities.includes('code-review')
+);
 
 // Pick best agent (sorted by success rate)
-const reviewer = agents.agents[0]; // code-reviewer (best success rate)
+const reviewer = agents[0]; // code-reviewer (best success rate)
 
 // Resolve model from config.yaml (ADR-075)
 const { resolveAgentModel } = require('./.claude/lib/utils/agent-config-reader.cjs');

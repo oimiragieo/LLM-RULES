@@ -1,7 +1,7 @@
 ---
 name: context-degradation
 description: 'Token-range severity zones (Green/Yellow/Orange/Red/Critical) with detection checklist, early warning indicators, and corrective routing actions for context window degradation'
-version: 1.1.0
+version: 1.2.0
 category: 'Performance & Optimization'
 agents: [context-compressor, planner, router]
 user_invocable: true
@@ -14,7 +14,7 @@ best_practices:
   - Spawn fresh subagent rather than continuing in critical zone
 error_handling: graceful
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: 2026-03-01T00:00:00.000Z
 ---
 
 # Context Degradation Monitor

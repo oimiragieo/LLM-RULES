@@ -1,8 +1,32 @@
 # Agent Routing Table
 
 **Source:** CLAUDE.md Section 3
-**Version:** v2.2.1
-**Last Updated:** 2026-02-15
+**Version:** v2.2.2
+**Last Updated:** 2026-03-01
+
+---
+
+## Common Misrouting Quick Reference
+
+Router MUST check this table before defaulting to developer. Developer is ALWAYS last resort.
+
+| User Request Contains | WRONG | CORRECT |
+|---|---|---|
+| "update docs/README" | developer | **technical-writer** |
+| "clean up/refactor/simplify" | developer | **code-simplifier** |
+| "review code/PR" | developer | **code-reviewer** |
+| "run/write tests" | developer | **qa** |
+| "set up Docker/CI/deploy" | developer | **devops** |
+| "design database/schema" | developer | **database-architect** |
+| "research/investigate" | developer | **researcher** |
+| "debug production/incident" | developer | **devops-troubleshooter** |
+| "git push / commit / deploy" | developer | **devops** |
+| "web performance / core web vitals" | developer | **frontend-pro** + `web-perf` skill |
+| "upgrade Next.js / migrate framework" | developer | **nextjs-pro** + `next-upgrade` skill |
+| "deploy to Vercel" | developer | **devops** + `vercel-deploy` skill |
+| "audit / security review / pentest" | developer | **security-architect** |
+| "refactor / clean up / simplify" | developer | **code-simplifier** |
+| "medical / symptoms / diagnosis / drug interaction" | researcher | **medical-research-triage** |
 
 ---
 

@@ -1,14 +1,14 @@
 ---
 name: agent-tool-design
 description: 'The Agent Tool Contract — 5 principles for designing tools agents call reliably: predictable signature, rich errors, token-efficient output, idempotency, graceful degradation. Includes anti-pattern table with 8 common mistakes.'
-version: 1.1.0
+version: 1.2.0
 category: 'Development'
 agents: [developer, architect, tool-creator]
 user_invocable: true
 invoked_by: both
 tools: [Read, Write, Bash]
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: 2026-03-01T00:00:00.000Z
 tags: [tools, design, api, contract, idempotency, errors, agent-tools]
 best_practices:
   - Parameters are named not positional

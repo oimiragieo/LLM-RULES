@@ -200,6 +200,14 @@ describe('router-tool-lockdown hook', () => {
     assert.strictEqual(result.result, 'block');
   });
 
+  it('should default to block mode when env is unset', () => {
+    delete process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT;
+    delete process.env.CLAUDE_AGENT_ID;
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {});
+    assert.strictEqual(result.pass, false);
+    assert.strictEqual(result.result, 'block');
+  });
+
   // ── Fix 1: Worktree CWD bypass tests ────────────────────────────────────────
 
   it('should allow subagent in depth-1 worktree to call Bash (CWD bypass)', () => {

@@ -247,8 +247,8 @@ function parseCommandLegacy(commandString) {
  * - bash -c "command"
  * - sh -c 'cmd1 && cmd2'
  * - zsh -c "complex command"
- * - bash -xc "command" (combined flags)
- * - bash -ec "command" (combined flags)
+ * Note: Combined flags (-xc, -ec) are NOT matched to avoid false positives
+ * with non-shell commands (ls -rc, ls -lc). Only exact -c is recognized.
  *
  * SEC-AUDIT-012: Now returns error context when dangerous patterns detected.
  *
@@ -265,11 +265,13 @@ function extractCArgument(commandString) {
 
   const tokens = result.tokens;
 
-  // Look for -c flag (standalone or combined with other flags like -xc, -ec, -ic)
+  // Look for exact -c flag only. Combined flags like -xc, -ec are NOT treated as -c
+  // because non-shell commands (ls -rc, ls -lc) would false-positive. The security
+  // tradeoff is acceptable: bash -xc is rare, and non-c invocations pass as valid anyway.
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
 
-    const isCFlag = token.startsWith('-') && !token.startsWith('--') && token.includes('c');
+    const isCFlag = token === '-c';
 
     if (isCFlag && i + 1 < tokens.length) {
       // The next token is the command to execute

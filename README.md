@@ -59,10 +59,10 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 ## Current Footprint
 
 - Agents: 75 files (includes 12 isolated worktree variants)
-- Skills: 465 `SKILL.md` definitions
-- Rules: 105 docs
-- Schemas: 148 `*.schema.json`
-- Commands: 102 `.claude/commands/*.md`
+- Skills: 552 `SKILL.md` definitions
+- Rules: 113 docs
+- Schemas: 319 `*.schema.json`
+- Commands: 263 `.claude/commands/*.md`
 
 ## Repository Layout
 
@@ -563,6 +563,7 @@ The `debug-log-analysis` skill (`Skill({ skill: 'debug-log-analysis' })`) docume
 | [spec-gathering](.claude/skills/spec-gathering/SKILL.md)                           | Requirements elicitation                                       |
 | [spec-init](.claude/skills/spec-init/SKILL.md)                                     | Specification bootstrapping                                    |
 | [dispatching-parallel-agents](.claude/skills/dispatching-parallel-agents/SKILL.md) | Parallel agent dispatch patterns                               |
+| [ralph-loop](.claude/skills/ralph-loop/SKILL.md)                                   | Autonomous iteration via Stop hook loop with verification gate |
 
 ### Security
 

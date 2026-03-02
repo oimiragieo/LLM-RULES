@@ -4,7 +4,7 @@
  * Defines alert thresholds and monitoring rules for Phase 4-5 production deployment.
  *
  * Usage:
- *   const alerts = require('./.claude/lib/monitoring/production-alerts.cjs');
+ *   const alerts = require('./production-alerts.cjs');
  *   const heapAlert = alerts.checkHeapUsage(process.memoryUsage().heapUsed);
  *   if (heapAlert.triggered) {
  *     console.error(heapAlert.message);

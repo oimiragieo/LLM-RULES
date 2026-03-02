@@ -100,4 +100,4 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 ## Related References
 
 - `commit-validator` skill - Validates commit message format
-- `.claude/hooks/git/commit-msg` - Pre-commit hook for validation
+- Pre-commit requirements are enforced by the hook system (settings.json)

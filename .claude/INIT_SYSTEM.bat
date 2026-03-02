@@ -16,7 +16,7 @@ if not exist "package.json" (
 echo [1/5] Installing dependencies...
 call pnpm install
 if errorlevel 1 (
-  echo FAILED: npm install
+  echo FAILED: pnpm install
   exit /b 1
 )
 

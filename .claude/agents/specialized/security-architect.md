@@ -29,6 +29,9 @@ tools:
   - Skill
 skills:
   - auth-security-expert
+  - audit-context-building
+  - building-secure-contracts
+  - content-security-scan
   - fiber-routing-and-csrf-protection
   - security-architect
   - task-management-protocol
@@ -51,6 +54,7 @@ skills:
   - medusa-security
   - gemini-cli-security
   - memory-search
+  - fix-review
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

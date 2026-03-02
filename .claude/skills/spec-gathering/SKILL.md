@@ -107,22 +107,23 @@ Based on the project context and task, suggest affected areas:
 
 Wait for confirmation or correction.
 
-### Phase 4.5: Invoke Progressive-Disclosure (ECLAIR Pattern)
+### Phase 4.5: Invoke Context-Compressor (Progressive Disclosure Mode / ECLAIR Pattern)
 
-Before gathering requirements manually, use the progressive-disclosure skill to optimize the clarification process:
+Before gathering requirements manually, use the context-compressor skill (progressive disclosure mode) to optimize the clarification process:
 
 ```javascript
 Skill({
-  skill: 'progressive-disclosure',
+  skill: 'context-compressor',
   context: {
     taskDescription: taskDescription,
     projectContext: projectContext,
     services: identifiedServices,
+    mode: 'progressive-disclosure',
   },
 });
 ```
 
-**Progressive-Disclosure performs:**
+**Context-Compressor (progressive disclosure mode) performs:**
 
 1. **E: Examine** - Analyze ambiguities in the task description
 2. **C: Categorize** - Prioritize by CRITICAL, HIGH, MEDIUM, LOW
@@ -137,9 +138,9 @@ Skill({
 - Smart defaults with [ASSUMES:] notation
 - Updated understanding of requirements
 
-### Phase 5: Gather Detailed Requirements (with Progressive-Disclosure)
+### Phase 5: Gather Detailed Requirements (with Context-Compressor)
 
-Ask only the critical clarification questions identified by progressive-disclosure:
+Ask only the critical clarification questions identified by context-compressor:
 
 **Budget:** 3-5 clarification questions maximum
 
@@ -217,7 +218,7 @@ const tokens = {
   ENDPOINT_PATH: gatheredRequirements.endpointPath || '',
   PROJECT_NAME: gatheredRequirements.projectName || 'Agent Studio',
 
-  // Assumptions from progressive-disclosure (optional but recommended)
+  // Assumptions from context-compressor (optional but recommended)
   ASSUMPTIONS_MADE: gatheredRequirements.assumptions.map(a => `- ${a}`).join('\n') || '',
   CLARIFICATIONS_ASKED: gatheredRequirements.clarifications || 0,
 };
@@ -268,7 +269,7 @@ test "$YAML_COUNT" -eq 2 && echo "✓ YAML valid" || echo "✗ YAML invalid"
 Before completing requirements gathering:
 
 - [ ] Task description confirmed with user
-- [ ] Progressive-disclosure skill invoked (Phase 4.5)
+- [ ] Context-compressor skill invoked in progressive disclosure mode (Phase 4.5)
 - [ ] Clarification budget respected (3-5 questions maximum)
 - [ ] CRITICAL priority questions asked and answered
 - [ ] All assumptions documented with [ASSUMES:] notation
@@ -309,7 +310,7 @@ Before completing requirements gathering:
 
 This skill works well with:
 
-- **progressive-disclosure**: Invoked in Phase 4.5 to optimize clarification process with ECLAIR pattern (3-5 limit, smart defaults, [ASSUMES:] notation)
+- **context-compressor**: Invoked in Phase 4.5 (progressive disclosure mode) to optimize clarification process with ECLAIR pattern (3-5 limit, smart defaults, [ASSUMES:] notation)
 - **template-renderer**: Used automatically after Phase 8 to render specification template with gathered requirements and assumptions
 - **spec-critique**: Use to validate the generated specification
 - **complexity-assessment**: Assess complexity after requirements are clear
@@ -318,10 +319,10 @@ This skill works well with:
 **Workflow Chain**:
 
 ```
-spec-gathering (→ progressive-disclosure in Phase 4.5) → template-renderer → spec-critique → planner
+spec-gathering (→ context-compressor in Phase 4.5) → template-renderer → spec-critique → planner
 ```
 
-**Progressive-Disclosure Integration Details**:
+**Context-Compressor Integration Details (Progressive Disclosure Mode)**:
 
 - **When**: Invoked at the start of Phase 5 (before manual questioning)
 - **Why**: Limits clarifications to 3-5 questions (reduces cognitive load), applies smart defaults, documents all assumptions
@@ -339,19 +340,20 @@ spec-gathering (→ progressive-disclosure in Phase 4.5) → template-renderer �
 1. Confirm task: "You want to add user authentication. Is this correct?"
    - User confirms
 
-2. **Invoke progressive-disclosure (Phase 4.5):**
+2. **Invoke context-compressor in progressive disclosure mode (Phase 4.5):**
 
    ```javascript
    Skill({
-     skill: 'progressive-disclosure',
+     skill: 'context-compressor',
      context: {
        taskDescription: "Add user authentication",
-       projectContext: {...}
+       projectContext: {...},
+       mode: 'progressive-disclosure'
      }
    });
    ```
 
-3. Progressive-disclosure returns:
+3. Context-compressor returns:
    - **CRITICAL questions (3 asked of 5 budget):**
      1. "Should users be able to reset passwords via email?" → YES
      2. "Do we need role-based access control (RBAC)?" → YES (Admin, User, Guest)

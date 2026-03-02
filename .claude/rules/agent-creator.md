@@ -75,7 +75,7 @@ skills: [list-of-skills]
 
 ### Related Workflows
 
-- `.claude/workflows/creation/ecosystem-creation-workflow.md`
+- `.claude/workflows/core/ecosystem-creation-workflow.md`
 - Agent creation triggers companion checks (skills, routing, registry)
 
 ## Post-Creation Checklist

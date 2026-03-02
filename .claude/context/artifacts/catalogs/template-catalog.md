@@ -170,15 +170,15 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ---
 
-### spec-template.md
+### spec.md
 
-| Field              | Value                                |
-| ------------------ | ------------------------------------ |
-| **Path**           | `.claude/templates/spec-template.md` |
-| **Category**       | Document Templates                   |
-| **Status**         | active                               |
-| **Used By Agents** | planner                              |
-| **Used By Skills** | spec-gathering                       |
+| Field              | Value                       |
+| ------------------ | --------------------------- |
+| **Path**           | `.claude/templates/spec.md` |
+| **Category**       | Document Templates          |
+| **Status**         | active                      |
+| **Used By Agents** | planner                     |
+| **Used By Skills** | spec-gathering              |
 
 **Purpose:** Lightweight specification template (alternative to specification-template.md) for rapid spec drafting.
 

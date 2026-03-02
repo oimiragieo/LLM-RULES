@@ -9,8 +9,8 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord, WebSearch, Web
 args: '--harness <path-or-name> [--trigger reflection|evolve|manual]'
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 # Eval Harness Updater

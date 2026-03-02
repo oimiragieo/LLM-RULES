@@ -113,7 +113,7 @@ Skill({ skill: 'debugging' });  // Invoke debugging skill
   Enumerate files locally and read from the clone; do not continue speculative API path probing.
 
 ### Finding Capabilities
-For a full skill list: Read .claude/context/artifacts/catalogs/skill-catalog.md
+For a full skill list: Read .claude/docs/skill-catalog.md
 For skill search: Look for skills matching your task domain
 For new skills: Domain experts (language-specific agents) have domain-focused skills
 `;

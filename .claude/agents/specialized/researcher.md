@@ -40,6 +40,7 @@ skills:
   - task-management-protocol
   - thinking-tools
   - memory-search
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

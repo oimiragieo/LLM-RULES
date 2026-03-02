@@ -1,7 +1,7 @@
 ---
 name: tool-search
 description: Semantic tool search with embeddings for scalable tool discovery. Enables on-demand tool loading to reduce context usage by 90%+ for large tool libraries.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true

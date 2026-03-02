@@ -1,5 +1,6 @@
 ---
-lastVerifiedAt: 2026-02-24T04:26:35.324Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 name: omega-codex-cli
 description: Shell out to OpenAI Codex CLI for headless code generation, analysis, and question-answering. Optimized for code tasks. Requires OPENAI_API_KEY env var.
 version: 1.0.0

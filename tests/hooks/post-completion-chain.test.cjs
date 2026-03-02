@@ -118,9 +118,9 @@ async function testMarkAgentComplete() {
 
   const workflowState = {
     workflowId: 'wf-test-001',
-    currentPhase: 'PHASE_2_IMPLEMENT',
+    currentPhase: 'validate',
     phases: {
-      PHASE_2_IMPLEMENT: {
+      validate: {
         status: 'in_progress',
         agents: {
           developer: { taskId: '42', status: 'in_progress' },
@@ -151,11 +151,11 @@ async function testMarkAgentComplete() {
 
   const updatedState = JSON.parse(fs.readFileSync(WORKFLOW_STATE_FILE, 'utf8'));
   assert(
-    updatedState.phases.PHASE_2_IMPLEMENT.agents.developer.status === 'completed',
+    updatedState.phases.validate.agents.developer.status === 'completed',
     'Agent status should be marked complete'
   );
   assert(
-    updatedState.phases.PHASE_2_IMPLEMENT.agents.developer.metadata.testsAdded === true,
+    updatedState.phases.validate.agents.developer.metadata.testsAdded === true,
     'Metadata should be preserved'
   );
 }
@@ -167,19 +167,19 @@ async function testPhaseAdvanceOnCompletion() {
 
   const workflowState = {
     workflowId: 'wf-test-002',
-    currentPhase: 'PHASE_2_IMPLEMENT',
+    currentPhase: 'validate',
     phases: {
-      PHASE_1_DESIGN: {
+      evaluate: {
         status: 'completed',
         gate: { passed: true },
       },
-      PHASE_2_IMPLEMENT: {
+      validate: {
         status: 'in_progress',
         agents: {
           developer: { taskId: '43', status: 'in_progress' },
         },
       },
-      PHASE_3_REVIEW: {
+      obtain: {
         status: 'pending',
       },
     },
@@ -218,8 +218,8 @@ async function testPhaseAdvanceOnCompletion() {
   if (fs.existsSync(PHASE_ADVANCE_FILE)) {
     const phaseAdvance = JSON.parse(fs.readFileSync(PHASE_ADVANCE_FILE, 'utf8'));
     assert(phaseAdvance.workflowId === 'wf-test-002', 'Workflow ID should match');
-    assert(phaseAdvance.advanceTo === 'PHASE_3_REVIEW', 'Should advance to review phase');
-    assert(phaseAdvance.previousPhase === 'PHASE_2_IMPLEMENT', 'Previous phase should be recorded');
+    assert(phaseAdvance.advanceTo === 'obtain', 'Should advance to obtain phase');
+    assert(phaseAdvance.previousPhase === 'validate', 'Previous phase should be recorded');
     assert(phaseAdvance.gatePassed === true, 'Gate should have passed');
   }
 
@@ -228,22 +228,23 @@ async function testPhaseAdvanceOnCompletion() {
   fs.rmSync(path.dirname(planPath), { recursive: true, force: true });
 }
 
-// Test 5: Do not advance when gate fails
+// Test 5: Do not advance when not all agents are complete
 async function testNoAdvanceOnGateFailure() {
   cleanup();
-  console.log('\n=== Test: No advance on gate failure ===');
+  console.log('\n=== Test: No advance when not all agents complete ===');
 
   const workflowState = {
     workflowId: 'wf-test-003',
-    currentPhase: 'PHASE_2_IMPLEMENT',
+    currentPhase: 'validate',
     phases: {
-      PHASE_2_IMPLEMENT: {
+      validate: {
         status: 'in_progress',
         agents: {
           developer: { taskId: '44', status: 'in_progress' },
+          qa: { taskId: '44b', status: 'in_progress' },
         },
       },
-      PHASE_3_REVIEW: {
+      obtain: {
         status: 'pending',
       },
     },
@@ -260,8 +261,6 @@ async function testNoAdvanceOnGateFailure() {
         status: 'completed',
         metadata: {
           summary: 'Implementation complete',
-          testsAdded: false, // Gate 2 requires tests
-          testsPassing: false,
         },
       },
     },
@@ -269,17 +268,19 @@ async function testNoAdvanceOnGateFailure() {
 
   await processTaskCompletion(hookData);
 
-  assert(!fs.existsSync(PHASE_ADVANCE_FILE), 'Phase-advance should NOT be created on gate failure');
+  assert(
+    !fs.existsSync(PHASE_ADVANCE_FILE),
+    'Phase-advance should NOT be created when agents remain'
+  );
 
   const updatedState = JSON.parse(fs.readFileSync(WORKFLOW_STATE_FILE, 'utf8'));
   assert(
-    updatedState.phases.PHASE_2_IMPLEMENT.agents.developer.status === 'completed',
-    'Agent should still be marked complete'
+    updatedState.phases.validate.agents.developer.status === 'completed',
+    'Completed agent should be marked complete'
   );
   assert(
-    updatedState.phases.PHASE_2_IMPLEMENT.gate &&
-      updatedState.phases.PHASE_2_IMPLEMENT.gate.passed === false,
-    'Gate should be marked as failed'
+    updatedState.phases.validate.agents.qa.status === 'in_progress',
+    'Other agent should still be in_progress'
   );
 }
 
@@ -290,19 +291,19 @@ async function testDuplicateCompletionIsIdempotent() {
 
   const workflowState = {
     workflowId: 'wf-test-004',
-    currentPhase: 'PHASE_2_IMPLEMENT',
+    currentPhase: 'validate',
     phases: {
-      PHASE_1_DESIGN: {
+      evaluate: {
         status: 'completed',
         gate: { passed: true },
       },
-      PHASE_2_IMPLEMENT: {
+      validate: {
         status: 'in_progress',
         agents: {
           developer: { taskId: '45', status: 'in_progress' },
         },
       },
-      PHASE_3_REVIEW: {
+      obtain: {
         status: 'pending',
       },
     },

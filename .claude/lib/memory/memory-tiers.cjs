@@ -64,8 +64,14 @@ function ensureDir(dirPath) {
 
 function parseJSONObjectStrict(raw) {
   try {
-    const parsed = JSON.parse(raw);
+    // SE-02: Use safeParseJSON to prevent prototype pollution on STM/MTM files
+    const { safeParseJSON } = require('../utils/safe-json.cjs');
+    const parsed = safeParseJSON(raw, null);
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return null;
+    }
+    // safeParseJSON returns Object.create(null) on parse failure — detect empty results
+    if (Object.keys(parsed).length === 0) {
       return null;
     }
     return parsed;

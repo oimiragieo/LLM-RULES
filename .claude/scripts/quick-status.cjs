@@ -43,7 +43,13 @@ function runQuickStatus(options = {}) {
       return;
     }
     try {
-      loadJson(filePath);
+      const parsed = loadJson(filePath);
+      // safeParseJSON returns Object.create(null) on parse failure — detect empty results
+      if (!parsed || Object.keys(parsed).length === 0) {
+        results.push({ label, status: 'INVALID (empty or unparseable)' });
+        ok = false;
+        return;
+      }
       results.push({ label, status: 'OK' });
     } catch (err) {
       results.push({ label, status: `INVALID (${err.message})` });

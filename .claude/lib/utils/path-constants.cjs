@@ -32,7 +32,7 @@ const TOOLS_DIR = norm(path.join(_dot, 'tools'));
 
 // --- File constants ---
 const SKILL_INDEX_PATH = norm(path.join(_cfg, 'skill-index.json'));
-const CATALOG_PATH = norm(path.join(_ctx, 'artifacts', 'catalogs', 'skill-catalog.md'));
+const CATALOG_PATH = norm(path.join(_dot, 'docs', 'skill-catalog.md'));
 const AGENT_REGISTRY_PATH = norm(path.join(_ctx, 'agent-registry.json'));
 const ACTIVE_CREATORS_PATH = norm(path.join(_ctx, 'runtime', 'active-creators.json'));
 const INTEGRATION_QUEUE_PATH = norm(path.join(_ctx, 'runtime', 'integration-queue.jsonl'));

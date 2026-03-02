@@ -76,7 +76,6 @@ The following workflows guide this agent's execution:
 | Workflow              | Path                                                | When to Use                          |
 | --------------------- | --------------------------------------------------- | ------------------------------------ |
 | Incident Response     | `.claude/workflows/operations/incident-response.md` | Production incident debugging        |
-| Domain Development    | `.claude/workflows/domain-development-workflow.md`  | Code-level debugging with TDD        |
 | Workspace Conventions | `.claude/rules/workspace-conventions.md`            | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):

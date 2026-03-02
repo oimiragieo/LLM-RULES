@@ -1,80 +1,385 @@
-# Workflow Enhancement Skills
+# Skill Catalog (Complete)
 
-**Source:** CLAUDE.md Section 8.5
-**Version:** v2.2.1
-**Last Updated:** 2026-02-15
-
----
-
-## PURPOSE
-
-Catalog of active workflow-enhancement skills available via `Skill()` tool for improving agent workflows, testing, research, and development processes. Includes hybrid search integration (`code-semantic-search`, `code-structural-search`, `ripgrep`) across core/specialized/domain agents. Archived skills live under `.claude/skills/_archive/dead/`.
+**Source:** `.claude/config/skill-index.json`
+**Referenced by:** CLAUDE.md Section 7 / Section 8.5
+**Last Generated:** 2026-02-28
 
 ---
 
-## CONTENT
+## Summary
 
-| Skill                                | When to Use                                                                            |
-| ------------------------------------ | -------------------------------------------------------------------------------------- |
-| `project-onboarding`                 | unfamiliar codebase                                                                    |
-| `thinking-tools`                     | self-reflection at critical phases                                                     |
-| `summarize-changes`                  | after non-trivial coding                                                               |
-| `session-handoff`                    | before ending long sessions                                                            |
-| `interactive-requirements-gathering` | structured user input                                                                  |
-| `artifact-lifecycle`                 | manage artifact updates/deprecation                                                    |
-| `workflow-creator`                   | create multi-agent workflows                                                           |
-| `agent-updater`                      | refresh existing agents with risk-scored diffs                                         |
-| `skill-updater`                      | refresh existing skills with research + TDD gates                                      |
-| `workflow-updater`                   | refresh existing workflows with gate/idempotency checks                                |
-| `memory-quality-auditor`             | audit memory retrieval quality and groundedness                                        |
-| `eval-harness-updater`               | refresh live/fallback eval harness reliability                                         |
-| `troubleshooting-regression`         | debug-log-first regression diagnosis and validation                                    |
-| `template-creator`                   | create templates                                                                       |
-| `schema-creator`                     | create JSON schemas                                                                    |
-| `hook-creator`                       | create safety/validation hooks                                                         |
-| `spec-init`                          | unified spec creation (progressive disclosure)                                         |
-| `spec-gathering`                     | start new features                                                                     |
-| `complexity-assessment`              | analyze complexity                                                                     |
-| `insight-extraction`                 | capture learnings                                                                      |
-| `ripgrep`                            | enhanced search for .mjs/.cjs/.mts/.cts                                                |
-| `code-semantic-search`               | semantic code search (hybrid: vectors + BM25)                                          |
-| `code-structural-search`             | AST-based pattern matching (ast-grep)                                                  |
-| `chrome-browser`                     | browser automation/testing                                                             |
-| `arxiv-mcp`                          | arXiv search/retrieve                                                                  |
-| `checklist-generator`                | quality checklists (IEEE + contextual)                                                 |
-| `template-renderer`                  | render templates with token replacement                                                |
-| `tdd`                                | test-driven development workflow                                                       |
-| `debugging`                          | systematic debugging approach                                                          |
-| `git-expert`                         | token-efficient git operations                                                         |
-| `security-architect`                 | OWASP Top 10, threat modeling                                                          |
-| `context-compressor`                 | reduce token usage while preserving context                                            |
-| `verification-before-completion`     | evidence-based completion gates                                                        |
-| `code-analyzer`                      | static code analysis and metrics                                                       |
-| `code-quality-expert`                | clean code, style guides, refactoring                                                  |
-| `code-style-validator`               | programmatic style validation (AST-based)                                              |
-| `agent-evaluation`                   | LLM-as-judge 5-dimension rubric for agent output quality                               |
-| `context-degradation`                | token severity zones, early-warning indicators, corrective routing                     |
-| `property-based-testing`             | fast-check patterns for JS/TS, 6 canonical property categories                         |
-| `multi-agent-architecture-reference` | 6-topology decision matrix with token economics and failure modes                      |
-| `agent-tool-design`                  | Agent Tool Contract: 5 principles and anti-pattern table                               |
-| `sharp-edges`                        | catalogue of confirmed SE-01–SE-07 hazards (paths, prototype pollution, ReDoS, etc.)   |
-| `debug-log-analysis`                 | structured debug log workflow: copy, reduce, categorize, cross-reference, report       |
-| `enhance-prompt`                     | transform vague UI/feature requests into structured specs with design system awareness |
-| `next-upgrade`                       | 9-step Next.js version migration workflow with codemod automation (13→14→15→16)        |
-| `vercel-deploy`                      | zero-auth Vercel deployment with framework auto-detection for 20+ frameworks           |
-| `shadcn-ui`                          | shadcn/ui: Tailwind CSS v4, Radix UI, dark mode, Next.js App Router setup              |
-| `web-perf`                           | 5-phase Core Web Vitals audit: LCP, CLS, INP thresholds and Chrome DevTools            |
-| `next-cache-components`              | Next.js 16 `'use cache'` directive, `cacheLife()`, `cacheTag()`, PPR patterns          |
+| Metric        | Count |
+| ------------- | ----- |
+| Total Skills  | 256   |
+| Active Skills | 256   |
+| Aliases       | 0     |
+| Domains       | 22    |
+| Categories    | 25    |
 
-### Skill Discovery
+---
 
-**Skill Catalog Location:** `.claude/context/artifacts/catalogs/skill-catalog.md`
+## Complete Skill Table
+
+| Skill                                          | Domain        | Category        | Description                                                                                                                 |
+| ---------------------------------------------- | ------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `ai-ml-expert`                                 | ai-ml         | AI/ML           | AI and ML expert covering PyTorch, TensorFlow, Hugging Face, scikit-learn, LLM integration, RAG pipelines, MLOps, and pr... |
+| `architecture-review`                          | architecture  | Architecture    | Architecture review and design validation. Evaluates system designs against best practices, identifies anti-patterns, an... |
+| `diagram-generator`                            | architecture  | Architecture    | Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system arc... |
+| `agent-creator`                                | creator       | Creator Tools   | Creates specialized AI agents on-demand when no existing agent matches a request. Use when the Router cannot find a suit... |
+| `artifact-lifecycle`                           | creator       | Other           | Unified lifecycle management for all framework artifacts (skills, agents, hooks, workflows, templates, schemas)             |
+| `hook-creator`                                 | creator       | Other           | Creates and registers hooks for the Claude Code framework. Handles pre/post tool execution, validation, memory, and sess... |
+| `schema-creator`                               | creator       | Other           | Creates JSON Schema validation files for skills, agents, hooks, workflows, and data structures. Ensures type safety and ... |
+| `skill-creator`                                | creator       | Creator Tools   | Create, validate, and convert skills for the agent ecosystem. Enforces standardized structure for consistency. Enables s... |
+| `template-creator`                             | creator       | Other           | Creates and registers templates for agents, skills, workflows, hooks, and code patterns. Handles post-creation catalog u... |
+| `template-renderer`                            | creator       | Other           | Render templates by replacing {{TOKEN}} placeholders with actual values, supporting all three templates (specification, ... |
+| `workflow-creator`                             | creator       | Other           | Creates multi-agent orchestration workflows for complex tasks. Handles enterprise workflows, operational procedures, and... |
+| `data-expert`                                  | database      | Other           | Data processing expert including parsing, transformation, and validation                                                    |
+| `database-architect`                           | database      | Database        | Database design and optimization specialist. Schema design, query optimization, indexing strategies, data modeling, and ... |
+| `database-expert`                              | database      | Other           | Database expert including Prisma, Supabase, SQL, and NoSQL patterns                                                         |
+| `pandas-data-manipulation-rules`               | database      | Other           | Focuses on pandas-specific rules for data manipulation, including method chaining, data selection using loc/iloc, and gr... |
+| `text-to-sql`                                  | database      | Database        | Convert natural language queries to SQL. Use for database queries, data analysis, and reporting.                            |
+| `async-operations`                             | development   | Other           | Specifies the preferred syntax for asynchronous operations using async/await and onMount for component initialization. T... |
+| `code-analyzer`                                | development   | Other           | Static code analysis and complexity metrics                                                                                 |
+| `code-quality-expert`                          | development   | Code Quality    | Code quality expert including clean code, style guides, and refactoring                                                     |
+| `code-style-validator`                         | development   | Other           | Programmatic code style validation using AST analysis. Complements (not replaces) code-style rules by providing automate... |
+| `comprehensive-unit-testing-with-pytest`       | development   | Other           | Aims for high test coverage using pytest, testing both common and edge cases.                                               |
+| `debugging`                                    | development   | Troubleshooting | Systematic 4-phase debugging with root cause investigation. Use when fixing bugs to prevent random fixes.                   |
+| `logging-module-usage`                         | development   | Other           | Employs the logging module judiciously to log important events, warnings, and errors.                                       |
+| `ripgrep`                                      | development   | Other           | Enhanced code search with custom ripgrep binary supporting ES module extensions and advanced patterns.                      |
+| `tdd`                                          | development   | Testing         | Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing mi... |
+| `test-generator`                               | development   | Other           | Generates test code from specifications, components, and API endpoints. Creates unit tests, integration tests, and E2E t... |
+| `aws-cloud-ops`                                | devops        | DevOps          | AWS cloud operations for CloudWatch, S3, Lambda, EC2, and IAM                                                               |
+| `ci-cd-implementation-rule`                    | devops        | Other           | Uses GitHub Actions or GitLab CI for CI/CD implementation.                                                                  |
+| `cloud-devops-expert`                          | devops        | Other           | Cloud and DevOps expert including AWS, GCP, Azure, and Terraform                                                            |
+| `configuration-management`                     | devops        | Other           | Configuration management techniques                                                                                         |
+| `container-expert`                             | devops        | Other           | Container orchestration expert including Docker, Kubernetes, Helm, and service mesh                                         |
+| `containerization-rules`                       | devops        | Other           | Rules for creating and maintaining Dockerfiles.                                                                             |
+| `docker-compose`                               | devops        | DevOps          | Docker Compose container orchestration and management. Manage multi-container applications, services, networks, and volu... |
+| `gcloud-cli`                                   | devops        | Other           | Google Cloud CLI operations and resource management                                                                         |
+| `helm-chart-scaffolding`                       | devops        | Other           | Design, organize, and manage Helm charts for templating and packaging Kubernetes applications with reusable configuratio... |
+| `incident-runbook-templates`                   | devops        | Other           | Create structured incident response runbooks with step-by-step procedures, escalation paths, and recovery actions. Use w... |
+| `k8s-manifest-generator`                       | devops        | Other           | Create production-ready Kubernetes manifests for Deployments, Services, ConfigMaps, and Secrets following best practices... |
+| `k8s-security-policies`                        | devops        | Other           | Implement Kubernetes security policies including NetworkPolicy, PodSecurityPolicy, and RBAC for production-grade securit... |
+| `kubernetes-flux`                              | devops        | DevOps          | Kubernetes cluster management and troubleshooting. Query pods, deployments, services, logs, and events. Supports context... |
+| `on-call-handoff-patterns`                     | devops        | Other           | Master on-call shift handoffs with context transfer, escalation procedures, and documentation. Use when transitioning on... |
+| `postmortem-writing`                           | devops        | Other           | Write effective blameless postmortems with root cause analysis, timelines, and action items. Use when conducting inciden... |
+| `sentry-monitoring`                            | devops        | Other           | Sentry error tracking and performance monitoring for real-time visibility into application errors, performance issues, a... |
+| `terraform-infra`                              | devops        | DevOps          | Terraform infrastructure operations with safety controls                                                                    |
+| `doc-generator`                                | documentation | Documentation   | Generates comprehensive documentation from code, APIs, and specifications. Creates API documentation, developer guides, ... |
+| `readme`                                       | documentation | Other           | Use when creating, updating, or generating README and documentation files for projects and libraries                        |
+| `writing-skills`                               | documentation | Documentation   | TDD applied to documentation - create production-ready skills. Use when authoring new skills. Includes writing style gui... |
+| `api-development-expert`                       | frameworks    | Other           | API development expert including REST design, OpenAPI, and documentation                                                    |
+| `frontend-expert`                              | frameworks    | Other           | Frontend development expert including UI/UX patterns, responsive design, and accessibility                                  |
+| `graphql-expert`                               | frameworks    | Other           | GraphQL expert including schema design, Apollo Client/Server, and caching                                                   |
+| `nextjs-expert`                                | frameworks    | Frameworks      | Next.js framework expert including App Router, Server Components, and API routes                                            |
+| `react-best-practices-vercel`                  | frameworks    | Frameworks      | React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, r... |
+| `react-expert`                                 | frameworks    | Frameworks      | React ecosystem expert including hooks, state management, component patterns, React 19 features, Shadcn UI, and Radix pr... |
+| `state-management-expert`                      | frameworks    | Other           | State management expert including MobX, Redux, Zustand, and reactive patterns                                               |
+| `svelte-expert`                                | frameworks    | Other           | Svelte and SvelteKit expert including components, stores, and routing                                                       |
+| `git-expert`                                   | git           | Version Control | Advanced Git operations wrapper. Optimizes token usage by guiding complex git workflows into efficient CLI commands.        |
+| `gitops-workflow`                              | git           | Other           | Implement GitOps workflows with ArgoCD and Flux for automated, declarative Kubernetes deployments with continuous reconc... |
+| `chrome-browser`                               | integration   | Integration     | Browser automation with two integrations - Chrome DevTools MCP (always available, performance tracing) and Claude-in-Chr... |
+| `github-mcp`                                   | integration   | Integration     | GitHub API operations - repositories, issues, pull requests, actions, code security, discussions, gists, and more. Use f... |
+| `github-ops`                                   | integration   | Other           | Workflow for repository reconnaissance and operations using GitHub CLI (gh). Optimizes token usage by using structured A... |
+| `slack-notifications`                          | integration   | Other           | Slack messaging, channels, and notifications - send messages, manage channels, interact with users, upload files, and ad... |
+| `web3-expert`                                  | integration   | Other           | Web3 and blockchain expert including Solidity, Ethereum, and smart contracts                                                |
+| `comprehensive-type-annotations`               | languages     | Other           | Requires detailed type annotations for all Python functions, methods, and class members.                                    |
+| `cpp`                                          | languages     | Other           | C++ coding standards and best practices.                                                                                    |
+| `go-expert`                                    | languages     | Languages       | Go programming expert including APIs, gRPC, concurrency, and best practices                                                 |
+| `java-expert`                                  | languages     | Other           | Java and Spring Boot expert including REST APIs, JPA, and microservices                                                     |
+| `jupyter-notebook-best-practices`              | languages     | Other           | Guidelines for structuring and documenting Jupyter notebooks for reproducibility and clarity.                               |
+| `nodejs-expert`                                | languages     | Other           | Node.js backend expert including Express, NestJS, and async patterns                                                        |
+| `php-expert`                                   | languages     | Other           | PHP expert including Laravel, WordPress, and Drupal development                                                             |
+| `prioritize-python-3-10-features`              | languages     | Other           | Prioritizes the use of new features available in Python 3.12 and later versions.                                            |
+| `python-backend-expert`                        | languages     | Languages       | Python backend expert including Django, FastAPI, Flask, SQLAlchemy, and async patterns                                      |
+| `typescript-expert`                            | languages     | Languages       | TypeScript and JavaScript expert including type systems, patterns, and tooling                                              |
+| `context-compressor`                           | memory        | Memory          | Context compression and summarization methodology. Techniques for reducing token usage while preserving decision-critica... |
+| `context-driven-development`                   | memory        | Other           | Context-Driven Development methodology - treating project context as managed artifacts alongside code for consistent AI ... |
+| `framework-context`                            | memory        | Memory          | Load and synthesize framework architecture context for reflection and planning tasks.                                       |
+| `project-analyzer`                             | memory        | Other           | Automated brownfield codebase analysis. Detects project type, frameworks, dependencies, architecture patterns, and gener... |
+| `project-onboarding`                           | memory        | Other           | Guided project onboarding for new codebases. Helps agents understand project structure, build systems, test commands, an... |
+| `recommend-evolution`                          | memory        | Memory          | Detect capability gaps and record standardized evolution recommendations.                                                   |
+| `recovery`                                     | memory        | Other           | Workflow recovery protocol for resuming workflows after context loss, session interruption, or errors. Handles state rec... |
+| `session-handoff`                              | memory        | Memory          | Prepare context for new conversations when session is lost or ending. Creates handoff documents that capture current sta... |
+| `android-expert`                               | mobile        | Mobile          | Comprehensive Android development expert covering Jetpack Compose, Kotlin coroutines/Flow, Architecture Components, Hilt... |
+| `expo-framework-rule`                          | mobile        | Other           | Expo Framework-specific guidelines. Includes best practices for Views, Blueprints, and Extensions.                          |
+| `expo-mobile-app-rule`                         | mobile        | Other           | Specifies best practices and conventions for Expo-based mobile app development.                                             |
+| `ios-expert`                                   | mobile        | Mobile          | iOS development expert including SwiftUI, UIKit, and Apple frameworks                                                       |
+| `mobile-first-design-rules`                    | mobile        | Other           | Focuses on rules and best practices for mobile-first design and responsive typography using tailwind.                       |
+| `mobile-ui-development-rule`                   | mobile        | Other           | General rules pertaining to Mobile UI development. Covers UI/UX best practices, state management, and navigation pattern... |
+| `react-native-skills-vercel`                   | mobile        | Mobile          | React Native and Expo best practices for building performant mobile apps. Use                                               |
+| `advanced-elicitation`                         | other         | Other           | Use when you want to improve response quality through meta-cognitive reasoning. Applies 15+ reasoning methods to reconsi... |
+| `agent-evaluation`                             | other         | Other           | LLM-as-judge evaluation framework with 5-dimension rubric (accuracy, groundedness, coherence, completeness, helpfulness)... |
+| `agent-tool-design`                            | other         | Other           | The Agent Tool Contract — 5 principles for designing tools agents call reliably: predictable signature, rich errors, tok... |
+| `agent-updater`                                | other         | Other           | Research-backed workflow to refresh existing agent prompts/frontmatter with diff-based risk scoring, TDD gates, and ecos... |
+| `angular-expert`                               | other         | Other           | Angular framework expert including components, services, RxJS, templates, and testing                                       |
+| `artifact-integrator`                          | other         | Other           | Deep integration analysis for newly created artifacts                                                                       |
+| `artifact-updater`                             | other         | Other           | [DEPRECATED] Route through type-specific updaters: skill-updater, agent-updater, workflow-updater.                          |
+| `ask-questions-if-underspecified`              | other         | Other           | Ask the minimum clarifying questions before implementation when requirements are ambiguous or missing crucial details       |
+| `assimilate`                                   | other         | Other           | Benchmark external agent frameworks and convert findings into a concrete TDD upgrade backlog for agent-studio evolution.... |
+| `astro-expert`                                 | other         | Other           | Astro framework expert including components, content collections, and integrations                                          |
+| `audit-context-building`                       | other         | Other           | Ultra-granular code analysis for deep architectural context building. Line-by-line and block-by-block analysis using Fir... |
+| `authentication-flow-rules`                    | other         | Other           | OAuth 2.1 compliant authentication flows (MANDATORY Q2 2026). PKCE required for ALL clients, Implicit Flow removed, mode... |
+| `best-practices-guidelines`                    | other         | Other           | Specifies best practices, including following RESTful API design principles, implementing responsive design, using Zod f... |
+| `brainstorming`                                | other         | Other           | Socratic design refinement before implementation — challenges assumptions, surfaces alternatives, identifies risks befor... |
+| `build-tools-expert`                           | other         | Other           | Build tools expert including Vite, Webpack, and bundler configuration                                                       |
+| `building-secure-contracts`                    | other         | Other           | Smart contract and secure API contract security analysis — invariant checking, access control, reentrancy, and integer o... |
+| `code-semantic-search`                         | other         | Other           | Semantic code search using Phase 1 vector embeddings and Phase 2 hybrid search.                                             |
+| `code-structural-search`                       | other         | Other           | Use ast-grep for AST-based code pattern matching.                                                                           |
+| `command-creator`                              | other         | Other           | Creates command files for the Claude Code framework. Commands are user-facing shortcuts that delegate to skills.            |
+| `commit-validator`                             | other         | Other           | Validates commit messages against Conventional Commits specification using programmatic validation. Replaces the git-con... |
+| `compliance-policy-check`                      | other         | Other           | Validate planned changes against local framework rules and policy guardrails before implementation or creation.             |
+| `composer-dependency-management`               | other         | Other           | Rules pertaining to Composer dependency management, promoting best practices for declaring and updating dependencies.       |
+| `content-security-scan`                        | other         | Other           | Automated security scanner for external skill/agent content fetched from GitHub or web sources. Runs a 7-step PASS/FAIL ... |
+| `context-degradation`                          | other         | Other           | Token-range severity zones (Green/Yellow/Orange/Red/Critical) with detection checklist, early warning indicators, and co... |
+| `convex-development-general`                   | other         | Other           | Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system... |
+| `creation-feasibility-gate`                    | other         | Other           | Validate whether a proposed new artifact is feasible in the current stack before creator workflows run.                     |
+| `debug-log-analysis`                           | other         | Other           | Structured debug log analysis for Claude Code sessions — copy log, run reducer, extract error patterns, correlate with f... |
+| `differential-review`                          | other         | Other           | Perform security-focused review of code diffs and pull requests, identifying newly introduced vulnerabilities, security ... |
+| `dispatching-parallel-agents`                  | other         | Other           | Concurrent investigation of independent failures. Use when multiple unrelated issues need parallel resolution.              |
+| `drizzle-orm-rules`                            | other         | Other           | Rules for using Drizzle ORM within the src/lib/db directory. Ensures consistent data modeling and database interactions.... |
+| `dry-principle`                                | other         | Other           | This rule enforces the Don't Repeat Yourself principle to avoid code duplication and improve maintainability.               |
+| `dto-conventions`                              | other         | Other           | Sets standards for Data Transfer Objects (DTOs), typically records, including parameter validation in compact canonical ... |
+| `dynamic-api-integration`                      | other         | Other           | Discover, parse, and call external HTTP APIs at runtime using OpenAPI specs, tool templates, and iterative chaining. Ada... |
+| `ecosystem-integrity-scanner`                  | other         | Other           | Deeply analyzes Agent Studio framework structural health: catching phantom require() references, wrong module depth path... |
+| `elixir-expert`                                | other         | Other           | Elixir and Phoenix expert including OTP, Ecto, and functional programming                                                   |
+| `enhance-prompt`                               | other         | Other           | Transforms vague UI/feature requests into structured, optimized prompts with design system awareness. Use when generatin... |
+| `eval-harness-updater`                         | other         | Other           | Refresh evaluation harnesses with live/fallback parser reliability, SLO gates, and regression checks.                       |
+| `feature-flag-management`                      | other         | Other           | Feature flag lifecycle management — toggling features safely, gradual rollouts, A/B testing patterns, and flag cleanup t... |
+| `fiber-logging-and-project-structure`          | other         | Other           | Applies best practices for logging, project structure, and environment variable usage specifically to the main applicati... |
+| `fiber-routing-and-csrf-protection`            | other         | Other           | Focuses on routing, CSRF protection, context handling, and template usage within the internal handlers directory.           |
+| `finishing-a-development-branch`               | other         | Other           | Complete development with structured merge/PR options. Use when ready to merge or submit work.                              |
+| `fix-review`                                   | other         | Other           | Verify fix commits address security findings without introducing new bugs or regressions. Analyzes diffs for anti-patter... |
+| `flutter-expert`                               | other         | Other           | Flutter and Dart expert including widgets, state management, and platform integration                                       |
+| `form-and-actions-in-sveltekit`                | other         | Other           | Describes Form and Actions implementations.                                                                                 |
+| `form-validation-with-zod`                     | other         | Other           | Enforces the use of Zod for form validation throughout the project.                                                         |
+| `function-length-and-responsibility`           | other         | Other           | This rule enforces the single responsibility principle, ensuring functions are short and focused.                           |
+| `gamedev-expert`                               | other         | Other           | Game development expert including DragonRuby, Unity, and game mechanics                                                     |
+| `gemini-cli-security`                          | other         | Other           | AI-powered code vulnerability analysis and dependency scanning using Gemini CLI security extension patterns. Detects har... |
+| `htmx-expert`                                  | other         | Other           | HTMX expert including hypermedia patterns, Django/Flask integration                                                         |
+| `insecure-defaults`                            | other         | Other           | Detect hardcoded credentials, default passwords, fail-open configurations, insecure default settings, and other security... |
+| `integration`                                  | other         | Other           | Integration skills                                                                                                          |
+| `jira-pm`                                      | other         | Other           | Jira project management and issue tracking integration                                                                      |
+| `kafka-development-practices`                  | other         | Other           | Applies general coding standards and best practices for Kafka development with Scala.                                       |
+| `large-data-with-dask`                         | other         | Other           | Specific optimization strategies for Python scripts working with larger-than-memory datasets via Dask.                      |
+| `linear-pm`                                    | other         | Other           | Linear project management - issues, projects, cycles, and roadmaps. Use for Linear-related tasks like managing issues, t... |
+| `llm-council`                                  | other         | Other           | Orchestrate multi-LLM parallel debate and synthesis. Dispatches prompts to available omega CLI wrappers in parallel, col... |
+| `medusa`                                       | other         | Other           | Medusa rules and best practices. These rules should be used when building applications with Medusa.                         |
+| `medusa-security`                              | other         | Other           | AI-first security scanning with Medusa. 3,000+ detection patterns covering AI/ML, agents, MCP, RAG, prompt injection, an... |
+| `memory-quality-auditor`                       | other         | Other           | Audit memory retrieval quality (drift, staleness, citation-groundedness) and produce remediation backlog.                   |
+| `memory-search`                                | other         | Other           | Semantic search over global agent memory. Use to retrieve previously learned patterns, decisions, gotchas, and workaroun... |
+| `modern-python`                                | other         | Other           | Modern Python tooling best practices using uv, ruff, ty, and pytest. Mandates the Trail of Bits Python coding standards ... |
+| `monorepo-and-tooling`                         | other         | Other           | Outlines the monorepo structure and tooling conventions, emphasizing the use of Taskfile.yml, and proper handling of env... |
+| `multi-agent-architecture-reference`           | other         | Other           | Decision matrix for selecting multi-agent topologies (Supervisor, Swarm, Hierarchical, Conductor) with token economics, ... |
+| `nativescript`                                 | other         | Other           | NativeScript best practices and patterns for mobile applications                                                            |
+| `nativewind-and-tailwind-css-compatibility`    | other         | Other           | Provides specific version compatibility notes for NativeWind and Tailwind CSS to prevent common installation errors.        |
+| `next-cache-components`                        | other         | Other           | Next.js 16 caching model expertise covering the 'use cache' directive, cacheLife() API, cacheTag() for invalidation, cac... |
+| `next-upgrade`                                 | other         | Other           | Structured workflow for upgrading Next.js applications across major versions. Use when migrating a Next.js project from ... |
+| `omega-claude-cli`                             | other         | Other           | Shell out to Claude Code CLI to invoke a second Claude session headlessly. Useful for cross-validation, second opinions,... |
+| `omega-codex-cli`                              | other         | Other           | Shell out to OpenAI Codex CLI for headless code generation, analysis, and question-answering. Optimized for code tasks. ... |
+| `omega-cursor-cli`                             | other         | Other           | Shell out to Cursor Agent CLI for headless IDE-aware code tasks. Supports multi-model routing (auto mode routes to Claud... |
+| `omega-gemini-cli`                             | other         | Other           | Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming... |
+| `paraglide-js-internationalization-i18n`       | other         | Other           | Details Paraglide.js i18n implementations.                                                                                  |
+| `pipeline-reflection-ux`                       | other         | Other           | Improve router-facing pipeline and reflection narration to reduce noisy status churn and make Step 0/Reflection outcomes... |
+| `planning-with-files`                          | other         | Other           | Manus-style file-based planning for complex tasks. Use task_plan.md, findings.md, and progress.md to maintain persistent... |
+| `poetry-rye-dependency-management`             | other         | Other           | Specifies Poetry or Rye for dependency management in Python projects.                                                       |
+| `powershell-expert`                            | other         | Other           | Master PowerShell scripting and Windows system administration for 2026. Enforces cross-platform compatibility (PS 7+), s... |
+| `prd-generator`                                | other         | Other           | Generate structured Product Requirements Documents using hypothesis-driven methodology with Implementation Phases tracki... |
+| `proactive-audit`                              | other         | Other           | Automated health checks for framework artifacts modified during a pipeline. Validates hook syntax, security patterns (SE... |
+| `property-based-testing`                       | other         | Other           | fast-check patterns for JS/TS — 6 canonical property categories with worked examples targeting agent-studio utilities (p... |
+| `pyqt6-ui-development-rules`                   | other         | Other           | Specific rules for PyQt6 based UI development focusing on UI/UX excellence and performance.                                 |
+| `qa-workflow`                                  | other         | Other           | QA validation and fix loop workflow — validates implementation completeness then iterates fix cycles until all acceptanc... |
+| `qwik-expert`                                  | other         | Other           | Qwik framework expert including resumability, lazy loading, and optimization                                                |
+| `ralph-loop`                                   | other         | Orchestration   | Autonomous iteration loop with dual-mode support. Standalone mode uses Stop hooks. Multi-agent mode uses router-managed ... |
+| `receiving-code-review`                        | other         | Other           | Process and act on code review feedback. Use when receiving review results.                                                 |
+| `requesting-code-review`                       | other         | Other           | Dispatch code-reviewer agent for two-stage review. Use after completing implementation tasks.                               |
+| `restcontroller-conventions`                   | other         | Other           | Specifies standards for RestController classes, including API route mappings, HTTP method annotations, dependency inject... |
+| `rule-auditor`                                 | other         | Other           | Validates code against coding standards and best practices. Reports compliance violations and suggests fixes.               |
+| `rule-creator`                                 | other         | Other           | Creates rule files for the Claude Code framework. Rules are markdown files in .claude/rules/ that are auto-loaded by Cla... |
+| `rust-expert`                                  | other         | Other           | Rust programming expert including ownership, borrowing, lifetimes, async Tokio patterns, error handling, trait system, p... |
+| `scientific-skills/biopython`                  | scientific    | Scientific      | BioPython integration (accessed via parent `scientific-skills` skill)                                                       |
+| `scientific-skills/hypothesis-generation`      | scientific    | Scientific      | Hypothesis generation (accessed via parent `scientific-skills` skill)                                                       |
+| `scientific-skills/literature-review`          | scientific    | Scientific      | Literature review (accessed via parent `scientific-skills` skill)                                                           |
+| `scientific-skills/rdkit`                      | scientific    | Scientific      | RDKit chemistry toolkit (accessed via parent `scientific-skills` skill)                                                     |
+| `scientific-skills/scanpy`                     | scientific    | Scientific      | Scanpy single-cell analysis (accessed via parent `scientific-skills` skill)                                                 |
+| `scientific-skills/scientific-schematics`      | scientific    | Scientific      | Scientific diagram generation (accessed via parent `scientific-skills` skill)                                               |
+| `semgrep-rule-creator`                         | other         | Other           | Create custom Semgrep rules for detecting project-specific vulnerabilities, enforcing coding standards, and building dom... |
+| `seo-and-meta-tags-in-sveltekit`               | other         | Other           | Provides SEO and Meta Tags guidelines in SvelteKit.                                                                         |
+| `service-class-conventions`                    | other         | Other           | Defines the structure and implementation of service classes, enforcing the use of interfaces, ServiceImpl classes, DTOs ... |
+| `shadcn-ui`                                    | other         | Other           | Deep expertise on shadcn/ui component library including installation, customization, theming, and accessibility patterns... |
+| `sharp-edges`                                  | other         | Other           | Living catalogue of 7 known hazard entries (SE-01 through SE-07) specific to agent-studio: Windows backslash paths, prot... |
+| `skill-updater`                                | other         | Other           | Research-backed skill refresh workflow for updating existing skills with TDD checkpoints, memory-aware integration, and ... |
+| `smart-revert`                                 | other         | Other           | Git-aware smart revert for tracks, phases, and tasks. Handles rewritten history, finds related commits, and provides saf... |
+| `solidjs-expert`                               | other         | Other           | SolidJS expert including reactivity, components, and store patterns                                                         |
+| `sparc-methodology`                            | other         | Other           | SPARC (Specification, Pseudocode, Architecture, Refinement, Completion) comprehensive development methodology with multi... |
+| `spec-critique`                                | other         | Other           | Self-critique specification documents using extended thinking — surfaces hidden assumptions, contradictions, missing edg... |
+| `spec-init`                                    | other         | Other           | Unified skill that guides spec creation through structured, interactive process.                                            |
+| `spec-to-code-compliance`                      | other         | Other           | Verify that implementation code faithfully implements its specification — checks function contracts, API contracts, and ... |
+| `stale-module-pruner`                          | other         | Other           | Ripgrep-powered dead-code crawler that finds stale, broken, or orphaned JavaScript/CJS/MJS modules in the Agent Studio f... |
+| `starknet-react-rules`                         | other         | Other           | Specific rules for Starknet React projects, focusing on blockchain integration.                                             |
+| `static-analysis`                              | other         | Other           | Run CodeQL and Semgrep static analysis with SARIF output for vulnerability detection, code quality assessment, and secur... |
+| `strict-user-requirements-adherence`           | other         | Other           | Strictly adheres to specified user flow and game rules, making sure to follow documented features.                          |
+| `subagent-driven-development`                  | other         | Other           | Execute plans via autonomous agents with two-stage review per task. Use for complex implementations requiring quality ga... |
+| `tall-stack-general`                           | other         | Other           | General guidelines for TALL stack development, emphasizing Laravel and PHP best practices.                                  |
+| `tauri-native-api-integration`                 | other         | Other           | Rules for integrating Tauri's native APIs in the frontend application.                                                      |
+| `tauri-security-rules`                         | other         | Other           | Security-related rules for Tauri application development.                                                                   |
+| `tauri-svelte-typescript-general`              | other         | Other           | General rules for developing desktop applications using Tauri with Svelte and TypeScript for the frontend.                  |
+| `tauri-svelte-ui-components`                   | other         | Other           | Rules specific to Svelte UI component development in Tauri applications.                                                    |
+| `token-saver-context-compression`              | other         | Other           | Search-aware context compression workflow for agent-studio. Use pnpm hybrid search + token-saver compression, then persi... |
+| `tool-creator`                                 | other         | Other           | Creates tool files for the Claude Code framework. Tools are executable utilities organized by category in .claude/tools/... |
+| `troubleshooting-regression`                   | other         | Other           | Regression troubleshooting workflow for hook/router/memory/search failures with enforced evidence and fix validation        |
+| `tsconfig-json-rules`                          | other         | Other           | Defines general rules for tsconfig.json. It suggest using strict TypeScript checks                                          |
+| `using-git-worktrees`                          | other         | Other           | Create isolated development workspaces with safety verification. Use when needing parallel development branches.            |
+| `variant-analysis`                             | other         | Other           | Discover vulnerability variants by identifying similar code patterns across a codebase using CodeQL and Semgrep pattern ... |
+| `vercel-ai-sdk-best-practices`                 | other         | Other           | Best practices for using the Vercel AI SDK in Next.js 15 applications with React Server Components and streaming capabil... |
+| `vercel-deploy`                                | other         | Other           | Zero-auth Vercel deployment workflow with automatic framework detection for 20+ frameworks. Use when deploying web appli... |
+| `vue-expert`                                   | other         | Other           | Vue.js ecosystem expert including Vue 3, Composition API, Nuxt, and Pinia                                                   |
+| `wave-executor`                                | other         | Orchestration   | Fresh-process orchestration for EPIC-tier batch pipelines. Spawns a new Bun process per wave via the Claude Agent SDK, p... |
+| `web-perf`                                     | other         | Other           | Structured 5-phase web performance audit workflow with Core Web Vitals thresholds and actionable optimization recommenda... |
+| `webapp-testing`                               | other         | Other           | Test local web applications using Playwright with Python. Verify frontend functionality, debug UI behavior, capture scre... |
+| `webmcp-browser-tools`                         | other         | Other           | WebMCP — browser-side API that lets web applications expose their own functionality as MCP tools TO AI agents. Use when ... |
+| `workflow-updater`                             | other         | Other           | Research-backed workflow to refresh existing workflow files with phase-gate regression checks, idempotency validation, a... |
+| `writing`                                      | other         | Other           | Deprecated alias for writing-skills skill                                                                                   |
+| `yara-authoring`                               | other         | Other           | YARA-X detection rule authoring with expert judgment, linting, atom analysis, and best practices. Teaches how to think l... |
+| `complexity-assessment`                        | planning      | Other           | AI-based complexity assessment for task analysis. Use when determining the appropriate workflow, phases, and validation ... |
+| `plan-generator`                               | planning      | Planning        | Creates structured plans from requirements. Generates comprehensive plans with steps, dependencies, risks, and success c... |
+| `checklist-generator`                          | quality       | Quality         | Generate context-aware quality checklists for code review and QA using IEEE 1028 base standards plus LLM contextual addi... |
+| `response-rater`                               | quality       | Other           | Rates responses and plans against quality rubrics. Used for plan validation, response quality audits, and multi-agent co... |
+| `verification-before-completion`               | quality       | Quality         | Gate function preventing unverified completion claims. Use before claiming any task is done.                                |
+| `interactive-requirements-gathering`           | requirements  | Other           | Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice pat... |
+| `spec-gathering`                               | requirements  | Requirements    | Requirements gathering workflow for specification creation. Use when starting a new feature, task, or project that needs... |
+| `arxiv-mcp`                                    | research      | Research        | Search and retrieve academic papers from arXiv.org using WebFetch and Exa. No MCP server required - uses existing tools ... |
+| `research-synthesis`                           | research      | Research        | Research best practices and synthesize into design decisions for artifact creation. Invoke BEFORE any creator skill to e... |
+| `scientific-skills`                            | scientific    | Scientific      | Comprehensive scientific research toolkit with 139 specialized skills for biology, chemistry, medicine, data science, an... |
+| `auth-security-expert`                         | security      | Security        | OAuth 2.1, JWT (RFC 8725), encryption, and authentication security expert. Enforces 2026 security standards.                |
+| `binary-analysis-patterns`                     | security      | Other           | Master binary analysis patterns including disassembly, decompilation, control flow analysis, and code pattern recognitio... |
+| `memory-forensics`                             | security      | Other           | Master memory forensics techniques including memory acquisition, process analysis, and artifact extraction using Volatil... |
+| `protocol-reverse-engineering`                 | security      | Other           | Master network protocol reverse engineering including packet analysis, protocol dissection, and custom protocol document... |
+| `security-architect`                           | security      | Security        | Security architecture and threat modeling. OWASP Top 10 2025 analysis, OWASP Agentic AI Top 10 (ASI01-ASI10), AI/LLM sec... |
+| `consensus-voting`                             | specialized   | Orchestration   | Byzantine consensus voting for multi-agent decision making. Implements voting protocols, conflict resolution, and agreem... |
+| `dependency-analyzer`                          | specialized   | Other           | Analyzes project dependencies, detects outdated packages, identifies breaking changes, and suggests safe update strategi... |
+| `filesystem`                                   | specialized   | Other           | File system operations guidance - read, write, search, and manage files using Claude Code's built-in tools.                 |
+| `insight-extraction`                           | specialized   | Other           | Extract actionable insights from completed coding sessions. Use when a session completes to capture learnings for future... |
+| `sequential-thinking`                          | specialized   | Specialized     | Sequential thinking and structured problem solving. Break down complex problems into steps with revision and branching c... |
+| `skill-discovery`                              | specialized   | Other           | How agents discover and use skills. Use to understand skill invocation protocol.                                            |
+| `smart-debug`                                  | specialized   | Other           | AI-assisted debugging specialist with deep knowledge of modern debugging tools, observability platforms, and automated r... |
+| `summarize-changes`                            | specialized   | Other           | Structured workflow for summarizing code changes after completing tasks. Creates clear, actionable summaries of what was... |
+| `swarm-coordination`                           | specialized   | Orchestration   | Multi-agent swarm coordination patterns. Orchestrates parallel agent execution, manages agent communication, handles tas... |
+| `task-management-protocol`                     | specialized   | Other           | Protocol for task synchronization, context handoff, and cross-session coordination using Claude Code task tools. Ensures... |
+| `thinking-tools`                               | specialized   | Specialized     | Structured thinking patterns for agent self-reflection. Includes think-about-collected-information (validate research), ... |
+| `tool-search`                                  | specialized   | Other           | Semantic tool search with embeddings for scalable tool discovery. Enables on-demand tool loading to reduce context usage... |
+| `track-management`                             | specialized   | Other           | Track management methodology - creating and managing logical work units (features, bugs, refactors) through specificatio... |
+| `workflow-patterns`                            | specialized   | Other           | TDD task implementation patterns - red-green-refactor cycle, phase checkpoints, git commits, and verification protocols ... |
+| `accessibility`                                | styling       | Other           | Ensure accessibility in UI components including semantic HTML, ARIA attributes, keyboard navigation, and WCAG 2.2 AA com... |
+| `design-and-user-experience-guidelines`        | styling       | Other           | Specifies design and user experience guidelines, including dark mode compatibility, responsive design, performance optim... |
+| `html-tailwind-css-and-javascript-expert-rule` | styling       | Other           | Sets the AI to act as an expert in HTML, Tailwind CSS, and vanilla JavaScript, focusing on clarity and readability for a... |
+| `styling-expert`                               | styling       | Styling         | CSS and styling expert including Tailwind, CSS-in-JS, and responsive design                                                 |
+| `ui-components-expert`                         | styling       | Other           | UI component library expert including Chakra, Material UI, and Mantine                                                      |
+| `visual-and-observational-rules`               | styling       | Other           | Defines the visual aspects of the game and how the player observes the world. This includes map color-coding, screen eff... |
+| `web-design-guidelines-vercel`                 | styling       | Styling         | Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit ... |
+
+---
+
+## Skills by Domain
+
+### ai-ml (1 skills)
+
+`ai-ml-expert`
+
+### architecture (2 skills)
+
+`architecture-review`, `diagram-generator`
+
+### creator (8 skills)
+
+`agent-creator`, `artifact-lifecycle`, `hook-creator`, `schema-creator`, `skill-creator`, `template-creator`, `template-renderer`, `workflow-creator`
+
+### database (5 skills)
+
+`data-expert`, `database-architect`, `database-expert`, `pandas-data-manipulation-rules`, `text-to-sql`
+
+### development (10 skills)
+
+`async-operations`, `code-analyzer`, `code-quality-expert`, `code-style-validator`, `comprehensive-unit-testing-with-pytest`, `debugging`, `logging-module-usage`, `ripgrep`, `tdd`, `test-generator`
+
+### devops (17 skills)
+
+`aws-cloud-ops`, `ci-cd-implementation-rule`, `cloud-devops-expert`, `configuration-management`, `container-expert`, `containerization-rules`, `docker-compose`, `gcloud-cli`, `helm-chart-scaffolding`, `incident-runbook-templates`, `k8s-manifest-generator`, `k8s-security-policies`, `kubernetes-flux`, `on-call-handoff-patterns`, `postmortem-writing`, `sentry-monitoring`, `terraform-infra`
+
+### documentation (3 skills)
+
+`doc-generator`, `readme`, `writing-skills`
+
+### frameworks (8 skills)
+
+`api-development-expert`, `frontend-expert`, `graphql-expert`, `nextjs-expert`, `react-best-practices-vercel`, `react-expert`, `state-management-expert`, `svelte-expert`
+
+### git (2 skills)
+
+`git-expert`, `gitops-workflow`
+
+### integration (5 skills)
+
+`chrome-browser`, `github-mcp`, `github-ops`, `slack-notifications`, `web3-expert`
+
+### languages (10 skills)
+
+`comprehensive-type-annotations`, `cpp`, `go-expert`, `java-expert`, `jupyter-notebook-best-practices`, `nodejs-expert`, `php-expert`, `prioritize-python-3-10-features`, `python-backend-expert`, `typescript-expert`
+
+### memory (8 skills)
+
+`context-compressor`, `context-driven-development`, `framework-context`, `project-analyzer`, `project-onboarding`, `recommend-evolution`, `recovery`, `session-handoff`
+
+### mobile (7 skills)
+
+`android-expert`, `expo-framework-rule`, `expo-mobile-app-rule`, `ios-expert`, `mobile-first-design-rules`, `mobile-ui-development-rule`, `react-native-skills-vercel`
+
+### other (132 skills)
+
+`advanced-elicitation`, `agent-evaluation`, `agent-tool-design`, `agent-updater`, `angular-expert`, `artifact-integrator`, `artifact-updater`, `ask-questions-if-underspecified`, `assimilate`, `astro-expert`, `audit-context-building`, `authentication-flow-rules`, `best-practices-guidelines`, `brainstorming`, `build-tools-expert`, `building-secure-contracts`, `code-semantic-search`, `code-structural-search`, `command-creator`, `commit-validator`, `compliance-policy-check`, `composer-dependency-management`, `content-security-scan`, `context-degradation`, `convex-development-general`, `creation-feasibility-gate`, `debug-log-analysis`, `differential-review`, `dispatching-parallel-agents`, `drizzle-orm-rules`, `dry-principle`, `dto-conventions`, `dynamic-api-integration`, `ecosystem-integrity-scanner`, `elixir-expert`, `enhance-prompt`, `eval-harness-updater`, `feature-flag-management`, `fiber-logging-and-project-structure`, `fiber-routing-and-csrf-protection`, `finishing-a-development-branch`, `fix-review`, `flutter-expert`, `form-and-actions-in-sveltekit`, `form-validation-with-zod`, `function-length-and-responsibility`, `gamedev-expert`, `gemini-cli-security`, `htmx-expert`, `insecure-defaults`, `integration`, `jira-pm`, `kafka-development-practices`, `large-data-with-dask`, `linear-pm`, `llm-council`, `medusa`, `medusa-security`, `memory-quality-auditor`, `memory-search`, `modern-python`, `monorepo-and-tooling`, `multi-agent-architecture-reference`, `nativescript`, `nativewind-and-tailwind-css-compatibility`, `next-cache-components`, `next-upgrade`, `omega-claude-cli`, `omega-codex-cli`, `omega-cursor-cli`, `omega-gemini-cli`, `paraglide-js-internationalization-i18n`, `pipeline-reflection-ux`, `planning-with-files`, `poetry-rye-dependency-management`, `powershell-expert`, `prd-generator`, `proactive-audit`, `property-based-testing`, `pyqt6-ui-development-rules`, `qa-workflow`, `qwik-expert`, `receiving-code-review`, `requesting-code-review`, `restcontroller-conventions`, `rule-auditor`, `rule-creator`, `rust-expert`, `scientific-skills/biopython`, `scientific-skills/hypothesis-generation`, `scientific-skills/literature-review`, `scientific-skills/rdkit`, `scientific-skills/scanpy`, `scientific-skills/scientific-schematics`, `semgrep-rule-creator`, `seo-and-meta-tags-in-sveltekit`, `service-class-conventions`, `shadcn-ui`, `sharp-edges`, `skill-updater`, `smart-revert`, `solidjs-expert`, `sparc-methodology`, `spec-critique`, `spec-init`, `spec-to-code-compliance`, `stale-module-pruner`, `starknet-react-rules`, `static-analysis`, `strict-user-requirements-adherence`, `subagent-driven-development`, `tall-stack-general`, `tauri-native-api-integration`, `tauri-security-rules`, `tauri-svelte-typescript-general`, `tauri-svelte-ui-components`, `token-saver-context-compression`, `tool-creator`, `troubleshooting-regression`, `tsconfig-json-rules`, `using-git-worktrees`, `variant-analysis`, `vercel-ai-sdk-best-practices`, `vercel-deploy`, `vue-expert`, `wave-executor`, `web-perf`, `webapp-testing`, `webmcp-browser-tools`, `workflow-updater`, `writing`, `yara-authoring`
+
+### planning (2 skills)
+
+`complexity-assessment`, `plan-generator`
+
+### quality (3 skills)
+
+`checklist-generator`, `response-rater`, `verification-before-completion`
+
+### requirements (2 skills)
+
+`interactive-requirements-gathering`, `spec-gathering`
+
+### research (2 skills)
+
+`arxiv-mcp`, `research-synthesis`
+
+### scientific (1 skills)
+
+`scientific-skills`
+
+### security (5 skills)
+
+`auth-security-expert`, `binary-analysis-patterns`, `memory-forensics`, `protocol-reverse-engineering`, `security-architect`
+
+### specialized (14 skills)
+
+`consensus-voting`, `dependency-analyzer`, `filesystem`, `insight-extraction`, `sequential-thinking`, `skill-discovery`, `smart-debug`, `summarize-changes`, `swarm-coordination`, `task-management-protocol`, `thinking-tools`, `tool-search`, `track-management`, `workflow-patterns`
+
+### styling (7 skills)
+
+`accessibility`, `design-and-user-experience-guidelines`, `html-tailwind-css-and-javascript-expert-rule`, `styling-expert`, `ui-components-expert`, `visual-and-observational-rules`, `web-design-guidelines-vercel`
+
+---
+
+## Skill Discovery
+
+**Skill Catalog Location:** `.claude/docs/skill-catalog.md`
 
 **Discovery Process:**
 
-1. Read catalog
-2. Search by category or keyword
-3. Invoke with: `Skill({ skill: "<skill-name>" })`
+1. Search this table by domain, category, or keyword
+2. Invoke with: `Skill({ skill: "<skill-name>" })`
 
 ### Invocation Pattern
 
@@ -93,10 +398,11 @@ Read('.claude/skills/tdd/SKILL.md');
 
 - **@CREATOR_SKILLS_TABLE.md** - Creator skills (agent-creator, skill-creator, etc.)
 - **@ENTERPRISE_WORKFLOWS.md** - Enterprise workflow paths
+- **@SKILL_USAGE_GUIDE.md** - Skill selection decision tree
 - **CLAUDE.md Section 7** - Skill Invocation Protocol
 
 ---
 
 ## BACK TO MAIN
 
-See **CLAUDE.md** Section 8.5 for inline summary.
+[CLAUDE.md Section 8.5](../CLAUDE.md#85-workflow-enhancement-skills)

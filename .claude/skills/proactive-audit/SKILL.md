@@ -99,13 +99,13 @@ For each changed artifact, apply the relevant checks from this matrix:
 
 ### Skill Files (`.claude/skills/**/SKILL.md`)
 
-| Check ID | Check                                       | Command                                                                   | Severity |
-| -------- | ------------------------------------------- | ------------------------------------------------------------------------- | -------- |
-| S-01     | Skill appears in skill-catalog.md           | `grep "<skill-name>" .claude/context/artifacts/catalogs/skill-catalog.md` | HIGH     |
-| S-02     | At least one agent has skill in frontmatter | `grep -r "<skill-name>" .claude/agents/ --include="*.md"`                 | MEDIUM   |
-| S-03     | Skill appears in CLAUDE.md Section 8.5      | `grep "<skill-name>" .claude/CLAUDE.md`                                   | MEDIUM   |
-| S-04     | SKILL.md has valid frontmatter              | Verify `name:`, `description:`, `version:` fields exist                   | MEDIUM   |
-| S-05     | Validate skills (if available)              | `pnpm validate:skills 2>&1`                                               | LOW      |
+| Check ID | Check                                       | Command                                                   | Severity |
+| -------- | ------------------------------------------- | --------------------------------------------------------- | -------- |
+| S-01     | Skill appears in skill-catalog.md           | `grep "<skill-name>" .claude/docs/skill-catalog.md`       | HIGH     |
+| S-02     | At least one agent has skill in frontmatter | `grep -r "<skill-name>" .claude/agents/ --include="*.md"` | MEDIUM   |
+| S-03     | Skill appears in CLAUDE.md Section 8.5      | `grep "<skill-name>" .claude/CLAUDE.md`                   | MEDIUM   |
+| S-04     | SKILL.md has valid frontmatter              | Verify `name:`, `description:`, `version:` fields exist   | MEDIUM   |
+| S-05     | Validate skills (if available)              | `pnpm validate:skills 2>&1`                               | LOW      |
 
 ### Agent Files (`.claude/agents/**/*.md`)
 

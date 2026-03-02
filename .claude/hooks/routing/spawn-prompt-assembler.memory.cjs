@@ -215,11 +215,11 @@ async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot 
   const { analyzeIntent } = libRequire(path.join('memory', 'intent-analyzer.cjs'));
   const context = await memoryManager.loadMemoryForContextAsync(projectRoot);
   const recentSessions = Array.isArray(context?.recent_sessions) ? context.recent_sessions : [];
-  let compressionSummary = recentSessions
+  const compressionSummary = recentSessions
     .map(session => `- ${session.summary || ''}`.trim())
     .filter(Boolean)
     .join('\n');
-  let recentMessages = recentSessions
+  const recentMessages = recentSessions
     .map(
       session => `[${session.source || 'mtm'}] ${session.timestamp || ''} ${session.summary || ''}`
     )
@@ -227,27 +227,7 @@ async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot 
     .filter(Boolean)
     .join('\n');
 
-  try {
-    const { getContextForSearch } = libRequire(
-      path.join('memory', 'session-context-for-search.cjs')
-    );
-    const searchContext = getContextForSearch(query, {
-      projectRoot,
-      maxArchives: 3,
-      maxMessages: 20,
-    });
-    if (searchContext.summaries.length > 0) {
-      compressionSummary = searchContext.summaries
-        .map(summary => `- ${summary}`.trim())
-        .filter(Boolean)
-        .join('\n');
-    }
-    if (searchContext.recentMessages.length > 0) {
-      recentMessages = searchContext.recentMessages.map(line => line.trim()).join('\n');
-    }
-  } catch (err) {
-    debugLog('spawn-prompt-assembler', 'Context for search failed (ignored)', err);
-  }
+  // Removed dead code: session-context-for-search.cjs is archived/missing
 
   const analysis = await analyzeIntent(
     {

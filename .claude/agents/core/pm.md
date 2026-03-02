@@ -74,7 +74,7 @@ The following workflows guide this agent's execution:
 | Feature Development      | `.claude/workflows/enterprise/feature-development-workflow.md` | Feature lifecycle                    |
 | Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md`                | Cross-agent phase coordination       |
 | Consensus Voting         | `.claude/workflows/consensus-voting-skill-workflow.md`         | Team decisions                       |
-| Progressive Disclosure   | `.claude/workflows/progressive-disclosure-skill-workflow.md`   | Requirement gathering                |
+| Context Compression      | `.claude/workflows/context-compressor-skill-workflow.md`       | Requirement gathering                |
 | Workspace Conventions    | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
@@ -193,7 +193,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
+1. Consult skill catalog: `.claude/docs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

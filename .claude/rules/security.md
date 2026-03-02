@@ -198,7 +198,7 @@ For comprehensive security review, invoke:
 
 ## Related Workflows
 
-- `.claude/workflows/security/security-review-workflow.md` - Structured security review process
+- `.claude/workflows/security-architect-skill-workflow.md` - Structured security review process
 - `.claude/workflows/core/router-decision.md` - Gate 2 (Security gate)
 
 ## Related References

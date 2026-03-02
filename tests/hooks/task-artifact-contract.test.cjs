@@ -215,6 +215,7 @@ test('pre-completion blocks completed status when required output file is missin
       tool_input: {
         taskId,
         status: 'completed',
+        metadata: { summary: 'Test task completion with artifact validation checks' },
       },
     };
     const result = runHook(PRE_COMPLETION_HOOK, input, {
@@ -247,6 +248,7 @@ test('pre-completion allows completed status when required output exists and is 
       tool_input: {
         taskId,
         status: 'completed',
+        metadata: { summary: 'Test task completion with artifact validation checks' },
       },
     };
     const result = runHook(PRE_COMPLETION_HOOK, input, {
@@ -284,6 +286,7 @@ test('pre-completion blocks when required output points to read-safety placehold
       tool_input: {
         taskId,
         status: 'completed',
+        metadata: { summary: 'Test task completion with artifact validation checks' },
       },
     };
     const result = runHook(PRE_COMPLETION_HOOK, input, {
@@ -323,6 +326,7 @@ test('pre-completion remains backward compatible when no required output contrac
       tool_input: {
         taskId: 'task-artifact-legacy-compat',
         status: 'completed',
+        metadata: { summary: 'Test task completion with artifact validation checks' },
       },
     };
     const result = runHook(PRE_COMPLETION_HOOK, input, {
@@ -350,6 +354,7 @@ test('pre-completion warn mode does not block missing required outputs', () => {
       tool_input: {
         taskId,
         status: 'completed',
+        metadata: { summary: 'Test task completion with artifact validation checks' },
       },
     };
     const result = runHook(PRE_COMPLETION_HOOK, input, {

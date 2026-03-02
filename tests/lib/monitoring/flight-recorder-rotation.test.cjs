@@ -12,6 +12,7 @@ const {
   rotateIfNeeded,
   pruneOldFiles,
   listRotatedFiles,
+  _logBuffer,
 } = require('../../../.claude/lib/monitoring/flight-recorder.cjs');
 
 test('flight recorder rotates oversized log and keeps writing', () => {
@@ -25,6 +26,7 @@ test('flight recorder rotates oversized log and keeps writing', () => {
     assert.equal(fs.existsSync(filePath), false, 'Active file should have been renamed');
 
     record({ event: 'test_event', component: 'test', traceId: 'trace-1' }, filePath);
+    _logBuffer.flushSync();
     assert.equal(fs.existsSync(filePath), true, 'New active file should exist');
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });

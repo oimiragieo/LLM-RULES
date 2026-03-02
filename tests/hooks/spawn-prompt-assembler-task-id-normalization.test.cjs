@@ -4,6 +4,7 @@ const assert = require('node:assert');
 const {
   normalizeTaskIdReferences,
   normalizeStalePathReferences,
+  ensureMandatorySpawnPreflight,
 } = require('../../.claude/hooks/routing/spawn-prompt-assembler.cjs');
 
 test('normalizeTaskIdReferences rewrites hardcoded task placeholders to active task id', () => {
@@ -71,7 +72,6 @@ test('normalizeTaskIdReferences rewrites "task #N" role markers and numeric task
 
 test('normalizeStalePathReferences rewrites known stale report and code paths', () => {
   const input = [
-    '.claude/lib/memory/memory-query.cjs',
     '.claude/lib/utils/safe-json-parse.cjs',
     'tests/metrics/metrics-schema-contract.test.cjs',
     'tests/metrics/metrics-reader-rollups.test.cjs',
@@ -80,7 +80,6 @@ test('normalizeStalePathReferences rewrites known stale report and code paths', 
   ].join('\n');
 
   const output = normalizeStalePathReferences(input);
-  assert.ok(output.includes('.claude/lib/memory/core/memory-query.cjs'));
   assert.ok(output.includes('.claude/lib/utils/safe-json.cjs'));
   assert.ok(output.includes('tests/lib/monitoring/metrics-schema-contract.test.cjs'));
   assert.ok(output.includes('tests/lib/monitoring/metrics-reader-rollups.test.cjs'));
@@ -88,7 +87,7 @@ test('normalizeStalePathReferences rewrites known stale report and code paths', 
   assert.ok(
     output.includes('.claude/context/reports/implementation-patterns-research-2026-02-13.md')
   );
-  assert.equal(output.includes('.claude/lib/memory/memory-query.cjs'), false);
+  assert.equal(output.includes('.claude/lib/utils/safe-json-parse.cjs'), false);
 });
 
 test('normalizes unix-style drive paths in prompt text on Windows', () => {
@@ -106,4 +105,12 @@ test('normalizes unix-style drive paths in prompt text on Windows', () => {
   } else {
     assert.equal(output, input);
   }
+});
+
+test('ensureMandatorySpawnPreflight injects task/session and read-before-edit guidance', () => {
+  const output = ensureMandatorySpawnPreflight('Implement fix', 'task-real-777');
+  assert.ok(output.includes('task_id "task-real-777"'));
+  assert.ok(output.includes('never session_id'));
+  assert.ok(output.includes('Read file before Edit/Write'));
+  assert.ok(output.includes('max 3 retries'));
 });

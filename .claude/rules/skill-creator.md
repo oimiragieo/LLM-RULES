@@ -69,7 +69,7 @@ paths:
 
 ### Related Workflows
 
-- `.claude/workflows/creation/ecosystem-creation-workflow.md` - Complete artifact lifecycle
+- `.claude/workflows/core/ecosystem-creation-workflow.md` - Complete artifact lifecycle
 - Skill creation triggers companion checks (hooks, commands, schemas)
 
 ## Post-Creation Checklist
@@ -79,7 +79,7 @@ After creating a skill, MUST:
 - [ ] Create rules file (`.claude/rules/{skill-name}.md`)
 - [ ] Create schema (`.claude/schemas/skill-{skill-name}-output.schema.json`)
 - [ ] Create command (`.claude/commands/{skill-name}.md`)
-- [ ] Update skill catalog (`.claude/context/artifacts/catalogs/skill-catalog.md`)
+- [ ] Update skill catalog (`.claude/docs/skill-catalog.md`)
 - [ ] Assign to at least one agent
 - [ ] Add CLAUDE.md reference (if routing keyword applies)
 - [ ] Test skill invocation with `Skill({ skill: '{skill-name}' })`

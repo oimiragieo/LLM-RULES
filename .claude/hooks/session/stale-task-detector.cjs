@@ -10,6 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const PROJECT_ROOT = (() => {
   try {
@@ -43,7 +44,7 @@ const TASKUPDATE_STATE_FILE = path.join(
 function readJSON(filePath) {
   try {
     if (!fs.existsSync(filePath)) return null;
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return safeParseJSON(fs.readFileSync(filePath, 'utf8'), null);
   } catch (_e) {
     return null;
   }
@@ -101,4 +102,38 @@ function main() {
   process.stdout.write(JSON.stringify({ continue: true }));
 }
 
-main();
+/**
+ * Detect stale tasks from a task list.
+ * Exported for testability.
+ *
+ * @param {Array<{id: string, subject: string, status: string, updatedAt?: string}>} tasks
+ * @param {number} [thresholdMs] - Stale threshold in ms (default: STALE_THRESHOLD_MS)
+ * @returns {string[]} Warning messages for stale tasks
+ */
+function detectStaleTasks(tasks, thresholdMs) {
+  const threshold = thresholdMs != null ? thresholdMs : STALE_THRESHOLD_MS;
+  if (!Array.isArray(tasks)) return [];
+  const now = Date.now();
+  const warnings = [];
+
+  for (const task of tasks) {
+    if (!task || task.status !== 'in_progress') continue;
+    if (!task.updatedAt) continue;
+    const ageMs = now - new Date(task.updatedAt).getTime();
+    if (isNaN(ageMs) || ageMs <= threshold) continue;
+    const ageMin = Math.round(ageMs / 60000);
+    const taskId = task.id || 'unknown';
+    const subject = task.subject || '';
+    warnings.push(
+      `[STALE-TASK] Task #${taskId} "${subject}" has been in_progress for ${ageMin}m — router may have forgotten to call TaskUpdate(completed)`
+    );
+  }
+
+  return warnings;
+}
+
+module.exports = { detectStaleTasks };
+
+if (require.main === module) {
+  main();
+}

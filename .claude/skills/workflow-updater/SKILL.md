@@ -9,8 +9,8 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord, WebSearch, Web
 args: '--workflow <name-or-path> [--trigger reflection|evolve|manual] [--mode plan|execute]'
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 # Workflow Updater

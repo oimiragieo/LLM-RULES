@@ -1,12 +1,15 @@
 ---
 name: webapp-testing
 description: Test local web applications using Playwright with Python. Verify frontend functionality, debug UI behavior, capture screenshots, and view browser console logs. Supports static HTML files, dynamic webapps with running servers, and automated test generation.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash, Glob, Grep]
 args: '<target-url|html-file> [--screenshot] [--headless] [--test-plan <path>]'
+agents: [qa, frontend-pro, developer]
+category: 'Testing'
+tags: [testing, playwright, browser, e2e, webapp, frontend, ui, screenshots]
 best_practices:
   - Always run helper scripts with --help first before reading source code
   - Wait for networkidle state before inspecting dynamic content
@@ -15,8 +18,8 @@ best_practices:
   - Check browser console logs for JavaScript errors alongside visual checks
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: null
+verified: true
+lastVerifiedAt: '2026-03-01'
 ---
 
 # Web Application Testing Skill
@@ -295,10 +298,40 @@ playwright install chromium
 | `chrome-browser`  | Alternative browser automation approach               |
 | `test-generator`  | Generate test code from testing patterns              |
 
-## Memory Protocol
+## Iron Laws
 
-**Before starting**: Check if there are existing test scripts or Playwright configurations in the project.
+1. **NEVER INSPECT DOM BEFORE NETWORKIDLE** — Dynamic web applications load content asynchronously. Inspecting the DOM before the page has stabilized produces incorrect or incomplete results.
+2. **NEVER use shell=True** when spawning server processes — always use `shell=False` with array arguments (SE-01 security requirement).
+3. **ALWAYS capture console errors** — browser console errors indicate real issues; never ignore them in test reports.
+4. **ALWAYS terminate server processes in finally blocks** — leaked server processes corrupt future test runs and consume resources.
+5. **NEVER hardcode waits** — use `page.wait_for_selector()` or `page.wait_for_load_state()` instead of `time.sleep()`.
 
-**During testing**: Write discovered selectors and page structure to report files. Capture screenshots at key interaction points.
+## Anti-Patterns
 
-**After completion**: Record testing patterns, discovered page structure, and any browser console errors to `.claude/context/memory/learnings.md` for future testing sessions.
+| Anti-Pattern                            | Why It Fails                                                       | Correct Approach                                                   |
+| --------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| Inspecting DOM before networkidle       | Dynamic content not yet loaded; assertions produce false negatives | Always `page.wait_for_load_state('networkidle')` before inspection |
+| Using `time.sleep()` for waits          | Flaky — too short on slow machines, too long on fast ones          | Use explicit waits: `wait_for_selector`, `wait_for_load_state`     |
+| Ignoring browser console errors         | Real JS errors go undetected; test passes but app is broken        | Always capture and report console errors in every test run         |
+| Using `shell=True` for server processes | Command injection vulnerability                                    | Always `shell=False` with list arguments                           |
+| Not cleaning up server processes        | Port conflicts, resource leaks on subsequent runs                  | Use `try/finally` to guarantee `server_proc.terminate()`           |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+
+Read `.claude/context/memory/learnings.md`
+
+Check for:
+
+- Existing test scripts or Playwright configurations in the project
+- Known page selectors from previous sessions
+- Previously discovered console errors or flaky test patterns
+
+**After completing:**
+
+- Testing pattern found -> `.claude/context/memory/learnings.md`
+- Test flakiness or browser issue -> `.claude/context/memory/issues.md`
+- Decision about test strategy -> `.claude/context/memory/decisions.md`
+
+> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.

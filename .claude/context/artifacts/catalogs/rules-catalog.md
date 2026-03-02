@@ -443,7 +443,7 @@ Miscellaneous specialized rules.
 
 ## Related Documentation
 
-- **Skill Catalog:** `.claude/context/artifacts/catalogs/skill-catalog.md`
+- **Skill Catalog:** `.claude/docs/skill-catalog.md`
 - **Command Catalog:** `.claude/context/artifacts/catalogs/command-catalog.md`
 - **Agent Routing:** `.claude/docs/@AGENT_ROUTING_TABLE.md`
 - **CLAUDE.md:** `.claude/CLAUDE.md`

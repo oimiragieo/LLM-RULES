@@ -2,11 +2,11 @@
 'use strict';
 /**
  * ecosystem-integrity-scanner - Enterprise Skill Script
- * Wraps scripts/validation/validate-ecosystem-integrity.cjs and surfaces
- * its output in a structured format for agent consumption.
+ * NOTE: The underlying validator (validate-ecosystem-integrity.cjs) has been
+ * removed. This skill now operates in stub mode and returns a deprecation
+ * notice. Use the proactive-audit skill or validate:full pipeline instead.
  */
 
-const { execSync } = require('child_process');
 const path = require('path');
 
 // Parse arguments
@@ -44,6 +44,29 @@ Description:
 
 const ROOT = process.cwd();
 const validatorPath = path.join(ROOT, 'scripts', 'validation', 'validate-ecosystem-integrity.cjs');
+
+const fs = require('fs');
+if (!fs.existsSync(validatorPath)) {
+  const msg =
+    'ecosystem-integrity-scanner: validate-ecosystem-integrity.cjs has been removed.\n' +
+    'Use Skill({ skill: "proactive-audit" }) or run pnpm validate:full instead.';
+  if (options.json) {
+    console.log(
+      JSON.stringify({
+        status: 'UNAVAILABLE',
+        errors: 0,
+        warnings: 1,
+        findings: [msg],
+        raw: msg,
+      })
+    );
+  } else {
+    process.stderr.write(msg + '\n');
+  }
+  process.exit(0);
+}
+
+const { execSync } = require('child_process');
 
 let stdout = '';
 let stderr = '';

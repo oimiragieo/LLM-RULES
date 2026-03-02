@@ -10,7 +10,7 @@ test('External Integration Routing', async t => {
     const classification = classifyIntent(prompt);
 
     assert.strictEqual(classification.intent, 'artifact-integrator');
-    assert.strictEqual(classification.source, 'intent_keywords_broad');
+    assert.strictEqual(classification.source, 'intent_keywords');
   });
 
   await t.test('should trigger artifact-integrator for "repo" keyword', () => {
@@ -34,7 +34,8 @@ test('External Integration Routing', async t => {
         'Please research this github repo: hmohamed01/powershell-expert and turn it into a skill.';
       const classification = classifyIntent(prompt);
 
-      assert.strictEqual(classification.intent, 'artifact-integrator');
+      // The intent may match 'researcher' first but disambiguation routes to artifact-integrator
+      assert.strictEqual(classification.defaultAgent, 'artifact-integrator');
     }
   );
 });

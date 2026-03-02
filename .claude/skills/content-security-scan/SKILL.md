@@ -1,7 +1,7 @@
 ---
 name: content-security-scan
 description: 'Automated security scanner for external skill/agent content fetched from GitHub or web sources. Runs a 7-step PASS/FAIL security gate against fetched markdown/text content.'
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -37,7 +37,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-20T00:00:00.000Z
+lastVerifiedAt: '2026-03-01'
 ---
 
 # Content Security Scan Skill

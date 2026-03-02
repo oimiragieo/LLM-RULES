@@ -75,7 +75,6 @@ The following workflows guide this agent's execution:
 
 | Workflow              | Path                                                           | When to Use                          |
 | --------------------- | -------------------------------------------------------------- | ------------------------------------ |
-| Domain Development    | `.claude/workflows/domain-development-workflow.md`             | TDD development cycle                |
 | Feature Development   | `.claude/workflows/enterprise/feature-development-workflow.md` | End-to-end feature work              |
 | Workspace Conventions | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
@@ -360,7 +359,7 @@ Skill({ skill: 'tdd' }); // Test-Driven Development
 | ---------------- | ------------------- | ------------------------------ |
 | Svelte frontend  | `svelte-expert`     | Svelte UI patterns             |
 | React frontend   | `react-expert`      | React patterns                 |
-| Testing strategy | `testing-expert`    | Comprehensive testing patterns |
+| Testing strategy | `tdd`               | Comprehensive testing patterns |
 | TypeScript work  | `typescript-expert` | TypeScript best practices      |
 | File operations  | `filesystem`        | File system patterns           |
 

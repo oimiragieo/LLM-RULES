@@ -21,14 +21,12 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 | Hook                            | Location                    | Trigger                                     | Default | Key Env Variables                                                                                                    |
 | ------------------------------- | --------------------------- | ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
 | `routing-guard.cjs`             | `.claude/hooks/routing/`    | PreToolUse(Task, Edit, Write, NotebookEdit) | block   | `PLANNER_FIRST_ENFORCEMENT`, `SECURITY_REVIEW_ENFORCEMENT`, `TASKLIST_FIRST_ENFORCEMENT`, `STATE_STALE_THRESHOLD_MS` |
-| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Write, Edit)                     | block   | `CREATOR_GUARD`                                                                                                      |
+| `unified-creator-guard.cjs`     | `.claude/hooks/routing/`    | PreToolUse(Edit, Write, NotebookEdit)       | block   | `CREATOR_GUARD`                                                                                                      |
 | `unified-pre-write-hook.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Write, Edit)                     | block   | Multiple (11 consolidated checks)                                                                                    |
 | `bash-command-validator.cjs`    | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `BASH_VALIDATOR_FAIL_OPEN`                                                                                           |
 | `shell-injection-validator.cjs` | `.claude/hooks/safety/`     | PreToolUse(Bash)                            | block   | `SHELL_INJECTION_VALIDATOR`                                                                                          |
 | `pre-task-unified.cjs`          | `.claude/hooks/routing/`    | PreToolUse(Task)                            | block   | `TASKLIST_FIRST_ENFORCEMENT`, `LOOP_PREVENTION_MODE`                                                                 |
-| `tool-scope-validator.cjs`      | `.claude/hooks/routing/`    | PreToolUse(All)                             | warn    | `TOOL_SCOPE_VALIDATOR`                                                                                               |
 | `reflection-step0-guard.cjs`    | `.claude/hooks/reflection/` | PreToolUse(TaskList)                        | block   | `REFLECTION_STEP0_ENFORCEMENT`                                                                                       |
-| `error-tracker-hook.cjs`        | `.claude/hooks/monitoring/` | PostToolUse(All)                            | N/A     | None (monitoring only)                                                                                               |
 | `post-creation-integration.cjs` | `.claude/hooks/workflow/`   | PostToolUse(TaskUpdate)                     | warn    | `INTEGRATION_ENFORCEMENT`                                                                                            |
 | `drift-detector.cjs`            | `.claude/hooks/session/`    | UserPromptSubmit                            | N/A     | None (always enabled, informational)                                                                                 |
 | `adaptive-quality-gate.cjs`     | `.claude/hooks/session/`    | PreToolUse(Edit, Write, NotebookEdit)       | N/A     | None (always enabled, informational)                                                                                 |
@@ -36,7 +34,7 @@ Detailed enforcement hook specifications for router-first protocol, including ho
 | `pre-compact.cjs`               | `.claude/hooks/session/`    | Stop                                        | N/A     | None (always enabled, informational)                                                                                 |
 | `bypass-audit-hook.cjs`         | `.claude/hooks/safety/`     | PostToolUse(Edit, Write, NotebookEdit)      | N/A     | `BYPASS_AUDIT_ENABLED`, `BYPASS_AUDIT_PATH`, `BYPASS_AUDIT_*_THRESHOLD`, `BYPASS_AUDIT_CORRELATION_WINDOW_MS`        |
 
-**Note:** `config-model-validator.cjs` and `intent-agent-match.cjs` were consolidated into `routing-guard.cjs` (Check 11 and Check 10 respectively) as of 2026-02-09. `task-status-enforcement.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09. `creator-compliance-validator.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09.
+**Note:** `config-model-validator.cjs` and `intent-agent-match.cjs` were consolidated into `routing-guard.cjs` (Check 11 and Check 10 respectively) as of 2026-02-09. `task-status-enforcement.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09. `creator-compliance-validator.cjs` was consolidated into `pre-completion-validation.cjs` as of 2026-02-09. `tool-scope-validator.cjs` and `error-tracker-hook.cjs` were archived (no longer active).
 
 ---
 
@@ -179,7 +177,7 @@ This hook consolidates these original hooks:
 5. `routing-guard.cjs` (subset) - Router write restrictions
 6. `router-write-guard.cjs` - Router cannot use Write/Edit
 7. `unified-creator-guard.cjs` - Creator workflow paths
-8. `tdd-check.cjs` - TDD enforcement (informational)
+8. TDD enforcement (consolidated into `unified-pre-write-hook.cjs`, check name: `tdd-check`)
 9. `plan-evolution-guard.cjs` - Plan file integrity
 10. `unified-evolution-guard.cjs` - Evolution state integrity
 11. `suggest-compact.cjs` - File size suggestions (informational)
@@ -534,13 +532,7 @@ Well under 100ms budget for non-blocking hooks.
 
 ---
 
-## 12. creator-compliance-validator.cjs (Deprecated)
-
-_Note: This hook was consolidated into `pre-completion-validation.cjs` as of 2026-02-09._
-
----
-
-## 13. SEC-ICE-001: Artifact Name Validation
+## 12. SEC-ICE-001: Artifact Name Validation
 
 **Location:** `.claude/lib/creators/companion-check.cjs` (library, not hook)
 **Scope:** All creator skills
@@ -772,64 +764,48 @@ AUTO_SPAWN_EVENT_CAP=10 claude
 
 ## Hook Registration
 
-Hooks are registered in `.claude/settings.json`:
+Hooks are registered in `.claude/settings.json` using the `{matcher, hooks: [{type, command}]}` format. See `.claude/settings.json` for the complete, authoritative hook registration configuration.
+
+**Abbreviated example** (actual format):
 
 ```json
 {
   "hooks": {
-    "routing-guard.cjs": {
-      "trigger": "PreToolUse",
-      "tool": "Task",
-      "enabled": true
-    },
-    "unified-creator-guard.cjs": {
-      "trigger": "PreToolUse",
-      "tool": ["Write", "Edit"],
-      "enabled": true
-    },
-    "unified-pre-write-hook.cjs": {
-      "trigger": "PreToolUse",
-      "tool": ["Write", "Edit"],
-      "enabled": true
-    },
-    "bash-command-validator.cjs": {
-      "trigger": "PreToolUse",
-      "tool": "Bash",
-      "enabled": true
-    },
-    "shell-injection-validator.cjs": {
-      "trigger": "PreToolUse",
-      "tool": "Bash",
-      "enabled": true
-    },
-    "pre-task-unified.cjs": {
-      "trigger": "PreToolUse",
-      "tool": "Task",
-      "enabled": true
-    },
-    "tool-scope-validator.cjs": {
-      "trigger": "PreToolUse",
-      "tool": "*",
-      "enabled": true
-    },
-    "reflection-step0-guard.cjs": {
-      "trigger": "PreToolUse",
-      "tool": "TaskList",
-      "enabled": true
-    },
-    "config-model-validator.cjs": {
-      "trigger": "PreToolUse",
-      "tool": "Task",
-      "enabled": true
-    },
-    "error-tracker-hook.cjs": {
-      "trigger": "PostToolUse",
-      "tool": "*",
-      "enabled": true
-    }
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/routing/unified-creator-guard.cjs" },
+          { "type": "command", "command": "node .claude/hooks/safety/write-pretool-bundle.cjs" }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/task-pretool-orchestrator.cjs"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/workflow/post-completion-chain.cjs" },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow/post-creation-integration.cjs"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
+
+> **Note:** `user-prompt-unified.cjs` is called indirectly via `user-prompt-orchestrator.cjs` (the registered UserPromptSubmit hook), not registered directly in settings.json.
 
 ---
 
@@ -1105,8 +1081,16 @@ If state reset fails, routing-guard.cjs detects stale state via:
 
 ### drift-detector.cjs
 
-**Event Type:** UserPromptSubmit
+**Event Type:** UserPromptSubmit (indirect -- NOT directly registered in settings.json)
 **Purpose:** Tracks original session intent, warns on drift after 6+ edits with <20% keyword overlap
+
+**Wiring Note:** `drift-detector.cjs` is NOT directly registered in `settings.json`. It is called indirectly through `user-prompt-orchestrator.cjs`, which IS registered on `UserPromptSubmit`. The orchestrator spawns three child processes on every user prompt:
+
+1. `state-reset.cjs` -- resets session state
+2. `drift-detector.cjs` -- detects session drift (this hook)
+3. `vector-db-warmstart.cjs` -- warms the vector DB
+
+Pattern: `settings.json` --> `user-prompt-orchestrator.cjs` --> `[state-reset.cjs, drift-detector.cjs, vector-db-warmstart.cjs]`
 
 **State File:** `.claude/context/runtime/drift-state.json`
 

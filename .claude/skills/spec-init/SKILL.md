@@ -18,8 +18,7 @@ Unified skill that guides spec creation through structured, interactive process.
 
 Wraps these existing skills:
 
-- progressive-disclosure (requirements gathering)
-- spec-validator (schema validation)
+- context-compressor (progressive disclosure mode for requirements gathering)
 - plan-generator (plan from spec)
 
 ## Workflow
@@ -38,7 +37,7 @@ Auto-detect from description:
 
 ### 2. Progressive Disclosure v2 (Adaptive, 5-7 questions)
 
-Invoke progressive-disclosure with adaptive algorithm:
+Invoke context-compressor (progressive disclosure mode) with adaptive algorithm:
 
 ```javascript
 const { AdaptiveQuestioner } = require('.claude/lib/utils/adaptive-discloser.cjs');
@@ -161,7 +160,7 @@ Auto-populate spec from answers:
 
 Validate spec against schema:
 
-- Invoke spec-validator skill
+- Validate spec completeness inline
 - Check: all required sections present
 - Check: at least 3 acceptance criteria
 - Check: effort estimate in days
@@ -227,8 +226,7 @@ spec-init workflow:
 
 ## Integration Points
 
-- progressive-disclosure (requirements gathering)
-- spec-validator (schema validation)
+- context-compressor (progressive disclosure mode for requirements gathering)
 - plan-generator (next step)
 - track-metadata schema (metadata)
 

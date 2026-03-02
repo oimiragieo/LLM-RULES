@@ -36,6 +36,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - context-compressor
+  - convex-development-general
   - token-saver-context-compression
   - debugging
   - git-expert
@@ -79,7 +80,6 @@ The following workflows guide this agent's execution:
 
 | Workflow              | Path                                                           | When to Use                          |
 | --------------------- | -------------------------------------------------------------- | ------------------------------------ |
-| Domain Development    | `.claude/workflows/domain-development-workflow.md`             | TDD development cycle                |
 | Feature Development   | `.claude/workflows/enterprise/feature-development-workflow.md` | End-to-end feature work              |
 | Workspace Conventions | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 

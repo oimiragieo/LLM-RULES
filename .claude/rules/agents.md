@@ -1,15 +1,20 @@
 # Agent Quick Reference
 
-## Core Agents
+## Core Agents (`core/`)
 
-| Agent         | Purpose                 | When to Use                 |
-| ------------- | ----------------------- | --------------------------- |
-| router        | Route work to agents    | Every request (automatic)   |
-| planner       | Implementation planning | Complex features, refactors |
-| architect     | System design           | Architectural decisions     |
-| developer     | TDD implementation      | New features, bug fixes     |
-| code-reviewer | Code review             | After writing code          |
-| qa            | Testing strategy        | Test execution, quality     |
+| Agent     | Purpose                 | When to Use                 |
+| --------- | ----------------------- | --------------------------- |
+| router    | Route work to agents    | Every request (automatic)   |
+| planner   | Implementation planning | Complex features, refactors |
+| architect | System design           | Architectural decisions     |
+| developer | TDD implementation      | New features, bug fixes     |
+| qa        | Testing strategy        | Test execution, quality     |
+
+## Specialized Agents (`specialized/`)
+
+| Agent         | Purpose     | When to Use        |
+| ------------- | ----------- | ------------------ |
+| code-reviewer | Code review | After writing code |
 
 ## Security & Documentation
 
@@ -29,7 +34,7 @@
 
 Available for specific technologies: `python-pro`, `typescript-pro`, `frontend-pro`, `devops-troubleshooter`, and 15+ others.
 
-See `.claude/context/agent-registry.json` for full list of 59 agents.
+See `.claude/context/agent-registry.json` for full list of 66 agents.
 
 ## Specialist-First Routing Law (IRON LAW)
 
@@ -49,7 +54,7 @@ See `.claude/context/agent-registry.json` for full list of 59 agents.
 | "integrate repo/onboard" | researcher | **artifact-integrator**   |
 | "debug production"       | developer  | **devops-troubleshooter** |
 
-**Why**: 59 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
+**Why**: 66 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
 
 ## Intent Classification (Semantic Matching)
 

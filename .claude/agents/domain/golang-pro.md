@@ -28,6 +28,7 @@ tools:
 skills:
   - debugging
   - fiber-routing-and-csrf-protection
+  - fiber-logging-and-project-structure
   - go-expert
   - task-management-protocol
   - tdd
@@ -73,7 +74,6 @@ The following workflows guide this agent's execution:
 
 | Workflow              | Path                                                           | When to Use                          |
 | --------------------- | -------------------------------------------------------------- | ------------------------------------ |
-| Domain Development    | `.claude/workflows/domain-development-workflow.md`             | TDD development cycle                |
 | Feature Development   | `.claude/workflows/enterprise/feature-development-workflow.md` | End-to-end feature work              |
 | Workspace Conventions | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 

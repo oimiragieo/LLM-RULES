@@ -7,8 +7,8 @@ const os = require('node:os');
 const {
   checkBashArtifactWriteSafety,
   checkAgentGuardrails,
-  readAgentGuardrailsStateAsync,
-  writeAgentGuardrailsStateAsync,
+  readAgentGuardrailsState,
+  writeAgentGuardrailsState,
 } = require('../../.claude/hooks/routing/pre-tool-unified.cjs');
 
 describe('pre-tool-unified agent guardrails', () => {
@@ -65,7 +65,7 @@ describe('pre-tool-unified agent guardrails', () => {
         },
       },
     };
-    writeAgentGuardrailsStateAsync(base, stateFile);
+    writeAgentGuardrailsState(base, stateFile);
   }
 
   test('blocks git commit when policy does not allow it', () => {
@@ -172,7 +172,7 @@ describe('pre-tool-unified agent guardrails', () => {
   test('reads/writes guardrail state file safely', () => {
     withTempGuardrailState(stateFile => {
       seedSession(stateFile, 'session-5');
-      const loaded = readAgentGuardrailsStateAsync(stateFile);
+      const loaded = readAgentGuardrailsState(stateFile);
       assert.ok(loaded.sessions['session-5']);
     });
   });

@@ -1,5 +1,6 @@
 ---
 name: multi-llm-consultant
+version: 1.0.0
 displayName: Multi-LLM Consultant
 category: domain
 model: sonnet
@@ -23,6 +24,10 @@ skills:
   - llm-council
   - verification-before-completion
   - ripgrep
+  - task-management-protocol
+  - code-semantic-search
+  - token-saver-context-compression
+  - memory-search
 triggerPhrases:
   - multiple perspectives
   - ask all LLMs
@@ -118,3 +123,17 @@ This agent should be spawned when user requests contain:
 - `omega-claude-cli` -- Claude Code CLI headless wrapper
 - `llm-council` -- Multi-LLM council orchestration protocol
 - `verification-before-completion` -- Evidence-based task completion
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
+
+<!-- agent-template-contract:v1 -->

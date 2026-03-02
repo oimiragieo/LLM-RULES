@@ -1,12 +1,14 @@
 ---
 name: yara-authoring
 description: YARA-X detection rule authoring with expert judgment, linting, atom analysis, and best practices. Teaches how to think like an expert YARA author for malware detection, threat hunting, and indicator-of-compromise identification using YARA-X (the Rust-based successor to legacy YARA).
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash, Glob, Grep]
 args: '<sample-path|hash|description> [--format yara-x|legacy] [--lint] [--atoms]'
+agents: [reverse-engineer, security-architect, penetration-tester]
+category: security
 best_practices:
   - Write rules targeting YARA-X syntax and features by default
   - Always include metadata fields (author, date, description, reference, hash)
@@ -15,8 +17,8 @@ best_practices:
   - Prefer specific byte patterns over broad wildcards to reduce false positives
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: null
+verified: true
+lastVerifiedAt: 2026-03-01T00:00:00.000Z
 ---
 
 # YARA Authoring Skill
@@ -60,13 +62,13 @@ This skill implements Trail of Bits' YARA authoring methodology for the agent-st
 - When reviewing YARA rules for quality and false positive rates
 - When building rule sets for automated scanning pipelines
 
-## Iron Law
+## Iron Laws
 
-```
-EVERY RULE MUST HAVE EFFICIENT ATOMS AND PASS LINTING
-```
-
-A YARA rule without efficient atoms will degrade scanner performance across the entire rule set. Always verify atom quality before deployment.
+1. **EVERY RULE MUST HAVE EFFICIENT ATOMS AND PASS LINTING** — a rule without efficient atoms degrades scanner performance across the entire rule set; always run `yr check` and `yr debug atoms` before deployment.
+2. **NEVER write rules without testing against both positive and negative samples** — false positives on clean files are as harmful as missed detections; validate FP rate before deploying.
+3. **ALWAYS include complete metadata** (author, date, description, reference, hash) — rules without metadata are unauditable and unmaintainable in enterprise rule sets.
+4. **NEVER use single-byte atoms or patterns starting with common bytes** (0x00, 0xFF, 0x90) — these generate massive false positive rates and degrade the entire YARA scanning pipeline.
+5. **ALWAYS use YARA-X toolchain (`yr`) by default** — legacy `yara`/`yarac` tooling lacks memory safety, performance optimizations, and modern module support; use YARA-X unless backward compatibility is explicitly required.
 
 ## YARA-X vs Legacy YARA
 
@@ -368,6 +370,16 @@ Before deploying any rule:
 | `variant-analysis`             | Find malware variants to tune rule coverage        |
 | `static-analysis`              | Automated analysis to complement YARA detection    |
 | `protocol-reverse-engineering` | Extract network signatures for YARA rules          |
+
+## Anti-Patterns
+
+| Anti-Pattern                         | Why It Fails                                                                          | Correct Approach                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Over-broad wildcards (`?? ?? ?? ??`) | Poor atoms cause rule to run against every file byte; massive performance degradation | Use at least 4 consecutive fixed bytes; scope wildcards to specific positions |
+| Skipping atom analysis               | Invisible performance sink; rule may have 1-byte atoms causing false positives        | Always run `yr debug atoms rule.yar` before deployment                        |
+| Missing metadata fields              | Rules become unauditable; cannot trace origin, sample, or analyst                     | Always include: author, date, description, reference, hash, tlp, score        |
+| Conditions before file type checks   | Expensive string matching runs on non-matching file types                             | Place `uint16(0) == 0x5A4D` (or equivalent) first in every condition          |
+| Using `nocase` on short strings      | Short case-insensitive patterns match everywhere in arbitrary data                    | Reserve `nocase` for strings >= 8 bytes; use exact case for shorter patterns  |
 
 ## Memory Protocol
 

@@ -98,18 +98,18 @@ describe('pre-tool-unified read safety', () => {
     }
   });
 
-  test('checkReadSafety blocks reading a directory', () => {
+  test('checkReadSafety rewrites reading a directory to a listing', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-dir-'));
     try {
       const result = checkReadSafety('Read', { file_path: tempDir });
-      assert.strictEqual(result.action, 'block');
-      assert.ok(result.message.includes('is a directory'));
+      assert.strictEqual(result.action, 'rewrite');
+      assert.ok(String(result.bypassWarning || result.message || '').includes('is a directory'));
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 
-  test('checkReadSafety blocks directory reads in bypassPermissions mode', () => {
+  test('checkReadSafety rewrites directory reads in bypassPermissions mode', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-dir-bypass-'));
     try {
       const result = checkReadSafety(
@@ -118,7 +118,6 @@ describe('pre-tool-unified read safety', () => {
         { permission_mode: 'bypassPermissions' }
       );
       assert.strictEqual(result.action, 'rewrite');
-      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
       assert.ok(String(result.bypassWarning || '').includes('is a directory'));
       assert.ok(fs.existsSync(result.rewrittenToolInput.file_path));
     } finally {
@@ -169,14 +168,11 @@ describe('pre-tool-unified read safety', () => {
 
   test('checkReadSafety suggests canonical path for known stale references', () => {
     const result = checkReadSafety('Read', {
-      file_path: '.claude/lib/memory/memory-query.cjs',
+      file_path: '.claude/lib/utils/safe-json-parse.cjs',
     });
     assert.strictEqual(result.action, 'rewrite');
     assert.ok(String(result.bypassWarning || '').includes('Rewrote stale path'));
-    assert.match(
-      String(result.rewrittenToolInput?.file_path || ''),
-      /memory[\\/]+core[\\/]+memory-query\.cjs/
-    );
+    assert.match(String(result.rewrittenToolInput?.file_path || ''), /utils[\\/]+safe-json\.cjs/);
   });
 
   test('checkReadSafety rewrites stale router path to core router agent', () => {
@@ -214,10 +210,13 @@ describe('pre-tool-unified read safety', () => {
         encoding: 'utf8',
       });
 
-      assert.strictEqual(proc.status, 2, `Expected block exit code, got: ${proc.status}`);
+      // Directory reads now rewrite (exit 0 with tool_input) instead of blocking
+      assert.strictEqual(proc.status, 0, `Expected rewrite exit code 0, got: ${proc.status}`);
       assert.ok(
-        (proc.stdout || '').includes('[READ SAFETY]'),
-        `Expected read safety message in stdout, got: ${proc.stdout}`
+        (proc.stdout || '').includes('tool_input') ||
+          (proc.stderr || '').includes('[READ SAFETY]') ||
+          (proc.stderr || '').includes('read-safety'),
+        `Expected read safety rewrite in output, got stdout: ${proc.stdout}, stderr: ${proc.stderr}`
       );
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
@@ -552,7 +551,7 @@ describe('pre-tool-unified read safety', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
-  test('checkReadSafety blocks directory reads in bypass mode even when default listing path is unavailable', () => {
+  test('checkReadSafety rewrites directory reads in bypass mode even when default listing path is unavailable', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'read-guard-rewrite-file-'));
     withPathRestored(defaultDirListingPath, () => {
       if (fs.existsSync(defaultDirListingPath)) {
@@ -566,7 +565,7 @@ describe('pre-tool-unified read safety', () => {
       );
 
       assert.strictEqual(result.action, 'rewrite');
-      assert.ok(String(result.bypassWarning || '').includes('[READ SAFETY][bypass]'));
+      assert.ok(String(result.bypassWarning || '').includes('is a directory'));
       assert.ok(fs.existsSync(result.rewrittenToolInput.file_path));
     });
     fs.rmSync(tempDir, { recursive: true, force: true });

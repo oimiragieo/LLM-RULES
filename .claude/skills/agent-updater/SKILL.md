@@ -9,8 +9,8 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, WebSearch, WebFetch, MemoryR
 args: '--agent <name-or-path> [--trigger reflection|evolve|manual] [--mode plan|execute]'
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 # Agent Updater
@@ -154,6 +154,22 @@ Use `node .claude/skills/agent-updater/scripts/main.cjs --agent <target> --mode 
 - Search evidence with `pnpm search:code` and search skills.
 - Use `token-saver-context-compression` only for large prompt diffs.
 - Use `recommend-evolution` if update is insufficient and net-new artifact needed.
+
+## Ecosystem Alignment Research Gate
+
+arXiv search is MANDATORY before updating agents. This ensures pattern alignment with current multi-agent orchestration research and avoids drift from established best practices.
+
+**Query pattern:**
+
+```
+mcp__Exa__web_search_exa({ query: 'site:arxiv.org multi-agent orchestration 2024 2025' })
+```
+
+**Minimum:** 1 arXiv query per update for pattern alignment. Adjust query terms to match the agent's domain (e.g., `site:arxiv.org LLM code review 2024 2025` for code-reviewer updates).
+
+**When arXiv is mandatory (not optional):** AI agents, LLM evaluation, orchestration, memory/RAG, security, static analysis, or any emerging methodology.
+
+**Record:** Include arXiv findings in the patch plan's research section and reference in `decisions.md` when findings influence the update.
 
 ## Enforcement Points for Parallel Safety
 

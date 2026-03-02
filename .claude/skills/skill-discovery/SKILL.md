@@ -1,7 +1,7 @@
 ---
 name: skill-discovery
 description: How agents discover and use skills. Use to understand skill invocation protocol.
-version: 1.0
+version: 1.0.0
 model: haiku
 invoked_by: agent
 user_invocable: false

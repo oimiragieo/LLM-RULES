@@ -18,13 +18,7 @@ const { execFileSync } = require('child_process');
 const { PROJECT_ROOT } = require('../../.claude/lib/utils/project-root.cjs');
 
 const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'router-state.json');
-const LOOP_STATE_FILE = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'self-healing',
-  'loop-state.json'
-);
+const LOOP_STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime', 'loop-state.json');
 const HOOK_PATH = path.join(PROJECT_ROOT, '.claude', 'hooks', 'session', 'state-reset.cjs');
 
 /**

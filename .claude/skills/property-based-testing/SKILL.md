@@ -1,7 +1,9 @@
 ---
 name: property-based-testing
 description: 'fast-check patterns for JS/TS — 6 canonical property categories with worked examples targeting agent-studio utilities (path normalization, safe-json, glob-to-regex, routing logic)'
-version: 1.0.0
+version: 1.1.0
+verified: true
+lastVerifiedAt: '2026-03-01'
 category: 'Testing'
 agents: [qa, developer]
 user_invocable: true

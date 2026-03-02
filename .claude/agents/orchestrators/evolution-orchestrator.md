@@ -22,7 +22,6 @@ tools:
   - TaskUpdate
   - TaskList
   - TaskGet
-  - AvailableAgents
   - Bash
   - Skill
   - WebSearch
@@ -179,7 +178,7 @@ Skill({ skill: 'sequential-thinking' });
 
 ```javascript
 // Check for naming conflicts
-Read('@.claude/context/artifacts/catalogs/skill-catalog.md');
+Read('@.claude/docs/skill-catalog.md');
 Grep('proposed-name', '@.claude/agents/');
 Grep('proposed-name', '@.claude/skills/');
 
@@ -485,7 +484,7 @@ if (artifactType === 'agent') {
 
 // 2. Update skill catalog (for skills)
 if (artifactType === 'skill') {
-  Edit('@.claude/context/artifacts/catalogs/skill-catalog.md', 'new skill entry');
+  Edit('@.claude/docs/skill-catalog.md', 'new skill entry');
 }
 
 // 3. Record in evolution state
@@ -546,7 +545,7 @@ if (edges.length === 0) {
 grep "<agent-name>" @.claude/CLAUDE.md || echo "FAILED: Not in routing table"
 
 # For skills
-grep "<skill-name>" @.claude/context/artifacts/catalogs/skill-catalog.md || echo "FAILED: Not in catalog"
+grep "<skill-name>" @.claude/docs/skill-catalog.md || echo "FAILED: Not in catalog"
 ```
 
 **Final State**:
@@ -933,21 +932,19 @@ When deciding which agent to spawn for evolution tasks, use capability discovery
 // Determine capability needed for evolution subtask
 const capability = determineCapability(task); // e.g., 'code-review', 'implementation'
 
-// Query healthy agents for that capability
-const agents = AvailableAgents({
-  capability: capability,
-  excludeFailed: true,
-  minSuccessRate: 0.7,
-});
+// Discover available agents from the registry
+const registry = Read('.claude/context/agent-registry.json');
+const agents = registry.agents.filter(a => a.capabilities.includes(capability));
 
-// Pick best healthy agent
-const best = agents.agents[0];
+// Pick best agent for the capability
+const best = agents[0];
 
-// If none available, return error with suggestions
+// If none available, fall back to broad search
 if (!best) {
+  const fallback = registry.agents.filter(a => a.domain === 'code').slice(0, 3);
   return {
-    error: 'No healthy agents for capability',
-    suggestions: AvailableAgents({ domain: 'code' }).agents.slice(0, 3),
+    error: 'No agents found for capability',
+    suggestions: fallback,
   };
 }
 

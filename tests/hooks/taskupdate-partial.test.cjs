@@ -37,11 +37,12 @@ async function testPartialUpdate() {
     }
   }
 
-  await test('contract validator should allow missing status', () => {
+  await test('contract validator should allow partial update with status', () => {
     const input = {
       tool_name: 'TaskUpdate',
       tool_input: {
         taskId: 'task-1',
+        status: 'in_progress',
         metadata: { progress: '50%' },
       },
     };
@@ -58,8 +59,13 @@ async function testPartialUpdate() {
       allowed_tools: ['TaskUpdate'],
     };
 
-    // 1. Initial call (partial update)
-    const res1 = checkTaskUpdateFirst(hookInput, 'TaskUpdate', { taskId: 'task-1' }, TEST_STATE);
+    // 1. Initial call (partial update with status)
+    const res1 = checkTaskUpdateFirst(
+      hookInput,
+      'TaskUpdate',
+      { taskId: 'task-1', status: 'in_progress' },
+      TEST_STATE
+    );
     if (res1.action !== 'allow') throw new Error(`Initial update blocked: ${res1.message}`);
 
     // 2. Subsequent call to another tool (Read)

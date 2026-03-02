@@ -33,6 +33,14 @@ const researchEnforcement = require('../evolution/research-enforcement.cjs');
 const qualityGate = require('../evolution/quality-gate-validator.cjs');
 const adaptiveGate = require('../session/adaptive-quality-gate.cjs');
 
+function formatHookError(err) {
+  if (!err) return 'Unknown hook failure (no error object)';
+  const message = typeof err.message === 'string' && err.message.trim() ? err.message.trim() : null;
+  if (message) return message;
+  const text = String(err).trim();
+  return text || 'Unknown hook failure (empty error message)';
+}
+
 async function main() {
   const perfStart = performance.now();
   let hookInput = null;
@@ -156,17 +164,18 @@ async function main() {
       });
     }
 
-    // Success - pass through the original input (or modified if any hook supported transformation)
-    process.stdout.write(JSON.stringify(hookInput));
+    // Success: no payload passthrough needed for this bundle. Emitting large tool_input
+    // can cause host-side JSON truncation during PreToolUse parsing.
     process.exit(0);
   } catch (err) {
-    // Fail-open by default: unexpected exceptions should not block ALL writes.
-    // Set HOOK_FAIL_CLOSED=true to revert to blocking behavior.
-    console.error(`[write-pretool-bundle] Unexpected error (fail-open): ${err.message}`);
-    if (process.env.HOOK_FAIL_CLOSED === 'true') {
-      process.exit(2);
+    // Fail-CLOSED by default for write safety hooks: unexpected exceptions block writes.
+    // Set WRITE_HOOK_FAIL_OPEN=true to revert to permissive behavior (NOT recommended).
+    const errorMessage = formatHookError(err);
+    console.error(`[write-pretool-bundle] Unexpected error (fail-closed): ${errorMessage}`);
+    if (process.env.WRITE_HOOK_FAIL_OPEN === 'true') {
+      process.exit(0);
     }
-    process.exit(0);
+    process.exit(2);
   }
 }
 

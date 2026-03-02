@@ -15,8 +15,8 @@ best_practices:
   - Execute in < 30 seconds for typical projects (< 10k files)
 error_handling: graceful
 streaming: supported
-executable: .claude/tools/project-analyzer/analyzer.mjs
-test_suite: .claude/tools/project-analyzer/tests/analyzer.test.mjs
+executable: .claude/tools/analysis/project-analyzer/analyzer.mjs
+test_suite: # no test file exists yet
 output_schema: .claude/schemas/project-analysis.schema.json
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
@@ -388,16 +388,13 @@ Validate analysis output against schema:
 
 ```bash
 # Analyze current project
-node .claude/tools/project-analyzer/analyzer.mjs
+node .claude/tools/analysis/project-analyzer/analyzer.mjs
 
 # Analyze specific directory
-node .claude/tools/project-analyzer/analyzer.mjs /path/to/project
+node .claude/tools/analysis/project-analyzer/analyzer.mjs /path/to/project
 
 # Output to file
-node .claude/tools/project-analyzer/analyzer.mjs --output .claude/context/artifacts/project-analysis.json
-
-# Run tests
-node .claude/tools/project-analyzer/tests/analyzer.test.mjs
+node .claude/tools/analysis/project-analyzer/analyzer.mjs --output .claude/context/artifacts/project-analysis.json
 ```
 
 **Agent Invocation**:

@@ -80,7 +80,7 @@ Acceptance Criteria:
 ### Related Skills
 
 - **spec-init**: Interactive requirements gathering
-- **interactive-requirements-gathering**: Structured questionnaire
+- **context-compressor**: Progressive disclosure for requirements gathering
 - **prd-generator**: Creates PRD from specification
 - **complexity-assessment**: Determines complexity from spec
 - **plan-generator**: Creates implementation plan from spec

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-02-19T09:30:00.000Z",
+  "lastUpdated": "2026-02-27T00:00:00.000Z",
   "nodes": {
     "skill:rust-expert": {
       "type": "skill",
@@ -902,7 +902,9 @@
       "type": "hook",
       "path": ".claude/hooks/monitoring/error-tracker-hook.cjs",
       "created": "2026-02-08T01:16:57.425Z",
-      "integrationStatus": "created"
+      "integrationStatus": "archived",
+      "archivedReason": "File moved to _archive/; consolidated into unified hooks (pre-tool-unified.cjs / post-tool-metrics-unified.cjs)",
+      "archivedAt": "2026-02-27T00:00:00.000Z"
     },
     "hook:error-tracker": {
       "type": "hook",
@@ -914,7 +916,9 @@
       "type": "hook",
       "path": ".claude/hooks/monitoring/execution-limit-monitor-hook.cjs",
       "created": "2026-02-08T01:16:57.425Z",
-      "integrationStatus": "created"
+      "integrationStatus": "archived",
+      "archivedReason": "File moved to _archive/; consolidated into unified hooks (pre-tool-unified.cjs / post-tool-metrics-unified.cjs)",
+      "archivedAt": "2026-02-27T00:00:00.000Z"
     },
     "hook:metrics-collector-hook": {
       "type": "hook",
@@ -962,7 +966,9 @@
       "type": "hook",
       "path": ".claude/hooks/routing/config-model-validator.cjs",
       "created": "2026-02-08T01:16:57.425Z",
-      "integrationStatus": "created"
+      "integrationStatus": "archived",
+      "archivedReason": "File moved to _archive/; consolidated into unified hooks (pre-tool-unified.cjs / post-tool-metrics-unified.cjs)",
+      "archivedAt": "2026-02-27T00:00:00.000Z"
     },
     "hook:intent-agent-match": {
       "type": "hook",
@@ -1010,7 +1016,9 @@
       "type": "hook",
       "path": ".claude/hooks/routing/tool-scope-validator.cjs",
       "created": "2026-02-08T01:16:57.425Z",
-      "integrationStatus": "created"
+      "integrationStatus": "archived",
+      "archivedReason": "File moved to _archive/; consolidated into unified hooks (pre-tool-unified.cjs / post-tool-metrics-unified.cjs)",
+      "archivedAt": "2026-02-27T00:00:00.000Z"
     },
     "hook:unified-creator-guard": {
       "type": "hook",
@@ -3625,276 +3633,6 @@
       "status": "active"
     },
     {
-      "from": "hook:conflict-detector",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:evolution-state-guard",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:quality-gate-validator",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:research-enforcement",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:sync-memory-index",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:error-tracker-hook",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:error-tracker",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:execution-limit-monitor-hook",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:metrics-collector-hook",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:metrics-collector",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:force-step0-execution",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:reflection-queue-processor",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:reflection-step0-guard",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:unified-reflection-handler",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:code-index-updater",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:config-model-validator",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:intent-agent-match",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:post-task-unified",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:pre-task-unified",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:routing-guard",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:spawn-prompt-assembler",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:task-list-tracker",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:task-status-enforcement",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:tool-scope-validator",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:unified-creator-guard",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:user-prompt-unified",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:bash-command-validator",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:shell-injection-validator",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:spawn-prompt-validator",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:unified-pre-write-hook",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:validate-skill-invocation",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:database-validators",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:filesystem-validators",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:git-validators",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:network-validators",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:process-validators",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:registry",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:shell-validators",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:windows-null-sanitizer",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:anomaly-detector",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:session-cleanup",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:state-reset",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:check-console-log",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:pre-completion-validation",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:post-completion-chain",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
       "from": "agent:architect",
       "to": "hook:reflection-queue-processor",
       "type": "enforced-by",
@@ -4189,300 +3927,6 @@
       "status": "active"
     },
     {
-      "from": "agent:architect",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:context-compressor",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:developer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:planner",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:pm",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:qa",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:reflection-agent",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:router",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:technical-writer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:ai-ml-specialist",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:android-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:data-engineer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:expo-mobile-developer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:fastapi-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:frontend-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:gamedev-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:golang-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:graphql-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:ios-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:java-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:mobile-ux-reviewer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:nextjs-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:nodejs-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:php-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:python-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:rust-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:scientific-research-expert",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:sveltekit-expert",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:tauri-desktop-developer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:typescript-pro",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:web3-blockchain-expert",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:c4-code",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:c4-component",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:c4-container",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:c4-context",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:code-reviewer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:code-simplifier",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:conductor-validator",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:database-architect",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:devops-troubleshooter",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:devops",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:incident-responder",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:researcher",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:reverse-engineer",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:security-architect",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:evolution-orchestrator",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:master-orchestrator",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:party-orchestrator",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "agent:swarm-coordinator",
-      "to": "hook:config-model-validator",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
       "from": "hook:conflict-detector",
       "to": "hook:post-task-unified",
       "type": "enforced-by",
@@ -4513,19 +3957,7 @@
       "status": "active"
     },
     {
-      "from": "hook:error-tracker-hook",
-      "to": "hook:post-task-unified",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
       "from": "hook:error-tracker",
-      "to": "hook:post-task-unified",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:execution-limit-monitor-hook",
       "to": "hook:post-task-unified",
       "type": "enforced-by",
       "status": "active"
@@ -4573,12 +4005,6 @@
       "status": "active"
     },
     {
-      "from": "hook:config-model-validator",
-      "to": "hook:post-task-unified",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
       "from": "hook:intent-agent-match",
       "to": "hook:post-task-unified",
       "type": "enforced-by",
@@ -4616,12 +4042,6 @@
     },
     {
       "from": "hook:task-status-enforcement",
-      "to": "hook:post-task-unified",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:tool-scope-validator",
       "to": "hook:post-task-unified",
       "type": "enforced-by",
       "status": "active"
@@ -8282,12 +7702,6 @@
     },
     {
       "from": "hook:post-creation-integration",
-      "to": "hook:execution-limit-monitor-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:post-creation-integration",
       "to": "hook:post-task-unified",
       "type": "enforced-by",
       "status": "active"
@@ -8329,19 +7743,7 @@
       "status": "active"
     },
     {
-      "from": "hook:error-tracker-hook",
-      "to": "hook:unified-pre-write-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
       "from": "hook:error-tracker",
-      "to": "hook:unified-pre-write-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:execution-limit-monitor-hook",
       "to": "hook:unified-pre-write-hook",
       "type": "enforced-by",
       "status": "active"
@@ -8389,12 +7791,6 @@
       "status": "active"
     },
     {
-      "from": "hook:config-model-validator",
-      "to": "hook:unified-pre-write-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
       "from": "hook:intent-agent-match",
       "to": "hook:unified-pre-write-hook",
       "type": "enforced-by",
@@ -8432,12 +7828,6 @@
     },
     {
       "from": "hook:task-status-enforcement",
-      "to": "hook:unified-pre-write-hook",
-      "type": "enforced-by",
-      "status": "active"
-    },
-    {
-      "from": "hook:tool-scope-validator",
       "to": "hook:unified-pre-write-hook",
       "type": "enforced-by",
       "status": "active"

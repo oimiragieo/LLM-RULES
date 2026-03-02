@@ -2,9 +2,9 @@
 
 # Command Catalog
 
-**Last Updated:** 2026-02-15
-**Total Commands:** 89
-**Pattern:** Thin delegators to skills (87 delegators, 1 enriched, 1 standalone)
+**Last Updated:** 2026-02-26
+**Total Commands:** 263
+**Pattern:** Thin delegators to skills (261 delegators, 1 enriched, 1 standalone)
 
 This catalog documents all slash commands in the agent-studio framework with their skill delegations and usage contexts.
 
@@ -12,92 +12,122 @@ This catalog documents all slash commands in the agent-studio framework with the
 
 ## Quick Reference
 
-| Command                               | Description                                  | Delegates To                         | Category     |
-| ------------------------------------- | -------------------------------------------- | ------------------------------------ | ------------ |
-| `/agent-creator`                      | Create specialized AI agents                 | `agent-creator`                      | Creator      |
-| `/agent-updater`                      | Refresh existing agents with risk scoring    | `agent-updater`                      | Creator      |
-| `/analyze`                            | Project structure and health analysis        | `code-analyzer`                      | Analysis     |
-| `/android-expert`                     | Android/Kotlin/Jetpack Compose               | `android-expert`                     | Mobile       |
-| `/api-development-expert`             | API design and development                   | `api-development-expert`             | Development  |
-| `/architecture-review`                | Architecture validation                      | `architecture-review`                | Architecture |
-| `/artifact-integrator`                | Integration analysis for artifacts           | `artifact-integrator`                | Creator      |
-| `/auth-security-expert`               | OAuth, JWT, authentication security          | `auth-security-expert`               | Security     |
-| `/build-fix`                          | Diagnose and fix build failures              | `debugging`                          | Development  |
-| `/checklist-generator`                | Generate validation checklists               | `checklist-generator`                | Quality      |
-| `/code-analyzer`                      | Static code analysis                         | `code-analyzer`                      | Analysis     |
-| `/code-quality-expert`                | Code quality and refactoring                 | `code-quality-expert`                | Development  |
-| `/code-semantic-search`               | Semantic code search                         | `code-semantic-search`               | Search       |
-| `/code-structural-search`             | AST-based code search                        | `code-structural-search`             | Search       |
-| `/complexity-assessment`              | Task complexity classification               | `complexity-assessment`              | Planning     |
-| `/compress`                           | Compress context to reduce tokens            | `context-compressor`                 | Context      |
-| `/token-saver-context-compression`    | Search-aware context compression             | `token-saver-context-compression`    | Context      |
-| `/troubleshooting-regression`         | Debug-log-first regression troubleshooting   | `troubleshooting-regression`         | Context      |
-| `/skill-updater`                      | Refresh existing skills with TDD gates       | `skill-updater`                      | Creator      |
-| `/skill-refresh`                      | Alias for skill updater refresh workflow     | `skill-updater`                      | Creator      |
-| `/container-expert`                   | Docker/container expertise                   | `container-expert`                   | DevOps       |
-| `/context-driven-development`         | Context as managed artifacts                 | `context-driven-development`         | Context      |
-| `/data-expert`                        | Data processing and transformation           | `data-expert`                        | Data         |
-| `/database-expert`                    | Database patterns and optimization           | `database-expert`                    | Data         |
-| `/debug`                              | Systematic debugging with root cause         | `debugging`                          | Development  |
-| `/debugging`                          | Systematic debugging                         | `debugging`                          | Development  |
-| `/differential-review`                | Differential code review                     | `differential-review`                | Security     |
-| `/docker-compose`                     | Docker Compose orchestration                 | `docker-compose`                     | DevOps       |
-| `/expo-framework-rule`                | Expo framework patterns                      | `expo-framework-rule`                | Mobile       |
-| `/eval-harness-updater`               | Refresh eval harness reliability and SLOs    | `eval-harness-updater`               | Validation   |
-| `/frontend-expert`                    | Frontend development patterns                | `frontend-expert`                    | Frontend     |
-| `/gamedev-expert`                     | Game development expertise                   | `gamedev-expert`                     | Gaming       |
-| `/go-expert`                          | Go language expertise                        | `go-expert`                          | Languages    |
-| `/graphql-expert`                     | GraphQL API design                           | `graphql-expert`                     | Frameworks   |
-| `/hook-creator`                       | Create framework hooks                       | `hook-creator`                       | Creator      |
-| `/incident-runbook-templates`         | Incident response runbooks                   | `incident-runbook-templates`         | DevOps       |
-| `/insecure-defaults`                  | Insecure defaults detection                  | `insecure-defaults`                  | Security     |
-| `/insight-extraction`                 | Extract session learnings                    | `insight-extraction`                 | Context      |
-| `/interactive-requirements-gathering` | A/B/C/D/E questionnaire framework            | `interactive-requirements-gathering` | Planning     |
-| `/ios-expert`                         | iOS/SwiftUI expertise                        | `ios-expert`                         | Mobile       |
-| `/java-expert`                        | Java/Spring Boot expertise                   | `java-expert`                        | Languages    |
-| `/k8s-manifest-generator`             | Kubernetes manifest generation               | `k8s-manifest-generator`             | DevOps       |
-| `/learn`                              | Extract session patterns to memory           | `context-compressor` + memory        | Context      |
-| `/mobile-first-design-rules`          | Mobile-first design patterns                 | `mobile-first-design-rules`          | Mobile       |
-| `/memory-quality-auditor`             | Audit memory retrieval and groundedness      | `memory-quality-auditor`             | Context      |
-| `/nextjs-expert`                      | Next.js expertise                            | `nextjs-expert`                      | Frameworks   |
-| `/nodejs-expert`                      | Node.js expertise                            | `nodejs-expert`                      | Languages    |
-| `/php-expert`                         | PHP expertise                                | `php-expert`                         | Languages    |
-| `/plan-generator`                     | Implementation plan generation               | `plan-generator`                     | Planning     |
-| `/planning-with-files`                | File-based planning workflow                 | `planning-with-files`                | Planning     |
-| `/postmortem-writing`                 | Blameless postmortem writing                 | `postmortem-writing`                 | DevOps       |
-| `/prd-generator`                      | Product requirements document generation     | `prd-generator`                      | Planning     |
-| `/project-onboarding`                 | New codebase onboarding                      | `project-onboarding`                 | Integration  |
-| `/python-backend-expert`              | Python backend expertise                     | `python-backend-expert`              | Languages    |
-| `/react-expert`                       | React expertise                              | `react-expert`                       | Frameworks   |
-| `/refactor-clean`                     | Safe refactoring and cleanup                 | `code-quality-expert`                | Quality      |
-| `/response-rater`                     | Plan and response quality audits             | `response-rater`                     | Validation   |
-| `/schema-creator`                     | Create JSON Schema validators                | `schema-creator`                     | Creator      |
-| `/security-architect`                 | Comprehensive security analysis              | `security-architect`                 | Security     |
-| `/security-review`                    | OWASP/STRIDE security analysis               | `security-architect`                 | Security     |
-| `/semgrep-rule-creator`               | Semgrep rule creation                        | `semgrep-rule-creator`               | Security     |
-| `/sentry-monitoring`                  | Sentry error tracking setup                  | `sentry-monitoring`                  | DevOps       |
-| `/session-handoff`                    | Handoff document creation                    | `session-handoff`                    | Context      |
-| `/setup-pm`                           | Configure package manager                    | standalone script                    | Setup        |
-| `/skill-creator`                      | Create and validate skills                   | `skill-creator`                      | Creator      |
-| `/spec-gathering`                     | Requirements gathering                       | `spec-gathering`                     | Planning     |
-| `/spec-init`                          | Unified spec creation                        | `spec-init`                          | Planning     |
-| `/static-analysis`                    | Static code analysis                         | `static-analysis`                    | Security     |
-| `/svelte-expert`                      | Svelte expertise                             | `svelte-expert`                      | Frameworks   |
-| `/tauri-native-api-integration`       | Tauri native API integration                 | `tauri-native-api-integration`       | Mobile       |
-| `/tdd`                                | Test-driven development with Iron Laws       | `tdd`                                | Development  |
-| `/template-creator`                   | Create templates                             | `template-creator`                   | Creator      |
-| `/terraform-infra`                    | Terraform infrastructure as code             | `terraform-infra`                    | DevOps       |
-| `/test-coverage`                      | Analyze coverage and identify gaps           | `tdd`                                | Quality      |
-| `/text-to-sql`                        | Natural language to SQL conversion           | `text-to-sql`                        | Data         |
-| `/thinking-tools`                     | Self-reflection patterns                     | `thinking-tools`                     | Patterns     |
-| `/typescript-expert`                  | TypeScript expertise                         | `typescript-expert`                  | Languages    |
-| `/variant-analysis`                   | Variant analysis for security                | `variant-analysis`                   | Security     |
-| `/verify`                             | Comprehensive verification before completion | `verification-before-completion`     | Quality      |
-| `/verification-before-completion`     | Pre-completion gate                          | `verification-before-completion`     | Quality      |
-| `/web3-expert`                        | Solidity/Ethereum expertise                  | `web3-expert`                        | Languages    |
-| `/workflow-creator`                   | Create orchestration workflows               | `workflow-creator`                   | Creator      |
-| `/workflow-updater`                   | Refresh existing workflows safely            | `workflow-updater`                   | Creator      |
-| `/write-plan`                         | Create implementation plan with tasks        | `plan-generator`                     | Planning     |
+| Command                               | Description                                  | Delegates To                         | Category      |
+| ------------------------------------- | -------------------------------------------- | ------------------------------------ | ------------- |
+| `/agent-creator`                      | Create specialized AI agents                 | `agent-creator`                      | Creator       |
+| `/agent-updater`                      | Refresh existing agents with risk scoring    | `agent-updater`                      | Creator       |
+| `/analyze`                            | Project structure and health analysis        | `code-analyzer`                      | Analysis      |
+| `/android-expert`                     | Android/Kotlin/Jetpack Compose               | `android-expert`                     | Mobile        |
+| `/api-development-expert`             | API design and development                   | `api-development-expert`             | Development   |
+| `/architecture-review`                | Architecture validation                      | `architecture-review`                | Architecture  |
+| `/artifact-integrator`                | Integration analysis for artifacts           | `artifact-integrator`                | Creator       |
+| `/auth-security-expert`               | OAuth, JWT, authentication security          | `auth-security-expert`               | Security      |
+| `/build-fix`                          | Diagnose and fix build failures              | `debugging`                          | Development   |
+| `/checklist-generator`                | Generate validation checklists               | `checklist-generator`                | Quality       |
+| `/code-analyzer`                      | Static code analysis                         | `code-analyzer`                      | Analysis      |
+| `/code-quality-expert`                | Code quality and refactoring                 | `code-quality-expert`                | Development   |
+| `/code-semantic-search`               | Semantic code search                         | `code-semantic-search`               | Search        |
+| `/code-structural-search`             | AST-based code search                        | `code-structural-search`             | Search        |
+| `/complexity-assessment`              | Task complexity classification               | `complexity-assessment`              | Planning      |
+| `/compress`                           | Compress context to reduce tokens            | `context-compressor`                 | Context       |
+| `/token-saver-context-compression`    | Search-aware context compression             | `token-saver-context-compression`    | Context       |
+| `/troubleshooting-regression`         | Debug-log-first regression troubleshooting   | `troubleshooting-regression`         | Context       |
+| `/skill-updater`                      | Refresh existing skills with TDD gates       | `skill-updater`                      | Creator       |
+| `/skill-refresh`                      | Alias for skill updater refresh workflow     | `skill-updater`                      | Creator       |
+| `/container-expert`                   | Docker/container expertise                   | `container-expert`                   | DevOps        |
+| `/context-driven-development`         | Context as managed artifacts                 | `context-driven-development`         | Context       |
+| `/data-expert`                        | Data processing and transformation           | `data-expert`                        | Data          |
+| `/database-expert`                    | Database patterns and optimization           | `database-expert`                    | Data          |
+| `/debug`                              | Systematic debugging with root cause         | `debugging`                          | Development   |
+| `/debugging`                          | Systematic debugging                         | `debugging`                          | Development   |
+| `/differential-review`                | Differential code review                     | `differential-review`                | Security      |
+| `/docker-compose`                     | Docker Compose orchestration                 | `docker-compose`                     | DevOps        |
+| `/expo-framework-rule`                | Expo framework patterns                      | `expo-framework-rule`                | Mobile        |
+| `/eval-harness-updater`               | Refresh eval harness reliability and SLOs    | `eval-harness-updater`               | Validation    |
+| `/frontend-expert`                    | Frontend development patterns                | `frontend-expert`                    | Frontend      |
+| `/gamedev-expert`                     | Game development expertise                   | `gamedev-expert`                     | Gaming        |
+| `/go-expert`                          | Go language expertise                        | `go-expert`                          | Languages     |
+| `/graphql-expert`                     | GraphQL API design                           | `graphql-expert`                     | Frameworks    |
+| `/hook-creator`                       | Create framework hooks                       | `hook-creator`                       | Creator       |
+| `/incident-runbook-templates`         | Incident response runbooks                   | `incident-runbook-templates`         | DevOps        |
+| `/insecure-defaults`                  | Insecure defaults detection                  | `insecure-defaults`                  | Security      |
+| `/insight-extraction`                 | Extract session learnings                    | `insight-extraction`                 | Context       |
+| `/interactive-requirements-gathering` | A/B/C/D/E questionnaire framework            | `interactive-requirements-gathering` | Planning      |
+| `/ios-expert`                         | iOS/SwiftUI expertise                        | `ios-expert`                         | Mobile        |
+| `/java-expert`                        | Java/Spring Boot expertise                   | `java-expert`                        | Languages     |
+| `/k8s-manifest-generator`             | Kubernetes manifest generation               | `k8s-manifest-generator`             | DevOps        |
+| `/learn`                              | Extract session patterns to memory           | `context-compressor` + memory        | Context       |
+| `/mobile-first-design-rules`          | Mobile-first design patterns                 | `mobile-first-design-rules`          | Mobile        |
+| `/memory-quality-auditor`             | Audit memory retrieval and groundedness      | `memory-quality-auditor`             | Context       |
+| `/nextjs-expert`                      | Next.js expertise                            | `nextjs-expert`                      | Frameworks    |
+| `/nodejs-expert`                      | Node.js expertise                            | `nodejs-expert`                      | Languages     |
+| `/php-expert`                         | PHP expertise                                | `php-expert`                         | Languages     |
+| `/plan-generator`                     | Implementation plan generation               | `plan-generator`                     | Planning      |
+| `/planning-with-files`                | File-based planning workflow                 | `planning-with-files`                | Planning      |
+| `/postmortem-writing`                 | Blameless postmortem writing                 | `postmortem-writing`                 | DevOps        |
+| `/prd-generator`                      | Product requirements document generation     | `prd-generator`                      | Planning      |
+| `/project-onboarding`                 | New codebase onboarding                      | `project-onboarding`                 | Integration   |
+| `/python-backend-expert`              | Python backend expertise                     | `python-backend-expert`              | Languages     |
+| `/react-expert`                       | React expertise                              | `react-expert`                       | Frameworks    |
+| `/refactor-clean`                     | Safe refactoring and cleanup                 | `code-quality-expert`                | Quality       |
+| `/response-rater`                     | Plan and response quality audits             | `response-rater`                     | Validation    |
+| `/schema-creator`                     | Create JSON Schema validators                | `schema-creator`                     | Creator       |
+| `/security-architect`                 | Comprehensive security analysis              | `security-architect`                 | Security      |
+| `/security-review`                    | OWASP/STRIDE security analysis               | `security-architect`                 | Security      |
+| `/semgrep-rule-creator`               | Semgrep rule creation                        | `semgrep-rule-creator`               | Security      |
+| `/sentry-monitoring`                  | Sentry error tracking setup                  | `sentry-monitoring`                  | DevOps        |
+| `/session-handoff`                    | Handoff document creation                    | `session-handoff`                    | Context       |
+| `/setup-pm`                           | Configure package manager                    | standalone script                    | Setup         |
+| `/skill-creator`                      | Create and validate skills                   | `skill-creator`                      | Creator       |
+| `/spec-gathering`                     | Requirements gathering                       | `spec-gathering`                     | Planning      |
+| `/spec-init`                          | Unified spec creation                        | `spec-init`                          | Planning      |
+| `/static-analysis`                    | Static code analysis                         | `static-analysis`                    | Security      |
+| `/svelte-expert`                      | Svelte expertise                             | `svelte-expert`                      | Frameworks    |
+| `/tauri-native-api-integration`       | Tauri native API integration                 | `tauri-native-api-integration`       | Mobile        |
+| `/tdd`                                | Test-driven development with Iron Laws       | `tdd`                                | Development   |
+| `/template-creator`                   | Create templates                             | `template-creator`                   | Creator       |
+| `/terraform-infra`                    | Terraform infrastructure as code             | `terraform-infra`                    | DevOps        |
+| `/test-coverage`                      | Analyze coverage and identify gaps           | `tdd`                                | Quality       |
+| `/text-to-sql`                        | Natural language to SQL conversion           | `text-to-sql`                        | Data          |
+| `/thinking-tools`                     | Self-reflection patterns                     | `thinking-tools`                     | Patterns      |
+| `/typescript-expert`                  | TypeScript expertise                         | `typescript-expert`                  | Languages     |
+| `/variant-analysis`                   | Variant analysis for security                | `variant-analysis`                   | Security      |
+| `/verify`                             | Comprehensive verification before completion | `verification-before-completion`     | Quality       |
+| `/verification-before-completion`     | Pre-completion gate                          | `verification-before-completion`     | Quality       |
+| `/web3-expert`                        | Solidity/Ethereum expertise                  | `web3-expert`                        | Languages     |
+| `/workflow-creator`                   | Create orchestration workflows               | `workflow-creator`                   | Creator       |
+| `/workflow-updater`                   | Refresh existing workflows safely            | `workflow-updater`                   | Creator       |
+| `/write-plan`                         | Create implementation plan with tasks        | `plan-generator`                     | Planning      |
+| `/accessibility`                      | Ensure accessibility (WCAG, semantic HTML)   | `accessibility`                      | Quality       |
+| `/advanced-elicitation`               | Meta-cognitive reasoning and refined outputs | `advanced-elicitation`               | Patterns      |
+| `/ai-ml-expert`                       | AI/ML with PyTorch, LangChain, LLM skills    | `ai-ml-expert`                       | Languages     |
+| `/best-practices-guidelines`          | REST, responsive design, Zod best practices  | `best-practices-guidelines`          | Development   |
+| `/binary-analysis-patterns`           | Disassembly and binary static analysis       | `binary-analysis-patterns`           | Security      |
+| `/consensus-voting`                   | Byzantine consensus for multi-agent voting   | `consensus-voting`                   | Patterns      |
+| `/database-architect`                 | Schema design and database optimization      | `database-architect`                 | Data          |
+| `/diagram-generator`                  | Architecture and system diagrams (Mermaid)   | `diagram-generator`                  | Planning      |
+| `/doc-generator`                      | API docs, guides, and manuals from code      | `doc-generator`                      | Documentation |
+| `/dry-principle`                      | Enforce DRY to reduce duplication            | `dry-principle`                      | Development   |
+| `/git-expert`                         | Advanced Git operations and workflows        | `git-expert`                         | Git           |
+| `/medusa-scan`                        | Deterministic Medusa security scan           | `medusa`                             | Security      |
+| `/memory-forensics`                   | Memory forensics with Volatility             | `memory-forensics`                   | Security      |
+| `/modern-python`                      | Modern Python with uv, ruff, ty, pytest      | `modern-python`                      | Languages     |
+| `/on-call-handoff-patterns`           | On-call shift handoffs and escalation        | `on-call-handoff-patterns`           | DevOps        |
+| `/protocol-reverse-engineering`       | Network protocol reverse engineering         | `protocol-reverse-engineering`       | Security      |
+| `/readme`                             | README and documentation generation          | `readme`                             | Documentation |
+| `/research-synthesis`                 | Research best practices before creation      | `research-synthesis`                 | Creator       |
+| `/scientific-skills`                  | Scientific research toolkit                  | `scientific-skills`                  | Other         |
+| `/sequential-thinking`                | Structured sequential problem solving        | `sequential-thinking`                | Patterns      |
+| `/sparc-methodology`                  | SPARC development methodology                | `sparc-methodology`                  | Patterns      |
+| `/summarize-changes`                  | Summarize code changes with action items     | `summarize-changes`                  | Development   |
+| `/swarm-coordination`                 | Multi-agent swarm coordination               | `swarm-coordination`                 | Patterns      |
+| `/task-management-protocol`           | Task sync, handoff, cross-session coord      | `task-management-protocol`           | Context       |
+| `/test-generator`                     | Unit, integration, and E2E test generation   | `test-generator`                     | Quality       |
+| `/track-management`                   | Feature, bug, and refactor track management  | `track-management`                   | Planning      |
+| `/webapp-testing`                     | Browser automation with Playwright           | `webapp-testing`                     | Quality       |
+| `/webmcp-browser-tools`               | WebMCP browser tool registration for AI      | `webmcp-browser-tools`               | Integration   |
+| `/workflow-patterns`                  | TDD task patterns, red-green-refactor        | `workflow-patterns`                  | Development   |
+| `/writing-skills`                     | TDD for documentation and prose              | `writing-skills`                     | Documentation |
 
 ---
 
@@ -359,11 +389,9 @@ Users should describe their task to the Router, which handles orchestration auto
 
 ### 2026-02-09 Cleanup (Task #13)
 
-#### `/brainstorm` (DELETED)
+#### `/brainstorm` (RESTORED)
 
-**Reason:** Delegates to `brainstorming` skill which doesn't exist. No backing skill implementation.
-
-**Future consideration:** If brainstorming functionality is needed, create the skill first via `research-synthesis` → `skill-creator`, then add the command.
+**Status:** The `brainstorming` skill now exists at `.claude/skills/brainstorming/SKILL.md`. Command `/brainstorming` delegates to it. The original `/brainstorm` was deleted but functionality is available via `/brainstorming`.
 
 #### `/execute-plan` (DELETED)
 
@@ -371,23 +399,17 @@ Users should describe their task to the Router, which handles orchestration auto
 
 **Future consideration:** Plan execution is handled by the Router's enterprise orchestration workflow. If a dedicated execution skill is needed, create it first.
 
-#### `/code-review` (DELETED)
+#### `/code-review` (RESTORED)
 
-**Reason:** Delegates to `requesting-code-review` skill which doesn't exist. No backing skill implementation.
+**Status:** The `requesting-code-review` skill now exists at `.claude/skills/requesting-code-review/SKILL.md`. Command `/requesting-code-review` delegates to it. The original `/code-review` was deleted but functionality is available via `/requesting-code-review`.
 
-**Future consideration:** Code review is handled by spawning the `code-reviewer` agent via the Router. If a skill wrapper is desired, create it first.
+#### `/e2e` (RESTORED)
 
-#### `/e2e` (DELETED)
+**Status:** The `qa-workflow` skill now exists at `.claude/skills/qa-workflow/SKILL.md`. Command `/qa-workflow` delegates to it. The original `/e2e` was deleted but functionality is available via `/qa-workflow`.
 
-**Reason:** Delegates to `qa-workflow` skill which doesn't exist. No backing skill implementation.
+#### `/eval` (RESTORED)
 
-**Future consideration:** E2E testing should be handled by the `qa` agent. If a dedicated skill is needed, create it first.
-
-#### `/eval` (DELETED)
-
-**Reason:** Delegates to `qa-workflow` skill which doesn't exist (same as `/e2e`). No backing skill implementation.
-
-**Future consideration:** Eval/regression testing should be handled by the `qa` agent. If a dedicated skill is needed, create it first.
+**Status:** The `qa-workflow` skill now exists at `.claude/skills/qa-workflow/SKILL.md`. Command `/qa-workflow` delegates to it. The original `/eval` was deleted but functionality is available via `/qa-workflow`.
 
 ---
 
@@ -456,7 +478,7 @@ Direct writes to `.claude/commands/` are allowed (commands are NOT creator-guard
 ## Related Documentation
 
 - **Command Architecture:** `.claude/context/plans/commands-overhaul-architecture-2026-02-07.md`
-- **Skill Catalog:** `.claude/context/artifacts/catalogs/skill-catalog.md`
+- **Skill Catalog:** `.claude/docs/skill-catalog.md`
 - **Agent Routing:** `.claude/docs/@AGENT_ROUTING_TABLE.md`
 - **Router Decision:** `.claude/workflows/core/router-decision.md`
 - **CLAUDE.md Section 7.1:** Commands (Slash Commands)

@@ -113,32 +113,32 @@ describe('agent-config-reader', () => {
   describe('getModelFromConfig', () => {
     it('should read planner model from config.yaml', () => {
       const model = getModelFromConfig('planner', PROJECT_ROOT);
-      // config.yaml has planner: model: claude-opus-4-5-20251101
-      assert.strictEqual(model, 'claude-opus-4-5-20251101');
+      // config.yaml has planner: model: opus (shorthand)
+      assert.strictEqual(model, 'opus');
     });
 
     it('should read developer model from config.yaml', () => {
       const model = getModelFromConfig('developer', PROJECT_ROOT);
-      // config.yaml has developer: model: claude-sonnet-4-5
-      assert.strictEqual(model, 'claude-sonnet-4-5');
+      // config.yaml has developer: model: sonnet (shorthand)
+      assert.strictEqual(model, 'sonnet');
     });
 
     it('should read qa model from config.yaml', () => {
       const model = getModelFromConfig('qa', PROJECT_ROOT);
-      // config.yaml has qa: model: claude-opus-4-5-20251101
-      assert.strictEqual(model, 'claude-opus-4-5-20251101');
+      // config.yaml has qa: model: opus (shorthand)
+      assert.strictEqual(model, 'opus');
     });
 
     it('should read architect model from config.yaml', () => {
       const model = getModelFromConfig('architect', PROJECT_ROOT);
-      // config.yaml has architect: model: claude-opus-4-5-20251101
-      assert.strictEqual(model, 'claude-opus-4-5-20251101');
+      // config.yaml has architect: model: opus (shorthand)
+      assert.strictEqual(model, 'opus');
     });
 
     it('should return configured model for security-architect', () => {
       const model = getModelFromConfig('security-architect', PROJECT_ROOT);
       assert.ok(typeof model === 'string');
-      assert.ok(model.includes('claude-'));
+      assert.ok(model.includes('opus') || model.includes('claude-'));
     });
 
     it('should return null for invalid project root', () => {

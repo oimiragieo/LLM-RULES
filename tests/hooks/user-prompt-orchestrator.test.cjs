@@ -119,11 +119,11 @@ describe('user-prompt-orchestrator.cjs - HOOK_ORDER Definition', () => {
     assert.ok(Array.isArray(orchestrator.HOOK_ORDER));
     assert.equal(orchestrator.HOOK_ORDER.length, 4);
 
-    // Verify exact order
-    assert.equal(orchestrator.HOOK_ORDER[0], '.claude/hooks/reflection/force-step0-execution.cjs');
-    assert.equal(orchestrator.HOOK_ORDER[1], '.claude/hooks/session/state-reset.cjs');
-    assert.equal(orchestrator.HOOK_ORDER[2], '.claude/hooks/routing/user-prompt-unified.cjs');
-    assert.equal(orchestrator.HOOK_ORDER[3], '.claude/hooks/session/drift-detector.cjs');
+    // Verify exact order (force-step0-execution.cjs removed — runs as direct hook in settings.json)
+    assert.equal(orchestrator.HOOK_ORDER[0], '.claude/hooks/session/state-reset.cjs');
+    assert.equal(orchestrator.HOOK_ORDER[1], '.claude/hooks/routing/user-prompt-unified.cjs');
+    assert.equal(orchestrator.HOOK_ORDER[2], '.claude/hooks/session/drift-detector.cjs');
+    assert.equal(orchestrator.HOOK_ORDER[3], '.claude/hooks/session/vector-db-warmstart.cjs');
   });
 });
 

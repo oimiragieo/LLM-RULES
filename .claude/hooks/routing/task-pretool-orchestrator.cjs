@@ -44,6 +44,7 @@ function runChildHook(hookPath, stdinData) {
     env: process.env,
     shell: false,
     windowsHide: true,
+    maxBuffer: 10 * 1024 * 1024, // 10MB — prevent hang on large spawn prompt output
   });
 }
 

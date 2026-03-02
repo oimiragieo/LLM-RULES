@@ -2,6 +2,8 @@
 name: solidjs-expert
 description: SolidJS expert including reactivity, components, and store patterns
 version: 1.0.0
+verified: true
+lastVerifiedAt: '2026-02-28'
 category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [solidjs, reactive, signals, frontend, performance]

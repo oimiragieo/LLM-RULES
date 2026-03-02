@@ -9,14 +9,13 @@ const path = require('path');
 const fs = require('fs');
 
 test('Read tool directory safety', async t => {
-  await t.test('Blocking directory read with helpful message', () => {
+  await t.test('Rewriting directory read with listing file', () => {
     const toolInput = { file_path: '.claude' };
     const result = checkReadSafety('Read', toolInput, { permission_mode: 'normal' });
 
     assert.strictEqual(result.checked, true);
-    assert.strictEqual(result.action, 'block');
-    assert.match(result.message, /is a directory/);
-    assert.match(result.message, /Use Glob\/rg --files/);
+    assert.strictEqual(result.action, 'rewrite');
+    assert.ok(String(result.bypassWarning || result.message || '').includes('is a directory'));
   });
 
   await t.test('Bypass mode rewrites directory read to listing', () => {

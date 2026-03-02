@@ -4,7 +4,7 @@ description: Search-aware context compression workflow for agent-studio. Use pnp
 argument-hint: [file-or-text-and-query]
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
-version: '1.0.0'
+version: 1.0.0
 tools: []
 ---
 
@@ -75,7 +75,7 @@ python .claude/skills/token-saver-context-compression/scripts/run_skill_workflow
 
 - Skill workflow: `.claude/workflows/token-saver-context-compression-skill-workflow.md`
 - Companion tool: `.claude/tools/token-saver-context-compression/token-saver-context-compression.cjs`
-- Command surface: `.claude/skills/token-saver-context-compression/commands/token-saver-context-compression.md`
+- Command surface: `.claude/commands/token-saver-context-compression.md`
 - Citation format is unchanged:
   - memory entries become `[mem:xxxxxxxx]`
   - RAG entries remain `[rag:xxxxxxxx]`

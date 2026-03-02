@@ -1,15 +1,28 @@
 ---
 name: nativescript
-version: 1.1.0
-category: 'Mobile'
-agents: [developer]
-tags: [nativescript, mobile, native, javascript, cross-platform]
+version: 1.2.0
+category: Mobile
+agents:
+  - developer
+  - mobile-ux-reviewer
+  - expo-mobile-developer
+tags:
+  - nativescript
+  - mobile
+  - native
+  - javascript
+  - cross-platform
 description: NativeScript best practices and patterns for mobile applications
 model: sonnet
 invoked_by: both
 user_invocable: true
-tools: [Read, Write, Edit]
-globs: '**/*.tsx, **/*.ts, **/*.vue, **/*.svelte, src/**/*.ts, app/**/*.ts, src/**/*.tsx, app/**/*.tsx, src/**/*.vue, app/**/*.vue, src/**/*.svelte'
+tools:
+  - Read
+  - Write
+  - Edit
+globs: >-
+  **/*.tsx, **/*.ts, **/*.vue, **/*.svelte, src/**/*.ts, app/**/*.ts, src/**/*.tsx, app/**/*.tsx, src/**/*.vue,
+  app/**/*.vue, src/**/*.svelte
 best_practices:
   - Follow the guidelines consistently
   - Apply rules during code review
@@ -17,7 +30,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: '2026-03-01T06:07:37.431Z'
 ---
 
 # Nativescript Skill

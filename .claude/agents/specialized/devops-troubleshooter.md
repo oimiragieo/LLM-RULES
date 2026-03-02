@@ -47,6 +47,7 @@ skills:
   - sentry-monitoring
   - smart-debug
   - memory-search
+  - debug-log-analysis
 ---
 
 <!-- agent-template-contract:v1 -->

@@ -4,6 +4,11 @@
 version: '2.2.2'
 environment: staging
 
+# --- Claude API Beta Headers (Context Management) ---
+# Enables auto-clearing of stale tool results from context window (84% token reduction)
+apiHeaders:
+  - 'context-management-2025-06-27'
+
 # --- Router Configuration (The Gatekeeper) ---
 agent_routing:
   router:
@@ -49,7 +54,7 @@ monitoring:
   dashboardRefreshMs: 5000 # 5s refresh rate
   thresholds:
     # Staging thresholds are 2x more lenient than production
-    hookExecutionTimeMs: 20 # Production: 10ms
+    hookExecutionTimeMs: 200 # Production: 100ms
     hookFailureRate: 10 # Production: 5%
     agentFailureRate: 6 # Production: 3%
     errorRatePerHour: 20 # Production: 10
@@ -60,12 +65,24 @@ monitoring:
   dashboard:
     refreshIntervalMs: 5000
 
+# --- Memory Management Configuration ---
+memory:
+  rotation:
+    threshold_kb: 20
+    max_age_days: 30
+  pruning:
+    similarity_threshold: 0.6
+  cold_storage:
+    max_age_days: 30
+
 # --- Feature Flags (All Enabled in Staging for Testing) ---
 features:
   partyMode:
     enabled: true # Enable for staging testing
     maxAgents: 5
-    turnLimit: 20
+    maxRounds: 20 # Staging: higher limit for testing (production: 10)
+    contextWarning: 100000
+    contextLimit: 150000
     costLimit: 50.0
   advancedElicitation:
     enabled: true # Enable for staging testing
@@ -82,6 +99,27 @@ features:
     enabled: true
   sidecarMemory:
     enabled: true # Enable for staging testing
+
+# --- Memory Management (Token Budget Framework) ---
+memory_management:
+  token_budgets:
+    haiku: 200000
+    sonnet: 200000
+    opus: 200000
+  token_tracking:
+    enabled: true
+    char_to_token_ratio: 0.75
+    warn_threshold: 0.90
+    warn_message: 'Agent approaching token limit - consider compression'
+    log_format: 'jsonl'
+  budget_calculation:
+    include_prompt: true
+    include_tool_results: true
+    include_context: true
+  auto_compression:
+    enabled: true
+    trigger_threshold: 0.90
+    max_compressions_per_session: 5
 
 # --- Staging-Specific Paths ---
 # All staging data stored in .claude/staging/ to isolate from development/production
@@ -108,16 +146,225 @@ testData:
 
 # --- Core Agents Definition (Same as Production) ---
 agents:
+  # Core agents (framework coordination)
+  router:
+    path: .claude/agents/core/router.md
+    model: haiku
   planner:
-    path: agents/core/planner.md
+    path: .claude/agents/core/planner.md
     model: opus
     extended_thinking: true
   developer:
-    path: agents/core/developer.md
+    path: .claude/agents/core/developer.md
     model: sonnet
   qa:
-    path: agents/core/qa.md
+    path: .claude/agents/core/qa.md
     model: opus
   architect:
-    path: agents/core/architect.md
+    path: .claude/agents/core/architect.md
+    model: opus
+  pm:
+    path: .claude/agents/core/pm.md
+    model: sonnet
+  technical-writer:
+    path: .claude/agents/core/technical-writer.md
+    model: sonnet
+  context-compressor:
+    path: .claude/agents/core/context-compressor.md
+    model: haiku
+  reflection-agent:
+    path: .claude/agents/core/reflection-agent.md
+    model: sonnet
+  technical-program-manager:
+    path: .claude/agents/core/technical-program-manager.md
+    model: sonnet
+
+  # Specialized agents (high-stakes decisions)
+  security-architect:
+    path: .claude/agents/specialized/security-architect.md
+    model: opus
+  code-reviewer:
+    path: .claude/agents/specialized/code-reviewer.md
+    model: sonnet
+  code-simplifier:
+    path: .claude/agents/specialized/code-simplifier.md
+    model: sonnet
+  database-architect:
+    path: .claude/agents/specialized/database-architect.md
+    model: opus
+  devops:
+    path: .claude/agents/specialized/devops.md
+    model: sonnet
+  devops-troubleshooter:
+    path: .claude/agents/specialized/devops-troubleshooter.md
+    model: sonnet
+  incident-responder:
+    path: .claude/agents/specialized/incident-responder.md
+    model: opus
+  researcher:
+    path: .claude/agents/specialized/researcher.md
+    model: sonnet
+  reverse-engineer:
+    path: .claude/agents/specialized/reverse-engineer.md
+    model: sonnet
+  sre-engineer:
+    path: .claude/agents/specialized/sre-engineer.md
+    model: sonnet
+  chaos-engineer:
+    path: .claude/agents/specialized/chaos-engineer.md
+    model: sonnet
+  penetration-tester:
+    path: .claude/agents/specialized/penetration-tester.md
+    model: opus
+  performance-engineer:
+    path: .claude/agents/specialized/performance-engineer.md
+    model: sonnet
+  accessibility-tester:
+    path: .claude/agents/specialized/accessibility-tester.md
+    model: sonnet
+  advanced-debugging:
+    path: .claude/agents/specialized/advanced-debugging.md
+    model: opus
+  conductor-validator:
+    path: .claude/agents/specialized/conductor-validator.md
+    model: sonnet
+
+  # C4 model agents (diagramming)
+  c4-code:
+    path: .claude/agents/specialized/c4-code.md
+    model: sonnet
+  c4-component:
+    path: .claude/agents/specialized/c4-component.md
+    model: sonnet
+  c4-container:
+    path: .claude/agents/specialized/c4-container.md
+    model: sonnet
+  c4-context:
+    path: .claude/agents/specialized/c4-context.md
+    model: sonnet
+
+  # Domain specialists (technology-specific)
+  python-pro:
+    path: .claude/agents/domain/python-pro.md
+    model: sonnet
+  typescript-pro:
+    path: .claude/agents/domain/typescript-pro.md
+    model: sonnet
+  frontend-pro:
+    path: .claude/agents/domain/frontend-pro.md
+    model: sonnet
+  nodejs-pro:
+    path: .claude/agents/domain/nodejs-pro.md
+    model: sonnet
+  nextjs-pro:
+    path: .claude/agents/domain/nextjs-pro.md
+    model: sonnet
+  fastapi-pro:
+    path: .claude/agents/domain/fastapi-pro.md
+    model: sonnet
+  golang-pro:
+    path: .claude/agents/domain/golang-pro.md
+    model: sonnet
+  rust-pro:
+    path: .claude/agents/domain/rust-pro.md
+    model: sonnet
+  java-pro:
+    path: .claude/agents/domain/java-pro.md
+    model: sonnet
+  php-pro:
+    path: .claude/agents/domain/php-pro.md
+    model: sonnet
+  ios-pro:
+    path: .claude/agents/domain/ios-pro.md
+    model: sonnet
+  android-pro:
+    path: .claude/agents/domain/android-pro.md
+    model: sonnet
+  expo-mobile-developer:
+    path: .claude/agents/domain/expo-mobile-developer.md
+    model: sonnet
+  tauri-desktop-developer:
+    path: .claude/agents/domain/tauri-desktop-developer.md
+    model: sonnet
+  gamedev-pro:
+    path: .claude/agents/domain/gamedev-pro.md
+    model: sonnet
+  sveltekit-expert:
+    path: .claude/agents/domain/sveltekit-expert.md
+    model: sonnet
+
+  # API/Architecture specialists
+  api-designer:
+    path: .claude/agents/domain/api-designer.md
+    model: sonnet
+  graphql-pro:
+    path: .claude/agents/domain/graphql-pro.md
+    model: sonnet
+  microservices-architect:
+    path: .claude/agents/domain/microservices-architect.md
+    model: opus
+
+  # AI/ML specialists
+  llm-architect:
+    path: .claude/agents/domain/llm-architect.md
+    model: opus
+  ai-ml-specialist:
+    path: .claude/agents/domain/ai-ml-specialist.md
+    model: sonnet
+  prompt-engineer:
+    path: .claude/agents/domain/prompt-engineer.md
+    model: sonnet
+  mcp-developer:
+    path: .claude/agents/domain/mcp-developer.md
+    model: sonnet
+
+  # Domain specialists with specialized roles
+  kubernetes-specialist:
+    path: .claude/agents/domain/kubernetes-specialist.md
+    model: opus
+  pm-coordinator:
+    path: .claude/agents/domain/pm-coordinator.md
+    model: sonnet
+  medical-research-triage:
+    path: .claude/agents/domain/medical-research-triage.md
+    model: opus
+
+  # Multi-LLM consultation
+  multi-llm-consultant:
+    path: .claude/agents/domain/multi-llm-consultant.md
+    model: sonnet
+
+  # Data specialists
+  data-engineer:
+    path: .claude/agents/domain/data-engineer.md
+    model: sonnet
+
+  # Emerging tech specialists
+  web3-blockchain-expert:
+    path: .claude/agents/domain/web3-blockchain-expert.md
+    model: sonnet
+  scientific-research-expert:
+    path: .claude/agents/domain/scientific-research-expert.md
+    model: sonnet
+  mobile-ux-reviewer:
+    path: .claude/agents/domain/mobile-ux-reviewer.md
+    model: sonnet
+
+  # Orchestrators (complex coordination - require opus)
+  master-orchestrator:
+    path: .claude/agents/orchestrators/master-orchestrator.md
+    model: opus
+    extended_thinking: true
+  evolution-orchestrator:
+    path: .claude/agents/orchestrators/evolution-orchestrator.md
+    model: opus
+    extended_thinking: true
+  party-orchestrator:
+    path: .claude/agents/orchestrators/party-orchestrator.md
+    model: opus
+  swarm-coordinator:
+    path: .claude/agents/orchestrators/swarm-coordinator.md
+    model: opus
+  artifact-integrator:
+    path: .claude/agents/orchestrators/artifact-integrator.md
     model: opus

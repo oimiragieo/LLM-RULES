@@ -1,7 +1,7 @@
 ---
 name: agent-evaluation
 description: LLM-as-judge evaluation framework with 5-dimension rubric (accuracy, groundedness, coherence, completeness, helpfulness) for scoring AI-generated content quality with weighted composite scores and evidence citations
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -10,7 +10,7 @@ agents: [qa, code-reviewer, reflection-agent]
 category: 'Validation & Quality'
 tags: [evaluation, llm-judge, quality, rubric, scoring, ai-output]
 verified: true
-lastVerifiedAt: 2026-02-21T07:00:00.000Z
+lastVerifiedAt: '2026-03-01'
 best_practices:
   - Always evaluate all 5 dimensions before computing composite score
   - Cite specific evidence from the output being evaluated for each dimension score

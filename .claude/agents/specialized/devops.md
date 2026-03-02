@@ -38,6 +38,7 @@ skills:
   - monorepo-and-tooling
   - filesystem
   - finishing-a-development-branch
+  - ralph-loop
   - git-expert
   - github-mcp
   - k8s-manifest-generator
@@ -66,6 +67,8 @@ skills:
   - vercel-deploy
   - web-perf
   - memory-search
+  - powershell-expert
+  - feature-flag-management
 ---
 
 <!-- agent-template-contract:v1 -->

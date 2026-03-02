@@ -78,6 +78,18 @@ function validate(context) {
  */
 async function main() {
   try {
+    // PERF: Fast pre-parse short-circuit for non-skill Read calls.
+    // ~95% of Read operations do not target skill files. Check the raw
+    // input string for "skills" before spending time on JSON parsing,
+    // sanitization, and helper calls. This avoids parseHookInputAsync()
+    // overhead (stdin read + safeParseJSON + sanitizeObject) for the
+    // vast majority of Read invocations.
+    const rawArg = process.argv[2] || '';
+    if (rawArg && !rawArg.includes('skills')) {
+      // argv input present but doesn't reference any skill path — fast exit
+      process.exit(0);
+    }
+
     // PERF-006/PERF-007: Use shared hook-input.cjs utility
     const hookInput = await parseHookInputAsync();
 

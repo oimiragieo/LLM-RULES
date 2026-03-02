@@ -1,7 +1,11 @@
 ---
 name: modern-python
 description: Modern Python tooling best practices using uv, ruff, ty, and pytest. Mandates the Trail of Bits Python coding standards for project setup, dependency management, linting, type checking, and testing. Based on patterns from trailofbits/cookiecutter-python.
-version: 1.0.0
+version: 1.1.0
+category: Languages
+agents: [python-pro, developer, fastapi-pro]
+tags:
+  [python, uv, ruff, ty, pytest, tooling, linting, formatting, type-checking, dependency-management]
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -15,8 +19,8 @@ best_practices:
   - Configure all tools in pyproject.toml, never in separate config files
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: null
+verified: true
+lastVerifiedAt: '2026-03-01'
 ---
 
 # Modern Python Skill
@@ -59,13 +63,23 @@ This skill implements Trail of Bits' modern Python coding standards for the agen
 - When writing standalone Python scripts that need proper structure
 - When an AI agent needs fast feedback from Python tooling
 
-## Iron Law
+## Iron Laws
 
-```
-ALL PYTHON TOOLING CONFIGURED IN pyproject.toml — NO SEPARATE CONFIG FILES
-```
+1. **ALWAYS** configure all Python tooling in `pyproject.toml` -- no separate config files (`setup.cfg`, `.flake8`, `mypy.ini`, `black.toml`) are permitted.
+2. **ALWAYS** use `uv add`/`uv remove` for dependency management -- never use bare `pip install` in projects managed by uv.
+3. **NEVER** commit `venv/`, `.venv/`, or pip-generated `requirements.txt` -- commit `uv.lock` for reproducible builds.
+4. **ALWAYS** use `uv run` to execute tools and scripts -- this ensures the correct virtual environment and dependency resolution.
+5. **NEVER** use legacy linting/formatting tools (flake8, black, isort, mypy) when ruff and ty are available -- consolidate to the Rust-based stack for speed and consistency.
 
-`pyproject.toml` is the single source of truth for all tool configuration. No `setup.cfg`, no `.flake8`, no `mypy.ini`, no `black.toml`.
+## Anti-Patterns
+
+| Anti-Pattern                                                    | Why It Fails                                                                        | Correct Approach                                                                      |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Using `pip install` directly in a uv-managed project            | Bypasses lockfile and dependency resolution; creates reproducibility drift          | Use `uv add <pkg>` to add dependencies and `uv sync` to install                       |
+| Maintaining `.flake8`, `mypy.ini`, or `black.toml` config files | Fragments configuration across multiple files; hard to maintain and audit           | Consolidate all tool config into `pyproject.toml` under `[tool.ruff]` and `[tool.ty]` |
+| Running `python script.py` instead of `uv run python script.py` | Uses system Python instead of project venv; dependency mismatches                   | Always use `uv run` to execute within the managed environment                         |
+| Globally installing CLI tools with `pip install --user`         | Pollutes global environment; version conflicts across projects                      | Use `uv tool run <tool>` or `uvx <tool>` for one-off tool execution                   |
+| Ignoring ruff security rules (`S` select)                       | Misses bandit-equivalent security checks like hardcoded passwords and SQL injection | Enable `select = ["S"]` in `[tool.ruff.lint]` for security linting                    |
 
 ## The Modern Python Stack
 

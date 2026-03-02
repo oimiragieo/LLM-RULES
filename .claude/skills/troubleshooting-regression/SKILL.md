@@ -4,7 +4,7 @@ description: Regression troubleshooting workflow for hook/router/memory/search f
 argument-hint: '[--prompt "..."] [--log-path <path>] [--mode quick|full]'
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
-version: '1.0.0'
+version: 1.0.0
 tools: []
 ---
 

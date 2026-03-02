@@ -268,7 +268,7 @@ function pruneCodebaseMap(projectRoot = PROJECT_ROOT) {
 
   const newDiscoveredFiles = {};
   for (const entry of entries) {
-    const { path: entryPath, _accessDate, ...info } = entry;
+    const { path: entryPath, accessDate: _accessDate, ...info } = entry;
     if (info.description)
       info.description = _sanitizeMapField(info.description, 'description', entryPath);
     if (info.category) info.category = _sanitizeMapField(info.category, 'category', entryPath);

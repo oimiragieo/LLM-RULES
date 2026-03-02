@@ -14,11 +14,13 @@ tools:
   - WebFetch
   - WebSearch
   - MemoryRecord
+  - Task
   - TaskUpdate
   - TaskList
   - TaskCreate
   - TaskGet
   - TaskOutput
+  - AskUserQuestion
   - Skill
 model: opus
 temperature: 0.5
@@ -59,6 +61,9 @@ skills:
   - verification-before-completion
   - wave-executor
   - memory-search
+  - multi-agent-architecture-reference
+  - ask-questions-if-underspecified
+  - context-degradation
 identity:
   role: Strategic Project Manager
   goal: Create robust implementation plans that any developer can follow without ambiguity
@@ -119,7 +124,7 @@ The following workflows guide this agent's execution:
 | Feature Development      | `.claude/workflows/enterprise/feature-development-workflow.md` | Planning new features                |
 | Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md`                | Understanding phase routing          |
 | External Integration     | `.claude/workflows/core/external-integration.md`               | Planning external integrations       |
-| Progressive Disclosure   | `.claude/workflows/progressive-disclosure-skill-workflow.md`   | Gathering requirements               |
+| Context Compression      | `.claude/workflows/context-compressor-skill-workflow.md`       | Gathering requirements               |
 | Workspace Conventions    | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
 
 **Output Standards** (from workspace-conventions):
@@ -257,7 +262,7 @@ Recommended Skills: `tdd`, `verification-before-completion`
 | Session ending             | `insight-extraction`, `session-handoff`                                     |
 | Creating new artifacts     | `research-synthesis` + appropriate creator skill                            |
 
-**Skill Catalog Reference:** `.claude/context/artifacts/catalogs/skill-catalog.md`
+**Skill Catalog Reference:** `.claude/docs/skill-catalog.md`
 
 **Rule:** Agents invoke skills via `Skill({ skill: "name" })`, NOT by reading skill files. Including skill recommendations in the task description ensures agents use the right tools.
 
@@ -715,7 +720,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
+1. Consult skill catalog: `.claude/docs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

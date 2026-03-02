@@ -3,7 +3,7 @@ verified: true
 lastVerifiedAt: 2026-02-18T21:55:39.677Z
 name: tdd
 description: Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely.
-version: 1.2
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true

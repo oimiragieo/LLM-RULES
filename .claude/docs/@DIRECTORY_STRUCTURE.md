@@ -260,7 +260,7 @@ skills/
 
 ### tools/
 
-**Total Active Tools:** 66 source files (25 archived, 8 relocated to lib/)
+**Total Active Tools:** 124 source files (25 archived, 8 relocated to lib/)
 **Boundary Rule:** CLI executables only; library modules go in `.claude/lib/`
 
 ```
@@ -270,10 +270,9 @@ tools/
 │   ├── doctor.mjs
 │   ├── validate-agents.mjs
 │   ├── security-lint.cjs
-│   ├── detect-orphans.mjs
 │   ├── validate-commit.mjs
-│   ├── tool_search.mjs
 │   └── git-notes-verify.cjs
+│   # detect-orphans.mjs and tool_search.mjs archived to _archive/
 ├── analysis/               # Code and project analysis
 │   ├── project-analyzer/
 │   ├── ecosystem-assessor/

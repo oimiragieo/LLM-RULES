@@ -30,12 +30,10 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 | Security Audit          | `.claude/workflows/security-architect-skill-workflow.md`              | security audit                    |
 | Architecture Review     | `.claude/workflows/architecture-review-skill-workflow.md`             | arch review                       |
 | Consensus Voting        | `.claude/workflows/consensus-voting-skill-workflow.md`                | consensus                         |
-| Swarm Coordination      | `.claude/workflows/enterprise/swarm-coordination-skill-workflow.md`   | swarm patterns                    |
 | Database Design         | `.claude/workflows/database-architect-skill-workflow.md`              | schema workflows                  |
 | Context Compression     | `.claude/workflows/context-compressor-skill-workflow.md`              | summarization                     |
 | Token Saver Compression | `.claude/workflows/token-saver-context-compression-skill-workflow.md` | search-aware evidence compression |
 | Post-Creation Valid.    | `.claude/workflows/core/post-creation-validation.md`                  | artifact integration              |
-| Progressive Disclos.    | `.claude/workflows/progressive-disclosure-skill-workflow.md`          | requirements gathering            |
 | **Domain Development**  | `.claude/workflows/domain-development-workflow.md`                    | **TDD for domain agents**         |
 | **Code Review**         | `.claude/workflows/code-review-workflow.md`                           | **two-pass review**               |
 | **Product Management**  | `.claude/workflows/product-management-workflow.md`                    | **INVEST sprint mgmt**            |
@@ -58,7 +56,6 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 
 - `feature-development-workflow.md` - End-to-end feature development
 - `c4-architecture-workflow.md` - C4 model documentation
-- `swarm-coordination-skill-workflow.md` - Multi-agent swarm patterns
 
 **Operations Workflows** (`.claude/workflows/operations/`):
 

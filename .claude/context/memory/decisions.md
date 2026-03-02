@@ -1,3 +1,12 @@
+## ADR-2026-03-01-063: Python/DevOps orphaned skill wiring batch (2026-03-01)
+
+**Status:** ACCEPTED
+**Date:** 2026-03-01
+**Trigger:** Orphaned skill sweep -- 5 skills (modern-python, poetry-rye-dependency-management, pyqt6-ui-development-rules, powershell-expert, feature-flag-management) had no agent-skill-matrix entries and defaulted to developer/Other.
+**Decision:** Wire each skill to domain-appropriate agents via agent-skill-matrix.json AND agent frontmatter. modern-python primary to python-pro; poetry-rye and pyqt6 secondary/contextual to python-pro; powershell to developer+devops; feature-flags to developer+devops+qa. Update CATEGORY_MAP in generate-skill-index-definitions.cjs for correct index classification.
+**Alternatives:** Could have created dedicated domain agents for each, but skills are cross-cutting and fit better as augmentations to existing agents.
+**Consequences:** 5 fewer orphaned catalog skills. python-pro now has comprehensive Python tooling coverage. devops gains PowerShell and feature-flag capabilities.
+
 ## ADR-2026-02-23-062: stale-module-pruner and proactive-audit skill-updater pass (2026-02-23)
 
 **Status:** ACCEPTED

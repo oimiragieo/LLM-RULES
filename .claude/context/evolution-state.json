@@ -1,7 +1,91 @@
 {
   "version": 1,
-  "lastEvolution": "2026-02-23-stale-module-pruner-proactive-audit-update",
+  "lastEvolution": "2026-03-01-dynamic-api-integration-update",
   "evolutions": [
+    {
+      "id": "2026-03-01-dynamic-api-integration-update",
+      "skill": "dynamic-api-integration",
+      "version": "1.2.0",
+      "date": "2026-03-01",
+      "type": "skill-updater",
+      "summary": "Added agents/category/tags frontmatter, wired to developer (secondary) and architect (secondary), updated lastVerifiedAt. Skill was already production-quality with 5 Iron Laws, 7 Anti-Patterns, full 5-phase UTCP workflow."
+    },
+    {
+      "id": "2026-03-01-context-degradation-update",
+      "skill": "context-degradation",
+      "version": "1.2.0",
+      "date": "2026-03-01",
+      "type": "skill-updater",
+      "summary": "Wired to context-compressor (primary) and planner (secondary) agents. Updated lastVerifiedAt. Skill was already production-quality with 5 Iron Laws and 5 Anti-Patterns."
+    },
+    {
+      "id": "2026-03-01-ask-questions-if-underspecified-update",
+      "skill": "ask-questions-if-underspecified",
+      "version": "1.2.0",
+      "date": "2026-03-01",
+      "type": "skill-updater",
+      "summary": "Added agents/category/tags frontmatter, wired to planner (primary) and developer (secondary), added memory entry. Skill already had 5 Iron Laws and 5 Anti-Patterns."
+    },
+    {
+      "id": "2026-03-01-multi-agent-architecture-reference-update",
+      "skill": "multi-agent-architecture-reference",
+      "version": "1.1.0",
+      "date": "2026-03-01",
+      "type": "skill-updater",
+      "summary": "Added Iron Laws (5), Anti-Patterns table (5 rows), wired to architect and planner agents, added to catalog Quick Reference Planning section"
+    },
+    {
+      "id": "2026-03-01-authentication-flow-rules-update",
+      "artifactType": "skill",
+      "name": "authentication-flow-rules",
+      "path": ".claude/skills/authentication-flow-rules/",
+      "status": "completed",
+      "completedAt": "2026-03-01T00:00:00.000Z",
+      "description": "Bumped authentication-flow-rules v2.0.0 -> v2.1.0. Added 5 Iron Laws (PKCE mandatory, Implicit Flow removed, token storage in HttpOnly cookies, access token TTL <=15min, refresh token rotation), 5-row Anti-Patterns table. Wired into skill-catalog.md Quick Reference Security row. Skill already assigned to security-architect. lastVerifiedAt updated to 2026-03-01.",
+      "affected": ["authentication-flow-rules"]
+    },
+    {
+      "id": "2026-03-01-python-devops-skill-updater-batch",
+      "artifactType": "skill-batch",
+      "name": "python-devops-skill-updater-batch",
+      "path": ".claude/skills/",
+      "status": "completed",
+      "completedAt": "2026-03-01T12:00:00.000Z",
+      "description": "Ran skill-updater for 5 orphaned Python/DevOps skills: modern-python (v1.1.0, python-pro/developer/fastapi-pro), poetry-rye-dependency-management (v2.0.0 full rewrite, python-pro/developer), pyqt6-ui-development-rules (v2.0.0 expanded, python-pro/developer), powershell-expert (v2.2.0, developer/devops), feature-flag-management (v2.0.0 full rewrite, developer/devops/qa). All wired into agent-skill-matrix.json, agent frontmatter, skill-catalog.md, and CATEGORY_MAP.",
+      "affected": [
+        "modern-python",
+        "poetry-rye-dependency-management",
+        "pyqt6-ui-development-rules",
+        "powershell-expert",
+        "feature-flag-management"
+      ]
+    },
+    {
+      "id": "2026-03-01-orphan-skill-wiring-batch",
+      "artifactType": "skill-batch",
+      "name": "orphan-skill-wiring-batch",
+      "path": ".claude/skills/",
+      "status": "completed",
+      "completedAt": "2026-03-01T00:00:00.000Z",
+      "description": "Wired 5 orphaned skills into agent-skill-matrix.json and agent frontmatter: agent-evaluation (v1.2.0 -> qa/code-reviewer/reflection-agent), property-based-testing (v1.1.0 -> qa/developer), webapp-testing (v1.1.0 -> qa/frontend-pro), fix-review (v1.1.0 -> security-architect/code-reviewer), debug-log-analysis (v1.2.0 -> reflection-agent/devops-troubleshooter/developer). All verified and set lastVerifiedAt.",
+      "affected": [
+        "agent-evaluation",
+        "property-based-testing",
+        "webapp-testing",
+        "fix-review",
+        "debug-log-analysis"
+      ]
+    },
+    {
+      "id": "2026-02-28-ralph-loop-skill-creation",
+      "artifactType": "skill",
+      "name": "ralph-loop",
+      "path": ".claude/skills/ralph-loop/",
+      "status": "completed",
+      "completedAt": "2026-02-28T00:00:00.000Z",
+      "description": "New skill ralph-loop created via skill-creator process. Enterprise bundle (9 components) + companion tool + workflow + global command + schema. Ralph files consolidated into .claude/ralph/. Assigned to developer, qa, devops, master-orchestrator. Research: 6 Exa sources, 3 arXiv papers.",
+      "affected": ["ralph-loop"]
+    },
     {
       "id": "2026-02-23-stale-module-pruner-proactive-audit-update",
       "artifactType": "skill-batch",
@@ -1200,5 +1284,21 @@
     }
   ],
   "pendingProposals": [],
-  "status": "idle"
+  "status": "idle",
+  "skills": {
+    "building-secure-contracts": {
+      "skill": "building-secure-contracts",
+      "version": "1.1.0",
+      "lastEvolution": "2026-03-01",
+      "trigger": "manual",
+      "description": "Promoted from stub to production-quality SKILL.md with CEI pattern, reentrancy analysis, access control audit, invariant verification, and OpenSCV taxonomy. Wired into security-architect agent and catalog."
+    },
+    "yara-authoring": {
+      "skill": "yara-authoring",
+      "version": "1.1.0",
+      "lastEvolution": "2026-03-01",
+      "trigger": "manual",
+      "description": "Added agents frontmatter, category, verified status. Expanded from singular Iron Law to 5-law suite. Added Anti-Patterns table. Wired into reverse-engineer and security-architect agents and catalog Security section."
+    }
+  }
 }

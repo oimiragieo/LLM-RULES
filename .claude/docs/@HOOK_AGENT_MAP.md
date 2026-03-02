@@ -26,6 +26,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `pre-completion-validation.cjs`     |        | x           | x        | x          |              | x          |
 | `creator-compliance-validator.cjs`  |        | x           |          | x          |              |            |
 | `quality-gate-validator.cjs`        |        | x           |          | x          |              |            |
+| `adaptive-quality-gate.cjs`         | x      | x           | x        | x          | x            | x          |
 | `check-console-log.cjs`             | x      | x           | x        | x          | x            | x          |
 | `pre-compact.cjs`                   | x      | x           | x        | x          | x            | x          |
 
@@ -44,8 +45,8 @@ This document provides a comprehensive mapping between enforcement hooks and age
 
 ### UserPromptSubmit (Router only)
 
-1. `reflection-queue-processor.cjs`
-2. `force-step0-execution.cjs`
+1. `force-step0-execution.cjs`
+2. `reflection-queue-processor.cjs`
 3. `sanitize-debug-log.cjs`
 4. `state-reset.cjs`
 5. `drift-detector.cjs`
@@ -61,7 +62,9 @@ This document provides a comprehensive mapping between enforcement hooks and age
 
 1. `pre-tool-unified.cjs`
 2. `write-pretool-bundle.cjs` (Consolidates: creator guard, contract validator, etc.)
-3. `conflict-detector.cjs` (Write only)
+3. `research-enforcement.cjs` (Write/Edit/NotebookEdit — enforces research phase before artifact creation)
+4. `conflict-detector.cjs` (Write only)
+5. `evolution-state-guard.cjs` (Write only — enforces EVOLVE state machine transitions)
 
 ### PreToolUse (Task)
 

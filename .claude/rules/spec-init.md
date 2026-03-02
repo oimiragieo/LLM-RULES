@@ -45,7 +45,6 @@ paths:
 
 ## Integration Points
 
-- Uses `progressive-disclosure` for adaptive questioning
-- Uses `spec-validator` for completeness checks
+- Uses `context-compressor` for adaptive questioning (progressive disclosure mode)
 - Feeds into `plan-generator` for implementation plans
 - Integrates with track-metadata schema

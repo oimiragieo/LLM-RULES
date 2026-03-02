@@ -47,6 +47,7 @@ skills:
   - async-operations
   - smart-debug
   - sequential-thinking
+  - ralph-loop
   - requesting-code-review
   - receiving-code-review
   - commit-validator
@@ -64,6 +65,16 @@ skills:
   - using-git-worktrees
   - git-expert
   - workflow-patterns
+  - property-based-testing
+  - debug-log-analysis
+  - modern-python
+  - powershell-expert
+  - feature-flag-management
+  - agent-tool-design
+  - ask-questions-if-underspecified
+  - elixir-expert
+  - medusa
+  - dynamic-api-integration
 capabilities:
   - code-generation
   - refactoring
@@ -403,7 +414,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
+1. Consult skill catalog: `.claude/docs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

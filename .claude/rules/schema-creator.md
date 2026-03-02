@@ -69,7 +69,7 @@ paths:
 
 ### Related Workflows
 
-- `.claude/workflows/creation/ecosystem-creation-workflow.md`
+- `.claude/workflows/core/ecosystem-creation-workflow.md`
 
 ## Post-Creation Checklist
 

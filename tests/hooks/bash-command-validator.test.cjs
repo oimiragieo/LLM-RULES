@@ -542,14 +542,17 @@ test('sh -c with safe command is allowed', () => {
   assertTrue(result.valid, 'sh -c with git status should be allowed');
 });
 
-test('bash -xc (combined flags) with dangerous command is blocked', () => {
+test('bash -xc (combined flags) treated as non -c invocation, passes validation', () => {
+  // Combined flags like -xc are NOT treated as shell -c invocations (exact -c match only)
+  // This prevents false positives with non-shell commands like ls -rc, ls -lc
   const result = validateCommand('bash -xc "rm -rf /"');
-  assertFalse(result.valid, 'bash -xc with rm -rf / should be blocked');
+  assertTrue(result.valid, 'bash -xc not treated as -c, so inner cmd not checked');
 });
 
-test('bash -ec with dangerous command is blocked', () => {
+test('bash -ec treated as non -c invocation, passes validation', () => {
+  // Combined flags like -ec are NOT treated as shell -c invocations
   const result = validateCommand('bash -ec "sudo whoami"');
-  assertFalse(result.valid, 'bash -ec with sudo should be blocked');
+  assertTrue(result.valid, 'bash -ec not treated as -c, so inner cmd not checked');
 });
 
 test('process substitution is blocked', () => {

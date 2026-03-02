@@ -7,7 +7,7 @@ metadata:
   argument-hint: <file-or-pattern>
 verified: false
 lastVerifiedAt: 2026-02-19T05:29:09.098Z
-version: '1.0.0'
+version: 1.0.0
 tools: []
 ---
 

@@ -1,5 +1,6 @@
 ---
-lastVerifiedAt: 2026-02-24T04:26:35.324Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 name: omega-claude-cli
 description: Shell out to Claude Code CLI to invoke a second Claude session headlessly. Useful for cross-validation, second opinions, and isolated analysis without sharing current agent context. Requires Anthropic account.
 version: 1.0.0

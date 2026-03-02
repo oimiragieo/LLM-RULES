@@ -1,7 +1,7 @@
 ---
 name: spec-to-code-compliance
 description: Verify that implementation code faithfully implements its specification — checks function contracts, API contracts, and protocol compliance against source specifications
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true

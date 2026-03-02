@@ -486,6 +486,21 @@ class MemoryVectorStore {
     });
   }
 
+  /**
+   * Generate embeddings via subprocess isolation (dispatches to worker pool).
+   * This is the single-call entry point used by generateEmbedding().
+   *
+   * @param {string[]} texts
+   * @param {number} batchSize
+   * @returns {Promise<number[][]>}
+   * @private
+   */
+  async _embedViaSubprocess(texts, batchSize) {
+    await this._spawnEmbedWorkers();
+    const worker = this._embedWorkers[0];
+    return this._embedViaSubprocessWorker(worker, texts, batchSize);
+  }
+
   async _spawnEmbedWorkers() {
     if (this._embedWorkers && this._embedWorkers.length > 0) return;
 

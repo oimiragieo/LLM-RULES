@@ -153,6 +153,7 @@ function validateArtifact(artifactPath) {
       cwd: PROJECT_ROOT,
       stdio: 'pipe',
       encoding: 'utf-8',
+      shell: false,
       windowsHide: true,
     });
 
@@ -236,6 +237,7 @@ function runValidatorScript(scriptPath, args = [], fallbackIssue = 'Validation f
       cwd: PROJECT_ROOT,
       stdio: 'pipe',
       encoding: 'utf-8',
+      shell: false,
       windowsHide: true,
     });
 

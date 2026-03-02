@@ -53,12 +53,12 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 
 **Purpose:** General command-line tools
 
-| Tool                   | Location | Purpose                        | Wiring Status                                 |
-| ---------------------- | -------- | ------------------------------ | --------------------------------------------- |
-| `detect-orphans.mjs`   | `cli/`   | Find orphaned files/references | Not scripted                                  |
-| `validate-commit.mjs`  | `cli/`   | Validate commit messages       | skill: commit-validator                       |
-| `tool_search.mjs`      | `cli/`   | Search for tools by capability | Deprecated: use SkillCatalog.search() instead |
-| `git-notes-verify.cjs` | `cli/`   | Audit trail verification       | Not scripted                                  |
+| Tool                     | Location        | Purpose                                   | Wiring Status                                      |
+| ------------------------ | --------------- | ----------------------------------------- | -------------------------------------------------- |
+| ~~`detect-orphans.mjs`~~ | `_archive/cli/` | Find orphaned files/references (archived) | Archived — use `validate:agent-skill-refs` instead |
+| `validate-commit.mjs`    | `cli/`          | Validate commit messages                  | skill: commit-validator                            |
+| ~~`tool_search.mjs`~~    | `_archive/cli/` | Search for tools by capability (archived) | Archived — use SkillCatalog.search() instead       |
+| `git-notes-verify.cjs`   | `cli/`          | Audit trail verification                  | Not scripted                                       |
 
 ### Analysis
 
@@ -119,10 +119,9 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 
 **Purpose:** Workflow execution, gates, and handlers
 
-| Tool                           | Location    | Purpose                       | Wiring Status |
-| ------------------------------ | ----------- | ----------------------------- | ------------- |
-| `workflow-context-tracker.mjs` | `workflow/` | Track workflow context        | Not scripted  |
-| `workflow-validator.mjs`       | `workflow/` | Validate workflow definitions | Not scripted  |
+> **Note:** `workflow-context-tracker.mjs` and `workflow-validator.mjs` were relocated to `.claude/lib/workflow/` (as `workflow-validator.cjs`). These are library modules, not CLI tools. See "Relocated to lib/" section below.
+
+_No standalone workflow CLI tools remain in this category. Workflow execution is handled by library modules in `.claude/lib/workflow/`._
 
 ### Context
 
@@ -287,16 +286,16 @@ Complete inventory of all tools in the `.claude/tools/` directory, including act
 
 ### Tools Referenced in package.json
 
-| Script Name                      | Tool Path                                      | Status                    |
-| -------------------------------- | ---------------------------------------------- | ------------------------- |
-| `doctor`                         | `cli/doctor.mjs`                               | Active                    |
-| `validate:agents`                | `cli/validate-agents.mjs`                      | Active (formerly phantom) |
-| `lint:security`                  | `cli/security-lint.cjs`                        | Active                    |
-| `init:staging`                   | `maintenance/init-staging.cjs`                 | Active                    |
-| `validate:framework-integration` | `run-agent-framework-integration-headless.mjs` | Active                    |
-| `validate:cujs`                  | `cuj-validator-unified.mjs`                    | Active                    |
-| `validate:commands`              | `validate-commands.mjs`                        | Active                    |
-| `validate:latest-integration`    | `validate-latest-integration-artifacts.mjs`    | Active                    |
+| Script Name                      | Tool Path                                      | Status                          |
+| -------------------------------- | ---------------------------------------------- | ------------------------------- |
+| `doctor`                         | `cli/doctor.mjs`                               | Active                          |
+| `validate:agents`                | `cli/validate-agents.mjs`                      | Active (formerly phantom)       |
+| `lint:security`                  | `cli/security-lint.cjs`                        | Active                          |
+| Not scripted                     | `cli/init-staging.cjs`                         | Active (no package.json script) |
+| `validate:framework-integration` | `run-agent-framework-integration-headless.mjs` | Active                          |
+| `validate:cujs`                  | `cuj-validator-unified.mjs`                    | Active                          |
+| `validate:commands`              | `validate-commands.mjs`                        | Active                          |
+| `validate:latest-integration`    | `validate-latest-integration-artifacts.mjs`    | Active                          |
 
 ### Tools Referenced in Skills
 

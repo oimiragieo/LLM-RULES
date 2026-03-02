@@ -1,7 +1,7 @@
 ---
 name: workflow-patterns
 description: TDD task implementation patterns - red-green-refactor cycle, phase checkpoints, git commits, and verification protocols for quality assurance.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 tools:

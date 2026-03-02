@@ -1,7 +1,10 @@
 ---
 name: webmcp-browser-tools
-description: 'WebMCP — browser-side API that lets web applications expose their own functionality as MCP tools TO AI agents. Use when designing or integrating with web apps that surface UI actions (forms, buttons, data queries) as callable agent tools. NOT for web scraping or fetching external pages.'
-version: 1.1.0
+description: >-
+  WebMCP — browser-side API that lets web applications expose their own functionality as MCP tools TO AI agents. Use
+  when designing or integrating with web apps that surface UI actions (forms, buttons, data queries) as callable agent
+  tools. NOT for web scraping or fetching external pages.
+version: 1.2.0
 model: sonnet
 invoked_by: agent
 user_invocable: false
@@ -13,7 +16,7 @@ agents:
   - frontend-pro
   - developer
   - researcher
-category: 'Web Development'
+category: Web Development
 tags:
   - webmcp
   - browser
@@ -23,7 +26,7 @@ tags:
   - web-development
   - chrome
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: '2026-03-01T06:07:51.950Z'
 ---
 
 # WebMCP Browser Tools

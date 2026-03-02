@@ -135,11 +135,6 @@ function isTaskNotificationPrompt(prompt) {
     prompt.includes('<task-id>')
   );
 }
-function debugLog(source, message, err) {
-  if (!process.env.DEBUG_HOOKS) return;
-  const details = err ? ` ${err.message || err}` : '';
-  console.warn(`[${source}] ${message}${details}`);
-}
 function buildHiddenSpawnSyncOptions(base = {}) {
   return { ...base, windowsHide: true };
 }
@@ -1900,14 +1895,7 @@ async function main() {
   const startTime = Date.now();
   try {
     const hookInput = await parseHookInputAsync();
-    if (process.env.SCHEDULER_TICK_ON_PROMPT === 'on') {
-      try {
-        const { runTick: runTick } = libRequire(path.join('scheduler', 'scheduler-tick.cjs'));
-        runTick(PROJECT_ROOT);
-      } catch (err) {
-        debugLog('user-prompt-unified', 'scheduler tick failed (ignored)', err);
-      }
-    }
+
     await runAllChecks(hookInput, PROJECT_ROOT);
     try {
       eventBus.emit(EventTypes.TOOL_COMPLETED, {

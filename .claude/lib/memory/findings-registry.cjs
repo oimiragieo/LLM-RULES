@@ -275,6 +275,15 @@ function upsertOpenFindings(projectRoot, findings, metadata = {}) {
   }
 
   registry.findings = Array.from(byFingerprint.values());
+
+  // Size cap: prevent unbounded growth of open-findings.json
+  const MAX_FINDINGS = 500;
+  if (registry.findings.length > MAX_FINDINGS) {
+    // Keep the most recently seen findings; prune oldest
+    registry.findings.sort((a, b) => (b.lastSeenAt || '').localeCompare(a.lastSeenAt || ''));
+    registry.findings = registry.findings.slice(0, MAX_FINDINGS);
+  }
+
   saveRegistry(projectRoot, registry);
 
   return {

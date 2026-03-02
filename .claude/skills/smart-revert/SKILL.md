@@ -1,6 +1,8 @@
 ---
 name: smart-revert
 version: 1.0.0
+verified: true
+lastVerifiedAt: '2026-02-28'
 category: 'Git & Version Control'
 agents: [developer, devops]
 tags: [git, revert, rollback, safety, impact-analysis]

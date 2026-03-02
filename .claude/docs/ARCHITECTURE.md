@@ -212,7 +212,7 @@ Task({
 
 ### Router Detection
 
-The router-enforcer logic (invoked inside `user-prompt-unified.cjs`) automatically detects when multi-agent planning is required using the shared routing table.
+The router-enforcer logic (invoked inside `user-prompt-unified.cjs`, which is called indirectly via `user-prompt-orchestrator.cjs` — the registered UserPromptSubmit hook in settings.json, not registered directly) automatically detects when multi-agent planning is required using the shared routing table.
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -424,12 +424,17 @@ function parseHookInput() {
 }
 ```
 
-**Active Hooks:**
+**Active Hooks (representative selection):**
 
-- `routing/user-prompt-unified.cjs` - Runs router-enforcer logic using `lib/routing/routing-table.cjs`
-- `safety/tdd-check.cjs` - Enforces TDD by checking for test files before code edits
+- `session/user-prompt-orchestrator.cjs` - Session-level routing and prompt analysis
+- `routing/routing-guard.cjs` - Enforces planner-first, specialist-first, and security review gates
+- `routing/unified-creator-guard.cjs` - Enforces creator workflow for artifact paths
+- `safety/write-pretool-bundle.cjs` - Consolidated write safety checks (file placement, size, content)
+- `safety/bash-pretool-bundle.cjs` - Consolidated bash safety checks (command validation, injection prevention)
+- `reflection/reflection-step0-guard.cjs` - Blocks TaskList until pending reflections are processed
+- `evolution/quality-gate-validator.cjs` - Quality gates between workflow phases
 
-**Hook Configuration** (in `settings.json`):
+**Hook Configuration** (in `settings.json` -- abbreviated):
 
 ```json
 {
@@ -437,13 +442,72 @@ function parseHookInput() {
     "UserPromptSubmit": [
       {
         "matcher": "",
-        "hooks": [{ "command": "node .claude/hooks/routing/user-prompt-unified.cjs" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/reflection/force-step0-execution.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/user-prompt-orchestrator.cjs"
+          },
+          { "type": "command", "command": "node .claude/hooks/session/stale-task-detector.cjs" }
+        ]
       }
     ],
     "PreToolUse": [
       {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/routing/pre-tool-unified.cjs" }
+        ]
+      },
+      {
         "matcher": "Edit|Write|NotebookEdit",
-        "hooks": [{ "command": "node .claude/hooks/safety/tdd-check.cjs" }]
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/routing/unified-creator-guard.cjs" },
+          { "type": "command", "command": "node .claude/hooks/safety/write-pretool-bundle.cjs" }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/safety/bash-pretool-bundle.cjs" }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/validation/pre-completion-validation.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/workflow/post-completion-chain.cjs" },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow/post-creation-integration.cjs"
+          }
+        ]
       }
     ]
   }
@@ -486,7 +550,7 @@ context/
 JSON schemas for validation:
 
 - `agent-definition.schema.json` - Agent file validation
-- `skill-manifest.schema.json` - Skill definition validation
+- `skill-definition.schema.json` - Skill definition validation
 
 ### 7. `.claude/workflows/`
 
@@ -497,7 +561,6 @@ workflows/
 ├── enterprise/                    # Complex multi-step operations
 │   ├── feature-development-workflow.md   # 12-step end-to-end feature development
 │   ├── c4-architecture-workflow.md       # C4 model architecture documentation
-│   └── swarm-coordination-skill-workflow.md  # Multi-agent swarm orchestration
 ├── operations/                    # Operational procedures
 │   ├── incident-response.md              # Incident response runbook
 │   └── qa-bounded-loop.md                # QA validation with bounded fix loops

@@ -100,4 +100,4 @@ Task({
 ## Related
 
 - Universal template: `.claude/templates/spawn/universal-agent-spawn.md`
-- Bash safety template: `.claude/templates/spawn/universal-agent-spawn.md`
+- Subordinate (one-shot) template: `.claude/templates/spawn/subordinate-once.md`

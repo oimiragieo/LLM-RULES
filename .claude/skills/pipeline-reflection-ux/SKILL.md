@@ -3,7 +3,7 @@ name: pipeline-reflection-ux
 description: Improve router-facing pipeline and reflection narration to reduce noisy status churn and make Step 0/Reflection outcomes explicit. Use when updating Router output contract, reflection reminder wording, or post-pipeline notification batching.
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
-version: '1.1.0'
+version: 1.1.0
 tools: []
 ---
 

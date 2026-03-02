@@ -12,7 +12,7 @@
  * proper workflow, resulting in "invisible" artifacts missing from
  * CLAUDE.md, catalogs, and agent assignments.
  *
- * Trigger: PreToolUse (matches: Edit|Write)
+ * Trigger: PreToolUse (matches: Edit|Write|NotebookEdit)
  *
  * ENFORCEMENT MODES:
  * - CREATOR_GUARD=block (default): Block unauthorized writes
@@ -196,7 +196,7 @@ const DEFAULT_TTL_MS = (() => {
 /**
  * Tools that this hook monitors
  */
-const WATCHED_TOOLS = ['Edit', 'Write'];
+const WATCHED_TOOLS = ['Edit', 'Write', 'NotebookEdit'];
 
 // =============================================================================
 // CORE FUNCTIONS
@@ -502,7 +502,7 @@ function validateArtifactContent(artifactType, content) {
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
 function validateCreatorWorkflow(toolName, toolInput) {
-  // Only check Edit/Write tools
+  // Only check Edit/Write/NotebookEdit tools
   if (!WATCHED_TOOLS.includes(toolName)) {
     return { pass: true };
   }

@@ -66,6 +66,7 @@ function runRegistryRefresh() {
   return spawnSync(process.execPath, ['.claude/tools/cli/generate-agent-registry.cjs'], {
     cwd: PROJECT_ROOT,
     stdio: 'pipe',
+    shell: false,
     windowsHide: true,
     encoding: 'utf8',
   });

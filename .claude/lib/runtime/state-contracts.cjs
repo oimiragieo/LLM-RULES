@@ -25,6 +25,9 @@ function getValidator(key, schemaFile) {
   if (validators.has(key)) return validators.get(key);
   const schema = loadSchema(schemaFile);
   if (!schema) {
+    process.stderr.write(
+      `[state-contracts] WARN: Schema file missing for "${key}" — installing passthrough validator\n`
+    );
     const passthrough = () => true;
     validators.set(key, passthrough);
     return passthrough;
@@ -33,7 +36,10 @@ function getValidator(key, schemaFile) {
     const compiled = ajv.compile(schema);
     validators.set(key, compiled);
     return compiled;
-  } catch (_err) {
+  } catch (compileErr) {
+    process.stderr.write(
+      `[state-contracts] WARN: AJV compile failed for "${key}": ${compileErr.message} — installing passthrough validator\n`
+    );
     const passthrough = () => true;
     validators.set(key, passthrough);
     return passthrough;

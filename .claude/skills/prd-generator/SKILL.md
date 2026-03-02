@@ -667,8 +667,8 @@ _Status: Draft_
 
 ## Related Skills
 
-- `progressive-disclosure` - 8-phase questioning for unclear requirements
-- `task-breakdown` - Break PRD phases into implementation tasks
+- `context-compressor` - Progressive disclosure for unclear requirements
+- `plan-generator` - Break PRD phases into implementation tasks
 - `research-synthesis` - Gather evidence for problem statement
 
 ## Assigned Agents

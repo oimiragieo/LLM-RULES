@@ -1,12 +1,12 @@
 /**
  * Write PreTool Bundle Tests
  *
- * Verifies fail-open behavior for unexpected exceptions.
+ * Verifies fail-CLOSED behavior for unexpected exceptions in write safety hooks.
  *
- * Bug fix validated:
- * - H-7: write-pretool-bundle.cjs was fail-closed by default —
- *   unexpected exceptions blocked ALL Write/Edit operations.
- *   Now defaults to fail-open (exit 0) unless HOOK_FAIL_CLOSED=true.
+ * Security rationale:
+ * - Write safety hooks (routing guard, creator guard, agent contract, etc.) protect
+ *   against unauthorized file writes. Failing open on crash bypasses ALL safety checks.
+ * - The hook now defaults to fail-closed (exit 2) unless WRITE_HOOK_FAIL_OPEN=true.
  *
  * Test execution: node --test tests/hooks/write-pretool-bundle.test.cjs
  */
@@ -22,24 +22,23 @@ const PROJECT_ROOT = path.resolve(__dirname, '../..');
 const HOOK_PATH = path.join(PROJECT_ROOT, '.claude/hooks/safety/write-pretool-bundle.cjs');
 
 describe('write-pretool-bundle fail behavior', () => {
-  test('source code defaults to fail-open (not fail-closed)', () => {
+  test('source code defaults to fail-closed (not fail-open)', () => {
     const src = fs.readFileSync(HOOK_PATH, 'utf8');
 
-    // The catch block should exit(0) by default (fail-open)
-    // and only exit(2) when HOOK_FAIL_CLOSED is explicitly set
+    // The catch block should exit(2) by default (fail-closed for security)
+    // and only exit(0) when WRITE_HOOK_FAIL_OPEN is explicitly set
     assert.ok(
-      src.includes('HOOK_FAIL_CLOSED'),
-      'Should use HOOK_FAIL_CLOSED env var for opt-in blocking'
+      src.includes('WRITE_HOOK_FAIL_OPEN'),
+      'Should use WRITE_HOOK_FAIL_OPEN env var for opt-in permissive behavior'
     );
-
-    // Should NOT have the old pattern of failing closed by default
-    assert.ok(
-      !src.includes("HOOK_FAIL_OPEN === 'true'"),
-      'Should NOT use HOOK_FAIL_OPEN (old pattern was fail-closed by default)'
+    assert.equal(
+      src.includes('process.stdout.write(JSON.stringify(hookInput))'),
+      false,
+      'Should not passthrough full hookInput JSON (can cause truncation parse failures)'
     );
   });
 
-  test('catch block exits 0 by default (fail-open)', () => {
+  test('catch block exits 2 by default (fail-closed)', () => {
     const src = fs.readFileSync(HOOK_PATH, 'utf8');
 
     // Extract everything after "} catch (err) {"
@@ -48,17 +47,17 @@ describe('write-pretool-bundle fail behavior', () => {
 
     const catchBody = src.slice(catchIdx, catchIdx + 500);
 
-    // The default path should be process.exit(0)
+    // The default path should be process.exit(2) (fail-closed)
     assert.ok(
-      catchBody.includes('process.exit(0)'),
-      'Catch block should have process.exit(0) as default (fail-open) path'
+      catchBody.includes('process.exit(2)'),
+      'Catch block should have process.exit(2) as default (fail-closed) path'
     );
 
-    // process.exit(2) should only be reached when HOOK_FAIL_CLOSED is true
-    if (catchBody.includes('process.exit(2)')) {
+    // process.exit(0) should only be reached when WRITE_HOOK_FAIL_OPEN is true
+    if (catchBody.includes('process.exit(0)')) {
       assert.ok(
-        catchBody.includes('HOOK_FAIL_CLOSED'),
-        'process.exit(2) in catch should be gated behind HOOK_FAIL_CLOSED'
+        catchBody.includes('WRITE_HOOK_FAIL_OPEN'),
+        'process.exit(0) in catch should be gated behind WRITE_HOOK_FAIL_OPEN'
       );
     }
   });

@@ -46,9 +46,14 @@ skills:
   - debugging
   - smart-debug
   - proactive-audit
+  - ralph-loop
   - troubleshooting-regression
   - web-perf
   - memory-search
+  - agent-evaluation
+  - property-based-testing
+  - webapp-testing
+  - feature-flag-management
 identity:
   role: Quality Gatekeeper
   goal: Break the code before users do through comprehensive testing and edge case analysis
@@ -283,7 +288,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
+1. Consult skill catalog: `.claude/docs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

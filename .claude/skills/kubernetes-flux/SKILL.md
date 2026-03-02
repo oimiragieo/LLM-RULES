@@ -1,7 +1,7 @@
 ---
 name: kubernetes-flux
 description: Kubernetes cluster management and troubleshooting. Query pods, deployments, services, logs, and events. Supports context switching, scaling, and rollout management. Use for Kubernetes debugging, monitoring, and operations.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true

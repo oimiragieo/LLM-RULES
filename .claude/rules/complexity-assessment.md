@@ -115,5 +115,5 @@ New tasks must be assessed before selecting a workflow approach. Wrong complexit
 ## Related References
 
 - `.claude/skills/complexity-assessment/SKILL.md` - Full skill documentation
-- `.claude/lib/routing/complexity-classifier.cjs` - Automated classifier
+- `.claude/lib/workflow/complexity-classifier.cjs` - Automated classifier
 - `enterprise-workflow.md` - Phase selection based on complexity

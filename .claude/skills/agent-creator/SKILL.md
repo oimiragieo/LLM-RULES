@@ -21,8 +21,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/agents/
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 **Mode: Hybrid (Prompt + Scripted Guardrails)** — Use prompt workflow plus `scripts/main.cjs` for contract-safe generation/validation.
@@ -618,8 +618,8 @@ The following hooks govern this agent's behavior at runtime:
 
 | Hook | Event | Purpose | Override |
 |------|-------|---------|----------|
-| `tool-scope-validator.cjs` | PreToolUse(All) | Validates tool is in allowed set | -- |
-| `execution-limit-monitor-hook.cjs` | PreToolUse(All) | Monitors execution limits | -- |
+| `pre-tool-unified.cjs` | PreToolUse(*) | Validates tool scope, path safety, Windows compat (11 checks) | -- |
+| `post-tool-metrics-unified.cjs` | PostToolUse(*) | Metrics collection, execution monitoring, logging | -- |
 | <!-- Add archetype-specific hooks from @HOOK_AGENT_MAP.md --> | | | |
 
 See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
@@ -1289,6 +1289,16 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
     - Reference python-pro.md for canonical structure
 ```
 
+## Anti-Patterns
+
+| Anti-Pattern                           | Why It Fails                                                          | Correct Approach                                       |
+| -------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------ |
+| Copying another agent verbatim         | Misses unique requirements, wrong tools/skills for the new domain     | Start from agent-creator with domain research (Step 2) |
+| Omitting `tools:` block in frontmatter | Registry falls back to defaults, agent gets wrong tool permissions    | Explicitly list all needed tools in YAML frontmatter   |
+| Skipping mandatory skills              | Agent missing core capabilities (task-mgmt, search, memory, etc.)     | Include all 6 mandatory skills in every agent          |
+| Writing agent `.md` directly           | Bypasses post-creation steps (catalog, registry, routing, assignment) | Always use `Skill({ skill: 'agent-creator' })`         |
+| No verification step                   | Agent deployed without integration validation, invisible to Router    | Run `validate-integration.cjs` before marking complete |
+
 ## System Impact Analysis (MANDATORY)
 
 **After creating ANY agent, you MUST analyze and update system-wide impacts.**
@@ -1708,7 +1718,7 @@ Before completion, verify all relevant handshakes:
 4. `validate-integration.cjs` passes for the created artifact.
 5. Skill index is regenerated when skill metadata changes.
 
-### Research Gate (Exa First, arXiv Fallback)
+### Research Gate (Exa + arXiv — BOTH MANDATORY)
 
 For new patterns, templates, or workflows, research is mandatory:
 

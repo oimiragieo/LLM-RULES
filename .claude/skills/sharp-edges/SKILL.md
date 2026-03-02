@@ -2,6 +2,8 @@
 name: sharp-edges
 description: 'Living catalogue of 7 known hazard entries (SE-01 through SE-07) specific to agent-studio: Windows backslash paths, prototype pollution, hook exit codes, async swallowing, ReDoS in glob-to-regex, DST arithmetic, array mutation during iteration. Each entry: symptom, root cause, fix, test assertion.'
 version: 1.0.0
+verified: true
+lastVerifiedAt: '2026-02-28'
 category: 'Debugging'
 agents: [developer, code-reviewer, qa, security-architect]
 user_invocable: true

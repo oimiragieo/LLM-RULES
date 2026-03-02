@@ -1,14 +1,16 @@
 ---
 name: ask-questions-if-underspecified
 description: Ask the minimum clarifying questions before implementation when requirements are ambiguous or missing crucial details
-version: 1.1.0
+version: 1.2.0
+category: 'Planning & Architecture'
+agents: [planner, developer, architect]
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash]
-
+tags: [clarification, requirements, underspecified, questions, scope, ambiguity]
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: 2026-03-01T00:00:00.000Z
 best_practices:
   - Follow existing project patterns
   - Document all outputs clearly

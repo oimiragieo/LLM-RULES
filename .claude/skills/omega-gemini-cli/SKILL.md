@@ -1,5 +1,6 @@
 ---
-lastVerifiedAt: 2026-02-24T04:26:35.324Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 name: omega-gemini-cli
 description: Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on "use Gemini", "analyze with Gemini", "large file", "sandbox", "brainstorm with Gemini".
 version: 2.0.0

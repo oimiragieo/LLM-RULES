@@ -53,6 +53,8 @@ skills:
   - static-analysis
   - gemini-cli-security
   - memory-search
+  - agent-evaluation
+  - fix-review
 context_files:
   - '@.claude/context/memory/learnings.md'
 hooks: {}

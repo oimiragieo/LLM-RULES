@@ -20,7 +20,9 @@ const cp = require('child_process');
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 const HOOK_ORDER = [
-  '.claude/hooks/reflection/force-step0-execution.cjs',
+  // NOTE: force-step0-execution.cjs is NOT listed here because it already runs
+  // as a direct hook in settings.json (UserPromptSubmit index 0). Including it
+  // here would cause double execution per user prompt.
   '.claude/hooks/session/state-reset.cjs',
   '.claude/hooks/routing/user-prompt-unified.cjs',
   '.claude/hooks/session/drift-detector.cjs',

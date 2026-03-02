@@ -25,8 +25,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/templates/
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 **Mode: Cognitive/Prompt-Driven** -- No standalone utility script; use via agent context.
@@ -987,9 +987,9 @@ After creating this report:
 
 1. **Research**: Invoke `research-synthesis`, review `.claude/templates/spawn/universal-agent-spawn.md`
 2. **Gather**: Analyze spawn pattern, specialized vs general-purpose
-3. **Validate name**: `specialized-agent-spawn` matches name regex
-4. **Design**: Structure for specialized spawn prompts with security considerations (SEC-TC-001)
-5. **Create**: `.claude/templates/spawn/specialized-agent-spawn.md`
+3. **Validate name**: Template name matches name regex
+4. **Design**: Structure for spawn prompts with security considerations (SEC-TC-001)
+5. **Create**: `.claude/templates/spawn/{template-name}.md`
 
 ```markdown
 ---

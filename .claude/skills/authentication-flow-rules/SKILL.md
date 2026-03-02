@@ -1,7 +1,11 @@
 ---
 name: authentication-flow-rules
 description: OAuth 2.1 compliant authentication flows (MANDATORY Q2 2026). PKCE required for ALL clients, Implicit Flow removed, modern token security.
-version: 2.0.0
+version: 2.1.0
+agents: [security-architect, developer]
+category: security
+verified: true
+lastVerifiedAt: '2026-03-01'
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -33,6 +37,24 @@ You help developers implement secure, standards-compliant authentication.
 - Migrate legacy OAuth 2.0 implementations to 2.1
 - Integrate modern authentication (passkeys, WebAuthn)
 </capabilities>
+
+## Iron Laws
+
+1. **PKCE IS MANDATORY FOR ALL CLIENTS** — OAuth 2.1 requires PKCE for both public AND confidential clients; there are no exceptions and no legacy carve-outs. Every authorization code flow must generate and validate a code_challenge with method S256.
+2. **IMPLICIT FLOW IS PERMANENTLY REMOVED** — Never use `response_type=token`; tokens returned in URL fragments leak via browser history, referrer headers, and server logs. Migrate immediately to Authorization Code + PKCE.
+3. **TOKENS MUST NEVER BE STORED IN LOCALSTORAGE OR SESSIONSTORAGE** — XSS vulnerabilities can exfiltrate tokens from JavaScript-accessible storage. Store access tokens in HttpOnly, Secure, SameSite=Strict cookies only.
+4. **ACCESS TOKEN LIFETIME MUST NOT EXCEED 15 MINUTES** — Short-lived tokens limit the blast radius of token theft. Refresh tokens must rotate on every use and invalidate all sessions on reuse detection.
+5. **EXACT REDIRECT URI MATCHING IS NON-NEGOTIABLE** — No wildcards, no partial matches, no trailing slash tolerance. Authorization server must reject any redirect_uri that does not match the pre-registered value exactly.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                             | Why It Fails                                                                                 | Correct Approach                                                                  |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Storing tokens in `localStorage`                                         | Exposed to XSS; any script on the page (including third-party) can read and exfiltrate       | Use HttpOnly cookies set server-side after token exchange                         |
+| Using Implicit Flow (`response_type=token`)                              | Tokens in URL fragments leak via browser history, Referer headers, and proxy/CDN logs        | Use Authorization Code Flow with PKCE                                             |
+| Collecting user passwords directly (Resource Owner Password Credentials) | Violates OAuth separation of concerns; client handles credentials it should never see        | Use Authorization Code Flow; direct users to the authorization server login page  |
+| Wildcard or partial redirect URI matching                                | Open redirect attack; adversary registers `https://evil.com` which prefix-matches a wildcard | Register exact URIs; server rejects any URI not in the pre-approved list          |
+| Long-lived access tokens (>15 min) without rotation                      | Token theft window is unbounded; compromised token grants long-term access                   | Keep access tokens ≤15 min; implement refresh token rotation with reuse detection |
 
 <instructions>
 ## OAuth 2.1 Compliance (MANDATORY Q2 2026)

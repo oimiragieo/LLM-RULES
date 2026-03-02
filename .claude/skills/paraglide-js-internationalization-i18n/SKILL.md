@@ -1,6 +1,8 @@
 ---
 name: paraglide-js-internationalization-i18n
 version: 1.0.0
+verified: true
+lastVerifiedAt: '2026-02-28'
 category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [i18n, paraglide, internationalization, sveltekit, translation]

@@ -1,7 +1,7 @@
 ---
 name: dependency-analyzer
 description: Analyzes project dependencies, detects outdated packages, identifies breaking changes, and suggests safe update strategies. Helps maintain dependency health and security.
-version: 1.0
+version: 1.0.0
 model: sonnet
 invoked_by: both
 user_invocable: true

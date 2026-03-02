@@ -2,6 +2,8 @@
 name: dispatching-parallel-agents
 description: Concurrent investigation of independent failures. Use when multiple unrelated issues need parallel resolution.
 version: 1.1.0
+verified: true
+lastVerifiedAt: '2026-02-28'
 category: 'Orchestration & Coordination'
 agents: [planner, master-orchestrator, developer]
 tags: [parallel-agents, fan-out, diagnosis, concurrent, synthesis]

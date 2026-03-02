@@ -1,6 +1,8 @@
 ---
 name: elixir-expert
 version: 1.1.0
+verified: true
+lastVerifiedAt: '2026-03-01'
 category: 'Languages'
 agents: [developer]
 tags: [elixir, phoenix, erlang, functional, otp]

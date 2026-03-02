@@ -81,7 +81,7 @@ What must pass before advancing
 
 ### Related Workflows
 
-- `.claude/workflows/creation/ecosystem-creation-workflow.md`
+- `.claude/workflows/core/ecosystem-creation-workflow.md`
 - Workflow creation triggers documentation updates
 
 ## Post-Creation Checklist

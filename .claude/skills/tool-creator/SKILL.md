@@ -15,8 +15,8 @@ best_practices:
 error_handling: graceful
 streaming: supported
 output_location: .claude/tools/
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 # Tool Creator
@@ -262,6 +262,14 @@ const main = async () => {
 
 - `skill-creator` - Create skills that invoke tools
 - `hook-creator` - Create pre/post hooks that wrap tool execution
+
+## Iron Laws
+
+1. **Every artifact MUST have a companion schema** — Tools without a schema have no contract; consumers cannot validate inputs/outputs. Create a JSON schema in `.claude/schemas/` for the tool's CLI interface.
+2. **Every artifact MUST be wired to at least one agent** — A tool not assigned to any agent is never invoked. Assign the tool to relevant agents via their `tools:` frontmatter array.
+3. **Every artifact MUST be indexed in its catalog** — Tools not in `tool-catalog.md` are invisible to discovery. Add an entry to `.claude/context/artifacts/catalogs/tool-catalog.md` under the correct category.
+4. **Every artifact MUST pass integration validation** — Run `node .claude/tools/cli/validate-integration.cjs <tool-path>` before marking creation complete. A tool that fails validation has broken references.
+5. **Every artifact MUST record a memory entry** — Write the tool creation pattern, decisions, and any issues to `.claude/context/memory/` (learnings.md, decisions.md, issues.md). Without memory, the creation is invisible to future sessions.
 
 ## Memory Protocol (MANDATORY)
 

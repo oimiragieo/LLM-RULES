@@ -202,6 +202,10 @@ describe('taskupdate-contract-validator exit codes (H-9)', () => {
       tool_input: {
         taskId: 'task-1',
         status: 'completed',
+        metadata: {
+          summary: 'Completed implementation of the feature',
+          filesModified: ['src/index.js'],
+        },
       },
     };
     const result = runHook(HOOK, input);

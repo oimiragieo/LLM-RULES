@@ -92,7 +92,10 @@ function generateCapabilityCard(
     }
   }
   // Merge with union of tools required by this agent's skills so registry has full set
-  if (toolsUnionFromSkills.length > 0) {
+  // EXCEPTION: Router agent has strict tool restrictions (Section 0 of CLAUDE.md).
+  // Router delegates skill execution to subagents, so skill tools must NOT be merged.
+  const TOOL_RESTRICTED_AGENTS = new Set(['router']);
+  if (toolsUnionFromSkills.length > 0 && !TOOL_RESTRICTED_AGENTS.has(agentId)) {
     const merged = new Set([...tools, ...toolsUnionFromSkills]);
     tools = [...merged];
   }
@@ -130,11 +133,11 @@ function generateCapabilityCard(
       name: capabilityName,
       domain: domain,
       description: description,
-      triggerPhrases: triggerPhrases.slice(0, 10),
-      requiredTools: tools.slice(0, 18),
-      skills: skills.slice(0, 10),
-      examples: examples.slice(0, 10),
-      tags: tags.slice(0, 15),
+      triggerPhrases: triggerPhrases.slice(0, 50),
+      requiredTools: tools.slice(0, 50),
+      skills: skills.slice(0, 50),
+      examples: examples.slice(0, 50),
+      tags: tags.slice(0, 50),
     },
   ];
 
@@ -235,12 +238,10 @@ class AgentRegistryGenerator {
         }
 
         const agentId = file.replace('.md', '');
-        // Normalize category (orchestrators -> orchestrator)
-        const normalizedCategory = category === 'orchestrators' ? 'orchestrator' : category;
 
         agents.set(agentId, {
           definition: agentDef,
-          category: normalizedCategory,
+          category: category,
           filePath: filePath,
         });
       }

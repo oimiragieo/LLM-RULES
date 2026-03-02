@@ -92,11 +92,14 @@ async function testLifecycle() {
 
   const initialState = {
     workflowId: 'wf-lifecycle',
-    currentPhase: 'PHASE_2_IMPLEMENT',
+    currentPhase: 'validate',
     phases: {
-      PHASE_2_IMPLEMENT: {
+      validate: {
         status: 'in_progress',
         agents: { developer: { taskId, status: 'in_progress' } },
+      },
+      obtain: {
+        status: 'pending',
       },
     },
   };
@@ -183,7 +186,7 @@ async function testLifecycle() {
   // Verify Phase Advance
   const finalState = JSON.parse(fs.readFileSync(WF_STATE, 'utf8'));
   console.log(`Current Phase: ${finalState.currentPhase}`);
-  if (finalState.currentPhase !== 'PHASE_3_REVIEW') {
+  if (finalState.currentPhase !== 'obtain') {
     throw new Error(`Workflow did not advance! Phase is still ${finalState.currentPhase}`);
   }
 

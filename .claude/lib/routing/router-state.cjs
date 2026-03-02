@@ -312,6 +312,9 @@ function saveStateWithRetry(updates, maxRetries = MAX_RETRIES) {
       ensureRuntimeDir();
       atomicWriteJSONSync(stateFile, merged);
       invalidateCache(stateFile);
+      // Clear TTL cache so subsequent getState() sees fresh data
+      delete getState._cache;
+      delete getState._cacheTimestamp;
       return merged;
     } catch (e) {
       // SEC-AUDIT-016 FIX #6: Log write failure

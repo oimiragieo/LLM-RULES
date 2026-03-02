@@ -25,7 +25,7 @@ flowchart TB
             direction LR
             BASH_V["Bash Hooks<br/>- windows-null-sanitizer<br/>- bash-command-validator"]
             ROUTE["Routing Hooks<br/>- routing-guard<br/>- pre-task-unified"]
-            SAFE["Safety Hooks<br/>- file-placement-guard<br/>- tdd-check"]
+            SAFE["Safety Hooks<br/>- file-placement-guard<br/>- unified-pre-write-hook"]
             EVOL["Evolution Hooks<br/>- unified-evolution-guard<br/>- plan-evolution-guard"]
             VALID["Validation Hooks<br/>- validate-skill-invocation"]
         end
@@ -153,13 +153,13 @@ Triggered when user submits a prompt, before any processing.
 
 #### Edit/Write/NotebookEdit Matcher
 
-| Hook                          | Purpose                       | Enforcement    |
-| ----------------------------- | ----------------------------- | -------------- |
-| `file-placement-guard.cjs`    | Enforces file placement rules | Warn (default) |
-| `routing-guard.cjs`           | Router tool restrictions      | Block          |
-| `tdd-check.cjs`               | Enforces TDD workflow         | Warn           |
-| `plan-evolution-guard.cjs`    | Validates plan modifications  | Warn           |
-| `unified-evolution-guard.cjs` | Enforces EVOLVE workflow      | Block          |
+| Hook                          | Purpose                               | Enforcement    |
+| ----------------------------- | ------------------------------------- | -------------- |
+| `file-placement-guard.cjs`    | Enforces file placement rules         | Warn (default) |
+| `routing-guard.cjs`           | Router tool restrictions              | Block          |
+| `unified-pre-write-hook.cjs`  | Consolidated write safety (incl. TDD) | Warn           |
+| `plan-evolution-guard.cjs`    | Validates plan modifications          | Warn           |
+| `unified-evolution-guard.cjs` | Enforces EVOLVE workflow              | Block          |
 
 #### Read Matcher
 
@@ -261,7 +261,7 @@ hooks/
 │   ├── file-placement-guard.cjs
 │   ├── router-write-guard.cjs
 │   ├── security-trigger.cjs
-│   ├── tdd-check.cjs
+│   ├── unified-pre-write-hook.cjs  # consolidated (includes tdd-check)
 │   ├── validate-skill-invocation.cjs
 │   ├── windows-null-sanitizer.cjs
 │   └── validators/      # Command validators

@@ -86,6 +86,18 @@
 
 **Benefits**: Reduced hook overhead from 6 checks to 2, faster execution
 
+## Fail-Open vs Fail-Closed Policy
+
+Hooks MUST follow the correct error-handling posture based on their category:
+
+| Category                                                              | Policy           | Exit Code on Error | Examples                                                                                                 |
+| --------------------------------------------------------------------- | ---------------- | ------------------ | -------------------------------------------------------------------------------------------------------- |
+| **Security hooks** (routing, creator, write)                          | Fail-closed      | `process.exit(2)`  | `routing-guard.cjs`, `unified-creator-guard.cjs`, `write-pretool-bundle.cjs`, `router-tool-lockdown.cjs` |
+| **Advisory hooks** (metrics, bypass-audit, validate-skill-invocation) | May fail-open    | `process.exit(0)`  | `post-tool-metrics-unified.cjs`, `bypass-audit-hook.cjs`                                                 |
+| **Post hooks** (all PostToolUse)                                      | Should fail-open | `process.exit(0)`  | `post-completion-chain.cjs`, `reflection-cleanup.cjs`                                                    |
+
+**Rationale:** Security hooks that fail-open on errors create bypass vectors (SEC-008). Advisory and post hooks should not block workflow on transient errors.
+
 ## Reference Documentation
 
 See `.claude/docs/HOOKS_REFERENCE.md` for comprehensive hook authoring guide.

@@ -1,6 +1,8 @@
 ---
 name: htmx-expert
 version: 1.0.0
+verified: true
+lastVerifiedAt: '2026-02-28'
 category: 'Frameworks'
 agents: [developer, frontend-pro]
 tags: [htmx, hypermedia, html, server-side, web]

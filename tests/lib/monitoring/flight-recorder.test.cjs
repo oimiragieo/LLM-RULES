@@ -18,6 +18,9 @@ const { PROJECT_ROOT } = require('../../../.claude/lib/utils/project-root.cjs');
 let recorder;
 const TEST_LOG = path.join(PROJECT_ROOT, '.claude', 'tmp', 'flight-recorder-test.jsonl');
 
+// Ensure the tmp directory exists before running tests
+fs.mkdirSync(path.join(PROJECT_ROOT, '.claude', 'tmp'), { recursive: true });
+
 async function testRecorder() {
   console.log('Flight Recorder Tests');
   console.log('=====================');
@@ -42,6 +45,13 @@ async function testRecorder() {
     console.log('Recorder module not found - expected in RED phase');
   }
 
+  // Helper to flush async log buffer after recording
+  function flushRecorder() {
+    if (recorder && recorder._logBuffer) {
+      recorder._logBuffer.flushSync();
+    }
+  }
+
   if (fs.existsSync(TEST_LOG)) fs.unlinkSync(TEST_LOG);
 
   await test('should append valid events to JSONL', async () => {
@@ -56,6 +66,7 @@ async function testRecorder() {
       },
       TEST_LOG
     );
+    flushRecorder();
 
     const content = fs.readFileSync(TEST_LOG, 'utf8').trim();
     const parsed = JSON.parse(content);

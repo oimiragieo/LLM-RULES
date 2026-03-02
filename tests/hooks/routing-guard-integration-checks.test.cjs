@@ -32,6 +32,7 @@ test('Routing Guard Integration - Checks 1, 5, 7', async t => {
     const toolInput = {
       subagent_type: 'developer',
       prompt: 'Implement the feature',
+      description: 'Implement the feature',
     };
 
     const result = runAllChecks('Task', toolInput, { permission_mode: 'normal' });
@@ -49,6 +50,7 @@ test('Routing Guard Integration - Checks 1, 5, 7', async t => {
     const toolInput = {
       subagent_type: 'devops',
       prompt: 'You are a devops agent. Please deploy the system.',
+      description: 'Deploy the system',
     };
 
     const result = runAllChecks('Task', toolInput, { permission_mode: 'normal' });
@@ -66,6 +68,7 @@ test('Routing Guard Integration - Checks 1, 5, 7', async t => {
       subagent_type: 'developer',
       prompt:
         'You are a developer. Please perform a deep security audit of the authentication system.',
+      description: 'Security audit of the authentication system',
     };
 
     const result = runAllChecks('Task', toolInput, { permission_mode: 'normal' });

@@ -10,7 +10,10 @@ const CONTEXTS_DIR = path.join(PROJECT_ROOT, '.claude', 'config', 'contexts');
 const MODES_DIR = path.join(PROJECT_ROOT, '.claude', 'config', 'modes');
 
 function isPathLike(value) {
-  return value.includes(path.sep) || value.endsWith('.yml') || value.endsWith('.yaml');
+  // SE-01: Check both separators so forward-slash paths work on Windows
+  return (
+    value.includes('/') || value.includes('\\') || value.endsWith('.yml') || value.endsWith('.yaml')
+  );
 }
 
 function resolveConfigPath(baseDir, nameOrPath) {

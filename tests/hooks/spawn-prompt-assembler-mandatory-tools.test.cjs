@@ -107,11 +107,13 @@ describe('TEST SUITE 1: agent-config.json mandatory tools', () => {
     }
   });
 
-  test('should have Skill in all agents tools array', () => {
+  test('should have Skill in all non-router agents tools array', () => {
     assert.ok(config && config.agents, 'Config with agents should be loaded');
     const agents = config.agents || {};
 
     for (const [agentName, agentConfig] of Object.entries(agents)) {
+      // Router is restricted to routing tools only (Section 0); Skill is not in its allowed set
+      if (agentName === 'router') continue;
       const tools = agentConfig.tools || [];
       assert.ok(Array.isArray(tools), `Agent "${agentName}" tools should be an array`);
       assert.ok(
@@ -121,7 +123,7 @@ describe('TEST SUITE 1: agent-config.json mandatory tools', () => {
     }
   });
 
-  test('should have all mandatory tools for each agent', () => {
+  test('should have all mandatory tools for each agent (router exempt from Skill)', () => {
     assert.ok(config && config.agents, 'Config with agents should be loaded');
     const agents = config.agents || {};
 
@@ -129,6 +131,8 @@ describe('TEST SUITE 1: agent-config.json mandatory tools', () => {
       const tools = agentConfig.tools || [];
 
       for (const mandatoryTool of MANDATORY_TOOLS) {
+        // Router is restricted to routing tools only (Section 0); Skill is not in its allowed set
+        if (agentName === 'router' && mandatoryTool === 'Skill') continue;
         assert.ok(
           tools.includes(mandatoryTool),
           `Agent "${agentName}" must have ${mandatoryTool}. Found: [${tools.join(', ')}]`
@@ -422,6 +426,8 @@ describe('TEST SUITE 5: Integration - mandatory tools enforcement chain', () => 
       const tools = agentConfig.tools || [];
 
       for (const mandatoryTool of manifestMandatory) {
+        // Router is restricted to routing tools only (Section 0); Skill is not in its allowed set
+        if (agentName === 'router' && mandatoryTool === 'Skill') continue;
         assert.ok(
           tools.includes(mandatoryTool),
           `Agent "${agentName}" should have manifest-defined mandatory tool ${mandatoryTool}`

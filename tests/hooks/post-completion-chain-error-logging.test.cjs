@@ -11,30 +11,33 @@ const {
   WORKFLOW_STATE_FILE,
 } = require('../../.claude/hooks/workflow/post-completion-chain.cjs');
 
-function withCapturedConsoleError(fn) {
+function withCapturedStderr(fn) {
   const logs = [];
-  const original = console.error;
-  console.error = (...args) => logs.push(args.map(String).join(' '));
+  const original = process.stderr.write;
+  process.stderr.write = (chunk, ..._rest) => {
+    logs.push(String(chunk));
+    return true;
+  };
   return Promise.resolve()
     .then(fn)
     .then(
       result => {
-        console.error = original;
+        process.stderr.write = original;
         return { result, logs };
       },
       error => {
-        console.error = original;
+        process.stderr.write = original;
         throw error;
       }
     );
 }
 
-test('post-completion-chain logs and fail-opens when workflow state file is missing', async () => {
+test('post-completion-chain fail-opens when workflow state file is missing', async () => {
   if (fs.existsSync(WORKFLOW_STATE_FILE)) {
     fs.unlinkSync(WORKFLOW_STATE_FILE);
   }
 
-  const { logs, result } = await withCapturedConsoleError(() =>
+  const { result } = await withCapturedStderr(() =>
     processTaskCompletion({
       toolUse: {
         tool: 'TaskUpdate',
@@ -47,16 +50,16 @@ test('post-completion-chain logs and fail-opens when workflow state file is miss
     })
   );
 
+  // Source silently returns pass-through when workflow state file is missing
   assert.deepEqual(result, { result: {} });
-  assert.ok(logs.some(line => line.includes('No workflow state file found')));
 });
 
-test('post-completion-chain logs invalid workflow JSON and returns pass-through', async () => {
+test('post-completion-chain logs invalid workflow JSON via auditLog and returns pass-through', async () => {
   fs.mkdirSync(path.dirname(WORKFLOW_STATE_FILE), { recursive: true });
   fs.writeFileSync(WORKFLOW_STATE_FILE, '{invalid-json', 'utf8');
 
   try {
-    const { logs, result } = await withCapturedConsoleError(() =>
+    const { logs, result } = await withCapturedStderr(() =>
       processTaskCompletion({
         toolUse: {
           tool: 'TaskUpdate',
@@ -70,6 +73,7 @@ test('post-completion-chain logs invalid workflow JSON and returns pass-through'
     );
 
     assert.deepEqual(result, { result: {} });
+    // auditLog writes structured JSON to stderr
     assert.ok(logs.some(line => line.includes('Invalid workflow state file')));
   } finally {
     if (fs.existsSync(WORKFLOW_STATE_FILE)) fs.unlinkSync(WORKFLOW_STATE_FILE);

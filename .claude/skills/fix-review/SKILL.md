@@ -1,12 +1,15 @@
 ---
 name: fix-review
 description: Verify fix commits address security findings without introducing new bugs or regressions. Analyzes diffs for anti-patterns like removed validation, weakened access control, reduced error handling, reordered external calls, and changed integer operations. Generates structured FIX_REVIEW_REPORT with finding status tracking.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Bash, Grep, Glob, Write]
 args: '<commit-ref|PR-number> [--findings-file <path>] [--output <report-path>]'
+agents: [security-architect, code-reviewer, developer]
+category: 'Security & Compliance'
+tags: [security, fix-review, audit, vulnerability, regression, diff-analysis]
 best_practices:
   - Always compare the fix against the original finding, not just the diff in isolation
   - Check for regression in adjacent code paths affected by the fix
@@ -15,8 +18,8 @@ best_practices:
   - Track partial fixes explicitly -- they are more dangerous than unfixed findings
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: null
+verified: true
+lastVerifiedAt: '2026-03-01'
 ---
 
 # Fix Review Skill
@@ -290,10 +293,40 @@ For each finding-fix pair:
 | `static-analysis`        | Automated confirmation of fix effectiveness       |
 | `code-reviewer`          | General code quality review of fix commits        |
 
-## Memory Protocol
+## Iron Laws
 
-**Before starting**: Read the original findings report and any prior fix review reports for context.
+1. **NO FINDING CLOSED WITHOUT FIX VERIFICATION** — A finding is not fixed until the fix has been reviewed against the original finding, verified to address root cause, and confirmed not to introduce new issues.
+2. **ALWAYS compare fix against original finding** — reviewing the diff in isolation misses context; the fix must address the specific vulnerability described.
+3. **ALWAYS check for all instances** — if a pattern is fixed in one location, verify that all other instances of the same pattern are also fixed.
+4. **NEVER close PARTIALLY_FIXED findings** — partial fixes are more dangerous than unfixed findings because they create false confidence.
+5. **ALWAYS check adjacent code paths** — fixes that pass all anti-pattern checks can still introduce regressions in code that depends on the changed behavior.
 
-**During analysis**: Write findings status incrementally to the report file. Track anti-patterns detected for pattern learning.
+## Anti-Patterns
 
-**After completion**: Record anti-pattern frequencies and fix quality patterns to `.claude/context/memory/learnings.md` for improving future fix reviews.
+| Anti-Pattern                             | Why It Fails                                                          | Correct Approach                                                 |
+| ---------------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Reviewing diff without reading finding   | Fix may address wrong issue or only surface symptom                   | Always re-read original finding before reviewing fix diff        |
+| Closing finding after any code change    | Change may be unrelated or insufficient                               | Verify fix status is FIXED with root cause elimination confirmed |
+| Ignoring partial fixes                   | PARTIALLY_FIXED is more dangerous than NOT_ADDRESSED (false security) | Track remaining gaps explicitly; keep finding open               |
+| Skipping anti-pattern checklist          | Subtle regressions (weakened validation, reordered checks) go unseen  | Run all 6 anti-pattern checks on every fix diff                  |
+| Not checking for variant vulnerabilities | Same bug pattern likely exists elsewhere in codebase                  | Invoke variant-analysis after confirming fix                     |
+
+## Memory Protocol (MANDATORY)
+
+**Before starting:**
+
+Read `.claude/context/memory/learnings.md`
+
+Check for:
+
+- Original findings report and any prior fix review reports
+- Known anti-pattern frequencies from previous fix reviews
+- Previous fix quality patterns for this codebase
+
+**After completing:**
+
+- Anti-pattern frequency data -> `.claude/context/memory/learnings.md`
+- Fix quality concern -> `.claude/context/memory/issues.md`
+- Decision about finding status -> `.claude/context/memory/decisions.md`
+
+> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.

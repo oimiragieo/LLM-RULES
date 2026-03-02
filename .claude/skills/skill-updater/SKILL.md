@@ -9,8 +9,8 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord, WebSearch, Web
 args: '--skill <name-or-path> [--trigger reflection|evolve|manual|stale_skill] [--mode plan|execute]'
 error_handling: graceful
 streaming: supported
-verified: false
-lastVerifiedAt: 2026-02-19T05:29:09.098Z
+verified: true
+lastVerifiedAt: '2026-02-28'
 ---
 
 # Skill Updater
@@ -299,7 +299,7 @@ After updating the skill, scan for capability gaps and resolve each using the ap
 1. Update references:
 
 - `.claude/CLAUDE.md`
-- `.claude/context/artifacts/catalogs/skill-catalog.md`
+- `.claude/docs/skill-catalog.md`
 - relevant agent prompts/frontmatter
 
 2. Record refresh outcome in:

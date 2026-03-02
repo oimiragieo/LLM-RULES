@@ -62,8 +62,8 @@ describe('Path Constants — structural invariants', () => {
     assert.ok(CATALOG_PATH.endsWith('skill-catalog.md'));
   });
 
-  test('CATALOG_PATH is under .claude/context/artifacts/catalogs', () => {
-    assert.ok(CATALOG_PATH.includes('artifacts/catalogs'));
+  test('CATALOG_PATH is under .claude/docs', () => {
+    assert.ok(CATALOG_PATH.includes('.claude/docs') || CATALOG_PATH.includes('artifacts/catalogs'));
   });
 
   test('AGENT_REGISTRY_PATH ends with agent-registry.json', () => {

@@ -1,23 +1,25 @@
 ---
 name: medusa
-version: 1.1.0
+version: 1.2.0
 category: 'External Integrations'
-agents: [developer]
-tags: [medusa, headless-commerce, ecommerce, nodejs, api]
-description: Medusa rules and best practices. These rules should be used when building applications with Medusa.
+agents: [developer, nextjs-pro]
+tags: [medusa, headless-commerce, ecommerce, nodejs, api, typescript, workflow-sdk]
+description: Medusa v2 rules and best practices for modular commerce architecture, Workflow SDK, data models, services, and admin customizations.
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit]
 globs: '**/*.tsx, **/*.ts, src/**/*.ts, src/**/*.tsx, src/**/*.js, src/**/*.jsx'
 best_practices:
-  - Follow the guidelines consistently
-  - Apply rules during code review
-  - Use as reference when writing new code
+  - Use Workflow SDK for all async operations with compensation
+  - Extend via modules, never modify core
+  - Always use Query to retrieve linked data
+  - Use MedusaError for error throwing
+  - Prefer snake_case for data model fields
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: '2026-03-01'
 ---
 
 # Medusa Skill

@@ -125,12 +125,18 @@ function generateRequiredPrefixFragment(taskId, description) {
 |  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
 +======================================================================+
 |  Your Task ID: ${taskIdValue}                                                  |
+|  IMPORTANT: Use this task_id for TaskUpdate/TaskGet/TaskOutput.      |
+|  NEVER use session_id for task tools.                                 |
 |                                                                      |
 |  PRE-FLIGHT (MANDATORY):                                             |
 |  TaskList();                                                         |
 |                                                                      |
 |  FIRST ACTION (MANDATORY):                                           |
 |  TaskUpdate({ taskId: "${taskIdValue}", status: "in_progress" });              |
+|                                                                      |
+|  BEFORE Edit/Write: Read the file first in this task context.        |
+|  If you hit "File has not been read yet", stop after 3 retries       |
+|  and switch strategy (re-read file, then edit).                      |
 |                                                                      |
 |  AFTER completing work, run:                                         |
 |  TaskUpdate({ taskId: "${taskIdValue}", status: "completed",                   |
@@ -180,6 +186,8 @@ function ensureMandatorySpawnPreflight(prompt, taskId) {
 ## Spawn Preflight (Mandatory)
 1) PRE-FLIGHT: TaskList()
 2) FIRST ACTION: TaskUpdate({ taskId: "${taskIdValue}", status: "in_progress" })
+3) Use task_id "${taskIdValue}" for TaskUpdate/TaskGet/TaskOutput (never session_id)
+4) Read file before Edit/Write; max 3 retries on repeated "file not read" errors
 `;
   return `${preflightBlock}\n${prompt}`;
 }

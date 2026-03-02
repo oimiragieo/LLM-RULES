@@ -7,7 +7,7 @@ const path = require('node:path');
 
 const TARGETS = [
   '.claude/hooks/reflection/force-step0-execution.cjs',
-  '.claude/hooks/reflection/reflection-step0-guard.cjs',
+  // reflection-step0-guard.cjs has its own readSpawnRequests (exported, tested separately)
   '.claude/hooks/reflection/reflection-queue-processor.cjs',
   '.claude/hooks/routing/user-prompt-unified.core.cjs',
 ];

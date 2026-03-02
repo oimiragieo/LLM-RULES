@@ -8,7 +8,7 @@
  * Sub-agents (identified by CLAUDE_AGENT_ID or task_id in hookInput)
  * are always allowed through.
  *
- * Env: ROUTER_TOOL_LOCKDOWN_ENFORCEMENT=block|warn|off (default: warn)
+ * Env: ROUTER_TOOL_LOCKDOWN_ENFORCEMENT=block|warn|off (default: block)
  *
  * @module router-tool-lockdown
  */
@@ -158,7 +158,7 @@ function suggestAgent(toolName) {
  */
 function checkRouterToolLockdown(toolName, toolInput, hookInput, cwd = process.cwd()) {
   try {
-    const enforcement = getEnforcementMode('ROUTER_TOOL_LOCKDOWN_ENFORCEMENT', 'warn');
+    const enforcement = getEnforcementMode('ROUTER_TOOL_LOCKDOWN_ENFORCEMENT', 'block');
 
     // If enforcement is off, always allow
     if (enforcement === 'off') {
@@ -240,9 +240,11 @@ async function main() {
     }
 
     process.exit(0);
-  } catch (_err) {
-    // Safety: never block accidentally — exit 0 on unexpected errors
-    process.exit(0);
+  } catch (err) {
+    console.error(
+      `[ROUTER-TOOL-LOCKDOWN] Unexpected error — blocking (fail-closed): ${err.message}`
+    );
+    process.exit(2);
   }
 }
 

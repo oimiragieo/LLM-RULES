@@ -190,8 +190,14 @@ function advancePhase(workflowId, nextPhase, stateFilePath = DEFAULT_STATE_FILE)
 
   // Advance to next phase
   state.currentPhase = nextPhase;
-  state.phases[nextPhase].status = 'in_progress';
-  state.phases[nextPhase].startedAt = now;
+
+  // Guard: 'COMPLETE' is a terminal state, not a phase with status tracking
+  if (nextPhase !== 'COMPLETE' && state.phases[nextPhase]) {
+    state.phases[nextPhase].status = 'in_progress';
+    state.phases[nextPhase].startedAt = now;
+  } else if (nextPhase === 'COMPLETE') {
+    state.completedAt = now;
+  }
 
   writeState(stateFilePath, state);
 }

@@ -537,11 +537,12 @@ async function main() {
     // Fail closed
     if (process.env.HOOK_FAIL_OPEN === 'true') {
       // SECURITY: Never fail-open for security-critical paths
+      // SE-01: Use [/\\] to match both Unix and Windows path separators
       const SECURITY_CRITICAL_PATTERNS = [
-        /\\.claude\/hooks\//,
-        /\\.claude\/agents\//,
-        /\\.env$/,
-        /\\.env\./,
+        /[/\\]\.claude[/\\]hooks[/\\]/,
+        /[/\\]\.claude[/\\]agents[/\\]/,
+        /\.env$/,
+        /\.env\./,
       ];
       const targetPath = targetFilePath;
       const isSecurityCritical = SECURITY_CRITICAL_PATTERNS.some(p => p.test(targetPath));

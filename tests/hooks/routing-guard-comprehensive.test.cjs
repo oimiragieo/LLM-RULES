@@ -389,7 +389,7 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
     assert.match(result.message, /TASK-CREATE VIOLATION/);
   });
 
-  it('should degrade repeated TaskCreate block into warning loop-breaker', () => {
+  it('should include dedupe message on repeated TaskCreate block', () => {
     const prevSessionId = process.env.CLAUDE_SESSION_ID;
     process.env.ROUTER_BLOCK_DEDUPE_THRESHOLD = '2';
     process.env.ROUTER_BLOCK_DEDUPE_WINDOW_MS = '60000';
@@ -411,8 +411,8 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
     assert.equal(first.result, 'block');
 
     const second = routingGuard.checkTaskCreate('TaskCreate');
-    assert.equal(second.pass, true);
-    assert.equal(second.result, 'warn');
+    assert.equal(second.pass, false);
+    assert.equal(second.result, 'block');
     assert.match(second.message, /Repeated block/);
 
     if (prevSessionId === undefined) {
@@ -442,23 +442,22 @@ describe('routing-guard.cjs - Check 3: TaskCreate Restriction', () => {
       })
     );
 
-    const first = routingGuard.runAllChecks('TaskCreate', {}, { session_id: sessionId });
+    const first = routingGuard.runAllChecks(
+      'TaskCreate',
+      { description: 'Test task' },
+      { session_id: sessionId }
+    );
     assert.equal(first.pass, false);
     assert.equal(first.result, 'block');
 
-    let dedupeWarning = null;
-    let attempts = 0;
-    while (!dedupeWarning && attempts < 3) {
-      const retry = routingGuard.runAllChecks('TaskCreate', {}, { session_id: sessionId });
-      assert.equal(retry.pass, true);
-      assert.equal(retry.result, 'allow');
-      assert.ok(Array.isArray(retry.warnings));
-      dedupeWarning = retry.warnings.find(
-        w => w.checkName === 'task-create-guard' && /Repeated block/.test(w.message || '')
-      );
-      attempts += 1;
-    }
-    assert.ok(dedupeWarning);
+    const second = routingGuard.runAllChecks(
+      'TaskCreate',
+      { description: 'Test task' },
+      { session_id: sessionId }
+    );
+    assert.equal(second.pass, false);
+    assert.equal(second.result, 'block');
+    assert.match(second.message, /Repeated block/);
 
     if (prevSessionId !== undefined) {
       process.env.CLAUDE_SESSION_ID = prevSessionId;
@@ -517,6 +516,7 @@ describe('routing-guard.cjs - Delegation to pre-task-unified for Task checks', (
     const result = routingGuard.runAllChecks('Task', {
       prompt: 'You are developer. Implement feature.',
       subagent_type: 'developer',
+      description: 'Implement feature',
     });
     assert.equal(result.pass, true);
   });
@@ -540,6 +540,7 @@ describe('routing-guard.cjs - Delegation to pre-task-unified for Task checks', (
     const result = routingGuard.runAllChecks('Task', {
       prompt: 'You are developer. Implement feature.',
       subagent_type: 'developer',
+      description: 'Implement feature',
     });
     assert.equal(result.pass, false);
     assert.equal(result.checkName, 'planner-first-guard');

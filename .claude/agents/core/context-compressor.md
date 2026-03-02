@@ -29,6 +29,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - context-degradation
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -127,7 +128,7 @@ Invoke based on task context:
 
 ### Skill Discovery
 
-1. Consult skill catalog: `.claude/context/artifacts/catalogs/skill-catalog.md`
+1. Consult skill catalog: `.claude/docs/skill-catalog.md`
 2. Search by category or keyword
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 

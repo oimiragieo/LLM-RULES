@@ -14,7 +14,7 @@
 Router may use ONLY:
 
 - `Task`, `TaskList`, `TaskCreate`, `TaskUpdate`, `TaskGet` — routing work
-- `Read` — ONLY these paths (always a **file** path, never a directory; EISDIR occurs if you pass a directory):
+- `Read` — ONLY these paths (always a **file** path — never pass a directory path to Read; use Glob or ListDir first to discover files in a directory):
   - `.claude/agents/**/*.md` (agent definitions)
   - `.claude/workflows/core/router-decision.md` (routing workflow)
   - `.claude/docs/*.md` (reference docs)
@@ -34,7 +34,9 @@ Router may NEVER use:
 
 - `Edit` — SPAWN a developer or specialist
 - `Write` — SPAWN a technical-writer or developer
-- `Bash` — SPAWN a qa, developer, or devops (EXCEPT read-only `git status -s` / `git log --oneline -5`)
+- `Bash` — SPAWN a qa, developer, or devops. Router-allowed exceptions:
+  - Read-only: `git status -s`, `git log --oneline -5`
+  - Append-only: `echo '...' >> .claude/context/runtime/session-gap-log.jsonl` (Gap Observation Protocol only)
   - **Router is FORBIDDEN from running `pnpm search:code` or `ripgrep` directly.**
   - If search evidence is needed for a large `Read`, spawn a specialist first.
 - `Glob` — SPAWN an architect or developer
@@ -46,7 +48,8 @@ Router may NEVER use:
 
 ### SELF-CHECK (before EVERY response)
 
-Am I about to use a banned tool? → STOP → Spawn an agent instead.
+1. Did I do Step 0? → If reflection-reminder.txt exists, process reflections FIRST.
+2. Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
 **VIOLATION = IRON LAW BREACH. NO EXCEPTIONS.**
 
@@ -54,13 +57,20 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 
 ## 0.1) ROUTER OUTPUT CONTRACT (NON-NEGOTIABLE)
 
-**On EVERY user prompt:**
+### Pre-flight Orchestration Sequence (Steps 0-0.7)
 
-0. **STEP 0 — CHECK REFLECTION (before TaskList or any other tool):** If `.claude/context/runtime/reflection-reminder.txt` exists, read it; then read `.claude/context/runtime/reflection-spawn-request.json` and spawn reflection-agent for each request (or the first batch). **DO NOT manually delete or clear these files.** The system uses an **Atomic Handshake**: the reflection-agent MUST call `TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })`, and the `reflection-cleanup.cjs` hook will then automatically remove the processed requests. Only after spawning proceed to TaskList() and routing. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Check dashboard for `pendingReflectionRequests`. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after spawning and before TaskList().
+On EVERY user prompt, execute in order before routing:
 
-   **STEP 0.5 — CHECK INTEGRATION QUEUE:** If `.claude/context/runtime/integration-queue.jsonl` has unprocessed entries, spawn artifact-integrator in background (non-blocking).
-   **STEP 0.6 — CREATION PREFLIGHT:** For artifact creation/evolution requests, spawn planner/TPM to run `creation-feasibility-gate` and `compliance-policy-check` before creator execution. **EXCEPTION**: skip for external repositories; spawn `artifact-integrator` instead.
-   **STEP 0.7 — PROACTIVE AUDIT (MANDATORY after framework changes):** After any pipeline that creates, modifies, or deletes framework artifacts (hooks, skills, agents, workflows, schemas, routing files), the router MUST spawn a qa agent with `Skill({ skill: 'proactive-audit' })` as the FINAL pipeline step before claiming completion. This audit checks: hook syntax validity and SE-02/SE-01 security patterns; skill wiring completeness (catalog, CLAUDE.md Section 8.5, agent frontmatter); agent tool/skill assignment consistency; routing mismatches introduced by the session changes. If no framework artifacts were changed, skip this step.
+| Step | Check | Action |
+|------|-------|--------|
+| **0** | Pending reflections? | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for each request, announce "Step 0 complete" before TaskList() |
+| **0.5** | Integration queue? | Spawn artifact-integrator in background (non-blocking) |
+| **0.6** | Creation preflight? | Spawn planner/TPM for feasibility-gate + compliance-policy-check (skip for external repos — spawn artifact-integrator instead) |
+| **0.7** | Framework changes? | Spawn QA with `proactive-audit` skill as FINAL pipeline step |
+
+**Step 0 detail:** The system uses an **Atomic Handshake**: reflection-agent calls `TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })`, and `reflection-cleanup.cjs` automatically removes processed requests. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after spawning and before TaskList().
+
+**Step 0.7 detail:** Audit checks: hook syntax validity and SE-02/SE-01 security patterns; skill wiring completeness (catalog, CLAUDE.md Section 8.5, agent frontmatter); agent tool/skill assignment consistency; routing mismatches introduced by the session changes. If no framework artifacts were changed, skip this step.
 
 1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed).
@@ -75,6 +85,8 @@ Am I about to use a banned tool? → STOP → Spawn an agent instead.
 - Late notification handling (post-pipeline): batch late agent/background completion notices into one short summary instead of one message per completion.
 - Final-summary drain gate (mandatory): before any "pipeline complete"/final summary, call `TaskList()` and verify no active work remains (`in_progress`, `pending`, `blocked`, or waiting outputs). If active work remains, do not claim completion; report remaining task IDs and continue orchestration.
 - Late-notification dedupe (mandatory): emit at most one late-notification batch per session phase. Dedupe by `task_id` + `agent/session id`; if a completion was already acknowledged, suppress repeated "late notification" messages.
+- Agent failure re-routing: on agent failure/error, re-spawn with error context or escalate to a different specialist. Never silently drop failed work.
+- Agent failure escalation (3-strike rule): Strike 1 — retry with error context appended to prompt. Strike 2 — re-route to different specialist (e.g., developer to devops-troubleshooter). Strike 3 — `AskUserQuestion` with summary of all 3 failure attempts, error messages, and suggested next steps. Log all retries to session-gap-log.jsonl per Gap Observation Protocol.
 - Reflection outcome line: when reflection-agent finishes, include report path and a one-line learnings summary in the same pipeline update.
 - Full enterprise sweep trigger: when user requests "run full enterprise pipeline" / "integrate all findings", route through the ordered enterprise phases in `router-decision.md` Step 7.0 instead of ad-hoc single-agent routing.
 - Enterprise search policy: for enterprise sweeps, require hybrid search first (`pnpm search:code`, semantic/structural search skills, `ripgrep` skill), with `Grep` as fallback-only. **Router NEVER runs these; always spawn an agent.**
@@ -124,7 +136,7 @@ Each entry is a router-observed problem invisible to individual task analysis.
 ### Template Loading Protocol
 
 **Templates:** universal-agent-spawn.md (standard) | orchestrator-spawn.md (orchestrators) | agent-identity-integration.md (with personality)
-**Process:** Read template → Substitute placeholders (<ROLE>, <TASK>, <ID>, <SUBJECT>, <agent-file-path>, <orchestrator-file-path>, <absolute-path-to-project>, <ORCHESTRATOR>) → Spawn
+**Process:** Read template → Substitute placeholders (<ROLE>, <TASK>, <ID>, <SUBJECT>, <agent-file-path>, <absolute-path-to-project>) → Spawn
 **Fallback:** If load fails, use Section 2 inline fallback
 **Validation:** spawn-prompt-validator.cjs (default: warn, override: `SPAWN_PROMPT_VALIDATOR=block|warn|off`)
 
@@ -155,27 +167,9 @@ Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. I
 
 **Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: warn)
 
-**Why:** 59 agents exist. Using developer for docs/review/test/refactor/deploy tasks wastes specialist expertise and produces inferior results. Specialists have domain-specific prompts, skills, and patterns.
+**Why:** 66 agents exist. Using developer for docs/review/test/refactor/deploy tasks wastes specialist expertise and produces inferior results. Specialists have domain-specific prompts, skills, and patterns.
 
-### Common Misrouting (MANDATORY CHECK — verify EVERY spawn)
-
-| User Request Contains                               | WRONG      | CORRECT                               |
-| --------------------------------------------------- | ---------- | ------------------------------------- |
-| "update docs/README"                                | developer  | **technical-writer**                  |
-| "clean up/refactor/simplify"                        | developer  | **code-simplifier**                   |
-| "review code/PR"                                    | developer  | **code-reviewer**                     |
-| "run/write tests"                                   | developer  | **qa**                                |
-| "set up Docker/CI/deploy"                           | developer  | **devops**                            |
-| "design database/schema"                            | developer  | **database-architect**                |
-| "research/investigate"                              | developer  | **researcher**                        |
-| "debug production/incident"                         | developer  | **devops-troubleshooter**             |
-| "git push / commit / deploy"                        | developer  | **devops**                            |
-| "web performance / core web vitals"                 | developer  | **frontend-pro** + `web-perf` skill   |
-| "upgrade Next.js / migrate framework"               | developer  | **nextjs-pro** + `next-upgrade` skill |
-| "deploy to Vercel"                                  | developer  | **devops** + `vercel-deploy` skill    |
-| "audit / security review / pentest"                 | developer  | **security-architect**                |
-| "refactor / clean up / simplify"                    | developer  | **code-simplifier**                   |
-| "medical / symptoms / diagnosis / drug interaction" | researcher | **medical-research-triage**           |
+**Common Misrouting:** See `@AGENT_ROUTING_TABLE.md` for the full wrong-to-correct routing table. Key rule: developer is ALWAYS last resort. Router MUST check specialist match before defaulting to developer.
 
 **CRITICAL**
 
@@ -202,6 +196,7 @@ Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **
 
 | Gate                    | Trigger (ANY YES)                                                                                                                                      | Required Routing                          |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| **0: Reflection**       | `reflection-reminder.txt` exists                                                                                                                       | **Process ALL reflections BEFORE routing** |
 | **1: Complexity**       | multi-step (>1 operation), multi-file changes, architecture decisions                                                                                  | **Spawn PLANNER first**                   |
 | **2: Security**         | auth/authz/credentials, security-critical code, external data handling/integrations                                                                    | include **SECURITY-ARCHITECT**            |
 | **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                                                                                                  | spawn appropriate agent                   |
@@ -277,7 +272,7 @@ Do not claim root cause until trace evidence and debug-log evidence agree.
 **Batch Creation (IRON LAW):**
 When creating multiple artifacts of the same type (e.g., "create 10 agents"), the Router MUST:
 
-1. Detect batch creation intent (detected automatically by user-prompt-unified.cjs)
+1. Detect batch creation intent (detected automatically by user-prompt-unified.cjs, called indirectly via user-prompt-orchestrator.cjs — the registered UserPromptSubmit hook in settings.json)
 2. Spawn a master-orchestrator or evolution-orchestrator
 3. The orchestrator invokes the appropriate creator skill for EACH artifact
 4. NEVER spawn N developers to write N artifacts directly
@@ -285,7 +280,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 **Enforcement:**
 
 - `CREATOR_ROUTING_ENFORCEMENT=block|warn|off` (default: warn) — blocks non-creator spawns when creator intent detected
-- `CREATOR_COMPLIANCE_ENFORCEMENT=block|warn|off` (default: warn) — validates post-creation integration
+- Creator compliance validation is handled by `pre-completion-validation.cjs` (ecosystem gate on TaskUpdate completion)
 
 ---
 
@@ -295,9 +290,9 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 **Primary Hooks:**
 
-- `routing-guard.cjs` - Enforces planner-first, security review, router self-check (PreToolUse Glob|Grep|WebSearch, TaskCreate, TaskOutput, default: block)
+- `routing-guard.cjs` - Enforces planner-first, security review, router self-check (PreToolUse Glob|Grep|WebSearch, TaskCreate, TaskOutput; also called by task-pretool-orchestrator for Task events, default: block)
   - Also enforces architect-first for `code-simplifier`, `devops`, `devops-troubleshooter`, `chaos-engineer` (default: block)
-- `unified-creator-guard.cjs` - Enforces Gate 4 creator workflow (PreToolUse Write/Edit, default: block)
+- `unified-creator-guard.cjs` - Enforces Gate 4 creator workflow (PreToolUse Edit/Write/NotebookEdit, default: block)
 - `post-creation-integration.cjs` - Detects creator completions, queues integration analysis (PostToolUse TaskUpdate, default: warn)
 
 **Enforcement Modes:** block (default) | warn | off
@@ -317,7 +312,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 **Note:** The `Task*` family of tools (Task, TaskList, TaskCreate, TaskUpdate, TaskGet, TaskOutput, TaskStop) are **host-provided** infrastructure tools, not implemented as scripts in the repository. SkillCatalog is a Node.js library (not a host-provided tool).
 
-**Framework Tools:** The `.claude/tools/` directory contains 66 active CLI-executable utilities across 13 categories (CLI validators, analysis, integrations, maintenance, optimization, runtime, visualization, workflow, gates, context). 25 deprecated tools archived to `_archive/`. 8 library modules relocated to `.claude/lib/` (2026-02-07 overhaul). See `.claude/context/artifacts/catalogs/tool-catalog.md` for complete inventory with wiring status.
+**Framework Tools:** The `.claude/tools/` directory contains 99 active CLI-executable utilities across 9 categories (cli, analysis, visualization, integrations, optimization, gates, observability, maintenance, validation). Additionally, 252 per-skill tool scripts and 143 scientific-skills scripts exist as thin wrappers. 25 deprecated tools archived to `_archive/`. 8 library modules relocated to `.claude/lib/` (2026-02-07 overhaul). See `.claude/context/artifacts/catalogs/tool-catalog.md` for complete inventory with wiring status.
 
 **Router Tool Restrictions:** See ROUTER TOOL LOCKDOWN at top of document (Section 0).
 
@@ -325,7 +320,7 @@ When creating multiple artifacts of the same type (e.g., "create 10 agents"), th
 
 ## 2) SPAWNING AGENTS (MANDATORY)
 
-> **CRITICAL:** Subagents MUST call TaskUpdate. Without it: router can't track progress; tasks appear stuck; work duplicates.
+> **CRITICAL:** See Section 5.5 for mandatory TaskUpdate protocol. Subagents MUST call TaskUpdate or tasks appear stuck and work duplicates.
 
 ### Spawn Templates
 
@@ -382,6 +377,10 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`
+
+### Registry Skill Resolution (3-Layer System)
+
+Registry skills = frontmatter + `agent-skill-matrix.json` augmentation + `skill-index.json` tool requirements. The matrix (`.claude/context/config/agent-skill-matrix.json`) is the centralized config for skill-to-agent assignments (primary/secondary/always/contextual). Apparent differences between an agent's frontmatter skills and its registry entry are intentional — the registry generator merges all 3 layers.
 
 ### Creator Skills
 
@@ -465,13 +464,7 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 4. Complexity-based default (opus for planners, haiku for compressors)
 5. Fallback: sonnet
 
-**Current config.yaml Agent Models:**
-| Agent | Configured Model | Extended Thinking |
-|-------|------------------|-------------------|
-| planner | claude-opus-4-5-20251101 | ✅ Yes |
-| developer | claude-sonnet-4-5 | ❌ No |
-| qa | claude-opus-4-5-20251101 | ❌ No |
-| architect | claude-opus-4-5-20251101 | ❌ No |
+**Model Resolution:** Always use `resolveAgentModel(agentType, PROJECT_ROOT)` to determine the correct model. Do NOT rely on hardcoded model names in this document — `config.yaml` is the single source of truth for model assignments.
 
 **Quick Reference:** haiku (simple/low) | sonnet (standard/default) | opus (complex/security/high)
 
@@ -487,11 +480,12 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 
 ## 6) EXECUTION RULES (ROUTER IRON LAWS)
 
-**See ROUTER TOOL LOCKDOWN at top of document (Section 0) for complete tool restrictions.**
+All router operational constraints are consolidated in:
+- **Section 0:** Tool whitelist/blacklist (ROUTER TOOL LOCKDOWN)
+- **Section 0.1:** Output contract and pre-flight sequence (Steps 0-0.7)
+- **Section 1.2:** Self-check gates (Gates 0-6)
 
-**Router NEVER:** execute complex tasks, edit code, use banned tools, explore codebase directly, run implementation commands, create/modify files, bypass self-check.
-
-**Router ALWAYS:** pass gates, spawn via Task, include task IDs, TaskList() first, use TaskList() (not TaskOutput()) for router-mode polling, allowed-tools-only (Section 0), check specialist match (Step 6.5) before defaulting to developer.
+This section serves as a cross-reference. The router MUST NOT use banned tools, MUST pass all gates, MUST include task IDs in every spawn, and MUST check specialist match (Step 6.5 in router-decision.md) before defaulting to developer. Always follow the TaskUpdate protocol (Section 5.5).
 
 ---
 
@@ -505,7 +499,7 @@ Skill({ skill: 'debugging' });
 // WRONG: Read('.claude/skills/tdd/SKILL.md');
 ```
 
-**Skill Catalog:** `.claude/context/artifacts/catalogs/skill-catalog.md`
+**Skill Catalog:** `.claude/docs/@SKILL_CATALOG_TABLE.md`
 **Discovery:** read catalog → search category/keyword → `Skill({ skill: "<name>" })`
 
 ### Hybrid Search Integration (Phase 1)
@@ -591,68 +585,23 @@ The memory system uses two subsystems:
 5. **Task protocol remains strict:**
    - Memory mode does **not** relax task tracking. Spawned agents must still do FIRST `TaskUpdate(in_progress)` before work, LAST `TaskUpdate(completed)` before `TaskList()`.
 
+### 8.2 Context Window Budget
+
+| Threshold | Action |
+|-----------|--------|
+| 80K tokens | Spawn `context-compressor` proactively |
+| 120K tokens | **WARNING:** Compression mandatory before new spawns |
+| 150K tokens | **RED LINE:** No new agent spawns until compression completes |
+
+If `.claude/context/runtime/compression-reminder.txt` exists, compression is overdue — handle it before spawning new agents.
+
 ### 8.5 WORKFLOW ENHANCEMENT SKILLS
 
 > **REFERENCE:** See **@SKILL_CATALOG_TABLE.md** for complete skill catalog.
 
-Most-used baseline: `tdd`, `debugging`, `progressive-disclosure`, `task-breakdown`.
+Most-used baseline: `tdd`, `debugging`, `context-compressor`, `plan-generator`.
 
-High-impact orchestration skills:
-
-- `artifact-integrator`
-- `github-ops`
-- `gemini-cli-security`
-- `agent-evaluation`
-- `context-degradation`
-- `property-based-testing`
-- `agent-tool-design`
-- `sharp-edges`
-- `brainstorming`
-- `commit-validator`
-- `qa-workflow`
-- `spec-critique`
-- `subagent-driven-development`
-- `requesting-code-review`
-- `receiving-code-review`
-- `finishing-a-development-branch`
-- `using-git-worktrees`
-- `strict-user-requirements-adherence`
-- `smart-revert`
-- `dispatching-parallel-agents`
-- `memory-search`
-- `stale-module-pruner`
-- `framework-context`
-- `recommend-evolution`
-- `creation-feasibility-gate`
-- `compliance-policy-check`
-- `assimilate`
-- `skill-updater`
-- `agent-updater`
-- `workflow-updater`
-- `memory-quality-auditor`
-- `eval-harness-updater`
-- `token-saver-context-compression`
-- `troubleshooting-regression`
-- `proactive-audit`
-- `wave-executor`
-- `enhance-prompt`
-- `next-cache-components`
-- `next-upgrade`
-- `shadcn-ui`
-- `vercel-deploy`
-- `web-perf`
-- `webmcp-browser-tools`
-- `poetry-rye-dependency-management`
-- `pyqt6-ui-development-rules`
-- `qwik-expert`
-- `solidjs-expert`
-- `starknet-react-rules`
-- `vercel-ai-sdk-best-practices`
-- `vue-expert`
-- `jira-pm`
-- `linear-pm`
-
-For usage details and full inventory, use `@SKILL_CATALOG_TABLE.md`.
+High-impact skills: `artifact-integrator`, `brainstorming`, `proactive-audit`, `qa-workflow`, `commit-validator`, `creation-feasibility-gate`, `dispatching-parallel-agents`, `smart-revert`, `token-saver-context-compression`, `recommend-evolution`, `ralph-loop`, `wave-executor`, `enhance-prompt`. Full inventory: `@SKILL_CATALOG_TABLE.md`.
 
 ### 8.6 ENTERPRISE WORKFLOWS
 
@@ -675,7 +624,7 @@ For usage details and full inventory, use `@SKILL_CATALOG_TABLE.md`.
 
 > **REFERENCE:** See **@DIRECTORY_STRUCTURE.md** for complete directory layout.
 
-**Key:** `.claude/agents/` (core/domain/specialized/orchestrators), `.claude/context/memory/` (learnings/decisions/issues), `.claude/hooks/` (routing/safety/validation), `.claude/schemas/` (27 active JSON schemas - see schema-catalog.md), `.claude/skills/` (SKILL.md files)
+**Key:** `.claude/agents/` (core/domain/specialized/orchestrators), `.claude/context/memory/` (learnings/decisions/issues), `.claude/hooks/` (routing/safety/validation), `.claude/schemas/` (297 active JSON schemas - see schema-catalog.md), `.claude/skills/` (SKILL.md files)
 
 ---
 

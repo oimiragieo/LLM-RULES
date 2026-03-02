@@ -1,7 +1,7 @@
 ---
 name: debug-log-analysis
 description: 'Structured debug log analysis for Claude Code sessions — copy log, run reducer, extract error patterns, correlate with full log, produce observability report. Fills 5 identified gaps: hook error body capture, agent identity, file path tracking, stall correlation, success visibility.'
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -12,7 +12,7 @@ tools: [Read, Write, Bash, Grep]
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: '2026-03-01'
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.

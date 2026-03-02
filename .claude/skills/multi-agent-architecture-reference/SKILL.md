@@ -1,7 +1,9 @@
 ---
 name: multi-agent-architecture-reference
 description: 'Decision matrix for selecting multi-agent topologies (Supervisor, Swarm, Hierarchical, Conductor) with token economics, failure modes, and escalation paths'
-version: 1.0.0
+version: 1.1.0
+verified: true
+lastVerifiedAt: '2026-03-01'
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -167,6 +169,24 @@ EPIC → Hierarchical + Consensus Voting (max 3 tiers + voting gate)
 - Document token budget per topology tier when spawning Hierarchical
 - Cross-reference failure mode taxonomy before finalizing topology choice
   </best_practices>
+
+## Iron Laws
+
+1. **ALWAYS start with Conductor** — default to master-orchestrator for MEDIUM/HIGH tasks; only escalate to Hierarchical when sub-orchestration is explicitly required by the task structure.
+2. **NEVER exceed depth=3 in Hierarchical** — token cost grows exponentially at each tier; depth >3 triggers SE-M04 (token runaway) and is considered an architectural defect.
+3. **ALWAYS assign TaskUpdate(in_progress) on Swarm task pickup** — missing task ownership is the root cause of SE-M05 (orphaned tasks); every agent in a swarm must call TaskUpdate before doing work.
+4. **NEVER use Consensus Voting for low-stakes decisions** — 12x token multiplier is justified only for architecture decisions, security approvals, or irreversible production changes.
+5. **ALWAYS cross-reference the failure mode taxonomy before finalizing topology** — each topology has documented failure modes (SE-M01 through SE-M05); skipping this review leads to production incidents.
+
+## Anti-Patterns
+
+| Anti-Pattern                                                             | Problem                                                                                      | Fix                                                                                                        |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Defaulting to Hierarchical for every complex task                        | Token runaway at depth >3; cascade failure risk; over-engineering most tasks                 | Use Conductor (sequential phases) first; only escalate to Hierarchical when sub-orchestration is mandatory |
+| Using Swarm for ordered, dependent tasks                                 | Swarm agents run concurrently and cannot enforce ordering; produces race conditions          | Use Conductor or Fan-out/Fan-in when task ordering matters                                                 |
+| Skipping TaskUpdate(in_progress) in Swarm                                | Tasks become orphaned (SE-M05); no ownership tracking; duplicated or dropped work            | Require every swarm agent to call TaskUpdate(in_progress) as its first action                              |
+| Adding Consensus Voting speculatively                                    | 12x token overhead kills budget for non-critical decisions; slowdown on all downstream tasks | Reserve consensus gate for genuinely high-stakes, irreversible decisions only                              |
+| Mixing topology concerns (Supervisor + Swarm + Hierarchical in one flow) | Complexity explosion; routing ambiguity; impossible to debug failures                        | Pick one primary topology per orchestration scope; compose only at well-defined phase boundaries           |
 
 ## Memory Protocol (MANDATORY)
 
