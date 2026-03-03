@@ -346,7 +346,13 @@
       "category": "code-indexing",
       "discovered_at": "2026-03-03T07:04:32.127Z",
       "last_accessed": "2026-03-03T07:04:39.490Z"
+    },
+    ".claude/lib/worktree/worktree-utils.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-03T15:20:46.781Z",
+      "last_accessed": "2026-03-03T15:20:46.781Z"
     }
   },
-  "last_updated": "2026-03-03T07:04:39.490Z"
+  "last_updated": "2026-03-03T15:20:46.781Z"
 }
