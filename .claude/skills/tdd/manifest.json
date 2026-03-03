@@ -1,0 +1,21 @@
+{
+  "name": "tdd",
+  "version": "1.0.0",
+  "skillType": "cognitive",
+  "npmDependencies": [
+    {
+      "package": "node",
+      "versionRange": ">=22.5.0",
+      "type": "runtime",
+      "purpose": "Required Node.js version for --test runner and test:node:test protocol"
+    },
+    {
+      "package": "pnpm",
+      "versionRange": ">=9.0.0",
+      "type": "package-manager",
+      "purpose": "Package manager for running pnpm test, pnpm lint:fix, and pnpm format"
+    }
+  ],
+  "lastResearchDate": "2026-03-03",
+  "staleAfterDays": 180
+}

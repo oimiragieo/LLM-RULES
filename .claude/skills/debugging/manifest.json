@@ -1,0 +1,21 @@
+{
+  "name": "debugging",
+  "version": "1.0.0",
+  "skillType": "cognitive",
+  "npmDependencies": [
+    {
+      "package": "node",
+      "versionRange": ">=22.5.0",
+      "type": "runtime",
+      "purpose": "Required Node.js version for running debug scripts and test runner"
+    },
+    {
+      "package": "pnpm",
+      "versionRange": ">=9.0.0",
+      "type": "package-manager",
+      "purpose": "Package manager for running pnpm test and other project commands"
+    }
+  ],
+  "lastResearchDate": "2026-03-03",
+  "staleAfterDays": 180
+}

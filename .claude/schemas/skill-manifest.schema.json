@@ -1,0 +1,166 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Skill Manifest Schema",
+  "description": "Machine-readable dependency manifest for agent-studio skills. Declares what external tools, libraries, APIs, and repositories a skill requires.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "version", "skillType"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Skill identifier matching the directory name under .claude/skills/"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "description": "Semver version of the skill manifest"
+    },
+    "skillType": {
+      "type": "string",
+      "enum": ["cognitive", "executable", "hybrid"],
+      "description": "cognitive = LLM reasoning only; executable = requires external CLI/binary tools; hybrid = both"
+    },
+    "externalDependencies": {
+      "type": "array",
+      "description": "External CLI tools, binaries, or services required by this skill",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Name of the external tool or binary"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["runtime", "cli", "library", "api", "package-manager"],
+            "description": "Category of dependency"
+          },
+          "version": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Required version or version range"
+          },
+          "installHint": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Installation command or documentation URL"
+          },
+          "optional": {
+            "type": "boolean",
+            "description": "If true, skill degrades gracefully without this dependency"
+          }
+        }
+      }
+    },
+    "npmDependencies": {
+      "type": "array",
+      "description": "npm packages or Node.js runtime requirements",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["package"],
+        "properties": {
+          "package": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "npm package name or 'node' for Node.js runtime"
+          },
+          "versionRange": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Semver range (e.g., '>=22.5.0', '^18.0.0')"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["runtime", "cli", "library", "api", "package-manager"],
+            "description": "Category of npm dependency"
+          },
+          "purpose": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Brief explanation of why this package is needed"
+          }
+        }
+      }
+    },
+    "apis": {
+      "type": "array",
+      "description": "External APIs or services this skill interacts with",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Name of the API or service"
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Base URL or documentation URL"
+          },
+          "authRequired": {
+            "type": "boolean",
+            "description": "Whether authentication credentials are required"
+          },
+          "purpose": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "How this skill uses the API"
+          }
+        }
+      }
+    },
+    "githubRepos": {
+      "type": "array",
+      "description": "GitHub repositories used as reference material or cloned by this skill",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Full GitHub repository URL"
+          },
+          "purpose": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "How this repository is used by the skill"
+          },
+          "cloneRequired": {
+            "type": "boolean",
+            "description": "If true, skill requires a local clone to function"
+          }
+        }
+      }
+    },
+    "lastResearchDate": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO 8601 date (YYYY-MM-DD) when dependency research was last performed"
+    },
+    "staleAfterDays": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Number of days after lastResearchDate before the manifest is considered stale"
+    }
+  }
+}

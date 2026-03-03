@@ -99,6 +99,123 @@ function hasCompanionTool(toolsRoot, skillBaseName, skillSlug) {
   return ['.cjs', '.mjs', '.js'].some(ext => fileExists(path.join(slugDir, `${skillSlug}${ext}`)));
 }
 
+/**
+ * Validates a skill's manifest.json against the skill-manifest schema rules.
+ * Returns { present, valid, errors } — does NOT affect skill score (warning only).
+ *
+ * @param {string} skillDir - Absolute path to the skill directory
+ * @returns {{ present: boolean, valid: boolean, errors: string[] }}
+ */
+function evaluateManifest(skillDir) {
+  const manifestPath = path.join(skillDir, 'manifest.json');
+
+  if (!fileExists(manifestPath)) {
+    return { present: false, valid: false, errors: [] };
+  }
+
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  } catch (err) {
+    return {
+      present: true,
+      valid: false,
+      errors: [`JSON parse error: ${err.message}`],
+    };
+  }
+
+  const errors = [];
+
+  // Required fields
+  const required = ['name', 'version', 'skillType'];
+  for (const field of required) {
+    if (manifest[field] === undefined || manifest[field] === null) {
+      errors.push(`Missing required field: ${field}`);
+    }
+  }
+
+  // skillType enum
+  const validSkillTypes = ['cognitive', 'executable', 'hybrid'];
+  if (manifest.skillType && !validSkillTypes.includes(manifest.skillType)) {
+    errors.push(
+      `Invalid skillType "${manifest.skillType}". Must be one of: ${validSkillTypes.join(', ')}`
+    );
+  }
+
+  // externalDependencies
+  if (manifest.externalDependencies !== undefined) {
+    if (!Array.isArray(manifest.externalDependencies)) {
+      errors.push('externalDependencies must be an array');
+    } else {
+      const validDepTypes = ['runtime', 'cli', 'library', 'api', 'package-manager'];
+      for (const dep of manifest.externalDependencies) {
+        if (typeof dep.name !== 'string' || dep.name.length === 0) {
+          errors.push('Each externalDependency must have a non-empty name');
+        }
+        if (dep.type && !validDepTypes.includes(dep.type)) {
+          errors.push(`Invalid dependency type "${dep.type}"`);
+        }
+      }
+    }
+  }
+
+  // npmDependencies
+  if (manifest.npmDependencies !== undefined) {
+    if (!Array.isArray(manifest.npmDependencies)) {
+      errors.push('npmDependencies must be an array');
+    } else {
+      for (const dep of manifest.npmDependencies) {
+        if (typeof dep.package !== 'string' || dep.package.length === 0) {
+          errors.push('Each npmDependency must have a non-empty package name');
+        }
+      }
+    }
+  }
+
+  // apis
+  if (manifest.apis !== undefined) {
+    if (!Array.isArray(manifest.apis)) {
+      errors.push('apis must be an array');
+    } else {
+      for (const api of manifest.apis) {
+        if (typeof api.name !== 'string' || api.name.length === 0) {
+          errors.push('Each api must have a non-empty name');
+        }
+      }
+    }
+  }
+
+  // githubRepos
+  if (manifest.githubRepos !== undefined) {
+    if (!Array.isArray(manifest.githubRepos)) {
+      errors.push('githubRepos must be an array');
+    } else {
+      for (const repo of manifest.githubRepos) {
+        if (typeof repo.url !== 'string' || repo.url.length === 0) {
+          errors.push('Each githubRepo must have a non-empty url');
+        }
+      }
+    }
+  }
+
+  // lastResearchDate format
+  if (manifest.lastResearchDate !== undefined) {
+    const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+    if (!datePattern.test(manifest.lastResearchDate)) {
+      errors.push('lastResearchDate must be in YYYY-MM-DD format');
+    }
+  }
+
+  // staleAfterDays
+  if (manifest.staleAfterDays !== undefined) {
+    if (typeof manifest.staleAfterDays !== 'number' || manifest.staleAfterDays < 0) {
+      errors.push('staleAfterDays must be a non-negative number');
+    }
+  }
+
+  return { present: true, valid: errors.length === 0, errors };
+}
+
 function evaluateSkill({ projectRoot, skillRelativePath }) {
   const skillsRoot = path.join(projectRoot, SKILLS_ROOT_REL);
   const toolsRoot = path.join(projectRoot, TOOLS_ROOT_REL);
@@ -144,12 +261,16 @@ function evaluateSkill({ projectRoot, skillRelativePath }) {
     }
   }
 
+  // Manifest check: optional/warning only — does not affect score
+  const manifest = evaluateManifest(skillDir);
+
   return {
     skill: skillRelativePath,
     score,
     checks,
     missing,
     archived: isArchivedSkillPath(skillRelativePath),
+    manifest,
   };
 }
 

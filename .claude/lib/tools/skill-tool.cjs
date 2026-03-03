@@ -16,6 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { runSetupCheck } = require('./setup-runner.cjs');
 
 const SKILLS_DIR = path.join(PROJECT_ROOT, '.claude', 'skills');
 const SKILL_ALIASES = {
@@ -71,6 +72,25 @@ function loadSkill(skillName) {
 }
 
 /**
+ * Get knowledge files for a skill
+ * @param {string} skillFilePath - Absolute path to SKILL.md
+ * @returns {string[]} Portable relative paths to knowledge/*.md files (empty if none)
+ */
+function getKnowledgeFiles(skillFilePath) {
+  try {
+    const knowledgeDir = path.join(path.dirname(skillFilePath), 'knowledge');
+    if (!fs.existsSync(knowledgeDir)) return [];
+    return fs
+      .readdirSync(knowledgeDir)
+      .filter(f => f.endsWith('.md'))
+      .sort()
+      .map(f => path.join('knowledge', f).replace(/\\/g, '/'));
+  } catch (_err) {
+    return [];
+  }
+}
+
+/**
  * Parse SKILL.md file to extract skill definition
  * @param {string} filePath - Path to SKILL.md
  * @param {string} skillName - Normalized skill name
@@ -87,6 +107,10 @@ function parseSkillFile(filePath, skillName) {
     // Get body (content after frontmatter)
     const body = frontmatterMatch ? content.slice(frontmatterMatch[0].length).trim() : content;
 
+    const skillDir = path.dirname(filePath);
+    const setupCjsPath = path.join(skillDir, 'setup.cjs');
+    const hasSetup = fs.existsSync(setupCjsPath);
+
     return {
       name: skillName,
       displayName: frontmatter.name || skillName,
@@ -97,6 +121,9 @@ function parseSkillFile(filePath, skillName) {
       filePath: path.relative(PROJECT_ROOT, filePath).replace(/\\/g, '/'),
       requiredTools: frontmatter.tools || frontmatter.requiredTools || ['Read', 'Write', 'Edit'],
       tags: frontmatter.tags || [],
+      knowledgeFiles: getKnowledgeFiles(filePath),
+      hasSetup,
+      setupPath: hasSetup ? path.relative(PROJECT_ROOT, setupCjsPath).replace(/\\/g, '/') : null,
     };
   } catch (err) {
     return {
@@ -107,6 +134,7 @@ function parseSkillFile(filePath, skillName) {
       domain: 'general',
       content: '',
       filePath: path.relative(PROJECT_ROOT, filePath).replace(/\\/g, '/'),
+      knowledgeFiles: [],
       error: err.message,
     };
   }
@@ -204,6 +232,11 @@ function Skill(options = {}) {
     };
   }
 
+  // Run setup check if skill declares a setup.cjs
+  const setupCheck = skill.hasSetup
+    ? runSetupCheck(path.dirname(path.join(PROJECT_ROOT, skill.filePath)))
+    : null;
+
   // Return skill content for agent to apply
   return {
     success: true,
@@ -216,6 +249,10 @@ function Skill(options = {}) {
     filePath: skill.filePath,
     requiredTools: skill.requiredTools,
     tags: skill.tags,
+    knowledgeFiles: skill.knowledgeFiles || [],
+    hasSetup: skill.hasSetup || false,
+    setupPath: skill.setupPath || null,
+    setupCheck,
     args: options.args || null,
     message: `Skill "${skill.displayName}" loaded. Apply the workflow described in the skill content.`,
   };

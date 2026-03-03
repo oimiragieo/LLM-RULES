@@ -1,0 +1,49 @@
+{
+  "name": "security-architect",
+  "version": "1.0.0",
+  "skillType": "executable",
+  "npmDependencies": [
+    {
+      "package": "node",
+      "versionRange": ">=22.5.0",
+      "type": "runtime",
+      "purpose": "Required Node.js version for running skill scripts"
+    },
+    {
+      "package": "pnpm",
+      "versionRange": ">=9.0.0",
+      "type": "package-manager",
+      "purpose": "Package manager for agent-studio project commands"
+    }
+  ],
+  "externalDependencies": [
+    {
+      "name": "semgrep",
+      "type": "cli",
+      "version": ">=1.60.0",
+      "installHint": "pip install semgrep  OR  brew install semgrep",
+      "optional": true
+    },
+    {
+      "name": "trufflehog",
+      "type": "cli",
+      "version": ">=3.0.0",
+      "installHint": "brew install trufflehog  OR  https://github.com/trufflesecurity/trufflehog/releases",
+      "optional": true
+    }
+  ],
+  "githubRepos": [
+    {
+      "url": "https://github.com/OWASP/CheatSheetSeries",
+      "purpose": "OWASP Cheat Sheet Series — security best practices reference",
+      "cloneRequired": false
+    },
+    {
+      "url": "https://github.com/OWASP/ASVS",
+      "purpose": "OWASP Application Security Verification Standard — security verification reference",
+      "cloneRequired": false
+    }
+  ],
+  "lastResearchDate": "2026-03-03",
+  "staleAfterDays": 90
+}
