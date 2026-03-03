@@ -1,0 +1,29 @@
+{
+  "name": "Async Error Handling with TDD",
+  "description": "Agent must implement async function with proper error handling using TDD cycle",
+  "input": {
+    "task": "Implement fetchUserData(userId) that fetches user from API and throws specific error on validation failure",
+    "language": "javascript",
+    "testFramework": "node:test",
+    "constraints": [
+      "Must handle network errors",
+      "Must validate response schema",
+      "Must throw TypeError for missing userId",
+      "Must throw ValidationError for invalid user data"
+    ]
+  },
+  "expectedBehavior": [
+    "Write tests for happy path first (user fetched successfully)",
+    "Write tests for error cases (network error, invalid data, missing userId)",
+    "Implement function to pass all tests",
+    "Test error handling with proper error types and messages",
+    "Refactor for clarity without changing behavior"
+  ],
+  "successCriteria": {
+    "testsWrittenFirst": true,
+    "allTestsPass": true,
+    "errorHandlingComplete": true,
+    "minimumTestCount": 5,
+    "asyncFunctionImplemented": true
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: best-practices-guidelines
-description: Specifies best practices, including following RESTful API design principles, implementing responsive design, using Zod for data validation, and regularly updating dependencies. This rule promotes mode
+description: Specifies best practices, including following RESTful API design principles, implementing responsive design, using Zod for data validation, and regularly updating dependencies. This skill promotes modern coding standards and helps developers write consistent, maintainable code.
 version: 1.0.0
 model: sonnet
 invoked_by: both
@@ -34,8 +34,12 @@ You help developers write better code by applying established guidelines and bes
 <instructions>
 When reviewing or writing code, apply these guidelines:
 
-- |- 10. Best Practices: - Follow RESTful API design principles when applicable - Implement responsive design for components - Use Zod for data validation - Regularly update dependencies and check for vulnerabilities
-  </instructions>
+**10. Best Practices:**
+- Follow RESTful API design principles when applicable
+- Implement responsive design for components
+- Use Zod for data validation
+- Regularly update dependencies and check for vulnerabilities
+</instructions>
 
 <examples>
 Example usage:

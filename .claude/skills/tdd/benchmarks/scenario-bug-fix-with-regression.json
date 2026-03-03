@@ -1,0 +1,23 @@
+{
+  "name": "Bug Fix with Regression Test",
+  "description": "Agent must fix a bug using TDD: write a regression test that exposes the bug, then fix it",
+  "input": {
+    "task": "Fix the off-by-one error in the paginate() function",
+    "buggyCode": "function paginate(items, page, perPage) { const start = page * perPage; return items.slice(start, start + perPage); }",
+    "bugReport": "paginate([1,2,3,4,5], 1, 2) returns [3,4] but page 1 should return [1,2]",
+    "language": "javascript"
+  },
+  "expectedBehavior": [
+    "Write a regression test that fails with the buggy code",
+    "Verify the test fails (RED phase)",
+    "Fix the bug (page should be 0-indexed or adjusted)",
+    "Verify the regression test passes (GREEN phase)",
+    "Check no existing functionality broken"
+  ],
+  "successCriteria": {
+    "regressionTestWritten": true,
+    "testFailsBeforeFix": true,
+    "testPassesAfterFix": true,
+    "bugFixed": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Red-Green-Refactor Cycle",
+  "description": "Agent must implement a pure function using strict TDD: write failing test first, minimal code to pass, then refactor",
+  "input": {
+    "task": "Implement a function isPalindrome(str) that returns true if the string is a palindrome (case-insensitive, ignoring spaces)",
+    "language": "javascript",
+    "testFramework": "node:test"
+  },
+  "expectedBehavior": [
+    "Write a failing test BEFORE any production code",
+    "Write minimal code to make the test pass",
+    "Add edge case tests (empty string, single char, mixed case)",
+    "Refactor for clarity without breaking tests"
+  ],
+  "successCriteria": {
+    "testsWrittenFirst": true,
+    "allTestsPass": true,
+    "minimumTestCount": 4,
+    "noProductionCodeBeforeTest": true
+  }
+}

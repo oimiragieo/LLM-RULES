@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-03T06:47:52.776Z",
+  "generatedAt": "2026-03-03T07:12:28.232Z",
   "metadata": {
     "totalSkills": 260,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-03T06:47:52.777Z",
+    "lastValidated": "2026-03-03T07:12:28.233Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -483,7 +483,7 @@
       "displayName": "Best Practices Guidelines",
       "category": "Other",
       "domain": "other",
-      "description": "Specifies best practices, including following RESTful API design principles, implementing responsive design, using Zod for data validation, and regularly updating dependencies. This rule promotes mode",
+      "description": "Specifies best practices, including following RESTful API design principles, implementing responsive design, using Zod for data validation, and regularly updating dependencies. This skill promotes modern coding standards and helps developers write consistent, maintainable code.",
       "requiredTools": [
         "Read",
         "Write",

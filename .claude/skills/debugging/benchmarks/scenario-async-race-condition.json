@@ -1,0 +1,27 @@
+{
+  "name": "Async Race Condition Detection",
+  "description": "Agent must identify and fix a race condition in concurrent async operations",
+  "input": {
+    "task": "Debug and fix race condition in concurrent user fetch and cache update",
+    "buggyCode": "async function getUser(id) { if (!cache[id]) { const user = await fetchUser(id); cache[id] = user; } return cache[id]; }",
+    "scenario": "Two simultaneous calls to getUser(1) both trigger fetchUser because cache check happens before await",
+    "language": "javascript",
+    "framework": "nodejs async/await"
+  },
+  "expectedBehavior": [
+    "Identify the race condition: cache check before async operation completes",
+    "Understand the timeline: both callers check cache (empty), both call fetchUser, both update cache",
+    "Trace how duplicate fetches occur",
+    "Implement proper concurrency guard: use a Promise map to deduplicate in-flight requests",
+    "Test with concurrent calls to verify single fetch per ID",
+    "Understand trade-offs: Promise.all vs per-request caching vs database transactions"
+  ],
+  "successCriteria": {
+    "raceConditionIdentified": true,
+    "rootCauseExplained": true,
+    "duplicateRequestsEliminated": true,
+    "concurrentCallsHandled": true,
+    "testDemonstrateConcurrency": true,
+    "singleFetchPerIdGuaranteed": true
+  }
+}

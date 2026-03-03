@@ -1,0 +1,27 @@
+{
+  "name": "Null Reference Error Diagnosis",
+  "description": "Agent must diagnose and fix a null reference error using systematic debugging methodology",
+  "input": {
+    "task": "Debug and fix: TypeError - Cannot read property 'name' of null in getUserName(user) function",
+    "buggyCode": "function getUserName(user) { return user.profile.name; }",
+    "callSite": "const name = getUserName(null);",
+    "language": "javascript",
+    "expectedError": "TypeError: Cannot read property 'profile' of null"
+  },
+  "expectedBehavior": [
+    "Identify the null reference point (user parameter)",
+    "Trace the call stack to understand how null was passed",
+    "Determine whether null is a valid input or a caller error",
+    "Implement defensive check: validate user exists before accessing properties",
+    "Consider error message clarity for debugging future issues",
+    "Test with both null and valid user objects"
+  ],
+  "successCriteria": {
+    "nullPointIdentified": true,
+    "rootCauseFound": true,
+    "defensiveCheckAdded": true,
+    "handlesNullGracefully": true,
+    "testsCoverNullCase": true,
+    "errorMessageClear": true
+  }
+}

@@ -91,6 +91,23 @@ function getKnowledgeFiles(skillFilePath) {
 }
 
 /**
+ * Check if observations directory exists for a skill
+ * @param {string} skillFilePath - Absolute path to SKILL.md
+ * @returns {string|null} Portable relative path to observations/ directory or null if none
+ */
+function getObservationsDir(skillFilePath) {
+  try {
+    const observationsDir = path.join(path.dirname(skillFilePath), 'observations');
+    if (fs.existsSync(observationsDir)) {
+      return 'observations';
+    }
+    return null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+/**
  * Parse SKILL.md file to extract skill definition
  * @param {string} filePath - Path to SKILL.md
  * @param {string} skillName - Normalized skill name
@@ -124,6 +141,7 @@ function parseSkillFile(filePath, skillName) {
       knowledgeFiles: getKnowledgeFiles(filePath),
       hasSetup,
       setupPath: hasSetup ? path.relative(PROJECT_ROOT, setupCjsPath).replace(/\\/g, '/') : null,
+      observationsDir: getObservationsDir(filePath),
     };
   } catch (err) {
     return {
@@ -135,6 +153,7 @@ function parseSkillFile(filePath, skillName) {
       content: '',
       filePath: path.relative(PROJECT_ROOT, filePath).replace(/\\/g, '/'),
       knowledgeFiles: [],
+      observationsDir: null,
       error: err.message,
     };
   }
@@ -252,6 +271,7 @@ function Skill(options = {}) {
     knowledgeFiles: skill.knowledgeFiles || [],
     hasSetup: skill.hasSetup || false,
     setupPath: skill.setupPath || null,
+    observationsDir: skill.observationsDir || null,
     setupCheck,
     args: options.args || null,
     message: `Skill "${skill.displayName}" loaded. Apply the workflow described in the skill content.`,
