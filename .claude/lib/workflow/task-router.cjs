@@ -6,6 +6,9 @@
  * weighted routing, and fallback strategies.
  */
 
+const path = require('path');
+const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+
 class TaskRouter {
   constructor(config = {}) {
     this.rules = config.rules || [];
@@ -16,7 +19,18 @@ class TaskRouter {
     this.totalRoutes = 0;
     this.delegations = new Map(); // taskId -> delegation state
     const DelegationStore = require('./delegation-store.cjs');
-    this.store = new DelegationStore(config.delegationsPath);
+    const sessionScope = (process.env.CLAUDE_SESSION_ID || `pid-${process.pid}`).replace(
+      /[^a-zA-Z0-9._-]/g,
+      '-'
+    );
+    const defaultDelegationsPath = path.join(
+      PROJECT_ROOT,
+      '.claude',
+      'context',
+      'memory',
+      `delegations.${sessionScope}.json`
+    );
+    this.store = new DelegationStore(config.delegationsPath || defaultDelegationsPath);
   }
 
   /**
@@ -320,7 +334,12 @@ class TaskRouter {
   async recoverOrphanedDelegations(now = Date.now()) {
     const recovered = [];
     for (const [taskId, record] of this.delegations.entries()) {
-      if (record.status === 'completed' || record.status === 'failed') continue;
+      if (
+        record.status === 'completed' ||
+        record.status === 'failed' ||
+        record.status === 'reassigned'
+      )
+        continue;
       const deadline = record.updatedAt + (record.timeoutMs || 30000);
       if (now >= deadline) {
         const updated = {

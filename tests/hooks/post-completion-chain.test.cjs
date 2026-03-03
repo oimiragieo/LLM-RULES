@@ -20,7 +20,16 @@ const {
   processTaskCompletion,
   WORKFLOW_STATE_FILE,
   PHASE_ADVANCE_FILE,
+  readAgentHealth,
 } = require('../../.claude/hooks/workflow/post-completion-chain.cjs');
+const AGENT_HEALTH_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'test-agent-health.json'
+);
+process.env.AGENT_HEALTH_PATH_OVERRIDE = AGENT_HEALTH_FILE;
 
 // Test utilities
 let testsFailed = 0;
@@ -38,7 +47,7 @@ function assert(condition, message) {
 }
 
 function cleanup() {
-  [WORKFLOW_STATE_FILE, PHASE_ADVANCE_FILE].forEach(file => {
+  [WORKFLOW_STATE_FILE, PHASE_ADVANCE_FILE, AGENT_HEALTH_FILE].forEach(file => {
     if (fs.existsSync(file)) {
       fs.unlinkSync(file);
     }
@@ -157,6 +166,11 @@ async function testMarkAgentComplete() {
   assert(
     updatedState.phases.validate.agents.developer.metadata.testsAdded === true,
     'Metadata should be preserved'
+  );
+  const health = readAgentHealth(AGENT_HEALTH_FILE);
+  assert(
+    health.agents.developer.successCount === 1,
+    'Agent success should be recorded in health file'
   );
 }
 
@@ -351,6 +365,30 @@ async function testDuplicateCompletionIsIdempotent() {
   fs.rmSync(path.dirname(planPath), { recursive: true, force: true });
 }
 
+// Test 7: Failed TaskUpdate should record agent health failure
+async function testFailureRecordsAgentHealth() {
+  cleanup();
+  console.log('\n=== Test: Failure records agent health ===');
+
+  const hookData = {
+    toolUse: {
+      tool: 'TaskUpdate',
+      input: {
+        taskId: '99',
+        status: 'failed',
+        metadata: {
+          agent: 'qa',
+        },
+      },
+    },
+  };
+
+  await processTaskCompletion(hookData);
+  const health = readAgentHealth(AGENT_HEALTH_FILE);
+  assert(health.agents.qa.failureCount === 1, 'Agent failure should be recorded');
+  assert(health.agents.qa.consecutiveFailures === 1, 'Consecutive failure count should increment');
+}
+
 // Run all tests
 async function runTests() {
   console.log('\n========================================');
@@ -365,6 +403,7 @@ async function runTests() {
     await testPhaseAdvanceOnCompletion();
     await testNoAdvanceOnGateFailure();
     await testDuplicateCompletionIsIdempotent();
+    await testFailureRecordsAgentHealth();
 
     console.log('\n========================================');
     console.log(`Tests Passed: ${testsPass}`);
@@ -372,6 +411,7 @@ async function runTests() {
     console.log('========================================\n');
 
     cleanup();
+    delete process.env.AGENT_HEALTH_PATH_OVERRIDE;
 
     if (testsFailed > 0) {
       process.exit(1);
@@ -380,6 +420,7 @@ async function runTests() {
     console.error('\nTest execution error:', error.message);
     console.error(error.stack);
     cleanup();
+    delete process.env.AGENT_HEALTH_PATH_OVERRIDE;
     process.exit(1);
   }
 }

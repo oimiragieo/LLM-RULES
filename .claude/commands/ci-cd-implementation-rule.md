@@ -1,5 +1,5 @@
 ---
-description: "Uses GitHub Actions or GitLab CI for CI/CD implementation."
+description: 'Uses GitHub Actions or GitLab CI for CI/CD implementation.'
 disable-model-invocation: true
 ---
 

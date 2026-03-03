@@ -1,5 +1,5 @@
 ---
-description: "Aims for high test coverage using pytest, testing both common and edge cases."
+description: 'Aims for high test coverage using pytest, testing both common and edge cases.'
 disable-model-invocation: true
 ---
 

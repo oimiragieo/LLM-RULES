@@ -9,7 +9,10 @@
 function preExecute(context) {
   // Validate skill invocation context
   if (!context || typeof context !== 'object') {
-    return { allow: true, message: 'design-and-user-experience-guidelines: no context to validate' };
+    return {
+      allow: true,
+      message: 'design-and-user-experience-guidelines: no context to validate',
+    };
   }
   return { allow: true };
 }

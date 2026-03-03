@@ -1,3 +1,63 @@
+## ADR-2026-03-02-107: Self-Healing Loop Evidence Integration (PROPOSED)
+
+**Date**: 2026-03-02
+**Status**: PROPOSED (awaiting implementation validation in next session)
+**Trigger**: Evolution deep-dive synthesis (Tasks 1-4, 2026-03-02) identified critical gap in self-healing maturity
+
+**Finding**: Agent-studio achieves only **3.5 out of 7 gold-standard properties** for self-improving AI systems. Gap analysis:
+
+- ✅ Atomic trials, Memory dedup, Actionable feedback (partial)
+- ❌ Staleness decay, HITL checkpoints
+- ⚠️ Eval-gated promotion (partial)
+
+**Root Cause**: Self-healing loop is **operationally closed but evidentially broken**. System executes Reflection → Evolution → Creation → Validation, but **outcome signals do not feedback into reflection context**. This causes:
+
+1. Duplicate learnings re-discovered across sessions (no outcome tracking prevents downweighting failures)
+2. Same evolution recommendations repeated (no indication whether they succeeded)
+3. Staleness decay cannot be implemented without success/failure signals
+
+**Decision**: Implement outcome signal injection to close evidence loop.
+
+**What Changes**:
+
+1. Add `outcome` field to reflection-log.jsonl schema (`outcome: "success" | "failure" | "pending"`)
+2. Modify post-completion-chain.cjs to inject outcome when creator-triggered changes complete validation
+3. Wire creator validation results (pass/fail) back to reflection spawn context
+4. Implement dead-letter governance for failed creator attempts
+
+**Why This Matters**:
+
+- Solves for Gold-Standard Property #5 (Staleness decay): learnings marked with outcome enable temporal downweighting
+- Solves for Gold-Standard Property #6 (HITL checkpoints): humans can verify whether recommendations succeeded before approving new ones
+- Enables Property #7 (Separate judge/executor): reflection can now see validator feedback
+
+**Effort**: ~8 hours total (modular; can be staged)
+
+**Success Criteria**:
+
+- Reflection-log.jsonl entries include `outcome` field populated for all creator-triggered cycles
+- Next reflection cycle has visibility into outcome of prior recommendations
+- Duplicate patterns no longer re-discovered if they failed in prior session
+- Gold-standard property count increases from 3.5 to 5.0+
+
+**Implementation Order**:
+
+1. Register missing hooks (P0, blocks handshake) — 5 min
+2. Add outcome field to schema (P0, enables tracking) — 1 hour
+3. Modify post-completion-chain.cjs (P0, injects signals) — 3 hours
+4. Wire validation results to reflection context (P1, closes loop) — 4 hours
+5. Test full cycle with outcome tracking (P1) — 2 hours
+
+**Alternatives Rejected**:
+
+- Just add staleness decay without outcomes: insufficient — need both temporal AND success/failure signals
+- Manual tracking via decisions.md: insufficient — requires automation to scale
+- Out-of-band governance system: overly complex, should be native to reflection
+
+**Next Steps**: Implement P0 items (hooks + schema) immediately; defer P1 items to sprint planning if complexity grows.
+
+---
+
 ## ADR-2026-03-01-063: Python/DevOps orphaned skill wiring batch (2026-03-01)
 
 **Status:** ACCEPTED

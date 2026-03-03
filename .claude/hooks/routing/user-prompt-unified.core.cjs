@@ -112,6 +112,9 @@ const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const USER_PROMPT_RESULTS_PATH = path.join(RUNTIME_DIR, 'user-prompt-results.jsonl');
 const USER_PROMPT_RESULTS_LOG_ENABLED = process.env.USER_PROMPT_RESULTS_LOG !== 'off';
 const USER_PROMPT_RESULTS_MAX_LINES = Number(process.env.USER_PROMPT_RESULTS_MAX_LINES || 2e3);
+const EVOLUTION_REQUESTS_PATH = path.join(RUNTIME_DIR, 'evolution-requests.jsonl');
+const EVOLUTION_SPAWN_REQUEST_PATH = path.join(RUNTIME_DIR, 'evolution-spawn-request.json');
+const EVOLUTION_REMINDER_PATH = path.join(RUNTIME_DIR, 'evolution-reminder.txt');
 const FINDINGS_PROMPT_SNAPSHOT_STATE_FILE = path.join(
   RUNTIME_DIR,
   'findings-trend-prompt-snapshot-state.json'
@@ -294,6 +297,76 @@ function recordPromptFindingsTrendSnapshot(
     }
   }
   return result;
+}
+
+function readJsonlEntries(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return [];
+    const content = fs.readFileSync(filePath, 'utf8');
+    if (!content.trim()) return [];
+    return content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean)
+      .map(line => safeParseJSON(line, null))
+      .filter(entry => entry && typeof entry === 'object');
+  } catch (_err) {
+    return [];
+  }
+}
+
+function detectRecurringCriticalEvolution(requests, threshold = 3) {
+  const minHits = Number.isFinite(Number(threshold)) ? Number(threshold) : 3;
+  const groups = new Map();
+
+  for (const req of requests) {
+    const severity = String(req?.severity || '').toUpperCase();
+    const priority = String(req?.priority || '').toLowerCase();
+    const isCritical = severity === 'CRITICAL' || priority === 'high';
+    if (!isCritical) continue;
+    const key =
+      String(req?.targetArtifact?.name || '').trim() ||
+      String(req?.summary || '').trim() ||
+      String(req?.evidence || '').trim();
+    if (!key) continue;
+    groups.set(key, (groups.get(key) || 0) + 1);
+  }
+
+  const pending = [];
+  for (const [key, count] of groups.entries()) {
+    if (count < minHits) continue;
+    pending.push({
+      id: `evo-auto-${Buffer.from(key).toString('hex').slice(0, 12)}`,
+      trigger: 'recurring_critical',
+      key,
+      count,
+      threshold: minHits,
+      status: 'pending',
+      generatedAt: new Date().toISOString(),
+    });
+  }
+  return pending;
+}
+
+function syncEvolutionSpawnReminder(options = {}) {
+  const requestsPath = options.requestsPath || EVOLUTION_REQUESTS_PATH;
+  const spawnPath = options.spawnPath || EVOLUTION_SPAWN_REQUEST_PATH;
+  const reminderPath = options.reminderPath || EVOLUTION_REMINDER_PATH;
+  const threshold = Number(options.threshold || process.env.EVOLUTION_AUTO_TRIGGER_THRESHOLD || 3);
+  const pending = detectRecurringCriticalEvolution(readJsonlEntries(requestsPath), threshold);
+  if (pending.length === 0) {
+    if (fs.existsSync(reminderPath)) fs.unlinkSync(reminderPath);
+    if (fs.existsSync(spawnPath)) fs.unlinkSync(spawnPath);
+    return { pending: 0 };
+  }
+
+  fs.mkdirSync(path.dirname(spawnPath), { recursive: true });
+  atomicWriteJSONSync(spawnPath, pending);
+  const reminder =
+    `Step 0.8: ${pending.length} recurring critical evolution request(s) detected.\n` +
+    `Read .claude/context/runtime/evolution-spawn-request.json and spawn evolution-orchestrator.\n`;
+  fs.writeFileSync(reminderPath, reminder, 'utf8');
+  return { pending: pending.length };
 }
 // =============================================================================
 // Check 2: Router Enforcer (uses shared routing-table.cjs)
@@ -1557,6 +1630,12 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   } catch (_e) {
     // best-effort; ignore
   }
+  // Evolution Step 0.8: derive pending auto-evolution requests from recurring critical entries.
+  try {
+    syncEvolutionSpawnReminder();
+  } catch (_e) {
+    // best-effort; ignore
+  }
   // Headless-safe reflection queue processing (optional, rate-limited).
   try {
     const mode = String(process.env.REFLECTION_QUEUE_PROCESS_ON_PROMPT || '').toLowerCase();
@@ -1941,6 +2020,8 @@ module.exports = {
   // Helper exports for testing
   parseHookInput: parseHookInputAsync,
   detectTriggers: detectTriggers,
+  detectRecurringCriticalEvolution: detectRecurringCriticalEvolution,
+  syncEvolutionSpawnReminder: syncEvolutionSpawnReminder,
   detectPlanningRequirement: detectPlanningRequirement,
   scoreAgents: scoreAgents,
   isTaskNotificationPrompt: isTaskNotificationPrompt,

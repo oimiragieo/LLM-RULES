@@ -1,5 +1,5 @@
 ---
-description: "Prioritizes the use of new features available in Python 3.12 and later versions."
+description: 'Prioritizes the use of new features available in Python 3.12 and later versions.'
 disable-model-invocation: true
 ---
 

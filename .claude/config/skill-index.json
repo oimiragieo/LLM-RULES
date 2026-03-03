@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-02T01:25:01.997Z",
+  "generatedAt": "2026-03-03T02:58:11.051Z",
   "metadata": {
-    "totalSkills": 254,
+    "totalSkills": 260,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-02T01:25:01.998Z",
+    "lastValidated": "2026-03-03T02:58:11.052Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -839,11 +839,14 @@
       "displayName": "Ralph Loop",
       "category": "Other",
       "domain": "other",
-      "description": "Other - ralph-loop",
+      "description": "Autonomous iteration loop with dual-mode support. Standalone mode uses Stop hooks (RALPH_ACTIVE=1). Multi-agent mode uses router-managed iteration. Never traps the host/router session.",
       "requiredTools": [
         "Read",
         "Write",
-        "Edit"
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep"
       ],
       "agentPrimary": [
         "developer"
@@ -6544,6 +6547,100 @@
       "priority": 3,
       "aliasOf": null
     },
+    "brand-compliance": {
+      "name": "brand-compliance",
+      "displayName": "Brand Compliance",
+      "category": "Other",
+      "domain": "other",
+      "description": "Audit content and assets for brand compliance — style guide validation, tone of voice checking, visual identity consistency, brand asset management, and cross-channel coherence.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Grep",
+        "Glob"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "brand-compliance"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "feedback-analysis": {
+      "name": "feedback-analysis",
+      "displayName": "Feedback Analysis",
+      "category": "Other",
+      "domain": "other",
+      "description": "Customer feedback analysis — sentiment detection, NPS/CSAT frameworks, feature request clustering, support ticket triage, churn signal detection, and feedback-to-roadmap translation",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "WebSearch",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "feedback-analysis"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "marketing-content": {
+      "name": "marketing-content",
+      "displayName": "Marketing Content",
+      "category": "Other",
+      "domain": "other",
+      "description": "Content strategy, copywriting frameworks (AIDA/PAS/BAB/4Ps/FAB), editorial calendar management, platform-specific content, A/B testing, campaign planning, audience targeting, and content performance measurement.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "marketing-content"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "regulatory-compliance": {
+      "name": "regulatory-compliance",
+      "displayName": "Regulatory Compliance",
+      "category": "Other",
+      "domain": "other",
+      "description": "Validate systems and processes against GDPR/CCPA privacy regulations, privacy-by-design principles, ADA/WCAG accessibility standards, data processing agreements (DPAs), and provide compliance checklists with regulatory change monitoring guidance.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Glob",
+        "Grep",
+        "Skill"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "regulatory-compliance"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "scientific-skills": {
       "name": "scientific-skills",
       "displayName": "Scientific Skills",
@@ -6574,6 +6671,56 @@
         "scientific-skills"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "seo-optimization": {
+      "name": "seo-optimization",
+      "displayName": "Seo Optimization",
+      "category": "Other",
+      "domain": "other",
+      "description": "Comprehensive 7-phase SEO optimization workflow covering technical SEO auditing, keyword research strategy, on-page optimization, content SEO and E-E-A-T, structured data implementation, link building, and AI search optimization. Use when auditing search engine visibility, diagnosing ranking issues, implementing schema markup, conducting keyword research, optimizing content for E-E-A-T signals, or adapting for AI-driven search (AI Overviews, SGE).",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "seo-optimization"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "user-research": {
+      "name": "user-research",
+      "displayName": "User Research",
+      "category": "Other",
+      "domain": "other",
+      "description": "UX research methodology skill — usability testing protocols, user interview frameworks, persona development, journey mapping, heuristic evaluation (Nielsen's 10), A/B test analysis, accessibility auditing, and research synthesis using NNGroup methodology.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep",
+        "WebSearch",
+        "WebFetch",
+        "TaskUpdate",
+        "Skill"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "user-research"
+      ],
+      "priority": 3,
       "aliasOf": null
     }
   },
@@ -6723,7 +6870,13 @@
         "multi-agent-architecture-reference",
         "spec-to-code-compliance",
         "webapp-testing",
-        "writing"
+        "writing",
+        "brand-compliance",
+        "feedback-analysis",
+        "marketing-content",
+        "regulatory-compliance",
+        "seo-optimization",
+        "user-research"
       ],
       "specialized": [
         "smart-debug",
@@ -7083,7 +7236,13 @@
         "visual-and-observational-rules",
         "webapp-testing",
         "workflow-patterns",
-        "writing"
+        "writing",
+        "brand-compliance",
+        "feedback-analysis",
+        "marketing-content",
+        "regulatory-compliance",
+        "seo-optimization",
+        "user-research"
       ],
       "Troubleshooting": [
         "debugging"
@@ -7427,7 +7586,13 @@
         "webapp-testing",
         "workflow-patterns",
         "writing",
-        "scientific-skills"
+        "brand-compliance",
+        "feedback-analysis",
+        "marketing-content",
+        "regulatory-compliance",
+        "scientific-skills",
+        "seo-optimization",
+        "user-research"
       ],
       "Write": [
         "tdd",
@@ -7636,7 +7801,13 @@
         "webapp-testing",
         "workflow-patterns",
         "writing",
-        "scientific-skills"
+        "brand-compliance",
+        "feedback-analysis",
+        "marketing-content",
+        "regulatory-compliance",
+        "scientific-skills",
+        "seo-optimization",
+        "user-research"
       ],
       "Edit": [
         "tdd",
@@ -7806,7 +7977,10 @@
         "visual-and-observational-rules",
         "workflow-patterns",
         "writing",
-        "scientific-skills"
+        "brand-compliance",
+        "scientific-skills",
+        "seo-optimization",
+        "user-research"
       ],
       "Bash": [
         "tdd",
@@ -7824,6 +7998,7 @@
         "brainstorming",
         "plan-generator",
         "spec-gathering",
+        "ralph-loop",
         "wave-executor",
         "security-architect",
         "auth-security-expert",
@@ -7954,6 +8129,8 @@
         "styling-expert",
         "ui-components-expert",
         "webapp-testing",
+        "feedback-analysis",
+        "marketing-content",
         "scientific-skills"
       ],
       "Glob": [
@@ -7968,6 +8145,7 @@
         "architecture-review",
         "complexity-assessment",
         "diagram-generator",
+        "ralph-loop",
         "wave-executor",
         "spec-critique",
         "security-architect",
@@ -8075,7 +8253,10 @@
         "tool-search",
         "ui-components-expert",
         "webapp-testing",
-        "scientific-skills"
+        "brand-compliance",
+        "regulatory-compliance",
+        "scientific-skills",
+        "user-research"
       ],
       "Grep": [
         "tdd",
@@ -8090,6 +8271,7 @@
         "architecture-review",
         "complexity-assessment",
         "diagram-generator",
+        "ralph-loop",
         "wave-executor",
         "spec-critique",
         "security-architect",
@@ -8197,7 +8379,10 @@
         "tool-search",
         "ui-components-expert",
         "webapp-testing",
-        "scientific-skills"
+        "brand-compliance",
+        "regulatory-compliance",
+        "scientific-skills",
+        "user-research"
       ],
       "Task": [
         "smart-debug",
@@ -8219,7 +8404,9 @@
         "creation-feasibility-gate",
         "compliance-policy-check",
         "eval-harness-updater",
-        "context-degradation"
+        "context-degradation",
+        "regulatory-compliance",
+        "user-research"
       ],
       "AskUserQuestion": [
         "prd-generator",
@@ -8248,7 +8435,9 @@
         "multi-agent-architecture-reference",
         "slack-notifications",
         "spec-to-code-compliance",
-        "scientific-skills"
+        "feedback-analysis",
+        "scientific-skills",
+        "user-research"
       ],
       "WebSearch": [
         "powershell-expert",
@@ -8263,7 +8452,9 @@
         "eval-harness-updater",
         "dynamic-api-integration",
         "multi-agent-architecture-reference",
-        "scientific-skills"
+        "feedback-analysis",
+        "scientific-skills",
+        "user-research"
       ],
       "MemoryRecord": [
         "agent-updater",
@@ -8282,7 +8473,8 @@
         "task-management-protocol"
       ],
       "TaskUpdate": [
-        "task-management-protocol"
+        "task-management-protocol",
+        "user-research"
       ],
       "mcp__Exa__web_search_exa": [
         "arxiv-mcp"
@@ -8461,7 +8653,13 @@
         "ui-components-expert",
         "visual-and-observational-rules",
         "webapp-testing",
-        "writing"
+        "writing",
+        "brand-compliance",
+        "feedback-analysis",
+        "marketing-content",
+        "regulatory-compliance",
+        "seo-optimization",
+        "user-research"
       ],
       "planner": [
         "plan-generator",
@@ -9284,7 +9482,13 @@
         "ui-components-expert",
         "visual-and-observational-rules",
         "webapp-testing",
-        "writing"
+        "writing",
+        "brand-compliance",
+        "feedback-analysis",
+        "marketing-content",
+        "regulatory-compliance",
+        "seo-optimization",
+        "user-research"
       ],
       "planner": [
         "plan-generator",

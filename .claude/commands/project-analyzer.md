@@ -1,5 +1,5 @@
 ---
-description: "Automated brownfield codebase analysis. Detects project type, frameworks, dependencies, architecture patterns, and generates comprehensive project profile. Essential for Conductor integration and onboarding existing projects."
+description: 'Automated brownfield codebase analysis. Detects project type, frameworks, dependencies, architecture patterns, and generates comprehensive project profile. Essential for Conductor integration and onboarding existing projects.'
 disable-model-invocation: true
 ---
 

@@ -107,3 +107,29 @@ test('readPhaseAdvanceFile accepts valid signal shape', () => {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('readEvolutionStateFile recovers malformed file with valid default state', () => {
+  const { dir, file } = mkTempJson('{bad');
+  try {
+    const state = contracts.readEvolutionStateFile(file, null);
+    assert.ok(state);
+    assert.equal(state.state, 'idle');
+    assert.equal(Array.isArray(state.evolutions), true);
+    const persisted = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert.equal(persisted.state, 'idle');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('readReflectionSpawnRequestFile recovers invalid payload to empty list', () => {
+  const { dir, file } = mkTempJson(JSON.stringify({ invalid: true }));
+  try {
+    const requests = contracts.readReflectionSpawnRequestFile(file, []);
+    assert.deepEqual(requests, []);
+    const persisted = JSON.parse(fs.readFileSync(file, 'utf8'));
+    assert.deepEqual(persisted, []);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

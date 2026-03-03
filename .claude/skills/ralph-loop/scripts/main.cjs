@@ -36,15 +36,17 @@ function status() {
     console.log(JSON.stringify({ active: false, message: 'No active ralph loop' }));
     return;
   }
-  console.log(JSON.stringify({
-    active: true,
-    iteration: state.iteration,
-    startedAt: state.startedAt,
-    lastRunAt: state.lastRunAt,
-    lastFindingsCount: state.lastFindingsCount ?? 'unknown',
-    promptExists: fs.existsSync(PROMPT_FILE),
-    guardrailsExists: fs.existsSync(GUARDRAILS_FILE),
-  }));
+  console.log(
+    JSON.stringify({
+      active: true,
+      iteration: state.iteration,
+      startedAt: state.startedAt,
+      lastRunAt: state.lastRunAt,
+      lastFindingsCount: state.lastFindingsCount ?? 'unknown',
+      promptExists: fs.existsSync(PROMPT_FILE),
+      guardrailsExists: fs.existsSync(GUARDRAILS_FILE),
+    })
+  );
 }
 
 function reset() {
@@ -64,19 +66,23 @@ function config(args) {
       console.error('max-iterations must be between 1 and 100');
       process.exit(1);
     }
-    console.log(JSON.stringify({
-      success: true,
-      message: `Set RALPH_MAX_ITERATIONS=${val} in your environment to apply`,
-      hint: `export RALPH_MAX_ITERATIONS=${val}`,
-    }));
+    console.log(
+      JSON.stringify({
+        success: true,
+        message: `Set RALPH_MAX_ITERATIONS=${val} in your environment to apply`,
+        hint: `export RALPH_MAX_ITERATIONS=${val}`,
+      })
+    );
   } else {
-    console.log(JSON.stringify({
-      maxIterations: process.env.RALPH_MAX_ITERATIONS || 25,
-      completionSignal: process.env.RALPH_COMPLETION_SIGNAL || 'RALPH_AUDIT_COMPLETE_NO_FINDINGS',
-      stateFile: STATE_FILE,
-      promptFile: PROMPT_FILE,
-      guardrailsFile: GUARDRAILS_FILE,
-    }));
+    console.log(
+      JSON.stringify({
+        maxIterations: process.env.RALPH_MAX_ITERATIONS || 25,
+        completionSignal: process.env.RALPH_COMPLETION_SIGNAL || 'RALPH_AUDIT_COMPLETE_NO_FINDINGS',
+        stateFile: STATE_FILE,
+        promptFile: PROMPT_FILE,
+        guardrailsFile: GUARDRAILS_FILE,
+      })
+    );
   }
 }
 

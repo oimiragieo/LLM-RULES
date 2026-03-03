@@ -1,5 +1,5 @@
 ---
-description: "This rule enforces the single responsibility principle, ensuring functions are short and focused."
+description: 'This rule enforces the single responsibility principle, ensuring functions are short and focused.'
 disable-model-invocation: true
 ---
 

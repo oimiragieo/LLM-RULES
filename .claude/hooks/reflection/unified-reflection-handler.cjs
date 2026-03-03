@@ -78,6 +78,13 @@ const STALE_CONSUMPTION_STATE_FILE = path.join(
   'runtime',
   'stale-artifacts-consumed.json'
 );
+const FAILURE_RECURRENCE_FILE = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'failure-recurrence.json'
+);
 
 function isEnabled() {
   if (process.env.REFLECTION_ENABLED === 'false') {
@@ -195,6 +202,42 @@ function safeReadJson(filePath, fallback = null) {
   } catch (_err) {
     return fallback;
   }
+}
+
+function trackFailureRecurrence(entry, options = {}) {
+  const runtimePath = options.filePath || FAILURE_RECURRENCE_FILE;
+  const trigger = String(entry?.trigger || '').trim();
+  if (!trigger) return null;
+  const failureClass =
+    trigger === 'error'
+      ? String(entry?.failureType || 'tool_failure').trim() || 'tool_failure'
+      : String(entry?.summary || '')
+            .toLowerCase()
+            .includes('without summary metadata')
+        ? 'missing_task_summary'
+        : null;
+  if (!failureClass) return null;
+
+  const payload = safeReadJson(runtimePath, { lastUpdatedAt: null, classes: {} }) || {
+    lastUpdatedAt: null,
+    classes: {},
+  };
+  const classes =
+    payload.classes && typeof payload.classes === 'object' && !Array.isArray(payload.classes)
+      ? payload.classes
+      : {};
+  const bucket =
+    classes[failureClass] && typeof classes[failureClass] === 'object'
+      ? classes[failureClass]
+      : { count: 0, lastSeenAt: null, lastTrigger: trigger };
+  bucket.count = Number(bucket.count || 0) + 1;
+  bucket.lastSeenAt = new Date().toISOString();
+  bucket.lastTrigger = trigger;
+  classes[failureClass] = bucket;
+  const next = { lastUpdatedAt: bucket.lastSeenAt, classes };
+  fs.mkdirSync(path.dirname(runtimePath), { recursive: true });
+  fs.writeFileSync(runtimePath, JSON.stringify(next, null, 2), 'utf8');
+  return { failureClass, count: bucket.count, filePath: runtimePath };
 }
 
 function readExistingEvolutionRequestIds(queuePath) {
@@ -338,6 +381,10 @@ async function main() {
       case 'task_completion': {
         const entry = eventHandlers.handleTaskCompletion(hookInput);
         const enrichedEntry = await attachSemanticPriorLearnings(entry);
+        const recurrence = trackFailureRecurrence(enrichedEntry);
+        if (recurrence) {
+          enrichedEntry.recurrence = recurrence;
+        }
         queueReflection(enrichedEntry);
         await appendReflectionLogEntry(enrichedEntry);
         outcome.queued = true;
@@ -351,6 +398,10 @@ async function main() {
       case 'error_recovery': {
         const entry = eventHandlers.handleErrorRecovery(hookInput);
         const enrichedEntry = await attachSemanticPriorLearnings(entry);
+        const recurrence = trackFailureRecurrence(enrichedEntry);
+        if (recurrence) {
+          enrichedEntry.recurrence = recurrence;
+        }
         queueReflection(enrichedEntry);
         await appendReflectionLogEntry(enrichedEntry);
         outcome.queued = true;
@@ -446,6 +497,7 @@ module.exports = {
   appendReflectionLogEntry,
   attachSemanticPriorLearnings,
   ingestStaleArtifactRecommendations,
+  trackFailureRecurrence,
   recordSession: actions.recordSession,
   triggerEmbeddingGeneration: actions.triggerEmbeddingGeneration,
   triggerMLSessionEnd: actions.triggerMLSessionEnd,

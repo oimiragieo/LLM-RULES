@@ -563,6 +563,29 @@ const INTENT_KEYWORDS = {
     'council debate',
     'multi-model',
   ],
+  'aso-specialist': [
+    'aso-specialist',
+    'aso',
+    'app store optimization',
+    'store listing',
+    'keyword research',
+    'app metadata',
+    'screenshot testing',
+  ],
+  'marketing-strategist': [
+    'marketing-strategist',
+    'marketing strategy',
+    'campaign planning',
+    'content creation',
+    'growth marketing',
+  ],
+  'brand-guardian': [
+    'brand-guardian',
+    'brand identity',
+    'brand enforcement',
+    'style guide compliance',
+    'visual identity',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

@@ -241,7 +241,7 @@ class AgentRegistryGenerator {
 
         agents.set(agentId, {
           definition: agentDef,
-          category: category,
+          category: category === 'orchestrators' ? 'orchestrator' : category,
           filePath: filePath,
         });
       }

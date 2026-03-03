@@ -1,5 +1,5 @@
 ---
-description: "General rules pertaining to Mobile UI development. Covers UI/UX best practices, state management, and navigation patterns."
+description: 'General rules pertaining to Mobile UI development. Covers UI/UX best practices, state management, and navigation patterns.'
 disable-model-invocation: true
 ---
 

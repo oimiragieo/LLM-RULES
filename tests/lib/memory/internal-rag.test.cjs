@@ -8,8 +8,9 @@
  * - Pure retrieval layer: searchInternalContext, rankResults, formatContext
  */
 
-const { describe, it, before } = require('node:test');
+const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert/strict');
+const { MemoryVectorStore } = require('../../../.claude/lib/memory/lancedb-client-impl.cjs');
 
 let searchInternalContext, rankResults, formatContext;
 
@@ -120,6 +121,10 @@ describe('internal-rag — pure functions', () => {
       assert.ok(Array.isArray(result.results));
     });
   });
+});
+
+after(() => {
+  MemoryVectorStore.clearSharedStores();
 });
 
 describe('SE-XX compliance — internal-rag', () => {

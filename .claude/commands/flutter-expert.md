@@ -1,5 +1,5 @@
 ---
-description: "Flutter and Dart expert including widgets, state management, and platform integration"
+description: 'Flutter and Dart expert including widgets, state management, and platform integration'
 disable-model-invocation: true
 ---
 

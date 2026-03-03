@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 
 const logger = createLogger('prompt-assembler');
@@ -22,6 +23,7 @@ const DEFAULT_RECENT_OBSERVATIONS_MAX_TOKENS = 400;
 const DEFAULT_TIER_B_MAX_TOKENS = 400;
 const DEFAULT_OPEN_FINDINGS_MAX_ITEMS = 3;
 const DEFAULT_OPEN_FINDINGS_MIN_SEVERITY = 'high';
+const DEFAULT_REFLECTION_ACTIONABLE_MAX_ITEMS = 3;
 
 function getTokenLimit(value, fallback) {
   const parsed = Number(value);
@@ -172,7 +174,11 @@ function loadMemoryContext(projectRoot = PROJECT_ROOT) {
     if (!memoryManager || typeof memoryManager.loadMemoryForContext !== 'function') {
       throw new Error('memoryManager.loadMemoryForContext is not available');
     }
-    return memoryManager.loadMemoryForContext(projectRoot);
+    const memory = memoryManager.loadMemoryForContext(projectRoot);
+    return {
+      ...(memory && typeof memory === 'object' ? memory : {}),
+      reflection_actionables: loadReflectionActionables(projectRoot),
+    };
   } catch (err) {
     logger.warn('memory_load_failed', { error: err?.message });
     try {
@@ -187,8 +193,68 @@ function loadMemoryContext(projectRoot = PROJECT_ROOT) {
       discoveries: [],
       recent_sessions: [],
       legacy_summary: '',
+      reflection_actionables: loadReflectionActionables(projectRoot),
     };
   }
+}
+
+function loadReflectionActionables(
+  projectRoot = PROJECT_ROOT,
+  limit = DEFAULT_REFLECTION_ACTIONABLE_MAX_ITEMS
+) {
+  const maxItems = getPositiveInt(limit, DEFAULT_REFLECTION_ACTIONABLE_MAX_ITEMS);
+  const filePath = path.join(projectRoot, '.claude', 'context', 'memory', 'reflection-log.jsonl');
+  if (!fs.existsSync(filePath)) return [];
+
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const entries = content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean)
+      .map(line => safeParseJSON(line, null))
+      .filter(entry => entry && typeof entry === 'object');
+
+    const actionables = [];
+    const seen = new Set();
+    for (const entry of entries.reverse()) {
+      if (Array.isArray(entry.actionItems)) {
+        for (const item of entry.actionItems) {
+          const normalized = normalizeMemoryText(item);
+          if (!normalized || seen.has(normalized)) continue;
+          seen.add(normalized);
+          actionables.push(normalized);
+          if (actionables.length >= maxItems) return actionables;
+        }
+      }
+
+      const summary = normalizeMemoryText(entry.summary || entry.error || '');
+      if (summary && !seen.has(summary)) {
+        seen.add(summary);
+        actionables.push(summary);
+        if (actionables.length >= maxItems) return actionables;
+      }
+    }
+
+    return actionables;
+  } catch (_err) {
+    return [];
+  }
+}
+
+function formatReflectionActionablesSection(actionables = []) {
+  const items = Array.isArray(actionables) ? actionables : [];
+  if (items.length === 0) return [];
+
+  const lines = [];
+  lines.push('### Reflection Learnings (Actionable)');
+  for (const item of items.slice(0, DEFAULT_REFLECTION_ACTIONABLE_MAX_ITEMS)) {
+    const clipped = clipMemoryText(item);
+    if (!clipped) continue;
+    lines.push(`- [${buildEvidenceId('mem', clipped)}] ${clipped}`);
+  }
+  lines.push('');
+  return lines;
 }
 
 function loadObservationalMemory(projectRoot = PROJECT_ROOT) {
@@ -268,6 +334,9 @@ function formatMemorySection(memory) {
   const decisions = Array.isArray(safe.decisions) ? safe.decisions : [];
   const discoveries = Array.isArray(safe.discoveries) ? safe.discoveries : [];
   const recentSessions = Array.isArray(safe.recent_sessions) ? safe.recent_sessions : [];
+  const reflectionActionables = Array.isArray(safe.reflection_actionables)
+    ? safe.reflection_actionables
+    : [];
 
   const lines = [];
   lines.push('## Memory Context (Auto-Loaded)');
@@ -293,6 +362,11 @@ function formatMemorySection(memory) {
       if (clipped) lines.push(`- [${buildEvidenceId('mem', clipped)}] ${clipped}`);
     }
     lines.push('');
+  }
+
+  const reflectionSection = formatReflectionActionablesSection(reflectionActionables);
+  if (reflectionSection.length > 0) {
+    lines.push(...reflectionSection);
   }
 
   if (decisions.length > 0) {
@@ -448,4 +522,6 @@ module.exports = {
   formatMemorySection,
   formatRagMemorySection,
   queryMemoryForSpawn,
+  loadReflectionActionables,
+  formatReflectionActionablesSection,
 };

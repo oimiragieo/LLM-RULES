@@ -4,35 +4,44 @@
 
 ### PROMPT.md Template
 
-```markdown
+````markdown
 # Ralph Loop: [Task Name]
 
 ## Mission
+
 [One-line directive — what the agent must accomplish]
 
 ## Before Doing Anything
+
 1. Read previous findings: `[findings-file-path]`
 2. Load context skills: `Skill({ skill: 'ripgrep' })`
 3. Read guardrails: `.claude/ralph/guardrails.md`
 
 ## Scope
+
 ### 1. [Area 1]
+
 - [Specific check or task]
 - [Specific check or task]
 
 ### 2. [Area 2]
+
 - [Specific check or task]
 
 ## Validation Commands
+
 ```bash
 [command 1]  # Must pass
 [command 2]  # Must pass
 ```
+````
 
 ## Findings Log
+
 Write findings to: `[findings-file-path]`
 
 Format:
+
 ```
 ### FINDING-NNN: [Category] Short title
 - **Severity:** CRITICAL | HIGH | MEDIUM | LOW
@@ -44,15 +53,18 @@ Format:
 ## Completion Condition
 
 **If findings remain open:**
+
 ```
 RALPH_ITERATION_COMPLETE: N findings remain open.
 ```
 
 **If ALL findings fixed and ALL validations pass:**
+
 ```
 RALPH_AUDIT_COMPLETE_NO_FINDINGS
 ```
-```
+
+````
 
 ## Settings Configuration
 
@@ -71,7 +83,7 @@ RALPH_AUDIT_COMPLETE_NO_FINDINGS
     ]
   }
 }
-```
+````
 
 ## Launcher Script
 

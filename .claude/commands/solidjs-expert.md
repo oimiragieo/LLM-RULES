@@ -1,5 +1,5 @@
 ---
-description: "SolidJS expert including reactivity, components, and store patterns"
+description: 'SolidJS expert including reactivity, components, and store patterns'
 disable-model-invocation: true
 ---
 

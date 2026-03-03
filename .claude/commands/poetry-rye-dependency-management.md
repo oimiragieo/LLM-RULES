@@ -1,5 +1,5 @@
 ---
-description: "Specifies Poetry or Rye for dependency management in Python projects."
+description: 'Specifies Poetry or Rye for dependency management in Python projects.'
 disable-model-invocation: true
 ---
 

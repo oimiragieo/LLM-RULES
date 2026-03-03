@@ -1,5 +1,5 @@
 ---
-description: "Qwik framework expert including resumability, lazy loading, and optimization"
+description: 'Qwik framework expert including resumability, lazy loading, and optimization'
 disable-model-invocation: true
 ---
 

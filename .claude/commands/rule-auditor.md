@@ -1,5 +1,5 @@
 ---
-description: "Validates code against coding standards and best practices. Reports compliance violations and suggests fixes."
+description: 'Validates code against coding standards and best practices. Reports compliance violations and suggests fixes.'
 disable-model-invocation: true
 ---
 

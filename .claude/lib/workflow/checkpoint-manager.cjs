@@ -509,7 +509,8 @@ async function save(arg1, arg2, arg3, arg4) {
 
   const checkpointPath = path.join(checkpointDir, `${workflowId}.json`);
   // Atomic write: write to temp file first, then rename to prevent corruption on crash
-  const tmpPath = checkpointPath + `.tmp-${Date.now()}`;
+  const tmpPath =
+    checkpointPath + `.tmp-${Date.now()}-${process.pid}-${Math.random().toString(36).slice(2, 10)}`;
   await fs.promises.writeFile(tmpPath, JSON.stringify(checkpoint, null, 2), 'utf8');
   await fs.promises.rename(tmpPath, checkpointPath);
 }

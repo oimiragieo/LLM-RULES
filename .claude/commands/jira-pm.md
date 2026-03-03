@@ -1,5 +1,5 @@
 ---
-description: "Jira project management and issue tracking integration"
+description: 'Jira project management and issue tracking integration'
 disable-model-invocation: true
 ---
 

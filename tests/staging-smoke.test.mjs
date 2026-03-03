@@ -95,10 +95,7 @@ test('staging-smoke: AGENT_STUDIO_ENV is recognized when set', () => {
   // If the env var is set, it must be one of the recognized values
   if (env !== undefined) {
     const valid = ['development', 'staging', 'production', 'test'];
-    assert.ok(
-      valid.includes(env),
-      `AGENT_STUDIO_ENV="${env}" must be one of: ${valid.join(', ')}`
-    );
+    assert.ok(valid.includes(env), `AGENT_STUDIO_ENV="${env}" must be one of: ${valid.join(', ')}`);
   }
   // If not set, that is fine — defaults to development
 });

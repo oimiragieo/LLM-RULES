@@ -1,5 +1,5 @@
 ---
-description: "Astro framework expert including components, content collections, and integrations"
+description: 'Astro framework expert including components, content collections, and integrations'
 disable-model-invocation: true
 ---
 

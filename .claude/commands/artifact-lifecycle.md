@@ -1,5 +1,5 @@
 ---
-description: "Unified lifecycle management for all framework artifacts (skills, agents, hooks, workflows, templates, schemas)"
+description: 'Unified lifecycle management for all framework artifacts (skills, agents, hooks, workflows, templates, schemas)'
 disable-model-invocation: true
 ---
 

@@ -77,7 +77,14 @@ async function readFile(filePath) {
  */
 async function countLines(filePath) {
   const content = await readFile(filePath);
-  return content ? content.split('\n').filter(line => line.trim()).length : 0;
+  if (!content) return 0;
+  const lines = content
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean);
+  if (lines.length === 0) return 0;
+  const expectedColumns = lines[0].split(',').length;
+  return lines.filter(line => line.split(',').length === expectedColumns).length;
 }
 
 /**

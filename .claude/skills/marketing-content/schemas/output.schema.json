@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "MarketingContent Output",
+  "description": "Output contract for marketing-content skill",
+  "type": "object",
+  "required": ["action", "result", "success"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "The action that was performed"
+    },
+    "success": {
+      "type": "boolean",
+      "description": "Whether the action completed successfully"
+    },
+    "result": {
+      "type": "object",
+      "description": "Action-specific output",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "The produced content (copy, brief, calendar, etc.)"
+        },
+        "framework_used": {
+          "type": "string",
+          "description": "Copywriting framework applied"
+        },
+        "kpis": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "KPIs defined for tracking success"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optimization recommendations"
+        }
+      }
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if success is false"
+    }
+  },
+  "additionalProperties": false
+}

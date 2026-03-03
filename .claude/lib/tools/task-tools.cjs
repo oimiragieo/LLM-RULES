@@ -13,6 +13,17 @@ const { spawn } = require('child_process');
 const { PROJECT_ROOT: _PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { assembleSpawnPrompt, assembleSpawnPromptAsync } = require('../spawn/prompt-assembler.cjs');
 
+function cleanupSharedStores() {
+  try {
+    const { MemoryVectorStore } = require('../memory/lancedb-client-impl.cjs');
+    if (MemoryVectorStore && typeof MemoryVectorStore.clearSharedStores === 'function') {
+      MemoryVectorStore.clearSharedStores();
+    }
+  } catch (_err) {
+    // Best effort cleanup.
+  }
+}
+
 function spawnSubagentProcess({
   subagentType,
   taskId,
@@ -193,6 +204,8 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
       description,
       error: error.message,
     };
+  } finally {
+    cleanupSharedStores();
   }
 }
 

@@ -1,5 +1,5 @@
 ---
-description: "Load and synthesize framework architecture context for reflection and planning tasks."
+description: 'Load and synthesize framework architecture context for reflection and planning tasks.'
 disable-model-invocation: true
 ---
 

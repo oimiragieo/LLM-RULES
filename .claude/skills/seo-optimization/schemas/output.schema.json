@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "SEO Optimization Output",
+  "description": "Structured output from seo-optimization skill execution",
+  "type": "object",
+  "required": ["status", "findings"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failure"],
+      "description": "Overall execution status"
+    },
+    "url": {
+      "type": "string",
+      "description": "Audited URL or domain"
+    },
+    "phase_completed": {
+      "type": "string",
+      "description": "Last completed phase of the SEO workflow"
+    },
+    "findings": {
+      "type": "object",
+      "properties": {
+        "P0": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["finding", "impact", "recommendation"],
+            "properties": {
+              "finding": { "type": "string" },
+              "impact": { "type": "string" },
+              "recommendation": { "type": "string" }
+            }
+          },
+          "description": "Critical findings requiring immediate action"
+        },
+        "P1": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["finding", "impact", "recommendation"],
+            "properties": {
+              "finding": { "type": "string" },
+              "impact": { "type": "string" },
+              "recommendation": { "type": "string" }
+            }
+          },
+          "description": "High-priority findings for current sprint"
+        },
+        "P2": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["finding", "impact", "recommendation"],
+            "properties": {
+              "finding": { "type": "string" },
+              "impact": { "type": "string" },
+              "recommendation": { "type": "string" }
+            }
+          },
+          "description": "Medium-priority findings for current quarter"
+        }
+      }
+    },
+    "core_web_vitals": {
+      "type": "object",
+      "properties": {
+        "lcp": { "type": "string" },
+        "inp": { "type": "string" },
+        "cls": { "type": "string" }
+      },
+      "description": "Core Web Vitals scores if measured"
+    },
+    "keywords_identified": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Target keywords identified during research phase"
+    },
+    "schema_types_implemented": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Structured data schema types implemented or recommended"
+    },
+    "report_path": {
+      "type": "string",
+      "description": "Path to full audit report if written to file"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,5 +1,5 @@
 ---
-description: "Applies best practices for logging, project structure, and environment variable usage specifically to the main application file."
+description: 'Applies best practices for logging, project structure, and environment variable usage specifically to the main application file.'
 disable-model-invocation: true
 ---
 

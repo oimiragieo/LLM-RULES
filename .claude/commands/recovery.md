@@ -1,5 +1,5 @@
 ---
-description: "Workflow recovery protocol for resuming workflows after context loss, session interruption, or errors. Handles state reconstruction, artifact recovery, and seamless workflow continuation."
+description: 'Workflow recovery protocol for resuming workflows after context loss, session interruption, or errors. Handles state reconstruction, artifact recovery, and seamless workflow continuation.'
 disable-model-invocation: true
 ---
 

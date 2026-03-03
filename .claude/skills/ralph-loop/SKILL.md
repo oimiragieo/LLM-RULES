@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 agents: [developer, qa, devops, master-orchestrator]
-category: "Orchestration"
+category: 'Orchestration'
 tags: [ralph, autonomous, loop, iteration, stop-hook, verification, audit]
 best_practices:
   - Always define clear completion criteria before starting
@@ -112,29 +112,29 @@ Router checks audit state file (.claude/context/runtime/ralph-state.json)
 
 ### Skill Bundle (included in this skill directory)
 
-| File | Relative Path | Purpose |
-|------|---------------|---------|
-| Main script | `scripts/main.cjs` | CLI for status/reset/config of ralph loop state |
-| Pre-execute hook | `hooks/pre-execute.cjs` | Input validation before skill execution |
-| Post-execute hook | `hooks/post-execute.cjs` | Output validation after skill execution |
-| Input schema | `schemas/input.schema.json` | Input validation schema |
-| Output schema | `schemas/output.schema.json` | Output contract schema |
-| Implementation template | `templates/implementation-template.md` | PROMPT.md and launcher templates |
-| Skill rule | `rules/ralph-loop.md` | Skill-specific rules |
+| File                    | Relative Path                          | Purpose                                         |
+| ----------------------- | -------------------------------------- | ----------------------------------------------- |
+| Main script             | `scripts/main.cjs`                     | CLI for status/reset/config of ralph loop state |
+| Pre-execute hook        | `hooks/pre-execute.cjs`                | Input validation before skill execution         |
+| Post-execute hook       | `hooks/post-execute.cjs`               | Output validation after skill execution         |
+| Input schema            | `schemas/input.schema.json`            | Input validation schema                         |
+| Output schema           | `schemas/output.schema.json`           | Output contract schema                          |
+| Implementation template | `templates/implementation-template.md` | PROMPT.md and launcher templates                |
+| Skill rule              | `rules/ralph-loop.md`                  | Skill-specific rules                            |
 
 ### Project-Level Files (set up per-project by the user)
 
 These files are NOT part of the skill bundle. They live in the hosting project's `.claude/` directory and must be created/configured by the user or via the implementation template.
 
-| File | Project Path | Purpose |
-|------|-------------|---------|
-| Stop hook | `.claude/hooks/ralph-stop-hook.cjs` | Loop controller (stdin -> transcript check -> re-inject) |
-| Prompt | `.claude/ralph/PROMPT.md` | Audit/task instructions re-injected each iteration |
-| State | `.claude/context/runtime/ralph-state.json` | Iteration count, timestamps, findings count (auto-created) |
-| Guardrails | `.claude/ralph/guardrails.md` | Learned lessons from past failures |
-| Launcher (bash) | `.claude/ralph/ralph-audit.sh` | Unix/macOS launcher script (sets RALPH_ACTIVE=1) |
-| Launcher (bat) | `.claude/ralph/ralph-audit.bat` | Windows launcher script (sets RALPH_ACTIVE=1) |
-| Settings | `.claude/settings.json` | Stop hook registration (Mode 1 only) |
+| File            | Project Path                               | Purpose                                                    |
+| --------------- | ------------------------------------------ | ---------------------------------------------------------- |
+| Stop hook       | `.claude/hooks/ralph-stop-hook.cjs`        | Loop controller (stdin -> transcript check -> re-inject)   |
+| Prompt          | `.claude/ralph/PROMPT.md`                  | Audit/task instructions re-injected each iteration         |
+| State           | `.claude/context/runtime/ralph-state.json` | Iteration count, timestamps, findings count (auto-created) |
+| Guardrails      | `.claude/ralph/guardrails.md`              | Learned lessons from past failures                         |
+| Launcher (bash) | `.claude/ralph/ralph-audit.sh`             | Unix/macOS launcher script (sets RALPH_ACTIVE=1)           |
+| Launcher (bat)  | `.claude/ralph/ralph-audit.bat`            | Windows launcher script (sets RALPH_ACTIVE=1)              |
+| Settings        | `.claude/settings.json`                    | Stop hook registration (Mode 1 only)                       |
 
 ## Usage
 
@@ -169,10 +169,10 @@ Create a custom `PROMPT.md` with:
 
 ### Completion Signals
 
-| Signal | Meaning |
-|--------|---------|
-| `RALPH_AUDIT_COMPLETE_NO_FINDINGS` | All validations pass, zero open findings |
-| `RALPH_ITERATION_COMPLETE: N findings remain` | Progress made, N findings still open |
+| Signal                                        | Meaning                                  |
+| --------------------------------------------- | ---------------------------------------- |
+| `RALPH_AUDIT_COMPLETE_NO_FINDINGS`            | All validations pass, zero open findings |
+| `RALPH_ITERATION_COMPLETE: N findings remain` | Progress made, N findings still open     |
 
 ## Stop Hook Protocol
 
@@ -195,21 +195,21 @@ The stop hook (`ralph-stop-hook.cjs`) follows this protocol:
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Allow exit (complete, max iterations, or error) |
-| 2 | Block exit, stdout fed back as next prompt |
+| Code | Meaning                                         |
+| ---- | ----------------------------------------------- |
+| 0    | Allow exit (complete, max iterations, or error) |
+| 2    | Block exit, stdout fed back as next prompt      |
 
 ## Configuration
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `RALPH_ACTIVE` | (unset) | Must be `1` to activate the Stop hook. Set by launcher scripts. Without this, the hook is a no-op. |
-| `RALPH_MAX_ITERATIONS` | 25 | Maximum loop iterations |
-| `RALPH_COMPLETION_SIGNAL` | `RALPH_AUDIT_COMPLETE_NO_FINDINGS` | String that signals completion |
-| `RALPH_CIRCUIT_BREAKER_THRESHOLD` | 3 | Consecutive iterations with unchanged findings count before circuit breaker trips |
+| Variable                          | Default                            | Description                                                                                        |
+| --------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `RALPH_ACTIVE`                    | (unset)                            | Must be `1` to activate the Stop hook. Set by launcher scripts. Without this, the hook is a no-op. |
+| `RALPH_MAX_ITERATIONS`            | 25                                 | Maximum loop iterations                                                                            |
+| `RALPH_COMPLETION_SIGNAL`         | `RALPH_AUDIT_COMPLETE_NO_FINDINGS` | String that signals completion                                                                     |
+| `RALPH_CIRCUIT_BREAKER_THRESHOLD` | 3                                  | Consecutive iterations with unchanged findings count before circuit breaker trips                  |
 
 ### State File Schema
 
@@ -228,22 +228,28 @@ The stop hook (`ralph-stop-hook.cjs`) follows this protocol:
 
 ```markdown
 # Mission
+
 One-line directive.
 
 ## Before Doing Anything
+
 Step 1: Read previous findings (if exists)
 Step 2: Load context/skills
 
 ## Scope
+
 Numbered list of areas to audit/fix.
 
 ## Validation Commands
+
 Commands that must pass for completion.
 
 ## Findings Log
+
 Where to write findings (path + format).
 
 ## Completion Condition
+
 Exact signal strings and when to use each.
 ```
 
@@ -261,6 +267,7 @@ The `guardrails.md` file accumulates "Signs" — lessons learned from failures:
 
 ```markdown
 ### Sign: [Name]
+
 - **Trigger**: When this applies
 - **Instruction**: What to do
 - **Added after**: What failure taught this
@@ -275,14 +282,14 @@ Output contract defined in `schemas/output.schema.json`.
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| No max iterations | Infinite loop burns tokens | Always set `maxIterations` (default 25) |
-| Vague completion criteria | Agent claims "done" prematurely | Use binary pass/fail validation commands |
-| No state persistence | Progress lost on context reset | Write findings to file, read at iteration start |
-| Stop hook without RALPH_ACTIVE guard | Traps host/router session in multi-agent setups | Check `RALPH_ACTIVE=1` before any other logic |
-| Running standalone mode from router | Router gets trapped by Stop hook | Use router-managed iteration (Mode 2) instead |
-| No guardrails | Same mistakes repeated each iteration | Maintain guardrails.md with learned Signs |
+| Anti-Pattern                         | Why It Fails                                    | Correct Approach                                |
+| ------------------------------------ | ----------------------------------------------- | ----------------------------------------------- |
+| No max iterations                    | Infinite loop burns tokens                      | Always set `maxIterations` (default 25)         |
+| Vague completion criteria            | Agent claims "done" prematurely                 | Use binary pass/fail validation commands        |
+| No state persistence                 | Progress lost on context reset                  | Write findings to file, read at iteration start |
+| Stop hook without RALPH_ACTIVE guard | Traps host/router session in multi-agent setups | Check `RALPH_ACTIVE=1` before any other logic   |
+| Running standalone mode from router  | Router gets trapped by Stop hook                | Use router-managed iteration (Mode 2) instead   |
+| No guardrails                        | Same mistakes repeated each iteration           | Maintain guardrails.md with learned Signs       |
 
 ## Iron Laws
 
@@ -299,6 +306,7 @@ Output contract defined in `schemas/output.schema.json`.
 Read `.claude/context/memory/learnings.md` using the `Read` tool.
 
 Check for:
+
 - Previously run ralph loops and their outcomes
 - Known audit patterns and failure modes
 - User preferences for iteration limits

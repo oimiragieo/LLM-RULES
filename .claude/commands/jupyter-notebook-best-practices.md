@@ -1,5 +1,5 @@
 ---
-description: "Guidelines for structuring and documenting Jupyter notebooks for reproducibility and clarity."
+description: 'Guidelines for structuring and documenting Jupyter notebooks for reproducibility and clarity.'
 disable-model-invocation: true
 ---
 

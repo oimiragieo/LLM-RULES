@@ -140,6 +140,13 @@ const INTENT_TO_AGENT = {
 
   // Multi-LLM Consultant
   multi_llm_consultant: 'multi-llm-consultant',
+  'qa-guardian': 'qa',
+  'contract-check': 'code-reviewer',
+  'bool-action': 'developer',
+  'repo-onboarder': 'researcher',
+  'aso-specialist': 'aso-specialist',
+  'marketing-strategist': 'marketing-strategist',
+  'brand-guardian': 'brand-guardian',
 };
 
 module.exports = { INTENT_TO_AGENT };

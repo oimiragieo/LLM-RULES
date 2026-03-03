@@ -1,5 +1,5 @@
 ---
-description: "Smart contract and secure API contract security analysis — invariant checking, access control, reentrancy, and integer overflow patterns"
+description: 'Smart contract and secure API contract security analysis — invariant checking, access control, reentrancy, and integer overflow patterns'
 disable-model-invocation: true
 ---
 

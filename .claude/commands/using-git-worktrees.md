@@ -1,5 +1,5 @@
 ---
-description: "Create isolated development workspaces with safety verification. Use when needing parallel development branches."
+description: 'Create isolated development workspaces with safety verification. Use when needing parallel development branches.'
 disable-model-invocation: true
 ---
 

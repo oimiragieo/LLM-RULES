@@ -1,5 +1,5 @@
 ---
-description: "Semantic search over global agent memory. Use to retrieve previously learned patterns, decisions, gotchas, and workarounds. Prevents stale-context errors across long sessions and multi-agent pipelines."
+description: 'Semantic search over global agent memory. Use to retrieve previously learned patterns, decisions, gotchas, and workarounds. Prevents stale-context errors across long sessions and multi-agent pipelines.'
 disable-model-invocation: true
 ---
 

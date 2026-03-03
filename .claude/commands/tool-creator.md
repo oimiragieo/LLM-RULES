@@ -1,5 +1,5 @@
 ---
-description: "Creates tool files for the Claude Code framework. Tools are executable utilities organized by category in .claude/tools/."
+description: 'Creates tool files for the Claude Code framework. Tools are executable utilities organized by category in .claude/tools/.'
 disable-model-invocation: true
 ---
 

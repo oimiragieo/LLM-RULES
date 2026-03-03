@@ -1,5 +1,5 @@
 ---
-description: "Sets the AI to act as an expert in HTML, Tailwind CSS, and vanilla JavaScript, focusing on clarity and readability for all HTML, JS, and CSS files."
+description: 'Sets the AI to act as an expert in HTML, Tailwind CSS, and vanilla JavaScript, focusing on clarity and readability for all HTML, JS, and CSS files.'
 disable-model-invocation: true
 ---
 

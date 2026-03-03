@@ -1,5 +1,5 @@
 ---
-description: "Specific rules for Starknet React projects, focusing on blockchain integration."
+description: 'Specific rules for Starknet React projects, focusing on blockchain integration.'
 disable-model-invocation: true
 ---
 

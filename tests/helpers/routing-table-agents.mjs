@@ -63,6 +63,7 @@ export const ROUTING_TABLE_AGENT_NAMES = [
   'kubernetes-specialist',
   'pm-coordinator',
   'advanced-debugging',
+  'multi-llm-consultant',
 ];
 
 export const INTENT_TO_AGENT_NAMES = [
@@ -131,4 +132,5 @@ export const INTENT_TO_AGENT_NAMES = [
   'kubernetes-specialist',
   'pm-coordinator',
   'advanced-debugging',
+  'multi-llm-consultant',
 ];

@@ -14,7 +14,9 @@ function preExecute(input = {}) {
 
   // Validate schema file exists
   if (!fs.existsSync(schemaPath)) {
-    process.stderr.write('[ralph-loop:pre-execute] Warning: input.schema.json not found, skipping validation\n');
+    process.stderr.write(
+      '[ralph-loop:pre-execute] Warning: input.schema.json not found, skipping validation\n'
+    );
     return { continue: true };
   }
 
@@ -33,7 +35,11 @@ function preExecute(input = {}) {
 
   // Check maxIterations bounds
   if (input.maxIterations !== undefined) {
-    if (typeof input.maxIterations !== 'number' || input.maxIterations < 1 || input.maxIterations > 100) {
+    if (
+      typeof input.maxIterations !== 'number' ||
+      input.maxIterations < 1 ||
+      input.maxIterations > 100
+    ) {
       errors.push('maxIterations must be a number between 1 and 100');
     }
   }

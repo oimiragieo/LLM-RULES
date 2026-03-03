@@ -7,11 +7,7 @@
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "success",
-        "partial",
-        "failed"
-      ],
+      "enum": ["success", "partial", "failed"],
       "description": "Execution status"
     },
     "output": {
@@ -28,13 +24,7 @@
             "properties": {
               "severity": {
                 "type": "string",
-                "enum": [
-                  "CRITICAL",
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW",
-                  "INFO"
-                ]
+                "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
               },
               "message": {
                 "type": "string"
@@ -43,10 +33,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "severity",
-              "message"
-            ]
+            "required": ["severity", "message"]
           }
         },
         "filesModified": {
@@ -56,13 +43,8 @@
           }
         }
       },
-      "required": [
-        "summary"
-      ]
+      "required": ["summary"]
     }
   },
-  "required": [
-    "status",
-    "output"
-  ]
+  "required": ["status", "output"]
 }

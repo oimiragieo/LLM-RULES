@@ -4,9 +4,20 @@
   "description": "Reflection quality assessment rubrics for evaluating agent outputs, plans, and code. Used by reflection-agent to score and improve outputs before completion.",
   "metadata": {
     "created": "2026-01-25T22:00:00Z",
-    "updated": "2026-01-25T22:00:00Z",
+    "updated": "2026-03-02T02:43:00Z",
     "author": "developer-agent",
     "purpose": "Standardized scoring criteria for reflection-based quality gates"
+  },
+  "failure_taxonomy": {
+    "description": "Structured failure categories used in reflection-log.jsonl for trend analysis.",
+    "allowed_values": [
+      "tool_failure",
+      "context_overflow",
+      "scope_drift",
+      "hallucination",
+      "timeout",
+      "dependency_error"
+    ]
   },
   "categories": {
     "completeness": {

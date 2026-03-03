@@ -1,5 +1,5 @@
 ---
-description: "Applies general coding standards and best practices for Kafka development with Scala."
+description: 'Applies general coding standards and best practices for Kafka development with Scala.'
 disable-model-invocation: true
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: "Focuses on routing, CSRF protection, context handling, and template usage within the internal handlers directory."
+description: 'Focuses on routing, CSRF protection, context handling, and template usage within the internal handlers directory.'
 disable-model-invocation: true
 ---
 

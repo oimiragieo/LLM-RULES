@@ -1,5 +1,5 @@
 ---
-description: "Defines the structure and implementation of service classes, enforcing the use of interfaces, ServiceImpl classes, DTOs for data transfer, and transactional management."
+description: 'Defines the structure and implementation of service classes, enforcing the use of interfaces, ServiceImpl classes, DTOs for data transfer, and transactional management.'
 disable-model-invocation: true
 ---
 

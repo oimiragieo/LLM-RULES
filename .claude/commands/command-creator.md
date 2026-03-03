@@ -1,5 +1,5 @@
 ---
-description: "Creates command files for the Claude Code framework. Commands are user-facing shortcuts that delegate to skills."
+description: 'Creates command files for the Claude Code framework. Commands are user-facing shortcuts that delegate to skills.'
 disable-model-invocation: true
 ---
 

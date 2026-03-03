@@ -11,6 +11,7 @@
 ## Verification-First Exit
 
 Never output the completion signal unless:
+
 1. All validation commands have been run
 2. All validation commands passed with zero errors
 3. The findings log has zero OPEN findings
@@ -27,16 +28,19 @@ Never output the completion signal unless:
 ## Integration Points
 
 ### Related Agents
+
 - `developer` — Primary executor for code-level ralph loops
 - `qa` — Verification-focused ralph loops (test passing, lint clean)
 - `master-orchestrator` — Multi-agent ralph loop coordination
 
 ### Related Skills
+
 - `verification-before-completion` — Verification gate pattern
 - `task-management-protocol` — Task state synchronization
 - `token-saver-context-compression` — Context management for long loops
 
 ### Related Files
+
 - `.claude/hooks/ralph-stop-hook.cjs` — Stop hook controller
 - `.claude/ralph/PROMPT.md` — Audit prompt template
 - `.claude/ralph/guardrails.md` — Accumulated failure lessons

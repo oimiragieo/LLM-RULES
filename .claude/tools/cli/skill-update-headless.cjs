@@ -20,6 +20,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const { validateEnterpriseBundle } = require('../../lib/creators/enterprise-bundle-validator.cjs');
 const {
@@ -191,7 +192,7 @@ function processCascadeQueue(projectRoot, options = {}) {
     .filter(Boolean)
     .map(line => {
       try {
-        return JSON.parse(line);
+        return safeParseJSON(line, null, null, null);
       } catch {
         return null;
       }
@@ -280,7 +281,7 @@ function runHeadlessUpdate(skillName, options = {}) {
 
       // Try to extract cost from JSON output
       try {
-        const parsed = JSON.parse(result.stdout);
+        const parsed = safeParseJSON(result.stdout, null, null, null);
         cost = parsed.cost_usd ? `$${parsed.cost_usd}` : 'N/A';
       } catch {
         // cost not available

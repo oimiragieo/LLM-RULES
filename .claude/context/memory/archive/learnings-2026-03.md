@@ -9,7 +9,6 @@
 - W-008 (memory-retention-config.cjs): Module was archived to `.claude/lib/memory/_archive/memory-retention-config.cjs`. Updated `MEMORY_SYSTEM.md` line 319 to point to the correct `_archive` path.
 - Pattern: Most "stale references" from the audit only appeared in archive memory files and audit reports — those are legitimate historical records, not actionable stale references.
 
-
 ---
 
 ## Skill Updated: fiber-logging-and-project-structure (2026-03-01)
@@ -24,7 +23,6 @@
 - Research: Fiber v3 logger middleware import path changed to `github.com/gofiber/fiber/v3/middleware/logger`; middleware registration order matters — Logger before routes only.
 - VoltAgent/awesome-agent-skills: no counterpart found for fiber-logging-and-project-structure.
 
-
 ---
 
 ## Skill Updated: dynamic-api-integration (2026-03-01)
@@ -36,7 +34,6 @@
 - Research: AutoTool (arXiv 2512.13278, Dec 2025) validates dynamic tool selection for agentic reasoning; MCP-Zero (arXiv 2506.01056, Jun 2025) confirms active tool discovery pattern; REST APIs to MCP (arXiv 2507.16044, Jul 2025) validates OpenAPI-first approach for LLM tool integration.
 - VoltAgent/awesome-agent-skills: no counterpart found for dynamic-api-integration.
 - Validation improved from 5 pass/3 fail → 8 pass/0 fail (3 skipped).
-
 
 ---
 
@@ -51,7 +48,6 @@
 - Research: Medusa v2 modular architecture confirmed; Workflow SDK is canonical pattern for all async ops; direct service calls in background jobs bypass distributed transactions.
 - VoltAgent/awesome-agent-skills: no counterpart found for medusa.
 
-
 ---
 
 ## Skill Updated: context-degradation (2026-03-01)
@@ -63,7 +59,6 @@
 - VoltAgent/awesome-agent-skills: no counterpart found for context-degradation.
 - Validation improved from 5 pass/3 fail → 8 pass/0 fail (3 skipped).
 - Pattern: skill correctly identifies context-compressor as primary agent; matrix entry was missing despite agents frontmatter being correct.
-
 
 ---
 
@@ -77,7 +72,6 @@
 - VoltAgent/awesome-agent-skills: no counterpart found for elixir-expert.
 - Pattern: skill with rich content (400+ lines, examples, Iron Laws, Anti-Patterns) still failed Check 4+5+10 purely due to missing matrix wiring.
 
-
 ---
 
 ## Skill Updated: ask-questions-if-underspecified (2026-03-01)
@@ -89,7 +83,6 @@
 - Research: Ambig-SWE (arXiv 2502.13069, Jan 2026) confirms interactive clarification is critical for software engineering agents; AskBench (arXiv 2602.11199, Feb 2026) validates asking clarifying questions improves task success rates.
 - VoltAgent/awesome-agent-skills: no counterpart found for ask-questions-if-underspecified.
 - Validation improved from 5 pass/3 fail → 8 pass/0 fail (3 skipped).
-
 
 ---
 
@@ -105,7 +98,6 @@
 - Research: Drizzle 2025 — identity columns are new PG standard; `drizzle-kit push` never for production; jsonb() outperforms json() for indexed queries (productdevbook gist 2026).
 - VoltAgent/awesome-agent-skills: no counterpart found for drizzle-orm-rules.
 
-
 ---
 
 ## Skill Updated: convex-development-general (2026-03-01)
@@ -118,7 +110,6 @@
 - Wired to: developer (contextual:convex_project), nextjs-pro (contextual:convex_project, frontmatter).
 - Validation improved from 5 pass/3 fail → 8 pass/0 fail (3 skipped).
 - Research: Convex best practices 2025 — prefer `.withIndex` over `.filter` (index misses); always await all Promises; `no-floating-promises` ESLint rule recommended.
-
 
 ---
 
@@ -134,7 +125,6 @@
 - Validation improved from 3 pass/5 fail → 8 pass/0 fail (3 skipped).
 - Gotcha: parseMarkdownTable() only parses FIRST table in catalog; skill must be in Quick Reference row, not just detailed section table.
 
-
 ---
 
 ## Skill Updated: agent-tool-design (2026-03-01)
@@ -146,7 +136,6 @@
 - VoltAgent/awesome-agent-skills: no counterpart found for agent-tool-design.
 - Validation improved from 5 pass/3 fail → 7 pass/1 fail (memory check resolves after this entry; 3 skipped).
 - Pattern: skill frontmatter agents field is metadata only; agent .md files are source of truth for Check 4.
-
 
 ---
 
@@ -164,13 +153,11 @@
 
 - Skill `scikit-bio` was reviewed and updated by the skill-updater pipeline.
 
-
 ---
 
 ## Orphan Skill Wiring Batch (2026-03-01)
 
 - 5 orphaned skills wired into agent-skill-matrix.json and agent frontmatter: agent-evaluation, property-based-testing, webapp-testing, fix-review, debug-log-analysis.
-
 
 ---
 
@@ -190,7 +177,6 @@
 - debug-log-analysis (v1.2.0): Wired to reflection-agent (secondary), devops-troubleshooter (secondary), developer (frontmatter). Debug log reducer + structured error categorization.
 - Pattern: validate-integration.cjs Check 4 requires skill name in agent .md frontmatter skills array, not just matrix. Check 10 (Router Discoverability) passes when Check 4 passes.
 
-
 ---
 
 ## Skill Updated: yara-authoring (2026-03-01)
@@ -203,7 +189,6 @@
 - VoltAgent/awesome-agent-skills: no counterpart found for yara-authoring.
 - Validation improved from 3 pass/5 fail → 8 pass/0 fail (3 skipped).
 
-
 ---
 
 ## Skill Updated: content-security-scan (2026-03-01)
@@ -215,7 +200,6 @@
 - Pattern: skill had correct agents in SKILL.md frontmatter but validator checks agent .md files directly — frontmatter agents field is for metadata only; agent .md files are the source of truth for Check 4.
 - Validation improved from 5 pass/3 fail → 8 pass/0 fail (3 skipped).
 - VoltAgent/awesome-agent-skills: no counterpart found for content-security-scan.
-
 
 ---
 
@@ -231,7 +215,6 @@
 - VoltAgent/awesome-agent-skills: no counterpart found for building-secure-contracts.
 - Validation: improved from 3 pass/5 fail → 8 pass/0 fail (3 skipped).
 
-
 ---
 
 ## Skill Updated: audit-context-building (2026-03-01)
@@ -242,7 +225,6 @@
 - Enterprise bundle: 9/9 complete (all components already existed).
 - Validation improved from 5 pass/3 fail → 8 pass/0 fail (3 skipped).
 - Research: OWASP 2025 audit methodology aligns with skill's First Principles + 5 Whys + 5 Hows approach; Broken Access Control remains top risk (3.73% incidence) — skill's cross-function flow analysis directly addresses this.
-
 
 ---
 
@@ -256,13 +238,11 @@
 - Research: 6 Exa sources + 3 arXiv papers (COCO, AutoLabs, CorrectAD) on autonomous agent loops.
 - Key finding: community stop-hook pattern reads stdin before checking state file (GitHub #234); our implementation has the same ordering.
 
-
 ---
 
 ## Skill Updated: scikit-learn (2026-02-23)
 
 - Skill `scikit-learn` was reviewed and updated by the skill-updater pipeline.
-
 
 ---
 
@@ -270,13 +250,11 @@
 
 - Skill `scikit-survival` was reviewed and updated by the skill-updater pipeline.
 
-
 ---
 
 ## Skill Updated: scvi-tools (2026-02-23)
 
 - Skill `scvi-tools` was reviewed and updated by the skill-updater pipeline.
-
 
 ---
 
@@ -284,13 +262,11 @@
 
 - Skill `seaborn` was reviewed and updated by the skill-updater pipeline.
 
-
 ---
 
 ## Skill Updated: shap (2026-02-23)
 
 - Skill `shap` was reviewed and updated by the skill-updater pipeline.
-
 
 ---
 
@@ -298,13 +274,11 @@
 
 - Skill `powershell-expert` was reviewed and updated by the skill-updater pipeline.
 
-
 ---
 
 ## Skill Updated: testing-expert (2026-02-23)
 
 - Skill `testing-expert` was reviewed and updated by the skill-updater pipeline.
-
 
 ---
 
@@ -312,13 +286,11 @@
 
 - Skill `writing` was reviewed and updated by the skill-updater pipeline.
 
-
 ---
 
 ## Skill Updated: agent-creator (2026-02-23)
 
 - Skill `agent-creator` was reviewed and updated by the skill-updater pipeline.
-
 
 ---
 

@@ -192,8 +192,10 @@ function stripDangerousKeys(obj, depth, maxDepth) {
     return result;
   }
 
-  // Return a new null-prototype object — do not mutate the original
+  // Use null-prototype objects for retained data, but return plain {}
+  // when all keys are stripped so normal prototype access remains available.
   const result = Object.create(null);
+  let copied = 0;
   const keys = Object.keys(obj);
   for (const key of keys) {
     if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
@@ -201,8 +203,9 @@ function stripDangerousKeys(obj, depth, maxDepth) {
       continue;
     }
     result[key] = stripDangerousKeys(obj[key], depth + 1, maxDepth);
+    copied += 1;
   }
-  return result;
+  return copied === 0 ? {} : result;
 }
 
 /**

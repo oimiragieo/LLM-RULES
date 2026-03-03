@@ -100,6 +100,11 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `REFLECTION_STEP0_ENFORCEMENT` | reflection-step0-guard.cjs | block   | block/warn/off |
 | `TASKLIST_FIRST_ENFORCEMENT`   | routing-guard.cjs          | block   | block/warn/off |
 
+Recommended defaults:
+
+- `REFLECTION_STEP0_ENFORCEMENT=block`
+- `TASKLIST_FIRST_ENFORCEMENT=block`
+
 ---
 
 **Provenance:** Created by developer agent for Task #1 (Phase 2 Ecosystem Hardening)

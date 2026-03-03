@@ -4,20 +4,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const os = require('node:os');
 const path = require('node:path');
+const { createTempProjectRuntime, cleanupTempRoot } = require('../support/runtime-fixtures.cjs');
 
 const hook = require('../../.claude/hooks/reflection/unified-reflection-handler.cjs');
 
-function mkTempRuntime() {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'stale-evolution-'));
-  const runtime = path.join(root, '.claude', 'context', 'runtime');
-  fs.mkdirSync(runtime, { recursive: true });
-  return { root, runtime };
-}
-
 test('ingestStaleArtifactRecommendations creates stale_skill evolution requests once per timestamp', () => {
-  const { root, runtime } = mkTempRuntime();
+  const { root, runtime } = createTempProjectRuntime('stale-evolution-');
   const stalePath = path.join(runtime, 'stale-artifacts.json');
   const queuePath = path.join(runtime, 'evolution-requests.jsonl');
   const statePath = path.join(runtime, 'stale-artifacts-consumed.json');
@@ -58,6 +51,6 @@ test('ingestStaleArtifactRecommendations creates stale_skill evolution requests 
     const parsed = lines.map(line => JSON.parse(line));
     assert.ok(parsed.every(entry => entry.trigger === 'stale_skill'));
   } finally {
-    fs.rmSync(root, { recursive: true, force: true });
+    cleanupTempRoot(root);
   }
 });

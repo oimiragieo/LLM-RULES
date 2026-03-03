@@ -1,5 +1,5 @@
 ---
-description: "Rules specific to Svelte UI component development in Tauri applications."
+description: 'Rules specific to Svelte UI component development in Tauri applications.'
 disable-model-invocation: true
 ---
 

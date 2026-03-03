@@ -1,5 +1,5 @@
 ---
-description: "Git-aware smart revert for tracks, phases, and tasks. Handles rewritten history, finds related commits, and provides safe rollback with multiple confirmation gates."
+description: 'Git-aware smart revert for tracks, phases, and tasks. Handles rewritten history, finds related commits, and provides safe rollback with multiple confirmation gates.'
 disable-model-invocation: true
 ---
 

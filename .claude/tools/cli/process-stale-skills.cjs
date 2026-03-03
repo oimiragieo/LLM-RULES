@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 function findProjectRoot() {
   let dir = __dirname;
@@ -35,10 +36,8 @@ function processStaleSkills(projectRoot, options = {}) {
     return { processed: 0, skipped: 0, total: 0 };
   }
 
-  let staleData;
-  try {
-    staleData = JSON.parse(fs.readFileSync(staleArtifactsPath, 'utf8'));
-  } catch (_err) {
+  const staleData = safeParseJSON(fs.readFileSync(staleArtifactsPath, 'utf8'), null, null, null);
+  if (!staleData || typeof staleData !== 'object') {
     return { processed: 0, skipped: 0, total: 0 };
   }
 

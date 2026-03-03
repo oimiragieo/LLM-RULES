@@ -1,5 +1,5 @@
 ---
-description: "Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system fields."
+description: 'Applies general rules for Convex development, emphasizing schema design, validator usage, and correct handling of system fields.'
 disable-model-invocation: true
 ---
 

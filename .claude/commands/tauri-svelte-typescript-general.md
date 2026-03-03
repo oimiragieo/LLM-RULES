@@ -1,5 +1,5 @@
 ---
-description: "General rules for developing desktop applications using Tauri with Svelte and TypeScript for the frontend."
+description: 'General rules for developing desktop applications using Tauri with Svelte and TypeScript for the frontend.'
 disable-model-invocation: true
 ---
 

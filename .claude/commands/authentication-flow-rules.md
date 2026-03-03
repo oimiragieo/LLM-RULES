@@ -1,5 +1,5 @@
 ---
-description: "OAuth 2.1 compliant authentication flows (MANDATORY Q2 2026). PKCE required for ALL clients, Implicit Flow removed, modern token security."
+description: 'OAuth 2.1 compliant authentication flows (MANDATORY Q2 2026). PKCE required for ALL clients, Implicit Flow removed, modern token security.'
 disable-model-invocation: true
 ---
 

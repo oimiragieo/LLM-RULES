@@ -1,5 +1,5 @@
 ---
-description: "Specifies best practices and conventions for Expo-based mobile app development."
+description: 'Specifies best practices and conventions for Expo-based mobile app development.'
 disable-model-invocation: true
 ---
 

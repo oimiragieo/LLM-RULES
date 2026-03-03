@@ -1,5 +1,5 @@
 ---
-description: "Feature flag lifecycle management — toggling features safely, gradual rollouts, A/B testing patterns, and flag cleanup to prevent technical debt"
+description: 'Feature flag lifecycle management — toggling features safely, gradual rollouts, A/B testing patterns, and flag cleanup to prevent technical debt'
 disable-model-invocation: true
 ---
 

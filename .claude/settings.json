@@ -104,6 +104,33 @@
         ]
       },
       {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/evolution/research-enforcement.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/evolution/evolution-state-guard.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/evolution/quality-gate-validator.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "Write",
         "hooks": [
           {

@@ -466,8 +466,7 @@ async function main() {
       process.exit(0);
     }
 
-    let input;
-    input = safeParseJSON(raw.trim(), null);
+    const input = safeParseJSON(raw.trim(), null);
     if (!input) {
       process.exit(0);
     }

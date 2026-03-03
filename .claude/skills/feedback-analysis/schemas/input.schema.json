@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "FeedbackAnalysis Input",
+  "description": "Validated inputs for feedback-analysis skill execution",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "sentiment",
+        "nps-csat",
+        "feature-clustering",
+        "ticket-triage",
+        "churn-signals",
+        "roadmap-translation",
+        "full-analysis"
+      ],
+      "description": "The analysis phase to execute. Use 'full-analysis' to run all phases."
+    },
+    "feedbackItems": {
+      "type": "array",
+      "description": "Array of feedback items to analyze",
+      "items": {
+        "type": "object",
+        "required": ["text", "source"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Raw feedback text"
+          },
+          "source": {
+            "type": "string",
+            "enum": ["nps", "csat", "support-ticket", "app-review", "social", "chat", "email"],
+            "description": "Channel the feedback came from"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10,
+            "description": "Numerical score (NPS 0-10, CSAT 1-5 normalized to 0-10)"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User identifier for churn correlation"
+          },
+          "userTier": {
+            "type": "string",
+            "enum": ["free", "pro", "enterprise"],
+            "description": "User subscription tier for priority weighting"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of feedback submission"
+          }
+        }
+      }
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Optional file path to write analysis report. Defaults to .claude/context/reports/backend/feedback-analysis-{date}.md"
+    },
+    "options": {
+      "type": "object",
+      "description": "Optional configuration overrides",
+      "properties": {
+        "minConfidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum confidence threshold for sentiment classification (default: 0.7)"
+        },
+        "maxTaxonomyTags": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 50,
+          "description": "Maximum number of ticket taxonomy tags (default: 30)"
+        },
+        "churnThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Churn risk score threshold for playbook trigger (default: 0.7)"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

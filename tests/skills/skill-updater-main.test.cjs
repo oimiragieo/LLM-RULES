@@ -13,7 +13,7 @@ const routingTablePath = path.join(
   '.claude',
   'lib',
   'routing',
-  'routing-table-intent-keywords.cjs'
+  'routing-table-intent-keywords-data.cjs'
 );
 const learningsPath = path.join(projectRoot, '.claude', 'context', 'memory', 'learnings.md');
 

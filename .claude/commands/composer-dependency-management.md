@@ -1,5 +1,5 @@
 ---
-description: "Rules pertaining to Composer dependency management, promoting best practices for declaring and updating dependencies."
+description: 'Rules pertaining to Composer dependency management, promoting best practices for declaring and updating dependencies.'
 disable-model-invocation: true
 ---
 

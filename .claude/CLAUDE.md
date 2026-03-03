@@ -61,12 +61,12 @@ Router may NEVER use:
 
 On EVERY user prompt, execute in order before routing:
 
-| Step | Check | Action |
-|------|-------|--------|
-| **0** | Pending reflections? | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for each request, announce "Step 0 complete" before TaskList() |
-| **0.5** | Integration queue? | Spawn artifact-integrator in background (non-blocking) |
-| **0.6** | Creation preflight? | Spawn planner/TPM for feasibility-gate + compliance-policy-check (skip for external repos — spawn artifact-integrator instead) |
-| **0.7** | Framework changes? | Spawn QA with `proactive-audit` skill as FINAL pipeline step |
+| Step    | Check                | Action                                                                                                                                                  |
+| ------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0**   | Pending reflections? | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for each request, announce "Step 0 complete" before TaskList() |
+| **0.5** | Integration queue?   | Spawn artifact-integrator in background (non-blocking)                                                                                                  |
+| **0.6** | Creation preflight?  | Spawn planner/TPM for feasibility-gate + compliance-policy-check (skip for external repos — spawn artifact-integrator instead)                          |
+| **0.7** | Framework changes?   | Spawn QA with `proactive-audit` skill as FINAL pipeline step                                                                                            |
 
 **Step 0 detail:** The system uses an **Atomic Handshake**: reflection-agent calls `TaskUpdate({ status: 'completed', metadata: { processedReflectionIds: [...] } })`, and `reflection-cleanup.cjs` automatically removes processed requests. A **PreToolUse(TaskList) guard** (`.claude/hooks/reflection/reflection-step0-guard.cjs`) blocks TaskList by default when pending reflections exist; set `REFLECTION_STEP0_ENFORCEMENT=warn` to allow with a warning. Router-visible narration is mandatory: emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` after spawning and before TaskList().
 
@@ -194,15 +194,15 @@ Whitelist/blacklist tables: see `router-decision.md` Steps 5–6 and Section 0 a
 
 Before EVERY response, Router must pass Gates 1–4. If any gate triggers → **spawn required agent(s)**.
 
-| Gate                    | Trigger (ANY YES)                                                                                                                                      | Required Routing                          |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| Gate                    | Trigger (ANY YES)                                                                                                                                      | Required Routing                           |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
 | **0: Reflection**       | `reflection-reminder.txt` exists                                                                                                                       | **Process ALL reflections BEFORE routing** |
-| **1: Complexity**       | multi-step (>1 operation), multi-file changes, architecture decisions                                                                                  | **Spawn PLANNER first**                   |
-| **2: Security**         | auth/authz/credentials, security-critical code, external data handling/integrations                                                                    | include **SECURITY-ARCHITECT**            |
-| **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                                                                                                  | spawn appropriate agent                   |
-| **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts                                                                       | invoke correct **creator skill** first    |
-| **5: Architect Review** | spawning code-simplifier/devops/devops-troubleshooter/chaos-engineer without prior architect review                                                    | spawn **ARCHITECT** first                 |
-| **6: Proactive Audit**  | pipeline completed that touched `.claude/hooks/`, `.claude/skills/`, `.claude/agents/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/` | spawn **QA** with `proactive-audit` skill |
+| **1: Complexity**       | multi-step (>1 operation), multi-file changes, architecture decisions                                                                                  | **Spawn PLANNER first**                    |
+| **2: Security**         | auth/authz/credentials, security-critical code, external data handling/integrations                                                                    | include **SECURITY-ARCHITECT**             |
+| **3: Tool**             | you would use blacklisted tools OR complex TaskCreate                                                                                                  | spawn appropriate agent                    |
+| **4: Creator Workflow** | creating artifacts / writing creator output paths / restoring archived artifacts                                                                       | invoke correct **creator skill** first     |
+| **5: Architect Review** | spawning code-simplifier/devops/devops-troubleshooter/chaos-engineer without prior architect review                                                    | spawn **ARCHITECT** first                  |
+| **6: Proactive Audit**  | pipeline completed that touched `.claude/hooks/`, `.claude/skills/`, `.claude/agents/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/` | spawn **QA** with `proactive-audit` skill  |
 
 Gate detail and decision tree live in `.claude/workflows/core/router-decision.md` (Step 4-6). Keep this section as the short enforcement checklist.
 
@@ -373,10 +373,18 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Sprint planning / roadmap / backlog / Jira/Linear              | `pm-coordinator`          | `.claude/agents/domain/pm-coordinator.md`          |
 | Memory leak / race condition / profiling / root cause analysis | `advanced-debugging`      | `.claude/agents/specialized/advanced-debugging.md` |
 | Multiple LLMs / compare Claude vs Gemini / LLM Council         | `multi-llm-consultant`    | `.claude/agents/domain/multi-llm-consultant.md`    |
+| Qa Guardian (legacy alias)                                     | `qa`                      | `.claude/agents/core/qa.md`                        |
+| Contract Check (legacy alias)                                  | `code-reviewer`           | `.claude/agents/core/code-reviewer.md`             |
+| Bool Action (legacy alias)                                     | `developer`               | `.claude/agents/core/developer.md`                 |
+| Repo Onboarder (legacy alias)                                  | `researcher`              | `.claude/agents/core/researcher.md`                |
+| Aso Specialist                                                 | `aso-specialist`          | `.claude/agents/domain/aso-specialist.md`          |
+| Marketing Strategist                                           | `marketing-strategist`    | `.claude/agents/domain/marketing-strategist.md`    |
+| Brand Guardian                                                 | `brand-guardian`          | `.claude/agents/domain/brand-guardian.md`          |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`
+Keyword updates are written to: `.claude/lib/routing/routing-table-intent-keywords-data.cjs`
 
 ### Registry Skill Resolution (3-Layer System)
 
@@ -481,6 +489,7 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 ## 6) EXECUTION RULES (ROUTER IRON LAWS)
 
 All router operational constraints are consolidated in:
+
 - **Section 0:** Tool whitelist/blacklist (ROUTER TOOL LOCKDOWN)
 - **Section 0.1:** Output contract and pre-flight sequence (Steps 0-0.7)
 - **Section 1.2:** Self-check gates (Gates 0-6)
@@ -587,10 +596,10 @@ The memory system uses two subsystems:
 
 ### 8.2 Context Window Budget
 
-| Threshold | Action |
-|-----------|--------|
-| 80K tokens | Spawn `context-compressor` proactively |
-| 120K tokens | **WARNING:** Compression mandatory before new spawns |
+| Threshold   | Action                                                        |
+| ----------- | ------------------------------------------------------------- |
+| 80K tokens  | Spawn `context-compressor` proactively                        |
+| 120K tokens | **WARNING:** Compression mandatory before new spawns          |
 | 150K tokens | **RED LINE:** No new agent spawns until compression completes |
 
 If `.claude/context/runtime/compression-reminder.txt` exists, compression is overdue — handle it before spawning new agents.

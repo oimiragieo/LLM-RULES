@@ -1,5 +1,5 @@
 ---
-description: "Token-range severity zones (Green/Yellow/Orange/Red/Critical) with detection checklist, early warning indicators, and corrective routing actions for context window degradation"
+description: 'Token-range severity zones (Green/Yellow/Orange/Red/Critical) with detection checklist, early warning indicators, and corrective routing actions for context window degradation'
 disable-model-invocation: true
 ---
 

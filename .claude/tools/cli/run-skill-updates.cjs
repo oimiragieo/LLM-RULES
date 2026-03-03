@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -121,7 +122,7 @@ function readEvolutionRequests(projectRoot) {
     .filter(Boolean)
     .map(line => {
       try {
-        return JSON.parse(line);
+        return safeParseJSON(line, null, null, null);
       } catch {
         return null;
       }
@@ -178,7 +179,7 @@ function findAssignedAgents(skillName, projectRoot) {
 
   let registry;
   try {
-    registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    registry = safeParseJSON(fs.readFileSync(registryPath, 'utf8'), null, null, null);
   } catch {
     return [];
   }
@@ -229,7 +230,7 @@ function markProcessedEntries(projectRoot, processedIds) {
 
   const updated = lines.map(line => {
     try {
-      const entry = JSON.parse(line);
+      const entry = safeParseJSON(line, null, null, null);
       if (entry && processedIds.has(entry.id)) {
         entry.processedAt = timestamp;
         entry.status = 'processed';

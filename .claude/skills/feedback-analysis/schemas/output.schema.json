@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "FeedbackAnalysis Output",
+  "description": "Output contract for feedback-analysis skill execution",
+  "type": "object",
+  "required": ["action", "success", "timestamp"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "The analysis action that was performed"
+    },
+    "success": {
+      "type": "boolean",
+      "description": "Whether the analysis completed successfully"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of analysis completion"
+    },
+    "itemsAnalyzed": {
+      "type": "integer",
+      "description": "Number of feedback items processed"
+    },
+    "sentiment": {
+      "type": "object",
+      "description": "Sentiment analysis results",
+      "properties": {
+        "overallPolarity": {
+          "type": "string",
+          "enum": ["positive", "negative", "neutral", "mixed"]
+        },
+        "distribution": {
+          "type": "object",
+          "properties": {
+            "positive": { "type": "number" },
+            "negative": { "type": "number" },
+            "neutral": { "type": "number" }
+          }
+        },
+        "mismatchCount": {
+          "type": "integer",
+          "description": "Number of score/text mismatch cases detected"
+        },
+        "topEmotions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "npsCsat": {
+      "type": "object",
+      "description": "NPS/CSAT analysis results",
+      "properties": {
+        "npsScore": { "type": "number" },
+        "promoterPct": { "type": "number" },
+        "passivePct": { "type": "number" },
+        "detractorPct": { "type": "number" },
+        "csatScore": { "type": "number" },
+        "mismatchSegments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string" },
+              "score": { "type": "number" },
+              "sentimentPolarity": { "type": "string" },
+              "riskLevel": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "featureClusters": {
+      "type": "array",
+      "description": "Feature request clusters ranked by priority",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cluster": { "type": "string" },
+          "frequency": { "type": "integer" },
+          "emotionWeight": { "type": "number" },
+          "churnCorrelation": { "type": "number" },
+          "priorityScore": { "type": "number" },
+          "sampleQuotes": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "ticketTriage": {
+      "type": "object",
+      "description": "Support ticket triage results",
+      "properties": {
+        "categorized": { "type": "integer" },
+        "p0Count": { "type": "integer" },
+        "p1Count": { "type": "integer" },
+        "p2Count": { "type": "integer" },
+        "p3Count": { "type": "integer" },
+        "topCategories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": { "type": "string" },
+              "count": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "churnSignals": {
+      "type": "array",
+      "description": "Users flagged as churn risk",
+      "items": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "riskScore": { "type": "number" },
+          "riskTier": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          },
+          "reasonCode": { "type": "string" },
+          "recommendedAction": { "type": "string" }
+        }
+      }
+    },
+    "roadmapItems": {
+      "type": "array",
+      "description": "Ranked roadmap items translated from feedback",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "priorityScore": { "type": "number" },
+          "priorityTier": {
+            "type": "string",
+            "enum": ["P0", "P1", "P2", "P3"]
+          },
+          "evidenceSummary": { "type": "string" },
+          "recommendedAction": {
+            "type": "string",
+            "enum": ["Implement", "Investigate", "Defer", "Decline"]
+          },
+          "supportingQuotes": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "reportPath": {
+      "type": "string",
+      "description": "Path to the written analysis report file"
+    },
+    "errors": {
+      "type": "array",
+      "description": "Non-fatal errors encountered during analysis",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

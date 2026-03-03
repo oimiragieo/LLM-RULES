@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "BrandComplianceInput",
+  "description": "Validated inputs for brand-compliance skill execution",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["audit", "tone-check", "visual-audit", "asset-check", "cross-channel"],
+      "description": "The compliance audit action to perform"
+    },
+    "contentPath": {
+      "type": "string",
+      "description": "Path to the content file or asset to audit"
+    },
+    "contentText": {
+      "type": "string",
+      "description": "Raw content text to audit (alternative to contentPath)"
+    },
+    "brandGuidelinesPath": {
+      "type": "string",
+      "description": "Path to brand guidelines document (optional; uses defaults if omitted)"
+    },
+    "voiceProfile": {
+      "type": "object",
+      "description": "Target brand voice profile scores (optional; uses defaults if omitted)",
+      "properties": {
+        "formality": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Formality score: 1 (casual) to 5 (formal)"
+        },
+        "warmth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Warmth score: 1 (distant) to 5 (approachable)"
+        },
+        "authority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Authority score: 1 (tentative) to 5 (confident)"
+        },
+        "energy": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Energy score: 1 (calm) to 5 (bold)"
+        }
+      }
+    },
+    "channels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of channels to evaluate for cross-channel coherence (e.g., ['web', 'instagram', 'print'])"
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Path to write the compliance report (optional; defaults to stdout)"
+    }
+  },
+  "additionalProperties": false
+}

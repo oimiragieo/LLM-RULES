@@ -204,7 +204,7 @@ function updateRoutingTableKeywords(name, _description) {
     '.claude',
     'lib',
     'routing',
-    'routing-table-intent-keywords.cjs'
+    'routing-table-intent-keywords-data.cjs'
   );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
@@ -218,6 +218,15 @@ function updateRoutingTableKeywords(name, _description) {
   const insertionPoint = content.indexOf(anchor);
   if (insertionPoint !== -1) {
     content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+    fs.writeFileSync(filePath, content, 'utf8');
+    return;
+  }
+
+  const exportAnchor = 'module.exports = {';
+  const exportIndex = content.indexOf(exportAnchor);
+  if (exportIndex !== -1) {
+    const insertAt = exportIndex + exportAnchor.length;
+    content = content.slice(0, insertAt) + '\n' + entry + content.slice(insertAt);
     fs.writeFileSync(filePath, content, 'utf8');
   }
 }

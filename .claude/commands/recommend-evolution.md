@@ -1,5 +1,5 @@
 ---
-description: "Detect capability gaps and record standardized evolution recommendations."
+description: 'Detect capability gaps and record standardized evolution recommendations.'
 disable-model-invocation: true
 ---
 

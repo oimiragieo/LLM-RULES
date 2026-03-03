@@ -1,5 +1,5 @@
 ---
-description: "Specific optimization strategies for Python scripts working with larger-than-memory datasets via Dask."
+description: 'Specific optimization strategies for Python scripts working with larger-than-memory datasets via Dask.'
 disable-model-invocation: true
 ---
 

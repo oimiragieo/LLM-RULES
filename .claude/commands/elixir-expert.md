@@ -1,5 +1,5 @@
 ---
-description: "Elixir and Phoenix expert including OTP, Ecto, and functional programming"
+description: 'Elixir and Phoenix expert including OTP, Ecto, and functional programming'
 disable-model-invocation: true
 ---
 

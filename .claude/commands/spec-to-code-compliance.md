@@ -1,5 +1,5 @@
 ---
-description: "Verify that implementation code faithfully implements its specification — checks function contracts, API contracts, and protocol compliance against source specifications"
+description: 'Verify that implementation code faithfully implements its specification — checks function contracts, API contracts, and protocol compliance against source specifications'
 disable-model-invocation: true
 ---
 

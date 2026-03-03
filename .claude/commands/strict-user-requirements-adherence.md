@@ -1,5 +1,5 @@
 ---
-description: "Strictly adheres to specified user flow and game rules, making sure to follow documented features."
+description: 'Strictly adheres to specified user flow and game rules, making sure to follow documented features.'
 disable-model-invocation: true
 ---
 

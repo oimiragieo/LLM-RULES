@@ -2,6 +2,7 @@
 description: Autonomous audit loop — router-managed iteration or standalone via Stop hook
 disable-model-invocation: true
 ---
+
 Run the ralph-loop audit. There are two modes:
 
 ## Mode 1: Router-managed iteration (multi-agent, default)

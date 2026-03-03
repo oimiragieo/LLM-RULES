@@ -1,5 +1,5 @@
 ---
-description: "Employs the logging module judiciously to log important events, warnings, and errors."
+description: 'Employs the logging module judiciously to log important events, warnings, and errors.'
 disable-model-invocation: true
 ---
 

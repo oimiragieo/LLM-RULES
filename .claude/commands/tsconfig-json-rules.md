@@ -1,5 +1,5 @@
 ---
-description: "Defines general rules for tsconfig.json. It suggest using strict TypeScript checks"
+description: 'Defines general rules for tsconfig.json. It suggest using strict TypeScript checks'
 disable-model-invocation: true
 ---
 

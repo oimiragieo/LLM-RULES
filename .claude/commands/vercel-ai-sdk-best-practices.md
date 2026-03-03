@@ -1,5 +1,5 @@
 ---
-description: "Best practices for using the Vercel AI SDK in Next.js 15 applications with React Server Components and streaming capabilities."
+description: 'Best practices for using the Vercel AI SDK in Next.js 15 applications with React Server Components and streaming capabilities.'
 disable-model-invocation: true
 ---
 

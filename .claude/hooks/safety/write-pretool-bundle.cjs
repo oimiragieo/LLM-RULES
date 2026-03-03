@@ -43,6 +43,15 @@ function formatHookError(err) {
 
 async function main() {
   const perfStart = performance.now();
+  const emitPerf = stage => {
+    const duration = performance.now() - perfStart;
+    if (process.env.DEBUG_HOOKS === 'true' || duration > 100) {
+      auditLog('write-pretool-bundle', 'perf_metrics', {
+        durationMs: Number(duration.toFixed(2)),
+        stage,
+      });
+    }
+  };
   let hookInput = null;
 
   try {
@@ -57,6 +66,7 @@ async function main() {
     const rgResult = runRoutingGuard(toolName, toolInput, hookInput);
     const t1 = performance.now();
     if (!rgResult.pass) {
+      emitPerf('routingGuard_block');
       console.log(formatResult(rgResult.result, rgResult.message));
       process.exit(2);
     }
@@ -65,6 +75,7 @@ async function main() {
     const creatorResult = validateCreatorWorkflow(toolName, toolInput);
     const t2 = performance.now();
     if (!creatorResult.pass) {
+      emitPerf('creatorGuard_block');
       console.log(formatResult(creatorResult.result, creatorResult.message));
       process.exit(2);
     }
@@ -78,6 +89,7 @@ async function main() {
         const validation = validateAgentContent(incomingContent, { requireMarker: true });
         if (!validation.valid) {
           const msg = `[AGENT-TEMPLATE-CONTRACT] ${validation.errors.join(' | ')}`;
+          emitPerf('agentContract_block');
           console.log(formatResult('block', msg));
           process.exit(2);
         }
@@ -89,6 +101,7 @@ async function main() {
     for (const check of preWriteChecks) {
       const result = await check.run(toolName, toolInput, hookInput);
       if (!result.pass) {
+        emitPerf('preWrite_block');
         console.log(formatResult(result.result, result.message));
         process.exit(2);
       }
@@ -100,6 +113,7 @@ async function main() {
     if (targetState) {
       const state = evolutionGuard.getEvolutionState();
       if (!evolutionGuard.isValidTransition(state?.state || 'idle', targetState)) {
+        emitPerf('evolutionGuard_block');
         console.log(formatResult('block', `Invalid evolution state transition: ${targetState}`));
         process.exit(2);
       }
@@ -112,6 +126,7 @@ async function main() {
       const state = researchEnforcement.getEvolutionState();
       const research = researchEnforcement.checkResearchComplete(state);
       if (!research.complete) {
+        emitPerf('research_block');
         console.log(formatResult('block', 'Research phase incomplete.'));
         process.exit(2);
       }
@@ -126,6 +141,7 @@ async function main() {
         const content = toolInput.content || toolInput.new_string || '';
         const validation = qualityGate.validateQuality(content, artifactType);
         if (!validation.valid) {
+          emitPerf('qualityGate_block');
           console.log(formatResult('block', 'Quality gate failed.'));
           process.exit(2);
         }
@@ -168,6 +184,7 @@ async function main() {
     // can cause host-side JSON truncation during PreToolUse parsing.
     process.exit(0);
   } catch (err) {
+    emitPerf('exception');
     // Fail-CLOSED by default for write safety hooks: unexpected exceptions block writes.
     // Set WRITE_HOOK_FAIL_OPEN=true to revert to permissive behavior (NOT recommended).
     const errorMessage = formatHookError(err);

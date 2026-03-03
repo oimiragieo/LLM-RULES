@@ -35,7 +35,9 @@ Description:
 }
 
 if (options.list) {
-  process.stdout.write('Guidelines for k8s-manifest-generator:\nSee SKILL.md for full guidelines\n');
+  process.stdout.write(
+    'Guidelines for k8s-manifest-generator:\nSee SKILL.md for full guidelines\n'
+  );
   process.exit(0);
 }
 

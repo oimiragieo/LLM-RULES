@@ -2,9 +2,11 @@
 
 const { getPreferredAgent } = require('./routing-table.cjs');
 const { loadCapabilityRouting } = require('./capability-routing-loader.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 function loadCapabilityRoutingForResolver() {
-  return loadCapabilityRouting();
+  const loaded = loadCapabilityRouting();
+  return safeParseJSON(JSON.stringify(loaded || {}), null, null, {});
 }
 
 const CAPABILITY_TO_DOMAIN = {

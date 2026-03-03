@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "MarketingContent Input",
+  "description": "Validated inputs for marketing-content skill execution",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "write-copy",
+        "plan-campaign",
+        "build-calendar",
+        "design-ab-test",
+        "analyze-performance",
+        "create-brief"
+      ],
+      "description": "The marketing content operation to perform"
+    },
+    "framework": {
+      "type": "string",
+      "enum": ["AIDA", "PAS", "BAB", "4Ps", "FAB"],
+      "description": "Copywriting framework to apply (optional; will be recommended based on audience stage if omitted)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "tiktok",
+        "instagram-reels",
+        "linkedin",
+        "email",
+        "blog",
+        "facebook",
+        "twitter",
+        "youtube"
+      ],
+      "description": "Target content platform (required for write-copy and plan-campaign actions)"
+    },
+    "audience_stage": {
+      "type": "string",
+      "enum": ["unaware", "problem-aware", "solution-aware", "product-aware", "most-aware"],
+      "description": "Audience awareness stage used to recommend the appropriate copywriting framework"
+    },
+    "topic": {
+      "type": "string",
+      "description": "The topic, product, or campaign subject to create content for"
+    },
+    "goal": {
+      "type": "string",
+      "enum": ["awareness", "traffic", "leads", "conversion", "retention"],
+      "description": "Primary business goal for the content"
+    },
+    "kpi": {
+      "type": "string",
+      "description": "Primary KPI to measure success (e.g., open_rate, CTR, conversion_rate)"
+    },
+    "duration_days": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 365,
+      "description": "Campaign or calendar duration in days"
+    }
+  },
+  "additionalProperties": false
+}

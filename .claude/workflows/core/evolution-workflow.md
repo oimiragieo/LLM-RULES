@@ -590,19 +590,24 @@ Glob('.claude/skills/*/SKILL.md');
 
 // 6. Run validation tools
 Bash("node .claude/tools/validate-agents.mjs 2>&1 | grep '<agent-name>'");
+
+// 7. Semantic regression guard (routing impact)
+// Ensure no routing keyword collision degrades existing agent precision.
+// quality-gate-validator.cjs enforces routing_collision checks during VERIFY.
 ```
 
 **Verification Checklist**:
 
-| Check                  | Criteria                       | Failure Action                 |
-| ---------------------- | ------------------------------ | ------------------------------ |
-| Placeholders           | No TODO, TBD, FIXME, etc.      | Return to LOCK                 |
-| Task Progress Protocol | Complete with Iron Laws        | Return to LOCK                 |
-| Memory Protocol        | All sections present           | Return to LOCK                 |
-| Assigned Skills        | All exist in `.claude/skills/` | Return to LOCK or remove skill |
-| Referenced Tools       | All are valid Claude tools     | Return to LOCK                 |
-| Examples               | Complete and executable        | Return to LOCK                 |
-| Documentation          | Explains when/why to use       | Return to LOCK                 |
+| Check                  | Criteria                         | Failure Action                 |
+| ---------------------- | -------------------------------- | ------------------------------ |
+| Placeholders           | No TODO, TBD, FIXME, etc.        | Return to LOCK                 |
+| Task Progress Protocol | Complete with Iron Laws          | Return to LOCK                 |
+| Memory Protocol        | All sections present             | Return to LOCK                 |
+| Assigned Skills        | All exist in `.claude/skills/`   | Return to LOCK or remove skill |
+| Referenced Tools       | All are valid Claude tools       | Return to LOCK                 |
+| Routing Impact         | No keyword collision regressions | Return to LOCK                 |
+| Examples               | Complete and executable          | Return to LOCK                 |
+| Documentation          | Explains when/why to use         | Return to LOCK                 |
 
 **Quality Standards**:
 

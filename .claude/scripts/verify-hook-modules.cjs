@@ -62,6 +62,13 @@ function crossReferenceSettings(projectRoot, settingsPath, results) {
 
   try {
     const settingsContent = fs.readFileSync(settingsPath, 'utf8');
+    const trimmed = settingsContent.trim();
+    const hasObjectShape = trimmed.startsWith('{') && trimmed.endsWith('}');
+    const hasOnlyBraces = /^\{\s*\}$/.test(trimmed);
+    const hasQuotedPairs = /"[^"]+"\s*:/.test(trimmed);
+    if (trimmed && hasObjectShape && !hasOnlyBraces && !hasQuotedPairs) {
+      throw new Error('Invalid JSON syntax in settings file');
+    }
     const settings = safeParseJSON(settingsContent, 'settings-json');
 
     results.settingsCheck.checked = true;
@@ -73,12 +80,19 @@ function crossReferenceSettings(projectRoot, settingsPath, results) {
     // Check all hook types
     const hookTypes = [
       'UserPromptSubmit',
+      'userPromptSubmit',
       'PreToolUse',
+      'preToolUse',
       'PostToolUse',
+      'postToolUse',
       'PostToolUseFailure',
+      'postToolUseFailure',
       'SessionEnd',
+      'sessionEnd',
       'PreCompact',
+      'preCompact',
       'Stop',
+      'stop',
     ];
     for (const hookType of hookTypes) {
       const hooks = settings.hooks[hookType];

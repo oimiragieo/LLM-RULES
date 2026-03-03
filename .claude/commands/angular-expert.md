@@ -1,5 +1,5 @@
 ---
-description: "Angular framework expert including components, services, RxJS, templates, and testing"
+description: 'Angular framework expert including components, services, RxJS, templates, and testing'
 disable-model-invocation: true
 ---
 

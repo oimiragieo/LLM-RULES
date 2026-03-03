@@ -57,6 +57,15 @@ function readJsonFile(filePath) {
   }
 }
 
+function writeRecoveryFile(filePath, value) {
+  try {
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify(value, null, 2), 'utf8');
+  } catch (_err) {
+    // best-effort recovery write
+  }
+}
+
 function readRouterStateFile(filePath, defaults) {
   const fallback = defaults && typeof defaults === 'object' ? { ...defaults } : {};
   const parsed = readJsonFile(filePath);
@@ -106,8 +115,44 @@ function readPhaseAdvanceFile(filePath, fallback = null) {
   return parsed;
 }
 
+function readEvolutionStateFile(filePath, fallback = null, options = {}) {
+  const parsed = readJsonFile(filePath);
+  const defaultState = {
+    version: '1.0.0',
+    state: 'idle',
+    currentEvolution: null,
+    evolutions: [],
+    patterns: [],
+    suggestions: [],
+    lastUpdated: new Date().toISOString(),
+  };
+  const fallbackState =
+    fallback && typeof fallback === 'object' && !Array.isArray(fallback)
+      ? { ...defaultState, ...fallback }
+      : defaultState;
+  const validate = getValidator('evolution-state', 'evolution-state.schema.json');
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !validate(parsed)) {
+    if (options.recover !== false) writeRecoveryFile(filePath, fallbackState);
+    return fallbackState;
+  }
+  return parsed;
+}
+
+function readReflectionSpawnRequestFile(filePath, fallback = [], options = {}) {
+  const parsed = readJsonFile(filePath);
+  const fallbackList = Array.isArray(fallback) ? fallback : [];
+  const validate = getValidator('reflection-spawn-request', 'reflection-spawn-request.schema.json');
+  if (!Array.isArray(parsed) || !validate(parsed)) {
+    if (options.recover !== false) writeRecoveryFile(filePath, fallbackList);
+    return fallbackList;
+  }
+  return parsed;
+}
+
 module.exports = {
   readRouterStateFile,
   readWorkflowStateFile,
   readPhaseAdvanceFile,
+  readEvolutionStateFile,
+  readReflectionSpawnRequestFile,
 };

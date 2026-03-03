@@ -17,6 +17,7 @@
 const assert = require('node:assert');
 const { describe, it, beforeEach, afterEach, _mock } = require('node:test');
 const path = require('path');
+/* eslint-disable max-lines */
 const fs = require('fs');
 const os = require('os');
 
@@ -514,6 +515,50 @@ describe('checkEvolutionTrigger', () => {
     assert.strictEqual(result.enabled, false, 'Should be disabled when env var is off');
 
     process.env.EVOLUTION_TRIGGER_DETECTION = oldEnv;
+  });
+});
+
+describe('evolution auto-trigger reminders', () => {
+  it('should detect recurring critical evolution requests', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const pending = unified.detectRecurringCriticalEvolution([
+      { severity: 'CRITICAL', summary: 'router drift in step 0.8' },
+      { severity: 'CRITICAL', summary: 'router drift in step 0.8' },
+      { severity: 'CRITICAL', summary: 'router drift in step 0.8' },
+      { severity: 'HIGH', summary: 'different issue' },
+    ]);
+
+    assert.strictEqual(pending.length, 1, 'Expected one recurring critical request');
+    assert.strictEqual(pending[0].trigger, 'recurring_critical');
+    assert.strictEqual(pending[0].count, 3);
+  });
+
+  it('should write evolution reminder files when recurring threshold is met', () => {
+    const unified = require('../../.claude/hooks/routing/user-prompt-unified.cjs');
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'evolution-reminder-'));
+    const requestsPath = path.join(tmpDir, 'evolution-requests.jsonl');
+    const spawnPath = path.join(tmpDir, 'evolution-spawn-request.json');
+    const reminderPath = path.join(tmpDir, 'evolution-reminder.txt');
+    try {
+      const entries = [
+        { priority: 'high', summary: 'missing autonomous trigger' },
+        { priority: 'high', summary: 'missing autonomous trigger' },
+        { priority: 'high', summary: 'missing autonomous trigger' },
+      ];
+      fs.writeFileSync(requestsPath, entries.map(e => JSON.stringify(e)).join('\n') + '\n', 'utf8');
+
+      const result = unified.syncEvolutionSpawnReminder({
+        requestsPath,
+        spawnPath,
+        reminderPath,
+        threshold: 3,
+      });
+      assert.strictEqual(result.pending, 1);
+      assert.strictEqual(fs.existsSync(spawnPath), true);
+      assert.strictEqual(fs.existsSync(reminderPath), true);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });
 

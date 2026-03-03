@@ -31,14 +31,16 @@ for (const file of files) {
       broken.push({
         file: path.relative(libDir, file),
         require: reqPath,
-        resolvedTo: path.relative(libDir, resolved)
+        resolvedTo: path.relative(libDir, resolved),
       });
     }
   }
 }
 
 console.log('=== BROKEN IMPORTS (' + broken.length + ') ===');
-broken.forEach(b => console.log('  ' + b.file + '  ->  ' + b.require + '  (resolves to: ' + b.resolvedTo + ')'));
+broken.forEach(b =>
+  console.log('  ' + b.file + '  ->  ' + b.require + '  (resolves to: ' + b.resolvedTo + ')')
+);
 console.log('');
 
 // Now find orphaned modules - modules that nothing else requires
@@ -68,7 +70,9 @@ for (const mod of allModules) {
   }
 }
 
-console.log('=== ORPHANED MODULES (not imported by any other lib module) (' + orphaned.length + ') ===');
+console.log(
+  '=== ORPHANED MODULES (not imported by any other lib module) (' + orphaned.length + ') ==='
+);
 orphaned.forEach(o => console.log('  ' + o));
 console.log('');
 console.log('Total lib modules: ' + files.length);

@@ -1,5 +1,5 @@
 ---
-description: "General guidelines for TALL stack development, emphasizing Laravel and PHP best practices."
+description: 'General guidelines for TALL stack development, emphasizing Laravel and PHP best practices.'
 disable-model-invocation: true
 ---
 

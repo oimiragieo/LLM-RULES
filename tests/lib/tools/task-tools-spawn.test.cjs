@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { Task } = require('../../../.claude/lib/tools/task-tools.cjs');
+const { MemoryVectorStore } = require('../../../.claude/lib/memory/lancedb-client-impl.cjs');
 
 function restoreEnv(name, value) {
   if (value === undefined) {
@@ -53,6 +54,7 @@ test('Task uses real process spawn by default', async () => {
       'Telemetry helper should emit TOOL_COMPLETED event to event-bus sink'
     );
   } finally {
+    MemoryVectorStore.clearSharedStores();
     restoreEnv('TASK_TOOL_REAL_SPAWN', previous);
     restoreEnv('EVENT_BUS_SINK', previousSink);
   }
@@ -75,6 +77,7 @@ test('Task supports simulate mode when TASK_TOOL_REAL_SPAWN=off', async () => {
     assert.ok(result.spawn);
     assert.equal(result.spawn.mode, 'simulated');
   } finally {
+    MemoryVectorStore.clearSharedStores();
     restoreEnv('TASK_TOOL_REAL_SPAWN', previous);
   }
 });

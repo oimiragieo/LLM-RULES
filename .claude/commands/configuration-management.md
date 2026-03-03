@@ -1,5 +1,5 @@
 ---
-description: "Configuration management techniques"
+description: 'Configuration management techniques'
 disable-model-invocation: true
 ---
 

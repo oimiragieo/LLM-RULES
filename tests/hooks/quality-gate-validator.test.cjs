@@ -13,6 +13,7 @@ const {
   detectArtifactType,
   findPlaceholders,
   findMissingSections,
+  detectRoutingCollisions,
   validateQuality,
   _PLACEHOLDER_PATTERNS,
   _REQUIRED_AGENT_SECTIONS,
@@ -183,6 +184,23 @@ test('findMissingSections returns empty for complete skill', () => {
   const content = '# Skill\n\n## Purpose\n\nThis skill does X.';
   const missing = findMissingSections(content, 'skill');
   assert.strictEqual(missing.length, 0);
+});
+
+test('detectRoutingCollisions reports keyword collisions for wrong target agent', () => {
+  const content = `
+triggerPhrases: ["test", "qa"]
+`;
+  const collisions = detectRoutingCollisions(content, 'developer');
+  assert.ok(collisions.length >= 1);
+  assert.ok(collisions.some(c => c.keyword === 'test'));
+});
+
+test('detectRoutingCollisions returns empty when keywords map to target agent', () => {
+  const content = `
+triggerPhrases: ["test", "qa"]
+`;
+  const collisions = detectRoutingCollisions(content, 'qa');
+  assert.strictEqual(collisions.length, 0);
 });
 
 // --- validateQuality tests ---

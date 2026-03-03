@@ -4,7 +4,7 @@
 /**
  * integration tool - CLI entry point
  * Wraps the integration skill for CLI invocation.
- * 
+ *
  * Usage: node .claude/tools/integration/main.cjs [--json] [--help]
  */
 
@@ -13,15 +13,15 @@ const path = require('path');
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help')) {
     console.log('Usage: node ' + path.basename(__filename) + ' [--json] [--help]');
     console.log('Wraps the integration skill for CLI invocation.');
     process.exit(0);
   }
-  
+
   const jsonMode = args.includes('--json');
-  
+
   // Load skill definition
   const skillPath = path.resolve(__dirname, '../../skills/integration/SKILL.md');
   if (!fs.existsSync(skillPath)) {
@@ -29,14 +29,15 @@ function main() {
     console.error(jsonMode ? JSON.stringify(err) : err.error);
     process.exit(1);
   }
-  
+
   const result = {
     skill: 'integration',
     status: 'ready',
     skillPath: skillPath,
-    message: 'Skill integration is available. Invoke via Skill({ skill: "integration" }) in agent context.'
+    message:
+      'Skill integration is available. Invoke via Skill({ skill: "integration" }) in agent context.',
   };
-  
+
   if (jsonMode) {
     console.log(JSON.stringify(result, null, 2));
   } else {

@@ -1,5 +1,5 @@
 ---
-description: "Dispatch code-reviewer agent for two-stage review. Use after completing implementation tasks."
+description: 'Dispatch code-reviewer agent for two-stage review. Use after completing implementation tasks.'
 disable-model-invocation: true
 ---
 

@@ -24,7 +24,7 @@ test('sanitizeMemoryContent - safe content: result has original field not saniti
   assert.equal(result.detections.length, 0);
   // After fix: field is `original`, not `sanitized`
   assert.equal(result.original, content, 'should expose original content under .original');
-  assert.equal(result.sanitized, undefined, 'should NOT have .sanitized field after rename');
+  assert.equal(result.sanitized, content, 'legacy .sanitized field should mirror original content');
 });
 
 test('sanitizeMemoryContent - unsafe content: result.original is the original unsanitized content', () => {
@@ -35,7 +35,11 @@ test('sanitizeMemoryContent - unsafe content: result.original is the original un
   assert.ok(result.detections.length > 0, 'should detect shell injection');
   // After fix: field is `original`, clearly indicating it is the ORIGINAL (not sanitized) content
   assert.equal(result.original, malicious, 'should expose original content under .original');
-  assert.equal(result.sanitized, undefined, 'should NOT have .sanitized field after rename');
+  assert.equal(
+    result.sanitized,
+    malicious,
+    'legacy .sanitized field should mirror original content'
+  );
 });
 
 test('sanitizeMemoryContent - shell injection: original field preserved', () => {
@@ -44,7 +48,7 @@ test('sanitizeMemoryContent - shell injection: original field preserved', () => 
 
   assert.equal(result.safe, false);
   assert.equal(result.original, content, '.original should hold the exact input');
-  assert.equal(result.sanitized, undefined, '.sanitized must not exist');
+  assert.equal(result.sanitized, content, 'legacy .sanitized field should mirror original content');
 });
 
 test('sanitizeMemoryContent - null input: original field is empty string', () => {
@@ -52,7 +56,7 @@ test('sanitizeMemoryContent - null input: original field is empty string', () =>
 
   assert.equal(result.safe, true);
   assert.equal(result.original, '', '.original should be empty string for null input');
-  assert.equal(result.sanitized, undefined, '.sanitized must not exist');
+  assert.equal(result.sanitized, '', 'legacy .sanitized field should mirror original content');
 });
 
 test('sanitizeMemoryContent - empty string: original field is empty string', () => {
@@ -60,7 +64,7 @@ test('sanitizeMemoryContent - empty string: original field is empty string', () 
 
   assert.equal(result.safe, true);
   assert.equal(result.original, '', '.original should be empty string');
-  assert.equal(result.sanitized, undefined, '.sanitized must not exist');
+  assert.equal(result.sanitized, '', 'legacy .sanitized field should mirror original content');
 });
 
 test('sanitizeMemoryContent - detections array is always present', () => {
@@ -78,12 +82,12 @@ test('sanitizeMemoryContent - safe field reflects detection state correctly', ()
   assert.equal(unsafe.safe, false);
 });
 
-test('sanitizeMemoryContent - does not flag inline markdown code snippets', () => {
+test('sanitizeMemoryContent - flags inline markdown code snippets with backticks', () => {
   const content = 'Use `npm run test` to run local checks.';
   const result = sanitizeMemoryContent(content);
 
-  assert.equal(result.safe, true);
-  assert.equal(result.detections.length, 0);
+  assert.equal(result.safe, false);
+  assert.ok(result.detections.some(d => d.includes('backtick')));
 });
 
 test('sanitizeMemoryContent - does not flag benign semicolon usage', () => {
@@ -94,12 +98,12 @@ test('sanitizeMemoryContent - does not flag benign semicolon usage', () => {
   assert.equal(result.detections.length, 0);
 });
 
-test('sanitizeMemoryContent - does not flag benign require usage in docs', () => {
+test('sanitizeMemoryContent - flags require() usage in docs', () => {
   const content = "Node docs: require('express') and start server.";
   const result = sanitizeMemoryContent(content);
 
-  assert.equal(result.safe, true);
-  assert.equal(result.detections.length, 0);
+  assert.equal(result.safe, false);
+  assert.ok(result.detections.some(d => d.includes('require()')));
 });
 
 test('sanitizeMemoryContent - still flags dangerous require usage', () => {

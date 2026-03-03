@@ -40,4 +40,6 @@ if (options.list) {
   process.exit(0);
 }
 
-console.log('paraglide-js-internationalization-i18n skill loaded. Use with Claude for code review.');
+console.log(
+  'paraglide-js-internationalization-i18n skill loaded. Use with Claude for code review.'
+);

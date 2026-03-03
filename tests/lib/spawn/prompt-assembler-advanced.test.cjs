@@ -144,6 +144,15 @@ describe('prompt-assembler advanced behavior', () => {
       assert.match(section, /\[mem:[a-f0-9]{8}\]/);
     });
 
+    it('formatMemorySection should include actionable reflection learnings when available', () => {
+      if (!assembler) assert.fail('Module not implemented yet');
+      const section = assembler.formatMemorySection({
+        reflection_actionables: ['Fix recurring summary metadata omissions in TaskUpdate'],
+      });
+      assert.ok(section.includes('### Reflection Learnings (Actionable)'));
+      assert.ok(section.includes('Fix recurring summary metadata omissions in TaskUpdate'));
+    });
+
     it('formatRagMemorySection should enforce max item cap', () => {
       if (!assembler) assert.fail('Module not implemented yet');
       const section = assembler.formatRagMemorySection(

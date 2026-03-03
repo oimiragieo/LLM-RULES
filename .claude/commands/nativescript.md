@@ -1,5 +1,5 @@
 ---
-description: "NativeScript best practices and patterns for mobile applications"
+description: 'NativeScript best practices and patterns for mobile applications'
 disable-model-invocation: true
 ---
 

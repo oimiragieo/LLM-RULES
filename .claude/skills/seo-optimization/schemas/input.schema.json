@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "SEO Optimization Input",
+  "description": "Validated inputs for seo-optimization skill execution",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "audit",
+        "keyword-research",
+        "on-page",
+        "structured-data",
+        "link-building",
+        "ai-search",
+        "full"
+      ],
+      "description": "The SEO workflow phase to execute. Use 'full' for complete 7-phase audit."
+    },
+    "url": {
+      "type": "string",
+      "description": "Target URL or domain to audit (e.g., https://example.com)"
+    },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Seed keywords for keyword research phase"
+    },
+    "competitors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Competitor domains for gap analysis (e.g., ['competitor.com'])"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2", "all"],
+      "default": "all",
+      "description": "Minimum priority level of findings to include in output"
+    },
+    "output_format": {
+      "type": "string",
+      "enum": ["report", "checklist", "recommendations"],
+      "default": "report",
+      "description": "Format of the output: full audit report, checklist, or recommendations only"
+    }
+  },
+  "additionalProperties": false
+}

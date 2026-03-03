@@ -1,5 +1,5 @@
 ---
-description: "Decision matrix for selecting multi-agent topologies (Supervisor, Swarm, Hierarchical, Conductor) with token economics, failure modes, and escalation paths"
+description: 'Decision matrix for selecting multi-agent topologies (Supervisor, Swarm, Hierarchical, Conductor) with token economics, failure modes, and escalation paths'
 disable-model-invocation: true
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: "React Native and Expo best practices for building performant mobile apps. Use"
+description: 'React Native and Expo best practices for building performant mobile apps. Use'
 disable-model-invocation: true
 ---
 

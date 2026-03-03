@@ -9,7 +9,10 @@
 function preExecute(context) {
   // Validate skill invocation context
   if (!context || typeof context !== 'object') {
-    return { allow: true, message: 'comprehensive-unit-testing-with-pytest: no context to validate' };
+    return {
+      allow: true,
+      message: 'comprehensive-unit-testing-with-pytest: no context to validate',
+    };
   }
   return { allow: true };
 }

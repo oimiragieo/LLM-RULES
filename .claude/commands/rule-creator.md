@@ -1,5 +1,5 @@
 ---
-description: "Creates rule files for the Claude Code framework. Rules are markdown files in .claude/rules/ that are auto-loaded by Claude Code."
+description: 'Creates rule files for the Claude Code framework. Rules are markdown files in .claude/rules/ that are auto-loaded by Claude Code.'
 disable-model-invocation: true
 ---
 

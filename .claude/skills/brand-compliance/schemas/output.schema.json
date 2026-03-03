@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "BrandComplianceOutput",
+  "description": "Structured output from brand-compliance skill execution",
+  "type": "object",
+  "required": ["action", "summary", "findings"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "The audit action that was performed"
+    },
+    "contentRef": {
+      "type": "string",
+      "description": "Reference to the content or asset that was audited"
+    },
+    "summary": {
+      "type": "object",
+      "required": ["totalFindings", "errors", "warnings", "passed", "complianceScore"],
+      "properties": {
+        "totalFindings": {
+          "type": "integer",
+          "description": "Total number of findings (errors + warnings)"
+        },
+        "errors": {
+          "type": "integer",
+          "description": "Number of blocking error findings"
+        },
+        "warnings": {
+          "type": "integer",
+          "description": "Number of informational warning findings"
+        },
+        "passed": {
+          "type": "integer",
+          "description": "Number of checks that passed"
+        },
+        "complianceScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall compliance score percentage (errors weighted 3x, warnings 1x)"
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "List of compliance findings",
+      "items": {
+        "type": "object",
+        "required": ["id", "area", "finding", "severity", "suggestedFix"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Finding sequence number"
+          },
+          "area": {
+            "type": "string",
+            "enum": ["style-guide", "tone", "visual", "asset", "cross-channel"],
+            "description": "Brand compliance area"
+          },
+          "finding": {
+            "type": "string",
+            "description": "Description of the compliance issue found"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["ERROR", "WARNING", "INFO"],
+            "description": "Finding severity: ERROR (blocking), WARNING (informational), INFO (note)"
+          },
+          "suggestedFix": {
+            "type": "string",
+            "description": "Specific remediation suggestion"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location reference (line number, section, element)"
+          }
+        }
+      }
+    },
+    "toneScore": {
+      "type": "object",
+      "description": "Tone of voice scoring results (present when action includes tone check)",
+      "properties": {
+        "formality": {
+          "type": "object",
+          "properties": {
+            "target": { "type": "integer" },
+            "actual": { "type": "integer" },
+            "delta": { "type": "integer" },
+            "status": { "type": "string", "enum": ["PASS", "WARN", "FAIL"] }
+          }
+        },
+        "warmth": {
+          "type": "object",
+          "properties": {
+            "target": { "type": "integer" },
+            "actual": { "type": "integer" },
+            "delta": { "type": "integer" },
+            "status": { "type": "string", "enum": ["PASS", "WARN", "FAIL"] }
+          }
+        },
+        "authority": {
+          "type": "object",
+          "properties": {
+            "target": { "type": "integer" },
+            "actual": { "type": "integer" },
+            "delta": { "type": "integer" },
+            "status": { "type": "string", "enum": ["PASS", "WARN", "FAIL"] }
+          }
+        },
+        "energy": {
+          "type": "object",
+          "properties": {
+            "target": { "type": "integer" },
+            "actual": { "type": "integer" },
+            "delta": { "type": "integer" },
+            "status": { "type": "string", "enum": ["PASS", "WARN", "FAIL"] }
+          }
+        }
+      }
+    },
+    "reportPath": {
+      "type": "string",
+      "description": "Path where the compliance report was written (if outputPath was specified)"
+    }
+  },
+  "additionalProperties": false
+}

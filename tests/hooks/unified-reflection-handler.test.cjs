@@ -95,6 +95,11 @@ function _readTestQueue() {
   return content.split('\n').map(line => JSON.parse(line));
 }
 
+const TEST_RECURRENCE_FILE = path.join(
+  __dirname,
+  '../../.claude/context/runtime/test-failure-recurrence.json'
+);
+
 // Import the module under test
 let hook;
 try {
@@ -396,6 +401,28 @@ describe('unified-reflection-handler.cjs', () => {
 
       assertEqual(entry.filePath, '/some/file.js');
     });
+
+    it('should classify timeout errors using failureType taxonomy', () => {
+      const input = {
+        tool_name: 'Bash',
+        tool_input: { command: 'npm test' },
+        tool_output: { exit_code: 124, stderr: 'Command timed out after 30s' },
+      };
+
+      const entry = hook.handleErrorRecovery(input);
+      assertEqual(entry.failureType, 'timeout');
+    });
+
+    it('should classify missing module errors as dependency_error', () => {
+      const input = {
+        tool_name: 'Bash',
+        tool_input: { command: 'node script.cjs' },
+        tool_output: { exit_code: 1, error: "Cannot find module 'left-pad'" },
+      };
+
+      const entry = hook.handleErrorRecovery(input);
+      assertEqual(entry.failureType, 'dependency_error');
+    });
   });
 
   describe('handleSessionEnd()', () => {
@@ -500,6 +527,36 @@ describe('unified-reflection-handler.cjs', () => {
       }
     });
   });
+
+  describe('trackFailureRecurrence()', () => {
+    it('should track error failure classes', () => {
+      try {
+        fs.rmSync(TEST_RECURRENCE_FILE, { force: true });
+      } catch (_e) {
+        // ignore
+      }
+      const first = hook.trackFailureRecurrence(
+        { trigger: 'error', failureType: 'timeout' },
+        { filePath: TEST_RECURRENCE_FILE }
+      );
+      const second = hook.trackFailureRecurrence(
+        { trigger: 'error', failureType: 'timeout' },
+        { filePath: TEST_RECURRENCE_FILE }
+      );
+      assertEqual(first.failureClass, 'timeout');
+      assertEqual(second.count, 2);
+    });
+
+    it('should track missing task summary recurrences', () => {
+      const result = hook.trackFailureRecurrence(
+        { trigger: 'task_completion', summary: 'Task 1 completed without summary metadata' },
+        { filePath: TEST_RECURRENCE_FILE }
+      );
+      assertEqual(result.failureClass, 'missing_task_summary');
+      const parsed = JSON.parse(fs.readFileSync(TEST_RECURRENCE_FILE, 'utf8'));
+      assert(parsed.classes.missing_task_summary, 'missing_task_summary bucket should exist');
+    });
+  });
 });
 // ============================================================
 
@@ -510,6 +567,11 @@ Promise.allSettled(pending).then(() => {
 
   // Cleanup
   cleanupTestQueue();
+  try {
+    fs.rmSync(TEST_RECURRENCE_FILE, { force: true });
+  } catch (_e) {
+    // ignore
+  }
   try {
     hook.QUEUE_FILE = originalQueueFile;
   } catch (_e) {

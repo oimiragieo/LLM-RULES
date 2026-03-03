@@ -12,7 +12,15 @@
  */
 
 const path = require('path');
-const mainScript = path.resolve(__dirname, '..', '..', 'skills', 'ralph-loop', 'scripts', 'main.cjs');
+const mainScript = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  'skills',
+  'ralph-loop',
+  'scripts',
+  'main.cjs'
+);
 
 // Delegate to main skill script
 require(mainScript);

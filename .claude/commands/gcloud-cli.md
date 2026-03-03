@@ -1,5 +1,5 @@
 ---
-description: "Google Cloud CLI operations and resource management"
+description: 'Google Cloud CLI operations and resource management'
 disable-model-invocation: true
 ---
 

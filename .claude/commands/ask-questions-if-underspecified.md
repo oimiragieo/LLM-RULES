@@ -1,5 +1,5 @@
 ---
-description: "Ask the minimum clarifying questions before implementation when requirements are ambiguous or missing crucial details"
+description: 'Ask the minimum clarifying questions before implementation when requirements are ambiguous or missing crucial details'
 disable-model-invocation: true
 ---
 

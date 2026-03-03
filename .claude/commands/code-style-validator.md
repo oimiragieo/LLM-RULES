@@ -1,5 +1,5 @@
 ---
-description: "Programmatic code style validation using AST analysis. Complements (not replaces) code-style rules by providing automated checking and instant feedback."
+description: 'Programmatic code style validation using AST analysis. Complements (not replaces) code-style rules by providing automated checking and instant feedback.'
 disable-model-invocation: true
 ---
 

@@ -4,7 +4,7 @@
 /**
  * shadcn-ui tool - CLI entry point
  * Wraps the shadcn-ui skill for CLI invocation.
- * 
+ *
  * Usage: node .claude/tools/shadcn-ui/main.cjs [--json] [--help]
  */
 
@@ -13,15 +13,15 @@ const path = require('path');
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help')) {
     console.log('Usage: node ' + path.basename(__filename) + ' [--json] [--help]');
     console.log('Wraps the shadcn-ui skill for CLI invocation.');
     process.exit(0);
   }
-  
+
   const jsonMode = args.includes('--json');
-  
+
   // Load skill definition
   const skillPath = path.resolve(__dirname, '../../skills/shadcn-ui/SKILL.md');
   if (!fs.existsSync(skillPath)) {
@@ -29,14 +29,15 @@ function main() {
     console.error(jsonMode ? JSON.stringify(err) : err.error);
     process.exit(1);
   }
-  
+
   const result = {
     skill: 'shadcn-ui',
     status: 'ready',
     skillPath: skillPath,
-    message: 'Skill shadcn-ui is available. Invoke via Skill({ skill: "shadcn-ui" }) in agent context.'
+    message:
+      'Skill shadcn-ui is available. Invoke via Skill({ skill: "shadcn-ui" }) in agent context.',
   };
-  
+
   if (jsonMode) {
     console.log(JSON.stringify(result, null, 2));
   } else {

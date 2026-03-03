@@ -1,5 +1,5 @@
 ---
-description: "Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on \"use Gemini\", \"analyze with Gemini\", \"large file\", \"sandbox\", \"brainstorm with Gemini\"."
+description: 'Use when the user wants to use Google Gemini for analysis, large files or codebases, sandbox execution, or brainstorming. Uses headless Gemini CLI scripts (no MCP). Triggers on "use Gemini", "analyze with Gemini", "large file", "sandbox", "brainstorm with Gemini".'
 disable-model-invocation: true
 ---
 

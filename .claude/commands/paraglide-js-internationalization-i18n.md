@@ -1,5 +1,5 @@
 ---
-description: "Details Paraglide.js i18n implementations."
+description: 'Details Paraglide.js i18n implementations.'
 disable-model-invocation: true
 ---
 

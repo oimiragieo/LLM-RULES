@@ -40,6 +40,7 @@ const {
 const eventBus = require('../../lib/events/event-bus.cjs');
 const { EventTypes } = require('../../lib/events/event-types.cjs');
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
+const { ROUTING_TABLE } = require('../../lib/routing/routing-table-core-map.cjs');
 
 // Placeholder patterns that indicate incomplete content
 const PLACEHOLDER_PATTERNS = [
@@ -169,13 +170,60 @@ function findMissingSections(content, artifactType) {
   return missing;
 }
 
+function extractTriggerKeywords(content) {
+  const keywords = new Set();
+  const inlineArray = content.match(/triggerPhrases\s*:\s*\[([^\]]+)\]/i);
+  if (inlineArray) {
+    const raw = inlineArray[1];
+    raw
+      .split(',')
+      .map(v => v.replace(/['"`]/g, '').trim().toLowerCase())
+      .filter(Boolean)
+      .forEach(v => keywords.add(v));
+  }
+
+  const lines = content.split('\n');
+  for (const line of lines) {
+    const lower = line.toLowerCase();
+    if (!lower.includes('trigger') && !lower.includes('keyword')) continue;
+    const tokens = line
+      .split(/[:,]/)
+      .slice(1)
+      .join(' ')
+      .split(/\s+/)
+      .map(v =>
+        v
+          .replace(/[^a-z0-9-]/gi, '')
+          .trim()
+          .toLowerCase()
+      )
+      .filter(v => v.length >= 3);
+    for (const token of tokens) keywords.add(token);
+  }
+  return [...keywords];
+}
+
+function detectRoutingCollisions(content, targetAgent) {
+  const agent = typeof targetAgent === 'string' ? targetAgent.trim() : '';
+  if (!agent) return [];
+  const keywords = extractTriggerKeywords(content);
+  const collisions = [];
+  for (const keyword of keywords) {
+    const mapped = ROUTING_TABLE[keyword];
+    if (mapped && mapped !== agent) {
+      collisions.push({ keyword, mappedTo: mapped });
+    }
+  }
+  return collisions;
+}
+
 /**
  * Validate artifact content quality
  * @param {string} content - File content
  * @param {string} artifactType - Type of artifact
  * @returns {{ valid: boolean, issues: Array }}
  */
-function validateQuality(content, artifactType) {
+function validateQuality(content, artifactType, options = {}) {
   const issues = [];
 
   // Check for placeholders
@@ -204,6 +252,20 @@ function validateQuality(content, artifactType) {
       type: 'too_short',
       message: `Content too short (${content.length} chars, minimum 500)`,
     });
+  }
+
+  if (artifactType === 'agent') {
+    const collisions = detectRoutingCollisions(content, options.targetAgent);
+    if (collisions.length > 0) {
+      issues.push({
+        type: 'routing_collision',
+        message: `Routing keyword collision(s): ${collisions
+          .slice(0, 5)
+          .map(c => `${c.keyword}->${c.mappedTo}`)
+          .join(', ')}`,
+        details: collisions.slice(0, 10),
+      });
+    }
   }
 
   return {
@@ -270,7 +332,8 @@ async function main() {
     }
 
     // Validate quality
-    const validation = validateQuality(content, artifactType);
+    const targetAgent = state?.currentEvolution?.name || null;
+    const validation = validateQuality(content, artifactType, { targetAgent });
 
     // If quality is good, allow
     if (validation.valid) {
@@ -321,6 +384,8 @@ module.exports = {
   isInVerifyPhase,
   findPlaceholders,
   findMissingSections,
+  extractTriggerKeywords,
+  detectRoutingCollisions,
   validateQuality,
   getEvolutionState,
   PLACEHOLDER_PATTERNS,

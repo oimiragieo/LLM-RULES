@@ -1,12 +1,13 @@
 ---
 description: Prevents agent from getting stuck on complex inline shell commands
-globs: ["**/*"]
+globs: ['**/*']
 alwaysApply: true
 ---
 
 # Shell Command Safety Rules
 
 ## Problem
+
 Complex `node -e` one-liners operating on large files (e.g., multi-MB JSON) frequently timeout or get killed in PowerShell, causing the agent to appear "stuck."
 
 ## Rules

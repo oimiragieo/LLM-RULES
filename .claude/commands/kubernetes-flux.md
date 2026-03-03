@@ -1,5 +1,5 @@
 ---
-description: "Kubernetes cluster management and troubleshooting. Query pods, deployments, services, logs, and events. Supports context switching, scaling, and rollout management. Use for Kubernetes debugging, monitoring, and operations."
+description: 'Kubernetes cluster management and troubleshooting. Query pods, deployments, services, logs, and events. Supports context switching, scaling, and rollout management. Use for Kubernetes debugging, monitoring, and operations.'
 disable-model-invocation: true
 ---
 

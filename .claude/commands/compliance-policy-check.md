@@ -1,5 +1,5 @@
 ---
-description: "Validate planned changes against local framework rules and policy guardrails before implementation or creation."
+description: 'Validate planned changes against local framework rules and policy guardrails before implementation or creation.'
 disable-model-invocation: true
 ---
 

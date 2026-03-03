@@ -1,5 +1,5 @@
 ---
-description: "State management expert including MobX, Redux, Zustand, and reactive patterns"
+description: 'State management expert including MobX, Redux, Zustand, and reactive patterns'
 disable-model-invocation: true
 ---
 

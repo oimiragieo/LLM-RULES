@@ -1,5 +1,5 @@
 ---
-description: "UI component library expert including Chakra, Material UI, and Mantine"
+description: 'UI component library expert including Chakra, Material UI, and Mantine'
 disable-model-invocation: true
 ---
 

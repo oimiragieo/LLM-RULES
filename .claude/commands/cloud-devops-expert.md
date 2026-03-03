@@ -1,5 +1,5 @@
 ---
-description: "Cloud and DevOps expert including AWS, GCP, Azure, and Terraform"
+description: 'Cloud and DevOps expert including AWS, GCP, Azure, and Terraform'
 disable-model-invocation: true
 ---
 

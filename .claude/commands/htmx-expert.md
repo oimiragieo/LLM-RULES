@@ -1,5 +1,5 @@
 ---
-description: "HTMX expert including hypermedia patterns, Django/Flask integration"
+description: 'HTMX expert including hypermedia patterns, Django/Flask integration'
 disable-model-invocation: true
 ---
 

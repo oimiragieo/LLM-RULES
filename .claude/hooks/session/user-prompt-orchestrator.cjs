@@ -82,6 +82,10 @@ function main() {
     process.exit(0);
     return;
   }
+  if (!stdinData.trim()) {
+    process.exit(0);
+    return;
+  }
 
   try {
     ensureBootstrapReadTargets();

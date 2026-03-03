@@ -1,5 +1,5 @@
 ---
-description: "Medusa rules and best practices. These rules should be used when building applications with Medusa."
+description: 'Medusa rules and best practices. These rules should be used when building applications with Medusa.'
 disable-model-invocation: true
 ---
 

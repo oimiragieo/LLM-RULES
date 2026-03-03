@@ -1,5 +1,5 @@
 ---
-description: "Specifies the preferred syntax for asynchronous operations using async/await and onMount for component initialization. This results in cleaner and more readable asynchronous code."
+description: 'Specifies the preferred syntax for asynchronous operations using async/await and onMount for component initialization. This results in cleaner and more readable asynchronous code.'
 disable-model-invocation: true
 ---
 

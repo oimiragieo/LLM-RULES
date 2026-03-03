@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 
 const TELEMETRY_FILE = path.join(
@@ -54,7 +55,7 @@ function main() {
   for (const line of content.split('\n')) {
     if (!line.trim()) continue;
     try {
-      const data = JSON.parse(line);
+      const data = safeParseJSON(line, null, null, null);
       totalQueries++;
       totalOriginal += Math.max(0, data.originalTokens || 0);
       totalCompressed += Math.max(0, data.compressedTokens || 0);

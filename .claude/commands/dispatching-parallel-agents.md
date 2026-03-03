@@ -1,5 +1,5 @@
 ---
-description: "Concurrent investigation of independent failures. Use when multiple unrelated issues need parallel resolution."
+description: 'Concurrent investigation of independent failures. Use when multiple unrelated issues need parallel resolution.'
 disable-model-invocation: true
 ---
 

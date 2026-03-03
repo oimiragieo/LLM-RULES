@@ -1,5 +1,5 @@
 ---
-description: "Enforces the use of Zod for form validation throughout the project."
+description: 'Enforces the use of Zod for form validation throughout the project.'
 disable-model-invocation: true
 ---
 

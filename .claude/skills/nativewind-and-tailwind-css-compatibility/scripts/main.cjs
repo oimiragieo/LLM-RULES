@@ -40,4 +40,6 @@ if (options.list) {
   process.exit(0);
 }
 
-console.log('nativewind-and-tailwind-css-compatibility skill loaded. Use with Claude for code review.');
+console.log(
+  'nativewind-and-tailwind-css-compatibility skill loaded. Use with Claude for code review.'
+);

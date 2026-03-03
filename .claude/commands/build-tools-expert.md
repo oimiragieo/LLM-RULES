@@ -1,5 +1,5 @@
 ---
-description: "Build tools expert including Vite, Webpack, and bundler configuration"
+description: 'Build tools expert including Vite, Webpack, and bundler configuration'
 disable-model-invocation: true
 ---
 

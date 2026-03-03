@@ -24,13 +24,23 @@ function extractHookPaths(settings) {
     for (const hookGroup of hookList) {
       const innerHooks = Array.isArray(hookGroup.hooks) ? hookGroup.hooks : [hookGroup];
       for (const hook of innerHooks) {
-        const hookCmd = hook.command || hook.path || '';
-        const match = hookCmd.match(/\.claude\/[^\s]+\.cjs/);
-        if (match) paths.push(match[0]);
+        if (typeof hook.path === 'string' && hook.path.endsWith('.cjs')) {
+          paths.push(hook.path);
+          continue;
+        }
+        const hookCmd = hook.command || '';
+        const matches = hookCmd.match(
+          /(?:[A-Za-z]:[\\/][^\s'"]+\.cjs|\.claude[\\/][^\s'"]+\.cjs|\.?[\\/][^\s'"]+\.cjs)/g
+        );
+        if (matches) paths.push(...matches);
       }
     }
   }
   return paths;
+}
+
+function resolveHookPath(projectRoot, hookPath) {
+  return path.isAbsolute(hookPath) ? hookPath : path.join(projectRoot, hookPath);
 }
 
 /**
@@ -143,7 +153,7 @@ async function validateForwardRefs(projectRoot, options = {}) {
 
       if (settings.hooks) {
         for (const hookRelPath of extractHookPaths(settings)) {
-          const hookAbsPath = path.join(projectRoot, hookRelPath);
+          const hookAbsPath = resolveHookPath(projectRoot, hookRelPath);
           if (!fs.existsSync(hookAbsPath)) {
             errors.push({
               layer: 'forward-ref',
@@ -233,7 +243,7 @@ async function validateBackwardRefs(projectRoot, options = {}) {
 
       if (settings.hooks) {
         for (const hookRelPath of extractHookPaths(settings)) {
-          if (fs.existsSync(path.join(projectRoot, hookRelPath))) {
+          if (fs.existsSync(resolveHookPath(projectRoot, hookRelPath))) {
             warnings.push({
               layer: 'backward-ref',
               artifact: hookRelPath,

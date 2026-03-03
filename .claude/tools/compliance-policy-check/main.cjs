@@ -4,7 +4,7 @@
 /**
  * compliance-policy-check tool - CLI entry point
  * Wraps the compliance-policy-check skill for CLI invocation.
- * 
+ *
  * Usage: node .claude/tools/compliance-policy-check/main.cjs [--json] [--help]
  */
 
@@ -13,15 +13,15 @@ const path = require('path');
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help')) {
     console.log('Usage: node ' + path.basename(__filename) + ' [--json] [--help]');
     console.log('Wraps the compliance-policy-check skill for CLI invocation.');
     process.exit(0);
   }
-  
+
   const jsonMode = args.includes('--json');
-  
+
   // Load skill definition
   const skillPath = path.resolve(__dirname, '../../skills/compliance-policy-check/SKILL.md');
   if (!fs.existsSync(skillPath)) {
@@ -29,14 +29,15 @@ function main() {
     console.error(jsonMode ? JSON.stringify(err) : err.error);
     process.exit(1);
   }
-  
+
   const result = {
     skill: 'compliance-policy-check',
     status: 'ready',
     skillPath: skillPath,
-    message: 'Skill compliance-policy-check is available. Invoke via Skill({ skill: "compliance-policy-check" }) in agent context.'
+    message:
+      'Skill compliance-policy-check is available. Invoke via Skill({ skill: "compliance-policy-check" }) in agent context.',
   };
-  
+
   if (jsonMode) {
     console.log(JSON.stringify(result, null, 2));
   } else {

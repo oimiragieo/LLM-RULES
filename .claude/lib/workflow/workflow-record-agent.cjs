@@ -14,7 +14,6 @@
 
 const path = require('path');
 const { getActiveWorkflow } = require('./workflow-state-manager.cjs');
-const { withWorkflowStateLock } = require('./workflow-state-lock.cjs');
 const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 
 /**
@@ -67,45 +66,37 @@ function recordAgentForCurrentPhaseIfActive(projectRoot, agentInfo, stateFilePat
       return;
     }
 
-    // Perform the write under the workflow state lock for concurrency safety
-    withWorkflowStateLock(async () => {
-      const { readWorkflowStateFile } = require('../runtime/state-contracts.cjs');
-      const state = readWorkflowStateFile(stateFilePath, null);
-      if (!state || state.workflowId !== workflowId) {
-        return;
-      }
+    const { readWorkflowStateFile } = require('../runtime/state-contracts.cjs');
+    const state = readWorkflowStateFile(stateFilePath, null);
+    if (!state || state.workflowId !== workflowId) {
+      return;
+    }
 
-      const phase = state.phases[currentPhase];
-      if (!phase) {
-        return;
-      }
+    const phase = state.phases[currentPhase];
+    if (!phase) {
+      return;
+    }
 
-      // Only set if not already recorded (avoid clobbering existing entry)
-      if (phase.agents && phase.agents[agentType]) {
-        return;
-      }
+    // Only set if not already recorded (avoid clobbering existing entry)
+    if (phase.agents && phase.agents[agentType]) {
+      return;
+    }
 
-      if (!phase.agents) {
-        phase.agents = {};
-      }
+    if (!phase.agents) {
+      phase.agents = {};
+    }
 
-      phase.agents[agentType] = {
-        taskId,
-        status: 'in_progress',
-        startedAt: new Date().toISOString(),
-        completedAt: null,
-        artifacts: [],
-        metadata: {},
-      };
+    phase.agents[agentType] = {
+      taskId,
+      status: 'in_progress',
+      startedAt: new Date().toISOString(),
+      completedAt: null,
+      artifacts: [],
+      metadata: {},
+    };
 
-      state.updatedAt = new Date().toISOString();
-      atomicWriteJSONSync(stateFilePath, state);
-    }).catch(err => {
-      // Swallow: workflow state errors must never block agent spawning
-      if (process.env.WORKFLOW_RECORD_AGENT_DEBUG === 'true') {
-        process.stderr.write(`[workflow-record-agent] lock error: ${err && err.message}\n`);
-      }
-    });
+    state.updatedAt = new Date().toISOString();
+    atomicWriteJSONSync(stateFilePath, state);
   } catch (err) {
     // Swallow all errors — bad workflow state must never block spawning
     if (process.env.WORKFLOW_RECORD_AGENT_DEBUG === 'true') {

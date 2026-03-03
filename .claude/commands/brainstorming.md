@@ -1,5 +1,5 @@
 ---
-description: "Socratic design refinement before implementation — challenges assumptions, surfaces alternatives, identifies risks before code is written"
+description: 'Socratic design refinement before implementation — challenges assumptions, surfaces alternatives, identifies risks before code is written'
 disable-model-invocation: true
 ---
 

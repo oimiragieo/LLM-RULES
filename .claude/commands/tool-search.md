@@ -1,5 +1,5 @@
 ---
-description: "Semantic tool search with embeddings for scalable tool discovery. Enables on-demand tool loading to reduce context usage by 90%+ for large tool libraries."
+description: 'Semantic tool search with embeddings for scalable tool discovery. Enables on-demand tool loading to reduce context usage by 90%+ for large tool libraries.'
 disable-model-invocation: true
 ---
 

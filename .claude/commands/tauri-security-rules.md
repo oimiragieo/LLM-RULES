@@ -1,5 +1,5 @@
 ---
-description: "Security-related rules for Tauri application development."
+description: 'Security-related rules for Tauri application development.'
 disable-model-invocation: true
 ---
 

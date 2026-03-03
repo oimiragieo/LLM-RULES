@@ -1,5 +1,5 @@
 ---
-description: "Rules for using Drizzle ORM within the src/lib/db directory. Ensures consistent data modeling and database interactions."
+description: 'Rules for using Drizzle ORM within the src/lib/db directory. Ensures consistent data modeling and database interactions.'
 disable-model-invocation: true
 ---
 

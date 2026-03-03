@@ -1,0 +1,38 @@
+{
+  "updatedAt": "2026-03-02T07:37:01.268Z",
+  "agents": {
+    "developer": {
+      "successCount": 93,
+      "failureCount": 0,
+      "consecutiveFailures": 0,
+      "successRate": 1,
+      "averageCompletionMs": null,
+      "totalCompletionMs": 0,
+      "completionSamples": 0,
+      "lastOutcome": "success",
+      "lastUpdatedAt": "2026-03-02T07:37:01.268Z"
+    },
+    "qa": {
+      "successCount": 13,
+      "failureCount": 0,
+      "consecutiveFailures": 0,
+      "successRate": 1,
+      "averageCompletionMs": null,
+      "totalCompletionMs": 0,
+      "completionSamples": 0,
+      "lastOutcome": "success",
+      "lastUpdatedAt": "2026-03-02T07:00:46.062Z"
+    },
+    "planner": {
+      "successCount": 17,
+      "failureCount": 0,
+      "consecutiveFailures": 0,
+      "successRate": 1,
+      "averageCompletionMs": null,
+      "totalCompletionMs": 0,
+      "completionSamples": 0,
+      "lastOutcome": "success",
+      "lastUpdatedAt": "2026-03-02T07:37:00.629Z"
+    }
+  }
+}

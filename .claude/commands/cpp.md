@@ -1,5 +1,5 @@
 ---
-description: "C++ coding standards and best practices."
+description: 'C++ coding standards and best practices.'
 disable-model-invocation: true
 ---
 

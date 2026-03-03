@@ -1,5 +1,5 @@
 ---
-description: "Process and act on code review feedback. Use when receiving review results."
+description: 'Process and act on code review feedback. Use when receiving review results.'
 disable-model-invocation: true
 ---
 

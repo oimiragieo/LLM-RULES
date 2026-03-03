@@ -1,8 +1,10 @@
 {
   "discovered_files": {
     "tests/fixtures/code-indexing/hook-test/src/main.js": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-03-01T05:31:52.333Z"
+      "last_accessed": "2026-03-02T07:00:08.941Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "discovered_at": "2026-02-11",
@@ -328,5 +330,5 @@
       "last_accessed": "2026-03-02T01:24:39.486Z"
     }
   },
-  "last_updated": "2026-03-02T01:24:39.486Z"
+  "last_updated": "2026-03-02T07:00:08.941Z"
 }

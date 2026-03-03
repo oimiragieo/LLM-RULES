@@ -13,6 +13,60 @@ function createReflectionEventHandlers({
   sessionEndEvents,
   minOutputLength,
 }) {
+  function classifyFailureType({ errorText = '', toolName = '', exitCode = null } = {}) {
+    const text = String(errorText || '').toLowerCase();
+
+    if (
+      text.includes('context window') ||
+      text.includes('context length') ||
+      text.includes('too many tokens') ||
+      text.includes('token limit')
+    ) {
+      return 'context_overflow';
+    }
+
+    if (
+      text.includes('timed out') ||
+      text.includes('timeout') ||
+      text.includes('etimedout') ||
+      text.includes('deadline exceeded')
+    ) {
+      return 'timeout';
+    }
+
+    if (
+      text.includes('cannot find module') ||
+      text.includes('module not found') ||
+      text.includes('dependency') ||
+      text.includes('enoent') ||
+      text.includes('no such file or directory')
+    ) {
+      return 'dependency_error';
+    }
+
+    if (
+      text.includes('hallucination') ||
+      text.includes('hallucinated') ||
+      text.includes('fabricated')
+    ) {
+      return 'hallucination';
+    }
+
+    if (
+      text.includes('scope creep') ||
+      text.includes('out of scope') ||
+      text.includes('not requested')
+    ) {
+      return 'scope_drift';
+    }
+
+    if (toolName === 'Bash' && typeof exitCode === 'number' && exitCode !== 0) {
+      return 'tool_failure';
+    }
+
+    return 'tool_failure';
+  }
+
   function normalizeTaskUpdateFields(toolInput) {
     const parsed = parseAndValidateTaskUpdate(toolInput, {
       requireTaskId: false,
@@ -181,6 +235,19 @@ function createReflectionEventHandlers({
       sessionId: process.env.CLAUDE_SESSION_ID,
       traceId: process.env.TRACE_ID,
     };
+
+    const errorText = [
+      entry.error,
+      typeof toolResult.stderr === 'string' ? toolResult.stderr : '',
+      typeof toolInput.command === 'string' ? toolInput.command : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+    entry.failureType = classifyFailureType({
+      errorText,
+      toolName,
+      exitCode: entry.exitCode,
+    });
 
     return entry;
   }

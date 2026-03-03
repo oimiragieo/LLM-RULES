@@ -95,7 +95,7 @@ const PROJECT_ROOT = resolveProjectRoot();
  * These are checked BEFORE path resolution to catch encoded attacks
  */
 const PATH_TRAVERSAL_PATTERNS = [
-  /\.\./, // Basic traversal
+  /(?:^|[\\/])\.\.(?:[\\/]|$)/, // Basic traversal segment only
   /%2e%2e/i, // URL-encoded traversal
   /%252e%252e/i, // Double URL-encoded
   /\x00/, // Null bytes

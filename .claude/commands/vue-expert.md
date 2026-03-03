@@ -1,5 +1,5 @@
 ---
-description: "Vue.js ecosystem expert including Vue 3, Composition API, Nuxt, and Pinia"
+description: 'Vue.js ecosystem expert including Vue 3, Composition API, Nuxt, and Pinia'
 disable-model-invocation: true
 ---
 

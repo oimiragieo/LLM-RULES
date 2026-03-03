@@ -1,5 +1,5 @@
 ---
-description: "Validate whether a proposed new artifact is feasible in the current stack before creator workflows run."
+description: 'Validate whether a proposed new artifact is feasible in the current stack before creator workflows run.'
 disable-model-invocation: true
 ---
 

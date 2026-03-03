@@ -1,5 +1,5 @@
 ---
-description: "How agents discover and use skills. Use to understand skill invocation protocol."
+description: 'How agents discover and use skills. Use to understand skill invocation protocol.'
 disable-model-invocation: true
 ---
 

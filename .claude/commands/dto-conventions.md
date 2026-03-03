@@ -1,5 +1,5 @@
 ---
-description: "Sets standards for Data Transfer Objects (DTOs), typically records, including parameter validation in compact canonical constructors."
+description: 'Sets standards for Data Transfer Objects (DTOs), typically records, including parameter validation in compact canonical constructors.'
 disable-model-invocation: true
 ---
 

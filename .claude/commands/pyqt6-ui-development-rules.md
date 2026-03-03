@@ -1,5 +1,5 @@
 ---
-description: "Specific rules for PyQt6 based UI development focusing on UI/UX excellence and performance."
+description: 'Specific rules for PyQt6 based UI development focusing on UI/UX excellence and performance.'
 disable-model-invocation: true
 ---
 

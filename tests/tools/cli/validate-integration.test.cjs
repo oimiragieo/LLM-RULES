@@ -20,35 +20,35 @@ const { parseMarkdownTable } = require('../../../.claude/lib/utils/markdown-tabl
 
 describe('validate-integration', () => {
   describe('validateArtifact', () => {
-    it('returns exitCode 2 for non-existent file', () => {
-      const result = validateArtifact('/non/existent/file.md');
+    it('returns exitCode 2 for non-existent file', async () => {
+      const result = await validateArtifact('/non/existent/file.md');
       assert.strictEqual(result.exitCode, 2);
       assert.strictEqual(result.passed, false);
     });
 
-    it('validates known agent artifact', () => {
+    it('validates known agent artifact', async () => {
       // Test with developer.md which should exist and be integrated
-      const result = validateArtifact('.claude/agents/core/developer.md');
+      const result = await validateArtifact('.claude/agents/core/developer.md');
 
       // Should not be exit code 2 (file not found)
       assert.notStrictEqual(result.exitCode, 2);
       assert.ok('passed' in result);
     });
 
-    it('validates known skill artifact', () => {
-      const result = validateArtifact('.claude/skills/tdd/SKILL.md');
+    it('validates known skill artifact', async () => {
+      const result = await validateArtifact('.claude/skills/tdd/SKILL.md');
       assert.notStrictEqual(result.exitCode, 2);
       assert.ok('passed' in result);
     });
 
-    it('validates known workflow artifact', () => {
-      const result = validateArtifact('.claude/workflows/core/router-decision.md');
+    it('validates known workflow artifact', async () => {
+      const result = await validateArtifact('.claude/workflows/core/router-decision.md');
       assert.notStrictEqual(result.exitCode, 2);
       assert.ok('passed' in result);
     });
 
-    it('validates known hook artifact', () => {
-      const result = validateArtifact('.claude/hooks/routing/routing-guard.cjs');
+    it('validates known hook artifact', async () => {
+      const result = await validateArtifact('.claude/hooks/routing/routing-guard.cjs');
       assert.notStrictEqual(result.exitCode, 2);
       assert.ok('passed' in result);
     });

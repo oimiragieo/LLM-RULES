@@ -7,10 +7,10 @@
 
 const implementationPath = './lancedb-client-impl.cjs';
 
-// Tests reload this module by deleting only this path from require.cache.
-// Also clearing the implementation keeps reload behavior equivalent to the
-// pre-refactor single-file module.
-delete require.cache[require.resolve(implementationPath)];
+// Optional reload mode for tests that explicitly require a fresh implementation.
+if (process.env.LANCEDB_CLIENT_FORCE_RELOAD === 'true') {
+  delete require.cache[require.resolve(implementationPath)];
+}
 
 const { MemoryVectorStore } = require(implementationPath);
 

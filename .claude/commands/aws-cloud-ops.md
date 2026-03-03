@@ -1,5 +1,5 @@
 ---
-description: "AWS cloud operations for CloudWatch, S3, Lambda, EC2, and IAM"
+description: 'AWS cloud operations for CloudWatch, S3, Lambda, EC2, and IAM'
 disable-model-invocation: true
 ---
 

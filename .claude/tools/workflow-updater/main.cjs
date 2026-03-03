@@ -4,7 +4,7 @@
 /**
  * workflow-updater tool - CLI entry point
  * Wraps the workflow-updater skill for CLI invocation.
- * 
+ *
  * Usage: node .claude/tools/workflow-updater/main.cjs [--json] [--help]
  */
 
@@ -13,15 +13,15 @@ const path = require('path');
 
 function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help')) {
     console.log('Usage: node ' + path.basename(__filename) + ' [--json] [--help]');
     console.log('Wraps the workflow-updater skill for CLI invocation.');
     process.exit(0);
   }
-  
+
   const jsonMode = args.includes('--json');
-  
+
   // Load skill definition
   const skillPath = path.resolve(__dirname, '../../skills/workflow-updater/SKILL.md');
   if (!fs.existsSync(skillPath)) {
@@ -29,14 +29,15 @@ function main() {
     console.error(jsonMode ? JSON.stringify(err) : err.error);
     process.exit(1);
   }
-  
+
   const result = {
     skill: 'workflow-updater',
     status: 'ready',
     skillPath: skillPath,
-    message: 'Skill workflow-updater is available. Invoke via Skill({ skill: "workflow-updater" }) in agent context.'
+    message:
+      'Skill workflow-updater is available. Invoke via Skill({ skill: "workflow-updater" }) in agent context.',
   };
-  
+
   if (jsonMode) {
     console.log(JSON.stringify(result, null, 2));
   } else {

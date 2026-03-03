@@ -9,7 +9,10 @@
 function preExecute(context) {
   // Validate skill invocation context
   if (!context || typeof context !== 'object') {
-    return { allow: true, message: 'paraglide-js-internationalization-i18n: no context to validate' };
+    return {
+      allow: true,
+      message: 'paraglide-js-internationalization-i18n: no context to validate',
+    };
   }
   return { allow: true };
 }

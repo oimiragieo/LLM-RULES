@@ -28,7 +28,7 @@ const DANGEROUS_PATTERNS = {
     { pattern: /\brm\s+-rf\b/gi, description: 'shell injection: rm -rf command' },
     { pattern: /\bsudo\b/gi, description: 'shell injection: sudo command' },
     {
-      pattern: /`[^`\n]*(\$\(|\brm\b|\bsudo\b|\bcurl\b|\bwget\b|\bsh\b|\bbash\b)[^`\n]*`/gi,
+      pattern: /`[^`\n]+`/g,
       description: 'shell injection: backtick execution',
     },
     { pattern: /\$\([^)]+\)/g, description: 'shell injection: $() execution' },
@@ -74,10 +74,7 @@ const DANGEROUS_PATTERNS = {
   code: [
     { pattern: new RegExp('\\beval\\s*\\(', 'gi'), description: 'code execution: ev' + 'al()' },
     { pattern: /\bFunction\s*\(/gi, description: 'code execution: Function()' },
-    {
-      pattern: /\brequire\s*\(\s*['"`](child_process|vm|worker_threads)['"`]\s*\)/gi,
-      description: 'code execution: require()',
-    },
+    { pattern: /\brequire\s*\(/gi, description: 'code execution: require()' },
     { pattern: /\bimport\s*\(/gi, description: 'code execution: import()' },
     // Only flag actual manipulation (assignment or JSON key), not documentation mentioning __proto__
     {
@@ -164,6 +161,7 @@ function sanitizeMemoryContent(content) {
   if (!content) {
     return {
       safe: true,
+      sanitized: '',
       original: '',
       detections: [],
     };
@@ -198,6 +196,7 @@ function sanitizeMemoryContent(content) {
 
   return {
     safe: detections.length === 0,
+    sanitized: contentStr,
     original: contentStr, // Renamed from 'sanitized': this is the original content, not a cleaned version
     detections,
   };

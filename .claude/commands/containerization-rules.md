@@ -1,5 +1,5 @@
 ---
-description: "Rules for creating and maintaining Dockerfiles."
+description: 'Rules for creating and maintaining Dockerfiles.'
 disable-model-invocation: true
 ---
 

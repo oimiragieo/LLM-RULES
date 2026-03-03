@@ -1,5 +1,5 @@
 ---
-description: "CSS and styling expert including Tailwind, CSS-in-JS, and responsive design"
+description: 'CSS and styling expert including Tailwind, CSS-in-JS, and responsive design'
 disable-model-invocation: true
 ---
 

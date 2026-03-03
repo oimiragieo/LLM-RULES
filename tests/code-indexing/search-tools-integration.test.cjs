@@ -14,10 +14,11 @@ const assert = require('node:assert');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Keep tests lightweight and deterministic: avoid loading transformer models / large caches.
-process.env.CODE_INDEX_EMBEDDER ??= 'mock';
-process.env.CODE_INDEX_EMBEDDINGS ??= 'off';
-process.env.MEMORY_SEMANTIC_SEARCH ??= 'off';
+// Keep tests lightweight and deterministic: force-disable semantic model workers.
+process.env.CODE_INDEX_EMBEDDER = 'mock';
+process.env.CODE_INDEX_EMBEDDINGS = 'off';
+process.env.MEMORY_SEMANTIC_SEARCH = 'off';
+process.env.LANCEDB_EMBEDDING_MODE = 'test';
 
 const { IndexManager } = require('../../.claude/lib/code-indexing/index-manager.cjs');
 const { MerkleTree } = require('../../.claude/lib/code-indexing/merkle-tree.cjs');
@@ -46,6 +47,8 @@ describe('Search tools and indexing E2E', () => {
 
   after(async () => {
     if (manager) await manager.close();
+    const { MemoryVectorStore } = require('../../.claude/lib/memory/lancedb-client-impl.cjs');
+    MemoryVectorStore.clearSharedStores();
     await fs.rm(FIXTURES_DIR, { recursive: true, force: true }).catch(() => {});
   });
 

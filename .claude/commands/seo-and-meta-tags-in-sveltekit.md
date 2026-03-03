@@ -1,5 +1,5 @@
 ---
-description: "Provides SEO and Meta Tags guidelines in SvelteKit."
+description: 'Provides SEO and Meta Tags guidelines in SvelteKit.'
 disable-model-invocation: true
 ---
 
