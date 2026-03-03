@@ -55,6 +55,28 @@ function main() {
       process.stderr.write(
         `[session-end-memory-promotion] Promoted session ${sessionId} STM -> MTM: ${result.mtmPath.replace(/\\/g, '/')}\n`
       );
+
+      // Trigger background LanceDB re-index of the promoted MTM file.
+      // Skip when running in BM25-only mode (no embedding vectors to update).
+      if (process.env.LANCEDB_EMBEDDING_MODE !== 'off') {
+        const { spawn } = require('child_process');
+        const child = spawn(
+          'node',
+          [
+            path.join(PROJECT_ROOT, '.claude', 'lib', 'code-indexing', 'generate-embeddings.cjs'),
+            '--memory-only',
+          ],
+          { stdio: 'ignore', detached: true, shell: false }
+        );
+        child.unref();
+        process.stderr.write(
+          '[session-end-memory-promotion] Triggered background memory re-index.\n'
+        );
+      } else {
+        process.stderr.write(
+          '[session-end-memory-promotion] Skipping re-index (LANCEDB_EMBEDDING_MODE=off).\n'
+        );
+      }
     } else {
       const reason = (result && result.error) || 'unknown error';
       process.stderr.write(
