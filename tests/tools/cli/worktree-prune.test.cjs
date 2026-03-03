@@ -30,9 +30,19 @@ describe('worktree-prune CLI', () => {
       timeout: 15000,
       shell: false,
     });
-    assert.equal(result.status, 0, `Expected exit 0 but got ${result.status}. stderr: ${result.stderr}`);
-    assert.ok(result.stdout.includes('Worktree Pruner'), `stdout should include "Worktree Pruner". Got: ${result.stdout}`);
-    assert.ok(result.stdout.includes('Summary:'), `stdout should include "Summary:". Got: ${result.stdout}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0 but got ${result.status}. stderr: ${result.stderr}`
+    );
+    assert.ok(
+      result.stdout.includes('Worktree Pruner'),
+      `stdout should include "Worktree Pruner". Got: ${result.stdout}`
+    );
+    assert.ok(
+      result.stdout.includes('Summary:'),
+      `stdout should include "Summary:". Got: ${result.stdout}`
+    );
   });
 
   it('prints [DRY RUN] notice in dry-run mode', () => {

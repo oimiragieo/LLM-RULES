@@ -5,10 +5,12 @@ const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 const fs = require('fs');
 const path = require('path');
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 const SKILLS_ROOT_REL = path.join('.claude', 'skills');
 const TOOLS_ROOT_REL = path.join('.claude', 'tools');
 const WORKFLOWS_ROOT_REL = path.join('.claude', 'workflows');
-const REPORTS_ROOT_REL = path.join('.claude', 'context', 'reports');
+const REPORTS_ROOT_REL = path.join('.claude', 'context', 'reports', 'backend');
 
 const CRITERIA = [
   { key: 'skill.md', weight: 5 },
@@ -115,7 +117,15 @@ function evaluateManifest(skillDir) {
 
   let manifest;
   try {
-    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const raw = fs.readFileSync(manifestPath, 'utf8');
+    manifest = safeParseJSON(raw, null);
+    if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+      return {
+        present: true,
+        valid: false,
+        errors: ['JSON parse error: invalid or empty manifest'],
+      };
+    }
   } catch (err) {
     return {
       present: true,
@@ -329,7 +339,14 @@ function parseArgs(argv) {
     } else if (argv[i] === '--require-perfect') {
       args.requirePerfect = true;
     } else if (argv[i] === '--min-score' && argv[i + 1] !== undefined) {
-      args.minScore = Number(argv[i + 1]);
+      const parsed = Number(argv[i + 1]);
+      if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+        process.stderr.write(
+          `ERROR: --min-score must be a finite number between 0 and 100. Got: ${argv[i + 1]}\n`
+        );
+        process.exit(1);
+      }
+      args.minScore = parsed;
       i += 1;
     }
   }
@@ -340,6 +357,9 @@ function parseArgs(argv) {
 function checkGate(summary, requirePerfect = false, results = [], minScore = null) {
   if (minScore !== null && minScore !== undefined) {
     const threshold = Number(minScore);
+    if (!Number.isFinite(threshold)) {
+      return { ok: false, reason: 'invalid_min_score', failing: [] };
+    }
     const failing = (results || []).filter(r => r.score < threshold).map(r => r.skill);
     if (failing.length > 0) {
       return { ok: false, reason: 'below_min_score', failing };

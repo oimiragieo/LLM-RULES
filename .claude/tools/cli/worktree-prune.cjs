@@ -23,6 +23,7 @@
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { detectDefaultBranch } = require('../../lib/worktree/worktree-utils.cjs');
 
 // Resolve project root from __dirname: .claude/tools/cli/ → three levels up
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -96,8 +97,11 @@ function listWorktrees() {
 function isStale(branch) {
   if (!branch) return false;
   try {
+    const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
     // SE-02: shell: false, array args
-    const uniqueCommits = git(['log', '--oneline', `main..${branch}`], { throws: false });
+    const uniqueCommits = git(['log', '--oneline', `${defaultBranch}..${branch}`], {
+      throws: false,
+    });
     if (uniqueCommits === null) return false;
     return uniqueCommits.trim().length === 0;
   } catch (_err) {
@@ -165,7 +169,8 @@ function main() {
 
   // Step 3: Filter to only worktrees under .claude/worktrees/
   // SE-01: normalize WORKTREES_DIR for path matching
-  const normalizedWorktreesDir = WORKTREES_DIR.replace(/\\/g, '/');
+  // Ensure trailing slash to prevent false prefix matches (e.g. worktrees-backup/)
+  const normalizedWorktreesDir = WORKTREES_DIR.replace(/\\/g, '/').replace(/\/?$/, '/');
   const subagentWorktrees = allWorktrees.filter(wt => {
     return (
       wt.worktreePath.startsWith(normalizedWorktreesDir) &&

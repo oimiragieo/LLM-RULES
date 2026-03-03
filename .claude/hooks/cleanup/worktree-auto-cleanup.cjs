@@ -24,6 +24,8 @@
 
 const { execFileSync } = require('child_process');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+const { detectDefaultBranch } = require('../../lib/worktree/worktree-utils.cjs');
 
 // Resolve project root: .claude/hooks/cleanup/ → three levels up
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -105,13 +107,14 @@ function listWorktrees() {
 }
 
 /**
- * Check if a branch is stale (fully merged into main).
+ * Check if a branch is stale (fully merged into the default branch).
  * @param {string} branch
  * @returns {boolean}
  */
 function isStale(branch) {
   if (!branch) return false;
-  const result = git(['log', '--oneline', `main..${branch}`]);
+  const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
+  const result = git(['log', '--oneline', `${defaultBranch}..${branch}`]);
   if (result === null) return false;
   return result.trim().length === 0;
 }
@@ -125,8 +128,11 @@ function run() {
   try {
     const raw = readStdin();
     if (!raw || !raw.trim()) return; // no input — no-op
-    // SE-02: safe parse to avoid prototype pollution
-    const parsed = JSON.parse(raw);
+    // SE-02: safeParseJSON to avoid prototype pollution
+    const parsed = safeParseJSON(raw, null);
+    if (!parsed || typeof parsed !== 'object') {
+      return; // malformed stdin — no-op
+    }
     input = parsed;
   } catch (_parseErr) {
     // malformed stdin — exit 0, no-op

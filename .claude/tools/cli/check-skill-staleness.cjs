@@ -144,8 +144,11 @@ function checkStaleness(skillDir) {
     };
   }
 
-  // Calculate age
-  const lastDate = new Date(lastResearchDate);
+  // Calculate age — append 'T00:00:00Z' to force UTC parsing so the result
+  // does not shift by +/- 1 day depending on the local timezone offset.
+  const lastDate = new Date(
+    lastResearchDate.length === 10 ? lastResearchDate + 'T00:00:00Z' : lastResearchDate
+  );
   if (isNaN(lastDate.getTime())) {
     return {
       isStale: false,
