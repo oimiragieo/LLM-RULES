@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — Worktree Lifecycle Management (2026-03-03)
+
+- **New CLI tool** `.claude/tools/cli/worktree-prune.cjs`: Prunes stale git worktrees under `.claude/worktrees/`. Detects staleness via `git log --oneline main..<branch>` (zero unique commits = stale). Supports `--dry-run` and `--force` flags. Uses `shell: false` for all exec calls (SE-02) and normalizes paths (SE-01). Available as `pnpm worktree:prune` and `pnpm worktree:prune:dry`.
+- **New PostToolUse hook** `.claude/hooks/cleanup/worktree-auto-cleanup.cjs`: Automatically cleans stale worktrees when an agent calls `TaskUpdate({ status: 'completed' })`. Reads stdin JSON protocol, guards on `TaskUpdate` + `completed` status, runs `git worktree prune`, then removes any merged worktrees. Always exits 0 (SE-03). Registered in `settings.json` with 10 s timeout.
+- **New test file** `tests/tools/cli/worktree-prune.test.cjs`: Three-case test suite using `node:test` + `spawnSync`. Verifies: (1) dry-run exits 0 and prints `Worktree Pruner`, (2) `[DRY RUN]` notice present, (3) summary line matches `/Summary: \d+ removed, \d+ skipped, \d+ errors/`.
+- **package.json scripts**: `worktree:prune` and `worktree:prune:dry` added to npm scripts.
+- **Pruned 9 stale worktrees** from `.claude/worktrees/` in this session using the new CLI tool.
+
 ### Removed — Lint Remediation and Root Cleanup (2026-03-02)
 
 - Deleted 8 orphaned temp/diagnostic files from project root: `_tmp_check_skill_mismatch.cjs`, `lint_issues.txt`, `test_all_output.txt`, `find-stale-modules.cjs`, `update-lancedb-pool.cjs`, `.validate_registry.cjs`, `.verify_settings.cjs`, `.verify_settings.js`

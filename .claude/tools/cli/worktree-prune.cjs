@@ -1,0 +1,243 @@
+#!/usr/bin/env node
+'use strict';
+/**
+ * worktree-prune.cjs
+ *
+ * CLI maintenance tool: prune stale git worktrees under .claude/worktrees/.
+ *
+ * A worktree is considered stale when its branch has been merged into main
+ * (i.e. `git log --oneline main..branch` returns zero lines).
+ *
+ * Usage:
+ *   node .claude/tools/cli/worktree-prune.cjs [--dry-run] [--force]
+ *
+ * Flags:
+ *   --dry-run   Print what would be removed without executing.
+ *   --force     Pass --force to `git worktree remove` (default: true).
+ *
+ * Exit codes:
+ *   0  All stale worktrees removed (or dry-run succeeded)
+ *   1  One or more errors occurred during removal
+ */
+
+const { execFileSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+// Resolve project root from __dirname: .claude/tools/cli/ → three levels up
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
+const WORKTREES_DIR = path.join(PROJECT_ROOT, '.claude', 'worktrees');
+
+// --- CLI flag parsing ---
+const args = process.argv.slice(2);
+const DRY_RUN = args.includes('--dry-run');
+const FORCE = !args.includes('--no-force'); // force by default
+
+/**
+ * Run a git command with shell: false.
+ *
+ * @param {string[]} gitArgs - Arguments for git.
+ * @param {object} [opts]
+ * @param {string} [opts.cwd] - Working directory (defaults to PROJECT_ROOT).
+ * @param {boolean} [opts.throws] - If false, return null on error instead of throwing.
+ * @returns {string|null}
+ */
+function git(gitArgs, { cwd = PROJECT_ROOT, throws = true } = {}) {
+  try {
+    // SE-02: shell: false with array args prevents injection
+    const result = execFileSync('git', gitArgs, {
+      cwd,
+      shell: false,
+      encoding: 'utf8',
+      timeout: 15000,
+    });
+    return result;
+  } catch (err) {
+    if (throws) throw err;
+    return null;
+  }
+}
+
+/**
+ * Parse `git worktree list --porcelain` output into an array of worktree objects.
+ *
+ * Each object has: { worktreePath, HEAD, branch }
+ *
+ * @returns {{ worktreePath: string, HEAD: string, branch: string }[]}
+ */
+function listWorktrees() {
+  const raw = git(['worktree', 'list', '--porcelain']);
+  const blocks = raw.trim().split(/\n\n+/);
+  const worktrees = [];
+  for (const block of blocks) {
+    const lines = block.split('\n');
+    const wtLine = lines.find(l => l.startsWith('worktree '));
+    const headLine = lines.find(l => l.startsWith('HEAD '));
+    const branchLine = lines.find(l => l.startsWith('branch '));
+    if (!wtLine) continue;
+    // SE-01: normalize backslashes
+    const worktreePath = wtLine.slice('worktree '.length).trim().replace(/\\/g, '/');
+    const HEAD = headLine ? headLine.slice('HEAD '.length).trim() : '';
+    const branch = branchLine ? branchLine.slice('branch refs/heads/'.length).trim() : '';
+    worktrees.push({ worktreePath, HEAD, branch });
+  }
+  return worktrees;
+}
+
+/**
+ * Determine whether a worktree branch is stale (fully merged into main).
+ *
+ * A branch is stale when `git log --oneline main..<branch>` returns zero lines.
+ * This means no commits exist in the branch that are not already in main.
+ *
+ * @param {string} branch - Branch name (short, e.g. "worktree-agent-abc123")
+ * @returns {boolean}
+ */
+function isStale(branch) {
+  if (!branch) return false;
+  try {
+    // SE-02: shell: false, array args
+    const uniqueCommits = git(['log', '--oneline', `main..${branch}`], { throws: false });
+    if (uniqueCommits === null) return false;
+    return uniqueCommits.trim().length === 0;
+  } catch (_err) {
+    return false;
+  }
+}
+
+/**
+ * Remove a git worktree by path.
+ *
+ * @param {string} worktreePath - Forward-slash normalized path.
+ * @returns {{ success: boolean, error: string|null }}
+ */
+function removeWorktree(worktreePath) {
+  // Convert back to OS-native path for git command
+  const nativePath = worktreePath.replace(/\//g, path.sep);
+  const removeArgs = ['worktree', 'remove', nativePath];
+  if (FORCE) removeArgs.push('--force');
+  try {
+    git(removeArgs);
+    return { success: true, error: null };
+  } catch (err) {
+    return { success: false, error: err.message || String(err) };
+  }
+}
+
+/**
+ * Run git worktree prune as a backstop cleanup.
+ */
+function pruneGitWorktrees() {
+  try {
+    git(['worktree', 'prune']);
+  } catch (_err) {
+    // non-fatal backstop
+  }
+}
+
+// ---- Main ----------------------------------------------------------------
+
+function main() {
+  console.log('Worktree Pruner');
+  console.log('================');
+  if (DRY_RUN) console.log('[DRY RUN] No changes will be made.\n');
+
+  // Step 1: Check if worktrees directory exists
+  if (!fs.existsSync(WORKTREES_DIR)) {
+    console.log('No .claude/worktrees/ directory found. Nothing to prune.');
+    console.log('\nSummary: 0 removed, 0 skipped, 0 errors');
+    process.exit(0);
+  }
+
+  // Step 2: Get all active worktrees from git
+  let allWorktrees;
+  try {
+    allWorktrees = listWorktrees();
+  } catch (err) {
+    console.error('ERROR: Failed to list worktrees:', err.message);
+    process.exit(1);
+  }
+
+  // SE-01: normalize cwd for comparison
+  const normalizedCwd = process.cwd().replace(/\\/g, '/');
+  // SE-01: normalize project root for comparison
+  const normalizedProjectRoot = PROJECT_ROOT.replace(/\\/g, '/');
+
+  // Step 3: Filter to only worktrees under .claude/worktrees/
+  // SE-01: normalize WORKTREES_DIR for path matching
+  const normalizedWorktreesDir = WORKTREES_DIR.replace(/\\/g, '/');
+  const subagentWorktrees = allWorktrees.filter(wt => {
+    return (
+      wt.worktreePath.startsWith(normalizedWorktreesDir) &&
+      wt.worktreePath !== normalizedProjectRoot
+    );
+  });
+
+  if (subagentWorktrees.length === 0) {
+    console.log('No subagent worktrees found under .claude/worktrees/.');
+    console.log('\nRunning git worktree prune as backstop...');
+    pruneGitWorktrees();
+    console.log('\nSummary: 0 removed, 0 skipped, 0 errors');
+    process.exit(0);
+  }
+
+  console.log(`Found ${subagentWorktrees.length} subagent worktree(s):\n`);
+
+  let removed = 0;
+  let skipped = 0;
+  let errors = 0;
+
+  // Step 4: For each worktree, check staleness and optionally remove
+  for (const wt of subagentWorktrees) {
+    const { worktreePath, branch } = wt;
+    const shortPath = worktreePath.replace(normalizedProjectRoot + '/', '');
+
+    // Safety guard: never remove the current session's worktree
+    if (normalizedCwd.startsWith(worktreePath)) {
+      console.log(`  SKIP  ${shortPath}  (current session worktree)`);
+      skipped++;
+      continue;
+    }
+
+    // Safety guard: never remove a worktree with no branch info
+    if (!branch) {
+      console.log(`  SKIP  ${shortPath}  (no branch info — run git worktree prune manually)`);
+      skipped++;
+      continue;
+    }
+
+    const stale = isStale(branch);
+    if (!stale) {
+      console.log(`  KEEP  ${shortPath}  [${branch}]  (has unique commits not in main)`);
+      skipped++;
+      continue;
+    }
+
+    if (DRY_RUN) {
+      console.log(`  [DRY-RUN] REMOVE  ${shortPath}  [${branch}]`);
+      removed++;
+    } else {
+      const result = removeWorktree(worktreePath);
+      if (result.success) {
+        console.log(`  REMOVED  ${shortPath}  [${branch}]`);
+        removed++;
+      } else {
+        console.log(`  ERROR    ${shortPath}  [${branch}]  — ${result.error}`);
+        errors++;
+      }
+    }
+  }
+
+  // Step 5: Run git worktree prune as backstop
+  if (!DRY_RUN) {
+    console.log('\nRunning git worktree prune as backstop...');
+    pruneGitWorktrees();
+  }
+
+  // Step 6: Print summary
+  console.log(`\nSummary: ${removed} removed, ${skipped} skipped, ${errors} errors`);
+
+  process.exit(errors > 0 ? 1 : 0);
+}
+
+main();

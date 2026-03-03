@@ -175,7 +175,9 @@
     "validate:status-check-governance": "node --test tests/workflows/required-status-checks-config.test.cjs tests/workflows/branch-protection-audit.test.cjs",
     "validate:agent-memory": "node .claude/tools/validation/validate-agent-memory.cjs",
     "skills:update-stale": "node .claude/tools/cli/run-skill-updates.cjs",
-    "validate:skill-consistency": "node .claude/tools/cli/validate-skill-agent-consistency.mjs"
+    "validate:skill-consistency": "node .claude/tools/cli/validate-skill-agent-consistency.mjs",
+    "worktree:prune": "node .claude/tools/cli/worktree-prune.cjs",
+    "worktree:prune:dry": "node .claude/tools/cli/worktree-prune.cjs --dry-run"
   },
   "keywords": [
     "claude",
