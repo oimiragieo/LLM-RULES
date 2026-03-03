@@ -420,6 +420,40 @@ async function main() {
       assembled += state.platformAwarenessRule;
     }
 
+    // WORKTREE CONTEXT INJECTION
+    // When the spawned agent runs in an isolated git worktree, inject the
+    // working environment block so the agent knows its isolation context.
+    // This block is added ONLY when:
+    //   1. The agent definition declares isolation: worktree, AND
+    //   2. The AGENT_WORKTREE_PATH env var is set (injected by the worktree spawn machinery)
+    const worktreePath = process.env.AGENT_WORKTREE_PATH || '';
+    if (agentType && worktreePath) {
+      // Load the agent registry to check isolation setting
+      let agentIsolation = null;
+      try {
+        const agentRegistry = libRequire(path.join('routing', 'agent-registry-loader.cjs'));
+        const agentConfig = agentRegistry.getAgent(agentType);
+        if (agentConfig) {
+          agentIsolation = agentConfig.isolation || null;
+        }
+      } catch (_regErr) {
+        // Agent registry lookup is best-effort; skip injection if unavailable
+      }
+
+      if (agentIsolation === 'worktree') {
+        const worktreeBranch = process.env.AGENT_WORKTREE_BRANCH || 'unknown';
+        // SE-01: normalize backslashes in path for display
+        const displayPath = worktreePath.replace(/\\/g, '/');
+        assembled +=
+          '\n\n## Your Working Environment\n' +
+          'You are running in an ISOLATED GIT WORKTREE.\n' +
+          `Working directory: ${displayPath}\n` +
+          `Branch: ${worktreeBranch}\n` +
+          'DO NOT write files outside your working directory.\n' +
+          'All file paths must use this working directory as the root.\n';
+      }
+    }
+
     assembled = normalizeTaskIdReferences(assembled, explicitTaskId);
     assembled = ensureMandatorySpawnPreflight(assembled, explicitTaskId);
     assembled = enforcePromptBudget(assembled);

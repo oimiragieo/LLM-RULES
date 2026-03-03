@@ -27,6 +27,9 @@ const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { detectDefaultBranch } = require('../../lib/worktree/worktree-utils.cjs');
 
+// TTL for worktree branches (default 24 hours). Override with WORKTREE_TTL_MS env var.
+const WORKTREE_TTL_MS = parseInt(process.env.WORKTREE_TTL_MS ?? '86400000', 10);
+
 // Resolve project root: .claude/hooks/cleanup/ → three levels up
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
@@ -107,12 +110,46 @@ function listWorktrees() {
 }
 
 /**
- * Check if a branch is stale (fully merged into the default branch).
+ * Extract the creation timestamp from a TTL-stamped branch name.
+ *
+ * Convention: `worktree-agent-<id>-<unixTimestampMs>`
+ * Example:    `worktree-agent-aa75a292-1741000000000`
+ *
+ * @param {string} branch - Branch name to inspect.
+ * @returns {number|null} Unix timestamp in milliseconds, or null if not TTL-stamped.
+ */
+function extractBranchTimestamp(branch) {
+  if (!branch) return null;
+  // Match trailing numeric segment (13-digit unix ms timestamp)
+  const match = branch.match(/-(\d{13})$/);
+  if (!match) return null;
+  const ts = parseInt(match[1], 10);
+  if (Number.isNaN(ts)) return null;
+  return ts;
+}
+
+/**
+ * Check if a branch has exceeded the TTL (time-to-live) limit.
+ *
+ * @param {string} branch - Branch name (may contain embedded timestamp).
+ * @returns {boolean} true if TTL-stamped branch is older than WORKTREE_TTL_MS.
+ */
+function isTTLExpired(branch) {
+  const ts = extractBranchTimestamp(branch);
+  if (ts === null) return false; // no timestamp → not TTL-managed
+  return Date.now() - ts > WORKTREE_TTL_MS;
+}
+
+/**
+ * Check if a branch is stale (fully merged into the default branch) OR TTL-expired.
  * @param {string} branch
  * @returns {boolean}
  */
 function isStale(branch) {
   if (!branch) return false;
+  // TTL-based check: branch older than WORKTREE_TTL_MS is always stale
+  if (isTTLExpired(branch)) return true;
+  // Merge-based check: zero unique commits compared to default branch
   const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
   const result = git(['log', '--oneline', `${defaultBranch}..${branch}`]);
   if (result === null) return false;

@@ -25,6 +25,9 @@ const fs = require('fs');
 const path = require('path');
 const { detectDefaultBranch } = require('../../lib/worktree/worktree-utils.cjs');
 
+// TTL for worktree branches (default 24 hours). Override with WORKTREE_TTL_MS env var.
+const WORKTREE_TTL_MS = parseInt(process.env.WORKTREE_TTL_MS ?? '86400000', 10);
+
 // Resolve project root from __dirname: .claude/tools/cli/ → three levels up
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const WORKTREES_DIR = path.join(PROJECT_ROOT, '.claude', 'worktrees');
@@ -86,16 +89,50 @@ function listWorktrees() {
 }
 
 /**
- * Determine whether a worktree branch is stale (fully merged into main).
+ * Extract the creation timestamp from a TTL-stamped branch name.
  *
- * A branch is stale when `git log --oneline main..<branch>` returns zero lines.
- * This means no commits exist in the branch that are not already in main.
+ * Convention: `worktree-agent-<id>-<unixTimestampMs>`
+ * Example:    `worktree-agent-aa75a292-1741000000000`
  *
- * @param {string} branch - Branch name (short, e.g. "worktree-agent-abc123")
+ * @param {string} branch - Branch name to inspect.
+ * @returns {number|null} Unix timestamp in milliseconds, or null if not TTL-stamped.
+ */
+function extractBranchTimestamp(branch) {
+  if (!branch) return null;
+  // Match trailing 13-digit unix ms timestamp
+  const match = branch.match(/-(\d{13})$/);
+  if (!match) return null;
+  const ts = parseInt(match[1], 10);
+  if (Number.isNaN(ts)) return null;
+  return ts;
+}
+
+/**
+ * Check if a TTL-stamped branch has exceeded its time-to-live.
+ *
+ * @param {string} branch - Branch name (may contain embedded timestamp).
+ * @returns {boolean} true if TTL-stamped and older than WORKTREE_TTL_MS.
+ */
+function isTTLExpired(branch) {
+  const ts = extractBranchTimestamp(branch);
+  if (ts === null) return false; // not TTL-managed
+  return Date.now() - ts > WORKTREE_TTL_MS;
+}
+
+/**
+ * Determine whether a worktree branch is stale (fully merged into main OR TTL-expired).
+ *
+ * A branch is stale when:
+ *   - It has an embedded timestamp and is older than WORKTREE_TTL_MS, OR
+ *   - `git log --oneline main..<branch>` returns zero lines (fully merged)
+ *
+ * @param {string} branch - Branch name (short, e.g. "worktree-agent-abc123-1741000000000")
  * @returns {boolean}
  */
 function isStale(branch) {
   if (!branch) return false;
+  // TTL-based check: branch older than WORKTREE_TTL_MS is always stale
+  if (isTTLExpired(branch)) return true;
   try {
     const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
     // SE-02: shell: false, array args
@@ -211,6 +248,7 @@ function main() {
       continue;
     }
 
+    const ttlExpired = isTTLExpired(branch);
     const stale = isStale(branch);
     if (!stale) {
       console.log(`  KEEP  ${shortPath}  [${branch}]  (has unique commits not in main)`);
@@ -218,13 +256,15 @@ function main() {
       continue;
     }
 
+    const staleReason = ttlExpired ? 'TTL expired' : 'merged into main';
+
     if (DRY_RUN) {
-      console.log(`  [DRY-RUN] REMOVE  ${shortPath}  [${branch}]`);
+      console.log(`  [DRY-RUN] REMOVE  ${shortPath}  [${branch}]  (${staleReason})`);
       removed++;
     } else {
       const result = removeWorktree(worktreePath);
       if (result.success) {
-        console.log(`  REMOVED  ${shortPath}  [${branch}]`);
+        console.log(`  REMOVED  ${shortPath}  [${branch}]  (${staleReason})`);
         removed++;
       } else {
         console.log(`  ERROR    ${shortPath}  [${branch}]  — ${result.error}`);

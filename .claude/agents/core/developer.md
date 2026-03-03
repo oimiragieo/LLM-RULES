@@ -355,10 +355,19 @@ TaskUpdate({
 
 // 3. Do the work...
 
-// 4. Mark complete when done
+// 4. Mark complete — ALWAYS include full metadata (see MANDATORY INLINE SUMMARY below)
 TaskUpdate({
   taskId: '3',
   status: 'completed',
+  metadata: {
+    summary: 'Added shouldUseWorktree() guard with 5 hard-stop checks + TTL cleanup',
+    filesModified: [
+      '.claude/lib/worktree/worktree-utils.cjs',
+      '.claude/hooks/cleanup/worktree-auto-cleanup.cjs',
+    ],
+    worktreePath: process.env.AGENT_WORKTREE_PATH || process.cwd(),
+    completedAt: new Date().toISOString(),
+  },
 });
 
 // 5. Check for next available task
@@ -371,6 +380,58 @@ TaskList();
 - Work survives context resets
 - No duplicate work (tasks have owners)
 - Dependencies are respected (blocked tasks can't start)
+
+## MANDATORY: Inline Summary Before TaskUpdate(completed)
+
+Before calling `TaskUpdate({ status: 'completed' })`, you MUST output an inline summary block. This is non-negotiable — omitting it causes silent task drops.
+
+```
+IMPLEMENTATION_RESULT:
+  summary: <one-line description of what was accomplished>
+  filesModified:
+    - path/to/file1.cjs
+    - path/to/file2.md
+  testsRun: <test command used>
+  testResult: <PASS/FAIL + counts>
+  worktreePath: <AGENT_WORKTREE_PATH or cwd>
+```
+
+The `pre-completion-validation.cjs` hook reads this block to validate completion. Without it, the hook may reject the TaskUpdate.
+
+## Worktree Operation (Isolation Mode)
+
+When running with `isolation: worktree`, this agent is spawned in an isolated git worktree under `.claude/worktrees/`. The spawn prompt will contain a "Your Working Environment" block with the exact `worktreePath` and `branch`.
+
+**Key behaviors in worktree isolation mode:**
+
+- All file writes are scoped to the worktree directory — do NOT write outside it
+- The worktree is auto-cleaned up by `worktree-auto-cleanup.cjs` when the task completes
+- Include `worktreePath` in every `TaskUpdate(completed)` metadata payload
+- Branch name format: `worktree-agent-<id>-<timestamp>` (TTL-encoded, cleaned after 24h)
+- If the working environment block is absent from your spawn prompt, check `process.env.AGENT_WORKTREE_PATH`
+
+**Inline summary in worktree mode:**
+
+Always include `worktreePath` in the `IMPLEMENTATION_RESULT` block so the Router can correlate your work with the correct worktree.
+
+## Fallback Mode (No Worktree Available)
+
+When `shouldUseWorktree()` returns `{ ok: false, reason }` (e.g., disk full, nested worktree, shallow clone, detached HEAD, Windows path too long), the system falls back to running in the main repository working tree.
+
+**Fallback behaviors:**
+
+- Agent runs without isolation — all changes go directly to the main working tree
+- The spawn prompt will NOT contain a "Your Working Environment" block
+- `process.env.AGENT_WORKTREE_PATH` will be empty
+- File changes are visible immediately in `git status` of the main repo
+- Increased risk of interference with other concurrent agents — prefer sequential execution
+
+**When you detect fallback mode:**
+
+1. Confirm with `process.env.AGENT_WORKTREE_PATH` — if empty, you are in fallback mode
+2. Proceed with extra care: avoid parallel file writes, stage changes frequently
+3. Include `worktreePath: 'main-worktree (fallback)'` in your `TaskUpdate` metadata
+4. The `shouldUseWorktree()` utility in `.claude/lib/worktree/worktree-utils.cjs` documents the exact checks
 
 ## Skill Invocation Protocol (MANDATORY)
 
