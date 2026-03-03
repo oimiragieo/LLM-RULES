@@ -337,6 +337,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/lifecycle/session-end-memory-promotion.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/reflection/unified-reflection-handler.cjs"
           },
           {

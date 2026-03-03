@@ -29,6 +29,12 @@ Use this template for all non-orchestrator agents.
 ## Memory Tooling Protocol (Required)
 
 - Read/write memory via framework tooling, not ad-hoc file edits.
+- **MemoryRecord Usage** (when available in your tool list):
+  - Record a **pattern** when you discover a reusable coding technique or best practice
+  - Record a **gotcha** when you hit an unexpected behavior, edge case, or platform quirk
+  - Record a **discovery** when you find important codebase facts (file purposes, config relationships, API contracts)
+  - Keep entries under 200 chars, include the `area` field (e.g., "memory", "hooks", "routing")
+  - Do NOT record trivial observations; only record insights that would save another agent >5 minutes
 - Before final `TaskUpdate(completed)`, include memory evidence in completion text:
   - files changed (for `resolutionEvidence.files`)
   - validation commands run (for `resolutionEvidence.commands`)

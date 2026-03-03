@@ -38,7 +38,7 @@
           "elixir_project": ["elixir-expert"],
           "medusa_project": ["medusa"]
         },
-        "always": ["verification-before-completion", "github-mcp"]
+        "always": ["verification-before-completion", "github-mcp", "memory-search"]
       },
       "planner": {
         "primary": [
@@ -53,7 +53,7 @@
           "large_project": ["brainstorming", "diagram-generator"],
           "multi_agent": ["dispatching-parallel-agents", "swarm-coordination"]
         },
-        "always": ["task-management-protocol"]
+        "always": ["task-management-protocol", "memory-search"]
       },
       "architect": {
         "primary": [
@@ -73,7 +73,7 @@
           "distributed_system": ["swarm-coordination", "consensus-voting"],
           "api_design": ["api-development-expert", "graphql-expert"]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
       },
       "qa": {
         "primary": ["tdd", "test-generator"],
@@ -90,7 +90,7 @@
           "browser_testing": ["chrome-browser", "webapp-testing"],
           "feature_flags": ["feature-flag-management"]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
       },
       "technical-writer": {
         "primary": ["doc-generator", "writing-skills", "readme"],
@@ -426,7 +426,8 @@
         "always": [
           "verification-before-completion",
           "receiving-code-review",
-          "requesting-code-review"
+          "requesting-code-review",
+          "memory-search"
         ]
       },
       "security-architect": {
@@ -443,7 +444,7 @@
           "web3_project": ["web3-expert", "building-secure-contracts"],
           "reverse_engineering": ["binary-analysis-patterns", "memory-forensics"]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
       },
       "devops": {
         "primary": ["docker-compose", "terraform-infra", "k8s-manifest-generator"],
@@ -471,7 +472,8 @@
           "database-architect",
           "consensus-voting",
           "context-compressor",
-          "kubernetes-flux"
+          "kubernetes-flux",
+          "memory-search"
         ]
       },
       "devops-troubleshooter": {
@@ -486,7 +488,7 @@
           "cloud_issue": ["aws-cloud-ops", "gcloud-cli"],
           "database_issue": ["database-expert"]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
       },
       "incident-responder": {
         "primary": ["incident-runbook-templates", "on-call-handoff-patterns", "postmortem-writing"],
@@ -600,7 +602,7 @@
         "primary": ["code-quality-expert", "code-analyzer", "code-style-validator"],
         "secondary": ["tdd", "debugging"],
         "contextual": {},
-        "always": ["verification-before-completion"]
+        "always": ["verification-before-completion", "memory-search"]
       },
       "researcher": {
         "primary": ["research-synthesis", "insight-extraction"],

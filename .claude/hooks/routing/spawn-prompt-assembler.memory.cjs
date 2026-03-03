@@ -27,6 +27,14 @@ const INJECTION_PATTERNS = [
 ];
 
 /**
+ * Maximum character budget for memory injection sections per spawn prompt.
+ * Prevents unbounded memory content from bloating agent spawn prompts.
+ * Override with MEMORY_INJECTION_MAX_CHARS env var.
+ * Default: 3600 chars (~900 tokens at 4 chars/token).
+ */
+const MEMORY_INJECTION_MAX_CHARS = parseInt(process.env.MEMORY_INJECTION_MAX_CHARS || '3600', 10);
+
+/**
  * Sanitize memory content by removing lines that match known prompt injection
  * patterns. Logs a warning to stderr when content is filtered.
  *
@@ -86,7 +94,16 @@ function appendSemanticMatches(prompt, results) {
     );
   }
 
-  const section = capTierBSection(lines.join('\n').trimEnd() + '\n');
+  const maxChars = parseInt(
+    process.env.MEMORY_INJECTION_MAX_CHARS || String(MEMORY_INJECTION_MAX_CHARS),
+    10
+  );
+  // Reserve 3 chars for surrounding newlines: '\n\n' prefix + '\n' suffix
+  const sectionBudget = Math.max(0, maxChars - 3);
+  let section = capTierBSection(lines.join('\n').trimEnd() + '\n');
+  if (section.length > sectionBudget) {
+    section = section.slice(0, sectionBudget);
+  }
   const marker = '## Memory Context (Auto-Loaded)';
   if (prompt.includes(marker)) {
     const nextHeaderIdx = prompt.indexOf('\n## ', prompt.indexOf(marker) + marker.length);
@@ -124,7 +141,16 @@ function appendQueryMemories(prompt, results) {
     );
   }
 
-  const section = capTierBSection(lines.join('\n').trimEnd() + '\n');
+  const maxChars = parseInt(
+    process.env.MEMORY_INJECTION_MAX_CHARS || String(MEMORY_INJECTION_MAX_CHARS),
+    10
+  );
+  // Reserve 3 chars for surrounding newlines: '\n\n' prefix + '\n' suffix
+  const sectionBudget = Math.max(0, maxChars - 3);
+  let section = capTierBSection(lines.join('\n').trimEnd() + '\n');
+  if (section.length > sectionBudget) {
+    section = section.slice(0, sectionBudget);
+  }
   const marker = '## Memory Context (Auto-Loaded)';
   if (prompt.includes(marker)) {
     const nextHeaderIdx = prompt.indexOf('\n## ', prompt.indexOf(marker) + marker.length);
@@ -279,7 +305,8 @@ async function runIntentAnalysis({ memoryManager, query, threshold, projectRoot 
 async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, stderrLog) {
   if (process.env.SPAWN_PROMPT_SEMANTIC_MEMORY === 'off') return assembled;
   const memoryQueryEnabled =
-    process.env.SPAWN_PROMPT_MEMORY_QUERY === '1' || process.env.SPAWN_PROMPT_MEMORY_QUERY === 'on';
+    process.env.SPAWN_PROMPT_MEMORY_QUERY !== '0' &&
+    process.env.SPAWN_PROMPT_MEMORY_QUERY !== 'off';
   const memoryManager = libRequire(path.join('memory', 'memory-manager.cjs'));
   const query =
     (toolInput.description && String(toolInput.description).trim()) ||
@@ -288,7 +315,7 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
     path.join('memory', 'memory-constants.cjs')
   );
   const intentAnalysisEnabled =
-    process.env.MEMORY_INTENT_ANALYSIS === '1' || process.env.MEMORY_INTENT_ANALYSIS === 'on';
+    process.env.MEMORY_INTENT_ANALYSIS !== '0' && process.env.MEMORY_INTENT_ANALYSIS !== 'off';
   let results = [];
 
   if (intentAnalysisEnabled) {

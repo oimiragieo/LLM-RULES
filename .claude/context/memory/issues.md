@@ -1,45 +1,3 @@
-## ISSUE: Worktree Accumulation on Missing TaskUpdate (2026-03-03 REFLECTION)
-
-**Status**: OPEN — P2 (reliability risk)
-
-**Observed**: `worktree-auto-cleanup.cjs` fires on `PostToolUse(TaskUpdate)` only. If an agent exits without calling TaskUpdate (error, timeout, context limit), its worktree persists indefinitely. 10 stale worktrees accumulated in one session.
-
-**Root Cause**: Single cleanup trigger path (TaskUpdate) does not cover agent exit-without-update cases.
-
-**Fix Path** (P2):
-
-1. Add secondary cleanup: session-end hook or periodic cron in `.claude/tools/cli/`
-2. Add worktree age-based pruning (> 2 hours old, task completed/deleted = safe to prune)
-3. Reference: `worktree-auto-cleanup.cjs` in `.claude/hooks/`
-
-**Evidence**:
-
-- Gap log entry: task-36, 2026-03-03T08:30:00Z
-- Reflection report: `.claude/context/reports/reflections/reflection-batch-session-2-2026-03-03.md`
-
----
-
-## ISSUE: Multi-LLM Council False Positives — No Code Cross-Check Step (2026-03-03 REFLECTION)
-
-**Status**: OPEN — P2 (quality risk)
-
-**Observed**: Codex model flagged `bytesRead` as "potentially undeclared" (finding H2) in council review. Architect investigation revealed bytesRead IS declared at line 43 of the file. The false positive added noise and required architect time to resolve.
-
-**Root Cause**: Multi-LLM council workflow does not include a mandatory cross-check step: "before including a HIGH/CRITICAL finding in the report, verify the claim against the actual code."
-
-**Fix Path** (P2):
-
-1. Add to council workflow instructions: "For each HIGH or CRITICAL finding, run a targeted code search to verify before including. Example: `rg -F 'variable_name' path/to/file` to confirm declared/undeclared status."
-2. Add confidence level field to council findings (LOW/MEDIUM/HIGH confidence in the finding itself)
-3. Reference: ADR-2026-03-03-108 (resolved this false positive)
-
-**Evidence**:
-
-- decisions.md: ADR-2026-03-03-108
-- Reflection report: `.claude/context/reports/reflections/reflection-batch-session-2-2026-03-03.md`
-
----
-
 ## ISSUE: Router Gap-Detection False Positives from File-Level Checks (2026-02-22 REFLECTION)
 
 **Status**: OPEN — P2 (reliability risk, not blocking)
@@ -221,6 +179,62 @@ node -e "const s=require('./.claude/settings.json'); const h=JSON.stringify(s); 
 **Prevention**: Add to skill-creator post-creation checklist and proactive-audit S-05 check (pnpm validate:skills).
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.563Z
+
+---
+
+## ISSUE: Missing TaskUpdate Summary Metadata — Recurring Pattern (2026-03-03) — P1
+
+**Status**: OPEN — P1 (RECURRING — count 11+ instances confirmed in failure-recurrence.json)
+
+**Observed**: Reflection IDs for tasks 2 and 3 (2026-03-03T17:48:52Z and 2026-03-03T17:51:49Z) completed with "Task X completed without summary metadata". This is the 11th+ instance of this failure class recorded in failure-recurrence.json.
+
+**Root Cause**: Agents call `TaskUpdate({ status: 'completed' })` without including `metadata.summary`. The `pre-completion-validation.cjs` hook either is not enforcing the summary field or is set to warn mode rather than block mode.
+
+**Impact**:
+
+- Reflection agent cannot score or extract learnings from the task (dataQuality: "insufficient")
+- Audit trail has gaps — completed work is invisible to post-session analysis
+- Learning system degrades as pattern recurrence increases
+
+**Recurrence**: Confirmed in reflection-log.jsonl entries for tasks 33, 34, 35 (2026-03-03 session) and tasks 2, 3 (2026-03-03 session 2). Total: 11+ confirmed instances across multiple sessions.
+
+**Fix Path (P1)**:
+
+1. Set `pre-completion-validation.cjs` to block mode (not warn) for missing summary
+2. Add summary field to all spawn prompt templates as MANDATORY contract
+3. Add summary validation to `universal-agent-spawn.md` TaskUpdate warning box
+4. Consider adding `SUMMARY_REQUIRED_ENFORCEMENT=block` env var
+
+**Evidence**:
+
+- `.claude/context/runtime/failure-recurrence.json`: failureClass "missing_task_summary", count 11+
+- Reflection IDs: `task_completion:2026-03-03T17:51:49.164Z:3`, `task_completion:2026-03-03T17:48:52.471Z:2`
+- reflection-log.jsonl entries: tasks 33, 34, 35 (2026-03-03)
+
+---
+
+## ISSUE: Developer Agent Misrouted for Worktree Infrastructure Tasks (2026-03-03) — P1
+
+**Status**: OPEN — P1 (confirmed routing pattern causing repeated retries)
+
+**Observed**: Task 36 assigned worktree-prune.cjs and worktree-auto-cleanup.cjs creation to the developer agent. Developer has `isolation: worktree` in its frontmatter. Zero files were created (all writes went into the isolated clone and were discarded). Router rerouted to devops agent which succeeded.
+
+**Root Cause**: Router did not check for "worktree", "hook creation", or "infrastructure file write" keywords before routing to developer. Developer's worktree isolation is incompatible with tasks that require writing to the parent repo's `.claude/` framework paths.
+
+**Routing Rule to Enforce**:
+
+- worktree lifecycle (create, prune, cleanup) → `devops`
+- hook creation (`.claude/hooks/**`) → `devops` or `hook-creator` skill
+- CLI tool creation (`.claude/tools/cli/`) → `devops` or `developer` with explicit `isolation: none` override
+- git operations (commit, push, branch management) → `devops`
+
+**Evidence**:
+
+- session-gap-log.jsonl: 2026-03-03T08:30:00Z, type: "retry", taskId: "task-36", agent: "developer"
+- Reflection report: `.claude/context/reports/reflections/reflection-batch-session-2-2026-03-03.md`
+- Memory pattern added: "Worktree Infrastructure Tasks Must Route to Devops Agent" (learnings.md 2026-03-03)
+
+**Priority**: P1 — each misrouting wastes one full agent spawn and retry cycle
 
 - [ROUTING WARN] Developer task routing warned. Keyword "simplify the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-02-24T04:47:20.582Z
 
@@ -1428,3 +1442,15 @@ node -e "const s=require('./.claude/settings.json'); const h=JSON.stringify(s); 
 - [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-03-03T06:59:47.940Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-03T06:59:47.962Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-03T19:58:08.338Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-03T19:58:08.353Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-03T19:58:08.370Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-03T20:00:30.538Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-03T20:00:30.554Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-03T20:00:30.570Z

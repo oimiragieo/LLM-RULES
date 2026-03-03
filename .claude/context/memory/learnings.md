@@ -111,6 +111,29 @@
 
 - Updated workflow: missing-workflow-xyz (2026-03-02)
 
+## Pattern: Worktree Infrastructure Tasks Must Route to Devops Agent (2026-03-03)
+
+**Pattern**: Worktree lifecycle management, hook creation, and framework infrastructure tasks MUST be routed to `devops` agent, NOT `developer` agent. Developer agent has `isolation: worktree` in frontmatter. When tasked with creating `.claude/` framework files under worktree isolation, all writes go into the isolated clone and are discarded at cleanup — resulting in zero visible changes after TaskUpdate(completed).
+
+**Evidence**:
+
+- Task 36 (2026-03-03): developer agent assigned worktree-prune.cjs + worktree-auto-cleanup.cjs creation → zero files created → rerouted to devops → succeeded
+- Gap log entry: `.claude/context/runtime/session-gap-log.jsonl` (2026-03-03T08:30:00Z, type: retry)
+- Pattern also seen: code-reviewer with worktree isolation fails to see unstaged changes (Task ~1 same day)
+
+**Routing Rule**:
+
+- Tasks writing to `.claude/hooks/`, `.claude/tools/cli/`, `.claude/skills/` framework paths → use `devops` agent
+- Tasks managing git worktree lifecycle (create, prune, cleanup) → use `devops` agent
+- Tasks requiring git operations (commit, push, branch management) → use `devops` agent
+- Developer agent safe for: code implementation in project source files, feature development, bug fixes
+
+**Why Devops**: devops agent has no worktree isolation in frontmatter — it operates on the main working tree. All file writes are immediately visible to the parent repo.
+
+**Detection for Router**: If developer agent completes a task involving `.claude/` path writes, run `git diff --name-only HEAD` to verify changes exist. If no diff, re-spawn to devops.
+
+---
+
 - Created new agent: aso-specialist (2026-03-03)
 
 - Created new agent: marketing-strategist (2026-03-03)
