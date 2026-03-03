@@ -278,6 +278,9 @@ test-fixtures/
 # Archive folder (old .claude backup)
 .claude.archive/
 
+# Worktree isolation directories (agent-spawned isolated worktrees; never commit)
+.claude/worktrees/
+
 # AI slop files (malformed absolute paths from agents)
 # Agents using absolute paths like C:\dev\... create concatenated filenames
 C:*

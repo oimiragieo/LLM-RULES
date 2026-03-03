@@ -208,3 +208,34 @@ test('buildDispatchPlan gates non-stale proposals without passing eval', () => {
   assert.equal(plan.gatedRequestIds.includes('no-eval'), true);
   assert.equal(plan.actions.length, 2);
 });
+
+test('applyQueueGovernance keeps idless requests when trimming overflow', () => {
+  const nowMs = Date.parse('2026-03-02T12:00:00.000Z');
+  const governed = router.applyQueueGovernance(
+    [
+      {
+        id: 'oldest',
+        timestamp: '2026-03-02T10:00:00.000Z',
+        status: 'proposed',
+        trigger: 'user_request',
+      },
+      {
+        id: 'keep-1',
+        timestamp: '2026-03-02T10:01:00.000Z',
+        status: 'proposed',
+        trigger: 'user_request',
+      },
+      { timestamp: '2026-03-02T10:02:00.000Z', status: 'proposed', trigger: 'user_request' },
+    ],
+    { maxPending: 2, ttlHours: 24, nowMs }
+  );
+
+  assert.equal(governed.activeRequests.length, 2);
+  assert.equal(governed.deadLetters.length, 1);
+  assert.equal(governed.deadLetters[0].deadLetterReason, 'queue_overflow');
+  assert.equal(governed.deadLetters[0].id, 'oldest');
+  assert.equal(
+    governed.activeRequests.some(item => !item.id),
+    true
+  );
+});

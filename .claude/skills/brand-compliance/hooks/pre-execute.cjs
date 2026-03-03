@@ -9,6 +9,17 @@
 const path = require('path');
 const fs = require('fs');
 
+function validateVoiceProfileDimension(voiceProfile, dim) {
+  if (!(dim in voiceProfile)) return;
+  const val = voiceProfile[dim];
+  if (typeof val !== 'number' || val < 1 || val > 5 || !Number.isInteger(val)) {
+    process.stderr.write(
+      `[brand-compliance/pre-execute] voiceProfile.${dim} must be an integer 1–5, got: ${val}\n`
+    );
+    process.exit(2);
+  }
+}
+
 function preExecute(input = {}) {
   try {
     const schemaPath = path.resolve(__dirname, '../schemas/input.schema.json');
@@ -53,15 +64,7 @@ function preExecute(input = {}) {
     if (input.voiceProfile) {
       const dimensions = ['formality', 'warmth', 'authority', 'energy'];
       for (const dim of dimensions) {
-        if (dim in input.voiceProfile) {
-          const val = input.voiceProfile[dim];
-          if (typeof val !== 'number' || val < 1 || val > 5 || !Number.isInteger(val)) {
-            process.stderr.write(
-              `[brand-compliance/pre-execute] voiceProfile.${dim} must be an integer 1–5, got: ${val}\n`
-            );
-            process.exit(2);
-          }
-        }
+        validateVoiceProfileDimension(input.voiceProfile, dim);
       }
     }
 

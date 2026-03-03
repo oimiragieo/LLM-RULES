@@ -75,7 +75,6 @@ const {
   getDepthLimit,
   getPatternThreshold,
   getPatternWindowMs,
-  parseIsoToMs,
   getEvolutionBudget,
   getCooldownMs,
   extractTaskIdFromTaskInput,
@@ -324,18 +323,20 @@ This is a safety mechanism to prevent infinite loops.`;
   const spawnAction = `spawn:${agentType}`;
   const threshold = getPatternThreshold();
   const patternWindowMs = getPatternWindowMs();
-
-  const entry = loopState.actionHistory?.find(a => a.action === spawnAction);
-  const count = entry ? Number(entry.count || 0) : 0;
-  const lastAtMs = parseIsoToMs(entry?.lastAt);
-  const hasRecentPattern = lastAtMs > 0 && Date.now() - lastAtMs <= patternWindowMs;
-  const activeNestedSpawn = Number(loopState.spawnDepth || 0) > 0;
-
-  if (activeNestedSpawn && hasRecentPattern && count >= threshold) {
-    const message = `[LOOP PREVENTION] Pattern detected: "${spawnAction}" repeated ${count} times. Threshold is ${threshold}.
+  const activeLoopGuardResult =
+    typeof loopStateManager.checkAndBlock === 'function'
+      ? loopStateManager.checkAndBlock({
+          state: loopState,
+          spawnAction,
+          depthLimit,
+          patternThreshold: threshold,
+          patternWindowMs,
+        })
+      : { blocked: false };
+  if (activeLoopGuardResult.blocked) {
+    const message = `${activeLoopGuardResult.message}
 
 This is a safety mechanism to prevent infinite loops.`;
-
     if (enforcement === 'block') {
       return { pass: false, result: 'block', message };
     }

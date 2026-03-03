@@ -64,14 +64,23 @@ const DEFAULT_STATE = {
  */
 const EVOLUTION_STATES = [
   'idle',
-  'evaluate',
-  'validate',
-  'obtain',
-  'lock',
-  'verify',
-  'enable',
+  'evaluating',
+  'validating',
+  'obtaining',
+  'locking',
+  'verifying',
+  'enabling',
   'complete',
 ];
+
+const PHASE_ALIASES = {
+  evaluate: 'evaluating',
+  validate: 'validating',
+  obtain: 'obtaining',
+  lock: 'locking',
+  verify: 'verifying',
+  enable: 'enabling',
+};
 
 // =============================================================================
 // EvolutionStateSync Class
@@ -309,8 +318,11 @@ class EvolutionStateSync {
     };
 
     // Update state field to match phase
-    if (evolution.phase && EVOLUTION_STATES.includes(evolution.phase)) {
-      state.state = evolution.phase;
+    const normalizedPhase =
+      PHASE_ALIASES[evolution.phase] ||
+      (EVOLUTION_STATES.includes(evolution.phase) ? evolution.phase : null);
+    if (normalizedPhase) {
+      state.state = normalizedPhase;
     }
 
     await this.saveState(state);

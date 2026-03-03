@@ -7,14 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Removed
+### Removed — Lint Remediation and Root Cleanup (2026-03-02)
 
+- Deleted 8 orphaned temp/diagnostic files from project root: `_tmp_check_skill_mismatch.cjs`, `lint_issues.txt`, `test_all_output.txt`, `find-stale-modules.cjs`, `update-lancedb-pool.cjs`, `.validate_registry.cjs`, `.verify_settings.cjs`, `.verify_settings.js`
 - Cleaned up obsolete `isolated-agents` architecture and related tools.
 - Removed legacy `self-healing` directory references.
 - Removed orphaned `agent-registry-*.json` index files.
 
-### Fixed
+### Fixed — ESLint Linting and Configuration (2026-03-02)
 
+- Added `.claude/worktrees/**` to ESLint ignores in `eslint.config.js` — eliminated 2570 spurious lint issues from worktree directories
+- Fixed `max-depth` warning in `.claude/skills/brand-compliance/hooks/pre-execute.cjs` by extracting `validateVoiceProfileDimension()` helper
+- ESLint now passes with 0 errors and 0 warnings
 - Fixed command parsing bug in `shell-validators.cjs` for combined flags inside `-c` evaluation.
 - Fixed version mismatch in `config.staging.yaml`.
 - Resolved ownership discrepancies in `skill-catalog.md` (`creation-feasibility-gate`, `compliance-policy-check`).

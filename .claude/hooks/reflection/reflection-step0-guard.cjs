@@ -212,8 +212,12 @@ function trimOldReflections(requests) {
 
   // Keep only the 5 most recent (sorted by timestamp descending)
   const sorted = requests
-    .filter(r => r && r.timestamp)
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    .filter(r => r && (r?.source?.timestamp || r?.timestamp))
+    .sort(
+      (a, b) =>
+        new Date(b?.source?.timestamp || b?.timestamp) -
+        new Date(a?.source?.timestamp || a?.timestamp)
+    );
 
   const trimmed = sorted.slice(0, MAX_PENDING_REFLECTIONS);
   const discarded = sorted.length - trimmed.length;

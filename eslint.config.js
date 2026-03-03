@@ -112,6 +112,7 @@ export default [
       'vendor/',
       '.claude.archive/', // Archived legacy code
       '.claude.old/', // Archived legacy code
+      '.claude/worktrees/**', // Isolated worktree directories
     ],
   },
 

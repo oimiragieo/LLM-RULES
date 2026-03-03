@@ -226,7 +226,12 @@ function applyQueueGovernance(requests, options = {}) {
       return aTs - bTs;
     });
     const overflow = byOldest.slice(0, proposed.length - maxPending);
-    const overflowIds = new Set(overflow.map(item => item.id));
+    const overflowRefs = new Set(overflow);
+    const overflowIds = new Set(
+      overflow
+        .map(item => (item?.id == null ? '' : String(item.id).trim()))
+        .filter(id => id.length > 0)
+    );
     for (const request of overflow) {
       deadLetters.push({
         ...request,
@@ -235,7 +240,13 @@ function applyQueueGovernance(requests, options = {}) {
         deadLetteredAt,
       });
     }
-    active.push(...proposed.filter(item => !overflowIds.has(item.id)));
+    active.push(
+      ...proposed.filter(item => {
+        if (overflowRefs.has(item)) return false;
+        const id = item?.id == null ? '' : String(item.id).trim();
+        return !id || !overflowIds.has(id);
+      })
+    );
   } else {
     active.push(...proposed);
   }

@@ -13,7 +13,9 @@ function extractKeyPoints(response) {
   const concerns = sentences.filter(s =>
     /\b(concern|risk|risks|however|issue|problem|security)\b/i.test(s)
   );
-  const actionItems = sentences.filter(s => /\b(need to|write|update|implement|add|create)\b/i.test(s));
+  const actionItems = sentences.filter(s =>
+    /\b(need to|write|update|implement|add|create)\b/i.test(s)
+  );
   return { decisions, concerns, actionItems };
 }
 
@@ -39,8 +41,12 @@ function identifyAgreements(responses) {
 function identifyDisagreements(responses) {
   const normalized = Array.isArray(responses) ? responses : [];
   const conflicts = [];
-  const hasPostgres = normalized.some(r => /\bpostgres(?:ql)?\b/i.test(String(r?.content || r?.response || '')));
-  const hasMongo = normalized.some(r => /\bmongodb\b/i.test(String(r?.content || r?.response || '')));
+  const hasPostgres = normalized.some(r =>
+    /\bpostgres(?:ql)?\b/i.test(String(r?.content || r?.response || ''))
+  );
+  const hasMongo = normalized.some(r =>
+    /\bmongodb\b/i.test(String(r?.content || r?.response || ''))
+  );
   if (hasPostgres && hasMongo) {
     conflicts.push({
       topic: 'database',
@@ -51,7 +57,9 @@ function identifyDisagreements(responses) {
   }
 
   const hasJwt = normalized.some(r => /\bjwt\b/i.test(String(r?.content || r?.response || '')));
-  const hasSession = normalized.some(r => /\bsession\b/i.test(String(r?.content || r?.response || '')));
+  const hasSession = normalized.some(r =>
+    /\bsession\b/i.test(String(r?.content || r?.response || ''))
+  );
   if (hasJwt && hasSession) {
     conflicts.push({
       topic: 'authentication',

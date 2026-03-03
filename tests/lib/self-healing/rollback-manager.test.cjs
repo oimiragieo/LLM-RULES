@@ -22,7 +22,10 @@ test('validatePathWithinRoot blocks paths outside project root', () => {
   try {
     const ok = validatePathWithinRoot(path.join(root, 'a.txt'), root);
     assert.ok(ok.startsWith(root));
-    assert.throws(() => validatePathWithinRoot(path.join(root, '..', 'outside.txt'), root), /SEC-006/);
+    assert.throws(
+      () => validatePathWithinRoot(path.join(root, '..', 'outside.txt'), root),
+      /SEC-006/
+    );
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

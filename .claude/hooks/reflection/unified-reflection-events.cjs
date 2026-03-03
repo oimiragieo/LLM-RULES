@@ -381,75 +381,56 @@ function createReflectionEventHandlers({
 
     const toolResult = getToolOutput(input) || '';
     const output = typeof toolResult === 'string' ? toolResult : '';
-    return {
-      patterns: extractPatterns(output),
-      gotchas: extractGotchas(output),
-      discoveries: extractDiscoveries(output),
-    };
+    return extractStructuredInsights(output);
+  }
+
+  function sanitizeTextEntries(value, maxEntries = 3) {
+    if (!Array.isArray(value)) return [];
+    return value
+      .filter(item => typeof item === 'string')
+      .map(item => item.trim())
+      .filter(item => item.length > 0 && item.length <= 200)
+      .slice(0, maxEntries);
+  }
+
+  function sanitizeDiscoveries(value) {
+    if (!Array.isArray(value)) return [];
+    return value
+      .filter(item => item && typeof item === 'object')
+      .map(item => ({
+        path: typeof item.path === 'string' ? item.path.trim() : '',
+        description: typeof item.description === 'string' ? item.description.trim() : '',
+      }))
+      .filter(item => item.path && item.description && !item.path.includes(' '))
+      .slice(0, 5);
+  }
+
+  function extractStructuredInsights(output) {
+    if (typeof output !== 'string' || !output.trim().startsWith('{')) {
+      return { patterns: [], gotchas: [], discoveries: [] };
+    }
+    try {
+      const parsed = JSON.parse(output);
+      return {
+        patterns: sanitizeTextEntries(parsed?.patterns, 3),
+        gotchas: sanitizeTextEntries(parsed?.gotchas, 3),
+        discoveries: sanitizeDiscoveries(parsed?.discoveries),
+      };
+    } catch (_err) {
+      return { patterns: [], gotchas: [], discoveries: [] };
+    }
   }
 
   function extractPatterns(output) {
-    const patterns = [];
-    const patternIndicators = [
-      /(?:pattern|approach|solution|technique|best practice):\s*(.+)/gi,
-      /(?:always|should|must|prefer)\s+(.{20,100})/gi,
-      /(?:use|using)\s+(\w+)\s+(?:for|to|when)\s+(.{10,50})/gi,
-    ];
-
-    for (const regex of patternIndicators) {
-      let match;
-      while ((match = regex.exec(output)) !== null) {
-        const patternText = match[1]?.trim();
-        if (patternText && patternText.length > 10 && patternText.length < 200) {
-          patterns.push(patternText);
-        }
-      }
-    }
-
-    return patterns.slice(0, 3);
+    return extractStructuredInsights(output).patterns;
   }
 
   function extractGotchas(output) {
-    const gotchas = [];
-    const gotchaIndicators = [
-      /(?:gotcha|pitfall|warning|caution|watch out|careful):\s*(.+)/gi,
-      /(?:don't|do not|never|avoid)\s+(.{20,100})/gi,
-      /(?:bug|issue|problem):\s*(.{20,150})/gi,
-      /(?:fixed|resolved)\s+(?:by|with)\s+(.{20,100})/gi,
-    ];
-
-    for (const regex of gotchaIndicators) {
-      let match;
-      while ((match = regex.exec(output)) !== null) {
-        const gotchaText = match[1]?.trim();
-        if (gotchaText && gotchaText.length > 10 && gotchaText.length < 200) {
-          gotchas.push(gotchaText);
-        }
-      }
-    }
-
-    return gotchas.slice(0, 3);
+    return extractStructuredInsights(output).gotchas;
   }
 
   function extractDiscoveries(output) {
-    const discoveries = [];
-    const filePatterns = [
-      /`([^`]+\.[a-z]{2,4})`[:\s-]+(.{10,100})/gi,
-      /(?:file|module|component)\s+`?([^\s`]+\.[a-z]{2,4})`?\s+(?:is|handles|contains|manages)\s+(.{10,80})/gi,
-    ];
-
-    for (const regex of filePatterns) {
-      let match;
-      while ((match = regex.exec(output)) !== null) {
-        const filePath = match[1]?.trim();
-        const description = match[2]?.trim();
-        if (filePath && description && !filePath.includes(' ')) {
-          discoveries.push({ path: filePath, description });
-        }
-      }
-    }
-
-    return discoveries.slice(0, 5);
+    return extractStructuredInsights(output).discoveries;
   }
 
   return {

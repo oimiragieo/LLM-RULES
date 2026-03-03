@@ -366,15 +366,6 @@ async function main() {
       process.exit(0);
     }
 
-    const staleIngest = ingestStaleArtifactRecommendations();
-    outcome.staleSkillRecommendations = staleIngest.created || 0;
-    const dispatchPlan = generateAndPersistDispatchPlan({
-      queuePath: EVOLUTION_REQUESTS_FILE,
-      outputPath: DEFAULT_DISPATCH_PATH,
-    });
-    outcome.evolutionDispatchActions = Array.isArray(dispatchPlan?.actions)
-      ? dispatchPlan.actions.length
-      : 0;
     outcome.eventType = eventType;
 
     switch (eventType) {
@@ -408,6 +399,15 @@ async function main() {
         break;
       }
       case 'session_end': {
+        const staleIngest = ingestStaleArtifactRecommendations();
+        outcome.staleSkillRecommendations = staleIngest.created || 0;
+        const dispatchPlan = generateAndPersistDispatchPlan({
+          queuePath: EVOLUTION_REQUESTS_FILE,
+          outputPath: DEFAULT_DISPATCH_PATH,
+        });
+        outcome.evolutionDispatchActions = Array.isArray(dispatchPlan?.actions)
+          ? dispatchPlan.actions.length
+          : 0;
         const result = eventHandlers.handleSessionEnd(hookInput);
         queueReflection(result.reflection);
         await appendReflectionLogEntry(result.reflection);

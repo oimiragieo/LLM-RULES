@@ -24,6 +24,7 @@ const LOOP_STATE_FILE = _LOOP_STATE_FILE;
 const STALE_SPAWN_MS = 10 * 60 * 1000;
 const ACTION_WINDOW_MS = 30 * 60 * 1000;
 const MAX_ACTION_HISTORY = 50;
+const DEFAULT_PATTERN_WINDOW_MS = 5 * 60 * 1000;
 
 function getSessionId() {
   return process.env.CLAUDE_SESSION_ID || 'session-unknown';
@@ -154,6 +155,46 @@ function recordEvolution(evolutionType, stateFile = _LOOP_STATE_FILE) {
   recordAction(`evolution:${evolutionType}`, stateFile);
 }
 
+function checkAndBlock({
+  state,
+  spawnAction,
+  depthLimit,
+  patternThreshold,
+  patternWindowMs = DEFAULT_PATTERN_WINDOW_MS,
+}) {
+  const loopState = state && typeof state === 'object' ? state : {};
+  const depth = Number(loopState.spawnDepth || 0);
+  if (Number.isFinite(depthLimit) && depth >= depthLimit) {
+    return {
+      blocked: true,
+      reason: 'depth_limit',
+      message: `[LOOP PREVENTION] Spawn depth limit exceeded (${depth}/${depthLimit}). Too many nested agent spawns.`,
+    };
+  }
+
+  if (!spawnAction || !Number.isFinite(patternThreshold) || patternThreshold <= 0) {
+    return { blocked: false };
+  }
+
+  const entry = loopState.actionHistory?.find(a => a.action === spawnAction);
+  const count = entry ? Number(entry.count || 0) : 0;
+  const lastAtMs = Date.parse(entry?.lastAt || '');
+  const hasRecentPattern =
+    Number.isFinite(lastAtMs) &&
+    Date.now() - lastAtMs <= Number(patternWindowMs || DEFAULT_PATTERN_WINDOW_MS);
+  const activeNestedSpawn = depth > 0;
+
+  if (activeNestedSpawn && hasRecentPattern && count >= patternThreshold) {
+    return {
+      blocked: true,
+      reason: 'pattern_threshold',
+      message: `[LOOP PREVENTION] Pattern detected: "${spawnAction}" repeated ${count} times. Threshold is ${patternThreshold}.`,
+    };
+  }
+
+  return { blocked: false };
+}
+
 module.exports = {
   _LOOP_STATE_FILE,
   LOOP_STATE_FILE,
@@ -164,4 +205,5 @@ module.exports = {
   recordSpawn,
   decrementSpawnDepth,
   recordEvolution,
+  checkAndBlock,
 };

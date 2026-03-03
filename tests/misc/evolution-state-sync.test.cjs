@@ -182,7 +182,7 @@ describe('EvolutionStateSync', () => {
 
       const newState = {
         version: '1.0.0',
-        state: 'evaluate',
+        state: 'evaluating',
         currentEvolution: { type: 'agent', name: 'test-agent' },
         evolutions: [],
         patterns: [],
@@ -196,7 +196,7 @@ describe('EvolutionStateSync', () => {
       // Verify by reading directly
       const content = fs.readFileSync(TEST_STATE_PATH, 'utf-8');
       const saved = JSON.parse(content);
-      expect(saved.state).toBe('evaluate');
+      expect(saved.state).toBe('evaluating');
       expect(saved.currentEvolution.name).toBe('test-agent');
     });
 
@@ -208,7 +208,7 @@ describe('EvolutionStateSync', () => {
 
       await new Promise(r => setTimeout(r, 10));
 
-      oldState.state = 'validate';
+      oldState.state = 'validating';
       await sync.saveState(oldState);
 
       const newState = await sync.loadState();
@@ -415,7 +415,7 @@ describe('EvolutionStateSync', () => {
       });
 
       const state = await sync.loadState();
-      expect(state.state).toBe('verify');
+      expect(state.state).toBe('verifying');
     });
   });
 
