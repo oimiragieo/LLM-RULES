@@ -112,21 +112,25 @@ Observations are recorded in JSONL format:
 ## Common Threat Patterns by Architecture Type
 
 ### Web Applications
+
 - Client-side validation without server-side checks (Tampering → A03)
 - Missing CSRF protection on state-changing endpoints (Tampering → A03)
 - Hardcoded credentials in source code (Information Disclosure → A01)
 
 ### APIs
+
 - Missing authentication on sensitive endpoints (Elevation → A01)
 - Verbose error messages leaking system details (Information → A09)
 - No rate limiting on auth endpoints (DoS → A05)
 
 ### Microservices
+
 - Service-to-service communication unencrypted (Information Disclosure → A02)
 - No mutual TLS between services (Spoofing → A07)
 - Missing distributed tracing for audit (Repudiation → A09)
 
 ### Databases
+
 - Credentials stored in plaintext (Information Disclosure → A02)
 - SQL injection via dynamic query construction (Tampering → A03)
 - Backups unencrypted (Information Disclosure → A02)

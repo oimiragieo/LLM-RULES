@@ -47,14 +47,7 @@ describe('parseArgs', () => {
   });
 
   it('parses multiple flags', () => {
-    const opts = parseArgs([
-      'node',
-      'main.cjs',
-      '--action',
-      'scan',
-      '--config',
-      'p/owasp-top-ten',
-    ]);
+    const opts = parseArgs(['node', 'main.cjs', '--action', 'scan', '--config', 'p/owasp-top-ten']);
     assert.strictEqual(opts.action, 'scan');
     assert.strictEqual(opts.config, 'p/owasp-top-ten');
   });
@@ -99,7 +92,10 @@ describe('generateReport', () => {
     assert.ok(content.includes('# Security Scan Report'), 'Report should have header');
     assert.ok(content.includes('pnpm-audit'), 'Report should include tool name');
     assert.ok(content.includes('lodash'), 'Report should include package name');
-    assert.ok(content.includes('Total findings:** 2') || content.includes('Total findings: 2'), 'Report should include finding count');
+    assert.ok(
+      content.includes('Total findings:** 2') || content.includes('Total findings: 2'),
+      'Report should include finding count'
+    );
   });
 
   it('handles empty findings gracefully', () => {

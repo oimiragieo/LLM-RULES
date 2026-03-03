@@ -19,10 +19,7 @@ const crypto = require('crypto');
 // 1. Generate PKCE code verifier + challenge
 function generatePKCE() {
   const codeVerifier = crypto.randomBytes(32).toString('base64url');
-  const codeChallenge = crypto
-    .createHash('sha256')
-    .update(codeVerifier)
-    .digest('base64url');
+  const codeChallenge = crypto.createHash('sha256').update(codeVerifier).digest('base64url');
   return { codeVerifier, codeChallenge };
 }
 
@@ -35,7 +32,7 @@ function buildAuthUrl({ clientId, redirectUri, scope, state }) {
     client_id: clientId,
     redirect_uri: redirectUri,
     scope,
-    state,                         // CSRF protection; verify on callback
+    state, // CSRF protection; verify on callback
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
   });
@@ -52,7 +49,7 @@ async function exchangeCode({ code, codeVerifier, clientId, redirectUri }) {
       code,
       redirect_uri: redirectUri,
       client_id: clientId,
-      code_verifier: codeVerifier,  // PKCE verifier — no client_secret needed
+      code_verifier: codeVerifier, // PKCE verifier — no client_secret needed
     }),
   });
   if (!response.ok) throw new Error(`Token exchange failed: ${response.status}`);
@@ -97,6 +94,7 @@ async function refreshTokens({ refreshToken, clientId }) {
 ```
 
 **OAuth 2.1 Checklist**:
+
 - [ ] PKCE required for all client types (public and confidential)
 - [ ] `state` parameter validated on callback
 - [ ] `redirect_uri` validated against pre-registered allowlist
@@ -120,16 +118,16 @@ function issueToken(payload, secret) {
   // RFC 8725 § 3.1: Use explicit algorithm in options, not payload
   return jwt.sign(
     {
-      sub: payload.userId,       // Subject: who the token is about
-      iss: 'https://myapp.com',  // Issuer: who issued the token
+      sub: payload.userId, // Subject: who the token is about
+      iss: 'https://myapp.com', // Issuer: who issued the token
       aud: 'https://api.myapp.com', // Audience: intended recipient
       iat: Math.floor(Date.now() / 1000),
       // DO NOT include sensitive data in payload (base64-decodable without secret)
     },
     secret,
     {
-      algorithm: 'HS256',        // Explicitly specify algorithm
-      expiresIn: '15m',          // Short-lived access token
+      algorithm: 'HS256', // Explicitly specify algorithm
+      expiresIn: '15m', // Short-lived access token
     }
   );
 }
@@ -137,7 +135,7 @@ function issueToken(payload, secret) {
 // SECURE JWT verification
 function verifyToken(token, secret) {
   return jwt.verify(token, secret, {
-    algorithms: ['HS256'],        // RFC 8725 § 3.1: allowlist algorithms explicitly
+    algorithms: ['HS256'], // RFC 8725 § 3.1: allowlist algorithms explicitly
     audience: 'https://api.myapp.com',
     issuer: 'https://myapp.com',
     // reject if missing 'alg' header, 'iss', 'aud', 'exp' claims
@@ -203,6 +201,7 @@ async function authMiddleware(req, res, next) {
 ```
 
 **JWT Checklist**:
+
 - [ ] Algorithm explicitly specified and allowlisted (never `alg: none`)
 - [ ] `iss` (issuer) and `aud` (audience) claims validated
 - [ ] Short expiry for access tokens (≤15 min); longer for refresh (≤7 days)
@@ -230,10 +229,10 @@ async function beginRegistration(userId, username) {
     rpID: 'myapp.com',
     userID: userId,
     userName: username,
-    attestationType: 'none',  // 'direct' for enterprise
+    attestationType: 'none', // 'direct' for enterprise
     authenticatorSelection: {
-      residentKey: 'required',         // Required for passkeys
-      userVerification: 'required',    // Biometric/PIN required
+      residentKey: 'required', // Required for passkeys
+      userVerification: 'required', // Biometric/PIN required
       authenticatorAttachment: 'platform', // Device passkey
     },
     excludeCredentials: await getUserCredentials(userId), // Prevent duplicates
@@ -263,7 +262,10 @@ async function finishRegistration(userId, response) {
 ### Authentication Flow
 
 ```javascript
-const { generateAuthenticationOptions, verifyAuthenticationResponse } = require('@simplewebauthn/server');
+const {
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse,
+} = require('@simplewebauthn/server');
 
 async function beginAuthentication(userId) {
   const credentials = await getUserCredentials(userId);
@@ -291,12 +293,16 @@ async function finishAuthentication(userId, response) {
   });
   if (!verification.verified) throw new Error('Authentication failed');
   // Update counter (replay attack prevention)
-  await updateCredentialCounter(credential.credentialID, verification.authenticationInfo.newCounter);
+  await updateCredentialCounter(
+    credential.credentialID,
+    verification.authenticationInfo.newCounter
+  );
   return { success: true };
 }
 ```
 
 **WebAuthn Checklist**:
+
 - [ ] Challenge is random (≥16 bytes) and single-use
 - [ ] Challenge expires (store with TTL, default 60s)
 - [ ] `expectedOrigin` validates against registered domain
@@ -316,19 +322,21 @@ Secure session patterns for server-rendered applications.
 const session = require('express-session');
 const RedisStore = require('connect-redis').default;
 
-app.use(session({
-  store: new RedisStore({ client: redisClient }),
-  secret: process.env.SESSION_SECRET,  // ≥32 random bytes
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
-    httpOnly: true,       // Prevents XSS access to cookie
-    sameSite: 'strict',   // CSRF protection
-    maxAge: 8 * 60 * 60 * 1000, // 8 hours
-  },
-  name: '__Host-sessionid', // __Host- prefix: enforces secure+path=/+no domain
-}));
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.SESSION_SECRET, // ≥32 random bytes
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+      httpOnly: true, // Prevents XSS access to cookie
+      sameSite: 'strict', // CSRF protection
+      maxAge: 8 * 60 * 60 * 1000, // 8 hours
+    },
+    name: '__Host-sessionid', // __Host- prefix: enforces secure+path=/+no domain
+  })
+);
 ```
 
 ### Session Regeneration (Prevents Session Fixation)
@@ -340,7 +348,7 @@ app.post('/login', async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
   // Destroy old session, create new one with new ID
-  req.session.regenerate((err) => {
+  req.session.regenerate(err => {
     if (err) return res.status(500).json({ error: 'Session error' });
     req.session.userId = user.id;
     req.session.role = user.role;
@@ -350,7 +358,7 @@ app.post('/login', async (req, res) => {
 
 // Destroy session on logout
 app.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
+  req.session.destroy(err => {
     res.clearCookie('__Host-sessionid');
     res.json({ success: true });
   });
@@ -361,8 +369,8 @@ app.post('/logout', (req, res) => {
 
 ```javascript
 // Enforce both absolute timeout AND idle timeout
-const ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;  // 8 hours
-const IDLE_TIMEOUT_MS = 30 * 60 * 1000;            // 30 minutes
+const ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000; // 8 hours
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 function checkSessionTimeout(req, res, next) {
   if (!req.session.userId) return next();
@@ -384,6 +392,7 @@ app.use(checkSessionTimeout);
 ```
 
 **Session Management Checklist**:
+
 - [ ] Session ID regenerated after login (prevents session fixation)
 - [ ] `HttpOnly` and `Secure` flags on session cookie
 - [ ] `SameSite=Strict` or `SameSite=Lax` on session cookie
@@ -432,6 +441,7 @@ async function resetPassword(token, newPassword) {
 ```
 
 **Password Reset Checklist**:
+
 - [ ] Token: ≥32 random bytes, never sequential or predictable
 - [ ] Store hash of token server-side (not raw token)
 - [ ] Token expires (≤1 hour)
@@ -444,11 +454,11 @@ async function resetPassword(token, newPassword) {
 
 ## Quick Reference: Algorithm Selection
 
-| Use Case | Recommended | Avoid |
-|----------|------------|-------|
-| Password hashing | bcrypt (cost≥12), argon2id | MD5, SHA-1, SHA-256 |
-| JWT symmetric | HS256, HS384 | HS512 (slower, no security benefit) |
-| JWT asymmetric | RS256, ES256 | RS512, none |
-| Random tokens | `crypto.randomBytes(32)` | `Math.random()`, timestamp-based |
-| Session secrets | `crypto.randomBytes(32).toString('hex')` | Human-chosen strings |
-| Symmetric encryption | AES-256-GCM | AES-ECB, DES, RC4 |
+| Use Case             | Recommended                              | Avoid                               |
+| -------------------- | ---------------------------------------- | ----------------------------------- |
+| Password hashing     | bcrypt (cost≥12), argon2id               | MD5, SHA-1, SHA-256                 |
+| JWT symmetric        | HS256, HS384                             | HS512 (slower, no security benefit) |
+| JWT asymmetric       | RS256, ES256                             | RS512, none                         |
+| Random tokens        | `crypto.randomBytes(32)`                 | `Math.random()`, timestamp-based    |
+| Session secrets      | `crypto.randomBytes(32).toString('hex')` | Human-chosen strings                |
+| Symmetric encryption | AES-256-GCM                              | AES-ECB, DES, RC4                   |

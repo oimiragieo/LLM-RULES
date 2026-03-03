@@ -83,9 +83,10 @@ function runSetupCheck(skillDir) {
     };
   }
 
-  const deps = manifest && manifest.setup && Array.isArray(manifest.setup.dependencies)
-    ? manifest.setup.dependencies
-    : [];
+  const deps =
+    manifest && manifest.setup && Array.isArray(manifest.setup.dependencies)
+      ? manifest.setup.dependencies
+      : [];
 
   const missing = [];
   const warnings = [];

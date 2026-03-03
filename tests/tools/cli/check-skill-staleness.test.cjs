@@ -24,7 +24,10 @@ function createTestSkillDir(name, manifestContent) {
 
   // Create manifest.json if provided
   if (manifestContent) {
-    fs.writeFileSync(path.join(skillDir, 'manifest.json'), JSON.stringify(manifestContent, null, 2));
+    fs.writeFileSync(
+      path.join(skillDir, 'manifest.json'),
+      JSON.stringify(manifestContent, null, 2)
+    );
   }
 
   return skillDir;

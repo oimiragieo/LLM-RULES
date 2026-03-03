@@ -11,6 +11,7 @@ prevention checklists, and example vulnerable code.
 **Risk**: Users can act outside their intended permissions. Most common OWASP category.
 
 **Detection Patterns**:
+
 - Direct object references without authorization checks (e.g., `/api/user/1234/data`)
 - Missing function-level access control (admin endpoints accessible to regular users)
 - CORS misconfiguration allowing unauthorized origins
@@ -18,6 +19,7 @@ prevention checklists, and example vulnerable code.
 - Privilege escalation via parameter manipulation (`role=admin` in request body)
 
 **Vulnerable Code Example**:
+
 ```javascript
 // VULNERABLE: No ownership check before returning data
 app.get('/api/documents/:id', authenticate, async (req, res) => {
@@ -34,6 +36,7 @@ app.get('/api/documents/:id', authenticate, async (req, res) => {
 ```
 
 **Prevention Checklist**:
+
 - [ ] Deny by default; explicitly grant permissions
 - [ ] Enforce access control server-side, not client-side
 - [ ] Log access control failures and alert on high frequency
@@ -48,6 +51,7 @@ app.get('/api/documents/:id', authenticate, async (req, res) => {
 **Risk**: Sensitive data exposed due to weak/absent encryption. Formerly "Sensitive Data Exposure."
 
 **Detection Patterns**:
+
 - Passwords stored as MD5/SHA-1 (weak hashing)
 - HTTP (not HTTPS) for sensitive data transmission
 - Weak cipher suites: RC4, DES, 3DES, MD5
@@ -56,6 +60,7 @@ app.get('/api/documents/:id', authenticate, async (req, res) => {
 - Missing `Secure` / `HttpOnly` flags on cookies containing session tokens
 
 **Vulnerable Code Example**:
+
 ```javascript
 // VULNERABLE: MD5 is broken for passwords
 const hash = crypto.createHash('md5').update(password).digest('hex');
@@ -73,6 +78,7 @@ if (!JWT_SECRET) throw new Error('JWT_SECRET not configured');
 ```
 
 **Prevention Checklist**:
+
 - [ ] Use bcrypt/scrypt/argon2 for passwords (never MD5/SHA-1)
 - [ ] TLS 1.2+ for all data in transit; disable TLS 1.0/1.1
 - [ ] Never log sensitive fields: passwords, tokens, PII, card numbers
@@ -87,6 +93,7 @@ if (!JWT_SECRET) throw new Error('JWT_SECRET not configured');
 **Risk**: Hostile data sent to interpreter as part of a command/query.
 
 **Detection Patterns**:
+
 - String concatenation in SQL queries
 - Unsanitized user input in shell commands
 - Template injection (`{{7*7}}` evaluating in server responses)
@@ -94,6 +101,7 @@ if (!JWT_SECRET) throw new Error('JWT_SECRET not configured');
 - LDAP injection in directory queries
 
 **Vulnerable Code Example**:
+
 ```javascript
 // VULNERABLE: SQL injection
 const query = `SELECT * FROM users WHERE email = '${userEmail}'`;
@@ -113,6 +121,7 @@ spawn('convert', [req.body.filename, 'output.png'], { shell: false });
 ```
 
 **Prevention Checklist**:
+
 - [ ] Use parameterized queries / prepared statements for ALL database calls
 - [ ] Always use `shell: false` with array args for child process spawning
 - [ ] Validate/sanitize input with an allowlist (not a denylist)
@@ -127,6 +136,7 @@ spawn('convert', [req.body.filename, 'output.png'], { shell: false });
 **Risk**: Missing or ineffective control design; security not considered at design time.
 
 **Detection Patterns**:
+
 - Business logic bypasses (skip checkout steps, negative quantities)
 - Missing rate limiting on sensitive actions (login, password reset, OTP)
 - No multi-factor for high-privilege operations
@@ -134,11 +144,13 @@ spawn('convert', [req.body.filename, 'output.png'], { shell: false });
 - Insufficient separation between tenants in multi-tenant systems
 
 **Examples**:
+
 - Password reset link not expiring → account takeover
 - Sending OTP over SMS without rate limit → brute force attack
 - Sequential user IDs exposing user count and enabling enumeration
 
 **Prevention Checklist**:
+
 - [ ] Threat-model new features before implementation
 - [ ] Use secure design patterns: fail-safe defaults, least privilege
 - [ ] Rate limit sensitive endpoints (10 attempts/min for login)
@@ -153,6 +165,7 @@ spawn('convert', [req.body.filename, 'output.png'], { shell: false });
 **Risk**: Missing security hardening, default credentials, overly permissive settings.
 
 **Detection Patterns**:
+
 - Default admin credentials unchanged
 - Debug mode enabled in production (`NODE_ENV=development`)
 - Stack traces / verbose errors exposed to users
@@ -161,6 +174,7 @@ spawn('convert', [req.body.filename, 'output.png'], { shell: false });
 - Cloud storage buckets publicly accessible (S3, GCS)
 
 **Vulnerable Code Example**:
+
 ```javascript
 // VULNERABLE: Debug mode exposes stack traces
 app.use((err, req, res, next) => {
@@ -178,12 +192,14 @@ app.use((err, req, res, next) => {
 ```
 
 **Security Headers (add via helmet.js)**:
+
 ```javascript
 const helmet = require('helmet');
 app.use(helmet()); // Sets: CSP, HSTS, X-Frame-Options, etc.
 ```
 
 **Prevention Checklist**:
+
 - [ ] Automated config validation in CI (Checkov, tfsec)
 - [ ] Set `NODE_ENV=production` in prod deployments
 - [ ] Security headers: CSP, HSTS, X-Content-Type-Options, X-Frame-Options
@@ -198,12 +214,14 @@ app.use(helmet()); // Sets: CSP, HSTS, X-Frame-Options, etc.
 **Risk**: Using components with known vulnerabilities.
 
 **Detection Patterns**:
+
 - `npm audit` shows critical/high CVEs
 - Outdated dependencies (check with `npm outdated`)
 - Using EOL frameworks (Node.js 14, React 16)
 - No dependency scanning in CI/CD pipeline
 
 **Prevention Checklist**:
+
 - [ ] Run `pnpm audit` in CI; fail on critical CVEs
 - [ ] Use Dependabot or Renovate for automated dependency updates
 - [ ] Subscribe to security advisories for critical dependencies
@@ -218,6 +236,7 @@ app.use(helmet()); // Sets: CSP, HSTS, X-Frame-Options, etc.
 **Risk**: Weaknesses in authentication allowing account compromise.
 
 **Detection Patterns**:
+
 - Permitting weak/common passwords (`password123`)
 - No brute force protection on login endpoint
 - Insecure "forgot password" flows (predictable tokens, no expiry)
@@ -225,11 +244,13 @@ app.use(helmet()); // Sets: CSP, HSTS, X-Frame-Options, etc.
 - Missing session invalidation on logout
 
 **Vulnerable Code Example**:
+
 ```javascript
 // VULNERABLE: No rate limiting, no lockout
 app.post('/login', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
-  if (user && user.password === req.body.password) { // plaintext!
+  if (user && user.password === req.body.password) {
+    // plaintext!
     req.session.userId = user.id;
     res.json({ success: true });
   }
@@ -237,18 +258,22 @@ app.post('/login', async (req, res) => {
 
 // SECURE: Rate limited, hashed passwords, account lockout
 const rateLimit = require('express-rate-limit');
-const loginLimiter = rateLimit({ windowMs: 15*60*1000, max: 5 });
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 
 app.post('/login', loginLimiter, async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user || !(await bcrypt.compare(req.body.password, user.passwordHash))) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
-  req.session.regenerate(() => { req.session.userId = user.id; res.json({ success: true }); });
+  req.session.regenerate(() => {
+    req.session.userId = user.id;
+    res.json({ success: true });
+  });
 });
 ```
 
 **Prevention Checklist**:
+
 - [ ] Enforce minimum password length (≥12 chars) and complexity
 - [ ] Rate limit login: max 5 attempts per 15 min per IP
 - [ ] Use secure, random tokens for password reset (min 32 bytes, expire in 1hr)
@@ -263,6 +288,7 @@ app.post('/login', loginLimiter, async (req, res) => {
 **Risk**: Code and infrastructure not protected against integrity violations.
 
 **Detection Patterns**:
+
 - No signature verification for software updates
 - Insecure deserialization of user-supplied data
 - CI/CD pipeline allows untrusted sources to inject code
@@ -270,6 +296,7 @@ app.post('/login', loginLimiter, async (req, res) => {
 - Missing subresource integrity (SRI) on CDN scripts
 
 **Vulnerable Code Example**:
+
 ```javascript
 // VULNERABLE: Deserializing untrusted data (node-serialize RCE)
 const data = JSON.parse(req.body.data);
@@ -283,6 +310,7 @@ if (error) return res.status(400).json({ error: error.details[0].message });
 ```
 
 **Prevention Checklist**:
+
 - [ ] Sign and verify software packages (`npm audit signatures`)
 - [ ] Use SRI hashes for CDN-hosted scripts
 - [ ] Validate all deserialized data with strict schemas
@@ -296,6 +324,7 @@ if (error) return res.status(400).json({ error: error.details[0].message });
 **Risk**: Insufficient logging prevents detection and forensics of breaches.
 
 **Detection Patterns**:
+
 - Authentication events not logged
 - No alerting on repeated access control failures
 - Logs contain PII or credentials (HIPAA/GDPR violation)
@@ -303,6 +332,7 @@ if (error) return res.status(400).json({ error: error.details[0].message });
 - Log injection possible via user-controlled data in log messages
 
 **Prevention Checklist**:
+
 - [ ] Log: login success/failure, privilege changes, access control failures
 - [ ] Never log: passwords, tokens, PII, full card numbers
 - [ ] Use structured logging (JSON) for machine parsing
@@ -317,11 +347,13 @@ if (error) return res.status(400).json({ error: error.details[0].message });
 **Risk**: Attacker tricks server into making requests to internal/unintended systems.
 
 **Detection Patterns**:
+
 - User-supplied URL passed directly to `fetch()`, `axios.get()`, `curl`
 - Webhook URL validation missing (can point to internal services)
 - URL redirect without host validation
 
 **Vulnerable Code Example**:
+
 ```javascript
 // VULNERABLE: SSRF — attacker can probe internal network
 app.post('/fetch-preview', async (req, res) => {
@@ -336,15 +368,22 @@ const BLOCKED_HOSTS = /^(localhost|127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168
 
 app.post('/fetch-preview', async (req, res) => {
   let parsed;
-  try { parsed = new URL(req.body.url); } catch { return res.status(400).json({ error: 'Invalid URL' }); }
-  if (!ALLOWED_PROTOCOLS.includes(parsed.protocol)) return res.status(400).json({ error: 'HTTPS only' });
-  if (BLOCKED_HOSTS.test(parsed.hostname)) return res.status(400).json({ error: 'Internal addresses not allowed' });
+  try {
+    parsed = new URL(req.body.url);
+  } catch {
+    return res.status(400).json({ error: 'Invalid URL' });
+  }
+  if (!ALLOWED_PROTOCOLS.includes(parsed.protocol))
+    return res.status(400).json({ error: 'HTTPS only' });
+  if (BLOCKED_HOSTS.test(parsed.hostname))
+    return res.status(400).json({ error: 'Internal addresses not allowed' });
   const response = await fetch(req.body.url);
   res.json({ content: await response.text() });
 });
 ```
 
 **Prevention Checklist**:
+
 - [ ] Validate and sanitize all user-supplied URLs
 - [ ] Use allowlist of permitted domains for outbound requests
 - [ ] Block private IP ranges, loopback, and cloud metadata endpoints (169.254.169.254)

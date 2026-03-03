@@ -866,20 +866,26 @@ Steps that say only "review", "analyze", or "check" without specifying HOW are I
 
 ```markdown
 ### Step 3: Analyze Dependencies
+
 Check for outdated packages and vulnerabilities.
 ```
 
 **Example — VALID step (follow this pattern):**
 
-```markdown
+````markdown
 ### Step 3: Analyze Dependencies
+
 **Command:**
+
 ```bash
 pnpm audit --json | node -e "const d=require('fs').readFileSync('/dev/stdin','utf8');const r=JSON.parse(d);console.log('Vulnerabilities:',r.metadata.vulnerabilities)"
 ```
+````
+
 **Expected output:** JSON summary of vulnerability counts by severity (e.g. `{ critical: 0, high: 1, moderate: 3 }`)
 **Verify:** Exit code 0 and valid JSON object printed to stdout
-```
+
+````
 
 Use `{{placeholder}}` syntax for values the invoking agent must substitute:
 
@@ -887,7 +893,7 @@ Use `{{placeholder}}` syntax for values the invoking agent must substitute:
 pnpm audit --json --audit-level={{severity_threshold}}
 node .claude/tools/cli/validate-integration.cjs {{skill_path}}
 grep "{{skill_name}}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
-```
+````
 
 This rule applies to every `<instructions>` step, every numbered checklist item, and every workflow action block in a skill's SKILL.md.
 

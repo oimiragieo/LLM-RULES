@@ -63,6 +63,7 @@ node --inspect-brk $(which pnpm) test
 ```
 
 **Key DevTools Features**:
+
 - Breakpoints (click gutter) + conditional breakpoints (right-click)
 - Watch expressions for variable state
 - Call stack panel for async frame inspection
@@ -85,7 +86,7 @@ const util = require('util');
 const debugAuth = util.debuglog('myapp:auth');
 const debugDB = util.debuglog('myapp:db');
 
-debugAuth('User %s attempting login', userId);  // Only outputs if DEBUG=myapp:auth
+debugAuth('User %s attempting login', userId); // Only outputs if DEBUG=myapp:auth
 debugDB('Query executed in %dms', elapsed);
 ```
 
@@ -112,6 +113,7 @@ clinic doctor -- node -e "require('./src/heavyFunction')()"
 ```
 
 **Reading the report**:
+
 - Green CPU: healthy
 - Yellow/Red CPU: bottleneck — use `clinic flame`
 - High event loop delay: I/O blocking or synchronous code in hot path
@@ -130,6 +132,7 @@ npx autocannon http://localhost:3000
 ```
 
 **Reading flamegraphs**:
+
 - X-axis = time (wider = more CPU time)
 - Y-axis = call stack (top = leaf function)
 - Hot frame: top-of-stack wide frame with no callers below it
@@ -192,6 +195,7 @@ process.on('SIGUSR2', () => {
 ```
 
 **Analysis in Chrome DevTools**:
+
 1. Open Chrome → DevTools → Memory tab
 2. Click "Load" → select `.heapsnapshot` file
 3. Use "Comparison" view: load before + after snapshots
@@ -199,6 +203,7 @@ process.on('SIGUSR2', () => {
 5. Retained size = how much memory would be freed if object were GC'd
 
 **Heap Analysis Workflow**:
+
 ```bash
 # 1. Start app
 node server.js &
@@ -242,18 +247,20 @@ require('wtfnode');
 ```
 
 **Common culprits found by wtfnode**:
+
 - Database connection pool not closed after tests
 - `setInterval` not cleared in test teardown
 - HTTP server `.listen()` without `.close()` after tests
 - Redis/pub-sub connection staying open
 
 **Fix pattern after identifying the handle**:
+
 ```javascript
 // In test teardown (after/afterAll):
 afterAll(async () => {
-  await dbPool.end();      // Close DB connection pool
-  clearInterval(myTimer);  // Clear intervals
-  server.close();          // Close HTTP server
+  await dbPool.end(); // Close DB connection pool
+  clearInterval(myTimer); // Clear intervals
+  server.close(); // Close HTTP server
   await redisClient.quit(); // Close Redis connection
 });
 ```
@@ -358,6 +365,7 @@ npx autocannon \
 ```
 
 **Combining with clinic**:
+
 ```bash
 # Terminal 1: Start clinic profiler
 clinic flame -- node server.js
@@ -372,18 +380,18 @@ npx autocannon -d 30 http://localhost:3000/api/heavy-endpoint
 
 ## Quick Tool Selection Guide
 
-| Problem | Tool | Command |
-|---------|------|---------|
-| Logic error, wrong values | Node Inspector | `node --inspect-brk script.js` |
-| High CPU usage | clinic flame / 0x | `npx 0x script.js` |
-| Memory growing over time | clinic heapsampler | `clinic heapsampler -- node script.js` |
-| Memory leak (retained objects) | heapdump | `kill -USR2 <pid>` then compare in DevTools |
-| Process won't exit | wtfnode | `node -r wtfnode script.js` |
-| Mysterious deprecation warnings | trace-warnings | `node --trace-warnings script.js` |
-| "What's causing this performance?" | clinic doctor | `clinic doctor -- node server.js` |
-| Request context lost in async | async_hooks | `AsyncLocalStorage` API |
-| HTTP throughput benchmark | autocannon | `npx autocannon http://localhost:3000` |
-| Programmatic CPU profile | v8-profiler-next | Profile specific sections in code |
+| Problem                            | Tool               | Command                                     |
+| ---------------------------------- | ------------------ | ------------------------------------------- |
+| Logic error, wrong values          | Node Inspector     | `node --inspect-brk script.js`              |
+| High CPU usage                     | clinic flame / 0x  | `npx 0x script.js`                          |
+| Memory growing over time           | clinic heapsampler | `clinic heapsampler -- node script.js`      |
+| Memory leak (retained objects)     | heapdump           | `kill -USR2 <pid>` then compare in DevTools |
+| Process won't exit                 | wtfnode            | `node -r wtfnode script.js`                 |
+| Mysterious deprecation warnings    | trace-warnings     | `node --trace-warnings script.js`           |
+| "What's causing this performance?" | clinic doctor      | `clinic doctor -- node server.js`           |
+| Request context lost in async      | async_hooks        | `AsyncLocalStorage` API                     |
+| HTTP throughput benchmark          | autocannon         | `npx autocannon http://localhost:3000`      |
+| Programmatic CPU profile           | v8-profiler-next   | Profile specific sections in code           |
 
 ---
 

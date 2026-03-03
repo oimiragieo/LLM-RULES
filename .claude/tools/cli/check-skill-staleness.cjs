@@ -28,7 +28,7 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const SKILLS_ROOT_REL = path.join('.claude', 'skills');
 const REPORTS_ROOT_REL = path.join('.claude', 'context', 'reports');
 
-function findProjectRoot() {
+function _findProjectRoot() {
   let dir = __dirname;
   while (dir !== path.dirname(dir)) {
     if (fs.existsSync(path.join(dir, '.claude'))) return dir;
@@ -109,7 +109,7 @@ function checkStaleness(skillDir) {
         ageInDays: null,
       };
     }
-  } catch (err) {
+  } catch (_err) {
     return {
       isStale: false,
       reason: 'manifest_parse_error',
@@ -316,7 +316,8 @@ function renderMarkdown(summary, results, generatedAt) {
     for (const skill of missingFields) {
       const missing = [];
       if (!skill.lastResearchDate) missing.push('lastResearchDate');
-      if (skill.staleAfterDays === null || skill.staleAfterDays === undefined) missing.push('staleAfterDays');
+      if (skill.staleAfterDays === null || skill.staleAfterDays === undefined)
+        missing.push('staleAfterDays');
       lines.push(`- ${skill.skill} (missing: ${missing.join(', ')})`);
     }
     lines.push('');

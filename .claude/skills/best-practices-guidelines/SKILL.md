@@ -35,11 +35,12 @@ You help developers write better code by applying established guidelines and bes
 When reviewing or writing code, apply these guidelines:
 
 **10. Best Practices:**
+
 - Follow RESTful API design principles when applicable
 - Implement responsive design for components
 - Use Zod for data validation
 - Regularly update dependencies and check for vulnerabilities
-</instructions>
+  </instructions>
 
 <examples>
 Example usage:

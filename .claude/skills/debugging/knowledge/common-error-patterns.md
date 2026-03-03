@@ -11,11 +11,13 @@ methodology.
 **Symptom**: `RangeError: Maximum call stack size exceeded`
 
 **Common Causes**:
+
 1. Infinite recursion (no base case)
 2. Circular object references in JSON.stringify
 3. Infinite event emitter loop
 
 **Diagnosis**:
+
 ```bash
 # Get stack trace with full depth
 node --stack-trace-limit=50 script.js 2>&1 | head -100
@@ -29,13 +31,19 @@ try { JSON.stringify(obj); } catch (e) { console.log('Circular:', e.message); }
 ```
 
 **Fix Patterns**:
+
 ```javascript
 // FIX 1: Add base case to recursive function
 // BROKEN: No termination condition
-function factorial(n) { return n * factorial(n - 1); }
+function factorial(n) {
+  return n * factorial(n - 1);
+}
 
 // FIXED: Base case added
-function factorial(n) { if (n <= 1) return 1; return n * factorial(n - 1); }
+function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
 
 // FIX 2: Circular JSON serialization — use replacer
 const seen = new WeakSet();
@@ -49,7 +57,9 @@ JSON.stringify(obj, (key, value) => {
 
 // FIX 3: Convert deep recursion to iteration
 // BROKEN: Deep recursion on large tree
-function sumTree(node) { return node.val + sumTree(node.left) + sumTree(node.right); }
+function sumTree(node) {
+  return node.val + sumTree(node.left) + sumTree(node.right);
+}
 
 // FIXED: Iterative with explicit stack
 function sumTree(root) {
@@ -73,12 +83,14 @@ function sumTree(root) {
 different results on repeated runs with same input.
 
 **Common Causes**:
+
 1. Concurrent writes to shared state (in-memory or file)
 2. Multiple event handler registrations
 3. Unguarded `check-then-act` patterns (TOCTOU)
 4. `await` inside loops creating interleaving
 
 **Diagnosis**:
+
 ```bash
 # Reproduce with stress test: run many times quickly
 for i in {1..20}; do node test.js; done | sort | uniq -c
@@ -91,6 +103,7 @@ grep -r "findOne\|findAll\|update\|create" src/ | grep -v "await" # Missing awai
 ```
 
 **Fix Patterns**:
+
 ```javascript
 // FIX 1: Mutex for shared state
 const { Mutex } = require('async-mutex');
@@ -117,12 +130,12 @@ await db.incrBy('counter', 1); // Redis: atomic
 // FIX 3: Use Promise.all instead of sequential await in loop
 // BROKEN: Race condition from serial writes
 for (const item of items) {
-  await processItem(item);  // Items can interleave if processItem has side effects
+  await processItem(item); // Items can interleave if processItem has side effects
 }
 
 // FIXED: Explicit serial execution when order matters
 for (const item of items) {
-  await processItem(item);  // Actually fine if truly sequential
+  await processItem(item); // Actually fine if truly sequential
 }
 // OR: Parallel when independent
 await Promise.all(items.map(item => processItem(item)));
@@ -136,6 +149,7 @@ await Promise.all(items.map(item => processItem(item)));
 heap snapshot shows retained objects growing over time.
 
 **Common Causes**:
+
 1. Event listeners not removed
 2. Closures holding references longer than needed
 3. Unbounded caches (Maps/Sets growing forever)
@@ -143,6 +157,7 @@ heap snapshot shows retained objects growing over time.
 5. Global variable accumulation
 
 **Diagnosis**:
+
 ```bash
 # Monitor RSS over time
 node --expose-gc script.js &
@@ -162,12 +177,13 @@ setTimeout(() => heapdump.writeSnapshot('./heap-after.heapsnapshot'), 30000);
 ```
 
 **Fix Patterns**:
+
 ```javascript
 // FIX 1: Remove event listeners when done
 class MyService extends EventEmitter {
   start() {
-    this._onData = (data) => this.process(data);
-    process.on('data', this._onData);  // Register with reference
+    this._onData = data => this.process(data);
+    process.on('data', this._onData); // Register with reference
   }
   stop() {
     process.off('data', this._onData); // Remove by same reference
@@ -195,12 +211,14 @@ metadata.set(userObj, { loginTime: Date.now() });
 **Symptom**: `Error: ENOENT: no such file or directory, open '/path/to/file'`
 
 **Common Causes**:
+
 1. Wrong working directory assumption
 2. File path using wrong separator (Windows: `\` vs Unix: `/`)
 3. File created in previous test run but not cleaned up / race condition
 4. Relative path resolution differs between execution contexts
 
 **Diagnosis**:
+
 ```bash
 # Verify working directory
 node -e "console.log(process.cwd())"
@@ -219,6 +237,7 @@ strace -e openat node script.js 2>&1 | grep ENOENT  # Linux only
 ```
 
 **Fix Patterns**:
+
 ```javascript
 const path = require('path');
 const { PROJECT_ROOT } = require('.claude/lib/utils/project-root.cjs');
@@ -251,12 +270,14 @@ function writeFileSafe(filePath, content) {
 **Symptom**: `Error: EACCES: permission denied, open '/path/to/file'`
 
 **Common Causes**:
+
 1. Writing to system directories without elevated privileges
 2. File owned by different user in CI/container environment
 3. File locked by another process (common on Windows)
 4. Hook/script trying to write to read-only path
 
 **Diagnosis**:
+
 ```bash
 # Check file permissions
 ls -la /path/to/file
@@ -272,6 +293,7 @@ lsof /path/to/file
 ```
 
 **Fix Patterns**:
+
 ```javascript
 // FIX 1: Write to user-writable location
 // BROKEN: Writing to system directory
@@ -309,6 +331,7 @@ Most common with SQLite databases during concurrent test runs.
 **Known Instance**: Windows SQLite memory.db tests — known flake, not a regression.
 
 **Diagnosis**:
+
 ```bash
 # Run tests serially to confirm race condition
 pnpm test --concurrency=1
@@ -319,6 +342,7 @@ ps aux | grep node    # Linux/Mac
 ```
 
 **Fix Patterns**:
+
 ```javascript
 // FIX 1: Use WAL mode for SQLite (allows concurrent reads)
 const db = new Database('memory.db');
@@ -352,12 +376,14 @@ if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
 **Symptom**: `UnhandledPromiseRejectionWarning` / process crash with `--unhandled-rejections=throw`
 
 **Common Causes**:
+
 1. `async` function called without `await` and without `.catch()`
 2. Promise rejection in event handler
 3. Rejection in `setTimeout`/`setInterval` callback
 4. Fire-and-forget async calls in loops
 
 **Diagnosis**:
+
 ```bash
 # Enable verbose rejection tracking
 node --trace-warnings --unhandled-rejections=throw script.js
@@ -368,6 +394,7 @@ grep -rn "async.*=>" src/ | grep -v "await"         # Async lambdas without awai
 ```
 
 **Fix Patterns**:
+
 ```javascript
 // FIX 1: Always attach .catch() to fire-and-forget promises
 // BROKEN (SE-04 violation):
@@ -378,7 +405,7 @@ someAsyncOperation().catch(err => logger.error('Operation failed:', err));
 
 // FIX 2: Never await in forEach (SE-04 violation)
 // BROKEN: forEach ignores returned promises
-items.forEach(async (item) => {
+items.forEach(async item => {
   await processItem(item); // Not awaited by forEach!
 });
 
@@ -407,6 +434,7 @@ process.on('unhandledRejection', (reason, promise) => {
 **Known in This Codebase**: `path.relative()` returns backslash paths on Windows.
 
 **Diagnosis**:
+
 ```javascript
 // Verify path separator in current environment
 const path = require('path');
@@ -417,6 +445,7 @@ console.log(path.relative('C:\\dev\\project', 'C:\\dev\\project\\src\\file.js'))
 ```
 
 **Fix Patterns**:
+
 ```javascript
 // FIX: Always normalize paths for regex/glob use
 const relativePath = path.relative(PROJECT_ROOT, absolutePath).replace(/\\/g, '/');
@@ -443,12 +472,14 @@ function toPortablePath(p) {
 `TypeError: Cannot read properties of null (reading 'bar')`
 
 **Common Causes**:
+
 1. API response shape changed; old code assumes old structure
 2. Optional chaining missing for deeply nested access
 3. Default values not provided for missing configuration
 4. Async race: accessing result before async op completes
 
 **Fix Patterns**:
+
 ```javascript
 // FIX 1: Optional chaining + nullish coalescing
 // BROKEN:

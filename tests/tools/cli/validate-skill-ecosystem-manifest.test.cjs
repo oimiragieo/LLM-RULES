@@ -11,10 +11,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const SCHEMA_PATH = path.join(
-  __dirname,
-  '../../../.claude/schemas/skill-manifest.schema.json'
-);
+const SCHEMA_PATH = path.join(__dirname, '../../../.claude/schemas/skill-manifest.schema.json');
 
 // ── Inline JSON Schema validator (no external deps) ──────────────────────────
 /**
@@ -138,10 +135,7 @@ function removeTmpDir(dir) {
 
 describe('skill-manifest.schema.json', () => {
   test('schema file exists at .claude/schemas/skill-manifest.schema.json', () => {
-    assert.ok(
-      fs.existsSync(SCHEMA_PATH),
-      `Schema file not found at ${SCHEMA_PATH}`
-    );
+    assert.ok(fs.existsSync(SCHEMA_PATH), `Schema file not found at ${SCHEMA_PATH}`);
   });
 
   test('schema file is valid JSON', () => {
@@ -158,11 +152,7 @@ describe('skill-manifest.schema.json', () => {
     assert.ok(schema.$schema, 'Schema must have a $schema field');
     assert.ok(schema.title, 'Schema must have a title field');
     assert.ok(schema.properties, 'Schema must have properties field');
-    assert.deepStrictEqual(
-      schema.type,
-      'object',
-      'Schema type must be "object"'
-    );
+    assert.deepStrictEqual(schema.type, 'object', 'Schema type must be "object"');
   });
 
   test('schema declares name, version, skillType as required', () => {
@@ -202,7 +192,7 @@ describe('manifest validation', () => {
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
     assert.ok(
-      result.errors.some((e) => e.includes('name')),
+      result.errors.some(e => e.includes('name')),
       'Should report missing name'
     );
   });
@@ -211,21 +201,21 @@ describe('manifest validation', () => {
     const manifest = { name: 'tdd', skillType: 'cognitive' };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('version')));
+    assert.ok(result.errors.some(e => e.includes('version')));
   });
 
   test('missing skillType fails validation', () => {
     const manifest = { name: 'tdd', version: '1.0.0' };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('skillType')));
+    assert.ok(result.errors.some(e => e.includes('skillType')));
   });
 
   test('invalid skillType fails validation', () => {
     const manifest = { name: 'tdd', version: '1.0.0', skillType: 'unknown' };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('skillType')));
+    assert.ok(result.errors.some(e => e.includes('skillType')));
   });
 
   test('valid externalDependencies array passes validation', () => {
@@ -251,7 +241,7 @@ describe('manifest validation', () => {
     };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('dependency type')));
+    assert.ok(result.errors.some(e => e.includes('dependency type')));
   });
 
   test('externalDependency without name fails validation', () => {
@@ -263,7 +253,7 @@ describe('manifest validation', () => {
     };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('name')));
+    assert.ok(result.errors.some(e => e.includes('name')));
   });
 
   test('valid npmDependencies array passes validation', () => {
@@ -289,7 +279,7 @@ describe('manifest validation', () => {
     };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('package')));
+    assert.ok(result.errors.some(e => e.includes('package')));
   });
 
   test('valid githubRepos array passes validation', () => {
@@ -314,7 +304,7 @@ describe('manifest validation', () => {
     };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('url')));
+    assert.ok(result.errors.some(e => e.includes('url')));
   });
 
   test('valid lastResearchDate in YYYY-MM-DD format passes', () => {
@@ -337,7 +327,7 @@ describe('manifest validation', () => {
     };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('lastResearchDate')));
+    assert.ok(result.errors.some(e => e.includes('lastResearchDate')));
   });
 
   test('valid staleAfterDays number passes', () => {
@@ -360,7 +350,7 @@ describe('manifest validation', () => {
     };
     const result = validateManifest(manifest);
     assert.strictEqual(result.valid, false);
-    assert.ok(result.errors.some((e) => e.includes('staleAfterDays')));
+    assert.ok(result.errors.some(e => e.includes('staleAfterDays')));
   });
 });
 
@@ -425,10 +415,7 @@ describe('real skill manifest files', () => {
 
   test('debugging/manifest.json exists', () => {
     const manifestPath = path.join(SKILLS_ROOT, 'debugging', 'manifest.json');
-    assert.ok(
-      fs.existsSync(manifestPath),
-      `debugging manifest not found at ${manifestPath}`
-    );
+    assert.ok(fs.existsSync(manifestPath), `debugging manifest not found at ${manifestPath}`);
   });
 
   test('debugging/manifest.json is valid and passes manifest validation', () => {
@@ -451,9 +438,7 @@ describe('real skill manifest files', () => {
 // ── evaluate-skill manifest check integration ─────────────────────────────────
 
 describe('evaluateSkill manifest.json check (optional/warning)', () => {
-  const {
-    evaluateSkill,
-  } = require('../../../.claude/tools/cli/validate-skill-ecosystem.cjs');
+  const { evaluateSkill } = require('../../../.claude/tools/cli/validate-skill-ecosystem.cjs');
 
   test('evaluateSkill reports manifest.present=false when manifest.json is absent', () => {
     const root = makeTmpDir();
@@ -567,7 +552,7 @@ describe('evaluateSkill manifest.json check (optional/warning)', () => {
     assert.strictEqual(result.manifest.present, true);
     assert.strictEqual(result.manifest.valid, false);
     assert.ok(
-      result.manifest.errors.some((e) => e.includes('parse') || e.includes('JSON')),
+      result.manifest.errors.some(e => e.includes('parse') || e.includes('JSON')),
       'Should report JSON parse error'
     );
 
