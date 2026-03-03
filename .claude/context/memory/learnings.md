@@ -116,3 +116,116 @@
 - Created new agent: marketing-strategist (2026-03-03)
 
 - Created new agent: brand-guardian (2026-03-03)
+
+---
+
+## Pattern: Worktree Isolation Compatibility Matrix (2026-03-03)
+
+**Pattern**: Worktree isolation (isolated git worktrees from clean HEAD) is **safe for code-generation tasks** but **breaks code-analysis tasks** that depend on uncommitted changes visibility.
+
+**Applies to**:
+
+- ✅ **SAFE**: developer, qa, testing agents (operate on committed code)
+- ❌ **UNSAFE**: code-reviewer, architect, code-simplifier (need working-tree visibility)
+
+**Evidence**:
+
+- Task 1 (2026-03-03): code-reviewer with worktree isolation → cannot see unstaged changes → fail → re-spawn without isolation → succeed
+- Lint pipeline showed 2570/2571 issues were in isolated worktrees (expected isolation to clean HEAD)
+
+**Workaround**:
+
+1. For in-flight code review: spawn code-reviewer WITHOUT `isolation: worktree`
+2. For committed code review: spawn code-reviewer WITH isolation (safe)
+3. For mixed scenarios: commit changes before code-review spawn
+
+**Implementation**:
+
+- Remove `isolation: worktree` from code-reviewer.md frontmatter (set to `isolation: none`)
+- Document this tradeoff in CLAUDE.md routing section
+- Future: Add spawn-time override flag for conditional isolation
+
+**Impact**:
+
+- Resolves blocking issue: code-review fails when spawned with worktree isolation
+- Enables best practice: use worktree isolation only for agents that don't need working-tree state
+
+- Created new agent: qa-guardian (2026-03-03)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-03)
+
+- Created new agent: contract-check (2026-03-03)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-03)
+
+- Created new agent: bool-action (2026-03-03)
+
+- Created new agent: repo-onboarder (2026-03-03)
+
+- Updated workflow: evolution-workflow (2026-03-03)
+
+- Updated workflow: missing-workflow-xyz (2026-03-03)
+
+- Created new agent: qa-guardian (2026-03-03)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-03)
+
+- Created new agent: contract-check (2026-03-03)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-03)
+
+- Created new agent: bool-action (2026-03-03)
+
+- Created new agent: repo-onboarder (2026-03-03)
+
+- Updated workflow: evolution-workflow (2026-03-03)
+
+- Updated workflow: missing-workflow-xyz (2026-03-03)
+
+- Created new agent: qa-guardian (2026-03-03)
+
+- Created new agent: contract-check (2026-03-03)
+
+- Created new agent: bool-action (2026-03-03)
+
+- Created new agent: repo-onboarder (2026-03-03)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-03)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-03)
+
+- Updated workflow: evolution-workflow (2026-03-03)
+
+- Updated workflow: missing-workflow-xyz (2026-03-03)
+
+- Created new agent: qa-guardian (2026-03-03)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-03)
+
+- Created new agent: contract-check (2026-03-03)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-03)
+
+- Created new agent: bool-action (2026-03-03)
+
+- Created new agent: repo-onboarder (2026-03-03)
+
+- Updated workflow: evolution-workflow (2026-03-03)
+
+- Updated workflow: missing-workflow-xyz (2026-03-03)
+
+- Created new agent: qa-guardian (2026-03-03)
+
+- Created new agent: contract-check (2026-03-03)
+
+- Created new agent: bool-action (2026-03-03)
+
+- Created new agent: repo-onboarder (2026-03-03)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-03)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-03)
+
+- Updated workflow: evolution-workflow (2026-03-03)
+
+- Updated workflow: missing-workflow-xyz (2026-03-03)

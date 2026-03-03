@@ -380,6 +380,10 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Aso Specialist                                                 | `aso-specialist`          | `.claude/agents/domain/aso-specialist.md`          |
 | Marketing Strategist                                           | `marketing-strategist`    | `.claude/agents/domain/marketing-strategist.md`    |
 | Brand Guardian                                                 | `brand-guardian`          | `.claude/agents/domain/brand-guardian.md`          |
+| Qa Guardian                                                    | `qa-guardian`             | `.claude/agents/domain/qa-guardian.md`             |
+| Contract Check                                                 | `contract-check`          | `.claude/agents/domain/contract-check.md`          |
+| Bool Action                                                    | `bool-action`             | `.claude/agents/domain/bool-action.md`             |
+| Repo Onboarder                                                 | `repo-onboarder`          | `.claude/agents/orchestrators/repo-onboarder.md`   |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 

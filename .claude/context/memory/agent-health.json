@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-03-02T07:37:01.268Z",
+  "updatedAt": "2026-03-03T07:18:02.736Z",
   "agents": {
     "developer": {
-      "successCount": 93,
+      "successCount": 135,
       "failureCount": 0,
       "consecutiveFailures": 0,
       "successRate": 1,
@@ -10,20 +10,9 @@
       "totalCompletionMs": 0,
       "completionSamples": 0,
       "lastOutcome": "success",
-      "lastUpdatedAt": "2026-03-02T07:37:01.268Z"
+      "lastUpdatedAt": "2026-03-03T07:18:02.736Z"
     },
     "qa": {
-      "successCount": 13,
-      "failureCount": 0,
-      "consecutiveFailures": 0,
-      "successRate": 1,
-      "averageCompletionMs": null,
-      "totalCompletionMs": 0,
-      "completionSamples": 0,
-      "lastOutcome": "success",
-      "lastUpdatedAt": "2026-03-02T07:00:46.062Z"
-    },
-    "planner": {
       "successCount": 17,
       "failureCount": 0,
       "consecutiveFailures": 0,
@@ -32,7 +21,18 @@
       "totalCompletionMs": 0,
       "completionSamples": 0,
       "lastOutcome": "success",
-      "lastUpdatedAt": "2026-03-02T07:37:00.629Z"
+      "lastUpdatedAt": "2026-03-03T06:57:57.888Z"
+    },
+    "planner": {
+      "successCount": 25,
+      "failureCount": 0,
+      "consecutiveFailures": 0,
+      "successRate": 1,
+      "averageCompletionMs": null,
+      "totalCompletionMs": 0,
+      "completionSamples": 0,
+      "lastOutcome": "success",
+      "lastUpdatedAt": "2026-03-03T07:18:02.299Z"
     }
   }
 }

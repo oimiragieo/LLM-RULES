@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-03-02T07:00:08.941Z"
+      "last_accessed": "2026-03-03T06:57:34.842Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "discovered_at": "2026-02-11",
@@ -328,7 +328,25 @@
       "category": "code-indexing",
       "discovered_at": "2026-03-02T01:24:39.486Z",
       "last_accessed": "2026-03-02T01:24:39.486Z"
+    },
+    ".claude/lib/tools/skill-tool.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-03T06:17:58.461Z",
+      "last_accessed": "2026-03-03T06:17:58.461Z"
+    },
+    "tests/tools/cli/validate-skill-ecosystem-manifest.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-03T06:47:29.012Z",
+      "last_accessed": "2026-03-03T06:47:29.012Z"
+    },
+    ".claude/tools/cli/check-skill-staleness.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-03T07:04:32.127Z",
+      "last_accessed": "2026-03-03T07:04:39.490Z"
     }
   },
-  "last_updated": "2026-03-02T07:00:08.941Z"
+  "last_updated": "2026-03-03T07:04:39.490Z"
 }

@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-02T07:41:14.390Z
+lastVerifiedAt: 2026-03-03T07:11:34.223Z
 name: reflection-agent
 version: 1.1.0
 description: >-
