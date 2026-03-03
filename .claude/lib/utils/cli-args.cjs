@@ -27,9 +27,7 @@ function parsePositiveFloat(str, argName, opts = {}) {
     process.exit(1);
   }
   if (val < min || val > max) {
-    process.stderr.write(
-      `Error: --${argName} must be between ${min} and ${max}, got: ${val}\n`
-    );
+    process.stderr.write(`Error: --${argName} must be between ${min} and ${max}, got: ${val}\n`);
     process.exit(1);
   }
   return val;

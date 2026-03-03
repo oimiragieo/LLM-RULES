@@ -8301,222 +8301,78 @@
   },
   "index": {
     "byCapability": {
-      "architect": [
-        "architect"
-      ],
-      "context-compressor": [
-        "context-compressor"
-      ],
-      "developer": [
-        "developer"
-      ],
-      "planner": [
-        "planner"
-      ],
-      "pm": [
-        "pm"
-      ],
-      "qa": [
-        "qa"
-      ],
-      "reflection-agent": [
-        "reflection-agent"
-      ],
-      "router": [
-        "router"
-      ],
-      "technical-program-manager": [
-        "technical-program-manager"
-      ],
-      "technical-writer": [
-        "technical-writer"
-      ],
-      "accessibility-tester": [
-        "accessibility-tester"
-      ],
-      "advanced-debugging": [
-        "advanced-debugging"
-      ],
-      "c4-code": [
-        "c4-code"
-      ],
-      "c4-component": [
-        "c4-component"
-      ],
-      "c4-container": [
-        "c4-container"
-      ],
-      "c4-context": [
-        "c4-context"
-      ],
-      "chaos-engineer": [
-        "chaos-engineer"
-      ],
-      "code-reviewer": [
-        "code-reviewer"
-      ],
-      "code-simplifier": [
-        "code-simplifier"
-      ],
-      "conductor-validator": [
-        "conductor-validator"
-      ],
-      "database-architect": [
-        "database-architect"
-      ],
-      "devops-troubleshooter": [
-        "devops-troubleshooter"
-      ],
-      "devops": [
-        "devops"
-      ],
-      "incident-responder": [
-        "incident-responder"
-      ],
-      "penetration-tester": [
-        "penetration-tester"
-      ],
-      "performance-engineer": [
-        "performance-engineer"
-      ],
-      "researcher": [
-        "researcher"
-      ],
-      "reverse-engineer": [
-        "reverse-engineer"
-      ],
-      "security-architect": [
-        "security-architect"
-      ],
-      "sre-engineer": [
-        "sre-engineer"
-      ],
-      "ai-ml-specialist": [
-        "ai-ml-specialist"
-      ],
-      "android": [
-        "android-pro"
-      ],
-      "api-designer": [
-        "api-designer"
-      ],
-      "aso-specialist": [
-        "aso-specialist"
-      ],
-      "brand-guardian": [
-        "brand-guardian"
-      ],
-      "compliance-checker": [
-        "compliance-checker"
-      ],
-      "data-engineer": [
-        "data-engineer"
-      ],
-      "expo-mobile-developer": [
-        "expo-mobile-developer"
-      ],
-      "fastapi": [
-        "fastapi-pro"
-      ],
-      "feedback-synthesizer": [
-        "feedback-synthesizer"
-      ],
-      "frontend": [
-        "frontend-pro"
-      ],
-      "gamedev": [
-        "gamedev-pro"
-      ],
-      "golang": [
-        "golang-pro"
-      ],
-      "graphql": [
-        "graphql-pro"
-      ],
-      "ios": [
-        "ios-pro"
-      ],
-      "java": [
-        "java-pro"
-      ],
-      "kubernetes-specialist": [
-        "kubernetes-specialist"
-      ],
-      "llm-architect": [
-        "llm-architect"
-      ],
-      "marketing-strategist": [
-        "marketing-strategist"
-      ],
-      "mcp-developer": [
-        "mcp-developer"
-      ],
-      "medical-research-triage": [
-        "medical-research-triage"
-      ],
-      "microservices-architect": [
-        "microservices-architect"
-      ],
-      "mobile-ux-reviewer": [
-        "mobile-ux-reviewer"
-      ],
-      "multi-llm-consultant": [
-        "multi-llm-consultant"
-      ],
-      "nextjs": [
-        "nextjs-pro"
-      ],
-      "nodejs": [
-        "nodejs-pro"
-      ],
-      "php": [
-        "php-pro"
-      ],
-      "pm-coordinator": [
-        "pm-coordinator"
-      ],
-      "prompt-engineer": [
-        "prompt-engineer"
-      ],
-      "python": [
-        "python-pro"
-      ],
-      "rust": [
-        "rust-pro"
-      ],
-      "scientific-research": [
-        "scientific-research-expert"
-      ],
-      "sveltekit": [
-        "sveltekit-expert"
-      ],
-      "tauri-desktop-developer": [
-        "tauri-desktop-developer"
-      ],
-      "typescript": [
-        "typescript-pro"
-      ],
-      "ux-researcher": [
-        "ux-researcher"
-      ],
-      "web3-blockchain": [
-        "web3-blockchain-expert"
-      ],
-      "artifact-integrator": [
-        "artifact-integrator"
-      ],
-      "evolution-orchestrator": [
-        "evolution-orchestrator"
-      ],
-      "master-orchestrator": [
-        "master-orchestrator"
-      ],
-      "party-orchestrator": [
-        "party-orchestrator"
-      ],
-      "swarm-coordinator": [
-        "swarm-coordinator"
-      ]
+      "architect": ["architect"],
+      "context-compressor": ["context-compressor"],
+      "developer": ["developer"],
+      "planner": ["planner"],
+      "pm": ["pm"],
+      "qa": ["qa"],
+      "reflection-agent": ["reflection-agent"],
+      "router": ["router"],
+      "technical-program-manager": ["technical-program-manager"],
+      "technical-writer": ["technical-writer"],
+      "accessibility-tester": ["accessibility-tester"],
+      "advanced-debugging": ["advanced-debugging"],
+      "c4-code": ["c4-code"],
+      "c4-component": ["c4-component"],
+      "c4-container": ["c4-container"],
+      "c4-context": ["c4-context"],
+      "chaos-engineer": ["chaos-engineer"],
+      "code-reviewer": ["code-reviewer"],
+      "code-simplifier": ["code-simplifier"],
+      "conductor-validator": ["conductor-validator"],
+      "database-architect": ["database-architect"],
+      "devops-troubleshooter": ["devops-troubleshooter"],
+      "devops": ["devops"],
+      "incident-responder": ["incident-responder"],
+      "penetration-tester": ["penetration-tester"],
+      "performance-engineer": ["performance-engineer"],
+      "researcher": ["researcher"],
+      "reverse-engineer": ["reverse-engineer"],
+      "security-architect": ["security-architect"],
+      "sre-engineer": ["sre-engineer"],
+      "ai-ml-specialist": ["ai-ml-specialist"],
+      "android": ["android-pro"],
+      "api-designer": ["api-designer"],
+      "aso-specialist": ["aso-specialist"],
+      "brand-guardian": ["brand-guardian"],
+      "compliance-checker": ["compliance-checker"],
+      "data-engineer": ["data-engineer"],
+      "expo-mobile-developer": ["expo-mobile-developer"],
+      "fastapi": ["fastapi-pro"],
+      "feedback-synthesizer": ["feedback-synthesizer"],
+      "frontend": ["frontend-pro"],
+      "gamedev": ["gamedev-pro"],
+      "golang": ["golang-pro"],
+      "graphql": ["graphql-pro"],
+      "ios": ["ios-pro"],
+      "java": ["java-pro"],
+      "kubernetes-specialist": ["kubernetes-specialist"],
+      "llm-architect": ["llm-architect"],
+      "marketing-strategist": ["marketing-strategist"],
+      "mcp-developer": ["mcp-developer"],
+      "medical-research-triage": ["medical-research-triage"],
+      "microservices-architect": ["microservices-architect"],
+      "mobile-ux-reviewer": ["mobile-ux-reviewer"],
+      "multi-llm-consultant": ["multi-llm-consultant"],
+      "nextjs": ["nextjs-pro"],
+      "nodejs": ["nodejs-pro"],
+      "php": ["php-pro"],
+      "pm-coordinator": ["pm-coordinator"],
+      "prompt-engineer": ["prompt-engineer"],
+      "python": ["python-pro"],
+      "rust": ["rust-pro"],
+      "scientific-research": ["scientific-research-expert"],
+      "sveltekit": ["sveltekit-expert"],
+      "tauri-desktop-developer": ["tauri-desktop-developer"],
+      "typescript": ["typescript-pro"],
+      "ux-researcher": ["ux-researcher"],
+      "web3-blockchain": ["web3-blockchain-expert"],
+      "artifact-integrator": ["artifact-integrator"],
+      "evolution-orchestrator": ["evolution-orchestrator"],
+      "master-orchestrator": ["master-orchestrator"],
+      "party-orchestrator": ["party-orchestrator"],
+      "swarm-coordinator": ["swarm-coordinator"]
     },
     "byDomain": {
       "security": [
@@ -8578,15 +8434,9 @@
         "typescript-pro",
         "web3-blockchain-expert"
       ],
-      "planning": [
-        "pm"
-      ],
-      "testing": [
-        "qa"
-      ],
-      "documentation": [
-        "technical-writer"
-      ],
+      "planning": ["pm"],
+      "testing": ["qa"],
+      "documentation": ["technical-writer"],
       "architecture": [
         "c4-container",
         "c4-context",
@@ -8594,17 +8444,9 @@
         "llm-architect",
         "microservices-architect"
       ],
-      "devops": [
-        "devops"
-      ],
-      "research": [
-        "researcher",
-        "medical-research-triage",
-        "ux-researcher"
-      ],
-      "mobile": [
-        "mobile-ux-reviewer"
-      ],
+      "devops": ["devops"],
+      "research": ["researcher", "medical-research-triage", "ux-researcher"],
+      "mobile": ["mobile-ux-reviewer"],
       "orchestration": [
         "artifact-integrator",
         "evolution-orchestrator",

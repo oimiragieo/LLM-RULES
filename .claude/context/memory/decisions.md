@@ -1,3 +1,43 @@
+## ADR-2026-03-03-109: Multi-LLM Council Pipeline Pattern (VALIDATED)
+
+**Date**: 2026-03-03
+**Status**: VALIDATED (session-2 council review + fix confirmed effectiveness)
+**Trigger**: Reflection on Tasks 1, 3, 4 — council review + implementation pipeline
+
+**Pattern Confirmed**: Multi-LLM Council → Architect Synthesis → Developer Implementation is a high-quality pipeline for codebase review:
+
+1. Council (multiple LLMs) identifies findings across SE categories
+2. Architect synthesizes, resolves false positives with code evidence, writes ADR + evolution plan
+3. Developer implements fixes from plan, referencing ADR decisions
+4. Devops validates: tests, lint, format, commit, push
+
+**Key Decision**: Add mandatory code cross-check step BEFORE including HIGH/CRITICAL findings in council report. Pattern: `rg -F 'symbol' file` to confirm declared/undeclared. Architect caught H2 false positive (bytesRead line 43) but this should be caught earlier.
+
+**Secondary Decision**: Worktree-isolated agent spawn prompts MUST include inline summary contract. Without it, router has no visibility into worktree output and must verify manually via git.
+
+---
+
+## ADR-2026-03-03-108: Skill System & Worktree Lifecycle Hardening Plan
+
+**Date**: 2026-03-03
+**Status**: APPROVED (plan written, pending implementation in task-4)
+**Trigger**: Multi-LLM council review + internal code review of commits 4138e4f0..4c290b7d
+
+**Decisions:**
+
+1. NaN gate bypass in validate-skill-ecosystem.cjs requires `Number.isFinite()` guard + range validation (0-100)
+2. All JSON.parse in hooks/tools MUST use safeParseJSON (SE-02 unconditional). ESLint rule proposed for enforcement.
+3. Worktree utilities to be extracted into `.claude/lib/worktree/worktree-utils.cjs` (DRY: listWorktrees, isStale, detectDefaultBranch, normalizeWorktreesDir)
+4. Default branch detection via `git symbolic-ref refs/remotes/origin/HEAD` instead of hardcoded 'main'
+5. Date arithmetic must use UTC normalization per SE-06 (new utility: `.claude/lib/utils/date-utils.cjs`)
+6. Council finding H2 (bytesRead ReferenceError) is a FALSE POSITIVE -- variable IS declared at line 43. Windows stdin fragility remains as minor item.
+7. Report tools must output to `.claude/context/reports/backend/` per workspace conventions
+
+**Plan**: `.claude/context/plans/skill-worktree-evolution-plan-2026-03-03.md`
+**Implementation**: 4 phases, merge gate after Phase 2, estimated 4.5 hours total
+
+---
+
 ## ADR-2026-03-02-107: Self-Healing Loop Evidence Integration (PROPOSED)
 
 **Date**: 2026-03-02

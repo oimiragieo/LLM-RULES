@@ -1,183 +1,42 @@
-## ISSUE: Skill System Overhaul Integration Gaps (2026-03-03) — P0 BLOCKING
+## ISSUE: Worktree Accumulation on Missing TaskUpdate (2026-03-03 REFLECTION)
 
-**Status**: OPEN — post-pipeline validation required before completion
+**Status**: OPEN — P2 (reliability risk)
 
-**Context**: Tasks 27-31 completed multi-phase skill system overhaul (Phases 3-5). Framework infrastructure changes require bidirectional validation: forward (creation) + backward (registration verification). Backward pass missing.
+**Observed**: `worktree-auto-cleanup.cjs` fires on `PostToolUse(TaskUpdate)` only. If an agent exits without calling TaskUpdate (error, timeout, context limit), its worktree persists indefinitely. 10 stale worktrees accumulated in one session.
 
-**Gaps Identified**:
+**Root Cause**: Single cleanup trigger path (TaskUpdate) does not cover agent exit-without-update cases.
 
-- [ ] Artifact-integrator post-pipeline validation not completed (Task 28 skill creation unknown)
-- [ ] CLAUDE.md Section 8.5 skill roster updates not confirmed
-- [ ] Artifact-graph edges not verified for new skill dependencies
-- [ ] Skill-agent consistency (Step 4.7) not executed post-pipeline
-- [ ] Proactive-audit (Task 30) output location not documented
-- [ ] Integration health score (ADR-100) not recorded
+**Fix Path** (P2):
 
-**Root Cause**: Creator ecosystem requires post-creation integration audit (artifact-integrator), but this was not spawned as final pipeline step.
-
-**Impact**: Orphaned skills, missing agent assignments, invisible artifacts may exist post-overhaul.
-
-**Solution**: Spawn artifact-integrator immediately with skill names from Task 28-29 to validate: (1) catalog presence, (2) index presence, (3) agent assignment, (4) orphan status. Document findings in this issue.
-
-**Owner**: router (Step 0.5 integration queue) or developer (manual remediation)
-
----
-
-## ISSUE: Self-Healing Loop Evidence Gap (2026-03-02) — CRITICAL
-
-**Status**: OPEN — P0 blocker for self-improvement maturity
-
-**Observed**: Evolution-Reflection cycle operationally closed but evidentially broken. System executes phases (Reflection → Evolution → Creation → Validation) but **does not feedback outcome signals back into reflection context**.
+1. Add secondary cleanup: session-end hook or periodic cron in `.claude/tools/cli/`
+2. Add worktree age-based pruning (> 2 hours old, task completed/deleted = safe to prune)
+3. Reference: `worktree-auto-cleanup.cjs` in `.claude/hooks/`
 
 **Evidence**:
 
-- Task #4 synthesis identified 4 P0 fixes with no automated follow-up
-- Reflection-log.jsonl contains recommendations, but no outcome field
-- Creator outputs (skills, agents) don't include validation results
-- Next reflection cycle has no visibility into whether prior recommendations succeeded
-
-**Impact**:
-
-- Duplicate patterns re-discovered in consecutive sessions (no staleness decay)
-- Same evolution recommendations repeated (no outcome tracking)
-- Self-healing loop appears broken because feedback is missing, not because of execution failure
-
-**Gold-Standard Property Missing**: Outcome signal injection to close evidence loop
-
-**Mitigation**:
-
-1. Add `outcome` field to reflection-log.jsonl entries
-2. Modify post-completion-chain.cjs to inject outcome signals when evolution-triggered changes complete
-3. Wire creator validation results back to reflection spawn context
-4. Implement dead-letter governance for failed creator attempts
-
-**Target Fix Date**: 2026-03-03
+- Gap log entry: task-36, 2026-03-03T08:30:00Z
+- Reflection report: `.claude/context/reports/reflections/reflection-batch-session-2-2026-03-03.md`
 
 ---
 
-## ISSUE: 2 Unregistered Hooks (2026-03-02) — P0 CRITICAL
+## ISSUE: Multi-LLM Council False Positives — No Code Cross-Check Step (2026-03-03 REFLECTION)
 
-**Status**: OPEN — Blocks reflection handshake
+**Status**: OPEN — P2 (quality risk)
 
-**Identified Hooks**:
+**Observed**: Codex model flagged `bytesRead` as "potentially undeclared" (finding H2) in council review. Architect investigation revealed bytesRead IS declared at line 43 of the file. The false positive added noise and required architect time to resolve.
 
-1. **reflection-cleanup.cjs** — Should run PostToolUse(TaskUpdate) to atomically remove processed reflection requests from reflection-spawn-request.json
-2. **[Hook #2 TBD]** — Pending full artifact audit
+**Root Cause**: Multi-LLM council workflow does not include a mandatory cross-check step: "before including a HIGH/CRITICAL finding in the report, verify the claim against the actual code."
 
-**Impact**:
+**Fix Path** (P2):
 
-- Without registration, reflection handshake signal (processedReflectionIds) is ignored
-- Reflection requests accumulate as stale entries in spawn queue
-- Session resets compound stale requests (50+ queue buildup observed)
-
-**Evidence**: Task #1 component analysis found both hooks missing from settings.json
-
-**Remediation**:
-
-```bash
-# 1. Add to .claude/settings.json
-"reflection-cleanup.cjs": { "event": "PostToolUse:TaskUpdate", "priority": 100 }
-
-# 2. Validate
-node .claude/tools/cli/validate-hook-registration.cjs
-
-# 3. Test
-pnpm test .claude/hooks/reflection/reflection-cleanup.cjs
-```
-
-**Target Fix Date**: 2026-03-02 (immediate)
-
----
-
-## ISSUE: Reflection Data Quality Gate Incomplete (2026-03-02)
-
-**Status**: OPEN — P1 (impacts reflection reliability)
-
-**Observed**: Phase 0 data sufficiency check (from reflection-agent.md) is correctly specified but not fully implemented in runtime
-
-**Gap**:
-
-- Agent definition documents Phase 0 (check summary, filesModified, dataQuality flag)
-- But agent does not auto-remediate insufficient data
-- Instead, score is withheld but no automatic follow-up triggered
-
-**Example**: If task completes without summary, reflection-agent should auto-spawn a correction request asking the original agent to provide metadata
-
-**Recommendation**:
-
-- When dataQuality is "insufficient", auto-create TaskUpdate request to original agent asking for metadata completion
-- Retry reflection after metadata provided
-
-**Priority**: P1 (improves reflection reliability without blocking current workflows)
-
-- Mitigation documented: "never spawn reflection-agent with run_in_background: true — always foreground"
-
-**Pattern**: Applies to any background-spawned agent that needs atomic completion handshake
-
-**Mitigation**: CLAUDE.md Step 0 must enforce reflection-agent ALWAYS foreground (no background spawns)
-
-**Related**: May affect other background spawn patterns; check if run_in_background affects tool whitelist globally 2. Tool whitelist configuration missing TaskUpdate for reflection-agent 3. Skill framework overrides standard tool availability
-
-**Workaround**: None — requires Router or system configuration fix.
-
----
-
-## ISSUE: Worktree Isolation Breaks Code Review on Uncommitted Changes (2026-03-03) — Systemic
-
-**Status**: OPEN — P1 (blocks core code-review capability)
-
-**Root Cause**: Git worktree isolation creates isolated clone from clean HEAD. Code-reviewer agent spawned with `isolation: worktree` cannot see unstaged/uncommitted changes in parent working tree.
-
-**Observed**:
-
-- Task 1 (2026-03-03 04:04:47Z): code-reviewer + worktree isolation → cannot locate unstaged code
-- Router detected and re-spawned without isolation → succeeded
-- Gap log entry: "code-reviewer in worktree could not see unstaged working-tree changes"
-
-**Systemic Pattern**: Worktree isolation is **incompatible with all in-flight code-analysis tasks**:
-
-- code-reviewer (analyze uncommitted changes)
-- architect (in-flight design review)
-- code-simplifier (analyze current state)
-
-**Current State**:
-
-- code-reviewer.md has `isolation: worktree` in frontmatter
-- This is the DEFAULT for this agent
-- Results in systematic failures on in-flight review requests
-
-**Impact**:
-
-- BLOCKS: Any code-review or architecture-review task on uncommitted changes
-- TRIGGERS: When task requires analyzing working-tree state + agent has worktree isolation enabled
-- MITIGATION: Manually spawn without isolation (Router re-spawns on detection, but still wastes cycle)
-
-**Fix Path** (P1):
-
-1. Remove `isolation: worktree` from code-reviewer frontmatter (set to `isolation: none`)
-2. Document limitation in CLAUDE.md routing section
-3. Add spawn-time override for future conditional isolation (tasks could request isolation if needed)
-
-**Evidence Files**:
-
-- Gap log: `.claude/context/runtime/session-gap-log.jsonl` (line 1)
-- Reflection report: `.claude/context/reports/reflections/lint-pipeline-reflection-2026-03-03.md`
-- Task metadata: task-1 completed with retry (code-reviewer first failure, then success)
+1. Add to council workflow instructions: "For each HIGH or CRITICAL finding, run a targeted code search to verify before including. Example: `rg -F 'variable_name' path/to/file` to confirm declared/undeclared status."
+2. Add confidence level field to council findings (LOW/MEDIUM/HIGH confidence in the finding itself)
+3. Reference: ADR-2026-03-03-108 (resolved this false positive)
 
 **Evidence**:
 
-- Reflection report: `.claude/context/reports/reflections/reflection-tasks-21-22-14-insufficient-data-2026-02-22.md`
-- Briefing requirement: "ATOMIC COMPLETION: In your final TaskUpdate({ status: "completed" }), include: metadata: { processedReflectionIds: [...] }"
-- Error message: "No such tool available: TaskUpdate"
-
-**Resolution Required**:
-
-1. Check if reflection-agent was spawned correctly (should be Task(), not Skill())
-2. Verify tool whitelist includes TaskUpdate for reflection-agent type
-3. Re-invoke reflection-agent with correct spawning mechanism
-4. Manually update reflection-spawn-request.json entries to mark processed: true if automated cleanup cannot run
-
-**Priority**: P1 (blocks reflection completion handshake across entire system)
+- decisions.md: ADR-2026-03-03-108
+- Reflection report: `.claude/context/reports/reflections/reflection-batch-session-2-2026-03-03.md`
 
 ---
 
@@ -209,6 +68,91 @@ pnpm test .claude/hooks/reflection/reflection-cleanup.cjs
 ---
 
 ## (END ENTRY 2026-02-22)
+
+---
+
+## ISSUE: Developer Agent in Worktree Isolation Fails .claude/ Framework Path Writes (2026-03-03) — SYSTEMIC
+
+**Status**: OPEN — P1 (recurring pattern, 2 confirmed instances in 24 hours)
+
+**Root Cause**: Developer agent and code-reviewer agent both have `isolation: worktree` in frontmatter. When spawned with worktree isolation, they receive a clean HEAD clone of the repo. Tasks requiring writes to `.claude/tools/`, `.claude/hooks/`, `.claude/skills/`, `.claude/agents/` FAIL because those paths either don't exist in the clean clone at the expected locations, or writes go to the clone (not the parent tree) and are then discarded.
+
+**Confirmed Instances**:
+
+1. code-reviewer (2026-03-03 morning, Task ~1): could not see unstaged changes in working tree for review. Rerouted without isolation → succeeded. (Documented in prior issues.md entry)
+2. developer (Task 36, 2026-03-03 ~08:30Z): zero files created in worktree for worktree-prune.cjs + worktree-auto-cleanup.cjs. Rerouted to devops → succeeded.
+
+**Pattern**: Both failures share the same root cause structure. The worktree isolation is by design for concurrent execution safety, but it breaks tasks that must interact with the parent repo's framework paths.
+
+**Impact**:
+
+- Router incurs retry overhead (one failed agent spawn + one successful respawn)
+- Gap log entry generated per failure
+- If not rerouted, work silently disappears (files created in worktree clone, not parent)
+
+**Fix Path (P1)**:
+
+1. Add routing override rule: tasks writing to `.claude/` framework paths MUST use `isolation: none` or be routed to agents without worktree isolation (devops, technical-writer)
+2. Add note to developer.md and code-reviewer.md frontmatter: "isolation: worktree is incompatible with framework file creation tasks"
+3. Consider spawn-time check in worktree creation logic: if task path is under `.claude/`, override isolation to none
+
+**Evidence**:
+
+- Gap log: `.claude/context/runtime/session-gap-log.jsonl` (entry 2026-03-03T08:30:00Z)
+- Reflection report: `.claude/context/reports/reflections/worktree-lifecycle-reflection-2026-03-03.md`
+- Prior related: `.claude/context/memory/issues.md` (Worktree Isolation Breaks Code Review entry, 2026-03-03 morning)
+
+**Priority**: P1 — fix before next session that involves framework file creation with developer agent
+
+---
+
+## ISSUE: worktree-auto-cleanup.cjs Likely Missing settings.json Registration (2026-03-03) — P0
+
+**Status**: OPEN — P0 (hook will never fire without registration)
+
+**Context**: Task 36 created `.claude/hooks/cleanup/worktree-auto-cleanup.cjs` as a PostToolUse hook. However, the hook was written directly (devops agent, not via hook-creator skill), which means the settings.json registration step was likely skipped.
+
+**Impact**: Without `settings.json` registration, the hook never fires. All TaskUpdate(completed) events pass without triggering automatic worktree cleanup. The 10 stale worktrees that accumulated leading to this task will continue to accumulate.
+
+**Verification command**:
+
+```bash
+node -e "const s=require('./.claude/settings.json'); const h=JSON.stringify(s); console.log(h.includes('worktree-auto-cleanup') ? 'REGISTERED' : 'NOT REGISTERED');"
+```
+
+**Fix**:
+
+1. If not registered: add PostToolUse hook entry to settings.json, OR re-invoke via hook-creator to properly wire
+2. Verify hook path is correct: `.claude/hooks/cleanup/worktree-auto-cleanup.cjs`
+3. Restart Claude Code session to pick up settings.json changes
+
+**Related gotcha**: id="hook-created-not-wired-in-settings" in gotchas.json — this exact scenario is documented
+
+**Priority**: P0 — without registration, worktree cleanup system is non-functional
+
+---
+
+## ISSUE: worktree-auto-cleanup.cjs Uses /dev/stdin as Primary Read Path (Windows) (2026-03-03) — P2
+
+**Status**: OPEN — P2 (hidden errors on every invocation, Windows-first repo)
+
+**Details**: `.claude/hooks/cleanup/worktree-auto-cleanup.cjs` uses `/dev/stdin` as the primary stdin read path in `readStdin()`. On Windows, this always throws (ENOENT or EACCES), falling through to the Windows-specific fallback (`\\\\.\\stdin` device path). The hook appears functional (fallback works) but generates a silent exception on every invocation.
+
+**Why this matters**:
+
+- agent-studio is a Windows-first repo (see SE-01, Windows backslash path gotchas)
+- Every PostToolUse(TaskUpdate) event triggers this hook
+- Each invocation throws an exception in the primary path before falling through to fallback
+- Over time this adds noise to error logs and may interfere with hook performance
+
+**Fix**: Swap primary and fallback in `readStdin()`:
+
+1. Attempt Windows-specific path first (`\\\\.\\stdin`) or use `process.stdin`
+2. Fall through to `/dev/stdin` for Unix environments
+
+**Evidence**: `worktree-auto-cleanup.cjs` line 37: `require('fs').readFileSync('/dev/stdin', 'utf8')`
+
+**Priority**: P2 — functional but noisy; fix before next session
 
 ---
 
