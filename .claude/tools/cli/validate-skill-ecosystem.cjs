@@ -190,6 +190,7 @@ function parseArgs(argv) {
     outputMd: null,
     includeArchived: false,
     requirePerfect: false,
+    minScore: null,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -206,13 +207,25 @@ function parseArgs(argv) {
       args.includeArchived = true;
     } else if (argv[i] === '--require-perfect') {
       args.requirePerfect = true;
+    } else if (argv[i] === '--min-score' && argv[i + 1] !== undefined) {
+      args.minScore = Number(argv[i + 1]);
+      i += 1;
     }
   }
 
   return args;
 }
 
-function checkGate(summary, requirePerfect = false) {
+function checkGate(summary, requirePerfect = false, results = [], minScore = null) {
+  if (minScore !== null && minScore !== undefined) {
+    const threshold = Number(minScore);
+    const failing = (results || []).filter(r => r.score < threshold).map(r => r.skill);
+    if (failing.length > 0) {
+      return { ok: false, reason: 'below_min_score', failing };
+    }
+    return { ok: true, reason: 'min_score_met' };
+  }
+
   if (!requirePerfect) {
     return { ok: true, reason: 'gate_disabled' };
   }
@@ -323,9 +336,15 @@ function main() {
   console.log(`JSON report: ${result.outputJson}`);
   console.log(`Markdown report: ${result.outputMd}`);
 
-  const gate = checkGate(result.summary, args.requirePerfect);
+  const gate = checkGate(result.summary, args.requirePerfect, result.results, args.minScore);
   if (!gate.ok) {
-    console.error('Ecosystem gate failed: skills still need work (<80 score present).');
+    if (gate.reason === 'below_min_score') {
+      console.error(
+        `Ecosystem gate failed: ${gate.failing.length} skill(s) score below --min-score ${args.minScore}: ${gate.failing.join(', ')}`
+      );
+    } else {
+      console.error('Ecosystem gate failed: skills still need work (<80 score present).');
+    }
     process.exit(1);
   }
 }
@@ -344,4 +363,5 @@ module.exports = {
   runAudit,
   checkGate,
   buildSkillSlug,
+  parseArgs,
 };

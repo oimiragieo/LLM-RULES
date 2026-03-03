@@ -157,9 +157,12 @@ test('isSkillFile returns false for similar but wrong path', () => {
   assertFalse(isSkillFile(filePath), 'Should require skill-name folder');
 });
 
-test('isSkillFile returns false for deeply nested SKILL.md', () => {
+test('isSkillFile returns true for deeply nested SKILL.md (nested skill support)', () => {
   const filePath = '.claude/skills/test-generator/examples/SKILL.md';
-  assertFalse(isSkillFile(filePath), 'Should not match SKILL.md in subdirectories');
+  assertTrue(
+    isSkillFile(filePath),
+    'Should match SKILL.md in nested subdirectories (nested skills supported)'
+  );
 });
 
 test('isSkillFile returns false for SKILL.txt', () => {
@@ -232,13 +235,82 @@ test('extractSkillName handles Windows paths with drive letter', () => {
   assertEqual(extractSkillName(filePath), 'tdd', 'Should extract from Windows path');
 });
 
-test('extractSkillName extracts first occurrence in nested paths', () => {
+test('extractSkillName extracts immediate parent in nested paths', () => {
   const filePath = '.claude/skills/test-generator/examples/skills/another/SKILL.md';
   assertEqual(
     extractSkillName(filePath),
-    'test-generator',
-    'Should extract first skill name after skills/'
+    'another',
+    'Should extract immediate parent directory of SKILL.md'
   );
+});
+
+// ============================================================
+// Nested Skill Path Tests (M3: Fix Nested Skill Path Matching)
+// ============================================================
+
+console.log('\n--- Nested Skill Path Matching (M3) ---');
+
+test('isSkillFile returns true for scientific-skills nested path (forward slashes)', () => {
+  const filePath = '.claude/skills/scientific-skills/skills/rdkit/SKILL.md';
+  assertTrue(isSkillFile(filePath), 'Should match deeply nested scientific-skills path');
+});
+
+test('isSkillFile returns true for two-level nested skill (forward slashes)', () => {
+  const filePath = '.claude/skills/container/nested/SKILL.md';
+  assertTrue(isSkillFile(filePath), 'Should match two-level nested skill path');
+});
+
+test('isSkillFile returns true for three-level nested skill', () => {
+  const filePath = '.claude/skills/scientific-skills/chemistry/rdkit/SKILL.md';
+  assertTrue(isSkillFile(filePath), 'Should match three-level nested skill path');
+});
+
+test('isSkillFile returns true for original one-level path (regression)', () => {
+  const filePath = '.claude/skills/tdd/SKILL.md';
+  assertTrue(isSkillFile(filePath), 'One-level paths should still work after fix');
+});
+
+test('isSkillFile returns true for nested path with backslashes', () => {
+  const filePath = '.claude\\skills\\scientific-skills\\skills\\rdkit\\SKILL.md';
+  assertTrue(isSkillFile(filePath), 'Should match nested path with Windows backslashes');
+});
+
+test('extractSkillName returns immediate parent for scientific-skills nested path', () => {
+  const filePath = '.claude/skills/scientific-skills/skills/rdkit/SKILL.md';
+  assertEqual(
+    extractSkillName(filePath),
+    'rdkit',
+    'Should return immediate parent directory rdkit'
+  );
+});
+
+test('extractSkillName returns immediate parent for two-level nested path', () => {
+  const filePath = '.claude/skills/container/nested/SKILL.md';
+  assertEqual(
+    extractSkillName(filePath),
+    'nested',
+    'Should return immediate parent directory nested'
+  );
+});
+
+test('extractSkillName still works for one-level path (regression)', () => {
+  const filePath = '.claude/skills/tdd/SKILL.md';
+  assertEqual(
+    extractSkillName(filePath),
+    'tdd',
+    'One-level extractSkillName should still return tdd'
+  );
+});
+
+test('validate warns with correct nested skill name', () => {
+  const context = {
+    tool: 'Read',
+    parameters: { file_path: '.claude/skills/scientific-skills/skills/rdkit/SKILL.md' },
+  };
+  const result = validate(context);
+  assertTrue(result.valid, 'Should be valid');
+  assertTrue(result.warning, 'Should have warning for nested skill path');
+  assertIncludes(result.warning, 'rdkit', 'Warning should include immediate skill name rdkit');
 });
 
 // ============================================================

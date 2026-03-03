@@ -95,7 +95,7 @@ function parseSkillFile(filePath, skillName) {
       domain: frontmatter.domain || 'general',
       content: body,
       filePath: path.relative(PROJECT_ROOT, filePath).replace(/\\/g, '/'),
-      requiredTools: frontmatter.requiredTools || ['Read', 'Write', 'Edit'],
+      requiredTools: frontmatter.tools || frontmatter.requiredTools || ['Read', 'Write', 'Edit'],
       tags: frontmatter.tags || [],
     };
   } catch (err) {

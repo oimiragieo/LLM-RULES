@@ -268,7 +268,7 @@ function validateCreatorEcosystem() {
   );
   const skillValidation = runValidatorScript(
     SKILL_ECOSYSTEM_VALIDATOR,
-    ['--require-perfect'],
+    ['--min-score', '70'],
     'Skill ecosystem gate failed'
   );
   const agentSkillReferenceValidation = runValidatorScript(

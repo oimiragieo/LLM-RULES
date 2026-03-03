@@ -143,6 +143,101 @@ describe('validate-skill-ecosystem', () => {
     assert.strictEqual(strictPass.ok, true);
   });
 
+  test('checkGate passes when all skills meet --min-score threshold', () => {
+    const results = [
+      { skill: 'a', score: 80 },
+      { skill: 'b', score: 70 },
+      { skill: 'c', score: 100 },
+    ];
+    const gate = checkGate({ scoreBuckets: { needsWork: 1 } }, false, results, 70);
+    assert.strictEqual(gate.ok, true);
+    assert.strictEqual(gate.reason, 'min_score_met');
+  });
+
+  test('checkGate fails when any skill is below --min-score threshold', () => {
+    const results = [
+      { skill: 'a', score: 80 },
+      { skill: 'b', score: 69 },
+      { skill: 'c', score: 100 },
+    ];
+    const gate = checkGate({ scoreBuckets: { needsWork: 1 } }, false, results, 70);
+    assert.strictEqual(gate.ok, false);
+    assert.strictEqual(gate.reason, 'below_min_score');
+    assert.ok(gate.failing.includes('b'));
+  });
+
+  test('checkGate with --min-score 0 always passes', () => {
+    const results = [{ skill: 'a', score: 0 }];
+    const gate = checkGate({ scoreBuckets: { needsWork: 1 } }, false, results, 0);
+    assert.strictEqual(gate.ok, true);
+  });
+
+  test('checkGate --min-score takes precedence over disabled gate when minScore is set', () => {
+    // When minScore is provided (even with requirePerfect=false), min-score logic applies
+    const results = [{ skill: 'a', score: 50 }];
+    const gate = checkGate({ scoreBuckets: { needsWork: 1 } }, false, results, 60);
+    assert.strictEqual(gate.ok, false);
+    assert.strictEqual(gate.reason, 'below_min_score');
+  });
+
+  test('checkGate --require-perfect still works independently of --min-score', () => {
+    // requirePerfect=true with needsWork > 0 should still fail (backward compat)
+    const gate = checkGate({ scoreBuckets: { needsWork: 2 } }, true, [], null);
+    assert.strictEqual(gate.ok, false);
+    assert.strictEqual(gate.reason, 'needs_work_present');
+  });
+
+  test('parseArgs supports --min-score flag', () => {
+    const { parseArgs } = require('../../../.claude/tools/cli/validate-skill-ecosystem.cjs');
+    const args = parseArgs(['--min-score', '70']);
+    assert.strictEqual(args.minScore, 70);
+  });
+
+  test('parseArgs --min-score defaults to null when not provided', () => {
+    const { parseArgs } = require('../../../.claude/tools/cli/validate-skill-ecosystem.cjs');
+    const args = parseArgs([]);
+    assert.strictEqual(args.minScore, null);
+  });
+
+  test('runAudit gate passes with --min-score 70 when all skills meet threshold', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-audit-'));
+    const skillsRoot = path.join(root, '.claude', 'skills');
+    const toolsRoot = path.join(root, '.claude', 'tools');
+    const workflowsRoot = path.join(root, '.claude', 'workflows');
+
+    // Create a fully compliant skill scoring 100
+    const skillPath = path.join(skillsRoot, 'full-skill');
+    fs.mkdirSync(skillPath, { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'SKILL.md'), '# full-skill');
+    fs.mkdirSync(path.join(skillPath, 'scripts'), { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'scripts', 'main.cjs'), 'module.exports = {};');
+    fs.mkdirSync(path.join(skillPath, 'hooks'), { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'hooks', 'pre-execute.cjs'), 'module.exports = {};');
+    fs.writeFileSync(path.join(skillPath, 'hooks', 'post-execute.cjs'), 'module.exports = {};');
+    fs.mkdirSync(path.join(skillPath, 'schemas'), { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'schemas', 'input.schema.json'), '{}');
+    fs.writeFileSync(path.join(skillPath, 'schemas', 'output.schema.json'), '{}');
+    fs.mkdirSync(path.join(skillPath, 'rules'), { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'rules', 'full-skill.md'), '# rule');
+    fs.mkdirSync(path.join(skillPath, 'commands'), { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'commands', 'full-skill.md'), '# cmd');
+    fs.mkdirSync(path.join(skillPath, 'templates'), { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'templates', 'implementation-template.md'), '# tpl');
+    fs.mkdirSync(path.join(skillPath, 'references'), { recursive: true });
+    fs.writeFileSync(path.join(skillPath, 'references', 'research-requirements.md'), '# refs');
+    fs.mkdirSync(path.join(toolsRoot, 'full-skill'), { recursive: true });
+    fs.writeFileSync(path.join(toolsRoot, 'full-skill', 'full-skill.cjs'), 'module.exports = {};');
+    fs.mkdirSync(workflowsRoot, { recursive: true });
+    fs.writeFileSync(path.join(workflowsRoot, 'full-skill-skill-workflow.md'), '# wf');
+
+    const report = runAudit({ projectRoot: root, minScore: 70 });
+    // All skills score 100, so gate should pass
+    const gate = checkGate(report.summary, false, report.results, 70);
+    assert.strictEqual(gate.ok, true);
+
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
   test('buildSummary aggregates missing categories and score buckets', () => {
     const summary = buildSummary([
       { score: 100, missing: [], skill: 'a' },

@@ -4,26 +4,8 @@
   "title": "Skill Definition Schema",
   "description": "Schema for validating Claude Code SKILL.md YAML frontmatter fields",
   "type": "object",
-  "required": [],
+  "required": ["name", "description"],
   "additionalProperties": true,
-  "anyOf": [
-    {
-      "required": ["name", "description"]
-    },
-    {
-      "required": ["output"],
-      "properties": {
-        "output": {
-          "type": "object",
-          "required": ["name", "description"],
-          "properties": {
-            "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "maxLength": 100 },
-            "description": { "type": "string", "minLength": 10, "maxLength": 1000 }
-          }
-        }
-      }
-    }
-  ],
   "properties": {
     "name": {
       "type": "string",

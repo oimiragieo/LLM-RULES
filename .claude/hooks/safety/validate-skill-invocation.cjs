@@ -15,7 +15,7 @@ const {
   extractFilePath,
 } = require('../../lib/utils/hook-input.cjs');
 
-const SKILL_PATH_PATTERN = /\.claude[/\\]skills[/\\][^/\\]+[/\\]SKILL\.md/i;
+const SKILL_PATH_PATTERN = /\.claude[/\\]skills[/\\](?:[^/\\]+[/\\])+SKILL\.md/i;
 
 /**
  * Check if a path is a skill file
@@ -32,7 +32,7 @@ function isSkillFile(filePath) {
  * @returns {string|null}
  */
 function extractSkillName(filePath) {
-  const match = filePath.match(/skills[/\\]([^/\\]+)[/\\]/i);
+  const match = filePath.match(/[/\\]([^/\\]+)[/\\]SKILL\.md$/i);
   return match ? match[1] : null;
 }
 
