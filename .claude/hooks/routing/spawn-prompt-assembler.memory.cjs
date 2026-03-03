@@ -366,11 +366,28 @@ async function applySemanticMemoryToPrompt(assembled, toolInput, basePrompt, std
         limit: 5,
         threshold: SEMANTIC_SEARCH_DEFAULT_THRESHOLD,
       });
-      if (queryResults.length > 0) {
-        assembled = appendQueryMemories(assembled, queryResults);
+      // Merge intent-analysis results (Option A fix: Bug B2).
+      // Intent results are richer (multi-query, filtered by category/contextType) and
+      // were previously discarded in this branch. Merge them with query results,
+      // deduplicating by content+source key so the same memory is not injected twice.
+      const seen = new Set();
+      const mergedResults = [];
+      for (const r of [...results, ...queryResults]) {
+        const key = `${r?.source || ''}:${String(r?.content || '')}`.trim();
+        if (key && !seen.has(key)) {
+          seen.add(key);
+          mergedResults.push(r);
+        }
+      }
+      if (mergedResults.length > 0) {
+        assembled = appendQueryMemories(assembled, mergedResults);
       }
     } catch (queryErr) {
       debugLog('spawn-prompt-assembler', 'Memory query retrieval failed (ignored)', queryErr);
+      // Fallback: if query fails but we have intent results, still inject them
+      if (results.length > 0) {
+        assembled = appendQueryMemories(assembled, results);
+      }
     }
   }
 

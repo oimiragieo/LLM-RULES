@@ -1,6 +1,6 @@
 'use strict';
 
-const { describe, it, before } = require('node:test');
+const { describe, it, before, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 
 /**
@@ -13,7 +13,6 @@ const assert = require('node:assert/strict');
  */
 
 describe('triggerMemoryExtraction (post-completion-chain)', () => {
-
   // We need to mock the memory-extractor module and memory-tiers module
   // before loading the hook. Use Node.js test mock.module if available,
   // otherwise we test the exported function with mocked dependencies inline.

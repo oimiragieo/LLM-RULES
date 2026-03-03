@@ -159,9 +159,7 @@ describe('appendQueryMemories() - Append query memory section', () => {
   });
 
   test('should append Relevant Memories section for valid results', () => {
-    const results = [
-      { source: 'mtm', similarity: 0.88, content: 'BM25 indexer has lazy IDF.' },
-    ];
+    const results = [{ source: 'mtm', similarity: 0.88, content: 'BM25 indexer has lazy IDF.' }];
     const result = appendQueryMemories(basePrompt, results);
     assert.ok(result.includes('Relevant Memories'), 'Expected section header');
     assert.ok(result.includes('BM25 indexer'), 'Expected memory content to appear');
@@ -207,6 +205,74 @@ describe('appendQueryMemories() - Append query memory section', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Bug B2: Intent-analysis dead code path when memoryQueryEnabled=true
+// ---------------------------------------------------------------------------
+describe('applySemanticMemoryToPrompt() - Intent-analysis merged into query path (B2 fix)', () => {
+  // Static analysis: verify intent results are NOT silently discarded when memoryQueryEnabled=true.
+  // Before the fix, intent results were only consumed in the `!memoryQueryEnabled` branch, making
+  // MEMORY_INTENT_ANALYSIS a no-op under the default configuration.
+  test('intent results should be merged into query path (not exclusively gated behind !memoryQueryEnabled)', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
+      'utf8'
+    );
+
+    // The buggy pattern was: intent `results` were ONLY referenced inside the
+    // `if (!memoryQueryEnabled && results.length > 0)` block. After the fix,
+    // `results` must also appear inside the `if (memoryQueryEnabled)` block
+    // (i.e., merged into the query path).
+    //
+    // Strategy: verify the `if (memoryQueryEnabled)` block contains `results`
+    // by checking there's a spread/reference to results within the block body.
+    // We look for `...results` or `results` near `mergedResults`/`queryResults`.
+    const hasMergeInQueryPath =
+      src.includes('...results, ...queryResults') ||
+      src.includes('...results,') ||
+      src.includes('mergedResults') ||
+      src.includes('allResults') ||
+      src.includes('combinedResults');
+
+    assert.ok(
+      hasMergeInQueryPath,
+      'Bug B2: intent results must be merged into the query path (memoryQueryEnabled=true). Expected spread like [...results, ...queryResults] or a mergedResults/allResults variable inside the memoryQueryEnabled block.'
+    );
+  });
+
+  test('query path should merge intent results when memoryQueryEnabled=true (source-level)', () => {
+    const fs = require('fs');
+    const path = require('path');
+    const src = fs.readFileSync(
+      path.resolve(__dirname, '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
+      'utf8'
+    );
+
+    // After fix: there should be logic that combines/merges intent `results`
+    // into the query path when memoryQueryEnabled=true.
+    // We look for evidence of intent results being used inside the memoryQueryEnabled block.
+    // Accept any of several reasonable merge patterns:
+    //   - concat(...results)
+    //   - ...results (spread)
+    //   - mergedResults that includes results
+    //   - combined/merged variable containing results
+    const hasMergeEvidence =
+      src.includes('...results') ||
+      src.includes('concat(results') ||
+      src.includes('results, queryResults') ||
+      src.includes('queryResults, results') ||
+      src.includes('mergedResults') ||
+      src.includes('combinedResults') ||
+      src.includes('allResults');
+
+    assert.ok(
+      hasMergeEvidence,
+      'Expected intent results to be merged into the query path when memoryQueryEnabled=true (spread, concat, or merged variable)'
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Default opt-out behavior (M1 requirement)
 // ---------------------------------------------------------------------------
 describe('applySemanticMemoryToPrompt() - Env variable opt-out defaults', () => {
@@ -219,10 +285,7 @@ describe('applySemanticMemoryToPrompt() - Env variable opt-out defaults', () => 
     const fs = require('fs');
     const path = require('path');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -250,10 +313,7 @@ describe('applySemanticMemoryToPrompt() - Env variable opt-out defaults', () => 
     const fs = require('fs');
     const path = require('path');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -281,10 +341,7 @@ describe('applySemanticMemoryToPrompt() - Env variable opt-out defaults', () => 
     const fs = require('fs');
     const path = require('path');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
