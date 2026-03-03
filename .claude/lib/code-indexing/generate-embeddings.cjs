@@ -84,7 +84,11 @@ function listFiles(dir) {
  * @returns {string}
  */
 function chunkId(filePath, text) {
-  const hash = crypto.createHash('md5').update(filePath + text).digest('hex').slice(0, 12);
+  const hash = crypto
+    .createHash('sha256')
+    .update(filePath + text)
+    .digest('hex')
+    .slice(0, 12);
   return `mem:${hash}`;
 }
 

@@ -60,7 +60,10 @@ function writePreloadScript(tempDir, _capturePath) {
     '    loadMemoryForContextAsync: async () => ({ recent_sessions: [] }),',
     '    searchMemory: async (_query, options) => {',
     '      if (capturePath) {',
-    "        fs.writeFileSync(capturePath, JSON.stringify(options), 'utf8');",
+    '        let calls = [];',
+    '        try { calls = JSON.parse(fs.readFileSync(capturePath, "utf8")); } catch (_) {}',
+    '        calls.push(options);',
+    "        fs.writeFileSync(capturePath, JSON.stringify(calls), 'utf8');",
     '      }',
     '      return [',
     '        {',
@@ -140,11 +143,21 @@ test('spawn-prompt-assembler intent analysis uses memory contextType filter', as
     assert.ok(result.stdout.includes('tool_input'));
 
     if (fs.existsSync(capturePath)) {
-      const captured = JSON.parse(fs.readFileSync(capturePath, 'utf8'));
-      assert.equal(captured.contextType, 'memory');
-      assert.equal(captured.category, 'preferences');
-      assert.ok(typeof captured.filters === 'string');
-      assert.ok(captured.filters.includes('metadata NOT LIKE'));
+      const calls = JSON.parse(fs.readFileSync(capturePath, 'utf8'));
+      // After the M2 merge fix, searchMemory is called multiple times:
+      // once by intent-analysis (with contextType: 'memory') and once by
+      // the query-memory path (without contextType). Verify that at least
+      // one call used the intent-analysis contextType filter.
+      const intentCall = Array.isArray(calls)
+        ? calls.find(c => c && c.contextType === 'memory')
+        : calls.contextType === 'memory'
+          ? calls
+          : null;
+      assert.ok(intentCall, 'Expected at least one searchMemory call with contextType: "memory"');
+      assert.equal(intentCall.contextType, 'memory');
+      assert.equal(intentCall.category, 'preferences');
+      assert.ok(typeof intentCall.filters === 'string');
+      assert.ok(intentCall.filters.includes('metadata NOT LIKE'));
     }
   } finally {
     if (fs.existsSync(capturePath)) {

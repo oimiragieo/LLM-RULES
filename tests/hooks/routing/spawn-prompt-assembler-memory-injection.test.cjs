@@ -85,10 +85,7 @@ describe('B2 fix — intent results merged into query path when memoryQueryEnabl
   it('source contains spread of intent results inside the memoryQueryEnabled block', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -112,10 +109,7 @@ describe('B2 fix — intent results merged into query path when memoryQueryEnabl
   it('mergedResults deduplicates by source+content key to prevent double-injection', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -139,8 +133,14 @@ describe('B2 fix — intent results merged into query path when memoryQueryEnabl
     const merged = [intentResult, queryResult];
     const output = appendQueryMemories(basePrompt, merged);
 
-    assert.ok(output.includes('safeParseJSON'), 'Expected intent-analysis content to appear in output');
-    assert.ok(output.includes('normalize Windows paths'), 'Expected query result content to appear');
+    assert.ok(
+      output.includes('safeParseJSON'),
+      'Expected intent-analysis content to appear in output'
+    );
+    assert.ok(
+      output.includes('normalize Windows paths'),
+      'Expected query result content to appear'
+    );
     assert.ok(output.includes('Relevant Memories'), 'Expected section header to be present');
   });
 });
@@ -153,10 +153,7 @@ describe('memoryQueryEnabled=false — intent results injected via appendSemanti
   it('source routes to appendSemanticMatches when memoryQueryEnabled is false', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -182,7 +179,10 @@ describe('memoryQueryEnabled=false — intent results injected via appendSemanti
     assert.ok(output.includes('Semantic Matches'), 'Expected "Semantic Matches" section header');
     assert.ok(output.includes('shell: false'), 'Expected content from intent result to appear');
     // Must NOT appear under the query header
-    assert.ok(!output.includes('Relevant Memories'), 'Expected Relevant Memories header to be absent');
+    assert.ok(
+      !output.includes('Relevant Memories'),
+      'Expected Relevant Memories header to be absent'
+    );
   });
 
   it('appendSemanticMatches limits output to 3 results even when intent returns more', () => {
@@ -211,9 +211,7 @@ describe('MEMORY_INJECTION_MAX_CHARS budget cap', () => {
   it('appendQueryMemories truncates injected section when budget is set to 200', () => {
     const basePrompt = '## Task\nWork.\n';
     const longContent = 'Q'.repeat(500);
-    const results = Array.from({ length: 5 }, (_, i) =>
-      makeResult(`s${i}`, 0.9, longContent)
-    );
+    const results = Array.from({ length: 5 }, (_, i) => makeResult(`s${i}`, 0.9, longContent));
 
     withEnv({ MEMORY_INJECTION_MAX_CHARS: '200' }, () => {
       const output = appendQueryMemories(basePrompt, results);
@@ -228,9 +226,7 @@ describe('MEMORY_INJECTION_MAX_CHARS budget cap', () => {
   it('appendSemanticMatches truncates injected section when budget is set to 200', () => {
     const basePrompt = '## Task\nWork.\n';
     const longContent = 'S'.repeat(500);
-    const results = Array.from({ length: 3 }, (_, i) =>
-      makeResult(`s${i}`, 0.9, longContent)
-    );
+    const results = Array.from({ length: 3 }, (_, i) => makeResult(`s${i}`, 0.9, longContent));
 
     withEnv({ MEMORY_INJECTION_MAX_CHARS: '200' }, () => {
       const output = appendSemanticMatches(basePrompt, results);
@@ -266,13 +262,13 @@ describe('MEMORY_INJECTION_MAX_CHARS budget cap', () => {
   it('MEMORY_INJECTION_MAX_CHARS constant is 3600 in the module source', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
-    assert.ok(src.includes('3600'), 'Expected MEMORY_INJECTION_MAX_CHARS default of 3600 in source');
+    assert.ok(
+      src.includes('3600'),
+      'Expected MEMORY_INJECTION_MAX_CHARS default of 3600 in source'
+    );
   });
 
   it('appendQueryMemories still injects content when budget is generous (3600)', () => {
@@ -339,10 +335,7 @@ describe('Graceful degradation — empty or null results produce no injection', 
   it('applySemanticMemoryToPrompt guard — SPAWN_PROMPT_SEMANTIC_MEMORY=off returns early', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
     // The early-return guard must be present
@@ -361,10 +354,7 @@ describe('Error handling — search failures must not crash injection', () => {
   it('applySemanticMemoryToPrompt catches errors from searchMemory (source-level)', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -381,10 +371,7 @@ describe('Error handling — search failures must not crash injection', () => {
   it('applySemanticMemoryToPrompt has a final fallback for searchMemory after hot-filter fails', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -404,10 +391,7 @@ describe('Error handling — search failures must not crash injection', () => {
   it('intent analysis failure is caught and logs via stderrLog', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
@@ -449,10 +433,7 @@ describe('Error handling — search failures must not crash injection', () => {
   it('memory query failure falls back to intent results when memoryQueryEnabled=true (source-level)', () => {
     const fs = require('fs');
     const src = fs.readFileSync(
-      path.resolve(
-        __dirname,
-        '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'
-      ),
+      path.resolve(__dirname, '../../../.claude/hooks/routing/spawn-prompt-assembler.memory.cjs'),
       'utf8'
     );
 
