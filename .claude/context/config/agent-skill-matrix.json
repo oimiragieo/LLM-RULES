@@ -38,7 +38,15 @@
           "elixir_project": ["elixir-expert"],
           "medusa_project": ["medusa"]
         },
-        "always": ["verification-before-completion", "github-mcp", "memory-search"]
+        "always": [
+          "verification-before-completion",
+          "github-mcp",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "planner": {
         "primary": [
@@ -53,7 +61,14 @@
           "large_project": ["brainstorming", "diagram-generator"],
           "multi_agent": ["dispatching-parallel-agents", "swarm-coordination"]
         },
-        "always": ["task-management-protocol", "memory-search"]
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "architect": {
         "primary": [
@@ -73,7 +88,15 @@
           "distributed_system": ["swarm-coordination", "consensus-voting"],
           "api_design": ["api-development-expert", "graphql-expert"]
         },
-        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "qa": {
         "primary": ["tdd", "test-generator"],
@@ -90,7 +113,15 @@
           "browser_testing": ["chrome-browser", "webapp-testing"],
           "feature_flags": ["feature-flag-management"]
         },
-        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "technical-writer": {
         "primary": ["doc-generator", "writing-skills", "readme"],
@@ -99,7 +130,13 @@
           "api_docs": ["api-development-expert"],
           "architecture_docs": ["architecture-review"]
         },
-        "always": ["verification-before-completion"]
+        "always": [
+          "verification-before-completion",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "pm": {
         "primary": ["plan-generator", "spec-gathering", "complexity-assessment"],
@@ -119,7 +156,12 @@
         ],
         "secondary": ["insight-extraction"],
         "contextual": {},
-        "always": []
+        "always": [
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "router": {
         "primary": ["skill-discovery", "complexity-assessment"],
@@ -427,7 +469,11 @@
           "verification-before-completion",
           "receiving-code-review",
           "requesting-code-review",
-          "memory-search"
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
         ]
       },
       "security-architect": {
@@ -444,7 +490,15 @@
           "web3_project": ["web3-expert", "building-secure-contracts"],
           "reverse_engineering": ["binary-analysis-patterns", "memory-forensics"]
         },
-        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "devops": {
         "primary": ["docker-compose", "terraform-infra", "k8s-manifest-generator"],
@@ -473,7 +527,11 @@
           "consensus-voting",
           "context-compressor",
           "kubernetes-flux",
-          "memory-search"
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
         ]
       },
       "devops-troubleshooter": {
@@ -488,7 +546,15 @@
           "cloud_issue": ["aws-cloud-ops", "gcloud-cli"],
           "database_issue": ["database-expert"]
         },
-        "always": ["verification-before-completion", "task-management-protocol", "memory-search"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "incident-responder": {
         "primary": ["incident-runbook-templates", "on-call-handoff-patterns", "postmortem-writing"],
@@ -497,7 +563,15 @@
           "security_incident": ["security-architect", "memory-forensics"],
           "database_incident": ["database-expert"]
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "c4-context": {
         "primary": ["diagram-generator", "architecture-review"],
@@ -550,7 +624,14 @@
           "drizzle_project": ["drizzle-orm-rules"],
           "vercel_kv": []
         },
-        "always": ["verification-before-completion", "task-management-protocol"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "accessibility-tester": {
         "primary": ["accessibility"],
@@ -602,7 +683,14 @@
         "primary": ["code-quality-expert", "code-analyzer", "code-style-validator"],
         "secondary": ["tdd", "debugging"],
         "contextual": {},
-        "always": ["verification-before-completion", "memory-search"]
+        "always": [
+          "verification-before-completion",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "researcher": {
         "primary": ["research-synthesis", "insight-extraction"],

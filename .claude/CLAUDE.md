@@ -519,8 +519,8 @@ Skill({ skill: 'debugging' });
 
 **Agents with code search capabilities** via integrated search skills:
 
-- **Current state**: 9 agents have search skills assigned (Phase 1 target: 13+ core agents)
-- **Phase 1 agents** (core + high-impact): developer, code-reviewer, code-simplifier, planner, qa, architect, database-architect, devops, devops-troubleshooter, incident-responder, security-architect, technical-writer, context-compressor
+- **Current state**: 13 agents have search skills assigned (Phase 1 complete)
+- **Phase 1 agents** (core + high-impact — COMPLETE): developer, code-reviewer, code-simplifier, planner, qa, architect, database-architect, devops, devops-troubleshooter, incident-responder, security-architect, technical-writer, context-compressor
 - **Phase 2 target**: 25+ domain agents (python-pro, typescript-pro, etc.)
 - **Phase 3 target**: 8 orchestrators (ripgrep only for quick scanning)
 
