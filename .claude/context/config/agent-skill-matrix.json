@@ -198,7 +198,15 @@
         "contextual": {
           "multi_team": ["dispatching-parallel-agents", "swarm-coordination"]
         },
-        "always": ["verification-before-completion"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       }
     },
     "domain": {
@@ -506,7 +514,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -559,7 +570,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -570,7 +584,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -611,7 +628,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -638,7 +658,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -649,7 +672,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -660,7 +686,15 @@
           "jira_integration": ["jira-pm"],
           "linear_integration": ["linear-pm"]
         },
-        "always": ["task-management-protocol", "ripgrep", "token-saver-context-compression"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "kubernetes-specialist": {
         "primary": ["container-expert", "debugging"],
@@ -669,7 +703,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -677,7 +714,14 @@
         "primary": ["research-synthesis", "scientific-skills"],
         "secondary": ["insight-extraction"],
         "contextual": {},
-        "always": ["task-management-protocol", "ripgrep", "token-saver-context-compression"]
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       }
     },
     "specialized": {
@@ -804,7 +848,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -815,7 +862,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -826,7 +876,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -837,7 +890,10 @@
         "always": [
           "verification-before-completion",
           "task-management-protocol",
+          "memory-search",
           "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -1008,7 +1064,14 @@
         "contextual": {
           "scientific_project": ["scientific-skills"]
         },
-        "always": ["task-management-protocol", "ripgrep", "token-saver-context-compression"]
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       }
     },
     "orchestrators": {
