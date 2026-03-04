@@ -81,13 +81,25 @@ Then call TaskList().`,
 ## Tool Profiles (Choose the smallest that works)
 
 - Read-only analysis:
-  - `Read`, `Grep`/`Glob` (or project search skill), `TaskUpdate`, `TaskList`, `Skill`
+  - `Read`, `Skill` (prefer search skills over `Grep`/`Glob`), `TaskUpdate`, `TaskList`
 - Code changes:
   - Read-only profile plus `Write`, `Edit`
 - Verification/testing:
   - Code-changes profile plus `Bash`
 
 Do not include optional tools unless the task needs them.
+
+## Search-First Protocol (MANDATORY)
+
+Before using `Grep` or `Glob` for code discovery, you MUST prefer framework search tools in this order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic search (fastest, recommended default)
+2. `Skill({ skill: 'ripgrep' })` — fast text/regex search in agent flows
+3. `Skill({ skill: 'code-semantic-search' })` — conceptual/intent-based search
+4. `Skill({ skill: 'code-structural-search' })` — AST-based pattern matching
+
+Use `Grep` ONLY for: single-file targeted checks, advanced PCRE2 regex, or when search skills are unavailable.
+Use `Read` for files ONLY after search identifies relevant paths — never use it as a discovery mechanism.
 
 ## Prompt Budget Rules
 

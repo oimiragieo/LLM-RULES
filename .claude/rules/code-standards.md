@@ -65,6 +65,17 @@
 
 ## Hybrid Search Commands
 
+**MANDATORY**: Agents MUST use framework search tools before falling back to Grep.
+Search preference order (highest to lowest):
+
+1. `pnpm search:code` — hybrid semantic + BM25 (recommended default)
+2. `Skill({ skill: 'ripgrep' })` — fast text search in agent flows
+3. `Skill({ skill: 'code-semantic-search' })` — conceptual/intent search
+4. `Skill({ skill: 'code-structural-search' })` — AST-based search
+5. `Grep` — FALLBACK ONLY (advanced regex, single-file checks)
+
+**Anti-Pattern**: Using `Grep` as primary code discovery tool. Grep does not leverage BM25 ranking or semantic understanding and produces lower-quality results for broad searches.
+
 **Code Search Tools**:
 
 - `pnpm search:code "pattern"` - Semantic + BM25 hybrid search

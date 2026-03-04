@@ -109,3 +109,13 @@ After work:
 - Delivery pattern learning -> `.claude/context/memory/learnings.md`
 - Program decision -> `.claude/context/memory/decisions.md`
 - Execution risk discovered -> `.claude/context/memory/issues.md`
+
+### Code Search Protocol
+
+Before using Grep/Read for code discovery, prefer framework search tools:
+
+- `pnpm search:code "query"` for hybrid BM25 + semantic search (preferred)
+- `Skill({ skill: 'ripgrep' })` for fast text/regex search
+- `Skill({ skill: 'code-semantic-search' })` for conceptual search
+- `Skill({ skill: 'code-structural-search' })` for AST-based matching
+- Grep: fallback only (single-file checks, advanced PCRE2)

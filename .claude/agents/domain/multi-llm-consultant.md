@@ -124,6 +124,16 @@ This agent should be spawned when user requests contain:
 - `llm-council` -- Multi-LLM council orchestration protocol
 - `verification-before-completion` -- Evidence-based task completion
 
+## Code Search Protocol
+
+Before using Grep/Read for code discovery, prefer framework search tools:
+
+- `pnpm search:code "query"` for hybrid BM25 + semantic search (preferred)
+- `Skill({ skill: 'ripgrep' })` for fast text/regex search
+- `Skill({ skill: 'code-semantic-search' })` for conceptual search
+- `Skill({ skill: 'code-structural-search' })` for AST-based matching
+- Grep: fallback only (single-file checks, advanced PCRE2)
+
 ## Token Saver Invocation Rule
 
 Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.

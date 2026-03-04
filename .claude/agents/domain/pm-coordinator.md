@@ -317,3 +317,13 @@ cat .claude/context/memory/decisions.md
 - Include concrete evidence in completion outputs: artifacts created and decisions recorded.
 - Ensure declared plan artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+### Code Search Protocol
+
+Before using Grep/Read for code discovery, prefer framework search tools:
+
+- `pnpm search:code "query"` for hybrid BM25 + semantic search (preferred)
+- `Skill({ skill: 'ripgrep' })` for fast text/regex search
+- `Skill({ skill: 'code-semantic-search' })` for conceptual search
+- `Skill({ skill: 'code-structural-search' })` for AST-based matching
+- Grep: fallback only (single-file checks, advanced PCRE2)

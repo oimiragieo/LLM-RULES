@@ -363,3 +363,13 @@ cat .claude/context/memory/learnings.md
 - Use `Skill({ skill: 'ripgrep', args: '...' })` for advanced regex/PCRE workflows.
 - Use `Skill({ skill: 'memory-search', args: '...' })` for prior ASO decisions and learnings.
 - Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.
+
+### Code Search Protocol
+
+Before using Grep/Read for code discovery, prefer framework search tools:
+
+- `pnpm search:code "query"` for hybrid BM25 + semantic search (preferred)
+- `Skill({ skill: 'ripgrep' })` for fast text/regex search
+- `Skill({ skill: 'code-semantic-search' })` for conceptual search
+- `Skill({ skill: 'code-structural-search' })` for AST-based matching
+- Grep: fallback only (single-file checks, advanced PCRE2)

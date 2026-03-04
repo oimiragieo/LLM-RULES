@@ -384,3 +384,13 @@ Review past incidents, known failure patterns, and runbooks.
 
 - For structured memory (patterns, gotchas, discoveries), use MemoryRecord with ype, content, rea, source, and optional confidence.
 - Do not use Write/Edit directly on .claude/context/memory/patterns.json or .claude/context/memory/gotchas.json (guard-enforced).
+
+### Code Search Protocol
+
+Before using Grep/Read for code discovery, prefer framework search tools:
+
+- `pnpm search:code "query"` for hybrid BM25 + semantic search (preferred)
+- `Skill({ skill: 'ripgrep' })` for fast text/regex search
+- `Skill({ skill: 'code-semantic-search' })` for conceptual search
+- `Skill({ skill: 'code-structural-search' })` for AST-based matching
+- Grep: fallback only (single-file checks, advanced PCRE2)

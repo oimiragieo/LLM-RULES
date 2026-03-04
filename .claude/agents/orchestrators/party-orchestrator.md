@@ -80,6 +80,13 @@ Return concise orchestration updates:
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
 
+## Code Search Protocol
+
+For code discovery needs, delegate to spawned agents with search skills or use:
+
+- `Skill({ skill: 'ripgrep' })` for quick keyword scanning
+- Detailed search should be delegated to specialist agents
+
 ## Token Saver Invocation Rule
 
 Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.

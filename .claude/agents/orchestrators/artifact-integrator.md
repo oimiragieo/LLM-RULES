@@ -206,6 +206,13 @@ Skill({ skill: 'verification-before-completion' });
 
 (Standard protocol as per project rules)
 
+## Code Search Protocol
+
+For code discovery needs, delegate to spawned agents with search skills or use:
+
+- `Skill({ skill: 'ripgrep' })` for quick keyword scanning
+- Detailed search should be delegated to specialist agents
+
 ## Memory Protocol
 
 (Standard protocol as per project rules)

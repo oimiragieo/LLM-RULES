@@ -515,21 +515,24 @@ Skill({ skill: 'debugging' });
 **Skill Catalog:** `.claude/docs/@SKILL_CATALOG_TABLE.md`
 **Discovery:** read catalog → search category/keyword → `Skill({ skill: "<name>" })`
 
-### Hybrid Search Integration (Phase 1)
+### Hybrid Search Integration (All Phases Complete)
 
 **Agents with code search capabilities** via integrated search skills:
 
-- **Current state**: 13 agents have search skills assigned (Phase 1 complete)
+- **Current state**: 63 agents have search skills assigned (Phases 1–3 complete, commit 7197fa60)
 - **Phase 1 agents** (core + high-impact — COMPLETE): developer, code-reviewer, code-simplifier, planner, qa, architect, database-architect, devops, devops-troubleshooter, incident-responder, security-architect, technical-writer, context-compressor
-- **Phase 2 target**: 25+ domain agents (python-pro, typescript-pro, etc.)
-- **Phase 3 target**: 8 orchestrators (ripgrep only for quick scanning)
+- **Phase 2** (25+ domain agents — COMPLETE, commit 7197fa60): python-pro, typescript-pro, and all domain specialists
+- **Phase 3** (8 orchestrators — COMPLETE, commit 7197fa60): ripgrep skill wired for quick scanning
 
-**Search-first protocol** for 3 core agents (`developer`, `code-reviewer`, `code-simplifier`):
+**Enforcement:** Search telemetry hook in `post-tool-metrics-unified.cjs` logs all search tool usage to `search-telemetry.jsonl`. Agents skipping search tools in favor of `Grep` will appear in telemetry anomalies.
 
-1. Search existing code before writing new code
-2. Use semantic search for pattern discovery
-3. Use structural search for precise code matching
-4. Use ripgrep for fast keyword searches
+**Search-first protocol** (ALL agents — MANDATORY):
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (recommended default)
+2. `Skill({ skill: 'ripgrep' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search' })` — conceptual/intent search
+4. `Skill({ skill: 'code-structural-search' })` — AST-based pattern matching
+5. `Grep` — FALLBACK ONLY (advanced PCRE2 or single-file targeted check)
 
 **Agent-creator integration:** New agents are guided to include search skills based on their domain (code-focused agents get all 3 search skills).
 

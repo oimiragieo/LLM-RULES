@@ -1001,3 +1001,10 @@ This ensures evolution tasks spawn healthy agents only, improving success rates.
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+### Code Search Protocol
+
+For code discovery needs, delegate to spawned agents with search skills or use:
+
+- `Skill({ skill: 'ripgrep' })` for quick keyword scanning
+- Detailed search should be delegated to specialist agents
