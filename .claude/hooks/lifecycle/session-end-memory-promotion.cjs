@@ -68,6 +68,11 @@ function main() {
           ],
           { stdio: 'ignore', detached: true, shell: false }
         );
+        child.on('error', err => {
+          process.stderr.write(
+            `[session-end-memory-promotion] Spawn error (ignored): ${err.message}\n`
+          );
+        });
         child.unref();
         process.stderr.write(
           '[session-end-memory-promotion] Triggered background memory re-index.\n'
