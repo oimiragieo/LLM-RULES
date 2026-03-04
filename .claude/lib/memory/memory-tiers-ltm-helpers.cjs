@@ -77,15 +77,26 @@ function generateSessionSummary(sessions) {
  * Entries with utility < EVICTION_THRESHOLD are deleted.
  * Only runs when LTM file count exceeds LTM_MAX_FILES.
  *
+ * Fix 1 (P0 NaN Guard): env var parsing validates with Number.isFinite to prevent NaN bugs.
+ * Fix 2 (P0 Mass Extinction Cap): evicts at most (files.length - LTM_MAX_FILES) files, lowest utility first.
+ * Fix 3 (P1 mtime Fallback): missing timestamp fields fall back to file mtime instead of Infinity.
+ * Fix 4 (P2 Eviction Preview Log): emits a preview warning to stderr before any deletions.
+ *
  * @param {string} ltmDir - Path to the LTM directory
  * @returns {{evicted: number, skipped: string|undefined}} Result summary
  */
 function evictStaleLTMFiles(ltmDir) {
   if (!fs.existsSync(ltmDir)) return { evicted: 0, skipped: 'ltm_dir_missing' };
 
-  const DECAY_FACTOR = parseFloat(process.env.LTM_DECAY_FACTOR || '0.05');
-  const EVICTION_THRESHOLD = parseFloat(process.env.LTM_EVICTION_THRESHOLD || '0.1');
-  const LTM_MAX_FILES = parseInt(process.env.LTM_MAX_FILES || '50', 10);
+  // Fix 1 (P0 NaN Guard): validate env var parsing — fall back to safe defaults on NaN/invalid
+  const rawDecay = parseFloat(process.env.LTM_DECAY_FACTOR || '');
+  const DECAY_FACTOR = Number.isFinite(rawDecay) && rawDecay > 0 ? rawDecay : 0.05;
+
+  const rawThreshold = parseFloat(process.env.LTM_EVICTION_THRESHOLD || '');
+  const EVICTION_THRESHOLD = Number.isFinite(rawThreshold) && rawThreshold > 0 ? rawThreshold : 0.1;
+
+  const rawMax = parseInt(process.env.LTM_MAX_FILES || '', 10);
+  const LTM_MAX_FILES = Number.isFinite(rawMax) && rawMax > 0 ? rawMax : 50;
 
   const files = fs.readdirSync(ltmDir).filter(f => f.endsWith('.json'));
   if (files.length <= LTM_MAX_FILES) return { evicted: 0, skipped: 'below_max_files' };
@@ -93,10 +104,14 @@ function evictStaleLTMFiles(ltmDir) {
   const { safeParseJSON } = require('../utils/safe-json.cjs');
   const now = Date.now();
   const MS_PER_DAY = 86400000;
-  let evicted = 0;
+
+  // Fix 2 (P0 Mass Extinction Cap): pre-compute utilities for all evictable files,
+  // then sort lowest utility first and cap at (files.length - LTM_MAX_FILES) evictions.
+  const evictionCap = files.length - LTM_MAX_FILES;
+  const candidates = [];
 
   for (const file of files) {
-    // Fix 1: never evict manually-promoted entries (promoted_*.json)
+    // Never evict manually-promoted entries (promoted_*.json)
     if (file.startsWith('promoted_')) continue;
 
     const filePath = path.join(ltmDir, file);
@@ -109,31 +124,69 @@ function evictStaleLTMFiles(ltmDir) {
     }
     if (!data || typeof data !== 'object') continue;
 
-    // Fix 2: treat missing/zero access_count as 1 so utility is never 0
+    // Treat missing/zero access_count as 1 so utility is never 0
     // (prevents evicting all entries when access tracking hasn't fired yet)
     const rawCount =
       typeof data.access_count === 'number' && data.access_count >= 0 ? data.access_count : 0;
     const accessCount = Math.max(rawCount, 1);
+
     const ts = data.consolidated_at || data.created_at || data.timestamp || null;
-    let stalenessDays = Infinity;
+    let stalenessDays;
     if (ts) {
       const parsed = new Date(ts).getTime();
       if (Number.isFinite(parsed) && parsed > 0) {
         stalenessDays = Math.max(0, (now - parsed) / MS_PER_DAY);
+      } else {
+        // Fix 3 (P1 mtime Fallback): invalid timestamp string → use file mtime
+        try {
+          stalenessDays = Math.max(0, (now - fs.statSync(filePath).mtimeMs) / MS_PER_DAY);
+        } catch (_e) {
+          stalenessDays = Infinity;
+        }
+      }
+    } else {
+      // Fix 3 (P1 mtime Fallback): no timestamp fields at all → fall back to file mtime
+      try {
+        stalenessDays = Math.max(0, (now - fs.statSync(filePath).mtimeMs) / MS_PER_DAY);
+      } catch (_e) {
+        stalenessDays = Infinity;
       }
     }
+
     const utility = accessCount * (1 / (1 + stalenessDays * DECAY_FACTOR));
 
     if (utility < EVICTION_THRESHOLD) {
-      try {
-        fs.unlinkSync(filePath);
-        process.stderr.write(
-          `[memory-tiers] evictStaleLTM: removed ${file} (utility=${utility.toFixed(4)}, access_count=${accessCount}, staleness_days=${Number.isFinite(stalenessDays) ? stalenessDays.toFixed(1) : 'inf'})\n`
-        );
-        evicted++;
-      } catch (_e) {
-        // non-critical — skip
-      }
+      candidates.push({ file, filePath, utility, accessCount, stalenessDays });
+    }
+  }
+
+  // Fix 2 (P0 Mass Extinction Cap): sort lowest utility first, cap at evictionCap
+  candidates.sort((a, b) => a.utility - b.utility);
+  const toEvict = candidates.slice(0, evictionCap);
+
+  // Fix 4 (P2 Eviction Preview Log): emit preview warning before any deletions
+  if (toEvict.length > 0) {
+    const previewList = toEvict
+      .map(
+        c =>
+          `${c.file}(utility=${c.utility.toFixed(4)},staleness_days=${Number.isFinite(c.stalenessDays) ? c.stalenessDays.toFixed(1) : 'inf'})`
+      )
+      .join(', ');
+    process.stderr.write(
+      `[memory-tiers] evictStaleLTM: preview — will evict ${toEvict.length} file(s): ${previewList}\n`
+    );
+  }
+
+  let evicted = 0;
+  for (const { file, filePath, utility, accessCount, stalenessDays } of toEvict) {
+    try {
+      fs.unlinkSync(filePath);
+      process.stderr.write(
+        `[memory-tiers] evictStaleLTM: removed ${file} (utility=${utility.toFixed(4)}, access_count=${accessCount}, staleness_days=${Number.isFinite(stalenessDays) ? stalenessDays.toFixed(1) : 'inf'})\n`
+      );
+      evicted++;
+    } catch (_e) {
+      // non-critical — skip
     }
   }
 

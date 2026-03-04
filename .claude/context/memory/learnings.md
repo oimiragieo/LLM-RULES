@@ -189,6 +189,38 @@
 
 - Updated workflow: missing-workflow-xyz (2026-03-03)
 
+---
+
+## LTM Eviction & Access Count Pattern (2026-03-03)
+
+**Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
+
+**Implementation**:
+- Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
+- NOT threshold-based: no longer wipes all entries when any age past 180 days
+- NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
+- mtime fallback: entries missing timestamp fields default to current time via `mtime || Date.now()`
+- Eviction preview log: `console.error` outputs deleted entries BEFORE deletion
+- **Access count wired**: `incrementLTMAccessCount()` in `contextual-memory.cjs` increments `accessCount` on search hit
+- Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
+
+**Why This Matters**:
+- Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
+- NaN guards prevent silent calculation failures that corrupt eviction decisions
+- mtime fallback prevents crash on malformed entries
+- Access count enables utility-based eviction (previously all entries had equal utility)
+
+**Multi-LLM Review** (Gemini + Codex):
+- Identified mass extinction bug (threshold-based eviction)
+- Identified NaN propagation risk in decay calculations
+- Validated cap-based approach is correct
+- Confirmed access_count wiring complete
+
+**Files Modified**:
+- `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
+- `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
+- `.claude/lib/memory/memory-manager.cjs` (NaN guards)
+
 - Created new agent: qa-guardian (2026-03-03)
 
 - Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-03)
@@ -205,6 +237,38 @@
 
 - Updated workflow: missing-workflow-xyz (2026-03-03)
 
+---
+
+## LTM Eviction & Access Count Pattern (2026-03-03)
+
+**Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
+
+**Implementation**:
+- Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
+- NOT threshold-based: no longer wipes all entries when any age past 180 days
+- NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
+- mtime fallback: entries missing timestamp fields default to current time via `mtime || Date.now()`
+- Eviction preview log: `console.error` outputs deleted entries BEFORE deletion
+- **Access count wired**: `incrementLTMAccessCount()` in `contextual-memory.cjs` increments `accessCount` on search hit
+- Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
+
+**Why This Matters**:
+- Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
+- NaN guards prevent silent calculation failures that corrupt eviction decisions
+- mtime fallback prevents crash on malformed entries
+- Access count enables utility-based eviction (previously all entries had equal utility)
+
+**Multi-LLM Review** (Gemini + Codex):
+- Identified mass extinction bug (threshold-based eviction)
+- Identified NaN propagation risk in decay calculations
+- Validated cap-based approach is correct
+- Confirmed access_count wiring complete
+
+**Files Modified**:
+- `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
+- `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
+- `.claude/lib/memory/memory-manager.cjs` (NaN guards)
+
 - Created new agent: qa-guardian (2026-03-03)
 
 - Created new agent: contract-check (2026-03-03)
@@ -221,6 +285,38 @@
 
 - Updated workflow: missing-workflow-xyz (2026-03-03)
 
+---
+
+## LTM Eviction & Access Count Pattern (2026-03-03)
+
+**Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
+
+**Implementation**:
+- Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
+- NOT threshold-based: no longer wipes all entries when any age past 180 days
+- NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
+- mtime fallback: entries missing timestamp fields default to current time via `mtime || Date.now()`
+- Eviction preview log: `console.error` outputs deleted entries BEFORE deletion
+- **Access count wired**: `incrementLTMAccessCount()` in `contextual-memory.cjs` increments `accessCount` on search hit
+- Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
+
+**Why This Matters**:
+- Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
+- NaN guards prevent silent calculation failures that corrupt eviction decisions
+- mtime fallback prevents crash on malformed entries
+- Access count enables utility-based eviction (previously all entries had equal utility)
+
+**Multi-LLM Review** (Gemini + Codex):
+- Identified mass extinction bug (threshold-based eviction)
+- Identified NaN propagation risk in decay calculations
+- Validated cap-based approach is correct
+- Confirmed access_count wiring complete
+
+**Files Modified**:
+- `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
+- `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
+- `.claude/lib/memory/memory-manager.cjs` (NaN guards)
+
 - Created new agent: qa-guardian (2026-03-03)
 
 - Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-03)
@@ -237,6 +333,38 @@
 
 - Updated workflow: missing-workflow-xyz (2026-03-03)
 
+---
+
+## LTM Eviction & Access Count Pattern (2026-03-03)
+
+**Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
+
+**Implementation**:
+- Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
+- NOT threshold-based: no longer wipes all entries when any age past 180 days
+- NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
+- mtime fallback: entries missing timestamp fields default to current time via `mtime || Date.now()`
+- Eviction preview log: `console.error` outputs deleted entries BEFORE deletion
+- **Access count wired**: `incrementLTMAccessCount()` in `contextual-memory.cjs` increments `accessCount` on search hit
+- Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
+
+**Why This Matters**:
+- Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
+- NaN guards prevent silent calculation failures that corrupt eviction decisions
+- mtime fallback prevents crash on malformed entries
+- Access count enables utility-based eviction (previously all entries had equal utility)
+
+**Multi-LLM Review** (Gemini + Codex):
+- Identified mass extinction bug (threshold-based eviction)
+- Identified NaN propagation risk in decay calculations
+- Validated cap-based approach is correct
+- Confirmed access_count wiring complete
+
+**Files Modified**:
+- `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
+- `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
+- `.claude/lib/memory/memory-manager.cjs` (NaN guards)
+
 - Created new agent: qa-guardian (2026-03-03)
 
 - Created new agent: contract-check (2026-03-03)
@@ -252,3 +380,35 @@
 - Updated workflow: evolution-workflow (2026-03-03)
 
 - Updated workflow: missing-workflow-xyz (2026-03-03)
+
+---
+
+## LTM Eviction & Access Count Pattern (2026-03-03)
+
+**Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
+
+**Implementation**:
+- Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
+- NOT threshold-based: no longer wipes all entries when any age past 180 days
+- NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
+- mtime fallback: entries missing timestamp fields default to current time via `mtime || Date.now()`
+- Eviction preview log: `console.error` outputs deleted entries BEFORE deletion
+- **Access count wired**: `incrementLTMAccessCount()` in `contextual-memory.cjs` increments `accessCount` on search hit
+- Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
+
+**Why This Matters**:
+- Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
+- NaN guards prevent silent calculation failures that corrupt eviction decisions
+- mtime fallback prevents crash on malformed entries
+- Access count enables utility-based eviction (previously all entries had equal utility)
+
+**Multi-LLM Review** (Gemini + Codex):
+- Identified mass extinction bug (threshold-based eviction)
+- Identified NaN propagation risk in decay calculations
+- Validated cap-based approach is correct
+- Confirmed access_count wiring complete
+
+**Files Modified**:
+- `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
+- `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
+- `.claude/lib/memory/memory-manager.cjs` (NaN guards)
