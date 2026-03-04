@@ -44,15 +44,10 @@ const metricsCollector = require(
 const errorTracker = require(
   path.join(PROJECT_ROOT, '.claude', 'hooks', 'monitoring', 'error-tracker.cjs')
 );
-const findingsRegistry = libRequire(path.join('memory', 'findings-registry.cjs'));
 
-let FINDINGS_SNAPSHOT_STATE_FILE = path.join(
-  PROJECT_ROOT,
-  '.claude',
-  'context',
-  'runtime',
-  'findings-snapshot-state.json'
-);
+// Helpers extracted to separate modules to keep line count manageable
+const findingsSnapshotHelpers = require('./findings-snapshot-helpers.cjs');
+const { shouldRecordFindingsSnapshot, recordPeriodicFindingsSnapshot } = findingsSnapshotHelpers;
 
 // =============================================================================
 // Check 1: Metrics Collector (from metrics-collector-hook.cjs)
@@ -533,43 +528,6 @@ function detectAnomalies(hookInput) {
   }
 }
 
-function shouldRecordFindingsSnapshot(nowMs) {
-  const intervalRaw = Number(process.env.FINDINGS_TREND_SNAPSHOT_INTERVAL_MS);
-  const intervalMs = Number.isFinite(intervalRaw) && intervalRaw > 0 ? intervalRaw : 15 * 60 * 1000;
-
-  try {
-    if (!fs.existsSync(FINDINGS_SNAPSHOT_STATE_FILE)) return true;
-    const payload = safeParseJSON(
-      fs.readFileSync(FINDINGS_SNAPSHOT_STATE_FILE, 'utf8'),
-      'findings-snapshot-state'
-    );
-    const lastRecordedMs = Number(payload?.lastRecordedMs || 0);
-    if (!Number.isFinite(lastRecordedMs)) return true;
-    return nowMs - lastRecordedMs >= intervalMs;
-  } catch (_err) {
-    return true;
-  }
-}
-
-function recordPeriodicFindingsSnapshot() {
-  const nowMs = Date.now();
-  if (!shouldRecordFindingsSnapshot(nowMs)) {
-    return { recorded: false, reason: 'cooldown' };
-  }
-
-  try {
-    findingsRegistry.recordFindingsTrendSnapshot(PROJECT_ROOT, 'post-tool-metrics-unified');
-    fs.mkdirSync(path.dirname(FINDINGS_SNAPSHOT_STATE_FILE), { recursive: true });
-    atomicWriteJSONSync(FINDINGS_SNAPSHOT_STATE_FILE, {
-      lastRecordedMs: nowMs,
-      lastRecordedAt: new Date(nowMs).toISOString(),
-    });
-    return { recorded: true };
-  } catch (err) {
-    return { recorded: false, error: err?.message || String(err) };
-  }
-}
-
 // =============================================================================
 // Combined Runner
 // =============================================================================
@@ -589,6 +547,14 @@ async function main() {
     trackErrors(hookInput);
     detectAnomalies(hookInput);
     recordPeriodicFindingsSnapshot();
+
+    // Search telemetry: log broad Grep usage instead of built-in search skills
+    if (getToolName(hookInput) === 'Grep') {
+      const toolInput = getToolInput(hookInput) || {};
+      if (detectSearchLikeGrep(toolInput)) {
+        recordSearchTelemetry(toolInput);
+      }
+    }
 
     const perfDuration = performance.now() - perfStart;
     if (process.env.DEBUG_HOOKS === 'true' || perfDuration > 100) {
@@ -616,23 +582,37 @@ if (require.main === module) {
   main();
 }
 
-// Exports for testing
+const searchTelemetry = require('./search-telemetry-helpers.cjs');
+const { detectSearchLikeGrep, recordSearchTelemetry } = searchTelemetry;
+
 module.exports = {
   collectMetrics,
   trackErrors,
   detectAnomalies,
   shouldRecordFindingsSnapshot,
   recordPeriodicFindingsSnapshot,
-  FINDINGS_SNAPSHOT_STATE_FILE,
+  get FINDINGS_SNAPSHOT_STATE_FILE() {
+    return findingsSnapshotHelpers.FINDINGS_SNAPSHOT_STATE_FILE;
+  },
+  get SEARCH_TELEMETRY_LOG() {
+    return searchTelemetry.SEARCH_TELEMETRY_LOG;
+  },
+  get FINDINGS_SNAPSHOT_LOG() {
+    return searchTelemetry.SEARCH_TELEMETRY_LOG;
+  },
+  detectSearchLikeGrep,
+  recordSearchTelemetry,
   main,
-  // Anomaly functions
-  setStateFile: filePath => {
-    STATE_FILE = filePath;
+  setStateFile: f => {
+    STATE_FILE = f;
   },
-  setAnomalyLog: filePath => {
-    ANOMALY_LOG = filePath;
+  setAnomalyLog: f => {
+    ANOMALY_LOG = f;
   },
-  setFindingsSnapshotStateFile: filePath => {
-    FINDINGS_SNAPSHOT_STATE_FILE = filePath;
+  setFindingsSnapshotStateFile: f => {
+    findingsSnapshotHelpers.setFindingsSnapshotStateFile(f);
+  },
+  setSearchTelemetryLog: f => {
+    searchTelemetry.setSearchTelemetryLog(f);
   },
 };

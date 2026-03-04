@@ -9,6 +9,7 @@
 'use strict';
 
 const path = require('path');
+const fs = require('fs');
 const { spawn } = require('child_process');
 const { PROJECT_ROOT: _PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { assembleSpawnPrompt, assembleSpawnPromptAsync } = require('../spawn/prompt-assembler.cjs');
@@ -209,11 +210,46 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
   }
 }
 
+// ---------------------------------------------------------------------------
+// Persistent task storage (file-based, for lib/tools usage)
+// Host-provided Task* tools are separate; this lib provides file-backed
+// persistence for scenarios where the host tools are unavailable.
+// ---------------------------------------------------------------------------
+
+const TASK_STORE_PATH =
+  require.resolve !== undefined
+    ? path.join(__dirname, '..', '..', 'context', 'runtime', 'tasks.json')
+    : null;
+
+function loadTaskStore() {
+  const storePath = TASK_STORE_PATH;
+  if (!storePath) return { tasks: [] };
+  try {
+    if (fs.existsSync(storePath)) {
+      return JSON.parse(fs.readFileSync(storePath, 'utf8'));
+    }
+  } catch (_e) {
+    /* ignore */
+  }
+  return { tasks: [] };
+}
+
+function saveTaskStore(store) {
+  const storePath = TASK_STORE_PATH;
+  if (!storePath) return;
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    fs.writeFileSync(storePath, JSON.stringify(store, null, 2) + '\n', 'utf8');
+  } catch (_e) {
+    /* ignore */
+  }
+}
+
 /**
- * TaskCreate Tool - Creates trackable tasks
+ * TaskCreate Tool - Creates trackable tasks with persistent storage
  */
 async function TaskCreate({ subject, description, priority = 'medium' }) {
-  console.log(`[TaskCreate] Creating task: ${subject}`);
+  process.stderr.write(`[TaskCreate] Creating task: ${subject}\n`);
 
   const task = {
     id: `task-${Date.now()}`,
@@ -224,65 +260,60 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
     created_at: new Date().toISOString(),
   };
 
+  const store = loadTaskStore();
+  store.tasks.push(task);
+  saveTaskStore(store);
+
   return task;
 }
 
 /**
- * TaskUpdate Tool - Updates task status and metadata
+ * TaskUpdate Tool - Updates task status and metadata with persistence
  */
 async function TaskUpdate({ taskId, status, metadata = {} }) {
-  console.log(`[TaskUpdate] Updating task ${taskId} to status: ${status}`);
+  process.stderr.write(`[TaskUpdate] Updating task ${taskId} to status: ${status}\n`);
 
-  const update = {
-    task_id: taskId,
-    status,
-    metadata,
-    updated_at: new Date().toISOString(),
-  };
+  const store = loadTaskStore();
+  const task = store.tasks.find(t => t.id === taskId);
+  if (task) {
+    if (status !== undefined) task.status = status;
+    if (metadata && Object.keys(metadata).length > 0) {
+      task.metadata = { ...(task.metadata || {}), ...metadata };
+    }
+    task.updated_at = new Date().toISOString();
+    saveTaskStore(store);
+  }
 
-  return update;
+  return { task_id: taskId, status, metadata, updated_at: new Date().toISOString() };
 }
 
 /**
- * TaskList Tool - Lists available tasks
+ * TaskList Tool - Lists tasks from persistent storage
  */
-async function TaskList({ status, limit = 10 } = {}) {
-  console.log(`[TaskList] Listing tasks with status: ${status || 'all'}`);
+async function TaskList({ status, limit = 100 } = {}) {
+  process.stderr.write(`[TaskList] Listing tasks with status: ${status || 'all'}\n`);
 
-  // Simulate task list
-  const tasks = [
-    {
-      id: 'task-1',
-      subject: 'Fix reflection deadlock',
-      status: 'completed',
-      priority: 'high',
-    },
-    {
-      id: 'task-2',
-      subject: 'Implement Task tool',
-      status: 'in_progress',
-      priority: 'high',
-    },
-  ];
+  const store = loadTaskStore();
+  const filtered = store.tasks.filter(task => !status || task.status === status).slice(0, limit);
 
-  return {
-    tasks: tasks.filter(task => !status || task.status === status).slice(0, limit),
-    total: tasks.length,
-  };
+  return { tasks: filtered, total: filtered.length };
 }
 
 /**
- * TaskGet Tool - Gets details of a specific task
+ * TaskGet Tool - Gets details of a specific task from persistent storage
  */
 async function TaskGet({ taskId }) {
-  console.log(`[TaskGet] Getting details for task: ${taskId}`);
+  process.stderr.write(`[TaskGet] Getting details for task: ${taskId}\n`);
 
-  // Simulate task retrieval
+  const store = loadTaskStore();
+  const task = store.tasks.find(t => t.id === taskId);
+  if (task) return task;
+
   return {
     id: taskId,
-    subject: 'Sample task',
-    description: 'Task description',
-    status: 'in_progress',
+    subject: 'Unknown task',
+    description: '',
+    status: 'unknown',
     priority: 'medium',
     created_at: new Date().toISOString(),
   };

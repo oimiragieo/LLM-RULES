@@ -94,18 +94,20 @@ describe('shouldOverrideWorktreeIsolation — non-framework paths', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 3. Agent type gating — only developer should trigger override
+// 3. Agent type gating — isolated agents (developer, qa, code-reviewer,
+//    frontend-pro, nextjs-pro, medical-research-triage) trigger override;
+//    non-isolated agents (architect, devops, planner) do not.
 // ---------------------------------------------------------------------------
 
 describe('shouldOverrideWorktreeIsolation — agent type gating', () => {
-  test('returns false for qa agent even with framework path', () => {
+  test('returns true for qa agent with framework path', () => {
     const prompt = 'Run tests for .claude/hooks/routing/routing-guard.cjs';
-    assert.strictEqual(shouldOverrideWorktreeIsolation(prompt, 'qa'), false);
+    assert.strictEqual(shouldOverrideWorktreeIsolation(prompt, 'qa'), true);
   });
 
-  test('returns false for code-reviewer agent even with framework path', () => {
+  test('returns true for code-reviewer agent with framework path', () => {
     const prompt = 'Review changes in .claude/skills/tdd/SKILL.md';
-    assert.strictEqual(shouldOverrideWorktreeIsolation(prompt, 'code-reviewer'), false);
+    assert.strictEqual(shouldOverrideWorktreeIsolation(prompt, 'code-reviewer'), true);
   });
 
   test('returns false for architect agent even with framework path', () => {

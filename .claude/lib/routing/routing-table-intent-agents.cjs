@@ -55,6 +55,7 @@ const INTENT_TO_AGENT = {
   database_architect: 'database-architect',
   devops: 'devops',
   devops_troubleshooter: 'devops-troubleshooter',
+  framework_maintenance: 'devops',
   incident_responder: 'incident-responder',
   reverse_engineer: 'reverse-engineer',
   researcher: 'researcher',
