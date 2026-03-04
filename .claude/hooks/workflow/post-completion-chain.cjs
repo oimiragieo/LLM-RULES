@@ -297,6 +297,21 @@ async function processTaskCompletion(hookData) {
   // Does not block the hook pipeline — errors are caught internally
   triggerMemoryExtraction(metadata, update.taskId);
 
+  // Advisory: warn when agent completed with substantial content but no MemoryRecord calls reported
+  const memoriesRecorded = Array.isArray(metadata.memoriesRecorded)
+    ? metadata.memoriesRecorded
+    : [];
+  const summaryForAdvisory = typeof metadata.summary === 'string' ? metadata.summary : '';
+  const discoveriesForAdvisory = Array.isArray(metadata.discoveries) ? metadata.discoveries : [];
+  const hasSubstantialContent = summaryForAdvisory.length > 50 || discoveriesForAdvisory.length > 0;
+  if (memoriesRecorded.length === 0 && hasSubstantialContent) {
+    process.stderr.write(
+      `[post-completion-chain] ADVISORY: Task ${update.taskId || '?'} completed with substantial content ` +
+        `but no MemoryRecord calls reported in metadata.memoriesRecorded. ` +
+        `Future agents may miss key learnings.\n`
+    );
+  }
+
   // Resolve paths at call time so env-var overrides work even when set after module load
   const workflowStateFile = getWorkflowStatePath();
   const phaseAdvanceFile = getPhaseAdvancePath();

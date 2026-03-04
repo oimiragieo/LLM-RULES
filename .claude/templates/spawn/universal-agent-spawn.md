@@ -26,18 +26,26 @@ Use this template for all non-orchestrator agents.
 4. **TOOLS ARE NOT AGENTS**: Creator/updater tools (ending in `-creator` or `-updater`) are **SKILLS**, not agents. Use `Skill({ skill: 'name' })`, NEVER `Task({ subagent_type: 'name' })` for these.
 5. Subagent does `TaskUpdate(in_progress)` first and `TaskUpdate(completed)` last.
 
-## Memory Tooling Protocol (Required)
+## Memory Tooling Protocol (MANDATORY for all tasks)
 
-- Read/write memory via framework tooling, not ad-hoc file edits.
-- **MemoryRecord Usage** (when available in your tool list):
-  - Record a **pattern** when you discover a reusable coding technique or best practice
-  - Record a **gotcha** when you hit an unexpected behavior, edge case, or platform quirk
-  - Record a **discovery** when you find important codebase facts (file purposes, config relationships, API contracts)
-  - Keep entries under 200 chars, include the `area` field (e.g., "memory", "hooks", "routing")
-  - Do NOT record trivial observations; only record insights that would save another agent >5 minutes
-- Before final `TaskUpdate(completed)`, include memory evidence in completion text:
-  - files changed (for `resolutionEvidence.files`)
-  - validation commands run (for `resolutionEvidence.commands`)
+**REQUIRED before TaskUpdate(completed):** Call MemoryRecord at least once per task that
+produces new findings. Zero MemoryRecord calls = invisible work to the learning system.
+
+Record EXACTLY one of these types per discovery:
+
+- `type: 'pattern'` — reusable solution, code technique, or best practice found
+- `type: 'gotcha'` — unexpected behavior, edge case, or platform quirk that cost time
+- `type: 'discovery'` — codebase facts: what a file does, config relationships, API contracts
+
+**Format:** `MemoryRecord({ type: 'gotcha', content: 'Windows paths need normalization in glob patterns', area: 'platform' })`
+
+- `content`: under 200 chars, specific enough to be actionable
+- `area`: one of 'memory', 'hooks', 'routing', 'testing', 'platform', 'security', 'performance', 'tooling', 'agents'
+
+**Threshold:** Only record if the insight would save another agent >5 minutes. If you learned
+nothing new, call `MemoryRecord({ type: 'discovery', content: 'No new discoveries in this task.', area: 'tooling' })`.
+This confirms you evaluated the threshold consciously, not that you forgot.
+
 - When task output produces report artifacts, ensure files actually exist at declared paths before completion.
 - Keep memory sections compact and focused; rely on observational/hybrid injection from hooks.
 
@@ -118,6 +126,7 @@ When calling `TaskUpdate({ status: 'completed' })`, metadata MUST include:
 - `summary`: string (>50 chars) describing what was accomplished
 - `filesModified`: string[] of changed file paths
 - `discoveries`: string[] of key findings (REQUIRED for HIGH complexity tasks)
+- `memoriesRecorded`: string[] of MemoryRecord type+area pairs called during this task (e.g. `['gotcha:platform', 'pattern:hooks']`). Empty array is allowed only if you consciously evaluated and found nothing worth recording.
 
 These fields trigger the memory extraction pipeline. Without them, your work is invisible to the learning system.
 
