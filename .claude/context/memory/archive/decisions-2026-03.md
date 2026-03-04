@@ -129,11 +129,13 @@
 **Decision**: Replace threshold-based LTM eviction with cap-based eviction.
 
 **Rationale**:
+
 - Threshold-based eviction could wipe ALL LTM entries in a single pass when many age past threshold (e.g., 180 days)
 - Cap-based eviction only evicts when `files.length > LTM_MAX_FILES`, maintaining a bounded set
 - Prevents mass extinction of useful learnings
 
 **Implementation**:
+
 - Eviction logic: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when needed)
 - NaN guards on: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` (use `Number.isFinite()`)
 - mtime fallback: entries missing `timestamp`/`mtime` fields default to `Date.now()`
@@ -150,11 +152,13 @@
 **Decision**: Wire `access_count` increment in memory search path to enable utility-based eviction prioritization.
 
 **Rationale**:
+
 - Previously all LTM entries had equal utility (no differentiation on access frequency)
 - Access count enables prioritizing frequently-used learnings (highest utility) for retention
 - Least-used entries (lowest utility) are evicted first when cap is exceeded
 
 **Implementation**:
+
 - Function: `incrementLTMAccessCount(entryId)` in `.claude/lib/memory/contextual-memory.cjs`
 - Triggers on every LTM search hit (memory-search.cjs calls it)
 - Utility calculation: combines `accessCount` with time decay for eviction priority
@@ -170,11 +174,13 @@
 **Decision**: Replace threshold-based LTM eviction with cap-based eviction.
 
 **Rationale**:
+
 - Threshold-based eviction could wipe ALL LTM entries in a single pass when many age past threshold (e.g., 180 days)
 - Cap-based eviction only evicts when `files.length > LTM_MAX_FILES`, maintaining a bounded set
 - Prevents mass extinction of useful learnings
 
 **Implementation**:
+
 - Eviction logic: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when needed)
 - NaN guards on: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` (use `Number.isFinite()`)
 - mtime fallback: entries missing `timestamp`/`mtime` fields default to `Date.now()`
@@ -191,11 +197,13 @@
 **Decision**: Wire `access_count` increment in memory search path to enable utility-based eviction prioritization.
 
 **Rationale**:
+
 - Previously all LTM entries had equal utility (no differentiation on access frequency)
 - Access count enables prioritizing frequently-used learnings (highest utility) for retention
 - Least-used entries (lowest utility) are evicted first when cap is exceeded
 
 **Implementation**:
+
 - Function: `incrementLTMAccessCount(entryId)` in `.claude/lib/memory/contextual-memory.cjs`
 - Triggers on every LTM search hit (memory-search.cjs calls it)
 - Utility calculation: combines `accessCount` with time decay for eviction priority

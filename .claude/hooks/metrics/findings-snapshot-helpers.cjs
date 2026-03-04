@@ -24,8 +24,7 @@ let STATE_FILE = path.join(
 
 function shouldRecordFindingsSnapshot(nowMs) {
   const intervalRaw = Number(process.env.FINDINGS_TREND_SNAPSHOT_INTERVAL_MS);
-  const intervalMs =
-    Number.isFinite(intervalRaw) && intervalRaw > 0 ? intervalRaw : 15 * 60 * 1000;
+  const intervalMs = Number.isFinite(intervalRaw) && intervalRaw > 0 ? intervalRaw : 15 * 60 * 1000;
   try {
     if (!fs.existsSync(STATE_FILE)) return true;
     const payload = safeParseJSON(fs.readFileSync(STATE_FILE, 'utf8'), 'findings-snapshot-state');
