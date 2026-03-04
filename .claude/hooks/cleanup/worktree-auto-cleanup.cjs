@@ -203,24 +203,15 @@ function run() {
   }
 }
 
-// --- Entry point ---
-// SE-03: Outer try/catch guarantees exit 0 on any unexpected error
-try {
-  run();
-} catch (_outerErr) {
-  // Log to stderr only — never stdout (reserved for JSON hook protocol)
-  process.stderr.write(
-    `[worktree-auto-cleanup] Non-fatal error: ${_outerErr && _outerErr.message ? _outerErr.message : String(_outerErr)}\n`
-  );
-}
-
-// SE-03: Always exit 0 — this hook MUST NOT block TaskUpdate
-process.exit(0);
-
-// Export internals for testing (not used in production)
-// Placed after process.exit() so requiring this module in tests won't execute process.exit()
-// (Node.js module loading does not re-execute code after a successful require/cache hit)
-// Note: tests should use spawnSync to run the hook as a subprocess to bypass process.exit().
-if (typeof module !== 'undefined') {
+if (require.main === module) {
+  // Only run and exit when executed directly (as a hook)
+  try {
+    run();
+  } catch (_outerErr) {
+    process.stderr.write(`[worktree-auto-cleanup] Outer error: ${_outerErr.message}\n`);
+  }
+  process.exit(0);
+} else {
+  // When required (for testing), export internals only
   module.exports._test_internals = { extractBranchTimestamp, isTTLExpired, readStdin };
 }

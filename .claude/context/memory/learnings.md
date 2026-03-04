@@ -1,3 +1,21 @@
+### Framework-Path Worktree Override (2026-03-04)
+
+- Worktree isolation (`isolation: worktree`) causes silent data loss when an agent targets `.claude/` framework paths — writes go into the isolated clone and are discarded at cleanup
+- Fix: `shouldOverrideWorktreeIsolation()` in `spawn-prompt-assembler.task-tools.cjs` detects framework paths and overrides isolation to `none`
+- Detection uses regex against 8 framework path segments: hooks, skills, agents, tools, workflows, templates, schemas, lib
+- Affected agents: developer, qa, code-reviewer, frontend-pro, nextjs-pro (all have `isolation: worktree` in frontmatter)
+- Safe for: source code tasks in `src/`, `tests/`, project root files
+- Evidence: 43% failure rate across 5+ confirmed incidents, commit 775ccf1f, 26 tests
+
+### Cross-Platform stdin Reading (2026-03-04)
+
+- `/dev/stdin` throws ENOENT on every invocation on Windows (Windows-first repo — see SE-01)
+- Fix: use `fs.readFileSync(0, 'utf8')` (file descriptor 0) which reads stdin cross-platform without device path
+- Applied to: `worktree-auto-cleanup.cjs`
+- Evidence: commit 775ccf1f
+
+---
+
 ## Skill Updated: authentication-flow-rules (2026-02-23)
 
 - Skill `authentication-flow-rules` was reviewed and updated by the skill-updater pipeline.
@@ -47,6 +65,28 @@
 - Refreshed skill: nativescript (2026-03-01)
 
 - Refreshed skill: webmcp-browser-tools (2026-03-01)
+
+---
+
+## Pattern: Multi-LLM Code Review Consensus Detects Critical Bugs (2026-03-04)
+
+Task 2 (2026-03-04): Multi-LLM consultation on LTM eviction fixes
+
+**Pattern**: Running the same code review through multiple LLM models (Gemini + Codex) and synthesizing results yields higher bug detection rate than single-model review.
+
+**Evidence**:
+
+- Both Gemini and Codex independently identified mass-extinction bug (evicts ALL files not just overflow)
+- Both independently identified NaN propagation from malformed env vars
+- Both independently validated correct fixes (promoted\_ exclusion, Math.max guard)
+- Single-pass review would likely have missed at least one class of bugs
+
+**Implementation**: Create multi-llm-consultant agent task when reviewing critical code paths. Request 2-3 independent model reviews before synthesizing.
+
+**Reuse**: This pattern is high-signal for P0 security-critical or complex algorithm reviews.
+
+---
+
 - Created new agent: qa-guardian (2026-03-02)
 
 - Created new agent: contract-check (2026-03-02)
@@ -196,6 +236,7 @@
 **Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
 
 **Implementation**:
+
 - Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
 - NOT threshold-based: no longer wipes all entries when any age past 180 days
 - NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
@@ -205,18 +246,21 @@
 - Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
 
 **Why This Matters**:
+
 - Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
 - NaN guards prevent silent calculation failures that corrupt eviction decisions
 - mtime fallback prevents crash on malformed entries
 - Access count enables utility-based eviction (previously all entries had equal utility)
 
 **Multi-LLM Review** (Gemini + Codex):
+
 - Identified mass extinction bug (threshold-based eviction)
 - Identified NaN propagation risk in decay calculations
 - Validated cap-based approach is correct
 - Confirmed access_count wiring complete
 
 **Files Modified**:
+
 - `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
 - `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
 - `.claude/lib/memory/memory-manager.cjs` (NaN guards)
@@ -244,6 +288,7 @@
 **Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
 
 **Implementation**:
+
 - Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
 - NOT threshold-based: no longer wipes all entries when any age past 180 days
 - NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
@@ -253,18 +298,21 @@
 - Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
 
 **Why This Matters**:
+
 - Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
 - NaN guards prevent silent calculation failures that corrupt eviction decisions
 - mtime fallback prevents crash on malformed entries
 - Access count enables utility-based eviction (previously all entries had equal utility)
 
 **Multi-LLM Review** (Gemini + Codex):
+
 - Identified mass extinction bug (threshold-based eviction)
 - Identified NaN propagation risk in decay calculations
 - Validated cap-based approach is correct
 - Confirmed access_count wiring complete
 
 **Files Modified**:
+
 - `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
 - `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
 - `.claude/lib/memory/memory-manager.cjs` (NaN guards)
@@ -292,6 +340,7 @@
 **Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
 
 **Implementation**:
+
 - Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
 - NOT threshold-based: no longer wipes all entries when any age past 180 days
 - NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
@@ -301,18 +350,21 @@
 - Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
 
 **Why This Matters**:
+
 - Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
 - NaN guards prevent silent calculation failures that corrupt eviction decisions
 - mtime fallback prevents crash on malformed entries
 - Access count enables utility-based eviction (previously all entries had equal utility)
 
 **Multi-LLM Review** (Gemini + Codex):
+
 - Identified mass extinction bug (threshold-based eviction)
 - Identified NaN propagation risk in decay calculations
 - Validated cap-based approach is correct
 - Confirmed access_count wiring complete
 
 **Files Modified**:
+
 - `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
 - `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
 - `.claude/lib/memory/memory-manager.cjs` (NaN guards)
@@ -340,6 +392,7 @@
 **Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
 
 **Implementation**:
+
 - Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
 - NOT threshold-based: no longer wipes all entries when any age past 180 days
 - NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
@@ -349,18 +402,21 @@
 - Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
 
 **Why This Matters**:
+
 - Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
 - NaN guards prevent silent calculation failures that corrupt eviction decisions
 - mtime fallback prevents crash on malformed entries
 - Access count enables utility-based eviction (previously all entries had equal utility)
 
 **Multi-LLM Review** (Gemini + Codex):
+
 - Identified mass extinction bug (threshold-based eviction)
 - Identified NaN propagation risk in decay calculations
 - Validated cap-based approach is correct
 - Confirmed access_count wiring complete
 
 **Files Modified**:
+
 - `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
 - `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
 - `.claude/lib/memory/memory-manager.cjs` (NaN guards)
@@ -388,6 +444,7 @@
 **Pattern**: LTM eviction changed from threshold-based to cap-based. Evicts lowest-utility entries only when `files.length > LTM_MAX_FILES`.
 
 **Implementation**:
+
 - Eviction is cap-based: `const needToEvict = files.length - LTM_MAX_FILES` (only evicts when threshold exceeded)
 - NOT threshold-based: no longer wipes all entries when any age past 180 days
 - NaN guard added for env vars: `LTM_DECAY_FACTOR`, `LTM_EVICTION_THRESHOLD`, `LTM_MAX_FILES` use `Number.isFinite()` check
@@ -397,18 +454,21 @@
 - Utility calculation: combines `accessCount` with time decay for eviction priority (highest utility kept, lowest evicted)
 
 **Why This Matters**:
+
 - Cap-based prevents mass extinction (threshold-based could wipe all LTM in single pass)
 - NaN guards prevent silent calculation failures that corrupt eviction decisions
 - mtime fallback prevents crash on malformed entries
 - Access count enables utility-based eviction (previously all entries had equal utility)
 
 **Multi-LLM Review** (Gemini + Codex):
+
 - Identified mass extinction bug (threshold-based eviction)
 - Identified NaN propagation risk in decay calculations
 - Validated cap-based approach is correct
 - Confirmed access_count wiring complete
 
 **Files Modified**:
+
 - `.claude/lib/memory/memory-pruner.cjs` (eviction logic)
 - `.claude/lib/memory/contextual-memory.cjs` (access_count increment)
 - `.claude/lib/memory/memory-manager.cjs` (NaN guards)

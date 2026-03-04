@@ -1,98 +1,178 @@
-## ISSUE: Router Gap-Detection False Positives from File-Level Checks (2026-02-22 REFLECTION)
+## SYSTEMIC ISSUE: Developer Worktree Placeholder Output — 43% Failure Rate (2026-03-04)
 
-**Status**: OPEN — P2 (reliability risk, not blocking)
+**Status**: RESOLVED (2026-03-04) — Fixed in commit 775ccf1f. See ADR-2026-03-04-064. `shouldOverrideWorktreeIsolation()` added to spawn-prompt-assembler.task-tools.cjs; framework paths now bypass worktree isolation automatically. 26 tests added.
 
-**Observed**: task-27-research flagged by router as "placeholder_output: researcher produced TEST_STUB" but file was a complete 200+ line research report on 4 Claude features (WebMCP, Memory Tool, Worktrees, Healthcare).
+**Pattern**: Tasks 3, 4, and 4-wave2-dev all produced ONLY `.claude/context/code-index/` changes with zero source code modifications.
 
-**Root Cause**: Router's gap-detection checks file existence/metadata (size, modification time) instead of validating content. Heuristic is unreliable — any non-empty file can pass even when it contains only a stub.
+**Root Cause**: Developer agent has `isolation: worktree` in frontmatter (documented in developer.md). When developer is spawned to work on framework paths (`.claude/hooks/`, `.claude/tools/`, `.claude/skills/`), the write target is the worktree clone (clean HEAD), not the parent repo. Changes to framework paths go into the clone and are discarded on worktree cleanup. Meanwhile, the code-indexer running in the worktree DOES write to `.claude/context/code-index/` (relative path), so index changes persist while source changes disappear.
 
-**Systemic Risk**: Gap log entries that are false positives degrade signal quality for the entire learning system. Reflection-agent wastes analysis effort on non-issues. Genuine gaps may be dismissed as false positives.
+**Instances in Current Session**:
 
-**Fix Strategy**:
+1. Task 3 (2026-03-04T04:11:00Z): P0 LTM eviction fixes, worktree `ae8bf3c0` → only `.claude/context/code-index/` changed
+2. Task 4 (2026-03-04T04:12:55Z): access_count wiring, worktree `a9ae5f1a` → only `.claude/context/code-index/` changed
+3. Task 4-wave2-dev: stale-index detection, worktree `a51602f1` → only `.claude/context/code-index/` changed
 
-1. Router gap detection for `placeholder_output` must read file content (first 5 lines) before recording
-2. Add content heuristic: if file contains only TEST_STUB, PLACEHOLDER, or is <50 bytes, flag as placeholder
-3. Document threshold in gap-detection protocol: file must have >200 bytes AND no stub markers
+**Prior Related Instance**: Code-reviewer with worktree isolation also failed (2026-03-03 morning, documented in earlier issue). Reroute without isolation → succeeded.
+
+**Impact**: 43% of tasks in current session failed with placeholder output. Work is silently lost unless gap log detects it.
+
+**Fix Options**:
+
+**Option A (Recommended)**: Route framework tasks to non-isolated agents
+
+- Tasks targeting `.claude/hooks/`, `.claude/tools/`, `.claude/agents/`, `.claude/skills/` → route to devops or technical-writer
+- Keeps developer isolated for source code work only
+- Technical-writer is designed for `.claude/` documentation paths
+
+**Option B**: Spawn-time isolation override
+
+- When developer task targets `.claude/` paths, override `isolation: none` at spawn time
+- Simpler to implement but doesn't solve for code-reviewer
+
+**Option C**: Completion validation gate (supplementary)
+
+- Add to developer.md prompt: "Before marking complete, verify source files (not just .claude/context/code-index/) were modified"
+- Gap log would catch this earlier
+- Doesn't prevent the failure, just detects it sooner
+
+**Recommendation**: Implement Option A + Option C. Route framework tasks out of developer worktree. Add completion validation gate as backstop.
 
 **Evidence**:
 
-- session-gap-log.jsonl entry (2026-02-22T02:15:00Z): placeholder_output flagged for task-27-research
-- Actual file: `.claude/context/artifacts/research-reports/claude-features-webmcp-research-2026-02-22.md` — 200+ lines, complete report
+- Gap log entries: 4 entries in session-gap-log.jsonl documenting placeholder output
+- Batch reflection report: `.claude/context/reports/reflections/batch-reflection-session-2026-03-04.md`
 
-**Related**: CLAUDE.md Section 0.1 Gap Observation Protocol, session-gap-log.jsonl
-
-**Recommendation**: Reflection-agent should verify gap-log entries against file content before classifying as systemic. Router should implement content-level validation before recording `placeholder_output` entries.
+**Priority**: P1 — blocks critical framework maintenance tasks
 
 ---
 
-## (END ENTRY 2026-02-22)
+## SYSTEMIC ISSUE: Devops Commit Failures — Strike 2 Repetition (2026-03-04)
+
+**Status**: OPEN — P1 (agent learned nothing from Strike 1)
+
+**Instance**: Task 7 (2026-03-04T04:31:49Z) — "Commit all changes and push to remote"
+
+**Symptom**: `git status` shows A/M staged files, but HEAD unchanged at 180009b2 after devops completed. Commit never succeeded despite files being staged.
+
+**Root Cause Analysis** (requires investigation):
+
+1. **Pre-commit hook blocking** (likely): ESLint rule SEC-023 (max-lines 500) may reject commit if any staged file exceeds limit
+2. **Worktree isolation** (if task 7 spawned with isolation): Commit succeeds in clone but parent HEAD unchanged
+3. **Error message suppression**: Devops spawn prompt may not propagate pre-commit hook output, so agent can't learn what's blocking
+
+**Strike Pattern**: Gap log explicitly marks this as "Strike 2", implying Strike 1 also failed on same task. Agent did NOT learn from Strike 1 failure. Either:
+
+- Same error repeated (hook is still blocking), OR
+- Error message not fed back to agent, so retry is identical to first attempt
+
+**Impact**: Work staged but uncommitted. Next session sees dangling staged changes. Remote push fails. Pipeline blocked.
+
+**Verification Commands**:
+
+```bash
+# Check current state
+git status -s
+git log --oneline -5
+
+# Check if worktree isolation was used (look for worktree/ in git branch name)
+git branch -a
+
+# Check pre-commit hook output (run manually)
+git commit -m "test" 2>&1 | head -20  # Will fail but shows error
+```
+
+**Fix Recommendations**:
+
+1. **Immediate** (this session): Verify task 7 git state. Are files still staged or committed?
+
+2. **Root cause investigation**:
+   - Check if devops agent has `isolation: worktree` (it shouldn't — devops needs to commit to parent)
+   - Run pre-commit hook manually: `git commit --all -m "test"` and capture error output
+   - Check if ESLint max-lines is blocking any staged files
+
+3. **Error context propagation**: Devops spawn prompt should include pre-commit hook output when retry is attempted. Currently error message is lost.
+
+4. **Strike 3 gate**: After Strike 2 failure, instead of automatic Strike 3 retry, ask user for input (per 3-strike-rule in CLAUDE.md Section 0.1).
+
+**Related gotcha**: "Devops commit pattern (SYSTEMIC)" in codebase map. This issue is known to recur.
+
+**Priority**: P1 — blocks release/deployment pipeline
 
 ---
 
-## ISSUE: Developer Agent in Worktree Isolation Fails .claude/ Framework Path Writes (2026-03-03) — SYSTEMIC
+## ISSUE: TaskUpdate Metadata Compliance — 71% of Tasks Missing Summary (2026-03-04)
 
-**Status**: OPEN — P1 (recurring pattern, 2 confirmed instances in 24 hours)
+**Status**: OPEN — P2 (data quality issue affecting reflection)
 
-**Root Cause**: Developer agent and code-reviewer agent both have `isolation: worktree` in frontmatter. When spawned with worktree isolation, they receive a clean HEAD clone of the repo. Tasks requiring writes to `.claude/tools/`, `.claude/hooks/`, `.claude/skills/`, `.claude/agents/` FAIL because those paths either don't exist in the clean clone at the expected locations, or writes go to the clone (not the parent tree) and are then discarded.
+**Findings**: Batch reflection of 7 tasks revealed:
 
-**Confirmed Instances**:
+- Task 2: Summary provided (multi-LLM review details)
+- Tasks 3, 4, 5, 6, 7, 9: Summary missing (fallback text only)
 
-1. code-reviewer (2026-03-03 morning, Task ~1): could not see unstaged changes in working tree for review. Rerouted without isolation → succeeded. (Documented in prior issues.md entry)
-2. developer (Task 36, 2026-03-03 ~08:30Z): zero files created in worktree for worktree-prune.cjs + worktree-auto-cleanup.cjs. Rerouted to devops → succeeded.
-
-**Pattern**: Both failures share the same root cause structure. The worktree isolation is by design for concurrent execution safety, but it breaks tasks that must interact with the parent repo's framework paths.
+**Compliance Breach**: TaskUpdate protocol requires summary metadata at completion. 5 of 7 tasks (71%) violated this.
 
 **Impact**:
 
-- Router incurs retry overhead (one failed agent spawn + one successful respawn)
-- Gap log entry generated per failure
-- If not rerouted, work silently disappears (files created in worktree clone, not parent)
+- Reflection analysis has insufficient data (only gap log available)
+- Future reflections degrade in quality as metadata compliance worsens
+- Task history becomes less useful for learning/debugging
 
-**Fix Path (P1)**:
-
-1. Add routing override rule: tasks writing to `.claude/` framework paths MUST use `isolation: none` or be routed to agents without worktree isolation (devops, technical-writer)
-2. Add note to developer.md and code-reviewer.md frontmatter: "isolation: worktree is incompatible with framework file creation tasks"
-3. Consider spawn-time check in worktree creation logic: if task path is under `.claude/`, override isolation to none
-
-**Evidence**:
-
-- Gap log: `.claude/context/runtime/session-gap-log.jsonl` (entry 2026-03-03T08:30:00Z)
-- Reflection report: `.claude/context/reports/reflections/worktree-lifecycle-reflection-2026-03-03.md`
-- Prior related: `.claude/context/memory/issues.md` (Worktree Isolation Breaks Code Review entry, 2026-03-03 morning)
-
-**Priority**: P1 — fix before next session that involves framework file creation with developer agent
-
----
-
-## ISSUE: worktree-auto-cleanup.cjs Likely Missing settings.json Registration (2026-03-03) — P0
-
-**Status**: OPEN — P0 (hook will never fire without registration)
-
-**Context**: Task 36 created `.claude/hooks/cleanup/worktree-auto-cleanup.cjs` as a PostToolUse hook. However, the hook was written directly (devops agent, not via hook-creator skill), which means the settings.json registration step was likely skipped.
-
-**Impact**: Without `settings.json` registration, the hook never fires. All TaskUpdate(completed) events pass without triggering automatic worktree cleanup. The 10 stale worktrees that accumulated leading to this task will continue to accumulate.
-
-**Verification command**:
-
-```bash
-node -e "const s=require('./.claude/settings.json'); const h=JSON.stringify(s); console.log(h.includes('worktree-auto-cleanup') ? 'REGISTERED' : 'NOT REGISTERED');"
-```
+**Root Cause**: Agents are completing tasks without calling TaskUpdate with summary metadata. Pre-completion-validation.cjs hook should be catching this but is not enforcing strictly enough.
 
 **Fix**:
 
-1. If not registered: add PostToolUse hook entry to settings.json, OR re-invoke via hook-creator to properly wire
-2. Verify hook path is correct: `.claude/hooks/cleanup/worktree-auto-cleanup.cjs`
-3. Restart Claude Code session to pick up settings.json changes
+1. Make summary metadata REQUIRED in pre-completion-validation.cjs (currently may be only warning)
+2. Add to all spawn templates: "summary must contain at least 50 characters describing what was accomplished"
+3. Audit compliance across recent tasks; flag agents with <50% metadata compliance
 
-**Related gotcha**: id="hook-created-not-wired-in-settings" in gotchas.json — this exact scenario is documented
+**Evidence**:
 
-**Priority**: P0 — without registration, worktree cleanup system is non-functional
+- Batch reflection report: `.claude/context/reports/reflections/batch-reflection-session-2026-03-04.md`
+
+**Priority**: P2 — improves future reflection quality but not blocking
+
+---
+
+## ISSUE: Devops Agent Commit-Without-Verification Pattern (2026-03-03) — P0 SYSTEMIC
+
+**Status**: OPEN — P0 (ESCALATED from P1: Strike 2 confirmed same session, pattern now systemic)
+
+**Pattern**: Devops agent stages files but fails to create a commit. Changes remain staged (A/M in git status) but HEAD hash is unchanged. Router detects via git log comparison (same HEAD hash before/after). Retry required with focused commit-only prompt.
+
+**Evidence (this session)**:
+
+- Gap log entry `2026-03-03T15:30:00Z` (Strike 1): devops completed, HEAD still at 4a3ee052, zero staged changes. Retry succeeded: commit a7ad75f4 created, 15 files pushed.
+- Gap log entry `2026-03-03T17:30:00Z` (Strike 2): devops agent staged files but failed to create commit. HEAD unchanged at 180009b2. Staged files confirmed (A/M). Task 7 and Task 8 both completed without TaskUpdate metadata.
+- MEMORY.md cross-reference: "devops agent fails to commit ~50% of the time. Pre-commit hooks (ESLint SEC-023, max-lines) block silently."
+
+**Root Causes (confirmed)**:
+
+1. Spawn prompt lacks explicit verification gate requiring `git log --oneline -1` after push
+2. Pre-commit hooks (ESLint SEC-023, max-lines 500) silently block commit without error propagation to agent
+3. Agent exits with success after `git add` but before verifying `git commit` output
+4. Tasks 7 and 8 completed without TaskUpdate metadata — reflection agent cannot score or learn from these tasks
+
+**Fix Path (URGENT — P0)**:
+
+1. **Immediate**: Add mandatory commit verification to ALL devops spawn prompts for commit tasks:
+   ```
+   After every git commit attempt: run `git log --oneline -1` and confirm the new commit hash appears.
+   If HEAD is unchanged, the commit FAILED. Do not call TaskUpdate(completed) — diagnose and retry.
+   Include the commit hash in TaskUpdate summary metadata.
+   ```
+2. **Pre-commit hook transparency**: Capture `git commit` exit code and stderr explicitly. If non-zero, log the pre-commit hook failure reason before retrying.
+3. **Router verification gate**: After any devops commit task, compare HEAD before/after before proceeding.
+4. **Meta-issue**: Tasks 7 and 8 missing metadata — pre-completion-validation.cjs must enforce summary as BLOCKING (not warn).
+
+**Recurrence count**: 3 confirmed failures in a single session (Strike 1, Strike 2 = Tasks 7+8)
+
+**Priority**: P0 — blocking work committed without verification; reflection system cannot learn from lost metadata
 
 ---
 
 ## ISSUE: worktree-auto-cleanup.cjs Uses /dev/stdin as Primary Read Path (Windows) (2026-03-03) — P2
 
-**Status**: OPEN — P2 (hidden errors on every invocation, Windows-first repo)
+**Status**: RESOLVED (2026-03-04) — Fixed in commit 775ccf1f. See ADR-2026-03-04-064. Replaced `/dev/stdin` with `fs.readFileSync(0, 'utf8')` (fd 0) which works cross-platform.
 
 **Details**: `.claude/hooks/cleanup/worktree-auto-cleanup.cjs` uses `/dev/stdin` as the primary stdin read path in `readStdin()`. On Windows, this always throws (ENOENT or EACCES), falling through to the Windows-specific fallback (`\\\\.\\stdin` device path). The hook appears functional (fallback works) but generates a silent exception on every invocation.
 
@@ -196,7 +276,7 @@ node -e "const s=require('./.claude/settings.json'); const h=JSON.stringify(s); 
 - Audit trail has gaps — completed work is invisible to post-session analysis
 - Learning system degrades as pattern recurrence increases
 
-**Recurrence**: Confirmed in reflection-log.jsonl entries for tasks 33, 34, 35 (2026-03-03 session) and tasks 2, 3 (2026-03-03 session 2). Total: 11+ confirmed instances across multiple sessions.
+**Recurrence**: Confirmed in reflection-log.jsonl entries for tasks 33, 34, 35 (2026-03-03 session), tasks 2, 3 (2026-03-03 session 2), AND tasks 7, 8 (2026-03-03 session 3 — Strike 2 devops commit failure). Total: 13+ confirmed instances across multiple sessions.
 
 **Fix Path (P1)**:
 
@@ -215,7 +295,7 @@ node -e "const s=require('./.claude/settings.json'); const h=JSON.stringify(s); 
 
 ## ISSUE: Developer Agent Misrouted for Worktree Infrastructure Tasks (2026-03-03) — P1
 
-**Status**: OPEN — P1 (confirmed routing pattern causing repeated retries)
+**Status**: RESOLVED (2026-03-04) — Fixed in commit 775ccf1f. See ADR-2026-03-04-064. Path-aware isolation override now handles framework path detection at spawn time; developer agent correctly writes to main when targeting `.claude/` paths.
 
 **Observed**: Task 36 assigned worktree-prune.cjs and worktree-auto-cleanup.cjs creation to the developer agent. Developer has `isolation: worktree` in its frontmatter. Zero files were created (all writes went into the isolated clone and were discarded). Router rerouted to devops agent which succeeded.
 
@@ -1454,3 +1534,15 @@ node -e "const s=require('./.claude/settings.json'); const h=JSON.stringify(s); 
 - [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-03T20:00:30.554Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-03T20:00:30.570Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-03T21:31:53.828Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-03T21:31:53.843Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-03T21:31:53.858Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-04T06:37:11.240Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-04T06:37:11.256Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-04T06:37:11.271Z

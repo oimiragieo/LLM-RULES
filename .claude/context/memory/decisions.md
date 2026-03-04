@@ -1,3 +1,22 @@
+## ADR-2026-03-04-064: Framework-Path Worktree Isolation Override (2026-03-04)
+
+**Status:** Accepted
+**Context:** Developer agents with `isolation: worktree` silently lost all work when targeting `.claude/` framework paths. Worktree clones are cleaned up after task completion, discarding all framework file modifications. 43% lifetime failure rate confirmed across 5+ incidents (Tasks 3, 4, 4-wave2-dev in 2026-03-04 session; Task 36 in 2026-03-03 session; code-reviewer in 2026-03-03 session).
+
+**Decision:** Add path-aware isolation override in `spawn-prompt-assembler.task-tools.cjs`. When a developer task prompt contains `.claude/` framework paths (hooks, skills, agents, tools, workflows, templates, schemas, lib), override worktree isolation to `none` so the agent works directly on main. Cross-platform stdin reading also fixed in `worktree-auto-cleanup.cjs` by replacing `/dev/stdin` with `fs.readFileSync(0, 'utf8')` (fd 0).
+
+**Alternatives Considered:**
+
+- (A) Remove `isolation: worktree` from developer.md entirely — loses worktree benefits for source code tasks
+- (B) Route all framework tasks to devops/nodejs-pro — workaround, does not fix root cause for future agents
+- (C) Path-aware override — preserves worktree for src/ tasks, prevents data loss for .claude/ tasks
+
+**Consequences:** Developer agents now correctly modify framework files. Source code tasks continue to benefit from worktree isolation. Added `shouldOverrideWorktreeIsolation()` function with 26 tests.
+
+**Evidence:** Commit 775ccf1f. Tests: `tests/hooks/spawn-prompt-assembler-worktree-override.test.cjs` (26 tests).
+
+---
+
 ## ADR-2026-03-01-063: Python/DevOps orphaned skill wiring batch (2026-03-01)
 
 **Status:** ACCEPTED

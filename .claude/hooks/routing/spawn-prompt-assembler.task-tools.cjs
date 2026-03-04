@@ -667,6 +667,9 @@ function shouldOverrideWorktreeIsolation(prompt, agentType) {
     '.claude/templates/',
     '.claude/schemas/',
     '.claude/lib/',
+    '.claude/commands/',
+    '.claude/config/',
+    '.claude/docs/',
   ];
 
   return frameworkPaths.some(fp => normalizedPrompt.includes(fp));
