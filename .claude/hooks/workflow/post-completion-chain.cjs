@@ -312,6 +312,32 @@ async function processTaskCompletion(hookData) {
     );
   }
 
+  // Advisory: validate Step 5.5 Memory Curation Contract for reflection-agent completions
+  const agentPrompt = toolInput?.prompt || toolInput?.metadata?.prompt || '';
+  const subagentType =
+    toolInput?.subagent_type ||
+    toolInput?.metadata?.subagent_type ||
+    toolInput?.metadata?.agent ||
+    '';
+  const isReflectionAgent =
+    subagentType === 'reflection-agent' ||
+    (typeof agentPrompt === 'string' && agentPrompt.includes('reflection'));
+  if (isReflectionAgent) {
+    const curationDecisions = Array.isArray(metadata.curationDecisions)
+      ? metadata.curationDecisions
+      : [];
+    if (curationDecisions.length === 0) {
+      process.stderr.write(
+        '[post-completion-chain] ADVISORY: reflection-agent completed without curationDecisions in metadata. ' +
+          'Step 5.5 Memory Curation Contract not satisfied.\n'
+      );
+    } else {
+      process.stderr.write(
+        `[post-completion-chain] Curation decisions recorded: ${curationDecisions.length} entries\n`
+      );
+    }
+  }
+
   // Resolve paths at call time so env-var overrides work even when set after module load
   const workflowStateFile = getWorkflowStatePath();
   const phaseAdvanceFile = getPhaseAdvancePath();

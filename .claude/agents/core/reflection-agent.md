@@ -503,6 +503,8 @@ Score each candidate `0-1` on:
 
 Only `retain` items with strong evidence and expected reuse. Record rationale in report and memory log.
 
+**Note:** `post-completion-chain.cjs` validates that curation decisions are present on reflection-agent completion (advisory). Include `curationDecisions` in your `TaskUpdate(completed)` metadata to satisfy the contract.
+
 4. **Reflection Log** → `.claude/context/memory/reflection-log.jsonl`
    - Append structured reflection entry (JSON)
    - Maintain append-only log for audit trail
@@ -528,7 +530,21 @@ Only `retain` items with strong evidence and expected reuse. Record rationale in
     "thorns": ["Missing edge case handling"]
   },
   "learnings": ["Pattern X is effective for use case Y"],
-  "recommendations": ["Add edge case tests", "Extract helper function"]
+  "recommendations": ["Add edge case tests", "Extract helper function"],
+  "curationDecisions": [
+    {
+      "entry": "Pattern: shell:false for child_process",
+      "decision": "retain",
+      "score": 0.9,
+      "rationale": "High reuse, strong evidence, critical safety pattern"
+    },
+    {
+      "entry": "Debug log from session 2026-01-20",
+      "decision": "archive",
+      "score": 0.2,
+      "rationale": "One-off debug context, low retrieval value"
+    }
+  ]
 }
 ```
 
