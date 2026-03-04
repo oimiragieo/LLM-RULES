@@ -30,12 +30,15 @@ function cleanup() {
 }
 
 function getRecordingOps() {
-  const recordingPath = require.resolve('../../../.claude/lib/memory/memory-manager-core-recording.cjs');
+  const recordingPath =
+    require.resolve('../../../.claude/lib/memory/memory-manager-core-recording.cjs');
   delete require.cache[recordingPath];
   const { createRecordingOps } = require(recordingPath);
   return createRecordingOps({
     PROJECT_ROOT: TEST_DIR,
-    validateProjectRoot: root => { if (!root) throw new Error('invalid root'); },
+    validateProjectRoot: root => {
+      if (!root) throw new Error('invalid root');
+    },
     getMemoryDir: root => path.join(root, '.claude', 'context', 'memory'),
     ensureDir: dir => fs.mkdirSync(dir, { recursive: true }),
     withFileLockSync: (_filePath, fn) => fn(),
@@ -48,18 +51,26 @@ function getRecordingOps() {
 
 function readTelemetryLines() {
   if (!fs.existsSync(TELEMETRY_FILE)) return [];
-  return fs.readFileSync(TELEMETRY_FILE, 'utf8')
-    .split('\n').filter(Boolean).map(line => JSON.parse(line));
+  return fs
+    .readFileSync(TELEMETRY_FILE, 'utf8')
+    .split('\n')
+    .filter(Boolean)
+    .map(line => JSON.parse(line));
 }
 
 describe('MemoryRecord telemetry — recordGotcha', () => {
   before(setup);
   after(cleanup);
-  beforeEach(() => { if (fs.existsSync(TELEMETRY_FILE)) fs.unlinkSync(TELEMETRY_FILE); });
+  beforeEach(() => {
+    if (fs.existsSync(TELEMETRY_FILE)) fs.unlinkSync(TELEMETRY_FILE);
+  });
 
   it('appends a telemetry entry when gotcha is recorded successfully', () => {
     const ops = getRecordingOps();
-    const wrote = ops.recordGotcha({ text: 'test gotcha for telemetry', area: 'testing' }, TEST_DIR);
+    const wrote = ops.recordGotcha(
+      { text: 'test gotcha for telemetry', area: 'testing' },
+      TEST_DIR
+    );
     assert.equal(wrote, true, 'recordGotcha should return true');
     const lines = readTelemetryLines();
     assert.equal(lines.length, 1, 'Should have exactly 1 telemetry entry');
@@ -99,11 +110,16 @@ describe('MemoryRecord telemetry — recordGotcha', () => {
 describe('MemoryRecord telemetry — recordPattern', () => {
   before(setup);
   after(cleanup);
-  beforeEach(() => { if (fs.existsSync(TELEMETRY_FILE)) fs.unlinkSync(TELEMETRY_FILE); });
+  beforeEach(() => {
+    if (fs.existsSync(TELEMETRY_FILE)) fs.unlinkSync(TELEMETRY_FILE);
+  });
 
   it('appends a telemetry entry when pattern is recorded successfully', () => {
     const ops = getRecordingOps();
-    const wrote = ops.recordPattern({ text: 'test pattern for telemetry', area: 'security' }, TEST_DIR);
+    const wrote = ops.recordPattern(
+      { text: 'test pattern for telemetry', area: 'security' },
+      TEST_DIR
+    );
     assert.equal(wrote, true, 'recordPattern should return true');
     const lines = readTelemetryLines();
     assert.equal(lines.length, 1);
@@ -127,12 +143,17 @@ describe('MemoryRecord telemetry — recordPattern', () => {
 describe('MemoryRecord telemetry — recordDiscovery', () => {
   before(setup);
   after(cleanup);
-  beforeEach(() => { if (fs.existsSync(TELEMETRY_FILE)) fs.unlinkSync(TELEMETRY_FILE); });
+  beforeEach(() => {
+    if (fs.existsSync(TELEMETRY_FILE)) fs.unlinkSync(TELEMETRY_FILE);
+  });
 
   it('appends a telemetry entry when discovery is recorded successfully', () => {
     const ops = getRecordingOps();
     const wrote = ops.recordDiscovery(
-      '.claude/lib/test.cjs', 'A test file for telemetry', 'library', TEST_DIR
+      '.claude/lib/test.cjs',
+      'A test file for telemetry',
+      'library',
+      TEST_DIR
     );
     assert.equal(wrote, true, 'recordDiscovery should return true');
     const lines = readTelemetryLines();

@@ -20,7 +20,11 @@ function listFiles(dir) {
 }
 
 function chunkId(filePath, text) {
-  return `mem:${crypto.createHash('sha256').update(filePath + text).digest('hex').slice(0, 12)}`;
+  return `mem:${crypto
+    .createHash('sha256')
+    .update(filePath + text)
+    .digest('hex')
+    .slice(0, 12)}`;
 }
 
 function extractMTMTexts(data) {
@@ -45,7 +49,8 @@ function extractLTMTexts(data) {
       }
     }
   }
-  if (Array.isArray(data.files_frequently_touched)) parts.push(`files: ${data.files_frequently_touched.join(', ')}`);
+  if (Array.isArray(data.files_frequently_touched))
+    parts.push(`files: ${data.files_frequently_touched.join(', ')}`);
   return parts.filter(Boolean);
 }
 

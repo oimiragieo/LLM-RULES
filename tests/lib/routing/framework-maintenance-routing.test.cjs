@@ -4,13 +4,13 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
-const {
-  classifyIntent,
-} = require('../../../.claude/lib/routing/intent-classifier.cjs');
+const { classifyIntent } = require('../../../.claude/lib/routing/intent-classifier.cjs');
 
 describe('framework-maintenance-routing', () => {
   it('should route .claude/hooks/ paths to devops', () => {
-    const result = classifyIntent('Fix logic in .claude/hooks/routing/user-prompt-unified.core.cjs');
+    const result = classifyIntent(
+      'Fix logic in .claude/hooks/routing/user-prompt-unified.core.cjs'
+    );
     assert.strictEqual(result.intent, 'framework_maintenance');
     assert.strictEqual(result.defaultAgent, 'devops');
   });

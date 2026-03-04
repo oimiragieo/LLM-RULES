@@ -14,10 +14,7 @@ describe('Spawn template MemoryRecord enforcement', () => {
     const content = fs.readFileSync(templatePath, 'utf8');
     assert.ok(content.includes('MANDATORY'), 'Template should contain MANDATORY');
     assert.ok(content.includes('MemoryRecord'), 'Template should mention MemoryRecord');
-    assert.ok(
-      content.includes('Zero MemoryRecord calls'),
-      'Template should warn about zero calls'
-    );
+    assert.ok(content.includes('Zero MemoryRecord calls'), 'Template should warn about zero calls');
   });
 
   it('documents memoriesRecorded in completion contract', () => {

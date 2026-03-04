@@ -55,26 +55,14 @@ describe('isSignalContent', () => {
   // Test 4: accepts first-person agent findings (not noise)
   it('accepts first-person agent findings', () => {
     assert.strictEqual(isSignalContent('I found that the routing table needs updating'), true);
-    assert.strictEqual(
-      isSignalContent('I confirmed the hook exits with code 0 on error'),
-      true
-    );
-    assert.strictEqual(
-      isSignalContent('I discovered a bug in the spawn-prompt-assembler'),
-      true
-    );
+    assert.strictEqual(isSignalContent('I confirmed the hook exits with code 0 on error'), true);
+    assert.strictEqual(isSignalContent('I discovered a bug in the spawn-prompt-assembler'), true);
     assert.strictEqual(
       isSignalContent('I verified the test passes after reverting the change'),
       true
     );
-    assert.strictEqual(
-      isSignalContent('I identified a race condition in memory-tiers.cjs'),
-      true
-    );
-    assert.strictEqual(
-      isSignalContent('I noticed that session.summary is not filtered'),
-      true
-    );
+    assert.strictEqual(isSignalContent('I identified a race condition in memory-tiers.cjs'), true);
+    assert.strictEqual(isSignalContent('I noticed that session.summary is not filtered'), true);
     assert.strictEqual(
       isSignalContent('I observed the agent skipping TaskUpdate in 3 sessions'),
       true
@@ -84,9 +72,7 @@ describe('isSignalContent', () => {
   // Test 5: accepts technical summaries with file references
   it('accepts technical summaries with file references and keywords', () => {
     assert.strictEqual(
-      isSignalContent(
-        'Delegation chain flattened: 4-hop to 2-hop in memory-manager.cjs'
-      ),
+      isSignalContent('Delegation chain flattened: 4-hop to 2-hop in memory-manager.cjs'),
       true
     );
     assert.strictEqual(
@@ -94,9 +80,7 @@ describe('isSignalContent', () => {
       true
     );
     assert.strictEqual(
-      isSignalContent(
-        'spawn-prompt-assembler.cjs now injects memory context via .claude/hooks/'
-      ),
+      isSignalContent('spawn-prompt-assembler.cjs now injects memory context via .claude/hooks/'),
       true
     );
     assert.strictEqual(
@@ -104,9 +88,7 @@ describe('isSignalContent', () => {
       true
     );
     assert.strictEqual(
-      isSignalContent(
-        'Implementation: LTM eviction uses utility = access_count * decay formula'
-      ),
+      isSignalContent('Implementation: LTM eviction uses utility = access_count * decay formula'),
       true
     );
   });
@@ -188,7 +170,11 @@ describe('generateSessionSummary', () => {
 
     const result = generateSessionSummary(sessions);
     assert.ok(result, 'should return a non-null result');
-    assert.strictEqual(result.key_learnings.length, 3, 'all 3 technical summaries should be included');
+    assert.strictEqual(
+      result.key_learnings.length,
+      3,
+      'all 3 technical summaries should be included'
+    );
     assert.ok(
       result.key_learnings[0].includes('memory-tiers-ltm-helpers.cjs'),
       'first learning should reference the file'

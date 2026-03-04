@@ -29,9 +29,7 @@ describe('STM merge atomicity', () => {
   });
 
   it('sequential STM merges preserve all memories', () => {
-    const { readSTMEntry, writeSTMEntry } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const { readSTMEntry, writeSTMEntry } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
     // Write initial STM with one existing memory
     writeSTMEntry(
@@ -76,9 +74,7 @@ describe('STM merge atomicity', () => {
   });
 
   it('concurrent STM merges may lose writes without locking', async () => {
-    const { readSTMEntry, writeSTMEntry } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const { readSTMEntry, writeSTMEntry } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
     writeSTMEntry(
       {
@@ -91,8 +87,8 @@ describe('STM merge atomicity', () => {
     // Simulate 5 concurrent read-merge-write operations
     // Each reads the same base, merges 2 memories, then writes.
     // Without locking, only the last writer wins.
-    const mergeOp = (batchIdx) => {
-      return new Promise((resolve) => {
+    const mergeOp = batchIdx => {
+      return new Promise(resolve => {
         setImmediate(() => {
           const existing = readSTMEntry(projectRoot) || {};
           const existingExtracted = Array.isArray(existing.extracted_memories)
@@ -145,9 +141,7 @@ describe('STM merge atomicity', () => {
   });
 
   it('writeSTMEntry creates stm directory if missing', () => {
-    const { writeSTMEntry, readSTMEntry } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const { writeSTMEntry, readSTMEntry } = require('../../../.claude/lib/memory/memory-tiers.cjs');
     const freshRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'stm-no-dir-'));
     const result = writeSTMEntry({ session_id: 'new', data: 'test' }, freshRoot);
     assert.ok(result.success, 'write should succeed');

@@ -6,9 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 
-const {
-  evictStaleLTMFiles,
-} = require('../../../.claude/lib/memory/memory-tiers-ltm-helpers.cjs');
+const { evictStaleLTMFiles } = require('../../../.claude/lib/memory/memory-tiers-ltm-helpers.cjs');
 
 // ---------------------------------------------------------------------------
 // Shared helpers (identical to evict-stale-ltm-files.test.cjs)
@@ -94,7 +92,7 @@ describe('evictStaleLTMFiles — edge cases', () => {
     });
     const stderrChunks = [];
     const originalWrite = process.stderr.write;
-    process.stderr.write = (chunk) => {
+    process.stderr.write = chunk => {
       stderrChunks.push(String(chunk));
       return true;
     };
@@ -124,8 +122,12 @@ describe('evictStaleLTMFiles — edge cases', () => {
       access_count: 100,
     });
     const origUnlink = fs.unlinkSync;
-    fs.unlinkSync = (p) => {
-      try { origUnlink(p); } catch (_e) { /* already gone */ }
+    fs.unlinkSync = p => {
+      try {
+        origUnlink(p);
+      } catch (_e) {
+        /* already gone */
+      }
       origUnlink(p);
     };
     const origStderr = process.stderr.write;
@@ -268,7 +270,7 @@ describe('evictStaleLTMFiles — edge cases', () => {
     });
     const stderrChunks = [];
     const originalWrite = process.stderr.write;
-    process.stderr.write = (chunk) => {
+    process.stderr.write = chunk => {
       stderrChunks.push(String(chunk));
       return true;
     };

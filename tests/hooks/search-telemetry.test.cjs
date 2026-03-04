@@ -20,13 +20,7 @@ const {
   SEARCH_TELEMETRY_LOG,
   setSearchTelemetryLog,
 } = require(
-  path.join(
-    PROJECT_ROOT,
-    '.claude',
-    'hooks',
-    'metrics',
-    'post-tool-metrics-unified.cjs'
-  )
+  path.join(PROJECT_ROOT, '.claude', 'hooks', 'metrics', 'post-tool-metrics-unified.cjs')
 );
 
 // ---------------------------------------------------------------------------

@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-03-03T19:59:40.147Z"
+      "last_accessed": "2026-03-04T14:07:11.563Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "discovered_at": "2026-02-11",
@@ -84,8 +84,10 @@
       "last_accessed": "2026-02-18T06:08:04.092Z"
     },
     ".claude/lib/routing/routing-table-intent-agents.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-18T06:32:19.085Z",
-      "last_accessed": "2026-02-22T01:05:54.206Z"
+      "last_accessed": "2026-03-04T13:52:56.660Z"
     },
     ".claude/hooks/validation/pre-completion-validation.cjs": {
       "discovered_at": "2026-02-18T06:42:24.699Z",
@@ -372,7 +374,67 @@
       "category": "code-indexing",
       "discovered_at": "2026-03-03T20:02:18.426Z",
       "last_accessed": "2026-03-03T20:02:18.426Z"
+    },
+    ".claude/hooks/metrics/search-telemetry.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T13:33:25.191Z",
+      "last_accessed": "2026-03-04T13:33:25.191Z"
+    },
+    "tests/agents/agent-search-tool-compliance.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T13:34:49.083Z",
+      "last_accessed": "2026-03-04T13:34:49.083Z"
+    },
+    ".claude/hooks/metrics/post-tool-metrics-unified.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T13:37:49.967Z",
+      "last_accessed": "2026-03-04T14:24:14.092Z"
+    },
+    "tests/hooks/spawn-prompt-assembler-worktree-override.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T13:39:09.062Z",
+      "last_accessed": "2026-03-04T13:39:09.062Z"
+    },
+    ".claude/lib/routing/routing-table-intent-keywords-data.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T13:52:21.781Z",
+      "last_accessed": "2026-03-04T13:52:21.781Z"
+    },
+    ".claude/lib/tools/task-tools.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T13:53:39.073Z",
+      "last_accessed": "2026-03-04T13:53:48.891Z"
+    },
+    "tests/hooks/search-telemetry.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T13:54:09.180Z",
+      "last_accessed": "2026-03-04T13:54:32.038Z"
+    },
+    "tests/lib/tools/task-tools-persistence.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T14:12:30.932Z",
+      "last_accessed": "2026-03-04T14:12:30.932Z"
+    },
+    ".claude/hooks/metrics/search-telemetry-helpers.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T14:13:37.540Z",
+      "last_accessed": "2026-03-04T14:13:37.540Z"
+    },
+    ".claude/hooks/metrics/findings-snapshot-helpers.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T14:22:25.094Z",
+      "last_accessed": "2026-03-04T14:22:25.094Z"
     }
   },
-  "last_updated": "2026-03-03T20:02:18.426Z"
+  "last_updated": "2026-03-04T14:24:14.092Z"
 }

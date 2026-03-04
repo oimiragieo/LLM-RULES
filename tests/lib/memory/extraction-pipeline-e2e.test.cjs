@@ -68,11 +68,7 @@ describe('extraction-pipeline-e2e', () => {
     });
 
     assert.equal(confident.length, 3, 'Should accept 3 memories at or above 0.7');
-    assert.equal(
-      candidates.length - confident.length,
-      2,
-      'Should filter out 2 memories below 0.7'
-    );
+    assert.equal(candidates.length - confident.length, 2, 'Should filter out 2 memories below 0.7');
   });
 
   it('accepts memories without explicit confidence field (defaults to 1.0)', () => {

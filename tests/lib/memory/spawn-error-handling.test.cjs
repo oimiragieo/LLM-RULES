@@ -32,9 +32,7 @@ describe('Session-end hook error handling', () => {
   });
 
   it('consolidateSession returns failure when STM file is missing', () => {
-    const { _consolidateSession } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const { _consolidateSession } = require('../../../.claude/lib/memory/memory-tiers.cjs');
     // No STM file written — consolidateSession should return failure gracefully
     const result = _consolidateSession('missing-session', projectRoot);
     assert.equal(result.success, false);
@@ -43,11 +41,14 @@ describe('Session-end hook error handling', () => {
   });
 
   it('consolidateSession returns failure for malformed STM JSON', () => {
-    const { _consolidateSession } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const { _consolidateSession } = require('../../../.claude/lib/memory/memory-tiers.cjs');
     const stmPath = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json'
+      projectRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
     );
     fs.writeFileSync(stmPath, '{{invalid json}}', 'utf8');
 
@@ -57,11 +58,14 @@ describe('Session-end hook error handling', () => {
   });
 
   it('consolidateSession returns failure for empty JSON object', () => {
-    const { _consolidateSession } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const { _consolidateSession } = require('../../../.claude/lib/memory/memory-tiers.cjs');
     const stmPath = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json'
+      projectRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
     );
     // parseJSONObjectStrict returns null for empty object (0 keys)
     fs.writeFileSync(stmPath, '{}', 'utf8');
@@ -71,14 +75,13 @@ describe('Session-end hook error handling', () => {
   });
 
   it('consolidateSession succeeds and clears STM on valid data', () => {
-    const { writeSTMEntry, readSTMEntry, _consolidateSession } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const {
+      writeSTMEntry,
+      readSTMEntry,
+      _consolidateSession,
+    } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
-    writeSTMEntry(
-      { session_id: 'good-session', summary: 'test session data' },
-      projectRoot
-    );
+    writeSTMEntry({ session_id: 'good-session', summary: 'test session data' }, projectRoot);
 
     // Verify STM exists before consolidation
     const before = readSTMEntry(projectRoot);
@@ -107,11 +110,7 @@ describe('Session-end hook error handling', () => {
     const originalMode = process.env.LANCEDB_EMBEDDING_MODE;
     try {
       process.env.LANCEDB_EMBEDDING_MODE = 'off';
-      assert.equal(
-        process.env.LANCEDB_EMBEDDING_MODE,
-        'off',
-        'env var should be set to off'
-      );
+      assert.equal(process.env.LANCEDB_EMBEDDING_MODE, 'off', 'env var should be set to off');
       // In the real hook, this condition causes the re-index spawn to be skipped.
       // We verify the env var check pattern matches what the hook uses.
       const shouldSkip = process.env.LANCEDB_EMBEDDING_MODE === 'off';
@@ -126,11 +125,14 @@ describe('Session-end hook error handling', () => {
   });
 
   it('consolidateSession for JSON array STM returns failure', () => {
-    const { _consolidateSession } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const { _consolidateSession } = require('../../../.claude/lib/memory/memory-tiers.cjs');
     const stmPath = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'stm', 'session_current.json'
+      projectRoot,
+      '.claude',
+      'context',
+      'memory',
+      'stm',
+      'session_current.json'
     );
     // parseJSONObjectStrict rejects arrays
     fs.writeFileSync(stmPath, '[1,2,3]', 'utf8');

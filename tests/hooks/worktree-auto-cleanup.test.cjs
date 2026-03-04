@@ -413,7 +413,11 @@ describe('worktree-auto-cleanup — run() with completed TaskUpdate', () => {
     });
     assert.strictEqual(result.status, 0, 'Expected exit 0 on completed TaskUpdate');
     // Hook only writes to stderr (not stdout) — stdout must stay clean
-    assert.strictEqual(result.stdout, '', 'Hook must not write to stdout (reserved for JSON protocol)');
+    assert.strictEqual(
+      result.stdout,
+      '',
+      'Hook must not write to stdout (reserved for JSON protocol)'
+    );
   });
 
   it('does not write JSON to stdout even when worktrees are processed', () => {

@@ -6,9 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 
-const {
-  evictStaleLTMFiles,
-} = require('../../../.claude/lib/memory/memory-tiers-ltm-helpers.cjs');
+const { evictStaleLTMFiles } = require('../../../.claude/lib/memory/memory-tiers-ltm-helpers.cjs');
 
 // ---------------------------------------------------------------------------
 // Helper: create a temp LTM directory and populate it with JSON files
