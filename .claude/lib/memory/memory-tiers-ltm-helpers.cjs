@@ -4,6 +4,51 @@ const fs = require('fs');
 const path = require('path');
 
 /**
+ * Determines whether a text string contains signal content worth storing in LTM.
+ *
+ * Rejects conversational user-intent phrases, questions, commands, and trivial strings.
+ * Accepts technical findings, file references, agent discoveries, and ADR-style decisions.
+ *
+ * Rules:
+ *   1. Noise patterns (reject unconditionally if text STARTS with a noise marker)
+ *   2. Signal patterns (accept if ANY signal keyword is found in the text)
+ *   3. Length gate (reject if text has NO signal keyword AND is < 80 chars)
+ *   4. First-person agent findings ("I found", "I confirmed") are treated as SIGNAL, not noise
+ *
+ * @param {string} text
+ * @returns {boolean}
+ */
+function isSignalContent(text) {
+  if (typeof text !== 'string' || text.length === 0) return false;
+
+  // Noise patterns — reject if text starts with these phrases
+  const noisePatterns = [
+    /^I\s+(want|would|need|prefer|do not|don't want|wish|would like)\b/i,
+    /^(Show me|Can you|Could you|Please|Help me|What|How|Why|When|Where)\b/i,
+    /^User prompt submitted/i,
+    /^Say\s/i,
+  ];
+
+  // Signal patterns — accept if ANY pattern matches anywhere in the text
+  const signalPatterns = [
+    /\.(cjs|mjs|ts|js|json|md)\b/,
+    /\b(ADR|hook|agent|skill|memory|pattern|config|spawn|route|lint|format|test|deploy|schema|middleware|factory|singleton|subscriber|event)\b/i,
+    /\.claude\//,
+    /function\s+\w+/,
+    /\bfix\b.*\bbug\b|\broot cause\b|\bimplementation\b/i,
+    /\bI\s+(found|confirmed|discovered|verified|identified|noticed|observed)\b/i,
+  ];
+
+  const isNoise = noisePatterns.some(p => p.test(text));
+  if (isNoise) return false;
+
+  const hasSignal = signalPatterns.some(p => p.test(text));
+  if (!hasSignal && text.length < 80) return false;
+
+  return true;
+}
+
+/**
  * Generate a summary from multiple sessions (for LTM archive)
  */
 function generateSessionSummary(sessions) {
@@ -26,8 +71,8 @@ function generateSessionSummary(sessions) {
   const fileFrequency = {};
 
   for (const session of sessions) {
-    // Collect learnings (from summaries)
-    if (session.summary) {
+    // Collect learnings (from summaries) — filter out noise/user-intent text
+    if (session.summary && isSignalContent(session.summary)) {
       allLearnings.push(session.summary);
     }
 
@@ -194,6 +239,7 @@ function evictStaleLTMFiles(ltmDir) {
 }
 
 module.exports = {
+  isSignalContent,
   generateSessionSummary,
   evictStaleLTMFiles,
 };
