@@ -61,7 +61,9 @@ function writeLtmFile(name, data) {
 
 function getEvictStaleLTM() {
   const modPath = require.resolve('../../../.claude/lib/memory/memory-tiers.cjs');
+  const helperPath = require.resolve('../../../.claude/lib/memory/memory-tiers-ltm-helpers.cjs');
   delete require.cache[modPath];
+  delete require.cache[helperPath];
   return require(modPath).evictStaleLTM;
 }
 
@@ -91,7 +93,7 @@ describe('evictStaleLTM', () => {
       writeLtmFile(`stale_${i}.json`, { access_count: 0, consolidated_at: oldDate });
     }
     const result = evict(TEST_DIR);
-    // All 5 should be evicted: utility = 0 * (1/(1 + 365*0.05)) = 0 < 0.1
+    // All 5 should be evicted: utility = 1 * (1/(1 + 365*0.05)) = 1/19.25 ≈ 0.052 < 0.1
     assert.strictEqual(result.evicted, 5);
     const remaining = fs.readdirSync(getLtmDir()).filter(f => f.endsWith('.json'));
     assert.strictEqual(remaining.length, 0);
@@ -117,17 +119,41 @@ describe('evictStaleLTM', () => {
     assert.ok(remaining.includes('keep_b.json'));
   });
 
-  it('treats missing access_count as 0 (stalest)', () => {
+  it('treats missing access_count as baseline 1 (still evicts when very stale)', () => {
     const evict = getEvictStaleLTM();
     const now = new Date();
     const oldDate = new Date(now - 200 * 86400000).toISOString();
-    // 4 files without access_count field, old dates
+    // 4 files without access_count field, old dates (200 days)
     for (let i = 0; i < 4; i++) {
       writeLtmFile(`no_ac_${i}.json`, { consolidated_at: oldDate, summary: 'test' });
     }
     const result = evict(TEST_DIR);
-    // utility = 0 * anything = 0 < 0.1 threshold -> all evicted
+    // utility = 1 * (1 / (1 + 200*0.05)) = 1/11 ≈ 0.0909 < 0.1 threshold -> all evicted
+    // (access_count=0 is raised to baseline 1, not 0, but entry is still stale enough)
     assert.strictEqual(result.evicted, 4);
+  });
+
+  it('never evicts promoted_*.json files even when above LTM_MAX_FILES', () => {
+    const evict = getEvictStaleLTM();
+    const now = new Date();
+    const oldDate = new Date(now - 500 * 86400000).toISOString();
+    // 2 promoted files with old timestamps and zero access — must NEVER be deleted
+    writeLtmFile('promoted_important.json', { access_count: 0, consolidated_at: oldDate });
+    writeLtmFile('promoted_critical.json', { access_count: 0, consolidated_at: oldDate });
+    // 3 regular stale files that should be evicted
+    writeLtmFile('summary_old_1.json', { access_count: 0, consolidated_at: oldDate });
+    writeLtmFile('summary_old_2.json', { access_count: 0, consolidated_at: oldDate });
+    writeLtmFile('summary_old_3.json', { access_count: 0, consolidated_at: oldDate });
+    const result = evict(TEST_DIR);
+    // Only the 3 summary files should be evicted; promoted files must survive
+    assert.strictEqual(result.evicted, 3, 'Should evict 3 stale summary files');
+    const remaining = fs.readdirSync(getLtmDir()).filter(f => f.endsWith('.json'));
+    assert.strictEqual(remaining.length, 2, 'Should preserve 2 promoted files');
+    assert.ok(
+      remaining.includes('promoted_important.json'),
+      'promoted_important.json must survive'
+    );
+    assert.ok(remaining.includes('promoted_critical.json'), 'promoted_critical.json must survive');
   });
 
   it('treats missing timestamp as oldest possible (Infinity staleness)', () => {
