@@ -346,15 +346,52 @@ class ContextualMemory {
     }
 
     if (process.env.MEMORY_SEMANTIC_SEARCH === 'off') {
-      return await this._keywordSearch(query, { limit });
+      const kwResults = await this._keywordSearch(query, { limit });
+      return this._applyRecencyWeight(kwResults);
     }
 
-    return await this.hybridMemoryQuery(query, {
+    const results = await this.hybridMemoryQuery(query, {
       ...options,
       limit,
       threshold,
       filters: effectiveFilters,
     });
+    return this._applyRecencyWeight(results);
+  }
+
+  /**
+   * Apply recency weighting to search results.
+   * Formula: recency_weight = 1.0 / (1 + days_since_access * DECAY_RATE)
+   *          final_score = original_score * (1 + RECENCY_BOOST * recency_weight)
+   * Results are re-sorted by adjusted score (descending).
+   *
+   * @param {Array} results - Search results with rrf_score or similarity fields
+   * @returns {Array} Results with recency-adjusted scores, sorted descending
+   */
+  _applyRecencyWeight(results) {
+    if (!Array.isArray(results) || results.length === 0) return results;
+    const DECAY_RATE = parseFloat(process.env.MEMORY_RECENCY_DECAY_RATE || '0.1');
+    const RECENCY_BOOST = parseFloat(process.env.MEMORY_RECENCY_BOOST || '0.3');
+    const now = Date.now();
+    const MS_PER_DAY = 86400000;
+
+    const weighted = results.map(r => {
+      const meta = r?.metadata && typeof r.metadata === 'object' ? r.metadata : {};
+      const ts = meta.consolidated_at || meta.created_at || meta.timestamp || null;
+      let recencyWeight = 1.0;
+      if (ts) {
+        const parsed = new Date(ts).getTime();
+        if (Number.isFinite(parsed) && parsed > 0) {
+          const daysSince = Math.max(0, (now - parsed) / MS_PER_DAY);
+          recencyWeight = 1.0 / (1 + daysSince * DECAY_RATE);
+        }
+      }
+      const originalScore = r.rrf_score ?? r.similarity ?? 0;
+      const adjustedScore = originalScore * (1 + RECENCY_BOOST * recencyWeight);
+      return { ...r, rrf_score: adjustedScore, _recency_weight: recencyWeight };
+    });
+
+    return weighted.sort((a, b) => (b.rrf_score ?? 0) - (a.rrf_score ?? 0));
   }
 
   _buildHybridResultId(result) {
