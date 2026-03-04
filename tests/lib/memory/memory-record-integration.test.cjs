@@ -37,16 +37,17 @@ describe('MemoryRecord integration', () => {
    * This mirrors how memory-manager-core.cjs wires createRecordingOps.
    */
   function buildRecordingOps() {
-    const { createRecordingOps } = require(
-      '../../../.claude/lib/memory/memory-manager-core-recording.cjs'
-    );
-    const { createStorageHelpers } = require(
-      '../../../.claude/lib/memory/memory-manager-core-storage.cjs'
-    );
+    const {
+      createRecordingOps,
+    } = require('../../../.claude/lib/memory/memory-manager-core-recording.cjs');
+    const {
+      createStorageHelpers,
+    } = require('../../../.claude/lib/memory/memory-manager-core-storage.cjs');
 
-    const getMemoryDir = (pr) =>
-      path.join(pr, '.claude', 'context', 'memory');
-    const ensureDir = (d) => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); };
+    const getMemoryDir = pr => path.join(pr, '.claude', 'context', 'memory');
+    const ensureDir = d => {
+      if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+    };
     const validateProjectRoot = () => {};
 
     const storage = createStorageHelpers({
@@ -78,9 +79,7 @@ describe('MemoryRecord integration', () => {
     );
     assert.equal(wrote, true, 'should return true for new entry');
 
-    const gotchasFile = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'gotchas.json'
-    );
+    const gotchasFile = path.join(projectRoot, '.claude', 'context', 'memory', 'gotchas.json');
     assert.ok(fs.existsSync(gotchasFile), 'gotchas.json should exist');
 
     const gotchas = safeParseJSON(fs.readFileSync(gotchasFile, 'utf8'), []);
@@ -103,9 +102,7 @@ describe('MemoryRecord integration', () => {
     );
     assert.equal(wrote, true);
 
-    const patternsFile = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'patterns.json'
-    );
+    const patternsFile = path.join(projectRoot, '.claude', 'context', 'memory', 'patterns.json');
     assert.ok(fs.existsSync(patternsFile), 'patterns.json should exist');
 
     const patterns = safeParseJSON(fs.readFileSync(patternsFile, 'utf8'), []);
@@ -117,15 +114,10 @@ describe('MemoryRecord integration', () => {
   it('recordGotcha deduplicates exact duplicate entries', () => {
     const ops = buildRecordingOps();
     ops.recordGotcha({ text: 'Duplicate test entry', area: 'general' }, projectRoot);
-    const second = ops.recordGotcha(
-      { text: 'Duplicate test entry', area: 'general' },
-      projectRoot
-    );
+    const second = ops.recordGotcha({ text: 'Duplicate test entry', area: 'general' }, projectRoot);
     assert.equal(second, false, 'duplicate should return false');
 
-    const gotchasFile = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'gotchas.json'
-    );
+    const gotchasFile = path.join(projectRoot, '.claude', 'context', 'memory', 'gotchas.json');
     const gotchas = safeParseJSON(fs.readFileSync(gotchasFile, 'utf8'), []);
     assert.equal(gotchas.length, 1, 'should still have only 1 entry');
   });
@@ -135,9 +127,7 @@ describe('MemoryRecord integration', () => {
     const wrote = ops.recordGotcha('Simple string gotcha', projectRoot);
     assert.equal(wrote, true);
 
-    const gotchasFile = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'gotchas.json'
-    );
+    const gotchasFile = path.join(projectRoot, '.claude', 'context', 'memory', 'gotchas.json');
     const gotchas = safeParseJSON(fs.readFileSync(gotchasFile, 'utf8'), []);
     assert.equal(gotchas.length, 1);
     assert.equal(gotchas[0].text, 'Simple string gotcha');
@@ -146,15 +136,10 @@ describe('MemoryRecord integration', () => {
   it('recordPattern deduplicates exact duplicate entries', () => {
     const ops = buildRecordingOps();
     ops.recordPattern({ text: 'Dup pattern', area: 'test' }, projectRoot);
-    const second = ops.recordPattern(
-      { text: 'Dup pattern', area: 'test' },
-      projectRoot
-    );
+    const second = ops.recordPattern({ text: 'Dup pattern', area: 'test' }, projectRoot);
     assert.equal(second, false, 'duplicate pattern should return false');
 
-    const patternsFile = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'patterns.json'
-    );
+    const patternsFile = path.join(projectRoot, '.claude', 'context', 'memory', 'patterns.json');
     const patterns = safeParseJSON(fs.readFileSync(patternsFile, 'utf8'), []);
     assert.equal(patterns.length, 1, 'should still have only 1 pattern');
   });
@@ -165,9 +150,7 @@ describe('MemoryRecord integration', () => {
       ops.recordGotcha({ text: `Gotcha number ${i}`, area: 'test' }, projectRoot);
     }
 
-    const gotchasFile = path.join(
-      projectRoot, '.claude', 'context', 'memory', 'gotchas.json'
-    );
+    const gotchasFile = path.join(projectRoot, '.claude', 'context', 'memory', 'gotchas.json');
     const gotchas = safeParseJSON(fs.readFileSync(gotchasFile, 'utf8'), []);
     assert.equal(gotchas.length, 5, 'should have 5 unique gotchas');
   });

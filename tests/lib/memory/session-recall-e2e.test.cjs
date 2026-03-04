@@ -6,7 +6,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-
 /**
  * P0 Verification: Session-to-session recall via consolidateSession.
  *
@@ -33,7 +32,10 @@ describe('Session recall end-to-end', () => {
 
   it('STM data persists in MTM after consolidateSession', () => {
     const {
-      writeSTMEntry, readSTMEntry, _consolidateSession, getMTMSessions,
+      writeSTMEntry,
+      readSTMEntry,
+      _consolidateSession,
+      getMTMSessions,
     } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
     const sessionData = {
@@ -67,9 +69,11 @@ describe('Session recall end-to-end', () => {
   });
 
   it('extracted_memories survive STM to MTM promotion', () => {
-    const { writeSTMEntry, _consolidateSession, getMTMSessions } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const {
+      writeSTMEntry,
+      _consolidateSession,
+      getMTMSessions,
+    } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
     writeSTMEntry(
       {
@@ -92,20 +96,19 @@ describe('Session recall end-to-end', () => {
       'extracted_memories should be array in MTM'
     );
     assert.equal(mtmSessions[0].extracted_memories.length, 3);
-    const ids = mtmSessions[0].extracted_memories.map((m) => m.id);
+    const ids = mtmSessions[0].extracted_memories.map(m => m.id);
     assert.deepEqual(ids, ['e1', 'e2', 'e3']);
   });
 
   it('multiple sessions accumulate in MTM', () => {
-    const { writeSTMEntry, _consolidateSession, getMTMSessions } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const {
+      writeSTMEntry,
+      _consolidateSession,
+      getMTMSessions,
+    } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
     for (let i = 0; i < 3; i++) {
-      writeSTMEntry(
-        { session_id: `multi-${i}`, summary: `Session ${i}` },
-        projectRoot
-      );
+      writeSTMEntry({ session_id: `multi-${i}`, summary: `Session ${i}` }, projectRoot);
       const result = _consolidateSession(`multi-${i}`, projectRoot);
       assert.equal(result.success, true, `consolidation ${i} should succeed`);
     }
@@ -113,7 +116,7 @@ describe('Session recall end-to-end', () => {
     const mtmSessions = getMTMSessions(projectRoot);
     assert.equal(mtmSessions.length, 3, 'should have 3 MTM sessions');
 
-    const sessionIds = mtmSessions.map((s) => s.session_id);
+    const sessionIds = mtmSessions.map(s => s.session_id);
     assert.ok(sessionIds.includes('multi-0'));
     assert.ok(sessionIds.includes('multi-1'));
     assert.ok(sessionIds.includes('multi-2'));
@@ -121,20 +124,16 @@ describe('Session recall end-to-end', () => {
 
   it('findMTMSession retrieves specific session by ID', () => {
     const {
-      writeSTMEntry, _consolidateSession, findMTMSession,
+      writeSTMEntry,
+      _consolidateSession,
+      findMTMSession,
     } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
-    writeSTMEntry(
-      { session_id: 'find-me', summary: 'Needle in haystack' },
-      projectRoot
-    );
+    writeSTMEntry({ session_id: 'find-me', summary: 'Needle in haystack' }, projectRoot);
     _consolidateSession('find-me', projectRoot);
 
     // Add another session to ensure findMTMSession filters correctly
-    writeSTMEntry(
-      { session_id: 'other-session', summary: 'Not this one' },
-      projectRoot
-    );
+    writeSTMEntry({ session_id: 'other-session', summary: 'Not this one' }, projectRoot);
     _consolidateSession('other-session', projectRoot);
 
     const found = findMTMSession('find-me', projectRoot);
@@ -149,9 +148,11 @@ describe('Session recall end-to-end', () => {
   });
 
   it('consolidated_at metadata is added during promotion', () => {
-    const { writeSTMEntry, _consolidateSession, getMTMSessions } = require(
-      '../../../.claude/lib/memory/memory-tiers.cjs'
-    );
+    const {
+      writeSTMEntry,
+      _consolidateSession,
+      getMTMSessions,
+    } = require('../../../.claude/lib/memory/memory-tiers.cjs');
 
     const before = new Date().toISOString();
     writeSTMEntry({ session_id: 'meta-test', summary: 'Metadata' }, projectRoot);
@@ -165,9 +166,6 @@ describe('Session recall end-to-end', () => {
       mtmSessions[0].consolidated_at >= before,
       'consolidated_at should be after test start'
     );
-    assert.ok(
-      mtmSessions[0].consolidated_at <= after,
-      'consolidated_at should be before test end'
-    );
+    assert.ok(mtmSessions[0].consolidated_at <= after, 'consolidated_at should be before test end');
   });
 });

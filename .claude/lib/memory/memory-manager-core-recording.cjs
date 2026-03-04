@@ -59,6 +59,27 @@ function createRecordingOps({
   maybeSyncMemoryJson,
   emitMemorySavedEvent,
 }) {
+  function _appendTelemetry(type, area, success, projectRoot) {
+    try {
+      const memoryDir = getMemoryDir(projectRoot);
+      const metricsDir = path.join(memoryDir, 'metrics');
+      if (!fs.existsSync(metricsDir)) {
+        fs.mkdirSync(metricsDir, { recursive: true });
+      }
+      const telemetryFile = path.join(metricsDir, 'memory-record-telemetry.jsonl');
+      const line =
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          type,
+          area: area || 'general',
+          success,
+        }) + '\n';
+      fs.appendFileSync(telemetryFile, line);
+    } catch (_e) {
+      // Never crash on telemetry failure
+    }
+  }
+
   function recordGotcha(gotcha, projectRoot = PROJECT_ROOT) {
     const started = Date.now();
     validateProjectRoot(projectRoot);
@@ -169,6 +190,11 @@ function createRecordingOps({
       );
       if (wrote && shouldSync) {
         maybeSyncMemoryJson(gotchasFile, projectRoot);
+      }
+      if (wrote) {
+        const area =
+          typeof gotcha === 'object' && gotcha ? normalizeArea(gotcha.area) : DEFAULT_AREA;
+        _appendTelemetry('gotcha', area, true, projectRoot);
       }
       return wrote;
     } catch (err) {
@@ -296,6 +322,11 @@ function createRecordingOps({
       if (wrote && shouldSync) {
         maybeSyncMemoryJson(patternsFile, projectRoot);
       }
+      if (wrote) {
+        const area =
+          typeof pattern === 'object' && pattern ? normalizeArea(pattern.area) : DEFAULT_AREA;
+        _appendTelemetry('pattern', area, true, projectRoot);
+      }
       return wrote;
     } catch (err) {
       recordMemoryOperation(
@@ -331,7 +362,7 @@ function createRecordingOps({
       return false;
     }
 
-    return withFileLockSync(mapFile, () => {
+    const wrote = withFileLockSync(mapFile, () => {
       let codebaseMap = { discovered_files: {}, last_updated: null };
       if (fs.existsSync(mapFile)) {
         const raw = fs.readFileSync(mapFile, 'utf8');
@@ -369,6 +400,10 @@ function createRecordingOps({
       });
       return true;
     });
+    if (wrote) {
+      _appendTelemetry('discovery', category || DEFAULT_AREA, true, projectRoot);
+    }
+    return wrote;
   }
 
   return {

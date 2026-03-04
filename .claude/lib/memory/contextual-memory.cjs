@@ -242,6 +242,59 @@ class ContextualMemory {
   }
 
   /**
+   * Check whether the LanceDB index is stale relative to MTM/LTM memory files.
+   *
+   * Compares the newest mtime of JSON files in the MTM and LTM directories
+   * against the mtime of the LanceDB persist directory. Fails-open: any error
+   * returns { stale: false }.
+   *
+   * @returns {{ stale: boolean, newestMemoryMtime: number, indexMtime: number }}
+   */
+  _checkIndexStaleness() {
+    try {
+      const mtmDir = path.join(this.config.memoryDir, 'mtm');
+      const ltmDir = path.join(this.config.memoryDir, 'ltm');
+      const indexDir = this.config.lancedbConfig.persistDirectory;
+
+      if (!fs.existsSync(indexDir)) {
+        return { stale: false, newestMemoryMtime: 0, indexMtime: 0 };
+      }
+
+      // Use newest file mtime inside index dir (more reliable than dir mtime,
+      // which reflects creation time rather than last index update)
+      let indexMtime = 0;
+      try {
+        const indexFiles = fs.readdirSync(indexDir);
+        if (indexFiles.length === 0) {
+          // Empty index dir — use dir mtime as fallback
+          indexMtime = fs.statSync(indexDir).mtimeMs;
+        } else {
+          for (const f of indexFiles) {
+            const fMtime = fs.statSync(path.join(indexDir, f)).mtimeMs;
+            if (fMtime > indexMtime) indexMtime = fMtime;
+          }
+        }
+      } catch (_e) {
+        indexMtime = fs.statSync(indexDir).mtimeMs;
+      }
+      let newestMemoryMtime = 0;
+
+      for (const dir of [mtmDir, ltmDir]) {
+        if (!fs.existsSync(dir)) continue;
+        for (const file of fs.readdirSync(dir)) {
+          if (!file.endsWith('.json')) continue;
+          const mtime = fs.statSync(path.join(dir, file)).mtimeMs;
+          if (mtime > newestMemoryMtime) newestMemoryMtime = mtime;
+        }
+      }
+
+      return { stale: newestMemoryMtime > indexMtime, newestMemoryMtime, indexMtime };
+    } catch (_e) {
+      return { stale: false, newestMemoryMtime: 0, indexMtime: 0 };
+    }
+  }
+
+  /**
    * Semantic search across all memory sources
    *
    * Routes to LanceDB for vector similarity search.
@@ -254,6 +307,12 @@ class ContextualMemory {
    * @returns {Promise<Array>} Ranked results with sources
    */
   async search(query, options = {}) {
+    const stalenessCheck = this._checkIndexStaleness();
+    if (stalenessCheck.stale) {
+      process.stderr.write(
+        `[contextual-memory] WARNING: LanceDB index may be stale — memory files newer than index (newestMemoryMtime=${stalenessCheck.newestMemoryMtime}, indexMtime=${stalenessCheck.indexMtime}). Run re-index to update.\n`
+      );
+    }
     const { SEMANTIC_SEARCH_DEFAULT_THRESHOLD } = require('./memory-constants.cjs');
     const { limit = 5, threshold = SEMANTIC_SEARCH_DEFAULT_THRESHOLD, filters } = options;
     const metadataFilters = {};
