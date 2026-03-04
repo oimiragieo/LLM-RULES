@@ -642,6 +642,36 @@ function resolveConfigModel(agentType) {
   }
 }
 
+/**
+ * Determines if worktree isolation should be overridden for a developer agent task.
+ * Framework paths (.claude/) should NOT use worktree isolation because changes
+ * are silently discarded when the worktree is cleaned up.
+ *
+ * @param {string} prompt - The task prompt text
+ * @param {string} agentType - The agent type being spawned
+ * @returns {boolean} true if isolation should be overridden to 'none'
+ */
+function shouldOverrideWorktreeIsolation(prompt, agentType) {
+  if (!prompt || typeof prompt !== 'string') return false;
+  if (!agentType || agentType.toLowerCase() !== 'developer') return false;
+
+  // Normalize Windows backslashes to forward slashes for consistent matching
+  const normalizedPrompt = prompt.replace(/\\/g, '/');
+
+  const frameworkPaths = [
+    '.claude/hooks/',
+    '.claude/skills/',
+    '.claude/agents/',
+    '.claude/tools/',
+    '.claude/workflows/',
+    '.claude/templates/',
+    '.claude/schemas/',
+    '.claude/lib/',
+  ];
+
+  return frameworkPaths.some(fp => normalizedPrompt.includes(fp));
+}
+
 module.exports = {
   sanitizeTaskPrompt,
   generateRequiredPrefixFragment,
@@ -664,4 +694,5 @@ module.exports = {
   requiresArtifactWrite,
   hasArtifactWriterTools,
   buildMissingWriterToolsMessage,
+  shouldOverrideWorktreeIsolation,
 };

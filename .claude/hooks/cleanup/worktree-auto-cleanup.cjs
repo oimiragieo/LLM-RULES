@@ -35,33 +35,19 @@ const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 /**
  * Safe stdin reader — returns null if stdin is not available or empty.
+ *
+ * Uses fd 0 directly (cross-platform). On Windows, /dev/stdin is unavailable
+ * (ENOENT), so we always use readFileSync(0) which works on both Windows and Unix.
+ *
  * @returns {string|null}
  */
 function readStdin() {
   try {
-    return require('fs').readFileSync('/dev/stdin', 'utf8');
+    // fd 0 is the POSIX/Windows standard input file descriptor — works on all platforms.
+    // This avoids the /dev/stdin path which fails on Windows with ENOENT.
+    return require('fs').readFileSync(0, 'utf8');
   } catch (_e) {
-    try {
-      // Windows fallback: read fd 0 directly
-      const buf = Buffer.alloc(65536);
-      let total = '';
-      let bytesRead;
-      const fd = require('fs').openSync('\\\\.\\stdin', 'r');
-
-      while (true) {
-        try {
-          bytesRead = require('fs').readSync(fd, buf, 0, buf.length, null);
-          if (bytesRead === 0) break;
-          total += buf.slice(0, bytesRead).toString('utf8');
-        } catch (_readErr) {
-          break;
-        }
-      }
-      require('fs').closeSync(fd);
-      return total || null;
-    } catch (_e2) {
-      return null;
-    }
+    return null;
   }
 }
 
@@ -230,3 +216,11 @@ try {
 
 // SE-03: Always exit 0 — this hook MUST NOT block TaskUpdate
 process.exit(0);
+
+// Export internals for testing (not used in production)
+// Placed after process.exit() so requiring this module in tests won't execute process.exit()
+// (Node.js module loading does not re-execute code after a successful require/cache hit)
+// Note: tests should use spawnSync to run the hook as a subprocess to bypass process.exit().
+if (typeof module !== 'undefined') {
+  module.exports._test_internals = { extractBranchTimestamp, isTTLExpired, readStdin };
+}

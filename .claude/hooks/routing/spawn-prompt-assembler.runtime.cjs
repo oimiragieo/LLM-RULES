@@ -56,6 +56,7 @@ const {
   requiresArtifactWrite,
   hasArtifactWriterTools,
   buildMissingWriterToolsMessage,
+  shouldOverrideWorktreeIsolation,
 } = taskTools;
 
 const {
@@ -426,31 +427,40 @@ async function main() {
     // This block is added ONLY when:
     //   1. The agent definition declares isolation: worktree, AND
     //   2. The AGENT_WORKTREE_PATH env var is set (injected by the worktree spawn machinery)
+    //   3. The task does NOT target framework paths (.claude/hooks/, .claude/skills/, etc.)
+    //      because framework changes are silently discarded when the worktree is cleaned up
     const worktreePath = process.env.AGENT_WORKTREE_PATH || '';
     if (agentType && worktreePath) {
-      // Load the agent registry to check isolation setting
-      let agentIsolation = null;
-      try {
-        const agentRegistry = libRequire(path.join('routing', 'agent-registry-loader.cjs'));
-        const agentConfig = agentRegistry.getAgent(agentType);
-        if (agentConfig) {
-          agentIsolation = agentConfig.isolation || null;
+      // Check if this is a developer task targeting framework paths — skip worktree injection
+      if (shouldOverrideWorktreeIsolation(assembled, agentType)) {
+        process.stderr.write(
+          '[worktree-override] Skipping worktree isolation for developer task targeting framework paths\n'
+        );
+      } else {
+        // Load the agent registry to check isolation setting
+        let agentIsolation = null;
+        try {
+          const agentRegistry = libRequire(path.join('routing', 'agent-registry-loader.cjs'));
+          const agentConfig = agentRegistry.getAgent(agentType);
+          if (agentConfig) {
+            agentIsolation = agentConfig.isolation || null;
+          }
+        } catch (_regErr) {
+          // Agent registry lookup is best-effort; skip injection if unavailable
         }
-      } catch (_regErr) {
-        // Agent registry lookup is best-effort; skip injection if unavailable
-      }
 
-      if (agentIsolation === 'worktree') {
-        const worktreeBranch = process.env.AGENT_WORKTREE_BRANCH || 'unknown';
-        // SE-01: normalize backslashes in path for display
-        const displayPath = worktreePath.replace(/\\/g, '/');
-        assembled +=
-          '\n\n## Your Working Environment\n' +
-          'You are running in an ISOLATED GIT WORKTREE.\n' +
-          `Working directory: ${displayPath}\n` +
-          `Branch: ${worktreeBranch}\n` +
-          'DO NOT write files outside your working directory.\n' +
-          'All file paths must use this working directory as the root.\n';
+        if (agentIsolation === 'worktree') {
+          const worktreeBranch = process.env.AGENT_WORKTREE_BRANCH || 'unknown';
+          // SE-01: normalize backslashes in path for display
+          const displayPath = worktreePath.replace(/\\/g, '/');
+          assembled +=
+            '\n\n## Your Working Environment\n' +
+            'You are running in an ISOLATED GIT WORKTREE.\n' +
+            `Working directory: ${displayPath}\n` +
+            `Branch: ${worktreeBranch}\n` +
+            'DO NOT write files outside your working directory.\n' +
+            'All file paths must use this working directory as the root.\n';
+        }
       }
     }
 
