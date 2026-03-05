@@ -40,6 +40,23 @@ function getAllAgents() {
   return SUBDIRS.flatMap(d => getAgentFiles(d));
 }
 
+/**
+ * Check if an agent has the search-compliance-exempt comment.
+ * Agents with this comment are skipped for body-text anti-pattern checks.
+ */
+function isExempt(content) {
+  return content.includes('<!-- search-compliance-exempt -->');
+}
+
+/**
+ * Extract the body text after frontmatter (everything after the closing ---).
+ */
+function extractBody(content) {
+  const fmEnd = content.indexOf('---', content.indexOf('---') + 3);
+  if (fmEnd === -1) return content;
+  return content.slice(fmEnd + 3);
+}
+
 function extractFrontmatterSkills(content) {
   const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
   if (!fmMatch) return [];
@@ -226,6 +243,7 @@ describe('No Grep-First Language in Agents', () => {
   it('no agent uses "use Grep for code discovery" without fallback qualifier', () => {
     const violations = [];
     for (const agent of agents) {
+      if (isExempt(agent.content)) continue;
       if (
         /use Grep (for|to) (code |codebase )?discover/i.test(agent.content) &&
         !/fallback/i.test(agent.content)
@@ -243,6 +261,7 @@ describe('No Grep-First Language in Agents', () => {
   it('no agent says "use Grep to search the codebase" as primary method', () => {
     const violations = [];
     for (const agent of agents) {
+      if (isExempt(agent.content)) continue;
       if (
         /use Grep to search (the )?codebase/i.test(agent.content) &&
         !/fallback|after|prefer.*instead/i.test(agent.content)
@@ -254,6 +273,176 @@ describe('No Grep-First Language in Agents', () => {
       violations,
       [],
       `Agents with Grep-as-primary-search language: ${violations.join(', ')}`
+    );
+  });
+});
+
+describe('No Raw Grep/Glob Tool Calls as Primary Search in Agents', () => {
+  const agents = getAllAgents();
+
+  it('no agent has Grep() call examples without fallback context', () => {
+    const violations = [];
+    for (const agent of agents) {
+      if (isExempt(agent.content)) continue;
+      // Match Grep({ or Grep( as tool call examples in prompt body
+      const body = extractBody(agent.content);
+      const grepCalls = body.match(/Grep\s*\(\s*\{/g);
+      if (!grepCalls) continue;
+      // Check if fallback/alternative qualifier exists nearby
+      const hasFallback = /fallback|FALLBACK|last.resort|advanced.regex|PCRE/i.test(body);
+      if (!hasFallback) {
+        violations.push(`${agent.subdir}/${agent.name}`);
+      }
+    }
+    assert.deepStrictEqual(
+      violations,
+      [],
+      `Agents with raw Grep() examples without fallback context: ${violations.join(', ')}`
+    );
+  });
+
+  it('no agent has Glob() call examples as primary discovery method', () => {
+    const violations = [];
+    for (const agent of agents) {
+      if (isExempt(agent.content)) continue;
+      const body = extractBody(agent.content);
+      const globCalls = body.match(/Glob\s*\(\s*\{/g);
+      if (!globCalls) continue;
+      // Check if the agent also mentions search skills
+      const hasSearchSkillRef =
+        body.includes('ripgrep') ||
+        body.includes('search:code') ||
+        body.includes('code-semantic-search');
+      if (!hasSearchSkillRef) {
+        violations.push(`${agent.subdir}/${agent.name}`);
+      }
+    }
+    assert.deepStrictEqual(
+      violations,
+      [],
+      `Agents with Glob() as primary discovery without search skill refs: ${violations.join(', ')}`
+    );
+  });
+});
+
+describe('No Direct Memory File Edits in Agent Prompts', () => {
+  const agents = getAllAgents();
+  // Files that should be edited via MemoryRecord, not Edit/Write
+  const GUARDED_MEMORY_FILES = [
+    'learnings.md',
+    'decisions.md',
+    'issues.md',
+    'patterns.json',
+    'gotchas.json',
+    'open-findings.json',
+    'access-stats.json',
+  ];
+
+  it('no agent has Edit() examples targeting guarded memory files', () => {
+    const violations = [];
+    for (const agent of agents) {
+      if (isExempt(agent.content)) continue;
+      const body = extractBody(agent.content);
+      for (const file of GUARDED_MEMORY_FILES) {
+        // Match Edit('...learnings.md' or Edit("...learnings.md" patterns
+        const editPattern = new RegExp(
+          `Edit\\s*\\(\\s*['"\`][^'"\`]*${file.replace('.', '\\.')}`,
+          'i'
+        );
+        if (editPattern.test(body)) {
+          violations.push(`${agent.subdir}/${agent.name} (Edit ${file})`);
+        }
+        // Match Write('...learnings.md' patterns
+        const writePattern = new RegExp(
+          `Write\\s*\\(\\s*['"\`][^'"\`]*${file.replace('.', '\\.')}`,
+          'i'
+        );
+        if (writePattern.test(body)) {
+          violations.push(`${agent.subdir}/${agent.name} (Write ${file})`);
+        }
+      }
+    }
+    assert.deepStrictEqual(
+      violations,
+      [],
+      `Agents with direct Edit/Write to guarded memory files: ${violations.join(', ')}`
+    );
+  });
+});
+
+describe('Orchestrator Search Skill References', () => {
+  const orchestrators = getAgentFiles('orchestrators');
+
+  it('orchestrator directory has files', () => {
+    assert.ok(orchestrators.length > 0, 'Expected orchestrator agent files');
+  });
+
+  for (const orch of orchestrators) {
+    if (isExempt(orch.content)) continue;
+
+    it(`orchestrators/${orch.name} references a search skill or search:code`, () => {
+      const hasRef =
+        orch.content.includes('ripgrep') ||
+        orch.content.includes('search:code') ||
+        orch.content.includes('code-semantic-search') ||
+        orch.content.includes('code-structural-search') ||
+        orch.content.includes('hybrid search') ||
+        orch.content.includes('Search-First') ||
+        orch.content.includes('pnpm search');
+      assert.ok(hasRef, `${orch.name} has no reference to search skills or search:code`);
+    });
+  }
+
+  it('no orchestrator uses raw Grep/Glob as primary search pattern', () => {
+    const violations = [];
+    for (const orch of orchestrators) {
+      if (isExempt(orch.content)) continue;
+      const body = extractBody(orch.content);
+      // Check for Grep({...}) patterns that appear as primary usage
+      const grepCallCount = (body.match(/Grep\s*\(\s*\{/g) || []).length;
+      const skillRefCount = (body.match(/ripgrep|search:code|code-semantic|code-structural/g) || [])
+        .length;
+      // If there are more Grep calls than search skill references, flag it
+      if (grepCallCount > 0 && skillRefCount === 0) {
+        violations.push(`orchestrators/${orch.name}`);
+      }
+    }
+    assert.deepStrictEqual(
+      violations,
+      [],
+      `Orchestrators with raw Grep as primary search: ${violations.join(', ')}`
+    );
+  });
+});
+
+describe('Agents with Search Skills Should Use Skill Invocation Syntax', () => {
+  const agents = getAllAgents();
+
+  it('agents with ripgrep in frontmatter mention Skill invocation or pnpm search', () => {
+    const violations = [];
+    for (const agent of agents) {
+      if (isExempt(agent.content)) continue;
+      if (SEARCH_SKILL_EXEMPTIONS.has(agent.name)) continue;
+      const skills = extractFrontmatterSkills(agent.content);
+      if (!skills.includes('ripgrep')) continue;
+      const body = extractBody(agent.content);
+      const hasSkillCall =
+        body.includes("Skill({ skill: 'ripgrep'") ||
+        body.includes('Skill({ skill: "ripgrep"') ||
+        body.includes('search:code') ||
+        body.includes('pnpm search') ||
+        body.includes('ripgrep skill') ||
+        body.includes('Search-First') ||
+        body.includes('Code Search Protocol') ||
+        body.includes('hybrid search');
+      if (!hasSkillCall) {
+        violations.push(`${agent.subdir}/${agent.name}`);
+      }
+    }
+    assert.deepStrictEqual(
+      violations,
+      [],
+      `Agents with ripgrep in frontmatter but no Skill invocation or search ref: ${violations.join(', ')}`
     );
   });
 });

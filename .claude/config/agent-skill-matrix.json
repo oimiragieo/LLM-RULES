@@ -1,0 +1,1479 @@
+{
+  "$schema": "../../schemas/agent-skill-matrix.schema.json",
+  "version": "1.0.0",
+  "description": "Maps agents to their recommended skills by category. Primary skills are essential, secondary are supporting, and contextual are conditionally loaded based on project type.",
+  "_documentation": "REGISTRY 3-LAYER SYSTEM: Agent registry skills are computed from 3 sources: (1) Agent .md frontmatter 'skills:' field (explicit), (2) This matrix file (centralized augmentation via primary/secondary/always/contextual), (3) skill-index.json (tool requirements per skill). The registry generator merges all 3 layers. This is BY DESIGN — the matrix is the augmentation engine. Apparent 'drift' between frontmatter and registry is expected and intentional.",
+  "lastUpdated": "2026-03-01T06:09:34.171Z",
+  "agents": {
+    "core": {
+      "developer": {
+        "primary": ["tdd", "debugging", "git-expert"],
+        "secondary": [
+          "code-quality-expert",
+          "code-analyzer",
+          "code-style-validator",
+          "commit-validator",
+          "smart-revert",
+          "github-ops",
+          "feature-flag-management",
+          "ask-questions-if-underspecified",
+          "dynamic-api-integration"
+        ],
+        "contextual": {
+          "python_project": [
+            "python-backend-expert",
+            "comprehensive-unit-testing-with-pytest",
+            "modern-python"
+          ],
+          "typescript_project": ["typescript-expert", "tdd"],
+          "security_review": ["security-architect"],
+          "context_limited": ["context-compressor"],
+          "property_testing": ["property-based-testing"],
+          "windows_project": ["powershell-expert"],
+          "desktop_project": ["pyqt6-ui-development-rules"],
+          "tool_design": ["agent-tool-design"],
+          "nativescript_project": ["nativescript"],
+          "convex_project": ["convex-development-general"],
+          "drizzle_project": ["drizzle-orm-rules"],
+          "elixir_project": ["elixir-expert"],
+          "medusa_project": ["medusa"]
+        },
+        "always": [
+          "verification-before-completion",
+          "github-mcp",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "planner": {
+        "primary": [
+          "plan-generator",
+          "sequential-thinking",
+          "complexity-assessment",
+          "multi-agent-architecture-reference",
+          "ask-questions-if-underspecified"
+        ],
+        "secondary": ["context-compressor", "spec-gathering", "context-degradation"],
+        "contextual": {
+          "large_project": ["brainstorming", "diagram-generator"],
+          "multi_agent": ["dispatching-parallel-agents", "swarm-coordination"]
+        },
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ]
+      },
+      "architect": {
+        "primary": [
+          "architecture-review",
+          "diagram-generator",
+          "database-architect",
+          "agent-tool-design",
+          "multi-agent-architecture-reference"
+        ],
+        "secondary": [
+          "security-architect",
+          "project-analyzer",
+          "brainstorming",
+          "dynamic-api-integration"
+        ],
+        "contextual": {
+          "distributed_system": ["swarm-coordination", "consensus-voting"],
+          "api_design": ["api-development-expert", "graphql-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "qa": {
+        "primary": ["tdd", "test-generator"],
+        "secondary": [
+          "code-analyzer",
+          "rule-auditor",
+          "qa-workflow",
+          "agent-evaluation",
+          "property-based-testing"
+        ],
+        "contextual": {
+          "python_project": ["comprehensive-unit-testing-with-pytest"],
+          "security_testing": ["security-architect"],
+          "browser_testing": ["chrome-browser", "webapp-testing"],
+          "feature_flags": ["feature-flag-management"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "technical-writer": {
+        "primary": ["doc-generator", "writing-skills", "readme"],
+        "secondary": ["diagram-generator"],
+        "contextual": {
+          "api_docs": ["api-development-expert"],
+          "architecture_docs": ["architecture-review"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "pm": {
+        "primary": ["plan-generator", "spec-gathering", "complexity-assessment"],
+        "secondary": ["interactive-requirements-gathering", "brainstorming"],
+        "contextual": {
+          "jira_integration": ["jira-pm"],
+          "linear_integration": ["linear-pm"]
+        },
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ]
+      },
+      "context-compressor": {
+        "primary": [
+          "context-compressor",
+          "session-handoff",
+          "summarize-changes",
+          "context-degradation"
+        ],
+        "secondary": ["insight-extraction"],
+        "contextual": {},
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ]
+      },
+      "router": {
+        "primary": ["skill-discovery", "complexity-assessment"],
+        "secondary": ["task-management-protocol"],
+        "contextual": {},
+        "always": []
+      },
+      "reflection-agent": {
+        "primary": ["insight-extraction", "session-handoff"],
+        "secondary": [
+          "context-compressor",
+          "summarize-changes",
+          "agent-evaluation",
+          "debug-log-analysis"
+        ],
+        "contextual": {},
+        "always": []
+      },
+      "technical-program-manager": {
+        "primary": ["plan-generator", "task-management-protocol", "complexity-assessment"],
+        "secondary": ["sequential-thinking", "spec-gathering"],
+        "contextual": {
+          "multi_team": ["dispatching-parallel-agents", "swarm-coordination"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      }
+    },
+    "domain": {
+      "python-pro": {
+        "primary": ["python-backend-expert", "tdd", "debugging", "modern-python"],
+        "secondary": [
+          "tdd",
+          "api-development-expert",
+          "git-expert",
+          "poetry-rye-dependency-management"
+        ],
+        "contextual": {
+          "fastapi_project": ["api-development-expert"],
+          "scientific_project": ["scientific-skills"],
+          "data_project": ["data-expert", "pandas-data-manipulation-rules"],
+          "desktop_project": ["pyqt6-ui-development-rules"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "rust-pro": {
+        "primary": ["tdd", "debugging", "git-expert"],
+        "secondary": ["tdd", "code-quality-expert"],
+        "contextual": {
+          "async_project": [],
+          "systems_project": ["memory-forensics"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "golang-pro": {
+        "primary": ["go-expert", "tdd", "debugging"],
+        "secondary": ["tdd", "api-development-expert", "git-expert"],
+        "contextual": {
+          "fiber_project": [
+            "fiber-logging-and-project-structure",
+            "fiber-routing-and-csrf-protection"
+          ],
+          "grpc_project": []
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "typescript-pro": {
+        "primary": ["typescript-expert", "tdd", "debugging"],
+        "secondary": ["tdd", "code-quality-expert", "git-expert"],
+        "contextual": {
+          "react_project": ["react-expert", "state-management-expert"],
+          "node_project": ["nodejs-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "fastapi-pro": {
+        "primary": ["python-backend-expert", "api-development-expert", "tdd"],
+        "secondary": ["debugging", "tdd", "database-expert", "modern-python"],
+        "contextual": {
+          "async_project": [],
+          "auth_project": ["auth-security-expert", "authentication-flow-rules"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "frontend-pro": {
+        "primary": ["frontend-expert", "react-expert", "styling-expert"],
+        "secondary": ["ui-components-expert", "accessibility", "tdd"],
+        "contextual": {
+          "vue_project": ["vue-expert"],
+          "svelte_project": ["svelte-expert"],
+          "mobile_first": ["mobile-first-design-rules"],
+          "browser_testing": ["webapp-testing"],
+          "webmcp_integration": ["webmcp-browser-tools"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "nodejs-pro": {
+        "primary": ["nodejs-expert", "typescript-expert", "tdd"],
+        "secondary": ["api-development-expert", "debugging", "tdd"],
+        "contextual": {
+          "express_project": [],
+          "nestjs_project": [],
+          "drizzle_project": ["drizzle-orm-rules"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "ios-pro": {
+        "primary": ["ios-expert", "tdd", "debugging"],
+        "secondary": ["mobile-ui-development-rule", "tdd"],
+        "contextual": {
+          "swiftui_project": ["ui-components-expert"],
+          "security_focus": ["security-architect"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "java-pro": {
+        "primary": ["java-expert", "tdd", "debugging"],
+        "secondary": ["tdd", "api-development-expert"],
+        "contextual": {
+          "spring_project": [
+            "dto-conventions",
+            "service-class-conventions",
+            "restcontroller-conventions"
+          ]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "nextjs-pro": {
+        "primary": ["nextjs-expert", "react-expert", "typescript-expert"],
+        "secondary": ["styling-expert", "tdd", "seo-and-meta-tags-in-sveltekit"],
+        "contextual": {
+          "vercel_deployment": ["vercel-ai-sdk-best-practices"],
+          "trpc_project": [],
+          "convex_project": ["convex-development-general"],
+          "medusa_project": ["medusa"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "php-pro": {
+        "primary": ["php-expert", "tdd", "debugging"],
+        "secondary": ["tdd", "api-development-expert"],
+        "contextual": {
+          "laravel_project": ["tall-stack-general"],
+          "composer_project": ["composer-dependency-management"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "sveltekit-expert": {
+        "primary": ["svelte-expert", "typescript-expert", "tdd"],
+        "secondary": ["styling-expert", "tdd"],
+        "contextual": {
+          "i18n_project": ["paraglide-js-internationalization-i18n"],
+          "form_handling": ["form-and-actions-in-sveltekit"],
+          "seo_focus": ["seo-and-meta-tags-in-sveltekit"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "tauri-desktop-developer": {
+        "primary": ["svelte-expert", "typescript-expert", "tdd"],
+        "secondary": ["tauri-svelte-typescript-general", "tauri-svelte-ui-components"],
+        "contextual": {
+          "security_focus": ["tauri-security-rules"],
+          "native_api": ["tauri-native-api-integration"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "expo-mobile-developer": {
+        "primary": ["react-expert", "expo-framework-rule", "tdd"],
+        "secondary": ["mobile-ui-development-rule", "expo-mobile-app-rule", "tdd"],
+        "contextual": {
+          "nativewind_styling": ["nativewind-and-tailwind-css-compatibility"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "data-engineer": {
+        "primary": ["data-expert", "python-backend-expert", "tdd"],
+        "secondary": ["database-expert", "pandas-data-manipulation-rules"],
+        "contextual": {
+          "large_data": ["large-data-with-dask"],
+          "ml_project": ["ai-ml-expert"],
+          "scientific_project": ["scientific-skills"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "graphql-pro": {
+        "primary": ["graphql-expert", "api-development-expert", "tdd"],
+        "secondary": ["typescript-expert", "tdd"],
+        "contextual": {
+          "apollo_project": ["state-management-expert"],
+          "relay_project": ["react-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "mobile-ux-reviewer": {
+        "primary": ["mobile-ui-development-rule", "mobile-first-design-rules", "accessibility"],
+        "secondary": ["design-and-user-experience-guidelines", "ui-components-expert"],
+        "contextual": {
+          "ios_project": ["ios-expert"],
+          "android_project": ["android-expert"],
+          "react_native_project": ["expo-mobile-app-rule"],
+          "nativescript_project": ["nativescript"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "ai-ml-specialist": {
+        "primary": ["ai-ml-expert", "python-backend-expert"],
+        "secondary": ["debugging", "tdd"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "android-pro": {
+        "primary": ["android-expert", "tdd", "debugging"],
+        "secondary": ["tdd", "git-expert"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "gamedev-pro": {
+        "primary": ["gamedev-expert", "debugging"],
+        "secondary": ["tdd", "code-quality-expert"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "scientific-research-expert": {
+        "primary": ["scientific-skills", "research-synthesis"],
+        "secondary": ["python-backend-expert", "data-expert"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "multi-llm-consultant": {
+        "primary": ["omega-gemini-cli", "omega-codex-cli", "omega-claude-cli"],
+        "secondary": ["llm-council", "ripgrep"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "web3-blockchain-expert": {
+        "primary": ["web3-expert"],
+        "secondary": ["security-architect", "tdd"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "api-designer": {
+        "primary": ["api-development-expert"],
+        "secondary": ["code-quality-expert", "tdd"],
+        "contextual": {
+          "graphql_project": ["graphql-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "aso-specialist": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "brand-guardian": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "compliance-checker": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "feedback-synthesizer": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "marketing-strategist": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "llm-architect": {
+        "primary": ["ai-ml-expert"],
+        "secondary": ["architecture-review", "diagram-generator"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "mcp-developer": {
+        "primary": ["tdd", "debugging"],
+        "secondary": ["tdd", "code-quality-expert"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "microservices-architect": {
+        "primary": ["architecture-review", "diagram-generator", "api-development-expert"],
+        "secondary": ["container-expert", "security-architect"],
+        "contextual": {
+          "kubernetes_project": ["container-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "prompt-engineer": {
+        "primary": ["advanced-elicitation"],
+        "secondary": ["thinking-tools", "context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "pm-coordinator": {
+        "primary": ["plan-generator", "task-management-protocol", "spec-gathering"],
+        "secondary": ["interactive-requirements-gathering", "brainstorming"],
+        "contextual": {
+          "jira_integration": ["jira-pm"],
+          "linear_integration": ["linear-pm"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "kubernetes-specialist": {
+        "primary": ["container-expert", "debugging"],
+        "secondary": ["tdd", "incident-runbook-templates"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "medical-research-triage": {
+        "primary": ["research-synthesis", "scientific-skills"],
+        "secondary": ["insight-extraction"],
+        "contextual": {},
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ]
+      },
+      "ux-researcher": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      }
+    },
+    "specialized": {
+      "code-reviewer": {
+        "primary": ["code-analyzer", "code-quality-expert", "tdd"],
+        "secondary": ["code-style-validator", "rule-auditor", "agent-evaluation"],
+        "contextual": {
+          "security_review": ["security-architect", "audit-context-building", "fix-review"],
+          "performance_review": ["debugging"]
+        },
+        "always": [
+          "verification-before-completion",
+          "receiving-code-review",
+          "requesting-code-review",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "security-architect": {
+        "primary": [
+          "security-architect",
+          "auth-security-expert",
+          "authentication-flow-rules",
+          "audit-context-building",
+          "building-secure-contracts",
+          "content-security-scan"
+        ],
+        "secondary": ["rule-auditor", "dependency-analyzer", "doc-generator", "fix-review"],
+        "contextual": {
+          "web3_project": ["web3-expert", "building-secure-contracts"],
+          "reverse_engineering": ["binary-analysis-patterns", "memory-forensics"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "devops": {
+        "primary": ["docker-compose", "terraform-infra", "k8s-manifest-generator"],
+        "secondary": [
+          "helm-chart-scaffolding",
+          "gitops-workflow",
+          "k8s-security-policies",
+          "ci-cd-implementation-rule",
+          "powershell-expert",
+          "feature-flag-management"
+        ],
+        "contextual": {
+          "aws_project": ["aws-cloud-ops"],
+          "gcp_project": ["gcloud-cli"],
+          "monitoring_focus": ["sentry-monitoring"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "git-expert",
+          "github-mcp",
+          "filesystem",
+          "containerization-rules",
+          "architecture-review",
+          "database-architect",
+          "consensus-voting",
+          "context-compressor",
+          "kubernetes-flux",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "devops-troubleshooter": {
+        "primary": ["debugging", "docker-compose", "k8s-manifest-generator"],
+        "secondary": [
+          "incident-runbook-templates",
+          "on-call-handoff-patterns",
+          "postmortem-writing",
+          "debug-log-analysis"
+        ],
+        "contextual": {
+          "cloud_issue": ["aws-cloud-ops", "gcloud-cli"],
+          "database_issue": ["database-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "incident-responder": {
+        "primary": ["incident-runbook-templates", "on-call-handoff-patterns", "postmortem-writing"],
+        "secondary": ["debugging", "sentry-monitoring"],
+        "contextual": {
+          "security_incident": ["security-architect", "memory-forensics"],
+          "database_incident": ["database-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "c4-context": {
+        "primary": ["diagram-generator", "architecture-review"],
+        "secondary": ["doc-generator", "project-analyzer"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "c4-container": {
+        "primary": ["diagram-generator", "architecture-review", "container-expert"],
+        "secondary": ["doc-generator", "project-analyzer"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "c4-component": {
+        "primary": ["diagram-generator", "architecture-review"],
+        "secondary": ["doc-generator", "code-analyzer"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "c4-code": {
+        "primary": ["diagram-generator", "code-analyzer"],
+        "secondary": ["doc-generator"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "conductor-validator": {
+        "primary": ["context-driven-development", "track-management", "workflow-patterns"],
+        "secondary": ["rule-auditor", "project-analyzer"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "reverse-engineer": {
+        "primary": [
+          "binary-analysis-patterns",
+          "memory-forensics",
+          "protocol-reverse-engineering",
+          "yara-authoring"
+        ],
+        "secondary": ["debugging", "code-analyzer"],
+        "contextual": {
+          "malware_analysis": ["security-architect", "yara-authoring"],
+          "network_analysis": ["protocol-reverse-engineering"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "database-architect": {
+        "primary": ["database-architect", "database-expert", "text-to-sql"],
+        "secondary": ["architecture-review", "diagram-generator"],
+        "contextual": {
+          "drizzle_project": ["drizzle-orm-rules"],
+          "vercel_kv": []
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "accessibility-tester": {
+        "primary": ["accessibility"],
+        "secondary": ["tdd", "code-analyzer"],
+        "contextual": {
+          "browser_testing": ["chrome-browser"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "chaos-engineer": {
+        "primary": ["tdd"],
+        "secondary": ["debugging", "container-expert"],
+        "contextual": {
+          "kubernetes_project": ["container-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "penetration-tester": {
+        "primary": ["security-architect"],
+        "secondary": ["tdd", "code-analyzer"],
+        "contextual": {
+          "web_project": ["auth-security-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "performance-engineer": {
+        "primary": ["debugging", "code-analyzer"],
+        "secondary": ["tdd", "code-quality-expert"],
+        "contextual": {
+          "browser_testing": ["chrome-browser"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "sre-engineer": {
+        "primary": ["container-expert", "debugging"],
+        "secondary": ["tdd", "incident-runbook-templates"],
+        "contextual": {
+          "kubernetes_project": ["container-expert"]
+        },
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "advanced-debugging": {
+        "primary": ["debugging", "memory-forensics", "code-analyzer"],
+        "secondary": ["tdd", "code-quality-expert"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "code-simplifier": {
+        "primary": ["code-quality-expert", "code-analyzer", "code-style-validator"],
+        "secondary": ["tdd", "debugging"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
+      },
+      "researcher": {
+        "primary": ["research-synthesis", "insight-extraction"],
+        "secondary": ["ripgrep", "context-compressor"],
+        "contextual": {
+          "scientific_project": ["scientific-skills"]
+        },
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ]
+      }
+    },
+    "orchestrators": {
+      "master-orchestrator": {
+        "primary": ["plan-generator", "task-management-protocol", "response-rater"],
+        "secondary": ["recovery", "swarm-coordination"],
+        "contextual": {
+          "parallel_execution": ["dispatching-parallel-agents"],
+          "track_based": ["track-management"],
+          "workflow_creation": ["workflow-creator"]
+        },
+        "always": [
+          "verification-before-completion",
+          "subagent-driven-development",
+          "task-management-protocol",
+          "ripgrep"
+        ]
+      },
+      "swarm-coordinator": {
+        "primary": ["swarm-coordination", "consensus-voting", "task-management-protocol"],
+        "secondary": ["dispatching-parallel-agents", "context-compressor"],
+        "contextual": {},
+        "always": ["verification-before-completion", "task-management-protocol", "ripgrep"]
+      },
+      "evolution-orchestrator": {
+        "primary": ["research-synthesis", "agent-creator", "skill-creator"],
+        "secondary": ["workflow-creator", "hook-creator", "template-creator", "schema-creator"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "artifact-lifecycle",
+          "ripgrep"
+        ]
+      },
+      "party-orchestrator": {
+        "primary": ["swarm-coordination", "consensus-voting"],
+        "secondary": ["dispatching-parallel-agents"],
+        "contextual": {},
+        "always": ["task-management-protocol", "ripgrep", "verification-before-completion"]
+      },
+      "artifact-integrator": {
+        "primary": ["project-onboarding", "ripgrep"],
+        "secondary": ["context-compressor", "ripgrep"],
+        "contextual": {},
+        "always": ["verification-before-completion", "task-management-protocol", "ripgrep"]
+      }
+    }
+  },
+  "skillCategories": {
+    "core": {
+      "description": "Essential development workflow skills",
+      "skills": ["tdd", "debugging", "code-quality-expert", "code-analyzer", "code-style-validator"]
+    },
+    "planning": {
+      "description": "Design, planning, and architecture skills",
+      "skills": [
+        "plan-generator",
+        "spec-gathering",
+        "spec-critique",
+        "complexity-assessment",
+        "brainstorming",
+        "architecture-review",
+        "diagram-generator"
+      ]
+    },
+    "security": {
+      "description": "Security analysis and validation skills",
+      "skills": [
+        "security-architect",
+        "auth-security-expert",
+        "authentication-flow-rules",
+        "binary-analysis-patterns",
+        "memory-forensics",
+        "protocol-reverse-engineering",
+        "fix-review"
+      ]
+    },
+    "languages": {
+      "description": "Language-specific expertise skills",
+      "skills": [
+        "python-backend-expert",
+        "typescript-expert",
+        "go-expert",
+        "java-expert",
+        "php-expert",
+        "cpp",
+        "elixir-expert",
+        "nodejs-expert"
+      ]
+    },
+    "frameworks": {
+      "description": "Framework-specific expertise skills",
+      "skills": [
+        "react-expert",
+        "nextjs-expert",
+        "svelte-expert",
+        "vue-expert",
+        "angular-expert",
+        "astro-expert",
+        "flutter-expert",
+        "graphql-expert",
+        "htmx-expert",
+        "webmcp-browser-tools"
+      ]
+    },
+    "mobile": {
+      "description": "Mobile development skills",
+      "skills": [
+        "ios-expert",
+        "android-expert",
+        "flutter-expert",
+        "expo-framework-rule",
+        "expo-mobile-app-rule",
+        "mobile-ui-development-rule",
+        "mobile-first-design-rules",
+        "nativescript"
+      ]
+    },
+    "devops": {
+      "description": "Infrastructure and deployment skills",
+      "skills": [
+        "docker-compose",
+        "terraform-infra",
+        "k8s-manifest-generator",
+        "helm-chart-scaffolding",
+        "gitops-workflow",
+        "aws-cloud-ops",
+        "gcloud-cli",
+        "kubernetes-flux",
+        "ci-cd-implementation-rule"
+      ]
+    },
+    "data": {
+      "description": "Data processing and database skills",
+      "skills": [
+        "database-architect",
+        "database-expert",
+        "data-expert",
+        "text-to-sql",
+        "ai-ml-expert",
+        "pandas-data-manipulation-rules",
+        "large-data-with-dask"
+      ]
+    },
+    "documentation": {
+      "description": "Documentation and writing skills",
+      "skills": ["doc-generator", "writing-skills", "readme", "diagram-generator"]
+    },
+    "git": {
+      "description": "Version control skills",
+      "skills": [
+        "git-expert",
+        "gitflow",
+        "github-mcp",
+        "github-ops",
+        "commit-validator",
+        "finishing-a-development-branch",
+        "using-git-worktrees"
+      ]
+    },
+    "validation": {
+      "description": "Quality and validation skills",
+      "skills": [
+        "verification-before-completion",
+        "qa-workflow",
+        "rule-auditor",
+        "code-style-validator",
+        "commit-validator",
+        "agent-evaluation"
+      ]
+    },
+    "memory": {
+      "description": "Context and memory management skills",
+      "skills": [
+        "context-compressor",
+        "session-handoff",
+        "summarize-changes",
+        "insight-extraction",
+        "operational-modes",
+        "recovery"
+      ]
+    },
+    "creators": {
+      "description": "Self-evolution and artifact creation skills",
+      "skills": [
+        "research-synthesis",
+        "agent-creator",
+        "skill-creator",
+        "workflow-creator",
+        "hook-creator",
+        "template-creator",
+        "schema-creator",
+        "artifact-lifecycle"
+      ]
+    },
+    "testing": {
+      "description": "Browser and E2E testing skills",
+      "skills": ["chrome-browser", "tdd", "qa-workflow", "property-based-testing", "webapp-testing"]
+    },
+    "orchestration": {
+      "description": "Multi-agent coordination skills",
+      "skills": [
+        "task-management-protocol",
+        "swarm-coordination",
+        "consensus-voting",
+        "dispatching-parallel-agents",
+        "subagent-driven-development",
+        "track-management"
+      ]
+    },
+    "scientific": {
+      "description": "Scientific research and analysis skills",
+      "skills": ["scientific-skills", "ai-ml-expert", "data-expert"]
+    },
+    "web3": {
+      "description": "Blockchain and Web3 skills",
+      "skills": ["web3-expert", "starknet-react-rules"]
+    }
+  },
+  "contextualTriggers": {
+    "python_project": {
+      "filePatterns": ["*.py", "pyproject.toml", "requirements.txt", "Pipfile", "setup.py"],
+      "description": "Python project detected"
+    },
+    "typescript_project": {
+      "filePatterns": ["*.ts", "*.tsx", "tsconfig.json"],
+      "description": "TypeScript project detected"
+    },
+    "react_project": {
+      "filePatterns": ["*.jsx", "*.tsx"],
+      "packageDependencies": ["react", "react-dom"],
+      "description": "React project detected"
+    },
+    "vue_project": {
+      "filePatterns": ["*.vue"],
+      "packageDependencies": ["vue"],
+      "description": "Vue.js project detected"
+    },
+    "svelte_project": {
+      "filePatterns": ["*.svelte"],
+      "packageDependencies": ["svelte"],
+      "description": "Svelte project detected"
+    },
+    "spring_project": {
+      "filePatterns": ["pom.xml", "build.gradle"],
+      "packageDependencies": ["spring-boot"],
+      "description": "Spring Boot project detected"
+    },
+    "laravel_project": {
+      "filePatterns": ["artisan", "composer.json"],
+      "description": "Laravel project detected"
+    },
+    "fastapi_project": {
+      "packageDependencies": ["fastapi"],
+      "description": "FastAPI project detected"
+    },
+    "scientific_project": {
+      "packageDependencies": ["numpy", "pandas", "scipy", "scikit-learn", "rdkit", "biopython"],
+      "description": "Scientific/research project detected"
+    },
+    "aws_project": {
+      "filePatterns": ["*.tf", "cloudformation*.yaml", "serverless.yml"],
+      "packageDependencies": ["boto3", "@aws-sdk/*"],
+      "description": "AWS project detected"
+    },
+    "gcp_project": {
+      "filePatterns": ["*.tf"],
+      "packageDependencies": ["google-cloud-*", "@google-cloud/*"],
+      "description": "Google Cloud project detected"
+    },
+    "security_review": {
+      "keywords": [
+        "security",
+        "auth",
+        "authentication",
+        "authorization",
+        "vulnerability",
+        "penetration",
+        "threat"
+      ],
+      "description": "Security-focused request"
+    },
+    "browser_testing": {
+      "keywords": ["e2e", "browser", "chrome", "playwright", "cypress", "selenium", "devtools"],
+      "description": "Browser or E2E testing request"
+    },
+    "web3_project": {
+      "packageDependencies": ["ethers", "web3", "hardhat", "foundry"],
+      "description": "Web3/blockchain project detected"
+    },
+    "property_testing": {
+      "keywords": ["property-based", "fast-check", "fuzzing", "invariant", "quickcheck"],
+      "description": "Property-based testing requested"
+    },
+    "nativescript_project": {
+      "packageDependencies": ["@nativescript/core", "nativescript"],
+      "filePatterns": ["nativescript.config.ts", "nativescript.config.js"],
+      "description": "NativeScript mobile project detected"
+    },
+    "webmcp_integration": {
+      "packageDependencies": [
+        "@mcp-b/react-webmcp",
+        "@mcp-b/webmcp-polyfill",
+        "@mcp-b/webmcp-types"
+      ],
+      "keywords": ["webmcp", "modelContext", "browser-side MCP"],
+      "description": "WebMCP browser-side tool integration detected"
+    }
+  },
+  "metadata": {
+    "totalAgents": 66,
+    "agentsByCategory": {
+      "core": 10,
+      "domain": 31,
+      "specialized": 20,
+      "orchestrators": 5
+    },
+    "skillMappingCoverage": "100%",
+    "generatedBy": "developer-agent",
+    "notes": [
+      "Primary skills are loaded on agent initialization",
+      "Secondary skills are loaded on-demand based on task requirements",
+      "Contextual skills are triggered by project detection or explicit request",
+      "Always skills are mandatory for all tasks regardless of context"
+    ]
+  }
+}

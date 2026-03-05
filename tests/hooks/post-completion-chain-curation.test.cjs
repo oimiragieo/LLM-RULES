@@ -103,9 +103,17 @@ describe('Memory Curation Validation', () => {
     const input = buildHookInput({ subagentType: 'developer', metadata: {} });
     const result = runCurationCheck(input.tool_input);
 
-    assert.strictEqual(result.isReflectionAgent, false, 'should not classify developer as reflection');
+    assert.strictEqual(
+      result.isReflectionAgent,
+      false,
+      'should not classify developer as reflection'
+    );
     assert.strictEqual(result.warned, false, 'should not warn for non-reflection agent');
-    assert.strictEqual(result.successMsg, null, 'should not emit success message for non-reflection');
+    assert.strictEqual(
+      result.successMsg,
+      null,
+      'should not emit success message for non-reflection'
+    );
   });
 
   it('validates curationDecisions schema: array of {entry, decision, score, rationale}', () => {
@@ -143,8 +151,16 @@ describe('Memory Curation Validation', () => {
     input.tool_input.prompt = 'You are running the reflection workflow for this session.';
     const result = runCurationCheck(input.tool_input);
 
-    assert.strictEqual(result.isReflectionAgent, true, 'should detect reflection via prompt content');
-    assert.strictEqual(result.warned, true, 'should warn for prompt-detected reflection without curationDecisions');
+    assert.strictEqual(
+      result.isReflectionAgent,
+      true,
+      'should detect reflection via prompt content'
+    );
+    assert.strictEqual(
+      result.warned,
+      true,
+      'should warn for prompt-detected reflection without curationDecisions'
+    );
   });
 
   it('logs correct count when multiple curation decisions are recorded', () => {
