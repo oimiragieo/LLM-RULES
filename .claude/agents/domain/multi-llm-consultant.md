@@ -26,6 +26,7 @@ skills:
   - ripgrep
   - task-management-protocol
   - code-semantic-search
+  - code-structural-search
   - token-saver-context-compression
   - memory-search
 triggerPhrases:

@@ -11,13 +11,14 @@ maxTurns: 28
 permissionMode: default
 priority: high
 tools:
+  - Bash
   - Read
+  - Skill
   - Task
-  - TaskUpdate
-  - TaskList
   - TaskCreate
   - TaskGet
-  - Skill
+  - TaskList
+  - TaskUpdate
 skills:
   - swarm-coordination
   - task-management-protocol

@@ -37,6 +37,7 @@ skills:
   - token-saver-context-compression
   - ripgrep
   - code-semantic-search
+  - code-structural-search
   - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'

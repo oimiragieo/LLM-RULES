@@ -191,4 +191,30 @@ describe('Agent Search Skill Compliance (agent-skill-matrix.json)', () => {
       );
     });
   });
+
+  describe('10. Only one agent-skill-matrix.json exists', () => {
+    it('should not have duplicate matrix files', () => {
+      const stale = path.join(ROOT, '.claude', 'config', 'agent-skill-matrix.json');
+      assert.ok(
+        !fs.existsSync(stale),
+        'Stale duplicate at .claude/config/agent-skill-matrix.json still exists'
+      );
+    });
+  });
+
+  describe('11. Non-exempt agents have verification-before-completion', () => {
+    it('should have verification-before-completion for non-exempt agents', () => {
+      const exempt = ['router', 'reflection-agent'];
+      const missing = [];
+      for (const agent of allAgentEntries) {
+        if (exempt.includes(agent.name)) continue;
+        if (!agent.always.includes('verification-before-completion')) missing.push(agent.name);
+      }
+      assert.strictEqual(
+        missing.length,
+        0,
+        `Agents missing verification-before-completion: ${missing.join(', ')}`
+      );
+    });
+  });
 });

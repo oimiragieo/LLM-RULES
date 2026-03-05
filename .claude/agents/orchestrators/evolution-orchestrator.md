@@ -137,9 +137,10 @@ E - Enable     -> Deploy and register in ecosystem
 // 1. Read current evolution state
 Read('@.claude/context/evolution-state.json');
 
-// 2. Check if similar artifact exists
-Glob('@.claude/agents/**/*.md'); // or skills, workflows, etc.
-Grep('similar capability pattern');
+// 2. Check if similar artifact exists using hybrid search
+Skill({ skill: 'ripgrep', args: 'capability pattern .claude/agents .claude/skills' });
+// OR for broader discovery:
+// pnpm search:code "similar capability pattern"
 
 // 3. Analyze the gap using structured thinking
 Skill({ skill: 'sequential-thinking' });
@@ -149,7 +150,7 @@ Skill({ skill: 'sequential-thinking' });
 **Gate Criteria**:
 
 - [ ] Clear capability gap identified and documented
-- [ ] No existing artifact meets the need (verified with Glob/Grep)
+- [ ] No existing artifact meets the need (verified with hybrid search)
 - [ ] Request is within ecosystem scope (not external integration)
 - [ ] Evolution state updated to "evaluating"
 
@@ -179,12 +180,11 @@ Skill({ skill: 'sequential-thinking' });
 ```javascript
 // Check for naming conflicts
 Read('@.claude/docs/skill-catalog.md');
-Grep('proposed-name', '@.claude/agents/');
-Grep('proposed-name', '@.claude/skills/');
+Skill({ skill: 'ripgrep', args: 'proposed-name .claude/agents .claude/skills' });
 
-// Check capability overlaps
-Glob('@.claude/agents/**/*.md');
-// Read each similar agent and compare capabilities
+// Check capability overlaps using hybrid search
+// pnpm search:code "proposed-name capability"
+// Then Read specific agent files that appear relevant
 
 // Verify naming conventions
 // Agents: kebab-case, descriptive-role
@@ -420,8 +420,9 @@ Read('created-artifact-path');
 // - Examples are functional
 // - Documentation is complete
 
-// For agents, verify skills exist
-Glob('@.claude/skills/*/SKILL.md'); // Check all assigned skills
+// For agents, verify skills exist using ripgrep
+Skill({ skill: 'ripgrep', args: 'SKILL.md .claude/skills' });
+// Then Read specific SKILL.md paths to verify content
 
 // Run validation tools if available
 Bash('node .claude/tools/validate-agents.mjs');
@@ -493,8 +494,13 @@ Edit('@.claude/context/evolution-state.json', {
 });
 
 // 4. Record in memory
-Edit('@.claude/context/memory/learnings.md', 'evolution record');
-Edit('@.claude/context/memory/decisions.md', 'design decisions from research');
+MemoryRecord({
+  type: 'discovery',
+  content: 'Evolution record: <artifact-type> <name> created',
+  area: 'evolution',
+});
+// Record design decisions via MemoryRecord (never Edit memory files directly)
+MemoryRecord({ type: 'pattern', content: 'design decisions from research', area: 'evolution' });
 
 // 5. Run artifact integration analysis (ADR-100)
 Skill({ skill: 'artifact-integrator' });
@@ -843,7 +849,7 @@ Review:
 
 === Phase E: EVALUATE ===
 - Reading evolution state: idle, no current evolution
-- Searching for existing agents: Glob("@.claude/agents/**/*graphql*.md")
+- Searching for existing agents: Skill({ skill: 'ripgrep', args: 'graphql .claude/agents .claude/skills' })
 - Result: No graphql-specific agent found
 - Gap confirmed: Need GraphQL schema reviewer
 - Gate 1 PASSED

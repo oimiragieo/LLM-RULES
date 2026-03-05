@@ -68,7 +68,8 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "token-saver-context-compression",
+          "verification-before-completion"
         ]
       },
       "architect": {
@@ -154,7 +155,8 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "token-saver-context-compression",
+          "verification-before-completion"
         ]
       },
       "context-compressor": {
@@ -172,7 +174,8 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "token-saver-context-compression",
+          "verification-before-completion"
         ]
       },
       "router": {
@@ -621,6 +624,66 @@
           "token-saver-context-compression"
         ]
       },
+      "aso-specialist": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "brand-guardian": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "compliance-checker": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "feedback-synthesizer": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
+      "marketing-strategist": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
+      },
       "llm-architect": {
         "primary": ["ai-ml-expert"],
         "secondary": ["architecture-review", "diagram-generator"],
@@ -720,8 +783,21 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "token-saver-context-compression",
+          "verification-before-completion"
         ]
+      },
+      "ux-researcher": {
+        "always": [
+          "code-semantic-search",
+          "code-structural-search",
+          "memory-search",
+          "ripgrep",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ],
+        "contextual": [],
+        "secondary": []
       }
     },
     "specialized": {
@@ -1070,7 +1146,8 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "token-saver-context-compression",
+          "verification-before-completion"
         ]
       }
     },
@@ -1111,7 +1188,7 @@
         "primary": ["swarm-coordination", "consensus-voting"],
         "secondary": ["dispatching-parallel-agents"],
         "contextual": {},
-        "always": ["task-management-protocol", "ripgrep"]
+        "always": ["task-management-protocol", "ripgrep", "verification-before-completion"]
       },
       "artifact-integrator": {
         "primary": ["project-onboarding", "ripgrep"],

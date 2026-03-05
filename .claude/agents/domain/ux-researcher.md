@@ -16,6 +16,8 @@ skills:
   - context-compressor
   - token-saver-context-compression
   - ripgrep
+  - code-semantic-search
+  - code-structural-search
   - memory-search
   - brainstorming
   - checklist-generator

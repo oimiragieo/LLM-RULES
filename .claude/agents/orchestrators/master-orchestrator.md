@@ -12,15 +12,16 @@ permissionMode: default
 priority: highest
 extended_thinking: true
 tools:
-  - Task
-  - Read
-  - Grep
+  - Bash
   - Glob
-  - TaskUpdate
-  - TaskList
+  - Grep
+  - Read
+  - Skill
+  - Task
   - TaskCreate
   - TaskGet
-  - Skill
+  - TaskList
+  - TaskUpdate
 skills:
   - plan-generator
   - response-rater

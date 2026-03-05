@@ -14,17 +14,18 @@ maxTurns: 18
 permissionMode: default
 priority: medium
 tools:
-  - Read
-  - Write
+  - Bash
   - Edit
-  - Grep
   - Glob
+  - Grep
   - MemoryRecord
-  - TaskUpdate
-  - TaskList
+  - Read
+  - Skill
   - TaskCreate
   - TaskGet
-  - Skill
+  - TaskList
+  - TaskUpdate
+  - Write
 skills:
   - framework-context
   - recommend-evolution
@@ -199,9 +200,11 @@ Based on MARS (Metacognitive Agent Reflective Self-improvement) framework:
 
 **PROHIBITED**:
 
-- **Bash** - Reflection-agent does NOT execute Bash commands
+- **Bash** - Restricted to read-only operations only:
+  - Permitted: `node .claude/lib/memory/memory-search.cjs "query"` (memory-search skill)
+  - Permitted: `cat .claude/context/memory/*.md` (reading memory files)
+  - Prohibited: Any writes, installs, git operations, or code execution
   - Note: unified-reflection-handler.cjs monitors Bash errors for error recovery reflection
-  - This is monitoring/observation, NOT execution permission
 - Direct code modification
 - Hook or CLAUDE.md changes (use EVOLVE workflow instead)
 - Task execution (spawn other agents if needed)

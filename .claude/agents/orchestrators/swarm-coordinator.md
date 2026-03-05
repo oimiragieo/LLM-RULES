@@ -10,13 +10,14 @@ permissionMode: default
 priority: high
 extended_thinking: true
 tools:
-  - Task
+  - Bash
   - Read
-  - TaskUpdate
-  - TaskList
+  - Skill
+  - Task
   - TaskCreate
   - TaskGet
-  - Skill
+  - TaskList
+  - TaskUpdate
 skills:
   - consensus-voting
   - swarm-coordination

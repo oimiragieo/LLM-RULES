@@ -11,6 +11,8 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const AGENTS_DIR = path.join(ROOT, '.claude', 'agents');
 const SKILLS_DIR = path.join(ROOT, '.claude', 'skills');
+const REGISTRY_PATH = path.join(ROOT, '.claude', 'context', 'agent-registry.json');
+const MATRIX_PATH = path.join(ROOT, '.claude', 'context', 'config', 'agent-skill-matrix.json');
 const SUBDIRS = ['core', 'domain', 'specialized', 'orchestrators'];
 
 // Agents exempt from search skill requirements entirely
@@ -105,11 +107,15 @@ function getValidSkillNames() {
 
 let allAgents;
 let validSkills;
+let registry;
+let matrix;
 
 describe('Agent Frontmatter Search Skills Compliance', () => {
   before(() => {
     allAgents = getAllAgentFiles();
     validSkills = getValidSkillNames();
+    registry = JSON.parse(fs.readFileSync(REGISTRY_PATH, 'utf8'));
+    matrix = JSON.parse(fs.readFileSync(MATRIX_PATH, 'utf8'));
     assert.ok(allAgents.length > 0, 'Should find agent .md files');
     assert.ok(validSkills.size > 0, 'Should find skill directories');
   });
@@ -171,6 +177,28 @@ describe('Agent Frontmatter Search Skills Compliance', () => {
         invalid.length,
         0,
         `Agents referencing non-existent skills: ${invalid.join('; ')}`
+      );
+    });
+  });
+
+  describe('5. All registry agents exist in skill matrix', () => {
+    it('should find every registry agent in the matrix', () => {
+      const exempt = ['router'];
+      const matrixAgentNames = new Set();
+      for (const category of Object.values(matrix.agents)) {
+        for (const name of Object.keys(category)) {
+          matrixAgentNames.add(name);
+        }
+      }
+      const missing = [];
+      for (const agent of Object.keys(registry.agents || {})) {
+        if (exempt.includes(agent)) continue;
+        if (!matrixAgentNames.has(agent)) missing.push(agent);
+      }
+      assert.strictEqual(
+        missing.length,
+        0,
+        `Registry agents missing from skill matrix: ${missing.join(', ')}`
       );
     });
   });

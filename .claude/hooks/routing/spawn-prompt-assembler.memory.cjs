@@ -17,10 +17,11 @@ const {
  */
 const INJECTION_PATTERNS = [
   /ignore\s+previous/i,
-  /ignore\s+all/i,
-  /disregard\s+instructions/i,
-  /system\s+prompt/i,
-  /override/i,
+  /ignore\s+all\s+instructions/i,
+  /disregard\s+(all\s+)?(previous\s+)?instructions/i,
+  /\bsystem\s+prompt\b.*\b(leak|reveal|show|dump|expose|ignore|bypass)\b/i,
+  /\b(bypass|ignore|override)\s+(all\s+)?(previous\s+)?instructions/i,
+  /override\s+(all\s+)?(previous\s+)?(system|safety|security|content|ai|model|assistant)/i,
   /you\s+are\s+now/i,
   /forget\s+everything/i,
   /new\s+instructions/i,
