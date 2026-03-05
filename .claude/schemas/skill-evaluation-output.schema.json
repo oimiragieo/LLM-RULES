@@ -1,0 +1,484 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-studio.dev/schemas/skill-evaluation-output.schema.json",
+  "title": "Skill Evaluation Output",
+  "description": "Schema for skill evaluation outputs produced by the grader, comparator, and analyzer agents. Each output type is a discriminated union on the 'workflow' field.",
+  "oneOf": [
+    { "$ref": "#/$defs/GraderReport" },
+    { "$ref": "#/$defs/ComparatorReport" },
+    { "$ref": "#/$defs/AnalyzerReportPostHoc" },
+    { "$ref": "#/$defs/AnalyzerReportBenchmark" }
+  ],
+  "$defs": {
+    "AssertionResult": {
+      "type": "object",
+      "required": ["assertion", "type", "result"],
+      "properties": {
+        "assertion": {
+          "type": "string",
+          "description": "The assertion text as written in the test case"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["file_exists", "contains", "does_not_contain", "tool_called", "tool_not_called", "format", "custom"],
+          "description": "Assertion classification"
+        },
+        "result": {
+          "type": "string",
+          "enum": ["PASS", "FAIL"],
+          "description": "PASS or FAIL; no partial credit"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Quote from transcript or output file supporting the result"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UnverifiedClaim": {
+      "type": "object",
+      "required": ["claim", "status", "reason"],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "description": "The agent's stated claim from the transcript"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["UNVERIFIED", "CONTRADICTED"],
+          "description": "Whether the claim could not be verified or was directly contradicted"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanation of why the claim is unverified or contradicted"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EvalCritique": {
+      "type": "object",
+      "required": ["assertion", "flag", "recommendation"],
+      "properties": {
+        "assertion": {
+          "type": "string",
+          "description": "The assertion being critiqued"
+        },
+        "flag": {
+          "type": "string",
+          "enum": ["too_vague", "not_verifiable", "trivially_true", "missing_coverage"],
+          "description": "Type of weakness in the assertion"
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "Concrete suggestion for improving this assertion"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GraderReport": {
+      "type": "object",
+      "title": "Grader Agent Output",
+      "description": "PASS/FAIL grading report produced by the grader agent after a benchmark test run",
+      "required": ["verdict", "pass_count", "fail_count", "total_assertions", "assertion_results", "instruction_score", "instruction_score_rationale", "summary"],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["PASS", "FAIL"],
+          "description": "Overall verdict for this test run"
+        },
+        "pass_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of assertions that passed"
+        },
+        "fail_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of assertions that failed"
+        },
+        "total_assertions": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total assertion count (pass_count + fail_count)"
+        },
+        "assertion_results": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AssertionResult" },
+          "description": "Per-assertion breakdown with evidence"
+        },
+        "unverified_claims": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/UnverifiedClaim" },
+          "description": "Agent claims in transcript not confirmed by output files"
+        },
+        "eval_critique": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/EvalCritique" },
+          "description": "Weaknesses in the assertions themselves (meta-evaluation)"
+        },
+        "instruction_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "1-10 score for how well the agent followed the skill's instructions"
+        },
+        "instruction_score_rationale": {
+          "type": "string",
+          "description": "One sentence explaining the instruction score"
+        },
+        "summary": {
+          "type": "string",
+          "description": "One-to-two sentence plain-language verdict with top finding"
+        },
+        "metrics": {
+          "type": "object",
+          "description": "Optional timing and resource metrics from the run",
+          "properties": {
+            "token_estimate": { "type": ["integer", "null"], "minimum": 0 },
+            "tool_call_count": { "type": ["integer", "null"], "minimum": 0 },
+            "wall_time_ms": { "type": ["integer", "null"], "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "RubricCriterion": {
+      "type": "object",
+      "required": ["criterion", "dimension", "version_a_score", "version_b_score"],
+      "properties": {
+        "criterion": {
+          "type": "string",
+          "description": "Name of the rubric criterion"
+        },
+        "dimension": {
+          "type": "string",
+          "enum": ["content", "structure"],
+          "description": "Evaluation dimension this criterion belongs to"
+        },
+        "version_a_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Score for Version A on this criterion (1=missing, 5=excellent)"
+        },
+        "version_b_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Score for Version B on this criterion (1=missing, 5=excellent)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Explanation of scores with transcript evidence"
+        }
+      },
+      "additionalProperties": false
+    },
+    "VersionScores": {
+      "type": "object",
+      "required": ["content_score", "structure_score", "overall_score"],
+      "properties": {
+        "content_score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Content dimension aggregate score (1-10)"
+        },
+        "structure_score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Structure dimension aggregate score (1-10)"
+        },
+        "overall_score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Weighted overall score: content 70%, structure 30% (1-10)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ExpectationResult": {
+      "type": "object",
+      "required": ["expectation", "version_a", "version_b"],
+      "properties": {
+        "expectation": {
+          "type": "string",
+          "description": "The expectation text"
+        },
+        "version_a": {
+          "type": "string",
+          "enum": ["PASS", "FAIL"],
+          "description": "Version A result for this expectation"
+        },
+        "version_b": {
+          "type": "string",
+          "enum": ["PASS", "FAIL"],
+          "description": "Version B result for this expectation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ComparatorReport": {
+      "type": "object",
+      "title": "Comparator Agent Output",
+      "description": "Blind A/B comparison report produced by the comparator agent",
+      "required": ["winner", "is_tie", "rubric", "scores", "winner_strengths", "loser_weaknesses", "reasoning", "confidence"],
+      "properties": {
+        "winner": {
+          "type": "string",
+          "enum": ["Version A", "Version B", "Tie"],
+          "description": "Which version won the comparison"
+        },
+        "is_tie": {
+          "type": "boolean",
+          "description": "True only for genuine ties where scores are within 0.5 and pass rates are equal"
+        },
+        "rubric": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RubricCriterion" },
+          "minItems": 1,
+          "description": "Per-criterion scores for both versions; rubric is task-adaptive"
+        },
+        "scores": {
+          "type": "object",
+          "required": ["version_a", "version_b"],
+          "properties": {
+            "version_a": { "$ref": "#/$defs/VersionScores" },
+            "version_b": { "$ref": "#/$defs/VersionScores" }
+          },
+          "additionalProperties": false,
+          "description": "Aggregated content, structure, and overall scores per version"
+        },
+        "expectation_results": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ExpectationResult" },
+          "description": "Per-expectation PASS/FAIL for both versions (if expectations provided)"
+        },
+        "expectation_pass_rates": {
+          "type": "object",
+          "properties": {
+            "version_a": { "type": "number", "minimum": 0, "maximum": 1 },
+            "version_b": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false,
+          "description": "Fraction of expectations passed per version (0.0-1.0)"
+        },
+        "winner_strengths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "2-4 specific strengths of the winning version with transcript evidence"
+        },
+        "loser_weaknesses": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "2-4 specific weaknesses of the losing version with evidence"
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "2-4 sentence explanation of the decision with specific evidence"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"],
+          "description": "Confidence level: high >2.0 margin, medium 0.5-2.0, low <0.5"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ImprovementSuggestion": {
+      "type": "object",
+      "required": ["category", "priority", "suggestion", "rationale"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["instructions", "tools", "examples", "error_handling", "structure", "references"],
+          "description": "Category of the improvement"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["High", "Medium", "Low"],
+          "description": "High: likely flips FAIL to PASS; Medium: improves quality; Low: marginal"
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Concrete, specific suggestion referencing lines or sections in the skill"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Observed failure or evidence this suggestion addresses"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AnalyzerReportPostHoc": {
+      "type": "object",
+      "title": "Analyzer Agent Output (Post-hoc Comparison)",
+      "description": "Analysis report from Workflow A: post-hoc comparison of two skill versions",
+      "required": ["workflow", "comparison_summary", "winner_strengths", "loser_weaknesses", "instruction_scores", "improvement_suggestions"],
+      "properties": {
+        "workflow": {
+          "type": "string",
+          "const": "post_hoc_comparison",
+          "description": "Discriminator field identifying this as Workflow A output"
+        },
+        "comparison_summary": {
+          "type": "object",
+          "required": ["winner", "margin", "comparator_reasoning_confirmed"],
+          "properties": {
+            "winner": { "type": "string", "description": "Version that won the comparison" },
+            "margin": {
+              "type": "string",
+              "enum": ["decisive", "significant", "marginal"],
+              "description": "Magnitude of the win"
+            },
+            "comparator_reasoning_confirmed": {
+              "type": "boolean",
+              "description": "Whether the analyst confirms the Comparator's stated reasoning"
+            },
+            "analyst_note": {
+              "type": "string",
+              "description": "Optional analyst amendment to the Comparator's reasoning"
+            }
+          },
+          "additionalProperties": false
+        },
+        "winner_strengths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["strength", "evidence"],
+            "properties": {
+              "strength": { "type": "string" },
+              "evidence": { "type": "string", "description": "Transcript line or file reference" }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "description": "2-4 specific strengths of the winning version with evidence"
+        },
+        "loser_weaknesses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["weakness", "evidence"],
+            "properties": {
+              "weakness": { "type": "string" },
+              "evidence": { "type": "string", "description": "Transcript line or file reference" }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "description": "2-4 specific weaknesses of the losing version with evidence"
+        },
+        "instruction_scores": {
+          "type": "object",
+          "required": ["version_a", "version_b"],
+          "properties": {
+            "version_a": {
+              "type": "object",
+              "required": ["score", "rationale"],
+              "properties": {
+                "score": { "type": "integer", "minimum": 1, "maximum": 10 },
+                "rationale": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "version_b": {
+              "type": "object",
+              "required": ["score", "rationale"],
+              "properties": {
+                "score": { "type": "integer", "minimum": 1, "maximum": 10 },
+                "rationale": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "description": "Instruction adherence scores (1-10) for each version"
+        },
+        "improvement_suggestions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ImprovementSuggestion" },
+          "description": "Targeted improvement suggestions for the losing skill version"
+        },
+        "execution_insights": {
+          "type": "object",
+          "description": "Optional token/timing comparison between versions",
+          "properties": {
+            "version_a_token_estimate": { "type": ["integer", "null"], "minimum": 0 },
+            "version_b_token_estimate": { "type": ["integer", "null"], "minimum": 0 },
+            "efficiency_gain": { "type": "string", "description": "e.g. '33%'" },
+            "primary_driver": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "AssertionPattern": {
+      "type": "object",
+      "required": ["assertion", "pattern"],
+      "properties": {
+        "assertion": { "type": "string" },
+        "pattern": {
+          "type": "string",
+          "enum": ["always_pass", "always_fail", "passes_with_skill_only", "high_variance"],
+          "description": "Behavioral pattern of this assertion across all runs"
+        },
+        "note": { "type": "string", "description": "Observation about the pattern" }
+      },
+      "additionalProperties": false
+    },
+    "AnalyzerReportBenchmark": {
+      "type": "object",
+      "title": "Analyzer Agent Output (Benchmark Pattern Analysis)",
+      "description": "Analysis report from Workflow B: pattern analysis across multiple grader runs",
+      "required": ["workflow", "run_count", "assertion_patterns", "observations"],
+      "properties": {
+        "workflow": {
+          "type": "string",
+          "const": "benchmark_pattern_analysis",
+          "description": "Discriminator field identifying this as Workflow B output"
+        },
+        "run_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total number of grader runs analyzed"
+        },
+        "assertion_patterns": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AssertionPattern" },
+          "description": "Per-assertion behavioral patterns across all runs"
+        },
+        "observations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Grounded observations about patterns; no improvement suggestions (patterns only)"
+        },
+        "resource_anomalies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["metric", "observation"],
+            "properties": {
+              "metric": {
+                "type": "string",
+                "enum": ["token_usage", "tool_call_count", "wall_time_ms"]
+              },
+              "observation": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Optional resource usage anomalies detected across runs"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

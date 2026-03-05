@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord, WebSearch, WebFetch]
-args: '--skill <name-or-path> [--trigger reflection|evolve|manual|stale_skill] [--mode plan|execute]'
+args: '--skill <name-or-path> [--trigger reflection|evolve|manual|stale_skill|eval_regression] [--mode plan|execute] [--eval-dir <path>]'
 error_handling: graceful
 streaming: supported
 verified: true
@@ -173,6 +173,36 @@ Skill({ skill: 'assimilate' });
 
 Compare current skill against enterprise bundle expectations:
 
+#### Structured Weakness Output Format (Optional — Eval-Backed Analysis)
+
+When evaluation data is available (from a previous eval runner run or grader report), structure Gap Analysis findings using the analyzer taxonomy for consistency with the evaluation pipeline:
+
+```json
+{
+  "gap_analysis_structured": {
+    "instruction_quality_score": 7,
+    "instruction_quality_rationale": "Agent followed main workflow but missed catalog registration step",
+    "weaknesses": [
+      {
+        "category": "instructions",
+        "priority": "High",
+        "finding": "Step 4 says 'update catalog' without specifying file path",
+        "evidence": "3 runs showed agent search loop before finding catalog"
+      },
+      {
+        "category": "references",
+        "priority": "Medium",
+        "finding": "No list of files the skill touches",
+        "evidence": "Path-lookup loops in 4 of 5 transcripts"
+      }
+    ]
+  }
+}
+```
+
+Categories: `instructions` | `tools` | `examples` | `error_handling` | `structure` | `references`
+Priority: `High` (likely changes outcome) | `Medium` (improves quality) | `Low` (marginal)
+
 - `SKILL.md` clarity + trigger rules + **CONTENT PRESERVATION** (Anti-Patterns, Workflows)
 - `scripts/main.cjs` deterministic output contract
 - `hooks/pre-execute.cjs` and `hooks/post-execute.cjs` (MANDATORY: create if missing)
@@ -191,6 +221,31 @@ Compare current skill against enterprise bundle expectations:
 - Convert assimilate output into concrete backlog entries under RED/GREEN/REFACTOR.
 - Do not overwrite local protected sections with imported content.
 
+### Step 3.5: Lean Audit
+
+Before writing any patches, check whether the skill itself has grown too large:
+
+1. **Line count check**: Count lines in the target SKILL.md.
+
+   ```bash
+   wc -l .claude/skills/<name>/SKILL.md
+   ```
+
+   Flag as over-budget if line count exceeds **500** (Anthropic "lean instructions" principle: more instructions hurt compliance once agents saturate on context).
+
+2. **Instruction weight analysis** (when eval data is available): For each major instruction block, ask:
+   - Does eval transcript evidence show agents following this instruction reliably?
+   - If a step has zero observed impact across ≥5 runs, it is a candidate for removal.
+   - Prefer consolidation over deletion: merge two related instructions into one sharper directive.
+
+3. **Output**: Produce a short lean-audit note (3–8 bullets):
+   - Current line count vs 500-line budget
+   - Sections with redundant or overlapping instructions
+   - Specific consolidation or removal candidates with rationale
+   - Net estimated line reduction if recommendations are applied
+
+4. Add lean-audit findings as REFACTOR entries in the Step 4 backlog.
+
 ### Step 4: TDD Refresh Backlog
 
 Create RED/GREEN/REFACTOR/VERIFY plan for the target skill:
@@ -198,6 +253,24 @@ Create RED/GREEN/REFACTOR/VERIFY plan for the target skill:
 1. RED: failing tests for stale or missing behavior
 2. GREEN: minimal implementation updates
 3. REFACTOR: tighten wording, reduce ambiguity, unify contracts
+
+   #### Generalization Check (REFACTOR sub-step)
+
+   After drafting any REFACTOR change, verify it generalizes — not just fixes the triggering failure:
+   - Run (or mentally simulate) the updated instruction against **at least 3 diverse test cases** beyond the one that triggered the update.
+   - Anti-pattern: fiddly, overfitty changes that fix the exact failing case but would break adjacent behavior or introduce a new blind spot.
+   - Principle: **"Rather than fiddly overfitty changes, prefer broader improvements."**
+   - If a proposed change only resolves the single triggering scenario, expand it or discard it in favor of a broader directive.
+
+   #### Comparator Gate (optional, post-REFACTOR)
+
+   When the REFACTOR delta is non-trivial (>10 lines changed or step semantics altered), run a blind comparator before accepting:
+   1. Snapshot the current SKILL.md as **Version A** and the proposed updated SKILL.md as **Version B** (no labels in the prompt — blind comparison only).
+   2. Invoke a comparator agent or use `Skill({ skill: 'agent-evaluation' })`:
+      - Prompt: "Given two versions of a skill file (A and B), which better satisfies the rubric: clarity, completeness, and resistance to overfitting? Answer: A, B, or tie."
+   3. **Accept** Version B only if the comparator selects B or declares a tie.
+   4. **If A wins**: review the specific instructions the comparator preferred in A, iterate on the REFACTOR draft, and run the comparator again before accepting.
+
 4. VERIFY:
    - `node .claude/tools/cli/validate-integration.cjs <target-SKILL.md>`
    - `node .claude/tools/cli/generate-skill-index.cjs`

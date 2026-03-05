@@ -2063,3 +2063,37 @@ When router analysis has no matching agent/skill for recurring intent:
 4. Complete integration wiring and validation before closing the gap.
 
 Do not bypass this flow with direct unmanaged artifact writes.
+
+## Optional: Evaluation-Driven Improvement
+
+After creating a skill, you may optionally run a quality evaluation loop to measure how well the skill guides agents and identify targeted improvements. Evaluation is **opt-in** — the default creation path is unchanged.
+
+### Flags
+
+| Flag                  | Behavior                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| `--quick`             | Default. Skip evaluation; complete after integration steps.                          |
+| `--eval`              | Run full evaluation loop (Create → Benchmark → Grade → Compare → Analyze → Iterate). |
+| `--eval --tier light` | Run lightweight evaluation (Benchmark + Grade only; no compare/analyze).             |
+
+### Evaluation Agents
+
+Three read-only evaluation agents are available in `.claude/skills/skill-creator/agents/`:
+
+- **grader.md** — Produces PASS/FAIL verdicts per assertion + instruction score (1-10)
+- **comparator.md** — Blind A/B comparison between two skill versions with rubric scores
+- **analyzer.md** — Categorized improvement suggestions (instructions/tools/examples/error_handling/structure/references)
+
+### Running an Evaluation
+
+```bash
+node .claude/skills/skill-creator/scripts/eval-runner.cjs \
+  --skill .claude/skills/<skill-name>/SKILL.md \
+  --output .claude/context/tmp/eval-$(date +%Y%m%d-%H%M%S)/
+```
+
+The runner scaffolds the evaluation directory structure and provides step-by-step instructions for executing the with-skill and baseline tracks.
+
+Full workflow documented in: `.claude/skills/skill-creator/EVAL_WORKFLOW.md`
+
+Output schema for all evaluation reports: `.claude/schemas/skill-evaluation-output.schema.json`
