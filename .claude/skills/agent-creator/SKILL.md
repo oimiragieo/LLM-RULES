@@ -10,6 +10,7 @@ tools: [Read, Write, Edit, Glob, Grep, WebSearch, WebFetch, Bash, Task]
 # If a tool becomes unavailable, spawned agents will be notified at spawn time via
 # pre-spawn-tool-validator.cjs hook (Phase 1B)
 # Single source of truth: .claude/config/tool-manifest.json
+args: '<agent-name> [options] [--eval] [--eval --tier light]'
 best_practices:
   - Verify no existing agent matches first
   - Research domain before creating agent
@@ -1733,3 +1734,45 @@ For new patterns, templates, or workflows, research is mandatory:
 - Run targeted tests for changed modules.
 - Run lint/format on changed files.
 - Keep commits scoped by concern (logic/docs/generated artifacts).
+
+## Optional: Evaluation-Driven Improvement
+
+After creating an agent, you may optionally run a quality evaluation loop to measure how well the agent definition guides behavior and identify targeted improvements. Evaluation is **opt-in** — the default creation path is unchanged.
+
+### Flags
+
+| Flag                  | Behavior                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| `--quick`             | Default. Skip evaluation; complete after integration steps.                          |
+| `--eval`              | Run full evaluation loop (Create → Benchmark → Grade → Compare → Analyze → Iterate). |
+| `--eval --tier light` | Run lightweight evaluation (Benchmark + Grade only; no compare/analyze).             |
+
+### Evaluation Agents
+
+Shared read-only evaluation agents at `.claude/skills/skill-creator/agents/`:
+
+- **grader.md** — Produces PASS/FAIL verdicts per assertion + instruction score (1-10)
+- **comparator.md** — Blind A/B comparison between two agent versions with rubric scores
+- **analyzer.md** — Categorized improvement suggestions (instructions/tools/examples/error_handling/structure/references)
+
+### Running an Evaluation
+
+```bash
+node .claude/skills/skill-creator/scripts/eval-runner.cjs \
+  --skill .claude/agents/<agent-type>/<agent-name>.md \
+  --output .claude/context/tmp/eval-$(date +%Y%m%d-%H%M%S)/
+```
+
+### Agent-Specific Assertions
+
+When evaluating agents, focus on:
+
+- **Role boundaries**: Agent stays within its domain; does not execute tasks outside its specialty
+- **TaskUpdate protocol**: Agent calls `TaskUpdate(in_progress)` before work and `TaskUpdate(completed)` after — no missing bookends
+- **Tool usage**: Agent uses only tools listed in frontmatter; no banned-tool violations
+- **Memory protocol**: Agent reads memory before starting and records learnings/decisions after completing
+- **Routing keywords**: Agent's keywords unambiguously route to it without matching unrelated agents
+- **Skill invocation**: Agent uses `Skill()` to invoke assigned skills rather than reading skill files directly
+
+Full workflow: `.claude/skills/skill-creator/EVAL_WORKFLOW.md`
+Output schema: `.claude/schemas/skill-evaluation-output.schema.json`

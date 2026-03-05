@@ -1199,3 +1199,7 @@ After creation completes, run the ecosystem integration checklist:
 - [ ] Schema validator wired (if applicable)
 - [ ] Schema referenced by consuming artifacts
 - [ ] Schema has test data examples
+
+## Evaluation Note
+
+Schema artifacts are deterministic and structurally verifiable — the Step 7 validation tests in this skill's workflow (AJV compilation, `$id` uniqueness check, required-field coverage, test-data round-trip) serve as the primary quality gate and provide stronger signal than LLM-as-judge scoring. For schemas that feed agent or hook output contracts, also validate against `skill-evaluation-output.schema.json` to ensure downstream evaluators can parse the results. Full evaluation protocol and grader/analyzer agent usage is documented in `.claude/skills/skill-creator/EVAL_WORKFLOW.md`.

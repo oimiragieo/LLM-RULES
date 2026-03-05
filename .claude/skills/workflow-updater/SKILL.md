@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, MemoryRecord, WebSearch, WebFetch]
-args: '--workflow <name-or-path> [--trigger reflection|evolve|manual] [--mode plan|execute]'
+args: '--workflow <name-or-path> [--trigger reflection|evolve|manual|eval_regression] [--mode plan|execute] [--eval-dir <path>]'
 error_handling: graceful
 streaming: supported
 verified: true
@@ -256,3 +256,59 @@ Read `.claude/context/memory/learnings.md`, `decisions.md`, `issues.md`.
 - Unresolved blocker → `.claude/context/memory/issues.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## Eval-Backed Gap Analysis
+
+When the `--trigger eval_regression` flag is set or when `--eval-dir <path>` points to an existing evaluation report directory, structure Gap Analysis findings using the analyzer taxonomy for consistency with the evaluation pipeline:
+
+### Structured Weakness Output Format
+
+```json
+{
+  "gap_analysis_structured": {
+    "instruction_quality_score": 7,
+    "instruction_quality_rationale": "Workflow followed main phases but missed phase-gate regression check",
+    "weaknesses": [
+      {
+        "category": "instructions",
+        "priority": "High",
+        "finding": "Phase advance condition not validated against quality-gates.cjs contract",
+        "evidence": "3 runs showed workflow advancing despite gate failures"
+      },
+      {
+        "category": "references",
+        "priority": "Medium",
+        "finding": "No explicit path to workflow-state.json in phase state tracking steps",
+        "evidence": "Path-lookup loops in 4 of 5 transcripts"
+      }
+    ]
+  }
+}
+```
+
+Categories: `instructions` | `tools` | `examples` | `error_handling` | `structure` | `references`
+Priority: `High` (likely changes outcome) | `Medium` (improves quality) | `Low` (marginal)
+
+### Step 3.5: Lean Audit
+
+Before writing any patches, check whether the workflow file has grown too large:
+
+1. **Line count check**: Count lines in the target workflow file.
+
+   ```bash
+   wc -l .claude/workflows/<category>/<name>.md
+   ```
+
+   Flag as over-budget if line count exceeds **500** (lean instructions principle).
+
+2. Produce a short lean-audit note (3–8 bullets): current line count vs 500-line budget, sections with redundant or overlapping phase descriptions, specific consolidation candidates with rationale, and net estimated line reduction.
+
+3. Add lean-audit findings as REFACTOR entries in the backlog.
+
+### Generalization Check
+
+After drafting any REFACTOR change, verify it generalizes across at least 3 diverse workflow use cases. Prefer broader improvements over fiddly overfitty changes that only fix the exact triggering scenario.
+
+### Comparator Gate
+
+When the REFACTOR delta is non-trivial (>10 lines changed or phase semantics altered), run a blind A/B comparison via `Skill({ skill: 'agent-evaluation' })` before accepting. Accept Version B only if the comparator selects B or declares a tie.

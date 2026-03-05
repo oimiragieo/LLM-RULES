@@ -1188,3 +1188,21 @@ For new patterns, templates, or workflows, research is mandatory:
 - Run targeted tests for changed modules.
 - Run lint/format on changed files.
 - Keep commits scoped by concern (logic/docs/generated artifacts).
+
+## Optional: Evaluation Quality Gate
+
+Run the shared evaluation framework to verify template quality:
+
+```bash
+node .claude/skills/skill-creator/scripts/eval-runner.cjs --skill template-creator
+```
+
+Grader assertions for template artifacts:
+
+- **Placeholder tokens documented**: All `<PLACEHOLDER>` tokens are listed with descriptions; no undocumented substitution points remain after rendering
+- **Output structure matches pattern**: Rendered template output matches the documented structure for its type (spawn, artifact, code)
+- **Spawn budget size limit**: Spawn templates render under 50KB (PROMPT_LENGTH_WARNING threshold); templates exceeding this trigger a size audit
+- **Catalog entry present**: Template is registered in `.claude/context/artifacts/catalogs/template-catalog.md` with type, purpose, and placeholder inventory
+- **Consuming skill documented**: At least one skill or agent references this template in its workflow
+
+See `.claude/skills/skill-creator/EVAL_WORKFLOW.md` for full evaluation protocol and grader/analyzer agent usage.

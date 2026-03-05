@@ -1007,3 +1007,21 @@ For new patterns, templates, or workflows, research is mandatory:
 - Run targeted tests for changed modules.
 - Run lint/format on changed files.
 - Keep commits scoped by concern (logic/docs/generated artifacts).
+
+## Optional: Evaluation Quality Gate
+
+Run the shared evaluation framework to verify workflow quality:
+
+```bash
+node .claude/skills/skill-creator/scripts/eval-runner.cjs --skill workflow-creator
+```
+
+Grader assertions for workflow artifacts:
+
+- **Phases coverage**: All required phases (Triage → Design → Implement → Review → Deploy → Document → Reflect) are present or explicitly skipped with justification
+- **Agent coordination handoffs**: Each phase defines `agents`, `inputs`, `outputs`, and `gates`; handoff contracts between phases are explicit
+- **Measurable quality gate criteria**: Each gate specifies pass/fail conditions (not vague descriptions); blocking vs non-blocking gates are labeled
+- **Workflow type classification**: Workflow is filed in the correct category (`core/`, `enterprise/`, `creation/`, `security/`, `operations/`)
+- **Registry entries present**: Workflow is added to `@ENTERPRISE_WORKFLOWS.md` and `@WORKFLOW_AGENT_MAP.md`
+
+See `.claude/skills/skill-creator/EVAL_WORKFLOW.md` for full evaluation protocol and grader/analyzer agent usage.

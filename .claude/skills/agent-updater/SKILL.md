@@ -6,7 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Glob, Grep, Bash, Skill, WebSearch, WebFetch, MemoryRecord]
-args: '--agent <name-or-path> [--trigger reflection|evolve|manual] [--mode plan|execute]'
+args: '--agent <name-or-path> [--trigger reflection|evolve|manual|eval_regression] [--mode plan|execute] [--eval-dir <path>]'
 error_handling: graceful
 streaming: supported
 verified: true
@@ -200,3 +200,59 @@ Do not introduce prompt rules that contradict active hook behavior.
 
 Before: read `.claude/context/memory/learnings.md`
 After: write learnings/decisions/issues updates.
+
+## Eval-Backed Gap Analysis
+
+When the `--trigger eval_regression` flag is set or when `--eval-dir <path>` points to an existing evaluation report directory, structure the Step 3 Gap Analysis findings using the analyzer taxonomy for consistency with the evaluation pipeline:
+
+### Structured Weakness Output Format
+
+```json
+{
+  "gap_analysis_structured": {
+    "instruction_quality_score": 7,
+    "instruction_quality_rationale": "Agent followed main workflow but missed ecosystem sync step",
+    "weaknesses": [
+      {
+        "category": "instructions",
+        "priority": "High",
+        "finding": "TaskUpdate(in_progress) call missing from workflow narrative",
+        "evidence": "3 runs showed agent proceeding without claiming task first"
+      },
+      {
+        "category": "references",
+        "priority": "Medium",
+        "finding": "No explicit path to generate-agent-registry.cjs in Step 7",
+        "evidence": "Path-lookup loops in 4 of 5 transcripts"
+      }
+    ]
+  }
+}
+```
+
+Categories: `instructions` | `tools` | `examples` | `error_handling` | `structure` | `references`
+Priority: `High` (likely changes outcome) | `Medium` (improves quality) | `Low` (marginal)
+
+### Step 3.5: Lean Audit
+
+Before writing any patches, check whether the agent file has grown too large:
+
+1. **Line count check**: Count lines in the target agent file.
+
+   ```bash
+   wc -l .claude/agents/<type>/<name>.md
+   ```
+
+   Flag as over-budget if line count exceeds **500** (lean instructions principle: more instructions hurt compliance once agents saturate on context).
+
+2. Produce a short lean-audit note (3–8 bullets): current line count vs 500-line budget, sections with redundant or overlapping instructions, specific consolidation candidates with rationale, and net estimated line reduction.
+
+3. Add lean-audit findings as REFACTOR entries in the Step 5 backlog.
+
+### Generalization Check
+
+After drafting any REFACTOR change, verify it generalizes across at least 3 diverse agent use cases before accepting. Prefer broader improvements over fiddly overfitty changes that only fix the exact triggering scenario.
+
+### Comparator Gate
+
+When the REFACTOR delta is non-trivial (>10 lines changed or step semantics altered), run a blind A/B comparison via `Skill({ skill: 'agent-evaluation' })` before accepting. Accept Version B only if the comparator selects B or declares a tie.

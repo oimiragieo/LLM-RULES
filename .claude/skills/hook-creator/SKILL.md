@@ -1157,3 +1157,21 @@ For new patterns, templates, or workflows, research is mandatory:
 - Run targeted tests for changed modules.
 - Run lint/format on changed files.
 - Keep commits scoped by concern (logic/docs/generated artifacts).
+
+## Optional: Evaluation Quality Gate
+
+Run the shared evaluation framework to verify hook quality:
+
+```bash
+node .claude/skills/skill-creator/scripts/eval-runner.cjs --skill hook-creator
+```
+
+Grader assertions for hook artifacts:
+
+- **Exit codes correct**: Hook exits `0` (allow) or `2` (block) only; exit `1` is never used (treated as error, not block per SE-03)
+- **100ms performance budget**: Hook body completes in under 100ms; no network calls, no blocking I/O, no long computation in the hot path
+- **Fail-open vs fail-closed policy**: Security hooks (routing, creator, write) are fail-closed (`process.exit(2)` on errors); advisory and PostToolUse hooks are fail-open (`process.exit(0)` on errors)
+- **Graceful error handling**: Hook body is wrapped in `try/catch`; unexpected errors exit `0` (non-critical) or `2` (security-critical) — never crash without an exit code
+- **Registration complete**: Hook is registered in `.claude/settings.json` and documented in `@ENFORCEMENT_HOOKS.md`
+
+See `.claude/skills/skill-creator/EVAL_WORKFLOW.md` for full evaluation protocol and grader/analyzer agent usage.

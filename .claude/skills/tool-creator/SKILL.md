@@ -348,3 +348,21 @@ For new patterns, templates, or workflows, research is mandatory:
 - Run targeted tests for changed modules.
 - Run lint/format on changed files.
 - Keep commits scoped by concern (logic/docs/generated artifacts).
+
+## Optional: Evaluation Quality Gate
+
+Run the shared evaluation framework to verify tool quality:
+
+```bash
+node .claude/skills/skill-creator/scripts/eval-runner.cjs --skill tool-creator
+```
+
+Grader assertions for tool artifacts:
+
+- **`--help` response**: Tool responds to `--help` (or `-h`) with a usage summary including required/optional arguments and at least one example invocation
+- **`shell: false` for child processes**: Any `child_process.spawn` or `execFile` call uses `shell: false` with array arguments (never `shell: true` per SE-security rules)
+- **Graceful missing input handling**: Tool exits with a non-zero code and a human-readable error message when required arguments are absent; no unhandled exceptions or crash dumps
+- **Catalog entry present**: Tool is registered in `.claude/context/artifacts/catalogs/tool-catalog.md` with category, description, and wiring status
+- **Timeout safety**: Long-running operations have explicit timeouts; no infinite loops on missing input
+
+See `.claude/skills/skill-creator/EVAL_WORKFLOW.md` for full evaluation protocol and grader/analyzer agent usage.
