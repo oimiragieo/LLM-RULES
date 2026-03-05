@@ -51,10 +51,7 @@ describe('checkFilesystem - Layer 1', () => {
     const winRoot = PROJECT_ROOT.replace(/\//g, '\\');
     const result = checkFilesystem('skill', 'tdd', winRoot);
     assert.strictEqual(result.found, true, 'should find tdd skill even with backslash root');
-    assert.ok(
-      !result.matchedPath.includes('\\'),
-      'matchedPath should use forward slashes (SE-01)'
-    );
+    assert.ok(!result.matchedPath.includes('\\'), 'matchedPath should use forward slashes (SE-01)');
   });
 });
 
@@ -131,15 +128,7 @@ describe('checkFuzzy - Layer 3', () => {
 
   it('detects auth-validator as similar to authentication-validator (abbreviation expansion)', () => {
     // 'auth' expands to 'authentication'
-    const candidates = checkFuzzy(
-      'skill',
-      'auth-validator',
-      '',
-      [],
-      PROJECT_ROOT,
-      0.3,
-      10
-    );
+    const candidates = checkFuzzy('skill', 'auth-validator', '', [], PROJECT_ROOT, 0.3, 10);
     assert.ok(Array.isArray(candidates), 'should return an array');
     // Validate structure of each candidate
     for (const c of candidates) {
@@ -162,8 +151,10 @@ describe('checkFuzzy - Layer 3', () => {
     );
     // At threshold 0.9, an exact name match would be required; no other skill should score this high
     assert.ok(Array.isArray(candidates), 'should return an array');
-    assert.ok(candidates.length === 0 || candidates.every(c => c.score >= 0.9),
-      'all returned candidates should meet the high threshold');
+    assert.ok(
+      candidates.length === 0 || candidates.every(c => c.score >= 0.9),
+      'all returned candidates should meet the high threshold'
+    );
   });
 
   it('returns array with score, name, and path fields', () => {

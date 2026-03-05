@@ -20,7 +20,15 @@
         },
         "type": {
           "type": "string",
-          "enum": ["file_exists", "contains", "does_not_contain", "tool_called", "tool_not_called", "format", "custom"],
+          "enum": [
+            "file_exists",
+            "contains",
+            "does_not_contain",
+            "tool_called",
+            "tool_not_called",
+            "format",
+            "custom"
+          ],
           "description": "Assertion classification"
         },
         "result": {
@@ -79,7 +87,16 @@
       "type": "object",
       "title": "Grader Agent Output",
       "description": "PASS/FAIL grading report produced by the grader agent after a benchmark test run",
-      "required": ["verdict", "pass_count", "fail_count", "total_assertions", "assertion_results", "instruction_score", "instruction_score_rationale", "summary"],
+      "required": [
+        "verdict",
+        "pass_count",
+        "fail_count",
+        "total_assertions",
+        "assertion_results",
+        "instruction_score",
+        "instruction_score_rationale",
+        "summary"
+      ],
       "properties": {
         "verdict": {
           "type": "string",
@@ -225,7 +242,16 @@
       "type": "object",
       "title": "Comparator Agent Output",
       "description": "Blind A/B comparison report produced by the comparator agent",
-      "required": ["winner", "is_tie", "rubric", "scores", "winner_strengths", "loser_weaknesses", "reasoning", "confidence"],
+      "required": [
+        "winner",
+        "is_tie",
+        "rubric",
+        "scores",
+        "winner_strengths",
+        "loser_weaknesses",
+        "reasoning",
+        "confidence"
+      ],
       "properties": {
         "winner": {
           "type": "string",
@@ -296,7 +322,14 @@
       "properties": {
         "category": {
           "type": "string",
-          "enum": ["instructions", "tools", "examples", "error_handling", "structure", "references"],
+          "enum": [
+            "instructions",
+            "tools",
+            "examples",
+            "error_handling",
+            "structure",
+            "references"
+          ],
           "description": "Category of the improvement"
         },
         "priority": {
@@ -319,7 +352,14 @@
       "type": "object",
       "title": "Analyzer Agent Output (Post-hoc Comparison)",
       "description": "Analysis report from Workflow A: post-hoc comparison of two skill versions",
-      "required": ["workflow", "comparison_summary", "winner_strengths", "loser_weaknesses", "instruction_scores", "improvement_suggestions"],
+      "required": [
+        "workflow",
+        "comparison_summary",
+        "winner_strengths",
+        "loser_weaknesses",
+        "instruction_scores",
+        "improvement_suggestions"
+      ],
       "properties": {
         "workflow": {
           "type": "string",

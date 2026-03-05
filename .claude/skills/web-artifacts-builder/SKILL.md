@@ -1,5 +1,5 @@
-<!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
----
+## <!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
+
 verified: true
 lastVerifiedAt: 2026-03-05T00:00:00.000Z
 name: web-artifacts-builder
@@ -14,14 +14,16 @@ category: frontend
 tags: [react, typescript, tailwind, shadcn, artifacts, html, bundle, vite, parcel]
 aliases: [artifact-builder, react-artifact, web-artifact]
 best_practices:
-  - Initialize with init-artifact.sh before any code
-  - Use shadcn/ui components from the pre-installed catalog
-  - Bundle with bundle-artifact.sh to get single-file HTML output
-  - Avoid Inter font, purple gradients, centered layouts (AI slop)
-  - Present artifact first, test only if issues arise
-  - Keep all state in React — no external APIs unless explicitly requested
-error_handling: strict
-streaming: supported
+
+- Initialize with init-artifact.sh before any code
+- Use shadcn/ui components from the pre-installed catalog
+- Bundle with bundle-artifact.sh to get single-file HTML output
+- Avoid Inter font, purple gradients, centered layouts (AI slop)
+- Present artifact first, test only if issues arise
+- Keep all state in React — no external APIs unless explicitly requested
+  error_handling: strict
+  streaming: supported
+
 ---
 
 # Web Artifacts Builder
@@ -37,6 +39,7 @@ This skill enables building elaborate React applications that bundle into a sing
 ## When to Invoke
 
 Use this skill when:
+
 - Building an interactive tool, calculator, dashboard, or form
 - The artifact needs React state management (not a static page)
 - The artifact uses shadcn/ui components (buttons, dialogs, tables, etc.)
@@ -55,6 +58,7 @@ cd <project-name>
 ```
 
 The `scripts/init-artifact.sh` script creates a fully configured project:
+
 - React 18 + TypeScript (via Vite)
 - Tailwind CSS 3.4.1 with shadcn/ui theming
 - Path aliases (`@/`) configured
@@ -64,6 +68,7 @@ The `scripts/init-artifact.sh` script creates a fully configured project:
 - Node 18+ compatibility (auto-pins Vite version)
 
 **After init, project structure:**
+
 ```
 <project-name>/
 ├── src/
@@ -85,17 +90,17 @@ Edit the generated files. Key patterns:
 All 40+ components are pre-installed. Import directly:
 
 ```tsx
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 export function MyArtifact() {
   return (
@@ -115,7 +120,7 @@ export function MyArtifact() {
 #### State Management Pattern
 
 ```tsx
-import { useState } from "react";
+import { useState } from 'react';
 
 interface AppState {
   items: string[];
@@ -126,7 +131,7 @@ interface AppState {
 export function App() {
   const [state, setState] = useState<AppState>({
     items: [],
-    input: "",
+    input: '',
     loading: false,
   });
 
@@ -135,15 +140,11 @@ export function App() {
     setState(prev => ({
       ...prev,
       items: [...prev.items, prev.input],
-      input: "",
+      input: '',
     }));
   };
 
-  return (
-    <div className="min-h-screen bg-background p-8">
-      {/* ... */}
-    </div>
-  );
+  return <div className="min-h-screen bg-background p-8">{/* ... */}</div>;
 }
 ```
 
@@ -164,12 +165,14 @@ textarea, toast, toggle, toggle-group, tooltip
 #### Design Guidelines
 
 Avoid AI slop patterns:
+
 - No `font-family: Inter` or `font-sans` as primary (use a distinctive font)
 - No purple gradient headers
 - No centered-everything layout
 - No uniform `rounded-lg` on every element
 
 Use intentional design:
+
 ```tsx
 // Good: distinctive typography + intentional colors
 <h1 className="text-4xl font-black tracking-tight text-slate-900">
@@ -192,6 +195,7 @@ bash scripts/bundle-artifact.sh
 **Requirements**: `index.html` must exist in the project root.
 
 **What the script does:**
+
 1. Installs bundling dependencies (parcel, @parcel/config-default, parcel-resolver-tspaths, html-inline)
 2. Creates `.parcelrc` config with path alias support
 3. Builds with Parcel (no source maps, optimized)
@@ -204,6 +208,7 @@ bash scripts/bundle-artifact.sh
 Display `bundle.html` in the Claude conversation. The artifact renders directly in the conversation interface.
 
 For file system access, the artifact is at:
+
 ```
 <project-name>/bundle.html
 ```
@@ -213,6 +218,7 @@ For file system access, the artifact is at:
 Testing is optional. Present the artifact first — test only if issues arise or if explicitly requested. Testing adds latency between request and delivery.
 
 If testing is needed:
+
 ```bash
 # Playwright/Puppeteer for visual verification
 npx playwright screenshot bundle.html screenshot.png
@@ -224,7 +230,7 @@ npx playwright screenshot bundle.html screenshot.png
 
 ```tsx
 // Simple tab-based navigation (no router needed for single-page artifacts)
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function App() {
   return (
@@ -254,13 +260,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 interface Item {
   id: string;
   name: string;
   value: number;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
 }
 
 function DataTable({ items }: { items: Item[] }) {
@@ -279,7 +285,7 @@ function DataTable({ items }: { items: Item[] }) {
             <TableCell className="font-medium">{item.name}</TableCell>
             <TableCell>{item.value}</TableCell>
             <TableCell>
-              <Badge variant={item.status === "active" ? "default" : "secondary"}>
+              <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>
                 {item.status}
               </Badge>
             </TableCell>
@@ -295,18 +301,18 @@ function DataTable({ items }: { items: Item[] }) {
 
 ```tsx
 // Recharts is available via shadcn/ui chart component
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis } from "recharts";
+import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis } from 'recharts';
 
 const data = [
-  { month: "Jan", value: 400 },
-  { month: "Feb", value: 300 },
-  { month: "Mar", value: 600 },
+  { month: 'Jan', value: 400 },
+  { month: 'Feb', value: 300 },
+  { month: 'Mar', value: 600 },
 ];
 
 function MyChart() {
   return (
-    <ChartContainer config={{ value: { label: "Value", color: "#2563eb" } }}>
+    <ChartContainer config={{ value: { label: 'Value', color: '#2563eb' } }}>
       <BarChart data={data}>
         <XAxis dataKey="month" />
         <YAxis />
@@ -320,22 +326,24 @@ function MyChart() {
 
 ## Troubleshooting
 
-| Issue | Cause | Fix |
-|---|---|---|
-| Bundle fails with path alias error | `@/` not resolved | Check `.parcelrc` has `parcel-resolver-tspaths` |
-| Styles not applying | Tailwind not in content paths | Verify `tailwind.config.js` includes `./src/**/*.{ts,tsx}` |
-| Components not found | shadcn not installed | Run `npx shadcn@latest add <component>` |
-| Bundle too large | External dependencies inlined | Use CDN-linked deps or tree-shake imports |
-| White screen in artifact | Runtime error | Check browser console, add error boundary |
+| Issue                              | Cause                         | Fix                                                        |
+| ---------------------------------- | ----------------------------- | ---------------------------------------------------------- |
+| Bundle fails with path alias error | `@/` not resolved             | Check `.parcelrc` has `parcel-resolver-tspaths`            |
+| Styles not applying                | Tailwind not in content paths | Verify `tailwind.config.js` includes `./src/**/*.{ts,tsx}` |
+| Components not found               | shadcn not installed          | Run `npx shadcn@latest add <component>`                    |
+| Bundle too large                   | External dependencies inlined | Use CDN-linked deps or tree-shake imports                  |
+| White screen in artifact           | Runtime error                 | Check browser console, add error boundary                  |
 
 ## Memory Protocol
 
 Before starting artifact development:
+
 ```bash
 cat .claude/context/memory/learnings.md | grep -i "artifact\|react\|shadcn\|tailwind"
 ```
 
 Record patterns after completion:
+
 - Effective component combinations → `.claude/context/memory/learnings.md`
 - Bundling issues → `.claude/context/memory/issues.md`
 

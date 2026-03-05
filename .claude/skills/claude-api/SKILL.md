@@ -1,5 +1,5 @@
-<!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
----
+## <!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
+
 verified: true
 lastVerifiedAt: 2026-03-05T00:00:00.000Z
 name: claude-api
@@ -14,14 +14,16 @@ category: development
 tags: [claude, anthropic, api, sdk, llm, agents, typescript, python]
 aliases: [anthropic-api, anthropic-sdk]
 best_practices:
-  - Use claude-opus-4-6 as default model unless user specifies otherwise
-  - Use thinking with type adaptive not budget_tokens (deprecated)
-  - Use streaming for requests with long input, output, or high max_tokens
-  - Use get_final_message or finalMessage helper for complete streamed responses
-  - Parse tool inputs with proper JSON methods not string operations
-  - Never truncate user inputs — discuss options instead
-error_handling: strict
-streaming: supported
+
+- Use claude-opus-4-6 as default model unless user specifies otherwise
+- Use thinking with type adaptive not budget_tokens (deprecated)
+- Use streaming for requests with long input, output, or high max_tokens
+- Use get_final_message or finalMessage helper for complete streamed responses
+- Parse tool inputs with proper JSON methods not string operations
+- Never truncate user inputs — discuss options instead
+  error_handling: strict
+  streaming: supported
+
 ---
 
 # Claude API & Agent SDK
@@ -39,20 +41,20 @@ Infer language from project files. Support: Python, TypeScript/JavaScript, Java/
 
 ## Which Surface to Use
 
-| Use Case | Surface |
-|---|---|
-| Single LLM call (classify, summarize, extract, Q&A) | Claude API direct |
-| Multi-step pipelines with tool use | Claude API + tool use |
-| Open-ended autonomous agents | Claude API agentic loop or Agent SDK |
-| Built-in tools (files, web, terminal) | Agent SDK |
+| Use Case                                            | Surface                              |
+| --------------------------------------------------- | ------------------------------------ |
+| Single LLM call (classify, summarize, extract, Q&A) | Claude API direct                    |
+| Multi-step pipelines with tool use                  | Claude API + tool use                |
+| Open-ended autonomous agents                        | Claude API agentic loop or Agent SDK |
+| Built-in tools (files, web, terminal)               | Agent SDK                            |
 
 ## Current Models
 
-| Model | ID | Context | Input $/1M | Output $/1M |
-|---|---|---|---|---|
-| Claude Opus 4.6 | `claude-opus-4-6` | 200K (1M beta) | $5.00 | $25.00 |
-| Claude Sonnet 4.6 | `claude-sonnet-4-6` | 200K (1M beta) | $3.00 | $15.00 |
-| Claude Haiku 4.5 | `claude-haiku-4-5` | 200K | $1.00 | $5.00 |
+| Model             | ID                  | Context        | Input $/1M | Output $/1M |
+| ----------------- | ------------------- | -------------- | ---------- | ----------- |
+| Claude Opus 4.6   | `claude-opus-4-6`   | 200K (1M beta) | $5.00      | $25.00      |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` | 200K (1M beta) | $3.00      | $15.00      |
+| Claude Haiku 4.5  | `claude-haiku-4-5`  | 200K           | $1.00      | $5.00       |
 
 **Default to `claude-opus-4-6`** unless the user explicitly requests another model.
 
@@ -79,10 +81,10 @@ response = client.messages.create(
 ```typescript
 // TypeScript — adaptive thinking
 const response = await client.messages.create({
-  model: "claude-opus-4-6",
+  model: 'claude-opus-4-6',
   max_tokens: 16000,
-  thinking: { type: "adaptive" },
-  messages: [{ role: "user", content: "Explain quantum entanglement" }],
+  thinking: { type: 'adaptive' },
+  messages: [{ role: 'user', content: 'Explain quantum entanglement' }],
 });
 ```
 
@@ -106,14 +108,14 @@ print(response.content[0].text)
 ### TypeScript
 
 ```typescript
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic(); // Uses ANTHROPIC_API_KEY env var
 
 const response = await client.messages.create({
-  model: "claude-opus-4-6",
+  model: 'claude-opus-4-6',
   max_tokens: 1024,
-  messages: [{ role: "user", content: "Hello, Claude!" }],
+  messages: [{ role: 'user', content: 'Hello, Claude!' }],
 });
 console.log(response.content[0].text);
 ```
@@ -141,13 +143,13 @@ final = stream.get_final_message()
 
 ```typescript
 const stream = await client.messages.stream({
-  model: "claude-opus-4-6",
+  model: 'claude-opus-4-6',
   max_tokens: 4096,
-  messages: [{ role: "user", content: prompt }],
+  messages: [{ role: 'user', content: prompt }],
 });
 
 for await (const chunk of stream) {
-  if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
+  if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
     process.stdout.write(chunk.delta.text);
   }
 }
@@ -237,16 +239,16 @@ response = client.beta.messages.create(
 ### TypeScript
 
 ```typescript
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic();
 
 const response = await client.beta.messages.create({
-  model: "claude-opus-4-6",
+  model: 'claude-opus-4-6',
   max_tokens: 4096,
-  tools: [{ type: "web_search_20250305", name: "web_search" }],
-  messages: [{ role: "user", content: "Research the latest MCP developments" }],
-  betas: ["interleaved-thinking-2025-05-14"],
+  tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+  messages: [{ role: 'user', content: 'Research the latest MCP developments' }],
+  betas: ['interleaved-thinking-2025-05-14'],
 });
 ```
 
@@ -302,24 +304,28 @@ messages.append({"role": "assistant", "content": response.content})
 ## Multi-Language Quick Reference
 
 **Go:**
+
 ```go
 import "github.com/anthropics/anthropic-sdk-go"
 client := anthropic.NewClient()
 ```
 
 **Java:**
+
 ```java
 import com.anthropic.client.AnthropicClient;
 AnthropicClient client = AnthropicClient.builder().build();
 ```
 
 **Ruby:**
+
 ```ruby
 require "anthropic"
 client = Anthropic::Client.new
 ```
 
 **cURL:**
+
 ```bash
 curl https://api.anthropic.com/v1/messages \
   -H "x-api-key: $ANTHROPIC_API_KEY" \
@@ -330,23 +336,25 @@ curl https://api.anthropic.com/v1/messages \
 
 ## Common Pitfalls
 
-| Pitfall | Fix |
-|---|---|
-| Using `budget_tokens` in thinking | Use `thinking: {type: "adaptive"}` instead |
-| Truncating long inputs | Discuss chunking or summarization options with user |
-| Using `output_format` | Use `output_config: {format: {...}}` instead |
-| Not streaming large responses | Add streaming for `max_tokens > 4096` |
+| Pitfall                            | Fix                                                       |
+| ---------------------------------- | --------------------------------------------------------- |
+| Using `budget_tokens` in thinking  | Use `thinking: {type: "adaptive"}` instead                |
+| Truncating long inputs             | Discuss chunking or summarization options with user       |
+| Using `output_format`              | Use `output_config: {format: {...}}` instead              |
+| Not streaming large responses      | Add streaming for `max_tokens > 4096`                     |
 | String manipulation on tool inputs | Use `json.loads(block.input)` / `JSON.parse(block.input)` |
-| Hardcoding API key | Use `ANTHROPIC_API_KEY` env var always |
+| Hardcoding API key                 | Use `ANTHROPIC_API_KEY` env var always                    |
 
 ## Memory Protocol
 
 Read before working on Claude API integrations:
+
 ```bash
 cat .claude/context/memory/learnings.md | grep -i "api\|anthropic\|sdk"
 ```
 
 Record findings after completing work:
+
 - Integration patterns → `.claude/context/memory/learnings.md`
 - API gotchas → `.claude/context/memory/issues.md`
 

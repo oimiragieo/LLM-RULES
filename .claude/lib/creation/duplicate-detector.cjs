@@ -190,11 +190,20 @@ function checkRegistry(artifactType, name, projectRoot) {
       case 'hook':
         return checkHookRegistry(name, root);
       case 'workflow':
-        return checkCatalogText(name, `${root}/.claude/context/artifacts/catalogs/workflow-catalog.md`);
+        return checkCatalogText(
+          name,
+          `${root}/.claude/context/artifacts/catalogs/workflow-catalog.md`
+        );
       case 'template':
-        return checkCatalogText(name, `${root}/.claude/context/artifacts/catalogs/template-catalog.md`);
+        return checkCatalogText(
+          name,
+          `${root}/.claude/context/artifacts/catalogs/template-catalog.md`
+        );
       case 'schema':
-        return checkCatalogText(name, `${root}/.claude/context/artifacts/catalogs/schema-catalog.md`);
+        return checkCatalogText(
+          name,
+          `${root}/.claude/context/artifacts/catalogs/schema-catalog.md`
+        );
       default:
         return { found: false, matchedPath: null };
     }
@@ -229,9 +238,8 @@ function checkAgentRegistry(name, root) {
   const normalizedName = String(name).toLowerCase();
   for (const key of Object.keys(agents)) {
     if (String(key).toLowerCase() === normalizedName) {
-      const filePath = agents[key] && agents[key].filePath
-        ? normalizePath(String(agents[key].filePath))
-        : null;
+      const filePath =
+        agents[key] && agents[key].filePath ? normalizePath(String(agents[key].filePath)) : null;
       return { found: true, matchedPath: filePath };
     }
   }
@@ -242,7 +250,9 @@ function checkAgentRegistry(name, root) {
  * Check skill-index.json and skill-catalog.md for a skill by name.
  */
 function checkSkillRegistry(name, root) {
-  const skillIndexPath = normalizePath(`${root}/.claude/context/artifacts/catalogs/skill-index.json`);
+  const skillIndexPath = normalizePath(
+    `${root}/.claude/context/artifacts/catalogs/skill-index.json`
+  );
   const normalizedName = String(name).toLowerCase();
 
   // Try skill-index.json first
@@ -255,7 +265,7 @@ function checkSkillRegistry(name, root) {
       if (data && typeof data === 'object') {
         const entries = Array.isArray(data) ? data : Object.keys(data);
         for (const entry of entries) {
-          const entryName = typeof entry === 'string' ? entry : (entry && entry.name);
+          const entryName = typeof entry === 'string' ? entry : entry && entry.name;
           if (entryName && String(entryName).toLowerCase() === normalizedName) {
             return { found: true, matchedPath: skillIndexPath };
           }
@@ -384,7 +394,10 @@ function checkFuzzy(
       const itemNormalized = normalizeForFuzzy(item.name);
       const itemNameTokens = tokenize(itemNormalized);
       const itemDescTokens = item.description ? tokenize(String(item.description)) : [];
-      const itemCombinedTokens = [...itemNameTokens, ...(item.triggerPhrases || []).flatMap(p => tokenize(String(p)))];
+      const itemCombinedTokens = [
+        ...itemNameTokens,
+        ...(item.triggerPhrases || []).flatMap(p => tokenize(String(p))),
+      ];
 
       // Name similarity (primary)
       const nameScore = jaccardSimilarity(proposedNameTokens, itemNameTokens);
@@ -438,15 +451,22 @@ function buildCorpus(artifactType, proposedName, root) {
         const agents = data && data.agents;
         if (agents && typeof agents === 'object') {
           for (const [agentName, agentData] of Object.entries(agents)) {
-            if (!agentName || String(agentName).toLowerCase() === String(proposedName).toLowerCase()) continue;
+            if (
+              !agentName ||
+              String(agentName).toLowerCase() === String(proposedName).toLowerCase()
+            )
+              continue;
             if (seenNames.has(agentName)) continue;
             seenNames.add(agentName);
 
-            const caps = Array.isArray(agentData && agentData.capabilities) ? agentData.capabilities : [];
+            const caps = Array.isArray(agentData && agentData.capabilities)
+              ? agentData.capabilities
+              : [];
             const firstCap = caps[0] || {};
             corpus.push({
               name: agentName,
-              path: agentData && agentData.filePath ? normalizePath(String(agentData.filePath)) : '',
+              path:
+                agentData && agentData.filePath ? normalizePath(String(agentData.filePath)) : '',
               description: firstCap.description || '',
               triggerPhrases: Array.isArray(firstCap.triggerPhrases) ? firstCap.triggerPhrases : [],
             });
@@ -533,7 +553,10 @@ function collectArtifactEntries(dir, pattern) {
         }
       } else if (item.isDirectory()) {
         // Recurse into subdirectories for hooks/workflows/templates/schemas
-        const subEntries = collectArtifactEntries(normalizePath(path.join(dir, item.name)), pattern);
+        const subEntries = collectArtifactEntries(
+          normalizePath(path.join(dir, item.name)),
+          pattern
+        );
         entries.push(...subEntries);
       }
     }
@@ -590,7 +613,10 @@ function checkDuplicate(options) {
 
   // Determine which layers to run
   const layersEnv = process.env.DUPLICATE_DETECTION_LAYERS || 'filesystem,registry,fuzzy';
-  const layers = layersEnv.split(',').map(l => l.trim().toLowerCase()).filter(Boolean);
+  const layers = layersEnv
+    .split(',')
+    .map(l => l.trim().toLowerCase())
+    .filter(Boolean);
 
   // Layer 1: Filesystem
   if (layers.includes('filesystem')) {

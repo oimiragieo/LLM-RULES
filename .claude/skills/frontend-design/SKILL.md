@@ -1,5 +1,5 @@
-<!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
----
+## <!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
+
 verified: true
 lastVerifiedAt: 2026-03-05T00:00:00.000Z
 name: frontend-design
@@ -14,14 +14,16 @@ category: frontend
 tags: [ui, design, css, react, typography, animation, components, aesthetics]
 aliases: [ui-design, design-system, frontend-aesthetics]
 best_practices:
-  - Choose a bold aesthetic direction and execute it with precision
-  - Avoid generic AI slop — centered layouts, Inter/Arial/Roboto, purple gradients, uniform rounded corners
-  - Select fonts that are characterful and context-appropriate, not default safe choices
-  - Commit to a cohesive color palette with dominant and sharp accent colors
-  - Prioritize high-impact motion (page load, key transitions) over scattered micro-interactions
-  - Match code complexity to vision — elaborate for maximalist, restrained for minimalist
-error_handling: strict
-streaming: supported
+
+- Choose a bold aesthetic direction and execute it with precision
+- Avoid generic AI slop — centered layouts, Inter/Arial/Roboto, purple gradients, uniform rounded corners
+- Select fonts that are characterful and context-appropriate, not default safe choices
+- Commit to a cohesive color palette with dominant and sharp accent colors
+- Prioritize high-impact motion (page load, key transitions) over scattered micro-interactions
+- Match code complexity to vision — elaborate for maximalist, restrained for minimalist
+  error_handling: strict
+  streaming: supported
+
 ---
 
 # Frontend Design
@@ -44,6 +46,7 @@ This skill enables creation of distinctive, production-grade frontend interfaces
 Generic AI-generated interfaces share predictable patterns that signal laziness:
 
 **Overused patterns to AVOID:**
+
 - Centered hero layout with heading + subtext + CTA button
 - Inter, Arial, Roboto, or system-ui as primary font
 - Purple-to-blue gradient as accent color
@@ -54,6 +57,7 @@ Generic AI-generated interfaces share predictable patterns that signal laziness:
 - Generic icons (plus, arrow, chevron) for decorative purposes
 
 **What to do instead:**
+
 - Choose an aesthetic direction and commit to it fully
 - Make typography do real work — size contrast, weight variation, spacing rhythm
 - Use color that creates tension or warmth, not just fills space
@@ -119,8 +123,10 @@ Generic AI-generated interfaces share predictable patterns that signal laziness:
 
 .surface {
   background: var(--bg);
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04);
 }
 ```
 
@@ -136,13 +142,13 @@ Generic AI-generated interfaces share predictable patterns that signal laziness:
   --bg: #0d1117;
   --text: #c9d1d9;
   --accent: #58a6ff;
-  --grid: rgba(255,255,255,0.04);
+  --grid: rgba(255, 255, 255, 0.04);
   --mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
 .data-panel {
-  background: rgba(13,17,23,0.95);
-  border: 1px solid rgba(48,54,61,0.8);
+  background: rgba(13, 17, 23, 0.95);
+  border: 1px solid rgba(48, 54, 61, 0.8);
   font-family: var(--mono);
 }
 ```
@@ -157,13 +163,13 @@ Generic AI-generated interfaces share predictable patterns that signal laziness:
 
 Don't reach for Inter, Arial, or system-ui. Choose fonts that carry meaning:
 
-| Intention | Good Choices | Avoid |
-|---|---|---|
-| Premium / Editorial | Canela, GT Sectra, Freight Text | Georgia |
-| Technical / Precise | JetBrains Mono, IBM Plex Mono | Courier |
-| Modern / Professional | GT America, Neue Haas Grotesk | Inter, Helvetica |
-| Warm / Approachable | Sora, Plus Jakarta Sans, Nunito | Roboto, Open Sans |
-| Bold / Display | Clash Display, Cabinet Grotesk | Futura |
+| Intention             | Good Choices                    | Avoid             |
+| --------------------- | ------------------------------- | ----------------- |
+| Premium / Editorial   | Canela, GT Sectra, Freight Text | Georgia           |
+| Technical / Precise   | JetBrains Mono, IBM Plex Mono   | Courier           |
+| Modern / Professional | GT America, Neue Haas Grotesk   | Inter, Helvetica  |
+| Warm / Approachable   | Sora, Plus Jakarta Sans, Nunito | Roboto, Open Sans |
+| Bold / Display        | Clash Display, Cabinet Grotesk  | Futura            |
 
 ### Type Scale
 
@@ -171,16 +177,33 @@ Use a clear hierarchy:
 
 ```css
 /* Display: hero headlines */
-.text-display { font-size: clamp(3rem, 8vw, 7rem); font-weight: 900; line-height: 0.95; }
+.text-display {
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 900;
+  line-height: 0.95;
+}
 
 /* Heading: section titles */
-.text-h1 { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 700; line-height: 1.1; }
+.text-h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
 
 /* Body: readable text */
-.text-body { font-size: 1rem; line-height: 1.65; letter-spacing: 0.01em; }
+.text-body {
+  font-size: 1rem;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
 
 /* Caption: secondary info */
-.text-caption { font-size: 0.8125rem; line-height: 1.4; letter-spacing: 0.04em; text-transform: uppercase; }
+.text-caption {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 ```
 
 ## Color System
@@ -198,8 +221,8 @@ Use a clear hierarchy:
   --color-text-muted: #6b5e4e;
 
   /* Accent: 10% of UI */
-  --color-accent: #c17b4a;        /* primary actions */
-  --color-accent-sharp: #e05a2b;  /* hover/active states */
+  --color-accent: #c17b4a; /* primary actions */
+  --color-accent-sharp: #e05a2b; /* hover/active states */
 }
 ```
 
@@ -214,30 +237,55 @@ High-impact reveals on page load (not scattered micro-interactions):
 ```css
 /* Staggered content entry */
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.hero-heading { animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.hero-sub { animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
-.hero-cta { animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+.hero-heading {
+  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.hero-sub {
+  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+.hero-cta {
+  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
 ```
 
 ### Purposeful Transitions
 
 ```css
 /* State transitions: fast and responsive */
-.button { transition: background-color 150ms ease, transform 100ms ease; }
-.button:hover { transform: translateY(-1px); }
-.button:active { transform: translateY(0); }
+.button {
+  transition:
+    background-color 150ms ease,
+    transform 100ms ease;
+}
+.button:hover {
+  transform: translateY(-1px);
+}
+.button:active {
+  transform: translateY(0);
+}
 
 /* Panel reveals: deliberate */
-.modal { transition: opacity 250ms ease, transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.modal {
+  transition:
+    opacity 250ms ease,
+    transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 ```
 
 ### Using Animation Libraries
 
 For complex sequences:
+
 - **Framer Motion** (React) — spring physics, layout animations, shared element transitions
 - **GSAP** — timeline-based, scroll-triggered, high-performance
 - **CSS @starting-style** — native enter/exit animations (modern browsers)
@@ -266,9 +314,15 @@ Don't constrain everything to a uniform container:
 
 ```css
 /* Let elements breathe */
-.hero { padding: 12rem 0 8rem; }
-.section { padding: 8rem 0; }
-.card { padding: 2.5rem; }
+.hero {
+  padding: 12rem 0 8rem;
+}
+.section {
+  padding: 8rem 0;
+}
+.card {
+  padding: 2.5rem;
+}
 ```
 
 ### Intentional Asymmetry
@@ -296,11 +350,13 @@ Before declaring a component done:
 ## Memory Protocol
 
 Before designing interfaces:
+
 ```bash
 cat .claude/context/memory/learnings.md | grep -i "design\|ui\|frontend\|css"
 ```
 
 After completing design work, record patterns:
+
 - Effective typography combinations → `.claude/context/memory/learnings.md`
 - Color system decisions → `.claude/context/memory/decisions.md`
 

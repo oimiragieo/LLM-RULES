@@ -100,9 +100,17 @@ The following workflows guide this agent's execution:
 **Approach**: Research first, validate always, deploy safely
 **Values**: Quality over speed, consistency over novelty, documentation over assumptions
 
-## Code Search
+## Search Protocol
 
-Use `ripgrep` skill for fast text/regex search across the codebase when needed.
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths (agent definitions, config files). Never use `Read`, `Grep`, or `Glob` for open-ended discovery — use the search skills above.
 
 ## Primary Responsibility
 

@@ -161,8 +161,7 @@ function buildPlaceholderTrack(trackName, skillPath, tier) {
   const now = Date.now();
   return {
     transcript: {
-      _note:
-        'This is a placeholder. In a live eval, the agent conversation log is captured here.',
+      _note: 'This is a placeholder. In a live eval, the agent conversation log is captured here.',
       track: trackName,
       skill_active: trackName === 'with-skill',
       skill_path: trackName === 'with-skill' ? skillPath : null,
@@ -181,8 +180,7 @@ function buildPlaceholderTrack(trackName, skillPath, tier) {
       tool_call_count: null,
       wall_time_ms: null,
       captured_at: new Date(now).toISOString(),
-      _note:
-        'Metrics are populated during live execution. Null values indicate placeholder run.',
+      _note: 'Metrics are populated during live execution. Null values indicate placeholder run.',
     },
   };
 }

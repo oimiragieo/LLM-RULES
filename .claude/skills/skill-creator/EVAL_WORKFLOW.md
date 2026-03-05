@@ -8,7 +8,7 @@ This document describes the optional evaluation loop for skill-creator. It is re
 
 ### Explanation Over Commands
 
-Rather than mandating evaluation steps, this workflow explains *why* each step matters. When you understand the reasoning, you can adapt the workflow intelligently instead of following it mechanically.
+Rather than mandating evaluation steps, this workflow explains _why_ each step matters. When you understand the reasoning, you can adapt the workflow intelligently instead of following it mechanically.
 
 ### Lean Instructions
 
@@ -18,10 +18,10 @@ Keep each skill under ~500 lines. If a skill's SKILL.md has grown large, the `--
 
 ## When to Use Evaluation
 
-| Path | When | Duration |
-|------|------|----------|
-| `--quick` (default) | Iterating fast, early draft, non-critical skill | 0 min overhead |
-| `--eval` | Before promoting a skill to production use or sharing widely | 10–20 min |
+| Path                | When                                                         | Duration       |
+| ------------------- | ------------------------------------------------------------ | -------------- |
+| `--quick` (default) | Iterating fast, early draft, non-critical skill              | 0 min overhead |
+| `--eval`            | Before promoting a skill to production use or sharing widely | 10–20 min      |
 
 The quick path (default behavior) preserves the existing research-synthesis → create → integrate workflow unchanged. The eval path adds an optional post-creation loop.
 
@@ -45,6 +45,7 @@ Run parallel test cases with two tracks:
 - **Baseline track**: agent executes the same task without any skill guidance
 
 **What the eval runner captures:**
+
 - Output files produced by each track
 - Agent transcript (tool calls, decisions, deviations)
 - Token usage estimate
@@ -74,6 +75,7 @@ Skill({ skill: 'skill-creator', args: '--grade <eval-output-dir>' });
 The grader produces a structured JSON report (see schema: `.claude/schemas/skill-evaluation-output.schema.json`).
 
 **What to watch:**
+
 - `instruction_score < 6`: skill instructions have gaps — agent deviated significantly
 - `fail_count > 0`: specific assertion failures need attention
 - `eval_critique`: weak assertions need strengthening before next iteration
@@ -100,14 +102,14 @@ Invoke the Analyzer agent for targeted improvement suggestions:
 
 The analyzer produces improvement suggestions organized by category:
 
-| Category | Address |
-|----------|---------|
-| `instructions` | Clarity, ordering, specificity of workflow steps |
-| `tools` | Missing tool calls, wrong tool, missing tool docs |
-| `examples` | Missing, outdated, or misleading examples |
-| `error_handling` | Missing error cases, silent failures |
-| `structure` | Section ordering, heading hierarchy |
-| `references` | Missing file path references |
+| Category         | Address                                           |
+| ---------------- | ------------------------------------------------- |
+| `instructions`   | Clarity, ordering, specificity of workflow steps  |
+| `tools`          | Missing tool calls, wrong tool, missing tool docs |
+| `examples`       | Missing, outdated, or misleading examples         |
+| `error_handling` | Missing error cases, silent failures              |
+| `structure`      | Section ordering, heading hierarchy               |
+| `references`     | Missing file path references                      |
 
 Each suggestion is tagged High / Medium / Low priority. Focus on **High** first.
 
@@ -125,11 +127,11 @@ Apply the High-priority suggestions from Step 5 as an additive patch to the skil
 
 Not every skill needs the full loop. Use the tier that matches the skill's complexity and risk:
 
-| Tier | Complexity | Required Steps | Notes |
-|------|------------|---------------|-------|
-| **TRIVIAL** | TRIVIAL | None | Skip eval entirely; quick path only |
-| **LIGHT** | LOW | Steps 2+3 only | Benchmark + Grade; no compare/analyze |
-| **FULL** | MEDIUM+ | Steps 2–6 | Complete loop with iteration |
+| Tier        | Complexity | Required Steps | Notes                                 |
+| ----------- | ---------- | -------------- | ------------------------------------- |
+| **TRIVIAL** | TRIVIAL    | None           | Skip eval entirely; quick path only   |
+| **LIGHT**   | LOW        | Steps 2+3 only | Benchmark + Grade; no compare/analyze |
+| **FULL**    | MEDIUM+    | Steps 2–6      | Complete loop with iteration          |
 
 The `--eval` flag runs the FULL tier. Use `--eval --tier light` for the LIGHT tier.
 
@@ -164,6 +166,7 @@ Agents communicate via structured JSON files in the eval output directory. The s
 `.claude/schemas/skill-evaluation-output.schema.json`
 
 Key fields:
+
 - Grader → `grader-report.json`: `verdict`, `assertion_results`, `instruction_score`
 - Comparator → `comparator-report.json`: `winner`, `scores`, `confidence`
 - Analyzer → `analyzer-report.json`: `improvement_suggestions[]` with `category`, `priority`

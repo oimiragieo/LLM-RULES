@@ -1,5 +1,5 @@
-<!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
----
+## <!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
+
 verified: true
 lastVerifiedAt: 2026-03-05T00:00:00.000Z
 name: doc-coauthoring
@@ -14,14 +14,16 @@ category: writing
 tags: [documentation, writing, collaboration, prd, spec, proposal, rfc, design-doc]
 aliases: [collaborative-writing, doc-writing, document-creation]
 best_practices:
-  - Ask clarifying questions before writing a single word
-  - Brainstorm 5-20 options per section then curate the best
-  - Use str_replace for targeted edits — never reprint entire documents
-  - Test with reader sub-agents before declaring complete
-  - Scaffold the full document early with placeholders
-  - Preserve authorial voice and preferences across sections
-error_handling: strict
-streaming: supported
+
+- Ask clarifying questions before writing a single word
+- Brainstorm 5-20 options per section then curate the best
+- Use str_replace for targeted edits — never reprint entire documents
+- Test with reader sub-agents before declaring complete
+- Scaffold the full document early with placeholders
+- Preserve authorial voice and preferences across sections
+  error_handling: strict
+  streaming: supported
+
 ---
 
 # Doc Co-Authoring Workflow
@@ -35,6 +37,7 @@ This skill guides collaborative document creation through three structured stage
 ## When to Invoke
 
 Triggers for this skill:
+
 - "Write a doc" / "Draft a proposal" / "Create a spec"
 - Product Requirements Document (PRD)
 - Design document / Technical spec
@@ -52,6 +55,7 @@ Triggers for this skill:
 Close knowledge gaps before writing anything.
 
 **Ask clarifying questions:**
+
 - What type of document is this? (PRD, design doc, proposal, RFC, runbook...)
 - Who is the audience? (engineers, executives, customers, mixed...)
 - What decisions should readers be able to make after reading this?
@@ -62,6 +66,7 @@ Close knowledge gaps before writing anything.
 If the user provides a brain dump, meeting notes, or links to existing docs — absorb everything. Extract the key requirements, constraints, and decisions already made.
 
 **Meta-context check:**
+
 - Are there existing templates or style guides to follow?
 - Is there a prior version of this document?
 - Are there related documents readers will cross-reference?
@@ -149,11 +154,13 @@ Answer these questions:
 ```
 
 **Integrate reader feedback:**
+
 - For each gap the reader found: decide whether to address in the doc or treat as out-of-scope
 - Targeted edits only — don't restructure unless essential
 - Re-test reader if major sections were changed
 
 **Completion criteria:**
+
 - [ ] All placeholder sections filled
 - [ ] Reader sub-agent can answer "what is this for?" correctly
 - [ ] No critical unanswered questions identified by reader
@@ -179,6 +186,7 @@ Never reprint the entire document to show one changed sentence. This respects th
 ### Preserve authorial voice
 
 If the author writes in a particular style (casual/formal, first-person/third-person, active/passive), match it in all additions. Note their stylistic choices explicitly:
+
 - "I notice you're using first-person plural ('we'). I'll maintain that."
 - "Your examples are concrete and code-focused. I'll keep examples technical."
 
@@ -203,11 +211,13 @@ Sections: Executive Summary, Problem, Proposed Solution, Business Case, Risks, T
 ## Memory Protocol
 
 Before starting a co-authoring session:
+
 ```bash
 cat .claude/context/memory/learnings.md | grep -i "doc\|writing\|spec\|prd"
 ```
 
 After completing a document, record patterns that worked:
+
 - Effective section structures → `.claude/context/memory/learnings.md`
 - Document types with special requirements → `.claude/context/memory/issues.md`
 

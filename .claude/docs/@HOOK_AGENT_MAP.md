@@ -45,7 +45,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 
 ### UserPromptSubmit (Router only)
 
-1. `force-step0-execution.cjs`
+1. `step0-reflection-enforcer.cjs`
 2. `reflection-queue-processor.cjs`
 3. `sanitize-debug-log.cjs`
 4. `state-reset.cjs`
