@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-03-04T16:25:10.692Z"
+      "last_accessed": "2026-03-05T04:36:12.662Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "discovered_at": "2026-02-11",
@@ -269,7 +269,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-22T00:48:23.801Z",
-      "last_accessed": "2026-03-03T19:47:02.035Z"
+      "last_accessed": "2026-03-04T21:12:27.764Z"
     },
     "tests/hooks/reflection/gap-log-injection.test.cjs": {
       "discovered_at": "2026-02-22T00:52:35.029Z",
@@ -367,7 +367,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-03-03T20:01:35.736Z",
-      "last_accessed": "2026-03-03T20:01:47.013Z"
+      "last_accessed": "2026-03-05T04:02:24.126Z"
     },
     "tests/hooks/workflow/post-completion-chain-extraction.test.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -439,8 +439,38 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-03-04T15:45:59.556Z",
-      "last_accessed": "2026-03-04T15:45:59.556Z"
+      "last_accessed": "2026-03-05T05:43:07.730Z"
+    },
+    ".claude/hooks/process-evolution-queue.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T21:12:20.153Z",
+      "last_accessed": "2026-03-04T21:12:20.153Z"
+    },
+    "tests/hooks/process-evolution-queue.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T21:12:58.914Z",
+      "last_accessed": "2026-03-04T21:13:40.277Z"
+    },
+    "tests/hooks/post-completion-chain-curation.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-04T21:13:18.506Z",
+      "last_accessed": "2026-03-04T21:14:13.126Z"
+    },
+    ".claude/lib/creation/duplicate-detector.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-05T18:28:26.039Z",
+      "last_accessed": "2026-03-05T18:40:08.016Z"
+    },
+    "tests/lib/creation/duplicate-detector.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-05T18:29:18.228Z",
+      "last_accessed": "2026-03-05T18:29:18.228Z"
     }
   },
-  "last_updated": "2026-03-04T16:25:10.692Z"
+  "last_updated": "2026-03-05T18:40:08.016Z"
 }

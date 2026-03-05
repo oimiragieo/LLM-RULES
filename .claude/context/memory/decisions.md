@@ -1,3 +1,22 @@
+## ADR-2026-03-05-065: Graduated Eval Rollout Pattern for Creator Skills (2026-03-05)
+
+**Status:** Accepted
+**Context:** Adding LLM-as-judge evaluation patterns to 8 creator/updater SKILL.md files. Risk varies significantly across skill types. Applying identical eval depth to all would create unnecessary complexity in low-risk skills.
+
+**Decision:** Use three complexity tiers for eval rollout across creator skills:
+
+- **FULL** (structured eval sections with grader assertions): agent-creator, agent-updater, workflow-creator, workflow-updater — high-impact, high-risk creators
+- **LIGHT** (brief eval guidance, simpler assertions): hook-creator, template-creator, tool-creator — medium-risk creators
+- **NOTE** (single paragraph): schema-creator — low-risk, highly constrained output
+
+Execute as canary rollout: schema-creator first (lowest risk), validate pattern, then expand.
+
+**Implementation:** Commit e1a7f9be. 8 SKILL.md files + skill-index.json updated. Lint/format clean. Multi-LLM review (Gemini+Claude) validated plan before implementation.
+
+**Consequences:** All 8 creator/updater skills now have proportional eval guidance. Codex limitation documented: fails plan-review tasks consistently (confirmed in task 8). Pre-edit snapshot capability identified as follow-up improvement. Shared eval agent location deferred as next deliverable.
+
+---
+
 ## ADR-2026-03-04-064: Framework-Path Worktree Isolation Override (2026-03-04)
 
 **Status:** Accepted

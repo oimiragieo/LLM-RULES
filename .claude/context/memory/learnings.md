@@ -1,3 +1,24 @@
+## Batch Reflection Closure (2026-03-05 Session 2)
+
+Second batch: 5 stale reflection requests from enterprise-search-audit pipeline (2026-03-04 23:35:56–23:54:18). All task completion reflections with task summaries present. Gap observations repeated across all 5 requests:
+
+- architect prompt-too-long error (2 retries)
+- developer incomplete agent-skill-matrix.json update (5 agents missed, re-spawn triggered)
+
+Pattern identified: Agent scope control failures + incomplete task metadata across multi-agent workflows.
+
+---
+
+## Batch Reflection Closure (2026-03-05 Session 1)
+
+5 stale reflection requests from 2026-03-04 (21:11:00–21:23:39) acknowledged and closed. All lacked `summary` metadata — the mandatory field required for actionable reflection. Sessions completing without summary metadata are non-analyzable; reflection cannot produce quality scores or learnings without it.
+
+**Pattern:** Task completions without summary metadata → reflection unable to analyze → institutional learnings lost across sessions.
+
+**Recommendation:** Enforce `summary` field as BLOCKING in pre-completion-validation.cjs. TaskUpdate(completed) without summary >50 chars should error, not silently skip reflection intake.
+
+---
+
 ### Framework-Path Worktree Override (2026-03-04)
 
 - Worktree isolation (`isolation: worktree`) causes silent data loss when an agent targets `.claude/` framework paths — writes go into the isolated clone and are discarded at cleanup

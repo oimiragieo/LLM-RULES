@@ -1,102 +1,44 @@
-## SYSTEMIC ISSUE: Developer Worktree Placeholder Output — 43% Failure Rate (2026-03-04)
+## ISSUE: TaskUpdate Metadata Compliance — Stale Reflections Tasks 16 and 1 (2026-03-05, session 2)
 
-**Status**: RESOLVED (2026-03-04) — Fixed in commit 775ccf1f. See ADR-2026-03-04-064. `shouldOverrideWorktreeIsolation()` added to spawn-prompt-assembler.task-tools.cjs; framework paths now bypass worktree isolation automatically. 26 tests added.
+**Status**: OPEN — P1 (ESCALATED FURTHER — two more null-yield reflections in this session batch)
 
-**Pattern**: Tasks 3, 4, and 4-wave2-dev all produced ONLY `.claude/context/code-index/` changes with zero source code modifications.
+**Instances this batch**:
 
-**Root Cause**: Developer agent has `isolation: worktree` in frontmatter (documented in developer.md). When developer is spawned to work on framework paths (`.claude/hooks/`, `.claude/tools/`, `.claude/skills/`), the write target is the worktree clone (clean HEAD), not the parent repo. Changes to framework paths go into the clone and are discarded on worktree cleanup. Meanwhile, the code-indexer running in the worktree DOES write to `.claude/context/code-index/` (relative path), so index changes persist while source changes disappear.
+- Task 16 (2026-03-05T04:46:28.321Z) — fallback summary, score withheld
+- Task 1 (2026-03-05T05:30:30.891Z) — fallback summary, score withheld
+- Task 2 (2026-03-05T05:33:56.031Z) — real summary provided, score 0.81 (PASS, dataQuality: partial)
 
-**Instances in Current Session**:
+**Note**: Task 2 had a real summary ("Updated orchestrator agent prompts for search-first compliance") demonstrating agents CAN provide summaries. Tasks 16 and 1 are strict enforcement failures.
 
-1. Task 3 (2026-03-04T04:11:00Z): P0 LTM eviction fixes, worktree `ae8bf3c0` → only `.claude/context/code-index/` changed
-2. Task 4 (2026-03-04T04:12:55Z): access_count wiring, worktree `a9ae5f1a` → only `.claude/context/code-index/` changed
-3. Task 4-wave2-dev: stale-index detection, worktree `a51602f1` → only `.claude/context/code-index/` changed
+**Cumulative pattern**: 14+ violations now documented. The `pre-completion-validation.cjs` advisory mode is demonstrably insufficient.
 
-**Prior Related Instance**: Code-reviewer with worktree isolation also failed (2026-03-03 morning, documented in earlier issue). Reroute without isolation → succeeded.
+**Immediate action required**: Convert hook from advisory (warn) to blocking (block) for the fallback string pattern `/Task \d+ completed without summary metadata/`.
 
-**Impact**: 43% of tasks in current session failed with placeholder output. Work is silently lost unless gap log detects it.
-
-**Fix Options**:
-
-**Option A (Recommended)**: Route framework tasks to non-isolated agents
-
-- Tasks targeting `.claude/hooks/`, `.claude/tools/`, `.claude/agents/`, `.claude/skills/` → route to devops or technical-writer
-- Keeps developer isolated for source code work only
-- Technical-writer is designed for `.claude/` documentation paths
-
-**Option B**: Spawn-time isolation override
-
-- When developer task targets `.claude/` paths, override `isolation: none` at spawn time
-- Simpler to implement but doesn't solve for code-reviewer
-
-**Option C**: Completion validation gate (supplementary)
-
-- Add to developer.md prompt: "Before marking complete, verify source files (not just .claude/context/code-index/) were modified"
-- Gap log would catch this earlier
-- Doesn't prevent the failure, just detects it sooner
-
-**Recommendation**: Implement Option A + Option C. Route framework tasks out of developer worktree. Add completion validation gate as backstop.
-
-**Evidence**:
-
-- Gap log entries: 4 entries in session-gap-log.jsonl documenting placeholder output
-- Batch reflection report: `.claude/context/reports/reflections/batch-reflection-session-2026-03-04.md`
-
-**Priority**: P1 — blocks critical framework maintenance tasks
+**Priority**: P1 — now requires developer agent to implement the block mode.
 
 ---
 
-## SYSTEMIC ISSUE: Devops Commit Failures — Strike 2 Repetition (2026-03-04)
+## ISSUE: TaskUpdate Metadata Compliance Persistent Failure — Task 16 Missing Summary (2026-03-05)
 
-**Status**: OPEN — P1 (agent learned nothing from Strike 1)
+**Status**: OPEN — P1 (ESCALATED — recurrence count now 12+, threshold for systemic action exceeded)
 
-**Instance**: Task 7 (2026-03-04T04:31:49Z) — "Commit all changes and push to remote"
+**Instance**: Task 16 (2026-03-05T04:46:28.321Z) — completed with fallback text "Task 16 completed without summary metadata"
 
-**Symptom**: `git status` shows A/M staged files, but HEAD unchanged at 180009b2 after devops completed. Commit never succeeded despite files being staged.
+**Pattern**: Identical fallback string observed across Tasks 7, 8, 1, 4, 10, 9, and now 16. Recurrence counter in failure-recurrence.json was at 11 for Task 9. Task 16 extends this streak.
 
-**Root Cause Analysis** (requires investigation):
+**Data Quality**: Reflection analysis yielded `dataQuality: "insufficient"` — score withheld per Iron Law. No filesModified, no outputArtifacts, no summary provided.
 
-1. **Pre-commit hook blocking** (likely): ESLint rule SEC-023 (max-lines 500) may reject commit if any staged file exceeds limit
-2. **Worktree isolation** (if task 7 spawned with isolation): Commit succeeds in clone but parent HEAD unchanged
-3. **Error message suppression**: Devops spawn prompt may not propagate pre-commit hook output, so agent can't learn what's blocking
+**Cumulative Impact**: The learning system is accumulating null-yield reflection events. Each missing-metadata completion wastes a reflection cycle (hook fires, agent spawns, but no learnings can be extracted). The audit trail for Task 16 is a complete blank.
 
-**Strike Pattern**: Gap log explicitly marks this as "Strike 2", implying Strike 1 also failed on same task. Agent did NOT learn from Strike 1 failure. Either:
+**Required Escalation**: The `pre-completion-validation.cjs` hook MUST be updated to BLOCK (not warn) when summary is the fallback string. Current advisory-only mode is failing to enforce the contract after 12+ violations.
 
-- Same error repeated (hook is still blocking), OR
-- Error message not fed back to agent, so retry is identical to first attempt
+**Actionable Fix**:
 
-**Impact**: Work staged but uncommitted. Next session sees dangling staged changes. Remote push fails. Pipeline blocked.
+1. Update `pre-completion-validation.cjs`: change summary validation from warn to block when summary matches `/Task \d+ completed without summary metadata/`
+2. Update all agent spawn templates to include the exact summary contract: "summary MUST be 50+ characters describing what was accomplished (not the fallback string)"
+3. Escalate to evolution-orchestrator if next 3 reflections still yield insufficient data
 
-**Verification Commands**:
-
-```bash
-# Check current state
-git status -s
-git log --oneline -5
-
-# Check if worktree isolation was used (look for worktree/ in git branch name)
-git branch -a
-
-# Check pre-commit hook output (run manually)
-git commit -m "test" 2>&1 | head -20  # Will fail but shows error
-```
-
-**Fix Recommendations**:
-
-1. **Immediate** (this session): Verify task 7 git state. Are files still staged or committed?
-
-2. **Root cause investigation**:
-   - Check if devops agent has `isolation: worktree` (it shouldn't — devops needs to commit to parent)
-   - Run pre-commit hook manually: `git commit --all -m "test"` and capture error output
-   - Check if ESLint max-lines is blocking any staged files
-
-3. **Error context propagation**: Devops spawn prompt should include pre-commit hook output when retry is attempted. Currently error message is lost.
-
-4. **Strike 3 gate**: After Strike 2 failure, instead of automatic Strike 3 retry, ask user for input (per 3-strike-rule in CLAUDE.md Section 0.1).
-
-**Related gotcha**: "Devops commit pattern (SYSTEMIC)" in codebase map. This issue is known to recur.
-
-**Priority**: P1 — blocks release/deployment pipeline
+**Priority**: P1 (upgraded from P2)
 
 ---
 
@@ -997,6 +939,15 @@ git commit -m "test" 2>&1 | head -20  # Will fail but shows error
 
 - [ROUTING WARN] Developer task routing warned. Keyword "c4 context diagram" suggests specialist "c4-context". Prompt triggered warning instead of block. Date: 2026-03-02T05:29:18.136Z
 
+## Devops Metadata Pattern (2026-03-04)
+
+- Issue: Devops agents (task 9, git push tasks) complete successfully but fail to call TaskUpdate with summary metadata
+- Pattern: Task completes (git operations succeed), but no `summary`, `filesModified`, or `outputArtifacts` in metadata
+- Root Cause: Pre-completion-validation.cjs may not be blocking sufficiently; devops agents skip metadata collection
+- Impact: Reflection analysis withholds scores; task quality cannot be assessed
+- Status: Recurring (observed in session 2026-03-04)
+- Fix: Strengthen TaskUpdate enforcement hook for devops agents; require metadata before status=completed is accepted
+
 - [ROUTING WARN] Developer task routing warned. Keyword "c4 container diagram" suggests specialist "c4-container". Prompt triggered warning instead of block. Date: 2026-03-02T05:29:18.153Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "c4 component diagram" suggests specialist "c4-component". Prompt triggered warning instead of block. Date: 2026-03-02T05:29:18.174Z
@@ -1678,3 +1629,27 @@ git commit -m "test" 2>&1 | head -20  # Will fail but shows error
 - [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-04T16:26:23.787Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-04T16:26:23.801Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-05T04:28:43.122Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-05T04:28:43.137Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-05T04:28:43.149Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-05T04:32:32.720Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-05T04:32:32.733Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-05T04:32:32.747Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-05T04:34:37.893Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-05T04:34:37.908Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-05T04:34:37.920Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-05T04:37:00.068Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-05T04:37:00.083Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-05T04:37:00.096Z
