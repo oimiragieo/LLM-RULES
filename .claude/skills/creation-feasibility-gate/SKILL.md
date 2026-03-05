@@ -51,17 +51,50 @@ Run a fast preflight feasibility check before creating a new agent/skill/workflo
 - Identify expected runtime/tool dependencies
 - Identify expected owner agents
 
-### Step 2: Preflight Checks
+### Step 2: Existence/Duplication Check (Iron Law #2)
+
+Use the shared duplicate detection library:
+
+```javascript
+const { checkDuplicate } = require('.claude/lib/creation/duplicate-detector.cjs');
+const result = checkDuplicate({
+  artifactType: artifactType, // from Step 1 classification
+  name: proposedName,
+  description: proposedDescription,
+});
+
+if (result.decision === 'EXACT_MATCH') {
+  return {
+    gate: 'BLOCK',
+    reason: `Artifact exists at ${result.matchedPath}. Use the ${artifactType}-updater skill instead.`,
+  };
+}
+if (result.decision === 'REGISTRY_MATCH') {
+  return {
+    gate: 'WARN',
+    reason: `"${proposedName}" found in ${result.message} but file may be missing. Investigate.`,
+  };
+}
+if (result.decision === 'SIMILAR_FOUND') {
+  return {
+    gate: 'WARN',
+    reason: `Similar artifacts found: ${result.candidates.map(c => `${c.name} (${(c.score * 100).toFixed(0)}%)`).join(', ')}. Confirm creation is intentional.`,
+  };
+}
+return { gate: 'PASS' };
+```
+
+The 3 detection layers (filesystem, registry/catalog, fuzzy/semantic) are handled internally by the library. See `.claude/lib/creation/duplicate-detector.cjs` for details.
+
+### Step 2.5: Additional Preflight Checks
 
 Run these checks with concrete evidence:
 
-1. **Existence/duplication check**
-   - Catalogs + registry + artifact paths
-2. **Stack compatibility check**
+1. **Stack compatibility check**
    - Required tooling/runtime present in current project conventions
-3. **Integration readiness check**
+2. **Integration readiness check**
    - Can it be routed/discovered/assigned after creation?
-4. **Security/creator boundary check**
+3. **Security/creator boundary check**
    - Ensure creator path and governance can be satisfied
 
 ### Step 3: Decision

@@ -186,6 +186,31 @@ Skill({ skill: 'research-synthesis' });
 
 **BLOCKING**: Template creation CANNOT proceed without research-synthesis invocation.
 
+### Step 0.1: Smart Duplicate Detection (MANDATORY)
+
+Before proceeding with creation, run the 3-layer duplicate check:
+
+```javascript
+const { checkDuplicate } = require('.claude/lib/creation/duplicate-detector.cjs');
+const result = checkDuplicate({
+  artifactType: 'template',
+  name: proposedName,
+  description: proposedDescription,
+  keywords: proposedKeywords || [],
+});
+```
+
+**Handle results:**
+
+- **`EXACT_MATCH`**: Stop creation. Route to `template-updater` skill instead: `Skill({ skill: 'template-updater' })`
+- **`REGISTRY_MATCH`**: Warn user — artifact is registered but file may be missing. Investigate before creating. Ask user to confirm.
+- **`SIMILAR_FOUND`**: Display candidates with scores. Ask user: "Similar artifact(s) exist. Continue with new creation or update existing?"
+- **`NO_MATCH`**: Proceed to next step.
+
+**Override**: If user explicitly passes `--force`, skip this check entirely.
+
+---
+
 ### Step 0.5: Companion Check
 
 Before proceeding with creation, run the ecosystem companion check:

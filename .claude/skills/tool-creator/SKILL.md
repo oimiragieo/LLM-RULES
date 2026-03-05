@@ -33,7 +33,32 @@ find .claude/tools/ -name "<tool-name>.*" -type f
 
 If EXISTS → use `Read` to inspect the current tool file, then `Edit` to apply changes directly. Run the post-creation integration steps (Step 4) after updating.
 
-If NEW → continue with Step 0.5.
+If NEW → continue with Step 0.1.
+
+## Step 0.1: Smart Duplicate Detection (MANDATORY)
+
+Before proceeding with creation, run the 3-layer duplicate check:
+
+```javascript
+const { checkDuplicate } = require('.claude/lib/creation/duplicate-detector.cjs');
+const result = checkDuplicate({
+  artifactType: 'tool',
+  name: proposedName,
+  description: proposedDescription,
+  keywords: proposedKeywords || [],
+});
+```
+
+**Handle results:**
+
+- **`EXACT_MATCH`**: Stop creation. Route to `tool-updater` skill instead: `Skill({ skill: 'tool-updater' })`
+- **`REGISTRY_MATCH`**: Warn user — artifact is registered but file may be missing. Investigate before creating. Ask user to confirm.
+- **`SIMILAR_FOUND`**: Display candidates with scores. Ask user: "Similar artifact(s) exist. Continue with new creation or update existing?"
+- **`NO_MATCH`**: Proceed to next step.
+
+**Override**: If user explicitly passes `--force`, skip this check entirely.
+
+---
 
 ## Step 0.5: Companion Check
 
