@@ -1,7 +1,7 @@
 ---
 name: debug-log-analysis
-description: 'Structured debug log analysis for Claude Code sessions — copy log, run reducer, extract error patterns, correlate with full log, produce observability report. Fills 5 identified gaps: hook error body capture, agent identity, file path tracking, stall correlation, success visibility.'
-version: 1.2.0
+description: 'Structured debug log analysis for Claude Code sessions — auto-discovers most recent log, runs reducer, extracts error patterns, correlates with full log, produces observability report. Fills 5 identified gaps: hook error body capture, agent identity, file path tracking, stall correlation, success visibility.'
+version: 1.3.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -9,10 +9,17 @@ category: Debugging
 agents: [reflection-agent, devops-troubleshooter, developer]
 tags: [debugging, observability, debug-log, errors, reflection, telemetry]
 tools: [Read, Write, Bash, Grep]
+args:
+  - name: session_id
+    description: Specific session UUID to analyze (default: most recent log)
+    required: false
+  - name: output_path
+    description: Where to write the analysis report (default: auto-generated)
+    required: false
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: '2026-03-01'
+lastVerifiedAt: '2026-03-05'
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -30,38 +37,86 @@ Structured workflow for extracting actionable signal from Claude Code session de
 
 ## Prerequisites
 
-Read `scripts/reduce-debug-log.mjs` first to understand reducer arguments.
+The `scripts/reduce-debug-log.mjs` script auto-detects the most recent log when no file argument is provided. It copies the log to `.tmp/` and produces a reduced version there.
 
-## Step 1: Locate the Debug Log
+## Step 0: Determine Analysis Mode
 
-Claude Code writes debug logs when started with `-d` flag. Current session log path is in the Claude Code UI header. Format:
+Two modes are available:
 
-```
-C:\Users\{user}\.claude\debug\{session-id}.txt
-```
+**Auto mode (recommended):** Let `pnpm debug:reduce` find and process the most recent log automatically.
 
-Also check: `C:\dev\projects\agent-studio\.tmp\{session-id}.txt`
+**Manual mode:** Provide a specific session UUID or log file path.
 
-## Step 2: Copy + Reduce
+## Step 1: Locate and Reduce the Debug Log
+
+**IMPORTANT: Always find the most recent log dynamically. NEVER hardcode session UUIDs.**
+
+### Auto mode (preferred)
 
 ```bash
-# 1. Copy the log (never operate on original)
-cp "{debug-log-path}" ".claude/context/tmp/debug-session-{date}.txt"
+# Auto-detect most recent log, copy to .tmp/, reduce in place
+cd /c/dev/projects/agent-studio && node scripts/reduce-debug-log.mjs 2>&1
 
-# 2. Run reducer (98%+ noise reduction)
-node scripts/reduce-debug-log.mjs \
-  ".claude/context/tmp/debug-session-{date}.txt" \
-  --output ".claude/context/tmp/debug-session-{date}-reduced.txt"
-
-# 3. Check reducer output size
-wc -l ".claude/context/tmp/debug-session-{date}-reduced.txt"
+# The script prints:
+# Auto-detected debug log: /home/user/.claude/debug/{session-uuid}.txt
+# Copied to: .tmp/{session-uuid}.txt
+# Original: N lines -> kept (issue-like): M -> ... -> after dedupe: K
+# Output: .tmp/{session-uuid}-reduced.txt
 ```
+
+Capture the output paths from the script output for subsequent steps.
+
+### Manual mode (when a specific session is needed)
+
+```bash
+# List recent debug logs sorted by modification time (most recent first)
+ls -t "$HOME/.claude/debug/"*.txt 2>/dev/null | head -5
+
+# Or on Windows (Git Bash):
+ls -t "$USERPROFILE/.claude/debug/"*.txt 2>/dev/null | head -5
+```
+
+Pick the target log path, then:
+
+```bash
+# Copy to temp (never operate on the original)
+mkdir -p .claude/context/tmp
+cp "$HOME/.claude/debug/{session-uuid}.txt" ".claude/context/tmp/debug-session-copy.txt"
+
+# Run reducer with explicit output path
+node scripts/reduce-debug-log.mjs \
+  ".claude/context/tmp/debug-session-copy.txt" \
+  --output ".claude/context/tmp/debug-session-reduced.txt"
+```
+
+### Verify reduction succeeded
+
+```bash
+# Check sizes
+wc -l ".claude/context/tmp/debug-session-copy.txt"
+wc -l ".claude/context/tmp/debug-session-reduced.txt"
+```
+
+Expected: reduced file is 1-5% of original line count (98%+ noise removed).
+
+## Step 2: Compare Original vs Reduced
+
+Calculate what was filtered out to understand the filter quality:
+
+```bash
+ORIGINAL_LINES=$(wc -l < ".claude/context/tmp/debug-session-copy.txt")
+REDUCED_LINES=$(wc -l < ".claude/context/tmp/debug-session-reduced.txt")
+echo "Original: $ORIGINAL_LINES lines | Reduced: $REDUCED_LINES lines"
+echo "Kept: $(echo "scale=1; $REDUCED_LINES * 100 / $ORIGINAL_LINES" | bc)%"
+```
+
+Note any anomalies — e.g., if reduction is less than 90%, the session had unusually many errors.
 
 ## Step 3: Read Reduced Log
 
-Read `.claude/context/tmp/debug-session-{date}-reduced.txt` in full.
+Read `.claude/context/tmp/debug-session-reduced.txt` in full.
 
-## Step 4: Categorize Error Patterns
+## Step 4: Categorize Error Patterns in Reduced Log
 
 For each line in the reduced log, classify into:
 
@@ -84,19 +139,39 @@ For the top 3 most frequent error categories:
 3. Identify: which tool call triggered it, which agent was running, what it was trying to do
 
 ```bash
-grep -n "PreToolUse:Write" ".claude/context/tmp/debug-session-{date}.txt" | head -30
+# Use the full copy (not the original, not the reduced)
+grep -n "PreToolUse:Write" ".claude/context/tmp/debug-session-copy.txt" | head -30
+grep -n "File does not exist" ".claude/context/tmp/debug-session-copy.txt" | head -30
+grep -n "timeout" ".claude/context/tmp/debug-session-copy.txt" -i | head -30
 ```
 
-## Step 6: Produce Structured Report
+## Step 6: Cleanup Temp Files
 
-Write to `.claude/context/reports/reflections/debug-log-analysis-{date}.md`:
+After analysis, clean up the working copy (keep the reduced file for the report if needed):
+
+```bash
+rm -f ".claude/context/tmp/debug-session-copy.txt"
+# Optionally keep the reduced file for reference; delete when done
+# rm -f ".claude/context/tmp/debug-session-reduced.txt"
+```
+
+## Step 7: Produce Structured Report
+
+Write to `.claude/context/reports/reflections/debug-log-analysis-{YYYY-MM-DD}.md`:
 
 ```markdown
-# Debug Log Analysis — {date}
+<!-- Agent: reflection-agent | Skill: debug-log-analysis | Session: {YYYY-MM-DD} -->
 
-**Session:** {session-id}
-**Log size:** {N} lines → {M} lines after reduction ({X}% reduction)
-**Analysis duration:** {time}
+# Debug Log Analysis — {YYYY-MM-DD}
+
+**Source log:** {path to original log — auto-detected or provided}
+**Session UUID:** {session-uuid extracted from filename}
+**Log statistics:**
+
+- Original: {N} lines / {bytes} bytes
+- Reduced: {M} lines / {bytes} bytes
+- Reduction ratio: {X}%
+  **Analysis timestamp:** {ISO-8601}
 
 ## Error Summary
 
