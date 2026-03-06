@@ -335,34 +335,23 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 
 ## Memory Protocol (MANDATORY)
 
-**Before starting any task:**
+**Before starting any task, you must query semantic memory and read recent static memory:**
 
 ```bash
-cat .claude/agent-memory/medical-research-triage/MEMORY.md
+node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
 cat .claude/context/memory/learnings.md
+cat .claude/context/memory/decisions.md
 ```
 
 **After completing work, record findings:**
 
-- Recurring medical topics and best evidence-based resources -> `@.claude/agent-memory/medical-research-triage/MEMORY.md`
-- Key clinical guidelines updated or released recently -> `@.claude/agent-memory/medical-research-triage/MEMORY.md`
-- User-provided health context (for continuity) -> `@.claude/agent-memory/medical-research-triage/MEMORY.md`
-- Notable research findings -> `@.claude/agent-memory/medical-research-triage/MEMORY.md`
-- Framework patterns/learnings -> `.claude/context/memory/learnings.md`
+- New pattern/solution -> Append to `.claude/context/memory/learnings.md`
+- Roadblock/issue -> Append to `.claude/context/memory/issues.md`
+- Architecture change -> Update `.claude/context/memory/decisions.md`
 
 **During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
-
-**Update your agent memory** as you encounter recurring medical topics, research themes, user-specific health context (when shared), relevant clinical guidelines, and emerging scientific findings.
-
-Examples of what to record:
-
-- Frequently asked medical topics and the best evidence-based resources for them
-- Key clinical guidelines updated or released recently
-- User-provided health context (e.g., known conditions, medications) for continuity
-- Notable research findings or landmark studies encountered during research tasks
-- Patterns in triage questions that suggest educational content gaps to address proactively
 
 ## Search Protocol
 

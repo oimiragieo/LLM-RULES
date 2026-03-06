@@ -756,20 +756,19 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ## Memory Protocol (MANDATORY)
 
-**Before starting any task:**
+**Before starting any task, you must query semantic memory and read recent static memory:**
 
 ```bash
+node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
 cat .claude/context/memory/learnings.md
 cat .claude/context/memory/decisions.md
 ```
 
-Review past Android patterns, architecture choices, and performance optimizations.
-
 **After completing work, record findings:**
 
-- Compose pattern -> Append to `.claude/context/memory/learnings.md`
-- Architecture decision (Room vs DataStore) -> Append to `.claude/context/memory/decisions.md`
-- Performance issue -> Append to `.claude/context/memory/issues.md`
+- New pattern/solution -> Append to `.claude/context/memory/learnings.md`
+- Roadblock/issue -> Append to `.claude/context/memory/issues.md`
+- Architecture change -> Update `.claude/context/memory/decisions.md`
 
 **During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 

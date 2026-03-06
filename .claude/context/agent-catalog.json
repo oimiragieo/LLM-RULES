@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-03-06T05:56:09.670Z",
+  "generatedAt": "2026-03-06T06:27:56.168Z",
   "agents": [
     {
       "id": "architect",
@@ -290,6 +290,7 @@
           "tags": [
             "router",
             "orchestrates",
+            "memory-search",
             "complexity-assessment",
             "skill-discovery",
             "task-management-protocol"
@@ -2232,6 +2233,7 @@
             "integrate",
             "onboard",
             "ingest",
+            "memory-search",
             "project-onboarding",
             "ripgrep",
             "code-semantic-search",
@@ -2239,8 +2241,7 @@
             "task-management-protocol",
             "verification-before-completion",
             "context-compressor",
-            "token-saver-context-compression",
-            "memory-search"
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -2260,6 +2261,7 @@
             "evolution",
             "orchestrator",
             "orchestrates",
+            "memory-search",
             "agent-creator",
             "artifact-lifecycle",
             "command-creator",
@@ -2275,8 +2277,7 @@
             "template-creator",
             "verification-before-completion",
             "workflow-creator",
-            "token-saver-context-compression",
-            "memory-search"
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -2297,6 +2298,7 @@
             "orchestrator",
             "coordinates",
             "implements",
+            "memory-search",
             "plan-generator",
             "response-rater",
             "ripgrep",
@@ -2309,7 +2311,6 @@
             "recovery",
             "swarm-coordination",
             "token-saver-context-compression",
-            "memory-search",
             "dispatching-parallel-agents",
             "track-management",
             "workflow-creator"
@@ -2331,6 +2332,7 @@
           "tags": [
             "party",
             "orchestrator",
+            "memory-search",
             "consensus-voting",
             "ripgrep",
             "code-semantic-search",
@@ -2339,8 +2341,7 @@
             "task-management-protocol",
             "verification-before-completion",
             "dispatching-parallel-agents",
-            "token-saver-context-compression",
-            "memory-search"
+            "token-saver-context-compression"
           ],
           "examples": []
         }
@@ -2359,6 +2360,7 @@
           "tags": [
             "swarm",
             "coordinator",
+            "memory-search",
             "consensus-voting",
             "ripgrep",
             "code-semantic-search",
@@ -2368,8 +2370,7 @@
             "verification-before-completion",
             "dispatching-parallel-agents",
             "context-compressor",
-            "token-saver-context-compression",
-            "memory-search"
+            "token-saver-context-compression"
           ],
           "examples": []
         }

@@ -203,7 +203,7 @@ Before: read \`.claude/context/memory/learnings.md\` and \`.claude/context/memor
 After: write learnings/decisions/issues updates.
 
 **CRITICAL PROTOCOL INJECTION RULE:**
-If you are updating an agent and it is missing the \`## Search Protocol\` or missing the \`## Memory Protocol (MANDATORY)\` blocks, or if its existing Memory Protocol only reads \`learnings.md\`, you MUST inject or update these blocks to match the framework standard exactly (which mandates reading BOTH learnings and decisions).
+If you are updating an agent and it is missing the \`## Search Protocol\` or missing the \`## Memory Protocol (MANDATORY)\` blocks, or if its existing Memory Protocol only reads \`learnings.md\`, you MUST inject or update these blocks to match the framework standard exactly (which mandates querying semantic memory `node .claude/lib/memory/memory-search.cjs` and reading BOTH learnings and decisions).
 Also, ensure the agent's frontmatter \`skills:\` array contains \`ripgrep\`, \`token-saver-context-compression\`, and \`code-semantic-search\`.
 
 ## Eval-Backed Gap Analysis

@@ -701,10 +701,12 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ## Memory Protocol (MANDATORY)
 
-**Before starting any task:**
+**Before starting any task, you must query semantic memory and read recent static memory:**
 
 ```bash
+node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
 cat .claude/context/memory/learnings.md
+cat .claude/context/memory/decisions.md
 ```
 
 **After completing work, record findings:**

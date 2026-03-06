@@ -310,20 +310,19 @@ Invoke token-saver when ANY of these hold:
 
 ## Memory Protocol (MANDATORY)
 
-**Before starting any task:**
+**Before starting any task, you must query semantic memory and read recent static memory:**
 
 ```bash
+node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
 cat .claude/context/memory/learnings.md
-cat .claude/context/memory/issues.md
+cat .claude/context/memory/decisions.md
 ```
-
-Review past debugging sessions, known root causes, and recurring patterns.
 
 **After completing work, record findings:**
 
-- New debugging pattern or root cause → Append to `.claude/context/memory/learnings.md`
-- Root cause analysis decision → Append to `.claude/context/memory/decisions.md`
-- Recurring bug pattern → Append to `.claude/context/memory/issues.md`
+- New pattern/solution -> Append to `.claude/context/memory/learnings.md`
+- Roadblock/issue -> Append to `.claude/context/memory/issues.md`
+- Architecture change -> Update `.claude/context/memory/decisions.md`
 
 **During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 

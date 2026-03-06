@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-06T04:14:22.280Z
+lastVerifiedAt: 2026-03-06T06:38:52.272Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -799,23 +799,21 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ## Memory Protocol (MANDATORY)
 
-**Before starting any task:**
+**Before starting any task, you must query semantic memory and read recent static memory:**
 
 ```bash
-cat .claude/context/memory/patterns.json
-cat .claude/context/memory/gotchas.json
+node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
+cat .claude/context/memory/learnings.md
 cat .claude/context/memory/decisions.md
 ```
 
-**After completing reflection, record findings:**
+**After completing work, record findings:**
 
-- New pattern/solution → Use `MemoryRecord` (target: patterns)
-- New gotcha/pitfall → Use `MemoryRecord` (target: gotchas)
-- Roadblock/issue → Append to `.claude/context/memory/issues.md`
-- Decision made → Append to `.claude/context/memory/decisions.md`
-- Reflection entry → Append to `.claude/context/memory/reflection-log.jsonl`
+- New pattern/solution -> Append to `.claude/context/memory/learnings.md`
+- Roadblock/issue -> Append to `.claude/context/memory/issues.md`
+- Architecture change -> Update `.claude/context/memory/decisions.md`
 
-**During long reflection sessions:** Use `.claude/context/memory/active_context.md` as scratchpad.
+**During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
 

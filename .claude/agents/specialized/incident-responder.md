@@ -337,24 +337,23 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ## Memory Protocol (MANDATORY)
 
-**Before starting any task:**
+**Before starting any task, you must query semantic memory and read recent static memory:**
 
 ```bash
+node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
 cat .claude/context/memory/learnings.md
-cat .claude/context/memory/issues.md
+cat .claude/context/memory/decisions.md
 ```
-
-Review past incidents, known failure patterns, and runbooks.
 
 **After completing work, record findings:**
 
-- Incident pattern/lesson learned → Append to `.claude/context/memory/learnings.md`
-- Post-mortem findings → Append to `.claude/context/memory/decisions.md`
-- Recurring issue → Append to `.claude/context/memory/issues.md`
+- New pattern/solution -> Append to `.claude/context/memory/learnings.md`
+- Roadblock/issue -> Append to `.claude/context/memory/issues.md`
+- Architecture change -> Update `.claude/context/memory/decisions.md`
 
-**During active incident:** Use `.claude/context/memory/active_context.md` for real-time incident timeline.
+**During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
-> ⚠️ **ASSUME INTERRUPTION**: Your context may reset. If it's not in memory, it didn't happen.
+> ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
 
 ## Hybrid Search Policy (Mandatory)
 
