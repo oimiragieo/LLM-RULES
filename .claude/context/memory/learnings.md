@@ -1,3 +1,29 @@
+## Debug Log Session Patterns — Streaming Stalls and Hook Errors (2026-03-06)
+
+From task-12 debug log analysis (2026-03-06T00:26):
+
+- **13 streaming stalls** detected in a single session — primary pattern: agent tasks approaching context/time limits mid-stream. Stalls > 60s typically precede an agent drop or incomplete TaskUpdate.
+- **105 advisory hook errors** — high count of advisory-mode hook firings indicates advisory mode is being treated as a free pass. When advisory errors exceed ~20 per session, consider converting the most-fired hook to block mode.
+- **YAML parse error in ux-researcher.md** — agent definition file has malformed YAML frontmatter; agent cannot be instantiated until fixed. This is a silent failure — the agent appears in the registry but fails at spawn time.
+- **Bash timeout** — a Bash command hit the default 2-minute timeout. Pattern: long-running node scripts or pnpm commands without explicit `timeout` parameter.
+- **Worktree permission failures** — worktree cleanup fails on Windows when the spawning agent still holds file handles. The `shouldOverrideWorktreeIsolation()` fix (commit 775ccf1f) handles framework paths but not file-handle contention.
+
+**Actionable pattern:** Sessions with 10+ streaming stalls should trigger `context-compressor` earlier; don't wait for the 80K token threshold warning.
+
+---
+
+## debug-log-analysis Skill v1.3.0 Upgrade (2026-03-06)
+
+From task 22 completion (2026-03-06T00:34):
+
+- **Dynamic log discovery**: skill now auto-detects most recent log without requiring session UUID — removes the most common operator error (hardcoded stale UUID)
+- **Structured analysis**: error categorization is now formalized into the taxonomy table (Hook Block, Read Miss, Token Overflow, Streaming Stall, Agent Drop, Tool Error)
+- **Cleanup step added**: temp files are removed after analysis — prevents `.claude/context/tmp/` accumulation across sessions
+
+Skill is catalog-present, index-present (agentPrimary: developer, supporting: reflection-agent, devops-troubleshooter). No registration gaps.
+
+---
+
 ## Batch Reflection Closure (2026-03-05 Session 2)
 
 Second batch: 5 stale reflection requests from enterprise-search-audit pipeline (2026-03-04 23:35:56–23:54:18). All task completion reflections with task summaries present. Gap observations repeated across all 5 requests:
