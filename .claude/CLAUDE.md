@@ -501,6 +501,10 @@ All router operational constraints are consolidated in:
 
 This section serves as a cross-reference. The router MUST NOT use banned tools, MUST pass all gates, MUST include task IDs in every spawn, and MUST check specialist match (Step 6.5 in router-decision.md) before defaulting to developer. Always follow the TaskUpdate protocol (Section 5.5).
 
+### File Deletion Safety (IRON LAW)
+
+**NEVER delete untracked files without explicit user confirmation.** Untracked files (`??` in `git status`) are often in-progress work with NO git recovery. Always ask before deleting. See `.claude/rules/file-deletion-safety.md` for full policy.
+
 ---
 
 ## 7) SKILL INVOCATION PROTOCOL
