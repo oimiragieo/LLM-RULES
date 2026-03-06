@@ -78,26 +78,42 @@ const ROUTER_BASH_WHITELIST = [
  * Determine if this invocation is from the router (not a sub-agent).
  * Returns true if we believe the caller is the router session.
  *
+ * Heuristic priority (definitive signals first, weak signals last):
+ *   1. hookInput.agent_id — Claude Code injects this for subagent hooks (definitive)
+ *   2. CLAUDE_AGENT_ID env var — definitive when set
+ *   3. task_id in hookInput — subagents always have task context
+ *   4. allowed_tools — negative signal (no Task tool = subagent)
+ *   5. Worktree CWD — weak tertiary signal (last resort)
+ *
  * @param {Object} hookInput - Hook input context
  * @param {string} [cwd] - Current working directory (defaults to process.cwd()).
  *   Injected for testability; production uses the real CWD.
  * @returns {boolean}
  */
 function isRouterSession(hookInput, cwd = process.cwd()) {
-  // CWD check — hooks running inside .claude/worktrees/ are subagents
-  if (isInWorktree(cwd)) {
-    return false; // Running in a worktree = subagent, not the router
+  // 1. hookInput.agent_id — Claude Code provides this field ONLY inside subagent
+  // hook calls. Its presence is the most reliable signal (per official docs:
+  // "Present only when the hook fires inside a subagent call. Use this to
+  // distinguish subagent hook calls from main-thread calls.")
+  if (hookInput && typeof hookInput === 'object') {
+    const hostAgentId = String(hookInput.agent_id || '').trim();
+    if (hostAgentId) {
+      return false; // Definitively inside a subagent
+    }
   }
 
-  // Check CLAUDE_AGENT_ID — set in sub-agents, empty/absent in router
+  // 2. CLAUDE_AGENT_ID env var — definitive when set
   const agentId = String(process.env.CLAUDE_AGENT_ID || '')
     .trim()
     .toLowerCase();
+  if (agentId === 'router') {
+    return true; // Explicitly identified as router
+  }
   if (agentId && agentId !== 'router') {
-    return false; // It's a sub-agent, not the router
+    return false; // Definitively a sub-agent
   }
 
-  // Check task_id in hookInput — present in spawned sub-agents
+  // 3. task_id in hookInput — subagents always have task context
   if (hookInput && typeof hookInput === 'object') {
     const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
     if (taskId) {
@@ -105,11 +121,17 @@ function isRouterSession(hookInput, cwd = process.cwd()) {
     }
   }
 
-  // Check allowed_tools — sub-agents typically don't have Task in their allowed list
-  // But this is unreliable, so we use it only as a negative signal
+  // 4. allowed_tools — sub-agents typically don't have Task in their allowed list
+  // Unreliable, so we use it only as a negative signal
   const allowedTools = Array.isArray(hookInput?.allowed_tools) ? hookInput.allowed_tools : null;
   if (allowedTools && allowedTools.length > 0 && !allowedTools.includes('Task')) {
     return false; // Sub-agent without Task tool access
+  }
+
+  // 5. Worktree CWD — weak tertiary signal (subagents often run in worktrees,
+  // but the router process may also have worktree CWD in edge cases)
+  if (isInWorktree(cwd)) {
+    return false; // Likely a subagent in a worktree
   }
 
   return true; // Default: assume router

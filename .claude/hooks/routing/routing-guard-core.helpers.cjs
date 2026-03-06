@@ -12,9 +12,10 @@ const { isInWorktree } = require('../../lib/utils/worktree-context.cjs');
  * the TASKLIST-FIRST enforcement gate.
  *
  * Context is considered explicit when ANY of:
- *   1. hookInput.task_id / taskId is present (spawned sub-agent)
- *   2. CLAUDE_AGENT_ID env var is set to a non-router value
- *   3. cwd is inside a Claude worktree (/.claude/worktrees/) — Fix 2
+ *   1. hookInput.agent_id is present (Claude Code native subagent field)
+ *   2. hookInput.task_id / taskId is present (spawned sub-agent)
+ *   3. CLAUDE_AGENT_ID env var is set to a non-router value
+ *   4. cwd is inside a Claude worktree (/.claude/worktrees/)
  *
  * @param {Object|null} [hookInput] - Hook input context
  * @param {string} [cwd] - Current working directory override for testing.
@@ -22,16 +23,21 @@ const { isInWorktree } = require('../../lib/utils/worktree-context.cjs');
  * @returns {boolean}
  */
 function hasExplicitAgentContext(hookInput = null, cwd = process.cwd()) {
-  // Fix 2: CWD worktree detection — hooks running inside a worktree are subagents
-  if (isInWorktree(cwd)) return true;
-
-  if (!hookInput || typeof hookInput !== 'object') return false;
-  const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
-  if (taskId) return true;
+  if (hookInput && typeof hookInput === 'object') {
+    // 1. hookInput.agent_id — Claude Code provides this ONLY inside subagent hooks
+    const hostAgentId = String(hookInput.agent_id || '').trim();
+    if (hostAgentId) return true;
+    // 2. task_id — spawned sub-agents have task context
+    const taskId = String(hookInput.task_id || hookInput.taskId || '').trim();
+    if (taskId) return true;
+  }
+  // 3. CLAUDE_AGENT_ID env var
   const agentId = String(process.env.CLAUDE_AGENT_ID || '')
     .trim()
     .toLowerCase();
   if (agentId && agentId !== 'router') return true;
+  // 4. CWD worktree detection — hooks running inside a worktree are subagents
+  if (isInWorktree(cwd)) return true;
   return false;
 }
 

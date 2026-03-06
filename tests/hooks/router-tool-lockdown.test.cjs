@@ -256,4 +256,66 @@ describe('router-tool-lockdown hook', () => {
     const result = checkRouterToolLockdown('Write', { file_path: 'src/foo.js' }, {}, fakeCwd);
     assert.strictEqual(result.pass, true, 'Worktree subagent should bypass Write lockdown');
   });
+
+  // ── hookInput.agent_id (Claude Code native subagent detection) ────────────
+
+  it('should allow subagent with agent_id in hookInput (Claude Code native field)', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const hookInput = { agent_id: 'agent-abc123', agent_type: 'developer' };
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, hookInput);
+    assert.strictEqual(result.pass, true, 'agent_id in hookInput should bypass lockdown');
+  });
+
+  it('should allow subagent with agent_id even in non-worktree CWD and no env var', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const fakeCwd = '/project'; // not in worktree
+    const hookInput = { agent_id: 'agent-xyz789' };
+    const result = checkRouterToolLockdown('Edit', { file_path: 'x.js' }, hookInput, fakeCwd);
+    assert.strictEqual(result.pass, true, 'agent_id should take priority over all other signals');
+  });
+
+  it('agent_id should take precedence over CLAUDE_AGENT_ID=router', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    process.env.CLAUDE_AGENT_ID = 'router';
+    const hookInput = { agent_id: 'agent-subagent-123' };
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, hookInput);
+    assert.strictEqual(result.pass, true, 'hookInput.agent_id should override env var');
+  });
+
+  // ── isRouterSession heuristic priority tests ─────────────────────────────
+
+  it('should block router even when CWD is in worktree if CLAUDE_AGENT_ID=router', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    process.env.CLAUDE_AGENT_ID = 'router';
+    const fakeCwd = '/project/.claude/worktrees/agent-abc123';
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {}, fakeCwd);
+    assert.strictEqual(result.pass, false, 'CLAUDE_AGENT_ID=router should override worktree CWD');
+    assert.strictEqual(result.result, 'block');
+  });
+
+  it('should allow subagent with CLAUDE_AGENT_ID even in non-worktree CWD', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    process.env.CLAUDE_AGENT_ID = 'developer';
+    const fakeCwd = '/project'; // not in a worktree
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {}, fakeCwd);
+    assert.strictEqual(result.pass, true, 'CLAUDE_AGENT_ID=developer should bypass lockdown');
+  });
+
+  it('should allow subagent with task_id even in non-worktree CWD', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    delete process.env.CLAUDE_AGENT_ID;
+    const fakeCwd = '/project'; // not in a worktree
+    const hookInput = { task_id: 'task-7' };
+    const result = checkRouterToolLockdown('Edit', { file_path: 'x.js' }, hookInput, fakeCwd);
+    assert.strictEqual(result.pass, true, 'task_id should take precedence over non-worktree CWD');
+  });
+
+  it('should treat CLAUDE_AGENT_ID with whitespace/case variations correctly', () => {
+    process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
+    process.env.CLAUDE_AGENT_ID = '  Router  ';
+    const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {});
+    assert.strictEqual(result.pass, false, 'Trimmed/lowercased "router" should be treated as router');
+  });
 });
