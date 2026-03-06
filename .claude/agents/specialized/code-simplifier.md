@@ -31,6 +31,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - code-style-validator
+  - lsp-navigator
   - memory-search
   - ripgrep
   - task-management-protocol

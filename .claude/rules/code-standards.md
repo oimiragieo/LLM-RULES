@@ -70,10 +70,11 @@
 Search preference order (highest to lowest):
 
 1. `pnpm search:code` — hybrid semantic + BM25 (recommended default)
-2. `Skill({ skill: 'ripgrep' })` — fast text search in agent flows
-3. `Skill({ skill: 'code-semantic-search' })` — conceptual/intent search
-4. `Skill({ skill: 'code-structural-search' })` — AST-based search
-5. `Grep` — FALLBACK ONLY (advanced regex, single-file checks)
+2. `Skill({ skill: 'lsp-navigator' })` — compiler-level definitions, references, types (once position is known)
+3. `Skill({ skill: 'ripgrep' })` — fast text search in agent flows
+4. `Skill({ skill: 'code-semantic-search' })` — conceptual/intent search
+5. `Skill({ skill: 'code-structural-search' })` — AST-based search
+6. `Grep` — FALLBACK ONLY (advanced regex, single-file checks)
 
 **Anti-Pattern**: Using `Grep` as primary code discovery tool. Grep does not leverage BM25 ranking or semantic understanding and produces lower-quality results for broad searches.
 
@@ -91,9 +92,43 @@ Search preference order (highest to lowest):
 
 **Skills**:
 
+- `lsp-navigator` - Compiler-level definitions, references, types
 - `code-semantic-search` - Semantic code search skill
 - `code-structural-search` - Structural (AST) search skill
 - `ripgrep` - Fast text search skill
+
+## LSP Navigation
+
+Use `lsp-navigator` for **compiler-verified precision** once you have a known file position:
+
+```javascript
+Skill({ skill: 'lsp-navigator' });
+
+// Then invoke native LSP operations directly:
+// lsp_goToDefinition({ filePath, line, character })   — find where a symbol is defined
+// lsp_findReferences({ filePath, line, character })   — find all usages
+// lsp_hover({ filePath, line, character })            — get type info
+// lsp_documentSymbol({ filePath, line, character })   — list file symbols
+// lsp_workspaceSymbol({ filePath, line, character })  — search workspace symbols
+// lsp_goToImplementation({ filePath, line, character }) — find implementations
+// lsp_prepareCallHierarchy({ filePath, line, character }) — prepare call hierarchy
+// lsp_incomingCalls({ filePath, line, character })    — who calls this?
+// lsp_outgoingCalls({ filePath, line, character })    — what does this call?
+```
+
+**Rules**: Always use absolute paths. Always use 1-based line/character. Always call
+`prepareCallHierarchy` before `incomingCalls`/`outgoingCalls`. Fall back to ripgrep
+if LSP returns empty (server may not be running for that language).
+
+**When to use LSP vs other search**:
+
+| Question                   | Tool                           |
+| -------------------------- | ------------------------------ |
+| "Where is `foo` defined?"  | lsp-navigator (goToDefinition) |
+| "Who calls `foo`?"         | lsp-navigator (incomingCalls)  |
+| "Find files about auth"    | pnpm search:code               |
+| "Find `foo` in all files"  | ripgrep (rg -F)                |
+| "Find all async functions" | code-structural-search         |
 
 **Example**:
 
@@ -118,5 +153,6 @@ pnpm search:file "config"
 ## Related References
 
 - `.claude/agents/specialized/code-reviewer.md` - Code review agent
+- `.claude/skills/lsp-navigator/SKILL.md` - LSP navigation skill (compiler-level)
 - `.claude/skills/code-semantic-search/SKILL.md` - Semantic search skill
 - `.claude/skills/code-structural-search/SKILL.md` - Structural search skill

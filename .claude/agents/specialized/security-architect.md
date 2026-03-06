@@ -34,6 +34,7 @@ skills:
   - building-secure-contracts
   - code-semantic-search
   - code-structural-search
+  - lsp-navigator
   - content-security-scan
   - memory-search
   - ripgrep

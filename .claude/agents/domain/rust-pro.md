@@ -28,6 +28,7 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - lsp-navigator
   - debugging
   - git-expert
   - memory-search

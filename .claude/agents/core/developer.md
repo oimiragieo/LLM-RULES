@@ -103,6 +103,7 @@ skills:
   - kafka-development-practices
   - large-data-with-dask
   - linear-pm
+  - lsp-navigator
   - llm-council
   - logging-module-usage
   - marketing-content

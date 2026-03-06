@@ -33,6 +33,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - debugging
+  - lsp-navigator
   - memory-forensics
   - memory-search
   - ripgrep

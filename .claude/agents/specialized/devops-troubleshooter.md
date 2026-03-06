@@ -27,6 +27,7 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - lsp-navigator
   - debugging
   - docker-compose
   - k8s-manifest-generator

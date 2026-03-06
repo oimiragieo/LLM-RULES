@@ -34,6 +34,7 @@ skills:
   - code-quality-expert
   - code-semantic-search
   - code-structural-search
+  - lsp-navigator
   - memory-search
   - receiving-code-review
   - requesting-code-review

@@ -30,6 +30,7 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - lsp-navigator
   - memory-search
   - ripgrep
   - security-architect

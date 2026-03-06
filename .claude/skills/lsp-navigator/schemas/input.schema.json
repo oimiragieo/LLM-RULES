@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "lspNavigatorInput",
+  "description": "Input for LSP navigation operations. All operations require an absolute filePath, 1-based line, and 1-based character.",
+  "type": "object",
+  "properties": {
+    "operation": {
+      "type": "string",
+      "enum": [
+        "goToDefinition",
+        "findReferences",
+        "hover",
+        "documentSymbol",
+        "workspaceSymbol",
+        "goToImplementation",
+        "prepareCallHierarchy",
+        "incomingCalls",
+        "outgoingCalls"
+      ],
+      "description": "LSP operation to invoke. One of 9 supported operations."
+    },
+    "filePath": {
+      "type": "string",
+      "description": "Absolute path to the target file. Relative paths are rejected (Iron Law 1).",
+      "pattern": "^(/|[A-Za-z]:\\\\)"
+    },
+    "line": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1-based line number. LSP protocol is 1-based; 0-based values cause off-by-one errors (Iron Law 2)."
+    },
+    "character": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "1-based character position within the line. LSP protocol is 1-based (Iron Law 2)."
+    }
+  },
+  "required": ["operation", "filePath", "line", "character"],
+  "additionalProperties": false
+}

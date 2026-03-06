@@ -27,6 +27,7 @@ tools:
 skills:
   - code-semantic-search
   - code-structural-search
+  - lsp-navigator
   - frontend-expert
   - memory-search
   - react-best-practices-vercel
