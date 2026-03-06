@@ -508,7 +508,13 @@
       "category": "code-indexing",
       "discovered_at": "2026-03-06T04:19:56.181Z",
       "last_accessed": "2026-03-06T04:20:34.653Z"
+    },
+    "scripts/validation/validate-sync.mjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T06:10:31.147Z",
+      "last_accessed": "2026-03-06T06:10:38.407Z"
     }
   },
-  "last_updated": "2026-03-06T05:56:56.668Z"
+  "last_updated": "2026-03-06T06:10:38.407Z"
 }

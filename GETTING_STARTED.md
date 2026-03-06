@@ -26,14 +26,14 @@ Before you begin, ensure you have:
 ```bash
 # Clone or download this repo, then copy to your project:
 cp -r .claude/ /path/to/your/project/
-cp CLAUDE.md /path/to/your/project/
+cp .claude/CLAUDE.md /path/to/your/project/CLAUDE.md
 ```
 
 **Windows PowerShell:**
 
 ```powershell
 Copy-Item -Path ".claude" -Destination "C:\path\to\your\project\.claude" -Recurse
-Copy-Item -Path "CLAUDE.md" -Destination "C:\path\to\your\project\CLAUDE.md"
+Copy-Item -Path ".claude\CLAUDE.md" -Destination "C:\path\to\your\project\CLAUDE.md"
 ```
 
 ### Step 2: Verify Structure
@@ -1337,7 +1337,7 @@ See `.claude/commands/` for all available commands.
 
 ### Agents Not Activating
 
-1. Check `CLAUDE.md` is in project root (not inside `.claude/`)
+1. Check `.claude/CLAUDE.md` exists (canonical location for this repo)
 2. Verify `.claude/config.yaml` exists
 3. Restart Claude Code after copying files
 4. Check agent file exists: `.claude/agents/{agent-name}.md`

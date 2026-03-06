@@ -165,10 +165,10 @@ if (readme) {
   }
 }
 
-if (fileExists('CLAUDE.md')) {
-  success('Root CLAUDE.md exists');
+if (fileExists('.claude/CLAUDE.md')) {
+  success('.claude/CLAUDE.md exists (canonical location)');
 } else {
-  error('Root CLAUDE.md missing (required for Claude Code)');
+  error('.claude/CLAUDE.md missing (required for Claude Code)');
 }
 
 if (fileExists('GETTING_STARTED.md')) {
@@ -188,7 +188,6 @@ const requiredFiles = [
   '.claude/config.yaml',
   '.claude/settings.json',
   '.claude/CLAUDE.md',
-  'CLAUDE.md',
 ];
 
 for (const file of requiredFiles) {
