@@ -51,6 +51,17 @@ These agent definition sections are protected and must survive updates:
 - `Anti-Patterns` section
 - Any section tagged `[PERMANENT]`
 
+### Preserving Identity Integrations (CRITICAL)
+
+If the target agent contains a `soul:` frontmatter property or a "SOUL.md Integration" / "Memory Evolution Protocol" section:
+
+- **PRESERVE** the `soul:` frontmatter field and its path
+- **PRESERVE** the `Read` tool and instructions to internalize the soul.md file at session start
+- **PRESERVE** the `Write` tool exception allowing modification of `.claude/context/memory/soul-memory.md`
+- **PRESERVE** the "Memory Evolution Protocol" section (entry format, write rules, cap limits)
+- **PRESERVE** the "Proactive Conversation Skills" section and its skill invocation guidance
+- **DO NOT** refactor soul-related sections into generic MemoryRecord/TaskUpdate patterns — they are a distinct personality paradigm, not redundant boilerplate
+
 ## Workflow
 
 ### Step 0.5: Companion Validation (MANDATORY)
