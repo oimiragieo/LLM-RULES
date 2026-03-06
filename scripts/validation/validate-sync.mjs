@@ -184,11 +184,7 @@ console.log('');
 console.log('5. Required Files Check');
 console.log('-------------------------------------------');
 
-const requiredFiles = [
-  '.claude/config.yaml',
-  '.claude/settings.json',
-  '.claude/CLAUDE.md',
-];
+const requiredFiles = ['.claude/config.yaml', '.claude/settings.json', '.claude/CLAUDE.md'];
 
 for (const file of requiredFiles) {
   if (fileExists(file)) {

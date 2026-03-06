@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-03-06T04:07:00.315Z"
+      "last_accessed": "2026-03-06T06:29:44.942Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "discovered_at": "2026-02-11",
@@ -302,18 +302,22 @@
       "last_accessed": "2026-02-22T03:30:37.296Z"
     },
     ".claude/hooks/routing/routing-guard-core.helpers.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-22T03:42:37.626Z",
-      "last_accessed": "2026-02-22T03:42:37.626Z"
+      "last_accessed": "2026-03-06T06:31:13.590Z"
     },
     "tests/hooks/router-tool-lockdown.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-22T04:00:22.587Z",
-      "last_accessed": "2026-02-22T04:00:22.587Z"
+      "last_accessed": "2026-03-06T06:30:52.146Z"
     },
     ".claude/hooks/routing/router-tool-lockdown.cjs": {
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-22T04:01:08.375Z",
-      "last_accessed": "2026-03-06T03:44:45.780Z"
+      "last_accessed": "2026-03-06T06:30:34.368Z"
     },
     "tests/hooks/stale-task-detector.test.cjs": {
       "discovered_at": "2026-02-22T04:01:46.008Z",
@@ -516,5 +520,5 @@
       "last_accessed": "2026-03-06T06:10:38.407Z"
     }
   },
-  "last_updated": "2026-03-06T06:10:38.407Z"
+  "last_updated": "2026-03-06T06:31:13.590Z"
 }

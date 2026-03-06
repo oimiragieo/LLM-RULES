@@ -585,3 +585,19 @@ Task 2 (2026-03-04): Multi-LLM consultation on LTM eviction fixes
 - Updated workflow: evolution-workflow (2026-03-06)
 
 - Updated workflow: missing-workflow-xyz (2026-03-06)
+
+- Created new agent: qa-guardian (2026-03-06)
+
+- Created new agent: contract-check (2026-03-06)
+
+- Created new agent: bool-action (2026-03-06)
+
+- Created new agent: repo-onboarder (2026-03-06)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-06)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-06)
+
+- Updated workflow: evolution-workflow (2026-03-06)
+
+- Updated workflow: missing-workflow-xyz (2026-03-06)
