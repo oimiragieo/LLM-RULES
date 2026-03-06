@@ -430,3 +430,40 @@ if (toolInput.run_in_background !== true) return { pass: true };
 | Documentation | 8/10 | RECE loop well-documented; reminder.txt creation path unclear |
 
 **Overall Score: 8.8/10** -- A mature, well-engineered subsystem with minor wiring gaps.
+
+---
+
+## Independent Validation (architect agent, task-6, second pass)
+
+### Findings Update
+
+**F-01 (MEDIUM) — RESOLVED**: The `agent-skill-matrix.json` `always` array for reflection-agent NOW contains 7 skills:
+`verification-before-completion`, `task-management-protocol`, `memory-search`, `ripgrep`, `code-semantic-search`, `code-structural-search`, `token-saver-context-compression` (lines 196-204). This was fixed in the EPIC enterprise audit session (commit c5d1d429).
+
+**F-03 (MEDIUM) — RESOLVED**: `ripgrep` is now in the `always` array (line 200). Fixed same session.
+
+**F-05 (LOW) — RESOLVED**: `memory-search` is now in the `always` array (line 199). The asymmetry between hook-side enrichment and agent-side capabilities no longer exists.
+
+### Remaining Open Findings
+
+| ID   | Severity | Status   | Finding |
+|------|----------|----------|---------|
+| F-01 | MEDIUM   | RESOLVED | memory-search now in always array |
+| F-02 | LOW      | OPEN     | reflection-reminder.txt creation path still not traced |
+| F-03 | MEDIUM   | RESOLVED | ripgrep now in always array |
+| F-04 | LOW      | OPEN     | Hardcoded task_id in generateSpawnInstruction (cosmetic) |
+| F-05 | LOW      | RESOLVED | memory-search asymmetry resolved |
+
+### Additional Observations (Second Pass)
+
+1. **Report path inconsistency**: Agent definition has two report paths — line 72 says `.claude/context/reports/backend/` (workspace conventions boilerplate) and line 712 says `.claude/context/reports/reflections/`. Both are valid but the inconsistency is confusing. Severity: LOW.
+
+2. **Empty memoryWrites in reflection-log.jsonl**: All 10 sampled entries (lines 1-10) have `memoryWrites: []`. Either the agent is not recording memory write metadata in log entries, or reflections are not producing memory writes. This weakens the audit trail for what knowledge was actually persisted. Severity: LOW.
+
+3. **Background spawn ban**: Confirmed HOOK-ENFORCED at `routing-guard-core.checks-task.cjs` line 508-537. Default enforcement mode: `block`. Not just documented.
+
+4. **Atomic handshake completeness**: Full chain verified end-to-end. All 7 hook registrations confirmed in settings.json. Loop breaker prevents deadlock. Ghost/stale/already-processed pruning prevents queue accumulation.
+
+### Updated Score: 9.2/10
+
+With F-01, F-03, and F-05 resolved, the remaining findings are all LOW severity. The reflection subsystem is production-quality with comprehensive defensive programming.

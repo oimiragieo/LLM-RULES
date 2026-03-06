@@ -6,6 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+dependencies: [research-synthesis]
 # Phase 1 Integration: Hook validation references .claude/config/tool-manifest.json
 # Hooks can validate tool availability and use fallback tools from the manifest
 # Single source of truth: .claude/config/tool-manifest.json

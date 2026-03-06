@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-03T07:11:34.223Z
+lastVerifiedAt: 2026-03-06T04:14:22.280Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -27,31 +27,17 @@ tools:
   - TaskUpdate
   - Write
 skills:
-  - framework-context
-  - recommend-evolution
-  - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - artifact-integrator
-  - compliance-policy-check
-  - creation-feasibility-gate
-  - assimilate
-  - code-analyzer
+  - framework-context
   - insight-extraction
-  - memory-quality-auditor
-  - eval-harness-updater
-  - agent-updater
-  - workflow-updater
-  - skill-updater
-  - summarize-changes
-  - task-management-protocol
-  - troubleshooting-regression
-  - verification-before-completion
   - memory-search
-  - agent-evaluation
-  - debug-log-analysis
+  - recommend-evolution
+  - ripgrep
+  - session-handoff
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'
@@ -919,3 +905,24 @@ Full research report: `.claude/context/artifacts/research-reports/reflection-age
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

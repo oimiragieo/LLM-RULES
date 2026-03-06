@@ -6,6 +6,7 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Edit, Bash, Glob, Grep]
+dependencies: [research-synthesis]
 # Phase 1 Integration: All tools validated against .claude/config/tool-manifest.json
 # When workflows spawn agents, agents receive tools from manifest-based toolsets
 # Single source of truth: .claude/config/tool-manifest.json

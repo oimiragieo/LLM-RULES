@@ -165,7 +165,7 @@ Each entry is a router-observed problem invisible to individual task analysis.
 
 Before spawning `developer`, Router MUST check Step 6.5 in router-decision.md. If ANY specialist keyword matches, use that specialist instead.
 
-**Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: warn)
+**Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: block)
 
 **Why:** 72 agents exist. Using developer for docs/review/test/refactor/deploy tasks wastes specialist expertise and produces inferior results. Specialists have domain-specific prompts, skills, and patterns.
 
@@ -384,6 +384,7 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Contract Check                                                 | `contract-check`          | `.claude/agents/domain/contract-check.md`          |
 | Bool Action                                                    | `bool-action`             | `.claude/agents/domain/bool-action.md`             |
 | Repo Onboarder                                                 | `repo-onboarder`          | `.claude/agents/orchestrators/repo-onboarder.md`   |
+| Ptest Agent                                                    | `ptest-agent`             | `.claude/agents/domain/ptest-agent.md`             |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 

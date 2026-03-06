@@ -1,315 +1,255 @@
 <!-- Agent: architect | Task: #7 | Session: 2026-03-05 -->
 
-# Evolution System Deep Dive Audit
+# Evolution System Audit Report
 
 **Date:** 2026-03-05
-**Agent:** architect
-**Task:** #7
+**Scope:** EVOLVE workflow, evolution-orchestrator, creator skills, enforcement hooks, end-to-end flow
+**Auditor:** Architect Agent (Task #7 - Phase 6: Evolution System Audit)
 
 ---
 
 ## Executive Summary
 
-The evolution system is architecturally sound with a well-defined 6-phase EVOLVE state machine, comprehensive hook enforcement, and active state tracking (126 completed evolutions). However, several wiring gaps exist: 5 of 6 creator skills lack a formal `dependencies: [research-synthesis]` frontmatter field, the evolution-orchestrator frontmatter is missing 4 creator skills it references in its body, and the `post-creation-integration.cjs` hook is registered but the CLAUDE.md incorrectly states it lives in `routing/` when it actually lives in `workflow/`.
+The EVOLVE workflow is **architecturally well-designed** but **operationally disconnected from the router**. The workflow definition, state machine, enforcement hooks, companion check system, and post-creation integration hook all exist and are functional. However, the router never automatically triggers the evolution-orchestrator -- it routes "no matching agent" to agent-creator directly, bypassing EVOLVE entirely. Additionally, 5 of 6 creator skills lack machine-readable `dependencies: [research-synthesis]` in frontmatter, and the research-enforcement hook has a coverage gap (missing 3 artifact path types).
 
-**Critical Findings:** 1 | **High Findings:** 3 | **Medium Findings:** 3 | **Low Findings:** 2
-
----
-
-## 1. EVOLVE Workflow Analysis
-
-**File:** `.claude/workflows/core/evolution-workflow.md` (1143 lines)
-
-### State Machine Definition
-
-The EVOLVE workflow defines a 6-phase state machine:
-
-| Phase | Name | Purpose |
-|-------|------|---------|
-| E | Evaluate | Detect capability gap, classify complexity |
-| V | Validate | Confirm gap is real, check for existing solutions |
-| O | Obtain/Research | MANDATORY research phase (min 3 queries, 3 sources) |
-| L | Lock | Create artifact via creator skill |
-| V | Verify | Test, validate, quality gate |
-| E | Enable | Wire into ecosystem, update registries |
-
-**Mermaid diagram present:** Lines 85-101 (correct state transitions documented)
-
-### Phase O Enforcement
-
-- **Line 304:** `> **CRITICAL**: This phase CANNOT be skipped. NO artifact creation without research.`
-- **Line 398:** `- [ ] Minimum 3 research queries executed (with evidence in report)`
-- **Line 399:** `- [ ] Minimum 3 external sources consulted (URLs documented)`
-- **Line 394:** Research report output path: `.claude/context/artifacts/research-reports/<artifact-name>-research.md`
-
-**VERDICT:** Phase O is well-documented with explicit non-bypass language.
-
-### Hook References
-
-The workflow references 6 enforcement hooks at lines 779-787:
-
-| Hook | File | Purpose |
-|------|------|---------|
-| research-enforcement | `.claude/hooks/evolution/research-enforcement.cjs` | Blocks creation without research |
-| evolution-state-guard | `.claude/hooks/evolution/evolution-state-guard.cjs` | Validates state transitions |
-| conflict-detector | `.claude/hooks/evolution/conflict-detector.cjs` | Prevents duplicate artifacts |
-| quality-gate-validator | `.claude/hooks/evolution/quality-gate-validator.cjs` | Enforces quality gates |
-| artifact-scoring-ledger-hook | `.claude/hooks/quality/artifact-scoring-ledger-hook.cjs` | Scores artifact quality |
-| audit-skill-recency | `.claude/hooks/session/audit-skill-recency.cjs` | Checks skill freshness |
-
-### Iron Laws
-
-Lines 838-870 define Iron Laws including:
-- Research-first (no creation without Phase O)
-- Single artifact per evolution (prevents scope creep)
-- State persistence (every phase writes to evolution-state.json)
-- Quality gate enforcement (Verify phase cannot be skipped)
-
-**FINDING [LOW] EVO-01:** The evolution-state schema at lines 878-903 does not include `pendingProposals` or `status` fields, but the actual `evolution-state.json` file contains both. Schema is outdated relative to implementation.
+**Overall Verdict: 4 PASS, 3 FAIL, 1 PARTIAL**
 
 ---
 
-## 2. Evolution Orchestrator Analysis
+## Area 1: Evolution Orchestrator Agent Definition
 
-**File:** `.claude/agents/orchestrators/evolution-orchestrator.md` (1004 lines)
+**Verdict: FAIL (partial)**
 
-### Frontmatter Configuration
+**Evidence:**
+- File: `.claude/agents/orchestrators/evolution-orchestrator.md`
+- Has `model: opus` (line 7) -- PASS
+- Has `Task` tool in tools list (line 20) -- PASS
+- Has `research-synthesis` in skills (line 33) -- PASS
+- Has all 6 EVOLVE phases documented in instructions -- PASS
+- **MISSING creator skills in frontmatter:** `hook-creator`, `schema-creator`, `template-creator`, `workflow-creator` are absent from the skills list despite Phase L (LOCK) requiring the orchestrator to invoke creator skills for artifact creation
 
-- **Model:** `opus` (line 7) -- correct for orchestrator complexity
-- **Tools:** includes `Task` tool (line 20) -- required for orchestrator delegation
-- **Extended thinking:** enabled (line 13)
+**Impact:** The evolution-orchestrator cannot invoke 4 of 6 creator skills during Phase L without them in its skill assignments. The skills it HAS are: `agent-creator`, `skill-creator`, `research-synthesis`, `artifact-lifecycle`, `command-creator`, `rule-creator`, `verification-before-completion`, `ripgrep`, `code-semantic-search`, `code-structural-search`, `task-management-protocol`.
 
-### Frontmatter Skills List
+**Fix:** Add `hook-creator`, `schema-creator`, `template-creator`, `workflow-creator` to frontmatter skills list.
 
-```yaml
-skills:
-  - agent-creator
-  - artifact-lifecycle
-  - command-creator
-  - research-synthesis
-  - ripgrep
-  - rule-creator
-  - skill-creator
-  - task-management-protocol
-  - verification-before-completion
+---
+
+## Area 2: EVOLVE Workflow Phases
+
+**Verdict: PASS**
+
+**Evidence:**
+- File: `.claude/workflows/core/evolution-workflow.md`
+- All 6 phases defined: Evaluate, Validate, Obtain, Lock, Verify, Enable
+- State machine with valid transitions documented (Mermaid diagram + transition table)
+- Phase O (OBTAIN) correctly requires minimum 3 research queries
+- Quality gates defined between every phase transition
+- References 6 enforcement hooks: `audit-skill-recency.cjs`, `conflict-detector.cjs`, `research-enforcement.cjs`, `evolution-state-guard.cjs`, `quality-gate-validator.cjs`, `artifact-scoring-ledger-hook.cjs`
+- State persistence via `evolution-state.json` (file-based state machine)
+
+**Notes:** The workflow document is comprehensive and well-structured. No gaps found in the workflow definition itself.
+
+---
+
+## Area 3: Creator Skill research-synthesis Dependencies
+
+**Verdict: FAIL**
+
+**Evidence:**
+Checked all 6 creator skill SKILL.md frontmatter for `dependencies:` field:
+
+| Creator Skill    | Has `dependencies: [research-synthesis]`? |
+|------------------|------------------------------------------|
+| agent-creator    | NO                                       |
+| skill-creator    | NO                                       |
+| workflow-creator | NO                                       |
+| hook-creator     | NO                                       |
+| template-creator | **YES** (line 15)                        |
+| schema-creator   | NO                                       |
+
+**Result:** 5 of 6 creator skills lack machine-readable dependency declaration.
+
+**Impact:** While `research-enforcement.cjs` enforces research at write-time (runtime enforcement), the lack of frontmatter `dependencies:` means:
+1. Skill discovery tooling cannot determine prerequisites
+2. Companion-check.cjs cannot validate research was done before creator invocation
+3. Automated pipelines that read skill metadata will skip the research step
+
+**Fix:** Add `dependencies: [research-synthesis]` to frontmatter of all 5 remaining creator skills.
+
+---
+
+## Area 4: Evolution Trigger Detection in Routing
+
+**Verdict: FAIL (critical)**
+
+**Evidence:**
+- `router-decision.md` lines 555-564: "No matching agent" maps to `agent-creator` (NOT evolution-orchestrator)
+- `router-decision.md` lines 1375-1379: "If Step 6 finds no matching agent" instructions say to spawn agent-creator, then spawn the new agent
+- `routing-guard.cjs`: Searched for "evolution", "capability_gap", "evolve" -- ZERO matches found
+- The routing table (`routing-table.cjs`) has no evolution-orchestrator entry for capability gap detection
+
+**Impact:** This is the most critical finding. The EVOLVE workflow is never automatically triggered. When the router encounters a capability gap ("no matching agent"), it:
+1. Spawns agent-creator directly (skipping Evaluate, Validate, Obtain phases)
+2. Bypasses the evolution state machine entirely
+3. Bypasses research-enforcement (since agent-creator may not write to artifact paths through the hook-guarded path)
+4. Never invokes evolution-orchestrator at all
+
+The only way evolution-orchestrator runs is via explicit user request ("evolve the framework" or similar). There is no automatic detection and routing.
+
+**Fix:**
+1. Add evolution-orchestrator to routing table for capability-gap intent keywords
+2. Update router-decision.md Step 6 to route "no matching agent" to evolution-orchestrator (not agent-creator)
+3. Add capability_gap detection in routing-guard.cjs (Check N+1)
+
+---
+
+## Area 5: Companion Check System
+
+**Verdict: PASS**
+
+**Evidence:**
+- File: `.claude/lib/creators/companion-check.cjs` (461 lines)
+- Loads `companionMatrix` from `ecosystem-impact-graph.json` -- verified populated with 9 artifact types: agent, skill, hook, workflow, command, rule, tool, template, schema
+- `checkCompanions()` validates required/recommended/optional companions
+- Supports 5 check strategies: file-exists, grep-in-file, json-key-exists, glob-match, settings-registered
+- `getAutoSpawnSuggestions()` generates spawn suggestions (kill switch: `AUTO_COMPANION_SPAWN=off` by default)
+- `formatCompanionChecklist()` produces markdown output
+- Used by creator skills during Step 0.5 (companion check before creation)
+
+**Notes:** The companion check system is well-implemented and functional. The companionMatrix covers all artifact types.
+
+---
+
+## Area 6: Post-Creation Integration Hook
+
+**Verdict: PASS**
+
+**Evidence:**
+- File: `.claude/hooks/workflow/post-creation-integration.cjs` (601 lines)
+- PostToolUse hook on TaskUpdate -- detects creator completions
+- `isCreatorCompletion()` checks both `metadata.creatorType` and pattern matches in summary text
+- `quickIntegrationCheck()` uses artifact-graph.cjs to find integration gaps
+- `runEcosystemImpactAnalysisWithTimeout()` runs impact analysis with timeout budget
+- `appendToQueueWithImpact()` writes to `integration-queue.jsonl` with sanitized impact report
+- Auto-spawns artifact-integrator when queue size >= `INTEGRATION_BATCH_SIZE` (default 5)
+- Advisory mode by default (`INTEGRATION_ENFORCEMENT=warn`), can be set to block
+
+**Notes:** This is one of the most complete components in the evolution pipeline. Comprehensive error handling, timeout budgeting, and configurable enforcement.
+
+---
+
+## Area 7: Artifact Integrator Capabilities
+
+**Verdict: PARTIAL**
+
+**Evidence:**
+- File: `.claude/agents/orchestrators/artifact-integrator.md` exists
+- Searched for "integration-queue" in artifact-integrator.md -- ZERO matches
+- The artifact-integrator agent definition does not reference `integration-queue.jsonl`
+- The post-creation-integration hook writes to the queue and spawns artifact-integrator, but passes context via spawn prompt (not queue file)
+- artifact-integrator has its own integrated pipeline for external repositories (including research + security audit)
+
+**Impact:** The artifact-integrator processes integration requests but does not directly read integration-queue.jsonl. The queue is consumed indirectly:
+1. Post-creation hook accumulates entries in the queue
+2. When batch size threshold is reached, hook spawns artifact-integrator with context
+3. Router Step 0.5 also checks the queue and spawns artifact-integrator
+
+This works but the artifact-integrator itself has no native awareness of the queue format. If the spawn prompt omits queue context, integration entries are orphaned.
+
+**Fix:** Consider adding explicit integration-queue.jsonl processing to artifact-integrator's instructions.
+
+---
+
+## Area 8: End-to-End Flow
+
+**Verdict: FAIL (chain broken)**
+
+**End-to-End Trace:**
+
+```
+User: "I need an agent that can do X" (capability gap)
+  |
+  v
+Router: Classifies intent, checks routing table
+  |
+  v
+Router: "No matching agent" -> routes to agent-creator  [BREAK POINT]
+  |                                                       |
+  |  (Should route to evolution-orchestrator)              |
+  |                                                       v
+  |                                              agent-creator runs
+  |                                              WITHOUT research-synthesis
+  |                                              (no dependencies: field)
+  |
+  v  (If evolution-orchestrator WERE spawned):
+  |
+  EVALUATE -> VALIDATE -> OBTAIN (research) -> LOCK (create) -> VERIFY -> ENABLE
+                            |                    |                |
+                            v                    v                v
+                    research-enforcement.cjs  companion-check.cjs  quality-gate-validator.cjs
+                    (checks 3/6 paths)       (fully functional)   (fully functional)
+                            |
+                            v
+                    MISSING: .claude/hooks/
+                    MISSING: .claude/templates/
+                    MISSING: .claude/schemas/
 ```
 
-**FINDING [HIGH] EVO-02:** The evolution-orchestrator frontmatter `skills` array is **missing 4 creator skills** that the orchestrator body references and invokes:
-- `workflow-creator` (referenced at line ~450+ in body)
-- `hook-creator` (referenced in body for hook creation)
-- `template-creator` (referenced in body)
-- `schema-creator` (referenced in body)
+**Chain Breaks:**
 
-These skills ARE invoked via `Skill()` calls in the orchestrator body text, but are NOT declared in the frontmatter. This means the 3-layer skill resolution system (frontmatter + agent-skill-matrix + skill-index) may not properly associate these skills with the evolution-orchestrator. The orchestrator CAN still invoke them at runtime via `Skill()`, but tooling that relies on frontmatter (registry generation, proactive audit skill checks) will report false negatives.
+1. **Router level (CRITICAL):** Router routes capability gaps to agent-creator, not evolution-orchestrator. The EVOLVE workflow is never triggered automatically.
 
-### Research-Synthesis Invocation
+2. **Research enforcement coverage (HIGH):** `research-enforcement.cjs` ARTIFACT_PATH_PATTERNS only covers 3 of 6 artifact types:
+   - COVERED: `.claude/agents/`, `.claude/skills/`, `.claude/workflows/`
+   - MISSING: `.claude/hooks/`, `.claude/templates/`, `.claude/schemas/`
 
-- Line 223: research-synthesis is invoked as part of Phase O
-- Line 682: referenced again in the workflow body
-- The orchestrator correctly enforces research-first by invoking `Skill({ skill: 'research-synthesis' })` before any creator skill
+3. **Creator skill dependencies (MEDIUM):** 5/6 creators lack `dependencies: [research-synthesis]` in frontmatter.
 
-### Registry Presence
-
-The evolution-orchestrator IS present in `agent-registry.json`:
-- ID: `evolution-orchestrator`
-- Category: `orchestrator`
-- File path: `.claude/agents/orchestrators/evolution-orchestrator.md`
-- Description: "Meta-agent that orchestrates the EVOLVE workflow..."
-- Routing keyword: `evolution-orchestrator`
-
-**VERDICT:** Orchestrator is properly registered and routable, but frontmatter skills list is incomplete.
+4. **Evolution-orchestrator skills (MEDIUM):** Missing 4 creator skills needed for Phase L.
 
 ---
 
-## 3. Evolution Hooks Audit
+## Findings Summary
 
-### Hook File Existence
-
-All 6 hooks referenced by the workflow exist on disk:
-
-| Hook | Path | Exists | Registered in settings.json |
-|------|------|--------|-----------------------------|
-| research-enforcement.cjs | `.claude/hooks/evolution/` | YES | YES (line 111) |
-| evolution-state-guard.cjs | `.claude/hooks/evolution/` | YES | YES (line 120) |
-| quality-gate-validator.cjs | `.claude/hooks/evolution/` | YES | YES (lines 129, 200) |
-| conflict-detector.cjs | `.claude/hooks/evolution/` | YES | YES (line 138) |
-| artifact-scoring-ledger-hook.cjs | `.claude/hooks/quality/` | YES | YES (line 237) |
-| audit-skill-recency.cjs | `.claude/hooks/session/` | YES | YES (line 33) |
-
-### research-enforcement.cjs Deep Dive
-
-- **Lines 1-50 read.** Header confirms PreToolUse hook for Write/Edit operations.
-- Enforces: Cannot create artifact files without completing research phase.
-- Checks `evolution-state.json` for at least `MIN_RESEARCH_ENTRIES = 3` research entries.
-- Enforcement modes: `RESEARCH_ENFORCEMENT=block|warn|off` (default: block)
-- **SEC-008 compliant:** Fails CLOSED (exit 2 on errors) to prevent security bypass.
-- Uses `safeReadJSON` (not raw `JSON.parse`) for SEC-007 prototype pollution prevention.
-- Uses shared utilities from `.claude/lib/utils/` (hook-input, project-root, state-cache, safe-json).
-
-### settings.json Registration
-
-All evolution hooks are properly registered in `.claude/settings.json` with correct file paths. The `quality-gate-validator.cjs` is registered TWICE (lines 129 and 200) for different trigger contexts, which is intentional (PreToolUse on different tool types).
-
-**VERDICT:** All hooks exist, are registered, and follow security best practices.
+| # | Area | Verdict | Severity | Description |
+|---|------|---------|----------|-------------|
+| F1 | Evolution Orchestrator | FAIL | MEDIUM | Missing 4 creator skills in frontmatter (hook-creator, schema-creator, template-creator, workflow-creator) |
+| F2 | EVOLVE Workflow | PASS | -- | All 6 phases, gates, state machine properly defined |
+| F3 | Creator Dependencies | FAIL | MEDIUM | 5/6 creators lack `dependencies: [research-synthesis]` in frontmatter |
+| F4 | Trigger Detection | FAIL | CRITICAL | Router routes capability gaps to agent-creator, bypassing EVOLVE entirely |
+| F5 | Companion Check | PASS | -- | Fully functional with populated companionMatrix (9 types) |
+| F6 | Post-Creation Integration | PASS | -- | Comprehensive implementation with auto-spawn and timeout budgeting |
+| F7 | Artifact Integrator | PARTIAL | LOW | No native integration-queue.jsonl awareness; relies on spawn prompt context |
+| F8 | End-to-End Flow | FAIL | CRITICAL | Chain broken at router level; research enforcement missing 3 artifact path types |
 
 ---
 
-## 4. State Tracking Analysis
+## Remediation Priority
 
-**File:** `.claude/context/evolution-state.json` (1304 lines)
+### P0 (Critical - blocks evolution from working)
+1. **F4:** Update router-decision.md to route "no matching agent" to evolution-orchestrator instead of agent-creator
+2. **F4:** Add evolution/capability-gap keywords to routing table
 
-### Structure
+### P1 (High - reduces enforcement coverage)
+3. **F8:** Add `.claude/hooks/`, `.claude/templates/`, `.claude/schemas/` to research-enforcement.cjs ARTIFACT_PATH_PATTERNS
+4. **F1:** Add missing 4 creator skills to evolution-orchestrator frontmatter
 
-```json
-{
-  "version": 1,
-  "lastEvolution": "2026-03-01-dynamic-api-integration-update",
-  "evolutions": [...],     // 126 entries
-  "pendingProposals": ...,
-  "status": ...,
-  "skills": ...
-}
-```
-
-- **126 completed evolutions** tracked since system inception
-- **Last evolution:** 2026-03-01 (dynamic-api-integration-update)
-- **Top-level keys:** version, lastEvolution, evolutions, pendingProposals, status, skills
-
-### Evolution Entry Format (from first entry)
-
-```json
-{
-  "id": "2026-03-01-dynamic-api-integration-update",
-  "skill": "dynamic-api-integration",
-  "version": "1.2.0",
-  "date": "2026-03-01",
-  "type": "skill-updater",
-  "summary": "Added agents/category/tags frontmatter..."
-}
-```
-
-**FINDING [MEDIUM] EVO-03:** The evolution entry format in the actual file includes only `id`, `skill`, `version`, `date`, `type`, `summary`. The evolution-workflow.md schema (lines 878-903) specifies additional fields like `phase`, `researchReport`, `qualityScore`, `artifactType`, `artifactPath`. The runtime state diverges from the documented schema -- either the hooks are not writing all fields, or the schema was expanded after the bulk of evolutions were recorded.
-
-**VERDICT:** State tracking is functional and actively used. Schema drift between documentation and runtime is a medium concern.
+### P2 (Medium - metadata correctness)
+5. **F3:** Add `dependencies: [research-synthesis]` to 5 remaining creator skill frontmatter files
+6. **F7:** Add integration-queue.jsonl processing instructions to artifact-integrator agent definition
 
 ---
 
-## 5. Creator Skill Integration
+## Verified Components (Healthy)
 
-### Creator Skill Inventory
-
-All 6 creator skills exist on disk:
-
-| Skill | Path | Exists | Has `dependencies: [research-synthesis]` |
-|-------|------|--------|-------------------------------------------|
-| agent-creator | `.claude/skills/agent-creator/SKILL.md` | YES | NO |
-| skill-creator | `.claude/skills/skill-creator/SKILL.md` | YES | NO |
-| workflow-creator | `.claude/skills/workflow-creator/SKILL.md` | YES | NO |
-| hook-creator | `.claude/skills/hook-creator/SKILL.md` | YES | NO |
-| template-creator | `.claude/skills/template-creator/SKILL.md` | YES | YES |
-| schema-creator | `.claude/skills/schema-creator/SKILL.md` | YES | NO |
-
-**FINDING [CRITICAL] EVO-04:** Only 1 of 6 creator skills (`template-creator`) has the formal `dependencies: [research-synthesis]` frontmatter field. The CLAUDE.md Section 3 states: "Always invoke research-synthesis BEFORE any other creator skill (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator)." This is an **Iron Law** in documentation but is NOT encoded in 5 of 6 creator skill frontmatters.
-
-**Impact:** The research-enforcement.cjs hook enforces research at the Write/Edit level (checking evolution-state.json for research entries). However, if a creator skill is invoked OUTSIDE the EVOLVE workflow (e.g., directly by a developer), there is no frontmatter-level signal that research-synthesis is a prerequisite. The hook enforcement partially compensates, but frontmatter is the canonical declaration mechanism for skill dependencies.
-
-**Mitigating factor:** The `agent-creator` frontmatter does include `best_practices: ["Research domain before creating agent"]` -- but this is advisory, not enforced.
-
-### Companion-Check Integration
-
-- `companion-check.cjs` exists at: `.claude/lib/creators/companion-check.cjs`
-- It is a **library module**, NOT a hook (not in `.claude/hooks/`)
-- Referenced by all 12 creator/updater skills' SKILL.md files (agent-creator, skill-creator, workflow-creator, hook-creator, template-creator, schema-creator, plus their updater counterparts, command-creator, rule-creator, tool-creator, artifact-lifecycle)
-- The companion-check is invoked programmatically within creator skill workflows, not as a hook registration
-
-**VERDICT:** companion-check is correctly implemented as a shared library callable from creator skills.
-
-### Post-Creation Integration
-
-- `post-creation-integration.cjs` exists at: `.claude/hooks/workflow/post-creation-integration.cjs`
-- Registered in settings.json at line 241
-- Triggers on PostToolUse of TaskUpdate (detects creator completions)
-- Queues integration analysis for artifact-integrator
-
-**FINDING [MEDIUM] EVO-05:** The CLAUDE.md Section 1.3 references `post-creation-integration.cjs` as if it is in the routing category, but it actually lives in `.claude/hooks/workflow/`. This is a documentation inaccuracy -- not a functional issue, since settings.json has the correct path.
-
-### process-evolution-queue.cjs
-
-- Located at: `.claude/hooks/process-evolution-queue.cjs` (root of hooks directory)
-- Implements a polling processor with exclusive file-based locking
-- Reads evolution dispatch plans from `.claude/context/runtime/evolution-dispatch-plan.json`
-- Uses `POLL_INTERVAL_MS = 60000` (1-minute polling)
-
-**FINDING [LOW] EVO-06:** This hook lives in the root `.claude/hooks/` directory rather than in `.claude/hooks/evolution/` alongside the other evolution hooks. Minor organizational inconsistency.
+- `evolution-state-guard.cjs` -- Valid state machine transition enforcement, proper exit codes, fail-open on errors
+- `quality-gate-validator.cjs` -- Placeholder detection, Memory Protocol checks, Task Progress Protocol validation
+- `evolution-state.json` -- Populated with real evolution history (2 entries, last: 2026-03-01)
+- `ecosystem-impact-graph.json` -- companionMatrix populated with all 9 artifact types
+- `companion-check.cjs` -- 461 lines, 5 check strategies, functional
+- `post-creation-integration.cjs` -- 601 lines, comprehensive PostToolUse hook
+- `evolution-workflow.md` -- Complete 6-phase workflow with Mermaid diagrams
 
 ---
 
-## 6. Gaps and Broken Wiring
-
-### Gap Summary
-
-| ID | Severity | Component | Description |
-|----|----------|-----------|-------------|
-| EVO-01 | LOW | evolution-workflow.md | Schema in docs outdated vs actual evolution-state.json structure |
-| EVO-02 | HIGH | evolution-orchestrator.md | Frontmatter missing 4 creator skills (workflow-creator, hook-creator, template-creator, schema-creator) |
-| EVO-03 | MEDIUM | evolution-state.json | Runtime entries have fewer fields than documented schema |
-| EVO-04 | CRITICAL | Creator skills (5 of 6) | Missing `dependencies: [research-synthesis]` in frontmatter |
-| EVO-05 | MEDIUM | CLAUDE.md Section 1.3 | Documents post-creation-integration as routing hook; actually in workflow/ |
-| EVO-06 | LOW | process-evolution-queue.cjs | Misplaced in hooks root instead of hooks/evolution/ |
-| EVO-07 | HIGH | evolution-orchestrator.md | No explicit error recovery documented for Phase O failure (research fails) |
-| EVO-08 | HIGH | Creator skills | No automated test verifying research-synthesis prerequisite enforcement |
-| EVO-09 | MEDIUM | evolution-state.json | No size rotation mechanism -- 126 entries growing indefinitely (1304 lines) |
-
-### EVO-07 Detail (HIGH)
-
-The evolution-orchestrator body describes the happy path extensively but does not document what happens when Phase O (research) fails -- e.g., when WebSearch/WebFetch are unavailable, rate-limited, or return no results. The research-enforcement hook will block creation, but the orchestrator has no documented fallback strategy (retry with different queries, degrade to local-only research, abort with clear error message).
-
-### EVO-08 Detail (HIGH)
-
-There are no integration tests verifying that invoking a creator skill without prior research-synthesis invocation is actually blocked by the research-enforcement hook. The hook exists and has correct logic, but the end-to-end path (creator skill -> Write attempt -> hook intercept -> block) is untested. If the hook registration is accidentally removed from settings.json, the Iron Law silently stops being enforced.
-
-### EVO-09 Detail (MEDIUM)
-
-The evolution-state.json file has 126 entries across 1304 lines and will grow indefinitely. Unlike the memory system (which has rotation via memory-rotator.cjs for files exceeding 20KB), evolution-state.json has no rotation or archival mechanism. At current growth rate (~126 entries in ~5 days), this could become unwieldy within weeks.
-
----
-
-## Architectural Assessment
-
-### What Works Well
-
-1. **Hook enforcement chain is complete.** All 6 referenced hooks exist, are registered, and follow security best practices (fail-closed, safeParseJSON, shared utilities).
-2. **State tracking is active.** 126 evolutions tracked with consistent entry format.
-3. **research-enforcement.cjs is well-implemented.** SEC-008 compliant, uses proper enforcement modes, checks minimum research entries.
-4. **companion-check is correctly factored.** Lives in shared library, referenced by all creator skills.
-5. **Evolution orchestrator is properly registered** in agent-registry.json with correct routing.
-
-### What Needs Remediation
-
-1. **[CRITICAL] Add `dependencies: [research-synthesis]` to 5 creator skill frontmatters** -- this is the single most important fix. It makes the Iron Law machine-readable.
-2. **[HIGH] Add 4 missing creator skills to evolution-orchestrator frontmatter** -- ensures registry/audit tooling correctly maps skill ownership.
-3. **[HIGH] Add Phase O failure recovery documentation** to evolution-orchestrator.md.
-4. **[HIGH] Create integration test for research-enforcement end-to-end path.**
-5. **[MEDIUM] Implement evolution-state.json rotation** or archival (similar to memory-rotator.cjs pattern).
-
----
-
-## Files Analyzed
-
-| File | Lines | Status |
-|------|-------|--------|
-| `.claude/workflows/core/evolution-workflow.md` | 1143 | Fully read |
-| `.claude/agents/orchestrators/evolution-orchestrator.md` | 1004 | Fully read |
-| `.claude/context/agent-registry.json` | ~8500 | Grep-searched |
-| `.claude/context/evolution-state.json` | 1304 | Structure verified |
-| `.claude/hooks/evolution/research-enforcement.cjs` | ~200 | First 50 lines read |
-| `.claude/hooks/evolution/evolution-state-guard.cjs` | ~200 | Existence verified |
-| `.claude/hooks/evolution/conflict-detector.cjs` | ~200 | Existence verified |
-| `.claude/hooks/evolution/quality-gate-validator.cjs` | ~200 | Existence verified |
-| `.claude/hooks/quality/artifact-scoring-ledger-hook.cjs` | ~200 | Existence verified |
-| `.claude/hooks/session/audit-skill-recency.cjs` | ~200 | Existence verified |
-| `.claude/hooks/process-evolution-queue.cjs` | ~200 | First 30 lines read |
-| `.claude/hooks/workflow/post-creation-integration.cjs` | ~200 | Existence verified |
-| `.claude/lib/creators/companion-check.cjs` | ~200 | Existence verified |
-| `.claude/settings.json` | ~300 | Grep-searched for registrations |
-| 6x Creator skill SKILL.md frontmatters | varies | Fully extracted |
+*End of Evolution System Audit Report*

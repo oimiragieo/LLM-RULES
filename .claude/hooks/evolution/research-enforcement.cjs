@@ -49,6 +49,9 @@ const ARTIFACT_PATH_PATTERNS = [
   /\.claude\/agents\//,
   /\.claude\/skills\//,
   /\.claude\/workflows\//,
+  /\.claude\/hooks\//,
+  /\.claude\/templates\//,
+  /\.claude\/schemas\//,
 ];
 
 const EVOLUTION_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');

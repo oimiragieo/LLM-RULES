@@ -71,6 +71,7 @@ const ROUTER_BASH_WHITELIST = [
   /^git\s+log\s+--oneline\s+-\d{1,2}$/,
   /^git\s+diff\s+--name-only(\s+HEAD)?$/,
   /^git\s+branch$/,
+  /^echo\s+'[^']*'\s*>>\s*\.claude\/context\/runtime\/session-gap-log\.jsonl$/,
 ];
 
 /**

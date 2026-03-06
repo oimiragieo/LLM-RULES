@@ -193,7 +193,15 @@
           "debug-log-analysis"
         ],
         "contextual": {},
-        "always": []
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       },
       "technical-program-manager": {
         "primary": ["plan-generator", "task-management-protocol", "complexity-assessment"],
@@ -630,6 +638,7 @@
           "code-structural-search",
           "memory-search",
           "ripgrep",
+          "task-management-protocol",
           "token-saver-context-compression",
           "verification-before-completion"
         ],
@@ -642,6 +651,7 @@
           "code-structural-search",
           "memory-search",
           "ripgrep",
+          "task-management-protocol",
           "token-saver-context-compression",
           "verification-before-completion"
         ],
@@ -654,6 +664,7 @@
           "code-structural-search",
           "memory-search",
           "ripgrep",
+          "task-management-protocol",
           "token-saver-context-compression",
           "verification-before-completion"
         ],
@@ -666,6 +677,7 @@
           "code-structural-search",
           "memory-search",
           "ripgrep",
+          "task-management-protocol",
           "token-saver-context-compression",
           "verification-before-completion"
         ],
@@ -678,6 +690,7 @@
           "code-structural-search",
           "memory-search",
           "ripgrep",
+          "task-management-protocol",
           "token-saver-context-compression",
           "verification-before-completion"
         ],
@@ -793,6 +806,7 @@
           "code-structural-search",
           "memory-search",
           "ripgrep",
+          "task-management-protocol",
           "token-saver-context-compression",
           "verification-before-completion"
         ],
@@ -1164,14 +1178,26 @@
           "verification-before-completion",
           "subagent-driven-development",
           "task-management-protocol",
-          "ripgrep"
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "memory-search"
         ]
       },
       "swarm-coordinator": {
         "primary": ["swarm-coordination", "consensus-voting", "task-management-protocol"],
         "secondary": ["dispatching-parallel-agents", "context-compressor"],
         "contextual": {},
-        "always": ["verification-before-completion", "task-management-protocol", "ripgrep"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "memory-search"
+        ]
       },
       "evolution-orchestrator": {
         "primary": ["research-synthesis", "agent-creator", "skill-creator"],
@@ -1181,20 +1207,40 @@
           "verification-before-completion",
           "task-management-protocol",
           "artifact-lifecycle",
-          "ripgrep"
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "memory-search"
         ]
       },
       "party-orchestrator": {
         "primary": ["swarm-coordination", "consensus-voting"],
         "secondary": ["dispatching-parallel-agents"],
         "contextual": {},
-        "always": ["task-management-protocol", "ripgrep", "verification-before-completion"]
+        "always": [
+          "task-management-protocol",
+          "ripgrep",
+          "verification-before-completion",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "memory-search"
+        ]
       },
       "artifact-integrator": {
         "primary": ["project-onboarding", "ripgrep"],
         "secondary": ["context-compressor", "ripgrep"],
         "contextual": {},
-        "always": ["verification-before-completion", "task-management-protocol", "ripgrep"]
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "memory-search"
+        ]
       }
     }
   },
