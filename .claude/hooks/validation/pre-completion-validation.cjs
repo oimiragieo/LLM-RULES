@@ -10,6 +10,10 @@
  *
  * ENVIRONMENT VARIABLES:
  * - TASK_STATUS_ENFORCEMENT: 'block' (default) | 'warn' | 'off'
+ * - PRE_COMPLETION_SUMMARY_ENFORCEMENT: 'block' (default) | 'warn' | 'off' — legacy summary gate
+ * - SUMMARY_REQUIRED_ENFORCEMENT: 'block' (default) | 'warn' | 'off' — blocks fallback strings and short summaries (<50 chars)
+ * - REFLECTION_SCORE_ENFORCEMENT: 'warn' (default) | 'block' | 'off'
+ * - TASK_OUTPUT_ENFORCEMENT: 'block' (default) | 'warn' | 'off'
  */
 
 'use strict';
@@ -420,9 +424,10 @@ function incrementTaskOutputMetric(counterName) {
 function isValidSummary(summary) {
   if (!summary || typeof summary !== 'string') return false;
   const trimmed = summary.trim();
-  if (trimmed.length < 20) return false; // Require substantive summary (was 10; minimal "Completed task 2" slipped through)
+  if (trimmed.length < 50) return false; // Require substantive summary (50+ chars; shorter strings are placeholders)
   // Reject known fallback/placeholder strings
   const FALLBACK_PATTERNS = [
+    /task\s+\d+\s+completed\s+without\s+summary\s+metadata/i,
     /^task\s+\d+\s+completed\s+without\s+summary/i,
     /^completed\s+without\s+summary/i,
     /^no\s+summary\s+(provided|available|metadata)/i,
@@ -432,6 +437,81 @@ function isValidSummary(summary) {
     /^finished$/i,
   ];
   return !FALLBACK_PATTERNS.some(pattern => pattern.test(trimmed));
+}
+
+/**
+ * Check if a summary is the known agent fallback string.
+ * @param {*} summary - The summary value to check
+ * @returns {boolean} true if it matches the fallback pattern
+ */
+function isFallbackSummary(summary) {
+  if (!summary || typeof summary !== 'string') return false;
+  return /task\s+\d+\s+completed\s+without\s+summary\s+metadata/i.test(summary.trim());
+}
+
+/**
+ * Enforce reflection score integrity — block/warn when a numeric score is emitted
+ * without a dataQuality field that verifies it was not fabricated.
+ * @param {object} toolParams - Raw TaskUpdate parameters
+ */
+function enforceReflectionScore(toolParams) {
+  const isReflectionCompletion =
+    (toolParams.metadata &&
+      Array.isArray(toolParams.metadata.processedReflectionIds) &&
+      toolParams.metadata.processedReflectionIds.length > 0) ||
+    (toolParams.metadata && typeof toolParams.metadata.score === 'number');
+
+  if (!isReflectionCompletion) return;
+
+  const hasScore = toolParams.metadata && typeof toolParams.metadata.score === 'number';
+  const hasDataQuality = toolParams.metadata && toolParams.metadata.dataQuality !== undefined;
+
+  if (hasScore && !hasDataQuality) {
+    const reflectionMode = getEnforcementMode('REFLECTION_SCORE_ENFORCEMENT', 'warn');
+    const reflectionMsg =
+      '[pre-completion-validation] Reflection score emitted without dataQuality field — cannot verify score was not fabricated. Add metadata.dataQuality: "full"|"partial"|"insufficient"';
+    if (reflectionMode === 'block') {
+      console.log(formatHookResult('block', reflectionMsg));
+      process.exit(2);
+    } else if (reflectionMode !== 'off') {
+      process.stderr.write(reflectionMsg + '\n');
+    }
+  }
+}
+
+/**
+ * Enforce required output artifacts for a completing task.
+ * @param {string|undefined} completionTaskId - The task ID being completed
+ * @param {object} toolParams - Raw TaskUpdate parameters
+ */
+function enforceRequiredOutputs(completionTaskId, toolParams) {
+  const requiredOutputs = resolveRequiredOutputsForTask(completionTaskId, toolParams);
+  const taskOutputMode = getEnforcementMode('TASK_OUTPUT_ENFORCEMENT', 'block');
+  if (taskOutputMode === 'off' || !completionTaskId || requiredOutputs.length === 0) return;
+
+  const outputValidation = validateRequiredOutputs(requiredOutputs);
+  if (outputValidation.passed) return;
+
+  incrementTaskOutputMetric('artifact_completion_blocked');
+  if (outputValidation.invalid.length > 0) {
+    incrementTaskOutputMetric('placeholder_attempt_detected');
+  }
+  const lines = ['REQUIRED OUTPUT VALIDATION FAILED'];
+  if (outputValidation.missing.length > 0) {
+    lines.push('Missing required outputs:');
+    for (const item of outputValidation.missing) lines.push(`- ${item}`);
+  }
+  if (outputValidation.invalid.length > 0) {
+    lines.push('Invalid placeholder outputs:');
+    for (const item of outputValidation.invalid) lines.push(`- ${item}`);
+  }
+  const validationMessage = lines.join('\n');
+  if (taskOutputMode === 'warn') {
+    console.warn(`[WARN] ${validationMessage}`);
+  } else {
+    console.log(formatHookResult('block', validationMessage));
+    process.exit(2);
+  }
 }
 
 /**
@@ -510,62 +590,37 @@ async function main() {
       }
     }
 
-    // REFLECTION_SCORE_ENFORCEMENT: detect reflection agent fabricating scores without dataQuality field.
-    // If a TaskUpdate carries a numeric score (indicating a reflection completion) but has no
-    // dataQuality field, we cannot verify the score was not fabricated under context pressure.
-    // Default mode is 'warn' — existing reflections are not broken; harden to 'block' to enforce.
-    const isReflectionCompletion =
-      (toolParams.metadata &&
-        Array.isArray(toolParams.metadata.processedReflectionIds) &&
-        toolParams.metadata.processedReflectionIds.length > 0) ||
-      (toolParams.metadata && typeof toolParams.metadata.score === 'number');
+    // SUMMARY_REQUIRED_ENFORCEMENT: block completion when summary is the known agent fallback
+    // string or is missing/empty/under 50 chars. Default is 'block' — advisory mode has failed
+    // to produce compliance (17+ documented violations across multiple sessions).
+    const summaryRequiredMode = getEnforcementMode('SUMMARY_REQUIRED_ENFORCEMENT', 'block');
+    if (summaryRequiredMode !== 'off') {
+      const rawSummary = toolParams.metadata && toolParams.metadata.summary;
+      const isFallback = isFallbackSummary(rawSummary);
+      const isMissingOrShort =
+        !rawSummary || typeof rawSummary !== 'string' || rawSummary.trim().length < 50;
 
-    if (isReflectionCompletion) {
-      const hasScore = toolParams.metadata && typeof toolParams.metadata.score === 'number';
-      const hasDataQuality = toolParams.metadata && toolParams.metadata.dataQuality !== undefined;
-
-      // If a numeric score is present but no dataQuality field, we cannot verify authenticity.
-      if (hasScore && !hasDataQuality) {
-        const reflectionMode = getEnforcementMode('REFLECTION_SCORE_ENFORCEMENT', 'warn');
-        const reflectionMsg =
-          '[pre-completion-validation] Reflection score emitted without dataQuality field — cannot verify score was not fabricated. Add metadata.dataQuality: "full"|"partial"|"insufficient"';
-        if (reflectionMode === 'block') {
-          console.log(formatHookResult('block', reflectionMsg));
+      if (isFallback || isMissingOrShort) {
+        const blockReason = isFallback
+          ? 'summary is the agent fallback string ("Task N completed without summary metadata") — provide a real summary describing what was done'
+          : 'summary is missing, empty, or under 50 characters — provide a substantive summary (50+ chars)';
+        const summaryRequiredMsg = `TaskUpdate blocked: summary metadata is required (50+ chars, not the fallback string). Reason: ${blockReason}. Set SUMMARY_REQUIRED_ENFORCEMENT=warn to downgrade.`;
+        if (summaryRequiredMode === 'block') {
+          console.log(formatHookResult('block', summaryRequiredMsg));
           process.exit(2);
-        } else if (reflectionMode !== 'off') {
-          process.stderr.write(reflectionMsg + '\n');
+        } else {
+          process.stderr.write(
+            `[pre-completion-validation] SUMMARY_REQUIRED_ENFORCEMENT WARNING: ${blockReason}\n`
+          );
         }
       }
     }
+
+    // REFLECTION_SCORE_ENFORCEMENT: detect reflection agent fabricating scores without dataQuality.
+    enforceReflectionScore(toolParams);
 
     const completionTaskId = parsedParams.normalized.taskId;
-    const requiredOutputs = resolveRequiredOutputsForTask(completionTaskId, toolParams);
-    const taskOutputMode = getEnforcementMode('TASK_OUTPUT_ENFORCEMENT', 'block');
-    if (taskOutputMode !== 'off' && completionTaskId && requiredOutputs.length > 0) {
-      const outputValidation = validateRequiredOutputs(requiredOutputs);
-      if (!outputValidation.passed) {
-        incrementTaskOutputMetric('artifact_completion_blocked');
-        if (outputValidation.invalid.length > 0) {
-          incrementTaskOutputMetric('placeholder_attempt_detected');
-        }
-        const lines = ['REQUIRED OUTPUT VALIDATION FAILED'];
-        if (outputValidation.missing.length > 0) {
-          lines.push('Missing required outputs:');
-          for (const item of outputValidation.missing) lines.push(`- ${item}`);
-        }
-        if (outputValidation.invalid.length > 0) {
-          lines.push('Invalid placeholder outputs:');
-          for (const item of outputValidation.invalid) lines.push(`- ${item}`);
-        }
-        const validationMessage = lines.join('\n');
-        if (taskOutputMode === 'warn') {
-          console.warn(`[WARN] ${validationMessage}`);
-        } else {
-          console.log(formatHookResult('block', validationMessage));
-          process.exit(2);
-        }
-      }
-    }
+    enforceRequiredOutputs(completionTaskId, toolParams);
 
     if (isEcosystemCreatorAction(toolParams)) {
       const ecosystem = validateCreatorEcosystem();
@@ -618,4 +673,6 @@ module.exports = {
   readActiveCreatorSkills,
   resolveRequiredOutputsForTask,
   validateRequiredOutputs,
+  isValidSummary,
+  isFallbackSummary,
 };

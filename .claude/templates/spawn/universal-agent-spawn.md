@@ -139,6 +139,7 @@ When calling `TaskUpdate({ status: 'completed' })`, metadata MUST include:
 - `filesModified`: string[] of changed file paths
 - `discoveries`: string[] of key findings (REQUIRED for HIGH complexity tasks)
 - `memoriesRecorded`: string[] of MemoryRecord type+area pairs called during this task (e.g. `['gotcha:platform', 'pattern:hooks']`). Empty array is allowed only if you consciously evaluated and found nothing worth recording.
+- **For git commit/push tasks**: `commitHash` string — the verified post-commit HEAD hash (e.g. `"commitHash": "abc1234"`). NEVER include this field if HEAD did not change from pre-commit (that means the commit failed).
 
 These fields trigger the memory extraction pipeline. Without them, your work is invisible to the learning system.
 

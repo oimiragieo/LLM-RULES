@@ -146,6 +146,49 @@ This skill will be automatically activated via the Skill() tool.
 4.  **Observability**: Prometheus, Grafana, ELK, Datadog.
 5.  **Release Management**: Versioning, deployments, rollbacks.
 
+## Commit Verification Protocol (MANDATORY)
+
+**Devops agents have a 50% commit failure rate due to silent pre-commit hook blocks (ESLint SEC-023, max-lines 500). Every git commit MUST be verified.**
+
+### Steps for every `git commit`
+
+1. **Capture pre-commit HEAD**: Before running `git commit`, record current HEAD hash:
+
+   ```bash
+   PRE_COMMIT_HEAD=$(git rev-parse HEAD)
+   ```
+
+2. **Run `git commit`**: Execute the commit command and capture output/stderr.
+
+3. **Verify HEAD changed**: After the commit command, compare HEAD again:
+
+   ```bash
+   POST_COMMIT_HEAD=$(git rev-parse HEAD)
+   if [ "$PRE_COMMIT_HEAD" = "$POST_COMMIT_HEAD" ]; then
+     echo "COMMIT FAILED — HEAD unchanged. Reading status and errors..."
+     git status
+     # Fix the blocking issue, then retry commit
+   else
+     echo "Commit succeeded: $POST_COMMIT_HEAD"
+   fi
+   ```
+
+4. **If commit failed**: Read `git status` output and any stderr. Common blockers:
+   - ESLint errors (SEC-023 shell injection, max-lines 500 limit) — fix lint errors then re-stage and recommit
+   - Pre-commit hook failures — read hook output and fix the violation
+
+5. **Include commit hash in TaskUpdate**: On success, include the commit hash in the completion metadata summary.
+
+6. **After `git push`**: Verify the push landed with:
+   ```bash
+   git log --oneline -1
+   ```
+   Confirm the hash matches the post-commit hash above.
+
+### Iron Law
+
+**NEVER call `TaskUpdate(completed)` for a commit or push task unless the commit hash is confirmed different from the pre-commit HEAD.** A commit that silently failed is not a completed task.
+
 ## Execution Rules
 
 - **Worker Role**: You execute tasks. You do not delegate.

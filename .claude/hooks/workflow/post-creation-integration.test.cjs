@@ -130,6 +130,45 @@ test('processCreatorCompletion writes to queue when gaps found', async () => {
   fs.unlinkSync(QUEUE_PATH);
 });
 
+test('processCreatorCompletion skips queue write when artifactId is unknown:unknown', async () => {
+  // Clean up queue
+  if (fs.existsSync(QUEUE_PATH)) {
+    fs.unlinkSync(QUEUE_PATH);
+  }
+
+  // Simulate a creator pattern match but no artifact metadata (generates unknown:unknown)
+  const hookData = {
+    toolUse: {
+      tool: 'TaskUpdate',
+      input: {
+        status: 'completed',
+        taskId: '99',
+        metadata: {
+          // creatorType not set — will be detected via subject pattern as 'unknown'
+          // No artifactId or artifactName — extractArtifactId returns 'unknown:unknown'
+          summary: 'skill-creator completed some work',
+        },
+      },
+    },
+  };
+
+  const result = await processCreatorCompletion(hookData);
+
+  // Queue should NOT have been written
+  const queueExists = fs.existsSync(QUEUE_PATH);
+  if (queueExists) {
+    const content = fs.readFileSync(QUEUE_PATH, 'utf8').trim();
+    assert.strictEqual(
+      content,
+      '',
+      'Queue should be empty — unknown:unknown entries must not be written'
+    );
+  }
+
+  // Hook should still allow (fail-open)
+  assert.ok(result.result.allow, 'Hook must allow (fail-open) even when skipping queue write');
+});
+
 test('appendToQueueWithImpact caps oversized queue entries to 10KB', () => {
   if (fs.existsSync(QUEUE_PATH)) fs.unlinkSync(QUEUE_PATH);
 

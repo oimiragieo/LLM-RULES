@@ -453,6 +453,21 @@ async function processCreatorCompletion(hookData) {
   // Extract artifact ID
   const artifactId = extractArtifactId(hookData, detection.creatorType);
 
+  // Guard: skip queue write if artifact ID is unresolvable (unknown:unknown pattern).
+  // This prevents noise entries from TaskUpdate completions that match creator
+  // patterns but carry no artifact metadata.
+  const idParts = artifactId.split(':');
+  const hasUnknownId =
+    artifactId === 'unknown:unknown' ||
+    (idParts.length === 2 && idParts[0] === 'unknown' && idParts[1] === 'unknown');
+  if (hasUnknownId) {
+    process.stderr.write(
+      `[post-creation-integration] Skipping queue write: artifactId resolved to "${artifactId}" (no artifact metadata in task completion). Detected creatorType="${detection.creatorType}". Ensure creator tasks include metadata.artifactId or metadata.artifactName.\n`
+    );
+    process.stdout.write(formatHookResult({ allow: true }));
+    return { result: { allow: true } };
+  }
+
   // Extract artifact path from metadata
   const artifactPath = toolInput.metadata?.artifactPath || artifactId;
 
