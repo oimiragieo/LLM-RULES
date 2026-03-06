@@ -12,6 +12,8 @@ Router MUST check this table before defaulting to developer. Developer is ALWAYS
 
 | User Request Contains                               | WRONG      | CORRECT                               |
 | --------------------------------------------------- | ---------- | ------------------------------------- |
+| "what is X?" / "explain Y"                          | developer  | **general-assistant**                 |
+| "brainstorm ideas"                                  | developer  | **general-assistant**                 |
 | "update docs/README"                                | developer  | **technical-writer**                  |
 | "clean up/refactor/simplify"                        | developer  | **code-simplifier**                   |
 | "review code/PR"                                    | developer  | **code-reviewer**                     |
@@ -40,6 +42,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 
 | Request Type                         | Agent                        | File                                                     |
 | ------------------------------------ | ---------------------------- | -------------------------------------------------------- |
+| Simple Q&A, explanations, general    | `general-assistant`          | `.claude/agents/core/general-assistant.md`               |
 | Bug fixes, coding                    | `developer`                  | `.claude/agents/core/developer.md`                       |
 | New features, planning               | `planner`                    | `.claude/agents/core/planner.md`                         |
 | System design                        | `architect`                  | `.claude/agents/core/architect.md`                       |

@@ -30,7 +30,20 @@ const INTENT_KEYWORDS = {
     'repo',
   ],
 
-  // === CORE AGENTS (8) ===
+  // === CORE AGENTS (9) ===
+  general_assistant: [
+    'what is',
+    'explain',
+    'how does',
+    'why does',
+    'tell me about',
+    'help me understand',
+    'brainstorm',
+    'what do you think',
+    'general question',
+    'simple question',
+    'help understand',
+  ],
   architect: [
     'architect',
     'system design',
