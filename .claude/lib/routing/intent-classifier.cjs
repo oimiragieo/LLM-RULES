@@ -198,7 +198,7 @@ function classifyIntent(prompt, options = {}) {
     defaultAgent = getPreferredAgent(intent);
   }
 
-  if (intent === 'general' && !defaultAgent) {
+  if (!defaultAgent) {
     const patternMatch = resolveByPattern(promptLower, ROUTING_PATTERNS);
     if (patternMatch) {
       intent = patternMatch.agent;
@@ -207,7 +207,7 @@ function classifyIntent(prompt, options = {}) {
     }
   }
 
-  if (intent === 'general' && !defaultAgent) {
+  if (!defaultAgent) {
     const fuzzyMatch = fuzzyMatchIntent(promptLower, INTENT_KEYWORDS, { threshold: 0.6 });
     if (fuzzyMatch) {
       intent = fuzzyMatch.intent;

@@ -2,6 +2,7 @@
 
 const INTENT_TO_AGENT = {
   // Core agents
+  general_assistant: 'general-assistant',
   architect: 'architect',
   context_compressor: 'context-compressor',
   developer: 'developer',
