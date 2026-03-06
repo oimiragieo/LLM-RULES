@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-06T05:50:10.866Z",
+  "generatedAt": "2026-03-06T05:58:26.055Z",
   "metadata": {
-    "totalSkills": 266,
+    "totalSkills": 265,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-06T05:50:10.867Z",
+    "lastValidated": "2026-03-06T05:58:26.055Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7102,29 +7102,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "ptest-skill": {
-      "name": "ptest-skill",
-      "displayName": "Ptest Skill",
-      "category": "Other",
-      "domain": "other",
-      "description": "A temporary test skill for verifying protocol injection",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Edit",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "ptest-skill"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "regulatory-compliance": {
       "name": "regulatory-compliance",
       "displayName": "Regulatory Compliance",
@@ -7408,7 +7385,6 @@
         "frontend-design",
         "marketing-content",
         "mcp-builder",
-        "ptest-skill",
         "regulatory-compliance",
         "seo-optimization",
         "user-research",
@@ -7780,7 +7756,6 @@
         "frontend-design",
         "marketing-content",
         "mcp-builder",
-        "ptest-skill",
         "regulatory-compliance",
         "seo-optimization",
         "user-research",
@@ -8135,7 +8110,6 @@
         "frontend-design",
         "marketing-content",
         "mcp-builder",
-        "ptest-skill",
         "regulatory-compliance",
         "scientific-skills",
         "seo-optimization",
@@ -8356,7 +8330,6 @@
         "frontend-design",
         "marketing-content",
         "mcp-builder",
-        "ptest-skill",
         "regulatory-compliance",
         "scientific-skills",
         "seo-optimization",
@@ -8536,7 +8509,6 @@
         "doc-coauthoring",
         "frontend-design",
         "mcp-builder",
-        "ptest-skill",
         "scientific-skills",
         "seo-optimization",
         "user-research",
@@ -8691,7 +8663,6 @@
         "webapp-testing",
         "feedback-analysis",
         "marketing-content",
-        "ptest-skill",
         "scientific-skills"
       ],
       "Glob": [
@@ -9224,7 +9195,6 @@
         "frontend-design",
         "marketing-content",
         "mcp-builder",
-        "ptest-skill",
         "regulatory-compliance",
         "seo-optimization",
         "user-research",
@@ -10466,7 +10436,6 @@
         "frontend-design",
         "marketing-content",
         "mcp-builder",
-        "ptest-skill",
         "regulatory-compliance",
         "seo-optimization",
         "user-research",

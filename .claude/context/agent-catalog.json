@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generatedAt": "2026-03-06T05:43:30.802Z",
+  "generatedAt": "2026-03-06T05:56:09.670Z",
   "agents": [
     {
       "id": "architect",
@@ -883,21 +883,6 @@
             "code-quality-expert",
             "chrome-browser"
           ],
-          "examples": []
-        }
-      ]
-    },
-    {
-      "id": "ptest-agent",
-      "name": "ptest-agent",
-      "description": "A temporary test agent to verify the Search and Memory protocols",
-      "version": "1.0.0",
-      "skills": [
-        {
-          "id": "ptest-agent",
-          "name": "ptest-agent",
-          "description": "A temporary test agent to verify the Search and Memory protocols",
-          "tags": ["ptest", "agent", "test"],
           "examples": []
         }
       ]

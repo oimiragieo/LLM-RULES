@@ -384,7 +384,6 @@ See Section 0 Template Loading Protocol for inline fallback pattern.
 | Contract Check                                                 | `contract-check`          | `.claude/agents/domain/contract-check.md`          |
 | Bool Action                                                    | `bool-action`             | `.claude/agents/domain/bool-action.md`             |
 | Repo Onboarder                                                 | `repo-onboarder`          | `.claude/agents/orchestrators/repo-onboarder.md`   |
-| Ptest Agent                                                    | `ptest-agent`             | `.claude/agents/domain/ptest-agent.md`             |
 
 For full mapping (domain/specialized agents), use `@AGENT_ROUTING_TABLE.md`.
 
