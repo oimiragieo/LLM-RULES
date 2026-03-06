@@ -23,11 +23,10 @@ streaming: supported
 
 ### Step 6: Update CLAUDE.md (BLOCKING)
 
-Add skill to appropriate section:
+Add skill to the appropriate reference file:
 
-- Section 8.5 for user-invocable workflow skills
-- Section 8.6 for enterprise workflows
-- Section 8.7 for domain/expert skills
+- `@SKILL_CATALOG_TABLE.md` for all skills (Section 7 canonical source)
+- `@ENTERPRISE_WORKFLOWS.md` for enterprise workflow skills
 
 **Entry format:**
 
@@ -47,7 +46,7 @@ Skill({ skill: '{{SKILL_NAME}}' });
 
 **Verify:**
 ```bash
-grep "{{SKILL_NAME}}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED - BLOCKING!"
+grep "{{SKILL_NAME}}" .claude/docs/@SKILL_CATALOG_TABLE.md || echo "ERROR: SKILL CATALOG NOT UPDATED - BLOCKING!"
 ````
 
 ### Step 7: Assign to Agents (BLOCKING)
@@ -73,11 +72,11 @@ grep -r "{{SKILL_NAME}}" .claude/agents/ || echo "ERROR: No agents assigned - BL
 
 - [ ] SKILL.md has valid YAML frontmatter
 - [ ] Memory Protocol section present
-- [ ] CLAUDE.md updated (grep verified)
+- [ ] @SKILL_CATALOG_TABLE.md updated (grep verified)
 - [ ] At least one agent assigned (grep verified)
 - [ ] learnings.md updated with creation record
 
-**WHY**: Skills not in CLAUDE.md are invisible to Router. Unassigned skills are never invoked.
+**WHY**: Skills not in the skill catalog are invisible to Router. Unassigned skills are never invoked.
 
 ---
 

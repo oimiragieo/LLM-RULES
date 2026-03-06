@@ -6,19 +6,19 @@
 
 ## ROUTER UPDATE REQUIRED (CRITICAL - DO NOT SKIP)
 
-**After creating this workflow, you MUST update CLAUDE.md:**
+**After creating this workflow, you MUST update the routing references:**
 
-1. Add to Section 3 "Multi-Agent Workflows" with path reference
+1. Add to `@ENTERPRISE_WORKFLOWS.md` with path reference
 2. Update learnings.md with integration summary
 3. Assign trigger conditions in routing documentation
 
 **Verification:**
 
 ```bash
-grep "{{WORKFLOW_FILE_NAME}}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
+grep "{{WORKFLOW_FILE_NAME}}" .claude/docs/@ENTERPRISE_WORKFLOWS.md || echo "ERROR: WORKFLOW NOT REGISTERED!"
 ```
 
-**WHY**: Workflows not documented in CLAUDE.md will never be invoked by the Router.
+**WHY**: Workflows not documented in the enterprise workflows reference will never be invoked by the Router.
 
 ---
 

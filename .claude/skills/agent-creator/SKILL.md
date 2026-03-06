@@ -35,7 +35,7 @@ Creates specialized AI agents on-demand for capabilities that don't have existin
 
 ## ROUTER UPDATE REQUIRED (CRITICAL - DO NOT SKIP)
 
-**After creating ANY agent, you MUST update CLAUDE.md Section 3 "AGENT ROUTING TABLE":**
+**After creating ANY agent, you MUST update `@AGENT_ROUTING_TABLE.md` (the canonical routing reference):**
 
 ```markdown
 | Request Type | agent-name | `.claude/agents/<category>/<name>.md` |
@@ -44,7 +44,7 @@ Creates specialized AI agents on-demand for capabilities that don't have existin
 **Verification:**
 
 ```bash
-grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NOT UPDATED!"
+grep "<agent-name>" .claude/docs/@AGENT_ROUTING_TABLE.md || echo "ERROR: ROUTING TABLE NOT UPDATED!"
 ```
 
 **WHY**: Agents not in the routing table will NEVER be spawned by the Router.
@@ -855,10 +855,10 @@ cat .claude/context/memory/learnings.md
 - Templates: `.claude/templates/`
 - Schemas: `.claude/schemas/`
 
-### Documentation References (CLAUDE.md v2.2.1)
+### Documentation References (CLAUDE.md v3.0.0)
 - Reference files use @notation: @AGENT_ROUTING_TABLE.md, @TOOL_REFERENCE.md, etc.
 - Located in: `.claude/docs/@*.md`
-- See: CLAUDE.md Section 3 (AGENT ROUTING TABLE reference)
+- See: CLAUDE.md Section 3 (ROUTING TABLE) and @AGENT_ROUTING_TABLE.md (canonical edit target)
 
 ### Shell Security (ADR-077)
 - Background Bash tasks require: `cd "$PROJECT_ROOT" || exit 1`
@@ -958,13 +958,13 @@ After writing, validate file was saved:
 3. **Skills exist** - All referenced skills are in `.claude/skills/`
 4. **File saved correctly** - Glob to verify file exists
 
-### Step 7: Update CLAUDE.md Routing Table (MANDATORY - BLOCKING)
+### Step 7: Update Routing Table (MANDATORY - BLOCKING)
 
 **This step is AUTOMATIC and BLOCKING. Do not skip.**
 
-After agent file is written, you MUST update the CLAUDE.md routing table:
+After agent file is written, you MUST update `@AGENT_ROUTING_TABLE.md` (the canonical routing reference):
 
-1. **Parse CLAUDE.md Section 3** ("AGENT ROUTING TABLE")
+1. **Parse `.claude/docs/@AGENT_ROUTING_TABLE.md`** (Section 3 canonical source)
 2. **Generate routing entry**:
    ```markdown
    | {request_type} | `{agent_name}` | `.claude/agents/{category}/{agent_name}.md` |
@@ -975,7 +975,7 @@ After agent file is written, you MUST update the CLAUDE.md routing table:
 3. **Verify with**:
 
    ```bash
-   grep "{agent-name}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NOT UPDATED!"
+   grep "{agent-name}" .claude/docs/@AGENT_ROUTING_TABLE.md || echo "ERROR: ROUTING TABLE NOT UPDATED!"
    ```
 
 **BLOCKING**: If routing table update fails, agent creation is INCOMPLETE. Do NOT proceed to spawning the agent.
@@ -1286,11 +1286,11 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
    - Without it, learnings are lost
 
 6. NO AGENT WITHOUT ROUTING TABLE ENTRY
-   - After creating agent, add to CLAUDE.md routing table
+   - After creating agent, add to @AGENT_ROUTING_TABLE.md
    - Unrouted agents are never spawned
 
 7. NO CREATION WITHOUT SYSTEM IMPACT ANALYSIS
-   - Update CLAUDE.md routing table (MANDATORY)
+   - Update @AGENT_ROUTING_TABLE.md routing table (MANDATORY)
    - Update router.md agent tables (MANDATORY)
    - Populate Enforcement Hooks section from @HOOK_AGENT_MAP.md (MANDATORY)
    - Populate Related Workflows section from @WORKFLOW_AGENT_MAP.md (MANDATORY)
@@ -1339,7 +1339,7 @@ Run this analysis after every agent creation:
 [AGENT-CREATOR] System Impact Analysis for: <agent-name>
 
 1. ROUTING TABLE UPDATE (MANDATORY)
-   - Add entry to CLAUDE.md routing table
+   - Add entry to @AGENT_ROUTING_TABLE.md
    - Format: | Request Type | agent-name | .claude/agents/<category>/<name>.md |
    - Choose appropriate request type keywords
 
@@ -1406,14 +1406,14 @@ Do not mark orchestrator creation complete until all four files reflect the new/
 ### System Update Commands
 
 ```bash
-# Add to CLAUDE.md routing table (edit manually)
-# Look for "## 3. AGENT ROUTING TABLE" section
+# Add to @AGENT_ROUTING_TABLE.md routing table (edit manually)
+# Look for the relevant agent category section
 
 # Update router.md agent tables (edit manually)
 # Look for "Core Agents:" or "Specialized Agents:" sections
 
 # Verify routing table entry exists
-grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: Not in routing table!"
+grep "<agent-name>" .claude/docs/@AGENT_ROUTING_TABLE.md || echo "ERROR: Not in routing table!"
 
 # Verify router.md entry exists
 grep "<agent-name>" .claude/agents/core/router.md || echo "ERROR: Not in router!"
@@ -1438,8 +1438,8 @@ for skill in $(grep -A10 "^skills:" .claude/agents/<category>/<agent>.md | grep 
   [ -f ".claude/skills/$skill/SKILL.md" ] || echo "BROKEN: $skill"
 done
 
-# Check CLAUDE.md routing table - MANDATORY
-grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: Not in routing table - AGENT CREATION INCOMPLETE"
+# Check @AGENT_ROUTING_TABLE.md routing table - MANDATORY
+grep "<agent-name>" .claude/docs/@AGENT_ROUTING_TABLE.md || echo "ERROR: Not in routing table - AGENT CREATION INCOMPLETE"
 
 # Check routing-table.cjs keywords registration (Step 7.5) - MANDATORY
 grep "<agent-name>" .claude/lib/routing/routing-table.cjs || echo "ERROR: Agent not in routing-table.cjs - AGENT CREATION INCOMPLETE"
@@ -1456,7 +1456,7 @@ grep "<agent-name>" .claude/lib/routing/routing-table.cjs || echo "ERROR: Agent 
 [ ] NO extended_thinking field unless explicitly documented
 [ ] NO MCP tools (mcp__*) unless whitelisted
 [ ] All assigned skills exist in .claude/skills/
-[ ] CLAUDE.md routing table updated
+[ ] @AGENT_ROUTING_TABLE.md routing table updated
 [ ] Routing table entry verified with grep
 [ ] validate-agents.mjs passes for new agent
 [ ] Task Progress Protocol section included in agent body
@@ -1674,7 +1674,7 @@ await queueCrossCreatorReview('agent', '.claude/agents/<category>/<agent-name>.m
 
 **Integration verification:**
 
-- [ ] Agent added to CLAUDE.md routing table (Section 3)
+- [ ] Agent added to @AGENT_ROUTING_TABLE.md (Section 3 canonical source)
 - [ ] Agent added to agent-registry.json
 - [ ] Agent assigned at least one skill
 - [ ] Agent category correct (core/domain/specialized/orchestrator)
@@ -1708,7 +1708,7 @@ Skill({ skill: 'skill-creator' });
 
 // 3. Agent needs workflow
 // Create workflow in .claude/workflows/<agent-name>-workflow.md
-// Update CLAUDE.md Section 8.6 if enterprise workflow
+// Update @ENTERPRISE_WORKFLOWS.md if enterprise workflow
 ```
 
 ### Post-Creation Checklist for Ecosystem Integration
@@ -1720,7 +1720,7 @@ After agent is fully created and validated:
 [ ] Does agent need multi-phase orchestration? -> Create workflow
 [ ] Does agent need code scaffolding? -> Create templates
 [ ] Does agent interact with external services? -> Consider MCP integration
-[ ] Should agent be part of enterprise workflows? -> Update Section 8.6
+[ ] Should agent be part of enterprise workflows? -> Update @ENTERPRISE_WORKFLOWS.md
 ```
 
 ## Ecosystem Alignment Contract (MANDATORY)
