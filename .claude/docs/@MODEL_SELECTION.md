@@ -1,8 +1,8 @@
 # Model Selection for Subagents
 
 **Source:** CLAUDE.md Section 5
-**Version:** v2.2.3
-**Last Updated:** 2026-02-10
+**Version:** v2.2.4
+**Last Updated:** 2026-03-06
 **ADR:** ADR-075 (Router Model Selection from Configuration)
 
 ---
@@ -24,6 +24,10 @@ Guidelines for selecting the appropriate Claude model (haiku, sonnet, opus) when
 | **P3**   | config.yaml        | `agents.{type}.model` entry      | **RECOMMENDED** - centralized control     |
 | **P4**   | Complexity default | Based on agent type              | Fallback for unconfigured agents          |
 | **P5**   | Hardcoded fallback | `sonnet`                         | Last resort                               |
+
+**Quick Reference:** haiku (simple/low) | sonnet (standard/default) | opus (complex/security/high)
+
+**Note:** This file is the canonical reference for model resolution logic. CLAUDE.md Section 5 contains only a summary pointer to this document. All code examples and precedence details live here.
 
 ### How Router Reads Agent Models
 

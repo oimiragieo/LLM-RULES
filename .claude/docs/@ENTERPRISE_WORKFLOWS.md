@@ -39,6 +39,34 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 | **Product Management**  | `.claude/workflows/product-management-workflow.md`                    | **INVEST sprint mgmt**            |
 | **Documentation**       | `.claude/workflows/documentation-workflow.md`                         | **Diataxis framework**            |
 
+### Enterprise Orchestration Workflow
+
+Complex tasks use phased execution with automatic advancement:
+**Triage -> Design -> Implement -> Review -> Deploy -> Document -> Reflect**
+
+**Key modules:**
+
+- `complexity-classifier.cjs` -- classifies TRIVIAL/LOW/MEDIUM/HIGH/EPIC
+- `workflow-state-manager.cjs` -- file-based state at `.claude/context/runtime/workflow-state.json`
+- `phase-advance-reader.cjs` -- reads signals + maps phases to agent types
+- `.claude/hooks/workflow/post-completion-chain.cjs` -- auto-advances phases on agent completion
+- `quality-gates.cjs` -- blocking/non-blocking gates between phases
+
+**Phase skipping by complexity:**
+
+| Complexity | Phases                                    | Agents |
+| ---------- | ----------------------------------------- | ------ |
+| TRIVIAL    | Implement -> Review                       | 2      |
+| LOW        | Design -> Implement -> Review             | 4      |
+| MEDIUM     | Design -> Implement -> Review -> Document | 6      |
+| HIGH       | All except Dynamic Creation               | 8+     |
+| EPIC       | All 8 phases                              | 12+    |
+
+See `enterprise-workflow.md` for full workflow specification.
+See `router-decision.md` Step 7.5 for integration details.
+
+---
+
 ### Workflow Categories
 
 **Core Workflows** (`.claude/workflows/core/`):

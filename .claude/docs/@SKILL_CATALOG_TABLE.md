@@ -394,12 +394,75 @@ Read('.claude/skills/tdd/SKILL.md');
 
 ---
 
+## Skill Invocation Protocol
+
+Agents must use `Skill()` to invoke skills (reading a skill file is NOT the same as invoking it).
+
+```javascript
+Skill({ skill: 'tdd' });
+Skill({ skill: 'debugging' });
+// WRONG: Read('.claude/skills/tdd/SKILL.md');
+```
+
+**Discovery:** read this catalog -> search category/keyword -> `Skill({ skill: "<name>" })`
+
+---
+
+## Commands (Slash Commands)
+
+Commands are user-facing shortcuts that delegate to skills. They live in `.claude/commands/` and are auto-discovered by Claude Code as `/commandname`.
+
+**Pattern:** All commands use thin delegation:
+
+```yaml
+---
+disable-model-invocation: true
+---
+Invoke the {skill-name} skill and follow it exactly as presented to you
+```
+
+**Catalog:** `.claude/context/artifacts/catalogs/command-catalog.md`
+
+**Key Commands:** `/brainstorm` (design), `/tdd` (development), `/debug` (debugging), `/verify` (verification), `/security-review` (security), `/code-review` (review)
+
+**Commands vs Skills vs Agents:**
+
+- **Commands** = user types `/name` (entry point)
+- **Skills** = agent invokes `Skill({ skill: "name" })` (behavior)
+- **Agents** = Router spawns `Task({ task_id: 'task-10', ... })` (execution)
+
+---
+
+## Hybrid Search Integration (All Phases Complete)
+
+**Agents with code search capabilities** via integrated search skills:
+
+- **Current state**: 63 agents have search skills assigned (Phases 1-3 complete, commit 7197fa60)
+- **Phase 1 agents** (core + high-impact -- COMPLETE): developer, code-reviewer, code-simplifier, planner, qa, architect, database-architect, devops, devops-troubleshooter, incident-responder, security-architect, technical-writer, context-compressor
+- **Phase 2** (25+ domain agents -- COMPLETE, commit 7197fa60): python-pro, typescript-pro, and all domain specialists
+- **Phase 3** (8 orchestrators -- COMPLETE, commit 7197fa60): ripgrep skill wired for quick scanning
+
+**Enforcement:** Search telemetry hook in `post-tool-metrics-unified.cjs` logs all search tool usage to `search-telemetry.jsonl`. Agents skipping search tools in favor of `Grep` will appear in telemetry anomalies.
+
+**Search-first protocol** (ALL agents -- MANDATORY):
+
+1. `pnpm search:code "query"` -- hybrid BM25 + semantic (recommended default)
+2. `Skill({ skill: 'ripgrep' })` -- fast text/regex search
+3. `Skill({ skill: 'code-semantic-search' })` -- conceptual/intent search
+4. `Skill({ skill: 'code-structural-search' })` -- AST-based pattern matching
+5. `Grep` -- FALLBACK ONLY (advanced PCRE2 or single-file targeted check)
+
+**Agent-creator integration:** New agents are guided to include search skills based on their domain (code-focused agents get all 3 search skills).
+
+---
+
 ## RELATED REFERENCES
 
 - **@CREATOR_SKILLS_TABLE.md** - Creator skills (agent-creator, skill-creator, etc.)
 - **@ENTERPRISE_WORKFLOWS.md** - Enterprise workflow paths
 - **@SKILL_USAGE_GUIDE.md** - Skill selection decision tree
-- **CLAUDE.md Section 7** - Skill Invocation Protocol
+- **@ROUTER_OPERATIONS.md** - Router operational protocols
+- **@MEMORY_PROTOCOL.md** - Memory persistence and tiers
 
 ---
 
