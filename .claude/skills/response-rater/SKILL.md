@@ -39,22 +39,22 @@ Use appropriate rubric for the content type:
 
 **For Plans**:
 
-| Dimension | Weight | Description |
-|-----------|--------|-------------|
-| Completeness | 20% | All required sections present |
-| Feasibility | 20% | Plan is realistic and achievable |
-| Risk Mitigation | 20% | Risks identified with mitigations |
-| Agent Coverage | 20% | Appropriate agents assigned |
-| Integration | 20% | Fits with existing systems |
+| Dimension       | Weight | Description                       |
+| --------------- | ------ | --------------------------------- |
+| Completeness    | 20%    | All required sections present     |
+| Feasibility     | 20%    | Plan is realistic and achievable  |
+| Risk Mitigation | 20%    | Risks identified with mitigations |
+| Agent Coverage  | 20%    | Appropriate agents assigned       |
+| Integration     | 20%    | Fits with existing systems        |
 
 **For Responses**:
 
-| Dimension | Weight | Description |
-|-----------|--------|-------------|
-| Correctness | 25% | Technically accurate |
-| Completeness | 25% | Addresses all requirements |
-| Clarity | 25% | Easy to understand |
-| Actionability | 25% | Provides clear next steps |
+| Dimension     | Weight | Description                |
+| ------------- | ------ | -------------------------- |
+| Correctness   | 25%    | Technically accurate       |
+| Completeness  | 25%    | Addresses all requirements |
+| Clarity       | 25%    | Easy to understand         |
+| Actionability | 25%    | Provides clear next steps  |
 
 ### Step 2: Evaluate Each Dimension
 

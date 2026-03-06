@@ -16,7 +16,7 @@ For the `model` setting in Claude Code, you can configure either:
 
 \* A \*\*model name\*\*
 
-&nbsp; \* Anthropic API: A full \*\*\[model name](<https://platform.claude.com/docs/en/about-claude/models/overview)\*\>*
+&nbsp; \* Anthropic API: A full \*\*\[model name](<https://platform.claude.com/docs/en/about-claude/models/overview)\*\>\*
 
 &nbsp; \* Bedrock: an inference profile ARN
 

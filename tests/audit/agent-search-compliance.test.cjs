@@ -36,11 +36,7 @@ const registry = loadJSON('.claude/context/agent-registry.json');
 const skillMatrix = loadJSON('.claude/context/config/agent-skill-matrix.json');
 const skillIndex = loadJSON('.claude/config/skill-index.json');
 
-const SEARCH_SKILLS = [
-  'ripgrep',
-  'code-semantic-search',
-  'code-structural-search',
-];
+const SEARCH_SKILLS = ['ripgrep', 'code-semantic-search', 'code-structural-search'];
 
 const BASELINE_SKILLS = [
   'token-saver-context-compression',
@@ -56,7 +52,7 @@ const EXCLUDED_AGENTS = ['router'];
 const MATRIX_NO_ALWAYS = ['router', 'reflection-agent'];
 
 const agentIds = Object.keys(registry.agents);
-const nonRouterAgents = agentIds.filter((id) => !EXCLUDED_AGENTS.includes(id));
+const nonRouterAgents = agentIds.filter(id => !EXCLUDED_AGENTS.includes(id));
 
 describe('Agent Search Compliance', () => {
   describe('Registry agent count', () => {
@@ -87,9 +83,7 @@ describe('Agent Search Compliance', () => {
         for (const cap of caps) {
           if (cap.skills) allSkills.push(...cap.skills);
         }
-        const missing = SEARCH_SKILLS.filter(
-          (s) => !allSkills.includes(s)
-        );
+        const missing = SEARCH_SKILLS.filter(s => !allSkills.includes(s));
         assert.deepStrictEqual(
           missing,
           [],
@@ -109,9 +103,7 @@ describe('Agent Search Compliance', () => {
         for (const cap of caps) {
           if (cap.skills) allSkills.push(...cap.skills);
         }
-        const missing = BASELINE_SKILLS.filter(
-          (s) => !allSkills.includes(s)
-        );
+        const missing = BASELINE_SKILLS.filter(s => !allSkills.includes(s));
         assert.deepStrictEqual(
           missing,
           [],
@@ -132,9 +124,7 @@ describe('Agent Search Compliance', () => {
         it(`${agentId} (${category}): matrix "always" has search skills`, () => {
           const entry = agents[agentId];
           const always = entry.always || [];
-          const missing = SEARCH_SKILLS.filter(
-            (s) => !always.includes(s)
-          );
+          const missing = SEARCH_SKILLS.filter(s => !always.includes(s));
           assert.deepStrictEqual(
             missing,
             [],
@@ -156,9 +146,7 @@ describe('Agent Search Compliance', () => {
         it(`${agentId} (${category}): matrix "always" has baseline skills`, () => {
           const entry = agents[agentId];
           const always = entry.always || [];
-          const missing = BASELINE_SKILLS.filter(
-            (s) => !always.includes(s)
-          );
+          const missing = BASELINE_SKILLS.filter(s => !always.includes(s));
           assert.deepStrictEqual(
             missing,
             [],
@@ -189,14 +177,12 @@ describe('Agent Search Compliance', () => {
         }
       }
       const orphans = nonRouterAgents.filter(
-        (id) =>
-          !matrixAgentIds.has(id) && !MATRIX_NO_ALWAYS.includes(id)
+        id => !matrixAgentIds.has(id) && !MATRIX_NO_ALWAYS.includes(id)
       );
       // Allow some agents to be in registry but not in matrix
       // (the matrix is augmentation, not exhaustive)
       // Report as informational but do not hard-fail
       if (orphans.length > 0) {
-         
         console.error(
           `INFO: ${orphans.length} agents in registry but not in skill-matrix: ${orphans.join(', ')}`
         );
@@ -212,8 +198,7 @@ describe('Agent Search Compliance', () => {
         const skill = skillIndex.skills[skillName];
         assert.ok(skill, `Skill ${skillName} missing from index`);
         assert.ok(
-          Array.isArray(skill.agentPrimary) &&
-            skill.agentPrimary.length > 0,
+          Array.isArray(skill.agentPrimary) && skill.agentPrimary.length > 0,
           `Skill ${skillName} has no agentPrimary assignments`
         );
       });
@@ -230,9 +215,7 @@ describe('Agent Search Compliance', () => {
           if (MATRIX_NO_ALWAYS.includes(agentId)) continue;
 
           const always = agents[agentId].always || [];
-          const hasSearchInMatrix = SEARCH_SKILLS.every((s) =>
-            always.includes(s)
-          );
+          const hasSearchInMatrix = SEARCH_SKILLS.every(s => always.includes(s));
           if (!hasSearchInMatrix) continue;
 
           const regAgent = registry.agents[agentId];
@@ -244,9 +227,7 @@ describe('Agent Search Compliance', () => {
           for (const cap of regAgent.capabilities || []) {
             if (cap.skills) regSkills.push(...cap.skills);
           }
-          const missingInReg = SEARCH_SKILLS.filter(
-            (s) => !regSkills.includes(s)
-          );
+          const missingInReg = SEARCH_SKILLS.filter(s => !regSkills.includes(s));
           if (missingInReg.length > 0) {
             failures.push(
               `${agentId}: matrix has search in always, registry missing: ${missingInReg.join(', ')}`

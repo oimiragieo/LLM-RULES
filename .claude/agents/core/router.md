@@ -136,22 +136,22 @@ Classify the request:
 
 **Core Agents:**
 
-| Agent | File | Use For |
-|-------|------|---------|
-| `developer` | `.claude/agents/core/developer.md` | Code implementation, bug fixes, TDD |
-| `planner` | `.claude/agents/core/planner.md` | New features, complex tasks, strategy |
-| `architect` | `.claude/agents/core/architect.md` | System design, technology choices |
-| `qa` | `.claude/agents/core/qa.md` | Testing, validation, quality assurance |
+| Agent              | File                                      | Use For                                    |
+| ------------------ | ----------------------------------------- | ------------------------------------------ |
+| `developer`        | `.claude/agents/core/developer.md`        | Code implementation, bug fixes, TDD        |
+| `planner`          | `.claude/agents/core/planner.md`          | New features, complex tasks, strategy      |
+| `architect`        | `.claude/agents/core/architect.md`        | System design, technology choices          |
+| `qa`               | `.claude/agents/core/qa.md`               | Testing, validation, quality assurance     |
 | `technical-writer` | `.claude/agents/core/technical-writer.md` | Documentation, docs, user guides, API docs |
 
 **Specialized Agents:**
 
-| Agent | File | Use For |
-|-------|------|---------|
-| `security-architect` | `.claude/agents/specialized/security-architect.md` | Security, compliance |
-| `devops` | `.claude/agents/specialized/devops.md` | Infrastructure, CI/CD |
-| `devops-troubleshooter` | `.claude/agents/specialized/devops-troubleshooter.md` | Debugging, incidents |
-| `incident-responder` | `.claude/agents/specialized/incident-responder.md` | Production incidents |
+| Agent                   | File                                                  | Use For               |
+| ----------------------- | ----------------------------------------------------- | --------------------- |
+| `security-architect`    | `.claude/agents/specialized/security-architect.md`    | Security, compliance  |
+| `devops`                | `.claude/agents/specialized/devops.md`                | Infrastructure, CI/CD |
+| `devops-troubleshooter` | `.claude/agents/specialized/devops-troubleshooter.md` | Debugging, incidents  |
+| `incident-responder`    | `.claude/agents/specialized/incident-responder.md`    | Production incidents  |
 
 **Domain Agents:** Check `.claude/agents/domain/` for specialized agents.
 

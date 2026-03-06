@@ -8,5 +8,55 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "219ff9b4f8a3641ec8cf5d52bccfd1e8c0eff47d"
+  },
+  {
+    "text": "Hook guard pattern for unknown artifact IDs: after extractArtifactId(), check if result is unknown:unknown, log to stderr, and return allow:true without writing to queue. This prevents phantom integration queue entries from accumulating for unresolvable artifacts.",
+    "area": "main",
+    "timestamp": "2026-03-06T02:06:47.175Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "38da39190b34eeb1ddc2f27ee62fff7863ca4e42"
+  },
+  {
+    "text": "Summary enforcement pattern: use SUMMARY_REQUIRED_ENFORCEMENT env var (default: block) in pre-completion-validation.cjs to block TaskUpdate(completed) when summary is missing, under 50 chars, or matches the agent fallback string. isFallbackSummary() helper detects the specific pattern. Min length increased from 20 to 50 chars for meaningful summaries.",
+    "area": "main",
+    "timestamp": "2026-03-06T02:06:50.201Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "ae5c46011ab50b089eb6f0b3a3a28ebab191ebde"
+  },
+  {
+    "text": "Commit verification via HEAD hash comparison: capture git log --oneline -1 HEAD hash BEFORE and AFTER a git commit attempt. If hashes are identical, the commit failed silently (pre-commit hook blocked it). This pattern is machine-verifiable, immune to agent misreading git output, and directly addresses the confirmed ~50% devops commit failure rate. Include the post-commit hash in TaskUpdate summary metadata.",
+    "area": "main",
+    "timestamp": "2026-03-06T02:10:05.284Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "cc8a96da7f348e227887ebad4e5d2a783c3022e8"
+  },
+  {
+    "text": "Bulk issues.md pruning pattern: when collapsing 100+ repetitive one-liner entries into a single summary note, include (1) date range the entries spanned, (2) approximate count of entries replaced, and (3) consolidation datestamp. This preserves audit trail while eliminating noise. Validated by Task 4: 76% line reduction (895 → 217 lines) for [ROUTING WARN] entries.",
+    "area": "main",
+    "timestamp": "2026-03-06T02:10:05.349Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "833342392ccee025ebb12c9f0d61bfdffcf9bb9d"
+  },
+  {
+    "text": "3-Stage Privacy Pipeline pattern: (1) Fast Vocabulary Filter (Regex/SentencePiece) → (2) Content Moderation (1B LLM) → (3) PII Detection (8B LLM + Pattern Fallback). Each stage can short-circuit the next. Optimized with Stage 1.5 fast-path heuristic to skip Stage 2 for trivially safe messages. Verified by 232 tests in PrivacyAirlock.js.",
+    "area": "main",
+    "timestamp": "2026-03-06T03:10:00.000Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "privacy_airlock_3_stage_pipeline"
   }
 ]

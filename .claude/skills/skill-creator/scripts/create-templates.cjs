@@ -118,17 +118,26 @@ node .claude/skills/${name}/scripts/main.cjs --help
 </usage_example>
 </examples>
 
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. \\\`pnpm search:code "<query>"\\\` (Primary intent-based search).
+2. \\\`ripgrep\\\` (for exact keyword/regex matches).
+3. semantic/structural search via code tools if available.
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
-\`\`\`bash
+\\\`\\\`\\\`bash
 cat .claude/context/memory/learnings.md
-\`\`\`
+cat .claude/context/memory/decisions.md
+\\\`\\\`\\\`
 
 **After completing:**
-- New pattern -> \`.claude/context/memory/learnings.md\`
-- Issue found -> \`.claude/context/memory/issues.md\`
-- Decision made -> \`.claude/context/memory/decisions.md\`
+- New pattern -> \\\`.claude/context/memory/learnings.md\\\`
+- Issue found -> \\\`.claude/context/memory/issues.md\\\`
+- Decision made -> \\\`.claude/context/memory/decisions.md\\\`
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
 `;

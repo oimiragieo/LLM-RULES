@@ -1752,7 +1752,7 @@ URL patterns support wildcards using `\*` to match any sequence of characters. T
 
 &nbsp; "allowedMcpServers": \[
 
-&nbsp; { "serverUrl": "<https://mcp.company.com/\>*" },
+&nbsp; { "serverUrl": "<https://mcp.company.com/\>\*" },
 
 &nbsp; { "serverUrl": "https://\*.internal.corp/\*" }
 

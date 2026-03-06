@@ -185,10 +185,10 @@ git sparse-checkout set services/payments
 
 **Cone mode vs. non-cone mode:**
 
-| Mode | Pattern Matching | Performance |
-|------|-----------------|-------------|
-| Cone (recommended) | Directory prefix only | Fast (O(log n) path matching) |
-| Non-cone | Full gitignore-style patterns | Slow on large trees |
+| Mode               | Pattern Matching              | Performance                   |
+| ------------------ | ----------------------------- | ----------------------------- |
+| Cone (recommended) | Directory prefix only         | Fast (O(log n) path matching) |
+| Non-cone           | Full gitignore-style patterns | Slow on large trees           |
 
 ### Git Scalar — Large Repository Optimization
 

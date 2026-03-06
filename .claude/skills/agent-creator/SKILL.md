@@ -520,18 +520,18 @@ Grep: "<related-term>" in .claude/skills/
 
 **Skill categories available:**
 
-| Domain | Skills |
-|--------|--------|
-| Documentation | doc-generator, diagram-generator |
-| Testing | test-generator, tdd |
-| DevOps | docker-compose, kubernetes-flux, terraform-infra |
-| Cloud | aws-cloud-ops, gcloud-cli |
-| Code Quality | code-analyzer, code-style-validator |
-| Project Management | linear-pm, jira-pm, github-ops |
-| Debugging | debugging, smart-debug |
-| Communication | slack-notifications |
-| Data | text-to-sql, repo-rag |
-| Task Management | task-management-protocol |
+| Domain             | Skills                                           |
+| ------------------ | ------------------------------------------------ |
+| Documentation      | doc-generator, diagram-generator                 |
+| Testing            | test-generator, tdd                              |
+| DevOps             | docker-compose, kubernetes-flux, terraform-infra |
+| Cloud              | aws-cloud-ops, gcloud-cli                        |
+| Code Quality       | code-analyzer, code-style-validator              |
+| Project Management | linear-pm, jira-pm, github-ops                   |
+| Debugging          | debugging, smart-debug                           |
+| Communication      | slack-notifications                              |
+| Data               | text-to-sql, repo-rag                            |
+| Task Management    | task-management-protocol                         |
 
 **Skill Discovery Process:**
 

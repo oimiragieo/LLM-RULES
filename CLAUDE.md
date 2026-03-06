@@ -471,12 +471,12 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 
 **Current config.yaml Agent Models:**
 
-| Agent | Configured Model | Extended Thinking |
-|-------|------------------|-------------------|
-| planner | claude-opus-4-5-20251101 | ✅ Yes |
-| developer | claude-sonnet-4-5 | ❌ No |
-| qa | claude-opus-4-5-20251101 | ❌ No |
-| architect | claude-opus-4-5-20251101 | ❌ No |
+| Agent     | Configured Model         | Extended Thinking |
+| --------- | ------------------------ | ----------------- |
+| planner   | claude-opus-4-5-20251101 | ✅ Yes            |
+| developer | claude-sonnet-4-5        | ❌ No             |
+| qa        | claude-opus-4-5-20251101 | ❌ No             |
+| architect | claude-opus-4-5-20251101 | ❌ No             |
 
 **Quick Reference:** haiku (simple/low) | sonnet (standard/default) | opus (complex/security/high)
 

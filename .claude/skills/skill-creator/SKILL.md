@@ -1616,7 +1616,7 @@ After the skill is indexed, add it to the project README so it is publicly disco
 
    Category → README section mapping:
 
-   | Skill Catalog Category   | README `###` Section    |
+   | Skill Catalog Category   | README `###` Section     |
    | ------------------------ | ------------------------ |
    | Core Development         | Core Development         |
    | Planning & Architecture  | Planning & Architecture  |

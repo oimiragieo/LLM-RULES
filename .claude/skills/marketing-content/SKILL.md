@@ -68,13 +68,13 @@ Before writing a single word, define:
 
 **Audience Awareness Stages → Framework Match:**
 
-| Awareness Stage | Best Framework | Why |
-|----------------|----------------|-----|
-| Unaware (cold) | AIDA, PAS | Build attention first; introduce problem |
-| Problem-aware | PAS, BAB | Lead with pain, show resolution |
-| Solution-aware | 4Ps, FAB | Evidence-based; translate features to value |
-| Product-aware | FAB, BAB | Show transformation; competitor contrast |
-| Most aware | Direct CTA | Skip education; they are ready |
+| Awareness Stage | Best Framework | Why                                         |
+| --------------- | -------------- | ------------------------------------------- |
+| Unaware (cold)  | AIDA, PAS      | Build attention first; introduce problem    |
+| Problem-aware   | PAS, BAB       | Lead with pain, show resolution             |
+| Solution-aware  | 4Ps, FAB       | Evidence-based; translate features to value |
+| Product-aware   | FAB, BAB       | Show transformation; competitor contrast    |
+| Most aware      | Direct CTA     | Skip education; they are ready              |
 
 ### Step 2: Content Pillar Definition
 

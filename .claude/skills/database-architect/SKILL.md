@@ -271,11 +271,11 @@ server_pool_size = 5
 
 **Pooling modes:**
 
-| Mode | Use Case | Notes |
-|------|----------|-------|
-| Session | Long-running connections, `LISTEN/NOTIFY` | 1 client = 1 server connection |
-| Transaction | Stateless APIs (recommended default) | Most efficient; breaks `SET` / prepared statements |
-| Statement | Rarely needed | Each statement can use a different server connection |
+| Mode        | Use Case                                  | Notes                                                |
+| ----------- | ----------------------------------------- | ---------------------------------------------------- |
+| Session     | Long-running connections, `LISTEN/NOTIFY` | 1 client = 1 server connection                       |
+| Transaction | Stateless APIs (recommended default)      | Most efficient; breaks `SET` / prepared statements   |
+| Statement   | Rarely needed                             | Each statement can use a different server connection |
 
 </execution_process>
 

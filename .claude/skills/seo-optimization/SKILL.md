@@ -351,12 +351,12 @@ Build high-quality backlinks using relevance-first outreach.
 
 **Anchor Text Diversity (avoid over-optimization):**
 
-| Anchor Type   | Target % | Example                    |
-| ------------- | -------- | -------------------------- |
-| Branded       | 40-50%   | "YourBrand"                |
-| Generic       | 20-25%   | "click here", "learn more" |
-| Partial match | 15-20%   | "SEO tool for agencies"    |
-| Exact match   | 5-10%    | "technical SEO audit"      |
+| Anchor Type   | Target % | Example                      |
+| ------------- | -------- | ---------------------------- |
+| Branded       | 40-50%   | "YourBrand"                  |
+| Generic       | 20-25%   | "click here", "learn more"   |
+| Partial match | 15-20%   | "SEO tool for agencies"      |
+| Exact match   | 5-10%    | "technical SEO audit"        |
 | Naked URL     | 5-10%    | "<https://example.com/page>" |
 
 **Anti-Patterns to Avoid:**

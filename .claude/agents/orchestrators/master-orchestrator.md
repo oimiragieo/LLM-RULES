@@ -110,7 +110,7 @@ Read('.claude/docs/AGENT_ROUTING_CARD.md')
 ## Responsibilities
 
 1. **Step 0 (Pre-flight)**: Before starting any new work, check `.claude/context/runtime/reflection-spawn-request.json`. If requests exist, spawn `reflection-agent` to batch process them.
-    - **Requirement**: The spawned agent MUST include `metadata: { processedReflectionIds: [...] }` in its final `TaskUpdate` to trigger automated cleanup.
+   - **Requirement**: The spawned agent MUST include `metadata: { processedReflectionIds: [...] }` in its final `TaskUpdate` to trigger automated cleanup.
 2. **Atomic Handshake**: Do NOT manually delete reflection files. The system will automatically remove processed requests upon successful `TaskUpdate(completed)`.
 3. **Scope**: Spawn `Planner` to breakdown requests.
 4. **Review**: Rate plans (7/10 minimum) using `response-rater`.

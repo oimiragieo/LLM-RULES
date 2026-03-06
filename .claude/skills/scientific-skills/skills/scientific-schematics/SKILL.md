@@ -26,17 +26,17 @@ Scientific schematics and diagrams transform complex concepts into clear visual 
 
 **Quality Thresholds by Document Type:**
 
-| Document Type | Threshold | Description |
-|---------------|-----------|-------------|
-| journal | 8.5/10 | Nature, Science, peer-reviewed journals |
-| conference | 8.0/10 | Conference papers |
-| thesis | 8.0/10 | Dissertations, theses |
-| grant | 8.0/10 | Grant proposals |
-| preprint | 7.5/10 | arXiv, bioRxiv, etc. |
-| report | 7.5/10 | Technical reports |
-| poster | 7.0/10 | Academic posters |
-| presentation | 6.5/10 | Slides, talks |
-| default | 7.5/10 | General purpose |
+| Document Type | Threshold | Description                             |
+| ------------- | --------- | --------------------------------------- |
+| journal       | 8.5/10    | Nature, Science, peer-reviewed journals |
+| conference    | 8.0/10    | Conference papers                       |
+| thesis        | 8.0/10    | Dissertations, theses                   |
+| grant         | 8.0/10    | Grant proposals                         |
+| preprint      | 7.5/10    | arXiv, bioRxiv, etc.                    |
+| report        | 7.5/10    | Technical reports                       |
+| poster        | 7.0/10    | Academic posters                        |
+| presentation  | 6.5/10    | Slides, talks                           |
+| default       | 7.5/10    | General purpose                         |
 
 **Simply describe what you want, and Nano Banana Pro creates it.** All diagrams are stored in the figures/ subfolder and referenced in papers/posters.
 

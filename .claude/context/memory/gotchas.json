@@ -18,5 +18,25 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "0ec200740c8539df089b3dc6d96fc5d094051465"
+  },
+  {
+    "text": "Integration queue poisoning: post-creation-integration.cjs was writing unknown:unknown entries to integration-queue.jsonl for TaskUpdate events where the artifact could not be resolved. These phantom entries caused artifact-integrator to retry indefinitely. Fix: guard after extractArtifactId() returns unknown:unknown. Cleanup: clear existing stale entries.",
+    "area": "main",
+    "timestamp": "2026-03-06T02:06:57.411Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "6771fdd822625950f40d12f61d79e9ccf9f4638c"
+  },
+  {
+    "text": "Position-based replacement vs Global Regex: index-based replacement (sanitized.substring(start, end)) is precise for LLM-reported PII but fails when used with pattern matches that only report the FIRST occurrence. Global regex replacement must be used for deduplicated pattern matches to prevent leakage of subsequent occurrences. Fix implemented in PrivacyAirlock.js Stage 3.",
+    "area": "main",
+    "timestamp": "2026-03-06T03:15:00.000Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "position_vs_regex_leakage"
   }
 ]

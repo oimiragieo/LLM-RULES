@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-03-05T04:36:12.662Z"
+      "last_accessed": "2026-03-06T04:07:00.315Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "discovered_at": "2026-02-11",
@@ -87,15 +87,19 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-18T06:32:19.085Z",
-      "last_accessed": "2026-03-04T13:52:56.660Z"
+      "last_accessed": "2026-03-06T04:14:59.461Z"
     },
     ".claude/hooks/validation/pre-completion-validation.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-18T06:42:24.699Z",
-      "last_accessed": "2026-02-18T06:48:06.485Z"
+      "last_accessed": "2026-03-06T02:00:17.158Z"
     },
     ".claude/hooks/workflow/post-creation-integration.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-18T06:42:55.537Z",
-      "last_accessed": "2026-02-21T04:54:01.631Z"
+      "last_accessed": "2026-03-06T01:42:24.948Z"
     },
     "tests/lib/memory/observations.test.cjs": {
       "discovered_at": "2026-02-18T13:33:21.802Z",
@@ -238,8 +242,10 @@
       "last_accessed": "2026-02-21T06:11:52.463Z"
     },
     ".claude/lib/routing/routing-table-intent-keywords.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-21T06:34:10.540Z",
-      "last_accessed": "2026-02-22T02:41:15.834Z"
+      "last_accessed": "2026-03-06T04:15:18.810Z"
     },
     ".claude/skills/multi-agent-architecture-reference/scripts/main.cjs": {
       "discovered_at": "2026-02-21T07:02:51.525Z",
@@ -304,8 +310,10 @@
       "last_accessed": "2026-02-22T04:00:22.587Z"
     },
     ".claude/hooks/routing/router-tool-lockdown.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
       "discovered_at": "2026-02-22T04:01:08.375Z",
-      "last_accessed": "2026-02-22T04:01:08.375Z"
+      "last_accessed": "2026-03-06T03:44:45.780Z"
     },
     "tests/hooks/stale-task-detector.test.cjs": {
       "discovered_at": "2026-02-22T04:01:46.008Z",
@@ -367,7 +375,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-03-03T20:01:35.736Z",
-      "last_accessed": "2026-03-05T04:02:24.126Z"
+      "last_accessed": "2026-03-06T02:51:42.327Z"
     },
     "tests/hooks/workflow/post-completion-chain-extraction.test.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -470,7 +478,37 @@
       "category": "code-indexing",
       "discovered_at": "2026-03-05T18:29:18.228Z",
       "last_accessed": "2026-03-05T18:29:18.228Z"
+    },
+    ".claude/hooks/workflow/post-creation-integration.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T01:42:46.202Z",
+      "last_accessed": "2026-03-06T01:42:46.202Z"
+    },
+    "tests/hooks/pre-completion-validation-summary.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T01:43:56.523Z",
+      "last_accessed": "2026-03-06T01:43:56.523Z"
+    },
+    ".claude/hooks/evolution/research-enforcement.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T03:44:26.431Z",
+      "last_accessed": "2026-03-06T03:44:26.431Z"
+    },
+    "tmp/audit_agents.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T04:15:51.918Z",
+      "last_accessed": "2026-03-06T04:16:00.808Z"
+    },
+    "tests/unit/agent-search-protocol.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T04:19:56.181Z",
+      "last_accessed": "2026-03-06T04:20:34.653Z"
     }
   },
-  "last_updated": "2026-03-05T18:40:08.016Z"
+  "last_updated": "2026-03-06T04:20:34.653Z"
 }

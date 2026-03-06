@@ -148,6 +148,7 @@ const INTENT_TO_AGENT = {
   'aso-specialist': 'aso-specialist',
   'marketing-strategist': 'marketing-strategist',
   'brand-guardian': 'brand-guardian',
+  'ptest-agent': 'ptest-agent',
 };
 
 module.exports = { INTENT_TO_AGENT };

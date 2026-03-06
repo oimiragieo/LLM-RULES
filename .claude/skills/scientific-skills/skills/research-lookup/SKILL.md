@@ -525,16 +525,16 @@ In addition to research-lookup, the scientific writer has access to **WebSearch*
 
 **When to use which tool:**
 
-| Task | Tool |
-|------|------|
-| Find academic papers | research-lookup |
-| Literature search | research-lookup |
-| Deep analysis/comparison | research-lookup (Sonar Reasoning Pro) |
-| Look up DOI/metadata | WebSearch |
-| Verify publication year | WebSearch |
-| Find journal volume/pages | WebSearch |
-| Current events/news | WebSearch |
-| Non-scholarly sources | WebSearch |
+| Task                      | Tool                                  |
+| ------------------------- | ------------------------------------- |
+| Find academic papers      | research-lookup                       |
+| Literature search         | research-lookup                       |
+| Deep analysis/comparison  | research-lookup (Sonar Reasoning Pro) |
+| Look up DOI/metadata      | WebSearch                             |
+| Verify publication year   | WebSearch                             |
+| Find journal volume/pages | WebSearch                             |
+| Current events/news       | WebSearch                             |
+| Non-scholarly sources     | WebSearch                             |
 
 ## Summary
 

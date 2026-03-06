@@ -212,7 +212,7 @@ This was resolved over 30 days ago.
 
 ## Recent Resolved Bug
 
-**Date:** 2026-02-01
+**Date:** 2026-03-01
 **Status: RESOLVED**
 
 This was resolved recently (within 30 days).
@@ -221,7 +221,7 @@ This was resolved recently (within 30 days).
 
 ## Open Bug
 
-**Date:** 2026-02-01
+**Date:** 2026-03-01
 
 This is still open.
 

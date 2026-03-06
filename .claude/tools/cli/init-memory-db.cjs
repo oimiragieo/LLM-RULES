@@ -48,7 +48,7 @@ function initializeDatabase(dbOrPath) {
         id TEXT PRIMARY KEY,
         type TEXT NOT NULL CHECK(type IN (
           'agent', 'task', 'skill', 'concept', 'file',
-          'pattern', 'decision', 'issue', 'memory'
+          'pattern', 'decision', 'issue', 'memory', 'gotcha'
         )),
         name TEXT NOT NULL,
         content TEXT,
@@ -163,7 +163,7 @@ function migrateToV2(db) {
         id TEXT PRIMARY KEY,
         type TEXT NOT NULL CHECK(type IN (
           'agent', 'task', 'skill', 'concept', 'file',
-          'pattern', 'decision', 'issue', 'memory'
+          'pattern', 'decision', 'issue', 'memory', 'gotcha'
         )),
         name TEXT NOT NULL,
         content TEXT,

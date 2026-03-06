@@ -193,13 +193,13 @@ Skill({ skill: 'ripgrep', args: 'proposed-name .claude/agents .claude/skills' })
 
 **Naming Conventions**:
 
-| Artifact | Convention | Example |
-|----------|------------|---------|
-| Agent | `<domain>-<role>` | `mobile-ux-reviewer`, `data-engineer` |
-| Skill | `<verb>-<object>` or `<domain>` | `code-analyzer`, `tdd`, `github-mcp` |
-| Workflow | `<process>-workflow` | `feature-development-workflow` |
-| Hook | `<trigger>-<action>` | `pre-commit-validator`, `security-guard` |
-| Schema | `<artifact>-schema` | `agent-schema`, `skill-schema` |
+| Artifact | Convention                      | Example                                  |
+| -------- | ------------------------------- | ---------------------------------------- |
+| Agent    | `<domain>-<role>`               | `mobile-ux-reviewer`, `data-engineer`    |
+| Skill    | `<verb>-<object>` or `<domain>` | `code-analyzer`, `tdd`, `github-mcp`     |
+| Workflow | `<process>-workflow`            | `feature-development-workflow`           |
+| Hook     | `<trigger>-<action>`            | `pre-commit-validator`, `security-guard` |
+| Schema   | `<artifact>-schema`             | `agent-schema`, `skill-schema`           |
 
 **State Transition**:
 
@@ -376,14 +376,14 @@ switch (artifactType) {
 
 **Artifact Locations**:
 
-| Artifact | Location |
-|----------|----------|
-| Agent | `.claude/agents/<category>/<name>.md` |
-| Skill | `.claude/skills/<name>/SKILL.md` |
+| Artifact | Location                                 |
+| -------- | ---------------------------------------- |
+| Agent    | `.claude/agents/<category>/<name>.md`    |
+| Skill    | `.claude/skills/<name>/SKILL.md`         |
 | Workflow | `.claude/workflows/<category>/<name>.md` |
-| Hook | `.claude/hooks/<category>/<name>.cjs` |
-| Schema | `.claude/schemas/<name>.json` |
-| Template | `.claude/templates/<name>.md` |
+| Hook     | `.claude/hooks/<category>/<name>.cjs`    |
+| Schema   | `.claude/schemas/<name>.json`            |
+| Template | `.claude/templates/<name>.md`            |
 
 **State Transition**:
 
@@ -435,13 +435,13 @@ Bash('node .claude/tools/validate-agents.mjs');
 
 **Quality Standards**:
 
-| Section | Requirement |
-|---------|-------------|
-| Core Persona | 4 fields: Identity, Style, Approach, Values |
-| Responsibilities | At least 3 numbered items |
-| Workflow | Step 0 (Load Skills) + numbered execution steps |
-| Task Progress Protocol | Iron Laws + code examples |
-| Memory Protocol | Before/After/During sections |
+| Section                | Requirement                                     |
+| ---------------------- | ----------------------------------------------- |
+| Core Persona           | 4 fields: Identity, Style, Approach, Values     |
+| Responsibilities       | At least 3 numbered items                       |
+| Workflow               | Step 0 (Load Skills) + numbered execution steps |
+| Task Progress Protocol | Iron Laws + code examples                       |
+| Memory Protocol        | Before/After/During sections                    |
 
 **State Transition**:
 
@@ -590,17 +590,17 @@ Write('@.claude/context/evolution-state.json', JSON.stringify(state, null, 2));
 
 **State Values**:
 
-| state | Meaning |
-|-------|---------|
-| `idle` | No evolution in progress |
+| state        | Meaning                                |
+| ------------ | -------------------------------------- |
+| `idle`       | No evolution in progress               |
 | `evaluating` | Phase E1: Checking if evolution needed |
-| `validating` | Phase V1: Checking for conflicts |
-| `obtaining` | Phase O: Researching (MANDATORY) |
-| `locking` | Phase L: Creating artifact |
-| `verifying` | Phase V2: Quality checking |
-| `enabling` | Phase E2: Deploying to ecosystem |
-| `blocked` | Gate failed, waiting for resolution |
-| `failed` | Evolution aborted |
+| `validating` | Phase V1: Checking for conflicts       |
+| `obtaining`  | Phase O: Researching (MANDATORY)       |
+| `locking`    | Phase L: Creating artifact             |
+| `verifying`  | Phase V2: Quality checking             |
+| `enabling`   | Phase E2: Deploying to ecosystem       |
+| `blocked`    | Gate failed, waiting for resolution    |
+| `failed`     | Evolution aborted                      |
 
 ## Error Handling
 
