@@ -616,6 +616,46 @@ async function main() {
       }
     }
 
+    // GIT_COMMIT_VERIFICATION: block devops/deploy completions when git status shows dirty state.
+    // This catches the 50% devops commit failure rate caused by silent pre-commit hook blocks.
+    const commitVerifyMode = getEnforcementMode('GIT_COMMIT_VERIFICATION', 'warn');
+    if (commitVerifyMode !== 'off') {
+      const summary = (toolParams.metadata && toolParams.metadata.summary) || '';
+      const summaryLower = summary.toLowerCase();
+      const isCommitTask =
+        summaryLower.includes('commit') ||
+        summaryLower.includes('push') ||
+        summaryLower.includes('deploy') ||
+        summaryLower.includes('git');
+      if (isCommitTask) {
+        try {
+          const gitResult = spawnSync('git', ['status', '--porcelain'], {
+            cwd: PROJECT_ROOT,
+            stdio: 'pipe',
+            encoding: 'utf-8',
+            shell: false,
+            windowsHide: true,
+            timeout: 5000,
+          });
+          const dirtyFiles = (gitResult.stdout || '')
+            .split('\n')
+            .filter(line => line.trim() && !line.startsWith('??'))
+            .map(line => line.trim());
+          if (dirtyFiles.length > 0) {
+            const gitMsg = `GIT COMMIT VERIFICATION FAILED: TaskUpdate(completed) claims commit/push but ${dirtyFiles.length} file(s) have uncommitted changes:\n${dirtyFiles.slice(0, 5).join('\n')}${dirtyFiles.length > 5 ? `\n... and ${dirtyFiles.length - 5} more` : ''}\nFix: stage and commit remaining changes before marking task complete. Set GIT_COMMIT_VERIFICATION=off to disable.`;
+            if (commitVerifyMode === 'block') {
+              console.log(formatHookResult('block', gitMsg));
+              process.exit(2);
+            } else {
+              process.stderr.write(`[pre-completion-validation] WARNING: ${gitMsg}\n`);
+            }
+          }
+        } catch (_gitErr) {
+          // Best effort — don't block on git check failure
+        }
+      }
+    }
+
     // REFLECTION_SCORE_ENFORCEMENT: detect reflection agent fabricating scores without dataQuality.
     enforceReflectionScore(toolParams);
 

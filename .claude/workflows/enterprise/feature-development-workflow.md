@@ -498,6 +498,44 @@ Generate comprehensive documentation for: $FEATURE_NAME
 
 **Expected Output**: API docs, user guides, runbooks, architecture documentation
 
+### Step 13: Branch Finalization & Cleanup
+
+**Agent**: DevOps with finishing-a-development-branch skill
+
+**Task Spawn**:
+
+```javascript
+Task({
+  task_id: 'task-13',
+  subagent_type: 'general-purpose',
+  description: 'Branch finalization and worktree cleanup',
+  prompt: `You are the DEVOPS agent.
+
+## Task
+Finalize the feature branch for: $FEATURE_NAME
+
+## Instructions
+1. Read your agent definition: .claude/agents/specialized/devops.md
+2. **Invoke skill**: Skill({ skill: 'finishing-a-development-branch' })
+3. Present the 4 options to the user (merge, PR, keep, discard)
+4. Execute the user's chosen option
+5. Clean up worktree if applicable (Options 1, 4)
+6. Verify no orphaned worktrees remain: git worktree list
+
+## Context
+- Feature branch from deployment step
+- CI status: verified passing
+- All reviews passed
+
+## Memory Protocol
+1. Read .claude/context/memory/learnings.md first
+2. Record cleanup outcomes to .claude/context/memory/learnings.md
+`,
+});
+```
+
+**Expected Output**: Branch merged/PR created/kept/discarded, worktree cleaned up
+
 ## Execution Parameters
 
 ### Required Parameters

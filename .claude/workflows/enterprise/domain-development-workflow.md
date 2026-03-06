@@ -203,6 +203,8 @@ Domain specialists are spawned during PHASE_2_IMPLEMENT of the enterprise featur
    - Update README if public API changed
    - Record implementation notes
 
+**Branch cleanup note:** Feature branch created here is cleaned up in the parent enterprise workflow's Phase 7 (FINALIZE) via the `finishing-a-development-branch` skill. Do not merge or delete the branch in this phase.
+
 ### Handoff to PHASE_3_REVIEW
 
 1. **TaskUpdate metadata:**

@@ -314,13 +314,13 @@ Complex tasks require multiple perspectives. Use this matrix to determine spawn 
 
 **Enterprise workflow phases by complexity:**
 
-| Complexity | Phases                                 | Agents |
-| ---------- | -------------------------------------- | ------ |
-| TRIVIAL    | Implement → Review                     | 2      |
-| LOW        | Design → Implement → Review            | 4      |
-| MEDIUM     | Design → Implement → Review → Document | 6      |
-| HIGH       | All except Dynamic Creation            | 8+     |
-| EPIC       | All 8 phases                           | 12+    |
+| Complexity | Phases                                             | Agents |
+| ---------- | -------------------------------------------------- | ------ |
+| TRIVIAL    | Implement → Deploy                                 | 2      |
+| LOW        | Design → Implement → Review → Deploy → Finalize    | 5      |
+| MEDIUM     | Design → Implement → Review → Deploy → Doc → Final | 7      |
+| HIGH       | All phases (Design through Finalize)               | 9+     |
+| EPIC       | All 8 phases + orchestrator coordination           | 12+    |
 
 See **@ENTERPRISE_WORKFLOWS.md** for full workflow specification and `router-decision.md` Step 7.5 for integration details.
 

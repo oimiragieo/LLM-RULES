@@ -97,6 +97,13 @@ This document defines a **deterministic state machine** that the Router MUST fol
                                   |
                          [GATE 6: LEARNINGS RECORDED]
                                   |
+                         +--------v---------+
+                         | PHASE 7: FINALIZE|
+                         |  (sequential)    |
+                         +--------+---------+
+                                  |
+                         [GATE 7: BRANCH CLEAN]
+                                  |
                               COMPLETE
 ```
 
@@ -133,7 +140,8 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
     "PHASE_3_REVIEW": { "status": "pending" },
     "PHASE_4_DEPLOY": { "status": "pending" },
     "PHASE_5_DOCUMENT": { "status": "pending" },
-    "PHASE_6_REFLECT": { "status": "pending" }
+    "PHASE_6_REFLECT": { "status": "pending" },
+    "PHASE_7_FINALIZE": { "status": "pending" }
   },
   "artifacts": {
     "designDoc": ".claude/context/plans/oauth2-design-2026-02-06.md",
@@ -782,9 +790,64 @@ The Router selects domain specialists based on project detection:
 
 **Gate 6 is non-blocking.** Reflection is valuable but should not prevent workflow completion.
 
+---
+
+## Phase 7: FINALIZE (Sequential)
+
+**Purpose:** Merge or PR the feature branch, clean up worktrees, verify clean workspace.
+**Duration:** 1 Router turn
+**Why this phase exists:** Without explicit finalization, worktrees and feature branches accumulate indefinitely. Phase 4 (Deploy) pushes to a remote branch but never merges or cleans up the local workspace.
+
+### Entry Criteria
+
+- Gate 6 passed (or Phase 6 skipped)
+- Workflow state: `PHASE_7_FINALIZE.status = "in_progress"`
+
+### Agents Spawned
+
+| Agent  | Responsibility                                                    |
+| ------ | ----------------------------------------------------------------- |
+| devops | Execute `finishing-a-development-branch` skill, clean up worktree |
+
+### Agent Context
+
+```
+## Finalization Context
+- Feature branch: {from Phase 4 metadata.branch}
+- Commit hash: {from Phase 4 metadata.commitHash}
+- CI status: {from Phase 4 metadata.ciPassed}
+- Workflow ID: {workflowId}
+
+## Instructions
+1. Invoke Skill({ skill: 'finishing-a-development-branch' })
+2. Present the 4 options to the user (merge, PR, keep, discard)
+3. Execute the user's choice
+4. Clean up worktree if applicable (Options 1, 4)
+5. Verify git worktree list shows no orphaned worktrees for this branch
+
+## Mandatory Outputs
+- TaskUpdate({ taskId: X, status: "completed", metadata: { finalizationChoice: "merge|pr|keep|discard", worktreeCleaned: true|false, branchMerged: true|false } })
+```
+
+### Exit Criteria
+
+- User's finalization choice executed
+- Worktree cleaned (for merge/discard choices)
+- No orphaned branches from this workflow
+
+### Quality Gate 7: BRANCH CLEAN
+
+| Check                                       | Required For | Blocking?    |
+| ------------------------------------------- | ------------ | ------------ |
+| Finalization choice executed                | ALL          | YES          |
+| Worktree removed (if merge or discard)      | ALL          | NO (warning) |
+| No uncommitted changes in main working tree | ALL          | YES          |
+
+**If gate fails:** Router re-spawns devops with instructions to clean up the remaining worktree/branch artifacts.
+
 ### Workflow Completion
 
-After Gate 6 (or after Phase 5 if Phase 6 is skipped):
+After Gate 7 (or after Phase 6 if Phase 7 is skipped for non-worktree workflows):
 
 1. Update workflow state: `currentPhase = "COMPLETE"`
 2. Report completion to user with summary:
@@ -793,6 +856,7 @@ After Gate 6 (or after Phase 5 if Phase 6 is skipped):
    - Key artifacts produced
    - Review findings summary
    - Learnings recorded
+   - Branch finalization status
 
 ---
 
@@ -804,12 +868,12 @@ After Gate 6 (or after Phase 5 if Phase 6 is skipped):
 Phase 0 (Triage) -> Phase 2 (Implement: developer) -> Phase 4 (Deploy: devops)
 ```
 
-Skipped: Phase 1 (no design needed), Phase 3 (no review needed), Phase 5 (no docs), Phase 6 (no reflection)
+Skipped: Phase 1, 3, 5, 6, 7 (no design, review, docs, reflection, or branch cleanup needed — commits go directly to main)
 
 ### LOW (single module, clear scope)
 
 ```
-Phase 0 -> Phase 1 (planner only) -> Phase 2 (developer) -> Phase 3 (code-reviewer only) -> Phase 4 (devops)
+Phase 0 -> Phase 1 (planner only) -> Phase 2 (developer) -> Phase 3 (code-reviewer only) -> Phase 4 (devops) -> Phase 7 (devops: finalize branch)
 ```
 
 Skipped: Phase 5 (docs usually not needed), Phase 6 (reflection optional)
@@ -817,7 +881,7 @@ Skipped: Phase 5 (docs usually not needed), Phase 6 (reflection optional)
 ### MEDIUM (multiple modules, moderate complexity)
 
 ```
-Phase 0 -> Phase 1 (planner + architect) -> Phase 2 (developer) -> Phase 3 (code-reviewer + qa) -> Phase 4 (devops) -> Phase 5 (technical-writer)
+Phase 0 -> Phase 1 (planner + architect) -> Phase 2 (developer) -> Phase 3 (code-reviewer + qa) -> Phase 4 (devops) -> Phase 5 (technical-writer) -> Phase 7 (devops: finalize branch)
 ```
 
 Skipped: Phase 6 (reflection optional)
@@ -825,7 +889,7 @@ Skipped: Phase 6 (reflection optional)
 ### HIGH (cross-cutting, architecture impact)
 
 ```
-Phase 0 -> Phase 1 (planner + architect + security-architect) -> Phase 2 (developer + domain specialist) -> Phase 3 (code-reviewer + qa + security-architect) -> Phase 4 (devops) -> Phase 5 (technical-writer) -> Phase 6 (reflection-agent)
+Phase 0 -> Phase 1 (planner + architect + security-architect) -> Phase 2 (developer + domain specialist) -> Phase 3 (code-reviewer + qa + security-architect) -> Phase 4 (devops) -> Phase 5 (technical-writer) -> Phase 6 (reflection-agent) -> Phase 7 (devops: finalize branch)
 ```
 
 No phases skipped.
@@ -833,7 +897,7 @@ No phases skipped.
 ### EPIC (system-wide, breaking changes)
 
 ```
-Phase 0 -> Phase 1 (planner + architect + security-architect + researcher) -> Phase 2 (developer + domain specialists) -> Phase 3 (code-reviewer + qa + security-architect + architect) -> Phase 4 (devops) -> Phase 5 (technical-writer) -> Phase 6 (reflection-agent)
+Phase 0 -> Phase 1 (planner + architect + security-architect + researcher) -> Phase 2 (developer + domain specialists) -> Phase 3 (code-reviewer + qa + security-architect + architect) -> Phase 4 (devops) -> Phase 5 (technical-writer) -> Phase 6 (reflection-agent) -> Phase 7 (devops: finalize branch)
 ```
 
 No phases skipped. Master-orchestrator coordinates if multiple subsystems affected.
@@ -1064,6 +1128,12 @@ sequenceDiagram
     R->>P6: Spawn reflection-agent
     P6->>M: Write learnings/decisions/issues
     P6-->>R: TaskUpdate(completed)
+    R->>WS: Update phase = PHASE_7
+
+    Note over R,P4: Phase 7: FINALIZE
+    R->>P4: Spawn devops (finishing-a-development-branch)
+    P4->>P4: Merge/PR/Keep/Discard + worktree cleanup
+    P4-->>R: TaskUpdate(completed, {finalizationChoice, worktreeCleaned})
     R->>WS: Update phase = COMPLETE
     R->>U: Workflow complete (summary)
 ```
@@ -1108,6 +1178,7 @@ CLAUDE.md Section 3.5 references this workflow. The Router reads CLAUDE.md, whic
 | Phase 4 (Deploy)    | devops                                                                            | Yes           | --                                                                                 |
 | Phase 5 (Document)  | technical-writer                                                                  | Yes           | --                                                                                 |
 | Phase 6 (Reflect)   | reflection-agent                                                                  | Yes           | --                                                                                 |
+| Phase 7 (Finalize)  | devops                                                                            | LOW+          | Skipped for TRIVIAL (direct-to-main commits)                                       |
 
 **Total unique agents activated:** 14 (vs 1 today)
 
