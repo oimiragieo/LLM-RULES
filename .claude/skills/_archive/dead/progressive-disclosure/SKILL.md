@@ -576,7 +576,7 @@ Budget remaining: 3 questions
 
 ## Best Practices
 
-### DO:
+### DO
 
 1. ✅ Always start with project context inference
 2. ✅ Group related questions together
@@ -585,7 +585,7 @@ Budget remaining: 3 questions
 5. ✅ Use industry standards as defaults
 6. ✅ Allow user to override any assumption
 
-### DON'T:
+### DON'T
 
 1. ❌ Don't ask cosmetic questions (colors, icons)
 2. ❌ Don't ask questions answerable from project context

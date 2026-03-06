@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -84,7 +84,7 @@ Customize Claude Code's behavior with these command-line flags:
 
 | `--input-format` | Specify input format for print mode (options: `text`, `stream-json`) | `claude -p --output-format json --input-format stream-json` |
 
-| `--json-schema` | Get validated JSON output matching a JSON Schema after agent completes its workflow (print mode only, see \[structured outputs](https://platform.claude.com/docs/en/agent-sdk/structured-outputs)) | `claude -p --json-schema '{"type":"object","properties":{...}}' "query"` |
+| `--json-schema` | Get validated JSON output matching a JSON Schema after agent completes its workflow (print mode only, see \[structured outputs](<https://platform.claude.com/docs/en/agent-sdk/structured-outputs>)) | `claude -p --json-schema '{"type":"object","properties":{...}}' "query"` |
 
 | `--maintenance` | Run maintenance hooks and exit | `claude --maintenance` |
 
@@ -108,7 +108,7 @@ Customize Claude Code's behavior with these command-line flags:
 
 | `--plugin-dir` | Load plugins from directories for this session only (repeatable) | `claude --plugin-dir ./my-plugins` |
 
-| `--print`, `-p` | Print response without interactive mode (see \[Agent SDK documentation](https://platform.claude.com/docs/en/agent-sdk/overview) for programmatic usage details) | `claude -p "query"` |
+| `--print`, `-p` | Print response without interactive mode (see \[Agent SDK documentation](<https://platform.claude.com/docs/en/agent-sdk/overview>) for programmatic usage details) | `claude -p "query"` |
 
 | `--remote` | Create a new \[web session](/en/claude-code-on-the-web) on claude.ai with the provided task description | `claude --remote "Fix the login bug"` |
 
@@ -266,4 +266,4 @@ For most use cases, `--append-system-prompt` or `--append-system-prompt-file` is
 
 \* \[Settings](/en/settings) - Configuration options
 
-\* \[Agent SDK documentation](https://platform.claude.com/docs/en/agent-sdk/overview) - Programmatic usage and integrations
+\* \[Agent SDK documentation](<https://platform.claude.com/docs/en/agent-sdk/overview>) - Programmatic usage and integrations

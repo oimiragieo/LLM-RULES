@@ -192,6 +192,7 @@ After running codemods, manually resolve remaining breaking changes.
    ```
 
 3. **Route Handlers**: GET route handlers are no longer cached by default
+
    ```typescript
    // Next.js 15+: explicitly set caching
    export const dynamic = 'force-static';

@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -16,11 +16,11 @@
 
 We give you the choice to allow your data to be used to improve future Claude models. We will train new models using data from Free, Pro, and Max accounts when this setting is on (including when you use Claude Code from these accounts).
 
-\*\*Commercial users\*\*: (Team and Enterprise plans, API, 3rd-party platforms, and Claude Gov) maintain existing policies: Anthropic does not train generative models using code or prompts sent to Claude Code under commercial terms, unless the customer has chosen to provide their data to us for model improvement (for example, the \[Developer Partner Program](https://support.claude.com/en/articles/11174108-about-the-development-partner-program)).
+\*\*Commercial users\*\*: (Team and Enterprise plans, API, 3rd-party platforms, and Claude Gov) maintain existing policies: Anthropic does not train generative models using code or prompts sent to Claude Code under commercial terms, unless the customer has chosen to provide their data to us for model improvement (for example, the \[Developer Partner Program](<https://support.claude.com/en/articles/11174108-about-the-development-partner-program>)).
 
 \### Development Partner Program
 
-If you explicitly opt in to methods to provide us with materials to train on, such as via the \[Development Partner Program](https://support.claude.com/en/articles/11174108-about-the-development-partner-program), we may use those materials provided to train our models. An organization admin can expressly opt-in to the Development Partner Program for their organization. Note that this program is available only for Anthropic first-party API, and not for Bedrock or Vertex users.
+If you explicitly opt in to methods to provide us with materials to train on, such as via the \[Development Partner Program](<https://support.claude.com/en/articles/11174108-about-the-development-partner-program>), we may use those materials provided to train our models. An organization admin can expressly opt-in to the Development Partner Program for their organization. Note that this program is available only for Anthropic first-party API, and not for Bedrock or Vertex users.
 
 \### Feedback using the `/bug` command
 
@@ -42,7 +42,7 @@ Anthropic retains Claude Code data based on your account type and preferences.
 
 \* Users who don't allow data use for model improvement: 30-day retention period
 
-\* Privacy settings can be changed at any time at \[claude.ai/settings/data-privacy-controls](https://claude.ai/settings/data-privacy-controls).
+\* Privacy settings can be changed at any time at \[claude.ai/settings/data-privacy-controls](<https://claude.ai/settings/data-privacy-controls>).
 
 \*\*Commercial users (Team, Enterprise, and API)\*\*:
 
@@ -52,9 +52,9 @@ Anthropic retains Claude Code data based on your account type and preferences.
 
 \* Local caching: Claude Code clients may store sessions locally for up to 30 days to enable session resumption (configurable)
 
-Learn more about data retention practices in our \[Privacy Center](https://privacy.anthropic.com/).
+Learn more about data retention practices in our \[Privacy Center](<https://privacy.anthropic.com/>).
 
-For full details, please review our \[Commercial Terms of Service](https://www.anthropic.com/legal/commercial-terms) (for Team, Enterprise, and API users) or \[Consumer Terms](https://www.anthropic.com/legal/consumer-terms) (for Free, Pro, and Max users) and \[Privacy Policy](https://www.anthropic.com/legal/privacy).
+For full details, please review our \[Commercial Terms of Service](<https://www.anthropic.com/legal/commercial-terms>) (for Team, Enterprise, and API users) or \[Consumer Terms](<https://www.anthropic.com/legal/consumer-terms>) (for Free, Pro, and Max users) and \[Privacy Policy](<https://www.anthropic.com/legal/privacy>).
 
 \## Data access
 
@@ -66,9 +66,9 @@ The diagram below shows how Claude Code connects to external services during ins
 
 <img src="https://mintcdn.com/claude-code/I9Dpo7RZuIbc86cX/images/claude-code-data-flow.svg?fit=max\&auto=format\&n=I9Dpo7RZuIbc86cX\&q=85\&s=9e77f476347e7c9983f6e211d27cf6a9" alt="Diagram showing Claude Code's external connections: install/update connects to NPM, and user requests connect to Anthropic services including Console auth, public-api, and optionally Statsig, Sentry, and bug reporting" data-og-width="720" width="720" data-og-height="520" height="520" data-path="images/claude-code-data-flow.svg" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/claude-code/I9Dpo7RZuIbc86cX/images/claude-code-data-flow.svg?w=280\&fit=max\&auto=format\&n=I9Dpo7RZuIbc86cX\&q=85\&s=94c033b9b6db3d10b9e2d7c6d681d9dc 280w, https://mintcdn.com/claude-code/I9Dpo7RZuIbc86cX/images/claude-code-data-flow.svg?w=560\&fit=max\&auto=format\&n=I9Dpo7RZuIbc86cX\&q=85\&s=430aaaf77c28c501d5753ffa456ee227 560w, https://mintcdn.com/claude-code/I9Dpo7RZuIbc86cX/images/claude-code-data-flow.svg?w=840\&fit=max\&auto=format\&n=I9Dpo7RZuIbc86cX\&q=85\&s=63c3c3f160b522220a8291fe2f93f970 840w, https://mintcdn.com/claude-code/I9Dpo7RZuIbc86cX/images/claude-code-data-flow.svg?w=1100\&fit=max\&auto=format\&n=I9Dpo7RZuIbc86cX\&q=85\&s=a7f6e838482f4a1a0a0b4683439369ea 1100w, https://mintcdn.com/claude-code/I9Dpo7RZuIbc86cX/images/claude-code-data-flow.svg?w=1650\&fit=max\&auto=format\&n=I9Dpo7RZuIbc86cX\&q=85\&s=5fbf749c2f94babb3ef72edfb7aba1e9 1650w, https://mintcdn.com/claude-code/I9Dpo7RZuIbc86cX/images/claude-code-data-flow.svg?w=2500\&fit=max\&auto=format\&n=I9Dpo7RZuIbc86cX\&q=85\&s=7a1babbdccc4986957698d9c5c30c4a8 2500w" />
 
-Claude Code is installed from \[NPM](https://www.npmjs.com/package/@anthropic-ai/claude-code). Claude Code runs locally. In order to interact with the LLM, Claude Code sends data over the network. This data includes all user prompts and model outputs. The data is encrypted in transit via TLS and is not encrypted at rest. Claude Code is compatible with most popular VPNs and LLM proxies.
+Claude Code is installed from \[NPM](<https://www.npmjs.com/package/@anthropic-ai/claude-code>). Claude Code runs locally. In order to interact with the LLM, Claude Code sends data over the network. This data includes all user prompts and model outputs. The data is encrypted in transit via TLS and is not encrypted at rest. Claude Code is compatible with most popular VPNs and LLM proxies.
 
-Claude Code is built on Anthropic's APIs. For details regarding our API's security controls, including our API logging procedures, please refer to compliance artifacts offered in the \[Anthropic Trust Center](https://trust.anthropic.com).
+Claude Code is built on Anthropic's APIs. For details regarding our API's security controls, including our API logging procedures, please refer to compliance artifacts offered in the \[Anthropic Trust Center](<https://trust.anthropic.com>).
 
 \### Cloud execution: Data flow and dependencies
 
@@ -86,9 +86,9 @@ For security details about cloud execution, see \[Security](/en/security#cloud-e
 
 \## Telemetry services
 
-Claude Code connects from users' machines to the Statsig service to log operational metrics such as latency, reliability, and usage patterns. This logging does not include any code or file paths. Data is encrypted in transit using TLS and at rest using 256-bit AES encryption. Read more in the \[Statsig security documentation](https://www.statsig.com/trust/security). To opt out of Statsig telemetry, set the `DISABLE\_TELEMETRY` environment variable.
+Claude Code connects from users' machines to the Statsig service to log operational metrics such as latency, reliability, and usage patterns. This logging does not include any code or file paths. Data is encrypted in transit using TLS and at rest using 256-bit AES encryption. Read more in the \[Statsig security documentation](<https://www.statsig.com/trust/security>). To opt out of Statsig telemetry, set the `DISABLE\_TELEMETRY` environment variable.
 
-Claude Code connects from users' machines to Sentry for operational error logging. The data is encrypted in transit using TLS and at rest using 256-bit AES encryption. Read more in the \[Sentry security documentation](https://sentry.io/security/). To opt out of error logging, set the `DISABLE\_ERROR\_REPORTING` environment variable.
+Claude Code connects from users' machines to Sentry for operational error logging. The data is encrypted in transit using TLS and at rest using 256-bit AES encryption. Read more in the \[Sentry security documentation](<https://sentry.io/security/>). To opt out of error logging, set the `DISABLE\_ERROR\_REPORTING` environment variable.
 
 When users run the `/bug` command, a copy of their full conversation history including code is sent to Anthropic. The data is encrypted in transit and at rest. Optionally, a Github issue is created in our public repository. To opt out of bug reporting, set the `DISABLE\_BUG\_COMMAND` environment variable.
 

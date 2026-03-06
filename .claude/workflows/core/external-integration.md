@@ -858,20 +858,20 @@ After each phase, verify:
 
 ## Error Recovery
 
-### If Phase 0 determines artifact exists and is current:
+### If Phase 0 determines artifact exists and is current
 
 1. Document decision in learnings.md
 2. STOP workflow - no integration needed
 3. Notify user: "Artifact already exists and is up-to-date"
 
-### If Phase 1 clone/download fails:
+### If Phase 1 clone/download fails
 
 1. Document error in issues.md
 2. Check network connectivity, permissions, URL validity
 3. Retry clone with corrected parameters
 4. If persistent failure, STOP workflow and notify user
 
-### If Phase 4 review finds BLOCKING issues:
+### If Phase 4 review finds BLOCKING issues
 
 1. Document BLOCKING issues in .claude/context/reports/backend/blockers.md
 2. Planner marks plan as BLOCKED
@@ -879,7 +879,7 @@ After each phase, verify:
 4. Notify user with blocker details and recommended actions
 5. Do NOT proceed to Phase 6
 
-### If Phase 5 consolidation finds conflicts:
+### If Phase 5 consolidation finds conflicts
 
 1. Document conflicts in .claude/context/reports/backend/conflicts.md
 2. Attempt automatic resolution if possible
@@ -887,7 +887,7 @@ After each phase, verify:
 4. Request user input for conflict resolution
 5. Update plan with user decisions
 
-### If Phase 6 integration fails:
+### If Phase 6 integration fails
 
 1. **ROLLBACK IMMEDIATELY**:
    - Delete partially copied files from target location
@@ -898,7 +898,7 @@ After each phase, verify:
 4. Notify user with failure details
 5. Provide rollback confirmation
 
-### If Phase 8 verification fails:
+### If Phase 8 verification fails
 
 1. **ROLLBACK INTEGRATION**:
    - Remove artifact from target location

@@ -56,8 +56,10 @@
 -->
 
 - **Status:** pending
-- ## Actions taken:
-- ## Files created/modified:
+
+- ## Actions taken
+
+- ## Files created/modified
 
 ## Test Results
 

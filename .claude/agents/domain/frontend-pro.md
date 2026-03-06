@@ -25,42 +25,18 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - angular-expert
-  - astro-expert
-  - frontend-expert
-  - htmx-expert
-  - paraglide-js-internationalization-i18n
-  - react-best-practices-vercel
-  - react-expert
-  - qwik-expert
-  - solidjs-expert
-  - vercel-ai-sdk-best-practices
-  - vue-expert
-  - styling-expert
-  - task-management-protocol
-  - verification-before-completion
-  - web-design-guidelines-vercel
-  - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - accessibility
-  - build-tools-expert
-  - debugging
-  - git-expert
-  - html-tailwind-css-and-javascript-expert-rule
-  - state-management-expert
-  - tdd
-  - typescript-expert
-  - ui-components-expert
-  - enhance-prompt
-  - shadcn-ui
-  - vercel-deploy
-  - web-perf
+  - frontend-expert
   - memory-search
-  - webapp-testing
-  - webmcp-browser-tools
+  - react-best-practices-vercel
+  - react-expert
+  - ripgrep
+  - styling-expert
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
+  - web-design-guidelines-vercel
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -715,3 +691,24 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 - `Skill({ skill: 'code-semantic-search' })` for conceptual search
 - `Skill({ skill: 'code-structural-search' })` for AST-based matching
 - Grep: fallback only (single-file checks, advanced PCRE2)
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

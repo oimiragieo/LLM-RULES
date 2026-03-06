@@ -329,12 +329,12 @@ Task({
 
 ## Error Recovery
 
-### If Phase 1 fails:
+### If Phase 1 fails
 
 1. {Recovery step}
 2. Restart Phase 1
 
-### If Phase 2 review finds blockers:
+### If Phase 2 review finds blockers
 
 1. {Recovery step}
 2. Re-run reviews
@@ -490,8 +490,8 @@ After workflow file is written, you MUST update CLAUDE.md:
 - `{agent-name}` - {Role description}
 ```
 
-3. **Insert in appropriate location** (alphabetical or at end of section)
-4. **Verify with**:
+1. **Insert in appropriate location** (alphabetical or at end of section)
+2. **Verify with**:
 
 ```bash
 grep "{workflow-name}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED - BLOCKING!"

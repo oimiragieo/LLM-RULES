@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -46,7 +46,7 @@ The fastest way to create a hook is through the `/hooks` interactive menu in Cla
 
 &nbsp; <Tab title="macOS">
 
-&nbsp; Uses \[`osascript`](https://ss64.com/mac/osascript.html) to trigger a native macOS notification through AppleScript:
+&nbsp; Uses \[`osascript`](<https://ss64.com/mac/osascript.html>) to trigger a native macOS notification through AppleScript:
 
 &nbsp; ```
 
@@ -238,9 +238,9 @@ This hook uses the `Notification` event, which fires when Claude is waiting for 
 
 \### Auto-format code after edits
 
-Automatically run \[Prettier](https://prettier.io/) on every file Claude edits, so formatting stays consistent without manual intervention.
+Automatically run \[Prettier](<https://prettier.io/>) on every file Claude edits, so formatting stays consistent without manual intervention.
 
-This hook uses the `PostToolUse` event with an `Edit|Write` matcher, so it runs only after file-editing tools. The command extracts the edited file path with \[`jq`](https://jqlang.github.io/jq/) and passes it to Prettier. Add this to `.claude/settings.json` in your project root:
+This hook uses the `PostToolUse` event with an `Edit|Write` matcher, so it runs only after file-editing tools. The command extracts the edited file path with \[`jq`](<https://jqlang.github.io/jq/>) and passes it to Prettier. Add this to `.claude/settings.json` in your project root:
 
 ```json theme={null}
 
@@ -278,7 +278,7 @@ This hook uses the `PostToolUse` event with an `Edit|Write` matcher, so it runs 
 
 <Note>
 
-&nbsp; The Bash examples on this page use `jq` for JSON parsing. Install it with `brew install jq` (macOS), `apt-get install jq` (Debian/Ubuntu), or see \[`jq` downloads](https://jqlang.github.io/jq/download/).
+&nbsp; The Bash examples on this page use `jq` for JSON parsing. Install it with `brew install jq` (macOS), `apt-get install jq` (Debian/Ubuntu), or see \[`jq` downloads](<https://jqlang.github.io/jq/download/>).
 
 </Note>
 
@@ -988,4 +988,4 @@ Toggle verbose mode with `Ctrl+O` to see hook output in the transcript, or run `
 
 \* \[Security considerations](/en/hooks#security-considerations): review before deploying hooks in shared or production environments
 
-\* \[Bash command validator example](https://github.com/anthropics/claude-code/blob/main/examples/hooks/bash\_command\_validator\_example.py): complete reference implementation
+\* \[Bash command validator example](<https://github.com/anthropics/claude-code/blob/main/examples/hooks/bash\_command\_validator\_example.py>): complete reference implementation

@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -20,7 +20,7 @@ You might encounter the following issues in WSL:
 
 \* Install with `npm install -g @anthropic-ai/claude-code --force --no-os-check` (Do NOT use `sudo`)
 
-\*\*Node not found errors\*\*: If you see `exec: node: not found` when running `claude`, your WSL environment may be using a Windows installation of Node.js. You can confirm this with `which npm` and `which node`, which should point to Linux paths starting with `/usr/` rather than `/mnt/c/`. To fix this, try installing Node via your Linux distribution's package manager or via \[`nvm`](https://github.com/nvm-sh/nvm).
+\*\*Node not found errors\*\*: If you see `exec: node: not found` when running `claude`, your WSL environment may be using a Windows installation of Node.js. You can confirm this with `which npm` and `which node`, which should point to Linux paths starting with `/usr/` rather than `/mnt/c/`. To fix this, try installing Node via your Linux distribution's package manager or via \[`nvm`](<https://github.com/nvm-sh/nvm>).
 
 \*\*nvm version conflicts\*\*: If you have nvm installed in both WSL and Windows, you may experience version conflicts when switching Node versions in WSL. This happens because WSL imports the Windows PATH by default, causing Windows nvm/npm to take priority over the WSL installation.
 
@@ -170,7 +170,7 @@ This command installs the appropriate build of Claude Code for your operating sy
 
 \### Windows: "Claude Code on Windows requires git-bash"
 
-Claude Code on native Windows requires \[Git for Windows](https://git-scm.com/downloads/win) which includes Git Bash. If Git is installed but not detected:
+Claude Code on native Windows requires \[Git for Windows](<https://git-scm.com/downloads/win>) which includes Git Bash. If Git is installed but not detected:
 
 1\. Set the path explicitly in PowerShell before running Claude:
 
@@ -378,7 +378,7 @@ Then set `USE\_BUILTIN\_RIPGREP=0` in your \[environment](/en/settings#environme
 
 \### Slow or incomplete search results on WSL
 
-Disk read performance penalties when \[working across file systems on WSL](https://learn.microsoft.com/en-us/windows/wsl/filesystems) may result in fewer-than-expected matches (but not a complete lack of search functionality) when using Claude Code on WSL.
+Disk read performance penalties when \[working across file systems on WSL](<https://learn.microsoft.com/en-us/windows/wsl/filesystems>) may result in fewer-than-expected matches (but not a complete lack of search functionality) when using Claude Code on WSL.
 
 <Note>
 
@@ -452,7 +452,7 @@ For additional JetBrains configuration tips, see our \[JetBrains IDE guide](/en/
 
 \### Reporting Windows IDE integration issues (both native and WSL)
 
-If you're experiencing IDE integration problems on Windows, \[create an issue](https://github.com/anthropics/claude-code/issues) with the following information:
+If you're experiencing IDE integration problems on Windows, \[create an issue](<https://github.com/anthropics/claude-code/issues>) with the following information:
 
 \* Environment type: native Windows (Git Bash) or WSL1/WSL2
 
@@ -552,7 +552,7 @@ If you're experiencing issues not covered here:
 
 1\. Use the `/bug` command within Claude Code to report problems directly to Anthropic
 
-2\. Check the \[GitHub repository](https://github.com/anthropics/claude-code) for known issues
+2\. Check the \[GitHub repository](<https://github.com/anthropics/claude-code>) for known issues
 
 3\. Run `/doctor` to diagnose issues. It checks:
 

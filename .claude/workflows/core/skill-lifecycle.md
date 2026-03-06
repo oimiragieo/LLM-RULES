@@ -876,21 +876,21 @@ Record lifecycle completion to .claude/context/memory/learnings.md
 
 ## Error Recovery
 
-### If Phase 1 fails (Discovery):
+### If Phase 1 fails (Discovery)
 
 1. Check file system permissions
 2. Verify creator registry is readable
 3. Retry with corrected paths
 4. Escalate to user if registry is corrupted
 
-### If Phase 2 fails (Decision):
+### If Phase 2 fails (Decision)
 
 1. Review discovery findings for clarity
 2. Ask user to clarify intent (create vs update)
 3. Re-run decision matrix with additional context
 4. Document decision blockers in issues.md
 
-### If Phase 3 fails (Action):
+### If Phase 3 fails (Action)
 
 1. Check if creator skill exists and is functional
 2. Verify all dependencies are available
@@ -898,7 +898,7 @@ Record lifecycle completion to .claude/context/memory/learnings.md
 4. Retry with fixed dependencies
 5. If blocking validation fails: STOP and report errors
 
-### If Phase 4 fails (Integration):
+### If Phase 4 fails (Integration)
 
 1. **CRITICAL**: If CLAUDE.md update fails, artifact is INVISIBLE
 2. Manually verify CLAUDE.md is writable
@@ -906,7 +906,7 @@ Record lifecycle completion to .claude/context/memory/learnings.md
 4. Validate grep commands succeed
 5. DO NOT proceed to Phase 5 if integration fails
 
-### If Phase 5 fails (Validation):
+### If Phase 5 fails (Validation)
 
 1. Review test failures in detail
 2. Fix broken references

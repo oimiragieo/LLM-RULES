@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-03T07:11:34.637Z
+lastVerifiedAt: 2026-03-06T04:14:22.722Z
 name: artifact-integrator
 version: 1.0.0
 description: Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces a security-first multi-agent pipeline.
@@ -36,27 +36,12 @@ tools:
     WebFetch,
   ]
 skills:
+  - project-onboarding
   - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
   - task-management-protocol
   - verification-before-completion
-  - agent-creator
-  - command-creator
-  - hook-creator
-  - rule-creator
-  - schema-creator
-  - skill-creator
-  - template-creator
-  - tool-creator
-  - workflow-creator
-  - github-ops
-  - agent-updater
-  - skill-updater
-  - workflow-updater
-  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -216,3 +201,24 @@ For code discovery needs, delegate to spawned agents with search skills or use:
 ## Memory Protocol
 
 (Standard protocol as per project rules)
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

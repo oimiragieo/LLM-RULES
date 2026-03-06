@@ -19,6 +19,7 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 **Mode: Cognitive/Prompt-Driven** — No standalone utility script; use via agent context.
@@ -114,11 +115,14 @@ Before finalizing a new skill, gather current best practices and constraints:
    **How to search:**
    - Invoke `Skill({ skill: 'github-ops' })` to use the structured GitHub reconnaissance workflow.
    - List the README to find relevant entries:
+
      ```bash
      gh api repos/VoltAgent/awesome-agent-skills/contents --jq '.[].name'
      gh api repos/VoltAgent/awesome-agent-skills/contents/README.md --jq '.content' | base64 -d | grep -i "<keyword>"
      ```
+
    - Or use GitHub code search:
+
      ```bash
      gh search code "<skill-topic-keywords>" --repo VoltAgent/awesome-agent-skills
      ```
@@ -128,9 +132,11 @@ Before finalizing a new skill, gather current best practices and constraints:
      `https://raw.githubusercontent.com/<org>/<repo>/main/skills/<skill-name>/SKILL.md`
      or the GitHub tree URL linked from the README listing.
    - Pull the raw content via `github-ops` or `WebFetch`:
+
      ```bash
      gh api repos/<org>/<repo>/contents/skills/<skill-name>/SKILL.md --jq '.content' | base64 -d
      ```
+
      Or: `WebFetch({ url: '<raw-github-url>', prompt: 'Extract skill structure, workflow steps, patterns, and best practices' })`
 
    #### Security Review Gate (MANDATORY — before incorporating external content)
@@ -558,6 +564,7 @@ If your skill uses tools prefixed with `mcp__<server>__*`, add the server to `.c
    ```
 
 4. **Verify registration:**
+
    ```bash
    grep "<server-name>" .claude/settings.json || echo "ERROR: MCP not registered!"
    ```
@@ -1303,7 +1310,7 @@ Based on skill domain and purpose, auto-assign to matching agents.
 - **Supporting**: Skill is frequently useful but not always needed
 - **On-demand**: Skill is only loaded for specific task types
 
-4. **Record assignments** in skill's SKILL.md under "Assigned Agents" section
+1. **Record assignments** in skill's SKILL.md under "Assigned Agents" section
 
 **Matching Rules:**
 
@@ -1370,6 +1377,7 @@ Update the skill catalog to ensure the new skill is discoverable.
 4. **Update catalog Quick Reference** (top of file) if new category or significant skill.
 
 5. **Verify update:**
+
    ```bash
    grep "{skill-name}" .claude/docs/skill-catalog.md || echo "ERROR: Skill catalog NOT UPDATED!"
    ```
@@ -1608,7 +1616,7 @@ After the skill is indexed, add it to the project README so it is publicly disco
 
    Category → README section mapping:
 
-   | Skill Catalog Category   | README `### ` Section    |
+   | Skill Catalog Category   | README `###` Section    |
    | ------------------------ | ------------------------ |
    | Core Development         | Core Development         |
    | Planning & Architecture  | Planning & Architecture  |

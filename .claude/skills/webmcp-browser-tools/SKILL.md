@@ -49,7 +49,7 @@ WebMCP is **not** a web scraper, crawler, or search engine. It is a tool registr
 
 ## Status (as of 2026-02-22)
 
-- **Spec**: W3C Community Group Draft — https://github.com/webmachinelearning/webmcp
+- **Spec**: W3C Community Group Draft — <https://github.com/webmachinelearning/webmcp>
 - **Browser support**: Early preview in **Chrome 146 Canary** (shipped February 2026) behind the `Experimental Web Platform Features` flag. Stable rollout expected mid–late 2026.
 - **Installable packages**: YES — the `@mcp-b/` ecosystem provides working npm packages today (polyfill + React integration)
 
@@ -177,7 +177,7 @@ Do NOT use this skill when:
 
 ## Monitoring
 
-Watch: https://github.com/webmachinelearning/webmcp for:
+Watch: <https://github.com/webmachinelearning/webmcp> for:
 
 - Chrome intent-to-ship / origin trial announcements
 - Firefox and Safari implementation signals

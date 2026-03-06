@@ -47,7 +47,7 @@ When reviewing or writing Convex code, apply these guidelines:
 - Always define table schemas using `defineTable(v.object({...}))` in `convex/schema.ts`.
 - Use `v.id("tableName")` for cross-document references — never plain `v.string()`.
 - Omit `_id` and `_creationTime` from schema definitions — they are auto-generated system fields.
-- See https://docs.convex.dev/database/types for all available validator types.
+- See <https://docs.convex.dev/database/types> for all available validator types.
 
 **Function Registration**
 

@@ -6,8 +6,8 @@
 **Date:** 2026-01-31 (updated 2026-02-19)
 **References:**
 
-- Cursor Architecture: https://towardsdatascience.com/how-cursor-actually-indexes-your-codebase/
-- Greb MCP: https://grebmcp.com/
+- Cursor Architecture: <https://towardsdatascience.com/how-cursor-actually-indexes-your-codebase/>
+- Greb MCP: <https://grebmcp.com/>
 - ADR-054: Memory System Enhancement Strategy
 
 ---

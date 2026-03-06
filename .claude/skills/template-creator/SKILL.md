@@ -179,6 +179,7 @@ Skill({ skill: 'research-synthesis' });
 - Review template catalog: Read `.claude/context/artifacts/catalogs/template-catalog.md`
 - Check if similar template already exists in the ecosystem
 - **Research domain-specific template structures** (minimum 2 queries required):
+
   ```javascript
   WebSearch({ query: 'best <domain/topic name> template report or files 2026' });
   WebSearch({ query: 'industry standard <template type> format <domain/tool> 2026' });
@@ -999,10 +1000,10 @@ After creating this report:
 **After completing:** Record patterns to learnings.md
 ```
 
-6. **Update catalog**: Add to template-catalog.md under Report Templates
-7. **Update README**: Add to reports section in templates README
-8. **Assign consumers**: Update security-architect and qa agent references
-9. **Update memory**: Record in learnings.md
+1. **Update catalog**: Add to template-catalog.md under Report Templates
+2. **Update README**: Add to reports section in templates README
+3. **Assign consumers**: Update security-architect and qa agent references
+4. **Update memory**: Record in learnings.md
 
 ### Example 2: Creating a Spawn Template
 
@@ -1063,11 +1064,11 @@ After using this template:
 - [ ] No unsanitized user input in prompt field
 ```
 
-6. **Update catalog**: Add to template-catalog.md under Spawn Templates
-7. **Update README**: Add to spawn section in templates README
-8. **Update CLAUDE.md**: Add to Section 2 (Spawn Templates) if framework-standard
-9. **Assign consumers**: Update router and spawn-template-resolver references
-10. **Update memory**: Record in learnings.md
+1. **Update catalog**: Add to template-catalog.md under Spawn Templates
+2. **Update README**: Add to spawn section in templates README
+3. **Update CLAUDE.md**: Add to Section 2 (Spawn Templates) if framework-standard
+4. **Assign consumers**: Update router and spawn-template-resolver references
+5. **Update memory**: Record in learnings.md
 
 ---
 

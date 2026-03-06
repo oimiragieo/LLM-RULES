@@ -242,7 +242,7 @@ AGENT: "Understood - the product automates code review feedback for developers a
 
 ## Anti-Patterns
 
-### Do NOT:
+### Do NOT
 
 - Ask multiple questions at once
 - Include unselected options in generated content
@@ -250,7 +250,7 @@ AGENT: "Understood - the product automates code review feedback for developers a
 - Assume answers without asking
 - Use technical jargon in options without explanation
 
-### Do:
+### Do
 
 - One question at a time
 - Clear, concise option descriptions

@@ -28,47 +28,24 @@ tools:
   - Skill
 skills:
   - architecture-review
-  - commit-validator
+  - code-semantic-search
+  - code-structural-search
   - consensus-voting
   - containerization-rules
   - context-compressor
   - database-architect
   - docker-compose
-  - kafka-development-practices
-  - monorepo-and-tooling
   - filesystem
-  - finishing-a-development-branch
-  - ralph-loop
   - git-expert
   - github-mcp
   - k8s-manifest-generator
   - kubernetes-flux
-  - smart-revert
+  - memory-search
+  - ripgrep
   - task-management-protocol
   - terraform-infra
-  - verification-before-completion
-  - ripgrep
-  - code-semantic-search
-  - code-structural-search
   - token-saver-context-compression
-  - dependency-analyzer
-  - aws-cloud-ops
-  - ci-cd-implementation-rule
-  - cloud-devops-expert
-  - configuration-management
-  - container-expert
-  - gcloud-cli
-  - gitops-workflow
-  - helm-chart-scaffolding
-  - k8s-security-policies
-  - next-upgrade
-  - sentry-monitoring
-  - template-renderer
-  - vercel-deploy
-  - web-perf
-  - memory-search
-  - powershell-expert
-  - feature-flag-management
+  - verification-before-completion
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -140,11 +117,11 @@ This skill will be automatically activated via the Skill() tool.
 
 ## Responsibilities
 
-1.  **Infrastructure as Code**: Terraform, CloudFormation, Pulumi.
-2.  **CI/CD Pipelines**: GitHub Actions, GitLab CI, Jenkins.
-3.  **Containerization**: Docker, Kubernetes (K8s), Helm.
-4.  **Observability**: Prometheus, Grafana, ELK, Datadog.
-5.  **Release Management**: Versioning, deployments, rollbacks.
+1. **Infrastructure as Code**: Terraform, CloudFormation, Pulumi.
+2. **CI/CD Pipelines**: GitHub Actions, GitLab CI, Jenkins.
+3. **Containerization**: Docker, Kubernetes (K8s), Helm.
+4. **Observability**: Prometheus, Grafana, ELK, Datadog.
+5. **Release Management**: Versioning, deployments, rollbacks.
 
 ## Commit Verification Protocol (MANDATORY)
 
@@ -180,9 +157,11 @@ This skill will be automatically activated via the Skill() tool.
 5. **Include commit hash in TaskUpdate**: On success, include the commit hash in the completion metadata summary.
 
 6. **After `git push`**: Verify the push landed with:
+
    ```bash
    git log --oneline -1
    ```
+
    Confirm the hash matches the post-commit hash above.
 
 ### Iron Law
@@ -211,12 +190,12 @@ Use search tools to understand the codebase before acting:
 
 ## Workflow
 
-1.  **Analyze**: Review architecture requirements.
-2.  **Design**: Plan infrastructure topology and pipelines.
-3.  **Implement**: Write IaC and pipeline configs.
-4.  **Verify**: Test deployments in staging.
-5.  **Monitor**: Setup alerts and dashboards.
-6.  **Lint + Format (BLOCKING)**: Run `pnpm lint:fix` and `pnpm format` before marking work complete.
+1. **Analyze**: Review architecture requirements.
+2. **Design**: Plan infrastructure topology and pipelines.
+3. **Implement**: Write IaC and pipeline configs.
+4. **Verify**: Test deployments in staging.
+5. **Monitor**: Setup alerts and dashboards.
+6. **Lint + Format (BLOCKING)**: Run `pnpm lint:fix` and `pnpm format` before marking work complete.
 
 ## Skill Invocation Protocol (MANDATORY)
 
@@ -319,3 +298,24 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 - `Skill({ skill: 'code-semantic-search' })` for conceptual search
 - `Skill({ skill: 'code-structural-search' })` for AST-based matching
 - Grep: fallback only (single-file checks, advanced PCRE2)
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

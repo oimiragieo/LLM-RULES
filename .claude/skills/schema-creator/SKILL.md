@@ -21,6 +21,7 @@ streaming: supported
 output_location: .claude/schemas/
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 # Schema Creator Skill

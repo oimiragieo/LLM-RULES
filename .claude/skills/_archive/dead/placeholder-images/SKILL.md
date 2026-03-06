@@ -32,7 +32,7 @@ You help developers write better code by applying established guidelines and bes
 <instructions>
 When reviewing or writing code, apply these guidelines:
 
-- While creating placeholder images as a part of your seed data, use https://placekitten.com/
+- While creating placeholder images as a part of your seed data, use <https://placekitten.com/>
   </instructions>
 
 <examples>

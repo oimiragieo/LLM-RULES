@@ -231,9 +231,11 @@ Track every file modified with instrumentation so cleanup is complete.
 After adding instrumentation, attempt to trigger the bug programmatically:
 
 1. **Run existing tests** that cover the affected code path:
+
    ```bash
    pnpm test -- --grep "<affected-module-or-test-pattern>"
    ```
+
 2. **Execute reproduction scripts** if present (e.g., `scripts/reproduce-bug.ts`, fixtures, seed scripts).
 3. **Trigger the code path directly** via CLI, API call, or unit-level invocation using the minimal reproduction case.
 4. **Collect the session log** after each auto-reproduction attempt.

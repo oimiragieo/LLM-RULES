@@ -223,19 +223,19 @@ After each phase, verify:
 
 ## Error Recovery
 
-### If Phase 1 fails:
+### If Phase 1 fails
 
 1. {{RECOVERY_STEP}}
 2. {{RECOVERY_STEP}}
 3. Restart Phase 1
 
-### If Phase 2 review finds blockers:
+### If Phase 2 review finds blockers
 
 1. {{RECOVERY_STEP}}
 2. {{RECOVERY_STEP}}
 3. Re-run reviews
 
-### If Phase 3 consolidation conflicts:
+### If Phase 3 consolidation conflicts
 
 1. {{RECOVERY_STEP}}
 2. {{RECOVERY_STEP}}

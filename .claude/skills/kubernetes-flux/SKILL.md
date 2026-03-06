@@ -340,8 +340,8 @@ Secret values are always masked. Only metadata shown.
 
 ## Related
 
-- kubectl docs: https://kubernetes.io/docs/reference/kubectl/
-- Kubernetes API: https://kubernetes.io/docs/reference/kubernetes-api/
+- kubectl docs: <https://kubernetes.io/docs/reference/kubectl/>
+- Kubernetes API: <https://kubernetes.io/docs/reference/kubernetes-api/>
 
 ## Memory Protocol (MANDATORY)
 

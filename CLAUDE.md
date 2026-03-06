@@ -470,6 +470,7 @@ const result = resolveAgentModel('planner', PROJECT_ROOT);
 5. Fallback: sonnet
 
 **Current config.yaml Agent Models:**
+
 | Agent | Configured Model | Extended Thinking |
 |-------|------------------|-------------------|
 | planner | claude-opus-4-5-20251101 | ✅ Yes |

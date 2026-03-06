@@ -400,6 +400,7 @@ TaskList();
    ```
 
 5. **Update task metadata**
+
    ```javascript
    TaskUpdate({
      taskId: 'X',
@@ -468,6 +469,7 @@ TaskList();
    ```
 
 4. **Update task metadata**
+
    ```javascript
    TaskUpdate({
      taskId: 'X',

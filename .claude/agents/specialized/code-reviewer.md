@@ -32,29 +32,16 @@ tools:
 skills:
   - code-analyzer
   - code-quality-expert
-  - qa-workflow
-  - receiving-code-review
-  - requesting-code-review
-  - tdd
-  - verification-before-completion
-  - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - task-management-protocol
-  - checklist-generator
-  - troubleshooting-regression
-  - code-style-validator
-  - differential-review
-  - dry-principle
-  - git-expert
-  - security-architect
-  - static-analysis
-  - gemini-cli-security
   - memory-search
-  - agent-evaluation
-  - fix-review
+  - receiving-code-review
+  - requesting-code-review
+  - ripgrep
+  - task-management-protocol
+  - tdd
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
 hooks: {}

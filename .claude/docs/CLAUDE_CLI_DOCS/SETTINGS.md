@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -200,7 +200,7 @@ Code through hierarchical settings:
 
 ```
 
-The `$schema` line in the example above points to the \[official JSON schema](https://json.schemastore.org/claude-code-settings.json) for Claude Code settings. Adding it to your `settings.json` enables autocomplete and inline validation in VS Code, Cursor, and any other editor that supports JSON schema validation.
+The `$schema` line in the example above points to the \[official JSON schema](<https://json.schemastore.org/claude-code-settings.json>) for Claude Code settings. Adding it to your `settings.json` enables autocomplete and inline validation in VS Code, Cursor, and any other editor that supports JSON schema validation.
 
 \### Available settings
 
@@ -416,7 +416,7 @@ Configure advanced sandboxing behavior. Sandboxing isolates bash commands from y
 
 Claude Code adds attribution to git commits and pull requests. These are configured separately:
 
-\* Commits use \[git trailers](https://git-scm.com/docs/git-interpret-trailers) (like `Co-Authored-By`) by default, which can be customized or disabled
+\* Commits use \[git trailers](<https://git-scm.com/docs/git-interpret-trailers>) (like `Co-Authored-By`) by default, which can be customized or disabled
 
 \* Pull request descriptions are plain text
 
@@ -1122,7 +1122,7 @@ Claude Code supports the following environment variables to control its behavior
 
 | `ANTHROPIC\_API\_KEY` | API key sent as `X-Api-Key` header, typically for the Claude SDK (for interactive usage, run `/login`) | |
 
-| `ANTHROPIC\_AUTH\_TOKEN` | Custom value for the `Authorization` header (the value you set here will be prefixed with `Bearer `) | |
+| `ANTHROPIC\_AUTH\_TOKEN` | Custom value for the `Authorization` header (the value you set here will be prefixed with `Bearer`) | |
 
 | `ANTHROPIC\_CUSTOM\_HEADERS` | Custom headers to add to requests (`Name: Value` format, newline-separated for multiple headers) | |
 
@@ -1144,7 +1144,7 @@ Claude Code supports the following environment variables to control its behavior
 
 | `ANTHROPIC\_SMALL\_FAST\_MODEL\_AWS\_REGION` | Override AWS region for the Haiku-class model when using Bedrock | |
 
-| `AWS\_BEARER\_TOKEN\_BEDROCK` | Bedrock API key for authentication (see \[Bedrock API keys](https://aws.amazon.com/blogs/machine-learning/accelerate-ai-development-with-amazon-bedrock-api-keys/)) | |
+| `AWS\_BEARER\_TOKEN\_BEDROCK` | Bedrock API key for authentication (see \[Bedrock API keys](<https://aws.amazon.com/blogs/machine-learning/accelerate-ai-development-with-amazon-bedrock-api-keys/>)) | |
 
 | `BASH\_DEFAULT\_TIMEOUT\_MS` | Default timeout for long-running bash commands | |
 
@@ -1264,7 +1264,7 @@ Claude Code supports the following environment variables to control its behavior
 
 | `MAX\_MCP\_OUTPUT\_TOKENS` | Maximum number of tokens allowed in MCP tool responses. Claude Code displays a warning when output exceeds 10,000 tokens (default: 25000) | |
 
-| `MAX\_THINKING\_TOKENS` | Override the \[extended thinking](https://platform.claude.com/docs/en/build-with-claude/extended-thinking) token budget. Thinking is enabled at max budget (31,999 tokens) by default. Use this to limit the budget (for example, `MAX\_THINKING\_TOKENS=10000`) or disable thinking entirely (`MAX\_THINKING\_TOKENS=0`). For Opus 4.6, thinking depth is controlled by \[effort level](/en/model-config#adjust-effort-level) instead, and this variable is ignored unless set to `0` to disable thinking. | |
+| `MAX\_THINKING\_TOKENS` | Override the \[extended thinking](<https://platform.claude.com/docs/en/build-with-claude/extended-thinking>) token budget. Thinking is enabled at max budget (31,999 tokens) by default. Use this to limit the budget (for example, `MAX\_THINKING\_TOKENS=10000`) or disable thinking entirely (`MAX\_THINKING\_TOKENS=0`). For Opus 4.6, thinking depth is controlled by \[effort level](/en/model-config#adjust-effort-level) instead, and this variable is ignored unless set to `0` to disable thinking. | |
 
 | `MCP\_CLIENT\_SECRET` | OAuth client secret for MCP servers that require \[pre-configured credentials](/en/mcp#use-pre-configured-oauth-credentials). Avoids the interactive prompt when adding a server with `--client-secret` | |
 

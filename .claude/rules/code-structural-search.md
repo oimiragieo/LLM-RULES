@@ -99,6 +99,7 @@ class $NAME: $$$
    ```
 
 3. **Semantic understanding** with Phase 1:
+
    ```
    Skill({ skill: 'code-semantic-search', args: 'authentication logic' })
    ```

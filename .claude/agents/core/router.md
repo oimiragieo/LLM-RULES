@@ -21,26 +21,6 @@ permissionMode: default
 skills:
   - complexity-assessment
   - skill-discovery
-  - ripgrep
-  - code-semantic-search
-  - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - agent-creator
-  - command-creator
-  - rule-creator
-  - tool-creator
-  - hook-creator
-  - semgrep-rule-creator
-  - skill-creator
-  - template-creator
-  - workflow-creator
-  - swarm-coordination
-  - task-management-protocol
-  - tool-search
-  - verification-before-completion
-  - wave-executor
-  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -155,6 +135,7 @@ Classify the request:
 ### Step 2: Select Agent(s)
 
 **Core Agents:**
+
 | Agent | File | Use For |
 |-------|------|---------|
 | `developer` | `.claude/agents/core/developer.md` | Code implementation, bug fixes, TDD |
@@ -164,6 +145,7 @@ Classify the request:
 | `technical-writer` | `.claude/agents/core/technical-writer.md` | Documentation, docs, user guides, API docs |
 
 **Specialized Agents:**
+
 | Agent | File | Use For |
 |-------|------|---------|
 | `security-architect` | `.claude/agents/specialized/security-architect.md` | Security, compliance |
@@ -289,51 +271,28 @@ TaskUpdate({
 })
 ```
 
-### Step 4: Handle No Match - Create New Agent
+### Step 4: Handle Capability Gaps (Self-Evolution)
 
-If no existing agent matches:
+If no existing agent matches the request, or if a new skill/workflow/hook is needed, you MUST trigger the **EVOLVE** workflow via the `evolution-orchestrator`. This ensures research-backed, validated evolution.
 
-```
+```javascript
 Task({
-  task_id: "creator-agent-1",
-  subagent_type: "general-purpose",
-  description: "Creating specialized agent",
+  task_id: 'evolution-1',
+  subagent_type: 'evolution-orchestrator',
+  model: 'opus',
+  description: 'Evolving ecosystem for: ${userRequest}',
   prompt: `
-You are the AGENT-CREATOR. Your skill is defined in @.claude/skills/agent-creator/SKILL.md
+You are the EVOLUTION-ORCHESTRATOR. Follow the EVOLVE workflow in @.claude/workflows/core/evolution-workflow.md
 
 ## Task
-Create a new agent for: ${userRequest}
+Evolve the ecosystem to handle: ${userRequest}
 
 ## Instructions
-1. Read the agent-creator skill
-2. Research the domain with WebSearch
-3. Create the agent using the CLI tool
-4. Then spawn the new agent to complete the original task
-`
-})
-```
-
-### Step 5: Handle New Skill Needed
-
-If new capability/tool is required:
-
-```
-Task({
-  task_id: "creator-skill-1",
-  subagent_type: "general-purpose",
-  description: "Creating new skill",
-  prompt: `
-You are the SKILL-CREATOR. Your skill is defined in @.claude/skills/skill-creator/SKILL.md
-
-## Task
-Create skill for: ${userRequest}
-
-## Instructions
-1. Read the skill-creator skill
-2. Create or convert the required skill
-3. Assign to appropriate agent
-`
-})
+1. Follow all 6 phases: Evaluate, Validate, Obtain (Research), Lock, Verify, Enable
+2. MANDATORY: Complete Phase O (OBTAIN) with minimum 3 research queries
+3. After evolution is complete, the new capability will be available for future tasks
+`,
+});
 ```
 
 ## Output Format
@@ -715,3 +674,24 @@ Check for user preferences and past routing patterns.
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

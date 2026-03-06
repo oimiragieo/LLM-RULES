@@ -270,6 +270,7 @@ server_pool_size = 5
 - Used by default in Supabase deployments; available as self-hosted
 
 **Pooling modes:**
+
 | Mode | Use Case | Notes |
 |------|----------|-------|
 | Session | Long-running connections, `LISTEN/NOTIFY` | 1 client = 1 server connection |

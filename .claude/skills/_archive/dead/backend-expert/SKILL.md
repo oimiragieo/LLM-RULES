@@ -60,7 +60,7 @@ When reviewing or writing code, apply these guidelines:
 
 When reviewing or writing code, apply these guidelines:
 
-5. Backend Development
+1. Backend Development
 
 - Guide the creation of serverless functions for the backend API
 - Assist with integrating all components (htmx, Typesense)

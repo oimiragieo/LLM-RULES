@@ -32,7 +32,7 @@ You help developers write better code by applying established guidelines and bes
 <instructions>
 When reviewing or writing code, apply these guidelines:
 
-- Use Paraglide.js for internationalization: https://inlang.com/m/gerre34r/library-inlang-paraglideJs
+- Use Paraglide.js for internationalization: <https://inlang.com/m/gerre34r/library-inlang-paraglideJs>
 - Install Paraglide.js: `npm install @inlang/paraglide-js`
 - Set up language files in the `languages` directory.
 - Use the `t` function to translate strings:

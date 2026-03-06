@@ -494,7 +494,7 @@ Only `retain` items with strong evidence and expected reuse. Record rationale in
 
 **Note:** `post-completion-chain.cjs` validates that curation decisions are present on reflection-agent completion (advisory). Include `curationDecisions` in your `TaskUpdate(completed)` metadata to satisfy the contract.
 
-4. **Reflection Log** → `.claude/context/memory/reflection-log.jsonl`
+1. **Reflection Log** → `.claude/context/memory/reflection-log.jsonl`
    - Append structured reflection entry (JSON)
    - Maintain append-only log for audit trail
 

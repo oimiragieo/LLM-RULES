@@ -23,7 +23,7 @@ paths:
 
 ### Syntax and Formatting
 
-- Follow Ruby Style Guide (https://rubystyle.guide/)
+- Follow Ruby Style Guide (<https://rubystyle.guide/>)
 - Use Ruby's expressive syntax (unless, ||=, &.)
 - Prefer single quotes for strings unless interpolation needed
 

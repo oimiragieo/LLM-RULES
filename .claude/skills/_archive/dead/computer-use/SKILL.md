@@ -523,6 +523,6 @@ Check for:
 
 ## Related
 
-- **Anthropic Documentation**: https://docs.anthropic.com/en/docs/build-with-claude/computer-use
-- **Reference Implementation**: https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo
-- **API Reference**: https://docs.anthropic.com/en/api/computer-use
+- **Anthropic Documentation**: <https://docs.anthropic.com/en/docs/build-with-claude/computer-use>
+- **Reference Implementation**: <https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo>
+- **API Reference**: <https://docs.anthropic.com/en/api/computer-use>

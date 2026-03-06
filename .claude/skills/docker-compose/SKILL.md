@@ -932,6 +932,7 @@ docker compose --profile debug down
    ```
 
 4. **Test the skill**:
+
    ```bash
    docker compose config
    docker compose ps
@@ -1111,12 +1112,12 @@ docker compose version
 
 ## Related
 
-- **Docker Compose Documentation**: https://docs.docker.com/compose/
-- **Compose File Reference**: https://docs.docker.com/compose/compose-file/
-- **Compose Watch Docs**: https://docs.docker.com/compose/how-tos/file-watch/
-- **Compose Profiles Docs**: https://docs.docker.com/compose/how-tos/profiles/
-- **Compose Include Docs**: https://docs.docker.com/compose/how-tos/multiple-compose-files/include/
-- **Docker CLI**: https://docs.docker.com/engine/reference/commandline/cli/
+- **Docker Compose Documentation**: <https://docs.docker.com/compose/>
+- **Compose File Reference**: <https://docs.docker.com/compose/compose-file/>
+- **Compose Watch Docs**: <https://docs.docker.com/compose/how-tos/file-watch/>
+- **Compose Profiles Docs**: <https://docs.docker.com/compose/how-tos/profiles/>
+- **Compose Include Docs**: <https://docs.docker.com/compose/how-tos/multiple-compose-files/include/>
+- **Docker CLI**: <https://docs.docker.com/engine/reference/commandline/cli/>
 - **Kubernetes Migration**: `.claude/skills/kubernetes-flux/` (Kubernetes orchestration)
 
 ## Sources

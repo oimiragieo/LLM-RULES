@@ -165,7 +165,7 @@ assert(Date.now() - start < 100); // Must complete in <100ms
 
 **Symptom:** Date calculations are off by 1 hour for events that cross daylight saving time boundaries.
 
-**Root cause:** Adding 24 _ 60 _ 60 \* 1000ms to a timestamp does not always equal "tomorrow" — DST transitions can make a day 23 or 25 hours long.
+**Root cause:** Adding 24 _60_ 60 \* 1000ms to a timestamp does not always equal "tomorrow" — DST transitions can make a day 23 or 25 hours long.
 
 **Fix:**
 

@@ -35,6 +35,7 @@ node .claude/skills/context-compressor/scripts/main.cjs --help
    ```
 
 2. **With Arguments**
+
    ```
     /context-compressor --option value
    ```

@@ -23,9 +23,11 @@ The skill invokes `.claude/tools/integrations/mcp-converter/batch_converter.py`.
 - **Python 3.10+**: [python.org](https://www.python.org/downloads/) or `winget install Python.Python.3.12` (Windows), `brew install python@3.12` (macOS).
 - **pip**: Usually included with Python; verify with `pip --version`.
 - **Dependencies**: From the repo root, install deps for the integration (e.g. PyYAML if required):
+
   ```bash
   pip install pyyaml
   ```
+
   Run from project root; the script uses `.claude/tools/integrations/mcp-converter/` (catalog: `mcp-catalog.yaml`).
 
 ## Cheat Sheet & Best Practices
@@ -74,9 +76,9 @@ python .claude/tools/mcp-converter/batch_converter.py
 
 ## ℹ️ How it Works
 
-1.  **Introspect**: Connects to the running MCP server.
-2.  **Analyze**: Estimates token usage of tool schemas.
-3.  **Generate**: Creates a `SKILL.md` wrapper that creates dynamic tool calls only when needed.
+1. **Introspect**: Connects to the running MCP server.
+2. **Analyze**: Estimates token usage of tool schemas.
+3. **Generate**: Creates a `SKILL.md` wrapper that creates dynamic tool calls only when needed.
 
 ## 🔧 Dependencies
 

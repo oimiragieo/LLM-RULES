@@ -220,7 +220,7 @@ Domain specialists are spawned during PHASE_2_IMPLEMENT of the enterprise featur
 }
 ```
 
-2. **Output artifacts:**
+1. **Output artifacts:**
    - Implementation notes: `.claude/context/reports/backend/domain/{language}-implementation-{YYYY-MM-DD}.md`
    - Test results: `.claude/context/tmp/test-results-{YYYY-MM-DD}.json`
 

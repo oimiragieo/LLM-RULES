@@ -67,6 +67,7 @@ Before writing a single word, define:
 - **Why**: Pain point or aspiration driving search/scroll
 
 **Audience Awareness Stages → Framework Match:**
+
 | Awareness Stage | Best Framework | Why |
 |----------------|----------------|-----|
 | Unaware (cold) | AIDA, PAS | Build attention first; introduce problem |

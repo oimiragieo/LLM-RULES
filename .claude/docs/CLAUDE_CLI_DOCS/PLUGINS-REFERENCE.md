@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -236,7 +236,7 @@ Plugins can bundle Model Context Protocol (MCP) servers to connect Claude Code w
 
 </Tip>
 
-Plugins can provide \[Language Server Protocol](https://microsoft.github.io/language-server-protocol/) (LSP) servers to give Claude real-time code intelligence while working on your codebase.
+Plugins can provide \[Language Server Protocol](<https://microsoft.github.io/language-server-protocol/>) (LSP) servers to give Claude real-time code intelligence while working on your codebase.
 
 LSP integration provides:
 
@@ -356,7 +356,7 @@ LSP integration provides:
 
 | `typescript-lsp` | TypeScript Language Server | `npm install -g typescript-language-server typescript` |
 
-| `rust-lsp` | rust-analyzer | \[See rust-analyzer installation](https://rust-analyzer.github.io/manual.html#installation) |
+| `rust-lsp` | rust-analyzer | \[See rust-analyzer installation](<https://rust-analyzer.github.io/manual.html#installation>) |
 
 Install the language server first, then install the plugin from the marketplace.
 
@@ -490,7 +490,7 @@ agent `agent-creator` for the plugin with name `plugin-dev` will appear as
 
 | `outputStyles` | string\\|array | Additional output style files/directories | `"./styles/"` |
 
-| `lspServers` | string\\|array\\|object | \[Language Server Protocol](https://microsoft.github.io/language-server-protocol/) configs for code intelligence (go to definition, find references, etc.) | `"./.lsp.json"` |
+| `lspServers` | string\\|array\\|object | \[Language Server Protocol](<https://microsoft.github.io/language-server-protocol/>) configs for code intelligence (go to definition, find references, etc.) | `"./.lsp.json"` |
 
 \### Path behavior rules
 

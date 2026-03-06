@@ -65,7 +65,7 @@ When reviewing or writing code, apply these guidelines:
 - Use functional and declarative programming patterns; avoid unnecessary classes except for state machines.
 - Prefer iteration and modularization over code duplication.
 - Structure files: component logic, markup, styles, helpers, types.
-- Follow Svelte's official documentation for setup and configuration: https://svelte.dev/docs
+- Follow Svelte's official documentation for setup and configuration: <https://svelte.dev/docs>
 - Use lowercase with hyphens for component files (e.g., `components/auth-form.svelte`).
 - Use PascalCase for component names in imports and usage.
 - Use camelCase for variables, functions, and props.

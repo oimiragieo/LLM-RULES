@@ -512,6 +512,7 @@ Before processing a reflection, validate the completed task against credibility 
 
 1. Set reflection confidence score to LOW
 2. Log anomaly to `.claude/context/memory/issues.md`:
+
    ```
    ## Hallucinated Completion Suspected: Task {id} ({date})
    Signal: {which signal triggered}
@@ -519,6 +520,7 @@ Before processing a reflection, validate the completed task against credibility 
    Expected: {complexity}-level work with file modifications
    Actual: Completed in {duration}s with {file_count} file changes
    ```
+
 3. Include "ANOMALY DETECTED" banner in reflection report
 4. Cross-reference against historical baselines in `.claude/context/memory/learnings.md` to determine if pattern is known
 

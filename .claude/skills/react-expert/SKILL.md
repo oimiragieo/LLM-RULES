@@ -357,7 +357,7 @@ return fetch('/api/users').then(r => r.json())
 
 export function UserProfileDisplay({ dataPromise }: { dataPromise: Promise<UserProfile> }) {
 const data = use(dataPromise) // suspends until resolved
-return <div>{/_ render data _/}</div>
+return <div>{/_render data_/}</div>
 }
 
 // Usage: <Suspense fallback={<Spinner />}><UserProfileDisplay dataPromise={fetchUserProfile()} /></Suspense>

@@ -37,7 +37,7 @@ This skill provides Slack API operations with progressive disclosure for optimal
 
 ### Setting up Slack Bot Token
 
-1. Create a Slack App at https://api.slack.com/apps
+1. Create a Slack App at <https://api.slack.com/apps>
 2. Navigate to "OAuth & Permissions"
 3. Add required bot token scopes:
    - `chat:write` - Send messages
@@ -513,9 +513,9 @@ Methods by tier:
 
 ## Related
 
-- Slack API Documentation: https://api.slack.com/docs
-- Block Kit Builder: https://app.slack.com/block-kit-builder
-- Slack App Management: https://api.slack.com/apps
+- Slack API Documentation: <https://api.slack.com/docs>
+- Block Kit Builder: <https://app.slack.com/block-kit-builder>
+- Slack App Management: <https://api.slack.com/apps>
 
 ## Memory Protocol (MANDATORY)
 

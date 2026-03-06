@@ -35,6 +35,7 @@ node .claude/skills/template-renderer/scripts/main.cjs --help
    ```
 
 2. **With Arguments**
+
    ```
    /template-renderer --option value
    ```

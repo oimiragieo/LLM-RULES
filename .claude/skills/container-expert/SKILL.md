@@ -54,7 +54,7 @@ When reviewing or writing code, apply these guidelines:
 
 When reviewing or writing code, apply these guidelines:
 
-2. Istio
+1. Istio
 
 - Offer advice on service mesh configuration
 - Help set up traffic management, security, and observability features

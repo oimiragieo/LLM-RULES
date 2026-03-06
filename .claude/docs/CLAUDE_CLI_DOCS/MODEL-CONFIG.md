@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -16,7 +16,7 @@ For the `model` setting in Claude Code, you can configure either:
 
 \* A \*\*model name\*\*
 
-&nbsp; \* Anthropic API: A full \*\*\[model name](https://platform.claude.com/docs/en/about-claude/models/overview)\*\*
+&nbsp; \* Anthropic API: A full \*\*\[model name](<https://platform.claude.com/docs/en/about-claude/models/overview)\*\>*
 
 &nbsp; \* Bedrock: an inference profile ARN
 
@@ -42,7 +42,7 @@ remembering exact version numbers:
 
 | \*\*`haiku`\*\* | Uses the fast and efficient Haiku model for simple tasks |
 
-| \*\*`sonnet\[1m]`\*\* | Uses Sonnet with a \[1 million token context window](https://platform.claude.com/docs/en/build-with-claude/context-windows#1m-token-context-window) for long sessions |
+| \*\*`sonnet\[1m]`\*\* | Uses Sonnet with a \[1 million token context window](<https://platform.claude.com/docs/en/build-with-claude/context-windows#1m-token-context-window>) for long sessions |
 
 | \*\*`opusplan`\*\* | Special mode that uses `opus` during plan mode, then switches to `sonnet` for execution |
 
@@ -184,7 +184,7 @@ and Sonnet's efficiency for execution.
 
 \### Adjust effort level
 
-\[Effort levels](https://platform.claude.com/docs/en/build-with-claude/effort) control Opus 4.6's adaptive reasoning, which dynamically allocates thinking based on task complexity. Lower effort is faster and cheaper for straightforward tasks, while higher effort provides deeper reasoning for complex problems.
+\[Effort levels](<https://platform.claude.com/docs/en/build-with-claude/effort>) control Opus 4.6's adaptive reasoning, which dynamically allocates thinking based on task complexity. Lower effort is faster and cheaper for straightforward tasks, while higher effort provides deeper reasoning for complex problems.
 
 Three levels are available: \*\*low\*\*, \*\*medium\*\*, and \*\*high\*\* (default).
 
@@ -200,7 +200,7 @@ Effort is currently supported on Opus 4.6. The effort slider appears in `/model`
 
 \### Extended context with \\\[1m]
 
-The `\[1m]` suffix enables a \[1 million token context window](https://platform.claude.com/docs/en/build-with-claude/context-windows#1m-token-context-window) for long sessions.
+The `\[1m]` suffix enables a \[1 million token context window](<https://platform.claude.com/docs/en/build-with-claude/context-windows#1m-token-context-window>) for long sessions.
 
 <Note>
 
@@ -226,7 +226,7 @@ You can use the `\[1m]` suffix with model aliases or full model names:
 
 Note: Extended context models have
 
-\[different pricing](https://platform.claude.com/docs/en/about-claude/pricing#long-context-pricing).
+\[different pricing](<https://platform.claude.com/docs/en/about-claude/pricing#long-context-pricing>).
 
 \## Checking your current model
 
@@ -260,7 +260,7 @@ Note: `ANTHROPIC\_SMALL\_FAST\_MODEL` is deprecated in favor of
 
 \### Prompt caching configuration
 
-Claude Code automatically uses \[prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) to optimize performance and reduce costs. You can disable prompt caching globally or for specific model tiers:
+Claude Code automatically uses \[prompt caching](<https://platform.claude.com/docs/en/build-with-claude/prompt-caching>) to optimize performance and reduce costs. You can disable prompt caching globally or for specific model tiers:
 
 | Environment variable | Description |
 

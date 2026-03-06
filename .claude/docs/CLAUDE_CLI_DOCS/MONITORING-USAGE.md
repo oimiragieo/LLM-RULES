@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -66,7 +66,7 @@ claude
 
 </Note>
 
-For full configuration options, see the \[OpenTelemetry specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options).
+For full configuration options, see the \[OpenTelemetry specification](<https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options>).
 
 \## Administrator configuration
 
@@ -224,7 +224,7 @@ These custom attributes will be included in all metrics and events, allowing you
 
 &nbsp; \*\*Important formatting requirements for OTEL\\\_RESOURCE\\\_ATTRIBUTES:\*\*
 
-&nbsp; The `OTEL\_RESOURCE\_ATTRIBUTES` environment variable follows the \[W3C Baggage specification](https://www.w3.org/TR/baggage/), which has strict formatting requirements:
+&nbsp; The `OTEL\_RESOURCE\_ATTRIBUTES` environment variable follows the \[W3C Baggage specification](<https://www.w3.org/TR/baggage/>), which has strict formatting requirements:
 
 &nbsp; \* \*\*No spaces allowed\*\*: Values cannot contain spaces. For example, `user.organizationName=My Company` is invalid
 
@@ -708,7 +708,7 @@ All metrics and events are exported with the following resource attributes:
 
 \## ROI measurement resources
 
-For a comprehensive guide on measuring return on investment for Claude Code, including telemetry setup, cost analysis, productivity metrics, and automated reporting, see the \[Claude Code ROI Measurement Guide](https://github.com/anthropics/claude-code-monitoring-guide). This repository provides ready-to-use Docker Compose configurations, Prometheus and OpenTelemetry setups, and templates for generating productivity reports integrated with tools like Linear.
+For a comprehensive guide on measuring return on investment for Claude Code, including telemetry setup, cost analysis, productivity metrics, and automated reporting, see the \[Claude Code ROI Measurement Guide](<https://github.com/anthropics/claude-code-monitoring-guide>). This repository provides ready-to-use Docker Compose configurations, Prometheus and OpenTelemetry setups, and templates for generating productivity reports integrated with tools like Linear.
 
 \## Security/privacy considerations
 
@@ -722,4 +722,4 @@ For a comprehensive guide on measuring return on investment for Claude Code, inc
 
 \## Monitoring Claude Code on Amazon Bedrock
 
-For detailed Claude Code usage monitoring guidance for Amazon Bedrock, see \[Claude Code Monitoring Implementation (Bedrock)](https://github.com/aws-solutions-library-samples/guidance-for-claude-code-with-amazon-bedrock/blob/main/assets/docs/MONITORING.md).
+For detailed Claude Code usage monitoring guidance for Amazon Bedrock, see \[Claude Code Monitoring Implementation (Bedrock)](<https://github.com/aws-solutions-library-samples/guidance-for-claude-code-with-amazon-bedrock/blob/main/assets/docs/MONITORING.md>).

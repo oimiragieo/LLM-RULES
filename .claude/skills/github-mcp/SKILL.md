@@ -169,8 +169,8 @@ If operations fail:
 
 ## Related
 
-- Official GitHub MCP Server: https://github.com/github/github-mcp-server
-- GitHub API Documentation: https://docs.github.com/en/rest
+- Official GitHub MCP Server: <https://github.com/github/github-mcp-server>
+- GitHub API Documentation: <https://docs.github.com/en/rest>
 
 ## Memory Protocol (MANDATORY)
 

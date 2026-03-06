@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -8,7 +8,7 @@
 
 > Use the Agent SDK to run Claude Code programmatically from the CLI, Python, or TypeScript.
 
-The \[Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview) gives you the same tools, agent loop, and context management that power Claude Code. It's available as a CLI for scripts and CI/CD, or as \[Python](https://platform.claude.com/docs/en/agent-sdk/python) and \[TypeScript](https://platform.claude.com/docs/en/agent-sdk/typescript) packages for full programmatic control.
+The \[Agent SDK](<https://platform.claude.com/docs/en/agent-sdk/overview>) gives you the same tools, agent loop, and context management that power Claude Code. It's available as a CLI for scripts and CI/CD, or as \[Python](<https://platform.claude.com/docs/en/agent-sdk/python>) and \[TypeScript](<https://platform.claude.com/docs/en/agent-sdk/typescript>) packages for full programmatic control.
 
 <Note>
 
@@ -24,7 +24,7 @@ claude -p "Find and fix the bug in auth.py" --allowedTools "Read,Edit,Bash"
 
 ```
 
-This page covers using the Agent SDK via the CLI (`claude -p`). For the Python and TypeScript SDK packages with structured outputs, tool approval callbacks, and native message objects, see the \[full Agent SDK documentation](https://platform.claude.com/docs/en/agent-sdk/overview).
+This page covers using the Agent SDK via the CLI (`claude -p`). For the Python and TypeScript SDK packages with structured outputs, tool approval callbacks, and native message objects, see the \[full Agent SDK documentation](<https://platform.claude.com/docs/en/agent-sdk/overview>).
 
 \## Basic usage
 
@@ -66,7 +66,7 @@ claude -p "Summarize this project" --output-format json
 
 ```
 
-To get output conforming to a specific schema, use `--output-format json` with `--json-schema` and a \[JSON Schema](https://json-schema.org/) definition. The response includes metadata about the request (session ID, usage, etc.) with the structured output in the `structured\_output` field.
+To get output conforming to a specific schema, use `--output-format json` with `--json-schema` and a \[JSON Schema](<https://json-schema.org/>) definition. The response includes metadata about the request (session ID, usage, etc.) with the structured output in the `structured\_output` field.
 
 This example extracts function names and returns them as an array of strings:
 
@@ -82,7 +82,7 @@ claude -p "Extract the main function names from auth.py" \\
 
 <Tip>
 
-&nbsp; Use a tool like \[jq](https://jqlang.github.io/jq/) to parse the response and extract specific fields:
+&nbsp; Use a tool like \[jq](<https://jqlang.github.io/jq/>) to parse the response and extract specific fields:
 
 &nbsp; ```bash theme={null}
 
@@ -114,7 +114,7 @@ claude -p "Explain recursion" --output-format stream-json --verbose --include-pa
 
 ```
 
-The following example uses \[jq](https://jqlang.github.io/jq/) to filter for text deltas and display just the streaming text. The `-r` flag outputs raw strings (no quotes) and `-j` joins without newlines so tokens stream continuously:
+The following example uses \[jq](<https://jqlang.github.io/jq/>) to filter for text deltas and display just the streaming text. The `-r` flag outputs raw strings (no quotes) and `-j` joins without newlines so tokens stream continuously:
 
 ```bash theme={null}
 
@@ -124,7 +124,7 @@ claude -p "Write a poem" --output-format stream-json --verbose --include-partial
 
 ```
 
-For programmatic streaming with callbacks and message objects, see \[Stream responses in real-time](https://platform.claude.com/docs/en/agent-sdk/streaming-output) in the Agent SDK documentation.
+For programmatic streaming with callbacks and message objects, see \[Stream responses in real-time](<https://platform.claude.com/docs/en/agent-sdk/streaming-output>) in the Agent SDK documentation.
 
 \### Auto-approve tools
 
@@ -150,7 +150,7 @@ claude -p "Look at my staged changes and create an appropriate commit" \\
 
 ```
 
-The `--allowedTools` flag uses \[permission rule syntax](/en/settings#permission-rule-syntax). The trailing ` \*` enables prefix matching, so `Bash(git diff \*)` allows any command starting with `git diff`. The space before `\*` is important: without it, `Bash(git diff\*)` would also match `git diff-index`.
+The `--allowedTools` flag uses \[permission rule syntax](/en/settings#permission-rule-syntax). The trailing `\*` enables prefix matching, so `Bash(git diff \*)` allows any command starting with `git diff`. The space before `\*` is important: without it, `Bash(git diff\*)` would also match `git diff-index`.
 
 <Note>
 

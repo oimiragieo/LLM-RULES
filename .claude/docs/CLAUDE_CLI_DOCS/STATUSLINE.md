@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -96,7 +96,7 @@ This walkthrough shows what's happening under the hood by manually creating a st
 
 <Note>Running \[`/statusline`](#use-the-statusline-command) with a description of what you want configures all of this for you automatically.</Note>
 
-These examples use Bash scripts, which work on macOS and Linux. On Windows, you can run Bash scripts through \[WSL (Windows Subsystem for Linux)](https://learn.microsoft.com/en-us/windows/wsl/install) or rewrite them in PowerShell.
+These examples use Bash scripts, which work on macOS and Linux. On Windows, you can run Bash scripts through \[WSL (Windows Subsystem for Linux)](<https://learn.microsoft.com/en-us/windows/wsl/install>) or rewrite them in PowerShell.
 
 <Frame>
 
@@ -108,7 +108,7 @@ These examples use Bash scripts, which work on macOS and Linux. On Windows, you 
 
 &nbsp; <Step title="Create a script that reads JSON and prints output">
 
-&nbsp; Claude Code sends JSON data to your script via stdin. This script uses \[`jq`](https://jqlang.github.io/jq/), a command-line JSON parser you may need to install, to extract the model name, directory, and context percentage, then prints a formatted line.
+&nbsp; Claude Code sends JSON data to your script via stdin. This script uses \[`jq`](<https://jqlang.github.io/jq/>), a command-line JSON parser you may need to install, to extract the model name, directory, and context percentage, then prints a formatted line.
 
 &nbsp; Save this to `~/.claude/statusline.sh` (where `~` is your home directory, such as `/Users/username` on macOS or `/home/username` on Linux):
 
@@ -188,9 +188,9 @@ Your script runs after each new assistant message, when the permission mode chan
 
 \* \*\*Multiple lines\*\*: each `echo` or `print` statement displays as a separate row. See the \[multi-line example](#display-multiple-lines).
 
-\* \*\*Colors\*\*: use \[ANSI escape codes](https://en.wikipedia.org/wiki/ANSI\_escape\_code#Colors) like `\\033\[32m` for green (terminal must support them). See the \[git status example](#git-status-with-colors).
+\* \*\*Colors\*\*: use \[ANSI escape codes](<https://en.wikipedia.org/wiki/ANSI\_escape\_code#Colors>) like `\\033\[32m` for green (terminal must support them). See the \[git status example](#git-status-with-colors).
 
-\* \*\*Links\*\*: use \[OSC 8 escape sequences](https://en.wikipedia.org/wiki/ANSI\_escape\_code#OSC) to make text clickable (Cmd+click on macOS, Ctrl+click on Windows/Linux). Requires a terminal that supports hyperlinks like iTerm2, Kitty, or WezTerm. See the \[clickable links example](#clickable-links).
+\* \*\*Links\*\*: use \[OSC 8 escape sequences](<https://en.wikipedia.org/wiki/ANSI\_escape\_code#OSC>) to make text clickable (Cmd+click on macOS, Ctrl+click on Windows/Linux). Requires a terminal that supports hyperlinks like iTerm2, Kitty, or WezTerm. See the \[clickable links example](#clickable-links).
 
 <Note>The status line runs locally and does not consume API tokens. It temporarily hides during certain UI interactions, including autocomplete suggestions, the help menu, and permission prompts.</Note>
 
@@ -386,7 +386,7 @@ These examples show common status line patterns. To use any example:
 
 3\. Add the path to your \[settings](#manually-configure-a-status-line)
 
-The Bash examples use \[`jq`](https://jqlang.github.io/jq/) to parse JSON. Python and Node.js have built-in JSON parsing.
+The Bash examples use \[`jq`](<https://jqlang.github.io/jq/>) to parse JSON. Python and Node.js have built-in JSON parsing.
 
 \### Context window usage
 
@@ -494,7 +494,7 @@ Display the current model and context window usage with a visual progress bar. E
 
 \### Git status with colors
 
-Show git branch with color-coded indicators for staged and modified files. This script uses \[ANSI escape codes](https://en.wikipedia.org/wiki/ANSI\_escape\_code#Colors) for terminal colors: `\\033\[32m` is green, `\\033\[33m` is yellow, and `\\033\[0m` resets to default.
+Show git branch with color-coded indicators for staged and modified files. This script uses \[ANSI escape codes](<https://en.wikipedia.org/wiki/ANSI\_escape\_code#Colors>) for terminal colors: `\\033\[32m` is green, `\\033\[33m` is yellow, and `\\033\[0m` resets to default.
 
 <Frame>
 
@@ -874,7 +874,7 @@ This example combines several techniques: threshold-based colors (green under 70
 
 &nbsp; branch = execSync('git branch --show-current', { encoding: 'utf8', stdio: \['pipe', 'pipe', 'ignore'] }).trim();
 
-&nbsp; branch = branch ? ` | 🌿 ${branch}` : '';
+&nbsp; branch = branch ? `| 🌿 ${branch}` : '';
 
 &nbsp; } catch {}
 
@@ -956,7 +956,7 @@ Each script gets the git remote URL, converts SSH format to HTTPS, and wraps the
 
 &nbsp; # Convert SSH to HTTPS format
 
-&nbsp; remote = re.sub(r'^git@github\\.com:', 'https://github.com/', remote)
+&nbsp; remote = re.sub(r'^git@github\\.com:', '<https://github.com/>', remote)
 
 &nbsp; remote = re.sub(r'\\.git$', '', remote)
 
@@ -998,7 +998,7 @@ Each script gets the git remote URL, converts SSH format to HTTPS, and wraps the
 
 &nbsp; // Convert SSH to HTTPS format
 
-&nbsp; remote = remote.replace(/^git@github\\.com:/, 'https://github.com/').replace(/\\.git$/, '');
+&nbsp; remote = remote.replace(/^git@github\\.com:/, '<https://github.com/').replace(/\\.git$/>, '');
 
 &nbsp; const repoName = path.basename(remote);
 
@@ -1234,7 +1234,7 @@ Each script checks if the cache file is missing or older than 5 seconds before r
 
 \* \*\*Cache slow operations\*\*: your script runs frequently during active sessions, so commands like `git status` can cause lag. See the \[caching example](#cache-expensive-operations) for how to handle this.
 
-Community projects like \[ccstatusline](https://github.com/sirmalloc/ccstatusline) and \[starship-claude](https://github.com/martinemde/starship-claude) provide pre-built configurations with themes and additional features.
+Community projects like \[ccstatusline](<https://github.com/sirmalloc/ccstatusline>) and \[starship-claude](<https://github.com/martinemde/starship-claude>) provide pre-built configurations with themes and additional features.
 
 \## Troubleshooting
 

@@ -1,0 +1,6 @@
+.claude/context/reports/
+.claude/context/artifacts/
+.claude/context/memory/archive/
+.claude/workflows/_archive/
+.claude/commands/
+node_modules/

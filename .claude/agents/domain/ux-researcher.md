@@ -7,20 +7,12 @@ temperature: 0.4
 context_strategy: lazy_load
 priority: medium
 skills:
-  - accessibility
-  - design-and-user-experience-guidelines
-  - diagram-generator
-  - doc-generator
-  - task-management-protocol
-  - verification-before-completion
-  - context-compressor
-  - token-saver-context-compression
-  - ripgrep
   - code-semantic-search
   - code-structural-search
   - memory-search
-  - brainstorming
-  - checklist-generator
+  - ripgrep
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - @.claude/context/memory/learnings.md
 ---
@@ -273,3 +265,24 @@ cat .claude/context/memory/learnings.md
 
 Source: github.com/msitarzewski/agency-agents (design/design-ux-researcher.md)
 Adapted and extended for agent-studio framework conventions.
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

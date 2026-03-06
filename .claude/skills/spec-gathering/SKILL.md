@@ -387,7 +387,7 @@ spec-gathering (→ context-compressor in Phase 4.5) → template-renderer → s
 }
 ```
 
-7. **Invoke template-renderer:**
+1. **Invoke template-renderer:**
 
 ```javascript
 Skill({

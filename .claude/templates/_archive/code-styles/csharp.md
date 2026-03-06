@@ -17,6 +17,7 @@ This document summarizes key rules and best practices from the Google C# Style G
 
 - **Indentation:** Use 2 spaces (never tabs).
 - **Braces:** K&R style-no line break before the opening brace; keep `} else` on one line; braces required even when optional.
+
   ```csharp
   if (condition) {
     DoSomething();
@@ -24,6 +25,7 @@ This document summarizes key rules and best practices from the Google C# Style G
     DoSomethingElse();
   }
   ```
+
 - **Line Length:** Column limit 100.
 - **One Statement Per Line:** Each statement on its own line.
 
@@ -48,30 +50,41 @@ Class member ordering:
 ## 4. Language Features
 
 - **var:** Use of `var` is encouraged if it aids readability by avoiding type names that are noisy, obvious, or unimportant. Prefer explicit types when it improves clarity.
+
   ```csharp
   var apple = new Apple();  // Good - type is obvious
   bool success = true;  // Preferred over var for basic types
   ```
+
 - **Expression-bodied Members:** Use sparingly for simple properties and lambdas; don't use on method definitions.
+
   ```csharp
   public int Age => _age;
   // Methods: prefer block bodies.
   ```
+
 - **String Interpolation:** In general, use whatever is easiest to read, particularly for logging and assert messages.
   - Be aware that chained `operator+` concatenations can be slower and cause memory churn.
   - If performance is a concern, `StringBuilder` can be faster for multiple concatenations.
+
   ```csharp
   var message = $"Hello, {name}!";
   ```
+
 - **Collection Initializers:** Use collection and object initializers when appropriate.
+
   ```csharp
   var list = new List<int> { 1, 2, 3 };
   ```
+
 - **Null-conditional Operators:** Use `?.` and `??` to simplify null checks.
+
   ```csharp
   var length = text?.Length ?? 0;
   ```
+
 - **Pattern Matching:** Use pattern matching for type checks and casts.
+
   ```csharp
   if (obj is string str) { /* use str */ }
   ```

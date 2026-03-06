@@ -39,7 +39,7 @@ You help developers write better code by applying established guidelines and bes
 
 When reviewing or writing code, apply these guidelines:
 
-4. Frontend Development
+1. Frontend Development
 
 - Offer suggestions for improving the HTMX-based frontend
 - Assist with responsive design and user experience enhancements

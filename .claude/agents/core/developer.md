@@ -30,51 +30,169 @@ tools:
   - TaskOutput
   - Skill
 skills:
-  - ecosystem-integrity-scanner
-  - stale-module-pruner
-  - task-management-protocol
-  - ripgrep
-  - code-semantic-search
-  - token-saver-context-compression
-  - verification-before-completion
-  - memory-search
-  - tdd
-  - debugging
-  - code-structural-search
-  - code-quality-expert
-  - best-practices-guidelines
-  - dry-principle
+  - agent-evaluation
+  - agent-updater
+  - angular-expert
+  - artifact-integrator
+  - assimilate
+  - astro-expert
   - async-operations
-  - smart-debug
-  - sequential-thinking
-  - ralph-loop
-  - requesting-code-review
-  - receiving-code-review
-  - commit-validator
-  - code-style-validator
-  - function-length-and-responsibility
-  - typescript-expert
-  - nodejs-expert
-  - api-development-expert
+  - aws-cloud-ops
+  - best-practices-guidelines
   - brainstorming
-  - spec-to-code-compliance
-  - sharp-edges
-  - context-driven-development
-  - qa-workflow
-  - finishing-a-development-branch
-  - using-git-worktrees
-  - git-expert
-  - workflow-patterns
-  - property-based-testing
+  - brand-compliance
+  - build-tools-expert
+  - checklist-generator
+  - chrome-browser
+  - ci-cd-implementation-rule
+  - claude-api
+  - cloud-devops-expert
+  - code-semantic-search
+  - code-structural-search
+  - commit-validator
+  - compliance-policy-check
+  - composer-dependency-management
+  - comprehensive-type-annotations
+  - comprehensive-unit-testing-with-pytest
+  - configuration-management
+  - convex-development-general
+  - cpp
+  - creation-feasibility-gate
   - debug-log-analysis
-  - modern-python
-  - powershell-expert
-  - feature-flag-management
-  - agent-tool-design
-  - ask-questions-if-underspecified
-  - elixir-expert
-  - medusa
+  - debugging
+  - dependency-analyzer
+  - design-and-user-experience-guidelines
+  - differential-review
+  - dispatching-parallel-agents
+  - doc-coauthoring
+  - drizzle-orm-rules
+  - dry-principle
+  - dto-conventions
   - dynamic-api-integration
+  - ecosystem-integrity-scanner
+  - elixir-expert
+  - enhance-prompt
+  - eval-harness-updater
+  - expo-mobile-app-rule
+  - feature-flag-management
+  - feedback-analysis
+  - fiber-logging-and-project-structure
+  - fiber-routing-and-csrf-protection
+  - finishing-a-development-branch
+  - fix-review
+  - flutter-expert
+  - form-and-actions-in-sveltekit
+  - form-validation-with-zod
+  - frontend-design
+  - function-length-and-responsibility
+  - gcloud-cli
+  - gemini-cli-security
+  - git-expert
+  - github-mcp
+  - github-ops
+  - gitops-workflow
+  - helm-chart-scaffolding
+  - hook-creator
+  - html-tailwind-css-and-javascript-expert-rule
+  - htmx-expert
+  - insecure-defaults
+  - interactive-requirements-gathering
+  - jira-pm
+  - jupyter-notebook-best-practices
+  - k8s-security-policies
+  - kafka-development-practices
+  - large-data-with-dask
+  - linear-pm
+  - llm-council
+  - logging-module-usage
+  - marketing-content
+  - mcp-builder
+  - medusa
+  - medusa-security
+  - memory-quality-auditor
+  - memory-search
+  - monorepo-and-tooling
+  - nativescript
+  - nativewind-and-tailwind-css-compatibility
+  - next-cache-components
+  - next-upgrade
+  - omega-cursor-cli
+  - pandas-data-manipulation-rules
+  - paraglide-js-internationalization-i18n
+  - pipeline-reflection-ux
+  - planning-with-files
+  - poetry-rye-dependency-management
+  - powershell-expert
+  - prd-generator
+  - prioritize-python-3-10-features
+  - proactive-audit
+  - project-analyzer
+  - property-based-testing
+  - pyqt6-ui-development-rules
+  - qa-workflow
+  - qwik-expert
+  - ralph-loop
+  - react-native-skills-vercel
+  - recovery
+  - regulatory-compliance
+  - restcontroller-conventions
+  - ripgrep
+  - rule-auditor
+  - rust-expert
+  - schema-creator
+  - scientific-skills
+  - semgrep-rule-creator
+  - sentry-monitoring
+  - seo-and-meta-tags-in-sveltekit
+  - seo-optimization
+  - service-class-conventions
+  - shadcn-ui
+  - sharp-edges
+  - skill-updater
+  - slack-notifications
+  - smart-debug
+  - smart-revert
+  - solidjs-expert
+  - sparc-methodology
+  - spec-critique
+  - spec-init
+  - spec-to-code-compliance
+  - stale-module-pruner
+  - starknet-react-rules
+  - state-management-expert
+  - static-analysis
+  - strict-user-requirements-adherence
+  - tall-stack-general
+  - task-management-protocol
+  - tauri-native-api-integration
+  - tauri-security-rules
+  - tauri-svelte-typescript-general
+  - tauri-svelte-ui-components
+  - tdd
+  - template-creator
+  - template-renderer
+  - thinking-tools
+  - token-saver-context-compression
+  - tool-creator
+  - tool-search
+  - troubleshooting-regression
+  - tsconfig-json-rules
+  - ui-components-expert
+  - user-research
+  - using-git-worktrees
+  - variant-analysis
+  - vercel-ai-sdk-best-practices
+  - vercel-deploy
+  - verification-before-completion
+  - visual-and-observational-rules
+  - vue-expert
+  - web-artifacts-builder
+  - web-perf
+  - webapp-testing
+  - webmcp-browser-tools
+  - workflow-creator
+  - workflow-updater
+  - writing-skills
 capabilities:
   - code-generation
   - refactoring
@@ -181,10 +299,10 @@ Read your assigned skill files to understand specialized workflows:
 
 ### Step 1-3: TDD Cycle (from tdd skill)
 
-1.  **Red**: Write a failing test for the requested feature/fix.
-2.  **Green**: Write the minimal code to pass the test.
-3.  **Refactor**: Improve code quality without changing behavior.
-4.  **Lint + Format**: Run `pnpm lint:fix` and `pnpm format` (BLOCKING - must pass before completion).
+1. **Red**: Write a failing test for the requested feature/fix.
+2. **Green**: Write the minimal code to pass the test.
+3. **Refactor**: Improve code quality without changing behavior.
+4. **Lint + Format**: Run `pnpm lint:fix` and `pnpm format` (BLOCKING - must pass before completion).
 
 ## Code Search Optimization
 
@@ -578,3 +696,24 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 - `Skill({ skill: 'code-semantic-search' })` for conceptual search
 - `Skill({ skill: 'code-structural-search' })` for AST-based matching
 - Grep: fallback only (single-file checks, advanced PCRE2)
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

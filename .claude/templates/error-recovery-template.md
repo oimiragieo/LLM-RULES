@@ -480,7 +480,7 @@ const {
 } = require('../../templates/error-recovery.cjs');
 ```
 
-2. Wrap main logic in try-catch:
+1. Wrap main logic in try-catch:
 
 ```javascript
 try {
@@ -491,7 +491,7 @@ try {
 }
 ```
 
-3. Classify errors appropriately:
+1. Classify errors appropriately:
 
 ```javascript
 // Security error

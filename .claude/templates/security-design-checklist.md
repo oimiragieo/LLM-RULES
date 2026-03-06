@@ -504,7 +504,7 @@ For deeper security analysis, cross-reference with OWASP Top 10:
 9. **A09:2021 – Logging Failures** → STRIDE: R (Repudiation)
 10. **A10:2021 – SSRF** → STRIDE: T (Tampering), I (Information Disclosure)
 
-**Full Guide**: https://owasp.org/Top10/
+**Full Guide**: <https://owasp.org/Top10/>
 
 ---
 

@@ -60,10 +60,10 @@ gh repo view {owner}/{repo} --json description,stargazerCount,updatedAt
 
 ## 🔄 Token-Efficient Workflow
 
-1.  **Map Tree**: List the root and core directories (`commands`, `src`, `docs`).
-2.  **Identify Entrypoints**: Look for `README.md`, `gemini-extension.json`, `package.json`, or `SKILL.md`.
-3.  **Targeted Fetch**: Download only the entrypoints first.
-4.  **Deep Dive**: Use `gh search code` to find logic patterns rather than reading every file.
+1. **Map Tree**: List the root and core directories (`commands`, `src`, `docs`).
+2. **Identify Entrypoints**: Look for `README.md`, `gemini-extension.json`, `package.json`, or `SKILL.md`.
+3. **Targeted Fetch**: Download only the entrypoints first.
+4. **Deep Dive**: Use `gh search code` to find logic patterns rather than reading every file.
 
 ## 🛡️ Platform Safety (Windows)
 

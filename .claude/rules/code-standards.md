@@ -15,6 +15,7 @@
 - Avoid ad-hoc console logging in production code
 - Use lowercase kebab-case for filenames (e.g., `user-service.js`)
 - Add provenance headers for generated files:
+
   ```markdown
   <!-- Agent: {type} | Task: #{id} | Session: {date} -->
   ```

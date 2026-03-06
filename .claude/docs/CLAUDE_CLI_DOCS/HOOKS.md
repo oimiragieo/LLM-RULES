@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -846,7 +846,7 @@ Here are examples of each pattern in action:
 
 </Tabs>
 
-For extended examples including Bash command validation, prompt filtering, and auto-approval scripts, see \[What you can automate](/en/hooks-guide#what-you-can-automate) in the guide and the \[Bash command validator reference implementation](https://github.com/anthropics/claude-code/blob/main/examples/hooks/bash\_command\_validator\_example.py).
+For extended examples including Bash command validation, prompt filtering, and auto-approval scripts, see \[What you can automate](/en/hooks-guide#what-you-can-automate) in the guide and the \[Bash command validator reference implementation](<https://github.com/anthropics/claude-code/blob/main/examples/hooks/bash\_command\_validator\_example.py>).
 
 \## Hook events
 

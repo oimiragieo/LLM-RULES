@@ -195,11 +195,11 @@ Provide guidance on maintaining ongoing compliance:
 
 #### Monitoring Sources
 
-- **GDPR**: European Data Protection Board (EDPB) — https://edpb.europa.eu/
-- **CCPA/CPRA**: California Privacy Protection Agency — https://cppa.ca.gov/
-- **US State Laws**: IAPP State Privacy Legislation Tracker — https://iapp.org/resources/article/us-state-privacy-legislation-tracker/
-- **WCAG**: W3C WAI — https://www.w3.org/WAI/
-- **ADA**: US DOJ ADA.gov — https://www.ada.gov/
+- **GDPR**: European Data Protection Board (EDPB) — <https://edpb.europa.eu/>
+- **CCPA/CPRA**: California Privacy Protection Agency — <https://cppa.ca.gov/>
+- **US State Laws**: IAPP State Privacy Legislation Tracker — <https://iapp.org/resources/article/us-state-privacy-legislation-tracker/>
+- **WCAG**: W3C WAI — <https://www.w3.org/WAI/>
+- **ADA**: US DOJ ADA.gov — <https://www.ada.gov/>
 
 #### Monitoring Cadence
 

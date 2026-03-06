@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -14,13 +14,13 @@ Claude Code provides analytics dashboards to help organizations understand devel
 
 | ----------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 
-| Claude for Teams / Enterprise | \[claude.ai/analytics/claude-code](https://claude.ai/analytics/claude-code) | Usage metrics, contribution metrics with GitHub integration, leaderboard, data export | \[Details](#access-analytics-for-teams-and-enterprise) |
+| Claude for Teams / Enterprise | \[claude.ai/analytics/claude-code](<https://claude.ai/analytics/claude-code>) | Usage metrics, contribution metrics with GitHub integration, leaderboard, data export | \[Details](#access-analytics-for-teams-and-enterprise) |
 
-| API (Claude Console) | \[platform.claude.com/claude-code](https://platform.claude.com/claude-code) | Usage metrics, spend tracking, team insights | \[Details](#access-analytics-for-api-customers) |
+| API (Claude Console) | \[platform.claude.com/claude-code](<https://platform.claude.com/claude-code>) | Usage metrics, spend tracking, team insights | \[Details](#access-analytics-for-api-customers) |
 
 \## Access analytics for Teams and Enterprise
 
-Navigate to \[claude.ai/analytics/claude-code](https://claude.ai/analytics/claude-code). Admins and Owners can view the dashboard.
+Navigate to \[claude.ai/analytics/claude-code](<https://claude.ai/analytics/claude-code>). Admins and Owners can view the dashboard.
 
 The Teams and Enterprise dashboard includes:
 
@@ -54,13 +54,13 @@ You need the Owner role to configure analytics settings. A GitHub admin must ins
 
 &nbsp; <Step title="Install the GitHub app">
 
-&nbsp; A GitHub admin installs the Claude GitHub app on your organization's GitHub account at \[github.com/apps/claude](https://github.com/apps/claude).
+&nbsp; A GitHub admin installs the Claude GitHub app on your organization's GitHub account at \[github.com/apps/claude](<https://github.com/apps/claude>).
 
 &nbsp; </Step>
 
 &nbsp; <Step title="Enable Claude Code analytics">
 
-&nbsp; A Claude Owner navigates to \[claude.ai/admin-settings/claude-code](https://claude.ai/admin-settings/claude-code) and enables the Claude Code analytics feature.
+&nbsp; A Claude Owner navigates to \[claude.ai/admin-settings/claude-code](<https://claude.ai/admin-settings/claude-code>) and enables the Claude Code analytics feature.
 
 &nbsp; </Step>
 
@@ -222,7 +222,7 @@ Contribution metrics help answer "Is this tool worth the investment?" with data 
 
 \* Compare PRs and lines of code shipped with vs. without Claude Code
 
-\* Use alongside \[DORA metrics](https://dora.dev/), sprint velocity, or other engineering KPIs to understand changes from adopting Claude Code
+\* Use alongside \[DORA metrics](<https://dora.dev/>), sprint velocity, or other engineering KPIs to understand changes from adopting Claude Code
 
 \#### Identify power users
 
@@ -240,7 +240,7 @@ To query this data through GitHub, search for PRs labeled with `claude-code-assi
 
 \## Access analytics for API customers
 
-API customers using the Claude Console can access analytics at \[platform.claude.com/claude-code](https://platform.claude.com/claude-code). You need the UsageView permission to access the dashboard, which is granted to Developer, Billing, Admin, Owner, and Primary Owner roles.
+API customers using the Claude Console can access analytics at \[platform.claude.com/claude-code](<https://platform.claude.com/claude-code>). You need the UsageView permission to access the dashboard, which is granted to Developer, Billing, Admin, Owner, and Primary Owner roles.
 
 <Note>
 

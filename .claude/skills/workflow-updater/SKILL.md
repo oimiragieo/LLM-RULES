@@ -11,6 +11,7 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 # Workflow Updater
@@ -70,7 +71,7 @@ For `high` risk: require explicit diff review and user confirmation before apply
 Skill({ skill: 'workflow-creator', args: '<new-workflow-name>' });
 ```
 
-3. If target exists, continue with refresh workflow.
+1. If target exists, continue with refresh workflow.
 
 ### Step 1: Framework + Memory Grounding (MANDATORY)
 
@@ -211,7 +212,7 @@ const entry = {
 };
 ```
 
-4. Resolve companion artifact gaps (MANDATORY):
+1. Resolve companion artifact gaps (MANDATORY):
 
 | Gap Discovered                           | Required Artifact | Creator to Invoke                      | When                              |
 | ---------------------------------------- | ----------------- | -------------------------------------- | --------------------------------- |
@@ -227,7 +228,7 @@ const entry = {
 | Repeated logic needs a reusable CLI tool | tool              | `Skill({ skill: 'tool-creator' })`     | CLI utility needed                |
 | Narrow/single-artifact capability only   | inline            | Document within this artifact only     | Too specific to generalize        |
 
-5. Record refresh outcome in memory files.
+1. Record refresh outcome in memory files.
 
 ## Enterprise Acceptance Checklist (Blocking)
 

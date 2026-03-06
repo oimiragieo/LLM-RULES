@@ -62,7 +62,7 @@ When reviewing or writing code, apply these guidelines:
 
 When reviewing or writing code, apply these guidelines:
 
-- Follow the Ruby Style Guide (https://rubystyle.guide/)
+- Follow the Ruby Style Guide (<https://rubystyle.guide/>)
 - Use Ruby's expressive syntax (e.g., unless, ||=, &.)
 - Prefer single quotes for strings unless interpolation is needed.
 

@@ -35,9 +35,17 @@ Goal: Deliver reliable outcomes with search-grounded decisions.
 3. Keep task state synchronized with TaskUpdate protocol.
 4. Validate outputs before completion.
 
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. \`pnpm search:code "<query>"\` (Primary intent-based search).
+2. \`ripgrep\` (for exact keyword/regex matches).
+3. semantic/structural search via code tools if available.
+
 ## Token Saver Invocation Rule
 
-Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+Use \`Skill({ skill: 'token-saver-context-compression' })\` only when context pressure is high and normal search+read would over-expand tokens.
 
 Invoke token-saver when ANY of these conditions hold:
 
@@ -47,13 +55,18 @@ Invoke token-saver when ANY of these conditions hold:
 
 Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
-## Memory Protocol
+## Memory Protocol (MANDATORY)
 
-Before starting:
-`cat .claude/context/memory/learnings.md`
+**Before starting:**
+\`\`\`bash
+cat .claude/context/memory/learnings.md
+cat .claude/context/memory/decisions.md
+\`\`\`
 
-After completing:
+**After completing:**
 
-- Record learnings in `.claude/context/memory/learnings.md`
-- Record issues in `.claude/context/memory/issues.md`
-- Record decisions in `.claude/context/memory/decisions.md`
+- New pattern -> \`.claude/context/memory/learnings.md\`
+- Issue found -> \`.claude/context/memory/issues.md\`
+- Decision made -> \`.claude/context/memory/decisions.md\`
+
+> ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

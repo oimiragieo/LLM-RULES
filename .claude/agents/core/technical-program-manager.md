@@ -24,23 +24,15 @@ tools:
   - TaskOutput
   - Skill
 skills:
-  - checklist-generator
   - code-semantic-search
-  - compliance-policy-check
-  - complexity-assessment
-  - creation-feasibility-gate
-  - framework-context
-  - plan-generator
-  - recommend-evolution
-  - research-synthesis
-  - sequential-thinking
-  - task-management-protocol
-  - verification-before-completion
-  - ripgrep
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
+  - complexity-assessment
   - memory-search
+  - plan-generator
+  - ripgrep
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -77,13 +69,13 @@ Skill({ skill: 'complexity-assessment' });
 Skill({ skill: 'task-management-protocol' });
 ```
 
-2. Gather context with hybrid search first (`pnpm search:code`, `Skill({ skill: 'ripgrep' })`, semantic/structural search). Use `Grep` as fallback.
-3. Read PRD, implementation plan, and active task state.
-4. Produce/update:
+1. Gather context with hybrid search first (`pnpm search:code`, `Skill({ skill: 'ripgrep' })`, semantic/structural search). Use `Grep` as fallback.
+2. Read PRD, implementation plan, and active task state.
+3. Produce/update:
    - Program milestones and phase checklist
    - RAID log
    - Blockers and escalation tasks
-5. Update task state with concrete evidence (files touched, checks run, unresolved blockers).
+4. Update task state with concrete evidence (files touched, checks run, unresolved blockers).
 
 ## Deliverables
 
@@ -119,3 +111,24 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 - `Skill({ skill: 'code-semantic-search' })` for conceptual search
 - `Skill({ skill: 'code-structural-search' })` for AST-based matching
 - Grep: fallback only (single-file checks, advanced PCRE2)
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

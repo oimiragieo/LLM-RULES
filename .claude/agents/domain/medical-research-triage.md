@@ -28,17 +28,15 @@ tools:
   - TaskOutput
   - Skill
 skills:
-  - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - arxiv-mcp
-  - scientific-skills
-  - sequential-thinking
-  - task-management-protocol
-  - verification-before-completion
   - memory-search
+  - research-synthesis
+  - ripgrep
+  - scientific-skills
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/agent-memory/medical-research-triage/MEMORY.md'
@@ -365,3 +363,24 @@ Examples of what to record:
 - User-provided health context (e.g., known conditions, medications) for continuity
 - Notable research findings or landmark studies encountered during research tasks
 - Patterns in triage questions that suggest educational content gaps to address proactively
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

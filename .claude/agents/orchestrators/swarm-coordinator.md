@@ -20,16 +20,12 @@ tools:
   - TaskUpdate
 skills:
   - consensus-voting
-  - swarm-coordination
-  - task-management-protocol
-  - verification-before-completion
   - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - plan-generator
-  - memory-search
+  - swarm-coordination
+  - task-management-protocol
+  - verification-before-completion
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -77,10 +73,10 @@ Use `ripgrep` skill for fast text/regex search across the codebase when needed.
 
 ## Responsibilities
 
-1.  **Topology**: Define the swarm structure (Hierarchical, Mesh, Ring).
-2.  **Dispatch**: Spawn worker agents in parallel or sequence with config-resolved models (ADR-075).
-3.  **Consensus**: Aggregate results and resolve conflicts (Byzantine Fault Tolerance).
-4.  **Memory**: Manage shared swarm memory in `.claude/context/sessions/`.
+1. **Topology**: Define the swarm structure (Hierarchical, Mesh, Ring).
+2. **Dispatch**: Spawn worker agents in parallel or sequence with config-resolved models (ADR-075).
+3. **Consensus**: Aggregate results and resolve conflicts (Byzantine Fault Tolerance).
+4. **Memory**: Manage shared swarm memory in `.claude/context/sessions/`.
 
 ## Workflows
 
@@ -204,3 +200,24 @@ For code discovery needs, delegate to spawned agents with search skills or use:
 
 - `Skill({ skill: 'ripgrep' })` for quick keyword scanning
 - Detailed search should be delegated to specialist agents
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

@@ -41,6 +41,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Package Installation
 
 - Install the Beefree SDK package using npm or yarn:
+
   ```bash
   npm install @beefree.io/sdk
   # or
@@ -50,6 +51,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Dependencies
 
 - Beefree SDK requires the following core dependencies:
+
   ```json
   {
     "dependencies": {
@@ -65,6 +67,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Environment Setup
 
 - Create a `.env` file in your project root with your Beefree credentials:
+
   ```env
   BEE_CLIENT_ID=your_client_id_here
   BEE_CLIENT_SECRET=your_client_secret_here
@@ -126,6 +129,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 - Use the V2 authentication endpoint: `https://auth.getbee.io/loginV2`
 - Pass the ENTIRE API response to the Beefree SDK, not just the token
 - Example authentication call:
+
   ```typescript
   const token = await fetch('http://localhost:3001/proxy/bee-auth', {
     method: 'POST',
@@ -139,6 +143,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### HTML Container
 
 - Create a dedicated container element for the Beefree SDK:
+
   ```html
   <div id="beefree-sdk-container"></div>
   ```
@@ -146,6 +151,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### CSS Styling
 
 - Style the container to ensure proper display:
+
   ```css
   #beefree-sdk-container {
     position: absolute;
@@ -188,6 +194,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Required Configuration Parameters
 
 - ALWAYS include the `container` parameter in your configuration:
+
   ```typescript
   const beeConfig = {
     container: 'beefree-sdk-container', // Required
@@ -198,6 +205,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Optional Configuration Parameters
 
 - Customize your SDK with optional parameters:
+
   ```typescript
   const beeConfig = {
     container: 'beefree-sdk-container', // Required
@@ -234,6 +242,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Callback Functions
 
 - Implement essential callback functions for proper functionality:
+
   ```typescript
   const beeConfig = {
     container: 'beefree-sdk-container',
@@ -261,6 +270,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Basic Initialization
 
 - Initialize the Beefree SDK with proper error handling:
+
   ```typescript
   async function initializeBeefree(authResponse) {
     try {
@@ -348,6 +358,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Autosave Functionality
 
 - Implement autosave to prevent data loss:
+
   ```typescript
   onAutoSave: function (jsonFile) {
     console.log("Auto-saving template...");
@@ -366,6 +377,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Import Process
 
 - Convert HTML templates to Beefree SDK's native JSON format:
+
   ```javascript
   const response = await fetch('https://api.getbee.io/v1/conversion/html-to-json', {
     method: 'POST',
@@ -381,6 +393,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Loading Imported Templates
 
 - Load imported templates into the Beefree SDK:
+
   ```typescript
   const importedTemplate = await importHtmlTemplate(htmlContent);
   beefreeSDK.start(importedTemplate);
@@ -391,6 +404,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### onError Callback
 
 - ALWAYS implement the `onError` callback to handle SDK errors:
+
   ```typescript
   onError: function (errorMessage) {
     console.error("Beefree SDK error:", errorMessage);
@@ -403,6 +417,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Authentication Error Handling
 
 - Handle authentication failures gracefully:
+
   ```typescript
   function getBeeToken(callback) {
     fetch('/api/beefree/auth', {
@@ -439,6 +454,7 @@ Guidelines and best practices for building applications with [Beefree SDK](https
 ### Change Detection
 
 - Use the `onChange` callback to track template changes:
+
   ```typescript
   onChange: function (jsonFile, response) {
   console.log('json', jsonFile);
@@ -458,6 +474,7 @@ Customize the Beefree SDK appearance with:
 ### Language Customization
 
 - Set the language for internationalization:
+
   ```typescript
   const beeConfig = {
     container: 'beefree-sdk-container',
@@ -468,6 +485,7 @@ Customize the Beefree SDK appearance with:
 ### Merge Tags and Special Links
 
 - Configure merge tags and special links for email personalization:
+
   ```typescript
   const beeConfig = {
     container: 'beefree-sdk-container',

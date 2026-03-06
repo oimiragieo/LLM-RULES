@@ -166,10 +166,10 @@ If tool execution fails:
 
 ## Related
 
-- Sentry API Documentation: https://docs.sentry.io/api/
-- Sentry Error Tracking: https://docs.sentry.io/product/issues/
-- Sentry Performance: https://docs.sentry.io/product/performance/
-- Sentry Releases: https://docs.sentry.io/product/releases/
+- Sentry API Documentation: <https://docs.sentry.io/api/>
+- Sentry Error Tracking: <https://docs.sentry.io/product/issues/>
+- Sentry Performance: <https://docs.sentry.io/product/performance/>
+- Sentry Releases: <https://docs.sentry.io/product/releases/>
 
 ## Memory Protocol (MANDATORY)
 

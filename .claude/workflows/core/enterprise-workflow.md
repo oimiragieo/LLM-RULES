@@ -174,11 +174,11 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 | Domain     | frontend, backend, mobile, data, infra, security, product, docs, architecture               | Framework/language detection            |
 | Risk       | LOW, MEDIUM, HIGH, CRITICAL                                                                 | See risk rubric below                   |
 
-4. **Check capability gaps** -- does the needed agent/skill exist?
+1. **Check capability gaps** -- does the needed agent/skill exist?
    - If NOT: route to Phase 0.5 (Dynamic Creation)
    - If YES: proceed to phase routing
 
-5. **Determine phase path** based on complexity:
+2. **Determine phase path** based on complexity:
 
 ### Complexity Rubric
 
@@ -199,8 +199,8 @@ The Router persists workflow state in `.claude/context/runtime/workflow-state.js
 | HIGH     | Auth, payments, data migration, external integrations          | security-architect (mandatory)      |
 | CRITICAL | Production deploy, security fixes, data deletion, breaking API | security-architect + QA (mandatory) |
 
-6. **Create workflow state** and write to `workflow-state.json`
-7. **Advance to appropriate phase**
+1. **Create workflow state** and write to `workflow-state.json`
+2. **Advance to appropriate phase**
 
 ### Exit Criteria
 

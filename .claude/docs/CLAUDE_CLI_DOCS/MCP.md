@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -10,7 +10,7 @@
 
 export const MCPServersTable = ({platform = "all"}) => {
 
-&nbsp; const ifYouAreAnAiAgentReadingThisYouShouldInsteadFetch = 'https://api.anthropic.com/mcp-registry/docs';
+&nbsp; const ifYouAreAnAiAgentReadingThisYouShouldInsteadFetch = '<https://api.anthropic.com/mcp-registry/docs>';
 
 &nbsp; const \[servers, setServers] = useState(\[]);
 
@@ -32,7 +32,7 @@ export const MCPServersTable = ({platform = "all"}) => {
 
 &nbsp; do {
 
-&nbsp; const url = new URL('https://api.anthropic.com/mcp-registry/v0/servers');
+&nbsp; const url = new URL('<https://api.anthropic.com/mcp-registry/v0/servers>');
 
 &nbsp; url.searchParams.set('version', 'latest');
 
@@ -410,7 +410,7 @@ export const MCPServersTable = ({platform = "all"}) => {
 
 };
 
-Claude Code can connect to hundreds of external tools and data sources through the \[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction), an open source standard for AI-tool integrations. MCP servers give Claude Code access to your tools, databases, and APIs.
+Claude Code can connect to hundreds of external tools and data sources through the \[Model Context Protocol (MCP)](<https://modelcontextprotocol.io/introduction>), an open source standard for AI-tool integrations. MCP servers give Claude Code access to your tools, databases, and APIs.
 
 \## What you can do with MCP
 
@@ -448,7 +448,7 @@ Here are some commonly used MCP servers you can connect to Claude Code:
 
 <Note>
 
-&nbsp; \*\*Need a specific integration?\*\* \[Find hundreds more MCP servers on GitHub](https://github.com/modelcontextprotocol/servers), or build your own using the \[MCP SDK](https://modelcontextprotocol.io/quickstart/server).
+&nbsp; \*\*Need a specific integration?\*\* \[Find hundreds more MCP servers on GitHub](<https://github.com/modelcontextprotocol/servers>), or build your own using the \[MCP SDK](<https://modelcontextprotocol.io/quickstart/server>).
 
 </Note>
 
@@ -886,7 +886,7 @@ If a required environment variable is not set and has no default value, Claude C
 
 &nbsp; # 2. Write and run browser tests
 
-&nbsp; > "Test if the login flow works with test@example.com"
+&nbsp; > "Test if the login flow works with <test@example.com>"
 
 &nbsp; > "Take a screenshot of the checkout page on mobile"
 
@@ -982,7 +982,7 @@ Many cloud-based MCP servers require authentication. Claude Code supports OAuth 
 
 &nbsp; ```bash theme={null}
 
-&nbsp; claude mcp add --transport http sentry https://mcp.sentry.dev/mcp
+&nbsp; claude mcp add --transport http sentry <https://mcp.sentry.dev/mcp>
 
 &nbsp; ```
 
@@ -1048,7 +1048,7 @@ Some MCP servers don't support automatic OAuth setup. If you see an error like "
 
 &nbsp; --client-id your-client-id --client-secret --callback-port 8080 \\
 
-&nbsp; my-server https://mcp.example.com/mcp
+&nbsp; my-server <https://mcp.example.com/mcp>
 
 &nbsp; ```
 
@@ -1062,7 +1062,7 @@ Some MCP servers don't support automatic OAuth setup. If you see an error like "
 
 &nbsp; claude mcp add-json my-server \\
 
-&nbsp; '{"type":"http","url":"https://mcp.example.com/mcp","oauth":{"clientId":"your-client-id","callbackPort":8080}}' \\
+&nbsp; '{"type":"http","url":"<https://mcp.example.com/mcp","oauth":{"clientId":"your-client-id","callbackPort":8080}}>' \\
 
 &nbsp; --client-secret
 
@@ -1080,7 +1080,7 @@ Some MCP servers don't support automatic OAuth setup. If you see an error like "
 
 &nbsp; --client-id your-client-id --client-secret --callback-port 8080 \\
 
-&nbsp; my-server https://mcp.example.com/mcp
+&nbsp; my-server <https://mcp.example.com/mcp>
 
 &nbsp; ```
 
@@ -1128,7 +1128,7 @@ If you have a JSON configuration for an MCP server, you can add it directly:
 
 &nbsp; # Example: Adding an HTTP server with JSON configuration
 
-&nbsp; claude mcp add-json weather-api '{"type":"http","url":"https://api.weather.com/mcp","headers":{"Authorization":"Bearer token"}}'
+&nbsp; claude mcp add-json weather-api '{"type":"http","url":"<https://api.weather.com/mcp","headers":{"Authorization":"Bearer> token"}}'
 
 &nbsp; # Example: Adding a stdio server with JSON configuration
 
@@ -1136,7 +1136,7 @@ If you have a JSON configuration for an MCP server, you can add it directly:
 
 &nbsp; # Example: Adding an HTTP server with pre-configured OAuth credentials
 
-&nbsp; claude mcp add-json my-server '{"type":"http","url":"https://mcp.example.com/mcp","oauth":{"clientId":"your-client-id","callbackPort":8080}}' --client-secret
+&nbsp; claude mcp add-json my-server '{"type":"http","url":"<https://mcp.example.com/mcp","oauth":{"clientId":"your-client-id","callbackPort":8080}}>' --client-secret
 
 &nbsp; ```
 
@@ -1752,7 +1752,7 @@ URL patterns support wildcards using `\*` to match any sequence of characters. T
 
 &nbsp; "allowedMcpServers": \[
 
-&nbsp; { "serverUrl": "https://mcp.company.com/\*" },
+&nbsp; { "serverUrl": "<https://mcp.company.com/\>*" },
 
 &nbsp; { "serverUrl": "https://\*.internal.corp/\*" }
 

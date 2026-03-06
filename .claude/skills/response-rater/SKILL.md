@@ -38,6 +38,7 @@ Response Rater - Rates responses and plans against quality rubrics. Provides sco
 Use appropriate rubric for the content type:
 
 **For Plans**:
+
 | Dimension | Weight | Description |
 |-----------|--------|-------------|
 | Completeness | 20% | All required sections present |
@@ -47,6 +48,7 @@ Use appropriate rubric for the content type:
 | Integration | 20% | Fits with existing systems |
 
 **For Responses**:
+
 | Dimension | Weight | Description |
 |-----------|--------|-------------|
 | Correctness | 25% | Technically accurate |

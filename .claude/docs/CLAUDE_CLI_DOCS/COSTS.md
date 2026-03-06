@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -40,7 +40,7 @@ Total code changes:    0 lines added, 0 lines removed
 
 \## Managing costs for teams
 
-When using Claude API, you can \[set workspace spend limits](https://platform.claude.com/docs/en/build-with-claude/workspaces#workspace-limits) on the total Claude Code workspace spend. Admins can \[view cost and usage reporting](https://platform.claude.com/docs/en/build-with-claude/workspaces#usage-and-cost-tracking) in the Console.
+When using Claude API, you can \[set workspace spend limits](<https://platform.claude.com/docs/en/build-with-claude/workspaces#workspace-limits>) on the total Claude Code workspace spend. Admins can \[view cost and usage reporting](<https://platform.claude.com/docs/en/build-with-claude/workspaces#usage-and-cost-tracking>) in the Console.
 
 <Note>
 
@@ -48,7 +48,7 @@ When using Claude API, you can \[set workspace spend limits](https://platform.cl
 
 </Note>
 
-On Bedrock, Vertex, and Foundry, Claude Code does not send metrics from your cloud. To get cost metrics, several large enterprises reported using \[LiteLLM](/en/llm-gateway#litellm-configuration), which is an open-source tool that helps companies \[track spend by key](https://docs.litellm.ai/docs/proxy/virtual\_keys#tracking-spend). This project is unaffiliated with Anthropic and has not been audited for security.
+On Bedrock, Vertex, and Foundry, Claude Code does not send metrics from your cloud. To get cost metrics, several large enterprises reported using \[LiteLLM](/en/llm-gateway#litellm-configuration), which is an open-source tool that helps companies \[track spend by key](<https://docs.litellm.ai/docs/proxy/virtual\_keys#tracking-spend>). This project is unaffiliated with Anthropic and has not been audited for security.
 
 \### Rate limit recommendations
 
@@ -262,4 +262,4 @@ These background processes consume a small amount of tokens (typically under \\$
 
 \## Understanding changes in Claude Code behavior
 
-Claude Code regularly receives updates that may change how features work, including cost reporting. Run `claude --version` to check your current version. For specific billing questions, contact Anthropic support through your \[Console account](https://platform.claude.com/login). For team deployments, start with a small pilot group to establish usage patterns before wider rollout.
+Claude Code regularly receives updates that may change how features work, including cost reporting. Run `claude --version` to check your current version. For specific billing questions, contact Anthropic support through your \[Console account](<https://platform.claude.com/login>). For team deployments, start with a small pilot group to establish usage patterns before wider rollout.

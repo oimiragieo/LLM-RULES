@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -148,11 +148,11 @@ claude --teammate-mode in-process
 
 ```
 
-Split-pane mode requires either \[tmux](https://github.com/tmux/tmux/wiki) or iTerm2 with the \[`it2` CLI](https://github.com/mkusaka/it2). To install manually:
+Split-pane mode requires either \[tmux](<https://github.com/tmux/tmux/wiki>) or iTerm2 with the \[`it2` CLI](<https://github.com/mkusaka/it2>). To install manually:
 
-\* \*\*tmux\*\*: install through your system's package manager. See the \[tmux wiki](https://github.com/tmux/tmux/wiki/Installing) for platform-specific instructions.
+\* \*\*tmux\*\*: install through your system's package manager. See the \[tmux wiki](<https://github.com/tmux/tmux/wiki/Installing>) for platform-specific instructions.
 
-\* \*\*iTerm2\*\*: install the \[`it2` CLI](https://github.com/mkusaka/it2), then enable the Python API in \*\*iTerm2 → Settings → General → Magic → Enable Python API\*\*.
+\* \*\*iTerm2\*\*: install the \[`it2` CLI](<https://github.com/mkusaka/it2>), then enable the Python API in \*\*iTerm2 → Settings → General → Magic → Enable Python API\*\*.
 
 \### Specify teammates and models
 

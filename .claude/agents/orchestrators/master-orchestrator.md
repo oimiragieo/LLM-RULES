@@ -25,32 +25,13 @@ tools:
 skills:
   - plan-generator
   - response-rater
+  - ripgrep
+  - code-semantic-search
+  - code-structural-search
   - subagent-driven-development
   - task-management-protocol
   - verification-before-completion
   - wave-executor
-  - ripgrep
-  - code-semantic-search
-  - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - artifact-integrator
-  - complexity-assessment
-  - sequential-thinking
-  - session-handoff
-  - swarm-coordination
-  - track-management
-  - ralph-loop
-  - workflow-creator
-  - agent-creator
-  - skill-creator
-  - command-creator
-  - rule-creator
-  - tool-creator
-  - hook-creator
-  - semgrep-rule-creator
-  - template-creator
-  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -128,15 +109,15 @@ Read('.claude/docs/AGENT_ROUTING_CARD.md')
 
 ## Responsibilities
 
-1.  **Step 0 (Pre-flight)**: Before starting any new work, check `.claude/context/runtime/reflection-spawn-request.json`. If requests exist, spawn `reflection-agent` to batch process them.
+1. **Step 0 (Pre-flight)**: Before starting any new work, check `.claude/context/runtime/reflection-spawn-request.json`. If requests exist, spawn `reflection-agent` to batch process them.
     - **Requirement**: The spawned agent MUST include `metadata: { processedReflectionIds: [...] }` in its final `TaskUpdate` to trigger automated cleanup.
-2.  **Atomic Handshake**: Do NOT manually delete reflection files. The system will automatically remove processed requests upon successful `TaskUpdate(completed)`.
-3.  **Scope**: Spawn `Planner` to breakdown requests.
-4.  **Review**: Rate plans (7/10 minimum) using `response-rater`.
-5.  **Select Agents**: Before spawning agents for any phase, consult `AGENT_ROUTING_CARD.md` to select the most specific specialist available. Never default to `developer` when a language, framework, mobile, or domain specialist matches the task.
-6.  **Coordinate**: Spawn specialized agents via `Task`, using the correct specialist from the routing card.
-7.  **Monitor**: Track progress and update `.claude/context/runtime/dashboard.md`.
-8.  **Synthesize**: Combine outputs into a final response for the user.
+2. **Atomic Handshake**: Do NOT manually delete reflection files. The system will automatically remove processed requests upon successful `TaskUpdate(completed)`.
+3. **Scope**: Spawn `Planner` to breakdown requests.
+4. **Review**: Rate plans (7/10 minimum) using `response-rater`.
+5. **Select Agents**: Before spawning agents for any phase, consult `AGENT_ROUTING_CARD.md` to select the most specific specialist available. Never default to `developer` when a language, framework, mobile, or domain specialist matches the task.
+6. **Coordinate**: Spawn specialized agents via `Task`, using the correct specialist from the routing card.
+7. **Monitor**: Track progress and update `.claude/context/runtime/dashboard.md`.
+8. **Synthesize**: Combine outputs into a final response for the user.
 
 ## Execution Rules
 
@@ -164,9 +145,9 @@ Use `Read` only for known specific file paths (agent definitions, registry files
 
 ## Standard Flow
 
-1.  **User Request**: "Build X."
-2.  **Orchestrate**: Call `Task({ task_id: 'task-1', subagent_type: 'developer', prompt: 'Build X' })`.
-3.  **Finish**: Publish artifacts.
+1. **User Request**: "Build X."
+2. **Orchestrate**: Call `Task({ task_id: 'task-1', subagent_type: 'developer', prompt: 'Build X' })`.
+3. **Finish**: Publish artifacts.
 
 ## Skill Invocation Protocol (MANDATORY)
 

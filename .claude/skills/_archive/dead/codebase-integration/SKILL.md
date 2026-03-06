@@ -323,7 +323,7 @@ context_files:
 
 ## Anti-Patterns
 
-### DO NOT:
+### DO NOT
 
 - Import without updating CLAUDE.md (Router won't know about new items)
 - Skip Memory Protocol section (Agents will forget learnings)
@@ -331,7 +331,7 @@ context_files:
 - Skip validation (Silent failures)
 - Create duplicate skills/agents (Confusion, wasted context)
 
-### DO:
+### DO
 
 - Check for existing equivalents first
 - Transform all paths to `.claude/` structure

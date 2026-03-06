@@ -17,6 +17,7 @@ streaming: supported
 output_location: .claude/tools/
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 # Tool Creator

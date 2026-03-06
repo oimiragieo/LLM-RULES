@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -132,7 +132,7 @@ Bash rules support glob patterns with `\*`. Wildcards can appear at any position
 
 ```
 
-The space before `\*` matters: `Bash(ls \*)` matches `ls -la` but not `lsof`, while `Bash(ls\*)` matches both. The legacy `:\*` suffix syntax is equivalent to ` \*` but is deprecated.
+The space before `\*` matters: `Bash(ls \*)` matches `ls -la` but not `lsof`, while `Bash(ls\*)` matches both. The legacy `:\*` suffix syntax is equivalent to `\*` but is deprecated.
 
 \## Tool-specific permission rules
 
@@ -144,9 +144,9 @@ Bash permission rules support wildcard matching with `\*`. Wildcards can appear 
 
 \* `Bash(npm run test \*)` matches Bash commands starting with `npm run test`
 
-\* `Bash(npm \*)` matches any command starting with `npm `
+\* `Bash(npm \*)` matches any command starting with `npm`
 
-\* `Bash(\* install)` matches any command ending with ` install`
+\* `Bash(\* install)` matches any command ending with `install`
 
 \* `Bash(git \* main)` matches commands like `git checkout main`, `git merge main`
 
@@ -188,7 +188,7 @@ When `\*` appears at the end with a space before it (like `Bash(ls \*)`), it enf
 
 `Edit` rules apply to all built-in tools that edit files. Claude makes a best-effort attempt to apply `Read` rules to all built-in tools that read files like Grep and Glob.
 
-Read and Edit rules both follow the \[gitignore](https://git-scm.com/docs/gitignore) specification with four distinct pattern types:
+Read and Edit rules both follow the \[gitignore](<https://git-scm.com/docs/gitignore>) specification with four distinct pattern types:
 
 | Pattern | Meaning | Example | Matches |
 
@@ -338,7 +338,7 @@ If a permission is allowed in user settings but denied in project settings, the 
 
 \## Example configurations
 
-This \[repository](https://github.com/anthropics/claude-code/tree/main/examples/settings) includes starter settings configurations for common deployment scenarios. Use these as starting points and adjust them to fit your needs.
+This \[repository](<https://github.com/anthropics/claude-code/tree/main/examples/settings>) includes starter settings configurations for common deployment scenarios. Use these as starting points and adjust them to fit your needs.
 
 \## See also
 

@@ -60,9 +60,9 @@ Verify: `git --version`
 
 Do not use `git status` repeatedly. Use this workflow:
 
-1.  **Check State**: `git status -s` (Short format saves tokens)
-2.  **Diff**: `git diff --cached` (Only check what you are about to commit)
-3.  **Log**: `git log --oneline -5` (Context without the noise)
+1. **Check State**: `git status -s` (Short format saves tokens)
+2. **Diff**: `git diff --cached` (Only check what you are about to commit)
+3. **Log**: `git log --oneline -5` (Context without the noise)
 
 ## 🔄 Common Patterns
 
@@ -184,6 +184,7 @@ git sparse-checkout set services/payments
 ```
 
 **Cone mode vs. non-cone mode:**
+
 | Mode | Pattern Matching | Performance |
 |------|-----------------|-------------|
 | Cone (recommended) | Directory prefix only | Fast (O(log n) path matching) |

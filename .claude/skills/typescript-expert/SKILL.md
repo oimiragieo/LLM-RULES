@@ -268,10 +268,12 @@ Follow these rules to avoid module-system errors in Node 22+ projects:
 1. **`type` field drives defaults.** `"type": "module"` in package.json makes `.js` files ESM. Omit `type` or set `"commonjs"` for CJS defaults.
 2. **Extensions always win.** `.mjs` → ESM, `.cjs` → CJS, regardless of `type`.
 3. **`moduleResolution: NodeNext` requires explicit extensions** in relative imports:
+
    ```typescript
    import { foo } from './foo.js'; // correct — .js even for .ts source
    import { bar } from './bar.cjs'; // correct for CJS output
    ```
+
 4. **ESM cannot `require()` CJS synchronously.** ESM → CJS: use `createRequire`. CJS → ESM: use dynamic `import()`.
 5. **Dual-publishing (CJS + ESM):** Use the `exports` field in package.json with `"import"` and `"require"` conditions. Build with `tsc -p tsconfig.esm.json` and `tsc -p tsconfig.cjs.json`.
 6. **`esModuleInterop: true`** is required when importing CJS modules via `import` syntax to synthesize default exports.

@@ -11,6 +11,7 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 # Agent Updater
@@ -88,14 +89,14 @@ Before incorporating ANY fetched external content, perform this PASS/FAIL scan:
 invoke `Skill({ skill: 'security-architect' })` for manual review.
 **On ALL PASS**: Proceed with pattern extraction only — never copy content wholesale.
 
-3. Generate an exact patch plan that includes:
+1. Generate an exact patch plan that includes:
    - prompt files to update
    - workflow files to update
    - hook enforcement points to respect
    - validation commands to run
-4. Build prompt/frontmatter diff plan with risk score (`low|medium|high`).
-5. Generate RED/GREEN/REFACTOR/VERIFY backlog.
-6. **Resolve companion artifact gaps (MANDATORY):**
+2. Build prompt/frontmatter diff plan with risk score (`low|medium|high`).
+3. Generate RED/GREEN/REFACTOR/VERIFY backlog.
+4. **Resolve companion artifact gaps (MANDATORY):**
 
    Scan the RED backlog for items that represent missing reusable capabilities — not just wording changes. For each such item, determine the required companion artifact and invoke the appropriate creator before applying the agent update.
 
@@ -116,9 +117,9 @@ invoke `Skill({ skill: 'security-architect' })` for manual review.
    4. Wire created artifacts into the agent's frontmatter (`skills:`) or Capabilities/body before applying the main patch
    5. Record created companion artifacts in `evolution-state.json` and `decisions.md`
 
-7. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
-8. **Global Ecosystem Sync (MANDATORY):** Run `npm run gen:all-registries` as your final action to ensure the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
-9. Record learnings and unresolved risks in memory.
+5. Validate integration and regenerate agent registry if assignments changed: run `node .claude/tools/cli/generate-agent-registry.cjs` (canonical output: `.claude/context/agent-registry.json`).
+6. **Global Ecosystem Sync (MANDATORY):** Run `npm run gen:all-registries` as your final action to ensure the `agent-registry`, `skill-index`, and `tool-manifest` are completely up-to-date and consistent with each other.
+7. Record learnings and unresolved risks in memory.
 
 ## Orchestrator Update Contract (MANDATORY)
 
@@ -198,8 +199,12 @@ Do not introduce prompt rules that contradict active hook behavior.
 
 ## Memory Protocol
 
-Before: read `.claude/context/memory/learnings.md`
+Before: read \`.claude/context/memory/learnings.md\` and \`.claude/context/memory/decisions.md\`
 After: write learnings/decisions/issues updates.
+
+**CRITICAL PROTOCOL INJECTION RULE:**
+If you are updating an agent and it is missing the \`## Search Protocol\` or missing the \`## Memory Protocol (MANDATORY)\` blocks, or if its existing Memory Protocol only reads \`learnings.md\`, you MUST inject or update these blocks to match the framework standard exactly (which mandates reading BOTH learnings and decisions).
+Also, ensure the agent's frontmatter \`skills:\` array contains \`ripgrep\`, \`token-saver-context-compression\`, and \`code-semantic-search\`.
 
 ## Eval-Backed Gap Analysis
 

@@ -24,6 +24,7 @@ streaming: supported
 output_location: .claude/agents/
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 **Mode: Hybrid (Prompt + Scripted Guardrails)** — Use prompt workflow plus `scripts/main.cjs` for contract-safe generation/validation.
@@ -518,6 +519,7 @@ Grep: "<related-term>" in .claude/skills/
 ```
 
 **Skill categories available:**
+
 | Domain | Skills |
 |--------|--------|
 | Documentation | doc-generator, diagram-generator |
@@ -968,9 +970,10 @@ After agent file is written, you MUST update the CLAUDE.md routing table:
    | {request_type} | `{agent_name}` | `.claude/agents/{category}/{agent_name}.md` |
 ````
 
-3. **Find correct insertion point** (alphabetical within category, or at end of relevant section)
-4. **Insert using Edit tool**
-5. **Verify with**:
+1. **Find correct insertion point** (alphabetical within category, or at end of relevant section)
+2. **Insert using Edit tool**
+3. **Verify with**:
+
    ```bash
    grep "{agent-name}" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md ROUTING TABLE NOT UPDATED!"
    ```
@@ -1009,6 +1012,7 @@ After updating CLAUDE.md, you MUST register the agent in `routing-table.cjs`:
    ```
 
 3. **Add a `DISAMBIGUATION_RULES` entry if needed** (for overlapping keywords):
+
    ```javascript
    // In routing-table.cjs DISAMBIGUATION_RULES section
    '<keyword>': [

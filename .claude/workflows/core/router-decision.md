@@ -1355,30 +1355,30 @@ Task({
 
 ## Error Recovery
 
-### If Step 1 finds conflicting tasks:
+### If Step 1 finds conflicting tasks
 
 1. Ask user which task takes priority
 2. Update task metadata to mark conflicts
 3. Proceed with routing decision
 
-### If Step 2 classification is ambiguous:
+### If Step 2 classification is ambiguous
 
 1. Use `AskUserQuestion()` to clarify intent
 2. Re-run classification with additional context
 
-### If Step 4 self-check fails (violation detected):
+### If Step 4 self-check fails (violation detected)
 
 1. STOP immediately
 2. Identify correct agent to spawn
 3. Spawn agent, do NOT execute work directly
 
-### If Step 6 finds no matching agent:
+### If Step 6 finds no matching agent
 
 1. Check `.claude/agents/domain/` for specialized agents
 2. If still no match, spawn `agent-creator` to create new agent
 3. After agent created, spawn new agent to handle original request
 
-### If Step 7 spawn fails:
+### If Step 7 spawn fails
 
 1. Check agent file exists
 2. Verify PROJECT_ROOT path is correct

@@ -11,6 +11,7 @@ error_handling: graceful
 streaming: supported
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 # Skill Updater
@@ -79,7 +80,7 @@ For `medium` and `high`, require a diff-first summary and explicit confirmation 
 Skill({ skill: 'skill-creator', args: '<new-skill-name>' });
 ```
 
-3. If target exists, continue with refresh workflow.
+1. If target exists, continue with refresh workflow.
 
 ### Step 1: Framework + Memory Grounding (MANDATORY)
 
@@ -104,13 +105,14 @@ Read memory context for historical failures and decisions:
 Skill({ skill: 'research-synthesis' });
 ```
 
-2. **Check VoltAgent/awesome-agent-skills for updated patterns (ALWAYS - Step 2A):**
+1. **Check VoltAgent/awesome-agent-skills for updated patterns (ALWAYS - Step 2A):**
 
    Search `https://github.com/VoltAgent/awesome-agent-skills` to determine if the skill being updated has a counterpart with newer or better patterns. This is a curated collection of 380+ community-validated skills.
 
    **How to check:**
    - Invoke `Skill({ skill: 'github-ops' })` to use structured GitHub reconnaissance.
    - Search the README or use GitHub code search:
+
      ```bash
      gh api repos/VoltAgent/awesome-agent-skills/contents/README.md --jq '.content' | base64 -d | grep -i "<skill-topic-keywords>"
      gh search code "<skill-name-or-keywords>" --repo VoltAgent/awesome-agent-skills
@@ -118,9 +120,11 @@ Skill({ skill: 'research-synthesis' });
 
    **If a matching counterpart skill is found:**
    - Pull the raw SKILL.md content via `github-ops` or `WebFetch`:
+
      ```bash
      gh api repos/<org>/<repo>/contents/skills/<skill-name>/SKILL.md --jq '.content' | base64 -d
      ```
+
      Or: `WebFetch({ url: '<raw-github-url>', prompt: 'Extract workflow steps, patterns, best practices, and any improvements compared to current skill' })`
 
    #### Security Review Gate (MANDATORY — before incorporating external content)
@@ -155,7 +159,7 @@ Skill({ skill: 'research-synthesis' });
    - Document the negative result briefly (e.g., "Checked VoltAgent/awesome-agent-skills for '<skill-name>' — no counterpart found")
    - Continue with Exa/web research
 
-3. Gather at least:
+2. Gather at least:
 
 - 3 Exa/web queries
 - 1+ arXiv papers (mandatory when topic involves AI/ML, agents, evaluation, orchestration, memory/RAG, security — not optional):
@@ -163,7 +167,7 @@ Skill({ skill: 'research-synthesis' });
   - Direct API: `WebFetch({ url: 'https://arxiv.org/search/?query=<topic>&searchtype=all&start=0' })`
 - 1 internal codebase parity check (`pnpm search:code`, `ripgrep`, semantic/structural search)
 
-4. Optional benchmark assimilation when parity against external repos is needed:
+1. Optional benchmark assimilation when parity against external repos is needed:
 
 ```javascript
 Skill({ skill: 'assimilate' });
@@ -212,6 +216,7 @@ Priority: `High` (likely changes outcome) | `Medium` (improves quality) | `Low` 
 - `rules/<skill>.md` (Check for and PRESERVE 'Anti-Patterns')
 - workflow doc in `.claude/workflows/*skill-workflow.md`
 - agent assignments, CLAUDE references, skill catalog coverage
+- Target Skill's Markdown Body: **MUST** contain a defined `## Search Protocol` block and the rigorous `## Memory Protocol (MANDATORY)` block ensuring it reads both `learnings.md` and `decisions.md`. Inject them if they are missing or outdated!
 - Search tooling: Ensure `pnpm search:code` is mandated over generic `grep`
 - Run `node .claude/tools/cli/validate-skill-ecosystem.cjs` and treat failures as blocking.
 
@@ -330,7 +335,7 @@ const bundle = validateEnterpriseBundle(skillName, projectRoot);
 // bundle: { complete, missing, existing, score, scoreNum, scoreMax }
 ```
 
-2. If score < 100%: run `scaffoldMissingComponents(skillName)` to generate missing pieces:
+1. If score < 100%: run `scaffoldMissingComponents(skillName)` to generate missing pieces:
 
 ```javascript
 const {
@@ -340,8 +345,8 @@ const scaffold = scaffoldMissingComponents(skillName, projectRoot);
 // scaffold: { created: string[], skipped: string[] }
 ```
 
-3. Log created components in TaskUpdate metadata.
-4. Run integration validation on new components.
+1. Log created components in TaskUpdate metadata.
+2. Run integration validation on new components.
 
 ### Step 7: Cascade Analysis + Companion Artifact Gap Resolution (MANDATORY)
 
@@ -375,13 +380,13 @@ After updating the skill, scan for capability gaps and resolve each using the ap
 - `.claude/docs/skill-catalog.md`
 - relevant agent prompts/frontmatter
 
-2. Record refresh outcome in:
+1. Record refresh outcome in:
 
 - `.claude/context/memory/learnings.md`
 - `.claude/context/evolution-state.json` (if EVOLVE-triggered)
 - Ensure target `SKILL.md` frontmatter has `verified: true` and `lastVerifiedAt: <ISO-8601>` (execute mode only).
 
-3. If new capability gap remains after refresh, invoke:
+1. If new capability gap remains after refresh, invoke:
 
 ```javascript
 Skill({ skill: 'recommend-evolution' });

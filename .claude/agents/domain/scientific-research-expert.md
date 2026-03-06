@@ -26,23 +26,15 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - task-management-protocol
-  - arxiv-mcp
-  - debugging
-  - diagram-generator
-  - doc-generator
-  - jupyter-notebook-best-practices
-  - python-backend-expert
-  - research-synthesis
-  - scientific-skills
-  - tdd
-  - verification-before-completion
   - memory-search
+  - research-synthesis
+  - ripgrep
+  - scientific-skills
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'
   - '@.claude/context/memory/decisions.md'
@@ -672,3 +664,24 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 - `Skill({ skill: 'code-semantic-search' })` for conceptual search
 - `Skill({ skill: 'code-structural-search' })` for AST-based matching
 - Grep: fallback only (single-file checks, advanced PCRE2)
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

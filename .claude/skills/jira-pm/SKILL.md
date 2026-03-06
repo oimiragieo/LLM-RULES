@@ -39,7 +39,7 @@ Jira PM (Project Management) - Provides integration with Atlassian Jira for issu
 
 Required:
 
-- JIRA_URL - Base URL of your Jira instance (e.g., https://yourcompany.atlassian.net)
+- JIRA_URL - Base URL of your Jira instance (e.g., <https://yourcompany.atlassian.net>)
 - JIRA_API_TOKEN - API token for authentication (generate at Jira Account Settings -> Security -> API Tokens)
 - JIRA_USER_EMAIL - Email address associated with the API token
 
@@ -169,7 +169,7 @@ Context Savings: 90%+ compared to loading full Jira MCP server
 - /rest/agile/1.0/sprint/{sprintId}/issue - Get sprint issues
 - /rest/api/3/issue/{issueKey}/comment - Get/add comments
 
-See https://developer.atlassian.com/cloud/jira/platform/rest/v3/ for full reference.
+See <https://developer.atlassian.com/cloud/jira/platform/rest/v3/> for full reference.
 </api_reference>
 
 ## Iron Laws

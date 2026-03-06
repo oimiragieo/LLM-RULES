@@ -90,8 +90,8 @@ Then provide your FINAL RANKING (best to worst):
 3. Response [Z]
 ```
 
-5. Parse FINAL RANKING from each reviewer's output using regex: `\d+\.\s*Response [A-Z]`
-6. Compute aggregate ranking (average position across all reviewers)
+1. Parse FINAL RANKING from each reviewer's output using regex: `\d+\.\s*Response [A-Z]`
+2. Compute aggregate ranking (average position across all reviewers)
 
 ### Stage 3: Chairman Synthesis
 

@@ -263,7 +263,7 @@ Update context files if revert affects product features.
 
 ## Anti-Patterns
 
-### Do NOT:
+### Do NOT
 
 - Revert without confirmation
 - Ignore ghost commits (fail silently)
@@ -271,7 +271,7 @@ Update context files if revert affects product features.
 - Force-push after revert
 - Revert merge commits without special handling
 
-### Do:
+### Do
 
 - Always verify target before action
 - Handle rewritten history gracefully

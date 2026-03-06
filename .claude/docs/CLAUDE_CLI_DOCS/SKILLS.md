@@ -1,6 +1,6 @@
 > ## Documentation Index
 
-> Fetch the complete documentation index at: https://code.claude.com/docs/llms.txt
+> Fetch the complete documentation index at: <https://code.claude.com/docs/llms.txt>
 
 > Use this file to discover all available pages before exploring further.
 
@@ -18,7 +18,7 @@ Skills extend what Claude can do. Create a `SKILL.md` file with instructions, an
 
 </Note>
 
-Claude Code skills follow the \[Agent Skills](https://agentskills.io) open standard, which works across multiple AI tools. Claude Code extends the standard with additional features like \[invocation control](#control-who-invokes-a-skill), \[subagent execution](#run-skills-in-a-subagent), and \[dynamic context injection](#inject-dynamic-context).
+Claude Code skills follow the \[Agent Skills](<https://agentskills.io>) open standard, which works across multiple AI tools. Claude Code extends the standard with additional features like \[invocation control](#control-who-invokes-a-skill), \[subagent execution](#run-skills-in-a-subagent), and \[dynamic context injection](#inject-dynamic-context).
 
 \## Getting started
 

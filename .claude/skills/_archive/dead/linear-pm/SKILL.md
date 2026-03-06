@@ -253,9 +253,9 @@ If tool execution fails:
 
 ## Related
 
-- Official Linear API Documentation: https://developers.linear.app/docs/graphql/working-with-the-graphql-api
-- Linear GraphQL Explorer: https://studio.apollographql.com/public/Linear-API/home
-- Linear Webhook Documentation: https://developers.linear.app/docs/graphql/webhooks
+- Official Linear API Documentation: <https://developers.linear.app/docs/graphql/working-with-the-graphql-api>
+- Linear GraphQL Explorer: <https://studio.apollographql.com/public/Linear-API/home>
+- Linear Webhook Documentation: <https://developers.linear.app/docs/graphql/webhooks>
 
 ## Memory Protocol (MANDATORY)
 

@@ -34,7 +34,7 @@ When reviewing or writing code, apply these guidelines:
 
 - When working with Convex, prioritize correct schema definition using the `v` validator.
 - Be aware of the automatically-generated system fields `_id` and `_creationTime`.
-- See https://docs.convex.dev/database/types for available types.
+- See <https://docs.convex.dev/database/types> for available types.
   </instructions>
 
 <examples>

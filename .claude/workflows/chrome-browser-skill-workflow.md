@@ -35,6 +35,7 @@ node .claude/skills/chrome-browser/scripts/main.cjs --help
    ```
 
 2. **With Arguments**
+
    ```
    /chrome-browser --option value
    ```

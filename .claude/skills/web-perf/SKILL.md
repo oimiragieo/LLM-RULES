@@ -121,6 +121,7 @@ LCP measures loading performance -- when the largest content element becomes vis
    - Use streaming SSR where supported
 
 4. **Optimize image delivery**
+
    ```html
    <!-- Modern format with fallback -->
    <picture>
@@ -246,6 +247,7 @@ INP measures interactivity -- the delay between user interaction and visual resp
    ```
 
 3. **Use `requestIdleCallback` for non-urgent work**
+
    ```javascript
    requestIdleCallback(() => {
      // Analytics, prefetching, non-visible updates

@@ -30,33 +30,18 @@ skills:
   - agent-creator
   - artifact-lifecycle
   - command-creator
+  - hook-creator
   - research-synthesis
-  - rule-creator
-  - skill-creator
-  - task-management-protocol
-  - verification-before-completion
   - ripgrep
   - code-semantic-search
   - code-structural-search
-  - context-compressor
-  - token-saver-context-compression
-  - agent-updater
-  - assimilate
-  - artifact-integrator
-  - compliance-policy-check
-  - creation-feasibility-gate
-  - tool-creator
-  - hook-creator
-  - semgrep-rule-creator
-  - plan-generator
+  - rule-creator
   - schema-creator
-  - skill-updater
-  - workflow-updater
+  - skill-creator
+  - task-management-protocol
   - template-creator
+  - verification-before-completion
   - workflow-creator
-  - eval-harness-updater
-  - memory-quality-auditor
-  - memory-search
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -207,6 +192,7 @@ Skill({ skill: 'ripgrep', args: 'proposed-name .claude/agents .claude/skills' })
 - [ ] Category/directory is appropriate for artifact type
 
 **Naming Conventions**:
+
 | Artifact | Convention | Example |
 |----------|------------|---------|
 | Agent | `<domain>-<role>` | `mobile-ux-reviewer`, `data-engineer` |
@@ -389,6 +375,7 @@ switch (artifactType) {
 - [ ] Task Progress Protocol section present in body
 
 **Artifact Locations**:
+
 | Artifact | Location |
 |----------|----------|
 | Agent | `.claude/agents/<category>/<name>.md` |
@@ -447,6 +434,7 @@ Bash('node .claude/tools/validate-agents.mjs');
 - [ ] Documentation explains when/why to use artifact
 
 **Quality Standards**:
+
 | Section | Requirement |
 |---------|-------------|
 | Core Persona | 4 fields: Identity, Style, Approach, Values |
@@ -601,6 +589,7 @@ Write('@.claude/context/evolution-state.json', JSON.stringify(state, null, 2));
 ```
 
 **State Values**:
+
 | state | Meaning |
 |-------|---------|
 | `idle` | No evolution in progress |

@@ -19,17 +19,17 @@ tools:
   - TaskGet
   - Skill
 skills:
-  - context-compressor
-  - session-handoff
-  - summarize-changes
-  - ripgrep
   - code-semantic-search
   - code-structural-search
-  - token-saver-context-compression
-  - task-management-protocol
-  - verification-before-completion
-  - memory-search
+  - context-compressor
   - context-degradation
+  - memory-search
+  - ripgrep
+  - session-handoff
+  - summarize-changes
+  - task-management-protocol
+  - token-saver-context-compression
+  - verification-before-completion
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -75,9 +75,9 @@ The following workflows guide this agent's execution:
 
 ## Capabilities
 
-1.  **Summarize**: Convert verbose logs/docs into executive summaries.
-2.  **Prune**: Remove duplicate or superseded information.
-3.  **Extract**: Pull out key decisions, blockers, and artifacts.
+1. **Summarize**: Convert verbose logs/docs into executive summaries.
+2. **Prune**: Remove duplicate or superseded information.
+3. **Extract**: Pull out key decisions, blockers, and artifacts.
 
 ## Compression Rules
 
@@ -215,3 +215,24 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 - `Skill({ skill: 'code-semantic-search' })` for conceptual search
 - `Skill({ skill: 'code-structural-search' })` for AST-based matching
 - Grep: fallback only (single-file checks, advanced PCRE2)
+
+## Search Protocol
+
+For code discovery and search tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Read`, `Grep`, or `Glob` for open-ended discovery.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits
+- Retrieved snippets/logs are too large to keep directly in working context

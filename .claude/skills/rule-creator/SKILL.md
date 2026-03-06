@@ -17,6 +17,7 @@ streaming: supported
 output_location: .claude/rules/
 verified: true
 lastVerifiedAt: '2026-02-28'
+dependencies: [research-synthesis]
 ---
 
 # Rule Creator

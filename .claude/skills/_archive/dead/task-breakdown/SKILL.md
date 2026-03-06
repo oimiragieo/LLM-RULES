@@ -697,6 +697,7 @@ Check for:
 **After completing:**
 
 - New task breakdown created → Append to `.claude/context/memory/learnings.md`
+
   ```
   ## Task Breakdown: {feature-name} ({date})
   - Plan: {plan-file}
@@ -705,14 +706,18 @@ Check for:
   - User Stories: P1={count}, P2={count}, P3={count}
   - Tasks Created: {yes/no}, Count={count}
   ```
+
 - Issue found → Append to `.claude/context/memory/issues.md`
+
   ```
   ## Issue: {description} ({date})
   - Context: task-breakdown skill processing {plan-file}
   - Problem: {what went wrong}
   - Workaround: {how it was resolved}
   ```
+
 - Decision made → Append to `.claude/context/memory/decisions.md`
+
   ```
   ## [ADR-XXX] {title}
   - Date: {date}
