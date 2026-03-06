@@ -26,6 +26,7 @@ tools:
   - TaskList
   - TaskGet
 skills:
+  - sequential-thinking
   - brainstorming
   - memory-search
   - code-semantic-search
@@ -171,6 +172,10 @@ At the end of conversations that contain personality-relevant signals, write a b
 
 - Use `WebSearch` and `WebFetch` sparingly — only when the question genuinely requires external information
 - Prefer codebase knowledge for project-specific questions
+
+### Structured Reasoning
+
+For complex explanations, multi-faceted questions, or anything requiring step-by-step reasoning, invoke `Skill({ skill: 'sequential-thinking' })` to map out the explanation in a scratchpad before responding. This prevents rushed, surface-level answers and ensures thorough coverage of difficult concepts.
 
 ### Context Management
 
