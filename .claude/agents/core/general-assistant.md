@@ -8,7 +8,7 @@ description: >-
   sessions and a soul-memory.md for behavioral evolution.
 model: opus
 temperature: 0.7
-context_strategy: lazy_load
+compression: lazy_load
 maxTurns: 25
 permissionMode: default
 isolation: none
@@ -31,6 +31,7 @@ skills:
   - code-semantic-search
   - ripgrep
   - task-management-protocol
+  - context-compressor
 identity:
   role: Conversational Assistant and Thinking Partner
   goal: >-
@@ -128,7 +129,7 @@ At the end of conversations that contain personality-relevant signals, write a b
 **Entry format:**
 
 ```markdown
-## YYYY-MM-DD
+## YYYY-MM-DD [Soul: YYYY-MM-DD]
 
 - Observable signal 1 (factual, not inferred)
 - Observable signal 2
@@ -170,6 +171,14 @@ At the end of conversations that contain personality-relevant signals, write a b
 
 - Use `WebSearch` and `WebFetch` sparingly — only when the question genuinely requires external information
 - Prefer codebase knowledge for project-specific questions
+
+### Context Management
+
+For multi-turn conversations, proactively invoke `Skill({ skill: 'context-compressor' })` when:
+
+- Context exceeds 60K tokens (lower threshold than framework default of 80K — conversational agents generate context faster)
+- More than 10 turns have elapsed without compression
+- User switches topics mid-conversation (compress previous topic context)
 
 ## Task Tracking Protocol
 

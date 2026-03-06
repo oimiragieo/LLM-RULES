@@ -4,7 +4,7 @@ Session highlights and user interaction patterns. Used to evolve SOUL.md over ti
 
 Format per entry:
 
-- Date header: `## YYYY-MM-DD`
+- Date header: `## YYYY-MM-DD [Soul: YYYY-MM-DD]` (second date = soul.md version active during interaction)
 - Bullet points: one observable signal per line
 - Only record personality-relevant signals (corrections, preferences, reactions)
 - Maximum 5 bullet points per session entry
