@@ -33,7 +33,13 @@ const INJECTION_PATTERNS = [
  * Override with MEMORY_INJECTION_MAX_CHARS env var.
  * Default: 3600 chars (~900 tokens at 4 chars/token).
  */
-const MEMORY_INJECTION_MAX_CHARS = parseInt(process.env.MEMORY_INJECTION_MAX_CHARS || '3600', 10);
+const _parsedMemoryInjectionMaxChars = parseInt(
+  process.env.MEMORY_INJECTION_MAX_CHARS || '3600',
+  10
+);
+const MEMORY_INJECTION_MAX_CHARS = Number.isFinite(_parsedMemoryInjectionMaxChars)
+  ? _parsedMemoryInjectionMaxChars
+  : 3600;
 
 /**
  * Sanitize memory content by removing lines that match known prompt injection
