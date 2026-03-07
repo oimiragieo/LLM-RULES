@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-07T20:08:38.453Z",
+  "generatedAt": "2026-03-07T20:18:06.571Z",
   "metadata": {
-    "totalSkills": 268,
+    "totalSkills": 269,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-07T20:08:38.454Z",
+    "lastValidated": "2026-03-07T20:18:06.572Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7259,6 +7259,32 @@
       "priority": 3,
       "aliasOf": null
     },
+    "telegram-polling": {
+      "name": "telegram-polling",
+      "displayName": "Telegram Polling",
+      "category": "Other",
+      "domain": "other",
+      "description": "Poll Telegram Bot API for new messages and route them to appropriate agents. Implements Loop 6 of the heartbeat ecosystem with offset tracking, DM pairing security, retry handling, and multi-turn session support.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskList",
+        "Skill"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "telegram-polling"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "user-research": {
       "name": "user-research",
       "displayName": "User Research",
@@ -7469,6 +7495,7 @@
         "regulatory-compliance",
         "scheduled-tasks",
         "seo-optimization",
+        "telegram-polling",
         "user-research",
         "web-artifacts-builder"
       ],
@@ -7843,6 +7870,7 @@
         "regulatory-compliance",
         "scheduled-tasks",
         "seo-optimization",
+        "telegram-polling",
         "user-research",
         "web-artifacts-builder"
       ],
@@ -8201,6 +8229,7 @@
         "scheduled-tasks",
         "scientific-skills",
         "seo-optimization",
+        "telegram-polling",
         "user-research",
         "web-artifacts-builder"
       ],
@@ -8421,6 +8450,7 @@
         "regulatory-compliance",
         "scientific-skills",
         "seo-optimization",
+        "telegram-polling",
         "user-research",
         "web-artifacts-builder"
       ],
@@ -8754,7 +8784,8 @@
         "lsp-navigator",
         "marketing-content",
         "scheduled-tasks",
-        "scientific-skills"
+        "scientific-skills",
+        "telegram-polling"
       ],
       "Glob": [
         "tdd",
@@ -9029,6 +9060,7 @@
         "eval-harness-updater",
         "context-degradation",
         "regulatory-compliance",
+        "telegram-polling",
         "user-research"
       ],
       "AskUserQuestion": [
@@ -9091,12 +9123,14 @@
       "TaskCreate": [
         "task-management-protocol",
         "heartbeat",
-        "scheduled-tasks"
+        "scheduled-tasks",
+        "telegram-polling"
       ],
       "TaskList": [
         "task-management-protocol",
         "heartbeat",
-        "scheduled-tasks"
+        "scheduled-tasks",
+        "telegram-polling"
       ],
       "TaskGet": [
         "task-management-protocol"
@@ -9105,6 +9139,7 @@
         "task-management-protocol",
         "heartbeat",
         "scheduled-tasks",
+        "telegram-polling",
         "user-research"
       ],
       "mcp__Exa__web_search_exa": [
@@ -9311,6 +9346,7 @@
         "regulatory-compliance",
         "scheduled-tasks",
         "seo-optimization",
+        "telegram-polling",
         "user-research",
         "web-artifacts-builder"
       ],
@@ -10559,6 +10595,7 @@
         "regulatory-compliance",
         "scheduled-tasks",
         "seo-optimization",
+        "telegram-polling",
         "user-research",
         "web-artifacts-builder"
       ],
