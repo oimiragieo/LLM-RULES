@@ -129,15 +129,21 @@ This skill will be automatically activated via the Skill() tool.
 
 ### Steps for every `git commit`
 
-1. **Capture pre-commit HEAD**: Before running `git commit`, record current HEAD hash:
+1. **Lint and Format (BLOCKING)**: Pre-commit hooks will silently fail your commit if the code violates styling rules. Before staging tracking data:
+
+   ```bash
+   pnpm lint:fix && pnpm format
+   ```
+
+2. **Capture pre-commit HEAD**: Before running `git commit`, record current HEAD hash:
 
    ```bash
    PRE_COMMIT_HEAD=$(git rev-parse HEAD)
    ```
 
-2. **Run `git commit`**: Execute the commit command and capture output/stderr.
+3. **Run `git commit`**: Execute the commit command and capture output/stderr.
 
-3. **Verify HEAD changed**: After the commit command, compare HEAD again:
+4. **Verify HEAD changed**: After the commit command, compare HEAD again:
 
    ```bash
    POST_COMMIT_HEAD=$(git rev-parse HEAD)
@@ -150,13 +156,13 @@ This skill will be automatically activated via the Skill() tool.
    fi
    ```
 
-4. **If commit failed**: Read `git status` output and any stderr. Common blockers:
+5. **If commit failed**: Read `git status` output and any stderr. Common blockers:
    - ESLint errors (SEC-023 shell injection, max-lines 500 limit) — fix lint errors then re-stage and recommit
    - Pre-commit hook failures — read hook output and fix the violation
 
-5. **Include commit hash in TaskUpdate**: On success, include the commit hash in the completion metadata summary.
+6. **Include commit hash in TaskUpdate**: On success, include the commit hash in the completion metadata summary.
 
-6. **After `git push`**: Verify the push landed with:
+7. **After `git push`**: Verify the push landed with:
 
    ```bash
    git log --oneline -1

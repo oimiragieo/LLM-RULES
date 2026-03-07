@@ -16,6 +16,7 @@ tools:
     TaskCreate,
     TaskGet,
     Skill,
+    MemoryRecord,
   ]
 model: sonnet
 temperature: 0.4
@@ -28,6 +29,7 @@ skills:
   - ripgrep
   - token-saver-context-compression
   - verification-before-completion
+  - task-management-protocol
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

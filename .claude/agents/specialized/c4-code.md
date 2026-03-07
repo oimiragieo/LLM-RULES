@@ -22,6 +22,7 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
+  - MemoryRecord
 skills:
   - code-analyzer
   - code-semantic-search

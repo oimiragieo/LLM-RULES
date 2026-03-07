@@ -121,7 +121,7 @@ EPIC → Hierarchical + Consensus Voting (max 3 tiers + voting gate)
 | Fan-out/Fan-in      | `wave-executor` skill                                 | Parallel batch processing; EPIC-tier pipelines      |
 | Swarm               | `swarm-coordination` skill                            | Concurrent independent task execution               |
 | Consensus           | `consensus-voting` skill                              | High-stakes decisions; multi-reviewer agreement     |
-| Supervisor          | Built into `router.md`                                | Task routing to specialist agents                   |
+| Supervisor          | Built into `CLAUDE.md`                                | Task routing to specialist agents                   |
 
 **When in doubt, start with Conductor.** The master-orchestrator pattern drives sequential phases with explicit TaskUpdate coordination — the lowest-risk default for most MEDIUM/HIGH tasks.
 

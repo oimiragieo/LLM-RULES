@@ -24,6 +24,7 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
+  - MemoryRecord
 skills:
   - api-development-expert
   - code-semantic-search

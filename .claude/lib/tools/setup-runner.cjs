@@ -42,6 +42,7 @@ function checkDependency(dep) {
       encoding: 'utf-8',
       timeout: 5000,
       shell: false,
+      windowsHide: true,
     }).trim();
 
     const meetsMin = dep.minVersion ? _versionSatisfies(raw, dep.minVersion) : true;

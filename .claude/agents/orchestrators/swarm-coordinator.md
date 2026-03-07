@@ -18,6 +18,7 @@ tools:
   - TaskGet
   - TaskList
   - TaskUpdate
+  - MemoryRecord
 skills:
   - memory-search
   - consensus-voting

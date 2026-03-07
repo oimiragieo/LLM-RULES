@@ -325,23 +325,10 @@ function recordMemoryBlockChurn(projectRoot, memorySectionString) {
 }
 
 module.exports = {
-  OBSERVATIONS_FILE,
-  OBSERVATIONS_SUMMARY_FILE,
-  MEMORY_CACHE_STABILITY_FILE,
-  DEFAULT_OBSERVATION_DECAY_PER_HOUR,
-  DEFAULT_CONTRADICTION_MAX_AGE_DAYS,
-  MIN_CONTRADICTION_TOKEN_OVERLAP,
   appendObservation,
   readObservations,
   scoreObservations,
   getByTopic,
   compactObservationsToSummary,
   recordMemoryBlockChurn,
-  resolveObservationsPath,
-  resolveObservationsSummaryPath,
-  resolveMemoryCacheStabilityPath,
-  getObservationDecayPerHour,
-  isContradictionEnabled,
-  findContradictedObservation,
-  normalizeObservation,
 };

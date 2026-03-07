@@ -10,6 +10,8 @@
 
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
+const lockfile = require('proper-lockfile');
 const { spawn } = require('child_process');
 const { PROJECT_ROOT: _PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { assembleSpawnPrompt, assembleSpawnPromptAsync } = require('../spawn/prompt-assembler.cjs');
@@ -149,7 +151,7 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
             includeMemory: true,
           });
 
-    const resolvedTaskId = task_id || `task-${Date.now()}`;
+    const resolvedTaskId = task_id || `task-${crypto.randomUUID()}`;
     const useRealSpawn =
       String(process.env.TASK_TOOL_REAL_SPAWN || 'on')
         .trim()
@@ -201,7 +203,7 @@ async function Task({ subagent_type, description, prompt, allowed_tools = [], _m
     return {
       status: 'error',
       agent: subagent_type,
-      task_id: task_id || `task-${Date.now()}`,
+      task_id: task_id || `task-${crypto.randomUUID()}`,
       description,
       error: error.message,
     };
@@ -226,7 +228,8 @@ function loadTaskStore() {
   if (!storePath) return { tasks: [] };
   try {
     if (fs.existsSync(storePath)) {
-      return JSON.parse(fs.readFileSync(storePath, 'utf8'));
+      const raw = fs.readFileSync(storePath, 'utf8');
+      return JSON.parse(raw);
     }
   } catch (_e) {
     /* ignore */
@@ -237,11 +240,58 @@ function loadTaskStore() {
 function saveTaskStore(store) {
   const storePath = TASK_STORE_PATH;
   if (!storePath) return;
+  fs.writeFileSync(storePath, JSON.stringify(store, null, 2) + '\n', 'utf8');
+}
+
+/**
+ * Perform a read-modify-write on the task store under a file lock.
+ * The callback receives the current store and must return the modified store.
+ * This prevents TOCTOU races under concurrent TaskCreate / TaskUpdate calls.
+ *
+ * @param {function(Object): Object} fn - Receives store, returns modified store
+ * @returns {*} Return value of fn (the mutated store or derived value)
+ */
+function withTaskStoreLock(fn) {
+  const storePath = TASK_STORE_PATH;
+  if (!storePath) return fn({ tasks: [] });
+
+  let release = null;
   try {
     fs.mkdirSync(path.dirname(storePath), { recursive: true });
-    fs.writeFileSync(storePath, JSON.stringify(store, null, 2) + '\n', 'utf8');
+
+    // Ensure file exists before locking (lockfile requires the file to exist)
+    if (!fs.existsSync(storePath)) {
+      fs.writeFileSync(storePath, JSON.stringify({ tasks: [] }), 'utf8');
+    }
+
+    try {
+      release = lockfile.lockSync(storePath);
+    } catch (lockErr) {
+      console.warn(`[TaskStore] Failed to acquire lock: ${lockErr.message}`);
+    }
+
+    // Read inside the lock so we get the authoritative current state
+    let store = { tasks: [] };
+    try {
+      const raw = fs.readFileSync(storePath, 'utf8');
+      store = JSON.parse(raw);
+    } catch (_e) {
+      /* start fresh if unreadable */
+    }
+
+    const result = fn(store);
+    saveTaskStore(store);
+    return result;
   } catch (_e) {
     /* ignore */
+  } finally {
+    if (release) {
+      try {
+        release();
+      } catch (_e) {
+        /* ignore */
+      }
+    }
   }
 }
 
@@ -252,7 +302,7 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
   process.stderr.write(`[TaskCreate] Creating task: ${subject}\n`);
 
   const task = {
-    id: `task-${Date.now()}`,
+    id: `task-${crypto.randomUUID()}`,
     subject,
     description,
     priority,
@@ -260,9 +310,9 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
     created_at: new Date().toISOString(),
   };
 
-  const store = loadTaskStore();
-  store.tasks.push(task);
-  saveTaskStore(store);
+  withTaskStoreLock(store => {
+    store.tasks.push(task);
+  });
 
   return task;
 }
@@ -273,16 +323,16 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
 async function TaskUpdate({ taskId, status, metadata = {} }) {
   process.stderr.write(`[TaskUpdate] Updating task ${taskId} to status: ${status}\n`);
 
-  const store = loadTaskStore();
-  const task = store.tasks.find(t => t.id === taskId);
-  if (task) {
-    if (status !== undefined) task.status = status;
-    if (metadata && Object.keys(metadata).length > 0) {
-      task.metadata = { ...(task.metadata || {}), ...metadata };
+  withTaskStoreLock(store => {
+    const task = store.tasks.find(t => t.id === taskId);
+    if (task) {
+      if (status !== undefined) task.status = status;
+      if (metadata && Object.keys(metadata).length > 0) {
+        task.metadata = { ...(task.metadata || {}), ...metadata };
+      }
+      task.updated_at = new Date().toISOString();
     }
-    task.updated_at = new Date().toISOString();
-    saveTaskStore(store);
-  }
+  });
 
   return { task_id: taskId, status, metadata, updated_at: new Date().toISOString() };
 }

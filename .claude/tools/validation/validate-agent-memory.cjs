@@ -53,10 +53,10 @@ function parseFrontmatter(text) {
 }
 
 function extractSection8(text) {
-  const start = text.search(/^##\s*8\)/m);
+  const start = text.search(/^##.*?\(Section 8\)/m);
   if (start === -1) return '';
   const rest = text.slice(start);
-  const nextHeaderOffset = rest.slice(1).search(/^##\s*\d+\)/m);
+  const nextHeaderOffset = rest.slice(1).search(/^## /m);
   const nextHeader = nextHeaderOffset === -1 ? -1 : nextHeaderOffset + 1;
   if (nextHeader === -1) return rest;
   return rest.slice(0, nextHeader);

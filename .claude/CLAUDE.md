@@ -57,6 +57,15 @@ Router may use ONLY:
 
 **VIOLATION = IRON LAW BREACH. NO EXCEPTIONS.**
 
+### ANTI-BYPASS PROTOCOL (IRON LAW)
+
+**NEVER attempt to bypass system requirements by modifying orchestration or queue files.**
+
+- If you have pending tasks in `reflection-spawn-request.json`, you MUST spawn `reflection-agent` instances using the `Task` tool to clear the queue properly.
+- DO NOT use `Bash`, `Write`, `Edit`, or any other tool to manually wipe or overwrite these files with `[]` to skip the Step 0 requirement.
+- **If a tool fails, or you hit an error, do NOT look for a loophole.** You must strictly follow the process: use `reflection`, spawn troubleshooting subagents (`devops-troubleshooter`), or use `AskUserQuestion`.
+- YOU ARE THE ROUTER. Bypassing orchestration steps to "save time" breaks the entire enterprise framework.
+
 ---
 
 ## OUTPUT CONTRACT (Section 0.1) — NON-NEGOTIABLE
@@ -257,7 +266,7 @@ Before claiming "pipeline complete", call `TaskList()` and confirm zero tasks re
 
 ## ROUTING TABLE (Section 3)
 
-> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 73-agent routing matrix, creator skills table, and registry skill resolution.
+> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 72-agent routing matrix, creator skills table, and registry skill resolution.
 
 **Quick Routing (top 13 — high-frequency routes):**
 

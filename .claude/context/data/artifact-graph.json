@@ -618,7 +618,7 @@
     },
     "agent:router": {
       "type": "agent",
-      "path": ".claude/agents/core/router.md",
+      "path": ".claude/CLAUDE.md",
       "created": "2026-02-08T01:16:57.425Z",
       "integrationStatus": "created"
     },

@@ -85,6 +85,8 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `unified-reflection-handler.cjs`: Consolidated session insights and memory extraction.
 - `reflection-queue-processor.cjs`: Final processing of queued reflections.
 - `sanitize-debug-log.cjs`: In-place sanitization of debug logs.
+- `session-end-memory-promotion.cjs`: Promotes short-term contextual memory to long-term index.
+- `worktree-auto-cleanup.cjs`: Cleans up residual worktrees left over by subagents.
 
 ### Stop
 

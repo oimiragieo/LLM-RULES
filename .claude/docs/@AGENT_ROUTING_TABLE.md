@@ -104,7 +104,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | Party mode orchestration             | `party-orchestrator`         | `.claude/agents/orchestrators/party-orchestrator.md`     |
 | Self-evolution                       | `evolution-orchestrator`     | `.claude/agents/orchestrators/evolution-orchestrator.md` |
 | Context compression                  | `context-compressor`         | `.claude/agents/core/context-compressor.md`              |
-| System routing                       | `router`                     | `.claude/agents/core/router.md` (Meta)                   |
+| System routing                       | `router`                     | `.claude/CLAUDE.md` (Meta)                               |
 
 **Agent Categories:**
 

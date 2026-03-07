@@ -146,4 +146,4 @@ These fields trigger the memory extraction pipeline. Without them, your work is 
 ## Related
 
 - Orchestrator template: `.claude/templates/spawn/orchestrator-spawn.md`
-- Router policy: `.claude/agents/core/router.md`
+- Router policy: `.claude/CLAUDE.md`

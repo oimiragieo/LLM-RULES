@@ -564,14 +564,6 @@ function isSecuritySpawned() {
   return getState().securitySpawned;
 }
 
-/**
- * Check if architect has been spawned
- * @returns {boolean} True if ARCHITECT agent was spawned
- */
-function isArchitectSpawned() {
-  return getState().architectSpawned === true;
-}
-
 // ==========================================
 // TaskUpdate Tracking Functions
 // ==========================================
@@ -734,6 +726,7 @@ function updateState(updates) {
 // Export functions
 module.exports = {
   // Existing exports
+  getStateFilePath,
   getState,
   updateState,
   resetToRouterMode,
@@ -742,8 +735,6 @@ module.exports = {
   isInAgentContext,
   checkWriteAllowed,
   getEnforcementMode,
-  STATE_FILE: getStateFilePath(),
-  getStateFilePath,
   PROJECT_ROOT,
   // Complexity tracking - setters
   setComplexity,
@@ -757,7 +748,6 @@ module.exports = {
   isPlannerSpawned,
   isSecurityRequired,
   isSecuritySpawned,
-  isArchitectSpawned,
   // TaskUpdate tracking
   recordTaskUpdate,
   wasTaskUpdateCalledRecently,
@@ -772,8 +762,6 @@ module.exports = {
   setCurrentSpawnTaskId,
   getCurrentSpawnTaskId,
   clearCurrentSpawnTaskId,
-  // Constants
-  VALID_COMPLEXITY_LEVELS,
   // Optimistic concurrency
   saveStateWithRetry,
   MAX_RETRIES,

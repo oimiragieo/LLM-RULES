@@ -36,6 +36,26 @@ const registry = loadJSON('.claude/context/agent-registry.json');
 const skillMatrix = loadJSON('.claude/context/config/agent-skill-matrix.json');
 const skillIndex = loadJSON('.claude/config/skill-index.json');
 
+// Parse frontmatter skills from agent .md files (source of truth, not capped like registry)
+function parseFrontmatterSkills(agentId) {
+  const agentDirs = ['core', 'domain', 'specialized', 'orchestrators'];
+  for (const dir of agentDirs) {
+    const fp = path.join(PROJECT_ROOT, '.claude', 'agents', dir, `${agentId}.md`);
+    if (fs.existsSync(fp)) {
+      const content = fs.readFileSync(fp, 'utf8');
+      const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+      if (!fmMatch) return [];
+      const fm = fmMatch[1];
+      const skillsMatch = fm.match(/^skills:\n((?:\s+-\s+.+\n?)*)/m);
+      if (!skillsMatch) return [];
+      return (
+        skillsMatch[1].match(/^\s+-\s+(.+)$/gm)?.map(l => l.replace(/^\s+-\s+/, '').trim()) || []
+      );
+    }
+  }
+  return [];
+}
+
 const SEARCH_SKILLS = ['ripgrep', 'code-semantic-search', 'code-structural-search'];
 
 const BASELINE_SKILLS = [
@@ -73,41 +93,35 @@ describe('Agent Search Compliance', () => {
     });
   });
 
-  describe('Search skills in registry', () => {
+  describe('Search skills in frontmatter', () => {
     for (const agentId of nonRouterAgents) {
-      it(`${agentId}: has all 3 search skills in registry`, () => {
+      it(`${agentId}: has all 3 search skills in frontmatter`, () => {
         const agent = registry.agents[agentId];
         assert.ok(agent, `Agent ${agentId} not found in registry`);
-        const caps = agent.capabilities || [];
-        const allSkills = [];
-        for (const cap of caps) {
-          if (cap.skills) allSkills.push(...cap.skills);
-        }
+        // Use frontmatter (source of truth) — registry caps at 50 skills
+        const allSkills = parseFrontmatterSkills(agentId);
         const missing = SEARCH_SKILLS.filter(s => !allSkills.includes(s));
         assert.deepStrictEqual(
           missing,
           [],
-          `Agent ${agentId} missing search skills in registry: ${missing.join(', ')}`
+          `Agent ${agentId} missing search skills in frontmatter: ${missing.join(', ')}`
         );
       });
     }
   });
 
-  describe('Baseline skills in registry', () => {
+  describe('Baseline skills in frontmatter', () => {
     for (const agentId of nonRouterAgents) {
-      it(`${agentId}: has baseline skills in registry`, () => {
+      it(`${agentId}: has baseline skills in frontmatter`, () => {
         const agent = registry.agents[agentId];
         assert.ok(agent, `Agent ${agentId} not found in registry`);
-        const caps = agent.capabilities || [];
-        const allSkills = [];
-        for (const cap of caps) {
-          if (cap.skills) allSkills.push(...cap.skills);
-        }
+        // Use frontmatter (source of truth) — registry caps at 50 skills
+        const allSkills = parseFrontmatterSkills(agentId);
         const missing = BASELINE_SKILLS.filter(s => !allSkills.includes(s));
         assert.deepStrictEqual(
           missing,
           [],
-          `Agent ${agentId} missing baseline skills in registry: ${missing.join(', ')}`
+          `Agent ${agentId} missing baseline skills in frontmatter: ${missing.join(', ')}`
         );
       });
     }
@@ -206,7 +220,7 @@ describe('Agent Search Compliance', () => {
   });
 
   describe('Registry-matrix consistency for search skills', () => {
-    it('every matrix agent with search in "always" also has them in registry', () => {
+    it('every matrix agent with search in "always" also has them in frontmatter', () => {
       const failures = [];
       for (const category of Object.keys(skillMatrix.agents)) {
         const agents = skillMatrix.agents[category];
@@ -218,19 +232,16 @@ describe('Agent Search Compliance', () => {
           const hasSearchInMatrix = SEARCH_SKILLS.every(s => always.includes(s));
           if (!hasSearchInMatrix) continue;
 
-          const regAgent = registry.agents[agentId];
-          if (!regAgent) {
-            failures.push(`${agentId}: in matrix but not in registry`);
+          // Use frontmatter as source of truth (registry caps at 50 skills)
+          const fmSkills = parseFrontmatterSkills(agentId);
+          if (fmSkills.length === 0) {
+            failures.push(`${agentId}: in matrix but no frontmatter found`);
             continue;
           }
-          const regSkills = [];
-          for (const cap of regAgent.capabilities || []) {
-            if (cap.skills) regSkills.push(...cap.skills);
-          }
-          const missingInReg = SEARCH_SKILLS.filter(s => !regSkills.includes(s));
-          if (missingInReg.length > 0) {
+          const missingInFm = SEARCH_SKILLS.filter(s => !fmSkills.includes(s));
+          if (missingInFm.length > 0) {
             failures.push(
-              `${agentId}: matrix has search in always, registry missing: ${missingInReg.join(', ')}`
+              `${agentId}: matrix has search in always, frontmatter missing: ${missingInFm.join(', ')}`
             );
           }
         }
@@ -238,7 +249,7 @@ describe('Agent Search Compliance', () => {
       assert.deepStrictEqual(
         failures,
         [],
-        `Registry-matrix inconsistencies:\n${failures.join('\n')}`
+        `Matrix-frontmatter inconsistencies:\n${failures.join('\n')}`
       );
     });
   });

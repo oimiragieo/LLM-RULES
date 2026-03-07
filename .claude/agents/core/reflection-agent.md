@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-06T14:41:46.943Z
+lastVerifiedAt: 2026-03-07T08:01:57.842Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -27,6 +27,7 @@ tools:
   - TaskUpdate
   - Write
 skills:
+  - code-analyzer
   - code-semantic-search
   - code-structural-search
   - lsp-navigator

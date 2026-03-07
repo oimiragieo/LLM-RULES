@@ -24,6 +24,7 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
+  - MemoryRecord
 skills:
   - ai-ml-expert
   - code-semantic-search

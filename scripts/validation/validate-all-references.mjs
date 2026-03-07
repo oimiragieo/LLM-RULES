@@ -218,7 +218,7 @@ function validateConfigYAML() {
   // Validate agent routing
   if (config.agent_routing) {
     Object.keys(config.agent_routing).forEach(agentName => {
-      if (agentName === 'sdk') return; // Skip SDK directory
+      if (agentName === 'sdk' || agentName === 'router') return; // Skip SDK directory and router
       const configuredPath = config?.agents?.[agentName]?.path;
       if (configuredPath) {
         if (!existsSync(resolve(rootDir, configuredPath))) {

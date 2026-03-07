@@ -34,7 +34,7 @@ const preTaskUnified = require('../../.claude/hooks/routing/pre-task-unified.cjs
 process.exit = originalExit;
 
 // Test helpers
-const ROUTER_STATE_FILE = routerState.STATE_FILE;
+const ROUTER_STATE_FILE = routerState.getStateFilePath();
 const LOOP_STATE_FILE = preTaskUnified.LOOP_STATE_FILE;
 const TASKLIST_LOOP_STATE_FILE = path.join(
   PROJECT_ROOT,
@@ -404,6 +404,8 @@ describe('pre-task-unified.cjs', () => {
   describe('runAllChecks', () => {
     it('should run all 3 checks in order', async () => {
       process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
+      process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
+      process.env.NESTED_WORKTREE_ENFORCEMENT = 'off';
 
       // Set up clean state
       writeState(ROUTER_STATE_FILE, {
@@ -428,6 +430,7 @@ describe('pre-task-unified.cjs', () => {
       };
 
       const result = await preTaskUnified.runAllChecks(input);
+      if (!result.pass) console.log('DEBUG MSG:', result.message);
       assert.strictEqual(result.pass, true);
 
       const loopState = readState(LOOP_STATE_FILE);

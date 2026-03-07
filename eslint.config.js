@@ -113,6 +113,7 @@ export default [
       '.claude.archive/', // Archived legacy code
       '.claude.old/', // Archived legacy code
       '.claude/worktrees/**', // Isolated worktree directories
+      '.claude/context/tmp/**', // Temporary scripts, not production code
     ],
   },
 

@@ -1291,7 +1291,7 @@ These rules are INVIOLABLE. Breaking them causes silent failures.
 
 7. NO CREATION WITHOUT SYSTEM IMPACT ANALYSIS
    - Update @AGENT_ROUTING_TABLE.md routing table (MANDATORY)
-   - Update router.md agent tables (MANDATORY)
+   - Update CLAUDE.md agent tables (MANDATORY)
    - Populate Enforcement Hooks section from @HOOK_AGENT_MAP.md (MANDATORY)
    - Populate Related Workflows section from @WORKFLOW_AGENT_MAP.md (MANDATORY)
    - Check if new workflows are needed
@@ -1344,7 +1344,7 @@ Run this analysis after every agent creation:
    - Choose appropriate request type keywords
 
 2. ROUTER AGENT UPDATE (MANDATORY)
-   - Update router.md Core/Specialized/Domain agent tables
+   - Update CLAUDE.md Core/Specialized/Domain agent tables
    - Add to Planning Orchestration Matrix if applicable
    - Add example spawn pattern if complex
 
@@ -1371,7 +1371,6 @@ If category is `orchestrators`, you MUST also update and verify all of the follo
 - `.claude/CLAUDE.md`
 - `.claude/workflows/core/router-decision.md`
 - `.claude/workflows/core/ecosystem-creation-workflow.md`
-- `.claude/agents/core/router.md`
 
 Do not mark orchestrator creation complete until all four files reflect the new/updated orchestrator behavior.
 
@@ -1387,7 +1386,7 @@ Do not mark orchestrator creation complete until all four files reflect the new/
    | Documentation, docs | technical-writer | .claude/agents/core/technical-writer.md |
 
 2. ROUTER AGENT UPDATE
-   Added to router.md Core Agents table
+   Added to CLAUDE.md Core Agents table
    Added to Planning Orchestration Matrix:
    | Documentation (new/update) | technical-writer | - | Single |
 
@@ -1409,14 +1408,14 @@ Do not mark orchestrator creation complete until all four files reflect the new/
 # Add to @AGENT_ROUTING_TABLE.md routing table (edit manually)
 # Look for the relevant agent category section
 
-# Update router.md agent tables (edit manually)
+# Update CLAUDE.md agent tables (edit manually)
 # Look for "Core Agents:" or "Specialized Agents:" sections
 
 # Verify routing table entry exists
 grep "<agent-name>" .claude/docs/@AGENT_ROUTING_TABLE.md || echo "ERROR: Not in routing table!"
 
-# Verify router.md entry exists
-grep "<agent-name>" .claude/agents/core/router.md || echo "ERROR: Not in router!"
+# Verify CLAUDE.md entry exists
+grep "<agent-name>" .claude/CLAUDE.md || echo "ERROR: Not in CLAUDE.md!"
 
 # Full validation
 node .claude/tools/cli/validate-agents.mjs

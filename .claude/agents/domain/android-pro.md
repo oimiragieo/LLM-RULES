@@ -24,6 +24,7 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
+  - MemoryRecord
 skills:
   - android-expert
   - code-semantic-search

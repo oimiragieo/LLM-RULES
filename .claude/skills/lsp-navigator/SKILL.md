@@ -1,13 +1,13 @@
 ---
 name: lsp-navigator
 description: Compiler-level code intelligence via native LSP — definitions, references, types, call hierarchies, and diagnostics.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Bash]
 verified: true
-lastVerifiedAt: '2026-03-06'
+lastVerifiedAt: '2026-03-07'
 dependencies: []
 agents:
   - developer
@@ -20,6 +20,14 @@ agents:
   - frontend-pro
   - nextjs-pro
   - advanced-debugging
+  - reflection-agent
+  - golang-pro
+  - java-pro
+  - python-pro
+  - rust-pro
+  - devops-troubleshooter
+  - penetration-tester
+  - security-architect
 category: 'Code Intelligence'
 tags:
   [

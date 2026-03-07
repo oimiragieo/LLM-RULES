@@ -17,13 +17,7 @@ const SUBDIRS = ['core', 'domain', 'specialized', 'orchestrators'];
 const ROUTER_FILE = 'router.md';
 
 // Core agents that MUST have MemoryRecord
-const CORE_MEMORY_AGENTS = new Set([
-  'developer',
-  'planner',
-  'architect',
-  'qa',
-  'reflection-agent',
-]);
+const CORE_MEMORY_AGENTS = new Set(['developer', 'planner', 'architect', 'qa', 'reflection-agent']);
 
 // Heavy-context agents that should have token-saver-context-compression
 const HEAVY_CONTEXT_AGENTS = new Set([
@@ -65,7 +59,9 @@ function parseAgentFile(filePath) {
   const tools = extractList(frontmatter, 'tools');
   const skills = extractList(frontmatter, 'skills');
   const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
-  const name = nameMatch ? nameMatch[1].trim().replace(/['"]/g, '') : path.basename(filePath, '.md');
+  const name = nameMatch
+    ? nameMatch[1].trim().replace(/['"]/g, '')
+    : path.basename(filePath, '.md');
 
   return { frontmatter, body, content, tools, skills, name };
 }
@@ -106,7 +102,12 @@ function extractList(fm, fieldName) {
           items.push(
             ...beforeBracket
               .split(',')
-              .map(s => s.trim().replace(/['"]/g, '').replace(/^\s*-\s*/, ''))
+              .map(s =>
+                s
+                  .trim()
+                  .replace(/['"]/g, '')
+                  .replace(/^\s*-\s*/, '')
+              )
               .filter(Boolean)
           );
         }
@@ -189,7 +190,9 @@ describe('Agent Tool Compliance', () => {
         );
 
         if (!hasPreferredSkill) {
-          violations.push(`${agent.subdir}/${agent.filename} has Grep/Glob but no preferred search skill`);
+          violations.push(
+            `${agent.subdir}/${agent.filename} has Grep/Glob but no preferred search skill`
+          );
         }
       }
 
@@ -223,7 +226,9 @@ describe('Agent Tool Compliance', () => {
         const hasFallbackPattern = fallbackPatterns.some(p => p.test(agent.body));
 
         if (hasPrimaryPattern && !hasFallbackPattern) {
-          violations.push(`${agent.subdir}/${agent.filename} positions Grep as primary search tool`);
+          violations.push(
+            `${agent.subdir}/${agent.filename} positions Grep as primary search tool`
+          );
         }
       }
 
@@ -242,7 +247,9 @@ describe('Agent Tool Compliance', () => {
       for (const agent of agents) {
         if (!HEAVY_CONTEXT_AGENTS.has(agent.name)) continue;
         if (!agent.skills.includes('token-saver-context-compression')) {
-          violations.push(`${agent.subdir}/${agent.filename} (${agent.name}) missing token-saver-context-compression`);
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing token-saver-context-compression`
+          );
         }
       }
 
@@ -261,7 +268,9 @@ describe('Agent Tool Compliance', () => {
       for (const agent of agents) {
         if (!CORE_MEMORY_AGENTS.has(agent.name)) continue;
         if (!agent.tools.includes('MemoryRecord')) {
-          violations.push(`${agent.subdir}/${agent.filename} (${agent.name}) missing MemoryRecord in tools`);
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing MemoryRecord in tools`
+          );
         }
       }
 
@@ -281,7 +290,9 @@ describe('Agent Tool Compliance', () => {
         // Skip agents without any skills frontmatter
         if (agent.skills.length === 0) continue;
         if (!agent.skills.includes('ripgrep')) {
-          violations.push(`${agent.subdir}/${agent.filename} (${agent.name}) missing ripgrep in skills`);
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing ripgrep in skills`
+          );
         }
       }
 
@@ -306,7 +317,9 @@ describe('Agent Tool Compliance', () => {
       const violations = [];
       for (const agent of agents) {
         if (!matrixAgentNames.has(agent.name)) {
-          violations.push(`${agent.subdir}/${agent.filename} (${agent.name}) not in agent-skill-matrix.json`);
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) not in agent-skill-matrix.json`
+          );
         }
       }
 
@@ -314,6 +327,141 @@ describe('Agent Tool Compliance', () => {
         violations.length,
         0,
         `Agents missing from skill matrix:\n  ${violations.join('\n  ')}`
+      );
+    });
+  });
+
+  describe('7. MemoryRecord: all non-orchestrator agents should have MemoryRecord in tools', () => {
+    it('non-orchestrator agents with a tools array must include MemoryRecord', () => {
+      const violations = [];
+      for (const agent of agents) {
+        if (agent.subdir === 'orchestrators') continue;
+        if (agent.tools.length === 0) continue;
+        if (!agent.tools.includes('MemoryRecord')) {
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing MemoryRecord in tools`
+          );
+        }
+      }
+      assert.strictEqual(
+        violations.length,
+        0,
+        `Non-orchestrator agents missing MemoryRecord:\n  ${violations.join('\n  ')}`
+      );
+    });
+  });
+
+  describe('8. Search Protocol section: non-exempt agents need ## Search Protocol in body', () => {
+    it('non-orchestrator, non-router agents should have a ## Search Protocol section', () => {
+      const violations = [];
+      for (const agent of agents) {
+        if (agent.subdir === 'orchestrators') continue;
+        if (!agent.body.includes('## Search Protocol')) {
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing ## Search Protocol section`
+          );
+        }
+      }
+      assert.strictEqual(
+        violations.length,
+        0,
+        `Agents missing ## Search Protocol section:\n  ${violations.join('\n  ')}`
+      );
+    });
+  });
+
+  describe('9. pnpm search:code reference: non-exempt agents must reference pnpm search:code', () => {
+    it('non-orchestrator agents should mention pnpm search:code in body', () => {
+      const violations = [];
+      for (const agent of agents) {
+        if (agent.subdir === 'orchestrators') continue;
+        if (!agent.body.includes('pnpm search:code')) {
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing pnpm search:code reference`
+          );
+        }
+      }
+      assert.strictEqual(
+        violations.length,
+        0,
+        `Agents missing pnpm search:code reference:\n  ${violations.join('\n  ')}`
+      );
+    });
+  });
+
+  describe('10. Grep fallback context: agents mentioning Grep should include fallback context', () => {
+    it('agents with Grep in body should pair it with fallback context', () => {
+      const violations = [];
+      for (const agent of agents) {
+        if (!agent.body.includes('Grep')) continue;
+        const hasFallback = /fallback|FALLBACK/.test(agent.body);
+        if (!hasFallback) {
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) mentions Grep without fallback context`
+          );
+        }
+      }
+      assert.strictEqual(
+        violations.length,
+        0,
+        `Agents mentioning Grep without fallback context:\n  ${violations.join('\n  ')}`
+      );
+    });
+  });
+
+  describe('11. token-saver-context-compression: all agents should have this skill', () => {
+    it('all agents should list token-saver-context-compression in frontmatter skills', () => {
+      const violations = [];
+      for (const agent of agents) {
+        if (agent.skills.length === 0) continue;
+        if (!agent.skills.includes('token-saver-context-compression')) {
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing token-saver-context-compression`
+          );
+        }
+      }
+      assert.strictEqual(
+        violations.length,
+        0,
+        `Agents missing token-saver-context-compression:\n  ${violations.join('\n  ')}`
+      );
+    });
+  });
+
+  describe('12. memory-search skill: all agents should have memory-search in frontmatter', () => {
+    it('all agents with skills should include memory-search', () => {
+      const violations = [];
+      for (const agent of agents) {
+        if (agent.skills.length === 0) continue;
+        if (!agent.skills.includes('memory-search')) {
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing memory-search skill`
+          );
+        }
+      }
+      assert.strictEqual(
+        violations.length,
+        0,
+        `Agents missing memory-search skill:\n  ${violations.join('\n  ')}`
+      );
+    });
+  });
+
+  describe('13. Skill() invocation: non-exempt agents should reference Skill({ in body', () => {
+    it('non-orchestrator, non-router agents should mention Skill({ invocation pattern', () => {
+      const violations = [];
+      for (const agent of agents) {
+        if (agent.subdir === 'orchestrators') continue;
+        if (!agent.body.includes('Skill({')) {
+          violations.push(
+            `${agent.subdir}/${agent.filename} (${agent.name}) missing Skill({ invocation pattern`
+          );
+        }
+      }
+      assert.strictEqual(
+        violations.length,
+        0,
+        `Agents missing Skill({ invocation pattern:\n  ${violations.join('\n  ')}`
       );
     });
   });

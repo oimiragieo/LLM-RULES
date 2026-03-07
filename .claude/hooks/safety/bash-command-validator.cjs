@@ -257,6 +257,40 @@ function detectSearchBypassPattern(command) {
 }
 
 /**
+ * Detect bash modifications to reflection queue files to prevent the LLM from
+ * bypassing mandatory Step 0 processing by simply wiping the queue files.
+ *
+ * @param {string} command - Raw shell command
+ * @returns {string|null} Blocking reason or null when safe
+ */
+function detectReflectionBypass(command) {
+  if (!command || typeof command !== 'string') return null;
+
+  const artifactPathPattern =
+    /\.claude[\\/]+context[\\/]+runtime[\\/]+reflection-(spawn-request\.json|reminder\.txt)/i;
+  if (!artifactPathPattern.test(command)) return null;
+
+  const writesViaRedirection =
+    /(?:>>?|1>>?)\s*['"]?[^'"\s]*\.claude[\\/]+context[\\/]+runtime[\\/]+reflection-/i.test(
+      command
+    );
+  const writesViaTee = /\btee\b[\s\S]*\.claude[\\/]+context[\\/]+runtime[\\/]+reflection-/i.test(
+    command
+  );
+  const modifiesViaFileOps =
+    /\b(?:cp|mv|touch|rm|del|echo|printf)\b[\s\S]*\.claude[\\/]+context[\\/]+runtime[\\/]+reflection-/i.test(
+      command
+    );
+
+  if (!writesViaRedirection && !writesViaTee && !modifiesViaFileOps) return null;
+
+  return (
+    'BLOCKED: Direct modification of reflection queue files via Bash is prohibited. ' +
+    'You MUST process the queue using the Task tool to spawn reflection-agents, which will automatically clear the queue upon completion.'
+  );
+}
+
+/**
  * Extract the bash command from hook input.
  *
  * @param {object} hookInput - The parsed hook context
@@ -387,6 +421,19 @@ async function main() {
       process.exit(2);
     }
 
+    const reflectionBypassReason = detectReflectionBypass(command);
+    if (reflectionBypassReason) {
+      if (isBypassPermissionsMode(hookInput)) {
+        console.error(
+          `[BASH-COMMAND-VALIDATOR][warn] ${reflectionBypassReason} (allowed in bypassPermissions mode)`
+        );
+        process.exit(0);
+      }
+      emitBashBlockVerdict(command, reflectionBypassReason);
+      console.error(formatBlockedMessage(command, reflectionBypassReason));
+      process.exit(2);
+    }
+
     // Validate the command using the registry
     const result = validateCommand(command);
 
@@ -461,6 +508,7 @@ module.exports = {
   detectBashReportWrite,
   detectBrittleCrossShellCount,
   detectSearchBypassPattern,
+  detectReflectionBypass,
   isBypassPermissionsMode,
   parseHookInput: parseHookInputAsync,
 };

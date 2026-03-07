@@ -24,6 +24,7 @@ tools:
   - TaskCreate
   - TaskGet
   - Skill
+  - MemoryRecord
 skills:
   - advanced-elicitation
   - code-semantic-search

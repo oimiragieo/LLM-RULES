@@ -278,9 +278,15 @@ function createActions(ctx) {
     if (content.includes(`'${name}':`)) return;
 
     const entry = `  '${name}': '${name}',`;
+    // Find the end of module.exports = { INTENT_TO_AGENT ... }; block correctly or the INTENT_TO_AGENT object itself
     const insertionPoint = content.lastIndexOf('};');
     if (insertionPoint !== -1) {
-      content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+      // If we're hitting the module.exports = { ... }; instead of the INTENT_TO_AGENT object end, we need to be careful.
+      // Easiest is to replace the end of INTENT_TO_AGENT
+      content = content.replace(
+        /};\s*module\.exports = { INTENT_TO_AGENT };/,
+        `${entry}\n};\n\nmodule.exports = { INTENT_TO_AGENT };`
+      );
       fs.writeFileSync(filePath, content, 'utf8');
     }
   }

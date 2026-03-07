@@ -25,6 +25,7 @@ tools:
     TaskCreate,
     TaskGet,
     Skill,
+    MemoryRecord,
   ]
 skills:
   - code-semantic-search
@@ -33,6 +34,7 @@ skills:
   - ripgrep
   - token-saver-context-compression
   - verification-before-completion
+  - task-management-protocol
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

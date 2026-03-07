@@ -26,6 +26,7 @@ tools:
   - TaskGet
   - TaskOutput
   - Skill
+  - MemoryRecord
 skills:
   - api-development-expert
   - architecture-review

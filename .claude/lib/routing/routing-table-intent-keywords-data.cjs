@@ -612,6 +612,17 @@ const INTENT_KEYWORDS = {
     'style guide compliance',
     'visual identity',
   ],
+  'qa-guardian': ['qa-guardian', 'qa', 'guardian', 'quality', 'gate', 'agent'],
+  'contract-check': ['contract-check', 'contract', 'check', 'agent'],
+  'bool-action': ['bool-action', 'bool', 'action', 'boolean', 'mode'],
+  'repo-onboarder': [
+    'repo-onboarder',
+    'repo',
+    'onboarder',
+    'repository',
+    'integration',
+    'orchestrator',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

@@ -141,7 +141,7 @@ This directory contains all agent definitions. Each agent is a markdown file wit
 │   ├── pm.md             # Product management
 │   ├── reflection-agent.md # Quality reflection
 │   ├── context-compressor.md # Context summarization
-│   └── router.md         # Request routing (meta-agent)
+│   └── CLAUDE.md         # Request routing (meta-agent)
 │
 ├── domain/               # Language/framework experts
 │   ├── python-pro.md

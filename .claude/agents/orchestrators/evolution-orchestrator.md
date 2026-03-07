@@ -26,6 +26,7 @@ tools:
   - Skill
   - WebSearch
   - WebFetch
+  - MemoryRecord
 skills:
   - memory-search
   - agent-creator

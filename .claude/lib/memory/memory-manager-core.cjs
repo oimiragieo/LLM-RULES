@@ -123,18 +123,6 @@ const reporting = createReportingOps({
   getMemoryDir,
 });
 
-function getCurrentSessionNumber(memoryDir) {
-  const sessionsDir = path.join(memoryDir, 'sessions');
-  ensureDir(sessionsDir);
-  const files = fs
-    .readdirSync(sessionsDir)
-    .filter(f => f.match(/^session_\d{3}\.json$/))
-    .sort();
-  if (files.length === 0) return 1;
-  const match = files[files.length - 1].match(/session_(\d{3})\.json/);
-  return match ? parseInt(match[1], 10) + 1 : 1;
-}
-
 function checkAndArchiveLearnings(projectRoot = PROJECT_ROOT) {
   const memoryDir = getMemoryDir(projectRoot);
   const learningsPath = path.join(memoryDir, 'learnings.md');
@@ -187,18 +175,6 @@ function checkAndArchiveLearnings(projectRoot = PROJECT_ROOT) {
     logger.info(`Archived ${result.archivedBytes} bytes`, { archivePath: result.archivePath });
   }
   return result;
-}
-
-function _pruneOldSessions(sessionsDir) {
-  const files = fs
-    .readdirSync(sessionsDir)
-    .filter(f => f.match(/^session_\d{3}\.json$/))
-    .sort();
-  if (files.length > CONFIG.MAX_SESSIONS) {
-    for (const file of files.slice(0, files.length - CONFIG.MAX_SESSIONS)) {
-      fs.unlinkSync(path.join(sessionsDir, file));
-    }
-  }
 }
 
 function _sanitizeMapField(fieldValue, fieldName, entryPath) {
@@ -378,14 +354,6 @@ async function atomicWriteAsync(filePath, data) {
   }
 }
 
-async function ensureDirAsync(dirPath) {
-  try {
-    await fsp.mkdir(dirPath, { recursive: true });
-  } catch (err) {
-    if (err.code !== 'EEXIST') throw err;
-  }
-}
-
 async function recordGotchaAsync(gotcha, projectRoot = PROJECT_ROOT) {
   return recording.recordGotcha(gotcha, projectRoot);
 }
@@ -509,7 +477,6 @@ async function forgetMemoryByQuery(query, options = {}, projectRoot = PROJECT_RO
 module.exports = {
   getMemoryDir,
   getNamedMemoryDir: storage.getNamedMemoryDir,
-  getCurrentSessionNumber,
   recordGotcha: recording.recordGotcha,
   recordPattern: recording.recordPattern,
   recordDiscovery: recording.recordDiscovery,
@@ -529,7 +496,6 @@ module.exports = {
   CONFIG,
   readMemoryAsync,
   atomicWriteAsync,
-  ensureDirAsync,
   recordGotchaAsync,
   recordPatternAsync,
   loadMemoryForContextAsync,

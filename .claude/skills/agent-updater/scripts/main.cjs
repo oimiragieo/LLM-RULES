@@ -28,7 +28,6 @@ const ORCHESTRATOR_REQUIRED_FILES = Object.freeze([
   '.claude/CLAUDE.md',
   '.claude/workflows/core/router-decision.md',
   '.claude/workflows/core/ecosystem-creation-workflow.md',
-  '.claude/agents/core/router.md',
 ]);
 
 function parseArgs(argv) {
@@ -108,7 +107,7 @@ function checkMandatorySkills(agentPath) {
   return { present, missing, allPresent: missing.length === 0 };
 }
 
-function findModuleExportInsertionPoint(content) {
+function _findModuleExportInsertionPoint(content) {
   const exportMatch = content.match(/\r?\n\r?\nmodule\.exports\s*=\s*\{/);
   if (!exportMatch) return -1;
   return exportMatch.index;
@@ -181,7 +180,7 @@ function updateRoutingTableKeywords(name, _description) {
     '.claude',
     'lib',
     'routing',
-    'routing-table-intent-keywords.cjs'
+    'routing-table-intent-keywords-data.cjs'
   );
   if (!fs.existsSync(filePath)) return;
   let content = fs.readFileSync(filePath, 'utf8');
@@ -191,12 +190,14 @@ function updateRoutingTableKeywords(name, _description) {
 
   const formattedKeywords = keywords.map(keyword => `    '${keyword}'`).join(',\n');
   const entry = `  '${name}': [\n${formattedKeywords},\n  ],`;
-  const insertionPoint = findModuleExportInsertionPoint(content);
+
+  const searchStr = '\n};\n\n// Deliberate overlaps';
+  const insertionPoint = content.indexOf(searchStr);
   if (insertionPoint !== -1) {
-    content = content.slice(0, insertionPoint) + entry + '\n' + content.slice(insertionPoint);
+    content = content.slice(0, insertionPoint) + '\n' + entry + content.slice(insertionPoint);
     fs.writeFileSync(filePath, content, 'utf8');
   } else {
-    throw new Error(`Unable to locate module.exports insertion point in ${filePath}`);
+    throw new Error(`Unable to locate INTENT_KEYWORDS insertion point in ${filePath}`);
   }
 }
 

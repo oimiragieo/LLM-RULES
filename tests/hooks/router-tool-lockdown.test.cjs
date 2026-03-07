@@ -316,6 +316,10 @@ describe('router-tool-lockdown hook', () => {
     process.env.ROUTER_TOOL_LOCKDOWN_ENFORCEMENT = 'block';
     process.env.CLAUDE_AGENT_ID = '  Router  ';
     const result = checkRouterToolLockdown('Bash', { command: 'pnpm test' }, {});
-    assert.strictEqual(result.pass, false, 'Trimmed/lowercased "router" should be treated as router');
+    assert.strictEqual(
+      result.pass,
+      false,
+      'Trimmed/lowercased "router" should be treated as router'
+    );
   });
 });

@@ -110,12 +110,12 @@
                     "mtime": 1771947459261.8975
                   }
                 },
-                "router.md": {
+                "CLAUDE.md": {
                   "type": "file",
-                  "name": "router.md",
+                  "name": "CLAUDE.md",
                   "hash": "5ec70d63fc738ccc64e7244c90be2f263bdca6fe8ff30d8e12348f2b3393360e",
                   "metadata": {
-                    "path": ".claude/agents/core/router.md",
+                    "path": ".claude/CLAUDE.md",
                     "size": 27875,
                     "mtime": 1771822116189.3882
                   }

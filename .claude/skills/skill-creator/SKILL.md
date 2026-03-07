@@ -1783,7 +1783,7 @@ These rules are INVIOLABLE. Breaking them causes bugs that are hard to detect.
    - Check if skill requires new routes in CLAUDE.md
    - Check if skill requires new agent (spawn agent-creator if yes)
    - Check if existing workflows need updating
-   - Check if router.md agent table needs updating
+   - Check if CLAUDE.md agent table needs updating
    - Document all system changes made
 
 8. NO SKILL WITHOUT REFERENCE COMPARISON
@@ -1834,8 +1834,8 @@ Run this analysis after every skill creation:
    - Update each agent's "Step 0: Load Skills" section
 
 3. ROUTER UPDATE CHECK
-   - Does router.md know about this capability?
-   - Update router.md Core/Specialized/Domain agent tables if needed
+   - Does Router know about this capability?
+   - Update CLAUDE.md Core/Specialized/Domain agent tables if needed
    - Update Planning Orchestration Matrix if needed
 
 4. WORKFLOW CHECK
@@ -1865,7 +1865,7 @@ Run this analysis after every skill creation:
    ✅ Assigned to: technical-writer, planner (for plan documentation)
 
 3. ROUTER UPDATE CHECK
-   ✅ Updated router.md Core Agents table
+   ✅ Updated CLAUDE.md Core Agents table
    ✅ Added row to Planning Orchestration Matrix
 
 4. WORKFLOW CHECK
@@ -1883,7 +1883,7 @@ Run this analysis after every skill creation:
 grep -i "<capability-keyword>" .claude/CLAUDE.md || echo "NEEDS ROUTE"
 
 # Check router agent tables
-grep -i "<capability-keyword>" .claude/agents/core/router.md || echo "NEEDS ROUTER UPDATE"
+grep -i "<capability-keyword>" .claude/CLAUDE.md || echo "NEEDS ROUTER UPDATE"
 
 # Check for related workflows
 ls .claude/workflows/*<keyword>* 2>/dev/null || echo "MAY NEED WORKFLOW"

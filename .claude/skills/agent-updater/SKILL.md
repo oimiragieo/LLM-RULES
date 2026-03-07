@@ -139,7 +139,6 @@ If the target agent is under `.claude/agents/orchestrators/`, the patch plan and
 - `.claude/CLAUDE.md`
 - `.claude/workflows/core/router-decision.md`
 - `.claude/workflows/core/ecosystem-creation-workflow.md`
-- `.claude/agents/core/router.md`
 
 Do not treat orchestrator updates as complete until all four files are checked and aligned with the new behavior.
 

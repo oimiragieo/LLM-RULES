@@ -559,7 +559,7 @@ function checkReadSafety(toolName, toolInput, hookInput = null) {
     ensureIntegrationQueueReadTarget(targetPath);
     if (!fs.existsSync(targetPath)) {
       const missingPathHints = {
-        '.claude/agents/router.md': '.claude/agents/core/router.md',
+        '.claude/agents/router.md': '.claude/CLAUDE.md',
         '.claude/lib/utils/safe-json-parse.cjs': '.claude/lib/utils/safe-json.cjs',
         'tests/metrics/metrics-schema-contract.test.cjs':
           'tests/lib/monitoring/metrics-schema-contract.test.cjs',

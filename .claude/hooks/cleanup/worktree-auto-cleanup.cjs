@@ -63,6 +63,7 @@ function git(gitArgs, cwd = PROJECT_ROOT) {
     return execFileSync('git', gitArgs, {
       cwd,
       shell: false,
+      windowsHide: true,
       encoding: 'utf8',
       timeout: 15000,
     });

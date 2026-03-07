@@ -557,28 +557,11 @@ function pruneStaleOpenFindings(projectRoot = PROJECT_ROOT, options = {}) {
 }
 
 module.exports = {
-  OPEN_FINDINGS_FILE,
-  OPEN_FINDINGS_TREND_FILE,
-  SEVERITY_RANK,
-  resolveOpenFindingsPath,
-  resolveFindingsTrendPath,
-  extractFindingsFromMarkdown,
-  upsertOpenFindings,
   ingestReportFindings,
   getOpenFindings,
   getFindingsSummary,
-  readFindingsTrend,
   recordFindingsTrendSnapshot,
   summarizeFindingsTrend,
   pruneStaleOpenFindings,
   resolveFindingsFromCompletion,
-  makeFingerprint,
-  normalizeSummary,
-  tokenize,
-  hasResolutionCue,
-  extractResolutionEvidence,
-  DEFAULT_RESOLUTION_MIN_OVERLAP,
-  DEFAULT_RESOLUTION_MODE,
-  STRICT_MIN_CONFIDENCE,
-  DEFAULT_STALE_FINDINGS_MAX_AGE_DAYS,
 };

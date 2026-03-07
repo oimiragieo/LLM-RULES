@@ -27,12 +27,14 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `creator-compliance-validator.cjs`  |        | x           |          | x          |              |            |
 | `quality-gate-validator.cjs`        |        | x           |          | x          |              |            |
 | `adaptive-quality-gate.cjs`         | x      | x           | x        | x          | x            | x          |
+| `session-end-memory-promotion.cjs`  | x      |             |          |            |              |            |
+| `worktree-auto-cleanup.cjs`         | x      |             |          |            |              |            |
 | `check-console-log.cjs`             | x      | x           | x        | x          | x            | x          |
 | `pre-compact.cjs`                   | x      | x           | x        | x          | x            | x          |
 
 **Agent Archetype Definitions:**
 
-- **Router**: router.md
+- **Router**: CLAUDE.md
 - **Implementer**: developer, planner, qa, architect, devops, all domain specialists
 - **Reviewer**: code-reviewer
 - **Documenter**: technical-writer, c4-\* agents

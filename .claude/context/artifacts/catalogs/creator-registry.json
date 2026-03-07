@@ -80,7 +80,7 @@
     {
       "name": "router",
       "category": "core",
-      "path": ".claude/agents/core/router.md"
+      "path": ".claude/CLAUDE.md"
     },
     {
       "name": "technical-writer",
@@ -249,26 +249,63 @@
     }
   ],
   "skills": [
-    { "name": "accessibility", "path": ".claude/skills/accessibility/SKILL.md" },
+    {
+      "name": "accessibility",
+      "path": ".claude/skills/accessibility/SKILL.md"
+    },
     {
       "name": "aceternity-ui-configuration",
       "path": ".claude/skills/aceternity-ui-configuration/SKILL.md"
     },
-    { "name": "activities", "path": ".claude/skills/activities/SKILL.md" },
+    {
+      "name": "activities",
+      "path": ".claude/skills/activities/SKILL.md"
+    },
     {
       "name": "additional-htmx-and-flask-instructions",
       "path": ".claude/skills/additional-htmx-and-flask-instructions/SKILL.md"
     },
-    { "name": "admin-interface-rules", "path": ".claude/skills/admin-interface-rules/SKILL.md" },
-    { "name": "agent-creator", "path": ".claude/skills/agent-creator/SKILL.md", "isCreator": true },
-    { "name": "agp-router-rules", "path": ".claude/skills/agp-router-rules/SKILL.md" },
-    { "name": "ai-ml-expert", "path": ".claude/skills/ai-ml-expert/SKILL.md" },
-    { "name": "alpine-js-usage-rules", "path": ".claude/skills/alpine-js-usage-rules/SKILL.md" },
-    { "name": "android-expert", "path": ".claude/skills/android-expert/SKILL.md" },
-    { "name": "angular-expert", "path": ".claude/skills/angular-expert/SKILL.md" },
-    { "name": "api-development-expert", "path": ".claude/skills/api-development-expert/SKILL.md" },
-    { "name": "apiresponse-class", "path": ".claude/skills/apiresponse-class/SKILL.md" },
-    { "name": "architecture-review", "path": ".claude/skills/architecture-review/SKILL.md" },
+    {
+      "name": "admin-interface-rules",
+      "path": ".claude/skills/admin-interface-rules/SKILL.md"
+    },
+    {
+      "name": "agent-creator",
+      "path": ".claude/skills/agent-creator/SKILL.md",
+      "isCreator": true
+    },
+    {
+      "name": "agp-router-rules",
+      "path": ".claude/skills/agp-router-rules/SKILL.md"
+    },
+    {
+      "name": "ai-ml-expert",
+      "path": ".claude/skills/ai-ml-expert/SKILL.md"
+    },
+    {
+      "name": "alpine-js-usage-rules",
+      "path": ".claude/skills/alpine-js-usage-rules/SKILL.md"
+    },
+    {
+      "name": "android-expert",
+      "path": ".claude/skills/android-expert/SKILL.md"
+    },
+    {
+      "name": "angular-expert",
+      "path": ".claude/skills/angular-expert/SKILL.md"
+    },
+    {
+      "name": "api-development-expert",
+      "path": ".claude/skills/api-development-expert/SKILL.md"
+    },
+    {
+      "name": "apiresponse-class",
+      "path": ".claude/skills/apiresponse-class/SKILL.md"
+    },
+    {
+      "name": "architecture-review",
+      "path": ".claude/skills/architecture-review/SKILL.md"
+    },
     {
       "name": "artifact-lifecycle",
       "path": ".claude/skills/artifact-lifecycle/SKILL.md",
@@ -276,30 +313,54 @@
       "isCreator": true,
       "category": "creator-tools"
     },
-    { "name": "artifact-publisher", "path": ".claude/skills/artifact-publisher/SKILL.md" },
+    {
+      "name": "artifact-publisher",
+      "path": ".claude/skills/artifact-publisher/SKILL.md"
+    },
     {
       "name": "assistant-behavior-rules",
       "path": ".claude/skills/assistant-behavior-rules/SKILL.md"
     },
-    { "name": "astro-expert", "path": ".claude/skills/astro-expert/SKILL.md" },
-    { "name": "async-operations", "path": ".claude/skills/async-operations/SKILL.md" },
+    {
+      "name": "astro-expert",
+      "path": ".claude/skills/astro-expert/SKILL.md"
+    },
+    {
+      "name": "async-operations",
+      "path": ".claude/skills/async-operations/SKILL.md"
+    },
     {
       "name": "asynchronous-programming-preference",
       "path": ".claude/skills/asynchronous-programming-preference/SKILL.md"
     },
-    { "name": "auth-security-expert", "path": ".claude/skills/auth-security-expert/SKILL.md" },
+    {
+      "name": "auth-security-expert",
+      "path": ".claude/skills/auth-security-expert/SKILL.md"
+    },
     {
       "name": "authentication-flow-rules",
       "path": ".claude/skills/authentication-flow-rules/SKILL.md"
     },
-    { "name": "automation-script-rule", "path": ".claude/skills/automation-script-rule/SKILL.md" },
-    { "name": "aws-cloud-ops", "path": ".claude/skills/aws-cloud-ops/SKILL.md" },
+    {
+      "name": "automation-script-rule",
+      "path": ".claude/skills/automation-script-rule/SKILL.md"
+    },
+    {
+      "name": "aws-cloud-ops",
+      "path": ".claude/skills/aws-cloud-ops/SKILL.md"
+    },
     {
       "name": "babel-configuration-for-nativewind",
       "path": ".claude/skills/babel-configuration-for-nativewind/SKILL.md"
     },
-    { "name": "backend-expert", "path": ".claude/skills/backend-expert/SKILL.md" },
-    { "name": "beefreesdk", "path": ".claude/skills/beefreesdk/SKILL.md" },
+    {
+      "name": "backend-expert",
+      "path": ".claude/skills/backend-expert/SKILL.md"
+    },
+    {
+      "name": "beefreesdk",
+      "path": ".claude/skills/beefreesdk/SKILL.md"
+    },
     {
       "name": "best-practices-guidelines",
       "path": ".claude/skills/best-practices-guidelines/SKILL.md"
@@ -308,7 +369,10 @@
       "name": "binary-analysis-patterns",
       "path": ".claude/skills/binary-analysis-patterns/SKILL.md"
     },
-    { "name": "brainstorming", "path": ".claude/skills/brainstorming/SKILL.md" },
+    {
+      "name": "brainstorming",
+      "path": ".claude/skills/brainstorming/SKILL.md"
+    },
     {
       "name": "browser-api-usage-rules",
       "path": ".claude/skills/browser-api-usage-rules/SKILL.md"
@@ -317,8 +381,14 @@
       "name": "bug-handling-with-todo-comments",
       "path": ".claude/skills/bug-handling-with-todo-comments/SKILL.md"
     },
-    { "name": "build-notes-file-rules", "path": ".claude/skills/build-notes-file-rules/SKILL.md" },
-    { "name": "build-tools-expert", "path": ".claude/skills/build-tools-expert/SKILL.md" },
+    {
+      "name": "build-notes-file-rules",
+      "path": ".claude/skills/build-notes-file-rules/SKILL.md"
+    },
+    {
+      "name": "build-tools-expert",
+      "path": ".claude/skills/build-tools-expert/SKILL.md"
+    },
     {
       "name": "check-x-md-content-rule",
       "path": ".claude/skills/check-x-md-content-rule/SKILL.md"
@@ -331,36 +401,66 @@
       "name": "ci-cd-implementation-rule",
       "path": ".claude/skills/ci-cd-implementation-rule/SKILL.md"
     },
-    { "name": "ckeditor-rules", "path": ".claude/skills/ckeditor-rules/SKILL.md" },
+    {
+      "name": "ckeditor-rules",
+      "path": ".claude/skills/ckeditor-rules/SKILL.md"
+    },
     {
       "name": "class-based-state-management",
       "path": ".claude/skills/class-based-state-management/SKILL.md"
     },
-    { "name": "cloud-devops-expert", "path": ".claude/skills/cloud-devops-expert/SKILL.md" },
+    {
+      "name": "cloud-devops-expert",
+      "path": ".claude/skills/cloud-devops-expert/SKILL.md"
+    },
     {
       "name": "cloud-native-and-kubernetes-expertise-rules",
       "path": ".claude/skills/cloud-native-and-kubernetes-expertise-rules/SKILL.md"
     },
-    { "name": "code-analyzer", "path": ".claude/skills/code-analyzer/SKILL.md" },
-    { "name": "code-quality-expert", "path": ".claude/skills/code-quality-expert/SKILL.md" },
-    { "name": "code-style-validator", "path": ".claude/skills/code-style-validator/SKILL.md" },
-    { "name": "codebase-integration", "path": ".claude/skills/codebase-integration/SKILL.md" },
+    {
+      "name": "code-analyzer",
+      "path": ".claude/skills/code-analyzer/SKILL.md"
+    },
+    {
+      "name": "code-quality-expert",
+      "path": ".claude/skills/code-quality-expert/SKILL.md"
+    },
+    {
+      "name": "code-style-validator",
+      "path": ".claude/skills/code-style-validator/SKILL.md"
+    },
+    {
+      "name": "codebase-integration",
+      "path": ".claude/skills/codebase-integration/SKILL.md"
+    },
     {
       "name": "collaboration-and-version-control-rules",
       "path": ".claude/skills/collaboration-and-version-control-rules/SKILL.md"
     },
-    { "name": "comment-usage", "path": ".claude/skills/comment-usage/SKILL.md" },
+    {
+      "name": "comment-usage",
+      "path": ".claude/skills/comment-usage/SKILL.md"
+    },
     {
       "name": "commit-message-guidelines",
       "path": ".claude/skills/commit-message-guidelines/SKILL.md"
     },
-    { "name": "commit-validator", "path": ".claude/skills/commit-validator/SKILL.md" },
+    {
+      "name": "commit-validator",
+      "path": ".claude/skills/commit-validator/SKILL.md"
+    },
     {
       "name": "communication-and-problem-solving",
       "path": ".claude/skills/communication-and-problem-solving/SKILL.md"
     },
-    { "name": "communication-tone", "path": ".claude/skills/communication-tone/SKILL.md" },
-    { "name": "complexity-assessment", "path": ".claude/skills/complexity-assessment/SKILL.md" },
+    {
+      "name": "communication-tone",
+      "path": ".claude/skills/communication-tone/SKILL.md"
+    },
+    {
+      "name": "complexity-assessment",
+      "path": ".claude/skills/complexity-assessment/SKILL.md"
+    },
     {
       "name": "composer-dependency-management",
       "path": ".claude/skills/composer-dependency-management/SKILL.md"
@@ -373,7 +473,10 @@
       "name": "comprehensive-unit-testing-with-pytest",
       "path": ".claude/skills/comprehensive-unit-testing-with-pytest/SKILL.md"
     },
-    { "name": "computer-use", "path": ".claude/skills/computer-use/SKILL.md" },
+    {
+      "name": "computer-use",
+      "path": ".claude/skills/computer-use/SKILL.md"
+    },
     {
       "name": "conditional-encapsulation",
       "path": ".claude/skills/conditional-encapsulation/SKILL.md"
@@ -382,16 +485,34 @@
       "name": "configuration-management",
       "path": ".claude/skills/configuration-management/SKILL.md"
     },
-    { "name": "consensus-voting", "path": ".claude/skills/consensus-voting/SKILL.md" },
-    { "name": "container-expert", "path": ".claude/skills/container-expert/SKILL.md" },
-    { "name": "containerization-rules", "path": ".claude/skills/containerization-rules/SKILL.md" },
-    { "name": "content-creation-rules", "path": ".claude/skills/content-creation-rules/SKILL.md" },
-    { "name": "context-compressor", "path": ".claude/skills/context-compressor/SKILL.md" },
+    {
+      "name": "consensus-voting",
+      "path": ".claude/skills/consensus-voting/SKILL.md"
+    },
+    {
+      "name": "container-expert",
+      "path": ".claude/skills/container-expert/SKILL.md"
+    },
+    {
+      "name": "containerization-rules",
+      "path": ".claude/skills/containerization-rules/SKILL.md"
+    },
+    {
+      "name": "content-creation-rules",
+      "path": ".claude/skills/content-creation-rules/SKILL.md"
+    },
+    {
+      "name": "context-compressor",
+      "path": ".claude/skills/context-compressor/SKILL.md"
+    },
     {
       "name": "context-driven-development",
       "path": ".claude/skills/context-driven-development/SKILL.md"
     },
-    { "name": "context-files-rules", "path": ".claude/skills/context-files-rules/SKILL.md" },
+    {
+      "name": "context-files-rules",
+      "path": ".claude/skills/context-files-rules/SKILL.md"
+    },
     {
       "name": "continuous-improvement-focus",
       "path": ".claude/skills/continuous-improvement-focus/SKILL.md"
@@ -400,23 +521,50 @@
       "name": "convex-development-general",
       "path": ".claude/skills/convex-development-general/SKILL.md"
     },
-    { "name": "cpp", "path": ".claude/skills/cpp/SKILL.md" },
-    { "name": "custom-slash-commands", "path": ".claude/skills/custom-slash-commands/SKILL.md" },
-    { "name": "data-expert", "path": ".claude/skills/data-expert/SKILL.md" },
-    { "name": "database-architect", "path": ".claude/skills/database-architect/SKILL.md" },
-    { "name": "database-expert", "path": ".claude/skills/database-expert/SKILL.md" },
-    { "name": "debugging", "path": ".claude/skills/debugging/SKILL.md" },
+    {
+      "name": "cpp",
+      "path": ".claude/skills/cpp/SKILL.md"
+    },
+    {
+      "name": "custom-slash-commands",
+      "path": ".claude/skills/custom-slash-commands/SKILL.md"
+    },
+    {
+      "name": "data-expert",
+      "path": ".claude/skills/data-expert/SKILL.md"
+    },
+    {
+      "name": "database-architect",
+      "path": ".claude/skills/database-architect/SKILL.md"
+    },
+    {
+      "name": "database-expert",
+      "path": ".claude/skills/database-expert/SKILL.md"
+    },
+    {
+      "name": "debugging",
+      "path": ".claude/skills/debugging/SKILL.md"
+    },
     {
       "name": "dependencies-management-rules",
       "path": ".claude/skills/dependencies-management-rules/SKILL.md"
     },
-    { "name": "dependency-analyzer", "path": ".claude/skills/dependency-analyzer/SKILL.md" },
+    {
+      "name": "dependency-analyzer",
+      "path": ".claude/skills/dependency-analyzer/SKILL.md"
+    },
     {
       "name": "design-and-user-experience-guidelines",
       "path": ".claude/skills/design-and-user-experience-guidelines/SKILL.md"
     },
-    { "name": "detailed-docstrings", "path": ".claude/skills/detailed-docstrings/SKILL.md" },
-    { "name": "diagram-generator", "path": ".claude/skills/diagram-generator/SKILL.md" },
+    {
+      "name": "detailed-docstrings",
+      "path": ".claude/skills/detailed-docstrings/SKILL.md"
+    },
+    {
+      "name": "diagram-generator",
+      "path": ".claude/skills/diagram-generator/SKILL.md"
+    },
     {
       "name": "directory-naming-convention",
       "path": ".claude/skills/directory-naming-convention/SKILL.md"
@@ -425,17 +573,38 @@
       "name": "dispatching-parallel-agents",
       "path": ".claude/skills/dispatching-parallel-agents/SKILL.md"
     },
-    { "name": "doc-generator", "path": ".claude/skills/doc-generator/SKILL.md" },
-    { "name": "docker-compose", "path": ".claude/skills/docker-compose/SKILL.md" },
-    { "name": "drizzle-orm-rules", "path": ".claude/skills/drizzle-orm-rules/SKILL.md" },
-    { "name": "dry-principle", "path": ".claude/skills/dry-principle/SKILL.md" },
-    { "name": "dto-conventions", "path": ".claude/skills/dto-conventions/SKILL.md" },
-    { "name": "editing-code-rules", "path": ".claude/skills/editing-code-rules/SKILL.md" },
+    {
+      "name": "doc-generator",
+      "path": ".claude/skills/doc-generator/SKILL.md"
+    },
+    {
+      "name": "docker-compose",
+      "path": ".claude/skills/docker-compose/SKILL.md"
+    },
+    {
+      "name": "drizzle-orm-rules",
+      "path": ".claude/skills/drizzle-orm-rules/SKILL.md"
+    },
+    {
+      "name": "dry-principle",
+      "path": ".claude/skills/dry-principle/SKILL.md"
+    },
+    {
+      "name": "dto-conventions",
+      "path": ".claude/skills/dto-conventions/SKILL.md"
+    },
+    {
+      "name": "editing-code-rules",
+      "path": ".claude/skills/editing-code-rules/SKILL.md"
+    },
     {
       "name": "elite-software-engineer-and-product-manager",
       "path": ".claude/skills/elite-software-engineer-and-product-manager/SKILL.md"
     },
-    { "name": "elixir-expert", "path": ".claude/skills/elixir-expert/SKILL.md" },
+    {
+      "name": "elixir-expert",
+      "path": ".claude/skills/elixir-expert/SKILL.md"
+    },
     {
       "name": "elon-musk-s-algorithm-for-efficiency",
       "path": ".claude/skills/elon-musk-s-algorithm-for-efficiency/SKILL.md"
@@ -444,14 +613,26 @@
       "name": "entity-class-conventions",
       "path": ".claude/skills/entity-class-conventions/SKILL.md"
     },
-    { "name": "executing-plans", "path": ".claude/skills/executing-plans/SKILL.md" },
+    {
+      "name": "executing-plans",
+      "path": ".claude/skills/executing-plans/SKILL.md"
+    },
     {
       "name": "experiment-configuration-with-hydra-yaml",
       "path": ".claude/skills/experiment-configuration-with-hydra-yaml/SKILL.md"
     },
-    { "name": "explaining-rules", "path": ".claude/skills/explaining-rules/SKILL.md" },
-    { "name": "expo-framework-rule", "path": ".claude/skills/expo-framework-rule/SKILL.md" },
-    { "name": "expo-mobile-app-rule", "path": ".claude/skills/expo-mobile-app-rule/SKILL.md" },
+    {
+      "name": "explaining-rules",
+      "path": ".claude/skills/explaining-rules/SKILL.md"
+    },
+    {
+      "name": "expo-framework-rule",
+      "path": ".claude/skills/expo-framework-rule/SKILL.md"
+    },
+    {
+      "name": "expo-mobile-app-rule",
+      "path": ".claude/skills/expo-mobile-app-rule/SKILL.md"
+    },
     {
       "name": "fiber-logging-and-project-structure",
       "path": ".claude/skills/fiber-logging-and-project-structure/SKILL.md"
@@ -464,17 +645,38 @@
       "name": "file-by-file-changes-rule",
       "path": ".claude/skills/file-by-file-changes-rule/SKILL.md"
     },
-    { "name": "file-management-rules", "path": ".claude/skills/file-management-rules/SKILL.md" },
-    { "name": "file-organization", "path": ".claude/skills/file-organization/SKILL.md" },
-    { "name": "file-path-usage", "path": ".claude/skills/file-path-usage/SKILL.md" },
-    { "name": "filesystem", "path": ".claude/skills/filesystem/SKILL.md" },
+    {
+      "name": "file-management-rules",
+      "path": ".claude/skills/file-management-rules/SKILL.md"
+    },
+    {
+      "name": "file-organization",
+      "path": ".claude/skills/file-organization/SKILL.md"
+    },
+    {
+      "name": "file-path-usage",
+      "path": ".claude/skills/file-path-usage/SKILL.md"
+    },
+    {
+      "name": "filesystem",
+      "path": ".claude/skills/filesystem/SKILL.md"
+    },
     {
       "name": "finishing-a-development-branch",
       "path": ".claude/skills/finishing-a-development-branch/SKILL.md"
     },
-    { "name": "firebase-rules", "path": ".claude/skills/firebase-rules/SKILL.md" },
-    { "name": "flutter-expert", "path": ".claude/skills/flutter-expert/SKILL.md" },
-    { "name": "folder-structure", "path": ".claude/skills/folder-structure/SKILL.md" },
+    {
+      "name": "firebase-rules",
+      "path": ".claude/skills/firebase-rules/SKILL.md"
+    },
+    {
+      "name": "flutter-expert",
+      "path": ".claude/skills/flutter-expert/SKILL.md"
+    },
+    {
+      "name": "folder-structure",
+      "path": ".claude/skills/folder-structure/SKILL.md"
+    },
     {
       "name": "form-and-actions-in-sveltekit",
       "path": ".claude/skills/form-and-actions-in-sveltekit/SKILL.md"
@@ -483,8 +685,14 @@
       "name": "form-validation-with-zod",
       "path": ".claude/skills/form-validation-with-zod/SKILL.md"
     },
-    { "name": "framer-motion-rules", "path": ".claude/skills/framer-motion-rules/SKILL.md" },
-    { "name": "frontend-expert", "path": ".claude/skills/frontend-expert/SKILL.md" },
+    {
+      "name": "framer-motion-rules",
+      "path": ".claude/skills/framer-motion-rules/SKILL.md"
+    },
+    {
+      "name": "frontend-expert",
+      "path": ".claude/skills/frontend-expert/SKILL.md"
+    },
     {
       "name": "full-stack-developer-persona",
       "path": ".claude/skills/full-stack-developer-persona/SKILL.md"
@@ -501,45 +709,91 @@
       "name": "functional-programming-preference",
       "path": ".claude/skills/functional-programming-preference/SKILL.md"
     },
-    { "name": "gamedev-expert", "path": ".claude/skills/gamedev-expert/SKILL.md" },
-    { "name": "gcloud-cli", "path": ".claude/skills/gcloud-cli/SKILL.md" },
-    { "name": "git-expert", "path": ".claude/skills/git-expert/SKILL.md" },
-    { "name": "gitflow", "path": ".claude/skills/gitflow/SKILL.md" },
-    { "name": "github-mcp", "path": ".claude/skills/github-mcp/SKILL.md" },
-    { "name": "github-ops", "path": ".claude/skills/github-ops/SKILL.md" },
-    { "name": "gitops-workflow", "path": ".claude/skills/gitops-workflow/SKILL.md" },
+    {
+      "name": "gamedev-expert",
+      "path": ".claude/skills/gamedev-expert/SKILL.md"
+    },
+    {
+      "name": "gcloud-cli",
+      "path": ".claude/skills/gcloud-cli/SKILL.md"
+    },
+    {
+      "name": "git-expert",
+      "path": ".claude/skills/git-expert/SKILL.md"
+    },
+    {
+      "name": "gitflow",
+      "path": ".claude/skills/gitflow/SKILL.md"
+    },
+    {
+      "name": "github-mcp",
+      "path": ".claude/skills/github-mcp/SKILL.md"
+    },
+    {
+      "name": "github-ops",
+      "path": ".claude/skills/github-ops/SKILL.md"
+    },
+    {
+      "name": "gitops-workflow",
+      "path": ".claude/skills/gitops-workflow/SKILL.md"
+    },
     {
       "name": "globalexceptionhandler-class",
       "path": ".claude/skills/globalexceptionhandler-class/SKILL.md"
     },
-    { "name": "go-expert", "path": ".claude/skills/go-expert/SKILL.md" },
-    { "name": "graphql-expert", "path": ".claude/skills/graphql-expert/SKILL.md" },
+    {
+      "name": "go-expert",
+      "path": ".claude/skills/go-expert/SKILL.md"
+    },
+    {
+      "name": "graphql-expert",
+      "path": ".claude/skills/graphql-expert/SKILL.md"
+    },
     {
       "name": "handle-incomplete-tasks",
       "path": ".claude/skills/handle-incomplete-tasks/SKILL.md"
     },
-    { "name": "helm-chart-scaffolding", "path": ".claude/skills/helm-chart-scaffolding/SKILL.md" },
+    {
+      "name": "helm-chart-scaffolding",
+      "path": ".claude/skills/helm-chart-scaffolding/SKILL.md"
+    },
     {
       "name": "history-and-next-task-rules",
       "path": ".claude/skills/history-and-next-task-rules/SKILL.md"
     },
-    { "name": "hook-creator", "path": ".claude/skills/hook-creator/SKILL.md", "isCreator": true },
-    { "name": "html-specific-rules", "path": ".claude/skills/html-specific-rules/SKILL.md" },
+    {
+      "name": "hook-creator",
+      "path": ".claude/skills/hook-creator/SKILL.md",
+      "isCreator": true
+    },
+    {
+      "name": "html-specific-rules",
+      "path": ".claude/skills/html-specific-rules/SKILL.md"
+    },
     {
       "name": "html-tailwind-css-and-javascript-expert-rule",
       "path": ".claude/skills/html-tailwind-css-and-javascript-expert-rule/SKILL.md"
     },
-    { "name": "htmx-expert", "path": ".claude/skills/htmx-expert/SKILL.md" },
+    {
+      "name": "htmx-expert",
+      "path": ".claude/skills/htmx-expert/SKILL.md"
+    },
     {
       "name": "image-optimization-rules",
       "path": ".claude/skills/image-optimization-rules/SKILL.md"
     },
-    { "name": "imports-aliasing", "path": ".claude/skills/imports-aliasing/SKILL.md" },
+    {
+      "name": "imports-aliasing",
+      "path": ".claude/skills/imports-aliasing/SKILL.md"
+    },
     {
       "name": "incident-runbook-templates",
       "path": ".claude/skills/incident-runbook-templates/SKILL.md"
     },
-    { "name": "insight-extraction", "path": ".claude/skills/insight-extraction/SKILL.md" },
+    {
+      "name": "insight-extraction",
+      "path": ".claude/skills/insight-extraction/SKILL.md"
+    },
     {
       "name": "interactive-requirements-gathering",
       "path": ".claude/skills/interactive-requirements-gathering/SKILL.md"
@@ -548,41 +802,86 @@
       "name": "internationalization-rule",
       "path": ".claude/skills/internationalization-rule/SKILL.md"
     },
-    { "name": "ios-expert", "path": ".claude/skills/ios-expert/SKILL.md" },
-    { "name": "java-expert", "path": ".claude/skills/java-expert/SKILL.md" },
-    { "name": "jira-pm", "path": ".claude/skills/jira-pm/SKILL.md" },
+    {
+      "name": "ios-expert",
+      "path": ".claude/skills/ios-expert/SKILL.md"
+    },
+    {
+      "name": "java-expert",
+      "path": ".claude/skills/java-expert/SKILL.md"
+    },
+    {
+      "name": "jira-pm",
+      "path": ".claude/skills/jira-pm/SKILL.md"
+    },
     {
       "name": "jupyter-notebook-best-practices",
       "path": ".claude/skills/jupyter-notebook-best-practices/SKILL.md"
     },
-    { "name": "k8s-manifest-generator", "path": ".claude/skills/k8s-manifest-generator/SKILL.md" },
-    { "name": "k8s-security-policies", "path": ".claude/skills/k8s-security-policies/SKILL.md" },
+    {
+      "name": "k8s-manifest-generator",
+      "path": ".claude/skills/k8s-manifest-generator/SKILL.md"
+    },
+    {
+      "name": "k8s-security-policies",
+      "path": ".claude/skills/k8s-security-policies/SKILL.md"
+    },
     {
       "name": "kafka-development-practices",
       "path": ".claude/skills/kafka-development-practices/SKILL.md"
     },
-    { "name": "kubernetes-flux", "path": ".claude/skills/kubernetes-flux/SKILL.md" },
-    { "name": "large-data-with-dask", "path": ".claude/skills/large-data-with-dask/SKILL.md" },
+    {
+      "name": "kubernetes-flux",
+      "path": ".claude/skills/kubernetes-flux/SKILL.md"
+    },
+    {
+      "name": "large-data-with-dask",
+      "path": ".claude/skills/large-data-with-dask/SKILL.md"
+    },
     {
       "name": "latest-language-versions-and-best-practices",
       "path": ".claude/skills/latest-language-versions-and-best-practices/SKILL.md"
     },
-    { "name": "library-usage", "path": ".claude/skills/library-usage/SKILL.md" },
-    { "name": "linear-pm", "path": ".claude/skills/linear-pm/SKILL.md" },
+    {
+      "name": "library-usage",
+      "path": ".claude/skills/library-usage/SKILL.md"
+    },
+    {
+      "name": "linear-pm",
+      "path": ".claude/skills/linear-pm/SKILL.md"
+    },
     {
       "name": "livewire-implementation-rules",
       "path": ".claude/skills/livewire-implementation-rules/SKILL.md"
     },
-    { "name": "logging-module-usage", "path": ".claude/skills/logging-module-usage/SKILL.md" },
-    { "name": "mcp-converter", "path": ".claude/skills/mcp-converter/SKILL.md" },
-    { "name": "medusa", "path": ".claude/skills/medusa/SKILL.md" },
-    { "name": "memory-forensics", "path": ".claude/skills/memory-forensics/SKILL.md" },
-    { "name": "metadata-and-seo-rules", "path": ".claude/skills/metadata-and-seo-rules/SKILL.md" },
+    {
+      "name": "logging-module-usage",
+      "path": ".claude/skills/logging-module-usage/SKILL.md"
+    },
+    {
+      "name": "mcp-converter",
+      "path": ".claude/skills/mcp-converter/SKILL.md"
+    },
+    {
+      "name": "medusa",
+      "path": ".claude/skills/medusa/SKILL.md"
+    },
+    {
+      "name": "memory-forensics",
+      "path": ".claude/skills/memory-forensics/SKILL.md"
+    },
+    {
+      "name": "metadata-and-seo-rules",
+      "path": ".claude/skills/metadata-and-seo-rules/SKILL.md"
+    },
     {
       "name": "minimal-code-changes-rule",
       "path": ".claude/skills/minimal-code-changes-rule/SKILL.md"
     },
-    { "name": "mkdocs-specific-rules", "path": ".claude/skills/mkdocs-specific-rules/SKILL.md" },
+    {
+      "name": "mkdocs-specific-rules",
+      "path": ".claude/skills/mkdocs-specific-rules/SKILL.md"
+    },
     {
       "name": "mobile-first-design-rules",
       "path": ".claude/skills/mobile-first-design-rules/SKILL.md"
@@ -591,15 +890,30 @@
       "name": "mobile-ui-development-rule",
       "path": ".claude/skills/mobile-ui-development-rule/SKILL.md"
     },
-    { "name": "modular-design-rule", "path": ".claude/skills/modular-design-rule/SKILL.md" },
-    { "name": "monorepo-and-tooling", "path": ".claude/skills/monorepo-and-tooling/SKILL.md" },
-    { "name": "nativescript", "path": ".claude/skills/nativescript/SKILL.md" },
+    {
+      "name": "modular-design-rule",
+      "path": ".claude/skills/modular-design-rule/SKILL.md"
+    },
+    {
+      "name": "monorepo-and-tooling",
+      "path": ".claude/skills/monorepo-and-tooling/SKILL.md"
+    },
+    {
+      "name": "nativescript",
+      "path": ".claude/skills/nativescript/SKILL.md"
+    },
     {
       "name": "nativewind-and-tailwind-css-compatibility",
       "path": ".claude/skills/nativewind-and-tailwind-css-compatibility/SKILL.md"
     },
-    { "name": "nextjs-expert", "path": ".claude/skills/nextjs-expert/SKILL.md" },
-    { "name": "nodejs-expert", "path": ".claude/skills/nodejs-expert/SKILL.md" },
+    {
+      "name": "nextjs-expert",
+      "path": ".claude/skills/nextjs-expert/SKILL.md"
+    },
+    {
+      "name": "nodejs-expert",
+      "path": ".claude/skills/nodejs-expert/SKILL.md"
+    },
     {
       "name": "observer-hoc-or-useobserver-hook",
       "path": ".claude/skills/observer-hoc-or-useobserver-hook/SKILL.md"
@@ -608,7 +922,10 @@
       "name": "on-call-handoff-patterns",
       "path": ".claude/skills/on-call-handoff-patterns/SKILL.md"
     },
-    { "name": "operational-modes", "path": ".claude/skills/operational-modes/SKILL.md" },
+    {
+      "name": "operational-modes",
+      "path": ".claude/skills/operational-modes/SKILL.md"
+    },
     {
       "name": "package-json-modification-protection",
       "path": ".claude/skills/package-json-modification-protection/SKILL.md"
@@ -629,19 +946,34 @@
       "name": "parameter-specific-logic-rules",
       "path": ".claude/skills/parameter-specific-logic-rules/SKILL.md"
     },
-    { "name": "payment-tracking-rule", "path": ".claude/skills/payment-tracking-rule/SKILL.md" },
+    {
+      "name": "payment-tracking-rule",
+      "path": ".claude/skills/payment-tracking-rule/SKILL.md"
+    },
     {
       "name": "persona-senior-full-stack-developer",
       "path": ".claude/skills/persona-senior-full-stack-developer/SKILL.md"
     },
-    { "name": "php-expert", "path": ".claude/skills/php-expert/SKILL.md" },
-    { "name": "placeholder-images", "path": ".claude/skills/placeholder-images/SKILL.md" },
-    { "name": "plan-generator", "path": ".claude/skills/plan-generator/SKILL.md" },
+    {
+      "name": "php-expert",
+      "path": ".claude/skills/php-expert/SKILL.md"
+    },
+    {
+      "name": "placeholder-images",
+      "path": ".claude/skills/placeholder-images/SKILL.md"
+    },
+    {
+      "name": "plan-generator",
+      "path": ".claude/skills/plan-generator/SKILL.md"
+    },
     {
       "name": "poetry-rye-dependency-management",
       "path": ".claude/skills/poetry-rye-dependency-management/SKILL.md"
     },
-    { "name": "postmortem-writing", "path": ".claude/skills/postmortem-writing/SKILL.md" },
+    {
+      "name": "postmortem-writing",
+      "path": ".claude/skills/postmortem-writing/SKILL.md"
+    },
     {
       "name": "pre-configured-apis-rules",
       "path": ".claude/skills/pre-configured-apis-rules/SKILL.md"
@@ -658,8 +990,14 @@
       "name": "private-vs-shared-components",
       "path": ".claude/skills/private-vs-shared-components/SKILL.md"
     },
-    { "name": "project-analyzer", "path": ".claude/skills/project-analyzer/SKILL.md" },
-    { "name": "project-onboarding", "path": ".claude/skills/project-onboarding/SKILL.md" },
+    {
+      "name": "project-analyzer",
+      "path": ".claude/skills/project-analyzer/SKILL.md"
+    },
+    {
+      "name": "project-onboarding",
+      "path": ".claude/skills/project-onboarding/SKILL.md"
+    },
     {
       "name": "prompt-generation-rules",
       "path": ".claude/skills/prompt-generation-rules/SKILL.md"
@@ -676,24 +1014,54 @@
       "name": "provide-real-file-links-rule",
       "path": ".claude/skills/provide-real-file-links-rule/SKILL.md"
     },
-    { "name": "publishing-rules", "path": ".claude/skills/publishing-rules/SKILL.md" },
+    {
+      "name": "publishing-rules",
+      "path": ".claude/skills/publishing-rules/SKILL.md"
+    },
     {
       "name": "pyqt6-ui-development-rules",
       "path": ".claude/skills/pyqt6-ui-development-rules/SKILL.md"
     },
-    { "name": "python-backend-expert", "path": ".claude/skills/python-backend-expert/SKILL.md" },
-    { "name": "qa-workflow", "path": ".claude/skills/qa-workflow/SKILL.md" },
-    { "name": "qwik-expert", "path": ".claude/skills/qwik-expert/SKILL.md" },
-    { "name": "react-expert", "path": ".claude/skills/react-expert/SKILL.md" },
-    { "name": "readme", "path": ".claude/skills/readme/SKILL.md" },
-    { "name": "receiving-code-review", "path": ".claude/skills/receiving-code-review/SKILL.md" },
+    {
+      "name": "python-backend-expert",
+      "path": ".claude/skills/python-backend-expert/SKILL.md"
+    },
+    {
+      "name": "qa-workflow",
+      "path": ".claude/skills/qa-workflow/SKILL.md"
+    },
+    {
+      "name": "qwik-expert",
+      "path": ".claude/skills/qwik-expert/SKILL.md"
+    },
+    {
+      "name": "react-expert",
+      "path": ".claude/skills/react-expert/SKILL.md"
+    },
+    {
+      "name": "readme",
+      "path": ".claude/skills/readme/SKILL.md"
+    },
+    {
+      "name": "receiving-code-review",
+      "path": ".claude/skills/receiving-code-review/SKILL.md"
+    },
     {
       "name": "recommended-folder-structure",
       "path": ".claude/skills/recommended-folder-structure/SKILL.md"
     },
-    { "name": "recovery", "path": ".claude/skills/recovery/SKILL.md" },
-    { "name": "rell-general-rules", "path": ".claude/skills/rell-general-rules/SKILL.md" },
-    { "name": "repo-rag", "path": ".claude/skills/repo-rag/SKILL.md" },
+    {
+      "name": "recovery",
+      "path": ".claude/skills/recovery/SKILL.md"
+    },
+    {
+      "name": "rell-general-rules",
+      "path": ".claude/skills/rell-general-rules/SKILL.md"
+    },
+    {
+      "name": "repo-rag",
+      "path": ".claude/skills/repo-rag/SKILL.md"
+    },
     {
       "name": "repository-class-conventions",
       "path": ".claude/skills/repository-class-conventions/SKILL.md"
@@ -705,8 +1073,14 @@
       "isCreator": true,
       "category": "creator-tools"
     },
-    { "name": "requesting-code-review", "path": ".claude/skills/requesting-code-review/SKILL.md" },
-    { "name": "response-rater", "path": ".claude/skills/response-rater/SKILL.md" },
+    {
+      "name": "requesting-code-review",
+      "path": ".claude/skills/requesting-code-review/SKILL.md"
+    },
+    {
+      "name": "response-rater",
+      "path": ".claude/skills/response-rater/SKILL.md"
+    },
     {
       "name": "restcontroller-conventions",
       "path": ".claude/skills/restcontroller-conventions/SKILL.md"
@@ -715,42 +1089,88 @@
       "name": "root-level-project-instructions",
       "path": ".claude/skills/root-level-project-instructions/SKILL.md"
     },
-    { "name": "rule-auditor", "path": ".claude/skills/rule-auditor/SKILL.md" },
+    {
+      "name": "rule-auditor",
+      "path": ".claude/skills/rule-auditor/SKILL.md"
+    },
     {
       "name": "schema-creator",
       "path": ".claude/skills/schema-creator/SKILL.md",
       "isCreator": true
     },
-    { "name": "security-architect", "path": ".claude/skills/security-architect/SKILL.md" },
+    {
+      "name": "security-architect",
+      "path": ".claude/skills/security-architect/SKILL.md"
+    },
     {
       "name": "senior-frontend-developer-mindset",
       "path": ".claude/skills/senior-frontend-developer-mindset/SKILL.md"
     },
-    { "name": "sentry-monitoring", "path": ".claude/skills/sentry-monitoring/SKILL.md" },
+    {
+      "name": "sentry-monitoring",
+      "path": ".claude/skills/sentry-monitoring/SKILL.md"
+    },
     {
       "name": "seo-and-meta-tags-in-sveltekit",
       "path": ".claude/skills/seo-and-meta-tags-in-sveltekit/SKILL.md"
     },
-    { "name": "sequential-thinking", "path": ".claude/skills/sequential-thinking/SKILL.md" },
+    {
+      "name": "sequential-thinking",
+      "path": ".claude/skills/sequential-thinking/SKILL.md"
+    },
     {
       "name": "service-class-conventions",
       "path": ".claude/skills/service-class-conventions/SKILL.md"
     },
-    { "name": "session-handoff", "path": ".claude/skills/session-handoff/SKILL.md" },
+    {
+      "name": "session-handoff",
+      "path": ".claude/skills/session-handoff/SKILL.md"
+    },
     {
       "name": "single-chunk-edits-rule",
       "path": ".claude/skills/single-chunk-edits-rule/SKILL.md"
     },
-    { "name": "skill-creator", "path": ".claude/skills/skill-creator/SKILL.md", "isCreator": true },
-    { "name": "skill-discovery", "path": ".claude/skills/skill-discovery/SKILL.md" },
-    { "name": "slack-notifications", "path": ".claude/skills/slack-notifications/SKILL.md" },
-    { "name": "smart-debug", "path": ".claude/skills/smart-debug/SKILL.md" },
-    { "name": "smart-revert", "path": ".claude/skills/smart-revert/SKILL.md" },
-    { "name": "solidjs-expert", "path": ".claude/skills/solidjs-expert/SKILL.md" },
-    { "name": "spec-critique", "path": ".claude/skills/spec-critique/SKILL.md" },
-    { "name": "spec-gathering", "path": ".claude/skills/spec-gathering/SKILL.md" },
-    { "name": "spec-writing", "path": ".claude/skills/spec-writing/SKILL.md" },
-    { "name": "starknet-react-rules", "path": ".claude/skills/starknet-react-rules/SKILL.md" },
+    {
+      "name": "skill-creator",
+      "path": ".claude/skills/skill-creator/SKILL.md",
+      "isCreator": true
+    },
+    {
+      "name": "skill-discovery",
+      "path": ".claude/skills/skill-discovery/SKILL.md"
+    },
+    {
+      "name": "slack-notifications",
+      "path": ".claude/skills/slack-notifications/SKILL.md"
+    },
+    {
+      "name": "smart-debug",
+      "path": ".claude/skills/smart-debug/SKILL.md"
+    },
+    {
+      "name": "smart-revert",
+      "path": ".claude/skills/smart-revert/SKILL.md"
+    },
+    {
+      "name": "solidjs-expert",
+      "path": ".claude/skills/solidjs-expert/SKILL.md"
+    },
+    {
+      "name": "spec-critique",
+      "path": ".claude/skills/spec-critique/SKILL.md"
+    },
+    {
+      "name": "spec-gathering",
+      "path": ".claude/skills/spec-gathering/SKILL.md"
+    },
+    {
+      "name": "spec-writing",
+      "path": ".claude/skills/spec-writing/SKILL.md"
+    },
+    {
+      "name": "starknet-react-rules",
+      "path": ".claude/skills/starknet-react-rules/SKILL.md"
+    },
     {
       "name": "state-management-expert",
       "path": ".claude/skills/state-management-expert/SKILL.md"
@@ -763,7 +1183,10 @@
       "name": "strict-user-requirements-adherence",
       "path": ".claude/skills/strict-user-requirements-adherence/SKILL.md"
     },
-    { "name": "styling-expert", "path": ".claude/skills/styling-expert/SKILL.md" },
+    {
+      "name": "styling-expert",
+      "path": ".claude/skills/styling-expert/SKILL.md"
+    },
     {
       "name": "subagent-driven-development",
       "path": ".claude/skills/subagent-driven-development/SKILL.md"
@@ -772,10 +1195,22 @@
       "name": "submission-process-outline",
       "path": ".claude/skills/submission-process-outline/SKILL.md"
     },
-    { "name": "summarize-changes", "path": ".claude/skills/summarize-changes/SKILL.md" },
-    { "name": "svelte-expert", "path": ".claude/skills/svelte-expert/SKILL.md" },
-    { "name": "swarm-coordination", "path": ".claude/skills/swarm-coordination/SKILL.md" },
-    { "name": "tall-stack-general", "path": ".claude/skills/tall-stack-general/SKILL.md" },
+    {
+      "name": "summarize-changes",
+      "path": ".claude/skills/summarize-changes/SKILL.md"
+    },
+    {
+      "name": "svelte-expert",
+      "path": ".claude/skills/svelte-expert/SKILL.md"
+    },
+    {
+      "name": "swarm-coordination",
+      "path": ".claude/skills/swarm-coordination/SKILL.md"
+    },
+    {
+      "name": "tall-stack-general",
+      "path": ".claude/skills/tall-stack-general/SKILL.md"
+    },
     {
       "name": "task-management-protocol",
       "path": ".claude/skills/task-management-protocol/SKILL.md",
@@ -786,7 +1221,10 @@
       "name": "tauri-native-api-integration",
       "path": ".claude/skills/tauri-native-api-integration/SKILL.md"
     },
-    { "name": "tauri-security-rules", "path": ".claude/skills/tauri-security-rules/SKILL.md" },
+    {
+      "name": "tauri-security-rules",
+      "path": ".claude/skills/tauri-security-rules/SKILL.md"
+    },
     {
       "name": "tauri-svelte-typescript-general",
       "path": ".claude/skills/tauri-svelte-typescript-general/SKILL.md"
@@ -801,51 +1239,105 @@
       "aliases": ["testing-expert"],
       "description": "Test-Driven Development with Iron Laws. Includes testing-expert capabilities."
     },
-    { "name": "tech-stack", "path": ".claude/skills/tech-stack/SKILL.md" },
+    {
+      "name": "tech-stack",
+      "path": ".claude/skills/tech-stack/SKILL.md"
+    },
     {
       "name": "technical-accuracy-and-usability-rules",
       "path": ".claude/skills/technical-accuracy-and-usability-rules/SKILL.md"
     },
-    { "name": "telegram-bot-api-rules", "path": ".claude/skills/telegram-bot-api-rules/SKILL.md" },
+    {
+      "name": "telegram-bot-api-rules",
+      "path": ".claude/skills/telegram-bot-api-rules/SKILL.md"
+    },
     {
       "name": "template-creator",
       "path": ".claude/skills/template-creator/SKILL.md",
       "isCreator": true
     },
-    { "name": "terminal-commands-rule", "path": ".claude/skills/terminal-commands-rule/SKILL.md" },
-    { "name": "terraform-infra", "path": ".claude/skills/terraform-infra/SKILL.md" },
-    { "name": "test-generator", "path": ".claude/skills/test-generator/SKILL.md" },
+    {
+      "name": "terminal-commands-rule",
+      "path": ".claude/skills/terminal-commands-rule/SKILL.md"
+    },
+    {
+      "name": "terraform-infra",
+      "path": ".claude/skills/terraform-infra/SKILL.md"
+    },
+    {
+      "name": "test-generator",
+      "path": ".claude/skills/test-generator/SKILL.md"
+    },
     {
       "name": "testing-expert",
       "path": ".claude/skills/testing-expert/SKILL.md",
       "deprecated": true,
       "redirectTo": "tdd"
     },
-    { "name": "text-to-sql", "path": ".claude/skills/text-to-sql/SKILL.md" },
-    { "name": "thinking-tools", "path": ".claude/skills/thinking-tools/SKILL.md" },
+    {
+      "name": "text-to-sql",
+      "path": ".claude/skills/text-to-sql/SKILL.md"
+    },
+    {
+      "name": "thinking-tools",
+      "path": ".claude/skills/thinking-tools/SKILL.md"
+    },
     {
       "name": "thoughtful-and-accurate-responses",
       "path": ".claude/skills/thoughtful-and-accurate-responses/SKILL.md"
     },
-    { "name": "todo-app-general-rules", "path": ".claude/skills/todo-app-general-rules/SKILL.md" },
-    { "name": "tool-search", "path": ".claude/skills/tool-search/SKILL.md" },
-    { "name": "toon-format", "path": ".claude/skills/toon-format/SKILL.md" },
-    { "name": "track-management", "path": ".claude/skills/track-management/SKILL.md" },
-    { "name": "trpc-api-rule", "path": ".claude/skills/trpc-api-rule/SKILL.md" },
+    {
+      "name": "todo-app-general-rules",
+      "path": ".claude/skills/todo-app-general-rules/SKILL.md"
+    },
+    {
+      "name": "tool-search",
+      "path": ".claude/skills/tool-search/SKILL.md"
+    },
+    {
+      "name": "toon-format",
+      "path": ".claude/skills/toon-format/SKILL.md"
+    },
+    {
+      "name": "track-management",
+      "path": ".claude/skills/track-management/SKILL.md"
+    },
+    {
+      "name": "trpc-api-rule",
+      "path": ".claude/skills/trpc-api-rule/SKILL.md"
+    },
     {
       "name": "truthfulness-and-clarity-for-ai",
       "path": ".claude/skills/truthfulness-and-clarity-for-ai/SKILL.md"
     },
-    { "name": "tsconfig-json-rules", "path": ".claude/skills/tsconfig-json-rules/SKILL.md" },
-    { "name": "type-hinting-rule", "path": ".claude/skills/type-hinting-rule/SKILL.md" },
-    { "name": "typescript-expert", "path": ".claude/skills/typescript-expert/SKILL.md" },
-    { "name": "ui-components-expert", "path": ".claude/skills/ui-components-expert/SKILL.md" },
+    {
+      "name": "tsconfig-json-rules",
+      "path": ".claude/skills/tsconfig-json-rules/SKILL.md"
+    },
+    {
+      "name": "type-hinting-rule",
+      "path": ".claude/skills/type-hinting-rule/SKILL.md"
+    },
+    {
+      "name": "typescript-expert",
+      "path": ".claude/skills/typescript-expert/SKILL.md"
+    },
+    {
+      "name": "ui-components-expert",
+      "path": ".claude/skills/ui-components-expert/SKILL.md"
+    },
     {
       "name": "unit-testing-requirement",
       "path": ".claude/skills/unit-testing-requirement/SKILL.md"
     },
-    { "name": "use-case-example", "path": ".claude/skills/use-case-example/SKILL.md" },
-    { "name": "using-git-worktrees", "path": ".claude/skills/using-git-worktrees/SKILL.md" },
+    {
+      "name": "use-case-example",
+      "path": ".claude/skills/use-case-example/SKILL.md"
+    },
+    {
+      "name": "using-git-worktrees",
+      "path": ".claude/skills/using-git-worktrees/SKILL.md"
+    },
     {
       "name": "vercel-ai-sdk-best-practices",
       "path": ".claude/skills/vercel-ai-sdk-best-practices/SKILL.md"
@@ -862,7 +1354,10 @@
       "name": "verify-information-rule",
       "path": ".claude/skills/verify-information-rule/SKILL.md"
     },
-    { "name": "version-control-rule", "path": ".claude/skills/version-control-rule/SKILL.md" },
+    {
+      "name": "version-control-rule",
+      "path": ".claude/skills/version-control-rule/SKILL.md"
+    },
     {
       "name": "virtual-environment-usage",
       "path": ".claude/skills/virtual-environment-usage/SKILL.md"
@@ -871,19 +1366,43 @@
       "name": "visual-and-observational-rules",
       "path": ".claude/skills/visual-and-observational-rules/SKILL.md"
     },
-    { "name": "vue-expert", "path": ".claude/skills/vue-expert/SKILL.md" },
-    { "name": "vueuse-library-rule", "path": ".claude/skills/vueuse-library-rule/SKILL.md" },
-    { "name": "web3-expert", "path": ".claude/skills/web3-expert/SKILL.md" },
-    { "name": "windows-compatibility", "path": ".claude/skills/windows-compatibility/SKILL.md" },
+    {
+      "name": "vue-expert",
+      "path": ".claude/skills/vue-expert/SKILL.md"
+    },
+    {
+      "name": "vueuse-library-rule",
+      "path": ".claude/skills/vueuse-library-rule/SKILL.md"
+    },
+    {
+      "name": "web3-expert",
+      "path": ".claude/skills/web3-expert/SKILL.md"
+    },
+    {
+      "name": "windows-compatibility",
+      "path": ".claude/skills/windows-compatibility/SKILL.md"
+    },
     {
       "name": "workflow-creator",
       "path": ".claude/skills/workflow-creator/SKILL.md",
       "isCreator": true
     },
-    { "name": "workflow-patterns", "path": ".claude/skills/workflow-patterns/SKILL.md" },
-    { "name": "writing", "path": ".claude/skills/writing/SKILL.md" },
-    { "name": "writing-plans", "path": ".claude/skills/writing-plans/SKILL.md" },
-    { "name": "writing-skills", "path": ".claude/skills/writing-skills/SKILL.md" }
+    {
+      "name": "workflow-patterns",
+      "path": ".claude/skills/workflow-patterns/SKILL.md"
+    },
+    {
+      "name": "writing",
+      "path": ".claude/skills/writing/SKILL.md"
+    },
+    {
+      "name": "writing-plans",
+      "path": ".claude/skills/writing-plans/SKILL.md"
+    },
+    {
+      "name": "writing-skills",
+      "path": ".claude/skills/writing-skills/SKILL.md"
+    }
   ],
   "hooks": [
     {

@@ -294,7 +294,7 @@ tools: [
   ]
 ```
 
-**Router Toolset** (router.md):
+**Router Toolset** (CLAUDE.md):
 
 ```yaml
 tools: [

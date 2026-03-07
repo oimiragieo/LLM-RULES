@@ -66,7 +66,7 @@ function main() {
             path.join(PROJECT_ROOT, '.claude', 'lib', 'code-indexing', 'generate-embeddings.cjs'),
             '--memory-only',
           ],
-          { stdio: 'ignore', detached: true, shell: false }
+          { stdio: 'ignore', detached: true, shell: false, windowsHide: true }
         );
         child.on('error', err => {
           process.stderr.write(

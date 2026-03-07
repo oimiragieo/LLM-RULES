@@ -23,6 +23,7 @@ tools:
   - TaskGet
   - TaskOutput
   - Skill
+  - MemoryRecord
 skills:
   - code-semantic-search
   - code-structural-search

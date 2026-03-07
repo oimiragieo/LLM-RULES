@@ -25,6 +25,7 @@ function gitRun(gitArgs, cwd) {
     const out = execFileSync('git', gitArgs, {
       cwd: cwd || process.cwd(),
       shell: false,
+      windowsHide: true,
       encoding: 'utf8',
       timeout: 15000,
     });
@@ -162,7 +163,7 @@ async function shouldUseWorktree(opts = {}) {
       const wmicOut = execSync(
         'wmic',
         ['logicaldisk', 'where', driveId, 'get', 'FreeSpace', '/value'],
-        { shell: false, encoding: 'utf8', timeout: 5000 }
+        { shell: false, windowsHide: true, encoding: 'utf8', timeout: 5000 }
       );
       const match = wmicOut.match(/FreeSpace=(\d+)/);
       if (match) {
@@ -172,6 +173,7 @@ async function shouldUseWorktree(opts = {}) {
       // Use df on Unix (SE-02: shell: false, array args)
       const dfOut = execSync('df', ['-k', '--output=avail', projectRoot], {
         shell: false,
+        windowsHide: true,
         encoding: 'utf8',
         timeout: 5000,
       });

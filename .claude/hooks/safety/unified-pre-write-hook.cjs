@@ -461,6 +461,39 @@ CHECKS.push({
   },
 });
 
+// Check 11: Reflection File Lockdown
+// Blocks direct manual writes to the reflection queue to prevent the LLM from
+// bypassing mandatory Step 0 processing by simply wiping the queue files.
+CHECKS.push({
+  name: 'reflection-file-lockdown',
+  run: async (_toolName, toolInput) => {
+    const filePath = toolInput.file_path || toolInput.target_file || '';
+    if (!filePath) return { pass: true };
+
+    const enforcement = getEnforcementMode('REFLECTION_FILE_LOCKDOWN', 'block');
+    if (enforcement === 'off') return { pass: true };
+
+    // Normalize path for cross-platform checking
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    const isReflectionJson =
+      normalizedPath.endsWith('.claude/context/runtime/reflection-spawn-request.json') ||
+      normalizedPath === 'reflection-spawn-request.json';
+    const isReflectionTxt =
+      normalizedPath.endsWith('.claude/context/runtime/reflection-reminder.txt') ||
+      normalizedPath === 'reflection-reminder.txt';
+
+    if (isReflectionJson || isReflectionTxt) {
+      return {
+        pass: false,
+        result: 'block',
+        message: `[REFLECTION-FILE-LOCKDOWN] BLOCKED: Direct modification of reflection queue files is prohibited. You MUST process the queue using the Task tool to spawn reflection-agents, which will automatically clear the queue upon completion.`,
+      };
+    }
+
+    return { pass: true };
+  },
+});
+
 // =============================================================================
 // MAIN EXECUTION
 // =============================================================================

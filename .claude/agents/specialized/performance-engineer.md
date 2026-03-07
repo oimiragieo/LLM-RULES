@@ -26,6 +26,7 @@ tools:
   - TaskGet
   - TaskOutput
   - Skill
+  - MemoryRecord
 skills:
   - code-analyzer
   - code-semantic-search

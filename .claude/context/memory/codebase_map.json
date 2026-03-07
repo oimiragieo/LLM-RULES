@@ -4,7 +4,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-06T07:16:13.004Z",
-      "last_accessed": "2026-03-06T06:29:44.942Z"
+      "last_accessed": "2026-03-07T07:11:46.320Z"
     },
     ".claude/lib/memory/core/memory-storage.cjs": {
       "discovered_at": "2026-02-11",
@@ -87,13 +87,13 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-18T06:32:19.085Z",
-      "last_accessed": "2026-03-06T05:56:56.668Z"
+      "last_accessed": "2026-03-07T05:56:42.495Z"
     },
     ".claude/hooks/validation/pre-completion-validation.cjs": {
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-18T06:42:24.699Z",
-      "last_accessed": "2026-03-06T02:00:17.158Z"
+      "last_accessed": "2026-03-06T13:20:18.241Z"
     },
     ".claude/hooks/workflow/post-creation-integration.cjs": {
       "description": "Auto-discovered (code-index-updater)",
@@ -245,7 +245,7 @@
       "description": "Auto-discovered (code-index-updater)",
       "category": "code-indexing",
       "discovered_at": "2026-02-21T06:34:10.540Z",
-      "last_accessed": "2026-03-06T05:53:55.427Z"
+      "last_accessed": "2026-03-07T07:15:30.278Z"
     },
     ".claude/skills/multi-agent-architecture-reference/scripts/main.cjs": {
       "discovered_at": "2026-02-21T07:02:51.525Z",
@@ -518,7 +518,103 @@
       "category": "code-indexing",
       "discovered_at": "2026-03-06T06:10:31.147Z",
       "last_accessed": "2026-03-06T06:10:38.407Z"
+    },
+    ".claude/lib/routing/intent-classifier.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T13:00:43.754Z",
+      "last_accessed": "2026-03-06T13:00:43.754Z"
+    },
+    ".claude/skills/lsp-navigator/scripts/main.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T14:05:02.356Z",
+      "last_accessed": "2026-03-06T14:05:02.356Z"
+    },
+    ".claude/skills/lsp-navigator/hooks/pre-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T14:05:22.399Z",
+      "last_accessed": "2026-03-06T14:05:22.399Z"
+    },
+    ".claude/skills/lsp-navigator/hooks/post-execute.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T14:05:39.396Z",
+      "last_accessed": "2026-03-06T14:05:39.396Z"
+    },
+    ".claude/tools/cli/lsp-diagnostics-runner.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T23:05:33.597Z",
+      "last_accessed": "2026-03-06T23:13:47.405Z"
+    },
+    ".claude/hooks/routing/user-prompt-unified.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-06T23:48:03.577Z",
+      "last_accessed": "2026-03-06T23:48:03.577Z"
+    },
+    ".claude/lib/memory/findings-registry.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T01:45:57.683Z",
+      "last_accessed": "2026-03-07T01:45:57.683Z"
+    },
+    ".claude/lib/memory/observations.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T01:46:00.795Z",
+      "last_accessed": "2026-03-07T01:46:00.795Z"
+    },
+    ".claude/lib/routing/router-state.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T01:46:02.340Z",
+      "last_accessed": "2026-03-07T01:47:14.960Z"
+    },
+    ".claude/lib/memory/memory-manager-core.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T01:46:06.103Z",
+      "last_accessed": "2026-03-07T01:47:13.870Z"
+    },
+    ".claude/lib/routing/routing-table-core-map.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T05:56:48.681Z",
+      "last_accessed": "2026-03-07T05:56:48.681Z"
+    },
+    "tests/security/json-remediation-sweep.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T05:56:54.552Z",
+      "last_accessed": "2026-03-07T05:56:54.552Z"
+    },
+    "tests/agents/agent-tool-compliance.test.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T06:03:26.982Z",
+      "last_accessed": "2026-03-07T06:42:33.820Z"
+    },
+    "eslint.config.js": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T06:05:49.313Z",
+      "last_accessed": "2026-03-07T06:05:49.313Z"
+    },
+    "scripts/validation/validate-archived-tests.mjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T07:07:58.894Z",
+      "last_accessed": "2026-03-07T07:07:58.894Z"
+    },
+    "scripts/validation/validate-full-parallel.cjs": {
+      "description": "Auto-discovered (code-index-updater)",
+      "category": "code-indexing",
+      "discovered_at": "2026-03-07T07:08:12.388Z",
+      "last_accessed": "2026-03-07T07:08:12.388Z"
     }
   },
-  "last_updated": "2026-03-06T06:31:13.590Z"
+  "last_updated": "2026-03-07T07:15:30.278Z"
 }

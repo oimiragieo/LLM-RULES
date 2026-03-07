@@ -48,7 +48,7 @@ This table shows which workflows are referenced by which agent archetypes. Workf
 
 **Agent Archetype Definitions:**
 
-- **Router**: router.md (1 agent) - Master routing and orchestration
+- **Router**: CLAUDE.md (1 definition) - Master routing and orchestration
 - **Implementer**: developer, planner, qa, security-architect, architect, database-architect, devops, devops-troubleshooter, incident-responder, code-simplifier, conductor-validator (11 agents) - Build and implement
 - **Reviewer**: code-reviewer (1 agent) - Review code quality and correctness
 - **Documenter**: technical-writer, c4-code, c4-component, c4-container, c4-context (5 agents) - Create documentation

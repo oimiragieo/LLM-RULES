@@ -190,7 +190,7 @@ If the target workflow is under `.claude/workflows/core/`, the patch plan MUST i
 
 - `.claude/CLAUDE.md` (routing references, phase descriptions)
 - `.claude/workflows/core/router-decision.md` (routing logic affected by phase changes)
-- `.claude/agents/core/router.md` (router alignment)
+- `.claude/CLAUDE.md` (router alignment)
 
 Do not treat a core workflow update as complete until all three files are verified against the new behavior.
 
@@ -238,7 +238,7 @@ const entry = {
 - [ ] RED/GREEN/REFACTOR/VERIFY backlog documented
 - [ ] Phase agents verified in agent-registry.json
 - [ ] Gate regressions validated (no blocking regressions introduced)
-- [ ] Core workflow sync completed if applicable (CLAUDE.md, router-decision.md, router.md)
+- [ ] Core workflow sync completed if applicable (CLAUDE.md, router-decision.md)
 - [ ] Workflow registry entry updated (phases, agents, status)
 - [ ] `@WORKFLOW_AGENT_MAP.md` updated if phase-agent assignments changed
 - [ ] `evolution-state.json` updated if EVOLVE-triggered
