@@ -17,6 +17,39 @@ Use this skill to reduce token usage while preserving grounded evidence. This in
 - MemoryRecord persistence into framework memory
 - spawn prompt evidence injection (`[mem:*]` / `[rag:*]`)
 
+## Activation
+
+The token-saver skill can be invoked in two ways:
+
+### Manual Invocation (always available)
+
+```javascript
+Skill({ skill: 'token-saver-context-compression' });
+```
+
+Use this when context pressure is high, `pnpm search:tokens` shows a file/directory exceeds 32K tokens, or you need query-targeted compression.
+
+### Auto-enforcement via compression-reminder.txt (requires AUTO_COMPRESSION_PHASE_3=1)
+
+Set `AUTO_COMPRESSION_PHASE_3=1` in `.env` to enable the compression-reminder.txt trigger:
+
+```bash
+# In .env
+AUTO_COMPRESSION_PHASE_3=1
+```
+
+When enabled, `compression-trigger.cjs` writes `.claude/context/runtime/compression-reminder.txt` whenever a compression event fires. The router reads this file and spawns `context-compressor` automatically.
+
+**Without this env var**: compression events are logged to `.claude/context/compression-stats.jsonl` but no `compression-reminder.txt` is written, so the router does not auto-spawn compression. The skill must be invoked manually.
+
+**Token thresholds** enforced by the router (from CLAUDE.md Section 8):
+
+- **80K tokens** — spawn `context-compressor` proactively
+- **120K tokens** — compression mandatory before new spawns
+- **150K tokens** — no new agent spawns until compression completes
+
+Note: These thresholds are router behavioral guidelines checked in CLAUDE.md Section 8. The `compression-trigger.cjs` triggers are separate heuristics (budget >90%, reads >10KB, fetches >5KB, periodic every 10 ops). There is no automated hook enforcing the 80K/120K/150K thresholds — they rely on the router reading `compression-reminder.txt`.
+
 ## When to Use
 
 - `pnpm search:tokens` shows a file/directory exceeds 32K tokens

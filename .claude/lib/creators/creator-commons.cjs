@@ -399,7 +399,7 @@ function enhancedIntegrationChecklist(artifactType, artifactPath, options = {}) 
         if (registry) {
           const hasEntry = Array.isArray(registry.agents)
             ? registry.agents.some(a => a.name === artifactName || a.type === artifactName)
-            : registry[artifactName] !== undefined;
+            : registry.agents !== undefined && registry.agents[artifactName] !== undefined;
 
           if (hasEntry) {
             result.passed.push('registry entry found');
@@ -521,8 +521,10 @@ function verifySkillCreation(skillName, options = {}) {
         let hasAssignment = false;
 
         // Search through agents for skill assignment
-        const agents = registry.agents || Object.values(registry);
-        for (const agent of Array.isArray(agents) ? agents : []) {
+        // registry.agents is an object keyed by agent ID, not an array
+        const agentsObj = registry.agents || {};
+        const agentsList = Array.isArray(agentsObj) ? agentsObj : Object.values(agentsObj);
+        for (const agent of agentsList) {
           const skills = agent.skills || agent.assigned_skills || [];
           if (Array.isArray(skills) && skills.includes(skillName)) {
             hasAssignment = true;

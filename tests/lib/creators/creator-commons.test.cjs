@@ -27,6 +27,8 @@ const {
   queueCrossCreatorReview,
   validateSchema,
   runIntegrationChecklist,
+  enhancedIntegrationChecklist,
+  verifySkillCreation,
 } = require('../../../.claude/lib/creators/creator-commons.cjs');
 
 // Test fixtures
@@ -306,5 +308,171 @@ describe('runIntegrationChecklist', () => {
 
     const totalChecks = result.passed.length + result.failed.length + result.warnings.length;
     assert.ok(totalChecks >= 2, 'should run at least 2 checks');
+  });
+});
+
+// =============================================================================
+// Regression: registry.agents is an object not an array (Bug 1 + Bug 2)
+// =============================================================================
+
+describe('enhancedIntegrationChecklist — registry.agents object lookup (Bug 1 regression)', () => {
+  beforeEach(() => {
+    ensureTmpDir();
+  });
+
+  afterEach(() => {
+    cleanTmpDir();
+  });
+
+  it('registry.agents keyed-by-id: finds an existing agent by key', () => {
+    // Reproduce the exact shape of the real agent-registry.json
+    const registry = {
+      agents: {
+        'my-agent': { id: 'my-agent', displayName: 'My Agent' },
+      },
+    };
+    const registryPath = path.join(TMP_DIR, 'agent-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2));
+
+    const artifactPath = path.join(TMP_DIR, 'my-agent.md');
+    fs.writeFileSync(
+      artifactPath,
+      '<!-- Agent: developer | Task: #1 | Session: 2026-03-07 -->\n# My Agent\n'
+    );
+
+    const result = enhancedIntegrationChecklist('agent', artifactPath, {
+      artifactName: 'my-agent',
+      registryPath,
+    });
+
+    // Bug 1 was: registry['my-agent'] (top-level key) instead of registry.agents['my-agent']
+    // With the fix, the lookup should succeed and find the entry.
+    assert.ok(
+      result.passed.some(p => p.includes('registry entry found')),
+      `expected "registry entry found" in passed; got: ${JSON.stringify(result.passed)}`
+    );
+    assert.ok(
+      !result.failed.some(f => f.includes('Missing agent-registry entry')),
+      `should NOT have a missing-entry failure; failed: ${JSON.stringify(result.failed)}`
+    );
+  });
+
+  it('registry.agents keyed-by-id: reports missing when agent is not present', () => {
+    const registry = {
+      agents: {
+        'other-agent': { id: 'other-agent', displayName: 'Other Agent' },
+      },
+    };
+    const registryPath = path.join(TMP_DIR, 'agent-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2));
+
+    const artifactPath = path.join(TMP_DIR, 'nonexistent-agent.md');
+    fs.writeFileSync(
+      artifactPath,
+      '<!-- Agent: developer | Task: #1 | Session: 2026-03-07 -->\n# Nonexistent Agent\n'
+    );
+
+    const result = enhancedIntegrationChecklist('agent', artifactPath, {
+      artifactName: 'nonexistent-agent',
+      registryPath,
+    });
+
+    assert.ok(
+      result.failed.some(f => f.includes('Missing agent-registry entry')),
+      `expected missing-entry failure; failed: ${JSON.stringify(result.failed)}`
+    );
+  });
+});
+
+describe('verifySkillCreation — Object.values(registry.agents) iteration (Bug 2 regression)', () => {
+  beforeEach(() => {
+    ensureTmpDir();
+  });
+
+  afterEach(() => {
+    cleanTmpDir();
+  });
+
+  it('registry.agents is an object not an array', () => {
+    const registry = require('../../../.claude/context/agent-registry.json');
+    assert.ok(
+      registry.agents && typeof registry.agents === 'object',
+      'registry.agents must exist and be an object'
+    );
+    assert.strictEqual(
+      Array.isArray(registry.agents),
+      false,
+      'registry.agents must NOT be an array — it is keyed by agent ID'
+    );
+  });
+
+  it('Object.values(registry.agents) iterates all agents', () => {
+    const registry = require('../../../.claude/context/agent-registry.json');
+    const values = Object.values(registry.agents);
+    assert.ok(values.length > 0, 'should have at least one agent');
+    // Every value should be an object with an id field
+    for (const agent of values) {
+      assert.ok(
+        agent && typeof agent === 'object',
+        `each agent entry must be an object, got: ${typeof agent}`
+      );
+    }
+  });
+
+  it('agent lookup by ID works via registry.agents[id]', () => {
+    const registry = require('../../../.claude/context/agent-registry.json');
+    const firstKey = Object.keys(registry.agents)[0];
+    const agent = registry.agents[firstKey];
+    assert.ok(agent, `registry.agents['${firstKey}'] should return the agent object`);
+    assert.ok(
+      agent.id || agent.displayName || agent.filePath,
+      'agent object should have at least one known field'
+    );
+  });
+
+  it('verifySkillCreation iterates object-shaped registry without skipping agents (Bug 2 fix)', () => {
+    // Build a fake registry where one agent has the skill assigned
+    const skillName = 'test-regression-skill-xyz';
+    const registry = {
+      agents: {
+        'agent-with-skill': {
+          id: 'agent-with-skill',
+          skills: [skillName],
+        },
+        'agent-without-skill': {
+          id: 'agent-without-skill',
+          skills: [],
+        },
+      },
+    };
+    const registryPath = path.join(TMP_DIR, 'agent-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2));
+
+    // Create a minimal skill directory so file-existence checks pass
+    const skillsDir = path.join(TMP_DIR, 'skills');
+    const skillDir = path.join(skillsDir, skillName);
+    fs.mkdirSync(skillDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(skillDir, 'SKILL.md'),
+      '<!-- Agent: developer | Task: #1 | Session: 2026-03-07 -->\n# Test Regression Skill\n'
+    );
+
+    const result = verifySkillCreation(skillName, {
+      skillsDir,
+      registryPath,
+      catalogPath: path.join(TMP_DIR, 'nonexistent-catalog.md'), // skip catalog check
+    });
+
+    // Bug 2 was: Array.isArray(agents) guard always evaluated false for object-shaped registry
+    // causing the for-loop to iterate [] and never find the assignment, producing a false warning.
+    // With the fix, Object.values() is used and the assignment IS found.
+    assert.ok(
+      result.passed.some(p => p.includes('agent assignment found')),
+      `expected "agent assignment found" in passed; got passed=${JSON.stringify(result.passed)}, warnings=${JSON.stringify(result.warnings)}`
+    );
+    assert.ok(
+      !result.warnings.some(w => w.includes('No agent assignment found')),
+      `should NOT warn about missing assignment when agent has the skill; warnings: ${JSON.stringify(result.warnings)}`
+    );
   });
 });

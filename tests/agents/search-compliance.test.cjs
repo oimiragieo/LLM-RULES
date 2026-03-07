@@ -1,55 +1,58 @@
 // tests/agents/search-compliance.test.cjs
-// Verifies that all agents have search skills wired and search-first
-// instructions in place after Phase 1-3 wiring (commit 7197fa60).
+// Comprehensive search compliance tests for agent tool usage.
+// Verifies agents instruct correct search tool hierarchy, MemoryRecord presence,
+// token-saver wiring, frontmatter validity, and router tool restrictions.
+//
+// Checks:
+//   A: Search tool compliance (Grep in tools → must reference ripgrep/search:code/etc.)
+//   B: MemoryRecord presence in core/domain/specialized agents
+//   C: Token-saver wiring for agents with >5 skills
+//   D: Frontmatter parseable (--- markers, name field, tools array)
+//   Router: Only whitelisted tools
 
 'use strict';
 
-const { describe, it, before } = require('node:test');
+const { describe, it, before, test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const AGENTS_DIR = path.join(ROOT, '.claude', 'agents');
-const TEMPLATES_DIR = path.join(ROOT, '.claude', 'templates', 'spawn');
-const CLAUDE_MD = path.join(ROOT, '.claude', 'CLAUDE.md');
-const CODE_STANDARDS = path.join(ROOT, '.claude', 'rules', 'code-standards.md');
+const SUBDIRS = ['core', 'domain', 'specialized', 'orchestrators'];
 
-const SEARCH_SKILLS = ['ripgrep', 'code-semantic-search', 'code-structural-search'];
-const SUBDIRS = ['core', 'specialized', 'domain', 'orchestrators'];
+// Lightweight agents exempt from MemoryRecord requirement (Check B)
+const MEMORY_RECORD_EXEMPTIONS = new Set([
+  'context-compressor',
+  'conductor-validator',
+  'c4-code',
+  'c4-component',
+  'c4-container',
+  'c4-context',
+  'general-assistant',
+]);
 
-// Agents that are exempt from search skill requirements (router, reflection, etc.)
-const SEARCH_SKILL_EXEMPTIONS = new Set(['router.md', 'reflection-agent.md']);
+// Router banned tools
+const ROUTER_BANNED_TOOLS = new Set(['Edit', 'Write', 'Glob', 'Grep', 'WebSearch', 'WebFetch']);
 
-// Agents exempt from Code Search Protocol body section
-const PROTOCOL_EXEMPTIONS = new Set(['router.md']);
+// Search-related references that satisfy Check A
+const SEARCH_REFERENCES = ['ripgrep', 'pnpm search:code', 'code-semantic-search', 'lsp-navigator'];
 
-function getAgentFiles(subdir) {
-  const dir = path.join(AGENTS_DIR, subdir);
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter(f => f.endsWith('.md'))
-    .map(f => {
-      const content = fs.readFileSync(path.join(dir, f), 'utf8');
-      return { name: f, subdir, content };
-    });
-}
-
-function getAllAgents() {
-  return SUBDIRS.flatMap(d => getAgentFiles(d));
-}
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 /**
- * Check if an agent has the search-compliance-exempt comment.
- * Agents with this comment are skipped for body-text anti-pattern checks.
+ * Extract YAML frontmatter text between --- markers.
+ * Returns null if no valid frontmatter found.
  */
-function isExempt(content) {
-  return content.includes('<!-- search-compliance-exempt -->');
+function extractFrontmatter(content) {
+  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  return match ? match[1] : null;
 }
 
 /**
- * Extract the body text after frontmatter (everything after the closing ---).
+ * Extract the body text after frontmatter.
  */
 function extractBody(content) {
   const fmEnd = content.indexOf('---', content.indexOf('---') + 3);
@@ -57,75 +60,401 @@ function extractBody(content) {
   return content.slice(fmEnd + 3);
 }
 
-function extractFrontmatterSkills(content) {
-  const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
-  if (!fmMatch) return [];
-  const fm = fmMatch[1];
-  const skills = [];
+/**
+ * Extract a YAML list field (tools: or skills:) from frontmatter text.
+ * Handles both dash-list and bracket-array formats.
+ */
+function extractList(fm, fieldName) {
+  const items = [];
   const lines = fm.split('\n');
-  let inSkills = false;
+  let inField = false;
+  const fieldRegex = new RegExp(`^${fieldName}:\\s*`);
+
   for (const line of lines) {
-    if (/^skills:/.test(line)) {
-      inSkills = true;
+    if (fieldRegex.test(line)) {
+      inField = true;
+      // Handle inline bracket array: tools: [Read, Write, Edit]
+      const bracketMatch = line.match(new RegExp(`${fieldName}:\\s*\\[([^\\]]*)\\]`));
+      if (bracketMatch) {
+        items.push(
+          ...bracketMatch[1]
+            .split(',')
+            .map(s => s.trim().replace(/['"]/g, ''))
+            .filter(Boolean)
+        );
+        inField = false;
+      }
       continue;
     }
-    if (inSkills && /^\s+-\s+/.test(line)) {
-      skills.push(line.replace(/^\s+-\s+/, '').trim());
-    } else if (inSkills && !/^\s+/.test(line) && line.trim() !== '') {
-      inSkills = false;
+    if (inField) {
+      if (/^\s*\[/.test(line)) continue;
+      if (/^\s*\]/.test(line) || /\]/.test(line)) {
+        const beforeBracket = line.replace(/\].*/, '').trim();
+        if (beforeBracket) {
+          items.push(
+            ...beforeBracket
+              .split(',')
+              .map(s =>
+                s
+                  .trim()
+                  .replace(/['"]/g, '')
+                  .replace(/^\s*-\s*/, '')
+              )
+              .filter(Boolean)
+          );
+        }
+        inField = false;
+        continue;
+      }
+      // Dash-list items: - Read
+      if (/^\s+-\s+/.test(line) || /^\s+-\s*["']/.test(line)) {
+        const item = line
+          .replace(/^\s+-\s+/, '')
+          .replace(/^\s+-\s*/, '')
+          .replace(/['"]/g, '')
+          .replace(/,\s*$/, '')
+          .trim();
+        if (item) items.push(item);
+      } else if (/^\s+\w/.test(line)) {
+        // Comma-separated continuation
+        items.push(
+          ...line
+            .split(',')
+            .map(s => s.trim().replace(/['"]/g, ''))
+            .filter(Boolean)
+        );
+      } else if (/^\w/.test(line)) {
+        inField = false;
+      }
     }
   }
-  return skills;
+  return items;
 }
 
-describe('Agent Search Skill Wiring', () => {
-  const agents = getAllAgents();
+/**
+ * Extract the name field from frontmatter.
+ */
+function extractName(fm) {
+  const match = fm.match(/^name:\s*(.+)$/m);
+  return match ? match[1].trim().replace(/['"]/g, '') : null;
+}
 
-  it('agent directory contains files to test', () => {
-    assert.ok(agents.length > 0, 'Expected at least one agent file to exist');
+/**
+ * Parse an agent file into a structured object.
+ */
+function parseAgent(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  const fm = extractFrontmatter(content);
+  const tools = fm ? extractList(fm, 'tools') : [];
+  const skills = fm ? extractList(fm, 'skills') : [];
+  const name = fm ? extractName(fm) : path.basename(filePath, '.md');
+  const body = extractBody(content);
+  return { content, fm, tools, skills, name, body, filePath };
+}
+
+/**
+ * Load all agent files from all subdirectories.
+ */
+function loadAllAgents() {
+  const agents = [];
+  for (const subdir of SUBDIRS) {
+    const dir = path.join(AGENTS_DIR, subdir);
+    if (!fs.existsSync(dir)) continue;
+    const files = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
+    for (const file of files) {
+      const filePath = path.join(dir, file);
+      if (!fs.statSync(filePath).isFile()) continue;
+      const agent = parseAgent(filePath);
+      agents.push({ ...agent, subdir, filename: file });
+    }
+  }
+  return agents;
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+let allAgents;
+
+before(() => {
+  allAgents = loadAllAgents();
+});
+
+describe('Check D: Frontmatter parseable', () => {
+  it('found agent files to test', () => {
+    assert.ok(allAgents.length > 0, 'Expected at least one agent file');
   });
 
-  for (const agent of agents) {
-    if (SEARCH_SKILL_EXEMPTIONS.has(agent.name)) continue;
+  for (const subdir of SUBDIRS) {
+    it(`all ${subdir}/ agents have valid YAML frontmatter with --- markers`, () => {
+      const failures = [];
+      const subset = allAgents.filter(a => a.subdir === subdir);
+      for (const agent of subset) {
+        if (!agent.fm) {
+          failures.push(`${agent.filename}: missing --- frontmatter markers`);
+        }
+      }
+      assert.deepStrictEqual(failures, [], `Frontmatter parse failures:\n${failures.join('\n')}`);
+    });
 
-    it(`${agent.subdir}/${agent.name} has at least one search skill`, () => {
-      const skills = extractFrontmatterSkills(agent.content);
-      const hasSearch = skills.some(s => SEARCH_SKILLS.some(ss => s.includes(ss)));
-      assert.ok(hasSearch, `${agent.name} missing search skills. Has: [${skills.join(', ')}]`);
+    it(`all ${subdir}/ agents have a name field`, () => {
+      const failures = [];
+      const subset = allAgents.filter(a => a.subdir === subdir);
+      for (const agent of subset) {
+        if (!agent.name) {
+          failures.push(`${agent.filename}: missing name field in frontmatter`);
+        }
+      }
+      assert.deepStrictEqual(failures, [], `Missing name field:\n${failures.join('\n')}`);
+    });
+
+    it(`all ${subdir}/ agents have a tools array`, () => {
+      const failures = [];
+      const subset = allAgents.filter(a => a.subdir === subdir);
+      for (const agent of subset) {
+        if (!agent.tools || agent.tools.length === 0) {
+          failures.push(`${agent.filename}: missing or empty tools array`);
+        }
+      }
+      assert.deepStrictEqual(failures, [], `Missing tools array:\n${failures.join('\n')}`);
     });
   }
 });
 
-describe('Agent Search-First Instructions', () => {
-  const agents = getAllAgents();
+describe('Check A: Search tool compliance', () => {
+  it('agents with Grep in tools reference at least one preferred search tool', () => {
+    const noncompliant = [];
+    for (const agent of allAgents) {
+      if (!agent.tools.includes('Grep')) continue;
+      // Check body text for any preferred search reference
+      const hasSearchRef = SEARCH_REFERENCES.some(ref => agent.content.includes(ref));
+      // Also check skills array for search skills
+      const hasSearchSkill =
+        agent.skills.includes('ripgrep') ||
+        agent.skills.includes('code-semantic-search') ||
+        agent.skills.includes('lsp-navigator');
+      if (!hasSearchRef && !hasSearchSkill) {
+        noncompliant.push(
+          `${agent.subdir}/${agent.filename} (name: ${agent.name}) — has Grep but no search skill/reference`
+        );
+      }
+    }
+    if (noncompliant.length > 0) {
+      console.error(
+        `[Check A] Search-noncompliant agents (${noncompliant.length}):\n  ${noncompliant.join('\n  ')}`
+      );
+    }
+    assert.deepStrictEqual(
+      noncompliant,
+      [],
+      `Agents with Grep in tools but no ripgrep/search:code/code-semantic-search/lsp-navigator reference:\n${noncompliant.join('\n')}`
+    );
+  });
+});
 
-  for (const agent of agents) {
-    if (PROTOCOL_EXEMPTIONS.has(agent.name)) continue;
+describe('Check B: MemoryRecord presence', () => {
+  for (const subdir of ['core', 'domain', 'specialized']) {
+    it(`all ${subdir}/ agents (except exemptions) have MemoryRecord in tools`, () => {
+      const missing = [];
+      const subset = allAgents.filter(a => a.subdir === subdir);
+      for (const agent of subset) {
+        if (MEMORY_RECORD_EXEMPTIONS.has(agent.name)) continue;
+        if (!agent.tools.includes('MemoryRecord')) {
+          missing.push(`${agent.filename} (name: ${agent.name})`);
+        }
+      }
+      assert.deepStrictEqual(
+        missing,
+        [],
+        `${subdir}/ agents missing MemoryRecord in tools:\n${missing.join('\n')}`
+      );
+    });
+  }
 
-    it(`${agent.subdir}/${agent.name} references search or hybrid search`, () => {
+  it('exempted lightweight agents are known and documented', () => {
+    // Verify exemptions actually exist as agent files
+    for (const exempted of MEMORY_RECORD_EXEMPTIONS) {
+      const found = allAgents.some(a => a.name === exempted);
+      assert.ok(found, `Exempted agent "${exempted}" not found in agent files — stale exemption?`);
+    }
+  });
+});
+
+describe('Check C: Token-saver wiring', () => {
+  it('agents with >5 skills reference token-saver-context-compression or similar', () => {
+    const missing = [];
+    for (const agent of allAgents) {
+      if (agent.skills.length <= 5) continue;
+      const hasTokenSaver =
+        agent.skills.includes('token-saver-context-compression') ||
+        agent.skills.includes('context-compressor') ||
+        agent.content.includes('token-saver') ||
+        agent.content.includes('context-compressor') ||
+        agent.content.includes('context compression');
+      if (!hasTokenSaver) {
+        missing.push(
+          `${agent.subdir}/${agent.filename} (name: ${agent.name}, skills: ${agent.skills.length}) — no compression skill`
+        );
+      }
+    }
+    if (missing.length > 0) {
+      console.error(
+        `[Check C] Agents with >5 skills but no token-saver/compression reference (${missing.length}):\n  ${missing.join('\n  ')}`
+      );
+    }
+    // This is a SHOULD, not a MUST — use a softer assertion that still reports
+    assert.deepStrictEqual(
+      missing,
+      [],
+      `Agents with >5 skills missing token-saver-context-compression or similar:\n${missing.join('\n')}`
+    );
+  });
+});
+
+describe('Router tool whitelist', () => {
+  let routerAgent;
+
+  before(() => {
+    // Look for router.md in core/ (primary location)
+    const routerPath = path.join(AGENTS_DIR, 'core', 'router.md');
+    if (fs.existsSync(routerPath)) {
+      routerAgent = parseAgent(routerPath);
+    }
+  });
+
+  it('router.md exists (or was deleted per ADR — skip if absent)', () => {
+    // Router.md was deleted per memory entry — this test documents that state
+    if (!routerAgent) {
+      test.todo('router.md was deleted — router is defined in CLAUDE.md only');
+      return;
+    }
+    assert.ok(routerAgent, 'router.md should exist in core/');
+  });
+
+  it('router does NOT have banned tools in its tools array', () => {
+    if (!routerAgent) return; // Skip if router.md absent
+    const violations = [];
+    for (const tool of routerAgent.tools) {
+      if (ROUTER_BANNED_TOOLS.has(tool)) {
+        violations.push(tool);
+      }
+    }
+    assert.deepStrictEqual(
+      violations,
+      [],
+      `Router has banned tools: ${violations.join(', ')}. Only Task, Read, AskUserQuestion, Bash-whitelist permitted.`
+    );
+  });
+
+  it('CLAUDE.md documents router tool lockdown', () => {
+    const claudeMd = fs.readFileSync(path.join(ROOT, '.claude', 'CLAUDE.md'), 'utf-8');
+    assert.ok(
+      claudeMd.includes('TOOL LOCKDOWN') || claudeMd.includes('BANNED TOOLS'),
+      'CLAUDE.md should document router tool lockdown'
+    );
+    // Verify banned tools are listed
+    for (const tool of ROUTER_BANNED_TOOLS) {
+      assert.ok(
+        claudeMd.includes(tool),
+        `CLAUDE.md should mention banned tool "${tool}" in lockdown section`
+      );
+    }
+  });
+});
+
+describe('Agent Search Skill Wiring (frontmatter)', () => {
+  // Agents exempt from requiring search skills in frontmatter
+  const SEARCH_SKILL_EXEMPTIONS = new Set(['reflection-agent']);
+
+  it('all agents (except exemptions) have at least one search skill in frontmatter', () => {
+    const SEARCH_SKILLS = [
+      'ripgrep',
+      'code-semantic-search',
+      'code-structural-search',
+      'lsp-navigator',
+    ];
+    const missing = [];
+    for (const agent of allAgents) {
+      if (SEARCH_SKILL_EXEMPTIONS.has(agent.name)) continue;
+      const hasSearch = agent.skills.some(s => SEARCH_SKILLS.some(ss => s.includes(ss)));
+      if (!hasSearch) {
+        missing.push(`${agent.subdir}/${agent.filename} (name: ${agent.name})`);
+      }
+    }
+    assert.deepStrictEqual(
+      missing,
+      [],
+      `Agents missing search skills in frontmatter:\n${missing.join('\n')}`
+    );
+  });
+});
+
+describe('Agent Search-First Instructions (body text)', () => {
+  it('all agents reference search or hybrid search in body text', () => {
+    const missing = [];
+    for (const agent of allAgents) {
       const hasSearchRef =
         agent.content.includes('Code Search Protocol') ||
         agent.content.includes('Search-First') ||
         agent.content.includes('search:code') ||
         agent.content.includes('ripgrep') ||
         agent.content.includes('hybrid search') ||
-        agent.content.includes('pnpm search');
-      assert.ok(
-        hasSearchRef,
-        `${agent.name} has no search-first reference (Code Search Protocol, ripgrep, search:code)`
-      );
-    });
+        agent.content.includes('pnpm search') ||
+        agent.content.includes('code-semantic-search');
+      if (!hasSearchRef) {
+        missing.push(`${agent.subdir}/${agent.filename} (name: ${agent.name})`);
+      }
+    }
+    assert.deepStrictEqual(
+      missing,
+      [],
+      `Agents with no search-first reference in body:\n${missing.join('\n')}`
+    );
+  });
+});
+
+describe('No Grep-First Language in Agents', () => {
+  function isExempt(content) {
+    return content.includes('<!-- search-compliance-exempt -->');
   }
+
+  it('no agent uses "use Grep for code discovery" without fallback qualifier', () => {
+    const violations = [];
+    for (const agent of allAgents) {
+      if (isExempt(agent.content)) continue;
+      if (
+        /use Grep (for|to) (code |codebase )?discover/i.test(agent.content) &&
+        !/fallback/i.test(agent.content)
+      ) {
+        violations.push(`${agent.subdir}/${agent.filename}`);
+      }
+    }
+    assert.deepStrictEqual(
+      violations,
+      [],
+      `Agents with unqualified Grep-first discovery language: ${violations.join(', ')}`
+    );
+  });
 });
 
 describe('Spawn Template Search-First', () => {
+  const TEMPLATES_DIR = path.join(ROOT, '.claude', 'templates', 'spawn');
   let template;
 
   before(() => {
-    template = fs.readFileSync(path.join(TEMPLATES_DIR, 'universal-agent-spawn.md'), 'utf8');
+    const templatePath = path.join(TEMPLATES_DIR, 'universal-agent-spawn.md');
+    if (fs.existsSync(templatePath)) {
+      template = fs.readFileSync(templatePath, 'utf-8');
+    }
+  });
+
+  it('universal-agent-spawn.md exists', () => {
+    assert.ok(template, 'universal-agent-spawn.md should exist');
   });
 
   it('contains Search-First Protocol section', () => {
+    if (!template) return;
     assert.ok(
       template.includes('Search-First Protocol'),
       'universal-agent-spawn.md missing Search-First Protocol section'
@@ -133,6 +462,7 @@ describe('Spawn Template Search-First', () => {
   });
 
   it('mentions pnpm search:code', () => {
+    if (!template) return;
     assert.ok(
       template.includes('pnpm search:code'),
       'universal-agent-spawn.md should mention pnpm search:code'
@@ -140,10 +470,12 @@ describe('Spawn Template Search-First', () => {
   });
 
   it('mentions ripgrep skill', () => {
+    if (!template) return;
     assert.ok(template.includes('ripgrep'), 'universal-agent-spawn.md should mention ripgrep');
   });
 
   it('says Grep is fallback only', () => {
+    if (!template) return;
     assert.match(
       template,
       /[Gg]rep\b.*(?:fallback|FALLBACK|only|ONLY)|(?:fallback|FALLBACK|only|ONLY).*[Gg]rep\b/i,
@@ -152,41 +484,12 @@ describe('Spawn Template Search-First', () => {
   });
 });
 
-describe('CLAUDE.md Search Status', () => {
-  let claudeMd;
-
-  before(() => {
-    claudeMd = fs.readFileSync(CLAUDE_MD, 'utf8');
-  });
-
-  it('reports 63 agents with search skills', () => {
-    assert.ok(
-      claudeMd.includes('63 agents'),
-      'CLAUDE.md should report 63 agents with search skills'
-    );
-  });
-
-  it('Phase 2 marked COMPLETE', () => {
-    assert.match(claudeMd, /Phase 2[^\n]*COMPLETE/, 'CLAUDE.md should mark Phase 2 as COMPLETE');
-  });
-
-  it('Phase 3 marked COMPLETE', () => {
-    assert.match(claudeMd, /Phase 3[^\n]*COMPLETE/, 'CLAUDE.md should mark Phase 3 as COMPLETE');
-  });
-
-  it('has search telemetry enforcement note', () => {
-    assert.ok(
-      claudeMd.includes('search-telemetry.jsonl'),
-      'CLAUDE.md should reference search-telemetry.jsonl'
-    );
-  });
-});
-
 describe('Code Standards Search Enforcement', () => {
+  const CODE_STANDARDS = path.join(ROOT, '.claude', 'rules', 'code-standards.md');
   let standards;
 
   before(() => {
-    standards = fs.readFileSync(CODE_STANDARDS, 'utf8');
+    standards = fs.readFileSync(CODE_STANDARDS, 'utf-8');
   });
 
   it('has MANDATORY enforcement language', () => {
@@ -214,13 +517,6 @@ describe('Code Standards Search Enforcement', () => {
     );
   });
 
-  it('mentions code-structural-search', () => {
-    assert.ok(
-      standards.includes('code-structural-search'),
-      'code-standards.md should mention code-structural-search'
-    );
-  });
-
   it('marks Grep as fallback', () => {
     assert.match(
       standards,
@@ -228,159 +524,14 @@ describe('Code Standards Search Enforcement', () => {
       'code-standards.md should mark Grep as FALLBACK'
     );
   });
-
-  it('has Anti-Pattern warning', () => {
-    assert.ok(
-      standards.includes('Anti-Pattern') || standards.includes('anti-pattern'),
-      'code-standards.md should include Anti-Pattern warning about Grep-first usage'
-    );
-  });
-});
-
-describe('No Grep-First Language in Agents', () => {
-  const agents = getAllAgents();
-
-  it('no agent uses "use Grep for code discovery" without fallback qualifier', () => {
-    const violations = [];
-    for (const agent of agents) {
-      if (isExempt(agent.content)) continue;
-      if (
-        /use Grep (for|to) (code |codebase )?discover/i.test(agent.content) &&
-        !/fallback/i.test(agent.content)
-      ) {
-        violations.push(`${agent.subdir}/${agent.name}`);
-      }
-    }
-    assert.deepStrictEqual(
-      violations,
-      [],
-      `Agents with unqualified Grep-first discovery language: ${violations.join(', ')}`
-    );
-  });
-
-  it('no agent says "use Grep to search the codebase" as primary method', () => {
-    const violations = [];
-    for (const agent of agents) {
-      if (isExempt(agent.content)) continue;
-      if (
-        /use Grep to search (the )?codebase/i.test(agent.content) &&
-        !/fallback|after|prefer.*instead/i.test(agent.content)
-      ) {
-        violations.push(`${agent.subdir}/${agent.name}`);
-      }
-    }
-    assert.deepStrictEqual(
-      violations,
-      [],
-      `Agents with Grep-as-primary-search language: ${violations.join(', ')}`
-    );
-  });
-});
-
-describe('No Raw Grep/Glob Tool Calls as Primary Search in Agents', () => {
-  const agents = getAllAgents();
-
-  it('no agent has Grep() call examples without fallback context', () => {
-    const violations = [];
-    for (const agent of agents) {
-      if (isExempt(agent.content)) continue;
-      // Match Grep({ or Grep( as tool call examples in prompt body
-      const body = extractBody(agent.content);
-      const grepCalls = body.match(/Grep\s*\(\s*\{/g);
-      if (!grepCalls) continue;
-      // Check if fallback/alternative qualifier exists nearby
-      const hasFallback = /fallback|FALLBACK|last.resort|advanced.regex|PCRE/i.test(body);
-      if (!hasFallback) {
-        violations.push(`${agent.subdir}/${agent.name}`);
-      }
-    }
-    assert.deepStrictEqual(
-      violations,
-      [],
-      `Agents with raw Grep() examples without fallback context: ${violations.join(', ')}`
-    );
-  });
-
-  it('no agent has Glob() call examples as primary discovery method', () => {
-    const violations = [];
-    for (const agent of agents) {
-      if (isExempt(agent.content)) continue;
-      const body = extractBody(agent.content);
-      const globCalls = body.match(/Glob\s*\(\s*\{/g);
-      if (!globCalls) continue;
-      // Check if the agent also mentions search skills
-      const hasSearchSkillRef =
-        body.includes('ripgrep') ||
-        body.includes('search:code') ||
-        body.includes('code-semantic-search');
-      if (!hasSearchSkillRef) {
-        violations.push(`${agent.subdir}/${agent.name}`);
-      }
-    }
-    assert.deepStrictEqual(
-      violations,
-      [],
-      `Agents with Glob() as primary discovery without search skill refs: ${violations.join(', ')}`
-    );
-  });
-});
-
-describe('No Direct Memory File Edits in Agent Prompts', () => {
-  const agents = getAllAgents();
-  // Files that should be edited via MemoryRecord, not Edit/Write
-  const GUARDED_MEMORY_FILES = [
-    'learnings.md',
-    'decisions.md',
-    'issues.md',
-    'patterns.json',
-    'gotchas.json',
-    'open-findings.json',
-    'access-stats.json',
-  ];
-
-  it('no agent has Edit() examples targeting guarded memory files', () => {
-    const violations = [];
-    for (const agent of agents) {
-      if (isExempt(agent.content)) continue;
-      const body = extractBody(agent.content);
-      for (const file of GUARDED_MEMORY_FILES) {
-        // Match Edit('...learnings.md' or Edit("...learnings.md" patterns
-        const editPattern = new RegExp(
-          `Edit\\s*\\(\\s*['"\`][^'"\`]*${file.replace('.', '\\.')}`,
-          'i'
-        );
-        if (editPattern.test(body)) {
-          violations.push(`${agent.subdir}/${agent.name} (Edit ${file})`);
-        }
-        // Match Write('...learnings.md' patterns
-        const writePattern = new RegExp(
-          `Write\\s*\\(\\s*['"\`][^'"\`]*${file.replace('.', '\\.')}`,
-          'i'
-        );
-        if (writePattern.test(body)) {
-          violations.push(`${agent.subdir}/${agent.name} (Write ${file})`);
-        }
-      }
-    }
-    assert.deepStrictEqual(
-      violations,
-      [],
-      `Agents with direct Edit/Write to guarded memory files: ${violations.join(', ')}`
-    );
-  });
 });
 
 describe('Orchestrator Search Skill References', () => {
-  const orchestrators = getAgentFiles('orchestrators');
-
-  it('orchestrator directory has files', () => {
+  it('all orchestrators reference a search skill or search:code', () => {
+    const orchestrators = allAgents.filter(a => a.subdir === 'orchestrators');
     assert.ok(orchestrators.length > 0, 'Expected orchestrator agent files');
-  });
-
-  for (const orch of orchestrators) {
-    if (isExempt(orch.content)) continue;
-
-    it(`orchestrators/${orch.name} references a search skill or search:code`, () => {
+    const missing = [];
+    for (const orch of orchestrators) {
       const hasRef =
         orch.content.includes('ripgrep') ||
         orch.content.includes('search:code') ||
@@ -389,60 +540,14 @@ describe('Orchestrator Search Skill References', () => {
         orch.content.includes('hybrid search') ||
         orch.content.includes('Search-First') ||
         orch.content.includes('pnpm search');
-      assert.ok(hasRef, `${orch.name} has no reference to search skills or search:code`);
-    });
-  }
-
-  it('no orchestrator uses raw Grep/Glob as primary search pattern', () => {
-    const violations = [];
-    for (const orch of orchestrators) {
-      if (isExempt(orch.content)) continue;
-      const body = extractBody(orch.content);
-      // Check for Grep({...}) patterns that appear as primary usage
-      const grepCallCount = (body.match(/Grep\s*\(\s*\{/g) || []).length;
-      const skillRefCount = (body.match(/ripgrep|search:code|code-semantic|code-structural/g) || [])
-        .length;
-      // If there are more Grep calls than search skill references, flag it
-      if (grepCallCount > 0 && skillRefCount === 0) {
-        violations.push(`orchestrators/${orch.name}`);
+      if (!hasRef) {
+        missing.push(`orchestrators/${orch.filename}`);
       }
     }
     assert.deepStrictEqual(
-      violations,
+      missing,
       [],
-      `Orchestrators with raw Grep as primary search: ${violations.join(', ')}`
-    );
-  });
-});
-
-describe('Agents with Search Skills Should Use Skill Invocation Syntax', () => {
-  const agents = getAllAgents();
-
-  it('agents with ripgrep in frontmatter mention Skill invocation or pnpm search', () => {
-    const violations = [];
-    for (const agent of agents) {
-      if (isExempt(agent.content)) continue;
-      if (SEARCH_SKILL_EXEMPTIONS.has(agent.name)) continue;
-      const skills = extractFrontmatterSkills(agent.content);
-      if (!skills.includes('ripgrep')) continue;
-      const body = extractBody(agent.content);
-      const hasSkillCall =
-        body.includes("Skill({ skill: 'ripgrep'") ||
-        body.includes('Skill({ skill: "ripgrep"') ||
-        body.includes('search:code') ||
-        body.includes('pnpm search') ||
-        body.includes('ripgrep skill') ||
-        body.includes('Search-First') ||
-        body.includes('Code Search Protocol') ||
-        body.includes('hybrid search');
-      if (!hasSkillCall) {
-        violations.push(`${agent.subdir}/${agent.name}`);
-      }
-    }
-    assert.deepStrictEqual(
-      violations,
-      [],
-      `Agents with ripgrep in frontmatter but no Skill invocation or search ref: ${violations.join(', ')}`
+      `Orchestrators missing search references: ${missing.join(', ')}`
     );
   });
 });

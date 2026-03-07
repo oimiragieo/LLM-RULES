@@ -505,6 +505,32 @@ fully index CJS modules without explicit `jsconfig.json` or `tsconfig.json` cove
 **Recommendation**: Use LSP as the primary tool for `.ts` and `.js` (ESM) files. For `.cjs` files,
 treat LSP as a secondary option and fall back to ripgrep immediately if LSP returns empty results.
 
+## Windows Path Normalization (SE-01)
+
+On Windows, `path.relative()` and other Node.js path utilities return backslash (`\`) separators
+instead of forward slashes. LSP operations and file path comparisons expect forward-slash paths.
+
+**Rules for Windows compatibility:**
+
+- Always normalize paths before passing them to LSP operations: `filePath.replace(/\\/g, '/')`
+- When comparing LSP result paths to local paths, normalize both sides
+- The diagnostics runner (`lsp-diagnostics-runner.cjs`) handles this via its `normalizePath()` utility
+- Use `[^/\\]*` in regex patterns if path normalization is uncertain
+- Do NOT use `path.relative()` output directly in regex or glob patterns without normalizing
+
+**Example:**
+
+```javascript
+// WRONG: path.relative() returns backslashes on Windows
+const relPath = path.relative(projectRoot, filePath); // ".claude\\lib\\routing.cjs"
+
+// CORRECT: normalize before use
+const relPath = path.relative(projectRoot, filePath).replace(/\\/g, '/');
+// ".claude/lib/routing.cjs"
+```
+
+This is Sharp Edge SE-01 in the codebase. See `.claude/rules/sharp-edges.md` for full details.
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
