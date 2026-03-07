@@ -63,6 +63,10 @@ const KEEP_PATTERNS = [
   /MaxFileReadTokenExceededError/,
   /FileTooLargeError/,
   /^\s+at\s+/,
+  /"level":\s*"error"/,
+  /"event":\s*"main_rejected"/,
+  /"event":\s*"module_load_failed"/,
+  /SyntaxError:/,
 ];
 
 // Lines to REMOVE (noise) — applied after keep
@@ -85,6 +89,15 @@ function keepLine(line) {
 }
 
 function removeLine(line) {
+  // Never remove JSON payloads that represent errors
+  if (
+    /^\s*\{/.test(line) &&
+    (line.includes('"level":"error"') ||
+      line.includes('"event":"main_rejected"') ||
+      line.includes('"event":"module_load_failed"'))
+  ) {
+    return false;
+  }
   return REMOVE_PATTERNS.some(re => re.test(line));
 }
 
