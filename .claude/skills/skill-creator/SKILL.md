@@ -62,8 +62,8 @@ Create, validate, install, and convert skills for the multi-agent ecosystem.
 **After creating ANY skill, you MUST update:**
 
 ```
-1. CLAUDE.md - Add to Section 8.5 "WORKFLOW ENHANCEMENT SKILLS" if user-invocable
-2. Skill Catalog - Add to .claude/docs/skill-catalog.md
+1. CLAUDE.md - Add to Section 3 quick routing table if skill introduces a new agent/orchestrator
+2. Skill Catalog - Update .claude/docs/@SKILL_CATALOG_TABLE.md
 3. learnings.md - Update with integration summary
 ```
 
@@ -71,7 +71,7 @@ Create, validate, install, and convert skills for the multi-agent ecosystem.
 
 ```bash
 grep "<skill-name>" .claude/CLAUDE.md || echo "ERROR: CLAUDE.md NOT UPDATED!"
-grep "<skill-name>" .claude/docs/skill-catalog.md || echo "ERROR: Skill catalog NOT UPDATED!"
+grep "<skill-name>" ".claude/docs/@SKILL_CATALOG_TABLE.md" || echo "ERROR: Skill catalog NOT UPDATED!"
 ```
 
 **WHY**: Skills not in CLAUDE.md are invisible to the Router. Skills not in the catalog are hard to discover.
@@ -1258,11 +1258,11 @@ After creating ANY skill file, you MUST complete these steps in order. Skill cre
 
 This step is AUTOMATIC and BLOCKING. Do not skip.
 
-1. **Determine skill section based on type:**
-   - User-invocable workflow skills -> Section 8.5 (WORKFLOW ENHANCEMENT SKILLS)
-   - Enterprise workflows -> Section 8.6 (ENTERPRISE WORKFLOWS)
-   - Domain/expert skills -> Section 8.7 (AUTO-CLAUDE INTEGRATED SKILLS or create new section)
-   - Infrastructure/tool skills -> Add to appropriate subsection
+1. **Determine what needs updating in CLAUDE.md:**
+   - Skill has an associated orchestrator agent -> Add row to Section 3 quick routing table
+   - Skill is a new workflow/tool type -> Section 3 quick routing table row (if agent introduced)
+   - Skill is user-invocable and important -> Section 7 (Skill Invocation) mention
+   - Infrastructure/tool skills -> Usually no CLAUDE.md entry needed
 
 2. **Generate skill entry in this exact format:**
 
@@ -1339,17 +1339,15 @@ skills: [tdd, debugging, new-skill-name]
 
 **BLOCKING**: At least one agent must be assigned. Unassigned skills are never invoked.
 
-### Step 8: Update Skill Catalog (MANDATORY - BLOCKING)
+### Step 8: Update Skill Catalog + Routing Docs (MANDATORY - BLOCKING)
 
-Update the skill catalog to ensure the new skill is discoverable.
+Update the skill catalog and routing docs to ensure the new skill and any new agent are discoverable.
+
+#### 8a. Skill Catalog (`@SKILL_CATALOG_TABLE.md`)
 
 1. **Read current catalog:**
 
-   Use `Read` on `.claude/docs/skill-catalog.md` (preferred), or Node if needed:
-
-   ```bash
-   node -e "const fs=require('fs');const p='.claude/docs/skill-catalog.md';if(fs.existsSync(p))console.log(fs.readFileSync(p,'utf8'));"
-   ```
+   Use `Read` on `.claude/docs/@SKILL_CATALOG_TABLE.md`.
 
 2. **Determine skill category** based on domain:
    - Core Development (tdd, debugging, code-analyzer)
@@ -1379,10 +1377,39 @@ Update the skill catalog to ensure the new skill is discoverable.
 5. **Verify update:**
 
    ```bash
-   grep "{skill-name}" .claude/docs/skill-catalog.md || echo "ERROR: Skill catalog NOT UPDATED!"
+   grep "{skill-name}" ".claude/docs/@SKILL_CATALOG_TABLE.md" || echo "ERROR: Skill catalog NOT UPDATED!"
    ```
 
 **BLOCKING**: Skill must appear in catalog. Uncataloged skills are hard to discover.
+
+#### 8b. Agent Routing Table (`@AGENT_ROUTING_TABLE.md`) — if new agent created
+
+If the skill creation involved creating a new orchestrator or agent:
+
+1. **Read current routing table:**
+
+   Use `Read` on `.claude/docs/@AGENT_ROUTING_TABLE.md`.
+
+2. **Add a row to the CONTENT table** using the format:
+
+   ```markdown
+   | {Request Type} | `{agent-id}` | `.claude/agents/{category}/{agent-id}.md` |
+   ```
+
+3. **Add a row to the Common Misrouting Quick Reference** if the new agent is likely to be misrouted:
+
+   ```markdown
+   | "{trigger phrase}" | developer | **{agent-id}** |
+   ```
+
+4. **Verify:**
+
+   ```bash
+   grep "{agent-id}" ".claude/docs/@AGENT_ROUTING_TABLE.md" || echo "ERROR: Routing table NOT UPDATED!"
+   grep "{agent-id}" ".claude/CLAUDE.md" || echo "ERROR: CLAUDE.md routing table NOT UPDATED!"
+   ```
+
+**BLOCKING**: If a new agent was created, it MUST appear in both `@AGENT_ROUTING_TABLE.md` and CLAUDE.md Section 3 quick routing table. An agent missing from the routing table is invisible to the Router.
 
 ### Step 9: System Impact Analysis (BLOCKING - VERIFICATION CHECKLIST)
 
@@ -1392,8 +1419,9 @@ Before marking skill creation complete, verify ALL items:
 
 - [ ] **SKILL.md created** with valid YAML frontmatter (name, description, version, tools)
 - [ ] **SKILL.md has Memory Protocol section** (copy from template if missing)
-- [ ] **CLAUDE.md updated** with skill documentation (verify with grep)
-- [ ] **Skill catalog updated** with skill entry (verify with grep)
+- [ ] **CLAUDE.md updated** — Section 3 quick routing table if new agent introduced (verify with grep)
+- [ ] **Skill catalog updated** in `@SKILL_CATALOG_TABLE.md` with skill entry (verify with grep)
+- [ ] **Agent routing table updated** in `@AGENT_ROUTING_TABLE.md` if new agent created (verify with grep)
 - [ ] **At least one agent assigned** skill in frontmatter (verify with grep)
 - [ ] **learnings.md updated** with creation record
 - [ ] **Reference skill comparison** completed (compare against tdd/SKILL.md)
@@ -1423,7 +1451,7 @@ head -20 .claude/skills/{skill-name}/SKILL.md | grep "^name:"
 grep "{skill-name}" .claude/CLAUDE.md
 
 # Check skill catalog has skill
-grep "{skill-name}" .claude/docs/skill-catalog.md
+grep "{skill-name}" ".claude/docs/@SKILL_CATALOG_TABLE.md"
 
 # Check agents have skill assigned
 grep -r "{skill-name}" .claude/agents/
@@ -1481,7 +1509,7 @@ Before calling `TaskUpdate({ status: "completed" })`, you MUST run the Post-Crea
    - Read the error output for specific failures
    - Fix each failure:
      - Missing CLAUDE.md entry -> Add to Section 8.5
-     - Missing skill catalog entry -> Add to skill-catalog.md
+     - Missing skill catalog entry -> Add to @SKILL_CATALOG_TABLE.md
      - Missing agent assignment -> Assign to relevant agents
      - Missing memory update -> Update learnings.md
    - Re-run validation until exit code is 0
