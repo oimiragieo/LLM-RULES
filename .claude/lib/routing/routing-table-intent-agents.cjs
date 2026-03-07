@@ -171,7 +171,6 @@ const INTENT_TO_AGENT = {
   persona: 'ux-researcher',
   'journey-map': 'ux-researcher',
   'user-testing': 'ux-researcher',
-  'enterprise-skill-test-1772870522912': 'enterprise-skill-test-1772870522912',
 };
 
 module.exports = { INTENT_TO_AGENT };
