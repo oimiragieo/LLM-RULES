@@ -623,6 +623,7 @@ const INTENT_KEYWORDS = {
     'integration',
     'orchestrator',
   ],
+  heartbeat: ['heartbeat', 'cron ecosystem', 'heartbeat loops', 'cron loops', 'scheduled loops'],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

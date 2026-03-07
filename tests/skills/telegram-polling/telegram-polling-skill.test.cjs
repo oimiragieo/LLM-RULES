@@ -112,4 +112,20 @@ describe('telegram-polling SKILL.md', () => {
     const content = fs.readFileSync(SKILL_PATH, 'utf8');
     assert.ok(content.includes('heartbeat'), 'should reference heartbeat skill');
   });
+
+  it('warns against raw JSON.parse (SE-02 compliance)', () => {
+    const content = fs.readFileSync(SKILL_PATH, 'utf8');
+    assert.ok(
+      content.includes('safeParseJSON') || content.includes('SE-02'),
+      'should reference safeParseJSON or SE-02'
+    );
+  });
+
+  it('wraps user message content in untrusted delimiters', () => {
+    const content = fs.readFileSync(SKILL_PATH, 'utf8');
+    assert.ok(
+      content.includes('untrusted') || content.includes('<untrusted_user_message>'),
+      'should use untrusted delimiters for user message'
+    );
+  });
 });

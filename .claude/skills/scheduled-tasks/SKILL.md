@@ -12,7 +12,7 @@ model: haiku
 invoked_by: both
 user_invocable: true
 error_handling: graceful
-verified: false
+verified: true
 ---
 
 # Scheduled Tasks & Heartbeat Skill

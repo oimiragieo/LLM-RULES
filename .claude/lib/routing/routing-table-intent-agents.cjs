@@ -171,6 +171,9 @@ const INTENT_TO_AGENT = {
   persona: 'ux-researcher',
   'journey-map': 'ux-researcher',
   'user-testing': 'ux-researcher',
+
+  // Heartbeat / cron orchestration intent
+  heartbeat: 'heartbeat-orchestrator',
 };
 
 module.exports = { INTENT_TO_AGENT };
