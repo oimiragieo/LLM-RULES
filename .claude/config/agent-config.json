@@ -1358,6 +1358,27 @@
         "Write"
       ],
       "model": "claude-sonnet-4-5"
+    },
+    "heartbeat-orchestrator": {
+      "tools": [
+        "CronCreate",
+        "CronList",
+        "CronDelete",
+        "Read",
+        "Write",
+        "Bash",
+        "Task",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskList",
+        "TaskGet",
+        "Skill",
+        "MemoryRecord",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "model": "claude-haiku-4-5"
     }
   },
   "thinkingBudgetMap": {
