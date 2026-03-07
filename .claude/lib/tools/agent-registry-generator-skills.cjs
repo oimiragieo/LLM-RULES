@@ -102,6 +102,26 @@ function getRequiredToolsUnionForAgent(agentId, matrix, skillIndex) {
 }
 
 /**
+ * Get only the "always" skills for an agent from the matrix.
+ * @param {string} agentId
+ * @param {Object} matrix
+ * @returns {string[]}
+ */
+function getAlwaysSkillsForAgent(agentId, matrix) {
+  const always = new Set();
+  const agents = matrix.agents || {};
+  for (const categoryAgents of Object.values(agents)) {
+    if (typeof categoryAgents !== 'object') continue;
+    const config = categoryAgents[agentId];
+    if (!config) continue;
+    for (const skill of Array.isArray(config.always) ? config.always : []) {
+      if (typeof skill === 'string' && skill.length > 0) always.add(skill);
+    }
+  }
+  return [...always];
+}
+
+/**
  * Consolidate assigned skills from frontmatter + matrix.
  * @param {string} agentId
  * @param {Object} matrix
@@ -139,4 +159,5 @@ module.exports = {
   getSkillEntryVariants,
   getRequiredToolsUnionForAgent,
   getAssignedSkillsForAgent,
+  getAlwaysSkillsForAgent,
 };

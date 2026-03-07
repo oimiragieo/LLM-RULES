@@ -33,6 +33,7 @@ const {
   getSkillEntryVariants,
   getRequiredToolsUnionForAgent,
   getAssignedSkillsForAgent,
+  getAlwaysSkillsForAgent,
 } = require('./agent-registry-generator-skills.cjs');
 
 // Try to load optional dependencies
@@ -334,6 +335,8 @@ class AgentRegistryGenerator {
         toolsUnionFromSkills,
         assignedSkills
       );
+      // Expose always-skills at top level for fast compliance checks (no skill-cap applied)
+      card.alwaysSkills = getAlwaysSkillsForAgent(agentId, matrix);
       this.registry.agents[agentId] = card;
     }
 

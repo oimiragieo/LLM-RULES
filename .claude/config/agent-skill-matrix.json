@@ -533,8 +533,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -589,8 +587,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -603,8 +599,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -712,8 +706,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -742,8 +734,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -756,8 +746,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -773,8 +761,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -787,8 +773,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -800,8 +784,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression",
           "verification-before-completion"
         ]
@@ -946,8 +928,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -960,8 +940,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -974,8 +952,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -988,8 +964,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression"
         ]
       },
@@ -1164,8 +1138,6 @@
           "task-management-protocol",
           "memory-search",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
           "token-saver-context-compression",
           "verification-before-completion"
         ]
@@ -1185,9 +1157,6 @@
           "subagent-driven-development",
           "task-management-protocol",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
-          "token-saver-context-compression",
           "memory-search"
         ]
       },
@@ -1199,9 +1168,6 @@
           "verification-before-completion",
           "task-management-protocol",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
-          "token-saver-context-compression",
           "memory-search"
         ]
       },
@@ -1214,9 +1180,6 @@
           "task-management-protocol",
           "artifact-lifecycle",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
-          "token-saver-context-compression",
           "memory-search"
         ]
       },
@@ -1228,9 +1191,6 @@
           "task-management-protocol",
           "ripgrep",
           "verification-before-completion",
-          "code-semantic-search",
-          "code-structural-search",
-          "token-saver-context-compression",
           "memory-search"
         ]
       },
@@ -1242,9 +1202,6 @@
           "verification-before-completion",
           "task-management-protocol",
           "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
-          "token-saver-context-compression",
           "memory-search"
         ]
       }

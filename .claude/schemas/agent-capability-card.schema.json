@@ -47,6 +47,12 @@
     },
     "metadata": {
       "$ref": "#/$defs/Metadata"
+    },
+    "alwaysSkills": {
+      "type": "array",
+      "description": "Skills always active for this agent (from matrix always list), uncapped",
+      "items": { "type": "string", "maxLength": 200 },
+      "maxItems": 200
     }
   },
   "$defs": {
