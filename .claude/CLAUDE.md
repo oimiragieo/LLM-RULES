@@ -270,21 +270,22 @@ Before claiming "pipeline complete", call `TaskList()` and confirm zero tasks re
 
 **Quick Routing (top 13 — high-frequency routes):**
 
-| Task Type                                 | Agent                 |
-| ----------------------------------------- | --------------------- |
-| Simple Q&A / explanations / brainstorming | `general-assistant`   |
-| Bug fixes / implementation                | `developer`           |
-| Documentation updates                     | `technical-writer`    |
-| Refactor/simplify                         | `code-simplifier`     |
-| Code review / audit                       | `code-reviewer`       |
-| Testing / QA / coverage                   | `qa`                  |
-| Architecture / system design              | `architect`           |
-| External Integration / onboarding         | `artifact-integrator` |
-| Security-sensitive work                   | `security-architect`  |
-| Infra / CI / deploy / git push            | `devops`              |
-| Planning / decomposition / HIGH tasks     | `planner`             |
-| External research / web investigation     | `researcher`          |
-| Memory leak / profiling / root cause      | `advanced-debugging`  |
+| Task Type                                 | Agent                    |
+| ----------------------------------------- | ------------------------ |
+| Simple Q&A / explanations / brainstorming | `general-assistant`      |
+| Bug fixes / implementation                | `developer`              |
+| Documentation updates                     | `technical-writer`       |
+| Refactor/simplify                         | `code-simplifier`        |
+| Code review / audit                       | `code-reviewer`          |
+| Testing / QA / coverage                   | `qa`                     |
+| Architecture / system design              | `architect`              |
+| External Integration / onboarding         | `artifact-integrator`    |
+| Security-sensitive work                   | `security-architect`     |
+| Infra / CI / deploy / git push            | `devops`                 |
+| Planning / decomposition / HIGH tasks     | `planner`                |
+| External research / web investigation     | `researcher`             |
+| Memory leak / profiling / root cause      | `advanced-debugging`     |
+| Heartbeat loops / cron ecosystem mgmt     | `heartbeat-orchestrator` |
 
 Full table and new agent entries: **@AGENT_ROUTING_TABLE.md** (canonical source for routing).
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`

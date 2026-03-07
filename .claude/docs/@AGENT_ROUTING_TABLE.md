@@ -103,6 +103,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | Swarm coordination                   | `swarm-coordinator`          | `.claude/agents/orchestrators/swarm-coordinator.md`      |
 | Party mode orchestration             | `party-orchestrator`         | `.claude/agents/orchestrators/party-orchestrator.md`     |
 | Self-evolution                       | `evolution-orchestrator`     | `.claude/agents/orchestrators/evolution-orchestrator.md` |
+| Heartbeat ecosystem management       | `heartbeat-orchestrator`     | `.claude/agents/orchestrators/heartbeat-orchestrator.md` |
 | Context compression                  | `context-compressor`         | `.claude/agents/core/context-compressor.md`              |
 | System routing                       | `router`                     | `.claude/CLAUDE.md` (Meta)                               |
 

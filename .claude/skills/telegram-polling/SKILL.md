@@ -4,8 +4,7 @@ version: 1.0.0
 description: Poll Telegram Bot API for new messages and route them to appropriate agents. Implements Loop 6 of the heartbeat ecosystem with offset tracking, DM pairing security, retry handling, and multi-turn session support.
 category: infrastructure
 trigger: when user wants to set up Telegram bot polling, receive Telegram messages, route Telegram DMs to agents, or integrate a Telegram bot with agent-studio
-tools:
-  [Read, Write, Bash, TaskCreate, TaskUpdate, TaskList, Skill]
+tools: [Read, Write, Bash, TaskCreate, TaskUpdate, TaskList, Skill]
 dependencies: [scheduled-tasks, heartbeat]
 tags: [telegram, polling, messaging, bot, integration, heartbeat, loop]
 model: haiku
@@ -99,7 +98,8 @@ function isPaired(userId) {
 function generatePairingCode(userId) {
   // Simple deterministic code — rotate daily for security
   const date = new Date().toISOString().slice(0, 10);
-  return require('crypto').createHash('sha256')
+  return require('crypto')
+    .createHash('sha256')
     .update(`${userId}:${date}:${token}`)
     .digest('hex')
     .slice(0, 6)
@@ -198,11 +198,11 @@ if (updates.length > 0) {
 
 ## Security Model
 
-| Policy | Behavior |
-|--------|----------|
+| Policy            | Behavior                                                 |
+| ----------------- | -------------------------------------------------------- |
 | Default (pairing) | Unknown senders get a pairing code, bot does not process |
-| Approved senders | Processed and routed to agents |
-| Allowlist bypass | Set `TELEGRAM_ALLOWED_SENDERS=id1,id2` in `.env` |
+| Approved senders  | Processed and routed to agents                           |
+| Allowlist bypass  | Set `TELEGRAM_ALLOWED_SENDERS=id1,id2` in `.env`         |
 
 **Prompt injection defense:**
 
@@ -218,9 +218,9 @@ if (updates.length > 0) {
 
 ```javascript
 // WRONG: sends intermediate tool results
-await sendMessage(chatId, "Thinking...");
-await sendMessage(chatId, "Found 3 results...");
-await sendMessage(chatId, "Here is the answer: ...");
+await sendMessage(chatId, 'Thinking...');
+await sendMessage(chatId, 'Found 3 results...');
+await sendMessage(chatId, 'Here is the answer: ...');
 
 // CORRECT: collect full response, send once
 const fullReply = await agentProcess(message);
@@ -235,7 +235,9 @@ Telegram API returns 429 (Too Many Requests) with a `retry_after` field:
 
 ```javascript
 if (response.status === 429) {
-  const { parameters: { retry_after } } = await response.json();
+  const {
+    parameters: { retry_after },
+  } = await response.json();
   // Wait retry_after seconds, then retry once
   await new Promise(r => setTimeout(r, retry_after * 1000));
   return retry(); // retry the fetch
@@ -268,13 +270,13 @@ The 2-minute polling interval prevents most rate-limit issues.
 
 Route by message content:
 
-| Message Pattern | Agent |
-|----------------|-------|
+| Message Pattern          | Agent                              |
+| ------------------------ | ---------------------------------- |
 | Code/technical questions | `developer` or `general-assistant` |
-| Research/information | `researcher` |
-| "review", "check" | `code-reviewer` |
-| General Q&A | `general-assistant` |
-| Default | `general-assistant` |
+| Research/information     | `researcher`                       |
+| "review", "check"        | `code-reviewer`                    |
+| General Q&A              | `general-assistant`                |
+| Default                  | `general-assistant`                |
 
 ---
 
