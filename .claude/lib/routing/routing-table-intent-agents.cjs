@@ -149,6 +149,29 @@ const INTENT_TO_AGENT = {
   'aso-specialist': 'aso-specialist',
   'marketing-strategist': 'marketing-strategist',
   'brand-guardian': 'brand-guardian',
+  // Compliance, feedback, and UX domain agents
+  compliance_checker: 'compliance-checker',
+  regulatory: 'compliance-checker',
+  gdpr: 'compliance-checker',
+  ccpa: 'compliance-checker',
+  privacy: 'compliance-checker',
+  'audit-compliance': 'compliance-checker',
+
+  feedback_synthesizer: 'feedback-synthesizer',
+  feedback: 'feedback-synthesizer',
+  nps: 'feedback-synthesizer',
+  csat: 'feedback-synthesizer',
+  'customer-feedback': 'feedback-synthesizer',
+  survey: 'feedback-synthesizer',
+  sentiment: 'feedback-synthesizer',
+
+  ux_researcher: 'ux-researcher',
+  'ux-research': 'ux-researcher',
+  usability: 'ux-researcher',
+  'user-research': 'ux-researcher',
+  persona: 'ux-researcher',
+  'journey-map': 'ux-researcher',
+  'user-testing': 'ux-researcher',
 };
 
 module.exports = { INTENT_TO_AGENT };

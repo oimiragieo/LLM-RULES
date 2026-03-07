@@ -27,6 +27,7 @@ skills:
   - swarm-coordination
   - task-management-protocol
   - verification-before-completion
+  - token-saver-context-compression
 ---
 
 <!-- agent-template-contract:v1 -->

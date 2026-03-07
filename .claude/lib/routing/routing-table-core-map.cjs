@@ -299,6 +299,16 @@ const ROUTING_TABLE = {
   'blast-radius': 'chaos-engineer',
   'steady-state': 'chaos-engineer',
   'fault-tolerance': 'chaos-engineer',
+  // General Assistant — Q&A, explanations, brainstorming
+  explain: 'general-assistant',
+  question: 'general-assistant',
+  'what is': 'general-assistant',
+  'how does': 'general-assistant',
+  brainstorm: 'general-assistant',
+  help: 'general-assistant',
+  clarify: 'general-assistant',
+  overview: 'general-assistant',
+
   // Artifact Integration
   'artifact-integrator': 'artifact-integrator',
   'artifact-integration': 'artifact-integrator',

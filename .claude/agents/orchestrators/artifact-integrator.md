@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-06T06:38:52.689Z
+lastVerifiedAt: 2026-03-07T00:19:38.837Z
 name: artifact-integrator
 version: 1.0.0
 description: Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces a security-first multi-agent pipeline.
@@ -43,6 +43,7 @@ skills:
   - code-structural-search
   - task-management-protocol
   - verification-before-completion
+  - token-saver-context-compression
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

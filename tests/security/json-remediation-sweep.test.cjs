@@ -21,7 +21,6 @@ const TARGET_FILES = [
   '.claude/lib/qa/report.cjs',
   '.claude/lib/memory/observations.cjs',
   '.claude/lib/memory/intent-analyzer.cjs',
-  '.claude/lib/evolution-state-sync.cjs',
   '.claude/hooks/reflection/unified-reflection-handler.cjs',
   '.claude/hooks/routing/pre-tool-unified.cjs',
   '.claude/lib/memory/contextual-memory-context-loader.cjs',

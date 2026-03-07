@@ -218,6 +218,20 @@
           "code-structural-search",
           "token-saver-context-compression"
         ]
+      },
+      "general-assistant": {
+        "primary": ["sequential-thinking", "brainstorming", "insight-extraction"],
+        "secondary": ["research-synthesis", "context-compressor"],
+        "contextual": {},
+        "always": [
+          "verification-before-completion",
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       }
     },
     "domain": {

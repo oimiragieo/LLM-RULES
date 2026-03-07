@@ -33,6 +33,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - wave-executor
+  - token-saver-context-compression
 ---
 
 <!-- agent-template-contract:v1 -->

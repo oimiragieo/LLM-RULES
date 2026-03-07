@@ -43,6 +43,7 @@ skills:
   - template-creator
   - verification-before-completion
   - workflow-creator
+  - token-saver-context-compression
 ---
 
 <!-- agent-template-contract:v1 -->
