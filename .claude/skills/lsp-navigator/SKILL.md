@@ -1,13 +1,13 @@
 ---
 name: lsp-navigator
 description: Compiler-level code intelligence via native LSP — definitions, references, types, call hierarchies, and diagnostics.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
-tools: [Read]
-verified: false
-lastVerifiedAt: null
+tools: [Read, Bash]
+verified: true
+lastVerifiedAt: '2026-03-06'
 dependencies: []
 agents:
   - developer
@@ -21,7 +21,18 @@ agents:
   - nextjs-pro
   - advanced-debugging
 category: 'Code Intelligence'
-tags: [lsp, navigation, definitions, references, types, call-hierarchy, code-intelligence]
+tags:
+  [
+    lsp,
+    navigation,
+    definitions,
+    references,
+    types,
+    call-hierarchy,
+    code-intelligence,
+    dead-code,
+    diagnostics,
+  ]
 ---
 
 # LSP Navigator
@@ -29,7 +40,8 @@ tags: [lsp, navigation, definitions, references, types, call-hierarchy, code-int
 <identity>
 Compiler-level code intelligence skill. Uses Claude Code's native LSP tool to provide
 type-safe navigation: go-to-definition, find-references, hover info, call hierarchies,
-and workspace symbol search. Complements text search (ripgrep), semantic search
+and workspace symbol search. Includes an automated diagnostics runner for dead-code
+detection and broken-import scanning. Complements text search (ripgrep), semantic search
 (code-semantic-search), and structural search (code-structural-search) with compiler-
 verified precision.
 </identity>
@@ -43,6 +55,7 @@ verified precision.
 - Navigate to interface/abstract method implementations (goToImplementation)
 - Build call hierarchy trees: callers (incomingCalls) and callees (outgoingCalls)
 - Prepare call hierarchy items at a position (prepareCallHierarchy)
+- **Automated diagnostics**: Run dead-code and broken-import scans via `lsp-diagnostics-runner.cjs`
 </capabilities>
 
 ## When to Use
@@ -55,6 +68,12 @@ Use lsp-navigator when you need **compiler-verified precision** rather than text
 - Building complete call hierarchy trees for architecture review
 - Validating that imports resolve correctly after a move/rename
 - Checking what methods an interface requires vs. what a class provides
+
+Use the **diagnostics runner** (`lsp-diagnostics-runner.cjs`) when you need:
+
+- Bulk dead-code detection across many files (exports with zero importers)
+- Broken import scanning (require() paths that don't resolve)
+- Codebase health checks as part of QA or proactive-audit workflows
 
 Do NOT use for:
 
@@ -216,6 +235,141 @@ lsp_findReferences({ filePath: '/abs/path/src/auth/validate.ts', line: 12, chara
 
 Pattern: hover (ground-truth type check) → findReferences (impact of the actual signature).
 
+### Use Case 5: Automated Dead Code Detection
+
+Use `documentSymbol` → `findReferences` as an automated sweep to detect exported symbols
+with zero external references. This pattern powers the `lsp-diagnostics-runner.cjs` script.
+
+```javascript
+// Step 1: List all symbols in the file
+lsp_documentSymbol({
+  filePath: '/abs/path/.claude/lib/memory/memory-manager.cjs',
+  line: 1,
+  character: 1,
+});
+
+// Step 2: For each exported symbol, check for external references
+lsp_findReferences({
+  filePath: '/abs/path/.claude/lib/memory/memory-manager.cjs',
+  line: 42,
+  character: 15,
+});
+// If results contain only the defining file → potential dead export
+```
+
+**Automated script**: `.claude/tools/cli/lsp-diagnostics-runner.cjs` implements this pattern
+using ripgrep as a fallback (since LSP has limited CJS support — see Anti-Patterns table).
+
+```bash
+# Run dead-exports check on all lib files
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports --format markdown
+
+# Exclude archived directories
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports --exclude-pattern "_archive"
+```
+
+**Note on hook exports (false positives)**: Hook files (`.claude/hooks/**`) export functions
+for testability but are invoked via stdin/stdout protocol, not `require()`. Their exports
+appear as dead code because test suites use dynamic require; the diagnostics runner
+marks hook export findings as LOW severity for this reason.
+
+### Use Case 6: Hook Wiring Verification
+
+Verify that hooks registered in `.claude/settings.json` exist on disk and their internal
+`require()` chains resolve without errors.
+
+```javascript
+// Step 1: Locate the hook registration in settings.json
+// (use ripgrep — LSP won't index JSON well for CJS references)
+// rg "routing-guard" .claude/settings.json
+
+// Step 2: Confirm the hook file exists and resolves its imports
+lsp_goToDefinition({
+  filePath: '/abs/path/.claude/hooks/routing/routing-guard.cjs',
+  line: 1,
+  character: 1,
+});
+
+// Step 3: Check the exports the hook provides (for testability audit)
+lsp_documentSymbol({
+  filePath: '/abs/path/.claude/hooks/routing/routing-guard.cjs',
+  line: 1,
+  character: 1,
+});
+```
+
+**Hybrid approach (more reliable for .cjs files)**: Combine ripgrep for settings.json
+registration lookup with `require.resolve()` for import chain validation:
+
+```bash
+# Find all registered hooks
+node -e "const s = require('./.claude/settings.json'); console.log(JSON.stringify(s.hooks, null, 2))"
+
+# Verify a hook's require chain resolves
+node -e "require('./.claude/hooks/routing/routing-guard.cjs'); console.log('OK')"
+```
+
+## Diagnostics Runner Tool (RECOMMENDED for .cjs codebases)
+
+**Script**: `.claude/tools/cli/lsp-diagnostics-runner.cjs`
+
+An automated scanner that finds dead code, broken imports, and unreferenced functions using
+ripgrep + `require.resolve()`. Use this instead of manual LSP calls for bulk analysis of
+`.cjs` CommonJS files (where native LSP has limited support).
+
+### Quick Start
+
+```bash
+# Find exported symbols that nobody imports (dead code)
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports
+
+# Find require() calls that don't resolve (broken imports)
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check broken-imports
+
+# Run both checks, exclude archived code
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports --check broken-imports --exclude-pattern "_archive"
+
+# Target specific directories
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports --glob ".claude/lib/routing/*.cjs"
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports --glob ".claude/hooks/**/*.cjs"
+
+# Output as markdown (for reports)
+node .claude/tools/cli/lsp-diagnostics-runner.cjs --check dead-exports --format markdown --output report.md
+```
+
+### CLI Flags
+
+| Flag                      | Default                | Description                                                                |
+| ------------------------- | ---------------------- | -------------------------------------------------------------------------- |
+| `--check <type>`          | (required)             | `dead-exports`, `broken-imports`, or `unreferenced-functions` (repeatable) |
+| `--glob <pattern>`        | `.claude/lib/**/*.cjs` | File glob pattern to scan                                                  |
+| `--exclude-pattern <pat>` | (none)                 | Exclude files matching pattern (e.g., `_archive`)                          |
+| `--format <fmt>`          | `table`                | Output format: `table`, `json`, or `markdown`                              |
+| `--output <file>`         | (stdout)               | Write results to file                                                      |
+
+### Severity Levels
+
+| Severity | Meaning                                                        |
+| -------- | -------------------------------------------------------------- |
+| HIGH     | Broken import (require doesn't resolve) — likely runtime error |
+| MEDIUM   | Dead export in non-hook file — probably unused code            |
+| LOW      | Dead export in hook file — expected (hooks export for testing) |
+
+### When Agents Should Use This
+
+- **qa** / **proactive-audit**: Run as part of codebase health checks
+- **code-reviewer**: Check for dead exports in changed files before approving
+- **architect**: Audit module dependencies and find disconnected subsystems
+- **code-simplifier**: Identify dead code candidates for removal
+- **developer**: Verify new exports are actually imported somewhere after implementation
+
+### Important: Hook Export False Positives
+
+Hook files (`.claude/hooks/**`) export functions for testability but are invoked via
+stdin/stdout JSON protocol, not `require()`. Their exports always appear as "dead"
+because no production code imports them — only test files do. The runner marks these
+as LOW severity automatically. **Do not treat hook dead-exports as bugs.**
+
 ## Standard Invocation Pattern
 
 ```javascript
@@ -327,6 +481,21 @@ Pre-execute hook: `hooks/pre-execute.cjs` validates `filePath` is absolute and `
 | Using LSP instead of rg for text-in-comments                | LSP only sees code symbols, not text in comments/strings             | Use ripgrep for text that includes non-code content      |
 | Trusting empty LSP results as "no references"               | Language server may not be running or file may not be indexed        | Verify LSP is active; fall back to ripgrep if empty      |
 | Using LSP on .cjs CommonJS files expecting TypeScript types | CJS files may have limited LSP support depending on workspace config | Fall back to ripgrep or structural search for .cjs files |
+
+## CJS File Limitations (Reflection from LSP Deep Dive)
+
+In practice, most LSP operations (`goToDefinition`, `findReferences`, `hover`) return empty
+results for `.cjs` CommonJS files in this workspace. The TypeScript language server does not
+fully index CJS modules without explicit `jsconfig.json` or `tsconfig.json` coverage.
+
+**What this means:**
+
+- For `.cjs` files: prefer ripgrep (`rg -F`) for reference counting and `require.resolve()` for import validation.
+- LSP `documentSymbol` may work on `.cjs` files for listing top-level exports, but is unreliable.
+- The hybrid approach (ripgrep + `require.resolve()`) proved more effective than LSP for the agent-studio codebase's `.cjs` hook and lib files.
+
+**Recommendation**: Use LSP as the primary tool for `.ts` and `.js` (ESM) files. For `.cjs` files,
+treat LSP as a secondary option and fall back to ripgrep immediately if LSP returns empty results.
 
 ## Memory Protocol (MANDATORY)
 

@@ -1,7 +1,22 @@
 ---
 name: ux-researcher
 description: Expert user experience researcher specializing in user behavior analysis, usability testing, persona development, journey mapping, heuristic evaluation, accessibility auditing, user interview synthesis, and A/B test analysis. Use when conducting UX research, synthesizing user feedback, evaluating usability, or planning research studies.
-tools: [Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Bash,
+    Grep,
+    Glob,
+    WebSearch,
+    WebFetch,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    Skill,
+  ]
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load
@@ -14,7 +29,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 <!-- agent-template-contract:v1 -->

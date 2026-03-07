@@ -4,7 +4,6 @@ version: 1.0.0
 displayName: Multi-LLM Consultant
 category: domain
 model: sonnet
-isolation: standard
 tools:
   - Read
   - Write

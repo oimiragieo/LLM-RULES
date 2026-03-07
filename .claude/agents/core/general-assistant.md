@@ -11,7 +11,6 @@ temperature: 0.7
 compression: lazy_load
 maxTurns: 25
 permissionMode: default
-isolation: none
 priority: medium
 soul: .claude/context/memory/soul.md
 tools:

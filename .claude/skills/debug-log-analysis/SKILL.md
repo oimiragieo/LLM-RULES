@@ -11,10 +11,10 @@ tags: [debugging, observability, debug-log, errors, reflection, telemetry]
 tools: [Read, Write, Bash, Grep]
 args:
   - name: session_id
-    description: Specific session UUID to analyze (default: most recent log)
+    description: 'Specific session UUID to analyze (default: most recent log)'
     required: false
   - name: output_path
-    description: Where to write the analysis report (default: auto-generated)
+    description: 'Where to write the analysis report (default: auto-generated)'
     required: false
 error_handling: graceful
 streaming: supported

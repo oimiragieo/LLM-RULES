@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-06T14:43:10.951Z",
+  "generatedAt": "2026-03-07T00:18:17.060Z",
   "metadata": {
     "totalSkills": 266,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-06T14:43:10.952Z",
+    "lastValidated": "2026-03-07T00:18:17.060Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7065,7 +7065,8 @@
       "domain": "other",
       "description": "Compiler-level code intelligence via native LSP — definitions, references, types, call hierarchies, and diagnostics.",
       "requiredTools": [
-        "Read"
+        "Read",
+        "Bash"
       ],
       "agentPrimary": [
         "developer"
@@ -8685,6 +8686,7 @@
         "ui-components-expert",
         "webapp-testing",
         "feedback-analysis",
+        "lsp-navigator",
         "marketing-content",
         "scientific-skills"
       ],
