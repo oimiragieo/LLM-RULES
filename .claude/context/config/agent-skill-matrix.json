@@ -218,6 +218,12 @@
           "code-structural-search",
           "token-saver-context-compression"
         ]
+      },
+      "general-assistant": {
+        "primary": [],
+        "secondary": [],
+        "contextual": {},
+        "always": ["memory-search", "ripgrep"]
       }
     },
     "domain": {

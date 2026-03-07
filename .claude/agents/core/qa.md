@@ -11,23 +11,21 @@ isolation: worktree
 priority: high
 extended_thinking: true
 tools:
-  [
-    Read,
-    Write,
-    Edit,
-    Glob,
-    Grep,
-    Bash,
-    WebFetch,
-    WebSearch,
-    MemoryRecord,
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    TaskOutput,
-    Skill,
-  ]
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+  - WebFetch
+  - WebSearch
+  - MemoryRecord
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - TaskOutput
+  - Skill
 skills:
   - code-semantic-search
   - code-structural-search

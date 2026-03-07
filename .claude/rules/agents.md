@@ -34,7 +34,7 @@
 
 Available for specific technologies: `python-pro`, `typescript-pro`, `frontend-pro`, `devops-troubleshooter`, and 15+ others.
 
-See `.claude/context/agent-registry.json` for full list of 66 agents.
+See `.claude/context/agent-registry.json` for full list of 72 agents.
 
 ## Specialist-First Routing Law (IRON LAW)
 
@@ -54,7 +54,7 @@ See `.claude/context/agent-registry.json` for full list of 66 agents.
 | "integrate repo/onboard" | researcher | **artifact-integrator**   |
 | "debug production"       | developer  | **devops-troubleshooter** |
 
-**Why**: 66 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
+**Why**: 72 agents exist. Specialists have domain-specific prompts, skills, and patterns. Using developer for specialist work produces inferior results.
 
 ## Intent Classification (Semantic Matching)
 

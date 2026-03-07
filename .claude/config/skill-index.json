@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-07T08:14:28.943Z",
+  "generatedAt": "2026-03-07T17:12:14.657Z",
   "metadata": {
-    "totalSkills": 266,
+    "totalSkills": 267,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-07T08:14:28.944Z",
+    "lastValidated": "2026-03-07T17:12:14.658Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -208,6 +208,7 @@
         "context-compressor",
         "reflection-agent",
         "technical-program-manager",
+        "general-assistant",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -4246,6 +4247,7 @@
         "context-compressor",
         "reflection-agent",
         "technical-program-manager",
+        "general-assistant",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -7147,6 +7149,34 @@
       "priority": 3,
       "aliasOf": null
     },
+    "scheduled-tasks": {
+      "name": "scheduled-tasks",
+      "displayName": "Scheduled Tasks",
+      "category": "Other",
+      "domain": "other",
+      "description": "Schedule recurring tasks and heartbeat monitoring using Claude Code's cron system (CronCreate/CronList/CronDelete). Implements the Agentic Heartbeat Pattern for ecosystem health monitoring.",
+      "requiredTools": [
+        "CronCreate",
+        "CronList",
+        "CronDelete",
+        "Read",
+        "Bash",
+        "TaskCreate",
+        "TaskUpdate",
+        "TaskList",
+        "MemoryRecord"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "scheduled-tasks"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "scientific-skills": {
       "name": "scientific-skills",
       "displayName": "Scientific Skills",
@@ -7408,6 +7438,7 @@
         "marketing-content",
         "mcp-builder",
         "regulatory-compliance",
+        "scheduled-tasks",
         "seo-optimization",
         "user-research",
         "web-artifacts-builder"
@@ -7780,6 +7811,7 @@
         "marketing-content",
         "mcp-builder",
         "regulatory-compliance",
+        "scheduled-tasks",
         "seo-optimization",
         "user-research",
         "web-artifacts-builder"
@@ -8135,6 +8167,7 @@
         "marketing-content",
         "mcp-builder",
         "regulatory-compliance",
+        "scheduled-tasks",
         "scientific-skills",
         "seo-optimization",
         "user-research",
@@ -8688,6 +8721,7 @@
         "feedback-analysis",
         "lsp-navigator",
         "marketing-content",
+        "scheduled-tasks",
         "scientific-skills"
       ],
       "Glob": [
@@ -9018,19 +9052,23 @@
         "skill-updater",
         "workflow-updater",
         "memory-quality-auditor",
-        "eval-harness-updater"
+        "eval-harness-updater",
+        "scheduled-tasks"
       ],
       "TaskCreate": [
-        "task-management-protocol"
+        "task-management-protocol",
+        "scheduled-tasks"
       ],
       "TaskList": [
-        "task-management-protocol"
+        "task-management-protocol",
+        "scheduled-tasks"
       ],
       "TaskGet": [
         "task-management-protocol"
       ],
       "TaskUpdate": [
         "task-management-protocol",
+        "scheduled-tasks",
         "user-research"
       ],
       "mcp__Exa__web_search_exa": [
@@ -9041,6 +9079,15 @@
       ],
       "mcp__filesystem__write_file": [
         "template-renderer"
+      ],
+      "CronCreate": [
+        "scheduled-tasks"
+      ],
+      "CronList": [
+        "scheduled-tasks"
+      ],
+      "CronDelete": [
+        "scheduled-tasks"
       ]
     },
     "byAgent": {
@@ -9222,6 +9269,7 @@
         "marketing-content",
         "mcp-builder",
         "regulatory-compliance",
+        "scheduled-tasks",
         "seo-optimization",
         "user-research",
         "web-artifacts-builder"
@@ -9375,6 +9423,10 @@
         "spec-gathering",
         "dispatching-parallel-agents",
         "swarm-coordination"
+      ],
+      "general-assistant": [
+        "memory-search",
+        "ripgrep"
       ],
       "python-pro": [
         "python-backend-expert",
@@ -10464,6 +10516,7 @@
         "marketing-content",
         "mcp-builder",
         "regulatory-compliance",
+        "scheduled-tasks",
         "seo-optimization",
         "user-research",
         "web-artifacts-builder"
@@ -10617,6 +10670,10 @@
         "spec-gathering",
         "dispatching-parallel-agents",
         "swarm-coordination"
+      ],
+      "general-assistant": [
+        "memory-search",
+        "ripgrep"
       ],
       "python-pro": [
         "python-backend-expert",

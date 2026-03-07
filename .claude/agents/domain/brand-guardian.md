@@ -11,22 +11,20 @@ priority: high
 verified: true
 lastVerifiedAt: '2026-03-03'
 tools:
-  [
-    Read,
-    Write,
-    Edit,
-    Glob,
-    Grep,
-    Bash,
-    WebSearch,
-    WebFetch,
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    Skill,
-    MemoryRecord,
-  ]
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+  - WebSearch
+  - WebFetch
+  - MemoryRecord
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
 skills:
   - code-semantic-search
   - code-structural-search

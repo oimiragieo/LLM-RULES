@@ -16,6 +16,21 @@ const CREATE_SCRIPT = path.join(
   'create.cjs'
 );
 
+const keywordsFile = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'lib',
+  'routing',
+  'routing-table-intent-keywords.cjs'
+);
+const agentsFile = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'lib',
+  'routing',
+  'routing-table-intent-agents.cjs'
+);
+
 function cleanupSkill(name) {
   const skillDir = path.join(PROJECT_ROOT, '.claude', 'skills', name);
   const workflowPath = path.join(PROJECT_ROOT, '.claude', 'workflows', `${name}-skill-workflow.md`);
@@ -30,6 +45,20 @@ test('create.cjs enterprise defaults scaffold full skill bundle', () => {
   const name = `enterprise-skill-test-${Date.now()}`;
   const description =
     'Enterprise scaffold validation skill for test coverage and reliability checks.';
+
+  // Save routing tables before test to allow reliable restore
+  let savedKeywords;
+  let savedAgents;
+  try {
+    savedKeywords = fs.readFileSync(keywordsFile, 'utf8');
+  } catch {
+    // file may not exist in test environment
+  }
+  try {
+    savedAgents = fs.readFileSync(agentsFile, 'utf8');
+  } catch {
+    // file may not exist in test environment
+  }
 
   cleanupSkill(name);
 
@@ -90,5 +119,8 @@ test('create.cjs enterprise defaults scaffold full skill bundle', () => {
     assert.match(researchDoc, /WebFetch \+ arXiv fallback/);
   } finally {
     cleanupSkill(name);
+    // Restore routing tables to pre-test state (snapshot/restore pattern)
+    if (savedKeywords) fs.writeFileSync(keywordsFile, savedKeywords, 'utf8');
+    if (savedAgents) fs.writeFileSync(agentsFile, savedAgents, 'utf8');
   }
 });

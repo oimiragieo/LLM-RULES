@@ -36,6 +36,5 @@ test('agent-updater patch plan includes orchestrator routing docs when target is
     '.claude/CLAUDE.md',
     '.claude/workflows/core/router-decision.md',
     '.claude/workflows/core/ecosystem-creation-workflow.md',
-    '.claude/agents/core/router.md',
   ]);
 });

@@ -42,13 +42,13 @@ describe('validate-agent-skill-references', () => {
     const agentsRoot = path.join(root, '.claude', 'agents');
     fs.mkdirSync(path.join(agentsRoot, 'core'), { recursive: true });
     fs.mkdirSync(path.join(agentsRoot, '_archive', 'old'), { recursive: true });
-    fs.writeFileSync(path.join(agentsRoot, 'core', 'router.md'), '# router', 'utf8');
+    fs.writeFileSync(path.join(agentsRoot, 'core', 'developer.md'), '# developer', 'utf8');
     fs.writeFileSync(path.join(agentsRoot, 'README.md'), '# readme', 'utf8');
     fs.writeFileSync(path.join(agentsRoot, '_archive', 'old', 'agent.md'), '# old', 'utf8');
 
     const files = walkAgentFiles(agentsRoot).map(f => f.replace(/\\/g, '/'));
     assert.equal(files.length, 1);
-    assert.ok(files[0].endsWith('/core/router.md'));
+    assert.ok(files[0].endsWith('/core/developer.md'));
 
     fs.rmSync(root, { recursive: true, force: true });
   });
@@ -101,8 +101,8 @@ describe('validate-agent-skill-references', () => {
     fs.mkdirSync(path.dirname(idxPath), { recursive: true });
 
     fs.writeFileSync(
-      path.join(agentsRoot, 'core', 'router.md'),
-      `---\nname: router\nskills:\n  - tdd\n---\nSkill({ skill: 'missing-skill' })`,
+      path.join(agentsRoot, 'core', 'developer.md'),
+      `---\nname: developer\nskills:\n  - tdd\n---\nSkill({ skill: 'missing-skill' })`,
       'utf8'
     );
     fs.writeFileSync(
@@ -126,7 +126,7 @@ describe('validate-agent-skill-references', () => {
     fs.mkdirSync(path.dirname(idxPath), { recursive: true });
 
     fs.writeFileSync(
-      path.join(agentsRoot, 'core', 'router.md'),
+      path.join(agentsRoot, 'core', 'developer.md'),
       `Skill({ skill: '<skill-name>' })\nSkill({ skill: 'name' })`,
       'utf8'
     );

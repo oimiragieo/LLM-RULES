@@ -110,6 +110,5 @@ test('agent-creator generate returns orchestrator integration checklist for orch
     '.claude/CLAUDE.md',
     '.claude/workflows/core/router-decision.md',
     '.claude/workflows/core/ecosystem-creation-workflow.md',
-    '.claude/agents/core/router.md',
   ]);
 });
