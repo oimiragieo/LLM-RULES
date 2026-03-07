@@ -218,20 +218,6 @@
           "code-structural-search",
           "token-saver-context-compression"
         ]
-      },
-      "general-assistant": {
-        "primary": ["brainstorming", "sequential-thinking", "insight-extraction"],
-        "secondary": ["ask-questions-if-underspecified", "interactive-requirements-gathering"],
-        "contextual": {},
-        "always": [
-          "ripgrep",
-          "memory-search",
-          "code-semantic-search",
-          "code-structural-search",
-          "token-saver-context-compression",
-          "verification-before-completion",
-          "task-management-protocol"
-        ]
       }
     },
     "domain": {
