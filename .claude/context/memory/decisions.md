@@ -1,3 +1,42 @@
+## ADR-2026-03-08A: MEGA EPIC Audit — Security Enforcement Hardening
+
+**Status:** Accepted
+**Context:** 100% framework audit (2026-03-08) found 5 security/enforcement hooks configured fail-open or warn-only. This creates bypass vectors (SEC-008 pattern).
+
+**Decision:** All security hooks MUST default to `block` (fail-closed). Upgraded in this session:
+
+- `spawn-prompt-validator.cjs` — fail-open → fail-closed (exit 2 on errors)
+- `external-content-guard.cjs` — warn → block default
+- `TASKLIST_FIRST_ENFORCEMENT` — missing default → explicit `'block'`
+- `TASK_SINGLE_PURPOSE_ENFORCEMENT` — warn → block
+
+**Rationale:** Advisory hooks (metrics, bypass-audit) may fail-open — they do not control access. Security hooks that fail-open on unexpected errors create bypass vectors because an attacker can craft input to trigger the error path and bypass the check entirely.
+
+**Consequence:** Any future hook created for security enforcement must use `process.exit(2)` in its catch block, not `process.exit(0)`. See `.claude/rules/hooks.md` fail-open vs fail-closed policy table.
+
+**Commits:** 616be685
+
+---
+
+## ADR-2026-03-08B: O_EXCL Atomic Lock for State Guard Files
+
+**Status:** Accepted
+**Context:** evolution-state-guard.cjs used non-atomic `fs.writeFileSync` to create a lock file. Under concurrent access (two evolution processes racing), both could see the file absent and proceed simultaneously — a TOCTOU race.
+
+**Decision:** State guard files that prevent concurrent execution MUST use `fs.openSync(path, 'wx')` (O_EXCL flag). The 'wx' flag is an atomic "create-exclusive" operation at the OS level: it fails with EEXIST if the file already exists, with no race window between check and create.
+
+**Alternatives Considered:**
+
+- (A) `proper-lockfile` — full lock library, overkill for simple guard files
+- (B) `fs.existsSync` + `fs.writeFileSync` — classic TOCTOU race, not safe
+- (C) `fs.openSync('wx')` — minimal, atomic, OS-guaranteed
+
+**Consequence:** Any future "guard file" pattern for preventing concurrent execution must use O_EXCL. Error handling: catch EEXIST specifically (`err.code === 'EEXIST'`) and treat as "already locked."
+
+**Commits:** 616be685
+
+---
+
 ## ADR-2026-03-07B: agent-registry.json Structure Contract
 
 - **Decision**: agent-registry.json `agents` field is an OBJECT keyed by agent ID string (not array)

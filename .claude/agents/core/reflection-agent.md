@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-08T20:22:39.256Z
+lastVerifiedAt: 2026-03-08T20:48:19.293Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -14,6 +14,7 @@ maxTurns: 18
 permissionMode: default
 priority: medium
 tools:
+  - Bash
   - Edit
   - Glob
   - Grep
@@ -189,6 +190,7 @@ Based on MARS (Metacognitive Agent Reflective Self-improvement) framework:
 
 - **Bash** - Restricted to read-only operations only:
   - Permitted: `node .claude/lib/memory/memory-search.cjs "query"` (memory-search skill)
+  - Permitted: `node scripts/analyze-session-transcript.mjs` (transcript heuristics)
   - Permitted: `cat .claude/context/memory/*.md` (reading memory files)
   - Prohibited: Any writes, installs, git operations, or code execution
   - Note: unified-reflection-handler.cjs monitors Bash errors for error recovery reflection
@@ -253,6 +255,14 @@ Gather context about the completed task:
 - Output artifacts
 - Trace evidence artifacts (`pnpm trace:query` output, flight-recorder references)
 - Duration and token metrics
+
+### Step 1.2: Transcript Heuristics
+
+Before evaluating task quality, verify if the session debug logs indicate any hidden systemic failures or API crashes (like Context Length Exceeded).
+
+1. Execute `Bash({ command: "node scripts/analyze-session-transcript.mjs" })`
+2. `Read` the `.tmp/transcript-analysis-*.md` file mentioned in the script output
+3. **If the analysis shows high debug log errors or API context errors, you MUST penalize the task (add to "thorns")** even if the output artifact looks superficially correct.
 
 ### Step 1.5: Read Router Gap Observations
 

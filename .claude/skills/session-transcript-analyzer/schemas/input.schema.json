@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "session-transcript-analyzer Input Schema",
+  "description": "Input validation schema for session-transcript-analyzer skill",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "session": {
+      "type": "string",
+      "description": "Specific session UUID to analyze. If not provided, it will automatically target the most recent session transcript."
+    }
+  },
+  "additionalProperties": false
+}

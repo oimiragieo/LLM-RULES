@@ -1,3 +1,25 @@
+## MEGA EPIC Audit Session (2026-03-08) — 100% Framework Audit
+
+- **[PATTERN] 8-phase audit approach for full framework audits**: (1) Research/TDD best practices, (2) Skill gap deep dive, (3) Multi-domain audit sweep (hooks/router/memory/permissions/reflection/security/unwired-code/workflows), (4) Phased fixes with TDD, (5) Multi-LLM review (Gemini+Codex), (6) Lint/format/commit, (7) Test suite + proactive audit, (8) Drain gate verification. Produced: 18 fixes, 424 tests pass, health score 9.2→9.6/10.
+- **[SECURITY] evolution-state-guard TOCTOU race fixed with O_EXCL**: The evolution state guard file was opened with `fs.writeFileSync` (not atomic). Fix: use `fs.openSync(path, 'wx')` (O_EXCL flag) which fails if file exists — providing true atomic lock semantics. This is the canonical fix for concurrent-access TOCTOU races on state guard files.
+- **[SECURITY] spawn-prompt-validator was fail-open (P2)**: Security hooks that fail due to unexpected errors were defaulting to `exit(0)` (allow). Fixed to `exit(2)` (block) for `spawn-prompt-validator.cjs`. Iron Law: security hooks MUST fail-closed. Advisory hooks (metrics, bypass-audit) may fail-open. See `.claude/rules/hooks.md` fail-open vs fail-closed policy table.
+- **[SECURITY] github-ops skill had shell:true (P0)**: `github-ops` skill was calling `execSync` with `shell: true`. Fixed to `spawn(..., { shell: false })` array args pattern. This is SE-03 (shell injection vector) from sharp-edges.md. Always audit new skills for shell:true on creation.
+- **[ROUTING] external-content-guard enforcement upgraded warn→block**: The hook that guards external content from being injected into agent context was only warning. Upgraded to block default. Security hooks default must be block, not warn.
+- **[ROUTING] TASKLIST_FIRST missing default enforcement fixed**: routing-guard.cjs Check for TASKLIST_FIRST was missing a `default: 'block'` fallback, meaning the env var being unset would not enforce. Fixed to default block.
+- **[ROUTING] researcher→artifact-integrator enforcement added**: routing-guard.cjs now checks for the "integrate/onboard repo" routing anti-pattern (researcher used when artifact-integrator is correct). This closes a known misrouting gap documented in CLAUDE.md.
+- **[SKILLS] 108/265 skills exist but are unwired**: Audit found 108 of 265 skill entries have no agent assignment in agent-skill-matrix.json. Framework skills (scheduled-tasks, arxiv-monitor, exa-monitor, etc.) were wired to specialist agents during this session. Pattern: every new skill must have an agent assignment in `agent-skill-matrix.json` at creation time, not deferred.
+- **[ROUTING] router-decision.md Step 6.5 must match CLAUDE.md routing table**: Found 3 agents (general-assistant, heartbeat-orchestrator, advanced-debugging) missing from router-decision.md Step 6.5 specialist keyword table. Fixed. The two files must be kept in sync — router-decision.md is the implementation, CLAUDE.md Section 3 is the reference.
+- **[HOOKS] pre-compact.cjs missing require.main guard**: Hook exported a function but was also runnable directly. Added `if (require.main === module)` guard to prevent hook code from running when the file is imported (test isolation). This is the same pattern as worktree-auto-cleanup.cjs (fixed 2026-03-04).
+- **[MEMORY] 13 JSON.parse locations without safeParseJSON**: Memory system audit found 13 raw JSON.parse calls on untrusted input. Fixed memory-extractor.cjs (P0). Pattern: any file reading JSON from stdin, agent output, or file system must use safeParseJSON from `.claude/lib/utils/safe-json.cjs`. SE-02 in sharp-edges.md.
+- **[MEMORY] contextual-memory LTM access-stats was non-atomic**: access-stats.json was written with `fs.writeFileSync` under concurrent conditions. Fixed to use `atomicWriteJSONSync`. Concurrent LTM reads/writes with non-atomic writes cause race conditions and corrupted JSON files.
+- **[COMPLIANCE] TASK_SINGLE_PURPOSE_ENFORCEMENT upgraded warn→block**: Routing guard enforcement mode for TASK_SINGLE_PURPOSE was defaulting to warn. Upgraded to block. Agents spawning multi-purpose tasks (combining implementation + testing + deployment in one task) now get hard-blocked.
+- **[WORKFLOWS] 194/411 workflow stubs**: Workflow inventory found 194 of 411 workflow files are placeholder stubs with no actual step definitions. Not fixed in this session (out of scope for security/routing/memory focus). Logged as P3 debt.
+- **[TDD] TDD skill updated with hook/memory/property-based testing patterns**: Added 3 new test pattern sections to `.claude/skills/tdd/SKILL.md`: hook testing (stdin/stdout protocol), memory testing (mocking memory-manager), and property-based testing (fast-check). These are the most-needed patterns missing from the original skill.
+- **[LSP] LSP skill updated with deferred tool prerequisite and .cjs warning**: Added explicit prerequisite: `ToolSearch({query:"select:LSP"})` must be called before LSP operations. Added .cjs limitation warning: LSP returns empty for .cjs files — use ripgrep instead. These were discovered as the most common LSP usage failures in this codebase.
+- **[METRICS] 424 tests pass, 0 fail after MEGA EPIC session**: Commits fac2f91a + 616be685 + 65941f11. Framework health score estimated 9.6/10 (up from 9.2/10 in previous EPIC session).
+
+---
+
 ## MEGA EPIC: Telegram Chat + File Drop (2026-03-08)
 
 - Commit 373209b8: outbox-based /ask reply delivery, file drop handler, markitdown skill
@@ -1205,6 +1227,22 @@ Task 2 (2026-03-04): Multi-LLM consultation on LTM eviction fixes
 - Probabilistic assertions needed for LLM routing tests: assert N/M correct, not exact match
 - tdd SKILL.md needs: probabilistic assertions section, contract testing, mutation gate for P0 paths
 - Report: .claude/context/reports/qa/tdd-research-2026-03-08.md
+
+- Created new agent: qa-guardian (2026-03-08)
+
+- Created new agent: contract-check (2026-03-08)
+
+- Created new agent: bool-action (2026-03-08)
+
+- Created new agent: repo-onboarder (2026-03-08)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-08)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-08)
+
+- Updated workflow: evolution-workflow (2026-03-08)
+
+- Updated workflow: missing-workflow-xyz (2026-03-08)
 
 - Created new agent: qa-guardian (2026-03-08)
 

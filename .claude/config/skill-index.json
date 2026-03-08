@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-08T20:22:45.238Z",
+  "generatedAt": "2026-03-08T21:31:57.066Z",
   "metadata": {
     "totalSkills": 273,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-08T20:22:45.239Z",
+    "lastValidated": "2026-03-08T21:31:57.067Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -791,6 +791,28 @@
         "receiving-code-review"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "session-transcript-analyzer": {
+      "name": "session-transcript-analyzer",
+      "displayName": "Session Transcript Analyzer",
+      "category": "Other",
+      "domain": "other",
+      "description": "Parses and merges Claude .jsonl transcripts with debug logs to generate a timeline heuristics report of API limits, context overflows, hook blocks, and tool failures.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "session-transcript-analyzer"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "brainstorming": {
@@ -7035,28 +7057,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "enterprise-skill-test-1773001364651": {
-      "name": "enterprise-skill-test-1773001364651",
-      "displayName": "Enterprise Skill Test 1773001364651",
-      "category": "Other",
-      "domain": "other",
-      "description": "Enterprise scaffold validation skill for test coverage and reliability checks.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "enterprise-skill-test-1773001364651"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "exa-monitor": {
       "name": "exa-monitor",
       "displayName": "Exa Monitor",
@@ -7453,6 +7453,7 @@
         "subagent-driven-development",
         "requesting-code-review",
         "receiving-code-review",
+        "session-transcript-analyzer",
         "brainstorming",
         "prd-generator",
         "planning-with-files",
@@ -7580,7 +7581,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1773001364651",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -7767,6 +7767,7 @@
         "subagent-driven-development",
         "requesting-code-review",
         "receiving-code-review",
+        "session-transcript-analyzer",
         "brainstorming",
         "prd-generator",
         "complexity-assessment",
@@ -7959,7 +7960,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1773001364651",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8093,6 +8093,7 @@
         "subagent-driven-development",
         "requesting-code-review",
         "receiving-code-review",
+        "session-transcript-analyzer",
         "brainstorming",
         "plan-generator",
         "prd-generator",
@@ -8321,7 +8322,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1773001364651",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8351,6 +8351,7 @@
         "best-practices-guidelines",
         "subagent-driven-development",
         "receiving-code-review",
+        "session-transcript-analyzer",
         "brainstorming",
         "plan-generator",
         "prd-generator",
@@ -8549,7 +8550,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1773001364651",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8754,6 +8754,7 @@
         "subagent-driven-development",
         "requesting-code-review",
         "receiving-code-review",
+        "session-transcript-analyzer",
         "brainstorming",
         "plan-generator",
         "spec-gathering",
@@ -8889,7 +8890,6 @@
         "ui-components-expert",
         "webapp-testing",
         "arxiv-monitor",
-        "enterprise-skill-test-1773001364651",
         "exa-monitor",
         "feedback-analysis",
         "heartbeat",
@@ -9330,6 +9330,7 @@
         "stale-module-pruner",
         "dry-principle",
         "best-practices-guidelines",
+        "session-transcript-analyzer",
         "brainstorming",
         "prd-generator",
         "planning-with-files",
@@ -9463,7 +9464,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1773001364651",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -10576,6 +10576,7 @@
         "stale-module-pruner",
         "dry-principle",
         "best-practices-guidelines",
+        "session-transcript-analyzer",
         "brainstorming",
         "prd-generator",
         "planning-with-files",
@@ -10709,7 +10710,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1773001364651",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",

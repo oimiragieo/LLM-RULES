@@ -68,5 +68,25 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "533dc3c5b2565c4bc337521a51d316aba9014179"
+  },
+  {
+    "text": "evolution-state-guard TOCTOU race: non-atomic writeFileSync creates race window for concurrent evolution processes. Fix: fs.openSync(path, wx) uses O_EXCL flag, atomic create-exclusive at OS level. Error handling: catch EEXIST specifically (err.code === EEXIST). Any state guard file preventing concurrent execution must use O_EXCL.",
+    "area": "main",
+    "timestamp": "2026-03-08T21:18:42.143Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "6bc694513b2a434aed60ed11bf50ba7b1853c2aa"
+  },
+  {
+    "text": "spawn-prompt-validator was fail-open: security hooks that catch unexpected errors and exit(0) create bypass vectors. Iron Law: security hooks must exit(2) in catch blocks (fail-closed). Advisory hooks (metrics, logging) may exit(0). Documented in .claude/rules/hooks.md fail-open vs fail-closed policy table.",
+    "area": "main",
+    "timestamp": "2026-03-08T21:18:42.172Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "9907c3ee469e6ab8f5689af3a4fb7bc093e32b49"
   }
 ]

@@ -60,7 +60,11 @@ test('task IDs use composite Date.now() and UUID slice format', async () => {
 
   // Composite format: task-<timestamp>-<8-char-uuid-slice>
   const compositePattern = /^task-\d{13}-[0-9a-f]{8}$/i;
-  assert.match(task.id, compositePattern, `Task ID "${task.id}" does not match time-uuid hybrid format`);
+  assert.match(
+    task.id,
+    compositePattern,
+    `Task ID "${task.id}" does not match time-uuid hybrid format`
+  );
 
   cleanupTasks();
 });
