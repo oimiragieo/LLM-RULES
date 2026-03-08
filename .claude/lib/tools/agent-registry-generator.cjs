@@ -136,7 +136,7 @@ function generateCapabilityCard(
       description: description,
       triggerPhrases: triggerPhrases.slice(0, 50),
       requiredTools: tools.slice(0, 50),
-      skills: skills.slice(0, 50),
+      skills: skills.slice(0, 250),
       examples: examples.slice(0, 50),
       tags: tags.slice(0, 50),
     },

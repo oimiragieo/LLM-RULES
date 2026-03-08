@@ -13,21 +13,19 @@ skills:
     - ripgrep
     - memory-search
 tools:
-  [
-    CronCreate,
-    CronList,
-    CronDelete,
-    Read,
-    Write,
-    Bash,
-    Task,
-    TaskCreate,
-    TaskUpdate,
-    TaskList,
-    TaskGet,
-    Skill,
-    MemoryRecord,
-  ]
+  - CronCreate
+  - CronList
+  - CronDelete
+  - Read
+  - Write
+  - Bash
+  - Task
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
+  - TaskGet
+  - Skill
+  - MemoryRecord
 isolation: none
 soul: .claude/context/memory/soul.md
 ---

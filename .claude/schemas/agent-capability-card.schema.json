@@ -114,7 +114,7 @@
         },
         "skills": {
           "type": "array",
-          "maxItems": 100,
+          "maxItems": 250,
           "items": {
             "type": "string",
             "maxLength": 100
