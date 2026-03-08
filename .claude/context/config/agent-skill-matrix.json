@@ -178,12 +178,6 @@
           "verification-before-completion"
         ]
       },
-      "router": {
-        "primary": ["skill-discovery", "complexity-assessment"],
-        "secondary": ["task-management-protocol"],
-        "contextual": {},
-        "always": []
-      },
       "reflection-agent": {
         "primary": ["insight-extraction", "session-handoff"],
         "secondary": [
@@ -193,15 +187,7 @@
           "debug-log-analysis"
         ],
         "contextual": {},
-        "always": [
-          "verification-before-completion",
-          "task-management-protocol",
-          "memory-search",
-          "ripgrep",
-          "code-semantic-search",
-          "code-structural-search",
-          "token-saver-context-compression"
-        ]
+        "always": []
       },
       "technical-program-manager": {
         "primary": ["plan-generator", "task-management-protocol", "complexity-assessment"],
@@ -223,7 +209,14 @@
         "primary": [],
         "secondary": [],
         "contextual": {},
-        "always": ["memory-search", "ripgrep"]
+        "always": [
+          "verification-before-completion",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression"
+        ]
       }
     },
     "domain": {

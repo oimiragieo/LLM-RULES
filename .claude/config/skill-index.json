@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-07T21:56:35.838Z",
+  "generatedAt": "2026-03-08T04:52:17.583Z",
   "metadata": {
-    "totalSkills": 270,
+    "totalSkills": 269,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-07T21:56:35.839Z",
+    "lastValidated": "2026-03-08T04:52:17.584Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -206,7 +206,6 @@
         "technical-writer",
         "pm",
         "context-compressor",
-        "reflection-agent",
         "technical-program-manager",
         "general-assistant",
         "python-pro",
@@ -398,8 +397,8 @@
         "technical-writer",
         "pm",
         "context-compressor",
-        "reflection-agent",
         "technical-program-manager",
+        "general-assistant",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -490,8 +489,8 @@
         "technical-writer",
         "pm",
         "context-compressor",
-        "reflection-agent",
         "technical-program-manager",
+        "general-assistant",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -630,8 +629,8 @@
         "technical-writer",
         "pm",
         "context-compressor",
-        "reflection-agent",
         "technical-program-manager",
+        "general-assistant",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -920,7 +919,6 @@
       "agentPrimary": [
         "planner",
         "pm",
-        "router",
         "technical-program-manager"
       ],
       "agentSupporting": [],
@@ -3773,8 +3771,8 @@
         "technical-writer",
         "pm",
         "context-compressor",
-        "reflection-agent",
         "technical-program-manager",
+        "general-assistant",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -3919,7 +3917,6 @@
         "technical-writer",
         "pm",
         "context-compressor",
-        "reflection-agent",
         "technical-program-manager",
         "python-pro",
         "rust-pro",
@@ -3984,9 +3981,7 @@
         "party-orchestrator",
         "artifact-integrator"
       ],
-      "agentSupporting": [
-        "router"
-      ],
+      "agentSupporting": [],
       "tags": [
         "specialized",
         "other",
@@ -4245,7 +4240,6 @@
         "technical-writer",
         "pm",
         "context-compressor",
-        "reflection-agent",
         "technical-program-manager",
         "general-assistant",
         "python-pro",
@@ -6641,7 +6635,7 @@
         "Grep"
       ],
       "agentPrimary": [
-        "router"
+        "developer"
       ],
       "agentSupporting": [],
       "tags": [
@@ -6649,7 +6643,7 @@
         "other",
         "skill-discovery"
       ],
-      "priority": 1,
+      "priority": 3,
       "aliasOf": null
     },
     "slack-notifications": {
@@ -7010,28 +7004,6 @@
       "tags": [
         "other",
         "doc-coauthoring"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
-    "enterprise-skill-test-1772920595252": {
-      "name": "enterprise-skill-test-1772920595252",
-      "displayName": "Enterprise Skill Test 1772920595252",
-      "category": "Other",
-      "domain": "other",
-      "description": "Enterprise scaffold validation skill for test coverage and reliability checks.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "enterprise-skill-test-1772920595252"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7508,7 +7480,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1772920595252",
         "feedback-analysis",
         "frontend-design",
         "heartbeat",
@@ -7884,7 +7855,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1772920595252",
         "feedback-analysis",
         "frontend-design",
         "heartbeat",
@@ -8243,7 +8213,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1772920595252",
         "feedback-analysis",
         "frontend-design",
         "heartbeat",
@@ -8468,7 +8437,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1772920595252",
         "feedback-analysis",
         "frontend-design",
         "marketing-content",
@@ -8805,7 +8773,6 @@
         "styling-expert",
         "ui-components-expert",
         "webapp-testing",
-        "enterprise-skill-test-1772920595252",
         "feedback-analysis",
         "heartbeat",
         "lsp-navigator",
@@ -9352,6 +9319,7 @@
         "project-analyzer",
         "react-native-skills-vercel",
         "recovery",
+        "skill-discovery",
         "slack-notifications",
         "spec-to-code-compliance",
         "state-management-expert",
@@ -9364,7 +9332,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1772920595252",
         "feedback-analysis",
         "frontend-design",
         "heartbeat",
@@ -9491,21 +9458,9 @@
         "verification-before-completion",
         "insight-extraction"
       ],
-      "router": [
-        "skill-discovery",
-        "complexity-assessment",
-        "task-management-protocol"
-      ],
       "reflection-agent": [
         "insight-extraction",
         "session-handoff",
-        "verification-before-completion",
-        "task-management-protocol",
-        "memory-search",
-        "ripgrep",
-        "code-semantic-search",
-        "code-structural-search",
-        "token-saver-context-compression",
         "context-compressor",
         "summarize-changes",
         "agent-evaluation",
@@ -9529,8 +9484,12 @@
         "swarm-coordination"
       ],
       "general-assistant": [
+        "verification-before-completion",
         "memory-search",
-        "ripgrep"
+        "ripgrep",
+        "code-semantic-search",
+        "code-structural-search",
+        "token-saver-context-compression"
       ],
       "python-pro": [
         "python-backend-expert",
@@ -10602,6 +10561,7 @@
         "project-analyzer",
         "react-native-skills-vercel",
         "recovery",
+        "skill-discovery",
         "slack-notifications",
         "spec-to-code-compliance",
         "state-management-expert",
@@ -10614,7 +10574,6 @@
         "brand-compliance",
         "claude-api",
         "doc-coauthoring",
-        "enterprise-skill-test-1772920595252",
         "feedback-analysis",
         "frontend-design",
         "heartbeat",
@@ -10741,21 +10700,9 @@
         "verification-before-completion",
         "insight-extraction"
       ],
-      "router": [
-        "skill-discovery",
-        "complexity-assessment",
-        "task-management-protocol"
-      ],
       "reflection-agent": [
         "insight-extraction",
         "session-handoff",
-        "verification-before-completion",
-        "task-management-protocol",
-        "memory-search",
-        "ripgrep",
-        "code-semantic-search",
-        "code-structural-search",
-        "token-saver-context-compression",
         "context-compressor",
         "summarize-changes",
         "agent-evaluation",
@@ -10779,8 +10726,12 @@
         "swarm-coordination"
       ],
       "general-assistant": [
+        "verification-before-completion",
         "memory-search",
-        "ripgrep"
+        "ripgrep",
+        "code-semantic-search",
+        "code-structural-search",
+        "token-saver-context-compression"
       ],
       "python-pro": [
         "python-backend-expert",

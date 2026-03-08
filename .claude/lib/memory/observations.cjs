@@ -325,6 +325,7 @@ function recordMemoryBlockChurn(projectRoot, memorySectionString) {
 }
 
 module.exports = {
+  MEMORY_CACHE_STABILITY_FILE,
   appendObservation,
   readObservations,
   scoreObservations,

@@ -35,7 +35,7 @@ function isSignalContent(text) {
     /\b(ADR|hook|agent|skill|memory|pattern|config|spawn|route|lint|format|test|deploy|schema|middleware|factory|singleton|subscriber|event)\b/i,
     /\.claude\//,
     /function\s+\w+/,
-    /\bfix\b.*\bbug\b|\broot cause\b|\bimplementation\b/i,
+    /\bfix\b.*\bbug\b|\broot cause\b|\bimplement\w*\b/i,
     /\bI\s+(found|confirmed|discovered|verified|identified|noticed|observed)\b/i,
   ];
 

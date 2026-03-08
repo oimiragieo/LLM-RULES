@@ -181,6 +181,25 @@ const {
   runEvolutionAudit,
 } = helpers;
 
+function performWorktreeCleanupIfCompleted(status) {
+  if (String(status).toLowerCase() !== 'completed') return;
+  try {
+    const { isUnderWorktreesDir, gitRun } = require('../../lib/worktree/worktree-utils.cjs');
+    if (isUnderWorktreesDir(process.cwd())) {
+      if (process.env.DEBUG_HOOKS === 'true') {
+        console.error(
+          `[post-task-unified] Worktree context detected. Purging untracked files before deletion...`
+        );
+      }
+      gitRun(['clean', '-fd'], process.cwd());
+    }
+  } catch (err) {
+    if (process.env.DEBUG_HOOKS === 'true') {
+      console.error(`[post-task-unified] Worktree cleanup failed: ${err.message}`);
+    }
+  }
+}
+
 // eslint-disable-next-line complexity
 async function main() {
   const startTime = Date.now();
@@ -211,6 +230,8 @@ async function main() {
         try {
           routerState.recordTaskUpdate(String(taskId), String(status));
           await lifecycleState.writeTaskStatus(String(taskId), String(status));
+          performWorktreeCleanupIfCompleted(String(status));
+
           const outputContract = readTaskOutputContract(taskId);
           appendTaskArtifactAudit({
             timestamp: new Date().toISOString(),
@@ -285,6 +306,7 @@ async function main() {
           try {
             routerState.recordTaskUpdate(String(taskId), 'completed');
             await lifecycleState.writeTaskStatus(String(taskId), 'completed');
+            performWorktreeCleanupIfCompleted('completed');
           } catch (_trackErr) {
             // Best-effort status reconciliation only.
           }

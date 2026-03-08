@@ -128,6 +128,8 @@ async function testLifecycle() {
   const res1 = await runHook(PRE_TASK_HOOK, spawnInput, {
     TASK_REQUIRE_CORE_MEMORY_READ: 'off',
     LOOP_PREVENTION_MODE: 'off',
+    CONCURRENT_AGENT_CAP_ENFORCEMENT: 'off',
+    NESTED_WORKTREE_ENFORCEMENT: 'off',
   });
   if (res1.code !== 0) throw new Error(`Spawn blocked: ${res1.stderr || res1.stdout}`);
 

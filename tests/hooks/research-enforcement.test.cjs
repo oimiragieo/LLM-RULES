@@ -123,7 +123,11 @@ test('isArtifactPath does NOT detect non-artifact files', () => {
   );
   assertEqual(isArtifactPath('.claude/settings.json'), false, 'Should not detect settings');
   assertEqual(isArtifactPath('src/index.ts'), false, 'Should not detect source');
-  assertEqual(isArtifactPath('.claude/hooks/evolution/hook.cjs'), false, 'Should not detect hooks');
+  assertEqual(
+    isArtifactPath('.claude/hooks/evolution/hook.cjs'),
+    true,
+    'Should detect hooks as artifact paths (Gate 4: hook-creator + research-synthesis required)'
+  );
 });
 
 test('isArtifactPath handles null/undefined', () => {

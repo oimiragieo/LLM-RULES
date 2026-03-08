@@ -123,6 +123,8 @@ describe('pre-task-unified exports and context tracker', () => {
     });
     process.env.CLAUDE_SESSION_ID = `memory-block-${Date.now()}`;
     process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+    process.env.NESTED_WORKTREE_ENFORCEMENT = 'off';
+    process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
 
     restoreState(TOOL_GOVERNANCE_STATE_FILE, null);
     const result = await preTaskUnified.runAllChecks({
@@ -148,6 +150,8 @@ describe('pre-task-unified exports and context tracker', () => {
     });
     process.env.CLAUDE_SESSION_ID = sessionId;
     process.env.TASKLIST_FIRST_ENFORCEMENT = 'off';
+    process.env.NESTED_WORKTREE_ENFORCEMENT = 'off';
+    process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
 
     writeState(TOOL_GOVERNANCE_STATE_FILE, {
       sessions: {

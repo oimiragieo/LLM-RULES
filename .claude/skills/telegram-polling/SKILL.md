@@ -66,13 +66,11 @@ CronCreate({
 
 ```javascript
 // Read offset (prevents reprocessing)
+const { safeReadJSON } = require('.claude/lib/utils/safe-json.cjs');
 const offsetFile = '.claude/context/tmp/telegram-offset.json';
 let offset = 0;
-try {
-  // Use safeParseJSON from .claude/lib/utils/safe-json.cjs (SE-02: never raw JSON.parse on untrusted input)
-  const data = JSON.parse(fs.readFileSync(offsetFile, 'utf8'));
-  offset = data.offset ?? 0;
-} catch {}
+const offsetData = safeReadJSON(offsetFile);
+offset = offsetData.offset ?? 0;
 
 // Fetch updates from Telegram
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -86,12 +84,10 @@ const { result: updates } = await response.json();
 Unknown senders must pair before the bot processes their messages.
 
 ```javascript
+const { safeReadJSON } = require('.claude/lib/utils/safe-json.cjs');
 const allowlistFile = '.claude/context/tmp/telegram-allowlist.json';
-let allowlist = [];
-try {
-  // Use safeParseJSON from .claude/lib/utils/safe-json.cjs (SE-02: never raw JSON.parse on untrusted input)
-  allowlist = JSON.parse(fs.readFileSync(allowlistFile, 'utf8'));
-} catch {}
+let allowlist = safeReadJSON(allowlistFile);
+if (!Array.isArray(allowlist)) allowlist = [];
 
 function isPaired(userId) {
   return allowlist.includes(String(userId));
@@ -155,12 +151,9 @@ for (const update of updates) {
 ```javascript
 async function routeToAgent(chatId, userId, text, updateId) {
   // Load session state (multi-turn conversation tracking)
+  const { safeReadJSON } = require('.claude/lib/utils/safe-json.cjs');
   const sessionsFile = '.claude/context/tmp/telegram-sessions.json';
-  let sessions = {};
-  try {
-    // Use safeParseJSON from .claude/lib/utils/safe-json.cjs (SE-02: never raw JSON.parse on untrusted input)
-    sessions = JSON.parse(fs.readFileSync(sessionsFile, 'utf8'));
-  } catch {}
+  const sessions = safeReadJSON(sessionsFile);
 
   const sessionKey = `tg_${chatId}`;
   const contextSummary = sessions[sessionKey]?.lastSummary ?? '';

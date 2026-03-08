@@ -405,20 +405,100 @@ function createReflectionEventHandlers({
       .slice(0, 5);
   }
 
+  function extractInsightsFromLines(text) {
+    const patterns = [];
+    const gotchas = [];
+    const discoveries = [];
+    const str = String(text);
+
+    // Pattern extraction — matches "pattern:", "best practice:", "approach:", etc.
+    const patternIndicators = [
+      /(?:pattern|approach|solution|technique|best practice):\s*(.+)/gi,
+      /(?:always|should|must|prefer)\s+(.{20,100})/gi,
+      /(?:use|using)\s+(\w+)\s+(?:for|to|when)\s+(.{10,50})/gi,
+    ];
+    for (const regex of patternIndicators) {
+      let match;
+      regex.lastIndex = 0;
+      while ((match = regex.exec(str)) !== null) {
+        const patternText = (match[1] || match[2] || '').trim();
+        if (patternText && patternText.length > 10 && patternText.length < 200) {
+          patterns.push(patternText);
+        }
+      }
+    }
+
+    // Gotcha extraction — matches "gotcha:", "warning:", "don't ...", etc.
+    const gotchaIndicators = [
+      /(?:gotcha|pitfall|warning|caution|watch out|careful):\s*(.+)/gi,
+      /(?:don't|do not|never|avoid)\s+(.{20,100})/gi,
+      /(?:bug|issue|problem):\s*(.{20,150})/gi,
+      /(?:fixed|resolved)\s+(?:by|with)\s+(.{20,100})/gi,
+    ];
+    for (const regex of gotchaIndicators) {
+      let match;
+      regex.lastIndex = 0;
+      while ((match = regex.exec(str)) !== null) {
+        const gotchaText = (match[1] || '').trim();
+        if (gotchaText && gotchaText.length > 10 && gotchaText.length < 200) {
+          gotchas.push(gotchaText);
+        }
+      }
+    }
+
+    // Discovery extraction — matches backtick-wrapped filenames with .cjs/.js/.ts etc.
+    const filePattern = /`([^`]+\.[a-z]{1,5})`/gi;
+    let match;
+    while ((match = filePattern.exec(str)) !== null) {
+      const fileName = match[1].trim();
+      if (fileName && !fileName.includes(' ') && fileName.length < 100) {
+        // Find a short description after the filename reference
+        const afterFile = str.slice(
+          match.index + match[0].length,
+          match.index + match[0].length + 120
+        );
+        const desc = afterFile.replace(/^\s+/, '').split(/[.!?]/)[0].trim();
+        discoveries.push({ path: fileName, description: desc || `File ${fileName} referenced` });
+      }
+    }
+
+    return {
+      patterns: sanitizeTextEntries(patterns, 3),
+      gotchas: sanitizeTextEntries(gotchas, 3),
+      discoveries: sanitizeDiscoveries(discoveries),
+    };
+  }
+
   function extractStructuredInsights(output) {
-    if (typeof output !== 'string' || !output.trim().startsWith('{')) {
+    if (typeof output !== 'string') {
       return { patterns: [], gotchas: [], discoveries: [] };
     }
-    try {
-      const parsed = JSON.parse(output);
-      return {
-        patterns: sanitizeTextEntries(parsed?.patterns, 3),
-        gotchas: sanitizeTextEntries(parsed?.gotchas, 3),
-        discoveries: sanitizeDiscoveries(parsed?.discoveries),
-      };
-    } catch (_err) {
-      return { patterns: [], gotchas: [], discoveries: [] };
+
+    const trimmed = output.trim();
+
+    if (trimmed.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        const result = {
+          patterns: sanitizeTextEntries(parsed?.patterns, 3),
+          gotchas: sanitizeTextEntries(parsed?.gotchas, 3),
+          discoveries: sanitizeDiscoveries(parsed?.discoveries),
+        };
+        // Fall through to line-based extraction if all arrays are empty
+        if (
+          result.patterns.length > 0 ||
+          result.gotchas.length > 0 ||
+          result.discoveries.length > 0
+        ) {
+          return result;
+        }
+      } catch (_err) {
+        // JSON parse failed — fall through to line-based extraction
+      }
     }
+
+    // Fallback: scan line-by-line for Pattern:/Gotcha:/Discovery: prefixes
+    return extractInsightsFromLines(output);
   }
 
   function extractPatterns(output) {

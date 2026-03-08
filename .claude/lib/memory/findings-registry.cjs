@@ -567,4 +567,5 @@ module.exports = {
   resolveFindingsFromCompletion,
   extractFindingsFromMarkdown,
   extractResolutionEvidence,
+  makeFingerprint,
 };

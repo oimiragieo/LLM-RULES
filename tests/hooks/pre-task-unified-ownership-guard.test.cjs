@@ -63,6 +63,8 @@ describe('pre-task-unified ownership guard', () => {
     process.env.TASK_REQUIRE_CORE_MEMORY_READ = 'off';
     process.env.TASK_OWNERSHIP_GUARD = 'block';
     process.env.TASK_PARALLEL_OWNERSHIP_REQUIRED = 'block';
+    process.env.CONCURRENT_AGENT_CAP_ENFORCEMENT = 'off';
+    process.env.NESTED_WORKTREE_ENFORCEMENT = 'off';
   });
 
   afterEach(() => {

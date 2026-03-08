@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-07T19:12:48.363Z
+lastVerifiedAt: 2026-03-08T03:07:27.914Z
 name: artifact-integrator
 version: 1.0.0
 description: Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces a security-first multi-agent pipeline.
@@ -21,21 +21,19 @@ triggerPhrases:
   - 'integrate repo'
 tools:
   - MemoryRecord
-  [
-    Read,
-    Write,
-    Edit,
-    Glob,
-    Grep,
-    Bash,
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    Task,
-    Skill,
-    WebFetch,
-  ]
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Task
+  - Skill
+  - WebFetch
 skills:
   - memory-search
   - project-onboarding

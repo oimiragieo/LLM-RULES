@@ -16,6 +16,7 @@ soul: .claude/context/memory/soul.md
 tools:
   - Read
   - Write
+  - Edit
   - Bash
   - WebSearch
   - WebFetch
@@ -23,6 +24,7 @@ tools:
   - MemoryRecord
   - TaskUpdate
   - TaskList
+  - TaskCreate
   - TaskGet
 skills:
   - sequential-thinking
