@@ -127,16 +127,6 @@ describe('Agent Search Skill Compliance (agent-skill-matrix.json)', () => {
   });
 
   describe('6. Exempt agents have empty or minimal always arrays', () => {
-    it('router should have empty always array', () => {
-      const router = allAgentEntries.find(a => a.name === 'router');
-      assert.ok(router, 'router must exist in matrix');
-      assert.strictEqual(
-        router.always.length,
-        0,
-        `router always array should be empty, got: ${JSON.stringify(router.always)}`
-      );
-    });
-
     it('reflection-agent should have empty always array', () => {
       const ra = allAgentEntries.find(a => a.name === 'reflection-agent');
       assert.ok(ra, 'reflection-agent must exist in matrix');

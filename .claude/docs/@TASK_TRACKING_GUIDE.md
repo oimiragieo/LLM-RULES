@@ -122,6 +122,7 @@ After spawning agents, Router should:
 - Detects tasks not updated after 1 hour
 - Auto-escalates stuck tasks
 - Logs to audit trail
+- **Worktree Garbage Collection**: Automatically executes `git clean -fd` within subagent worktrees upon receiving `TaskUpdate({ status: "completed" })` (or inferred completion) to purge untracked artifacts and prevent `Directory not empty` removal failures.
 - Default: `warn`
 
 ### Escalation Thresholds

@@ -17,7 +17,29 @@ function setupTestRoot() {
 }
 
 function cleanupTestRoot() {
-  fs.rmSync(TEST_ROOT, { recursive: true, force: true });
+  try {
+    const lancedbClient = require('../../../.claude/lib/memory/lancedb-client.cjs');
+    if (lancedbClient && typeof lancedbClient.closeConnection === 'function') {
+      lancedbClient.closeConnection();
+    }
+    const dbClient = require('../../../.claude/lib/memory/db-client.cjs');
+    if (dbClient && typeof dbClient.closeDb === 'function') {
+      dbClient.closeDb();
+    }
+  } catch (_err) {
+    // Ignore cleanup errs
+  }
+  // Wait a tick for Windows file locks to release
+  return new Promise(resolve => {
+    setTimeout(() => {
+      try {
+        fs.rmSync(TEST_ROOT, { recursive: true, force: true });
+      } catch (_e) {
+        // best effort
+      }
+      resolve();
+    }, 100);
+  });
 }
 
 function collectMatchingFiles(rootDir, predicate) {
@@ -101,7 +123,7 @@ test(
       } else {
         process.env.MEMORY_TIER_EVENT_LOG = prevEventLog;
       }
-      cleanupTestRoot();
+      await cleanupTestRoot();
     }
   }
 );
@@ -163,7 +185,7 @@ test(
       const lockArtifacts = collectMatchingFiles(memoryDir, name => name.endsWith('.lock'));
       assert.deepEqual(lockArtifacts, [], `Unexpected lock artifacts: ${lockArtifacts.join(', ')}`);
     } finally {
-      cleanupTestRoot();
+      await cleanupTestRoot();
     }
   }
 );

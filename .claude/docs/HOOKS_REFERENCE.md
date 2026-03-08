@@ -61,7 +61,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 ### PostToolUse
 
 - `post-tool-metrics-unified.cjs`: Collects metrics, tracks errors, detects anomalies.
-- `post-task-unified.cjs`: Task completion tracking, learning extraction, trend snapshots.
+- `post-task-unified.cjs`: Task completion tracking, learning extraction, trend snapshots, and worktree garbage collection.
 - `post-completion-chain.cjs`: Runs after task completion.
 - `reflection-cleanup.cjs`: Performs cleanup after reflections.
 - `artifact-scoring-ledger-hook.cjs`: Updates artifact scores.

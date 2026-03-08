@@ -31,19 +31,42 @@ describe('heartbeat SKILL.md', () => {
 
   it('includes all 7 heartbeat loops', () => {
     const content = fs.readFileSync(SKILL_PATH, 'utf8');
-    assert.ok(content.includes('reflection') || content.includes('Reflection'), 'should include reflection loop');
-    assert.ok(content.includes('evolution') || content.includes('Evolution'), 'should include evolution loop');
-    assert.ok(content.includes('briefing') || content.includes('Briefing') || content.includes('Morning'), 'should include morning briefing loop');
-    assert.ok(content.includes('index') || content.includes('Index'), 'should include indexing loop');
+    assert.ok(
+      content.includes('reflection') || content.includes('Reflection'),
+      'should include reflection loop'
+    );
+    assert.ok(
+      content.includes('evolution') || content.includes('Evolution'),
+      'should include evolution loop'
+    );
+    assert.ok(
+      content.includes('briefing') || content.includes('Briefing') || content.includes('Morning'),
+      'should include morning briefing loop'
+    );
+    assert.ok(
+      content.includes('index') || content.includes('Index'),
+      'should include indexing loop'
+    );
     assert.ok(content.includes('drain') || content.includes('Drain'), 'should include drain loop');
-    assert.ok(content.includes('Telegram') || content.includes('telegram'), 'should include telegram loop');
-    assert.ok(content.includes('arXiv') || content.includes('arxiv') || content.includes('research digest') || content.includes('Research Digest'), 'should include research digest loop');
+    assert.ok(
+      content.includes('Telegram') || content.includes('telegram'),
+      'should include telegram loop'
+    );
+    assert.ok(
+      content.includes('arXiv') ||
+        content.includes('arxiv') ||
+        content.includes('research digest') ||
+        content.includes('Research Digest'),
+      'should include research digest loop'
+    );
   });
 
   it('includes auto-reschedule loop (CronCreate before CronDelete)', () => {
     const content = fs.readFileSync(SKILL_PATH, 'utf8');
     assert.ok(
-      content.includes('reschedule') || content.includes('Reschedule') || content.includes('auto-reschedule'),
+      content.includes('reschedule') ||
+        content.includes('Reschedule') ||
+        content.includes('auto-reschedule'),
       'should include auto-reschedule pattern'
     );
     // Verify CronCreate appears before CronDelete in reschedule section
