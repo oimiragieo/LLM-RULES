@@ -41,7 +41,7 @@ test('routing-guard blocks router Write when input arrives only on stdin', () =>
   const payload = {
     tool_name: 'Write',
     tool_input: {
-      file_path: '.claude/context/runtime/should-not-write.txt',
+      file_path: 'src/services/user-data.txt',
       content: 'router should not write directly',
     },
     session_id: 'stdin-security-regression',

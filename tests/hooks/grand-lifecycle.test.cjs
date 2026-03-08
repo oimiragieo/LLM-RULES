@@ -163,6 +163,7 @@ async function testLifecycle() {
     tool_input: { file_path: 'README.md' },
     session_id: sessionId,
     allowed_tools: ['TaskUpdate', 'Read'],
+    permission_mode: 'bypassPermissions',
   };
   const res4 = await runHook(PRE_TOOL_HOOK, readInput);
   if (res4.code !== 0) throw new Error(`Read blocked: ${res4.stderr || res4.stdout}`);
