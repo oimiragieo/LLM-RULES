@@ -298,6 +298,21 @@ AGENT_STUDIO_ENV=staging claude
 | `ROUTER_GIT_COMMIT_ENFORCEMENT`   | string | warn    | Enforcement behavior for git commit usage by the router.          |
 | `ROUTING_GUARD_TEST_FORCE_THROW`  | bool   | false   | Internal testing force throw toggle for routing guard.            |
 
+### Heartbeat Ecosystem Variables
+
+| Variable                 | Default                                                            | Purpose                                                                      |
+| ------------------------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `ARXIV_KEYWORDS`         | `multi-agent systems,LLM reasoning,autonomous agents,RAG,tool use` | Comma-separated keywords for `arxiv-monitor` scheduled skill (Loop 7)        |
+| `EXA_MONITOR_TOPICS`     | `["Claude AI updates","agent frameworks","LLM tooling"]`           | JSON array of topics for `exa-monitor` scheduled skill (Loop 7)              |
+| `TELEGRAM_BOT_TOKEN`     | _(unset)_                                                          | Telegram Bot API token — Loop 6 (telegram-polling) skips gracefully if unset |
+| `TELEGRAM_ALLOWED_USERS` | _(unset)_                                                          | Comma-separated Telegram user IDs allowed to send commands                   |
+| `TELEGRAM_CHAT_IDS`      | _(unset)_                                                          | Comma-separated chat IDs to monitor for incoming messages                    |
+
+**Skills:** `arxiv-monitor`, `exa-monitor`, `telegram-polling`, `heartbeat`
+**Start:** `/heartbeat-start` command (or `Skill({ skill: 'heartbeat' })`)
+
+---
+
 ### Live Eval Harness Variables (Test/Eval)
 
 These variables are used by `tests/evals/subagent-memory-rag-live.eval.cjs` (they are eval harness toggles, not runtime hook controls):

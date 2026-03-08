@@ -136,16 +136,19 @@ CronCreate({
 
 **Discord note**: Discord uses webhooks (push-based) rather than polling. Send messages via Discord webhook URL, but receiving requires a persistent process — recommend Telegram for bidirectional communication.
 
-### Loop 7: arXiv/Exa Research Digest (daily at 7am)
+### Loop 7: ArXiv + Exa Research Digest (daily at 7am)
 
-Surfaces relevant academic and news content.
+Surfaces relevant academic papers and web news. Delegates to the dedicated monitor skills.
 
 ```javascript
 CronCreate({
   schedule: '0 7 * * *',
-  task: 'Research digest: Fetch arXiv for recent multi-agent LLM papers (max 5 results, sorted by date): http://export.arxiv.org/api/query?search_query=all:multi-agent+LLM+orchestration&max_results=5&sortBy=submittedDate&sortOrder=descending. WebSearch for "Claude Code agent patterns 2026". Summarize top 3 most relevant findings. Append to .claude/context/memory/research-digest.md with date header.',
+  task: 'Research digest: Invoke Skill({ skill: "arxiv-monitor" }) to fetch new ArXiv papers matching ARXIV_KEYWORDS. Then invoke Skill({ skill: "exa-monitor" }) to fetch new Exa web results for EXA_MONITOR_TOPICS. Both skills handle deduplication and append to their respective digest files (arxiv-digest.md, exa-digest.md). Reply HEARTBEAT_OK when both complete.',
 });
 ```
+
+**Dedicated skills:** `arxiv-monitor` (every 6h standalone) | `exa-monitor` (every 4h standalone)
+**Config:** `ARXIV_KEYWORDS` and `EXA_MONITOR_TOPICS` env vars (see `.env.example`)
 
 ---
 
@@ -252,5 +255,8 @@ minute hour day-of-month month day-of-week
 ## Related Skills
 
 - `scheduled-tasks` — low-level cron patterns (this skill builds on it)
+- `arxiv-monitor` — dedicated ArXiv paper monitor (ARXIV_KEYWORDS, 6h interval)
+- `exa-monitor` — dedicated Exa web search monitor (EXA_MONITOR_TOPICS, 4h interval)
+- `telegram-polling` — Telegram Bot API polling (TELEGRAM_BOT_TOKEN required)
 - `task-management-protocol` — task tracking patterns
 - `memory-search` — semantic memory queries used by loop prompts

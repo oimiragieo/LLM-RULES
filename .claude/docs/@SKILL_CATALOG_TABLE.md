@@ -10,8 +10,8 @@
 
 | Metric        | Count |
 | ------------- | ----- |
-| Total Skills  | 256   |
-| Active Skills | 256   |
+| Total Skills  | 258   |
+| Active Skills | 258   |
 | Aliases       | 0     |
 | Domains       | 22    |
 | Categories    | 25    |
@@ -252,6 +252,8 @@
 | `interactive-requirements-gathering`           | requirements   | Other           | Structured interactive questionnaire framework for gathering requirements from users. Uses A/B/C/D/E multiple choice pat...                                                                                                                                                  |
 | `spec-gathering`                               | requirements   | Requirements    | Requirements gathering workflow for specification creation. Use when starting a new feature, task, or project that needs...                                                                                                                                                  |
 | `arxiv-mcp`                                    | research       | Research        | Search and retrieve academic papers from arXiv.org using WebFetch and Exa. No MCP server required - uses existing tools ...                                                                                                                                                  |
+| `arxiv-monitor`                                | research       | Research        | Scheduled ArXiv paper monitor (every 6h). Reads ARXIV_KEYWORDS env var, fetches new papers via ArXiv API, deduplicates via named memory, appends summaries to arxiv-digest.md for morning briefing integration.                                                              |
+| `exa-monitor`                                  | research       | Research        | Scheduled Exa web search monitor (every 4h). Reads EXA_MONITOR_TOPICS env var, fetches new results via Exa MCP, deduplicates URLs via named memory, appends summaries to exa-digest.md for morning briefing integration.                                                     |
 | `research-synthesis`                           | research       | Research        | Research best practices and synthesize into design decisions for artifact creation. Invoke BEFORE any creator skill to e...                                                                                                                                                  |
 | `scientific-skills`                            | scientific     | Scientific      | Comprehensive scientific research toolkit with 139 specialized skills for biology, chemistry, medicine, data science, an...                                                                                                                                                  |
 | `auth-security-expert`                         | security       | Security        | OAuth 2.1, JWT (RFC 8725), encryption, and authentication security expert. Enforces 2026 security standards.                                                                                                                                                                 |
@@ -353,9 +355,9 @@
 
 `interactive-requirements-gathering`, `spec-gathering`
 
-### research (2 skills)
+### research (4 skills)
 
-`arxiv-mcp`, `research-synthesis`
+`arxiv-mcp`, `arxiv-monitor`, `exa-monitor`, `research-synthesis`
 
 ### scientific (1 skills)
 
