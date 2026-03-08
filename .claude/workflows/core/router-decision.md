@@ -576,19 +576,22 @@ User Request: <USER_REQUEST>
 
 **STOP. If your Step 6 selection is `developer`, you MUST check this table before proceeding. Developer is the LAST RESORT.**
 
-| If the task involves...                               | Override to             |
-| ----------------------------------------------------- | ----------------------- |
-| Documentation, README, guides, doc review             | `technical-writer`      |
-| Code cleanup, simplification, refactoring for clarity | `code-simplifier`       |
-| Code review, PR review, implementation audit          | `code-reviewer`         |
-| Testing only (writing/running tests, no new features) | `qa`                    |
-| Infrastructure, Docker, CI/CD, deployment             | `devops`                |
-| Database schema, queries, migrations, optimization    | `database-architect`    |
-| Python-specific implementation                        | `python-pro`            |
-| Frontend/React/Vue/CSS work                           | `frontend-pro`          |
-| Node.js/Express/NestJS backend                        | `nodejs-pro`            |
-| Research, fact-finding, external investigation        | `researcher`            |
-| Debugging production issues, incident triage          | `devops-troubleshooter` |
+| If the task involves...                               | Override to              |
+| ----------------------------------------------------- | ------------------------ |
+| Documentation, README, guides, doc review             | `technical-writer`       |
+| Code cleanup, simplification, refactoring for clarity | `code-simplifier`        |
+| Code review, PR review, implementation audit          | `code-reviewer`          |
+| Testing only (writing/running tests, no new features) | `qa`                     |
+| Infrastructure, Docker, CI/CD, deployment             | `devops`                 |
+| Database schema, queries, migrations, optimization    | `database-architect`     |
+| Python-specific implementation                        | `python-pro`             |
+| Frontend/React/Vue/CSS work                           | `frontend-pro`           |
+| Node.js/Express/NestJS backend                        | `nodejs-pro`             |
+| Research, fact-finding, external investigation        | `researcher`             |
+| Debugging production issues, incident triage          | `devops-troubleshooter`  |
+| Memory leak, profiling, advanced root cause analysis  | `advanced-debugging`     |
+| Simple Q&A, explanations, brainstorming, chat         | `general-assistant`      |
+| Heartbeat loops, cron ecosystem management            | `heartbeat-orchestrator` |
 
 **Rule:** `developer` is the LAST RESORT for general coding tasks that don't match any specialist. If a specialist exists, USE IT.
 
@@ -753,9 +756,10 @@ Review payment feature design for security best practices.
 
 ## Instructions
 1. Read your agent definition: .claude/agents/specialized/security-architect.md
-2. **Invoke skills**: Skill({ skill: "security-architect" })
-3. Wait for planner output, then review: .claude/context/plans/payment-feature-plan.md
-4. Save review to: .claude/context/reports/security/security-review.md
+2. **Invoke research-synthesis FIRST**: Skill({ skill: "research-synthesis" }) — gather current security research before analysis (see security-architect-skill-workflow.md Phase 0)
+3. **Invoke skills**: Skill({ skill: "security-architect" })
+4. Wait for planner output, then review: .claude/context/plans/payment-feature-plan.md
+5. Save review to: .claude/context/reports/security/security-review.md
 
 ## Memory Protocol
 1. Read .claude/context/memory/learnings.md first

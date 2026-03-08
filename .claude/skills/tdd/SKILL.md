@@ -199,19 +199,26 @@ Assume interruption: if it is not in memory, it did not happen.
 ## Agent-Studio TDD Extensions (2026)
 
 ### Hook Testing Pattern
+
 Hooks use stdin/stdout JSON protocol:
+
 ```js
-const proc = require('child_process').spawn('node', ['.claude/hooks/routing/routing-guard.cjs'], {shell:false});
-proc.stdin.write(JSON.stringify({tool_name:'Write',tool_input:{}}));
+const proc = require('child_process').spawn('node', ['.claude/hooks/routing/routing-guard.cjs'], {
+  shell: false,
+});
+proc.stdin.write(JSON.stringify({ tool_name: 'Write', tool_input: {} }));
 proc.stdin.end();
 // Exit 0=allow, 2=block
 ```
 
 ### Memory TDD
+
 Mock MemoryRecord. Test confidence gate (threshold 0.7). Use atomic writes.
 
 ### Property-Based Testing
+
 Use fast-check for routing: ensure routeIntent(anyString) always returns string.
 
 ### Contract Testing
+
 Validate TaskUpdate metadata schemas (processedReflectionIds: string[]).

@@ -110,17 +110,17 @@ describe('GAP-A: EXTERNAL_CONTENT_GUARD_MODE env var', () => {
     assert.ok(result.message, 'block result should include a message');
   });
 
-  test('GAP-A-4: unset EXTERNAL_CONTENT_GUARD_MODE defaults to warn (backward-compatible)', () => {
+  test('GAP-A-4: unset EXTERNAL_CONTENT_GUARD_MODE defaults to block (security-category hook, fail-closed)', () => {
     delete process.env.EXTERNAL_CONTENT_GUARD_MODE;
     const result = guard.handleWebFetch(
       { url: 'https://untrusted-evil-org.com/payload' },
       MOCK_CONFIG
     );
-    // Default is 'warn' — untrusted domains should warn, not block
+    // Default is 'block' — security hooks must fail-closed per hooks.md policy
     assert.strictEqual(
       result.action,
-      'warn',
-      `Unset mode should default to 'warn', got '${result.action}'`
+      'block',
+      `Unset mode should default to 'block', got '${result.action}'`
     );
   });
 
@@ -311,7 +311,7 @@ describe('GAP-C: gh api enforcement parity', () => {
     );
   });
 
-  test('GAP-C-3: default mode (unset) causes gh api to warn (backward-compatible)', () => {
+  test('GAP-C-3: default mode (unset) causes gh api to block (security-category hook, fail-closed)', () => {
     delete process.env.EXTERNAL_CONTENT_GUARD_MODE;
     const result = guard.handleBash(
       { command: 'gh api repos/gemini-cli-extensions/security' },
@@ -319,8 +319,8 @@ describe('GAP-C: gh api enforcement parity', () => {
     );
     assert.strictEqual(
       result.action,
-      'warn',
-      `Expected 'warn' (default) for untrusted gh api, got '${result.action}'`
+      'block',
+      `Expected 'block' (default) for untrusted gh api, got '${result.action}'`
     );
   });
 

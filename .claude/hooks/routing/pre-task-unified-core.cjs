@@ -95,7 +95,7 @@ async function checkTaskListFirst(toolName, hookInput = null) {
   if (permissionMode === 'bypasspermissions') {
     return { pass: true };
   }
-  const mode = getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT').toLowerCase();
+  const mode = getEnforcementMode('TASKLIST_FIRST_ENFORCEMENT', 'block').toLowerCase();
   if (mode === 'off') {
     return { pass: true };
   }

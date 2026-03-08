@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-08T17:10:25.801Z",
+  "generatedAt": "2026-03-08T19:41:49.025Z",
   "metadata": {
     "totalAgents": 73,
     "healthyAgents": 73,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-03-08T17:10:25.801Z",
-    "lastFullScan": "2026-03-08T17:10:25.801Z"
+    "lastHealthCheck": "2026-03-08T19:41:49.025Z",
+    "lastFullScan": "2026-03-08T19:41:49.025Z"
   },
   "agents": {
     "architect": {
@@ -115,14 +115,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.793Z",
+        "lastUpdate": "2026-03-08T19:41:49.017Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.794Z",
-        "updatedAt": "2026-03-08T17:10:25.794Z"
+        "createdAt": "2026-03-08T19:41:49.018Z",
+        "updatedAt": "2026-03-08T19:41:49.018Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -216,14 +216,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.795Z",
+        "lastUpdate": "2026-03-08T19:41:49.019Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.795Z",
-        "updatedAt": "2026-03-08T17:10:25.795Z"
+        "createdAt": "2026-03-08T19:41:49.019Z",
+        "updatedAt": "2026-03-08T19:41:49.019Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -555,14 +555,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.795Z",
+        "lastUpdate": "2026-03-08T19:41:49.019Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.795Z",
-        "updatedAt": "2026-03-08T17:10:25.795Z"
+        "createdAt": "2026-03-08T19:41:49.019Z",
+        "updatedAt": "2026-03-08T19:41:49.019Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -592,7 +592,9 @@
             "brainstorming",
             "memory-search",
             "code-semantic-search",
+            "recovery",
             "ripgrep",
+            "session-handoff",
             "task-management-protocol",
             "context-compressor",
             "omega-gemini-cli",
@@ -626,7 +628,9 @@
             "brainstorming",
             "memory-search",
             "code-semantic-search",
+            "recovery",
             "ripgrep",
+            "session-handoff",
             "task-management-protocol",
             "context-compressor",
             "omega-gemini-cli",
@@ -649,7 +653,9 @@
             "brainstorming",
             "memory-search",
             "code-semantic-search",
+            "recovery",
             "ripgrep",
+            "session-handoff",
             "task-management-protocol",
             "context-compressor",
             "omega-gemini-cli",
@@ -676,14 +682,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.795Z",
+        "lastUpdate": "2026-03-08T19:41:49.019Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.795Z",
-        "updatedAt": "2026-03-08T17:10:25.795Z"
+        "createdAt": "2026-03-08T19:41:49.019Z",
+        "updatedAt": "2026-03-08T19:41:49.019Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -802,14 +808,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.795Z",
+        "lastUpdate": "2026-03-08T19:41:49.019Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.4.0",
-        "createdAt": "2026-03-08T17:10:25.795Z",
-        "updatedAt": "2026-03-08T17:10:25.795Z"
+        "createdAt": "2026-03-08T19:41:49.019Z",
+        "updatedAt": "2026-03-08T19:41:49.019Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -906,14 +912,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.795Z",
+        "lastUpdate": "2026-03-08T19:41:49.019Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.795Z",
-        "updatedAt": "2026-03-08T17:10:25.795Z"
+        "createdAt": "2026-03-08T19:41:49.019Z",
+        "updatedAt": "2026-03-08T19:41:49.019Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -945,6 +951,7 @@
             "memory-search",
             "ripgrep",
             "task-management-protocol",
+            "proactive-audit",
             "tdd",
             "test-generator",
             "token-saver-context-compression",
@@ -974,6 +981,7 @@
             "memory-search",
             "ripgrep",
             "task-management-protocol",
+            "proactive-audit",
             "tdd",
             "test-generator",
             "token-saver-context-compression",
@@ -1000,6 +1008,7 @@
             "memory-search",
             "ripgrep",
             "task-management-protocol",
+            "proactive-audit",
             "tdd",
             "test-generator",
             "token-saver-context-compression",
@@ -1027,14 +1036,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.795Z",
+        "lastUpdate": "2026-03-08T19:41:49.019Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.795Z",
-        "updatedAt": "2026-03-08T17:10:25.795Z"
+        "createdAt": "2026-03-08T19:41:49.019Z",
+        "updatedAt": "2026-03-08T19:41:49.019Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1074,7 +1083,6 @@
             "verification-before-completion"
           ],
           "requiredTools": [
-            "Bash",
             "Edit",
             "Glob",
             "Grep",
@@ -1085,7 +1093,8 @@
             "TaskGet",
             "TaskList",
             "TaskUpdate",
-            "Write"
+            "Write",
+            "Bash"
           ],
           "skills": [
             "code-analyzer",
@@ -1140,14 +1149,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.795Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.795Z",
-        "updatedAt": "2026-03-08T17:10:25.795Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": []
     },
@@ -1240,14 +1249,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1347,14 +1356,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1450,14 +1459,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1491,6 +1500,7 @@
             "memory-forensics",
             "memory-search",
             "ripgrep",
+            "smart-debug",
             "task-management-protocol",
             "token-saver-context-compression",
             "verification-before-completion"
@@ -1520,6 +1530,7 @@
             "memory-forensics",
             "memory-search",
             "ripgrep",
+            "smart-debug",
             "task-management-protocol",
             "token-saver-context-compression",
             "verification-before-completion",
@@ -1539,6 +1550,7 @@
             "memory-forensics",
             "memory-search",
             "ripgrep",
+            "smart-debug",
             "task-management-protocol",
             "token-saver-context-compression",
             "verification-before-completion",
@@ -1557,14 +1569,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1654,14 +1666,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1751,14 +1763,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1851,14 +1863,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1950,14 +1962,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2053,14 +2065,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2179,14 +2191,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2286,14 +2298,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.020Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.020Z",
+        "updatedAt": "2026-03-08T19:41:49.020Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2390,14 +2402,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.796Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.796Z",
-        "updatedAt": "2026-03-08T17:10:25.796Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2498,14 +2510,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2611,14 +2623,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2756,14 +2768,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2872,14 +2884,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2913,6 +2925,7 @@
             "security-architect",
             "task-management-protocol",
             "token-saver-context-compression",
+            "variant-analysis",
             "verification-before-completion"
           ],
           "requiredTools": [
@@ -2941,6 +2954,7 @@
             "security-architect",
             "task-management-protocol",
             "token-saver-context-compression",
+            "variant-analysis",
             "verification-before-completion",
             "tdd",
             "code-analyzer",
@@ -2959,6 +2973,7 @@
             "security-architect",
             "task-management-protocol",
             "token-saver-context-compression",
+            "variant-analysis",
             "verification-before-completion",
             "tdd",
             "code-analyzer",
@@ -2976,14 +2991,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3080,14 +3095,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3182,14 +3197,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.021Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.021Z",
+        "updatedAt": "2026-03-08T19:41:49.021Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -3287,14 +3302,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.797Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.797Z",
-        "updatedAt": "2026-03-08T17:10:25.797Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3325,6 +3340,7 @@
             "planning",
             "audit-context-building",
             "auth-security-expert",
+            "fix-review",
             "authentication-flow-rules",
             "building-secure-contracts",
             "code-semantic-search",
@@ -3357,6 +3373,7 @@
           "skills": [
             "audit-context-building",
             "auth-security-expert",
+            "fix-review",
             "authentication-flow-rules",
             "building-secure-contracts",
             "code-semantic-search",
@@ -3372,7 +3389,6 @@
             "rule-auditor",
             "dependency-analyzer",
             "doc-generator",
-            "fix-review",
             "web3-expert",
             "binary-analysis-patterns",
             "memory-forensics"
@@ -3387,6 +3403,7 @@
             "planning",
             "audit-context-building",
             "auth-security-expert",
+            "fix-review",
             "authentication-flow-rules",
             "building-secure-contracts",
             "code-semantic-search",
@@ -3402,7 +3419,6 @@
             "rule-auditor",
             "dependency-analyzer",
             "doc-generator",
-            "fix-review",
             "web3-expert",
             "binary-analysis-patterns",
             "memory-forensics"
@@ -3419,14 +3435,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3523,14 +3539,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3622,14 +3638,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3726,14 +3742,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3831,14 +3847,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3922,14 +3938,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4015,14 +4031,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4112,14 +4128,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4222,14 +4238,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4330,14 +4346,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4440,14 +4456,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4531,14 +4547,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4658,14 +4674,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4759,14 +4775,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4870,14 +4886,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.022Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.022Z",
+        "updatedAt": "2026-03-08T19:41:49.022Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4980,14 +4996,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5086,14 +5102,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5197,14 +5213,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5298,14 +5314,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.798Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.798Z",
-        "updatedAt": "2026-03-08T17:10:25.798Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5396,14 +5412,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5489,14 +5505,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -5590,14 +5606,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5690,14 +5706,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -5795,14 +5811,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5911,14 +5927,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6051,14 +6067,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6166,14 +6182,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6275,14 +6291,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6381,14 +6397,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.023Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.023Z",
+        "updatedAt": "2026-03-08T19:41:49.023Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6485,14 +6501,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6591,14 +6607,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6709,14 +6725,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6814,14 +6830,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6917,14 +6933,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7025,14 +7041,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.799Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.799Z",
-        "updatedAt": "2026-03-08T17:10:25.799Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7135,14 +7151,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7246,14 +7262,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7341,14 +7357,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -7443,14 +7459,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7553,14 +7569,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7675,14 +7691,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7745,14 +7761,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": []
     },
@@ -7851,14 +7867,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7948,14 +7964,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.024Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.024Z",
+        "updatedAt": "2026-03-08T19:41:49.024Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -8046,14 +8062,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-08T17:10:25.800Z",
+        "lastUpdate": "2026-03-08T19:41:49.025Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-08T17:10:25.800Z",
-        "updatedAt": "2026-03-08T17:10:25.800Z"
+        "createdAt": "2026-03-08T19:41:49.025Z",
+        "updatedAt": "2026-03-08T19:41:49.025Z"
       },
       "alwaysSkills": [
         "verification-before-completion",

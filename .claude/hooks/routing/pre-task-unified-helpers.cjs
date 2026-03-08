@@ -394,7 +394,7 @@ function checkSpawnRoleGuardrails(toolInput) {
     return { pass: true, warnings: [message] };
   }
 
-  const singlePurposeMode = getEnforcementMode('TASK_SINGLE_PURPOSE_ENFORCEMENT', 'warn');
+  const singlePurposeMode = getEnforcementMode('TASK_SINGLE_PURPOSE_ENFORCEMENT', 'block');
   if (singlePurposeMode !== 'off' && hasMultiWaveDirective(toolInput)) {
     const message =
       '[SPAWN-GUARDRAIL] Multi-wave task detected in one spawn prompt. Use one focused objective per agent task.';

@@ -11,6 +11,7 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const {
   computeQualityScore,
+  incrementLTMAccessCount,
   isPathInside,
   loadContextSync,
   toSafeInt,
@@ -22,31 +23,6 @@ const {
   keywordSearch,
   searchWithRipgrep,
 } = require('./contextual-memory-search-fallback.cjs');
-const { safeParseJSON } = require('../utils/safe-json.cjs');
-
-/**
- * Increment accessCount and update lastAccessed for an LTM JSON file.
- * Only operates on paths that contain '/ltm/' (normalized with forward slashes).
- * Wraps all I/O in try/catch so errors never break the search call path.
- *
- * @param {string} filePath - Absolute path to the JSON file
- */
-function incrementLTMAccessCount(filePath) {
-  try {
-    if (!filePath || typeof filePath !== 'string') return;
-    const normalized = filePath.replace(/\\/g, '/');
-    if (!normalized.includes('/ltm/')) return;
-
-    const raw = fs.readFileSync(filePath, 'utf8');
-    const data = safeParseJSON(raw);
-    const current = typeof data.accessCount === 'number' ? data.accessCount : 0;
-    data.accessCount = current + 1;
-    data.lastAccessed = new Date().toISOString();
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-  } catch (_e) {
-    // must not break search
-  }
-}
 
 const logger = createLogger('contextual-memory');
 
@@ -249,7 +225,9 @@ class ContextualMemory {
     return loadContextSync(this, options);
   }
 
-  async loadContext(options = {}) { return this.loadContextSync(options); }
+  async loadContext(options = {}) {
+    return this.loadContextSync(options);
+  }
 
   /**
    * Check whether the LanceDB index is stale relative to MTM/LTM memory files.
@@ -597,13 +575,21 @@ class ContextualMemory {
     return fused.slice(0, limit);
   }
 
-  _getRipgrepPath() { return getRipgrepPath(this); }
+  _getRipgrepPath() {
+    return getRipgrepPath(this);
+  }
 
-  _getAstGrepPath() { return getAstGrepPath(this); }
+  _getAstGrepPath() {
+    return getAstGrepPath(this);
+  }
 
-  async _checkBinaryAvailable(binPath) { return checkBinaryAvailable(binPath); }
+  async _checkBinaryAvailable(binPath) {
+    return checkBinaryAvailable(binPath);
+  }
 
-  async _searchWithRipgrep(query, files, limit) { return searchWithRipgrep(this, query, files, limit); }
+  async _searchWithRipgrep(query, files, limit) {
+    return searchWithRipgrep(this, query, files, limit);
+  }
 
   /**
    * Keyword search fallback (ripgrep/ast-grep when available; bounded file reads otherwise).

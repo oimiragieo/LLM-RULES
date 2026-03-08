@@ -38,5 +38,35 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "position_vs_regex_leakage"
+  },
+  {
+    "text": "AUTO_COMPRESSION_PHASE_3=1 env var is REQUIRED to enable compression-reminder.txt writes. Without it, token-saver 80K/120K/150K thresholds are doc-only with no enforcement hook. compression-trigger.cjs writes compression-reminder.txt only when this var is set. All references to automatic token-saver activation in agent prompts are inaccurate without this env var.",
+    "area": "main",
+    "timestamp": "2026-03-07T18:40:44.921Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "b7179a56c95b0765388ffb75117d96f856dd5604"
+  },
+  {
+    "text": "After any major CLAUDE.md structural rewrite (v2.x → v3.0.0 etc.), ALL creator skill post-creation checklists must be audited for stale section references. Sections get renamed/merged — e.g. Section 8.5 became @SKILL_CATALOG_TABLE.md, skill-catalog.md became @SKILL_CATALOG_TABLE.md. Stale refs survive in SKILL.md files and silently break creator workflows.",
+    "area": "main",
+    "timestamp": "2026-03-07T21:11:27.424Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "12843f3a6f4d7e18be9050f49ccd0689bc569afc"
+  },
+  {
+    "text": "omega-claude-cli fails inside CronCreate fires due to nested session error. Use Task() to spawn subagents inside CronCreate tasks, not omega-claude-cli.",
+    "area": "main",
+    "timestamp": "2026-03-08T08:33:29.023Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "533dc3c5b2565c4bc337521a51d316aba9014179"
   }
 ]

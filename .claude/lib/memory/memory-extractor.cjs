@@ -4,6 +4,7 @@ const { ModelClient } = require('../clients/model-client.cjs');
 const { createLogger } = require('../utils/logger.cjs');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { getMemoryExtractionPrompt } = require('./prompts/memory-extraction.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('memory-extractor');
 
@@ -198,7 +199,7 @@ async function extractMemoriesFromSession(sessionData, options = {}) {
     if (!jsonPayload) {
       return [];
     }
-    const parsed = JSON.parse(jsonPayload);
+    const parsed = safeParseJSON(jsonPayload, null);
     if (!parsed || !Array.isArray(parsed.memories)) {
       return fallbackExtractMemories(sessionData);
     }

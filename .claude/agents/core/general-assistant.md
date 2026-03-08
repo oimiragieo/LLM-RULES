@@ -31,7 +31,9 @@ skills:
   - brainstorming
   - memory-search
   - code-semantic-search
+  - recovery
   - ripgrep
+  - session-handoff
   - task-management-protocol
   - context-compressor
   - omega-gemini-cli

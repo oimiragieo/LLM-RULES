@@ -94,17 +94,17 @@ Do NOT use for:
 
 ## Operation Reference
 
-| Operation              | Purpose                           | Best For                                           |
-| ---------------------- | --------------------------------- | -------------------------------------------------- |
-| `goToDefinition`       | Find where a symbol is defined    | Navigating to source of imported functions/classes |
-| `findReferences`       | Find all usages of a symbol       | Impact analysis before refactoring                 |
-| `hover`                | Get type info and docs            | Verifying parameter types, checking API contracts  |
-| `documentSymbol`       | List all symbols in a file        | File structure overview, finding entry points      |
-| `workspaceSymbol`      | Search symbols by name            | Finding functions/classes across the workspace     |
-| `goToImplementation`   | Find implementations of interface | Tracing concrete behavior of abstract types        |
+| Operation              | Purpose                                                                                                         | Best For                                           |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `goToDefinition`       | Find where a symbol is defined                                                                                  | Navigating to source of imported functions/classes |
+| `findReferences`       | Find all usages of a symbol                                                                                     | Impact analysis before refactoring                 |
+| `hover`                | Get type info and docs                                                                                          | Verifying parameter types, checking API contracts  |
+| `documentSymbol`       | List all symbols in a file                                                                                      | File structure overview, finding entry points      |
+| `workspaceSymbol`      | Search symbols by name                                                                                          | Finding functions/classes across the workspace     |
+| `goToImplementation`   | Find implementations of interface                                                                               | Tracing concrete behavior of abstract types        |
 | `prepareCallHierarchy` | Get call hierarchy item ⚠️ Always call this BEFORE incomingCalls/outgoingCalls or you get silent empty results. | Setting up for incoming/outgoing call analysis     |
-| `incomingCalls`        | Find all callers                  | Understanding who depends on this function         |
-| `outgoingCalls`        | Find all callees                  | Understanding what a function depends on           |
+| `incomingCalls`        | Find all callers                                                                                                | Understanding who depends on this function         |
+| `outgoingCalls`        | Find all callees                                                                                                | Understanding what a function depends on           |
 
 All operations require: `filePath` (absolute path), `line` (1-based), `character` (1-based).
 

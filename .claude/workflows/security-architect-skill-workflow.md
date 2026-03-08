@@ -51,6 +51,15 @@ This workflow provides a systematic approach to security assessment that covers 
 - **balanced**: Block on High+ findings (default)
 - **aggressive**: Block on Critical only
 
+## Phase 0: Research Synthesis (MANDATORY FIRST STEP)
+
+**Agent**: Security Architect
+**Action**: Invoke `Skill({ skill: 'research-synthesis' })` to gather current security research before any analysis begins.
+**Purpose**: Ensures threat modeling and vulnerability assessment are grounded in up-to-date CVEs, OWASP findings, and threat intelligence.
+**Duration**: 30-60 minutes
+
+---
+
 ## Phase 1: Threat Modeling
 
 **Agent**: Security Architect

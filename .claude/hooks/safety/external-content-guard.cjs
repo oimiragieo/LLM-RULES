@@ -58,16 +58,16 @@ const AUDIT_LOG_PATH = path.join(
  * Get the current enforcement mode.
  * Reads EXTERNAL_CONTENT_GUARD_MODE each time so tests can override it per-test.
  * Values: 'block' | 'warn' | 'off'
- * Default: 'warn' (backward-compatible)
+ * Default: 'block' (security-category hook must fail-closed per hooks.md policy)
  *
  * @returns {'block'|'warn'|'off'}
  */
 function getEnforcementMode() {
   const raw = process.env.EXTERNAL_CONTENT_GUARD_MODE;
-  if (!raw) return 'warn';
+  if (!raw) return 'block';
   const mode = raw.toLowerCase().trim();
   if (mode === 'block' || mode === 'warn' || mode === 'off') return mode;
-  return 'warn';
+  return 'block';
 }
 
 // ---------------------------------------------------------------------------

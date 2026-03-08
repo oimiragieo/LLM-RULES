@@ -63,6 +63,7 @@ The project follows a strict, contract-first lifecycle for creating or updating 
 
 - **Naming:** Lowercase kebab-case (e.g., `ux-reviewer`, `data-engineer`).
 - **Documentation:** Use the **Lazy-Load Rule**: Prefix `.claude/` paths with `@` in markdown (e.g., `@.claude/docs/GUIDE.md`) to minimize prompt tokens.
+- **Context Control:** You MUST proactively summarize your context and execute `token-saver-context-compression` or manual truncation BEFORE accumulating 150K tokens. Reading massive log files or directories without `grep` will cause API crash errors.
 - **Shell Security:** Background tasks must initialize CWD to `PROJECT_ROOT` and avoid dangerous patterns (rm -rf, eval).
 - **Task Tracking:** Every agent MUST use `TaskUpdate` to track progress (`in_progress`, `completed`).
 

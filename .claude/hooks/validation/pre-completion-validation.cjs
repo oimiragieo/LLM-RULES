@@ -618,7 +618,7 @@ async function main() {
 
     // GIT_COMMIT_VERIFICATION: block devops/deploy completions when git status shows dirty state.
     // This catches the 50% devops commit failure rate caused by silent pre-commit hook blocks.
-    const commitVerifyMode = getEnforcementMode('GIT_COMMIT_VERIFICATION', 'warn');
+    const commitVerifyMode = getEnforcementMode('GIT_COMMIT_VERIFICATION', 'block');
     if (commitVerifyMode !== 'off') {
       const summary = (toolParams.metadata && toolParams.metadata.summary) || '';
       const summaryLower = summary.toLowerCase();

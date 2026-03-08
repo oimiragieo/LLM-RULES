@@ -37,6 +37,7 @@ skills:
   - memory-forensics
   - memory-search
   - ripgrep
+  - smart-debug
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion

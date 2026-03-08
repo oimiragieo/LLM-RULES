@@ -33,6 +33,7 @@ skills:
   - memory-search
   - ripgrep
   - task-management-protocol
+  - proactive-audit
   - tdd
   - test-generator
   - token-saver-context-compression

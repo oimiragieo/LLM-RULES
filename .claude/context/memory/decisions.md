@@ -1,3 +1,13 @@
+## ADR-2026-03-07B: agent-registry.json Structure Contract
+
+- **Decision**: agent-registry.json `agents` field is an OBJECT keyed by agent ID string (not array)
+- **Correct access**: `registry.agents[agentId]` for lookup; `Object.values(registry.agents)` for iteration; `Object.keys(registry.agents).length` for count
+- **Wrong**: `registry.agents.length` (returns undefined), `Array.isArray(registry.agents)` (returns false), `registry.agents.forEach(...)` (TypeError)
+- **Fixed in**: creator-commons.cjs, commit 39c6e7d2
+- **Regression test**: tests/lib/creators/creator-commons.test.cjs
+
+---
+
 ## ADR-2026-03-05-065: Graduated Eval Rollout Pattern for Creator Skills (2026-03-05)
 
 **Status:** Accepted

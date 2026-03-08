@@ -269,7 +269,7 @@ Before claiming "pipeline complete", call `TaskList()` and confirm zero tasks re
 
 ## ROUTING TABLE (Section 3)
 
-> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 72-agent routing matrix, creator skills table, and registry skill resolution.
+> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 73-agent routing matrix, creator skills table, and registry skill resolution.
 
 **Quick Routing (top 13 — high-frequency routes):**
 
@@ -376,9 +376,9 @@ See **@TASK_TRACKING_GUIDE.md** for complete TaskUpdate protocol.
 Before spawning, discover the best available agent via capability registry (`.claude/context/agent-registry.json`):
 
 1. **Classify capability** — code-review | implementation | testing | security-review | architecture-design | documentation. See `.claude/config/capability-routing.json`.
-2. **Query registry** — select candidates with matching capability and `health: available`.
+2. **Query registry** — select candidates with matching capability and `health.status: "healthy"`.
 3. **Select best** — pick highest-confidence candidate; fallback to recommended agent; last resort: `developer`.
-4. **Check availability** — verify `agent.health.status !== 'unavailable'`, agent has required tools.
+4. **Check availability** — verify `agent.health.status === 'healthy'`, agent has required tools.
 5. **Spawn** — `Task({ task_id: 'task-N', subagent_type: best.id, prompt: ... })`
 
 **Self-healing:** If no healthy candidates found, re-check capability mapping in `router-decision.md`, fall back to best-fit specialist, log as capacity issue.
@@ -454,7 +454,7 @@ All external reference files are located in `.claude/docs/`:
 
 | @File Name                   | Section           | Purpose                                                                               |
 | ---------------------------- | ----------------- | ------------------------------------------------------------------------------------- |
-| **@AGENT_ROUTING_TABLE.md**  | Section 3         | Complete 72-agent routing matrix (canonical)                                          |
+| **@AGENT_ROUTING_TABLE.md**  | Section 3         | Complete 73-agent routing matrix (canonical)                                          |
 | **@ROUTER_OPERATIONS.md**    | Sections 0.1, 1.2 | Pipeline UX, Gap Protocol, Template Loading, Gate detail, Batch Creation, Trace-First |
 | **@MEMORY_PROTOCOL.md**      | Section 8         | Memory tier architecture, file rotation, STM/MTM/LTM, context compressor              |
 | **@CREATOR_SKILLS_TABLE.md** | Section 3         | Creator skill invocation patterns                                                     |

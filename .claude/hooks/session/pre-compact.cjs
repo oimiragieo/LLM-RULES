@@ -136,5 +136,7 @@ function main() {
   process.exit(0);
 }
 
-// Execute
-main();
+// Execute only when run directly (not when imported in tests)
+if (require.main === module) {
+  main();
+}

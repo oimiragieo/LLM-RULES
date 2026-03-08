@@ -14,7 +14,6 @@ maxTurns: 18
 permissionMode: default
 priority: medium
 tools:
-  - Bash
   - Edit
   - Glob
   - Grep

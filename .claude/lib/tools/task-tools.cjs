@@ -244,16 +244,16 @@ function saveTaskStore(store) {
 }
 
 /**
- * Perform a read-modify-write on the task store under a file lock.
+ * Perform an async read-modify-write on the task store under a file lock.
  * The callback receives the current store and must return the modified store.
  * This prevents TOCTOU races under concurrent TaskCreate / TaskUpdate calls.
  *
- * @param {function(Object): Object} fn - Receives store, returns modified store
- * @returns {*} Return value of fn (the mutated store or derived value)
+ * @param {function(Object): Promise<Object>|Object} fn - Receives store, returns/mutates store
+ * @returns {Promise<*>} Return value of fn (the mutated store or derived value)
  */
-function withTaskStoreLock(fn) {
+async function withTaskStoreLock(fn) {
   const storePath = TASK_STORE_PATH;
-  if (!storePath) return fn({ tasks: [] });
+  if (!storePath) return await fn({ tasks: [] });
 
   let release = null;
   try {
@@ -265,9 +265,14 @@ function withTaskStoreLock(fn) {
     }
 
     try {
-      release = lockfile.lockSync(storePath);
+      release = await lockfile.lock(storePath, {
+        retries: { retries: 10, minTimeout: 100, maxTimeout: 1000 },
+      });
     } catch (lockErr) {
-      console.warn(`[TaskStore] Failed to acquire lock: ${lockErr.message}`);
+      console.error(
+        `[TaskStore] CRITICAL: Failed to acquire lock after retries: ${lockErr.message}`
+      );
+      throw new Error(`Could not acquire lock for tasks.json: ${lockErr.message}`);
     }
 
     // Read inside the lock so we get the authoritative current state
@@ -275,19 +280,20 @@ function withTaskStoreLock(fn) {
     try {
       const raw = fs.readFileSync(storePath, 'utf8');
       store = JSON.parse(raw);
-    } catch (_e) {
+    } catch (parseErr) {
+      console.warn(
+        `[TaskStore] Failed to read or parse tasks.json: ${parseErr.message}, starting fresh`
+      );
       /* start fresh if unreadable */
     }
 
-    const result = fn(store);
+    const result = await fn(store);
     saveTaskStore(store);
     return result;
-  } catch (_e) {
-    /* ignore */
   } finally {
     if (release) {
       try {
-        release();
+        await release();
       } catch (_e) {
         /* ignore */
       }
@@ -302,7 +308,7 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
   process.stderr.write(`[TaskCreate] Creating task: ${subject}\n`);
 
   const task = {
-    id: `task-${crypto.randomUUID()}`,
+    id: `task-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`,
     subject,
     description,
     priority,
@@ -310,7 +316,7 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
     created_at: new Date().toISOString(),
   };
 
-  withTaskStoreLock(store => {
+  await withTaskStoreLock(async store => {
     store.tasks.push(task);
   });
 
@@ -323,7 +329,7 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
 async function TaskUpdate({ taskId, status, metadata = {} }) {
   process.stderr.write(`[TaskUpdate] Updating task ${taskId} to status: ${status}\n`);
 
-  withTaskStoreLock(store => {
+  await withTaskStoreLock(async store => {
     const task = store.tasks.find(t => t.id === taskId);
     if (task) {
       if (status !== undefined) task.status = status;

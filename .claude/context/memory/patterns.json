@@ -58,5 +58,115 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "privacy_airlock_3_stage_pipeline"
+  },
+  {
+    "text": "agent-registry.json agents field is an OBJECT keyed by agent ID string, not an array. Use Object.values(registry.agents) for iteration and registry.agents[agentId] for lookup. Array.isArray(registry.agents) returns false. Bug was in creator-commons.cjs at lines ~400 and ~524. Fixed commit 39c6e7d2.",
+    "area": "main",
+    "timestamp": "2026-03-07T18:40:38.313Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "9b9ad81736491f76d8d81b31806b8c2f294b7e41"
+  },
+  {
+    "text": "Registry sync / timestamp commits must run tests first: before committing any agent-registry or agent-skill-matrix sync, run node --test on agent-search-tool-compliance.test.cjs. Pre-existing failures must be tracked with TaskCreate before the commit, not only noted in the commit message.",
+    "area": "main",
+    "timestamp": "2026-03-07T19:43:22.541Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "a5d69c427f4a6df8278e30447b5df2c28af4ac6d"
+  },
+  {
+    "text": "CronCreate loop pattern for periodic ecosystem integrations: CronCreate must be called BEFORE CronDelete when rescheduling to ensure idempotency. Used in heartbeat skill and telegram-polling skill (2026-03-07). Wrong order causes duplicate cron registrations.",
+    "area": "main",
+    "timestamp": "2026-03-07T21:08:27.338Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "a4c9ad53182474b6596c730ea55599a5dcc8cd1d"
+  },
+  {
+    "text": "agent-registry.json agents field is an OBJECT keyed by agent ID string — NEVER treat as array. Correct: Object.values(registry.agents) for iteration, registry.agents[id] for lookup, Object.keys(registry.agents).length for count. Wrong: registry.agents.length (undefined), Array.isArray check (false). Fixed in creator-commons.cjs commit 39c6e7d2 with 23 regression tests.",
+    "area": "main",
+    "timestamp": "2026-03-07T21:08:36.841Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "96027577d4aa4926dfdd097592f0bcba952b255b"
+  },
+  {
+    "text": "Telegram Bot API polling pattern: store offset in .claude/context/tmp/telegram-offset.json (default 0), fetch getUpdates?offset={n}&timeout=5&limit=10, advance offset = last_update_id + 1. Never send partial/streaming replies — Telegram requires final-only responses.",
+    "area": "main",
+    "timestamp": "2026-03-07T21:11:12.882Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "ea63ff0a488b933d48ee42d6e9d964a14ba93d71"
+  },
+  {
+    "text": "skill-creator post-creation checklist (v3.0.0): Step 6 = CLAUDE.md Section 3 quick routing table, Step 8 = @SKILL_CATALOG_TABLE.md (NOT skill-catalog.md), Step 8b = @AGENT_ROUTING_TABLE.md (when skill introduces new agent/orchestrator), Step 9 = verify grep in both docs. Stale v2.x refs removed in commit 76ff12f3.",
+    "area": "main",
+    "timestamp": "2026-03-07T21:11:20.131Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "66f0f6bb1ec843d42542a95f8aebb2ab40bb9db5"
+  },
+  {
+    "text": "researcher agent is reliable for state checks — when a task requires verifying current state (test pass/fail counts, file existence, configuration status) without writing code, the researcher agent performs well. Evidence: Task 22 used researcher for verification pass that accurately reduced failure count from 18 to 13 and identified 7 pre-existing P2 failures by line number.",
+    "area": "main",
+    "timestamp": "2026-03-08T01:25:13.075Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "13b61299905b88b487f7825bc34cc2e03add63c1"
+  },
+  {
+    "text": "Heartbeat auto-spawn: sentinel file (.claude/context/runtime/heartbeat-active.json) with expires_at field. Router reads at Step 0.5; spawns heartbeat-orchestrator only if missing/stale. Use proper-lockfile (ADR-116). expires_at = now + 46h (not 48h, to check before 3-day cron expiry).",
+    "area": "main",
+    "timestamp": "2026-03-08T08:33:03.995Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "badaa103376e091d70923c3908b740ffc4f206d9"
+  },
+  {
+    "text": "CronCreate loop isolation: omega-claude-cli is BLOCKED in nested Claude Code sessions. Use native CronCreate plus Task() delegation for complex loops.",
+    "area": "main",
+    "timestamp": "2026-03-08T08:33:28.763Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "6a278420d84b741d91fe404df05b4dd3cdbba9fc"
+  },
+  {
+    "text": "Telegram bot UX: /approve and /deny are P0 commands (governance). State in telegram-state.json: last_update_id, pending_responses[], authorized_user_ids[].",
+    "area": "main",
+    "timestamp": "2026-03-08T08:33:28.848Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "c523e96328fd72c42457e070d651c3bf1902c174"
+  },
+  {
+    "text": "Memory upgrade #1 priority (unanimous council): confidence-gated 3-tier promotion. provisional (auto-written) to learnings.md (2+ sessions) to canonical (5+ reinforcements). Semantic dedup via LanceDB before promotion.",
+    "area": "main",
+    "timestamp": "2026-03-08T08:33:28.933Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "2da061c5e18fa87368f574352034ba23bbaa1da9"
   }
 ]

@@ -30,6 +30,7 @@ tools:
 skills:
   - audit-context-building
   - auth-security-expert
+  - fix-review
   - authentication-flow-rules
   - building-secure-contracts
   - code-semantic-search

@@ -41,6 +41,9 @@ const { PROJECT_ROOT } = require('../../lib/utils/project-root.cjs');
 // PERF-004: Use state cache to reduce redundant file I/O
 const { getCachedState } = require('../../lib/utils/state-cache.cjs');
 
+// SEC-TOCTOU: Use safeParseJSON for lock file parsing (prevents prototype pollution)
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 // Valid states in the EVOLVE workflow
 const VALID_STATES = [
   'idle',
@@ -70,6 +73,117 @@ const STATE_TRANSITIONS = {
 };
 
 const EVOLUTION_STATE_PATH = path.join(PROJECT_ROOT, '.claude', 'context', 'evolution-state.json');
+const EVOLUTION_LOCK_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'evolution-lock.json'
+);
+const EVOLUTION_LOCK_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+/**
+ * Atomically acquire an evolution lock using O_EXCL flag to prevent TOCTOU races.
+ * Two concurrent processes calling checkEvolutionLock+writeEvolutionLock could both
+ * pass the check before either writes (classic TOCTOU). O_EXCL makes file creation
+ * atomic at the OS level — exactly one writer wins.
+ *
+ * @param {string} owner - Identifier for who is acquiring the lock
+ * @returns {boolean} true if lock was acquired, false if held by another process
+ */
+function acquireEvolutionLock(owner) {
+  try {
+    const dir = path.dirname(EVOLUTION_LOCK_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const lockData = JSON.stringify({ timestamp: Date.now(), pid: process.pid, owner });
+    // O_EXCL ensures atomic creation — fails immediately if file exists (EEXIST)
+    fs.writeFileSync(EVOLUTION_LOCK_PATH, lockData, { flag: 'wx' });
+    return true; // Lock acquired
+  } catch (err) {
+    if (err.code === 'EEXIST') {
+      // Lock exists — check if it is stale (> 30 min)
+      try {
+        const raw = fs.readFileSync(EVOLUTION_LOCK_PATH, 'utf8');
+        // SEC: Use safeParseJSON to prevent prototype pollution from tampered lock file
+        const existing = safeParseJSON(raw, null);
+        const age = Date.now() - (existing && existing.timestamp ? Number(existing.timestamp) : 0);
+        if (age > EVOLUTION_LOCK_TTL_MS) {
+          // Stale lock — remove and retry once
+          try {
+            fs.unlinkSync(EVOLUTION_LOCK_PATH);
+          } catch (_unlinkErr) {
+            return false; // Could not remove stale lock — another process may have it
+          }
+          try {
+            const lockData = JSON.stringify({ timestamp: Date.now(), pid: process.pid, owner });
+            fs.writeFileSync(EVOLUTION_LOCK_PATH, lockData, { flag: 'wx' });
+            return true;
+          } catch (_retryErr) {
+            return false; // Lost the retry race — another process acquired the lock
+          }
+        }
+      } catch (_readErr) {
+        // Cannot read lock file — treat as active to fail safe
+      }
+      return false; // Active lock held by another process
+    }
+    // Unexpected error — fail open to avoid blocking legitimate work
+    return true;
+  }
+}
+
+/**
+ * Check if an evolution lock is currently active (non-stale).
+ * This is a read-only check — does not acquire or modify the lock.
+ *
+ * @returns {{ locked: boolean, owner?: string, since?: string }}
+ */
+function checkEvolutionLock() {
+  try {
+    if (!fs.existsSync(EVOLUTION_LOCK_PATH)) {
+      return { locked: false };
+    }
+    const raw = fs.readFileSync(EVOLUTION_LOCK_PATH, 'utf8');
+    // SEC: Use safeParseJSON to prevent prototype pollution from tampered lock file
+    const lock = safeParseJSON(raw, null);
+    if (!lock || typeof lock !== 'object') {
+      return { locked: false };
+    }
+    const timestamp = lock.timestamp ? Number(lock.timestamp) : 0;
+    const age = Date.now() - timestamp;
+    if (age < EVOLUTION_LOCK_TTL_MS) {
+      return { locked: true, owner: lock.owner, since: new Date(timestamp).toISOString() };
+    }
+    // Stale lock — treat as expired
+    return { locked: false };
+  } catch (_err) {
+    // If we can't read the lock, fail open to avoid blocking legitimate work
+    return { locked: false };
+  }
+}
+
+/**
+ * Write an evolution lock file (non-atomic — prefer acquireEvolutionLock for new starts).
+ * Kept for backward compatibility with callers that do not need atomic acquisition.
+ * @param {string} owner - Identifier for who holds the lock
+ */
+function writeEvolutionLock(owner) {
+  try {
+    const dir = path.dirname(EVOLUTION_LOCK_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(
+      EVOLUTION_LOCK_PATH,
+      JSON.stringify({ timestamp: Date.now(), pid: process.pid, owner }, null, 2),
+      'utf8'
+    );
+  } catch (_err) {
+    // Best-effort — don't block if write fails
+  }
+}
 
 /**
  * Get enforcement mode from environment variable
@@ -185,6 +299,27 @@ async function main() {
       process.exit(0);
     }
 
+    // Concurrent evolution prevention: atomically acquire lock when starting (idle -> evaluating).
+    // acquireEvolutionLock uses O_EXCL to prevent TOCTOU races — two concurrent processes
+    // cannot both pass the old checkEvolutionLock+writeEvolutionLock pair.
+    const currentStateForLock = getEvolutionState()?.state || 'idle';
+    if (currentStateForLock === 'idle' && targetState === 'evaluating') {
+      const acquired = acquireEvolutionLock('evolution-orchestrator');
+      if (!acquired) {
+        // Failed to acquire — another process holds the lock
+        const currentLock = checkEvolutionLock();
+        const msg = `[EVOLUTION LOCK] Evolution already in progress (owner: ${currentLock.owner || 'unknown'}, since: ${currentLock.since || 'unknown'}). Cannot start a concurrent evolution run. Wait for the current run to complete or expire (TTL: 30 minutes).`;
+        if (enforcement === 'block') {
+          console.log(JSON.stringify({ result: 'block', message: msg }));
+          process.exit(2);
+        } else {
+          console.log(JSON.stringify({ result: 'warn', message: msg }));
+          process.exit(0);
+        }
+      }
+      // Lock acquired — proceed with the state transition
+    }
+
     // Get current evolution state
     const state = getEvolutionState();
     const currentState = state?.state || 'idle';
@@ -238,8 +373,13 @@ module.exports = {
   isValidTransition,
   extractTargetState,
   getEvolutionState,
+  checkEvolutionLock,
+  writeEvolutionLock,
+  acquireEvolutionLock, // SEC-TOCTOU: Atomic lock acquisition (replaces checkEvolutionLock+writeEvolutionLock)
   VALID_STATES,
   STATE_TRANSITIONS,
   PROJECT_ROOT,
   EVOLUTION_STATE_PATH,
+  EVOLUTION_LOCK_PATH,
+  EVOLUTION_LOCK_TTL_MS,
 };

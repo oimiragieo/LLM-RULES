@@ -5,7 +5,7 @@ const path = require('path');
 
 function executeGh(args) {
   const result = spawnSync('gh', args, {
-    shell: true,
+    shell: false,
     encoding: 'utf8',
     windowsHide: true,
   });

@@ -2,7 +2,7 @@
 name: 'aso-specialist'
 version: 1.0.0
 description: 'App Store Optimization specialist for keyword research, metadata optimization, screenshot A/B testing, competitor analysis, and localization. Use for mobile app discoverability, store listing improvements, and organic download growth strategies.'
-model: 'sonnet'
+model: sonnet
 temperature: '0.3'
 context_strategy: lazy_load
 maxTurns: 18

@@ -257,6 +257,23 @@ function checkSpecialistOverride(toolName, toolInput = {}) {
   const isDeveloperSpawn =
     declaredSubagent === 'developer' || /\byou are (?:a |the )?developer\b/i.test(prompt);
 
+  // Check researcher→artifact-integrator misrouting (P2-1)
+  if (declaredSubagent === 'researcher') {
+    const description = (toolInput.description || '').toLowerCase();
+    const combined = `${prompt} ${description}`;
+    const integrationKeywords = ['integrate', 'onboard', 'ingest', 'repository', 'repo'];
+    const hasIntegrationIntent = integrationKeywords.some(kw => combined.includes(kw));
+    if (hasIntegrationIntent) {
+      const message =
+        '[ROUTING] Use artifact-integrator for repo integration tasks, not researcher. ' +
+        'researcher is for external research/investigation; artifact-integrator handles repo ingestion, onboarding, and integration.';
+      if (enforcement === 'block') {
+        return { pass: false, result: 'block', message };
+      }
+      return { pass: true, result: 'warn', warnings: [message] };
+    }
+  }
+
   if (!isDeveloperSpawn) {
     return { pass: true };
   }

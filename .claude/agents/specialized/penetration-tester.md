@@ -37,6 +37,7 @@ skills:
   - security-architect
   - task-management-protocol
   - token-saver-context-compression
+  - variant-analysis
   - verification-before-completion
 context_files:
   - '@.claude/context/memory/learnings.md'

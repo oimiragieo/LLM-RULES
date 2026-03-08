@@ -5,7 +5,7 @@ const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { createLogger } = require('../utils/logger.cjs');
-const { atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
+const { atomicWriteSync, atomicWriteJSONSync } = require('../utils/atomic-write.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const logger = createLogger('contextual-memory');
@@ -406,8 +406,33 @@ function loadContextSync(memory, options = {}) {
   return result;
 }
 
+/**
+ * Increment accessCount and update lastAccessed for an LTM JSON file.
+ * Only operates on paths that contain '/ltm/' (normalized with forward slashes).
+ * Wraps all I/O in try/catch so errors never break the search call path.
+ *
+ * @param {string} filePath - Absolute path to the JSON file
+ */
+function incrementLTMAccessCount(filePath) {
+  try {
+    if (!filePath || typeof filePath !== 'string') return;
+    const normalized = filePath.replace(/\\/g, '/');
+    if (!normalized.includes('/ltm/')) return;
+
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const data = safeParseJSON(raw);
+    const current = typeof data.accessCount === 'number' ? data.accessCount : 0;
+    data.accessCount = current + 1;
+    data.lastAccessed = new Date().toISOString();
+    atomicWriteSync(filePath, JSON.stringify(data, null, 2));
+  } catch (_e) {
+    // must not break search
+  }
+}
+
 module.exports = {
   computeQualityScore,
+  incrementLTMAccessCount,
   isPathInside,
   loadContextSync,
   toSafeInt,

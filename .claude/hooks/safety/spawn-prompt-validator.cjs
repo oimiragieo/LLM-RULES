@@ -1122,9 +1122,9 @@ async function main() {
 
     debugLog('spawn-prompt-validator', 'Validation error', err);
 
-    // Fail open to not block legitimate spawns (default behavior)
-    // For production, consider: SPAWN_PROMPT_VALIDATOR_FAIL_MODE=closed
-    const failMode = process.env.SPAWN_PROMPT_VALIDATOR_FAIL_MODE || 'open';
+    // Fail closed by default (security hook policy — hooks.md: security hooks must fail-closed)
+    // Override to fail-open for advisory/non-blocking usage: SPAWN_PROMPT_VALIDATOR_FAIL_MODE=open
+    const failMode = process.env.SPAWN_PROMPT_VALIDATOR_FAIL_MODE || 'closed';
 
     if (failMode === 'closed') {
       try {
