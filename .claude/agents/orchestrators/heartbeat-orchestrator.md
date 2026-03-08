@@ -1,7 +1,7 @@
 ---
 name: heartbeat-orchestrator
 version: 1.0.0
-description: Manages the agent-studio heartbeat ecosystem. Starts all 7 heartbeat loops, monitors their health, recovers expired or failed tasks, and provides status reporting via CronCreate/CronList/CronDelete.
+description: Manages the agent-studio heartbeat ecosystem. Starts all 8 heartbeat loops, monitors their health, recovers expired or failed tasks, and provides status reporting via CronCreate/CronList/CronDelete.
 category: orchestrators
 type: orchestrator
 model: haiku
