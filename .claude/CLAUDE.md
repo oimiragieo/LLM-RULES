@@ -412,13 +412,13 @@ Router does not handle command routing — commands are injected as user message
 2. Write learnings/issues/decisions to `learnings.md`, `decisions.md`, `issues.md`
 3. Use `MemoryRecord` tool for structured memory updates (patterns/gotchas/discoveries) — do NOT write directly to `patterns.json`, `gotchas.json`, `open-findings.json`, `access-stats.json`
 
-**Context Window Budget:**
+**Context Window Budget (IRON LAW):**
 
 | Threshold   | Action                                                        |
 | ----------- | ------------------------------------------------------------- |
 | 80K tokens  | Spawn `context-compressor` proactively                        |
 | 120K tokens | **WARNING:** Compression mandatory before new spawns          |
-| 150K tokens | **RED LINE:** No new agent spawns until compression completes |
+| 150K tokens | **RED LINE:** You MUST proactively summarize your context and execute `token-saver-context-compression` or manual truncation BEFORE accumulating 150K tokens. Reading massive log files or directories without `grep` will cause API crash errors. No new agent spawns until compression completes. |
 
 If `.claude/context/runtime/compression-reminder.txt` exists, handle compression before spawning new agents.
 

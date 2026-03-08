@@ -53,14 +53,14 @@ test('concurrent TaskCreate does not lose tasks (no write lost under parallel ca
   cleanupTasks();
 });
 
-test('task IDs use UUID format (no Date.now() prefix)', async () => {
+test('task IDs use composite Date.now() and UUID slice format', async () => {
   cleanupTasks();
 
-  const task = await TaskCreate({ subject: 'UUID test', description: '-' });
+  const task = await TaskCreate({ subject: 'Composite ID test', description: '-' });
 
-  // UUID v4 format: task-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-  const uuidPattern = /^task-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  assert.match(task.id, uuidPattern, `Task ID "${task.id}" does not match UUID v4 format`);
+  // Composite format: task-<timestamp>-<8-char-uuid-slice>
+  const compositePattern = /^task-\d{13}-[0-9a-f]{8}$/i;
+  assert.match(task.id, compositePattern, `Task ID "${task.id}" does not match time-uuid hybrid format`);
 
   cleanupTasks();
 });

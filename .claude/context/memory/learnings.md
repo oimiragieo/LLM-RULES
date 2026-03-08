@@ -1205,3 +1205,67 @@ Task 2 (2026-03-04): Multi-LLM consultation on LTM eviction fixes
 - Probabilistic assertions needed for LLM routing tests: assert N/M correct, not exact match
 - tdd SKILL.md needs: probabilistic assertions section, contract testing, mutation gate for P0 paths
 - Report: .claude/context/reports/qa/tdd-research-2026-03-08.md
+
+- Created new agent: qa-guardian (2026-03-08)
+
+- Created new agent: contract-check (2026-03-08)
+
+- Created new agent: bool-action (2026-03-08)
+
+- Created new agent: repo-onboarder (2026-03-08)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-08)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-08)
+
+- Updated workflow: evolution-workflow (2026-03-08)
+
+- Updated workflow: missing-workflow-xyz (2026-03-08)
+
+- Created new agent: qa-guardian (2026-03-08)
+
+- Created new agent: contract-check (2026-03-08)
+
+- Created new agent: bool-action (2026-03-08)
+
+- Created new agent: repo-onboarder (2026-03-08)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-08)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-08)
+
+- Updated workflow: evolution-workflow (2026-03-08)
+
+- Updated workflow: missing-workflow-xyz (2026-03-08)
+
+- Created new agent: qa-guardian (2026-03-08)
+
+- Created new agent: contract-check (2026-03-08)
+
+- Created new agent: bool-action (2026-03-08)
+
+- Created new agent: repo-onboarder (2026-03-08)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-08)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-08)
+
+- Updated workflow: evolution-workflow (2026-03-08)
+
+- Updated workflow: missing-workflow-xyz (2026-03-08)
+
+- Created new agent: qa-guardian (2026-03-08)
+
+- Created new agent: contract-check (2026-03-08)
+
+- Created new agent: bool-action (2026-03-08)
+
+- Created new agent: repo-onboarder (2026-03-08)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-08)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-08)
+
+- Updated workflow: evolution-workflow (2026-03-08)
+
+- Updated workflow: missing-workflow-xyz (2026-03-08)
