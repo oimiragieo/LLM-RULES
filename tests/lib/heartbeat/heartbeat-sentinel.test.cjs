@@ -113,7 +113,10 @@ describe('heartbeat-sentinel', () => {
       const diffMs = expiresAt - writtenAt;
       const expectedMs = 46 * 60 * 60 * 1000;
       // Allow ±5 seconds of clock drift.
-      assert.ok(Math.abs(diffMs - expectedMs) < 5000, `expiry diff should be ~46h, got ${diffMs}ms`);
+      assert.ok(
+        Math.abs(diffMs - expectedMs) < 5000,
+        `expiry diff should be ~46h, got ${diffMs}ms`
+      );
     });
 
     it('loop entries have expected fields', () => {
@@ -145,7 +148,11 @@ describe('heartbeat-sentinel', () => {
       mod.writeSentinel(LOOPS_5);
       const second = JSON.parse(fs.readFileSync(mod.getSentinelPath(), 'utf8'));
       assert.equal(second.loop_count, 5, 'second write should have loop_count 5');
-      assert.notEqual(first.session_id, second.session_id, 'session_id should differ between writes');
+      assert.notEqual(
+        first.session_id,
+        second.session_id,
+        'session_id should differ between writes'
+      );
     });
   });
 

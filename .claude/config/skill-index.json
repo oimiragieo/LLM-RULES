@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-08T09:20:47.601Z",
+  "generatedAt": "2026-03-08T17:04:26.144Z",
   "metadata": {
-    "totalSkills": 271,
+    "totalSkills": 272,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-08T09:20:47.602Z",
+    "lastValidated": "2026-03-08T17:04:26.145Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7179,6 +7179,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "markitdown-converter": {
+      "name": "markitdown-converter",
+      "displayName": "Markitdown Converter",
+      "category": "Other",
+      "domain": "other",
+      "description": "Convert files to Markdown using Microsoft's MarkItDown library",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "markitdown-converter"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "mcp-builder": {
       "name": "mcp-builder",
       "displayName": "Mcp Builder",
@@ -7542,6 +7564,7 @@
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
+        "markitdown-converter",
         "mcp-builder",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -7919,6 +7942,7 @@
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
+        "markitdown-converter",
         "mcp-builder",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8279,6 +8303,7 @@
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
+        "markitdown-converter",
         "mcp-builder",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8503,6 +8528,7 @@
         "feedback-analysis",
         "frontend-design",
         "marketing-content",
+        "markitdown-converter",
         "mcp-builder",
         "regulatory-compliance",
         "scientific-skills",
@@ -8842,6 +8868,7 @@
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
+        "markitdown-converter",
         "scheduled-tasks",
         "scientific-skills",
         "telegram-polling"
@@ -9415,6 +9442,7 @@
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
+        "markitdown-converter",
         "mcp-builder",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -10659,6 +10687,7 @@
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
+        "markitdown-converter",
         "mcp-builder",
         "regulatory-compliance",
         "scheduled-tasks",

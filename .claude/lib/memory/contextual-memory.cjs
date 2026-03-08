@@ -51,16 +51,6 @@ function incrementLTMAccessCount(filePath) {
 const logger = createLogger('contextual-memory');
 
 /**
- * @typedef {Object} ContextualMemoryConfig
- * @property {string} [projectRoot]
- * @property {string} [memoryDir]
- * @property {string} [dbPath]
- * @property {Object} [lancedbConfig]
- * @property {string} lancedbConfig.persistDirectory
- * @property {string} lancedbConfig.collectionName
- */
-
-/**
  * ContextualMemory - Unified API for hybrid memory system
  *
  * Aggregates three memory sources with smart routing:
@@ -259,9 +249,7 @@ class ContextualMemory {
     return loadContextSync(this, options);
   }
 
-  async loadContext(options = {}) {
-    return this.loadContextSync(options);
-  }
+  async loadContext(options = {}) { return this.loadContextSync(options); }
 
   /**
    * Check whether the LanceDB index is stale relative to MTM/LTM memory files.
@@ -440,7 +428,12 @@ class ContextualMemory {
     const metadata = result?.metadata && typeof result.metadata === 'object' ? result.metadata : {};
     if (metadata.id) return `id:${metadata.id}`;
 
-    const position = metadata.chunkPos ?? metadata.pos ?? metadata.position ?? metadata.line ?? metadata.lineNumber;
+    const position =
+      metadata.chunkPos ??
+      metadata.pos ??
+      metadata.position ??
+      metadata.line ??
+      metadata.lineNumber;
     if (metadata.path && position !== undefined && position !== null) {
       return `pathpos:${metadata.path}:${position}`;
     }
@@ -604,25 +597,13 @@ class ContextualMemory {
     return fused.slice(0, limit);
   }
 
-  /** @private @returns {string|null} */
-  _getRipgrepPath() {
-    return getRipgrepPath(this);
-  }
+  _getRipgrepPath() { return getRipgrepPath(this); }
 
-  /** @private @returns {string|null} */
-  _getAstGrepPath() {
-    return getAstGrepPath(this);
-  }
+  _getAstGrepPath() { return getAstGrepPath(this); }
 
-  /** @private @returns {Promise<boolean>} */
-  async _checkBinaryAvailable(binPath) {
-    return await checkBinaryAvailable(binPath);
-  }
+  async _checkBinaryAvailable(binPath) { return checkBinaryAvailable(binPath); }
 
-  /** @private @returns {Promise<Array>} */
-  async _searchWithRipgrep(query, files, limit) {
-    return await searchWithRipgrep(this, query, files, limit);
-  }
+  async _searchWithRipgrep(query, files, limit) { return searchWithRipgrep(this, query, files, limit); }
 
   /**
    * Keyword search fallback (ripgrep/ast-grep when available; bounded file reads otherwise).
@@ -645,11 +626,7 @@ class ContextualMemory {
    * @param {string} filters.created_after - ISO 8601 timestamp
    * @returns {Promise<Array>} Array of entities matching criteria
    *
-   * @example
-   * const concepts = await memory.findEntities('concept', {
-   *   quality_score: 0.8,
-   *   limit: 10
-   * });
+   * @example const concepts = await memory.findEntities('concept', { quality_score: 0.8, limit: 10 });
    */
   async findEntities(type, filters = {}) {
     const entityQuery = this._getEntityQuery();
@@ -668,11 +645,7 @@ class ContextualMemory {
    * @param {number} options.depth - Traversal depth (default: 1)
    * @returns {Promise<Array>} Array of {entity, relationship_type, weight}
    *
-   * @example
-   * const related = await memory.getRelated('task-123', {
-   *   relationshipType: 'blocks',
-   *   depth: 2
-   * });
+   * @example const related = await memory.getRelated('task-123', { relationshipType: 'blocks', depth: 2 });
    */
   async getRelated(id, options = {}) {
     const entityQuery = this._getEntityQuery();
@@ -689,8 +662,7 @@ class ContextualMemory {
    * @param {string} relativePath - File path relative to memoryDir
    * @returns {Promise<string>} File contents
    *
-   * @example
-   * const content = await memory.readFile('learnings.md');
+   * @example const content = await memory.readFile('learnings.md');
    */
   async readFile(relativePath) {
     const filePath = path.resolve(this.config.memoryDir, relativePath);

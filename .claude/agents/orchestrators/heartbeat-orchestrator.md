@@ -28,6 +28,8 @@ tools:
   - MemoryRecord
 isolation: none
 soul: .claude/context/memory/soul.md
+created_by: direct (retroactive attribution)
+compliance_status: legacy-direct-creation
 ---
 
 <!-- Agent: developer | Task: #heartbeat-orchestrator | Session: 2026-03-07 -->

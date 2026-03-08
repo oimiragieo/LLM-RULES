@@ -13,6 +13,8 @@ invoked_by: both
 user_invocable: true
 error_handling: graceful
 verified: true
+created_by: direct (retroactive attribution)
+compliance_status: legacy-direct-creation
 ---
 
 <!-- Agent: developer | Task: #heartbeat-skill | Session: 2026-03-07 -->

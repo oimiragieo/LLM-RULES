@@ -11,6 +11,8 @@ model: sonnet
 invoked_by: both
 user_invocable: true
 verified: true
+created_by: direct (retroactive attribution)
+compliance_status: legacy-direct-creation
 ---
 
 <!-- Agent: nodejs-pro | Task: #12 | Session: 2026-03-08 -->
