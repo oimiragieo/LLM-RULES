@@ -17,6 +17,99 @@ verified: true
 
 # Scheduled Tasks & Heartbeat Skill
 
+## Primary Interface: /loop Slash Command
+
+The primary user-facing way to invoke scheduled tasks is via the `/loop` command. This is the
+recommended interface for most users.
+
+### Syntax
+
+```
+/loop <interval> <prompt>         # interval-based
+/loop every 5m <prompt>           # explicit "every" syntax
+/loop 2h <prompt>                 # shorthand hours
+/loop at 8:00am <prompt>          # time-based (daily at local time)
+```
+
+### Common Intervals
+
+```
+2m, 5m, 10m, 15m, 30m            # minutes
+1h, 2h, 4h, 6h, 12h              # hours
+at 8:00am, at 3:00pm             # daily time triggers (local timezone)
+```
+
+### Examples
+
+```
+/loop 5m Check for new Telegram messages and reply
+/loop 2h Distill recent session learnings into .claude/context/memory/learnings.md
+/loop at 8:00am Read issues.md and CHANGELOG.md and give morning briefing
+/loop every 4h Run pnpm search:code "indexing" to refresh codebase index
+/loop 30m Heartbeat: read agent-health.json, check memory sizes, TaskList for stuck tasks
+```
+
+### Chaining: Run a Slash Command on a Schedule
+
+```
+/loop 20m /review-pr 1234         # run a slash command on a schedule
+/loop 2h /heartbeat-start         # restart heartbeat ecosystem every 2 hours
+```
+
+### Key Behaviors
+
+| Behavior               | Detail                                                                           |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| **Jitter**             | Tasks fire up to 10% of their period late (max 15 min) — avoids stampedes        |
+| **No catch-up**        | Missed fires are NOT replayed after sleep/hibernation                            |
+| **Session-scoped**     | Loops stop automatically when the Claude Code session ends                       |
+| **Local timezone**     | `at HH:MMam/pm` triggers use local time, not UTC                                 |
+| **Max 50 loops**       | Hard cap of 50 concurrent scheduled tasks per session                            |
+| **3-day expiry**       | All loops silently self-delete 3 days after creation (reschedule before day 2.5) |
+| **Fire-between-turns** | Tasks fire only when Claude is idle, not mid-response                            |
+
+---
+
+## Heartbeat OS Pattern
+
+Use `/loop` to build a self-improving agent ecosystem that runs continuously in the background:
+
+### Continuous Reflection (every 2h)
+
+```
+/loop 2h Read .claude/context/memory/issues.md and recent session context. Extract patterns, workarounds, and decisions. Append to learnings.md and decisions.md.
+```
+
+### Autonomous Evolution (daily at 3am)
+
+```
+/loop at 3:00am Review learnings.md and test failures. Use agent-updater skill to improve agent .md files. Run pnpm validate:full before finalizing.
+```
+
+### Morning Briefing (weekdays at 8am)
+
+```
+/loop at 8:00am Read CHANGELOG.md and issues.md. Summarize technical debt, flaky tests, and top 2 tasks for today.
+```
+
+### Context Drain (every 15m)
+
+```
+/loop 15m Check if all tasks are done. If TaskList shows zero in_progress tasks, summarize session to memory and surface readiness for /clear to user.
+```
+
+### Codebase Indexing (every 4h)
+
+```
+/loop 4h Run pnpm code:index:reindex to refresh the BM25 and semantic search index.
+```
+
+### Start the Full Heartbeat Ecosystem
+
+Use `/heartbeat-start` to launch all 7 loops in one command. See `.claude/commands/heartbeat-start.md`.
+
+---
+
 ## Overview
 
 Provides patterns for scheduling recurring tasks using Claude Code's built-in cron system (`CronCreate`/`CronList`/`CronDelete`). Also implements the Agentic Heartbeat Pattern for keeping the agent ecosystem healthy.

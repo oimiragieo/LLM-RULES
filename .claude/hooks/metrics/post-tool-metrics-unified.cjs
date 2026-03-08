@@ -49,6 +49,11 @@ const errorTracker = require(
 const findingsSnapshotHelpers = require('./findings-snapshot-helpers.cjs');
 const { shouldRecordFindingsSnapshot, recordPeriodicFindingsSnapshot } = findingsSnapshotHelpers;
 
+// Context window hard guards (80K / 120K / 150K token thresholds)
+const { emitContextWindowWarning } = require(
+  path.join(LIB_DIR, 'utils', 'context-window-guard.cjs')
+);
+
 // =============================================================================
 // Check 1: Metrics Collector (from metrics-collector-hook.cjs)
 // =============================================================================
@@ -547,6 +552,7 @@ async function main() {
     trackErrors(hookInput);
     detectAnomalies(hookInput);
     recordPeriodicFindingsSnapshot();
+    emitContextWindowWarning(hookInput);
 
     // Search telemetry: log broad Grep usage instead of built-in search skills
     if (getToolName(hookInput) === 'Grep') {
