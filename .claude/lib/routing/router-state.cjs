@@ -726,6 +726,7 @@ function updateState(updates) {
 // Export functions
 module.exports = {
   // Existing exports
+  STATE_FILE: getStateFilePath(),
   getStateFilePath,
   getState,
   updateState,

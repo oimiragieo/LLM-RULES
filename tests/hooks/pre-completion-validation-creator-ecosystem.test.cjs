@@ -54,7 +54,7 @@ test('validateCreatorEcosystem honors validator path override', () => {
   ];
 });
 
-test('validateCreatorEcosystem enforces strict skill ecosystem gate with --require-perfect', () => {
+test('validateCreatorEcosystem enforces strict skill ecosystem gate with --min-score', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-ecosystem-gate-'));
   const creatorValidatorPath = path.join(tmpDir, 'creator-validator.cjs');
   const skillValidatorPath = path.join(tmpDir, 'skill-validator.cjs');
@@ -63,7 +63,7 @@ test('validateCreatorEcosystem enforces strict skill ecosystem gate with --requi
   fs.writeFileSync(
     skillValidatorPath,
     `
-if (process.argv.includes('--require-perfect')) {
+if (process.argv.includes('--min-score')) {
   process.exit(0);
 }
 process.exit(1);
