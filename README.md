@@ -451,15 +451,39 @@ Control Agent Studio from Telegram while the session is running.
 
 Owner-only commands require your Telegram user ID to match `TELEGRAM_OWNER_ID`.
 
+### File Drop Support
+
+Send any file in the Telegram chat to automatically convert it to Markdown and store it as agent memory:
+
+| File Type | Extensions | Converted To |
+|-----------|-----------|--------------|
+| Documents | .pdf, .docx, .pptx, .xlsx | Structured Markdown |
+| Web pages | .html, .htm | Clean Markdown |
+| Data files | .csv, .json, .xml | Markdown tables |
+| Images | .jpg, .png, .gif, .webp | Alt-text description |
+| Audio | .mp3, .wav, .m4a, .ogg | Transcription (if supported) |
+
+**How it works:**
+1. Drop a file in the Telegram chat
+2. Bot downloads and converts it using [MarkItDown](https://github.com/microsoft/markitdown)
+3. Content is stored as agent memory (searchable by all agents)
+4. Bot replies with a confirmation
+
+**Requirements:** Python with markitdown: `pip install 'markitdown[all]'`
+
+**File size limit:** 20MB (Telegram Bot API limit)
+
 ### Environment Variables Quick Reference
 
 For the full list, see `.env.example` and `.claude/docs/@ENVIRONMENT_CONFIG.md`.
 
 | Variable                 | Required          | Description                                         |
 | ------------------------ | ----------------- | --------------------------------------------------- |
-| `TELEGRAM_BOT_TOKEN`     | For Telegram      | Bot API token from @BotFather                       |
-| `TELEGRAM_OWNER_ID`      | For Telegram      | Your Telegram numeric user ID (privileged commands) |
-| `TELEGRAM_ALLOWED_USERS` | For Telegram      | Comma-separated user IDs allowed to use the bot     |
+| `TELEGRAM_BOT_TOKEN`        | For Telegram      | Bot API token from @BotFather                              |
+| `TELEGRAM_OWNER_ID`         | For Telegram      | Your Telegram numeric user ID (privileged commands)        |
+| `TELEGRAM_ALLOWED_USERS`    | For Telegram      | Comma-separated user IDs allowed to use the bot            |
+| `TELEGRAM_OWNER_USERNAME`   | Optional          | Your @username (no @ prefix, display only)                 |
+| `TELEGRAM_OWNER_CHAT_ID`    | Recommended       | Numeric user ID (get from @userinfobot)                    |
 | `ARXIV_KEYWORDS`         | For research loop | Comma-separated ArXiv search topics                 |
 | `EXA_MONITOR_TOPICS`     | For research loop | JSON array of web monitoring topics                 |
 
@@ -757,10 +781,11 @@ The `debug-log-analysis` skill (`Skill({ skill: 'debug-log-analysis' })`) docume
 
 | Skill                                                          | Description                        |
 | -------------------------------------------------------------- | ---------------------------------- |
-| [doc-generator](.claude/skills/doc-generator/SKILL.md)         | Technical documentation generation |
-| [writing-skills](.claude/skills/writing-skills/SKILL.md)       | TDD applied to skill authoring     |
-| [readme](.claude/skills/readme/SKILL.md)                       | README generation patterns         |
-| [summarize-changes](.claude/skills/summarize-changes/SKILL.md) | Change summary generation          |
+| [doc-generator](.claude/skills/doc-generator/SKILL.md)                   | Technical documentation generation                    |
+| [writing-skills](.claude/skills/writing-skills/SKILL.md)                 | TDD applied to skill authoring                        |
+| [readme](.claude/skills/readme/SKILL.md)                                 | README generation patterns                            |
+| [summarize-changes](.claude/skills/summarize-changes/SKILL.md)           | Change summary generation                             |
+| [markitdown-converter](.claude/skills/markitdown-converter/SKILL.md)     | Convert files to Markdown (PDF, DOCX, XLSX, images, audio) |
 
 ### Git & Version Control
 
