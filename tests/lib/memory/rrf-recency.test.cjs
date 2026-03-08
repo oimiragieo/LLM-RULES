@@ -91,11 +91,11 @@ describe('_applyRecencyWeight', () => {
     const noTs = { content: 'no-ts', rrf_score: 0.5, metadata: {} };
     const weighted = cm._applyRecencyWeight([noTs]);
     assert.ok(weighted.length === 1);
-    // With no timestamp, recencyWeight defaults to 1.0
-    // adjustedScore = 0.5 * (1 + 0.3 * 1.0) = 0.65
+    // With no timestamp, recencyWeight defaults to 1.0, importance defaults to 0.5
+    // combinedScore = 0.5*0.6 + 1.0*0.3*0.2 + 0.5*0.2 = 0.3 + 0.06 + 0.1 = 0.46
     assert.ok(
-      Math.abs(weighted[0].rrf_score - 0.65) < 0.001,
-      `Expected ~0.65, got ${weighted[0].rrf_score}`
+      Math.abs(weighted[0].rrf_score - 0.46) < 0.001,
+      `Expected ~0.46, got ${weighted[0].rrf_score}`
     );
   });
 
@@ -105,13 +105,13 @@ describe('_applyRecencyWeight', () => {
     const veryOld = new Date(now - 400 * 86400000).toISOString();
     const results = [makeResult(0.5, veryOld)];
     const weighted = cm._applyRecencyWeight(results);
-    // recencyWeight = 1/(1 + 400*0.1) = 1/41 ~ 0.0244
-    // adjustedScore = 0.5 * (1 + 0.3 * 0.0244) ~ 0.5 * 1.0073 ~ 0.5037
+    // recencyWeight = 1/(1 + 400*0.1) = 1/41 ~ 0.02439
+    // combinedScore = 0.5*0.6 + 0.02439*0.3*0.2 + 0.5*0.2 = 0.3 + 0.001463 + 0.1 = 0.401463
     assert.ok(
-      weighted[0].rrf_score < 0.51,
-      `Very old result should have minimal boost, got ${weighted[0].rrf_score}`
+      weighted[0].rrf_score < 0.41,
+      `Very old result should have minimal recency contribution, got ${weighted[0].rrf_score}`
     );
-    assert.ok(weighted[0].rrf_score > 0.5, `Score should still be >= base score`);
+    assert.ok(weighted[0].rrf_score > 0.4, `Score should be ~0.401`);
   });
 
   it('respects custom env vars for decay rate and boost', () => {
@@ -123,10 +123,10 @@ describe('_applyRecencyWeight', () => {
     const results = [makeResult(0.5, ts)];
     const weighted = cm._applyRecencyWeight(results);
     // recencyWeight = 1/(1 + 10*0.5) = 1/6 ~ 0.1667
-    // adjustedScore = 0.5 * (1 + 1.0 * 0.1667) ~ 0.5 * 1.1667 ~ 0.5833
+    // combinedScore = 0.5*0.6 + 0.1667*1.0*0.2 + 0.5*0.2 = 0.3 + 0.03333 + 0.1 = 0.43333
     assert.ok(
-      Math.abs(weighted[0].rrf_score - 0.5833) < 0.01,
-      `Expected ~0.5833 with custom env, got ${weighted[0].rrf_score}`
+      Math.abs(weighted[0].rrf_score - 0.4333) < 0.01,
+      `Expected ~0.4333 with custom env, got ${weighted[0].rrf_score}`
     );
   });
 
