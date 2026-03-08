@@ -108,6 +108,8 @@ function _writeSTMEntry(sessionData, projectRoot = PROJECT_ROOT) {
 
   const stmPath = path.join(stmDir, 'session_current.json');
   const entry = {
+    importance: 0.5,
+    consolidated: false,
     ...sessionData,
     tier: 'STM',
     updated_at: new Date().toISOString(),
@@ -237,6 +239,8 @@ function _consolidateSession(sessionId, projectRoot = PROJECT_ROOT) {
 
   // Add consolidation metadata
   const mtmData = {
+    importance: 0.5,
+    consolidated: false,
     ...sessionData,
     tier: 'MTM',
     consolidated_at: now.toISOString(),
@@ -354,6 +358,8 @@ function _promoteToLTM(sessionId, projectRoot = PROJECT_ROOT) {
 
   // Add promotion metadata
   const ltmData = {
+    importance: 0.5,
+    consolidated: false,
     ...found.data,
     tier: 'LTM',
     promoted_at: now.toISOString(),

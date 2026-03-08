@@ -48,8 +48,27 @@ When spawned, immediately:
 2. Call `Skill({ skill: 'heartbeat' })` to load the full loop specifications
 3. Call `CronList()` to check current ecosystem state
 4. Register any missing loops (see Loop Registry below)
-5. Report all active loop IDs to the user
-6. Call `TaskUpdate(completed)` when registration is done
+5. After all loops are registered, call `CronList()` again to verify all N loops are active
+6. Write the sentinel file to record successful registration:
+
+```javascript
+const { writeSentinel } = require('.claude/lib/heartbeat/heartbeat-sentinel.cjs');
+const registeredLoops = [
+  // populate from your CronCreate results:
+  {
+    id: '<cron-task-id>',
+    name: 'reflection-2h',
+    schedule: '0 */2 * * *',
+    registered_at: new Date().toISOString(),
+  },
+  // ... one entry per registered loop
+];
+writeSentinel(registeredLoops);
+// Log: "✓ Heartbeat sentinel written — expires in 46h"
+```
+
+1. Report all active loop IDs to the user
+2. Call `TaskUpdate(completed)` when registration is done
 
 ## Loop Registry
 

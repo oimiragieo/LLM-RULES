@@ -31,6 +31,7 @@ Router may use ONLY:
   - `.claude/context/runtime/reflection-*.txt` (step 0 check)
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
+  - `.claude/context/runtime/heartbeat-active.json` (step 0.5 heartbeat check)
   - For large reads: use `offset/limit`; require prior search evidence for unwindowed reads
 - `AskUserQuestion` — clarifying with user
 - `Bash` — ONLY these two exceptions:
@@ -74,14 +75,16 @@ Router may use ONLY:
 
 On EVERY user prompt, execute in order before routing:
 
-| Step    | Check                | Action                                                                                                                                                  |
-| ------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **0**   | Pending reflections? | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for each request, announce "Step 0 complete" before TaskList() |
-| **0.5** | Integration queue?   | Spawn artifact-integrator in background (non-blocking)                                                                                                  |
-| **0.6** | Creation preflight?  | Spawn planner/TPM for feasibility-gate + compliance-policy-check (skip for external repos — spawn artifact-integrator instead)                          |
-| **0.7** | Framework changes?   | Spawn QA with `proactive-audit` skill as FINAL pipeline step                                                                                            |
+| Step    | Check                | Action                                                                                                                                                                                                     |
+| ------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0**   | Pending reflections? | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for each request, announce "Step 0 complete" before TaskList()                                                    |
+| **0.5** | Integration queue?   | Spawn artifact-integrator in background (non-blocking). ALSO: Read `.claude/context/runtime/heartbeat-active.json` — if missing, expired, or loop_count < 8: spawn `heartbeat-orchestrator` in background. |
+| **0.6** | Creation preflight?  | Spawn planner/TPM for feasibility-gate + compliance-policy-check (skip for external repos — spawn artifact-integrator instead)                                                                             |
+| **0.7** | Framework changes?   | Spawn QA with `proactive-audit` skill as FINAL pipeline step                                                                                                                                               |
 
 **Step 0 detail:** Atomic Handshake — reflection-agent calls `TaskUpdate(completed, { processedReflectionIds: [...] })` and `reflection-cleanup.cjs` removes processed requests. PreToolUse(TaskList) guard blocks TaskList when reflections pending (`REFLECTION_STEP0_ENFORCEMENT=warn` to allow). Emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` before TaskList().
+
+**Step 0.5 detail:** Two background spawns: (1) artifact-integrator for integration queue. (2) Heartbeat sentinel check — reads `heartbeat-active.json`; spawns `heartbeat-orchestrator` in background if file missing/expired/incomplete. Orchestrator idempotently registers missing loops and writes fresh sentinel (46h expiry). At most 1 heartbeat spawn per 46h.
 
 **Step 0.7 detail:** Audit checks hook syntax, skill wiring completeness, agent tool/skill consistency, routing mismatches. Skip if no framework artifacts changed.
 

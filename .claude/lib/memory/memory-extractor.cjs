@@ -6,6 +6,23 @@ const { PROJECT_ROOT } = require('../utils/project-root.cjs');
 const { getMemoryExtractionPrompt } = require('./prompts/memory-extraction.cjs');
 
 const logger = createLogger('memory-extractor');
+
+/**
+ * Score the importance of a memory record based on its text content.
+ * Returns a value in [0.1, 0.95].
+ *
+ * @param {string} text - The memory text to score
+ * @returns {number} Importance score between 0.1 and 0.95
+ */
+function scoreImportance(text) {
+  let score = 0.5;
+  if (/CRITICAL|P0|IRON LAW|NEVER/i.test(text)) score = 0.9;
+  else if (/P1|BLOCKING|MANDATORY/i.test(text)) score = 0.75;
+  else if (/note:|pattern:|gotcha:/i.test(text)) score = 0.7;
+  else if (/resolved|fixed|completed/i.test(text)) score = 0.4;
+  if (text.length < 50) score = Math.max(0.1, score - 0.1);
+  return Math.min(0.95, Math.max(0.1, score));
+}
 const RECENT_MESSAGES_LIMIT = Number(process.env.MEMORY_EXTRACTION_RECENT_MESSAGES_LIMIT || 40);
 const RECENT_MESSAGES_MAX_CHARS = Number(process.env.MEMORY_EXTRACTION_RECENT_CHARS_LIMIT || 8000);
 const LIST_LIMIT = Number(process.env.MEMORY_EXTRACTION_LIST_LIMIT || 12);
@@ -71,6 +88,7 @@ function buildFallbackCandidate(category, text, tag) {
     abstract: label.slice(0, 80),
     overview: label,
     content: clean,
+    importance: scoreImportance(clean),
   };
 }
 
@@ -184,7 +202,10 @@ async function extractMemoriesFromSession(sessionData, options = {}) {
     if (!parsed || !Array.isArray(parsed.memories)) {
       return fallbackExtractMemories(sessionData);
     }
-    return parsed.memories;
+    return parsed.memories.map(record => ({
+      ...record,
+      importance: scoreImportance(record.text || record.content || record.overview || ''),
+    }));
   } catch (error) {
     logger.warn('Memory extraction failed', {
       error: error.message,
@@ -205,6 +226,7 @@ async function extractMemoriesFromSession(sessionData, options = {}) {
 }
 
 module.exports = {
+  scoreImportance,
   buildRecentMessages,
   extractMemoriesFromSession,
   fallbackExtractMemories,

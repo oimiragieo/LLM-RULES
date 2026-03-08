@@ -98,9 +98,9 @@ class ContextualMemory {
       },
     };
 
-    // Initialize components (undefined = not yet tried; null = tried and unavailable)
-    this.vectorStore = null; // Lazy initialization
-    this.entityQuery = undefined; // Lazy initialization
+    // null = tried and unavailable; undefined = not yet tried
+    this.vectorStore = null;
+    this.entityQuery = undefined;
     this._mockModeWarned = false;
     this._semanticFallbackWarned = false;
   }
@@ -212,7 +212,6 @@ class ContextualMemory {
       .all(type, limit);
 
     if (rows.length === 0) return [];
-
     const mapped = rows.map(r => ({
       text: r.name + (r.content ? '\n' + r.content : ''),
       timestamp: r.created_at,
@@ -230,7 +229,6 @@ class ContextualMemory {
     } catch (_e) {
       // best-effort
     }
-
     return mapped;
   }
 
@@ -246,7 +244,6 @@ class ContextualMemory {
       totalChars += itemStr.length;
       result.push(item);
     }
-
     return result;
   }
 
@@ -303,7 +300,6 @@ class ContextualMemory {
         indexMtime = fs.statSync(indexDir).mtimeMs;
       }
       let newestMemoryMtime = 0;
-
       for (const dir of [mtmDir, ltmDir]) {
         if (!fs.existsSync(dir)) continue;
         for (const file of fs.readdirSync(dir)) {
@@ -312,7 +308,6 @@ class ContextualMemory {
           if (mtime > newestMemoryMtime) newestMemoryMtime = mtime;
         }
       }
-
       return { stale: newestMemoryMtime > indexMtime, newestMemoryMtime, indexMtime };
     } catch (_e) {
       return { stale: false, newestMemoryMtime: 0, indexMtime: 0 };
@@ -422,8 +417,20 @@ class ContextualMemory {
         }
       }
       const originalScore = r.rrf_score ?? r.similarity ?? 0;
-      const adjustedScore = originalScore * (1 + RECENCY_BOOST * recencyWeight);
-      return { ...r, rrf_score: adjustedScore, _recency_weight: recencyWeight };
+      const importanceScore =
+        typeof r.importance === 'number' && Number.isFinite(r.importance)
+          ? r.importance
+          : typeof meta.importance === 'number' && Number.isFinite(meta.importance)
+            ? meta.importance
+            : 0.5;
+      const combinedScore =
+        originalScore * 0.6 + recencyWeight * RECENCY_BOOST * 0.2 + importanceScore * 0.2;
+      return {
+        ...r,
+        rrf_score: combinedScore,
+        _recency_weight: recencyWeight,
+        _importance_score: importanceScore,
+      };
     });
 
     return weighted.sort((a, b) => (b.rrf_score ?? 0) - (a.rrf_score ?? 0));
@@ -433,12 +440,7 @@ class ContextualMemory {
     const metadata = result?.metadata && typeof result.metadata === 'object' ? result.metadata : {};
     if (metadata.id) return `id:${metadata.id}`;
 
-    const position =
-      metadata.chunkPos ??
-      metadata.pos ??
-      metadata.position ??
-      metadata.line ??
-      metadata.lineNumber;
+    const position = metadata.chunkPos ?? metadata.pos ?? metadata.position ?? metadata.line ?? metadata.lineNumber;
     if (metadata.path && position !== undefined && position !== null) {
       return `pathpos:${metadata.path}:${position}`;
     }
@@ -602,57 +604,29 @@ class ContextualMemory {
     return fused.slice(0, limit);
   }
 
-  /**
-   * Get ripgrep binary path from @vscode/ripgrep npm package.
-   * @private
-   * @returns {string|null} Path to ripgrep binary or null if unavailable
-   */
+  /** @private @returns {string|null} */
   _getRipgrepPath() {
     return getRipgrepPath(this);
   }
 
-  /**
-   * Get ast-grep binary path from @ast-grep/cli npm package.
-   * @private
-   * @returns {string|null} Path to ast-grep binary or null if unavailable
-   */
+  /** @private @returns {string|null} */
   _getAstGrepPath() {
     return getAstGrepPath(this);
   }
 
-  /**
-   * Check if a binary is available by running --version.
-   * @private
-   * @param {string} binPath - Path to binary
-   * @returns {Promise<boolean>}
-   */
+  /** @private @returns {Promise<boolean>} */
   async _checkBinaryAvailable(binPath) {
     return await checkBinaryAvailable(binPath);
   }
 
-  /**
-   * Use ripgrep to search memory files.
-   * @private
-   * @param {string} query - Search query
-   * @param {string[]} files - Relative file paths to search
-   * @param {number} limit - Max results
-   * @returns {Promise<Array>}
-   */
+  /** @private @returns {Promise<Array>} */
   async _searchWithRipgrep(query, files, limit) {
     return await searchWithRipgrep(this, query, files, limit);
   }
 
   /**
-   * Keyword search fallback for when semantic search is unavailable.
-   *
-   * Enhanced to use ripgrep and ast-grep when available for faster searches.
-   * Falls back to bounded file reads if tools unavailable.
-   *
-   * @private
-   * @param {string} query
-   * @param {object} options
-   * @param {number} options.limit
-   * @returns {Promise<Array>}
+   * Keyword search fallback (ripgrep/ast-grep when available; bounded file reads otherwise).
+   * @private @returns {Promise<Array>}
    */
   async _keywordSearch(query, options = {}) {
     return await keywordSearch(this, query, options);

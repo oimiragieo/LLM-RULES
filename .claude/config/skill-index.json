@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-08T07:38:55.460Z",
+  "generatedAt": "2026-03-08T09:20:47.601Z",
   "metadata": {
     "totalSkills": 271,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-08T07:38:55.461Z",
+    "lastValidated": "2026-03-08T09:20:47.602Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7312,7 +7312,7 @@
       "displayName": "Telegram Polling",
       "category": "Other",
       "domain": "other",
-      "description": "Poll Telegram Bot API for new messages and route them to appropriate agents. Implements Loop 6 of the heartbeat ecosystem with offset tracking, DM pairing security, retry handling, and multi-turn session support.",
+      "description": "Poll Telegram Bot API for new messages and route commands to agents. Implements 10-command bot with fail-closed allowlist, owner-only tier, two-step approve, audit logging, and replay-prevention offset tracking.",
       "requiredTools": [
         "Read",
         "Write",
@@ -7320,6 +7320,7 @@
         "TaskCreate",
         "TaskUpdate",
         "TaskList",
+        "TaskGet",
         "Skill"
       ],
       "agentPrimary": [
@@ -9195,7 +9196,8 @@
         "telegram-polling"
       ],
       "TaskGet": [
-        "task-management-protocol"
+        "task-management-protocol",
+        "telegram-polling"
       ],
       "TaskUpdate": [
         "task-management-protocol",
