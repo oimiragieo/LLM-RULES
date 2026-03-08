@@ -297,3 +297,21 @@ C:*
 C\:*
 *devprojectsagent-studio*
 tests/lib/memory/.test-lancedb/
+
+# Root-level debug/temp txt files from session analysis scripts
+clean_errors.txt
+reduced_log_5.txt
+temp_debug_log_5.txt
+test_out.txt
+f1326443-clean.txt
+*-clean.txt
+*_clean.txt
+temp_debug_*.txt
+
+# Test temp directories with random suffixes
+tests/lib/memory/.test-memory-contracts-overflow-*/
+tests/lib/memory/.test-memory-contracts-*/
+
+# Runtime memory index files (auto-regenerated, not source-controlled)
+.claude/context/memory/agent-health.json
+.claude/context/memory/codebase_map.json

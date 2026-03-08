@@ -31,12 +31,30 @@ function getClaudeHome() {
 }
 
 /**
- * Searches ~/.claude/projects recursively for the most recent .jsonl file.
+ * Determines the Claude project folder name based on the current working directory.
+ * E.g., C:\dev\projects\agent-studio -> C--dev-projects-agent-studio
+ */
+function getProjectDir() {
+    const cwd = process.cwd();
+    let folderName = cwd.replace(':\\', '--').replace(/\\/g, '-').replace(/\//g, '-');
+    if (folderName.startsWith('-')) {
+        folderName = folderName.replace(/^-/, '');
+    }
+    return path.join(getClaudeHome(), 'projects', folderName);
+}
+
+/**
+ * Searches the project's transcript directory for the most recent .jsonl file.
  */
 function findMostRecentTranscript() {
-    const projectsDir = path.join(getClaudeHome(), 'projects');
-    if (!fs.existsSync(projectsDir)) {
-        throw new Error(`Projects directory not found: ${projectsDir}`);
+    let searchDir = getProjectDir();
+    if (!fs.existsSync(searchDir)) {
+        console.warn(`⚠️ Warning: Specific project dir not found (${searchDir}). Falling back to global search.`);
+        searchDir = path.join(getClaudeHome(), 'projects');
+    }
+
+    if (!fs.existsSync(searchDir)) {
+        throw new Error(`Projects directory not found: ${searchDir}`);
     }
 
     const allFiles = [];
@@ -54,10 +72,10 @@ function findMostRecentTranscript() {
         }
     }
 
-    scanDir(projectsDir);
+    scanDir(searchDir);
 
     if (allFiles.length === 0) {
-        throw new Error(`No .jsonl transcripts found in ${projectsDir}`);
+        throw new Error(`No .jsonl transcripts found in ${searchDir}`);
     }
 
     allFiles.sort((a, b) => b.mtime - a.mtime);
@@ -68,9 +86,13 @@ function findMostRecentTranscript() {
  * Finds the specific JSONL file for a given session ID
  */
 function findTranscriptById(sessionId) {
-    const projectsDir = path.join(getClaudeHome(), 'projects');
-    if (!fs.existsSync(projectsDir)) {
-        throw new Error(`Projects directory not found: ${projectsDir}`);
+    let searchDir = getProjectDir();
+    if (!fs.existsSync(searchDir)) {
+        searchDir = path.join(getClaudeHome(), 'projects');
+    }
+
+    if (!fs.existsSync(searchDir)) {
+        throw new Error(`Projects directory not found: ${searchDir}`);
     }
 
     let foundPath = null;
@@ -88,10 +110,10 @@ function findTranscriptById(sessionId) {
         }
     }
 
-    scanDir(projectsDir);
+    scanDir(searchDir);
 
     if (!foundPath) {
-        throw new Error(`Transcript for session ${sessionId} not found in ${projectsDir}`);
+        throw new Error(`Transcript for session ${sessionId} not found in ${searchDir}`);
     }
 
     const stats = fs.statSync(foundPath);
