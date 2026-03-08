@@ -45,6 +45,9 @@ tags:
 
 # LSP Navigator
 
+> **PREREQUISITE**: LSP tools are deferred. Load first: ToolSearch({query:"select:LSP"})
+> **CRITICAL**: LSP returns EMPTY for .cjs files. Use ripgrep for .cjs instead.
+
 <identity>
 Compiler-level code intelligence skill. Uses Claude Code's native LSP tool to provide
 type-safe navigation: go-to-definition, find-references, hover info, call hierarchies,
@@ -99,7 +102,7 @@ Do NOT use for:
 | `documentSymbol`       | List all symbols in a file        | File structure overview, finding entry points      |
 | `workspaceSymbol`      | Search symbols by name            | Finding functions/classes across the workspace     |
 | `goToImplementation`   | Find implementations of interface | Tracing concrete behavior of abstract types        |
-| `prepareCallHierarchy` | Get call hierarchy item           | Setting up for incoming/outgoing call analysis     |
+| `prepareCallHierarchy` | Get call hierarchy item ⚠️ Always call this BEFORE incomingCalls/outgoingCalls or you get silent empty results. | Setting up for incoming/outgoing call analysis     |
 | `incomingCalls`        | Find all callers                  | Understanding who depends on this function         |
 | `outgoingCalls`        | Find all callees                  | Understanding what a function depends on           |
 
