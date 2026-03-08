@@ -66,7 +66,8 @@ Use Bash to query the ArXiv API (no authentication required):
 
 ```bash
 # Search for papers from last 7 days matching a keyword
-curl -s "http://export.arxiv.org/api/query?search_query=all:${KEYWORD}&sortBy=submittedDate&sortOrder=descending&max_results=10"
+ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$KEYWORD")
+curl -s "https://export.arxiv.org/api/query?search_query=all:${ENCODED}&sortBy=submittedDate&sortOrder=descending&max_results=10"
 ```
 
 Or use the HuggingFace MCP paper_search tool if available:
@@ -94,13 +95,9 @@ for (const paper of fetchedPapers) {
   });
 }
 
-// Update seen IDs in memory (cap at 1000 to prevent unbounded growth)
+// Persist seen IDs via named memory (cap at 1000 to prevent unbounded growth)
 const seenArr = [...seenIds].slice(-1000);
-MemoryRecord({
-  type: 'discovery',
-  text: `arxiv-seen-ids: ${JSON.stringify(seenArr)}`,
-  area: 'research',
-});
+await writeMemory('arxiv-seen-ids', JSON.stringify(seenArr));
 ```
 
 ### Step 4: Append to Digest File
@@ -115,9 +112,8 @@ if (newPapers.length > 0) {
     .join('\n---\n');
 
   // Append to named memory digest
-  const existing = fs
-    .readFileSync('.claude/context/memory/named/arxiv-digest.md', 'utf8')
-    .catch(() => '');
+  const digestPath = '.claude/context/memory/named/arxiv-digest.md';
+  const existing = fs.existsSync(digestPath) ? fs.readFileSync(digestPath, 'utf8') : '';
   fs.writeFileSync(
     '.claude/context/memory/named/arxiv-digest.md',
     `${existing}\n\n## ArXiv Update — ${new Date().toISOString().slice(0, 10)}\n\n${digest}`
@@ -149,10 +145,10 @@ The morning briefing loop reads `arxiv-digest.md` for recent papers:
 
 ## Deduplication
 
-- Seen paper IDs stored via `MemoryRecord` (keyed as `arxiv-seen-ids`)
+- Seen paper IDs stored via `writeMemory('arxiv-seen-ids', ...)` (named memory API)
 - Capped at 1000 most recent IDs to prevent unbounded growth
 - Papers with matching IDs are silently skipped on subsequent runs
-- Reset by calling `MemoryRecord({ type: 'discovery', text: 'arxiv-seen-ids: []', area: 'research' })`
+- Reset by calling `await writeMemory('arxiv-seen-ids', '[]')`
 
 ---
 

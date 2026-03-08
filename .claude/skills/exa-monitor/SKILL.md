@@ -51,9 +51,12 @@ Polls the Exa search engine every 4 hours for topics configured in `EXA_MONITOR_
 ### Step 1: Load Topics and Seen URLs
 
 ```javascript
-const topics = JSON.parse(
-  process.env.EXA_MONITOR_TOPICS || '["Claude AI updates","agent frameworks"]'
-);
+let topics;
+try {
+  topics = JSON.parse(process.env.EXA_MONITOR_TOPICS || '["Claude AI updates","agent frameworks"]');
+} catch (_e) {
+  topics = ['Claude AI updates', 'agent frameworks'];
+}
 
 // Load previously seen URLs from memory
 const seenRaw = await readMemory('exa-seen-urls');
@@ -86,13 +89,9 @@ for (const result of exaResults) {
   });
 }
 
-// Persist seen URLs (cap at 2000)
+// Persist seen URLs via named memory (cap at 2000)
 const seenArr = [...seenUrls].slice(-2000);
-MemoryRecord({
-  type: 'discovery',
-  text: `exa-seen-urls: ${JSON.stringify(seenArr)}`,
-  area: 'research',
-});
+await writeMemory('exa-seen-urls', JSON.stringify(seenArr));
 ```
 
 ### Step 4: Append to Digest
@@ -139,9 +138,9 @@ if (newResults.length > 0) {
 
 ## Deduplication
 
-- Seen URLs stored via `MemoryRecord` (keyed as `exa-seen-urls`)
+- Seen URLs stored via `writeMemory('exa-seen-urls', ...)` (named memory API)
 - Capped at 2000 most recent URLs
-- Reset with: `MemoryRecord({ type: 'discovery', text: 'exa-seen-urls: []', area: 'research' })`
+- Reset with: `await writeMemory('exa-seen-urls', '[]')`
 
 ---
 
