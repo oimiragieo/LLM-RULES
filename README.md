@@ -377,6 +377,92 @@ Key env var:
 
 - `ARTIFACT_QUALITY_DAEMON_INTERVAL_MS` (default `300000`)
 
+## Heartbeat Ecosystem & Telegram Control
+
+Agent Studio includes a background heartbeat ecosystem that keeps the agent runtime healthy, indexed, informed, and reachable from your phone.
+
+### Heartbeat Auto-Start
+
+Heartbeat loops start automatically at each session. The router's Step 0.5 preflight reads
+`heartbeat-active.json` and spawns `heartbeat-orchestrator` if any loops are missing or expired.
+
+You can also start them manually with `/heartbeat-start` in your Claude Code session.
+
+**The 8 loops:**
+
+| Loop                      | Schedule         | What it does                                                                                |
+| ------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| 0 — Auto-reschedule       | Every 2 days     | Re-registers any loops that expired (3-day Claude Code limit)                               |
+| 1 — Continuous reflection | Every 2 hours    | Extracts patterns from session transcripts; rotates memory when `learnings.md` exceeds 35KB |
+| 2 — Agent evolution       | Daily at 3am     | Applies accumulated learnings to improve agent definitions                                  |
+| 3 — Morning briefing      | 8am weekdays     | Summarizes open issues, recent commits, and 2 priority tasks for the day                    |
+| 4 — Codebase indexing     | Every 4 hours    | Keeps the hybrid BM25 + semantic search index fresh                                         |
+| 5 — Context drain         | Every 15 minutes | Detects when the task pipeline is idle and prompts for `/clear`                             |
+| 6 — Telegram polling      | Every 2 minutes  | Polls your Telegram bot for commands and routes them to agents                              |
+| 7 — Research digest       | Daily at 7am     | Fetches ArXiv papers and Exa web results matching your configured topics                    |
+
+All loops are session-scoped — they restart when you open a new terminal. Loop 0 prevents silent
+expiry within a session by re-registering loops before the 3-day Claude Code limit is reached.
+
+Full loop contracts and state files: `.claude/docs/HEARTBEAT_STATE_CONTRACTS.md`
+
+### Telegram Phone Control Setup
+
+Control Agent Studio from Telegram while the session is running.
+
+**Your bot:** [@Agent_studio_bot](https://t.me/Agent_studio_bot) — already created and wired in.
+
+**Steps to connect your account:**
+
+1. Find your Telegram user ID: message [@userinfobot](https://t.me/userinfobot) on Telegram. It
+   replies with your numeric ID (e.g., `123456789`).
+
+2. Edit `.env` and set these three variables:
+
+   ```bash
+   TELEGRAM_BOT_TOKEN=<your_token>          # From @BotFather — already set if you followed setup
+   TELEGRAM_OWNER_ID=123456789              # Your numeric Telegram user ID
+   TELEGRAM_ALLOWED_USERS=123456789         # Comma-separated IDs allowed to use the bot
+   ```
+
+3. Start the heartbeat ecosystem (this activates Telegram polling as Loop 6):
+
+   ```
+   /heartbeat-start
+   ```
+
+4. Open Telegram and message [@Agent_studio_bot](https://t.me/Agent_studio_bot). Try `/status`
+   or `/help` to confirm the connection.
+
+### Telegram Commands Reference
+
+| Command            | Who    | What it does                                                           |
+| ------------------ | ------ | ---------------------------------------------------------------------- |
+| `/help`            | Anyone | List all commands                                                      |
+| `/status`          | Anyone | Active loops, pending tasks, last heartbeat time                       |
+| `/tasks`           | Anyone | Current task list with status                                          |
+| `/loops`           | Anyone | Active heartbeat loops                                                 |
+| `/logs`            | Anyone | Last 20 session gap log entries                                        |
+| `/memory QUERY`    | Anyone | Search recent learnings for a keyword                                  |
+| `/ask QUESTION`    | Owner  | Ask the AI a question and get a reply                                  |
+| `/spawn TYPE DESC` | Owner  | Spawn an agent (`general-assistant`, `researcher`, `technical-writer`) |
+| `/approve TASK_ID` | Owner  | Two-step task approval (then `/confirm TASK_ID` within 60 seconds)     |
+| `/deny TASK_ID`    | Owner  | Cancel a pending task                                                  |
+
+Owner-only commands require your Telegram user ID to match `TELEGRAM_OWNER_ID`.
+
+### Environment Variables Quick Reference
+
+For the full list, see `.env.example` and `.claude/docs/@ENVIRONMENT_CONFIG.md`.
+
+| Variable                 | Required          | Description                                         |
+| ------------------------ | ----------------- | --------------------------------------------------- |
+| `TELEGRAM_BOT_TOKEN`     | For Telegram      | Bot API token from @BotFather                       |
+| `TELEGRAM_OWNER_ID`      | For Telegram      | Your Telegram numeric user ID (privileged commands) |
+| `TELEGRAM_ALLOWED_USERS` | For Telegram      | Comma-separated user IDs allowed to use the bot     |
+| `ARXIV_KEYWORDS`         | For research loop | Comma-separated ArXiv search topics                 |
+| `EXA_MONITOR_TOPICS`     | For research loop | JSON array of web monitoring topics                 |
+
 ## Drop-In Setup (Use In Another Repo)
 
 1. Copy `.claude/` into the target repository.
