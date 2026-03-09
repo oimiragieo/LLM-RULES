@@ -374,14 +374,13 @@ async function main() {
     const command = match ? match[1].toLowerCase() : null;
     const args    = match ? (match[2] || '').trim() : '';
 
-    if (!command) continue;
-
-    // Auth
-    const authResult = checkAuth(senderId, command);
+    // Auth check happens before command validation so non-commands from
+    // authorized users get a helpful reply instead of silent drop.
+    const authResult = checkAuth(senderId, command || '/unknown');
     auditLog({
       user_id: senderId,
       username: msg.from?.username || null,
-      command,
+      command: command || '(no-command)',
       args: args.slice(0, 100),
       allowed: authResult !== 'silent_drop',
       outcome: authResult,
@@ -390,6 +389,11 @@ async function main() {
     if (authResult === 'silent_drop') continue;
     if (authResult === 'not_owner') {
       await sendMessage(chatId, 'Unauthorized');
+      continue;
+    }
+
+    if (!command) {
+      await sendMessage(chatId, 'Send /help for available commands.');
       continue;
     }
 
