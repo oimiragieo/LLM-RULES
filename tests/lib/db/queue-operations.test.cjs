@@ -101,6 +101,17 @@ describe('enqueueMessage()', () => {
     const row = db.prepare('SELECT user_id FROM message_queue WHERE id = ?').get(id);
     assert.strictEqual(row.user_id, null);
   });
+
+  it('emits new-message event when enqueuing', (t, done) => {
+    const { queueEvents } = require('../../../.claude/lib/db/queue-operations.cjs');
+
+    queueEvents.once('new-message', id => {
+      assert.ok(id, 'id is emitted');
+      done();
+    });
+
+    enqueueMessage(db, { chatId: 'c_event', text: 'emit check' });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -223,7 +234,9 @@ describe('completeMessage()', () => {
     const result = completeMessage(db, claimed.id);
 
     assert.strictEqual(result, true);
-    const row = db.prepare('SELECT status, completed_at FROM message_queue WHERE id = ?').get(claimed.id);
+    const row = db
+      .prepare('SELECT status, completed_at FROM message_queue WHERE id = ?')
+      .get(claimed.id);
     assert.strictEqual(row.status, 'completed');
     assert.ok(row.completed_at > 0, 'completed_at should be set');
   });
@@ -247,7 +260,9 @@ describe('failMessage()', () => {
 
     failMessage(db, claimed.id, 'network error');
 
-    const row = db.prepare('SELECT status, last_error, attempt_count FROM message_queue WHERE id = ?').get(claimed.id);
+    const row = db
+      .prepare('SELECT status, last_error, attempt_count FROM message_queue WHERE id = ?')
+      .get(claimed.id);
     assert.strictEqual(row.status, 'pending');
     assert.strictEqual(row.last_error, 'network error');
   });
@@ -256,7 +271,9 @@ describe('failMessage()', () => {
     const { id } = enqueueMessage(db, { chatId: 'c', text: 'exhaust me' });
 
     // Manually bump attempt_count to 2 (status stays pending so claimNextMessage can pick it up)
-    db.prepare("UPDATE message_queue SET attempt_count = 2, status = 'pending' WHERE id = ?").run(id);
+    db.prepare("UPDATE message_queue SET attempt_count = 2, status = 'pending' WHERE id = ?").run(
+      id
+    );
 
     // claimNextMessage increments attempt_count → 3
     const claimed = claimNextMessage(db, 1);

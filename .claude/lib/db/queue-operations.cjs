@@ -16,6 +16,9 @@
 
 const crypto = require('crypto');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const EventEmitter = require('events');
+
+const queueEvents = new EventEmitter();
 
 // ---------------------------------------------------------------------------
 // Enqueue
@@ -38,6 +41,8 @@ function enqueueMessage(db, { chatId, userId, text, attachments }) {
        (id, chat_id, user_id, text, attachments, timestamp, status, attempt_count)
      VALUES (?, ?, ?, ?, ?, ?, 'pending', 0)`
   ).run(id, chatId, userId || null, text, attachmentsJson, timestamp);
+
+  queueEvents.emit('new-message', id);
 
   return { id };
 }
@@ -90,9 +95,7 @@ function claimNextMessage(db, workerId) {
       return null;
     }
 
-    return db
-      .prepare('SELECT * FROM message_queue WHERE id = ?')
-      .get(row.id);
+    return db.prepare('SELECT * FROM message_queue WHERE id = ?').get(row.id);
   });
 
   const claimed = claimTx();
@@ -317,4 +320,5 @@ module.exports = {
   recoverStaleClaims,
   getPendingCount,
   getQueueStats,
+  queueEvents,
 };
