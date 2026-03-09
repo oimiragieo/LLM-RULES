@@ -180,13 +180,33 @@ describe('buildClaudeAction', () => {
     assert.strictEqual(typeof action.instruction, 'string');
   });
 
-  it('/approve has instruction string', async () => {
+  it('/approve generates a preview instruction using TaskGet (not TaskUpdate)', async () => {
     const action = await buildClaudeAction(CHAT, MSG, '/approve', '42');
     assert.ok(action);
     assert.strictEqual(action.type, 'task_mgmt');
     assert.strictEqual(action.action, 'approve');
     assert.strictEqual(action.taskId, '42');
     assert.strictEqual(typeof action.instruction, 'string');
+    // Must use TaskGet to fetch task details (preview step)
+    assert.ok(
+      action.instruction.includes('TaskGet'),
+      `/approve instruction must call TaskGet. Got: ${action.instruction.slice(0, 300)}`
+    );
+    // Must NOT actually invoke TaskUpdate (the instruction may mention it in a "Do NOT" context,
+    // but must not contain the execution call pattern TaskUpdate({)
+    assert.ok(
+      !action.instruction.includes('TaskUpdate({'),
+      `/approve instruction must NOT invoke TaskUpdate({. Got: ${action.instruction.slice(0, 300)}`
+    );
+    // Must instruct user to reply /confirm or /deny
+    assert.ok(
+      action.instruction.includes('/confirm'),
+      `/approve instruction must mention /confirm. Got: ${action.instruction.slice(0, 300)}`
+    );
+    assert.ok(
+      action.instruction.includes('/deny'),
+      `/approve instruction must mention /deny. Got: ${action.instruction.slice(0, 300)}`
+    );
   });
 
   it('/deny has instruction string', async () => {
