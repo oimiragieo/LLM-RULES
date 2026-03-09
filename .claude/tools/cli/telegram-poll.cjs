@@ -148,10 +148,17 @@ function httpsGet(url) {
   });
 }
 
-async function sendMessage(chatId, text) {
+async function sendMessage(chatId, text, useMarkdown = false) {
+  const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+  const safeText = text.slice(0, 4096);
   try {
-    const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
-    await httpsPost(url, { chat_id: chatId, text: text.slice(0, 4096), parse_mode: 'Markdown' });
+    const body = { chat_id: chatId, text: safeText };
+    if (useMarkdown) body.parse_mode = 'Markdown';
+    const result = await httpsPost(url, body);
+    if (!result.ok && useMarkdown) {
+      // Markdown parse failed — retry as plain text
+      await httpsPost(url, { chat_id: chatId, text: safeText });
+    }
   } catch (e) {
     process.stderr.write(`sendMessage error: ${e.message}\n`);
   }
@@ -203,7 +210,7 @@ async function handleHelp(chatId) {
     '/spawn TYPE DESC — Spawn agent (owner only)',
     '/approve TASK\\_ID — Approve task (owner only)',
     '/deny TASK\\_ID — Deny task (owner only)',
-  ].join('\n'));
+  ].join('\n'), true);
 }
 
 async function handleStatus(chatId) {
@@ -220,7 +227,7 @@ async function handleStatus(chatId) {
     `Active loops: ${loopCount}`,
     `Last registration: ${lastHeartbeat}`,
     `Telegram: polling every 2 min`,
-  ].join('\n'));
+  ].join('\n'), true);
 }
 
 async function handleLoops(chatId) {
@@ -232,7 +239,7 @@ async function handleLoops(chatId) {
       return;
     }
     const lines = loops.map((l, i) => `${i}. ${l.name} (${l.schedule})`);
-    await sendMessage(chatId, `*Active Loops* (${loops.length})\n${lines.join('\n')}`);
+    await sendMessage(chatId, `*Active Loops* (${loops.length})\n${lines.join('\n')}`, true);
   } catch (_) {
     await sendMessage(chatId, 'Could not read heartbeat-active.json.');
   }
@@ -247,7 +254,7 @@ async function handleLogs(chatId) {
         return `[${(e.timestamp || '').slice(11, 19)}] ${e.type}: ${e.description || ''}`;
       } catch (_) { return l.slice(0, 100); }
     });
-    await sendMessage(chatId, `*Last ${last20.length} Gap Log Entries*\n\`\`\`\n${last20.join('\n')}\n\`\`\``);
+    await sendMessage(chatId, `Last ${last20.length} gap log entries:\n${last20.join('\n')}`);
   } catch (_) {
     await sendMessage(chatId, 'No session gap log found.');
   }
@@ -261,7 +268,7 @@ async function handleMemory(chatId, query) {
     if (!matched.length) {
       await sendMessage(chatId, `No matches for "${query}" in learnings.md`);
     } else {
-      await sendMessage(chatId, `*Memory: "${query}"*\n${matched.slice(0, 10).join('\n')}`);
+      await sendMessage(chatId, `Memory: "${query}"\n${matched.slice(0, 10).join('\n')}`);
     }
   } catch (_) {
     await sendMessage(chatId, 'learnings.md not found.');
