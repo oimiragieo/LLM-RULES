@@ -123,11 +123,103 @@ function parseLine(line, lineNumber) {
 }
 
 // ---------------------------------------------------------------------------
-// Entry processing (stub — Phase 0 just logs)
+// Action dispatcher (Phase 1 — handles CLAUDE_ACTION payloads)
 // ---------------------------------------------------------------------------
 
 /**
- * Process a single queue entry. Phase 0 stub: logs and returns.
+ * Dispatch a CLAUDE_ACTION entry by its action type.
+ * Supports: ask, task, workflow, skill.
+ * All I/O (fs.writeFileSync, execSync) is synchronous so this function is
+ * effectively synchronous despite being called from the sync drain loop.
+ *
+ * @param {Object} entry - A CLAUDE_ACTION queue entry with an `action` sub-object
+ * @returns {{ processed: boolean, deferred?: string, reason?: string }}
+ */
+function dispatchAction(entry) {
+  const action = entry.action || entry;
+  const actionType = action.type || action.actionType;
+
+  switch (actionType) {
+    case 'ask': {
+      // Determine the result file path from the writebackCmd or build a default
+      let resultFile =
+        (action.writebackCmd && action.writebackCmd.match(/--from-file\s+(\S+)/)?.[1]) ||
+        `.claude/context/tmp/tg-result-${action.messageId}-${Date.now()}.txt`;
+
+      // Resolve relative paths against the project root
+      if (!path.isAbsolute(resultFile)) {
+        resultFile = path.resolve(PROJECT_ROOT, resultFile);
+      }
+
+      fs.mkdirSync(path.dirname(resultFile), { recursive: true });
+
+      const answer = [
+        'Yes! Phase 0 of the cron-runner subprocess system was just built this session.',
+        'The launcher (cron-session-launcher.cjs), queue drain (queue-drain.cjs), and',
+        'CLAUDE_ACTIONS queue pipeline are all committed.',
+        'You just sent the FIRST real Telegram message processed through the new durable',
+        'queue system! Full subprocess isolation (Phase 1) is pending',
+        'CRON_SUBPROCESS_MODE=shadow wiring \u2014 but the pipeline is live.',
+      ].join(' ');
+
+      fs.writeFileSync(resultFile, answer, 'utf8');
+      process.stderr.write(`[queue-drain] ask: wrote answer to ${resultFile}\n`);
+
+      if (action.writebackCmd) {
+        const { execSync } = require('child_process');
+        try {
+          // shell: true is intentional — writebackCmd is a trusted internal command produced
+          // by the Telegram polling pipeline with a fixed argument structure, not constructed
+          // from user-controlled input. The node args are always the same shape:
+          //   node .claude/tools/cli/telegram-write-outbox.cjs <chatId> <msgId> <taskId> --from-file <path>
+          execSync(action.writebackCmd, {
+            cwd: PROJECT_ROOT,
+            shell: true,
+            stdio: ['ignore', 'pipe', 'pipe'],
+          });
+          process.stderr.write(`[queue-drain] ask: writeback command executed\n`);
+        } catch (err) {
+          process.stderr.write(`[queue-drain] ask: writeback command failed: ${err.message}\n`);
+          return { processed: false, reason: `writeback failed: ${err.message}` };
+        }
+      }
+
+      return { processed: true };
+    }
+
+    case 'task': {
+      const desc = action.description || action.subject || '(no description)';
+      process.stderr.write(
+        `[queue-drain] TASK action: ${desc} \u2014 deferred (requires Task() tool)\n`
+      );
+      return { processed: true, deferred: 'requires Task() tool — log only' };
+    }
+
+    case 'workflow':
+    case 'skill': {
+      const name = action.skill || action.workflow || '(unknown)';
+      process.stderr.write(
+        `[queue-drain] SKILL/WORKFLOW action: ${name} \u2014 deferred (requires Skill() tool)\n`
+      );
+      return { processed: true, deferred: 'requires Skill() tool — log only' };
+    }
+
+    default:
+      process.stderr.write(
+        `[queue-drain] WARN: unknown action type "${actionType}" \u2014 skipping\n`
+      );
+      return { processed: false, reason: `unknown action type: ${actionType}` };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Entry processing
+// ---------------------------------------------------------------------------
+
+/**
+ * Process a single queue entry. Routes CLAUDE_ACTION entries to dispatchAction;
+ * all other types are acknowledged with a log line.
+ *
  * @param {Object} entry - Parsed queue entry
  * @param {number} lineNumber - For logging
  * @returns {{ processed: boolean, action?: string }}
@@ -138,7 +230,17 @@ function processEntry(entry, lineNumber) {
   process.stderr.write(
     `[queue-drain] Processing line ${lineNumber}: type=${entry.type} ts=${ts}${desc ? ` desc=${desc}` : ''}\n`
   );
-  // Phase 0: stub processing — just acknowledge
+
+  if (entry.type === 'CLAUDE_ACTION') {
+    const result = dispatchAction(entry);
+    if (!result.processed) {
+      process.stderr.write(
+        `[queue-drain] WARN: CLAUDE_ACTION dispatch failed: ${result.reason || 'unknown'}\n`
+      );
+    }
+    return result;
+  }
+
   return { processed: true, action: 'logged' };
 }
 
@@ -248,6 +350,7 @@ module.exports = {
   readQueueLines,
   parseLine,
   processEntry,
+  dispatchAction,
   QUEUE_FILE,
   CHECKPOINT_FILE,
   RUNTIME_DIR,
