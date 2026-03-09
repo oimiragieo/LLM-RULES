@@ -54,7 +54,7 @@ When spawned, immediately:
 6. Write the sentinel file to record successful registration:
 
 ```javascript
-const { writeSentinel } = require('.claude/lib/heartbeat/heartbeat-sentinel.cjs');
+const { writeSentinel, writeSessionPing } = require('.claude/lib/heartbeat/heartbeat-sentinel.cjs');
 const registeredLoops = [
   // populate from your CronCreate results:
   {
@@ -67,6 +67,8 @@ const registeredLoops = [
 ];
 writeSentinel(registeredLoops);
 // Log: "✓ Heartbeat sentinel written — expires in 46h"
+writeSessionPing(registeredLoops);
+// Log: "✓ Session ping written — expires in 15min (gates Step 0.5)"
 ```
 
 1. Report all active loop IDs to the user

@@ -238,4 +238,74 @@ describe('heartbeat-sentinel', () => {
       assert.equal(result.data.loop_count, 8);
     });
   });
+
+  // ── session ping ─────────────────────────────────────────────────────────
+
+  describe('session ping', () => {
+    afterEach(() => {
+      const p = mod.getSessionPingPath();
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+    });
+
+    it('getSessionPingPath() returns absolute path ending in heartbeat-session-ping.json', () => {
+      const p = mod.getSessionPingPath();
+      assert.ok(path.isAbsolute(p));
+      assert.ok(p.endsWith('heartbeat-session-ping.json'));
+    });
+
+    it('writeSessionPing() writes a file and returns the path', () => {
+      const p = mod.writeSessionPing(LOOPS_8);
+      assert.ok(fs.existsSync(p));
+      assert.equal(p, mod.getSessionPingPath());
+    });
+
+    it('writeSessionPing() writes valid JSON with expected fields', () => {
+      mod.writeSessionPing(LOOPS_8);
+      const data = JSON.parse(fs.readFileSync(mod.getSessionPingPath(), 'utf8'));
+      assert.ok(typeof data.written_at === 'string');
+      assert.ok(typeof data.expires_at === 'string');
+      assert.equal(data.loop_count, 8);
+      assert.equal(data.ttl_minutes, 15);
+    });
+
+    it('writeSessionPing() expires_at is ~15 minutes after written_at', () => {
+      mod.writeSessionPing(LOOPS_8);
+      const data = JSON.parse(fs.readFileSync(mod.getSessionPingPath(), 'utf8'));
+      const diffMs = new Date(data.expires_at).getTime() - new Date(data.written_at).getTime();
+      assert.ok(Math.abs(diffMs - 15 * 60 * 1000) < 5000);
+    });
+
+    it('checkSessionPing() returns missing when file does not exist', () => {
+      const result = mod.checkSessionPing();
+      assert.equal(result.valid, false);
+      assert.equal(result.reason, 'missing');
+    });
+
+    it('checkSessionPing() returns valid: true for a fresh ping', () => {
+      mod.writeSessionPing(LOOPS_8);
+      const result = mod.checkSessionPing();
+      assert.equal(result.valid, true);
+      assert.equal(result.reason, 'ok');
+    });
+
+    it('checkSessionPing() returns expired for an expired ping', () => {
+      mod.writeSessionPing(LOOPS_8);
+      const p = mod.getSessionPingPath();
+      const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+      data.expires_at = new Date(Date.now() - 1000).toISOString();
+      fs.writeFileSync(p, JSON.stringify(data, null, 2));
+      const result = mod.checkSessionPing();
+      assert.equal(result.valid, false);
+      assert.equal(result.reason, 'expired');
+    });
+
+    it('checkSessionPing() returns corrupt for non-JSON content', () => {
+      const p = mod.getSessionPingPath();
+      fs.mkdirSync(path.dirname(p), { recursive: true });
+      fs.writeFileSync(p, 'NOT JSON', 'utf8');
+      const result = mod.checkSessionPing();
+      assert.equal(result.valid, false);
+      assert.equal(result.reason, 'corrupt');
+    });
+  });
 });

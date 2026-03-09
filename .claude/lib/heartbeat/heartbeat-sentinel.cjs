@@ -142,4 +142,67 @@ function checkSentinel(expectedLoops = 8) {
   return { valid: true, reason: 'ok', data };
 }
 
-module.exports = { writeSentinel, checkSentinel, getSentinelPath };
+/** Absolute path to the session ping file (short-TTL: 15 min). */
+function getSessionPingPath() {
+  const projectRoot = path.resolve(__dirname, '..', '..', '..', '..');
+  return path.join(projectRoot, '.claude', 'context', 'runtime', 'heartbeat-session-ping.json');
+}
+
+const SESSION_PING_TTL_MS = 15 * 60 * 1000;
+
+/**
+ * Write the session ping after confirming loops are active.
+ *
+ * Step 0.5 checks this short-TTL file (not the 46h sentinel) to decide
+ * whether to spawn heartbeat-orchestrator. Cron loops die on terminal close;
+ * the 15-min TTL ensures new sessions always trigger re-registration.
+ *
+ * @param {Array} loops Registered loop objects (or empty array).
+ * @returns {string} Path to the written ping file.
+ */
+function writeSessionPing(loops) {
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + SESSION_PING_TTL_MS);
+  const data = {
+    written_at: now.toISOString(),
+    expires_at: expiresAt.toISOString(),
+    loop_count: Array.isArray(loops) ? loops.length : 0,
+    ttl_minutes: 15,
+  };
+  const pingPath = getSessionPingPath();
+  const pingDir = path.dirname(pingPath);
+  if (!fs.existsSync(pingDir)) fs.mkdirSync(pingDir, { recursive: true });
+  _atomicWrite(pingPath, JSON.stringify(data, null, 2));
+  return pingPath;
+}
+
+/**
+ * Check whether the session ping is still valid.
+ *
+ * @returns {{ valid: boolean, reason: string, data: object|null }}
+ */
+function checkSessionPing() {
+  const pingPath = getSessionPingPath();
+  if (!fs.existsSync(pingPath)) return { valid: false, reason: 'missing', data: null };
+  let data;
+  try {
+    data = JSON.parse(fs.readFileSync(pingPath, 'utf8'));
+  } catch (_) {
+    return { valid: false, reason: 'corrupt', data: null };
+  }
+  if (!data.expires_at) return { valid: false, reason: 'no_expiry', data };
+  const expiresAt = new Date(data.expires_at);
+  if (isNaN(expiresAt.getTime()) || expiresAt < new Date()) {
+    return { valid: false, reason: 'expired', data };
+  }
+  return { valid: true, reason: 'ok', data };
+}
+
+module.exports = {
+  writeSentinel,
+  checkSentinel,
+  getSentinelPath,
+  writeSessionPing,
+  checkSessionPing,
+  getSessionPingPath,
+};
