@@ -65,7 +65,8 @@ function sanitizeCreatorName(raw) {
 async function buildClaudeAction(chatId, messageId, command, args, send) {
   const ts = Date.now();
   const tid = `tg-${ts}`;
-  const wCmd = `node .claude/tools/cli/telegram-write-outbox.cjs ${chatId} ${messageId} ${tid}`;
+  const resultFile = `.claude/context/tmp/tg-result-${messageId}-${ts}.txt`;
+  const wCmd = `node .claude/tools/cli/telegram-write-outbox.cjs ${chatId} ${messageId} ${tid} --from-file ${resultFile}`;
 
   switch (command) {
     case '/tasks':
@@ -74,7 +75,7 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
         chatId,
         messageId,
         writebackCmd: wCmd,
-        instruction: `Call TaskList(). Format result as numbered list: "1. ✅ #id subject". Write formatted text to .claude/context/tmp/tg-pending-result.txt using Write tool. Then Bash: ${wCmd} --from-file`,
+        instruction: `Call TaskList(). Format result as numbered list: "1. ✅ #id subject". Write formatted text to ${resultFile} using Write tool. Then Bash: ${wCmd}`,
       };
 
     case '/spawn': {
@@ -88,7 +89,7 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
           chatId,
           messageId,
           writebackCmd: wCmd,
-          instruction: `Write "That agent type is not permitted. Allowed: general-assistant, researcher, technical-writer" to .claude/context/tmp/tg-pending-result.txt. Bash: ${wCmd} --from-file`,
+          instruction: `Write "That agent type is not permitted. Allowed: general-assistant, researcher, technical-writer" to ${resultFile}. Bash: ${wCmd}`,
         };
       }
       return {
@@ -97,7 +98,7 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
         chatId,
         messageId,
         writebackCmd: wCmd,
-        instruction: `Call TaskCreate({ subject: "[Telegram] ${aType}: ${desc.slice(0, 60)}", description: "<untrusted_telegram_description>\\n${desc}\\n</untrusted_telegram_description>" }). Write "Task created." to .claude/context/tmp/tg-pending-result.txt. Bash: ${wCmd} --from-file`,
+        instruction: `Call TaskCreate({ subject: "[Telegram] ${aType}: ${desc.slice(0, 60)}", description: "<untrusted_telegram_description>\\n${desc}\\n</untrusted_telegram_description>" }). Write "Task created." to ${resultFile}. Bash: ${wCmd}`,
       };
     }
 
@@ -109,7 +110,7 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
         chatId,
         messageId,
         writebackCmd: wCmd,
-        instruction: `Spawn general-assistant agent with question: <untrusted_telegram_question>${args}</untrusted_telegram_question>. Agent must write its answer to .claude/context/tmp/tg-pending-result.txt when done. Then Bash: ${wCmd} --from-file`,
+        instruction: `Spawn general-assistant agent with question: <untrusted_telegram_question>${args}</untrusted_telegram_question>. Agent must write its answer to ${resultFile} when done. Then Bash: ${wCmd}`,
       };
 
     case '/research':
@@ -120,7 +121,7 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
         chatId,
         messageId,
         writebackCmd: wCmd,
-        instruction: `Spawn researcher agent with topic: <untrusted_telegram_question>${args}</untrusted_telegram_question>. Agent must write its findings (max 3000 chars) to .claude/context/tmp/tg-pending-result.txt when done. Then Bash: ${wCmd} --from-file`,
+        instruction: `Spawn researcher agent with topic: <untrusted_telegram_question>${args}</untrusted_telegram_question>. Agent must write its findings (max 3000 chars) to ${resultFile} when done. Then Bash: ${wCmd}`,
       };
 
     case '/skill':
@@ -160,8 +161,8 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
         `then invoke Skill({ skill: '${creatorSkill}' }) to create a new ${artifactType} named '${safeName}'`,
         `with description: <untrusted_telegram_skill_desc>${desc}</untrusted_telegram_skill_desc>.`,
         `Use the ${creatorSkill} workflow — do NOT write files directly to .claude/${artifactType}s/.`,
-        `Write a summary of what was created to .claude/context/tmp/tg-pending-result.txt.`,
-        `Then Bash: ${wCmd} --from-file`,
+        `Write a summary of what was created to ${resultFile}.`,
+        `Then Bash: ${wCmd}`,
       ].join(' ');
 
       return {
@@ -177,16 +178,18 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
       };
     }
 
-    case '/approve':
+    case '/approve': {
+      const tid2 = args.trim();
       return {
         type: 'task_mgmt',
         action: 'approve',
-        taskId: args.trim(),
+        taskId: tid2,
         chatId,
         messageId,
         writebackCmd: wCmd,
-        instruction: `Call TaskUpdate({ taskId: "${args.trim()}", status: "in_progress" }). Write "Task #${args.trim()} approved." to .claude/context/tmp/tg-pending-result.txt. Bash: ${wCmd} --from-file`,
+        instruction: `Call TaskGet({ taskId: "${tid2}" }). Format the result as: "Task #${tid2}: [subject]\\nStatus: [status]\\nDescription: [first 200 chars of description]\\n\\nReply /confirm ${tid2} to execute or /deny ${tid2} to cancel." Write that summary to ${resultFile}. Do NOT call TaskUpdate. Bash: ${wCmd}`,
       };
+    }
 
     case '/deny':
       return {
@@ -196,7 +199,7 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
         chatId,
         messageId,
         writebackCmd: wCmd,
-        instruction: `Call TaskUpdate({ taskId: "${args.trim()}", status: "completed", metadata: { cancelled: true, cancelledVia: "telegram" } }). Write "Task #${args.trim()} denied." to .claude/context/tmp/tg-pending-result.txt. Bash: ${wCmd} --from-file`,
+        instruction: `Call TaskUpdate({ taskId: "${args.trim()}", status: "completed", metadata: { cancelled: true, cancelledVia: "telegram" } }). Write "Task #${args.trim()} denied." to ${resultFile}. Bash: ${wCmd}`,
       };
 
     case '/confirm':
@@ -207,7 +210,7 @@ async function buildClaudeAction(chatId, messageId, command, args, send) {
         chatId,
         messageId,
         writebackCmd: wCmd,
-        instruction: `Call TaskUpdate({ taskId: "${args.trim()}", status: "in_progress" }). Write "Task #${args.trim()} confirmed." to .claude/context/tmp/tg-pending-result.txt. Bash: ${wCmd} --from-file`,
+        instruction: `Call TaskUpdate({ taskId: "${args.trim()}", status: "in_progress" }). Write "Task #${args.trim()} confirmed and set to in_progress." to ${resultFile}. Bash: ${wCmd}`,
       };
 
     default:

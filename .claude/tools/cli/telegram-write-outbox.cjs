@@ -4,30 +4,39 @@
  * Append one entry to the Telegram outbox.
  * Usage:
  *   node telegram-write-outbox.cjs <chatId> <replyToMsgId> <agentTaskId> <text...>
- *   node telegram-write-outbox.cjs <chatId> <replyToMsgId> <agentTaskId> --from-file
+ *   node telegram-write-outbox.cjs <chatId> <replyToMsgId> <agentTaskId> --from-file <filepath>
  *
- * --from-file reads the message text from .claude/context/tmp/tg-pending-result.txt
- * (avoids bash quoting issues for multiline/special-char results).
+ * --from-file <filepath> reads the message text from the given per-request file path.
+ * Each command invocation uses a unique file (tg-result-<messageId>-<ts>.txt) to prevent
+ * concurrent write races when multiple commands execute simultaneously.
  *
  * Claude calls this after running a tool so it never has to manipulate JSON directly.
  */
 
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
 
-const ROOT        = path.resolve(__dirname, '..', '..', '..'); // agent-studio root
+const ROOT = path.resolve(__dirname, '..', '..', '..'); // agent-studio root
 const OUTBOX_FILE = path.join(ROOT, '.claude', 'context', 'tmp', 'telegram-outbox.json');
 
-const [,, chatId, replyToMsgId, agentTaskId, ...restArgs] = process.argv;
+const [, , chatId, replyToMsgId, agentTaskId, ...restArgs] = process.argv;
 
-// --from-file: read text from a fixed temp path (avoids bash quoting issues for multiline results)
-const TMP_RESULT = path.join(ROOT, '.claude', 'context', 'tmp', 'tg-pending-result.txt');
+// --from-file <filepath>: read text from a per-request file path (avoids bash quoting issues
+// for multiline/special-char results and prevents concurrent write races).
 let text;
 if (restArgs[0] === '--from-file') {
+  // Accept per-request file path as the argument following --from-file.
+  // The path may be relative (resolved against cwd) or absolute.
+  const filePath = restArgs[1];
+  if (!filePath) {
+    process.stderr.write('telegram-write-outbox: --from-file requires a file path argument\n');
+    process.exit(1);
+  }
+  const resolvedPath = path.isAbsolute(filePath) ? filePath : path.resolve(ROOT, filePath);
   try {
-    text = fs.readFileSync(TMP_RESULT, 'utf8').trim();
+    text = fs.readFileSync(resolvedPath, 'utf8').trim();
   } catch (_) {
-    process.stderr.write(`telegram-write-outbox: --from-file: cannot read ${TMP_RESULT}\n`);
+    process.stderr.write(`telegram-write-outbox: --from-file: cannot read ${resolvedPath}\n`);
     process.exit(1);
   }
 } else {
@@ -35,8 +44,12 @@ if (restArgs[0] === '--from-file') {
 }
 
 if (!chatId || !replyToMsgId || !agentTaskId || !text) {
-  process.stderr.write('Usage: telegram-write-outbox.cjs <chatId> <replyToMsgId> <agentTaskId> <text...>\n');
-  process.stderr.write('       telegram-write-outbox.cjs <chatId> <replyToMsgId> <agentTaskId> --from-file\n');
+  process.stderr.write(
+    'Usage: telegram-write-outbox.cjs <chatId> <replyToMsgId> <agentTaskId> <text...>\n'
+  );
+  process.stderr.write(
+    '       telegram-write-outbox.cjs <chatId> <replyToMsgId> <agentTaskId> --from-file <filepath>\n'
+  );
   process.exit(1);
 }
 
@@ -53,7 +66,9 @@ try {
   const raw = fs.readFileSync(OUTBOX_FILE, 'utf8');
   const parsed = JSON.parse(raw);
   if (Array.isArray(parsed)) outbox = parsed;
-} catch (_) { /* start fresh */ }
+} catch (_) {
+  /* start fresh */
+}
 
 outbox.push({
   chatId: Number(chatId),
