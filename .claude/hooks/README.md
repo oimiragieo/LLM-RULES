@@ -48,6 +48,23 @@ Enforces Router-First protocol for all user interactions.
 **When it runs:** On user message receipt
 **What it enforces:** All requests must go through Router agent before execution
 
+#### Router Identity Reminder (`router-identity-reminder.cjs`)
+
+Injects a concise router identity reminder into every router-session prompt, anchoring
+the model's identity as the ROUTER before it processes each user message.
+
+**When it runs:** UserPromptSubmit — via `user-prompt-orchestrator` HOOK_ORDER, fires
+before `user-prompt-unified.cjs` so the reminder precedes routing analysis.
+
+**What it does:**
+- Writes a formatted reminder to stderr (forwarded as `<system-reminder>` by orchestrator)
+- Reminds Claude of: Step 0/0.5 preflight, TaskList()-first rule, banned tools, specialist-first routing
+- Skips silently for subagent sessions (detected by `task_id: task-N` prefix pattern)
+
+**Enforcement mode:** Advisory only — always exits 0, never blocks.
+**Toggle:** `ROUTER_IDENTITY_REMINDER=off` to disable without editing CLAUDE.md.
+**Test file:** `.claude/hooks/routing/router-identity-reminder.test.cjs`
+
 ### Session Hooks
 
 Located in `.claude/hooks/session/`

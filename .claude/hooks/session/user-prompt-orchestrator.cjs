@@ -24,6 +24,11 @@ const HOOK_ORDER = [
   // as a direct hook in settings.json (UserPromptSubmit index 0). Including it
   // here would cause double execution per user prompt.
   '.claude/hooks/session/state-reset.cjs',
+  // Router identity reminder fires before routing analysis so the reminder
+  // is visible to Claude before any routing enforcement runs.
+  // Skips silently for subagent sessions (detects task_id: task-N prefix).
+  // Toggle off: ROUTER_IDENTITY_REMINDER=off
+  '.claude/hooks/routing/router-identity-reminder.cjs',
   '.claude/hooks/routing/user-prompt-unified.cjs',
   '.claude/hooks/session/drift-detector.cjs',
   '.claude/hooks/session/vector-db-warmstart.cjs',

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — Cron-Runner Subprocess Architecture (Phase 0 & 1) (2026-03-09)
+
+- **Script-First Cron Optimization (Phase 0)**: Refactored `telegram-poll.cjs`, `reflection-check.cjs`, and `evolution-check.cjs` to append tasks directly to a durable `.claude/context/runtime/cron-actions-queue.jsonl` queue rather than returning stringified `CLAUDE_ACTIONS` payloads. This eliminates massive context bloat within the main LLM session.
+- **Node.js Daemon Pivot (Phase 1)**: Deployed a detached, persistent background daemon via `cron-session-launcher.cjs`. Initially spanning natively via Claude CLI proved unstable due to Ink's strict TTY requirements. The launcher now forks itself as a pure JS daemon (`--daemon`) performing a synchronous 60-second `setInterval` loop to drain the action queue without consuming any routing LLM tokens.
+- **Heartbeat & Telemetry**: Introduced `cron-session-ping.json` to project telemetry, recording queue depth snapshots and ensuring daemon liveliness mapping accurately to metrics dashboards.
+
 ### Added — Worktree Lifecycle Management (2026-03-03)
 
 - **New CLI tool** `.claude/tools/cli/worktree-prune.cjs`: Prunes stale git worktrees under `.claude/worktrees/`. Detects staleness via `git log --oneline main..<branch>` (zero unique commits = stale). Supports `--dry-run` and `--force` flags. Uses `shell: false` for all exec calls (SE-02) and normalizes paths (SE-01). Available as `pnpm worktree:prune` and `pnpm worktree:prune:dry`.
