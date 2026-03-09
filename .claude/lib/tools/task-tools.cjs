@@ -314,6 +314,7 @@ async function TaskCreate({ subject, description, priority = 'medium' }) {
     priority,
     status: 'created',
     created_at: new Date().toISOString(),
+    metadata: { global_id: crypto.randomUUID() },
   };
 
   await withTaskStoreLock(async store => {

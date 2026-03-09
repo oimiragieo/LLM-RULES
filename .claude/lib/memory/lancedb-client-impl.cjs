@@ -1045,7 +1045,15 @@ class MemoryVectorStore {
     if (!documents || documents.length === 0) return;
     if (!this.isInitialized) await this.initialize();
 
-    const toEmbed = documents.filter(d => (d.text || d.content || '').trim());
+    const toEmbed = documents
+      .map(d => {
+        let text = d.text || d.content || '';
+        // V7 Token Gate: Hard limit at approx 100k tokens
+        if (text.length > 400000) text = text.substring(0, 400000);
+        return { ...d, text, content: text };
+      })
+      .filter(d => (d.text || '').trim());
+
     if (toEmbed.length === 0) return;
 
     const tableDim = await this.getTableVectorDimension();
@@ -1235,6 +1243,7 @@ class MemoryVectorStore {
 
     const results = await searchBuilder.toArray();
 
+    const now = Date.now();
     // detailed results map matching standard MemoryVectorStore interface
     const mapped = results.map(r => {
       let metadata = {};
@@ -1244,11 +1253,22 @@ class MemoryVectorStore {
         metadata = { raw: r.metadata };
       }
 
+      let similarity = distanceToSimilarity(r._distance);
+      // V7 Gates: Importance Scaling & Time Decay
+      if (typeof metadata.importance_score === 'number') {
+        similarity *= Math.max(0.5, metadata.importance_score);
+      }
+      if (typeof metadata.timestamp === 'number') {
+        const ageDays = (now - metadata.timestamp) / (1000 * 60 * 60 * 24);
+        const timeDecay = Math.max(0.5, Math.exp(-0.01 * ageDays));
+        similarity *= timeDecay;
+      }
+
       return {
         id: r.id,
         content: r.text,
         metadata: metadata,
-        similarity: distanceToSimilarity(r._distance),
+        similarity: similarity,
       };
     });
 

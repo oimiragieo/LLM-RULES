@@ -19,6 +19,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const USAGE = `
 Usage: node scripts/reduce-debug-log.mjs [<file>] [options]
@@ -143,7 +144,8 @@ function findMostRecentDebugLog() {
  */
 function copyToTmp(sourcePath) {
   // Use the directory of this script's parent (project root) when invoked via pnpm
-  const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+  const __filename = fileURLToPath(import.meta.url);
+  const projectRoot = path.resolve(path.dirname(__filename), '..');
   const tmpDir = path.join(projectRoot, '.tmp');
   fs.mkdirSync(tmpDir, { recursive: true });
   const sessionId = path.basename(sourcePath);

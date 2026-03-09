@@ -10,13 +10,20 @@ const fs = require('fs');
 const { getDb, closeDb, runMigrations } = require('../../../.claude/lib/db/sqlite-manager.cjs');
 const { enqueueMessage } = require('../../../.claude/lib/db/queue-operations.cjs');
 const { BudgetEnforcementService } = require('../../../.claude/lib/workers/budget-enforcement.cjs');
-const { queueEvents, emitNewMessage, Dispatcher } = require('../../../.claude/lib/workers/dispatcher.cjs');
+const {
+  queueEvents,
+  emitNewMessage,
+  Dispatcher,
+} = require('../../../.claude/lib/workers/dispatcher.cjs');
 
 /**
  * Create a temp DB path unique to each test run.
  */
 function makeTempDbPath() {
-  return path.join(os.tmpdir(), `agent-studio-dispatcher-test-${Date.now()}-${Math.random().toString(36).slice(2)}.db`);
+  return path.join(
+    os.tmpdir(),
+    `agent-studio-dispatcher-test-${Date.now()}-${Math.random().toString(36).slice(2)}.db`
+  );
 }
 
 describe('Dispatcher', () => {
@@ -39,9 +46,21 @@ describe('Dispatcher', () => {
       dispatcher = null;
     }
     closeDb(dbPath);
-    try { fs.rmSync(dbPath, { force: true }); } catch (_) { /* ignore */ }
-    try { fs.rmSync(dbPath + '-wal', { force: true }); } catch (_) { /* ignore */ }
-    try { fs.rmSync(dbPath + '-shm', { force: true }); } catch (_) { /* ignore */ }
+    try {
+      fs.rmSync(dbPath, { force: true });
+    } catch (_) {
+      /* ignore */
+    }
+    try {
+      fs.rmSync(dbPath + '-wal', { force: true });
+    } catch (_) {
+      /* ignore */
+    }
+    try {
+      fs.rmSync(dbPath + '-shm', { force: true });
+    } catch (_) {
+      /* ignore */
+    }
   });
 
   describe('start / stop', () => {
@@ -78,7 +97,7 @@ describe('Dispatcher', () => {
 
       const { id } = enqueueMessage(db, { chatId: 'chat1', text: 'hello' });
 
-      dispatcher.on('worker-claimed', (row) => {
+      dispatcher.on('worker-claimed', row => {
         assert.equal(row.id, id);
         done();
       });
@@ -91,7 +110,9 @@ describe('Dispatcher', () => {
       dispatcher = new Dispatcher({ db, budget, failSafeIntervalMs: 999999 });
 
       let claimed = false;
-      dispatcher.on('worker-claimed', () => { claimed = true; });
+      dispatcher.on('worker-claimed', () => {
+        claimed = true;
+      });
 
       dispatcher.start();
       emitNewMessage('nonexistent');
@@ -111,7 +132,7 @@ describe('Dispatcher', () => {
 
       const { id } = enqueueMessage(db, { chatId: 'chat2', text: 'failsafe test' });
 
-      dispatcher.on('worker-claimed', (row) => {
+      dispatcher.on('worker-claimed', row => {
         assert.equal(row.id, id);
         done();
       });
@@ -123,13 +144,18 @@ describe('Dispatcher', () => {
 
   describe('budget gating', () => {
     it('does not claim when MAX_CONCURRENT is reached', (_, done) => {
-      const tightBudget = new BudgetEnforcementService({ maxTokensPerMinute: 400000, maxConcurrentWorkers: 0 });
+      const tightBudget = new BudgetEnforcementService({
+        maxTokensPerMinute: 400000,
+        maxConcurrentWorkers: 0,
+      });
       dispatcher = new Dispatcher({ db, budget: tightBudget, failSafeIntervalMs: 999999 });
 
       enqueueMessage(db, { chatId: 'chat3', text: 'blocked' });
 
       let claimed = false;
-      dispatcher.on('worker-claimed', () => { claimed = true; });
+      dispatcher.on('worker-claimed', () => {
+        claimed = true;
+      });
 
       dispatcher.start();
       emitNewMessage('any');

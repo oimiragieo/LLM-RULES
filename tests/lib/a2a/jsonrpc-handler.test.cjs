@@ -120,10 +120,7 @@ describe('JSON-RPC handler', () => {
   // ── Invalid request ────────────────────────────────────────────────────────
   describe('invalid request', () => {
     it('returns -32600 when jsonrpc field is missing or wrong', async () => {
-      const res = await request(app)
-        .post('/a2a')
-        .send({ id: 1, method: 'tasks/send' })
-        .expect(400);
+      const res = await request(app).post('/a2a').send({ id: 1, method: 'tasks/send' }).expect(400);
 
       assert.equal(res.body.error.code, -32600);
     });
@@ -138,10 +135,7 @@ describe('JSON-RPC handler', () => {
     });
 
     it('returns -32600 when method is missing', async () => {
-      const res = await request(app)
-        .post('/a2a')
-        .send({ jsonrpc: '2.0', id: 1 })
-        .expect(400);
+      const res = await request(app).post('/a2a').send({ jsonrpc: '2.0', id: 1 }).expect(400);
 
       assert.equal(res.body.error.code, -32600);
     });

@@ -57,6 +57,7 @@ the model's identity as the ROUTER before it processes each user message.
 before `user-prompt-unified.cjs` so the reminder precedes routing analysis.
 
 **What it does:**
+
 - Writes a formatted reminder to stderr (forwarded as `<system-reminder>` by orchestrator)
 - Reminds Claude of: Step 0/0.5 preflight, TaskList()-first rule, banned tools, specialist-first routing
 - Skips silently for subagent sessions (detected by `task_id: task-N` prefix pattern)

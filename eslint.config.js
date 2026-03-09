@@ -114,6 +114,12 @@ export default [
       '.claude.old/', // Archived legacy code
       '.claude/worktrees/**', // Isolated worktree directories
       '.claude/context/tmp/**', // Temporary scripts, not production code
+      '.claude/skills/reddit-researcher/**', // Untracked in-progress skill (not yet committed)
+      'rename_agent.cjs', // Untracked in-progress utility script
+      'revert_rename.cjs', // Untracked in-progress utility script
+      'update_frequencies.cjs', // Untracked in-progress utility script
+      'update_skill_loops.cjs', // Untracked in-progress utility script
+      'update_skill_rigidity.cjs', // Untracked in-progress utility script
     ],
   },
 

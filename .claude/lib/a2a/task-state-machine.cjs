@@ -65,9 +65,7 @@ class TaskStateMachine {
 
     const allowed = VALID_TRANSITIONS[task.status];
     if (!allowed || !allowed.has(newStatus)) {
-      throw new Error(
-        `Invalid transition from '${task.status}' to '${newStatus}' for task ${id}`
-      );
+      throw new Error(`Invalid transition from '${task.status}' to '${newStatus}' for task ${id}`);
     }
 
     task.status = newStatus;

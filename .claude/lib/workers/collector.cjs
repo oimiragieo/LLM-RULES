@@ -53,12 +53,12 @@ class Collector {
         }
       };
 
-      const wrappedResolve = (value) => {
+      const wrappedResolve = value => {
         cleanup();
         resolve(value);
       };
 
-      const wrappedReject = (err) => {
+      const wrappedReject = err => {
         cleanup();
         reject(err);
       };

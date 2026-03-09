@@ -175,7 +175,13 @@ class BM25Indexer {
 
     // Process each document
     for (const doc of docs) {
-      const tokens = this._tokenize(doc.text);
+      // V7 Token Gate: Hard limit at approx 100k tokens to prevent OOM
+      let text = doc.text || '';
+      if (text.length > 400000) {
+        text = text.substring(0, 400000);
+      }
+
+      const tokens = this._tokenize(text);
       const termFreqs = this._calculateTermFreqs(tokens);
 
       this.documents.push({
@@ -311,9 +317,22 @@ class BM25Indexer {
 
     // Score all documents
     const results = [];
+    const now = Date.now();
     for (const doc of this.documents) {
-      const score = this._calculateBM25Score(doc, queryTokens);
+      let score = this._calculateBM25Score(doc, queryTokens);
       if (score > 0) {
+        // V7 Gates: Importance Scaling & Time Decay
+        const meta = this.docMetadata[doc.id];
+        if (meta) {
+          if (typeof meta.importance_score === 'number') {
+            score *= Math.max(0.5, meta.importance_score);
+          }
+          if (typeof meta.timestamp === 'number') {
+            const ageDays = (now - meta.timestamp) / (1000 * 60 * 60 * 24);
+            const timeDecay = Math.max(0.5, Math.exp(-0.01 * ageDays));
+            score *= timeDecay;
+          }
+        }
         results.push({ id: doc.id, score });
       }
     }

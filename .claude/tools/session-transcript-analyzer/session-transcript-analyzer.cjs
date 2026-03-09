@@ -14,7 +14,10 @@ if (process.argv.includes('--help')) {
 const { spawnSync } = require('child_process');
 const path = require('path');
 
-const mainScript = path.resolve(__dirname, '../../skills/session-transcript-analyzer/scripts/main.cjs');
+const mainScript = path.resolve(
+  __dirname,
+  '../../skills/session-transcript-analyzer/scripts/main.cjs'
+);
 const args = process.argv.slice(2);
 
 const result = spawnSync('node', [mainScript, ...args], { stdio: 'inherit' });

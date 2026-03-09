@@ -187,6 +187,7 @@ const SAFE_COMMANDS_ALLOWLIST = [
   'comm', // Compare sorted line sets (read-only)
   'du', // Disk usage (read-only)
   'sleep', // Pause execution (benign timing)
+  'timeout', // Time limit execution (benign wrapper)
 
   // Basic file operations (path validation happens in filesystem-validators.cjs)
   'mkdir',

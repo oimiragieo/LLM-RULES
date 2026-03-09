@@ -178,5 +178,25 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "d56a264c902fdd19f20cee0da3594c8645e211f7"
+  },
+  {
+    "text": "Shadow-mode migration pattern for stateful subprocess replacement: add CRON_SUBPROCESS_MODE=shadow|active env flag. In shadow mode, subprocess writes to queue but router does NOT drain/act. Switch to active at Phase 2 boundary. Prevents double-execution during parallel-run migration phase.",
+    "area": "main",
+    "timestamp": "2026-03-09T04:14:21.307Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "aa66b94c4fbcb17e8b16d1436cfcdb52d9e9b8ec"
+  },
+  {
+    "text": "Multi-LLM council review convergence: when two independent LLM reviewers flag the same risk without colluding, treat it as HIGH-CONFIDENCE finding. In Task 12 council, both Gemini and Codex independently identified (1) Phase 1 double-execution risk, (2) queue ack contract gap — neither had seen the other's response. This validates the multi-LLM council pattern as a reliable signal amplifier.",
+    "area": "main",
+    "timestamp": "2026-03-09T04:14:21.459Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "4a775240a04ad70f0d5950bd717c02ce2a1f7095"
   }
 ]

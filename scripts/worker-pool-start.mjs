@@ -69,7 +69,10 @@ process.stdout.write(
 const db = getDb(dbPath);
 runMigrations(db);
 
-const budget = new BudgetEnforcementService({ maxTokensPerMinute, maxConcurrentWorkers: maxWorkers });
+const budget = new BudgetEnforcementService({
+  maxTokensPerMinute,
+  maxConcurrentWorkers: maxWorkers,
+});
 
 /**
  * Default processFn — replace with real processing logic in production.

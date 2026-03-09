@@ -134,9 +134,19 @@ describe('runMigrations()', () => {
       .map(r => r.name);
 
     const expected = [
-      'id', 'chat_id', 'user_id', 'text', 'attachments',
-      'timestamp', 'status', 'worker_pid', 'claimed_at',
-      'heartbeat_at', 'attempt_count', 'last_error', 'completed_at',
+      'id',
+      'chat_id',
+      'user_id',
+      'text',
+      'attachments',
+      'timestamp',
+      'status',
+      'worker_pid',
+      'claimed_at',
+      'heartbeat_at',
+      'attempt_count',
+      'last_error',
+      'completed_at',
     ];
 
     for (const col of expected) {
@@ -156,9 +166,20 @@ describe('runMigrations()', () => {
       .all()
       .map(r => r.name);
 
-    const expected = ['id', 'source', 'mime_type', 'hash', 'size_bytes',
-      'importance_score', 'summary', 'entities', 'clean_text',
-      'vision_embedded', 'indexed_at', 'expires_at'];
+    const expected = [
+      'id',
+      'source',
+      'mime_type',
+      'hash',
+      'size_bytes',
+      'importance_score',
+      'summary',
+      'entities',
+      'clean_text',
+      'vision_embedded',
+      'indexed_at',
+      'expires_at',
+    ];
 
     for (const col of expected) {
       assert.ok(cols.includes(col), `file_memory should have column: ${col}`);
@@ -177,8 +198,15 @@ describe('runMigrations()', () => {
       .all()
       .map(r => r.name);
 
-    const expected = ['id', 'session_id', 'agent_type', 'content',
-      'importance_score', 'tags', 'created_at'];
+    const expected = [
+      'id',
+      'session_id',
+      'agent_type',
+      'content',
+      'importance_score',
+      'tags',
+      'created_at',
+    ];
 
     for (const col of expected) {
       assert.ok(cols.includes(col), `episodic_memory should have column: ${col}`);

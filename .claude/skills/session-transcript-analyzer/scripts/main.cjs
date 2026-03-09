@@ -9,10 +9,13 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 
 const options = Object.fromEntries(
-  process.argv.slice(2).filter(arg => arg.startsWith('--')).map(flag => {
-    const [key, value] = flag.replace(/^--/, '').split('=');
-    return [key, value || true];
-  })
+  process.argv
+    .slice(2)
+    .filter(arg => arg.startsWith('--'))
+    .map(flag => {
+      const [key, value] = flag.replace(/^--/, '').split('=');
+      return [key, value || true];
+    })
 );
 
 if (options.help) {
@@ -30,7 +33,10 @@ if (process.argv.includes('--session')) {
 }
 
 // Target the existing analyzer script
-const analyzerScript = path.resolve(__dirname, '../../../../scripts/analyze-session-transcript.mjs');
+const analyzerScript = path.resolve(
+  __dirname,
+  '../../../../scripts/analyze-session-transcript.mjs'
+);
 
 console.log(`Executing analyzer script...`);
 const result = spawnSync('node', [analyzerScript, ...args], { stdio: 'inherit' });

@@ -13,13 +13,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const REGISTRY_PATH = path.join(
-  __dirname,
-  '..',
-  '..',
-  'context',
-  'agent-registry.json'
-);
+const REGISTRY_PATH = path.join(__dirname, '..', '..', 'context', 'agent-registry.json');
 
 /**
  * Load the agent registry from disk.

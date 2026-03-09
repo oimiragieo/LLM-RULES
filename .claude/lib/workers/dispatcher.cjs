@@ -20,7 +20,11 @@
  */
 
 const EventEmitter = require('events');
-const { claimNextMessage, recoverStaleClaims, getPendingCount } = require('../db/queue-operations.cjs');
+const {
+  claimNextMessage,
+  recoverStaleClaims,
+  getPendingCount,
+} = require('../db/queue-operations.cjs');
 
 /** Shared bus for signalling new messages across the process. */
 const queueEvents = new EventEmitter();
@@ -45,7 +49,13 @@ class Dispatcher extends EventEmitter {
    * @param {number} [opts.staleThresholdMs=300000]
    * @param {number} [opts.failSafeIntervalMs=15000]
    */
-  constructor({ db, budget, maxWorkers = 3, staleThresholdMs = 300000, failSafeIntervalMs = 15000 }) {
+  constructor({
+    db,
+    budget,
+    maxWorkers = 3,
+    staleThresholdMs = 300000,
+    failSafeIntervalMs = 15000,
+  }) {
     super();
     this._db = db;
     this._budget = budget;

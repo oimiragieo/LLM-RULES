@@ -17,7 +17,9 @@ const crypto = require('crypto');
 const { getDb, closeDb, runMigrations } = require('../../.claude/lib/db/sqlite-manager.cjs');
 const { enqueueMessage, getQueueStats } = require('../../.claude/lib/db/queue-operations.cjs');
 const { consolidate } = require('../../.claude/lib/memory/consolidation/consolidate-agent.cjs');
-const { enforceRetention } = require('../../.claude/lib/memory/consolidation/retention-enforcer.cjs');
+const {
+  enforceRetention,
+} = require('../../.claude/lib/memory/consolidation/retention-enforcer.cjs');
 const { WorkerPool } = require('../../.claude/lib/workers/worker-pool.cjs');
 const { BudgetEnforcementService } = require('../../.claude/lib/workers/budget-enforcement.cjs');
 const { emitNewMessage } = require('../../.claude/lib/workers/dispatcher.cjs');
@@ -40,10 +42,14 @@ function makeTempDb() {
 function cleanupDb(dbPath) {
   try {
     closeDb(dbPath);
-  } catch (_) { /* ignore */ }
+  } catch (_) {
+    /* ignore */
+  }
   try {
     fs.rmSync(dbPath, { force: true });
-  } catch (_) { /* ignore */ }
+  } catch (_) {
+    /* ignore */
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -69,13 +75,16 @@ describe('Worker pool — end-to-end message processing', () => {
   it('processes an enqueued message through the worker pool', { timeout: 10000 }, async () => {
     const processed = [];
 
-    const budget = new BudgetEnforcementService({ maxTokensPerMinute: 400000, maxConcurrentWorkers: 3 });
+    const budget = new BudgetEnforcementService({
+      maxTokensPerMinute: 400000,
+      maxConcurrentWorkers: 3,
+    });
 
     pool = new WorkerPool({
       db,
       budget,
       concurrency: 1,
-      processFn: async (row) => {
+      processFn: async row => {
         processed.push(row.id);
       },
       failSafeIntervalMs: 1000,
@@ -92,7 +101,10 @@ describe('Worker pool — end-to-end message processing', () => {
 
     // Wait for worker-done event (emitted after completeMessage)
     await new Promise((resolve, reject) => {
-      const deadline = setTimeout(() => reject(new Error('Timed out waiting for worker-done')), 8000);
+      const deadline = setTimeout(
+        () => reject(new Error('Timed out waiting for worker-done')),
+        8000
+      );
       pool.once('worker-done', () => {
         clearTimeout(deadline);
         resolve();
@@ -228,7 +240,10 @@ describe('Consolidation agent — processes unconsolidated entries', () => {
     const insight = db.prepare('SELECT * FROM episodic_memory WHERE id = ?').get(result.insightId);
     assert.ok(insight, 'Insight row should exist in episodic_memory');
     assert.equal(insight.session_id, 'consolidation');
-    assert.ok(insight.content.startsWith('consolidated:'), 'Content should start with "consolidated:"');
+    assert.ok(
+      insight.content.startsWith('consolidated:'),
+      'Content should start with "consolidated:"'
+    );
     assert.ok(insight.content.includes(fm1), 'Content should include fm1 id');
     assert.ok(insight.content.includes(fm2), 'Content should include fm2 id');
     assert.equal(insight.importance_score, 0.7);
@@ -320,45 +335,53 @@ describe('A2A server — enqueues message on tasks/sendSubscribe when db+pool pr
     cleanupDb(dbPath);
   });
 
-  it('enqueues a message to the queue when tasks/sendSubscribe is called', { timeout: 5000 }, async () => {
-    const http = require('http');
+  it(
+    'enqueues a message to the queue when tasks/sendSubscribe is called',
+    { timeout: 5000 },
+    async () => {
+      const http = require('http');
 
-    const body = JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'tasks/sendSubscribe',
-      params: { message: { role: 'user', parts: [{ text: 'hello' }] } },
-    });
-
-    const statsBefore = getQueueStats(db);
-
-    await new Promise((resolve, reject) => {
-      const req = http.request(`${baseUrl}/a2a/subscribe`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body),
-        },
-      }, (res) => {
-        // SSE stream — just read a chunk and then destroy
-        res.once('data', () => {
-          res.destroy();
-          resolve();
-        });
-        res.on('error', () => resolve()); // ignore destroy error
+      const body = JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tasks/sendSubscribe',
+        params: { message: { role: 'user', parts: [{ text: 'hello' }] } },
       });
-      req.on('error', reject);
-      req.write(body);
-      req.end();
-    });
 
-    const statsAfter = getQueueStats(db);
-    assert.equal(
-      statsAfter.pending + statsAfter.claimed + statsAfter.completed,
-      statsBefore.pending + statsBefore.claimed + statsBefore.completed + 1,
-      'Should have enqueued 1 new message'
-    );
-  });
+      const statsBefore = getQueueStats(db);
+
+      await new Promise((resolve, reject) => {
+        const req = http.request(
+          `${baseUrl}/a2a/subscribe`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(body),
+            },
+          },
+          res => {
+            // SSE stream — just read a chunk and then destroy
+            res.once('data', () => {
+              res.destroy();
+              resolve();
+            });
+            res.on('error', () => resolve()); // ignore destroy error
+          }
+        );
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+      });
+
+      const statsAfter = getQueueStats(db);
+      assert.equal(
+        statsAfter.pending + statsAfter.claimed + statsAfter.completed,
+        statsBefore.pending + statsBefore.claimed + statsBefore.completed + 1,
+        'Should have enqueued 1 new message'
+      );
+    }
+  );
 
   it('does NOT enqueue when db/pool not provided', { timeout: 5000 }, async () => {
     const http = require('http');
@@ -381,19 +404,23 @@ describe('A2A server — enqueues message on tasks/sendSubscribe when db+pool pr
     });
 
     await new Promise((resolve, reject) => {
-      const req = http.request(`${url2}/a2a/subscribe`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body2),
+      const req = http.request(
+        `${url2}/a2a/subscribe`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(body2),
+          },
         },
-      }, (res) => {
-        res.once('data', () => {
-          res.destroy();
-          resolve();
-        });
-        res.on('error', () => resolve());
-      });
+        res => {
+          res.once('data', () => {
+            res.destroy();
+            resolve();
+          });
+          res.on('error', () => resolve());
+        }
+      );
       req.on('error', reject);
       req.write(body2);
       req.end();

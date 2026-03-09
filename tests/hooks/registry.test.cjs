@@ -247,6 +247,12 @@ describe('registry', () => {
       assert.strictEqual(result.hasValidator, false);
     });
 
+    test('ALLOWS allowlisted command: timeout', () => {
+      const result = validateCommand('timeout 60 pnpm test');
+      assert.strictEqual(result.valid, true);
+      assert.strictEqual(result.hasValidator, false);
+    });
+
     test('ALLOWS allowlisted command: git status', () => {
       // This also has a validator, but should still pass
       const result = validateCommand('git status');

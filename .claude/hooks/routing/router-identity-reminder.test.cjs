@@ -29,17 +29,9 @@ assert.strictEqual(
   'task_id without numeric suffix should NOT match'
 );
 
-assert.strictEqual(
-  isSubagentPrompt(''),
-  false,
-  'empty string should NOT be detected as subagent'
-);
+assert.strictEqual(isSubagentPrompt(''), false, 'empty string should NOT be detected as subagent');
 
-assert.strictEqual(
-  isSubagentPrompt(null),
-  false,
-  'null should NOT throw and should return false'
-);
+assert.strictEqual(isSubagentPrompt(null), false, 'null should NOT throw and should return false');
 
 // --- isSubagentPrompt: should return true for subagent task prompts ---
 

@@ -69,7 +69,7 @@ class WorkerPool extends EventEmitter {
    * Start the pool: begin listening for claimed messages from the dispatcher.
    */
   start() {
-    this._dispatcher.on('worker-claimed', (claimedRow) => this._spawnWorker(claimedRow));
+    this._dispatcher.on('worker-claimed', claimedRow => this._spawnWorker(claimedRow));
     this._dispatcher.start();
   }
 
@@ -95,18 +95,18 @@ class WorkerPool extends EventEmitter {
       heartbeatIntervalMs: this._heartbeatIntervalMs,
     });
 
-    runner.on('worker-done', (payload) => {
+    runner.on('worker-done', payload => {
       this._activeWorkers = Math.max(0, this._activeWorkers - 1);
       this.emit('worker-done', payload);
     });
 
-    runner.on('worker-error', (payload) => {
+    runner.on('worker-error', payload => {
       this._activeWorkers = Math.max(0, this._activeWorkers - 1);
       this.emit('worker-error', payload);
     });
 
     // Fire-and-forget; errors are handled by runner event emission
-    runner.run(claimedRow, this._processFn).catch((err) => {
+    runner.run(claimedRow, this._processFn).catch(err => {
       // Should never reach here (runner.run catches internally), but guard anyway
       process.stderr.write(`[WorkerPool] unexpected error in runner.run: ${err.message}\n`);
     });

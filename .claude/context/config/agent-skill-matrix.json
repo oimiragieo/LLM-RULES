@@ -217,6 +217,20 @@
           "code-structural-search",
           "token-saver-context-compression"
         ]
+      },
+      "heartbeat-orchestrator": {
+        "primary": ["heartbeat", "scheduled-tasks"],
+        "secondary": [],
+        "contextual": {},
+        "always": [
+          "task-management-protocol",
+          "memory-search",
+          "ripgrep",
+          "code-semantic-search",
+          "code-structural-search",
+          "token-saver-context-compression",
+          "verification-before-completion"
+        ]
       }
     },
     "domain": {

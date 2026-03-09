@@ -191,7 +191,7 @@ function performWorktreeCleanupIfCompleted(status) {
           `[post-task-unified] Worktree context detected. Purging untracked files before deletion...`
         );
       }
-      gitRun(['clean', '-fd'], process.cwd());
+      gitRun(['clean', '-fdx'], process.cwd());
     }
   } catch (err) {
     if (process.env.DEBUG_HOOKS === 'true') {

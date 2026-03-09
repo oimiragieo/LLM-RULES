@@ -17,14 +17,7 @@ const path = require('path');
 const Database = require('better-sqlite3');
 
 // Default DB path — runtime directory
-const DEFAULT_DB_PATH = path.join(
-  __dirname,
-  '..',
-  '..',
-  'context',
-  'runtime',
-  'agent-studio.db'
-);
+const DEFAULT_DB_PATH = path.join(__dirname, '..', '..', 'context', 'runtime', 'agent-studio.db');
 
 const MIGRATIONS_DIR = path.join(__dirname, 'migrations');
 

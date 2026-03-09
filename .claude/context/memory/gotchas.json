@@ -2,5 +2,25 @@
   {
     "text": "MEM_E2E_SENTINEL_ALWAYS_USE_TASKUPDATE_FIRST",
     "timestamp": "2026-02-15T00:00:00.000Z"
+  },
+  {
+    "text": "Subprocess spawn on Windows: detached:true + unref() is insufficient for orphan prevention when terminal is force-closed. Short-term fix: clear PID file on launcher startup, treat stale cron-session-ping.json as dead (re-launch). Long-term: use windowsHide:true + Windows Job Object attachment.",
+    "area": "main",
+    "timestamp": "2026-03-09T04:14:02.668Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "06c52ca79dc485559b460f01aaed9766f7485ad7"
+  },
+  {
+    "text": "JSONL queue for cron subprocess: O_EXCL atomic drain via file rename (not in-place rewrite) is required to prevent partial drains. Also implement line-level try/parse with skip-on-error to prevent one corrupted line from halting all queue processing.",
+    "area": "main",
+    "timestamp": "2026-03-09T04:14:11.499Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "86f4f76c1ffbbe65f72f4b3b0a2c39959943ce5e"
   }
 ]

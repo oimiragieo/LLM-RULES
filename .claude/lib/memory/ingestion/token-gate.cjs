@@ -17,8 +17,8 @@ const CHARS_PER_TOKEN = 4; // Fast heuristic approximation
  * @returns {number}
  */
 function estimateTokens(text) {
-    if (!text) return 0;
-    return Math.ceil(text.length / CHARS_PER_TOKEN);
+  if (!text) return 0;
+  return Math.ceil(text.length / CHARS_PER_TOKEN);
 }
 
 /**
@@ -29,7 +29,7 @@ function estimateTokens(text) {
  * @returns {boolean}
  */
 function exceedsLimit(text, limit = MAX_TOKENS_PER_FILE) {
-    return estimateTokens(text) > limit;
+  return estimateTokens(text) > limit;
 }
 
 /**
@@ -40,17 +40,17 @@ function exceedsLimit(text, limit = MAX_TOKENS_PER_FILE) {
  * @returns {string}
  */
 function truncateToLimit(text, limit = MAX_TOKENS_PER_FILE) {
-    if (!text) return '';
-    const estimated = estimateTokens(text);
-    if (estimated <= limit) return text;
+  if (!text) return '';
+  const estimated = estimateTokens(text);
+  if (estimated <= limit) return text;
 
-    const charLimit = limit * CHARS_PER_TOKEN;
-    return text.substring(0, charLimit);
+  const charLimit = limit * CHARS_PER_TOKEN;
+  return text.substring(0, charLimit);
 }
 
 module.exports = {
-    estimateTokens,
-    exceedsLimit,
-    truncateToLimit,
-    MAX_TOKENS_PER_FILE
+  estimateTokens,
+  exceedsLimit,
+  truncateToLimit,
+  MAX_TOKENS_PER_FILE,
 };

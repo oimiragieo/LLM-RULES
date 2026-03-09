@@ -1,3 +1,32 @@
+## ADR-2026-03-09A: Cron-Runner Subprocess Isolation — APPROVED-WITH-CONDITIONS (2026-03-09)
+
+**Status:** Conditionally Approved (pending Phase 1 conditions)
+**Context:** Cron ticks firing into the Router session cause 15K-60K tokens/hour of context pollution. Moving cron loop ownership to a persistent subprocess (via `child_process.spawn detached:true`) with a JSONL queue bridge was evaluated by a multi-LLM council (Gemini + Codex + Claude chairman).
+
+**Decision:** APPROVE-WITH-CONDITIONS.
+
+- Subprocess isolation pattern (sidecar) is architecturally correct for this problem.
+- Phase 0 (launcher + skill creation, no behavior changes) is authorized to proceed immediately.
+- Phase 1 is BLOCKED until: (C1) queue drain/ack protocol defined, (C2) CRON_SUBPROCESS_MODE=shadow flag implemented.
+- Phase 2 is BLOCKED until all 3 BLOCKING conditions resolved (C1, C2, C3: credential inheritance check).
+
+**Key Design Decisions:**
+
+- Queue drain: atomic file rename (not in-place rewrite), line-level try/parse skip-on-error
+- Shadow mode: CRON_SUBPROCESS_MODE env var controls whether router drains queue (shadow=no, active=yes)
+- Credential inheritance: launcher must verify ANTHROPIC_API_KEY present in process.env before spawn
+- Model selection: Haiku for simple heartbeats, allow escalation to Sonnet for distillation tasks
+
+**Risk Record:**
+
+- CRITICAL: Queue drain/ack protocol unspecified (could cause silent action loss or duplicate execution)
+- HIGH: Phase 1 double-execution without shadow mode flag
+- HIGH: Windows orphan subprocess + credential inheritance gap
+
+**Evidence:** `.claude/context/reports/architecture/cron-runner-subprocess-council-2026-03-09.md`
+
+---
+
 ## ADR-2026-03-08A: MEGA EPIC Audit — Security Enforcement Hardening
 
 **Status:** Accepted

@@ -46,7 +46,7 @@ start()
     console.log(`[a2a] JSON-RPC:   http://localhost:${port}/a2a`);
     console.log(`[a2a] SSE:        http://localhost:${port}/a2a/subscribe`);
   })
-  .catch((err) => {
+  .catch(err => {
     console.error('[a2a] Failed to start server:', err.message);
     process.exit(1);
   });

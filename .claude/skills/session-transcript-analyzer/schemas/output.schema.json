@@ -3,9 +3,7 @@
   "title": "session-transcript-analyzer Output Schema",
   "description": "Output validation schema for session-transcript-analyzer skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",
