@@ -63,6 +63,13 @@ const CMD_QUEUE = path.join(ROOT, '.claude', 'context', 'tmp', 'telegram-command
 const HB_FILE = path.join(ROOT, '.claude', 'context', 'runtime', 'heartbeat-active.json');
 const GAP_LOG = path.join(ROOT, '.claude', 'context', 'runtime', 'session-gap-log.jsonl');
 const LEARNINGS = path.join(ROOT, '.claude', 'context', 'memory', 'learnings.md');
+const CRON_ACTIONS_QUEUE = path.join(
+  ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'cron-actions-queue.jsonl'
+);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -459,18 +466,29 @@ async function main() {
     }
   }
 
-  // Emit structured actions for Claude if any commands need Claude tools
-  const pending = readCmdQueue();
-  if (pending.length) {
-    // Claude reads this line and executes each action mechanically
-    process.stdout.write(`CLAUDE_ACTIONS:${JSON.stringify(pending)}\n`);
-    writeCmdQueue([]); // clear — Claude will process from the JSON above
-  } else {
-    process.stdout.write(`HEARTBEAT_OK (${newUpdates.length} message(s) processed)\n`);
-  }
+  flushActionQueue(newUpdates.length);
 
   // Write updated state (confirmations etc)
   writeState(state);
+}
+
+// Flush pending Claude actions to durable JSONL queue (instead of inline stdout emit)
+function flushActionQueue(processedCount) {
+  const pending = readCmdQueue();
+  if (pending.length) {
+    ensureDir(CRON_ACTIONS_QUEUE);
+    for (const action of pending) {
+      const line = JSON.stringify({
+        ...action,
+        queuedAt: action.queuedAt || new Date().toISOString(),
+      });
+      fs.appendFileSync(CRON_ACTIONS_QUEUE, line + '\n');
+    }
+    writeCmdQueue([]); // clear after persisting to queue file
+    process.stdout.write(`QUEUED_ACTIONS: ${pending.length}\n`);
+  } else {
+    process.stdout.write(`HEARTBEAT_OK (${processedCount} message(s) processed)\n`);
+  }
 }
 
 // ── Test exports (only when loaded as module, not via direct execution) ──────
