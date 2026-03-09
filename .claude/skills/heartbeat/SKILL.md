@@ -34,7 +34,7 @@ The **Heartbeat Ecosystem** keeps agent-studio healthy, indexed, and informed by
 Run these `/loop` commands in your Claude Code session:
 
 ```
-/loop 2h Read .claude/context/runtime/reflection-reminder.txt — if exists and has content, spawn reflection-agent. Check .claude/context/memory/learnings.md byte size via Bash (wc -c). If > 35000 bytes run: node .claude/lib/memory/memory-rotator.cjs. Reply HEARTBEAT_OK if all healthy.
+/loop 2h Run: node .claude/tools/cli/reflection-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.
 ```
 
 ```
@@ -42,11 +42,11 @@ Run these `/loop` commands in your Claude Code session:
 ```
 
 ```
-/loop 15m TaskList() — if zero active or pending tasks, report "Pipeline drained — ready for /clear if desired." Reply HEARTBEAT_OK otherwise.
+/loop 30m Run: node .claude/tools/cli/context-drain.cjs\nReply exactly with the stdout output, then exit.
 ```
 
 ```
-/loop 24h Read .claude/context/memory/learnings.md for patterns mentioning agent behavior or routing issues. If 3+ actionable improvements found: spawn developer agent with skill-updater skill. Otherwise reply HEARTBEAT_OK.
+/loop 24h Run: node .claude/tools/cli/evolution-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.
 ```
 
 ---
@@ -60,7 +60,7 @@ Prevents silent 3-day expiry. **CRITICAL ORDER**: Always `CronCreate` new tasks 
 ```javascript
 CronCreate({
   schedule: '0 0 */2 * *',
-  task: 'Self-maintenance: CronList() to inventory active tasks. Identify missing heartbeat loops from the expected set (reflection-2h, evolution-24h, briefing-8am, indexing-4h, drain-15m, telegram-2m, research-7am, reschedule-2d). Recreate any missing tasks using schedules in .claude/context/plans/heartbeat-ecosystem-design-2026-03-07.md. Report recreated task IDs.',
+  task: 'Self-maintenance: CronList() to inventory active tasks. Identify missing heartbeat loops from the expected set (reflection-2h, evolution-24h, briefing-8am, indexing-4h, drain-30m, telegram-5m, research-7am, reschedule-2d). Recreate any missing tasks using schedules in .claude/context/plans/heartbeat-ecosystem-design-2026-03-07.md. Report recreated task IDs.',
 });
 ```
 
@@ -71,7 +71,7 @@ Extracts patterns from session transcripts before they are lost.
 ```javascript
 CronCreate({
   schedule: '0 */2 * * *',
-  task: 'Reflection heartbeat: Read .claude/context/runtime/reflection-reminder.txt — if exists and has content, spawn reflection-agent. Read .claude/context/memory/learnings.md — if > 35000 bytes, run: node .claude/lib/memory/memory-rotator.cjs and report. Check .claude/context/memory/issues.md for P0 items. Reply HEARTBEAT_OK if all healthy.',
+  task: 'Run: node .claude/tools/cli/reflection-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.',
 });
 ```
 
@@ -82,7 +82,7 @@ Applies accumulated learnings to improve agent definitions.
 ```javascript
 CronCreate({
   schedule: '0 3 * * *',
-  task: 'Agent evolution: Read .claude/context/memory/learnings.md for agent improvement patterns. Read agent-health.json for degraded agents. If 3+ actionable improvements or any degraded agent found: spawn developer with skill-updater skill to update agent .md files, then pnpm validate:full. Otherwise reply HEARTBEAT_OK.',
+  task: 'Run: node .claude/tools/cli/evolution-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.',
 });
 ```
 
@@ -93,7 +93,7 @@ Summarizes overnight state and suggests priority work.
 ```javascript
 CronCreate({
   schedule: '0 8 * * 1-5',
-  task: 'Morning briefing: Read issues.md for unresolved items. Read learnings.md last 20 lines for recent patterns. Run: git log --oneline -5. Summarize: (1) Top 3 open issues by priority, (2) Recent technical debt indicators, (3) 2 optimal tasks to tackle today. Format as morning briefing report.',
+  task: 'Morning briefing: Spawn researcher via Task() to read issues.md, learnings.md, git log, and generate morning briefing report. Do NOT wait for sub-agent. Reply HEARTBEAT_OK and exit.',
 });
 ```
 
@@ -104,22 +104,22 @@ Keeps hybrid search index fresh.
 ```javascript
 CronCreate({
   schedule: '0 */4 * * *',
-  task: 'Index freshness check: Check mtime of .claude/context/data/bm25-index.json via Bash. If older than 4 hours or missing: run pnpm code:index:reindex and report outcome. If fresh: reply HEARTBEAT_OK.',
+  task: 'Index freshness check: Check mtime of .claude/context/data/bm25-index.json via Bash. If older than 4 hours/missing: run pnpm code:index:reindex. Reply HEARTBEAT_OK and exit.',
 });
 ```
 
-### Loop 5: Context Drain + Clear (every 15min)
+### Loop 5: Context Drain + Clear (every 30min)
 
 Detects pipeline idle state — warns user, does NOT auto-clear.
 
 ```javascript
 CronCreate({
-  schedule: '*/15 * * * *',
-  task: 'Context drain check: TaskList() — if zero tasks in in_progress or pending and pipeline appears idle, report "Pipeline drained — ready for /clear if desired" with completion summary. Do NOT auto-clear. Reply HEARTBEAT_OK if tasks still active.',
+  schedule: '*/30 * * * *',
+  task: 'Run: node .claude/tools/cli/context-drain.cjs\nReply exactly with the stdout output, then exit.',
 });
 ```
 
-### Loop 6: Telegram Polling (every 2min)
+### Loop 6: Telegram Polling (every 5min)
 
 Polls Telegram Bot API for user messages and routes to agents.
 
@@ -131,8 +131,8 @@ Polls Telegram Bot API for user messages and routes to agents.
 
 ```javascript
 CronCreate({
-  schedule: '*/2 * * * *',
-  task: 'Telegram polling: Check TELEGRAM_BOT_TOKEN env var — if set, fetch getUpdates API for new messages. Route each message to appropriate agent (researcher/developer/code-reviewer/etc), execute task, reply via sendMessage API. Track update offset in .claude/context/tmp/telegram-offset.json. Reply HEARTBEAT_OK if no messages or token not configured.',
+  schedule: '*/5 * * * *',
+  task: 'Run: node .claude/tools/cli/telegram-poll.cjs\nParse stdout. Reply HEARTBEAT_OK and exit.',
 });
 ```
 
@@ -145,7 +145,7 @@ Surfaces relevant academic papers and web news. Delegates to the dedicated monit
 ```javascript
 CronCreate({
   schedule: '0 7 * * *',
-  task: 'Research digest: Invoke Skill({ skill: "arxiv-monitor" }) to fetch new ArXiv papers matching ARXIV_KEYWORDS. Then invoke Skill({ skill: "exa-monitor" }) to fetch new Exa web results for EXA_MONITOR_TOPICS. Both skills handle deduplication and append to their respective digest files (arxiv-digest.md, exa-digest.md). Reply HEARTBEAT_OK when both complete.',
+  task: 'Research digest: Spawn researcher via Task() to invoke arxiv-monitor and exa-monitor skills. Do NOT wait for sub-agent. Reply HEARTBEAT_OK and exit.',
 });
 ```
 
@@ -177,10 +177,10 @@ CronCreate({ schedule: '0 8 * * 1-5', task: '...' }); // see Loop 3 above
 CronCreate({ schedule: '0 */4 * * *', task: '...' }); // see Loop 4 above
 
 // Loop 5: Drain Check
-CronCreate({ schedule: '*/15 * * * *', task: '...' }); // see Loop 5 above
+CronCreate({ schedule: '*/30 * * * *', task: '...' }); // see Loop 5 above
 
 // Loop 6: Telegram Polling
-CronCreate({ schedule: '*/2 * * * *', task: '...' }); // see Loop 6 above
+CronCreate({ schedule: '*/5 * * * *', task: '...' }); // see Loop 6 above
 
 // Loop 7: Research Digest
 CronCreate({ schedule: '0 7 * * *', task: '...' }); // see Loop 7 above
@@ -221,11 +221,11 @@ for (const task of tasks) {
 
 ```
 minute hour day-of-month month day-of-week
-*/2    *    *             *     *            = Every 2 minutes
+*/5    *    *             *     *            = Every 5 minutes
 0      */2  *             *     *            = Every 2 hours
 0      8    *             *     1-5          = Weekdays at 8am
 0      */4  *             *     *            = Every 4 hours
-*/15   *    *             *     *            = Every 15 minutes
+*/30   *    *             *     *            = Every 30 minutes
 0      0    */2           *     *            = Every 2 days at midnight
 ```
 

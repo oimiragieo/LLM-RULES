@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-08T21:31:57.066Z",
+  "generatedAt": "2026-03-09T05:28:10.394Z",
   "metadata": {
-    "totalSkills": 273,
+    "totalSkills": 275,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-08T21:31:57.067Z",
+    "lastValidated": "2026-03-09T05:28:10.394Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -208,6 +208,7 @@
         "context-compressor",
         "technical-program-manager",
         "general-assistant",
+        "heartbeat-orchestrator",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -399,6 +400,7 @@
         "context-compressor",
         "technical-program-manager",
         "general-assistant",
+        "heartbeat-orchestrator",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -491,6 +493,7 @@
         "context-compressor",
         "technical-program-manager",
         "general-assistant",
+        "heartbeat-orchestrator",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -631,6 +634,7 @@
         "context-compressor",
         "technical-program-manager",
         "general-assistant",
+        "heartbeat-orchestrator",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -3795,6 +3799,7 @@
         "context-compressor",
         "technical-program-manager",
         "general-assistant",
+        "heartbeat-orchestrator",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -3940,6 +3945,7 @@
         "pm",
         "context-compressor",
         "technical-program-manager",
+        "heartbeat-orchestrator",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -4264,6 +4270,7 @@
         "context-compressor",
         "technical-program-manager",
         "general-assistant",
+        "heartbeat-orchestrator",
         "python-pro",
         "rust-pro",
         "golang-pro",
@@ -7035,6 +7042,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "cron-runner": {
+      "name": "cron-runner",
+      "displayName": "Cron Runner",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - cron-runner",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "cron-runner"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "doc-coauthoring": {
       "name": "doc-coauthoring",
       "displayName": "Doc Coauthoring",
@@ -7148,14 +7177,14 @@
         "MemoryRecord"
       ],
       "agentPrimary": [
-        "developer"
+        "heartbeat-orchestrator"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "heartbeat"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "lsp-navigator": {
@@ -7245,6 +7274,27 @@
       "priority": 3,
       "aliasOf": null
     },
+    "reddit-researcher": {
+      "name": "reddit-researcher",
+      "displayName": "Reddit Researcher",
+      "category": "Other",
+      "domain": "other",
+      "description": "Search and read public Reddit posts, subreddits, and comments via the unauthenticated JSON API. Safe read-only access with SSRF-prevention hostname allowlist.",
+      "requiredTools": [
+        "WebFetch",
+        "WebSearch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "reddit-researcher"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "regulatory-compliance": {
       "name": "regulatory-compliance",
       "displayName": "Regulatory Compliance",
@@ -7287,14 +7337,14 @@
         "MemoryRecord"
       ],
       "agentPrimary": [
-        "developer"
+        "heartbeat-orchestrator"
       ],
       "agentSupporting": [],
       "tags": [
         "other",
         "scheduled-tasks"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "scientific-skills": {
@@ -7580,6 +7630,7 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -7589,6 +7640,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
         "seo-optimization",
@@ -7959,6 +8011,7 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -7968,6 +8021,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
         "seo-optimization",
@@ -8321,6 +8375,7 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8549,6 +8604,7 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8733,6 +8789,7 @@
         "writing",
         "brand-compliance",
         "claude-api",
+        "cron-runner",
         "doc-coauthoring",
         "frontend-design",
         "mcp-builder",
@@ -9206,6 +9263,7 @@
         "slack-notifications",
         "spec-to-code-compliance",
         "feedback-analysis",
+        "reddit-researcher",
         "scientific-skills",
         "user-research"
       ],
@@ -9223,6 +9281,7 @@
         "dynamic-api-integration",
         "multi-agent-architecture-reference",
         "feedback-analysis",
+        "reddit-researcher",
         "scientific-skills",
         "user-research"
       ],
@@ -9463,17 +9522,17 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
-        "heartbeat",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "reddit-researcher",
         "regulatory-compliance",
-        "scheduled-tasks",
         "seo-optimization",
         "telegram-polling",
         "user-research",
@@ -9624,6 +9683,17 @@
         "code-semantic-search",
         "code-structural-search",
         "token-saver-context-compression"
+      ],
+      "heartbeat-orchestrator": [
+        "heartbeat",
+        "scheduled-tasks",
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
+        "code-semantic-search",
+        "code-structural-search",
+        "token-saver-context-compression",
+        "verification-before-completion"
       ],
       "python-pro": [
         "python-backend-expert",
@@ -10709,17 +10779,17 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
-        "heartbeat",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "reddit-researcher",
         "regulatory-compliance",
-        "scheduled-tasks",
         "seo-optimization",
         "telegram-polling",
         "user-research",
@@ -10870,6 +10940,17 @@
         "code-semantic-search",
         "code-structural-search",
         "token-saver-context-compression"
+      ],
+      "heartbeat-orchestrator": [
+        "heartbeat",
+        "scheduled-tasks",
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
+        "code-semantic-search",
+        "code-structural-search",
+        "token-saver-context-compression",
+        "verification-before-completion"
       ],
       "python-pro": [
         "python-backend-expert",
