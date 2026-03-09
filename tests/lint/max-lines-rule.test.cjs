@@ -11,7 +11,7 @@ const eslintBin = path.join(
 describe('ESLint max-lines rule', () => {
   it('should report error for files exceeding 500 lines (skipBlankLines, skipComments)', () => {
     // Create a temp file with 501 non-blank, non-comment lines
-    const tmpDir = path.join(__dirname, '../../.claude/context/tmp');
+    const tmpDir = path.join(__dirname, '../_tmp_lint');
     const tmpFile = path.join(tmpDir, 'test-overlength.cjs');
     const fs = require('fs');
     fs.mkdirSync(tmpDir, { recursive: true });
@@ -46,7 +46,7 @@ describe('ESLint max-lines rule', () => {
   });
 
   it('should allow files with 500 or fewer non-blank non-comment lines', () => {
-    const tmpDir = path.join(__dirname, '../../.claude/context/tmp');
+    const tmpDir = path.join(__dirname, '../_tmp_lint');
     const tmpFile = path.join(tmpDir, 'test-underlength.cjs');
     const fs = require('fs');
     fs.mkdirSync(tmpDir, { recursive: true });

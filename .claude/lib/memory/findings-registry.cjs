@@ -558,6 +558,7 @@ function pruneStaleOpenFindings(projectRoot = PROJECT_ROOT, options = {}) {
 
 module.exports = {
   OPEN_FINDINGS_FILE,
+  resolveFindingsTrendPath,
   ingestReportFindings,
   getOpenFindings,
   getFindingsSummary,

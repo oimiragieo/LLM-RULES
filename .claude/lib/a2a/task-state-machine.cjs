@@ -71,9 +71,10 @@ class TaskStateMachine {
     task.status = newStatus;
     task.updatedAt = new Date().toISOString();
 
-    // Evict terminal tasks after 5 minutes to prevent unbounded Map growth
+    // Evict terminal tasks after 5 minutes to prevent unbounded Map growth.
+    // .unref() so this timer does not prevent the process from exiting in tests.
     if (TERMINAL_STATES.has(newStatus)) {
-      setTimeout(() => this._tasks.delete(id), 5 * 60 * 1000);
+      setTimeout(() => this._tasks.delete(id), 5 * 60 * 1000).unref();
     }
 
     return { ...task };

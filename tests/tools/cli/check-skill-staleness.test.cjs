@@ -132,7 +132,23 @@ describe('check-skill-staleness', () => {
     });
 
     it('returns invalid_date_format for malformed dates', () => {
+      // Use a string that fails the YYYY-MM-DD regex (wrong separator)
       const skillDir = createTestSkillDir('test-bad-date', {
+        name: 'test',
+        version: '1.0.0',
+        skillType: 'cognitive',
+        lastResearchDate: '2024/01/15',
+        staleAfterDays: 90,
+      });
+
+      const result = checkStaleness(skillDir);
+      assert.strictEqual(result.isStale, false);
+      assert.strictEqual(result.reason, 'invalid_date_format');
+    });
+
+    it('returns invalid_date_value for dates with valid format but impossible values', () => {
+      // '2024-13-45' passes YYYY-MM-DD regex but month 13 is invalid
+      const skillDir = createTestSkillDir('test-bad-value', {
         name: 'test',
         version: '1.0.0',
         skillType: 'cognitive',
@@ -142,7 +158,7 @@ describe('check-skill-staleness', () => {
 
       const result = checkStaleness(skillDir);
       assert.strictEqual(result.isStale, false);
-      assert.strictEqual(result.reason, 'invalid_date_format');
+      assert.strictEqual(result.reason, 'invalid_date_value');
     });
   });
 
@@ -201,6 +217,11 @@ describe('check-skill-staleness', () => {
   });
 
   describe('evaluateAllSkills', () => {
+    before(() => {
+      // Reset shared TEST_DIR so prior checkStaleness dirs don't pollute the count
+      cleanupTestDir();
+    });
+
     it('evaluates multiple skills', () => {
       // Create fresh skill
       const now = new Date();
@@ -235,7 +256,8 @@ describe('check-skill-staleness', () => {
       assert.strictEqual(results.length, 3);
       assert.strictEqual(summary.totalSkills, 3);
       assert.strictEqual(summary.staleCount, 1);
-      assert.strictEqual(summary.freshCount, 1);
+      // freshCount includes all non-stale results (fresh-skill + no-manifest-skill)
+      assert.strictEqual(summary.freshCount, 2);
       assert.strictEqual(summary.noManifestCount, 1);
     });
 
