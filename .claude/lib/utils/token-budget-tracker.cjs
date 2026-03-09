@@ -14,6 +14,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { PROJECT_ROOT } = require('./project-root.cjs');
+const { safeParseJSON } = require('./safe-json.cjs');
 const TOKEN_LOG_PATH = path.join(PROJECT_ROOT, '.claude/context/token-usage.jsonl');
 const CHAR_TO_TOKEN_RATIO = 0.75; // 1 char ≈ 0.75 tokens (estimate)
 const DEFAULT_BUDGET = 200000; // Per model (haiku/sonnet/opus all same for simplicity)
@@ -26,7 +27,8 @@ const BUDGET_STATE_PATH = path.join(RUNTIME_DIR, 'budget-tracker.json');
 function loadState() {
   try {
     if (fs.existsSync(BUDGET_STATE_PATH)) {
-      return JSON.parse(fs.readFileSync(BUDGET_STATE_PATH, 'utf8'));
+      const { data } = safeParseJSON(fs.readFileSync(BUDGET_STATE_PATH, 'utf8'), {});
+      return data;
     }
   } catch (_err) {
     // Ignore load errors, return empty
