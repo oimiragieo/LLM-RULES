@@ -215,7 +215,8 @@
           "ripgrep",
           "code-semantic-search",
           "code-structural-search",
-          "token-saver-context-compression"
+          "token-saver-context-compression",
+          "task-management-protocol"
         ]
       },
       "heartbeat-orchestrator": {

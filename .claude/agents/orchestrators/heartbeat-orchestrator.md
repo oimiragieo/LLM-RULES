@@ -6,14 +6,15 @@ category: orchestrators
 type: orchestrator
 model: haiku
 skills:
-  always:
-    - heartbeat
-    - scheduled-tasks
-    - task-management-protocol
-    - ripgrep
-    - memory-search
-    - code-semantic-search
-    - code-structural-search
+  - heartbeat
+  - scheduled-tasks
+  - task-management-protocol
+  - ripgrep
+  - memory-search
+  - code-semantic-search
+  - code-structural-search
+  - token-saver-context-compression
+  - verification-before-completion
 tools:
   - CronCreate
   - CronList

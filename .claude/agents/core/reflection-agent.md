@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-09T04:04:39.916Z
+lastVerifiedAt: 2026-03-09T09:13:08.907Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -40,6 +40,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
+  - artifact-integrator
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'

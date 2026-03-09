@@ -76,11 +76,11 @@ const nonRouterAgents = agentIds.filter(id => !EXCLUDED_AGENTS.includes(id));
 
 describe('Agent Search Compliance', () => {
   describe('Registry agent count', () => {
-    it('should have expected total agent count (72)', () => {
+    it('should have expected total agent count (73)', () => {
       assert.equal(
         registry.metadata.totalAgents,
-        72,
-        `Expected 72 agents, got ${registry.metadata.totalAgents}`
+        73,
+        `Expected 73 agents, got ${registry.metadata.totalAgents}`
       );
     });
 

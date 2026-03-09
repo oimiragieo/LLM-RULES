@@ -45,6 +45,7 @@ skills:
   - verification-before-completion
   - workflow-creator
   - token-saver-context-compression
+  - artifact-integrator
 ---
 
 <!-- agent-template-contract:v1 -->
