@@ -36,6 +36,9 @@ const { parseHookInputAsync, getToolName, getToolInput, getToolOutput } = libReq
 const { safeParseJSON } = libRequire(path.join('utils', 'safe-json.cjs'));
 const { atomicWriteJSONSync } = libRequire(path.join('utils', 'atomic-write.cjs'));
 const { appendJsonl } = libRequire(path.join('utils', 'jsonl-utils.cjs'));
+const { trackAgentUsage, estimateTokens } = libRequire(
+  path.join('utils', 'token-budget-tracker.cjs')
+);
 
 // Import monitoring modules (library-style, not CLI wrappers)
 const metricsCollector = require(
@@ -545,6 +548,20 @@ async function main() {
     const hookInput = await parseHookInputAsync();
     if (!hookInput) {
       process.exit(0);
+    }
+
+    // Persist tool I/O tokens to the budget tracker
+    try {
+      const sessionId = hookInput.session_id || process.env.CLAUDE_SESSION_ID || 'unknown';
+      const output = getToolOutput(hookInput);
+      const outputStr = typeof output === 'string' ? output : JSON.stringify(output || '');
+      const toolInput = getToolInput(hookInput) || {};
+      const inputStr = JSON.stringify(toolInput);
+
+      const inputT = estimateTokens(inputStr).tokens;
+      trackAgentUsage(sessionId, { inputTokens: inputT, toolResults: outputStr });
+    } catch (_err) {
+      // Best-effort token tracking
     }
 
     // Run all checks (all are best-effort, never block)

@@ -1126,7 +1126,7 @@ describe('routing-guard', () => {
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block', // Enable blocking
-          // Point to our test runtime directory
+          ROUTER_STATE_FILE: stateFile, // Point to our test runtime directory
         },
         cwd: PROJECT_ROOT,
       });
@@ -1162,6 +1162,7 @@ describe('routing-guard', () => {
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
+          ROUTER_STATE_FILE: stateFile,
         },
         cwd: PROJECT_ROOT,
       });
@@ -1188,6 +1189,7 @@ describe('routing-guard', () => {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
           ROUTER_WRITE_GUARD: 'block',
+          ROUTER_STATE_FILE: stateFile,
         },
         cwd: PROJECT_ROOT,
       });
@@ -1214,6 +1216,7 @@ describe('routing-guard', () => {
           ...process.env,
           ROUTER_SELF_CHECK: 'off', // Enforcement disabled
           TASKLIST_FIRST_ENFORCEMENT: 'off',
+          ROUTER_STATE_FILE: stateFile,
         },
         cwd: PROJECT_ROOT,
       });
@@ -1238,6 +1241,7 @@ describe('routing-guard', () => {
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
+          ROUTER_STATE_FILE: stateFile,
         },
         cwd: PROJECT_ROOT,
       });
@@ -1267,6 +1271,7 @@ describe('routing-guard', () => {
         env: {
           ...process.env,
           ROUTER_SELF_CHECK: 'block',
+          ROUTER_STATE_FILE: stateFile,
         },
         cwd: PROJECT_ROOT,
       });
@@ -1303,6 +1308,7 @@ describe('routing-guard', () => {
             ...process.env,
             ROUTER_SELF_CHECK: 'block',
             ROUTER_WRITE_GUARD: 'block',
+            ROUTER_STATE_FILE: stateFile,
           },
           cwd: PROJECT_ROOT,
         });

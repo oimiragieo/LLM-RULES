@@ -666,17 +666,6 @@ function main() {
     fs.mkdirSync(CONFIG_DIR, { recursive: true });
   }
 
-  // Sync agent-skill-matrix.json to .claude/config/ for callers that expect it there (debug-log-fix 5.4/6.2)
-  const LEGACY_AGENT_SKILL_MATRIX_PATH = path.join(CONFIG_DIR, 'agent-skill-matrix.json');
-  if (fs.existsSync(AGENT_SKILL_MATRIX_PATH)) {
-    try {
-      const raw = fs.readFileSync(AGENT_SKILL_MATRIX_PATH, 'utf8');
-      fs.writeFileSync(LEGACY_AGENT_SKILL_MATRIX_PATH, raw, 'utf8');
-    } catch (err) {
-      console.warn(`Warning: Could not sync agent-skill-matrix to .claude/config: ${err.message}`);
-    }
-  }
-
   // Write index
   fs.writeFileSync(INDEX_PATH, JSON.stringify(index, null, 2));
 

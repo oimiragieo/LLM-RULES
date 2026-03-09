@@ -18,9 +18,35 @@ const TOKEN_LOG_PATH = path.join(PROJECT_ROOT, '.claude/context/token-usage.json
 const CHAR_TO_TOKEN_RATIO = 0.75; // 1 char ≈ 0.75 tokens (estimate)
 const DEFAULT_BUDGET = 200000; // Per model (haiku/sonnet/opus all same for simplicity)
 
-// In-memory storage for agent token usage
-// Structure: { agentId: { totalTokens: number, budget: number } }
-const agentUsageMap = new Map();
+// Persistent storage path
+const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude/context/runtime');
+const BUDGET_STATE_PATH = path.join(RUNTIME_DIR, 'budget-tracker.json');
+
+// Helper to load state
+function loadState() {
+  try {
+    if (fs.existsSync(BUDGET_STATE_PATH)) {
+      return JSON.parse(fs.readFileSync(BUDGET_STATE_PATH, 'utf8'));
+    }
+  } catch (_err) {
+    // Ignore load errors, return empty
+  }
+  return {};
+}
+
+// Helper to save state atomically
+function saveState(state) {
+  try {
+    if (!fs.existsSync(RUNTIME_DIR)) {
+      fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+    }
+    const tmp = BUDGET_STATE_PATH + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(state, null, 2), 'utf8');
+    fs.renameSync(tmp, BUDGET_STATE_PATH);
+  } catch (_err) {
+    // Best effort saving
+  }
+}
 
 /**
  * Estimate tokens from content length
@@ -55,15 +81,17 @@ function trackAgentUsage(agentId, usage) {
   // Calculate total tokens for this usage
   const usageTokens = inputTokens + outputTokens + toolTokensEstimate;
 
+  const state = loadState();
+
   // Get or initialize agent usage
-  if (!agentUsageMap.has(agentId)) {
-    agentUsageMap.set(agentId, {
+  if (!state[agentId]) {
+    state[agentId] = {
       totalTokens: 0,
       budget: DEFAULT_BUDGET,
-    });
+    };
   }
 
-  const agentData = agentUsageMap.get(agentId);
+  const agentData = state[agentId];
 
   // Update cumulative total
   agentData.totalTokens += usageTokens;
@@ -79,6 +107,9 @@ function trackAgentUsage(agentId, usage) {
   } else if (percentUsed >= 80) {
     status = 'WARNING';
   }
+
+  // Save changes
+  saveState(state);
 
   return {
     agentId,
@@ -97,7 +128,8 @@ function trackAgentUsage(agentId, usage) {
  * @returns {{ used: number, budget: number, remaining: number, percentUsed: number, status: string }}
  */
 function checkBudgetStatus(agentId) {
-  if (!agentUsageMap.has(agentId)) {
+  const state = loadState();
+  if (!state[agentId]) {
     return {
       used: 0,
       budget: DEFAULT_BUDGET,
@@ -107,7 +139,7 @@ function checkBudgetStatus(agentId) {
     };
   }
 
-  const agentData = agentUsageMap.get(agentId);
+  const agentData = state[agentId];
   const remaining = agentData.budget - agentData.totalTokens;
   const percentUsed = (agentData.totalTokens / agentData.budget) * 100;
 

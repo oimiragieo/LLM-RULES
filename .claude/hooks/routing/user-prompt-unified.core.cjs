@@ -45,7 +45,7 @@ const { getAgentForCapability: getAgentForCapability } = libRequire(
   path.join('routing', 'agent-registry-resolver.cjs')
 );
 const semanticRouter = libRequire(path.join('routing', 'semantic-router.cjs'));
-const { estimateTokens: estimateTokens } = libRequire(
+const { estimateTokens: estimateTokens, trackAgentUsage: trackAgentUsage } = libRequire(
   path.join('utils', 'token-budget-tracker.cjs')
 );
 const { checkCompressionNeeded: checkCompressionNeeded, triggerCompression: triggerCompression } =
@@ -563,21 +563,24 @@ function checkTokenMonitoring(hookInput) {
   const breachWindowMs = Number(tokenMonitoring.breach_window_ms || 10 * 60 * 1e3);
   const downgradeAfterBreaches = Number(tokenMonitoring.downgrade_after_breaches || 3);
   const sessionId = process.env.CLAUDE_SESSION_ID || 'unknown';
+
+  const usageStats = trackAgentUsage(sessionId, { inputTokens: estimate.tokens });
+  const totalTokens = usageStats.totalTokens || estimate.tokens;
+
   const result = {
     enabled: true,
-    promptTokens: estimate.tokens,
+    promptTokens: totalTokens,
     prompt: prompt,
     maxTokens: maxTokens,
     hardLimit: hardLimit,
     sessionId: sessionId,
-    percentUsed:
-      maxTokens > 0 ? Number((((estimate.tokens || 0) / maxTokens) * 100).toFixed(2)) : 0,
+    percentUsed: maxTokens > 0 ? Number(((totalTokens / maxTokens) * 100).toFixed(2)) : 0,
     status: 'ok',
     downgraded: false,
     breachCount: 0,
   };
-  const usageRatio = maxTokens > 0 ? estimate.tokens / maxTokens : 0;
-  if (hardLimit && estimate.tokens >= hardLimit) {
+  const usageRatio = maxTokens > 0 ? totalTokens / maxTokens : 0;
+  if (hardLimit && totalTokens >= hardLimit) {
     result.status = 'hard_limit_exceeded';
   } else if (maxTokens && usageRatio >= criticalRatio) {
     result.status = 'critical';
@@ -626,14 +629,14 @@ function checkTokenMonitoring(hookInput) {
     state.sessions[sessionId] = { breachCount: 0, lastBreachAt: 0, downgradedUntil: 0 };
     writeTokenSloState(state);
   }
-  if (maxTokens && estimate.tokens >= maxTokens) {
+  if (maxTokens && totalTokens >= maxTokens) {
     console.warn(
-      `[user-prompt-unified] Token monitoring: prompt estimate ${estimate.tokens} exceeds max_session_tokens (${maxTokens}).`
+      `[user-prompt-unified] Token monitoring: cumulative tokens ${totalTokens} exceeds max_session_tokens (${maxTokens}).`
     );
   }
-  if (hardLimit && estimate.tokens >= hardLimit) {
+  if (hardLimit && totalTokens >= hardLimit) {
     console.warn(
-      `[user-prompt-unified] Token monitoring: prompt estimate ${estimate.tokens} exceeds hard_limit (${hardLimit}).`
+      `[user-prompt-unified] Token monitoring: cumulative tokens ${totalTokens} exceeds hard_limit (${hardLimit}).`
     );
     try {
       eventBus.emit(EventTypes.TOOL_FAILED, {

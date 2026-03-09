@@ -289,6 +289,27 @@ export default [
     },
   },
 
+  // Claude Code agent-runtime scripts - use native Claude Code tool globals
+  // (CronList, CronCreate, CronDelete, TaskUpdate, etc. are injected by the Claude Code runtime)
+  {
+    files: [
+      '.claude/context/runtime/**/*.cjs',
+      '.claude/tools/cli/heartbeat-orchestrator-register.cjs',
+      '.claude/tools/cron-runner/**/*.cjs',
+    ],
+    languageOptions: {
+      globals: {
+        CronList: 'readonly',
+        CronCreate: 'readonly',
+        CronDelete: 'readonly',
+        TaskUpdate: 'readonly',
+        TaskCreate: 'readonly',
+        TaskList: 'readonly',
+        TaskGet: 'readonly',
+      },
+    },
+  },
+
   // Advanced elicitation tests - allow method variable for destructuring
   {
     files: ['.claude/skills/advanced-elicitation/**/*.{js,mjs,cjs}'],

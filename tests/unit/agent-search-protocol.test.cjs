@@ -19,7 +19,6 @@ const CODE_FOCUSED_AGENTS = [
   'security-architect',
   'devops',
   'devops-troubleshooter',
-  'researcher',
   'database-architect',
   'incident-responder',
   'python-pro',
@@ -41,11 +40,8 @@ const CODE_FOCUSED_AGENTS = [
   'web3-blockchain-expert',
   'gamedev-pro',
   'data-engineer',
-  'scientific-research-expert',
   'fastapi-pro',
   'mcp-developer',
-  'llm-architect',
-  'microservices-architect',
   'advanced-debugging',
   'penetration-tester',
   'performance-engineer',
@@ -53,7 +49,6 @@ const CODE_FOCUSED_AGENTS = [
   'sre-engineer',
   'chaos-engineer',
   'accessibility-tester',
-  'prompt-engineer',
   'api-designer',
 ];
 
@@ -183,7 +178,7 @@ describe('Agent Search Protocol — Frontmatter Skills', () => {
 describe('Agent-Skill Matrix Consistency', () => {
   let matrix;
   before(() => {
-    matrix = loadJSON('.claude/config/agent-skill-matrix.json');
+    matrix = loadJSON('.claude/context/config/agent-skill-matrix.json');
   });
 
   it('matrix always-skills are superset of search skills for code agents', () => {
