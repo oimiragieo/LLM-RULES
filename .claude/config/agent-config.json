@@ -1262,7 +1262,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "'sonnet'"
+      "model": "claude-sonnet-4-5"
     },
     "brand-guardian": {
       "tools": [
@@ -1281,7 +1281,7 @@
         "WebSearch",
         "Write"
       ],
-      "model": "'sonnet'"
+      "model": "claude-sonnet-4-5"
     },
     "compliance-checker": {
       "tools": [
