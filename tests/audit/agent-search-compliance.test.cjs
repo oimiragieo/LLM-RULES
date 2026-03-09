@@ -68,8 +68,36 @@ const BASELINE_SKILLS = [
 // Agents explicitly excluded from search skill requirements
 const EXCLUDED_AGENTS = ['router'];
 
-// Agents with intentionally empty "always" arrays in the matrix
-const MATRIX_NO_ALWAYS = ['router', 'reflection-agent'];
+// Agents with intentionally empty "always" arrays in the matrix,
+// OR agents that follow the nuanced search policy (P2 non-code / P3 orchestrators)
+// that intentionally exclude code-semantic-search and code-structural-search.
+// These are checked by tests/agents/agent-search-tool-compliance.test.cjs instead.
+const MATRIX_NO_ALWAYS = [
+  'router',
+  'reflection-agent',
+  // P2 Domain Non-Code (ripgrep + token-saver only, no code-semantic/structural)
+  'mobile-ux-reviewer',
+  'scientific-research-expert',
+  'multi-llm-consultant',
+  'medical-research-triage',
+  'pm-coordinator',
+  'kubernetes-specialist',
+  'llm-architect',
+  'microservices-architect',
+  'prompt-engineer',
+  // P2 Specialized Non-Code
+  'c4-context',
+  'c4-container',
+  'c4-component',
+  'c4-code',
+  'researcher',
+  // P3 Orchestrators (ripgrep only, no code-semantic/structural/token-saver)
+  'master-orchestrator',
+  'swarm-coordinator',
+  'evolution-orchestrator',
+  'party-orchestrator',
+  'artifact-integrator',
+];
 
 const agentIds = Object.keys(registry.agents);
 const nonRouterAgents = agentIds.filter(id => !EXCLUDED_AGENTS.includes(id));

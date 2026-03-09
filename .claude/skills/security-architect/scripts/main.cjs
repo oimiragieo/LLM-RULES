@@ -144,6 +144,7 @@ function runScan(opts = {}) {
       cwd,
       encoding: 'utf8',
       maxBuffer: 20 * 1024 * 1024, // 20 MB
+      windowsHide: true,
     });
 
     if (result.error) {

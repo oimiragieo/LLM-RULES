@@ -16,6 +16,7 @@ const REGISTRY_PATH = path.join(ROOT, '.claude', 'context', 'agent-registry.json
 const EXEMPT_AGENTS = new Set(['router', 'reflection-agent']);
 
 // Non-code agents exempt from code-semantic-search and code-structural-search
+// P2 Domain Non-Code + P2 Specialized Non-Code follow the nuanced search policy
 const NON_CODE_AGENTS = new Set([
   'router',
   'reflection-agent',
@@ -24,7 +25,22 @@ const NON_CODE_AGENTS = new Set([
   'marketing-strategist',
   'feedback-synthesizer',
   'compliance-checker',
+  // P2 Domain Non-Code
   'mobile-ux-reviewer',
+  'scientific-research-expert',
+  'multi-llm-consultant',
+  'medical-research-triage',
+  'pm-coordinator',
+  'kubernetes-specialist',
+  'llm-architect',
+  'microservices-architect',
+  'prompt-engineer',
+  // P2 Specialized Non-Code
+  'c4-context',
+  'c4-container',
+  'c4-component',
+  'c4-code',
+  'researcher',
 ]);
 
 // Orchestrators exempt from memory-search and token-saver-context-compression

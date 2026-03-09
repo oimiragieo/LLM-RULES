@@ -73,6 +73,7 @@ function findProjectRoot(cwd = process.cwd()) {
  */
 function getActiveWorktreeCount(projectRoot, cwd = process.cwd()) {
   try {
+    if (projectRoot === null) return 0;
     const root = projectRoot || findProjectRoot(cwd);
     if (!root) return 0;
     // Reconstruct OS-native path from forward-slash normalized root

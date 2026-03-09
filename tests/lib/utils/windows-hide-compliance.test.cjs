@@ -19,7 +19,7 @@ describe('windowsHide compliance', () => {
     const files = await new Glob('**/*.{cjs,mjs,js}', {
       cwd: claudeDir,
       absolute: true,
-      ignore: ['**/node_modules/**', '**/_archive/**', '**/tmp/**'],
+      ignore: ['**/node_modules/**', '**/_archive/**', '**/tmp/**', '**/worktrees/**'],
     }).walk();
 
     const violations = [];
