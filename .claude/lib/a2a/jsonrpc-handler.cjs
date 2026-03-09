@@ -62,12 +62,15 @@ function validateRequest(body) {
   if (typeof body.method !== 'string' || !body.method) {
     return err(body.id ?? null, ERR_INVALID_REQUEST, 'Method must be a non-empty string');
   }
-  // id must be present and be string, number, or null
+  // Per JSON-RPC 2.0: omitted id means notification (fire-and-forget) — always valid.
+  // Present id must be string, number, or null.
   if (
-    body.id === undefined ||
-    (body.id !== null && typeof body.id !== 'string' && typeof body.id !== 'number')
+    body.id !== undefined &&
+    body.id !== null &&
+    typeof body.id !== 'string' &&
+    typeof body.id !== 'number'
   ) {
-    return err(null, ERR_INVALID_REQUEST, 'Invalid or missing id');
+    return err(null, ERR_INVALID_REQUEST, 'Invalid id type');
   }
   return null;
 }
@@ -90,6 +93,7 @@ function createJsonRpcHandler(stateMachine, _sseStreams) {
     }
 
     const { method, id, params = {} } = body;
+    const isNotification = id === undefined;
 
     try {
       switch (method) {
@@ -97,6 +101,7 @@ function createJsonRpcHandler(stateMachine, _sseStreams) {
           const task = stateMachine.createTask(params);
           stateMachine.transition(task.id, 'working');
           const updated = stateMachine.getTask(task.id);
+          if (isNotification) return res.status(204).end();
           return res.json(ok(id, updated));
         }
 
@@ -143,10 +148,12 @@ function createJsonRpcHandler(stateMachine, _sseStreams) {
         }
 
         default: {
+          if (isNotification) return res.status(204).end();
           return res.status(404).json(err(id, ERR_METHOD_NOT_FOUND, `Method not found: ${method}`));
         }
       }
     } catch (e) {
+      if (isNotification) return res.status(204).end();
       return res.status(500).json(err(id, -32603, `Internal error: ${e.message}`));
     }
   };

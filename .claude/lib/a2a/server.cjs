@@ -28,6 +28,7 @@ const {
 } = require('./jsonrpc-handler.cjs');
 const { getAgentCardRouter } = require('./agent-card.cjs');
 const { enqueueMessage } = require('../db/queue-operations.cjs');
+const { emitNewMessage } = require('../workers/dispatcher.cjs');
 
 const JSON_RPC_VERSION = '2.0';
 
@@ -95,13 +96,20 @@ function createA2aServer({ port = 3100, db, pool } = {}) {
     const params = body.params || {};
     const task = stateMachine.createTask(params);
 
-    // If db and pool are provided, enqueue the task params for async worker processing
+    // If db and pool are provided, enqueue the task params for async worker processing.
+    // Do this BEFORE opening the SSE stream so we can fail cleanly if enqueue fails.
     if (db && pool) {
       try {
         enqueueMessage(db, { chatId: 'a2a', userId: 'a2a', text: JSON.stringify(params) });
+        // Wake the dispatcher immediately; without this the pool polls every 15 seconds
+        emitNewMessage(task.id);
       } catch (_enqErr) {
-        // Non-fatal: queue integration failure should not break SSE response
         process.stderr.write(`[A2A] enqueueMessage error: ${_enqErr.message}\n`);
+        return res.status(500).json({
+          jsonrpc: JSON_RPC_VERSION,
+          id: body.id ?? null,
+          error: { code: -32603, message: `Failed to queue task: ${_enqErr.message}` },
+        });
       }
     }
 

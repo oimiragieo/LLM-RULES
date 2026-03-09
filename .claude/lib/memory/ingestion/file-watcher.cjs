@@ -34,8 +34,9 @@ function shouldIgnore(filePath) {
 /**
  * Starts watching the specified directory.
  * @param {string} rootDir
+ * @param {import('better-sqlite3').Database} db - SQLite db instance for enqueue
  */
-function startWatcher(rootDir = process.cwd()) {
+function startWatcher(rootDir = process.cwd(), db) {
   console.log(`[Memory] Starting recursive file watcher on: ${rootDir}`);
 
   try {
@@ -55,12 +56,22 @@ function startWatcher(rootDir = process.cwd()) {
         if (now - lastSeen > DEBOUNCE_MS) {
           debounceMap.set(fullPath, now);
 
-          enqueueMessage({
-            type: 'FILE_INGEST',
-            payload: { filePath: fullPath, eventType },
-          }).catch(dbErr => {
+          if (!db) {
+            console.warn('[Memory] file-watcher: no db provided, skipping enqueue');
+            return;
+          }
+          try {
+            enqueueMessage(db, {
+              chatId: 'file-watcher',
+              userId: 'file-watcher',
+              text: JSON.stringify({
+                type: 'FILE_INGEST',
+                payload: { filePath: fullPath, eventType },
+              }),
+            });
+          } catch (dbErr) {
             console.error(`[Memory] Failed to enqueue file event: ${dbErr.message}`);
-          });
+          }
         }
       });
     });

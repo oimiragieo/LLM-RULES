@@ -140,10 +140,20 @@ describe('JSON-RPC handler', () => {
       assert.equal(res.body.error.code, -32600);
     });
 
-    it('returns -32600 when id is missing', async () => {
+    it('treats missing id as JSON-RPC 2.0 notification and returns 204', async () => {
+      // Per JSON-RPC 2.0 spec: omitted id = notification (fire-and-forget).
+      // Notifications must be processed but return no response body.
+      await request(app)
+        .post('/a2a')
+        .send({ jsonrpc: '2.0', method: 'tasks/send', params: {} })
+        .expect(204);
+    });
+
+    it('returns -32600 when id has an invalid type', async () => {
+      // Present id with invalid type (object) must still be rejected
       const res = await request(app)
         .post('/a2a')
-        .send({ jsonrpc: '2.0', method: 'tasks/send' })
+        .send({ jsonrpc: '2.0', id: { bad: true }, method: 'tasks/send' })
         .expect(400);
 
       assert.equal(res.body.error.code, -32600);
