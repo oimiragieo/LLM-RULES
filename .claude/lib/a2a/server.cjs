@@ -21,8 +21,13 @@
 const express = require('express');
 const { TaskStateMachine } = require('./task-state-machine.cjs');
 const { SseStream } = require('./sse-stream.cjs');
-const { createJsonRpcHandler, ERR_INVALID_REQUEST, ERR_TASK_NOT_FOUND } = require('./jsonrpc-handler.cjs');
+const {
+  createJsonRpcHandler,
+  ERR_INVALID_REQUEST,
+  ERR_TASK_NOT_FOUND,
+} = require('./jsonrpc-handler.cjs');
 const { getAgentCardRouter } = require('./agent-card.cjs');
+const { enqueueMessage } = require('../db/queue-operations.cjs');
 
 const JSON_RPC_VERSION = '2.0';
 
@@ -31,10 +36,11 @@ const JSON_RPC_VERSION = '2.0';
  *
  * @param {object} [options]
  * @param {number} [options.port=3100]
- * @param {object} [options.db] - SQLite db instance (unused in P3; reserved for P4)
+ * @param {object} [options.db] - SQLite db instance (optional; enables queue integration when provided)
+ * @param {object} [options.pool] - WorkerPool instance (optional; used alongside db)
  * @returns {{ app: import('express').Application, start: () => void, stop: () => Promise<void> }}
  */
-function createA2aServer({ port = 3100, db: _db } = {}) {
+function createA2aServer({ port = 3100, db, pool } = {}) {
   const app = express();
 
   // Shared state
@@ -86,7 +92,18 @@ function createA2aServer({ port = 3100, db: _db } = {}) {
     }
 
     // Create task and open SSE stream
-    const task = stateMachine.createTask(body.params || {});
+    const params = body.params || {};
+    const task = stateMachine.createTask(params);
+
+    // If db and pool are provided, enqueue the task params for async worker processing
+    if (db && pool) {
+      try {
+        enqueueMessage(db, { chatId: 'a2a', userId: 'a2a', text: JSON.stringify(params) });
+      } catch (_enqErr) {
+        // Non-fatal: queue integration failure should not break SSE response
+        process.stderr.write(`[A2A] enqueueMessage error: ${_enqErr.message}\n`);
+      }
+    }
 
     // Set up SSE stream before transitioning so the first event is captured
     const stream = new SseStream(res);
@@ -139,7 +156,7 @@ function createA2aServer({ port = 3100, db: _db } = {}) {
 
   function start() {
     return new Promise((resolve, reject) => {
-      _server = app.listen(port, (err) => {
+      _server = app.listen(port, err => {
         if (err) return reject(err);
         resolve(_server);
       });
@@ -154,7 +171,7 @@ function createA2aServer({ port = 3100, db: _db } = {}) {
         stream.close();
         sseStreams.delete(taskId);
       }
-      _server.close((err) => {
+      _server.close(err => {
         _server = null;
         if (err) return reject(err);
         resolve();
