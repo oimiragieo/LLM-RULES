@@ -115,6 +115,7 @@ export default [
       '.claude/worktrees/**', // Isolated worktree directories
       '.claude/context/tmp/**', // Temporary scripts, not production code
       '.claude/skills/reddit-researcher/**', // Untracked in-progress skill (not yet committed)
+      '**/*.ts', // TypeScript files — no TS parser configured; these are doc/example files only
       'rename_agent.cjs', // Untracked in-progress utility script
       'revert_rename.cjs', // Untracked in-progress utility script
       'update_frequencies.cjs', // Untracked in-progress utility script

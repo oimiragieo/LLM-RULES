@@ -12,6 +12,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const REGISTRY_PATH = path.join(__dirname, '..', '..', 'context', 'agent-registry.json');
 
@@ -23,8 +24,9 @@ const REGISTRY_PATH = path.join(__dirname, '..', '..', 'context', 'agent-registr
 function loadRegistry() {
   try {
     const raw = fs.readFileSync(REGISTRY_PATH, 'utf8');
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed.agents === 'object' ? parsed : { agents: {} };
+    const { success, data } = safeParseJSON(raw, {});
+    if (!success || typeof data.agents !== 'object') return { agents: {} };
+    return data;
   } catch {
     return { agents: {} };
   }
