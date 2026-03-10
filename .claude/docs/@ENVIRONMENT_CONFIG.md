@@ -48,25 +48,27 @@ All environment-specific settings are managed through the `.env` file located at
 
 ### Enforcement Mode Variables
 
-| Variable                         | Values         | Default | Purpose                                                                    |
-| -------------------------------- | -------------- | ------- | -------------------------------------------------------------------------- |
-| `PLANNER_FIRST_ENFORCEMENT`      | block/warn/off | block   | Enforce planner-first routing                                              |
-| `CREATOR_GUARD`                  | block/warn/off | block   | Enforce creator workflow (Gate 4)                                          |
-| `SPAWN_PROMPT_VALIDATOR`         | block/warn/off | warn    | Validate spawn prompts                                                     |
-| `CONFIG_MODEL_VALIDATOR`         | block/warn/off | block   | Enforce spawn model matches configured model                               |
-| `ROUTER_WRITE_GUARD`             | block/warn/off | block   | Block router writes                                                        |
-| `SECURITY_REVIEW_ENFORCEMENT`    | block/warn/off | block   | Enforce security reviews                                                   |
-| `TASK_COMPLETION_GUARD`          | block/warn/off | block   | Block completion-like Task output without matching TaskUpdate(completed)   |
-| `RESEARCH_ENFORCEMENT`           | block/warn/off | block   | Enforce research before creation                                           |
-| `REFLECTION_STEP0_ENFORCEMENT`   | block/warn/off | block   | Enforce reflection Step 0 guard                                            |
-| `TASKLIST_FIRST_ENFORCEMENT`     | block/warn/off | block   | Enforce TaskList() before Task()                                           |
-| `ROUTER_BASH_GUARD`              | block/warn/off | block   | Block non-whitelisted Router Bash commands                                 |
-| `SPECIALIST_ROUTING_ENFORCEMENT` | block/warn/off | block   | Enforce specialist-first routing (developer is last resort)                |
-| `INTENT_AGENT_MATCH`             | block/warn/off | block   | Block Task spawns with agent/intent mismatch                               |
-| `TASKUPDATE_FIRST_ENFORCEMENT`   | block/warn/off | block   | Require explicit `TaskUpdate(in_progress)` before other subagent tools     |
-| `TASKUPDATE_FIRST_AUTOMARK`      | true/false     | false   | Auto-mark in-progress when TaskUpdate is missing (legacy fallback)         |
-| `TASKUPDATE_FIRST_BOOTSTRAP`     | true/false     | false   | Allow router-state bootstrap to satisfy TaskUpdate-first (legacy fallback) |
-| `STATE_STALE_THRESHOLD_MS`       | number         | 600000  | State staleness threshold in ms (10 minutes)                               |
+| Variable                         | Values         | Default | Purpose                                                                                                            |
+| -------------------------------- | -------------- | ------- | ------------------------------------------------------------------------------------------------------------------ |
+| `PLANNER_FIRST_ENFORCEMENT`      | block/warn/off | block   | Enforce planner-first routing                                                                                      |
+| `CREATOR_GUARD`                  | block/warn/off | block   | Enforce creator workflow (Gate 4)                                                                                  |
+| `SPAWN_PROMPT_VALIDATOR`         | block/warn/off | warn    | Validate spawn prompts                                                                                             |
+| `CONFIG_MODEL_VALIDATOR`         | block/warn/off | block   | Enforce spawn model matches configured model                                                                       |
+| `ROUTER_WRITE_GUARD`             | block/warn/off | block   | Block router writes                                                                                                |
+| `SECURITY_REVIEW_ENFORCEMENT`    | block/warn/off | block   | Enforce security reviews                                                                                           |
+| `TASK_COMPLETION_GUARD`          | block/warn/off | block   | Block completion-like Task output without matching TaskUpdate(completed)                                           |
+| `RESEARCH_ENFORCEMENT`           | block/warn/off | block   | Enforce research before creation                                                                                   |
+| `REFLECTION_STEP0_ENFORCEMENT`   | block/warn/off | block   | Enforce reflection Step 0 guard                                                                                    |
+| `TASKLIST_FIRST_ENFORCEMENT`     | block/warn/off | block   | Enforce TaskList() before Task()                                                                                   |
+| `ROUTER_BASH_GUARD`              | block/warn/off | block   | Block non-whitelisted Router Bash commands                                                                         |
+| `SPECIALIST_ROUTING_ENFORCEMENT` | block/warn/off | block   | Enforce specialist-first routing (developer is last resort)                                                        |
+| `INTENT_AGENT_MATCH`             | block/warn/off | block   | Block Task spawns with agent/intent mismatch                                                                       |
+| `TASKUPDATE_FIRST_ENFORCEMENT`   | block/warn/off | block   | Require explicit `TaskUpdate(in_progress)` before other subagent tools                                             |
+| `TASKUPDATE_FIRST_AUTOMARK`      | true/false     | false   | Auto-mark in-progress when TaskUpdate is missing (legacy fallback)                                                 |
+| `TASKUPDATE_FIRST_BOOTSTRAP`     | true/false     | false   | Allow router-state bootstrap to satisfy TaskUpdate-first (legacy fallback)                                         |
+| `STATE_STALE_THRESHOLD_MS`       | number         | 600000  | State staleness threshold in ms (10 minutes)                                                                       |
+| `STALE_TASK_AUTO_QUEUE`          | on/off         | on      | Enable stale-task-detector queue writes to `stale-tasks.json`; when off, Step 0.4 is a no-op                       |
+| `SPAWN_SAFETY_PREAMBLE`          | on/off         | on      | Append `FORBIDDEN COMMANDS` safety suffix to spawn prompts via `prompt-assembler.cjs`; when off, suffix is omitted |
 
 **Enforcement Modes:**
 

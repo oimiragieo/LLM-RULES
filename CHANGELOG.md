@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security — Prompt Safety System (2026-03-10)
+
+- **Gate 4 pre-flight checklist (Patch 1)**: CLAUDE.md "BEFORE YOU TYPE" section expanded with explicit Gate 4 pre-flight checklist covering modification and restoration verbs, not just net-new creation. Eliminates rationalizations like "just restoring" or "small fix" that previously bypassed creator workflow enforcement (`ee1e0a12`).
+- **`prompt-assembler.cjs` safety suffix injection (Patch 3)**: `prompt-assembler.cjs` now appends a `FORBIDDEN COMMANDS` block to every assembled spawn prompt. Lists high-risk bash patterns that agents must never execute without explicit user confirmation. Kill switch: `SPAWN_SAFETY_PREAMBLE=off` (`ee1e0a12`).
+- **Forbidden bash patterns in spawn templates (Patch 2)**: Added forbidden bash pattern block to `universal-agent-spawn.md` — applies to all standard agent spawns (`6e964d15`).
+- **Forbidden bash patterns in subordinate template (Patch 4)**: Same forbidden bash pattern block added to `subordinate-once.md` — ensures one-shot agents apply the same safety constraints (`6e964d15`).
+
+### Added — Stale-Task Auto-Close / Durable Execution Fix 2 (2026-03-10)
+
+- **`stale-task-detector.cjs` queue writes**: Stale tasks now write to `.claude/context/runtime/stale-tasks.json` queue instead of relying on in-session polling alone. Queue persists across context resets so ghost tasks from crashed sessions are closed on the next Router prompt (`a7e92f1a`).
+- **CLAUDE.md Step 0.4 pre-flight**: Router pre-flight sequence now includes Step 0.4 — reads `stale-tasks.json`, calls `TaskUpdate(completed)` for each entry with `auto-closed: stale` summary, then deletes the file. Ensures the drain gate is always clearable after session interruptions (`a7e92f1a`).
+- **Four code-quality fixes (Codex review)**: PID-tmp race condition, dedup gap, kill switch robustness, and silent catch block fixed in `stale-task-detector.cjs` before merge (`a7e92f1a`).
+- **`@ROUTER_OPERATIONS.md` Step 0.4 section**: New reference section documenting trigger conditions, queue behavior, kill switch (`STALE_TASK_AUTO_QUEUE`), and drain-gate rationale.
+
+### Fixed — Config and Hardening (2026-03-10)
+
+- **`token-budget-tracker.cjs` JSON safety**: Replaced raw `JSON.parse` calls with `safeParseJSON` from `.claude/lib/utils/safe-json.cjs`. Renamed unused `err` catch-block parameters to `_err` to satisfy ESLint `no-unused-vars` (`e8d6c9fb`).
+- **`agent-config.json` malformed model strings**: Fixed `aso-specialist` and `brand-guardian` model values from `"'sonnet'"` (double-quoted with embedded single quotes) to `"claude-sonnet-4-5"` (`d3d2cefc`).
+- **Module-size baseline updated**: `validate:full` now exits 0. `unified-reflection-events.cjs` (533 lines) and `bash-command-validator.cjs` (515 lines) accepted as pre-existing oversized modules; baseline updated so CI does not flag them as new violations (`80a910a0`).
+
+---
+
 ### Added — Cron-Runner Subprocess Architecture (Phase 0 & 1) (2026-03-09)
 
 - **Script-First Cron Optimization (Phase 0)**: Refactored `telegram-poll.cjs`, `reflection-check.cjs`, and `evolution-check.cjs` to append tasks directly to a durable `.claude/context/runtime/cron-actions-queue.jsonl` queue rather than returning stringified `CLAUDE_ACTIONS` payloads. This eliminates massive context bloat within the main LLM session.

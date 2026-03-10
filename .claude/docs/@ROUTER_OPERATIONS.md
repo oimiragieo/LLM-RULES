@@ -169,6 +169,20 @@ Do not claim root cause until trace evidence and debug-log evidence agree.
 
 ---
 
+## Step 0.4: Stale-Task Auto-Close (Durable Execution Fix 2)
+
+**Trigger:** File `.claude/context/runtime/stale-tasks.json` exists with one or more entries.
+
+**Action:** For each entry in the file, call `TaskUpdate({ taskId, status: "completed", metadata: { summary: "auto-closed: stale >{ageMin}min, no TaskUpdate(completed) received" } })`, then delete the file. Log each closure to `session-gap-log.jsonl`.
+
+**How entries get there:** `stale-task-detector.cjs` monitors in-progress tasks. When a task exceeds the staleness threshold with no `TaskUpdate(completed)` received, the detector writes an entry to `stale-tasks.json`. This queue persists across context resets so ghost tasks from a crashed session are closed on the next Router prompt.
+
+**Kill switch:** Set `STALE_TASK_AUTO_QUEUE=off` to disable the detector queue write. When off, stale tasks are still detected but no queue entry is written; Step 0.4 becomes a no-op.
+
+**Why non-negotiable:** Ghost tasks (in-progress tasks from crashed agents) block the drain gate — Router cannot claim pipeline complete while tasks remain in-progress. Step 0.4 ensures the drain gate is always clearable even after session interruptions.
+
+---
+
 ## RELATED REFERENCES
 
 - **@ENFORCEMENT_HOOKS.md** - Hook enforcement details
