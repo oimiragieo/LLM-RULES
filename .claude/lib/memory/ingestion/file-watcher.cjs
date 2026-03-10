@@ -17,6 +17,27 @@ const { enqueueMessage } = require('../../db/queue-operations.cjs');
 const debounceMap = new Map();
 const DEBOUNCE_MS = 2000;
 
+// Periodic cleanup for debounceMap entries to prevent unbounded memory growth.
+// Entries older than DEBOUNCE_MS * 10 are considered stale and safe to remove.
+// Uses .unref() so the interval does not prevent the process from exiting.
+const DEBOUNCE_CLEANUP_MULTIPLIER = 10;
+setInterval(
+  () => {
+    const staleThreshold = Date.now() - DEBOUNCE_MS * DEBOUNCE_CLEANUP_MULTIPLIER;
+    for (const [key, timestamp] of debounceMap) {
+      if (timestamp < staleThreshold) {
+        debounceMap.delete(key);
+      }
+    }
+  },
+  10 * 60 * 1000 /* 10 minutes */
+).unref();
+
+// Clean up debounceMap on process exit to release memory
+process.on('exit', () => {
+  debounceMap.clear();
+});
+
 // Directories to purely ignore
 const IGNORED_DIRS = new Set(['.git', 'node_modules', '.tmp', '.claude/debug']);
 

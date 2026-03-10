@@ -19,6 +19,10 @@
 
 const crypto = require('crypto');
 
+// Zombie task watchdog: transitions tasks stuck in active states for too long
+const ZOMBIE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+const ZOMBIE_CHECK_INTERVAL_MS = 5 * 60 * 1000; // check every 5 minutes
+
 // Valid state transitions: key = from-state, value = set of allowed to-states
 const VALID_TRANSITIONS = {
   submitted: new Set(['working', 'canceled']),
@@ -45,6 +49,51 @@ class TaskStateMachine {
 
     if (this._db) {
       this._restoreFromDb();
+    }
+
+    this._startZombieWatchdog();
+  }
+
+  // ── Zombie watchdog ──────────────────────────────────────────────────────
+
+  /**
+   * Start a periodic interval that scans for zombie tasks (tasks stuck in
+   * 'working' or 'input-required' state for longer than ZOMBIE_TIMEOUT_MS)
+   * and transitions them to 'failed'.
+   * Uses .unref() so the interval does not prevent the process from exiting.
+   */
+  _startZombieWatchdog() {
+    if (!this._tasks) return;
+
+    this._zombieWatchdog = setInterval(() => {
+      const now = Date.now();
+      for (const [id, task] of this._tasks) {
+        if (task.status !== 'working' && task.status !== 'input-required') continue;
+
+        const taskAge = now - new Date(task.createdAt).getTime();
+        if (taskAge > ZOMBIE_TIMEOUT_MS) {
+          process.stderr.write(
+            `[TaskStateMachine] zombie-timeout: task ${id} in '${task.status}' for ${Math.round(taskAge / 60000)}min — transitioning to failed\n`
+          );
+          try {
+            this.transition(id, 'failed', 'zombie-timeout');
+          } catch (err) {
+            process.stderr.write(
+              `[TaskStateMachine] zombie watchdog transition error for ${id}: ${err.message}\n`
+            );
+          }
+        }
+      }
+    }, ZOMBIE_CHECK_INTERVAL_MS).unref();
+  }
+
+  /**
+   * Stop the zombie watchdog interval (useful in tests to prevent open handles).
+   */
+  stopWatchdog() {
+    if (this._zombieWatchdog) {
+      clearInterval(this._zombieWatchdog);
+      this._zombieWatchdog = null;
     }
   }
 
@@ -266,4 +315,10 @@ class TaskStateMachine {
   }
 }
 
-module.exports = { TaskStateMachine, VALID_TRANSITIONS, TERMINAL_STATES };
+module.exports = {
+  TaskStateMachine,
+  VALID_TRANSITIONS,
+  TERMINAL_STATES,
+  ZOMBIE_TIMEOUT_MS,
+  ZOMBIE_CHECK_INTERVAL_MS,
+};

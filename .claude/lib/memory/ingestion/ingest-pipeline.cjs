@@ -11,6 +11,9 @@ const crypto = require('crypto');
 const path = require('path');
 const { Worker } = require('worker_threads');
 const { getDb } = require('../../db/sqlite-manager.cjs');
+
+// Hard timeout for file-converter worker threads (configurable via env)
+const WORKER_TIMEOUT_MS = Number(process.env.WORKER_TIMEOUT_MS) || 60 * 1000; // 60 seconds
 const { exceedsLimit, truncateToLimit } = require('./token-gate.cjs');
 const { scoreContent } = require('./importance-scorer.cjs');
 const { extractMetadata } = require('./image-metadata-extractor.cjs');
@@ -27,11 +30,28 @@ function convertFileInWorker(filePath) {
     const workerPath = path.join(__dirname, 'file-converter.cjs');
     const worker = new Worker(workerPath, { workerData: { filePath } });
 
-    worker.on('message', message => resolve(message));
-    worker.on('error', err =>
-      resolve({ ok: false, error: err.message, content: null, mimeType: null })
-    );
+    // Hard timeout: terminate worker if it runs too long to prevent hung threads.
+    // Uses .unref() so the timer does not prevent the process from exiting normally.
+    const timer = setTimeout(() => {
+      worker.terminate();
+      resolve({
+        ok: false,
+        error: `Worker timeout after ${WORKER_TIMEOUT_MS}ms`,
+        content: null,
+        mimeType: null,
+      });
+    }, WORKER_TIMEOUT_MS).unref();
+
+    worker.on('message', message => {
+      clearTimeout(timer);
+      resolve(message);
+    });
+    worker.on('error', err => {
+      clearTimeout(timer);
+      resolve({ ok: false, error: err.message, content: null, mimeType: null });
+    });
     worker.on('exit', code => {
+      clearTimeout(timer);
       if (code !== 0) {
         resolve({
           ok: false,
