@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RedditResearcherOutput",
+  "description": "Output schema for the reddit-researcher skill",
+  "type": "object",
+  "required": ["success"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the operation completed successfully"
+    },
+    "action": {
+      "type": "string",
+      "enum": ["search", "subreddit", "post"],
+      "description": "The action that was performed"
+    },
+    "results": {
+      "type": "array",
+      "description": "Array of post objects returned by the action",
+      "items": {
+        "type": "object",
+        "required": ["title", "url"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Post title"
+          },
+          "url": {
+            "type": "string",
+            "description": "Post URL"
+          },
+          "subreddit": {
+            "type": "string",
+            "description": "Subreddit the post belongs to"
+          },
+          "score": {
+            "type": "integer",
+            "description": "Post score (upvotes minus downvotes)"
+          },
+          "numComments": {
+            "type": "integer",
+            "description": "Number of comments on the post"
+          },
+          "created": {
+            "type": "number",
+            "description": "Post creation time as Unix timestamp (UTC)"
+          },
+          "selftext": {
+            "type": "string",
+            "description": "Post body text (truncated to 500 chars)"
+          }
+        }
+      }
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message when success is false"
+    }
+  }
+}
