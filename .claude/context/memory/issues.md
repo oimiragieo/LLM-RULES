@@ -294,3 +294,42 @@
 - [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-03-10T09:24:29.447Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-10T09:24:29.461Z
+
+---
+
+## [OPEN] P1: TaskStateMachine has no persistence — restart = total state loss (2026-03-10)
+
+**Source:** Gemini 2.5 + Codex 0.106.0 multi-LLM review
+**Component:** `.claude/lib/a2a/task-state-machine.cjs`
+**Risk:** Any A2A server restart or OOM crash wipes all in-flight task state. Clients polling get 404.
+**Fix:** Persist task state to existing SQLite `queue-operations.cjs` on every state transition.
+**Report:** `.claude/context/reports/backend/multi-llm-review-2026-03-10.md`
+
+## [OPEN] P1: Memory consolidation lacks atomicity — rows can be double-processed (2026-03-10)
+
+**Source:** Codex 0.106.0 multi-LLM review
+**Component:** consolidate-agent.cjs (reads file_memory + episodic_memory)
+**Risk:** Multiple consolidators or re-runs process overlapping rows without transaction. Rows marked `consolidated_at` before derived insight is committed — duplicate insights, inconsistent state.
+**Fix:** Wrap read + mark-consolidated + insert-insight in single SQLite `BEGIN IMMEDIATE` transaction.
+**Report:** `.claude/context/reports/backend/multi-llm-review-2026-03-10.md`
+
+## [OPEN] P2: Worker thread has no hard timeout — malformed files can hang ingestion (2026-03-10)
+
+**Source:** Codex 0.106.0
+**Component:** `.claude/lib/memory/ingestion/file-converter.cjs`
+**Risk:** Parser hangs, decompression bombs, or CPU spikes on bad files can stall the entire ingestion pipeline indefinitely. `token-gate.cjs` handles token limits but not pre-parse size limits.
+**Fix:** Add `setTimeout(() => worker.terminate(), TIMEOUT)` in host + pre-dispatch file size check.
+
+## [OPEN] P2: Zombie tasks in `working` state bypass TTL eviction (2026-03-10)
+
+**Source:** Gemini 2.5
+**Component:** `.claude/lib/a2a/task-state-machine.cjs`
+**Risk:** TTL eviction only fires on terminal state transitions. Tasks stuck in `working` never reach terminal → accumulate indefinitely → OOM in high-volume scenarios.
+**Fix:** Add `setInterval` watchdog that scans Map for `working` tasks older than 30min and transitions them to `failed`.
+
+## [OPEN] P3: debounceMap in file-watcher never cleared — slow memory leak (2026-03-10)
+
+**Source:** Own analysis during multi-LLM review
+**Component:** `.claude/lib/memory/ingestion/file-watcher.cjs`
+**Risk:** `debounceMap` keyed by file path, never purged. Long-running watchers on active codebases accumulate unique paths indefinitely.
+**Fix:** Periodic cleanup: purge entries older than 10× DEBOUNCE_MS, or cap map size.

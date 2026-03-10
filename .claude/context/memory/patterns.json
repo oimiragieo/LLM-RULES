@@ -220,5 +220,15 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "e7cb12c0e762f65c8a5ab012f515d25bf51039e5"
+  },
+  {
+    "text": "better-sqlite3 immediate() for consolidation: db.transaction(fn).immediate() works for SELECT+UPDATE+INSERT patterns (verified v12.6.2). Use BEGIN IMMEDIATE when no retry guard exists, DEFERRED when changes===0 check handles concurrent writes.",
+    "area": "main",
+    "timestamp": "2026-03-10T11:06:53.393Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "7c020ebe815d2a1555f3937f2753421d1c45a96f"
   }
 ]

@@ -33,5 +33,25 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "f9181992cb4ac2d7fab7ef0bd4994729b120222f"
+  },
+  {
+    "text": "INSERT OR REPLACE in SQLite is DELETE+INSERT — resets ALL unspecified columns to NULL/defaults. NEVER use for task state persistence updates. Use INSERT (create) + UPDATE (transition) or ON CONFLICT DO UPDATE instead. Codex confirmed this risk for A2A task persistence.",
+    "area": "main",
+    "timestamp": "2026-03-10T11:07:01.445Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "2e6be059adfedd29d5e942fa8902baa44e3817c7"
+  },
+  {
+    "text": "Gemini CLI background tasks: when run via background=true, Gemini CLI produces 0 bytes output for 3+ minutes on technical queries. For time-constrained multi-LLM reviews, Codex + direct code verification is more reliable. Use Gemini with sufficient wait time (5+ min) or foreground.",
+    "area": "main",
+    "timestamp": "2026-03-10T11:07:09.584Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "c544ea68ad9883ccf0143ddc126807258b8af674"
   }
 ]
