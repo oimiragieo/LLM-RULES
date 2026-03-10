@@ -27,6 +27,8 @@ Use this skill to refresh an existing skill safely: research current best practi
 - User asks to audit/refresh an existing skill
 - Regression trends point to weak skill instructions, missing schemas, or stale command/hook wiring
 
+This skill uses a caller-oriented trigger taxonomy: updates are requested by external signals (reflection flags, EVOLVE, regression trends) rather than self-triggered.
+
 ## The Iron Law
 
 Never update a skill blindly. Every refresh must be evidence-backed, TDD-gated, and integration-validated.
@@ -64,7 +66,7 @@ For `medium` and `high`, require a diff-first summary and explicit confirmation 
 
 - [ ] Patch plan includes RED -> GREEN -> REFACTOR -> VERIFY mapping.
 - [ ] Protected sections are preserved.
-- [ ] `validate-skill-ecosystem` passes for target skill.
+- [ ] `validate-skill-ecosystem.cjs` passes for target skill.
 - [ ] Integration generators run (`generate-skill-index`, registry/catalog updates as needed).
 - [ ] Memory updates recorded (`learnings`, `issues`, `decisions`) with concrete outcome.
 - [ ] `lastVerifiedAt` and `verified` are updated in execute mode only.
@@ -222,9 +224,10 @@ Priority: `High` (likely changes outcome) | `Medium` (improves quality) | `Low` 
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
 ```
+
+Read `.claude/context/memory/learnings.md`
+Read `.claude/context/memory/decisions.md`
 
 **After completing work, record findings:**
 

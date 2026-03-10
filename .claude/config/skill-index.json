@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-10T16:36:49.572Z",
+  "generatedAt": "2026-03-10T18:50:05.497Z",
   "metadata": {
-    "totalSkills": 276,
+    "totalSkills": 275,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-10T16:36:49.573Z",
+    "lastValidated": "2026-03-10T18:50:05.498Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7057,28 +7057,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "enterprise-skill-test-1773160608715": {
-      "name": "enterprise-skill-test-1773160608715",
-      "displayName": "Enterprise Skill Test 1773160608715",
-      "category": "Other",
-      "domain": "other",
-      "description": "Enterprise scaffold validation skill for test coverage and reliability checks.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "enterprise-skill-test-1773160608715"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "exa-monitor": {
       "name": "exa-monitor",
       "displayName": "Exa Monitor",
@@ -7625,7 +7603,6 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8007,7 +7984,6 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8372,7 +8348,6 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8602,7 +8577,6 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8945,7 +8919,6 @@
         "webapp-testing",
         "arxiv-monitor",
         "claude-api",
-        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "heartbeat",
@@ -9525,7 +9498,6 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -10752,7 +10724,6 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",

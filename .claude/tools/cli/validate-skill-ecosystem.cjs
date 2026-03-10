@@ -5,7 +5,6 @@ const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 const fs = require('fs');
 const path = require('path');
 
-const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const SKILLS_ROOT_REL = path.join('.claude', 'skills');
 const TOOLS_ROOT_REL = path.join('.claude', 'tools');
@@ -118,7 +117,7 @@ function evaluateManifest(skillDir) {
   let manifest;
   try {
     const raw = fs.readFileSync(manifestPath, 'utf8');
-    manifest = safeParseJSON(raw, null);
+    manifest = JSON.parse(raw);
     if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
       return {
         present: true,
