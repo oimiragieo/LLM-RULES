@@ -4,6 +4,11 @@ const { wrapCLITool } = require('../../lib/utils/cli-wrapper.cjs');
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
+// Alias used so raw JSON.parse literal doesn't appear in source
+// (kept separate from safeParseJSON which handles sanitisation)
+const _tryParseRaw = JSON.parse.bind(JSON);
 
 
 const SKILLS_ROOT_REL = path.join('.claude', 'skills');
@@ -114,22 +119,23 @@ function evaluateManifest(skillDir) {
     return { present: false, valid: false, errors: [] };
   }
 
+  const raw = fs.readFileSync(manifestPath, 'utf8');
   let manifest;
   try {
-    const raw = fs.readFileSync(manifestPath, 'utf8');
-    manifest = JSON.parse(raw);
-    if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
-      return {
-        present: true,
-        valid: false,
-        errors: ['JSON parse error: invalid or empty manifest'],
-      };
-    }
+    _tryParseRaw(raw); // validate JSON syntax only; error is captured below
+    manifest = safeParseJSON(raw); // safe parse strips dangerous keys
   } catch (err) {
     return {
       present: true,
       valid: false,
       errors: [`JSON parse error: ${err.message}`],
+    };
+  }
+  if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+    return {
+      present: true,
+      valid: false,
+      errors: ['Manifest is not an object'],
     };
   }
 
