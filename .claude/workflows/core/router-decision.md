@@ -121,9 +121,13 @@ TaskList();
 - **Pending tasks exist**: Check if user request relates to existing tasks
   - If related: Spawn agent with task ID reference
   - If unrelated: Continue to Step 2
+- **Completed tasks with `requiresDevopsPush: true`**:
+  - **CRITICAL LOOP PREVENTION**: You MUST immediately call `TaskUpdate({ taskId: "<id>", metadata: { requiresDevopsPush: false } })` to clear this flag BEFORE spawning any agents. If you fail to do this, you will trigger an infinite loop.
+  - **Enterprise Conflict Check**: Look at the other pending tasks. Is there already a planned `devops` task (e.g., "Branch finalization") waiting for this task to complete? If yes, just let the existing enterprise workflow proceed. DO NOT spawn a duplicate devops agent.
+  - **Single Task Handoff**: If there is no planned devops task waiting, spawn a new `devops` agent to commit and push the changes for this specific task.
 - **No pending tasks**: Continue to Step 2
 
-**Why**: Prevents duplicate work and maintains task continuity.
+**Why**: Prevents duplicate work, maintains task continuity, and ensures pending file modifications are pushed without lagging.
 
 ## Step 2: Request Classification
 
@@ -239,8 +243,8 @@ Integrate external codebase: {user request}
 
 **Blacklisted Tools** (Router NEVER uses directly):
 
-- `Edit` - Code/config modification
-- `Write` - File creation
+- `Edit` - Code/config modification. **(Attempting this WILL TRIGGER A SECURITY INTERCEPT BLOCK `[ROUTER-FIRST PROTOCOL VIOLATION]`)**
+- `Write` - File creation. **(Attempting this WILL TRIGGER A SECURITY INTERCEPT BLOCK `[ROUTER-FIRST PROTOCOL VIOLATION]`)**
 - `Bash` (implementation) - Running builds, tests, scripts (except read-only git status/log)
 - `Glob` - Codebase exploration
 - `Grep` - Code search/analysis
@@ -249,7 +253,7 @@ Integrate external codebase: {user request}
 
 **Decision**:
 
-- **YES**: STOP. Spawn appropriate agent (see Step 6). DO NOT PROCEED.
+- **YES**: STOP. Spawn a `developer` or appropriate specialist agent. DO NOT PROCEED. The `unified-creator-guard` will block you.
 - **NO**: Continue to Question 2.
 
 ### Question 2: Is this a multi-step task requiring code/config changes?

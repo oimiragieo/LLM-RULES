@@ -21,7 +21,7 @@ const DRIFT_STATE_FILE = path.join(RUNTIME_DIR, 'drift-state.json');
 const MEMORY_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'memory');
 const REFLECTION_LOG = path.join(MEMORY_DIR, 'reflection-log.jsonl');
 const ARCHIVE_DIR = path.join(MEMORY_DIR, 'archive');
-const REFLECTION_LOG_MAX_BYTES = 500 * 1024; // 500KB
+const REFLECTION_LOG_MAX_BYTES = 50 * 1024; // 50KB — reduced from 500KB to prevent spawn-prompt context overflow
 
 /**
  * Safely read and parse a JSON file, returning defaults on error

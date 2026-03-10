@@ -309,6 +309,13 @@ const ROUTING_TABLE = {
   clarify: 'general-assistant',
   overview: 'general-assistant',
 
+  // Ecosystem Evolution
+  audit: 'ecosystem-auditor',
+  auditor: 'ecosystem-auditor',
+  'audit-codebase': 'ecosystem-auditor',
+  'missing-agents': 'ecosystem-auditor',
+  'missing-skills': 'ecosystem-auditor',
+
   // Artifact Integration
   'artifact-integrator': 'artifact-integrator',
   'artifact-integration': 'artifact-integrator',

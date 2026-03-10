@@ -1,3 +1,93 @@
+## [CODE/QA] Multi-LLM Cross-Validation — JSON.parse Severity Calibration (2026-03-10)
+
+Pattern: When multiple LLMs review the same codebase findings, severity levels can diverge. In the 2026-03-10 session, an initial scan (task 2) reported 40 raw JSON.parse() usages as P0. Codex cross-validation (task 7) downgraded JSON.parse to P2 because hooks/lib files were already patched with safeParseJSON. Similarly, console.log in scripts was rated acceptable (scripts-only usage). Key lesson: always cross-validate P0 findings against already-patched locations before filing issues. The Memory EPIC (243/243 tests) confirms production-readiness; Codex found no additional critical gaps that changed the overall assessment.
+
+---
+
+## [CODE/QA] LSP Wiring Health Check — A2A/Worker Pool Exports (2026-03-10)
+
+Pattern: LSP-based wiring health check (task 3) produced 98% health score for A2A, worker pool, and dispatcher exports. All critical exports verified correct. One unused Collector class identified as low severity. Key insight: 98% wiring health = one minor unused class not causing runtime issues. LSP is effective for bulk export verification but returns empty for .cjs files — use ripgrep fallback for .cjs checks. A2A architecture is confirmed production-ready based on 243/243 test passing + 98% LSP wiring.
+
+---
+
+## [CODE/QA] Skill Quality Gap Audit — Gate 4 Compliance Review (2026-03-10)
+
+Pattern: Task 6 identified quality gaps in 9 skills via Gate 4 compliance review. P0 gaps: `session-transcript-analyzer` (stub/incomplete implementation) and `claude-api` (bad frontmatter format). P1 gaps: 5 skills missing required Iron Laws and Memory Protocol sections. Key action: skill-updater must be invoked for these skills before they are trusted for production agent use. Stubs are particularly dangerous as agents may invoke them expecting real behavior. Frontmatter format errors cause agent model resolution failures. This audit pattern (Gate 4 + Iron Laws + Memory Protocol presence check) should become part of proactive-audit QA workflow.
+
+---
+
+## [CODE/SECURITY] JSON.parse Scan Results — Deduplication Against Already-Patched Code (2026-03-10)
+
+Pattern: Task 2 raw code scan found 40 JSON.parse() instances. After Codex cross-validation (task 7), confirmed hooks and lib files already patched. Remaining JSON.parse usages are in non-critical paths (scripts, test utilities). This deduplication step is essential: initial scans always overcount because they cannot distinguish patched from unpatched locations without cross-referencing patch history. Future scans should exclude `safeParseJSON` caller sites (already safe) from JSON.parse counts. The 37 console.log findings similarly classified as acceptable after domain analysis (scripts-only, not production hooks).
+
+---
+
+## [CODE/ARCH] Memory File Truncation Fix — MaxFileReadTokenExceededError Root Cause (2026-03-10)
+
+Pattern: Developer agent 0 tool uses issue was caused by bloated memory files (issues.md, reflection-log.jsonl exceeding 500KB). This triggered `MaxFileReadTokenExceededError` in spawn-prompt-assembler when auto-injecting memory context into spawn prompts. Fix: truncate memory files to 200 most recent records. Implementation detail: memory files grow unbounded when reflection agents append learnings without pruning old entries. Prevention: memory-quality-auditor should run monthly to prune stale/redundant entries. The 200-record truncation threshold preserves recent operational context while staying within token budgets.
+
+---
+
+## [CODE/ARCH] Ecosystem-Auditor Agent Rewrite — Agent-Creator Template Compliance (2026-03-10)
+
+Pattern: ecosystem-auditor agent was rewritten using strict agent-creator template. Key change: extracted `audit` capability routing from shared capability bucket to dedicated `ecosystem-evolution` capability. This resolved a routing conflict where two agents (ecosystem-auditor + another) both mapped to the `audit` capability, causing ambiguous routing. Rule: each specialized agent should own a unique capability identifier. When two agents share a capability key, the router picks arbitrarily — this must be caught during agent creation via agent-creator template validation.
+
+---
+
+## [WORKFLOW] Reflection Queue Batching — Prevent Context Explosion from Single Zombie Task (2026-03-10)
+
+Pattern: When 10+ reflection requests accumulate about the same stale task (e.g., task-lifecycle-42 zombie generating 31 gap-log entries), the Router must batch them into 2 agents of 5-6 reflections each rather than spawning 11 agents simultaneously. Spawning 11 reflection agents in parallel causes context explosion and coordination overhead. The batching strategy: batch-1 processes reflections 1-6 and calls reflection-cleanup.cjs; batch-2 processes reflections 7-11 and clears the reminder file. The processedReflectionIds in TaskUpdate metadata is the atomic handshake that tells reflection-cleanup.cjs what to remove from the spawn-request.json. Root cause of the accumulation: a single zombie task with missing TaskUpdate(completed) triggers stale-task-detector on every UserPromptSubmit, generating one gap-log entry per prompt — each entry becomes a separate reflection request. Fix: process stale-tasks.json in Step 0.4 early enough to close zombie tasks before they generate 10+ entries.
+
+---
+
+## [WORKFLOW] Stale task-lifecycle-42 Pattern — Devops Agent Context Expiry Without TaskUpdate (2026-03-10)
+
+Pattern: task-lifecycle-42 was detected stale 35+ times across a single session (gap-log entries from 179min to 477min stale). Root cause: a devops agent was spawned for git work (commit/push), completed the actual git operations successfully, but the agent's context expired or the session closed before `TaskUpdate({ status: "completed" })` was called. The task remained `in_progress` indefinitely. This is distinct from the devops commit failure pattern (where git commit itself fails) — here the git work succeeded but the lifecycle close was missed. Detection: stale-task-detector fires on UserPromptSubmit; 35 gap-log entries from a single zombie task confirms the per-task cooldown gap in the detector. Resolution: Router Step 0.4 auto-closed via `stale-tasks.json`. Key signal: rapid-burst gap-log entries (4-6 within 2 seconds) indicate the same zombie task triggering on repeated user prompts, not a real ongoing issue pattern. Gap-log dedup by task ID with 30-min cooldown would reduce this from 35 entries to ~1.
+
+---
+
+## [WORKFLOW] TaskUpdate Metadata Missing — Task 17 Recurrence (2026-03-10)
+
+Pattern: Task 17 completed with fallback summary string, contributing to the documented 16+ instance recurrence of missing task metadata. The `pre-completion-validation.cjs` hook remains in advisory/warn mode. Each missing-metadata completion produces a null-yield reflection cycle (hook fires, agent spawns, no learnings extractable). The cumulative cost is: each violation = ~1 reflection agent invocation wasted + audit trail gap. Resolution requires block-mode enforcement of the fallback string pattern in `pre-completion-validation.cjs`.
+
+---
+
+## [CODE] stale-task-detector writeStaleTasksQueue — Atomic Write + Dedup Pattern (2026-03-10)
+
+Pattern: `writeStaleTasksQueue()` in `stale-task-detector.cjs` uses tmp+rename atomic write and per-task deduplication via a Set of existing `taskId`s. Kill switch: `STALE_TASK_AUTO_QUEUE=off`. This correctly prevents `stale-tasks.json` from accumulating duplicate stale entries across UserPromptSubmit bursts. Router Step 0.4 in CLAUDE.md now references `stale-tasks.json` as the canonical source for auto-close actions. The dedup covers the queue file; gap-log dedup (separate concern) is still missing (see issues.md).
+
+---
+
+## [WORKFLOW] Stale-Task-Detector Deduplication Gap — Gap-Log Spam Pattern (2026-03-10)
+
+Pattern: `stale-task-detector.cjs` fires on every `UserPromptSubmit` with no per-task cooldown. A single zombie task (task-lifecycle-42, stale 458+ min) generated 30 gap-log entries in one session. Reflection agents receive only the last N entries from spawn requests, so a single zombie task can crowd out all genuine integration/routing gaps. Fix requires: (1) per-task deduplication or 30-min cooldown in the detector, (2) ensuring Router Step 0.4 (`stale-tasks.json`) is processed at session start to close zombie tasks before they accumulate entries. This is a signal-to-noise problem — the detector is advisory but must not become a noise amplifier.
+
+---
+
+## [CODE/QA] validate:full Fix — Module-Size Baseline + Malformed Model Strings (2026-03-10)
+
+Pattern: Two categories of failures block `validate:full`: (1) Module-size baseline drift — when files grow beyond their baseline thresholds, baseline must be updated via `pnpm validate:baseline` or similar; (2) Malformed model string values in `agent-config.json` — short aliases like `sonnet` must be replaced with full model IDs like `claude-sonnet-4-5`. Fix: update baseline file + normalize model strings in `agent-config.json`. Both were fixed in the 2026-03-09/10 session. Validate:full must always be run as the final gate before considering a batch of agent/config changes complete.
+
+---
+
+## [CODE/QA] Agent Model String Validation — 'sonnet' vs 'claude-sonnet-4-5' (2026-03-09)
+
+Pattern: Agent `model:` frontmatter values MUST use full model IDs (e.g., `claude-sonnet-4-5`), not short aliases (e.g., `sonnet`). Short aliases caused 2943 framework test failures during the EPIC codebase audit. Fix: normalize in `agent-config.json` and agent frontmatter. Affected agents detected via test runner output. Commits: `e8d6c9fb`, `d3d2cefc`. Prevention: add schema validation for model string format in agent registry compilation.
+
+---
+
+## [CODE/QA] EPIC Codebase Health Audit Pattern — Incremental Commit Strategy (2026-03-09)
+
+Pattern: For large framework health audits (lint + test + wire verification), use incremental commits at each gate: (1) lint-clean commit, (2) wire-verification commit, (3) test-fix commit. This creates a clean rollback surface at each checkpoint. Commits `27629434` (lint+wiring), `e8d6c9fb` (safeParseJSON fix in token-budget-tracker), `d3d2cefc` (malformed model values) each independently verifiable and reversible. The Memory EPIC (A2A + Worker Pool) was verified fully wired in this session without regressions.
+
+---
+
+## [WORKFLOW] Stale Task Detection via stale-task-detector.cjs (2026-03-09)
+
+Pattern: `stale-task-detector.cjs` fires on `UserPromptSubmit` and detects tasks in `in_progress` status for >N minutes. When triggered, it writes a `missing_metadata` gap to `session-gap-log.jsonl`. Task "task-lifecycle-42" was detected stale at 179 minutes. Agents MUST call `TaskUpdate({ status: "completed" })` immediately when work finishes — delayed completion calls are a systemic reliability gap and show as stale-task-detector findings. The detector is advisory (not blocking), so stale tasks do not prevent future work but DO accumulate as gap-log noise for reflection agents.
+
+---
+
 ## [CODE/ARCH] Queue Drain/Ack Protocol as Design-Time Requirement (2026-03-09)
 
 Pattern: Any distributed state system using a JSONL queue bridge MUST specify delivery semantics at design time. Minimum spec: line-level parse isolation (skip malformed lines, log them), atomic drain via file rename (not in-place rewrite), drain checkpoint (last-processed entry ID) for crash recovery. Both Gemini and Codex independently identified the missing queue protocol as the CRITICAL gap in the cron-runner subprocess architecture. See: `.claude/context/reports/architecture/cron-runner-subprocess-council-2026-03-09.md`
@@ -1347,3 +1437,5 @@ Task 2 (2026-03-04): Multi-LLM consultation on LTM eviction fixes
 - Updated workflow: evolution-workflow (2026-03-09)
 
 - Updated workflow: missing-workflow-xyz (2026-03-09)
+
+- Created new agent: ecosystem-auditor (2026-03-10)

@@ -198,5 +198,27 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "4a775240a04ad70f0d5950bd717c02ce2a1f7095"
+  },
+  {
+    "text": "Memory file truncation to 200 records prevents MaxFileReadTokenExceededError. When issues.md or reflection-log.jsonl exceed 500KB, spawn-prompt-assembler crashes with token exceeded error causing Developer agent 0 tool uses. Fix: truncate to 200 most recent entries.",
+    "area": "main",
+    "date": "2026-03-10",
+    "timestamp": "2026-03-10T09:20:38.559Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "d147b96981d27836ff0f9f6cbe2a88a7f3c36b91"
+  },
+  {
+    "text": "Multi-LLM cross-validation for security findings: initial scan severity (P0) must be verified against already-patched code before filing issues. Use a second LLM (Codex) to confirm finding applies to unpatched code. Prevents P0 false-positive inflation.",
+    "area": "main",
+    "date": "2026-03-10",
+    "timestamp": "2026-03-10T09:20:54.570Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "e7cb12c0e762f65c8a5ab012f515d25bf51039e5"
   }
 ]

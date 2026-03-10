@@ -3,58 +3,53 @@
   "version": "1.0.0",
   "description": "Maps common request patterns to capabilities and default agents for router capability discovery",
   "lastUpdated": "2026-01-31",
-
   "capabilityMap": {
     "review": "code-review",
     "code review": "code-review",
     "critique": "code-review",
     "analyze code": "code-review",
     "pr review": "code-review",
-
     "implement": "implementation",
     "code": "implementation",
     "build": "implementation",
     "feature": "planning",
     "develop": "implementation",
     "create": "implementation",
-
     "fix": "bug-fixing",
     "bug": "bug-fixing",
     "debug": "bug-fixing",
     "patch": "bug-fixing",
     "resolve": "bug-fixing",
-
     "test": "testing",
     "testing": "testing",
     "tdd": "testing",
     "qa": "testing",
     "quality": "testing",
     "validate": "testing",
-
     "research": "research",
     "investigate": "research",
     "analyze": "research",
     "explore": "research",
     "study": "research",
-
     "security": "security-review",
-    "audit": "security-review",
     "vulnerability": "security-review",
-    "pentest": "penetration-testing",
     "owasp": "security-review",
-
+    "audit": "ecosystem-evolution",
+    "ecosystem": "ecosystem-evolution",
+    "missing agents": "ecosystem-evolution",
+    "missing skills": "ecosystem-evolution",
+    "auto-evolve": "ecosystem-evolution",
+    "pentest": "penetration-testing",
     "architecture": "architecture-design",
     "design": "architecture-design",
     "system design": "architecture-design",
     "structure": "architecture-design",
-
     "document": "documentation",
     "docs": "documentation",
     "readme": "documentation",
     "guide": "documentation",
     "tutorial": "documentation",
     "api docs": "documentation",
-
     "deploy": "devops",
     "infrastructure": "devops",
     "ci/cd": "devops",
@@ -63,23 +58,19 @@
     "helm": "kubernetes-specialist",
     "argocd": "kubernetes-specialist",
     "docker": "devops",
-
     "incident": "incident-response",
     "outage": "incident-response",
     "emergency": "incident-response",
     "production issue": "incident-response",
-
     "plan": "planning",
     "planning": "planning",
     "strategy": "planning",
     "roadmap": "product-planning",
     "breakdown": "planning",
-
     "orchestrate": "orchestration",
     "coordinate": "orchestration",
     "multi-agent": "orchestration",
     "workflow": "orchestration",
-
     "integrate": "artifact-integration",
     "onboard": "artifact-integration",
     "ingest": "artifact-integration",
@@ -87,7 +78,6 @@
     "repo": "artifact-integration",
     "github.com": "artifact-integration",
     "https://": "artifact-integration",
-
     "what is": "conversational",
     "explain": "conversational",
     "how does": "conversational",
@@ -99,7 +89,6 @@
     "general question": "conversational",
     "simple question": "conversational"
   },
-
   "defaultAgents": {
     "artifact-integration": "artifact-integrator",
     "code-review": "code-reviewer",
@@ -117,9 +106,9 @@
     "planning": "planner",
     "product-planning": "pm",
     "orchestration": "master-orchestrator",
+    "ecosystem-evolution": "ecosystem-auditor",
     "conversational": "general-assistant"
   },
-
   "domainFallbacks": {
     "code": ["developer", "code-reviewer"],
     "testing": ["qa", "developer"],
@@ -135,7 +124,6 @@
     "database": ["database-architect", "developer"],
     "conversational": ["general-assistant"]
   },
-
   "capabilityPriority": {
     "description": "When multiple capabilities match, use this priority order",
     "order": [
@@ -149,9 +137,7 @@
       "research"
     ]
   },
-
   "routingConditions": {},
-
   "notes": {
     "usage": "Router uses this config to classify user requests into capabilities, then queries AvailableAgents({ capability: '...' }) to find best agent",
     "fallback": "If no agents found for capability, try domain-based lookup using domainFallbacks",

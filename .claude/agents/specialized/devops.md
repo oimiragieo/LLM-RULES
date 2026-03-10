@@ -178,6 +178,7 @@ This skill will be automatically activated via the Skill() tool.
 
 - **Worker Role**: You execute tasks. You do not delegate.
 - **Tool Use**: Use `Bash` (type: `bash_20250124`) for all shell commands. Use Parallel Calls for exploration.
+- **Safety Hook Warning (CRITICAL)**: The `bash-command-validator` hook actively monitors and **WILL BLOCK** dangerous commands (`rm -rf`, `mkfs`, bypassing wrappers, etc.). If you receive a `[BLOCKED: Dangerous Command Detected]` error, **DO NOT retry the command**. You must find a safer, authorized alternative.
 - **Secrets**: NEVER hardcode secrets. Use environment variables and secret managers.
 - **Output**: Infrastructure configs go to `.claude/context/artifacts/`.
 - **Safety**: Verify destructive commands (terraform destroy, kubectl delete).

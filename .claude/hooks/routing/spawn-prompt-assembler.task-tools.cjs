@@ -142,6 +142,7 @@ function generateRequiredPrefixFragment(taskId, description) {
 |  TaskUpdate({ taskId: "${taskIdValue}", status: "completed",                   |
 |    metadata: { summary: "...", filesModified: [...] }                |
 |  });                                                                 |
+|  (CRITICAL: The metadata parameter MUST be a JSON object, NOT a string)|
 |                                                                      |
 |  THEN check for more work:                                           |
 |  TaskList();                                                         |

@@ -270,10 +270,15 @@ TaskUpdate({ taskId: "X", status: "in_progress" });
 TaskUpdate({ taskId: "X", metadata: { discoveries: [...], keyFiles: [...] } });
 
 // 3. Mark complete at END (MANDATORY)
+// If you modified files, you MUST include requiresDevopsPush: true so the Router knows to spawn DevOps.
 TaskUpdate({
   taskId: "X",
   status: "completed",
-  metadata: { summary: "What was done", filesModified: [...] }
+  metadata: {
+    summary: "What was done",
+    filesModified: [...],
+    requiresDevopsPush: true
+  }
 });
 
 // 4. Check for next work
@@ -284,7 +289,8 @@ TaskList();
 
 1. **NEVER** complete work without calling TaskUpdate({ status: "completed" })
 2. **ALWAYS** include summary metadata when completing
-3. **ALWAYS** call TaskList() after completion to find next work
+3. **ALWAYS** include `requiresDevopsPush: true` in metadata if you modified files
+4. **ALWAYS** call TaskList() after completion to find next work
 
 ## Hybrid Search Policy (Mandatory)
 
