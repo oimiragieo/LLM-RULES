@@ -475,3 +475,19 @@ Raw line-count tail-truncation (e.g., `tail -200`) of multi-agent memory files c
 - Updated workflow: evolution-workflow (2026-03-10)
 
 - Updated workflow: missing-workflow-xyz (2026-03-10)
+
+- Created new agent: qa-guardian (2026-03-10)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-10)
+
+- Created new agent: contract-check (2026-03-10)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-10)
+
+- Created new agent: bool-action (2026-03-10)
+
+- Created new agent: repo-onboarder (2026-03-10)
+
+- Updated workflow: evolution-workflow (2026-03-10)
+
+- Updated workflow: missing-workflow-xyz (2026-03-10)

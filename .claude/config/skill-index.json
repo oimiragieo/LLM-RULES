@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-10T14:36:37.880Z",
+  "generatedAt": "2026-03-10T16:36:49.572Z",
   "metadata": {
     "totalSkills": 276,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-10T14:36:37.881Z",
+    "lastValidated": "2026-03-10T16:36:49.573Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -246,6 +246,7 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -310,6 +311,7 @@
         "gamedev-pro",
         "api-designer",
         "mcp-developer",
+        "ecosystem-auditor",
         "performance-engineer",
         "advanced-debugging"
       ],
@@ -334,6 +336,7 @@
         "Grep"
       ],
       "agentPrimary": [
+        "ecosystem-auditor",
         "code-reviewer",
         "c4-code",
         "performance-engineer",
@@ -429,6 +432,7 @@
         "marketing-strategist",
         "mcp-developer",
         "ux-researcher",
+        "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -503,6 +507,7 @@
         "marketing-strategist",
         "mcp-developer",
         "ux-researcher",
+        "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -634,6 +639,7 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -3799,6 +3805,7 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -3941,6 +3948,7 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -4266,6 +4274,7 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
         "devops",
@@ -5501,7 +5510,7 @@
         "Grep"
       ],
       "agentPrimary": [
-        "developer"
+        "ecosystem-auditor"
       ],
       "agentSupporting": [
         "qa",
@@ -5513,7 +5522,7 @@
         "other",
         "rule-auditor"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "seo-and-meta-tags-in-sveltekit": {
@@ -7048,9 +7057,9 @@
       "priority": 3,
       "aliasOf": null
     },
-    "enterprise-skill-test-1773153397267": {
-      "name": "enterprise-skill-test-1773153397267",
-      "displayName": "Enterprise Skill Test 1773153397267",
+    "enterprise-skill-test-1773160608715": {
+      "name": "enterprise-skill-test-1773160608715",
+      "displayName": "Enterprise Skill Test 1773160608715",
       "category": "Other",
       "domain": "other",
       "description": "Enterprise scaffold validation skill for test coverage and reliability checks.",
@@ -7065,7 +7074,7 @@
       "agentSupporting": [],
       "tags": [
         "other",
-        "enterprise-skill-test-1773153397267"
+        "enterprise-skill-test-1773160608715"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7616,7 +7625,7 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773153397267",
+        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -7998,7 +8007,7 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773153397267",
+        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8363,7 +8372,7 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773153397267",
+        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8593,7 +8602,7 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773153397267",
+        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -8936,7 +8945,7 @@
         "webapp-testing",
         "arxiv-monitor",
         "claude-api",
-        "enterprise-skill-test-1773153397267",
+        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "heartbeat",
@@ -9470,7 +9479,6 @@
         "form-validation-with-zod",
         "function-length-and-responsibility",
         "restcontroller-conventions",
-        "rule-auditor",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
         "tall-stack-general",
@@ -9517,7 +9525,7 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773153397267",
+        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -10187,6 +10195,18 @@
         "task-management-protocol",
         "token-saver-context-compression",
         "verification-before-completion"
+      ],
+      "ecosystem-auditor": [
+        "rule-auditor",
+        "code-analyzer",
+        "verification-before-completion",
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
+        "code-semantic-search",
+        "code-structural-search",
+        "token-saver-context-compression",
+        "code-quality-expert"
       ],
       "code-reviewer": [
         "code-analyzer",
@@ -10686,7 +10706,6 @@
         "form-validation-with-zod",
         "function-length-and-responsibility",
         "restcontroller-conventions",
-        "rule-auditor",
         "seo-and-meta-tags-in-sveltekit",
         "service-class-conventions",
         "tall-stack-general",
@@ -10733,7 +10752,7 @@
         "claude-api",
         "cron-runner",
         "doc-coauthoring",
-        "enterprise-skill-test-1773153397267",
+        "enterprise-skill-test-1773160608715",
         "exa-monitor",
         "feedback-analysis",
         "frontend-design",
@@ -11403,6 +11422,18 @@
         "task-management-protocol",
         "token-saver-context-compression",
         "verification-before-completion"
+      ],
+      "ecosystem-auditor": [
+        "rule-auditor",
+        "code-analyzer",
+        "verification-before-completion",
+        "task-management-protocol",
+        "memory-search",
+        "ripgrep",
+        "code-semantic-search",
+        "code-structural-search",
+        "token-saver-context-compression",
+        "code-quality-expert"
       ],
       "code-reviewer": [
         "code-analyzer",

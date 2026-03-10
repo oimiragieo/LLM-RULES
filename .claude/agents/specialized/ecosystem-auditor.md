@@ -10,11 +10,12 @@ permissionMode: default
 priority: high
 verified: true
 lastVerifiedAt: '2026-03-10T06:00:38.407Z'
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
-skills: |
+tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill, MemoryRecord]
+skills:
   - task-management-protocol
   - ripgrep
   - code-semantic-search
+  - code-structural-search
   - token-saver-context-compression
   - verification-before-completion
   - memory-search
@@ -106,6 +107,15 @@ TaskUpdate({
   },
 });
 ```
+
+## Search Protocol
+
+Use hybrid search for all codebase discovery:
+1. `pnpm search:code` — semantic + BM25 hybrid search (primary)
+2. `Skill({ skill: 'ripgrep' })` — fast text search
+3. `Skill({ skill: 'code-semantic-search' })` — conceptual search
+4. `Skill({ skill: 'code-structural-search' })` — AST-based search
+5. `Grep` — fallback only for single-file checks
 
 ## Token Saver Invocation Rule
 
