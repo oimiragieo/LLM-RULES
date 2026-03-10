@@ -123,6 +123,12 @@ function appendOpenFindings(memorySection, projectRoot) {
 }
 
 function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
+  if (basePrompt === null || basePrompt === undefined) {
+    basePrompt = '';
+  }
+  if (typeof basePrompt !== 'string') {
+    throw new TypeError(`basePrompt must be a string, got ${typeof basePrompt}`);
+  }
   const overrides = loadAgentPromptOverrides(agentType, projectRoot);
   const ruleSnippet = getPresetRuleSnippet(presetId, projectRoot);
   let mergedBasePrompt = overrides ? `${basePrompt}\n\n${overrides}` : basePrompt;

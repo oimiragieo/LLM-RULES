@@ -379,7 +379,7 @@ class AdaptiveQuestioner {
     let shouldStop = false;
     let adjustedReadiness = readiness;
 
-    if (qualityScore < 50) {
+    if (qualityScore < 40) {
       adjustedReadiness = Math.min(adjustedReadiness, 55);
     }
 
@@ -388,7 +388,7 @@ class AdaptiveQuestioner {
     } else if (qualityScore >= 50) {
       shouldStop =
         (adjustedReadiness >= 80 && missingCritical.length === 0) ||
-        (missingCritical.length === 0 && history.length >= 4 && qualityScore >= 60) ||
+        (missingCritical.length === 0 && history.length >= 4 && qualityScore >= 50) ||
         (history.length >= 5 && qualityScore >= 70 && completenessScore >= 60) ||
         history.length >= 10;
     }
