@@ -40,6 +40,13 @@ const TASKUPDATE_STATE_FILE = path.join(
   'runtime',
   'taskupdate-first-state.json'
 );
+const STALE_TASKS_QUEUE_PATH = path.join(
+  PROJECT_ROOT,
+  '.claude',
+  'context',
+  'runtime',
+  'stale-tasks.json'
+);
 
 function readJSON(filePath) {
   try {
@@ -55,6 +62,48 @@ function appendGapLog(entry) {
     fs.appendFileSync(GAP_LOG_PATH, JSON.stringify(entry) + '\n');
   } catch (_e) {
     // Non-critical
+  }
+}
+
+/**
+ * Atomically write/merge stale task entries to stale-tasks.json.
+ * Uses write-to-.tmp-then-rename pattern to avoid partial writes.
+ * Kill switch: STALE_TASK_AUTO_QUEUE=off disables queue writing.
+ *
+ * @param {Array<{taskId: string, ageMin: number, detectedAt: string, subject: string}>} newEntries
+ */
+function writeStaleTasksQueue(newEntries) {
+  if ((process.env.STALE_TASK_AUTO_QUEUE || '').trim().toLowerCase() === 'off') return;
+  if (!newEntries || newEntries.length === 0) return;
+  try {
+    const runtimeDir = path.dirname(STALE_TASKS_QUEUE_PATH);
+    if (!fs.existsSync(runtimeDir)) {
+      fs.mkdirSync(runtimeDir, { recursive: true });
+    }
+
+    // Read existing queue (if any) to avoid duplicates
+    let existing = { tasks: [] };
+    if (fs.existsSync(STALE_TASKS_QUEUE_PATH)) {
+      const parsed = safeParseJSON(fs.readFileSync(STALE_TASKS_QUEUE_PATH, 'utf8'), null);
+      if (parsed && Array.isArray(parsed.tasks)) {
+        existing = parsed;
+      }
+    }
+
+    const existingIds = new Set(existing.tasks.map(t => t.taskId));
+    const toAdd = newEntries.filter(e => {
+      if (existingIds.has(e.taskId)) return false;
+      existingIds.add(e.taskId);
+      return true;
+    });
+    if (toAdd.length === 0) return;
+
+    const merged = { tasks: [...existing.tasks, ...toAdd] };
+    const tmp = STALE_TASKS_QUEUE_PATH + '.tmp.' + process.pid;
+    fs.writeFileSync(tmp, JSON.stringify(merged, null, 2), 'utf8');
+    fs.renameSync(tmp, STALE_TASKS_QUEUE_PATH);
+  } catch (queueErr) {
+    process.stderr.write('[stale-task-detector] queue write failed: ' + queueErr.message + '\n');
   }
 }
 
@@ -75,17 +124,21 @@ function main() {
         if (ageMs > STALE_THRESHOLD_MS) {
           const ageMin = Math.round(ageMs / 60000);
           const taskId = entry.taskId || sessionId;
-          stale.push({ taskId, ageMin });
+          const subject = entry.subject || '';
+          stale.push({ taskId, ageMin, subject });
         }
       }
     }
 
     if (stale.length > 0) {
-      for (const { taskId, ageMin } of stale) {
+      const detectedAt = new Date().toISOString();
+      const queueEntries = [];
+
+      for (const { taskId, ageMin, subject } of stale) {
         const msg = `[STALE-TASK] Task "${taskId}" has been in_progress for ${ageMin}m — router may have forgotten to call TaskUpdate(completed)`;
         process.stderr.write(msg + '\n');
         appendGapLog({
-          timestamp: new Date().toISOString(),
+          timestamp: detectedAt,
           type: 'missing_metadata',
           taskId,
           description: `Stale in_progress task detected: "${taskId}" has been in_progress for ${ageMin} minutes without completion`,
@@ -93,7 +146,10 @@ function main() {
             'Detected by stale-task-detector.cjs on UserPromptSubmit. Router must call TaskUpdate({ status: "completed" }) when work is done.',
           source: 'stale-task-detector',
         });
+        queueEntries.push({ taskId, ageMin, detectedAt, subject });
       }
+
+      writeStaleTasksQueue(queueEntries);
     }
   } catch (_e) {
     // Never block on error

@@ -60,6 +60,7 @@ If YES: `Write`, `Edit`, and `NotebookEdit` are FORBIDDEN on these paths — eve
 **If you use a banned tool on these paths, the task is a FAILURE.** You did not partially succeed. You violated routing policy. This causes harm: it bypasses creator workflows, breaks auditability, and corrupts the framework's safety model.
 
 Do not rationalize exceptions such as:
+
 - "small fix" / "just one line"
 - "faster this way"
 - "I already know the content"
@@ -70,12 +71,14 @@ Do not rationalize exceptions such as:
 These are all WRONG. Gate 4 applies to modifications, restorations, and copies — not just net-new creation.
 
 **WRONG patterns (banned):**
+
 - `Edit(".claude/skills/my-skill/SKILL.md", ...)`
 - `Write(".claude/agents/core/developer.md", ...)`
 - `Write(".claude/hooks/routing/routing-guard.cjs", ...)`
 - Generating full content and then writing it directly to any creator-managed path
 
 **CORRECT pattern:**
+
 > "This target is protected by Gate 4. I must invoke the appropriate creator skill, not write the file directly."
 > → `Skill({ skill: "skill-creator" })` for skills
 > → `Skill({ skill: "agent-creator" })` for agents
@@ -100,6 +103,7 @@ If you are about to type a banned tool call, STOP and invoke the creator skill i
 - **If you have pending tasks in `reflection-spawn-request.json`, you MUST ALWAYS spawn `reflection-agent` instances using the `Task` tool to clear the queue properly.**
 - DO NOT use `Bash`, `Write`, `Edit`, or any other tool to manually wipe or overwrite queue files with `[]` or delete lines from `reflection-reminder.txt` even if you consider the contents to be "stale" or "unactionable".
 - **If an agent or tool fails (e.g., `devops` fails to commit), DO NOT spawn a different, inappropriate agent (like `nodejs-pro`) as a manual workaround.** You are the router, not a developer. You must strictly follow the process: use `reflection`, spawn dedicated troubleshooting subagents (like `devops-troubleshooter`), or use `AskUserQuestion` to fix the root cause.
+- **Stale task auto-close (Step 0.4):** when `stale-tasks.json` exists with entries, ALWAYS close each task via `TaskUpdate` before proceeding. Never skip this step or delete the file without closing the tasks.
 - YOU ARE THE ROUTER. Bypassing orchestration steps to "save time" breaks the entire enterprise framework.
 
 ---
@@ -113,6 +117,7 @@ On EVERY user prompt, execute in order before routing:
 | Step    | Check                | Action                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **0**   | Pending reflections? | Read `reflection-reminder.txt` + `reflection-spawn-request.json`, spawn reflection-agent for each request, announce "Step 0 complete" before TaskList()                                                                                                                                                                                                                                                                                                                                                                              |
+| **0.4** | Stale tasks?         | Read `.claude/context/runtime/stale-tasks.json` — for each entry call `TaskUpdate({ taskId, status: "completed", metadata: { summary: "auto-closed: stale >{ageMin}min, no TaskUpdate(completed) received" } })`, then delete the file. Log each closure to gap-log.                                                                                                                                                                                                                                                                 |
 | **0.5** | Integration queue?   | Spawn artifact-integrator in background (non-blocking). ALSO: Check `HEARTBEAT_AUTO_START` env var — if `false`, skip heartbeat spawn entirely. Otherwise read `.claude/context/runtime/heartbeat-session-ping.json` — if missing or expired (15-min TTL): spawn `heartbeat-orchestrator` in background (it calls CronList() idempotently and re-registers any dead loops). **Why ping not sentinel**: cron loops are session-scoped; the 46h `heartbeat-active.json` sentinel outlives sessions and would suppress re-registration. |
 | **0.6** | Creation preflight?  | Spawn planner/TPM for feasibility-gate + compliance-policy-check (skip for external repos — spawn artifact-integrator instead)                                                                                                                                                                                                                                                                                                                                                                                                       |
 | **0.7** | Framework changes?   | Spawn QA with `proactive-audit` skill as FINAL pipeline step                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
