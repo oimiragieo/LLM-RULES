@@ -184,7 +184,8 @@
     "worktree:prune": "node .claude/tools/cli/worktree-prune.cjs",
     "worktree:prune:dry": "node .claude/tools/cli/worktree-prune.cjs --dry-run",
     "memory:check": "node scripts/check-memory-bloat.cjs",
-    "memory:prune": "node scripts/prune-reflection-log.cjs"
+    "memory:prune": "node scripts/prune-reflection-log.cjs",
+    "memory:archive-decisions": "node scripts/archive-old-decisions.cjs"
   },
   "keywords": [
     "claude",

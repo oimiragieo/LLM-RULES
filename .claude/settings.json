@@ -180,6 +180,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/routing/spawn-token-guard.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/task-pretool-orchestrator.cjs"
           }
         ]
