@@ -1379,6 +1379,23 @@
         "Grep"
       ],
       "model": "claude-haiku-4-5"
+    },
+    "ecosystem-auditor": {
+      "tools": [
+        "Bash",
+        "Edit",
+        "Glob",
+        "Grep",
+        "MemoryRecord",
+        "Read",
+        "Skill",
+        "TaskCreate",
+        "TaskGet",
+        "TaskList",
+        "TaskUpdate",
+        "Write"
+      ],
+      "model": "'sonnet'"
     }
   },
   "thinkingBudgetMap": {

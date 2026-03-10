@@ -12,8 +12,8 @@ import { parseArgs } from 'util';
 
 const require = createRequire(import.meta.url);
 
-const { createA2aServer } = require('./.claude/lib/a2a/server.cjs');
-const { getDb, runMigrations } = require('./.claude/lib/db/sqlite-manager.cjs');
+const { createA2aServer } = require('../.claude/lib/a2a/server.cjs');
+const { getDb, runMigrations } = require('../.claude/lib/db/sqlite-manager.cjs');
 
 // ── Parse CLI args ────────────────────────────────────────────────────────────
 const { values } = parseArgs({

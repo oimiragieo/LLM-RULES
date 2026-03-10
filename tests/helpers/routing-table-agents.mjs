@@ -64,6 +64,8 @@ export const ROUTING_TABLE_AGENT_NAMES = [
   'pm-coordinator',
   'advanced-debugging',
   'multi-llm-consultant',
+  'general-assistant',
+  'ecosystem-auditor',
 ];
 
 export const INTENT_TO_AGENT_NAMES = [
@@ -133,4 +135,13 @@ export const INTENT_TO_AGENT_NAMES = [
   'pm-coordinator',
   'advanced-debugging',
   'multi-llm-consultant',
+  'general-assistant',
+  'ecosystem-auditor',
+  'aso-specialist',
+  'marketing-strategist',
+  'brand-guardian',
+  'compliance-checker',
+  'feedback-synthesizer',
+  'ux-researcher',
+  'heartbeat-orchestrator',
 ];
