@@ -129,6 +129,25 @@ function buildBasePrompt(basePrompt, agentType, presetId, projectRoot) {
   if (ruleSnippet) {
     mergedBasePrompt = `## Preset Rules\n\n${ruleSnippet}\n\n${mergedBasePrompt}`;
   }
+
+  // === DYNAMIC SAFETY PREAMBLE (Patch 3) ===
+  // Inject forbidden commands block as suffix so all spawned agents receive it.
+  // Guard clause prevents double-injection on pre-assembled prompts.
+  // Kill switch: set SPAWN_SAFETY_PREAMBLE=off to disable (e.g. in test environments).
+  const SAFETY_PREAMBLE_ENABLED =
+    String(process.env.SPAWN_SAFETY_PREAMBLE || 'on').toLowerCase() !== 'off';
+  if (SAFETY_PREAMBLE_ENABLED && !mergedBasePrompt.includes('FORBIDDEN COMMANDS')) {
+    const safetyPreamble =
+      `\n\n## FORBIDDEN COMMANDS (Hard Stop)\n` +
+      `- NEVER run \`rm -rf\`, \`git clean -f\`, or bulk-delete without explicit user confirmation of the exact target\n` +
+      `- NEVER run \`git push --force\` or \`git reset --hard\` without explicit user authorization\n` +
+      `- NEVER use \`shell: true\` with child_process — always use \`shell: false\` with array args\n` +
+      `- NEVER write to \`.claude/skills/**\`, \`.claude/agents/**\`, \`.claude/hooks/**\`, \`.claude/workflows/**\` directly — these are Gate 4 creator paths\n` +
+      `- When in doubt about a destructive command, stop and ask the user first\n`;
+    mergedBasePrompt = mergedBasePrompt + safetyPreamble;
+  }
+  // === END SAFETY PREAMBLE ===
+
   return mergedBasePrompt;
 }
 

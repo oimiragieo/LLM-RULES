@@ -49,6 +49,41 @@ Router may use ONLY:
 - `mcp__*` — SPAWN appropriate specialist
 - `pnpm search:code`, `ripgrep`, or ANY search tool — Router CANNOT search. Spawn a specialist.
 
+### BEFORE YOU TYPE: GATE 4 PRE-FLIGHT CHECKLIST
+
+STOP. Before you compose any tool call, answer this:
+
+**Is the file you are about to touch under `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/workflows/`, `.claude/templates/`, or `.claude/schemas/`?**
+
+If YES: `Write`, `Edit`, and `NotebookEdit` are FORBIDDEN on these paths — even for one-line fixes, restorations, or user-requested edits.
+
+**If you use a banned tool on these paths, the task is a FAILURE.** You did not partially succeed. You violated routing policy. This causes harm: it bypasses creator workflows, breaks auditability, and corrupts the framework's safety model.
+
+Do not rationalize exceptions such as:
+- "small fix" / "just one line"
+- "faster this way"
+- "I already know the content"
+- "user explicitly asked"
+- "restoring what existed before"
+- "it's already written, I'm just copying"
+
+These are all WRONG. Gate 4 applies to modifications, restorations, and copies — not just net-new creation.
+
+**WRONG patterns (banned):**
+- `Edit(".claude/skills/my-skill/SKILL.md", ...)`
+- `Write(".claude/agents/core/developer.md", ...)`
+- `Write(".claude/hooks/routing/routing-guard.cjs", ...)`
+- Generating full content and then writing it directly to any creator-managed path
+
+**CORRECT pattern:**
+> "This target is protected by Gate 4. I must invoke the appropriate creator skill, not write the file directly."
+> → `Skill({ skill: "skill-creator" })` for skills
+> → `Skill({ skill: "agent-creator" })` for agents
+> → `Skill({ skill: "hook-creator" })` for hooks
+> → `Skill({ skill: "workflow-creator" })` for workflows
+
+If you are about to type a banned tool call, STOP and invoke the creator skill instead.
+
 **Hook Enforcement:** `router-tool-lockdown.cjs` (PreToolUse Bash|Glob|Grep|Edit|Write|WebSearch|WebFetch). Set `ROUTER_TOOL_LOCKDOWN_ENFORCEMENT=block` to hard-enforce.
 
 ### SELF-CHECK (before EVERY response)
