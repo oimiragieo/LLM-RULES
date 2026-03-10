@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-10T11:42:16.954Z",
+  "generatedAt": "2026-03-10T11:48:14.360Z",
   "metadata": {
     "totalSkills": 275,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-10T11:42:16.955Z",
+    "lastValidated": "2026-03-10T11:48:14.361Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -6983,11 +6983,15 @@
       "displayName": "Claude Api",
       "category": "Other",
       "domain": "other",
-      "description": "Other - claude-api",
+      "description": "Build apps with the Claude API or Anthropic SDK. TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`/`claude_agent_sdk`, or user asks to use Claude API, Anthropic SDKs, or Agent SDK. DO NOT TRIGGER when: code imports `openai`/other AI SDK, general programming, or ML/data-science tasks.",
       "requiredTools": [
         "Read",
         "Write",
-        "Edit"
+        "Edit",
+        "Bash",
+        "Glob",
+        "Grep",
+        "WebFetch"
       ],
       "agentPrimary": [
         "developer"
@@ -8905,6 +8909,7 @@
         "ui-components-expert",
         "webapp-testing",
         "arxiv-monitor",
+        "claude-api",
         "exa-monitor",
         "feedback-analysis",
         "heartbeat",
@@ -9036,6 +9041,7 @@
         "ui-components-expert",
         "webapp-testing",
         "brand-compliance",
+        "claude-api",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -9162,6 +9168,7 @@
         "ui-components-expert",
         "webapp-testing",
         "brand-compliance",
+        "claude-api",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -9220,6 +9227,7 @@
         "multi-agent-architecture-reference",
         "slack-notifications",
         "spec-to-code-compliance",
+        "claude-api",
         "feedback-analysis",
         "reddit-researcher",
         "scientific-skills",
