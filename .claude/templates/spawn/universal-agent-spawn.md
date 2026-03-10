@@ -131,6 +131,15 @@ Use MemoryRecord to persist discoveries during your work:
 
 Example: `MemoryRecord({ type: 'gotcha', content: 'Windows paths need normalization in glob patterns', area: 'platform' })`
 
+> [!WARNING] FORBIDDEN BASH PATTERNS — blocked by safety hooks, waste a full turn:
+>
+> - `git config user.name/email` → don't set identity; commit directly
+> - `git push --force/-f` to main/master → NEVER allowed
+> - `git reset --hard` / `git clean -f` / `rm -rf` → confirm with user first
+> - `echo "..." > .claude/context/reports/` → use Write tool, not bash redirect
+> - `rg --type cjs` → invalid alias; use `rg -g '*.cjs'` instead
+> - `spawn(..., { shell: true })` → always `{ shell: false }` with array args
+
 ## TaskUpdate Completion Contract
 
 When calling `TaskUpdate({ status: 'completed' })`, metadata MUST include:

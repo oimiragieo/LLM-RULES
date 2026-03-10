@@ -563,6 +563,14 @@ User Request: <USER_REQUEST>
 | **New template**        | `template-creator` | `.claude/skills/template-creator/SKILL.md` |
 | **New schema**          | `schema-creator`   | `.claude/skills/schema-creator/SKILL.md`   |
 
+### Gate 4 Path-Based Check (ALWAYS run before verb analysis)
+
+Is the target file inside a guarded directory? → Gate 4 applies regardless of verb (create/fix/update/edit/restore/register/wire).
+
+Guarded dirs: `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/workflows/`, `.claude/templates/`, `.claude/schemas/`
+
+Additional trigger verbs now covered: fix / update / edit / improve / refactor / restore / re-enable / copy from archive / register / wire into registry
+
 ### Multi-Agent Workflows (Complex Orchestration)
 
 | Request Type                   | Workflow                     | Path                                                           |
