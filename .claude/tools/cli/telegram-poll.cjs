@@ -87,14 +87,16 @@ function atomicWrite(target, content) {
 
 function safeRead(file, fallback) {
   try {
-    const raw = fs.readFileSync(file, 'utf8');
+    const raw = fs.readFileSync(file, 'utf8').trim();
+    if (!raw) return fallback;
     // Use safeParseJSON for prototype-pollution protection on untrusted content.
-    // It returns the parsed value directly; on JSON.parse failure it returns
-    // Object.create(null) (an empty null-prototype object) rather than throwing.
-    // We use a secondary JSON.parse to determine whether the parse succeeded so
-    // we can return the safeParseJSON-stripped result on success and fallback on failure.
-    JSON.parse(raw); // throws if invalid JSON — caught below
-    return safeParseJSON(raw);
+    // safeParseJSON returns Object.create(null) on parse failure (not the fallback type).
+    // We recover by checking the result matches the expected fallback type.
+    const result = safeParseJSON(raw);
+    const expectedType = Array.isArray(fallback) ? 'array' : typeof fallback;
+    if (expectedType === 'array' && !Array.isArray(result)) return fallback;
+    if (expectedType === 'object' && (typeof result !== 'object' || Array.isArray(result))) return fallback;
+    return result;
   } catch (_) {
     return fallback;
   }
@@ -155,11 +157,11 @@ function httpsPost(url, body) {
           buf += c;
         });
         res.on('end', () => {
-          try {
-            resolve(JSON.parse(buf));
-          } catch (_) {
-            resolve({ ok: false });
-          }
+          const parsed = safeParseJSON(buf);
+          // safeParseJSON returns Object.create(null) on parse failure
+          const isValid = parsed && typeof parsed === 'object' && !Array.isArray(parsed) &&
+            Object.getPrototypeOf(parsed) !== null;
+          resolve(isValid ? parsed : { ok: false });
         });
       }
     );
@@ -179,11 +181,11 @@ function httpsGet(url) {
           buf += c;
         });
         res.on('end', () => {
-          try {
-            resolve(JSON.parse(buf));
-          } catch (_) {
-            resolve({ ok: false });
-          }
+          const parsed = safeParseJSON(buf);
+          // safeParseJSON returns Object.create(null) on parse failure
+          const isValid = parsed && typeof parsed === 'object' && !Array.isArray(parsed) &&
+            Object.getPrototypeOf(parsed) !== null;
+          resolve(isValid ? parsed : { ok: false });
         });
       })
       .on('error', reject);
@@ -307,12 +309,12 @@ async function handleLogs(chatId) {
   try {
     const lines = fs.readFileSync(GAP_LOG, 'utf8').trim().split('\n').filter(Boolean);
     const last20 = lines.slice(-20).map(l => {
-      try {
-        const e = JSON.parse(l);
+      const e = safeParseJSON(l);
+      // safeParseJSON returns Object.create(null) on failure; fall back to raw line
+      if (e && typeof e.type !== 'undefined') {
         return `[${(e.timestamp || '').slice(11, 19)}] ${e.type}: ${e.description || ''}`;
-      } catch (_) {
-        return l.slice(0, 100);
       }
+      return l.slice(0, 100);
     });
     await sendMessage(chatId, `Last ${last20.length} gap log entries:\n${last20.join('\n')}`);
   } catch (_) {

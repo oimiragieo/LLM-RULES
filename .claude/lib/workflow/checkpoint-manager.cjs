@@ -512,7 +512,17 @@ async function save(arg1, arg2, arg3, arg4) {
   const tmpPath =
     checkpointPath + `.tmp-${Date.now()}-${process.pid}-${Math.random().toString(36).slice(2, 10)}`;
   await fs.promises.writeFile(tmpPath, JSON.stringify(checkpoint, null, 2), 'utf8');
-  await fs.promises.rename(tmpPath, checkpointPath);
+  // Atomic rename with EPERM/EBUSY retry for Windows file-lock contention
+  try {
+    await fs.promises.rename(tmpPath, checkpointPath);
+  } catch (err) {
+    if (err.code === 'EPERM' || err.code === 'EBUSY') {
+      await new Promise(resolve => setTimeout(resolve, 5));
+      await fs.promises.rename(tmpPath, checkpointPath);
+    } else {
+      throw err;
+    }
+  }
 }
 
 /**

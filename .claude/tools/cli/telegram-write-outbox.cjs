@@ -15,6 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..'); // agent-studio root
 const OUTBOX_FILE = path.join(ROOT, '.claude', 'context', 'tmp', 'telegram-outbox.json');
@@ -64,7 +65,7 @@ function atomicWrite(target, content) {
 let outbox = [];
 try {
   const raw = fs.readFileSync(OUTBOX_FILE, 'utf8');
-  const parsed = JSON.parse(raw);
+  const parsed = safeParseJSON(raw);
   if (Array.isArray(parsed)) outbox = parsed;
 } catch (_) {
   /* start fresh */

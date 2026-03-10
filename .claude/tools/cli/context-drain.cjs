@@ -1,12 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '../../..');
 const file = path.join(ROOT, '.claude/context/runtime/tasks.json');
 
 try {
   const content = fs.readFileSync(file, 'utf8');
-  const taskObj = JSON.parse(content);
+  const taskObj = safeParseJSON(content);
   const taskList = Array.isArray(taskObj.tasks) ? taskObj.tasks : [];
   const active = taskList.filter(t => t.status === 'in_progress' || t.status === 'pending');
 
