@@ -182,7 +182,9 @@
     "skills:update-stale": "node .claude/tools/cli/run-skill-updates.cjs",
     "validate:skill-consistency": "node .claude/tools/cli/validate-skill-agent-consistency.mjs",
     "worktree:prune": "node .claude/tools/cli/worktree-prune.cjs",
-    "worktree:prune:dry": "node .claude/tools/cli/worktree-prune.cjs --dry-run"
+    "worktree:prune:dry": "node .claude/tools/cli/worktree-prune.cjs --dry-run",
+    "memory:check": "node scripts/check-memory-bloat.cjs",
+    "memory:prune": "node scripts/prune-reflection-log.cjs"
   },
   "keywords": [
     "claude",
