@@ -47,8 +47,8 @@ test('UserPromptSubmit includes orchestrator hook in command chain', () => {
   const commands = listCommands(block);
   assert.ok(commands.length >= 1, 'UserPromptSubmit should have at least one command hook');
   assert.ok(
-    commands.includes('node .claude/hooks/session/user-prompt-orchestrator.cjs'),
-    'UserPromptSubmit should include orchestrator hook'
+    commands.includes('node .claude/hooks/routing/user-prompt-unified.cjs'),
+    'UserPromptSubmit should include unified orchestrator hook'
   );
 });
 

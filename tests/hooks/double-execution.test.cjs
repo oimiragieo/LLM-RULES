@@ -49,8 +49,15 @@ describe('UserPromptSubmit hook double-execution prevention', () => {
       }
     }
 
-    // Verify none of the orchestrated hooks are also directly registered
+    // user-prompt-unified.cjs is now the primary registered hook (replacing the orchestrator
+    // in settings.json). It appears in the orchestrator's HOOK_ORDER for backwards-compat
+    // sequential execution, but is not double-executing because the orchestrator itself is
+    // no longer registered in settings.json.
+    const PRIMARY_HOOK = 'user-prompt-unified.cjs';
+
+    // Verify none of the orchestrated child hooks are also directly registered
     for (const hookPath of hookPaths) {
+      if (hookPath.includes(PRIMARY_HOOK)) continue; // primary hook — exempt
       const isRegistered = registeredCommands.some(cmd => cmd.includes(hookPath));
       assert.ok(
         !isRegistered,
@@ -60,7 +67,7 @@ describe('UserPromptSubmit hook double-execution prevention', () => {
     }
   });
 
-  test('user-prompt-orchestrator.cjs IS registered in settings.json', () => {
+  test('user-prompt-unified.cjs IS registered in settings.json', () => {
     const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
     const userPromptHooks = settings.hooks?.UserPromptSubmit || [];
     const registeredCommands = [];
@@ -70,12 +77,12 @@ describe('UserPromptSubmit hook double-execution prevention', () => {
       }
     }
 
-    const orchestratorRegistered = registeredCommands.some(cmd =>
-      cmd.includes('user-prompt-orchestrator.cjs')
+    const unifiedRegistered = registeredCommands.some(cmd =>
+      cmd.includes('user-prompt-unified.cjs')
     );
     assert.ok(
-      orchestratorRegistered,
-      'user-prompt-orchestrator.cjs must be registered in settings.json'
+      unifiedRegistered,
+      'user-prompt-unified.cjs must be registered in settings.json'
     );
   });
 });

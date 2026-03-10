@@ -55,8 +55,8 @@ test('settings.json Stop hooks include sanitize-debug-log command', () => {
   assert.equal(hasSanitizer, true);
 });
 
-test('settings.json UserPromptSubmit hooks include sanitize-debug-log command', () => {
+test('settings.json UserPromptSubmit hooks include unified orchestrator', () => {
   const commands = getHookCommands('UserPromptSubmit');
-  const hasSanitizer = commands.some(command => /sanitize-debug-log/i.test(command));
-  assert.equal(hasSanitizer, true);
+  const hasUnified = commands.some(command => /user-prompt-unified/i.test(command));
+  assert.equal(hasUnified, true);
 });

@@ -6,7 +6,7 @@
  *
  * Handles fire-and-forget memory extraction from agent completion metadata.
  * Separated from post-completion-chain.cjs to enforce LOCK_ORDER:
- *   withWorkflowStateLock (workflow domain) MUST NOT mix with withFileLock (memory domain)
+ *   Workflow state locks MUST NOT mix with file locks (memory domain)
  *   in the same file.
  *
  * This module owns the withFileLock domain for completion events.
