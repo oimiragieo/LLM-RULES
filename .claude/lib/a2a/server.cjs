@@ -45,7 +45,7 @@ function createA2aServer({ port = 3100, db, pool } = {}) {
   const app = express();
 
   // Shared state
-  const stateMachine = new TaskStateMachine();
+  const stateMachine = new TaskStateMachine(db || null);
   /** @type {Map<string, SseStream>} */
   const sseStreams = new Map();
 
