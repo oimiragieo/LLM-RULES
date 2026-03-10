@@ -27,8 +27,8 @@ const BUDGET_STATE_PATH = path.join(RUNTIME_DIR, 'budget-tracker.json');
 function loadState() {
   try {
     if (fs.existsSync(BUDGET_STATE_PATH)) {
-      const { data } = safeParseJSON(fs.readFileSync(BUDGET_STATE_PATH, 'utf8'), {});
-      return data;
+      const state = safeParseJSON(fs.readFileSync(BUDGET_STATE_PATH, 'utf8'));
+      return state || {};
     }
   } catch (_err) {
     // Ignore load errors, return empty

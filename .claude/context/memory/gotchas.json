@@ -2,56 +2,5 @@
   {
     "text": "MEM_E2E_SENTINEL_ALWAYS_USE_TASKUPDATE_FIRST",
     "timestamp": "2026-02-15T00:00:00.000Z"
-  },
-  {
-    "text": "Subprocess spawn on Windows: detached:true + unref() is insufficient for orphan prevention when terminal is force-closed. Short-term fix: clear PID file on launcher startup, treat stale cron-session-ping.json as dead (re-launch). Long-term: use windowsHide:true + Windows Job Object attachment.",
-    "area": "main",
-    "timestamp": "2026-03-09T04:14:02.668Z",
-    "accessCount": 0,
-    "lastAccessed": null,
-    "writeSource": "memory_api",
-    "dedupStatus": "create",
-    "id": "06c52ca79dc485559b460f01aaed9766f7485ad7"
-  },
-  {
-    "text": "JSONL queue for cron subprocess: O_EXCL atomic drain via file rename (not in-place rewrite) is required to prevent partial drains. Also implement line-level try/parse with skip-on-error to prevent one corrupted line from halting all queue processing.",
-    "area": "main",
-    "timestamp": "2026-03-09T04:14:11.499Z",
-    "accessCount": 0,
-    "lastAccessed": null,
-    "writeSource": "memory_api",
-    "dedupStatus": "create",
-    "id": "86f4f76c1ffbbe65f72f4b3b0a2c39959943ce5e"
-  },
-  {
-    "text": "stale-task-detector.cjs fires on every UserPromptSubmit with no per-task cooldown. A single zombie task can flood gap-log with 40+ identical entries in one session, crowding out genuine signals. Workaround: Router Step 0.4 stale-tasks.json auto-close prevents accumulation if processed early.",
-    "area": "main",
-    "date": "2026-03-10",
-    "timestamp": "2026-03-10T09:20:54.504Z",
-    "accessCount": 0,
-    "lastAccessed": null,
-    "writeSource": "memory_api",
-    "dedupStatus": "create",
-    "id": "f9181992cb4ac2d7fab7ef0bd4994729b120222f"
-  },
-  {
-    "text": "INSERT OR REPLACE in SQLite is DELETE+INSERT — resets ALL unspecified columns to NULL/defaults. NEVER use for task state persistence updates. Use INSERT (create) + UPDATE (transition) or ON CONFLICT DO UPDATE instead. Codex confirmed this risk for A2A task persistence.",
-    "area": "main",
-    "timestamp": "2026-03-10T11:07:01.445Z",
-    "accessCount": 0,
-    "lastAccessed": null,
-    "writeSource": "memory_api",
-    "dedupStatus": "create",
-    "id": "2e6be059adfedd29d5e942fa8902baa44e3817c7"
-  },
-  {
-    "text": "Gemini CLI background tasks: when run via background=true, Gemini CLI produces 0 bytes output for 3+ minutes on technical queries. For time-constrained multi-LLM reviews, Codex + direct code verification is more reliable. Use Gemini with sufficient wait time (5+ min) or foreground.",
-    "area": "main",
-    "timestamp": "2026-03-10T11:07:09.584Z",
-    "accessCount": 0,
-    "lastAccessed": null,
-    "writeSource": "memory_api",
-    "dedupStatus": "create",
-    "id": "c544ea68ad9883ccf0143ddc126807258b8af674"
   }
 ]

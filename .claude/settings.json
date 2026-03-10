@@ -14,27 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/step0-reflection-enforcer.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/reflection/reflection-queue-processor.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/tools/cli/sanitize-debug-log.cjs --in-place"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session/user-prompt-orchestrator.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session/audit-skill-recency.cjs"
-          },
-          {
-            "type": "command",
-            "command": "node .claude/hooks/session/stale-task-detector.cjs"
+            "command": "node .claude/hooks/routing/user-prompt-unified.cjs"
           }
         ]
       }

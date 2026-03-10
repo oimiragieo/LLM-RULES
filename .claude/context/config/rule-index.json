@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.0.0",
   "generated_at": "2026-03-10T05:58:41.738Z",
   "prebuilt": false,
   "total_rules": 114,
@@ -21,7 +21,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "html", "ios"],
+      "technologies": [
+        "go",
+        "html",
+        "ios"
+      ],
       "type": "master",
       "size": 7905,
       "line_count": 281
@@ -32,7 +36,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript"],
+      "technologies": [
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 2997,
       "line_count": 82
@@ -43,7 +50,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["typescript"],
+      "technologies": [
+        "typescript"
+      ],
       "type": "master",
       "size": 2579,
       "line_count": 92
@@ -54,7 +63,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["python", "typescript"],
+      "technologies": [
+        "python",
+        "typescript"
+      ],
       "type": "master",
       "size": 4271,
       "line_count": 104
@@ -65,7 +77,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 4446,
       "line_count": 109
@@ -76,7 +90,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["android", "kotlin"],
+      "technologies": [
+        "android",
+        "kotlin"
+      ],
       "type": "master",
       "size": 2219,
       "line_count": 75
@@ -87,7 +104,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "graphql", "rest"],
+      "technologies": [
+        "api",
+        "graphql",
+        "rest"
+      ],
       "type": "master",
       "size": 2208,
       "line_count": 79
@@ -98,7 +119,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 5572,
       "line_count": 121
@@ -131,7 +154,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "rest", "rust"],
+      "technologies": [
+        "api",
+        "go",
+        "rest",
+        "rust"
+      ],
       "type": "master",
       "size": 6935,
       "line_count": 172
@@ -142,7 +170,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "css", "rest", "typescript"],
+      "technologies": [
+        "api",
+        "css",
+        "rest",
+        "typescript"
+      ],
       "type": "master",
       "size": 4839,
       "line_count": 222
@@ -153,7 +186,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["python", "rust", "sass"],
+      "technologies": [
+        "python",
+        "rust",
+        "sass"
+      ],
       "type": "master",
       "size": 5895,
       "line_count": 164
@@ -164,7 +201,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "react", "typescript"],
+      "technologies": [
+        "api",
+        "react",
+        "typescript"
+      ],
       "type": "master",
       "size": 1790,
       "line_count": 52
@@ -186,7 +227,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "typescript"],
+      "technologies": [
+        "api",
+        "go",
+        "typescript"
+      ],
       "type": "master",
       "size": 3967,
       "line_count": 187
@@ -197,7 +242,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript"],
+      "technologies": [
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 2837,
       "line_count": 101
@@ -208,7 +256,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "nodejs", "typescript"],
+      "technologies": [
+        "api",
+        "nodejs",
+        "typescript"
+      ],
       "type": "master",
       "size": 5952,
       "line_count": 159
@@ -219,7 +271,14 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "java", "javascript", "python", "rust", "typescript"],
+      "technologies": [
+        "go",
+        "java",
+        "javascript",
+        "python",
+        "rust",
+        "typescript"
+      ],
       "type": "master",
       "size": 3250,
       "line_count": 158
@@ -230,7 +289,14 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "jsx", "python", "tsx", "typescript"],
+      "technologies": [
+        "java",
+        "javascript",
+        "jsx",
+        "python",
+        "tsx",
+        "typescript"
+      ],
       "type": "master",
       "size": 2965,
       "line_count": 134
@@ -241,7 +307,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 5625,
       "line_count": 120
@@ -263,7 +331,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["docker", "kubernetes", "terraform"],
+      "technologies": [
+        "docker",
+        "kubernetes",
+        "terraform"
+      ],
       "type": "master",
       "size": 1939,
       "line_count": 66
@@ -274,7 +346,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["express", "java", "javascript"],
+      "technologies": [
+        "express",
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 5214,
       "line_count": 202
@@ -296,7 +372,16 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "html", "pydantic", "python", "rest", "rust", "sql", "typescript"],
+      "technologies": [
+        "api",
+        "html",
+        "pydantic",
+        "python",
+        "rest",
+        "rust",
+        "sql",
+        "typescript"
+      ],
       "type": "master",
       "size": 1678,
       "line_count": 66
@@ -307,7 +392,14 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "java", "javascript", "mongodb", "postgresql", "sql"],
+      "technologies": [
+        "go",
+        "java",
+        "javascript",
+        "mongodb",
+        "postgresql",
+        "sql"
+      ],
       "type": "master",
       "size": 11101,
       "line_count": 371
@@ -318,7 +410,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "prisma", "rest", "sql"],
+      "technologies": [
+        "api",
+        "prisma",
+        "rest",
+        "sql"
+      ],
       "type": "master",
       "size": 1726,
       "line_count": 66
@@ -340,7 +437,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go"],
+      "technologies": [
+        "api",
+        "go"
+      ],
       "type": "master",
       "size": 5615,
       "line_count": 165
@@ -351,7 +451,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 3845,
       "line_count": 91
@@ -362,7 +464,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 5719,
       "line_count": 249
@@ -373,7 +477,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["docker", "rest", "terraform"],
+      "technologies": [
+        "docker",
+        "rest",
+        "terraform"
+      ],
       "type": "master",
       "size": 1697,
       "line_count": 63
@@ -384,7 +492,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "typescript"],
+      "technologies": [
+        "api",
+        "go",
+        "typescript"
+      ],
       "type": "master",
       "size": 5034,
       "line_count": 247
@@ -395,7 +507,13 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "react", "tsx", "typescript"],
+      "technologies": [
+        "api",
+        "go",
+        "react",
+        "tsx",
+        "typescript"
+      ],
       "type": "master",
       "size": 1969,
       "line_count": 74
@@ -428,7 +546,13 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "css", "html", "react", "typescript"],
+      "technologies": [
+        "api",
+        "css",
+        "html",
+        "react",
+        "typescript"
+      ],
       "type": "master",
       "size": 2207,
       "line_count": 83
@@ -439,7 +563,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["express", "go", "ruby"],
+      "technologies": [
+        "express",
+        "go",
+        "ruby"
+      ],
       "type": "master",
       "size": 2385,
       "line_count": 86
@@ -461,7 +589,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["rest"],
+      "technologies": [
+        "rest"
+      ],
       "type": "master",
       "size": 2540,
       "line_count": 104
@@ -472,7 +602,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "rest"],
+      "technologies": [
+        "api",
+        "go",
+        "rest"
+      ],
       "type": "master",
       "size": 2055,
       "line_count": 67
@@ -483,7 +617,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "graphql", "rest"],
+      "technologies": [
+        "api",
+        "graphql",
+        "rest"
+      ],
       "type": "master",
       "size": 2130,
       "line_count": 82
@@ -494,7 +632,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "java", "javascript"],
+      "technologies": [
+        "go",
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 2234,
       "line_count": 89
@@ -505,7 +647,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "java", "javascript"],
+      "technologies": [
+        "go",
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 4378,
       "line_count": 110
@@ -527,7 +673,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "nodejs", "rest"],
+      "technologies": [
+        "api",
+        "go",
+        "nodejs",
+        "rest"
+      ],
       "type": "master",
       "size": 4569,
       "line_count": 106
@@ -538,7 +689,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go"],
+      "technologies": [
+        "api",
+        "go"
+      ],
       "type": "master",
       "size": 6086,
       "line_count": 195
@@ -549,7 +703,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 1649,
       "line_count": 51
@@ -560,7 +716,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["ios", "swift"],
+      "technologies": [
+        "ios",
+        "swift"
+      ],
       "type": "master",
       "size": 2204,
       "line_count": 79
@@ -571,7 +730,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "java", "rest"],
+      "technologies": [
+        "api",
+        "java",
+        "rest"
+      ],
       "type": "master",
       "size": 2357,
       "line_count": 79
@@ -582,7 +745,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "kubernetes", "rest", "terraform"],
+      "technologies": [
+        "api",
+        "kubernetes",
+        "rest",
+        "terraform"
+      ],
       "type": "master",
       "size": 1836,
       "line_count": 64
@@ -604,7 +772,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 4126,
       "line_count": 112
@@ -615,7 +785,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["android", "ios", "react"],
+      "technologies": [
+        "android",
+        "ios",
+        "react"
+      ],
       "type": "master",
       "size": 2011,
       "line_count": 74
@@ -626,7 +800,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["pytest", "python"],
+      "technologies": [
+        "pytest",
+        "python"
+      ],
       "type": "master",
       "size": 980,
       "line_count": 34
@@ -658,7 +835,14 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "express", "jest", "nestjs", "nodejs", "typescript"],
+      "technologies": [
+        "api",
+        "express",
+        "jest",
+        "nestjs",
+        "nodejs",
+        "typescript"
+      ],
       "type": "master",
       "size": 2210,
       "line_count": 78
@@ -669,7 +853,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 10497,
       "line_count": 460
@@ -680,7 +866,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 2553,
       "line_count": 81
@@ -691,7 +879,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "php", "sql"],
+      "technologies": [
+        "api",
+        "php",
+        "sql"
+      ],
       "type": "master",
       "size": 2383,
       "line_count": 82
@@ -702,7 +894,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 4617,
       "line_count": 143
@@ -724,7 +918,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 2036,
       "line_count": 67
@@ -746,7 +942,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "pytest", "rust"],
+      "technologies": [
+        "go",
+        "pytest",
+        "rust"
+      ],
       "type": "master",
       "size": 3020,
       "line_count": 110
@@ -757,7 +957,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 6638,
       "line_count": 228
@@ -789,7 +991,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "nextjs", "react", "typescript"],
+      "technologies": [
+        "api",
+        "nextjs",
+        "react",
+        "typescript"
+      ],
       "type": "master",
       "size": 2088,
       "line_count": 67
@@ -800,7 +1007,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "rest"],
+      "technologies": [
+        "java",
+        "javascript",
+        "rest"
+      ],
       "type": "master",
       "size": 3950,
       "line_count": 143
@@ -844,7 +1055,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "express", "go", "rust"],
+      "technologies": [
+        "api",
+        "express",
+        "go",
+        "rust"
+      ],
       "type": "master",
       "size": 2740,
       "line_count": 75
@@ -866,7 +1082,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "prisma", "python", "react"],
+      "technologies": [
+        "go",
+        "prisma",
+        "python",
+        "react"
+      ],
       "type": "master",
       "size": 6109,
       "line_count": 176
@@ -877,7 +1098,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "rest", "rust"],
+      "technologies": [
+        "go",
+        "rest",
+        "rust"
+      ],
       "type": "master",
       "size": 6540,
       "line_count": 139
@@ -888,7 +1113,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "rust"],
+      "technologies": [
+        "java",
+        "javascript",
+        "rust"
+      ],
       "type": "master",
       "size": 6545,
       "line_count": 208
@@ -899,7 +1128,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "html", "sql"],
+      "technologies": [
+        "go",
+        "html",
+        "sql"
+      ],
       "type": "master",
       "size": 4282,
       "line_count": 103
@@ -910,7 +1143,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 1860,
       "line_count": 65
@@ -921,7 +1156,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "java", "javascript"],
+      "technologies": [
+        "api",
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 5683,
       "line_count": 165
@@ -943,7 +1182,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "rust"],
+      "technologies": [
+        "go",
+        "rust"
+      ],
       "type": "master",
       "size": 1645,
       "line_count": 41
@@ -954,7 +1196,9 @@
       "description": "Prevents agent from getting stuck on complex inline shell commands",
       "globs": "['**/*']",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 1459,
       "line_count": 34
@@ -965,7 +1209,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["typescript"],
+      "technologies": [
+        "typescript"
+      ],
       "type": "master",
       "size": 2429,
       "line_count": 86
@@ -976,7 +1222,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 2067,
       "line_count": 72
@@ -987,7 +1235,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "ios", "rest"],
+      "technologies": [
+        "api",
+        "go",
+        "ios",
+        "rest"
+      ],
       "type": "master",
       "size": 5689,
       "line_count": 136
@@ -1009,7 +1262,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "typescript"],
+      "technologies": [
+        "java",
+        "javascript",
+        "typescript"
+      ],
       "type": "master",
       "size": 3316,
       "line_count": 80
@@ -1020,7 +1277,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["rest"],
+      "technologies": [
+        "rest"
+      ],
       "type": "master",
       "size": 7248,
       "line_count": 324
@@ -1031,7 +1290,13 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["html", "react", "svelte", "sveltekit", "typescript"],
+      "technologies": [
+        "html",
+        "react",
+        "svelte",
+        "sveltekit",
+        "typescript"
+      ],
       "type": "master",
       "size": 2460,
       "line_count": 85
@@ -1042,7 +1307,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "java", "javascript"],
+      "technologies": [
+        "api",
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 6931,
       "line_count": 217
@@ -1053,7 +1322,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "typescript"],
+      "technologies": [
+        "java",
+        "javascript",
+        "typescript"
+      ],
       "type": "master",
       "size": 6514,
       "line_count": 250
@@ -1064,7 +1337,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "typescript"],
+      "technologies": [
+        "java",
+        "javascript",
+        "typescript"
+      ],
       "type": "master",
       "size": 2765,
       "line_count": 90
@@ -1075,7 +1352,11 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "rust", "typescript"],
+      "technologies": [
+        "api",
+        "rust",
+        "typescript"
+      ],
       "type": "master",
       "size": 1915,
       "line_count": 74
@@ -1086,7 +1367,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["rails"],
+      "technologies": [
+        "rails"
+      ],
       "type": "master",
       "size": 4283,
       "line_count": 158
@@ -1097,7 +1380,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "typescript"],
+      "technologies": [
+        "go",
+        "typescript"
+      ],
       "type": "master",
       "size": 1914,
       "line_count": 80
@@ -1108,7 +1394,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["terraform"],
+      "technologies": [
+        "terraform"
+      ],
       "type": "master",
       "size": 1616,
       "line_count": 57
@@ -1119,7 +1407,12 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "ios", "react", "vue"],
+      "technologies": [
+        "api",
+        "ios",
+        "react",
+        "vue"
+      ],
       "type": "master",
       "size": 6637,
       "line_count": 152
@@ -1130,7 +1423,13 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "java", "javascript", "rest"],
+      "technologies": [
+        "api",
+        "go",
+        "java",
+        "javascript",
+        "rest"
+      ],
       "type": "master",
       "size": 4063,
       "line_count": 147
@@ -1141,7 +1440,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["sql"],
+      "technologies": [
+        "sql"
+      ],
       "type": "master",
       "size": 1690,
       "line_count": 66
@@ -1174,7 +1475,14 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript", "nextjs", "nodejs", "react", "typescript"],
+      "technologies": [
+        "java",
+        "javascript",
+        "nextjs",
+        "nodejs",
+        "react",
+        "typescript"
+      ],
       "type": "master",
       "size": 1648,
       "line_count": 50
@@ -1196,7 +1504,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["express", "rust"],
+      "technologies": [
+        "express",
+        "rust"
+      ],
       "type": "master",
       "size": 3636,
       "line_count": 119
@@ -1207,7 +1518,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["solidity", "web3"],
+      "technologies": [
+        "solidity",
+        "web3"
+      ],
       "type": "master",
       "size": 2660,
       "line_count": 75
@@ -1218,7 +1532,13 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "go", "html", "playwright", "python"],
+      "technologies": [
+        "api",
+        "go",
+        "html",
+        "playwright",
+        "python"
+      ],
       "type": "master",
       "size": 842,
       "line_count": 34
@@ -1229,7 +1549,15 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api", "java", "javascript", "playwright", "react", "svelte", "vue"],
+      "technologies": [
+        "api",
+        "java",
+        "javascript",
+        "playwright",
+        "react",
+        "svelte",
+        "vue"
+      ],
       "type": "master",
       "size": 2005,
       "line_count": 64
@@ -1240,7 +1568,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go"],
+      "technologies": [
+        "go"
+      ],
       "type": "master",
       "size": 2364,
       "line_count": 98
@@ -1251,7 +1581,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 2458,
       "line_count": 79
@@ -1262,7 +1594,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["go", "sql"],
+      "technologies": [
+        "go",
+        "sql"
+      ],
       "type": "master",
       "size": 3255,
       "line_count": 88
@@ -1273,7 +1608,10 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["java", "javascript"],
+      "technologies": [
+        "java",
+        "javascript"
+      ],
       "type": "master",
       "size": 478,
       "line_count": 23
@@ -1284,7 +1622,9 @@
       "description": "",
       "globs": "",
       "priority": "",
-      "technologies": ["api"],
+      "technologies": [
+        "api"
+      ],
       "type": "master",
       "size": 964,
       "line_count": 37
@@ -1425,8 +1765,13 @@
       ".claude/rules/scientific-skills.md",
       ".claude/rules/webapp-testing.md"
     ],
-    "android": [".claude/rules/android-expert.md", ".claude/rules/mobile-first-design-rules.md"],
-    "kotlin": [".claude/rules/android-expert.md"],
+    "android": [
+      ".claude/rules/android-expert.md",
+      ".claude/rules/mobile-first-design-rules.md"
+    ],
+    "kotlin": [
+      ".claude/rules/android-expert.md"
+    ],
     "api": [
       ".claude/rules/api-development-expert.md",
       ".claude/rules/auth-security-expert.md",
@@ -1469,7 +1814,10 @@
       ".claude/rules/workflow-patterns.md",
       ".claude/rules/yara-authoring.md"
     ],
-    "graphql": [".claude/rules/api-development-expert.md", ".claude/rules/graphql-expert.md"],
+    "graphql": [
+      ".claude/rules/api-development-expert.md",
+      ".claude/rules/graphql-expert.md"
+    ],
     "rest": [
       ".claude/rules/api-development-expert.md",
       ".claude/rules/auth-security-expert.md",
@@ -1507,7 +1855,9 @@
       ".claude/rules/frontend-expert.md",
       ".claude/rules/nextjs-expert.md"
     ],
-    "sass": [".claude/rules/binary-analysis-patterns.md"],
+    "sass": [
+      ".claude/rules/binary-analysis-patterns.md"
+    ],
     "react": [
       ".claude/rules/checklist-generator.md",
       ".claude/rules/expo-framework-rule.md",
@@ -1527,14 +1877,22 @@
       ".claude/rules/nodejs-expert.md",
       ".claude/rules/typescript-expert.md"
     ],
-    "jsx": [".claude/rules/code-style-validator.md"],
+    "jsx": [
+      ".claude/rules/code-style-validator.md"
+    ],
     "tsx": [
       ".claude/rules/code-style-validator.md",
       ".claude/rules/expo-framework-rule.md",
       ".claude/rules/nextjs-expert.md"
     ],
-    "docker": [".claude/rules/container-expert.md", ".claude/rules/docker-compose.md"],
-    "kubernetes": [".claude/rules/container-expert.md", ".claude/rules/k8s-manifest-generator.md"],
+    "docker": [
+      ".claude/rules/container-expert.md",
+      ".claude/rules/docker-compose.md"
+    ],
+    "kubernetes": [
+      ".claude/rules/container-expert.md",
+      ".claude/rules/k8s-manifest-generator.md"
+    ],
     "terraform": [
       ".claude/rules/container-expert.md",
       ".claude/rules/docker-compose.md",
@@ -1548,7 +1906,10 @@
       ".claude/rules/rust-expert.md",
       ".claude/rules/verification-before-completion.md"
     ],
-    "pydantic": [".claude/rules/data-expert.md", ".claude/rules/python-backend-expert.md"],
+    "pydantic": [
+      ".claude/rules/data-expert.md",
+      ".claude/rules/python-backend-expert.md"
+    ],
     "sql": [
       ".claude/rules/data-expert.md",
       ".claude/rules/database-architect.md",
@@ -1558,11 +1919,22 @@
       ".claude/rules/text-to-sql.md",
       ".claude/rules/workspace-conventions.md"
     ],
-    "mongodb": [".claude/rules/database-architect.md"],
-    "postgresql": [".claude/rules/database-architect.md"],
-    "prisma": [".claude/rules/database-expert.md", ".claude/rules/scientific-skills.md"],
-    "ruby": [".claude/rules/gamedev-expert.md"],
-    "swift": [".claude/rules/ios-expert.md"],
+    "mongodb": [
+      ".claude/rules/database-architect.md"
+    ],
+    "postgresql": [
+      ".claude/rules/database-architect.md"
+    ],
+    "prisma": [
+      ".claude/rules/database-expert.md",
+      ".claude/rules/scientific-skills.md"
+    ],
+    "ruby": [
+      ".claude/rules/gamedev-expert.md"
+    ],
+    "swift": [
+      ".claude/rules/ios-expert.md"
+    ],
     "pytest": [
       ".claude/rules/modern-python.md",
       ".claude/rules/project-onboarding.md",
@@ -1573,20 +1945,53 @@
       ".claude/rules/react-expert.md",
       ".claude/rules/typescript-expert.md"
     ],
-    "tailwind": [".claude/rules/nextjs-expert.md"],
-    "jest": [".claude/rules/nodejs-expert.md"],
-    "nestjs": [".claude/rules/nodejs-expert.md"],
-    "php": [".claude/rules/php-expert.md"],
-    "django": [".claude/rules/python-backend-expert.md"],
-    "fastapi": [".claude/rules/python-backend-expert.md"],
-    "flask": [".claude/rules/python-backend-expert.md"],
-    "htmx": [".claude/rules/python-backend-expert.md"],
-    "svelte": [".claude/rules/svelte-expert.md", ".claude/rules/webmcp-browser-tools.md"],
-    "sveltekit": [".claude/rules/svelte-expert.md"],
-    "rails": [".claude/rules/tdd.md"],
-    "vue": [".claude/rules/test-generator.md", ".claude/rules/webmcp-browser-tools.md"],
-    "solidity": [".claude/rules/web3-expert.md"],
-    "web3": [".claude/rules/web3-expert.md"],
-    "playwright": [".claude/rules/webapp-testing.md", ".claude/rules/webmcp-browser-tools.md"]
+    "tailwind": [
+      ".claude/rules/nextjs-expert.md"
+    ],
+    "jest": [
+      ".claude/rules/nodejs-expert.md"
+    ],
+    "nestjs": [
+      ".claude/rules/nodejs-expert.md"
+    ],
+    "php": [
+      ".claude/rules/php-expert.md"
+    ],
+    "django": [
+      ".claude/rules/python-backend-expert.md"
+    ],
+    "fastapi": [
+      ".claude/rules/python-backend-expert.md"
+    ],
+    "flask": [
+      ".claude/rules/python-backend-expert.md"
+    ],
+    "htmx": [
+      ".claude/rules/python-backend-expert.md"
+    ],
+    "svelte": [
+      ".claude/rules/svelte-expert.md",
+      ".claude/rules/webmcp-browser-tools.md"
+    ],
+    "sveltekit": [
+      ".claude/rules/svelte-expert.md"
+    ],
+    "rails": [
+      ".claude/rules/tdd.md"
+    ],
+    "vue": [
+      ".claude/rules/test-generator.md",
+      ".claude/rules/webmcp-browser-tools.md"
+    ],
+    "solidity": [
+      ".claude/rules/web3-expert.md"
+    ],
+    "web3": [
+      ".claude/rules/web3-expert.md"
+    ],
+    "playwright": [
+      ".claude/rules/webapp-testing.md",
+      ".claude/rules/webmcp-browser-tools.md"
+    ]
   }
 }

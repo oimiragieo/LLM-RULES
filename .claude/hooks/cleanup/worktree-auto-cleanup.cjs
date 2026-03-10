@@ -181,17 +181,28 @@ function run() {
 
   // Step 4: List worktrees and remove any stale ones
   const worktrees = listWorktrees();
-  const normalizedCwd = process.cwd().replace(/\\/g, '/');
 
   for (const wt of worktrees) {
     const { worktreePath, branch } = wt;
 
-    // Only process worktrees under .claude/worktrees/
-    if (!worktreePath.startsWith(normalizedWorktreesDir)) continue;
+    // Use path.resolve() to guarantee absolute, OS-specific path normalization for all sources
+    const resolvedWtPath = path.resolve(worktreePath);
+    const resolvedWorktreesDir = path.resolve(normalizedWorktreesDir);
+    const resolvedRoot = path.resolve(PROJECT_ROOT);
+    const resolvedCwd = path.resolve(process.cwd());
+
+    // Only process worktrees securely under the designated directory
+    if (!resolvedWtPath.toLowerCase().startsWith(resolvedWorktreesDir.toLowerCase())) continue;
+
     // Safety: never remove main project root
-    if (worktreePath === normalizedProjectRoot) continue;
-    // Safety: never remove current session's worktree (Windows EBUSY risk)
-    if (normalizedCwd.startsWith(worktreePath)) continue;
+    if (resolvedWtPath.toLowerCase() === resolvedRoot.toLowerCase()) continue;
+
+    // Safety: bulletproof check to ensure we never delete the active session's worktree (Windows EBUSY risk)
+    // path.relative returns an empty string if paths are identical, or a relative path not starting with .. if cwd is inside wtPath
+    const isCwdInsideWt = path.relative(resolvedWtPath, resolvedCwd);
+    if (isCwdInsideWt === '' || (!isCwdInsideWt.startsWith('..') && !path.isAbsolute(isCwdInsideWt))) {
+      continue;
+    }
     // Safety: skip if no branch info
     if (!branch) continue;
 
