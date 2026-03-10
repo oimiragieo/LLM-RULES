@@ -21,7 +21,7 @@ function estimateTokens(text) {
 }
 
 const chunks = [];
-process.stdin.on('data', (c) => chunks.push(c));
+process.stdin.on('data', c => chunks.push(c));
 process.stdin.on('end', () => {
   try {
     const input = JSON.parse(Buffer.concat(chunks).toString());

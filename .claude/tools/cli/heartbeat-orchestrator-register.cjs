@@ -112,7 +112,9 @@ async function main() {
 
     // Report each loop
     for (const loop of finalLoops) {
-      const isHeartbeat = LOOPS_TO_REGISTER.some(l => l.name && loop.task?.includes(l.task?.substring(0, 20)));
+      const isHeartbeat = LOOPS_TO_REGISTER.some(
+        l => l.name && loop.task?.includes(l.task?.substring(0, 20))
+      );
       const marker = isHeartbeat ? '♥' : '·';
       console.log(`  ${marker} ${loop.id} (${loop.schedule || 'custom'})`);
     }
@@ -122,7 +124,10 @@ async function main() {
 
   // Step 4: Write sentinel file
   console.log('\nStep 4: Writing heartbeat sentinel...');
-  const { writeSentinel, writeSessionPing } = require('./.claude/lib/heartbeat/heartbeat-sentinel.cjs');
+  const {
+    writeSentinel,
+    writeSessionPing,
+  } = require('./.claude/lib/heartbeat/heartbeat-sentinel.cjs');
 
   try {
     const sentinelPath = writeSentinel(registeredIds);

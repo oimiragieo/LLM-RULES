@@ -13,10 +13,7 @@ try {
 
   // Resolve send-event.cjs relative to this hook's location
   const path = require('path');
-  const sendEventPath = path.resolve(
-    __dirname,
-    '../../../../tools/observability/send-event.cjs'
-  );
+  const sendEventPath = path.resolve(__dirname, '../../../../tools/observability/send-event.cjs');
 
   let sendEvent;
   try {

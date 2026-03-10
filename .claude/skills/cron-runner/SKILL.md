@@ -1,6 +1,6 @@
 ---
 name: cron-runner
-description: "Background orchestrator that drains the system-wide cron-actions-queue.jsonl queue safely, preventing LLM context pollution in the primary router."
+description: 'Background orchestrator that drains the system-wide cron-actions-queue.jsonl queue safely, preventing LLM context pollution in the primary router.'
 type: agent-skill
 version: 1.0.0
 ---

@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-10T11:48:14.360Z",
+  "generatedAt": "2026-03-10T12:02:35.852Z",
   "metadata": {
     "totalSkills": 275,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-10T11:48:14.361Z",
+    "lastValidated": "2026-03-10T12:02:35.853Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7009,7 +7009,7 @@
       "displayName": "Cron Runner",
       "category": "Other",
       "domain": "other",
-      "description": "Other - cron-runner",
+      "description": "Background orchestrator that drains the system-wide cron-actions-queue.jsonl queue safely, preventing LLM context pollution in the primary router.",
       "requiredTools": [
         "Read",
         "Write",

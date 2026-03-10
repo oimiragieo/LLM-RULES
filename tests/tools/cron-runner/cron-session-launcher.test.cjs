@@ -74,9 +74,12 @@ describe('cron-session-launcher', () => {
       assert.equal(content, '12345');
 
       // Verify O_EXCL fails on second attempt
-      assert.throws(() => {
-        fs.openSync(pidFile, 'wx');
-      }, { code: 'EEXIST' });
+      assert.throws(
+        () => {
+          fs.openSync(pidFile, 'wx');
+        },
+        { code: 'EEXIST' }
+      );
     });
 
     it('O_EXCL prevents race conditions', () => {
@@ -88,9 +91,12 @@ describe('cron-session-launcher', () => {
       fs.closeSync(fd1);
 
       // Second open with O_EXCL fails (even if file was just created)
-      assert.throws(() => {
-        fs.openSync(pidFile, 'wx');
-      }, { code: 'EEXIST' });
+      assert.throws(
+        () => {
+          fs.openSync(pidFile, 'wx');
+        },
+        { code: 'EEXIST' }
+      );
     });
 
     it('stale PID file can be reclaimed', () => {

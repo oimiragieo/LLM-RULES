@@ -37,8 +37,7 @@ for (const line of lines) {
   if (dateMatch && line.startsWith('#')) {
     // Flush previous entry
     if (currentEntry.length) {
-      const target =
-        currentDate && new Date(currentDate).getTime() < cutoff ? toArchive : toKeep;
+      const target = currentDate && new Date(currentDate).getTime() < cutoff ? toArchive : toKeep;
       target.push(...currentEntry);
     }
     currentDate = dateMatch[1];
@@ -49,8 +48,7 @@ for (const line of lines) {
 }
 // Flush last entry
 if (currentEntry.length) {
-  const target =
-    currentDate && new Date(currentDate).getTime() < cutoff ? toArchive : toKeep;
+  const target = currentDate && new Date(currentDate).getTime() < cutoff ? toArchive : toKeep;
   target.push(...currentEntry);
 }
 

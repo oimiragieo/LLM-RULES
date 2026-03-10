@@ -203,7 +203,7 @@ describe('queue-drain', () => {
     it('returns empty for empty file', () => {
       fs.writeFileSync(testEnv.queueFile, '');
       const content = fs.readFileSync(testEnv.queueFile, 'utf-8');
-      const lines = content.split('\n').filter((l) => l.trim() !== '');
+      const lines = content.split('\n').filter(l => l.trim() !== '');
       assert.equal(lines.length, 0);
     });
 
@@ -216,7 +216,7 @@ describe('queue-drain', () => {
       fs.writeFileSync(testEnv.queueFile, entries.join('\n') + '\n');
 
       const content = fs.readFileSync(testEnv.queueFile, 'utf-8');
-      const allLines = content.split('\n').filter((l) => l.trim() !== '');
+      const allLines = content.split('\n').filter(l => l.trim() !== '');
       assert.equal(allLines.length, 3);
 
       // Simulate reading from offset 1
@@ -251,7 +251,11 @@ describe('queue-drain', () => {
       const lines = [
         JSON.stringify({ type: 'CRON_TICK', loop: 'a', timestamp: '2026-03-09T12:00:00Z' }),
         '{bad json here}}}',
-        JSON.stringify({ type: 'CLAUDE_ACTION', action: 'test', timestamp: '2026-03-09T12:01:00Z' }),
+        JSON.stringify({
+          type: 'CLAUDE_ACTION',
+          action: 'test',
+          timestamp: '2026-03-09T12:01:00Z',
+        }),
         '',
         JSON.stringify({ type: 'HEALTH_PING', timestamp: '2026-03-09T12:02:00Z' }),
       ];
@@ -259,7 +263,7 @@ describe('queue-drain', () => {
       fs.writeFileSync(queueFile, lines.join('\n') + '\n');
 
       // Test parseLine on each non-empty line
-      const nonEmpty = lines.filter((l) => l.trim() !== '');
+      const nonEmpty = lines.filter(l => l.trim() !== '');
       const results = nonEmpty.map((line, i) => queueDrain.parseLine(line, i));
 
       // Line 0: valid CRON_TICK
@@ -298,7 +302,7 @@ describe('queue-drain', () => {
       // Parse and process each
       const parsed = lines.map((l, i) => queueDrain.parseLine(l, i));
       assert.equal(parsed.length, 3);
-      assert.ok(parsed.every((p) => p !== null));
+      assert.ok(parsed.every(p => p !== null));
 
       // Process with error isolation
       const results = [];

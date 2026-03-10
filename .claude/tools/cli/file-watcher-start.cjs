@@ -17,4 +17,4 @@ console.log(`[File Watcher] Initializing background watcher for: ${rootDir}`);
 startWatcher(rootDir);
 
 // Keep the process alive indefinitely
-setInterval(() => { }, 1000 * 60 * 60);
+setInterval(() => {}, 1000 * 60 * 60);

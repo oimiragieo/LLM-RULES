@@ -123,15 +123,18 @@ node scripts/analyze-session-transcript.mjs --out .claude/context/reports/backen
 
 ```markdown
 # Session Analysis Report: f1326443-490f-486b-bb67-01c72bf42408
+
 Generated: 2026-03-10T12:00:00.000Z
 
 ## Overview Metrics
+
 - **User Turns:** 14
 - **Tool Invocations:** 87
 - **Tool Errors:** 3
 - **Debug Log Errors:** 2
 
 ## Tool Usage Summary
+
 - `Read`: 34 times
 - `Edit`: 18 times
 - `Bash`: 15 times
@@ -139,11 +142,14 @@ Generated: 2026-03-10T12:00:00.000Z
 - `TaskUpdate`: 8 times
 
 ## Heuristic Findings
+
 ### Context Length Exceeded (API Error)
+
 The orchestrator accumulated too many tokens and crashed the API request.
 Occurred **1** times.
 
 ## Top Tool Failures (from Transcript UI)
+
 - `toolu_01ABC`: File not found: .claude/context/runtime/stale-tasks.json...
 ```
 

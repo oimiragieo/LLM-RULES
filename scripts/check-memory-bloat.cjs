@@ -18,7 +18,9 @@ for (const [file, threshold] of Object.entries(THRESHOLDS)) {
   if (threshold.lines) {
     const lines = fs.readFileSync(fpath, 'utf8').split('\n').length;
     if (lines > threshold.lines) {
-      console.error(`BLOAT: ${file} has ${lines} lines (threshold: ${threshold.lines}) — ${threshold.desc}`);
+      console.error(
+        `BLOAT: ${file} has ${lines} lines (threshold: ${threshold.lines}) — ${threshold.desc}`
+      );
       bloated++;
     } else {
       console.log(`OK: ${file} has ${lines} lines`);
@@ -26,12 +28,17 @@ for (const [file, threshold] of Object.entries(THRESHOLDS)) {
   } else if (threshold.bytes) {
     const size = fs.statSync(fpath).size;
     if (size > threshold.bytes) {
-      console.error(`BLOAT: ${file} is ${(size/1024).toFixed(1)}KB (threshold: ${(threshold.bytes/1024).toFixed(0)}KB) — ${threshold.desc}`);
+      console.error(
+        `BLOAT: ${file} is ${(size / 1024).toFixed(1)}KB (threshold: ${(threshold.bytes / 1024).toFixed(0)}KB) — ${threshold.desc}`
+      );
       bloated++;
     } else {
-      console.log(`OK: ${file} is ${(size/1024).toFixed(1)}KB`);
+      console.log(`OK: ${file} is ${(size / 1024).toFixed(1)}KB`);
     }
   }
 }
-if (bloated > 0) { console.error(`\n${bloated} file(s) exceed bloat thresholds. Address before spawning agents.`); process.exit(1); }
+if (bloated > 0) {
+  console.error(`\n${bloated} file(s) exceed bloat thresholds. Address before spawning agents.`);
+  process.exit(1);
+}
 console.log('\nAll memory files within thresholds.');

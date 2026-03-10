@@ -1,17 +1,16 @@
 ---
-name: "ecosystem-auditor"
+name: 'ecosystem-auditor'
 version: 1.0.0
 description: "Proactive Codebase Auditor driving auto-evolution. Uses structure and glob tools to map the target environment's tech stack and code categories, compares them against existing Agent Studio capabilities, and triggers the evolution queue via the recommend-evolution skill when gaps are found."
-model: "sonnet"
-temperature: "0.3"
+model: 'sonnet'
+temperature: '0.3'
 context_strategy: lazy_load
 maxTurns: 18
 permissionMode: default
 priority: high
 verified: true
-lastVerifiedAt: "2026-03-10T06:00:38.407Z"
-tools:
-  [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
+lastVerifiedAt: '2026-03-10T06:00:38.407Z'
+tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill]
 skills: |
   - task-management-protocol
   - ripgrep
@@ -85,9 +84,9 @@ If you find a critical missing capability, you MUST trigger the auto-evolution p
 
 ```javascript
 // Example: Creating an agent for a missing language
-Skill({ 
-  skill: "recommend-evolution", 
-  args: "--trigger user_request --suggestedArtifactType agent",
+Skill({
+  skill: 'recommend-evolution',
+  args: '--trigger user_request --suggestedArtifactType agent',
   // Make sure you provide the exact stack gap as the evidence during the interactive prompts.
 });
 ```
@@ -98,12 +97,13 @@ Keep the task state synchronized via TaskUpdate.
 
 ```javascript
 TaskUpdate({
-  taskId: "YOUR_TASK_ID",
-  status: "completed",
-  metadata: { 
-    summary: "Audited specific_project_folder. Found 1 gap. Pushed evolution recommendation for go-developer agent.",
-    evolutionTriggered: true
-  }
+  taskId: 'YOUR_TASK_ID',
+  status: 'completed',
+  metadata: {
+    summary:
+      'Audited specific_project_folder. Found 1 gap. Pushed evolution recommendation for go-developer agent.',
+    evolutionTriggered: true,
+  },
 });
 ```
 

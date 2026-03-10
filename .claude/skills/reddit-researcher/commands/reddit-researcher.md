@@ -12,21 +12,21 @@ Search and read public Reddit content using the unauthenticated JSON API.
 
 ## Actions
 
-| Action | Description | Required Parameters |
-|--------|-------------|-------------------|
-| `search` | Search Reddit globally or within a subreddit | `--query` |
-| `subreddit` | Fetch hot posts from a subreddit | `--subreddit` |
-| `post` | Fetch a specific post with its metadata | `--subreddit`, `--postId` |
+| Action      | Description                                  | Required Parameters       |
+| ----------- | -------------------------------------------- | ------------------------- |
+| `search`    | Search Reddit globally or within a subreddit | `--query`                 |
+| `subreddit` | Fetch hot posts from a subreddit             | `--subreddit`             |
+| `post`      | Fetch a specific post with its metadata      | `--subreddit`, `--postId` |
 
 ## Parameters
 
-| Parameter | Type | Description | Constraints |
-|-----------|------|-------------|-------------|
-| `--action` | enum | Action to perform | Required. One of: search, subreddit, post |
-| `--subreddit` | string | Subreddit name (no r/ prefix) | Pattern: `^[A-Za-z0-9_]{1,50}$` |
-| `--query` | string | Search query text | Max 200 characters |
-| `--postId` | string | Reddit post ID | Pattern: `^[a-z0-9]{4,10}$` |
-| `--limit` | integer | Max results | 1-25 (default: 10) |
+| Parameter     | Type    | Description                   | Constraints                               |
+| ------------- | ------- | ----------------------------- | ----------------------------------------- |
+| `--action`    | enum    | Action to perform             | Required. One of: search, subreddit, post |
+| `--subreddit` | string  | Subreddit name (no r/ prefix) | Pattern: `^[A-Za-z0-9_]{1,50}$`           |
+| `--query`     | string  | Search query text             | Max 200 characters                        |
+| `--postId`    | string  | Reddit post ID                | Pattern: `^[a-z0-9]{4,10}$`               |
+| `--limit`     | integer | Max results                   | 1-25 (default: 10)                        |
 
 ## Invocation via Skill tool
 
@@ -39,6 +39,7 @@ Skill({ skill: 'reddit-researcher' });
 ## Security
 
 All URLs are validated against SSRF allowlist before fetching:
+
 - `reddit.com`
 - `www.reddit.com`
 - `old.reddit.com`

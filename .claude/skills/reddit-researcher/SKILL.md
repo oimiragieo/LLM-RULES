@@ -48,16 +48,16 @@ Fetch and analyze public Reddit content without authentication using the Reddit 
 
 ## API Reference
 
-| Endpoint | Description | Notes |
-|----------|-------------|-------|
-| `https://www.reddit.com/r/{sub}.json` | Hot posts in subreddit | Default sort: hot |
-| `https://www.reddit.com/r/{sub}/hot.json` | Hot posts (explicit) | |
-| `https://www.reddit.com/r/{sub}/new.json` | New posts | |
-| `https://www.reddit.com/r/{sub}/top.json?t=week` | Top posts by time | t=hour/day/week/month/year/all |
-| `https://www.reddit.com/r/{sub}/about.json` | Subreddit metadata | subscriber count, description |
-| `https://www.reddit.com/search.json?q={query}` | Global search | |
-| `https://www.reddit.com/r/{sub}/search.json?q={query}&restrict_sr=1` | Subreddit-scoped search | |
-| `https://www.reddit.com/r/{sub}/comments/{id}.json` | Post with comments | Returns array[2]: post + comments |
+| Endpoint                                                             | Description             | Notes                             |
+| -------------------------------------------------------------------- | ----------------------- | --------------------------------- |
+| `https://www.reddit.com/r/{sub}.json`                                | Hot posts in subreddit  | Default sort: hot                 |
+| `https://www.reddit.com/r/{sub}/hot.json`                            | Hot posts (explicit)    |                                   |
+| `https://www.reddit.com/r/{sub}/new.json`                            | New posts               |                                   |
+| `https://www.reddit.com/r/{sub}/top.json?t=week`                     | Top posts by time       | t=hour/day/week/month/year/all    |
+| `https://www.reddit.com/r/{sub}/about.json`                          | Subreddit metadata      | subscriber count, description     |
+| `https://www.reddit.com/search.json?q={query}`                       | Global search           |                                   |
+| `https://www.reddit.com/r/{sub}/search.json?q={query}&restrict_sr=1` | Subreddit-scoped search |                                   |
+| `https://www.reddit.com/r/{sub}/comments/{id}.json`                  | Post with comments      | Returns array[2]: post + comments |
 
 **Query Parameters:**
 
@@ -79,11 +79,7 @@ User-Agent: agent-studio-reddit-researcher/1.0
 Always validate URLs using `new URL().hostname` before passing to WebFetch. Do not use regex or string-contains matching — those fail on encoded URLs and normalization tricks.
 
 ```javascript
-const ALLOWED_REDDIT_HOSTS = new Set([
-  'reddit.com',
-  'www.reddit.com',
-  'old.reddit.com'
-]);
+const ALLOWED_REDDIT_HOSTS = new Set(['reddit.com', 'www.reddit.com', 'old.reddit.com']);
 
 function validateRedditUrl(href) {
   let parsed;
@@ -112,11 +108,11 @@ function validateRedditUrl(href) {
 
 ## Rate Limit Guidance
 
-| Endpoint Type | Limit | Notes |
-|---------------|-------|-------|
-| General listing endpoints | 10 req/min | Rolling window |
-| Search endpoints | ~3-5 req/min | More restrictive |
-| WebFetch built-in cache | 15-min TTL | Repeated calls to same URL are free |
+| Endpoint Type             | Limit        | Notes                               |
+| ------------------------- | ------------ | ----------------------------------- |
+| General listing endpoints | 10 req/min   | Rolling window                      |
+| Search endpoints          | ~3-5 req/min | More restrictive                    |
+| WebFetch built-in cache   | 15-min TTL   | Repeated calls to same URL are free |
 
 **Safe multi-call pattern:** Add 1-2 second delays between calls. Use `limit=25` to get enough results per call without needing rapid pagination.
 
@@ -182,13 +178,13 @@ Headers: User-Agent: agent-studio-reddit-researcher/1.0
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Fetching reddit.com without `.json` suffix | Returns HTML, not structured data | Always append `.json` to the URL path |
-| Using regex to validate URLs | Fails on encoded/normalized URLs; SSRF bypass possible | Use `new URL(href).hostname` and check against allowlist Set |
-| No User-Agent header | Reddit blocks anonymous requests; returns 429 or HTML | Always include `User-Agent: agent-studio-reddit-researcher/1.0` |
-| Rapid successive requests (>10/min) | Rate limit triggers 429 responses | Add 1-2s delays; use `limit=100` to reduce call count |
-| Attempting write operations | Reddit's public JSON API is read-only without OAuth | Use only GET endpoints; never attempt POST/PUT/DELETE |
+| Anti-Pattern                               | Why It Fails                                           | Correct Approach                                                |
+| ------------------------------------------ | ------------------------------------------------------ | --------------------------------------------------------------- |
+| Fetching reddit.com without `.json` suffix | Returns HTML, not structured data                      | Always append `.json` to the URL path                           |
+| Using regex to validate URLs               | Fails on encoded/normalized URLs; SSRF bypass possible | Use `new URL(href).hostname` and check against allowlist Set    |
+| No User-Agent header                       | Reddit blocks anonymous requests; returns 429 or HTML  | Always include `User-Agent: agent-studio-reddit-researcher/1.0` |
+| Rapid successive requests (>10/min)        | Rate limit triggers 429 responses                      | Add 1-2s delays; use `limit=100` to reduce call count           |
+| Attempting write operations                | Reddit's public JSON API is read-only without OAuth    | Use only GET endpoints; never attempt POST/PUT/DELETE           |
 
 ---
 
