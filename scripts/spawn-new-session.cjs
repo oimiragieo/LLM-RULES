@@ -12,7 +12,7 @@ const { enterDrainMode } = require('../.claude/lib/context/drain-state.cjs');
 // Parse CLI options
 const args = process.argv.slice(2);
 const skipDrain = args.includes('--skip-drain');
-const command = args.includes('--command') ? args[args.indexOf('--command') + 1] : 'claude';
+const claudeFlags = args.includes('--flags') ? args[args.indexOf('--flags') + 1] : '--dangerously-skip-permissions -d';
 const resumeInstructions = args.includes('--message') ? args[args.indexOf('--message') + 1] : 'Please continue the current task from the handoff inbox.';
 
 function spawnDetached(bin, spawnArgs, cwd) {
@@ -180,14 +180,21 @@ function main() {
     console.log(`[spawn-new-session] Session ${sessionId} entered DRAIN mode.`);
   }
 
-  // 4. Spawn the new terminal
-  // We use `set CLAUDECODE= && cmd` on Windows, or `unset CLAUDECODE; cmd` on POSIX
-  // to ensure the new context doesn't inherit any active task states or specific overrides.
+  // 4. Spawn the new terminal.
+  // Strategy: run claude in -p (print/headless) mode first with a seed prompt.
+  //   - The UserPromptSubmit hook fires, claims the baton, writes the ACK, and
+  //     injects the full handover context alongside the seed prompt.
+  //   - Claude processes the context and starts working autonomously (Step 0, etc.)
+  //   - When the -p turn completes the session is persisted to disk.
+  //   - Then `claude --continue` opens interactive mode on that same session so
+  //     the user can take over or review output.
+  // We unset CLAUDECODE so the child process doesn't see a nested-session error.
+  const seedPrompt = 'continue';
   let cleanCommand;
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && ${command}`;
+    cleanCommand = `set CLAUDECODE= && claude ${claudeFlags} -p "${seedPrompt}" && claude ${claudeFlags} -c`;
   } else {
-    cleanCommand = `unset CLAUDECODE && ${command}`;
+    cleanCommand = `unset CLAUDECODE && claude ${claudeFlags} -p "${seedPrompt}" && claude ${claudeFlags} -c`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
