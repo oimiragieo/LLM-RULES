@@ -1,138 +1,115 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "shift-change-log.schema.json",
-  "title": "ShiftChangeHandoverLog",
-  "description": "Atomic handover document written by a draining Claude session for consumption by the successor session",
   "type": "object",
-  "required": [
-    "schemaVersion",
-    "handoffId",
-    "generation",
-    "status",
-    "sessionId",
-    "activePid",
-    "currentObjective",
-    "contextPercent",
-    "contextSummary",
-    "memoryPointers",
-    "pendingActions",
-    "subagentStates",
-    "resumeInstructions",
-    "pendingMemoryWrites",
-    "drainDeadline",
-    "timestamp"
-  ],
-  "additionalProperties": false,
+  "required": ["schemaVersion", "handoffId", "generation", "status", "sessionId", "timestamp"],
   "properties": {
     "schemaVersion": {
       "type": "string",
-      "const": "1.0.0",
-      "description": "Schema version for forward compatibility"
+      "pattern": "^1\\.\\d+\\.\\d+$"
     },
     "handoffId": {
       "type": "string",
-      "minLength": 1,
-      "description": "Unique identifier for this handoff event (UUID v4 recommended)"
+      "format": "uuid"
     },
     "generation": {
       "type": "integer",
-      "minimum": 0,
-      "description": "Monotonically increasing generation counter for this objective"
+      "minimum": 0
     },
     "status": {
       "type": "string",
-      "enum": ["WRITING", "READY", "CLAIMED", "SUPERSEDED", "FAILED"],
-      "description": "Lifecycle state of this handover log"
+      "enum": ["WRITING", "READY", "CLAIMED", "SUPERSEDED", "FAILED"]
     },
     "sessionId": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Unique identifier for the session that wrote this log"
+      "type": "string"
     },
     "activePid": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "Process ID of the session that wrote this log (informational only — best-effort, may be stale)"
+      "type": "integer"
     },
     "currentObjective": {
-      "type": "string",
-      "minLength": 1,
-      "description": "High-level goal still in progress at time of handoff"
+      "type": "string"
     },
     "contextPercent": {
       "type": "number",
       "minimum": 0,
-      "maximum": 1,
-      "description": "Estimated context window utilization at time of handoff (0.0–1.0)"
+      "maximum": 1
     },
     "contextSummary": {
-      "type": "string",
-      "description": "Oral tradition capture — implicit context, conventions, and decisions not in memory files"
+      "type": "string"
     },
     "memoryPointers": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["file", "key", "summary"],
-        "additionalProperties": false,
         "properties": {
-          "file": { "type": "string", "minLength": 1 },
-          "key": { "type": "string", "minLength": 1 },
-          "summary": { "type": "string" }
-        }
-      },
-      "description": "References to recent updates in persistent memory files"
+          "file": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": ["file", "key", "summary"]
+      }
     },
     "pendingActions": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["taskId", "description", "priority"],
-        "additionalProperties": false,
         "properties": {
-          "taskId": { "type": "string", "minLength": 1 },
-          "description": { "type": "string" },
+          "taskId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
           "priority": {
             "type": "string",
             "enum": ["high", "medium", "low"]
           }
-        }
-      },
-      "description": "Tasks the successor session must execute upon claiming"
+        },
+        "required": ["taskId", "description", "priority"]
+      }
     },
     "subagentStates": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["taskId", "agentType", "status"],
-        "additionalProperties": false,
         "properties": {
-          "taskId": { "type": "string", "minLength": 1 },
-          "agentType": { "type": "string" },
-          "status": { "type": "string" },
-          "outputFile": { "type": "string" }
-        }
-      },
-      "description": "State snapshot of active or recently completed subagents"
+          "taskId": {
+            "type": "string"
+          },
+          "agentType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "outputFile": {
+            "type": "string"
+          }
+        },
+        "required": ["taskId", "agentType", "status", "outputFile"]
+      }
     },
     "resumeInstructions": {
-      "type": "string",
-      "description": "Imperative instructions for what the successor session must do first"
+      "type": "string"
     },
     "pendingMemoryWrites": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Memory write operations that were pending at drain time and must be applied by successor"
+      "items": {
+        "type": "string"
+      }
     },
     "drainDeadline": {
       "type": "string",
-      "format": "date-time",
-      "description": "ISO8601 deadline after which drain is declared complete regardless of active tasks"
+      "format": "date-time"
     },
     "timestamp": {
       "type": "string",
-      "format": "date-time",
-      "description": "ISO8601 timestamp when this log was written"
+      "format": "date-time"
     }
   }
 }

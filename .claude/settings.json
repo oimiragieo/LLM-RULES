@@ -165,15 +165,6 @@
         ]
       },
       {
-        "matcher": "TaskCreate|Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/routing/finish-only-guard.cjs"
-          }
-        ]
-      },
-      {
         "matcher": "Task",
         "hooks": [
           {
@@ -183,6 +174,15 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/task-pretool-orchestrator.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskCreate|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/finish-only-guard.cjs"
           }
         ]
       },

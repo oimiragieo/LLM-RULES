@@ -1,89 +1,85 @@
-#!/usr/bin/env node
-// Agent: developer | Task: #7 | Session: 2026-03-10
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
-const { LOG_FILENAME } = require('./shift-change-log-writer.cjs');
-const SUPPORTED_SCHEMA_MAJOR = '1';
 
-function getDefaultRuntimeDir() {
-  return path.join(__dirname, '../../context/runtime');
-}
-
-/**
- * Read and validate a shift change handover log.
- * Returns null for: missing file, corrupt JSON, status !== READY, version mismatch.
- * @param {string} [runtimeDir]
- * @returns {object|null}
- */
-function readHandoverLog(runtimeDir) {
-  const dir = runtimeDir || getDefaultRuntimeDir();
-  const logPath = path.join(dir, LOG_FILENAME);
+function readHandoverLog(runtimeDir = path.join(process.cwd(), '.claude/context/runtime')) {
+  const logPath = path.join(runtimeDir, 'shift-change-log.json');
 
   if (!fs.existsSync(logPath)) {
     return null;
   }
 
-  let raw;
-  try {
-    raw = fs.readFileSync(logPath, 'utf8');
-  } catch {
-    return null;
-  }
+  const content = fs.readFileSync(logPath, 'utf8');
+  const log = safeParseJSON(content);
 
-  const data = safeParseJSON(raw);
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    return null;
-  }
-
-  // Reject incomplete writes
-  if (data.status === 'WRITING') {
-    return null;
-  }
-
-  // Only READY logs are consumable
-  if (data.status !== 'READY') {
-    return null;
-  }
-
-  // Schema version must be compatible (starts with '1.')
-  if (!data.schemaVersion || !String(data.schemaVersion).startsWith(`${SUPPORTED_SCHEMA_MAJOR}.`)) {
-    process.stderr.write(`[shift-change-log-reader] Incompatible schemaVersion: ${data.schemaVersion}\n`);
-    return null;
-  }
-
-  return data;
-}
-
-/**
- * Atomically transition log status from READY to CLAIMED.
- * @param {string} [runtimeDir]
- * @param {string} claimingSessionId
- * @returns {boolean} true if claimed successfully
- */
-function claimHandoverLog(runtimeDir, claimingSessionId) {
-  const dir = runtimeDir || getDefaultRuntimeDir();
-  const logPath = path.join(dir, LOG_FILENAME);
-
-  const log = readHandoverLog(dir);
   if (!log) {
-    return false;
+    return null;
   }
 
-  log.status = 'CLAIMED';
-  log.claimedBy = claimingSessionId;
-  log.claimedAt = new Date().toISOString();
-
-  try {
-    const tmpPath = logPath + '.claim.tmp';
-    fs.writeFileSync(tmpPath, JSON.stringify(log, null, 2), 'utf8');
-    fs.renameSync(tmpPath, logPath);
-    return true;
-  } catch {
-    return false;
+  if (log.status !== 'READY') {
+    return null;
   }
+
+  if (!log.schemaVersion || !log.schemaVersion.startsWith('1.')) {
+    return null;
+  }
+
+  return log;
 }
 
-module.exports = { readHandoverLog, claimHandoverLog };
+function claimHandoverLog(runtimeDir, sessionId) {
+  const logPath = path.join(runtimeDir, 'shift-change-log.json');
+  const claimingPath = path.join(
+    runtimeDir,
+    `shift-change-log.claiming-${sessionId || Date.now()}.json`
+  );
+
+  // Step 1: Atomic acquire via rename
+  try {
+    fs.renameSync(logPath, claimingPath);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      // Log was already claimed by another session or doesn't exist
+      return false;
+    }
+    console.warn(`[shift-change-log-reader] error locking log:`, error.message);
+    return false;
+  }
+
+  // Step 2: Read, Validate, Update
+  let success = false;
+  try {
+    const content = fs.readFileSync(claimingPath, 'utf8');
+    const log = safeParseJSON(content);
+
+    if (log && log.status === 'READY') {
+      log.status = 'CLAIMED';
+      // Write updated status back
+      fs.writeFileSync(claimingPath, JSON.stringify(log, null, 2), 'utf8');
+
+      // Step 3: Atomic commit via rename back to original
+      fs.renameSync(claimingPath, logPath);
+      success = true;
+    } else {
+      // If invalid or not READY, just rename it back
+      fs.renameSync(claimingPath, logPath);
+    }
+  } catch (error) {
+    console.warn(`[shift-change-log-reader] error processing claimed log:`, error.message);
+    // Best-effort rollback
+    if (fs.existsSync(claimingPath) && !fs.existsSync(logPath)) {
+      try {
+        fs.renameSync(claimingPath, logPath);
+      } catch (_e) {
+        /* ignore */
+      }
+    }
+  }
+
+  return success;
+}
+
+module.exports = {
+  readHandoverLog,
+  claimHandoverLog,
+};

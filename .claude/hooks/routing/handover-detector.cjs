@@ -1,110 +1,87 @@
-#!/usr/bin/env node
-// Agent: developer | Task: #10 | Session: 2026-03-10
-/**
- * Handover Detector Hook (UserPromptSubmit)
- *
- * Detects fresh sessions that have an existing READY handover log and injects
- * resume context into the session. Mirrors the reflection-reminder.txt pattern.
- *
- * Behavior:
- * 1. If session-id.json already exists → not a fresh session → allow, exit
- * 2. Generate new sessionId
- * 3. Read handover log — if none or not READY → allow, exit
- * 4. Claim the log (READY → CLAIMED)
- * 5. Clear stale drain-state.json from old session
- * 6. Process pendingMemoryWrites (append to decisions.md)
- * 7. Inject resume context message
- *
- * Fail-open on all errors (advisory hook).
- */
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
-
-const RUNTIME_DIR = process.env.SHIFT_CHANGE_RUNTIME_DIR || path.join(__dirname, '../../context/runtime');
-const SESSION_ID_FILE = path.join(RUNTIME_DIR, 'session-id.json');
-const MEMORY_DIR = path.join(__dirname, '../../context/memory');
+const { getOrCreateSessionId } = require('../../lib/context/session-id-manager.cjs');
+const {
+  readHandoverLog,
+  claimHandoverLog,
+} = require('../../lib/context/shift-change-log-reader.cjs');
+const { exitDrainMode, getDrainState } = require('../../lib/context/drain-state.cjs');
 
 function formatResumeMessage(log) {
-  const lines = ['=== SHIFT CHANGE RESUME ==='];
-  lines.push(`Objective: ${log.currentObjective}`);
+  let msg = `SHIFT CHANGE RESUME: ${log.resumeInstructions || 'No specific resume instructions provided.'}\n\n`;
   if (log.contextSummary) {
-    lines.push(`Context: ${log.contextSummary}`);
-  }
-  if (log.resumeInstructions) {
-    lines.push(`Instructions: ${log.resumeInstructions}`);
+    msg += `Context: ${log.contextSummary}\n\n`;
   }
   if (log.pendingActions && log.pendingActions.length > 0) {
-    lines.push('Pending actions:');
-    for (const action of log.pendingActions) {
-      lines.push(`  [${action.priority.toUpperCase()}] ${action.description} (task: ${action.taskId})`);
-    }
+    msg += `Pending:\n`;
+    log.pendingActions.forEach(a => {
+      msg += `- [${a.priority}] ${a.description}\n`;
+    });
   }
-  if (log.memoryPointers && log.memoryPointers.length > 0) {
-    lines.push('Memory pointers:');
-    for (const mp of log.memoryPointers) {
-      lines.push(`  ${mp.file} → ${mp.key}: ${mp.summary}`);
-    }
-  }
-  lines.push('=== END SHIFT CHANGE RESUME ===');
-  return lines.join('\n');
+  return msg;
 }
 
-function processPendingMemoryWrites(writes) {
-  if (!Array.isArray(writes) || writes.length === 0) return;
-  const decisionsPath = path.join(MEMORY_DIR, 'decisions.md');
+function run() {
   try {
-    const entries = writes.map(w => `\n- [shift-change handover] ${w}`).join('');
-    fs.appendFileSync(decisionsPath, entries, 'utf8');
-  } catch { /* non-critical */ }
-}
-
-function main() {
-  process.stdin.resume();
-  process.stdin.on('end', () => {
-    try {
-      // If session-id.json exists, this is NOT a fresh session
-      if (fs.existsSync(SESSION_ID_FILE)) {
-        process.stdout.write(JSON.stringify({ allow: true }));
-        return;
-      }
-
-      const { getOrCreateSessionId } = require('../../lib/context/session-id-manager.cjs');
-      const { readHandoverLog, claimHandoverLog } = require('../../lib/context/shift-change-log-reader.cjs');
-      const { exitDrainMode, getDrainState } = require('../../lib/context/drain-state.cjs');
-
-      const newSessionId = getOrCreateSessionId(RUNTIME_DIR);
-
-      const log = readHandoverLog(RUNTIME_DIR);
-      if (!log) {
-        process.stdout.write(JSON.stringify({ allow: true }));
-        return;
-      }
-
-      // Claim the log
-      claimHandoverLog(RUNTIME_DIR, newSessionId);
-
-      // Clear stale drain state from old session
-      const drainState = getDrainState(RUNTIME_DIR);
-      if (drainState && drainState.sessionId !== newSessionId) {
-        exitDrainMode(RUNTIME_DIR);
-      }
-
-      // Process pending memory writes
-      processPendingMemoryWrites(log.pendingMemoryWrites);
-
-      const message = formatResumeMessage(log);
-
-      process.stdout.write(JSON.stringify({
-        allow: true,
-        message
-      }));
-    } catch {
-      // Fail-open on all errors
-      process.stdout.write(JSON.stringify({ allow: true }));
+    const inputStr = fs.readFileSync(0, 'utf8');
+    if (!inputStr) {
+      console.log(JSON.stringify({ allow: true }));
+      return;
     }
-  });
+
+    const runtimeDir = path.join(process.cwd(), '.claude/context/runtime');
+    const sessionPath = path.join(runtimeDir, 'session-id.json');
+    if (fs.existsSync(sessionPath)) {
+      console.log(JSON.stringify({ allow: true }));
+      return;
+    }
+
+    const newSessionId = getOrCreateSessionId(runtimeDir);
+
+    const log = readHandoverLog(runtimeDir);
+    if (!log || log.status !== 'READY') {
+      console.log(JSON.stringify({ allow: true }));
+      return;
+    }
+
+    claimHandoverLog(runtimeDir, newSessionId);
+
+    const drainState = getDrainState(runtimeDir);
+    if (drainState && drainState.sessionId !== newSessionId) {
+      exitDrainMode(runtimeDir);
+    }
+
+    if (log.pendingMemoryWrites && log.pendingMemoryWrites.length > 0) {
+      const memoryDir = path.join(process.cwd(), '.claude/context/memory');
+      if (!fs.existsSync(memoryDir)) fs.mkdirSync(memoryDir, { recursive: true });
+      const inboxPath = path.join(memoryDir, 'handoff_inbox.md');
+
+      const header = `\n### Memory items from session ${log.sessionId} (Resumed by ${newSessionId} at ${new Date().toISOString()})\n`;
+      const writes = header + log.pendingMemoryWrites.map(w => `- ${w}\n`).join('');
+      fs.appendFileSync(inboxPath, writes, 'utf8');
+    }
+
+    // Write sentinel ACK for M5.3
+    const ackPath = path.join(runtimeDir, 'shift-change-ack.json');
+    fs.writeFileSync(
+      ackPath,
+      JSON.stringify(
+        {
+          timestamp: new Date().toISOString(),
+          claimedBy: newSessionId,
+          originalSession: log.sessionId,
+        },
+        null,
+        2
+      ),
+      'utf8'
+    );
+
+    const message = formatResumeMessage(log);
+    console.log(JSON.stringify({ allow: true, message }));
+  } catch (_error) {
+    console.log(JSON.stringify({ allow: true }));
+  }
 }
 
-main();
+run();

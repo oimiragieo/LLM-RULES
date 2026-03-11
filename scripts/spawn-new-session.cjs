@@ -1,0 +1,218 @@
+#!/usr/bin/env node
+'use strict';
+/* eslint-disable no-unused-vars */
+
+const fs = require('fs');
+const path = require('path');
+const { spawn, execFileSync } = require('child_process');
+const { writeHandoverLog } = require('../.claude/lib/context/shift-change-log-writer.cjs');
+const { getOrCreateSessionId } = require('../.claude/lib/context/session-id-manager.cjs');
+const { enterDrainMode } = require('../.claude/lib/context/drain-state.cjs');
+
+// Parse CLI options
+const args = process.argv.slice(2);
+const skipDrain = args.includes('--skip-drain');
+const command = args.includes('--command') ? args[args.indexOf('--command') + 1] : 'claude';
+const resumeInstructions = args.includes('--message') ? args[args.indexOf('--message') + 1] : 'Please continue the current task from the handoff inbox.';
+
+function spawnDetached(bin, spawnArgs, cwd) {
+  const opts = {
+    shell: false,
+    detached: true,
+    stdio: 'ignore',
+  };
+  if (cwd) opts.cwd = cwd;
+  const proc = spawn(bin, spawnArgs, opts);
+  proc.unref();
+  return proc;
+}
+
+function spawnMacOS(cmd, cwd) {
+  const termProg = process.env.TERM_PROGRAM || '';
+  const fullCommand = cwd ? `cd ${JSON.stringify(cwd)} && ${cmd}` : cmd;
+  const escaped = fullCommand.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+  let script;
+  if (termProg === 'iTerm.app') {
+    script = `
+tell application "iTerm"
+  create window with default profile command "/bin/bash -c \\"${escaped}\\""
+end tell`;
+  } else {
+    script = `
+tell application "Terminal"
+  if it is running then
+    do script "${escaped}"
+  else
+    do script "${escaped}" in window 1
+  end if
+  activate
+end tell`;
+  }
+
+  return spawnDetached('osascript', ['-e', script], cwd);
+}
+
+function detectLinuxTerminal() {
+  const candidates = [
+    'wezterm', 'kitty', 'alacritty', 'gnome-terminal',
+    'konsole', 'xfce4-terminal', 'xterm',
+  ];
+  for (const bin of candidates) {
+    try {
+      execFileSync('which', [bin], { stdio: 'pipe' });
+      return bin;
+    } catch {
+      // not found
+    }
+  }
+  return 'xterm';
+}
+
+function spawnLinuxHeadless(cmd, cwd) {
+  try {
+    execFileSync('which', ['tmux'], { stdio: 'pipe' });
+    const sessionName = `context-handoff-${Date.now()}`;
+    const tmuxArgs = ['new-session', '-d', '-s', sessionName];
+    if (cwd) tmuxArgs.push('-c', cwd);
+    tmuxArgs.push(cmd);
+    execFileSync('tmux', tmuxArgs, { stdio: 'ignore' });
+    console.log(`[spawn-new-session] Created tmux session '${sessionName}'.`);
+    console.log(`[spawn-new-session] Attach with: tmux attach -t ${sessionName}`);
+  } catch {
+    console.warn('[spawn-new-session] No GUI display and no tmux. Open a new terminal and run:');
+    console.warn(`[spawn-new-session]   ${cmd}`);
+  }
+}
+
+function spawnLinux(cmd, cwd) {
+  if (!process.env.DISPLAY && !process.env.WAYLAND_DISPLAY) {
+    return spawnLinuxHeadless(cmd, cwd);
+  }
+
+  const terminal = detectLinuxTerminal();
+  const fullCommand = cwd ? `cd ${JSON.stringify(cwd)} && ${cmd}` : cmd;
+
+  switch (terminal) {
+    case 'wezterm':
+      return spawnDetached('wezterm', ['start', '--', 'bash', '-c', fullCommand], cwd);
+    case 'kitty':
+      return spawnDetached('kitty', ['--', 'bash', '-c', fullCommand], cwd);
+    case 'alacritty':
+      return spawnDetached('alacritty', ['-e', 'bash', '-c', fullCommand], cwd);
+    case 'gnome-terminal':
+      return spawnDetached('gnome-terminal', ['--', 'bash', '-c', fullCommand], cwd);
+    case 'konsole':
+      return spawnDetached('konsole', ['-e', 'bash', '-c', fullCommand], cwd);
+    case 'xfce4-terminal':
+      return spawnDetached('xfce4-terminal', ['-e', `bash -c ${JSON.stringify(fullCommand)}`], cwd);
+    case 'xterm':
+    default:
+      return spawnDetached('xterm', ['-e', 'bash', '-c', fullCommand], cwd);
+  }
+}
+
+function spawnTerminalWindow(cmd, opts = {}) {
+  const platform = process.platform;
+
+  if (process.env.TMUX) {
+    return spawnDetached('tmux', ['new-window', cmd], opts.cwd);
+  }
+
+  if (process.env.ZELLIJ) {
+    return spawnDetached('zellij', ['action', 'new-tab', '--command', cmd], opts.cwd);
+  }
+
+  if (platform === 'win32') {
+    if (process.env.WT_SESSION) {
+      return spawnDetached('cmd.exe', [
+        '/c', 'start', '', 'wt', '-w', 'new', 'new-tab', 'cmd', '/k', cmd,
+      ], opts.cwd);
+    }
+    return spawnDetached('powershell', [
+      '-Command',
+      `Start-Process cmd.exe -ArgumentList '/k ${cmd.replace(/'/g, "''")}'`,
+    ], opts.cwd);
+  }
+
+  if (platform === 'darwin') {
+    return spawnMacOS(cmd, opts.cwd);
+  }
+
+  if (platform === 'linux') {
+    return spawnLinux(cmd, opts.cwd);
+  }
+
+  console.warn(`[spawn-new-session] Unsupported platform: ${platform}. Open a terminal manually and run: ${cmd}`);
+}
+
+function main() {
+  console.log(`[spawn-new-session] Initiating context handoff...`);
+  const runtimeDir = path.join(process.cwd(), '.claude/context/runtime');
+  const maxWaitMs = 120 * 1000;
+  
+  // 1. Get current session
+  const sessionId = getOrCreateSessionId(runtimeDir);
+
+  // 2. Draft the handover log
+  const handoverData = {
+    schemaVersion: "1.0.0",
+    generation: 1,
+    sessionId: sessionId,
+    resumeInstructions: resumeInstructions,
+    contextSummary: "Handoff initiated via spawn-new-session.cjs",
+    pendingMemoryWrites: [],
+    pendingActions: []
+  };
+
+  try {
+    writeHandoverLog(handoverData, runtimeDir);
+    console.log(`[spawn-new-session] Wrote READY handover log for session ${sessionId}.`);
+  } catch (error) {
+    console.error(`[spawn-new-session] Failed to write handover log: ${error.message}`);
+    process.exit(1);
+  }
+
+  // 3. Mark the current session as draining (to block new TaskCreate) unless skipped
+  if (!skipDrain) {
+    enterDrainMode({ sessionId, drainDeadlineMinutes: 2 }, runtimeDir);
+    console.log(`[spawn-new-session] Session ${sessionId} entered DRAIN mode.`);
+  }
+
+  // 4. Spawn the new terminal
+  // We use `set CLAUDECODE= && cmd` on Windows, or `unset CLAUDECODE; cmd` on POSIX
+  // to ensure the new context doesn't inherit any active task states or specific overrides.
+  let cleanCommand;
+  if (process.platform === 'win32') {
+    cleanCommand = `set CLAUDECODE= && ${command}`;
+  } else {
+    cleanCommand = `unset CLAUDECODE && ${command}`;
+  }
+
+  console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
+  spawnTerminalWindow(cleanCommand, { cwd: process.cwd() });
+
+  // 5. Fire up the wait-for-handoff polling synchronously
+  console.log(`[spawn-new-session] Polling for handoff confirmation (timeout ${maxWaitMs/1000}s)...`);
+  try {
+    const waitForHandoffScript = path.join(process.cwd(), 'scripts', 'wait-for-handoff.mjs');
+    execFileSync('node', [waitForHandoffScript, '--timeout', '120'], { stdio: 'inherit' });
+    console.log(`[spawn-new-session] Handoff loop completed successfully! Safe to exit.`);
+  } catch (error) {
+    console.error(`[spawn-new-session] The wait script failed or timed out: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+ 
+if (require.main === module) {
+  try {
+    main();
+  } catch (e) {
+    console.error(`[spawn-new-session] Fatal error initialized: ${e && e.message ? e.message : e}`);
+    process.exit(1);
+  }
+}
+ 
+
+module.exports = { spawnTerminalWindow };

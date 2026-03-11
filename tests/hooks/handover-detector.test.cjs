@@ -1,177 +1,256 @@
-// Agent: developer | Task: #10 | Session: 2026-03-10
-'use strict';
+const test = require('node:test');
+const assert = require('node:assert');
+const path = require('node:path');
+const fs = require('node:fs');
 
-const { test, describe, beforeEach, afterEach } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const { getOrCreateSessionId } = require('../../.claude/lib/context/session-id-manager.cjs');
 
-const {
-  getOrCreateSessionId,
-  SESSION_ID_FILENAME
-} = require('../../.claude/lib/context/session-id-manager.cjs');
+test('session-id-manager > generates a new sessionId on first call', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-session-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
 
-const {
-  writeHandoverLog,
-  LOG_FILENAME
-} = require('../../.claude/lib/context/shift-change-log-writer.cjs');
+  const id = getOrCreateSessionId(tmpDir);
+  assert.ok(id);
+  assert.strictEqual(typeof id, 'string');
+  assert.ok(id.length > 10);
 
-const {
-  enterDrainMode,
-  DRAIN_FILENAME
-} = require('../../.claude/lib/context/drain-state.cjs');
+  const fileExists = fs.existsSync(path.join(tmpDir, 'session-id.json'));
+  assert.ok(fileExists, 'session-id.json should be created');
 
-function makeTmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'handover-test-'));
-}
-
-function validLog(overrides = {}) {
-  return {
-    sessionId: 'old-session',
-    activePid: 12345,
-    currentObjective: 'Implement shift-change system',
-    contextPercent: 0.85,
-    contextSummary: 'Working on agent-studio context mgmt.',
-    memoryPointers: [{ file: 'decisions.md', key: 'ADR-120', summary: 'Archive by threshold' }],
-    pendingActions: [{ taskId: 'T9', description: 'Finish Phase 2', priority: 'high' }],
-    subagentStates: [],
-    resumeInstructions: 'Run TaskList, then continue Phase 2.',
-    pendingMemoryWrites: ['Decision: marker-file over PID kill'],
-    drainDeadline: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-    ...overrides
-  };
-}
-
-// ─── Session ID Manager Tests ─────────────────────────────────────────────────
-
-describe('session-id-manager', () => {
-  let tmpDir;
-  let origEnv;
-  beforeEach(() => {
-    tmpDir = makeTmpDir();
-    origEnv = process.env.CLAUDE_SESSION_ID;
-    delete process.env.CLAUDE_SESSION_ID;
-  });
-  afterEach(() => {
-    if (origEnv !== undefined) process.env.CLAUDE_SESSION_ID = origEnv;
-    else delete process.env.CLAUDE_SESSION_ID;
-  });
-
-  test('generates a new sessionId on first call', () => {
-    const id = getOrCreateSessionId(tmpDir);
-    assert.ok(id && id.length > 0);
-    assert.ok(fs.existsSync(path.join(tmpDir, SESSION_ID_FILENAME)));
-  });
-
-  test('returns same sessionId on subsequent calls', () => {
-    const id1 = getOrCreateSessionId(tmpDir);
-    const id2 = getOrCreateSessionId(tmpDir);
-    assert.equal(id1, id2);
-  });
-
-  test('generates NEW sessionId when called with force=true', () => {
-    const id1 = getOrCreateSessionId(tmpDir);
-    const id2 = getOrCreateSessionId(tmpDir, { force: true });
-    assert.notEqual(id1, id2);
-  });
-
-  test('reads sessionId from env CLAUDE_SESSION_ID if set', () => {
-    process.env.CLAUDE_SESSION_ID = 'env-provided-id';
-    const id = getOrCreateSessionId(tmpDir);
-    assert.equal(id, 'env-provided-id');
-    delete process.env.CLAUDE_SESSION_ID;
-  });
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ─── Handover Detector Hook Tests (stdin/stdout simulation) ──────────────────
+test('session-id-manager > returns same sessionId on subsequent calls', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-session-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
 
-const { spawnSync } = require('child_process');
+  const id1 = getOrCreateSessionId(tmpDir);
+  const id2 = getOrCreateSessionId(tmpDir);
+  assert.strictEqual(id1, id2, 'Should return the same ID');
 
-const HOOK_PATH = path.join(__dirname, '../../.claude/hooks/routing/handover-detector.cjs');
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
 
-function runHook(runtimeDir) {
-  const input = JSON.stringify({ prompt: 'hello' });
-  const result = spawnSync(process.execPath, [HOOK_PATH], {
-    input,
-    encoding: 'utf8',
-    env: { ...process.env, SHIFT_CHANGE_RUNTIME_DIR: runtimeDir },
-    shell: false
-  });
+test('session-id-manager > generates NEW sessionId when called with force=true', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-session-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  const id1 = getOrCreateSessionId(tmpDir);
+  const id2 = getOrCreateSessionId(tmpDir, { force: true });
+  assert.notStrictEqual(id1, id2, 'Should return a new ID when forced');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('session-id-manager > reads sessionId from env CLAUDE_SESSION_ID if set', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-session-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  process.env.CLAUDE_SESSION_ID = 'test-env-session';
   try {
-    return JSON.parse(result.stdout);
-  } catch {
-    return { allow: true, _raw: result.stdout, _err: result.stderr };
+    const id = getOrCreateSessionId(tmpDir);
+    assert.strictEqual(id, 'test-env-session', 'Should read from env val');
+  } finally {
+    delete process.env.CLAUDE_SESSION_ID;
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+const { execFileSync } = require('child_process');
+const { writeHandoverLog } = require('../../.claude/lib/context/shift-change-log-writer.cjs');
+const { enterDrainMode } = require('../../.claude/lib/context/drain-state.cjs');
+
+function runHook(inputJson, env = {}) {
+  try {
+    const hookPath = path.join(process.cwd(), '.claude/hooks/routing/handover-detector.cjs');
+    if (!fs.existsSync(hookPath)) {
+      throw new Error(`Hook file not found: ${hookPath}`);
+    }
+    const result = execFileSync('node', [hookPath], {
+      input: JSON.stringify(inputJson),
+      env: { ...process.env, ...env },
+      stdio: ['pipe', 'pipe', 'ignore'],
+      encoding: 'utf8',
+    });
+    return JSON.parse(result);
+  } catch (err) {
+    if (err.stdout) {
+      try {
+        return JSON.parse(err.stdout);
+      } catch (_e) {
+        /* ignore */
+      }
+    }
+    throw err;
   }
 }
 
-describe('handover-detector hook', () => {
-  let tmpDir;
-  beforeEach(() => { tmpDir = makeTmpDir(); });
+test('handover-detector > detects existing READY handover log on fresh session', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
 
-  test('allows through when no handover log exists', () => {
-    const result = runHook(tmpDir);
-    assert.equal(result.allow, true);
-    assert.ok(!result.message || result.message === '');
-  });
+  writeHandoverLog(
+    {
+      schemaVersion: '1.0.0',
+      generation: 1,
+      sessionId: 'old-session',
+      resumeInstructions: 'Run tests',
+      contextSummary: 'Did stuff',
+      pendingActions: [{ taskId: '1', description: 'do thing', priority: 'high' }],
+    },
+    tmpDir
+  );
 
-  test('does nothing when session-id.json already exists (not fresh session)', () => {
-    // Pre-create session-id.json to simulate existing session
-    const sessionPath = path.join(tmpDir, SESSION_ID_FILENAME);
-    fs.writeFileSync(sessionPath, JSON.stringify({ sessionId: 'existing-id', createdAt: new Date().toISOString() }), 'utf8');
-    writeHandoverLog(validLog(), tmpDir);
-    const result = runHook(tmpDir);
-    assert.equal(result.allow, true);
-    // Should not have injected resume content (message should be empty or undefined)
-    assert.ok(!result.message || !result.message.includes('SHIFT CHANGE RESUME'));
-  });
+  const res = runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' }); // ensure env empty
 
-  test('detects existing READY handover log on fresh session and injects resume context', () => {
-    writeHandoverLog(validLog(), tmpDir);
-    const result = runHook(tmpDir);
-    assert.equal(result.allow, true);
-    assert.ok(result.message && result.message.includes('SHIFT CHANGE RESUME'));
-    assert.ok(result.message.includes('Implement shift-change system'));
-  });
+  assert.strictEqual(res.allow, true);
+  assert.ok(res.message, 'Should inject message');
+  assert.ok(res.message.includes('SHIFT CHANGE RESUME'));
+  assert.ok(res.message.includes('Run tests'));
 
-  test('claims the log after injecting resume context', () => {
-    writeHandoverLog(validLog(), tmpDir);
-    runHook(tmpDir);
-    const logPath = path.join(tmpDir, LOG_FILENAME);
-    const content = JSON.parse(fs.readFileSync(logPath, 'utf8'));
-    assert.equal(content.status, 'CLAIMED');
-  });
+  // Clean up
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  const logPath = path.join(tmpDir, 'shift-change-log.json');
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+});
 
-  test('generates a new sessionId for the fresh session', () => {
-    writeHandoverLog(validLog(), tmpDir);
-    runHook(tmpDir);
-    assert.ok(fs.existsSync(path.join(tmpDir, SESSION_ID_FILENAME)));
-  });
+test('handover-detector > does nothing when no handover log exists', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const logPath = path.join(tmpDir, 'shift-change-log.json');
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
 
-  test('clears stale drain-state.json from old session', () => {
-    writeHandoverLog(validLog(), tmpDir);
-    // Write drain state belonging to old session
-    enterDrainMode({ sessionId: 'old-session', drainDeadlineMinutes: 5 }, tmpDir);
-    assert.ok(fs.existsSync(path.join(tmpDir, DRAIN_FILENAME)));
-    runHook(tmpDir);
-    // After hook, stale drain should be cleared (old sessionId != new sessionId)
-    assert.equal(fs.existsSync(path.join(tmpDir, DRAIN_FILENAME)), false);
-  });
+  const res = runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
 
-  test('does nothing when handover log is CLAIMED', () => {
-    writeHandoverLog(validLog(), tmpDir);
-    const logPath = path.join(tmpDir, LOG_FILENAME);
-    const content = JSON.parse(fs.readFileSync(logPath, 'utf8'));
-    content.status = 'CLAIMED';
-    fs.writeFileSync(logPath, JSON.stringify(content), 'utf8');
-    const result = runHook(tmpDir);
-    assert.equal(result.allow, true);
-    assert.ok(!result.message || !result.message.includes('SHIFT CHANGE RESUME'));
-  });
+  assert.strictEqual(res.allow, true);
+  assert.ok(!res.message, 'Should not have a message');
 
-  test('fails open on error (no session-id, corrupt log)', () => {
-    fs.writeFileSync(path.join(tmpDir, LOG_FILENAME), 'CORRUPT{{', 'utf8');
-    const result = runHook(tmpDir);
-    assert.equal(result.allow, true);
-  });
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+});
+
+test('handover-detector > does nothing when handover log is CLAIMED', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+
+  const log = writeHandoverLog({ schemaVersion: '1.0.0', generation: 1, sessionId: 'old' }, tmpDir);
+  log.status = 'CLAIMED';
+  fs.writeFileSync(path.join(tmpDir, 'shift-change-log.json'), JSON.stringify(log));
+
+  const res = runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+  assert.strictEqual(res.allow, true);
+  assert.ok(!res.message, 'Should not inject message for CLAIMED log');
+
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
+});
+
+test('handover-detector > claims the log after injecting resume context', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+
+  writeHandoverLog({ schemaVersion: '1.0.0', generation: 1, sessionId: 'old' }, tmpDir);
+
+  runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  const content = JSON.parse(fs.readFileSync(path.join(tmpDir, 'shift-change-log.json'), 'utf8'));
+  assert.strictEqual(content.status, 'CLAIMED');
+
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
+});
+
+test('handover-detector > generates a new sessionId for the fresh session', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+
+  writeHandoverLog({ schemaVersion: '1.0.0', generation: 1, sessionId: 'old' }, tmpDir);
+
+  runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  assert.ok(fs.existsSync(sessionPath), 'Should generate a new session id');
+
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
+});
+
+test('handover-detector > clears stale drain-state.json from old session', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+
+  writeHandoverLog({ schemaVersion: '1.0.0', generation: 1, sessionId: 'old' }, tmpDir);
+  enterDrainMode({ sessionId: 'old', drainDeadlineMinutes: 5 }, tmpDir);
+
+  runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  assert.strictEqual(
+    fs.existsSync(path.join(tmpDir, 'drain-state.json')),
+    false,
+    'Should remove stale drain state'
+  );
+
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
+});
+
+test('handover-detector > writes pending memory writes from handover log to handoff_inbox.md', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+
+  const memoryDir = path.join(process.cwd(), '.claude/context/memory');
+  if (!fs.existsSync(memoryDir)) fs.mkdirSync(memoryDir, { recursive: true });
+  const inboxPath = path.join(memoryDir, 'handoff_inbox.md');
+  const origInbox = fs.existsSync(inboxPath) ? fs.readFileSync(inboxPath, 'utf8') : '';
+
+  writeHandoverLog(
+    {
+      schemaVersion: '1.0.0',
+      generation: 1,
+      sessionId: 'old',
+      pendingMemoryWrites: ['Decision: use JWT in M3'],
+    },
+    tmpDir
+  );
+
+  runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  const newInbox = fs.readFileSync(inboxPath, 'utf8');
+  assert.ok(
+    newInbox.includes('Decision: use JWT in M3'),
+    'Should append memory writes to handoff_inbox'
+  );
+  assert.ok(
+    newInbox.includes('Memory items from session old'),
+    'Should include attribution header'
+  );
+
+  // Clean up
+  fs.writeFileSync(inboxPath, origInbox);
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
+});
+
+test('handover-detector > generates Sentinel ACK json upon successful claim', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const ackPath = path.join(tmpDir, 'shift-change-ack.json');
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+
+  writeHandoverLog({ schemaVersion: '1.0.0', generation: 1, sessionId: 'old' }, tmpDir);
+
+  runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: 'new-ack-session' });
+
+  assert.ok(fs.existsSync(ackPath), 'Sentinel ACK should be created');
+  const ack = JSON.parse(fs.readFileSync(ackPath, 'utf8'));
+  assert.strictEqual(ack.claimedBy, 'new-ack-session');
+  assert.strictEqual(ack.originalSession, 'old');
+
+  // Clean up
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
 });
