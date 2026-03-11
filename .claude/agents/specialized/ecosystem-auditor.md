@@ -5,7 +5,7 @@ description: "Proactive Codebase Auditor driving auto-evolution. Uses structure 
 model: 'sonnet'
 temperature: '0.3'
 context_strategy: lazy_load
-maxTurns: 18
+maxTurns: 25
 permissionMode: default
 priority: high
 verified: true
@@ -30,6 +30,8 @@ skills:
   - ripgrep
   - code-semantic-search
   - code-structural-search
+  - ecosystem-integrity-scanner
+  - recommend-evolution
   - token-saver-context-compression
   - verification-before-completion
   - memory-search
@@ -89,6 +91,12 @@ Check the existing Agent Studio capabilities:
 
 - `Glob({ pattern: ".claude/agents/**/*.md" })`
 - `Glob({ pattern: ".claude/skills/**/SKILL.md" })`
+
+For deep integrity scanning, invoke:
+
+```javascript
+Skill({ skill: 'ecosystem-integrity-scanner' });
+```
 
 Compare the required stack against the ecosystem.
 
