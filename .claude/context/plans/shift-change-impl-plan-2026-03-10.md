@@ -602,6 +602,13 @@ It may be useful for a future "soft resume" mode (see §6.5).
 | WT CLI command separator? | Semicolons: `wt cmd1 ; cmd2`. In PowerShell: backtick-escaped `` `; `` |
 | Open specific profile? | `wt -w new new-tab -p "Profile Name" cmd /k claude` |
 | Set tab title? | `wt -w new new-tab --title "Claude New Session" cmd /k claude` |
+| macOS terminal spawn? | `osascript` only — `open -a Terminal cmd` cannot run a command. Two targets: Terminal.app (`do script`) and iTerm2 (`create window with default profile command`) |
+| macOS terminal detection? | `process.env.TERM_PROGRAM` — `'iTerm.app'` for iTerm2, `'Apple_Terminal'` for Terminal.app, `'WarpTerminal'` for Warp (no API — fall back to Terminal.app) |
+| Linux terminal spawn? | Check `$DISPLAY` + `$WAYLAND_DISPLAY`. Try in order: wezterm, kitty, alacritty, gnome-terminal, konsole, xfce4-terminal, xterm |
+| gnome-terminal command arg? | Use `--` separator: `gnome-terminal -- bash -c claude`. The `-e`/`--command` flags are DEPRECATED |
+| tmux integration? | When `$TMUX` is set: `tmux new-window claude` → immediately visible. Takes priority over all platform paths |
+| Zellij integration? | When `$ZELLIJ` is set: `zellij action new-tab --command claude` → immediately visible |
+| Headless Linux (no DISPLAY)? | If tmux installed: `tmux new-session -d -s claude-handoff claude` + print attach instructions. Else: print manual instruction |
 
 ### Windows Terminal CLI Quick Reference (from learn.microsoft.com docs, 2026-03-10)
 
@@ -647,77 +654,134 @@ wait briefly to confirm the process started, then write `session-spawned.json` m
 
 ```javascript
 // Pseudocode — TDD to flesh out exact implementation
-// VERIFIED 2026-03-10: wt.exe is a Windows App Execution Alias.
-// TWO reliable approaches from Node.js:
-//   A) cmd.exe /c wt ...  — cmd.exe resolves App Execution Aliases
-//   B) powershell.exe Start-Process wt ...  — Start-Process uses shell infrastructure
-// Use approach A (cmd.exe) as primary: simpler args, no PowerShell escaping needed.
-// Use approach B (Start-Process) or Start-Process cmd.exe as fallback.
-// ALWAYS use -w new to force a new WT window (not a tab in the user's current session).
-const { spawn } = require('child_process');
+// VERIFIED 2026-03-10: Full cross-platform decision tree for spawning an interactive
+// Claude session in a new visible terminal window.
+//
+// Decision order (highest-priority first):
+//   1. $TMUX set         → tmux new-window (any platform, already in tmux)
+//   2. $ZELLIJ set       → zellij action new-tab (any platform, already in Zellij)
+//   3. win32 + WT_SESSION → cmd.exe /c wt -w new new-tab (Windows Terminal)
+//   4. win32 (no WT)     → powershell Start-Process cmd.exe (plain cmd window)
+//   5. darwin + iTerm2   → osascript iTerm "create window with default profile command"
+//   6. darwin (other)    → osascript Terminal.app "do script" (covers Warp, Apple_Terminal)
+//   7. linux + DISPLAY   → try wezterm/kitty/alacritty/gnome-terminal/konsole/xterm
+//   8. headless linux    → tmux new-session -d + print attach instructions
+//
+// KEY GOTCHAS (verified 2026-03-10):
+//   - open -a Terminal cmd  CANNOT run a command — always use osascript
+//   - Terminal.app: use "do script CMD" (not "make new window") to get a new window
+//   - iTerm2: use "create window with default profile command CMD" (iTerm2 3.x+)
+//   - Warp has no CLI/AppleScript API — falls back to Terminal.app osascript (acceptable)
+//   - gnome-terminal: use "--" separator; "-e"/"--command" flags are DEPRECATED
+//   - Check both $DISPLAY and $WAYLAND_DISPLAY for Linux display server detection
+//   - wt.exe is an App Execution Alias — direct spawn() FAILS; route via cmd.exe /c wt
+//   - ALWAYS use -w new with wt to force a new WINDOW (not a tab in current session)
+//   - ALWAYS call child.unref() — without it, parent waits for child, hangs the hook
+//   - ALWAYS shell: false with array args — prevents shell metacharacter injection
+const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Spawn an interactive Claude session in a new visible terminal window.
- *
- * Windows Terminal (WT_SESSION set):
- *   Primary:  cmd.exe /c wt -w new new-tab --title "Claude New Session" cmd /k claude
- *   Fallback: powershell.exe Start-Process wt -ArgumentList "-w new new-tab --title ... cmd /k claude"
- *
- * Non-WT Windows:
- *   powershell.exe Start-Process cmd.exe -ArgumentList "/k claude" -WindowStyle Normal
- *
- * NOTE: Direct spawn('wt.exe', ...) does NOT work — aliases require shell resolution.
- * NOTE: Use -w new (not new-tab alone) to guarantee a NEW window, not a tab in current WT.
- */
 function spawnInteractiveSession(runtimeDir, opts = {}) {
   const { title = 'Claude New Session', profile } = opts;
-  const isWindows = process.platform === 'win32';
-  const isWindowsTerminal = !!process.env.WT_SESSION;
+  const cmd = 'claude';
 
   let child;
   let terminalType;
 
-  if (isWindows) {
-    if (isWindowsTerminal) {
-      // Approach A: cmd.exe /c wt — cmd.exe resolves App Execution Aliases
-      // -w new: always open a NEW window (not a tab in the user's current WT)
+  // ── Priority 1: tmux (any platform) ──────────────────────────────────────
+  if (process.env.TMUX) {
+    child = spawn('tmux', ['new-window', '-n', 'claude-handoff', cmd], {
+      detached: true, shell: false, stdio: 'ignore'
+    });
+    terminalType = 'tmux';
+
+  // ── Priority 2: Zellij (any platform) ────────────────────────────────────
+  } else if (process.env.ZELLIJ) {
+    child = spawn('zellij', ['action', 'new-tab', '--command', cmd], {
+      detached: true, shell: false, stdio: 'ignore'
+    });
+    terminalType = 'zellij';
+
+  // ── Priority 3/4: Windows ─────────────────────────────────────────────────
+  } else if (process.platform === 'win32') {
+    if (process.env.WT_SESSION) {
+      // cmd.exe resolves App Execution Aliases (wt.exe is not on Node.js PATH)
+      // -w new: force a new WINDOW (not a tab in the user's current WT session)
       const profileArgs = profile ? ['-p', profile] : [];
       child = spawn('cmd.exe', [
         '/c', 'wt', '-w', 'new', 'new-tab',
         '--title', title,
         ...profileArgs,
-        'cmd', '/k', 'claude'
+        'cmd', '/k', cmd
       ], { detached: true, shell: false, stdio: 'ignore' });
       terminalType = 'windows-terminal';
     } else {
-      // Fallback: new cmd.exe window via PowerShell Start-Process
       child = spawn('powershell.exe', [
         '-NoProfile', '-Command',
-        `Start-Process cmd.exe -ArgumentList "/k claude" -WindowStyle Normal`
+        `Start-Process cmd.exe -ArgumentList "/k ${cmd}" -WindowStyle Normal`
       ], { detached: true, shell: false, stdio: 'ignore' });
       terminalType = 'cmd';
     }
+
+  // ── Priority 5/6: macOS ───────────────────────────────────────────────────
+  } else if (process.platform === 'darwin') {
+    let script;
+    if (process.env.TERM_PROGRAM === 'iTerm.app') {
+      // iTerm2 3.x+ AppleScript API
+      script = `tell application "iTerm"\ncreate window with default profile command "/bin/bash -c \\"${cmd}\\""\nend tell`;
+    } else {
+      // Terminal.app (covers Apple_Terminal, Warp fallback, VS Code terminal, unknown)
+      // NOTE: "do script CMD" opens a new window when Terminal is already running
+      script = `tell application "Terminal"\nif it is running then\ndo script "${cmd}"\nelse\ndo script "${cmd}" in window 1\nend if\nactivate\nend tell`;
+    }
+    child = spawn('osascript', ['-e', script], {
+      detached: true, shell: false, stdio: 'ignore'
+    });
+    terminalType = process.env.TERM_PROGRAM === 'iTerm.app' ? 'iterm2' : 'terminal-app';
+
+  // ── Priority 7/8: Linux ───────────────────────────────────────────────────
   } else {
-    // Unix: try common terminal emulators in order
-    const terminals = [
-      ['gnome-terminal', ['--', 'claude']],
-      ['xterm', ['-e', 'claude']],
-      ['konsole', ['-e', 'claude']],
-    ];
-    for (const [bin, args] of terminals) {
+    const hasDisplay = !!(process.env.DISPLAY || process.env.WAYLAND_DISPLAY);
+    if (hasDisplay) {
+      // Try terminal emulators in priority order
+      // gnome-terminal: use "--" separator (not -e, which is deprecated)
+      // kitty/alacritty/wezterm: each has their own flag style
+      const terminals = [
+        ['wezterm', ['start', '--', cmd]],
+        ['kitty', [cmd]],
+        ['alacritty', ['-e', cmd]],
+        ['gnome-terminal', ['--', 'bash', '-c', cmd]],
+        ['konsole', ['-e', cmd]],
+        ['xfce4-terminal', ['-e', cmd]],
+        ['xterm', ['-e', cmd]],
+      ];
+      for (const [bin, args] of terminals) {
+        try {
+          execFileSync('which', [bin], { stdio: 'ignore' });
+          child = spawn(bin, args, { detached: true, shell: false, stdio: 'ignore' });
+          terminalType = bin;
+          break;
+        } catch { continue; }
+      }
+    }
+    if (!child) {
+      // Headless fallback: create detached tmux session + print attach instructions
       try {
-        child = spawn(bin, args, { detached: true, shell: false, stdio: 'ignore' });
-        terminalType = bin;
-        break;
-      } catch { continue; }
+        execFileSync('which', ['tmux'], { stdio: 'ignore' });
+        child = spawn('tmux', ['new-session', '-d', '-s', 'claude-handoff', cmd], {
+          detached: true, shell: false, stdio: 'ignore'
+        });
+        terminalType = 'tmux-headless';
+        process.stderr.write(`[shift-change] New session started headlessly.\nAttach with: tmux attach -t claude-handoff\n`);
+      } catch {
+        process.stderr.write(`[shift-change] No terminal emulator available. Run manually: ${cmd}\n`);
+        throw new Error('No suitable terminal emulator found');
+      }
     }
   }
 
-  if (!child) throw new Error('No suitable terminal emulator found');
-
-  child.unref(); // Do not wait for child — let it run independently
+  child.unref(); // MANDATORY — prevents parent hook from waiting for child to exit
 
   // Write spawned marker (O_EXCL — atomic, race-safe, prevents double-spawn)
   const markerPath = path.join(runtimeDir, 'session-spawned.json');
@@ -747,6 +811,18 @@ spawn('cmd.exe', ['/c', 'wt', 'new-tab', 'cmd', '/k', 'claude'], ...);
 
 // ❌ WRONG — shell: true opens a security attack surface
 spawn('wt', ['-w', 'new', 'new-tab', ...], { shell: true });
+
+// ❌ WRONG — open -a Terminal cannot pass a command to run
+spawn('open', ['-a', 'Terminal', 'claude'], ...);
+// → Opens Terminal.app but doesn't run claude
+
+// ❌ WRONG — gnome-terminal -e is DEPRECATED (use -- separator instead)
+spawn('gnome-terminal', ['-e', 'claude'], ...);
+// → Warning/failure on modern GNOME
+
+// ❌ WRONG — missing child.unref() on macOS/Linux
+const child = spawn('osascript', ['-e', script], { detached: true });
+// child.unref() missing → hook hangs until Terminal.app exits (never)
 ```
 
 ### M4.2: Session Trigger Integration
