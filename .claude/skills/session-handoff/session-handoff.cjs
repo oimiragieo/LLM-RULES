@@ -30,7 +30,9 @@ if (activeTasks.length > 0) {
   console.error(`\n[session-handoff] ABORT: Cannot handoff session while tasks are active.`);
   console.error(`Active tasks found:`);
   activeTasks.forEach(t => console.error(`  - [${t.id}] ${t.description} (${t.status})`));
-  console.error(`\nPlease instruct the model to finish or formally suspend these tasks before handing off.`);
+  console.error(
+    `\nPlease instruct the model to finish or formally suspend these tasks before handing off.`
+  );
   process.exit(1);
 }
 
@@ -57,7 +59,7 @@ const handoverData = {
   resumeInstructions: 'Resume previous objective.',
   fallbackInstruction: 'Run TaskList() to discover pending work, check active_context.md',
   contextSummary: contextSummary,
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString(),
 };
 
 const tmpPath = path.join(runtimeDir, `shift-change-log.tmp-${Date.now()}.json`);
