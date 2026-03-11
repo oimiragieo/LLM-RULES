@@ -374,7 +374,10 @@ test('handover-detector > FRESH_SPAWN: clears inherited session-id.json and inje
 
   assert.strictEqual(res.allow, true);
   assert.ok(res.message, 'Should inject resume message');
-  assert.ok(res.message.includes('SHIFT CHANGE RESUME'), 'Should include SHIFT CHANGE RESUME header');
+  assert.ok(
+    res.message.includes('SHIFT CHANGE RESUME'),
+    'Should include SHIFT CHANGE RESUME header'
+  );
   assert.ok(
     res.message.includes('Continue the FRESH_SPAWN test task'),
     'Should include resumeInstructions from handover log'

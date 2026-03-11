@@ -38,6 +38,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `drift-detector.cjs`: Detects state drift.
 - `user-prompt-unified.cjs`: Consolidated router analysis, memory reminders, and health checks.
 - `user-prompt-orchestrator.cjs`: Orchestrates multi-agent workflows.
+- `handover-detector.cjs`: Detects shift-change handovers on fresh session start. Reads `shift-change-log.json`, claims the handover, and injects a structured resume message (pre-flight steps 0–0.5 + pending actions) into the first prompt. Fail-open (advisory).
 
 ### PreToolUse
 
@@ -57,6 +58,8 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `creator-compliance-validator.cjs`: Validates post-creation compliance.
 - `quality-gate-validator.cjs`: Enforces workflow quality gates.
 - `adaptive-quality-gate.cjs`: Non-blocking edit counter; suggests quality checkpoints at adaptive thresholds based on correction rate.
+- `spawn-token-guard.cjs`: Estimates spawn prompt token count on every `Task` call. Writes `compression-reminder.txt` and warns at 80K tokens; blocks the spawn at 120K tokens to prevent "Prompt is too long" failures. Fail-open (advisory).
+- `finish-only-guard.cjs`: Blocks `TaskCreate` and `Task` calls when the session is in drain mode (finishing state). Prevents new work from being started while existing tasks are being completed. Fail-open (advisory).
 
 ### PostToolUse
 

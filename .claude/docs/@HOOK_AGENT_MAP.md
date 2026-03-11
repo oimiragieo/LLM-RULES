@@ -27,6 +27,9 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `creator-compliance-validator.cjs`  |        | x           |          | x          |              |            |
 | `quality-gate-validator.cjs`        |        | x           |          | x          |              |            |
 | `adaptive-quality-gate.cjs`         | x      | x           | x        | x          | x            | x          |
+| `handover-detector.cjs`             | x      |             |          |            |              |            |
+| `spawn-token-guard.cjs`             | x      | x           |          |            | x            |            |
+| `finish-only-guard.cjs`             | x      | x           |          |            | x            |            |
 | `session-end-memory-promotion.cjs`  | x      |             |          |            |              |            |
 | `worktree-auto-cleanup.cjs`         | x      |             |          |            |              |            |
 | `check-console-log.cjs`             | x      | x           | x        | x          | x            | x          |
@@ -54,6 +57,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 5. `drift-detector.cjs`
 6. `user-prompt-unified.cjs`
 7. `user-prompt-orchestrator.cjs`
+8. `handover-detector.cjs` (matcher: all prompts — fires on fresh session start)
 
 ### PreToolUse (Bash)
 
@@ -74,6 +78,8 @@ This document provides a comprehensive mapping between enforcement hooks and age
 2. `pre-task-unified.cjs`
 3. `routing-guard.cjs`
 4. `spawn-prompt-validator.cjs`
+5. `spawn-token-guard.cjs` (matcher: Task — warns at 80K tokens, blocks at 120K)
+6. `finish-only-guard.cjs` (matcher: TaskCreate|Task — blocks when session is draining)
 
 ### PreToolUse (TaskUpdate)
 
