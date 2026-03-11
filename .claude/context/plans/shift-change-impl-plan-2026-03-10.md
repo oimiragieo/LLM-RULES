@@ -596,9 +596,10 @@ It may be useful for a future "soft resume" mode (see §6.5).
 | Is `--resume` right for hard reset? | NO — restores old context. Use bare `claude` instead |
 | Is `/rewind` programmatic? | NO — UI-only (slash command + Esc+Esc). Cannot be called from hooks |
 | Windows Terminal detection? | `process.env.WT_SESSION` is set when running inside Windows Terminal |
-| Terminal spawn on Windows? | `cmd.exe /c wt -w new new-tab ...` (WT) or `Start-Process cmd.exe` (fallback) — see §M4.1 |
-| Can Node.js spawn wt.exe directly? | NO — App Execution Alias; route via `cmd.exe /c wt` or `powershell Start-Process wt` |
+| Terminal spawn on Windows? | `cmd.exe /c start '' wt -w new new-tab ...` — MUST use `start` for GUI window from non-interactive subprocess; plain `cmd /c wt` silently produces no visible window |
+| Can Node.js spawn wt.exe directly? | NO — App Execution Alias; route via `cmd.exe /c start '' wt` |
 | Force NEW WINDOW (not tab in current WT)? | Use `-w new` flag: `wt -w new new-tab ...` (also `-w -1`) |
+| CLAUDECODE env var? | Claude Code sets `CLAUDECODE`; child `claude` processes detect it and refuse to start. MUST unset before launching: `set CLAUDECODE= && claude` (cmd.exe) or `unset CLAUDECODE && claude` (bash/zsh) |
 | WT CLI command separator? | Semicolons: `wt cmd1 ; cmd2`. In PowerShell: backtick-escaped `` `; `` |
 | Open specific profile? | `wt -w new new-tab -p "Profile Name" cmd /k claude` |
 | Set tab title? | `wt -w new new-tab --title "Claude New Session" cmd /k claude` |

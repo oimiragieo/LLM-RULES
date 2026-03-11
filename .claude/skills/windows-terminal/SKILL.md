@@ -56,18 +56,35 @@ PS C:\Users\oimir> wt.exe
 
 ### Reliable Approaches from Node.js
 
-**Approach A — cmd.exe /c wt (primary, simpler):**
-`cmd.exe` resolves App Execution Aliases. Pass `wt` as the command after `/c`.
+**Approach A — cmd.exe /c start wt (PRIMARY — verified 2026-03-10):**
+`cmd /c start` is the Windows built-in for launching GUI windows from non-interactive
+subprocess contexts (e.g. Claude Code hooks, piped processes). Plain `cmd /c wt` silently
+fails to produce a visible window from such contexts. The empty string `''` is a required
+title placeholder for `start` when passing arguments to the target program.
+
+Two additional requirements when spawning `claude`:
+- **Unset `CLAUDECODE`**: Claude Code sets this env var; child `claude` processes detect it
+  and refuse to start ("cannot be launched inside another Claude Code session"). Clear it in
+  the cmd command with `set CLAUDECODE=` before invoking `claude`.
+- **`cmd /k` keeps the window open** after the command finishes (useful for interactive use
+  or `-p` print-mode demos). Use `cmd /c` if you want the window to close on exit.
+
 ```javascript
-spawn('cmd.exe', ['/c', 'wt', '-w', 'new', 'new-tab', '--title', 'My Title', 'cmd', '/k', 'claude'],
-  { detached: true, shell: false, stdio: 'ignore' });
+// VERIFIED working from non-interactive subprocess (Claude Code hook, Bash tool, etc.)
+spawn('cmd.exe', [
+  '/c', 'start', '',   // 'start' = Windows GUI window launcher; '' = required title placeholder
+  'wt', '-w', 'new', 'new-tab',
+  '--title', 'My Title',
+  'cmd', '/k', 'set CLAUDECODE= && claude'  // unset CLAUDECODE before launching claude
+], { shell: false });
+// Note: no detached/stdio/unref needed — 'start' fully detaches by design
 ```
 
 **Approach B — PowerShell Start-Process (alternative):**
 `Start-Process` uses the Windows shell infrastructure to resolve aliases.
 ```javascript
 spawn('powershell.exe', ['-NoProfile', '-Command',
-  'Start-Process wt -ArgumentList "-w new new-tab --title \'My Title\' cmd /k claude"'
+  'Start-Process wt -ArgumentList "-w new new-tab --title \'My Title\' cmd /k \'set CLAUDECODE= && claude\'"'
 ], { detached: true, shell: false, stdio: 'ignore' });
 ```
 
@@ -274,6 +291,14 @@ function spawnInteractiveSession(command, opts = {}) {
 ```javascript
 // ❌ CommandNotFoundException — wt.exe alias not on Node.js child process PATH
 spawn('wt.exe', ['-w', 'new', 'new-tab', 'cmd', '/k', 'claude'], { shell: false });
+
+// ❌ cmd /c wt (without 'start') — silently produces no visible window from non-interactive
+//    subprocess contexts (Claude Code hooks, piped Bash, service processes)
+spawn('cmd.exe', ['/c', 'wt', '-w', 'new', 'new-tab', 'cmd', '/k', 'claude'], { shell: false });
+
+// ❌ Missing 'set CLAUDECODE=' — claude refuses to start inside another Claude Code session
+//    ("Nested sessions share runtime resources and will crash all active sessions")
+spawn('cmd.exe', ['/c', 'start', '', 'wt', '-w', 'new', 'new-tab', 'cmd', '/k', 'claude']);
 
 // ❌ new-tab without -w new — opens TAB in user's existing WT session (confusing UX)
 spawn('cmd.exe', ['/c', 'wt', 'new-tab', '--title', 'Claude', 'cmd', '/k', 'claude']);
