@@ -205,10 +205,14 @@ function main() {
   // Strip -d from seed flags: -d redirects output to debug file → blank WT window during seed.
   const seedFlags = claudeFlags.replace(/\s*-d\b/g, '').trim();
   let cleanCommand;
+  // CLAUDE_FRESH_SPAWN=1 tells handover-detector that this window was spawned by a
+  // handoff. The detector uses it to safely clear the inherited session-id.json
+  // (which belongs to the old session) without a race condition — the old session
+  // never has this env var set, so it cannot mistakenly re-claim the handover log.
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
+    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
   } else {
-    cleanCommand = `unset CLAUDECODE && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
+    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);

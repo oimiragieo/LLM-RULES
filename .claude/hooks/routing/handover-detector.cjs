@@ -44,14 +44,36 @@ function run() {
 
     const runtimeDir = path.join(process.cwd(), '.claude/context/runtime');
     const sessionPath = path.join(runtimeDir, 'session-id.json');
+
+    const logPath = path.join(runtimeDir, 'shift-change-log.json');
+    const ackPath = path.join(runtimeDir, 'shift-change-ack.json');
+
+    // FRESH_SPAWN: This window was spawned by a handoff (CLAUDE_FRESH_SPAWN=1 is set
+    // in the spawn command). The new window inherits session-id.json from the old
+    // session. If it matches the pending handover's source session, clear it so
+    // getOrCreateSessionId generates a fresh ID for this session.
+    // The old session never has CLAUDE_FRESH_SPAWN set, so it cannot trigger this path.
+    // MUST run before the session-id.json existence guard below.
+    if (process.env.CLAUDE_FRESH_SPAWN === '1' && fs.existsSync(sessionPath)) {
+      try {
+        const existingData = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+        const logData = fs.existsSync(logPath)
+          ? JSON.parse(fs.readFileSync(logPath, 'utf8'))
+          : null;
+        if (logData && logData.status === 'READY' && existingData.sessionId === logData.sessionId) {
+          fs.unlinkSync(sessionPath);
+        }
+      } catch (_e) {
+        // ignore — fall through to normal flow
+      }
+    }
+
     if (fs.existsSync(sessionPath)) {
       console.log(JSON.stringify({ allow: true }));
       return;
     }
 
     const newSessionId = getOrCreateSessionId(runtimeDir);
-    const logPath = path.join(runtimeDir, 'shift-change-log.json');
-    const ackPath = path.join(runtimeDir, 'shift-change-ack.json');
 
     // MT-A: Re-READY timeout recovery (5 mins) for logs stuck in CLAIMED without an ACK
     if (fs.existsSync(logPath)) {

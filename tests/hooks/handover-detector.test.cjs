@@ -340,3 +340,51 @@ test('handover-detector > M8.1: injected message contains Step 0 pre-flight bloc
   if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
   fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
 });
+
+test('handover-detector > FRESH_SPAWN: clears inherited session-id.json and injects resume message', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  const ackPath = path.join(tmpDir, 'shift-change-ack.json');
+  const logPath = path.join(tmpDir, 'shift-change-log.json');
+
+  // Ensure clean slate
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+
+  // Simulate old session's session-id.json inherited by new window
+  const oldSessionId = 'old-session-inherited-abc123';
+  fs.writeFileSync(sessionPath, JSON.stringify({ sessionId: oldSessionId }), 'utf8');
+
+  // Write READY handover log from the old session
+  writeHandoverLog(
+    {
+      schemaVersion: '1.0.0',
+      generation: 1,
+      sessionId: oldSessionId,
+      resumeInstructions: 'Continue the FRESH_SPAWN test task',
+      contextSummary: 'Testing FRESH_SPAWN env var behavior',
+      pendingMemoryWrites: [],
+      pendingActions: [],
+    },
+    tmpDir
+  );
+
+  // Run hook WITH CLAUDE_FRESH_SPAWN=1 (simulates newly spawned window)
+  const res = runHook({ command: 'continue' }, { CLAUDE_SESSION_ID: '', CLAUDE_FRESH_SPAWN: '1' });
+
+  assert.strictEqual(res.allow, true);
+  assert.ok(res.message, 'Should inject resume message');
+  assert.ok(res.message.includes('SHIFT CHANGE RESUME'), 'Should include SHIFT CHANGE RESUME header');
+  assert.ok(
+    res.message.includes('Continue the FRESH_SPAWN test task'),
+    'Should include resumeInstructions from handover log'
+  );
+
+  // ACK sentinel should have been written
+  assert.ok(fs.existsSync(ackPath), 'ACK sentinel should be written');
+
+  // Clean up
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+});
