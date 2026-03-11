@@ -188,12 +188,13 @@ function main() {
   //   - Then `claude --continue` opens interactive mode on that same session so
   //     the user can take over or review output.
   // We unset CLAUDECODE so the child process doesn't see a nested-session error.
+  // Single word — no quotes needed, avoids breaking the outer cmd /k "..." quoting on Windows
   const seedPrompt = 'continue';
   let cleanCommand;
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && claude ${claudeFlags} -p "${seedPrompt}" && claude ${claudeFlags} -c`;
+    cleanCommand = `set CLAUDECODE= && claude ${claudeFlags} -p ${seedPrompt} && claude ${claudeFlags} -c`;
   } else {
-    cleanCommand = `unset CLAUDECODE && claude ${claudeFlags} -p "${seedPrompt}" && claude ${claudeFlags} -c`;
+    cleanCommand = `unset CLAUDECODE && claude ${claudeFlags} -p ${seedPrompt} && claude ${claudeFlags} -c`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
