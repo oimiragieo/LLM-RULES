@@ -199,20 +199,22 @@ function main() {
   //     -d redirects stdout to a debug log file, making the window appear blank.
   //     The UserPromptSubmit hook fires on the -p prompt, claims the baton, and
   //     injects the full handover context. Claude processes it and responds.
-  //   Phase B (interactive): claude -c  — resumes the same session with full flags (-d etc.)
-  //     so the user can take over and see debug output.
+  //   Phase B (interactive): claude -c  — resumes the same session WITHOUT -d so the
+  //     TUI renders visibly in the new window. -d redirects stdout to a debug file,
+  //     making the window appear blank just like the seed phase.
   // We unset CLAUDECODE so the child process doesn't see a nested-session error.
-  // Strip -d from seed flags: -d redirects output to debug file → blank WT window during seed.
+  // Strip -d from BOTH phases: -d redirects output to debug file → blank WT window.
   const seedFlags = claudeFlags.replace(/\s*-d\b/g, '').trim();
+  const interactiveFlags = seedFlags; // same: no -d so TUI is visible
   let cleanCommand;
   // CLAUDE_FRESH_SPAWN=1 tells handover-detector that this window was spawned by a
   // handoff. The detector uses it to safely clear the inherited session-id.json
   // (which belongs to the old session) without a race condition — the old session
   // never has this env var set, so it cannot mistakenly re-claim the handover log.
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
+    cleanCommand = `set CLAUDECODE= && set CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${interactiveFlags} -c`;
   } else {
-    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
+    cleanCommand = `unset CLAUDECODE && export CLAUDE_FRESH_SPAWN=1 && claude ${seedFlags} -p continue && claude ${interactiveFlags} -c`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
