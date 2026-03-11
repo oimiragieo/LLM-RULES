@@ -150,8 +150,7 @@ function spawnTerminalWindow(cmd, opts = {}) {
 function main() {
   console.log(`[spawn-new-session] Initiating context handoff...`);
   const runtimeDir = path.join(process.cwd(), '.claude/context/runtime');
-  const maxWaitMs = 120 * 1000;
-  
+
   // 1. Get current session
   const sessionId = getOrCreateSessionId(runtimeDir);
 
@@ -200,16 +199,14 @@ function main() {
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
   spawnTerminalWindow(cleanCommand, { cwd: process.cwd() });
 
-  // 5. Fire up the wait-for-handoff polling synchronously
-  console.log(`[spawn-new-session] Polling for handoff confirmation (timeout ${maxWaitMs/1000}s)...`);
-  try {
-    const waitForHandoffScript = path.join(process.cwd(), 'scripts', 'wait-for-handoff.mjs');
-    execFileSync('node', [waitForHandoffScript, '--timeout', '120'], { stdio: 'inherit' });
-    console.log(`[spawn-new-session] Handoff loop completed successfully! Safe to exit.`);
-  } catch (error) {
-    console.error(`[spawn-new-session] The wait script failed or timed out: ${error.message}`);
-    process.exit(1);
-  }
+  // 5. Fire-and-forget — the old session exits immediately after spawning.
+  //    The new session's UserPromptSubmit hook writes the ACK to both:
+  //      - .claude/context/runtime/shift-change-ack.json  (runtime sentinel)
+  //      - .claude/context/memory/handoff_inbox.md         (durable memory record)
+  //    No need to block here waiting for the new window to finish starting.
+  //    Use scripts/wait-for-handoff.mjs manually for debugging if needed.
+  console.log(`[spawn-new-session] Handoff initiated. New session will ACK via memory on first prompt.`);
+  console.log(`[spawn-new-session] Safe to exit. Check handoff_inbox.md for confirmation.`);
 }
 
  
