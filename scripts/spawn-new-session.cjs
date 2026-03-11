@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-/* eslint-disable no-unused-vars */
+ 
 
 const fs = require('fs');
 const path = require('path');
@@ -165,23 +165,42 @@ function main() {
   // 1. Get current session
   const sessionId = getOrCreateSessionId(runtimeDir);
 
-  // 2. Draft the handover log
-  const handoverData = {
-    schemaVersion: '1.0.0',
-    generation: 1,
-    sessionId: sessionId,
-    resumeInstructions: resumeInstructions,
-    contextSummary: 'Handoff initiated via spawn-new-session.cjs',
-    pendingMemoryWrites: [],
-    pendingActions: [],
-  };
+  // 2. Draft the handover log — only if NOT called with --skip-drain.
+  //    When --skip-drain is passed, session-handoff.cjs already wrote a rich log
+  //    (from active_context.md). Overwriting it here would lose that context.
+  if (!skipDrain) {
+    const handoverData = {
+      schemaVersion: '1.0.0',
+      generation: 1,
+      sessionId: sessionId,
+      resumeInstructions: resumeInstructions,
+      contextSummary: 'Handoff initiated via spawn-new-session.cjs',
+      pendingMemoryWrites: [],
+      pendingActions: [],
+    };
 
-  try {
-    writeHandoverLog(handoverData, runtimeDir);
-    console.log(`[spawn-new-session] Wrote READY handover log for session ${sessionId}.`);
-  } catch (error) {
-    console.error(`[spawn-new-session] Failed to write handover log: ${error.message}`);
-    process.exit(1);
+    try {
+      writeHandoverLog(handoverData, runtimeDir);
+      console.log(`[spawn-new-session] Wrote READY handover log for session ${sessionId}.`);
+    } catch (error) {
+      console.error(`[spawn-new-session] Failed to write handover log: ${error.message}`);
+      process.exit(1);
+    }
+  } else {
+    console.log(`[spawn-new-session] --skip-drain: preserving existing handover log.`);
+  }
+
+  // 2b. Clear session-id.json so the new session's handover-detector initializes
+  //     fresh. Without this, the detector sees the current session's session-id.json
+  //     and bails early, injecting nothing into the new window.
+  const sessionIdPath = path.join(runtimeDir, 'session-id.json');
+  if (fs.existsSync(sessionIdPath)) {
+    try {
+      fs.unlinkSync(sessionIdPath);
+      console.log(`[spawn-new-session] Cleared session-id.json for fresh handover-detector init.`);
+    } catch (e) {
+      console.warn(`[spawn-new-session] Could not clear session-id.json: ${e.message}`);
+    }
   }
 
   // 3. Mark the current session as draining (to block new TaskCreate) unless skipped
