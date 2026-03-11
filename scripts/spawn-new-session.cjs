@@ -12,8 +12,12 @@ const { enterDrainMode } = require('../.claude/lib/context/drain-state.cjs');
 // Parse CLI options
 const args = process.argv.slice(2);
 const skipDrain = args.includes('--skip-drain');
-const claudeFlags = args.includes('--flags') ? args[args.indexOf('--flags') + 1] : '--dangerously-skip-permissions -d';
-const resumeInstructions = args.includes('--message') ? args[args.indexOf('--message') + 1] : 'Please continue the current task from the handoff inbox.';
+const claudeFlags = args.includes('--flags')
+  ? args[args.indexOf('--flags') + 1]
+  : '--dangerously-skip-permissions -d';
+const resumeInstructions = args.includes('--message')
+  ? args[args.indexOf('--message') + 1]
+  : 'Please continue the current task from the handoff inbox.';
 
 function spawnDetached(bin, spawnArgs, cwd) {
   const opts = {
@@ -55,8 +59,13 @@ end tell`;
 
 function detectLinuxTerminal() {
   const candidates = [
-    'wezterm', 'kitty', 'alacritty', 'gnome-terminal',
-    'konsole', 'xfce4-terminal', 'xterm',
+    'wezterm',
+    'kitty',
+    'alacritty',
+    'gnome-terminal',
+    'konsole',
+    'xfce4-terminal',
+    'xterm',
   ];
   for (const bin of candidates) {
     try {
@@ -144,7 +153,9 @@ function spawnTerminalWindow(cmd, opts = {}) {
     return spawnLinux(cmd, opts.cwd);
   }
 
-  console.warn(`[spawn-new-session] Unsupported platform: ${platform}. Open a terminal manually and run: ${cmd}`);
+  console.warn(
+    `[spawn-new-session] Unsupported platform: ${platform}. Open a terminal manually and run: ${cmd}`
+  );
 }
 
 function main() {
@@ -156,13 +167,13 @@ function main() {
 
   // 2. Draft the handover log
   const handoverData = {
-    schemaVersion: "1.0.0",
+    schemaVersion: '1.0.0',
     generation: 1,
     sessionId: sessionId,
     resumeInstructions: resumeInstructions,
-    contextSummary: "Handoff initiated via spawn-new-session.cjs",
+    contextSummary: 'Handoff initiated via spawn-new-session.cjs',
     pendingMemoryWrites: [],
-    pendingActions: []
+    pendingActions: [],
   };
 
   try {
@@ -180,21 +191,16 @@ function main() {
   }
 
   // 4. Spawn the new terminal.
-  // Strategy: run claude in -p (print/headless) mode first with a seed prompt.
-  //   - The UserPromptSubmit hook fires, claims the baton, writes the ACK, and
-  //     injects the full handover context alongside the seed prompt.
-  //   - Claude processes the context and starts working autonomously (Step 0, etc.)
-  //   - When the -p turn completes the session is persisted to disk.
-  //   - Then `claude --continue` opens interactive mode on that same session so
-  //     the user can take over or review output.
+  // Strategy: open a plain interactive claude session in the new window.
+  //   - The UserPromptSubmit hook (handover-detector.cjs) fires on the first user prompt,
+  //     claims the baton, writes the ACK, and injects the full handover context.
+  //   - Claude then resumes working from where the old session left off.
   // We unset CLAUDECODE so the child process doesn't see a nested-session error.
-  // Single word — no quotes needed, avoids breaking the outer cmd /k "..." quoting on Windows
-  const seedPrompt = 'continue';
   let cleanCommand;
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && claude ${claudeFlags} -p ${seedPrompt} && claude ${claudeFlags} -c`;
+    cleanCommand = `set CLAUDECODE= && claude ${claudeFlags}`;
   } else {
-    cleanCommand = `unset CLAUDECODE && claude ${claudeFlags} -p ${seedPrompt} && claude ${claudeFlags} -c`;
+    cleanCommand = `unset CLAUDECODE && claude ${claudeFlags}`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
@@ -206,11 +212,12 @@ function main() {
   //      - .claude/context/memory/handoff_inbox.md         (durable memory record)
   //    No need to block here waiting for the new window to finish starting.
   //    Use scripts/wait-for-handoff.mjs manually for debugging if needed.
-  console.log(`[spawn-new-session] Handoff initiated. New session will ACK via memory on first prompt.`);
+  console.log(
+    `[spawn-new-session] Handoff initiated. New session will ACK via memory on first prompt.`
+  );
   console.log(`[spawn-new-session] Safe to exit. Check handoff_inbox.md for confirmation.`);
 }
 
- 
 if (require.main === module) {
   try {
     main();
@@ -219,6 +226,5 @@ if (require.main === module) {
     process.exit(1);
   }
 }
- 
 
 module.exports = { spawnTerminalWindow };
