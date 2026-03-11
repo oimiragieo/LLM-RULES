@@ -190,17 +190,21 @@ function main() {
     console.log(`[spawn-new-session] Session ${sessionId} entered DRAIN mode.`);
   }
 
-  // 4. Spawn the new terminal.
-  // Strategy: open a plain interactive claude session in the new window.
-  //   - The UserPromptSubmit hook (handover-detector.cjs) fires on the first user prompt,
-  //     claims the baton, writes the ACK, and injects the full handover context.
-  //   - Claude then resumes working from where the old session left off.
+  // 4. Spawn the new terminal — two-phase auto-start:
+  //   Phase A (seed): claude -p continue  — NO -d flag so output shows in the WT window.
+  //     -d redirects stdout to a debug log file, making the window appear blank.
+  //     The UserPromptSubmit hook fires on the -p prompt, claims the baton, and
+  //     injects the full handover context. Claude processes it and responds.
+  //   Phase B (interactive): claude -c  — resumes the same session with full flags (-d etc.)
+  //     so the user can take over and see debug output.
   // We unset CLAUDECODE so the child process doesn't see a nested-session error.
+  // Strip -d from seed flags: -d redirects output to debug file → blank WT window during seed.
+  const seedFlags = claudeFlags.replace(/\s*-d\b/g, '').trim();
   let cleanCommand;
   if (process.platform === 'win32') {
-    cleanCommand = `set CLAUDECODE= && claude ${claudeFlags}`;
+    cleanCommand = `set CLAUDECODE= && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
   } else {
-    cleanCommand = `unset CLAUDECODE && claude ${claudeFlags}`;
+    cleanCommand = `unset CLAUDECODE && claude ${seedFlags} -p continue && claude ${claudeFlags} -c`;
   }
 
   console.log(`[spawn-new-session] Spawning new terminal window with: ${cleanCommand}`);
