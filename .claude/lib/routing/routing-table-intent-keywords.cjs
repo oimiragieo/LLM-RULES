@@ -8,4 +8,16 @@ const {
 module.exports = {
   INTENT_KEYWORDS,
   ALLOWED_INTENT_KEYWORD_OVERLAPS,
+  'windows-terminal': [
+    'windows-terminal',
+    'windows',
+    'terminal',
+    'spawn',
+    'manage',
+    'from',
+    'node',
+    'with',
+    'execution',
+    'alias',
+  ],
 };

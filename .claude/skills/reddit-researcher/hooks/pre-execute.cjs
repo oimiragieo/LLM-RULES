@@ -10,8 +10,6 @@
  *   node pre-execute.cjs '{"action":"search","query":"test"}'
  */
 
-const { URL } = require('url');
-
 // ---------------------------------------------------------------------------
 // SSRF allowlist
 // ---------------------------------------------------------------------------
@@ -40,46 +38,58 @@ const VALID_ACTIONS = new Set(['search', 'subreddit', 'post']);
 const SUBREDDIT_RE = /^[A-Za-z0-9_]{1,50}$/;
 const POST_ID_RE = /^[a-z0-9]{4,10}$/;
 
-function validateInput(input) {
-  const errors = [];
-
+function validateBase(input, errors) {
   if (!input || typeof input !== 'object') {
     errors.push('Input must be an object');
-    return errors;
+    return false;
   }
-
   if (!input.action) {
     errors.push('action is required');
   } else if (!VALID_ACTIONS.has(input.action)) {
     errors.push(`action must be one of: ${[...VALID_ACTIONS].join(', ')}`);
   }
+  return true;
+}
 
-  if (input.subreddit !== undefined) {
-    if (typeof input.subreddit !== 'string' || !SUBREDDIT_RE.test(input.subreddit)) {
-      errors.push('subreddit must match pattern ^[A-Za-z0-9_]{1,50}$');
-    }
+function validateFormat(input, errors) {
+  if (
+    input.subreddit !== undefined &&
+    (typeof input.subreddit !== 'string' || !SUBREDDIT_RE.test(input.subreddit))
+  ) {
+    errors.push('subreddit must match pattern ^[A-Za-z0-9_]{1,50}$');
   }
-
   if (input.query !== undefined) {
-    if (typeof input.query !== 'string') {
-      errors.push('query must be a string');
-    } else if (input.query.length > 200) {
-      errors.push('query must be 200 characters or less');
-    }
+    if (typeof input.query !== 'string') errors.push('query must be a string');
+    else if (input.query.length > 200) errors.push('query must be 200 characters or less');
   }
-
-  if (input.postId !== undefined) {
-    if (typeof input.postId !== 'string' || !POST_ID_RE.test(input.postId)) {
-      errors.push('postId must match pattern ^[a-z0-9]{4,10}$');
-    }
+  if (
+    input.postId !== undefined &&
+    (typeof input.postId !== 'string' || !POST_ID_RE.test(input.postId))
+  ) {
+    errors.push('postId must match pattern ^[a-z0-9]{4,10}$');
   }
-
   if (input.limit !== undefined) {
     const limit = Number(input.limit);
-    if (!Number.isInteger(limit) || limit < 1 || limit > 25) {
+    if (!Number.isInteger(limit) || limit < 1 || limit > 25)
       errors.push('limit must be an integer between 1 and 25');
-    }
   }
+}
+
+function validateActionSpecific(input, errors) {
+  if (input.action === 'search' && !input.query) errors.push('query is required for search action');
+  if (input.action === 'subreddit' && !input.subreddit)
+    errors.push('subreddit is required for subreddit action');
+  if (input.action === 'post') {
+    if (!input.subreddit) errors.push('subreddit is required for post action');
+    if (!input.postId) errors.push('postId is required for post action');
+  }
+}
+
+function validateInput(input) {
+  const errors = [];
+  if (!validateBase(input, errors)) return errors;
+
+  validateFormat(input, errors);
 
   // SSRF check: validate any url field
   if (input.url) {
@@ -87,18 +97,7 @@ function validateInput(input) {
     if (urlError) errors.push(urlError);
   }
 
-  // Action-specific validation
-  if (input.action === 'search' && !input.query) {
-    errors.push('query is required for search action');
-  }
-  if (input.action === 'subreddit' && !input.subreddit) {
-    errors.push('subreddit is required for subreddit action');
-  }
-  if (input.action === 'post') {
-    if (!input.subreddit) errors.push('subreddit is required for post action');
-    if (!input.postId) errors.push('postId is required for post action');
-  }
-
+  validateActionSpecific(input, errors);
   return errors;
 }
 

@@ -95,7 +95,8 @@ function safeRead(file, fallback) {
     const result = safeParseJSON(raw);
     const expectedType = Array.isArray(fallback) ? 'array' : typeof fallback;
     if (expectedType === 'array' && !Array.isArray(result)) return fallback;
-    if (expectedType === 'object' && (typeof result !== 'object' || Array.isArray(result))) return fallback;
+    if (expectedType === 'object' && (typeof result !== 'object' || Array.isArray(result)))
+      return fallback;
     return result;
   } catch (_) {
     return fallback;
@@ -159,7 +160,10 @@ function httpsPost(url, body) {
         res.on('end', () => {
           const parsed = safeParseJSON(buf);
           // safeParseJSON returns Object.create(null) on parse failure
-          const isValid = parsed && typeof parsed === 'object' && !Array.isArray(parsed) &&
+          const isValid =
+            parsed &&
+            typeof parsed === 'object' &&
+            !Array.isArray(parsed) &&
             Object.getPrototypeOf(parsed) !== null;
           resolve(isValid ? parsed : { ok: false });
         });
@@ -183,7 +187,10 @@ function httpsGet(url) {
         res.on('end', () => {
           const parsed = safeParseJSON(buf);
           // safeParseJSON returns Object.create(null) on parse failure
-          const isValid = parsed && typeof parsed === 'object' && !Array.isArray(parsed) &&
+          const isValid =
+            parsed &&
+            typeof parsed === 'object' &&
+            !Array.isArray(parsed) &&
             Object.getPrototypeOf(parsed) !== null;
           resolve(isValid ? parsed : { ok: false });
         });

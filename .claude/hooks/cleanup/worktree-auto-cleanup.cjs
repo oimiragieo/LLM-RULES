@@ -200,7 +200,10 @@ function run() {
     // Safety: bulletproof check to ensure we never delete the active session's worktree (Windows EBUSY risk)
     // path.relative returns an empty string if paths are identical, or a relative path not starting with .. if cwd is inside wtPath
     const isCwdInsideWt = path.relative(resolvedWtPath, resolvedCwd);
-    if (isCwdInsideWt === '' || (!isCwdInsideWt.startsWith('..') && !path.isAbsolute(isCwdInsideWt))) {
+    if (
+      isCwdInsideWt === '' ||
+      (!isCwdInsideWt.startsWith('..') && !path.isAbsolute(isCwdInsideWt))
+    ) {
       continue;
     }
     // Safety: skip if no branch info

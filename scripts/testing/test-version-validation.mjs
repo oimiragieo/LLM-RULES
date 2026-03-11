@@ -97,7 +97,7 @@ async function testVersionMismatch() {
   } finally {
     // Restore original index
     await fs.writeFile(RULE_INDEX_PATH, originalContent);
-    await fs.unlink(BACKUP_PATH);
+    await fs.rm(BACKUP_PATH, { force: true });
   }
 }
 
@@ -131,7 +131,7 @@ async function testMissingVersion() {
   } finally {
     // Restore original index
     await fs.writeFile(RULE_INDEX_PATH, originalContent);
-    await fs.unlink(BACKUP_PATH);
+    await fs.rm(BACKUP_PATH, { force: true });
   }
 }
 

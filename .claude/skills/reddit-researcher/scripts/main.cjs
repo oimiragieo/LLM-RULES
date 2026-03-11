@@ -21,7 +21,6 @@
  */
 
 const https = require('https');
-const { URL } = require('url');
 
 // ---------------------------------------------------------------------------
 // SSRF allowlist — validated before every fetch

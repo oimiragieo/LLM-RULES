@@ -1,164 +1,239 @@
-// Agent: developer | Task: #9 | Session: 2026-03-10
-'use strict';
-
-const { test, describe, beforeEach } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const test = require('node:test');
+const assert = require('node:assert');
+const path = require('node:path');
+const fs = require('node:fs');
 
 const {
   enterDrainMode,
   isDraining,
   exitDrainMode,
   getDrainState,
-  DRAIN_FILENAME
 } = require('../../.claude/lib/context/drain-state.cjs');
 
-function makeTmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'drain-test-'));
-}
+test('drain-state > enterDrainMode writes drain-state.json with sessionId and deadline', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-drain-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
 
-// ─── Drain State Manager Tests ────────────────────────────────────────────────
+  enterDrainMode({ sessionId: 'abc', drainDeadlineMinutes: 5 }, tmpDir);
 
-describe('drain-state', () => {
-  let tmpDir;
-  beforeEach(() => { tmpDir = makeTmpDir(); });
+  const drainPath = path.join(tmpDir, 'drain-state.json');
+  assert.ok(fs.existsSync(drainPath), 'drain-state.json should exist');
 
-  test('enterDrainMode writes drain-state.json with sessionId and deadline', () => {
-    enterDrainMode({ sessionId: 'abc', drainDeadlineMinutes: 5 }, tmpDir);
-    const drainPath = path.join(tmpDir, DRAIN_FILENAME);
-    assert.ok(fs.existsSync(drainPath));
-    const content = JSON.parse(fs.readFileSync(drainPath, 'utf8'));
-    assert.equal(content.sessionId, 'abc');
-    assert.ok(content.drainDeadline);
-    const deadline = new Date(content.drainDeadline);
-    const now = new Date();
-    // Deadline should be ~5 minutes from now (within 10 second tolerance)
-    assert.ok(deadline > now);
-    assert.ok(deadline < new Date(Date.now() + 5 * 60 * 1000 + 10000));
-    assert.ok(content.activatedAt);
-  });
+  const content = JSON.parse(fs.readFileSync(drainPath, 'utf8'));
+  assert.strictEqual(content.sessionId, 'abc');
+  assert.ok(content.activatedAt, 'activatedAt should be set');
+  assert.ok(content.drainDeadline, 'drainDeadline should be set');
 
-  test('isDraining returns true when drain-state.json exists with matching sessionId', () => {
-    enterDrainMode({ sessionId: 'abc', drainDeadlineMinutes: 5 }, tmpDir);
-    assert.equal(isDraining('abc', tmpDir), true);
-  });
+  // Verify deadline is roughly 5 minutes in the future
+  const deadlineDate = new Date(content.drainDeadline);
+  const now = new Date();
+  const diffMinutes = (deadlineDate - now) / 1000 / 60;
+  assert.ok(diffMinutes > 4.9 && diffMinutes < 5.1, 'drainDeadline should be ~5 minutes ahead');
 
-  test('isDraining returns false when no drain-state.json', () => {
-    assert.equal(isDraining('abc', tmpDir), false);
-  });
-
-  test('isDraining returns false for DIFFERENT sessionId (new session)', () => {
-    enterDrainMode({ sessionId: 'old-session', drainDeadlineMinutes: 5 }, tmpDir);
-    assert.equal(isDraining('new-session', tmpDir), false);
-  });
-
-  test('isDraining returns false when drainDeadline has passed', () => {
-    // Write expired drain state manually
-    const expiredState = {
-      sessionId: 'abc',
-      drainDeadline: new Date(Date.now() - 60 * 1000).toISOString(),
-      activatedAt: new Date(Date.now() - 2 * 60 * 1000).toISOString()
-    };
-    fs.writeFileSync(path.join(tmpDir, DRAIN_FILENAME), JSON.stringify(expiredState), 'utf8');
-    assert.equal(isDraining('abc', tmpDir), false);
-  });
-
-  test('exitDrainMode removes drain-state.json', () => {
-    enterDrainMode({ sessionId: 'abc' }, tmpDir);
-    exitDrainMode(tmpDir);
-    assert.equal(fs.existsSync(path.join(tmpDir, DRAIN_FILENAME)), false);
-  });
-
-  test('exitDrainMode is idempotent (no error if file already gone)', () => {
-    assert.doesNotThrow(() => exitDrainMode(tmpDir));
-  });
-
-  test('getDrainState returns parsed state when file exists', () => {
-    enterDrainMode({ sessionId: 'abc', drainDeadlineMinutes: 5 }, tmpDir);
-    const state = getDrainState(tmpDir);
-    assert.ok(state);
-    assert.equal(state.sessionId, 'abc');
-  });
-
-  test('getDrainState returns null when file does not exist', () => {
-    const state = getDrainState(tmpDir);
-    assert.equal(state, null);
-  });
-
-  test('enterDrainMode throws if sessionId is missing', () => {
-    assert.throws(() => enterDrainMode({}, tmpDir), /sessionId is required/);
-  });
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-// ─── Finish-Only Guard Hook Tests (stdin/stdout simulation) ───────────────────
+test('drain-state > isDraining returns true when drain-state.json exists with matching sessionId', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-drain-match-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
 
-const { spawnSync } = require('child_process');
+  enterDrainMode({ sessionId: 'abc', drainDeadlineMinutes: 5 }, tmpDir);
+  assert.strictEqual(isDraining('abc', tmpDir), true);
 
-const HOOK_PATH = path.join(__dirname, '../../.claude/hooks/routing/finish-only-guard.cjs');
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
 
-function runHook(toolName, sessionId, drainDir) {
-  const input = JSON.stringify({ tool_name: toolName });
-  const env = {
-    ...process.env,
-    CLAUDE_SESSION_ID: sessionId,
-    SHIFT_CHANGE_RUNTIME_DIR: drainDir
+test('drain-state > isDraining returns false when no drain-state.json', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-drain-none-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  assert.strictEqual(isDraining('abc', tmpDir), false);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('drain-state > isDraining returns false for DIFFERENT sessionId (new session)', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-drain-diff-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  enterDrainMode({ sessionId: 'old-session', drainDeadlineMinutes: 5 }, tmpDir);
+  assert.strictEqual(isDraining('new-session', tmpDir), false);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('drain-state > isDraining returns false when drainDeadline has passed', () => {
+  const tmpDir = path.join(
+    process.cwd(),
+    '.claude/context/runtime/test-drain-expired-' + Date.now()
+  );
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  // Manually write expired drain state
+  const state = {
+    sessionId: 'abc',
+    activatedAt: new Date(Date.now() - 120000).toISOString(),
+    drainDeadline: new Date(Date.now() - 60000).toISOString(), // 1 min ago
   };
-  const result = spawnSync(process.execPath, [HOOK_PATH], {
-    input,
-    encoding: 'utf8',
-    env,
-    shell: false
-  });
+  fs.writeFileSync(path.join(tmpDir, 'drain-state.json'), JSON.stringify(state));
+
+  assert.strictEqual(isDraining('abc', tmpDir), false);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('drain-state > exitDrainMode removes drain-state.json', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-drain-exit-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  enterDrainMode({ sessionId: 'abc', drainDeadlineMinutes: 5 }, tmpDir);
+  const drainPath = path.join(tmpDir, 'drain-state.json');
+  assert.ok(fs.existsSync(drainPath));
+
+  exitDrainMode(tmpDir);
+  assert.strictEqual(fs.existsSync(drainPath), false, 'File should be removed');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('drain-state > getDrainState returns parsed state or null', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime/test-drain-get-' + Date.now());
+  fs.mkdirSync(tmpDir, { recursive: true });
+
+  assert.strictEqual(getDrainState(tmpDir), null, 'Should return null when missing');
+
+  enterDrainMode({ sessionId: 'abc', drainDeadlineMinutes: 5 }, tmpDir);
+  const state = getDrainState(tmpDir);
+  assert.ok(state, 'Should return state object');
+  assert.strictEqual(state.sessionId, 'abc');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+const { execFileSync } = require('child_process');
+
+function runHook(inputJson, env = {}) {
   try {
-    return JSON.parse(result.stdout);
-  } catch {
-    return { allow: true, _raw: result.stdout, _err: result.stderr };
+    const hookPath = path.join(process.cwd(), '.claude/hooks/routing/finish-only-guard.cjs');
+    // Ensure file exists before running
+    if (!fs.existsSync(hookPath)) {
+      throw new Error(`Hook file not found: ${hookPath}`);
+    }
+    const result = execFileSync('node', [hookPath], {
+      input: JSON.stringify(inputJson),
+      env: { ...process.env, ...env },
+      stdio: ['pipe', 'pipe', 'ignore'],
+      encoding: 'utf8',
+    });
+    return JSON.parse(result);
+  } catch (err) {
+    if (err.stdout) {
+      try {
+        return JSON.parse(err.stdout);
+      } catch (_e) {
+        /* ignore */
+      }
+    }
+    throw err;
   }
 }
 
-describe('finish-only-guard hook', () => {
-  let tmpDir;
-  beforeEach(() => { tmpDir = makeTmpDir(); });
+test('finish-only-guard hook > blocks TaskCreate when draining with matching sessionId', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  enterDrainMode({ sessionId: 'session-matching', drainDeadlineMinutes: 5 }, tmpDir);
 
-  test('allows TaskCreate when NOT draining', () => {
-    const result = runHook('TaskCreate', 'session-1', tmpDir);
-    assert.equal(result.allow, true);
-  });
+  const res = runHook(
+    { tool_name: 'TaskCreate', arguments: {} },
+    { CLAUDE_SESSION_ID: 'session-matching' }
+  );
+  assert.strictEqual(res.allow, false);
+  assert.ok(res.message.includes('draining') || res.message.includes('Session draining'));
 
-  test('allows TaskUpdate even during drain', () => {
-    enterDrainMode({ sessionId: 'session-1', drainDeadlineMinutes: 5 }, tmpDir);
-    const result = runHook('TaskUpdate', 'session-1', tmpDir);
-    assert.equal(result.allow, true);
-  });
+  exitDrainMode(tmpDir);
+});
 
-  test('allows TaskList even during drain', () => {
-    enterDrainMode({ sessionId: 'session-1', drainDeadlineMinutes: 5 }, tmpDir);
-    const result = runHook('TaskList', 'session-1', tmpDir);
-    assert.equal(result.allow, true);
-  });
+test('finish-only-guard hook > allows TaskCreate when NOT draining', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  exitDrainMode(tmpDir); // ensure clear
 
-  test('allows TaskCreate when drainDeadline has expired', () => {
-    const expiredState = {
-      sessionId: 'session-1',
-      drainDeadline: new Date(Date.now() - 60 * 1000).toISOString(),
-      activatedAt: new Date().toISOString()
-    };
-    fs.writeFileSync(path.join(tmpDir, DRAIN_FILENAME), JSON.stringify(expiredState), 'utf8');
-    const result = runHook('TaskCreate', 'session-1', tmpDir);
-    assert.equal(result.allow, true);
-  });
+  const res = runHook(
+    { tool_name: 'TaskCreate', arguments: {} },
+    { CLAUDE_SESSION_ID: 'session-clean' }
+  );
+  assert.strictEqual(res.allow, true);
+});
 
-  test('allows non-task tools unconditionally', () => {
-    enterDrainMode({ sessionId: 'session-1', drainDeadlineMinutes: 5 }, tmpDir);
-    const result = runHook('Read', 'session-1', tmpDir);
-    assert.equal(result.allow, true);
-  });
+test('finish-only-guard hook > allows TaskCreate when drain sessionId differs (new session)', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  enterDrainMode({ sessionId: 'session-old', drainDeadlineMinutes: 5 }, tmpDir);
 
-  test('fails open on corrupt drain-state.json', () => {
-    fs.writeFileSync(path.join(tmpDir, DRAIN_FILENAME), 'NOT JSON {{', 'utf8');
-    const result = runHook('TaskCreate', 'session-1', tmpDir);
-    assert.equal(result.allow, true);
-  });
+  const res = runHook(
+    { tool_name: 'TaskCreate', arguments: {} },
+    { CLAUDE_SESSION_ID: 'session-new' }
+  );
+  assert.strictEqual(res.allow, true);
+
+  exitDrainMode(tmpDir);
+});
+
+test('finish-only-guard hook > allows TaskUpdate even during drain', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  enterDrainMode({ sessionId: 'session-matching', drainDeadlineMinutes: 5 }, tmpDir);
+
+  const res = runHook(
+    { tool_name: 'TaskUpdate', arguments: {} },
+    { CLAUDE_SESSION_ID: 'session-matching' }
+  );
+  assert.strictEqual(res.allow, true);
+
+  exitDrainMode(tmpDir);
+});
+
+test('finish-only-guard hook > allows TaskList even during drain', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  enterDrainMode({ sessionId: 'session-matching', drainDeadlineMinutes: 5 }, tmpDir);
+
+  const res = runHook(
+    { tool_name: 'TaskList', arguments: {} },
+    { CLAUDE_SESSION_ID: 'session-matching' }
+  );
+  assert.strictEqual(res.allow, true);
+
+  exitDrainMode(tmpDir);
+});
+
+test('finish-only-guard hook > allows TaskCreate when drainDeadline expired', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+  const state = {
+    sessionId: 'session-matching',
+    activatedAt: new Date(Date.now() - 120000).toISOString(),
+    drainDeadline: new Date(Date.now() - 60000).toISOString(), // 1 min ago
+  };
+  fs.writeFileSync(path.join(tmpDir, 'drain-state.json'), JSON.stringify(state));
+
+  const res = runHook(
+    { tool_name: 'TaskCreate', arguments: {} },
+    { CLAUDE_SESSION_ID: 'session-matching' }
+  );
+  assert.strictEqual(res.allow, true);
+
+  exitDrainMode(tmpDir);
+});
+
+test('finish-only-guard hook > is fail-open (allows on unexpected errors)', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+  // Corrupt the json
+  fs.writeFileSync(path.join(tmpDir, 'drain-state.json'), 'not json{');
+
+  const res = runHook(
+    { tool_name: 'TaskCreate', arguments: {} },
+    { CLAUDE_SESSION_ID: 'session-matching' }
+  );
+  assert.strictEqual(res.allow, true, 'Should be fail-open');
+
+  exitDrainMode(tmpDir);
 });

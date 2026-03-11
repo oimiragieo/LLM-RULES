@@ -80,9 +80,6 @@ describe('UserPromptSubmit hook double-execution prevention', () => {
     const unifiedRegistered = registeredCommands.some(cmd =>
       cmd.includes('user-prompt-unified.cjs')
     );
-    assert.ok(
-      unifiedRegistered,
-      'user-prompt-unified.cjs must be registered in settings.json'
-    );
+    assert.ok(unifiedRegistered, 'user-prompt-unified.cjs must be registered in settings.json');
   });
 });

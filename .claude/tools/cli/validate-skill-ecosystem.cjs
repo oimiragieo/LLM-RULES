@@ -10,7 +10,6 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 // (kept separate from safeParseJSON which handles sanitisation)
 const _tryParseRaw = JSON.parse.bind(JSON);
 
-
 const SKILLS_ROOT_REL = path.join('.claude', 'skills');
 const TOOLS_ROOT_REL = path.join('.claude', 'tools');
 const WORKFLOWS_ROOT_REL = path.join('.claude', 'workflows');
