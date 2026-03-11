@@ -125,14 +125,15 @@ function spawnTerminalWindow(cmd, opts = {}) {
 
   if (platform === 'win32') {
     if (process.env.WT_SESSION) {
-      return spawnDetached('cmd.exe', [
-        '/c', 'start', '', 'wt', '-w', 'new', 'new-tab', 'cmd', '/k', cmd,
-      ], opts.cwd);
+      const wtArgs = ['/c', 'start', '', 'wt', '-w', 'new', 'new-tab'];
+      if (opts.cwd) wtArgs.push('-d', opts.cwd);
+      wtArgs.push('--title', 'Claude New Session', 'cmd', '/k', cmd);
+      return spawnDetached('cmd.exe', wtArgs, opts.cwd);
     }
-    return spawnDetached('powershell', [
-      '-Command',
-      `Start-Process cmd.exe -ArgumentList '/k ${cmd.replace(/'/g, "''")}'`,
-    ], opts.cwd);
+    const psCmd = opts.cwd
+      ? `Start-Process cmd.exe -WorkingDirectory ${JSON.stringify(opts.cwd)} -ArgumentList '/k ${cmd.replace(/'/g, "''")}'`
+      : `Start-Process cmd.exe -ArgumentList '/k ${cmd.replace(/'/g, "''")}'`;
+    return spawnDetached('powershell', ['-Command', psCmd], opts.cwd);
   }
 
   if (platform === 'darwin') {
