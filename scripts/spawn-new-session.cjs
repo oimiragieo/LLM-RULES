@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 'use strict';
- 
 
-const fs = require('fs');
 const path = require('path');
 const { spawn, execFileSync } = require('child_process');
 const { writeHandoverLog } = require('../.claude/lib/context/shift-change-log-writer.cjs');
@@ -188,19 +186,6 @@ function main() {
     }
   } else {
     console.log(`[spawn-new-session] --skip-drain: preserving existing handover log.`);
-  }
-
-  // 2b. Clear session-id.json so the new session's handover-detector initializes
-  //     fresh. Without this, the detector sees the current session's session-id.json
-  //     and bails early, injecting nothing into the new window.
-  const sessionIdPath = path.join(runtimeDir, 'session-id.json');
-  if (fs.existsSync(sessionIdPath)) {
-    try {
-      fs.unlinkSync(sessionIdPath);
-      console.log(`[spawn-new-session] Cleared session-id.json for fresh handover-detector init.`);
-    } catch (e) {
-      console.warn(`[spawn-new-session] Could not clear session-id.json: ${e.message}`);
-    }
   }
 
   // 3. Mark the current session as draining (to block new TaskCreate) unless skipped
