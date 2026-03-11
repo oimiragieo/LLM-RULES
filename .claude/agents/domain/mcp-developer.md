@@ -36,7 +36,6 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
 context_files:
-  - '@.claude/context/memory/learnings.md'
 capabilities:
   - mcp-server-development
   - mcp-client-integration
@@ -193,8 +192,8 @@ Before implementing any MCP server or client, analyze the requirements:
 3. **Review prior MCP decisions** in memory:
 
    ```bash
-   cat .claude/context/memory/learnings.md
-   cat .claude/context/memory/decisions.md
+   node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
    ```
 
 ### Step 3: TDD Implementation Cycle
@@ -923,8 +922,8 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

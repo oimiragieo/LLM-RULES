@@ -38,7 +38,6 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
 context_files:
-  - '@.claude/context/memory/learnings.md'
   - '@.claude/agent-memory/medical-research-triage/MEMORY.md'
 identity:
   role: Medical Research & Triage Specialist
@@ -339,8 +338,8 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

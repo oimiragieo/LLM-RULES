@@ -36,7 +36,6 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
 context_files:
-  - '@.claude/context/memory/learnings.md'
 capabilities:
   - wcag-compliance
   - screen-reader-testing
@@ -843,8 +842,8 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

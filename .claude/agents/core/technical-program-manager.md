@@ -93,8 +93,8 @@ Use `Skill({ skill: 'token-saver-context-compression' })` only when synthesizing
 Before work:
 
 ```bash
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 After work:

@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-10T16:36:47.654Z
+lastVerifiedAt: 2026-03-11T05:13:49.576Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -44,8 +44,6 @@ skills:
 context_files:
   - '@.claude/context/memory/patterns.json'
   - '@.claude/context/memory/gotchas.json'
-  - '@.claude/context/memory/decisions.md'
-  - '@.claude/context/memory/issues.md'
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -815,8 +813,8 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

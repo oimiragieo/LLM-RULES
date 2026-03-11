@@ -269,3 +269,5 @@ All three now pass 8/0/3 validation.
 - `scientific-skills` (v2.17.0, updated lastVerifiedAt): Set verified=true. Added 5 Iron Laws (always query databases first, never analyze without documenting, always chain skills, never report without statistical validation, always visualize intermediate results). Added Anti-Patterns table (5 rows). Added Memory Protocol section (was missing).
 
 All three now pass 8/0/3 validation.
+
+- [shift-change handover] Decision: marker-file over PID kill (2026-03-11)

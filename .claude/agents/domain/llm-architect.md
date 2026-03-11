@@ -61,7 +61,6 @@ identity:
     decision_making: evidence-based
   motto: Architecture is the difference between an LLM demo and an LLM product.
 context_files:
-  - '@.claude/context/memory/learnings.md'
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -203,8 +202,8 @@ Use available tools to research current best practices:
 3. **Review prior decisions** in memory:
 
    ```bash
-   cat .claude/context/memory/decisions.md
-   cat .claude/context/memory/learnings.md
+
+   node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
    ```
 
 4. **Analyze trade-offs** between competing approaches with evidence:
@@ -706,8 +705,8 @@ Do NOT invoke token-saver for normal small tasks (few files, short snippets); us
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

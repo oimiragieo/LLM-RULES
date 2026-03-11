@@ -34,7 +34,6 @@ skills:
   - verification-before-completion
   - task-management-protocol
 context_files:
-  - '@.claude/context/memory/learnings.md'
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -131,7 +130,7 @@ Skill({ skill: 'enhance-prompt' });
 ### Step 1: Understand and Scope
 
 1. **Claim task**: Call `TaskUpdate({ taskId: '<id>', status: 'in_progress' })` immediately
-2. **Read memory**: `cat .claude/context/memory/learnings.md` for previous brand work context
+2. **Read memory**: `node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"` for previous brand work context
 3. **Clarify request**: Identify whether this is an audit, creation, update, or validation task
 4. **Identify brand assets**: Glob for existing brand files, style guides, design tokens, content files
 5. **Map touchpoints**: List all channels in scope (web, mobile, social, print, etc.)
@@ -291,8 +290,8 @@ Before using Grep/Read for code discovery, prefer framework search tools:
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

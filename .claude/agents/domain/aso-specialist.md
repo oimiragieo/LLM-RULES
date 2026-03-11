@@ -34,7 +34,6 @@ skills:
   - task-management-protocol
   - verification-before-completion
 context_files:
-  - '@.claude/context/memory/learnings.md'
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -342,8 +341,8 @@ Skill({ skill: 'token-saver-context-compression' });
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

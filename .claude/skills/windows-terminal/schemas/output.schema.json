@@ -3,9 +3,7 @@
   "title": "windows-terminal Output Schema",
   "description": "Output validation schema for windows-terminal skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

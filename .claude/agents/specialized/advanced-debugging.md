@@ -42,8 +42,6 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
 context_files:
-  - '@.claude/context/memory/learnings.md'
-  - '@.claude/context/memory/issues.md'
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -316,8 +314,8 @@ Invoke token-saver when ANY of these hold:
 
 ```bash
 node .claude/lib/memory/memory-search.cjs "<your specific task domain/concept>"
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing work, record findings:**

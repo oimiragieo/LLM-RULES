@@ -10,7 +10,21 @@ permissionMode: default
 priority: high
 verified: true
 lastVerifiedAt: '2026-03-10T06:00:38.407Z'
-tools: [Read, Write, Edit, Glob, Grep, Bash, TaskUpdate, TaskList, TaskCreate, TaskGet, Skill, MemoryRecord]
+tools:
+  [
+    Read,
+    Write,
+    Edit,
+    Glob,
+    Grep,
+    Bash,
+    TaskUpdate,
+    TaskList,
+    TaskCreate,
+    TaskGet,
+    Skill,
+    MemoryRecord,
+  ]
 skills:
   - task-management-protocol
   - ripgrep
@@ -20,7 +34,6 @@ skills:
   - verification-before-completion
   - memory-search
 context_files:
-  - '@.claude/context/memory/learnings.md'
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -111,6 +124,7 @@ TaskUpdate({
 ## Search Protocol
 
 Use hybrid search for all codebase discovery:
+
 1. `pnpm search:code` — semantic + BM25 hybrid search (primary)
 2. `Skill({ skill: 'ripgrep' })` — fast text search
 3. `Skill({ skill: 'code-semantic-search' })` — conceptual search
@@ -126,8 +140,8 @@ Use `Skill({ skill: 'token-saver-context-compression' })` only when context pres
 **Before starting:**
 
 ```bash
-cat .claude/context/memory/learnings.md
-cat .claude/context/memory/decisions.md
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+
 ```
 
 **After completing:**

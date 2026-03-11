@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: false
 tools: [Read, Write, Bash]
 agents: [developer, nodejs-pro]
-category: "Specialized Patterns"
+category: 'Specialized Patterns'
 tags: [windows, terminal, spawn, wt, child-process, hooks]
 verified: true
 lastVerifiedAt: 2026-03-10
@@ -43,11 +43,13 @@ reliable spawn patterns, and anti-patterns to avoid.
 
 `wt.exe` is a **Windows App Execution Alias** registered at
 `%LOCALAPPDATA%\Microsoft\WindowsApps`. App Execution Aliases:
+
 - Work in interactive shells (cmd.exe, PowerShell terminal sessions)
 - Are **NOT** resolvable from `child_process.spawn()` in Node.js
 - Require the Windows shell infrastructure unavailable to child processes
 
 **User confirmed failure (2026-03-10):**
+
 ```powershell
 PS C:\Users\oimir> wt.exe
 # wt.exe : The term 'wt.exe' is not recognized...
@@ -63,6 +65,7 @@ fails to produce a visible window from such contexts. The empty string `''` is a
 title placeholder for `start` when passing arguments to the target program.
 
 Two additional requirements when spawning `claude`:
+
 - **Unset `CLAUDECODE`**: Claude Code sets this env var; child `claude` processes detect it
   and refuse to start ("cannot be launched inside another Claude Code session"). Clear it in
   the cmd command with `set CLAUDECODE=` before invoking `claude`.
@@ -71,29 +74,51 @@ Two additional requirements when spawning `claude`:
 
 ```javascript
 // VERIFIED working from non-interactive subprocess (Claude Code hook, Bash tool, etc.)
-spawn('cmd.exe', [
-  '/c', 'start', '',   // 'start' = Windows GUI window launcher; '' = required title placeholder
-  'wt', '-w', 'new', 'new-tab',
-  '--title', 'My Title',
-  'cmd', '/k', 'set CLAUDECODE= && claude'  // unset CLAUDECODE before launching claude
-], { shell: false });
+spawn(
+  'cmd.exe',
+  [
+    '/c',
+    'start',
+    '', // 'start' = Windows GUI window launcher; '' = required title placeholder
+    'wt',
+    '-w',
+    'new',
+    'new-tab',
+    '--title',
+    'My Title',
+    'cmd',
+    '/k',
+    'set CLAUDECODE= && claude', // unset CLAUDECODE before launching claude
+  ],
+  { shell: false }
+);
 // Note: no detached/stdio/unref needed — 'start' fully detaches by design
 ```
 
 **Approach B — PowerShell Start-Process (alternative):**
 `Start-Process` uses the Windows shell infrastructure to resolve aliases.
+
 ```javascript
-spawn('powershell.exe', ['-NoProfile', '-Command',
-  'Start-Process wt -ArgumentList "-w new new-tab --title \'My Title\' cmd /k \'set CLAUDECODE= && claude\'"'
-], { detached: true, shell: false, stdio: 'ignore' });
+spawn(
+  'powershell.exe',
+  [
+    '-NoProfile',
+    '-Command',
+    "Start-Process wt -ArgumentList \"-w new new-tab --title 'My Title' cmd /k 'set CLAUDECODE= && claude'\"",
+  ],
+  { detached: true, shell: false, stdio: 'ignore' }
+);
 ```
 
 **Approach C — PowerShell Start-Process cmd (no WT required):**
 Fallback when Windows Terminal is not installed or WT_SESSION is not set.
+
 ```javascript
-spawn('powershell.exe', ['-NoProfile', '-Command',
-  'Start-Process cmd.exe -ArgumentList "/k claude" -WindowStyle Normal'
-], { detached: true, shell: false, stdio: 'ignore' });
+spawn(
+  'powershell.exe',
+  ['-NoProfile', '-Command', 'Start-Process cmd.exe -ArgumentList "/k claude" -WindowStyle Normal'],
+  { detached: true, shell: false, stdio: 'ignore' }
+);
 ```
 
 ---
@@ -108,18 +133,19 @@ If no command is specified, `new-tab` is used by default.
 
 ### Global Options
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--window <id>` | `-w` | Target window. `new`/`-1` = always new window; `0`/`last` = most recent; name = named window |
-| `--maximized` | `-M` | Launch maximized |
-| `--fullscreen` | `-F` | Launch fullscreen |
-| `--focus` | `-f` | Launch in focus mode |
-| `--pos x,y` | | Launch at position |
-| `--size c,r` | | Launch with columns/rows |
+| Option          | Short | Description                                                                                  |
+| --------------- | ----- | -------------------------------------------------------------------------------------------- |
+| `--window <id>` | `-w`  | Target window. `new`/`-1` = always new window; `0`/`last` = most recent; name = named window |
+| `--maximized`   | `-M`  | Launch maximized                                                                             |
+| `--fullscreen`  | `-F`  | Launch fullscreen                                                                            |
+| `--focus`       | `-f`  | Launch in focus mode                                                                         |
+| `--pos x,y`     |       | Launch at position                                                                           |
+| `--size c,r`    |       | Launch with columns/rows                                                                     |
 
 ### Subcommands
 
 #### new-tab (nt)
+
 ```
 wt new-tab [options] [commandline]
   -p <profile>          Profile name
@@ -133,6 +159,7 @@ wt new-tab [options] [commandline]
 ```
 
 #### split-pane (sp)
+
 ```
 wt split-pane [options] [commandline]
   -H / --horizontal     Split horizontally
@@ -143,11 +170,13 @@ wt split-pane [options] [commandline]
 ```
 
 #### focus-tab (ft)
+
 ```
 wt focus-tab -t <index>   Focus tab by zero-based index
 ```
 
 #### move-focus (mf)
+
 ```
 wt move-focus <direction>
   # direction: up|down|left|right|first|previous|nextInOrder|previousInOrder
@@ -157,12 +186,12 @@ wt move-focus <direction>
 
 Commands are separated by `;`. Escaping rules depend on the calling shell:
 
-| Shell | Separator | Example |
-|-------|-----------|---------|
-| cmd.exe | `;` | `wt new-tab cmd ; new-tab powershell` |
-| PowerShell | `` `; `` (backtick-escaped) | `` wt new-tab cmd `; new-tab powershell `` |
-| PowerShell stop-parse | `--% ;` | `wt --% new-tab cmd ; new-tab powershell` |
-| Node.js (cmd.exe approach) | Array element `";"` | `['/c', 'wt', 'new-tab', 'cmd', ';', 'new-tab', 'powershell']` |
+| Shell                      | Separator                   | Example                                                        |
+| -------------------------- | --------------------------- | -------------------------------------------------------------- |
+| cmd.exe                    | `;`                         | `wt new-tab cmd ; new-tab powershell`                          |
+| PowerShell                 | `` `; `` (backtick-escaped) | ``wt new-tab cmd `; new-tab powershell``                       |
+| PowerShell stop-parse      | `--% ;`                     | `wt --% new-tab cmd ; new-tab powershell`                      |
+| Node.js (cmd.exe approach) | Array element `";"`         | `['/c', 'wt', 'new-tab', 'cmd', ';', 'new-tab', 'powershell']` |
 
 ---
 
@@ -209,7 +238,9 @@ function spawnWtNewWindow(command, opts = {}) {
   wtArgs.push('cmd', '/k', command);
 
   const child = spawn('cmd.exe', wtArgs, {
-    detached: true, shell: false, stdio: 'ignore'
+    detached: true,
+    shell: false,
+    stdio: 'ignore',
   });
   child.unref(); // Do NOT wait for child — let it run independently
   return child;
@@ -230,7 +261,9 @@ function spawnWtNewTab(command, opts = {}) {
   wtArgs.push('cmd', '/k', command);
 
   const child = spawn('cmd.exe', wtArgs, {
-    detached: true, shell: false, stdio: 'ignore'
+    detached: true,
+    shell: false,
+    stdio: 'ignore',
   });
   child.unref();
   return child;
@@ -242,10 +275,15 @@ function spawnWtNewTab(command, opts = {}) {
 ```javascript
 function spawnCmdNewWindow(command, opts = {}) {
   const { windowStyle = 'Normal' } = opts;
-  const child = spawn('powershell.exe', [
-    '-NoProfile', '-Command',
-    `Start-Process cmd.exe -ArgumentList "/k ${command}" -WindowStyle ${windowStyle}`
-  ], { detached: true, shell: false, stdio: 'ignore' });
+  const child = spawn(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-Command',
+      `Start-Process cmd.exe -ArgumentList "/k ${command}" -WindowStyle ${windowStyle}`,
+    ],
+    { detached: true, shell: false, stdio: 'ignore' }
+  );
   child.unref();
   return child;
 }
@@ -274,7 +312,9 @@ function spawnInteractiveSession(command, opts = {}) {
           const child = spawn(bin, args, { detached: true, shell: false, stdio: 'ignore' });
           child.unref();
           return child;
-        } catch { /* try next */ }
+        } catch {
+          /* try next */
+        }
       }
       throw new Error('No suitable terminal emulator found on Unix');
     }
@@ -378,18 +418,23 @@ const isWT = !!process.env.WT_SESSION;
 
 if (isWT) {
   // cmd.exe resolves App Execution Alias
-  const child = spawn('cmd.exe', [
-    '/c', 'wt', '-w', 'new', 'new-tab',
-    '--title', 'Claude New Session',
-    'cmd', '/k', 'claude'
-  ], { detached: true, shell: false, stdio: 'ignore' });
+  const child = spawn(
+    'cmd.exe',
+    ['/c', 'wt', '-w', 'new', 'new-tab', '--title', 'Claude New Session', 'cmd', '/k', 'claude'],
+    { detached: true, shell: false, stdio: 'ignore' }
+  );
   child.unref();
 } else {
   // Fallback: plain cmd.exe window
-  const child = spawn('powershell.exe', [
-    '-NoProfile', '-Command',
-    'Start-Process cmd.exe -ArgumentList "/k claude" -WindowStyle Normal'
-  ], { detached: true, shell: false, stdio: 'ignore' });
+  const child = spawn(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-Command',
+      'Start-Process cmd.exe -ArgumentList "/k claude" -WindowStyle Normal',
+    ],
+    { detached: true, shell: false, stdio: 'ignore' }
+  );
   child.unref();
 }
 ```
@@ -399,22 +444,37 @@ if (isWT) {
 ```javascript
 // Open a new WT window with two vertical panes: claude on left, PowerShell on right
 // Note: semicolons in cmd.exe arrays require escaping as a string element ';'
-spawn('cmd.exe', [
-  '/c', 'wt', '-w', 'new',
-  'new-tab', '--title', 'Claude', 'cmd', '/k', 'claude',
-  ';', 'split-pane', '-V', 'powershell'
-], { detached: true, shell: false, stdio: 'ignore' });
+spawn(
+  'cmd.exe',
+  [
+    '/c',
+    'wt',
+    '-w',
+    'new',
+    'new-tab',
+    '--title',
+    'Claude',
+    'cmd',
+    '/k',
+    'claude',
+    ';',
+    'split-pane',
+    '-V',
+    'powershell',
+  ],
+  { detached: true, shell: false, stdio: 'ignore' }
+);
 ```
 
 ### Example 3: Open a specific WT profile
 
 ```javascript
 // Open Windows Terminal with the 'Ubuntu' WSL profile in a new window
-spawn('cmd.exe', [
-  '/c', 'wt', '-w', 'new', 'new-tab',
-  '-p', 'Ubuntu',
-  '--title', 'WSL Session'
-], { detached: true, shell: false, stdio: 'ignore' });
+spawn('cmd.exe', ['/c', 'wt', '-w', 'new', 'new-tab', '-p', 'Ubuntu', '--title', 'WSL Session'], {
+  detached: true,
+  shell: false,
+  stdio: 'ignore',
+});
 ```
 
 ### Example 4: Detect and report terminal strategy
@@ -452,6 +512,7 @@ For code discovery and search tasks, follow this priority order:
 Read `.claude/context/memory/learnings.md` and `.claude/context/memory/decisions.md`.
 
 **After completing:**
+
 - New pattern → `.claude/context/memory/learnings.md`
 - Issue found → `.claude/context/memory/issues.md`
 - Decision made → `.claude/context/memory/decisions.md`
