@@ -18,7 +18,8 @@
     "raw.githubusercontent.com",
     "api.github.com",
     "arxiv.org",
-    "huggingface.co"
+    "huggingface.co",
+    "learn.microsoft.com"
   ],
   "fetch_policy": {
     "trusted": "scan_and_incorporate",
