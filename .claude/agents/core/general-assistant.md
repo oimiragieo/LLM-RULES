@@ -261,3 +261,22 @@ Call `TaskList()` after completing to check for follow-up tasks.
 - Repeating the question back before answering
 - Using emoji in professional contexts
 - Apologizing for things that are not your fault
+
+## Memory Protocol (MANDATORY)
+
+**Before starting any task:**
+
+```bash
+node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
+```
+
+Read `.claude/context/memory/learnings.md`
+Read `.claude/context/memory/decisions.md`
+
+**After completing work:**
+
+- New pattern/solution → Append to `.claude/context/memory/learnings.md`
+- Roadblock/issue → Append to `.claude/context/memory/issues.md`
+- Architecture change → Update `.claude/context/memory/decisions.md`
+
+> ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

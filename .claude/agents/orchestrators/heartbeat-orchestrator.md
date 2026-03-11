@@ -168,3 +168,13 @@ MemoryRecord({
 - Heartbeat design: `.claude/context/plans/heartbeat-ecosystem-design-2026-03-07.md`
 - Skill: `Skill({ skill: 'heartbeat' })`
 - Scheduled-tasks patterns: `Skill({ skill: 'scheduled-tasks' })`
+
+## Search Protocol
+
+Use hybrid search for all codebase discovery:
+
+1. `pnpm search:code` — semantic + BM25 hybrid search (primary)
+2. `Skill({ skill: 'ripgrep' })` — fast text search
+3. `Skill({ skill: 'code-semantic-search' })` — conceptual search
+4. `Skill({ skill: 'code-structural-search' })` — AST-based search
+5. `Grep` — fallback only for single-file checks

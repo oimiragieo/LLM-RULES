@@ -37,6 +37,7 @@ skills:
   - recommend-evolution
   - ripgrep
   - session-handoff
+  - session-transcript-analyzer
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
