@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "WindowsTerminal Input",
+  "description": "Validated inputs for windows-terminal spawn operations",
+  "type": "object",
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["spawn-new-window", "spawn-new-tab", "spawn-cmd-fallback", "detect-strategy"],
+      "description": "The terminal operation to perform"
+    },
+    "command": {
+      "type": "string",
+      "description": "Shell command to run in the terminal (e.g. 'claude', 'powershell')",
+      "maxLength": 256
+    },
+    "title": {
+      "type": "string",
+      "description": "Tab/window title for Windows Terminal",
+      "maxLength": 64,
+      "pattern": "^[a-zA-Z0-9 \\-_.]+$"
+    },
+    "profile": {
+      "type": "string",
+      "description": "Windows Terminal profile name (e.g. 'Windows PowerShell', 'Ubuntu')",
+      "maxLength": 64
+    },
+    "startingDir": {
+      "type": "string",
+      "description": "Starting directory path for the new terminal",
+      "maxLength": 512
+    },
+    "runtimeDir": {
+      "type": "string",
+      "description": "Runtime directory for writing session-spawned.json marker",
+      "maxLength": 512
+    }
+  },
+  "additionalProperties": false
+}

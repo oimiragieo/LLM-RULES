@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-10T18:50:05.497Z",
+  "generatedAt": "2026-03-11T01:42:54.411Z",
   "metadata": {
-    "totalSkills": 275,
+    "totalSkills": 276,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-10T18:50:05.498Z",
+    "lastValidated": "2026-03-11T01:42:54.412Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7448,6 +7448,28 @@
       ],
       "priority": 3,
       "aliasOf": null
+    },
+    "windows-terminal": {
+      "name": "windows-terminal",
+      "displayName": "Windows Terminal",
+      "category": "Other",
+      "domain": "other",
+      "description": "Spawn and manage Windows Terminal (wt.exe) windows and tabs from Node.js scripts and Claude Code hooks, with App Execution Alias resolution, correct CLI flags, and anti-patterns to avoid",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "windows-terminal"
+      ],
+      "priority": 3,
+      "aliasOf": null
     }
   },
   "index": {
@@ -7617,7 +7639,8 @@
         "seo-optimization",
         "telegram-polling",
         "user-research",
-        "web-artifacts-builder"
+        "web-artifacts-builder",
+        "windows-terminal"
       ],
       "specialized": [
         "smart-debug",
@@ -7998,7 +8021,8 @@
         "seo-optimization",
         "telegram-polling",
         "user-research",
-        "web-artifacts-builder"
+        "web-artifacts-builder",
+        "windows-terminal"
       ],
       "Troubleshooting": [
         "debugging"
@@ -8362,7 +8386,8 @@
         "seo-optimization",
         "telegram-polling",
         "user-research",
-        "web-artifacts-builder"
+        "web-artifacts-builder",
+        "windows-terminal"
       ],
       "Write": [
         "tdd",
@@ -8588,7 +8613,8 @@
         "seo-optimization",
         "telegram-polling",
         "user-research",
-        "web-artifacts-builder"
+        "web-artifacts-builder",
+        "windows-terminal"
       ],
       "Edit": [
         "tdd",
@@ -8927,7 +8953,8 @@
         "markitdown-converter",
         "scheduled-tasks",
         "scientific-skills",
-        "telegram-polling"
+        "telegram-polling",
+        "windows-terminal"
       ],
       "Glob": [
         "tdd",
@@ -9510,7 +9537,8 @@
         "seo-optimization",
         "telegram-polling",
         "user-research",
-        "web-artifacts-builder"
+        "web-artifacts-builder",
+        "windows-terminal"
       ],
       "planner": [
         "plan-generator",
@@ -10736,7 +10764,8 @@
         "seo-optimization",
         "telegram-polling",
         "user-research",
-        "web-artifacts-builder"
+        "web-artifacts-builder",
+        "windows-terminal"
       ],
       "planner": [
         "plan-generator",
