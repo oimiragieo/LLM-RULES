@@ -236,6 +236,42 @@ test('handover-detector > writes pending memory writes from handover log to hand
   fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
 });
 
+test('handover-detector > MT-A: Restores CLAIMED logs older than 5 minutes to READY', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const logPath = path.join(tmpDir, 'shift-change-log.json');
+  const ackPath = path.join(tmpDir, 'shift-change-ack.json');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+
+  // Create a log in CLAIMED state exactly 6 minutes old
+  const oldLog = {
+    schemaVersion: '1.0.0',
+    status: 'CLAIMED',
+    sessionId: 'stuck-session',
+    generation: 1,
+  };
+  fs.writeFileSync(logPath, JSON.stringify(oldLog));
+  const sixMinutesAgo = Date.now() - 6 * 60 * 1000;
+  fs.utimesSync(logPath, new Date(sixMinutesAgo), new Date(sixMinutesAgo));
+
+  runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  assert.ok(fs.existsSync(logPath), 'Log should still exist after recovery attempt');
+  const recoveredLog = JSON.parse(fs.readFileSync(logPath, 'utf8'));
+  assert.strictEqual(
+    recoveredLog.status,
+    'CLAIMED',
+    'Log should now be claimed by the current session since it was reset to READY first'
+  );
+
+  // Clean up
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+});
+
 test('handover-detector > generates Sentinel ACK json upon successful claim', () => {
   const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
   const ackPath = path.join(tmpDir, 'shift-change-ack.json');
@@ -251,6 +287,56 @@ test('handover-detector > generates Sentinel ACK json upon successful claim', ()
   assert.strictEqual(ack.originalSession, 'old');
 
   // Clean up
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
+});
+
+test('handover-detector > M8.1: injected message contains Step 0 pre-flight block', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  const ackPath = path.join(tmpDir, 'shift-change-ack.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+
+  writeHandoverLog(
+    {
+      schemaVersion: '1.0.0',
+      generation: 1,
+      sessionId: 'old-session',
+      resumeInstructions: 'Resume the refactor task',
+      contextSummary: 'Working on Phase 8',
+    },
+    tmpDir
+  );
+
+  const res = runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  assert.strictEqual(res.allow, true);
+  assert.ok(res.message, 'Should inject message');
+
+  // Step 0 pre-flight header must be present
+  assert.ok(res.message.includes('Step 0'), 'Should include Step 0');
+  assert.ok(
+    res.message.includes('DO NOT call TaskList()'),
+    'Should include TaskList block warning'
+  );
+  assert.ok(
+    res.message.includes('reflection-reminder.txt'),
+    'Should reference reflection-reminder.txt'
+  );
+  assert.ok(res.message.includes('Step 0.4'), 'Should include Step 0.4');
+  assert.ok(res.message.includes('stale-tasks.json'), 'Should reference stale-tasks.json');
+  assert.ok(res.message.includes('Step 0.5'), 'Should include Step 0.5');
+  assert.ok(
+    res.message.includes('integration-queue.jsonl'),
+    'Should reference integration-queue.jsonl'
+  );
+
+  // Handover context must still be present
+  assert.ok(res.message.includes('Resume the refactor task'), 'Should include resumeInstructions');
+
+  // Clean up
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
   if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
   fs.unlinkSync(path.join(tmpDir, 'shift-change-log.json'));
 });

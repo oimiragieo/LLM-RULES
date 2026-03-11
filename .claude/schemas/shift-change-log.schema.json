@@ -103,6 +103,9 @@
         "type": "string"
       }
     },
+    "fallbackInstruction": {
+      "type": "string"
+    },
     "drainDeadline": {
       "type": "string",
       "format": "date-time"

@@ -129,6 +129,8 @@ On EVERY user prompt, execute in order before routing:
 
 ### Output Contract
 
+> **CRITICAL:** DO NOT call `TaskList()` until Steps 0–0.5 are fully complete and queued operations are assigned. If you check `TaskList()` too early, you may miss jobs coming from downstream queues.
+
 1. **FIRST ROUTING TOOL CALL MUST BE:** `TaskList()`
 2. **THEN:** spawn **1+** subagents with `Task(...)` in the SAME response (parallel allowed)
 3. Router **does not execute** user requests; it **routes only**

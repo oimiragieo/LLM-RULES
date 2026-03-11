@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+
 const { getOrCreateSessionId } = require('../../lib/context/session-id-manager.cjs');
 const {
   readHandoverLog,
@@ -8,7 +9,17 @@ const {
 const { exitDrainMode, getDrainState } = require('../../lib/context/drain-state.cjs');
 
 function formatResumeMessage(log) {
-  let msg = `SHIFT CHANGE RESUME: ${log.resumeInstructions || 'No specific resume instructions provided.'}\n\n`;
+  // M8.1: Step 0 pre-flight block — prepended so it has highest attention priority
+  let msg = `## SHIFT CHANGE RESUME — MANDATORY PRE-FLIGHT (DO NOT SKIP)\n\n`;
+  msg += `**DO NOT call TaskList() until Steps 0–0.5 are fully complete.**\n\n`;
+  msg += `Execute in order before routing:\n`;
+  msg += `- **Step 0**: Check \`reflection-reminder.txt\` + \`reflection-spawn-request.json\` — spawn reflection-agent for each pending request\n`;
+  msg += `- **Step 0.4**: Check \`.claude/context/runtime/stale-tasks.json\` — close each stale task via TaskUpdate before proceeding\n`;
+  msg += `- **Step 0.5**: Check \`.claude/context/runtime/integration-queue.jsonl\` — spawn artifact-integrator (background) if entries exist\n\n`;
+  msg += `---\n\n`;
+
+  // Handover context
+  msg += `SHIFT CHANGE RESUME: ${log.resumeInstructions || log.fallbackInstruction || 'Run TaskList() to discover pending work, check active_context.md'}\n\n`;
   if (log.contextSummary) {
     msg += `Context: ${log.contextSummary}\n\n`;
   }
@@ -17,6 +28,8 @@ function formatResumeMessage(log) {
     log.pendingActions.forEach(a => {
       msg += `- [${a.priority}] ${a.description}\n`;
     });
+  } else if (log.fallbackInstruction) {
+    msg += `Fallback: ${log.fallbackInstruction}\n`;
   }
   return msg;
 }
@@ -37,6 +50,32 @@ function run() {
     }
 
     const newSessionId = getOrCreateSessionId(runtimeDir);
+    const logPath = path.join(runtimeDir, 'shift-change-log.json');
+    const ackPath = path.join(runtimeDir, 'shift-change-ack.json');
+
+    // MT-A: Re-READY timeout recovery (5 mins) for logs stuck in CLAIMED without an ACK
+    if (fs.existsSync(logPath)) {
+      try {
+        const logContent = fs.readFileSync(logPath, 'utf8');
+        const existingLog = JSON.parse(logContent);
+        if (existingLog && existingLog.status === 'CLAIMED') {
+          if (!fs.existsSync(ackPath)) {
+            const stats = fs.statSync(logPath);
+            const ageMs = Date.now() - stats.mtimeMs;
+            if (ageMs > 5 * 60 * 1000) {
+              console.warn(
+                `[handover-detector] Found CLAIMED log older than 5 minutes with no ACK. Resetting to READY for recovery.`
+              );
+              existingLog.status = 'READY';
+              // Write recovery status
+              fs.writeFileSync(logPath, JSON.stringify(existingLog, null, 2), 'utf8');
+            }
+          }
+        }
+      } catch (_e) {
+        // ignore parse/stat errors during recovery attempt
+      }
+    }
 
     const log = readHandoverLog(runtimeDir);
     if (!log || log.status !== 'READY') {
@@ -62,7 +101,6 @@ function run() {
     }
 
     // Write sentinel ACK for M5.3
-    const ackPath = path.join(runtimeDir, 'shift-change-ack.json');
     fs.writeFileSync(
       ackPath,
       JSON.stringify(

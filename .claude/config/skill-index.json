@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-11T05:32:47.023Z",
+  "generatedAt": "2026-03-11T12:57:53.587Z",
   "metadata": {
     "totalSkills": 276,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-11T05:32:47.024Z",
+    "lastValidated": "2026-03-11T12:57:53.589Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -3867,12 +3867,9 @@
       "displayName": "Session Handoff",
       "category": "Memory",
       "domain": "memory",
-      "description": "Prepare context for new conversations when session is lost or ending. Creates handoff documents that capture current state, progress, and next steps for seamless continuation.",
+      "description": "Initiate a session handoff to transfer context and pending actions to a new terminal session. Executing this skill safely drains tasks and launches a new cross-platform window natively.",
       "requiredTools": [
-        "Read",
-        "Write",
-        "Glob",
-        "Grep"
+        "Bash"
       ],
       "agentPrimary": [
         "context-compressor",
@@ -8254,7 +8251,6 @@
         "artifact-integrator",
         "context-compressor",
         "memory-quality-auditor",
-        "session-handoff",
         "task-management-protocol",
         "context-driven-development",
         "insight-extraction",
@@ -8505,7 +8501,6 @@
         "artifact-integrator",
         "context-compressor",
         "memory-quality-auditor",
-        "session-handoff",
         "task-management-protocol",
         "context-driven-development",
         "insight-extraction",
@@ -8888,6 +8883,7 @@
         "schema-creator",
         "tool-creator",
         "memory-quality-auditor",
+        "session-handoff",
         "insight-extraction",
         "assimilate",
         "memory-search",
@@ -9037,7 +9033,6 @@
         "template-creator",
         "schema-creator",
         "memory-quality-auditor",
-        "session-handoff",
         "insight-extraction",
         "assimilate",
         "creation-feasibility-gate",
@@ -9163,7 +9158,6 @@
         "template-creator",
         "schema-creator",
         "memory-quality-auditor",
-        "session-handoff",
         "insight-extraction",
         "assimilate",
         "creation-feasibility-gate",
