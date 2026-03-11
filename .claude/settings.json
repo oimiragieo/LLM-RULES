@@ -17,6 +17,15 @@
             "command": "node .claude/hooks/routing/user-prompt-unified.cjs"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/handover-detector.cjs"
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -152,6 +161,15 @@
           {
             "type": "command",
             "command": "node .claude/hooks/routing/routing-guard.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "TaskCreate|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/finish-only-guard.cjs"
           }
         ]
       },
