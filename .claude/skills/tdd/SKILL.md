@@ -222,3 +222,108 @@ Use fast-check for routing: ensure routeIntent(anyString) always returns string.
 ### Contract Testing
 
 Validate TaskUpdate metadata schemas (processedReflectionIds: string[]).
+
+## Multi-Agent TDD Decomposition (2026 Standard)
+
+Based on TDFlow (arXiv:2510.23761, 94.3% SWE-Bench Verified), monolithic TDD agents score 60–70%. Split into specialized sub-agents:
+
+| Role        | Agent              | Responsibility                                 |
+| ----------- | ------------------ | ---------------------------------------------- |
+| Test Author | `qa`               | Write failing test, commit test-only           |
+| Implementer | `developer`        | Implement to green — MUST NOT modify tests     |
+| Verifier    | `reflection-agent` | Detect test-hacking, verify RED→GREEN evidence |
+
+**Pattern:**
+
+1. QA agent writes test → commits test file alone (no implementation)
+2. Developer agent implements → runs tests → commits implementation
+3. Reflection agent reviews diff: if test assertions changed → FAIL (test-hacking)
+
+**Test-hacking detection:** reflection-agent checks `git diff HEAD~1 HEAD -- '*.test.*'` — any assertion changes after implementation commit = REJECT.
+
+**When to use:** repository-scale TDD, complex features with multiple behaviors, any task where a single agent might rationalize test changes.
+
+## LSP Pre-RED Type Verification
+
+Before writing a failing test, verify the API contract exists to prevent "fails due to wrong API" rather than "fails due to missing behavior":
+
+```bash
+# Step 1: Find the target function's file + line
+pnpm search:code "functionName"
+
+# Step 2: Verify signature with LSP hover
+lsp_hover({ filePath: "/abs/path/to/file.ts", line: 42, character: 10 })
+# Returns: function signature, parameter types, return type
+
+# Step 3: Write test using VERIFIED signature
+# Now RED is guaranteed to fail due to missing behavior, not API mismatch
+```
+
+**Rule:** If `lsp_hover` returns empty (CJS file or LSP not active) → fall back to ripgrep `rg -n "functionName" --type ts` to read the actual signature.
+
+**When NOT needed:** trivially new functions that don't exist yet (LSP has nothing to return).
+
+## Contract Testing (Hook Boundaries — Expanded)
+
+Hook contracts define the stdin/stdout JSON protocol. Test at the boundary:
+
+```js
+// Hook contract test pattern
+const proc = spawn('node', ['.claude/hooks/routing/routing-guard.cjs'], { shell: false });
+const input = JSON.stringify({
+  tool_name: 'Edit',
+  tool_input: { file_path: '.claude/agents/core/developer.md' },
+});
+proc.stdin.write(input);
+proc.stdin.end();
+
+// Assert: exit code 2 (block) for protected paths
+// Assert: stdout JSON contains { allow: false, message: /Gate 4/ }
+```
+
+**TaskUpdate metadata contract:**
+
+```js
+// Validate processedReflectionIds schema
+const schema = {
+  type: 'object',
+  required: ['processedReflectionIds'],
+  properties: { processedReflectionIds: { type: 'array', items: { type: 'string' } } },
+  additionalProperties: false,
+};
+```
+
+**Agent-Studio hook contracts to test:**
+
+- `routing-guard.cjs`: blocks Task without task_id (exit 2)
+- `unified-creator-guard.cjs`: blocks Write to `.claude/skills/**/SKILL.md` (exit 2)
+- `spawn-token-guard.cjs`: warns at 80K tokens (exit 0 + message)
+
+## Mutation Testing (Stryker JS)
+
+Mutation testing validates test QUALITY, not just coverage. Run after achieving 100% line coverage:
+
+```bash
+# Install (once per project)
+pnpm add -D @stryker-mutator/core @stryker-mutator/jest-runner
+
+# Run mutation tests
+pnpm stryker run
+
+# Target threshold: >80% mutation score
+# Score = (killed mutations / total mutations) × 100
+```
+
+**Interpret results:**
+
+- **Killed** — test suite caught the mutation ✓
+- **Survived** — test suite MISSED this code path (add assertion)
+- **No coverage** — no test exercises this line at all (add test)
+
+**When to run:** after completing a TDD cycle for security-critical code (hooks, validators, routing logic). Not required for all code — prioritize by risk.
+
+**Agent-Studio priority targets for mutation testing:**
+
+- `.claude/hooks/routing/routing-guard.cjs`
+- `.claude/hooks/safety/unified-creator-guard.cjs`
+- `.claude/lib/routing/routing-table.cjs`

@@ -20,6 +20,8 @@
  *   ROUTER_IDENTITY_REMINDER=on|off  (default: on)
  */
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 const SUBAGENT_PATTERNS = [
   /^task_id:\s*task-\d+/i,
   /^You are (?:a |an )?\w[\w-]+ agent[.:\n]/i,
@@ -75,7 +77,7 @@ function main() {
 
   process.stdin.on('end', () => {
     try {
-      const input = JSON.parse(raw || '{}');
+      const input = safeParseJSON(raw || '{}');
       const prompt = input.prompt || '';
 
       if (isSubagentPrompt(prompt)) {

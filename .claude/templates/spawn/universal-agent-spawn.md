@@ -152,7 +152,32 @@ When calling `TaskUpdate({ status: 'completed' })`, metadata MUST include:
 
 These fields trigger the memory extraction pipeline. Without them, your work is invisible to the learning system.
 
+## Named Memory API (for topic-specific persistence)
+
+For topic-specific persistent notes that survive session boundaries, use the named memory API via `memory-manager.cjs`. This is **separate** from `MemoryRecord` (which records gotchas/patterns/discoveries):
+
+```javascript
+const manager = require('.claude/lib/memory/memory-manager.cjs');
+
+// Write: persist a topic-specific note
+await manager.writeMemory('auth-design-decisions', '## JWT vs Sessions\nChose JWT because...');
+
+// Read: retrieve a previous note in a future session
+const notes = await manager.readMemory('auth-design-decisions');
+
+// List: see all named memories
+const names = await manager.listMemories(); // ['auth-design-decisions', ...]
+```
+
+**When to use named memory** (vs MemoryRecord):
+
+- MemoryRecord → structured patterns/gotchas/discoveries (auto-indexed by memory system)
+- Named memory → free-form notes, design docs, ongoing work context that spans sessions
+
+**STM/MTM/LTM tiers** are managed automatically by `spawn-prompt-assembler`. You do not need to interact with them directly. They inject prior session context into your spawn prompt automatically.
+
 ## Related
 
 - Orchestrator template: `.claude/templates/spawn/orchestrator-spawn.md`
 - Router policy: `.claude/CLAUDE.md`
+- Named memory API: `.claude/lib/memory/memory-manager.cjs`

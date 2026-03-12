@@ -8,6 +8,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const WARN_THRESHOLD = 80_000; // tokens — write compression-reminder.txt
 const BLOCK_THRESHOLD = 120_000; // tokens — block spawn
@@ -24,7 +25,7 @@ const chunks = [];
 process.stdin.on('data', c => chunks.push(c));
 process.stdin.on('end', () => {
   try {
-    const input = JSON.parse(Buffer.concat(chunks).toString());
+    const input = safeParseJSON(Buffer.concat(chunks).toString());
     const toolName = input?.tool_name || '';
 
     if (toolName !== 'Task') {

@@ -534,6 +534,63 @@ const relPath = path.relative(projectRoot, filePath).replace(/\\/g, '/');
 
 This is Sharp Edge SE-01 in the codebase. See `.claude/rules/sharp-edges.md` for full details.
 
+## TDD Integration Patterns (2026)
+
+### Use Case 7: TDD Pre-RED Type Verification
+
+Before writing a failing test, confirm the API contract exists. This prevents test failure due to "wrong API signature" rather than "missing behavior."
+
+**Workflow:**
+
+```
+1. pnpm search:code "targetFunction"  → find file + rough line
+2. lsp_hover(filePath, line, char)    → get exact signature
+3. Write test using verified signature → RED = missing behavior only
+4. Implement minimal GREEN patch
+5. lsp_findReferences(filePath, line, char) → verify no callers broken
+```
+
+**Example:**
+
+```js
+// Before writing test for `validateTaskUpdate(metadata, schema)`:
+lsp_hover({ filePath: '/abs/path/task-validator.ts', line: 47, character: 5 });
+// Returns: "(metadata: TaskMetadata, schema: JSONSchema) => ValidationResult"
+// Now test can assert: validateTaskUpdate({}, schema) throws ValidationError
+// Without hover: might write validateTaskUpdate(schema, metadata) → fails for wrong reason
+```
+
+**Fallback for CJS files:** LSP returns empty for `.cjs`. Use ripgrep:
+
+```bash
+rg -n "function validateTaskUpdate\|validateTaskUpdate\s*=" .claude/lib/ --type js
+```
+
+### Use Case 8: Test Boundary Analysis
+
+Before writing a contract test, enumerate ALL callers of the target function. Missed callers = incomplete contract coverage.
+
+**Workflow:**
+
+```
+1. Identify target function (the API boundary to test)
+2. lsp_findReferences(filePath, line, char) → all call sites
+3. For each call site: lsp_hover → check argument types + return type usage
+4. Write contract test that covers observed calling patterns
+5. After contract test GREEN: rerun findReferences to verify no new callers added
+```
+
+**Example:** Testing `routeIntent(intent: string) → AgentType`:
+
+```js
+// Find all callers
+lsp_findReferences({ filePath: '/abs/routing-table.cjs', line: 23, character: 18 });
+// Returns: 7 call sites in router-decision.md, fuzzy-intent-matcher, tests/routing.test.cjs
+// Now write contract test that covers all 7 calling patterns
+```
+
+**When to skip:** Internal private functions with single caller — test through the public API instead.
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**

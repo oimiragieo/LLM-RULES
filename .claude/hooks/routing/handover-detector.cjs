@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { getOrCreateSessionId } = require('../../lib/context/session-id-manager.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const {
   readHandoverLog,
   claimHandoverLog,
@@ -56,9 +57,9 @@ function run() {
     // MUST run before the session-id.json existence guard below.
     if (process.env.CLAUDE_FRESH_SPAWN === '1' && fs.existsSync(sessionPath)) {
       try {
-        const existingData = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+        const existingData = safeParseJSON(fs.readFileSync(sessionPath, 'utf8'));
         const logData = fs.existsSync(logPath)
-          ? JSON.parse(fs.readFileSync(logPath, 'utf8'))
+          ? safeParseJSON(fs.readFileSync(logPath, 'utf8'))
           : null;
         if (logData && logData.status === 'READY' && existingData.sessionId === logData.sessionId) {
           fs.unlinkSync(sessionPath);
@@ -79,7 +80,7 @@ function run() {
     if (fs.existsSync(logPath)) {
       try {
         const logContent = fs.readFileSync(logPath, 'utf8');
-        const existingLog = JSON.parse(logContent);
+        const existingLog = safeParseJSON(logContent);
         if (existingLog && existingLog.status === 'CLAIMED') {
           if (!fs.existsSync(ackPath)) {
             const stats = fs.statSync(logPath);

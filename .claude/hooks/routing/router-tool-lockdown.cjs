@@ -180,54 +180,53 @@ function suggestAgent(toolName) {
  * @returns {{ pass: boolean, result?: string, message?: string }}
  */
 function checkRouterToolLockdown(toolName, toolInput, hookInput, cwd = process.cwd()) {
-  try {
-    const enforcement = getEnforcementMode('ROUTER_TOOL_LOCKDOWN_ENFORCEMENT', 'block');
+  // No inner try/catch — errors propagate to main()'s fail-closed outer catch (exit 2).
+  // SEC-FIX F-001: inner catch was swallowing errors and returning pass:true,
+  // bypassing the outer fail-closed handler. Security hooks must fail-closed on ALL errors.
 
-    // If enforcement is off, always allow
-    if (enforcement === 'off') {
-      return { pass: true };
-    }
+  const enforcement = getEnforcementMode('ROUTER_TOOL_LOCKDOWN_ENFORCEMENT', 'block');
 
-    // If tool is whitelisted for router, always allow
-    if (ROUTER_WHITELISTED_TOOLS.includes(toolName)) {
-      return { pass: true };
-    }
-
-    // If tool is not in the banned list, allow (unknown tools pass through)
-    if (!ROUTER_BANNED_TOOLS.includes(toolName)) {
-      return { pass: true };
-    }
-
-    // If this is a sub-agent (not the router), always allow
-    if (!isRouterSession(hookInput, cwd)) {
-      return { pass: true };
-    }
-
-    // Special case: Bash with whitelisted command (git status, git log, etc.)
-    if (toolName === 'Bash' && toolInput) {
-      const command = toolInput.command || '';
-      if (isWhitelistedBashCommand(command)) {
-        return { pass: true };
-      }
-    }
-
-    // Build the block/warn message
-    const agent = suggestAgent(toolName);
-    const message =
-      `[ROUTER-LOCKDOWN] Router is FORBIDDEN from using ${toolName}. ` +
-      `Spawn an agent instead: Task({ task_id: 'task-N', subagent_type: '${agent}', prompt: '...' }). ` +
-      'Section 0 CLAUDE.md Tool Lockdown.';
-
-    if (enforcement === 'block') {
-      return { pass: false, result: 'block', message };
-    }
-
-    // warn mode — pass but emit warning
-    return { pass: true, result: 'warn', message };
-  } catch (_err) {
-    // Safety: never block on unexpected errors
+  // If enforcement is off, always allow
+  if (enforcement === 'off') {
     return { pass: true };
   }
+
+  // If tool is whitelisted for router, always allow
+  if (ROUTER_WHITELISTED_TOOLS.includes(toolName)) {
+    return { pass: true };
+  }
+
+  // If tool is not in the banned list, allow (unknown tools pass through)
+  if (!ROUTER_BANNED_TOOLS.includes(toolName)) {
+    return { pass: true };
+  }
+
+  // If this is a sub-agent (not the router), always allow
+  if (!isRouterSession(hookInput, cwd)) {
+    return { pass: true };
+  }
+
+  // Special case: Bash with whitelisted command (git status, git log, etc.)
+  if (toolName === 'Bash' && toolInput) {
+    const command = toolInput.command || '';
+    if (isWhitelistedBashCommand(command)) {
+      return { pass: true };
+    }
+  }
+
+  // Build the block/warn message
+  const agent = suggestAgent(toolName);
+  const message =
+    `[ROUTER-LOCKDOWN] Router is FORBIDDEN from using ${toolName}. ` +
+    `Spawn an agent instead: Task({ task_id: 'task-N', subagent_type: '${agent}', prompt: '...' }). ` +
+    'Section 0 CLAUDE.md Tool Lockdown.';
+
+  if (enforcement === 'block') {
+    return { pass: false, result: 'block', message };
+  }
+
+  // warn mode — pass but emit warning
+  return { pass: true, result: 'warn', message };
 }
 
 /**

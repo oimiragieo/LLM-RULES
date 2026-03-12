@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { isDraining } = require('../../lib/context/drain-state.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 function getSessionId() {
   if (process.env.CLAUDE_SESSION_ID) {
@@ -9,7 +10,7 @@ function getSessionId() {
   const sessionPath = path.join(process.cwd(), '.claude/context/runtime/session-id.json');
   if (fs.existsSync(sessionPath)) {
     try {
-      const data = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+      const data = safeParseJSON(fs.readFileSync(sessionPath, 'utf8'));
       if (data.sessionId) return data.sessionId;
     } catch (_e) {
       /* empty */
@@ -26,7 +27,7 @@ function run() {
       return;
     }
 
-    const input = JSON.parse(inputStr);
+    const input = safeParseJSON(inputStr);
 
     if (input.tool_name !== 'TaskCreate' && input.tool_name !== 'Task') {
       console.log(JSON.stringify({ allow: true }));
