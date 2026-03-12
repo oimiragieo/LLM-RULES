@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed — Context Saturation Mitigation (2026-03-12)
+
+- **`.claudeignore` Context Bloat Prevention**: Discovered that the native Claude CLI actively and eagerly loads massive root files (like `CHANGELOG.md`, `README.md`, `GETTING_STARTED.md`) into its invisible System prompt context upon startup. This incurred a hidden 65,000+ token penalty at boot, instantly saturating the 200,000 API token limit and causing silent subagent crashes ("Prompt is too long").
+- Implemented a broad `.claudeignore` file at the project root to aggressively block the CLI from mapping static documentation and binary directories (`node_modules`, `.git`, `.claude/context`, `.claude/worktrees`) into the context window, resolving the API crashes without sacrificing runtime capabilities.
+- Fixed an outdated configuration reference in `.claude/config.yaml` to ensure headless integration suites recognize `.claude/CLAUDE.md` as the core router.
+
 ### Security — Prompt Safety System (2026-03-10)
 
 - **Gate 4 pre-flight checklist (Patch 1)**: CLAUDE.md "BEFORE YOU TYPE" section expanded with explicit Gate 4 pre-flight checklist covering modification and restoration verbs, not just net-new creation. Eliminates rationalizations like "just restoring" or "small fix" that previously bypassed creator workflow enforcement (`ee1e0a12`).

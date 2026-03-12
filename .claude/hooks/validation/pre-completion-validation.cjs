@@ -77,7 +77,7 @@ const ENFORCED_CREATOR_SKILLS = [
   'workflow-creator',
 ];
 
-const VALID_STATUSES = VALID_TASK_STATUSES;
+const _VALID_STATUSES = VALID_TASK_STATUSES;
 
 /**
  * Read current task status from file
@@ -528,7 +528,7 @@ async function main() {
     if (toolName !== 'TaskUpdate') process.exit(0);
 
     const parsedParams = parseAndValidateTaskUpdate(toolParams, {
-      allowedStatuses: VALID_STATUSES,
+      allowedStatuses: VALID_TASK_STATUSES,
       requireTaskId: false,
       requireStatus: false,
     });
@@ -540,11 +540,11 @@ async function main() {
       const newStatus = parsedParams.normalized.status;
 
       if (taskId && newStatus) {
-        if (!VALID_STATUSES.includes(newStatus)) {
-          const msg = `Invalid status: "${newStatus}". Valid: ${VALID_STATUSES.join(', ')}`;
+        if (!VALID_TASK_STATUSES.includes(newStatus)) {
+          const msg = `Invalid status: "${newStatus}". Valid: ${VALID_TASK_STATUSES.join(', ')}`;
           if (taskStatusMode === 'block') {
             console.log(formatHookResult('block', msg));
-            process.exit(0);
+            process.exit(2);
           } else {
             console.warn(`[WARN] ${msg}`);
           }

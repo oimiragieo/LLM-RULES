@@ -40,7 +40,7 @@ function parseHookInput() {
     return JSON.parse(input);
   } catch (error) {
     console.error('[FILE-PATH-GUARD] Failed to parse hook input:', error.message);
-    process.exit(1); // Block on parse error
+    process.exit(2); // Block on parse error
   }
 }
 
@@ -100,7 +100,7 @@ function validate() {
 
   if (!filePath) {
     console.error('[FILE-PATH-GUARD] BLOCKED: No file path provided');
-    process.exit(1); // Block
+    process.exit(2); // Block
   }
 
   // Check for AI slop patterns
@@ -110,7 +110,7 @@ function validate() {
     console.error(`[FILE-PATH-GUARD] Pattern matched: ${slopPattern}`);
     console.error(`[FILE-PATH-GUARD] Use relative paths from PROJECT_ROOT instead.`);
     console.error(`[FILE-PATH-GUARD] Example: .claude/context/artifacts/file.txt`);
-    process.exit(1); // Block
+    process.exit(2); // Block
   }
 
   // Check for absolute paths
@@ -118,7 +118,7 @@ function validate() {
     console.error(`[FILE-PATH-GUARD] BLOCKED: Absolute path detected: ${filePath}`);
     console.error(`[FILE-PATH-GUARD] Use relative paths from PROJECT_ROOT.`);
     console.error(`[FILE-PATH-GUARD] Example: .claude/context/artifacts/file.txt`);
-    process.exit(1); // Block
+    process.exit(2); // Block
   }
 
   // Check for valid relative path patterns

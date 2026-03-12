@@ -3,7 +3,7 @@
 verified: true
 lastVerifiedAt: 2026-03-05T00:00:00.000Z
 name: claude-api
-description: "Build apps with the Claude API or Anthropic SDK. TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`/`claude_agent_sdk`, or user asks to use Claude API, Anthropic SDKs, or Agent SDK. DO NOT TRIGGER when: code imports `openai`/other AI SDK, general programming, or ML/data-science tasks."
+description: 'Build apps with the Claude API or Anthropic SDK. TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`/`claude_agent_sdk`, or user asks to use Claude API, Anthropic SDKs, or Agent SDK. DO NOT TRIGGER when: code imports `openai`/other AI SDK, general programming, or ML/data-science tasks.'
 version: 1.0.0
 model: sonnet
 invoked_by: both
@@ -14,16 +14,14 @@ category: development
 tags: [claude, anthropic, api, sdk, llm, agents, typescript, python]
 aliases: [anthropic-api, anthropic-sdk]
 best_practices:
-
-- Use claude-opus-4-6 as default model unless user specifies otherwise
-- Use thinking with type adaptive not budget_tokens (deprecated)
-- Use streaming for requests with long input, output, or high max_tokens
-- Use get_final_message or finalMessage helper for complete streamed responses
-- Parse tool inputs with proper JSON methods not string operations
-- Never truncate user inputs — discuss options instead
-  error_handling: strict
-  streaming: supported
-
+  - Use claude-opus-4-6 as default model unless user specifies otherwise
+  - Use thinking with type adaptive not budget_tokens (deprecated)
+  - Use streaming for requests with long input, output, or high max_tokens
+  - Use get_final_message or finalMessage helper for complete streamed responses
+  - Use parse tool inputs with proper JSON methods not string operations
+  - Never truncate user inputs — discuss options instead
+error_handling: strict
+streaming: supported
 ---
 
 # Claude API & Agent SDK

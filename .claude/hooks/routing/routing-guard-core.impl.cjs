@@ -356,7 +356,6 @@ function isFailOpenOverrideAuthorized() {
   return scope.includes('all') || scope.includes('routing-guard');
 }
 
-// eslint-disable-next-line complexity
 async function main() {
   const startTime = Date.now();
   try {
@@ -500,7 +499,7 @@ async function main() {
       } catch (_) {
         /* best-effort */
       }
-      process.exit(result.result === 'block' ? 2 : 0);
+      process.exit(0);
     }
 
     logRouterChurnEvent({

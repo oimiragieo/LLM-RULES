@@ -217,7 +217,7 @@ Mock MemoryRecord. Test confidence gate (threshold 0.7). Use atomic writes.
 
 ### Property-Based Testing
 
-Use fast-check for any function with invariants — not just routing. fast-check 3.x (2025) adds improved unicode, date, and bigint arbitraries.
+Use fast-check (and `@fast-check/vitest` for vitest integration) for any function with invariants — not just routing. fast-check 3.x (2025) adds improved unicode, date, and bigint arbitraries.
 
 **Routing invariant (existing):**
 
@@ -557,8 +557,8 @@ export default {
 ```
 
 ```bash
-# Run mutation tests
-pnpm stryker run
+# Run mutation tests (use incremental to speed up local loops)
+pnpm stryker run --incremental
 
 # Target threshold: >80% mutation score
 # Score = (killed mutations / total mutations) × 100

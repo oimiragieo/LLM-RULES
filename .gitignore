@@ -133,6 +133,7 @@ context/sessions/
 .env
 .env.local
 .env.*.local
+.env.minimal
 
 # Secrets and Credentials
 **/secrets/

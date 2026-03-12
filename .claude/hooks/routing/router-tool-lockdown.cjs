@@ -252,7 +252,7 @@ async function main() {
 
     if (!result.pass) {
       console.log(formatResult(result.result, result.message));
-      process.exit(2);
+      process.exit(0);
       return;
     }
 

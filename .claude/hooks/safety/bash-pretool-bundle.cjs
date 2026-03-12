@@ -66,9 +66,15 @@ function main() {
     }
 
     if (res.status !== 0) {
-      if (res.stdout) process.stdout.write(res.stdout);
+      if (res.stdout) process.stderr.write(res.stdout);
       if (res.stderr) process.stderr.write(res.stderr);
-      process.exit(res.status || 2);
+      console.log(
+        JSON.stringify({
+          allow: false,
+          message: `Command blocked by safety sub-hook (${path.basename(hookPath)}). See debug trace for details.`,
+        })
+      );
+      process.exit(2);
     }
 
     currentInput = applyHookOutput(currentInput, res.stdout);

@@ -912,6 +912,14 @@ The `debug-log-analysis` skill (`Skill({ skill: 'debug-log-analysis' })`) docume
 | [dry-principle](.claude/skills/dry-principle/SKILL.md)                                     | DRY enforcement patterns                |
 | [async-operations](.claude/skills/async-operations/SKILL.md)                               | Async/await patterns and anti-patterns  |
 
+## Troubleshooting
+
+### "Prompt is too long" / Context Saturation on Startup
+
+If Claude Code subagents crash immediately on spawn with an API size limit error (e.g., "Prompt is too long" or saturating the 200,000 token limit without executing), ensure that the `.claudeignore` file is present in the repository root.
+
+By default, the Claude Code CLI actively scopes any massive Markdown files (`CHANGELOG.md`, `README.md`, `GETTING_STARTED.md`) and data directories located in the repository root into its invisible system context payload. The `.claudeignore` file securely blocks this eager-loading behavior, freeing up an estimated 65,000+ tokens and preventing instant crashes.
+
 ## Operational Notes
 
 - `.claude/context/` stores runtime artifacts and persistent operational memory.

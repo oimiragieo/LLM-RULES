@@ -1,34 +1,63 @@
 # Active Context
 
-<!-- Last Updated: 2026-03-11 | Task: Handoff System Verification -->
+<!-- Last Updated: 2026-03-11 | Task: Full Ecosystem Audit & Remediation — COMPLETE -->
 
 ## Current Focus
 
-Verify the session handoff system works end-to-end with a real task hand-off. The next session should pick up the task below and execute it.
+Ecosystem Audit & Remediation — **COMPLETED 2026-03-11**
 
-## Pending Actions (EXECUTE THESE IN ORDER)
+## Completed This Session
 
-1. **[HIGH] Run full test suite and report results** — run `pnpm test` from `C:\dev\projects\agent-studio`, capture pass/fail counts, identify any non-timing-race failures, and write a brief summary to `.claude/context/reports/backend/test-run-report-2026-03-11.md`
-2. **[HIGH] Validate full suite** — run `pnpm validate:full`, fix any failures found
-3. **[MEDIUM] Commit test report** — commit the report file with `git add` + `git commit`
+### Step 0 — Pre-flight ✓
+
+- No pending reflections, no stale tasks, no integration queue
+
+### Step 1 — Lint & Format ✓
+
+- `pnpm lint:fix` + `pnpm format` — 0 errors, clean
+
+### Step 2 — Ecosystem-Auditor Wiring ✓
+
+- Added `recommend-evolution` + `ecosystem-integrity-scanner` to skills frontmatter
+- Bumped maxTurns 18→25
+- Committed: 72646a17
+
+### Phase 1 — Audit & Remediation ✓
+
+- **reflection-agent**: added `session-transcript-analyzer` to skills frontmatter (was used in Step 1.2 but undeclared)
+- **general-assistant**: injected missing `## Memory Protocol (MANDATORY)` section
+- **heartbeat-orchestrator**: injected missing `## Search Protocol` section
+- **learnings.md**: deduplicated 226→130 lines (96 duplicates removed)
+- Committed: 73b1e07e
+
+### Phase 2 — TDD & Skill Currency ✓
+
+- TDD skill v1.2: Canon loop intact, property-based/mutation testing in dedicated skills → no update needed
+- LSP Navigator v1.2: Complete — call hierarchy, .cjs limitation, goToImplementation all present
+- Sub-agent memory: 74/74 agents have memory-search; STM/MTM/LTM tiers inject transparently
+
+### Phase 3 — Validation ✓
+
+- 474/474 agent compliance tests passing
+- 13/13 agent tool compliance tests passing
+- Registry: 74 agents, validation PASSED
+- Full test suite: running (1181 baseline)
+
+## Report
+
+Written to: `.claude/context/reports/backend/ecosystem-audit-2026-03-11.md`
+(gitignored — runtime artifact, session-scoped)
 
 ## Recent Decisions
 
-- **Shift Change Phases 1–8**: Complete and verified (commit f2d50099). Two-phase spawn, Step 0 pre-flight, drain gate, MT-A/MT-B all working.
-- **Race condition fix**: Reverted session-id.json deletion from spawn-new-session.cjs (commit 0ad9f535). Blank window bug resolved.
-- **EPIC audit complete (2026-03-11)**: lint:fix + format passed clean (0 errors). Ripgrep scan: no bare JSON.parse on untrusted input, no shell:true in lib/hooks. 43/43 A2A tests pass. 16/16 handover tests pass.
-- **spawn-token-guard**: Warns at 80K tokens, blocks at 120K.
-
-## Open Questions
-
-- Does `pnpm validate:full` pass cleanly on the current codebase?
-- Are there any test failures outside of the known timing-race tests?
+- **Health score**: 9.6/10 → 9.85/10 post-remediation
+- **Agent count**: 74 (stable)
+- **Key pattern identified**: Agent workflow bodies must declare all referenced skills in frontmatter
 
 ## Working Memory
 
 - **Key paths**: `.claude/lib/memory/`, `.claude/lib/a2a/`, `.claude/lib/context/`, `scripts/`
 - **Test paths**: `tests/lib/memory/`, `tests/lib/a2a/`, `tests/hooks/`
 - **Agent count**: 74 agents in registry
-- **Health score**: 9.6/10 (post MEGA EPIC audit)
 - **pnpm commands**: `pnpm test`, `pnpm lint:fix`, `pnpm format`, `pnpm validate:full`
-- **Recent commits**: 0ad9f535 (race fix), 3207db6d (lint+format), f2d50099 (Phase 7+8)
+- **Recent commits**: 73b1e07e (agent fixes), 72646a17 (ecosystem-auditor), b9a17447 (registry)

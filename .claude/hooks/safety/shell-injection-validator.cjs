@@ -422,18 +422,22 @@ if (require.main === module) {
     raw += chunk;
   });
   process.stdin.on('end', () => {
-    // Validate JSON is parseable first (fail-closed on invalid input)
-    try {
-      JSON.parse(raw);
-    } catch (_e) {
+    // Validate input exists before parsing
+    if (!raw) {
       process.stdout.write(
         JSON.stringify({ allowed: false, reason: '[SHELL-INJECTION] Invalid JSON input' })
       );
       process.exit(2);
-      return;
     }
+
     // Use safeParseJSON for prototype-pollution-safe parsing
-    const input = safeParseJSON(raw);
+    const input = safeParseJSON(raw, null);
+    if (!input) {
+      process.stdout.write(
+        JSON.stringify({ allowed: false, reason: '[SHELL-INJECTION] Invalid JSON input' })
+      );
+      process.exit(2);
+    }
 
     // Extract command from Claude Code hook payload structure
     // The hook receives: { tool_name, tool_input: { command } }

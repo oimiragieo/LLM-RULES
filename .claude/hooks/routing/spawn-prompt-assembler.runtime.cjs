@@ -336,7 +336,7 @@ async function main() {
     if (!prepared) process.exit(0);
     if (prepared.blockMessage) {
       console.log(formatResult('block', prepared.blockMessage));
-      process.exit(2);
+      process.exit(0);
     }
 
     const { toolInput, basePrompt, explicitTaskId, inputPromptLength, hookSessionId } = prepared;
@@ -353,7 +353,7 @@ async function main() {
     ) {
       incrementTaskOutputMetric('artifact_contract_missing_tools');
       console.log(formatResult('block', buildMissingWriterToolsMessage(requiredOutputs)));
-      process.exit(2);
+      process.exit(0);
       return;
     }
 
@@ -367,7 +367,7 @@ async function main() {
     if (requiresArtifactWrite(requiredOutputs) && !hasArtifactWriterTools(allowedTools)) {
       incrementTaskOutputMetric('artifact_contract_missing_tools');
       console.log(formatResult('block', buildMissingWriterToolsMessage(requiredOutputs)));
-      process.exit(2);
+      process.exit(0);
       return;
     }
     persistTaskOutputContract(explicitTaskId, requiredOutputs, agentType);

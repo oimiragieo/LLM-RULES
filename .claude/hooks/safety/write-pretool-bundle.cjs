@@ -68,7 +68,7 @@ async function main() {
     if (!rgResult.pass) {
       emitPerf('routingGuard_block');
       console.log(formatResult(rgResult.result, rgResult.message));
-      process.exit(2);
+      process.exit(0);
     }
 
     // 2. Unified Creator Guard
@@ -77,7 +77,7 @@ async function main() {
     if (!creatorResult.pass) {
       emitPerf('creatorGuard_block');
       console.log(formatResult(creatorResult.result, creatorResult.message));
-      process.exit(2);
+      process.exit(0);
     }
 
     // 3. Agent Template Contract
@@ -91,7 +91,7 @@ async function main() {
           const msg = `[AGENT-TEMPLATE-CONTRACT] ${validation.errors.join(' | ')}`;
           emitPerf('agentContract_block');
           console.log(formatResult('block', msg));
-          process.exit(2);
+          process.exit(0);
         }
       }
     }
@@ -103,7 +103,7 @@ async function main() {
       if (!result.pass) {
         emitPerf('preWrite_block');
         console.log(formatResult(result.result, result.message));
-        process.exit(2);
+        process.exit(0);
       }
     }
     const t4 = performance.now();
@@ -115,7 +115,7 @@ async function main() {
       if (!evolutionGuard.isValidTransition(state?.state || 'idle', targetState)) {
         emitPerf('evolutionGuard_block');
         console.log(formatResult('block', `Invalid evolution state transition: ${targetState}`));
-        process.exit(2);
+        process.exit(0);
       }
     }
     const t5 = performance.now();
@@ -128,7 +128,7 @@ async function main() {
       if (!research.complete) {
         emitPerf('research_block');
         console.log(formatResult('block', 'Research phase incomplete.'));
-        process.exit(2);
+        process.exit(0);
       }
     }
     const t6 = performance.now();
@@ -143,7 +143,7 @@ async function main() {
         if (!validation.valid) {
           emitPerf('qualityGate_block');
           console.log(formatResult('block', 'Quality gate failed.'));
-          process.exit(2);
+          process.exit(0);
         }
       }
     }

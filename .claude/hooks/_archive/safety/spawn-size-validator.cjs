@@ -247,7 +247,7 @@ function main() {
     }
 
     console.error('\nMore info: .claude/docs/MEMORY_MANAGEMENT.md');
-    process.exit(1);
+    process.exit(2);
   }
 
   // If warning, print but allow

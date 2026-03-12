@@ -19,7 +19,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const HOOK_PATH = path.resolve(__dirname, '../../.claude/hooks/validation/pre-completion-validation.cjs');
+const HOOK_PATH = path.resolve(
+  __dirname,
+  '../../.claude/hooks/validation/pre-completion-validation.cjs'
+);
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 
 // ---------------------------------------------------------------------------
@@ -59,11 +62,20 @@ test('validateArtifact returns { passed: false } when validate-integration scrip
   const hook = require(HOOK_PATH);
 
   // A path that contains /.claude/agents/ but does not exist on disk
-  const fakePath = path.join(PROJECT_ROOT, '.claude', 'agents', 'nonexistent-fake-xyz-regression.md');
+  const fakePath = path.join(
+    PROJECT_ROOT,
+    '.claude',
+    'agents',
+    'nonexistent-fake-xyz-regression.md'
+  );
   assert.ok(!fs.existsSync(fakePath), 'Precondition: test artifact path must NOT exist');
 
   const result = hook.validateArtifact(fakePath);
-  assert.equal(result.passed, false, 'validateArtifact should return { passed: false } for nonexistent path');
+  assert.equal(
+    result.passed,
+    false,
+    'validateArtifact should return { passed: false } for nonexistent path'
+  );
 });
 
 // ---------------------------------------------------------------------------
@@ -96,7 +108,9 @@ test('hook subprocess exits with code 2 when artifact validation fails (regressi
 
   // Craft a hook input where filesModified contains a fake agent path
   // detectArtifacts will pick it up because it contains /.claude/agents/
-  const fakeAgentPath = path.join(tmpDir, '.claude', 'agents', 'fake-regression-agent.md').replace(/\\/g, '/');
+  const fakeAgentPath = path
+    .join(tmpDir, '.claude', 'agents', 'fake-regression-agent.md')
+    .replace(/\\/g, '/');
 
   const hookInput = {
     tool_name: 'TaskUpdate',
@@ -106,7 +120,8 @@ test('hook subprocess exits with code 2 when artifact validation fails (regressi
       metadata: {
         // Path must contain /.claude/agents/ to be detected as an artifact
         filesModified: [fakeAgentPath],
-        summary: 'Regression test for P0 fix: verify artifact validation block exits with code 2 not 0',
+        summary:
+          'Regression test for P0 fix: verify artifact validation block exits with code 2 not 0',
       },
     },
   };
@@ -120,8 +135,8 @@ test('hook subprocess exits with code 2 when artifact validation fails (regressi
     result.status,
     2,
     `Hook must exit with code 2 when artifact validation fails (got ${result.status}). ` +
-    'This is a regression guard for the P0 fix that removed a dead process.exit(0) ' +
-    'that was shadowing the block exit(2) at line 692.'
+      'This is a regression guard for the P0 fix that removed a dead process.exit(0) ' +
+      'that was shadowing the block exit(2) at line 692.'
   );
 
   // Also verify the block message is present in stdout

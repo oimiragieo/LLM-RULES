@@ -188,26 +188,28 @@ function run() {
     // Use path.resolve() to guarantee absolute, OS-specific path normalization for all sources
     const resolvedWtPath = path.resolve(worktreePath);
     const resolvedWorktreesDir = path.resolve(normalizedWorktreesDir);
-    const resolvedRoot = path.resolve(PROJECT_ROOT);
+    const _resolvedRoot = path.resolve(PROJECT_ROOT);
     const resolvedCwd = path.resolve(process.cwd());
 
     // Only process worktrees securely under the designated directory
     if (!resolvedWtPath.toLowerCase().startsWith(resolvedWorktreesDir.toLowerCase())) continue;
 
-    // Safety: never remove main project root
-    if (resolvedWtPath.toLowerCase() === resolvedRoot.toLowerCase()) continue;
-
-    // Safety: bulletproof check to ensure we never delete the active session's worktree (Windows EBUSY risk)
-    // path.relative returns an empty string if paths are identical, or a relative path not starting with .. if cwd is inside wtPath
-    const isCwdInsideWt = path.relative(resolvedWtPath, resolvedCwd);
-    if (
-      isCwdInsideWt === '' ||
-      (!isCwdInsideWt.startsWith('..') && !path.isAbsolute(isCwdInsideWt))
-    ) {
+    // Safety: bulletproof check to ensure we never delete the active session's worktree (Windows EBUSY risk + Stop hook crash)
+    const wtLower = resolvedWtPath.replace(/\\/g, '/').toLowerCase();
+    const cwdLower = resolvedCwd.replace(/\\/g, '/').toLowerCase();
+    if (cwdLower === wtLower || cwdLower.startsWith(wtLower + '/')) {
       continue;
     }
+
     // Safety: skip if no branch info
     if (!branch) continue;
+
+    // Safety: Never delete a worktree that was created less than 2 hours ago.
+    // This prevents agents from deleting OTHER active agents' worktrees that haven't committed yet.
+    const ts = extractBranchTimestamp(branch);
+    if (ts && (Date.now() - ts < 2 * 60 * 60 * 1000)) {
+      continue;
+    }
 
     if (isStale(branch)) {
       const nativePath = worktreePath.replace(/\//g, path.sep);

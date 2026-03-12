@@ -99,7 +99,7 @@ async function main() {
 if (require.main === module) {
   main().catch(err => {
     console.log(formatResult('block', `[AGENT-TEMPLATE-CONTRACT] ${err.message}`));
-    process.exit(2);
+    process.exit(0);
   });
 }
 

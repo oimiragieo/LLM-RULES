@@ -201,7 +201,7 @@ async function main() {
         hookInput
       );
       console.log(formatResult('block', message));
-      process.exit(2);
+      process.exit(0);
     }
     if (bashArtifactWriteResult.warning) {
       console.warn(`[pre-tool-unified:guardrail] ${bashArtifactWriteResult.warning}`);
@@ -218,7 +218,7 @@ async function main() {
         hookInput
       );
       console.log(formatResult('block', message));
-      process.exit(2);
+      process.exit(0);
     }
     if (structuredMemoryWriteResult.warning) {
       console.warn(`[pre-tool-unified:memory-guard] ${structuredMemoryWriteResult.warning}`);
@@ -228,7 +228,7 @@ async function main() {
     if (guardrailResult.action === 'block') {
       const message = applyCircuitBreakerMessage(toolName, guardrailResult.message, hookInput);
       console.log(formatResult('block', message));
-      process.exit(2);
+      process.exit(0);
     }
     if (guardrailResult.action === 'rewrite' && guardrailResult.rewrittenCommand) {
       if (guardrailResult.bypassWarning) {

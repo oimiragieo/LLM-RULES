@@ -13,6 +13,8 @@ const memoryDir = path.join(projectRoot, '.claude/context/memory');
 const tasksFile = path.join(runtimeDir, 'tasks.json');
 
 console.log('[session-handoff] Initiating programmatic session handoff...');
+const args = process.argv.slice(2);
+const autoSuspend = args.includes('--auto-suspend');
 
 // MT-B: Drain-complete gate via tasks database reading
 let tasks = [];
@@ -27,13 +29,40 @@ if (fs.existsSync(tasksFile)) {
 
 const activeTasks = tasks.filter(t => t.status === 'in_progress' || t.status === 'blocked');
 if (activeTasks.length > 0) {
-  console.error(`\n[session-handoff] ABORT: Cannot handoff session while tasks are active.`);
-  console.error(`Active tasks found:`);
-  activeTasks.forEach(t => console.error(`  - [${t.id}] ${t.description} (${t.status})`));
-  console.error(
-    `\nPlease instruct the model to finish or formally suspend these tasks before handing off.`
-  );
-  process.exit(1);
+  if (autoSuspend) {
+    console.log(
+      `[session-handoff] --auto-suspend flag detected. Suspending ${activeTasks.length} active tasks...`
+    );
+    let modified = false;
+    tasks.forEach(t => {
+      if (t.status === 'in_progress' || t.status === 'blocked') {
+        t.status = 'suspended';
+        t.metrics = t.metrics || {};
+        t.metrics.suspended_at = new Date().toISOString();
+        t.metrics.suspend_reason = 'Auto-suspended during session handoff via --auto-suspend flag';
+        modified = true;
+      }
+    });
+    if (modified) {
+      try {
+        fs.writeFileSync(tasksFile, JSON.stringify(tasks, null, 2), 'utf8');
+        console.log(`[session-handoff] Tasks successfully suspended.`);
+      } catch (e) {
+        console.error(
+          `[session-handoff] Failed to write tasks database during suspend: ${e.message}`
+        );
+        process.exit(1);
+      }
+    }
+  } else {
+    console.error(`\n[session-handoff] ABORT: Cannot handoff session while tasks are active.`);
+    console.error(`Active tasks found:`);
+    activeTasks.forEach(t => console.error(`  - [${t.id}] ${t.description} (${t.status})`));
+    console.error(
+      `\nPlease instruct the model to finish or formally suspend these tasks before handing off, or pass the --auto-suspend flag.`
+    );
+    process.exit(1);
+  }
 }
 
 // Ensure runtime dir exists
@@ -47,7 +76,9 @@ const sessionId = getOrCreateSessionId(runtimeDir);
 let contextSummary = 'Context transferred via session-handoff skill.';
 const activeContextPath = path.join(memoryDir, 'active_context.md');
 if (fs.existsSync(activeContextPath)) {
-  contextSummary = fs.readFileSync(activeContextPath, 'utf8').substring(0, 1000);
+  // Option 1 Fix: Eliminated the blind 1000-character length truncation to prevent 'brevity bias' context collapse.
+  // We use a high 100,000 threshold (~25k tokens) strictly to prevent memory crash exceptions but allow full transfer.
+  contextSummary = fs.readFileSync(activeContextPath, 'utf8').substring(0, 100000);
 }
 
 // Build the M7.1 Log directly

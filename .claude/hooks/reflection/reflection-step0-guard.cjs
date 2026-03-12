@@ -436,7 +436,7 @@ async function main() {
         reason: 'reflection_step0_pending',
       });
       console.log(formatResult('block', message));
-      process.exit(2);
+      process.exit(0);
     }
 
     await emitEventWithTimeout(EventTypes.TOOL_COMPLETED, {

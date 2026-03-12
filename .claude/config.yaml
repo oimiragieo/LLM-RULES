@@ -131,7 +131,7 @@ memory_management:
 agents:
   # Core agents (framework coordination)
   router:
-    path: .claude/agents/core/router.md
+    path: .claude/CLAUDE.md
     model: haiku
   planner:
     path: .claude/agents/core/planner.md

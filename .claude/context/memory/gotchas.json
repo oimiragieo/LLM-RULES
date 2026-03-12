@@ -53,5 +53,25 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "c544ea68ad9883ccf0143ddc126807258b8af674"
+  },
+  {
+    "text": "STM consolidateSession() in memory-tiers.cjs has no auto-trigger — must be explicitly called at session boundary. No hook in settings.json fires it automatically. STM content is ephemeral without explicit caller.",
+    "area": "main",
+    "timestamp": "2026-03-12T05:52:27.737Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "d98fba417e00a61fcce79a86020cec14a5bef128"
+  },
+  {
+    "text": "heartbeat-orchestrator loop registry (CronCreate IDs) stored only in working memory + CronList — session restart loses all 8 loop registrations. Use writeMemory(\"heartbeat-loop-registry\") to persist across sessions.",
+    "area": "main",
+    "timestamp": "2026-03-12T05:52:27.776Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "525cc81552a988be5aea99ae7983e03db6d573a4"
   }
 ]

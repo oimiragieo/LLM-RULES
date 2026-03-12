@@ -1,116 +1,10 @@
-## ADR-2026-03-09A: Cron-Runner Subprocess Isolation — APPROVED-WITH-CONDITIONS (2026-03-09)
+## ADR-2026-03-12-064: Security Audit Confirms shell:false Compliance Baseline (2026-03-12)
 
-**Status:** Conditionally Approved (pending Phase 1 conditions)
-**Context:** Cron ticks firing into the Router session cause 15K-60K tokens/hour of context pollution. Moving cron loop ownership to a persistent subprocess (via `child_process.spawn detached:true`) with a JSONL queue bridge was evaluated by a multi-LLM council (Gemini + Codex + Claude chairman).
-
-**Decision:** APPROVE-WITH-CONDITIONS.
-
-- Subprocess isolation pattern (sidecar) is architecturally correct for this problem.
-- Phase 0 (launcher + skill creation, no behavior changes) is authorized to proceed immediately.
-- Phase 1 is BLOCKED until: (C1) queue drain/ack protocol defined, (C2) CRON_SUBPROCESS_MODE=shadow flag implemented.
-- Phase 2 is BLOCKED until all 3 BLOCKING conditions resolved (C1, C2, C3: credential inheritance check).
-
-**Key Design Decisions:**
-
-- Queue drain: atomic file rename (not in-place rewrite), line-level try/parse skip-on-error
-- Shadow mode: CRON_SUBPROCESS_MODE env var controls whether router drains queue (shadow=no, active=yes)
-- Credential inheritance: launcher must verify ANTHROPIC_API_KEY present in process.env before spawn
-- Model selection: Haiku for simple heartbeats, allow escalation to Sonnet for distillation tasks
-
-**Risk Record:**
-
-- CRITICAL: Queue drain/ack protocol unspecified (could cause silent action loss or duplicate execution)
-- HIGH: Phase 1 double-execution without shadow mode flag
-- HIGH: Windows orphan subprocess + credential inheritance gap
-
-**Evidence:** `.claude/context/reports/architecture/cron-runner-subprocess-council-2026-03-09.md`
-
----
-
-## ADR-2026-03-08A: MEGA EPIC Audit — Security Enforcement Hardening
-
-**Status:** Accepted
-**Context:** 100% framework audit (2026-03-08) found 5 security/enforcement hooks configured fail-open or warn-only. This creates bypass vectors (SEC-008 pattern).
-
-**Decision:** All security hooks MUST default to `block` (fail-closed). Upgraded in this session:
-
-- `spawn-prompt-validator.cjs` — fail-open → fail-closed (exit 2 on errors)
-- `external-content-guard.cjs` — warn → block default
-- `TASKLIST_FIRST_ENFORCEMENT` — missing default → explicit `'block'`
-- `TASK_SINGLE_PURPOSE_ENFORCEMENT` — warn → block
-
-**Rationale:** Advisory hooks (metrics, bypass-audit) may fail-open — they do not control access. Security hooks that fail-open on unexpected errors create bypass vectors because an attacker can craft input to trigger the error path and bypass the check entirely.
-
-**Consequence:** Any future hook created for security enforcement must use `process.exit(2)` in its catch block, not `process.exit(0)`. See `.claude/rules/hooks.md` fail-open vs fail-closed policy table.
-
-**Commits:** 616be685
-
----
-
-## ADR-2026-03-08B: O_EXCL Atomic Lock for State Guard Files
-
-**Status:** Accepted
-**Context:** evolution-state-guard.cjs used non-atomic `fs.writeFileSync` to create a lock file. Under concurrent access (two evolution processes racing), both could see the file absent and proceed simultaneously — a TOCTOU race.
-
-**Decision:** State guard files that prevent concurrent execution MUST use `fs.openSync(path, 'wx')` (O_EXCL flag). The 'wx' flag is an atomic "create-exclusive" operation at the OS level: it fails with EEXIST if the file already exists, with no race window between check and create.
-
-**Alternatives Considered:**
-
-- (A) `proper-lockfile` — full lock library, overkill for simple guard files
-- (B) `fs.existsSync` + `fs.writeFileSync` — classic TOCTOU race, not safe
-- (C) `fs.openSync('wx')` — minimal, atomic, OS-guaranteed
-
-**Consequence:** Any future "guard file" pattern for preventing concurrent execution must use O_EXCL. Error handling: catch EEXIST specifically (`err.code === 'EEXIST'`) and treat as "already locked."
-
-**Commits:** 616be685
-
----
-
-## ADR-2026-03-07B: agent-registry.json Structure Contract
-
-- **Decision**: agent-registry.json `agents` field is an OBJECT keyed by agent ID string (not array)
-- **Correct access**: `registry.agents[agentId]` for lookup; `Object.values(registry.agents)` for iteration; `Object.keys(registry.agents).length` for count
-- **Wrong**: `registry.agents.length` (returns undefined), `Array.isArray(registry.agents)` (returns false), `registry.agents.forEach(...)` (TypeError)
-- **Fixed in**: creator-commons.cjs, commit 39c6e7d2
-- **Regression test**: tests/lib/creators/creator-commons.test.cjs
-
----
-
-## ADR-2026-03-05-065: Graduated Eval Rollout Pattern for Creator Skills (2026-03-05)
-
-**Status:** Accepted
-**Context:** Adding LLM-as-judge evaluation patterns to 8 creator/updater SKILL.md files. Risk varies significantly across skill types. Applying identical eval depth to all would create unnecessary complexity in low-risk skills.
-
-**Decision:** Use three complexity tiers for eval rollout across creator skills:
-
-- **FULL** (structured eval sections with grader assertions): agent-creator, agent-updater, workflow-creator, workflow-updater — high-impact, high-risk creators
-- **LIGHT** (brief eval guidance, simpler assertions): hook-creator, template-creator, tool-creator — medium-risk creators
-- **NOTE** (single paragraph): schema-creator — low-risk, highly constrained output
-
-Execute as canary rollout: schema-creator first (lowest risk), validate pattern, then expand.
-
-**Implementation:** Commit e1a7f9be. 8 SKILL.md files + skill-index.json updated. Lint/format clean. Multi-LLM review (Gemini+Claude) validated plan before implementation.
-
-**Consequences:** All 8 creator/updater skills now have proportional eval guidance. Codex limitation documented: fails plan-review tasks consistently (confirmed in task 8). Pre-edit snapshot capability identified as follow-up improvement. Shared eval agent location deferred as next deliverable.
-
----
-
-## ADR-2026-03-04-064: Framework-Path Worktree Isolation Override (2026-03-04)
-
-**Status:** Accepted
-**Context:** Developer agents with `isolation: worktree` silently lost all work when targeting `.claude/` framework paths. Worktree clones are cleaned up after task completion, discarding all framework file modifications. 43% lifetime failure rate confirmed across 5+ incidents (Tasks 3, 4, 4-wave2-dev in 2026-03-04 session; Task 36 in 2026-03-03 session; code-reviewer in 2026-03-03 session).
-
-**Decision:** Add path-aware isolation override in `spawn-prompt-assembler.task-tools.cjs`. When a developer task prompt contains `.claude/` framework paths (hooks, skills, agents, tools, workflows, templates, schemas, lib), override worktree isolation to `none` so the agent works directly on main. Cross-platform stdin reading also fixed in `worktree-auto-cleanup.cjs` by replacing `/dev/stdin` with `fs.readFileSync(0, 'utf8')` (fd 0).
-
-**Alternatives Considered:**
-
-- (A) Remove `isolation: worktree` from developer.md entirely — loses worktree benefits for source code tasks
-- (B) Route all framework tasks to devops/nodejs-pro — workaround, does not fix root cause for future agents
-- (C) Path-aware override — preserves worktree for src/ tasks, prevents data loss for .claude/ tasks
-
-**Consequences:** Developer agents now correctly modify framework files. Source code tasks continue to benefit from worktree isolation. Added `shouldOverrideWorktreeIsolation()` function with 26 tests.
-
-**Evidence:** Commit 775ccf1f. Tests: `tests/hooks/spawn-prompt-assembler-worktree-override.test.cjs` (26 tests).
+**Status:** ACCEPTED (observation)
+**Date:** 2026-03-12
+**Trigger:** Security audit of all active `.claude/hooks/` files (65 files scanned).
+**Decision:** All 65 production hook files are shell:false compliant. The one `shell:true` instance in `tools/cron-runner/queue-drain.cjs` is documented-intentional (non-hook tool, trusted internal command). This establishes a verified compliance baseline as of 2026-03-11. Track any new hook additions against this baseline via CI.
+**Consequences:** shell:false baseline confirmed. Future hook authors must not use `shell:true` in production hook code. The cron-runner exception must be unit-tested to assert `writebackCmd` is assembled from hardcoded parts only.
 
 ---
 
@@ -271,3 +165,11 @@ All three now pass 8/0/3 validation.
 All three now pass 8/0/3 validation.
 
 - [shift-change handover] Decision: marker-file over PID kill (2026-03-11)
+
+## ADR-125: lsp-navigator P2 Gap in Non-Code-Primary Agents (2026-03-12)
+
+**Status:** Accepted
+**Decision:** `lsp-navigator` skill is NOT required for ops/infra/research-focused agents (researcher, ecosystem-auditor, devops, reverse-engineer, database-architect, performance-engineer, sre-engineer, incident-responder, chaos-engineer). It is a P2 enhancement for these 9 agents, not a P0/P1 compliance requirement.
+**Rationale:** These agents' primary workflows do not require compiler-level symbol navigation. LSP is most valuable for agents doing deep code authoring or refactoring (developer, code-reviewer, architect, qa, code-simplifier, security-architect, typescript-pro, etc.). Forcing lsp-navigator on ops/infra agents adds noise to their skills list without functional benefit.
+**Evidence:** Agent wiring compliance audit 2026-03-11 — all 18 code-work agents that do need LSP already have it. The 9 agents missing it have ops/infra/research primary workflows.
+**Next action:** Add lsp-navigator to these 9 agents in next agent update cycle (non-urgent).

@@ -88,5 +88,5 @@ try {
   process.exit(0);
 } catch (err) {
   console.error('[REGEN-HOOK] ❌ Error:', err.message);
-  process.exit(1);
+  process.exit(2);
 }

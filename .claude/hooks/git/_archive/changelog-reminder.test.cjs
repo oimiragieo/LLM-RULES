@@ -103,7 +103,7 @@ console.log('\nvalidate() — lock files excluded from code detection');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 if (failed > 0) {
-  process.exit(1);
+  process.exit(2);
 } else {
   process.exit(0);
 }

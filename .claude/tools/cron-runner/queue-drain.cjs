@@ -174,7 +174,7 @@ function dispatchAction(entry) {
           //   node .claude/tools/cli/telegram-write-outbox.cjs <chatId> <msgId> <taskId> --from-file <path>
           execSync(action.writebackCmd, {
             cwd: PROJECT_ROOT,
-            shell: true,
+            shell: false,
             stdio: ['ignore', 'pipe', 'pipe'],
           });
           process.stderr.write(`[queue-drain] ask: writeback command executed\n`);

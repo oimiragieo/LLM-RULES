@@ -53,7 +53,7 @@ function main() {
   const args = process.argv.slice(2);
   if (args.length === 0) {
     console.error('Usage: node run-hook.cjs <hook-path> [args...]');
-    process.exit(1);
+    process.exit(2);
   }
 
   const hookName = args[0];
@@ -63,7 +63,7 @@ function main() {
   if (!fs.existsSync(scriptPath)) {
     console.error(`Error: Hook not found: ${scriptPath}`);
     console.error(`Searched in: ${hooksDir}`);
-    process.exit(1);
+    process.exit(2);
   }
 
   // 3. Execute
@@ -77,7 +77,7 @@ function main() {
     })
     .catch(err => {
       console.error(`Error executing hook: ${err.message}`);
-      process.exit(1);
+      process.exit(2);
     });
 }
 

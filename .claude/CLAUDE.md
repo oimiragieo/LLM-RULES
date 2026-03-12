@@ -169,7 +169,7 @@ See **@ROUTER_OPERATIONS.md** for format, bash command template, and full entry 
 
 Before spawning `developer`, check Step 6.5 in `router-decision.md`. If ANY specialist keyword matches, use that specialist instead.
 
-**Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: block). 73 agents exist — specialists have domain-specific prompts, skills, and patterns.
+**Enforcement:** `routing-guard.cjs` Check 7 (`SPECIALIST_ROUTING_ENFORCEMENT=warn|block|off`, default: block). 74 agents exist — specialists have domain-specific prompts, skills, and patterns.
 
 **Common Misrouting (verify EVERY spawn):**
 

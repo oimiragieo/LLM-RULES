@@ -402,7 +402,7 @@ async function main() {
     const completionGuardResult = runTaskCompletionGuard(toolOutputStr, effectiveTaskId, toolInput);
     if (!completionGuardResult.pass) {
       console.log(formatResult(completionGuardResult.result, completionGuardResult.message));
-      process.exit(2);
+      process.exit(0);
       return;
     }
 

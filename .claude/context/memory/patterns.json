@@ -230,5 +230,35 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "7c020ebe815d2a1555f3937f2753421d1c45a96f"
+  },
+  {
+    "text": "Agent compliance 6-axis audit template: (1) ripgrep skill, (2) token-saver skill, (3) code-semantic/structural-search skills, (4) registry/disk alignment, (5) broken skill refs, (6) required tools (MemoryRecord/TaskUpdate/Skill). All 74 agents verified clean in 2026-03-11 audit.",
+    "area": "main",
+    "timestamp": "2026-03-12T05:52:18.402Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "8265e5d1064c844a48fdbfa2dd64d3b12b3e6522"
+  },
+  {
+    "text": "Named memory API pattern for session-restart resilience: writeMemory(\"registry-key\", JSON.stringify(state)) after registration; readMemory(\"registry-key\") on startup to detect already-registered entries. Located at memory-manager-core.cjs.",
+    "area": "main",
+    "timestamp": "2026-03-12T05:52:27.808Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "f4111bb397be1be69935df6b08d4d7ca69b4760c"
+  },
+  {
+    "text": "EPIC audit session boundary: pipelines with 3+ heavy analysis phases (security audit, structural audit, gap analysis) consistently hit 150K token ceiling before implementation. Plan an explicit session boundary between analysis and implementation phases in the pipeline plan document. This is a recurring P0 pattern (3rd occurrence: 2026-02-09, 2026-02-10, 2026-03-12).",
+    "area": "main",
+    "timestamp": "2026-03-12T20:54:36.555Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "c552d3f4c52bd4c066553f7b8b38515834d5533f"
   }
 ]

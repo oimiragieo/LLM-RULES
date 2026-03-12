@@ -171,7 +171,7 @@ async function main() {
 if (require.main === module) {
   main().catch(err => {
     console.error('[Evolution Processor] Fatal error:', err.message);
-    process.exit(1);
+    process.exit(2);
   });
 }
 

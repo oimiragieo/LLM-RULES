@@ -203,7 +203,7 @@ async function main() {
 
       if (MODE === 'block') {
         console.error(errorMessage);
-        process.exit(1);
+        process.exit(2);
       } else {
         // warn mode
         console.warn(`[WARN] ${errorMessage}`);

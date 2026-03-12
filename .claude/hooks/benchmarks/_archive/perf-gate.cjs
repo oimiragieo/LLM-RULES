@@ -50,5 +50,5 @@ async function main() {
 
 main().catch(err => {
   console.error(`[PERF-GATE] ERROR: ${err.message}`);
-  process.exit(1);
+  process.exit(2);
 });

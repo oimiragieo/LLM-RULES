@@ -711,6 +711,17 @@ LSP 3.18 does **NOT** introduce a standard test lens provider protocol. "Run Tes
 - `SnippetTextEdit` is primarily an editor UX enhancement; not exposed via lsp-navigator tool
 - Diagnostic `MarkupContent` improves error readability in editors but does not change how `lsp_diagnostics` results appear to agents
 
+## LSPRAG (LSP-Augmented RAG)
+
+When building context for LLM prompts, use LSPRAG to retrieve exact, compiler-verified dependencies rather than relying on pure text or embedding similarity.
+
+**Workflow:**
+
+1. Discover the entry point function.
+2. Use `outgoingCalls` to find all internal methods it invokes.
+3. Use `goToDefinition` to pull the exact source code of those dependencies.
+4. Pass this compiler-verified subgraph into the context instead of blindly pasting entire files.
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
