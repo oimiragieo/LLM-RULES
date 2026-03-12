@@ -480,8 +480,8 @@ function createReflectionEventHandlers({
 
     if (trimmed.startsWith('{')) {
       try {
-        const { data: parsed } = safeParseJSON(trimmed, null);
-        if (!parsed) return { patterns: [], gotchas: [], discoveries: [] };
+        const parsed = safeParseJSON(trimmed, null);
+        if (!parsed || !parsed.patterns) return { patterns: [], gotchas: [], discoveries: [] };
         const result = {
           patterns: sanitizeTextEntries(parsed?.patterns, 3),
           gotchas: sanitizeTextEntries(parsed?.gotchas, 3),

@@ -297,7 +297,7 @@ function detectBypass(params) {
   let matchedRecord = null;
   for (const line of lines) {
     try {
-      const { data: record } = safeParseJSON(line, null);
+      const record = safeParseJSON(line, null);
       if (!record || record.type !== 'block_verdict') continue;
       if (record.tool !== tool) continue;
 
@@ -328,7 +328,7 @@ function detectBypass(params) {
   let cumulativeBypassCount = 0;
   for (const line of lines) {
     try {
-      const { data: r } = safeParseJSON(line, null);
+      const r = safeParseJSON(line, null);
       if (r && r.type === 'bypass_confirmed') cumulativeBypassCount++;
     } catch (_) {
       /* skip */
