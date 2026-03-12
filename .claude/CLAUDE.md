@@ -310,7 +310,7 @@ Before claiming "pipeline complete", call `TaskList()` and confirm zero tasks re
 
 ## ROUTING TABLE (Section 3)
 
-> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 73-agent routing matrix, creator skills table, and registry skill resolution.
+> **REFERENCE:** See **@AGENT_ROUTING_TABLE.md** for the complete 74-agent routing matrix, creator skills table, and registry skill resolution.
 
 **Quick Routing (top 13 — high-frequency routes):**
 
@@ -495,7 +495,7 @@ All external reference files are located in `.claude/docs/`:
 
 | @File Name                   | Section           | Purpose                                                                               |
 | ---------------------------- | ----------------- | ------------------------------------------------------------------------------------- |
-| **@AGENT_ROUTING_TABLE.md**  | Section 3         | Complete 73-agent routing matrix (canonical)                                          |
+| **@AGENT_ROUTING_TABLE.md**  | Section 3         | Complete 74-agent routing matrix (canonical)                                          |
 | **@ROUTER_OPERATIONS.md**    | Sections 0.1, 1.2 | Pipeline UX, Gap Protocol, Template Loading, Gate detail, Batch Creation, Trace-First |
 | **@MEMORY_PROTOCOL.md**      | Section 8         | Memory tier architecture, file rotation, STM/MTM/LTM, context compressor              |
 | **@CREATOR_SKILLS_TABLE.md** | Section 3         | Creator skill invocation patterns                                                     |

@@ -17,7 +17,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-28T00:00:00.000Z
+lastVerifiedAt: 2026-03-12T00:00:00.000Z
 skills:
   - task-management-protocol
   - ripgrep
@@ -221,6 +221,60 @@ The stop hook (`ralph-stop-hook.cjs`) follows this protocol:
   "lastFindingsCount": 5
 }
 ```
+
+### TDD State Schema (for TDD-mode loops)
+
+When using ralph-loop for TDD workflows, use a separate TDD-specific state file at `.claude/context/runtime/tdd-state.json`. This schema tracks per-scenario RED/GREEN evidence across session interruptions:
+
+```json
+{
+  "scenarios": [
+    {
+      "id": "sc-001",
+      "description": "routing-guard blocks Write on creator paths",
+      "status": "pending|red|green|refactored"
+    }
+  ],
+  "completedScenarios": [
+    {
+      "id": "sc-001",
+      "evidenceCommand": "node --test tests/hooks/routing-guard.test.cjs",
+      "redEvidence": "AssertionError: expected exit code 2, got 0",
+      "greenEvidence": "✓ routing-guard blocks Write (4ms)",
+      "passedAt": "2026-03-12T10:00:00Z"
+    }
+  ],
+  "currentScenario": "sc-002",
+  "evidenceLog": [
+    {
+      "scenarioId": "sc-001",
+      "phase": "red|green|refactored",
+      "output": "<verbatim test runner output>",
+      "timestamp": "2026-03-12T09:58:00Z"
+    }
+  ]
+}
+```
+
+**TDD Session Resumption:** On each loop iteration, before picking a scenario:
+
+```javascript
+const tddState = JSON.parse(
+  fs.readFileSync('.claude/context/runtime/tdd-state.json', 'utf-8') || '{}'
+);
+const completedIds = (tddState.completedScenarios || []).map(s => s.id);
+const remaining = (tddState.scenarios || []).filter(s => !completedIds.includes(s.id));
+if (remaining.length === 0) {
+  // All scenarios complete — emit RALPH_AUDIT_COMPLETE_NO_FINDINGS
+  console.log('RALPH_AUDIT_COMPLETE_NO_FINDINGS');
+  process.exit(0);
+}
+const nextScenario = remaining[0];
+```
+
+**Critical rule:** Never re-execute scenarios already in `completedScenarios`. The `evidenceLog` is append-only — each phase (red/green/refactored) adds a new entry. Circuit breaker trips if `currentScenario` is unchanged for 3+ iterations.
+
+**Integration with TDP:** When spawning the developer agent for a TDD loop iteration, extract the red evidence from `evidenceLog` and inject verbatim into the spawn prompt (see `tdd` skill — Test-Driven Prompting pattern).
 
 ## Writing Effective Prompts
 

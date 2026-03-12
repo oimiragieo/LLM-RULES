@@ -207,7 +207,7 @@ function run() {
     // Safety: Never delete a worktree that was created less than 2 hours ago.
     // This prevents agents from deleting OTHER active agents' worktrees that haven't committed yet.
     const ts = extractBranchTimestamp(branch);
-    if (ts && (Date.now() - ts < 2 * 60 * 60 * 1000)) {
+    if (ts && Date.now() - ts < 2 * 60 * 60 * 1000) {
       continue;
     }
 

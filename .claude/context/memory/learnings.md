@@ -177,3 +177,14 @@
 - Memory files actively used (confirmed 2026-03-12 entries exist)
 - P1 actions: skill-updater on tdd + lsp-navigator skills with above gaps
 - Report: .claude/context/artifacts/research-reports/tdd-lsp-gap-analysis-research-2026-03-12.md
+
+## Ecosystem Audit 2026-03-12 — Key Findings
+
+- **routing-guard exits 0 on block**: `routing-guard-core.impl.cjs` emits deny JSON but calls `process.exit(0)` at block path. Must be `process.exit(2)` per security hook policy. 5 ENFORCEMENT-003 tests fail.
+- **validate-ecosystem-integrity.cjs does not exist** — ecosystem-integrity-scanner skill references a nonexistent script. Use `ci-validation-gate.cjs` as closest equivalent.
+- **loop skill missing** — `.claude/skills/loop/` directory and SKILL.md do not exist. No agent frontmatter references it (safe for now).
+- **Agent count**: 74 agents on disk = 74 in registry = 100% aligned. All 74 have health.status: "healthy".
+- **Hook coverage**: 38/38 settings.json hooks verified on disk. Unified-creator-guard invoked via write-pretool-bundle bundle pattern (by design, not directly in settings).
+- **spawn-token-guard**: Correctly registered as first Task PreToolUse hook, correctly fail-open (all exits are 0).
+- **Memory files**: learnings 11KB, decisions 14KB, issues 15KB — all within thresholds after 2026-03-12 bloat fix.
+- **Agent search coverage**: 68/68 non-orchestrator agents have pnpm search:code + token-saver references.

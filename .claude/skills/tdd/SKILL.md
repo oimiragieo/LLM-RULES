@@ -1,9 +1,9 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-18T21:55:39.677Z
+lastVerifiedAt: 2026-03-12T00:00:00.000Z
 name: tdd
-description: Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely.
-version: 1.2.0
+description: Canon TDD for humans and AI agents. Use for production code changes by writing tests first, proving RED, implementing minimal GREEN, and refactoring safely. 2026 edition adds TDP, flakiness gate, ralph-loop integration, and memory-search in Step 0.
+version: 1.3.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -59,9 +59,20 @@ If code was written first, discard and restart from RED.
 
 ### Step 0: Create/refresh scenario backlog
 
+Before building the backlog, query memory for past failure signatures and reusable test templates:
+
+```javascript
+Skill({ skill: 'memory-search' }); // query: "<feature-name> test failure signatures"
+```
+
+Read `.claude/context/memory/learnings.md` for recurring anti-patterns relevant to this task.
+
+Then:
+
 - Keep a short ordered list of test scenarios for this task.
 - Prioritize by design signal and risk, not by implementation convenience.
 - Add discovered scenarios during execution.
+- Reuse templates from memory — do not repeat failure patterns already documented.
 
 ### Step 1: Pick exactly one scenario and write one runnable test
 
@@ -86,6 +97,19 @@ If code was written first, discard and restart from RED.
 - Re-run narrow test command.
 - Run impacted suite (or package-level test set).
 - Confirm no regressions.
+
+**Flakiness Gate (mandatory for async, hook, or nondeterministic tests):**
+
+For tests that involve async I/O, stop hooks, timers, or file system operations, a single pass is insufficient. Require 3 consecutive passes before declaring GREEN:
+
+```bash
+# Run 3 times — all 3 must pass
+node --test tests/hooks/routing-guard.test.cjs && \
+node --test tests/hooks/routing-guard.test.cjs && \
+node --test tests/hooks/routing-guard.test.cjs
+```
+
+A test that passes once and fails on the second run is RED, not GREEN. Do not advance to Step 5 until 3 consecutive passes are confirmed.
 
 ### Step 5: Optional refactor
 
@@ -120,6 +144,112 @@ Hard rules:
 - memory never bypasses RED proof
 - memory never changes Canon sequence
 - keep profile bounded and low-noise
+
+## Test-Driven Prompting (TDP) — 2026 Standard Pattern
+
+TDP is the dominant 2026 pattern for multi-agent TDD: inject the **verbatim failing test output** into the developer agent spawn prompt. This eliminates interpretation errors — the developer sees exactly what the test runner sees.
+
+### Pattern
+
+Instead of describing the failure in prose, capture stdout/stderr and inject it directly:
+
+```javascript
+// Step 1: Run test and capture raw output
+const { execSync } = require('child_process');
+let testOutput = '';
+try {
+  execSync('node --test tests/hooks/routing-guard.test.cjs', { encoding: 'utf-8' });
+} catch (e) {
+  testOutput = e.stdout + e.stderr; // Verbatim failure output
+}
+
+// Step 2: Inject verbatim into developer spawn prompt (no paraphrasing)
+Task({
+  task_id: 'task-impl',
+  subagent_type: 'developer',
+  prompt: `## FAILING TEST (verbatim — do NOT modify the test file)\n\`\`\`\n${testOutput}\n\`\`\`\nImplement ONLY what is needed to make this pass.`,
+});
+```
+
+### Why TDP Works
+
+- Eliminates paraphrased failure descriptions (telephone game effect)
+- Developer has the full assertion context: line number, actual vs expected values
+- Forces minimal implementation — developer can only implement what the test demands
+- Prevents specification drift between QA agent's test intent and developer's interpretation
+
+### TDP + Multi-Agent TDD Decomposition
+
+| Step | Agent              | Action                                                   |
+| ---- | ------------------ | -------------------------------------------------------- |
+| 1    | `qa`               | Write failing test, commit test-only, capture raw output |
+| 2    | Router             | Extract test output, build TDP spawn prompt              |
+| 3    | `developer`        | Implement to GREEN using verbatim test output as spec    |
+| 4    | `reflection-agent` | Verify no test assertions were modified (git diff check) |
+
+**Source:** Simon Willison (2026) — "Red/Green TDD for agents: failing test output IS the specification"; TDFlow arXiv:2510.23761.
+
+## Autonomous TDD with ralph-loop (Session-Persistent Iteration)
+
+For repository-scale TDD where sessions may be interrupted, wire ralph-loop (Mode 2 — router-managed) to maintain the TDD scenario backlog across interruptions:
+
+### TDD State Schema
+
+Maintain a TDD-specific state file at `.claude/context/runtime/tdd-state.json`:
+
+```json
+{
+  "scenarios": [
+    {
+      "id": "sc-001",
+      "description": "routing-guard blocks Write on creator paths",
+      "status": "pending"
+    },
+    { "id": "sc-002", "description": "spawn-token-guard warns at 80K tokens", "status": "green" }
+  ],
+  "completedScenarios": [
+    {
+      "id": "sc-002",
+      "evidenceCommand": "node --test tests/hooks/spawn-token-guard.test.cjs",
+      "passedAt": "2026-03-12T10:00:00Z"
+    }
+  ],
+  "currentScenario": "sc-001",
+  "evidenceLog": [
+    {
+      "scenarioId": "sc-001",
+      "phase": "red",
+      "output": "AssertionError: expected exit code 2, got 0",
+      "timestamp": "..."
+    }
+  ]
+}
+```
+
+### Resume Pattern
+
+At the start of each iteration, read the TDD state file:
+
+```javascript
+// Step 0 — before building/refreshing backlog
+const state = JSON.parse(
+  fs.readFileSync('.claude/context/runtime/tdd-state.json', 'utf-8') || '{}'
+);
+const completedIds = (state.completedScenarios || []).map(s => s.id);
+const remaining = (state.scenarios || []).filter(s => !completedIds.includes(s.id));
+// Pick next scenario from remaining — never re-run completed ones
+```
+
+### Integration with ralph-loop Mode 2
+
+1. Router spawns `qa` agent with `{ task_id, subagent_type: 'qa', prompt: TDP_PROMPT + verbatim state }`
+2. `qa` writes test → runs → captures output → updates `tdd-state.json` (phase: red)
+3. Router spawns `developer` with TDP prompt (verbatim test output injected)
+4. `developer` implements → updates `tdd-state.json` (phase: green)
+5. Router checks `remaining.length === 0` → emit `RALPH_AUDIT_COMPLETE_NO_FINDINGS`
+6. If remaining > 0 → loop back to step 1 with next scenario
+
+**Anti-pattern:** Never re-run scenarios already marked `green` in state — this wastes iterations and may corrupt evidence logs.
 
 ## Repository-Scale and Class-Level Guidance
 

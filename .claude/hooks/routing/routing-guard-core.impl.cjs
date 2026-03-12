@@ -356,6 +356,14 @@ function isFailOpenOverrideAuthorized() {
   return scope.includes('all') || scope.includes('routing-guard');
 }
 
+/**
+ * Security hooks MUST be fail-closed: exit 2 to block, 0 to warn/pass-through.
+ * Extracted from main() to stay within ESLint complexity budget.
+ */
+function resolveExitCode(result) {
+  return result.result === 'block' ? 2 : 0;
+}
+
 async function main() {
   const startTime = Date.now();
   try {
@@ -499,7 +507,7 @@ async function main() {
       } catch (_) {
         /* best-effort */
       }
-      process.exit(0);
+      process.exit(resolveExitCode(result));
     }
 
     logRouterChurnEvent({
