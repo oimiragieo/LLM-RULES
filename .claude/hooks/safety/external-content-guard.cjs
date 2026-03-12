@@ -621,7 +621,8 @@ async function main() {
 
     if (result.action === 'block') {
       process.stderr.write(`[${HOOK_NAME}] BLOCKED: ${result.message}\n`);
-      process.exit(2);
+      console.log(JSON.stringify({ allow: false, message: result.message }));
+      process.exit(0);
     }
 
     if (result.action === 'warn' && result.message) {
@@ -631,12 +632,16 @@ async function main() {
     // Allow (exit 0) for 'allow' or 'warn'
     process.exit(0);
   } catch (err) {
-    // Fail OPEN on unexpected errors to avoid breaking existing workflows
-    auditLog(HOOK_NAME, 'error_fail_open', { error: err.message });
+    // Fail CLOSED on unexpected errors (SEC-008 compliance)
+    // Set EXTERNAL_CONTENT_GUARD_FAIL_OPEN=true to opt-in to fail-open for debugging
+    auditLog(HOOK_NAME, 'error_fail_closed', { error: err.message });
     if (process.env.DEBUG_HOOKS === 'true') {
-      process.stderr.write(`[${HOOK_NAME}] Unexpected error (failing open): ${err.message}\n`);
+      process.stderr.write(`[${HOOK_NAME}] Unexpected error (failing closed): ${err.message}\n`);
     }
-    process.exit(0);
+    if (process.env.EXTERNAL_CONTENT_GUARD_FAIL_OPEN === 'true') {
+      process.exit(0);
+    }
+    process.exit(2);
   }
 }
 

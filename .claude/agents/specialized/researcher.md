@@ -32,6 +32,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - insight-extraction
+  - lsp-navigator
   - memory-search
   - research-synthesis
   - ripgrep

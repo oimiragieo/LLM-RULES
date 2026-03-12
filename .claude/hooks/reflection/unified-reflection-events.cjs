@@ -1,5 +1,7 @@
 'use strict';
 
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
+
 function createReflectionEventHandlers({
   getToolName,
   getToolInput,
@@ -478,7 +480,8 @@ function createReflectionEventHandlers({
 
     if (trimmed.startsWith('{')) {
       try {
-        const parsed = JSON.parse(trimmed);
+        const { data: parsed } = safeParseJSON(trimmed, null);
+        if (!parsed) return { patterns: [], gotchas: [], discoveries: [] };
         const result = {
           patterns: sanitizeTextEntries(parsed?.patterns, 3),
           gotchas: sanitizeTextEntries(parsed?.gotchas, 3),

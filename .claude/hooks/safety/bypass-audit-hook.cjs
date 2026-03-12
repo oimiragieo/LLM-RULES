@@ -297,8 +297,8 @@ function detectBypass(params) {
   let matchedRecord = null;
   for (const line of lines) {
     try {
-      const record = JSON.parse(line);
-      if (record.type !== 'block_verdict') continue;
+      const { data: record } = safeParseJSON(line, null);
+      if (!record || record.type !== 'block_verdict') continue;
       if (record.tool !== tool) continue;
 
       const normalizedRecord = (record.filePath || '').replace(/\\/g, '/');
@@ -328,8 +328,8 @@ function detectBypass(params) {
   let cumulativeBypassCount = 0;
   for (const line of lines) {
     try {
-      const r = JSON.parse(line);
-      if (r.type === 'bypass_confirmed') cumulativeBypassCount++;
+      const { data: r } = safeParseJSON(line, null);
+      if (r && r.type === 'bypass_confirmed') cumulativeBypassCount++;
     } catch (_) {
       /* skip */
     }

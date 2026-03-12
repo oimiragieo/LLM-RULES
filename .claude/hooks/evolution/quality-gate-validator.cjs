@@ -355,19 +355,19 @@ async function main() {
         // Best-effort
       }
       console.log(JSON.stringify({ result: 'block', message }));
-      process.exit(2);
+      process.exit(0);
     } else {
       // Default to warn
       console.log(JSON.stringify({ result: 'warn', message }));
       process.exit(0);
     }
   } catch (err) {
-    // Fail open on errors to avoid blocking legitimate work
+    // Fail CLOSED on errors (SEC-008 compliance for security hooks)
     if (process.env.DEBUG_HOOKS) {
       console.error('quality-gate-validator error:', err.message);
       console.error('Stack trace:', err.stack);
     }
-    process.exit(0);
+    process.exit(2);
   }
 }
 

@@ -31,6 +31,7 @@ skills:
   - code-structural-search
   - container-expert
   - debugging
+  - lsp-navigator
   - memory-search
   - ripgrep
   - task-management-protocol

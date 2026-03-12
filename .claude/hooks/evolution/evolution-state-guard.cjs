@@ -311,7 +311,7 @@ async function main() {
         const msg = `[EVOLUTION LOCK] Evolution already in progress (owner: ${currentLock.owner || 'unknown'}, since: ${currentLock.since || 'unknown'}). Cannot start a concurrent evolution run. Wait for the current run to complete or expire (TTL: 30 minutes).`;
         if (enforcement === 'block') {
           console.log(JSON.stringify({ result: 'block', message: msg }));
-          process.exit(2);
+          process.exit(0);
         } else {
           console.log(JSON.stringify({ result: 'warn', message: msg }));
           process.exit(0);
@@ -344,19 +344,19 @@ async function main() {
         // Best-effort
       }
       console.log(JSON.stringify({ result: 'block', message }));
-      process.exit(2);
+      process.exit(0);
     } else {
       // Default to warn
       console.log(JSON.stringify({ result: 'warn', message }));
       process.exit(0);
     }
   } catch (err) {
-    // Fail open on errors to avoid blocking legitimate work
+    // Fail CLOSED on errors (SEC-008 compliance for security hooks)
     if (process.env.DEBUG_HOOKS) {
       console.error('evolution-state-guard error:', err.message);
       console.error('Stack trace:', err.stack);
     }
-    process.exit(0);
+    process.exit(2);
   }
 }
 

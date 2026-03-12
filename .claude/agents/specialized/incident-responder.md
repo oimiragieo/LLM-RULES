@@ -27,6 +27,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - incident-runbook-templates
+  - lsp-navigator
   - memory-search
   - on-call-handoff-patterns
   - postmortem-writing

@@ -40,6 +40,7 @@ skills:
   - github-mcp
   - k8s-manifest-generator
   - kubernetes-flux
+  - lsp-navigator
   - memory-search
   - ripgrep
   - task-management-protocol

@@ -534,6 +534,95 @@ const relPath = path.relative(projectRoot, filePath).replace(/\\/g, '/');
 
 This is Sharp Edge SE-01 in the codebase. See `.claude/rules/sharp-edges.md` for full details.
 
+## LSP 3.17 Features (2025+ — typescript-language-server 5.x)
+
+LSP 3.17 (widely deployed by 2025) added capabilities not covered in the base operation reference. These are supported by `typescript-language-server` 5.x, the LSP server for TypeScript/JavaScript workspaces.
+
+### New Operations Table
+
+| Operation                  | Protocol Method                     | Purpose                                     | Best For                                                     |
+| -------------------------- | ----------------------------------- | ------------------------------------------- | ------------------------------------------------------------ |
+| `lsp_inlayHint`            | `textDocument/inlayHint`            | Inline parameter names and type annotations | TDD pre-RED verification — see parameter names without hover |
+| `lsp_prepareTypeHierarchy` | `textDocument/prepareTypeHierarchy` | Prepare a type hierarchy item at position   | Starting point for supertypes/subtypes traversal             |
+| `lsp_supertypes`           | `typeHierarchy/supertypes`          | Find parent types/interfaces                | Tracing inheritance chains upward                            |
+| `lsp_subtypes`             | `typeHierarchy/subtypes`            | Find all implementors/subclasses            | Finding all concrete implementations of an interface         |
+| `lsp_goToDeclaration`      | `textDocument/declaration`          | Go to TypeScript `declare` statement        | Resolving ambient declarations, `.d.ts` files                |
+
+**Note:** All operations follow the same signature as existing LSP operations: `{ filePath: string (absolute), line: number (1-based), character: number (1-based) }`.
+
+### Inlay Hints (TDD Pre-RED Shortcut)
+
+`lsp_inlayHint` returns inline annotations showing parameter names and inferred types directly in the source — faster than calling `lsp_hover` for each parameter position.
+
+```javascript
+// Before writing a test, get all parameter names in the target function's call site
+lsp_inlayHint({
+  filePath: '/abs/path/src/task-validator.ts',
+  // Range covering the function call (line range)
+  range: { start: { line: 47, character: 0 }, end: { line: 47, character: 80 } },
+});
+// Returns: [{ label: "metadata:", position: {...} }, { label: "schema:", position: {...} }]
+// Now you know the parameter order without reading the full signature
+```
+
+**TDD use case:** Confirm parameter order before writing assertions. Prevents "fails for wrong API reason" red.
+
+### Type Hierarchy (Architect + Code-Reviewer)
+
+```javascript
+// Trace all implementations of an interface
+// Step 1: Prepare hierarchy item
+lsp_prepareTypeHierarchy({
+  filePath: '/abs/path/src/agents/base-agent.ts',
+  line: 5,
+  character: 18, // Position on the interface name
+});
+
+// Step 2: Find all subtypes (implementors)
+lsp_subtypes({
+  filePath: '/abs/path/src/agents/base-agent.ts',
+  line: 5,
+  character: 18,
+});
+// Returns: [DeveloperAgent, QAAgent, ArchitectAgent, ...] — all concrete implementations
+
+// Step 3: Find supertypes (parent interfaces/classes)
+lsp_supertypes({
+  filePath: '/abs/path/src/agents/developer-agent.ts',
+  line: 12,
+  character: 10,
+});
+```
+
+**Agent use cases:**
+
+- `architect`: Map full inheritance hierarchy before architectural decisions
+- `code-reviewer`: Verify all subtypes handle a changed interface method
+- `security-architect`: Find all implementations of security-critical interfaces
+
+### Declaration vs Definition
+
+`lsp_goToDeclaration` differs from `lsp_goToDefinition` for TypeScript ambient declarations:
+
+```javascript
+// goToDefinition → finds the implementation in .ts source
+// goToDeclaration → finds the `declare` statement in .d.ts or ambient block
+
+lsp_goToDeclaration({
+  filePath: '/abs/path/src/hooks/routing-guard.ts',
+  line: 3,
+  character: 20, // Position on an imported type
+});
+// For types imported from @types packages → returns the .d.ts declaration
+// For local types → same as goToDefinition
+```
+
+**When to use:** Resolving types from third-party `@types/*` packages, ambient module declarations, or `declare global` blocks.
+
+### CJS Limitation Applies to All LSP 3.17 Features
+
+The existing CJS limitation (see Anti-Patterns table) applies to all LSP 3.17 operations equally. For `.cjs` files: fall back to ripgrep. These features work best with `.ts` and `.js` (ESM) files.
+
 ## TDD Integration Patterns (2026)
 
 ### Use Case 7: TDD Pre-RED Type Verification
@@ -590,6 +679,37 @@ lsp_findReferences({ filePath: '/abs/routing-table.cjs', line: 23, character: 18
 ```
 
 **When to skip:** Internal private functions with single caller — test through the public API instead.
+
+## LSP 3.18 Features (2026 — Addendum)
+
+LSP 3.18 was ratified in 2025-2026. Key additions relevant to code navigation and TDD workflows:
+
+| Feature                        | Method                              | TDD Relevance                                                                                                       |
+| ------------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `SnippetTextEdit`              | `textDocument/codeAction` responses | Test scaffolding with cursor positioning — editors can auto-insert test function templates with cursor at assertion |
+| Diagnostic `MarkupContent`     | `textDocument/publishDiagnostics`   | Test failure messages can include formatted markdown, code blocks, doc links                                        |
+| Relative file watcher patterns | `workspace/didChangeWatchedFiles`   | More accurate test file change detection for watch mode                                                             |
+| Position encoding negotiation  | `initialize` capability exchange    | Fixes multi-byte character off-by-one errors in files with Unicode identifiers                                      |
+
+**Note on test code lenses (common misconception):**
+LSP 3.18 does **NOT** introduce a standard test lens provider protocol. "Run Test" and "Debug Test" code lenses (the green ▶ buttons in editors) are implemented by IDE-specific extensions (VSCode Test Explorer API, Vitest plugin, Jest runner) — **not** by the LSP standard. This means LSP operations cannot programmatically trigger test execution; use `pnpm test` or Stryker directly.
+
+**`SnippetTextEdit` for test scaffolding:**
+
+```javascript
+// LSP 3.18 allows code actions to return snippet text edits
+// An LSP server could theoretically return a test skeleton with cursor tabs:
+// "void testMyFunction($1) {\n  expect($2).toBe($3);\n}"
+// However, this requires server-side support — typescript-language-server
+// does not currently emit test snippet code actions.
+// Agent-studio use: not actionable today; monitor for ts-server 6.x support.
+```
+
+**Practical impact on lsp-navigator skill:**
+
+- The existing operations (definitions, references, hover, call hierarchy) are unchanged in 3.18
+- `SnippetTextEdit` is primarily an editor UX enhancement; not exposed via lsp-navigator tool
+- Diagnostic `MarkupContent` improves error readability in editors but does not change how `lsp_diagnostics` results appear to agents
 
 ## Memory Protocol (MANDATORY)
 

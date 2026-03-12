@@ -29,6 +29,7 @@ skills:
   - code-structural-search
   - database-architect
   - database-expert
+  - lsp-navigator
   - memory-search
   - ripgrep
   - task-management-protocol

@@ -29,6 +29,7 @@ skills:
   - binary-analysis-patterns
   - code-semantic-search
   - code-structural-search
+  - lsp-navigator
   - memory-forensics
   - memory-search
   - protocol-reverse-engineering

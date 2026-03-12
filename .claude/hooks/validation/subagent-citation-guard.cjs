@@ -91,12 +91,7 @@ async function main() {
     console.error(check.message);
   }
   if (check.result === 'block') {
-    console.log(
-      formatResult({
-        decision: 'block',
-        reason: check.message,
-      })
-    );
+    console.log(formatResult('block', check.message));
     process.exit(2);
   }
 

@@ -120,6 +120,8 @@ export default [
       'update_frequencies.cjs', // Untracked in-progress utility script
       'update_skill_loops.cjs', // Untracked in-progress utility script
       'update_skill_rigidity.cjs', // Untracked in-progress utility script
+      '.tmp/**', // Session temp scripts (not production code, not tracked)
+      'scripts/maintenance/patch-hook-exits.cjs', // Untracked in-progress maintenance script
     ],
   },
 

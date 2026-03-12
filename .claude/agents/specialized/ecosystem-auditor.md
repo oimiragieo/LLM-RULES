@@ -31,6 +31,7 @@ skills:
   - code-semantic-search
   - code-structural-search
   - ecosystem-integrity-scanner
+  - lsp-navigator
   - recommend-evolution
   - token-saver-context-compression
   - verification-before-completion
