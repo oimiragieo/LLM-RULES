@@ -119,6 +119,14 @@ const content = args.content.startsWith('#')
 await writeFile(rulePath, content);
 ```
 
+### Mandatory: Register in index
+
+```bash
+pnpm index-rules
+```
+
+Verify `total_rules` count increased. Rule is invisible to agents until indexed.
+
 ### Step 3: Verify Auto-Discovery
 
 Rules in `.claude/rules/` are automatically loaded by Claude Code. No manual registration needed.
