@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — MEGA EPIC Framework Evolution Wave 1 + 2 (2026-03-13)
+
+Assimilated 17 external repositories. Net additions: +1 agent, +9 skills, +10 rule files.
+
+#### New Skills (4)
+
+- **`transcription`** — Audio/video-to-text via Whisper AI. Supports local inference (faster-whisper, no API key required) and cloud backend (OpenAI Whisper API). Output formats: SRT, VTT, JSON, plain text.
+- **`tts-generation`** — Text-to-speech synthesis via OpenAI TTS, ElevenLabs, or gTTS (free). Configurable voice, speed, and format. Requires `OPENAI_API_KEY` or `ELEVENLABS_API_KEY`; gTTS requires no key.
+- **`deep-research`** — 5-phase autonomous research pipeline: scope definition, multi-source search, synthesis, validation, and citation generation. Uses `EXA_API_KEY` for enhanced semantic search (optional).
+- **`browser-automation`** — Playwright-based web automation for data extraction, form filling, multi-step navigation, and authenticated session management.
+
+#### Updated Skills (7)
+
+- **`assimilate`** — Upgraded to CLI-Anything 7-phase integration pipeline with improved conflict detection and registry reconciliation.
+- **`diagram-generator`** — Interactive HTML output with dark mode support. Added git history, mind map, and timeline diagram types.
+- **`lsp-navigator`** — Language server configuration for 6 languages: clangd (C/C++), gopls (Go), pyright (Python), rust-analyzer (Rust), tsserver (TypeScript), jdtls (Java).
+- **`multi-agent-architecture-reference`** — Expanded with AutoGen, CrewAI, AgencySwarm, and BabyAGI patterns.
+- **`cloud-run`** — Updated with GCP Cloud Run MCP tool patterns.
+- **`figma`** — Updated with Figma MCP server tools (12 tools: design context, code connect, variables API).
+- **`vercel-deploy`** — Updated with latest Vercel CLI framework detection and deploy configuration.
+
+#### New Agents (1)
+
+- **`legacy-modernizer`** — Codebase modernization specialist. Handles jQuery-to-React migrations, CommonJS-to-ESM conversions, Python 2-to-3 upgrades, and general dependency modernization workflows.
+
+#### Updated Agents (1)
+
+- **`aso-specialist`** — Updated with App Store Connect CLI patterns covering build submission, TestFlight distribution, code signing, and Xcode Cloud orchestration.
+
+#### New Rules (10)
+
+Wave 1: `go-development`, `rust-development`, `typescript-development`, `docker-development`, `refactoring-patterns`
+
+Wave 2: `lancedb`, `supabase`, `playwright-testing`, `astro`, `solidjs`
+
+#### Registry
+
+- Agents: 75 (+1)
+- Skills: 282 (+9)
+- Rule files: +10
+
+#### Source repositories assimilated
+
+CLI-Anything, awesome-openclaw-skills, awesome-agent-skills, awesome-claude-code-subagents, modelcontextprotocol/servers, mermaid-diagram-plugin, ai-skills (sanjay3290), transcribe-anything, App-Store-Connect-CLI, awesome_ai_agents, claude-plugins-official, awesome-rules, awesome-cursorrules, cloud-run-mcp, claude-quickstarts, vercel, figma/mcp-server-guide
+
+---
+
 ### Fixed — Context Saturation Mitigation (2026-03-12)
 
 - **`.claudeignore` Context Bloat Prevention**: Discovered that the native Claude CLI actively and eagerly loads massive root files (like `CHANGELOG.md`, `README.md`, `GETTING_STARTED.md`) into its invisible System prompt context upon startup. This incurred a hidden 65,000+ token penalty at boot, instantly saturating the 200,000 API token limit and causing silent subagent crashes ("Prompt is too long").

@@ -46,6 +46,23 @@ Repeated queries are auto-cached (~5ms hit vs ~800ms miss). BM25 index auto-upda
 
 `search:tokens` shows file/directory sizes, token estimates, and recommends splitting oversized source files (>15K tokens) into smaller modules for better AI agent readability.
 
+### Optional API Keys (AI-Powered Skills)
+
+Some skills require external API keys. All are optional — core functionality works without them.
+
+```bash
+# Copy the example env file and add your keys
+cp .env.example .env
+```
+
+| Variable            | Used by                                      | Notes                              |
+| ------------------- | -------------------------------------------- | ---------------------------------- |
+| `OPENAI_API_KEY`    | `tts-generation` (OpenAI TTS), `transcription` (cloud backend) | Optional — local alternatives available |
+| `ELEVENLABS_API_KEY`| `tts-generation` (ElevenLabs voices)         | Optional — OpenAI TTS or gTTS (free) as fallback |
+| `EXA_API_KEY`       | `deep-research` (enhanced semantic search)   | Optional — web search works without it |
+
+Skills that work without any API key: `transcription` (local via faster-whisper), `tts-generation` (gTTS, free), `browser-automation`, `diagram-generator`, all code/routing skills.
+
 ### Dynamic Agent Worktrees
 
 Agent Studio dynamically supports Git Worktree isolation for dangerous/massive subagent tasks. The orchestrator spawns `isolated-*` agents (e.g., `isolated-developer`, `isolated-architect`) for high-risk or sweeping refactors. These agents inherently use the `-w` flag in Claude Code to sandbox their work in isolated branches—preventing race conditions during parallel execution.
