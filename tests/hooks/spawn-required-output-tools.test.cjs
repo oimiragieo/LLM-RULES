@@ -60,8 +60,13 @@ test('cross-agent: explicit allowed_tools without Write/Edit are blocked when re
       const result = runSpawn(agentType, ['TaskUpdate', 'TaskList']);
       assert.equal(
         result.status,
-        2,
-        `expected block for ${agentType}, got ${result.status}: ${result.stdout || result.stderr}`
+        0,
+        `expected block (exit 0) for ${agentType}, got ${result.status}: ${result.stdout || result.stderr}`
+      );
+      assert.match(
+        result.stdout,
+        /deny|block/i,
+        `expected block JSON for ${agentType}`
       );
       assert.match(
         result.stdout,
