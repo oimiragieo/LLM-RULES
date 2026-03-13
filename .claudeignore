@@ -1,0 +1,12 @@
+# Stop Claude Code CLI from eagerly loading massive documentation files into context
+CHANGELOG.md
+GETTING_STARTED.md
+README.md
+GEMINI.md
+
+# Explictly exempt the global router rules
+!CLAUDE.md
+
+# Stop loading entire sqlite / binary DB dumps by accident
+.claude/context/**
+.claude/data/**
