@@ -188,3 +188,19 @@
 - **spawn-token-guard**: Correctly registered as first Task PreToolUse hook, correctly fail-open (all exits are 0).
 - **Memory files**: learnings 11KB, decisions 14KB, issues 15KB — all within thresholds after 2026-03-12 bloat fix.
 - **Agent search coverage**: 68/68 non-orchestrator agents have pnpm search:code + token-saver references.
+
+## EPIC Ecosystem Audit — 2026-03-12 (commit 779bf82b)
+
+**P0 Fixed:** `routing-guard-core.impl.cjs` — block path was exiting 0 instead of 2. Fix: `resolveExitCode()` helper extracted to keep complexity ≤50. 5 tests that were failing now pass (94/94 total).
+
+**P1 Fixed:** CLAUDE.md agent count "73 agents" corrected to "74 agents" in Section 3 and reference index.
+
+**Shell-injection-validator:** Already uses `safeParseJSON` correctly — auditor finding from prior session was stale.
+
+**TDD Skill v1.3:** Added TDP (Test-Driven Prompting), 3-consecutive-pass flakiness gate, memory-search in Step 0, and Autonomous TDD with ralph-loop section.
+
+**ralph-loop Skill:** Added TDD State Schema `{scenarios[], completedScenarios[], currentScenario, evidenceLog[]}` with resumption pattern.
+
+**Spawn failures:** Context >100K tokens causes "Prompt is too long" on ALL agent spawns. Pattern: switch to direct execution mode.
+
+**ESLint complexity gate:** Adding a ternary inside a function at complexity=50 blocks commit. Always extract to named helper function.

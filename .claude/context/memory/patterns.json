@@ -260,5 +260,72 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "c552d3f4c52bd4c066553f7b8b38515834d5533f"
+  },
+  {
+    "text": "Research-backed skill updates: cite arXiv papers and authoritative sources in skill version commits (e.g. TDD v1.3 cites arXiv:2510.23761, latent.space/anita-tdd). Provides stronger evidence trail and justifies breaking protocol changes. Apply to all future skill modernization tasks.",
+    "area": "main",
+    "timestamp": "2026-03-13T00:52:22.292Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "84fa42a6fccebd192ce4d9b55376914ad4412f2b"
+  },
+  {
+    "text": "SEC-008 exit-code audit: always verify security hooks exit 2 (fail-closed) not exit 0 (fail-open) in block path. routing-guard exit-0 bug caused 5 test failures and was a bypass vector. resolveExitCode() helper pattern: extract exit-code logic to named helper when ESLint complexity budget is tight.",
+    "area": "main",
+    "timestamp": "2026-03-13T00:53:30.240Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "bd0862f3251f0bf02e8889c210b9af36015edfa3"
+  },
+  {
+    "text": "TDD flakiness gate: require 3 consecutive passes for async/hook/nondeterministic tests before declaring GREEN. Prevents flaky test false positives from blocking TDD cycles. Source: tdd skill v1.3 (commit 779bf82b, 2026-03-12).",
+    "area": "main",
+    "timestamp": "2026-03-13T00:57:48.456Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "6e37df34fe20a51b402912408bb3ff37d6769b7a"
+  },
+  {
+    "text": "TDP (Test-Driven Prompting): inject verbatim failing test output into developer spawn prompt. Reduces hallucination of fix strategy; agent sees exact assertion errors rather than inferred context. Source: tdd skill v1.3 / 2026 industry standard.",
+    "area": "main",
+    "timestamp": "2026-03-13T00:57:48.593Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "7c3ac4b5b84792a3dd3487ad77995dfe676a4079"
+  },
+  {
+    "text": "Meta-reflection quality is bounded by source task metadata quality. When source tasks have full metadata (summary, filesModified, outputArtifacts), meta-reflections produce accurate secondary assessments with actionable curation. When source tasks have fallback strings (\"Task X completed without summary metadata\"), the reflection chain breaks and memoryWrites array stays empty. Enforce pre-completion-validation.cjs to prevent fallback strings upstream.",
+    "area": "main",
+    "timestamp": "2026-03-13T01:39:53.250Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "d7cb387baec9ad8e280d93f407830375611118e0"
+  },
+  {
+    "text": "Reflection spawn task ID duality: when reflection-agent is spawned via Task(), it has TWO task IDs to close — its own internal reflection-task-* ID (via processedReflectionIds handshake) AND the router-level task ID (e.g., task #7). Without explicit instruction in spawn prompt to close both, the router drain gate never clears. Fix: always include in reflection spawn prompt: After atomic handshake, ALSO call TaskUpdate({ taskId: <router-task-id>, status: completed }).",
+    "area": "reflection",
+    "type": "pattern",
+    "createdAt": "2026-03-13T01:40:00.000Z",
+    "source": "reflection-agent meta-reflection 2026-03-13"
+  },
+  {
+    "text": "reflection-log.jsonl recovery: when reflection spawn receives fallback string, check reflection-log.jsonl for earlier entry with same taskId — real summary may have been captured by first post-completion-chain.cjs invocation. Formalize as Step 1.3 in reflection workflow.",
+    "area": "main",
+    "timestamp": "2026-03-13T03:47:01.601Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "916a6041cfa3e06c79f4cb7b52d75a95a84a72ab"
   }
 ]

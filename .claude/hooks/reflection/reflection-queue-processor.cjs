@@ -286,7 +286,11 @@ Task({
 function generateSpawnRequest(entry) {
   const reason = buildReason(entry);
   const taskPrompt = buildTaskPrompt(entry);
-  const id = `${entry.trigger}:${entry.timestamp}:${entry.taskId || entry.context || ''}`;
+  const rawId = `${entry.trigger}:${entry.timestamp}:${entry.taskId || entry.context || ''}`;
+  const id = `reflection-${rawId
+    .replace(/[^a-z0-9-]/gi, '-')
+    .toLowerCase()
+    .slice(0, 40)}`;
 
   return {
     id,
@@ -445,7 +449,7 @@ Instructions:
 3. Update memory files as appropriate
 4. Document any patterns or issues discovered
 5. ATOMIC COMPLETION: In your final TaskUpdate call, you MUST use this exact format:
-   TaskUpdate({ taskId: "${reflectionTaskId}", status: "completed", metadata: { processedReflectionIds: ["${id}"] } })
+   TaskUpdate({ taskId: "${reflectionTaskId}", status: "completed", metadata: { processedReflectionIds: ["${reflectionTaskId}"] } })
    Your reflection task ID is: ${reflectionTaskId}`;
 }
 

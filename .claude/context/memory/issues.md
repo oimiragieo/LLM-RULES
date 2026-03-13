@@ -1,3 +1,41 @@
+## missing_task_summary Self-Healing Threshold Exceeded — P0 Escalation (2026-03-13)
+
+**Issue**: `missing_task_summary` failure class has reached count = **9** as of 2026-03-13T01:16:15Z. Self-healing trigger threshold is 5+ repeated failures. First documented 2026-02-14, confirmed across 4+ sessions.
+
+**Impact**: 9 consecutive task completions without metadata summary in the 2026-03-13 session. Reflection agent cannot produce scores. Audit trail gaps for tasks 1, 4, 6, 7, 8, 9, and related reflection tasks.
+
+**Root Causes**:
+
+1. EPIC pipeline context overflow causes tasks to be blocked/auto-closed without work or metadata
+2. `pre-completion-validation.cjs` does not detect the fallback string "Task X completed without summary metadata"
+3. Stale-task auto-close template does not include descriptive summary text
+
+**Required Actions (P0)**:
+
+- Add fallback-string detection to `pre-completion-validation.cjs`: block if `metadata.summary.includes("completed without summary metadata")`
+- Invoke `recommend-evolution` for self-healing: enforce summary metadata at task completion boundary
+- Update stale-task auto-close template to include: "auto-closed: stale >{ageMin}min — context overflow blocked spawn, no work executed"
+
+**Priority**: P0 (self-healing threshold exceeded — 9 occurrences, threshold 5)
+
+Source: reflection of task_completion:2026-03-13T00:52:53.501Z:6
+
+---
+
+## TaskUpdate metadata type error — recurring P1 (2026-03-12)
+
+**Issue**: Agents pass `metadata` as a JSON string instead of a record object when calling TaskUpdate. Causes InputValidationError and silent task completion failure.
+
+**Occurrences**: 3 sessions confirmed (2026-02-14, 2026-03-08, 2026-03-12). Transcript toolu_01QYi7KuJrms7UAzZUXdAGfH and toolu_01G9bMwAUj8WpXP27K2sffNf both showed this pattern.
+
+**Root Cause**: Agent inlines JSON.stringify() or wraps the object in a template string before passing to TaskUpdate.
+
+**Solution**: Add metadata type validation to pre-completion-validation.cjs — reject if typeof metadata === 'string'.
+
+**Priority**: P1 (recurring, affects reflection handshake reliability)
+
+---
+
 ## Context Overflow at EPIC Pipeline Phase 3 (2026-03-12)
 
 **Issue**: EPIC ecosystem audit plan (task #1, 22 atomic tasks, 3 phases) hit 150K token limit when router attempted to spawn Phase 3 implementation agents. Tasks 6, 7, 8 were blocked. All audit phases complete but implementation deferred to fresh session.
@@ -28,6 +66,25 @@
 **Mitigation**: Split EPIC pipelines at Phase boundary explicitly — Phase 1-2 (audit/analysis) in Session A, Phase 3+ (implementation) in fresh Session B. Use session-handoff skill to transfer state. Do NOT attempt all phases in a single session for EPIC+ complexity.
 **Status**: OPEN — no automated enforcement; requires manual discipline at pipeline design time.
 **Evidence**: session-gap-log.jsonl entry 2026-03-12T00:00:00Z, context: ecosystem-audit-epic
+
+---
+
+## Missing TaskUpdate Summary — Threshold Crossed (P0 — 2026-03-13)
+
+**Issue**: `failure-recurrence.json` records `missing_task_summary` count = 9+ (tasks 7, 8, 9, 11 in the 2026-03-13 session batch are all fallback strings). This crosses the recommend-evolution threshold (5+ recurring failures of same class). The reflection-log.jsonl entries for these tasks show `memoryWrites: []` and zero learnings extracted.
+
+**Impact**: Reflection pipeline produces no learnings for approximately 30-40% of completed tasks. Audit trail is compromised for pipeline phases that hit context limits or complete without explicit `metadata.summary`.
+
+**Root Cause**: Agents under high context pressure complete tasks via `TaskUpdate(completed)` without populating `metadata.summary`. The `pre-completion-validation.cjs` hook fires a warning but does not block. The fallback string "Task N completed without summary metadata" is inserted by the hook or post-completion-chain.cjs.
+
+**Resolution Required**:
+
+1. Upgrade `pre-completion-validation.cjs` to hard-block `TaskUpdate(completed)` when `metadata.summary` is absent or is the fallback string (P0 — change to fail-closed for security hooks category)
+2. OR: Teach the hook to synthesize a summary from `metadata.filesModified + metadata.outputArtifacts` when summary is missing (graceful fallback)
+3. Consider evolution recommendation: `metadata-summary-enforcer` hook or updated `pre-completion-validation.cjs` enforcement mode
+
+**Priority**: P0 (9+ confirmed occurrences; crosses evolution trigger threshold)
+**Source**: reflection of tasks 7, 8, 9 (2026-03-13T01:16:12-13Z) — all fallback metadata
 
 ---
 
@@ -171,3 +228,78 @@
 - [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-12T21:43:00.464Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-12T21:43:00.483Z
+
+## Skill-Updater Bypass During EPIC Implementation (2026-03-12)
+
+**Issue**: EPIC remediation task 779bf82b modified `.claude/skills/tdd/SKILL.md` and `.claude/skills/ralph-loop/SKILL.md` via direct Edit, bypassing the skill-updater creator workflow. The remediation plan itself explicitly required `Skill({ skill: 'skill-updater' })` for all B-batch items. CREATOR_GUARD was apparently in warn/off mode during implementation.
+
+**Impact**: Audit trail gap; creator workflow bypass; unified-creator-guard.cjs did not block the writes. End state is functionally correct but the process integrity was violated.
+
+**Solution**: Enforce CREATOR_GUARD=block by default in all sessions. Add detection to the post-session reflection check for direct edits to protected paths.
+
+**Priority**: P2 (process compliance, not functional regression)
+
+**Status**: Open
+
+---
+
+## [P1] reflection-agent fails to call TaskUpdate(completed) on router-spawned tasks — 2026-03-12
+
+**Pattern:** When the router spawns reflection-agent via `Task()`, the agent creates its own internal task IDs (e.g. `reflection-task-completion-*`) but does NOT call `TaskUpdate(completed)` on the **router's** task ID (e.g. task #7, #8, #9). Tasks stay `in_progress` indefinitely — router drain gate never clears.
+
+**Evidence:** Tasks 7, 8, 9 all stuck `in_progress` after reflection agents completed 23–28 tool uses each. Had to be manually closed.
+
+**Root cause:** Reflection spawn prompts include the agent's own `taskId` for the atomic handshake, but NOT an instruction to also close the router-level task that spawned them. The two task IDs are different.
+
+**Fix required:** Every reflection-agent spawn prompt must include:
+
+```
+After your atomic TaskUpdate handshake, ALSO call:
+TaskUpdate({ taskId: "<router-task-id>", status: "completed" })
+```
+
+Or: reflection-agent.md should explicitly instruct the agent to close BOTH its internal reflection task AND the router task that spawned it.
+
+**Recurrence:** 3 of 5 reflection agents in this session failed. Treat as systemic, not one-off.
+
+---
+
+## missing_task_summary — Systemic P1, count 9 (2026-03-13)
+
+**Issue**: Agents complete tasks via TaskUpdate without providing a `summary` field in `metadata`. The reflection queue receives the fallback string "Task X completed without summary metadata". This makes scoring impossible (dataQuality: insufficient) and blocks meaningful learning extraction.
+
+**Count**: 9 confirmed occurrences tracked in `failure-recurrence.json` (classes.missing_task_summary.count = 9). Tasks 1, 4, 6, 7, 8, 9 in current session all missing summary. Meets threshold (5+) for evolution recommendation.
+
+**Root Cause**: Agents either (a) call `TaskUpdate({ status: 'completed' })` without metadata, (b) pass metadata as a string, or (c) omit the `summary` key from metadata. The `pre-completion-validation.cjs` hook is supposed to enforce this but is not blocking or is not being triggered for all task completions.
+
+**Evidence from reflection log**: Tasks 7, 8, 9 all share identical recurrence metadata showing count 7→8→9 incrementing.
+
+**Fix required**:
+
+- `pre-completion-validation.cjs`: enforce `metadata.summary` is a non-empty string (not just metadata type check)
+- Consider adding explicit `summary` requirement to universal-agent-spawn.md template
+- Router spawn prompts should include a reminder: "Your TaskUpdate(completed) MUST include metadata.summary as a string"
+
+**Priority**: P1 (9 occurrences; prevents reflection-agent from scoring work; breaks audit trail)
+
+**Evolution trigger**: 9 occurrences exceeds the `repeated_error` threshold (5+). Recommend: add `summary` enforcement to `pre-completion-validation.cjs` or spawn a hook-updater task.
+
+Source: reflection of task 9, timestamp 2026-03-13T01:16:13.740Z
+
+---
+
+## duplicate_trigger_fallback: New post-completion-chain.cjs Sub-type (2026-03-13)
+
+**Issue**: `post-completion-chain.cjs` fires twice for the same task within 14 seconds when devops agents use immediate git operations after TaskUpdate. The second invocation loses the task metadata reference and produces the fallback string "Task X completed without summary metadata". This is a distinct failure sub-type from the standard `missing_task_summary` (agent omission).
+
+**Evidence**: Task 13 reflection-log.jsonl shows two entries for same taskId — 01:45:58Z (real summary: "lint+format passed, drain gate fix committed at ee26bec2") and 01:46:12Z (fallback string). Both triggered reflection spawns.
+
+**Root Cause**: post-completion-chain.cjs has no idempotency guard. Two rapid TaskUpdate events from devops commit operations trigger double invocation.
+
+**Recovery Technique**: Check reflection-log.jsonl for earlier entry with same taskId before concluding insufficient data — real summary may have been captured by the first invocation. This should be formalized as Step 1.3 in the reflection workflow.
+
+**Required Fix**: Add idempotency guard to post-completion-chain.cjs using taskId as deduplication key (session-scoped Set or timestamp-delta check >30s).
+
+**Priority**: P1
+
+Source: reflection of task 13 (reflection-task-completion-2026-03-13t01-46-12-729z), 2026-03-13T02:00:00Z

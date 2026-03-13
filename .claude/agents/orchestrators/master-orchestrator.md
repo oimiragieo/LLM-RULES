@@ -112,14 +112,36 @@ Read('.claude/docs/AGENT_ROUTING_CARD.md')
 
 ## Responsibilities
 
-1. **Step 0 (Pre-flight)**: Before starting any new work, check `.claude/context/runtime/reflection-spawn-request.json`. If requests exist, spawn `reflection-agent` to batch process them.
+1. **Step 0 (Pre-flight)**: Before starting any new work, check `.claude/context/runtime/reflection-spawn-request.json`. If requests exist, spawn `reflection-agent` to batch process them using the `Task()` tool for EACH request.
+   - **MANDATORY FORMAT**: You MUST map the JSON fields correctly:
+
+     ```javascript
+     Task({
+       task_id: request.id,
+       subagent_type: request.subagent_type,
+       description: request.description,
+       prompt:
+         request.prompt +
+         '\n\nRead .claude/context/runtime/session-gap-log.jsonl for router gap observations this session.',
+     });
+     ```
+
    - **Requirement**: The spawned agent MUST include `metadata: { processedReflectionIds: [...] }` in its final `TaskUpdate` to trigger automated cleanup.
+
 2. **Atomic Handshake**: Do NOT manually delete reflection files. The system will automatically remove processed requests upon successful `TaskUpdate(completed)`.
 3. **Scope**: Spawn `Planner` to breakdown requests.
 4. **Review**: Rate plans (7/10 minimum) using `response-rater`.
 5. **Select Agents**: Before spawning agents for any phase, consult `AGENT_ROUTING_CARD.md` to select the most specific specialist available. Never default to `developer` when a language, framework, mobile, or domain specialist matches the task.
 6. **Coordinate**: Spawn specialized agents via `Task`, using the correct specialist from the routing card.
 7. **Monitor**: Track progress and update `.claude/context/runtime/dashboard.md`.
+   - **Abandoned Tasks Detection**: If you observe tasks stuck in `in_progress` because an agent previously finished (e.g. used all its tool uses) but failed to call `TaskUpdate({status: "completed"})`, you MUST:
+     1. Close the task manually using `TaskUpdate`
+     2. Record a gap observation immediately using `Bash`:
+
+        ```bash
+        echo "{\"type\":\"agent_failure(abandoned_task)\", \"description\":\"Agent abandoned task <id> without calling TaskUpdate(completed)\", \"taskId\":\"<id>\"}" >> .claude/context/runtime/session-gap-log.jsonl
+        ```
+
 8. **Synthesize**: Combine outputs into a final response for the user.
 
 ## Execution Rules

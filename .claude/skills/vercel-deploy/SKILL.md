@@ -8,7 +8,7 @@ metadata:
   source: vercel-labs/agent-skills
 verified: true
 lastVerifiedAt: 2026-02-22T00:00:00.000Z
-version: 1.0.0
+version: 1.1.0
 tools: []
 ---
 
@@ -328,6 +328,82 @@ Add rewrites for SPA frameworks:
 | Hardcoded env vars in deploy command | Secrets exposed in shell history and logs        | Configure env vars in Vercel project settings    |
 | Ignoring post-deploy build logs      | Silent failures go undetected                    | Always check logs after deployment               |
 | No framework detection verification  | Wrong settings cause build failures              | Verify auto-detected framework in project config |
+
+## Framework Detection Patterns
+
+Vercel CLI auto-detects frameworks by checking project files in this priority order:
+
+| Framework        | Detection File         | Build Command           | Output Dir |
+| ---------------- | ---------------------- | ----------------------- | ---------- |
+| Next.js          | `next.config.*`        | `next build`            | `.next`    |
+| Remix            | `remix.config.*`       | `remix build`           | `build`    |
+| SvelteKit        | `svelte.config.*`      | `vite build`            | `build`    |
+| Astro            | `astro.config.*`       | `astro build`           | `dist`     |
+| Nuxt             | `nuxt.config.*`        | `nuxt build`            | `.output`  |
+| Vite             | `vite.config.*`        | `vite build`            | `dist`     |
+| Gatsby           | `gatsby-config.*`      | `gatsby build`          | `public`   |
+| Angular          | `angular.json`         | `ng build`              | `dist`     |
+| Vue CLI          | `vue.config.*`         | `vue-cli-service build` | `dist`     |
+| Create React App | `react-scripts` in pkg | `react-scripts build`   | `build`    |
+| Docusaurus       | `docusaurus.config.*`  | `docusaurus build`      | `build`    |
+| Eleventy         | `.eleventy.js`         | `eleventy`              | `_site`    |
+| Hugo             | `config.toml` (Hugo)   | `hugo`                  | `public`   |
+| Jekyll           | `_config.yml` (Jekyll) | `jekyll build`          | `_site`    |
+| Static HTML      | `index.html` only      | none                    | `.`        |
+
+When auto-detection fails, specify framework explicitly:
+
+```bash
+vercel --build-env FRAMEWORK_PRESET=nextjs
+```
+
+## Environment Variable Management
+
+### Setting Environment Variables
+
+```bash
+# Add env var (prompts for value)
+vercel env add MY_VAR production
+
+# Add from .env file
+vercel env pull .env.local
+
+# List all env vars
+vercel env ls
+
+# Remove env var
+vercel env rm MY_VAR production
+```
+
+### Environment Scopes
+
+| Scope         | When Applied            | Use For           |
+| ------------- | ----------------------- | ----------------- |
+| `production`  | Production deploys only | API keys, secrets |
+| `preview`     | Preview deploys (PRs)   | Staging configs   |
+| `development` | `vercel dev` only       | Local development |
+
+### Monorepo Configuration
+
+For pnpm/npm/yarn workspaces:
+
+```json
+{
+  "buildCommand": "cd ../.. && pnpm build --filter=my-app",
+  "installCommand": "pnpm install --filter=my-app...",
+  "rootDirectory": "packages/my-app"
+}
+```
+
+Set root directory in Vercel dashboard or `vercel.json`:
+
+```json
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm turbo build --filter=web",
+  "outputDirectory": "apps/web/.next"
+}
+```
 
 ## Memory Protocol (MANDATORY)
 

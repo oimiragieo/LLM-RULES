@@ -1,7 +1,7 @@
 ---
 name: terraform-infra
 description: Terraform infrastructure operations with safety controls
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -135,6 +135,93 @@ terraform apply tfplan
 | Init failed  | Check provider credentials    |
 | State locked | Check for other operations    |
 | Plan failed  | Review error output carefully |
+
+## Module Development
+
+### Creating Reusable Modules
+
+Structure modules following HashiCorp conventions:
+
+```
+modules/
+  vpc/
+    main.tf          # Resource definitions
+    variables.tf     # Input variables
+    outputs.tf       # Output values
+    versions.tf      # Required provider versions
+    README.md        # Module documentation
+```
+
+### Module Best Practices
+
+| Practice              | Description                                    |
+| --------------------- | ---------------------------------------------- |
+| Single responsibility | Each module manages one logical resource group |
+| Typed variables       | Use `type` constraints on all variables        |
+| Validation blocks     | Add `validation {}` for input constraints      |
+| Sensitive outputs     | Mark secrets with `sensitive = true`           |
+| Version constraints   | Pin module source versions                     |
+
+### Module Source Patterns
+
+```hcl
+# Local module
+module "vpc" {
+  source = "./modules/vpc"
+}
+
+# Terraform Registry
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.0"
+}
+
+# Git source (pinned tag)
+module "vpc" {
+  source = "git::https://github.com/org/modules.git//vpc?ref=v1.2.0"
+}
+```
+
+## Provider Development Patterns
+
+### Custom Provider Skeleton
+
+```go
+package provider
+
+import (
+    "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+)
+
+func Provider() *schema.Provider {
+    return &schema.Provider{
+        Schema: map[string]*schema.Schema{
+            "api_key": {
+                Type:        schema.TypeString,
+                Required:    true,
+                Sensitive:   true,
+                DefaultFunc: schema.EnvDefaultFunc("API_KEY", nil),
+            },
+        },
+        ResourcesMap: map[string]*schema.Resource{
+            "myservice_resource": resourceMyServiceResource(),
+        },
+    }
+}
+```
+
+### Testing Modules
+
+```bash
+# Validate module syntax
+cd modules/vpc && terraform validate
+
+# Run module tests (Terraform 1.6+)
+terraform test
+
+# Plan with module
+terraform plan -var-file=examples/basic.tfvars
+```
 
 ## Iron Laws
 

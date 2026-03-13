@@ -1,3 +1,13 @@
+## ADR-2026-03-12-065: Multi-Model Review Must Run in Fresh Session (2026-03-12)
+
+**Status:** ACCEPTED (pattern)
+**Date:** 2026-03-12
+**Trigger:** Task 5 Phase 3 multi-model review (Gemini/Codex) blocked by 24 context-length-exceeded errors after long Phases 1 and 2.
+**Decision:** Multi-model review phases that follow heavy analysis+implementation sequences MUST run as the first phase of a fresh session. The EPIC pipeline plan template must include an explicit "Fresh Session Gate" checkpoint before multi-model review steps. "Start review in fresh session" must appear in the handoff note of the preceding implementation task.
+**Consequences:** Adds an explicit session boundary in EPIC pipelines. Slightly extends wall-clock time but prevents review phase from being silently dropped due to context overflow.
+
+---
+
 ## ADR-2026-03-12-064: Security Audit Confirms shell:false Compliance Baseline (2026-03-12)
 
 **Status:** ACCEPTED (observation)
@@ -173,3 +183,26 @@ All three now pass 8/0/3 validation.
 **Rationale:** These agents' primary workflows do not require compiler-level symbol navigation. LSP is most valuable for agents doing deep code authoring or refactoring (developer, code-reviewer, architect, qa, code-simplifier, security-architect, typescript-pro, etc.). Forcing lsp-navigator on ops/infra agents adds noise to their skills list without functional benefit.
 **Evidence:** Agent wiring compliance audit 2026-03-11 — all 18 code-work agents that do need LSP already have it. The 9 agents missing it have ops/infra/research primary workflows.
 **Next action:** Add lsp-navigator to these 9 agents in next agent update cycle (non-urgent).
+
+## ADR-2026-03-12-066: Extend drain gate to include reflection queue check
+
+**Date:** 2026-03-12
+**Status:** Decided
+
+**Problem:** Reflections queued during a pipeline (via TaskUpdate post-tool hooks) are not caught until the next UserPromptSubmit, because Step 0 only fires on new user messages. Router writes deliverable before reflections are processed.
+
+**Decision:** The Completion Reporting drain gate (CLAUDE.md Section 2) must include a reflection queue check as step 3:
+
+1. TaskList() → zero tasks
+2. Read reflection-spawn-request.json → if entries > 0, spawn reflection-agents BEFORE writing deliverable
+3. Only then write the completion summary
+
+**Why not a per-prompt validator:** Expensive (fires on every response). The drain gate check is free — it only costs 1 file read at natural pipeline completion points, not on every single router response.
+
+**Implementation needed:**
+
+- Update CLAUDE.md "Completion Reporting (Drain Gate)" section
+- Update router-decision.md Step drain gate
+- No hook changes needed — infrastructure already works correctly
+
+**Root cause of 2026-03-12 incident:** Drain gate only checked TaskList(), not reflection queue. 5 reflections left unprocessed until next UserPromptSubmit.

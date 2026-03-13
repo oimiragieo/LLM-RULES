@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-12T22:51:30.918Z",
+  "generatedAt": "2026-03-13T04:28:38.631Z",
   "metadata": {
-    "totalSkills": 276,
+    "totalSkills": 278,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-12T22:51:30.918Z",
+    "lastValidated": "2026-03-13T04:28:38.632Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7010,6 +7010,29 @@
       "priority": 3,
       "aliasOf": null
     },
+    "cloud-run": {
+      "name": "cloud-run",
+      "displayName": "Cloud Run",
+      "category": "Other",
+      "domain": "other",
+      "description": "Google Cloud Run deployment, service management, traffic splitting, and log inspection. Use when deploying containerized apps to Cloud Run, managing services, or inspecting Cloud Run logs.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "cloud-run"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "cron-runner": {
       "name": "cron-runner",
       "displayName": "Cron Runner",
@@ -7101,6 +7124,29 @@
       "tags": [
         "other",
         "feedback-analysis"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "figma": {
+      "name": "figma",
+      "displayName": "Figma",
+      "category": "Other",
+      "domain": "other",
+      "description": "Figma design-to-code workflow. Read Figma files, inspect components, extract design tokens, and translate designs to implementation. Use when working with Figma designs, extracting styles, or building design systems.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "figma"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7620,10 +7666,12 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cloud-run",
         "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
+        "figma",
         "frontend-design",
         "heartbeat",
         "lsp-navigator",
@@ -8002,10 +8050,12 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cloud-run",
         "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
+        "figma",
         "frontend-design",
         "heartbeat",
         "lsp-navigator",
@@ -8366,10 +8416,12 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cloud-run",
         "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
+        "figma",
         "frontend-design",
         "heartbeat",
         "lsp-navigator",
@@ -8595,10 +8647,12 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cloud-run",
         "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
+        "figma",
         "frontend-design",
         "marketing-content",
         "markitdown-converter",
@@ -8941,8 +8995,10 @@
         "webapp-testing",
         "arxiv-monitor",
         "claude-api",
+        "cloud-run",
         "exa-monitor",
         "feedback-analysis",
+        "figma",
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
@@ -9199,6 +9255,7 @@
         "webapp-testing",
         "brand-compliance",
         "claude-api",
+        "cloud-run",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -9259,6 +9316,7 @@
         "spec-to-code-compliance",
         "claude-api",
         "feedback-analysis",
+        "figma",
         "reddit-researcher",
         "scientific-skills",
         "user-research"
@@ -9517,10 +9575,12 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cloud-run",
         "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
+        "figma",
         "frontend-design",
         "lsp-navigator",
         "marketing-content",
@@ -10744,10 +10804,12 @@
         "arxiv-monitor",
         "brand-compliance",
         "claude-api",
+        "cloud-run",
         "cron-runner",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
+        "figma",
         "frontend-design",
         "lsp-navigator",
         "marketing-content",

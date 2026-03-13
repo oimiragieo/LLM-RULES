@@ -1,7 +1,7 @@
 ---
 name: assimilate
 description: Benchmark external agent frameworks and convert findings into a concrete TDD upgrade backlog for agent-studio evolution.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -101,6 +101,58 @@ Each backlog item must include:
 - target files
 - command-level validation steps
 - rollback/safety notes
+
+## Alternative: Seven-Phase CLI Conversion Pipeline
+
+When assimilating a CLI tool (rather than a full framework), use this streamlined pipeline inspired by CLI-Anything (HKUDS/CLI-Anything):
+
+### Phase A: Analyze
+
+1. Run `TOOL --help` (and `TOOL SUBCOMMAND --help`) to auto-discover all flags, subcommands, and options.
+2. Parse output into a structured capability map: `{ commands: [], flags: [], outputFormats: [] }`.
+3. Identify the tool's primary domain and interaction model (REPL, one-shot, daemon).
+
+### Phase B: Design
+
+1. Map CLI capabilities to agent-studio skill sections (When to Use, Workflow, Commands).
+2. Define the JSON output contract — all generated wrappers MUST support `--output json` or equivalent structured output to eliminate parsing complexity for agents.
+3. Identify which capabilities map to existing skills (dedup) vs. new skills (create).
+
+### Phase C: Implement
+
+1. Write the SKILL.md with workflow steps that invoke the CLI tool.
+2. Include concrete command examples with expected JSON output.
+3. Add error handling for common CLI failure modes (missing auth, network errors, invalid args).
+
+### Phase D: Plan Tests
+
+1. Define RED tests: expected CLI output for known inputs.
+2. Define boundary tests: invalid flags, missing required args, permission errors.
+
+### Phase E: Write Tests
+
+1. Create test fixtures with mock CLI output.
+2. Write assertions against the JSON output contract.
+
+### Phase F: Document
+
+1. Generate usage examples for each major workflow.
+2. Document environment requirements (tool installation, auth setup).
+
+### Phase G: Publish
+
+1. Register in skill index via `pnpm skills:index`.
+2. Update agent-registry if skill is assigned to a specialist agent.
+
+### Iterative Refinement Loop
+
+After initial publication, run a refinement cycle:
+
+1. Compare the skill's coverage against the full `--help` output.
+2. Identify uncovered subcommands or flags.
+3. Repeat Phases B-G for uncovered capabilities.
+4. Score coverage: `covered_commands / total_commands * 100%`.
+5. Target >80% coverage before marking skill as complete.
 
 ## Output Contract
 

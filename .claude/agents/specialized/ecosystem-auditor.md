@@ -74,7 +74,11 @@ Given a target project folder or context, you must:
 
 ### Step 1: Map the Environment
 
-Use tools to understand what the user's project is built with:
+Before investigating any structural details, you MUST sanitize the context:
+
+- Run `Bash` (`pnpm context:auto-ignore <target_directory>`) to automatically suppress any massive text files that will crash your token window.
+
+Then, use tools to understand what the user's project is built with:
 
 - `Bash` (`pnpm search:structure`) to get top-level component architecture.
 - `Glob` (e.g., `Glob({ pattern: "**/*.{go,ts,rs,py,js,md}" })`) to see file extensions.

@@ -73,5 +73,35 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "525cc81552a988be5aea99ae7983e03db6d573a4"
+  },
+  {
+    "text": "CREATOR_GUARD bypass risk: During long EPIC implementation sessions, unified-creator-guard.cjs may be in warn mode. Agents can then directly Edit .claude/skills/**/*.md without going through skill-updater. This bypasses the audit trail. Always verify CREATOR_GUARD=block is active, or check git diff for protected path modifications after session.",
+    "area": "main",
+    "timestamp": "2026-03-13T00:52:31.266Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "bc63605fce790a17ca587bdaa141e2cea8493926"
+  },
+  {
+    "text": "reflection-agent dual-task-ID: When router spawns reflection-agent via Task(), TWO task IDs exist: (a) the router Task() task_id and (b) the internal reflection-task-completion-* ID. The atomic handshake only closes (b). Router-level task (a) stays in_progress indefinitely. Fix: spawn prompts must explicitly instruct reflection-agent to call TaskUpdate(completed) on BOTH IDs.",
+    "area": "main",
+    "timestamp": "2026-03-13T01:39:29.819Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "f0e7f86e13c236d618009329ebcd99e637fea48b"
+  },
+  {
+    "text": "post-completion-chain.cjs fires twice within 14s for devops tasks that git commit immediately after TaskUpdate, producing duplicate_trigger_fallback: second invocation loses task metadata and emits fallback string. Add idempotency guard using taskId deduplication set.",
+    "area": "main",
+    "timestamp": "2026-03-13T03:46:53.821Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "4b4799126c4c0de6a8dd566c4922a59e6e1e9149"
   }
 ]

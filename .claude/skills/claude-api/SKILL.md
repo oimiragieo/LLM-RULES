@@ -4,7 +4,7 @@ verified: true
 lastVerifiedAt: 2026-03-05T00:00:00.000Z
 name: claude-api
 description: 'Build apps with the Claude API or Anthropic SDK. TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`/`claude_agent_sdk`, or user asks to use Claude API, Anthropic SDKs, or Agent SDK. DO NOT TRIGGER when: code imports `openai`/other AI SDK, general programming, or ML/data-science tasks.'
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -331,6 +331,85 @@ curl https://api.anthropic.com/v1/messages \
   -H "content-type: application/json" \
   -d '{"model":"claude-opus-4-6","max_tokens":1024,"messages":[{"role":"user","content":"Hello"}]}'
 ```
+
+## Autonomous Coding Agent Pattern
+
+Build multi-session autonomous coding agents using the Claude Agent SDK's two-agent architecture (from anthropics/claude-quickstarts):
+
+### Architecture: Initializer + Coding Agent
+
+```
+Session 1:                    Session 2:                    Session N:
++-----------+                 +-----------+                 +-----------+
+|Initializer|                 |Initializer|                 |Initializer|
+|  Agent    |                 |  Agent    |                 |  Agent    |
++-----+-----+                +-----+-----+                +-----+-----+
+      |                             |                             |
+      v                             v                             v
++-----+-----+                +-----+-----+                +-----+-----+
+|  Coding   |                |  Coding   |                |  Coding   |
+|  Agent    |                |  Agent    |                |  Agent    |
++-----------+                +-----------+                +-----------+
+      |                             |                             |
+      +---------> git commit -------+---------> git commit -------+
+```
+
+### Initializer Agent
+
+- Reads the feature list / requirements document
+- Determines which feature to work on next (marks completed ones)
+- Prepares context and constraints for the coding agent
+- Spawns the coding agent with focused instructions
+
+### Coding Agent
+
+- Receives a single focused task from the initializer
+- Implements using TDD (write tests, implement, verify)
+- Commits progress to git after each logical unit
+- Reports completion back to the initializer
+
+### Git-Persisted Progress
+
+The key innovation: progress is persisted via git commits, not in-memory state.
+
+```python
+from claude_agent_sdk import Agent, tool
+
+@tool
+def commit_progress(message: str, files: list[str]):
+    """Commit completed work to git."""
+    subprocess.run(["git", "add"] + files, check=True)
+    subprocess.run(["git", "commit", "-m", message], check=True)
+```
+
+Between sessions:
+
+1. Git log shows what was completed
+2. Feature list file shows what remains
+3. No session state needed — fresh agent reads git history
+
+### Feature List Tracking
+
+Maintain a `features.md` file that both agents read/write:
+
+```markdown
+# Features
+
+- [x] User authentication (JWT)
+- [x] Database schema setup
+- [ ] API endpoints for CRUD <-- next
+- [ ] Frontend dashboard
+- [ ] Email notifications
+```
+
+The initializer marks features complete after the coding agent finishes each one.
+
+### When to Use This Pattern
+
+- Building complete applications over multiple sessions
+- Long-running projects that exceed single context windows
+- Projects requiring incremental, testable progress
+- Autonomous coding with minimal human intervention
 
 ## Common Pitfalls
 

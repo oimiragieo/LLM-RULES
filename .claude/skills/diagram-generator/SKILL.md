@@ -1,7 +1,7 @@
 ---
 name: diagram-generator
 description: Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system architecture, database schemas, component relationships, and data flows.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -271,6 +271,71 @@ node .claude/tools/diagram-generator/scripts/generate.mjs --type sequence "user 
 
 </usage_example>
 </examples>
+
+## Interactive HTML Output
+
+For enhanced visualization, generate self-contained HTML files with interactive Mermaid rendering:
+
+### Supported Diagram Types (9 total)
+
+| Type      | Mermaid Keyword   | Best For                    |
+| --------- | ----------------- | --------------------------- |
+| Flowchart | `flowchart TB/LR` | Decision flows, processes   |
+| Sequence  | `sequenceDiagram` | API interactions, protocols |
+| Class     | `classDiagram`    | OOP structure, interfaces   |
+| State     | `stateDiagram-v2` | Lifecycle, state machines   |
+| ER        | `erDiagram`       | Database schemas            |
+| Gantt     | `gantt`           | Project timelines           |
+| Pie       | `pie`             | Distribution, composition   |
+| Git Graph | `gitGraph`        | Branch strategies           |
+| Mindmap   | `mindmap`         | Brainstorming, hierarchy    |
+
+### HTML Output Pattern
+
+When user requests interactive/standalone diagrams, generate a self-contained HTML file:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DIAGRAM_TITLE</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
+        securityLevel: 'loose',
+      });
+    </script>
+    <style>
+      body {
+        font-family: system-ui;
+        margin: 2rem;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #1a1a2e;
+          color: #e0e0e0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>DIAGRAM_TITLE</h1>
+    <div class="mermaid">MERMAID_CONTENT_HERE</div>
+  </body>
+</html>
+```
+
+### Dark Mode Support
+
+All generated HTML diagrams automatically detect system dark mode preference via `prefers-color-scheme` media query and switch between Mermaid's `default` and `dark` themes.
+
+### Output Location for HTML Diagrams
+
+- HTML diagrams: `.claude/context/artifacts/diagrams/{subject}-{type}-{YYYY-MM-DD}.html`
+- Standard Mermaid: `.claude/context/artifacts/diagrams/{subject}-{type}-{YYYY-MM-DD}.mmd`
 
 ## Iron Laws
 

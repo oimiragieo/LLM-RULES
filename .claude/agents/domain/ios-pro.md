@@ -1,6 +1,6 @@
 ---
 name: ios-pro
-version: 1.0.0
+version: 1.1.0
 description: >-
   iOS/Swift development expert for iPhone, iPad, watchOS, and visionOS apps. Use for building native iOS applications,
   SwiftUI interfaces, UIKit components, and Apple platform integrations.
@@ -695,6 +695,76 @@ For major iOS features:
 - Use extensions to organize code
 - Keep files under 400 lines
 - Use meaningful names (no abbreviations)
+
+## App Store Connect CLI (asc)
+
+### Overview
+
+The `asc` CLI (App-Store-Connect-CLI) automates App Store Connect workflows from terminal or CI/CD. Install via Homebrew: `brew install rudrankriyam/formulae/asc`.
+
+**Authentication**: Set environment variables for API key auth:
+
+```bash
+export ASC_KEY_ID="your-key-id"
+export ASC_ISSUER_ID="your-issuer-id"
+export ASC_PRIVATE_KEY_PATH="/path/to/AuthKey.p8"
+```
+
+### Build & TestFlight Management
+
+| Command                                                 | Purpose                      |
+| ------------------------------------------------------- | ---------------------------- |
+| `asc builds list --app <bundleId>`                      | List recent builds           |
+| `asc builds info <buildId>`                             | Get build details            |
+| `asc testflight groups list --app <bundleId>`           | List beta groups             |
+| `asc testflight builds add --group <name> --build <id>` | Add build to beta group      |
+| `asc testflight feedback list --app <bundleId>`         | List TestFlight feedback     |
+| `asc testflight crashes list --build <buildId>`         | List crash reports for build |
+
+### Release Automation Pipeline
+
+```bash
+# Full release pipeline: validate → attach build → submit for review
+asc apps versions create --app <bundleId> --version "2.1.0" --platform IOS
+asc apps versions attach --app <bundleId> --version "2.1.0" --build <buildId>
+asc apps versions submit --app <bundleId> --version "2.1.0"
+```
+
+**Release Checklist (automated via asc):**
+
+1. `asc builds list --app <bundleId> --pre-release` — verify build processed
+2. `asc testflight builds add` — distribute to beta testers
+3. `asc testflight feedback list` — review beta feedback
+4. `asc apps versions create` — create App Store version
+5. `asc apps versions attach` — attach approved build
+6. `asc apps versions submit` — submit for App Store review
+
+### Metadata & Localization
+
+```bash
+# Manage app metadata
+asc apps info --app <bundleId>                     # View app info
+asc apps versions locales list --version <verId>   # List localizations
+asc apps versions locales update --version <verId> --locale en-US   --description "New features..." --keywords "productivity,ios"
+```
+
+### CI/CD Integration Pattern
+
+```yaml
+# GitHub Actions example
+- name: Submit to TestFlight
+  env:
+    ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+    ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+    ASC_PRIVATE_KEY_PATH: ${{ runner.temp }}/AuthKey.p8
+  run: |
+    echo "${{ secrets.ASC_PRIVATE_KEY }}" > $ASC_PRIVATE_KEY_PATH
+    asc testflight builds add --group "Internal Testers" --build $BUILD_ID
+```
+
+### Output Formats
+
+`asc` supports TTY-aware output: tables (default terminal), JSON (`--format json`), Markdown (`--format markdown`). Use `--format json` in CI/CD for parsing.
 
 ## Verification Protocol
 
