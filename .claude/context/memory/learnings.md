@@ -1,3 +1,25 @@
+## Rule Creation — Wave 4A (2026-03-13)
+
+Created 5 new rule files in `.claude/rules/` from awesome-rules/awesome-cursorrules patterns:
+
+- `lancedb-rules.md` — IVF_PQ indexing, hybrid search, batch writes, versioning, anti-patterns
+- `supabase-rules.md` — Auth/OAuth, RLS policies, Edge Functions, Realtime, Storage
+- `playwright-testing-rules.md` — Page Object Model, fixtures, locators, storage state, no waitForTimeout
+- `astro-rules.md` — Frontmatter, Islands hydration directives, Content Collections, Image component, SSR
+- `solidjs-rules.md` — Signals, createMemo, createEffect, For/Show, createStore, batch()
+  All passed `runIntegrationChecklist` + `queueCrossCreatorReview` via `.claude/lib/creators/creator-commons.cjs`.
+  Integration lib path: `.claude/lib/creators/creator-commons.cjs` (NOT `.claude/lib/creator-commons.cjs`).
+
+## tts-generation Skill Created (2026-03-13)
+
+**Skill:** `.claude/skills/tts-generation/SKILL.md`
+
+- Created AI text-to-speech skill covering OpenAI TTS (tts-1/tts-1-hd), ElevenLabs (eleven_turbo_v2), and Google gTTS backends
+- OpenAI TTS max 4096 chars/request — long text requires chunking with pydub for concatenation
+- Voice options: alloy, echo, fable, onyx, nova, shimmer (OpenAI); cloneable voices (ElevenLabs); 40+ languages (gTTS)
+- Assigned to: developer, ai-ml-expert agents
+- Catalog updated in @SKILL_CATALOG_TABLE.md under AI/ML category
+
 ## EPIC Pipeline Context Overflow Prevention — Enforcement at Plan Time (2026-03-12)
 
 **Pattern: Context-Compressor Gate Between EPIC Phases**

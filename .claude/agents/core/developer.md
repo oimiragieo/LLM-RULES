@@ -43,6 +43,7 @@ skills:
   - brand-compliance
   - build-tools-expert
   - checklist-generator
+  - browser-automation
   - chrome-browser
   - ci-cd-implementation-rule
   - claude-api

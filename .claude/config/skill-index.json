@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-13T04:28:38.631Z",
+  "generatedAt": "2026-03-13T20:21:18.493Z",
   "metadata": {
-    "totalSkills": 278,
+    "totalSkills": 282,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-13T04:28:38.632Z",
+    "lastValidated": "2026-03-13T20:21:18.494Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -6456,7 +6456,7 @@
       "displayName": "Multi Agent Architecture Reference",
       "category": "Other",
       "domain": "other",
-      "description": "Decision matrix for selecting multi-agent topologies (Supervisor, Swarm, Hierarchical, Conductor) with token economics, failure modes, and escalation paths",
+      "description": "Decision matrix for multi-agent topologies with token economics, failure modes, escalation paths, and external framework equivalents",
       "requiredTools": [
         "Read",
         "WebSearch",
@@ -6984,6 +6984,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "browser-automation": {
+      "name": "browser-automation",
+      "displayName": "Browser Automation",
+      "category": "Other",
+      "domain": "other",
+      "description": "Programmatic web automation using Playwright Python — data extraction, form filling, multi-step workflows, auth session management, screenshot/PDF capture, and anti-detection patterns. Use for scripted automation tasks, not interactive MCP-based browser control.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "browser-automation"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "claude-api": {
       "name": "claude-api",
       "displayName": "Claude Api",
@@ -7051,6 +7075,32 @@
       "tags": [
         "other",
         "cron-runner"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "deep-research": {
+      "name": "deep-research",
+      "displayName": "Deep Research",
+      "category": "Other",
+      "domain": "other",
+      "description": "Multi-step autonomous research methodology for deep investigation tasks with structured synthesis",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "WebSearch",
+        "WebFetch",
+        "Bash",
+        "Grep",
+        "Glob"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "deep-research"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7442,6 +7492,51 @@
       "priority": 3,
       "aliasOf": null
     },
+    "transcription": {
+      "name": "transcription",
+      "displayName": "Transcription",
+      "category": "Other",
+      "domain": "other",
+      "description": "Audio and video transcription using Whisper AI via the transcribe-anything package. Supports local files, YouTube URLs, and microphone input with multiple backends (faster-whisper, openai-whisper, Whisper API).",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "transcription"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "tts-generation": {
+      "name": "tts-generation",
+      "displayName": "Tts Generation",
+      "category": "Other",
+      "domain": "other",
+      "description": "AI text-to-speech generation using OpenAI TTS, ElevenLabs, and Google TTS backends. Converts text to audio files with voice selection, speed control, and format options.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "tts-generation"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "user-research": {
       "name": "user-research",
       "displayName": "User Research",
@@ -7665,9 +7760,11 @@
         "writing",
         "arxiv-monitor",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
         "cloud-run",
         "cron-runner",
+        "deep-research",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -7683,6 +7780,8 @@
         "scheduled-tasks",
         "seo-optimization",
         "telegram-polling",
+        "transcription",
+        "tts-generation",
         "user-research",
         "web-artifacts-builder",
         "windows-terminal"
@@ -8049,9 +8148,11 @@
         "writing",
         "arxiv-monitor",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
         "cloud-run",
         "cron-runner",
+        "deep-research",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8067,6 +8168,8 @@
         "scheduled-tasks",
         "seo-optimization",
         "telegram-polling",
+        "transcription",
+        "tts-generation",
         "user-research",
         "web-artifacts-builder",
         "windows-terminal"
@@ -8415,9 +8518,11 @@
         "writing",
         "arxiv-monitor",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
         "cloud-run",
         "cron-runner",
+        "deep-research",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8433,6 +8538,8 @@
         "scientific-skills",
         "seo-optimization",
         "telegram-polling",
+        "transcription",
+        "tts-generation",
         "user-research",
         "web-artifacts-builder",
         "windows-terminal"
@@ -8646,9 +8753,11 @@
         "writing",
         "arxiv-monitor",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
         "cloud-run",
         "cron-runner",
+        "deep-research",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8661,6 +8770,8 @@
         "scientific-skills",
         "seo-optimization",
         "telegram-polling",
+        "transcription",
+        "tts-generation",
         "user-research",
         "web-artifacts-builder",
         "windows-terminal"
@@ -8994,8 +9105,10 @@
         "ui-components-expert",
         "webapp-testing",
         "arxiv-monitor",
+        "browser-automation",
         "claude-api",
         "cloud-run",
+        "deep-research",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -9006,6 +9119,8 @@
         "scheduled-tasks",
         "scientific-skills",
         "telegram-polling",
+        "transcription",
+        "tts-generation",
         "windows-terminal"
       ],
       "Glob": [
@@ -9128,7 +9243,9 @@
         "ui-components-expert",
         "webapp-testing",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
+        "deep-research",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -9254,8 +9371,10 @@
         "ui-components-expert",
         "webapp-testing",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
         "cloud-run",
+        "deep-research",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -9315,10 +9434,12 @@
         "slack-notifications",
         "spec-to-code-compliance",
         "claude-api",
+        "deep-research",
         "feedback-analysis",
         "figma",
         "reddit-researcher",
         "scientific-skills",
+        "tts-generation",
         "user-research"
       ],
       "WebSearch": [
@@ -9334,6 +9455,7 @@
         "eval-harness-updater",
         "dynamic-api-integration",
         "multi-agent-architecture-reference",
+        "deep-research",
         "feedback-analysis",
         "reddit-researcher",
         "scientific-skills",
@@ -9574,9 +9696,11 @@
         "writing",
         "arxiv-monitor",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
         "cloud-run",
         "cron-runner",
+        "deep-research",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -9590,6 +9714,8 @@
         "regulatory-compliance",
         "seo-optimization",
         "telegram-polling",
+        "transcription",
+        "tts-generation",
         "user-research",
         "web-artifacts-builder",
         "windows-terminal"
@@ -10803,9 +10929,11 @@
         "writing",
         "arxiv-monitor",
         "brand-compliance",
+        "browser-automation",
         "claude-api",
         "cloud-run",
         "cron-runner",
+        "deep-research",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -10819,6 +10947,8 @@
         "regulatory-compliance",
         "seo-optimization",
         "telegram-polling",
+        "transcription",
+        "tts-generation",
         "user-research",
         "web-artifacts-builder",
         "windows-terminal"

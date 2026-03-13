@@ -31,6 +31,7 @@ skills:
   - arxiv-mcp
   - code-semantic-search
   - code-structural-search
+  - deep-research
   - insight-extraction
   - lsp-navigator
   - memory-search

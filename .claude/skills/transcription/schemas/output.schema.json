@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Transcription Skill Output",
+  "description": "Output contract for transcription skill execution",
+  "type": "object",
+  "required": ["success", "outputDir"],
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether transcription completed successfully"
+    },
+    "outputDir": {
+      "type": "string",
+      "description": "Absolute path to the directory containing transcript output files"
+    },
+    "detectedLanguage": {
+      "type": "string",
+      "description": "ISO 639-1 language code detected in the audio"
+    },
+    "languageConfidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score for language detection (0.0-1.0)"
+    },
+    "outputFiles": {
+      "type": "object",
+      "description": "Paths to generated output files by format",
+      "properties": {
+        "srt": { "type": "string", "description": "Path to .srt subtitle file" },
+        "vtt": { "type": "string", "description": "Path to .vtt WebVTT file" },
+        "txt": { "type": "string", "description": "Path to plain text transcript" },
+        "json": { "type": "string", "description": "Path to structured JSON transcript" },
+        "speaker_json": { "type": "string", "description": "Path to speaker-diarized JSON (insane backend only)" }
+      }
+    },
+    "modelUsed": {
+      "type": "string",
+      "description": "Whisper model size that was used"
+    },
+    "backendUsed": {
+      "type": "string",
+      "description": "Compute backend that was used"
+    },
+    "durationSeconds": {
+      "type": "number",
+      "description": "Duration of the input audio in seconds"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if success is false"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Transcription Skill Input",
+  "description": "Validated inputs for transcription skill execution via transcribe-anything",
+  "type": "object",
+  "required": ["input"],
+  "properties": {
+    "input": {
+      "type": "string",
+      "description": "Path to local audio/video file, or URL (YouTube, Rumble, etc.)"
+    },
+    "model": {
+      "type": "string",
+      "enum": ["tiny", "small", "medium", "large", "large-v3", "large-v2"],
+      "description": "Whisper model size. larger = more accurate but slower.",
+      "default": "large-v3"
+    },
+    "lang": {
+      "type": "string",
+      "description": "ISO 639-1 language code (e.g. 'en', 'fr', 'de') or omit for auto-detection"
+    },
+    "device": {
+      "type": "string",
+      "enum": ["cpu", "cuda", "mlx", "insane", "groq"],
+      "description": "Compute backend. cpu=universal, cuda=NVIDIA GPU, mlx=Apple Silicon, insane=fastest GPU, groq=cloud API"
+    },
+    "output_dir": {
+      "type": "string",
+      "description": "Directory to write transcript output files. Defaults to current directory."
+    },
+    "task": {
+      "type": "string",
+      "enum": ["transcribe", "translate"],
+      "description": "transcribe=same language output, translate=translate to English",
+      "default": "transcribe"
+    },
+    "hf_token": {
+      "type": "string",
+      "description": "HuggingFace token for speaker diarization (insane backend only)"
+    },
+    "initial_prompt": {
+      "type": "string",
+      "description": "Domain vocabulary hint to improve accuracy for technical, medical, or industry-specific content"
+    },
+    "batch_size": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 64,
+      "description": "GPU batch size for throughput optimization"
+    }
+  },
+  "additionalProperties": false
+}

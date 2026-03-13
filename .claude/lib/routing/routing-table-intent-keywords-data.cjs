@@ -6,6 +6,14 @@
 // Kebab-case keys (e.g., 'reflection-agent') are used when the key matches an agent name verbatim.
 const INTENT_KEYWORDS = {
   // === HIGH PRIORITY INTENTS ===
+  'deep-research': [
+    'deep-research',
+    'deep research',
+    'multi-step research',
+    'autonomous research',
+    'research methodology',
+    'investigation',
+  ],
   researcher: [
     'investigate',
     'research',

@@ -89,6 +89,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | AI/ML/Deep Learning                  | `ai-ml-specialist`           | `.claude/agents/domain/ai-ml-specialist.md`              |
 | Web3/Blockchain/DeFi                 | `web3-blockchain-expert`     | `.claude/agents/domain/web3-blockchain-expert.md`        |
 | Game development                     | `gamedev-pro`                | `.claude/agents/domain/gamedev-pro.md`                   |
+| Legacy codebase modernization        | `legacy-modernizer`          | `.claude/agents/domain/legacy-modernizer.md`             |
 | LLM architecture/RAG/model serving   | `llm-architect`              | `.claude/agents/domain/llm-architect.md`                 |
 | Prompt engineering/optimization      | `prompt-engineer`            | `.claude/agents/domain/prompt-engineer.md`               |
 | MCP server/client development        | `mcp-developer`              | `.claude/agents/domain/mcp-developer.md`                 |

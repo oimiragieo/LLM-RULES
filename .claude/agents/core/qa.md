@@ -34,6 +34,7 @@ skills:
   - ripgrep
   - task-management-protocol
   - proactive-audit
+  - browser-automation
   - tdd
   - test-generator
   - token-saver-context-compression
