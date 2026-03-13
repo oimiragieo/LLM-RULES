@@ -130,6 +130,23 @@ For each changed artifact, apply the relevant checks from this matrix:
 | SC-01    | Valid JSON syntax                   | `node -e "JSON.parse(require('fs').readFileSync('<file>', 'utf8'))"`        | CRITICAL |
 | SC-02    | Schema appears in schema-catalog.md | `grep "<schema-name>" .claude/context/artifacts/catalogs/schema-catalog.md` | MEDIUM   |
 
+### Documentation Staleness Check
+
+After any feature work, verify:
+
+1. **CHANGELOG.md** — does it have an entry dated within the last session?
+   - Check: `git log --oneline -5` vs `grep "## \[" CHANGELOG.md | head -3`
+   - FAIL if: feature commits exist but no matching CHANGELOG entry
+
+2. **.env.example** — does it document all env vars in the codebase?
+   - Check: `grep -r "process.env\." .claude/skills/ .claude/hooks/ | grep -oP "process\.env\.\K\w+" | sort -u`
+   - Compare against entries in `.env.example`
+   - FAIL if: env var used in code but not documented in `.env.example`
+
+3. **README.md** — are agent/skill counts current?
+   - Check counts in README vs `jq '.agents | length' .claude/context/agent-registry.json`
+   - WARN if counts diverge by more than 2
+
 ### Routing Files (`.claude/lib/routing/routing-table.cjs`, `.claude/CLAUDE.md`)
 
 | Check ID | Check                    | Command                                              | Severity |

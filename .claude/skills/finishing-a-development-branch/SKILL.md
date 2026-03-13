@@ -228,6 +228,17 @@ git worktree remove <worktree-path>
 
 - **using-git-worktrees** - Cleans up worktree created by that skill
 
+## Documentation Gate (BLOCKING — must pass before commit)
+
+Before ANY commit on a feature/skill/agent branch:
+
+- [ ] **CHANGELOG.md** — entry added under `[Unreleased]` with today's date
+- [ ] **README.md** — updated if agent/skill counts changed or new user-facing capability added
+- [ ] **.env.example** — commented entry added for EVERY new API key, token, or env var introduced
+- [ ] **Skill/agent description** — frontmatter `description:` accurately reflects new capabilities
+
+If any item is unchecked → DO NOT COMMIT. Update docs first.
+
 ## Iron Laws
 
 1. **ALWAYS** run the full test suite and verify it passes before offering any merge/PR option — presenting merge options with failing tests leads to broken main branches and failed CI pipelines.
