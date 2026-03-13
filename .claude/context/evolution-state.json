@@ -42,7 +42,9 @@
       "status": "completed",
       "completedAt": "2026-03-01T00:00:00.000Z",
       "description": "Bumped authentication-flow-rules v2.0.0 -> v2.1.0. Added 5 Iron Laws (PKCE mandatory, Implicit Flow removed, token storage in HttpOnly cookies, access token TTL <=15min, refresh token rotation), 5-row Anti-Patterns table. Wired into skill-catalog.md Quick Reference Security row. Skill already assigned to security-architect. lastVerifiedAt updated to 2026-03-01.",
-      "affected": ["authentication-flow-rules"]
+      "affected": [
+        "authentication-flow-rules"
+      ]
     },
     {
       "id": "2026-03-01-python-devops-skill-updater-batch",
@@ -84,7 +86,9 @@
       "status": "completed",
       "completedAt": "2026-02-28T00:00:00.000Z",
       "description": "New skill ralph-loop created via skill-creator process. Enterprise bundle (9 components) + companion tool + workflow + global command + schema. Ralph files consolidated into .claude/ralph/. Assigned to developer, qa, devops, master-orchestrator. Research: 6 Exa sources, 3 arXiv papers.",
-      "affected": ["ralph-loop"]
+      "affected": [
+        "ralph-loop"
+      ]
     },
     {
       "id": "2026-02-23-stale-module-pruner-proactive-audit-update",
@@ -94,7 +98,10 @@
       "status": "completed",
       "completedAt": "2026-02-23T00:00:00.000Z",
       "description": "stale-module-pruner: stub SKILL.md rewritten to v1.0.0, catalog fixed (added to Quick Reference Core Development row), developer agent assignment added. proactive-audit: v1.1.0→v1.2.0, Mandatory Skills table added.",
-      "affected": ["stale-module-pruner", "proactive-audit"]
+      "affected": [
+        "stale-module-pruner",
+        "proactive-audit"
+      ]
     },
     {
       "id": "2026-02-22-ecosystem-integrity-scanner-install",
@@ -104,7 +111,9 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:59.000Z",
       "description": "New skill ecosystem-integrity-scanner wired into framework via skill-updater. SKILL.md v1.1.0 with Iron Laws, Anti-Patterns, Memory Protocol, 6 mandatory skills. Enterprise bundle scaffolded (9 components). Assigned to qa, developer, architect. Catalog updated (Validation & Quality: 11→12). Validator debugged: 53 false positives → 0 errors.",
-      "affected": ["ecosystem-integrity-scanner"]
+      "affected": [
+        "ecosystem-integrity-scanner"
+      ]
     },
     {
       "id": "2026-02-22-batch49-skill-updater-sweep",
@@ -114,7 +123,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 49 (FINAL BATCH): web-perf (v1.0.0 verified, Iron Laws + Anti-Patterns + Memory Protocol added), webmcp-browser-tools (v1.1.0 verified, Iron Laws + Anti-Patterns), writing-skills (v1.1→v1.1.0 semver fix, verified, Check 8 fix, Iron Laws + Anti-Patterns).",
-      "affected": ["web-perf", "webmcp-browser-tools", "writing-skills"]
+      "affected": [
+        "web-perf",
+        "webmcp-browser-tools",
+        "writing-skills"
+      ]
     },
     {
       "id": "2026-02-22-batch48-skill-updater-sweep",
@@ -124,7 +137,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 48: verification-before-completion (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns), vue-expert (v1.0.0 verified, Iron Laws + Anti-Patterns), wave-executor (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["verification-before-completion", "vue-expert", "wave-executor"]
+      "affected": [
+        "verification-before-completion",
+        "vue-expert",
+        "wave-executor"
+      ]
     },
     {
       "id": "2026-02-22-batch47-skill-updater-sweep",
@@ -134,7 +151,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 47: variant-analysis (v1.0.0 verified, Iron Laws + Anti-Patterns), vercel-ai-sdk-best-practices (v1.0.0 verified, Iron Laws + Anti-Patterns), vercel-deploy (v1.0.0 verified, Iron Laws + Anti-Patterns + Memory Protocol added).",
-      "affected": ["variant-analysis", "vercel-ai-sdk-best-practices", "vercel-deploy"]
+      "affected": [
+        "variant-analysis",
+        "vercel-ai-sdk-best-practices",
+        "vercel-deploy"
+      ]
     },
     {
       "id": "2026-02-22-batch46-skill-updater-sweep",
@@ -144,7 +165,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 46: troubleshooting-regression (v1.0.0 verified, Iron Laws + Anti-Patterns), typescript-expert (v1.1.0 verified, Iron Laws + Anti-Patterns), using-git-worktrees (v1.0.0 verified, Iron Laws + Anti-Patterns).",
-      "affected": ["troubleshooting-regression", "typescript-expert", "using-git-worktrees"]
+      "affected": [
+        "troubleshooting-regression",
+        "typescript-expert",
+        "using-git-worktrees"
+      ]
     },
     {
       "id": "2026-02-22-batch45-skill-updater-sweep",
@@ -154,7 +179,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 45: thinking-tools (v1.0.0 verified, Check 8 fix, Iron Laws + Anti-Patterns), token-saver-context-compression (v1.0.0 verified, Iron Laws + Anti-Patterns), track-management (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["thinking-tools", "token-saver-context-compression", "track-management"]
+      "affected": [
+        "thinking-tools",
+        "token-saver-context-compression",
+        "track-management"
+      ]
     },
     {
       "id": "2026-02-22-batch44-skill-updater-sweep",
@@ -164,7 +193,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 44: terraform-infra (v1.0.0 verified, Iron Laws + Anti-Patterns), test-generator (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns), text-to-sql (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns + Memory Protocol added).",
-      "affected": ["terraform-infra", "test-generator", "text-to-sql"]
+      "affected": [
+        "terraform-infra",
+        "test-generator",
+        "text-to-sql"
+      ]
     },
     {
       "id": "2026-02-22-batch43-skill-updater-sweep",
@@ -174,7 +207,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 43: swarm-coordination (v1.0→v1.0.0 semver fix, verified, Iron Laws + Anti-Patterns), task-management-protocol (v1.0.0 verified, Iron Laws + Anti-Patterns), tauri-native-api-integration (v1.0.0 verified, Iron Laws + Anti-Patterns).",
-      "affected": ["swarm-coordination", "task-management-protocol", "tauri-native-api-integration"]
+      "affected": [
+        "swarm-coordination",
+        "task-management-protocol",
+        "tauri-native-api-integration"
+      ]
     },
     {
       "id": "2026-02-22-batch42-skill-updater-sweep",
@@ -184,7 +221,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 42: subagent-driven-development (v1.0.0 verified, Iron Laws + Anti-Patterns), summarize-changes (v1.0.0 verified, Iron Laws + Anti-Patterns), svelte-expert (v1.0.0 verified, Iron Laws + Anti-Patterns).",
-      "affected": ["subagent-driven-development", "summarize-changes", "svelte-expert"]
+      "affected": [
+        "subagent-driven-development",
+        "summarize-changes",
+        "svelte-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch41-skill-updater-sweep",
@@ -194,7 +235,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 41: starknet-react-rules (v1.0.0 verified, Iron Laws + Anti-Patterns), static-analysis (v1.0.0 verified, Iron Laws + Anti-Patterns), strict-user-requirements-adherence (v1.0.0 verified, Iron Laws + Anti-Patterns).",
-      "affected": ["starknet-react-rules", "static-analysis", "strict-user-requirements-adherence"]
+      "affected": [
+        "starknet-react-rules",
+        "static-analysis",
+        "strict-user-requirements-adherence"
+      ]
     },
     {
       "id": "2026-02-22-batch40-skill-updater-sweep",
@@ -204,7 +249,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 40: spec-critique (v1.0.0 verified, Iron Laws + Anti-Patterns), spec-gathering (v1.0.0 verified, fixed {{}} placeholder, Iron Laws + Anti-Patterns), spec-init (v1.0.0 verified, Iron Laws + Anti-Patterns).",
-      "affected": ["spec-critique", "spec-gathering", "spec-init"]
+      "affected": [
+        "spec-critique",
+        "spec-gathering",
+        "spec-init"
+      ]
     },
     {
       "id": "2026-02-22-batch39-skill-updater-sweep",
@@ -214,7 +263,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 39: smart-revert (v1.0.0 verified, Iron Laws + Anti-Patterns), solidjs-expert (v1.0.0 verified, Iron Laws + Anti-Patterns), sparc-methodology (v2.7.0 verified, fixed TodoWrite→TaskCreate placeholder, Iron Laws + Anti-Patterns + Memory Protocol).",
-      "affected": ["smart-revert", "solidjs-expert", "sparc-methodology"]
+      "affected": [
+        "smart-revert",
+        "solidjs-expert",
+        "sparc-methodology"
+      ]
     },
     {
       "id": "2026-02-22-batch38-skill-updater-sweep",
@@ -224,7 +277,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 38: session-handoff (v1.0.0 verified, Iron Laws + Anti-Patterns), shadcn-ui (v1.0.0 verified, Iron Laws + Anti-Patterns + Memory Protocol added), smart-debug (v2.0→v2.0.0 semver fix, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["session-handoff", "shadcn-ui", "smart-debug"]
+      "affected": [
+        "session-handoff",
+        "shadcn-ui",
+        "smart-debug"
+      ]
     },
     {
       "id": "2026-02-22-batch37-skill-updater-sweep",
@@ -234,7 +291,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 37: security-architect (v1.1→v1.1.0 semver fix, verified, replaced ## Rules with Iron Laws + Anti-Patterns), semgrep-rule-creator (v1.1.0 verified, Iron Laws + Anti-Patterns added), sequential-thinking (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns added).",
-      "affected": ["security-architect", "semgrep-rule-creator", "sequential-thinking"]
+      "affected": [
+        "security-architect",
+        "semgrep-rule-creator",
+        "sequential-thinking"
+      ]
     },
     {
       "id": "2026-02-22-batch36-skill-updater-sweep",
@@ -244,7 +305,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 36: response-rater (v2.0→v2.0.0 semver fix, verified, Iron Laws + Anti-Patterns), ripgrep (v1.1.0, updated lastVerifiedAt, fixed Check 8 TODO false positive, Iron Laws + Anti-Patterns), scientific-skills (v2.17.0, verified, Iron Laws + Anti-Patterns + Memory Protocol added).",
-      "affected": ["response-rater", "ripgrep", "scientific-skills"]
+      "affected": [
+        "response-rater",
+        "ripgrep",
+        "scientific-skills"
+      ]
     },
     {
       "id": "2026-02-22-batch35-skill-updater-sweep",
@@ -254,7 +319,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 35: recommend-evolution (v1.0.0→v1.1.0, verified, replaced prose Iron Law with 5-law section + Anti-Patterns), requesting-code-review (v1.0.0→v1.1.0, added verified+lastVerifiedAt, Iron Laws + Anti-Patterns), research-synthesis (v1.0.0→v1.1.0, verified, replaced 6-law prose block with proper 5-law section + Anti-Patterns).",
-      "affected": ["recommend-evolution", "requesting-code-review", "research-synthesis"]
+      "affected": [
+        "recommend-evolution",
+        "requesting-code-review",
+        "research-synthesis"
+      ]
     },
     {
       "id": "2026-02-22-batch34-skill-updater-sweep",
@@ -264,7 +333,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 34: react-expert (updated lastVerifiedAt, fixed Check 8 template placeholders, added Iron Laws + Anti-Patterns), readme (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), receiving-code-review (v1.0.0→v1.1.0, added verified+lastVerifiedAt, Iron Laws + Anti-Patterns).",
-      "affected": ["react-expert", "readme", "receiving-code-review"]
+      "affected": [
+        "react-expert",
+        "readme",
+        "receiving-code-review"
+      ]
     },
     {
       "id": "2026-02-22-batch33-skill-updater-sweep",
@@ -274,7 +347,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 33: python-backend-expert (updated lastVerifiedAt, added Iron Laws + Anti-Patterns), qa-workflow (v1.0.0→v1.1.0, replaced prose Iron Law with 5-law section + Anti-Patterns), qwik-expert (v1.0.0→v1.1.0, added verified+lastVerifiedAt, Iron Laws + Anti-Patterns).",
-      "affected": ["python-backend-expert", "qa-workflow", "qwik-expert"]
+      "affected": [
+        "python-backend-expert",
+        "qa-workflow",
+        "qwik-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch32-skill-updater-sweep",
@@ -284,7 +361,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 32: proactive-audit (v1.0.0→v1.1.0, verified, Iron Laws + 3-col Anti-Patterns replacing bullet list), project-onboarding (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns added), pyqt6-ui-development-rules (v1.0.0→v1.1.0, added verified+lastVerifiedAt, Iron Laws + Anti-Patterns). progressive-disclosure not found — skipped.",
-      "affected": ["proactive-audit", "project-onboarding", "pyqt6-ui-development-rules"]
+      "affected": [
+        "proactive-audit",
+        "project-onboarding",
+        "pyqt6-ui-development-rules"
+      ]
     },
     {
       "id": "2026-02-22-batch31-skill-updater-sweep",
@@ -294,7 +375,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 31: planning-with-files (v1.0.0→v1.1.0, verified, Iron Laws + 3-col Anti-Patterns, fixed HTML comment Check 8), postmortem-writing (v1.0→v1.1.0 semver fix, verified, Iron Laws added), prd-generator (v1.0→v1.1.0 semver fix, verified, single Iron Law replaced with 5-law section + Anti-Patterns table).",
-      "affected": ["planning-with-files", "postmortem-writing", "prd-generator"]
+      "affected": [
+        "planning-with-files",
+        "postmortem-writing",
+        "prd-generator"
+      ]
     },
     {
       "id": "2026-02-22-batch30-skill-updater-sweep",
@@ -304,7 +389,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 30: php-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), pipeline-reflection-ux (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns + Memory Protocol), plan-generator (v1.1→v1.1.0 semver fix, verified, Iron Laws added).",
-      "affected": ["php-expert", "pipeline-reflection-ux", "plan-generator"]
+      "affected": [
+        "php-expert",
+        "pipeline-reflection-ux",
+        "plan-generator"
+      ]
     },
     {
       "id": "2026-02-22-batch29-skill-updater-sweep",
@@ -314,7 +403,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 29: nextjs-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), nodejs-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), on-call-handoff-patterns (v1.0→v1.1.0 semver fix, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["nextjs-expert", "nodejs-expert", "on-call-handoff-patterns"]
+      "affected": [
+        "nextjs-expert",
+        "nodejs-expert",
+        "on-call-handoff-patterns"
+      ]
     },
     {
       "id": "2026-02-22-batch28-skill-updater-sweep",
@@ -324,7 +417,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 28: nativescript (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), next-cache-components (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns table), next-upgrade (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["nativescript", "next-cache-components", "next-upgrade"]
+      "affected": [
+        "nativescript",
+        "next-cache-components",
+        "next-upgrade"
+      ]
     },
     {
       "id": "2026-02-22-batch27-skill-updater-sweep",
@@ -348,7 +445,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 26: medusa-security (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), memory-forensics (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns, normalized Memory Protocol paths), memory-quality-auditor (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns, added Memory Protocol).",
-      "affected": ["medusa-security", "memory-forensics", "memory-quality-auditor"]
+      "affected": [
+        "medusa-security",
+        "memory-forensics",
+        "memory-quality-auditor"
+      ]
     },
     {
       "id": "2026-02-22-batch25-skill-updater-sweep",
@@ -358,7 +459,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 25: large-data-with-dask (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), linear-pm (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), medusa (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["large-data-with-dask", "linear-pm", "medusa"]
+      "affected": [
+        "large-data-with-dask",
+        "linear-pm",
+        "medusa"
+      ]
     },
     {
       "id": "2026-02-22-batch24-skill-updater-sweep",
@@ -368,7 +473,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 24: jira-pm (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), k8s-manifest-generator (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), kafka-development-practices (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["jira-pm", "k8s-manifest-generator", "kafka-development-practices"]
+      "affected": [
+        "jira-pm",
+        "k8s-manifest-generator",
+        "kafka-development-practices"
+      ]
     },
     {
       "id": "2026-02-22-batch23-skill-updater-sweep",
@@ -378,7 +487,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 23: interactive-requirements-gathering (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), ios-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), java-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["interactive-requirements-gathering", "ios-expert", "java-expert"]
+      "affected": [
+        "interactive-requirements-gathering",
+        "ios-expert",
+        "java-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch22-skill-updater-sweep",
@@ -388,7 +501,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 22: incident-runbook-templates (v1.0→v1.1.0, semver fix, verified, Iron Laws + Anti-Patterns), insight-extraction (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), insecure-defaults (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["incident-runbook-templates", "insight-extraction", "insecure-defaults"]
+      "affected": [
+        "incident-runbook-templates",
+        "insight-extraction",
+        "insecure-defaults"
+      ]
     },
     {
       "id": "2026-02-22-batch21-skill-updater-sweep",
@@ -398,7 +515,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 21: github-ops (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), go-expert (v1.0.0→v1.1.0, verified, fixed Check 8 todos→unresolved, Iron Laws + Anti-Patterns), graphql-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["github-ops", "go-expert", "graphql-expert"]
+      "affected": [
+        "github-ops",
+        "go-expert",
+        "graphql-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch20-skill-updater-sweep",
@@ -408,7 +529,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:59:00.000Z",
       "description": "Production-readiness sweep batch 20: framework-context (v1.0.0→v1.1.0, verified, Iron Laws expanded + Anti-Patterns), gamedev-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), git-expert (v1.1.0→v1.2.0, lastVerifiedAt updated, Iron Laws expanded + Anti-Patterns).",
-      "affected": ["framework-context", "gamedev-expert", "git-expert"]
+      "affected": [
+        "framework-context",
+        "gamedev-expert",
+        "git-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch19-skill-updater-sweep",
@@ -446,7 +571,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:30:00.000Z",
       "description": "Production-readiness sweep batch 17: dynamic-api-integration (v1.0.0→v1.1.0, Iron Laws expanded to 5), elixir-expert (v1.0.0→v1.1.0, Iron Laws + Anti-Patterns), enhance-prompt (v1.0.0→v1.1.0, Iron Laws added).",
-      "affected": ["dynamic-api-integration", "elixir-expert", "enhance-prompt"]
+      "affected": [
+        "dynamic-api-integration",
+        "elixir-expert",
+        "enhance-prompt"
+      ]
     },
     {
       "id": "2026-02-22-batch16-skill-updater-sweep",
@@ -456,7 +585,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T23:00:00.000Z",
       "description": "Production-readiness sweep batch 16: docker-compose (v1.1→v1.2.0, semver fix, Iron Laws + Anti-Patterns), doc-generator (v1.0→v1.1.0, semver fix, verified, Iron Laws + Anti-Patterns), dry-principle (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["docker-compose", "doc-generator", "dry-principle"]
+      "affected": [
+        "docker-compose",
+        "doc-generator",
+        "dry-principle"
+      ]
     },
     {
       "id": "2026-02-22-batch15-skill-updater-sweep",
@@ -466,7 +599,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T22:00:00.000Z",
       "description": "Production-readiness sweep batch 15: diagram-generator (v1.0→v1.1.0, semver fix, verified, Iron Laws + Anti-Patterns), differential-review (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), dispatching-parallel-agents (v1.0.0→v1.1.0, Iron Laws + Anti-Patterns).",
-      "affected": ["diagram-generator", "differential-review", "dispatching-parallel-agents"]
+      "affected": [
+        "diagram-generator",
+        "differential-review",
+        "dispatching-parallel-agents"
+      ]
     },
     {
       "id": "2026-02-22-batch14-skill-updater-sweep",
@@ -476,7 +613,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T21:00:00.000Z",
       "description": "Production-readiness sweep batch 14: data-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), debug-log-analysis (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), debugging (v1.1.0→v1.1.1, Iron Laws expanded to 5 + Anti-Patterns).",
-      "affected": ["data-expert", "debug-log-analysis", "debugging"]
+      "affected": [
+        "data-expert",
+        "debug-log-analysis",
+        "debugging"
+      ]
     },
     {
       "id": "2026-02-22-batch13-skill-updater-sweep",
@@ -486,7 +627,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T20:00:00.000Z",
       "description": "Production-readiness sweep batch 13: creation-feasibility-gate (v1.0.0→v1.1.0, verified, Iron Laws expanded + Anti-Patterns), database-architect (v1.1.0→v1.1.1, lastVerifiedAt updated, Iron Laws + Anti-Patterns added), database-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns added).",
-      "affected": ["creation-feasibility-gate", "database-architect", "database-expert"]
+      "affected": [
+        "creation-feasibility-gate",
+        "database-architect",
+        "database-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch12-skill-updater-sweep",
@@ -510,7 +655,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T18:00:00.000Z",
       "description": "Production-readiness sweep batch 11: consensus-voting (v1.0→v1.1.0, semver fix, verified, Iron Laws + Anti-Patterns), container-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), content-security-scan (v1.0.0→v1.1.0, verified, Iron Laws expanded + Anti-Patterns).",
-      "affected": ["consensus-voting", "container-expert", "content-security-scan"]
+      "affected": [
+        "consensus-voting",
+        "container-expert",
+        "content-security-scan"
+      ]
     },
     {
       "id": "2026-02-22-batch10-skill-updater-sweep",
@@ -520,7 +669,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T17:00:00.000Z",
       "description": "Production-readiness sweep batch 10: commit-validator (v1.0.0→v1.1.0, Iron Laws + Anti-Patterns), complexity-assessment (v1.0.0→v1.1.0, verified, Iron Laws expanded + Anti-Patterns), compliance-policy-check (v1.0.0→v1.1.0, verified, Iron Laws expanded + Anti-Patterns).",
-      "affected": ["commit-validator", "complexity-assessment", "compliance-policy-check"]
+      "affected": [
+        "commit-validator",
+        "complexity-assessment",
+        "compliance-policy-check"
+      ]
     },
     {
       "id": "2026-02-22-batch9-skill-updater-sweep",
@@ -530,7 +683,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T16:00:00.000Z",
       "description": "Production-readiness sweep batch 9: code-semantic-search (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), code-structural-search (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), code-style-validator (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["code-semantic-search", "code-structural-search", "code-style-validator"]
+      "affected": [
+        "code-semantic-search",
+        "code-structural-search",
+        "code-style-validator"
+      ]
     },
     {
       "id": "2026-02-22-batch8-skill-updater-sweep",
@@ -540,7 +697,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T15:00:00.000Z",
       "description": "Production-readiness sweep batch 8: checklist-generator (v1.0→v1.1.0, semver fix, verified, Iron Laws expanded to 5 + Anti-Patterns), code-analyzer (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), code-quality-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["checklist-generator", "code-analyzer", "code-quality-expert"]
+      "affected": [
+        "checklist-generator",
+        "code-analyzer",
+        "code-quality-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch7-skill-updater-sweep",
@@ -550,7 +711,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T14:00:00.000Z",
       "description": "Production-readiness sweep batch 7: auth-security-expert (v2.0.0→v2.1.0, verified, Iron Laws + Anti-Patterns), binary-analysis-patterns (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), brainstorming (v1.0.0→v1.1.0, Iron Laws + Anti-Patterns).",
-      "affected": ["auth-security-expert", "binary-analysis-patterns", "brainstorming"]
+      "affected": [
+        "auth-security-expert",
+        "binary-analysis-patterns",
+        "brainstorming"
+      ]
     },
     {
       "id": "2026-02-22-batch6-skill-updater-sweep",
@@ -560,7 +725,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T13:00:00.000Z",
       "description": "Production-readiness sweep batch 6: astro-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), async-operations (v1.0.0→v1.1.0, agents field, verified, Iron Laws + Anti-Patterns), audit-context-building (v1.0.0→v1.1.0, agents field, verified, Iron Laws expanded to 5 + Anti-Patterns).",
-      "affected": ["astro-expert", "async-operations", "audit-context-building"]
+      "affected": [
+        "astro-expert",
+        "async-operations",
+        "audit-context-building"
+      ]
     },
     {
       "id": "2026-02-22-batch5-skill-updater-sweep",
@@ -570,7 +739,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T12:00:00.000Z",
       "description": "Production-readiness sweep batch 5: arxiv-mcp (v2.0.0→v2.1.0, verified, Iron Laws + Anti-Patterns), ask-questions-if-underspecified (v1.0→v1.1.0, semver fix, stub replaced with real content, Iron Laws + Anti-Patterns), assimilate (v1.0.0→v1.1.0, verified, expanded Iron Laws to 5 + Anti-Patterns).",
-      "affected": ["arxiv-mcp", "ask-questions-if-underspecified", "assimilate"]
+      "affected": [
+        "arxiv-mcp",
+        "ask-questions-if-underspecified",
+        "assimilate"
+      ]
     },
     {
       "id": "2026-02-22-batch4-skill-updater-sweep",
@@ -580,7 +753,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T11:00:00.000Z",
       "description": "Production-readiness sweep batch 4: artifact-integrator (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), artifact-lifecycle (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns, agents field added). artifact-updater already passed validation.",
-      "affected": ["artifact-integrator", "artifact-lifecycle"]
+      "affected": [
+        "artifact-integrator",
+        "artifact-lifecycle"
+      ]
     },
     {
       "id": "2026-02-22-batch3-skill-updater-sweep",
@@ -590,7 +766,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T10:00:00.000Z",
       "description": "Production-readiness sweep batch 3: angular-expert (v1.0.0→v1.1.0, verified, Iron Laws + Anti-Patterns), api-development-expert (v1.1.0→v1.2.0, Iron Laws + Anti-Patterns), architecture-review (v1.0→v1.1.0 semver fix, verified, Iron Laws + Anti-Patterns).",
-      "affected": ["angular-expert", "api-development-expert", "architecture-review"]
+      "affected": [
+        "angular-expert",
+        "api-development-expert",
+        "architecture-review"
+      ]
     },
     {
       "id": "2026-02-22-batch2-skill-updater-sweep",
@@ -601,7 +781,11 @@
       "completedAt": "2026-02-22T09:00:00.000Z",
       "category": "Development",
       "description": "Production-readiness sweep batch 2: agent-tool-design (v1.0.0→v1.1.0, Iron Laws added, verified), ai-ml-expert (v2.0.0→v2.1.0, Iron Laws added), android-expert (v2.0.0→v2.1.0, Iron Laws added, toDomain false-positive fixed). All now meet production SKILL.md standard.",
-      "affected": ["agent-tool-design", "ai-ml-expert", "android-expert"]
+      "affected": [
+        "agent-tool-design",
+        "ai-ml-expert",
+        "android-expert"
+      ]
     },
     {
       "id": "2026-02-22-batch1-skill-updater-sweep",
@@ -612,7 +796,11 @@
       "completedAt": "2026-02-22T08:00:00.000Z",
       "category": "Validation & Quality",
       "description": "Production-readiness sweep batch 1: advanced-elicitation (v1.0.0→v1.1.0, Iron Laws + Anti-Patterns added), agent-evaluation (v1.0.0→v1.1.0, Iron Laws expanded to 5 + Anti-Patterns added), accessibility (v2.1.0→v2.2.0, Iron Laws added). All three now meet production SKILL.md standard.",
-      "affected": ["accessibility", "advanced-elicitation", "agent-evaluation"]
+      "affected": [
+        "accessibility",
+        "advanced-elicitation",
+        "agent-evaluation"
+      ]
     },
     {
       "id": "2026-02-22-memory-search-skill-updater",
@@ -643,7 +831,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T06:00:00.000Z",
       "category": "Creator Tools",
-      "agents": ["developer", "architect"],
+      "agents": [
+        "developer",
+        "architect"
+      ],
       "description": "Propagated Universal Companion Artifact Gap Trigger table (11-row, all creator types) and upgraded arXiv research to mandatory (not fallback) across all 12 *-creator and *-updater skills. Now every creator/updater can trigger any other creator/updater when research identifies a gap. arXiv search is mandatory for AI/ML, agents, evaluation, orchestration, memory/RAG, security topics.",
       "affected": [
         "skill-creator",
@@ -668,9 +859,15 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Creator Tools",
-      "agents": ["developer", "architect"],
+      "agents": [
+        "developer",
+        "architect"
+      ],
       "description": "Expanded Bidirectional Gap Trigger in agent-creator (v2.2.0→v2.3.0) and agent-updater (v1.1.0→v1.2.0) to cover all artifact types. When research finds capability gaps, the appropriate creator is now triggered: skill-creator, skill-updater, template-creator, hook-creator, workflow-creator, or schema-creator. Previously only skills were covered.",
-      "affected": ["agent-creator", "agent-updater"]
+      "affected": [
+        "agent-creator",
+        "agent-updater"
+      ]
     },
     {
       "id": "2026-02-22-advanced-debugging-updater-run",
@@ -698,9 +895,16 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Domain + Specialized",
-      "agents": ["router", "planner"],
+      "agents": [
+        "router",
+        "planner"
+      ],
       "description": "Created 3 new agents: kubernetes-specialist (domain/opus — K8s, Helm, ArgoCD, GitOps, operators), pm-coordinator (domain/sonnet — sprint planning, roadmaps, Jira/Linear, OKRs), advanced-debugging (specialized/opus — memory leaks, race conditions, profiling, root cause analysis). Routing table, CLAUDE.md, and agent-registry updated.",
-      "affected": ["kubernetes-specialist", "pm-coordinator", "advanced-debugging"]
+      "affected": [
+        "kubernetes-specialist",
+        "pm-coordinator",
+        "advanced-debugging"
+      ]
     },
     {
       "id": "2026-02-22-iron-laws-integration",
@@ -710,9 +914,16 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Creator Tools",
-      "agents": ["developer", "architect"],
+      "agents": [
+        "developer",
+        "architect"
+      ],
       "description": "Integrated Three Architectural Iron Laws (I: Enforcement Hooks, II: Model-Agnostic Schemas, III: Observability) into skill-creator (v2.2.0), hook-creator (v2.2.0), schema-creator (v2.2.0). Created centralized send-event.cjs observability tool. Added Typed Artifact Search (A/B/C) and World-Class Maturity Model to skill-creator.",
-      "affected": ["skill-creator", "hook-creator", "schema-creator"]
+      "affected": [
+        "skill-creator",
+        "hook-creator",
+        "schema-creator"
+      ]
     },
     {
       "id": "2026-02-22-creator-updater-alignment",
@@ -722,7 +933,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Creator Tools",
-      "agents": ["skill-creator", "agent-creator"],
+      "agents": [
+        "skill-creator",
+        "agent-creator"
+      ],
       "description": "Alignment pass across all creator/updater skills: workflow-updater rewrite (v1.1.0), stale artifact-updater references removed from command-creator/rule-creator/tool-creator, agent-updater checklist + lint/evolution-state steps added, skill-updater cascade extended to workflow-updater",
       "affected": [
         "workflow-updater",
@@ -741,7 +955,11 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Frameworks",
-      "agents": ["frontend-pro", "developer", "researcher"],
+      "agents": [
+        "frontend-pro",
+        "developer",
+        "researcher"
+      ],
       "description": "WebMCP browser-side API skill — corrected from v1.0.0 placeholder to v1.1.0 with Chrome 146 Canary support and @mcp-b/ ecosystem packages"
     },
     {
@@ -752,7 +970,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Frameworks",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/htmx-expert/SKILL.md"
     },
     {
@@ -763,7 +984,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "DevOps & Infrastructure",
-      "agents": ["developer", "devops"],
+      "agents": [
+        "developer",
+        "devops"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/kafka-development-practices/SKILL.md"
     },
     {
@@ -774,7 +998,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Data & Database",
-      "agents": ["developer", "data-engineer"],
+      "agents": [
+        "developer",
+        "data-engineer"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/large-data-with-dask/SKILL.md"
     },
     {
@@ -785,7 +1012,9 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "External Integrations",
-      "agents": ["developer"],
+      "agents": [
+        "developer"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/medusa/SKILL.md"
     },
     {
@@ -796,7 +1025,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "DevOps & Infrastructure",
-      "agents": ["developer", "devops"],
+      "agents": [
+        "developer",
+        "devops"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/monorepo-and-tooling/SKILL.md"
     },
     {
@@ -807,7 +1039,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Mobile",
-      "agents": ["developer", "expo-mobile-developer"],
+      "agents": [
+        "developer",
+        "expo-mobile-developer"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/nativewind-and-tailwind-css-compatibility/SKILL.md"
     },
     {
@@ -818,7 +1053,9 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Mobile",
-      "agents": ["developer"],
+      "agents": [
+        "developer"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/nativescript/SKILL.md"
     },
     {
@@ -829,7 +1066,10 @@
       "status": "completed",
       "completedAt": "2026-02-22T00:00:00.000Z",
       "category": "Frameworks",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "restoredFrom": ".claude/skills/_archive/dead/paraglide-js-internationalization-i18n/SKILL.md"
     },
     {
@@ -1039,7 +1279,11 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "master-orchestrator", "planner"],
+      "agents": [
+        "developer",
+        "master-orchestrator",
+        "planner"
+      ],
       "category": "Development Workflow"
     },
     {
@@ -1049,7 +1293,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "code-reviewer"],
+      "agents": [
+        "developer",
+        "code-reviewer"
+      ],
       "category": "Development Workflow"
     },
     {
@@ -1059,7 +1306,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "code-reviewer"],
+      "agents": [
+        "developer",
+        "code-reviewer"
+      ],
       "category": "Development Workflow"
     },
     {
@@ -1069,7 +1319,11 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["planner", "master-orchestrator", "developer"],
+      "agents": [
+        "planner",
+        "master-orchestrator",
+        "developer"
+      ],
       "category": "Orchestration & Coordination"
     },
     {
@@ -1079,7 +1333,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "devops"],
+      "agents": [
+        "developer",
+        "devops"
+      ],
       "category": "Git & Version Control"
     },
     {
@@ -1089,7 +1346,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "devops"],
+      "agents": [
+        "developer",
+        "devops"
+      ],
       "category": "Git & Version Control"
     },
     {
@@ -1099,7 +1359,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "devops"],
+      "agents": [
+        "developer",
+        "devops"
+      ],
       "category": "Git & Version Control"
     },
     {
@@ -1109,7 +1372,11 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["qa", "planner", "developer"],
+      "agents": [
+        "qa",
+        "planner",
+        "developer"
+      ],
       "category": "Validation & Quality"
     },
     {
@@ -1119,7 +1386,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "category": "Frameworks"
     },
     {
@@ -1129,7 +1399,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "category": "Frameworks"
     },
     {
@@ -1139,7 +1412,9 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer"],
+      "agents": [
+        "developer"
+      ],
       "category": "External Integrations"
     },
     {
@@ -1149,7 +1424,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "database-architect"],
+      "agents": [
+        "developer",
+        "database-architect"
+      ],
       "category": "Data & Database"
     },
     {
@@ -1159,7 +1437,9 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer"],
+      "agents": [
+        "developer"
+      ],
       "category": "Languages"
     },
     {
@@ -1169,7 +1449,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "golang-pro"],
+      "agents": [
+        "developer",
+        "golang-pro"
+      ],
       "category": "Frameworks"
     },
     {
@@ -1179,7 +1462,11 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "golang-pro", "security-architect"],
+      "agents": [
+        "developer",
+        "golang-pro",
+        "security-architect"
+      ],
       "category": "Frameworks"
     },
     {
@@ -1189,7 +1476,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "expo-mobile-developer"],
+      "agents": [
+        "developer",
+        "expo-mobile-developer"
+      ],
       "category": "Mobile"
     },
     {
@@ -1199,7 +1489,9 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer"],
+      "agents": [
+        "developer"
+      ],
       "category": "Languages"
     },
     {
@@ -1209,7 +1501,9 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer"],
+      "agents": [
+        "developer"
+      ],
       "category": "Languages"
     },
     {
@@ -1219,7 +1513,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "category": "Frameworks"
     },
     {
@@ -1229,7 +1526,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "category": "Frameworks"
     },
     {
@@ -1239,7 +1539,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "web3-blockchain-expert"],
+      "agents": [
+        "developer",
+        "web3-blockchain-expert"
+      ],
       "category": "External Integrations"
     },
     {
@@ -1249,7 +1552,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "category": "Vercel & Web Performance"
     },
     {
@@ -1259,7 +1565,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["developer", "frontend-pro"],
+      "agents": [
+        "developer",
+        "frontend-pro"
+      ],
       "category": "Frameworks"
     },
     {
@@ -1269,7 +1578,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["planner", "developer"],
+      "agents": [
+        "planner",
+        "developer"
+      ],
       "category": "Other"
     },
     {
@@ -1279,7 +1591,10 @@
       "version": "1.0.0",
       "source": "archive/dead",
       "date": "2026-02-22",
-      "agents": ["planner", "developer"],
+      "agents": [
+        "planner",
+        "developer"
+      ],
       "category": "Other"
     }
   ],
@@ -1299,6 +1614,92 @@
       "lastEvolution": "2026-03-01",
       "trigger": "manual",
       "description": "Added agents frontmatter, category, verified status. Expanded from singular Iron Law to 5-law suite. Added Anti-Patterns table. Wired into reverse-engineer and security-architect agents and catalog Security section."
+    }
+  },
+  "artifacts": {
+    "cleanup-always": {
+      "status": "active",
+      "versions": {
+        "1.0.0": {
+          "date": "2026-03-13T00:00:00.000Z",
+          "verified": true,
+          "reason": "Initial creation"
+        }
+      },
+      "linked_issues": [],
+      "last_audit": "2026-03-13T00:00:00.000Z"
+    },
+    "documentation-always": {
+      "status": "active",
+      "versions": {
+        "1.0.0": {
+          "date": "2026-03-13T00:00:00.000Z",
+          "verified": true,
+          "reason": "Initial creation"
+        }
+      },
+      "linked_issues": [],
+      "last_audit": "2026-03-13T00:00:00.000Z"
+    },
+    "solidjs-rules": {
+      "status": "active",
+      "versions": {
+        "1.0.0": {
+          "date": "2026-03-13T00:00:00.000Z",
+          "verified": true,
+          "reason": "Initial creation"
+        }
+      },
+      "linked_issues": [],
+      "last_audit": "2026-03-13T00:00:00.000Z"
+    },
+    "astro-rules": {
+      "status": "active",
+      "versions": {
+        "1.0.0": {
+          "date": "2026-03-13T00:00:00.000Z",
+          "verified": true,
+          "reason": "Initial creation"
+        }
+      },
+      "linked_issues": [],
+      "last_audit": "2026-03-13T00:00:00.000Z"
+    },
+    "playwright-testing-rules": {
+      "status": "active",
+      "versions": {
+        "1.0.0": {
+          "date": "2026-03-13T00:00:00.000Z",
+          "verified": true,
+          "reason": "Initial creation"
+        }
+      },
+      "linked_issues": [],
+      "last_audit": "2026-03-13T00:00:00.000Z"
+    },
+    "supabase-rules": {
+      "status": "active",
+      "versions": {
+        "1.0.0": {
+          "date": "2026-03-13T00:00:00.000Z",
+          "verified": true,
+          "reason": "Initial creation"
+        }
+      },
+      "linked_issues": [],
+      "last_audit": "2026-03-13T00:00:00.000Z"
+    },
+    "lancedb-rules": {
+      "status": "active",
+      "versions": {
+        "1.0.0": {
+          "date": "2026-03-13T00:00:00.000Z",
+          "verified": true,
+          "reason": "Initial creation"
+        }
+      },
+      "linked_issues": [],
+      "last_audit": "2026-03-13T00:00:00.000Z"
     }
   }
 }

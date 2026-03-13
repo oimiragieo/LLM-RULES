@@ -139,7 +139,9 @@ test('spawn blocks when required report output is declared but Write/Edit tools 
       SPAWN_ADAPTIVE_ENRICHMENT: 'off',
     });
 
-    assert.equal(result.status, 0,
+    assert.equal(
+      result.status,
+      0,
       `expected block exit code 2, got ${result.status}: ${result.stdout}`
     );
     assert.match(
@@ -220,7 +222,9 @@ test('pre-completion blocks completed status when required output file is missin
       TASK_STATUS_ENFORCEMENT: 'off',
       TASK_OUTPUT_ENFORCEMENT: 'block',
     });
-    assert.equal(result.status, 0,
+    assert.equal(
+      result.status,
+      0,
       `expected block exit code 2, got ${result.status}: ${result.stdout}`
     );
     assert.match(result.stdout, /REQUIRED OUTPUT VALIDATION FAILED|Missing required outputs/i);
@@ -289,7 +293,9 @@ test('pre-completion blocks when required output points to read-safety placehold
       TASK_STATUS_ENFORCEMENT: 'off',
       TASK_OUTPUT_ENFORCEMENT: 'block',
     });
-    assert.equal(result.status, 0,
+    assert.equal(
+      result.status,
+      0,
       `expected block exit code 2, got ${result.status}: ${result.stdout}`
     );
     assert.match(result.stdout, /Invalid placeholder outputs|REQUIRED OUTPUT VALIDATION FAILED/i);

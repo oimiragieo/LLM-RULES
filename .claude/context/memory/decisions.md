@@ -1,3 +1,62 @@
+## ADR-2026-03-13-068: QA Must Verify Rule-Index Count After Rule Creation (2026-03-13)
+
+**Status:** ACCEPTED
+**Date:** 2026-03-13
+**Trigger:** Session task #14 created 7 rule files (lancedb, supabase, playwright, astro, solidjs, cleanup-always, documentation-always) but `pnpm index-rules` was never run by subagents. Gap-log entry confirmed: "rule-index count discrepancy 114→126". The QA agent passed without detecting this gap.
+
+**Decision:** QA agent MUST proactively check rule-index count whenever any session involved rule creation. Specifically:
+1. Run `pnpm index-rules 2>/dev/null | tail -1` and capture count
+2. Count `.claude/rules/*.md` files in the directory
+3. Assert that indexed count matches file count (or that the count increased by the number of rules created)
+4. FAIL QA if discrepancy exists
+
+**Verification command QA must run:**
+```bash
+node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log('Indexed rules:', Object.keys(d.rules||d).length)"
+```
+
+**Root Cause:** rule-creator Step 4 (run `pnpm index-rules`) is mandatory per the skill's workflow, but subagents skipped it. QA did not check index health as part of its final validation sweep.
+
+**Consequences:** QA must add a "framework index integrity" check to its proactive-audit checklist. This check verifies: rule-index count, skill-index count (if skills created), and agent-registry count (if agents created) all match the actual file counts.
+
+---
+
+## ADR-2026-03-13-067: Root-Level Slop Files Are QA Responsibility (2026-03-13)
+
+**Status:** ACCEPTED
+**Date:** 2026-03-13
+**Trigger:** 19 untracked files accumulated in the project root during the MEGA EPIC session (dump-test.cjs, test-out.txt, errors.json, eslint.json, rename_agent.cjs, revert_rename.cjs, update_frequencies.cjs, update_skill_loops.cjs, update_skill_rigidity.cjs, etc.). The router failed to detect these. User had to manually confront the router about cleanup.
+
+**Decision:** QA agent MUST run `git status -s | grep "^??" | grep -v ".claude/"` as part of its final pipeline check. Any `??` files in the project root (excluding `.claude/` paths) should be flagged as a QA finding. QA must:
+1. List all untracked root-level files
+2. Categorize them: temp scripts, test outputs, migration scripts, debug files
+3. ASK USER before deleting (per file-deletion-safety iron law)
+4. Report them as a "workspace hygiene" finding if QA cannot confirm their purpose
+
+**Root Cause:** Developers created temp scripts and test artifacts in project root without cleaning up. QA passed without checking workspace hygiene.
+
+**Consequences:** Adds a "workspace hygiene" check to QA's proactive-audit. QA must NEVER delete untracked files silently — it must list them and report, then ask user. This is distinct from the file-deletion-safety rule which prevents deletion; this ADR mandates QA to *detect* and *surface* the problem.
+
+---
+
+## ADR-2026-03-13-066: Router Self-Accountability — Failure Must Be Logged, Not Deflected (2026-03-13)
+
+**Status:** ACCEPTED
+**Date:** 2026-03-13
+**Trigger:** Router observed devops agent failing to commit ~50% of the time this session. Instead of logging this as a router routing failure (chose wrong agent) or escalating, the router noted "systemic devops issue" in comments and continued. User confronted the router about 19 root-level slop files and router initially deflected blame to subagents.
+
+**Decision:** When the Router observes a routing failure (wrong agent chosen, agent produces wrong output, agent fails its task), the Router MUST:
+1. Log a gap-log entry with `type: "routing_failure"` (not just `cleanup_finding`)
+2. Self-reflect: was the agent choice wrong? Should a different agent have been used?
+3. For devops commit failures specifically: immediately switch to `nodejs-pro` (confirmed reliable) rather than retrying devops or blaming the agent
+4. When surfacing cleanup issues to the user, own the routing decision — do not blame only the subagent
+
+**Pattern established:** `nodejs-pro` with `git add -u && git commit` is the reliable commit pattern when devops fails. Router must use this as the fallback immediately (not after user intervention).
+
+**Consequences:** Router's gap-log entries must include `routerDecision` field explaining what the router chose and why. Reflection-agent must score routing quality as a dimension.
+
+---
+
 ## ADR-2026-03-12-065: Multi-Model Review Must Run in Fresh Session (2026-03-12)
 
 **Status:** ACCEPTED (pattern)
@@ -34,81 +93,6 @@
 **Trigger:** User requested skill-updater on stale-module-pruner and proactive-audit.
 
 **Decision:** (1) stale-module-pruner: rewrote stub SKILL.md to v1.0.0 with real workflow (ripgrep-based dead code crawl, dry-run gate, prune report), 5 Iron Laws, 5 Anti-Patterns, Memory Protocol, 6 mandatory skills. Fixed catalog: added to Quick Reference Core Development row (16→17) since parseMarkdownTable() only reads first table. Added developer to agent assignments. (2) proactive-audit: upgraded v1.1.0→v1.2.0, added Mandatory Skills table (6 skills), updated lastVerifiedAt. Both pass validate-integration.
-
----
-
-## ADR-2026-02-22-039: Batch 28 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** nativescript, next-cache-components, next-upgrade
-
-**Changes applied:**
-
-- `nativescript` (v1.0.0→v1.1.0): Added verified=true, lastVerifiedAt, added 5 Iron Laws (always platform-specific files, never direct visual tree manipulation, always retain delegates, never deeply nested layouts, always clean up timers/listeners), added Anti-Patterns table (5 rows).
-- `next-cache-components` (v'1.0.0'→v'1.1.0'): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always explicit use cache, never cache auth-dependent, always cacheTag on mutable data, never cache mutations, always revalidateTag after mutation), replaced bullet Anti-Patterns with proper 3-column table (5 rows).
-- `next-upgrade` (v'1.0.0'→v'1.1.0'): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always dedicated branch, never skip versions, always run codemods first, never undocumented --legacy-peer-deps, always full build+test), added Anti-Patterns table (5 rows).
-
----
-
-## ADR-2026-02-22-040: Batch 29 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** nextjs-expert, nodejs-expert, on-call-handoff-patterns
-
-**Changes applied:**
-
-- `nextjs-expert` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always App Router, never use client by default, always await Request APIs, never omit error.tsx, always fill+sizes for fluid images), added Anti-Patterns table (5 rows).
-- `nodejs-expert` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always validate DTOs, never use callbacks, always global exception filter, never block event loop, always connection pooling), added Anti-Patterns table (5 rows).
-- `on-call-handoff-patterns` (v1.0→v1.1.0): Fixed semver, set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always write handoff doc, never skip sync call, always escalate within 30 min, never skip alerting verification, always document next steps), added Anti-Patterns table (5 rows).
-
----
-
-## ADR-2026-02-22-041: Batch 30 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** php-expert, pipeline-reflection-ux, plan-generator
-
-**Changes applied:**
-
-- `php-expert` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always parameterized queries, never md5/sha1 passwords, always strict_types, never silent Exception catch, always validate at boundary), added Anti-Patterns table (5 rows).
-- `pipeline-reflection-ux` (v'1.0.0'→v'1.1.0'): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always Step 0 narration, never batch reflection with dependents, always emit reflection outcome, never per-agent late notifications, always preserve block semantics), added Anti-Patterns table (5 rows), added Memory Protocol section.
-- `plan-generator` (v1.1→v1.1.0 semver fix): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws section (always executable command, never 7+ tasks per phase, always verification gates, never plan without rollback, always coordinate specialists). Existing Anti-Patterns table preserved.
-
----
-
-## ADR-2026-02-22-042: Batch 31 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** planning-with-files, postmortem-writing, prd-generator
-
-**Changes applied:**
-
-- `planning-with-files` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt, removed HTML comment template markers from findings.md and progress.md templates (fixed Check 8), fixed `- ## Actions taken:` syntax, added 5 Iron Laws (always create 3 files first, always re-read plan before decisions, never retry with identical inputs, always write multimodal findings immediately, never mark complete without verifying deliverables), replaced 2-column Anti-Patterns with 3-column table (5 rows).
-- `postmortem-writing` (v1.0→v1.1.0 semver fix): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always write within 48 hours, never blame individuals, always trace 3+ levels of why, always assign owner/priority/date to actions, never skip what went well), existing 3-column Anti-Patterns table preserved.
-- `prd-generator` (v1.0→v1.1.0 semver fix): Set verified=true, updated lastVerifiedAt, replaced single prose Iron Law code block with proper 5 Iron Laws section (never solution before problem, always include Won't in MoSCoW, always measurable hypothesis, always map phase dependencies, never let PRD go stale), added Anti-Patterns table (5 rows).
-
----
-
-## ADR-2026-02-22-043: Batch 32 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** proactive-audit, project-onboarding, pyqt6-ui-development-rules
-
-**Changes applied:**
-
-- `proactive-audit` (v1.0.0→v1.1.0): Set verified=true, added lastVerifiedAt, added 5 Iron Laws (always run all checks, never trust task metadata, never self-attest PASS, never ignore SE-02, always check hook syntax), replaced bullet Anti-Patterns with 3-column table (5 rows).
-- `project-onboarding` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always check existing memories first, never assume conventions, always write to persistent memory, always verify commands, never skip memory updates), added Anti-Patterns table (5 rows) before Memory Protocol.
-- `pyqt6-ui-development-rules` (v1.0.0→v1.1.0): Added verified=true, lastVerifiedAt, added 5 Iron Laws (always signal/slot, never block UI thread, always app-level QSS, never absolute pixels, always cross-platform testing), added Anti-Patterns table (5 rows). Note: progressive-disclosure skill directory not found — skipped.
 
 ---
 

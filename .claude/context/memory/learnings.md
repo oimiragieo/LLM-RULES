@@ -1,3 +1,67 @@
+## Agent Oversizing in Batch Creation Pipelines — Two-Pass Pattern (2026-03-13)
+
+**Task**: Task #13 — legacy-modernizer agent from MEGA EPIC 17-repo assimilation
+
+**Pattern: Agent-Creator Oversizing in Batch EPIC Pipelines**
+
+- Agents created during MEGA EPIC batch passes consistently exceed the 6KB/~200-line budget when agent-creator synthesizes from multiple external sources simultaneously
+- legacy-modernizer was initially 19KB (far over the 6KB limit); required code-simplifier trimming pass to reach 5.1KB
+- This is now the 2nd confirmed occurrence of oversized-draft-then-trim pattern in the same MEGA EPIC session (browser-automation skill was the first — 1st occurrence, Task #15)
+- Root cause: agent-creator synthesizes from rich external repos (awesome-claude-code-subagents patterns) and includes everything found rather than distilling to essentials
+- **Fix (IRON LAW)**: agent-creator in MEGA EPIC batch mode MUST add explicit size gate before accepting output: if draft > 6KB or > 200 lines → auto-invoke code-simplifier before registry registration. Do NOT accept first-draft oversized artifacts.
+- **Recommended enforcement**: agent-creator Step N (post-draft) should include `wc -l` + `wc -c` check and fail if over threshold, similar to how skill-creator should add a 4KB/120-line gate
+- **The two-pass anti-pattern is avoidable**: a size constraint prompt-template appended to agent-creator's synthesis step ("max 200 lines, max 6KB, no inline code examples") would prevent the first-pass oversizing
+
+**Integration status**: legacy-modernizer cataloged, routing table updated, assigned to domain/
+
+---
+
+## Skill Sizing Budget in Batch Creation Pipelines (2026-03-13)
+
+**Task**: Task #15 — browser-automation skill from MEGA EPIC 17-repo assimilation
+
+**Pattern: Skill-Creator Oversizing in Batch EPIC Pipelines**
+
+- Skills created during large MEGA EPIC batch passes may exceed the recommended 4-5KB budget because skill-creator synthesizes from multiple external sources simultaneously
+- browser-automation was initially oversized, required code-simplifier trimming to reach 3.8KB
+- Sibling skills in same batch stayed within budget: tts-generation ~4KB, transcription ~4KB, deep-research ~5KB, lsp-navigator ~5KB
+- Root cause: batch assimilation from 3 external repos (mermaid-diagram-plugin, claude-quickstarts, vercel) produces richer-than-needed content
+- **Fix**: When skill-creator is invoked in MEGA EPIC batch mode, add explicit "max 4KB / 120 lines" size gate before accepting output; if oversized, auto-invoke code-simplifier before catalog registration
+- **Integration check passed**: browser-automation cataloged, indexed (agentPrimary: developer), assigned to developer.md + qa.md agents
+
+---
+
+## MEGA EPIC Completion — Ecosystem Assimilation (2026-03-13)
+
+**Task**: Task #1 — 17 repos assimilated, 75 agents (+1 legacy-modernizer), 282 skills, 2 commits (2046b614 + f5dec41e), 47 files touched.
+
+**Pattern: Batch External Repo Assimilation at EPIC Scale**
+
+- Successfully integrated content from 17 external repositories into agent-studio skill/rule/agent ecosystem
+- Key artifacts created: tts-generation, transcription, deep-research, browser-automation, vercel-deploy (updated), lsp-navigator (updated), legacy-modernizer agent, 5 rules (lancedb, supabase, playwright-testing, astro, solidjs), aso-specialist (updated)
+- Rule count discrepancy: rule-index not updated — `pnpm index-rules` step was skipped by at least one rule-creator invocation. Count verification after batch creation is mandatory.
+- QA gate (task #16) passed as final validation before commit — 75 agents, 282 skills confirmed.
+- Agent count registry check is mandatory when agents are added — registry compliance tests expect exact count.
+
+**Pattern: Temp File Hygiene for Developer/Integration Agents (IRON LAW)**
+
+- Developer and testing agents consistently dump temp/debug scripts to the project root: `dump-test.cjs`, `errors.json`, `eslint.json`, `test-out.txt`, `rename_agent.cjs`, etc.
+- **IRON LAW**: ALL temporary scripts, logs, and CLI output dumps MUST go to `.claude/context/tmp/` OR your system's `tmp/` equivalent. 
+- **IRON LAW**: NEVER leave one-off scripts or JSON dumps in the project root. The project root is considered a sacred production boundary.
+- If you need a script to remain permanently, place it in `scripts/maintenance/` and commit it.
+- **Enforcement**: Subagents that pollute the project root with ephemeral logs and test outputs are actively violating the `workspace-conventions` rule.
+
+## Rule Creator Step 4 Mandatory Verification (2026-03-13)
+
+**Issue**: rule-creator was invoked but `pnpm index-rules` (Step 4) was skipped during MEGA EPIC. This caused a rule-index count discrepancy (claimed 114→126 but index not updated).
+
+**Pattern**:
+- rule-creator Step 4 (`pnpm index-rules`) is MANDATORY after any rule file creation
+- Count verification is required: compare before-count with expected after-count
+- If count doesn't match, rule creation failed silently — re-run the creator step
+
+**Enforcement**: Post-creation integration step for rules should validate `pnpm validate:rules` exits clean.
+
 ## Rule Creation — Wave 4A (2026-03-13)
 
 Created 5 new rule files in `.claude/rules/` from awesome-rules/awesome-cursorrules patterns:
