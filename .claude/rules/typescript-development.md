@@ -23,7 +23,9 @@ Always use `strict: true` in tsconfig.json. Never disable individual strict chec
 
 ```typescript
 // BAD
-function parse(data: any) { return data.name; }
+function parse(data: any) {
+  return data.name;
+}
 
 // GOOD
 function parse(data: unknown): string {
@@ -40,7 +42,11 @@ Model state as discriminated unions — never use optional fields to represent s
 
 ```typescript
 // BAD
-interface State { loading?: boolean; data?: string; error?: Error; }
+interface State {
+  loading?: boolean;
+  data?: string;
+  error?: Error;
+}
 
 // GOOD
 type State =
@@ -59,10 +65,14 @@ function assertNever(x: never): never {
 }
 
 switch (state.status) {
-  case 'loading': return '...';
-  case 'success': return state.data;
-  case 'error': return state.error.message;
-  default: return assertNever(state);
+  case 'loading':
+    return '...';
+  case 'success':
+    return state.data;
+  case 'error':
+    return state.error.message;
+  default:
+    return assertNever(state);
 }
 ```
 

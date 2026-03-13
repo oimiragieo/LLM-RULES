@@ -161,7 +161,20 @@ function removeWorktree(worktreePath) {
     git(removeArgs);
     return { success: true, error: null };
   } catch (err) {
-    return { success: false, error: err.message || String(err) };
+    // Windows file-lock fallback: aggressively rm the directory
+    try {
+      if (fs.existsSync(nativePath)) {
+        fs.rmSync(nativePath, { recursive: true, force: true, maxRetries: 3, retryDelay: 500 });
+        // Clean up git's internal state after brute-force removal
+        pruneGitWorktrees();
+      }
+      return { success: true, error: null };
+    } catch (rmErr) {
+      return {
+        success: false,
+        error: `Git worktree remove failed: ${err.message || String(err)} AND fallback rmSync failed: ${rmErr.message || String(rmErr)}`,
+      };
+    }
   }
 }
 

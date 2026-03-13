@@ -176,13 +176,13 @@ gcloud run services logs read SERVICE_NAME --region us-central1 --limit 20
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|-------------|-------------|-----------------|
-| Missing --region flag | Interactive prompt breaks CI/CD | Always specify region explicitly |
-| Public endpoints for internal APIs | Security exposure | Use IAM auth + Cloud Run invoker role |
-| Hardcoded secrets in env vars | Secrets visible in service config | Use Secret Manager integration |
-| No min-instances for latency-critical | Cold start adds 2-10s latency | Set --min-instances 1+ for critical paths |
-| Single revision (no traffic split) | No rollback path | Always keep previous revision, split traffic gradually |
+| Anti-Pattern                          | Why It Fails                      | Correct Approach                                       |
+| ------------------------------------- | --------------------------------- | ------------------------------------------------------ |
+| Missing --region flag                 | Interactive prompt breaks CI/CD   | Always specify region explicitly                       |
+| Public endpoints for internal APIs    | Security exposure                 | Use IAM auth + Cloud Run invoker role                  |
+| Hardcoded secrets in env vars         | Secrets visible in service config | Use Secret Manager integration                         |
+| No min-instances for latency-critical | Cold start adds 2-10s latency     | Set --min-instances 1+ for critical paths              |
+| Single revision (no traffic split)    | No rollback path                  | Always keep previous revision, split traffic gradually |
 
 ## Memory Protocol (MANDATORY)
 

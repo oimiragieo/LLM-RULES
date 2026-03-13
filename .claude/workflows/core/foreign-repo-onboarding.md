@@ -1,6 +1,7 @@
 ---
 description: Standardized startup workflow before analyzing or managing a new, unknown, foreign repository to prevent AI context token bloating.
 ---
+
 # Foreign Repository Onboarding Workflow
 
 ## 1. Context Sanitization (MANDATORY)
@@ -13,7 +14,7 @@ Before viewing ANY files or exploring the structure of a completely new codebase
 pnpm context:auto-ignore
 ```
 
-*Why?* This script natively traverses the filesystem computing `stat.size / 4` (token heuristic) for every text-based file. If a file breaches 80,000 tokens (approx 320KB), it is automatically appended to `.claudeignore` to protect your session.
+_Why?_ This script natively traverses the filesystem computing `stat.size / 4` (token heuristic) for every text-based file. If a file breaches 80,000 tokens (approx 320KB), it is automatically appended to `.claudeignore` to protect your session.
 
 1. Verify suppression:
 

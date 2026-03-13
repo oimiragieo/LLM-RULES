@@ -20,8 +20,12 @@ function processOrder(order: Order) {
 }
 
 // AFTER
-function calculateTax(total: number): number { return total * 0.08; }
-function calculateShipping(weight: number): number { return weight > 5 ? 15 : 5; }
+function calculateTax(total: number): number {
+  return total * 0.08;
+}
+function calculateShipping(weight: number): number {
+  return weight > 5 ? 15 : 5;
+}
 
 function processOrder(order: Order) {
   const finalTotal = order.total + calculateTax(order.total) + calculateShipping(order.weight);
@@ -48,11 +52,16 @@ When a function takes 3+ related parameters:
 
 ```typescript
 // BEFORE
-function createUser(firstName: string, lastName: string, email: string, role: string) { }
+function createUser(firstName: string, lastName: string, email: string, role: string) {}
 
 // AFTER
-interface CreateUserParams { firstName: string; lastName: string; email: string; role: string; }
-function createUser(params: CreateUserParams) { }
+interface CreateUserParams {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+}
+function createUser(params: CreateUserParams) {}
 ```
 
 ## Remove Flag Arguments
@@ -61,11 +70,11 @@ Boolean flags are a code smell — split into two functions:
 
 ```typescript
 // BEFORE
-function render(data: Data, isVerbose: boolean) { }
+function render(data: Data, isVerbose: boolean) {}
 
 // AFTER
-function render(data: Data) { }
-function renderVerbose(data: Data) { }
+function render(data: Data) {}
+function renderVerbose(data: Data) {}
 ```
 
 ## Decompose Conditional
@@ -74,13 +83,15 @@ Extract complex boolean logic into named predicates:
 
 ```typescript
 // BEFORE
-if (user.role === 'admin' && user.verified && !user.suspended && Date.now() < user.expiresAt) { }
+if (user.role === 'admin' && user.verified && !user.suspended && Date.now() < user.expiresAt) {
+}
 
 // AFTER
 function isActiveAdmin(user: User): boolean {
   return user.role === 'admin' && user.verified && !user.suspended && Date.now() < user.expiresAt;
 }
-if (isActiveAdmin(user)) { }
+if (isActiveAdmin(user)) {
+}
 ```
 
 ## Replace Conditional with Map/Strategy
@@ -98,7 +109,9 @@ function getIcon(type: string): string {
 
 // AFTER
 const ICONS: Record<string, string> = { error: '❌', warning: '⚠️', info: 'ℹ️' };
-function getIcon(type: string): string { return ICONS[type] ?? '?'; }
+function getIcon(type: string): string {
+  return ICONS[type] ?? '?';
+}
 ```
 
 ## Inline Variable (Remove Unnecessary Intermediary)

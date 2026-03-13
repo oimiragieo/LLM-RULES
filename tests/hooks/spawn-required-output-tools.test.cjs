@@ -27,6 +27,7 @@ const AGENTS = ['developer', 'researcher', 'architect', 'security-architect', 'q
 
 function runSpawn(agentType, allowedTools) {
   return cp.spawnSync(process.execPath, [SPAWN_HOOK], {
+    shell: false,
     input: JSON.stringify({
       session_id: `spawn-required-tools-${agentType}`,
       tool_name: 'Task',
@@ -63,11 +64,7 @@ test('cross-agent: explicit allowed_tools without Write/Edit are blocked when re
         0,
         `expected block (exit 0) for ${agentType}, got ${result.status}: ${result.stdout || result.stderr}`
       );
-      assert.match(
-        result.stdout,
-        /deny|block/i,
-        `expected block JSON for ${agentType}`
-      );
+      assert.match(result.stdout, /deny|block/i, `expected block JSON for ${agentType}`);
       assert.match(
         result.stdout,
         /missing Write\/Edit|Required output artifact/i,

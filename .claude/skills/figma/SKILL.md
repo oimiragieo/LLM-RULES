@@ -88,42 +88,42 @@ curl -s -H "X-Figma-Token: $FIGMA_ACCESS_TOKEN" \
 ```css
 /* Colors */
 :root {
-  --color-primary: #2563EB;      /* From Figma: Primary/500 */
-  --color-secondary: #7C3AED;    /* From Figma: Secondary/500 */
-  --color-surface: #FFFFFF;      /* From Figma: Surface/Default */
+  --color-primary: #2563eb; /* From Figma: Primary/500 */
+  --color-secondary: #7c3aed; /* From Figma: Secondary/500 */
+  --color-surface: #ffffff; /* From Figma: Surface/Default */
 }
 
 /* Typography */
 :root {
   --font-heading: 'Inter', sans-serif;
   --font-body: 'Inter', sans-serif;
-  --text-xl: 1.25rem;           /* From Figma: Heading/XL */
-  --text-base: 1rem;            /* From Figma: Body/Base */
+  --text-xl: 1.25rem; /* From Figma: Heading/XL */
+  --text-base: 1rem; /* From Figma: Body/Base */
   --leading-tight: 1.25;
   --leading-normal: 1.5;
 }
 
 /* Spacing */
 :root {
-  --space-1: 0.25rem;           /* 4px */
-  --space-2: 0.5rem;            /* 8px */
-  --space-4: 1rem;              /* 16px */
-  --space-8: 2rem;              /* 32px */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem; /* 8px */
+  --space-4: 1rem; /* 16px */
+  --space-8: 2rem; /* 32px */
 }
 ```
 
 ### Step 3: Auto-Layout to CSS Mapping
 
-| Figma Auto-Layout | CSS Equivalent |
-|-------------------|---------------|
-| Horizontal | `display: flex; flex-direction: row;` |
-| Vertical | `display: flex; flex-direction: column;` |
-| Space between | `justify-content: space-between;` |
-| Packed (start) | `justify-content: flex-start;` |
-| Gap: 16 | `gap: 1rem;` |
-| Padding: 16,24 | `padding: 1rem 1.5rem;` |
-| Fill container | `flex: 1;` or `width: 100%;` |
-| Hug contents | `width: fit-content;` |
+| Figma Auto-Layout | CSS Equivalent                           |
+| ----------------- | ---------------------------------------- |
+| Horizontal        | `display: flex; flex-direction: row;`    |
+| Vertical          | `display: flex; flex-direction: column;` |
+| Space between     | `justify-content: space-between;`        |
+| Packed (start)    | `justify-content: flex-start;`           |
+| Gap: 16           | `gap: 1rem;`                             |
+| Padding: 16,24    | `padding: 1rem 1.5rem;`                  |
+| Fill container    | `flex: 1;` or `width: 100%;`             |
+| Hug contents      | `width: fit-content;`                    |
 
 ### Step 4: Component Inspection
 
@@ -145,13 +145,13 @@ For each Figma component, extract:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|-------------|-------------|-----------------|
-| Hardcoded hex colors | Breaks on design system update | Use CSS variables mapped from Figma tokens |
-| Ignoring auto-layout | Layout doesn't match design | Map auto-layout 1:1 to flexbox/grid |
-| Pixel-perfect obsession | Wastes time, ignores responsive | Match design intent, not exact pixels |
-| Skipping component variants | Missing states (hover, disabled) | Extract ALL Figma variants |
-| Manual token extraction | Error-prone, doesn't scale | Use Figma REST API for programmatic extraction |
+| Anti-Pattern                | Why It Fails                     | Correct Approach                               |
+| --------------------------- | -------------------------------- | ---------------------------------------------- |
+| Hardcoded hex colors        | Breaks on design system update   | Use CSS variables mapped from Figma tokens     |
+| Ignoring auto-layout        | Layout doesn't match design      | Map auto-layout 1:1 to flexbox/grid            |
+| Pixel-perfect obsession     | Wastes time, ignores responsive  | Match design intent, not exact pixels          |
+| Skipping component variants | Missing states (hover, disabled) | Extract ALL Figma variants                     |
+| Manual token extraction     | Error-prone, doesn't scale       | Use Figma REST API for programmatic extraction |
 
 ## Memory Protocol (MANDATORY)
 
