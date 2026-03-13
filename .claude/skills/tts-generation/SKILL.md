@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash, WebFetch]
 agents: [developer, ai-ml-expert]
-category: "AI/ML"
+category: 'AI/ML'
 tags: [tts, text-to-speech, audio, openai, elevenlabs, google-tts, voice]
 best_practices:
   - Choose model tier based on latency vs quality requirements (tts-1 for speed, tts-1-hd for quality)
@@ -29,14 +29,14 @@ Generate speech audio from text using AI backends.
 
 ## Backend Comparison
 
-| Feature    | OpenAI TTS          | ElevenLabs          | Google TTS     |
-| ---------- | ------------------- | ------------------- | -------------- |
-| Quality    | High                | Highest             | Medium         |
-| Latency    | Low (tts-1)         | Medium              | Low            |
-| Cost       | ~$15/1M chars       | ~$22/1M chars       | Free (limited) |
-| Voices     | 6 preset            | Cloneable           | 40+ languages  |
-| Max chars  | 4096/request        | Unlimited           | ~5000/request  |
-| Streaming  | Yes                 | Yes                 | No             |
+| Feature   | OpenAI TTS    | ElevenLabs    | Google TTS     |
+| --------- | ------------- | ------------- | -------------- |
+| Quality   | High          | Highest       | Medium         |
+| Latency   | Low (tts-1)   | Medium        | Low            |
+| Cost      | ~$15/1M chars | ~$22/1M chars | Free (limited) |
+| Voices    | 6 preset      | Cloneable     | 40+ languages  |
+| Max chars | 4096/request  | Unlimited     | ~5000/request  |
+| Streaming | Yes           | Yes           | No             |
 
 ## Quick Start
 

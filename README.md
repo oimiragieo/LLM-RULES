@@ -55,11 +55,11 @@ Some skills require external API keys. All are optional — core functionality w
 cp .env.example .env
 ```
 
-| Variable            | Used by                                      | Notes                              |
-| ------------------- | -------------------------------------------- | ---------------------------------- |
-| `OPENAI_API_KEY`    | `tts-generation` (OpenAI TTS), `transcription` (cloud backend) | Optional — local alternatives available |
-| `ELEVENLABS_API_KEY`| `tts-generation` (ElevenLabs voices)         | Optional — OpenAI TTS or gTTS (free) as fallback |
-| `EXA_API_KEY`       | `deep-research` (enhanced semantic search)   | Optional — web search works without it |
+| Variable             | Used by                                                        | Notes                                            |
+| -------------------- | -------------------------------------------------------------- | ------------------------------------------------ |
+| `OPENAI_API_KEY`     | `tts-generation` (OpenAI TTS), `transcription` (cloud backend) | Optional — local alternatives available          |
+| `ELEVENLABS_API_KEY` | `tts-generation` (ElevenLabs voices)                           | Optional — OpenAI TTS or gTTS (free) as fallback |
+| `EXA_API_KEY`        | `deep-research` (enhanced semantic search)                     | Optional — web search works without it           |
 
 Skills that work without any API key: `transcription` (local via faster-whisper), `tts-generation` (gTTS, free), `browser-automation`, `diagram-generator`, all code/routing skills.
 

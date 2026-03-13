@@ -3,9 +3,7 @@
   "title": "deep-research Output Schema",
   "description": "Output validation schema for deep-research skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

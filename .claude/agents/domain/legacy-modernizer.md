@@ -121,7 +121,11 @@ Skill({ skill: 'debugging' });
 TaskList();
 TaskUpdate({ taskId: '<id>', status: 'in_progress' });
 // ...work...
-TaskUpdate({ taskId: '<id>', status: 'completed', metadata: { summary: '...', filesModified: [], testResult: 'PASS N/N' } });
+TaskUpdate({
+  taskId: '<id>',
+  status: 'completed',
+  metadata: { summary: '...', filesModified: [], testResult: 'PASS N/N' },
+});
 TaskList();
 ```
 

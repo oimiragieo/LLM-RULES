@@ -6,6 +6,7 @@
 ## Source Repository
 
 **Primary source:** https://github.com/aj47/transcribe-anything
+
 - Wraps Whisper AI with intelligent backend selection
 - Handles isolated venv management per backend
 - Supports: local files, YouTube URLs, microphone input
@@ -19,12 +20,14 @@ Proceeding with primary source + arXiv research.
 ## Academic Research (arXiv)
 
 **Whisper paper:** "Robust Speech Recognition via Large-Scale Weak Supervision" (OpenAI, 2022)
+
 - arXiv: https://arxiv.org/abs/2212.04356
 - Key finding: Large-scale diverse training data (680K hours) enables near-human accuracy
 - Architecture: encoder-decoder Transformer, multitask training (transcription + translation + language ID)
 - Model sizes: tiny (39M) → large-v3 (1.5B parameters)
 
 **faster-whisper:** SYSTRAN implementation using CTranslate2
+
 - 4x faster than original whisper on same hardware
 - Lower memory footprint via INT8 quantization
 

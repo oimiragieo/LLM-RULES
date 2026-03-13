@@ -5,12 +5,14 @@
 **Trigger:** Session task #14 created 7 rule files (lancedb, supabase, playwright, astro, solidjs, cleanup-always, documentation-always) but `pnpm index-rules` was never run by subagents. Gap-log entry confirmed: "rule-index count discrepancy 114→126". The QA agent passed without detecting this gap.
 
 **Decision:** QA agent MUST proactively check rule-index count whenever any session involved rule creation. Specifically:
+
 1. Run `pnpm index-rules 2>/dev/null | tail -1` and capture count
 2. Count `.claude/rules/*.md` files in the directory
 3. Assert that indexed count matches file count (or that the count increased by the number of rules created)
 4. FAIL QA if discrepancy exists
 
 **Verification command QA must run:**
+
 ```bash
 node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log('Indexed rules:', Object.keys(d.rules||d).length)"
 ```
@@ -28,6 +30,7 @@ node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | n
 **Trigger:** 19 untracked files accumulated in the project root during the MEGA EPIC session (dump-test.cjs, test-out.txt, errors.json, eslint.json, rename_agent.cjs, revert_rename.cjs, update_frequencies.cjs, update_skill_loops.cjs, update_skill_rigidity.cjs, etc.). The router failed to detect these. User had to manually confront the router about cleanup.
 
 **Decision:** QA agent MUST run `git status -s | grep "^??" | grep -v ".claude/"` as part of its final pipeline check. Any `??` files in the project root (excluding `.claude/` paths) should be flagged as a QA finding. QA must:
+
 1. List all untracked root-level files
 2. Categorize them: temp scripts, test outputs, migration scripts, debug files
 3. ASK USER before deleting (per file-deletion-safety iron law)
@@ -35,7 +38,7 @@ node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | n
 
 **Root Cause:** Developers created temp scripts and test artifacts in project root without cleaning up. QA passed without checking workspace hygiene.
 
-**Consequences:** Adds a "workspace hygiene" check to QA's proactive-audit. QA must NEVER delete untracked files silently — it must list them and report, then ask user. This is distinct from the file-deletion-safety rule which prevents deletion; this ADR mandates QA to *detect* and *surface* the problem.
+**Consequences:** Adds a "workspace hygiene" check to QA's proactive-audit. QA must NEVER delete untracked files silently — it must list them and report, then ask user. This is distinct from the file-deletion-safety rule which prevents deletion; this ADR mandates QA to _detect_ and _surface_ the problem.
 
 ---
 
@@ -46,6 +49,7 @@ node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | n
 **Trigger:** Router observed devops agent failing to commit ~50% of the time this session. Instead of logging this as a router routing failure (chose wrong agent) or escalating, the router noted "systemic devops issue" in comments and continued. User confronted the router about 19 root-level slop files and router initially deflected blame to subagents.
 
 **Decision:** When the Router observes a routing failure (wrong agent chosen, agent produces wrong output, agent fails its task), the Router MUST:
+
 1. Log a gap-log entry with `type: "routing_failure"` (not just `cleanup_finding`)
 2. Self-reflect: was the agent choice wrong? Should a different agent have been used?
 3. For devops commit failures specifically: immediately switch to `nodejs-pro` (confirmed reliable) rather than retrying devops or blaming the agent

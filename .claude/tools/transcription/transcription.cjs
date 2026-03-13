@@ -48,11 +48,11 @@ const child = spawn(process.execPath, [SKILL_MAIN, ...args], {
   stdio: 'inherit',
 });
 
-child.on('close', (code) => {
+child.on('close', code => {
   process.exit(code || 0);
 });
 
-child.on('error', (err) => {
+child.on('error', err => {
   process.stderr.write(`Error: ${err.message}\n`);
   process.exit(1);
 });

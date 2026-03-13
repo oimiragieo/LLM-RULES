@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, WebSearch, WebFetch, Bash, Grep, Glob]
 agents: [researcher, planner, architect]
-category: "Research & Investigation"
+category: 'Research & Investigation'
 tags: [research, deep-research, investigation, synthesis, multi-step, autonomous]
 best_practices:
   - Define explicit scope and success criteria before starting
@@ -65,12 +65,12 @@ Deep Research Skill — Multi-step autonomous research methodology for structure
 
 ## Tool Usage
 
-| Tool | Phase | Purpose |
-|------|-------|---------|
-| `WebSearch` | 2A | Broad source discovery |
-| `WebFetch` | 2B | Extract content from URLs |
-| `Read` / `Grep` | 2C | Search codebase for prior art |
-| `Write` | 5 | Save report |
+| Tool            | Phase | Purpose                       |
+| --------------- | ----- | ----------------------------- |
+| `WebSearch`     | 2A    | Broad source discovery        |
+| `WebFetch`      | 2B    | Extract content from URLs     |
+| `Read` / `Grep` | 2C    | Search codebase for prior art |
+| `Write`         | 5     | Save report                   |
 
 ## Output Locations
 

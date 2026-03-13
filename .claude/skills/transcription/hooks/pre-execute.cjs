@@ -14,7 +14,9 @@ function preExecute(input = {}) {
   try {
     // Validate schema file exists
     if (!fs.existsSync(SCHEMA_PATH)) {
-      process.stderr.write('[pre-execute:transcription] Schema file not found, skipping validation\n');
+      process.stderr.write(
+        '[pre-execute:transcription] Schema file not found, skipping validation\n'
+      );
       return { continue: true };
     }
 
@@ -63,7 +65,9 @@ function preExecute(input = {}) {
     return { continue: true };
   } catch (err) {
     // Fail-open on unexpected errors — do not block execution
-    process.stderr.write(`[pre-execute:transcription] Unexpected error (fail-open): ${err.message}\n`);
+    process.stderr.write(
+      `[pre-execute:transcription] Unexpected error (fail-open): ${err.message}\n`
+    );
     return { continue: true };
   }
 }

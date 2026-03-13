@@ -71,17 +71,17 @@ function main() {
   let _stdout = '';
   let stderr = '';
 
-  child.stdout.on('data', (data) => {
+  child.stdout.on('data', data => {
     _stdout += data.toString();
     process.stdout.write(data);
   });
 
-  child.stderr.on('data', (data) => {
+  child.stderr.on('data', data => {
     stderr += data.toString();
     process.stderr.write(data);
   });
 
-  child.on('close', (code) => {
+  child.on('close', code => {
     const success = code === 0;
     const outputDir = args.output_dir || './';
 
@@ -96,12 +96,16 @@ function main() {
       process.stdout.write('\n' + JSON.stringify(result) + '\n');
       process.exit(0);
     } else {
-      process.stderr.write('\n' + JSON.stringify({ ...result, error: `transcribe-anything exited with code ${code}` }) + '\n');
+      process.stderr.write(
+        '\n' +
+          JSON.stringify({ ...result, error: `transcribe-anything exited with code ${code}` }) +
+          '\n'
+      );
       process.exit(1);
     }
   });
 
-  child.on('error', (err) => {
+  child.on('error', err => {
     if (err.code === 'ENOENT') {
       process.stderr.write(
         'Error: transcribe-anything not found. Install with: pip install transcribe-anything\n'

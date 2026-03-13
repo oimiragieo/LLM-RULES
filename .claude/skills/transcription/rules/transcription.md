@@ -18,12 +18,12 @@
 
 ## Model Selection Guide
 
-| Use Case | Recommended Model | Reason |
-|----------|------------------|--------|
-| Quick/draft | small | Speed priority |
-| General purpose | large-v3 | Best accuracy/speed balance |
-| Technical content | large-v3 + --initial_prompt | Domain vocabulary helps |
-| Low-resource devices | medium | Balance of resources |
+| Use Case             | Recommended Model           | Reason                      |
+| -------------------- | --------------------------- | --------------------------- |
+| Quick/draft          | small                       | Speed priority              |
+| General purpose      | large-v3                    | Best accuracy/speed balance |
+| Technical content    | large-v3 + --initial_prompt | Domain vocabulary helps     |
+| Low-resource devices | medium                      | Balance of resources        |
 
 ## Integration Points
 

@@ -46,13 +46,13 @@ cat "{{output_dir}}/{{filename}}.txt"
 
 ## Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `{{input}}` | File path or URL | `podcast.mp3` |
-| `{{input_file}}` | Local file path | `/data/audio.mp3` |
-| `{{input_url}}` | Remote URL | `https://youtube.com/...` |
-| `{{model_size}}` | Whisper model | `large-v3` |
-| `{{output_dir}}` | Output directory | `./transcripts/` |
-| `{{filename}}` | Base filename | `podcast` |
-| `{{lang}}` | Language code | `en` |
-| `{{device}}` | Backend device | `cuda` |
+| Variable         | Description      | Example                   |
+| ---------------- | ---------------- | ------------------------- |
+| `{{input}}`      | File path or URL | `podcast.mp3`             |
+| `{{input_file}}` | Local file path  | `/data/audio.mp3`         |
+| `{{input_url}}`  | Remote URL       | `https://youtube.com/...` |
+| `{{model_size}}` | Whisper model    | `large-v3`                |
+| `{{output_dir}}` | Output directory | `./transcripts/`          |
+| `{{filename}}`   | Base filename    | `podcast`                 |
+| `{{lang}}`       | Language code    | `en`                      |
+| `{{device}}`     | Backend device   | `cuda`                    |

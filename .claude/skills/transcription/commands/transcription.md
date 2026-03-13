@@ -5,11 +5,13 @@
 Transcribe an audio or video file using Whisper AI.
 
 **Usage:**
+
 ```
 /transcribe <file_or_url> [model] [lang] [device]
 ```
 
 **Examples:**
+
 ```
 /transcribe podcast.mp3
 /transcribe podcast.mp3 large-v3 en
@@ -18,6 +20,7 @@ Transcribe an audio or video file using Whisper AI.
 ```
 
 **Arguments:**
+
 - `file_or_url` — Path to local audio/video or URL (required)
 - `model` — Model size: tiny|small|medium|large|large-v3 (default: large-v3)
 - `lang` — Language code (default: auto-detect)
@@ -26,6 +29,7 @@ Transcribe an audio or video file using Whisper AI.
 **Output:** Creates transcript files (`.srt`, `.vtt`, `.txt`, `.json`) in the output directory.
 
 **Invocation:**
+
 ```javascript
 Skill({ skill: 'transcription', args: '--input podcast.mp3 --model large-v3' });
 ```

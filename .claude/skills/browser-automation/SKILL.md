@@ -33,11 +33,11 @@ pip install playwright-stealth  # optional, for anti-detection
 
 ## Skill Comparison
 
-| Skill | Use Case |
-|-------|----------|
+| Skill                | Use Case                                       |
+| -------------------- | ---------------------------------------------- |
 | `browser-automation` | Scripted automation, data pipelines, form bots |
-| `webapp-testing` | QA assertions, visual regression, test suites |
-| `chrome-browser` | Interactive MCP DevTools control |
+| `webapp-testing`     | QA assertions, visual regression, test suites  |
+| `chrome-browser`     | Interactive MCP DevTools control               |
 
 ## Iron Law
 
@@ -99,12 +99,12 @@ page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => 
 
 ## Anti-Patterns
 
-| Anti-Pattern | Correct Approach |
-|---|---|
+| Anti-Pattern             | Correct Approach                                     |
+| ------------------------ | ---------------------------------------------------- |
 | `time.sleep()` for waits | `page.wait_for_selector()` / `wait_for_load_state()` |
-| CSS selectors for forms | `get_by_label()`, `get_by_role()` |
-| Re-login each run | `context.storage_state()` persistence |
-| Committing auth state | Add `auth-state.json` to `.gitignore` |
+| CSS selectors for forms  | `get_by_label()`, `get_by_role()`                    |
+| Re-login each run        | `context.storage_state()` persistence                |
+| Committing auth state    | Add `auth-state.json` to `.gitignore`                |
 
 ## Memory Protocol (MANDATORY)
 

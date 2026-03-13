@@ -63,15 +63,15 @@ Files that should NOT exist in the project root after a task completes:
 
 ## Where Files SHOULD Go
 
-| File Type         | Correct Location                           |
-| ----------------- | ------------------------------------------ |
-| Debug output      | `.claude/context/tmp/`                     |
-| Analysis reports  | `.claude/context/reports/`                 |
-| Plans             | `.claude/context/plans/`                   |
-| Research          | `.claude/context/artifacts/research-reports/` |
-| One-off scripts   | `.claude/tools/cli/` (if kept) or deleted  |
-| Test output       | `.claude/context/tmp/` or deleted          |
-| Lint output       | Never persisted — pipe to stdout only      |
+| File Type        | Correct Location                              |
+| ---------------- | --------------------------------------------- |
+| Debug output     | `.claude/context/tmp/`                        |
+| Analysis reports | `.claude/context/reports/`                    |
+| Plans            | `.claude/context/plans/`                      |
+| Research         | `.claude/context/artifacts/research-reports/` |
+| One-off scripts  | `.claude/tools/cli/` (if kept) or deleted     |
+| Test output      | `.claude/context/tmp/` or deleted             |
+| Lint output      | Never persisted — pipe to stdout only         |
 
 ## Related References
 

@@ -333,7 +333,6 @@ Execute as canary rollout: schema-creator first (lowest risk), validate pattern,
 
 **Evidence:** Commit 775ccf1f. Tests: `tests/hooks/spawn-prompt-assembler-worktree-override.test.cjs` (26 tests).
 
-
 ---
 
 ## ADR-2026-02-22-039: Batch 28 Skill-Updater Sweep

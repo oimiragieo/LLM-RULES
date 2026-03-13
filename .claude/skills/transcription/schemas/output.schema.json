@@ -31,7 +31,10 @@
         "vtt": { "type": "string", "description": "Path to .vtt WebVTT file" },
         "txt": { "type": "string", "description": "Path to plain text transcript" },
         "json": { "type": "string", "description": "Path to structured JSON transcript" },
-        "speaker_json": { "type": "string", "description": "Path to speaker-diarized JSON (insane backend only)" }
+        "speaker_json": {
+          "type": "string",
+          "description": "Path to speaker-diarized JSON (insane backend only)"
+        }
       }
     },
     "modelUsed": {

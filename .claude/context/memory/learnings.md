@@ -46,7 +46,7 @@
 **Pattern: Temp File Hygiene for Developer/Integration Agents (IRON LAW)**
 
 - Developer and testing agents consistently dump temp/debug scripts to the project root: `dump-test.cjs`, `errors.json`, `eslint.json`, `test-out.txt`, `rename_agent.cjs`, etc.
-- **IRON LAW**: ALL temporary scripts, logs, and CLI output dumps MUST go to `.claude/context/tmp/` OR your system's `tmp/` equivalent. 
+- **IRON LAW**: ALL temporary scripts, logs, and CLI output dumps MUST go to `.claude/context/tmp/` OR your system's `tmp/` equivalent.
 - **IRON LAW**: NEVER leave one-off scripts or JSON dumps in the project root. The project root is considered a sacred production boundary.
 - If you need a script to remain permanently, place it in `scripts/maintenance/` and commit it.
 - **Enforcement**: Subagents that pollute the project root with ephemeral logs and test outputs are actively violating the `workspace-conventions` rule.
@@ -56,6 +56,7 @@
 **Issue**: rule-creator was invoked but `pnpm index-rules` (Step 4) was skipped during MEGA EPIC. This caused a rule-index count discrepancy (claimed 114→126 but index not updated).
 
 **Pattern**:
+
 - rule-creator Step 4 (`pnpm index-rules`) is MANDATORY after any rule file creation
 - Count verification is required: compare before-count with expected after-count
 - If count doesn't match, rule creation failed silently — re-run the creator step

@@ -10,7 +10,9 @@ Add an entry under `## [Unreleased]` using Keep a Changelog format:
 
 ```markdown
 ## [Unreleased]
+
 ### Added
+
 - Brief description of what was added and why
 ```
 
@@ -38,15 +40,15 @@ NEW_VAR=example_value
 
 ## Triggers
 
-| Trigger | CHANGELOG | README | .env.example |
-|---------|-----------|--------|--------------|
-| New feature / capability | YES | if user-visible | if new env var |
-| Bug fix | YES | rarely | no |
-| New agent or skill | YES | YES | if new env var |
-| New hook | YES | no | if new env var |
-| New env var | YES | if required | YES |
-| Refactor (no behavior change) | YES (brief) | no | no |
-| Docs-only change | no | YES | no |
+| Trigger                       | CHANGELOG   | README          | .env.example   |
+| ----------------------------- | ----------- | --------------- | -------------- |
+| New feature / capability      | YES         | if user-visible | if new env var |
+| Bug fix                       | YES         | rarely          | no             |
+| New agent or skill            | YES         | YES             | if new env var |
+| New hook                      | YES         | no              | if new env var |
+| New env var                   | YES         | if required     | YES            |
+| Refactor (no behavior change) | YES (brief) | no              | no             |
+| Docs-only change              | no          | YES             | no             |
 
 ## Anti-Patterns (NEVER)
 

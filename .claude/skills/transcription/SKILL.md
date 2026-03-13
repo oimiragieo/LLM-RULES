@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Bash, Read, Write]
 agents: [developer, ai-ml-expert, researcher]
-category: "AI/ML"
+category: 'AI/ML'
 tags: [transcription, audio, video, whisper, speech-to-text, faster-whisper, subtitles, srt]
 best_practices:
   - Use faster-whisper backend by default — it is 4x faster than openai-whisper on the same hardware
@@ -54,34 +54,34 @@ transcribe-anything audio.mp3 --device insane --hf_token YOUR_HF_TOKEN
 
 ## Key Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--model` | `tiny`, `small`, `medium`, `large`, `large-v3` | `large-v3` |
-| `--lang` | Language code (`en`, `fr`, `de`) or `auto` | auto-detect |
-| `--device` | `cpu`, `cuda`, `mlx`, `insane`, `groq` | auto-select |
-| `--output_dir` | Directory to write transcript files | `./` |
-| `--task` | `transcribe` or `translate` (→ English) | `transcribe` |
-| `--hf_token` | HuggingFace token for speaker diarization | — |
-| `--initial_prompt` | Domain vocabulary hint for technical terms | — |
+| Option             | Description                                    | Default      |
+| ------------------ | ---------------------------------------------- | ------------ |
+| `--model`          | `tiny`, `small`, `medium`, `large`, `large-v3` | `large-v3`   |
+| `--lang`           | Language code (`en`, `fr`, `de`) or `auto`     | auto-detect  |
+| `--device`         | `cpu`, `cuda`, `mlx`, `insane`, `groq`         | auto-select  |
+| `--output_dir`     | Directory to write transcript files            | `./`         |
+| `--task`           | `transcribe` or `translate` (→ English)        | `transcribe` |
+| `--hf_token`       | HuggingFace token for speaker diarization      | —            |
+| `--initial_prompt` | Domain vocabulary hint for technical terms     | —            |
 
 ## Backend Comparison
 
-| Backend | Platform | Speed | Requires |
-|---------|----------|-------|----------|
-| `faster-whisper` | Windows/Linux/Mac | Fast | No internet |
-| `mlx` | Mac Apple Silicon only | 4x faster | No internet |
-| `insane` | Windows/Linux GPU | Fastest local | No internet, optional HF token |
-| `groq` | Cloud API | 189–250x real-time | Internet + Groq API key |
-| `cpu` | Universal | Slowest | No internet |
+| Backend          | Platform               | Speed              | Requires                       |
+| ---------------- | ---------------------- | ------------------ | ------------------------------ |
+| `faster-whisper` | Windows/Linux/Mac      | Fast               | No internet                    |
+| `mlx`            | Mac Apple Silicon only | 4x faster          | No internet                    |
+| `insane`         | Windows/Linux GPU      | Fastest local      | No internet, optional HF token |
+| `groq`           | Cloud API              | 189–250x real-time | Internet + Groq API key        |
+| `cpu`            | Universal              | Slowest            | No internet                    |
 
 ## Output Files
 
-| File | Format |
-|------|--------|
-| `.srt` | SubRip subtitles with timestamps |
-| `.vtt` | WebVTT subtitles |
-| `.txt` | Plain text transcript |
-| `.json` | Structured segments with timestamps and confidence |
+| File           | Format                                             |
+| -------------- | -------------------------------------------------- |
+| `.srt`         | SubRip subtitles with timestamps                   |
+| `.vtt`         | WebVTT subtitles                                   |
+| `.txt`         | Plain text transcript                              |
+| `.json`        | Structured segments with timestamps and confidence |
 | `speaker.json` | Speaker-partitioned dialogue (insane backend only) |
 
 ## Agent Usage Pattern

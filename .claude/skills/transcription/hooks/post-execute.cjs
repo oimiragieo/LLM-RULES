@@ -10,10 +10,7 @@ const fs = require('fs');
 
 function postExecute(context = {}) {
   try {
-    const sendEventPath = path.resolve(
-      __dirname,
-      '../../../../tools/observability/send-event.cjs'
-    );
+    const sendEventPath = path.resolve(__dirname, '../../../../tools/observability/send-event.cjs');
 
     if (fs.existsSync(sendEventPath)) {
       const { sendEvent } = require(sendEventPath);
@@ -30,10 +27,7 @@ function postExecute(context = {}) {
       });
     } else {
       // Fallback: append directly to tool-events.jsonl
-      const eventsPath = path.resolve(
-        __dirname,
-        '../../../../context/runtime/tool-events.jsonl'
-      );
+      const eventsPath = path.resolve(__dirname, '../../../../context/runtime/tool-events.jsonl');
       const event = JSON.stringify({
         timestamp: new Date().toISOString(),
         tool_name: 'transcription',
@@ -45,7 +39,9 @@ function postExecute(context = {}) {
     }
   } catch (err) {
     // Fail-open — post hooks must not block workflow
-    process.stderr.write(`[post-execute:transcription] Event emit failed (fail-open): ${err.message}\n`);
+    process.stderr.write(
+      `[post-execute:transcription] Event emit failed (fail-open): ${err.message}\n`
+    );
   }
 }
 
