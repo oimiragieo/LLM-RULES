@@ -70,11 +70,22 @@ flowchart TD
 
 1. Check if `.claude/context/runtime/reflection-reminder.txt` exists.
 2. If exists, read `.claude/context/runtime/reflection-spawn-request.json`.
-3. **SPAWN** `reflection-agent` for the requests.
+3. **SPAWN** `reflection-agent` for EACH request in the JSON array using the `Task()` tool. You MUST map the JSON fields correctly:
+
+   ```javascript
+   Task({
+     task_id: request.id,
+     subagent_type: request.subagent_type,
+     description: request.description,
+     prompt:
+       request.prompt +
+       '\n\nRead .claude/context/runtime/session-gap-log.jsonl for router gap observations this session.',
+   });
+   ```
+
 4. **CRITICAL**: DO NOT manually delete the reminder file or clear the JSON file.
 5. The system uses an **Atomic Handshake**: the `reflection-agent` MUST call `TaskUpdate` with `metadata: { processedReflectionIds: [...] }`.
 6. The `reflection-cleanup.cjs` hook will then automatically remove the processed requests.
-7. **When constructing the reflection spawn prompt**, include: `Read .claude/context/runtime/session-gap-log.jsonl for router gap observations this session.`
 
 **Why**: Ensures no reflection data is lost if the agent fails or crashes. Gap observations capture cross-agent pipeline failures that individual agents cannot see.
 
@@ -121,6 +132,14 @@ TaskList();
 - **Pending tasks exist**: Check if user request relates to existing tasks
   - If related: Spawn agent with task ID reference
   - If unrelated: Continue to Step 2
+  - **Abandoned Tasks Detection (CRITICAL)**: If you observe tasks stuck in `in_progress` because an agent previously finished (e.g. used all its tool uses) but failed to call `TaskUpdate({status: "completed"})`, you MUST:
+    1. Close the task manually using `TaskUpdate`
+    2. Record a gap observation immediately using `Bash`:
+
+       ```bash
+       echo "{\"type\":\"agent_failure(abandoned_task)\", \"description\":\"Agent abandoned task <id> without calling TaskUpdate(completed)\", \"taskId\":\"<id>\"}" >> .claude/context/runtime/session-gap-log.jsonl
+       ```
+
 - **Completed tasks with `requiresDevopsPush: true`**:
   - **CRITICAL LOOP PREVENTION**: You MUST immediately call `TaskUpdate({ taskId: "<id>", metadata: { requiresDevopsPush: false } })` to clear this flag BEFORE spawning any agents. If you fail to do this, you will trigger an infinite loop.
   - **Enterprise Conflict Check**: Look at the other pending tasks. Is there already a planned `devops` task (e.g., "Branch finalization") waiting for this task to complete? If yes, just let the existing enterprise workflow proceed. DO NOT spawn a duplicate devops agent.
@@ -1245,6 +1264,12 @@ Rules:
 - Never emit final completion while active tasks remain.
 - If task output is still pending fan-in, continue polling with `TaskList()` until settled.
 - If blocked tasks remain, report blockers explicitly in the status update.
+
+**Completion gate — execute ALL checks in order before writing the final deliverable:**
+
+1. **Task drain**: `TaskList()` — confirm zero tasks remain in `in_progress`, `pending`, or `blocked`. If any remain, report those task IDs and continue orchestration.
+2. **Reflection queue**: Read `.claude/context/runtime/reflection-spawn-request.json` — if any entries exist with `status: "pending"` (or no status field), spawn reflection-agent instances for each BEFORE writing the completion deliverable.
+3. **Claim completion**: Only after steps 1 and 2 both pass, write the completion summary.
 
 ### 9.6 Late-Notification Dedupe (MANDATORY)
 

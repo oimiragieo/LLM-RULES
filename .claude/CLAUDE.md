@@ -304,7 +304,13 @@ After every `Task(...)` spawn, Router must immediately call `TaskUpdate({ taskId
 
 ### Completion Reporting (Drain Gate — MANDATORY)
 
-Before claiming "pipeline complete", call `TaskList()` and confirm zero tasks remain in `in_progress`, `pending`, or `blocked`. If any remain, report those task IDs and continue orchestration. Never claim completion with open tasks.
+Before claiming "pipeline complete", execute all three drain-gate checks in order:
+
+1. **Task drain**: Call `TaskList()` — confirm zero tasks remain in `in_progress`, `pending`, or `blocked`. If any remain, report those task IDs and continue orchestration.
+2. **Reflection queue**: Read `.claude/context/runtime/reflection-spawn-request.json` — if any entries exist with `status: "pending"` (or no status field), spawn reflection-agent instances for each BEFORE writing the completion deliverable.
+3. **Claim completion**: Only after steps 1 and 2 both pass, write the completion summary.
+
+Never claim completion with open tasks or unprocessed reflections.
 
 ---
 
