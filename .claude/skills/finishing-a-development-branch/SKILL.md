@@ -152,6 +152,49 @@ git branch -D <feature-branch>
 
 Then: Cleanup worktree (Step 5)
 
+### Step 4.5: Cleanup Scan (MANDATORY)
+
+**Run this before ANY commit, regardless of which option was chosen.**
+
+**4.5.1 — Project root scan:**
+
+```bash
+ls -1 | grep -vE '^(\.|node_modules|src|tests|scripts|dist|build|docs|package\.json|package-lock\.json|pnpm-lock\.yaml|tsconfig|eslint|prettier|jest|vitest|README|LICENSE|CHANGELOG|CLAUDE\.md|\.env)'
+```
+
+If this outputs anything, those files are AI slop. Delete or move them before proceeding.
+
+**4.5.2 — Prune stale worktrees:**
+
+```bash
+git worktree prune
+```
+
+**4.5.3 — Clean temp directory:**
+
+```bash
+ls .claude/context/tmp/ 2>/dev/null && echo "Temp files exist — delete if from this session"
+```
+
+**4.5.4 — Log to session gap log if slop was found:**
+
+```bash
+echo '{"timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","type":"cleanup","agent":"developer","description":"Deleted AI slop from project root: <filenames>","context":"finishing-a-development-branch cleanup scan"}' >> .claude/context/runtime/session-gap-log.jsonl
+```
+
+**4.5.5 — Queue reflection if slop was found** (append to `reflection-spawn-request.json`):
+
+```json
+{
+  "id": "<uuid>",
+  "trigger": "ai-slop-found",
+  "priority": "low",
+  "context": "Cleanup scan found unexpected files in project root. Investigate which task created them."
+}
+```
+
+See `.claude/rules/cleanup-always.md` for the full slop pattern list and correct file destinations.
+
 ### Step 5: Cleanup Worktree
 
 **For Options 1, 2, 4:**

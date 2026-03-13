@@ -130,6 +130,33 @@ For each changed artifact, apply the relevant checks from this matrix:
 | SC-01    | Valid JSON syntax                   | `node -e "JSON.parse(require('fs').readFileSync('<file>', 'utf8'))"`        | CRITICAL |
 | SC-02    | Schema appears in schema-catalog.md | `grep "<schema-name>" .claude/context/artifacts/catalogs/schema-catalog.md` | MEDIUM   |
 
+### Root Cleanliness Check
+
+```bash
+ls -1 | grep -cvE '^(\.|node_modules|src|tests|scripts|dist|build|docs|package\.json|package-lock\.json|pnpm-lock\.yaml|tsconfig|eslint|prettier|jest|vitest|README|LICENSE|CHANGELOG|CLAUDE\.md|\.env)'
+```
+
+**FAIL** if the count is greater than 0.
+
+Known slop patterns (any of these in project root = FAIL):
+
+- `*-debug*.txt`, `*-debug*.log`, `debug-*.json`
+- `dump-*.cjs`, `dump-*.js`, `dump-*.json`
+- `rename_*.cjs`, `revert_*.cjs`, `update_*.cjs`
+- `test-out.txt`, `lint-output.txt`, `eslint.json`, `errors.json`
+- UUID-named files (e.g. `a3f2c1b0-*.json`)
+- `new_session_analysis.md` or any `*.analysis.md` not under `.claude/context/`
+- Any `.cjs`/`.js`/`.mjs` not referenced in `package.json` scripts or tracked project source
+- Any `.md` not named `README.md`, `CLAUDE.md`, `LICENSE`, or `CHANGELOG.md`
+
+**Action when FAIL:**
+
+1. Delete the offending files (or move to `.claude/context/tmp/` if content may be needed)
+2. Log deletion to `session-gap-log.jsonl` with `type: "cleanup"`
+3. Append a `reflection-spawn-request.json` entry with `trigger: "ai-slop-found"` so the root cause is investigated
+
+Reference: `.claude/rules/cleanup-always.md`
+
 ### Documentation Staleness Check
 
 After any feature work, verify:
