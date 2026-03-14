@@ -1,3 +1,41 @@
+## MEGA EPIC Phase 2 — Wave-Based Parallel Execution Pattern (2026-03-14)
+
+**Session**: MEGA EPIC Phase 2 final (reflection-mega-epic-phase2-final)
+**Result**: 100% plan completion + net-new capabilities. 76 agents (+1 nlp-engineer), 285 skills (+3: code-graph-context, security-scanning, design-systems). Score: 0.89 PASS.
+
+**Pattern 1: Wave-Based Parallel Execution (2 agents max per wave)**
+
+- 6 waves (2A-2F), each with exactly 2 parallel agents. Zero context overflow observed.
+- IRON LAW confirmed: max 2 heavy agents per wave prevents context saturation (prior evidence: 4+ = overflow).
+- Wave naming (2A, 2B, 2C...) provides clear dependency ordering and audit trail.
+
+**Pattern 2: Devops Agent Cut-Off Pattern (5 occurrences)**
+
+- Devops agents were cut off mid-commit 5 times. Resume pattern recovered all 5.
+- Root cause: long devops prompts (merge + cleanup + commit) exceed context mid-execution.
+- Fix: Spawn devops with single focused command (commit only or merge only, not both).
+- Recovery: Always resume devops if cut off rather than re-spawning fresh (avoids duplicate work).
+
+**Pattern 3: Skill-Creator Tight Output When Given Exact Content**
+
+- Providing exact markdown in the creator prompt produced correct, under-4KB skills first pass.
+- Zero oversizing events in Phase 2 (contrast: Phase 1 had 2 oversizing incidents requiring code-simplifier trim).
+- Pattern: Provide exact content + explicit size constraints in creator prompt → first-pass success.
+
+**Pattern 4: Researcher + Explore Parallel Gap Assessment**
+
+- Spawning researcher (web research) + Explore (local codebase scan) simultaneously for gap analysis saved time.
+- Researcher covers external API updates; Explore covers current state of local skills/agents.
+- Pattern: Use this dual-spawn for any "what's changed externally vs what we have" assessment.
+
+**Pattern 5: Worktree-Per-Developer + Devops Merge Agent**
+
+- Every developer agent created its own worktree automatically.
+- Devops merge agent handles cleanup: copy → remove worktree → prune → commit. Reliable.
+- No worktree conflicts observed across 6 waves.
+
+---
+
 ## MEGA EPIC Commit Pattern — Untracked Architectural Tooling (2026-03-13)
 
 **Task**: task-commit-untracked — 9 files, 958 insertions committed to main branch

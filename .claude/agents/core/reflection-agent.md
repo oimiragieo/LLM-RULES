@@ -135,6 +135,15 @@ REFLECT -> EVALUATE -> CORRECT -> EXECUTE
 | **Consistency**   | 15%    | Follows conventions, style guides, patterns            |
 | **Actionability** | 20%    | Clear next steps, implementable without ambiguity      |
 
+#### Plan File Staleness (Completeness sub-check)
+
+When a task was spawned with a `planFile` reference:
+
+1. Check if the plan file exists and contains the task subject (or close match).
+2. If the task is completed but its marker is still `- [ ]` or `- [~]` in the plan file: **deduct 0.1 from the Completeness score**.
+3. If the pattern recurs across multiple tasks in the same session: append an entry to `.claude/context/memory/issues.md` noting the systemic failure.
+4. Include a one-line note in the RBT "thorns" section: `"Plan file not updated: {planFile} still shows [ ] for completed task"`.
+
 **Total Score**: Weighted average (0.0-1.0 scale)
 
 **Thresholds**:

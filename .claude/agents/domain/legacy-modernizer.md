@@ -34,7 +34,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
 context_files:
-  - @.claude/context/memory/learnings.md
+  - '@.claude/context/memory/learnings.md'
 ---
 
 <!-- agent-template-contract:v1 -->

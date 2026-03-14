@@ -327,5 +327,25 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "916a6041cfa3e06c79f4cb7b52d75a95a84a72ab"
+  },
+  {
+    "text": "EPIC Wave Execution: max 2 heavy agents per wave prevents context overflow. Wave naming (2A, 2B...) provides dependency ordering. Confirmed across 6 waves in MEGA EPIC Phase 2 with zero context overflow events.",
+    "area": "main",
+    "timestamp": "2026-03-14T01:00:53.013Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "d1c4b50ad639463e8ac588fcecb00746566438f1"
+  },
+  {
+    "text": "Skill-creator first-pass success: providing exact markdown content + explicit size constraints (max 4KB/120 lines) in creator prompt produces correct under-budget artifacts first-pass. Zero oversizing in MEGA EPIC Phase 2.",
+    "area": "main",
+    "timestamp": "2026-03-14T01:01:10.780Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "ff0429604267e0c7018de462c9724735686e850b"
   }
 ]

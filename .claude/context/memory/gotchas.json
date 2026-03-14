@@ -103,5 +103,15 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "4b4799126c4c0de6a8dd566c4922a59e6e1e9149"
+  },
+  {
+    "text": "Devops agent cut-off gotcha: devops agents cut off mid-commit when given combined merge+cleanup+commit prompts. Fix: single-purpose devops commands only. Recovery: always resume (not re-spawn) to avoid duplicate commits.",
+    "area": "main",
+    "timestamp": "2026-03-14T01:01:01.879Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "d1d5c3cbd0abf57dae0903602dd4432a95b46165"
   }
 ]

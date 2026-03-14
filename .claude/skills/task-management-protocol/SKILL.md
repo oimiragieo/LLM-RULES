@@ -42,6 +42,31 @@ Background agents complete work but main sessions don't receive notifications. A
 | `TaskCreate(...)` | Create new task            | Planning phase, discovered subtasks |
 | `TaskUpdate(...)` | Update status/metadata     | Progress, discoveries, completion   |
 
+## Plan File Update Protocol (IRON LAW)
+
+When a task is part of a plan file (`.claude/context/plans/*.md`), the executing agent — NOT the router — is responsible for updating task markers.
+
+**On task start**: Find the task line in the plan file and change `- [ ]` to `- [~]`.
+
+**On task complete**: Change `- [~]` to `- [x]` and append a one-line result note.
+
+**Tool**: Use `Edit` on the specific line — do NOT rewrite the whole file.
+
+**Timing**: Update the plan file BEFORE calling `TaskUpdate(completed)`.
+
+**Silence**: If the plan file does not exist, skip silently — do not error.
+
+```bash
+# Find the line number
+grep -n "task subject keywords" .claude/context/plans/my-plan.md
+
+# Then use Edit to change [ ] → [~] on start, [~] → [x] on complete
+```
+
+**Anti-pattern**: Leaving plan file updates to the router. The router only sees completed tasks — plan files must be updated live during execution.
+
+---
+
 ## The Protocol
 
 ### Phase 1: Session Start (MANDATORY)

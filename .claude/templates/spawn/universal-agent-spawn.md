@@ -152,6 +152,8 @@ When calling `TaskUpdate({ status: 'completed' })`, metadata MUST include:
 
 These fields trigger the memory extraction pipeline. Without them, your work is invisible to the learning system.
 
+> [!WARNING] PLAN FILE: If spawned with a plan file path, update `[ ]` → `[~]` on start and `[~]` → `[x]` on complete. Use `Edit` on the specific line. Do this BEFORE `TaskUpdate(completed)`. Skip silently if the plan file does not exist.
+
 ## Named Memory API (for topic-specific persistence)
 
 For topic-specific persistent notes that survive session boundaries, use the named memory API via `memory-manager.cjs`. This is **separate** from `MemoryRecord` (which records gotchas/patterns/discoveries):

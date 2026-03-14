@@ -1,7 +1,29 @@
 {
-  "lastDaily": "2026-03-13T00:45:53.067Z",
+  "lastDaily": "2026-03-14T01:04:53.703Z",
   "lastWeekly": "2026-03-09T00:02:58.456Z",
   "history": [
+    {
+      "type": "daily",
+      "timestamp": "2026-03-14T01:04:53.703Z",
+      "tasks": [
+        {
+          "type": "consolidation",
+          "success": true
+        },
+        {
+          "type": "healthCheck",
+          "success": true
+        },
+        {
+          "type": "metricsLog",
+          "success": true
+        },
+        {
+          "type": "taskRecovery",
+          "success": true
+        }
+      ]
+    },
     {
       "type": "daily",
       "timestamp": "2026-03-13T00:45:53.067Z",
@@ -783,26 +805,8 @@
           "success": true
         }
       ]
-    },
-    {
-      "type": "daily",
-      "timestamp": "2026-02-16T00:34:12.312Z",
-      "tasks": [
-        {
-          "type": "consolidation",
-          "success": true
-        },
-        {
-          "type": "healthCheck",
-          "success": true
-        },
-        {
-          "type": "metricsLog",
-          "success": true
-        }
-      ]
     }
   ],
-  "lastRun": "2026-03-13T00:45:53.067Z",
+  "lastRun": "2026-03-14T01:04:53.703Z",
   "lastColdArchive": "2026-03-09T00:02:58.679Z"
 }
