@@ -20,6 +20,7 @@ Skill({ skill: 'task-delegation' });
 ```
 
 Use when:
+
 - Spawning subagents to perform work
 - Decomposing a complex task into parallel or sequential subtasks
 - Implementing handoff metadata between agents
@@ -48,9 +49,9 @@ Every `Task()` call MUST include a `task_id` parameter. Missing `task_id` is har
 
 ```javascript
 Task({
-    task_id: 'task-7',
-    subagent_type: 'developer',
-    prompt: `
+  task_id: 'task-7',
+  subagent_type: 'developer',
+  prompt: `
 ## Task ID: task-7
 ## Agent: developer
 
@@ -105,7 +106,7 @@ Task({ task_id: 'task-4', subagent_type: 'qa', prompt: '...' });
 // WRONG: 3+ heavy agents causes context overflow
 Task({ task_id: 'task-3', subagent_type: 'developer', prompt: '...' });
 Task({ task_id: 'task-4', subagent_type: 'qa', prompt: '...' });
-Task({ task_id: 'task-5', subagent_type: 'architect', prompt: '...' });  // DO NOT
+Task({ task_id: 'task-5', subagent_type: 'architect', prompt: '...' }); // DO NOT
 ```
 
 For 3+ parallel workstreams, use `master-orchestrator` to manage sequencing.
@@ -118,24 +119,20 @@ Use structured metadata on `TaskUpdate(completed)` to enable downstream agents t
 
 ```javascript
 TaskUpdate({
-    taskId: 'task-5',
-    status: 'completed',
-    metadata: {
-        summary: 'Implemented JWT auth middleware with refresh tokens',
-        filesModified: [
-            'src/middleware/auth.ts',
-            'src/lib/jwt.ts',
-            'tests/middleware/auth.test.ts',
-        ],
-        outputArtifacts: ['.claude/context/plans/auth-design.md'],
-        keyDecisions: [
-            'Used RS256 (asymmetric) over HS256 for key rotation support',
-            'Refresh tokens stored in Redis with 7-day TTL',
-        ],
-        discoveredFiles: ['src/auth/legacy-session.ts'],  // existing code to reuse/replace
-        worktreePath: process.env.AGENT_WORKTREE_PATH || process.cwd(),
-        completedAt: new Date().toISOString(),
-    },
+  taskId: 'task-5',
+  status: 'completed',
+  metadata: {
+    summary: 'Implemented JWT auth middleware with refresh tokens',
+    filesModified: ['src/middleware/auth.ts', 'src/lib/jwt.ts', 'tests/middleware/auth.test.ts'],
+    outputArtifacts: ['.claude/context/plans/auth-design.md'],
+    keyDecisions: [
+      'Used RS256 (asymmetric) over HS256 for key rotation support',
+      'Refresh tokens stored in Redis with 7-day TTL',
+    ],
+    discoveredFiles: ['src/auth/legacy-session.ts'], // existing code to reuse/replace
+    worktreePath: process.env.AGENT_WORKTREE_PATH || process.cwd(),
+    completedAt: new Date().toISOString(),
+  },
 });
 ```
 
@@ -157,8 +154,11 @@ Before claiming "pipeline complete", execute all drain-gate checks in order:
 const tasks = TaskList();
 const openTasks = tasks.filter(t => ['in_progress', 'pending', 'blocked'].includes(t.status));
 if (openTasks.length > 0) {
-    // Report open task IDs, continue orchestration
-    console.log('Still open:', openTasks.map(t => t.id));
+  // Report open task IDs, continue orchestration
+  console.log(
+    'Still open:',
+    openTasks.map(t => t.id)
+  );
 }
 
 // Step 2: Reflection queue check
@@ -174,24 +174,25 @@ if (openTasks.length > 0) {
 
 ## Model Selection
 
-| Task Type                              | Model  | Rationale                           |
-|----------------------------------------|--------|-------------------------------------|
-| Simple Q&A, research, summarization    | haiku  | Cost-effective, fast                |
-| Implementation, bug fixes, tests       | sonnet | Balanced capability/cost (default)  |
-| Architecture, security review, planning| opus   | Highest reasoning for complex tasks |
-| Orchestrators (master, evolution)      | opus   | Must coordinate many subtasks       |
-| Context compression                    | haiku  | Token-efficient, low complexity     |
+| Task Type                               | Model  | Rationale                           |
+| --------------------------------------- | ------ | ----------------------------------- |
+| Simple Q&A, research, summarization     | haiku  | Cost-effective, fast                |
+| Implementation, bug fixes, tests        | sonnet | Balanced capability/cost (default)  |
+| Architecture, security review, planning | opus   | Highest reasoning for complex tasks |
+| Orchestrators (master, evolution)       | opus   | Must coordinate many subtasks       |
+| Context compression                     | haiku  | Token-efficient, low complexity     |
 
 ```javascript
 Task({
-    task_id: 'task-8',
-    subagent_type: 'security-architect',
-    model: 'claude-opus-4-5',  // explicit override
-    prompt: '...',
+  task_id: 'task-8',
+  subagent_type: 'security-architect',
+  model: 'claude-opus-4-5', // explicit override
+  prompt: '...',
 });
 ```
 
 Model precedence (highest to lowest):
+
 1. Explicit `model:` in `Task()` call
 2. Agent frontmatter `model:` field
 3. `config.yaml agents.{type}.model`
@@ -221,17 +222,17 @@ Poll with `TaskList()` to detect when blocked tasks become unblocked, then spawn
 
 Before spawning `developer`, check if a specialist matches. Developer is the LAST RESORT.
 
-| Request Type             | Correct Agent             |
-|--------------------------|---------------------------|
-| Update documentation     | `technical-writer`        |
-| Refactor/clean up code   | `code-simplifier`         |
-| Review code              | `code-reviewer`           |
-| Run tests / QA           | `qa`                      |
-| Deploy / CI / Docker     | `devops`                  |
-| Database design          | `database-architect`      |
-| Research / investigate   | `researcher`              |
-| Security-sensitive work  | `security-architect`      |
-| Debug production         | `devops-troubleshooter`   |
+| Request Type            | Correct Agent           |
+| ----------------------- | ----------------------- |
+| Update documentation    | `technical-writer`      |
+| Refactor/clean up code  | `code-simplifier`       |
+| Review code             | `code-reviewer`         |
+| Run tests / QA          | `qa`                    |
+| Deploy / CI / Docker    | `devops`                |
+| Database design         | `database-architect`    |
+| Research / investigate  | `researcher`            |
+| Security-sensitive work | `security-architect`    |
+| Debug production        | `devops-troubleshooter` |
 
 ---
 

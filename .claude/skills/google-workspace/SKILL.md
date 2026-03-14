@@ -19,6 +19,7 @@ Skill({ skill: 'google-workspace' });
 ```
 
 Use when:
+
 - Integrating with Gmail (send/read/search emails)
 - Working with Google Calendar (create/list/update events)
 - Managing Google Drive (upload/download/share files)
@@ -243,21 +244,21 @@ If a Google Workspace MCP server is available, prefer it over direct API calls:
 ```javascript
 // In Claude Code agent context
 mcp__google_workspace__gmail_send({
-    to: 'user@example.com',
-    subject: 'Hello',
-    body: 'Message body',
-})
+  to: 'user@example.com',
+  subject: 'Hello',
+  body: 'Message body',
+});
 
 mcp__google_workspace__calendar_create_event({
-    title: 'Meeting',
-    start: '2026-03-15T09:00:00Z',
-    end: '2026-03-15T10:00:00Z',
-})
+  title: 'Meeting',
+  start: '2026-03-15T09:00:00Z',
+  end: '2026-03-15T10:00:00Z',
+});
 
 mcp__google_workspace__drive_upload({
-    name: 'file.pdf',
-    path: '/local/path/file.pdf',
-})
+  name: 'file.pdf',
+  path: '/local/path/file.pdf',
+});
 ```
 
 ---
@@ -275,19 +276,19 @@ mcp__google_workspace__drive_upload({
 
 ## Common Scopes Reference
 
-| Service  | Scope                                              | Access Level   |
-|----------|----------------------------------------------------|----------------|
-| Gmail    | `gmail.readonly`                                   | Read-only      |
-| Gmail    | `gmail.send`                                       | Send only      |
-| Gmail    | `gmail.modify`                                     | Read/write     |
-| Calendar | `calendar.readonly`                                | Read-only      |
-| Calendar | `calendar`                                         | Full access    |
-| Drive    | `drive.readonly`                                   | Read-only      |
-| Drive    | `drive.file`                                       | App-created    |
-| Drive    | `drive`                                            | Full access    |
-| Sheets   | `spreadsheets.readonly`                            | Read-only      |
-| Sheets   | `spreadsheets`                                     | Full access    |
-| Docs     | `documents.readonly`                               | Read-only      |
-| Docs     | `documents`                                        | Full access    |
+| Service  | Scope                   | Access Level |
+| -------- | ----------------------- | ------------ |
+| Gmail    | `gmail.readonly`        | Read-only    |
+| Gmail    | `gmail.send`            | Send only    |
+| Gmail    | `gmail.modify`          | Read/write   |
+| Calendar | `calendar.readonly`     | Read-only    |
+| Calendar | `calendar`              | Full access  |
+| Drive    | `drive.readonly`        | Read-only    |
+| Drive    | `drive.file`            | App-created  |
+| Drive    | `drive`                 | Full access  |
+| Sheets   | `spreadsheets.readonly` | Read-only    |
+| Sheets   | `spreadsheets`          | Full access  |
+| Docs     | `documents.readonly`    | Read-only    |
+| Docs     | `documents`             | Full access  |
 
 Always use the most restrictive scope that meets your requirements.

@@ -6,20 +6,20 @@ Rules for developing Claude Code plugins: MCP servers, Agent Studio skills, hook
 
 Claude Code supports four extension points:
 
-| Extension Type | Location | Purpose | Creator Skill |
-|----------------|----------|---------|---------------|
-| **Skills** | `.claude/skills/<name>/SKILL.md` | Reusable workflows invoked via `Skill()` | `skill-creator` |
-| **Agents** | `.claude/agents/**/<name>.md` | Specialized subagents spawned via `Task()` | `agent-creator` |
-| **Hooks** | `.claude/hooks/**/<name>.cjs` | PreToolUse/PostToolUse enforcement | `hook-creator` |
-| **MCP Servers** | External process (stdio/SSE) | Tools, resources, prompts for Claude | `mcp-builder` |
+| Extension Type  | Location                         | Purpose                                    | Creator Skill   |
+| --------------- | -------------------------------- | ------------------------------------------ | --------------- |
+| **Skills**      | `.claude/skills/<name>/SKILL.md` | Reusable workflows invoked via `Skill()`   | `skill-creator` |
+| **Agents**      | `.claude/agents/**/<name>.md`    | Specialized subagents spawned via `Task()` | `agent-creator` |
+| **Hooks**       | `.claude/hooks/**/<name>.cjs`    | PreToolUse/PostToolUse enforcement         | `hook-creator`  |
+| **MCP Servers** | External process (stdio/SSE)     | Tools, resources, prompts for Claude       | `mcp-builder`   |
 
 **IRON LAW**: Never write directly to creator-managed paths. Always use the creator skill:
 
 ```javascript
-Skill({ skill: 'skill-creator' });   // For skills
-Skill({ skill: 'agent-creator' });   // For agents
-Skill({ skill: 'hook-creator' });    // For hooks
-Skill({ skill: 'mcp-builder' });     // For MCP servers
+Skill({ skill: 'skill-creator' }); // For skills
+Skill({ skill: 'agent-creator' }); // For agents
+Skill({ skill: 'hook-creator' }); // For hooks
+Skill({ skill: 'mcp-builder' }); // For MCP servers
 ```
 
 ---
@@ -39,10 +39,7 @@ MCP servers communicate via JSON-RPC 2.0 over stdio or SSE transport. Each serve
 ```typescript
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 const server = new Server(
   { name: 'my-mcp-server', version: '1.0.0' },
@@ -67,7 +64,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 }));
 
 // Handle tool calls
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+server.setRequestHandler(CallToolRequestSchema, async request => {
   if (request.params.name === 'my_tool') {
     const { param } = request.params.arguments as { param: string };
     // Tool implementation here
@@ -144,12 +141,15 @@ Skills are markdown files containing workflow instructions for Claude Code agent
 # Skill Name
 
 ## Purpose
+
 One-sentence description of what this skill enables.
 
 ## When to Invoke
+
 `Skill({ skill: 'skill-name' })`
 
 Invoke when:
+
 - Condition 1
 - Condition 2
 
@@ -158,13 +158,16 @@ Invoke when:
 ## Workflow
 
 ### Step 1: ...
+
 ### Step 2: ...
 
 ## Anti-Patterns
+
 - Never do X
 - Avoid Y
 
 ## Related Skills
+
 - `other-skill` — brief description
 ```
 
@@ -189,12 +192,12 @@ Read('.claude/skills/tdd/SKILL.md');
 
 ### Skills vs Rules
 
-| | Skills | Rules |
-|-|--------|-------|
-| **Format** | SKILL.md with structured workflow | .md with standards/guidelines |
-| **Location** | `.claude/skills/<name>/SKILL.md` | `.claude/rules/<name>.md` |
-| **Invocation** | `Skill({ skill: 'name' })` | Auto-injected into context |
-| **Purpose** | Step-by-step workflows | Always-on standards |
+|                | Skills                            | Rules                         |
+| -------------- | --------------------------------- | ----------------------------- |
+| **Format**     | SKILL.md with structured workflow | .md with standards/guidelines |
+| **Location**   | `.claude/skills/<name>/SKILL.md`  | `.claude/rules/<name>.md`     |
+| **Invocation** | `Skill({ skill: 'name' })`        | Auto-injected into context    |
+| **Purpose**    | Step-by-step workflows            | Always-on standards           |
 
 ---
 
@@ -204,12 +207,12 @@ Hooks intercept tool calls for enforcement, validation, and logging.
 
 ### Hook Types
 
-| Event | Hook Type | Common Use |
-|-------|-----------|------------|
-| `PreToolUse` | Validation/blocking | Guard dangerous operations |
-| `PostToolUse` | Metrics/logging | Track completions, update state |
-| `UserPromptSubmit` | Preprocessing | Inject context, validate prompts |
-| `Stop` | Cleanup | Check for console.logs, slop files |
+| Event              | Hook Type           | Common Use                         |
+| ------------------ | ------------------- | ---------------------------------- |
+| `PreToolUse`       | Validation/blocking | Guard dangerous operations         |
+| `PostToolUse`      | Metrics/logging     | Track completions, update state    |
+| `UserPromptSubmit` | Preprocessing       | Inject context, validate prompts   |
+| `Stop`             | Cleanup             | Check for console.logs, slop files |
 
 ### Hook File Structure
 
@@ -223,7 +226,9 @@ const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 // Read stdin
 let inputData = '';
-process.stdin.on('data', (chunk) => { inputData += chunk; });
+process.stdin.on('data', chunk => {
+  inputData += chunk;
+});
 process.stdin.on('end', () => {
   const { success, data } = safeParseJSON(inputData, {});
 
@@ -256,21 +261,21 @@ function validate(data) {
 
 ### Exit Code Protocol
 
-| Exit Code | Meaning |
-|-----------|---------|
-| `0` | Allow the tool call |
-| `2` | Block the tool call |
-| `1` | Error (NOT block — treated as allow) |
+| Exit Code | Meaning                              |
+| --------- | ------------------------------------ |
+| `0`       | Allow the tool call                  |
+| `2`       | Block the tool call                  |
+| `1`       | Error (NOT block — treated as allow) |
 
 **CRITICAL**: Never exit with code `1` intending to block. Use `2` for blocks.
 
 ### Fail-Open vs Fail-Closed
 
-| Hook Category | Policy | Exit on Error |
-|---------------|--------|---------------|
+| Hook Category            | Policy      | Exit on Error     |
+| ------------------------ | ----------- | ----------------- |
 | Security/routing/creator | Fail-closed | `process.exit(2)` |
-| Advisory/metrics/logging | Fail-open | `process.exit(0)` |
-| PostToolUse (all) | Fail-open | `process.exit(0)` |
+| Advisory/metrics/logging | Fail-open   | `process.exit(0)` |
+| PostToolUse (all)        | Fail-open   | `process.exit(0)` |
 
 ### Hook Registration
 
@@ -340,6 +345,7 @@ Brief description of the agent's role and persona.
 ## Workflow
 
 ### Step 1: ...
+
 ### Step 2: ...
 
 ## Anti-Patterns
@@ -350,20 +356,20 @@ Brief description of the agent's role and persona.
 
 ### Agent Placement
 
-| Category | Path | Examples |
-|----------|------|---------|
-| Core | `.claude/agents/core/` | developer, qa, architect |
-| Domain | `.claude/agents/domain/` | python-pro, k8s-specialist |
-| Specialized | `.claude/agents/specialized/` | code-reviewer, code-simplifier |
-| Orchestrators | `.claude/agents/orchestrators/` | master-orchestrator |
+| Category      | Path                            | Examples                       |
+| ------------- | ------------------------------- | ------------------------------ |
+| Core          | `.claude/agents/core/`          | developer, qa, architect       |
+| Domain        | `.claude/agents/domain/`        | python-pro, k8s-specialist     |
+| Specialized   | `.claude/agents/specialized/`   | code-reviewer, code-simplifier |
+| Orchestrators | `.claude/agents/orchestrators/` | master-orchestrator            |
 
 ### Model Selection
 
-| Complexity | Model | Use When |
-|------------|-------|----------|
-| Simple | `haiku` | Compression, simple lookups |
-| Standard | `sonnet` | Most implementation tasks |
-| Complex | `opus` | Security reviews, architecture, orchestrators |
+| Complexity | Model    | Use When                                      |
+| ---------- | -------- | --------------------------------------------- |
+| Simple     | `haiku`  | Compression, simple lookups                   |
+| Standard   | `sonnet` | Most implementation tasks                     |
+| Complex    | `opus`   | Security reviews, architecture, orchestrators |
 
 ### TaskUpdate Protocol (MANDATORY)
 

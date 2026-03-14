@@ -1,12 +1,3 @@
-## 2026-03-12 — Structural Ecosystem Audit Findings
-
-- **CRITICAL: issues.md bloat** — was 441KB/4942 lines, 11x past threshold. Fixed 2026-03-12 (archived to issues-archive-2026-03-12.md). Fix: add rotation config to prevent recurrence.
-- **P1: CLAUDE.md agent count stale** — States "73 agents" but 74 exist. Fix: update line 172 to "74 agents".
-- **P1: shell-injection-validator.cjs** — Raw `JSON.parse` at line 427 before `safeParseJSON` at line 436. Prototype pollution window. Fix: remove raw parse, consolidate to single safeParseJSON.
-- **P1: step0-reflection-enforcer.cjs unregistered** — Hook exists at `.claude/hooks/session/step0-reflection-enforcer.cjs` but not in settings.json. UserPromptSubmit Step 0 injection path inactive. Fix: register or archive.
-
----
-
 ## Untracked Architectural Tooling — Commit Without Integration Queue (2026-03-13)
 
 **Type**: integration_gap (commit task)
@@ -134,6 +125,16 @@ Source: reflection of task_completion:2026-03-13T20:07:18.029Z (task #14)
 
 **Status**: OPEN — systemic, 3+ confirmed sessions, no automated enforcement exists
 **Source**: session-gap-log.jsonl entries 1-3, 2026-03-13; ADR-2026-03-13-067 covers QA side
+**Update 2026-03-14**: Same 4 gap-log entries (cleanup_finding) observed again in Wave 2E-2F session — pattern persists. No new file categories added; same developer and multiple agents implicated.
+
+---
+
+## Skill Registration Gap: design-systems (2026-03-14)
+
+- [ ] Catalog: MISSING — not listed in `.claude/docs/skill-catalog.md`
+- [ ] Index: PRESENT (`.claude/config/skill-index.json` has entry with agentPrimary)
+- [ ] Agent assignment: MISSING — no agent frontmatter `skills:` array lists `design-systems`
+      Source: reflection of task 17 (batch reflection-task-completion-2026-03-14t00-39-48-544z)
 
 ---
 

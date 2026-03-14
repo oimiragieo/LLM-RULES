@@ -347,5 +347,15 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "ff0429604267e0c7018de462c9724735686e850b"
+  },
+  {
+    "text": "Skill-catalog.md gap after creator workflow: skill-creator writes SKILL.md and skill-index.json entry but does NOT update skill-catalog.md. Manual doc update step gets skipped in Wave-based creation sessions. Mitigation: add post-creation catalog check to skill-creator workflow or artifact-integrator.",
+    "area": "main",
+    "timestamp": "2026-03-14T05:12:39.302Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "09373cd95ce79a149fce4f16fcdfb285d9aa79da"
   }
 ]

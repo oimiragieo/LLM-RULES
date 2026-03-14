@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-14T05:40:03.656Z",
+  "generatedAt": "2026-03-14T05:53:52.082Z",
   "metadata": {
-    "totalSkills": 291,
+    "totalSkills": 295,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-14T05:40:03.658Z",
+    "lastValidated": "2026-03-14T05:53:52.084Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7215,6 +7215,29 @@
       "priority": 3,
       "aliasOf": null
     },
+    "electron-pro": {
+      "name": "electron-pro",
+      "displayName": "Electron Pro",
+      "category": "Other",
+      "domain": "other",
+      "description": "Expert Electron desktop application development — main/renderer process architecture, IPC communication, native OS APIs (menus, tray, notifications, dialogs), auto-updates, code signing, packaging with electron-builder/forge, security hardening (contextIsolation, sandbox), and performance optimization. Use for building cross-platform desktop apps.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "electron-pro"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "exa-monitor": {
       "name": "exa-monitor",
       "displayName": "Exa Monitor",
@@ -7285,6 +7308,30 @@
       "tags": [
         "other",
         "figma"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "fintech-engineer": {
+      "name": "fintech-engineer",
+      "displayName": "Fintech Engineer",
+      "category": "Other",
+      "domain": "other",
+      "description": "Fintech engineering expertise — payment processing (Stripe, Plaid), PCI DSS compliance, financial data modeling (double-entry bookkeeping), fraud detection patterns, bank-grade security (encryption, tokenization), open banking APIs, cryptocurrency/blockchain integration, regulatory compliance (KYC/AML), and idempotent financial transaction design. Use for payment systems, banking apps, trading platforms, and fintech infrastructure.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write",
+        "Edit",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "fintech-engineer"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7641,6 +7688,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "slack-expert": {
+      "name": "slack-expert",
+      "displayName": "Slack Expert",
+      "category": "Other",
+      "domain": "other",
+      "description": "Expert-level Slack platform development using Bolt SDK — build Slack apps with slash commands, interactive components (buttons, modals, shortcuts), home tabs, event subscriptions, workflows, Socket Mode, and Block Kit. Use for building Slack bots, workflow automation, and rich interactive Slack experiences.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write",
+        "Edit",
+        "WebFetch"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "slack-expert"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "task-delegation": {
       "name": "task-delegation",
       "displayName": "Task Delegation",
@@ -7781,6 +7852,29 @@
       "tags": [
         "other",
         "web-artifacts-builder"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "websocket-engineer": {
+      "name": "websocket-engineer",
+      "displayName": "Websocket Engineer",
+      "category": "Other",
+      "domain": "other",
+      "description": "Expert WebSocket and real-time communication engineering — WebSocket protocol (RFC 6455), ws/Socket.IO server implementation, authentication, heartbeat/reconnection, horizontal scaling with Redis pub/sub, Server-Sent Events (SSE), WebRTC signaling, and observability. Use for chat, live dashboards, multiplayer, collaborative editing, and event-driven real-time systems.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "websocket-engineer"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7968,9 +8062,11 @@
         "deep-research",
         "design-systems",
         "doc-coauthoring",
+        "electron-pro",
         "exa-monitor",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "frontend-design",
         "google-workspace",
         "heartbeat",
@@ -7985,12 +8081,14 @@
         "scheduled-tasks",
         "security-scanning",
         "seo-optimization",
+        "slack-expert",
         "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
         "user-research",
         "web-artifacts-builder",
+        "websocket-engineer",
         "windows-terminal"
       ],
       "specialized": [
@@ -8365,9 +8463,11 @@
         "deep-research",
         "design-systems",
         "doc-coauthoring",
+        "electron-pro",
         "exa-monitor",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "frontend-design",
         "google-workspace",
         "heartbeat",
@@ -8382,12 +8482,14 @@
         "scheduled-tasks",
         "security-scanning",
         "seo-optimization",
+        "slack-expert",
         "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
         "user-research",
         "web-artifacts-builder",
+        "websocket-engineer",
         "windows-terminal"
       ],
       "Troubleshooting": [
@@ -8744,9 +8846,11 @@
         "deep-research",
         "design-systems",
         "doc-coauthoring",
+        "electron-pro",
         "exa-monitor",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "frontend-design",
         "google-workspace",
         "heartbeat",
@@ -8761,12 +8865,14 @@
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
+        "slack-expert",
         "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
         "user-research",
         "web-artifacts-builder",
+        "websocket-engineer",
         "windows-terminal"
       ],
       "Write": [
@@ -8988,9 +9094,11 @@
         "deep-research",
         "design-systems",
         "doc-coauthoring",
+        "electron-pro",
         "exa-monitor",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "frontend-design",
         "google-workspace",
         "imagen-generation",
@@ -9002,12 +9110,14 @@
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
+        "slack-expert",
         "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
         "user-research",
         "web-artifacts-builder",
+        "websocket-engineer",
         "windows-terminal"
       ],
       "Edit": [
@@ -9186,6 +9296,8 @@
         "cron-runner",
         "design-systems",
         "doc-coauthoring",
+        "electron-pro",
+        "fintech-engineer",
         "frontend-design",
         "google-workspace",
         "imagen-generation",
@@ -9194,9 +9306,11 @@
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
+        "slack-expert",
         "task-delegation",
         "user-research",
-        "web-artifacts-builder"
+        "web-artifacts-builder",
+        "websocket-engineer"
       ],
       "Bash": [
         "tdd",
@@ -9352,18 +9466,22 @@
         "claude-api",
         "cloud-run",
         "deep-research",
+        "electron-pro",
         "exa-monitor",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "heartbeat",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "scheduled-tasks",
         "scientific-skills",
+        "slack-expert",
         "telegram-polling",
         "transcription",
         "tts-generation",
+        "websocket-engineer",
         "windows-terminal"
       ],
       "Glob": [
@@ -9680,8 +9798,10 @@
         "deep-research",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "reddit-researcher",
         "scientific-skills",
+        "slack-expert",
         "tts-generation",
         "user-research"
       ],
@@ -9949,9 +10069,11 @@
         "deep-research",
         "design-systems",
         "doc-coauthoring",
+        "electron-pro",
         "exa-monitor",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "frontend-design",
         "google-workspace",
         "imagen-generation",
@@ -9964,12 +10086,14 @@
         "regulatory-compliance",
         "security-scanning",
         "seo-optimization",
+        "slack-expert",
         "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
         "user-research",
         "web-artifacts-builder",
+        "websocket-engineer",
         "windows-terminal"
       ],
       "planner": [
@@ -11191,9 +11315,11 @@
         "deep-research",
         "design-systems",
         "doc-coauthoring",
+        "electron-pro",
         "exa-monitor",
         "feedback-analysis",
         "figma",
+        "fintech-engineer",
         "frontend-design",
         "google-workspace",
         "imagen-generation",
@@ -11206,12 +11332,14 @@
         "regulatory-compliance",
         "security-scanning",
         "seo-optimization",
+        "slack-expert",
         "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
         "user-research",
         "web-artifacts-builder",
+        "websocket-engineer",
         "windows-terminal"
       ],
       "planner": [

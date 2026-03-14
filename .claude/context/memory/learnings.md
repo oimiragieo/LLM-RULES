@@ -1,3 +1,24 @@
+## Plan-File Update Enforcement — Triple-Anchor Pattern (2026-03-14)
+
+**Task**: 21 — fix(protocol): enforce plan-file updates by executing agents (not router)
+**Commit**: 3f7b7447 | **Score**: 0.892 PASS
+
+**Pattern: Triple-Anchor Protocol Enforcement**
+
+When enforcing a new behavioral protocol across the framework, anchor it in three places:
+
+1. **Rule** (`.claude/rules/`) — the canonical spec with full detail (markers, timing, tools, anti-patterns)
+2. **Template** (`.claude/templates/spawn/`) — propagates awareness to all future spawns automatically
+3. **Rubric** (reflection-agent.md) — creates a feedback loop that scores compliance in future reflections
+
+Without all three anchors, behavioral changes decay. A rule alone is referenced only when agents read it explicitly. A template ensures every new spawn carries the requirement. A rubric ensures violations are detected and scored.
+
+**Application**: Use this triple-anchor pattern for any behavioral enforcement that must survive across sessions and agents.
+
+**Evidence**: Plan-file update: `plan-file-update.md` (rule) + `universal-agent-spawn.md` (template) + `reflection-agent.md` rubric section (feedback loop).
+
+---
+
 ## MEGA EPIC Phase 2 — Wave-Based Parallel Execution Pattern (2026-03-14)
 
 **Session**: MEGA EPIC Phase 2 final (reflection-mega-epic-phase2-final)
@@ -341,3 +362,13 @@ Created 5 new rule files in `.claude/rules/` from awesome-rules/awesome-cursorru
 **Spawn failures:** Context >100K tokens causes "Prompt is too long" on ALL agent spawns. Pattern: switch to direct execution mode.
 
 **ESLint complexity gate:** Adding a ternary inside a function at complexity=50 blocks commit. Always extract to named helper function.
+
+## MEGA WAVE 3 Research Track A (2026-03-14)
+
+- VoltAgent OpenClaw has 5,366 community skills; best picks for agent-studio: academic-deep-research, rate-limiter, adversarial-prompting, airtable-automation
+- Telegram is confirmed in OpenClaw Communication category (149 skills) but agent-studio already has telegram-polling skill
+- VoltAgent awesome-agent-skills: biggest gaps are Google Workspace CLI suite (12 skills), Firecrawl, Hugging Face model management, Neon, Notion
+- VoltAgent subagents: 128 agents; agent-studio covers ~74; key NEW agents to create: slack-expert, electron-pro, mlops-engineer, fintech-engineer, payment-integration, iot-engineer, m365-admin
+- CLI-Anything: 7-phase pipeline (Analyze→Design→Implement→Plan Tests→Write Tests→Document→Publish) converts GUI apps to JSON-enabled CLIs; integrate with assimilate skill
+- CodeGraphContext: MCP server supporting 14 languages + KùzuDB graph backend; directly upgrades existing code-graph-context skill; use for cross-language call chain analysis
+- Top 10 priority picks: (1) CodeGraphContext MCP, (2) GWS CLI suite, (3) Firecrawl, (4) slack-expert agent, (5) CLI-Anything/assimilate, (6) electron-pro, (7) HuggingFace skills, (8) mlops-engineer, (9) rate-limiter skill, (10) fintech/payment agents

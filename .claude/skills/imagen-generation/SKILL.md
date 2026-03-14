@@ -18,6 +18,7 @@ Skill({ skill: 'imagen-generation' });
 ```
 
 Use when:
+
 - Generating images from text prompts via Google Imagen on Vertex AI
 - Editing existing images with text instructions (image-to-image)
 - Inpainting / outpainting specific regions of an image
@@ -212,13 +213,13 @@ response.images[0].save('imagen3_output.png')
 
 ## Model Reference
 
-| Model ID                           | Use Case                        | Notes                     |
-|------------------------------------|---------------------------------|---------------------------|
-| `imagen-3.0-generate-001`          | Highest quality generation      | Latest, best prompt follow|
-| `imagen-3.0-fast-generate-001`     | Fast/cost-effective generation  | Lower latency             |
-| `imagegeneration@006`              | Stable production model         | Well-tested               |
-| `imagegeneration@005`              | Previous generation             | Legacy                    |
-| `imagen-3.0-capability-001`        | Editing and transformations     | Inpaint, outpaint         |
+| Model ID                       | Use Case                       | Notes                      |
+| ------------------------------ | ------------------------------ | -------------------------- |
+| `imagen-3.0-generate-001`      | Highest quality generation     | Latest, best prompt follow |
+| `imagen-3.0-fast-generate-001` | Fast/cost-effective generation | Lower latency              |
+| `imagegeneration@006`          | Stable production model        | Well-tested                |
+| `imagegeneration@005`          | Previous generation            | Legacy                     |
+| `imagen-3.0-capability-001`    | Editing and transformations    | Inpaint, outpaint          |
 
 ---
 

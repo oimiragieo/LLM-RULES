@@ -13,6 +13,7 @@ Skill({ skill: 'mcp-catalog' });
 ```
 
 Invoke when:
+
 - Selecting an MCP server for a specific capability
 - Configuring MCP servers in Claude Code settings
 - Building a new MCP server integration
@@ -22,22 +23,22 @@ Invoke when:
 
 ## Official Anthropic / MCP Reference Servers
 
-| Server | Package | Capability | Transport |
-|--------|---------|------------|-----------|
-| `filesystem` | `@modelcontextprotocol/server-filesystem` | Read/write local files with configurable roots | stdio |
-| `github` | `@modelcontextprotocol/server-github` | GitHub repos, PRs, issues, search | stdio |
-| `gitlab` | `@modelcontextprotocol/server-gitlab` | GitLab projects, MRs, pipelines | stdio |
-| `google-drive` | `@modelcontextprotocol/server-gdrive` | Google Drive file access and search | stdio |
-| `google-maps` | `@modelcontextprotocol/server-google-maps` | Geocoding, directions, place search | stdio |
-| `postgres` | `@modelcontextprotocol/server-postgres` | PostgreSQL read access with schema inspection | stdio |
-| `sqlite` | `@modelcontextprotocol/server-sqlite` | SQLite read/write with business intelligence | stdio |
-| `slack` | `@modelcontextprotocol/server-slack` | Slack channels, messages, user management | stdio |
-| `memory` | `@modelcontextprotocol/server-memory` | KV-based persistent memory graph | stdio |
-| `puppeteer` | `@modelcontextprotocol/server-puppeteer` | Browser automation and web scraping | stdio |
-| `brave-search` | `@modelcontextprotocol/server-brave-search` | Brave Search API — web and local results | stdio |
-| `fetch` | `@modelcontextprotocol/server-fetch` | HTTP fetch with robots.txt compliance | stdio |
-| `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Dynamic chain-of-thought reasoning | stdio |
-| `aws-kb-retrieval` | `@modelcontextprotocol/server-aws-kb-retrieval` | AWS Knowledge Base retrieval via Bedrock | stdio |
+| Server                | Package                                            | Capability                                     | Transport |
+| --------------------- | -------------------------------------------------- | ---------------------------------------------- | --------- |
+| `filesystem`          | `@modelcontextprotocol/server-filesystem`          | Read/write local files with configurable roots | stdio     |
+| `github`              | `@modelcontextprotocol/server-github`              | GitHub repos, PRs, issues, search              | stdio     |
+| `gitlab`              | `@modelcontextprotocol/server-gitlab`              | GitLab projects, MRs, pipelines                | stdio     |
+| `google-drive`        | `@modelcontextprotocol/server-gdrive`              | Google Drive file access and search            | stdio     |
+| `google-maps`         | `@modelcontextprotocol/server-google-maps`         | Geocoding, directions, place search            | stdio     |
+| `postgres`            | `@modelcontextprotocol/server-postgres`            | PostgreSQL read access with schema inspection  | stdio     |
+| `sqlite`              | `@modelcontextprotocol/server-sqlite`              | SQLite read/write with business intelligence   | stdio     |
+| `slack`               | `@modelcontextprotocol/server-slack`               | Slack channels, messages, user management      | stdio     |
+| `memory`              | `@modelcontextprotocol/server-memory`              | KV-based persistent memory graph               | stdio     |
+| `puppeteer`           | `@modelcontextprotocol/server-puppeteer`           | Browser automation and web scraping            | stdio     |
+| `brave-search`        | `@modelcontextprotocol/server-brave-search`        | Brave Search API — web and local results       | stdio     |
+| `fetch`               | `@modelcontextprotocol/server-fetch`               | HTTP fetch with robots.txt compliance          | stdio     |
+| `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Dynamic chain-of-thought reasoning             | stdio     |
+| `aws-kb-retrieval`    | `@modelcontextprotocol/server-aws-kb-retrieval`    | AWS Knowledge Base retrieval via Bedrock       | stdio     |
 
 ---
 
@@ -45,45 +46,45 @@ Invoke when:
 
 ### Developer Tools
 
-| Server | Source | Capability |
-|--------|--------|------------|
-| `exa` | `exa-labs/exa-mcp-server` | AI-powered web search (semantic) |
-| `linear` | `linear-mcp-server` | Linear issue tracking and project management |
-| `jira` | community | Jira issue read/write, sprint management |
-| `notion` | community | Notion pages, databases, search |
-| `obsidian` | community | Obsidian vault read/write |
-| `sentry` | community | Sentry error tracking, issues, events |
-| `datadog` | community | Datadog metrics, logs, monitors |
-| `figma` | community | Figma design file access, component export |
+| Server     | Source                    | Capability                                   |
+| ---------- | ------------------------- | -------------------------------------------- |
+| `exa`      | `exa-labs/exa-mcp-server` | AI-powered web search (semantic)             |
+| `linear`   | `linear-mcp-server`       | Linear issue tracking and project management |
+| `jira`     | community                 | Jira issue read/write, sprint management     |
+| `notion`   | community                 | Notion pages, databases, search              |
+| `obsidian` | community                 | Obsidian vault read/write                    |
+| `sentry`   | community                 | Sentry error tracking, issues, events        |
+| `datadog`  | community                 | Datadog metrics, logs, monitors              |
+| `figma`    | community                 | Figma design file access, component export   |
 
 ### Data & Analytics
 
-| Server | Source | Capability |
-|--------|--------|------------|
-| `bigquery` | community | Google BigQuery read queries |
-| `mongodb` | community | MongoDB document CRUD and aggregation |
-| `redis` | community | Redis key operations, pub/sub |
+| Server          | Source    | Capability                             |
+| --------------- | --------- | -------------------------------------- |
+| `bigquery`      | community | Google BigQuery read queries           |
+| `mongodb`       | community | MongoDB document CRUD and aggregation  |
+| `redis`         | community | Redis key operations, pub/sub          |
 | `elasticsearch` | community | Elasticsearch search, index management |
-| `snowflake` | community | Snowflake SQL queries |
+| `snowflake`     | community | Snowflake SQL queries                  |
 
 ### Cloud & Infrastructure
 
-| Server | Source | Capability |
-|--------|--------|------------|
-| `aws` | community | AWS resource management (EC2, S3, Lambda) |
-| `gcp` | community | Google Cloud resource management |
-| `cloudflare` | `@cloudflare/mcp-server-cloudflare` | Workers, KV, R2, D1 management |
-| `vercel` | community | Vercel deployments, projects, domains |
-| `kubernetes` | community | Kubernetes cluster management |
+| Server       | Source                              | Capability                                |
+| ------------ | ----------------------------------- | ----------------------------------------- |
+| `aws`        | community                           | AWS resource management (EC2, S3, Lambda) |
+| `gcp`        | community                           | Google Cloud resource management          |
+| `cloudflare` | `@cloudflare/mcp-server-cloudflare` | Workers, KV, R2, D1 management            |
+| `vercel`     | community                           | Vercel deployments, projects, domains     |
+| `kubernetes` | community                           | Kubernetes cluster management             |
 
 ### Communication
 
-| Server | Source | Capability |
-|--------|--------|------------|
-| `discord` | community | Discord server management and messaging |
-| `telegram` | community | Telegram bot messaging |
-| `twilio` | community | SMS, voice, WhatsApp via Twilio |
-| `sendgrid` | community | Email sending via SendGrid |
+| Server     | Source    | Capability                              |
+| ---------- | --------- | --------------------------------------- |
+| `discord`  | community | Discord server management and messaging |
+| `telegram` | community | Telegram bot messaging                  |
+| `twilio`   | community | SMS, voice, WhatsApp via Twilio         |
+| `sendgrid` | community | Email sending via SendGrid              |
 
 ---
 
@@ -96,11 +97,7 @@ Invoke when:
   "mcpServers": {
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/path/to/allowed/directory"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
     },
     "github": {
       "command": "npx",
@@ -156,17 +153,17 @@ Variables are resolved from the shell environment where Claude Code runs.
 
 Agent Studio skills that wrap MCP servers:
 
-| Skill | Underlying MCP | Agent Studio Path |
-|-------|----------------|-------------------|
-| `github-ops` | `@modelcontextprotocol/server-github` | `.claude/skills/github-ops/` |
-| `github-mcp` | `@modelcontextprotocol/server-github` | `.claude/skills/github-mcp/` |
-| `figma` | Figma MCP server | `.claude/skills/figma/` |
-| `google-workspace` | Google Drive + Sheets MCP | `.claude/skills/google-workspace/` |
-| `slack-notifications` | Slack MCP | `.claude/skills/slack-notifications/` |
-| `linear-pm` | Linear MCP | `.claude/skills/linear-pm/` |
-| `jira-pm` | Jira MCP | `.claude/skills/jira-pm/` |
-| `arxiv-mcp` | ArXiv search | `.claude/skills/arxiv-mcp/` |
-| `webmcp-browser-tools` | Browser tools MCP | `.claude/skills/webmcp-browser-tools/` |
+| Skill                  | Underlying MCP                        | Agent Studio Path                      |
+| ---------------------- | ------------------------------------- | -------------------------------------- |
+| `github-ops`           | `@modelcontextprotocol/server-github` | `.claude/skills/github-ops/`           |
+| `github-mcp`           | `@modelcontextprotocol/server-github` | `.claude/skills/github-mcp/`           |
+| `figma`                | Figma MCP server                      | `.claude/skills/figma/`                |
+| `google-workspace`     | Google Drive + Sheets MCP             | `.claude/skills/google-workspace/`     |
+| `slack-notifications`  | Slack MCP                             | `.claude/skills/slack-notifications/`  |
+| `linear-pm`            | Linear MCP                            | `.claude/skills/linear-pm/`            |
+| `jira-pm`              | Jira MCP                              | `.claude/skills/jira-pm/`              |
+| `arxiv-mcp`            | ArXiv search                          | `.claude/skills/arxiv-mcp/`            |
+| `webmcp-browser-tools` | Browser tools MCP                     | `.claude/skills/webmcp-browser-tools/` |
 
 ---
 
@@ -203,6 +200,7 @@ Skill({ skill: 'skill-creator' })
 ```
 
 The skill should:
+
 - Document the MCP server's tools and resources
 - Provide usage examples
 - Define when to invoke
@@ -242,11 +240,11 @@ The skill should:
 
 ### Tool vs Resource vs Prompt
 
-| Concept | Purpose | Agent Interaction |
-|---------|---------|-------------------|
-| **Tool** | Execute actions (write file, call API) | Agent calls `mcp__serverName__toolName()` |
-| **Resource** | Read data (file contents, DB records) | Agent reads `mcp://serverName/resource/path` |
-| **Prompt** | Reusable prompt templates | Agent requests prompt template by name |
+| Concept      | Purpose                                | Agent Interaction                            |
+| ------------ | -------------------------------------- | -------------------------------------------- |
+| **Tool**     | Execute actions (write file, call API) | Agent calls `mcp__serverName__toolName()`    |
+| **Resource** | Read data (file contents, DB records)  | Agent reads `mcp://serverName/resource/path` |
+| **Prompt**   | Reusable prompt templates              | Agent requests prompt template by name       |
 
 ### Naming Convention in Claude Code
 

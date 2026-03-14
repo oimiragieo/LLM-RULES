@@ -127,14 +127,14 @@ REFLECT -> EVALUATE -> CORRECT -> EXECUTE
 
 ### Rubric-Based Scoring
 
-| Dimension              | Weight | Description                                            |
-| ---------------------- | ------ | ------------------------------------------------------ |
-| **Completeness**       | 20%    | All required sections present and thoroughly addressed |
-| **Accuracy**           | 20%    | No factual errors, correct paths, valid syntax         |
-| **Clarity**            | 15%    | Well-structured, readable, easy to understand          |
-| **Consistency**        | 15%    | Follows conventions, style guides, patterns            |
-| **Actionability**      | 15%    | Clear next steps, implementable without ambiguity      |
-| **Process Adherence**  | 15%    | TaskUpdate metadata present, commits match claims, no spawn traceability violations, gap log clean |
+| Dimension             | Weight | Description                                                                                        |
+| --------------------- | ------ | -------------------------------------------------------------------------------------------------- |
+| **Completeness**      | 20%    | All required sections present and thoroughly addressed                                             |
+| **Accuracy**          | 20%    | No factual errors, correct paths, valid syntax                                                     |
+| **Clarity**           | 15%    | Well-structured, readable, easy to understand                                                      |
+| **Consistency**       | 15%    | Follows conventions, style guides, patterns                                                        |
+| **Actionability**     | 15%    | Clear next steps, implementable without ambiguity                                                  |
+| **Process Adherence** | 15%    | TaskUpdate metadata present, commits match claims, no spawn traceability violations, gap log clean |
 
 #### Plan File Staleness (Completeness sub-check)
 
@@ -285,14 +285,14 @@ Before evaluating task quality, scan key session logs for process adherence sign
 
 **Flags to look for**:
 
-| Flag | Source | Signal |
-|------|--------|--------|
-| `retry` entries | gap-log | Agent re-spawned — instability |
-| `placeholder_output` | gap-log | Agent returned stub instead of real output |
-| `missing_metadata` | gap-log | TaskUpdate completed without summary |
-| Score < 0.7 in last 3 reflections | reflection-log | Systemic quality decline |
-| Commits missing for claimed files | git log | Unverified completion claim |
-| `task_id` absent from spawn | spawn-log | Traceability violation |
+| Flag                              | Source         | Signal                                     |
+| --------------------------------- | -------------- | ------------------------------------------ |
+| `retry` entries                   | gap-log        | Agent re-spawned — instability             |
+| `placeholder_output`              | gap-log        | Agent returned stub instead of real output |
+| `missing_metadata`                | gap-log        | TaskUpdate completed without summary       |
+| Score < 0.7 in last 3 reflections | reflection-log | Systemic quality decline                   |
+| Commits missing for claimed files | git log        | Unverified completion claim                |
+| `task_id` absent from spawn       | spawn-log      | Traceability violation                     |
 
 **Produce a Process Audit table** (include in Step 6 report):
 
