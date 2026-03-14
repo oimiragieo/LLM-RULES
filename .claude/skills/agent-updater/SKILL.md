@@ -216,6 +216,45 @@ After: write learnings/decisions/issues updates.
 If you are updating an agent and it is missing the \`## Search Protocol\` or missing the \`## Memory Protocol (MANDATORY)\` blocks, or if its existing Memory Protocol only reads \`learnings.md\`, you MUST inject or update these blocks to match the framework standard exactly (which mandates querying semantic memory `node .claude/lib/memory/memory-search.cjs` and reading BOTH learnings and decisions).
 Also, ensure the agent's frontmatter \`skills:\` array contains \`ripgrep\`, \`token-saver-context-compression\`, and \`code-semantic-search\`.
 
+**TASK LIFECYCLE INJECTION RULE (MANDATORY):**
+If you are updating an agent and it is missing the `## Task Progress Protocol (MANDATORY)` section (or only has a partial version missing the `metadata.summary` field, `filesModified` array, or the Three Iron Laws), you MUST inject or update this section. The canonical template is in `.claude/templates/spawn/universal-agent-spawn.md`. Every agent file MUST contain:
+
+```markdown
+## Task Progress Protocol (MANDATORY)
+
+**When assigned a task, use TaskUpdate to track progress:**
+
+\`\`\`javascript
+// 1. ABSOLUTE FIRST ACTION — claim the task
+TaskUpdate({ taskId: '<your-task-id>', status: 'in_progress', owner: '<agent-name>' });
+
+// 2. Do the work...
+
+// 3. ABSOLUTE LAST ACTION — mark complete with metadata
+TaskUpdate({
+  taskId: '<your-task-id>',
+  status: 'completed',
+  metadata: {
+    summary: 'Brief description of what was accomplished (>50 chars)',
+    filesModified: ['path/to/file1', 'path/to/file2'],
+    completedAt: new Date().toISOString(),
+  },
+});
+
+// 4. Check for next available task
+TaskList();
+\`\`\`
+
+**The Three Iron Laws of Task Tracking:**
+1. **LAW 1**: ALWAYS call TaskUpdate({ status: "in_progress" }) FIRST before any work
+2. **LAW 2**: ALWAYS call TaskUpdate({ status: "completed", metadata: {...} }) LAST after all work
+3. **LAW 3**: ALWAYS call TaskList() after completion to find next work
+
+See `.claude/templates/spawn/universal-agent-spawn.md` for the canonical spawn template with the full 70-line enforcement warning box used by the Router when spawning this agent.
+```
+
+The `pre-completion-validation.cjs` hook validates the IMPLEMENTATION_RESULT block before accepting TaskUpdate(completed). Missing it causes silent task drops.
+
 ## Eval-Backed Gap Analysis
 
 When the `--trigger eval_regression` flag is set or when `--eval-dir <path>` points to an existing evaluation report directory, structure the Step 3 Gap Analysis findings using the analyzer taxonomy for consistency with the evaluation pipeline:

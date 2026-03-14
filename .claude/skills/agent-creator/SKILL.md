@@ -824,6 +824,12 @@ TaskList();
 - No duplicate work (tasks have owners)
 - Dependencies are respected (blocked tasks can't start)
 
+> **Spawn Template Reference**: The Router uses `.claude/templates/spawn/universal-agent-spawn.md`
+> when spawning this agent. That template contains the full 70-line enforcement warning box.
+> The Task Progress Protocol above must match the contract defined in that template exactly.
+> See `pre-completion-validation.cjs` — it validates the IMPLEMENTATION_RESULT block before
+> accepting TaskUpdate(completed). Missing metadata causes silent task drops.
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting any task:**
