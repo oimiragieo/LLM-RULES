@@ -119,8 +119,6 @@ For new skills: Domain experts (language-specific agents) have domain-focused sk
 `;
 }
 
-
-
 function injectSections(basePrompt, sections) {
   const parts = [];
 

@@ -63,6 +63,7 @@ git checkout -b autoresearch/<tag>
 ### Step 1.3 — Read In-Scope Files
 
 Read these three files for full context before touching anything:
+
 - `README.md` — repository context and goals
 - `prepare.py` — fixed constants, data prep, tokenizer, dataloader, evaluation. **DO NOT MODIFY.**
 - `train.py` — the only file you modify. Architecture, optimizer, hyperparameters, training loop.
@@ -123,6 +124,7 @@ git status
 ### Step 2.2 — Formulate a Hypothesis
 
 Pick ONE focused idea to test. Examples:
+
 - "Increase learning rate from 0.01 to 0.03"
 - "Add gradient clipping at norm 1.0"
 - "Switch from ReLU to SiLU activation"
@@ -130,6 +132,7 @@ Pick ONE focused idea to test. Examples:
 - "Remove value embeddings to simplify the attention"
 
 **If you have run out of obvious ideas:**
+
 - Re-read `train.py` from scratch for angles you missed
 - Re-read `prepare.py` for constraints you may not have noticed
 - Try combining two near-miss experiments from `results.tsv`
@@ -143,11 +146,13 @@ Pick ONE focused idea to test. Examples:
 Apply only the changes needed for this single hypothesis. Keep the diff minimal and reviewable.
 
 **Constraints (from `prepare.py` — cannot change):**
+
 - Training time budget: 5 minutes wall clock (excluding startup/compilation)
 - Sequence length, evaluation protocol, tokenizer
 - `evaluate_bpb` function — this is the ground truth metric
 
 **What you CAN change in `train.py`:**
+
 - Model architecture (depth, width, attention pattern, activations)
 - Optimizer (type, learning rate, scheduler, momentum)
 - Training loop (batch size, accumulation, warmup)
@@ -189,6 +194,7 @@ grep "^val_bpb:\|^peak_vram_mb:" run.log
 ```
 
 Expected output when successful:
+
 ```
 val_bpb:          0.997900
 peak_vram_mb:     45060.2
@@ -216,8 +222,9 @@ If you cannot fix a crash after 2 attempts, give up on the idea.
 Update your internal baseline value.
 
 **Simplicity criterion:** Before keeping a win, weigh it:
+
 - Improvement of ~0.001 val_bpb + added 20 lines of complex code → probably not worth it
-- Improvement of ~0.001 val_bpb from *deleting* code → definitely keep
+- Improvement of ~0.001 val_bpb from _deleting_ code → definitely keep
 - Improvement of ~0 but much simpler code → keep (simplification win)
 - Large improvement (>0.005 val_bpb) + reasonable complexity → keep
 
@@ -242,21 +249,23 @@ echo -e "${COMMIT}\t0.997900\t44.0\tkeep\tincrease LR to 0.04" >> results.tsv
 ```
 
 **TSV schema:**
-| Column | Type | Example | Notes |
-|--------|------|---------|-------|
-| commit | string | `a1b2c3d` | 7-char short hash |
-| val_bpb | float | `0.997900` | Use `0.000000` for crashes |
-| memory_gb | float | `44.0` | `peak_vram_mb / 1024`, round to 1 decimal. Use `0.0` for crashes |
-| status | enum | `keep` | `keep`, `discard`, or `crash` |
-| description | string | `increase LR to 0.04` | Short text, no tabs |
+
+| Column      | Type   | Example               | Notes                                                            |
+| ----------- | ------ | --------------------- | ---------------------------------------------------------------- |
+| commit      | string | `a1b2c3d`             | 7-char short hash                                                |
+| val_bpb     | float  | `0.997900`            | Use `0.000000` for crashes                                       |
+| memory_gb   | float  | `44.0`                | `peak_vram_mb / 1024`, round to 1 decimal. Use `0.0` for crashes |
+| status      | enum   | `keep`                | `keep`, `discard`, or `crash`                                    |
+| description | string | `increase LR to 0.04` | Short text, no tabs                                              |
 
 **Example results.tsv:**
+
 ```
-commit	val_bpb	memory_gb	status	description
-a1b2c3d	0.997900	44.0	keep	baseline
-b2c3d4e	0.993200	44.2	keep	increase LR to 0.04
-c3d4e5f	1.005000	44.0	discard	switch to GeLU activation
-d4e5f6g	0.000000	0.0	crash	double model width (OOM)
+commit val_bpb memory_gb status description
+a1b2c3d 0.997900 44.0 keep baseline
+b2c3d4e 0.993200 44.2 keep increase LR to 0.04
+c3d4e5f 1.005000 44.0 discard switch to GeLU activation
+d4e5f6g 0.000000 0.0 crash double model width (OOM)
 ```
 
 **IMPORTANT:** Do NOT `git add results.tsv`. Leave it untracked. It tracks all experiments across keeps and discards on this branch.
@@ -267,14 +276,14 @@ d4e5f6g	0.000000	0.0	crash	double model width (OOM)
 
 When evaluating whether to keep a change, apply this framework:
 
-| Improvement | Complexity change | Decision |
-|-------------|-------------------|----------|
-| > 0.005 val_bpb lower | Reasonable | Keep |
-| 0.001–0.005 lower | Minimal | Keep |
-| 0.001–0.005 lower | Major (20+ lines, hacky) | Discard |
-| ≈ 0 | Simpler (fewer lines) | Keep (simplification win) |
-| ≈ 0 | Equal complexity | Discard |
-| 0 or worse | Any | Discard |
+| Improvement           | Complexity change        | Decision                  |
+| --------------------- | ------------------------ | ------------------------- |
+| > 0.005 val_bpb lower | Reasonable               | Keep                      |
+| 0.001–0.005 lower     | Minimal                  | Keep                      |
+| 0.001–0.005 lower     | Major (20+ lines, hacky) | Discard                   |
+| ≈ 0                   | Simpler (fewer lines)    | Keep (simplification win) |
+| ≈ 0                   | Equal complexity         | Discard                   |
+| 0 or worse            | Any                      | Discard                   |
 
 **Goal: the lowest val_bpb in the cleanest code.** Complexity is a debt that compounds.
 
@@ -313,18 +322,18 @@ Re-reading `train.py` and `prepare.py` from scratch often surfaces new angles.
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| `cat run.log` or `tail -n 500 run.log` | Floods context with gigabytes of training logs; crashes session | `grep "^val_bpb:\|^peak_vram_mb:" run.log` only |
-| Asking "should I keep going?" | Human is likely asleep; defeats the purpose of autonomous research | NEVER STOP. Continue indefinitely until manually interrupted |
-| Trying to "fix" a failed hypothesis | Most bad ideas are fundamentally wrong, not implementation bugs | `git reset --hard HEAD~1` and move to next idea |
-| Running multiple hypotheses in one experiment | Impossible to attribute wins or losses to specific changes | One hypothesis per commit, one commit per experiment |
-| Modifying `prepare.py` | Corrupts evaluation protocol; results become incomparable | Never touch `prepare.py`. It is fixed. |
-| Forgetting to redirect output | Training stdout floods agent context mid-experiment | Always `uv run train.py > run.log 2>&1` |
-| `git add results.tsv` | Clutters git history; results span all experiments including discards | Never track results.tsv in git |
-| Using commas in results.tsv | Commas inside description field break CSV parsers | Always use TAB separators in results.tsv |
-| Waiting 10+ minutes for a stuck run | OOM or infinite loops hang silently | Kill any run exceeding 10 minutes; treat as crash |
-| Keeping a tiny win with major complexity added | Complexity accumulates; future experiments suffer | Apply simplicity criterion: tiny gain + ugly code = discard |
+| Anti-Pattern                                   | Why It Fails                                                          | Correct Approach                                             |
+| ---------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `cat run.log` or `tail -n 500 run.log`         | Floods context with gigabytes of training logs; crashes session       | `grep "^val_bpb:\|^peak_vram_mb:" run.log` only              |
+| Asking "should I keep going?"                  | Human is likely asleep; defeats the purpose of autonomous research    | NEVER STOP. Continue indefinitely until manually interrupted |
+| Trying to "fix" a failed hypothesis            | Most bad ideas are fundamentally wrong, not implementation bugs       | `git reset --hard HEAD~1` and move to next idea              |
+| Running multiple hypotheses in one experiment  | Impossible to attribute wins or losses to specific changes            | One hypothesis per commit, one commit per experiment         |
+| Modifying `prepare.py`                         | Corrupts evaluation protocol; results become incomparable             | Never touch `prepare.py`. It is fixed.                       |
+| Forgetting to redirect output                  | Training stdout floods agent context mid-experiment                   | Always `uv run train.py > run.log 2>&1`                      |
+| `git add results.tsv`                          | Clutters git history; results span all experiments including discards | Never track results.tsv in git                               |
+| Using commas in results.tsv                    | Commas inside description field break CSV parsers                     | Always use TAB separators in results.tsv                     |
+| Waiting 10+ minutes for a stuck run            | OOM or infinite loops hang silently                                   | Kill any run exceeding 10 minutes; treat as crash            |
+| Keeping a tiny win with major complexity added | Complexity accumulates; future experiments suffer                     | Apply simplicity criterion: tiny gain + ugly code = discard  |
 
 ---
 

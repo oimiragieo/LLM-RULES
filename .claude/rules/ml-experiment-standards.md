@@ -40,18 +40,20 @@ All else being equal, simpler code is preferred over complex code. When evaluati
 Use a tab-separated `results.tsv` file. **Never use commas** (commas appear in descriptions and break CSV parsers). Keep this file untracked in git.
 
 **Header:**
+
 ```
-commit	val_bpb	memory_gb	status	description
+commit val_bpb memory_gb status description
 ```
 
 **Columns:**
-| Column | Format | Notes |
-|--------|--------|-------|
-| commit | 7-char hex | `git rev-parse --short HEAD` |
-| val_bpb | 6 decimal places | Use `0.000000` for crashes |
-| memory_gb | 1 decimal place | `peak_vram_mb / 1024`. Use `0.0` for crashes |
-| status | enum | `keep`, `discard`, or `crash` |
-| description | free text | Short, no tabs |
+
+| Column      | Format           | Notes                                        |
+| ----------- | ---------------- | -------------------------------------------- |
+| commit      | 7-char hex       | `git rev-parse --short HEAD`                 |
+| val_bpb     | 6 decimal places | Use `0.000000` for crashes                   |
+| memory_gb   | 1 decimal place  | `peak_vram_mb / 1024`. Use `0.0` for crashes |
+| status      | enum             | `keep`, `discard`, or `crash`                |
+| description | free text        | Short, no tabs                               |
 
 **Never commit `results.tsv` to git.** It spans all experiments including discards.
 
@@ -104,5 +106,6 @@ If ideas are exhausted: re-read source files, combine near-misses, try radical c
 ## When to Invoke
 
 Reference these standards when running:
+
 - `Skill({ skill: 'ml-experiment-loop' })` — the primary autonomous experiment loop skill
 - Any ML experiment that uses a fixed compute budget and a single validation metric
