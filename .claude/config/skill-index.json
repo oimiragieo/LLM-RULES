@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-14T05:35:26.086Z",
+  "generatedAt": "2026-03-14T05:40:03.656Z",
   "metadata": {
-    "totalSkills": 290,
+    "totalSkills": 291,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-14T05:35:26.088Z",
+    "lastValidated": "2026-03-14T05:40:03.658Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7470,6 +7470,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "mcp-catalog": {
+      "name": "mcp-catalog",
+      "displayName": "Mcp Catalog",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - mcp-catalog",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "mcp-catalog"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "reddit-researcher": {
       "name": "reddit-researcher",
       "displayName": "Reddit Researcher",
@@ -7957,6 +7979,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "mcp-catalog",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8353,6 +8376,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "mcp-catalog",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8731,6 +8755,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "mcp-catalog",
         "regulatory-compliance",
         "scheduled-tasks",
         "scientific-skills",
@@ -8972,6 +8997,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "mcp-catalog",
         "regulatory-compliance",
         "scientific-skills",
         "security-scanning",
@@ -9164,6 +9190,7 @@
         "google-workspace",
         "imagen-generation",
         "mcp-builder",
+        "mcp-catalog",
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
@@ -9932,6 +9959,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "mcp-catalog",
         "reddit-researcher",
         "regulatory-compliance",
         "security-scanning",
@@ -11173,6 +11201,7 @@
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
+        "mcp-catalog",
         "reddit-researcher",
         "regulatory-compliance",
         "security-scanning",
