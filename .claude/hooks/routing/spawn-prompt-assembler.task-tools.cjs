@@ -190,7 +190,7 @@ function ensureMandatorySpawnPreflight(prompt, taskId) {
 3) Use task_id "${taskIdValue}" for TaskUpdate/TaskGet/TaskOutput (never session_id)
 4) Read file before Edit/Write; max 3 retries on repeated "file not read" errors
 `;
-  return `${preflightBlock}\n${prompt}`;
+  return `${prompt}\n${preflightBlock}`;
 }
 
 function hasRequiredWarningBox(prompt) {

@@ -232,13 +232,13 @@ TaskUpdate({ taskId: '<your-task-id>', status: 'in_progress', owner: '<agent-nam
 
 // 3. ABSOLUTE LAST ACTION — mark complete with metadata
 TaskUpdate({
-  taskId: '<your-task-id>',
-  status: 'completed',
-  metadata: {
-    summary: 'Brief description of what was accomplished (>50 chars)',
-    filesModified: ['path/to/file1', 'path/to/file2'],
-    completedAt: new Date().toISOString(),
-  },
+taskId: '<your-task-id>',
+status: 'completed',
+metadata: {
+summary: 'Brief description of what was accomplished (>50 chars)',
+filesModified: ['path/to/file1', 'path/to/file2'],
+completedAt: new Date().toISOString(),
+},
 });
 
 // 4. Check for next available task
@@ -246,6 +246,7 @@ TaskList();
 \`\`\`
 
 **The Three Iron Laws of Task Tracking:**
+
 1. **LAW 1**: ALWAYS call TaskUpdate({ status: "in_progress" }) FIRST before any work
 2. **LAW 2**: ALWAYS call TaskUpdate({ status: "completed", metadata: {...} }) LAST after all work
 3. **LAW 3**: ALWAYS call TaskList() after completion to find next work

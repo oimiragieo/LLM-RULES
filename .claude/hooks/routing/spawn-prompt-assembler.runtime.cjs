@@ -194,11 +194,7 @@ function prepareTaskSpawnContext(hookInput, sessionId) {
   const inputPromptLength = basePrompt.length;
 
   if (!hasRequiredWarningBox(basePrompt) || !hasTaskIdReference(basePrompt)) {
-    const description = toolInput.description || '';
-    basePrompt = generateRequiredPrefixFragment(explicitTaskId, description) + '\n\n' + basePrompt;
-    debugLog('spawn-prompt-assembler', 'Prepended required prefix fragment', {
-      hasWarningBox: hasRequiredWarningBox(toolInput.prompt),
-      hasTaskId: hasTaskIdReference(toolInput.prompt),
+    debugLog('spawn-prompt-assembler', 'Task warning missing from basePrompt, will append later', {
       taskId: explicitTaskId,
     });
   }
@@ -467,6 +463,15 @@ async function main() {
     assembled = normalizeTaskIdReferences(assembled, explicitTaskId);
     assembled = ensureMandatorySpawnPreflight(assembled, explicitTaskId);
     assembled = enforcePromptBudget(assembled);
+
+    // === NEW DYNAMIC METADATA BLOCK APPENDED END ===
+    if (!hasRequiredWarningBox(assembled) || !hasTaskIdReference(assembled)) {
+      const description = toolInput.description || '';
+      const warningSuffix = generateRequiredPrefixFragment(explicitTaskId, description);
+      assembled = assembled + `\n\n${warningSuffix}`;
+    }
+    // ===============================================
+
     putCachedAssembly(cacheKey, assembled);
     perf.mark('model_and_budget_ms');
     const selectedModel = resolveSelectedModel(toolInput, configModel, explicitTaskId, agentType);

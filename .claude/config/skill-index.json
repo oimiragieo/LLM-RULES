@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-14T18:15:28.670Z",
+  "generatedAt": "2026-03-14T19:02:03.582Z",
   "metadata": {
-    "totalSkills": 298,
+    "totalSkills": 299,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-14T18:15:28.671Z",
+    "lastValidated": "2026-03-14T19:02:03.583Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7647,6 +7647,31 @@
       "priority": 3,
       "aliasOf": null
     },
+    "ml-experiment-loop": {
+      "name": "ml-experiment-loop",
+      "displayName": "Ml Experiment Loop",
+      "category": "Other",
+      "domain": "other",
+      "description": "Autonomous fixed-budget ML experiment loop — setup, iterative hypothesis testing, git-based keep/discard tracking, and indefinite autonomous execution. Implements the karpathy/autoresearch protocol.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash",
+        "Grep",
+        "Glob"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "ml-experiment-loop"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "reddit-researcher": {
       "name": "reddit-researcher",
       "displayName": "Reddit Researcher",
@@ -8191,6 +8216,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "ml-experiment-loop",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8595,6 +8621,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "ml-experiment-loop",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8981,6 +9008,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "ml-experiment-loop",
         "regulatory-compliance",
         "scheduled-tasks",
         "scientific-skills",
@@ -9230,6 +9258,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "ml-experiment-loop",
         "regulatory-compliance",
         "scientific-skills",
         "security-scanning",
@@ -9429,6 +9458,7 @@
         "imagen-generation",
         "mcp-builder",
         "mcp-catalog",
+        "ml-experiment-loop",
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
@@ -9603,6 +9633,7 @@
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
+        "ml-experiment-loop",
         "scheduled-tasks",
         "scientific-skills",
         "slack-expert",
@@ -9736,6 +9767,7 @@
         "browser-automation",
         "claude-api",
         "deep-research",
+        "ml-experiment-loop",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -9866,6 +9898,7 @@
         "claude-api",
         "cloud-run",
         "deep-research",
+        "ml-experiment-loop",
         "regulatory-compliance",
         "scientific-skills",
         "user-research"
@@ -10215,6 +10248,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "ml-experiment-loop",
         "reddit-researcher",
         "regulatory-compliance",
         "seo-optimization",
@@ -11514,6 +11548,7 @@
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
+        "ml-experiment-loop",
         "reddit-researcher",
         "regulatory-compliance",
         "seo-optimization",

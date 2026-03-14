@@ -161,20 +161,57 @@ function isStale(branch) {
 }
 
 /**
- * Remove a git worktree by path.
+ * Delete a git branch by name.
  *
- * @param {string} worktreePath - Forward-slash normalized path.
+ * Attempts a safe delete (-d) first; if the branch is not fully merged per git's
+ * bookkeeping but has no unique commits vs main, falls back to force-delete (-D).
+ *
+ * @param {string} branch - Short branch name (e.g. "worktree-agent-abc123").
  * @returns {{ success: boolean, error: string|null }}
  */
-function removeWorktree(worktreePath) {
+function deleteBranch(branch) {
+  if (!branch) return { success: true, error: null }; // nothing to delete
+  try {
+    git(['branch', '-d', branch]);
+    return { success: true, error: null };
+  } catch (_safeDeleteErr) {
+    // Branch may not be recognised as merged — check unique commits before force-delete
+    try {
+      const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
+      const unique = git(['log', '--oneline', `${defaultBranch}..${branch}`], { throws: false });
+      if (unique !== null && unique.trim().length === 0) {
+        // No unique commits — safe to force-delete
+        git(['branch', '-D', branch]);
+        return { success: true, error: null };
+      }
+      return {
+        success: false,
+        error: `Branch ${branch} has unmerged commits — skipping branch delete`,
+      };
+    } catch (innerErr) {
+      return {
+        success: false,
+        error: `Branch delete failed: ${innerErr.message || String(innerErr)}`,
+      };
+    }
+  }
+}
+
+/**
+ * Remove a git worktree by path, then delete its backing branch.
+ *
+ * @param {string} worktreePath - Forward-slash normalized path.
+ * @param {string} branch - Short branch name to delete after worktree removal.
+ * @returns {{ success: boolean, error: string|null }}
+ */
+function removeWorktree(worktreePath, branch) {
   // Convert back to OS-native path for git command
   const nativePath = worktreePath.replace(/\//g, path.sep);
   const removeArgs = ['worktree', 'remove', nativePath];
   if (FORCE) removeArgs.push('--force');
   try {
     git(removeArgs);
-    return { success: true, error: null };
-  } catch (err) {
+  } catch (_worktreeRemoveErr) {
     // Windows file-lock fallback: aggressively rm the directory
     // Increased maxRetries to 10 and retryDelay to 1000 (10 seconds total) for aggressive Defender lockouts
     try {
@@ -183,14 +220,22 @@ function removeWorktree(worktreePath) {
         // Clean up git's internal state after brute-force removal
         pruneGitWorktrees();
       }
-      return { success: true, error: null };
     } catch (rmErr) {
       return {
         success: false,
-        error: `Git worktree remove failed: ${err.message || String(err)} AND fallback rmSync failed: ${rmErr.message || String(rmErr)}`,
+        error: `Git worktree remove failed: ${_worktreeRemoveErr.message || String(_worktreeRemoveErr)} AND fallback rmSync failed: ${rmErr.message || String(rmErr)}`,
       };
     }
   }
+
+  // Delete the backing branch now that the worktree is gone
+  const branchResult = deleteBranch(branch);
+  if (!branchResult.success) {
+    // Non-fatal: worktree is removed, but log the branch warning
+    console.warn(`  WARN  Could not delete branch ${branch}: ${branchResult.error}`);
+  }
+
+  return { success: true, error: null };
 }
 
 /**
@@ -292,7 +337,7 @@ function main() {
       console.log(`  [DRY-RUN] REMOVE  ${shortPath}  [${branch}]  (${staleReason})`);
       removed++;
     } else {
-      const result = removeWorktree(worktreePath);
+      const result = removeWorktree(worktreePath, branch);
       if (result.success) {
         console.log(`  REMOVED  ${shortPath}  [${branch}]  (${staleReason})`);
         removed++;

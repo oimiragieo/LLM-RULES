@@ -19,29 +19,29 @@ Use this template for all non-orchestrator agents.
 - Adds explicit turn budgets to prevent runaway subagent loops.
 
 +======================================================================+
-|  WARNING: TASK TRACKING IS MANDATORY — READ BEFORE ANY WORK         |
+| WARNING: TASK TRACKING IS MANDATORY — READ BEFORE ANY WORK |
 +======================================================================+
-|  Your Task ID: <REPLACE_WITH_ACTUAL_TASK_ID>                        |
-|                                                                      |
-|  STEP 1 — ABSOLUTE FIRST ACTION, call:                              |
-|  TaskUpdate({ taskId: "<ID>", status: "in_progress" });             |
-|                                                                      |
-|  STEP 2 — Do your work.                                             |
-|                                                                      |
-|  STEP 3 — ABSOLUTE LAST ACTION (after lint, format, tests), call:  |
-|  TaskUpdate({                                                        |
-|    taskId: "<ID>",                                                   |
-|    status: "completed",                                              |
-|    metadata: {                                                       |
-|      summary: "What was accomplished (>50 chars required)",         |
-|      filesModified: ["path/to/file1", "path/to/file2"],             |
-|    }                                                                 |
-|  });                                                                 |
-|                                                                      |
-|  THEN call TaskList() to find the next task.                        |
-|                                                                      |
-|  FAILURE TO CALL TaskUpdate(completed) = TASK APPEARS STUCK FOREVER |
-|  THE HOOK SYSTEM WILL DETECT MISSING COMPLETION AND BLOCK OUTPUT     |
+| Your Task ID: <REPLACE_WITH_ACTUAL_TASK_ID> |
+| |
+| STEP 1 — ABSOLUTE FIRST ACTION, call: |
+| TaskUpdate({ taskId: "<ID>", status: "in_progress" }); |
+| |
+| STEP 2 — Do your work. |
+| |
+| STEP 3 — ABSOLUTE LAST ACTION (after lint, format, tests), call: |
+| TaskUpdate({ |
+| taskId: "<ID>", |
+| status: "completed", |
+| metadata: { |
+| summary: "What was accomplished (>50 chars required)", |
+| filesModified: ["path/to/file1", "path/to/file2"], |
+| } |
+| }); |
+| |
+| THEN call TaskList() to find the next task. |
+| |
+| FAILURE TO CALL TaskUpdate(completed) = TASK APPEARS STUCK FOREVER |
+| THE HOOK SYSTEM WILL DETECT MISSING COMPLETION AND BLOCK OUTPUT |
 +======================================================================+
 
 ## Required sequence

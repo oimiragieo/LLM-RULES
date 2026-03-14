@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed — Prompt Caching Hierarchy Inversion (2026-03-14)
+
+- **LLM Cache Hit Optimization**: Restructured the `spawn-prompt-assembler` generation logic to maximize Anthropic/Gemini prefix caching retention by clustering static ecosystem rules at the top and isolating dynamic per-task identifiers at the bottom.
+- Removed brittle regex-based string splitters in `spawn-prompt-assembler-sections.cjs` and replaced them with a strict, explicitly concatenated array: `[STATIC]` Tools, Skills, Discovery -> `[SEMI-STATIC]` RAG Memory -> `[STATIC]` Constitution -> `[DYNAMIC]` User Query / Base Prompt.
+- Stripped dynamic Task UUIDs and Worktree Path alerts from the top of the generated Subagent prompts and appended them to the absolute bottom in `spawn-prompt-assembler.runtime.cjs`.
+- Restored `ensureMandatorySpawnPreflight` to safely append its payload rather than prepending.
+
 ### Added — MEGA EPIC Framework Evolution Wave 1 + 2 (2026-03-13)
 
 Assimilated 17 external repositories. Net additions: +1 agent, +9 skills, +10 rule files.

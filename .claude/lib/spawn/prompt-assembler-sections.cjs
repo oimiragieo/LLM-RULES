@@ -2,7 +2,7 @@
 'use strict';
 
 const DEFAULT_SKILL_SECTION_MODE = 'full';
-const BANNER_LINE = '+======================================================================+';
+const _BANNER_LINE = '+======================================================================+';
 
 function normalizeSkillSectionMode(mode) {
   const value = String(mode || DEFAULT_SKILL_SECTION_MODE)
@@ -119,98 +119,26 @@ For new skills: Domain experts (language-specific agents) have domain-focused sk
 `;
 }
 
-function buildInjectedSections(sections) {
-  return `\n\n${sections.toolsSection}\n\n${sections.skillsSection}\n\n${sections.discoverySection}\n\n`;
-}
 
-function locateInjectionWindow(basePrompt) {
-  const projectContextMatch = basePrompt.match(/## PROJECT CONTEXT/i);
-  const instructionsMatch = basePrompt.match(/## Instructions/i);
-
-  const firstBannerIndex = basePrompt.indexOf(BANNER_LINE);
-  let lastWarningBoxEnd = firstBannerIndex;
-  if (firstBannerIndex !== -1) {
-    const secondBanner = basePrompt.indexOf(BANNER_LINE, firstBannerIndex + 1);
-    if (secondBanner !== -1) {
-      lastWarningBoxEnd = secondBanner + BANNER_LINE.length;
-    }
-  }
-
-  if (projectContextMatch) {
-    return {
-      beforeContent: basePrompt.slice(0, projectContextMatch.index),
-      afterContent: basePrompt.slice(projectContextMatch.index),
-    };
-  }
-  if (instructionsMatch) {
-    return {
-      beforeContent: basePrompt.slice(0, instructionsMatch.index),
-      afterContent: basePrompt.slice(instructionsMatch.index),
-    };
-  }
-  if (lastWarningBoxEnd > 0) {
-    return {
-      beforeContent: basePrompt.slice(0, lastWarningBoxEnd),
-      afterContent: basePrompt.slice(lastWarningBoxEnd),
-    };
-  }
-  return { beforeContent: basePrompt, afterContent: '' };
-}
-
-function injectMemorySection(enhanced, memorySection) {
-  if (!memorySection || enhanced.includes('## Memory Context (Auto-Loaded)')) {
-    return enhanced;
-  }
-
-  const header = '## Memory Protocol';
-  const idx = enhanced.toLowerCase().indexOf(header.toLowerCase());
-  if (idx !== -1) {
-    const afterHeaderIdx = enhanced.indexOf('\n', idx);
-    const nextHeadingIdx = enhanced.indexOf('\n## ', afterHeaderIdx === -1 ? idx : afterHeaderIdx);
-    if (nextHeadingIdx !== -1) {
-      return (
-        enhanced.slice(0, nextHeadingIdx) +
-        `\n\n${memorySection}\n` +
-        enhanced.slice(nextHeadingIdx)
-      );
-    }
-  }
-  return `${enhanced}\n\n${memorySection}\n`;
-}
-
-function injectBehaviourSection(enhanced, behaviourSection) {
-  if (!behaviourSection || enhanced.includes('## Dynamic behaviour rules')) {
-    return enhanced;
-  }
-
-  const marker = '## Memory Context (Auto-Loaded)';
-  if (enhanced.includes(marker)) {
-    const nextHeaderIdx = enhanced.indexOf('\n## ', enhanced.indexOf(marker) + marker.length);
-    if (nextHeaderIdx !== -1) {
-      return (
-        enhanced.slice(0, nextHeaderIdx) +
-        `\n\n${behaviourSection}\n` +
-        enhanced.slice(nextHeaderIdx)
-      );
-    }
-  }
-
-  return `${enhanced}\n\n${behaviourSection}\n`;
-}
 
 function injectSections(basePrompt, sections) {
-  if (!basePrompt) {
-    const parts = [sections.toolsSection, sections.skillsSection, sections.discoverySection];
-    if (sections.memorySection) parts.push(sections.memorySection);
-    if (sections.behaviourSection) parts.push(sections.behaviourSection);
-    return parts.filter(Boolean).join('\n\n');
-  }
+  const parts = [];
 
-  const { beforeContent, afterContent } = locateInjectionWindow(basePrompt);
-  let enhanced = beforeContent + buildInjectedSections(sections) + afterContent;
-  enhanced = injectMemorySection(enhanced, sections.memorySection);
-  enhanced = injectBehaviourSection(enhanced, sections.behaviourSection);
-  return enhanced;
+  // STATIC HIERARCHY TOP (Highest cache hit rate)
+  if (sections.toolsSection) parts.push(sections.toolsSection);
+  if (sections.skillsSection) parts.push(sections.skillsSection);
+  if (sections.discoverySection) parts.push(sections.discoverySection);
+
+  // SEMI-STATIC RAG (Medium tier)
+  if (sections.memorySection) parts.push(sections.memorySection);
+
+  // SEMI-STATIC CONSTITUTION/BEHAVIOUR
+  if (sections.behaviourSection) parts.push(sections.behaviourSection);
+
+  // DYNAMIC/VOLATILE (Bottom tier - user query, task IDs, warnings)
+  if (basePrompt) parts.push(basePrompt);
+
+  return parts.filter(p => typeof p === 'string' && p.trim().length > 0).join('\n\n');
 }
 
 module.exports = {

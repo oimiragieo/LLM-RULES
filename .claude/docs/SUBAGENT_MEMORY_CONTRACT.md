@@ -53,7 +53,7 @@ Live and fallback evals should measure:
 
 ## Implementation Pointers
 
-- Prompt injection: `.claude/lib/spawn/prompt-assembler.cjs`
-- Task spawn path: `.claude/hooks/routing/spawn-prompt-assembler.cjs`
+- Prompt injection core: `.claude/lib/spawn/prompt-assembler-sections.cjs`
+- Task spawn path: `.claude/hooks/routing/spawn-prompt-assembler.runtime.cjs`
 - Live/fallback eval harness: `tests/evals/subagent-memory-rag-live.eval.cjs`
 - Hook E2E citation checks: `tests/hooks/spawn-prompt-assembler-citation-e2e.test.cjs`

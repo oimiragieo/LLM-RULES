@@ -10,6 +10,23 @@ const learnPath = path.join(ROOT, '.claude/context/memory/learnings.md');
 
 const actions = [];
 
+// --- Worktree Slop Auto-Detection ---
+try {
+  const worktreesDir = path.join(ROOT, '.claude', 'worktrees');
+  if (fs.existsSync(worktreesDir)) {
+    const entries = fs.readdirSync(worktreesDir, { withFileTypes: true });
+    const activeWorktrees = entries.filter(e => e.isDirectory() && e.name.startsWith('agent-'));
+    if (activeWorktrees.length > 15) {
+      actions.push({
+        type: 'task_create',
+        subject: 'devops',
+        description: `Critical: ${activeWorktrees.length} active agent worktrees detected in .claude/worktrees. This is a severe resource leak. Please investigate and fix worktree-auto-cleanup.cjs to properly prune agent worktrees safely across Windows/Linux, and then execute worktree-prune.cjs to clean up the existing slop.`,
+      });
+    }
+  }
+} catch (_wtErr) {
+  // Graceful degradation if directory scan fails
+}
 // Evaluate if there's enough new learnings to trigger an evolution cycle
 if (fs.existsSync(learnPath)) {
   const stats = fs.statSync(learnPath);
