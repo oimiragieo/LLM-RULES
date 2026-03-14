@@ -1,3 +1,5 @@
+// @ts-ignore TS80001: this file intentionally uses CommonJS ('use strict' + require/module.exports).
+// All callers are .cjs files that use require(). Conversion to ESM is not safe.
 'use strict';
 
 const {
