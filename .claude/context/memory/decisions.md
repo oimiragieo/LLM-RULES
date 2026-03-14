@@ -1,3 +1,21 @@
+## ADR-2026-03-14-069: Devops Agent Required as Final Wave in All EPIC Pipelines (2026-03-14)
+
+**Status:** Accepted
+**Date:** 2026-03-14
+**Trigger:** MEGA Wave 3 — Wave 5 QA agent did not complete git push. Final commit (47622327) required a separate devops task (#18).
+
+**Decision:** Any EPIC pipeline (10+ artifacts, 5+ waves) MUST include a dedicated `devops` agent spawn as the final wave. QA agents are validation-focused and have a ~50% commit/push completion rate. Devops agents are purpose-built for git operations.
+
+**Pattern:**
+- Wave N-1: QA proactive audit (validate only, do not push)
+- Wave N: Devops (commit, push, verify git log)
+
+**Anti-pattern:** Expecting QA agents to handle both validation AND git push in the same task. They frequently stall at push.
+
+**Enforcement:** Add to EPIC pipeline template; make devops final wave explicit in planning phase.
+
+---
+
 ## ADR-2026-03-13-068: QA Must Verify Rule-Index Count After Rule Creation (2026-03-13)
 
 **Status:** ACCEPTED
@@ -14,7 +32,7 @@
 **Verification command QA must run:**
 
 ```bash
-node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log('Indexed rules:', Object.keys(d.rules||d).length)"
+node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); process.stdout.write('Indexed rules: ' + Object.keys(d.rules||d).length + '\n')"
 ```
 
 **Root Cause:** rule-creator Step 4 (run `pnpm index-rules`) is mandatory per the skill's workflow, but subagents skipped it. QA did not check index health as part of its final validation sweep.

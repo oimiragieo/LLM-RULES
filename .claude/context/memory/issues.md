@@ -1,3 +1,16 @@
+## SYSTEMIC: missing_task_summary Recurrence Count Now 13 (2026-03-14)
+
+**Type**: systemic_failure (process_adherence)
+**Severity**: P1 — RECURRING, UNRESOLVED
+**Evidence**: reflection-log.jsonl shows Tasks 11, 15, 17 in MEGA Wave 3 all completed WITHOUT summary metadata. failure-recurrence.json count = 13.
+**Impact**: Reflection agent cannot score tasks properly. Learning extraction quality degraded. Reflection log entries show `"summary": "Task X completed without summary metadata"` for all three.
+**Root cause**: Sub-agents spawned in MEGA Wave 3 pipeline did not include `metadata.summary` in their `TaskUpdate(completed)` calls. The `pre-completion-validation.cjs` hook is advisory, not blocking — it warns but does not enforce.
+**Pattern**: This failure class appears on 13 tasks now. It is NOT a one-off. The validation hook needs to be upgraded from advisory to blocking for summary field specifically.
+**Recommended fix**: Either (1) upgrade pre-completion-validation.cjs to block (exit 2) when summary is missing, OR (2) add explicit instruction in spawn template warning box that summary field is mandatory in metadata.
+**Status**: OPEN — recurring systemic issue across sessions.
+
+---
+
 ## Untracked Architectural Tooling — Commit Without Integration Queue (2026-03-13)
 
 **Type**: integration_gap (commit task)
