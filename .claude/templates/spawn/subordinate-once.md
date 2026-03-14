@@ -41,22 +41,29 @@ Task({
 > - `spawn(..., { shell: true })` → always `{ shell: false }` with array args
 
 +======================================================================+
-|  WARNING: TASK TRACKING REQUIRED - READ THIS FIRST                   |
+|  WARNING: TASK TRACKING IS MANDATORY — READ BEFORE ANY WORK         |
 +======================================================================+
 |  Your Task ID: <ID>                                                  |
 |                                                                      |
-|  BEFORE doing ANY work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "in_progress" });              |
+|  STEP 1 — ABSOLUTE FIRST ACTION, call:                              |
+|  TaskUpdate({ taskId: "<ID>", status: "in_progress" });             |
 |                                                                      |
-|  AFTER completing work, run:                                         |
-|  TaskUpdate({ taskId: "<ID>", status: "completed",                   |
-|    metadata: { summary: "...", filesModified: [...] }                |
+|  STEP 2 — Do your work (respond once; do NOT delegate or spawn).    |
+|                                                                      |
+|  STEP 3 — ABSOLUTE LAST ACTION (nothing after this), call:          |
+|  TaskUpdate({                                                        |
+|    taskId: "<ID>",                                                   |
+|    status: "completed",                                              |
+|    metadata: {                                                       |
+|      summary: "What was accomplished (>50 chars required)",         |
+|      filesModified: ["path/to/file1", "path/to/file2"],             |
+|    }                                                                 |
 |  });                                                                 |
 |                                                                      |
-|  THEN check for more work:                                           |
-|  TaskList();                                                         |
+|  THEN call TaskList() to check for more work.                       |
 |                                                                      |
-|  FAILURE TO UPDATE TASK STATUS BREAKS THE ENTIRE SYSTEM              |
+|  FAILURE TO CALL TaskUpdate(completed) = TASK APPEARS STUCK FOREVER |
+|  THE HOOK SYSTEM WILL DETECT MISSING COMPLETION AND BLOCK OUTPUT     |
 |  YOU WILL BE EVALUATED ON: Task status updates, not just output      |
 +======================================================================+
 

@@ -28,20 +28,29 @@ function createPostTaskCompletionHelpers(deps) {
     return COMPLETION_INDICATORS.some(pattern => pattern.test(output));
   }
 
-  function formatTaskCompletionWarning(output) {
+  function formatTaskCompletionWarning(output, taskId) {
     const snippet = output.substring(0, 200).replace(/\n/g, ' ');
+    const idDisplay = taskId ? String(taskId) : '<TASK_ID>';
     return `
 +======================================================================+
-|  WARNING: TASK COMPLETION DETECTED WITHOUT TaskUpdate                |
+|  WARNING: TASK COMPLETION DETECTED WITHOUT TaskUpdate(completed)     |
 +======================================================================+
 |  Agent output indicates task completion, but no TaskUpdate was       |
 |  recorded recently.                                                  |
 |                                                                      |
 |  Output snippet: "${snippet.substring(0, 50)}..."                    |
 |                                                                      |
-|  AGENTS MUST call TaskUpdate({ status: "completed" }) when done!     |
+|  COPY-PASTE THIS AS YOUR ABSOLUTE LAST ACTION:                       |
+|  TaskUpdate({                                                        |
+|    taskId: "${idDisplay}",                                           |
+|    status: "completed",                                              |
+|    metadata: {                                                       |
+|      summary: "Describe what was accomplished (>50 chars)",         |
+|      filesModified: ["path/to/modified/file"],                      |
+|    }                                                                 |
+|  });                                                                 |
 |                                                                      |
-|  This may indicate the agent ignored task tracking instructions.     |
+|  FAILURE TO CALL TaskUpdate(completed) = TASK STUCK IN SYSTEM       |
 +======================================================================+
 `;
   }
@@ -224,7 +233,7 @@ function createPostTaskCompletionHelpers(deps) {
       return { pass: true };
     }
 
-    const warning = formatTaskCompletionWarning(toolOutput);
+    const warning = formatTaskCompletionWarning(toolOutput, taskId);
     synthesizeRecoveryTaskUpdate(
       taskId,
       'missing_taskupdate_completed',
