@@ -405,6 +405,40 @@ Set root directory in Vercel dashboard or `vercel.json`:
 }
 ```
 
+## Local Development
+
+`vercel dev` — runs your project locally with Vercel's edge network simulation
+
+- Supports: serverless functions, edge functions, environment variables
+- Port: defaults to 3000, use `vercel dev --listen 3001` for custom port
+- Hot reload: automatic for Next.js, SvelteKit, Astro, Nuxt
+
+```bash
+vercel dev                    # Start local dev server on port 3000
+vercel dev --listen 3001      # Custom port
+```
+
+## vercel.json Configuration Patterns
+
+```json
+{
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api/index" }],
+  "redirects": [{ "source": "/old", "destination": "/new", "permanent": true }],
+  "headers": [{ "source": "/(.*)", "headers": [{ "key": "X-Frame-Options", "value": "DENY" }] }],
+  "functions": { "api/heavy.js": { "memory": 3009, "maxDuration": 60 } },
+  "crons": [{ "path": "/api/cron", "schedule": "0 * * * *" }]
+}
+```
+
+## Team & Project Config
+
+```bash
+vercel teams ls                 # List teams
+vercel switch <team-slug>       # Switch active team
+vercel link                     # Link local dir to Vercel project
+vercel project ls               # List projects in current team
+```
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**

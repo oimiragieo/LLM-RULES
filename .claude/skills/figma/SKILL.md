@@ -153,6 +153,29 @@ For each Figma component, extract:
 | Skipping component variants | Missing states (hover, disabled) | Extract ALL Figma variants                     |
 | Manual token extraction     | Error-prone, doesn't scale       | Use Figma REST API for programmatic extraction |
 
+## Figma MCP Server Tools (figma/mcp-server-guide)
+
+When the official Figma MCP server is running, these 12 tools are available:
+
+| Tool | Purpose |
+|------|---------|
+| `get_design_context` | Get full design context for a file/node (components, styles, layout) |
+| `generate_figma_design` | Generate new designs from natural language description |
+| `get_variable_defs` | Extract all design tokens (colors, spacing, typography variables) |
+| `get_screenshot` | Capture rendered screenshot of a frame/component |
+| `code_connect_map` | Map Figma components to their code counterparts |
+| `create_design_system_rules` | Auto-generate design system documentation |
+| `get_figjam` | Access FigJam board content and sticky notes |
+| `generate_diagram` | Generate Figma diagram from Mermaid input |
+| `get_components` | List all published components in a file |
+| `get_styles` | Extract all defined styles (color, text, effect) |
+| `export_assets` | Export assets as PNG/SVG/PDF with scale options |
+| `get_annotations` | Retrieve design annotations and spec notes |
+
+**MCP Setup**: Install Figma Desktop app -> Settings -> Enable MCP server
+**Auth**: Uses active Figma session (no API key needed for local MCP)
+**Key workflow**: get_design_context -> code_connect_map -> export_assets for design-to-code
+
 ## Memory Protocol (MANDATORY)
 
 **Before starting:**
