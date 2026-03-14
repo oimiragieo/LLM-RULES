@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-14T00:22:05.914Z",
+  "generatedAt": "2026-03-14T00:39:12.440Z",
   "metadata": {
-    "totalSkills": 282,
+    "totalSkills": 285,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-14T00:22:05.916Z",
+    "lastValidated": "2026-03-14T00:39:12.441Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7057,6 +7057,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "code-graph-context": {
+      "name": "code-graph-context",
+      "displayName": "Code Graph Context",
+      "category": "Other",
+      "domain": "other",
+      "description": "Structural code graph queries via CodeGraphContext MCP (tree-sitter + KuzuDB). Find callers, callees, class hierarchies, dead code, and module dependencies.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "code-graph-context"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "cron-runner": {
       "name": "cron-runner",
       "displayName": "Cron Runner",
@@ -7101,6 +7123,28 @@
       "tags": [
         "other",
         "deep-research"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "design-systems": {
+      "name": "design-systems",
+      "displayName": "Design Systems",
+      "category": "Other",
+      "domain": "other",
+      "description": "Design system lookup, CSS best practices, and AI-driven UI component generation via MCP tools",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "design-systems"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7443,6 +7487,28 @@
       "priority": 1,
       "aliasOf": null
     },
+    "security-scanning": {
+      "name": "security-scanning",
+      "displayName": "Security Scanning",
+      "category": "Other",
+      "domain": "other",
+      "description": "Automated security scanning pipeline covering SAST (Semgrep), SCA (OWASP dependency-check), SBOM generation (Syft), vulnerability scanning (Grype), and secrets detection (detect-secrets). Invoked by security-architect for pre-commit gates, CI integration, and finding triage.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "security-scanning"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "seo-optimization": {
       "name": "seo-optimization",
       "displayName": "Seo Optimization",
@@ -7763,8 +7829,10 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "code-graph-context",
         "cron-runner",
         "deep-research",
+        "design-systems",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -7778,6 +7846,7 @@
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
+        "security-scanning",
         "seo-optimization",
         "telegram-polling",
         "transcription",
@@ -8151,8 +8220,10 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "code-graph-context",
         "cron-runner",
         "deep-research",
+        "design-systems",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8166,6 +8237,7 @@
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
+        "security-scanning",
         "seo-optimization",
         "telegram-polling",
         "transcription",
@@ -8521,8 +8593,10 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "code-graph-context",
         "cron-runner",
         "deep-research",
+        "design-systems",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8536,6 +8610,7 @@
         "regulatory-compliance",
         "scheduled-tasks",
         "scientific-skills",
+        "security-scanning",
         "seo-optimization",
         "telegram-polling",
         "transcription",
@@ -8756,8 +8831,10 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "code-graph-context",
         "cron-runner",
         "deep-research",
+        "design-systems",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -8768,6 +8845,7 @@
         "mcp-builder",
         "regulatory-compliance",
         "scientific-skills",
+        "security-scanning",
         "seo-optimization",
         "telegram-polling",
         "transcription",
@@ -8946,11 +9024,14 @@
         "writing",
         "brand-compliance",
         "claude-api",
+        "code-graph-context",
         "cron-runner",
+        "design-systems",
         "doc-coauthoring",
         "frontend-design",
         "mcp-builder",
         "scientific-skills",
+        "security-scanning",
         "seo-optimization",
         "user-research",
         "web-artifacts-builder"
@@ -9699,8 +9780,10 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "code-graph-context",
         "cron-runner",
         "deep-research",
+        "design-systems",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -9712,6 +9795,7 @@
         "mcp-builder",
         "reddit-researcher",
         "regulatory-compliance",
+        "security-scanning",
         "seo-optimization",
         "telegram-polling",
         "transcription",
@@ -10932,8 +11016,10 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "code-graph-context",
         "cron-runner",
         "deep-research",
+        "design-systems",
         "doc-coauthoring",
         "exa-monitor",
         "feedback-analysis",
@@ -10945,6 +11031,7 @@
         "mcp-builder",
         "reddit-researcher",
         "regulatory-compliance",
+        "security-scanning",
         "seo-optimization",
         "telegram-polling",
         "transcription",
