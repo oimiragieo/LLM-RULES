@@ -108,3 +108,68 @@ import { createUser } from './user-service';
 ## When to Invoke
 
 Reference these standards for any TypeScript file. For deep TypeScript architecture, use the `typescript-pro` agent.
+
+## TypeScript with AI/LLM Integration
+
+When integrating with the Anthropic SDK or other LLM APIs, apply strict typing at every boundary.
+
+**Typed Anthropic SDK Usage:**
+
+```typescript
+import Anthropic from '@anthropic-ai/sdk';
+import type { Message, ContentBlock } from '@anthropic-ai/sdk/resources/messages';
+
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+async function generate(prompt: string): Promise<string> {
+  const message: Message = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  // Narrow content block type before accessing text
+  const textBlock = message.content.find(
+    (block): block is Extract<ContentBlock, { type: 'text' }> => block.type === 'text'
+  );
+  if (!textBlock) throw new Error('No text content in response');
+  return textBlock.text;
+}
+```
+
+**Zod for Runtime Validation of LLM Outputs:**
+
+LLM responses are `unknown` at runtime — always parse with Zod before use:
+
+```typescript
+import { z } from 'zod';
+
+const TaskPlanSchema = z.object({
+  tasks: z.array(
+    z.object({
+      id: z.string(),
+      description: z.string(),
+      agent: z.enum(['developer', 'qa', 'devops', 'technical-writer']),
+      priority: z.number().int().min(1).max(5),
+    })
+  ),
+  estimatedSteps: z.number().int().positive(),
+});
+
+type TaskPlan = z.infer<typeof TaskPlanSchema>;
+
+async function parseLLMPlan(rawOutput: unknown): Promise<TaskPlan> {
+  const result = TaskPlanSchema.safeParse(rawOutput);
+  if (!result.success) {
+    throw new Error(`Invalid LLM output: ${result.error.message}`);
+  }
+  return result.data;
+}
+```
+
+**Rules:**
+
+- Never use `as` casts on LLM response bodies — use Zod `safeParse` and handle the error branch
+- Define SDK type imports with `import type` to prevent bundling type-only symbols
+- Use discriminated unions for multi-step agent state machines (not `status?: string`)
+- Export Zod schemas alongside their inferred types so consumers can validate at their own boundaries

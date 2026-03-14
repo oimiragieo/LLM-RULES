@@ -144,3 +144,77 @@ test('allows 18-year-old users', () => {
 
 - `ADR-103` - Integration boundary testing principles
 - `.claude/agents/core/qa.md` - QA agent responsibilities
+
+## VoltAgent Testing Patterns
+
+**Snapshot Testing for Agent Outputs:**
+
+Capture and assert on agent output structure to prevent regressions across LLM updates:
+
+```typescript
+import { expect, test } from 'vitest';
+
+test('agent returns expected structure', async () => {
+  const result = await agent.run({ input: 'summarize this document' });
+  // Snapshot the shape, not the exact text (LLM output varies)
+  expect(result).toMatchObject({
+    status: 'success',
+    output: expect.any(String),
+    toolCallCount: expect.any(Number),
+  });
+  // Snapshot stable structural properties
+  expect(Object.keys(result)).toMatchSnapshot();
+});
+```
+
+**Contract Testing for Multi-Agent Pipelines:**
+
+Define and verify contracts between agents in a pipeline:
+
+```typescript
+// Define the contract
+interface PlannerOutputContract {
+  tasks: Array<{ id: string; description: string; agent: string }>;
+  estimatedSteps: number;
+}
+
+test('planner output satisfies developer input contract', async () => {
+  const plannerOutput = await plannerAgent.run({ goal: 'add auth' });
+  // Validate against contract schema (Zod)
+  const parsed = PlannerOutputContractSchema.safeParse(plannerOutput);
+  expect(parsed.success).toBe(true);
+  // Each task must name a valid agent
+  parsed.data!.tasks.forEach(task => {
+    expect(VALID_AGENTS).toContain(task.agent);
+  });
+});
+```
+
+**When to invoke**: `Skill({ skill: 'agent-evaluation' })` for LLM-as-judge agent output evaluation
+
+## Cross-Cutting Test Standards (2026 Update)
+
+**Test File Placement:**
+
+- Skill tests: `tests/skills/<skill-name>.test.cjs`
+- Agent tests: `tests/agents/<agent-name>.test.cjs`
+- Hook tests: `tests/hooks/<hook-name>.test.cjs`
+- Library tests: `tests/lib/<module>.test.cjs`
+
+**Coverage Requirements:**
+
+- All hooks must have unit tests covering: allow path, block path, and error/edge cases
+- All skills must have integration tests verifying `Skill()` invocation wiring
+- Agents must have tool-compliance tests (see `tests/agents/agent-tool-compliance.test.cjs`)
+
+**Test Isolation (MANDATORY):**
+
+- Never share mutable state between `test()` blocks — use `beforeEach` for fresh state
+- Never write to `.claude/context/` in tests — use `tests/_tmp/` and clean up in `afterEach`
+- Never call real LLM APIs in unit tests — mock at the SDK boundary
+
+**Determinism Gate:**
+
+- Seed random number generators in tests that use randomness
+- Pin timestamps with `vi.setSystemTime()` / `MockDate` for date-sensitive logic
+- CI must pass with `--seed` for reproducible test ordering
