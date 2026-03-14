@@ -176,6 +176,7 @@ const INTENT_TO_AGENT = {
   heartbeat: 'heartbeat-orchestrator',
   'ecosystem-auditor': 'ecosystem-auditor',
   'deep-research': 'deep-research',
+  'api-testing': 'api-testing',
 };
 
 module.exports = { INTENT_TO_AGENT };

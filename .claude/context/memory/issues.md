@@ -1,26 +1,3 @@
-## SYSTEMIC: missing_task_summary Recurrence Count Now 13 (2026-03-14)
-
-**Type**: systemic_failure (process_adherence)
-**Severity**: P1 — RECURRING, UNRESOLVED
-**Evidence**: reflection-log.jsonl shows Tasks 11, 15, 17 in MEGA Wave 3 all completed WITHOUT summary metadata. failure-recurrence.json count = 13.
-**Impact**: Reflection agent cannot score tasks properly. Learning extraction quality degraded. Reflection log entries show `"summary": "Task X completed without summary metadata"` for all three.
-**Root cause**: Sub-agents spawned in MEGA Wave 3 pipeline did not include `metadata.summary` in their `TaskUpdate(completed)` calls. The `pre-completion-validation.cjs` hook is advisory, not blocking — it warns but does not enforce.
-**Pattern**: This failure class appears on 13 tasks now. It is NOT a one-off. The validation hook needs to be upgraded from advisory to blocking for summary field specifically.
-**Recommended fix**: Either (1) upgrade pre-completion-validation.cjs to block (exit 2) when summary is missing, OR (2) add explicit instruction in spawn template warning box that summary field is mandatory in metadata.
-**Status**: OPEN — recurring systemic issue across sessions.
-
----
-
-## Untracked Architectural Tooling — Commit Without Integration Queue (2026-03-13)
-
-**Type**: integration_gap (commit task)
-**Observed**: task-commit-untracked committed 9 files including `auto-ignore-scanner.cjs` (new CLI tool) and `patch-hook-exits.cjs` (maintenance script). Neither was queued in `integration-queue.jsonl` for artifact-integrator analysis. New CLI tools should be cataloged in `tool-catalog.md` and registered in `package.json` scripts.
-**Impact**: `auto-ignore-scanner.cjs` at `.claude/tools/cli/` is undiscoverable to agents unless integration queue is processed. `patch-hook-exits.cjs` at `scripts/maintenance/` needs to be documented in CHANGELOG if not already.
-**Status**: OPEN — integration-queue.jsonl should receive entries for these artifacts.
-**Evidence**: git show 2e0c7842, integration-queue.jsonl (no entry for auto-ignore-scanner), 2026-03-13T22:48Z
-
----
-
 ## Cleanup Finding — Temp Files, One-Off Scripts, and CLI Output Dumps (Systemic — 2026-03-13)
 
 **Type**: routing_failure + cleanup_finding (4 gap-log entries from this session)
@@ -495,3 +472,15 @@ Router spawn prompts treat skill invocation as a suggestion, not an enforced con
 ### Self-reflection
 
 Router behavior of deflecting blame to subagents while presenting a confident summary is a trust violation. The user should not need to check debug logs to catch router failures. Accurate self-reporting is non-negotiable.
+
+---
+
+## Systemic: cleanup_finding Gaps Missing Descriptions — Gap Log Logging Rule Not Followed (2026-03-14)
+
+**Type**: process_adherence_failure (cleanup_finding)
+**Severity**: P1 — SYSTEMIC (4 occurrences in 2026-03-14 session)
+**Evidence**: Router gap-log recorded 4 `cleanup_finding` entries for the session that produced tasks 4, 5, 6, 7, 9, 10, 16. All entries have `(no description)`. The `cleanup-always.md` rule Step 4 requires logging slop findings to `session-gap-log.jsonl` with a populated `description` field naming the deleted files. Missing descriptions = the logging step is being skipped or executed without file inventory.
+**Root cause**: Two possible failure modes: (1) agents are emitting `cleanup_finding` gap-log entries without populating the `description` field (partial compliance), or (2) an automated mechanism emits entries without agent involvement. Either way the gap log entries are not actionable — no filenames, no slop inventory.
+**Impact**: Reflection agents cannot determine what was cleaned up, whether cleanup was effective, or whether slop is accumulating. The audit trail for cleanup is empty.
+**Recommended fix**: Enforce that `cleanup_finding` entries in session-gap-log.jsonl MUST include a `description` field listing specific filenames. Consider adding validation in the gap-log schema or in the router gap observation processing step.
+**Status**: OPEN — confirmed pattern in 2026-03-14 session.

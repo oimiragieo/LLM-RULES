@@ -55,10 +55,10 @@ Full-stack Electron desktop app development — from architecture through distri
 const win = new BrowserWindow({
   webPreferences: {
     preload: path.join(__dirname, 'preload.js'),
-    contextIsolation: true,    // REQUIRED: isolates renderer from preload
-    sandbox: true,             // RECOMMENDED: OS-level sandbox
-    nodeIntegration: false,    // REQUIRED: never expose Node to renderer
-    webSecurity: true,         // REQUIRED: never disable
+    contextIsolation: true, // REQUIRED: isolates renderer from preload
+    sandbox: true, // RECOMMENDED: OS-level sandbox
+    nodeIntegration: false, // REQUIRED: never expose Node to renderer
+    webSecurity: true, // REQUIRED: never disable
     allowRunningInsecureContent: false,
   },
 });
@@ -78,11 +78,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // Expose specific, validated methods only
   openFile: () => ipcRenderer.invoke('dialog:openFile'),
-  saveFile: (content) => {
+  saveFile: content => {
     if (typeof content !== 'string') throw new Error('Invalid content');
     return ipcRenderer.invoke('dialog:saveFile', content);
   },
-  onUpdateAvailable: (callback) => {
+  onUpdateAvailable: callback => {
     // One-way: main → renderer
     const listener = (_, data) => callback(data);
     ipcRenderer.on('update-available', listener);
@@ -153,17 +153,23 @@ const template = [
   {
     label: 'Edit',
     submenu: [
-      { role: 'undo' }, { role: 'redo' }, { type: 'separator' },
-      { role: 'cut' }, { role: 'copy' }, { role: 'paste' },
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
     ],
   },
   // macOS: add app menu as first item
-  ...(process.platform === 'darwin' ? [{
-    label: app.name,
-    submenu: [
-      { role: 'about' }, { type: 'separator' }, { role: 'hide' }, { role: 'quit' },
-    ],
-  }] : []),
+  ...(process.platform === 'darwin'
+    ? [
+        {
+          label: app.name,
+          submenu: [{ role: 'about' }, { type: 'separator' }, { role: 'hide' }, { role: 'quit' }],
+        },
+      ]
+    : []),
 ];
 
 Menu.setApplicationMenu(Menu.buildFromTemplate(template));
@@ -177,11 +183,13 @@ const { Tray, Menu, nativeImage } = require('electron');
 const icon = nativeImage.createFromPath(path.join(__dirname, 'assets/tray-icon.png'));
 const tray = new Tray(icon);
 tray.setToolTip('My App');
-tray.setContextMenu(Menu.buildFromTemplate([
-  { label: 'Open', click: () => win.show() },
-  { label: 'Quit', click: () => app.quit() },
-]));
-tray.on('click', () => win.isVisible() ? win.hide() : win.show());
+tray.setContextMenu(
+  Menu.buildFromTemplate([
+    { label: 'Open', click: () => win.show() },
+    { label: 'Quit', click: () => app.quit() },
+  ])
+);
+tray.on('click', () => (win.isVisible() ? win.hide() : win.show()));
 ```
 
 ### Notifications
@@ -263,7 +271,9 @@ function createWindow() {
   // Or for dev server: mainWindow.loadURL('http://localhost:5173');
 
   mainWindow.once('ready-to-show', () => mainWindow.show());
-  mainWindow.on('closed', () => { mainWindow = null; });
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
 app.whenReady().then(() => {
@@ -287,11 +297,11 @@ const { autoUpdater } = require('electron-updater');
 
 autoUpdater.checkForUpdatesAndNotify();
 
-autoUpdater.on('update-available', (info) => {
+autoUpdater.on('update-available', info => {
   win.webContents.send('update-available', info);
 });
 
-autoUpdater.on('update-downloaded', (info) => {
+autoUpdater.on('update-downloaded', info => {
   win.webContents.send('update-downloaded', info);
 });
 

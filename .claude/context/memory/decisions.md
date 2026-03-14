@@ -7,6 +7,7 @@
 **Decision:** Any EPIC pipeline (10+ artifacts, 5+ waves) MUST include a dedicated `devops` agent spawn as the final wave. QA agents are validation-focused and have a ~50% commit/push completion rate. Devops agents are purpose-built for git operations.
 
 **Pattern:**
+
 - Wave N-1: QA proactive audit (validate only, do not push)
 - Wave N: Devops (commit, push, verify git log)
 

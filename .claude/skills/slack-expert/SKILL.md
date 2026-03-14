@@ -28,14 +28,14 @@ Full-platform Slack development using the Bolt SDK. Covers interactive app devel
 
 ## Requirements
 
-| Variable | Purpose | Required |
-|---|---|---|
-| `SLACK_BOT_TOKEN` | Bot OAuth token (`xoxb-...`) | Yes (single workspace) |
-| `SLACK_SIGNING_SECRET` | Request signature verification | Yes |
-| `SLACK_APP_TOKEN` | Socket Mode app-level token (`xapp-...`) | Socket Mode only |
-| `SLACK_CLIENT_ID` | OAuth client ID | Multi-workspace only |
-| `SLACK_CLIENT_SECRET` | OAuth client secret | Multi-workspace only |
-| `SLACK_STATE_SECRET` | OAuth state token | Multi-workspace only |
+| Variable               | Purpose                                  | Required               |
+| ---------------------- | ---------------------------------------- | ---------------------- |
+| `SLACK_BOT_TOKEN`      | Bot OAuth token (`xoxb-...`)             | Yes (single workspace) |
+| `SLACK_SIGNING_SECRET` | Request signature verification           | Yes                    |
+| `SLACK_APP_TOKEN`      | Socket Mode app-level token (`xapp-...`) | Socket Mode only       |
+| `SLACK_CLIENT_ID`      | OAuth client ID                          | Multi-workspace only   |
+| `SLACK_CLIENT_SECRET`  | OAuth client secret                      | Multi-workspace only   |
+| `SLACK_STATE_SECRET`   | OAuth state token                        | Multi-workspace only   |
 
 ## Quick Start — Bolt App (Node.js)
 
@@ -235,13 +235,17 @@ app.event('app_home_opened', async ({ event, client }) => {
 
 ```javascript
 // Use lazy: for operations that take >3s
-app.command('/report', async ({ command, ack, respond, say }) => {
-  await ack(); // Must ack in <3s
-}, async ({ command, respond }) => {
-  // lazy: runs asynchronously, can take minutes
-  const report = await generateReport(command.text);
-  await respond({ text: report, response_type: 'in_channel' });
-});
+app.command(
+  '/report',
+  async ({ command, ack, respond, say }) => {
+    await ack(); // Must ack in <3s
+  },
+  async ({ command, respond }) => {
+    // lazy: runs asynchronously, can take minutes
+    const report = await generateReport(command.text);
+    await respond({ text: report, response_type: 'in_channel' });
+  }
+);
 ```
 
 ### Socket Mode (Internal Tools)
@@ -302,18 +306,18 @@ app.step(ws);
 
 ## Scopes Reference
 
-| Capability | Required Scopes |
-|---|---|
-| Post messages | `chat:write` |
-| Read channels | `channels:read`, `groups:read` |
-| Read messages | `channels:history`, `groups:history` |
-| Slash commands | `commands` |
-| React to messages | `reactions:write` |
-| Upload files | `files:write` |
-| Read user profiles | `users:read`, `users:read.email` |
-| Home tab | `im:history` |
-| Bot mentions | `app_mentions:read` |
-| DMs | `im:write`, `mpim:write` |
+| Capability         | Required Scopes                      |
+| ------------------ | ------------------------------------ |
+| Post messages      | `chat:write`                         |
+| Read channels      | `channels:read`, `groups:read`       |
+| Read messages      | `channels:history`, `groups:history` |
+| Slash commands     | `commands`                           |
+| React to messages  | `reactions:write`                    |
+| Upload files       | `files:write`                        |
+| Read user profiles | `users:read`, `users:read.email`     |
+| Home tab           | `im:history`                         |
+| Bot mentions       | `app_mentions:read`                  |
+| DMs                | `im:write`, `mpim:write`             |
 
 ## Common Patterns
 
@@ -356,7 +360,7 @@ async function lookupUser(client, email) {
 ## Error Handling
 
 ```javascript
-app.error(async (error) => {
+app.error(async error => {
   console.error('Global error handler', error);
   // Notify admin channel
   await app.client.chat.postMessage({

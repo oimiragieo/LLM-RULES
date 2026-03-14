@@ -71,7 +71,9 @@ wss.on('connection', (ws, req) => {
 
   // 3. Heartbeat setup
   ws.isAlive = true;
-  ws.on('pong', () => { ws.isAlive = true; });
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
 
   // 4. Message handling
   ws.on('message', (data, isBinary) => {
@@ -90,7 +92,7 @@ wss.on('connection', (ws, req) => {
     console.log(`Client ${ws.userId} disconnected: ${code} ${reason}`);
   });
 
-  ws.on('error', (err) => {
+  ws.on('error', err => {
     console.error(`WebSocket error for ${ws.userId}:`, err.message);
   });
 
@@ -100,7 +102,7 @@ wss.on('connection', (ws, req) => {
 
 // Heartbeat interval — terminate dead connections every 30s
 const heartbeat = setInterval(() => {
-  wss.clients.forEach((ws) => {
+  wss.clients.forEach(ws => {
     if (!ws.isAlive) {
       ws.terminate();
       return;
@@ -117,7 +119,7 @@ function sendToUser(userId, payload) {
   const userClients = clients.get(userId);
   if (!userClients) return;
   const data = JSON.stringify(payload);
-  userClients.forEach((ws) => {
+  userClients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) ws.send(data);
   });
 }
@@ -125,7 +127,7 @@ function sendToUser(userId, payload) {
 // Broadcast to all connected clients
 function broadcast(payload, excludeUserId = null) {
   const data = JSON.stringify(payload);
-  wss.clients.forEach((ws) => {
+  wss.clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN && ws.userId !== excludeUserId) {
       ws.send(data);
     }
@@ -155,11 +157,17 @@ wss.on('connection', (ws, req) => {
 // Server: req.headers['sec-websocket-protocol']
 
 // First message auth (for frameworks that don't support upgrade auth)
-ws.once('message', (data) => {
+ws.once('message', data => {
   const { type, token } = JSON.parse(data);
-  if (type !== 'auth') { ws.close(4001, 'Auth required'); return; }
+  if (type !== 'auth') {
+    ws.close(4001, 'Auth required');
+    return;
+  }
   const user = verifyToken(token);
-  if (!user) { ws.close(4001, 'Unauthorized'); return; }
+  if (!user) {
+    ws.close(4001, 'Unauthorized');
+    return;
+  }
   ws.userId = user.id;
   setupMessageHandler(ws);
 });
@@ -179,10 +187,10 @@ await sub.connect();
 const CHANNEL = 'ws:broadcast';
 
 // Subscribe to Redis messages and relay to local clients
-await sub.subscribe(CHANNEL, (message) => {
+await sub.subscribe(CHANNEL, message => {
   const payload = JSON.parse(message);
   // Deliver to local connections matching the target
-  wss.clients.forEach((ws) => {
+  wss.clients.forEach(ws => {
     if (ws.readyState === WebSocket.OPEN) {
       if (!payload.targetUserId || ws.userId === payload.targetUserId) {
         ws.send(JSON.stringify(payload.data));
@@ -193,7 +201,10 @@ await sub.subscribe(CHANNEL, (message) => {
 
 // Publish cross-instance — all servers receive and relay
 async function broadcastViaRedis(data, targetUserId = null) {
-  await pub.publish(CHANNEL, JSON.stringify({ data, targetUserId, serverId: process.env.SERVER_ID }));
+  await pub.publish(
+    CHANNEL,
+    JSON.stringify({ data, targetUserId, serverId: process.env.SERVER_ID })
+  );
 }
 
 // Rooms with Redis Sets
@@ -232,10 +243,10 @@ io.use(async (socket, next) => {
   next();
 });
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
   socket.join(`user:${socket.userId}`); // Auto room per user
 
-  socket.on('join-room', (roomId) => {
+  socket.on('join-room', roomId => {
     socket.join(roomId);
     socket.to(roomId).emit('user-joined', { userId: socket.userId });
   });
@@ -245,7 +256,7 @@ io.on('connection', (socket) => {
     socket.to(roomId).emit('message', { userId: socket.userId, text, ts: Date.now() });
   });
 
-  socket.on('disconnect', (reason) => {
+  socket.on('disconnect', reason => {
     console.log(`${socket.userId} disconnected: ${reason}`);
   });
 });
@@ -289,7 +300,7 @@ class RealtimeClient {
       }
     };
 
-    this.#ws.onclose = (event) => {
+    this.#ws.onclose = event => {
       if (event.code === 4001) {
         this.emit('unauthorized');
         return; // Don't reconnect on auth failure
@@ -299,7 +310,7 @@ class RealtimeClient {
       this.#reconnectDelay = Math.min(this.#reconnectDelay * 2, this.#maxDelay);
     };
 
-    this.#ws.onerror = (err) => {
+    this.#ws.onerror = err => {
       console.error('WebSocket error', err);
     };
   }
@@ -329,7 +340,7 @@ class RealtimeClient {
 
 // Usage
 const client = new RealtimeClient('wss://api.example.com/ws', authToken);
-const unsubscribe = client.on('message', (msg) => displayMessage(msg));
+const unsubscribe = client.on('message', msg => displayMessage(msg));
 client.send('join-room', { roomId: 'general' });
 // Cleanup:
 unsubscribe();
@@ -341,7 +352,10 @@ unsubscribe();
 // Server — simpler than WebSockets for server → client push
 app.get('/events', (req, res) => {
   const user = authenticate(req);
-  if (!user) { res.sendStatus(401); return; }
+  if (!user) {
+    res.sendStatus(401);
+    return;
+  }
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -356,7 +370,7 @@ app.get('/events', (req, res) => {
   send('connected', { userId: user.id });
 
   // Register for push events
-  const unsubscribe = eventBus.on(`user:${user.id}`, (data) => send('update', data));
+  const unsubscribe = eventBus.on(`user:${user.id}`, data => send('update', data));
   const heartbeat = setInterval(() => res.write(':heartbeat\n\n'), 15_000);
 
   req.on('close', () => {
@@ -367,7 +381,7 @@ app.get('/events', (req, res) => {
 
 // Browser — SSE client
 const source = new EventSource('/events');
-source.addEventListener('update', (e) => {
+source.addEventListener('update', e => {
   const data = JSON.parse(e.data);
   updateUI(data);
 });
@@ -446,11 +460,11 @@ function checkRateLimit(userId, limit = 60, windowMs = 60_000) {
 ```javascript
 // Metrics to track
 const metrics = {
-  connections: 0,           // Current active connections
-  messagesIn: 0,            // Messages received per second
-  messagesOut: 0,           // Messages sent per second
-  errors: 0,                // Error count
-  avgLatency: 0,            // Round-trip time (using ping/pong timestamps)
+  connections: 0, // Current active connections
+  messagesIn: 0, // Messages received per second
+  messagesOut: 0, // Messages sent per second
+  errors: 0, // Error count
+  avgLatency: 0, // Round-trip time (using ping/pong timestamps)
 };
 
 // Emit latency metric with custom ping payload
@@ -459,7 +473,7 @@ function measureLatency(ws) {
   const payload = Buffer.alloc(8);
   payload.writeBigInt64BE(BigInt(start));
   ws.ping(payload);
-  ws.once('pong', (data) => {
+  ws.once('pong', data => {
     const sent = Number(data.readBigInt64BE());
     metrics.avgLatency = Date.now() - sent;
   });

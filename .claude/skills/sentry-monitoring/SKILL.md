@@ -183,3 +183,29 @@ Read `.claude/context/memory/learnings.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## OpenTelemetry + Grafana Stack
+
+Auto-instrument with OTel, export to Sentry + Grafana simultaneously:
+
+```typescript
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { SentrySpanProcessor } from '@sentry/opentelemetry';
+const sdk = new NodeSDK({ spanProcessor: new SentrySpanProcessor() });
+sdk.start();
+```
+
+### Continuous Profiling (Pyroscope)
+
+```bash
+# pyroscope.configure({ applicationName: 'api', serverAddress: 'http://pyroscope:4040' })
+```
+
+### Grafana + Prometheus
+
+```yaml
+services:
+  prometheus: { image: prom/prometheus }
+  grafana: { image: grafana/grafana }
+  otel-collector: { image: otel/opentelemetry-collector-contrib }
+```

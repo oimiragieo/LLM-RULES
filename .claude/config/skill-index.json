@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-14T05:53:52.082Z",
+  "generatedAt": "2026-03-14T07:24:47.991Z",
   "metadata": {
-    "totalSkills": 295,
+    "totalSkills": 298,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-14T05:53:52.084Z",
+    "lastValidated": "2026-03-14T07:24:47.992Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -6933,6 +6933,30 @@
       "priority": 3,
       "aliasOf": null
     },
+    "api-testing": {
+      "name": "api-testing",
+      "displayName": "Api Testing",
+      "category": "Other",
+      "domain": "other",
+      "description": "API security testing and validation for REST/GraphQL/gRPC endpoints, contract testing, load testing, fuzzing, and Postman/Bruno/Hurl workflows",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Bash",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "api-testing"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "arxiv-monitor": {
       "name": "arxiv-monitor",
       "displayName": "Arxiv Monitor",
@@ -7097,6 +7121,29 @@
       "tags": [
         "other",
         "cloud-run"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "cloudflare-workers": {
+      "name": "cloudflare-workers",
+      "displayName": "Cloudflare Workers",
+      "category": "Other",
+      "domain": "other",
+      "description": "Cloudflare Workers edge computing — Durable Objects, KV, R2, D1, Workers AI, AI Gateway",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "cloudflare-workers"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7406,6 +7453,28 @@
         "heartbeat"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "huggingface": {
+      "name": "huggingface",
+      "displayName": "Huggingface",
+      "category": "Other",
+      "domain": "other",
+      "description": "Hugging Face Hub operations, model inference, dataset management, PEFT/LoRA fine-tuning, and Spaces deployment via MCP tools and Python APIs",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "huggingface"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "imagen-generation": {
@@ -8050,6 +8119,7 @@
         "spec-to-code-compliance",
         "webapp-testing",
         "writing",
+        "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
         "azure-devops",
@@ -8057,6 +8127,7 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "cloudflare-workers",
         "code-graph-context",
         "cron-runner",
         "deep-research",
@@ -8070,6 +8141,7 @@
         "frontend-design",
         "google-workspace",
         "heartbeat",
+        "huggingface",
         "imagen-generation",
         "lsp-navigator",
         "marketing-content",
@@ -8451,6 +8523,7 @@
         "webapp-testing",
         "workflow-patterns",
         "writing",
+        "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
         "azure-devops",
@@ -8458,6 +8531,7 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "cloudflare-workers",
         "code-graph-context",
         "cron-runner",
         "deep-research",
@@ -8471,6 +8545,7 @@
         "frontend-design",
         "google-workspace",
         "heartbeat",
+        "huggingface",
         "imagen-generation",
         "lsp-navigator",
         "marketing-content",
@@ -8834,6 +8909,7 @@
         "webapp-testing",
         "workflow-patterns",
         "writing",
+        "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
         "azure-devops",
@@ -8841,6 +8917,7 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "cloudflare-workers",
         "code-graph-context",
         "cron-runner",
         "deep-research",
@@ -8854,6 +8931,7 @@
         "frontend-design",
         "google-workspace",
         "heartbeat",
+        "huggingface",
         "imagen-generation",
         "lsp-navigator",
         "marketing-content",
@@ -9082,6 +9160,7 @@
         "webapp-testing",
         "workflow-patterns",
         "writing",
+        "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
         "azure-devops",
@@ -9089,6 +9168,7 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "cloudflare-workers",
         "code-graph-context",
         "cron-runner",
         "deep-research",
@@ -9101,6 +9181,7 @@
         "fintech-engineer",
         "frontend-design",
         "google-workspace",
+        "huggingface",
         "imagen-generation",
         "marketing-content",
         "markitdown-converter",
@@ -9292,6 +9373,7 @@
         "azure-devops",
         "brand-compliance",
         "claude-api",
+        "cloudflare-workers",
         "code-graph-context",
         "cron-runner",
         "design-systems",
@@ -9300,6 +9382,7 @@
         "fintech-engineer",
         "frontend-design",
         "google-workspace",
+        "huggingface",
         "imagen-generation",
         "mcp-builder",
         "mcp-catalog",
@@ -9461,10 +9544,12 @@
         "styling-expert",
         "ui-components-expert",
         "webapp-testing",
+        "api-testing",
         "arxiv-monitor",
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "cloudflare-workers",
         "deep-research",
         "electron-pro",
         "exa-monitor",
@@ -9603,6 +9688,7 @@
         "tool-search",
         "ui-components-expert",
         "webapp-testing",
+        "api-testing",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -9731,6 +9817,7 @@
         "tool-search",
         "ui-components-expert",
         "webapp-testing",
+        "api-testing",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -10057,6 +10144,7 @@
         "visual-and-observational-rules",
         "webapp-testing",
         "writing",
+        "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
         "azure-devops",
@@ -10064,6 +10152,7 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "cloudflare-workers",
         "code-graph-context",
         "cron-runner",
         "deep-research",
@@ -10076,6 +10165,7 @@
         "fintech-engineer",
         "frontend-design",
         "google-workspace",
+        "huggingface",
         "imagen-generation",
         "lsp-navigator",
         "marketing-content",
@@ -11303,6 +11393,7 @@
         "visual-and-observational-rules",
         "webapp-testing",
         "writing",
+        "api-testing",
         "arxiv-monitor",
         "atlassian-integration",
         "azure-devops",
@@ -11310,6 +11401,7 @@
         "browser-automation",
         "claude-api",
         "cloud-run",
+        "cloudflare-workers",
         "code-graph-context",
         "cron-runner",
         "deep-research",
@@ -11322,6 +11414,7 @@
         "fintech-engineer",
         "frontend-design",
         "google-workspace",
+        "huggingface",
         "imagen-generation",
         "lsp-navigator",
         "marketing-content",

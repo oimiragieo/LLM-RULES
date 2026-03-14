@@ -124,15 +124,30 @@ function isTTLExpired(branch) {
  *
  * A branch is stale when:
  *   - It has an embedded timestamp and is older than WORKTREE_TTL_MS, OR
- *   - `git log --oneline main..<branch>` returns zero lines (fully merged)
+ *   - `git log --oneline main..<branch>` returns zero lines (fully merged) AND the directory is older than 24 hours.
  *
  * @param {string} branch - Branch name (short, e.g. "worktree-agent-abc123-1741000000000")
+ * @param {string} worktreePath - The path to the worktree to check its filesystem modification time
  * @returns {boolean}
  */
-function isStale(branch) {
+function isStale(branch, worktreePath) {
   if (!branch) return false;
   // TTL-based check: branch older than WORKTREE_TTL_MS is always stale
   if (isTTLExpired(branch)) return true;
+
+  // ZOMBIE PREVENTION: If there is no explicit TTL in the branch name, check the filesystem age first
+  // Active agents with 0 commits will fail the git log check below, so they MUST be protected here
+  try {
+    const stats = fs.statSync(worktreePath);
+    const ageMs = Date.now() - stats.mtimeMs;
+    // If the folder was modified within our standard TTL, it belongs to an active agent. DON'T touch it.
+    if (ageMs < WORKTREE_TTL_MS) {
+      return false;
+    }
+  } catch (_err) {
+    // If we can't stat it, fall through to branch checking
+  }
+
   try {
     const defaultBranch = detectDefaultBranch(PROJECT_ROOT);
     // SE-02: shell: false, array args
@@ -162,9 +177,10 @@ function removeWorktree(worktreePath) {
     return { success: true, error: null };
   } catch (err) {
     // Windows file-lock fallback: aggressively rm the directory
+    // Increased maxRetries to 10 and retryDelay to 1000 (10 seconds total) for aggressive Defender lockouts
     try {
       if (fs.existsSync(nativePath)) {
-        fs.rmSync(nativePath, { recursive: true, force: true, maxRetries: 3, retryDelay: 500 });
+        fs.rmSync(nativePath, { recursive: true, force: true, maxRetries: 10, retryDelay: 1000 });
         // Clean up git's internal state after brute-force removal
         pruneGitWorktrees();
       }
@@ -262,9 +278,11 @@ function main() {
     }
 
     const ttlExpired = isTTLExpired(branch);
-    const stale = isStale(branch);
+    const stale = isStale(branch, worktreePath);
     if (!stale) {
-      console.log(`  KEEP  ${shortPath}  [${branch}]  (has unique commits not in main)`);
+      console.log(
+        `  KEEP  ${shortPath}  [${branch}]  (has unique commits not in main OR is currently active)`
+      );
       skipped++;
       continue;
     }

@@ -764,3 +764,62 @@ For complex algorithmic problems, architecture decisions, or debugging:
 - List assumptions, constraints, and edge cases first
 - Consider 2-3 alternative approaches before picking one
 - Document the chosen approach rationale in a comment
+
+### Multi-Session Persistence
+
+For long-running tasks that may span multiple sessions:
+
+- Write state to `.claude/context/plans/{feature}-progress.json` before starting
+- Include: `{ feature, currentStep, completedSteps, pendingSteps, decisions, timestamp }`
+- Read this file at session start to resume from last known state
+- Update after each logical unit completes
+
+### Git-Based Progress Checkpointing
+
+Commit after each logical unit to create recoverable save points:
+
+```bash
+git add -u && git commit -m "wip({feature}): {step} complete"
+```
+
+- Format: `wip({feature}): {step} complete` for in-progress work
+- Use conventional commit format on final completion: `feat({feature}): {description}`
+- Never accumulate more than one logical unit without committing
+
+### Incremental Feature Implementation
+
+Break features into 3-5 atomic steps before writing any code:
+
+1. Define the steps in a spec comment or progress file
+2. Implement one step at a time (test → implement → commit)
+3. Use `TaskCreate` for steps that require separate agent focus
+4. Do not proceed to step N+1 until step N tests pass
+
+### TDD Strict Mode
+
+Red-Green-Refactor with verified failing test first:
+
+```bash
+# Step 1: Write test, verify it FAILS
+pnpm test -- --testPathPattern="feature.test"
+# Must see: FAIL (not "no tests found" or "pass")
+
+# Step 2: Implement minimal code to pass
+# Step 3: pnpm test — must see PASS
+
+# Step 4: Refactor, re-run tests
+pnpm test && pnpm lint:fix && pnpm format
+```
+
+Never skip the "verify RED" step — a passing test before implementation means the test is wrong.
+
+### Tool Search Before Code
+
+Always search before writing new code:
+
+```bash
+pnpm search:code "relevant pattern or function name"
+```
+
+If results exist: read them, understand them, reuse or extend rather than duplicate.
+If no results: proceed with new implementation, but document why it's novel.

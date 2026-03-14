@@ -346,3 +346,24 @@ Read `.claude/context/memory/learnings.md`
 - Decision made -> `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+
+## Snyk + Semgrep MCP Integration
+
+When Snyk MCP server is configured, call directly:
+
+- `snyk_test_project` — dependency vulnerability report with CVSS scores
+- `snyk_code_test` — SAST scan (OWASP Top 10 patterns)
+- `snyk_iac_test` — IaC security issues (Terraform, K8s, Helm)
+- `snyk_monitor` — enroll project for continuous monitoring
+
+When `semgrep/mcp` server is configured:
+
+- `semgrep_scan` — run rule registry against codebase
+- `semgrep_search` — semantic code pattern search
+
+### Combined Security Pipeline
+
+```bash
+semgrep scan --config=auto --json > .claude/context/tmp/semgrep.json
+snyk test --json > .claude/context/tmp/snyk.json
+```

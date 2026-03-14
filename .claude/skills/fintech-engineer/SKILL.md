@@ -49,7 +49,7 @@ const price = 9.99;
 const tax = price * 0.08; // 0.7992000000000001 — WRONG
 
 // GOOD — integer arithmetic in cents
-const priceInCents = 999;      // $9.99
+const priceInCents = 999; // $9.99
 const taxInCents = Math.round(priceInCents * 0.08); // 80 cents = $0.80
 
 // Currency formatting (display only — never compute with these)
@@ -63,7 +63,7 @@ function formatMoney(cents: number, currency = 'USD'): string {
 
 // Money type for type safety
 type Money = {
-  amount: number;   // Integer in smallest unit
+  amount: number; // Integer in smallest unit
   currency: string; // ISO 4217 (USD, EUR, GBP)
 };
 
@@ -116,7 +116,7 @@ async function recordPayment(
   db: Database,
   { userId, amountCents, currency, stripeChargeId, idempotencyKey }: PaymentParams
 ) {
-  return db.transaction(async (trx) => {
+  return db.transaction(async trx => {
     // Idempotency check
     const existing = await trx('transactions').where({ idempotency_key: idempotencyKey }).first();
     if (existing) return existing; // Return same result, do not double-process
@@ -127,7 +127,7 @@ async function recordPayment(
     await trx('ledger_entries').insert({
       transaction_id: txId,
       account_id: CASH_ACCOUNT_ID,
-      amount: amountCents,      // Positive = debit
+      amount: amountCents, // Positive = debit
       currency,
       reference_type: 'payment',
       reference_id: stripeChargeId,
@@ -137,22 +137,24 @@ async function recordPayment(
     await trx('ledger_entries').insert({
       transaction_id: txId,
       account_id: REVENUE_ACCOUNT_ID,
-      amount: -amountCents,     // Negative = credit
+      amount: -amountCents, // Negative = credit
       currency,
       reference_type: 'payment',
       reference_id: stripeChargeId,
     });
 
     // Record transaction with idempotency key
-    const tx = await trx('transactions').insert({
-      id: txId,
-      user_id: userId,
-      idempotency_key: idempotencyKey,
-      amount: amountCents,
-      currency,
-      status: 'completed',
-      stripe_charge_id: stripeChargeId,
-    }).returning('*');
+    const tx = await trx('transactions')
+      .insert({
+        id: txId,
+        user_id: userId,
+        idempotency_key: idempotencyKey,
+        amount: amountCents,
+        currency,
+        status: 'completed',
+        stripe_charge_id: stripeChargeId,
+      })
+      .returning('*');
 
     return tx[0];
   });
@@ -188,7 +190,7 @@ app.post('/webhook/stripe', express.raw({ type: 'application/json' }), (req, res
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(
-      req.body,                              // Raw body — do NOT parse as JSON first
+      req.body, // Raw body — do NOT parse as JSON first
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
@@ -235,15 +237,17 @@ async function refundPayment(paymentIntentId: string, amountCents?: number) {
 ```typescript
 import { PlaidApi, Configuration, PlaidEnvironments, Products, CountryCode } from 'plaid';
 
-const plaid = new PlaidApi(new Configuration({
-  basePath: PlaidEnvironments[process.env.PLAID_ENV as 'sandbox' | 'production'],
-  baseOptions: {
-    headers: {
-      'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
-      'PLAID-SECRET': process.env.PLAID_SECRET,
+const plaid = new PlaidApi(
+  new Configuration({
+    basePath: PlaidEnvironments[process.env.PLAID_ENV as 'sandbox' | 'production'],
+    baseOptions: {
+      headers: {
+        'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
+        'PLAID-SECRET': process.env.PLAID_SECRET,
+      },
     },
-  },
-}));
+  })
+);
 
 // 1. Create Link token (server-side)
 async function createLinkToken(userId: string) {
@@ -308,9 +312,8 @@ async function idempotentOperation<T>(
 }
 
 // Usage
-const charge = await idempotentOperation(
-  `charge:${orderId}:${userId}`,
-  () => stripe.charges.create({ amount: 9999, currency: 'usd', source: tokenId })
+const charge = await idempotentOperation(`charge:${orderId}:${userId}`, () =>
+  stripe.charges.create({ amount: 9999, currency: 'usd', source: tokenId })
 );
 ```
 
@@ -337,9 +340,7 @@ function maskPAN(pan: string): string {
 function sanitizeForLogging(obj: Record<string, unknown>): Record<string, unknown> {
   const REDACT_FIELDS = ['card_number', 'cvv', 'pan', 'ssn', 'account_number'];
   return Object.fromEntries(
-    Object.entries(obj).map(([k, v]) =>
-      REDACT_FIELDS.includes(k) ? [k, '[REDACTED]'] : [k, v]
-    )
+    Object.entries(obj).map(([k, v]) => (REDACT_FIELDS.includes(k) ? [k, '[REDACTED]'] : [k, v]))
   );
 }
 ```
@@ -382,10 +383,10 @@ type RiskLevel = 'low' | 'medium' | 'high' | 'blocked';
 interface KYCCheck {
   userId: string;
   identityVerified: boolean;
-  pepMatch: boolean;        // Politically Exposed Person
-  sanctionsMatch: boolean;  // OFAC, EU, UN sanctions lists
+  pepMatch: boolean; // Politically Exposed Person
+  sanctionsMatch: boolean; // OFAC, EU, UN sanctions lists
   countryRisk: 'low' | 'medium' | 'high';
-  documentScore: number;    // 0-100 from ID verification provider
+  documentScore: number; // 0-100 from ID verification provider
 }
 
 function calculateRisk(check: KYCCheck): RiskLevel {
@@ -416,12 +417,12 @@ const HIGH_RISK_COUNTRIES = new Set(['KP', 'IR', 'SY', 'CU']); // OFAC restricte
 interface AuditEntry {
   id: string;
   timestamp: Date;
-  actor: string;        // userId or 'system'
-  action: string;       // 'payment.created', 'refund.issued', etc.
+  actor: string; // userId or 'system'
+  action: string; // 'payment.created', 'refund.issued', etc.
   resourceType: string; // 'payment', 'account', 'user'
   resourceId: string;
-  before?: unknown;     // State before change (for mutations)
-  after?: unknown;      // State after change
+  before?: unknown; // State before change (for mutations)
+  after?: unknown; // State after change
   ip?: string;
   userAgent?: string;
 }
@@ -465,11 +466,13 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const status = subscription.status;
   // 'active', 'past_due', 'canceled', 'unpaid', 'trialing', 'paused'
 
-  await db('subscriptions').where({ stripe_id: subscription.id }).update({
-    status,
-    current_period_end: new Date(subscription.current_period_end * 1000),
-    cancel_at_period_end: subscription.cancel_at_period_end,
-  });
+  await db('subscriptions')
+    .where({ stripe_id: subscription.id })
+    .update({
+      status,
+      current_period_end: new Date(subscription.current_period_end * 1000),
+      cancel_at_period_end: subscription.cancel_at_period_end,
+    });
 
   if (status === 'past_due') {
     await sendPaymentFailedEmail(subscription.customer as string);
@@ -491,14 +494,14 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
 ## Regulatory References
 
-| Regulation | Scope | Key Requirements |
-|---|---|---|
-| PCI DSS 4.0 | Card payments | Encrypt PANs, tokenize, audit logs, penetration testing |
-| GDPR | EU users | Right to erasure, data minimization, breach notification |
-| PSD2 | EU payments | Strong Customer Authentication (SCA), Open Banking APIs |
-| SOX | Public companies | Financial controls, audit trails, immutable records |
-| BSA/AML | US transactions | KYC, CTR >$10K, SAR filing, sanctions screening |
-| CCPA | California users | Data access rights, opt-out of sale |
+| Regulation  | Scope            | Key Requirements                                         |
+| ----------- | ---------------- | -------------------------------------------------------- |
+| PCI DSS 4.0 | Card payments    | Encrypt PANs, tokenize, audit logs, penetration testing  |
+| GDPR        | EU users         | Right to erasure, data minimization, breach notification |
+| PSD2        | EU payments      | Strong Customer Authentication (SCA), Open Banking APIs  |
+| SOX         | Public companies | Financial controls, audit trails, immutable records      |
+| BSA/AML     | US transactions  | KYC, CTR >$10K, SAR filing, sanctions screening          |
+| CCPA        | California users | Data access rights, opt-out of sale                      |
 
 ## Related
 
