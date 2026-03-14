@@ -423,6 +423,24 @@ function testStillScansEvalInCodeFiles() {
   assert(evalFindings.length > 0, 'Should still detect eval() in .js files');
 }
 
+function testDoesNotFlagMethodChainedEval() {
+  // SEC-012 must NOT fire on method-chained .eval() calls (e.g., PyTorch model.eval())
+  const content = [
+    'model.eval()',
+    'self.eval()',
+    'obj.eval()',
+    'model.eval().train()',
+  ].join('\n');
+  const filePath = createTestFile(content, '.py');
+
+  const findings = scanFile(filePath);
+  const evalFindings = findings.filter(f => f.ruleId === 'SEC-012');
+  assert(
+    evalFindings.length === 0,
+    'Should NOT flag method-chained .eval() calls (false-positive regression)'
+  );
+}
+
 function testStillScansHttpInCodeFiles() {
   // Code files should still be scanned for http:// (non-localhost)
   const content = `const url = "http://example.com/api";`;
@@ -478,6 +496,7 @@ function main() {
     ['Skips eval() in memory .json files', testSkipsEvalInMemoryJson],
     ['Skips http:// in .schema.json files', testSkipsHttpInSchemaJson],
     ['Still scans eval() in code files', testStillScansEvalInCodeFiles],
+    ['Does not flag method-chained .eval() (SEC-012 false-positive)', testDoesNotFlagMethodChainedEval],
     ['Still scans http:// in code files', testStillScansHttpInCodeFiles],
   ];
 

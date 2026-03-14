@@ -191,7 +191,7 @@ const SECURITY_RULES = [
     id: 'SEC-012',
     name: 'Eval Usage',
     severity: 'high',
-    pattern: /\beval\s*\(/g,
+    pattern: /(?<![\w.])eval\s*\(/g,
     description: 'eval() usage detected - potential code injection',
     fix: 'Avoid eval(); use safer alternatives',
     codeOnly: true, // Only scan code files, not .md/.json docs
