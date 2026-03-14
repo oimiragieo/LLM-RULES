@@ -1,51 +1,3 @@
-## Cleanup Finding — Temp Files, One-Off Scripts, and CLI Output Dumps (Systemic — 2026-03-13)
-
-**Type**: routing_failure + cleanup_finding (4 gap-log entries from this session)
-**Observed**: Router gap-log recorded 4 `cleanup_finding` entries during the MEGA EPIC session:
-
-1. Developer agents wrote temp test/debug files (`dump-test.cjs`, `test-out.txt`, `test_out.txt`, `test-errors*.log`) to project root instead of `.claude/context/tmp/`
-2. Developer agents captured CLI output to root-level files (`errors.json`, `eslint.json`, `lint-output.txt`, `clean_errors.txt`, `reduced_log_5.txt`, `temp_debug_log_5.txt`) for inspection then abandoned them
-3. Developer agents created one-off migration/utility scripts (`rename_agent.cjs`, `revert_rename.cjs`, `update_frequencies.cjs`, `update_skill_loops.cjs`, `update_skill_rigidity.cjs`) in project root and never committed or deleted them
-4. Multiple agents created rule files without running `pnpm index-rules` — rules visible in filesystem but orphaned from rule-index
-
-**Pattern Classification**: SYSTEMIC (3+ confirmed instances across multiple agents, multiple sessions). These are not one-off failures — they are a repeated behavioral gap in developer agent execution.
-**Root Cause**: Developer agent definition lacks explicit temp file placement rule. `cleanup-always.md` rule was added during this session (MEGA EPIC) but was not enforced prior to that. The rule-creator integration gap (missing `pnpm index-rules`) is a separate systemic gap in the creator skill workflow.
-**Resolution Required**:
-
-1. `cleanup-always.md` rule added 2026-03-13 — enforce at end of every developer task
-2. Rule-creator Step 4 must be a numbered gate with explicit count verification
-3. Router must include "end-of-task cleanup scan" in all developer spawn prompts
-   **Priority**: P1 (systemic — confirmed across multiple MEGA EPIC sub-sessions)
-   **Source**: session-gap-log.jsonl entries (2026-03-13)
-
----
-
-## rule-creator Post-Creation Indexing Gap — Creator Skill Step Skipped (2026-03-13)
-
-**Issue**: Task #14 invoked `rule-creator` for 7 rules (lancedb, supabase, playwright-testing, astro, solidjs, cleanup-always, documentation-always). All 7 rule files were written to `.claude/rules/`. However, the mandatory `pnpm index-rules` step was skipped by every subagent involved. The rule-index remained at 114 instead of advancing to 126 (or 121, accounting for 7 new rules). Rules were invisible to agents until the gap was detected via gap-log review.
-
-**Impact**: 7 rules created but effectively orphaned — not indexed, not discoverable by agents relying on the rule catalog. Router deflected responsibility when confronted rather than owning the oversight.
-
-**Root Causes**:
-
-1. The `pnpm index-rules` step in rule-creator SKILL.md is labeled "Mandatory: Register in index" but sits between Step 2 and Step 3 without its own numbered step label. Subagents may skip it because it appears inline rather than as a numbered gate.
-2. The router did not include "verify index count increased" in the task completion criteria when spawning rule-creator agents.
-3. QA did not check rule-index count as part of its proactive-audit (addressed by ADR-2026-03-13-068).
-4. No post-creation hook verifies that `pnpm index-rules` was actually run after rule files are written.
-
-**Required Actions (P1)**:
-
-- Promote `pnpm index-rules` to a numbered step with explicit count verification in rule-creator SKILL.md
-- Router must include "verify `total_rules` count increased" in any task that involves rule-creator
-- Add a post-execute hook to rule-creator that auto-runs `pnpm index-rules` and fails if count does not increase
-- QA proactive-audit must verify rule-index count matches `.claude/rules/*.md` file count (per ADR-2026-03-13-068)
-
-**Priority**: P1 (7 rules orphaned in single session; gap detection required manual intervention)
-
-**Status**: Rule files exist but un-indexed. Remediation: run `pnpm index-rules` manually.
-
----
-
 ## Skill Registration Gap: browser-automation Catalog Missing (2026-03-13)
 
 **Issue**: `browser-automation` skill was created in task #15 (MEGA EPIC batch, 2026-03-13) and the prior reflection (task-completion-2026-03-13t20-07-19-386z) claimed "All registration checks passed." However, cross-validation against the canonical source confirms the skill is **NOT present** in `.claude/docs/skill-catalog.md`.
@@ -133,6 +85,53 @@ Source: reflection of task_completion:2026-03-13T20:07:18.029Z (task #14)
 - [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-12T20:59:41.350Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-12T20:59:41.366Z
+
+---
+
+## Skill Registration Gap: ml-experiment-loop (2026-03-14)
+
+- [x] Catalog: MISSING — not listed in `.claude/docs/skill-catalog.md` (Step 4.7 check; skill was added via skills:index regeneration but catalog table not updated)
+- [x] Index: PRESENT — found in `.claude/config/skill-index.json` (regenerated as part of commit 49015b79)
+- [x] Agent assignment: PRESENT — `ml-researcher.md` lists `ml-experiment-loop` in `skills:` frontmatter
+
+**Root Cause**: `skill-catalog.md` was not updated when `ml-experiment-loop` was created/updated during the autoresearch integration task (Task 10, 2026-03-14). The skill index was regenerated correctly but the human-readable catalog table was not updated.
+
+**Impact**: Skill is discoverable via index and agent assignment but NOT via catalog-driven Router lookups. Agents relying on `@SKILL_CATALOG_TABLE.md` cannot discover this skill.
+
+**Required Actions (P2)**:
+
+1. Add `ml-experiment-loop` row to `.claude/docs/skill-catalog.md` table
+2. Enforce catalog update in `skill-creator` and integration workflows — catalog update must be a numbered gate
+
+**Priority**: P2
+**Source**: reflection of task 10 (reflection-task-completion-2026-03-14t19-02-19-967z)
+**Status**: Open
+
+---
+
+## CHANGELOG.md Not Updated on autoresearch Skill/Rule Integration (2026-03-14)
+
+**Type**: documentation-always violation
+**Task**: Task 10 — karpathy/autoresearch integration into Agent Studio
+
+**Description**: The `documentation-always` rule (`.claude/rules/documentation-always.md`) requires a CHANGELOG.md entry for every feature addition, including new agents, skills, and rules. Task 10 added:
+- `ml-experiment-loop` skill (v2.0.0, 330-line update)
+- `ml-experiment-standards.md` rule (~110 lines)
+- Registry regeneration (80 agents, 299 skills)
+
+No CHANGELOG.md entry was created for any of these additions.
+
+**Impact**: Capability additions are invisible in the project changelog. Violates the documentation-always iron law.
+
+**Required Actions (P1)**:
+
+1. Add CHANGELOG.md entry under `## [Unreleased]` covering: ml-experiment-loop skill v2.0.0, ml-experiment-standards rule, autoresearch integration
+2. Update documentation-always enforcement to include pre-completion check for CHANGELOG modification on skill/rule tasks
+
+**Priority**: P1
+**Source**: reflection of task 10 (reflection-task-completion-2026-03-14t19-02-19-967z)
+**Status**: Open
+
 
 - [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-12T21:02:08.371Z
 

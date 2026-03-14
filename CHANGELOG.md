@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — karpathy/autoresearch Integration (2026-03-14)
+
+- Integrated karpathy/autoresearch: `ml-experiment-loop` skill (v2.0.0) with autonomous ML research protocol — fixed-budget experiments, git-based keep/discard, crash recovery, simplicity criterion
+- `ml-researcher` domain agent for autonomous ML experimentation workflows
+- `ml-experiment-standards` rule for reproducible ML experiment conventions
+- `autoresearch` slash command and templates
+
 ### Fixed — Prompt Caching Hierarchy Inversion (2026-03-14)
 
 - **LLM Cache Hit Optimization**: Restructured the `spawn-prompt-assembler` generation logic to maximize Anthropic/Gemini prefix caching retention by clustering static ecosystem rules at the top and isolating dynamic per-task identifiers at the bottom.

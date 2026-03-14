@@ -10,8 +10,8 @@
 
 | Metric        | Count |
 | ------------- | ----- |
-| Total Skills  | 258   |
-| Active Skills | 258   |
+| Total Skills  | 259   |
+| Active Skills | 259   |
 | Aliases       | 0     |
 | Domains       | 22    |
 | Categories    | 25    |
@@ -25,6 +25,7 @@
 | `ai-ml-expert`                                 | ai-ml          | AI/ML                | AI and ML expert covering PyTorch, TensorFlow, Hugging Face, scikit-learn, LLM integration, RAG pipelines, MLOps, and pr...                                                                                                                                                  |
 | `transcription`                                | ai-ml          | AI/ML                | Audio and video transcription using Whisper AI via transcribe-anything. Supports local files, YouTube URLs, faster-whisper/mlx/groq backends, SRT/VTT/TXT/JSON output.                                                                                                       |
 | `tts-generation`                               | ai-ml          | AI/ML                | AI text-to-speech generation using OpenAI TTS, ElevenLabs, and Google TTS backends. Voice selection, speed control, chunking for long text, and multiple audio output formats.                                                                                               |
+| `ml-experiment-loop`                           | ai-ml          | AI/ML                | Autonomous ML research loop (karpathy/autoresearch v2.0.0). Fixed-budget experiments with git-based keep/discard, crash recovery, and simplicity criterion. Use for iterative ML experimentation workflows.                                                                  |
 | `architecture-review`                          | architecture   | Architecture         | Architecture review and design validation. Evaluates system designs against best practices, identifies anti-patterns, an...                                                                                                                                                  |
 | `diagram-generator`                            | architecture   | Architecture         | Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system arc...                                                                                                                                                  |
 | `agent-creator`                                | creator        | Creator Tools        | Creates specialized AI agents on-demand when no existing agent matches a request. Use when the Router cannot find a suit...                                                                                                                                                  |
@@ -294,9 +295,9 @@
 
 ## Skills by Domain
 
-### ai-ml (1 skills)
+### ai-ml (4 skills)
 
-`ai-ml-expert`
+`ai-ml-expert`, `ml-experiment-loop`, `transcription`, `tts-generation`
 
 ### architecture (2 skills)
 

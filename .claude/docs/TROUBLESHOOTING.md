@@ -618,3 +618,48 @@ Symptoms:
 Fix:
 
 - Run `npm run agents:contract:backfill` or directly `node .claude/tools/cli/backfill-agent-template-contract.cjs --apply` to automatically restore lost boilerplate sections to all 70+ agents without needing manual edits. Always follow up with `npm run gen:all-registries`.
+
+### D. Orphaned Reflection/Evolution Hooks
+
+Symptoms:
+
+- `unified-reflection-handler.cjs` correctly produces `evolution-dispatch-plan.json` but the system never automatically self-heals or routes those requests to the `agent-updater`/`skill-updater`.
+
+Root Cause:
+
+- The executor script `process-evolution-queue.cjs` was orphaned and never wired into the heartbeat loop.
+
+Fix Applied:
+
+- Integrated `process-evolution-queue.cjs` into `.claude/tools/cli/evolution-check.cjs`. The daily `evolution-24h` heartbeat now natively pushes the output payloads directly into the central orchestrator's `cron-actions-queue.jsonl`.
+
+### E. Zombie Worktrees Surviving Cleanups
+
+Symptoms:
+
+- `.claude/worktrees/agent-*` directories accumulate heavily, surviving both the post-task cleanup hook and the 12-hour background cron sweeps.
+
+Root Cause:
+
+- The `worktree-auto-cleanup.cjs` hook explicitly skips deleting its own directory to prevent Windows `EBUSY` locks. It then skips deleting all other active directories because they are shielded by a 2-hour TTL. 
+- The background `worktree-prune.cjs` script was measuring age using `fs.statSync` on the root agent directory, which completely fails because inner file changes do not update the directory's root timestamp on some filesystems, preventing the 12-hour threshold from expiring.
+
+Fix Applied:
+
+- Added a "slop auto-detection" block in the daily `evolution-check.cjs` that safely spawns `devops` when more than 15 worktrees accumulate.
+- Changed `worktree-prune.cjs` to strictly parse the embedded 13-digit Unix Epoch integer from the `worktree-agent-<id>-<timestamp>` string, guaranteeing absolute age verification.
+
+### F. High LLM Prompt Cache Misses
+
+Symptoms:
+
+- Anthropic/Gemini caching dashboards report near 0% cache hit rates despite using statically defined agent boundaries.
+
+Root Cause:
+
+- The `spawn-prompt-assembler` prepended dynamic meta fields (massive 300-word Warning Message Boxes and per-session Task UUID injections) to the absolute top of the system prompt. Because prompt caching requires exact prefix matching, this constantly changing preamble immediately busted the cache line before it could hit the static Tool/Agent rules. 
+
+Fix Applied:
+
+- Inverted the `spawn-prompt-assembler-sections.cjs` architectural layout. Statically declared items (Tools, Skills, Memory RAG, Agent Constitution) are explicitly array-concatenated first. 
+- Dynamic warning fields (`ensureMandatorySpawnPreflight`) and UUIDs were relocated to append onto the absolute bottom of the payload.

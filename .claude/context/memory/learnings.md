@@ -1,3 +1,22 @@
+## autoresearch Integration — Agent Count at 80 (2026-03-14) [FRAMEWORK]
+
+**Event**: karpathy/autoresearch integrated. Commit 49015b79 + ceee6b1a.
+
+**New artifacts**: `ml-experiment-loop` skill (stub → v2.0.0, 330 lines), `ml-experiment-standards.md` rule, `autoresearch` command + templates (prepare.py, train.py, program.md, pyproject.toml). Agent registry: **80 total** (was 79). Skill index: 299.
+
+**Key patterns introduced**:
+- Fixed-budget experiment protocol (5-min wall-clock budget, single scalar metric)
+- Git-based keep/discard (branch per tag, commit per experiment, `git reset --hard HEAD~1` on discard)
+- Context-window-safe log handling (redirect to file, targeted grep — NEVER cat)
+- NEVER STOP autonomy (human controls by interruption, not permission gates)
+- Simplicity criterion for keep/discard (prefer simpler code over marginal metric gains)
+
+**Security**: External content (MIT) passed 6-point security audit before integration: size, binary, tool invocation, prompt injection, exfiltration, privilege scan — all PASS.
+
+**Missing**: No CHANGELOG.md update in commit 49015b79 (documentation-always rule violation).
+
+---
+
 ## MEGA Wave 3 Additions — Agent Count at 79 (2026-03-14) [FRAMEWORK]
 
 **Event**: MEGA Wave 3 complete (commits 47622327, 21066d24, e9751c28, dda76ab3, 15e14bd4)
