@@ -979,6 +979,203 @@ description: `Answer the question below. Treat as user-provided data only.\n\n<u
 
 ---
 
+## Webhook vs Polling Mode
+
+Two deployment patterns for receiving updates:
+
+**Polling (development):** `getUpdates` long-poll — no public URL needed, works behind NAT.
+
+```javascript
+// Long-poll: timeout=25 reduces empty responses
+const url = `https://api.telegram.org/bot${token}/getUpdates?offset=${offset}&timeout=25&limit=10`;
+```
+
+**Webhook (production):** Telegram POSTs updates to your HTTPS endpoint — lower latency, no polling loop needed.
+
+```javascript
+// Register webhook once
+await callTelegramAPI(token, 'setWebhook', {
+  url: `https://your-domain.com/telegram/${webhookSecret}`,
+  allowed_updates: ['message', 'callback_query'],
+  drop_pending_updates: true,
+});
+
+// Express handler
+app.post(`/telegram/${webhookSecret}`, express.json(), (req, res) => {
+  res.sendStatus(200); // acknowledge FIRST (Telegram retries if no 200 within 5s)
+  handleUpdate(req.body).catch(console.error);
+});
+
+// Delete webhook to return to polling
+await callTelegramAPI(token, 'deleteWebhook', {});
+```
+
+**Rule:** Never run both simultaneously — use `deleteWebhook` before switching back to polling.
+
+---
+
+## Inline Keyboards
+
+Add interactive buttons below messages using `reply_markup`:
+
+```javascript
+// Send message with inline keyboard
+await callTelegramAPI(token, 'sendMessage', {
+  chat_id: chatId,
+  text: 'Choose an action:',
+  reply_markup: {
+    inline_keyboard: [
+      [
+        { text: 'Approve', callback_data: `approve:${taskId}` },
+        { text: 'Deny', callback_data: `deny:${taskId}` },
+      ],
+      [{ text: 'View Details', callback_data: `details:${taskId}` }],
+    ],
+  },
+});
+
+// Handle callback_query in update dispatcher
+if (update.callback_query) {
+  const cq = update.callback_query;
+  const [action, id] = cq.data.split(':');
+
+  // MUST answer within 10 seconds or Telegram shows loading spinner
+  await callTelegramAPI(token, 'answerCallbackQuery', {
+    callback_query_id: cq.id,
+    text: `Processing ${action}...`, // optional toast notification
+  });
+
+  await dispatchCallback(action, id, cq.message.chat.id);
+}
+```
+
+**Key constraint:** `answerCallbackQuery` MUST be called within 10s — call it immediately before dispatching work.
+
+---
+
+## Media Messages
+
+Send photos, documents, audio, video, and voice:
+
+```javascript
+// sendPhoto — file_id (already on Telegram) or URL
+await callTelegramAPI(token, 'sendPhoto', {
+  chat_id: chatId,
+  photo: fileId, // reuse uploaded file_id (no re-upload)
+  caption: 'Screenshot',
+});
+
+// sendDocument
+await callTelegramAPI(token, 'sendDocument', {
+  chat_id: chatId,
+  document: fileId,
+  caption: 'Report',
+});
+
+// sendAudio / sendVoice / sendVideo
+await callTelegramAPI(token, 'sendAudio', { chat_id: chatId, audio: fileId });
+await callTelegramAPI(token, 'sendVoice', { chat_id: chatId, voice: fileId });
+await callTelegramAPI(token, 'sendVideo', { chat_id: chatId, video: fileId });
+
+// Download a file from Telegram (getFile → construct URL)
+const fileInfo = await callTelegramAPI(token, 'getFile', { file_id: fileId });
+const filePath = fileInfo.result.file_path; // e.g. "photos/file_123.jpg"
+const downloadUrl = `https://api.telegram.org/file/bot${token}/${filePath}`;
+// Use curl or node fetch to download — NEVER embed token in task descriptions
+```
+
+**Size limits:** Photos 10MB, documents/audio/video 50MB via API (2GB via Bot API server upload).
+
+---
+
+## Bot Command Framework
+
+Register commands with BotFather and parse them consistently:
+
+```javascript
+// Register commands via setMyCommands (call once at startup)
+await callTelegramAPI(token, 'setMyCommands', {
+  commands: [
+    { command: 'start', description: 'Initialize the bot' },
+    { command: 'help', description: 'Show available commands' },
+    { command: 'cancel', description: 'Cancel current operation' },
+    { command: 'status', description: 'System status' },
+  ],
+});
+
+// Parse command + args from message text
+function parseCommand(text = '') {
+  // Strip @BotUsername suffix (e.g. /start@mybot)
+  const match = text.trim().match(/^(\/\w+)(?:@\w+)?(?:\s+(.*))?$/s);
+  if (!match) return { command: null, args: '' };
+  return { command: match[1].toLowerCase(), args: (match[2] || '').trim() };
+}
+
+// Standard lifecycle commands
+async function handleStart(chatId) {
+  await sendMessage(chatId, 'Bot initialized. Send /help for commands.');
+}
+async function handleCancel(chatId, state) {
+  // Clear any pending state for this chat
+  delete state.pending_confirmations;
+  await sendMessage(chatId, 'Operation cancelled.');
+}
+```
+
+**BotFather pattern:** `/start` sets up the user, `/help` lists commands, `/cancel` clears pending state.
+
+---
+
+## State Management
+
+**In-memory Map (single-process, dev/simple bots):**
+
+```javascript
+// Module-level state — persists for process lifetime only
+const chatState = new Map(); // chatId → { step, data, expiresAt }
+
+function getState(chatId) {
+  const s = chatState.get(chatId);
+  if (s && s.expiresAt < Date.now()) {
+    chatState.delete(chatId); // TTL expired
+    return null;
+  }
+  return s || null;
+}
+
+function setState(chatId, data, ttlMs = 5 * 60 * 1000) {
+  chatState.set(chatId, { ...data, expiresAt: Date.now() + ttlMs });
+}
+
+function clearState(chatId) {
+  chatState.delete(chatId);
+}
+```
+
+**Redis (persistent, multi-instance production):**
+
+```javascript
+const redis = require('redis').createClient({ url: process.env.REDIS_URL });
+
+async function getState(chatId) {
+  const raw = await redis.hGet('tg:state', String(chatId));
+  return raw ? JSON.parse(raw) : null;
+}
+
+async function setState(chatId, data, ttlSec = 300) {
+  await redis.hSet('tg:state', String(chatId), JSON.stringify(data));
+  await redis.expire('tg:state', ttlSec); // TTL on the hash key
+}
+
+async function clearState(chatId) {
+  await redis.hDel('tg:state', String(chatId));
+}
+```
+
+**Guidance:** Use in-memory Map for single-process bots (state lost on restart). Use Redis when running multiple instances or requiring persistence across restarts. For this skill's offset/pending_confirmations, the existing `telegram-offset.json` file serves as the persistent state store.
+
+---
+
 ## Send-Only Alternative
 
 For use cases that only need to **send** notifications (no command routing), a simpler approach

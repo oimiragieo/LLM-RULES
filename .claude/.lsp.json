@@ -1,14 +1,12 @@
 {
-    "typescript": {
-        "command": "C:/dev/projects/agent-studio/node_modules/.bin/typescript-language-server.cmd",
-        "args": [
-            "--stdio"
-        ],
-        "extensionToLanguage": {
-            ".ts": "typescript",
-            ".tsx": "typescriptreact",
-            ".js": "javascript",
-            ".jsx": "javascriptreact"
-        }
+  "typescript": {
+    "command": "C:/dev/projects/agent-studio/node_modules/.bin/typescript-language-server.cmd",
+    "args": ["--stdio"],
+    "extensionToLanguage": {
+      ".ts": "typescript",
+      ".tsx": "typescriptreact",
+      ".js": "javascript",
+      ".jsx": "javascriptreact"
     }
+  }
 }

@@ -11,6 +11,7 @@ agents: [frontend-pro, ui-components-expert, mobile-ux-reviewer]
 Access design token libraries, CSS documentation, and AI-driven component generation.
 
 ## Design Systems MCP (southleft/design-systems-mcp)
+
 Semantic search across 188+ design systems (Material, Ant Design, Carbon, Chakra, etc.):
 
 ```bash
@@ -26,6 +27,7 @@ mcp__design_systems__get_patterns({ pattern: "form validation error" })
 **Use cases**: Find existing component patterns before building custom, get design token values, compare component API across systems.
 
 ## CSS MCP (stolinski/css-mcp)
+
 MDN CSS documentation + browser compatibility via MCP:
 
 ```bash
@@ -35,6 +37,7 @@ mcp__css__get_examples({ selector: ":is()" })
 ```
 
 ## Magic MCP — AI UI Component Generation (21st-dev)
+
 Generate UI components from natural language:
 
 ```bash
@@ -44,6 +47,7 @@ mcp__magic__find_component({ query: "pricing table with feature comparison" })
 ```
 
 ## Design Token Standards
+
 ```css
 /* CSS Custom Properties (recommended) */
 --color-primary: #6366f1;
@@ -55,9 +59,11 @@ mcp__magic__find_component({ query: "pricing table with feature comparison" })
 ```
 
 ## Anti-Patterns
+
 - Never hardcode hex colors in components — use design tokens
 - Never reinvent components that exist in your design system
 - Never use px for spacing in responsive layouts — use rem/em
 
 ## When to invoke
+
 Skill({ skill: 'design-systems' }) for design token lookup, component pattern research, CSS best practices, AI component generation

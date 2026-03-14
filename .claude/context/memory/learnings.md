@@ -1,3 +1,15 @@
+## MEGA EPIC Commit Pattern — Untracked Architectural Tooling (2026-03-13)
+
+**Task**: task-commit-untracked — 9 files, 958 insertions committed to main branch
+
+**Pattern: Batch Architectural Tooling Commit Without Integration Queue**
+
+- When committing untracked architectural tooling files (CLI scripts, maintenance tools, config files), the devops agent correctly commits to main with a well-structured conventional commit message and co-author attribution
+- The commit included critical fixes (`patch-hook-exits.cjs` — eliminates 475K token infinite hook loop) and new CLI tools (`auto-ignore-scanner.cjs` — dynamic .claudeignore generator for foreign codebases)
+- Gap detected: new CLI tools and maintenance scripts committed without corresponding integration-queue.jsonl entries — these require artifact-integrator analysis to ensure tool-catalog.md, package.json scripts, and CHANGELOG are updated
+- **Pattern (IRON LAW)**: Any new tool under `.claude/tools/cli/` or `scripts/maintenance/` committed for the first time MUST generate an integration-queue.jsonl entry so artifact-integrator can verify catalog registration and package.json wiring
+- Score: 0.84 PASS — good commit hygiene, minor integration gap
+
 ## Agent Oversizing in Batch Creation Pipelines — Two-Pass Pattern (2026-03-13)
 
 **Task**: Task #13 — legacy-modernizer agent from MEGA EPIC 17-repo assimilation

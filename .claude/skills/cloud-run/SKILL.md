@@ -188,15 +188,15 @@ gcloud run services logs read SERVICE_NAME --region us-central1 --limit 20
 
 When the `cloud-run-mcp` MCP server is configured, these tools are available:
 
-| Tool | Description | Key Params |
-|------|-------------|------------|
+| Tool                   | Description                            | Key Params                         |
+| ---------------------- | -------------------------------------- | ---------------------------------- |
 | `deploy-file-contents` | Deploy code directly from file content | service_name, region, source_files |
-| `list-services` | List all Cloud Run services | project_id, region |
-| `get-service` | Get service details + URL | service_name, project_id, region |
-| `get-service-log` | Fetch recent logs | service_name, project_id, limit |
-| `deploy-local-folder` | Deploy from local directory | folder_path, service_name, region |
-| `list-projects` | List GCP projects | — |
-| `create-project` | Create new GCP project | project_id, project_name |
+| `list-services`        | List all Cloud Run services            | project_id, region                 |
+| `get-service`          | Get service details + URL              | service_name, project_id, region   |
+| `get-service-log`      | Fetch recent logs                      | service_name, project_id, limit    |
+| `deploy-local-folder`  | Deploy from local directory            | folder_path, service_name, region  |
+| `list-projects`        | List GCP projects                      | —                                  |
+| `create-project`       | Create new GCP project                 | project_id, project_name           |
 
 **MCP setup**: `npx @google-cloud/cloud-run-mcp` or configure in Claude Desktop settings.json
 **Auth**: Application Default Credentials (`gcloud auth application-default login`)

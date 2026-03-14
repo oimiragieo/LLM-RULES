@@ -1,75 +1,41 @@
-## TaskUpdate metadata type error — recurring P1 (2026-03-12)
-
-**Issue**: Agents pass `metadata` as a JSON string instead of a record object when calling TaskUpdate. Causes InputValidationError and silent task completion failure.
-
-**Occurrences**: 3 sessions confirmed (2026-02-14, 2026-03-08, 2026-03-12). Transcript toolu_01QYi7KuJrms7UAzZUXdAGfH and toolu_01G9bMwAUj8WpXP27K2sffNf both showed this pattern.
-
-**Root Cause**: Agent inlines JSON.stringify() or wraps the object in a template string before passing to TaskUpdate.
-
-**Solution**: Add metadata type validation to pre-completion-validation.cjs — reject if typeof metadata === 'string'.
-
-**Priority**: P1 (recurring, affects reflection handshake reliability)
-
----
-
-## Context Overflow at EPIC Pipeline Phase 3 (2026-03-12)
-
-**Issue**: EPIC ecosystem audit plan (task #1, 22 atomic tasks, 3 phases) hit 150K token limit when router attempted to spawn Phase 3 implementation agents. Tasks 6, 7, 8 were blocked. All audit phases complete but implementation deferred to fresh session.
-
-**Pattern**: This is a recurring P0 issue. Prior instance: "EPIC Plan Execution Context Risk - Task #25 (P1)" — same root cause (34 agent spawns, heavy context accumulation).
-
-**Root Cause**: EPIC pipelines (22+ tasks, multiple audit/analysis phases) accumulate context from agent outputs. By Phase 3 the router context is saturated. Even with max-4-concurrent cap, each phase's results (returned inline or via TaskUpdate summaries) compound.
-
-**Prevention**:
-
-- Enforce wave-based execution: 2 agents max per wave (not 4 for heavy analysis)
-- Agents must write detailed output to `.claude/context/reports/` files — return ONLY file path + 5-bullet summary (max 500 chars)
-- Spawn `context-compressor` after each audit phase before moving to next
-- In EPIC plan prompts, explicitly require agents to NOT return inline analysis — cite report file only
-
-**Priority**: P0 (blocks implementation phase of every EPIC audit)
-
-**Status**: Open — fresh session required for Phase 3 implementation
-
----
-
-## EPIC Pipeline Context Overflow — Systemic Pattern (2026-03-12)
-
-**Type**: context_overflow (router gap)
-**Observed**: Phase 3 implementation spawn blocked for tasks 6, 7, 8 — session context exceeded 150K tokens during ecosystem-audit-epic pipeline. All audit phases completed but implementation phase could not start in same session.
-**Pattern**: EPIC pipelines with 3+ analysis phases (security audit + structural audit + skill gap analysis) consistently exceed 150K token budget before reaching implementation spawns. This is the 3rd confirmed instance.
-**Root cause**: Analysis agents return dense reports inline (or the router accumulates their outputs). By Phase 3, working context is saturated.
-**Mitigation**: Split EPIC pipelines at Phase boundary explicitly — Phase 1-2 (audit/analysis) in Session A, Phase 3+ (implementation) in fresh Session B. Use session-handoff skill to transfer state. Do NOT attempt all phases in a single session for EPIC+ complexity.
-**Status**: OPEN — no automated enforcement; requires manual discipline at pipeline design time.
-**Evidence**: session-gap-log.jsonl entry 2026-03-12T00:00:00Z, context: ecosystem-audit-epic
-
----
-
-## Missing TaskUpdate Summary — Threshold Crossed (P0 — 2026-03-13)
-
-**Issue**: `failure-recurrence.json` records `missing_task_summary` count = 9+ (tasks 7, 8, 9, 11 in the 2026-03-13 session batch are all fallback strings). This crosses the recommend-evolution threshold (5+ recurring failures of same class). The reflection-log.jsonl entries for these tasks show `memoryWrites: []` and zero learnings extracted.
-
-**Impact**: Reflection pipeline produces no learnings for approximately 30-40% of completed tasks. Audit trail is compromised for pipeline phases that hit context limits or complete without explicit `metadata.summary`.
-
-**Root Cause**: Agents under high context pressure complete tasks via `TaskUpdate(completed)` without populating `metadata.summary`. The `pre-completion-validation.cjs` hook fires a warning but does not block. The fallback string "Task N completed without summary metadata" is inserted by the hook or post-completion-chain.cjs.
-
-**Resolution Required**:
-
-1. Upgrade `pre-completion-validation.cjs` to hard-block `TaskUpdate(completed)` when `metadata.summary` is absent or is the fallback string (P0 — change to fail-closed for security hooks category)
-2. OR: Teach the hook to synthesize a summary from `metadata.filesModified + metadata.outputArtifacts` when summary is missing (graceful fallback)
-3. Consider evolution recommendation: `metadata-summary-enforcer` hook or updated `pre-completion-validation.cjs` enforcement mode
-
-**Priority**: P0 (9+ confirmed occurrences; crosses evolution trigger threshold)
-**Source**: reflection of tasks 7, 8, 9 (2026-03-13T01:16:12-13Z) — all fallback metadata
-
----
-
 ## 2026-03-12 — Structural Ecosystem Audit Findings
 
 - **CRITICAL: issues.md bloat** — was 441KB/4942 lines, 11x past threshold. Fixed 2026-03-12 (archived to issues-archive-2026-03-12.md). Fix: add rotation config to prevent recurrence.
 - **P1: CLAUDE.md agent count stale** — States "73 agents" but 74 exist. Fix: update line 172 to "74 agents".
 - **P1: shell-injection-validator.cjs** — Raw `JSON.parse` at line 427 before `safeParseJSON` at line 436. Prototype pollution window. Fix: remove raw parse, consolidate to single safeParseJSON.
 - **P1: step0-reflection-enforcer.cjs unregistered** — Hook exists at `.claude/hooks/session/step0-reflection-enforcer.cjs` but not in settings.json. UserPromptSubmit Step 0 injection path inactive. Fix: register or archive.
+
+---
+
+## Untracked Architectural Tooling — Commit Without Integration Queue (2026-03-13)
+
+**Type**: integration_gap (commit task)
+**Observed**: task-commit-untracked committed 9 files including `auto-ignore-scanner.cjs` (new CLI tool) and `patch-hook-exits.cjs` (maintenance script). Neither was queued in `integration-queue.jsonl` for artifact-integrator analysis. New CLI tools should be cataloged in `tool-catalog.md` and registered in `package.json` scripts.
+**Impact**: `auto-ignore-scanner.cjs` at `.claude/tools/cli/` is undiscoverable to agents unless integration queue is processed. `patch-hook-exits.cjs` at `scripts/maintenance/` needs to be documented in CHANGELOG if not already.
+**Status**: OPEN — integration-queue.jsonl should receive entries for these artifacts.
+**Evidence**: git show 2e0c7842, integration-queue.jsonl (no entry for auto-ignore-scanner), 2026-03-13T22:48Z
+
+---
+
+## Cleanup Finding — Temp Files, One-Off Scripts, and CLI Output Dumps (Systemic — 2026-03-13)
+
+**Type**: routing_failure + cleanup_finding (4 gap-log entries from this session)
+**Observed**: Router gap-log recorded 4 `cleanup_finding` entries during the MEGA EPIC session:
+
+1. Developer agents wrote temp test/debug files (`dump-test.cjs`, `test-out.txt`, `test_out.txt`, `test-errors*.log`) to project root instead of `.claude/context/tmp/`
+2. Developer agents captured CLI output to root-level files (`errors.json`, `eslint.json`, `lint-output.txt`, `clean_errors.txt`, `reduced_log_5.txt`, `temp_debug_log_5.txt`) for inspection then abandoned them
+3. Developer agents created one-off migration/utility scripts (`rename_agent.cjs`, `revert_rename.cjs`, `update_frequencies.cjs`, `update_skill_loops.cjs`, `update_skill_rigidity.cjs`) in project root and never committed or deleted them
+4. Multiple agents created rule files without running `pnpm index-rules` — rules visible in filesystem but orphaned from rule-index
+
+**Pattern Classification**: SYSTEMIC (3+ confirmed instances across multiple agents, multiple sessions). These are not one-off failures — they are a repeated behavioral gap in developer agent execution.
+**Root Cause**: Developer agent definition lacks explicit temp file placement rule. `cleanup-always.md` rule was added during this session (MEGA EPIC) but was not enforced prior to that. The rule-creator integration gap (missing `pnpm index-rules`) is a separate systemic gap in the creator skill workflow.
+**Resolution Required**:
+
+1. `cleanup-always.md` rule added 2026-03-13 — enforce at end of every developer task
+2. Rule-creator Step 4 must be a numbered gate with explicit count verification
+3. Router must include "end-of-task cleanup scan" in all developer spawn prompts
+   **Priority**: P1 (systemic — confirmed across multiple MEGA EPIC sub-sessions)
+   **Source**: session-gap-log.jsonl entries (2026-03-13)
 
 ---
 
@@ -97,6 +63,31 @@
 
 **Status**: Rule files exist but un-indexed. Remediation: run `pnpm index-rules` manually.
 
+---
+
+## Skill Registration Gap: browser-automation Catalog Missing (2026-03-13)
+
+**Issue**: `browser-automation` skill was created in task #15 (MEGA EPIC batch, 2026-03-13) and the prior reflection (task-completion-2026-03-13t20-07-19-386z) claimed "All registration checks passed." However, cross-validation against the canonical source confirms the skill is **NOT present** in `.claude/docs/skill-catalog.md`.
+
+- [ ] Catalog: MISSING — not found in `.claude/docs/skill-catalog.md`
+- [ ] Artifact graph: MISSING — integration queue entry has `not-in-graph` gap (P1 pending)
+- [x] Index: PRESENT — found in `.claude/config/skill-index.json`
+- [x] Agent assignment: PRESENT — `developer.md` and `qa.md` both list `browser-automation`
+
+**Root Cause**: The prior reflection's Step 4.7 catalog check produced a false positive. The grep pattern used may not have matched the actual catalog table format, or the catalog file was not checked at all.
+
+**Impact**: Skill is discoverable via index but NOT via catalog-driven workflows. Router and agents relying on the catalog cannot discover this skill.
+
+**Required Actions (P1)**:
+
+1. Run `artifact-integrator` on `skill:browser-automation` to add catalog entry and artifact graph node
+2. Review Step 4.7 implementation to ensure catalog grep uses exact match patterns consistent with the catalog table format
+3. Add a post-Step-4.7 validation: if grep returns 0 matches for skill name in catalog, flag as CATALOG_MISSING (never assume "no output = present")
+
+**Priority**: P1
+**Source**: reflection of task reflection-task-completion-2026-03-13t22-24-44-099z
+**Status**: Open — awaiting artifact-integrator processing
+
 Source: reflection of task_completion:2026-03-13T20:07:18.029Z (task #14)
 
 ---
@@ -118,6 +109,33 @@ Source: reflection of task_completion:2026-03-13T20:07:18.029Z (task #14)
 **Resolution**: Continue EPIC implementation in a fresh session. Reference report at `.claude/context/reports/` for P1/P2 finding details.
 
 **Prevention rule**: For EPIC pipelines with 3+ analysis phases, plan an explicit session boundary between analysis and implementation in the pipeline plan document. Document this as a pipeline design constraint.
+
+## Developer Agent Workspace Hygiene — Systemic Slop Pattern (2026-03-13)
+
+**Issue**: Developer agent repeatedly creates temp files, debug output, and one-off migration scripts in the project root and does not clean them up. Confirmed in multiple 2026-03 sessions via gap-log `cleanup_finding` entries (agent=developer, agent=multiple).
+
+**Confirmed file categories from 2026-03-13 session:**
+
+1. **Temp/debug scripts**: `dump-test.cjs`, `test-out.txt`, `test_out.txt`, `test-errors*.log`, `framework-test.log`
+2. **CLI output captures**: `errors.json`, `eslint.json`, `lint-output.txt`, `clean_errors.txt`, `reduced_log_5.txt`, `temp_debug_log_5.txt`, `f1326443-clean.txt`
+3. **One-off migration scripts**: `rename_agent.cjs`, `revert_rename.cjs`, `update_frequencies.cjs`, `update_skill_loops.cjs`, `update_skill_rigidity.cjs`
+
+**Root Cause**: The `cleanup-always.md` rule exists (`.claude/rules/cleanup-always.md`) but is not consistently applied by the developer agent. The rule defines correct locations (`.claude/context/tmp/` for temp, `scripts/maintenance/` for reusable scripts) but enforcement is missing.
+
+**Pattern**: Developer skips the end-of-task cleanup scan (Step 1 in `cleanup-always.md`) even when the rule is injected into the session context.
+
+**Impact**: Workspace accumulates untracked files. User must manually confront the router. QA must detect (ADR-2026-03-13-067). Files remain until user asks — no self-healing.
+
+**Required Fixes (P1)**:
+
+1. Developer agent prompt must include explicit cleanup scan command at end of every task
+2. Pre-completion-validation.cjs should flag untracked root-level files as a soft block
+3. A post-completion hook that runs `git status -s | grep "^?? "` and logs any root-level untracked files to gap-log would enable proactive detection
+
+**Status**: OPEN — systemic, 3+ confirmed sessions, no automated enforcement exists
+**Source**: session-gap-log.jsonl entries 1-3, 2026-03-13; ADR-2026-03-13-067 covers QA side
+
+---
 
 - [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-12T20:59:41.332Z
 

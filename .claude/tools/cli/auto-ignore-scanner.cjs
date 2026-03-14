@@ -16,16 +16,48 @@ const SIZE_THRESHOLD_BYTES = TOKEN_THRESHOLD * CHARS_PER_TOKEN; // 320,000 bytes
 
 // Extensions to scan exclusively
 const TEXT_EXTENSIONS = new Set([
-  '.js', '.cjs', '.mjs', '.ts', '.mts', '.cts', '.jsx', '.tsx',
-  '.json', '.yaml', '.yml', '.md', '.mdx', '.css', '.html', '.htm',
-  '.py', '.sh', '.bash', '.txt', '.csv', '.sql', '.xml', '.log',
-  '.rst', '.ini', '.toml', '.lock'
+  '.js',
+  '.cjs',
+  '.mjs',
+  '.ts',
+  '.mts',
+  '.cts',
+  '.jsx',
+  '.tsx',
+  '.json',
+  '.yaml',
+  '.yml',
+  '.md',
+  '.mdx',
+  '.css',
+  '.html',
+  '.htm',
+  '.py',
+  '.sh',
+  '.bash',
+  '.txt',
+  '.csv',
+  '.sql',
+  '.xml',
+  '.log',
+  '.rst',
+  '.ini',
+  '.toml',
+  '.lock',
 ]);
 
 // Directories to aggressively skip
 const SKIP_DIRS = new Set([
-  'node_modules', '.git', 'dist', 'build', '.next', 'coverage',
-  '.tmp', '.cache', 'vendor', '__pycache__'
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  '.next',
+  'coverage',
+  '.tmp',
+  '.cache',
+  'vendor',
+  '__pycache__',
 ]);
 
 const args = process.argv.slice(2);
@@ -34,7 +66,9 @@ const positionalArgs = args.filter(a => !a.startsWith('--'));
 const targetDir = positionalArgs[0] ? path.resolve(positionalArgs[0]) : process.cwd();
 
 console.log(`\n🔍 Auto-Ignore Scanner: Analyzing ${targetDir}`);
-process.stderr.write(`   Threshold: >${TOKEN_THRESHOLD} tokens (~${(SIZE_THRESHOLD_BYTES / 1024).toFixed(0)}KB)`);
+process.stderr.write(
+  `   Threshold: >${TOKEN_THRESHOLD} tokens (~${(SIZE_THRESHOLD_BYTES / 1024).toFixed(0)}KB)`
+);
 
 if (!fs.existsSync(targetDir)) {
   console.error(`❌ Target directory does not exist: ${targetDir}`);
@@ -57,7 +91,7 @@ function walk(dir, depth) {
 
   for (const entry of entries) {
     if (SKIP_DIRS.has(entry.name) || entry.name.startsWith('.')) {
-      // Also aggressively skip hidden directories (e.g. .claude/context/, .venv) 
+      // Also aggressively skip hidden directories (e.g. .claude/context/, .venv)
       // except if it's the root directory itself.
       if (entry.isDirectory()) continue;
     }
@@ -68,7 +102,7 @@ function walk(dir, depth) {
       walk(fullPath, depth + 1);
     } else if (entry.isFile()) {
       const ext = path.extname(entry.name).toLowerCase();
-      
+
       // We only care about text-based files that would bloat context.
       // Binary files are already excluded from context natively by the LLM runner.
       if (!TEXT_EXTENSIONS.has(ext)) continue;
@@ -123,7 +157,7 @@ if (fs.existsSync(ignorePath)) {
 }
 
 const IGNORE_HEADER_START = '# --- AUTO-IGNORE: MASSIVE FILES START ---';
-const IGNORE_HEADER_END   = '# --- AUTO-IGNORE: MASSIVE FILES END ---';
+const IGNORE_HEADER_END = '# --- AUTO-IGNORE: MASSIVE FILES END ---';
 
 // Clean out previous block if it exists
 let newContent = existingContent;
@@ -146,5 +180,7 @@ newContent += appendBlock;
 
 fs.writeFileSync(ignorePath, newContent.trim() + '\n', 'utf8');
 
-console.log(`\n💾 Successfully wrote ${massiveFiles.length} exclusion rules to ${path.relative(process.cwd(), ignorePath) || '.claudeignore'}`);
+console.log(
+  `\n💾 Successfully wrote ${massiveFiles.length} exclusion rules to ${path.relative(process.cwd(), ignorePath) || '.claudeignore'}`
+);
 process.exit(0);

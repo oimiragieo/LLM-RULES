@@ -22,30 +22,30 @@ Structural code graph queries using the CodeGraphContext MCP server (tree-sitter
 
 ## When to Use vs Other Search Tools
 
-| Need | Tool |
-|------|------|
-| Who calls `foo()`? | `find_callers` (this skill) |
-| What does `foo()` call? | `find_callees` (this skill) |
+| Need                                     | Tool                               |
+| ---------------------------------------- | ---------------------------------- |
+| Who calls `foo()`?                       | `find_callers` (this skill)        |
+| What does `foo()` call?                  | `find_callees` (this skill)        |
 | Class hierarchy / interface implementors | `get_class_hierarchy` (this skill) |
-| Dead code / unreachable functions | `find_dead_code` (this skill) |
-| Module-level import graph | `get_module_deps` (this skill) |
-| Keyword / regex search | `pnpm search:code` or ripgrep |
-| Semantic / conceptual search | `code-semantic-search` skill |
-| AST shape matching | `code-structural-search` skill |
-| Compiler-verified definition/references | `lsp-navigator` skill |
+| Dead code / unreachable functions        | `find_dead_code` (this skill)      |
+| Module-level import graph                | `get_module_deps` (this skill)     |
+| Keyword / regex search                   | `pnpm search:code` or ripgrep      |
+| Semantic / conceptual search             | `code-semantic-search` skill       |
+| AST shape matching                       | `code-structural-search` skill     |
+| Compiler-verified definition/references  | `lsp-navigator` skill              |
 
 Use this skill when you need **relationship traversal** across the call graph or import graph, not text matching.
 
 ## MCP Tool Reference
 
-| Tool | Purpose | Key Parameters |
-|------|---------|----------------|
-| `find_callers` | All functions/methods that call a symbol | `symbol`, `file?`, `depth?` |
-| `find_callees` | All symbols called by a function | `symbol`, `file?`, `depth?` |
-| `get_class_hierarchy` | Superclasses, subclasses, interfaces | `class_name`, `direction?` |
-| `find_dead_code` | Functions with no callers in graph | `scope?`, `min_confidence?` |
-| `get_module_deps` | Import/require dependency graph | `module`, `direction?`, `depth?` |
-| `query_graph` | Raw Cypher query against KuzuDB | `cypher`, `params?` |
+| Tool                  | Purpose                                  | Key Parameters                   |
+| --------------------- | ---------------------------------------- | -------------------------------- |
+| `find_callers`        | All functions/methods that call a symbol | `symbol`, `file?`, `depth?`      |
+| `find_callees`        | All symbols called by a function         | `symbol`, `file?`, `depth?`      |
+| `get_class_hierarchy` | Superclasses, subclasses, interfaces     | `class_name`, `direction?`       |
+| `find_dead_code`      | Functions with no callers in graph       | `scope?`, `min_confidence?`      |
+| `get_module_deps`     | Import/require dependency graph          | `module`, `direction?`, `depth?` |
+| `query_graph`         | Raw Cypher query against KuzuDB          | `cypher`, `params?`              |
 
 ## Setup
 
@@ -70,19 +70,19 @@ Add to `.claude/settings.json` under `mcpServers`:
 
 ```javascript
 // 1. Find all callers of a function
-mcp__CodeGraphContext__find_callers({ symbol: "shouldUseWorktree", depth: 2 })
+mcp__CodeGraphContext__find_callers({ symbol: 'shouldUseWorktree', depth: 2 });
 
 // 2. Trace what a function depends on
-mcp__CodeGraphContext__find_callees({ symbol: "routeRequest", file: "routing-table.cjs" })
+mcp__CodeGraphContext__find_callees({ symbol: 'routeRequest', file: 'routing-table.cjs' });
 
 // 3. Dead code candidates (low confidence = more results)
-mcp__CodeGraphContext__find_dead_code({ scope: "src/", min_confidence: 0.8 })
+mcp__CodeGraphContext__find_dead_code({ scope: 'src/', min_confidence: 0.8 });
 
 // 4. Raw Cypher for custom traversal
 mcp__CodeGraphContext__query_graph({
-  cypher: "MATCH (a:Function)-[:CALLS]->(b:Function) WHERE b.name = $name RETURN a",
-  params: { name: "handleAuth" }
-})
+  cypher: 'MATCH (a:Function)-[:CALLS]->(b:Function) WHERE b.name = $name RETURN a',
+  params: { name: 'handleAuth' },
+});
 ```
 
 ## Integration with Agent-Studio Memory
@@ -90,8 +90,16 @@ mcp__CodeGraphContext__query_graph({
 After graph analysis, record structural findings:
 
 ```javascript
-MemoryRecord({ type: "pattern", content: "routeRequest has 12 callers — high-risk refactor target", area: "architecture" })
-MemoryRecord({ type: "gotcha", content: "worktree-utils dead code: shouldPruneWorktree() never called", area: "cleanup" })
+MemoryRecord({
+  type: 'pattern',
+  content: 'routeRequest has 12 callers — high-risk refactor target',
+  area: 'architecture',
+});
+MemoryRecord({
+  type: 'gotcha',
+  content: 'worktree-utils dead code: shouldPruneWorktree() never called',
+  area: 'cleanup',
+});
 ```
 
 ## Anti-Patterns
@@ -104,7 +112,7 @@ MemoryRecord({ type: "gotcha", content: "worktree-utils dead code: shouldPruneWo
 ## When to Invoke
 
 ```javascript
-Skill({ skill: 'code-graph-context' })
+Skill({ skill: 'code-graph-context' });
 ```
 
 Invoke for: impact analysis before refactoring, call chain debugging, dead code audits, module dependency reviews, and architectural dependency mapping.

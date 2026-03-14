@@ -1,284 +1,30 @@
 ---
 name: diagram-generator
-description: Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system architecture, database schemas, component relationships, and data flows.
-version: 1.2.0
+description: Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system architecture, database schemas, component relationships, data flows, and standalone HTML exports.
+version: 1.3.0
 model: sonnet
 invoked_by: both
 user_invocable: true
 tools: [Read, Write, Glob, Grep]
 best_practices:
-  - Use Mermaid syntax for diagrams
+  - Use Mermaid syntax for all diagrams
   - Extract structure from code and documentation
-  - Create clear, readable diagrams
-  - Include relationships and dependencies
+  - Keep diagrams under 200 nodes
   - Generate both high-level and detailed views
 error_handling: graceful
 streaming: supported
 templates: [architecture-diagram, database-diagram, component-diagram, sequence-diagram]
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: 2026-03-13T00:00:00.000Z
 ---
 
-**References (archive):** [SCAFFOLD_SKILLS_ARCHIVE_MAP.md](../../docs/SCAFFOLD_SKILLS_ARCHIVE_MAP.md) — Mermaid/output patterns from claude-flow code-intelligence, everything-claude-code architect.
-
 <identity>
-Diagram Generator Skill - Generates architecture, database, and system diagrams using Mermaid syntax to visualize system structure, relationships, and flows.
+Diagram Generator — creates Mermaid diagrams and standalone HTML exports for architecture, schemas, flows, and all supported diagram types.
 </identity>
 
-<capabilities>
-- Creating architecture diagrams
-- Documenting database schemas
-- Visualizing component relationships
-- Documenting data flows
-- Creating sequence diagrams
-- Generating system overviews
-</capabilities>
+## Diagram Types
 
-## Processing Limits (Memory Safeguard)
-
-Diagram generator can analyze large codebases. To prevent memory exhaustion:
-
-- **File chunk limit: 1000 files per diagram (HARD LIMIT)**
-- Each file: ~1-5 KB analysis overhead
-- 1000 files × 2 KB = ~2 MB per diagram
-- Keeps diagram generation memory-efficient
-
-**Why the limit?**
-
-- Analyzing 5000+ files → 10+ MB memory → context explosion
-- Diagrams for 5000+ files → impossible to visualize
-- Visual limit: ~100-200 nodes per diagram (human readable)
-
-**Recommend:**
-
-- 1000 files: OK, generates ~100-150 component nodes
-- 2000 files: Consider splitting into 2 diagrams
-- 5000+ files: MUST split into 5+ diagrams by module/subsystem
-
-<instructions>
-<execution_process>
-
-### Step 1: Identify Diagram Type
-
-Determine what type of diagram is needed:
-
-- **Architecture Diagram**: System structure and components
-- **Database Diagram**: Schema and relationships
-- **Component Diagram**: Component interactions
-- **Sequence Diagram**: Process flows
-- **Flowchart**: Decision flows
-
-### Step 2: Extract Structure
-
-Analyze code and documentation (Use Parallel Read/Grep/Glob):
-
-- Read architecture documents
-- Analyze component structure
-- Extract database schema
-- Identify relationships
-- Understand data flows
-
-### Chunking Large Codebases
-
-If codebase has >1000 files:
-
-**Option 1: Split by subsystem**
-
-```javascript
-// Generate diagram for each major subsystem
-generateDiagram({ files: 'src/auth/**', title: 'Authentication Module' });
-generateDiagram({ files: 'src/api/**', title: 'API Module' });
-generateDiagram({ files: 'src/ui/**', title: 'UI Module' });
-```
-
-**Option 2: Split by layer**
-
-```javascript
-generateDiagram({ files: 'src/models/**', title: 'Data Models' });
-generateDiagram({ files: 'src/services/**', title: 'Business Logic' });
-generateDiagram({ files: 'src/controllers/**', title: 'API Controllers' });
-```
-
-**Option 3: Generate overview first, then details**
-
-```javascript
-// 1. High-level architecture (10-20 files)
-generateDiagram({ files: ["src/index.ts", "src/app.ts", ...], title: "Architecture" });
-// 2. Detailed subsystems (500-1000 files each)
-generateDiagram({ files: "src/auth/**", title: "Authentication Details" });
-```
-
-### Step 3: Generate Mermaid Diagram
-
-Create diagram using Mermaid syntax:
-
-- Use appropriate diagram type
-- Define nodes and relationships
-- Add labels and descriptions
-- Include styling if needed
-
-### Step 4: Embed in Documentation
-
-Embed diagram in markdown:
-
-- Use mermaid code blocks
-- Add diagram description
-- Reference in documentation
-
-### Timeout Management
-
-- Default timeout: 30 seconds per diagram
-- 1000 files analysis: ~20 seconds (OK)
-- 2000 files analysis: ~40 seconds (EXCEEDS TIMEOUT)
-- If approaching timeout: Reduce file count or increase timeout
-
-**Pattern for large codebases:**
-
-- Split into 6-8 focused diagrams
-- Each <1000 files, <30 seconds
-- Total analysis time: 3-4 minutes
-
-</execution_process>
-
-<integration>
-**Integration with Architect Agent**:
-- Generates architecture diagrams
-- Documents system structure
-- Visualizes component relationships
-
-**Integration with Database Architect Agent**:
-
-- Generates database schema diagrams
-- Documents table relationships
-- Visualizes data models
-
-**Integration with Technical Writer Agent**:
-
-- Embeds diagrams in documentation
-- Creates visual documentation
-- Enhances documentation clarity
-  </integration>
-
-<best_practices>
-
-1. **Use Mermaid**: Standard syntax for compatibility
-2. **Keep Clear**: Simple, readable diagrams
-3. **Show Relationships**: Include all important connections
-4. **Add Labels**: Clear node and edge labels
-5. **Update Regularly**: Keep diagrams current with code
-   </best_practices>
-   </instructions>
-
-<examples>
-<code_example>
-**Architecture Diagram**
-
-```mermaid
-graph TB
-    Client[Client Application]
-    API[API Gateway]
-    Auth[Auth Service]
-    User[User Service]
-    DB[(Database)]
-
-    Client --> API
-    API --> Auth
-    API --> User
-    User --> DB
-    Auth --> DB
-```
-
-</code_example>
-
-<code_example>
-**Database Schema Diagram**
-
-```mermaid
-erDiagram
-    USERS ||--o{ ORDERS : places
-    USERS {
-        uuid id PK
-        string email
-        string name
-    }
-    ORDERS ||--|{ ORDER_ITEMS : contains
-    ORDERS {
-        uuid id PK
-        uuid user_id FK
-        date created_at
-    }
-    ORDER_ITEMS {
-        uuid id PK
-        uuid order_id FK
-        uuid product_id FK
-        int quantity
-    }
-```
-
-</code_example>
-
-<code_example>
-**Component Diagram**
-
-```mermaid
-graph LR
-    A[Component A] --> B[Component B]
-    A --> C[Component C]
-    B --> D[Component D]
-    C --> D
-```
-
-</code_example>
-
-<code_example>
-**Sequence Diagram**
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant API
-    participant Auth
-    participant DB
-
-    User->>API: Login Request
-    API->>Auth: Validate Credentials
-    Auth->>DB: Query User
-    DB-->>Auth: User Data
-    Auth-->>API: JWT Token
-    API-->>User: Auth Response
-```
-
-</code_example>
-</examples>
-
-<examples>
-<usage_example>
-**Example Commands**:
-
-```bash
-# Generate architecture diagram
-node .claude/tools/diagram-generator/scripts/generate.mjs --type architecture "authentication system"
-
-# Generate database schema diagram
-node .claude/tools/diagram-generator/scripts/generate.mjs --type database "user management module"
-
-# Generate component diagram
-node .claude/tools/diagram-generator/scripts/generate.mjs --type component "API service relationships"
-
-# Generate sequence diagram
-node .claude/tools/diagram-generator/scripts/generate.mjs --type sequence "user login flow"
-```
-
-</usage_example>
-</examples>
-
-## Interactive HTML Output
-
-For enhanced visualization, generate self-contained HTML files with interactive Mermaid rendering:
-
-### Supported Diagram Types (9 total)
-
-| Type      | Mermaid Keyword   | Best For                    |
+| Type      | Keyword           | Best For                    |
 | --------- | ----------------- | --------------------------- |
 | Flowchart | `flowchart TB/LR` | Decision flows, processes   |
 | Sequence  | `sequenceDiagram` | API interactions, protocols |
@@ -287,83 +33,72 @@ For enhanced visualization, generate self-contained HTML files with interactive 
 | ER        | `erDiagram`       | Database schemas            |
 | Gantt     | `gantt`           | Project timelines           |
 | Pie       | `pie`             | Distribution, composition   |
-| Git Graph | `gitGraph`        | Branch strategies           |
-| Mindmap   | `mindmap`         | Brainstorming, hierarchy    |
+| Mindmap   | `mindmap`         | Hierarchical mind maps      |
+| Timeline  | `timeline`        | Chronological events        |
+| Git Graph | `gitGraph`        | Branch visualization        |
+| Kanban    | `kanban`          | Task boards                 |
+| Quadrant  | `quadrantChart`   | 2x2 matrix                  |
 
-### HTML Output Pattern
+## Processing Limits
 
-When user requests interactive/standalone diagrams, generate a self-contained HTML file:
+- **File chunk limit: 1000 files per diagram (HARD LIMIT)**
+- Visual limit: ~200 nodes max per diagram
+- Large codebases: split by subsystem/layer; generate overview first then details
+
+## Standalone HTML Output Mode
+
+**Trigger phrases:** "export as HTML", "standalone diagram", "interactive diagram"
+
+Generate a self-contained HTML file with embedded Mermaid.js CDN, dark/light toggle button, and responsive CSS (max-width: 1200px):
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>DIAGRAM_TITLE</title>
+    <title>TITLE</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
-      mermaid.initialize({
-        startOnLoad: true,
-        theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
-        securityLevel: 'loose',
-      });
+      mermaid.initialize({ startOnLoad: true, theme: 'dark' });
     </script>
     <style>
       body {
         font-family: system-ui;
-        margin: 2rem;
-      }
-      @media (prefers-color-scheme: dark) {
-        body {
-          background: #1a1a2e;
-          color: #e0e0e0;
-        }
+        max-width: 1200px;
+        margin: 2rem auto;
+        background: #1e1e2e;
+        color: #cdd6f4;
       }
     </style>
   </head>
   <body>
-    <h1>DIAGRAM_TITLE</h1>
-    <div class="mermaid">MERMAID_CONTENT_HERE</div>
+    <h1>TITLE</h1>
+    <button
+      onclick="let d=!d;mermaid.initialize({startOnLoad:false,theme:d?'dark':'default'});document.querySelector('.mermaid').removeAttribute('data-processed');mermaid.run()"
+    >
+      Toggle Theme
+    </button>
+    <div class="mermaid">MERMAID_CONTENT</div>
   </body>
 </html>
 ```
 
-### Dark Mode Support
+**Default:** dark mode (`background: #1e1e2e`, `color: #cdd6f4`)
+**Output:** `.claude/context/artifacts/diagrams/{subject}-{YYYY-MM-DD}.html`
 
-All generated HTML diagrams automatically detect system dark mode preference via `prefers-color-scheme` media query and switch between Mermaid's `default` and `dark` themes.
+## Output Location
 
-### Output Location for HTML Diagrams
-
-- HTML diagrams: `.claude/context/artifacts/diagrams/{subject}-{type}-{YYYY-MM-DD}.html`
-- Standard Mermaid: `.claude/context/artifacts/diagrams/{subject}-{type}-{YYYY-MM-DD}.mmd`
+- Mermaid files: `.claude/context/artifacts/diagrams/{subject}-{type}-{YYYY-MM-DD}.mmd`
+- HTML files: `.claude/context/artifacts/diagrams/{subject}-{YYYY-MM-DD}.html`
 
 ## Iron Laws
 
-1. **ALWAYS** use Mermaid syntax for all generated diagrams — never produce free-form ASCII art or PlantUML; only Mermaid is portable and version-controllable.
-2. **NEVER** exceed 200 nodes in a single diagram — beyond that threshold the diagram becomes cognitively unreadable; split large systems into multiple focused diagrams by subsystem.
-3. **ALWAYS** enforce the 1000-file hard limit per diagram generation run — analyzing more files without chunking causes context explosion and memory exhaustion.
-4. **NEVER** write diagram files to project root or arbitrary locations — all diagrams go to `.claude/context/artifacts/diagrams/` with the naming convention `{subject}-{type}-{YYYY-MM-DD}.mmd`.
-5. **ALWAYS** label connections that are not self-evidently directional — an unlabeled arrow between two ambiguously-named nodes is indistinguishable from any other relationship.
+1. Mermaid syntax only — no ASCII art or PlantUML.
+2. Never exceed 200 nodes per diagram.
+3. Never write diagrams outside `.claude/context/artifacts/diagrams/`.
+4. Label all non-obvious connections.
+5. Enforce 1000-file hard limit — chunk large codebases.
 
-## Anti-Patterns
+## When to invoke
 
-| Anti-Pattern                                      | Why It Fails                                                                 | Correct Approach                                                                |
-| ------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Generating a single diagram for 500+ node systems | Unreadable; cognitive overload; renders as noise                             | Split by subsystem: overview diagram (10-20 nodes) + detail diagrams per module |
-| Using free-form ASCII art instead of Mermaid      | Not renderable in standard tools; not version-diffable                       | Use Mermaid syntax exclusively; all tools that render code docs support it      |
-| Analyzing all files without chunking              | >1000 files causes context explosion and timeouts                            | Enforce 1000-file hard limit; spawn multiple diagram tasks for large codebases  |
-| Writing diagrams to arbitrary paths               | Diagrams become unfindable; no catalog integration                           | Always write to `.claude/context/artifacts/diagrams/{subdir}/`                  |
-| Defaulting to `graph TB` for every diagram type   | Wrong layout for sequence/ER/class content; forces readers to mentally remap | Use the Diagram Type Selection Matrix to pick the correct type for the content  |
-
-## Memory Protocol (MANDATORY)
-
-**Before starting:**
-Read `.claude/context/memory/learnings.md`
-
-**After completing:**
-
-- New pattern -> `.claude/context/memory/learnings.md`
-- Issue found -> `.claude/context/memory/issues.md`
-- Decision made -> `.claude/context/memory/decisions.md`
-
-> ASSUME INTERRUPTION: If it's not in memory, it didn't happen.
+`Skill({ skill: 'diagram-generator' })` for architecture diagrams, HTML exports, mindmaps, timelines, git visualizations, kanban boards, and quadrant charts.

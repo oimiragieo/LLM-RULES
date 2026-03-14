@@ -27,7 +27,6 @@ const AGENTS = ['developer', 'researcher', 'architect', 'security-architect', 'q
 
 function runSpawn(agentType, allowedTools) {
   return cp.spawnSync(process.execPath, [SPAWN_HOOK], {
-    shell: false,
     input: JSON.stringify({
       session_id: `spawn-required-tools-${agentType}`,
       tool_name: 'Task',

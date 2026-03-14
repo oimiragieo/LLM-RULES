@@ -73,13 +73,13 @@ stopword removal, NER. MinHash LSH for near-duplicates. Batch via `nlp.pipe()` w
 
 ### Model Selection
 
-| Task | Recommended | Rule |
-|------|-------------|------|
-| Classification | `distilbert`, `roberta-base` | BERT encoder, ≤512 tokens |
-| NER | `dslim/bert-base-NER`, spaCy `en_core_web_trf` | spaCy in production |
-| Sentiment | `cardiffnlp/twitter-roberta-base-sentiment` | Domain-specific preferred |
-| Embeddings | `all-MiniLM-L6-v2` (speed), `all-mpnet-base-v2` (accuracy) | Normalize=True |
-| Generation | `mistralai/Mistral-7B-Instruct-v0.2` | QLoRA for GPU efficiency |
+| Task           | Recommended                                                | Rule                      |
+| -------------- | ---------------------------------------------------------- | ------------------------- |
+| Classification | `distilbert`, `roberta-base`                               | BERT encoder, ≤512 tokens |
+| NER            | `dslim/bert-base-NER`, spaCy `en_core_web_trf`             | spaCy in production       |
+| Sentiment      | `cardiffnlp/twitter-roberta-base-sentiment`                | Domain-specific preferred |
+| Embeddings     | `all-MiniLM-L6-v2` (speed), `all-mpnet-base-v2` (accuracy) | Normalize=True            |
+| Generation     | `mistralai/Mistral-7B-Instruct-v0.2`                       | QLoRA for GPU efficiency  |
 
 Semantic similarity at scale → bi-encoder. High-accuracy reranking → cross-encoder second stage.
 
@@ -107,12 +107,12 @@ reranker (`cross-encoder/ms-marco-MiniLM-L-6-v2`) as third stage.
 
 ### Evaluation Metrics
 
-| Task | Primary | Secondary |
-|------|---------|-----------|
-| Classification | F1 macro/weighted | ROC-AUC |
-| NER | F1 entity-level | Per-type F1 |
-| Summarization | ROUGE-L | BERTScore |
-| RAG | RAGAS faithfulness | Answer relevancy |
+| Task           | Primary            | Secondary        |
+| -------------- | ------------------ | ---------------- |
+| Classification | F1 macro/weighted  | ROC-AUC          |
+| NER            | F1 entity-level    | Per-type F1      |
+| Summarization  | ROUGE-L            | BERTScore        |
+| RAG            | RAGAS faithfulness | Answer relevancy |
 
 Use `sklearn.metrics.classification_report`, HuggingFace `evaluate`, `ragas`.
 
@@ -162,8 +162,13 @@ After work: append to `.claude/context/memory/learnings.md` and `decisions.md`.
 
 ```javascript
 TaskUpdate({ taskId: 'N', status: 'in_progress', owner: 'nlp-engineer' });
-TaskUpdate({ taskId: 'N', status: 'completed', metadata: {
-  summary: 'NLP pipeline: F1=0.91', filesModified: ['src/nlp/classifier.py'],
-  worktreePath: process.env.AGENT_WORKTREE_PATH || process.cwd(),
-}});
+TaskUpdate({
+  taskId: 'N',
+  status: 'completed',
+  metadata: {
+    summary: 'NLP pipeline: F1=0.91',
+    filesModified: ['src/nlp/classifier.py'],
+    worktreePath: process.env.AGENT_WORKTREE_PATH || process.cwd(),
+  },
+});
 ```

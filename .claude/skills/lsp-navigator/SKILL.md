@@ -549,20 +549,20 @@ Read `.claude/context/memory/learnings.md`
 
 ## Language Server Quick Reference
 
-| Language   | Server                       | Install                                        |
-| ---------- | ---------------------------- | ---------------------------------------------- |
-| C/C++      | `clangd`                     | `apt install clangd` / `brew install llvm`     |
-| Go         | `gopls`                      | `go install golang.org/x/tools/gopls@latest`   |
-| Python     | `pyright`                    | `npm i -g pyright`                             |
-| Rust       | `rust-analyzer`              | `rustup component add rust-analyzer`           |
-| Java       | `jdtls`                      | `brew install jdtls` / Eclipse JDT LS release  |
-| TS/JS      | `typescript-language-server` | `npm i -g typescript-language-server`          |
-| Lua        | `lua-language-server`        | `brew install lua-language-server`             |
-| Bash       | `bashls`                     | `npm i -g bash-language-server`                |
-| JSON       | `jsonls`                     | `npm i -g vscode-langservers-extracted`        |
-| YAML       | `yamlls`                     | `npm i -g yaml-language-server`                |
-| TOML       | `taplo`                      | `cargo install taplo-cli`                      |
-| Markdown   | `marksman`                   | `brew install marksman` / GitHub releases      |
+| Language | Server                       | Install                                       |
+| -------- | ---------------------------- | --------------------------------------------- |
+| C/C++    | `clangd`                     | `apt install clangd` / `brew install llvm`    |
+| Go       | `gopls`                      | `go install golang.org/x/tools/gopls@latest`  |
+| Python   | `pyright`                    | `npm i -g pyright`                            |
+| Rust     | `rust-analyzer`              | `rustup component add rust-analyzer`          |
+| Java     | `jdtls`                      | `brew install jdtls` / Eclipse JDT LS release |
+| TS/JS    | `typescript-language-server` | `npm i -g typescript-language-server`         |
+| Lua      | `lua-language-server`        | `brew install lua-language-server`            |
+| Bash     | `bashls`                     | `npm i -g bash-language-server`               |
+| JSON     | `jsonls`                     | `npm i -g vscode-langservers-extracted`       |
+| YAML     | `yamlls`                     | `npm i -g yaml-language-server`               |
+| TOML     | `taplo`                      | `cargo install taplo-cli`                     |
+| Markdown | `marksman`                   | `brew install marksman` / GitHub releases     |
 
 **Note**: Claude Code activates these automatically when installed — no manual start required.
 LSP for `.cjs` files remains unreliable; use ripgrep as primary for CommonJS files.

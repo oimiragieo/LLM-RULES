@@ -26,8 +26,9 @@ for (const file of files) {
   let changed = false;
 
   // 1. Normal console.log(formatResult(...)) \\n process.exit(2)
-  const regex = /(console\.log\s*\(\s*(?:formatResult|JSON\.stringify)\s*\([^;]+;\s*(?:return;\s*)?)(?:await\s+[a-zA-Z0-9_\(,\)\s]+;\s*)?process\.exit\(\s*2\s*\)/g;
-  
+  const regex =
+    /(console\.log\s*\(\s*(?:formatResult|JSON\.stringify)\s*\([^;]+;\s*(?:return;\s*)?)(?:await\s+[a-zA-Z0-9_\(,\)\s]+;\s*)?process\.exit\(\s*2\s*\)/g;
+
   content = content.replace(regex, (match, p1) => {
     changed = true;
     return match.replace(/process\.exit\(\s*2\s*\)/, 'process.exit(0)');
@@ -54,9 +55,10 @@ for (const file of files) {
       changed = true;
     }
   }
-  
+
   // 3. Fix external-content-guard.cjs which uses console.log(JSON.stringify({allow:false, ...})); process.exit(2);
-  const jsonExitRegex = /(console\.log\s*\(\s*JSON\.stringify\s*\(\{[\s\S]*?\}\)\s*\);\s*)process\.exit\(2\)/g;
+  const jsonExitRegex =
+    /(console\.log\s*\(\s*JSON\.stringify\s*\(\{[\s\S]*?\}\)\s*\);\s*)process\.exit\(2\)/g;
   content = content.replace(jsonExitRegex, (match, p1) => {
     changed = true;
     return p1 + 'process.exit(0)';

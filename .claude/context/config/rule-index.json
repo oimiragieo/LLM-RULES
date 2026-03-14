@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-03-13T22:19:33.231Z",
+  "generated_at": "2026-03-14T00:46:39.823Z",
   "prebuilt": false,
   "total_rules": 126,
   "master_rules": 126,
@@ -188,7 +188,7 @@
       "priority": "",
       "technologies": ["jest", "rails", "vitest"],
       "type": "master",
-      "size": 3452,
+      "size": 3467,
       "line_count": 82
     },
     {
@@ -419,8 +419,8 @@
       "priority": "",
       "technologies": ["go"],
       "type": "master",
-      "size": 2352,
-      "line_count": 70
+      "size": 2673,
+      "line_count": 72
     },
     {
       "path": ".claude/rules/dry-principle.md",

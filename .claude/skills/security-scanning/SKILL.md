@@ -20,13 +20,13 @@ Automated security scanning pipeline: SAST, SCA, SBOM, and secrets detection.
 
 ## Tools
 
-| Tool | Purpose | Install |
-|------|---------|---------|
-| Semgrep | SAST — static analysis | `pip install semgrep` |
-| OWASP dependency-check | SCA — known CVEs in deps | `brew install dependency-check` |
-| Syft | SBOM generation | `brew install anchore/syft/syft` |
-| Grype | Vulnerability scanner (uses SBOM) | `brew install anchore/grype/grype` |
-| detect-secrets | Secrets detection | `pip install detect-secrets` |
+| Tool                   | Purpose                           | Install                            |
+| ---------------------- | --------------------------------- | ---------------------------------- |
+| Semgrep                | SAST — static analysis            | `pip install semgrep`              |
+| OWASP dependency-check | SCA — known CVEs in deps          | `brew install dependency-check`    |
+| Syft                   | SBOM generation                   | `brew install anchore/syft/syft`   |
+| Grype                  | Vulnerability scanner (uses SBOM) | `brew install anchore/grype/grype` |
+| detect-secrets         | Secrets detection                 | `pip install detect-secrets`       |
 
 ## Phase 1: SAST — Static Analysis (Semgrep)
 
@@ -211,12 +211,14 @@ LOW/INFO findings:
 ## Suppression Patterns
 
 **Semgrep (inline):**
+
 ```python
 # nosemgrep: python.lang.security.audit.hardcoded-password.hardcoded-password
 PASSWORD = os.environ["PASSWORD"]
 ```
 
 **detect-secrets (.secrets.baseline):**
+
 ```bash
 # Mark as false positive during audit
 detect-secrets audit .secrets.baseline
@@ -224,10 +226,11 @@ detect-secrets audit .secrets.baseline
 ```
 
 **Grype (grype.yaml):**
+
 ```yaml
 ignore:
   - vulnerability: CVE-2021-44228
-    reason: "Not affected — log4j not in classpath"
+    reason: 'Not affected — log4j not in classpath'
 ```
 
 ## When to Invoke
@@ -247,13 +250,13 @@ ignore:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It Fails | Correct Approach |
-|---|---|---|
-| Skipping SCA for "known" deps | CVEs are discovered continuously | Always run SCA; pin versions + audit |
-| Suppressing all Semgrep findings | Breaks the safety net | Suppress only with justification + owner |
-| Not rotating detected secrets | Secret is already compromised | Rotate immediately, then suppress |
-| SBOM generated but not scanned | SBOM alone adds no security value | Always run Grype against generated SBOM |
-| Scanning only in CI | Developers get slow feedback loop | Add pre-commit hooks for SAST + secrets |
+| Anti-Pattern                     | Why It Fails                      | Correct Approach                         |
+| -------------------------------- | --------------------------------- | ---------------------------------------- |
+| Skipping SCA for "known" deps    | CVEs are discovered continuously  | Always run SCA; pin versions + audit     |
+| Suppressing all Semgrep findings | Breaks the safety net             | Suppress only with justification + owner |
+| Not rotating detected secrets    | Secret is already compromised     | Rotate immediately, then suppress        |
+| SBOM generated but not scanned   | SBOM alone adds no security value | Always run Grype against generated SBOM  |
+| Scanning only in CI              | Developers get slow feedback loop | Add pre-commit hooks for SAST + secrets  |
 
 ## Memory Protocol (MANDATORY)
 
@@ -261,6 +264,7 @@ ignore:
 Read `.claude/context/memory/learnings.md`
 
 **After completing:**
+
 - New pattern -> `.claude/context/memory/learnings.md`
 - Issue found -> `.claude/context/memory/issues.md`
 - Decision made -> `.claude/context/memory/decisions.md`
