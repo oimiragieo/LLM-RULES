@@ -127,13 +127,14 @@ REFLECT -> EVALUATE -> CORRECT -> EXECUTE
 
 ### Rubric-Based Scoring
 
-| Dimension         | Weight | Description                                            |
-| ----------------- | ------ | ------------------------------------------------------ |
-| **Completeness**  | 25%    | All required sections present and thoroughly addressed |
-| **Accuracy**      | 25%    | No factual errors, correct paths, valid syntax         |
-| **Clarity**       | 15%    | Well-structured, readable, easy to understand          |
-| **Consistency**   | 15%    | Follows conventions, style guides, patterns            |
-| **Actionability** | 20%    | Clear next steps, implementable without ambiguity      |
+| Dimension              | Weight | Description                                            |
+| ---------------------- | ------ | ------------------------------------------------------ |
+| **Completeness**       | 20%    | All required sections present and thoroughly addressed |
+| **Accuracy**           | 20%    | No factual errors, correct paths, valid syntax         |
+| **Clarity**            | 15%    | Well-structured, readable, easy to understand          |
+| **Consistency**        | 15%    | Follows conventions, style guides, patterns            |
+| **Actionability**      | 15%    | Clear next steps, implementable without ambiguity      |
+| **Process Adherence**  | 15%    | TaskUpdate metadata present, commits match claims, no spawn traceability violations, gap log clean |
 
 #### Plan File Staleness (Completeness sub-check)
 
@@ -273,7 +274,40 @@ Before evaluating task quality, verify if the session debug logs indicate any hi
 2. `Read` the `.tmp/transcript-analysis-*.md` file mentioned in the script output
 3. **If the analysis shows high debug log errors or API context errors, you MUST penalize the task (add to "thorns")** even if the output artifact looks superficially correct.
 
-### Step 1.5: Read Router Gap Observations
+### Step 1.5: Session Log Review
+
+Before evaluating task quality, scan key session logs for process adherence signals:
+
+1. **Read `session-gap-log.jsonl`** — router-observed gaps (retries, placeholders, stalls)
+2. **Read `reflection-log.jsonl`** — prior reflection outcomes (look for recurring low scores)
+3. **Run `git log --oneline -10`** — verify commits match claimed `filesModified`
+4. **Read `spawn-log.jsonl`** — check for missing `task_id`, oversized prompts, or banned-tool spawns
+
+**Flags to look for**:
+
+| Flag | Source | Signal |
+|------|--------|--------|
+| `retry` entries | gap-log | Agent re-spawned — instability |
+| `placeholder_output` | gap-log | Agent returned stub instead of real output |
+| `missing_metadata` | gap-log | TaskUpdate completed without summary |
+| Score < 0.7 in last 3 reflections | reflection-log | Systemic quality decline |
+| Commits missing for claimed files | git log | Unverified completion claim |
+| `task_id` absent from spawn | spawn-log | Traceability violation |
+
+**Produce a Process Audit table** (include in Step 6 report):
+
+```
+| Check | Source | Result | Notes |
+|-------|--------|--------|-------|
+| Gap log entries | session-gap-log.jsonl | PASS/FAIL | count, types |
+| Commit coverage | git log | PASS/FAIL | missing files |
+| Spawn traceability | spawn-log.jsonl | PASS/FAIL | missing task_ids |
+| Reflection trend | reflection-log.jsonl | PASS/FAIL | score trend |
+```
+
+**Escalation**: Any FAIL in this table feeds directly into the **Process Adherence** rubric dimension (Step 2). If 2+ FAILs, append a structured entry to `.claude/context/memory/issues.md`.
+
+### Step 1.6: Read Router Gap Observations
 
 Before evaluating task quality, check for router-observed pipeline gaps:
 
@@ -324,7 +358,8 @@ const outputType = detectOutputType(task);
     "accuracy": 0.95,
     "clarity": 0.8,
     "consistency": 0.85,
-    "actionability": 0.7
+    "actionability": 0.7,
+    "processAdherence": 0.9
   },
   "overallScore": 0.83,
   "threshold": "pass"
@@ -530,7 +565,8 @@ Only `retain` items with strong evidence and expected reuse. Record rationale in
     "accuracy": 0.95,
     "clarity": 0.8,
     "consistency": 0.85,
-    "actionability": 0.7
+    "actionability": 0.7,
+    "processAdherence": 0.9
   },
   "overallScore": 0.83,
   "rbt": {
@@ -577,6 +613,7 @@ Agent: developer
 - Clarity: 0.80 / 1.0
 - Consistency: 0.85 / 1.0
 - Actionability: 0.70 / 1.0
+- Process Adherence: 0.90 / 1.0
 
 ## RBT Diagnosis
 
@@ -777,6 +814,7 @@ TaskUpdate({
       clarity: 0.8,
       consistency: 0.85,
       actionability: 0.8,
+      processAdherence: 0.9,
     },
     overallScore: 0.84,
     summary: 'Reflected on task #X: score 0.85, 2 learnings extracted, memory updated',
