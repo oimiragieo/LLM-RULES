@@ -102,12 +102,80 @@ MemoryRecord({
 });
 ```
 
+## MCP Server Mode (Dual CLI + MCP)
+
+CodeGraphContext supports two operation modes:
+
+**CLI mode** (batch indexing, one-shot queries):
+
+```bash
+code-graph-context index --root . --lang typescript,javascript
+code-graph-context query --cypher "MATCH (f:Function) RETURN f.name LIMIT 10"
+```
+
+**MCP server mode** (live, incremental — recommended for agent use):
+
+```bash
+npx @codetiger/code-graph-context-mcp --watch --db .claude/context/data/code-graph.kuzu
+```
+
+With `--watch`, the server monitors file changes and re-indexes incrementally. No manual re-index after refactors.
+
+### Neo4j Enterprise Option
+
+For large codebases (>100K nodes), replace KuzuDB with Neo4j:
+
+```bash
+code-graph-context index --root . --backend neo4j --uri bolt://localhost:7687
+```
+
+Add to `settings.json`:
+
+```json
+"CodeGraphContext": {
+  "command": "code-graph-context-mcp",
+  "args": ["--backend", "neo4j", "--uri", "bolt://localhost:7687"]
+}
+```
+
+### Interactive HTML Visualization
+
+Generate a browsable call graph:
+
+```bash
+code-graph-context visualize --output .claude/context/tmp/call-graph.html
+```
+
+### Pre-Indexed Bundles
+
+For CI/CD pipelines, ship a pre-built graph bundle with the repo:
+
+```bash
+# In CI: build + archive
+code-graph-context index --root . --export .claude/context/data/code-graph.bundle.gz
+
+# In agent startup: restore
+code-graph-context restore --bundle .claude/context/data/code-graph.bundle.gz
+```
+
+### Complexity Analysis
+
+```javascript
+// Find high-complexity functions (cyclomatic > 10)
+mcp__CodeGraphContext__query_graph({
+  cypher:
+    'MATCH (f:Function) WHERE f.complexity > $threshold RETURN f.name, f.file, f.complexity ORDER BY f.complexity DESC',
+  params: { threshold: 10 },
+});
+```
+
 ## Anti-Patterns
 
 - Do not use `query_graph` raw Cypher before checking if a purpose-built tool covers the need
 - Do not treat `find_dead_code` results as certain — dynamic dispatch and reflection create false positives
-- Re-index after significant refactors: `code-graph-context index --incremental`
+- With `--watch` MCP mode, manual re-index is not needed — avoid running `index --incremental` during active MCP sessions
 - Graph queries do not cross language boundaries (TypeScript ≠ Python in same repo)
+- Do not use KuzuDB for >100K node graphs in production — switch to Neo4j backend
 
 ## When to Invoke
 

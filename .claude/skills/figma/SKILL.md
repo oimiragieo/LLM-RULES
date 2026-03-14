@@ -171,10 +171,13 @@ When the official Figma MCP server is running, these 12 tools are available:
 | `get_styles`                 | Extract all defined styles (color, text, effect)                     |
 | `export_assets`              | Export assets as PNG/SVG/PDF with scale options                      |
 | `get_annotations`            | Retrieve design annotations and spec notes                           |
+| `get_metadata`               | Get XML layer representation of a file/node for programmatic parsing |
+| `whoami`                     | Get current user identity, plan tier, and available seat count       |
 
 **MCP Setup**: Install Figma Desktop app -> Settings -> Enable MCP server
 **Auth**: Uses active Figma session (no API key needed for local MCP)
 **Key workflow**: get_design_context -> code_connect_map -> export_assets for design-to-code
+**Identity check**: Use `whoami` to verify plan tier before calling enterprise-only tools
 
 ## Memory Protocol (MANDATORY)
 

@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-14T01:53:09.375Z",
+  "generatedAt": "2026-03-14T05:35:15.998Z",
   "metadata": {
-    "totalSkills": 285,
+    "totalSkills": 290,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-14T01:53:09.379Z",
+    "lastValidated": "2026-03-14T05:35:15.999Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -6960,6 +6960,50 @@
       "priority": 3,
       "aliasOf": null
     },
+    "atlassian-integration": {
+      "name": "atlassian-integration",
+      "displayName": "Atlassian Integration",
+      "category": "Other",
+      "domain": "other",
+      "description": "Atlassian ecosystem integration covering Jira project management, Confluence documentation, Bitbucket source control, and cross-product automation workflows",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "atlassian-integration"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "azure-devops": {
+      "name": "azure-devops",
+      "displayName": "Azure Devops",
+      "category": "Other",
+      "domain": "other",
+      "description": "Azure DevOps integration covering pipelines, boards, repos, artifacts, and work item management via Azure CLI and REST API",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "azure-devops"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "brand-compliance": {
       "name": "brand-compliance",
       "displayName": "Brand Compliance",
@@ -7267,6 +7311,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "google-workspace": {
+      "name": "google-workspace",
+      "displayName": "Google Workspace",
+      "category": "Other",
+      "domain": "other",
+      "description": "Google Workspace integration skill for Gmail, Calendar, Drive, Docs, and Sheets via Python client libraries and MCP servers",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "google-workspace"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "heartbeat": {
       "name": "heartbeat",
       "displayName": "Heartbeat",
@@ -7293,6 +7359,28 @@
         "heartbeat"
       ],
       "priority": 1,
+      "aliasOf": null
+    },
+    "imagen-generation": {
+      "name": "imagen-generation",
+      "displayName": "Imagen Generation",
+      "category": "Other",
+      "domain": "other",
+      "description": "Google Imagen image generation via Vertex AI — text-to-image, image editing, inpainting, and upscaling using ImageGenerationModel",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "imagen-generation"
+      ],
+      "priority": 3,
       "aliasOf": null
     },
     "lsp-navigator": {
@@ -7527,6 +7615,28 @@
       "tags": [
         "other",
         "seo-optimization"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "task-delegation": {
+      "name": "task-delegation",
+      "displayName": "Task Delegation",
+      "category": "Other",
+      "domain": "other",
+      "description": "Agent task delegation patterns — spawn protocols, handoff metadata, drain gate, parallel limits, and model selection for multi-agent orchestration",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "task-delegation"
       ],
       "priority": 3,
       "aliasOf": null
@@ -7825,6 +7935,8 @@
         "webapp-testing",
         "writing",
         "arxiv-monitor",
+        "atlassian-integration",
+        "azure-devops",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -7838,7 +7950,9 @@
         "feedback-analysis",
         "figma",
         "frontend-design",
+        "google-workspace",
         "heartbeat",
+        "imagen-generation",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
@@ -7848,6 +7962,7 @@
         "scheduled-tasks",
         "security-scanning",
         "seo-optimization",
+        "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -8216,6 +8331,8 @@
         "workflow-patterns",
         "writing",
         "arxiv-monitor",
+        "atlassian-integration",
+        "azure-devops",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -8229,7 +8346,9 @@
         "feedback-analysis",
         "figma",
         "frontend-design",
+        "google-workspace",
         "heartbeat",
+        "imagen-generation",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
@@ -8239,6 +8358,7 @@
         "scheduled-tasks",
         "security-scanning",
         "seo-optimization",
+        "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -8589,6 +8709,8 @@
         "workflow-patterns",
         "writing",
         "arxiv-monitor",
+        "atlassian-integration",
+        "azure-devops",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -8602,7 +8724,9 @@
         "feedback-analysis",
         "figma",
         "frontend-design",
+        "google-workspace",
         "heartbeat",
+        "imagen-generation",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
@@ -8612,6 +8736,7 @@
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
+        "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -8827,6 +8952,8 @@
         "workflow-patterns",
         "writing",
         "arxiv-monitor",
+        "atlassian-integration",
+        "azure-devops",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -8840,6 +8967,8 @@
         "feedback-analysis",
         "figma",
         "frontend-design",
+        "google-workspace",
+        "imagen-generation",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
@@ -8847,6 +8976,7 @@
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
+        "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -9022,6 +9152,8 @@
         "visual-and-observational-rules",
         "workflow-patterns",
         "writing",
+        "atlassian-integration",
+        "azure-devops",
         "brand-compliance",
         "claude-api",
         "code-graph-context",
@@ -9029,10 +9161,13 @@
         "design-systems",
         "doc-coauthoring",
         "frontend-design",
+        "google-workspace",
+        "imagen-generation",
         "mcp-builder",
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
+        "task-delegation",
         "user-research",
         "web-artifacts-builder"
       ],
@@ -9776,6 +9911,8 @@
         "webapp-testing",
         "writing",
         "arxiv-monitor",
+        "atlassian-integration",
+        "azure-devops",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -9789,6 +9926,8 @@
         "feedback-analysis",
         "figma",
         "frontend-design",
+        "google-workspace",
+        "imagen-generation",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
@@ -9797,6 +9936,7 @@
         "regulatory-compliance",
         "security-scanning",
         "seo-optimization",
+        "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
@@ -11012,6 +11152,8 @@
         "webapp-testing",
         "writing",
         "arxiv-monitor",
+        "atlassian-integration",
+        "azure-devops",
         "brand-compliance",
         "browser-automation",
         "claude-api",
@@ -11025,6 +11167,8 @@
         "feedback-analysis",
         "figma",
         "frontend-design",
+        "google-workspace",
+        "imagen-generation",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
@@ -11033,6 +11177,7 @@
         "regulatory-compliance",
         "security-scanning",
         "seo-optimization",
+        "task-delegation",
         "telegram-polling",
         "transcription",
         "tts-generation",
