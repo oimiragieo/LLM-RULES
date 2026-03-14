@@ -36,7 +36,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
-context_files:
+context_files: null
 capabilities:
   - api-contract-design
   - openapi-generation

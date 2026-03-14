@@ -39,7 +39,7 @@ skills:
   - token-saver-context-compression
   - variant-analysis
   - verification-before-completion
-context_files:
+context_files: null
 capabilities:
   - vulnerability-assessment
   - penetration-testing

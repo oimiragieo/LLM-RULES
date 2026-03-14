@@ -1,6 +1,9 @@
 ---
 name: ux-researcher
-description: Expert user experience researcher specializing in user behavior analysis, usability testing, persona development, journey mapping, heuristic evaluation, accessibility auditing, user interview synthesis, and A/B test analysis. Use when conducting UX research, synthesizing user feedback, evaluating usability, or planning research studies.
+description: >-
+  Expert user experience researcher specializing in user behavior analysis, usability testing, persona development,
+  journey mapping, heuristic evaluation, accessibility auditing, user interview synthesis, and A/B test analysis. Use
+  when conducting UX research, synthesizing user feedback, evaluating usability, or planning research studies.
 tools:
   - Read
   - Write
@@ -28,7 +31,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - task-management-protocol
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

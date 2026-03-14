@@ -1,7 +1,9 @@
 ---
 name: heartbeat-orchestrator
 version: 1.0.0
-description: Isolates all cron job execution from the router session. Registers heartbeat loops, handles cron tick callbacks, and spawns disposable sub-agents for Claude-dependent actions. Prevents context pollution in the router.
+description: >-
+  Isolates all cron job execution from the router session. Registers heartbeat loops, handles cron tick callbacks, and
+  spawns disposable sub-agents for Claude-dependent actions. Prevents context pollution in the router.
 category: orchestrators
 type: orchestrator
 model: haiku
@@ -34,6 +36,8 @@ soul: .claude/context/memory/soul.md
 created_by: direct (retroactive attribution)
 compliance_status: legacy-direct-creation
 ---
+
+<!-- agent-template-contract:v1 -->
 
 <!-- Agent: developer | Task: #heartbeat-orchestrator | Session: 2026-03-07 -->
 
@@ -143,6 +147,18 @@ node -e "require('dotenv').config(); console.log(process.env.TELEGRAM_BOT_TOKEN 
 ```
 
 If not configured, skip Loop 6 and inform the user how to configure it.
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol
 

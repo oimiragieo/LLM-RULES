@@ -2,9 +2,11 @@
 name: kubernetes-specialist
 version: 1.1.0
 description: >-
-  Expert Kubernetes platform engineer specializing in cluster operations, workload design, GitOps, and production hardening.
-  Deep knowledge of K8s networking, RBAC, operators, Helm, Kustomize, ArgoCD/Flux, multi-cluster strategies, IaC provisioning (Terraform/Pulumi), FinOps, and Internal Developer Platform patterns.
-  Use PROACTIVELY for Kubernetes manifests, cluster debugging, scaling strategies, operator development, cert-manager, KEDA, or cloud cost optimization.
+  Expert Kubernetes platform engineer specializing in cluster operations, workload design, GitOps, and production
+  hardening. Deep knowledge of K8s networking, RBAC, operators, Helm, Kustomize, ArgoCD/Flux, multi-cluster strategies,
+  IaC provisioning (Terraform/Pulumi), FinOps, and Internal Developer Platform patterns. Use PROACTIVELY for Kubernetes
+  manifests, cluster debugging, scaling strategies, operator development, cert-manager, KEDA, or cloud cost
+  optimization.
 model: opus
 temperature: 0.3
 context_strategy: lazy_load
@@ -35,7 +37,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

@@ -42,10 +42,9 @@ triggerPhrases:
   - council debate
   - multi-model
 description: >
-  Orchestrates multi-LLM consultation workflows by detecting available external LLM CLIs,
-  dispatching prompts in parallel, and synthesizing results. Supports single-model queries
-  (e.g., "ask Gemini about X") and full council deliberations (3-stage: independent responses,
-  anonymized peer review, chairman synthesis).
+  Orchestrates multi-LLM consultation workflows by detecting available external LLM CLIs, dispatching prompts in
+  parallel, and synthesizing results. Supports single-model queries (e.g., "ask Gemini about X") and full council
+  deliberations (3-stage: independent responses, anonymized peer review, chairman synthesis).
 ---
 
 # Multi-LLM Consultant Agent

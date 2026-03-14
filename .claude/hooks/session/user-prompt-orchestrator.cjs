@@ -95,7 +95,7 @@ function main() {
   try {
     ensureBootstrapReadTargets();
   } catch (err) {
-    stderrLog(`bootstrap read target creation failed: ${err.message}`);
+    stderrLog(`bootstrap target read/creation failed: ${err.message}`);
   }
 
   for (const hookPath of HOOK_ORDER) {

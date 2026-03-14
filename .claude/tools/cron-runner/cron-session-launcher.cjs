@@ -143,12 +143,36 @@ function writeSessionPing(pid, mode) {
 
 /**
  * Validate that required environment variables are present.
+ * If missing, attempt to load them from a local .env file.
+ * We no longer enforce ANTHROPIC_API_KEY as a fatal requirement because
+ * Claude Code handles global OAuth authentication natively.
  * @returns {{ valid: boolean, missing: string[] }}
  */
 function validateEnvironment() {
-  const required = ['ANTHROPIC_API_KEY'];
-  const missing = required.filter(key => !process.env[key]);
-  return { valid: missing.length === 0, missing };
+  // Attempt to load .env manually if missing
+  if (!process.env.ANTHROPIC_API_KEY) {
+    const envPath = path.join(PROJECT_ROOT, '.env');
+    if (fs.existsSync(envPath)) {
+      try {
+        const envContent = fs.readFileSync(envPath, 'utf8');
+        envContent.split('\n').forEach(line => {
+          const match = line.match(/^\s*([^#]\w+)\s*=\s*(.*)/);
+          if (match) {
+            const key = match[1].trim();
+            const val = match[2].trim().replace(/^['"]|['"]$/g, '');
+            if (!process.env[key]) {
+              process.env[key] = val;
+            }
+          }
+        });
+      } catch (_err) {
+        // ignore read errors
+      }
+    }
+  }
+
+  // Always return valid so Claude CLI can use its global keyring/OAuth
+  return { valid: true, missing: [] };
 }
 
 /**
@@ -204,15 +228,15 @@ function launch(options) {
   const baseArgs = ['--dangerously-skip-permissions'];
   const spawnArgs = opts.args ? baseArgs.concat(opts.args) : baseArgs;
 
-  // Step 5: Spawn detached subprocess (shell: false for security)
+  // Step 5: Spawn detached subprocess (shell: required for .cmd on Windows)
   let child;
   try {
     child = spawn(claudeBinary, spawnArgs, {
       detached: true,
       stdio: 'ignore',
-      shell: false,
+      shell: process.platform === 'win32',
       windowsHide: true,
-      env: process.env, // Inherit full env (includes ANTHROPIC_API_KEY)
+      env: process.env, // Inherit full env
     });
     // Suppress unhandled 'error' event from crashing the process
     child.on('error', () => {});

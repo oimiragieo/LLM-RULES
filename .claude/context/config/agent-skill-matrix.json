@@ -845,11 +845,7 @@
       "legacy-modernizer": {
         "primary": ["debugging", "code-semantic-search"],
         "secondary": ["tdd", "refactoring"],
-        "always": [
-          "ripgrep",
-          "task-management-protocol",
-          "verification-before-completion"
-        ],
+        "always": ["ripgrep", "task-management-protocol", "verification-before-completion"],
         "contextual": {}
       },
       "nlp-engineer": {

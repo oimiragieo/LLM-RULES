@@ -39,7 +39,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - web-design-guidelines-vercel
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

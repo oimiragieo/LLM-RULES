@@ -39,7 +39,7 @@ skills:
   - token-saver-context-compression
   - typescript-expert
   - verification-before-completion
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

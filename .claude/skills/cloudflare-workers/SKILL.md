@@ -7,7 +7,7 @@ invoked_by: agent
 user_invocable: false
 tools: [Read, Write, Edit, Bash]
 agents: [developer, devops]
-category: "DevOps & Infrastructure"
+category: 'DevOps & Infrastructure'
 tags: [cloudflare, workers, edge, durable-objects, kv, r2, d1, ai-gateway, workers-ai, wrangler]
 ---
 
@@ -119,12 +119,12 @@ export class RoomDO implements DurableObject {
 
 ### Storage Tiers
 
-| Storage | Use Case | Consistency | Latency |
-|---------|----------|-------------|---------|
-| KV | Config, feature flags, cached data | Eventual (60s) | ~1ms read |
-| R2 | Files, images, large objects | Strong | ~10ms |
-| D1 | Relational data, queries | Strong | ~5ms |
-| DO Storage | Per-entity state, coordination | Strong (per-DO) | ~1ms |
+| Storage    | Use Case                           | Consistency     | Latency   |
+| ---------- | ---------------------------------- | --------------- | --------- |
+| KV         | Config, feature flags, cached data | Eventual (60s)  | ~1ms read |
+| R2         | Files, images, large objects       | Strong          | ~10ms     |
+| D1         | Relational data, queries           | Strong          | ~5ms      |
+| DO Storage | Per-entity state, coordination     | Strong (per-DO) | ~1ms      |
 
 ```typescript
 // KV — best for reads, not writes
@@ -143,9 +143,7 @@ await env.MY_R2.put('uploads/image.png', request.body, {
 });
 
 // D1 — SQLite at the edge
-const { results } = await env.MY_D1.prepare(
-  'SELECT * FROM users WHERE id = ?'
-).bind(userId).all();
+const { results } = await env.MY_D1.prepare('SELECT * FROM users WHERE id = ?').bind(userId).all();
 
 // Batch D1 writes for efficiency
 await env.MY_D1.batch([
@@ -195,7 +193,7 @@ const gatewayUrl = `https://gateway.ai.cloudflare.com/v1/${env.CF_ACCOUNT_ID}/${
 const response = await fetch(`${gatewayUrl}/chat/completions`, {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
+    Authorization: `Bearer ${env.OPENAI_API_KEY}`,
     'Content-Type': 'application/json',
     // Optional: cache control
     'cf-aig-cache-ttl': '3600',
@@ -272,6 +270,9 @@ wrangler dev --remote                 # Dev against production bindings
 wrangler deploy                       # Deploy to production
 wrangler deploy --env staging         # Deploy to staging environment
 
+# Type generation (ALWAYS run after editing wrangler.toml/wrangler.jsonc)
+wrangler types                        # Generates worker-configuration.d.ts — never hand-write Env interface
+
 # Storage management
 wrangler kv:key put --binding MY_KV "key" "value"
 wrangler kv:key get --binding MY_KV "key"
@@ -286,10 +287,85 @@ wrangler secret list
 # Durable Objects
 wrangler durable-objects migrate apply  # Apply pending migrations
 
-# Logs
+# Logs and observability
 wrangler tail                         # Stream live logs from production
 wrangler tail --format pretty
+wrangler tail --json                  # Structured JSON log stream for analysis
 ```
+
+---
+
+## Performance Patterns
+
+```typescript
+// Use ctx.waitUntil() for non-blocking background work
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const response = await handleRequest(request, env);
+
+    // Fire-and-forget: analytics, cache warm, audit logging
+    ctx.waitUntil(logAnalytics(request, response, env));
+
+    return response;
+  },
+};
+
+// Stream large bodies — never buffer fully into memory
+async function streamBody(request: Request, env: Env): Promise<Response> {
+  const { readable, writable } = new TransformStream();
+  // Pipe without buffering — stays within 128MB Worker limit
+  request.body?.pipeTo(writable);
+  return new Response(readable);
+}
+```
+
+**Durable Objects with SQLite (2025 default):**
+
+New Durable Objects should use the SQL API for storage — SQLite-backed DOs provide relational queries, indexes, and transactions:
+
+```typescript
+export class RoomDO implements DurableObject {
+  private sql: SqlStorage;
+
+  constructor(state: DurableObjectState, env: Env) {
+    this.state = state;
+    this.sql = state.storage.sql;
+    // Create tables on first initialization
+    this.sql.exec(
+      `CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, ts INTEGER, body TEXT)`
+    );
+  }
+
+  async addMessage(body: string): Promise<void> {
+    this.sql.exec('INSERT INTO messages (ts, body) VALUES (?, ?)', Date.now(), body);
+  }
+
+  async getMessages(): Promise<{ id: number; ts: number; body: string }[]> {
+    return [...this.sql.exec('SELECT * FROM messages ORDER BY ts DESC LIMIT 50')];
+  }
+}
+```
+
+---
+
+## Observability
+
+Enable Workers Logs and Traces before any production deployment:
+
+```toml
+# wrangler.toml
+[observability]
+enabled = true
+head_sampling_rate = 1  # 0.0–1.0; reduce for high-volume workers
+```
+
+```typescript
+// Structured logging — searchable in Workers dashboard
+console.log(JSON.stringify({ level: 'info', requestId: crypto.randomUUID(), path: url.pathname }));
+console.error(JSON.stringify({ level: 'error', message: err.message, stack: err.stack }));
+```
+
+**Never use `passThroughOnException()`** — it hides bugs. Use explicit try/catch with structured error responses.
 
 ---
 
@@ -302,6 +378,10 @@ wrangler tail --format pretty
 - **Never write to D1 on every request** — batch writes or use a queue (Workers Queue) for high-throughput write paths
 - **Never exceed 128MB script size** — keep Workers bundles lean; offload large assets to R2
 - **Never rely on in-memory state between requests** — Workers are stateless; use KV/D1/DO for persistence
+- **Never store request-scoped data in module-level variables** — isolates reuse across requests causing data leaks; pass state via function arguments
+- **Never use `passThroughOnException()`** — it hides bugs silently; use explicit try/catch blocks
+- **Never hand-write the `Env` interface** — run `wrangler types` to generate it from your actual config
+- **Never use `Math.random()` for security tokens** — use `crypto.randomUUID()` or `crypto.getRandomValues()`
 
 ---
 
@@ -345,10 +425,38 @@ pnpm vitest run --pool @cloudflare/vitest-pool-workers
 
 ---
 
-## Memory Protocol
+## Search Protocol
 
-**Before starting:** Check `.claude/context/memory/learnings.md` for Cloudflare-specific gotchas (wrangler version issues, D1 migration quirks, DO hibernation bugs).
+Before starting any Cloudflare Workers task, search for existing wrangler configs and worker scripts:
 
-**After completing:** Record any Cloudflare Workers gotchas, undocumented behavior, or version-specific issues to `.claude/context/memory/issues.md`.
+```bash
+pnpm search:code "wrangler OR DurableObject OR KVNamespace OR R2Bucket"
+pnpm search:code "cloudflare workers"
+```
+
+Use `Skill({ skill: 'ripgrep' })` for fast search across `.toml` and `.ts` files. Use `Skill({ skill: 'code-semantic-search' })` to find similar edge function patterns.
+
+---
+
+## Memory Protocol (MANDATORY)
+
+**Before starting any task, you must query semantic memory and read recent static memory:**
+
+```bash
+node .claude/lib/memory/memory-search.cjs "cloudflare workers durable objects KV R2 D1"
+```
+
+Read `.claude/context/memory/learnings.md`
+Read `.claude/context/memory/decisions.md`
+
+Check for Cloudflare-specific gotchas (wrangler version issues, D1 migration quirks, DO hibernation bugs, SQLite API changes).
+
+**After completing work, record findings:**
+
+- Cloudflare Workers gotchas or undocumented behavior -> Append to `.claude/context/memory/issues.md`
+- Storage tier decisions (KV vs D1 vs DO) -> Update `.claude/context/memory/decisions.md`
+- Wrangler version-specific issues -> Append to `.claude/context/memory/learnings.md`
+
+**During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
 > ASSUME INTERRUPTION: If it's not in memory, it didn't happen.

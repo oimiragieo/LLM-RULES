@@ -27,6 +27,7 @@ const { detectDefaultBranch } = require('../../lib/worktree/worktree-utils.cjs')
 
 // TTL for worktree branches (default 24 hours). Override with WORKTREE_TTL_MS env var.
 const WORKTREE_TTL_MS = parseInt(process.env.WORKTREE_TTL_MS ?? '86400000', 10);
+const WORKTREE_SHIELD_MS = parseInt(process.env.WORKTREE_SHIELD_MS ?? '43200000', 10); // 12 hours absolute protection
 
 // Resolve project root from __dirname: .claude/tools/cli/ → three levels up
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -124,28 +125,26 @@ function isTTLExpired(branch) {
  *
  * A branch is stale when:
  *   - It has an embedded timestamp and is older than WORKTREE_TTL_MS, OR
- *   - `git log --oneline main..<branch>` returns zero lines (fully merged) AND the directory is older than 24 hours.
+ *   - `git log --oneline main..<branch>` returns zero lines (fully merged) AND the embedded branch timestamp is older than 12 hours.
  *
  * @param {string} branch - Branch name (short, e.g. "worktree-agent-abc123-1741000000000")
- * @param {string} worktreePath - The path to the worktree to check its filesystem modification time
  * @returns {boolean}
  */
-function isStale(branch, worktreePath) {
+function isStale(branch) {
   if (!branch) return false;
   // TTL-based check: branch older than WORKTREE_TTL_MS is always stale
   if (isTTLExpired(branch)) return true;
 
-  // ZOMBIE PREVENTION: If there is no explicit TTL in the branch name, check the filesystem age first
-  // Active agents with 0 commits will fail the git log check below, so they MUST be protected here
-  try {
-    const stats = fs.statSync(worktreePath);
-    const ageMs = Date.now() - stats.mtimeMs;
-    // If the folder was modified within our standard TTL, it belongs to an active agent. DON'T touch it.
-    if (ageMs < WORKTREE_TTL_MS) {
-      return false;
+  // ZOMBIE PREVENTION (IRON SHIELD): Extract the embedded timestamp from the branch name
+  // If the branch name contains a valid timestamp that is less than 12 hours old, it is
+  // explicitly protected from deletion. Active agents with 0 commits will fail the git log
+  // check below, so they MUST be protected here using their undisputed creation time.
+  const branchCreationAgeMs = extractBranchTimestamp(branch);
+  if (branchCreationAgeMs !== null) {
+    const ageMs = Date.now() - branchCreationAgeMs;
+    if (ageMs < WORKTREE_SHIELD_MS) {
+      return false; // Age is verified less than 12 hours. SHIELD ENGAGED.
     }
-  } catch (_err) {
-    // If we can't stat it, fall through to branch checking
   }
 
   try {
@@ -278,10 +277,10 @@ function main() {
     }
 
     const ttlExpired = isTTLExpired(branch);
-    const stale = isStale(branch, worktreePath);
+    const stale = isStale(branch);
     if (!stale) {
       console.log(
-        `  KEEP  ${shortPath}  [${branch}]  (has unique commits not in main OR is currently active)`
+        `  KEEP  ${shortPath}  [${branch}]  (has unique commits not in main OR is inside 12-hour age shield)`
       );
       skipped++;
       continue;

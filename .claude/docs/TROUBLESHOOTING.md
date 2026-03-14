@@ -577,3 +577,44 @@ Fix Applied:
 
 - Scaffolder function stubs modified to use `_context` or explicitly ignored.
 - Logically cohesive routing files suppressed with `/* eslint-disable max-lines */`.
+
+## 14. Recent Session Learnings & Fixes (2026-03-14)
+
+### A. Visible Terminal Pop-ups from Background Daemons on Windows
+
+Symptoms:
+
+- A new `cmd.exe` or terminal window visibly opens when the system attempts to spawn a background daemon (like the telegram heartbeat loop or cron runner).
+
+Root Cause:
+
+- Using Node's `cp.spawn()` with `{ detached: true, shell: true }` on Windows inherently forces a visible console window to spawn. Though `windowsHide: true` exists, it is often overridden or ignored when `shell: true` is mandated to resolve the CLI binary path (e.g. executing the global `claude` CLI).
+
+Fix Applied:
+
+- Avoid manual Node shell scripts for daemon supervision entirely.
+- **Native LLM Orchestration:** Delegated the background spawning responsibility to the Router agent at Step 0.5. The Router natively uses `Task({ subagent_type: 'heartbeat-orchestrator' })` after checking the short-TTL `heartbeat-session-ping.json` file. The CLI's native subagent tool spawns invisibly without `cmd.exe` pop-ups.
+
+### B. YAML Parse Errors in Agent Frontmatter
+
+Symptoms:
+
+- Validating the ecosystem fails with: `"invalid frontmatter yaml"`.
+
+Root Cause:
+
+- Strings in the YAML header starting with an `@` symbol (often used for relative documentation links like `@.claude/context/memory/learnings.md`) are treated as syntax errors by `js-yaml` unless quoted.
+
+Fix:
+
+- Standardize on wrapping `@`-prefixed paths in double-quotes in all YAML blocks: `"- \"@.claude/context/memory/learnings.md\""`.
+
+### C. Missing Core Contract Headers
+
+Symptoms:
+
+- `pnpm validate:full` fails with `Missing required heading: ## Token Saver Invocation Rule` on random agents.
+
+Fix:
+
+- Run `npm run agents:contract:backfill` or directly `node .claude/tools/cli/backfill-agent-template-contract.cjs --apply` to automatically restore lost boilerplate sections to all 70+ agents without needing manual edits. Always follow up with `npm run gen:all-registries`.

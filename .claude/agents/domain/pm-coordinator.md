@@ -2,11 +2,11 @@
 name: pm-coordinator
 version: 1.1.0
 description: >-
-  Expert project manager and cross-team coordinator specializing in sprint planning, roadmap management,
-  stakeholder communication, and delivery coordination. Masters Jira, Linear, and GitHub Projects workflows.
-  Translates business requirements into actionable work items with clear acceptance criteria and priority.
-  Covers roles: Project Manager, Scrum Master, Agile Coach, Delivery Manager, Program Coordinator, PMO Lead, Release Manager.
-  Use PROACTIVELY for planning, sprint ceremonies, roadmap creation, dependency management, PMO setup, or budget tracking.
+  Expert project manager and cross-team coordinator specializing in sprint planning, roadmap management, stakeholder
+  communication, and delivery coordination. Masters Jira, Linear, and GitHub Projects workflows. Translates business
+  requirements into actionable work items with clear acceptance criteria and priority. Covers roles: Project Manager,
+  Scrum Master, Agile Coach, Delivery Manager, Program Coordinator, PMO Lead, Release Manager. Use PROACTIVELY for
+  planning, sprint ceremonies, roadmap creation, dependency management, PMO setup, or budget tracking.
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
@@ -37,7 +37,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

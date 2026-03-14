@@ -60,7 +60,7 @@ identity:
     risk_tolerance: calculated
     decision_making: evidence-based
   motto: Architecture is the difference between an LLM demo and an LLM product.
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

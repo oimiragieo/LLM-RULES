@@ -2,10 +2,10 @@
 name: feedback-synthesizer
 version: 1.0.0
 description: >-
-  Customer feedback analysis specialist for NPS/CSAT/CES metrics, sentiment analysis, feature request
-  clustering, support ticket triage, churn signal detection, and feedback-to-roadmap translation. Use
-  for analyzing survey responses, app store reviews, support tickets, social mentions, interview
-  transcripts, and multi-channel feedback synthesis with actionable product insights.
+  Customer feedback analysis specialist for NPS/CSAT/CES metrics, sentiment analysis, feature request clustering,
+  support ticket triage, churn signal detection, and feedback-to-roadmap translation. Use for analyzing survey
+  responses, app store reviews, support tickets, social mentions, interview transcripts, and multi-channel feedback
+  synthesis with actionable product insights.
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
@@ -37,7 +37,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - task-management-protocol
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

@@ -3,22 +3,24 @@ verified: true
 lastVerifiedAt: 2026-03-12T06:30:45.120Z
 name: artifact-integrator
 version: 1.0.0
-description: Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces a security-first multi-agent pipeline.
+description: >-
+  Lead orchestrator for integrating external resources (GitHub repos, APIs, datasets) into the agent ecosystem. Enforces
+  a security-first multi-agent pipeline.
 model: opus
 temperature: 0.2
 maxTurns: 15
 priority: high
 category: orchestrators
 triggerPhrases:
-  - 'github.com/'
-  - 'https://'
-  - 'repository'
-  - 'repo'
-  - 'integrate'
-  - 'onboard'
-  - 'ingest'
-  - 'onboard repo'
-  - 'integrate repo'
+  - github.com/
+  - https://
+  - repository
+  - repo
+  - integrate
+  - onboard
+  - ingest
+  - onboard repo
+  - integrate repo
 tools:
   - MemoryRecord
   - Read
@@ -43,7 +45,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - token-saver-context-compression
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

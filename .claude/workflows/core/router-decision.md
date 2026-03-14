@@ -89,22 +89,24 @@ flowchart TD
 
 **Why**: Ensures no reflection data is lost if the agent fails or crashes. Gap observations capture cross-agent pipeline failures that individual agents cannot see.
 
-## Step 0.5: CHECK INTEGRATION QUEUE (Non-Blocking)
+## Step 0.5: HEARTBEAT & INTEGRATION CHECK (Non-Blocking)
 
-**Before Step 1 (TaskList), check for pending artifact integrations:**
+**Before Step 1 (TaskList), execute these two background orchestration checks:**
 
-1. Check if `.claude/context/runtime/integration-queue.jsonl` exists and has unprocessed entries
-2. If unprocessed entries found (entries with `"processed": false`):
-   a. Spawn artifact-integrator in background (sonnet model)
-   b. Continue to Step 1 immediately (non-blocking)
-3. If no queue or no unprocessed entries: continue to Step 1
+1. **Heartbeat Check:** Read `.claude/context/runtime/heartbeat-session-ping.json`.
+   - If the file is missing, OR the JSON lacks a future `expires_at` timestamp:
+   - SPAWN the `heartbeat-orchestrator` agent using the `Task({ subagent_type: 'heartbeat-orchestrator' })` tool to natively register all background loops. Do not wait for it.
+2. **Integration Queue Check:** Check if `.claude/context/runtime/integration-queue.jsonl` exists and has unprocessed entries (`"processed": false`).
+   - If yes: SPAWN `artifact-integrator` in background using the `Task({ subagent_type: 'artifact-integrator' })` tool.
 
-**Note:** Integration analysis runs in parallel with the user's primary request. It does not delay response.
+3. Continue to Step 1 immediately (non-blocking).
+
+**Note:** Integration analysis and heartbeat recovery run in parallel with the user's primary request. They do not delay response.
 
 **Queue location:** `.claude/context/runtime/integration-queue.jsonl`
-**Integration skill:** `artifact-integrator` (Phase 2 skill)
+**Heartbeat state:** `.claude/context/runtime/heartbeat-session-ping.json`
 
-**Why**: Ensures newly created artifacts are integrated into the ecosystem (catalogs, agent assignments, routing tables) without blocking the user's primary workflow.
+**Why**: Ensures background cron loops remain active and newly created artifacts are integrated into the ecosystem without blocking the user's primary workflow.
 
 ## Step 0.6: CREATION PREFLIGHT (Artifact Creation Requests)
 

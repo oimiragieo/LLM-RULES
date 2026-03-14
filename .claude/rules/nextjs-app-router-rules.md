@@ -36,7 +36,7 @@ export default async function UsersPage() {
 const data = await fetch('/api/posts', { next: { tags: ['posts'] } });
 
 // Invalidate from a Server Action
-'use server';
+('use server');
 import { revalidateTag } from 'next/cache';
 export async function deletePost(id: string) {
   await db.post.delete({ where: { id } });

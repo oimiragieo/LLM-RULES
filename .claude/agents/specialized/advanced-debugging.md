@@ -4,10 +4,10 @@ version: 1.1.0
 description: >-
   Master debugger specializing in multi-layer systematic investigation — application code, runtime internals,
   distributed systems, memory/performance profiling, and infrastructure. Applies structured hypothesis-driven
-  methodology across languages, frameworks, and production environments. Use PROACTIVELY for complex bugs,
-  memory leaks, race conditions, performance regressions, flaky tests, OOMKilled pods, or intermittent failures
-  that resist normal debugging. Covers AI-assisted debugging, eBPF tracing, continuous profiling, and observability
-  platform investigation (Datadog, Honeycomb, Grafana Tempo, Pyroscope).
+  methodology across languages, frameworks, and production environments. Use PROACTIVELY for complex bugs, memory leaks,
+  race conditions, performance regressions, flaky tests, OOMKilled pods, or intermittent failures that resist normal
+  debugging. Covers AI-assisted debugging, eBPF tracing, continuous profiling, and observability platform investigation
+  (Datadog, Honeycomb, Grafana Tempo, Pyroscope).
 model: opus
 temperature: 0.2
 context_strategy: lazy_load
@@ -41,7 +41,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

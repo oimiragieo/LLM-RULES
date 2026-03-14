@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: true
 tools: [Read, Write, Bash, Glob, Grep]
 agents: [developer, qa, security-architect]
-category: "Validation & Quality"
+category: 'Validation & Quality'
 tags: [api-testing, security, postman, contract-testing, load-testing, fuzzing, rest, graphql, grpc]
 best_practices:
   - Test authentication and authorization on every endpoint
@@ -41,14 +41,14 @@ Invoke when:
 
 ## Toolchain
 
-| Tool      | Purpose                            | Install                     |
-| --------- | ---------------------------------- | --------------------------- |
-| **Bruno** | Git-native API collection runner   | `npm i -g @usebruno/cli`    |
-| **Hurl**  | Plain-text HTTP test runner        | `cargo install hurl` or pkg |
-| **k6**    | JavaScript-based load testing      | `brew install k6`           |
-| **httpie**| Human-friendly curl replacement    | `pip install httpie`        |
-| **Zap**   | OWASP automated security scanner   | Docker or standalone binary |
-| **Nuclei**| Template-driven vuln scanner       | `go install nuclei`         |
+| Tool       | Purpose                          | Install                     |
+| ---------- | -------------------------------- | --------------------------- |
+| **Bruno**  | Git-native API collection runner | `npm i -g @usebruno/cli`    |
+| **Hurl**   | Plain-text HTTP test runner      | `cargo install hurl` or pkg |
+| **k6**     | JavaScript-based load testing    | `brew install k6`           |
+| **httpie** | Human-friendly curl replacement  | `pip install httpie`        |
+| **Zap**    | OWASP automated security scanner | Docker or standalone binary |
+| **Nuclei** | Template-driven vuln scanner     | `go install nuclei`         |
 
 ---
 
@@ -168,18 +168,18 @@ npx jest tests/contract/ --forceExit
 
 Run this checklist against every new API surface. Document PASS / FAIL for each item.
 
-| #    | Risk                           | Test Command                                                                                  |
-| ---- | ------------------------------ | --------------------------------------------------------------------------------------------- |
-| API1 | Broken Object Level Auth       | `hurl tests/security/bola.hurl` — access resource with wrong user token                      |
-| API2 | Broken Auth                    | `hurl tests/security/auth.hurl` — expired token, no token, invalid signature                  |
-| API3 | Broken Object Property Auth    | `hurl tests/security/mass-assignment.hurl` — send admin fields in POST body                  |
-| API4 | Unrestricted Resource Consumption | `k6 run tests/load/burst.js` — spike to 1000 RPS and verify rate limiting returns 429     |
-| API5 | Broken Function Level Auth     | `hurl tests/security/flauth.hurl` — call admin endpoints as regular user                     |
-| API6 | Unrestricted Access to Sensitive Business Flows | `hurl tests/security/business-flow.hurl` — replay/race critical operations |
-| API7 | Server Side Request Forgery    | `hurl tests/security/ssrf.hurl` — supply internal URLs as callback parameters                |
-| API8 | Security Misconfiguration      | Check response headers: `curl -I http://localhost:3000/api/health`                            |
-| API9 | Improper Inventory Management  | Compare OpenAPI spec endpoints vs. live server: `npx @stoplight/spectral lint openapi.json`  |
-| API10| Unsafe Consumption of APIs     | Review all third-party API calls for input validation and response schema checks              |
+| #     | Risk                                            | Test Command                                                                                |
+| ----- | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| API1  | Broken Object Level Auth                        | `hurl tests/security/bola.hurl` — access resource with wrong user token                     |
+| API2  | Broken Auth                                     | `hurl tests/security/auth.hurl` — expired token, no token, invalid signature                |
+| API3  | Broken Object Property Auth                     | `hurl tests/security/mass-assignment.hurl` — send admin fields in POST body                 |
+| API4  | Unrestricted Resource Consumption               | `k6 run tests/load/burst.js` — spike to 1000 RPS and verify rate limiting returns 429       |
+| API5  | Broken Function Level Auth                      | `hurl tests/security/flauth.hurl` — call admin endpoints as regular user                    |
+| API6  | Unrestricted Access to Sensitive Business Flows | `hurl tests/security/business-flow.hurl` — replay/race critical operations                  |
+| API7  | Server Side Request Forgery                     | `hurl tests/security/ssrf.hurl` — supply internal URLs as callback parameters               |
+| API8  | Security Misconfiguration                       | Check response headers: `curl -I http://localhost:3000/api/health`                          |
+| API9  | Improper Inventory Management                   | Compare OpenAPI spec endpoints vs. live server: `npx @stoplight/spectral lint openapi.json` |
+| API10 | Unsafe Consumption of APIs                      | Review all third-party API calls for input validation and response schema checks            |
 
 **Verify API8 headers:**
 
@@ -199,13 +199,13 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '30s', target: 50 },   // ramp up
-    { duration: '1m',  target: 50 },   // steady state
-    { duration: '15s', target: 0 },    // ramp down
+    { duration: '30s', target: 50 }, // ramp up
+    { duration: '1m', target: 50 }, // steady state
+    { duration: '15s', target: 0 }, // ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'],  // 95th percentile < 500ms
-    http_req_failed:   ['rate<0.01'],  // error rate < 1%
+    http_req_duration: ['p(95)<500'], // 95th percentile < 500ms
+    http_req_failed: ['rate<0.01'], // error rate < 1%
   },
 };
 
@@ -273,6 +273,26 @@ nuclei -u http://localhost:3000 \
 
 ---
 
+## gRPC-Specific Testing
+
+```bash
+# Use grpcurl for gRPC endpoint testing
+grpcurl -plaintext localhost:50051 list                          # discover services
+grpcurl -plaintext localhost:50051 describe mypackage.MyService  # inspect service
+grpcurl -d '{"name":"Alice"}' localhost:50051 mypackage.MyService/GetUser
+
+# mTLS enforcement check — verify both-way cert validation
+grpcurl -cert client.crt -key client.key -cacert ca.crt \
+  myservice.example.com:443 mypackage.MyService/GetUser
+
+# Fuzz gRPC: send wrong field types, missing required fields
+grpcurl -d '{"name": null}' localhost:50051 mypackage.MyService/GetUser
+```
+
+**Expected:** Server returns `NOT_FOUND` or `INVALID_ARGUMENT`, not `INTERNAL`. mTLS rejects requests without valid client cert.
+
+---
+
 ## Related Skills
 
 - `security-architect` — full STRIDE threat modeling and penetration test orchestration
@@ -289,20 +309,38 @@ Output contract defined in `schemas/output.schema.json`.
 
 ---
 
-## Memory Protocol (MANDATORY)
+## Search Protocol
 
-**Before starting:**
+Before starting any API testing task, search for existing test suites and known patterns:
 
 ```bash
-node -e "const fs=require('fs');const p='.claude/context/memory/learnings.md';const t=fs.existsSync(p)?fs.readFileSync(p,'utf8'):'';console.log(t.split(/\r?\n/).slice(0,120).join('\n'));"
+pnpm search:code "hurl OR k6 OR nuclei OR pact"
+pnpm search:code "api security test"
 ```
+
+Use `Skill({ skill: 'ripgrep' })` for fast pattern matching across test files. Use `Skill({ skill: 'code-semantic-search' })` to find existing security test logic by intent.
+
+---
+
+## Memory Protocol (MANDATORY)
+
+**Before starting any task, you must query semantic memory and read recent static memory:**
+
+```bash
+node .claude/lib/memory/memory-search.cjs "api security testing endpoint validation"
+```
+
+Read `.claude/context/memory/learnings.md`
+Read `.claude/context/memory/decisions.md`
 
 Check for previously discovered API security issues, known endpoint patterns, and tool version gotchas.
 
-**After completing:**
+**After completing work, record findings:**
 
-- New vulnerability pattern found -> `.claude/context/memory/learnings.md`
-- Recurring false-positive -> `.claude/context/memory/issues.md`
-- Architecture decision (e.g., "disable GraphQL introspection in prod") -> `.claude/context/memory/decisions.md`
+- New vulnerability pattern found -> Append to `.claude/context/memory/learnings.md`
+- Recurring false-positive -> Append to `.claude/context/memory/issues.md`
+- Architecture decision (e.g., "disable GraphQL introspection in prod") -> Update `.claude/context/memory/decisions.md`
+
+**During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

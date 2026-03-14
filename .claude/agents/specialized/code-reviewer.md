@@ -41,7 +41,7 @@ skills:
   - tdd
   - token-saver-context-compression
   - verification-before-completion
-context_files:
+context_files: null
 hooks: {}
 ---
 

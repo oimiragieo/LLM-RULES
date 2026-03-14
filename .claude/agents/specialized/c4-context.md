@@ -34,7 +34,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

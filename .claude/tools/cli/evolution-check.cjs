@@ -1,5 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const ROOT = path.resolve(__dirname, '../../..');
 const learnPath = path.join(ROOT, '.claude/context/memory/learnings.md');
@@ -18,6 +22,44 @@ if (fs.existsSync(learnPath)) {
         'Run 24h evolution cycle: evaluate agent definitions against recent learnings and propose structural code improvements.',
     });
   }
+}
+
+// Process self-healing reflection queue
+try {
+  const processorScript = path.join(ROOT, '.claude', 'hooks', 'process-evolution-queue.cjs');
+  if (fs.existsSync(processorScript)) {
+    const result = spawnSync('node', [processorScript, '--run-once'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'], // ignore stderr to prevent cron noise
+      timeout: 60000,
+      shell: false,
+    });
+    const output = result.stdout;
+
+    if (output) {
+      const lines = output.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (parsed && parsed.type === 'evolution-dispatch' && parsed.skill) {
+            const argsStr =
+              typeof parsed.args === 'string' ? parsed.args : JSON.stringify(parsed.args || {});
+            actions.push({
+              type: 'task_create',
+              subject: parsed.skill,
+              description: `Process self-healing evolution request (trigger: ${parsed.trigger}). Execute with args: ${argsStr}`,
+            });
+          }
+        } catch (_e) {
+          // Ignore non-JSON lines or parse errors
+        }
+      }
+    }
+  }
+} catch (_err) {
+  // Graceful degradation if queue processor fails
 }
 
 if (actions.length > 0) {

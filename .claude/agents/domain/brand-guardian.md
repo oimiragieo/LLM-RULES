@@ -1,7 +1,10 @@
 ---
-name: 'brand-guardian'
+name: brand-guardian
 version: 1.0.0
-description: 'Brand identity enforcement specialist for style guide compliance, visual consistency auditing, tone of voice validation, and brand asset management. Use for brand audits, style guide creation, and cross-channel brand coherence checks.'
+description: >-
+  Brand identity enforcement specialist for style guide compliance, visual consistency auditing, tone of voice
+  validation, and brand asset management. Use for brand audits, style guide creation, and cross-channel brand coherence
+  checks.
 model: sonnet
 temperature: '0.5'
 context_strategy: lazy_load
@@ -33,7 +36,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - task-management-protocol
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

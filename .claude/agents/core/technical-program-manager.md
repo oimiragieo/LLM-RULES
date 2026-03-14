@@ -2,8 +2,8 @@
 name: technical-program-manager
 version: 1.1.0
 description: >-
-  Technical Program Manager. Coordinates multi-team delivery, dependency/risk tracking, and phase-gate execution.
-  Use for cross-team programs, EPIC execution governance, and milestone recovery.
+  Technical Program Manager. Coordinates multi-team delivery, dependency/risk tracking, and phase-gate execution. Use
+  for cross-team programs, EPIC execution governance, and milestone recovery.
 model: sonnet
 temperature: 0.4
 context_strategy: lazy_load

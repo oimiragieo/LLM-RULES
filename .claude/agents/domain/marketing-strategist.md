@@ -2,11 +2,10 @@
 name: marketing-strategist
 version: 1.0.0
 description: >-
-  Expert marketing strategist consolidating campaign planning, content creation, growth hacking, and
-  social media management across LinkedIn, Twitter/X, Instagram, TikTok, and Facebook. Use for
-  campaign planning, A/B testing, audience targeting, content calendars, viral marketing, SEO/SEM,
-  conversion optimization, analytics, brand voice, influencer marketing, email marketing, and paid
-  advertising.
+  Expert marketing strategist consolidating campaign planning, content creation, growth hacking, and social media
+  management across LinkedIn, Twitter/X, Instagram, TikTok, and Facebook. Use for campaign planning, A/B testing,
+  audience targeting, content calendars, viral marketing, SEO/SEM, conversion optimization, analytics, brand voice,
+  influencer marketing, email marketing, and paid advertising.
 model: sonnet
 temperature: 0.7
 context_strategy: lazy_load
@@ -38,7 +37,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - task-management-protocol
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

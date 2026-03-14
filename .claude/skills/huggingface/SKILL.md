@@ -276,13 +276,16 @@ model = AutoModelForCausalLM.from_pretrained(
 model = prepare_model_for_kbit_training(model)
 ```
 
-### SFT with TRL
+### SFT with TRL (2025 Best Practices)
+
+Use conversational message format for modern SFT workflows:
 
 ```python
 from trl import SFTTrainer, SFTConfig
 from datasets import load_dataset
 
-dataset = load_dataset("timdettmers/openassistant-guanaco", split="train")
+# 2025: Use conversational format with system prompt
+dataset = load_dataset("HuggingFaceH4/ultrachat_200k", split="train_sft")
 
 training_args = SFTConfig(
     output_dir="./sft-output",
@@ -290,9 +293,14 @@ training_args = SFTConfig(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,
     learning_rate=2e-4,
-    fp16=True,
+    bf16=True,                         # prefer bf16 over fp16 for stability
     logging_steps=10,
     save_strategy="epoch",
+    # Performance: pack sequences to fill context window (reduces padding waste)
+    packing=True,
+    max_seq_length=2048,
+    # Train only on assistant responses, not on user/system tokens
+    dataset_kwargs={"skip_prepare_dataset": False},
     push_to_hub=True,
     hub_model_id="username/my-finetuned-model",
 )
@@ -302,13 +310,29 @@ trainer = SFTTrainer(
     args=training_args,
     train_dataset=dataset,
     peft_config=lora_config,
-    dataset_text_field="text",
 )
 trainer.train()
 trainer.push_to_hub()
 ```
 
-**Verify:** Loss decreases from epoch 1 to 3. `trainer.state.log_history[-1]["train_loss"]` should be < initial loss.
+**Performance Optimization (Liger Kernels + Flash Attention):**
+
+```python
+# Significant speedup for supported architectures (Llama, Mistral, Phi)
+from liger_kernel.transformers import apply_liger_kernel_to_llama
+
+# Apply before model loading
+apply_liger_kernel_to_llama()
+
+model = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3.1-8B",
+    torch_dtype=torch.bfloat16,
+    device_map="auto",
+    attn_implementation="flash_attention_2",  # 2-4x throughput improvement
+)
+```
+
+**Verify:** Loss decreases from epoch 1 to 3. `trainer.state.log_history[-1]["train_loss"]` should be < initial loss. Training time with packing + Flash Attention + Liger Kernels is typically 5-20x faster than naive baseline.
 
 ### Merging Adapters
 
@@ -397,21 +421,21 @@ api.upload_folder(
 
 ### By Task
 
-| Task | Recommended Models | Notes |
-|------|--------------------|-------|
-| Text generation | `meta-llama/Llama-3.1-8B-Instruct`, `mistralai/Mistral-7B-Instruct-v0.3` | Instruction-tuned for chat |
-| Text classification | `distilbert-base-uncased-finetuned-sst-2-english` | Fast, lightweight |
-| Token classification (NER) | `dslim/bert-base-NER` | Strong NER baseline |
-| Question answering | `deepset/roberta-base-squad2` | SQuAD2 trained |
-| Summarization | `facebook/bart-large-cnn` | News summarization |
-| Translation | `Helsinki-NLP/opus-mt-{src}-{tgt}` | Replace src/tgt with language codes |
-| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` | Fast semantic similarity |
-| Image classification | `google/vit-base-patch16-224` | Vision Transformer baseline |
-| Object detection | `facebook/detr-resnet-50` | COCO-trained |
-| Image generation | `stabilityai/stable-diffusion-xl-base-1.0` | SDXL for high quality |
-| ASR (speech-to-text) | `openai/whisper-large-v3` | Best accuracy |
-| Text-to-speech | `suno/bark` | Expressive TTS |
-| Multimodal (vision+language) | `Qwen/Qwen2-VL-7B-Instruct`, `llava-hf/llava-1.5-7b-hf` | VQA and captioning |
+| Task                         | Recommended Models                                                       | Notes                               |
+| ---------------------------- | ------------------------------------------------------------------------ | ----------------------------------- |
+| Text generation              | `meta-llama/Llama-3.1-8B-Instruct`, `mistralai/Mistral-7B-Instruct-v0.3` | Instruction-tuned for chat          |
+| Text classification          | `distilbert-base-uncased-finetuned-sst-2-english`                        | Fast, lightweight                   |
+| Token classification (NER)   | `dslim/bert-base-NER`                                                    | Strong NER baseline                 |
+| Question answering           | `deepset/roberta-base-squad2`                                            | SQuAD2 trained                      |
+| Summarization                | `facebook/bart-large-cnn`                                                | News summarization                  |
+| Translation                  | `Helsinki-NLP/opus-mt-{src}-{tgt}`                                       | Replace src/tgt with language codes |
+| Embeddings                   | `sentence-transformers/all-MiniLM-L6-v2`                                 | Fast semantic similarity            |
+| Image classification         | `google/vit-base-patch16-224`                                            | Vision Transformer baseline         |
+| Object detection             | `facebook/detr-resnet-50`                                                | COCO-trained                        |
+| Image generation             | `stabilityai/stable-diffusion-xl-base-1.0`                               | SDXL for high quality               |
+| ASR (speech-to-text)         | `openai/whisper-large-v3`                                                | Best accuracy                       |
+| Text-to-speech               | `suno/bark`                                                              | Expressive TTS                      |
+| Multimodal (vision+language) | `Qwen/Qwen2-VL-7B-Instruct`, `llava-hf/llava-1.5-7b-hf`                  | VQA and captioning                  |
 
 ### Selection Criteria
 
@@ -428,6 +452,29 @@ huggingface-cli repo search --filter pipeline_tag:text-generation --limit 10
 
 ---
 
+## Evaluation Strategy
+
+Before fine-tuning, evaluate whether prompting alone solves your problem. Fine-tuning is justified for: domain-specific knowledge injection, controlled output style, hallucination reduction in narrow domains, and specialized task optimization at scale.
+
+**Evaluate fine-tuned models in production-like conditions:**
+
+```bash
+# Serve the fine-tuned model with TGI or vLLM for realistic latency testing
+docker run --gpus all -p 8080:80 \
+  ghcr.io/huggingface/text-generation-inference:latest \
+  --model-id username/my-finetuned-model
+
+# Run evaluation harness against the served model
+lm_eval --model openai-chat-completions \
+  --model_args base_url=http://localhost:8080/v1,model=username/my-finetuned-model \
+  --tasks mmlu,hellaswag \
+  --output_path ./eval-results/
+```
+
+**Verify:** Perplexity on held-out validation set decreases. Task-specific benchmark scores match or exceed baseline model.
+
+---
+
 ## Anti-Patterns
 
 - **Never hardcode HF tokens** — use `HF_TOKEN` env var or `huggingface-cli login`
@@ -438,6 +485,9 @@ huggingface-cli repo search --filter pipeline_tag:text-generation --limit 10
 - **Never use `pipeline()` in production fine-tuning loops** — use `AutoModel` + `Trainer` for control
 - **Never merge adapters before evaluation** — evaluate PEFT model first, merge only if satisfactory
 - **Never use `model.generate()` without `max_new_tokens`** — unbounded generation hangs
+- **Never skip packing for SFT** — `packing=True` in SFTConfig dramatically reduces training time by filling context windows
+- **Never use `fp16=True` when `bf16` is available** — bfloat16 is more numerically stable for LLM fine-tuning on Ampere+ GPUs
+- **Never evaluate only on training distribution** — use held-out eval set and standard benchmarks via lm-evaluation-harness
 
 ---
 
@@ -465,14 +515,40 @@ python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_
 - `debugging` — Systematic debugging for training instabilities
 - `mcp-catalog` — MCP server selection and configuration
 
-## Memory Protocol
+---
 
-**Before starting any HF task:**
+## Search Protocol
 
-- Check `.claude/context/memory/learnings.md` for prior model selections and known issues
-- Check `.claude/context/memory/issues.md` for known HF API rate limits or token issues
+Before starting any Hugging Face task, search for existing model loading code and dataset pipelines:
 
-**After completing:**
+```bash
+pnpm search:code "from transformers OR from datasets OR InferenceClient OR SFTTrainer"
+pnpm search:code "huggingface fine-tuning"
+```
 
-- Record model selection decisions in `.claude/context/memory/decisions.md`
-- Record any HF API quirks in `.claude/context/memory/issues.md`
+Use `Skill({ skill: 'ripgrep' })` to find existing `.py` training scripts. Use `Skill({ skill: 'code-semantic-search' })` to find similar ML pipeline patterns by intent.
+
+---
+
+## Memory Protocol (MANDATORY)
+
+**Before starting any task, you must query semantic memory and read recent static memory:**
+
+```bash
+node .claude/lib/memory/memory-search.cjs "huggingface transformers fine-tuning model selection"
+```
+
+Read `.claude/context/memory/learnings.md`
+Read `.claude/context/memory/decisions.md`
+
+Check for prior model selections, known HF API rate limits, tokenizer issues, and CUDA compatibility gotchas.
+
+**After completing work, record findings:**
+
+- Model selection decisions (why model X over Y) -> Update `.claude/context/memory/decisions.md`
+- HF API quirks, rate limits, token issues -> Append to `.claude/context/memory/issues.md`
+- Training optimization discoveries -> Append to `.claude/context/memory/learnings.md`
+
+**During long tasks:** Use `.claude/context/memory/active_context.md` as scratchpad.
+
+> ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.

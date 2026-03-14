@@ -1,3 +1,67 @@
+## MEGA Wave 3 Additions — Agent Count at 79 (2026-03-14) [FRAMEWORK]
+
+**Event**: MEGA Wave 3 complete (commits 47622327, 21066d24, e9751c28, dda76ab3, 15e14bd4)
+
+**New agents**: `mlops-engineer` (ML pipeline + model deployment), `data-scientist` (analytics + statistical modeling), `terraform-engineer` (IaC specialist — Terraform/Terragrunt). Agent count: **79 total** (was 76 post-Phase-2).
+
+**New skills**: `cloudflare-workers`, `huggingface`, `api-testing` (new); `assimilate` v1.3.0 (updated — CLI-Anything 7-phase pipeline with JSON-structured output, multi-platform CLI gen, session management); `static-analysis` (updated); `sentry-monitoring` (updated with OTel patterns).
+
+**New rules**: `vue-nuxt-rules.md`, `nextjs-app-router-rules.md`
+
+**Application**: Agent count compliance test updated to expect 79 (commit 21066d24). Any future agent addition must update test assertion in `tests/agents/agent-tool-compliance.test.cjs`.
+
+**Pattern**: skill-index.json post-commit reflects 295 skills; pre-commit hook auto-regenerates — manual `pnpm skills:index` unnecessary after commits.
+
+---
+
+## MCP Ecosystem Gap Analysis Pattern (2026-03-14) [RESEARCH]
+
+**Task**: #1 — MCP deep-dive research (15 opportunities identified)
+**Report**: `.claude/context/reports/mcp-deep-dive-2026-03-14.md`
+
+**Pattern: Dual-source MCP audit (official registry + community lists + VoltAgent repos)**
+
+- Technique: cross-reference MCP official registry + awesome-mcp-servers + VoltAgent awesome-\* repos against existing agent/skill catalog
+- Result: 15 creation targets ranked HIGH/MED/LOW
+- Highest-priority gaps found: security SAST (semgrep-mcp, snyk-mcp), ML specialization (mlops-engineer, data-scientist), web pentest (burp-suite via PortSwigger MCP)
+- All official reference MCP servers (fetch, filesystem, git, memory, sequential-thinking) already covered by native tools/skills — skip list eliminates false positives
+
+**Application**: Use this dual-source pattern for future ecosystem audits. The report format (Priority Matrix table + per-server detailed analysis) is the canonical template.
+
+**Gotcha**: `semgrep-rule-creator` skill (writing rules) ≠ `semgrep-scanner` skill (running scans). Two distinct use cases; audit must check BOTH dimensions when evaluating coverage.
+
+---
+
+## assimilate Skill v1.3.0 — CLI-Anything Pipeline (2026-03-14) [SKILL]
+
+**Task**: #2 — assimilate skill updated to v1.3.0
+
+**Pattern: CLI-Anything 7-phase pipeline for skill assimilation**
+
+Phase structure: (1) Discover CLI entry points → (2) Extract tool signatures → (3) Generate skill scaffold → (4) Produce JSON-structured output → (5) Multi-platform target gen → (6) Session management → (7) Integration registration.
+
+**Application**: When assimilating any CLI tool into agent-studio, invoke `Skill({ skill: 'assimilate' })` — the v1.3.0 pipeline handles multi-platform generation (shell, PowerShell, Python) from a single invocation. JSON-structured output feeds directly into skill-index.
+
+**Note**: 295 skills indexed after this update (skill-index.json). Pre-commit hook regenerated automatically.
+
+---
+
+## developer.md Autonomous Coding Patterns (2026-03-14) [AGENT]
+
+**Task**: #4 — developer.md updated with autonomous coding patterns
+**Commit**: e9751c28
+
+**New patterns added to developer agent**:
+
+1. **Multi-session persistence**: Always read `active_context.md` at task start; always write progress to it before context limit. Prevents total context loss across session boundaries.
+2. **Git checkpointing**: Commit after every logical unit of work (not just at "done"). Enables rollback to any working state. Frequency: commit when feature increment works OR before risky refactor.
+3. **TDD strict mode**: Write failing test first — ALWAYS. Never add production code without a failing test. Red-Green-Refactor with explicit commit at each color.
+4. **Search-before-code**: Run `pnpm search:code` to find existing implementations BEFORE writing new code. Prevents duplicates, reveals reuse opportunities.
+
+**Application**: These patterns are now canonical in developer.md — spawn prompts that reference developer.md automatically inherit these patterns.
+
+---
+
 ## cleanup-always Rule: Gap Log Descriptions Are Mandatory (2026-03-14) [PROCESS]
 
 **Pattern: cleanup_finding gap-log entries without descriptions are not actionable**
@@ -444,3 +508,5 @@ Key anti-patterns captured:
 - Use `state.acceptWebSocket()` not `ws.accept()` for DO WebSockets (hibernation)
 - Never use `setTimeout`/`setInterval` — use Cron Triggers or DO alarms
 - Never store secrets in wrangler.toml vars — use `wrangler secret put`
+
+- Refreshed agent: .claude/agents/domain/aso-specialist.md (2026-03-14)

@@ -38,7 +38,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - yara-authoring
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

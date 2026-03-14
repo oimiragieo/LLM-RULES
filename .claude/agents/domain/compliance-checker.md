@@ -2,10 +2,9 @@
 name: compliance-checker
 version: 1.0.0
 description: >-
-  Regulatory compliance specialist for GDPR/CCPA privacy validation, ADA/WCAG accessibility
-  standards, data processing agreements, privacy-by-design auditing, and compliance risk scoring.
-  Use for compliance audits, regulatory gap analysis, DPA review, privacy impact assessments,
-  and generating compliance checklists with remediation roadmaps.
+  Regulatory compliance specialist for GDPR/CCPA privacy validation, ADA/WCAG accessibility standards, data processing
+  agreements, privacy-by-design auditing, and compliance risk scoring. Use for compliance audits, regulatory gap
+  analysis, DPA review, privacy impact assessments, and generating compliance checklists with remediation roadmaps.
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
@@ -37,7 +36,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - task-management-protocol
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

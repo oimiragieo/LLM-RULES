@@ -128,6 +128,7 @@
     "dlq:ci": "node .claude/tools/cli/dlq-health-summary.cjs --json --hours 24 --assert-max-total 200 --assert-max-rate-per-hour 10 --assert-max-failed 150 --assert-max-cancelled 150",
     "telemetry:maintain": "node .claude/tools/cli/flight-recorder-maintenance.cjs --json",
     "telemetry:maintain:dry-run": "node .claude/tools/cli/flight-recorder-maintenance.cjs --json --dry-run true",
+    "cron:start": "node .claude/tools/cron-runner/cron-session-launcher.cjs",
     "routing:prototypes": "node .claude/tools/cli/generate-routing-prototypes.cjs",
     "routing:status": "node .claude/scripts/quick-status.cjs",
     "skills:index": "node .claude/tools/cli/generate-skill-index.cjs",

@@ -2,10 +2,9 @@
 name: nlp-engineer
 version: 1.0.0
 description: >-
-  NLP pipeline development specialist for text classification, entity extraction, sentiment analysis,
-  embedding generation, language model fine-tuning, RAG pipeline design, text preprocessing, and
-  tokenization. Use for spaCy, NLTK, Hugging Face Transformers, BERT/GPT/T5 tasks, vector search,
-  and semantic similarity pipelines.
+  NLP pipeline development specialist for text classification, entity extraction, sentiment analysis, embedding
+  generation, language model fine-tuning, RAG pipeline design, text preprocessing, and tokenization. Use for spaCy,
+  NLTK, Hugging Face Transformers, BERT/GPT/T5 tasks, vector search, and semantic similarity pipelines.
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
@@ -38,7 +37,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - memory-search
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -134,6 +133,18 @@ Use `sklearn.metrics.classification_report`, HuggingFace `evaluate`, `ragas`.
 - Never mix tokenizers across model versions
 - Never skip deduplication before train/test split — data leakage
 - Never use batch_size=1 for inference
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol
 

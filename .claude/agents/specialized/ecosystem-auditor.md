@@ -1,8 +1,11 @@
 ---
-name: 'ecosystem-auditor'
+name: ecosystem-auditor
 version: 1.0.0
-description: "Proactive Codebase Auditor driving auto-evolution. Uses structure and glob tools to map the target environment's tech stack and code categories, compares them against existing Agent Studio capabilities, and triggers the evolution queue via the recommend-evolution skill when gaps are found."
-model: 'sonnet'
+description: >-
+  Proactive Codebase Auditor driving auto-evolution. Uses structure and glob tools to map the target environment's tech
+  stack and code categories, compares them against existing Agent Studio capabilities, and triggers the evolution queue
+  via the recommend-evolution skill when gaps are found.
+model: sonnet
 temperature: '0.3'
 context_strategy: lazy_load
 maxTurns: 25
@@ -11,20 +14,18 @@ priority: high
 verified: true
 lastVerifiedAt: '2026-03-10T06:00:38.407Z'
 tools:
-  [
-    Read,
-    Write,
-    Edit,
-    Glob,
-    Grep,
-    Bash,
-    TaskUpdate,
-    TaskList,
-    TaskCreate,
-    TaskGet,
-    Skill,
-    MemoryRecord,
-  ]
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - Bash
+  - TaskUpdate
+  - TaskList
+  - TaskCreate
+  - TaskGet
+  - Skill
+  - MemoryRecord
 skills:
   - task-management-protocol
   - ripgrep
@@ -36,7 +37,7 @@ skills:
   - token-saver-context-compression
   - verification-before-completion
   - memory-search
-context_files:
+context_files: null
 ---
 
 <!-- agent-template-contract:v1 -->

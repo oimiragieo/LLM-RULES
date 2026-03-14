@@ -1,7 +1,10 @@
 ---
 name: legacy-modernizer
 version: 1.0.0
-description: Modernizes legacy codebases by upgrading outdated patterns, frameworks, and syntax to modern equivalents while preserving behavior. Use for jQuery-to-React migrations, callback-to-async/await refactors, Python 2-to-3 upgrades, CommonJS-to-ESM conversions, and any systematic legacy-to-modern codebase transformation.
+description: >-
+  Modernizes legacy codebases by upgrading outdated patterns, frameworks, and syntax to modern equivalents while
+  preserving behavior. Use for jQuery-to-React migrations, callback-to-async/await refactors, Python 2-to-3 upgrades,
+  CommonJS-to-ESM conversions, and any systematic legacy-to-modern codebase transformation.
 model: sonnet
 temperature: 0.3
 context_strategy: lazy_load
@@ -137,6 +140,18 @@ TaskList();
 3. `Skill({ skill: 'code-semantic-search' })` — conceptual pattern discovery
 4. `Skill({ skill: 'code-structural-search' })` — AST-level transform targeting
 5. `Grep` — fallback only
+
+## Token Saver Invocation Rule
+
+Use `Skill({ skill: 'token-saver-context-compression' })` only when context pressure is high and normal search+read would over-expand tokens.
+
+Invoke token-saver when ANY of these conditions hold:
+
+- You need to synthesize across many search hits (typically 10+ candidates).
+- Retrieved snippets/logs are too large to keep directly in working context.
+- You are preparing evidence-heavy handoff/review output and need compact grounding.
+
+Do NOT invoke token-saver for normal small tasks (few files, short snippets); use regular hybrid search + direct reads instead.
 
 ## Memory Protocol (MANDATORY)
 

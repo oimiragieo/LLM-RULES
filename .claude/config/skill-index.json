@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-14T07:25:15.797Z",
+  "generatedAt": "2026-03-14T17:54:07.504Z",
   "metadata": {
     "totalSkills": 298,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-14T07:25:15.798Z",
+    "lastValidated": "2026-03-14T17:54:07.505Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -69,6 +69,8 @@
         "api-designer",
         "mcp-developer",
         "kubernetes-specialist",
+        "terraform-engineer",
+        "legacy-modernizer",
         "accessibility-tester",
         "penetration-tester",
         "performance-engineer",
@@ -137,6 +139,9 @@
         "gamedev-pro",
         "mcp-developer",
         "kubernetes-specialist",
+        "mlops-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
         "devops-troubleshooter",
         "performance-engineer",
         "sre-engineer",
@@ -146,6 +151,8 @@
         "fastapi-pro",
         "nodejs-pro",
         "ai-ml-specialist",
+        "data-scientist",
+        "terraform-engineer",
         "code-reviewer",
         "incident-responder",
         "reverse-engineer",
@@ -246,6 +253,11 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -432,6 +444,11 @@
         "marketing-strategist",
         "mcp-developer",
         "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -639,6 +656,11 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -1622,7 +1644,9 @@
         "devops",
         "devops-troubleshooter"
       ],
-      "agentSupporting": [],
+      "agentSupporting": [
+        "terraform-engineer"
+      ],
       "tags": [
         "devops",
         "docker-compose"
@@ -1642,6 +1666,7 @@
         "Glob"
       ],
       "agentPrimary": [
+        "terraform-engineer",
         "devops"
       ],
       "agentSupporting": [],
@@ -1670,7 +1695,9 @@
         "devops",
         "devops-troubleshooter"
       ],
-      "agentSupporting": [],
+      "agentSupporting": [
+        "terraform-engineer"
+      ],
       "tags": [
         "devops",
         "other",
@@ -1694,6 +1721,7 @@
         "developer"
       ],
       "agentSupporting": [
+        "mlops-engineer",
         "devops",
         "incident-responder"
       ],
@@ -2107,7 +2135,8 @@
       ],
       "agentSupporting": [
         "developer",
-        "fastapi-pro"
+        "fastapi-pro",
+        "nlp-engineer"
       ],
       "tags": [
         "other",
@@ -2979,6 +3008,7 @@
       "agentSupporting": [
         "fastapi-pro",
         "data-engineer",
+        "data-scientist",
         "devops-troubleshooter",
         "incident-responder"
       ],
@@ -3005,7 +3035,8 @@
         "Glob"
       ],
       "agentPrimary": [
-        "data-engineer"
+        "data-engineer",
+        "data-scientist"
       ],
       "agentSupporting": [
         "python-pro",
@@ -3059,7 +3090,10 @@
       ],
       "agentPrimary": [
         "ai-ml-specialist",
-        "llm-architect"
+        "llm-architect",
+        "data-scientist",
+        "mlops-engineer",
+        "nlp-engineer"
       ],
       "agentSupporting": [
         "data-engineer"
@@ -3945,6 +3979,11 @@
         "kubernetes-specialist",
         "medical-research-triage",
         "ux-researcher",
+        "data-scientist",
+        "mlops-engineer",
+        "terraform-engineer",
+        "legacy-modernizer",
+        "nlp-engineer",
         "ecosystem-auditor",
         "code-reviewer",
         "security-architect",
@@ -7699,11 +7738,13 @@
       ],
       "agentPrimary": [
         "scientific-research-expert",
-        "medical-research-triage"
+        "medical-research-triage",
+        "data-scientist"
       ],
       "agentSupporting": [
         "python-pro",
         "data-engineer",
+        "nlp-engineer",
         "researcher"
       ],
       "tags": [
@@ -7725,14 +7766,16 @@
         "Edit"
       ],
       "agentPrimary": [
-        "developer"
+        "terraform-engineer"
       ],
-      "agentSupporting": [],
+      "agentSupporting": [
+        "mlops-engineer"
+      ],
       "tags": [
         "other",
         "security-scanning"
       ],
-      "priority": 3,
+      "priority": 1,
       "aliasOf": null
     },
     "seo-optimization": {
@@ -10174,7 +10217,6 @@
         "mcp-catalog",
         "reddit-researcher",
         "regulatory-compliance",
-        "security-scanning",
         "seo-optimization",
         "slack-expert",
         "task-delegation",
@@ -10841,6 +10883,57 @@
         "task-management-protocol",
         "token-saver-context-compression",
         "verification-before-completion"
+      ],
+      "data-scientist": [
+        "ai-ml-expert",
+        "data-expert",
+        "scientific-skills",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "database-expert",
+        "debugging"
+      ],
+      "mlops-engineer": [
+        "ai-ml-expert",
+        "debugging",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "sentry-monitoring",
+        "security-scanning"
+      ],
+      "terraform-engineer": [
+        "terraform-infra",
+        "security-scanning",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "k8s-manifest-generator",
+        "docker-compose",
+        "tdd",
+        "debugging"
+      ],
+      "legacy-modernizer": [
+        "debugging",
+        "code-semantic-search",
+        "ripgrep",
+        "task-management-protocol",
+        "verification-before-completion",
+        "tdd"
+      ],
+      "nlp-engineer": [
+        "ai-ml-expert",
+        "debugging",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "scientific-skills",
+        "modern-python"
       ],
       "ecosystem-auditor": [
         "rule-auditor",
@@ -11423,7 +11516,6 @@
         "mcp-catalog",
         "reddit-researcher",
         "regulatory-compliance",
-        "security-scanning",
         "seo-optimization",
         "slack-expert",
         "task-delegation",
@@ -12090,6 +12182,57 @@
         "task-management-protocol",
         "token-saver-context-compression",
         "verification-before-completion"
+      ],
+      "data-scientist": [
+        "ai-ml-expert",
+        "data-expert",
+        "scientific-skills",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "database-expert",
+        "debugging"
+      ],
+      "mlops-engineer": [
+        "ai-ml-expert",
+        "debugging",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "sentry-monitoring",
+        "security-scanning"
+      ],
+      "terraform-engineer": [
+        "terraform-infra",
+        "security-scanning",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "k8s-manifest-generator",
+        "docker-compose",
+        "tdd",
+        "debugging"
+      ],
+      "legacy-modernizer": [
+        "debugging",
+        "code-semantic-search",
+        "ripgrep",
+        "task-management-protocol",
+        "verification-before-completion",
+        "tdd"
+      ],
+      "nlp-engineer": [
+        "ai-ml-expert",
+        "debugging",
+        "ripgrep",
+        "code-semantic-search",
+        "task-management-protocol",
+        "verification-before-completion",
+        "scientific-skills",
+        "modern-python"
       ],
       "ecosystem-auditor": [
         "rule-auditor",
