@@ -10,6 +10,12 @@ skills:
   - data-expert
   - database-expert
   - scientific-skills
+  - ripgrep
+  - code-semantic-search
+  - memory-search
+  - token-saver-context-compression
+  - task-management-protocol
+  - verification-before-completion
 tags:
   - data-science
   - statistics
@@ -122,3 +128,14 @@ Route tasks to `data-scientist` when the request involves:
 - Production ML model deployment → use `devops` + `ai-ml-specialist`
 - Database schema design → use `database-architect`
 - Business intelligence dashboards → use `frontend-pro`
+
+## Search Protocol
+
+For code and data discovery tasks, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search across files
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Grep` or `Glob` for open-ended discovery.

@@ -808,6 +808,60 @@
         ],
         "contextual": [],
         "secondary": []
+      },
+      "data-scientist": {
+        "primary": ["ai-ml-expert", "data-expert", "scientific-skills"],
+        "secondary": ["database-expert", "debugging"],
+        "always": [
+          "ripgrep",
+          "code-semantic-search",
+          "task-management-protocol",
+          "verification-before-completion"
+        ],
+        "contextual": {}
+      },
+      "mlops-engineer": {
+        "primary": ["ai-ml-expert", "debugging"],
+        "secondary": ["sentry-monitoring", "security-scanning"],
+        "always": [
+          "ripgrep",
+          "code-semantic-search",
+          "task-management-protocol",
+          "verification-before-completion"
+        ],
+        "contextual": {}
+      },
+      "terraform-engineer": {
+        "primary": ["terraform-infra", "security-scanning"],
+        "secondary": ["k8s-manifest-generator", "docker-compose", "tdd", "debugging"],
+        "always": [
+          "ripgrep",
+          "code-semantic-search",
+          "task-management-protocol",
+          "verification-before-completion"
+        ],
+        "contextual": {}
+      },
+      "legacy-modernizer": {
+        "primary": ["debugging", "code-semantic-search"],
+        "secondary": ["tdd", "refactoring"],
+        "always": [
+          "ripgrep",
+          "task-management-protocol",
+          "verification-before-completion"
+        ],
+        "contextual": {}
+      },
+      "nlp-engineer": {
+        "primary": ["ai-ml-expert", "debugging"],
+        "secondary": ["scientific-skills", "modern-python"],
+        "always": [
+          "ripgrep",
+          "code-semantic-search",
+          "task-management-protocol",
+          "verification-before-completion"
+        ],
+        "contextual": {}
       }
     },
     "specialized": {

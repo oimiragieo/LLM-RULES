@@ -14,6 +14,11 @@ skills:
   - task-management-protocol
   - tdd
   - debugging
+  - ripgrep
+  - code-semantic-search
+  - memory-search
+  - token-saver-context-compression
+  - verification-before-completion
 context_files:
   - @.claude/context/memory/learnings.md
   - @.claude/context/memory/decisions.md
@@ -290,3 +295,15 @@ cat .claude/context/memory/decisions.md
 - Architecture decision (e.g., state splitting strategy) -> Append to `.claude/context/memory/decisions.md`
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Search Protocol
+
+For code and configuration discovery, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search across files
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Skill({ skill: 'code-structural-search', args: '...' })` — AST/shape queries
+5. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Grep` or `Glob` for open-ended discovery.

@@ -28,6 +28,8 @@ skills:
   - security-scanning
   - code-semantic-search
   - ripgrep
+  - memory-search
+  - token-saver-context-compression
   - task-management-protocol
   - verification-before-completion
 tags:
@@ -190,3 +192,14 @@ Route to `mlops-engineer` when the task involves:
 - ETL pipelines, feature store construction, raw data processing → `data-engineer`
 - Kubernetes cluster setup, cloud provisioning → `kubernetes-specialist` or `devops`
 - Security audits of ML infrastructure → `security-architect`
+
+## Search Protocol
+
+For code and configuration discovery, follow this priority order:
+
+1. `pnpm search:code "query"` — hybrid BM25 + semantic (primary, recommended default)
+2. `Skill({ skill: 'ripgrep', args: '...' })` — fast text/regex search across files
+3. `Skill({ skill: 'code-semantic-search', args: '...' })` — conceptual/intent queries
+4. `Grep` — FALLBACK ONLY (advanced regex edge cases or single-file targeted checks)
+
+Use `Read` only for known specific file paths. Never use `Grep` or `Glob` for open-ended discovery.

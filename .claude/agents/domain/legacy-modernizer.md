@@ -33,6 +33,7 @@ skills:
   - verification-before-completion
   - task-management-protocol
   - token-saver-context-compression
+  - memory-search
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---

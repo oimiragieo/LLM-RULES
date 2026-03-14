@@ -37,6 +37,7 @@ skills:
   - task-management-protocol
   - token-saver-context-compression
   - verification-before-completion
+  - memory-search
 context_files:
 ---
 
