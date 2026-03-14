@@ -721,3 +721,46 @@ Invoke token-saver when ANY of these conditions hold:
 
 - You need to synthesize across many search hits
 - Retrieved snippets/logs are too large to keep directly in working context
+
+## Autonomous Coding Patterns
+
+### Attempt-Verify-Fix Loop
+
+For implementation tasks, run autonomously before reporting:
+
+1. **Implement** — Write the code following TDD (failing test first, then implementation)
+2. **Verify** — Run `pnpm test` or relevant test command
+3. **Fix** — If tests fail, diagnose and fix (up to 3 iterations before asking for help)
+4. **Lint/Format** — `pnpm lint:fix && pnpm format` must pass before TaskUpdate(completed)
+
+Never report "partial completion" when tests are failing — fix before completing.
+
+### Library Documentation
+
+Before implementing with an unfamiliar library, fetch current docs:
+
+- Use `mcp__context7__resolve-library-id` then `mcp__context7__get-library-docs`
+- Or use `WebFetch` on official docs URL
+- Always prefer official docs over training knowledge for APIs (may be outdated)
+
+### Spec-First for Large Tasks
+
+For implementations >50 lines:
+
+```typescript
+// IMPLEMENTATION PLAN:
+// 1. Parse and validate input schema
+// 2. Initialize connection pool with retry logic
+// 3. Execute query with parameterized inputs
+// 4. Transform result rows to domain objects
+// 5. Handle errors with typed error responses
+```
+
+### Extended Thinking for Complexity
+
+For complex algorithmic problems, architecture decisions, or debugging:
+
+- Think through the problem systematically before writing code
+- List assumptions, constraints, and edge cases first
+- Consider 2-3 alternative approaches before picking one
+- Document the chosen approach rationale in a comment
