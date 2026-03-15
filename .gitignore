@@ -260,6 +260,8 @@ yarn.lock
 *.bak
 *.old
 .claude/lib/_test-fixtures/backups/
+# .env backups (contain secrets — never commit)
+.claude/context/backups/
 
 # Consolidated test directories (data/temp generated during tests)
 tests/data/
