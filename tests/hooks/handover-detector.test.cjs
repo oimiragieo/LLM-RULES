@@ -391,3 +391,154 @@ test('handover-detector > FRESH_SPAWN: clears inherited session-id.json and inje
   if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
   if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
 });
+
+// ============================================================
+// TDD RED Phase: New tests for structured JSON handoff format
+// These tests should FAIL until handover-detector.cjs is updated
+// to handle the new structured resumeInstructions format.
+// ============================================================
+
+test('handover-detector > correctly parses structured JSON handoff log (new format)', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  const ackPath = path.join(tmpDir, 'shift-change-ack.json');
+  const logPath = path.join(tmpDir, 'shift-change-log.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+
+  // Write a handover log with structured resumeInstructions (v2.0.0 format)
+  const structuredLog = {
+    schemaVersion: '2.0.0',
+    generation: 1,
+    sessionId: 'structured-test-session',
+    status: 'READY',
+    tokenCount: 155000,
+    resumeInstructions: {
+      objective: 'Implement session handoff auto-trigger',
+      nextStep: 'Run failing tests and implement session-budget-watchdog.cjs',
+      openTasks: ['task-5: Write auto-trigger hook', 'task-6: Update handover-detector'],
+      keyFiles: ['.claude/hooks/session/session-budget-watchdog.cjs'],
+      recentDecisions: ['ADR: Use 3-tier threshold model (140K/160K/180K)'],
+      risks: ['budget-tracker.json may not be updated by any hook'],
+      resumePrompt: 'You are resuming a session-handoff overhaul. Start with TaskList().',
+    },
+    contextSummary: 'Working on TDD RED phase',
+    fallbackInstruction: 'Run TaskList() to discover pending work',
+    timestamp: new Date().toISOString(),
+  };
+
+  fs.writeFileSync(logPath, JSON.stringify(structuredLog, null, 2), 'utf8');
+
+  const res = runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  assert.strictEqual(res.allow, true);
+  assert.ok(res.message, 'Should inject message for structured log');
+
+  // The resume message should include the objective from structured format
+  assert.ok(
+    res.message.includes('Implement session handoff auto-trigger'),
+    'Should include objective from structured resumeInstructions'
+  );
+
+  // Should include the nextStep
+  assert.ok(
+    res.message.includes('session-budget-watchdog'),
+    'Should include nextStep content from structured resumeInstructions'
+  );
+
+  // Should include openTasks
+  assert.ok(
+    res.message.includes('task-5') || res.message.includes('Write auto-trigger hook'),
+    'Should include openTasks from structured resumeInstructions'
+  );
+
+  // Clean up
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+});
+
+test('handover-detector > falls back gracefully to legacy string format', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  const ackPath = path.join(tmpDir, 'shift-change-ack.json');
+  const logPath = path.join(tmpDir, 'shift-change-log.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+
+  // Write a legacy handover log with string resumeInstructions (v1.0.0 format)
+  writeHandoverLog(
+    {
+      schemaVersion: '1.0.0',
+      generation: 1,
+      sessionId: 'legacy-session',
+      resumeInstructions: 'Resume the auth refactor task',
+      contextSummary: 'Working on authentication',
+    },
+    tmpDir
+  );
+
+  const res = runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  assert.strictEqual(res.allow, true);
+  assert.ok(res.message, 'Should inject message for legacy format');
+  assert.ok(
+    res.message.includes('Resume the auth refactor task'),
+    'Should still render legacy string resumeInstructions'
+  );
+
+  // Clean up
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+});
+
+test('handover-detector > injects objective and nextStep into session context', () => {
+  const tmpDir = path.join(process.cwd(), '.claude/context/runtime');
+  const sessionPath = path.join(tmpDir, 'session-id.json');
+  const ackPath = path.join(tmpDir, 'shift-change-ack.json');
+  const logPath = path.join(tmpDir, 'shift-change-log.json');
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+
+  const structuredLog = {
+    schemaVersion: '2.0.0',
+    generation: 1,
+    sessionId: 'context-inject-session',
+    status: 'READY',
+    resumeInstructions: {
+      objective: 'Complete the TDD test suite for session handoff',
+      nextStep: 'Implement session-budget-watchdog.cjs to make failing tests pass',
+      openTasks: [],
+      keyFiles: [],
+      recentDecisions: [],
+      risks: [],
+      resumePrompt: 'Start by running the failing test suite.',
+    },
+    contextSummary: 'TDD RED phase complete',
+    fallbackInstruction: 'Run TaskList()',
+    timestamp: new Date().toISOString(),
+  };
+
+  fs.writeFileSync(logPath, JSON.stringify(structuredLog, null, 2), 'utf8');
+
+  const res = runHook({ command: 'hello' }, { CLAUDE_SESSION_ID: '' });
+
+  assert.strictEqual(res.allow, true);
+  assert.ok(res.message, 'Should inject message');
+
+  // Both objective and nextStep must appear in the injected message
+  assert.ok(
+    res.message.includes('Complete the TDD test suite'),
+    'Injected message must contain the objective'
+  );
+  assert.ok(
+    res.message.includes('Implement session-budget-watchdog'),
+    'Injected message must contain the nextStep'
+  );
+
+  // Clean up
+  if (fs.existsSync(sessionPath)) fs.unlinkSync(sessionPath);
+  if (fs.existsSync(ackPath)) fs.unlinkSync(ackPath);
+  if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
+});
