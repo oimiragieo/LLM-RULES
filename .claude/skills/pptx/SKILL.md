@@ -83,13 +83,13 @@ prs.save("presentation.pptx")
 
 Standard layouts available in default template:
 
-| Index | Name | Use For |
-|-------|------|---------|
-| 0 | Title Slide | Opening slide |
-| 1 | Title and Content | Main content slides |
-| 2 | Title and Two Content | Side-by-side comparison |
-| 5 | Title Only | Charts or images with title |
-| 6 | Blank | Custom layouts |
+| Index | Name                  | Use For                     |
+| ----- | --------------------- | --------------------------- |
+| 0     | Title Slide           | Opening slide               |
+| 1     | Title and Content     | Main content slides         |
+| 2     | Title and Two Content | Side-by-side comparison     |
+| 5     | Title Only            | Charts or images with title |
+| 6     | Blank                 | Custom layouts              |
 
 ```python
 # List all layouts in a template

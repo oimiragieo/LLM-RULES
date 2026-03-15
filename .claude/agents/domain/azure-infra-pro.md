@@ -85,12 +85,12 @@ spec:
       metadata:
         connectionFromEnv: SERVICE_BUS_CONNECTION_STRING
         queueName: orders
-        messageCount: "10"   # 1 replica per 10 messages
-        activationMessageCount: "1"
+        messageCount: '10' # 1 replica per 10 messages
+        activationMessageCount: '1'
     - type: cpu
       metricType: Utilization
       metadata:
-        value: "70"
+        value: '70'
 ```
 
 ```bicep

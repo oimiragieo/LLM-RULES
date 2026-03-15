@@ -4,11 +4,11 @@ Rules for building observable systems using the three pillars: logs, metrics, an
 
 ## The Three Pillars
 
-| Pillar    | Answers                        | Primary Tools                          |
-|-----------|--------------------------------|----------------------------------------|
-| **Logs**  | What happened?                 | OpenTelemetry Logs, Loki, CloudWatch   |
-| **Metrics** | How is the system behaving? | Prometheus, OTLP, Datadog, CloudWatch  |
-| **Traces** | Why is it slow/broken?        | OpenTelemetry Traces, Jaeger, Tempo    |
+| Pillar      | Answers                     | Primary Tools                         |
+| ----------- | --------------------------- | ------------------------------------- |
+| **Logs**    | What happened?              | OpenTelemetry Logs, Loki, CloudWatch  |
+| **Metrics** | How is the system behaving? | Prometheus, OTLP, Datadog, CloudWatch |
+| **Traces**  | Why is it slow/broken?      | OpenTelemetry Traces, Jaeger, Tempo   |
 
 ## OpenTelemetry — Structured Instrumentation
 
@@ -50,7 +50,7 @@ import { trace, SpanStatusCode, context, propagation } from '@opentelemetry/api'
 const tracer = trace.getTracer('order-service', '1.0.0');
 
 async function processPayment(orderId: string, amount: number): Promise<PaymentResult> {
-  return tracer.startActiveSpan('payment.process', async (span) => {
+  return tracer.startActiveSpan('payment.process', async span => {
     span.setAttributes({
       'order.id': orderId,
       'payment.amount': amount,
@@ -149,22 +149,23 @@ def create_order(request):
 ```yaml
 # SLO Definition — service level objectives
 slos:
-  - name: "API Availability"
-    description: "Order API responds with 2xx or 4xx for ≥99.9% of requests"
-    target: 99.9  # percent
-    window: "30d"
+  - name: 'API Availability'
+    description: 'Order API responds with 2xx or 4xx for ≥99.9% of requests'
+    target: 99.9 # percent
+    window: '30d'
     sli:
       type: availability
       metric: "sum(rate(http_requests_total{status_code!~'5..'}[5m])) / sum(rate(http_requests_total[5m]))"
 
-  - name: "Order Processing Latency"
-    description: "95th percentile order processing time ≤ 500ms"
-    target: 99.0  # 99% of windows meet this
-    window: "30d"
+  - name: 'Order Processing Latency'
+    description: '95th percentile order processing time ≤ 500ms'
+    target: 99.0 # 99% of windows meet this
+    window: '30d'
     sli:
       type: latency
       metric: "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{endpoint='/orders'}[5m]))"
-      threshold: 0.5  # seconds
+      threshold: 0.5 # seconds
+
 
 # Error budget = 100% - SLO target
 # 99.9% availability → 0.1% error budget → 43.8 min/month downtime allowed
@@ -187,9 +188,9 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "High error budget burn rate detected"
-          description: "Error rate {{ $value | humanizePercentage }} — burning budget 14x fast"
-          runbook_url: "https://wiki/runbooks/high-error-rate"
+          summary: 'High error budget burn rate detected'
+          description: 'Error rate {{ $value | humanizePercentage }} — burning budget 14x fast'
+          runbook_url: 'https://wiki/runbooks/high-error-rate'
 
       - alert: APIHighLatency
         expr: |
@@ -200,7 +201,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: "API p99 latency > 1s for {{ $labels.endpoint }}"
+          summary: 'API p99 latency > 1s for {{ $labels.endpoint }}'
 ```
 
 ## Anti-Patterns (NEVER)

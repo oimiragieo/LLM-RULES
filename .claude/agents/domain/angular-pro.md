@@ -75,7 +75,7 @@ import { ProductService } from './product.service';
 
 @Component({
   selector: 'app-product-list',
-  standalone: true,               // Angular 17+ default
+  standalone: true, // Angular 17+ default
   imports: [CommonModule, RouterLink],
   template: `
     <div *ngFor="let product of products()">
@@ -87,9 +87,9 @@ import { ProductService } from './product.service';
   `,
 })
 export class ProductListComponent {
-  private productService = inject(ProductService);  // inject() over constructor DI
+  private productService = inject(ProductService); // inject() over constructor DI
 
-  products = this.productService.products;           // Signal from service
+  products = this.productService.products; // Signal from service
   totalProducts = computed(() => this.products().length);
 
   formatPrice(price: number): string {
@@ -118,7 +118,7 @@ export class CartService {
     this._items.update(items => {
       const existing = items.find(i => i.productId === product.id);
       if (existing) {
-        return items.map(i => i.productId === product.id ? { ...i, qty: i.qty + qty } : i);
+        return items.map(i => (i.productId === product.id ? { ...i, qty: i.qty + qty } : i));
       }
       return [...items, { productId: product.id, name: product.name, price: product.price, qty }];
     });
@@ -168,15 +168,19 @@ export const ProductStore = signalStore(
     inStock: computed(() => products().filter(p => p.stock > 0)),
   })),
   withMethods((store, productService = inject(ProductService)) => ({
-    loadProducts: rxMethod<void>(pipe(
-      tap(() => patchState(store, { loading: true })),
-      switchMap(() => productService.getAll().pipe(
-        tapResponse(
-          products => patchState(store, { products, loading: false }),
-          error => patchState(store, { error: error.message, loading: false }),
+    loadProducts: rxMethod<void>(
+      pipe(
+        tap(() => patchState(store, { loading: true })),
+        switchMap(() =>
+          productService.getAll().pipe(
+            tapResponse(
+              products => patchState(store, { products, loading: false }),
+              error => patchState(store, { error: error.message, loading: false })
+            )
+          )
         )
-      ))
-    )),
+      )
+    ),
   }))
 );
 ```

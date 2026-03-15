@@ -107,33 +107,33 @@ end
 
 ```javascript
 // app/javascript/controllers/search_controller.js
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ["input", "results"]
-  static values = { url: String, delay: { type: Number, default: 300 } }
+  static targets = ['input', 'results'];
+  static values = { url: String, delay: { type: Number, default: 300 } };
 
   connect() {
-    this.debouncedSearch = this.debounce(this.search.bind(this), this.delayValue)
+    this.debouncedSearch = this.debounce(this.search.bind(this), this.delayValue);
   }
 
   search() {
-    const query = this.inputTarget.value
-    if (query.length < 2) return
+    const query = this.inputTarget.value;
+    if (query.length < 2) return;
 
     fetch(`${this.urlValue}?q=${encodeURIComponent(query)}`, {
-      headers: { Accept: "text/vnd.turbo-stream.html" }
+      headers: { Accept: 'text/vnd.turbo-stream.html' },
     })
       .then(r => r.text())
-      .then(html => Turbo.renderStreamMessage(html))
+      .then(html => Turbo.renderStreamMessage(html));
   }
 
   debounce(fn, wait) {
-    let timer
+    let timer;
     return (...args) => {
-      clearTimeout(timer)
-      timer = setTimeout(() => fn(...args), wait)
-    }
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), wait);
+    };
   }
 }
 ```

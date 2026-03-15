@@ -61,17 +61,17 @@ npx -y @modelcontextprotocol/server-memory
 
 ### MCP Memory Server Tools
 
-| Tool | Purpose |
-|------|---------|
-| `create_entities` | Add one or more entities with type and observations |
-| `create_relations` | Add directed relations between entities |
-| `add_observations` | Append new observations to existing entities |
-| `delete_entities` | Remove entities (and their relations) |
-| `delete_observations` | Remove specific observations |
-| `delete_relations` | Remove specific relations |
-| `read_graph` | Return the full graph |
-| `search_nodes` | Search entities by query string |
-| `open_nodes` | Retrieve specific entities by name |
+| Tool                  | Purpose                                             |
+| --------------------- | --------------------------------------------------- |
+| `create_entities`     | Add one or more entities with type and observations |
+| `create_relations`    | Add directed relations between entities             |
+| `add_observations`    | Append new observations to existing entities        |
+| `delete_entities`     | Remove entities (and their relations)               |
+| `delete_observations` | Remove specific observations                        |
+| `delete_relations`    | Remove specific relations                           |
+| `read_graph`          | Return the full graph                               |
+| `search_nodes`        | Search entities by query string                     |
+| `open_nodes`          | Retrieve specific entities by name                  |
 
 ### Usage Pattern
 
@@ -80,52 +80,49 @@ npx -y @modelcontextprotocol/server-memory
 mcp__memory__create_entities({
   entities: [
     {
-      name: "authentication-service",
-      entityType: "service",
+      name: 'authentication-service',
+      entityType: 'service',
       observations: [
-        "Handles JWT authentication and refresh token rotation",
-        "Located at src/auth/",
-        "Uses Redis for token storage",
-        "Rate-limited to 100 req/min per IP"
-      ]
+        'Handles JWT authentication and refresh token rotation',
+        'Located at src/auth/',
+        'Uses Redis for token storage',
+        'Rate-limited to 100 req/min per IP',
+      ],
     },
     {
-      name: "Alice Chen",
-      entityType: "person",
-      observations: [
-        "Senior engineer, owns the auth service",
-        "On-call for auth incidents"
-      ]
-    }
-  ]
+      name: 'Alice Chen',
+      entityType: 'person',
+      observations: ['Senior engineer, owns the auth service', 'On-call for auth incidents'],
+    },
+  ],
 });
 
 // Create relations
 mcp__memory__create_relations({
   relations: [
     {
-      from: "Alice Chen",
-      to: "authentication-service",
-      relationType: "owns"
-    }
-  ]
+      from: 'Alice Chen',
+      to: 'authentication-service',
+      relationType: 'owns',
+    },
+  ],
 });
 
 // Add new observations as you learn more
 mcp__memory__add_observations({
   observations: [
     {
-      entityName: "authentication-service",
-      contents: ["Migrated to Argon2 password hashing in March 2026"]
-    }
-  ]
+      entityName: 'authentication-service',
+      contents: ['Migrated to Argon2 password hashing in March 2026'],
+    },
+  ],
 });
 
 // Search for relevant nodes
-mcp__memory__search_nodes({ query: "authentication" });
+mcp__memory__search_nodes({ query: 'authentication' });
 
 // Retrieve specific entities
-mcp__memory__open_nodes({ names: ["authentication-service", "Alice Chen"] });
+mcp__memory__open_nodes({ names: ['authentication-service', 'Alice Chen'] });
 ```
 
 ### Session Startup Pattern (MANDATORY)
@@ -138,7 +135,7 @@ const existing = await mcp__memory__read_graph({});
 // Review existing entities for this domain
 
 // 2. Search for relevant entities
-const relevant = await mcp__memory__search_nodes({ query: "<current task domain>" });
+const relevant = await mcp__memory__search_nodes({ query: '<current task domain>' });
 
 // 3. Update entities with new observations from this session
 // ... do work ...
@@ -147,10 +144,10 @@ const relevant = await mcp__memory__search_nodes({ query: "<current task domain>
 await mcp__memory__add_observations({
   observations: [
     {
-      entityName: "my-project",
-      contents: [`Session ${new Date().toISOString()}: Discovered X, fixed Y`]
-    }
-  ]
+      entityName: 'my-project',
+      contents: [`Session ${new Date().toISOString()}: Discovered X, fixed Y`],
+    },
+  ],
 });
 ```
 
@@ -248,47 +245,47 @@ relations = get_entity_relations(graph, "Alice Chen")
 
 ```typescript
 interface Entity {
-  id: string;              // Stable UUID (never changes)
-  name: string;            // Human-readable identifier
-  type: EntityType;        // Normalized type string
-  observations: string[];  // Timestamped facts (append-only)
-  created_at: string;      // ISO 8601
-  updated_at: string;      // ISO 8601
+  id: string; // Stable UUID (never changes)
+  name: string; // Human-readable identifier
+  type: EntityType; // Normalized type string
+  observations: string[]; // Timestamped facts (append-only)
+  created_at: string; // ISO 8601
+  updated_at: string; // ISO 8601
 }
 
 interface Relation {
-  from: string;   // Entity name (source)
-  to: string;     // Entity name (target)
-  type: string;   // Directional verb: "owns", "depends_on", "calls", "manages"
+  from: string; // Entity name (source)
+  to: string; // Entity name (target)
+  type: string; // Directional verb: "owns", "depends_on", "calls", "manages"
   created_at: string;
 }
 
 // Common entity types
 type EntityType =
-  | "person"
-  | "service"
-  | "codebase"
-  | "file"
-  | "concept"
-  | "organization"
-  | "tool"
-  | "decision"
-  | "issue"
-  | "feature";
+  | 'person'
+  | 'service'
+  | 'codebase'
+  | 'file'
+  | 'concept'
+  | 'organization'
+  | 'tool'
+  | 'decision'
+  | 'issue'
+  | 'feature';
 ```
 
 ## Common Relation Types
 
-| Relation | Direction | Example |
-|----------|-----------|---------|
-| `owns` | person → service | Alice owns auth-service |
-| `depends_on` | service → service | api-gateway depends_on auth-service |
-| `calls` | service → service | checkout calls payment-processor |
-| `manages` | person → person | CTO manages engineering team |
-| `implements` | service → concept | auth-service implements JWT |
-| `documented_in` | feature → file | login documented_in README |
-| `fixes` | commit → issue | fix/abc123 fixes issue-456 |
-| `blocks` | issue → issue | JIRA-100 blocks JIRA-101 |
+| Relation        | Direction         | Example                             |
+| --------------- | ----------------- | ----------------------------------- |
+| `owns`          | person → service  | Alice owns auth-service             |
+| `depends_on`    | service → service | api-gateway depends_on auth-service |
+| `calls`         | service → service | checkout calls payment-processor    |
+| `manages`       | person → person   | CTO manages engineering team        |
+| `implements`    | service → concept | auth-service implements JWT         |
+| `documented_in` | feature → file    | login documented_in README          |
+| `fixes`         | commit → issue    | fix/abc123 fixes issue-456          |
+| `blocks`        | issue → issue     | JIRA-100 blocks JIRA-101            |
 
 ## Codebase Knowledge Graph Pattern
 
@@ -363,10 +360,12 @@ mcp__memory__search_nodes({ query: "<task domain>" })
 ```javascript
 // Record key discoveries as observations
 mcp__memory__add_observations({
-  observations: [{
-    entityName: "<project-or-domain>",
-    contents: ["<what was learned this session>"]
-  }]
+  observations: [
+    {
+      entityName: '<project-or-domain>',
+      contents: ['<what was learned this session>'],
+    },
+  ],
 });
 ```
 

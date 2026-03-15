@@ -357,5 +357,45 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "09373cd95ce79a149fce4f16fcdfb285d9aa79da"
+  },
+  {
+    "text": "Headless CLI path resolution: when spawning CLI tools from cron/service contexts, use where/which auto-detection at startup. resolveClaude() runs where claude (Windows) or which claude (Unix), with CLAUDE_CLI_PATH env var fallback. Applied in telegram-claude-bridge.cjs commit e3ab739b. Anti-pattern: hard-coding the command string in spawn() calls for headless contexts.",
+    "area": "main",
+    "timestamp": "2026-03-15T19:42:50.425Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "eba16a77b668832a11dd5b6d9a98ccf74cb26fd2"
+  },
+  {
+    "text": "MEGA EVOLUTION Wave 4 validation sequence: lint-fix (954 files) -> format (8627 files) -> validate (schema/config) -> agents:registry regenerate. This is the proven post-evolution quality gate sequence. lint scope < format scope because format also runs on generated/non-source files. Run in this exact order.",
+    "area": "main",
+    "timestamp": "2026-03-15T19:46:25.687Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "44e9ba63f060cc3eb00af8436ce9b976452a6e58"
+  },
+  {
+    "text": "Parallel research batching for EPIC evolutions: Divide repositories into groups (A=4, B+C=2, D+E+F=6) and assign each group to a parallel researcher agent. Each group produces an action classification table: UPDATE vs CREATE. This reduces research time from sequential (N*30min) to max(group_time). Pattern confirmed in MEGA EVOLUTION v1 and v2 on 2026-03-14 and 2026-03-15.",
+    "area": "main",
+    "timestamp": "2026-03-15T19:46:34.269Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "bca9413bc270a34021c090de74c5460709fc7d6b"
+  },
+  {
+    "text": "Rules repositories as sources for rule creation: Before creating new rules (erlang-rules.md, zig-rules.md), check awesome-rules and cursorrules community repos for established best practices. These repos contain curated, community-validated patterns that outperform from-scratch rule authoring. Confirmed when creating erlang, zig, and observability rules in MEGA EVOLUTION v2 Wave 3.",
+    "area": "main",
+    "timestamp": "2026-03-15T19:46:43.488Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "bd278a499499f9c0067166f42b14169ceed0b13a"
   }
 ]

@@ -68,6 +68,7 @@ mvp, minimum viable product, product backlog
 # Q2 2026 OKRs — Growth Team
 
 ## Objective 1: Accelerate New User Activation
+
 **Why**: 40% of sign-ups never complete onboarding, limiting growth
 
 Key Result 1: Increase Day-1 activation rate from 28% to 45%
@@ -75,11 +76,13 @@ Key Result 2: Reduce time-to-first-value from 8 minutes to 3 minutes
 Key Result 3: Increase free-to-paid conversion within 14 days from 12% to 18%
 
 Initiatives:
+
 - Redesign onboarding flow (guided setup wizard)
 - Add in-app checklist for key activation actions
 - A/B test email drip sequence for non-activated users
 
 ## Objective 2: Improve Retention in Months 2-3
+
 Key Result 1: Increase 30-day retention from 55% to 65%
 Key Result 2: Reduce churn from 8%/month to 5%/month
 Key Result 3: Increase weekly active users / monthly active users ratio from 40% to 55%
@@ -90,14 +93,15 @@ Key Result 3: Increase weekly active users / monthly active users ratio from 40%
 ```markdown
 # Feature Prioritization — RICE Scoring
 
-| Feature | Reach | Impact | Confidence | Effort | RICE Score | Priority |
-|---------|-------|--------|------------|--------|-----------|----------|
-| Guided onboarding | 800/mo | 3 | 80% | 3 weeks | 64 | P0 |
-| Dark mode | 500/mo | 1 | 90% | 1 week | 45 | P2 |
-| CSV export | 200/mo | 2 | 70% | 2 weeks | 14 | P3 |
-| Team collaboration | 150/mo | 3 | 50% | 8 weeks | 2.8 | P4 |
+| Feature            | Reach  | Impact | Confidence | Effort  | RICE Score | Priority |
+| ------------------ | ------ | ------ | ---------- | ------- | ---------- | -------- |
+| Guided onboarding  | 800/mo | 3      | 80%        | 3 weeks | 64         | P0       |
+| Dark mode          | 500/mo | 1      | 90%        | 1 week  | 45         | P2       |
+| CSV export         | 200/mo | 2      | 70%        | 2 weeks | 14         | P3       |
+| Team collaboration | 150/mo | 3      | 50%        | 8 weeks | 2.8        | P4       |
 
 RICE = (Reach × Impact × Confidence) / Effort
+
 - Reach: unique users per month affected
 - Impact: 0.25=minimal, 0.5=low, 1=medium, 2=high, 3=massive
 - Confidence: 0-100% (how certain are you?)
@@ -110,30 +114,36 @@ RICE = (Reach × Impact × Confidence) / Effort
 # PRD: Order Status Self-Service Portal
 
 ## TL;DR
+
 Customers can check order status without contacting support, reducing support tickets by 30%.
 
 ## Problem
+
 - 1,200 "where is my order" tickets/month (35% of all support volume)
 - Average 8-minute handle time per ticket
 - Customer satisfaction NPS drops 12 points after order status inquiries
 
 ## Goals
-| Goal | Metric | Baseline | Target |
-|------|--------|----------|--------|
-| Reduce WISMO tickets | Ticket volume | 1,200/mo | 840/mo |
-| Improve CSAT | NPS score | 42 | 50 |
-| Reduce support cost | Cost per resolution | $4.50 | $0.20 |
+
+| Goal                 | Metric              | Baseline | Target |
+| -------------------- | ------------------- | -------- | ------ |
+| Reduce WISMO tickets | Ticket volume       | 1,200/mo | 840/mo |
+| Improve CSAT         | NPS score           | 42       | 50     |
+| Reduce support cost  | Cost per resolution | $4.50    | $0.20  |
 
 ## Non-Goals
+
 - Real-time GPS tracking (future iteration)
 - Automated rescheduling of deliveries
 
 ## User Stories
+
 **Primary User: Customer checking order status**
 As a customer, I want to check my order status without calling support,
 so I can get information instantly at any time.
 
 Acceptance Criteria:
+
 - [ ] Access with order ID + email (no account required)
 - [ ] Shows current status + history
 - [ ] Displays estimated delivery window
@@ -141,15 +151,18 @@ Acceptance Criteria:
 - [ ] Mobile-responsive
 
 ## Success Metrics (6 weeks post-launch)
+
 - WISMO tickets reduced by ≥30%
 - Portal adoption ≥60% of order inquiries
 - Customer satisfaction with portal ≥4.2/5.0
 
 ## Open Questions
+
 1. Should we show real-time carrier location? (Research needed)
 2. Do we support international orders in v1? (Confirm with ops)
 
 ## Launch Plan
+
 - Week 1-4: Development
 - Week 5: Internal QA + soft launch (10% traffic)
 - Week 6: Full launch + monitoring
@@ -161,20 +174,24 @@ Acceptance Criteria:
 # North Star Metric Framework
 
 ## North Star Metric: Weekly Active Senders (WAS)
+
 "Number of unique users who send at least one message per week"
 Rationale: Measures engaged users, correlates strongly with revenue and retention
 
 ## Input Metrics (leading indicators)
+
 - Acquisition: New sign-ups per week
 - Activation: % completing setup within Day 1
 - Engagement: Messages sent per active user
 - Retention: Week 2 retention rate
 
 ## Counter Metrics (prevent gaming)
+
 - Spam complaints (ensure quality, not just volume)
 - Support tickets (ensure experience doesn't degrade)
 
 ## Segmentation
+
 - By acquisition channel (SEO vs paid vs referral)
 - By company size (SMB vs mid-market vs enterprise)
 - By use case (sales vs marketing vs support)

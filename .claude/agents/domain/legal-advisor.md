@@ -70,23 +70,25 @@ software license audit, regulatory compliance, data retention, right to erasure
 ```markdown
 # Open Source License Risk Matrix
 
-| License       | Can Sell | Patent Grant | Copyleft     | Network Use Clause | Risk Level |
-|---------------|----------|--------------|--------------|-------------------|------------|
-| MIT           | ✅ Yes   | No explicit  | None         | No                | Low        |
-| Apache 2.0    | ✅ Yes   | ✅ Explicit  | None         | No                | Low        |
-| BSD 2/3       | ✅ Yes   | No explicit  | None         | No                | Low        |
-| MPL 2.0       | ✅ Yes   | ✅ Explicit  | File-level   | No                | Medium     |
-| LGPL v2.1/3   | ✅ Yes   | ✅ Explicit  | Library-only | No                | Medium     |
-| GPL v2/v3     | ✅ Yes   | ✅ v3 only   | Full         | No                | High (SaaS exception) |
-| AGPL v3       | ✅ Yes   | ✅ Explicit  | Full + SaaS  | **Yes**           | High       |
-| SSPL          | ⚠️ Risk  | No           | Full + infra | **Yes**           | Very High  |
-| Proprietary   | ❌ No   | —            | —            | —                 | Check terms |
+| License     | Can Sell | Patent Grant | Copyleft     | Network Use Clause | Risk Level            |
+| ----------- | -------- | ------------ | ------------ | ------------------ | --------------------- |
+| MIT         | ✅ Yes   | No explicit  | None         | No                 | Low                   |
+| Apache 2.0  | ✅ Yes   | ✅ Explicit  | None         | No                 | Low                   |
+| BSD 2/3     | ✅ Yes   | No explicit  | None         | No                 | Low                   |
+| MPL 2.0     | ✅ Yes   | ✅ Explicit  | File-level   | No                 | Medium                |
+| LGPL v2.1/3 | ✅ Yes   | ✅ Explicit  | Library-only | No                 | Medium                |
+| GPL v2/v3   | ✅ Yes   | ✅ v3 only   | Full         | No                 | High (SaaS exception) |
+| AGPL v3     | ✅ Yes   | ✅ Explicit  | Full + SaaS  | **Yes**            | High                  |
+| SSPL        | ⚠️ Risk  | No           | Full + infra | **Yes**            | Very High             |
+| Proprietary | ❌ No    | —            | —            | —                  | Check terms           |
 
 ## Key Risk: AGPL "Network Use" Clause
+
 AGPL v3 §13: If you run AGPL software as a network service (SaaS), you MUST provide
 the complete source code to users. This applies even without distributing binaries.
 
 ## Copyleft Propagation Rules
+
 - GPL: If you link/include GPL code in your software → your entire binary is GPL
 - LGPL: Linking is OK if you use the library as a "distinct component" (dynamic linking preferred)
 - MPL: Only the MPL-licensed FILES must be open-sourced, not your entire codebase
@@ -98,11 +100,13 @@ the complete source code to users. This applies even without distributing binari
 # GDPR Compliance Checklist (Software Products)
 
 ## Lawful Basis (Art. 6)
+
 - [ ] Identified legal basis for each processing activity (consent/contract/legitimate interest)
 - [ ] Consent: Specific, informed, unambiguous, withdrawable, no pre-ticked boxes
 - [ ] Legitimate interest: Documented LIA (Legitimate Interest Assessment) for each use case
 
 ## Data Subject Rights (Arts. 15-22)
+
 - [ ] Right to Access: Can deliver machine-readable export within 30 days
 - [ ] Right to Erasure (Right to be Forgotten): Can delete all PII across all systems
 - [ ] Right to Portability: Can export data in structured, machine-readable format (JSON/CSV)
@@ -111,6 +115,7 @@ the complete source code to users. This applies even without distributing binari
 - [ ] Right to Object: Can stop processing for direct marketing immediately
 
 ## Technical Measures (Arts. 25, 32)
+
 - [ ] Encryption at rest and in transit (TLS 1.2+ for transit, AES-256 for rest)
 - [ ] Pseudonymization for analytics (replace PII with non-reversible tokens)
 - [ ] Access controls: Role-based, least privilege, logged
@@ -118,12 +123,14 @@ the complete source code to users. This applies even without distributing binari
 - [ ] Retention policy documented and enforced (automated deletion)
 
 ## Documentation (Art. 30)
+
 - [ ] Records of Processing Activities (RoPA) maintained
 - [ ] Privacy Policy: Plain language, specific, updated
 - [ ] DPAs signed with all sub-processors
 - [ ] DPO appointed (if required: >250 employees, large-scale monitoring, or sensitive data)
 
 ## Breach Response (Art. 33-34)
+
 - [ ] Incident response plan documented
 - [ ] Can notify supervisory authority within 72 hours of breach discovery
 - [ ] Can notify affected users when "high risk" to their rights and freedoms
@@ -135,6 +142,7 @@ the complete source code to users. This applies even without distributing binari
 # Terms of Service — Critical Clauses Checklist
 
 ## Must-Have Clauses
+
 1. **Acceptable Use Policy** — What users may NOT do (illegal activity, scraping, abuse)
 2. **Intellectual Property** — Who owns user-generated content; who owns the product
 3. **Disclaimer of Warranties** — IMPORTANT: "AS IS" disclaimer limits liability
@@ -147,6 +155,7 @@ the complete source code to users. This applies even without distributing binari
 10. **Service Level** — Uptime commitments (or explicit disclaimer)
 
 ## SaaS-Specific Additions
+
 - **Data Processing**: GDPR-compliant DPA as an addendum (for EU users)
 - **Subprocessors list**: Link to updated subprocessor list
 - **Data portability**: Commitment to export on termination
@@ -160,10 +169,12 @@ the complete source code to users. This applies even without distributing binari
 # DPA Key Sections
 
 ## 1. Definitions
+
 - Controller: The customer (determines purpose of processing)
 - Processor: Your company (processes on behalf of controller)
 
 ## 2. Processing Details
+
 - Subject matter: What data is processed (user records, events, etc.)
 - Duration: Length of contract + deletion timeline
 - Nature: Operations performed (storage, analysis, transmission)
@@ -172,6 +183,7 @@ the complete source code to users. This applies even without distributing binari
 - Categories of data subjects: Customers, employees, prospects
 
 ## 3. Processor Obligations
+
 - Process only on documented instructions
 - Confidentiality obligations for authorized personnel
 - Technical and organizational security measures
@@ -182,11 +194,13 @@ the complete source code to users. This applies even without distributing binari
 - Deletion or return of data on termination
 
 ## 4. Sub-Processors
+
 - Current list with name, location, processing description
 - 30-day notice before adding new sub-processors
 - Right to object mechanism
 
 ## 5. Data Transfers (EU)
+
 - Standard Contractual Clauses (SCCs) for transfers outside EEA
 - Transfer Impact Assessment (TIA) reference
 ```
@@ -197,24 +211,29 @@ the complete source code to users. This applies even without distributing binari
 # Key IP Clauses for Contractor/Employee Agreements
 
 ## Work-Made-for-Hire Doctrine (US)
+
 - Employee work created within scope of employment = company owns it automatically
 - Contractor work: NOT work-for-hire by default — requires explicit written assignment
 
 ## Assignment Clause (Contractor)
+
 "Contractor hereby assigns and transfers to Company all right, title, and interest in
 any work product, inventions, code, or other IP created in the performance of Services."
 
 ## Pre-Existing IP Disclosure
+
 - Contractors must disclose IP they owned BEFORE engagement
 - Use "Schedule A" to list excluded pre-existing IP
 - Prevents retroactive claims on contractor's prior work
 
 ## Open Source Contribution Policy
+
 - Requires advance written approval before contributing company code to open source
 - Requires advance written approval before using new open source libraries
 - Specify which licenses are pre-approved (MIT, Apache 2.0, BSD → typically OK)
 
 ## Moral Rights (Relevant in EU/Canada)
+
 - Authors retain moral rights (attribution, integrity) even when economic rights assigned
 - "Waiver of moral rights" clause needed in jurisdictions recognizing them
 ```

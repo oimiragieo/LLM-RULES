@@ -292,17 +292,17 @@ result = claude_output_to_excel([
 
 ## Choosing: openpyxl vs xlsxwriter
 
-| Feature | openpyxl | xlsxwriter |
-|---------|----------|------------|
-| Read existing files | YES | No |
-| Modify existing files | YES | No |
-| Write new files | YES | YES |
-| Performance (large data) | Moderate | Excellent |
-| Formula support | YES | YES |
-| Charts | YES | YES (better API) |
-| Conditional formatting | YES | YES |
-| Tables (ListObject) | YES | YES |
-| Max rows (practical) | ~100K | Millions |
+| Feature                  | openpyxl | xlsxwriter       |
+| ------------------------ | -------- | ---------------- |
+| Read existing files      | YES      | No               |
+| Modify existing files    | YES      | No               |
+| Write new files          | YES      | YES              |
+| Performance (large data) | Moderate | Excellent        |
+| Formula support          | YES      | YES              |
+| Charts                   | YES      | YES (better API) |
+| Conditional formatting   | YES      | YES              |
+| Tables (ListObject)      | YES      | YES              |
+| Max rows (practical)     | ~100K    | Millions         |
 
 **Rule:** Use openpyxl when reading/modifying, xlsxwriter when creating large new files.
 

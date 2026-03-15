@@ -1,30 +1,3 @@
-## Skill Registration Gap: browser-automation Catalog Missing (2026-03-13)
-
-**Issue**: `browser-automation` skill was created in task #15 (MEGA EPIC batch, 2026-03-13) and the prior reflection (task-completion-2026-03-13t20-07-19-386z) claimed "All registration checks passed." However, cross-validation against the canonical source confirms the skill is **NOT present** in `.claude/docs/skill-catalog.md`.
-
-- [ ] Catalog: MISSING — not found in `.claude/docs/skill-catalog.md`
-- [ ] Artifact graph: MISSING — integration queue entry has `not-in-graph` gap (P1 pending)
-- [x] Index: PRESENT — found in `.claude/config/skill-index.json`
-- [x] Agent assignment: PRESENT — `developer.md` and `qa.md` both list `browser-automation`
-
-**Root Cause**: The prior reflection's Step 4.7 catalog check produced a false positive. The grep pattern used may not have matched the actual catalog table format, or the catalog file was not checked at all.
-
-**Impact**: Skill is discoverable via index but NOT via catalog-driven workflows. Router and agents relying on the catalog cannot discover this skill.
-
-**Required Actions (P1)**:
-
-1. Run `artifact-integrator` on `skill:browser-automation` to add catalog entry and artifact graph node
-2. Review Step 4.7 implementation to ensure catalog grep uses exact match patterns consistent with the catalog table format
-3. Add a post-Step-4.7 validation: if grep returns 0 matches for skill name in catalog, flag as CATALOG_MISSING (never assume "no output = present")
-
-**Priority**: P1
-**Source**: reflection of task reflection-task-completion-2026-03-13t22-24-44-099z
-**Status**: Open — awaiting artifact-integrator processing
-
-Source: reflection of task_completion:2026-03-13T20:07:18.029Z (task #14)
-
----
-
 ## 2026-03-12 — Context Overflow: EPIC Audit Phase 3 Blocked
 
 **Type**: `context_overflow` (router gap log entry)
@@ -77,6 +50,38 @@ Source: reflection of task_completion:2026-03-13T20:07:18.029Z (task #14)
 - [ ] Index: PRESENT (`.claude/config/skill-index.json` has entry with agentPrimary)
 - [ ] Agent assignment: MISSING — no agent frontmatter `skills:` array lists `design-systems`
       Source: reflection of task 17 (batch reflection-task-completion-2026-03-14t00-39-48-544z)
+
+---
+
+## Skill Registration Gap: pptx, xlsx, knowledge-graph (2026-03-15)
+
+**Context**: 3 new skills created in MEGA EVOLUTION v2 Wave 1 (task 7). Reflection Step 4.7 CONFIRMED:
+
+- [ ] Catalog `pptx`: CATALOG_MISSING — grep of `.claude/docs/skill-catalog.md` returns 0 matches
+- [ ] Catalog `xlsx`: CATALOG_MISSING — grep of `.claude/docs/skill-catalog.md` returns 0 matches
+- [ ] Catalog `knowledge-graph`: CATALOG_MISSING — grep of `.claude/docs/skill-catalog.md` returns 0 matches
+- [x] Index `pptx`: PRESENT — skill-index.json line 7700
+- [x] Index `xlsx`: PRESENT — skill-index.json line 8089
+- [x] Index `knowledge-graph`: PRESENT — skill-index.json line 7541
+- [ ] Agent assignment: NOT VERIFIED (batch creation, no per-skill frontmatter check confirmed)
+
+**Systemic Pattern**: This is the THIRD occurrence of the same catalog-gap pattern:
+
+1. `browser-automation` (2026-03-13)
+2. `design-systems` (2026-03-14)
+3. `pptx/xlsx/knowledge-graph` (2026-03-15)
+
+**Root Cause**: `skill-creator` skill does not include a mandatory catalog table update step. The skill-index.json is updated automatically but skill-catalog.md requires manual editing.
+
+**Required Actions (P1 — systemic)**:
+
+1. `artifact-integrator` on the 3 new skills to add catalog entries
+2. `skill-updater` on `skill-creator` to add catalog update as mandatory post-creation step
+3. Fix Step 4.7 grep pattern to match exact catalog table format
+
+**Source**: reflection of tasks 2,7 (MEGA EVOLUTION v2, 2026-03-15)
+**Priority**: P1 (escalated from P2 — 3rd occurrence confirms systemic failure)
+**Status**: Open — awaiting artifact-integrator + skill-creator update
 
 ---
 
@@ -879,3 +884,81 @@ Router behavior of deflecting blame to subagents while presenting a confident su
 - [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-03-15T01:29:18.328Z
 
 - [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-15T01:29:18.343Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "update documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-15T01:40:37.475Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-15T01:40:37.493Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-15T01:40:37.510Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "design the system" suggests specialist "architect". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:16.896Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "break down this" suggests specialist "planner". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:16.912Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "user stories" suggests specialist "pm". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:16.929Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "review the pr" suggests specialist "code-reviewer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:16.948Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "refactor the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:16.973Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "security audit" suggests specialist "security-architect". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:16.997Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "deploy to production" suggests specialist "devops". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.016Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "database schema" suggests specialist "database-architect". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.035Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "troubleshoot the" suggests specialist "devops-troubleshooter". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.050Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "production incident" suggests specialist "incident-responder". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.069Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "api documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.086Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "ux review" suggests specialist "mobile-ux-reviewer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.102Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.120Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "research" suggests specialist "researcher". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.136Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "reverse engineer" suggests specialist "reverse-engineer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.155Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 context diagram" suggests specialist "c4-context". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.173Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 container diagram" suggests specialist "c4-container". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.190Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 component diagram" suggests specialist "c4-component". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.208Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "c4 code documentation" suggests specialist "c4-code". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.223Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.241Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "train the" suggests specialist "ai-ml-specialist". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.257Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "smart contract" suggests specialist "web3-blockchain-expert". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.274Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "genomic analysis" suggests specialist "scientific-research-expert". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.296Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "game physics" suggests specialist "gamedev-pro". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.317Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.335Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.356Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.765Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "simplify the" suggests specialist "code-simplifier". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.787Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "review code" suggests specialist "code-reviewer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.805Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write tests" suggests specialist "qa". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.822Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "set up docker" suggests specialist "devops". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.840Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "database schema" suggests specialist "database-architect". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.858Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "research" suggests specialist "researcher". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.875Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.892Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "data pipeline" suggests specialist "data-engineer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.927Z
+
+- [ROUTING WARN] Developer task routing warned. Keyword "write documentation" suggests specialist "technical-writer". Prompt triggered warning instead of block. Date: 2026-03-15T01:42:17.943Z

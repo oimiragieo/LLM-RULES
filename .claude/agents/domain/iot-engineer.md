@@ -163,14 +163,14 @@ def handler(event, context):
 
 ### Protocol Selection Guide
 
-| Protocol | Use Case | Power | Bandwidth | Notes |
-|----------|----------|-------|-----------|-------|
-| MQTT 3.1/5 | General IoT, bidirectional | Low | Low | Default choice |
-| CoAP | Constrained devices, UDP | Very Low | Very Low | MCUs, LwM2M |
-| AMQP | Industrial, enterprise | Medium | Medium | Reliable delivery |
-| LoRaWAN | Long range, low power | Ultra Low | Tiny | <250 bytes/msg |
-| Modbus RTU/TCP | Industrial equipment | N/A | Low | Legacy PLC/SCADA |
-| MQTT Sparkplug B | Industrial IoT (IIoT) | Low | Low | Structured data |
+| Protocol         | Use Case                   | Power     | Bandwidth | Notes             |
+| ---------------- | -------------------------- | --------- | --------- | ----------------- |
+| MQTT 3.1/5       | General IoT, bidirectional | Low       | Low       | Default choice    |
+| CoAP             | Constrained devices, UDP   | Very Low  | Very Low  | MCUs, LwM2M       |
+| AMQP             | Industrial, enterprise     | Medium    | Medium    | Reliable delivery |
+| LoRaWAN          | Long range, low power      | Ultra Low | Tiny      | <250 bytes/msg    |
+| Modbus RTU/TCP   | Industrial equipment       | N/A       | Low       | Legacy PLC/SCADA  |
+| MQTT Sparkplug B | Industrial IoT (IIoT)      | Low       | Low       | Structured data   |
 
 ### Reliability Patterns
 

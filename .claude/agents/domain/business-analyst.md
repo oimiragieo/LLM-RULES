@@ -67,45 +67,57 @@ non-functional requirements, wireframe requirements, as-is to-be, process improv
 # Business Requirements Document
 
 ## 1. Executive Summary
+
 - Project name, sponsor, date
 - Problem statement (1-2 paragraphs)
 - Proposed solution summary
 
 ## 2. Business Objectives
-| Objective | Metric | Target | Timeline |
-|-----------|--------|--------|----------|
-| Reduce order processing time | Avg minutes per order | <5 min | Q2 2026 |
-| Increase customer self-service | % of issues resolved without agent | >70% | Q3 2026 |
+
+| Objective                      | Metric                             | Target | Timeline |
+| ------------------------------ | ---------------------------------- | ------ | -------- |
+| Reduce order processing time   | Avg minutes per order              | <5 min | Q2 2026  |
+| Increase customer self-service | % of issues resolved without agent | >70%   | Q3 2026  |
 
 ## 3. Scope
+
 ### In Scope
+
 - [List features/processes included]
 
 ### Out of Scope
+
 - [Explicit exclusions to prevent scope creep]
 
 ## 4. Stakeholders
-| Stakeholder | Role | Interest | Influence |
-|-------------|------|----------|-----------|
-| VP Operations | Sponsor | Cost reduction | High |
-| Order Team | End User | Ease of use | Medium |
+
+| Stakeholder   | Role     | Interest       | Influence |
+| ------------- | -------- | -------------- | --------- |
+| VP Operations | Sponsor  | Cost reduction | High      |
+| Order Team    | End User | Ease of use    | Medium    |
 
 ## 5. Functional Requirements
+
 ### FR-001: Order Status Self-Service
+
 **Priority**: High
 **Description**: Customers shall be able to check order status without contacting support.
 **Acceptance Criteria**:
+
 - Customer enters order ID on portal
 - System displays current status within 3 seconds
 - Status updates reflected within 15 minutes of change
 
 ## 6. Non-Functional Requirements
+
 - Performance: Page load < 2s at 95th percentile
 - Availability: 99.9% uptime during business hours
 - Security: All PII encrypted at rest and in transit
 
 ## 7. Assumptions and Constraints
+
 ## 8. Success Metrics and KPIs
+
 ## 9. Risks and Mitigation
 ```
 
@@ -115,17 +127,22 @@ non-functional requirements, wireframe requirements, as-is to-be, process improv
 # User Story Map: Order Management
 
 ## Activities (top row)
+
 Browse Products → Add to Cart → Checkout → Track Order → Return/Refund
 
 ## User Tasks (middle row — what users do)
+
 ### Track Order
+
 - View current status
 - See delivery estimate
 - Get shipping carrier link
 - Receive proactive notifications
 
 ## User Stories (bottom row — backlog items)
+
 ### View current status
+
 - As a customer, I want to see my order status in real-time so I don't need to call support.
   Acceptance Criteria:
   - [ ] Status shows: Placed / Processing / Shipped / Delivered / Cancelled
@@ -139,23 +156,26 @@ Browse Products → Add to Cart → Checkout → Track Order → Return/Refund
 # Gap Analysis: Order Processing System
 
 ## Current State (As-Is)
-| Process Step | Current Method | Pain Points | Time Required |
-|--------------|----------------|-------------|---------------|
-| Order intake | Manual email | Errors, delays | 15 min/order |
-| Status update | Phone/email | High support volume | 5 min/inquiry |
+
+| Process Step  | Current Method | Pain Points         | Time Required |
+| ------------- | -------------- | ------------------- | ------------- |
+| Order intake  | Manual email   | Errors, delays      | 15 min/order  |
+| Status update | Phone/email    | High support volume | 5 min/inquiry |
 
 ## Future State (To-Be)
-| Process Step | Proposed Method | Benefits | Time Required |
-|--------------|-----------------|----------|---------------|
-| Order intake | Automated API | Error-free, instant | <1 min/order |
-| Status update | Customer portal | 24/7 self-service | 0 min/inquiry |
+
+| Process Step  | Proposed Method | Benefits            | Time Required |
+| ------------- | --------------- | ------------------- | ------------- |
+| Order intake  | Automated API   | Error-free, instant | <1 min/order  |
+| Status update | Customer portal | 24/7 self-service   | 0 min/inquiry |
 
 ## Gaps
-| Gap | Priority | Effort | Owner |
-|-----|----------|--------|-------|
-| No API integration with supplier | High | Large | IT |
-| No customer portal | High | Large | Product |
-| Manual routing rules | Medium | Small | Operations |
+
+| Gap                              | Priority | Effort | Owner      |
+| -------------------------------- | -------- | ------ | ---------- |
+| No API integration with supplier | High     | Large  | IT         |
+| No customer portal               | High     | Large  | Product    |
+| Manual routing rules             | Medium   | Small  | Operations |
 ```
 
 ### Process Model (BPMN-style Mermaid)

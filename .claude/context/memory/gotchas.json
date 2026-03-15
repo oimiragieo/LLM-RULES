@@ -113,5 +113,15 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "d1d5c3cbd0abf57dae0903602dd4432a95b46165"
+  },
+  {
+    "text": "Batch skill creation misses catalog registration: When creating multiple skills in a single wave (Wave 1 of MEGA EVOLUTION), new skills (pptx, xlsx, knowledge-graph) are not automatically added to skill-catalog.md. This creates orphaned skills that are invisible to the Router. Confirmed 3 times (2026-02-14, 2026-03-14, 2026-03-15). Fix: add explicit catalog registration step to Wave 1 plan checklist.",
+    "area": "main",
+    "timestamp": "2026-03-15T19:46:16.668Z",
+    "accessCount": 0,
+    "lastAccessed": null,
+    "writeSource": "memory_api",
+    "dedupStatus": "create",
+    "id": "588ffda1f1841069f25f83ac3542bf5ad836e3fb"
   }
 ]

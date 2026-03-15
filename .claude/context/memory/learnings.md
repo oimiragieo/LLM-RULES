@@ -1,3 +1,22 @@
+## Telegram Claude Bridge — Headless PATH Fix (2026-03-15) [INTEGRATION]
+
+**Task**: Task 1 supplemental — permanent Telegram pipeline fix (commit e3ab739b)
+
+**Root cause**: `telegram-poll.cjs` called `claude` binary via CLI dispatch but the binary was not on PATH in headless cron context. The process ran under the cron user environment where `~/.local/bin` or npm global bin was not in PATH.
+
+**Fix pattern**:
+- Created `.claude/tools/cli/telegram-claude-bridge.cjs` with auto-detection: `resolveClaude()` uses `where claude` (Windows) / `which claude` (Unix) at startup rather than assuming PATH availability
+- Wired bridge at 3 dispatch sites in `telegram-poll.cjs` via `invokeClaude()`/`sendTyping()`/`handleAsk()`
+- Added ESLint `max-lines` override for telegram CLI files (650 line limit) — large CLI files legitimately exceed 300-line default
+- Documented in `.claude/docs/TELEGRAM_ARCHITECTURE.md`
+- `.env.example` updated with `CLAUDE_CLI_PATH` documentation for manual override
+
+**Gotcha**: When spawning CLI tools from cron/headless contexts on any platform, never assume PATH includes user-installed binaries. Use `where`/`which` auto-detection at runtime + `CLAUDE_CLI_PATH` env var override as escape hatch.
+
+**Anti-pattern**: Hard-coding `claude` as the command string in `spawn()` calls for headless contexts. The cron daemon and service accounts often have minimal PATH (`/usr/bin:/bin` only).
+
+---
+
 ## MEGA EVOLUTION v2 Complete — 100 Agents, 302 Skills, 3 New Rules (2026-03-15) [FRAMEWORK]
 
 **Event**: MEGA EVOLUTION v2 fully executed. All 4 waves complete.

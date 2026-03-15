@@ -141,21 +141,25 @@ When context cannot be compressed further and session must be handed off:
 # Context Compression Report — {datetime}
 
 ## Before
+
 - learnings.md: {before_lines} lines, {before_kb}KB
 - decisions.md: {before_lines} lines, {before_kb}KB
 - Total estimated tokens: {before_tokens}
 
 ## Actions Taken
+
 - Merged {N} duplicate learnings entries
 - Archived {N} entries older than 90 days
 - Compressed {N} verbose patterns into summaries
 
 ## After
+
 - learnings.md: {after_lines} lines, {after_kb}KB
 - Total estimated tokens: {after_tokens}
 - Reduction: {pct}%
 
 ## Preserved
+
 - {N} PERMANENT/IRON LAW entries untouched
 - {N} recent entries (< 30 days) untouched
 ```

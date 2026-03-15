@@ -1,3 +1,22 @@
+## ADR-2026-03-15-070: MEGA EVOLUTION v2 — Augmentation-First Strategy for Ecosystem Expansion (2026-03-15)
+
+**Status:** Accepted & Implemented (commit b8c79f14)
+**Date:** 2026-03-15
+**Context:** Framework has 292 skills, 74→100 agents, 133 rules before this evolution. Analyzing 18+ repos.
+
+**Decision:** Use augmentation-first strategy when performing large ecosystem evolutions:
+
+- Map incoming repos to UPDATE (not CREATE) where functionality overlaps with existing artifacts
+- Batch parallel research (Groups A, B+C, D+E+F) into 3 tasks rather than 6 individual tasks
+- Wave-based execution: Wave 1 (skills) → Wave 2 (agents) → Wave 3 (rules) → Wave 4 (validation)
+- Run validation gate (lint/format/validate/registry) as a dedicated final wave
+
+**Evidence:** 39 files, 10,618 insertions in single commit. 9 skills updated, 3 skills created, 20 agents created, 3 rules created. lint 0 errors, format clean, validate passed.
+
+**Rule:** For MEGA EVOLUTION tasks: parallel research → sequential waves → single validation wave. Never skip lint/format/validate/registry regeneration as final gate.
+
+---
+
 ## ADR-2026-03-14-069: Devops Agent Required as Final Wave in All EPIC Pipelines (2026-03-14)
 
 **Status:** Accepted

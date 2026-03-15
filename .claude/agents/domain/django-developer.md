@@ -161,14 +161,14 @@ def send_order_confirmation(self, order_id: int):
 
 ### Security Checklist
 
-| Check | Pattern |
-|-------|---------|
-| SQL injection | Use ORM — never `.raw()` with user input |
-| CSRF | `{% csrf_token %}` in all forms; `CsrfViewMiddleware` enabled |
-| Authentication | `@login_required` / `IsAuthenticated` on all protected views |
-| Mass assignment | Use `serializer.validated_data`, never `**request.POST` |
-| File uploads | Validate MIME type, randomize filename, store outside MEDIA_ROOT |
-| Secrets | `SECRET_KEY`, DB creds from env vars, never in `settings.py` |
+| Check           | Pattern                                                          |
+| --------------- | ---------------------------------------------------------------- |
+| SQL injection   | Use ORM — never `.raw()` with user input                         |
+| CSRF            | `{% csrf_token %}` in all forms; `CsrfViewMiddleware` enabled    |
+| Authentication  | `@login_required` / `IsAuthenticated` on all protected views     |
+| Mass assignment | Use `serializer.validated_data`, never `**request.POST`          |
+| File uploads    | Validate MIME type, randomize filename, store outside MEDIA_ROOT |
+| Secrets         | `SECRET_KEY`, DB creds from env vars, never in `settings.py`     |
 
 ### Testing with pytest-django
 

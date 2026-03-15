@@ -302,7 +302,7 @@ cat pom.xml | grep "spring-boot.version"
 cat build.gradle | grep "org.springframework.boot"
 ```
 
-Spring Boot 3.x requires Jakarta EE 9+ (javax.*→ jakarta.*).
+Spring Boot 3.x requires Jakarta EE 9+ (javax._→ jakarta._).
 
 ### Step 2: Read Memory
 

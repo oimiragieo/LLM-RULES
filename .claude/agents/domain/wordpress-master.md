@@ -219,14 +219,14 @@ add_filter('woocommerce_payment_gateways', fn($gateways) => array_merge($gateway
 
 ### Security Checklist
 
-| Check | Pattern |
-|-------|---------|
+| Check              | Pattern                                                                     |
+| ------------------ | --------------------------------------------------------------------------- |
 | Nonce verification | `check_ajax_referer('action_name')` for AJAX; `wp_verify_nonce()` for forms |
-| Capability check | `current_user_can('manage_options')` before admin actions |
-| Data sanitization | `sanitize_text_field()`, `absint()`, `sanitize_email()` on all input |
-| Output escaping | `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()` on all output |
-| Database queries | Use `$wpdb->prepare()` — NEVER string concatenation in SQL |
-| Direct access | `if (!defined('ABSPATH')) exit;` at top of every PHP file |
+| Capability check   | `current_user_can('manage_options')` before admin actions                   |
+| Data sanitization  | `sanitize_text_field()`, `absint()`, `sanitize_email()` on all input        |
+| Output escaping    | `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()` on all output     |
+| Database queries   | Use `$wpdb->prepare()` — NEVER string concatenation in SQL                  |
+| Direct access      | `if (!defined('ABSPATH')) exit;` at top of every PHP file                   |
 
 ### WP-CLI Patterns
 
