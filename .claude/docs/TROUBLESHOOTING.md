@@ -663,3 +663,18 @@ Fix Applied:
 
 - Inverted the `spawn-prompt-assembler-sections.cjs` architectural layout. Statically declared items (Tools, Skills, Memory RAG, Agent Constitution) are explicitly array-concatenated first.
 - Dynamic warning fields (`ensureMandatorySpawnPreflight`) and UUIDs were relocated to append onto the absolute bottom of the payload.
+
+### G. Deep Insight Log Diagnostics / Telemetry
+
+Symptoms:
+
+- LLM tasks fail silently or you need to audit a massive (e.g., 5MB-10MB) session log that crashes context windows when `view_file` is used directly.
+
+Root Cause:
+
+- Raw agent interactions (especially those hitting code generation and memory RAG) produce enormous `.claude/debug/*.txt` log files that are difficult for an agent to read via grep without saturating tokens.
+
+Fix Applied / Tooling Available:
+
+- ALWAYS use `node scripts/reduce-debug-log.mjs <log_path>` to squash massive debug logs (often achieving 90%+ noise reduction by extracting only hook decisions, exceptions, and side-channel metadata) before trying to read them.
+- To detect UI tool blockers (like git conflicts or authentication denies) that do not appear in background logs, run `node scripts/analyze-session-transcript.mjs <log_path>`. This compiles a markdown report detailing `Tool Errors`, systemic bypasses, and top tool failures grouped by intent.

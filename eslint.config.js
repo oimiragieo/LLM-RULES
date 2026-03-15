@@ -392,4 +392,17 @@ export default [
       ],
     },
   },
+
+  // Telegram CLI tools — self-contained polling scripts with inline command handlers.
+  // These legitimately exceed the default 500-line limit; raising to 650 for this glob.
+  {
+    files: [
+      '.claude/tools/cli/telegram-poll.cjs',
+      '.claude/tools/cli/telegram-claude-bridge.cjs',
+      '.claude/tools/cli/telegram-command-router.cjs',
+    ],
+    rules: {
+      'max-lines': ['warn', { max: 650, skipBlankLines: true, skipComments: true }],
+    },
+  },
 ];
