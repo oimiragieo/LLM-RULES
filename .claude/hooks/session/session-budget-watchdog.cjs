@@ -25,7 +25,7 @@ const THRESHOLDS = [
   {
     tier: 180,
     level: 'critical',
-    message: (tokens) =>
+    message: tokens =>
       `CRITICAL [${tokens.toLocaleString()} / ~180K tokens]: Context is near the hard limit. ` +
       `Run \`/session-handoff\` NOW to preserve session state and spawn a fresh session. ` +
       `Continuing without a handoff risks losing work when the context window is exhausted.`,
@@ -33,7 +33,7 @@ const THRESHOLDS = [
   {
     tier: 160,
     level: 'strong',
-    message: (tokens) =>
+    message: tokens =>
       `WARNING [${tokens.toLocaleString()} / ~160K tokens]: Context is approaching the critical threshold. ` +
       `Plan to initiate a session handoff soon. ` +
       `Run \`/session-handoff\` before the next complex task to ensure continuity.`,
@@ -41,7 +41,7 @@ const THRESHOLDS = [
   {
     tier: 140,
     level: 'advisory',
-    message: (tokens) =>
+    message: tokens =>
       `ADVISORY [${tokens.toLocaleString()} / ~140K tokens]: Context window is 70% full. ` +
       `Consider running \`/session-handoff\` after completing the current task. ` +
       `This is an early warning — handoff is not urgent yet.`,
@@ -101,7 +101,7 @@ function run() {
     const totalTokens = sessionEntry.totalTokens;
 
     // Find the highest tier that applies (THRESHOLDS is ordered highest-to-lowest)
-    const applicableTier = THRESHOLDS.find((t) => totalTokens >= t.tier * 1000);
+    const applicableTier = THRESHOLDS.find(t => totalTokens >= t.tier * 1000);
 
     if (!applicableTier) {
       // Below all thresholds — allow with no message
