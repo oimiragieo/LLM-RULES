@@ -74,9 +74,8 @@ async function main(hookInput = null) {
 
 if (require.main === module) {
   main().catch(() => {
-    const message = '[TASKUPDATE-CONTRACT] Failed to parse hook input';
-    console.log(formatResult({ allow: false, message }));
-    process.exit(0);
+    process.stderr.write('[TASKUPDATE-CONTRACT] Failed to parse hook input\n');
+    process.exit(2);
   });
 }
 

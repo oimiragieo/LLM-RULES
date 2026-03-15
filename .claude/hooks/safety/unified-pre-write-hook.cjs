@@ -591,8 +591,8 @@ async function main() {
 
     auditLog('unified-pre-write-hook', 'error_fail_closed', { error: err.message });
 
-    console.log(formatResult('block', `Hook error (fail-closed): ${err.message}`));
-    process.exit(0);
+    process.stderr.write(`[unified-pre-write-hook] BLOCKED (fail-closed): ${err.message}\n`);
+    process.exit(2);
   }
 }
 

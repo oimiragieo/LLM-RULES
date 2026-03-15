@@ -621,8 +621,7 @@ async function main() {
 
     if (result.action === 'block') {
       process.stderr.write(`[${HOOK_NAME}] BLOCKED: ${result.message}\n`);
-      console.log(JSON.stringify({ allow: false, message: result.message }));
-      process.exit(0);
+      process.exit(2);
     }
 
     if (result.action === 'warn' && result.message) {

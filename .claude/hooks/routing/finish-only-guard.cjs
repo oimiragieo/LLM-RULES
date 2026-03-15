@@ -36,13 +36,10 @@ function run() {
 
     const sessionId = getSessionId();
     if (sessionId && isDraining(sessionId)) {
-      console.log(
-        JSON.stringify({
-          allow: false,
-          message: 'Session is draining. Please finish current tasks and do not create new ones.',
-        })
+      process.stderr.write(
+        'finish-only-guard: BLOCKED — session is draining. Please finish current tasks and do not create new ones.\n'
       );
-      return;
+      process.exit(2);
     }
 
     console.log(JSON.stringify({ allow: true }));

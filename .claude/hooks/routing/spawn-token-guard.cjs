@@ -37,13 +37,10 @@ process.stdin.on('end', () => {
     const tokens = estimateTokens(prompt);
 
     if (tokens >= BLOCK_THRESHOLD) {
-      process.stdout.write(
-        JSON.stringify({
-          allow: false,
-          message: `spawn-token-guard: BLOCKED — spawn prompt ~${tokens.toLocaleString()} tokens exceeds ${BLOCK_THRESHOLD.toLocaleString()} hard limit. Run context compression first (token-saver-context-compression skill).`,
-        })
+      process.stderr.write(
+        `spawn-token-guard: BLOCKED — spawn prompt ~${tokens.toLocaleString()} tokens exceeds ${BLOCK_THRESHOLD.toLocaleString()} hard limit. Run context compression first (token-saver-context-compression skill).\n`
       );
-      process.exit(0);
+      process.exit(2);
     }
 
     if (tokens >= WARN_THRESHOLD) {
