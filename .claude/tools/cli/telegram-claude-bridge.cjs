@@ -28,11 +28,11 @@ function resolveClaude(env) {
   const explicit = (env.CLAUDE_CLI_PATH || '').trim();
   if (explicit) return explicit;
   const isWin = process.platform === 'win32';
-  const r = spawnSync(
-    isWin ? 'cmd.exe' : 'which',
-    isWin ? ['/c', 'where', 'claude'] : ['claude'],
-    { encoding: 'utf8', timeout: 5000, shell: false }
-  );
+  const r = spawnSync(isWin ? 'cmd.exe' : 'which', isWin ? ['/c', 'where', 'claude'] : ['claude'], {
+    encoding: 'utf8',
+    timeout: 5000,
+    shell: false,
+  });
   return r.status === 0 && r.stdout ? r.stdout.trim().split('\n')[0].trim() : 'claude';
 }
 
@@ -94,22 +94,36 @@ async function handleAsk(ctx, chatId, text) {
     const response = await new Promise((resolve, reject) => {
       // setImmediate lets the typing indicator fire before blocking on Claude
       setImmediate(() => {
-        try { resolve(invokeClaude(bin, text, 90000)); }
-        catch (err) { reject(err); }
+        try {
+          resolve(invokeClaude(bin, text, 90000));
+        } catch (err) {
+          reject(err);
+        }
       });
     });
     const reply = response || '(no response)';
     // Chunk at 4000 chars — Telegram hard limit is 4096
     for (let i = 0; i < reply.length; i += 4000) {
       const chunk = reply.slice(i, i + 4000);
-      try { await sendMessage(chatId, chunk, true); }
-      catch (_) { await sendMessage(chatId, chunk, false); } // Markdown fallback
+      try {
+        await sendMessage(chatId, chunk, true);
+      } catch (_) {
+        await sendMessage(chatId, chunk, false);
+      } // Markdown fallback
     }
-    auditLog({ type: 'claude_response', chatId, promptLength: text.length, responseLength: reply.length });
+    auditLog({
+      type: 'claude_response',
+      chatId,
+      promptLength: text.length,
+      responseLength: reply.length,
+    });
   } catch (err) {
     process.stderr.write(`handleAsk error: ${err.message}\n`);
     auditLog({ type: 'claude_error', chatId, error: err.message });
-    await sendMessage(chatId, `Sorry, I could not process your request. Error: ${err.message.slice(0, 200)}`);
+    await sendMessage(
+      chatId,
+      `Sorry, I could not process your request. Error: ${err.message.slice(0, 200)}`
+    );
   }
 }
 

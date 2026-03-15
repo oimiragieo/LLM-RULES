@@ -318,3 +318,6 @@ tests/lib/memory/.test-memory-contracts-*/
 # Runtime memory index files (auto-regenerated, not source-controlled)
 .claude/context/memory/agent-health.json
 .claude/context/memory/codebase_map.json
+
+# Scheduled tasks lock file (runtime artifact; not source-controlled)
+.claude/scheduled_tasks.lock

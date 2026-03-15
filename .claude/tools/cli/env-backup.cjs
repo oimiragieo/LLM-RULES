@@ -20,7 +20,7 @@ function getDateSuffix() {
 function pruneOldBackups(dir, max) {
   const files = fs
     .readdirSync(dir)
-    .filter((f) => f.startsWith('.env.backup-'))
+    .filter(f => f.startsWith('.env.backup-'))
     .sort(); // lexicographic = chronological for YYYY-MM-DD
   if (files.length > max) {
     const toDelete = files.slice(0, files.length - max);

@@ -148,7 +148,6 @@ function auditLog(entry) {
   fs.appendFileSync(AUDIT_FILE, line + '\n');
 }
 
-
 // ── HTTP helpers ─────────────────────────────────────────────────────────────
 
 function httpsPost(url, body) {

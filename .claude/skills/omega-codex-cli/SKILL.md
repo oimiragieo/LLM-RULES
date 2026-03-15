@@ -75,11 +75,11 @@ node .claude/skills/omega-codex-cli/scripts/verify-setup.mjs
 
 ## Models
 
-| Model ID             | Description                                                              | When to Use                                           |
-| -------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------- |
-| `codex-mini-latest`  | **Default.** Fine-tuned o4-mini. Low-latency code Q&A. $1.50/$6 per 1M. | Fast code questions, CI pipelines, high-volume calls  |
-| `gpt-5.4`            | Full GPT-5.4 (released ~2026-03-05). 1M context, computer-use, top coding perf. | Complex multi-file tasks, computer-use agentic flows |
-| `gpt-5.4-pro`        | Pro variant of GPT-5.4. Higher capacity, higher cost.                    | State-of-the-art coding benchmarks, research tasks    |
+| Model ID            | Description                                                                     | When to Use                                          |
+| ------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `codex-mini-latest` | **Default.** Fine-tuned o4-mini. Low-latency code Q&A. $1.50/$6 per 1M.         | Fast code questions, CI pipelines, high-volume calls |
+| `gpt-5.4`           | Full GPT-5.4 (released ~2026-03-05). 1M context, computer-use, top coding perf. | Complex multi-file tasks, computer-use agentic flows |
+| `gpt-5.4-pro`       | Pro variant of GPT-5.4. Higher capacity, higher cost.                           | State-of-the-art coding benchmarks, research tasks   |
 
 **Default model:** `codex-mini-latest` — fine-tuned o4-mini optimized for low-latency code Q&A with a 75% caching discount. Do not override unless you need GPT-5.4's extended context or computer-use capability.
 
@@ -93,12 +93,12 @@ node .claude/skills/omega-codex-cli/scripts/ask-codex.mjs "PROMPT" --model gpt-5
 
 ## Flags
 
-| Flag             | Description                                                                          |
-| ---------------- | ------------------------------------------------------------------------------------ |
+| Flag             | Description                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------ |
 | `--model MODEL`  | Override model (default: `codex-mini-latest`). Use `gpt-5.4` or `gpt-5.4-pro` for GPT-5.4. |
-| `--json`         | JSONL event stream output                                                            |
-| `--sandbox`      | Workspace-write sandbox mode                                                         |
-| `--timeout-ms N` | Timeout in milliseconds (exit code 124 on expiry)                                    |
+| `--json`         | JSONL event stream output                                                                  |
+| `--sandbox`      | Workspace-write sandbox mode                                                               |
+| `--timeout-ms N` | Timeout in milliseconds (exit code 124 on expiry)                                          |
 
 ## Exit Codes
 

@@ -56,27 +56,27 @@
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `.claude/tools/cli/telegram-poll.cjs` | Main poll loop — runs every 2 min via cron |
-| `.claude/tools/cli/telegram-command-router.cjs` | Routes slash commands, builds Claude action objects |
-| `.claude/context/tmp/telegram-offset.json` | Persisted getUpdates offset (cross-run state) |
-| `.claude/context/runtime/cron-actions-queue.jsonl` | Queue for complex commands (background processing) |
-| `.claude/skills/telegram-polling/SKILL.md` | Skill documentation |
+| File                                               | Purpose                                             |
+| -------------------------------------------------- | --------------------------------------------------- |
+| `.claude/tools/cli/telegram-poll.cjs`              | Main poll loop — runs every 2 min via cron          |
+| `.claude/tools/cli/telegram-command-router.cjs`    | Routes slash commands, builds Claude action objects |
+| `.claude/context/tmp/telegram-offset.json`         | Persisted getUpdates offset (cross-run state)       |
+| `.claude/context/runtime/cron-actions-queue.jsonl` | Queue for complex commands (background processing)  |
+| `.claude/skills/telegram-polling/SKILL.md`         | Skill documentation                                 |
 
 ---
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `TELEGRAM_BOT_TOKEN` | **Yes** | Bot API token from @BotFather |
-| `TELEGRAM_OWNER_ID` | Recommended | Your numeric Telegram user ID |
-| `TELEGRAM_OWNER_USERNAME` | Recommended | Your Telegram username |
-| `TELEGRAM_ALLOWED_USERS` | Recommended | Comma-separated allowed user IDs |
-| `TELEGRAM_OWNER_CHAT_ID` | Optional | Chat ID for owner DMs |
-| `TELEGRAM_CHAT_IDS` | Optional | Restrict to specific chat IDs |
-| `CLAUDE_CLI_PATH` | Optional | Full path to `claude` binary — auto-detected if not set |
+| Variable                  | Required    | Description                                             |
+| ------------------------- | ----------- | ------------------------------------------------------- |
+| `TELEGRAM_BOT_TOKEN`      | **Yes**     | Bot API token from @BotFather                           |
+| `TELEGRAM_OWNER_ID`       | Recommended | Your numeric Telegram user ID                           |
+| `TELEGRAM_OWNER_USERNAME` | Recommended | Your Telegram username                                  |
+| `TELEGRAM_ALLOWED_USERS`  | Recommended | Comma-separated allowed user IDs                        |
+| `TELEGRAM_OWNER_CHAT_ID`  | Optional    | Chat ID for owner DMs                                   |
+| `TELEGRAM_CHAT_IDS`       | Optional    | Restrict to specific chat IDs                           |
+| `CLAUDE_CLI_PATH`         | Optional    | Full path to `claude` binary — auto-detected if not set |
 
 ---
 
@@ -135,15 +135,15 @@ require('https').get('https://api.telegram.org/bot'+t+'/getMe',r=>{
 
 ## Troubleshooting
 
-| Symptom | Root Cause | Fix |
-|---------|-----------|-----|
-| Messages received, no response | `handleAsk` not wired to dispatch | Fixed 2026-03-15: wired at lines 539, 562, 578 |
-| `Cannot launch nested Claude Code session` | `CLAUDECODE` env var still set | Script sets `CLAUDECODE: ''` in spawnSync env |
-| `claude: command not found` in cron | npm PATH not in cron environment | Set `CLAUDE_CLI_PATH` in `.env` |
-| Same message processed twice | Offset not persisted | Offset written to `telegram-offset.json` after each batch |
-| 404 from Telegram API | Invalid/expired bot token | Regenerate token via @BotFather |
-| Markdown parse error from Telegram | Response contains unescaped markdown | Script retries with `parse_mode` omitted |
-| Timeout on long prompts | 90s limit hit | Set `TELEGRAM_CLAUDE_TIMEOUT_MS` env var |
+| Symptom                                    | Root Cause                           | Fix                                                       |
+| ------------------------------------------ | ------------------------------------ | --------------------------------------------------------- |
+| Messages received, no response             | `handleAsk` not wired to dispatch    | Fixed 2026-03-15: wired at lines 539, 562, 578            |
+| `Cannot launch nested Claude Code session` | `CLAUDECODE` env var still set       | Script sets `CLAUDECODE: ''` in spawnSync env             |
+| `claude: command not found` in cron        | npm PATH not in cron environment     | Set `CLAUDE_CLI_PATH` in `.env`                           |
+| Same message processed twice               | Offset not persisted                 | Offset written to `telegram-offset.json` after each batch |
+| 404 from Telegram API                      | Invalid/expired bot token            | Regenerate token via @BotFather                           |
+| Markdown parse error from Telegram         | Response contains unescaped markdown | Script retries with `parse_mode` omitted                  |
+| Timeout on long prompts                    | 90s limit hit                        | Set `TELEGRAM_CLAUDE_TIMEOUT_MS` env var                  |
 
 ---
 
