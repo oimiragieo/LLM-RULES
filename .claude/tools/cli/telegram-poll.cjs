@@ -7,8 +7,12 @@
  * Simple commands handled entirely in-script (no Claude needed):
  *   /help, /status, /loops, /logs, /memory
  *
- * Claude-dependent commands written to command queue for next cron tick:
- *   /tasks, /ask, /research, /skill, /agent, /workflow,
+ * Claude-dependent commands invoked INLINE (direct claude -p call):
+ *   /ask <text>       — invoke Claude with text, send response back
+ *   <free-form text>  — route free-form messages to Claude
+ *
+ * Other Claude-dependent commands queued for background processing:
+ *   /tasks, /research, /skill, /agent, /workflow,
  *   /spawn, /approve, /confirm, /deny
  *
  * Usage: node .claude/tools/cli/telegram-poll.cjs
@@ -18,6 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { spawnSync } = require('child_process');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 const { sanitizeCreatorName, buildClaudeAction } = require('./telegram-command-router.cjs');
 
@@ -137,6 +142,44 @@ function auditLog(entry) {
   const line = JSON.stringify({ timestamp: new Date().toISOString(), ...entry });
   ensureDir(AUDIT_FILE);
   fs.appendFileSync(AUDIT_FILE, line + '\n');
+}
+
+// ── Claude invocation ────────────────────────────────────────────────────────
+
+/**
+ * Invoke Claude headlessly via `cmd.exe /c claude -p <prompt>`.
+ * Uses cmd.exe wrapper because the npm-installed `claude` is a .cmd script
+ * that cannot be spawned directly with shell:false on Windows.
+ * CLAUDECODE env var is unset to prevent the nested-session guard from blocking.
+ *
+ * @param {string} prompt - The prompt to send to Claude
+ * @param {number} [timeoutMs=90000] - Timeout in milliseconds
+ * @returns {string} - Claude's response text
+ * @throws {Error} - If Claude exits non-zero or times out
+ */
+function invokeClaude(prompt, timeoutMs) {
+  const timeout = timeoutMs || 90000;
+  const claudePath = process.env.CLAUDE_CLI_PATH || 'claude';
+
+  // On Windows, npm-installed CLI scripts are .cmd files — must run via cmd.exe
+  // shell: false is required to prevent shell injection (security rule)
+  const result = spawnSync('cmd.exe', ['/c', claudePath, '-p', prompt, '--output-format', 'text'], {
+    encoding: 'utf8',
+    timeout,
+    shell: false,
+    env: Object.assign({}, process.env, {
+      CLAUDECODE: '', // unset nested-session guard
+    }),
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+  if (result.status !== 0) {
+    const errSnippet = (result.stderr || '').slice(0, 300);
+    throw new Error(`claude exited ${result.status}: ${errSnippet}`);
+  }
+  return (result.stdout || '').trim();
 }
 
 // ── HTTP helpers ─────────────────────────────────────────────────────────────
@@ -347,7 +390,63 @@ async function handleMemory(chatId, query) {
   }
 }
 
-async function queueForClaude(chatId, messageId, senderId, command, args) {
+/**
+ * Send a "typing..." chat action to Telegram (fire-and-forget, non-blocking).
+ * Shows the user that the bot is working before Claude responds.
+ */
+function sendTyping(chatId) {
+  const url = `https://api.telegram.org/bot${TOKEN}/sendChatAction`;
+  httpsPost(url, { chat_id: chatId, action: 'typing' }).catch(() => {});
+}
+
+/**
+ * Invoke Claude inline for /ask <text> and free-form messages.
+ * Sends "typing" indicator, calls claude -p, then sends chunked response.
+ * Falls back to an error message if Claude invocation fails.
+ */
+async function handleAsk(chatId, text) {
+  sendTyping(chatId);
+  try {
+    const response = await new Promise((resolve, reject) => {
+      // Run synchronously but in a setImmediate to allow the typing action to fire first
+      setImmediate(() => {
+        try {
+          const result = invokeClaude(text, 90000);
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+
+    const reply = response || '(no response)';
+    // Chunk at 4000 chars to stay well under Telegram's 4096 char limit
+    for (let i = 0; i < reply.length; i += 4000) {
+      const chunk = reply.slice(i, i + 4000);
+      try {
+        await sendMessage(chatId, chunk, true);
+      } catch (_mdErr) {
+        // Markdown parse failed — retry as plain text
+        await sendMessage(chatId, chunk, false);
+      }
+    }
+    auditLog({
+      type: 'claude_response',
+      chatId,
+      promptLength: text.length,
+      responseLength: reply.length,
+    });
+  } catch (err) {
+    process.stderr.write(`handleAsk error: ${err.message}\n`);
+    auditLog({ type: 'claude_error', chatId, error: err.message });
+    await sendMessage(
+      chatId,
+      `Sorry, I could not process your request. Error: ${err.message.slice(0, 200)}`
+    );
+  }
+}
+
+async function queueForClaude(chatId, messageId, command, args) {
   const action = await buildClaudeAction(chatId, messageId, command, args, sendMessage);
   if (!action) return; // null means already handled (e.g. invalid name replied inline)
   const queue = readCmdQueue();
@@ -436,7 +535,8 @@ async function main() {
     }
 
     if (!command) {
-      await sendMessage(chatId, 'Send /help for available commands.');
+      // Free-form message — route to Claude inline
+      await handleAsk(chatId, text);
       continue;
     }
 
@@ -457,9 +557,12 @@ async function main() {
       case '/memory':
         await handleMemory(chatId, args);
         break;
-      // Claude-dependent
-      case '/tasks':
+      // Inline Claude invocation — no queue, responds immediately
       case '/ask':
+        await handleAsk(chatId, args || text);
+        break;
+      // Queued commands (background processing via cron-actions-queue.jsonl)
+      case '/tasks':
       case '/research':
       case '/skill':
       case '/agent':
@@ -468,10 +571,11 @@ async function main() {
       case '/approve':
       case '/confirm':
       case '/deny':
-        await queueForClaude(chatId, msgId, senderId, command, args);
+        await queueForClaude(chatId, msgId, command, args);
         break;
       default:
-        await sendMessage(chatId, `Unknown command: ${command}. Send /help for list.`);
+        // Unknown slash command — try routing to Claude as a free-form query
+        await handleAsk(chatId, text);
     }
   }
 
