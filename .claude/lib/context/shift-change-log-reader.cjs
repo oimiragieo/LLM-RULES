@@ -20,7 +20,7 @@ function readHandoverLog(runtimeDir = path.join(process.cwd(), '.claude/context/
     return null;
   }
 
-  if (!log.schemaVersion || !log.schemaVersion.startsWith('1.')) {
+  if (!log.schemaVersion) {
     return null;
   }
 

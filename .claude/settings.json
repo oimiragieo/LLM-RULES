@@ -26,6 +26,15 @@
             "command": "node .claude/hooks/routing/handover-detector.cjs"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/session-budget-watchdog.cjs"
+          }
+        ]
       }
     ],
     "PreToolUse": [

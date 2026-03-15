@@ -224,7 +224,7 @@ Update your internal baseline value.
 **Simplicity criterion:** Before keeping a win, weigh it:
 
 - Improvement of ~0.001 val_bpb + added 20 lines of complex code → probably not worth it
-- Improvement of ~0.001 val_bpb from _deleting_ code → definitely keep
+- Improvement of ~0.001 val*bpb from \_deleting* code → definitely keep
 - Improvement of ~0 but much simpler code → keep (simplification win)
 - Large improvement (>0.005 val_bpb) + reasonable complexity → keep
 

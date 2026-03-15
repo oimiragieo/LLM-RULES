@@ -5,6 +5,7 @@
 **New artifacts**: `ml-experiment-loop` skill (stub → v2.0.0, 330 lines), `ml-experiment-standards.md` rule, `autoresearch` command + templates (prepare.py, train.py, program.md, pyproject.toml). Agent registry: **80 total** (was 79). Skill index: 299.
 
 **Key patterns introduced**:
+
 - Fixed-budget experiment protocol (5-min wall-clock budget, single scalar metric)
 - Git-based keep/discard (branch per tag, commit per experiment, `git reset --hard HEAD~1` on discard)
 - Context-window-safe log handling (redirect to file, targeted grep — NEVER cat)
@@ -545,3 +546,35 @@ Key anti-patterns captured:
 - Updated workflow: evolution-workflow (2026-03-14)
 
 - Updated workflow: missing-workflow-xyz (2026-03-14)
+
+## Session Handoff Research (2026-03-14) [Task #task-handoff-research]
+
+**`--resume`/`-r` behavior (VERIFIED from official docs):** Restores session by name or ID from disk. Does NOT restore LLM context window state. Resuming agent starts fresh and rebuilds context from persisted conversation log. Design handoff docs to be self-contained.
+
+**`--name`/`-n` flag:** Sets a human-readable session name. Enables `claude --resume <name>` from any terminal. Use format `shift-YYYY-MM-DD-HH` for shift-change sessions.
+
+**`--fork-session`:** Creates new session ID from an existing session's history. Use before risky operations. Works with `--resume` or `--continue`.
+
+**`--session-id`:** Force a specific UUID for the session (must be valid UUID format). Enables deterministic session identity.
+
+**Token Counting API (VERIFIED):** `client.messages.count_tokens()` (Python) / `client.messages.countTokens()` (TS) is a real, free endpoint. Returns `{ input_tokens: N }` estimate (±5%). Rate limited separately from messages.create() (100–8,000 RPM by tier). Use for pre-flight validation before spawning sessions with large handoff prompts.
+
+**Production handoff patterns:** Winning pattern = separate durable state from working context. Write all outputs to persistent storage immediately; new sessions query storage rather than relying on in-context history. Summarization at thresholds (not line-count truncation).
+
+**Report:** `.claude/context/artifacts/research-reports/session-handoff-research-2026-03-14.md`
+
+- Created new agent: qa-guardian (2026-03-15)
+
+- Created new agent: contract-check (2026-03-15)
+
+- Created new agent: bool-action (2026-03-15)
+
+- Created new agent: repo-onboarder (2026-03-15)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-15)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-15)
+
+- Updated workflow: evolution-workflow (2026-03-15)
+
+- Updated workflow: missing-workflow-xyz (2026-03-15)

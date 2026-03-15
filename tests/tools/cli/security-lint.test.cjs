@@ -425,12 +425,7 @@ function testStillScansEvalInCodeFiles() {
 
 function testDoesNotFlagMethodChainedEval() {
   // SEC-012 must NOT fire on method-chained .eval() calls (e.g., PyTorch model.eval())
-  const content = [
-    'model.eval()',
-    'self.eval()',
-    'obj.eval()',
-    'model.eval().train()',
-  ].join('\n');
+  const content = ['model.eval()', 'self.eval()', 'obj.eval()', 'model.eval().train()'].join('\n');
   const filePath = createTestFile(content, '.py');
 
   const findings = scanFile(filePath);
@@ -496,7 +491,10 @@ function main() {
     ['Skips eval() in memory .json files', testSkipsEvalInMemoryJson],
     ['Skips http:// in .schema.json files', testSkipsHttpInSchemaJson],
     ['Still scans eval() in code files', testStillScansEvalInCodeFiles],
-    ['Does not flag method-chained .eval() (SEC-012 false-positive)', testDoesNotFlagMethodChainedEval],
+    [
+      'Does not flag method-chained .eval() (SEC-012 false-positive)',
+      testDoesNotFlagMethodChainedEval,
+    ],
     ['Still scans http:// in code files', testStillScansHttpInCodeFiles],
   ];
 

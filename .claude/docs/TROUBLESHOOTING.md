@@ -641,7 +641,7 @@ Symptoms:
 
 Root Cause:
 
-- The `worktree-auto-cleanup.cjs` hook explicitly skips deleting its own directory to prevent Windows `EBUSY` locks. It then skips deleting all other active directories because they are shielded by a 2-hour TTL. 
+- The `worktree-auto-cleanup.cjs` hook explicitly skips deleting its own directory to prevent Windows `EBUSY` locks. It then skips deleting all other active directories because they are shielded by a 2-hour TTL.
 - The background `worktree-prune.cjs` script was measuring age using `fs.statSync` on the root agent directory, which completely fails because inner file changes do not update the directory's root timestamp on some filesystems, preventing the 12-hour threshold from expiring.
 
 Fix Applied:
@@ -657,9 +657,9 @@ Symptoms:
 
 Root Cause:
 
-- The `spawn-prompt-assembler` prepended dynamic meta fields (massive 300-word Warning Message Boxes and per-session Task UUID injections) to the absolute top of the system prompt. Because prompt caching requires exact prefix matching, this constantly changing preamble immediately busted the cache line before it could hit the static Tool/Agent rules. 
+- The `spawn-prompt-assembler` prepended dynamic meta fields (massive 300-word Warning Message Boxes and per-session Task UUID injections) to the absolute top of the system prompt. Because prompt caching requires exact prefix matching, this constantly changing preamble immediately busted the cache line before it could hit the static Tool/Agent rules.
 
 Fix Applied:
 
-- Inverted the `spawn-prompt-assembler-sections.cjs` architectural layout. Statically declared items (Tools, Skills, Memory RAG, Agent Constitution) are explicitly array-concatenated first. 
+- Inverted the `spawn-prompt-assembler-sections.cjs` architectural layout. Statically declared items (Tools, Skills, Memory RAG, Agent Constitution) are explicitly array-concatenated first.
 - Dynamic warning fields (`ensureMandatorySpawnPreflight`) and UUIDs were relocated to append onto the absolute bottom of the payload.

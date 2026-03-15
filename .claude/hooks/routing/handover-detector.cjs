@@ -9,6 +9,57 @@ const {
 } = require('../../lib/context/shift-change-log-reader.cjs');
 const { exitDrainMode, getDrainState } = require('../../lib/context/drain-state.cjs');
 
+function formatResumeInstructions(resumeInstructions) {
+  // Handle both structured JSON (v2.0.0) and legacy string (v1.0.0) formats
+  if (typeof resumeInstructions === 'string') {
+    // Legacy format — return as-is
+    return resumeInstructions;
+  }
+  if (resumeInstructions && typeof resumeInstructions === 'object') {
+    // Structured format — render each field
+    let out = '';
+    if (resumeInstructions.objective) {
+      out += `**Objective:** ${resumeInstructions.objective}\n\n`;
+    }
+    if (resumeInstructions.nextStep) {
+      out += `**Next Step:** ${resumeInstructions.nextStep}\n\n`;
+    }
+    if (resumeInstructions.openTasks && resumeInstructions.openTasks.length > 0) {
+      out += `**Open Tasks:**\n`;
+      resumeInstructions.openTasks.forEach(t => {
+        out += `- ${t}\n`;
+      });
+      out += '\n';
+    }
+    if (resumeInstructions.keyFiles && resumeInstructions.keyFiles.length > 0) {
+      out += `**Key Files:**\n`;
+      resumeInstructions.keyFiles.forEach(f => {
+        out += `- ${f}\n`;
+      });
+      out += '\n';
+    }
+    if (resumeInstructions.recentDecisions && resumeInstructions.recentDecisions.length > 0) {
+      out += `**Recent Decisions:**\n`;
+      resumeInstructions.recentDecisions.forEach(d => {
+        out += `- ${d}\n`;
+      });
+      out += '\n';
+    }
+    if (resumeInstructions.risks && resumeInstructions.risks.length > 0) {
+      out += `**Risks:**\n`;
+      resumeInstructions.risks.forEach(r => {
+        out += `- ${r}\n`;
+      });
+      out += '\n';
+    }
+    if (resumeInstructions.resumePrompt) {
+      out += `${resumeInstructions.resumePrompt}\n`;
+    }
+    return out.trim() || 'Run TaskList() to discover pending work.';
+  }
+  return 'Run TaskList() to discover pending work, check active_context.md';
+}
+
 function formatResumeMessage(log) {
   // M8.1: Step 0 pre-flight block — prepended so it has highest attention priority
   let msg = `## SHIFT CHANGE RESUME — MANDATORY PRE-FLIGHT (DO NOT SKIP)\n\n`;
@@ -19,8 +70,9 @@ function formatResumeMessage(log) {
   msg += `- **Step 0.5**: Check \`.claude/context/runtime/integration-queue.jsonl\` — spawn artifact-integrator (background) if entries exist\n\n`;
   msg += `---\n\n`;
 
-  // Handover context
-  msg += `SHIFT CHANGE RESUME: ${log.resumeInstructions || log.fallbackInstruction || 'Run TaskList() to discover pending work, check active_context.md'}\n\n`;
+  // Handover context — handle both structured JSON and legacy string formats
+  const formattedInstructions = formatResumeInstructions(log.resumeInstructions);
+  msg += `SHIFT CHANGE RESUME: ${formattedInstructions || log.fallbackInstruction || 'Run TaskList() to discover pending work, check active_context.md'}\n\n`;
   if (log.contextSummary) {
     msg += `Context: ${log.contextSummary}\n\n`;
   }
