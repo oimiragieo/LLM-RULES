@@ -1,7 +1,7 @@
 ---
 name: database-expert
 description: Database expert including Prisma, Supabase, SQL, and NoSQL patterns
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -14,7 +14,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
+lastVerifiedAt: 2026-03-15T00:00:00.000Z
 ---
 
 # Database Expert
@@ -134,6 +134,92 @@ This expert skill consolidates 1 individual skills:
 | Unbounded `.findAll()` / `SELECT *` without LIMIT | Returns entire table; causes timeouts and memory spikes on large datasets | Always paginate with LIMIT/OFFSET or cursor-based pagination         |
 | No connection pooling                             | Serverless functions exhaust database connections under load              | Use PgBouncer / Supavisor in transaction mode                        |
 | Logging full query strings with values            | Leaks PII and credentials into log aggregators                            | Log query templates only; redact all bound parameter values          |
+
+## MCP Database Servers
+
+Use official MCP servers to give agents direct database access without writing custom integration code.
+
+### PostgreSQL MCP Server
+
+```bash
+# Quick start — no install required
+npx -y @modelcontextprotocol/server-postgres postgresql://user:pass@localhost/mydb
+
+# Claude Desktop / agent-studio settings.json
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    }
+  }
+}
+```
+
+**Available tools:** `query` (read-only SELECT), `list_tables`, `describe_table`
+
+**Key design: read-only enforcement**
+
+The PostgreSQL MCP server wraps queries in `BEGIN READ ONLY` transactions, preventing accidental mutations. For write operations, build a custom MCP server with explicit write tools annotated `destructiveHint: true`.
+
+**Agent workflow pattern:**
+
+```
+1. list_tables → discover available tables
+2. describe_table → understand schema before querying
+3. query → run SELECT with explicit column list + LIMIT
+```
+
+### SQLite MCP Server
+
+```bash
+npx -y @modelcontextprotocol/server-sqlite /path/to/database.db
+
+# settings.json
+{
+  "mcpServers": {
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "/path/to/database.db"]
+    }
+  }
+}
+```
+
+**Available tools:** `read_query`, `write_query`, `create_table`, `list_tables`, `describe_table`, `insert_row`, `delete_rows`
+
+**SQLite MCP usage patterns:**
+
+```sql
+-- Discover schema
+list_tables()
+describe_table({ table_name: "users" })
+
+-- Safe read pattern
+read_query({ query: "SELECT id, name, email FROM users WHERE active = 1 LIMIT 100" })
+
+-- Write with explicit columns (never INSERT SELECT *)
+insert_row({ table_name: "users", data: { name: "Alice", email: "alice@example.com" } })
+
+-- Conditional delete (always use WHERE)
+delete_rows({ table_name: "sessions", where: "expires_at < datetime('now')" })
+```
+
+**Security rules for SQLite MCP:**
+
+- Point the server at a dedicated app database, never system databases
+- Use read-only file permissions when write access is not required
+- Log all `write_query` and `delete_rows` calls in audit trail
+
+### When to Use MCP vs Custom Implementation
+
+| Scenario                                  | Use MCP Server        | Build Custom                    |
+| ----------------------------------------- | --------------------- | ------------------------------- |
+| Agent needs to query a DB for context     | MCP (postgres/sqlite) | No                              |
+| Read-only exploration / analysis          | MCP                   | No                              |
+| Complex business logic + DB writes        | No                    | Custom MCP with validated tools |
+| Multiple DB operations in one transaction | No                    | Custom (MCP is single-op)       |
+| DB + external API in one workflow         | No                    | Custom orchestration            |
 
 ## Memory Protocol (MANDATORY)
 

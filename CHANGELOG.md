@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — MEGA EVOLUTION v2 Wave 3: Rules (2026-03-15)
+
+3 new rules files. Total rules: 136+.
+
+#### New Rules (3)
+
+- **`erlang-rules.md`** — Erlang/OTP best practices: supervision trees, gen_server pattern, message passing, ETS, process naming, error handling, EUnit testing.
+- **`zig-rules.md`** — Zig systems programming standards: allocator-parameter pattern, defer/errdefer memory management, error union propagation, comptime generics, slice safety, build.zig patterns.
+- **`observability-rules.md`** — Observability standards: OpenTelemetry (Python + TypeScript), structured logging (JSON Lines format), Prometheus metric naming + SLO design, alerting burn rate rules, anti-patterns (no PII in logs, no high-cardinality labels).
+
+---
+
+### Added — MEGA EVOLUTION v2 Wave 2: Agents (2026-03-15)
+
+20 new domain agents. Registry: 100 agents (was 80).
+
+#### New Domain Agents (20)
+
+- **`angular-pro`** — Angular 17+ signals, standalone components, inject(), toSignal(), @ngrx/signals SignalStore.
+- **`swift-pro`** — Swift 5.9+ structured concurrency, actors, @Observable macro, SwiftData, Swift Testing (@Suite/@Test), Sendability.
+- **`postgres-pro`** — PostgreSQL JSONB+GIN indexes, declarative partitioning, pgvector (IVFFlat+HNSW), window functions, EXPLAIN ANALYZE, covering indexes.
+- **`business-analyst`** — BRD structure, user story maps, gap analysis tables, BPMN-style Mermaid diagrams, Given-When-Then acceptance criteria.
+- **`product-manager`** — OKR framework, RICE scoring, PRD structure, North Star metric framework, JTBD interview format.
+- **`sql-pro`** — Advanced window functions, recursive CTEs, ROLLUP/CUBE/GROUPING SETS, pivot patterns, sargable predicates, cross-database JSON aggregation.
+- **`kotlin-pro`** — Kotlin coroutines + structured concurrency, sealed classes, Compose Multiplatform (CMP), KMP shared logic, Ktor server, extension function DSLs.
+- **`rails-pro`** — Rails 7/8 Hotwire (Turbo Frames + Streams), Stimulus controllers, Active Record optimized queries, Solid Queue, ViewComponent, RSpec + FactoryBot.
+- **`spring-boot-pro`** — Spring Boot 3+ REST controllers, Spring Security 6 JWT, Spring Data JPA with projections, Spring WebFlux, GraalVM native images, Testcontainers.
+- **`azure-infra-pro`** — AKS with KEDA autoscaling, Azure Container Apps, Bicep IaC, Managed Identity + Key Vault, Azure DevOps pipelines, Azure Monitor alerts.
+- **`terragrunt-pro`** — Terragrunt DRY patterns, run-all, dependency blocks with mock outputs, before/after hooks, environment promotion via account.hcl inheritance.
+- **`windows-infra-pro`** — Windows Server PowerShell DSC, WinRM/CIM sessions, Active Directory bulk operations, GPO reporting, Windows Event Log security hunting.
+- **`m365-admin`** — Microsoft 365 Graph API batch licensing, Exchange Online audit, Entra ID Conditional Access, Intune compliance, Teams administration.
+- **`legal-advisor`** — Open source license compliance matrix (MIT/Apache/GPL/AGPL), GDPR checklist, ToS key clauses, DPA structure, IP assignment patterns.
+- **`django-developer`** — Django ORM select_related/prefetch_related, DRF ViewSets, Celery idempotent tasks, pytest-django, security checklist.
+- **`dotnet-pro`** — .NET 8 Minimal API with TypedResults, EF Core ExecuteUpdateAsync, DI lifetime patterns, BackgroundService, xUnit + IClassFixture.
+- **`iot-engineer`** — MQTT QoS + TLS + exponential backoff, AWS IoT Core SDK v2, Greengrass Lambda edge, OTA protocol, protocol selection table.
+- **`quant-analyst`** — vectorbt backtesting, scipy risk metrics (Sharpe/VaR/CVaR/Calmar), mean-variance portfolio optimization, walk-forward validation, Black-Scholes with Greeks.
+- **`wordpress-master`** — WordPress singleton plugin pattern, WP_Query, Gutenberg block.json + render.php, WooCommerce payment gateway, WP-CLI.
+- **`context-manager`** — Context window optimization specialist (haiku model), semantic-safe pruning protocol, compression report format.
+
+---
+
+### Added — MEGA EVOLUTION v2 Wave 1: Skills (2026-03-15)
+
+18-repo analysis. 9 skills updated, 3 new skills created. Skill index: 302.
+
+#### New Skills (3)
+
+- **`pptx`** — PowerPoint generation via python-pptx. Covers slide layouts, text formatting, tables, charts, images, and agent workflow pattern (`claude_output_to_slides`).
+- **`xlsx`** — Excel spreadsheet generation via openpyxl + xlsxwriter. Covers headers, formulas, named styles, conditional formatting, charts, and high-performance large-dataset export.
+- **`knowledge-graph`** — Persistent entity/relation knowledge graph for agents. Option 1: MCP Memory Server (`@modelcontextprotocol/server-memory`). Option 2: local JSON graph (Python). Mandatory session startup/end protocol.
+
+#### Updated Skills (9)
+
+- **`assimilate`** — Added CLI-native patterns: `--help` autodiscovery, `--json` output, wrapper scripts.
+- **`mcp-builder`** — Added Official MCP Server Templates section: PostgreSQL/SQLite/Filesystem/GitHub MCP quick-start patterns and decision table.
+- **`database-expert`** — Added MCP Database Servers section: PostgreSQL (read-only) + SQLite MCP integration patterns, when-to-use table.
+- **`fintech-engineer`** — Added Stripe Advanced Best Practices: API version pinning, webhook deduplication with event ID table, Radar fraud metadata, SCA/PSD2 handling, Connect platform patterns.
+- **`transcription`** — Added Batch Processing Large Audio Files section (pydub chunking, performance table) and WhisperX Speaker Diarization section (word-level timestamps, diarization output format).
+- **`diagram-generator`** — Updated with Mermaid.js current syntax and HTML interactive output patterns.
+- **`claude-api`** — Added quickstart patterns for support agents, financial advisors, and autonomous agents.
+- **`webapp-testing`** — Added Puppeteer MCP server integration patterns.
+- **`github-ops`** — Added GitHub MCP server tool reference and operation patterns.
+
 ### Added — karpathy/autoresearch Integration (2026-03-14)
 
 - Integrated karpathy/autoresearch: `ml-experiment-loop` skill (v2.0.0) with autonomous ML research protocol — fixed-budget experiments, git-based keep/discard, crash recovery, simplicity criterion

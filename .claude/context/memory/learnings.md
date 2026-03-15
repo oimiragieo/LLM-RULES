@@ -1,3 +1,29 @@
+## MEGA EVOLUTION v2 Complete — 100 Agents, 302 Skills, 3 New Rules (2026-03-15) [FRAMEWORK]
+
+**Event**: MEGA EVOLUTION v2 fully executed. All 4 waves complete.
+
+**Wave 2 — Agents**: 20 new domain agents created. Registry grew from 80 → 100 agents. New agents: angular-pro, swift-pro, postgres-pro, business-analyst, product-manager, sql-pro, kotlin-pro, rails-pro, spring-boot-pro, azure-infra-pro, terragrunt-pro, windows-infra-pro, m365-admin, legal-advisor, django-developer, dotnet-pro, iot-engineer, quant-analyst, wordpress-master, context-manager.
+
+**Wave 3 — Rules**: 3 new rules created: erlang-rules.md (OTP/supervision patterns), zig-rules.md (allocator-parameter pattern, defer/errdefer, comptime), observability-rules.md (OTel, Prometheus SLOs, structured logging).
+
+**Wave 4 — Validation**: lint 0 errors (954 files), format clean (8627 files), validate pass, registry regenerated at 100 agents.
+
+**Key pattern**: All new agents follow agent-template-contract:v1 with YAML frontmatter, enforcement hooks, core persona, routing keywords, key capabilities (code examples), workflow, anti-patterns, memory protocol.
+
+---
+
+## MEGA EVOLUTION v2 Wave 1 Complete — Skill Index at 302 (2026-03-15) [FRAMEWORK]
+
+**Event**: MEGA EVOLUTION v2 Wave 1 executed. 9 skills updated, 3 new skills created. Skill index now 302.
+
+**Updated skills**: assimilate (CLI JSON + --help autodiscovery), mcp-builder (official MCP server templates), database-expert (PostgreSQL + SQLite MCP patterns), fintech-engineer (Stripe advanced: API versioning, webhook dedup, Radar, SCA, Connect), transcription (batch processing + WhisperX diarization), diagram-generator (Mermaid.js + HTML interactive), claude-api (quickstart patterns), webapp-testing (Puppeteer MCP), github-ops (GitHub MCP tools).
+
+**New skills**: `pptx` (python-pptx — slides, tables, charts, images), `xlsx` (openpyxl + xlsxwriter — Excel reports, conditional formatting), `knowledge-graph` (MCP memory server + local JSON graph — entities, relations, observations).
+
+**Key pattern**: knowledge-graph skill bridges MCP Memory Server (`@modelcontextprotocol/server-memory`) with local JSON fallback. Session startup/end protocol mandatory.
+
+**Lint status**: 0 errors. markdownlint passed 931 files.
+
 ## autoresearch Integration — Agent Count at 80 (2026-03-14) [FRAMEWORK]
 
 **Event**: karpathy/autoresearch integrated. Commit 49015b79 + ceee6b1a.
@@ -622,3 +648,52 @@ Key anti-patterns captured:
 - Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-15)
 
 - Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-15)
+
+- Updated workflow: evolution-workflow (2026-03-15)
+
+- Updated workflow: missing-workflow-xyz (2026-03-15)
+
+## Heartbeat Ecosystem Registration (2026-03-15)
+
+**Agent:** heartbeat-orchestrator | **Task:** task-1 | **Status:** Completed
+
+### 8 Heartbeat Loops Registered
+
+The heartbeat ecosystem consists of 8 independent cron loops that keep agent-studio healthy and indexed:
+
+1. **reschedule-2d** (critical, `0 0 */2 * *`) — Auto-reschedule loop runs every 2 days to prevent 3-day silent expiry of all scheduled tasks. MUST fire to maintain the heartbeat.
+
+2. **reflection-2h** (high, `0 */2 * * *`) — Extracts patterns from session transcripts every 2 hours, writes to learnings.md, decisions.md, issues.md before context is lost.
+
+3. **evolution-24h** (medium, `0 3 * * *`) — Applies accumulated learnings to improve agent definitions at 3am daily.
+
+4. **briefing-8am** (low, `0 8 * * 1-5`) — Morning briefing spawned at 8am weekdays, summarizes overnight state.
+
+5. **indexing-4h** (high, `0 */4 * * *`) — Checks BM25 index freshness, rebuilds if stale (>4h), keeps hybrid search working.
+
+6. **drain-15m** (critical, `*/15 * * * *`) — Context drain detection every 15 minutes. Does NOT auto-clear, warns user. Watches TaskList() for stalled tasks.
+
+7. **telegram-2m** (optional, `*/2 * * * *`) — Polls Telegram Bot API every 2 minutes for bidirectional messaging. Requires TELEGRAM_BOT_TOKEN env var.
+
+8. **research-7am** (low, `0 7 * * *`) — arXiv/Exa research digest spawned at 7am daily via arxiv-monitor and exa-monitor skills.
+
+### Tick Isolation Protocol
+
+All cron ticks follow **script-first, LLM-last** pattern:
+
+- Run associated Node.js script (.claude/tools/cli/)
+- If output is `HEARTBEAT_OK`, exit immediately (no LLM)
+- If `QUEUED_ACTIONS`, spawn Task() without waiting for completion
+
+### Sentinel Files
+
+- **heartbeat-session-ping.json**: TTL 15 minutes, gates Step 0.5 of router startup. Router spawns fresh heartbeat-orchestrator if missing/stale.
+- **Heartbeat registry**: Expires 46 hours after registration. Reschedule loop recreates all missing loops before expiry.
+
+### Critical Order for CronCreate/CronDelete
+
+ALWAYS `CronCreate` new task BEFORE `CronDelete` old one. Never delete first — creates scheduling gap where heartbeat is silent.
+
+### Status
+
+All 8 loops registered and verified. Heartbeat ecosystem is active for this session.

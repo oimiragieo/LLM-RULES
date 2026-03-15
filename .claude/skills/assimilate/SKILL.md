@@ -1,7 +1,7 @@
 ---
 name: assimilate
 description: Benchmark external agent frameworks and convert findings into a concrete TDD upgrade backlog for agent-studio evolution.
-version: 1.3.0
+version: 1.4.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -9,7 +9,7 @@ tools: [Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch, Skill]
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: 2026-03-14T00:00:00.000Z
+lastVerifiedAt: 2026-03-15T00:00:00.000Z
 ---
 
 # Assimilate
@@ -88,6 +88,79 @@ After assimilation, generate installable wrappers. Always emit `--output json` f
 - **pip (Python):** `pyproject.toml` `[project.scripts]` → `cli.py` with `__main__` guard → `pipx run <tool>`
 - **cargo (Rust):** `Cargo.toml` `[[bin]]` + `clap` → `src/main.rs` → `cargo install <tool>`
 - **go build (Go):** `cmd/<tool>/main.go` + `cobra` → `go install <module>@latest`
+
+## CLI-Anything Wrapper Generation
+
+Generate LLM-callable wrappers for ANY CLI tool using the CLI-Anything methodology (ref: [HKUDS/CLI-Anything](https://github.com/HKUDS/CLI-Anything)).
+
+### `--help` Autodiscovery Pattern
+
+```bash
+# Step 1: Capture help output for all subcommands
+TOOL --help > help_root.txt
+TOOL SUBCOMMAND --help > help_sub.txt
+
+# Step 2: Parse into structured schema
+node -e "
+const help = require('fs').readFileSync('help_root.txt', 'utf8');
+const commands = help.match(/^\s+(\w[\w-]*)\s+(.+)$/gm) || [];
+console.log(JSON.stringify(commands.map(c => {
+  const [, name, desc] = c.trim().match(/^(\S+)\s+(.+)$/) || [];
+  return { name, description: desc };
+}), null, 2));
+"
+```
+
+### MCP Tool Schema Generation from CLI
+
+Convert discovered CLI capabilities into MCP tool definitions:
+
+```typescript
+// From CLI --help output, generate MCP tool schema
+function cliToMcpTool(command: CLICommand): McpToolDefinition {
+  return {
+    name: command.name.replace(/-/g, '_'),
+    description: command.description,
+    inputSchema: {
+      type: 'object',
+      properties: Object.fromEntries(
+        command.flags.map(f => [
+          f.name,
+          {
+            type: f.type || 'string',
+            description: f.description,
+            ...(f.default !== undefined && { default: f.default }),
+          },
+        ])
+      ),
+      required: command.flags.filter(f => f.required).map(f => f.name),
+    },
+  };
+}
+```
+
+### JSON Output Adapter Pattern
+
+Force structured JSON output from CLI tools that normally produce text:
+
+```bash
+# Pattern: pipe text output through jq or custom parser
+TOOL command --format json 2>/dev/null || \
+TOOL command | node -e "
+  const lines = require('fs').readFileSync('/dev/stdin','utf8').split('\n');
+  console.log(JSON.stringify({ output: lines.filter(Boolean) }));
+"
+```
+
+### Supported Application Categories
+
+| Category  | Examples                   | Wrapper Pattern                      |
+| --------- | -------------------------- | ------------------------------------ |
+| Graphics  | GIMP, Blender, ImageMagick | Batch processing via CLI flags       |
+| Office    | LibreOffice, Pandoc        | Document conversion pipelines        |
+| Dev Tools | Docker, kubectl, terraform | Direct JSON output (`--format json`) |
+| Media     | ffmpeg, yt-dlp             | Stream processing with progress      |
+| System    | systemctl, pm2             | Status queries + action commands     |
 
 ## Session Management
 

@@ -1,10 +1,10 @@
 ## <!-- Agent: developer | Task: #5 | Session: 2026-03-05 -->
 
 verified: true
-lastVerifiedAt: 2026-03-05T00:00:00.000Z
+lastVerifiedAt: 2026-03-15T00:00:00.000Z
 name: mcp-builder
 description: Guide developers in creating Model Context Protocol (MCP) servers. Use for building MCP tools that enable LLMs to interact with external services. Covers TypeScript (primary) and Python FastMCP (secondary), tool annotations, Zod/Pydantic validation, and evaluation question creation.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -302,6 +302,130 @@ After completing the server, record findings:
 - Working patterns → `.claude/context/memory/learnings.md`
 - API integration gotchas → `.claude/context/memory/issues.md`
 - Architecture decisions → `.claude/context/memory/decisions.md`
+
+## Official MCP Server Templates
+
+The `modelcontextprotocol/servers` repository provides production-ready reference implementations. Use these as starting templates before building custom servers.
+
+### PostgreSQL MCP Server
+
+```bash
+# Install and run directly
+npx -y @modelcontextprotocol/server-postgres postgresql://localhost/mydb
+```
+
+**Claude Desktop config:**
+
+```json
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/mydb"]
+    }
+  }
+}
+```
+
+**Tools provided:** `query` (read-only SQL), `list_tables`, `describe_table`
+
+**Key implementation patterns from the reference server:**
+
+```typescript
+// Read-only query tool pattern
+server.tool(
+  'query',
+  'Run a read-only SQL query',
+  { sql: z.string().describe('SQL SELECT statement') },
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  async ({ sql }) => {
+    // Enforce read-only by setting transaction to read-only
+    const result = await pool.query('BEGIN READ ONLY; ' + sql + '; COMMIT');
+    return {
+      content: [{ type: 'text', text: JSON.stringify(result.rows, null, 2) }],
+    };
+  }
+);
+```
+
+### SQLite MCP Server
+
+```bash
+# Install and run
+npx -y @modelcontextprotocol/server-sqlite /path/to/database.db
+```
+
+**Claude Desktop config:**
+
+```json
+{
+  "mcpServers": {
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite", "/path/to/database.db"]
+    }
+  }
+}
+```
+
+**Tools provided:** `read_query`, `write_query`, `create_table`, `list_tables`, `describe_table`, `insert_row`, `delete_rows`
+
+**Schema introspection pattern:**
+
+```typescript
+server.tool(
+  'describe_table',
+  'Get the schema for a table',
+  { table_name: z.string().describe('Name of the table') },
+  { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  async ({ table_name }) => {
+    const rows = db.prepare(`PRAGMA table_info(?)`).all(table_name);
+    return {
+      content: [{ type: 'text', text: JSON.stringify(rows, null, 2) }],
+    };
+  }
+);
+```
+
+### Filesystem MCP Server
+
+```bash
+npx -y @modelcontextprotocol/server-filesystem /allowed/path
+```
+
+**Tools provided:** `read_file`, `write_file`, `list_directory`, `create_directory`, `move_file`, `search_files`, `get_file_info`
+
+**Path safety pattern (copy this for any filesystem tool):**
+
+```typescript
+function validatePath(requestedPath: string, allowedDir: string): string {
+  const resolved = path.resolve(requestedPath);
+  if (!resolved.startsWith(path.resolve(allowedDir))) {
+    throw new Error(`Path ${requestedPath} is outside allowed directory`);
+  }
+  return resolved;
+}
+```
+
+### GitHub MCP Server
+
+```bash
+npx -y @modelcontextprotocol/server-github
+# Requires: GITHUB_PERSONAL_ACCESS_TOKEN env var
+```
+
+**Tools provided:** `create_repository`, `get_file_contents`, `push_files`, `create_issue`, `create_pull_request`, `search_repositories`, `search_code`, `fork_repository`, `list_commits`
+
+### When to Use Official Servers vs Custom
+
+| Scenario                          | Use Official Server | Build Custom |
+| --------------------------------- | ------------------- | ------------ |
+| Standard PostgreSQL/SQLite access | YES                 | No           |
+| GitHub repo operations            | YES                 | No           |
+| Custom API integration            | No                  | YES          |
+| Business-specific logic           | No                  | YES          |
+| Combining multiple APIs           | No                  | YES          |
+| Existing service with SDK         | No                  | YES          |
 
 ## Common Pitfalls
 

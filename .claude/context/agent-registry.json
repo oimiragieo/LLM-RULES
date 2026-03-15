@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-15T01:39:41.663Z",
+  "generatedAt": "2026-03-15T16:41:57.434Z",
   "metadata": {
-    "totalAgents": 80,
-    "healthyAgents": 80,
+    "totalAgents": 100,
+    "healthyAgents": 100,
     "degradedAgents": 0,
     "unavailableAgents": 0,
-    "lastHealthCheck": "2026-03-15T01:39:41.663Z",
-    "lastFullScan": "2026-03-15T01:39:41.663Z"
+    "lastHealthCheck": "2026-03-15T16:41:57.434Z",
+    "lastFullScan": "2026-03-15T16:41:57.434Z"
   },
   "agents": {
     "architect": {
@@ -115,14 +115,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.654Z",
+        "lastUpdate": "2026-03-15T16:41:57.425Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.655Z",
-        "updatedAt": "2026-03-15T01:39:41.655Z"
+        "createdAt": "2026-03-15T16:41:57.426Z",
+        "updatedAt": "2026-03-15T16:41:57.426Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -216,14 +216,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.655Z",
+        "lastUpdate": "2026-03-15T16:41:57.426Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.655Z",
-        "updatedAt": "2026-03-15T01:39:41.655Z"
+        "createdAt": "2026-03-15T16:41:57.426Z",
+        "updatedAt": "2026-03-15T16:41:57.426Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -556,14 +556,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.655Z",
+        "lastUpdate": "2026-03-15T16:41:57.426Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.655Z",
-        "updatedAt": "2026-03-15T01:39:41.655Z"
+        "createdAt": "2026-03-15T16:41:57.426Z",
+        "updatedAt": "2026-03-15T16:41:57.426Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -683,14 +683,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.655Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.655Z",
-        "updatedAt": "2026-03-15T01:39:41.655Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -810,14 +810,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.655Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.4.0",
-        "createdAt": "2026-03-15T01:39:41.655Z",
-        "updatedAt": "2026-03-15T01:39:41.655Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -914,14 +914,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.656Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.656Z",
-        "updatedAt": "2026-03-15T01:39:41.656Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -1041,14 +1041,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.656Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.656Z",
-        "updatedAt": "2026-03-15T01:39:41.656Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1160,14 +1160,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.656Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.656Z",
-        "updatedAt": "2026-03-15T01:39:41.656Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": []
     },
@@ -1260,14 +1260,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.656Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.656Z",
-        "updatedAt": "2026-03-15T01:39:41.656Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1367,14 +1367,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.656Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.656Z",
-        "updatedAt": "2026-03-15T01:39:41.656Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1470,14 +1470,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.656Z",
+        "lastUpdate": "2026-03-15T16:41:57.427Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-15T01:39:41.656Z",
-        "updatedAt": "2026-03-15T01:39:41.656Z"
+        "createdAt": "2026-03-15T16:41:57.427Z",
+        "updatedAt": "2026-03-15T16:41:57.427Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1580,14 +1580,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.656Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.656Z",
-        "updatedAt": "2026-03-15T01:39:41.656Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1677,14 +1677,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1772,14 +1772,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1870,14 +1870,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -1967,14 +1967,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2071,14 +2071,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2197,14 +2197,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2304,14 +2304,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2408,14 +2408,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.657Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.657Z",
-        "updatedAt": "2026-03-15T01:39:41.657Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2519,14 +2519,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.658Z",
+        "lastUpdate": "2026-03-15T16:41:57.428Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.658Z",
-        "updatedAt": "2026-03-15T01:39:41.658Z"
+        "createdAt": "2026-03-15T16:41:57.428Z",
+        "updatedAt": "2026-03-15T16:41:57.428Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2632,14 +2632,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.658Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.658Z",
-        "updatedAt": "2026-03-15T01:39:41.658Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2780,14 +2780,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.658Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.658Z",
-        "updatedAt": "2026-03-15T01:39:41.658Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -2891,14 +2891,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3001,14 +3001,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3108,14 +3108,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3215,14 +3215,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3323,14 +3323,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -3429,14 +3429,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3562,14 +3562,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3669,14 +3669,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3768,14 +3768,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3872,14 +3872,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -3890,6 +3890,96 @@
         "code-structural-search",
         "token-saver-context-compression"
       ]
+    },
+    "angular-pro": {
+      "id": "angular-pro",
+      "displayName": "angular-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/angular-pro.md",
+      "capabilities": [
+        {
+          "name": "angular",
+          "domain": "code",
+          "description": "Angular framework specialist for enterprise web applications. Covers Angular 17+ signals, standalone components, reactive forms, RxJS patterns, NgRx state management, Angular Material, lazy loading...",
+          "triggerPhrases": [
+            "angular",
+            "pro",
+            "angular-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "angular-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ],
+          "examples": [],
+          "tags": [
+            "angular",
+            "pro",
+            "angular-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
+      },
+      "alwaysSkills": []
     },
     "api-designer": {
       "id": "api-designer",
@@ -3977,14 +4067,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4072,14 +4162,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4090,6 +4180,94 @@
         "token-saver-context-compression",
         "verification-before-completion"
       ]
+    },
+    "azure-infra-pro": {
+      "id": "azure-infra-pro",
+      "displayName": "azure-infra-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/azure-infra-pro.md",
+      "capabilities": [
+        {
+          "name": "azure-infra",
+          "domain": "code",
+          "description": "Azure infrastructure specialist for cloud architecture and operations. Covers AKS with KEDA autoscaling, Azure Container Apps, Bicep/ARM templates, Azure DevOps pipelines, Azure Service Bus, Event ...",
+          "triggerPhrases": [
+            "azure",
+            "infra",
+            "pro",
+            "deployments",
+            "cloud-devops-expert",
+            "terraform-infra",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "cloud-devops-expert",
+            "terraform-infra",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "azure",
+            "infra",
+            "pro",
+            "deployments",
+            "cloud-devops-expert",
+            "terraform-infra",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.429Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.429Z",
+        "updatedAt": "2026-03-15T16:41:57.429Z"
+      },
+      "alwaysSkills": []
     },
     "brand-guardian": {
       "id": "brand-guardian",
@@ -4165,14 +4343,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4183,6 +4361,84 @@
         "token-saver-context-compression",
         "verification-before-completion"
       ]
+    },
+    "business-analyst": {
+      "id": "business-analyst",
+      "displayName": "business-analyst",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/business-analyst.md",
+      "capabilities": [
+        {
+          "name": "business-analyst",
+          "domain": "code",
+          "description": "Business analyst specialist for requirements gathering, process modeling, use case documentation, gap analysis, and stakeholder communication. Covers BRD/SRS writing, BPMN process diagrams, user st...",
+          "triggerPhrases": [
+            "business",
+            "analyst",
+            "diagram-generator",
+            "prd-generator",
+            "brainstorming",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "diagram-generator",
+            "prd-generator",
+            "brainstorming",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "business",
+            "analyst",
+            "diagram-generator",
+            "prd-generator",
+            "brainstorming",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
+      },
+      "alwaysSkills": []
     },
     "compliance-checker": {
       "id": "compliance-checker",
@@ -4262,14 +4518,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.659Z",
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.659Z",
-        "updatedAt": "2026-03-15T01:39:41.659Z"
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4280,6 +4536,81 @@
         "token-saver-context-compression",
         "verification-before-completion"
       ]
+    },
+    "context-manager": {
+      "id": "context-manager",
+      "displayName": "context-manager",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/context-manager.md",
+      "capabilities": [
+        {
+          "name": "context-manager",
+          "domain": "code",
+          "description": "Context window optimization specialist for Claude Code agents. Manages token budget, applies progressive compression strategies, deduplicates memory, prunes stale entries, and coordinates session h...",
+          "triggerPhrases": [
+            "context",
+            "manager",
+            "coordinates",
+            "context-compressor",
+            "token-saver-context-compression",
+            "memory-search",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "context-compressor",
+            "token-saver-context-compression",
+            "memory-search",
+            "task-management-protocol",
+            "verification-before-completion"
+          ],
+          "examples": [],
+          "tags": [
+            "context",
+            "manager",
+            "coordinates",
+            "context-compressor",
+            "token-saver-context-compression",
+            "memory-search",
+            "task-management-protocol",
+            "verification-before-completion"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "haiku"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
+      },
+      "alwaysSkills": []
     },
     "data-engineer": {
       "id": "data-engineer",
@@ -4372,14 +4703,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4479,14 +4810,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -4494,6 +4825,193 @@
         "task-management-protocol",
         "verification-before-completion"
       ]
+    },
+    "django-developer": {
+      "id": "django-developer",
+      "displayName": "django-developer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/django-developer.md",
+      "capabilities": [
+        {
+          "name": "django-developer",
+          "domain": "code",
+          "description": "Django and Django REST Framework expert for web application development. Covers Django ORM, migrations, class-based views, REST APIs, authentication (JWT, session, OAuth), Celery task queues, Djang...",
+          "triggerPhrases": [
+            "django",
+            "developer",
+            "deployment",
+            "python-backend-expert",
+            "database-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "python-backend-expert",
+            "database-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ],
+          "examples": [],
+          "tags": [
+            "django",
+            "developer",
+            "deployment",
+            "python-backend-expert",
+            "database-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
+      },
+      "alwaysSkills": []
+    },
+    "dotnet-pro": {
+      "id": "dotnet-pro",
+      "displayName": "dotnet-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/dotnet-pro.md",
+      "capabilities": [
+        {
+          "name": "dotnet",
+          "domain": "code",
+          "description": ".NET and C# specialist for ASP.NET Core, Entity Framework Core, MAUI, Blazor, microservices, gRPC, SignalR, background services, and Azure integration. Use for building .NET web APIs, desktop apps,...",
+          "triggerPhrases": [
+            "dotnet",
+            "pro",
+            "building",
+            "tdd",
+            "debugging",
+            "database-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "tdd",
+            "debugging",
+            "database-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ],
+          "examples": [],
+          "tags": [
+            "dotnet",
+            "pro",
+            "building",
+            "tdd",
+            "debugging",
+            "database-expert",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search",
+            "token-saver-context-compression"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
+      },
+      "alwaysSkills": []
     },
     "expo-mobile-developer": {
       "id": "expo-mobile-developer",
@@ -4584,14 +5102,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4694,14 +5212,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.430Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.430Z",
+        "updatedAt": "2026-03-15T16:41:57.430Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -4785,14 +5303,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -4912,14 +5430,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5013,14 +5531,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5124,14 +5642,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5234,14 +5752,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5340,14 +5858,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5358,6 +5876,84 @@
         "code-structural-search",
         "token-saver-context-compression"
       ]
+    },
+    "iot-engineer": {
+      "id": "iot-engineer",
+      "displayName": "iot-engineer",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/iot-engineer.md",
+      "capabilities": [
+        {
+          "name": "iot-engineer",
+          "domain": "code",
+          "description": "IoT and embedded systems specialist covering MQTT, device firmware, edge computing, sensor integration, OTA updates, and IoT cloud platforms (AWS IoT Core, Azure IoT Hub, Google Cloud IoT). Use for...",
+          "triggerPhrases": [
+            "iot",
+            "engineer",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "iot",
+            "engineer",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
+      },
+      "alwaysSkills": []
     },
     "java-pro": {
       "id": "java-pro",
@@ -5451,14 +6047,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5469,6 +6065,93 @@
         "code-structural-search",
         "token-saver-context-compression"
       ]
+    },
+    "kotlin-pro": {
+      "id": "kotlin-pro",
+      "displayName": "kotlin-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/kotlin-pro.md",
+      "capabilities": [
+        {
+          "name": "kotlin",
+          "domain": "code",
+          "description": "Kotlin language specialist for Android, Kotlin Multiplatform, and server-side Kotlin. Covers coroutines, Flow, Compose Multiplatform, Kotlin DSL, sealed classes, extension functions, Arrow function...",
+          "triggerPhrases": [
+            "kotlin",
+            "pro",
+            "android-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "android-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "kotlin",
+            "pro",
+            "android-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
+      },
+      "alwaysSkills": []
     },
     "kubernetes-specialist": {
       "id": "kubernetes-specialist",
@@ -5552,14 +6235,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5652,20 +6335,102 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "ripgrep",
         "task-management-protocol",
         "verification-before-completion"
       ]
+    },
+    "legal-advisor": {
+      "id": "legal-advisor",
+      "displayName": "legal-advisor",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/legal-advisor.md",
+      "capabilities": [
+        {
+          "name": "legal-advisor",
+          "domain": "code",
+          "description": "Legal and compliance review specialist for software products and technology companies. Covers privacy law (GDPR, CCPA, COPPA), open source license compliance (MIT/Apache/GPL/LGPL/AGPL), software te...",
+          "triggerPhrases": [
+            "legal",
+            "advisor",
+            "review",
+            "audits",
+            "regulatory-compliance",
+            "brainstorming",
+            "research-synthesis",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "regulatory-compliance",
+            "brainstorming",
+            "research-synthesis",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "legal",
+            "advisor",
+            "review",
+            "audits",
+            "regulatory-compliance",
+            "brainstorming",
+            "research-synthesis",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
+      },
+      "alwaysSkills": []
     },
     "llm-architect": {
       "id": "llm-architect",
@@ -5746,14 +6511,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -5762,6 +6527,87 @@
         "ripgrep",
         "token-saver-context-compression"
       ]
+    },
+    "m365-admin": {
+      "id": "m365-admin",
+      "displayName": "m365-admin",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/m365-admin.md",
+      "capabilities": [
+        {
+          "name": "m365-admin",
+          "domain": "code",
+          "description": "Microsoft 365 administration specialist for enterprise environments. Covers Exchange Online, SharePoint, Teams, Microsoft Entra ID (Azure AD), Intune MDM/MAM, Microsoft Graph API, PowerShell automa...",
+          "triggerPhrases": [
+            "m365",
+            "admin",
+            "powershell-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "powershell-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "m365",
+            "admin",
+            "powershell-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
+      },
+      "alwaysSkills": []
     },
     "marketing-strategist": {
       "id": "marketing-strategist",
@@ -5837,14 +6683,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -5938,14 +6784,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6038,14 +6884,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.660Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.660Z",
-        "updatedAt": "2026-03-15T01:39:41.660Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -6141,14 +6987,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6203,14 +7049,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": []
     },
@@ -6299,14 +7145,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.431Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.431Z",
+        "updatedAt": "2026-03-15T16:41:57.431Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -6412,14 +7258,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6550,14 +7396,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6663,14 +7509,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6769,14 +7615,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -6875,14 +7721,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -6981,14 +7827,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7085,14 +7931,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7101,6 +7947,171 @@
         "ripgrep",
         "token-saver-context-compression"
       ]
+    },
+    "postgres-pro": {
+      "id": "postgres-pro",
+      "displayName": "postgres-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/postgres-pro.md",
+      "capabilities": [
+        {
+          "name": "postgres",
+          "domain": "code",
+          "description": "PostgreSQL expert for advanced database design, performance tuning, and operations. Covers JSONB operations, table partitioning, pgvector for vector similarity search, window functions, CTEs, EXPLA...",
+          "triggerPhrases": [
+            "postgres",
+            "pro",
+            "design",
+            "analyze",
+            "database-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "database-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "postgres",
+            "pro",
+            "design",
+            "analyze",
+            "database-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
+      },
+      "alwaysSkills": []
+    },
+    "product-manager": {
+      "id": "product-manager",
+      "displayName": "product-manager",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/product-manager.md",
+      "capabilities": [
+        {
+          "name": "product-manager",
+          "domain": "code",
+          "description": "Product Manager specialist for roadmap planning, OKR setting, PRD writing, prioritization frameworks, feature scoping, stakeholder management, and product metrics. Covers RICE/ICE scoring, Jobs-to-...",
+          "triggerPhrases": [
+            "product",
+            "manager",
+            "planning",
+            "prd-generator",
+            "brainstorming",
+            "diagram-generator",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "prd-generator",
+            "brainstorming",
+            "diagram-generator",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "product",
+            "manager",
+            "planning",
+            "prd-generator",
+            "brainstorming",
+            "diagram-generator",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
+      },
+      "alwaysSkills": []
     },
     "prompt-engineer": {
       "id": "prompt-engineer",
@@ -7189,14 +8200,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7305,14 +8316,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.661Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.661Z",
-        "updatedAt": "2026-03-15T01:39:41.661Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7323,6 +8334,179 @@
         "code-structural-search",
         "token-saver-context-compression"
       ]
+    },
+    "quant-analyst": {
+      "id": "quant-analyst",
+      "displayName": "quant-analyst",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/quant-analyst.md",
+      "capabilities": [
+        {
+          "name": "quant-analyst",
+          "domain": "code",
+          "description": "Quantitative finance and algorithmic trading specialist. Covers factor models, backtesting frameworks (Zipline, Backtrader, vectorbt), options pricing (Black-Scholes, Monte Carlo), risk metrics (Va...",
+          "triggerPhrases": [
+            "quant",
+            "analyst",
+            "python-backend-expert",
+            "data-expert",
+            "fintech-engineer",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "python-backend-expert",
+            "data-expert",
+            "fintech-engineer",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "quant",
+            "analyst",
+            "python-backend-expert",
+            "data-expert",
+            "fintech-engineer",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
+      },
+      "alwaysSkills": []
+    },
+    "rails-pro": {
+      "id": "rails-pro",
+      "displayName": "rails-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/rails-pro.md",
+      "capabilities": [
+        {
+          "name": "rails",
+          "domain": "code",
+          "description": "Ruby on Rails specialist for modern web applications. Covers Rails 7+ Hotwire (Turbo + Stimulus), import maps, Solid Queue, Solid Cache, Solid Cable, Active Record patterns, Action Cable, ViewCompo...",
+          "triggerPhrases": [
+            "rails",
+            "pro",
+            "deployment",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "rails",
+            "pro",
+            "deployment",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
+      },
+      "alwaysSkills": []
     },
     "rust-pro": {
       "id": "rust-pro",
@@ -7410,14 +8594,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7513,14 +8697,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7529,6 +8713,182 @@
         "ripgrep",
         "token-saver-context-compression"
       ]
+    },
+    "spring-boot-pro": {
+      "id": "spring-boot-pro",
+      "displayName": "spring-boot-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/spring-boot-pro.md",
+      "capabilities": [
+        {
+          "name": "spring-boot",
+          "domain": "code",
+          "description": "Spring Boot 3+ specialist for enterprise Java applications. Covers Spring Boot 3.x with Jakarta EE, Spring Security 6, Spring Data JPA, Spring WebFlux (reactive), GraalVM native images, Spring Modu...",
+          "triggerPhrases": [
+            "spring",
+            "boot",
+            "pro",
+            "testcontainers",
+            "java-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "java-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "spring",
+            "boot",
+            "pro",
+            "testcontainers",
+            "java-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
+      },
+      "alwaysSkills": []
+    },
+    "sql-pro": {
+      "id": "sql-pro",
+      "displayName": "sql-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/sql-pro.md",
+      "capabilities": [
+        {
+          "name": "sql",
+          "domain": "code",
+          "description": "Advanced SQL specialist covering complex query writing across multiple database engines. Covers window functions, CTEs, recursive queries, analytical functions, query optimization, execution plan a...",
+          "triggerPhrases": [
+            "sql",
+            "pro",
+            "plan",
+            "design",
+            "database-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "database-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "sql",
+            "pro",
+            "plan",
+            "design",
+            "database-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
+      },
+      "alwaysSkills": []
     },
     "sveltekit-expert": {
       "id": "sveltekit-expert",
@@ -7619,14 +8979,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7637,6 +8997,95 @@
         "code-structural-search",
         "token-saver-context-compression"
       ]
+    },
+    "swift-pro": {
+      "id": "swift-pro",
+      "displayName": "swift-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/swift-pro.md",
+      "capabilities": [
+        {
+          "name": "swift",
+          "domain": "code",
+          "description": "Swift language specialist for iOS, macOS, watchOS, visionOS, and server-side Swift. Covers Swift 5.9+ macros, Swift concurrency (async/await, actors, structured concurrency), SwiftData, @Observable...",
+          "triggerPhrases": [
+            "swift",
+            "pro",
+            "testing",
+            "ios-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "ios-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "swift",
+            "pro",
+            "testing",
+            "ios-expert",
+            "tdd",
+            "debugging",
+            "code-semantic-search",
+            "code-structural-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.432Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.432Z",
+        "updatedAt": "2026-03-15T16:41:57.432Z"
+      },
+      "alwaysSkills": []
     },
     "tauri-desktop-developer": {
       "id": "tauri-desktop-developer",
@@ -7729,14 +9178,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -7839,14 +9288,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "ripgrep",
@@ -7854,6 +9303,90 @@
         "task-management-protocol",
         "verification-before-completion"
       ]
+    },
+    "terragrunt-pro": {
+      "id": "terragrunt-pro",
+      "displayName": "terragrunt-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/terragrunt-pro.md",
+      "capabilities": [
+        {
+          "name": "terragrunt",
+          "domain": "code",
+          "description": "Terragrunt specialist for DRY Terraform infrastructure management. Covers Terragrunt run-all, dependency blocks, generate blocks, remote state management, environment promotion patterns, module ver...",
+          "triggerPhrases": [
+            "terragrunt",
+            "pro",
+            "terraform-infra",
+            "cloud-devops-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "terraform-infra",
+            "cloud-devops-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "terragrunt",
+            "pro",
+            "terraform-infra",
+            "cloud-devops-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
+      },
+      "alwaysSkills": []
     },
     "typescript-pro": {
       "id": "typescript-pro",
@@ -7947,14 +9480,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8042,14 +9575,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "code-semantic-search",
@@ -8144,14 +9677,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8162,6 +9695,170 @@
         "code-structural-search",
         "token-saver-context-compression"
       ]
+    },
+    "windows-infra-pro": {
+      "id": "windows-infra-pro",
+      "displayName": "windows-infra-pro",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/windows-infra-pro.md",
+      "capabilities": [
+        {
+          "name": "windows-infra",
+          "domain": "code",
+          "description": "Windows infrastructure specialist for enterprise environments. Covers Active Directory, Group Policy, WinRM remote management, PowerShell DSC (Desired State Configuration), Windows Server 2022, Hyp...",
+          "triggerPhrases": [
+            "windows",
+            "infra",
+            "pro",
+            "powershell-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "powershell-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "windows",
+            "infra",
+            "pro",
+            "powershell-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
+      },
+      "alwaysSkills": []
+    },
+    "wordpress-master": {
+      "id": "wordpress-master",
+      "displayName": "wordpress-master",
+      "category": "domain",
+      "filePath": ".claude/agents/domain/wordpress-master.md",
+      "capabilities": [
+        {
+          "name": "wordpress-master",
+          "domain": "code",
+          "description": "WordPress and WooCommerce specialist for custom theme development, plugin development, Gutenberg block creation, REST API integration, performance optimization, and WooCommerce extensions. Use for ...",
+          "triggerPhrases": [
+            "wordpress",
+            "master",
+            "php-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "requiredTools": [
+            "Read",
+            "Write",
+            "Edit",
+            "Bash",
+            "Grep",
+            "Glob",
+            "WebSearch",
+            "WebFetch",
+            "TaskUpdate",
+            "TaskList",
+            "TaskCreate",
+            "TaskGet",
+            "Skill",
+            "MemoryRecord"
+          ],
+          "skills": [
+            "php-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ],
+          "examples": [],
+          "tags": [
+            "wordpress",
+            "master",
+            "php-expert",
+            "debugging",
+            "code-semantic-search",
+            "ripgrep",
+            "task-management-protocol",
+            "verification-before-completion",
+            "memory-search"
+          ]
+        }
+      ],
+      "constraints": {
+        "maxConcurrentTasks": 5,
+        "preferredModel": "sonnet"
+      },
+      "health": {
+        "status": "healthy",
+        "consecutiveFailures": 0,
+        "successCount": 0,
+        "failureCount": 0,
+        "successRate": 1,
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
+        "isolatedAt": null,
+        "isolationReason": null
+      },
+      "metadata": {
+        "version": "1.0.0",
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
+      },
+      "alwaysSkills": []
     },
     "artifact-integrator": {
       "id": "artifact-integrator",
@@ -8254,14 +9951,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8376,14 +10073,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.1.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8467,14 +10164,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -8581,14 +10278,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8675,14 +10372,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "2.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "task-management-protocol",
@@ -8770,14 +10467,14 @@
         "successCount": 0,
         "failureCount": 0,
         "successRate": 1,
-        "lastUpdate": "2026-03-15T01:39:41.662Z",
+        "lastUpdate": "2026-03-15T16:41:57.433Z",
         "isolatedAt": null,
         "isolationReason": null
       },
       "metadata": {
         "version": "1.0.0",
-        "createdAt": "2026-03-15T01:39:41.662Z",
-        "updatedAt": "2026-03-15T01:39:41.662Z"
+        "createdAt": "2026-03-15T16:41:57.433Z",
+        "updatedAt": "2026-03-15T16:41:57.433Z"
       },
       "alwaysSkills": [
         "verification-before-completion",
@@ -8888,23 +10585,41 @@
       "android": [
         "android-pro"
       ],
+      "angular": [
+        "angular-pro"
+      ],
       "api-designer": [
         "api-designer"
       ],
       "aso-specialist": [
         "aso-specialist"
       ],
+      "azure-infra": [
+        "azure-infra-pro"
+      ],
       "brand-guardian": [
         "brand-guardian"
       ],
+      "business-analyst": [
+        "business-analyst"
+      ],
       "compliance-checker": [
         "compliance-checker"
+      ],
+      "context-manager": [
+        "context-manager"
       ],
       "data-engineer": [
         "data-engineer"
       ],
       "data-scientist": [
         "data-scientist"
+      ],
+      "django-developer": [
+        "django-developer"
+      ],
+      "dotnet": [
+        "dotnet-pro"
       ],
       "expo-mobile-developer": [
         "expo-mobile-developer"
@@ -8930,8 +10645,14 @@
       "ios": [
         "ios-pro"
       ],
+      "iot-engineer": [
+        "iot-engineer"
+      ],
       "java": [
         "java-pro"
+      ],
+      "kotlin": [
+        "kotlin-pro"
       ],
       "kubernetes-specialist": [
         "kubernetes-specialist"
@@ -8939,8 +10660,14 @@
       "legacy-modernizer": [
         "legacy-modernizer"
       ],
+      "legal-advisor": [
+        "legal-advisor"
+      ],
       "llm-architect": [
         "llm-architect"
+      ],
+      "m365-admin": [
+        "m365-admin"
       ],
       "marketing-strategist": [
         "marketing-strategist"
@@ -8981,11 +10708,23 @@
       "pm-coordinator": [
         "pm-coordinator"
       ],
+      "postgres": [
+        "postgres-pro"
+      ],
+      "product-manager": [
+        "product-manager"
+      ],
       "prompt-engineer": [
         "prompt-engineer"
       ],
       "python": [
         "python-pro"
+      ],
+      "quant-analyst": [
+        "quant-analyst"
+      ],
+      "rails": [
+        "rails-pro"
       ],
       "rust": [
         "rust-pro"
@@ -8993,14 +10732,26 @@
       "scientific-research": [
         "scientific-research-expert"
       ],
+      "spring-boot": [
+        "spring-boot-pro"
+      ],
+      "sql": [
+        "sql-pro"
+      ],
       "sveltekit": [
         "sveltekit-expert"
+      ],
+      "swift": [
+        "swift-pro"
       ],
       "tauri-desktop-developer": [
         "tauri-desktop-developer"
       ],
       "terraform-engineer": [
         "terraform-engineer"
+      ],
+      "terragrunt": [
+        "terragrunt-pro"
       ],
       "typescript": [
         "typescript-pro"
@@ -9010,6 +10761,12 @@
       ],
       "web3-blockchain": [
         "web3-blockchain-expert"
+      ],
+      "windows-infra": [
+        "windows-infra-pro"
+      ],
+      "wordpress-master": [
+        "wordpress-master"
       ],
       "artifact-integrator": [
         "artifact-integrator"
@@ -9059,12 +10816,18 @@
         "reverse-engineer",
         "sre-engineer",
         "android-pro",
+        "angular-pro",
         "api-designer",
         "aso-specialist",
+        "azure-infra-pro",
         "brand-guardian",
+        "business-analyst",
         "compliance-checker",
+        "context-manager",
         "data-engineer",
         "data-scientist",
+        "django-developer",
+        "dotnet-pro",
         "expo-mobile-developer",
         "fastapi-pro",
         "feedback-synthesizer",
@@ -9072,9 +10835,13 @@
         "golang-pro",
         "graphql-pro",
         "ios-pro",
+        "iot-engineer",
         "java-pro",
+        "kotlin-pro",
         "kubernetes-specialist",
         "legacy-modernizer",
+        "legal-advisor",
+        "m365-admin",
         "marketing-strategist",
         "mcp-developer",
         "mlops-engineer",
@@ -9082,13 +10849,23 @@
         "nlp-engineer",
         "nodejs-pro",
         "php-pro",
+        "postgres-pro",
+        "product-manager",
         "prompt-engineer",
         "python-pro",
+        "quant-analyst",
+        "rails-pro",
         "rust-pro",
+        "spring-boot-pro",
+        "sql-pro",
         "sveltekit-expert",
+        "swift-pro",
         "tauri-desktop-developer",
         "terraform-engineer",
-        "typescript-pro"
+        "terragrunt-pro",
+        "typescript-pro",
+        "windows-infra-pro",
+        "wordpress-master"
       ],
       "planning": [
         "planner",
@@ -9175,12 +10952,18 @@
       "domain": [
         "ai-ml-specialist",
         "android-pro",
+        "angular-pro",
         "api-designer",
         "aso-specialist",
+        "azure-infra-pro",
         "brand-guardian",
+        "business-analyst",
         "compliance-checker",
+        "context-manager",
         "data-engineer",
         "data-scientist",
+        "django-developer",
+        "dotnet-pro",
         "expo-mobile-developer",
         "fastapi-pro",
         "feedback-synthesizer",
@@ -9189,10 +10972,14 @@
         "golang-pro",
         "graphql-pro",
         "ios-pro",
+        "iot-engineer",
         "java-pro",
+        "kotlin-pro",
         "kubernetes-specialist",
         "legacy-modernizer",
+        "legal-advisor",
         "llm-architect",
+        "m365-admin",
         "marketing-strategist",
         "mcp-developer",
         "medical-research-triage",
@@ -9206,16 +10993,26 @@
         "nodejs-pro",
         "php-pro",
         "pm-coordinator",
+        "postgres-pro",
+        "product-manager",
         "prompt-engineer",
         "python-pro",
+        "quant-analyst",
+        "rails-pro",
         "rust-pro",
         "scientific-research-expert",
+        "spring-boot-pro",
+        "sql-pro",
         "sveltekit-expert",
+        "swift-pro",
         "tauri-desktop-developer",
         "terraform-engineer",
+        "terragrunt-pro",
         "typescript-pro",
         "ux-researcher",
-        "web3-blockchain-expert"
+        "web3-blockchain-expert",
+        "windows-infra-pro",
+        "wordpress-master"
       ],
       "orchestrator": [
         "artifact-integrator",
@@ -9262,12 +11059,18 @@
       "sre-engineer",
       "ai-ml-specialist",
       "android-pro",
+      "angular-pro",
       "api-designer",
       "aso-specialist",
+      "azure-infra-pro",
       "brand-guardian",
+      "business-analyst",
       "compliance-checker",
+      "context-manager",
       "data-engineer",
       "data-scientist",
+      "django-developer",
+      "dotnet-pro",
       "expo-mobile-developer",
       "fastapi-pro",
       "feedback-synthesizer",
@@ -9276,10 +11079,14 @@
       "golang-pro",
       "graphql-pro",
       "ios-pro",
+      "iot-engineer",
       "java-pro",
+      "kotlin-pro",
       "kubernetes-specialist",
       "legacy-modernizer",
+      "legal-advisor",
       "llm-architect",
+      "m365-admin",
       "marketing-strategist",
       "mcp-developer",
       "medical-research-triage",
@@ -9293,16 +11100,26 @@
       "nodejs-pro",
       "php-pro",
       "pm-coordinator",
+      "postgres-pro",
+      "product-manager",
       "prompt-engineer",
       "python-pro",
+      "quant-analyst",
+      "rails-pro",
       "rust-pro",
       "scientific-research-expert",
+      "spring-boot-pro",
+      "sql-pro",
       "sveltekit-expert",
+      "swift-pro",
       "tauri-desktop-developer",
       "terraform-engineer",
+      "terragrunt-pro",
       "typescript-pro",
       "ux-researcher",
       "web3-blockchain-expert",
+      "windows-infra-pro",
+      "wordpress-master",
       "artifact-integrator",
       "evolution-orchestrator",
       "heartbeat-orchestrator",

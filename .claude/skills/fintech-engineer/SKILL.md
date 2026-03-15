@@ -1,7 +1,7 @@
 ---
 name: fintech-engineer
 description: Fintech engineering expertise — payment processing (Stripe, Plaid), PCI DSS compliance, financial data modeling (double-entry bookkeeping), fraud detection patterns, bank-grade security (encryption, tokenization), open banking APIs, cryptocurrency/blockchain integration, regulatory compliance (KYC/AML), and idempotent financial transaction design. Use for payment systems, banking apps, trading platforms, and fintech infrastructure.
-version: 1.0.0
+version: 1.1.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -16,7 +16,7 @@ best_practices:
 error_handling: graceful
 streaming: not_applicable
 verified: false
-lastVerifiedAt: 2026-03-14T00:00:00.000Z
+lastVerifiedAt: 2026-03-15T00:00:00.000Z
 ---
 
 # Fintech Engineer Skill
@@ -479,6 +479,128 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   }
 }
 ```
+
+## Stripe Advanced Best Practices
+
+### Stripe API Version Pinning
+
+Always pin the API version in the Stripe client constructor. Never rely on the account default:
+
+```typescript
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-12-18.acacia', // Pin explicitly — never omit
+  typescript: true,
+  telemetry: false, // Disable telemetry in production if desired
+});
+```
+
+Upgrade API versions deliberately in a test environment. Breaking changes in Stripe API versions can silently corrupt payment flows.
+
+### Webhook Idempotency with Event ID Deduplication
+
+Store processed webhook event IDs to prevent double-processing on retries:
+
+```typescript
+async function processWebhookEvent(event: Stripe.Event) {
+  // Check if already processed
+  const processed = await db('webhook_events').where({ stripe_event_id: event.id }).first();
+  if (processed) {
+    console.log(`Skipping duplicate event: ${event.id}`);
+    return { status: 'already_processed' };
+  }
+
+  // Process the event
+  await handleEvent(event);
+
+  // Mark as processed (with upsert for race safety)
+  await db('webhook_events')
+    .insert({
+      stripe_event_id: event.id,
+      event_type: event.type,
+      processed_at: new Date(),
+    })
+    .onConflict('stripe_event_id')
+    .ignore();
+}
+```
+
+### Radar Fraud Rules (Stripe Radar)
+
+Configure Stripe Radar rules for fraud detection. Use metadata to pass risk signals:
+
+```typescript
+// Pass risk metadata to Radar
+const paymentIntent = await stripe.paymentIntents.create({
+  amount: amountCents,
+  currency,
+  customer: customerId,
+  metadata: {
+    user_account_age_days: String(accountAgeDays),
+    is_first_purchase: String(isFirstPurchase),
+    shipping_matches_billing: String(shippingMatchesBilling),
+    risk_score: String(computedRiskScore),
+  },
+});
+
+// Radar rule example (configured in Stripe Dashboard):
+// Block if: :risk_level: = 'high' AND :metadata.is_first_purchase: = 'true'
+```
+
+### Strong Customer Authentication (SCA) for PSD2
+
+For European payments, handle SCA challenges properly:
+
+```typescript
+// On frontend: handle requires_action status
+const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret);
+
+if (paymentIntent?.status === 'requires_action') {
+  // Stripe.js handles 3DS challenge automatically
+  // Server webhook will fire payment_intent.succeeded when complete
+}
+
+// Never mark order as paid until webhook payment_intent.succeeded fires
+// Frontend confirmation is NOT authoritative
+```
+
+### Connect Platform Patterns
+
+For marketplace/platform Stripe Connect:
+
+```typescript
+// Create charge on behalf of connected account
+const charge = await stripe.charges.create(
+  {
+    amount: 10000, // $100.00
+    currency: 'usd',
+    source: token,
+    application_fee_amount: 500, // $5.00 platform fee
+  },
+  {
+    stripeAccount: connectedAccountId, // 'acct_xxx'
+  }
+);
+
+// Transfer to connected account (separate transfers model)
+const transfer = await stripe.transfers.create({
+  amount: 9500, // $100 - $5 fee
+  currency: 'usd',
+  destination: connectedAccountId,
+  transfer_group: orderId,
+});
+```
+
+### Stripe Testing Checklist
+
+| Scenario           | Test Card             | Expected                          |
+| ------------------ | --------------------- | --------------------------------- |
+| Successful payment | `4242 4242 4242 4242` | `payment_intent.succeeded`        |
+| Declined card      | `4000 0000 0000 0002` | `payment_intent.payment_failed`   |
+| Requires 3DS       | `4000 0025 0000 3155` | `requires_action` → 3DS → success |
+| Insufficient funds | `4000 0000 0000 9995` | `card_declined`                   |
+| Expired card       | `4000 0000 0000 0069` | `expired_card`                    |
+
+Always test webhook delivery with `stripe listen --forward-to localhost:3000/webhook` during development.
 
 ## Anti-Patterns
 

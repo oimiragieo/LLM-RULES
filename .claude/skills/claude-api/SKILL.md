@@ -1,10 +1,10 @@
 ---
 # Agent: developer | Task: #5 | Session: 2026-03-05
 verified: true
-lastVerifiedAt: 2026-03-05T00:00:00.000Z
+lastVerifiedAt: 2026-03-15T00:00:00.000Z
 name: claude-api
 description: 'Build apps with the Claude API or Anthropic SDK. TRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`/`claude_agent_sdk`, or user asks to use Claude API, Anthropic SDKs, or Agent SDK. DO NOT TRIGGER when: code imports `openai`/other AI SDK, general programming, or ML/data-science tasks.'
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -410,6 +410,189 @@ The initializer marks features complete after the coding agent finishes each one
 - Long-running projects that exceed single context windows
 - Projects requiring incremental, testable progress
 - Autonomous coding with minimal human intervention
+
+## Support Agent Quickstart Pattern
+
+Build a customer support agent that handles tickets, escalates unresolved issues, and maintains conversation history (from anthropics/claude-quickstarts):
+
+```python
+import anthropic
+from typing import Optional
+
+client = anthropic.Anthropic()
+
+SUPPORT_SYSTEM_PROMPT = """You are a helpful customer support agent for Acme Corp.
+You have access to the following tools to help customers:
+- look_up_order: Find order status by order ID
+- process_refund: Initiate a refund for an order
+- escalate_ticket: Escalate to human support with a reason
+
+Always be polite and empathetic. If you cannot resolve an issue, escalate it."""
+
+support_tools = [
+    {
+        "name": "look_up_order",
+        "description": "Look up the status of a customer order",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "order_id": {"type": "string", "description": "The order ID (e.g. ORD-12345)"}
+            },
+            "required": ["order_id"]
+        }
+    },
+    {
+        "name": "process_refund",
+        "description": "Process a refund for a completed order",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "order_id": {"type": "string"},
+                "reason": {"type": "string", "description": "Reason for refund"}
+            },
+            "required": ["order_id", "reason"]
+        }
+    },
+    {
+        "name": "escalate_ticket",
+        "description": "Escalate an unresolved issue to human support",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "issue_summary": {"type": "string"},
+                "priority": {"type": "string", "enum": ["low", "medium", "high"]}
+            },
+            "required": ["issue_summary", "priority"]
+        }
+    }
+]
+
+def run_support_agent(user_message: str, conversation_history: list) -> tuple[str, list]:
+    """Run one turn of the support agent, returning (response, updated_history)."""
+    conversation_history.append({"role": "user", "content": user_message})
+
+    while True:
+        response = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=2048,
+            system=SUPPORT_SYSTEM_PROMPT,
+            tools=support_tools,
+            messages=conversation_history
+        )
+
+        if response.stop_reason == "end_turn":
+            text_content = next((b.text for b in response.content if hasattr(b, 'text')), "")
+            conversation_history.append({"role": "assistant", "content": response.content})
+            return text_content, conversation_history
+
+        # Handle tool use
+        tool_results = []
+        for block in response.content:
+            if block.type == "tool_use":
+                result = execute_tool(block.name, block.input)
+                tool_results.append({
+                    "type": "tool_result",
+                    "tool_use_id": block.id,
+                    "content": str(result)
+                })
+
+        conversation_history.append({"role": "assistant", "content": response.content})
+        conversation_history.append({"role": "user", "content": tool_results})
+```
+
+## Financial Analyst Agent Pattern
+
+Build a financial analysis agent that processes market data and generates reports (from anthropics/claude-quickstarts):
+
+```python
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+financial_tools = [
+    {
+        "name": "get_stock_price",
+        "description": "Get current and historical stock price data",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "symbol": {"type": "string", "description": "Stock ticker symbol (e.g. AAPL)"},
+                "period": {"type": "string", "enum": ["1d", "1w", "1m", "3m", "1y"],
+                          "description": "Time period for historical data"}
+            },
+            "required": ["symbol"]
+        }
+    },
+    {
+        "name": "calculate_metrics",
+        "description": "Calculate financial metrics like PE ratio, moving averages, volatility",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "symbol": {"type": "string"},
+                "metrics": {
+                    "type": "array",
+                    "items": {"type": "string", "enum": ["pe_ratio", "ma_50", "ma_200", "volatility", "beta"]},
+                    "description": "Financial metrics to calculate"
+                }
+            },
+            "required": ["symbol", "metrics"]
+        }
+    },
+    {
+        "name": "generate_report",
+        "description": "Generate a structured financial analysis report",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "symbol": {"type": "string"},
+                "report_type": {"type": "string", "enum": ["summary", "detailed", "comparison"]},
+                "output_format": {"type": "string", "enum": ["markdown", "json", "html"]}
+            },
+            "required": ["symbol", "report_type"]
+        }
+    }
+]
+
+FINANCIAL_SYSTEM_PROMPT = """You are an expert financial analyst. Analyze stocks and market data
+to provide actionable insights. Always:
+1. Gather relevant data before making recommendations
+2. Consider multiple metrics and timeframes
+3. Clearly state assumptions and limitations
+4. Structure analysis with: Summary → Data Analysis → Key Findings → Recommendation"""
+
+def analyze_stock(symbol: str, question: Optional[str] = None) -> str:
+    """Run a financial analysis agent for a given stock symbol."""
+    prompt = question or f"Provide a comprehensive analysis of {symbol} stock."
+
+    messages = [{"role": "user", "content": prompt}]
+
+    while True:
+        response = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=4096,
+            system=FINANCIAL_SYSTEM_PROMPT,
+            tools=financial_tools,
+            messages=messages
+        )
+
+        if response.stop_reason == "end_turn":
+            return next((b.text for b in response.content if hasattr(b, 'text')), "")
+
+        tool_results = []
+        for block in response.content:
+            if block.type == "tool_use":
+                result = execute_financial_tool(block.name, block.input)
+                tool_results.append({
+                    "type": "tool_result",
+                    "tool_use_id": block.id,
+                    "content": json.dumps(result)
+                })
+
+        messages.append({"role": "assistant", "content": response.content})
+        messages.append({"role": "user", "content": tool_results})
+```
 
 ## Common Pitfalls
 

@@ -1,7 +1,7 @@
 ---
 name: github-ops
 description: Workflow for repository reconnaissance and operations using GitHub CLI (gh). Optimizes token usage by using structured API queries instead of blind file fetching.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -88,6 +88,76 @@ gh repo view {owner}/{repo} --json description,stargazerCount,updatedAt
 | Unscoped `gh search code` queries              | Returns GitHub-wide results; noise overwhelms signal            | Always add `--repo owner/name` or `--owner org` scope qualifier                          |
 | Reading binary or generated files              | Binary content is unreadable; generated files change frequently | Identify file type first; skip binaries; read source files only                          |
 | Sequential API calls for each file             | Unnecessary round-trips inflate latency                         | Batch: use `gh api` trees or search to identify multiple targets, then fetch in parallel |
+
+## GitHub MCP Server Operations
+
+When the official GitHub MCP server (`@modelcontextprotocol/server-github`) is configured, use these higher-level tools for repository management and automation:
+
+```json
+// settings.json configuration
+"github": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-github"],
+  "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
+}
+```
+
+### PR Automation Pattern
+
+```bash
+# Create PR with auto-generated description
+gh pr create \
+  --title "feat: add feature X" \
+  --body "$(gh api repos/{owner}/{repo}/compare/{base}...{head} --jq '.commits[].commit.message' | head -5)" \
+  --base main \
+  --head feature/x
+
+# Auto-merge after CI passes
+gh pr merge --auto --squash --delete-branch
+```
+
+### Issue Management
+
+```bash
+# List open issues by label
+gh issue list --label "bug" --state open --json number,title,assignees
+
+# Bulk-close resolved issues
+gh issue list --label "stale" --json number --jq '.[].number' | \
+  xargs -I{} gh issue close {} --comment "Closing as stale"
+
+# Create issue from template
+gh issue create \
+  --title "Bug: [description]" \
+  --body-file .github/ISSUE_TEMPLATE/bug_report.md \
+  --label "bug,needs-triage"
+```
+
+### Release Automation
+
+```bash
+# Create release with auto-generated notes
+gh release create v1.2.0 \
+  --generate-notes \
+  --title "v1.2.0" \
+  --target main
+
+# Upload release assets
+gh release upload v1.2.0 dist/*.tar.gz dist/*.zip
+```
+
+### Workflow Management
+
+```bash
+# Trigger workflow manually
+gh workflow run deploy.yml --field environment=production
+
+# Watch workflow run
+gh run watch $(gh run list --workflow=deploy.yml --limit=1 --json databaseId --jq '.[0].databaseId')
+
+# Download workflow artifacts
+gh run download --name=build-artifacts --dir=./artifacts
+```
 
 ## Assigned Agents
 

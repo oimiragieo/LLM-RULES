@@ -1,7 +1,7 @@
 ---
 name: webapp-testing
 description: Test local web applications using Playwright with Python. Verify frontend functionality, debug UI behavior, capture screenshots, and view browser console logs. Supports static HTML files, dynamic webapps with running servers, and automated test generation.
-version: 1.1.0
+version: 1.2.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -19,7 +19,7 @@ best_practices:
 error_handling: graceful
 streaming: supported
 verified: true
-lastVerifiedAt: '2026-03-01'
+lastVerifiedAt: '2026-03-15'
 ---
 
 # Web Application Testing Skill
@@ -315,6 +315,63 @@ playwright install chromium
 | Ignoring browser console errors         | Real JS errors go undetected; test passes but app is broken        | Always capture and report console errors in every test run         |
 | Using `shell=True` for server processes | Command injection vulnerability                                    | Always `shell=False` with list arguments                           |
 | Not cleaning up server processes        | Port conflicts, resource leaks on subsequent runs                  | Use `try/finally` to guarantee `server_proc.terminate()`           |
+
+## Puppeteer MCP Browser Automation
+
+For agent-native browser automation without Python, use the Puppeteer MCP server from modelcontextprotocol/servers:
+
+### Setup
+
+Add to `.claude/settings.json` under `mcpServers`:
+
+```json
+"puppeteer": {
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+}
+```
+
+### MCP Tool Reference
+
+| Tool                   | Purpose                                   |
+| ---------------------- | ----------------------------------------- |
+| `puppeteer_navigate`   | Navigate to URL, wait for page load       |
+| `puppeteer_screenshot` | Capture screenshot (full page or element) |
+| `puppeteer_click`      | Click on CSS selector                     |
+| `puppeteer_fill`       | Fill form input with value                |
+| `puppeteer_select`     | Select dropdown option by value           |
+| `puppeteer_hover`      | Hover over element                        |
+| `puppeteer_evaluate`   | Execute JavaScript in browser context     |
+
+### Usage Pattern
+
+```javascript
+// Navigate and capture state
+mcp__puppeteer__puppeteer_navigate({ url: 'http://localhost:3000' });
+mcp__puppeteer__puppeteer_screenshot({ name: 'initial-state', fullPage: true });
+
+// Interact with forms
+mcp__puppeteer__puppeteer_fill({ selector: 'input[name="email"]', value: 'test@example.com' });
+mcp__puppeteer__puppeteer_click({ selector: 'button[type="submit"]' });
+mcp__puppeteer__puppeteer_screenshot({ name: 'after-submit' });
+
+// Evaluate page state
+mcp__puppeteer__puppeteer_evaluate({
+  script:
+    'JSON.stringify({ title: document.title, errors: [...document.querySelectorAll(".error")].map(e => e.textContent) })',
+});
+```
+
+### When to Use Puppeteer MCP vs Playwright Python
+
+| Scenario                              | Use               |
+| ------------------------------------- | ----------------- |
+| Quick page verification in agent flow | Puppeteer MCP     |
+| Complex test suites with assertions   | Playwright Python |
+| Screenshot capture as evidence        | Puppeteer MCP     |
+| Form interaction and navigation       | Either            |
+| CI test automation                    | Playwright Python |
+| Agent-embedded browser checks         | Puppeteer MCP     |
 
 ## Memory Protocol (MANDATORY)
 

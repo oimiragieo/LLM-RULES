@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-15T01:39:34.811Z",
+  "generatedAt": "2026-03-15T16:41:57.834Z",
   "metadata": {
-    "totalSkills": 300,
+    "totalSkills": 302,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-15T01:39:34.812Z",
+    "lastValidated": "2026-03-15T16:41:57.835Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7324,28 +7324,6 @@
       "priority": 3,
       "aliasOf": null
     },
-    "enterprise-skill-test-1773538774087": {
-      "name": "enterprise-skill-test-1773538774087",
-      "displayName": "Enterprise Skill Test 1773538774087",
-      "category": "Other",
-      "domain": "other",
-      "description": "Enterprise scaffold validation skill for test coverage and reliability checks.",
-      "requiredTools": [
-        "Read",
-        "Write",
-        "Bash"
-      ],
-      "agentPrimary": [
-        "developer"
-      ],
-      "agentSupporting": [],
-      "tags": [
-        "other",
-        "enterprise-skill-test-1773538774087"
-      ],
-      "priority": 3,
-      "aliasOf": null
-    },
     "exa-monitor": {
       "name": "exa-monitor",
       "displayName": "Exa Monitor",
@@ -7560,6 +7538,31 @@
       "priority": 3,
       "aliasOf": null
     },
+    "knowledge-graph": {
+      "name": "knowledge-graph",
+      "displayName": "Knowledge Graph",
+      "category": "Other",
+      "domain": "other",
+      "description": "Entity and relation tracking skill using MCP memory server patterns and local knowledge graph storage. Build persistent knowledge graphs of entities, relationships, and observations across agent sessions. Covers the MCP memory server (@modelcontextprotocol/server-memory), local JSON-based graphs, and entity-relation querying patterns for long-running agents.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write",
+        "Edit",
+        "Glob",
+        "Grep"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "knowledge-graph"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "lsp-navigator": {
       "name": "lsp-navigator",
       "displayName": "Lsp Navigator",
@@ -7690,6 +7693,29 @@
       "tags": [
         "other",
         "ml-experiment-loop"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "pptx": {
+      "name": "pptx",
+      "displayName": "Pptx",
+      "category": "Other",
+      "domain": "other",
+      "description": "PowerPoint presentation generation using python-pptx. Create slides from Claude output, data analysis, or structured content. Covers slide templates, shapes, charts, tables, and themed presentations. Use for generating .pptx files programmatically.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "pptx"
       ],
       "priority": 3,
       "aliasOf": null
@@ -8059,6 +8085,29 @@
       ],
       "priority": 3,
       "aliasOf": null
+    },
+    "xlsx": {
+      "name": "xlsx",
+      "displayName": "Xlsx",
+      "category": "Other",
+      "domain": "other",
+      "description": "Excel spreadsheet generation using openpyxl and xlsxwriter. Convert Claude output, data analysis results, and tabular data into formatted .xlsx files with charts, formulas, conditional formatting, and multiple sheets. Use for generating Excel reports programmatically.",
+      "requiredTools": [
+        "Bash",
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "xlsx"
+      ],
+      "priority": 3,
+      "aliasOf": null
     }
   },
   "index": {
@@ -8224,7 +8273,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1773538774087",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -8234,12 +8282,14 @@
         "heartbeat",
         "huggingface",
         "imagen-generation",
+        "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pptx",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8253,7 +8303,8 @@
         "user-research",
         "web-artifacts-builder",
         "websocket-engineer",
-        "windows-terminal"
+        "windows-terminal",
+        "xlsx"
       ],
       "specialized": [
         "smart-debug",
@@ -8630,7 +8681,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1773538774087",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -8640,12 +8690,14 @@
         "heartbeat",
         "huggingface",
         "imagen-generation",
+        "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pptx",
         "reddit-researcher",
         "regulatory-compliance",
         "scheduled-tasks",
@@ -8659,7 +8711,8 @@
         "user-research",
         "web-artifacts-builder",
         "websocket-engineer",
-        "windows-terminal"
+        "windows-terminal",
+        "xlsx"
       ],
       "Troubleshooting": [
         "debugging"
@@ -9018,7 +9071,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1773538774087",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -9028,12 +9080,14 @@
         "heartbeat",
         "huggingface",
         "imagen-generation",
+        "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pptx",
         "regulatory-compliance",
         "scheduled-tasks",
         "scientific-skills",
@@ -9047,7 +9101,8 @@
         "user-research",
         "web-artifacts-builder",
         "websocket-engineer",
-        "windows-terminal"
+        "windows-terminal",
+        "xlsx"
       ],
       "Write": [
         "tdd",
@@ -9271,7 +9326,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1773538774087",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -9280,11 +9334,13 @@
         "google-workspace",
         "huggingface",
         "imagen-generation",
+        "knowledge-graph",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pptx",
         "regulatory-compliance",
         "scientific-skills",
         "security-scanning",
@@ -9297,7 +9353,8 @@
         "user-research",
         "web-artifacts-builder",
         "websocket-engineer",
-        "windows-terminal"
+        "windows-terminal",
+        "xlsx"
       ],
       "Edit": [
         "tdd",
@@ -9482,9 +9539,11 @@
         "google-workspace",
         "huggingface",
         "imagen-generation",
+        "knowledge-graph",
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pptx",
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
@@ -9492,7 +9551,8 @@
         "task-delegation",
         "user-research",
         "web-artifacts-builder",
-        "websocket-engineer"
+        "websocket-engineer",
+        "xlsx"
       ],
       "Bash": [
         "tdd",
@@ -9651,16 +9711,17 @@
         "cloudflare-workers",
         "deep-research",
         "electron-pro",
-        "enterprise-skill-test-1773538774087",
         "exa-monitor",
         "feedback-analysis",
         "figma",
         "fintech-engineer",
         "heartbeat",
+        "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "ml-experiment-loop",
+        "pptx",
         "scheduled-tasks",
         "scientific-skills",
         "slack-expert",
@@ -9668,7 +9729,8 @@
         "transcription",
         "tts-generation",
         "websocket-engineer",
-        "windows-terminal"
+        "windows-terminal",
+        "xlsx"
       ],
       "Glob": [
         "tdd",
@@ -9794,6 +9856,7 @@
         "browser-automation",
         "claude-api",
         "deep-research",
+        "knowledge-graph",
         "ml-experiment-loop",
         "regulatory-compliance",
         "scientific-skills",
@@ -9925,6 +9988,7 @@
         "claude-api",
         "cloud-run",
         "deep-research",
+        "knowledge-graph",
         "ml-experiment-loop",
         "regulatory-compliance",
         "scientific-skills",
@@ -10262,7 +10326,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1773538774087",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -10271,12 +10334,14 @@
         "google-workspace",
         "huggingface",
         "imagen-generation",
+        "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pptx",
         "reddit-researcher",
         "regulatory-compliance",
         "seo-optimization",
@@ -10288,7 +10353,8 @@
         "user-research",
         "web-artifacts-builder",
         "websocket-engineer",
-        "windows-terminal"
+        "windows-terminal",
+        "xlsx"
       ],
       "planner": [
         "plan-generator",
@@ -11563,7 +11629,6 @@
         "design-systems",
         "doc-coauthoring",
         "electron-pro",
-        "enterprise-skill-test-1773538774087",
         "exa-monitor",
         "feedback-analysis",
         "figma",
@@ -11572,12 +11637,14 @@
         "google-workspace",
         "huggingface",
         "imagen-generation",
+        "knowledge-graph",
         "lsp-navigator",
         "marketing-content",
         "markitdown-converter",
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pptx",
         "reddit-researcher",
         "regulatory-compliance",
         "seo-optimization",
@@ -11589,7 +11656,8 @@
         "user-research",
         "web-artifacts-builder",
         "websocket-engineer",
-        "windows-terminal"
+        "windows-terminal",
+        "xlsx"
       ],
       "planner": [
         "plan-generator",

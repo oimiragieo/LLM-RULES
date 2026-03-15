@@ -1,7 +1,7 @@
 ---
 name: diagram-generator
 description: Generates architecture, database, and system diagrams using Mermaid syntax. Creates visual representations of system architecture, database schemas, component relationships, data flows, and standalone HTML exports.
-version: 1.3.0
+version: 1.4.0
 model: sonnet
 invoked_by: both
 user_invocable: true
@@ -15,7 +15,7 @@ error_handling: graceful
 streaming: supported
 templates: [architecture-diagram, database-diagram, component-diagram, sequence-diagram]
 verified: true
-lastVerifiedAt: 2026-03-13T00:00:00.000Z
+lastVerifiedAt: 2026-03-15T00:00:00.000Z
 ---
 
 <identity>
@@ -98,6 +98,103 @@ Generate a self-contained HTML file with embedded Mermaid.js CDN, dark/light tog
 3. Never write diagrams outside `.claude/context/artifacts/diagrams/`.
 4. Label all non-obvious connections.
 5. Enforce 1000-file hard limit — chunk large codebases.
+
+## Mermaid Plugin Generation Pattern
+
+Generate diagrams from code analysis using the Claude Code plugin pattern (ref: agentic-coding-school/mermaid-diagram-plugin):
+
+### Step 1: Analyze Codebase Structure
+
+```bash
+# Identify components to diagram
+pnpm search:code "class|interface|module|service|component" | head -50
+```
+
+### Step 2: Generate Mermaid Source
+
+Use Claude to transform code analysis into diagram syntax. Always request a specific diagram type and scope:
+
+```
+"Generate a Mermaid flowchart TB of the authentication flow in src/auth/"
+"Create an ER diagram for the database tables in prisma/schema.prisma"
+"Make a sequence diagram for the API request lifecycle in src/api/"
+```
+
+### Step 3: Render Interactive HTML
+
+For standalone shareable diagrams, use the full HTML template:
+
+```javascript
+// Plugin invocation pattern (from mermaid-diagram-plugin)
+const mermaidContent = `
+flowchart TB
+  A[User Request] --> B{Auth Check}
+  B -- Valid --> C[Route Handler]
+  B -- Invalid --> D[401 Response]
+  C --> E[Database Query]
+  E --> F[Response]
+`;
+
+// Render to interactive HTML
+const html = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>${title}</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+    <style>
+      body { font-family: system-ui; max-width: 1200px; margin: 2rem auto;
+             background: #1e1e2e; color: #cdd6f4; }
+      .controls { margin-bottom: 1rem; }
+      button { padding: 0.5rem 1rem; margin-right: 0.5rem; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>${title}</h1>
+    <div class="controls">
+      <button onclick="toggleTheme()">Toggle Theme</button>
+      <button onclick="downloadSVG()">Download SVG</button>
+    </div>
+    <div class="mermaid">${mermaidContent}</div>
+    <script>
+      let dark = true;
+      function toggleTheme() {
+        dark = !dark;
+        mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'default' });
+        document.querySelector('.mermaid').removeAttribute('data-processed');
+        mermaid.run();
+      }
+      function downloadSVG() {
+        const svg = document.querySelector('.mermaid svg');
+        if (!svg) return;
+        const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = '${title.replace(/\s+/g, '-')}.svg'; a.click();
+      }
+    </script>
+  </body>
+</html>`;
+```
+
+### Step 4: Save Output
+
+```bash
+# Save interactive HTML to standard location
+# .claude/context/artifacts/diagrams/{subject}-{YYYY-MM-DD}.html
+```
+
+### Plugin Invocation from Agent
+
+When an agent needs a diagram as part of a workflow:
+
+```javascript
+// Invoke diagram-generator skill, then request specific type
+Skill({ skill: 'diagram-generator' });
+
+// Then describe what to diagram with context
+// "Create a class diagram for src/lib/routing/ — show all classes and their relationships"
+```
 
 ## When to invoke
 
