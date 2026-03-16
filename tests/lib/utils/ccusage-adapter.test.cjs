@@ -12,10 +12,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
 
-const ADAPTER_PATH = path.resolve(
-  __dirname,
-  '../../../.claude/lib/utils/ccusage-adapter.cjs'
-);
+const ADAPTER_PATH = path.resolve(__dirname, '../../../.claude/lib/utils/ccusage-adapter.cjs');
 
 const adapter = require(ADAPTER_PATH);
 
@@ -46,7 +43,6 @@ afterEach(() => {
 
 describe('ccusage-adapter', () => {
   describe('getSessionUsage()', () => {
-
     // ── Test 1: returns structured usage on success ───────────────────────────
     it('returns structured usage when ccusage succeeds', () => {
       adapter.setExecOverride(() => makeDailyResponse());
@@ -69,7 +65,9 @@ describe('ccusage-adapter', () => {
     it('returns null when ccusage is not installed (ENOENT)', () => {
       const err = new Error('spawn npx ENOENT');
       err.code = 'ENOENT';
-      adapter.setExecOverride(() => { throw err; });
+      adapter.setExecOverride(() => {
+        throw err;
+      });
 
       const result = adapter.getSessionUsage();
       assert.strictEqual(result, null, 'should return null on ENOENT');
@@ -80,7 +78,10 @@ describe('ccusage-adapter', () => {
       process.env.CCUSAGE_DISABLED = 'true';
 
       let called = false;
-      adapter.setExecOverride(() => { called = true; return makeDailyResponse(); });
+      adapter.setExecOverride(() => {
+        called = true;
+        return makeDailyResponse();
+      });
 
       const result = adapter.getSessionUsage();
       assert.strictEqual(result, null, 'should return null when disabled');
@@ -90,7 +91,10 @@ describe('ccusage-adapter', () => {
     // ── Test 4: memoized cache within TTL ─────────────────────────────────────
     it('uses memoized cache within TTL (execFileSync called only once)', () => {
       let callCount = 0;
-      adapter.setExecOverride(() => { callCount++; return makeDailyResponse(); });
+      adapter.setExecOverride(() => {
+        callCount++;
+        return makeDailyResponse();
+      });
 
       const r1 = adapter.getSessionUsage();
       const r2 = adapter.getSessionUsage();
@@ -103,11 +107,14 @@ describe('ccusage-adapter', () => {
     // ── Test 5: re-fetches after TTL expires ──────────────────────────────────
     it('re-fetches after TTL expires', () => {
       let callCount = 0;
-      adapter.setExecOverride(() => { callCount++; return makeDailyResponse(); });
+      adapter.setExecOverride(() => {
+        callCount++;
+        return makeDailyResponse();
+      });
 
-      adapter.getSessionUsage();      // call 1 — populates cache
-      adapter._forceExpireCache();    // expire TTL
-      adapter.getSessionUsage();      // call 2 — re-fetch
+      adapter.getSessionUsage(); // call 1 — populates cache
+      adapter._forceExpireCache(); // expire TTL
+      adapter.getSessionUsage(); // call 2 — re-fetch
 
       assert.strictEqual(callCount, 2, 'should re-fetch after TTL expires');
     });
@@ -156,9 +163,7 @@ describe('ccusage-adapter', () => {
       const source = fs.readFileSync(ADAPTER_PATH, 'utf8');
       assert.ok(source.includes('safeParseJSON'), 'should use safeParseJSON');
       // Strip comments, then verify no bare JSON.parse
-      const noComments = source
-        .replace(/\/\/[^\n]*/g, '')
-        .replace(/\/\*[\s\S]*?\*\//g, '');
+      const noComments = source.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
       assert.ok(
         !noComments.includes('JSON.parse('),
         'should not use raw JSON.parse() in non-comment code'

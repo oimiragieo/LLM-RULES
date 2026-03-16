@@ -1,6 +1,6 @@
 ---
 name: context-compressor
-version: 1.0.0
+version: 1.1.0
 description: Intelligently summarizes and compresses context (files, logs, outputs) to save tokens and prevent poisoning.
 model: haiku
 temperature: 0.3
@@ -134,6 +134,48 @@ Invoke based on task context:
 3. Invoke with: `Skill({ skill: "<skill-name>" })`
 
 **Important**: Always use `Skill()` tool - reading skill files alone does NOT apply them.
+
+## Actual Token Usage (ccusage-adapter)
+
+Before deciding on a compression strategy, check actual API token usage for today via `ccusage-adapter`.
+This gives a data-driven basis for choosing compression aggressiveness instead of guessing.
+
+```javascript
+// Step: query actual usage before compression strategy decision
+let usageData = null;
+try {
+  const ccusage = require('.claude/lib/utils/ccusage-adapter.cjs');
+  usageData = ccusage.getTodayTotals();
+} catch (_err) {
+  // ccusage unavailable — fall back to heuristic estimation
+}
+
+if (usageData) {
+  const totalTokens = usageData.inputTokens + usageData.outputTokens;
+  // Use actual counts to calibrate compression level:
+  //   < 80K  → light compression (summary only)
+  //   80K–120K → standard compression
+  //   > 120K → aggressive compression (remove all reasoning chains, keep only decisions + artifacts)
+  //
+  // Also log cache tokens — high cacheReadTokens indicates effective prompt caching;
+  // adjust compression scope to preserve cached context where possible.
+  console.log('[context-compressor] ccusage today:', {
+    inputTokens: usageData.inputTokens,
+    outputTokens: usageData.outputTokens,
+    cacheCreationTokens: usageData.cacheCreationTokens,
+    cacheReadTokens: usageData.cacheReadTokens,
+    totalCost: `$${usageData.totalCost.toFixed(4)}`,
+    totalTokens,
+  });
+} else {
+  // Fall back: use heuristic thresholds from CLAUDE.md Section 8
+  // (80K / 120K / 150K) or compression-trigger.cjs signals.
+  console.log('[context-compressor] ccusage unavailable — using heuristic thresholds');
+}
+```
+
+**When ccusage is unavailable** (`getTodayTotals()` returns `null`): continue with the
+existing heuristic-based decision path. Never block compression on ccusage availability.
 
 ## Token Saver Invocation Rule
 

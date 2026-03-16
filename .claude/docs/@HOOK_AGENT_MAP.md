@@ -110,14 +110,14 @@ This document provides a comprehensive mapping between enforcement hooks and age
 
 ## Section 3: Environment Variable Overrides
 
-| Variable                       | Hook                       | Default | Values         |
-| ------------------------------ | -------------------------- | ------- | -------------- |
-| `PLANNER_FIRST_ENFORCEMENT`    | routing-guard.cjs          | block   | block/warn/off |
-| `SECURITY_REVIEW_ENFORCEMENT`  | routing-guard.cjs          | block   | block/warn/off |
-| `CREATOR_GUARD`                | unified-creator-guard.cjs  | block   | block/warn/off |
-| `REFLECTION_STEP0_ENFORCEMENT` | reflection-step0-guard.cjs | block   | block/warn/off |
-| `TASKLIST_FIRST_ENFORCEMENT`   | routing-guard.cjs          | block   | block/warn/off |
-| `WORKTREE_PREFLIGHT_ENFORCEMENT`| worktree-preflight-check.cjs| block   | block/warn/off |
+| Variable                         | Hook                         | Default | Values         |
+| -------------------------------- | ---------------------------- | ------- | -------------- |
+| `PLANNER_FIRST_ENFORCEMENT`      | routing-guard.cjs            | block   | block/warn/off |
+| `SECURITY_REVIEW_ENFORCEMENT`    | routing-guard.cjs            | block   | block/warn/off |
+| `CREATOR_GUARD`                  | unified-creator-guard.cjs    | block   | block/warn/off |
+| `REFLECTION_STEP0_ENFORCEMENT`   | reflection-step0-guard.cjs   | block   | block/warn/off |
+| `TASKLIST_FIRST_ENFORCEMENT`     | routing-guard.cjs            | block   | block/warn/off |
+| `WORKTREE_PREFLIGHT_ENFORCEMENT` | worktree-preflight-check.cjs | block   | block/warn/off |
 
 Recommended defaults:
 

@@ -27,7 +27,12 @@ const CCUSAGE_VERSION = '1';
 const CACHE_TTL_MS = 30_000;
 
 /** Sensitive env vars to strip before spawning subprocess */
-const SENSITIVE_VARS = ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'CLAUDE_API_KEY', 'ANTHROPIC_AUTH_TOKEN'];
+const SENSITIVE_VARS = [
+  'ANTHROPIC_API_KEY',
+  'OPENAI_API_KEY',
+  'CLAUDE_API_KEY',
+  'ANTHROPIC_AUTH_TOKEN',
+];
 
 /** Internal memoization cache */
 const _cache = { data: null, timestamp: 0 };
@@ -72,13 +77,7 @@ function _execCcusage(extraArgs) {
     return null;
   }
 
-  const args = [
-    `ccusage@${CCUSAGE_VERSION}`,
-    'daily',
-    '--json',
-    '--offline',
-    ...extraArgs,
-  ];
+  const args = [`ccusage@${CCUSAGE_VERSION}`, 'daily', '--json', '--offline', ...extraArgs];
 
   let stdout;
   try {
@@ -147,7 +146,7 @@ function _normalize(raw) {
  */
 function getSessionUsage() {
   const now = Date.now();
-  if (_cache.data && (now - _cache.timestamp) < CACHE_TTL_MS) {
+  if (_cache.data && now - _cache.timestamp < CACHE_TTL_MS) {
     return _cache.data;
   }
 

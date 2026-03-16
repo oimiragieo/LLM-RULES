@@ -20,7 +20,7 @@ const { execSync } = require('child_process');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 let inputData = '';
-process.stdin.on('data', (chunk) => {
+process.stdin.on('data', chunk => {
   inputData += chunk;
 });
 process.stdin.on('end', () => {
@@ -67,8 +67,7 @@ process.stdin.on('end', () => {
     const changedFiles = gitOutput.split('\n').filter(Boolean);
     const modifiedCount = changedFiles.length;
 
-    const enforcement =
-      process.env.WORKTREE_PREFLIGHT_ENFORCEMENT || 'warn';
+    const enforcement = process.env.WORKTREE_PREFLIGHT_ENFORCEMENT || 'warn';
 
     const message = `[worktree-preflight] Working tree has ${modifiedCount} uncommitted change(s). Worktree agents will clone stale HEAD, not your local changes. Commit first or spawn without worktree isolation.`;
 

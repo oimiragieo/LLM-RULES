@@ -3,8 +3,8 @@ name: token-saver-context-compression
 description: Search-aware context compression workflow for agent-studio. Use pnpm hybrid search + token-saver compression, then persist distilled learnings via MemoryRecord.
 argument-hint: [file-or-text-and-query]
 verified: true
-lastVerifiedAt: 2026-02-22T00:00:00.000Z
-version: 1.0.0
+lastVerifiedAt: 2026-03-16T00:00:00.000Z
+version: 1.1.0
 tools: []
 ---
 
@@ -66,10 +66,57 @@ Emit MemoryRecord payloads and let framework hooks process sync/indexing.
 ## Workflow
 
 1. Retrieve candidate context (`pnpm search:code "<query>"`).
-2. Compress using token-saver in JSON mode (`run_skill_workflow.py --output-format json`).
-3. If evidence is insufficient and fail gate is on, stop.
-4. Map distilled insights into MemoryRecord-ready payloads.
-5. Persist through MemoryRecord so `.claude/hooks/memory/sync-memory-index.cjs` runs.
+
+### Step 0.5: Check Actual Token Usage (ccusage-adapter)
+
+Before compressing, query actual API token usage for today via `ccusage-adapter`. This lets you make
+data-driven compression decisions instead of relying solely on heuristic thresholds.
+
+```javascript
+// Attempt to read actual token usage (graceful degradation — never blocks compression)
+let usageData = null;
+try {
+  const ccusage = require('.claude/lib/utils/ccusage-adapter.cjs');
+  usageData = ccusage.getTodayTotals();
+} catch (_err) {
+  // ccusage not installed or unavailable — fall back to heuristic estimation
+}
+
+if (usageData) {
+  // Log actual usage for decision-making
+  console.log('[token-saver] Actual usage today:', {
+    inputTokens: usageData.inputTokens,
+    outputTokens: usageData.outputTokens,
+    cacheCreationTokens: usageData.cacheCreationTokens,
+    cacheReadTokens: usageData.cacheReadTokens,
+    totalCost: `$${usageData.totalCost.toFixed(4)}`,
+  });
+
+  // Use actual counts to decide compression aggressiveness
+  // totalTokens > 80K  → standard compression
+  // totalTokens > 120K → aggressive compression
+  const totalTokens = usageData.inputTokens + usageData.outputTokens;
+  if (totalTokens > 120_000) {
+    console.log('[token-saver] HIGH pressure (>120K tokens) — aggressive compression mode');
+  } else if (totalTokens > 80_000) {
+    console.log('[token-saver] MODERATE pressure (>80K tokens) — standard compression mode');
+  } else {
+    console.log('[token-saver] LOW pressure (<80K tokens) — light compression');
+  }
+} else {
+  // ccusage unavailable — fall through to heuristic estimation from compression-trigger.cjs
+  console.log('[token-saver] ccusage unavailable — using heuristic token estimation');
+}
+```
+
+**Fallback behavior**: when `getTodayTotals()` returns `null` (ccusage not installed, timeout, or
+`CCUSAGE_DISABLED=1`), the workflow continues using existing heuristic thresholds from
+`compression-trigger.cjs`. The step never blocks compression.
+
+1. Compress using token-saver in JSON mode (`run_skill_workflow.py --output-format json`).
+2. If evidence is insufficient and fail gate is on, stop.
+3. Map distilled insights into MemoryRecord-ready payloads.
+4. Persist through MemoryRecord so `.claude/hooks/memory/sync-memory-index.cjs` runs.
 
 ## Mapping Rule (Deterministic)
 
