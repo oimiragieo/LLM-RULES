@@ -9,10 +9,7 @@ const { test, describe, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-const MODULE_PATH = path.resolve(
-  __dirname,
-  '../../../.claude/lib/verification/goal-verifier.cjs'
-);
+const MODULE_PATH = path.resolve(__dirname, '../../../.claude/lib/verification/goal-verifier.cjs');
 
 // ------------------------------------------------------------------
 // checkTruths
@@ -63,7 +60,9 @@ describe('checkTruths', () => {
   });
 
   test('includes description in error message on failure', () => {
-    const fakeExec = () => { throw new Error('boom'); };
+    const fakeExec = () => {
+      throw new Error('boom');
+    };
     const result = checkTruths([{ description: 'my-check', command: 'foo' }], { exec: fakeExec });
     assert.match(result.errors[0], /my-check/);
   });
@@ -82,10 +81,7 @@ describe('checkArtifacts', () => {
 
   test('returns all passed when all paths exist', () => {
     const fakeExists = () => true;
-    const artifacts = [
-      '/some/path/file.js',
-      '/another/path/other.cjs',
-    ];
+    const artifacts = ['/some/path/file.js', '/another/path/other.cjs'];
     const result = checkArtifacts(artifacts, { exists: fakeExists });
     assert.equal(result.passed, 2);
     assert.equal(result.failed, 0);
@@ -93,7 +89,7 @@ describe('checkArtifacts', () => {
   });
 
   test('returns failure when a path does not exist', () => {
-    const fakeExists = (p) => p !== '/missing/file.js';
+    const fakeExists = p => p !== '/missing/file.js';
     const artifacts = ['/exists/file.js', '/missing/file.js'];
     const result = checkArtifacts(artifacts, { exists: fakeExists });
     assert.equal(result.passed, 1);
@@ -110,14 +106,17 @@ describe('checkArtifacts', () => {
 
   test('normalizes Windows backslash paths before checking', () => {
     const seen = [];
-    const fakeExists = (p) => {
+    const fakeExists = p => {
       seen.push(p);
       return true;
     };
     const artifacts = ['C:\\some\\win\\path.js'];
     checkArtifacts(artifacts, { exists: fakeExists });
     // Should have been normalized to forward slashes
-    assert.ok(seen.some(p => p.includes('/')), 'Expected normalized forward-slash path');
+    assert.ok(
+      seen.some(p => p.includes('/')),
+      'Expected normalized forward-slash path'
+    );
   });
 });
 
@@ -156,7 +155,9 @@ describe('checkWiring', () => {
   });
 
   test('returns failure when file cannot be read', () => {
-    const fakeReadFile = () => { throw new Error('ENOENT'); };
+    const fakeReadFile = () => {
+      throw new Error('ENOENT');
+    };
     const keyLinks = [
       { description: 'broken file', pattern: 'anything', file: '/nonexistent.cjs' },
     ];
@@ -275,7 +276,9 @@ function validate(x) {
   });
 
   test('handles file read error gracefully', () => {
-    const fakeReadFile = () => { throw new Error('ENOENT'); };
+    const fakeReadFile = () => {
+      throw new Error('ENOENT');
+    };
     // Should not throw, should return empty array or error entry
     let result;
     assert.doesNotThrow(() => {

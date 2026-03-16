@@ -29,10 +29,7 @@ const fs = require('fs');
 const os = require('os');
 
 // Absolute path to the module under test
-const MODULE_PATH = path.join(
-  __dirname,
-  '../../../.claude/lib/spawn/prompt-assembler-context.cjs'
-);
+const MODULE_PATH = path.join(__dirname, '../../../.claude/lib/spawn/prompt-assembler-context.cjs');
 
 /**
  * Helper: create a temp directory with an optional project-context.md file

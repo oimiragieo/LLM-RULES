@@ -318,7 +318,9 @@ test('detectWorktreeMutation blocks git worktree prune', () => {
 });
 
 test('detectWorktreeMutation blocks chained git worktree commands bypassing early exits', () => {
-  const reason = detectWorktreeMutation('git worktree remove .claude/worktrees/agent-aa5c8f72 --force 2>&1 || echo "skip"; git worktree prune');
+  const reason = detectWorktreeMutation(
+    'git worktree remove .claude/worktrees/agent-aa5c8f72 --force 2>&1 || echo "skip"; git worktree prune'
+  );
   assertTrue(Boolean(reason), 'Should block chained git worktree commands');
 });
 
@@ -338,7 +340,9 @@ test('detectWorktreeMutation blocks rm -rf against .claude/worktrees', () => {
 });
 
 test('detectWorktreeMutation blocks Windows Remove-Item against .claude/worktrees', () => {
-  const reason = detectWorktreeMutation('Remove-Item -Recurse -Force .claude\\worktrees\\agent-123');
+  const reason = detectWorktreeMutation(
+    'Remove-Item -Recurse -Force .claude\\worktrees\\agent-123'
+  );
   assertTrue(Boolean(reason), 'Should block PowerShell deletion of worktrees');
 });
 

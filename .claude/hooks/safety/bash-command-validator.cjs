@@ -292,7 +292,7 @@ function detectReflectionBypass(command) {
 
 /**
  * Detect bash commands that manipulate or delete `.claude/worktrees`
- * This prevents agents from accidentally committing suicide by deleting their 
+ * This prevents agents from accidentally committing suicide by deleting their
  * own active isolated worktree, which breaks the Node runtime loading hooks CWD.
  *
  * @param {string} command - Raw shell command
@@ -312,8 +312,9 @@ function detectWorktreeMutation(command) {
   }
 
   // Block native OS deletions against the `.claude/worktrees` trajectory natively
-  const deleteWorktreesPathPattern = /\b(?:rm|del|Remove-Item)\b[\s\S]*\.claude[\\/]+worktrees[\\/]+/i;
-  
+  const deleteWorktreesPathPattern =
+    /\b(?:rm|del|Remove-Item)\b[\s\S]*\.claude[\\/]+worktrees[\\/]+/i;
+
   if (deleteWorktreesPathPattern.test(command)) {
     return (
       'BLOCKED: Direct deletion of `.claude/worktrees` files via Bash is prohibited. ' +
@@ -321,7 +322,7 @@ function detectWorktreeMutation(command) {
     );
   }
 
-  // If we are cd'd into a worktree, blocking rm . is too complex without CWD context, 
+  // If we are cd'd into a worktree, blocking rm . is too complex without CWD context,
   // but deleting the path directly is covered above.
 
   return null;

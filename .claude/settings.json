@@ -164,6 +164,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/safety/worktree-preflight-check.cjs"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/routing/spawn-token-guard.cjs"
           },
           {
@@ -206,6 +210,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/metrics/post-tool-metrics-unified.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/monitoring/context-window-monitor.cjs"
           }
         ]
       },

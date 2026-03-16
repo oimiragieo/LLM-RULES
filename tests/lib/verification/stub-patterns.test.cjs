@@ -9,10 +9,7 @@ const { test, describe, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-const MODULE_PATH = path.resolve(
-  __dirname,
-  '../../../.claude/lib/verification/stub-patterns.cjs'
-);
+const MODULE_PATH = path.resolve(__dirname, '../../../.claude/lib/verification/stub-patterns.cjs');
 
 describe('STUB_PATTERNS array', () => {
   let STUB_PATTERNS;
@@ -34,7 +31,7 @@ describe('STUB_PATTERNS array', () => {
     }
   });
 
-  test('TODO pattern matches // TODO: ...' , () => {
+  test('TODO pattern matches // TODO: ...', () => {
     const todoPattern = STUB_PATTERNS.find(p => p.name === 'TODO');
     assert.ok(todoPattern, 'Should have a TODO pattern');
     assert.ok(todoPattern.regex.test('// TODO: implement this'), 'Should match // TODO comment');
@@ -75,7 +72,10 @@ describe('STUB_PATTERNS array', () => {
   test('empty-function pattern matches () => {}', () => {
     const emptyFnPattern = STUB_PATTERNS.find(p => p.name === 'EMPTY_FUNCTION');
     assert.ok(emptyFnPattern, 'Should have an EMPTY_FUNCTION pattern');
-    assert.ok(emptyFnPattern.regex.test('const fn = () => {};'), 'Should match empty arrow function');
+    assert.ok(
+      emptyFnPattern.regex.test('const fn = () => {};'),
+      'Should match empty arrow function'
+    );
     assert.ok(emptyFnPattern.regex.test('function foo() {}'), 'Should match empty named function');
   });
 
@@ -168,12 +168,7 @@ describe('No false positives', () => {
   });
 
   test('legitimate function with meaningful body is not flagged', () => {
-    const lines = [
-      'function calculate(a, b) {',
-      '  const sum = a + b;',
-      '  return sum;',
-      '}',
-    ];
+    const lines = ['function calculate(a, b) {', '  const sum = a + b;', '  return sum;', '}'];
     for (const line of lines) {
       assert.equal(isStub(line, '/math.cjs'), false, `Line should not be stub: ${line}`);
     }

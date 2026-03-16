@@ -37,9 +37,7 @@ describe('enhanceRecall — reordering by importance score', () => {
   });
 
   it('returns results unchanged shape — does not mutate originals', () => {
-    const results = [
-      { content: 'test result', score: 0.5, importance: 0.7 },
-    ];
+    const results = [{ content: 'test result', score: 0.5, importance: 0.7 }];
     const original = JSON.parse(JSON.stringify(results));
     enhanceRecall('query', results);
     assert.deepEqual(results, original, 'enhanceRecall should not mutate input array');

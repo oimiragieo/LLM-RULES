@@ -13,10 +13,46 @@
 
 // Stop-words to filter when generating sub-queries
 const STOP_WORDS = new Set([
-  'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
-  'of', 'with', 'by', 'from', 'up', 'about', 'into', 'is', 'are', 'was',
-  'were', 'be', 'been', 'has', 'have', 'had', 'do', 'does', 'did', 'it',
-  'its', 'this', 'that', 'these', 'those', 'not', 'no', 'so', 'if',
+  'a',
+  'an',
+  'the',
+  'and',
+  'or',
+  'but',
+  'in',
+  'on',
+  'at',
+  'to',
+  'for',
+  'of',
+  'with',
+  'by',
+  'from',
+  'up',
+  'about',
+  'into',
+  'is',
+  'are',
+  'was',
+  'were',
+  'be',
+  'been',
+  'has',
+  'have',
+  'had',
+  'do',
+  'does',
+  'did',
+  'it',
+  'its',
+  'this',
+  'that',
+  'these',
+  'those',
+  'not',
+  'no',
+  'so',
+  'if',
 ]);
 
 /**
@@ -54,9 +90,8 @@ function enhanceRecall(query, results, options) {
   // Sort descending by combined score
   copy.sort((a, b) => _combinedScore(b) - _combinedScore(a));
 
-  const maxResults = (options && typeof options.maxResults === 'number')
-    ? options.maxResults
-    : copy.length;
+  const maxResults =
+    options && typeof options.maxResults === 'number' ? options.maxResults : copy.length;
 
   return copy.slice(0, maxResults);
 }

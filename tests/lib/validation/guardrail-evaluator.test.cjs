@@ -9,14 +9,9 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-const {
-  parseGuardrails,
-  evaluateGuardrail,
-  evaluateAll,
-} = require(path.join(
-  __dirname,
-  '../../../.claude/lib/validation/guardrail-evaluator.cjs'
-));
+const { parseGuardrails, evaluateGuardrail, evaluateAll } = require(
+  path.join(__dirname, '../../../.claude/lib/validation/guardrail-evaluator.cjs')
+);
 
 // ---------------------------------------------------------------------------
 // parseGuardrails
