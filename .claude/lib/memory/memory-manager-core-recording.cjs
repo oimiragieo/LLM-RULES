@@ -169,6 +169,12 @@ function createRecordingOps({
           };
           entry.id = buildEntryId(entry);
 
+          try {
+            entry.importance = scoreImportance(entry.text || '', entry.area);
+          } catch (_e) {
+            entry.importance = 0.5;
+          }
+
           gotchas.push(entry);
           atomicWriteJSONSync(gotchasFile, gotchas, { skipLock: true });
           shouldSync = true;
@@ -176,13 +182,6 @@ function createRecordingOps({
             key: `gotchas:${entry.id}`,
             value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
             source: 'memory-manager.recordGotcha',
-          });
-          process.nextTick(() => {
-            try {
-              scoreImportance(entry.text || '', entry.area);
-            } catch (_e) {
-              // Never crash on importance scoring failure
-            }
           });
         }
 
@@ -307,6 +306,12 @@ function createRecordingOps({
           };
           entry.id = buildEntryId(entry);
 
+          try {
+            entry.importance = scoreImportance(entry.text || '', entry.area);
+          } catch (_e) {
+            entry.importance = 0.5;
+          }
+
           patterns.push(entry);
           atomicWriteJSONSync(patternsFile, patterns, { skipLock: true });
           shouldSync = true;
@@ -314,13 +319,6 @@ function createRecordingOps({
             key: `patterns:${entry.id}`,
             value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
             source: 'memory-manager.recordPattern',
-          });
-          process.nextTick(() => {
-            try {
-              scoreImportance(entry.text || '', entry.area);
-            } catch (_e) {
-              // Never crash on importance scoring failure
-            }
           });
         }
 

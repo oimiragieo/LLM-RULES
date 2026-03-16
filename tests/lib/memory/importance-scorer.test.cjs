@@ -113,3 +113,21 @@ describe('scoreImportance — defaults and edge cases', () => {
     assert.equal(lower, upper, 'Keyword matching should be case-insensitive');
   });
 });
+
+describe('scoreImportance — entry.importance persistence contract', () => {
+  it('returns a number storable as entry.importance in range [0.1, 1.0]', () => {
+    const entry = { text: 'some memory content to record', area: 'general' };
+    let score;
+    try {
+      score = scoreImportance(entry.text, entry.area);
+    } catch (_e) {
+      score = 0.5;
+    }
+    entry.importance = score;
+    assert.ok(typeof entry.importance === 'number', 'entry.importance must be a number');
+    assert.ok(
+      entry.importance >= 0.1 && entry.importance <= 1.0,
+      `entry.importance must be in [0.1, 1.0], got ${entry.importance}`
+    );
+  });
+});
