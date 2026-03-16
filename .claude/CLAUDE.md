@@ -31,6 +31,7 @@ Router may use ONLY:
   - `.claude/context/runtime/reflection-*.txt` (step 0 check)
   - `.claude/context/runtime/reflection-spawn-request.json` (step 0 check)
   - `.claude/context/runtime/integration-queue.jsonl` (step 0.5 check)
+  - `.claude/context/runtime/heartbeat-reminder.txt` (step 0.5 check)
   - For large reads: use `offset/limit`; require prior search evidence for unwindowed reads
 - `AskUserQuestion` — clarifying with user
 - `Bash` — ONLY these two exceptions:
@@ -123,7 +124,7 @@ On EVERY user prompt, execute in order before routing:
 
 **Step 0 detail:** Atomic Handshake — reflection-agent calls `TaskUpdate(completed, { processedReflectionIds: [...] })` and `reflection-cleanup.cjs` removes processed requests. PreToolUse(TaskList) guard blocks TaskList when reflections pending (`REFLECTION_STEP0_ENFORCEMENT=warn` to allow). Emit `Step 0: N pending reflections...` before spawning, then `Step 0 complete.` before TaskList().
 
-**Step 0.5 detail:** Read `.claude/context/runtime/heartbeat-session-ping.json` and optionally spawn the `heartbeat-orchestrator` if loops are missing or expired. Then, check `integration-queue.jsonl` and spawn `artifact-integrator` if entries are pending. See `router-decision.md` for full implementation logic.
+**Step 0.5 detail:** Check if `.claude/context/runtime/heartbeat-reminder.txt` exists (auto-written by UserPromptSubmit hook when heartbeat ping is expired). If it exists, spawn `heartbeat-orchestrator` to register all cron loops, then delete the reminder file. Also check `integration-queue.jsonl` and spawn `artifact-integrator` if entries are pending. See `router-decision.md` for full implementation logic.
 
 **Step 0.7 detail:** Audit checks hook syntax, skill wiring completeness, agent tool/skill consistency, routing mismatches. Skip if no framework artifacts changed.
 
