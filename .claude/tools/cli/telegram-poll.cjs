@@ -169,8 +169,7 @@ function httpsPost(url, body) {
         res.on('end', () => {
           const parsed = safeParseJSON(buf);
           // safeParseJSON returns Object.create(null) on parse failure
-          const isValid =
-            parsed && typeof parsed === 'object' && !Array.isArray(parsed);
+          const isValid = parsed && typeof parsed === 'object' && !Array.isArray(parsed);
           resolve(isValid ? parsed : { ok: false });
         });
       }
@@ -193,8 +192,7 @@ function httpsGet(url) {
         res.on('end', () => {
           const parsed = safeParseJSON(buf);
           // safeParseJSON returns Object.create(null) on parse failure
-          const isValid =
-            parsed && typeof parsed === 'object' && !Array.isArray(parsed);
+          const isValid = parsed && typeof parsed === 'object' && !Array.isArray(parsed);
           resolve(isValid ? parsed : { ok: false });
         });
       })
@@ -352,7 +350,15 @@ async function handleMemory(chatId, query) {
 
 // Bridge ctx for handleAsk (imported from telegram-claude-bridge.cjs)
 // Built lazily after TOKEN, httpsPost, sendMessage, auditLog are defined.
-const askCtx = () => ({ bin: CLAUDE_BIN, token: TOKEN, httpsPost, sendMessage, auditLog });
+// outboxPath is passed so handleAsk can write async Claude responses for delivery.
+const askCtx = () => ({
+  bin: CLAUDE_BIN,
+  token: TOKEN,
+  httpsPost,
+  sendMessage,
+  auditLog,
+  outboxPath: OUTBOX_FILE,
+});
 
 async function queueForClaude(chatId, messageId, command, args) {
   const action = await buildClaudeAction(chatId, messageId, command, args, sendMessage);

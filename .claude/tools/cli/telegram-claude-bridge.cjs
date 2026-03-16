@@ -6,12 +6,13 @@
  * Extracted from telegram-poll.cjs to keep that file under the 500-line limit.
  *
  * Exports:
- *   resolveClaude(env)                      → string (full path to claude binary)
- *   invokeClaude(bin, prompt, timeoutMs)    → string (Claude response)
- *   sendTyping(token, chatId, httpsPost)    → void   (fire-and-forget)
- *   handleAsk(ctx, chatId, text)            → Promise<void>
+ *   resolveClaude(env)                                    → string (full path to claude binary)
+ *   invokeClaude(bin, prompt, timeoutMs)                  → string (Claude response, synchronous)
+ *   invokeClaudeAsync(bin, prompt, chatId, outboxPath)    → void   (async, writes to outbox on completion)
+ *   sendTyping(token, chatId, httpsPost)                  → void   (fire-and-forget)
+ *   handleAsk(ctx, chatId, text)                          → Promise<void>
  *
- * ctx = { bin, token, httpsPost, sendMessage, auditLog }
+ * ctx = { bin, token, httpsPost, sendMessage, auditLog, outboxPath }
  */
 
 const { spawnSync } = require('child_process');
@@ -70,6 +71,101 @@ function invokeClaude(bin, prompt, timeoutMs) {
 }
 
 /**
+ * Invoke Claude headlessly using async child_process.spawn.
+ *
+ * Fires the process in the background and writes the response to an outbox
+ * JSON file once Claude exits. The polling loop's processOutbox() will pick
+ * it up on the next tick and deliver it to the user.
+ *
+ * On Windows, claude is an npm `.cmd` script that must be run via cmd.exe
+ * with shell:false (prevents shell injection — security rule).
+ * CLAUDECODE is unset to prevent the nested-session guard from blocking.
+ *
+ * @param {string} bin         - Full path or name of claude binary (from resolveClaude)
+ * @param {string} prompt      - Prompt text to send
+ * @param {number|string} chatId - Telegram chat ID (for outbox entry)
+ * @param {string} outboxPath  - Absolute path to telegram-outbox.json
+ */
+function invokeClaudeAsync(bin, prompt, chatId, outboxPath) {
+  const fs = require('fs');
+  const isWin = process.platform === 'win32';
+  const exe = isWin ? 'cmd.exe' : bin;
+  const args = isWin
+    ? ['/c', bin, '-p', prompt, '--output-format', 'text']
+    : ['-p', prompt, '--output-format', 'text'];
+
+  const child = require('child_process').spawn(exe, args, {
+    shell: false,
+    env: Object.assign({}, process.env, { CLAUDECODE: '' }),
+    stdio: ['ignore', 'pipe', 'pipe'],
+    detached: false,
+  });
+
+  let stdout = '';
+  let stderr = '';
+  child.stdout.on('data', d => {
+    stdout += d;
+  });
+  child.stderr.on('data', d => {
+    stderr += d;
+  });
+
+  // Kill after 120s to prevent zombie processes
+  const timer = setTimeout(() => {
+    child.kill('SIGTERM');
+  }, 120000);
+
+  child.on('close', code => {
+    clearTimeout(timer);
+    const response = stdout.trim() || `(Claude exited ${code}: ${stderr.slice(0, 200)})`;
+    // Append to outbox atomically so next poll tick delivers the response
+    const outbox = [];
+    try {
+      const existing = fs.readFileSync(outboxPath, 'utf8');
+      const parsed = JSON.parse(existing);
+      if (Array.isArray(parsed)) outbox.push(...parsed);
+    } catch (_) {
+      // outbox may not exist yet — that is fine
+    }
+    outbox.push({ chatId, text: response, createdAt: new Date().toISOString() });
+    const tmp = outboxPath + '.tmp.' + process.pid;
+    // Ensure the directory exists before writing
+    const path = require('path');
+    const dir = path.dirname(outboxPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(tmp, JSON.stringify(outbox, null, 2));
+    fs.renameSync(tmp, outboxPath);
+  });
+
+  child.on('error', err => {
+    clearTimeout(timer);
+    process.stderr.write(`invokeClaudeAsync spawn error: ${err.message}\n`);
+    // Write error to outbox so the user is not left waiting forever
+    try {
+      const fs2 = require('fs');
+      const outbox = [];
+      try {
+        const existing = fs2.readFileSync(outboxPath, 'utf8');
+        const parsed = JSON.parse(existing);
+        if (Array.isArray(parsed)) outbox.push(...parsed);
+      } catch (readErr) {
+        process.stderr.write(`invokeClaudeAsync outbox read error: ${readErr.message}\n`);
+      }
+      outbox.push({
+        chatId,
+        text: `(Error starting Claude: ${err.message.slice(0, 200)})`,
+        createdAt: new Date().toISOString(),
+      });
+      const tmp = outboxPath + '.tmp.' + process.pid;
+      fs2.writeFileSync(tmp, JSON.stringify(outbox, null, 2));
+      fs2.renameSync(tmp, outboxPath);
+    } catch (writeErr) {
+      process.stderr.write(`invokeClaudeAsync outbox write error: ${writeErr.message}\n`);
+    }
+  });
+}
+
+/**
  * Send a "typing..." chat action to Telegram (fire-and-forget).
  * Shows the user the bot is working before Claude responds.
  */
@@ -81,50 +177,38 @@ function sendTyping(token, chatId, httpsPost) {
 }
 
 /**
- * Handle /ask and free-form messages: invoke Claude inline and send response.
+ * Handle /ask and free-form messages using the async worker pattern.
  *
- * @param {{ bin: string, token: string, httpsPost: Function, sendMessage: Function, auditLog: Function }} ctx
+ * Instead of blocking on Claude synchronously (which caused 2-minute cron
+ * timeouts and stalled the entire polling loop), this function fires
+ * invokeClaudeAsync and returns immediately. Claude's response is written
+ * to the outbox file; processOutbox() delivers it on the next poll tick.
+ *
+ * @param {{ bin: string, token: string, httpsPost: Function, sendMessage: Function, auditLog: Function, outboxPath: string }} ctx
  * @param {number|string} chatId
  * @param {string} text  - User's message text
  */
 async function handleAsk(ctx, chatId, text) {
-  const { bin, token, httpsPost, sendMessage, auditLog } = ctx;
+  const { bin, token, httpsPost, sendMessage, auditLog, outboxPath } = ctx;
   sendTyping(token, chatId, httpsPost);
-  try {
-    const response = await new Promise((resolve, reject) => {
-      // setImmediate lets the typing indicator fire before blocking on Claude
-      setImmediate(() => {
-        try {
-          resolve(invokeClaude(bin, text, 90000));
-        } catch (err) {
-          reject(err);
-        }
-      });
-    });
-    const reply = response || '(no response)';
-    // Chunk at 4000 chars — Telegram hard limit is 4096
-    for (let i = 0; i < reply.length; i += 4000) {
-      const chunk = reply.slice(i, i + 4000);
-      try {
-        await sendMessage(chatId, chunk, true);
-      } catch (_) {
-        await sendMessage(chatId, chunk, false);
-      } // Markdown fallback
-    }
-    auditLog({
-      type: 'claude_response',
-      chatId,
-      promptLength: text.length,
-      responseLength: reply.length,
-    });
-  } catch (err) {
-    process.stderr.write(`handleAsk error: ${err.message}\n`);
-    auditLog({ type: 'claude_error', chatId, error: err.message });
-    await sendMessage(
-      chatId,
-      `Sorry, I could not process your request. Error: ${err.message.slice(0, 200)}`
+
+  const path = require('path');
+  // Resolve outbox path: use ctx.outboxPath if provided, else derive from __dirname
+  const resolvedOutboxPath =
+    outboxPath ||
+    path.join(
+      path.resolve(__dirname, '..', '..', '..'),
+      '.claude',
+      'context',
+      'tmp',
+      'telegram-outbox.json'
     );
-  }
+
+  // Fire and forget — response delivered via outbox on next poll tick
+  invokeClaudeAsync(bin, text, chatId, resolvedOutboxPath);
+
+  await sendMessage(chatId, "\u23f3 Processing your request... I'll reply when ready.");
+  auditLog({ type: 'ask_queued', chatId, promptLength: text.length });
 }
 
-module.exports = { resolveClaude, invokeClaude, sendTyping, handleAsk };
+module.exports = { resolveClaude, invokeClaude, invokeClaudeAsync, sendTyping, handleAsk };
