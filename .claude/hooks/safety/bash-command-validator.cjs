@@ -474,12 +474,6 @@ async function main() {
 
     const worktreeMutationReason = detectWorktreeMutation(command);
     if (worktreeMutationReason) {
-      if (isBypassPermissionsMode(hookInput)) {
-        console.error(
-          `[BASH-COMMAND-VALIDATOR][warn] ${worktreeMutationReason} (allowed in bypassPermissions mode)`
-        );
-        process.exit(0);
-      }
       emitBashBlockVerdict(command, worktreeMutationReason);
       console.error(formatBlockedMessage(command, worktreeMutationReason));
       process.exit(2);
