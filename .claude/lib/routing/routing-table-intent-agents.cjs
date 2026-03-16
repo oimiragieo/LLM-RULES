@@ -63,6 +63,7 @@ const INTENT_TO_AGENT = {
 
   // Orchestrators
   master_orchestrator: 'master-orchestrator',
+  init_workspace: 'master-orchestrator',
   swarm_coordinator: 'swarm-coordinator',
   evolution_orchestrator: 'evolution-orchestrator',
   party_mode: 'party-orchestrator',

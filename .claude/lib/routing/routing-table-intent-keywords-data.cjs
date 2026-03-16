@@ -282,6 +282,14 @@ const INTENT_KEYWORDS = {
     'mission',
     'ceo',
   ],
+  init_workspace: [
+    'init',
+    'initialize repository',
+    'generate agents.md',
+    'create agents.md',
+    'auto-evolve',
+    'bootstrap workspace',
+  ],
   swarm_coordinator: [
     'swarm',
     'multi-agent',

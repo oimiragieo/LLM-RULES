@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-03-16T04:29:03.756Z",
+  "generated_at": "2026-03-16T05:13:42.574Z",
   "prebuilt": false,
   "total_rules": 139,
   "master_rules": 139,
@@ -529,8 +529,8 @@
       "priority": "",
       "technologies": ["rest"],
       "type": "master",
-      "size": 2540,
-      "line_count": 104
+      "size": 2789,
+      "line_count": 108
     },
     {
       "path": ".claude/rules/go-development.md",
@@ -825,8 +825,8 @@
       "priority": "",
       "technologies": [],
       "type": "master",
-      "size": 2276,
-      "line_count": 65
+      "size": 3258,
+      "line_count": 95
     },
     {
       "path": ".claude/rules/plan-generator.md",

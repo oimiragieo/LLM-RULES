@@ -15,7 +15,7 @@
   ".claude\\lib\\memory\\learnings-parser.cjs": 687,
   ".claude\\lib\\workflow\\checkpoint-manager.cjs": 685,
   ".claude\\hooks\\safety\\external-content-guard.cjs": 677,
-  ".claude\\lib\\routing\\routing-table-intent-keywords-data.cjs": 695,
+  ".claude\\lib\\routing\\routing-table-intent-keywords-data.cjs": 703,
   ".claude\\hooks\\routing\\routing-guard-core.impl.cjs": 655,
   ".claude\\hooks\\reflection\\reflection-queue-processor.cjs": 650,
   ".claude\\hooks\\metrics\\post-tool-metrics-unified.cjs": 642,
