@@ -397,5 +397,35 @@
     "writeSource": "memory_api",
     "dedupStatus": "create",
     "id": "bd278a499499f9c0067166f42b14169ceed0b13a"
+  },
+  {
+    "text": "Heartbeat loop registration pattern: Heartbeat-orchestrator successfully registers multiple heterogeneous cron loop patterns (email, telegram, webhook) in parallel. Loop structure is protocol-agnostic; state persistence ensures recovery across session restarts. CronCreate BEFORE CronDelete when rescheduling prevents duplicates. Validated with 8 concurrent loops in Task 12 (2026-03-16).",
+    "area": "infrastructure",
+    "type": "cron-orchestration",
+    "timestamp": "2026-03-16T05:48:43.808Z",
+    "taskId": "12",
+    "confidence": "high",
+    "evidence": "8 loops operational, state recovery tested, multi-session persistence verified",
+    "id": "heartbeat_loop_registration_pattern"
+  },
+  {
+    "text": "Telegram Bot API polling protocol: store offset in .claude/context/tmp/telegram-offset.json, fetch getUpdates with offset, timeout=5, limit=10. Advance offset = last_update_id + 1. Never send partial/streaming replies — Telegram requires final-only responses. Confirmed working in Task 12 telegram polling heartbeat loop.",
+    "area": "integration",
+    "type": "telegram-api",
+    "timestamp": "2026-03-16T05:48:43.808Z",
+    "taskId": "12",
+    "confidence": "high",
+    "evidence": "telegram polling loop operational in production heartbeat",
+    "id": "telegram_bot_polling_pattern"
+  },
+  {
+    "text": "Ecosystem bootstrap completion pattern: Init skill generates localized capability map identifying missing skills/agents for specific codebase. Bootstrap is a prerequisite for ecosystem-wide initialization workflows. Task bootstrap-init confirmed ecosystem initialization framework is operational and ready for distributed use.",
+    "area": "ecosystem",
+    "type": "bootstrap-orchestration",
+    "timestamp": "2026-03-16T02:18:00.000Z",
+    "trigger": "missing_agents_md",
+    "confidence": "high",
+    "evidence": "init skill created, committed, integration verified",
+    "id": "ecosystem_bootstrap_pattern"
   }
 ]

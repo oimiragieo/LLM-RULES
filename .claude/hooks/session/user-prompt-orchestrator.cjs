@@ -62,15 +62,16 @@ function ensureBootstrapReadTargets(projectRoot = PROJECT_ROOT) {
         status: 'pending',
         subagent_type: 'init',
         description: 'Initialize ecosystem for new codebase',
-        prompt: 'Run the init skill to generate the localized ecosystem capability map (AGENTS.md) and identify any missing skills or agents for this specific codebase.',
+        prompt:
+          'Run the init skill to generate the localized ecosystem capability map (AGENTS.md) and identify any missing skills or agents for this specific codebase.',
         source: {
           trigger: 'missing_agents_md',
           timestamp: new Date().toISOString(),
           taskId: 'bootstrap-init-task',
           context: 'user-prompt-orchestrator',
-          priority: 'high'
-        }
-      }
+          priority: 'high',
+        },
+      },
     ];
     initialSpawnRequest = `${JSON.stringify(initPayload, null, 2)}\n`;
     initialReminder = `Step 0.1: Ecosystem bootstrap required. Read .claude/context/runtime/reflection-spawn-request.json and spawn the 'init' skill.\n`;

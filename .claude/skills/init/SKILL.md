@@ -38,7 +38,7 @@ Cross-reference the discovered tech stack and repository complexity against the 
 
 ### Stage 3: Targeted Staleness Audit
 
-Identify **ONLY the subset** of pre-existing agents and skills that are mathematically applicable to this repository's stack (e.g., if it's a TS web app, target `typescript`, `react`, `jest`, `frontend`). *Do not evaluate all 200+ unrelated framework assets.*
+Identify **ONLY the subset** of pre-existing agents and skills that are mathematically applicable to this repository's stack (e.g., if it's a TS web app, target `typescript`, `react`, `jest`, `frontend`). _Do not evaluate all 200+ unrelated framework assets._
 
 For each applicable asset:
 

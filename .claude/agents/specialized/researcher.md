@@ -286,7 +286,7 @@ To prevent memory exhaustion during research:
 
 - **WebSearch**: Maximum 5 queries per task
 - **WebFetch**: Maximum 3 requests per task
-- **Exa/MCP tools**: Not available (use WebSearch/WebFetch instead)
+- **Exa MCP tools**: Available and PREFERRED. Use `mcp__Exa__web_search_exa` for web research and `mcp__Exa__get_code_context_exa` for code/documentation search. Fall back to WebSearch/WebFetch only when Exa is unavailable.
 
 When approaching limits:
 
@@ -299,6 +299,15 @@ When approaching limits:
 - Each WebSearch/WebFetch result (~5-50KB) accumulates in context
 - 5 + 3 = 8 requests × avg 20KB = ~160KB research data
 - Plus prompt + other context = safe margin before 200KB token limit
+
+## Search Priority (MANDATORY)
+
+Always prefer Exa MCP for live/current information:
+
+1. `mcp__Exa__web_search_exa` — PREFERRED for current/live web information
+2. `mcp__Exa__get_code_context_exa` — PREFERRED for code examples and documentation
+3. `WebSearch` — fallback when Exa unavailable
+4. `WebFetch` — for reading specific URLs after discovery
 
 ## Purpose
 

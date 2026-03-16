@@ -216,6 +216,27 @@ async function sendMessage(chatId, text, useMarkdown = false) {
   }
 }
 
+async function sendMessageWithKeyboard(chatId, text, keyboard, useMarkdown = false) {
+  const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+  const body = {
+    chat_id: chatId,
+    text: text.slice(0, 4096),
+    reply_markup: JSON.stringify({ inline_keyboard: keyboard }),
+  };
+  if (useMarkdown) body.parse_mode = 'Markdown';
+  try {
+    const result = await httpsPost(url, body);
+    if (!result.ok && useMarkdown) {
+      // Markdown parse failed — retry as plain text without keyboard
+      body.parse_mode = undefined;
+      delete body.parse_mode;
+      await httpsPost(url, body);
+    }
+  } catch (e) {
+    process.stderr.write(`sendMessageWithKeyboard error: ${e.message}\n`);
+  }
+}
+
 async function fetchUpdates(offset) {
   try {
     const url = `https://api.telegram.org/bot${TOKEN}/getUpdates?offset=${offset}&timeout=5&limit=10`;
@@ -252,25 +273,24 @@ async function processOutbox() {
 // ── Command handlers (in-script, no LLM) ─────────────────────────────────────
 
 async function handleHelp(chatId) {
-  await sendMessage(
-    chatId,
+  const keyboard = [
     [
-      '*Agent Studio Bot Commands*',
-      '/help — This message',
-      '/status — System status',
-      '/loops — Active heartbeat loops',
-      '/logs — Last 20 session gap log entries',
-      '/memory QUERY — Search learnings.md',
-      '/tasks — List tasks (queued for Claude)',
-      '/ask QUESTION — Ask Claude (owner only)',
-      '/research TOPIC — Deep research via researcher agent (owner only)',
-      '/skill NAME DESC — Create a new skill (owner only, Gate 4)',
-      '/agent NAME DESC — Create a new agent (owner only, Gate 4)',
-      '/workflow NAME DESC — Create a new workflow (owner only, Gate 4)',
-      '/spawn TYPE DESC — Spawn agent (owner only)',
-      '/approve TASK\\_ID — Approve task (owner only)',
-      '/deny TASK\\_ID — Deny task (owner only)',
-    ].join('\n'),
+      { text: '📊 Status', callback_data: 'cmd_status' },
+      { text: '🔄 Loops', callback_data: 'cmd_loops' },
+    ],
+    [
+      { text: '📋 Tasks', callback_data: 'cmd_tasks' },
+      { text: '📝 Logs', callback_data: 'cmd_logs' },
+    ],
+    [
+      { text: '🧠 Memory', callback_data: 'cmd_memory' },
+      { text: '❓ Ask', callback_data: 'cmd_ask' },
+    ],
+  ];
+  await sendMessageWithKeyboard(
+    chatId,
+    '*Agent Studio Bot* — tap a button or type a command:',
+    keyboard,
     true
   );
 }
@@ -286,16 +306,15 @@ async function handleStatus(chatId) {
     /* ignore */
   }
 
-  await sendMessage(
-    chatId,
-    [
-      '*System Status*',
-      `Active loops: ${loopCount}`,
-      `Last registration: ${lastHeartbeat}`,
-      `Telegram: polling every 2 min`,
-    ].join('\n'),
-    true
-  );
+  const statusText = [
+    '*System Status*',
+    `Active loops: ${loopCount}`,
+    `Last registration: ${lastHeartbeat}`,
+    `Telegram: polling every 2 min`,
+  ].join('\n');
+
+  const keyboard = [[{ text: '🔄 Refresh', callback_data: 'cmd_status' }]];
+  await sendMessageWithKeyboard(chatId, statusText, keyboard, true);
 }
 
 async function handleLoops(chatId) {
@@ -393,6 +412,60 @@ function checkAuth(senderId, command) {
   return 'ok';
 }
 
+// ── Callback query handler (extracted to reduce main() complexity) ────────────
+
+async function handleCallbackQuery(callback) {
+  const cbChatId = callback.message.chat.id;
+  const cbData = callback.data;
+  const cbSenderId = callback.from?.id;
+
+  const cbAuth = checkAuth(cbSenderId, '/' + (cbData || '').replace(/^cmd_/, ''));
+
+  // Always answer to remove loading spinner
+  await httpsPost(`https://api.telegram.org/bot${TOKEN}/answerCallbackQuery`, {
+    callback_query_id: callback.id,
+  });
+
+  if (cbAuth === 'silent_drop') return;
+
+  auditLog({
+    type: 'callback_query',
+    user_id: cbSenderId,
+    username: callback.from?.username || null,
+    callback_data: cbData,
+    allowed: true,
+    outcome: cbAuth,
+  });
+
+  if (cbAuth === 'not_owner' && (cbData === 'cmd_tasks' || cbData === 'cmd_ask')) {
+    await sendMessage(cbChatId, 'Unauthorized');
+    return;
+  }
+
+  switch (cbData) {
+    case 'cmd_status':
+      await handleStatus(cbChatId);
+      break;
+    case 'cmd_loops':
+      await handleLoops(cbChatId);
+      break;
+    case 'cmd_logs':
+      await handleLogs(cbChatId);
+      break;
+    case 'cmd_memory':
+      await sendMessage(cbChatId, 'Reply with /memory KEYWORD to search');
+      break;
+    case 'cmd_tasks':
+      await queueForClaude(cbChatId, 0, '/tasks', '');
+      break;
+    case 'cmd_ask':
+      await sendMessage(cbChatId, 'Reply with /ask YOUR QUESTION');
+      break;
+    default:
+      break;
+  }
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -417,6 +490,12 @@ async function main() {
   writeState(state);
 
   for (const update of newUpdates) {
+    // Handle callback_query (inline keyboard button taps)
+    if (update.callback_query) {
+      await handleCallbackQuery(update.callback_query);
+      continue;
+    }
+
     const msg = update.message || update.edited_message;
     if (!msg || !msg.text) continue;
 
@@ -526,6 +605,10 @@ if (typeof module !== 'undefined' && module.exports) {
     checkAuth,
     // Expose for integration tests
     _internals: { readState, writeState, readCmdQueue, writeCmdQueue, readOutbox, writeOutbox },
+    // Wave 2: keyboard support
+    sendMessageWithKeyboard,
+    handleHelp,
+    handleStatus,
   };
 }
 
