@@ -3,9 +3,7 @@
   "title": "codebase-cleaner Output Schema",
   "description": "Output validation schema for codebase-cleaner skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",

@@ -37,6 +37,13 @@
 
 ---
 
+## Batch Reflection: 2026-03-16 Session Tasks 2,7,9,10,11,13,14 (commits aa60d32e, 23f678a2)
+
+- `evolution-check.cjs QUEUED_ACTIONS: 1` appeared in ALL 8 reflections — this is a persistent background signal, not a per-task incident; treat as informational unless it reaches >= 3 consecutive sessions
+- Plan file staleness (markers staying `[ ]` after task completion) recurred for the 3rd time — systemic; root cause is `TaskUpdate(completed)` called before plan file Edit; enforce order: plan Edit first, then TaskUpdate
+- External CLI review gate (task 7): when CLIs prompt for input, architect approval is a sufficient substitute review gate
+- Context Window Monitor hook delivered via TDD with 5/5 tests — TDD pattern confirmed effective for hooks
+
 ## Mission Mode Governance Repair (2026-03-16) [Task #23]
 
 **Agent:** developer | **Status:** Completed

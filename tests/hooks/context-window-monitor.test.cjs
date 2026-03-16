@@ -61,9 +61,7 @@ beforeEach(() => {
   savedBudgetTracker = fs.existsSync(BUDGET_TRACKER)
     ? fs.readFileSync(BUDGET_TRACKER, 'utf8')
     : null;
-  savedSessionId = fs.existsSync(SESSION_ID_FILE)
-    ? fs.readFileSync(SESSION_ID_FILE, 'utf8')
-    : null;
+  savedSessionId = fs.existsSync(SESSION_ID_FILE) ? fs.readFileSync(SESSION_ID_FILE, 'utf8') : null;
 });
 
 afterEach(() => {
@@ -87,7 +85,11 @@ test('should exit 0 with no additionalContext when usage is below 65%', () => {
 
   const result = runHook(JSON.stringify({ hook_event_name: 'PostToolUse', tool_name: 'Bash' }));
 
-  assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+  );
 
   const output = JSON.parse(result.stdout);
   assert.ok(!output.additionalContext, 'Should not inject additionalContext below threshold');
@@ -99,18 +101,16 @@ test('should inject warning additionalContext when context usage exceeds 65%', (
 
   const result = runHook(JSON.stringify({ hook_event_name: 'PostToolUse', tool_name: 'Bash' }));
 
-  assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+  );
 
   const output = JSON.parse(result.stdout);
   assert.ok(output.additionalContext, 'Should inject additionalContext at 65% threshold');
-  assert.ok(
-    typeof output.additionalContext === 'string',
-    'additionalContext should be a string'
-  );
-  assert.ok(
-    output.additionalContext.length > 0,
-    'additionalContext should not be empty'
-  );
+  assert.ok(typeof output.additionalContext === 'string', 'additionalContext should be a string');
+  assert.ok(output.additionalContext.length > 0, 'additionalContext should not be empty');
   // Should mention context/compression
   assert.ok(
     /context|compress|remaining/i.test(output.additionalContext),
@@ -124,7 +124,11 @@ test('should inject critical warning additionalContext when context usage exceed
 
   const result = runHook(JSON.stringify({ hook_event_name: 'PostToolUse', tool_name: 'Edit' }));
 
-  assert.strictEqual(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+  assert.strictEqual(
+    result.status,
+    0,
+    `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+  );
 
   const output = JSON.parse(result.stdout);
   assert.ok(output.additionalContext, 'Should inject additionalContext at 75% threshold');
@@ -156,7 +160,10 @@ test('should exit 0 gracefully when token metrics are unavailable (missing budge
     output = JSON.parse(result.stdout);
   }, 'Output should be valid JSON even when metrics are unavailable');
   // Should not inject a warning when metrics are unavailable
-  assert.ok(!output.additionalContext, 'Should not inject additionalContext when metrics unavailable');
+  assert.ok(
+    !output.additionalContext,
+    'Should not inject additionalContext when metrics unavailable'
+  );
 });
 
 test('should exit 0 gracefully when stdin contains malformed JSON', () => {

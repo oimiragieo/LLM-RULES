@@ -6,7 +6,10 @@
  */
 
 const options = Object.fromEntries(
-  process.argv.slice(2).filter(arg => arg.startsWith('--')).map(flag => [flag.replace(/^--/, ''), true])
+  process.argv
+    .slice(2)
+    .filter(arg => arg.startsWith('--'))
+    .map(flag => [flag.replace(/^--/, ''), true])
 );
 
 if (options.help) {

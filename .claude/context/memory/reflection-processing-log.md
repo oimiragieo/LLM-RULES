@@ -39,6 +39,7 @@
    - State isolation per loop prevents cross-contamination; centralized orchestrator manages lifecycle
 
 **Patterns Consolidated:**
+
 - Heartbeat loop registration pattern (infrastructure-level)
 - Telegram Bot API polling pattern (protocol-specific)
 - CronCreate idempotency pattern (state management)

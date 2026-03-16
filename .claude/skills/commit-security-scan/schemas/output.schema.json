@@ -3,9 +3,7 @@
   "title": "commit-security-scan Output Schema",
   "description": "Output validation schema for commit-security-scan skill",
   "type": "object",
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "properties": {
     "success": {
       "type": "boolean",
