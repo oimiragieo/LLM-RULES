@@ -45,13 +45,42 @@ function ensureBootstrapReadTargets(projectRoot = PROJECT_ROOT) {
   const memoryDir = path.join(projectRoot, '.claude', 'context', 'memory');
   const metricsDir = path.join(projectRoot, '.claude', 'context', 'metrics');
 
+  // PHASE 28: Deep Ecosystem Evolution Auto-Trigger
+  // If AGENTS.md is missing, this is the first time Agent Studio is running in this repository.
+  // We MUST schedule the 'init' skill to run immediately at Step 0 of the router to build the
+  // localized ecosystem capability map (AGENTS.md).
+  const agentsMdPath = path.join(projectRoot, '.claude', 'AGENTS.md');
+  const isFirstRun = !fs.existsSync(agentsMdPath);
+
+  let initialSpawnRequest = '[]\n';
+  let initialReminder = 'No pending reflection requests.\n';
+
+  if (isFirstRun) {
+    const initPayload = [
+      {
+        id: 'bootstrap-init',
+        status: 'pending',
+        subagent_type: 'init',
+        description: 'Initialize ecosystem for new codebase',
+        prompt: 'Run the init skill to generate the localized ecosystem capability map (AGENTS.md) and identify any missing skills or agents for this specific codebase.',
+        source: {
+          trigger: 'missing_agents_md',
+          timestamp: new Date().toISOString(),
+          taskId: 'bootstrap-init-task',
+          context: 'user-prompt-orchestrator',
+          priority: 'high'
+        }
+      }
+    ];
+    initialSpawnRequest = `${JSON.stringify(initPayload, null, 2)}\n`;
+    initialReminder = `Step 0.1: Ecosystem bootstrap required. Read .claude/context/runtime/reflection-spawn-request.json and spawn the 'init' skill.\n`;
+  }
+
   // Prevent noisy "Read file does not exist" errors before routing hooks have
   // had a chance to create advisory placeholders.
-  ensureFileIfMissing(path.join(runtimeDir, 'reflection-spawn-request.json'), '[]\n');
-  ensureFileIfMissing(
-    path.join(runtimeDir, 'reflection-reminder.txt'),
-    'No pending reflection requests.\n'
-  );
+  ensureFileIfMissing(path.join(runtimeDir, 'reflection-spawn-request.json'), initialSpawnRequest);
+  ensureFileIfMissing(path.join(runtimeDir, 'reflection-reminder.txt'), initialReminder);
+
   ensureFileIfMissing(
     path.join(memoryDir, 'open-findings.json'),
     `${JSON.stringify({ generatedAt: new Date().toISOString(), findings: [] }, null, 2)}\n`
