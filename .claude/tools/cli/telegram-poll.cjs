@@ -170,10 +170,7 @@ function httpsPost(url, body) {
           const parsed = safeParseJSON(buf);
           // safeParseJSON returns Object.create(null) on parse failure
           const isValid =
-            parsed &&
-            typeof parsed === 'object' &&
-            !Array.isArray(parsed) &&
-            Object.getPrototypeOf(parsed) !== null;
+            parsed && typeof parsed === 'object' && !Array.isArray(parsed);
           resolve(isValid ? parsed : { ok: false });
         });
       }
@@ -197,10 +194,7 @@ function httpsGet(url) {
           const parsed = safeParseJSON(buf);
           // safeParseJSON returns Object.create(null) on parse failure
           const isValid =
-            parsed &&
-            typeof parsed === 'object' &&
-            !Array.isArray(parsed) &&
-            Object.getPrototypeOf(parsed) !== null;
+            parsed && typeof parsed === 'object' && !Array.isArray(parsed);
           resolve(isValid ? parsed : { ok: false });
         });
       })
