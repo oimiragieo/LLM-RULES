@@ -5,7 +5,7 @@
  * Note: Uses NO external dependencies so it can run immediately after git clone.
  */
 
-const { execSync, spawn } = require('child_process');
+const { execFileSync, spawn } = require('child_process');
 
 // ANSI Escapes for pretty UI
 const c = {
@@ -42,13 +42,14 @@ if (majorNode < 22 || (majorNode === 22 && minorNode < 5)) {
 
 // Check pnpm
 try {
-  execSync('pnpm --version', { shell: true, stdio: 'pipe' });
+  execFileSync('pnpm', ['--version'], { shell: false, stdio: 'pipe' });
   console.log(` ${c.green}✔ pnpm package manager found${c.reset}`);
 } catch (_e) {
   console.log(` ${c.yellow}⚠ pnpm not found. Attempting to install via corepack...${c.reset}`);
   try {
-    execSync('corepack enable && corepack prepare pnpm@latest --activate', {
-      shell: true,
+    execFileSync('corepack', ['enable'], { shell: false, stdio: 'inherit' });
+    execFileSync('corepack', ['prepare', 'pnpm@latest', '--activate'], {
+      shell: false,
       stdio: 'inherit',
     });
     console.log(` ${c.green}✔ pnpm installed successfully${c.reset}`);
@@ -69,18 +70,28 @@ console.log(
 );
 
 // 2. Setup Pipeline Definition
+// Each step has either cmd+args (array form, shell:false) or cmds (sequential commands, no &&)
 const steps = [
   {
     name: 'Enable Git Optimizations',
-    cmd: 'git config --local core.untrackedCache true && git config --local core.fsmonitor true',
+    // Two sequential git config calls — split to avoid shell:true with &&
+    cmds: [
+      ['git', ['config', '--local', 'core.untrackedCache', 'true']],
+      ['git', ['config', '--local', 'core.fsmonitor', 'true']],
+    ],
     est: '1s',
   },
-  { name: 'Install Dependencies', cmd: 'pnpm install', est: '30-60s' },
-  { name: 'Initialize SQLite Memory & Context', cmd: 'pnpm memory:init', est: '2s' },
-  { name: 'Compile Agent Registry', cmd: 'pnpm agents:registry', est: '2s' },
-  { name: 'Generate Routing Prototypes', cmd: 'pnpm routing:prototypes', est: '2s' },
-  { name: 'Compile Skills Catalog', cmd: 'pnpm agents:catalog', est: '1s' },
-  { name: 'Build Hybrid Search Vector Index', cmd: 'pnpm code:index:reindex', est: '12-17m' },
+  { name: 'Install Dependencies', cmd: 'pnpm', args: ['install'], est: '30-60s' },
+  { name: 'Initialize SQLite Memory & Context', cmd: 'pnpm', args: ['memory:init'], est: '2s' },
+  { name: 'Compile Agent Registry', cmd: 'pnpm', args: ['agents:registry'], est: '2s' },
+  { name: 'Generate Routing Prototypes', cmd: 'pnpm', args: ['routing:prototypes'], est: '2s' },
+  { name: 'Compile Skills Catalog', cmd: 'pnpm', args: ['agents:catalog'], est: '1s' },
+  {
+    name: 'Build Hybrid Search Vector Index',
+    cmd: 'pnpm',
+    args: ['code:index:reindex'],
+    est: '12-17m',
+  },
 ];
 
 console.log(`${c.bold}${c.blue}>> Phase 2: Orchestrated Setup Workflow${c.reset}`);
@@ -94,8 +105,23 @@ function runStep(step, index) {
     // For long running indexing step or install, pipe stdout to show progress instead of a silent hang
     const isVerbose = step.name.includes('Install') || step.name.includes('Index');
 
-    const proc = spawn(step.cmd, {
-      shell: true,
+    // Sequential multi-command step (uses array args, shell:false)
+    if (step.cmds) {
+      try {
+        for (const [cmd, args] of step.cmds) {
+          execFileSync(cmd, args, { shell: false, stdio: 'ignore' });
+        }
+        console.log(` ${c.green}✔ ${step.name} Complete${c.reset}`);
+        resolve();
+      } catch (err) {
+        console.log(` ${c.red}✖ Process failed: ${err.message}${c.reset}`);
+        reject(new Error(`Failed on step: ${step.name}`));
+      }
+      return;
+    }
+
+    const proc = spawn(step.cmd, step.args || [], {
+      shell: false,
       stdio: isVerbose ? 'inherit' : 'ignore',
     });
 

@@ -25,6 +25,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 // =============================================================================
 // CONSTANTS
@@ -35,17 +36,17 @@ const path = require('path');
  * Based on Anthropic pricing as of 2026-01
  */
 const MODEL_COSTS = {
-  'claude-opus-4-5-20251101': {
+  'claude-opus-4-6': {
     input: 0.015 / 1000, // $15 per 1M input tokens
     output: 0.075 / 1000, // $75 per 1M output tokens
     shorthand: 'opus',
   },
-  'claude-sonnet-4-5': {
+  'claude-sonnet-4-6': {
     input: 0.003 / 1000, // $3 per 1M input tokens
     output: 0.015 / 1000, // $15 per 1M output tokens
     shorthand: 'sonnet',
   },
-  'claude-haiku-4-5': {
+  'claude-haiku-4-5-20251001': {
     input: 0.00025 / 1000, // $0.25 per 1M input tokens
     output: 0.00125 / 1000, // $1.25 per 1M output tokens
     shorthand: 'haiku',
@@ -279,13 +280,9 @@ function parseAuditLog(projectRoot) {
 
   const events = [];
   for (const line of lines) {
-    try {
-      const event = JSON.parse(line);
-      if (event.event === 'ConfigModelSelection') {
-        events.push(event);
-      }
-    } catch (_e) {
-      // Skip malformed lines
+    const { success, data: event } = safeParseJSON(line, null);
+    if (success && event && event.event === 'ConfigModelSelection') {
+      events.push(event);
     }
   }
 
@@ -449,12 +446,8 @@ function rotateAuditLogs(options = {}) {
   const lines = content.trim().split('\n').filter(Boolean);
 
   const kept = lines.filter(line => {
-    try {
-      const event = JSON.parse(line);
-      return event.timestamp && event.timestamp >= cutoff;
-    } catch (_e) {
-      return false; // Drop malformed lines
-    }
+    const { success, data: event } = safeParseJSON(line, null);
+    return success && event && event.timestamp && event.timestamp >= cutoff;
   });
 
   fs.writeFileSync(logPath, kept.join('\n') + (kept.length > 0 ? '\n' : ''));

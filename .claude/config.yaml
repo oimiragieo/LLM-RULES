@@ -43,9 +43,8 @@ integrations:
 # --- Token Monitoring ---
 token_monitoring:
   enabled: true
-  max_session_tokens: 60000 # Warning threshold (best-effort estimate in user-prompt-unified)
-  hard_limit: 100000 # Action required (best-effort estimate in user-prompt-unified)
-
+  max_session_tokens: 800000 # Warning threshold (best-effort estimate in user-prompt-unified)
+  hard_limit: 950000 # Action required (best-effort estimate in user-prompt-unified)
 # --- Evolution Settings (Self-Evolution System) ---
 evolution:
   auto_start: true # EVOLVE workflow auto-triggers when new artifacts block (opt-out mode)
@@ -86,8 +85,8 @@ features:
     enabled: true # Multi-agent collaboration (PRODUCTION READY)
     maxAgents: 4 # Maximum agents per round (SEC-PM-005)
     maxRounds: 10 # Maximum rounds per session (SEC-PM-005)
-    contextWarning: 100000 # Token warning threshold
-    contextLimit: 150000 # Token hard limit
+    contextWarning: 800000 # Token warning threshold
+    contextLimit: 950000 # Token hard limit
     costLimit: 50.0 # Cost limit per session (USD)
   advancedElicitation:
     enabled: false # Advanced meta-cognitive reasoning (default: off)
@@ -105,7 +104,7 @@ memory_management:
   token_budgets:
     haiku: 200000 # Max tokens per haiku-based agent
     sonnet: 200000 # Max tokens per sonnet-based agent
-    opus: 200000 # Max tokens per opus-based agent
+    opus: 1000000 # Max tokens per opus-based agent
 
   # Token tracking config
   token_tracking:

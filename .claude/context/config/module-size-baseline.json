@@ -1,5 +1,5 @@
 {
-  ".claude\\hooks\\routing\\user-prompt-unified.core.cjs": 2046,
+  ".claude\\hooks\\routing\\user-prompt-unified.core.cjs": 2081,
   ".claude\\lib\\memory\\lancedb-client-impl.cjs": 1380,
   ".claude\\hooks\\safety\\spawn-prompt-validator.cjs": 1181,
   ".claude\\hooks\\routing\\pre-tool-unified.read-safety.cjs": 860,

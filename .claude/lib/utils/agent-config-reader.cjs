@@ -18,7 +18,7 @@
  * Usage:
  *   const { resolveAgentModel, normalizeModel } = require('./agent-config-reader.cjs');
  *   const result = resolveAgentModel('planner', projectRoot);
- *   // result: { model: 'claude-opus-4-5-20251101', shorthand: 'opus', source: 'config.yaml' }
+ *   // result: { model: 'claude-opus-4-6', shorthand: 'opus', source: 'config.yaml' }
  *
  * @module agent-config-reader
  */
@@ -38,13 +38,13 @@ const path = require('path');
  */
 const MODEL_ALIASES = {
   // Shorthand to full ID
-  opus: 'claude-opus-4-5-20251101',
-  sonnet: 'claude-sonnet-4-5',
-  haiku: 'claude-haiku-4-5',
+  opus: 'claude-opus-4-6',
+  sonnet: 'claude-sonnet-4-6',
+  haiku: 'claude-haiku-4-5-20251001',
   // Full ID to shorthand
-  'claude-opus-4-5-20251101': 'opus',
-  'claude-sonnet-4-5': 'sonnet',
-  'claude-haiku-4-5': 'haiku',
+  'claude-opus-4-6': 'opus',
+  'claude-sonnet-4-6': 'sonnet',
+  'claude-haiku-4-5-20251001': 'haiku',
 };
 
 // =============================================================================

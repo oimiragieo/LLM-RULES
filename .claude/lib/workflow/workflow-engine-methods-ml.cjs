@@ -64,7 +64,7 @@ module.exports = {
       });
 
       // Resolve default model from config
-      let modelId = 'claude-sonnet-4-5';
+      let modelId = 'claude-sonnet-4-6';
       try {
         const { resolveAgentModel } = require('../utils/agent-config-reader.cjs');
         const resolved = resolveAgentModel('developer');

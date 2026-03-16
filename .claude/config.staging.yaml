@@ -38,9 +38,8 @@ integrations:
 # --- Token Monitoring ---
 token_monitoring:
   enabled: true
-  max_session_tokens: 60000
-  hard_limit: 100000
-
+  max_session_tokens: 800000
+  hard_limit: 950000
 # --- Evolution Settings ---
 evolution:
   auto_start: true
@@ -81,8 +80,8 @@ features:
     enabled: true # Enable for staging testing
     maxAgents: 5
     maxRounds: 20 # Staging: higher limit for testing (production: 10)
-    contextWarning: 100000
-    contextLimit: 150000
+    contextWarning: 800000
+    contextLimit: 950000
     costLimit: 50.0
   advancedElicitation:
     enabled: true # Enable for staging testing
@@ -105,7 +104,7 @@ memory_management:
   token_budgets:
     haiku: 200000
     sonnet: 200000
-    opus: 200000
+    opus: 1000000
   token_tracking:
     enabled: true
     char_to_token_ratio: 0.75

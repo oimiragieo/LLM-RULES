@@ -1,3 +1,42 @@
+## Telegram UX EPIC Waves 1-2 (2026-03-16) [Task #13, commits 4529e28a + 4752d04a]
+
+**Agent:** nodejs-pro | **Status:** Waves 1-2 complete, Waves 3-5 in fresh session
+
+### [CODE] Async Telegram Outbox Pattern
+
+- `invokeClaude()` (spawnSync) → `invokeClaudeAsync()` (spawn + SIGTERM guard) is a clean 1-file refactor in `.claude/tools/cli/telegram-claude-bridge.cjs`
+- Pattern: async spawn writes result atomically to `telegram-outbox.json`; `processOutbox()` delivers on next poll tick
+- Keep sync version for backward-compat and `resolveClaude` use; only the `handleAsk` path goes async
+- Fire-and-forget + immediate "Processing…" ACK keeps polling loop unblocked
+- Apply when any CLI tool needs to background Claude invocations
+
+### [CODE] InlineKeyboardMarkup Without grammy
+
+- Telegram `reply_markup` JSON works via raw HTTPS `sendMessage` with `JSON.stringify({ inline_keyboard: [...] })`
+- No grammy dependency needed for cron-polled scripts; saves runtime overhead
+- `callback_data` format: `cmd_{command}_{args}` (max 64 bytes — enforce byte-length in builder, not just string length)
+- `answerCallbackQuery(callbackQueryId)` is required by Telegram API (acknowledgment within 10s or warning shown to user)
+- Benchmarked against OpenClaw's `TelegramInlineButtons` pattern in `.claude.archive/.tmp/openclaw-main/src/telegram/`
+- Reference: `.claude/tools/cli/telegram-poll.cjs` (commit 4752d04a)
+
+### [WORKFLOW] Module Consolidation vs Plan — Pragmatic Deviation
+
+- Plan specified 3 new modules: `telegram-async-worker.cjs`, `telegram-keyboards.cjs`, `telegram-callback-handler.cjs`
+- Implementation consolidated into existing files: `telegram-claude-bridge.cjs` (async) and `telegram-poll.cjs` (keyboards + callbacks)
+- This is acceptable for a cron script with 621 LOC — separate modules add overhead without benefit at this scale
+- For Waves 3-5: voice handler and file handler SHOULD be separate modules (different concerns, testable independently)
+- Pattern: Planner creates modular designs; implementer consolidates when the total is under ~800 LOC. Document deviation in commit message.
+
+### [WORKFLOW] Plan File Staleness — Recurring Pattern
+
+- Executing agent committed Waves 1-2 but left ALL plan tasks marked `- [ ]` in `.claude/context/plans/telegram-ux-epic-plan-2026-03-16.md`
+- This is the 3rd recurrence across sessions (matches reflection rubric staleness check)
+- Root cause: agent marks TaskUpdate(completed) BEFORE updating plan file markers
+- Fix: plan file update (`[ ] → [x]`) must happen BEFORE `TaskUpdate(completed)` — see `.claude/rules/plan-file-update.md`
+- Systemic issue logged to issues.md
+
+---
+
 ## Mission Mode Governance Repair (2026-03-16) [Task #23]
 
 **Agent:** developer | **Status:** Completed
@@ -294,3 +333,10 @@ All 8 loops registered and verified. Heartbeat ecosystem is active for this sess
 **Commit**: e3ab739b | **File**: telegram-claude-bridge.cjs
 
 - Created new agent: task-manager (2026-03-16)
+
+## GSD Framework Deep Dive (2026-03-16)
+
+- Completed full analysis of get-shit-done framework vs agent-studio
+- Report at: .claude/context/reports/backend/gsd-deep-dive-2026-03-16.md
+- Key finding: 7 P0 features to adopt (goal-backward verification, deviation rules, per-task commits, analysis paralysis guard, checkpoint types, plan must_haves, CONTEXT.md)
+- GSD uses XML-structured plans, 3-level artifact verification, wave execution, autonomous mode with gap closure cycle

@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { safeParseJSON } = require('../utils/safe-json.cjs');
 
 const METRICS_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'metrics');
 
@@ -52,11 +53,13 @@ async function readMetrics(file, options = {}) {
   for await (const line of rl) {
     try {
       if (line.trim()) {
-        const metric = JSON.parse(line);
-        const metricTime = new Date(metric.timestamp).getTime();
+        const { success, data: metric } = safeParseJSON(line);
+        if (success) {
+          const metricTime = new Date(metric.timestamp).getTime();
 
-        if (metricTime >= cutoffTime) {
-          metrics.push(metric);
+          if (metricTime >= cutoffTime) {
+            metrics.push(metric);
+          }
         }
       }
     } catch (error) {
@@ -96,11 +99,15 @@ async function readMetricsWithStats(file, options = {}) {
     totalLines++;
     try {
       if (line.trim()) {
-        const metric = JSON.parse(line);
-        const metricTime = new Date(metric.timestamp).getTime();
+        const { success, data: metric } = safeParseJSON(line);
+        if (success) {
+          const metricTime = new Date(metric.timestamp).getTime();
 
-        if (metricTime >= cutoffTime) {
-          metrics.push(metric);
+          if (metricTime >= cutoffTime) {
+            metrics.push(metric);
+          }
+        } else {
+          parseErrors++;
         }
       }
     } catch (_error) {

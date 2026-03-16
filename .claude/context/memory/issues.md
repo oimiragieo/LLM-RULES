@@ -19,6 +19,25 @@
 
 ---
 
+## P2: Plan File Staleness — 3rd Recurrence (2026-03-16)
+
+**Issue**: Executing agent (nodejs-pro) committed Waves 1-2 of Telegram UX EPIC but left ALL plan tasks marked `- [ ]` in the plan file. This is the 3rd observed recurrence across sessions.
+**Root Cause**: Agent calls `TaskUpdate(completed)` BEFORE updating plan file markers. The plan-file-update.md rule states markers must be updated BEFORE TaskUpdate.
+**Impact**: Plan files become unreliable as progress indicators. Reflection agent must retroactively fix markers.
+**Fix**: Reinforce plan file update instruction in nodejs-pro spawn prompts. Consider adding a pre-completion hook that checks plan file staleness before allowing TaskUpdate(completed).
+**Status**: OPEN (systemic)
+
+---
+
+## P2: Wave 2 Commit Scope Drift (2026-03-16)
+
+**Issue**: Wave 2 commit (4752d04a) modified 9 files including agent-registry.json (1071+/- lines), rule-index.json, researcher.md, skill-index.json, user-prompt-orchestrator.cjs, and init SKILL.md. Only telegram-poll.cjs changes were wave-2-scoped.
+**Impact**: Commit is not atomic to the task. Side-effect changes make rollback risky and git history harder to follow.
+**Fix**: Enforce single-concern commits. Registry regeneration should be a separate chore commit.
+**Status**: OPEN
+
+---
+
 ## P1: Cleanup Findings — Systemic Slop Pattern
 
 **Issue**: Developer agent creates temp scripts in project root instead of `.claude/context/tmp/`. cleanup-always.md rules not enforced.

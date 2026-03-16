@@ -20,33 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
-
-const THRESHOLDS = [
-  {
-    tier: 180,
-    level: 'critical',
-    message: tokens =>
-      `CRITICAL [${tokens.toLocaleString()} / ~180K tokens]: Context is near the hard limit. ` +
-      `Run \`/session-handoff\` NOW to preserve session state and spawn a fresh session. ` +
-      `Continuing without a handoff risks losing work when the context window is exhausted.`,
-  },
-  {
-    tier: 160,
-    level: 'strong',
-    message: tokens =>
-      `WARNING [${tokens.toLocaleString()} / ~160K tokens]: Context is approaching the critical threshold. ` +
-      `Plan to initiate a session handoff soon. ` +
-      `Run \`/session-handoff\` before the next complex task to ensure continuity.`,
-  },
-  {
-    tier: 140,
-    level: 'advisory',
-    message: tokens =>
-      `ADVISORY [${tokens.toLocaleString()} / ~140K tokens]: Context window is 70% full. ` +
-      `Consider running \`/session-handoff\` after completing the current task. ` +
-      `This is an early warning — handoff is not urgent yet.`,
-  },
-];
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 function run() {
   try {
@@ -60,7 +34,7 @@ function run() {
     if (fs.existsSync(sessionIdPath)) {
       try {
         const raw = fs.readFileSync(sessionIdPath, 'utf8');
-        const parsed = JSON.parse(raw);
+        const parsed = safeParseJSON(raw, null);
         if (parsed && typeof parsed.sessionId === 'string') {
           sessionId = parsed.sessionId;
         }
@@ -79,7 +53,7 @@ function run() {
     let budgetData;
     try {
       const raw = fs.readFileSync(budgetPath, 'utf8');
-      budgetData = JSON.parse(raw);
+      budgetData = safeParseJSON(raw, null);
     } catch (_e) {
       // Malformed JSON — fail open
       console.log(JSON.stringify({ allow: true }));
@@ -99,9 +73,37 @@ function run() {
     }
 
     const totalTokens = sessionEntry.totalTokens;
+    const budget = sessionEntry.budget || 200000;
+
+    const THRESHOLDS = [
+      {
+        tierTarget: 0.9,
+        level: 'critical',
+        message: tokens =>
+          `CRITICAL [${tokens.toLocaleString()} / ~${Math.round(budget / 1000)}K tokens]: Context is near the hard limit. ` +
+          `Run \`/session-handoff\` NOW to preserve session state and spawn a fresh session. ` +
+          `Continuing without a handoff risks losing work when the context window is exhausted.`,
+      },
+      {
+        tierTarget: 0.8,
+        level: 'strong',
+        message: tokens =>
+          `WARNING [${tokens.toLocaleString()} / ~${Math.round(budget / 1000)}K tokens]: Context is approaching the critical threshold. ` +
+          `Plan to initiate a session handoff soon. ` +
+          `Run \`/session-handoff\` before the next complex task to ensure continuity.`,
+      },
+      {
+        tierTarget: 0.7,
+        level: 'advisory',
+        message: tokens =>
+          `ADVISORY [${tokens.toLocaleString()} / ~${Math.round(budget / 1000)}K tokens]: Context window is 70% full. ` +
+          `Consider running \`/session-handoff\` after completing the current task. ` +
+          `This is an early warning — handoff is not urgent yet.`,
+      },
+    ];
 
     // Find the highest tier that applies (THRESHOLDS is ordered highest-to-lowest)
-    const applicableTier = THRESHOLDS.find(t => totalTokens >= t.tier * 1000);
+    const applicableTier = THRESHOLDS.find(t => totalTokens >= budget * t.tierTarget);
 
     if (!applicableTier) {
       // Below all thresholds — allow with no message
@@ -112,7 +114,7 @@ function run() {
     // Check if sentinel already exists for this specific tier
     const sentinelPath = path.join(
       runtimeDir,
-      `session-handoff-reminder-${applicableTier.tier}K.txt`
+      `session-handoff-reminder-${applicableTier.level}.txt`
     );
 
     if (fs.existsSync(sentinelPath)) {
