@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-16T00:13:25.170Z",
+  "generatedAt": "2026-03-16T00:44:38.592Z",
   "metadata": {
-    "totalSkills": 302,
+    "totalSkills": 303,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-16T00:13:25.171Z",
+    "lastValidated": "2026-03-16T00:44:38.593Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7209,6 +7209,31 @@
       "priority": 3,
       "aliasOf": null
     },
+    "cron-decision": {
+      "name": "cron-decision",
+      "displayName": "Cron Decision",
+      "category": "Other",
+      "domain": "other",
+      "description": "Decision framework for agents to determine WHEN and WHETHER to use Claude Code's native cron scheduler (CronCreate/CronList/CronDelete) vs OS cron, GitHub Actions, or simple Task() delegation.",
+      "requiredTools": [
+        "CronCreate",
+        "CronList",
+        "CronDelete",
+        "TaskCreate",
+        "Read",
+        "Bash"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "cron-decision"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "cron-runner": {
       "name": "cron-runner",
       "displayName": "Cron Runner",
@@ -8268,6 +8293,7 @@
         "cloud-run",
         "cloudflare-workers",
         "code-graph-context",
+        "cron-decision",
         "cron-runner",
         "deep-research",
         "design-systems",
@@ -8676,6 +8702,7 @@
         "cloud-run",
         "cloudflare-workers",
         "code-graph-context",
+        "cron-decision",
         "cron-runner",
         "deep-research",
         "design-systems",
@@ -9066,6 +9093,7 @@
         "cloud-run",
         "cloudflare-workers",
         "code-graph-context",
+        "cron-decision",
         "cron-runner",
         "deep-research",
         "design-systems",
@@ -9709,6 +9737,7 @@
         "claude-api",
         "cloud-run",
         "cloudflare-workers",
+        "cron-decision",
         "deep-research",
         "electron-pro",
         "exa-monitor",
@@ -10091,6 +10120,7 @@
       ],
       "TaskCreate": [
         "task-management-protocol",
+        "cron-decision",
         "heartbeat",
         "scheduled-tasks",
         "telegram-polling"
@@ -10123,18 +10153,21 @@
       ],
       "CronCreate": [
         "arxiv-monitor",
+        "cron-decision",
         "exa-monitor",
         "heartbeat",
         "scheduled-tasks"
       ],
       "CronList": [
         "arxiv-monitor",
+        "cron-decision",
         "exa-monitor",
         "heartbeat",
         "scheduled-tasks"
       ],
       "CronDelete": [
         "arxiv-monitor",
+        "cron-decision",
         "exa-monitor",
         "heartbeat",
         "scheduled-tasks"
@@ -10321,6 +10354,7 @@
         "cloud-run",
         "cloudflare-workers",
         "code-graph-context",
+        "cron-decision",
         "cron-runner",
         "deep-research",
         "design-systems",
@@ -11624,6 +11658,7 @@
         "cloud-run",
         "cloudflare-workers",
         "code-graph-context",
+        "cron-decision",
         "cron-runner",
         "deep-research",
         "design-systems",

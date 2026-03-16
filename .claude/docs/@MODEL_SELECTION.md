@@ -29,6 +29,47 @@ Guidelines for selecting the appropriate Claude model (haiku, sonnet, opus) when
 
 **Note:** This file is the canonical reference for model resolution logic. CLAUDE.md Section 5 contains only a summary pointer to this document. All code examples and precedence details live here.
 
+---
+
+## CONTEXT WINDOW SIZES (2026)
+
+| Model                       | Shorthand | Context Window        | Notes                                              |
+| --------------------------- | --------- | --------------------- | -------------------------------------------------- |
+| `claude-opus-4-6`           | `opus`    | 1,000,000 tokens (1M) | Full 1M context; ideal for large-codebase analysis |
+| `claude-sonnet-4-6`         | `sonnet`  | 200,000 tokens (200K) | Standard max membership; sufficient for most tasks |
+| `claude-haiku-4-5-20251001` | `haiku`   | 200,000 tokens (200K) | Lightweight tasks only                             |
+
+> **Note:** A 1M-context Sonnet variant exists but is API/max-membership tier only and is not the standard deployment. Use `opus` when 1M context is required.
+
+### Large-Context Routing Guidance
+
+**Prefer Opus (1M window) for:**
+
+- Analysis of very large codebases (>150K tokens of source)
+- Long document processing (legal, architecture specs, large logs)
+- Ingesting large context before synthesis or summarization
+- Tasks where the executing agent might need >150K tokens in its working context
+
+**Sonnet (200K) is sufficient for:**
+
+- Standard development tasks, code review, and most feature work
+- Documents and codebases that fit within 150K tokens
+- The majority (80%+) of agent spawns
+
+**Planner guidance:** When decomposing tasks that involve large context loads (>150K tokens), the planner should explicitly recommend `opus` model for the executing agent in its plan output.
+
+**Spawn guidance:** If a spawned agent might need >150K context tokens to complete its work, set `model: 'opus'` explicitly in the `Task()` call:
+
+```javascript
+// Agent needs to analyze a large codebase section — use opus
+Task({
+  task_id: 'task-5',
+  subagent_type: 'developer',
+  model: 'opus', // Explicit override: large context load expected
+  prompt: `Analyze the full authentication subsystem across 50+ files...`,
+});
+```
+
 ### How Router Reads Agent Models
 
 ```javascript
@@ -144,11 +185,11 @@ const COMPLEXITY_DEFAULTS = {
 
 Both shorthand and full IDs are supported:
 
-| Shorthand | Full Model ID              |
-| --------- | -------------------------- |
-| `opus`    | `claude-opus-4-5-20251101` |
-| `sonnet`  | `claude-sonnet-4-5`        |
-| `haiku`   | `claude-haiku-4-5`         |
+| Shorthand | Full Model ID               | Context Window |
+| --------- | --------------------------- | -------------- |
+| `opus`    | `claude-opus-4-6`           | 1M tokens      |
+| `sonnet`  | `claude-sonnet-4-6`         | 200K tokens    |
+| `haiku`   | `claude-haiku-4-5-20251001` | 200K tokens    |
 
 ```javascript
 const { normalizeModel, getShorthand } = require('.claude/lib/utils/agent-config-reader.cjs');

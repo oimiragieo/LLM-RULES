@@ -1,6 +1,6 @@
 ---
 name: scheduled-tasks
-version: 1.0.0
+version: 1.1.0
 description: Schedule recurring tasks and heartbeat monitoring using Claude Code's cron system (CronCreate/CronList/CronDelete). Implements the Agentic Heartbeat Pattern for ecosystem health monitoring.
 category: infrastructure
 trigger: when user wants recurring tasks, scheduled maintenance, heartbeat monitoring, periodic health checks, cron jobs
@@ -16,6 +16,8 @@ verified: true
 ---
 
 # Scheduled Tasks & Heartbeat Skill
+
+**Official docs:** <https://code.claude.com/docs/en/scheduled-tasks>
 
 ## Primary Interface: /loop Slash Command
 
@@ -118,6 +120,63 @@ Provides patterns for scheduling recurring tasks using Claude Code's built-in cr
 
 - **Cron tasks**: "Run this SPECIFIC task at 3am Tuesday" — deterministic, time-anchored maintenance
 - **Heartbeat**: "Check in periodically; act IF something needs attention" — awareness-based, conditional liveness
+
+## Decision Framework: When to Use Cron
+
+### Quick Decision Checklist (run through before calling CronCreate)
+
+1. **Is the task recurring?** If NO → use `TaskCreate` instead (cron is for recurring work only).
+2. **Can it tolerate up to 15-minute jitter?** If NO → use OS cron or GitHub Actions (CronCreate has built-in jitter).
+3. **Is it acceptable to lose it on terminal close?** If NO → use OS cron (`crontab -e`) or GitHub Actions for persistence.
+4. **Will it complete within the session?** If the session may end before the task fires → prefer OS-level scheduling.
+5. **Is it for monitoring/health checks?** If YES → CronCreate is the right tool (this is its primary use case).
+6. **Are there 10+ other cron tasks already scheduled?** If YES → reconsider; stay under 10 concurrent tasks (50-cap headroom).
+
+### Decision Tree
+
+```
+Need a recurring task?
+├── NO → Use TaskCreate (one-shot) or Task()
+└── YES
+    ├── Must survive terminal close?
+    │   ├── YES → Use OS cron (crontab -e) or GitHub Actions
+    │   └── NO (session-scoped is fine)
+    │       ├── Time-critical (< 15 min precision required)?
+    │       │   ├── YES → Use OS cron or GitHub Actions
+    │       │   └── NO → CronCreate is appropriate ✓
+    │       └── Is it monitoring/heartbeat?
+    │           └── YES → CronCreate is ideal ✓
+```
+
+### When to Use CronCreate
+
+- Session-scoped heartbeat monitoring (agent health, memory sizes, stuck tasks)
+- Periodic index rebuilds during an active work session
+- Scheduled memory rotation checks while actively developing
+- Auto-reschedule tasks that keep other cron tasks alive
+- Morning briefings and context-drain checks during sessions
+
+### When to Use OS Cron / GitHub Actions Instead
+
+- Tasks that must run even when Claude Code is not open
+- Production scheduled jobs (backups, deployments, data pipelines)
+- Tasks requiring sub-minute precision or hard time guarantees
+- Any task where silent expiry (3-day limit) is unacceptable
+
+### When NOT to Use CronCreate
+
+- One-time tasks (use `Task` or `TaskCreate`)
+- Tasks triggered by events rather than time (use hooks or event listeners)
+- Tasks requiring external system persistence across Claude restarts
+- Time-critical alerts where 15-minute jitter is unacceptable
+
+### Session-Scope Context Note
+
+> **CRITICAL — Session-Scoped Loops:** All `CronCreate` loops are registered to the current Claude Code session and are permanently lost when the session ends (terminal close, `/clear`, or session restart). After any session restart, all loops must be re-registered manually.
+>
+> **heartbeat-orchestrator handles this automatically.** When the heartbeat ecosystem is running, `heartbeat-orchestrator` is responsible for detecting missing loops after session restarts and re-registering them. If you are not using `heartbeat-orchestrator`, you must re-register all loops yourself at the start of each new session.
+>
+> To check which loops are active: `CronList()`. If loops are missing after a restart, re-run the setup commands or invoke `/heartbeat-start`.
 
 ## Quick Reference
 
