@@ -130,6 +130,9 @@ function injectSections(basePrompt, sections) {
   // SEMI-STATIC RAG (Medium tier)
   if (sections.memorySection) parts.push(sections.memorySection);
 
+  // PROJECT CONTEXT (after memory, before behaviour)
+  if (sections.projectContextSection) parts.push(sections.projectContextSection);
+
   // SEMI-STATIC CONSTITUTION/BEHAVIOUR
   if (sections.behaviourSection) parts.push(sections.behaviourSection);
 

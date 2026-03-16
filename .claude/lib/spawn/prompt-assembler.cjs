@@ -56,6 +56,7 @@ const {
   loadBehaviourRules,
   formatBehaviourSection,
 } = require('./prompt-assembler-agent.cjs');
+const { loadProjectContext } = require('./prompt-assembler-context.cjs');
 
 const DEFAULT_SKILL_SECTION_MODE = 'full';
 
@@ -193,12 +194,15 @@ function assembleSpawnPrompt({
     memorySection = appendOpenFindings(resolveMemorySection(projectRoot), projectRoot);
   }
 
+  const projectContext = loadProjectContext({ projectRoot });
+
   const behaviourSection = formatBehaviourSection(loadBehaviourRules(projectRoot));
   const mergedBasePrompt = buildBasePrompt(basePrompt, agentType, presetId, projectRoot);
 
   const enhancedPrompt = injectSections(mergedBasePrompt, {
     ...promptSections,
     memorySection,
+    projectContextSection: projectContext || '',
     behaviourSection,
   });
 
@@ -265,12 +269,15 @@ async function assembleSpawnPromptAsync(options = {}) {
     memorySection = appendOpenFindings(memorySection, projectRoot);
   }
 
+  const projectContext = loadProjectContext({ projectRoot });
+
   const behaviourSection = formatBehaviourSection(loadBehaviourRules(projectRoot));
   const mergedBasePrompt = buildBasePrompt(basePrompt, agentType, presetId, projectRoot);
 
   const enhancedPrompt = injectSections(mergedBasePrompt, {
     ...promptSections,
     memorySection,
+    projectContextSection: projectContext || '',
     behaviourSection,
   });
 

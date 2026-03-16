@@ -302,7 +302,8 @@ function detectWorktreeMutation(command) {
   if (!command || typeof command !== 'string') return null;
 
   // Block `git worktree remove/prune/add` (but allow `list`)
-  const dangerousGitWorktreePattern = /\bgit\s+worktree\s+(remove|prune|add)\b/i;
+  // Using global flag to catch chained commands, e.g., `cmd || git worktree prune`
+  const dangerousGitWorktreePattern = /\bgit\s+worktree\s+(?:remove|prune|add)\b/gi;
   if (dangerousGitWorktreePattern.test(command)) {
     return (
       'BLOCKED: Agents are strictly prohibited from manually mutating git worktrees (`git worktree remove/prune/add`). ' +

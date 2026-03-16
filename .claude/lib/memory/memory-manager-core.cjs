@@ -18,6 +18,7 @@ const { createLogger } = require('../utils/logger.cjs');
 const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
 const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { enhanceRecall } = require('./adaptive-recall.cjs');
 
 const logger = createLogger('memory-manager');
 const asyncWriteQueue = new Map();
@@ -411,7 +412,8 @@ async function _callContextualMemory(method, args) {
 }
 
 async function searchMemory(query, options = {}) {
-  return _callContextualMemory('search', [query, options]);
+  const results = await _callContextualMemory('search', [query, options]);
+  return enhanceRecall(query, results);
 }
 
 async function findEntities(type, filters = {}) {

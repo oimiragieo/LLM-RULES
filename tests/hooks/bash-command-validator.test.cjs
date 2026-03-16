@@ -317,6 +317,11 @@ test('detectWorktreeMutation blocks git worktree prune', () => {
   assertTrue(Boolean(reason), 'Should block git worktree prune');
 });
 
+test('detectWorktreeMutation blocks chained git worktree commands bypassing early exits', () => {
+  const reason = detectWorktreeMutation('git worktree remove .claude/worktrees/agent-aa5c8f72 --force 2>&1 || echo "skip"; git worktree prune');
+  assertTrue(Boolean(reason), 'Should block chained git worktree commands');
+});
+
 test('detectWorktreeMutation blocks git worktree add', () => {
   const reason = detectWorktreeMutation('git worktree add .claude/worktrees/agent-new');
   assertTrue(Boolean(reason), 'Should block git worktree add');

@@ -7,6 +7,7 @@ const { DEFAULT_AREA } = require('./memory-areas.cjs');
 const { recordMemoryOperation } = require('./memory-slo-metrics.cjs');
 const { sanitizeMemoryContent } = require('./memory-sanitizer.cjs');
 const { safeParseJSON } = require('../utils/safe-json.cjs');
+const { scoreImportance } = require('./importance-scorer.cjs');
 
 function tokenize(text) {
   return String(text || '')
@@ -176,6 +177,13 @@ function createRecordingOps({
             value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
             source: 'memory-manager.recordGotcha',
           });
+          process.nextTick(() => {
+            try {
+              scoreImportance(entry.text || '', entry.area);
+            } catch (_e) {
+              // Never crash on importance scoring failure
+            }
+          });
         }
 
         return !isDuplicate;
@@ -306,6 +314,13 @@ function createRecordingOps({
             key: `patterns:${entry.id}`,
             value: { id: entry.id, area: entry.area, timestamp: entry.timestamp },
             source: 'memory-manager.recordPattern',
+          });
+          process.nextTick(() => {
+            try {
+              scoreImportance(entry.text || '', entry.area);
+            } catch (_e) {
+              // Never crash on importance scoring failure
+            }
           });
         }
 
