@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Must-Haves Verification Schema",
+  "description": "Goal-backward verification criteria for planner output",
+  "type": "object",
+  "properties": {
+    "truths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Boolean conditions that must be true (e.g., 'all tests pass')"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Files/artifacts that must exist (e.g., 'tests/auth.test.cjs')"
+    },
+    "key_links": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Integration points that must be wired (e.g., 'hook registered in settings.json')"
+    }
+  },
+  "required": ["truths", "artifacts"]
+}

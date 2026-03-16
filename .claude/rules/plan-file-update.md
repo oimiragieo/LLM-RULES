@@ -46,6 +46,36 @@ new: - [x] Implement feature X — done: added Y, modified Z
 | `- [~]` | In progress |
 | `- [x]` | Done        |
 
+## Execution Context Snapshot
+
+When completing a step in a multi-step workflow, agents SHOULD write a snapshot to the plan file's frontmatter or a companion `.snapshot.json` file:
+
+- `steps_completed`: Array of completed step identifiers
+- `last_task_metadata`: Key findings and decisions from the last completed step
+- `key_findings`: Important discoveries that inform subsequent steps
+
+Schema: `.claude/schemas/workflow-snapshot.schema.json`
+
+This enables workflow resumption after context loss or session interruption.
+
+**Example snapshot file** (`.claude/context/plans/my-plan.snapshot.json`):
+
+```json
+{
+  "workflow_id": "my-plan-2026-03-16",
+  "current_step": 3,
+  "total_steps": 7,
+  "steps_completed": ["M1", "M2", "M3"],
+  "last_task_metadata": {
+    "agent": "developer",
+    "filesModified": ["src/auth/jwt.ts"]
+  },
+  "key_findings": ["JWT library supports RS256", "Redis required for token blocklist"],
+  "timestamp": "2026-03-16T10:00:00Z",
+  "resumable": true
+}
+```
+
 ## Anti-Patterns (NEVER)
 
 - Never leave plan file updates to the router — the router updates plan files only as a fallback, not as the primary mechanism.

@@ -441,6 +441,36 @@ Instead: `pnpm search:code "router."` → read top 10 → ask if more needed
 
 Always produce a structured plan in markdown format, saved to `.claude/context/plans/`.
 
+### must_haves Block (MANDATORY)
+
+Every plan MUST include a `must_haves` block at the end with goal-backward verification:
+- **truths**: Boolean assertions that must hold when done (e.g., "all tests pass", "no lint errors")
+- **artifacts**: Files that must exist when done (e.g., "tests/feature.test.cjs")
+- **key_links**: Integration wiring that must be verified (e.g., "hook registered in settings.json")
+
+Schema: `.claude/schemas/must-haves.schema.json`
+
+The `must_haves` block is verified by the qa agent before marking any plan as complete.
+
+**Example must_haves block:**
+
+```markdown
+## must_haves
+
+### truths
+- All tests pass (`pnpm test` exits 0)
+- No lint errors (`pnpm lint:fix` produces no output)
+- No format changes (`pnpm format` produces no diff)
+
+### artifacts
+- `tests/feature.test.cjs` — regression tests for new behavior
+- `.claude/schemas/feature.schema.json` — schema for new data structure
+
+### key_links
+- Hook registered in `.claude/settings.json` under correct event
+- Agent added to `.claude/context/agent-registry.json`
+```
+
 ### Plan Template Structure
 
 Every plan MUST follow this structure with Phase 0 as the mandatory first phase:
