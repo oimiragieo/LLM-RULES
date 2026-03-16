@@ -1091,3 +1091,24 @@ Invoke token-saver when ANY of these conditions hold:
 
 - You need to synthesize across many search hits
 - Retrieved snippets/logs are too large to keep directly in working context
+
+### Token Budget Estimation (MANDATORY)
+
+Every microtask MUST include an `estimated_tokens` field:
+
+- Count files to read × average file size (assume 200 lines = ~4K tokens per file)
+- Add output size estimate (report: ~2K tokens, code: ~1K per file modified)
+- Add base overhead: ~20K tokens (system prompt + rules + memory injection)
+
+**Hard limits:**
+
+- Any task estimated >80K tokens MUST be split into sub-tasks
+- Max 15 file reads per agent task
+- Max 5 large files (>200 lines) per task
+- Analysis tasks: instruct agents to "write incrementally after reading 5-7 files"
+
+**Token estimation formula:**
+`estimated_tokens = (files_to_read × 4000) + (output_size × 1000) + 20000`
+
+Example: Task reads 10 files and writes a report = (10 × 4000) + (1 × 2000) + 20000 = 62K ✓
+Example: Task reads 25 files and writes analysis = (25 × 4000) + (1 × 2000) + 20000 = 122K ✗ SPLIT IT
