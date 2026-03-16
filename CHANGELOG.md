@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `task-manager` agent (haiku): post-pipeline task hygiene — closes stale tasks, audits 9 framework health invariants, creates fix tasks for CRITICAL/HIGH violations, produces structured health reports
+- Router drain gate Step 2.5: conditional task-manager spawn for HIGH/EPIC pipelines when stale task signals detected
 - `cron-decision` skill: decision framework for when/whether to use Claude's native cron scheduler vs alternatives (one-off tasks, manual triggers, external schedulers)
 - `scheduled-tasks` skill v1.1.0: added decision framework, official URL (https://code.claude.com/docs/en/scheduled-tasks), session-scope context note
 - `@MODEL_SELECTION.md`: context window sizes table (Opus 4.6 = 1M tokens, Sonnet 4.6 = 200K tokens) and large-context routing guidance (>150K tokens → use opus)

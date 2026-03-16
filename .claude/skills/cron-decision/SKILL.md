@@ -54,20 +54,20 @@ Answer these 5 questions in order. The FIRST "yes" that hits a stop condition de
 
 ## Decision Matrix
 
-| Scenario | Recommended Tool | Reason |
-|---|---|---|
-| Periodic background monitoring during active session | `CronCreate` | Session-scoped is fine; this is CronCreate's primary use case |
-| Agent ecosystem heartbeat (health checks, memory sizes) | `CronCreate` via `heartbeat-orchestrator` | Use dedicated orchestrator, not raw CronCreate |
-| One-time task (now or delayed) | `Task()` or `TaskCreate` | Cron is for recurring work only |
-| Nightly backup or data pipeline | **OS cron** (`crontab -e`) | Must survive terminal close |
-| CI/CD pipeline trigger | **GitHub Actions** `schedule:` | Cloud-run, no terminal dependency |
-| Data refresh every 4 hours during development | `CronCreate` | Session-scoped is acceptable for dev workflows |
-| Production scheduled job | **OS cron** or **GitHub Actions** | Never rely on session-scoped for production |
-| Event-driven reaction (file change, hook trigger) | **Hook** (PreToolUse/PostToolUse) | Time-based scheduler is wrong tool for events |
-| User-requested one-off analysis | `Task()` | Single execution, no recurrence needed |
-| Weekly report generation (must run unattended) | **GitHub Actions** | Unattended, cloud-run, persistent |
-| Session index rebuild during development | `CronCreate` | Session-scoped is fine; fires while Claude is open |
-| Reflection queue drain check | `CronCreate` via `heartbeat-orchestrator` | Part of heartbeat ecosystem |
+| Scenario                                                | Recommended Tool                          | Reason                                                        |
+| ------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------- |
+| Periodic background monitoring during active session    | `CronCreate`                              | Session-scoped is fine; this is CronCreate's primary use case |
+| Agent ecosystem heartbeat (health checks, memory sizes) | `CronCreate` via `heartbeat-orchestrator` | Use dedicated orchestrator, not raw CronCreate                |
+| One-time task (now or delayed)                          | `Task()` or `TaskCreate`                  | Cron is for recurring work only                               |
+| Nightly backup or data pipeline                         | **OS cron** (`crontab -e`)                | Must survive terminal close                                   |
+| CI/CD pipeline trigger                                  | **GitHub Actions** `schedule:`            | Cloud-run, no terminal dependency                             |
+| Data refresh every 4 hours during development           | `CronCreate`                              | Session-scoped is acceptable for dev workflows                |
+| Production scheduled job                                | **OS cron** or **GitHub Actions**         | Never rely on session-scoped for production                   |
+| Event-driven reaction (file change, hook trigger)       | **Hook** (PreToolUse/PostToolUse)         | Time-based scheduler is wrong tool for events                 |
+| User-requested one-off analysis                         | `Task()`                                  | Single execution, no recurrence needed                        |
+| Weekly report generation (must run unattended)          | **GitHub Actions**                        | Unattended, cloud-run, persistent                             |
+| Session index rebuild during development                | `CronCreate`                              | Session-scoped is fine; fires while Claude is open            |
+| Reflection queue drain check                            | `CronCreate` via `heartbeat-orchestrator` | Part of heartbeat ecosystem                                   |
 
 ---
 
@@ -102,15 +102,15 @@ The `heartbeat-orchestrator` manages:
 
 ## CronCreate Constraints (Critical Before Using)
 
-| Constraint | Detail |
-|---|---|
-| **Session-scoped** | Dies when terminal closes — no persistence across restarts |
-| **3-day auto-expiry** | Self-deletes silently after 3 days (reschedule before day 2.5) |
-| **Jitter** | Fires up to 10% of period late (max 15 min) |
-| **No catch-up** | Missed fires are NOT replayed |
-| **50-task cap** | Max 50 concurrent scheduled tasks per session |
-| **Fire-between-turns** | Fires only when Claude is idle, not mid-response |
-| **No extended syntax** | `L`, `W`, `?`, `MON`-style names are NOT supported |
+| Constraint             | Detail                                                         |
+| ---------------------- | -------------------------------------------------------------- |
+| **Session-scoped**     | Dies when terminal closes — no persistence across restarts     |
+| **3-day auto-expiry**  | Self-deletes silently after 3 days (reschedule before day 2.5) |
+| **Jitter**             | Fires up to 10% of period late (max 15 min)                    |
+| **No catch-up**        | Missed fires are NOT replayed                                  |
+| **50-task cap**        | Max 50 concurrent scheduled tasks per session                  |
+| **Fire-between-turns** | Fires only when Claude is idle, not mid-response               |
+| **No extended syntax** | `L`, `W`, `?`, `MON`-style names are NOT supported             |
 
 ---
 
@@ -162,13 +162,13 @@ CronDelete({ id: 'abc12345' });
 
 **Common schedules:**
 
-| Expression | Meaning |
-|---|---|
-| `*/30 * * * *` | Every 30 minutes |
-| `*/5 * * * *` | Every 5 minutes (minimum recommended) |
-| `0 * * * *` | Every hour on the hour |
-| `0 2 * * *` | Every day at 2am local time |
-| `0 3 * * 0` | Every Sunday at 3am |
+| Expression     | Meaning                               |
+| -------------- | ------------------------------------- |
+| `*/30 * * * *` | Every 30 minutes                      |
+| `*/5 * * * *`  | Every 5 minutes (minimum recommended) |
+| `0 * * * *`    | Every hour on the hour                |
+| `0 2 * * *`    | Every day at 2am local time           |
+| `0 3 * * 0`    | Every Sunday at 3am                   |
 
 ---
 

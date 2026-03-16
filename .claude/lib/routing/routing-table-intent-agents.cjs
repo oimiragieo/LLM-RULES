@@ -175,6 +175,7 @@ const INTENT_TO_AGENT = {
   // Heartbeat / cron orchestration intent
   heartbeat: 'heartbeat-orchestrator',
   'ecosystem-auditor': 'ecosystem-auditor',
+  'task-manager': 'task-manager',
 };
 
 module.exports = { INTENT_TO_AGENT };

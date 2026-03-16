@@ -60,7 +60,10 @@ describe('heartbeat-step05-check hook', () => {
 
     const { stdout, stderr, status } = runHook({ tool_name: 'TaskList', tool_input: {} });
     assert.equal(status, 0, 'hook must exit 0 (advisory)');
-    assert.ok(stdout.includes('"allow":true'), `stdout must contain {"allow":true}, got: ${stdout}`);
+    assert.ok(
+      stdout.includes('"allow":true'),
+      `stdout must contain {"allow":true}, got: ${stdout}`
+    );
     assert.equal(stderr, '', 'no stderr warning expected for valid ping');
   });
 
@@ -70,8 +73,14 @@ describe('heartbeat-step05-check hook', () => {
 
     const { stdout, stderr, status } = runHook({ tool_name: 'TaskList', tool_input: {} });
     assert.equal(status, 0, 'hook must exit 0 even when ping missing');
-    assert.ok(stdout.includes('"allow":true'), `stdout must contain {"allow":true}, got: ${stdout}`);
-    assert.ok(stderr.includes('[Step 0.5]'), `stderr should warn about missing ping, got: ${stderr}`);
+    assert.ok(
+      stdout.includes('"allow":true'),
+      `stdout must contain {"allow":true}, got: ${stdout}`
+    );
+    assert.ok(
+      stderr.includes('[Step 0.5]'),
+      `stderr should warn about missing ping, got: ${stderr}`
+    );
   });
 
   it('exits 0 and warns on stderr when ping is expired', () => {
@@ -88,7 +97,10 @@ describe('heartbeat-step05-check hook', () => {
 
     const { stdout, stderr, status } = runHook({ tool_name: 'TaskList', tool_input: {} });
     assert.equal(status, 0, 'hook must exit 0 even for expired ping');
-    assert.ok(stdout.includes('"allow":true'), `stdout must contain {"allow":true}, got: ${stdout}`);
+    assert.ok(
+      stdout.includes('"allow":true'),
+      `stdout must contain {"allow":true}, got: ${stdout}`
+    );
     assert.ok(
       stderr.includes('[Step 0.5]'),
       `stderr should warn about expired ping, got: ${stderr}`

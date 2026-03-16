@@ -1,3 +1,17 @@
+## Model Selection Context Window Guidance (2026-03-16) [Task #21]
+
+**Pattern: Large-context routing threshold for opus model selection**
+
+- Opus (1M context) is appropriate when executing agent may need >150K tokens in working context
+- Concrete use cases: analysis of very large codebases (>150K source tokens), long document processing, ingestion-before-synthesis tasks
+- Planner agents should explicitly recommend `model: 'opus'` in plan output when decomposing such tasks
+- Router should set `model: 'opus'` explicitly in Task() call — do not rely on defaults for large-context loads
+- Cross-reference: CLAUDE.md Section 8 memory budget thresholds (80K/120K/150K tokens) align with this guidance
+
+**Issue to watch**: @MODEL_SELECTION.md now has two sets of model IDs — 4-6 IDs in Context Window table vs 4-5 IDs in Agent Config Examples. Verify `normalizeModel()` in agent-config-reader.cjs handles both.
+
+---
+
 ## TDD/LSP Gap Analysis (2026-03-12) [Task #3]
 
 **Findings: TDD skill v1.2.0 is substantively current with 2026 standards (updated 2026-03-11)**
@@ -263,3 +277,5 @@ All 8 loops registered and verified. Heartbeat ecosystem is active for this sess
 **Application**: Any background service (Telegram bot, cron job, webhook handler) that spawns `claude` must resolve the binary path dynamically and unset `CLAUDECODE`.
 
 **Commit**: e3ab739b | **File**: telegram-claude-bridge.cjs
+
+- Created new agent: task-manager (2026-03-16)

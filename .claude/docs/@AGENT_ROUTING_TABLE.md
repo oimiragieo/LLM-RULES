@@ -29,6 +29,7 @@ Router MUST check this table before defaulting to developer. Developer is ALWAYS
 | "audit / security review / pentest"                 | developer  | **security-architect**                |
 | "refactor / clean up / simplify"                    | developer  | **code-simplifier**                   |
 | "medical / symptoms / diagnosis / drug interaction" | researcher | **medical-research-triage**           |
+| "task audit" / "clean up stale tasks"               | developer  | **task-manager**                      |
 
 ---
 
@@ -107,6 +108,7 @@ Complete agent routing matrix mapping request types to agent definitions across 
 | Heartbeat ecosystem management       | `heartbeat-orchestrator`     | `.claude/agents/orchestrators/heartbeat-orchestrator.md` |
 | Context compression                  | `context-compressor`         | `.claude/agents/core/context-compressor.md`              |
 | System routing                       | `router`                     | `.claude/CLAUDE.md` (Meta)                               |
+| Task hygiene / stale task audit      | `task-manager`               | `.claude/agents/specialized/task-manager.md`             |
 
 **Agent Categories:**
 

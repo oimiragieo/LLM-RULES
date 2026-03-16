@@ -643,6 +643,16 @@ const INTENT_KEYWORDS = {
     'uses',
     'structure',
   ],
+  'task-manager': [
+    'task-manager',
+    'task hygiene',
+    'task audit',
+    'stale tasks',
+    'task cleanup',
+    'framework health check',
+    'task compliance',
+    'pipeline hygiene',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.

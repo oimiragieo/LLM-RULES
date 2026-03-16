@@ -309,6 +309,10 @@ const ROUTING_TABLE = {
   clarify: 'general-assistant',
   overview: 'general-assistant',
 
+  // Task Management
+  'task-hygiene': 'task-manager',
+  'task-audit': 'task-manager',
+
   // Ecosystem Evolution
   audit: 'ecosystem-auditor',
   auditor: 'ecosystem-auditor',

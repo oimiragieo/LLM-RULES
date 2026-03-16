@@ -66,6 +66,7 @@ export const ROUTING_TABLE_AGENT_NAMES = [
   'multi-llm-consultant',
   'general-assistant',
   'ecosystem-auditor',
+  'task-manager',
 ];
 
 export const INTENT_TO_AGENT_NAMES = [

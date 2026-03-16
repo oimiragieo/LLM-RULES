@@ -308,6 +308,11 @@ Before claiming "pipeline complete", execute all three drain-gate checks in orde
 
 1. **Task drain**: Call `TaskList()` — confirm zero tasks remain in `in_progress`, `pending`, or `blocked`. If any remain, report those task IDs and continue orchestration.
 2. **Reflection queue**: Read `.claude/context/runtime/reflection-spawn-request.json` — if any entries exist with `status: "pending"` (or no status field), spawn reflection-agent instances for each BEFORE writing the completion deliverable.
+   2.5. **Task hygiene** (HIGH/EPIC pipelines or stale signals): After reflection queue check, spawn `task-manager` (haiku) when ANY of the following are true:
+   - `stale-tasks.json` had entries Step 0.4 could not auto-close
+   - `TaskList()` shows tasks remaining `in_progress` after all spawned agents returned
+   - Session gap-log has >3 entries of type `stale-task` or `hook-warning` in this session
+   - User explicitly requested "task audit" or "framework health check"
 3. **Claim completion**: Only after steps 1 and 2 both pass, write the completion summary.
 
 Never claim completion with open tasks or unprocessed reflections.
@@ -336,6 +341,7 @@ Never claim completion with open tasks or unprocessed reflections.
 | External research / web investigation     | `researcher`             |
 | Memory leak / profiling / root cause      | `advanced-debugging`     |
 | Heartbeat loops / cron ecosystem mgmt     | `heartbeat-orchestrator` |
+| Task hygiene / stale task audit           | `task-manager`           |
 
 Full table and new agent entries: **@AGENT_ROUTING_TABLE.md** (canonical source for routing).
 **Source of Truth:** `.claude/lib/routing/routing-table.cjs`

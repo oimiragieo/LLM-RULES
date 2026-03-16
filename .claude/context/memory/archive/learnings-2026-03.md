@@ -527,3 +527,107 @@ Pattern identified: Agent scope control failures + incomplete task metadata acro
 ## Skill Updated: omega-gemini-cli (2026-02-24)
 
 - Skill `omega-gemini-cli` was reviewed and updated by the skill-updater pipeline.
+
+---
+
+## TDD 2026 Industry Research (2026-03-11) [Task #4]
+
+**Multi-agent TDD is the 2025-2026 standard (TDFlow 94.3% SWE-Bench Verified):**
+
+- 4-sub-agent decomposition: propose → debug → revise → generate-test outperforms monolithic single-agent loops
+- Test writing (not code generation) is the primary bottleneck for AI TDD
+- Pattern: QA writes test + commits, developer implements without touching test file, reflection verifies no test hacking
+- Test-hacking rate drops from ~40% to 7/800 runs with sub-agent decomposition
+
+**LSP pre-RED type verification (LSPAI FSE 2025):**
+
+- Using lsp_hover BEFORE writing test raises valid test rate 25%+ by preventing API mismatch false REDs
+- Falls back to `node -e "typeof require('./file').fn"` for .cjs files where LSP returns empty
+
+**PBT with @fast-check/vitest (2025 standard, 650K monthly downloads):**
+
+- Best for: routeIntent(anyString) → always returns string; hook(anyJSON) → exits 0 or 2
+- Two modes: one-time random (lightweight) and full PBT; both integrate with Vitest natively
+
+**Mutation testing gap (Stryker JS):**
+
+- Not in TDD skill or testing.md — P1 gap
+- Target: >70% production, >90% security-critical hooks/routing
+- Incremental mode makes CI integration practical
+
+**Top 5 gaps found:** (1) multi-agent TDD pattern, (2) LSP pre-RED verification, (3) @fast-check/vitest actionable example, (4) contract testing for hook schemas, (5) mutation testing guidance
+
+**Report:** `.claude/context/artifacts/research-reports/tdd-2026-standards-research-2026-03-11.md`
+
+---
+
+## Structural Audit Patterns (2026-03-12)
+
+**Pattern: Dead Code exit(0)/exit(2) in Security Hooks [HOOK]**
+
+- Context: pre-completion-validation.cjs line 692 had `process.exit(0); process.exit(2);` — Node.js exits on first call
+- Impact: Artifact output contract enforcement was completely non-functional (block printed to stdout but exit(0) allowed through)
+- Detection: Line-level code read (not function-level) required to catch this
+- Application: When reviewing security hooks, read the actual exit lines, not just the overall flow
+
+**Pattern: formatResult() Object Signature Silent Bypass [HOOK]**
+
+- Context: `formatResult({ decision: 'block', reason: msg })` does not set `result.allow` — inferredDecision defaults to 'allow'
+- Root cause: formatResult() checks `result.allow` (boolean), not `result.decision` (string), when called with an object
+- Fix: Always use string-first signature: `formatResult('block', check.message)`
+- Application: Any hook calling formatResult with an object arg should be audited for this bypass
+
+**Pattern: Fail-Open Sibling Hook Audit Heuristic [HOOK]**
+
+- Context: 3 of 4 evolution hooks shared the same fail-open catch block defect (exit 0 instead of exit 2)
+- Heuristic: When one security hook in a directory has a defect, audit ALL sibling hooks in that directory for the same class
+- Application: Batch-apply fixes; never fix one sibling in isolation
+
+**Pattern: Policy Without ESLint Enforcement Causes Drift [SECURITY]**
+
+- Context: ADR-115 accepted safeParseJSON for all hooks Feb 2026; 3 hooks still using raw JSON.parse in Mar 2026
+- Root cause: Policy documentation does not prevent future regressions without automated lint rule
+- Fix: Add ESLint rule blocking raw JSON.parse in .claude/hooks/ directory
+- Application: Any security policy for code patterns needs corresponding ESLint/tooling enforcement
+
+---
+
+## [2026-03-12] TDD Modernization Research (Task #22)
+
+- **Stryker/Vitest**: `@stryker-mutator/vitest-runner` is the 2025-2026 standard for mutation testing ESM/TypeScript; replaces jest-runner. StrykerJS 7.0+. Use `stryker.config.mjs` with `testRunner: 'vitest'`. Browser Mode NOT supported. Always uses `perTest` coverage analysis.
+- **TDAID five phases**: Plan → Red → Green → Refactor → Validate. Plan phase uses thinking-model for structured TDD plan before code. Validate phase is human gate for spec-gaming detection. Agent-studio Multi-Agent TDD (QA→Developer→Reflection) covers phases 2-4.
+- **LSP 3.18**: No dedicated test lens provider — test "Run/Debug" code lenses are IDE-extension territory, not LSP standard. New: SnippetTextEdit (test scaffolding), diagnostic MarkupContent (rich test failure messages).
+- **TDD skill gap**: Current SKILL.md uses `@stryker-mutator/jest-runner` install example — should be vitest-runner for ESM/TypeScript targets.
+- Research report: `.claude/context/artifacts/research-reports/tdd-modernization-research-2026-03-12.md`
+
+- Created new agent: qa-guardian (2026-03-12)
+
+- Created new agent: contract-check (2026-03-12)
+
+- Created new agent: bool-action (2026-03-12)
+
+- Created new agent: repo-onboarder (2026-03-12)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-12)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-12)
+
+- Updated workflow: evolution-workflow (2026-03-12)
+
+- Updated workflow: missing-workflow-xyz (2026-03-12)
+
+- Created new agent: qa-guardian (2026-03-12)
+
+- Created new agent: contract-check (2026-03-12)
+
+- Created new agent: bool-action (2026-03-12)
+
+- Created new agent: repo-onboarder (2026-03-12)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-12)
+
+- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-12)
+
+- Updated workflow: evolution-workflow (2026-03-12)
+
+- Updated workflow: missing-workflow-xyz (2026-03-12)
