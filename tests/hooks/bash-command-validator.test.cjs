@@ -61,6 +61,7 @@ const {
   detectBashReportWrite,
   detectBrittleCrossShellCount,
   detectSearchBypassPattern,
+  detectWorktreeMutation,
   isBypassPermissionsMode,
 } = require('../../.claude/hooks/safety/bash-command-validator.cjs');
 
@@ -304,6 +305,36 @@ test('detectSearchBypassPattern allows pnpm search:code and rg usage', () => {
     null,
     'Should allow rg command'
   );
+});
+
+test('detectWorktreeMutation blocks git worktree remove', () => {
+  const reason = detectWorktreeMutation('git worktree remove .claude/worktrees/agent-123 --force');
+  assertTrue(Boolean(reason), 'Should block git worktree remove');
+});
+
+test('detectWorktreeMutation blocks git worktree prune', () => {
+  const reason = detectWorktreeMutation('git worktree prune');
+  assertTrue(Boolean(reason), 'Should block git worktree prune');
+});
+
+test('detectWorktreeMutation blocks git worktree add', () => {
+  const reason = detectWorktreeMutation('git worktree add .claude/worktrees/agent-new');
+  assertTrue(Boolean(reason), 'Should block git worktree add');
+});
+
+test('detectWorktreeMutation allows git worktree list', () => {
+  const reason = detectWorktreeMutation('git worktree list');
+  assertEqual(reason, null, 'Should allow git worktree list');
+});
+
+test('detectWorktreeMutation blocks rm -rf against .claude/worktrees', () => {
+  const reason = detectWorktreeMutation('rm -rf .claude/worktrees/agent-123');
+  assertTrue(Boolean(reason), 'Should block direct deletion of worktrees');
+});
+
+test('detectWorktreeMutation blocks Windows Remove-Item against .claude/worktrees', () => {
+  const reason = detectWorktreeMutation('Remove-Item -Recurse -Force .claude\\worktrees\\agent-123');
+  assertTrue(Boolean(reason), 'Should block PowerShell deletion of worktrees');
 });
 
 test('isBypassPermissionsMode detects bypass permissions payloads', () => {

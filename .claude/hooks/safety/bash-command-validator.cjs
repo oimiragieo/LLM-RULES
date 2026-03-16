@@ -291,6 +291,42 @@ function detectReflectionBypass(command) {
 }
 
 /**
+ * Detect bash commands that manipulate or delete `.claude/worktrees`
+ * This prevents agents from accidentally committing suicide by deleting their 
+ * own active isolated worktree, which breaks the Node runtime loading hooks CWD.
+ *
+ * @param {string} command - Raw shell command
+ * @returns {string|null} Blocking reason or null when safe
+ */
+function detectWorktreeMutation(command) {
+  if (!command || typeof command !== 'string') return null;
+
+  // Block `git worktree remove/prune/add` (but allow `list`)
+  const dangerousGitWorktreePattern = /\bgit\s+worktree\s+(remove|prune|add)\b/i;
+  if (dangerousGitWorktreePattern.test(command)) {
+    return (
+      'BLOCKED: Agents are strictly prohibited from manually mutating git worktrees (`git worktree remove/prune/add`). ' +
+      'Worktrees are critical to process isolation. The background orchestrator cron will securely garbage collect stale trees.'
+    );
+  }
+
+  // Block native OS deletions against the `.claude/worktrees` trajectory natively
+  const deleteWorktreesPathPattern = /\b(?:rm|del|Remove-Item)\b[\s\S]*\.claude[\\/]+worktrees[\\/]+/i;
+  
+  if (deleteWorktreesPathPattern.test(command)) {
+    return (
+      'BLOCKED: Direct deletion of `.claude/worktrees` files via Bash is prohibited. ' +
+      'Do not attempt to manually clean up agent instances. The background orchestrator automatically handles this.'
+    );
+  }
+
+  // If we are cd'd into a worktree, blocking rm . is too complex without CWD context, 
+  // but deleting the path directly is covered above.
+
+  return null;
+}
+
+/**
  * Extract the bash command from hook input.
  *
  * @param {object} hookInput - The parsed hook context
@@ -434,6 +470,19 @@ async function main() {
       process.exit(2);
     }
 
+    const worktreeMutationReason = detectWorktreeMutation(command);
+    if (worktreeMutationReason) {
+      if (isBypassPermissionsMode(hookInput)) {
+        console.error(
+          `[BASH-COMMAND-VALIDATOR][warn] ${worktreeMutationReason} (allowed in bypassPermissions mode)`
+        );
+        process.exit(0);
+      }
+      emitBashBlockVerdict(command, worktreeMutationReason);
+      console.error(formatBlockedMessage(command, worktreeMutationReason));
+      process.exit(2);
+    }
+
     // Validate the command using the registry
     const result = validateCommand(command);
 
@@ -509,6 +558,7 @@ module.exports = {
   detectBrittleCrossShellCount,
   detectSearchBypassPattern,
   detectReflectionBypass,
+  detectWorktreeMutation,
   isBypassPermissionsMode,
   parseHookInput: parseHookInputAsync,
 };

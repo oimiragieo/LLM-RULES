@@ -25,12 +25,12 @@ const { isStub, STUB_PATTERNS } = require('./stub-patterns.cjs');
  * @returns {{ passed: number, failed: number, errors: string[] }}
  */
 function checkTruths(truths, deps) {
-  const exec =
+  const executeCmd =
     deps && deps.exec
       ? deps.exec
       : (() => {
           const { execSync } = require('node:child_process');
-          return cmd => execSync(cmd, { shell: false, stdio: 'pipe' });
+          return cmd => execSync(cmd, { shell: false, stdio: 'pipe', windowsHide: true });
         })();
 
   const errors = [];
@@ -39,7 +39,7 @@ function checkTruths(truths, deps) {
 
   for (const truth of truths) {
     try {
-      exec(truth.command);
+      executeCmd(truth.command);
       passed++;
     } catch (err) {
       failed++;
