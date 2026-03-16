@@ -1,6 +1,21 @@
-## Model Selection Context Window Guidance (2026-03-16) [Task #21]
+## Mission Mode Governance Repair (2026-03-16) [Task #23]
 
-**Pattern: Large-context routing threshold for opus model selection**
+**Agent:** developer | **Status:** Completed
+
+### Mission Orchestrator Implementation
+
+The Mission Orchestrator components have been scaffolded and the baseline test runner verification system is active.
+
+Key governance actions taken:
+
+- Added `start-mission` workflow to `CLAUDE.md`, `WORKFLOW_CATALOG.md`, `workflow-registry.json`, and `@WORKFLOW_AGENT_MAP.md`.
+- Added `system-health-check` skill to `@SKILL_CATALOG_TABLE.md` and registered it to the `master-orchestrator.md`.
+- Added `mission/` templates to `templates/README.md` and `template-catalog.md` (`CONTINUATION_PLAN.md`, `INVARIANTS.md`, `ANTI_GOALS.md`).
+- Established mapping between `start-mission` workflow and `master-orchestrator`.
+
+---
+
+## Model Selection Context Window Guidance (2026-03-16) [Task #21]**Pattern: Large-context routing threshold for opus model selection**
 
 - Opus (1M context) is appropriate when executing agent may need >150K tokens in working context
 - Concrete use cases: analysis of very large codebases (>150K source tokens), long document processing, ingestion-before-synthesis tasks

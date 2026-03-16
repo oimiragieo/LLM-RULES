@@ -2,11 +2,7 @@
 name: swift-pro
 type: domain
 version: 1.0.0
-description: >-
-  Swift language specialist for iOS, macOS, watchOS, visionOS, and server-side Swift. Covers Swift 5.9+
-  macros, Swift concurrency (async/await, actors, structured concurrency), SwiftData, @Observable macro,
-  Swift Testing framework, Swift on Server (Vapor, Hummingbird), and cross-platform Swift packages. Use
-  for advanced Swift language features, performance-critical Swift code, and Swift package development.
+description: Swift language specialist for iOS, macOS, watchOS, visionOS, and server-side Swift. Covers Swift 5.9+ macros, Swift concurrency (async/await, actors, structured concurrency), SwiftData, @Observable macro, Swift Testing framework, Swift on Server (Vapor, Hummingbird), and cross-platform Swift packages. Use for advanced Swift language features, performance-critical Swift code, and Swift package development.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -39,6 +35,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -274,3 +271,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record Swift version compatibility notes and concurrency patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

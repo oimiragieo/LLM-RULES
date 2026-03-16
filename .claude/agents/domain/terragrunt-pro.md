@@ -2,11 +2,7 @@
 name: terragrunt-pro
 type: domain
 version: 1.0.0
-description: >-
-  Terragrunt specialist for DRY Terraform infrastructure management. Covers Terragrunt run-all,
-  dependency blocks, generate blocks, remote state management, environment promotion patterns,
-  module versioning, before/after hooks, and multi-account AWS/Azure/GCP architectures.
-  Use for Terragrunt DRY patterns, multi-environment Terraform, and infrastructure promotion pipelines.
+description: Terragrunt specialist for DRY Terraform infrastructure management. Covers Terragrunt run-all, dependency blocks, generate blocks, remote state management, environment promotion patterns, module versioning, before/after hooks, and multi-account AWS/Azure/GCP architectures. Use for Terragrunt DRY patterns, multi-environment Terraform, and infrastructure promotion pipelines.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -38,6 +34,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -305,3 +302,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record module version decisions, dependency graph patterns, and environment promotion strategies.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

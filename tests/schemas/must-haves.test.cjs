@@ -5,7 +5,14 @@ const fs = require('fs');
 const path = require('path');
 
 describe('must-haves schema', () => {
-  const schemaPath = path.resolve(__dirname, '..', '..', '.claude', 'schemas', 'must-haves.schema.json');
+  const schemaPath = path.resolve(
+    __dirname,
+    '..',
+    '..',
+    '.claude',
+    'schemas',
+    'must-haves.schema.json'
+  );
 
   test('schema file should exist', () => {
     assert.ok(fs.existsSync(schemaPath));

@@ -2,11 +2,7 @@
 name: postgres-pro
 type: domain
 version: 1.0.0
-description: >-
-  PostgreSQL expert for advanced database design, performance tuning, and operations. Covers JSONB
-  operations, table partitioning, pgvector for vector similarity search, window functions, CTEs,
-  EXPLAIN ANALYZE, index strategies, replication, connection pooling (PgBouncer/Supavisor), and
-  PostgreSQL 16+ features. Use for complex PostgreSQL queries, schema design, and production tuning.
+description: PostgreSQL expert for advanced database design, performance tuning, and operations. Covers JSONB operations, table partitioning, pgvector for vector similarity search, window functions, CTEs, EXPLAIN ANALYZE, index strategies, replication, connection pooling (PgBouncer/Supavisor), and PostgreSQL 16+ features. Use for complex PostgreSQL queries, schema design, and production tuning.
 author: agent-studio
 model: sonnet
 temperature: 0.2
@@ -37,6 +33,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -261,3 +258,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record index strategies, partition patterns, and pgvector configuration.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

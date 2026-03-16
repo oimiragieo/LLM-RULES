@@ -10,8 +10,8 @@
 
 | Metric        | Count |
 | ------------- | ----- |
-| Total Skills  | 260   |
-| Active Skills | 260   |
+| Total Skills  | 261   |
+| Active Skills | 261   |
 | Aliases       | 0     |
 | Domains       | 22    |
 | Categories    | 25    |
@@ -102,6 +102,7 @@
 | `heartbeat`                                    | infrastructure | Infrastructure       | Start and manage the full heartbeat ecosystem. Registers 8 background loops (reflection-2h, evolution-24h, briefing-8am, indexing-4h, drain-15m, telegram-2m, research-7am, reschedule-2d) via CronCreate. Session-scoped; includes auto-reschedule to prevent 3-day expiry. |
 | `scheduled-tasks`                              | infrastructure | Infrastructure       | Schedule recurring tasks and heartbeat loops using CronCreate/CronList/CronDelete. Covers cron syntax, session-scoped constraints, 50-task cap, and idempotent loop design patterns.                                                                                         |
 | `cron-decision`                                | infrastructure | Infrastructure       | Decision framework for choosing between CronCreate, OS cron, GitHub Actions, or Task() for scheduling. Quick checklist, decision matrix, and heartbeat integration guidance.                                                                                                 |
+| `system-health-check`                          | infrastructure | Infrastructure       | Per-mission ecosystem validation. Validates MCP servers, verifies database readiness, validates environment variables, and confirms core LLM connectivity before launching workflows.                                                                                        |
 | `context-compressor`                           | memory         | Memory               | Context compression and summarization methodology. Techniques for reducing token usage while preserving decision-critica...                                                                                                                                                  |
 | `context-driven-development`                   | memory         | Other                | Context-Driven Development methodology - treating project context as managed artifacts alongside code for consistent AI ...                                                                                                                                                  |
 | `framework-context`                            | memory         | Memory               | Load and synthesize framework architecture context for reflection and planning tasks.                                                                                                                                                                                        |

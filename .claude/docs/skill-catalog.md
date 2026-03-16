@@ -1,12 +1,12 @@
 # Skill Catalog
 
-> **Total Skills: 134** (1 deprecated alias) | Last Updated: 2026-02-23
+> **Total Skills: 135** (1 deprecated alias) | Last Updated: 2026-03-15
 
 This catalog indexes all active skills in the Claude Code Enterprise Framework.
 
 **Post-Cleanup Summary:**
 
-- **Active Skills:** 130 (maintained and invoked)
+- **Active Skills:** 131 (maintained and invoked)
 - **Deprecated Aliases:** 0 (all aliases removed)
 - **Scientific Parent:** 1 (`scientific-skills` with 139 sub-skills)
 - **Archived:** 214 dead skills → `.claude/skills/_archive/dead/` (see README)
@@ -31,7 +31,7 @@ This catalog indexes all active skills in the Claude Code Enterprise Framework.
 | [Code Style & Linting](#code-style--linting)         | 3     | code-style-validator, dry-principle, async-operations                                                                                                                                                                                                                                                                                                                                    |
 | [Creator Tools](#creator-tools)                      | 14    | research-synthesis, agent-creator, agent-updater, skill-creator, skill-updater, workflow-updater, hook-creator, workflow-creator, template-creator, schema-creator, artifact-integrator, command-creator, rule-creator, tool-creator                                                                                                                                                     |
 | [Memory & Context](#memory--context)                 | 17    | context-compressor, token-saver-context-compression, memory-quality-auditor, session-handoff, task-management-protocol, context-driven-development, context-degradation, insight-extraction, track-management, pipeline-reflection-ux, framework-context, recommend-evolution, assimilate, creation-feasibility-gate, compliance-policy-check, troubleshooting-regression, memory-search |
-| [Validation & Quality](#validation--quality)         | 14    | verification-before-completion, checklist-generator, proactive-audit, ecosystem-integrity-scanner, response-rater, test-generator, accessibility, eval-harness-updater, qa-workflow, spec-critique, strict-user-requirements-adherence, agent-evaluation, property-based-testing, webapp-testing                                                                                         |
+| [Validation & Quality](#validation--quality)         | 15    | verification-before-completion, checklist-generator, proactive-audit, ecosystem-integrity-scanner, response-rater, test-generator, accessibility, eval-harness-updater, qa-workflow, spec-critique, strict-user-requirements-adherence, agent-evaluation, property-based-testing, webapp-testing, system-health-check                                                                    |
 | [Specialized Patterns](#specialized-patterns)        | 10    | thinking-tools, spec-gathering, spec-init, sequential-thinking, consensus-voting, swarm-coordination, interactive-requirements-gathering, planning-with-files, sparc-methodology, dispatching-parallel-agents                                                                                                                                                                            |
 | [External Integrations](#external-integrations)      | 7     | project-onboarding, dynamic-api-integration, medusa, convex-development-general, starknet-react-rules, omega-codex-cli, omega-cursor-cli                                                                                                                                                                                                                                                 |
 | [Scientific Research](#scientific-research)          | 1     | scientific-skills (parent with 139 sub-skills)                                                                                                                                                                                                                                                                                                                                           |
@@ -360,6 +360,7 @@ Quality validation skills.
 | `response-rater`                     | Plan and response quality audits                                                                                                                            | master-orchestrator      |
 | `test-generator`                     | Test code generation                                                                                                                                        | qa                       |
 | `accessibility`                      | WCAG compliance validation                                                                                                                                  | mobile-ux-reviewer       |
+| `system-health-check`                | System health checks using Claude Code commands and metrics                                                                                                 | master-orchestrator      |
 | `eval-harness-updater`               | Refreshes eval harness reliability and SLO gates                                                                                                            | developer                |
 | `qa-workflow`                        | QA validation and fix loop workflow — validates implementation completeness, iterates fix cycles until all acceptance criteria pass and quality gates clear | developer                |
 | `strict-user-requirements-adherence` | Enforce strict adherence to user-specified flows and documented features, preventing scope creep                                                            | developer                |

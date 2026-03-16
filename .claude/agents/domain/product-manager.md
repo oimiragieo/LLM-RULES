@@ -2,11 +2,7 @@
 name: product-manager
 type: domain
 version: 1.0.0
-description: >-
-  Product Manager specialist for roadmap planning, OKR setting, PRD writing, prioritization frameworks,
-  feature scoping, stakeholder management, and product metrics. Covers RICE/ICE scoring, Jobs-to-be-Done
-  methodology, outcome-based roadmaps, sprint goal setting, release management, and data-driven product
-  decisions. Use for product strategy, feature planning, and product documentation.
+description: Product Manager specialist for roadmap planning, OKR setting, PRD writing, prioritization frameworks, feature scoping, stakeholder management, and product metrics. Covers RICE/ICE scoring, Jobs-to-be-Done methodology, outcome-based roadmaps, sprint goal setting, release management, and data-driven product decisions. Use for product strategy, feature planning, and product documentation.
 author: agent-studio
 model: sonnet
 temperature: 0.4
@@ -36,6 +32,9 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
+  - ripgrep
+  - code-semantic-search
 context_files: null
 ---
 
@@ -271,3 +270,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record product frameworks used, stakeholder dynamics, and metric baselines.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

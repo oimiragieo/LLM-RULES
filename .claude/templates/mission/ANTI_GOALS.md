@@ -6,4 +6,4 @@ This document lists the deliberate non-goals of this mission. Do not waste token
 - **Do NOT** optimize startup times if the test runs under 100ms.
 - **Do NOT** add unrelated dependencies.
 - **Do NOT** update documentation for systems we are not actively working on in the `CONTINUATION_PLAN`.
-- *(Add your specific anti-goals here)*
+- _(Add your specific anti-goals here)_

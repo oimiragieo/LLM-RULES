@@ -242,3 +242,22 @@ All three now pass 8/0/3 validation.
 - No hook changes needed — infrastructure already works correctly
 
 **Root cause of 2026-03-12 incident:** Drain gate only checked TaskList(), not reflection queue. 5 reflections left unprocessed until next UserPromptSubmit.
+
+## ADR-2026-03-16-001: task-manager Wired into Router Drain Gate (2026-03-16)
+
+**Status:** Accepted & Implemented (commit 49b9e851)
+**Context:** HIGH/EPIC pipelines accumulated stale tasks post-completion with no automated cleanup.
+**Decision:** task-manager (haiku model) spawned in drain gate Step 2.5 when: stale-tasks.json has unclosed entries, TaskList shows in_progress tasks after all agents returned, gap-log has >3 stale entries, or user requests task audit.
+**4-file wiring pattern for new router agents:** CLAUDE.md + @AGENT_ROUTING_TABLE.md + routing-table-core-map.cjs + intent-keywords-data.cjs — all 4 required.
+**Consequences:** Agent registry at 101 agents. Router drain gate now 3 steps: task drain → reflection queue → task hygiene check.
+
+---
+
+## ADR-2026-03-16-002: cron-decision Skill Integration Gap (2026-03-16)
+
+**Status:** OPEN — Requires Follow-up
+**Issue:** cron-decision skill created (Task 23) with skill-creator. skill-index.json updated automatically, but skill-catalog.md NOT auto-updated. No agent frontmatter wiring.
+**Decision:** skill-creator workflow does not auto-update catalog. Catalog and agent frontmatter wiring must be done as separate explicit steps after skill creation.
+**Follow-up required:** Update skill-catalog.md + wire into heartbeat-orchestrator/developer/planner/architect frontmatter.
+
+---

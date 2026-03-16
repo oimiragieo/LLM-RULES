@@ -34,6 +34,10 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `worktree-auto-cleanup.cjs`         | x      |             |          |            |              |            |
 | `check-console-log.cjs`             | x      | x           | x        | x          | x            | x          |
 | `pre-compact.cjs`                   | x      | x           | x        | x          | x            | x          |
+| `startup-failopen-audit.cjs`        | x      |             |          |            |              |            |
+| `session-budget-watchdog.cjs`       | x      |             |          |            |              |            |
+| `heartbeat-step05-check.cjs`        | x      |             |          |            |              |            |
+| `analysis-paralysis-guard.cjs`      | x      | x           | x        | x          | x            | x          |
 
 **Agent Archetype Definitions:**
 
@@ -58,6 +62,8 @@ This document provides a comprehensive mapping between enforcement hooks and age
 6. `user-prompt-unified.cjs`
 7. `user-prompt-orchestrator.cjs`
 8. `handover-detector.cjs` (matcher: all prompts — fires on fresh session start)
+9. `startup-failopen-audit.cjs`
+10. `session-budget-watchdog.cjs`
 
 ### PreToolUse (Bash)
 
@@ -80,6 +86,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 4. `spawn-prompt-validator.cjs`
 5. `spawn-token-guard.cjs` (matcher: Task — warns at 80K tokens, blocks at 120K)
 6. `finish-only-guard.cjs` (matcher: TaskCreate|Task — blocks when session is draining)
+7. `heartbeat-step05-check.cjs`
 
 ### PreToolUse (TaskUpdate)
 
@@ -95,6 +102,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 3. `reflection-cleanup.cjs`
 4. `artifact-scoring-ledger-hook.cjs`
 5. `post-creation-integration.cjs`
+6. `analysis-paralysis-guard.cjs`
 
 ---
 

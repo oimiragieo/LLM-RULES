@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Task Output Guardrails",
+  "description": "Validates agent TaskUpdate(completed) metadata meets minimum quality bar",
+  "type": "object",
+  "properties": {
+    "summary": { "type": "string", "minLength": 10, "maxLength": 500 },
+    "filesModified": { "type": "array", "items": { "type": "string" } },
+    "testsRun": { "type": "boolean" },
+    "lintClean": { "type": "boolean" },
+    "success": { "type": "boolean" },
+    "criteria_met": { "type": "array", "items": { "type": "string" } },
+    "criteria_failed": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["summary"]
+}

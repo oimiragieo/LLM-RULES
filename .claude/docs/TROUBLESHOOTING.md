@@ -677,4 +677,5 @@ Root Cause:
 Fix Applied / Tooling Available:
 
 - ALWAYS use `node scripts/reduce-debug-log.mjs <log_path>` to squash massive debug logs (often achieving 90%+ noise reduction by extracting only hook decisions, exceptions, and side-channel metadata) before trying to read them.
+- Never run `node scripts/reduce-debug-log.mjs <log_path>` on the debug file directly. Instead, copy the file to a new location and run the script on the copy (preferably a .tmp folder).
 - To detect UI tool blockers (like git conflicts or authentication denies) that do not appear in background logs, run `node scripts/analyze-session-transcript.mjs <log_path>`. This compiles a markdown report detailing `Tool Errors`, systemic bypasses, and top tool failures grouped by intent.

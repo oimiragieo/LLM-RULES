@@ -39,6 +39,8 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `user-prompt-unified.cjs`: Consolidated router analysis, memory reminders, and health checks.
 - `user-prompt-orchestrator.cjs`: Orchestrates multi-agent workflows.
 - `handover-detector.cjs`: Detects shift-change handovers on fresh session start. Reads `shift-change-log.json`, claims the handover, and injects a structured resume message (pre-flight steps 0–0.5 + pending actions) into the first prompt. Fail-open (advisory).
+- `startup-failopen-audit.cjs`: Audits startup fail-open state.
+- `session-budget-watchdog.cjs`: Monitors session token budget and limits.
 
 ### PreToolUse
 
@@ -52,6 +54,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `research-enforcement.cjs`: Enforces research phase completion before artifact creation (Write/Edit to agent/skill/workflow paths blocked without 3+ research entries).
 - `validate-skill-invocation.cjs`: Validates Skill usage.
 - `reflection-step0-guard.cjs`: Blocks TaskList if reflections are pending.
+- `heartbeat-step05-check.cjs`: Enforces TaskList check after Step 0.5 heartbeat check.
 - `spawn-prompt-validator.cjs`: Validates Task spawn prompts.
 - `taskupdate-contract-validator.cjs`: Validates TaskUpdate inputs.
 - `pre-completion-validation.cjs`: Validates task completion quality.
@@ -82,6 +85,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `stale-task-detector.cjs`: Detects stale tasks.
 - `task-pretool-orchestrator.cjs`: Orchestrates pretool tasks.
 - `workflow-watchdog-hook.cjs`: Watchdog for workflows.
+- `analysis-paralysis-guard.cjs`: Prevents infinite looping on reads.
 
 ### SessionEnd
 

@@ -2,11 +2,7 @@
 name: business-analyst
 type: domain
 version: 1.0.0
-description: >-
-  Business analyst specialist for requirements gathering, process modeling, use case documentation,
-  gap analysis, and stakeholder communication. Covers BRD/SRS writing, BPMN process diagrams, user
-  story mapping, acceptance criteria, business process improvement (BPI), and data analysis for
-  business decisions. Use for requirements documentation, process analysis, and stakeholder alignment.
+description: Business analyst specialist for requirements gathering, process modeling, use case documentation, gap analysis, and stakeholder communication. Covers BRD/SRS writing, BPMN process diagrams, user story mapping, acceptance criteria, business process improvement (BPI), and data analysis for business decisions. Use for requirements documentation, process analysis, and stakeholder alignment.
 author: agent-studio
 model: sonnet
 temperature: 0.4
@@ -36,6 +32,9 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
+  - ripgrep
+  - code-semantic-search
 context_files: null
 ---
 
@@ -264,3 +263,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record stakeholder patterns, domain-specific terminology, and process insights.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

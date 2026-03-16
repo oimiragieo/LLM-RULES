@@ -2,10 +2,7 @@
 name: iot-engineer
 type: domain
 version: 1.0.0
-description: >-
-  IoT and embedded systems specialist covering MQTT, device firmware, edge computing, sensor integration,
-  OTA updates, and IoT cloud platforms (AWS IoT Core, Azure IoT Hub, Google Cloud IoT). Use for
-  connected device development, industrial IoT protocols, and edge-to-cloud data pipelines.
+description: IoT and embedded systems specialist covering MQTT, device firmware, edge computing, sensor integration, OTA updates, and IoT cloud platforms (AWS IoT Core, Azure IoT Hub, Google Cloud IoT). Use for connected device development, industrial IoT protocols, and edge-to-cloud data pipelines.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -35,6 +32,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -223,3 +221,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record protocol quirks, device-specific gotchas, and cloud platform patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

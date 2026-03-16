@@ -2,11 +2,7 @@
 name: spring-boot-pro
 type: domain
 version: 1.0.0
-description: >-
-  Spring Boot 3+ specialist for enterprise Java applications. Covers Spring Boot 3.x with
-  Jakarta EE, Spring Security 6, Spring Data JPA, Spring WebFlux (reactive), GraalVM native
-  images, Spring Modulith, Testcontainers, and virtual threads (Project Loom). Use for
-  enterprise Spring microservices, reactive APIs, and Spring Boot 3 migration.
+description: Spring Boot 3+ specialist for enterprise Java applications. Covers Spring Boot 3.x with Jakarta EE, Spring Security 6, Spring Data JPA, Spring WebFlux (reactive), GraalVM native images, Spring Modulith, Testcontainers, and virtual threads (Project Loom). Use for enterprise Spring microservices, reactive APIs, and Spring Boot 3 migration.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -39,6 +35,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -341,3 +338,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record Spring Boot version compatibility, reactive vs. imperative decisions, and Testcontainers configuration.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

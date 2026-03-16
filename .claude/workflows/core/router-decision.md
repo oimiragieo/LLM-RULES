@@ -170,6 +170,7 @@ TaskList();
 | **Code review**       | "review", "PR", "pull request", "feedback"                                            | "Review this PR"                 |
 | **Party Mode**        | "party mode", "multi-agent collaboration", "discuss with team", "debate", "consensus" | "Party Mode: review this design" |
 | **Artifact creation** | "create agent", "create skill", "create workflow"                                     | "Create mobile UX agent"         |
+| **Mission**           | "start mission", "mission mode", "ceo delegation", "orchestrate"                      | "Start mission 4"                |
 
 ### 2.2 Complexity Classification
 
@@ -502,11 +503,11 @@ This precedence prevents generic regex matches from overriding explicit keyword 
 
 ### Orchestrator Agents
 
-| Request Type                            | Agent                 | File                                                  |
-| --------------------------------------- | --------------------- | ----------------------------------------------------- |
-| Project orchestration                   | `master-orchestrator` | `.claude/agents/orchestrators/master-orchestrator.md` |
-| Swarm coordination                      | `swarm-coordinator`   | `.claude/agents/orchestrators/swarm-coordinator.md`   |
-| **Party Mode (Multi-agent discussion)** | `party-orchestrator`  | `.claude/agents/orchestrators/party-orchestrator.md`  |
+| Request Type                                         | Agent                 | File                                                  |
+| ---------------------------------------------------- | --------------------- | ----------------------------------------------------- |
+| Project orchestration, start mission, ceo delegation | `master-orchestrator` | `.claude/agents/orchestrators/master-orchestrator.md` |
+| Swarm coordination                                   | `swarm-coordinator`   | `.claude/agents/orchestrators/swarm-coordinator.md`   |
+| **Party Mode (Multi-agent discussion)**              | `party-orchestrator`  | `.claude/agents/orchestrators/party-orchestrator.md`  |
 
 **Keywords for Party Mode**: "party mode", "multi-agent collaboration", "discuss with team", "debate", "consensus", "team perspective"
 

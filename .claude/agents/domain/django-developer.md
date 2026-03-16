@@ -2,11 +2,7 @@
 name: django-developer
 type: domain
 version: 1.0.0
-description: >-
-  Django and Django REST Framework expert for web application development. Covers Django ORM, migrations,
-  class-based views, REST APIs, authentication (JWT, session, OAuth), Celery task queues, Django admin,
-  signals, middleware, and deployment patterns. Use for Python/Django web backends, REST APIs, and
-  full-stack Django applications.
+description: Django and Django REST Framework expert for web application development. Covers Django ORM, migrations, class-based views, REST APIs, authentication (JWT, session, OAuth), Celery task queues, Django admin, signals, middleware, and deployment patterns. Use for Python/Django web backends, REST APIs, and full-stack Django applications.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -244,3 +240,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record Django version quirks, migration pitfalls, or DRF patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

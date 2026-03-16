@@ -184,6 +184,7 @@ Before spawning `developer`, check Step 6.5 in `router-decision.md`. If ANY spec
 | "research/investigate"   | developer  | **researcher**            |
 | "integrate/onboard repo" | researcher | **artifact-integrator**   |
 | "debug production"       | developer  | **devops-troubleshooter** |
+| "start mission/project"  | developer  | **master-orchestrator**   |
 
 See **@AGENT_ROUTING_TABLE.md** for the complete wrong-to-correct routing table.
 

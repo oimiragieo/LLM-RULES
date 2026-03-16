@@ -5,7 +5,14 @@ const fs = require('fs');
 const path = require('path');
 
 describe('workflow-snapshot schema', () => {
-  const schemaPath = path.resolve(__dirname, '..', '..', '.claude', 'schemas', 'workflow-snapshot.schema.json');
+  const schemaPath = path.resolve(
+    __dirname,
+    '..',
+    '..',
+    '.claude',
+    'schemas',
+    'workflow-snapshot.schema.json'
+  );
 
   test('schema file should exist', () => {
     assert.ok(fs.existsSync(schemaPath));

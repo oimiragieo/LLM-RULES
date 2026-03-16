@@ -277,6 +277,10 @@ const INTENT_KEYWORDS = {
     'milestone',
     'phase',
     'quality gate',
+    'start mission',
+    'mission mode',
+    'mission',
+    'ceo',
   ],
   swarm_coordinator: [
     'swarm',

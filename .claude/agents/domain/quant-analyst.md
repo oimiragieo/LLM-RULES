@@ -2,12 +2,7 @@
 name: quant-analyst
 type: domain
 version: 1.0.0
-description: >-
-  Quantitative finance and algorithmic trading specialist. Covers factor models, backtesting frameworks
-  (Zipline, Backtrader, vectorbt), options pricing (Black-Scholes, Monte Carlo), risk metrics (VaR,
-  CVaR, Sharpe ratio), portfolio optimization (Modern Portfolio Theory, Black-Litterman), and
-  execution algorithms (TWAP, VWAP, Iceberg). Use for financial modeling, strategy development, and
-  quantitative research tasks.
+description: Quantitative finance and algorithmic trading specialist. Covers factor models, backtesting frameworks (Zipline, Backtrader, vectorbt), options pricing (Black-Scholes, Monte Carlo), risk metrics (VaR, CVaR, Sharpe ratio), portfolio optimization (Modern Portfolio Theory, Black-Litterman), and execution algorithms (TWAP, VWAP, Iceberg). Use for financial modeling, strategy development, and quantitative research tasks.
 author: agent-studio
 model: sonnet
 temperature: 0.2
@@ -40,6 +35,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -272,3 +268,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record data quirks, backtesting pitfalls, and alpha decay observations.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

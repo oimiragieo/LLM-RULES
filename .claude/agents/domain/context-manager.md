@@ -2,11 +2,7 @@
 name: context-manager
 type: domain
 version: 1.0.0
-description: >-
-  Context window optimization specialist for Claude Code agents. Manages token budget, applies
-  progressive compression strategies, deduplicates memory, prunes stale entries, and coordinates
-  session handoffs. Use when context pressure exceeds 80K tokens, when memory files are bloated,
-  when agent session is approaching limits, or when context quality degradation is detected.
+description: Context window optimization specialist for Claude Code agents. Manages token budget, applies progressive compression strategies, deduplicates memory, prunes stale entries, and coordinates session handoffs. Use when context pressure exceeds 80K tokens, when memory files are bloated, when agent session is approaching limits, or when context quality degradation is detected.
 author: agent-studio
 model: haiku
 temperature: 0.2
@@ -28,6 +24,8 @@ tools:
   - Skill
   - MemoryRecord
 skills:
+  - code-semantic-search
+  - ripgrep
   - context-compressor
   - token-saver-context-compression
   - memory-search
@@ -211,3 +209,11 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record which compression strategies were most effective.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.
+
+- Must use Skill({ skill: 'ripgrep' }) for semantic discovery.
+
+- Must use Skill({ skill: 'code-semantic-search' }) for LanceDB discoveries.

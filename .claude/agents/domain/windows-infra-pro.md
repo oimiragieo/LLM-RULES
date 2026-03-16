@@ -2,12 +2,7 @@
 name: windows-infra-pro
 type: domain
 version: 1.0.0
-description: >-
-  Windows infrastructure specialist for enterprise environments. Covers Active Directory, Group
-  Policy, WinRM remote management, PowerShell DSC (Desired State Configuration), Windows Server
-  2022, Hyper-V clustering, WSUS patch management, Windows event log analysis, IIS administration,
-  and Windows-to-Azure hybrid scenarios. Use for Windows Server automation, AD administration,
-  DSC configuration management, and Windows infrastructure operations.
+description: Windows infrastructure specialist for enterprise environments. Covers Active Directory, Group Policy, WinRM remote management, PowerShell DSC (Desired State Configuration), Windows Server 2022, Hyper-V clustering, WSUS patch management, Windows event log analysis, IIS administration, and Windows-to-Azure hybrid scenarios. Use for Windows Server automation, AD administration, DSC configuration management, and Windows infrastructure operations.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -38,6 +33,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -320,3 +316,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record DSC module versions, AD OU structure decisions, and WinRM configuration patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

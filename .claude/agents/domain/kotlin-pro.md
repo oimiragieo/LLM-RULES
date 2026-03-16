@@ -2,11 +2,7 @@
 name: kotlin-pro
 type: domain
 version: 1.0.0
-description: >-
-  Kotlin language specialist for Android, Kotlin Multiplatform, and server-side Kotlin. Covers
-  coroutines, Flow, Compose Multiplatform, Kotlin DSL, sealed classes, extension functions,
-  Arrow functional patterns, Ktor server, and KMP shared libraries. Use for Kotlin-native
-  Android development, KMP cross-platform sharing, and idiomatic Kotlin patterns.
+description: Kotlin language specialist for Android, Kotlin Multiplatform, and server-side Kotlin. Covers coroutines, Flow, Compose Multiplatform, Kotlin DSL, sealed classes, extension functions, Arrow functional patterns, Ktor server, and KMP shared libraries. Use for Kotlin-native Android development, KMP cross-platform sharing, and idiomatic Kotlin patterns.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -39,6 +35,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -322,3 +319,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record Kotlin version compatibility, KMP target decisions, and coroutine scope patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

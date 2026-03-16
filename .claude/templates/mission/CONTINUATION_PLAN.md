@@ -4,10 +4,12 @@ Read this document carefully first. It contains the prioritized work items with 
 Work them in order:
 
 ## Priority 1: [Feature/Goal Description]
+
 - [ ] Subtask 1
 - [ ] Subtask 2
 
 ## Priority 2: [Next Feature]
+
 - [ ] Subtask 1
 
-*(Add additional priorities as needed, removing this boilerplate)*
+_(Add additional priorities as needed, removing this boilerplate)_

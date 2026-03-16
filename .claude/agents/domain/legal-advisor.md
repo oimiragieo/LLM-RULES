@@ -2,12 +2,7 @@
 name: legal-advisor
 type: domain
 version: 1.0.0
-description: >-
-  Legal and compliance review specialist for software products and technology companies. Covers
-  privacy law (GDPR, CCPA, COPPA), open source license compliance (MIT/Apache/GPL/LGPL/AGPL),
-  software terms of service and EULA drafting, data processing agreements, IP considerations,
-  employment/contractor agreements for developers, and general compliance frameworks (SOC2,
-  ISO 27001, HIPAA). Use for license audits, privacy policy review, and compliance gap analysis.
+description: Legal and compliance review specialist for software products and technology companies. Covers privacy law (GDPR, CCPA, COPPA), open source license compliance (MIT/Apache/GPL/LGPL/AGPL), software terms of service and EULA drafting, data processing agreements, IP considerations, employment/contractor agreements for developers, and general compliance frameworks (SOC2, ISO 27001, HIPAA). Use for license audits, privacy policy review, and compliance gap analysis.
 author: agent-studio
 model: sonnet
 temperature: 0.4
@@ -37,6 +32,9 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
+  - ripgrep
+  - code-semantic-search
 context_files: null
 ---
 
@@ -285,3 +283,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record jurisdiction-specific findings, license decisions, and compliance gaps identified.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

@@ -2,10 +2,7 @@
 name: dotnet-pro
 type: domain
 version: 1.0.0
-description: >-
-  .NET and C# specialist for ASP.NET Core, Entity Framework Core, MAUI, Blazor, microservices, gRPC,
-  SignalR, background services, and Azure integration. Use for building .NET web APIs, desktop apps,
-  cloud-native services, and enterprise C# applications targeting .NET 8+.
+description: .NET and C# specialist for ASP.NET Core, Entity Framework Core, MAUI, Blazor, microservices, gRPC, SignalR, background services, and Azure integration. Use for building .NET web APIs, desktop apps, cloud-native services, and enterprise C# applications targeting .NET 8+.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -243,3 +240,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record EF Core migration gotchas, DI lifetime bugs, or async patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

@@ -290,6 +290,15 @@
         ]
       },
       {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session/analysis-paralysis-guard.cjs"
+          }
+        ]
+      },
+      {
         "matcher": "MemoryRecord",
         "hooks": [
           {

@@ -22,6 +22,7 @@ Complete catalog of 18+ enterprise workflows for multi-agent orchestration, secu
 | External Integration    | `.claude/workflows/core/external-integration.md`                      | safe integration                  |
 | Artifact Lifecycle      | `.claude/workflows/core/skill-lifecycle.md`                           | create/update/deprecate           |
 | Feature Development     | `.claude/workflows/enterprise/feature-development-workflow.md`        | end-to-end                        |
+| Mission Mode            | `.claude/workflows/start-mission.md`                                  | strict pre-flight & constraints   |
 | C4 Architecture         | `.claude/workflows/enterprise/c4-architecture-workflow.md`            | C4 docs                           |
 | Conductor Setup         | `.claude/workflows/conductor-setup-workflow.md`                       | CDD setup                         |
 | Incident Response       | `.claude/workflows/operations/incident-response.md`                   | prod incidents                    |
@@ -79,6 +80,7 @@ See `router-decision.md` Step 7.5 for integration details.
 - `skill-lifecycle.md` - Artifact creation, updates, deprecation
 - `reflection-workflow.md` - Quality reflection and learning capture
 - `post-creation-validation.md` - Artifact integration validation
+- `start-mission.md` - Strict mission execution with pre-flight checks and formalized invariant constraints
 
 **Enterprise Workflows** (`.claude/workflows/enterprise/`):
 

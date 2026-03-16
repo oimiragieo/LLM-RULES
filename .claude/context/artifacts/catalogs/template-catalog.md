@@ -2,8 +2,8 @@
 
 # Template Catalog
 
-**Last Updated:** 2026-02-07
-**Total Active Templates:** 28
+**Last Updated:** 2026-03-15
+**Total Active Templates:** 31
 **Archived Templates:** 14 (see `_archive/README.md`)
 
 This catalog documents all active templates in the agent-studio framework with their agent/skill assignments and usage contexts.
@@ -414,6 +414,50 @@ This catalog documents all active templates in the agent-studio framework with t
 
 ---
 
+## 7. Mission Templates (3 active)
+
+### CONTINUATION_PLAN.md
+
+| Field              | Value                                            |
+| ------------------ | ------------------------------------------------ |
+| **Path**           | `.claude/templates/mission/CONTINUATION_PLAN.md` |
+| **Category**       | Mission Templates                                |
+| **Status**         | active                                           |
+| **Used By Agents** | master-orchestrator                              |
+| **Used By Skills** | start-mission                                    |
+
+**Purpose:** Structures handoffs between shifts during missions.
+
+---
+
+### INVARIANTS.md
+
+| Field              | Value                                     |
+| ------------------ | ----------------------------------------- |
+| **Path**           | `.claude/templates/mission/INVARIANTS.md` |
+| **Category**       | Mission Templates                         |
+| **Status**         | active                                    |
+| **Used By Agents** | master-orchestrator                       |
+| **Used By Skills** | start-mission                             |
+
+**Purpose:** Defines core invariants required for mission safety.
+
+---
+
+### ANTI_GOALS.md
+
+| Field              | Value                                     |
+| ------------------ | ----------------------------------------- |
+| **Path**           | `.claude/templates/mission/ANTI_GOALS.md` |
+| **Category**       | Mission Templates                         |
+| **Status**         | active                                    |
+| **Used By Agents** | master-orchestrator                       |
+| **Used By Skills** | start-mission                             |
+
+**Purpose:** Defines explicit non-goals for bounding mission scope.
+
+---
+
 ## Archived Templates
 
 **Total Archived:** 14 templates
@@ -480,7 +524,8 @@ Direct writes to `.claude/templates/` bypass creator workflow and create "invisi
 | **Report**     | 5      | developer, qa, researcher | tdd, qa-workflow, research-synthesis                         |
 | **Code Style** | 3      | developer, code-reviewer  | tdd, code-quality-expert                                     |
 | **Utility**    | 3      | All agents                | session-handoff, context-compressor                          |
-| **TOTAL**      | **28** | —                         | —                                                            |
+| **Mission**    | 3      | master-orchestrator       | start-mission                                                |
+| **TOTAL**      | **31** | —                         | —                                                            |
 
 ---
 

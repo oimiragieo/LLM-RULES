@@ -9,7 +9,7 @@ maxTurns: 20
 permissionMode: default
 priority: high
 verified: true
-lastVerifiedAt: "2026-03-15T00:00:00.000Z"
+lastVerifiedAt: '2026-03-15T00:00:00.000Z'
 tools: [Read, Bash, MemoryRecord, TaskUpdate, TaskList, TaskCreate, TaskGet]
 tags:
   - task-hygiene
@@ -32,10 +32,10 @@ context_files:
 
 The following hooks govern this agent's behavior at runtime:
 
-| Hook | Event | Purpose | Override |
-|------|-------|---------|----------|
-| `pre-tool-unified.cjs` | PreToolUse(*) | Validates tool scope, path safety, Windows compat (11 checks) | -- |
-| `post-tool-metrics-unified.cjs` | PostToolUse(*) | Metrics collection, execution monitoring, logging | -- |
+| Hook                            | Event           | Purpose                                                       | Override |
+| ------------------------------- | --------------- | ------------------------------------------------------------- | -------- |
+| `pre-tool-unified.cjs`          | PreToolUse(\*)  | Validates tool scope, path safety, Windows compat (11 checks) | --       |
+| `post-tool-metrics-unified.cjs` | PostToolUse(\*) | Metrics collection, execution monitoring, logging             | --       |
 
 See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
@@ -43,10 +43,10 @@ See `@.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow | Path | When to Use |
-|----------|------|-------------|
+| Workflow              | Path                                     | When to Use                          |
+| --------------------- | ---------------------------------------- | ------------------------------------ |
 | Workspace Conventions | `.claude/rules/workspace-conventions.md` | Output placement, naming, provenance |
-| Task Tracking | `.claude/rules/task-tracking.md` | Task state management |
+| Task Tracking         | `.claude/rules/task-tracking.md`         | Task state management                |
 
 **Output Standards** (from workspace-conventions):
 
@@ -160,15 +160,17 @@ For each CRITICAL or HIGH violation found in Phase 2:
 // Example: reflection queue buildup
 TaskCreate({
   subject: 'CRITICAL: Process 5 pending reflection requests',
-  description: 'reflection-spawn-request.json has 5 pending entries. Router must spawn reflection-agent for each via Task() tool. Do NOT wipe the file manually.',
-  activeForm: 'Processing reflection queue'
+  description:
+    'reflection-spawn-request.json has 5 pending entries. Router must spawn reflection-agent for each via Task() tool. Do NOT wipe the file manually.',
+  activeForm: 'Processing reflection queue',
 });
 
 // Example: missing hook
 TaskCreate({
   subject: 'CRITICAL: Restore missing routing-guard.cjs hook',
-  description: 'routing-guard.cjs is absent from .claude/hooks/routing/. This is a security regression. Invoke hook-creator skill to restore.',
-  activeForm: 'Restoring routing guard hook'
+  description:
+    'routing-guard.cjs is absent from .claude/hooks/routing/. This is a security regression. Invoke hook-creator skill to restore.',
+  activeForm: 'Restoring routing guard hook',
 });
 ```
 
@@ -194,11 +196,12 @@ TaskUpdate({
   taskId: '<stale-id>',
   status: 'completed',
   metadata: {
-    summary: 'Auto-closed by task-manager: task was in_progress with no update for >30min. Original owner: <owner>.',
+    summary:
+      'Auto-closed by task-manager: task was in_progress with no update for >30min. Original owner: <owner>.',
     closedBy: 'task-manager',
     closedAt: new Date().toISOString(),
-    reason: 'stale-no-update'
-  }
+    reason: 'stale-no-update',
+  },
 });
 ```
 
@@ -223,24 +226,27 @@ Produce a structured report:
 ## Task Manager Health Report — {timestamp}
 
 ### Task System
+
 - Total tasks: N
 - Stale tasks closed: N
 - Fix tasks created: N
 
 ### Framework Health
-| Invariant | Status |
-|-----------|--------|
-| routing-guard.cjs | OK / MISSING |
-| unified-creator-guard.cjs | OK / MISSING |
-| reflection workflow | OK / MISSING |
-| stale-tasks.json | ABSENT / {count} entries |
-| heartbeat-session-ping.json | EXISTS / ABSENT |
-| agent registry count | {count} (>=79 required) |
-| integration queue | {count} pending |
-| reflection queue | {count} pending |
-| post-tool-metrics-unified.cjs | OK / MISSING |
+
+| Invariant                     | Status                   |
+| ----------------------------- | ------------------------ |
+| routing-guard.cjs             | OK / MISSING             |
+| unified-creator-guard.cjs     | OK / MISSING             |
+| reflection workflow           | OK / MISSING             |
+| stale-tasks.json              | ABSENT / {count} entries |
+| heartbeat-session-ping.json   | EXISTS / ABSENT          |
+| agent registry count          | {count} (>=79 required)  |
+| integration queue             | {count} pending          |
+| reflection queue              | {count} pending          |
+| post-tool-metrics-unified.cjs | OK / MISSING             |
 
 ### Summary
+
 {brief summary of actions taken and current health status}
 ```
 
@@ -272,16 +278,16 @@ When executing the health audit cycle, follow this 8-step approach:
 
 ## Example Interactions
 
-| User Request | Agent Action |
-|--------------|-------------|
-| "Run post-pipeline health check" | Executes all 6 phases, reports framework status |
-| "Clean up stale tasks" | Phase 1 + Phase 5: verify staleness then close |
-| "Check framework invariants" | Phase 2 only: run 9-item checklist |
-| "There are tasks stuck in_progress" | Phase 1: audit each via TaskGet, close confirmed stale |
-| "Reflection queue has 8 pending" | Phase 4: create fix task for router to process reflections |
-| "Agent count seems wrong" | Phase 2 invariant 6: check registry count vs 79 baseline |
-| "Pipeline finished, do cleanup" | Full 6-phase cycle |
-| "Are there duplicate fix tasks?" | Phase 4 pre-check: scan TaskList for existing open fix tasks |
+| User Request                        | Agent Action                                                 |
+| ----------------------------------- | ------------------------------------------------------------ |
+| "Run post-pipeline health check"    | Executes all 6 phases, reports framework status              |
+| "Clean up stale tasks"              | Phase 1 + Phase 5: verify staleness then close               |
+| "Check framework invariants"        | Phase 2 only: run 9-item checklist                           |
+| "There are tasks stuck in_progress" | Phase 1: audit each via TaskGet, close confirmed stale       |
+| "Reflection queue has 8 pending"    | Phase 4: create fix task for router to process reflections   |
+| "Agent count seems wrong"           | Phase 2 invariant 6: check registry count vs 79 baseline     |
+| "Pipeline finished, do cleanup"     | Full 6-phase cycle                                           |
+| "Are there duplicate fix tasks?"    | Phase 4 pre-check: scan TaskList for existing open fix tasks |
 
 ## Output Locations
 
@@ -311,7 +317,8 @@ TaskUpdate({
   taskId: '<your-task-id>',
   status: 'completed',
   metadata: {
-    summary: 'Framework health audit complete. N violations found, N fix tasks created, N stale tasks closed.',
+    summary:
+      'Framework health audit complete. N violations found, N fix tasks created, N stale tasks closed.',
     filesModified: [],
     closedStaleCount: 0,
     fixTasksCreated: 0,

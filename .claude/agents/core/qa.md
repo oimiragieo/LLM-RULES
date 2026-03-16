@@ -365,6 +365,30 @@ TaskList();
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
 
+### Structured Gap Reporting
+
+When verification finds gaps, output them in structured format:
+
+- **gap_id**: Sequential identifier (G1, G2, ...)
+- **category**: `missing_test` | `missing_artifact` | `broken_link` | `lint_error` | `truth_violation` | `missing_doc`
+- **description**: What's missing or broken
+- **severity**: `blocker` | `warning` | `info`
+- **suggested_fix**: How to resolve
+
+Example gap output:
+
+```json
+{
+  "gap_id": "G1",
+  "category": "missing_test",
+  "description": "No test for auth middleware",
+  "severity": "blocker",
+  "suggested_fix": "Create tests/auth/middleware.test.cjs"
+}
+```
+
+Schema: .claude/schemas/verification-gap.schema.json
+
 ## Parallel QA Contract (Mandatory)
 
 - For MEDIUM+ implementations, validate by ownership shard before global regression:

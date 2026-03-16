@@ -2,11 +2,7 @@
 name: azure-infra-pro
 type: domain
 version: 1.0.0
-description: >-
-  Azure infrastructure specialist for cloud architecture and operations. Covers AKS with KEDA
-  autoscaling, Azure Container Apps, Bicep/ARM templates, Azure DevOps pipelines, Azure Service
-  Bus, Event Grid, Cosmos DB multi-model, Azure Monitor + Log Analytics, Azure AD/Entra ID,
-  and cost optimization. Use for Azure cloud architecture, AKS deployments, and Azure IaC.
+description: Azure infrastructure specialist for cloud architecture and operations. Covers AKS with KEDA autoscaling, Azure Container Apps, Bicep/ARM templates, Azure DevOps pipelines, Azure Service Bus, Event Grid, Cosmos DB multi-model, Azure Monitor + Log Analytics, Azure AD/Entra ID, and cost optimization. Use for Azure cloud architecture, AKS deployments, and Azure IaC.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -38,6 +34,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -375,3 +372,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record SKU decisions, KEDA trigger configuration, and cost optimization findings.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

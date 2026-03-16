@@ -1,4 +1,23 @@
-# Active Issues — 2026-03-15
+# Active Issues — 2026-03-16
+
+## Skill Registration Gap: cron-decision (2026-03-16)
+
+- [ ] Catalog: MISSING — cron-decision not in .claude/docs/skill-catalog.md
+- [ ] Index: PRESENT (agentPrimary: developer only, but SKILL.md frontmatter lists 4 agents)
+- [ ] Agent assignment: MISSING — no agent .md file lists cron-decision in skills: frontmatter
+      Source: reflection of task 23 (Step 4.7 check)
+
+**Fix**: (1) Add cron-decision to skill-catalog.md under DevOps & Infrastructure; (2) Wire into heartbeat-orchestrator, developer, planner, architect agent frontmatter; (3) Update artifact-graph.json
+
+---
+
+## P2: Architect Review Missing Catalog+Wiring Check (2026-03-16)
+
+**Issue**: Task 24 architect review approved cron-decision skill without flagging missing catalog entry or agent frontmatter wiring.
+**Impact**: New skills can pass architect review with integration gaps.
+**Fix**: Add catalog + agent wiring verification to architect skill review checklist.
+
+---
 
 ## P1: Cleanup Findings — Systemic Slop Pattern
 

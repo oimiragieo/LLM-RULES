@@ -241,6 +241,16 @@
       ],
       "status": "active"
     },
+    "start-mission-workflow": {
+      "path": "start-mission.md",
+      "category": "core",
+      "type": "sequential",
+      "description": "Strict pre-flight environment checks, invariant bounding, and parallel scouting loop before code modification.",
+      "phases": 3,
+      "requiredAgents": ["router", "master-orchestrator"],
+      "triggers": ["multi_agent", "high_complexity"],
+      "status": "active"
+    },
     "database-architect-workflow": {
       "path": "database-architect-skill-workflow.md",
       "category": "root",

@@ -16,7 +16,7 @@ This table shows which workflows are referenced by which agent archetypes. Workf
 
 | Workflow                           | Router | Implementer | Reviewer | Documenter | Orchestrator | Researcher | Domain |
 | ---------------------------------- | ------ | ----------- | -------- | ---------- | ------------ | ---------- | ------ |
-| **Core Workflows (8)**             |
+| **Core Workflows (9)**             |
 | router-decision                    | x      |             |          |            |              |            |        |
 | enterprise-workflow                | x      | x           | x        | x          | x            | x          | x      |
 | evolution-workflow                 | x      |             |          |            | x            |            |        |
@@ -25,6 +25,7 @@ This table shows which workflows are referenced by which agent archetypes. Workf
 | skill-lifecycle                    |        |             |          |            | x            |            |        |
 | post-creation-validation           |        |             |          |            | x            |            |        |
 | external-integration               |        | x           |          |            |              |            | x      |
+| start-mission                      | x      |             |          |            | x            |            |        |
 | **Enterprise Workflows (3)**       |
 | c4-architecture-workflow           |        | x           |          | x          |              |            |        |
 | qa-bounded-loop                    |        |             | x        |            |              |            |        |

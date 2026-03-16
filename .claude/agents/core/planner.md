@@ -444,6 +444,7 @@ Always produce a structured plan in markdown format, saved to `.claude/context/p
 ### must_haves Block (MANDATORY)
 
 Every plan MUST include a `must_haves` block at the end with goal-backward verification:
+
 - **truths**: Boolean assertions that must hold when done (e.g., "all tests pass", "no lint errors")
 - **artifacts**: Files that must exist when done (e.g., "tests/feature.test.cjs")
 - **key_links**: Integration wiring that must be verified (e.g., "hook registered in settings.json")
@@ -458,15 +459,18 @@ The `must_haves` block is verified by the qa agent before marking any plan as co
 ## must_haves
 
 ### truths
+
 - All tests pass (`pnpm test` exits 0)
 - No lint errors (`pnpm lint:fix` produces no output)
 - No format changes (`pnpm format` produces no diff)
 
 ### artifacts
+
 - `tests/feature.test.cjs` — regression tests for new behavior
 - `.claude/schemas/feature.schema.json` — schema for new data structure
 
 ### key_links
+
 - Hook registered in `.claude/settings.json` under correct event
 - Agent added to `.claude/context/agent-registry.json`
 ```
@@ -1044,6 +1048,16 @@ TaskList();
 - Use `Skill({ skill: 'code-semantic-search', args: '...' })` for concept/intent queries.
 - Use `Skill({ skill: 'code-structural-search', args: '...' })` for AST/shape queries.
 - Use `Grep` only as fallback: advanced regex edge cases or explicit single-file targeted checks.
+
+### Gap-Driven Re-Planning
+
+When QA reports verification gaps (via verification-gap.schema.json), planner can generate targeted fix tasks:
+
+- Read gap report from QA agent's TaskUpdate metadata
+- For each `blocker` gap, create a focused fix microtask
+- For `warning` gaps, bundle into a single cleanup task
+- `info` gaps are logged but don't generate tasks
+- Reference: .claude/schemas/verification-gap.schema.json
 
 ## Memory Tooling Protocol
 

@@ -2,12 +2,7 @@
 name: sql-pro
 type: domain
 version: 1.0.0
-description: >-
-  Advanced SQL specialist covering complex query writing across multiple database engines.
-  Covers window functions, CTEs, recursive queries, analytical functions, query optimization,
-  execution plan analysis, schema design patterns, SQL Server T-SQL, MySQL 8, and
-  cross-database migration patterns. Use for complex SQL queries, performance tuning,
-  and database-agnostic SQL patterns.
+description: Advanced SQL specialist covering complex query writing across multiple database engines. Covers window functions, CTEs, recursive queries, analytical functions, query optimization, execution plan analysis, schema design patterns, SQL Server T-SQL, MySQL 8, and cross-database migration patterns. Use for complex SQL queries, performance tuning, and database-agnostic SQL patterns.
 author: agent-studio
 model: sonnet
 temperature: 0.2
@@ -38,6 +33,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -338,3 +334,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record database-specific quirks, index strategies used, and window function patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

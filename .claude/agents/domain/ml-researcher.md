@@ -30,7 +30,7 @@ Use `Skill({ skill: 'ml-experiment-loop' })` to learn how to reliably run the ev
 ## Rules of Engagement
 
 - **Never get stuck in a syntax loop.** If `train.py` crashes 3 times in a row due to syntax/dimension mismatches, revert back to the last known working state and take a smaller step.
-- **Document the journey.** Once an experiment finishes, log the hypothesis, the diff, and the resulting metric using `Skill({ skill: 'research-logger' })`.
+- **Document the journey.** Once an experiment finishes, log the hypothesis, the diff, and the resulting metric using native file writing tools.
 - **Ignore distractions.** You don't need to read all the code. Start by tweaking obvious hyperparameters (learning rate, weight decay, batch size) before moving to complex architectural changes (rotary embeddings, SwiGLU, custom optimizers).
 
 ## Token Saver Invocation Rule

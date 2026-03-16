@@ -2,11 +2,7 @@
 name: rails-pro
 type: domain
 version: 1.0.0
-description: >-
-  Ruby on Rails specialist for modern web applications. Covers Rails 7+ Hotwire (Turbo + Stimulus),
-  import maps, Solid Queue, Solid Cache, Solid Cable, Active Record patterns, Action Cable,
-  ViewComponent, Kamal deployment, and Rails 8 features. Use for Rails API development,
-  full-stack Rails with Hotwire, and Rails performance optimization.
+description: Ruby on Rails specialist for modern web applications. Covers Rails 7+ Hotwire (Turbo + Stimulus), import maps, Solid Queue, Solid Cache, Solid Cable, Active Record patterns, Action Cable, ViewComponent, Kamal deployment, and Rails 8 features. Use for Rails API development, full-stack Rails with Hotwire, and Rails performance optimization.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -38,6 +34,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -340,3 +337,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record Rails version quirks, Hotwire patterns, and Active Record optimization strategies.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

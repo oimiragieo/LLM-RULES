@@ -29,6 +29,7 @@ Router MUST check this table before defaulting to developer. Developer is ALWAYS
 | "audit / security review / pentest"                 | developer  | **security-architect**                |
 | "refactor / clean up / simplify"                    | developer  | **code-simplifier**                   |
 | "medical / symptoms / diagnosis / drug interaction" | researcher | **medical-research-triage**           |
+| "start mission" / "mission mode" / "ceo"            | developer  | **master-orchestrator**               |
 | "task audit" / "clean up stale tasks"               | developer  | **task-manager**                      |
 
 ---

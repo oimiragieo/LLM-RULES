@@ -2,12 +2,7 @@
 name: m365-admin
 type: domain
 version: 1.0.0
-description: >-
-  Microsoft 365 administration specialist for enterprise environments. Covers Exchange Online,
-  SharePoint, Teams, Microsoft Entra ID (Azure AD), Intune MDM/MAM, Microsoft Graph API,
-  PowerShell automation (ExchangeOnline + MSGraph + Teams modules), compliance and DLP policies,
-  conditional access, and Microsoft 365 Defender. Use for M365 tenant administration,
-  PowerShell automation, and Microsoft 365 governance.
+description: Microsoft 365 administration specialist for enterprise environments. Covers Exchange Online, SharePoint, Teams, Microsoft Entra ID (Azure AD), Intune MDM/MAM, Microsoft Graph API, PowerShell automation (ExchangeOnline + MSGraph + Teams modules), compliance and DLP policies, conditional access, and Microsoft 365 Defender. Use for M365 tenant administration, PowerShell automation, and Microsoft 365 governance.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -38,6 +33,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -287,3 +283,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record tenant-specific configuration quirks, app registration decisions, and policy templates used.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

@@ -2,11 +2,7 @@
 name: angular-pro
 type: domain
 version: 1.0.0
-description: >-
-  Angular framework specialist for enterprise web applications. Covers Angular 17+ signals, standalone
-  components, reactive forms, RxJS patterns, NgRx state management, Angular Material, lazy loading,
-  SSR with Angular Universal, and performance optimization. Use for Angular SPA development, component
-  architecture, and enterprise Angular projects.
+description: Angular framework specialist for enterprise web applications. Covers Angular 17+ signals, standalone components, reactive forms, RxJS patterns, NgRx state management, Angular Material, lazy loading, SSR with Angular Universal, and performance optimization. Use for Angular SPA development, component architecture, and enterprise Angular projects.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -240,3 +236,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record Angular version quirks, RxJS patterns, and NgRx migration notes.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

@@ -1,9 +1,9 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-03-14T17:50:49.007Z",
+  "generated_at": "2026-03-16T04:29:03.756Z",
   "prebuilt": false,
-  "total_rules": 135,
-  "master_rules": 135,
+  "total_rules": 139,
+  "master_rules": 139,
   "library_rules": 0,
   "schema_version": "1.0.0",
   "versioning": {
@@ -434,6 +434,17 @@
       "line_count": 247
     },
     {
+      "path": ".claude/rules/erlang-rules.md",
+      "name": "erlang-rules",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": ["api", "go", "rest"],
+      "type": "master",
+      "size": 5465,
+      "line_count": 159
+    },
+    {
       "path": ".claude/rules/expo-framework-rule.md",
       "name": "expo-framework-rule",
       "description": "",
@@ -687,6 +698,17 @@
       "line_count": 112
     },
     {
+      "path": ".claude/rules/ml-experiment-standards.md",
+      "name": "ml-experiment-standards",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": [],
+      "type": "master",
+      "size": 5796,
+      "line_count": 112
+    },
+    {
       "path": ".claude/rules/mobile-first-design-rules.md",
       "name": "mobile-first-design-rules",
       "description": "",
@@ -750,6 +772,17 @@
       "type": "master",
       "size": 2210,
       "line_count": 78
+    },
+    {
+      "path": ".claude/rules/observability-rules.md",
+      "name": "observability-rules",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": ["api", "nodejs", "python", "typescript"],
+      "type": "master",
+      "size": 7065,
+      "line_count": 219
     },
     {
       "path": ".claude/rules/on-call-handoff-patterns.md",
@@ -1519,6 +1552,17 @@
       "type": "master",
       "size": 964,
       "line_count": 37
+    },
+    {
+      "path": ".claude/rules/zig-rules.md",
+      "name": "zig-rules",
+      "description": "",
+      "globs": "",
+      "priority": "",
+      "technologies": ["go"],
+      "type": "master",
+      "size": 5824,
+      "line_count": 179
     }
   ],
   "technology_map": {
@@ -1536,6 +1580,7 @@
       ".claude/rules/docker-development.md",
       ".claude/rules/documentation-always.md",
       ".claude/rules/dry-principle.md",
+      ".claude/rules/erlang-rules.md",
       ".claude/rules/expo-framework-rule.md",
       ".claude/rules/gamedev-expert.md",
       ".claude/rules/go-development.md",
@@ -1566,7 +1611,8 @@
       ".claude/rules/typescript-development.md",
       ".claude/rules/webapp-testing.md",
       ".claude/rules/workflow-creator.md",
-      ".claude/rules/workspace-conventions.md"
+      ".claude/rules/workspace-conventions.md",
+      ".claude/rules/zig-rules.md"
     ],
     "html": [
       ".claude/rules/accessibility.md",
@@ -1653,6 +1699,7 @@
       ".claude/rules/nextjs-app-router-rules.md",
       ".claude/rules/nextjs-expert.md",
       ".claude/rules/nodejs-expert.md",
+      ".claude/rules/observability-rules.md",
       ".claude/rules/plugin-development.md",
       ".claude/rules/react-expert.md",
       ".claude/rules/refactoring-patterns.md",
@@ -1677,6 +1724,7 @@
       ".claude/rules/fastapi-rules.md",
       ".claude/rules/lancedb-rules.md",
       ".claude/rules/modern-python.md",
+      ".claude/rules/observability-rules.md",
       ".claude/rules/python-backend-expert.md",
       ".claude/rules/scientific-skills.md",
       ".claude/rules/webapp-testing.md"
@@ -1697,6 +1745,7 @@
       ".claude/rules/differential-review.md",
       ".claude/rules/doc-generator.md",
       ".claude/rules/dry-principle.md",
+      ".claude/rules/erlang-rules.md",
       ".claude/rules/expo-framework-rule.md",
       ".claude/rules/fastapi-rules.md",
       ".claude/rules/frontend-expert.md",
@@ -1712,6 +1761,7 @@
       ".claude/rules/nextjs-app-router-rules.md",
       ".claude/rules/nextjs-expert.md",
       ".claude/rules/nodejs-expert.md",
+      ".claude/rules/observability-rules.md",
       ".claude/rules/performance.md",
       ".claude/rules/php-expert.md",
       ".claude/rules/plugin-development.md",
@@ -1742,6 +1792,7 @@
       ".claude/rules/data-expert.md",
       ".claude/rules/database-expert.md",
       ".claude/rules/docker-compose.md",
+      ".claude/rules/erlang-rules.md",
       ".claude/rules/git-workflow.md",
       ".claude/rules/go-expert.md",
       ".claude/rules/graphql-expert.md",
@@ -1814,6 +1865,7 @@
       ".claude/rules/code-standards.md",
       ".claude/rules/insecure-defaults.md",
       ".claude/rules/nodejs-expert.md",
+      ".claude/rules/observability-rules.md",
       ".claude/rules/typescript-expert.md"
     ],
     "jsx": [

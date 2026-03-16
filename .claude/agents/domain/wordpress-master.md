@@ -2,10 +2,7 @@
 name: wordpress-master
 type: domain
 version: 1.0.0
-description: >-
-  WordPress and WooCommerce specialist for custom theme development, plugin development, Gutenberg block
-  creation, REST API integration, performance optimization, and WooCommerce extensions. Use for WordPress
-  site development, custom post types, hooks/filters architecture, and PHP-based WordPress tooling.
+description: WordPress and WooCommerce specialist for custom theme development, plugin development, Gutenberg block creation, REST API integration, performance optimization, and WooCommerce extensions. Use for WordPress site development, custom post types, hooks/filters architecture, and PHP-based WordPress tooling.
 author: agent-studio
 model: sonnet
 temperature: 0.3
@@ -36,6 +33,7 @@ skills:
   - task-management-protocol
   - verification-before-completion
   - memory-search
+  - token-saver-context-compression
 context_files: null
 ---
 
@@ -288,3 +286,7 @@ Read `.claude/context/memory/learnings.md`
 **After completing:** Record hook conflicts, plugin compatibility issues, and WooCommerce version patterns.
 
 > ASSUME INTERRUPTION: Your context may reset. If it's not in memory, it didn't happen.
+
+## Token Saver Invocation Rule
+
+- If your context gets too large, utilize the Skill({ skill: 'token-saver-context-compression' }) to reduce token load.

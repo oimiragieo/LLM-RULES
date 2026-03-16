@@ -1,7 +1,29 @@
 {
   "version": 1,
-  "lastEvolution": "2026-03-01-dynamic-api-integration-update",
+  "lastEvolution": "2026-03-15-system-health-check",
   "evolutions": [
+    {
+      "id": "2026-03-15-system-health-check",
+      "artifactType": "skill",
+      "name": "system-health-check",
+      "path": ".claude/skills/system-health-check/SKILL.md",
+      "status": "completed",
+      "completedAt": "2026-03-15T00:00:00.000Z",
+      "category": "Validation & Quality",
+      "agents": ["master-orchestrator", "developer"],
+      "description": "Added system-health-check skill. Part of Mission Mode feature.",
+      "affected": ["system-health-check"]
+    },
+    {
+      "id": "2026-03-15-mission-templates",
+      "artifactType": "template",
+      "name": "mission-templates",
+      "path": ".claude/templates/",
+      "status": "completed",
+      "completedAt": "2026-03-15T00:00:00.000Z",
+      "description": "Added CONTINUATION_PLAN, INVARIANTS, and ANTI_GOALS templates.",
+      "affected": ["CONTINUATION_PLAN.md", "INVARIANTS.md", "ANTI_GOALS.md"]
+    },
     {
       "id": "2026-03-01-dynamic-api-integration-update",
       "skill": "dynamic-api-integration",
