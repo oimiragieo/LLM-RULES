@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Heartbeat cron ticks now delegate to heartbeat-orchestrator subagent via Task() instead of executing inline in the router session (fixes context flooding)
+- Session ping TTL increased from 15 min to 40 min — prevents excessive Step 0.5 re-spawns (Gemini/GPT reviewed: 40min = 2.5× 30min drain refresh interval)
+- Step 0.5 enforcement hardened: new advisory hook `heartbeat-step05-check.cjs` warns on PreToolUse(TaskList) when ping is expired
+- `context-drain.cjs` now refreshes the session ping on every run, keeping Step 0.5 satisfied
+- Fixed sentinel `heartbeat-sentinel.cjs` path resolution bug: was resolving 4 levels up (landing in `C:/dev/projects/`) instead of 3 (correct project root)
+
+---
+
 ### Added — MEGA EVOLUTION v2 Wave 3: Rules (2026-03-15)
 
 3 new rules files. Total rules: 136+.

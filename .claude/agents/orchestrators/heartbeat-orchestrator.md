@@ -58,6 +58,18 @@ You MUST follow the script-first, LLM-last pattern for **all** cron tick callbac
 3. If the script outputs `QUEUED_ACTIONS` or handles it internally, simply exit with `HEARTBEAT_OK` or the relevant message. Do not attempt to parse subagent tasks directly.
 4. Do NOT wait for the sub-agent to finish. Spawn and forget.
 
+## Tick Callback Handling
+
+When spawned for an individual tick (task_id starts with 'hb-'):
+
+1. Call TaskUpdate(in_progress) immediately
+2. Run the specified script via Bash: `node .claude/tools/cli/<script>.cjs`
+3. If stdout contains HEARTBEAT_OK: call TaskUpdate(completed) and exit
+4. If stdout contains QUEUED_ACTIONS: process the queue file, then call TaskUpdate(completed) and exit
+5. If script fails or stderr contains errors: write warning to `.claude/context/runtime/session-gap-log.jsonl`, call TaskUpdate(completed) and exit
+6. Do NOT re-register loops — this is a single-tick execution only
+7. Do NOT spawn additional sub-agents — execute inline
+
 ## Startup Protocol
 
 When spawned, immediately:

@@ -72,7 +72,19 @@ function setupWindows() {
   // Register the task: daily at 08:17, run as current user
   // Build the /TR value: schtasks requires a single quoted string for the command
   const trValue = '"' + nodeWin + '" "' + scriptWin + '"';
-  const cmd = ['schtasks', '/Create', '/TN', taskName, '/TR', trValue, '/SC', 'DAILY', '/ST', '08:17', '/F'];
+  const cmd = [
+    'schtasks',
+    '/Create',
+    '/TN',
+    taskName,
+    '/TR',
+    trValue,
+    '/SC',
+    'DAILY',
+    '/ST',
+    '08:17',
+    '/F',
+  ];
 
   try {
     execSync(cmd.join(' '), { stdio: 'inherit', shell: false });

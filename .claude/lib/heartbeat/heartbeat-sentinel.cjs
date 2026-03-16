@@ -24,7 +24,7 @@ try {
 
 /** Absolute path to the sentinel file. */
 function getSentinelPath() {
-  const projectRoot = path.resolve(__dirname, '..', '..', '..', '..');
+  const projectRoot = path.resolve(__dirname, '..', '..', '..');
   return path.join(projectRoot, '.claude', 'context', 'runtime', 'heartbeat-active.json');
 }
 
@@ -142,20 +142,21 @@ function checkSentinel(expectedLoops = 8) {
   return { valid: true, reason: 'ok', data };
 }
 
-/** Absolute path to the session ping file (short-TTL: 15 min). */
+/** Absolute path to the session ping file (short-TTL: 40 min). */
 function getSessionPingPath() {
-  const projectRoot = path.resolve(__dirname, '..', '..', '..', '..');
+  const projectRoot = path.resolve(__dirname, '..', '..', '..');
   return path.join(projectRoot, '.claude', 'context', 'runtime', 'heartbeat-session-ping.json');
 }
 
-const SESSION_PING_TTL_MS = 15 * 60 * 1000;
+const SESSION_PING_TTL_MS = 40 * 60 * 1000;
 
 /**
  * Write the session ping after confirming loops are active.
  *
  * Step 0.5 checks this short-TTL file (not the 46h sentinel) to decide
  * whether to spawn heartbeat-orchestrator. Cron loops die on terminal close;
- * the 15-min TTL ensures new sessions always trigger re-registration.
+ * the 40-min TTL (2.5× the 30-min drain loop interval) ensures new sessions
+ * always trigger re-registration with a 10-min safety margin.
  *
  * @param {Array} loops Registered loop objects (or empty array).
  * @returns {string} Path to the written ping file.
@@ -167,7 +168,7 @@ function writeSessionPing(loops) {
     written_at: now.toISOString(),
     expires_at: expiresAt.toISOString(),
     loop_count: Array.isArray(loops) ? loops.length : 0,
-    ttl_minutes: 15,
+    ttl_minutes: 40,
   };
   const pingPath = getSessionPingPath();
   const pingDir = path.dirname(pingPath);

@@ -34,19 +34,19 @@ The **Heartbeat Ecosystem** keeps agent-studio healthy, indexed, and informed by
 Run these `/loop` commands in your Claude Code session:
 
 ```
-/loop 2h Run: node .claude/tools/cli/reflection-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.
+/loop 2h Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-reflection-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to run reflection-check.cjs. Reply HEARTBEAT_OK after spawning.
 ```
 
 ```
-/loop 4h Check if .claude/context/data/bm25-index.json is older than 4 hours via Bash (stat mtime). If stale or missing: run pnpm code:index:reindex. Reply HEARTBEAT_OK if fresh.
+/loop 4h Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-indexing-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to check bm25-index.json mtime and reindex if stale. Reply HEARTBEAT_OK after spawning.
 ```
 
 ```
-/loop 30m Run: node .claude/tools/cli/context-drain.cjs\nReply exactly with the stdout output, then exit.
+/loop 30m Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-drain-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to run context-drain.cjs and report stdout. Reply HEARTBEAT_OK after spawning.
 ```
 
 ```
-/loop 24h Run: node .claude/tools/cli/evolution-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.
+/loop 24h Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-evolution-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to run evolution-check.cjs. Reply HEARTBEAT_OK after spawning.
 ```
 
 ---
@@ -71,7 +71,7 @@ Extracts patterns from session transcripts before they are lost.
 ```javascript
 CronCreate({
   schedule: '0 */2 * * *',
-  task: 'Run: node .claude/tools/cli/reflection-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.',
+  task: "Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-reflection-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to execute this tick. The orchestrator must: (1) call TaskUpdate(in_progress), (2) run `node .claude/tools/cli/reflection-check.cjs`, (3) if stdout is HEARTBEAT_OK, call TaskUpdate(completed) and exit. Do NOT run the script directly in the router session. Reply HEARTBEAT_OK immediately after spawning.",
 });
 ```
 
@@ -82,7 +82,7 @@ Applies accumulated learnings to improve agent definitions.
 ```javascript
 CronCreate({
   schedule: '0 3 * * *',
-  task: 'Run: node .claude/tools/cli/evolution-check.cjs\nParse stdout. If HEARTBEAT_OK, reply HEARTBEAT_OK and exit.',
+  task: "Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-evolution-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to execute this tick. The orchestrator must: (1) call TaskUpdate(in_progress), (2) run `node .claude/tools/cli/evolution-check.cjs`, (3) if stdout is HEARTBEAT_OK, call TaskUpdate(completed) and exit. Do NOT run the script directly in the router session. Reply HEARTBEAT_OK immediately after spawning.",
 });
 ```
 
@@ -104,7 +104,7 @@ Keeps hybrid search index fresh.
 ```javascript
 CronCreate({
   schedule: '0 */4 * * *',
-  task: 'Index freshness check: Check mtime of .claude/context/data/bm25-index.json via Bash. If older than 4 hours/missing: run pnpm code:index:reindex. Reply HEARTBEAT_OK and exit.',
+  task: "Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-indexing-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to execute this tick. The orchestrator must: (1) call TaskUpdate(in_progress), (2) check mtime of .claude/context/data/bm25-index.json via Bash; if older than 4 hours or missing, run `pnpm code:index:reindex`, (3) call TaskUpdate(completed) and exit. Do NOT run the script directly in the router session. Reply HEARTBEAT_OK immediately after spawning.",
 });
 ```
 
@@ -115,7 +115,7 @@ Detects pipeline idle state — warns user, does NOT auto-clear.
 ```javascript
 CronCreate({
   schedule: '*/30 * * * *',
-  task: 'Run: node .claude/tools/cli/context-drain.cjs\nReply exactly with the stdout output, then exit.',
+  task: "Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-drain-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to execute this tick. The orchestrator must: (1) call TaskUpdate(in_progress), (2) run `node .claude/tools/cli/context-drain.cjs`, (3) reply with the exact stdout output, then call TaskUpdate(completed) and exit. Do NOT run the script directly in the router session. Reply HEARTBEAT_OK immediately after spawning.",
 });
 ```
 
@@ -132,7 +132,7 @@ Polls Telegram Bot API for user messages and routes to agents.
 ```javascript
 CronCreate({
   schedule: '*/5 * * * *',
-  task: 'Run: node .claude/tools/cli/telegram-poll.cjs\nParse stdout. Reply HEARTBEAT_OK and exit.',
+  task: "Heartbeat tick: Spawn heartbeat-orchestrator subagent via Task({ task_id: 'hb-telegram-' + Date.now(), subagent_type: 'heartbeat-orchestrator' }) to execute this tick. The orchestrator must: (1) call TaskUpdate(in_progress), (2) run `node .claude/tools/cli/telegram-poll.cjs`, (3) if stdout is HEARTBEAT_OK, call TaskUpdate(completed) and exit. Do NOT run the script directly in the router session. Reply HEARTBEAT_OK immediately after spawning.",
 });
 ```
 

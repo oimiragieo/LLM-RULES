@@ -1,115 +1,3 @@
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-11)
-
-- Created new agent: contract-check (2026-03-11)
-
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-11)
-
-- Created new agent: bool-action (2026-03-11)
-
-- Created new agent: repo-onboarder (2026-03-11)
-
-- Updated workflow: evolution-workflow (2026-03-11)
-
-- Updated workflow: missing-workflow-xyz (2026-03-11)
-
-## TDD 2026 Industry Research (2026-03-11) [Task #4]
-
-**Multi-agent TDD is the 2025-2026 standard (TDFlow 94.3% SWE-Bench Verified):**
-
-- 4-sub-agent decomposition: propose → debug → revise → generate-test outperforms monolithic single-agent loops
-- Test writing (not code generation) is the primary bottleneck for AI TDD
-- Pattern: QA writes test + commits, developer implements without touching test file, reflection verifies no test hacking
-- Test-hacking rate drops from ~40% to 7/800 runs with sub-agent decomposition
-
-**LSP pre-RED type verification (LSPAI FSE 2025):**
-
-- Using lsp_hover BEFORE writing test raises valid test rate 25%+ by preventing API mismatch false REDs
-- Falls back to `node -e "typeof require('./file').fn"` for .cjs files where LSP returns empty
-
-**PBT with @fast-check/vitest (2025 standard, 650K monthly downloads):**
-
-- Best for: routeIntent(anyString) → always returns string; hook(anyJSON) → exits 0 or 2
-- Two modes: one-time random (lightweight) and full PBT; both integrate with Vitest natively
-
-**Mutation testing gap (Stryker JS):**
-
-- Not in TDD skill or testing.md — P1 gap
-- Target: >70% production, >90% security-critical hooks/routing
-- Incremental mode makes CI integration practical
-
-**Top 5 gaps found:** (1) multi-agent TDD pattern, (2) LSP pre-RED verification, (3) @fast-check/vitest actionable example, (4) contract testing for hook schemas, (5) mutation testing guidance
-
-**Report:** `.claude/context/artifacts/research-reports/tdd-2026-standards-research-2026-03-11.md`
-
-## Structural Audit Patterns (2026-03-12)
-
-**Pattern: Dead Code exit(0)/exit(2) in Security Hooks [HOOK]**
-
-- Context: pre-completion-validation.cjs line 692 had `process.exit(0); process.exit(2);` — Node.js exits on first call
-- Impact: Artifact output contract enforcement was completely non-functional (block printed to stdout but exit(0) allowed through)
-- Detection: Line-level code read (not function-level) required to catch this
-- Application: When reviewing security hooks, read the actual exit lines, not just the overall flow
-
-**Pattern: formatResult() Object Signature Silent Bypass [HOOK]**
-
-- Context: `formatResult({ decision: 'block', reason: msg })` does not set `result.allow` — inferredDecision defaults to 'allow'
-- Root cause: formatResult() checks `result.allow` (boolean), not `result.decision` (string), when called with an object
-- Fix: Always use string-first signature: `formatResult('block', check.message)`
-- Application: Any hook calling formatResult with an object arg should be audited for this bypass
-
-**Pattern: Fail-Open Sibling Hook Audit Heuristic [HOOK]**
-
-- Context: 3 of 4 evolution hooks shared the same fail-open catch block defect (exit 0 instead of exit 2)
-- Heuristic: When one security hook in a directory has a defect, audit ALL sibling hooks in that directory for the same class
-- Application: Batch-apply fixes; never fix one sibling in isolation
-
-**Pattern: Policy Without ESLint Enforcement Causes Drift [SECURITY]**
-
-- Context: ADR-115 accepted safeParseJSON for all hooks Feb 2026; 3 hooks still using raw JSON.parse in Mar 2026
-- Root cause: Policy documentation does not prevent future regressions without automated lint rule
-- Fix: Add ESLint rule blocking raw JSON.parse in .claude/hooks/ directory
-- Application: Any security policy for code patterns needs corresponding ESLint/tooling enforcement
-
-## [2026-03-12] TDD Modernization Research (Task #22)
-
-- **Stryker/Vitest**: `@stryker-mutator/vitest-runner` is the 2025-2026 standard for mutation testing ESM/TypeScript; replaces jest-runner. StrykerJS 7.0+. Use `stryker.config.mjs` with `testRunner: 'vitest'`. Browser Mode NOT supported. Always uses `perTest` coverage analysis.
-- **TDAID five phases**: Plan → Red → Green → Refactor → Validate. Plan phase uses thinking-model for structured TDD plan before code. Validate phase is human gate for spec-gaming detection. Agent-studio Multi-Agent TDD (QA→Developer→Reflection) covers phases 2-4.
-- **LSP 3.18**: No dedicated test lens provider — test "Run/Debug" code lenses are IDE-extension territory, not LSP standard. New: SnippetTextEdit (test scaffolding), diagnostic MarkupContent (rich test failure messages).
-- **TDD skill gap**: Current SKILL.md uses `@stryker-mutator/jest-runner` install example — should be vitest-runner for ESM/TypeScript targets.
-- Research report: `.claude/context/artifacts/research-reports/tdd-modernization-research-2026-03-12.md`
-
-- Created new agent: qa-guardian (2026-03-12)
-
-- Created new agent: contract-check (2026-03-12)
-
-- Created new agent: bool-action (2026-03-12)
-
-- Created new agent: repo-onboarder (2026-03-12)
-
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-12)
-
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-12)
-
-- Updated workflow: evolution-workflow (2026-03-12)
-
-- Updated workflow: missing-workflow-xyz (2026-03-12)
-
-- Created new agent: qa-guardian (2026-03-12)
-
-- Created new agent: contract-check (2026-03-12)
-
-- Created new agent: bool-action (2026-03-12)
-
-- Created new agent: repo-onboarder (2026-03-12)
-
-- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-12)
-
-- Refreshed agent: .claude/agents/orchestrators/artifact-integrator.md (2026-03-12)
-
-- Updated workflow: evolution-workflow (2026-03-12)
-
-- Updated workflow: missing-workflow-xyz (2026-03-12)
-
 ## TDD/LSP Gap Analysis (2026-03-12) [Task #3]
 
 **Findings: TDD skill v1.2.0 is substantively current with 2026 standards (updated 2026-03-11)**
@@ -123,6 +11,8 @@
 - P1 actions: skill-updater on tdd + lsp-navigator skills with above gaps
 - Report: .claude/context/artifacts/research-reports/tdd-lsp-gap-analysis-research-2026-03-12.md
 
+---
+
 ## Ecosystem Audit 2026-03-12 — Key Findings
 
 - **routing-guard exits 0 on block**: `routing-guard-core.impl.cjs` emits deny JSON but calls `process.exit(0)` at block path. Must be `process.exit(2)` per security hook policy. 5 ENFORCEMENT-003 tests fail.
@@ -133,6 +23,8 @@
 - **spawn-token-guard**: Correctly registered as first Task PreToolUse hook, correctly fail-open (all exits are 0).
 - **Memory files**: learnings 11KB, decisions 14KB, issues 15KB — all within thresholds after 2026-03-12 bloat fix.
 - **Agent search coverage**: 68/68 non-orchestrator agents have pnpm search:code + token-saver references.
+
+---
 
 ## EPIC Ecosystem Audit — 2026-03-12 (commit 779bf82b)
 
@@ -150,6 +42,8 @@
 
 **ESLint complexity gate:** Adding a ternary inside a function at complexity=50 blocks commit. Always extract to named helper function.
 
+---
+
 ## MEGA WAVE 3 Research Track A (2026-03-14)
 
 - VoltAgent OpenClaw has 5,366 community skills; best picks for agent-studio: academic-deep-research, rate-limiter, adversarial-prompting, airtable-automation
@@ -159,6 +53,8 @@
 - CLI-Anything: 7-phase pipeline (Analyze→Design→Implement→Plan Tests→Write Tests→Document→Publish) converts GUI apps to JSON-enabled CLIs; integrate with assimilate skill
 - CodeGraphContext: MCP server supporting 14 languages + KùzuDB graph backend; directly upgrades existing code-graph-context skill; use for cross-language call chain analysis
 - Top 10 priority picks: (1) CodeGraphContext MCP, (2) GWS CLI suite, (3) Firecrawl, (4) slack-expert agent, (5) CLI-Anything/assimilate, (6) electron-pro, (7) HuggingFace skills, (8) mlops-engineer, (9) rate-limiter skill, (10) fintech/payment agents
+
+---
 
 ## cloudflare-workers skill created (2026-03-14) [SKILL_CREATION]
 
@@ -192,6 +88,8 @@ Key anti-patterns captured:
 - Updated workflow: evolution-workflow (2026-03-14)
 
 - Updated workflow: missing-workflow-xyz (2026-03-14)
+
+---
 
 ## Session Handoff Research (2026-03-14) [Task #task-handoff-research]
 
@@ -273,6 +171,8 @@ Key anti-patterns captured:
 
 - Updated workflow: missing-workflow-xyz (2026-03-15)
 
+---
+
 ## Heartbeat Ecosystem Registration (2026-03-15)
 
 **Agent:** heartbeat-orchestrator | **Task:** task-1 | **Status:** Completed
@@ -318,6 +218,8 @@ ALWAYS `CronCreate` new task BEFORE `CronDelete` old one. Never delete first —
 
 All 8 loops registered and verified. Heartbeat ecosystem is active for this session.
 
+---
+
 ## [2026-03-15] OpenClaw + Claude Code Persistent Scheduling
 
 **OpenClaw architecture**: File-based memory (`~/clawd/` Markdown files) + local Gateway Node.js process on :18789 + cron-driven heartbeat. No database needed — filesystem IS the persistence mechanism. 302k+ stars.
@@ -335,3 +237,29 @@ All 8 loops registered and verified. Heartbeat ecosystem is active for this sess
 **acpx** (github.com/openclaw/acpx): Headless ACP CLI for stateful sessions. Supports prompt queueing (`--no-wait`), named sessions (`-s backend`), NDJSON streaming. Good for multi-agent parallel session management.
 
 **Claude Code native `/loop`**: Session-scoped only (dies on terminal close). Max 50 tasks. 3-day expiry. Use `CronCreate`/`CronList`/`CronDelete` tools programmatically. `CLAUDE_CODE_DISABLE_CRON=1` to disable.
+
+---
+
+## Multi-LLM Council: Architecture + Hook Security (2026-03-15)
+
+- SEC-002 is a SILENT SECURITY NULL: hooks outputting {allow:false} but exiting 0 do NOT block anything. Claude Code uses exit code only. Any such hook is decorative, not enforcing.
+- omega-claude-cli hits Windows cmd.exe 8191-char limit for long prompts. Workaround: pipe prompt via PowerShell `Write-Output $prompt | claude --dangerously-skip-permissions`
+- Persistent worker consensus: Node.js daemon + NSSM (Windows) / systemd (Linux) + SQLite WAL queue. Never session-scoped. Worker must NOT require() from .claude/lib/ (framework paths change).
+- Telegram claude -p per message: wrong for production. Pattern: lightweight intake → SQLite queue → tiered dispatch (SDK direct / minimal 500-token prompt / full Claude Code). Saves 100x tokens.
+- Council report: .claude/context/reports/backend/multillm-review-2026-03-15.md
+
+---
+
+## Telegram Pipeline PATH Fix (2026-03-15) [Task #11, commit e3ab739b]
+
+**Root cause**: `claude` binary not found in non-interactive cron/subprocess PATH. Cron environments strip PATH to `/usr/bin:/bin`; the `claude` binary (installed via npm global) is in `/usr/local/bin` or `~/.npm-global/bin`.
+
+**Fix pattern (`resolveClaude()` in telegram-claude-bridge.cjs)**:
+
+- Try `which claude` (or `where.exe claude` on Windows) to locate binary at runtime
+- Fallback: `path.join(os.homedir(), '.npm-global', 'bin', 'claude')` and similar platform paths
+- Always unset `CLAUDECODE` env var before spawning Claude from a cron/script context — Claude Code sets this env var and child processes detect it, refusing with "Nested sessions share runtime resources"
+
+**Application**: Any background service (Telegram bot, cron job, webhook handler) that spawns `claude` must resolve the binary path dynamically and unset `CLAUDECODE`.
+
+**Commit**: e3ab739b | **File**: telegram-claude-bridge.cjs

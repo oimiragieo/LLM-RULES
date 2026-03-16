@@ -265,14 +265,14 @@ describe('heartbeat-sentinel', () => {
       assert.ok(typeof data.written_at === 'string');
       assert.ok(typeof data.expires_at === 'string');
       assert.equal(data.loop_count, 8);
-      assert.equal(data.ttl_minutes, 15);
+      assert.equal(data.ttl_minutes, 40);
     });
 
-    it('writeSessionPing() expires_at is ~15 minutes after written_at', () => {
+    it('writeSessionPing() expires_at is ~40 minutes after written_at', () => {
       mod.writeSessionPing(LOOPS_8);
       const data = JSON.parse(fs.readFileSync(mod.getSessionPingPath(), 'utf8'));
       const diffMs = new Date(data.expires_at).getTime() - new Date(data.written_at).getTime();
-      assert.ok(Math.abs(diffMs - 15 * 60 * 1000) < 5000);
+      assert.ok(Math.abs(diffMs - 40 * 60 * 1000) < 5000);
     });
 
     it('checkSessionPing() returns missing when file does not exist', () => {

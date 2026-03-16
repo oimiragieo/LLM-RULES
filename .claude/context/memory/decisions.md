@@ -1,3 +1,13 @@
+## ADR-121: Heartbeat Tick Delegation Pattern (2026-03-15)
+
+All heartbeat cron tick prompts delegate to heartbeat-orchestrator via Task() instead of running bash scripts inline in the router session. Inline execution flooded the router context. The orchestrator has a "Tick Callback Handling" section for task_id starting with 'hb-'.
+
+## ADR-122: Session Ping TTL = 40 Minutes (2026-03-15)
+
+The heartbeat session ping TTL was changed from 15 min to 40 min. Multi-LLM review (Gemini + GPT-5.4) determined: 40min = 2.5× the 30min drain loop interval, providing a 10-min safety margin without creating a long ghost-loop window after terminal close.
+
+---
+
 ## ADR-2026-03-15-070: MEGA EVOLUTION v2 — Augmentation-First Strategy for Ecosystem Expansion (2026-03-15)
 
 **Status:** Accepted & Implemented (commit b8c79f14)

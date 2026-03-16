@@ -134,6 +134,10 @@
           {
             "type": "command",
             "command": "node .claude/hooks/reflection/reflection-step0-guard.cjs"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/routing/heartbeat-step05-check.cjs"
           }
         ]
       },

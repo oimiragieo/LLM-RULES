@@ -1,9 +1,17 @@
 const fs = require('fs');
 const path = require('path');
-const { safeParseJSON } = require('../lib/utils/safe-json.cjs');
+const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const ROOT = path.resolve(__dirname, '../../..');
 const file = path.join(ROOT, '.claude/context/runtime/tasks.json');
+
+// Refresh heartbeat session ping (keeps Step 0.5 from re-spawning orchestrator unnecessarily)
+try {
+  const { writeSessionPing } = require('../../lib/heartbeat/heartbeat-sentinel.cjs');
+  writeSessionPing([]);
+} catch (_) {
+  /* ignore if sentinel module unavailable */
+}
 
 try {
   const content = fs.readFileSync(file, 'utf8');
