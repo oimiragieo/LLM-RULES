@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-16T02:08:36.191Z",
+  "generatedAt": "2026-03-16T03:57:09.211Z",
   "metadata": {
-    "totalSkills": 303,
+    "totalSkills": 304,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-16T02:08:36.192Z",
+    "lastValidated": "2026-03-16T03:57:09.212Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -4467,6 +4467,28 @@
       "priority": 1,
       "aliasOf": null
     },
+    "system-health-check": {
+      "name": "system-health-check",
+      "displayName": "System Health Check",
+      "category": "Other",
+      "domain": "other",
+      "description": "Verifies repository baseline test passing state and available memory/GPU resources to ensure safe mission execution.",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "system-health-check"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "eval-harness-updater": {
       "name": "eval-harness-updater",
       "displayName": "Eval Harness Updater",
@@ -8233,6 +8255,7 @@
         "memory-search",
         "proactive-audit",
         "ecosystem-integrity-scanner",
+        "system-health-check",
         "eval-harness-updater",
         "qa-workflow",
         "strict-user-requirements-adherence",
@@ -8603,6 +8626,7 @@
         "ecosystem-integrity-scanner",
         "response-rater",
         "test-generator",
+        "system-health-check",
         "eval-harness-updater",
         "qa-workflow",
         "strict-user-requirements-adherence",
@@ -8985,6 +9009,7 @@
         "ecosystem-integrity-scanner",
         "response-rater",
         "test-generator",
+        "system-health-check",
         "eval-harness-updater",
         "qa-workflow",
         "strict-user-requirements-adherence",
@@ -9257,6 +9282,7 @@
         "checklist-generator",
         "response-rater",
         "test-generator",
+        "system-health-check",
         "eval-harness-updater",
         "qa-workflow",
         "strict-user-requirements-adherence",
@@ -9490,6 +9516,7 @@
         "assimilate",
         "checklist-generator",
         "response-rater",
+        "system-health-check",
         "eval-harness-updater",
         "qa-workflow",
         "strict-user-requirements-adherence",
@@ -10276,6 +10303,7 @@
         "checklist-generator",
         "proactive-audit",
         "ecosystem-integrity-scanner",
+        "system-health-check",
         "eval-harness-updater",
         "qa-workflow",
         "strict-user-requirements-adherence",
@@ -11580,6 +11608,7 @@
         "checklist-generator",
         "proactive-audit",
         "ecosystem-integrity-scanner",
+        "system-health-check",
         "eval-harness-updater",
         "qa-workflow",
         "strict-user-requirements-adherence",

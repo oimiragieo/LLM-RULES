@@ -713,6 +713,38 @@ function shouldOverrideWorktreeIsolation(prompt, agentType) {
   return true;
 }
 
+/**
+ * loadProjectContext - Load project-context.md from a given project root.
+ * Returns the file contents as a string, or empty string if missing.
+ *
+ * @param {string} [projectRoot] - Optional override for project root path
+ * @returns {string}
+ */
+function loadProjectContext(projectRoot) {
+  const root = projectRoot || PROJECT_ROOT;
+  const pcPath = path.join(root, '.claude', 'context', 'project-context.md');
+  try {
+    if (!fs.existsSync(pcPath)) return '';
+    return fs.readFileSync(pcPath, 'utf8');
+  } catch (_e) {
+    return '';
+  }
+}
+
+/**
+ * appendProjectContextSection - Inject project-context.md content into a spawn prompt.
+ * Skips injection if content is empty or if the prompt already has a ## Project Context section.
+ *
+ * @param {string} prompt - Base spawn prompt
+ * @param {string} contextContent - Content from project-context.md
+ * @returns {string} Updated prompt
+ */
+function appendProjectContextSection(prompt, contextContent) {
+  if (!contextContent || !contextContent.trim()) return prompt;
+  if (prompt.includes('## Project Context')) return prompt;
+  return `${prompt}\n\n## Project Context\n\n${contextContent.trim()}`;
+}
+
 module.exports = {
   sanitizeTaskPrompt,
   generateRequiredPrefixFragment,
@@ -736,4 +768,6 @@ module.exports = {
   hasArtifactWriterTools,
   buildMissingWriterToolsMessage,
   shouldOverrideWorktreeIsolation,
+  loadProjectContext,
+  appendProjectContextSection,
 };

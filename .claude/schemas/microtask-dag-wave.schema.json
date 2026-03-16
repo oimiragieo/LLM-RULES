@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Microtask DAG Wave Schema",
+  "description": "Validates wave numbering in planner microtask DAG output",
+  "type": "object",
+  "properties": {
+    "task_id": { "type": "string", "pattern": "^M[0-9]+$" },
+    "wave": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "parallel_group": { "type": "string" },
+    "depends_on": { "type": "array", "items": { "type": "string" } },
+    "target_agent": { "type": "string" },
+    "owned_paths": { "type": "array", "items": { "type": "string" } },
+    "forbidden_paths": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["task_id", "wave", "target_agent"]
+}

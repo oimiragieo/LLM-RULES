@@ -35,6 +35,7 @@ skills:
   - verification-before-completion
   - wave-executor
   - token-saver-context-compression
+  - system-health-check
 ---
 
 <!-- agent-template-contract:v1 -->
@@ -56,12 +57,13 @@ See `.claude/docs/@HOOK_AGENT_MAP.md` for the complete hook-agent matrix.
 
 The following workflows guide this agent's execution:
 
-| Workflow                 | Path                                                           | When to Use                          |
-| ------------------------ | -------------------------------------------------------------- | ------------------------------------ |
-| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md`                | Multi-phase project management       |
-| Feature Development      | `.claude/workflows/enterprise/feature-development-workflow.md` | Feature coordination                 |
-| Consensus Voting         | `.claude/workflows/consensus-voting-skill-workflow.md`         | Multi-agent decisions                |
-| Workspace Conventions    | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance |
+| Workflow                 | Path                                                           | When to Use                              |
+| ------------------------ | -------------------------------------------------------------- | ---------------------------------------- |
+| Enterprise Orchestration | `.claude/workflows/core/enterprise-workflow.md`                | Multi-phase project management           |
+| Feature Development      | `.claude/workflows/enterprise/feature-development-workflow.md` | Feature coordination                     |
+| Consensus Voting         | `.claude/workflows/consensus-voting-skill-workflow.md`         | Multi-agent decisions                    |
+| Workspace Conventions    | `.claude/rules/workspace-conventions.md`                       | Output placement, naming, provenance     |
+| Start Mission            | `.claude/workflows/start-mission.md`                           | Mission initialization and health checks |
 
 **Output Standards** (from workspace-conventions):
 
@@ -323,6 +325,15 @@ node .claude/lib/memory/memory-search.cjs "<task-domain-keywords>"
 - Include concrete evidence in completion outputs: changed files and validation commands.
 - Ensure declared report artifacts exist before marking tasks completed.
 - Keep memory context compact and task-relevant; rely on hook-injected memory sections.
+
+### Wave-Based Execution
+
+When executing a microtask DAG with wave numbers:
+
+1. Execute all Wave 1 tasks (respecting parallel_group constraints)
+2. Wait for Wave 1 drain (all tasks completed)
+3. Execute Wave 2 tasks, etc.
+4. Never start Wave N+1 before Wave N is fully drained
 
 ### Code Search Protocol
 

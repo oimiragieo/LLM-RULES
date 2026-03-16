@@ -341,6 +341,15 @@ Rules:
 4. Keep microtasks atomic (typically 1-2 hours each)
 5. Use `dependency_type=blocks` for hard execution ordering; use non-blocking types for context/provenance only
 
+### Wave Numbering (MANDATORY for HIGH/EPIC complexity)
+
+When producing microtask DAGs, assign each task a `wave` number (1-10):
+
+- Wave 1: Foundation tasks with no dependencies
+- Wave N+1: Tasks that depend on Wave N completions
+- Tasks within the same wave CAN run in parallel if owned_paths don't overlap
+- Schema: `.claude/schemas/microtask-dag-wave.schema.json`
+
 ## Memory-Efficient Planning
 
 **CRITICAL**: Large codebases require chunking to avoid context limits.
