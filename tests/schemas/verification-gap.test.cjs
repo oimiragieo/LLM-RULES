@@ -4,7 +4,14 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 
-const schemaPath = path.resolve(__dirname, '..', '..', '.claude', 'schemas', 'verification-gap.schema.json');
+const schemaPath = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '.claude',
+  'schemas',
+  'verification-gap.schema.json'
+);
 
 describe('verification-gap schema', () => {
   test('schema file should exist', () => {

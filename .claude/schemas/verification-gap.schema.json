@@ -7,7 +7,14 @@
     "gap_id": { "type": "string", "pattern": "^G[0-9]+$" },
     "category": {
       "type": "string",
-      "enum": ["missing_test", "missing_artifact", "broken_link", "lint_error", "truth_violation", "missing_doc"]
+      "enum": [
+        "missing_test",
+        "missing_artifact",
+        "broken_link",
+        "lint_error",
+        "truth_violation",
+        "missing_doc"
+      ]
     },
     "description": { "type": "string" },
     "severity": { "type": "string", "enum": ["blocker", "warning", "info"] },
