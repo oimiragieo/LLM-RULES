@@ -51,6 +51,7 @@ process.stdin.on('end', () => {
         timeout: 5000,
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
+        windowsHide: true,
       }).trim();
     } catch (_gitErr) {
       // Not a git repo or git not available — allow

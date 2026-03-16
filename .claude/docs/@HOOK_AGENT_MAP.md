@@ -38,6 +38,8 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `session-budget-watchdog.cjs`       | x      |             |          |            |              |            |
 | `heartbeat-step05-check.cjs`        | x      |             |          |            |              |            |
 | `analysis-paralysis-guard.cjs`      | x      | x           | x        | x          | x            | x          |
+| `context-window-monitor.cjs`        | x      |             |          |            |              |            |
+| `worktree-preflight-check.cjs`      | x      |             |          |            |              |            |
 
 **Agent Archetype Definitions:**
 
@@ -115,6 +117,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `CREATOR_GUARD`                | unified-creator-guard.cjs  | block   | block/warn/off |
 | `REFLECTION_STEP0_ENFORCEMENT` | reflection-step0-guard.cjs | block   | block/warn/off |
 | `TASKLIST_FIRST_ENFORCEMENT`   | routing-guard.cjs          | block   | block/warn/off |
+| `WORKTREE_PREFLIGHT_ENFORCEMENT`| worktree-preflight-check.cjs| block   | block/warn/off |
 
 Recommended defaults:
 
