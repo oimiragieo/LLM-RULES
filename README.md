@@ -81,6 +81,53 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 - Schemas: 319 `*.schema.json`
 - Commands: 263 `.claude/commands/*.md`
 
+## Quality Gates and Verification Patterns
+
+Agent Studio ships several features that enforce completion quality and reduce plan drift across agent pipelines.
+
+### Project Constitution
+
+A project constitution file (`.claude/context/project-context.md`) is auto-injected into spawn prompts. It carries operational constraints — scope boundaries, architecture conventions, and non-negotiables — so every spawned agent operates from the same baseline without needing them restated per-task.
+
+### Analysis Paralysis Guard
+
+A hook at `.claude/hooks/session/analysis-paralysis-guard.cjs` monitors consecutive read-only tool calls and fires a warning when an agent exceeds its tier threshold. Thresholds are agent-type-aware:
+
+| Agent type     | Read-only call limit |
+| -------------- | -------------------- |
+| `executor`     | 5                    |
+| `analyst`      | 15                   |
+| `orchestrator` | 20                   |
+| `hunter`       | 25                   |
+
+### Must-Haves Verification
+
+The `must-haves` schema (`.claude/schemas/must-haves.schema.json`) provides goal-backward verification. Planners declare `truths` (facts that must hold), `artifacts` (files that must exist), and `key_links` (cross-references) as acceptance criteria. The `reflection-agent` scores each task completion against the `must_haves` block.
+
+### Deviation Protocol
+
+When a developer agent needs to deviate from a plan, it documents the deviation — reason, scope change, impact — before making changes. This creates an audit trail and keeps planner state consistent with what was actually built.
+
+### SUCCESS/FAILURE Metrics
+
+The universal spawn template includes a `criteria_met`/`criteria_failed` block in `TaskUpdate` metadata. Every agent completion carries structured evidence of what passed and what did not, enabling downstream agents and the reflection pipeline to make data-driven decisions.
+
+### Verification Gap Reporting
+
+QA agents emit structured gap reports using the verification-gap schema (`.claude/schemas/verification-gap.schema.json`). Each gap has an ID (G1, G2...), severity (`critical`, `high`, `medium`, `low`), and a description. The planner ingests these reports and generates targeted fix tasks — closing the feedback loop between QA findings and implementation work.
+
+### Token Budget Estimation
+
+Planners attach an `estimated_tokens` field to every task. Tasks projected to exceed 80K tokens are split before dispatch. This prevents agents from running into context overflow mid-task and avoids silent truncation.
+
+### Workflow Continuation Snapshots
+
+Execution context is persisted using the workflow-snapshot schema (`.claude/schemas/workflow-snapshot.schema.json`). When a session is interrupted, the snapshot carries enough state for a new session to resume without re-running completed phases.
+
+### Checkpoint Taxonomy
+
+Pipelines emit standardized checkpoints (`.claude/schemas/checkpoint-taxonomy.schema.json`) at `wave_complete`, `phase_gate`, and `quality_gate` boundaries. Orchestrators use these to verify forward progress before advancing.
+
 ## Repository Layout
 
 ```text

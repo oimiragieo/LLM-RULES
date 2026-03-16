@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Project constitution file (`.claude/context/project-context.md`) for consistent AI agent behavior across sessions (from BMAD-METHOD)
+- Analysis paralysis guard hook (`.claude/hooks/session/analysis-paralysis-guard.cjs`) with 4-tier agent-type-aware thresholds: executor (5), analyst (15), orchestrator (20), hunter (25)
+- Formal wave numbering in planner microtask DAGs with schema validation (`.claude/schemas/microtask-dag-wave.schema.json`) (from GSD)
+- Goal-backward must-haves verification schema (`.claude/schemas/must-haves.schema.json`) with truths/artifacts/key_links structure (from GSD)
+- Workflow continuation snapshots schema (`.claude/schemas/workflow-snapshot.schema.json`) for execution context persistence and session resumption (from BMAD-METHOD)
+- Deviation protocol in `developer.md` — agents document plan deviations before making changes (from GSD)
+- SUCCESS/FAILURE metrics in universal spawn template with `criteria_met`/`criteria_failed` tracking in `TaskUpdate` metadata (from BMAD-METHOD)
+- Explicit criteria scoring in `reflection-agent.md` — scores output against the `must_haves` block
+- Pre-completion self-check phase for developer agent — mandatory verification step before `TaskUpdate(completed)` (from GSD)
+- Per-task atomic commit protocol in `developer.md` and `git-workflow.md` — 1:1 task-to-commit mapping (from GSD methodology)
+- Verification gap schema (`.claude/schemas/verification-gap.schema.json`) for structured QA gap reporting (G1, G2... with severity levels)
+- Task output guardrails schema (`.claude/schemas/task-output-guardrails.schema.json`) for validating `TaskUpdate` metadata quality
+- Gap-driven re-planning mode in `planner.md` — generates fix tasks from QA gap reports (from GSD)
+- Checkpoint taxonomy schema (`.claude/schemas/checkpoint-taxonomy.schema.json`) for standardized pipeline checkpoints (wave_complete, phase_gate, quality_gate)
+- Token budget estimation in `planner.md` — mandatory `estimated_tokens` field; tasks exceeding 80K tokens are split automatically
 - `task-manager` agent (haiku): post-pipeline task hygiene — closes stale tasks, audits 9 framework health invariants, creates fix tasks for CRITICAL/HIGH violations, produces structured health reports
 - Router drain gate Step 2.5: conditional task-manager spawn for HIGH/EPIC pipelines when stale task signals detected
 - `cron-decision` skill: decision framework for when/whether to use Claude's native cron scheduler vs alternatives (one-off tasks, manual triggers, external schedulers)
