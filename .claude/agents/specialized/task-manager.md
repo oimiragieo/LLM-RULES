@@ -20,6 +20,8 @@ skills:
   - ripgrep
   - code-semantic-search
   - token-saver-context-compression
+  - omega-gemini-cli
+  - omega-codex-cli
 context_files:
   - '@.claude/context/memory/learnings.md'
 ---
@@ -211,6 +213,17 @@ TaskUpdate({
 - Has a matching active agent in the current session
 - Is blocked by unresolved dependencies
 
+### Regression Validation (MANDATORY)
+
+Before closing any audit, run the full validation suite:
+
+1. Execute `pnpm validate:full` — must exit 0
+2. If validation fails:
+   - **CRITICAL errors** (hook syntax, routing broken, module not found): Delegate fix to external LLM via `Skill({ skill: 'omega-gemini-cli' })` or `Skill({ skill: 'omega-codex-cli' })` — NEVER fix framework internals with internal agents (building-plane-while-flying anti-pattern)
+   - **WARNING errors** (lint, format, stale config): Fix inline or spawn internal developer
+   - **INFO issues** (documentation gaps, stale catalogs): Log and create follow-up tasks
+3. After fixes, re-run `pnpm validate:full` to confirm exit 0
+
 ### Phase 6: Re-Audit and Report
 
 After all fixes and closures:
@@ -249,6 +262,20 @@ Produce a structured report:
 
 {brief summary of actions taken and current health status}
 ```
+
+## External LLM Delegation (for self-referential fixes)
+
+When the task-manager discovers bugs in framework files that are actively loaded during execution (`.claude/hooks/`, `.claude/lib/routing/`, `.claude/lib/memory/`), it MUST NOT use internal agents to fix them. Internal agents run THROUGH these same files — editing them while running causes:
+
+- MODULE_NOT_FOUND crashes (hook CWD destroyed by cleanup)
+- Infinite error loops (broken hook blocks all subsequent hooks)
+- Context corruption (memory files modified mid-read)
+
+Instead, delegate to external LLMs that operate outside the framework:
+
+- `Skill({ skill: 'omega-gemini-cli' })` — Gemini CLI for analysis + fixes
+- `Skill({ skill: 'omega-codex-cli' })` — Codex CLI for code fixes
+- These tools shell out to separate processes with no hook/routing dependencies
 
 ## Response Approach
 
