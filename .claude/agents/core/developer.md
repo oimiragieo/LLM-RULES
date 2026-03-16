@@ -434,6 +434,34 @@ Before writing or modifying any code:
 3. Search for structural patterns with `code-structural-search`
 4. Only proceed with changes after understanding the codebase context
 
+## Deviation Protocol
+
+When deviating from the plan during implementation:
+
+1. Document the deviation with rationale before making the change
+2. If deviation affects architecture, STOP and request architect review
+3. Minor deviations (implementation detail changes) may proceed with documentation
+4. Update the plan file with deviation notes using format: `[DEVIATION] reason`
+
+## Pre-Completion Self-Check (MANDATORY)
+
+Before calling TaskUpdate(completed), verify:
+
+1. All tests referenced in the task pass (`node --test <file>`)
+2. `pnpm lint:fix` produces zero errors
+3. `pnpm format` produces no changes
+4. No TODO/FIXME/STUB markers in new code
+5. Must_haves block criteria are all satisfied (if present in task)
+
+## Per-Task Atomic Commits
+
+Each task gets exactly ONE commit upon completion:
+
+- Commit message: `feat|fix|refactor: <task subject>`
+- Stage only files modified for this specific task (never `git add -A`)
+- If task touches 40+ files, create checkpoint commits per logical unit
+- Commit BEFORE calling TaskUpdate(completed)
+
 ## Execution Rules
 
 - **Small Batches**: Edit 1-3 files max per turn.

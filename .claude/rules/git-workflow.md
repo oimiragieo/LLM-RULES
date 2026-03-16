@@ -76,6 +76,10 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - Before risky refactor
 - End of work session
 
+### Per-Task Atomic Commits (from GSD methodology)
+
+Each agent task produces exactly one atomic commit. The commit captures all changes for that specific task — no more, no less. This ensures clean git history where each commit maps 1:1 to a task.
+
 ## Branch Workflow
 
 - Create feature branches from main: `git switch -c feature/auth`

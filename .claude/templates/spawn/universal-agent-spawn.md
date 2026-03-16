@@ -44,6 +44,14 @@ Use this template for all non-orchestrator agents.
 | THE HOOK SYSTEM WILL DETECT MISSING COMPLETION AND BLOCK OUTPUT |
 +======================================================================+
 
+### Completion Criteria
+
+Every task has explicit success/failure metrics:
+
+- **SUCCESS**: All acceptance criteria met, tests pass, lint clean
+- **FAILURE**: Any acceptance criterion unmet — document which ones and why
+- Report metrics in TaskUpdate metadata: `{ success: true/false, criteria_met: [...], criteria_failed: [...] }`
+
 ## Required sequence
 
 1. `TaskList()` first.

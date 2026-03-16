@@ -136,7 +136,16 @@ REFLECT -> EVALUATE -> CORRECT -> EXECUTE
 | **Actionability**     | 15%    | Clear next steps, implementable without ambiguity                                                  |
 | **Process Adherence** | 15%    | TaskUpdate metadata present, commits match claims, no spawn traceability violations, gap log clean |
 
-#### Plan File Staleness (Completeness sub-check)
+#### Explicit Criteria Scoring
+
+When evaluating completed tasks, score against the task's must_haves block:
+
+- For each `truth`: verify boolean condition (PASS/FAIL)
+- For each `artifact`: verify file exists (PASS/FAIL)
+- For each `key_link`: verify integration wiring (PASS/FAIL)
+- Report: `criteria_score: X/Y passed`
+
+### Plan File Staleness (Completeness sub-check)
 
 When a task was spawned with a `planFile` reference:
 
