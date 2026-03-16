@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `cron-decision` skill: decision framework for when/whether to use Claude's native cron scheduler vs alternatives (one-off tasks, manual triggers, external schedulers)
+- `scheduled-tasks` skill v1.1.0: added decision framework, official URL (https://code.claude.com/docs/en/scheduled-tasks), session-scope context note
+- `@MODEL_SELECTION.md`: context window sizes table (Opus 4.6 = 1M tokens, Sonnet 4.6 = 200K tokens) and large-context routing guidance (>150K tokens → use opus)
+
 ### Fixed
 
 - Heartbeat cron ticks now delegate to heartbeat-orchestrator subagent via Task() instead of executing inline in the router session (fixes context flooding)
