@@ -1633,6 +1633,41 @@ async function runAllChecks(hookInput, projectRoot = PROJECT_ROOT) {
   } catch (_e) {
     // best-effort; ignore
   }
+  // Heartbeat Step 0.5: Check if heartbeat loops are active. If not, write a reminder
+  // so the router spawns heartbeat-orchestrator on the first prompt of a new session.
+  try {
+    const runtimeDir = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+    const pingPath = path.join(runtimeDir, 'heartbeat-session-ping.json');
+    const heartbeatReminderPath = path.join(runtimeDir, 'heartbeat-reminder.txt');
+    let needsHeartbeat = false;
+
+    if (!fs.existsSync(pingPath)) {
+      needsHeartbeat = true;
+    } else {
+      const pingRaw = fs.readFileSync(pingPath, 'utf8');
+      const ping = safeParseJSON(pingRaw);
+      const expiresAt = ping?.expires_at;
+      if (!expiresAt || Date.now() > new Date(expiresAt).getTime()) {
+        needsHeartbeat = true;
+      }
+    }
+
+    if (needsHeartbeat && !fs.existsSync(heartbeatReminderPath)) {
+      if (!fs.existsSync(runtimeDir)) {
+        fs.mkdirSync(runtimeDir, { recursive: true });
+      }
+      fs.writeFileSync(
+        heartbeatReminderPath,
+        'STEP 0.5: Heartbeat loops are NOT active. Spawn heartbeat-orchestrator with Skill({ skill: "heartbeat" }) or Task({ subagent_type: "heartbeat-orchestrator" }) to register all cron loops. Delete this file after spawning.\n',
+        'utf8'
+      );
+    } else if (!needsHeartbeat && fs.existsSync(heartbeatReminderPath)) {
+      fs.unlinkSync(heartbeatReminderPath);
+    }
+  } catch (_e) {
+    // best-effort; ignore
+  }
+
   // Evolution Step 0.8: derive pending auto-evolution requests from recurring critical entries.
   try {
     syncEvolutionSpawnReminder();
