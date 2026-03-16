@@ -18,18 +18,12 @@ test('tokens command file exists', () => {
 
 test('tokens command contains ccusage reference', () => {
   const content = fs.readFileSync(COMMAND_PATH, 'utf8');
-  assert.ok(
-    content.includes('ccusage'),
-    'Expected tokens.md to reference "ccusage"'
-  );
+  assert.ok(content.includes('ccusage'), 'Expected tokens.md to reference "ccusage"');
 });
 
 test('tokens command contains getTodayTotals reference', () => {
   const content = fs.readFileSync(COMMAND_PATH, 'utf8');
-  assert.ok(
-    content.includes('getTodayTotals'),
-    'Expected tokens.md to reference "getTodayTotals"'
-  );
+  assert.ok(content.includes('getTodayTotals'), 'Expected tokens.md to reference "getTodayTotals"');
 });
 
 test('tokens command is valid markdown starting with #', () => {

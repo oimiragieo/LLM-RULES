@@ -19,9 +19,7 @@
  */
 
 const path = require('path');
-const { safeParseJSON } = require(
-  path.resolve(__dirname, '../../lib/utils/safe-json.cjs')
-);
+const { safeParseJSON } = require(path.resolve(__dirname, '../../lib/utils/safe-json.cjs'));
 
 // ── Adapter loading ──────────────────────────────────────────────────────────
 
@@ -130,8 +128,8 @@ function _run() {
   // Primary usage line
   lines.push(
     `[ccusage] Today: ${_fmtNum(totalTokens)} tokens` +
-    ` (in: ${_fmtNum(inputTokens)}, out: ${_fmtNum(outputTokens)})` +
-    ` | ${_fmtCost(totalCost)}`
+      ` (in: ${_fmtNum(inputTokens)}, out: ${_fmtNum(outputTokens)})` +
+      ` | ${_fmtCost(totalCost)}`
   );
 
   // Cache savings line (only when cache was used)

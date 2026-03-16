@@ -41,6 +41,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 - `handover-detector.cjs`: Detects shift-change handovers on fresh session start. Reads `shift-change-log.json`, claims the handover, and injects a structured resume message (pre-flight steps 0–0.5 + pending actions) into the first prompt. Fail-open (advisory).
 - `startup-failopen-audit.cjs`: Audits startup fail-open state.
 - `session-budget-watchdog.cjs`: Monitors session token budget and limits.
+- `ccusage-statusline.cjs`: Displays real-time token usage and cost from ccusage CLI on each prompt. Fail-open (advisory).
 
 ### PreToolUse
 

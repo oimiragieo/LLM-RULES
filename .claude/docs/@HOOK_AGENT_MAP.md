@@ -40,6 +40,7 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `analysis-paralysis-guard.cjs`      | x      | x           | x        | x          | x            | x          |
 | `context-window-monitor.cjs`        | x      |             |          |            |              |            |
 | `worktree-preflight-check.cjs`      | x      |             |          |            |              |            |
+| `ccusage-statusline.cjs`            | x      |             |          |            |              |            |
 
 **Agent Archetype Definitions:**
 

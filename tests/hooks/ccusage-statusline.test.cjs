@@ -18,10 +18,7 @@ const assert = require('node:assert/strict');
 const { execFileSync } = require('child_process');
 const path = require('path');
 
-const HOOK_PATH = path.resolve(
-  __dirname,
-  '../../.claude/hooks/monitoring/ccusage-statusline.cjs'
-);
+const HOOK_PATH = path.resolve(__dirname, '../../.claude/hooks/monitoring/ccusage-statusline.cjs');
 
 /**
  * Run the hook with given env overrides and return { stdout, stderr, exitCode }.
@@ -144,11 +141,7 @@ test('exits 0 silently when adapter returns null (graceful degradation)', () => 
 
   assert.equal(exitCode, 0, 'Must exit 0 when no data');
   // No error message should be emitted to stderr
-  assert.doesNotMatch(
-    stderr,
-    /error|Error|ENOENT/i,
-    'Must not emit error messages on null data'
-  );
+  assert.doesNotMatch(stderr, /error|Error|ENOENT/i, 'Must not emit error messages on null data');
 });
 
 // ── Test 5: cost formatted to 4 decimal places ─────────────────────────────
