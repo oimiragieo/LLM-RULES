@@ -14,6 +14,15 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node .claude/hooks/monitoring/ccusage-statusline.cjs"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
             "command": "node .claude/hooks/startup/startup-failopen-audit.cjs"
           }
         ]
