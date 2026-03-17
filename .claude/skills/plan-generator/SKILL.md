@@ -149,12 +149,27 @@ Every task MUST include:
 6. **Rollback** - Command to undo (if applicable)
 7. **Parallel marker** - `[⚡ parallel OK]` if can run concurrently
 
+**Enhanced task format with structured completion fields** (verify/done/files are OPTIONAL — omit for backward compatibility):
+
+```markdown
+- [ ] **N.1** [Task description] (~X min)
+  - **Command**: `actual shell command here`
+  - **Verify**: `pnpm test -- --grep "pattern"` (command proving task is done)
+  - **Done**: [measurable criteria for "done" — e.g. "All tests pass, lint clean, file exists"]
+  - **Files**: [`path/to/file1`, `path/to/file2`] (files this task creates or modifies)
+  - **Rollback**: `command to undo if needed`
+```
+
+> **Schema**: Full task structure is documented in `.claude/schemas/plan-format.schema.json`.
+> The `verify`, `done`, and `files` fields are optional — existing plans without them remain valid.
+
 ### Guidelines
 - Define clear objectives
 - Break down into phases (<=7 phases total)
 - Each phase has <=7 tasks
 - Every task has executable commands
 - Include verification gates between phases
+- For **HIGH** or **EPIC** complexity tasks, invoke `discuss-phase` skill BEFORE generating the plan to surface ambiguities and resolve scope, architecture, and acceptance criteria questions with the user
 
 ### Step 4: Assess Risks
 
@@ -459,6 +474,8 @@ Before finalizing any plan, verify:
 
 - [ ] Can I copy-paste every command and run it?
 - [ ] Does every verify command have a clear pass/fail output?
+- [ ] Does each task have a `verify` command that proves completion objectively?
+- [ ] Does each task have a `done` criteria that is measurable and unambiguous?
 - [ ] Is there a rollback for every destructive operation?
 - [ ] Are time estimates realistic and granular?
 - [ ] Are parallel tasks marked with ⚡?
@@ -487,6 +504,7 @@ See `.claude/templates/plan-template.md` for complete token list.
 
 - [`template-renderer`](../template-renderer/SKILL.md) - Renders plan-template with token replacement
 - [`writing-plans`](../writing-plans/SKILL.md) - Bite-sized task plans with complete code for implementation
+- [`discuss-phase`](../discuss-phase/SKILL.md) - Requirement disambiguation for HIGH/EPIC tasks before planning
 
 ## Memory Protocol (MANDATORY)
 

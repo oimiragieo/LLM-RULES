@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Plan Format",
+  "description": "Structured plan format for agent-studio plans with executable tasks. Supports optional verify/done/files fields per task for measurable completion criteria.",
+  "type": "object",
+  "required": ["title"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Plan title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional plan description or executive summary"
+    },
+    "status": {
+      "type": "string",
+      "description": "Current plan status",
+      "enum": ["draft", "in_progress", "completed", "cancelled"]
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the plan was created"
+    },
+    "phases": {
+      "type": "array",
+      "description": "Plan phases containing grouped tasks",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Phase name"
+          },
+          "dependencies": {
+            "type": "array",
+            "description": "Phase names or numbers this phase depends on",
+            "items": { "type": "string" }
+          },
+          "parallel": {
+            "type": "boolean",
+            "description": "Whether tasks in this phase can run concurrently"
+          },
+          "tasks": {
+            "type": "array",
+            "description": "Tasks within this phase",
+            "items": {
+              "type": "object",
+              "required": ["id", "description"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Task identifier in N.M format (e.g. '1.1')",
+                  "pattern": "^[0-9]+\\.[0-9]+$"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "What this task does"
+                },
+                "command": {
+                  "type": "string",
+                  "description": "Executable shell or Task() command to run"
+                },
+                "verify": {
+                  "type": "string",
+                  "description": "Command that proves the task is done (e.g. 'pnpm test -- --grep \"pattern\"'). Should have clear pass/fail output."
+                },
+                "done": {
+                  "type": "string",
+                  "description": "Human-readable measurable criteria for 'done' (e.g. 'All tests pass, lint is clean')"
+                },
+                "files": {
+                  "type": "array",
+                  "description": "List of files this task will create or modify",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "rollback": {
+                  "type": "string",
+                  "description": "Command to undo this task if it needs to be reverted"
+                },
+                "estimate": {
+                  "type": "string",
+                  "description": "Time estimate for this task (e.g. '~15 min')"
+                },
+                "parallel": {
+                  "type": "boolean",
+                  "description": "Whether this task can run concurrently with sibling tasks"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "Task completion status",
+                  "enum": ["pending", "in_progress", "done", "skipped"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "description": "Identified risks with mitigations",
+      "items": {
+        "type": "object",
+        "required": ["risk", "impact"],
+        "properties": {
+          "risk": { "type": "string" },
+          "impact": {
+            "type": "string",
+            "enum": ["H", "M", "L", "High", "Medium", "Low"]
+          },
+          "mitigation": { "type": "string" },
+          "rollback": { "type": "string" }
+        }
+      }
+    }
+  }
+}
