@@ -16,6 +16,8 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { execFileSync } = require('child_process');
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const HOOK_PATH = path.resolve(__dirname, '../../.claude/hooks/monitoring/ccusage-statusline.cjs');
@@ -213,4 +215,48 @@ test('shows cache savings when cache tokens are present', () => {
 test('exits 0 on malformed/empty stdin (fail-open)', () => {
   const { exitCode } = runHookWithStderr({}, 'NOT VALID JSON {{{');
   assert.equal(exitCode, 0, 'Must exit 0 even with malformed stdin');
+});
+
+// ── Test 9: writes status to runtime file when CCUSAGE_RUNTIME_DIR is set ──
+
+test('writes status to runtime file when CCUSAGE_RUNTIME_DIR is set', () => {
+  const { spawnSync } = require('child_process');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ccusage-test-'));
+
+  try {
+    const mockData = JSON.stringify({
+      inputTokens: 100,
+      outputTokens: 200,
+      cacheCreationTokens: 0,
+      cacheReadTokens: 0,
+      totalCost: 0.0015,
+    });
+
+    const result = spawnSync('node', [HOOK_PATH], {
+      input: '{}',
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        CCUSAGE_DISABLED: 'false',
+        CCUSAGE_TEST_MOCK_DATA: mockData,
+        CCUSAGE_RUNTIME_DIR: tmpDir,
+      },
+      shell: false,
+      timeout: 10_000,
+    });
+
+    assert.equal(result.status ?? 0, 0, 'Hook must exit 0');
+
+    const statusFile = path.join(tmpDir, 'ccusage-status.txt');
+    assert.ok(
+      fs.existsSync(statusFile),
+      'ccusage-status.txt must be created in CCUSAGE_RUNTIME_DIR'
+    );
+
+    const content = fs.readFileSync(statusFile, 'utf8');
+    assert.match(content, /\[ccusage\]/, 'status file must contain [ccusage] prefix');
+    assert.match(content, /300/, 'status file must contain total token count (100+200=300)');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });

@@ -18,8 +18,17 @@
  * @module ccusage-statusline
  */
 
+const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require(path.resolve(__dirname, '../../lib/utils/safe-json.cjs'));
+
+// ── Runtime file output ───────────────────────────────────────────────────────
+
+const PROJECT_ROOT = process.cwd();
+const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+const STATUS_FILE = process.env.CCUSAGE_RUNTIME_DIR
+  ? path.join(process.env.CCUSAGE_RUNTIME_DIR, 'ccusage-status.txt')
+  : path.join(RUNTIME_DIR, 'ccusage-status.txt');
 
 // ── Adapter loading ──────────────────────────────────────────────────────────
 
@@ -139,8 +148,18 @@ function _run() {
     );
   }
 
+  const output = lines.join('\n') + '\n';
+
+  // Write to runtime file so the router can read status without intercepting stderr
+  try {
+    fs.mkdirSync(path.dirname(STATUS_FILE), { recursive: true });
+    fs.writeFileSync(STATUS_FILE, output, 'utf8');
+  } catch (_writeErr) {
+    // Fail-open: never block the user's prompt over a status file write failure
+  }
+
   // Write to stderr (hooks use stderr for informational output)
-  process.stderr.write(lines.join('\n') + '\n');
+  process.stderr.write(output);
 }
 
 main();
