@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "contracts": {
+    "implementation": {
+      "requiredMetadata": ["summary", "filesModified"],
+      "minSummaryLength": 20,
+      "requiredArtifacts": []
+    },
+    "review": {
+      "requiredMetadata": ["summary", "findingsCount"],
+      "minSummaryLength": 30,
+      "requiredArtifacts": []
+    },
+    "planning": {
+      "requiredMetadata": ["summary", "outputArtifacts"],
+      "minSummaryLength": 20,
+      "requiredArtifacts": ["planFile"]
+    },
+    "research": {
+      "requiredMetadata": ["summary", "outputArtifacts"],
+      "minSummaryLength": 20,
+      "requiredArtifacts": ["reportFile"]
+    },
+    "documentation": {
+      "requiredMetadata": ["summary", "filesModified"],
+      "minSummaryLength": 15,
+      "requiredArtifacts": []
+    },
+    "testing": {
+      "requiredMetadata": ["summary", "testsPassed", "testsFailed"],
+      "minSummaryLength": 15,
+      "requiredArtifacts": []
+    },
+    "security-review": {
+      "requiredMetadata": ["summary", "findingsCount", "criticalCount"],
+      "minSummaryLength": 30,
+      "requiredArtifacts": ["reportFile"]
+    }
+  }
+}

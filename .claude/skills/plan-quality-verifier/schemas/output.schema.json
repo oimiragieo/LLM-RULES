@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "PlanQualityVerifier Output",
+  "description": "Result of plan quality verification across 8 dimensions",
+  "type": "object",
+  "required": ["pass", "score", "dimensions"],
+  "properties": {
+    "pass": {
+      "type": "boolean",
+      "description": "True when overall score >= 60 (default threshold)"
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall quality score 0-100 (average of dimension scores * 10)"
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "description": "Per-dimension scores",
+      "items": {
+        "type": "object",
+        "required": ["name", "score"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "requirement-coverage",
+              "task-completeness",
+              "dependency-validity",
+              "scope-sanity",
+              "artifact-wiring",
+              "risk-assessment",
+              "testability",
+              "estimation-quality"
+            ]
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10,
+            "description": "Dimension score 0-10"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
