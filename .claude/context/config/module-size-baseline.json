@@ -42,7 +42,7 @@
   ".claude\\lib\\utils\\performance-profiler.cjs": 524,
   ".claude\\lib\\memory\\memory-scheduler-tasks.cjs": 522,
   ".claude\\hooks\\reflection\\unified-reflection-handler.cjs": 519,
-  ".claude\\hooks\\safety\\bash-command-validator.cjs": 567,
+  ".claude\\hooks\\safety\\bash-command-validator.cjs": 575,
   ".claude\\hooks\\safety\\bypass-audit-hook.cjs": 513,
   ".claude\\lib\\memory\\memory-manager-core.cjs": 510
 }

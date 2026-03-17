@@ -317,6 +317,13 @@ test('detectWorktreeMutation blocks git worktree prune', () => {
   assertTrue(Boolean(reason), 'Should block git worktree prune');
 });
 
+test('detectWorktreeMutation ALLOWS Claude Code native teardown payload', () => {
+  const payload =
+    'cd "C:/dev/projects/agent-studio" && git worktree remove .claude/worktrees/agent-ab5819ef --force 2>&1 || true && git worktree prune && git status -s && echo "-…"';
+  const reason = detectWorktreeMutation(payload);
+  assertFalse(Boolean(reason), 'Should ALLOW Claude Code native teardown payload');
+});
+
 test('detectWorktreeMutation blocks chained git worktree commands bypassing early exits', () => {
   const reason = detectWorktreeMutation(
     'git worktree remove .claude/worktrees/agent-aa5c8f72 --force 2>&1 || echo "skip"; git worktree prune'

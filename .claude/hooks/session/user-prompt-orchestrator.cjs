@@ -137,7 +137,28 @@ function main() {
 
     // Child process execution failure (not hook block) -> fail-open.
     if (result.error) {
-      stderrLog(`child execution failed for ${hookPath}: ${result.error.message}`);
+      const errMsg = result.error.message || '';
+      stderrLog(`child execution failed for ${hookPath}: ${errMsg}`);
+
+      // AUTO-RECOVERY: If the upstream Claude Code binary caches a stale absolute path
+      // because a worktree was deleted mid-session, all subsequent hooks will throw
+      // MODULE_NOT_FOUND. We MUST trap this and force the agent to /clear.
+      if (errMsg.includes('MODULE_NOT_FOUND') && errMsg.includes('.claude')) {
+        try {
+          const reminderPath = path.join(
+            PROJECT_ROOT,
+            '.claude',
+            'context',
+            'runtime',
+            'reflection-reminder.txt'
+          );
+          const recoveryPayload = `[CRITICAL SYSTEM FAULT] Your current working directory (CWD) was corrupted or deleted (likely a stale worktree). The Claude Code runtime has permanently cached broken absolute paths, causing all hooks to throw MODULE_NOT_FOUND. You MUST immediately execute the \`/clear\` command to reset your session context and restore a healthy CWD.\n`;
+          fs.writeFileSync(reminderPath, recoveryPayload, 'utf8');
+          stderrLog('Auto-recovery triggered: injected CWD corruption reset payload');
+        } catch (recoverErr) {
+          stderrLog(`Auto-recovery write failed: ${recoverErr.message}`);
+        }
+      }
       continue;
     }
 
