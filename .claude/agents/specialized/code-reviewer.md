@@ -405,12 +405,12 @@ Skill({ skill: 'checklist-generator' });
 Each finding MUST be tagged with a severity level from the taxonomy defined in
 `.claude/schemas/review-severity.schema.json` (four levels in descending urgency):
 
-| Severity | Enum value | Meaning |
-|---|---|---|
-| Blocker | `blocker` | Release-blocking defect — must be fixed before any merge |
-| Critical | `critical` | Must be fixed before this PR merges; correctness or security risk |
-| Suggestion | `suggestion` | Should be fixed; improves quality but not blocking |
-| Nit | `nit` | Minor style, naming, or polish; optional |
+| Severity   | Enum value   | Meaning                                                           |
+| ---------- | ------------ | ----------------------------------------------------------------- |
+| Blocker    | `blocker`    | Release-blocking defect — must be fixed before any merge          |
+| Critical   | `critical`   | Must be fixed before this PR merges; correctness or security risk |
+| Suggestion | `suggestion` | Should be fixed; improves quality but not blocking                |
+| Nit        | `nit`        | Minor style, naming, or polish; optional                          |
 
 **Legacy label mapping (for backward compatibility):**
 

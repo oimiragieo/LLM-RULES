@@ -14,11 +14,11 @@ Brief description of what was tested and the outcome.
 
 ## Criteria Verification
 
-| # | Criterion | Status | Evidence |
-|---|-----------|--------|----------|
-| 1 | {{criterion}} | {{PASS/FAIL}} | {{evidence}} |
-| 2 | {{criterion}} | {{PASS/FAIL}} | {{evidence}} |
-| 3 | {{criterion}} | {{PASS/FAIL}} | {{evidence}} |
+| #   | Criterion     | Status        | Evidence     |
+| --- | ------------- | ------------- | ------------ |
+| 1   | {{criterion}} | {{PASS/FAIL}} | {{evidence}} |
+| 2   | {{criterion}} | {{PASS/FAIL}} | {{evidence}} |
+| 3   | {{criterion}} | {{PASS/FAIL}} | {{evidence}} |
 
 ---
 

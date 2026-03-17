@@ -5,10 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 
-const SCHEMA_PATH = path.resolve(
-  __dirname,
-  '../../.claude/schemas/failure-taxonomy.schema.json'
-);
+const SCHEMA_PATH = path.resolve(__dirname, '../../.claude/schemas/failure-taxonomy.schema.json');
 
 describe('F1: 10-Category Failure Taxonomy Schema', () => {
   it('schema file should exist', () => {

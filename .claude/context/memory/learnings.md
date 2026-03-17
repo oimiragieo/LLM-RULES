@@ -349,3 +349,5 @@ All 8 loops registered and verified. Heartbeat ecosystem is active for this sess
 - GSD uses XML-structured plans, 3-level artifact verification, wave execution, autonomous mode with gap closure cycle
 
 - Refreshed agent: .claude/agents/specialized/code-reviewer.md (2026-03-17)
+
+- Refreshed agent: .claude/agents/core/reflection-agent.md (2026-03-17)

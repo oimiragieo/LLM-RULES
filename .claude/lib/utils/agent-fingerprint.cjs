@@ -19,11 +19,22 @@ const crypto = require('crypto');
  * @type {Buffer}
  */
 const DNS_NAMESPACE = Buffer.from([
-  0x6b, 0xa7, 0xb8, 0x10, // time_low
-  0x9d, 0xad,             // time_mid
-  0x11, 0xd1,             // time_hi_and_version
-  0x80, 0xb4,             // clock_seq
-  0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8, // node
+  0x6b,
+  0xa7,
+  0xb8,
+  0x10, // time_low
+  0x9d,
+  0xad, // time_mid
+  0x11,
+  0xd1, // time_hi_and_version
+  0x80,
+  0xb4, // clock_seq
+  0x00,
+  0xc0,
+  0x4f,
+  0xd4,
+  0x30,
+  0xc8, // node
 ]);
 
 /**
@@ -47,11 +58,7 @@ function generateAgentFingerprint(agentId) {
   const nameBytes = Buffer.from(`agent-studio:${agentId}`, 'utf8');
 
   // SHA-1 hash of (namespace || name)
-  const hash = crypto
-    .createHash('sha1')
-    .update(DNS_NAMESPACE)
-    .update(nameBytes)
-    .digest();
+  const hash = crypto.createHash('sha1').update(DNS_NAMESPACE).update(nameBytes).digest();
 
   // Set version: nibble 13 (bits 76-79 of octet 6) = 0101 (5)
   hash[6] = (hash[6] & 0x0f) | 0x50;

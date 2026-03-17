@@ -78,7 +78,7 @@ Count total deviations logged across all task metadata `deviations[]` arrays.
 - 1–2 deviations → 85
 - 3–5 deviations → 65
 - 6–10 deviations → 40
-- >10 deviations → 10
+- > 10 deviations → 10
 
 #### D3: Test Pass Rate (weight: 25%)
 
@@ -119,12 +119,12 @@ composite = (D1 * 0.30) + (D2 * 0.20) + (D3 * 0.25) + (D4 * 0.10) + (D5 * 0.15)
 
 ### Step 4: Determine Verdict
 
-| Composite Score | Verdict            |
-|-----------------|--------------------|
-| > 90            | EXCELLENT          |
-| > 75            | GOOD               |
-| > 60            | ACCEPTABLE         |
-| ≤ 60            | NEEDS_IMPROVEMENT  |
+| Composite Score | Verdict           |
+| --------------- | ----------------- |
+| > 90            | EXCELLENT         |
+| > 75            | GOOD              |
+| > 60            | ACCEPTABLE        |
+| ≤ 60            | NEEDS_IMPROVEMENT |
 
 ### Step 5: Generate Recommendations
 
@@ -144,6 +144,7 @@ Write the structured evaluation to `.claude/context/reports/backend/pipeline-eva
 
 ```markdown
 <!-- Agent: pipeline-evaluator | Task: #{taskId} | Session: {date} -->
+
 # Pipeline Evaluation: {pipelineId}
 
 **Evaluated At**: {ISO timestamp}
@@ -152,13 +153,13 @@ Write the structured evaluation to `.claude/context/reports/backend/pipeline-eva
 
 ## Dimension Scores
 
-| Dimension            | Score | Weight | Weighted |
-|----------------------|-------|--------|---------|
-| Task Completion Rate | {D1}  | 30%    | {D1*0.3} |
-| Deviation Count      | {D2}  | 20%    | {D2*0.2} |
-| Test Pass Rate       | {D3}  | 25%    | {D3*0.25} |
-| Time Efficiency      | {D4}  | 10%    | {D4*0.1} |
-| Quality Score        | {D5}  | 15%    | {D5*0.15} |
+| Dimension            | Score | Weight | Weighted   |
+| -------------------- | ----- | ------ | ---------- |
+| Task Completion Rate | {D1}  | 30%    | {D1\*0.3}  |
+| Deviation Count      | {D2}  | 20%    | {D2\*0.2}  |
+| Test Pass Rate       | {D3}  | 25%    | {D3\*0.25} |
+| Time Efficiency      | {D4}  | 10%    | {D4\*0.1}  |
+| Quality Score        | {D5}  | 15%    | {D5\*0.15} |
 
 ## Recommendations
 
@@ -172,7 +173,7 @@ Also write the machine-readable JSON to `.claude/context/reports/backend/pipelin
 ## Scoring Reference
 
 | Verdict           | Composite | Meaning                              |
-|-------------------|-----------|--------------------------------------|
+| ----------------- | --------- | ------------------------------------ |
 | EXCELLENT         | > 90      | Pipeline executed near-perfectly     |
 | GOOD              | > 75      | Minor issues; no systemic problems   |
 | ACCEPTABLE        | > 60      | Notable gaps but goals met           |

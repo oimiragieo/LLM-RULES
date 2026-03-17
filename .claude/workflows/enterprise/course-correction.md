@@ -142,6 +142,7 @@ All course corrections MUST produce a valid `sprint-change-proposal.schema.json`
 Schema location: `.claude/schemas/sprint-change-proposal.schema.json`
 
 **Minimum required fields:**
+
 - `reason` — human-readable description of why correction is needed
 - `impact` — structured impact object with `tasksAffected` and `riskLevel`
 - `proposedChanges` — array of change objects with `action`, `target`, `rationale`

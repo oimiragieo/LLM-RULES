@@ -51,7 +51,11 @@ describe('Course Correction Workflow', () => {
     assert.ok(fs.existsSync(schemaPath), `Schema file not found at ${schemaPath}`);
     const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 
-    assert.equal(schema.$schema, 'http://json-schema.org/draft-07/schema#', 'Schema must use draft-07');
+    assert.equal(
+      schema.$schema,
+      'http://json-schema.org/draft-07/schema#',
+      'Schema must use draft-07'
+    );
     assert.ok(schema.required, 'Schema must have required fields');
     assert.ok(schema.required.includes('reason'), 'Schema must require "reason"');
     assert.ok(schema.required.includes('impact'), 'Schema must require "impact"');
@@ -75,10 +79,7 @@ describe('Course Correction Workflow', () => {
 
     assert.ok(props.proposedChanges, 'Schema must have "proposedChanges" property');
     assert.equal(props.proposedChanges.type, 'array', '"proposedChanges" must be an array');
-    assert.ok(
-      props.proposedChanges.items,
-      '"proposedChanges" must have items definition'
-    );
+    assert.ok(props.proposedChanges.items, '"proposedChanges" must have items definition');
     const changeItem = props.proposedChanges.items;
     assert.ok(changeItem.properties, '"proposedChanges" items must have properties');
     assert.ok(changeItem.properties.action, '"proposedChanges[].action" must exist');

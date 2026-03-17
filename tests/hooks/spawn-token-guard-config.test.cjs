@@ -38,12 +38,20 @@ function makeTaskInput(promptLength) {
 describe('D8: Configurable Context Thresholds', () => {
   beforeEach(() => {
     // Clean up reminder if it exists
-    try { fs.unlinkSync(REMINDER_PATH); } catch (_) { /* ignore */ }
+    try {
+      fs.unlinkSync(REMINDER_PATH);
+    } catch (_) {
+      /* ignore */
+    }
   });
 
   afterEach(() => {
     // Restore state
-    try { fs.unlinkSync(REMINDER_PATH); } catch (_) { /* ignore */ }
+    try {
+      fs.unlinkSync(REMINDER_PATH);
+    } catch (_) {
+      /* ignore */
+    }
   });
 
   it('should use default 80K warn threshold when env var is not set', () => {

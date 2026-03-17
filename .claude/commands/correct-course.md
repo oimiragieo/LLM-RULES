@@ -9,6 +9,7 @@ Invoke this command when the current sprint or plan requires correction due to b
 **Usage:** `/correct-course <reason for course correction>`
 
 **Arguments:**
+
 - `$ARGUMENTS` — A brief description of why course correction is needed (e.g., "critical API dependency changed", "scope expanded by 40%", "blocker discovered in auth module")
 
 ## What This Does

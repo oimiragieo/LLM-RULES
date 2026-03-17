@@ -99,9 +99,9 @@ TaskUpdate({
   status: 'completed',
   metadata: {
     summary: 'UAT complete: PASS/FAIL — N/M criteria satisfied',
-    reportPath: '.claude/context/reports/backend/uat-{feature}-{YYYY-MM-DD}.md'
-  }
-})
+    reportPath: '.claude/context/reports/backend/uat-{feature}-{YYYY-MM-DD}.md',
+  },
+});
 ```
 
 ---

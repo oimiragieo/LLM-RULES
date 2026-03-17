@@ -98,15 +98,7 @@ describe('filterPreservingAnomalies', () => {
   });
 
   it('preserves anomaly lines when trimming', () => {
-    const lines = [
-      'line1',
-      'line2',
-      'FATAL: crash',
-      'line3',
-      'line4',
-      'ERROR: oops',
-      'line5',
-    ];
+    const lines = ['line1', 'line2', 'FATAL: crash', 'line3', 'line4', 'ERROR: oops', 'line5'];
     // maxLines=3 → 2 anomaly lines + 1 normal (most recent)
     const result = filterPreservingAnomalies(lines, 3);
     assert.ok(result.includes('FATAL: crash'), 'FATAL line must be preserved');
@@ -115,14 +107,7 @@ describe('filterPreservingAnomalies', () => {
   });
 
   it('preserves original order of kept lines', () => {
-    const lines = [
-      'normal1',
-      'ERROR: first',
-      'normal2',
-      'normal3',
-      'FATAL: second',
-      'normal4',
-    ];
+    const lines = ['normal1', 'ERROR: first', 'normal2', 'normal3', 'FATAL: second', 'normal4'];
     const result = filterPreservingAnomalies(lines, 4);
     // Both anomaly lines kept; 2 normal slots → last 2 normals = normal3, normal4
     const errorIdx = result.indexOf('ERROR: first');

@@ -5,10 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 
-const SCHEMA_PATH = path.resolve(
-  __dirname,
-  '../../.claude/schemas/review-severity.schema.json'
-);
+const SCHEMA_PATH = path.resolve(__dirname, '../../.claude/schemas/review-severity.schema.json');
 
 describe('C4: Review Severity Schema', () => {
   it('schema file should exist', () => {
@@ -69,7 +66,10 @@ describe('C4: Review Severity Schema', () => {
 
   it('severity levels should be in expected order (blocker, critical, suggestion, nit)', () => {
     const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf-8'));
-    assert.deepEqual(schema.enum, ['blocker', 'critical', 'suggestion', 'nit'],
-      'Severity levels must be in canonical order');
+    assert.deepEqual(
+      schema.enum,
+      ['blocker', 'critical', 'suggestion', 'nit'],
+      'Severity levels must be in canonical order'
+    );
   });
 });

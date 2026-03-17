@@ -3,9 +3,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const {
-  parseSkillFrontmatter,
-} = require('../../.claude/lib/utils/skill-frontmatter-parser.cjs');
+const { parseSkillFrontmatter } = require('../../.claude/lib/utils/skill-frontmatter-parser.cjs');
 
 describe('parseSkillFrontmatter', () => {
   describe('basic frontmatter parsing', () => {
@@ -26,11 +24,7 @@ describe('parseSkillFrontmatter', () => {
     });
 
     it('parses quoted string values', () => {
-      const content = [
-        '---',
-        'description: "A skill with spaces and: colons"',
-        '---',
-      ].join('\n');
+      const content = ['---', 'description: "A skill with spaces and: colons"', '---'].join('\n');
 
       const result = parseSkillFrontmatter(content);
       assert.ok(result !== null);
@@ -38,13 +32,9 @@ describe('parseSkillFrontmatter', () => {
     });
 
     it('parses multiple scalar fields', () => {
-      const content = [
-        '---',
-        'name: my-skill',
-        'version: 1.2.3',
-        'author: developer',
-        '---',
-      ].join('\n');
+      const content = ['---', 'name: my-skill', 'version: 1.2.3', 'author: developer', '---'].join(
+        '\n'
+      );
 
       const result = parseSkillFrontmatter(content);
       assert.equal(result.name, 'my-skill');
@@ -102,14 +92,7 @@ describe('parseSkillFrontmatter', () => {
 
   describe('block list values', () => {
     it('parses block list (- items)', () => {
-      const content = [
-        '---',
-        'tags:',
-        '  - tdd',
-        '  - testing',
-        '  - quality',
-        '---',
-      ].join('\n');
+      const content = ['---', 'tags:', '  - tdd', '  - testing', '  - quality', '---'].join('\n');
 
       const result = parseSkillFrontmatter(content);
       assert.deepEqual(result.tags, ['tdd', 'testing', 'quality']);
@@ -149,12 +132,7 @@ describe('parseSkillFrontmatter', () => {
     });
 
     it('handles frontmatter with comments', () => {
-      const content = [
-        '---',
-        '# This is a comment',
-        'description: My skill',
-        '---',
-      ].join('\n');
+      const content = ['---', '# This is a comment', 'description: My skill', '---'].join('\n');
 
       const result = parseSkillFrontmatter(content);
       assert.equal(result.description, 'My skill');

@@ -1,28 +1,3 @@
-## ADR-123: Framework Upgrade Plan — Pre-Implementation Audit Reclassification (2026-03-17)
-
-The 16-feature framework upgrade plan (synthesis of GSD, BMAD, crewAI research) was audited against the actual codebase before implementation. Key findings:
-
-- **3 features reclassified from NEW to UPGRADE/WIRE**: F-002 (Analysis Paralysis Guard — already exists with per-tier thresholds), F-003 (Task Output Guardrails — hooks exist, missing contracts file), F-004 (Adversarial Review — skeleton skill exists)
-- **1 feature SKIP**: F-006 (Project Context Injection — fully implemented in `prompt-assembler-context.cjs` + `project-context.md`)
-- **2 features promoted to P0**: F-005 (STATE.md — per Gemini consensus), F-007 (Deviation Rules — zero risk, zero code)
-- **Wave 1 order**: F-007 (trivial) → F-005 (low) → F-003 (wire) → F-001 Lite (medium)
-- **Gemini mitigations accepted**: "Investigative Mode" for F-002, "Certified Clean" override for F-004
-- **GO verdict**: Both Gemini (8.5/10) and Codex confirmed direction; plan approved for TDD implementation
-
-Full plan: `.claude/context/plans/framework-upgrade-plan-2026-03-17.md`
-
----
-
-## ADR-121: Heartbeat Tick Delegation Pattern (2026-03-15)
-
-All heartbeat cron tick prompts delegate to heartbeat-orchestrator via Task() instead of running bash scripts inline in the router session. Inline execution flooded the router context. The orchestrator has a "Tick Callback Handling" section for task_id starting with 'hb-'.
-
-## ADR-122: Session Ping TTL = 40 Minutes (2026-03-15)
-
-The heartbeat session ping TTL was changed from 15 min to 40 min. Multi-LLM review (Gemini + GPT-5.4) determined: 40min = 2.5× the 30min drain loop interval, providing a 10-min safety margin without creating a long ghost-loop window after terminal close.
-
----
-
 ## ADR-2026-03-15-070: MEGA EVOLUTION v2 — Augmentation-First Strategy for Ecosystem Expansion (2026-03-15)
 
 **Status:** Accepted & Implemented (commit b8c79f14)
@@ -163,36 +138,6 @@ node scripts/index-rules.cjs 2>/dev/null; cat .claude/config/rule-index.json | n
 
 ---
 
-## ADR-2026-02-22-044: Batch 33 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** python-backend-expert, qa-workflow, qwik-expert
-
-**Changes applied:**
-
-- `python-backend-expert` (v1.1.0, updated lastVerifiedAt to 2026-02-22): Added 5 Iron Laws (always lifespan context, never session.query in SA2.0+, always parameterized queries, never blocking I/O in async, always Pydantic v2 boundary validation), added Anti-Patterns table (5 rows). ADR+evolution state added.
-- `qa-workflow` (v1.0.0→v1.1.0): Updated lastVerifiedAt, replaced single prose Iron Law code block with proper 5 Iron Laws section (never approve without all criteria, always exact file/line in reports, never sign off with failing tests, always full regression suite, never exceed 5 loop iterations), added Anti-Patterns table (5 rows).
-- `qwik-expert` (v1.0.0→v1.1.0): Added verified=true, lastVerifiedAt, added 5 Iron Laws (always $ suffix, never browser APIs in body, always useSignal/useStore, never top-level large imports, always functional components), added Anti-Patterns table (5 rows).
-
----
-
-## ADR-2026-02-22-045: Batch 34 Skill-Updater Sweep
-
-**Date:** 2026-02-22
-**Status:** Accepted
-
-**Skills updated:** react-expert, readme, receiving-code-review
-
-**Changes applied:**
-
-- `react-expert` (v1.1.0, updated lastVerifiedAt): Fixed Check 8 false positives — renamed TodoList/todos to ItemList/items to avoid case-insensitive 'todo' match; replaced `{{Name}}` template placeholders with concrete example names (Button, ContactForm, UserProfile, UserData). Added 5 Iron Laws (always functional components, never violate Rules of Hooks, always push state down, never side effects in render, always small client components), added Anti-Patterns table (5 rows).
-- `readme` (v1.0.0→v1.1.0): Set verified=true, updated lastVerifiedAt, added 5 Iron Laws (always lead with value, never Quick Start >10 lines, always working examples, never let README go stale, always test links), added Anti-Patterns table (5 rows). Existing Anti-Patterns table retained.
-- `receiving-code-review` (v1.0.0→v1.1.0): Added verified=true, lastVerifiedAt, added 5 Iron Laws (never implement without verification, always clarify before implementing, never performative agreement, always one-at-a-time testing, never implement unused features), added Anti-Patterns table (5 rows).
-
----
-
 ## ADR-2026-02-22-046: Batch 35 Skill-Updater Sweep
 
 **Date:** 2026-02-22
@@ -265,14 +210,3 @@ All three now pass 8/0/3 validation.
 **Decision:** task-manager (haiku model) spawned in drain gate Step 2.5 when: stale-tasks.json has unclosed entries, TaskList shows in_progress tasks after all agents returned, gap-log has >3 stale entries, or user requests task audit.
 **4-file wiring pattern for new router agents:** CLAUDE.md + @AGENT_ROUTING_TABLE.md + routing-table-core-map.cjs + intent-keywords-data.cjs — all 4 required.
 **Consequences:** Agent registry at 101 agents. Router drain gate now 3 steps: task drain → reflection queue → task hygiene check.
-
----
-
-## ADR-2026-03-16-002: cron-decision Skill Integration Gap (2026-03-16)
-
-**Status:** OPEN — Requires Follow-up
-**Issue:** cron-decision skill created (Task 23) with skill-creator. skill-index.json updated automatically, but skill-catalog.md NOT auto-updated. No agent frontmatter wiring.
-**Decision:** skill-creator workflow does not auto-update catalog. Catalog and agent frontmatter wiring must be done as separate explicit steps after skill creation.
-**Follow-up required:** Update skill-catalog.md + wire into heartbeat-orchestrator/developer/planner/architect frontmatter.
-
----
