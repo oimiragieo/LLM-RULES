@@ -10,8 +10,18 @@ const fs = require('fs');
 const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
-const WARN_THRESHOLD = 80_000; // tokens — write compression-reminder.txt
-const BLOCK_THRESHOLD = 120_000; // tokens — block spawn
+// D8: Configurable Context Thresholds — read from env with fallback to hardcoded defaults
+const DEFAULT_WARN = 80_000;
+const DEFAULT_BLOCK = 120_000;
+
+function parseThreshold(envVal, fallback) {
+  if (!envVal) return fallback;
+  const n = parseInt(envVal, 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+const WARN_THRESHOLD = parseThreshold(process.env.CONTEXT_THRESHOLD_WARN, DEFAULT_WARN);
+const BLOCK_THRESHOLD = parseThreshold(process.env.CONTEXT_THRESHOLD_BLOCK, DEFAULT_BLOCK);
 
 const RUNTIME_DIR = path.join(__dirname, '../../context/runtime');
 const COMPRESSION_REMINDER = path.join(RUNTIME_DIR, 'compression-reminder.txt');
