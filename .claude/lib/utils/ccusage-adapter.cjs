@@ -306,15 +306,57 @@ function setExecOverride(_fn) {
   // Kept so old test teardown code (setExecOverride(null)) does not throw.
 }
 
+// ── Pricing table (per 1M tokens, USD, March 2026) ───────────────────────────
+
+/**
+ * Anthropic Claude API pricing per million tokens.
+ * Default model is 'opus' (most conservative estimate).
+ */
+const PRICING = {
+  // Claude 4.6 / 4.5 generation (verified March 2026)
+  // Cache write = 1.25x input, cache read = 0.1x input
+  opus: { input: 5.0, output: 25.0, cacheWrite: 6.25, cacheRead: 0.5 },
+  sonnet: { input: 3.0, output: 15.0, cacheWrite: 3.75, cacheRead: 0.3 },
+  haiku: { input: 1.0, output: 5.0, cacheWrite: 1.25, cacheRead: 0.1 },
+};
+
+/**
+ * Calculate costs and savings from token usage data.
+ *
+ * @param {{ inputTokens: number, outputTokens: number, cacheCreationTokens: number, cacheReadTokens: number }} totals
+ * @param {string} [model='opus'] - Pricing tier: 'opus', 'sonnet', or 'haiku'
+ * @returns {{ actualCost: number, cacheSavings: number, uncachedCost: number }}
+ */
+function calculateCost(totals, model) {
+  const tier = PRICING[model] || PRICING['opus'];
+  const m = 1_000_000; // per-million divisor
+
+  const inputCost = (totals.inputTokens / m) * tier.input;
+  const outputCost = (totals.outputTokens / m) * tier.output;
+  const cacheWriteCost = (totals.cacheCreationTokens / m) * tier.cacheWrite;
+  const cacheReadCost = (totals.cacheReadTokens / m) * tier.cacheRead;
+
+  // What cache reads WOULD have cost as fresh input
+  const cacheReadAsInput = (totals.cacheReadTokens / m) * tier.input;
+
+  const actualCost = inputCost + outputCost + cacheWriteCost + cacheReadCost;
+  const uncachedCost = inputCost + outputCost + cacheWriteCost + cacheReadAsInput;
+  const cacheSavings = cacheReadAsInput - cacheReadCost;
+
+  return { actualCost, cacheSavings, uncachedCost };
+}
+
 module.exports = {
   getSessionUsage,
   getDailyUsage,
   getTodayTotals,
+  calculateCost,
   clearCache,
   _forceExpireCache,
   setExecOverride,
   setParseOverride,
   _cwdToProjectDir,
   _yyyymmddToISO,
+  PRICING,
   CCUSAGE_VERSION,
 };

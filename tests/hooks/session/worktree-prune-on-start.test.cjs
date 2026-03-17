@@ -16,10 +16,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const HOOK = path.resolve(
-  __dirname,
-  '../../../.claude/hooks/session/worktree-prune-on-start.cjs'
-);
+const HOOK = path.resolve(__dirname, '../../../.claude/hooks/session/worktree-prune-on-start.cjs');
 
 /**
  * Helper: run the hook with stdin and optional env overrides.
@@ -56,7 +53,11 @@ test('exits 0 and allows prompt on valid stdin', () => {
   const { dir, cleanup } = makeTempRuntime();
   try {
     const result = runHook(VALID_STDIN, { WORKTREE_PRUNE_RUNTIME_DIR: dir });
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+    );
     const output = result.stdout.trim();
     if (output) {
       const parsed = JSON.parse(output);

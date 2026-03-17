@@ -16,10 +16,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const HOOK = path.resolve(
-  __dirname,
-  '../../../.claude/hooks/monitoring/hook-error-detector.cjs'
-);
+const HOOK = path.resolve(__dirname, '../../../.claude/hooks/monitoring/hook-error-detector.cjs');
 
 /**
  * Helper: run the hook with stdin and optional env overrides.
@@ -66,8 +63,8 @@ function makeWorktreeModuleNotFoundStdin() {
       output: '',
       error:
         "Error: Cannot find module '/absolute/project/.claude/worktrees/agent-abc123/some/hook.cjs'\n" +
-        "Require stack:\n- /absolute/project/.claude/worktrees/agent-abc123/some/hook.cjs\n" +
-        "    at MODULE_NOT_FOUND",
+        'Require stack:\n- /absolute/project/.claude/worktrees/agent-abc123/some/hook.cjs\n' +
+        '    at MODULE_NOT_FOUND',
     },
   });
 }
@@ -79,9 +76,7 @@ function makeNonWorktreeModuleNotFoundStdin() {
     tool_name: 'Bash',
     tool_result: {
       output: '',
-      error:
-        "Error: Cannot find module 'some-npm-package'\n" +
-        "    at MODULE_NOT_FOUND",
+      error: "Error: Cannot find module 'some-npm-package'\n" + '    at MODULE_NOT_FOUND',
     },
   });
 }
@@ -90,7 +85,11 @@ test('exits 0 on normal tool result with no errors', () => {
   const { dir, cleanup } = makeTempRuntime();
   try {
     const result = runHook(makeNormalStdin(), { HOOK_ERROR_DETECTOR_RUNTIME_DIR: dir });
-    assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`
+    );
   } finally {
     cleanup();
   }
@@ -109,7 +108,10 @@ test('detects MODULE_NOT_FOUND with worktree path and exits 0', () => {
     );
     // Should have written the gap log entry
     const gapLog = path.join(dir, 'session-gap-log.jsonl');
-    assert.ok(fs.existsSync(gapLog), 'Gap log should be written when worktree MODULE_NOT_FOUND detected');
+    assert.ok(
+      fs.existsSync(gapLog),
+      'Gap log should be written when worktree MODULE_NOT_FOUND detected'
+    );
     const lines = fs.readFileSync(gapLog, 'utf8').trim().split('\n');
     const lastEntry = JSON.parse(lines[lines.length - 1]);
     assert.equal(lastEntry.type, 'hook-error', 'Gap log entry type must be hook-error');

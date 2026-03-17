@@ -78,7 +78,10 @@ function run() {
       // Count pruned entries from verbose output
       // git worktree prune --verbose prints one line per pruned entry
       if (result && result.trim()) {
-        prunedCount = result.trim().split('\n').filter(line => line.trim().length > 0).length;
+        prunedCount = result
+          .trim()
+          .split('\n')
+          .filter(line => line.trim().length > 0).length;
       }
     } catch (gitErr) {
       // git may not be available or may fail — fail-open, continue to write flag

@@ -38,6 +38,7 @@ skills:
   - memory-search
   - multi-agent-architecture-reference
   - plan-generator
+  - plan-quality-verifier
   - recommend-evolution
   - ripgrep
   - sequential-thinking

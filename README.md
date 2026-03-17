@@ -120,6 +120,35 @@ QA agents emit structured gap reports using the verification-gap schema (`.claud
 
 Planners attach an `estimated_tokens` field to every task. Tasks projected to exceed 80K tokens are split before dispatch. This prevents agents from running into context overflow mid-task and avoids silent truncation.
 
+### Live Token Usage and Cost Tracking
+
+A `UserPromptSubmit` hook (`ccusage-statusline.cjs`) parses Claude Code's JSONL session logs on every prompt and writes a live status file to `.claude/context/runtime/ccusage-status.txt`. The router reads this file and includes token usage in pipeline summaries.
+
+The status tracks three layers of cost optimization:
+
+```
+[tokens]      57,685 today (in: 1,403 / out: 56,282) | Cost: $86.82
+[cache]       $316.97 saved | 66,701,262 reads, 7,961,389 writes
+[compression] 18 events | 596.2KB freed (~152,627 tokens) | ~$0.76 saved
+```
+
+| Line            | What it measures                                                           | Optimization layer |
+| --------------- | -------------------------------------------------------------------------- | ------------------ |
+| `[tokens]`      | Actual API spend using real pricing tables                                 | Raw cost           |
+| `[cache]`       | Savings from Anthropic's prompt caching (90% discount on repeated context) | Server-side        |
+| `[compression]` | Tokens avoided by the framework's context compression pipeline             | Client-side        |
+
+Pricing is calculated per-model using built-in rate tables (updated March 2026):
+
+| Model      | Input   | Output   | Cache Write | Cache Read |
+| ---------- | ------- | -------- | ----------- | ---------- |
+| Opus 4.6   | $5.00/M | $25.00/M | $6.25/M     | $0.50/M    |
+| Sonnet 4.6 | $3.00/M | $15.00/M | $3.75/M     | $0.30/M    |
+| Haiku 4.5  | $1.00/M | $5.00/M  | $1.25/M     | $0.10/M    |
+
+Set `CCUSAGE_MODEL=sonnet` or `CCUSAGE_MODEL=haiku` to match your model. Defaults to `opus`.
+Set `CCUSAGE_STATUSLINE=off` to disable.
+
 ### Workflow Continuation Snapshots
 
 Execution context is persisted using the workflow-snapshot schema (`.claude/schemas/workflow-snapshot.schema.json`). When a session is interrupted, the snapshot carries enough state for a new session to resume without re-running completed phases.

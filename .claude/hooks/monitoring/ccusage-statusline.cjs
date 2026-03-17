@@ -46,6 +46,22 @@ function _loadAdapter() {
   }
 }
 
+/**
+ * Lazily load compression stats. Returns null if unavailable.
+ *
+ * @returns {{ totalCompressions: number, totalBytesSaved: number, averageReduction: string, lastCompressionTime: string }|null}
+ */
+function _loadCompressionStats() {
+  try {
+    const { getCompressionStats } = require(
+      path.resolve(__dirname, '../../lib/utils/compression-trigger.cjs')
+    );
+    return getCompressionStats();
+  } catch (_err) {
+    return null;
+  }
+}
+
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
 /**
@@ -129,22 +145,59 @@ function _run() {
   if (!data) return; // no data available (ccusage disabled/not installed)
 
   // 4. Build and emit the status line
-  const { inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens, totalCost } = data;
+  const { inputTokens, outputTokens, cacheCreationTokens, cacheReadTokens } = data;
 
   const totalTokens = inputTokens + outputTokens;
   const lines = [];
 
-  // Primary usage line
+  // Calculate real costs using pricing table
+  let costs = null;
+  try {
+    const adapter = _loadAdapter();
+    if (adapter && adapter.calculateCost) {
+      costs = adapter.calculateCost(data, process.env.CCUSAGE_MODEL || 'opus');
+    }
+  } catch (_e) {
+    // fall back to no cost display
+  }
+
+  // Line 1: Token usage + real cost
+  const costStr = costs ? _fmtCost(costs.actualCost) : _fmtCost(0);
   lines.push(
-    `[ccusage] Today: ${_fmtNum(totalTokens)} tokens` +
-      ` (in: ${_fmtNum(inputTokens)}, out: ${_fmtNum(outputTokens)})` +
-      ` | ${_fmtCost(totalCost)}`
+    `[tokens] ${_fmtNum(totalTokens)} today` +
+      ` (in: ${_fmtNum(inputTokens)} / out: ${_fmtNum(outputTokens)})` +
+      ` | Cost: ${costStr}`
   );
 
-  // Cache savings line (only when cache was used)
+  // Line 2: Cache savings (only when cache was used)
   if (cacheCreationTokens > 0 || cacheReadTokens > 0) {
+    const savedStr = costs ? _fmtCost(costs.cacheSavings) : '?';
     lines.push(
-      `[ccusage] Cache: ${_fmtNum(cacheReadTokens)} read, ${_fmtNum(cacheCreationTokens)} written`
+      `[cache] ${savedStr} saved | ${_fmtNum(cacheReadTokens)} reads, ${_fmtNum(cacheCreationTokens)} writes`
+    );
+  }
+
+  // Line 3: Compression stats (only when compressions have occurred)
+  const compStats = _loadCompressionStats();
+  if (compStats && compStats.totalCompressions > 0) {
+    const kbFreed = (compStats.totalBytesSaved / 1024).toFixed(1);
+    // Estimate tokens avoided: ~4 chars per token
+    const tokensAvoided = Math.round(compStats.totalBytesSaved / 4);
+    // Estimate cost saved (tokens that would have been input)
+    const model = process.env.CCUSAGE_MODEL || 'opus';
+    let compSaved = '';
+    try {
+      const adapter = _loadAdapter();
+      if (adapter && adapter.PRICING) {
+        const tier = adapter.PRICING[model] || adapter.PRICING['opus'];
+        const saved = (tokensAvoided / 1_000_000) * tier.input;
+        compSaved = ` | ~${_fmtCost(saved)} saved`;
+      }
+    } catch (_e) {
+      // skip cost estimate
+    }
+    lines.push(
+      `[compression] ${compStats.totalCompressions} events | ${kbFreed}KB freed (~${_fmtNum(tokensAvoided)} tokens)${compSaved}`
     );
   }
 

@@ -3,8 +3,8 @@ name: token-saver-context-compression
 description: Search-aware context compression workflow for agent-studio. Use pnpm hybrid search + token-saver compression, then persist distilled learnings via MemoryRecord.
 argument-hint: [file-or-text-and-query]
 verified: true
-lastVerifiedAt: 2026-03-16T00:00:00.000Z
-version: 1.1.0
+lastVerifiedAt: 2026-03-17T00:00:00.000Z
+version: 1.2.0
 tools: []
 ---
 
@@ -67,34 +67,33 @@ Emit MemoryRecord payloads and let framework hooks process sync/indexing.
 
 1. Retrieve candidate context (`pnpm search:code "<query>"`).
 
-### Step 0.5: Check Actual Token Usage (ccusage-adapter)
+### Step 0.5: Check Actual Token Usage + Cost (ccusage-adapter)
 
-Before compressing, query actual API token usage for today via `ccusage-adapter`. This lets you make
-data-driven compression decisions instead of relying solely on heuristic thresholds.
+Before compressing, query actual API token usage and cost for today via `ccusage-adapter`.
+This lets you make data-driven compression decisions and report accurate cost savings.
 
 ```javascript
 // Attempt to read actual token usage (graceful degradation — never blocks compression)
 let usageData = null;
+let costs = null;
 try {
   const ccusage = require('.claude/lib/utils/ccusage-adapter.cjs');
   usageData = ccusage.getTodayTotals();
+  if (usageData) {
+    costs = ccusage.calculateCost(usageData, process.env.CCUSAGE_MODEL || 'opus');
+  }
 } catch (_err) {
   // ccusage not installed or unavailable — fall back to heuristic estimation
 }
 
-if (usageData) {
-  // Log actual usage for decision-making
-  console.log('[token-saver] Actual usage today:', {
-    inputTokens: usageData.inputTokens,
-    outputTokens: usageData.outputTokens,
-    cacheCreationTokens: usageData.cacheCreationTokens,
-    cacheReadTokens: usageData.cacheReadTokens,
-    totalCost: `$${usageData.totalCost.toFixed(4)}`,
+if (usageData && costs) {
+  console.log('[token-saver] Usage today:', {
+    total: usageData.inputTokens + usageData.outputTokens,
+    cost: `$${costs.actualCost.toFixed(4)}`,
+    cacheSaved: `$${costs.cacheSavings.toFixed(4)}`,
   });
 
   // Use actual counts to decide compression aggressiveness
-  // totalTokens > 80K  → standard compression
-  // totalTokens > 120K → aggressive compression
   const totalTokens = usageData.inputTokens + usageData.outputTokens;
   if (totalTokens > 120_000) {
     console.log('[token-saver] HIGH pressure (>120K tokens) — aggressive compression mode');
@@ -112,6 +111,85 @@ if (usageData) {
 **Fallback behavior**: when `getTodayTotals()` returns `null` (ccusage not installed, timeout, or
 `CCUSAGE_DISABLED=1`), the workflow continues using existing heuristic thresholds from
 `compression-trigger.cjs`. The step never blocks compression.
+
+**Status file**: the `ccusage-statusline` hook writes a live status to
+`.claude/context/runtime/ccusage-status.txt` on every prompt. Read it for a quick human-readable
+summary without calling the adapter directly.
+
+## Pricing Table
+
+**Canonical reference** — these rates are used by `ccusage-adapter.cjs → calculateCost()`.
+When `skill-updater` refreshes this skill, it must verify these values via Exa search and
+update both this table and `PRICING` in `.claude/lib/utils/ccusage-adapter.cjs`.
+
+> Last verified: March 2026 (sources: Silicon Data, IntuitionLabs, DevTk.AI)
+
+| Model                        | Input   | Output   | Cache Write (1.25× input) | Cache Read (0.10× input) |
+| ---------------------------- | ------- | -------- | ------------------------- | ------------------------ |
+| `opus` → Claude Opus 4.6     | $5.00/M | $25.00/M | $6.25/M                   | $0.50/M                  |
+| `sonnet` → Claude Sonnet 4.6 | $3.00/M | $15.00/M | $3.75/M                   | $0.30/M                  |
+| `haiku` → Claude Haiku 4.5   | $1.00/M | $5.00/M  | $1.25/M                   | $0.10/M                  |
+
+Cache pricing rules (Anthropic standard):
+
+- **Cache write** = 1.25× base input price (25% premium to store the prefix)
+- **Cache read** = 0.10× base input price (90% discount on repeated context)
+
+Set `CCUSAGE_MODEL=sonnet` or `CCUSAGE_MODEL=haiku` to match your active model.
+Default is `opus` (conservative — highest rates, largest savings shown).
+
+### Cost Tracking Components
+
+The cost tracking pipeline consists of three files:
+
+| File                                              | Role                                                                              |
+| ------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `.claude/lib/utils/ccusage-adapter.cjs`           | Parses JSONL session logs, sums tokens, calculates cost via `PRICING` table       |
+| `.claude/hooks/monitoring/ccusage-statusline.cjs` | `UserPromptSubmit` hook — runs adapter each prompt, writes status to runtime file |
+| `.claude/context/runtime/ccusage-status.txt`      | Live status file — read by router for pipeline summaries                          |
+
+**Status output format** (three savings layers):
+
+```
+[tokens]      <N> today (in: <N> / out: <N>) | Cost: $<X>
+[cache]       $<X> saved | <N> reads, <N> writes
+[compression] <N> events | <X>KB freed (~<N> tokens) | ~$<X> saved
+```
+
+- `[tokens]` — actual API spend
+- `[cache]` — server-side savings (Anthropic prompt caching, 90% discount on cache reads)
+- `[compression]` — client-side savings (tokens this skill avoided sending entirely)
+
+## Maintenance Instructions (for skill-updater)
+
+When `skill-updater` refreshes this skill, execute this additional step **after** the standard
+research protocol:
+
+### Pricing Verification Step
+
+1. Run an Exa search to confirm current Claude API pricing:
+
+   ```javascript
+   mcp__Exa__web_search_exa({
+     query: 'Anthropic Claude API pricing per million tokens Opus Sonnet Haiku current',
+     numResults: 4,
+   });
+   ```
+
+2. Cross-reference at least **two sources** (e.g., Anthropic docs, Silicon Data, IntuitionLabs, DevTk.AI).
+
+3. Compare found rates against the **Pricing Table** above.
+
+4. If any rate has changed:
+   - Update the table in this SKILL.md
+   - Update the `PRICING` constant in `.claude/lib/utils/ccusage-adapter.cjs`
+   - Update the `Last verified` date
+   - Record the change in `.claude/context/memory/decisions.md`
+
+5. If no rates changed, update only the `Last verified` date.
+
+> **Why this matters**: stale pricing shows inflated savings ($86 showing as $258 with old Opus 4.0
+> rates). Accurate pricing is core to this skill's cost-reporting value.
 
 1. Compress using token-saver in JSON mode (`run_skill_workflow.py --output-format json`).
 2. If evidence is insufficient and fail gate is on, stop.

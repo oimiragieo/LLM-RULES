@@ -1,3 +1,18 @@
+## ADR-123: Framework Upgrade Plan — Pre-Implementation Audit Reclassification (2026-03-17)
+
+The 16-feature framework upgrade plan (synthesis of GSD, BMAD, crewAI research) was audited against the actual codebase before implementation. Key findings:
+
+- **3 features reclassified from NEW to UPGRADE/WIRE**: F-002 (Analysis Paralysis Guard — already exists with per-tier thresholds), F-003 (Task Output Guardrails — hooks exist, missing contracts file), F-004 (Adversarial Review — skeleton skill exists)
+- **1 feature SKIP**: F-006 (Project Context Injection — fully implemented in `prompt-assembler-context.cjs` + `project-context.md`)
+- **2 features promoted to P0**: F-005 (STATE.md — per Gemini consensus), F-007 (Deviation Rules — zero risk, zero code)
+- **Wave 1 order**: F-007 (trivial) → F-005 (low) → F-003 (wire) → F-001 Lite (medium)
+- **Gemini mitigations accepted**: "Investigative Mode" for F-002, "Certified Clean" override for F-004
+- **GO verdict**: Both Gemini (8.5/10) and Codex confirmed direction; plan approved for TDD implementation
+
+Full plan: `.claude/context/plans/framework-upgrade-plan-2026-03-17.md`
+
+---
+
 ## ADR-121: Heartbeat Tick Delegation Pattern (2026-03-15)
 
 All heartbeat cron tick prompts delegate to heartbeat-orchestrator via Task() instead of running bash scripts inline in the router session. Inline execution flooded the router context. The orchestrator has a "Tick Callback Handling" section for task_id starting with 'hb-'.

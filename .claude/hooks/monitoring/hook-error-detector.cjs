@@ -25,7 +25,9 @@ const path = require('path');
 const { safeParseJSON } = require('../../lib/utils/safe-json.cjs');
 
 const PROJECT_ROOT = process.cwd();
-const RUNTIME_DIR = path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
+const RUNTIME_DIR =
+  process.env.HOOK_ERROR_DETECTOR_RUNTIME_DIR ||
+  path.join(PROJECT_ROOT, '.claude', 'context', 'runtime');
 const GAP_LOG = path.join(RUNTIME_DIR, 'session-gap-log.jsonl');
 const SIGNAL_FILE = path.join(RUNTIME_DIR, 'hook-recovery-needed.txt');
 
@@ -39,8 +41,9 @@ function isWorktreeModuleError(text) {
 
 function run(input) {
   try {
-    const { data } = safeParseJSON(input, {});
+    const data = safeParseJSON(input, {});
     const errorText =
+      (data && data.tool_result && data.tool_result.error) ||
       (data && data.error) ||
       (data && data.stderr) ||
       (data && data.output && data.output.error) ||

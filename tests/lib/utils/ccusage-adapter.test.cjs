@@ -403,10 +403,7 @@ describe('ccusage-adapter', () => {
         !noComments.includes('execFileSync('),
         'should not call execFileSync in non-comment code'
       );
-      assert.ok(
-        !noComments.includes('execSync('),
-        'should not call execSync in non-comment code'
-      );
+      assert.ok(!noComments.includes('execSync('), 'should not call execSync in non-comment code');
     });
 
     // ── Test 22: setExecOverride is a safe no-op ──────────────────────────────
