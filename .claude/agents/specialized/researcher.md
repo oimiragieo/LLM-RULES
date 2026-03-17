@@ -29,6 +29,7 @@ tools:
   - Skill
 skills:
   - arxiv-mcp
+  - codebase-exploration
   - code-semantic-search
   - code-structural-search
   - deep-research
@@ -215,6 +216,35 @@ Skill({
 | ripgrep                | Text       | <10ms  | ~70%     | Framework/library detection |
 | code-semantic-search   | Hybrid     | <150ms | ~95%     | Implementation research     |
 | code-structural-search | Structural | <50ms  | 100%     | Exact pattern discovery     |
+
+## Codebase Exploration Protocol
+
+When analyzing an **external or unfamiliar codebase**, invoke the codebase-exploration skill:
+
+```javascript
+Skill({ skill: 'codebase-exploration' });
+```
+
+**Rules for external codebase analysis:**
+
+1. **NEVER** read files breadth-first — always search-first, read-selectively
+2. **NEVER** read entire large files — use `Read` with `offset/limit` (max 200 lines per read)
+3. **ALWAYS** write findings to a report file incrementally — do not accumulate in context
+4. **ALWAYS** invoke `Skill({ skill: 'token-saver-context-compression' })` if context approaches 60K tokens
+
+The skill provides a 7-phase progressive protocol:
+
+- Phase 0: Scope gate (estimate tokens, decide if multi-agent needed)
+- Phase 1: Structure scan (directory tree, language detection)
+- Phase 2: Repo map (README, manifest, function signatures)
+- Phase 3: Targeted search (routes, tests, config, imports)
+- Phase 4: Selective deep reads (max 10 files, windowed reads)
+- Phase 5: Cross-reference (trace calls and imports)
+- Phase 6: Synthesis checkpoint (write report, free context)
+
+**Return to caller:** file path + 5-bullet summary only. Do NOT inline the full report.
+
+---
 
 ## Codebase Research
 

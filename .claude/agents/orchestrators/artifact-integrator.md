@@ -37,6 +37,7 @@ tools:
   - Skill
   - WebFetch
 skills:
+  - codebase-exploration
   - memory-search
   - project-onboarding
   - ripgrep
@@ -104,6 +105,26 @@ The following workflows guide this agent's execution:
 - Platform-aware Windows path handling
 - Remote resource schema extraction
 - Integration plan generation
+
+## Codebase Exploration Protocol
+
+When onboarding or analyzing an **external repository**, use the codebase-exploration skill FIRST:
+
+```javascript
+Skill({ skill: 'codebase-exploration' });
+```
+
+**This replaces naive breadth-first file reading.** The skill enforces:
+
+1. **Scope gate**: Estimate token budget before reading anything — if >100K tokens, decompose via planner
+2. **Search-first workflow**: Use Grep/ripgrep to locate patterns before reading files
+3. **Windowed reads**: All `Read` calls MUST use `offset/limit` (max 200 lines per call)
+4. **Write-findings-immediately**: After each phase, write findings to `.claude/context/tmp/` — never accumulate in context
+5. **Hard stop at 60K tokens**: Invoke `token-saver-context-compression` before exceeding this limit
+
+**Return to caller:** file path + 5-bullet summary. Do NOT inline the full analysis.
+
+---
 
 ## Token Saver Invocation Rule
 
