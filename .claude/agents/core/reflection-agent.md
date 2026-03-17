@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-03-15T01:39:28.035Z
+lastVerifiedAt: 2026-03-17T14:55:51.190Z
 name: reflection-agent
 version: 1.1.0
 description: >-
@@ -601,6 +601,54 @@ Only `retain` items with strong evidence and expected reuse. Record rationale in
   ]
 }
 ```
+
+### Step 5.7: Closed-Loop Evolution Trigger
+
+After completing RECE scoring and writing the reflection log entry, check whether the scored agent has accumulated enough consecutive low scores to warrant autonomous evolution.
+
+#### 5.7.1 Score Check
+
+```javascript
+const {
+  getAgentScoreSummary,
+  isEvolutionEligible,
+} = require('.claude/lib/utils/reflection-score-tracker.cjs');
+const summary = getAgentScoreSummary(agentId);
+```
+
+If `summary.consecutiveLowCount >= 3`:
+
+1. Call `isEvolutionEligible(agentId)` — if `eligible: false`, log the reason to `issues.md` and skip
+2. If eligible, append to `.claude/context/runtime/reflection-spawn-request.json`:
+
+```json
+{
+  "id": "<uuid>",
+  "trigger": "low-score-evolution",
+  "timestamp": "<ISO>",
+  "priority": "medium",
+  "context": "Agent <agentId> scored below 6.0 for <consecutiveLowCount> consecutive reflections. Dimensions: <lowest dimensions>. Use agent-updater skill to improve the agent prompt.",
+  "subagent_type": "general-purpose",
+  "target_agent": "<agentId>",
+  "suggested_skill": "agent-updater"
+}
+```
+
+**Protected agents (NEVER evolve):** `router`, `planner`, `master-orchestrator`, `evolution-orchestrator`
+
+**Circuit breaker:** `isEvolutionEligible()` enforces a 24h cooldown per agent — at most one evolution request per agent per day.
+
+#### 5.7.2 Score Trend Reporting
+
+Check `summary.trend`:
+
+- `declining` → append to `.claude/context/memory/learnings.md`: `[TREND-ALERT] Agent <agentId> showing declining performance over last N reflections. Recommend review.`
+- `improving` → no action needed
+- `stable` → no action needed
+
+**Research basis:** EvoTool (arXiv:2603.04900) blame-aware mutation, SCOPE (arXiv:2512.15374) dual-stream prompt evolution, AgentEvolver (arXiv:2511.10395) self-attributing reward signals — all confirm that score-triggered, feedback-guided prompt evolution outperforms static agent definitions.
+
+---
 
 ### Step 6: Report
 
