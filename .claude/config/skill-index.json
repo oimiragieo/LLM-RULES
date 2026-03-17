@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-17T07:30:49.239Z",
+  "generatedAt": "2026-03-17T16:58:54.104Z",
   "metadata": {
-    "totalSkills": 312,
+    "totalSkills": 313,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-17T07:30:49.240Z",
+    "lastValidated": "2026-03-17T16:58:54.105Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7277,6 +7277,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "codebase-exploration": {
+      "name": "codebase-exploration",
+      "displayName": "Codebase Exploration",
+      "category": "Other",
+      "domain": "other",
+      "description": "Other - codebase-exploration",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "codebase-exploration"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "commit-security-scan": {
       "name": "commit-security-scan",
       "displayName": "Commit Security Scan",
@@ -8497,6 +8519,7 @@
         "cloudflare-workers",
         "code-graph-context",
         "codebase-cleaner",
+        "codebase-exploration",
         "commit-security-scan",
         "cron-decision",
         "cron-runner",
@@ -8915,6 +8938,7 @@
         "cloudflare-workers",
         "code-graph-context",
         "codebase-cleaner",
+        "codebase-exploration",
         "commit-security-scan",
         "cron-decision",
         "cron-runner",
@@ -9315,6 +9339,7 @@
         "cloudflare-workers",
         "code-graph-context",
         "codebase-cleaner",
+        "codebase-exploration",
         "commit-security-scan",
         "cron-decision",
         "cron-runner",
@@ -9580,6 +9605,7 @@
         "cloudflare-workers",
         "code-graph-context",
         "codebase-cleaner",
+        "codebase-exploration",
         "commit-security-scan",
         "cron-runner",
         "deep-research",
@@ -9795,6 +9821,7 @@
         "claude-api",
         "cloudflare-workers",
         "code-graph-context",
+        "codebase-exploration",
         "cron-runner",
         "design-systems",
         "doc-coauthoring",
@@ -10606,6 +10633,7 @@
         "cloudflare-workers",
         "code-graph-context",
         "codebase-cleaner",
+        "codebase-exploration",
         "commit-security-scan",
         "cron-decision",
         "cron-runner",
@@ -11919,6 +11947,7 @@
         "cloudflare-workers",
         "code-graph-context",
         "codebase-cleaner",
+        "codebase-exploration",
         "commit-security-scan",
         "cron-decision",
         "cron-runner",
