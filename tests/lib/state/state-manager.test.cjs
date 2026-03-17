@@ -52,7 +52,10 @@ describe('state-manager', () => {
       assert.ok(content.includes('## Velocity'), 'Should have Velocity section');
       assert.ok(content.includes('## Recent Decisions'), 'Should have Recent Decisions section');
       assert.ok(content.includes('## Blockers'), 'Should have Blockers section');
-      assert.ok(content.includes('## Session Continuity'), 'Should have Session Continuity section');
+      assert.ok(
+        content.includes('## Session Continuity'),
+        'Should have Session Continuity section'
+      );
     });
   });
 

@@ -61,10 +61,7 @@ describe('F-005: STATE.md Session Continuity Digest — Template', () => {
 
 describe('F-005: STATE.md Session Continuity Digest — Initial File', () => {
   test('initial STATE.md exists at .claude/context/memory/STATE.md', () => {
-    assert.ok(
-      fs.existsSync(STATE_FILE),
-      `Expected STATE.md to exist at ${STATE_FILE}`
-    );
+    assert.ok(fs.existsSync(STATE_FILE), `Expected STATE.md to exist at ${STATE_FILE}`);
   });
 
   test('STATE.md contains all 5 required sections', () => {

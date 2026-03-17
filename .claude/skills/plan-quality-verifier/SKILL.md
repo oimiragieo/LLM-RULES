@@ -7,7 +7,7 @@ invoked_by: both
 user_invocable: false
 tools: [Read, Bash]
 agents: [planner, architect, developer]
-category: "Validation & Quality"
+category: 'Validation & Quality'
 tags: [planning, validation, quality, verification, plan]
 ---
 
@@ -85,12 +85,12 @@ console.log(JSON.stringify(result, null, 2));
 
 ### Step 3: Interpret results
 
-| Result            | Action                                                                                          |
-| ----------------- | ----------------------------------------------------------------------------------------------- |
-| `pass: true`      | Proceed — hand off plan to executing agents                                                     |
-| `pass: false`     | Block — return feedback to planner with failing dimensions                                      |
-| Score 60-69       | Marginal pass — flag low-scoring dimensions for improvement in next iteration                   |
-| Score < 40        | Hard block — plan needs significant rework before re-evaluation                                 |
+| Result        | Action                                                                        |
+| ------------- | ----------------------------------------------------------------------------- |
+| `pass: true`  | Proceed — hand off plan to executing agents                                   |
+| `pass: false` | Block — return feedback to planner with failing dimensions                    |
+| Score 60-69   | Marginal pass — flag low-scoring dimensions for improvement in next iteration |
+| Score < 40    | Hard block — plan needs significant rework before re-evaluation               |
 
 ### Step 4: Report failing dimensions
 
@@ -109,16 +109,16 @@ Action required: Revise the plan and re-run verification.
 
 ## Dimension Reference
 
-| Dimension              | What it Measures                                              | Good Signals                                     |
-| ---------------------- | ------------------------------------------------------------- | ------------------------------------------------ |
-| requirement-coverage   | Are all stated requirements addressed by tasks?               | Keywords: requirement, feature, user story       |
-| task-completeness      | Do tasks have clear ownership and deliverables?               | Keywords: implement, create, update, agent       |
-| dependency-validity    | Are task dependencies explicit and cycle-free?                | Keywords: depends, blocked by, after, before     |
-| scope-sanity           | Is the plan scope realistic and bounded?                      | Phase/wave structure, bounded scope language     |
-| artifact-wiring        | Are output artifacts explicitly listed per task?              | Keywords: artifact, output, file, deliverable    |
-| risk-assessment        | Are risks identified with mitigations?                        | Keywords: risk, mitigation, fallback, contingency|
-| testability            | Are acceptance criteria and test hooks defined?               | Keywords: test, verify, acceptance, criteria     |
-| estimation-quality     | Are effort/time estimates provided?                           | Keywords: estimate, hours, days, effort, wave    |
+| Dimension            | What it Measures                                 | Good Signals                                      |
+| -------------------- | ------------------------------------------------ | ------------------------------------------------- |
+| requirement-coverage | Are all stated requirements addressed by tasks?  | Keywords: requirement, feature, user story        |
+| task-completeness    | Do tasks have clear ownership and deliverables?  | Keywords: implement, create, update, agent        |
+| dependency-validity  | Are task dependencies explicit and cycle-free?   | Keywords: depends, blocked by, after, before      |
+| scope-sanity         | Is the plan scope realistic and bounded?         | Phase/wave structure, bounded scope language      |
+| artifact-wiring      | Are output artifacts explicitly listed per task? | Keywords: artifact, output, file, deliverable     |
+| risk-assessment      | Are risks identified with mitigations?           | Keywords: risk, mitigation, fallback, contingency |
+| testability          | Are acceptance criteria and test hooks defined?  | Keywords: test, verify, acceptance, criteria      |
+| estimation-quality   | Are effort/time estimates provided?              | Keywords: estimate, hours, days, effort, wave     |
 
 ## Enforcement Hooks
 

@@ -7,10 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const HOOK = path.resolve(
-  __dirname,
-  '../../../.claude/hooks/session/analysis-paralysis-guard.cjs'
-);
+const HOOK = path.resolve(__dirname, '../../../.claude/hooks/session/analysis-paralysis-guard.cjs');
 
 /**
  * Creates a temp project dir with a pre-seeded paralysis-state.json.
@@ -59,7 +56,11 @@ test('investigative mode: executor agent does NOT warn at 6 reads when INVESTIGA
   const { tmpDir, cleanup } = createTempProject(5); // state has 5 reads; hook increments to 6
   try {
     const result = runHook(makeReadPayload(), { ANALYSIS_PARALYSIS_INVESTIGATIVE: 'true' }, tmpDir);
-    assert.equal(result.status, 0, `Hook should exit 0 (allow), got ${result.status}. stderr: ${result.stderr}`);
+    assert.equal(
+      result.status,
+      0,
+      `Hook should exit 0 (allow), got ${result.status}. stderr: ${result.stderr}`
+    );
     assert.equal(
       result.stderr || '',
       '',

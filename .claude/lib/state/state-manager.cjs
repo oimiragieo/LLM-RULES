@@ -10,10 +10,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const DEFAULT_STATE_PATH = path.resolve(
-  __dirname,
-  '../../context/memory/STATE.md'
-);
+const DEFAULT_STATE_PATH = path.resolve(__dirname, '../../context/memory/STATE.md');
 
 const MAX_DECISIONS = 5;
 
@@ -77,7 +74,10 @@ function parseState(content) {
         if (match) {
           state.blockers.push({ id: match[1], description: match[2] });
         } else {
-          state.blockers.push({ id: String(state.blockers.length + 1), description: trimmed.slice(2) });
+          state.blockers.push({
+            id: String(state.blockers.length + 1),
+            description: trimmed.slice(2),
+          });
         }
       }
     } else if (section === 'continuity') {
@@ -99,9 +99,7 @@ function serializeState(state) {
   const blockerLines = state.blockers.length
     ? state.blockers.map(b => `- [${b.id}] ${b.description}`).join('\n')
     : '_none_';
-  const decisionLines = decisions.length
-    ? decisions.map(d => `- ${d}`).join('\n')
-    : '_none_';
+  const decisionLines = decisions.length ? decisions.map(d => `- ${d}`).join('\n') : '_none_';
 
   return `# SESSION STATE
 Updated: ${updated}

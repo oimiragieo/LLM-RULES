@@ -1,6 +1,9 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
-const { verifyPlan, DIMENSIONS } = require('../../../.claude/lib/validation/plan-quality-verifier.cjs');
+const {
+  verifyPlan,
+  DIMENSIONS,
+} = require('../../../.claude/lib/validation/plan-quality-verifier.cjs');
 
 describe('plan-quality-verifier', () => {
   it('has 8 dimensions', () => {
@@ -27,7 +30,9 @@ describe('plan-quality-verifier', () => {
   });
 
   it('returns dimension details', () => {
-    const result = verifyPlan('A plan that is long enough to be valid but has minimal structure for testing purposes here.');
+    const result = verifyPlan(
+      'A plan that is long enough to be valid but has minimal structure for testing purposes here.'
+    );
     assert.ok(result.dimensions.length === 8);
     for (const dim of result.dimensions) {
       assert.ok(dim.name);

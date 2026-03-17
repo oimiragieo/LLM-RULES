@@ -17,10 +17,7 @@ const RULE_FILE = path.join(PROJECT_ROOT, '.claude', 'rules', 'deviation-protoco
 
 describe('F-007: Deviation Rules Protocol', () => {
   test('rule file exists at .claude/rules/deviation-protocol.md', () => {
-    assert.ok(
-      fs.existsSync(RULE_FILE),
-      `Expected deviation-protocol.md to exist at ${RULE_FILE}`
-    );
+    assert.ok(fs.existsSync(RULE_FILE), `Expected deviation-protocol.md to exist at ${RULE_FILE}`);
   });
 
   test('rule file contains all 4 deviation rules', () => {
