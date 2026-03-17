@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pipeline Evaluation",
+  "description": "Structured output of a pipeline-evaluator skill run",
+  "type": "object",
+  "required": ["pipelineId", "scores", "verdict"],
+  "properties": {
+    "pipelineId": {
+      "type": "string",
+      "description": "Unique identifier for the evaluated pipeline"
+    },
+    "evaluatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the evaluation was performed"
+    },
+    "taskCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of tasks in the pipeline"
+    },
+    "scores": {
+      "type": "object",
+      "description": "Per-dimension scores",
+      "required": ["taskCompletionRate", "testPassRate", "qualityScore"],
+      "properties": {
+        "taskCompletionRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of tasks that reached completed status (0-100)"
+        },
+        "deviationCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total deviations logged across all task metadata"
+        },
+        "deviationScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Inverse score derived from deviation count (100 = no deviations)"
+        },
+        "testPassRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of test assertions that passed (0-100)"
+        },
+        "timeEfficiency": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Ratio of estimated to actual duration, capped at 100"
+        },
+        "qualityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Code quality signal score based on lint/format/TODO markers (0-100)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "compositeScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Weighted composite of all dimension scores"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["EXCELLENT", "GOOD", "ACCEPTABLE", "NEEDS_IMPROVEMENT"],
+      "description": "Qualitative verdict derived from composite score"
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "Ranked list of actionable improvement recommendations",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dimensionWeights": {
+      "type": "object",
+      "description": "Weights used in composite score calculation",
+      "properties": {
+        "taskCompletionRate": { "type": "number" },
+        "deviationScore": { "type": "number" },
+        "testPassRate": { "type": "number" },
+        "timeEfficiency": { "type": "number" },
+        "qualityScore": { "type": "number" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

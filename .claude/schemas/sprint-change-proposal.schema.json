@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sprint-change-proposal.schema.json",
+  "title": "Sprint Change Proposal",
+  "description": "Structured proposal for course correction during an active sprint or development cycle.",
+  "type": "object",
+  "required": ["reason", "impact", "proposedChanges"],
+  "additionalProperties": false,
+  "properties": {
+    "trigger": {
+      "type": "string",
+      "description": "Classification of what triggered the course correction.",
+      "enum": [
+        "scope-change",
+        "blocker",
+        "velocity-drop",
+        "priority-shift",
+        "external-dependency",
+        "other"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable explanation of why the course correction is needed.",
+      "minLength": 10,
+      "maxLength": 1000
+    },
+    "impact": {
+      "type": "object",
+      "description": "Assessment of the downstream impact caused by the trigger.",
+      "required": ["tasksAffected", "riskLevel"],
+      "additionalProperties": false,
+      "properties": {
+        "tasksAffected": {
+          "type": "array",
+          "description": "List of task IDs or task names affected by this change.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        },
+        "riskLevel": {
+          "type": "string",
+          "description": "Overall risk level of proceeding with or without the correction.",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "effortDelta": {
+          "type": "number",
+          "description": "Estimated change in effort in story points or hours. Positive = more work, negative = less work.",
+          "examples": [5, -3, 0]
+        },
+        "summary": {
+          "type": "string",
+          "description": "Optional one-paragraph summary of the impact.",
+          "maxLength": 500
+        }
+      }
+    },
+    "proposedChanges": {
+      "type": "array",
+      "description": "List of specific changes to apply to the current plan.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["action", "target", "rationale"],
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "The type of change to apply to the target task or feature.",
+            "enum": ["add", "remove", "defer", "reprioritize", "rescope"]
+          },
+          "target": {
+            "type": "string",
+            "description": "Task ID or feature name being changed.",
+            "minLength": 1
+          },
+          "rationale": {
+            "type": "string",
+            "description": "One-sentence justification for this specific change.",
+            "minLength": 5,
+            "maxLength": 300
+          },
+          "deferredTo": {
+            "type": "string",
+            "description": "If action is 'defer', the target sprint or milestone.",
+            "examples": ["next-sprint", "v2.0", "backlog"]
+          },
+          "newPriority": {
+            "type": "string",
+            "description": "If action is 'reprioritize', the new priority level.",
+            "enum": ["critical", "high", "medium", "low"]
+          }
+        }
+      }
+    },
+    "approvedBy": {
+      "type": "string",
+      "description": "Identifier of the stakeholder or user who approved this change proposal.",
+      "examples": ["user", "product-owner", "tech-lead"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of when the proposal was created or approved.",
+      "format": "date-time",
+      "examples": ["2026-03-17T10:30:00Z"]
+    }
+  }
+}

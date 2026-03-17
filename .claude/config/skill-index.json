@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-03-17T07:15:35.592Z",
+  "generatedAt": "2026-03-17T07:30:49.239Z",
   "metadata": {
-    "totalSkills": 310,
+    "totalSkills": 312,
     "totalDomains": 22,
     "totalCategories": 25,
-    "lastValidated": "2026-03-17T07:15:35.593Z",
+    "lastValidated": "2026-03-17T07:30:49.240Z",
     "source": ".claude/docs/skill-catalog.md",
     "archivedIncluded": false
   },
@@ -7835,6 +7835,28 @@
       "priority": 3,
       "aliasOf": null
     },
+    "pipeline-evaluator": {
+      "name": "pipeline-evaluator",
+      "displayName": "Pipeline Evaluator",
+      "category": "Other",
+      "domain": "other",
+      "description": "Evaluates completed agent pipelines across 5 scoring dimensions and produces a composite verdict with actionable recommendations",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "pipeline-evaluator"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
     "plan-quality-verifier": {
       "name": "plan-quality-verifier",
       "displayName": "Plan Quality Verifier",
@@ -8146,6 +8168,28 @@
       "tags": [
         "other",
         "tts-generation"
+      ],
+      "priority": 3,
+      "aliasOf": null
+    },
+    "uat-verify": {
+      "name": "uat-verify",
+      "displayName": "Uat Verify",
+      "category": "Other",
+      "domain": "other",
+      "description": "Verify completed work against acceptance criteria, collect evidence, and produce a PASS/FAIL UAT report",
+      "requiredTools": [
+        "Read",
+        "Write",
+        "Edit"
+      ],
+      "agentPrimary": [
+        "developer"
+      ],
+      "agentSupporting": [],
+      "tags": [
+        "other",
+        "uat-verify"
       ],
       "priority": 3,
       "aliasOf": null
@@ -8477,6 +8521,7 @@
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
         "reddit-researcher",
@@ -8489,6 +8534,7 @@
         "telegram-polling",
         "transcription",
         "tts-generation",
+        "uat-verify",
         "user-flow-validator",
         "user-research",
         "web-artifacts-builder",
@@ -8893,6 +8939,7 @@
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
         "reddit-researcher",
@@ -8905,6 +8952,7 @@
         "telegram-polling",
         "transcription",
         "tts-generation",
+        "uat-verify",
         "user-flow-validator",
         "user-research",
         "web-artifacts-builder",
@@ -9291,6 +9339,7 @@
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
         "regulatory-compliance",
@@ -9303,6 +9352,7 @@
         "telegram-polling",
         "transcription",
         "tts-generation",
+        "uat-verify",
         "user-flow-validator",
         "user-research",
         "web-artifacts-builder",
@@ -9551,6 +9601,7 @@
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pipeline-evaluator",
         "pptx",
         "regulatory-compliance",
         "scientific-skills",
@@ -9561,6 +9612,7 @@
         "telegram-polling",
         "transcription",
         "tts-generation",
+        "uat-verify",
         "user-flow-validator",
         "user-research",
         "web-artifacts-builder",
@@ -9757,12 +9809,14 @@
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pipeline-evaluator",
         "pptx",
         "scientific-skills",
         "security-scanning",
         "seo-optimization",
         "slack-expert",
         "task-delegation",
+        "uat-verify",
         "user-research",
         "web-artifacts-builder",
         "websocket-engineer",
@@ -10575,6 +10629,7 @@
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
         "reddit-researcher",
@@ -10585,6 +10640,7 @@
         "telegram-polling",
         "transcription",
         "tts-generation",
+        "uat-verify",
         "user-flow-validator",
         "user-research",
         "web-artifacts-builder",
@@ -11886,6 +11942,7 @@
         "mcp-builder",
         "mcp-catalog",
         "ml-experiment-loop",
+        "pipeline-evaluator",
         "plan-quality-verifier",
         "pptx",
         "reddit-researcher",
@@ -11896,6 +11953,7 @@
         "telegram-polling",
         "transcription",
         "tts-generation",
+        "uat-verify",
         "user-flow-validator",
         "user-research",
         "web-artifacts-builder",
