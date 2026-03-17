@@ -93,8 +93,11 @@ function run() {
   });
   process.stdin.on('end', () => {
     try {
-      const { success, data } = safeParseJSON(inputData, {});
-      if (!success) {
+      // DR-1: Bug fix — safeParseJSON returns parsed object directly (not { success, data }).
+      // Previous code destructured { success, data } which always yielded undefined, causing
+      // early exit and making the hook a no-op.
+      const data = safeParseJSON(inputData, null);
+      if (!data || typeof data !== 'object') {
         process.exit(0);
       }
 
@@ -112,8 +115,8 @@ function run() {
       try {
         const raw = fs.readFileSync(stateFile, 'utf8');
         const parsed = safeParseJSON(raw, {});
-        if (parsed.success && parsed.data && typeof parsed.data.readCount === 'number') {
-          state = parsed.data;
+        if (parsed && typeof parsed.readCount === 'number') {
+          state = parsed;
         }
       } catch (_e) {
         // File doesn't exist yet — use defaults
@@ -131,9 +134,21 @@ function run() {
       state.lastTool = toolName;
 
       // Determine agent tier
-      const agentType = process.env.AGENT_TYPE || '';
-      const activeSkill = process.env.ACTIVE_SKILL || '';
-      const tier = getAgentTier(agentType, activeSkill);
+      // INVESTIGATIVE MODE: If ANALYSIS_PARALYSIS_INVESTIGATIVE=true|1, override all
+      // agent tier thresholds to hunter-tier values regardless of actual agent type.
+      // This allows deep code review agents to read extensively without false positives.
+      const investigativeMode =
+        process.env.ANALYSIS_PARALYSIS_INVESTIGATIVE === 'true' ||
+        process.env.ANALYSIS_PARALYSIS_INVESTIGATIVE === '1';
+
+      let tier;
+      if (investigativeMode) {
+        tier = 'hunter';
+      } else {
+        const agentType = process.env.AGENT_TYPE || '';
+        const activeSkill = process.env.ACTIVE_SKILL || '';
+        tier = getAgentTier(agentType, activeSkill);
+      }
       const thresholds = THRESHOLDS[tier] || THRESHOLDS.executor;
 
       // Emit warnings to stderr (advisory only — never block)
