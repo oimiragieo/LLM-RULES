@@ -50,6 +50,22 @@
 
 ---
 
+## P1: TaskUpdate Metadata Contract Not Enforced — Reflections 1-2 (2026-03-17)
+
+**Issue**: Tasks 1 and 2 completed without `metadata.summary` field. Reflection agent cannot score these tasks.
+
+**Pattern**: 2 tasks completed; both defaulted to fallback string ("Task X completed without summary metadata").
+
+**Root Cause**: `TaskUpdate(completed)` call did not include the `metadata` object with required fields. No enforcement mechanism blocks empty summaries.
+
+**Impact**: Reflection agent withholds scores; quality data lost; no learnings persist.
+
+**Fix**: Implement pre-completion hook (pre-completion-validation.cjs) to require non-empty `metadata.summary` before allowing TaskUpdate(completed) to succeed.
+
+**Status**: OPEN (metric-level)
+
+---
+
 ## P2: evolution-check.cjs QUEUED_ACTIONS:1 — Recurring Pattern (2026-03-16)
 
 **Issue**: `evolution-check.cjs` has reported `QUEUED_ACTIONS: 1` across 6 consecutive reflection entries in session 2026-03-16 (tasks 10, 11, 12, 13, 14, 15). The same single queued action persists across all task completions.

@@ -347,3 +347,5 @@ All 8 loops registered and verified. Heartbeat ecosystem is active for this sess
 - Report at: .claude/context/reports/backend/gsd-deep-dive-2026-03-16.md
 - Key finding: 7 P0 features to adopt (goal-backward verification, deviation rules, per-task commits, analysis paralysis guard, checkpoint types, plan must_haves, CONTEXT.md)
 - GSD uses XML-structured plans, 3-level artifact verification, wave execution, autonomous mode with gap closure cycle
+
+- Refreshed agent: .claude/agents/specialized/code-reviewer.md (2026-03-17)

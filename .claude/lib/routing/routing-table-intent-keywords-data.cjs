@@ -665,6 +665,11 @@ const INTENT_KEYWORDS = {
     'task compliance',
     'pipeline hygiene',
   ],
+  'code-reviewer': [
+    'code-reviewer',
+    'code',
+    'reviewer',
+  ],
 };
 
 // Deliberate overlaps must be explicitly tracked so new collisions are reviewed.
