@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session/worktree-prune-on-start.cjs"
+            "command": "node .claude/hooks/startup/worktree-prune-on-start.cjs"
           }
         ]
       },
