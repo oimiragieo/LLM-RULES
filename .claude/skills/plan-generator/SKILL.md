@@ -38,6 +38,22 @@ Plan Generator Skill - Creates structured, validated plans from requirements by 
 <instructions>
 <execution_process>
 
+### Step 0: Previous Task Intelligence (Cross-Task Context)
+
+Before creating a new plan, gather context from recent work to avoid duplication and build on prior decisions:
+
+1. **Recent commits**: Run `git log --oneline -5` to see what was recently shipped
+2. **Recent tasks**: Call `TaskList()` to check for completed tasks with relevant metadata
+3. **Recent decisions**: Read `.claude/context/memory/decisions.md` for architectural choices that constrain this plan
+4. **Recent issues**: Read `.claude/context/memory/issues.md` for known blockers or workarounds
+
+Use this context to:
+
+- Avoid re-implementing features that were recently shipped
+- Respect architectural decisions already made (don't contradict them without escalation)
+- Build on completed work rather than starting from scratch
+- Reference specific commit hashes or task IDs when relevant
+
 ### Step 1: Analyze Requirements
 
 Parse user requirements:
