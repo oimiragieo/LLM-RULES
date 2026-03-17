@@ -31,6 +31,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 
 ### UserPromptSubmit
 
+- `worktree-prune-on-start.cjs`: Cleans up orphaned worktrees before session initialization.
 - `reflection-queue-processor.cjs`: Processes pending reflections (headless-safe).
 - `force-step0-execution.cjs`: Ensures Step 0 is performed when needed.
 - `sanitize-debug-log.cjs`: Removes sensitive data from logs.
@@ -67,6 +68,7 @@ All hooks are Node.js scripts (`.cjs`) that receive JSON input via stdin and ret
 
 ### PostToolUse
 
+- `hook-error-detector.cjs`: Detects hook validation and execution errors.
 - `post-tool-metrics-unified.cjs`: Collects metrics, tracks errors, detects anomalies.
 - `post-task-unified.cjs`: Task completion tracking, learning extraction, trend snapshots, and worktree garbage collection.
 - `post-completion-chain.cjs`: Runs after task completion.

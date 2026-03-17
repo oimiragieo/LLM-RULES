@@ -41,6 +41,8 @@ This document provides a comprehensive mapping between enforcement hooks and age
 | `context-window-monitor.cjs`        | x      |             |          |            |              |            |
 | `worktree-preflight-check.cjs`      | x      |             |          |            |              |            |
 | `ccusage-statusline.cjs`            | x      |             |          |            |              |            |
+| `worktree-prune-on-start.cjs`       | x      |             |          |            |              |            |
+| `hook-error-detector.cjs`           | x      | x           | x        | x          | x            | x          |
 
 **Agent Archetype Definitions:**
 
