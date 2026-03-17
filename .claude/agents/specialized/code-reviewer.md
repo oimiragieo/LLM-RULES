@@ -1,6 +1,6 @@
 ---
 verified: true
-lastVerifiedAt: 2026-02-20T14:39:48.595Z
+lastVerifiedAt: 2026-03-17T13:43:43.179Z
 name: code-reviewer
 version: 1.0.0
 description: >-
@@ -402,19 +402,21 @@ Skill({ skill: 'checklist-generator' });
 
 ## Issue Categorization
 
-**Critical (Must Fix)**
+Each finding MUST be tagged with a severity level from the taxonomy defined in
+`.claude/schemas/review-severity.schema.json` (four levels in descending urgency):
 
-- Bugs, security issues, data loss risks, broken functionality
-- Spec violations that break requirements
+| Severity | Enum value | Meaning |
+|---|---|---|
+| Blocker | `blocker` | Release-blocking defect — must be fixed before any merge |
+| Critical | `critical` | Must be fixed before this PR merges; correctness or security risk |
+| Suggestion | `suggestion` | Should be fixed; improves quality but not blocking |
+| Nit | `nit` | Minor style, naming, or polish; optional |
 
-**Important (Should Fix)**
+**Legacy label mapping (for backward compatibility):**
 
-- Architecture problems, missing features, poor error handling, test gaps
-- Partial spec deviations
-
-**Minor (Nice to Have)**
-
-- Code style, optimization opportunities, documentation improvements
+- "Critical (Must Fix)" maps to `blocker` or `critical`
+- "Important (Should Fix)" maps to `suggestion`
+- "Minor (Nice to Have)" maps to `nit`
 
 **For each issue, provide:**
 

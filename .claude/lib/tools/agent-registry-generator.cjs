@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { PROJECT_ROOT } = require('../utils/project-root.cjs');
+const { generateAgentFingerprint } = require('../utils/agent-fingerprint.cjs');
 const {
   getDefaultTools,
   DOMAIN_MAPPING,
@@ -162,6 +163,7 @@ function generateCapabilityCard(
     displayName: displayName,
     category: category,
     filePath: relativePath,
+    fingerprint: generateAgentFingerprint(agentId),
     capabilities: capabilities,
     constraints: {
       maxConcurrentTasks: 5,
