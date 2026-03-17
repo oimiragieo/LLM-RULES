@@ -81,6 +81,34 @@ Agent Studio natively supports integrating with other headless LLM Code CLIs (Ge
 - Schemas: 319 `*.schema.json`
 - Commands: 263 `.claude/commands/*.md`
 
+## Framework Upgrade Initiative (Phase 1 Complete)
+
+Agent Studio's roadmap includes a structured multi-phase upgrade derived from analysing 8 external agent frameworks:
+
+| Framework                | Focus area                                     |
+| ------------------------ | ---------------------------------------------- |
+| GSD (Get Shit Done)      | Task discipline, atomic commits, deviation docs |
+| BMAD-METHOD              | Project constitution, workflow snapshots        |
+| CrewAI                   | Failure taxonomy, role-based routing            |
+| lossless-claw            | Context compression, anomaly preservation       |
+| AgentRx                  | Agent fingerprinting, structured diagnostics    |
+| agency-agents            | Review severity, code quality vocabulary        |
+| MetaClaw                 | Frontmatter parsing, skill metadata             |
+| awesome-llm-apps         | Composable utility patterns                     |
+
+The analysis produced **47 candidate features** (12 P0, 25 P1, 10 P2). Phase 1 shipped 6 features:
+
+| ID | Feature                      | Artifact                                           |
+| -- | ---------------------------- | -------------------------------------------------- |
+| D8 | Configurable context thresholds | `.env.example` + `spawn-token-guard.cjs`        |
+| F1 | 10-category failure taxonomy    | `.claude/schemas/failure-taxonomy.schema.json`  |
+| C4 | Review severity taxonomy        | `.claude/schemas/review-severity.schema.json`   |
+| G1 | Agent fingerprinting            | `.claude/lib/utils/agent-fingerprint.cjs`       |
+| D7 | Anomaly preservation            | `.claude/lib/utils/anomaly-detector.cjs`        |
+| H1 | SKILL.md frontmatter parser     | `.claude/lib/utils/skill-frontmatter-parser.cjs`|
+
+Full implementation plan: `.claude/context/plans/framework-upgrade-plan-2026-03-17.md`
+
 ## Quality Gates and Verification Patterns
 
 Agent Studio ships several features that enforce completion quality and reduce plan drift across agent pipelines.

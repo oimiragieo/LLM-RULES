@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **D8 — Configurable context thresholds**: three env vars (`CONTEXT_THRESHOLD_WARN`, `CONTEXT_THRESHOLD_BLOCK`, `CONTEXT_THRESHOLD_RED`) in `.env.example` let operators override the default 80K/120K/150K token thresholds in `spawn-token-guard.cjs` without editing source
+- **F1 — Failure taxonomy schema** (`.claude/schemas/failure-taxonomy.schema.json`): 10-category structured vocabulary for agent failures (`tool_misuse`, `task_scope_violation`, `context_overflow`, `state_corruption`, `dependency_failure`, `timeout`, `permission_denied`, `validation_failure`, `integration_failure`, `unknown`) derived from CrewAI and AgentRx analysis
+- **C4 — Review severity taxonomy schema** (`.claude/schemas/review-severity.schema.json`): four-level severity vocabulary (`blocker`, `critical`, `suggestion`, `nit`) for code review feedback; `code-reviewer` agent updated to reference this schema
+- **G1 — Agent fingerprinting utility** (`.claude/lib/utils/agent-fingerprint.cjs`): generates deterministic UUID5 fingerprints for agents using `agent_id + version` as the namespace seed, enabling stable identity across session restarts and task handoffs
+- **D7 — Anomaly preservation utility** (`.claude/lib/utils/anomaly-detector.cjs`): extracts and preserves `FATAL`, `ERROR`, and `WARNING` lines from log content before context compression so high-signal diagnostics are never lost
+- **H1 — SKILL.md frontmatter parser** (`.claude/lib/utils/skill-frontmatter-parser.cjs`): extracts `description` and `use_when` frontmatter fields from skill files, enabling skill-catalog tooling and routing heuristics to operate on structured skill metadata
+
 - Project constitution file (`.claude/context/project-context.md`) for consistent AI agent behavior across sessions (from BMAD-METHOD)
 - Analysis paralysis guard hook (`.claude/hooks/session/analysis-paralysis-guard.cjs`) with 4-tier agent-type-aware thresholds: executor (5), analyst (15), orchestrator (20), hunter (25)
 - Formal wave numbering in planner microtask DAGs with schema validation (`.claude/schemas/microtask-dag-wave.schema.json`) (from GSD)
