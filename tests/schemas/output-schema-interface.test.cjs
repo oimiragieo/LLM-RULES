@@ -9,9 +9,7 @@ const schemasDir = path.resolve(__dirname, '..', '..', '.claude', 'schemas');
 
 function loadValidator(filename) {
   const ajv = new Ajv({ allErrors: true });
-  const schema = JSON.parse(
-    fs.readFileSync(path.join(schemasDir, filename), 'utf8')
-  );
+  const schema = JSON.parse(fs.readFileSync(path.join(schemasDir, filename), 'utf8'));
   return ajv.compile(schema);
 }
 
@@ -72,10 +70,7 @@ describe('task-output.schema.json', () => {
       status: 'success',
       filesModified: [],
     });
-    assert.ok(
-      valid,
-      `Minimal output should validate: ${JSON.stringify(validate.errors)}`
-    );
+    assert.ok(valid, `Minimal output should validate: ${JSON.stringify(validate.errors)}`);
   });
 
   test('accepts all optional fields', () => {
@@ -90,10 +85,7 @@ describe('task-output.schema.json', () => {
       tokensEstimated: 50000,
       completedAt: '2026-03-18T10:00:00Z',
     });
-    assert.ok(
-      valid,
-      `Full output should validate: ${JSON.stringify(validate.errors)}`
-    );
+    assert.ok(valid, `Full output should validate: ${JSON.stringify(validate.errors)}`);
   });
 
   test('backward-compatible with current TaskUpdate metadata', () => {
@@ -137,10 +129,7 @@ describe('guardrail-result.schema.json', () => {
         { name: 'completeness', passed: true, message: 'All fields present' },
       ],
     });
-    assert.ok(
-      valid,
-      `Should validate passing result: ${JSON.stringify(validate.errors)}`
-    );
+    assert.ok(valid, `Should validate passing result: ${JSON.stringify(validate.errors)}`);
   });
 
   test('validates a failing guardrail result with retry info', () => {
@@ -158,10 +147,7 @@ describe('guardrail-result.schema.json', () => {
       circuitBreakerTripped: true,
       escalated: true,
     });
-    assert.ok(
-      valid,
-      `Should validate failing result: ${JSON.stringify(validate.errors)}`
-    );
+    assert.ok(valid, `Should validate failing result: ${JSON.stringify(validate.errors)}`);
   });
 
   test('rejects result missing passed field', () => {
@@ -245,10 +231,7 @@ describe('failure-taxonomy.schema.json', () => {
       agentType: 'developer',
       timestamp: '2026-03-18T12:00:00Z',
     });
-    assert.ok(
-      valid,
-      `Full failure entry should validate: ${JSON.stringify(validate.errors)}`
-    );
+    assert.ok(valid, `Full failure entry should validate: ${JSON.stringify(validate.errors)}`);
   });
 
   test('other category accepts free text description', () => {
