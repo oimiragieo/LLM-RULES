@@ -1,9 +1,31 @@
 ---
-paths:
-  - .claude/skills/context-compressor/**
+description: Auto-compression triggers for ALL agents. Fires when context is large.
 ---
 
 # Context Compressor Rules
+
+## MANDATORY TRIGGER (ALL AGENTS)
+
+**When ANY of these conditions are true, invoke `Skill({ skill: 'context-compressor' })` BEFORE continuing:**
+
+- You are reading files totaling >25K tokens
+- Your output would exceed 50K characters
+- You are synthesizing across 10+ search results
+- `compression-reminder.txt` exists in `.claude/context/runtime/`
+- You receive a "context pressure" or "token budget" warning from any hook
+
+**Exact commands to run (DO NOT use generic summarization):**
+
+```bash
+# Profile first
+python .claude/skills/context-compressor/scripts/profile_tokens.py --file <path> --output-format auto
+
+# Compress (pick the right mode)
+python .claude/skills/context-compressor/scripts/compress_context.py --file <path> --mode query_guided --query "<question>" --output-format auto
+
+# Full workflow with evidence check
+python .claude/skills/context-compressor/scripts/run_skill_workflow.py --file <path> --mode evidence_aware --query "<question>" --output-format auto --fail-on-insufficient-evidence
+```
 
 ## Core Principles
 
@@ -12,6 +34,7 @@ paths:
 - Maintain traceability through references
 - Test that work can continue from compressed context
 - Use structured formats for consistency
+- **ALWAYS use the Python scripts above — never fall back to generic summarization**
 
 ## Standards
 
